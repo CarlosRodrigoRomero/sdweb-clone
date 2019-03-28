@@ -1,0 +1,75 @@
+.imagen-termica-div:hover .imagen-termica-tooltip {
+    display: block;
+}
+
+.imagen-termica-div {
+    position: relative;
+    margin-bottom: 1.5rem;
+    /* overflow: hidden; */
+}
+
+.imagen-termica-tooltip {
+    display: none;
+    background: #e7e1e1e3;
+    margin-left: 28px;
+    /* padding: 5px; */
+    position: absolute;
+    z-index: 100000;
+    width: 70px;
+    height: 28px;
+    border: 1px solid grey;
+}
+
+.pc-details-derecha {
+    display: flex;
+    flex-direction: column;
+}
+
+.pc-details-derecha-item {
+    display: flex;
+    flex-direction: row;
+    margin-top: 0.6rem;
+    vertical-align: center;
+}
+
+.pc-texto {
+    display: flex;
+    justify-content: center;
+    line-height: 1rem;
+    flex-direction: column;
+}
+
+.detail-title {
+    font-weight: 800;
+    font-size: 1.5 rem;
+}
+
+.pc-details-derecha-item-tabla {
+    display: flex;
+    margin-left: 0.8rem;
+    flex-direction: column;
+    vertical-align: center;
+}
+
+.icon-success {
+    color: green;
+}
+
+.icon-error {
+    /* color: red; */
+}
+
+.icon-flag {
+    color: grey;
+}
+
+.pc-details-derecha-icon {
+    margin-right: 0.5rem;
+    font-size: 2rem;
+}
+
+.pc-detail-botones-dialog {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}

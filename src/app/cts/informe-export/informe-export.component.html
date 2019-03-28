@@ -1,0 +1,344 @@
+<div id="content" #content>
+    <div class="row">
+        <div class="col-xs-12 text-center">
+            <h1>Análisis termográfico aéreo de módulos fotovoltaicos</h1>
+            <div class="text-center">
+                <img src="../../../assets/images/portada.jpg" />
+            </div>
+
+            <h5 class="text-right">Planta solar: {{planta.nombre}} ({{planta.potencia}} MW - {{planta.tipo}})</h5>
+            <h5 class="text-right">Fecha del vuelo: {{fechaVuelo}} </h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h3>1. Introducción</h3>
+            <p>
+                Este documento contiene los resultados de la inspección termográfica realizada en la planta solar fotovoltaica de {{planta.nombre}} de {{planta.potencia}} MW ({{planta.tipo}}). </p>
+            <p>
+                La inspección ha sido realizada mediante vehículos aéreos no tripulados operados y diseñados a tal efecto por Solardrone.
+            </p>
+
+            <p>
+                Las inspecciones termográficas en instalaciones solares fotovoltaicas forman parte del mantenimiento preventivo recomendado para este tipo de instalaciones y tiene como objetivo anticiparse a aquellos problemas en los paneles que no son detectables fácilmente
+                de otra manera.
+            </p>
+
+            <p>
+                Es importante que este mantenimiento sea llevado a cabo por profesionales, ya que una termografía mal realizada durante varios años puede afectar al estado general de la planta. El equipo de Solardrone cuenta con personal formado en Termografía Infrarroja
+                Nivel 1.
+            </p>
+
+            <p>
+                Entre las ventajas de realizar termografía infrarroja de manera regular por profesionales, permite aumentar la eficiencia de la planta (performance ratio), evitar reparaciones más costosas, aumentar la vida útil de los equipos, detectar problemas relacionados
+                con distintos fabricantes de paneles, problemas de conexión entre módulos… entre una larga lista de ventajas.
+            </p>
+
+            <p>
+                Solardrone utiliza la más avanzada tecnología al servicio de la fotovoltaica con el fin de reducir al mínimo el tiempo y el coste de operación sin renunciar a la más alta calidad y fiabilidad.
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h4>1.1 Criterios de operación</h4>
+
+            <p>
+                Debido a la gran novedad que supone realizar inspecciones termográficas mediante vehículos aéreos no tripulados (en adelante ‘drone’ o ‘UAV’), aún no existe una norma específica que recomiende criterios de inspección mediante UAV. Solardrone, a partir
+                de la norma internacional para inspecciones termográficas a pie UNE-EN 62446:2011 y junto con expertos en el sector, ha conseguido adaptar esta norma a los UAV con resultados satisfactorios según los criterios que se explican a continuación.
+            </p>
+
+            <p>
+                El criterio base sobre el que se asientan todas las demás decisiones de operación mediante UAV es que se debe detectar el mismo número y tipo de punto calientes que a pie. Además deben obtenerse con la misma temperatura y fiabilidad. Para conseguir esto:
+            </p>
+
+            <ul>
+                <li>Debe poder detectar en vuelo cualquier tamaño de defecto que se detecta a pie. Con este fin, se ha establecido 5 cm2 como tamaño mínimo detectable, para así tener un GSD (ground simple distance) adecuado. Para ello se escoge la combinación
+                    pertinente de resolución de la cámara/altura de vuelo/lente de la cámara, que se detalla en la tabla 1.</li>
+
+                <li>
+                    Para obtener la misma calidad de mediciones y con la misma sensibilidad que a pie, se utiliza una cámara térmica FLIR radiométrica infrarroja (banda espectral 7.5 – 13.5 μm) con una sensibilidad de 0.05 ºC, suficiente para la detección de cualquier anomalía
+                    térmica. </li>
+            </ul>
+
+            <p>
+                Por último, para evitar la reflexión del vidrio, el ángulo que forma el drone con el panel siempre ha cumplido los requisitos dados por FLIR en su documento “Guía sobre termografía para aplicaciones en edificios y energía renovable”, tal y como detalla
+                la siguiente imagen:
+            </p>
+
+            <div class="text-center">
+                <img src="../../../assets/images/angulo_vuelo.png" alt="">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            <h4>1.2 Datos del vuelo</h4>
+
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th class="text-center" colspan="2">Vehículo aéreo no tripulado</th>
+                    </tr>
+                    <tr>
+                        <th scope="row">Modelo</th>
+                        <td>{{global.uav}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Cámara térmica</th>
+                        <td>{{global.camara_termica}}</td>
+
+                    </tr>
+                    <tr>
+                        <th class="text-center" colspan="2">Datos del vuelo</th>
+                    </tr>
+                    <tr>
+                        <th scope="row">Fecha</th>
+                        <td>{{fechaVuelo}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Horario de los vuelos</th>
+                        <td>{{informe.hora_inicio}} - {{informe.hora_fin}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Velocidad</th>
+                        <td>{{informe.velocidad}} m/s</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Altura</th>
+                        <td>{{informe.alturaVuelo}} m</td>
+                    </tr>
+                    <tr>
+                        <th class="text-center" colspan="2">Datos meteorológicos</th>
+                    </tr>
+                    <tr>
+                        <th scope="row">Irradiancia</th>
+                        <td> > {{informe.irradiancia}} W/m2 (correcta según norma UNE-EN 62446:2011)</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Temperatura</th>
+                        <td>{{informe.temperatura}} ºC</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Nubes</th>
+                        <td>0% - Despejado</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h4>1.3 Irradiancia durante el vuelo</h4>
+            <p>
+                Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de {{planta.nombre}}, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde
+                el aire, de manera que cada imagen tiene una irradiancia asociada.
+            </p>
+
+            <img src="https://via.placeholder.com/300" alt="">
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h4>1.4 Pérdida de Performance Ratio (ΔPR)</h4>
+
+            <p>
+                El coeficiente de rendimiento de sistemas fotovoltaicos o Performance Ratio es un parámetro que tuvo su origen conceptual en la norma IES 61724 (1998) para ser utilizado como indicador de calidad en la evaluación de sistemas fotovoltaicos.
+            </p>
+
+            <p>
+                Este parámetro se utiliza para medir el rendimiento de cualquier sistema fotovoltaico. En otras palabras, si queremos saber si un módulo está generando la energía que debería bastaría con conocer su PR. No podemos conocer el PR de cada módulo con una
+                termografía, pero lo que sí podemos conocer es la pérdida de PR (ΔPR) producida por anomalía térmica respecto a sus condiciones ideales. Es decir, un módulo con un punto caliente que causa una ΔPR = -1% tiene menos importancia que una
+                anomalía que causa una ΔPR = -33%, el cual está haciendo caer la producción eléctrica del módulo en un 33%.
+            </p>
+
+            <p>
+                La pérdida de PR nos indica, por tanto, lo perjudicial que es una anomalía térmica, identificando explícitamente los puntos sobre los que se debe actuar para optimizar la producción eléctrica. Es un parámetro indispensable en el diagnóstico termográfico
+                de una instalación fotovoltaica, ya que nos permite tomar decisiones en base a un dato técnico-económico objetivo.
+            </p>
+
+            <p>
+                Para poder evaluar la planta utilizaremos los siguientes dos sencillos conceptos:
+            </p>
+
+            <h5><u> Pérdidas de performance ratio (ΔPR)</u></h5>
+
+            <p>
+                Cada incidencia tiene una variación de performance ratio asociado. Por ejemplo, un diodo bypass cortocircuitado produce un 33% de pérdidas en el módulo (ΔPR=33%), mientras que un punto caliente aislado produce de media &lt 5% de pérdidas.
+            </p>
+
+            <h5><u> Módulos apagados equivalentes</u></h5>
+
+            <p>
+                El concepto “módulos apagados equivalentes” es la cantidad equivalente de módulos que no generan energía debido a las incidencias registradas en la planta. Por ejemplo, si tenemos tres módulos idénticos con un defecto en un diodo bypass cada uno, cada
+                módulo genera un 33% menos de energía. Entonces, el número de módulos apagados equivalentes es 1.
+            </p>
+
+            <p>
+                Uniendo los dos conceptos anteriores, se puede hacer una estimación “grosso modo” de la variación de PR de la planta de la siguiente manera:
+            </p>
+
+            <div class="text-center">
+                <img src="../../../assets/images/formula_mae.png" alt="">
+            </div>
+
+            <p>
+                Siendo N = Número de módulos; PR = Performance ratio; MAE = Módulos apagados equivalente calculados
+            </p>
+
+            <p>
+                Por lo tanto, sabiendo el MAE sabremos cuánto PR estamos perdiendo debido a las incidencias encontradas.
+            </p>
+            <p>
+                El objetivo será obtener un MAE bajo, lo cual nos indicará un correcto mantenimiento de la planta. Según la siguiente tabla, podemos clasificar el mantenimiento de una planta en:
+            </p>
+
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">%MAE de la planta</th>
+                        <th scope="col">Mantenimiento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">
+                            < {{global.mae[0]}}%</th>
+                                <td>Muy bueno</td>
+
+                    </tr>
+                    <tr>
+                        <th scope="row">{{global.mae[0]}}% - {{global.mae[1]}}%</th>
+                        <td>Correcto</td>
+
+                    </tr>
+                    <tr>
+                        <th scope="row">> {{global.mae[1]}}%</th>
+                        <td>Mejorable</td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h4>1.5 Clasificación de las incidencias</h4>
+
+            <p>
+                Según la norma UNE-62446:2011 de inspección termográfica de instalaciones fotovoltaicas, el dato recomendado a documentar en estas es el la diferencia de temperatura (gradiente) entre el punto caliente y la zona no afectada de la misma placa. En base
+                a este criterio y a la pérdida de PR tratada en el punto anterior, se han analizado las anomalías térmicas para clasificarlas en grave, media o leve según su importancia. El cuadro siguiente resume esta clasificación:
+            </p>
+
+
+
+            <p>
+                Son clasificados como incidencias muy graves aquellos puntos calientes cuya temperatura sea mayor que la temperatura límite del fabricante. Son incidencias graves aquellas con un gradiente de temperatura sea ≥ 40ºC o aquellos con pérdidas de PR ≥ 33%.
+                Las incidencias medias son aquellas con un gradiente de entre 20ºC y 40ºC o una pérdida de PR de entre el 10% y el 33%. Son clasificadas como incidencias leves aquellas con un gradiente menor del 20ºC o una pérdida de PR menor del 3%.
+                No son considerados defectos aquellos con un gradiente inferior a 5ºC.
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h4>1.6 Cómo localizar las incidencias</h4>
+
+            <p>
+                Todas las incidencias tienen asociada una localización GPS, cuyo margen de error es de unos pocos metros (0-2 metros). </p>
+            <p>
+                Además todos ellos tienen asociado los parámetros “sociedad”, “norte o sur”, “fila” y “columna” según el mapa habitual de la planta, suministrado por Veolia.
+            </p>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h3>2. Resumen de los resultados de la inspección termográfica</h3>
+
+            <p>
+                Los resultados de la inspección termográfica se adjunta en formato EXCEL en el archivo ‘Resultados - Inspeccion termografica {{planta.nombre}}.xlsx’. Dentro de este archivo se encuentran todas las incidencias encontradas y sus datos asociados (localización,
+                temperatura, tipo, imagen, etc.). Para poder ver las imágenes correctamente es importante que la carpeta ‘imágenes’ esté en la misma carpeta que el archivo Excel (por 7 lo que si abrimos el archivo Excel directamente desde el archivo comprimido,
+                no podremos ver las imágenes).
+            </p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h4>2.1 Clasificación de incidencias por relevancia</h4>
+            <p>
+                A continuación se detallan la cantidad de incidencias registradas según su importancia.
+            </p>
+
+            Se han registrado en total 154 incidencias, de las cuales 70 tienen relevancia ‘Leve’ y 84 tienen relevancia ‘Grave’.
+
+
+
+
+
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h4>Tipos de puntos calientes</h4>
+
+            <p-chart type="bar" [data]="dataTipos"></p-chart>
+
+            <p-chart type="doughnut" [data]="dataSeveridad"></p-chart>
+
+            <br>
+            <table>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Cantidad</th>
+                    <th>%</th>
+                </tr>
+                <tr *ngFor="let i of numTipos">
+                    <td>{{global.labels_tipos[i]}}</td>
+                    <td>{{count_tipos[i]}}</td>
+                    <td>{{count_tipos[i]/all_pcs.length*100}} %</td>
+
+
+
+                </tr>
+            </table>
+            <h4>Puntos calientes por posición</h4>
+            <table>
+                <tr *ngFor="let filas of countPosicion">
+                    <td *ngFor="let num of filas">{{num}}</td>
+
+                </tr>
+            </table>
+
+            <h4>MAE</h4>
+            El MAE de la planta es: {{mae}}
+        </div>
+    </div>
+</div>
+
+<button (click)="downloadPDF2()">Generar PDF</button>

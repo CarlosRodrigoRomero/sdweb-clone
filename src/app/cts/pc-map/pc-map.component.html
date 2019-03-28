@@ -1,0 +1,21 @@
+<!-- <div class="mat-elevation-z8"> -->
+
+
+<agm-map [latitude]="planta.latitud" [longitude]="planta.longitud" [mapTypeId]="mapType" [zoom]="zoom" [disableDefaultUI]="false">
+    <agm-circle *ngFor="let pc of filteredPcs" (circleClick)="onMapCircleClick(pc)" [latitude]="pc.gps_lat" [longitude]="pc.gps_lng" [radius]="5" [strokeOpacity]="1" [strokePosition]="0" [strokeColor]="getStrokeColor(pc.severidad)" [strokeWeight]="3" [fillOpacity]="0.3"
+        [editable]="false">
+    </agm-circle>
+</agm-map>
+
+<!-- <agm-circle [latitude]="current_gps_lat" [longitude]="current_gps_lng" [radius]="5" [fillColor]="'red'" [circleDraggable]="false" [editable]="false">
+    </agm-circle> -->
+
+<!-- <agm-marker [ngClass]="{selected_marker: selected_pc === pc}" *ngFor="let pc of filterPcsByFlight(current_flight)" [id]='pc.local_id' (markerClick)="onMapMarkerClick(pc)" [latitude]="pc.gps_lat" [longitude]="pc.gps_lng" [label]="{text: pc.local_id + '', color: pc.color}"
+        [markerDraggable]="true" (dragEnd)="onMarkerDragEnd(pc, $event)">
+
+    </agm-marker> -->
+
+
+
+
+<!-- </div> -->

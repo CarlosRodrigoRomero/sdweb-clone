@@ -1,0 +1,41 @@
+.mat-sort-header-container {
+    align-items: center;
+}
+
+.filtro-severidad {
+    display: flex;
+    flex-direction: column;
+}
+
+.circle {
+    width: 15px;
+    height: 15px;
+    align-self: center;
+    border-radius: 50%;
+}
+
+.circleSeveridad1 {
+    background: #20B2AA;
+}
+
+.circleSeveridad2 {
+    background: #FF4500;
+}
+
+.circleSeveridad3 {
+    background: #b70000;
+}
+
+.filtros-severidad {
+    display: flex;
+    flex-direction: column;
+}
+
+.filtro-severidad-text {
+    margin-left: 0.5rem;
+}
+
+.filtros-severidad-circulo-texto {
+    display: flex;
+    flex-direction: row;
+}

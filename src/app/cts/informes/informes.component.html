@@ -1,0 +1,16 @@
+<div class="row">
+    <div *ngFor="let informe of informes" class="col s6">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Informe de la planta {{informe.altura_vuelo}}</span>
+                <span class="card-content">
+                    <button routerLink="/informe-edit/{{informe.id}}" class="btn waves-effect waves-light green left">Editar informe</button>
+                    <button routerLink="/informe-view/{{informe.id}}" class="btn waves-effect waves-light blue right">Ver informe</button>
+                </span>
+
+
+            </div>
+        </div>
+
+    </div>
+</div>

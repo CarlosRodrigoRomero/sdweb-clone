@@ -1,0 +1,32 @@
+<mat-card>
+    <mat-card-content>
+        <h2> Severidad</h2>
+        <div class="filtro-severidad">
+            <mat-checkbox *ngFor="let ts of tiposSeveridad" [checked]=true (change)="onCheckBoxSeveridadChange($event)" value="{{ts}}">
+                <div class="filtros-severidad-circulo-texto">
+                    <div class="circle circleSeveridad{{ts}}"></div>
+                    <span class="filtro-severidad-text">{{labelsSeveridad[ts-1]}} </span>
+                </div>
+            </mat-checkbox>
+
+            <!-- <mat-checkbox [checked]=true (change)="onCheckBoxSeveridadChange($event)" class="example-margin" value="4">Muy grave</mat-checkbox>
+            <mat-checkbox [checked]=true (change)="onCheckBoxSeveridadChange($event)" class="example-margin" value="3">Grave</mat-checkbox>
+            <mat-checkbox [checked]=true (change)="onCheckBoxSeveridadChange($event)" class="example-margin" value="2">Medio</mat-checkbox>
+            <mat-checkbox [checked]=true (change)="onCheckBoxSeveridadChange($event)" class="example-margin" value="1">Leve</mat-checkbox>
+        -->
+        </div>
+
+        <h2> Tipo </h2>
+        <div class="filtro-severidad">
+            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="1">Célula caliente</mat-checkbox>
+            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="2">Varias células calientes</mat-checkbox>
+            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="3">Substring en CA</mat-checkbox>
+            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="4">Módulos en CA</mat-checkbox>
+            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="5">2 Substrings en CA</mat-checkbox>
+            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="6">Substring en CC</mat-checkbox>
+            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="7">Rotura de vidrio</mat-checkbox>
+
+        </div>
+
+    </mat-card-content>
+</mat-card>
