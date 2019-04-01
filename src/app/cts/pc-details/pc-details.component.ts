@@ -4,6 +4,7 @@ import 'get-image-pixels';
 import Pica from 'pica';
 import { InformeInterface } from '../../models/informe';
 import { GLOBAL } from 'src/app/services/global';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 const pica = Pica();
 
@@ -27,14 +28,19 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   public pcRecomendacion: string[];
   public pcPerdidas: string[];
 
-  constructor() { }
+  constructor(
+    private storage: AngularFireStorage,
+  ) { }
 
   ngOnInit() {
-    this.pc.downloadUrl$.subscribe( url => {
-      this.pc.downloadUrlString = url;
-    });
-    this.minTemp = this.informe.tempMin;
-    this.maxTemp = this.informe.tempMax;
+    if (!this.pc.downloadUrl$) {
+      this.pc.downloadUrl$ = this.storage.ref(`informes/${this.informe.id}/jpg/${this.pc.archivoPublico}`).getDownloadURL();
+      this.pc.downloadUrl$.subscribe( url => {
+        this.pc.downloadUrlString = url;
+      });
+    }
+    this.minTemp = this.pc.rangeMin;
+    this.maxTemp = this.pc.rangeMax;
 
     this.pcDescripcion = GLOBAL.pcDescripcion;
     this.pcCausa = GLOBAL.pcCausa;
@@ -86,7 +92,58 @@ downloadReclamacion() {
       xhr.send();
     });
  }
+ downloadJpgVisual(pc: PcInterface) {
 
+  this.storage.ref(`informes/${this.pc.informeId}/jpgVisual/${pc.archivoPublico}`).getDownloadURL()
+    .subscribe( downloadUrl => {
+    this.pc.downloadUrlStringVisual = downloadUrl;
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = 'blob';
+    xhr.onload = (event) => {
+      /* Create a new Blob object using the response
+      *  data of the onload object.
+      */
+      const blob = new Blob([xhr.response], { type: 'image/jpg' });
+      const a: any = document.createElement('a');
+      a.style = 'display: none';
+      document.body.appendChild(a);
+      const url = window.URL.createObjectURL(blob);
+      a.href = url;
+      a.download = pc.archivoPublico;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    };
+    xhr.open('GET', downloadUrl);
+    xhr.send();
+  });
+}
+
+
+downloadJpg(pc: PcInterface) {
+
+  this.storage.ref(`informes/${this.pc.informeId}/jpg/${pc.archivoPublico}`).getDownloadURL()
+    .subscribe( downloadUrl => {
+    this.pc.downloadUrlString = downloadUrl;
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = 'blob';
+    xhr.onload = (event) => {
+      /* Create a new Blob object using the response
+      *  data of the onload object.
+      */
+      const blob = new Blob([xhr.response], { type: 'image/jpg' });
+      const a: any = document.createElement('a');
+      a.style = 'display: none';
+      document.body.appendChild(a);
+      const url = window.URL.createObjectURL(blob);
+      a.href = url;
+      a.download = pc.archivoPublico;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    };
+    xhr.open('GET', downloadUrl);
+    xhr.send();
+  });
+}
   onMouseLeaveCanvas($event) {
     this.tooltipElement.style.display = 'none';
   }

@@ -2,10 +2,10 @@ import { Component, OnInit, Input, Inject } from '@angular/core';
 import { PcInterface } from 'src/app/models/pc';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DialogData } from '../pc-map/pc-map.component';
-import Pica from 'pica';
 import { GLOBAL } from 'src/app/services/global';
-const pica = Pica();
 import 'fabric';
+import { AngularFireStorage } from '@angular/fire/storage';
+import { InformeInterface } from 'src/app/models/informe';
 declare let fabric;
 
 @Component({
@@ -36,6 +36,7 @@ export class PcDetailsDialogComponent implements OnInit {
   public visualCanvas;
 
   constructor(
+    private storage: AngularFireStorage,
     public dialogRef: MatDialogRef<PcDetailsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData) {
       this.minTemp = 41;
@@ -279,7 +280,7 @@ export class PcDetailsDialogComponent implements OnInit {
   }
 
   onMouseLeaveCanvas($event) {
-    this.tooltipElement.style.display = 'none';
+    // this.tooltipElement.style.display = 'none';
   }
 
   onMouseMoveCanvas($event: MouseEvent) {
@@ -308,7 +309,8 @@ export class PcDetailsDialogComponent implements OnInit {
 
   downloadRjpg(pc: PcInterface) {
 
-    this.pc.downloadUrlRjpg$.subscribe( downloadUrl => {
+    this.storage.ref(`informes/${this.pc.informeId}/rjpg/${pc.archivoPublico}`).getDownloadURL()
+      .subscribe( downloadUrl => {
       this.pc.downloadUrlStringRjpg = downloadUrl;
       const xhr = new XMLHttpRequest();
       xhr.responseType = 'blob';
@@ -330,6 +332,59 @@ export class PcDetailsDialogComponent implements OnInit {
       xhr.send();
     });
  }
+
+ downloadJpgVisual(pc: PcInterface) {
+
+  this.storage.ref(`informes/${this.pc.informeId}/jpgVisual/${pc.archivoPublico}`).getDownloadURL()
+    .subscribe( downloadUrl => {
+    this.pc.downloadUrlStringVisual = downloadUrl;
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = 'blob';
+    xhr.onload = (event) => {
+      /* Create a new Blob object using the response
+      *  data of the onload object.
+      */
+      const blob = new Blob([xhr.response], { type: 'image/jpg' });
+      const a: any = document.createElement('a');
+      a.style = 'display: none';
+      document.body.appendChild(a);
+      const url = window.URL.createObjectURL(blob);
+      a.href = url;
+      a.download = pc.archivoPublico;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    };
+    xhr.open('GET', downloadUrl);
+    xhr.send();
+  });
+}
+
+
+downloadJpg(pc: PcInterface) {
+
+  this.storage.ref(`informes/${this.pc.informeId}/jpg/${pc.archivoPublico}`).getDownloadURL()
+    .subscribe( downloadUrl => {
+    this.pc.downloadUrlString = downloadUrl;
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = 'blob';
+    xhr.onload = (event) => {
+      /* Create a new Blob object using the response
+      *  data of the onload object.
+      */
+      const blob = new Blob([xhr.response], { type: 'image/jpg' });
+      const a: any = document.createElement('a');
+      a.style = 'display: none';
+      document.body.appendChild(a);
+      const url = window.URL.createObjectURL(blob);
+      a.href = url;
+      a.download = pc.archivoPublico;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    };
+    xhr.open('GET', downloadUrl);
+    xhr.send();
+  });
+}
 
 
  setEventListenersCanvas() {

@@ -62,20 +62,16 @@
 
                     <app-pc-details [informe]="informe" [selectedPc]="expandedElement" [pc]="element"></app-pc-details>
 
-
-
                 </div>
             </td>
         </ng-container>
 
 
 
-        <tr mat-header-row *matHeaderRowDef="columnsToDisplay "></tr>
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
         <tr mat-row *matRowDef="let element; columns: columnsToDisplay; " class="example-element-row" [class.example-expanded-row]="expandedElement=== element" (click)="onClickToggleDetail(element)">
         </tr>
         <tr mat-row *matRowDef="let row; columns: [ 'expandedDetail'] " class="example-detail-row"></tr>
-
-        <mat-paginator [pageSizeOptions]="[10,25,50,100] "></mat-paginator>
     </table>
-    <mat-paginator [pageSizeOptions]="[10,25,50,100] "></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[10,25,50,100]" showFirstLastButtons></mat-paginator>
 </div>

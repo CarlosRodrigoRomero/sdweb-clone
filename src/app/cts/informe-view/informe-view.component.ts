@@ -23,6 +23,8 @@ export class InformeViewComponent implements OnInit {
   public chartOptions: any;
   public filteredPcs: PcInterface[];
   public allPcs: PcInterface[];
+  public allPcsConSeguidores: PcInterface[];
+  public seguidores: PcInterface[];
   private informeId: string;
   public informe: InformeInterface;
   public planta: PlantaInterface;
@@ -42,7 +44,6 @@ export class InformeViewComponent implements OnInit {
     this.informeService.getInforme(this.informeId).subscribe( informe => {
       this.informe = informe;
       this.plantaService.getPlanta(informe.plantaId).subscribe( planta => {
-        console.log('getPlanta', planta);
         this.planta = planta;
         this.isLoaded1 = true;
       });
@@ -77,11 +78,19 @@ export class InformeViewComponent implements OnInit {
     let filtroSeveridad;
     this.pcService.getPcs(this.informeId).subscribe(
       response => {
-          this.allPcs = response.map( (pc, i, a) => {
-            pc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${pc.archivoPublico}`).getDownloadURL();
-            pc.downloadUrl$ = this.storage.ref(`informes/${this.informeId}/jpg/${pc.archivoPublico}`).getDownloadURL();
-            pc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/_mini_${pc.archivoPublico}`).getDownloadURL();
+          this.allPcsConSeguidores = response.map( (pc, i, a) => {
+            //  Les añadimos los observables de los archivos....
+            // pc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${pc.archivoPublico}`).getDownloadURL();
+            // pc.downloadUrl$ = this.storage.ref(`informes/${this.informeId}/jpg/${pc.archivoPublico}`).getDownloadURL();
+            // pc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/_mini_${pc.archivoPublico}`).getDownloadURL();
+
             return pc;
+          });
+          this.seguidores = this.allPcsConSeguidores.filter( (pc, i, a) => {
+            return pc.tipo === 0;
+          });
+          this.allPcs = this.allPcsConSeguidores.filter( (pc, i, a) => {
+            return pc.tipo > 0;
           });
           for (let j of this.numSeveridad) {
             filtroSeveridad = this.allPcs.filter( pc => pc.severidad === j);

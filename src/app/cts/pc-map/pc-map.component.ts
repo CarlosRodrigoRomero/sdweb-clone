@@ -8,6 +8,7 @@ import { AgmMap } from '@agm/core';
 import { GLOBAL } from 'src/app/services/global';
 import { MatDialog } from '@angular/material';
 import { PcDetailsDialogComponent } from '../pc-details-dialog/pc-details-dialog.component';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 
 export interface DialogData {
@@ -36,6 +37,7 @@ export class PcMapComponent implements OnInit {
   mapType = 'satellite';
 
   constructor(
+    private storage: AngularFireStorage,
     public dialog: MatDialog,
     private pcService: PcService,
     private route: ActivatedRoute
@@ -48,7 +50,7 @@ export class PcMapComponent implements OnInit {
   ngOnInit() {
     this.pcService.currentFilteredPcs$.subscribe(
       list => {
-        console.log('list', list, this.planta);
+        // console.log('list', list, this.planta);
         this.filteredPcs = list;
         // this.map.triggerResize();
         // this.pcDataSource.filterPredicate = (data, filter) => {
@@ -66,11 +68,19 @@ export class PcMapComponent implements OnInit {
     }
 
     onMapCircleClick(selectedPc: PcInterface): void {
+      // selectedPc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${selectedPc.archivoPublico}`).getDownloadURL();
+      if (!selectedPc.downloadUrl$) {
+        selectedPc.downloadUrl$ = this.storage.ref(`informes/${this.informeId}/jpg/${selectedPc.archivoPublico}`).getDownloadURL();
+      }
+      if (!selectedPc.downloadUrlVisual$ ) {
+        selectedPc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/_mini_${selectedPc.archivoPublico}`)
+              .getDownloadURL();
+      }
       const dialogRef = this.dialog.open(PcDetailsDialogComponent, {
         // width: '1600px',
         // height: '600px',
         hasBackdrop: true,
-        data: {pc: selectedPc, allPcs: this.allPcs, informe: this.informe }
+        data: {pc: selectedPc, allPcs: this.allPcs}
       });
 
       dialogRef.afterClosed().subscribe(result => {

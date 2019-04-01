@@ -6,7 +6,7 @@
                 <img src="../../../assets/images/portada.jpg" />
             </div>
 
-            <h5 class="text-right">Planta solar: {{planta.nombre}} ({{planta.potencia}} MW - {{planta.tipo}})</h5>
+            <h5 class="text-right">Planta solar: {{planta.nombre | async}} ({{planta.potencia}} MW - {{planta.tipo}})</h5>
             <h5 class="text-right">Fecha del vuelo: {{fechaVuelo}} </h5>
         </div>
     </div>
@@ -312,14 +312,14 @@
             <p-chart type="doughnut" [data]="dataSeveridad"></p-chart>
 
             <br>
-            <table>
+            <table *ngIf="numTipos">
                 <tr>
                     <th>Tipo</th>
                     <th>Cantidad</th>
                     <th>%</th>
                 </tr>
                 <tr *ngFor="let i of numTipos">
-                    <td>{{global.labels_tipos[i]}}</td>
+                    <td>{{global?.labels_tipos[i]}}</td>
                     <td>{{count_tipos[i]}}</td>
                     <td>{{count_tipos[i]/all_pcs.length*100}} %</td>
 
@@ -328,7 +328,7 @@
                 </tr>
             </table>
             <h4>Puntos calientes por posición</h4>
-            <table>
+            <table *ngIf="countPosicion">
                 <tr *ngFor="let filas of countPosicion">
                     <td *ngFor="let num of filas">{{num}}</td>
 

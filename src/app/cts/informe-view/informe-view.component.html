@@ -15,10 +15,10 @@
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Plantas
           </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <!-- <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="#">Planta 1</a>
                         <a class="dropdown-item" href="#">Planta 2</a>
-                    </div>
+                    </div> -->
                 </li>
                 <li class="nav-item">
                     <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Informes</a>
@@ -90,9 +90,12 @@
                             </div>
                             <div class="div-mae-1">
                                 <div class="div-mae-2">
-                                    <span class="text-light mae-porcentaje">{{informe?.mae}}</span>
+                                    <span class="text-light mae-porcentaje">{{informe?.mae | number: '1.2'}}</span>
                                 </div>
                                 <span class="text-light mae-pct-simbolo">%</span>
+                            </div>
+                            <div class="div-mae-3">
+                                <h4 class="text-center text-light">(muy bueno)</h4>
                             </div>
 
                         </div>
@@ -112,11 +115,11 @@
             <li class="nav-item">
                 <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Mapa</a>
             </li>
-            <li class="nav-item">
+            <li *ngIf="planta.tipo !== '2 ejes'" class="nav-item">
                 <a class="nav-link" id="ortophoto-tab" data-toggle="tab" href="#ortophoto" role="tab" aria-controls="ortophoto" aria-selected="false">Mapa térmico</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" target="_blank" href="https://drive.google.com/file/d/1XGquWmHQDhwqVrXbueoiRUL3zG4ORgUq/view?usp=sharing">Informe PDF</a>
+                <a class="nav-link" id="export-tab" data-toggle="tab" href="#export" role="tab" aria-controls="export" aria-selected="false">Informe PDF</a>
             </li>
             <li class="nav-item">
                 <a href="https://drive.google.com/file/d/1a4wnbwqb3H5zsGmcagZzT6ScOWi-CbFR/view?usp=sharing" target="_blank" class="nav-link">Informe EXCEL</a>
@@ -150,6 +153,7 @@
 
                         </div>
                     </div>
+
                     <div class="tab-pane fade" id="ortophoto" role="tabpanel" aria-labelledby="ortophoto-tab">
                         <div class="row">
                             <div class="col-12 text-center">
@@ -161,9 +165,8 @@
                         </div>
                     </div>
 
-                    <div class="tab-pane fade" id="informe" role="tabpanel" aria-labelledby="informe-tab">
+                    <div class="tab-pane fade" id="export" role="tabpanel" aria-labelledby="export-tab">
                         <!-- <app-informe-export [allPcs]="allPcs" [informe]="informe" [planta]="planta"></app-informe-export> -->
-                        Aasd
                     </div>
                 </div>
             </div>

@@ -56,14 +56,14 @@ export class InformeEditComponent implements OnInit {
   public rangeValue: number;
   public selected_pc: PcInterface;
   public flights_data: Object;
-  public flights_list: String[];
-  public flights_names: String[];
-  public flights_numbers: Number[];
+  public flights_list: string[];
+  public flights_names: string[];
+  public flights_numbers: number[];
   public currentFlight: string;
   private columnas: number;
   private filas: number;
-  public columnas_array: Number[];
-  public filas_array: Number[];
+  public columnas_array: number[];
+  public filas_array: number[];
   public max_temp: number;
   public min_temp: number;
   public image_width: number;
@@ -71,6 +71,7 @@ export class InformeEditComponent implements OnInit {
   public current_datetime: number;
   public manualRotation: boolean;
   private gmt_hours_diff: number;
+  public lastRef: number[];
 
   constructor(
     private route: ActivatedRoute,
@@ -97,6 +98,7 @@ export class InformeEditComponent implements OnInit {
     this.current_gps_lat = 39.453186;
     this.current_track_heading = 0;
     this.current_image_rotation = 0;
+    this.squareBase = 20;
 
     this.image_width = 640;
     this.image_height = 512;
@@ -525,12 +527,12 @@ export class InformeEditComponent implements OnInit {
   }
 
   onDblClickCanvas(event) {
-    const left = event.offsetX - this.squareWidth / 2;
-    const top = event.offsetY - this.squareHeight / 2;
+    const leftCoord = event.offsetX - this.squareWidth / 2;
+    const topCoord = event.offsetY - this.squareHeight / 2;
     this.localIdCount += 1;
     const actObj = new fabric.Rect({
-      left,
-      top,
+      left: leftCoord,
+      top: topCoord,
       fill: 'rgba(0,0,0,0)',
       stroke: 'red',
       strokeWidth: 1,
@@ -544,13 +546,13 @@ export class InformeEditComponent implements OnInit {
     });
 
     const actObjRef = new fabric.Rect({
-      left: 50,
-      top: 50,
+      left: leftCoord + this.squareWidth + 30,
+      top: topCoord,
       fill: 'rgba(0,0,0,0)',
       stroke: 'blue',
       strokeWidth: 1,
-      width: this.squareWidth / 1.5,
-      height: this.squareHeight / 1.5,
+      width: this.squareWidth,
+      height: this.squareHeight,
       hasControls: true,
       local_id: this.localIdCount,
       ref: true,
@@ -613,12 +615,11 @@ export class InformeEditComponent implements OnInit {
       this.selected_pc.color = 'black';
     }
     this.addPcToDb(newPc);
-    this.updatePcInDb(newPc, true);
-    // this.onMapMarkerClick(newPc);
+    // this.updatePcInDb(newPc, true);
+    this.onMapMarkerClick(newPc);
   }
 
   onMouseUpCanvas(event) {
-    console.log('mouseUp');
     if (this.selected_pc) {
       this.updatePcInDb(this.selected_pc, false);
     }
@@ -711,14 +712,13 @@ export class InformeEditComponent implements OnInit {
           }
 
           if ( this.planta.vertical ) { // vertical
-            this.squareWidth = 30;
+            this.squareWidth = this.squareBase;
             this.squareHeight = Math.round(this.squareWidth * 3 / 2);
           } else {  // horizontal
-            this.squareHeight = 30;
+            this.squareHeight = this.squareBase;
             this.squareWidth = Math.round(this.squareHeight * 3 / 2);
           }
 
-          this.squareBase = Math.min(this.squareWidth, this.squareHeight);
 
         },
         error => {
@@ -975,7 +975,17 @@ export class InformeEditComponent implements OnInit {
 
   updatePcInDb(pc: PcInterface, newPc: boolean = false) {
       this.pcService.updatePc(pc);
-      this.getPcsList();
+
+      // Actualizar this.allPcs
+      this.allPcs = this.allPcs.map( (element) => {
+        if (pc.id === element.id) {
+          return pc;
+        } else {
+          return element;
+        }
+      });
+
+      // this.getPcsList();
     }
 
   drawPcInCanvas(pc: PcInterface) {

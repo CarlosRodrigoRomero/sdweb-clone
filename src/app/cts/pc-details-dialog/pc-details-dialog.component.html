@@ -8,7 +8,7 @@
 <div mat-dialog-content>
 
     <div class="row">
-        <div class="col-7">
+        <div class="col-6">
 
 
             <div id="imagen-div" class="imagen-termica-div" (mouseleave)="onMouseLeaveCanvas($event)">
@@ -26,7 +26,7 @@
         </div>
 
 
-        <div class="col-5 pc-details-derecha">
+        <div class="col-6 pc-details-derecha">
 
             <div class="pc-details-derecha-item">
                 <div class="pc-details-derecha-icon">
@@ -130,13 +130,15 @@
                 </div>
                 <div class="pc-texto">
                     <span class="detail-title">Meteo: </span>
-                    <span>{{pc.irradiancia}} W/m<sup>2</sup> | {{pc.temperaturaAire}} ºC | {{pc.nubosidad}} % nubes | Epsilon: {{pc.emisividad}}</span>
+                    <span>{{pc.irradiancia}} W/m<sup>2</sup> | Viento: {{pc.viento}} | {{pc.temperaturaAire}} ºC | {{pc.nubosidad}} % nubes | Emisividad: {{pc.emisividad}} | Temp. Reflejada: {{pc.temperaturaReflejada}} ºC</span>
                 </div>
             </div>
 
             <div style="justify-content: space-between" class="pc-details-derecha-item">
-                <button (click)="downloadRjpg(pc)" mat-raised-button>RJPG</button>
-                <button mat-raised-button>reclamacion</button>
+                <button (click)="downloadRjpg(pc)" mat-raised-button>JPG Radiométrico</button>
+                <button (click)="downloadJpgVisual(pc)" mat-raised-button>JPG Visual</button>
+                <button (click)="downloadJpg(pc)" mat-raised-button>JPG</button>
+                <!-- <button mat-raised-button>reclamacion</button> -->
                 <!-- <button (click)="pc.resuelto = !pc.resuelto" [disabled]="pc.resuelto" mat-raised-button> <i *ngIf="pc.resuelto" class="fas fa-check"></i> resuelto</button> -->
             </div>
         </div>

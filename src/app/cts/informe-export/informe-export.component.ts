@@ -104,7 +104,7 @@ export class InformeExportComponent implements OnInit {
 
     // Calcular las alturas
     for (let y of arrayFilas) {
-      let countColumnas = Array();
+      const countColumnas = Array();
       for (let x of arrayColumnas) {
         countColumnas.push(this.allPcs.filter( pc => pc.local_x === x && pc.local_y === y).length);
       }
@@ -120,12 +120,12 @@ export class InformeExportComponent implements OnInit {
 
     // Calcular la severidad
     let filtroSeveridad;
-    console.log('numSeveridad', this.numSeveridad);
-    console.log('allPcs', this.allPcs);
+    // console.log('numSeveridad', this.numSeveridad);
+    // console.log('allPcs', this.allPcs);
 
     for (let j of this.numSeveridad) {
       filtroSeveridad = this.allPcs.filter( pc => pc.severidad === j);
-      console.log('filtroSeveridad', filtroSeveridad);
+      // console.log('filtroSeveridad', filtroSeveridad);
       this.countSeveridad.push(filtroSeveridad.length);
     }
 

@@ -8,9 +8,11 @@
         </div>
 
         <div class="pc-detail-botones">
-            <button (click)="downloadRjpg(pc)" mat-raised-button>Rjpg</button>
+            <button (click)="downloadRjpg(pc)" mat-raised-button>JPG Radiométrico</button>
+            <button (click)="downloadJpgVisual(pc)" mat-raised-button>JPG Visual</button>
+            <button (click)="downloadJpg(pc)" mat-raised-button>JPG</button>
             <button mat-raised-button>informe reclamacion</button>
-            <button (click)="pc.resuelto = !pc.resuelto" [disabled]="pc.resuelto" mat-raised-button> <i *ngIf="pc.resuelto" class="fas fa-check"></i>resuelto</button>
+            <!-- <button (click)="pc.resuelto = !pc.resuelto" [disabled]="pc.resuelto" mat-raised-button> <i *ngIf="pc.resuelto" class="fas fa-check"></i>resuelto</button> -->
         </div>
 
     </div>
@@ -107,7 +109,7 @@
             </div>
             <div class="pc-texto">
                 <span class="detail-title">Fecha de captura: </span>
-                <span>{{pc.datetime * 1000 | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                <span>{{pc.datetime * 1000 | date:'dd/MM/yyyy HH:mm'}}</span>
             </div>
         </div>
         <div class="pc-details-derecha-item">
@@ -116,7 +118,7 @@
             </div>
             <div class="pc-texto">
                 <span class="detail-title">Meteo: </span>
-                <span>{{informe.irradiancia}} W/m<sup>2</sup> | {{informe.temperatura}} ºC | {{informe.nubosidad}} % nubes | Eps: 0.82</span>
+                <span>{{pc.irradiancia}} W/m<sup>2</sup> | Viento: {{pc.viento}} | {{pc.temperaturaAire}} ºC | {{pc.nubosidad}} % nubes | Emisividad: {{pc.emisividad}} | Temp. Reflejada: {{pc.temperaturaReflejada}} ºC</span>
             </div>
         </div>
 

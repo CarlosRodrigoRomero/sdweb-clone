@@ -25,6 +25,10 @@ export class PcService {
     this.filteredPcsSource.next(pcs);
   }
 
+  getSeguidores(informeId: string) {
+    
+  }
+
 
   getPcs(informeId: string) {
     const query$ = this.afs.collection<PcInterface>('pcs', ref => ref.where('informeId', '==', informeId));
