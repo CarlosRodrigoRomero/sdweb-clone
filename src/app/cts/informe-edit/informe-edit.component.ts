@@ -30,14 +30,14 @@ export class InformeEditComponent implements OnInit {
   public DEFAULT_LNG: number;
   public mapType: string;
   public defaultZoom: number;
-  public file_list: string[];
+  public fileList: string[];
   public canvas;
   private canvas2;
   public fabImg;
   public fabImg2;
   public squareBase;
   public squareHeight;
-  public square_width;
+  public squareWidth;
   public tooltip_temp;
   public pc_img_coords;
   public pc_temp;
@@ -84,7 +84,7 @@ export class InformeEditComponent implements OnInit {
 
     this.localIdCount = 0;
     this.rangeValue = 0;
-    this.file_list = new Array();
+    this.fileList = new Array();
     this.coords = new Array();
 
     // this.max_temp = 70;
@@ -112,6 +112,39 @@ export class InformeEditComponent implements OnInit {
     this.getInforme();
     this.canvas = new fabric.Canvas('mainCanvas');
     this.canvas2 = new fabric.Canvas('hiddenCanvas');
+
+    // this.canvas.on('object:modified', this.onObjectModified);
+  }
+
+  onObjectModified(event) {
+    // const actObj = this.canvas.getActiveObject();
+    const actObj = event.target;
+
+    // Get HS img coords and draw triangle
+    if (actObj !== null && actObj !== undefined) {
+      if (actObj.get('type') === 'rect' && actObj.isMoving === true) {
+        const actObjRaw = this.transformActObjToRaw(actObj);
+        // const max_temp = this.getMaxTempInActObj(actObj);
+        // this.selected_pc.temperaturaMax = max_temp.max_temp;
+        // this.selected_pc.img_x = max_temp.max_temp_x;
+        // this.selected_pc.img_y = max_temp.max_temp_y;
+        if (actObjRaw.ref === true) {
+          // console.log('actObjRaw ref', actObjRaw);
+          this.selected_pc.refTop = Math.round(actObjRaw.top);
+          this.selected_pc.refLeft = Math.round(actObjRaw.left);
+          this.selected_pc.refWidth = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
+          this.selected_pc.refHeight = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
+
+        } else {
+          // console.log('NoRef', this.selected_pc);
+          this.selected_pc.img_top = Math.round(actObjRaw.top);
+          this.selected_pc.img_left = Math.round(actObjRaw.left);
+          this.selected_pc.img_width = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
+          this.selected_pc.img_height = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
+
+        }
+      }
+    }
   }
 
 
@@ -216,8 +249,12 @@ export class InformeEditComponent implements OnInit {
       height = act_obj.height;
 
     }
+    act_obj.left = left;
+    act_obj.top = top;
+    act_obj.width = width;
+    act_obj.height = height;
 
-    return {left, top, width, height};
+    return act_obj;
   }
 
   transformActObjToRotated(act_obj) {
@@ -257,50 +294,50 @@ export class InformeEditComponent implements OnInit {
   }
   onMouseMoveCanvas(event: MouseEvent) {
 
-    const raw_coords = this.transformCoordsToRaw(event.offsetX, event.offsetY);
+    // const raw_coords = this.transformCoordsToRaw(event.offsetX, event.offsetY);
     // console.log('offsetX e y', event.offsetX, event.offsetY);
     // console.log('raw_coordsX e y', raw_coords.x, raw_coords.y);
-    const mouseX = raw_coords.x;
-    const mouseY = raw_coords.y;
+    // const mouseX = raw_coords.x;
+    // const mouseY = raw_coords.y;
 
     // Temperatura puntual
     // console.log('canvas2 size', this.canvas2.height, this.canvas2.width);
-    const mousePositionData = this.canvas2.getContext('2d').getImageData(mouseX , mouseY , 1, 1).data;
-    console.log('mouseX', mouseX, 'mouseY', mouseY);
-    console.log('mousePositionData', mousePositionData);
-    const mouseTemp = this.rgb2temp(mousePositionData[0], mousePositionData[1], mousePositionData[2]);
-    console.log('mouse_temp', mouseTemp);
+    // const mousePositionData = this.canvas2.getContext('2d').getImageData(mouseX , mouseY , 1, 1).data;
+    // console.log('mouseX', mouseX, 'mouseY', mouseY);
+    // console.log('mousePositionData', mousePositionData);
+    // const mouseTemp = this.rgb2temp(mousePositionData[0], mousePositionData[1], mousePositionData[2]);
+    // console.log('mouse_temp', mouseTemp);
 
 
-    // Coger maxima temperatura de los alrededores
-    const mouseSquare = this.canvas2
-      .getContext('2d')
-      .getImageData(
-        Math.max(0, Math.round(mouseX - this.squareBase / 2)),
-        Math.max(0, Math.round(mouseY - this.squareBase / 2)),
-        this.squareBase,
-        this.squareBase
-      );
+    // // Coger maxima temperatura de los alrededores
+    // const mouseSquare = this.canvas2
+    //   .getContext('2d')
+    //   .getImageData(
+    //     Math.max(0, Math.round(mouseX - this.squareBase / 2)),
+    //     Math.max(0, Math.round(mouseY - this.squareBase / 2)),
+    //     this.squareBase,
+    //     this.squareBase
+    //   );
 
     // Get max temp
-    const mouse_temps_array = [];
-    for (
-      let i = 0, n = mouseSquare.height * mouseSquare.width * 4;
-      i < n;
-      i += 4
-    ) {
-      mouse_temps_array.push(
-        this.rgb2temp(
-          mouseSquare.data[i],
-          mouseSquare.data[i + 1],
-          mouseSquare.data[i + 2]
-        )
-      ); // i+3 is alpha (the fourth element)
-    }
-    // console.log('mouse_temps_array', mouse_temps_array);
-    const mouse_max_temp_array = this.indexOfMax(mouse_temps_array);
-    // console.log('index_of', mouse_max_temp_array);
-    this.tooltip_temp = mouse_max_temp_array[0];
+    // const mouse_temps_array = [];
+    // for (
+    //   let i = 0, n = mouseSquare.height * mouseSquare.width * 4;
+    //   i < n;
+    //   i += 4
+    // ) {
+    //   mouse_temps_array.push(
+    //     this.rgb2temp(
+    //       mouseSquare.data[i],
+    //       mouseSquare.data[i + 1],
+    //       mouseSquare.data[i + 2]
+    //     )
+    //   ); // i+3 is alpha (the fourth element)
+    // }
+    // // console.log('mouse_temps_array', mouse_temps_array);
+    // const mouse_max_temp_array = this.indexOfMax(mouse_temps_array);
+    // // console.log('index_of', mouse_max_temp_array);
+    // this.tooltip_temp = mouse_max_temp_array[0];
 
 
     //
@@ -309,53 +346,65 @@ export class InformeEditComponent implements OnInit {
     // #############################
 
     // console.log('x,y', event.offsetX, event.offsetY, 'tx, ty', mouseX, mouseY);
-    const act_obj = this.canvas.getActiveObject();
+    // const actObj = this.canvas.getActiveObject();
 
-    // Get HS img coords and draw triangle
-    if (act_obj !== null && act_obj !== undefined) {
-      if (act_obj.get('type') === 'rect' && act_obj.isMoving === true) {
+    // // Get HS img coords and draw triangle
+    // if (actObj !== null && actObj !== undefined) {
+    //   if (actObj.get('type') === 'rect' && actObj.isMoving === true) {
+    //     const actObjRaw = this.transformActObjToRaw(actObj);
+    //     // const max_temp = this.getMaxTempInActObj(actObj);
+    //     // this.selected_pc.temperaturaMax = max_temp.max_temp;
+    //     // this.selected_pc.img_x = max_temp.max_temp_x;
+    //     // this.selected_pc.img_y = max_temp.max_temp_y;
+    //     if (actObjRaw.ref === true) {
+    //       // console.log('actObjRaw ref', actObjRaw);
+    //       this.selected_pc.refTop = Math.round(actObjRaw.top);
+    //       this.selected_pc.refLeft = Math.round(actObjRaw.left);
+    //       this.selected_pc.refWidth = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
+    //       this.selected_pc.refHeight = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
 
-        const act_obj_raw = this.transformActObjToRaw(act_obj);
-        const max_temp = this.getMaxTempInActObj(act_obj);
-        this.selected_pc.temperatura = max_temp.max_temp;
-        this.selected_pc.img_x = max_temp.max_temp_x;
-        this.selected_pc.img_y = max_temp.max_temp_y;
-        this.selected_pc.img_top = act_obj_raw.top;
-        this.selected_pc.img_width = act_obj_raw.width;
-        this.selected_pc.img_left = act_obj_raw.left;
-        this.selected_pc.img_height = act_obj_raw.height;
+    //     } else {
+    //       // console.log('NoRef', this.selected_pc);
+    //       this.selected_pc.img_top = Math.round(actObjRaw.top);
+    //       this.selected_pc.img_left = Math.round(actObjRaw.left);
+    //       this.selected_pc.img_width = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
+    //       this.selected_pc.img_height = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
 
-        // console.log('top: ', act_obj_raw.top);
+    //     }
+        // console.log('selected_pc_mod top, left', this.selected_pc.img_top, this.selected_pc.img_left);
         // this.updatePcInDb(this.selected_pc, false);
 
+        // console.log('RAW: top,left,width, height', actObjRaw.top, actObjRaw.left, actObjRaw.width, actObjRaw.height);
+
+        // console.log('top: ', actObjRaw.top);
         // $('#temp').html(Math.round(temperature*10)/10);
         // $('#max_temp').html( Math.round(temps.max()*10)/10);
         // $('#sq_height').html(squareHeight);
         // $('#sq_width').html(squareWidth);
 
-      }
-    }
+    //   }
+    // }
   }
 
 
 
-  getMaxTempInActObj(act_obj) { // en la imagen rotada
+  getMaxTempInActObj(actObj) { // en la imagen rotada
 
     // get the color array for the pixels around the mouse
-    const act_obj_raw = this.transformActObjToRaw(act_obj);
-    // console.log('RAW. left, top, width, height', act_obj_raw.left, act_obj_raw.top, act_obj_raw.width, act_obj_raw.height);
-    // console.log('ROT. left, top, width, height', act_obj.left, act_obj.top, act_obj.width, act_obj.height);
+    const actObjRaw = this.transformActObjToRaw(actObj);
+    // console.log('RAW. left, top, width, height', actObjRaw.left, actObjRaw.top, actObjRaw.width, actObjRaw.height);
+    // console.log('ROT. left, top, width, height', actObj.left, actObj.top, actObj.width, actObj.height);
 
-    const act_obj_data = this.canvas2
+    const actObjData = this.canvas2
       .getContext('2d')
-      .getImageData(act_obj_raw.left, act_obj_raw.top, act_obj_raw.width, act_obj_raw.height)
+      .getImageData(actObjRaw.left, actObjRaw.top, actObjRaw.width, actObjRaw.height)
       .data;
     // let square_pixel_data = this.canvas2.getContext('2d').getImageData(x, y, 1, 1).data;
     const act_obj_temps_array = [];
 
-    for (let i = 0, n = act_obj_raw.height * act_obj_raw.width * 4; i < n; i += 4) {
+    for (let i = 0, n = actObjRaw.height * actObjRaw.width * 4; i < n; i += 4) {
       act_obj_temps_array.push(
-        this.rgb2temp(act_obj_data[i], act_obj_data[i + 1], act_obj_data[i + 2])
+        this.rgb2temp(actObjData[i], actObjData[i + 1], actObjData[i + 2])
       );
       // i+3 is alpha (the fourth element)
     }
@@ -364,12 +413,12 @@ export class InformeEditComponent implements OnInit {
     const act_obj_max_temp = act_obj_max_temp_arr[0];
     const act_obj_max_index = act_obj_max_temp_arr[1];
     const act_obj_max_temp_y_raw = Math.round(
-      act_obj_raw.top + Math.trunc(act_obj_max_index / act_obj_raw.width)
+      actObjRaw.top + Math.trunc(act_obj_max_index / actObjRaw.width)
     );
     const act_obj_max_temp_x_raw = Math.round(
-      act_obj_raw.left +
+      actObjRaw.left +
         act_obj_max_index -
-        Math.trunc(act_obj_max_index / act_obj_raw.width) * act_obj_raw.width
+        Math.trunc(act_obj_max_index / actObjRaw.width) * actObjRaw.width
     );
 
     // draw triangle
@@ -378,7 +427,7 @@ export class InformeEditComponent implements OnInit {
 
     // console.log('TRIANGLE RAW: rotated_x: ', act_obj_max_temp_x_raw, 'rotated_y: ', act_obj_max_temp_y_raw);
     // console.log('TRIANGLE: rotated_x: ', act_obj_max_temp_rotated.x, 'rotated_y: ', act_obj_max_temp_rotated.y);
-    this.drawTriangle(act_obj_max_temp_rotated.x, act_obj_max_temp_rotated.y);
+    // this.drawTriangle(act_obj_max_temp_rotated.x, act_obj_max_temp_rotated.y);
     // this.drawTriangle2(act_obj_max_temp_x_raw, act_obj_max_temp_y_raw);
     // console.log('max_temp:', act_obj_max_temp, 'x, y: ', act_obj_max_temp_x_raw, act_obj_max_temp_y_raw);
 
@@ -423,15 +472,15 @@ export class InformeEditComponent implements OnInit {
     }
   }
 
-  addFabricImage(img_src) {
-    const left_and_top = this.getLeftAndTop();
+  addFabricImage(imgSrc) {
+    const leftAndTop = this.getLeftAndTop();
 
     const objectsCanvas = this.canvas.getObjects();
     for (let i = 0; i <= objectsCanvas.length; i++) {
       this.canvas.remove(objectsCanvas[i]);
     }
 
-    fabric.Image.fromURL(img_src, image => {
+    fabric.Image.fromURL(imgSrc, image => {
       // add background image
       if (this.fabImg) {
         this.canvas.remove(this.fabImg);
@@ -442,10 +491,10 @@ export class InformeEditComponent implements OnInit {
         {
           // scaleX: this.canvas.width / image.width,
           // scaleY: this.canvas.height / image.height,
-          crossOrigin: 'Anonymous',
+          crossOrigin: 'anonymous',
           angle: this.current_image_rotation,
-          left: left_and_top.left,
-          top: left_and_top.top,
+          left: leftAndTop.left,
+          top: leftAndTop.top,
           // originX: 'top',
           // originY: 'left'
 
@@ -456,7 +505,7 @@ export class InformeEditComponent implements OnInit {
 
     this.canvas2.clear();
     const img2 = new Image();
-    img2.src = img_src;
+    img2.src = imgSrc;
     img2.setAttribute('crossOrigin', 'anonymous');
     img2.onload = ev => {
          img2.setAttribute('crossOrigin', 'anonymous');
@@ -464,8 +513,8 @@ export class InformeEditComponent implements OnInit {
           this.canvas2.remove(this.fabImg2);
          }
          this.fabImg2 = new fabric.Image(img2, {
-          // left: left_and_top.left,
-          // top: left_and_top.top,
+          // left: leftAndTop.left,
+          // top: leftAndTop.top,
           // angle: this.current_image_rotation,
           crossOrigin: 'Anonymous',
           selectable: false
@@ -476,67 +525,88 @@ export class InformeEditComponent implements OnInit {
   }
 
   onDblClickCanvas(event) {
-    const left = event.offsetX - this.square_width / 2;
+    const left = event.offsetX - this.squareWidth / 2;
     const top = event.offsetY - this.squareHeight / 2;
     this.localIdCount += 1;
-    const act_obj = new fabric.Rect({
+    const actObj = new fabric.Rect({
       left,
       top,
       fill: 'rgba(0,0,0,0)',
       stroke: 'red',
       strokeWidth: 1,
-      width: this.square_width,
+      width: this.squareWidth,
       height: this.squareHeight,
       hasControls: true,
-      local_id: this.localIdCount
+      local_id: this.localIdCount,
+      ref: false,
+      hasRotatingPoint: false,
+
     });
 
-    this.canvas.add(act_obj);
-    this.canvas.setActiveObject(act_obj);
-
-    // const max_temp = this.getMaxTempInActObj(act_obj);
-    const max_temp = 0;
-
-    const act_obj_raw_coords = this.transformActObjToRaw(act_obj);
-    const act_obj_raw = new fabric.Rect({
-      left: act_obj_raw_coords.left,
-      top: act_obj_raw_coords.top,
+    const actObjRef = new fabric.Rect({
+      left: 50,
+      top: 50,
       fill: 'rgba(0,0,0,0)',
-      stroke: 'red',
+      stroke: 'blue',
       strokeWidth: 1,
-      hasControls: false,
-      width: act_obj_raw_coords.width,
-      height: act_obj_raw_coords.height,
-      local_id: this.localIdCount
+      width: this.squareWidth / 1.5,
+      height: this.squareHeight / 1.5,
+      hasControls: true,
+      local_id: this.localIdCount,
+      ref: true,
+      hasRotatingPoint: false,
     });
+
+    this.canvas.add(actObj);
+    this.canvas.add(actObjRef);
+    this.canvas.setActiveObject(actObj);
+
+    // const max_temp = 0;
+    // const max_temp = this.getMaxTempInActObj(actObj);
+
+    const actObjRawCoords = this.transformActObjToRaw(actObj);
+    const actObjRefRawCoords = this.transformActObjToRaw(actObjRef);
+    // const act_obj_raw = new fabric.Rect({
+    //   left: actObjRawCoords.left,
+    //   top: actObjRawCoords.top,
+    //   fill: 'rgba(0,0,0,0)',
+    //   stroke: 'red',
+    //   strokeWidth: 1,
+    //   hasControls: false,
+    //   width: actObjRawCoords.width,
+    //   height: actObjRawCoords.height,
+    //   local_id: this.localIdCount
+    // });
     // this.canvas2.add(act_obj_raw);
     // this.canvas2.setActiveObject(act_obj_raw);
 
     const newPc: PcInterface = {
       id: '',
       archivo: this.currentFileName,
-      tipo: 1, // tipo
+      tipo: 8, // tipo (celula caliente por defecto)
       local_x: 1, // local_x
       local_y: 0, // local_x
       global_x: 0, // global_x
       global_y: '', // global_y
       gps_lng: this.current_gps_lng,
       gps_lat: this.current_gps_lat,
-      temperatura: max_temp.max_temp,
-      temperatura_real: max_temp.max_temp,
-      img_left: act_obj_raw.left,
-      img_top: act_obj_raw.top,
-      img_width: act_obj_raw_coords.width,
-      img_height: act_obj_raw_coords.height,
-      img_x: max_temp.max_temp_x, // coordenadas raw
-      img_y: max_temp.max_temp_y, // coordenadas raw
+      img_left: actObjRawCoords.left,
+      img_top: actObjRawCoords.top,
+      img_width: actObjRawCoords.width,
+      img_height: actObjRawCoords.height,
+      img_x: 0, // coordenadas raw
+      img_y: 0, // coordenadas raw
       local_id: this.localIdCount,
       vuelo: this.currentFlight,
       image_rotation: this.current_image_rotation,
       informeId: this.informe.id,
       datetime: this.current_datetime,
-      severidad: 0,
-      resuelto: false
+      resuelto: false,
+      color: 'white',
+      refTop: actObjRefRawCoords.top,
+      refLeft: actObjRefRawCoords.left,
+      refHeight: actObjRefRawCoords.height,
+      refWidth: actObjRefRawCoords.width,
     };
 
     if (this.selected_pc) {
@@ -548,14 +618,40 @@ export class InformeEditComponent implements OnInit {
   }
 
   onMouseUpCanvas(event) {
+    console.log('mouseUp');
     if (this.selected_pc) {
       this.updatePcInDb(this.selected_pc, false);
     }
 
     const actObj = this.canvas.getActiveObject();
+    // console.log('actObj', actObj);
+    // console.log('top,left,width, height', actObj.top, actObj.left, actObj.width, actObj.height);
+
+
+
     if (actObj !== null && actObj !== undefined) {
       if (actObj.get('type') === 'rect') {
+        const actObjRaw = this.transformActObjToRaw(actObj);
         this.selectPcFromLocalId(actObj.local_id);
+
+        if (actObjRaw.ref === true) {
+          // console.log('actObjRaw ref', actObjRaw);
+          this.selected_pc.refTop = Math.round(actObjRaw.top);
+          this.selected_pc.refLeft = Math.round(actObjRaw.left);
+          this.selected_pc.refWidth = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
+          this.selected_pc.refHeight = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
+
+        } else {
+          // console.log('NoRef', this.selected_pc);
+          this.selected_pc.img_top = Math.round(actObjRaw.top);
+          this.selected_pc.img_left = Math.round(actObjRaw.left);
+          this.selected_pc.img_width = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
+          this.selected_pc.img_height = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
+
+        }
+
+
+        this.updatePcInDb(this.selected_pc, false);
       }
     }
   }
@@ -564,8 +660,8 @@ export class InformeEditComponent implements OnInit {
     this.selected_pc = this.allPcs.find(item => item.local_id === localId);
 
     // transformar coordenadas a rotated
-    const rotatedPcCoords = this.transformCoordsToRotated(this.selected_pc.img_x, this.selected_pc.img_y);
-    this.drawTriangle(rotatedPcCoords.x, rotatedPcCoords.y);
+    // const rotatedPcCoords = this.transformCoordsToRotated(this.selected_pc.img_x, this.selected_pc.img_y);
+    // this.drawTriangle(rotatedPcCoords.x, rotatedPcCoords.y);
     // this.drawTriangle2(this.selected_pc.img_x, this.selected_pc.img_y); // TO REMOVE
   }
 
@@ -604,7 +700,6 @@ export class InformeEditComponent implements OnInit {
         response => {
 
           this.planta = response;
-          
 
           this.filas_array = [];
           this.columnas_array = [];
@@ -616,14 +711,14 @@ export class InformeEditComponent implements OnInit {
           }
 
           if ( this.planta.vertical ) { // vertical
-            this.square_width = 15;
-            this.squareHeight = Math.round(this.square_width * 3 / 2);
+            this.squareWidth = 30;
+            this.squareHeight = Math.round(this.squareWidth * 3 / 2);
           } else {  // horizontal
-            this.squareHeight = 15;
-            this.square_width = Math.round(this.squareHeight * 3 / 2);
+            this.squareHeight = 30;
+            this.squareWidth = Math.round(this.squareHeight * 3 / 2);
           }
 
-          this.squareBase = Math.min(this.square_width, this.squareHeight);
+          this.squareBase = Math.min(this.squareWidth, this.squareHeight);
 
         },
         error => {
@@ -666,7 +761,7 @@ export class InformeEditComponent implements OnInit {
                 } else {
                   this.flights_data = response2;
                   this.flights_list = Object.keys(this.flights_data);
-                  this.file_list = response2[Object.keys(this.flights_data)[0]].files;
+                  this.fileList = response2[Object.keys(this.flights_data)[0]].files;
                   this.coords = response2[Object.keys(this.flights_data)[0]].coords;
                   this.setImageFromRangeValue(1);
                 }
@@ -784,7 +879,7 @@ export class InformeEditComponent implements OnInit {
         this.rangeValue = value;
       }
       // El input es el 'value' del slider
-      // Para pasar del value del slider al indice de 'file_list' o '/coords' hay que restarle uno
+      // Para pasar del value del slider al indice de 'fileList' o '/coords' hay que restarle uno
       const arrayIndex = value - 1;
       this.current_datetime = this.getDateTimeFromDateAndTime(this.coords[arrayIndex].Date,
                               this.coords[arrayIndex].Time);
@@ -797,12 +892,12 @@ export class InformeEditComponent implements OnInit {
       this.current_track_heading = Math.round(this.coords[arrayIndex].TrackHeading);
       this.current_image_rotation = this.getCurrentImageRotation(this.current_track_heading);
 
-      this.currentFileName = this.file_list[arrayIndex];
+      this.currentFileName = this.fileList[arrayIndex];
       this.addFabricImage(
         this.informeService.getImageUrl(
           this.informe.carpeta,
           this.currentFlight,
-          this.file_list[arrayIndex]
+          this.fileList[arrayIndex]
         )
       );
 
@@ -832,7 +927,7 @@ export class InformeEditComponent implements OnInit {
 
       // Poner imagen del pc
       // // Obtener el indice de la imagen
-      const sliderValue = this.file_list.indexOf(pc.archivo);
+      const sliderValue = this.fileList.indexOf(pc.archivo);
       // // Sumar 1 y cambiar la imagen
       this.setImageFromRangeValue(sliderValue + 1);
 
@@ -840,9 +935,9 @@ export class InformeEditComponent implements OnInit {
       this.rangeValue = sliderValue + 1;
       // Dibujar pc dentro de la imagen (recuadro y triangulo)
       // transformar coordenadas a rotated
-      const rotatedPcCoords = this.transformCoordsToRotated(pc.img_x, pc.img_y);
+      // const rotatedPcCoords = this.transformCoordsToRotated(pc.img_x, pc.img_y);
 
-      this.drawTriangle(rotatedPcCoords.x, rotatedPcCoords.y);
+      // this.drawTriangle(rotatedPcCoords.x, rotatedPcCoords.y);
     }
   onClickDeletePc(pc: PcInterface) {
 
@@ -893,13 +988,31 @@ export class InformeEditComponent implements OnInit {
         hasControls: false,
         width: pc.img_width,
         height: pc.img_height,
-        local_id: pc.local_id
+        local_id: pc.local_id,
+        ref: false,
+        hasRotatingPoint: false,
       });
+      const rectRef2 = new fabric.Rect({
+        left: pc.refLeft,
+        top: pc.refTop,
+        fill: 'rgba(0,0,0,0)',
+        stroke: 'red',
+        strokeWidth: 1,
+        hasControls: false,
+        width: pc.refWidth,
+        height: pc.refHeight,
+        local_id: pc.local_id,
+        ref: false,
+        hasRotatingPoint: false,
+      });
+
+
 
       this.canvas2.add(rect2);
       this.canvas2.setActiveObject(rect2);
 
       const transformedRect = this.transformActObjToRotated(rect2);
+      const transformedRectRef = this.transformActObjToRotated(rectRef2);
 
       const rect = new fabric.Rect({
         left: transformedRect.left,
@@ -907,13 +1020,29 @@ export class InformeEditComponent implements OnInit {
         fill: 'rgba(0,0,0,0)',
         stroke: 'red',
         strokeWidth: 1,
-        hasControls: false,
+        hasControls: true,
         width: transformedRect.width,
         height: transformedRect.height,
-        local_id: pc.local_id
+        local_id: pc.local_id,
+        ref: false
+      });
+
+      const rectRef = new fabric.Rect({
+        left: transformedRectRef.left,
+        top: transformedRectRef.top,
+        fill: 'rgba(0,0,0,0)',
+        stroke: 'blue',
+        strokeWidth: 1,
+        hasControls: true,
+        width: transformedRectRef.width,
+        height: transformedRectRef.height,
+        local_id: pc.local_id,
+        ref: true
       });
 
       this.canvas.add(rect);
+      this.canvas.add(rectRef);
+
       this.canvas.setActiveObject(rect);
     }
 
@@ -927,7 +1056,7 @@ export class InformeEditComponent implements OnInit {
 
   changeFlight(flightName) {
       this.currentFlight = flightName;
-      this.file_list = this.flights_data[flightName].files;
+      this.fileList = this.flights_data[flightName].files;
       this.coords = this.flights_data[flightName].coords;
     }
 
@@ -937,4 +1066,6 @@ export class InformeEditComponent implements OnInit {
   onClickNextImage(event) {
       this.rangeValue += 1;
     }
+
+
   }

@@ -8,12 +8,11 @@ import { AgmMap } from '@agm/core';
 import { GLOBAL } from 'src/app/services/global';
 import { MatDialog } from '@angular/material';
 import { PcDetailsDialogComponent } from '../pc-details-dialog/pc-details-dialog.component';
-import { InformeViewComponent } from '../informe-view/informe-view.component';
 
 
 export interface DialogData {
   pc: PcInterface;
-  selectedPc: PcInterface;
+  allPcs: PcInterface[];
 }
 
 
@@ -26,13 +25,14 @@ export interface DialogData {
 export class PcMapComponent implements OnInit {
   @Input() planta: PlantaInterface;
   @Input() informe: InformeInterface;
+  @Input() allPcs: PcInterface[];
   @ViewChild('agm-map') map: AgmMap;
 
 
   public filteredPcs: PcInterface[];
   public informeId: string;
 
-  zoom = 16;
+  zoom = 17;
   mapType = 'satellite';
 
   constructor(
@@ -66,16 +66,14 @@ export class PcMapComponent implements OnInit {
     }
 
     onMapCircleClick(selectedPc: PcInterface): void {
-      console.log(selectedPc);
       const dialogRef = this.dialog.open(PcDetailsDialogComponent, {
-        width: '1400px',
-        height: '600px',
-        data: {pc: selectedPc, '{selectedPc}': selectedPc, informe: this.informe }
+        // width: '1600px',
+        // height: '600px',
+        hasBackdrop: true,
+        data: {pc: selectedPc, allPcs: this.allPcs, informe: this.informe }
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
-        // this.animal = result;
       });
 
     }

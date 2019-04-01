@@ -9,7 +9,7 @@
             </h2>
             <div *ngIf="alertMessage" class="alert alert-warning" role="alert">{{alertMessage}}</div>
 
-            <div class="btn-group btn-group-toggle">
+            <div class="btn-group btn-group-toggle btn-group-vuelos">
                 <label [ngClass]="{selected_flight: currentFlight === flight}" *ngFor="let flight of flights_list" [for]="flight" class="btn btn-secondary">
                                 <input type="radio" name="options" [id]="flight" autocomplete="off" (change)="onClickFlightsCheckbox($event)" />{{flight}}
                 </label>
@@ -21,14 +21,14 @@
             <div class="input-range-div">
                 <button class="btn btn-secondary input-range-button" (click)="setImageFromRangeValue(rangeValue-4)"> &lt; </button>
 
-                <input type="range" id="slider" min=1 [max]="file_list.length || 1" step="1" [(value)]="rangeValue" (input)="onInputRange($event)" />
+                <input type="range" id="slider" min=1 [max]="fileList.length || 1" step="1" [(value)]="rangeValue" (input)="onInputRange($event)" />
                 <!-- hay que restarle 1 -->
                 <button class="btn btn-secondary input-range-button" (click)="setImageFromRangeValue(rangeValue+4)"> &gt; </button>
             </div>
 
             <div class="row">
                 <div class="col col-xs-6">
-                    <span id="tooltip"> {{tooltip_temp}} </span>
+                    <!-- <span id="tooltip"> {{tooltip_temp}} </span> -->
                     <div (dblclick)="onDblClickCanvas($event)" (mouseup)="onMouseUpCanvas($event)" (mousemove)="onMouseMoveCanvas($event)">
                         <canvas class="imagen-termica" id="mainCanvas" width="640" height="512"></canvas>
                     </div>
@@ -52,7 +52,7 @@
                     <div *ngIf="selected_pc" class="selected-pc-div">
                         <div class="selected-pc-header">
                             <div class="selected-pc-id">
-                                Id: {{ selected_pc.local_id }} ({{ selected_pc.vuelo }}) - <b>{{selected_pc.temperatura}} ºC</b>
+                                Id: {{ selected_pc.local_id }} ({{ selected_pc.vuelo }}) - <b>{{selected_pc.temperaturaMax}} ºC</b>
                             </div>
                             <div>- {{selected_pc.image_rotation}} º -</div>
 
@@ -81,6 +81,14 @@
                             </div> -->
 
                             <div class="selected-pc-tipo">
+                                <label class="selected-pc-tipo-label">
+                                            <input (change)="updatePcInDb(selected_pc, false)" [(ngModel)]="selected_pc.tipo" type="radio" name="tipo" [value]="8" />
+                                            <img class="img-fluid" src="../../../assets/images/tipo_8.png">
+                                    </label>
+                                <label class="selected-pc-tipo-label">
+                                        <input (change)="updatePcInDb(selected_pc, false)" [(ngModel)]="selected_pc.tipo" type="radio" name="tipo" [value]="9" />
+                                        <img class="img-fluid" src="../../../assets/images/tipo_9.png">
+                                </label>
 
                                 <label class="selected-pc-tipo-label">
                                     <input (change)="updatePcInDb(selected_pc, false)" [(ngModel)]="selected_pc.tipo" type="radio" name="tipo" [value]="3" />
@@ -102,14 +110,7 @@
                                         <input (change)="updatePcInDb(selected_pc, false)" [(ngModel)]="selected_pc.tipo" type="radio" name="tipo" [value]="7" />
                                         <img class="img-fluid" src="../../../assets/images/tipo_7.png">
                                 </label>
-                                <label class="selected-pc-tipo-label">
-                                    <input (change)="updatePcInDb(selected_pc, false)" [(ngModel)]="selected_pc.tipo" type="radio" name="tipo" [value]="8" />
-                                    <img class="img-fluid" src="../../../assets/images/tipo_8.png">
-                            </label>
-                                <label class="selected-pc-tipo-label">
-                                <input (change)="updatePcInDb(selected_pc, false)" [(ngModel)]="selected_pc.tipo" type="radio" name="tipo" [value]="9" />
-                                <img class="img-fluid" src="../../../assets/images/tipo_9.png">
-                        </label>
+
                                 <label class="selected-pc-tipo-label">
                             <input (change)="updatePcInDb(selected_pc, false)" [(ngModel)]="selected_pc.tipo" type="radio" name="tipo" [value]="10" />
                             <img class="img-fluid" src="../../../assets/images/tipo_10.png">
@@ -139,6 +140,14 @@
                                     <input (change)="updatePcInDb(selected_pc, false)" [(ngModel)]="selected_pc.tipo" type="radio" name="tipo" [value]="2" />
                                     <img class="img-fluid" src="../../../assets/images/tipo_2.png">
                                 </label>
+
+
+                                <label class="selected-pc-tipo-label">
+                                        <input (change)="updatePcInDb(selected_pc, false)" [(ngModel)]="selected_pc.tipo" type="radio" name="tipo" [value]="0" />
+                                        <img class="img-fluid" src="../../../assets/images/tipo_0.png">
+                                    </label>
+
+
                             </div>
                         </div>
 
@@ -190,7 +199,7 @@
                     <th> {{pc.global_x}}, {{pc.global_y}}</th>
                     <th> {{pc.local_x}}, {{pc.local_y}}</th>
 
-                    <th> {{pc.temperatura}}</th>
+                    <th> {{pc.temperaturaMax}}</th>
                     <th> <button type="button" class="btn btn-danger btn-eliminar" (click)="onClickDeletePc(pc)">X</button>
                     </th>
                 </tr>

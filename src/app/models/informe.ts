@@ -17,4 +17,5 @@ export interface InformeInterface {
     tempLimite?: number;
     alturaVuelo?: number;
     nubosidad?: number;
+    numeroModulos?: number;
 }

@@ -30,7 +30,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   constructor() { }
 
   ngOnInit() {
-    this.pc.downloadUrl.subscribe( url => {
+    this.pc.downloadUrl$.subscribe( url => {
       this.pc.downloadUrlString = url;
     });
     this.minTemp = this.informe.tempMin;

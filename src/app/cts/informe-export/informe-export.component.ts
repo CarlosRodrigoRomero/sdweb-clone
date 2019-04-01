@@ -78,11 +78,11 @@ export class InformeExportComponent implements OnInit {
         // Severidad: 3 grave
         pc.severidad = 3;
       } else if (pc.tipo === 1 || pc.tipo === 2 || pc.tipo === 8 || pc.tipo === 9) {
-        if ( pc.temperatura_real > this.planta.temp_limite ) {
+        if ( pc.temperaturaMax > this.planta.temp_limite ) {
           pc.severidad = 4; // muy grave
 
         } else {
-          let dt = pc.temperatura_real - this.informe.tempMediaModulos;
+          let dt = pc.temperaturaMax - this.informe.tempMediaModulos;
           if (dt >= GLOBAL.severidad_dt[2]) {
             pc.severidad = 3; // grave
  

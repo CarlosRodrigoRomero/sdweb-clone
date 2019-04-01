@@ -1,12 +1,24 @@
-<h1 mat-dialog-title>Anomalía #{{pc.local_id}} </h1>
+<div mat-dialog-title>
+    <h3 class="dialog-title">Anomalía nº {{pc.local_id}} </h3>
+    <label class="switch">
+        <input [(ngModel)]="slider" type="checkbox" id="changeImage" (ngModelChange)="onSliderChange($event)">
+        <span class="slider round"></span>
+    </label>
+</div>
 <div mat-dialog-content>
 
     <div class="row">
         <div class="col-7">
-            <div class="imagen-termica-div" (mouseleave)="onMouseLeaveCanvas($event)">
+
+
+            <div id="imagen-div" class="imagen-termica-div" (mouseleave)="onMouseLeaveCanvas($event)">
                 <canvas (mousemove)="onMouseMoveCanvas($event)" id="dialog-canvas" width="640" height="512">
-          </canvas>
-                <span class="imagen-termica-tooltip text-center" id="dialog-tooltip">{{tooltipTemp}} ºC</span>
+                </canvas>
+                <!-- <span class="imagen-termica-tooltip text-center" id="dialog-tooltip">{{tooltipTemp}} ºC</span> -->
+                <!-- <canvas id="hidden-canvas" width="640" height="512"></canvas> -->
+            </div>
+            <div id="imagen-visual-div" class="imagen-termica-div">
+                <canvas id="visual-canvas" width="640" height="512"></canvas>
             </div>
 
 
@@ -27,21 +39,21 @@
 
                 <div class="pc-details-derecha-item-tabla">
                     <span class="text-center"><strong>Temp máx</strong></span>
-                    <span class="text-center">{{pc.temperatura_real}} ºC</span>
+                    <span class="text-center">{{pc.temperaturaMax}} ºC</span>
                 </div>
                 <div class="pc-details-derecha-item-tabla">
-                    <span class="text-center"><strong>Temp media</strong></span>
-                    <span class="text-center">{{pc.temperaturaMedia}} ºC</span>
+                    <span class="text-center"><strong>Temp ref</strong></span>
+                    <span style="color:blue" class="text-center">{{pc.temperaturaRef}} ºC</span>
                 </div>
 
                 <div class="pc-details-derecha-item-tabla">
-                    <span class="text-center"><strong>Gradiente</strong></span>
-                    <span class="text-center">+ {{pc.gradiente | number: '1.0-1'}} ºC</span>
+                    <span class="text-center"><strong>Gradiente (normalizado)</strong></span>
+                    <span style="color:red" class="text-center">+ {{pc.gradienteNormalizado | number: '1.0-1'}} ºC</span>
                 </div>
 
                 <div class="pc-details-derecha-item-tabla">
                     <span class="text-center"><strong>Pérdidas</strong></span>
-                    <span style="color:red" class="text-center">{{pcPerdidas[pc.tipo]}} %</span>
+                    <span style="color:red" class="text-center">{{pc.perdidas * 100}} %</span>
                 </div>
 
             </div>
@@ -109,7 +121,7 @@
                 </div>
                 <div class="pc-texto">
                     <span class="detail-title">Fecha de captura: </span>
-                    <span>{{pc.datetime * 1000 | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                    <span>{{pc.datetime * 1000 | date:'dd/MM/yyyy HH:mm'}}</span>
                 </div>
             </div>
             <div class="pc-details-derecha-item">
@@ -118,19 +130,19 @@
                 </div>
                 <div class="pc-texto">
                     <span class="detail-title">Meteo: </span>
-                    <span>1028 W/m<sup>2</sup> | 35 ºC | 0 % nubes | Epsilon: 0.82</span>
+                    <span>{{pc.irradiancia}} W/m<sup>2</sup> | {{pc.temperaturaAire}} ºC | {{pc.nubosidad}} % nubes | Epsilon: {{pc.emisividad}}</span>
                 </div>
             </div>
 
             <div style="justify-content: space-between" class="pc-details-derecha-item">
                 <button (click)="downloadRjpg(pc)" mat-raised-button>RJPG</button>
                 <button mat-raised-button>reclamacion</button>
-                <button (click)="pc.resuelto = !pc.resuelto" [disabled]="pc.resuelto" mat-raised-button> <i *ngIf="pc.resuelto" class="fas fa-check"></i> resuelto</button>
+                <!-- <button (click)="pc.resuelto = !pc.resuelto" [disabled]="pc.resuelto" mat-raised-button> <i *ngIf="pc.resuelto" class="fas fa-check"></i> resuelto</button> -->
             </div>
         </div>
     </div>
     <!-- <button mat-button (click)="onNoClick()">Cerrar</button> -->
 
-    <!-- <div mat-dialog-actions>
-    </div> -->
+    <mat-dialog-actions>
+    </mat-dialog-actions>
 </div>

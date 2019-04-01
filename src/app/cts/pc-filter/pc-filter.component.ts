@@ -22,7 +22,7 @@ export class PcFilterComponent implements OnInit {
     this.filtroSeveridad = GLOBAL.tipos_severidad;
     this.filtroSeveridad = [1, 2, 3, 4];
     this.filtroTipo = [1, 2, 3, 4, 5, 6];
-    console.log('aaa', this.filtroSeveridad, GLOBAL.tipos_severidad);
+    // console.log('aaa', this.filtroSeveridad, GLOBAL.tipos_severidad);
   }
 
   ngOnInit() {

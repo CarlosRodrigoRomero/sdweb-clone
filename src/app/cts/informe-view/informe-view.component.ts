@@ -79,7 +79,8 @@ export class InformeViewComponent implements OnInit {
       response => {
           this.allPcs = response.map( (pc, i, a) => {
             pc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${pc.archivoPublico}`).getDownloadURL();
-            pc.downloadUrl = this.storage.ref(`informes/${this.informeId}/jpg/${pc.archivoPublico}`).getDownloadURL();
+            pc.downloadUrl$ = this.storage.ref(`informes/${this.informeId}/jpg/${pc.archivoPublico}`).getDownloadURL();
+            pc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/_mini_${pc.archivoPublico}`).getDownloadURL();
             return pc;
           });
           for (let j of this.numSeveridad) {
@@ -98,7 +99,7 @@ export class InformeViewComponent implements OnInit {
 
 
   initializeChart() {
-    console.log('count_sve', this.countSeveridad);
+    // console.log('count_sve', this.countSeveridad);
 
     this.dataSeveridad = {
       labels: GLOBAL.labels_severidad,

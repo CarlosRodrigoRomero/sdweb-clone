@@ -45,7 +45,7 @@ export class PcListComponent implements OnInit {
     private pcService: PcService,
     private route: ActivatedRoute
   ) {
-    this.columnsToDisplay = ['severidad', 'tipo', 'perdidas', 'local_id', 'temperatura_real', 'gradiente'];
+    this.columnsToDisplay = ['severidad', 'tipo', 'perdidas', 'local_id', 'temperaturaMax', 'gradienteNormalizado'];
     this.informeId = this.route.snapshot.paramMap.get('id');
     this.pcDescripcion = GLOBAL.pcDescripcion;
     this.pcPerdidas = GLOBAL.pcPerdidas;
@@ -82,7 +82,7 @@ export class PcListComponent implements OnInit {
   }
 
   getPercent(pc: PcInterface) {
-    let result = pc.temperatura_real - pc.temperaturaMedia;
+    let result = pc.temperaturaMax - pc.temperaturaMedia;
     result /= (this.planta.temp_limite - pc.temperaturaMedia);
     result *= 100;
     result = Math.abs(result);

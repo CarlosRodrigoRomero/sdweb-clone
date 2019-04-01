@@ -1,6 +1,6 @@
 export let GLOBAL = {
   url: 'http://localhost:3977/api',
-  num_tipos: 7,
+  num_tipos: 14,
   perdidas_tipo: [0.01, 0.03, 0.33, 0, 1, 0.33, 0.1, 0.01, 0.04],
   camara_termica: 'DJI XT2 640 13mm',
   uav: 'Multirrotor Solardrone MKIV',

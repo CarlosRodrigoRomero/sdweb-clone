@@ -169,7 +169,7 @@ export class OrtophotoComponent implements OnInit {
       //   gps_lng: this.current_gps_lng,
       //   gps_lat: this.current_gps_lat,
       //   temperatura: max_temp.max_temp,
-      //   temperatura_real: max_temp.max_temp,
+      //   temperaturaMax: max_temp.max_temp,
       //   img_left: act_obj_raw.left,
       //   img_top: act_obj_raw.top,
       //   img_width: act_obj_raw_coords.width,

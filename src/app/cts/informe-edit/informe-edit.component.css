@@ -16,6 +16,10 @@ agm-map {
     height: 5px;
 }
 
+.btn-group-vuelos {
+    flex-wrap: wrap;
+}
+
 #tabla_pcs {
     background-color: rgba(153, 143, 143, 0.26);
     font-size: 0.7rem;
@@ -167,6 +171,7 @@ agm-map {
     height: 100vh;
     overflow: scroll;
     padding: 0;
+    z-index: 99999;
 }
 
 #container-ppal {
@@ -183,16 +188,16 @@ agm-map {
 }
 
 .local-coords-table-cell-h {
-    width: 20px;
-    height: 10px;
+    width: 25px;
+    height: 15px;
     text-align: center;
     font-size: 0.8rem;
     cursor: pointer;
 }
 
 .local-coords-table-cell-v {
-    width: 10px;
-    height: 20px;
+    width: 15px;
+    height: 25px;
     text-align: center;
     font-size: 0.8rem;
     cursor: pointer;
