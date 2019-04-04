@@ -14,4 +14,5 @@ export interface PlantaInterface {
     vertical?: boolean;
     num_modulos?: number;
     temp_limite?: number;
+    zoom?: number;
 }

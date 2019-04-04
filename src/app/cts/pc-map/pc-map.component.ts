@@ -33,8 +33,8 @@ export class PcMapComponent implements OnInit {
   public filteredPcs: PcInterface[];
   public informeId: string;
 
-  zoom = 17;
-  mapType = 'satellite';
+  public zoom = this.planta.zoom;
+  public mapType = 'satellite';
 
   constructor(
     private storage: AngularFireStorage,

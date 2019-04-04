@@ -18,7 +18,6 @@ export class InformesComponent implements OnInit {
 
   ngOnInit() {
     this.auth.user$.subscribe(user => {
-      console.log('user', user.uid);
       this.informeService.getInformesDeEmpresa(user.uid).subscribe( informes => {
         this.informes = informes;
       });

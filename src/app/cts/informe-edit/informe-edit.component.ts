@@ -701,6 +701,7 @@ export class InformeEditComponent implements OnInit {
         response => {
 
           this.planta = response;
+          this.defaultZoom = this.planta.zoom;
 
           this.filas_array = [];
           this.columnas_array = [];
