@@ -8,9 +8,9 @@ import { NavbarComponent } from './cts/navbar/navbar.component';
 import { InformesComponent } from './cts/informes/informes.component';
 import { InformeEditComponent } from './cts/informe-edit/informe-edit.component';
 import { InformeViewComponent } from './cts/informe-view/informe-view.component';
-
 import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireStorageModule, StorageBucket } from '@angular/fire/storage';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -37,7 +37,9 @@ import { PcDetailsDialogComponent } from './cts/pc-details-dialog/pc-details-dia
 import { InformeExportComponent } from './cts/informe-export/informe-export.component';
 import { OrtophotoComponent } from './cts/ortophoto/ortophoto.component';
 import { MapService } from './services/orto.service';
-
+import { LoginComponent } from './cts/login/login.component';
+import { AuthService } from './services/auth.service';
+import { NgxAuthFirebaseUIModule } from 'ngx-auth-firebaseui';
 
 @NgModule({
   declarations: [
@@ -52,7 +54,8 @@ import { MapService } from './services/orto.service';
     PcMapComponent,
     PcDetailsDialogComponent,
     InformeExportComponent,
-    OrtophotoComponent
+    OrtophotoComponent,
+    LoginComponent
   ],
   entryComponents: [
     PcDetailsDialogComponent
@@ -82,6 +85,7 @@ import { MapService } from './services/orto.service';
     BrowserAnimationsModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule,
+    AngularFireAuthModule,
     AngularFireStorageModule,
     CdkTableModule,
     CdkTreeModule,
@@ -119,12 +123,20 @@ import { MapService } from './services/orto.service';
     MatToolbarModule,
     MatTooltipModule,
     MatTreeModule,
+    NgxAuthFirebaseUIModule.forRoot({
+        apiKey: 'AIzaSyAT1o9xo0dBaLjBFL2HFiG-r_ipKO6_tqc',
+        authDomain: 'sdweb-d33ce.firebaseapp.com',
+        databaseURL: 'https://sdweb-d33ce.firebaseio.com',
+        projectId: 'sdweb-d33ce',
+        storageBucket: 'sdweb-d33ce.appspot.com',
+        messagingSenderId: '229404593483',
+    }),
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM'
     })
 
   ],
-  providers: [MapService],
+  providers: [MapService, AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

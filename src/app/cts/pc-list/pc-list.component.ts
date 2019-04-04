@@ -45,7 +45,7 @@ export class PcListComponent implements OnInit {
     private pcService: PcService,
     private route: ActivatedRoute
   ) {
-    this.columnsToDisplay = ['severidad', 'tipo', 'perdidas', 'local_id', 'temperaturaMax', 'gradienteNormalizado'];
+    this.columnsToDisplay = ['severidad', 'tipo', 'perdidas', 'local_id', 'global_x', 'temperaturaMax', 'gradienteNormalizado'];
     this.informeId = this.route.snapshot.paramMap.get('id');
     this.pcDescripcion = GLOBAL.pcDescripcion;
     this.pcPerdidas = GLOBAL.pcPerdidas;

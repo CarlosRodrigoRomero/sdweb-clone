@@ -26,7 +26,7 @@ export class PcService {
   }
 
   getSeguidores(informeId: string) {
-    
+
   }
 
 

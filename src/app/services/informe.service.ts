@@ -35,6 +35,16 @@ export class InformeService {
   }))
 );
   }
+  getInformesDeEmpresa(uid: string) {
+    const query$ = this.afs.collection<InformeInterface>('informes', ref => ref.where('empresa', '==', uid));
+    return query$.snapshotChanges().pipe(
+      map(actions => actions.map(a => {
+    const data = a.payload.doc.data() as InformeInterface;
+    data.id = a.payload.doc.id;
+    return data;
+  }))
+);
+  }
 
   getInforme(id: string) {
     this.informeDoc = this.afs.doc<InformeInterface>('informes/' + id);

@@ -14,18 +14,16 @@ export class PcFilterComponent implements OnInit {
   public severidad: MatButtonToggleGroup;
   public filtroSeveridad: number[];
   public filtroTipo: number[];
-  tiposSeveridad = GLOBAL.tipos_severidad;
-  labelsSeveridad = GLOBAL.labels_severidad;
-
+  public labelsSeveridad = GLOBAL.labels_severidad;
+  public descripcionSeveridad = GLOBAL.descripcionSeveridad;
+  public tiposSeveridad = GLOBAL.tipos_severidad;
 
   constructor(private pcService: PcService) {
-    this.filtroSeveridad = GLOBAL.tipos_severidad;
-    this.filtroSeveridad = [1, 2, 3, 4];
-    this.filtroTipo = [1, 2, 3, 4, 5, 6];
-    // console.log('aaa', this.filtroSeveridad, GLOBAL.tipos_severidad);
   }
 
   ngOnInit() {
+    this.filtroSeveridad = [1, 2, 3, 4];
+    this.filtroTipo = [1, 2, 3, 4, 5, 6];
   }
 
 

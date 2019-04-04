@@ -3,9 +3,8 @@ import { PcInterface } from 'src/app/models/pc';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DialogData } from '../pc-map/pc-map.component';
 import { GLOBAL } from 'src/app/services/global';
-import 'fabric';
 import { AngularFireStorage } from '@angular/fire/storage';
-import { InformeInterface } from 'src/app/models/informe';
+import 'fabric';
 declare let fabric;
 
 @Component({
@@ -170,8 +169,21 @@ export class PcDetailsDialogComponent implements OnInit {
       hoverCursor: 'pointer',
       selectable: true
     });
+    const textId = new fabric.Text(
+      ' #'.concat(pc.local_id.toString().concat(' ')), {
+        left: pc.img_left,
+        top: pc.img_top - 26,
+        fontSize: 20,
+        textBackgroundColor: 'red',
+        ref: 'text',
+        selectable: false,
+        hoverCursor: 'default',
+        fill: 'black'
+    });
+
     this.canvas.add(actObj1);
     this.canvas.add(actObj2);
+    this.canvas.add(textId);
     this.canvas.renderAll();
   }
 
@@ -226,7 +238,7 @@ export class PcDetailsDialogComponent implements OnInit {
         fill: 'blue'
     });
 
-    TextRef.set('fontFamily', 'Quicksand');
+
 
     this.oldActObjRef1 = actObjRef1;
     this.oldActObjRef2 = actObjRef2;
@@ -270,6 +282,8 @@ export class PcDetailsDialogComponent implements OnInit {
         hoverCursor: 'default',
         fill: 'red',
     });
+
+
 
     this.oldTriangle = triangle;
     this.oldTextTriangle = textTriangle;
@@ -324,7 +338,7 @@ export class PcDetailsDialogComponent implements OnInit {
         document.body.appendChild(a);
         const url = window.URL.createObjectURL(blob);
         a.href = url;
-        a.download = pc.archivoPublico;
+        a.download = `radiometrico_${pc.archivoPublico}`;
         a.click();
         window.URL.revokeObjectURL(url);
       };
@@ -350,7 +364,7 @@ export class PcDetailsDialogComponent implements OnInit {
       document.body.appendChild(a);
       const url = window.URL.createObjectURL(blob);
       a.href = url;
-      a.download = pc.archivoPublico;
+      a.download = `visual_${pc.archivoPublico}`;
       a.click();
       window.URL.revokeObjectURL(url);
     };
@@ -377,7 +391,7 @@ downloadJpg(pc: PcInterface) {
       document.body.appendChild(a);
       const url = window.URL.createObjectURL(blob);
       a.href = url;
-      a.download = pc.archivoPublico;
+      a.download = `jpg_${pc.archivoPublico}`;
       a.click();
       window.URL.revokeObjectURL(url);
     };

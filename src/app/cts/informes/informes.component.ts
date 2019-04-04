@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { InformeInterface } from '../../models/informe';
 import { InformeService } from '../../services/informe.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-informes',
@@ -10,12 +11,20 @@ import { InformeService } from '../../services/informe.service';
 export class InformesComponent implements OnInit {
   public informes: InformeInterface[];
 
-  constructor(private informeService: InformeService) { }
+  constructor(
+    private auth: AuthService,
+    private informeService: InformeService
+    ) { }
 
   ngOnInit() {
-    this.informeService.getInformes().subscribe( informes => {
-      this.informes = informes;
+    this.auth.user$.subscribe(user => {
+      console.log('user', user.uid);
+      this.informeService.getInformesDeEmpresa(user.uid).subscribe( informes => {
+        this.informes = informes;
+      });
     });
+
+
   }
 
 }

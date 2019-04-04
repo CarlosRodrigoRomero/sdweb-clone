@@ -50,6 +50,7 @@
 .detail-title {
     font-weight: 800;
     font-size: 1.5 rem;
+    margin-right: 1rem;
 }
 
 .pc-details-derecha-item-tabla {
@@ -154,4 +155,20 @@ input:checked+.slider:before {
 
 .mat-dialog-content {
     overflow: hidden !important;
+}
+
+.colorSeveridad1 {
+    color: #20B2AA;
+}
+
+.colorSeveridad2 {
+    color: #FF4500;
+}
+
+.colorSeveridad3 {
+    color: #b70000;
+}
+
+.severidad {
+    margin-right: 5rem;
 }

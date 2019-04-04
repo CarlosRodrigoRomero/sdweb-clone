@@ -1,0 +1,18 @@
+.informe-card {
+    max-width: 400px;
+}
+
+.informe-header-image {
+    background-size: cover;
+}
+
+.boton-ver-informe {
+    text-align: center;
+    font-size: 1rem;
+    background-color: #eeeeee;
+}
+
+.cards-actions {
+    display: flex;
+    justify-content: space-around;
+}

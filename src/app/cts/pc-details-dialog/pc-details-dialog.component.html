@@ -1,5 +1,6 @@
 <div mat-dialog-title>
-    <h3 class="dialog-title">Anomalía nº {{pc.local_id}} </h3>
+    <h4 class="dialog-title">Anomalía nº {{pc.local_id}} </h4>
+    <span class="severidad colorSeveridad{{pc.severidad}}">(CoA {{pc.severidad}})</span>
     <label class="switch">
         <input [(ngModel)]="slider" type="checkbox" id="changeImage" (ngModelChange)="onSliderChange($event)">
         <span class="slider round"></span>
@@ -8,7 +9,7 @@
 <div mat-dialog-content>
 
     <div class="row">
-        <div class="col-6">
+        <div class="7">
 
 
             <div id="imagen-div" class="imagen-termica-div" (mouseleave)="onMouseLeaveCanvas($event)">
@@ -26,7 +27,7 @@
         </div>
 
 
-        <div class="col-6 pc-details-derecha">
+        <div class="col-5 pc-details-derecha">
 
             <div class="pc-details-derecha-item">
                 <div class="pc-details-derecha-icon">
@@ -121,7 +122,7 @@
                 </div>
                 <div class="pc-texto">
                     <span class="detail-title">Fecha de captura: </span>
-                    <span>{{pc.datetime * 1000 | date:'dd/MM/yyyy HH:mm'}}</span>
+                    <span>{{pc.datetime * 1000 | date:'dd/MM/yyyy HH:mm'}} UTC</span>
                 </div>
             </div>
             <div class="pc-details-derecha-item">

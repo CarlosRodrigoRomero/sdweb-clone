@@ -5,19 +5,18 @@
             <mat-checkbox *ngFor="let ts of tiposSeveridad" [checked]=true (change)="onCheckBoxSeveridadChange($event)" value="{{ts}}">
                 <div class="filtros-severidad-circulo-texto">
                     <div class="circle circleSeveridad{{ts}}"></div>
+
+
                     <span class="filtro-severidad-text">{{labelsSeveridad[ts-1]}} </span>
+                    <i matTooltip="{{descripcionSeveridad[ts-1]}}" class="info-severidad fas fa-info-circle"></i>
                 </div>
             </mat-checkbox>
 
-            <!-- <mat-checkbox [checked]=true (change)="onCheckBoxSeveridadChange($event)" class="example-margin" value="4">Muy grave</mat-checkbox>
-            <mat-checkbox [checked]=true (change)="onCheckBoxSeveridadChange($event)" class="example-margin" value="3">Grave</mat-checkbox>
-            <mat-checkbox [checked]=true (change)="onCheckBoxSeveridadChange($event)" class="example-margin" value="2">Medio</mat-checkbox>
-            <mat-checkbox [checked]=true (change)="onCheckBoxSeveridadChange($event)" class="example-margin" value="1">Leve</mat-checkbox>
-        -->
+
         </div>
 
-        <h2> Tipo </h2>
-        <div class="filtro-severidad">
+        <h2 *ngIf="false"> Tipo </h2>
+        <div *ngIf="false" class="filtro-severidad">
             <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="1">Célula caliente</mat-checkbox>
             <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="2">Varias células calientes</mat-checkbox>
             <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="3">Substring en CA</mat-checkbox>

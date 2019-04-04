@@ -4,12 +4,16 @@ import { InformeEditComponent } from './cts/informe-edit/informe-edit.component'
 import { InformesComponent } from './cts/informes/informes.component';
 import { NgModule } from '@angular/core';
 import { OrtophotoComponent } from './cts/ortophoto/ortophoto.component';
+import { LoginComponent } from './cts/login/login.component';
+import { AuthGuard } from './services/auth.guard';
 
 const routes: Routes = [
-  {path: '', component: InformesComponent},
-  {path: 'informe-view/:id', component: InformeViewComponent},
-  {path: 'informe-edit/:id', component: InformeEditComponent},
-  {path: 'orto', component: OrtophotoComponent},
+  {path: '', component: LoginComponent},
+  {path: 'informe-view/:id', component: InformeViewComponent, canActivate: [AuthGuard]},
+  // {path: 'informe-edit/:id', component: InformeEditComponent},
+  {path: 'informes', component: InformesComponent, canActivate: [AuthGuard]},
+  // {path: 'orto', component: OrtophotoComponent },
+  {path: 'login', component: LoginComponent},
 ];
 
 @NgModule({

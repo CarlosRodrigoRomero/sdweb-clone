@@ -1,36 +1,5 @@
 <div *ngIf="isLoaded1 && isLoaded2 && isLoaded3">
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light nav-informe">
-        <a class="navbar-brand" href="#">
-            <img src="../../../assets/images/logo_sd.png" height="40" class="d-inline-block align-top" alt="">
-        </a>
-
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Plantas
-          </a>
-                    <!-- <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Planta 1</a>
-                        <a class="dropdown-item" href="#">Planta 2</a>
-                    </div> -->
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Informes</a>
-                </li>
-            </ul>
-            <!-- <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form> -->
-        </div>
-    </nav>
-
     <div class="container">
         <div class="header-informe">
             <div class="row">
@@ -63,11 +32,11 @@
                         </div>
                         <div class="col-12 datos-meteo">
                             <div class="col-2 col-datos-meteo">
-                                <i class="fas fa-thermometer-half"></i>
+                                <i class="fas fa-chess-board"></i>
                             </div>
                             <div class="datos-meteo-texto">
-                                <span class="text-light datos-meteo-numero">{{informe?.temperatura}} ºC</span>
-                                <span class="text-light">Temperatura ambiente</span>
+                                <span class="text-light datos-meteo-numero">{{informe?.gsd}} cm/pixel</span>
+                                <span class="text-light">GSD (ground sample distance)</span>
                             </div>
                         </div>
                     </div>
@@ -95,7 +64,7 @@
                                 <span class="text-light mae-pct-simbolo">%</span>
                             </div>
                             <div class="div-mae-3">
-                                <h4 class="text-center text-light">(muy bueno)</h4>
+                                <!-- <h4 class="text-center text-light">(muy bueno)</h4> -->
                             </div>
 
                         </div>
@@ -119,10 +88,10 @@
                 <a class="nav-link" id="ortophoto-tab" data-toggle="tab" href="#ortophoto" role="tab" aria-controls="ortophoto" aria-selected="false">Mapa térmico</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="export-tab" data-toggle="tab" href="#export" role="tab" aria-controls="export" aria-selected="false">Informe PDF</a>
+                <a class="nav-link" (click)="downloadInformePdf()" href="javascript:void(0)">Descargar PDF</a>
             </li>
             <li class="nav-item">
-                <a href="https://drive.google.com/file/d/1a4wnbwqb3H5zsGmcagZzT6ScOWi-CbFR/view?usp=sharing" target="_blank" class="nav-link">Informe EXCEL</a>
+                <a (click)="downloadInformeExcel()" href="javascript:void(0)" class="nav-link">Descargar EXCEL</a>
             </li>
         </ul>
         <div class="row">

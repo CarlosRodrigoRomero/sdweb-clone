@@ -8,7 +8,6 @@ export interface InformeInterface {
     irradiancia?: number;
     tempMediaModulos?: number;
     velocidad?: number;
-    gsd?: number;
     carpeta?: string;
     carpetaBase?: string;
     mae?: number;
@@ -18,4 +17,5 @@ export interface InformeInterface {
     alturaVuelo?: number;
     nubosidad?: number;
     numeroModulos?: number;
+    gsd?: number;
 }

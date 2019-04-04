@@ -55,6 +55,7 @@ export interface PcInterface {
      datetimeString?: string;
      rangeMax?: number;
      rangeMin?: number;
+     nubosidad?: string;
 
 
 

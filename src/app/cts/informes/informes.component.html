@@ -1,16 +1,22 @@
-<div class="row">
-    <div *ngFor="let informe of informes" class="col s6">
-        <div class="card">
-            <div class="card-content">
-                <span class="card-title">Informe de la planta {{informe.altura_vuelo}}</span>
-                <span class="card-content">
-                    <button routerLink="/informe-edit/{{informe.id}}" class="btn waves-effect waves-light green left">Editar informe</button>
-                    <button routerLink="/informe-view/{{informe.id}}" class="btn waves-effect waves-light blue right">Ver informe</button>
-                </span>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-4">
+            <mat-card *ngFor="let informe of informes" class="informe-card">
+                <mat-card-header>
+                    <div mat-card-avatar class="informe-header-image"></div>
+                    <mat-card-title>{{informe.nombre}}</mat-card-title>
+                    <mat-card-subtitle>2 MW - 2 ejes</mat-card-subtitle>
+                </mat-card-header>
+                <img mat-card-image src="../../../assets/images/puebla.jpg" alt="">
+                <mat-card-content>
+                    <p>
 
-
-            </div>
+                    </p>
+                </mat-card-content>
+                <mat-card-actions class="cards-actions">
+                    <button class="boton-ver-informe" routerLink="/informe-view/{{informe.id}}" mat-button>Ver informe</button>
+                </mat-card-actions>
+            </mat-card>
         </div>
-
     </div>
 </div>

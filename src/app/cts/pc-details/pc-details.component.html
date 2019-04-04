@@ -1,24 +1,11 @@
 <div class="row">
     <div class="col-6">
 
-        <div class="imagen-termica-div" (mouseleave)="onMouseLeaveCanvas($event)">
-            <canvas (mousemove)="onMouseMoveCanvas($event)" id={{pc.id}} width="360" height="256">
+        <div class="imagen-termica-div">
+            <canvas id={{pc.id}} width="{{canvasWidth}}" height="{{canvasHeight}}">
       </canvas>
-            <span class="imagen-termica-tooltip text-center" id='tooltip_{{pc.id}}'>{{tooltipTemp}} ºC</span>
+            <!-- <span class="imagen-termica-tooltip text-center" id='tooltip_{{pc.id}}'>{{tooltipTemp}} ºC</span> -->
         </div>
-
-        <div class="pc-detail-botones">
-            <button (click)="downloadRjpg(pc)" mat-raised-button>JPG Radiométrico</button>
-            <button (click)="downloadJpgVisual(pc)" mat-raised-button>JPG Visual</button>
-            <button (click)="downloadJpg(pc)" mat-raised-button>JPG</button>
-            <button mat-raised-button>informe reclamacion</button>
-            <!-- <button (click)="pc.resuelto = !pc.resuelto" [disabled]="pc.resuelto" mat-raised-button> <i *ngIf="pc.resuelto" class="fas fa-check"></i>resuelto</button> -->
-        </div>
-
-    </div>
-
-    <div class="col-6 pc-details-derecha">
-
         <div class="pc-details-derecha-item">
             <div class="pc-details-derecha-icon">
                 <i class="fas fa-info-circle"></i>
@@ -29,21 +16,35 @@
             </div>
 
             <div class="pc-details-derecha-item-tabla">
-                <span class="text-center"><strong>Temp media</strong></span>
-                <span class="text-center">{{pc.temperaturaMedia}} ºC</span>
+                <span class="text-center"><strong>Temp referencia</strong></span>
+                <span class="text-center">{{pc.temperaturaRef}} ºC</span>
             </div>
 
             <div class="pc-details-derecha-item-tabla">
                 <span class="text-center"><strong>Gradiente</strong></span>
-                <span class="text-center">+ {{pc.gradiente | number: '1.0-1'}} ºC</span>
+                <span style="color:red" class="text-center">+ {{pc.gradienteNormalizado | number: '1.0-1'}} ºC</span>
             </div>
 
             <div class="pc-details-derecha-item-tabla">
                 <span class="text-center"><strong>Pérdidas</strong></span>
-                <span class="text-center">{{pcPerdidas[pc.tipo]}} %</span>
+                <span class="text-center">{{pc.perdidas * 100}} %</span>
             </div>
 
         </div>
+
+        <div class="pc-detail-botones">
+            <button (click)="downloadRjpg(pc)" mat-raised-button>JPG Radiométrico</button>
+            <button (click)="downloadJpgVisual(pc)" mat-raised-button>JPG Visual</button>
+            <button (click)="downloadJpg(pc)" mat-raised-button>JPG</button>
+            <!-- <button mat-raised-button>informe reclamacion</button> -->
+            <!-- <button (click)="pc.resuelto = !pc.resuelto" [disabled]="pc.resuelto" mat-raised-button> <i *ngIf="pc.resuelto" class="fas fa-check"></i>resuelto</button> -->
+        </div>
+
+    </div>
+
+    <div class="col-6 pc-details-derecha">
+
+
 
         <div class="pc-details-derecha-item">
             <div class="pc-details-derecha-icon">
@@ -82,7 +83,7 @@
             </div>
             <div class="pc-texto">
                 <span class="detail-title">Localización:</span>
-                <a href="#">(ver en el mapa)</a>
+                <!-- <a href="#">(ver en el mapa)</a> -->
             </div>
 
             <div class="pc-details-derecha-item-tabla">
@@ -109,7 +110,7 @@
             </div>
             <div class="pc-texto">
                 <span class="detail-title">Fecha de captura: </span>
-                <span>{{pc.datetime * 1000 | date:'dd/MM/yyyy HH:mm'}}</span>
+                <span>{{pc.datetime * 1000 | date:'dd/MM/yyyy HH:mm'}} UTC</span>
             </div>
         </div>
         <div class="pc-details-derecha-item">

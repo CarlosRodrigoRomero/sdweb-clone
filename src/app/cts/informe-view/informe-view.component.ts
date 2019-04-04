@@ -124,5 +124,53 @@ export class InformeViewComponent implements OnInit {
     this.isLoaded3 = true;
   }
 
+  downloadInformePdf() {
+    this.storage.ref(`informes/${this.informe.id}/informe.pdf`).getDownloadURL()
+      .subscribe( downloadUrl => {
+      const xhr = new XMLHttpRequest();
+      xhr.responseType = 'blob';
+      xhr.onload = (event) => {
+        /* Create a new Blob object using the response
+        *  data of the onload object.
+        */
+        const blob = new Blob([xhr.response], { type: 'image/jpg' });
+        const a: any = document.createElement('a');
+        a.style = 'display: none';
+        document.body.appendChild(a);
+        const url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = `${this.informe.fecha}_${this.planta.nombre}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      };
+      xhr.open('GET', downloadUrl);
+      xhr.send();
+    });
+  }
+
+  downloadInformeExcel() {
+    this.storage.ref(`informes/${this.informe.id}/excel.xlsx`).getDownloadURL()
+      .subscribe( downloadUrl => {
+      const xhr = new XMLHttpRequest();
+      xhr.responseType = 'blob';
+      xhr.onload = (event) => {
+        /* Create a new Blob object using the response
+        *  data of the onload object.
+        */
+        const blob = new Blob([xhr.response], { type: 'image/jpg' });
+        const a: any = document.createElement('a');
+        a.style = 'display: none';
+        document.body.appendChild(a);
+        const url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = `${this.informe.fecha}_${this.planta.nombre}.xlsx`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      };
+      xhr.open('GET', downloadUrl);
+      xhr.send();
+    });
+  }
+
 }
 

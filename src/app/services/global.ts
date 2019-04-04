@@ -5,8 +5,14 @@ export let GLOBAL = {
   camara_termica: 'DJI XT2 640 13mm',
   uav: 'Multirrotor Solardrone MKIV',
   mae: [0.1, 0.2],
+  resolucionCamara: [512, 640],
   // labels_severidad: ['Leve', 'Media', 'Grave'],
   labels_severidad: ['CoA 1', 'CoA 2', 'CoA 3'],
+  descripcionSeveridad: [
+    'Tipo 1: sin anomalía. Hacemos seguimiento, pero no hay que actuar',
+    'Tipo 2: anomalía térmica: ver la causa y, si es necesario, arreglar en un periodo razonable.',
+    'Tipo 3: anomalía relevante para la seguridad: próxima interrupción de la operación normal del módulo, actuar cuanto antes.'
+  ],
   tipos_severidad: [1, 2, 3],
   // colores_severidad: ['#20B2AA', '#FFD700', '#FF4500', '#800000'],
   colores_severidad: ['#20B2AA', '#FF4500', '#b70000'],

@@ -35,6 +35,13 @@
                 <span>{{element.local_id}}</span> </td>
         </ng-container>
 
+        <ng-container matColumnDef="global_x">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Seguidor </th>
+            <td mat-cell *matCellDef="let element">
+                <span>{{element.global_x}}</span> </td>
+        </ng-container>
+
+
         <ng-container matColumnDef="temperaturaMax">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Temperatura máx. </th>
             <td mat-cell *matCellDef="let element">
