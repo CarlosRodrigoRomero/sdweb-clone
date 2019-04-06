@@ -33,7 +33,6 @@ export class PcMapComponent implements OnInit {
   public filteredPcs: PcInterface[];
   public informeId: string;
 
-  public zoom = this.planta.zoom;
   public mapType = 'satellite';
 
   constructor(
@@ -77,7 +76,7 @@ export class PcMapComponent implements OnInit {
               .getDownloadURL();
       }
       const dialogRef = this.dialog.open(PcDetailsDialogComponent, {
-        // width: '1600px',
+        width: '1100px',
         // height: '600px',
         hasBackdrop: true,
         data: {pc: selectedPc, allPcs: this.allPcs}

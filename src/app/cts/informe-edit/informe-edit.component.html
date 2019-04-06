@@ -19,11 +19,13 @@
             <input type="checkbox" [(ngModel)]="manualRotation">
 
             <div class="input-range-div">
-                <button class="btn btn-secondary input-range-button" (click)="setImageFromRangeValue(rangeValue-4)"> &lt; </button>
-
+                <button class="btn btn-secondary input-range-button" (click)="setImageFromRangeValue(rangeValue-4)"> &lt; | &lt; </button>
+                <button class="btn btn-secondary input-range-button" (click)="setImageFromRangeValue(rangeValue-1)"> &lt; </button>
                 <input type="range" id="slider" min=1 [max]="fileList.length || 1" step="1" [(value)]="rangeValue" (input)="onInputRange($event)" />
                 <!-- hay que restarle 1 -->
-                <button class="btn btn-secondary input-range-button" (click)="setImageFromRangeValue(rangeValue+4)"> &gt; </button>
+                <button class="btn btn-secondary input-range-button" (click)="setImageFromRangeValue(rangeValue+1)"> &gt; </button>
+                <button class="btn btn-secondary input-range-button" (click)="setImageFromRangeValue(rangeValue+4)"> &gt; | &gt; </button>
+
             </div>
 
             <div class="row">

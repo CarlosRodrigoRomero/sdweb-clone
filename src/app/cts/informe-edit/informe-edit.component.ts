@@ -72,6 +72,8 @@ export class InformeEditComponent implements OnInit {
   public manualRotation: boolean;
   private gmt_hours_diff: number;
   public lastRef: number[];
+  public currentGlobalX: number;
+  public currentGlobalY: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -390,58 +392,58 @@ export class InformeEditComponent implements OnInit {
 
 
 
-  getMaxTempInActObj(actObj) { // en la imagen rotada
+  // getMaxTempInActObj(actObj) { // en la imagen rotada
 
-    // get the color array for the pixels around the mouse
-    const actObjRaw = this.transformActObjToRaw(actObj);
-    // console.log('RAW. left, top, width, height', actObjRaw.left, actObjRaw.top, actObjRaw.width, actObjRaw.height);
-    // console.log('ROT. left, top, width, height', actObj.left, actObj.top, actObj.width, actObj.height);
+  //   // get the color array for the pixels around the mouse
+  //   const actObjRaw = this.transformActObjToRaw(actObj);
+  //   // console.log('RAW. left, top, width, height', actObjRaw.left, actObjRaw.top, actObjRaw.width, actObjRaw.height);
+  //   // console.log('ROT. left, top, width, height', actObj.left, actObj.top, actObj.width, actObj.height);
 
-    const actObjData = this.canvas2
-      .getContext('2d')
-      .getImageData(actObjRaw.left, actObjRaw.top, actObjRaw.width, actObjRaw.height)
-      .data;
-    // let square_pixel_data = this.canvas2.getContext('2d').getImageData(x, y, 1, 1).data;
-    const act_obj_temps_array = [];
+  //   const actObjData = this.canvas2
+  //     .getContext('2d')
+  //     .getImageData(actObjRaw.left, actObjRaw.top, actObjRaw.width, actObjRaw.height)
+  //     .data;
+  //   // let square_pixel_data = this.canvas2.getContext('2d').getImageData(x, y, 1, 1).data;
+  //   const act_obj_temps_array = [];
 
-    for (let i = 0, n = actObjRaw.height * actObjRaw.width * 4; i < n; i += 4) {
-      act_obj_temps_array.push(
-        this.rgb2temp(actObjData[i], actObjData[i + 1], actObjData[i + 2])
-      );
-      // i+3 is alpha (the fourth element)
-    }
+  //   for (let i = 0, n = actObjRaw.height * actObjRaw.width * 4; i < n; i += 4) {
+  //     act_obj_temps_array.push(
+  //       this.rgb2temp(actObjData[i], actObjData[i + 1], actObjData[i + 2])
+  //     );
+  //     // i+3 is alpha (the fourth element)
+  //   }
 
-    const act_obj_max_temp_arr = this.indexOfMax(act_obj_temps_array);
-    const act_obj_max_temp = act_obj_max_temp_arr[0];
-    const act_obj_max_index = act_obj_max_temp_arr[1];
-    const act_obj_max_temp_y_raw = Math.round(
-      actObjRaw.top + Math.trunc(act_obj_max_index / actObjRaw.width)
-    );
-    const act_obj_max_temp_x_raw = Math.round(
-      actObjRaw.left +
-        act_obj_max_index -
-        Math.trunc(act_obj_max_index / actObjRaw.width) * actObjRaw.width
-    );
+  //   const act_obj_max_temp_arr = this.indexOfMax(act_obj_temps_array);
+  //   const act_obj_max_temp = act_obj_max_temp_arr[0];
+  //   const act_obj_max_index = act_obj_max_temp_arr[1];
+  //   const act_obj_max_temp_y_raw = Math.round(
+  //     actObjRaw.top + Math.trunc(act_obj_max_index / actObjRaw.width)
+  //   );
+  //   const act_obj_max_temp_x_raw = Math.round(
+  //     actObjRaw.left +
+  //       act_obj_max_index -
+  //       Math.trunc(act_obj_max_index / actObjRaw.width) * actObjRaw.width
+  //   );
 
-    // draw triangle
-    // convertir a coordenadas de canvas1
-    const act_obj_max_temp_rotated = this.transformCoordsToRotated(act_obj_max_temp_x_raw, act_obj_max_temp_y_raw);
+  //   // draw triangle
+  //   // convertir a coordenadas de canvas1
+  //   const act_obj_max_temp_rotated = this.transformCoordsToRotated(act_obj_max_temp_x_raw, act_obj_max_temp_y_raw);
 
-    // console.log('TRIANGLE RAW: rotated_x: ', act_obj_max_temp_x_raw, 'rotated_y: ', act_obj_max_temp_y_raw);
-    // console.log('TRIANGLE: rotated_x: ', act_obj_max_temp_rotated.x, 'rotated_y: ', act_obj_max_temp_rotated.y);
-    // this.drawTriangle(act_obj_max_temp_rotated.x, act_obj_max_temp_rotated.y);
-    // this.drawTriangle2(act_obj_max_temp_x_raw, act_obj_max_temp_y_raw);
-    // console.log('max_temp:', act_obj_max_temp, 'x, y: ', act_obj_max_temp_x_raw, act_obj_max_temp_y_raw);
+  //   // console.log('TRIANGLE RAW: rotated_x: ', act_obj_max_temp_x_raw, 'rotated_y: ', act_obj_max_temp_y_raw);
+  //   // console.log('TRIANGLE: rotated_x: ', act_obj_max_temp_rotated.x, 'rotated_y: ', act_obj_max_temp_rotated.y);
+  //   // this.drawTriangle(act_obj_max_temp_rotated.x, act_obj_max_temp_rotated.y);
+  //   // this.drawTriangle2(act_obj_max_temp_x_raw, act_obj_max_temp_y_raw);
+  //   // console.log('max_temp:', act_obj_max_temp, 'x, y: ', act_obj_max_temp_x_raw, act_obj_max_temp_y_raw);
 
-    this.pc_temp = Math.round(act_obj_max_temp * 10) / 10;
+  //   this.pc_temp = Math.round(act_obj_max_temp * 10) / 10;
 
-    // report that pixel data
-    return {
-      max_temp: act_obj_max_temp,
-      max_temp_x: act_obj_max_temp_x_raw,
-      max_temp_y: act_obj_max_temp_y_raw
-    };
-  }
+  //   // report that pixel data
+  //   return {
+  //     max_temp: act_obj_max_temp,
+  //     max_temp_x: act_obj_max_temp_x_raw,
+  //     max_temp_y: act_obj_max_temp_y_raw
+  //   };
+  // }
 
   private drawTriangle(x: number, y: number) {
     if (this.oldTriangle !== null && this.oldTriangle !== undefined) {
@@ -613,6 +615,12 @@ export class InformeEditComponent implements OnInit {
 
     if (this.selected_pc) {
       this.selected_pc.color = 'black';
+      if (this.selected_pc.archivo === newPc.archivo) {
+        newPc.global_x = this.selected_pc.global_x;
+        newPc.global_y = this.selected_pc.global_y;
+        newPc.gps_lng = this.selected_pc.gps_lng;
+        newPc.gps_lat = this.selected_pc.gps_lat;
+      }
     }
     this.addPcToDb(newPc);
     // this.updatePcInDb(newPc, true);
@@ -666,18 +674,18 @@ export class InformeEditComponent implements OnInit {
     // this.drawTriangle2(this.selected_pc.img_x, this.selected_pc.img_y); // TO REMOVE
   }
 
-  rgb2temp(red, green, blue) {
-    // a = (max_temp - min_temp) / 255
-    // b= min_temp
-    const max_temp = this.max_temp;
-    const min_temp = this.min_temp;
+  // rgb2temp(red, green, blue) {
+  //   // a = (max_temp - min_temp) / 255
+  //   // b= min_temp
+  //   // const max_temp = this.max_temp;
+  //   // const min_temp = this.min_temp;
 
-    const b = min_temp;
-    const a = (max_temp - min_temp) / 255;
+  //   const b = min_temp;
+  //   const a = (max_temp - min_temp) / 255;
 
-    const x = (red + green + blue) / 3;
-    return Math.round((x * a + b) * 10) / 10;
-  }
+  //   const x = (red + green + blue) / 3;
+  //   return Math.round((x * a + b) * 10) / 10;
+  // }
 
   indexOfMax(arr) {
     if (arr.length === 0) {
@@ -747,8 +755,8 @@ export class InformeEditComponent implements OnInit {
             console.log('errorrr 1');
           } else {
             this.informe = response;
-            this.min_temp = this.informe.tempMin;
-            this.max_temp = this.informe.tempMax;
+            // this.min_temp = this.informe.tempMin;
+            // this.max_temp = this.informe.tempMax;
 
             this.getPlanta(this.informe.plantaId);
             // Cogemos todos los pcs de esta informe
@@ -855,9 +863,13 @@ export class InformeEditComponent implements OnInit {
       this.selected_pc = null;
       const value = parseInt(event.target.value, 10);
       this.setImageFromRangeValue(value);
-      this.rangeValue = value;
+    }
+    onClickNext(rangeValue) {
+      if (this.selected_pc !== null) {
 
-      // draw circle in map
+        this.selected_pc = null;
+      }
+      
     }
 
   getDateTimeFromDateAndTime(date: string, time: string) {
@@ -907,11 +919,12 @@ export class InformeEditComponent implements OnInit {
         if (pc.archivo === this.currentFileName) {
           this.drawPcInCanvas(pc);
         }
-
       }
       this.canvas.discardActiveObject();
       // Añadir numero de vuelo
       // TODO
+
+      console.log('selected_pc', this.selected_pc);
     }
 
   onMapMarkerClick(pc: PcInterface) {
@@ -968,15 +981,17 @@ export class InformeEditComponent implements OnInit {
       this.updatePcInDb(pc, false);
     }
   onClickLocalCoordsTable(selectedPc: PcInterface, f: number, c: number) {
-      // console.log(selected_pc, f, c);
-      selectedPc.local_x = c;
-      selectedPc.local_y = f;
+      if (this.selected_pc === selectedPc) {
+        this.selected_pc.local_x = c;
+        this.selected_pc.local_y = f;
+      }
       this.updatePcInDb(selectedPc, false);
     }
 
-  updatePcInDb(pc: PcInterface, newPc: boolean = false) {
+  updatePcInDb(pc: PcInterface, updateAll: boolean = false) {
       this.pcService.updatePc(pc);
 
+      // if (updateAll) {
       // Actualizar this.allPcs
       this.allPcs = this.allPcs.map( (element) => {
         if (pc.id === element.id) {
@@ -985,8 +1000,7 @@ export class InformeEditComponent implements OnInit {
           return element;
         }
       });
-
-      // this.getPcsList();
+    // }
     }
 
   drawPcInCanvas(pc: PcInterface) {

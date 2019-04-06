@@ -6,6 +6,7 @@ import { NgModule } from '@angular/core';
 import { OrtophotoComponent } from './cts/ortophoto/ortophoto.component';
 import { LoginComponent } from './cts/login/login.component';
 import { AuthGuard } from './services/auth.guard';
+import { IndexComponent } from './cts/index/index.component';
 
 const routes: Routes = [
   {path: '', component: LoginComponent},

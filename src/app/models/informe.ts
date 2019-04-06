@@ -11,8 +11,6 @@ export interface InformeInterface {
     carpeta?: string;
     carpetaBase?: string;
     mae?: number;
-    tempMax?: number;
-    tempMin?: number;
     tempLimite?: number;
     alturaVuelo?: number;
     nubosidad?: number;

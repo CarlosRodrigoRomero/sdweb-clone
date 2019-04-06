@@ -40,6 +40,7 @@ import { MapService } from './services/orto.service';
 import { LoginComponent } from './cts/login/login.component';
 import { AuthService } from './services/auth.service';
 import { NgxAuthFirebaseUIModule } from 'ngx-auth-firebaseui';
+import { IndexComponent } from './cts/index/index.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { NgxAuthFirebaseUIModule } from 'ngx-auth-firebaseui';
     PcDetailsDialogComponent,
     InformeExportComponent,
     OrtophotoComponent,
-    LoginComponent
+    LoginComponent,
+    IndexComponent
   ],
   entryComponents: [
     PcDetailsDialogComponent

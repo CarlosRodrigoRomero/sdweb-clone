@@ -25,7 +25,7 @@ export let GLOBAL = {
     'Punto caliente', // 1
     'Varios puntos calientes', // 2
     'Substring en CA', // 3
-    'String', // 4
+    'String en CA', // 4
     'Módulo en CA', // 5
     'Substring en CC', // 6
     'Módulo en CC', // 7

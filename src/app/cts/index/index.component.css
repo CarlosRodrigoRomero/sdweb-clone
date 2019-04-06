@@ -1,0 +1,208 @@
+header {
+    height: 80px;
+    border-bottom: 1px solid red;
+}
+
+.logo {
+    width: 200px;
+    align-self: center;
+}
+
+.imagen-principal-div {
+    background-color: #DFDBE5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.imagen-principal {
+    background-image: url("../../../assets/images/fondo_1.jpg");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 80vh;
+    /*	display:flex;
+	justify-content: center;
+	flex-direction: column;*/
+}
+
+.cabecera img {
+    margin: 0 auto;
+}
+
+.text-container {
+    height: 66%;
+    display: flex;
+    justify-content: center;
+}
+
+.imagen-text {
+    margin: 0 2rem;
+    color: white;
+    align-self: center;
+    font-size: 5rem;
+    text-align: center;
+    margin-top: 5rem;
+}
+
+.subtitulo span {
+    font-size: 2rem;
+}
+
+.seccion h1 {
+    margin-bottom: 4rem;
+    margin-top: 5rem;
+}
+
+.propuesta-valor h3 {
+    margin-top: 1rem;
+    margin-bottom: 5rem;
+}
+
+.descripcion {
+    text-align: center;
+}
+
+.propuesta-imagen {
+    margin: 2rem auto;
+    width: 100px;
+}
+
+.imagen {
+    width: 60%;
+    margin: 2rem auto;
+}
+
+@media (max-width: 768px) {
+    .imagen {
+        width: 90%;
+        margin: 2rem auto;
+    }
+    .imagen-text {
+        margin-top: 7rem;
+        width: 100%;
+    }
+}
+
+.especialistas {
+    padding-bottom: 40px;
+    background-color: rgba(128, 128, 128, 0.08);
+    border-top: 1px solid rgba(0, 0, 0, 0.29);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.29);
+}
+
+.seccion {
+    padding-bottom: 40px;
+}
+
+.oscuro {
+    background-color: rgba(128, 128, 128, 0.08);
+    border-top: 1px solid rgba(0, 0, 0, 0.29);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.29);
+}
+
+.especialistas-titulo {
+    margin: 5rem 0;
+}
+
+
+/*.certificados {
+	margin-top:3rem;
+}*/
+
+.img-certificados {
+    margin: 2rem auto;
+    width: 40%;
+}
+
+.seccion h4 {
+    margin-bottom: 2rem;
+}
+
+.seccion h2 {
+    margin-top: 5rem;
+    margin-bottom: 3rem;
+}
+
+.img-competitivos {
+    margin: 2rem auto;
+    width: 60%;
+}
+
+.recorrido-titulo {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #cd0409;
+    margin-top: 2rem;
+}
+
+.recorrido-titulo2 {
+    font-size: 2.2rem;
+    margin-bottom: 3rem;
+    margin-top: 3rem;
+    color: #cd0409;
+}
+
+.recorrido-texto {
+    margin-top: 1rem;
+}
+
+.recorrido-imagen {
+    width: auto;
+    max-width: 100%;
+    height: 200px;
+    margin: 0 auto;
+    display: block;
+}
+
+.lista-datos {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.lista-texto {
+    margin-top: 1rem;
+    margin-bottom: 3rem;
+}
+
+.lista-imagen {
+    align-self: center;
+    height: 150px;
+    width: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.lista-datos li {
+    display: flex;
+    flex-direction: column;
+}
+
+.apoyo {
+    padding-bottom: 40px;
+    background-color: white;
+    border-top: 1px solid rgba(0, 0, 0, 0.29);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.29);
+    margin-top: 3rem;
+    padding-top: 5rem;
+}
+
+.apoyo h2 {
+    margin-bottom: 5rem;
+}
+
+.apoyo h4 {
+    margin-bottom: 5rem;
+}
+
+.img-apoyo {
+    margin: 0 auto;
+    width: 75%;
+}
+
+footer img {
+    margin: 0 auto;
+}
+
+p {
+    font-size: 1.5rem;
+}

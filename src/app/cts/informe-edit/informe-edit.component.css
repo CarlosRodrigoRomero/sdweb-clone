@@ -157,8 +157,9 @@ agm-map {
 }
 
 .input-range-button {
-    height: 1.5rem;
-    width: 1.5rem;
+    height: 2rem;
+    width: 2rem;
+    margin-right: 0.5rem;
     align-self: center;
     padding: 0px;
 }

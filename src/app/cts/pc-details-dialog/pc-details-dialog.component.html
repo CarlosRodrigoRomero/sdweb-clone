@@ -9,7 +9,7 @@
 <div mat-dialog-content>
 
     <div class="row">
-        <div class="7">
+        <div class="col-7">
 
 
             <div id="imagen-div" class="imagen-termica-div" (mouseleave)="onMouseLeaveCanvas($event)">
@@ -29,7 +29,7 @@
 
         <div class="col-5 pc-details-derecha">
 
-            <div class="pc-details-derecha-item">
+            <div *ngIf="true" class="pc-details-derecha-item">
                 <div class="pc-details-derecha-icon">
                     <i class="fas fa-info-circle"></i>
                 </div>

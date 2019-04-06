@@ -82,7 +82,7 @@ export class InformeExportComponent implements OnInit {
           pc.severidad = 4; // muy grave
 
         } else {
-          let dt = pc.temperaturaMax - this.informe.tempMediaModulos;
+          const dt = pc.gradienteNormalizado;
           if (dt >= GLOBAL.severidad_dt[2]) {
             pc.severidad = 3; // grave
  
