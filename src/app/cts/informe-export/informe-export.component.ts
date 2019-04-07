@@ -64,6 +64,9 @@ export class InformeExportComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Ordenar Pcs por seguidor:
+    this.allPcs.sort(this.compare);
+
     this.arrayFilas = Array(this.planta.filas).fill(0).map( (_, i) => i + 1);
     this.arrayColumnas = Array(this.planta.columnas).fill(0).map( (_, i) => i + 1);
 
@@ -86,8 +89,6 @@ export class InformeExportComponent implements OnInit {
       }
       this.countPosicion.push(countColumnas);
     }
-    console.log('count posicion', this.countPosicion);
-    console.log('arrayFilas', this.arrayFilas);
 
     // Calcular los tipos de puntos calientes
     let filtroCategoria;
@@ -138,6 +139,25 @@ export class InformeExportComponent implements OnInit {
           ]
         };
 
+  }
+  public calificacionMae(mae: number) {
+    if (mae <= 0.1) {
+      return 'muy bueno';
+    } else if (mae <= 0.2) {
+      return 'correcto';
+    } else {
+      return 'mejorable';
+    }
+  }
+
+  compare(a: PcInterface, b: PcInterface) {
+    if (a.global_x < b.global_x) {
+      return -1;
+    }
+    if (a.global_x > b.global_x) {
+      return 1;
+    }
+    return 0;
   }
 
 

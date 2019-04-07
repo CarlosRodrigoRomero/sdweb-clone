@@ -125,6 +125,7 @@
     <div class="row">
         <div class="col-12">
             <h4>1.3 Irradiancia durante el vuelo</h4>
+
             <p *ngIf="informe.irradiancia === 0">
                 Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de {{planta.nombre}}, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde
                 el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.
@@ -133,22 +134,22 @@
                 Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición que Solardrone ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el
                 aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.
             </p>
-
-            <img id="imgIrradiancia" class="img-fluid rounded" src="{{irradianciaImg$ | async}}" alt="">
-
+            <div class="text-center">
+                <img id="imgIrradiancia" class="img-fluid rounded" src="{{irradianciaImg$ | async}}" alt="">
+            </div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-12">
             <h4>1.4 Ajuste de parámetros térmicos</h4>
-            <h5>1.5 Emisividad</h5>
+            <h5>1.4.1 Emisividad</h5>
             <p>
                 La emisividad del material se mide de manera experimental en le campo. La emisivdad del mismo depende del tipo de vidrio de los paneles y de la suciedad que tengan. La emisividad escogida por el termógrafo tras el ensayo experimental es de:
             </p>
             <span class="text-center"><strong>Emisividad = 0.85</strong></span>
 
-            <h5>1.6 Irradiancia</h5>
+            <h5>1.4.2 Irradiancia</h5>
             <p>
                 Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de {{planta.nombre}}, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde
                 el aire, de manera que cada imagen tiene una irradiancia asociada.
@@ -161,7 +162,7 @@
 
     <div class="row">
         <div class="col-12">
-            <h4>1.6 Pérdida de Performance Ratio (ΔPR)</h4>
+            <h4>1.5 Pérdida de Performance Ratio (ΔPR)</h4>
 
             <p>
                 El coeficiente de rendimiento de sistemas fotovoltaicos o Performance Ratio es un parámetro que tuvo su origen conceptual en la norma IES 61724 (1998) para ser utilizado como indicador de calidad en la evaluación de sistemas fotovoltaicos.
@@ -211,8 +212,15 @@
                 Por lo tanto, sabiendo el MAE sabremos cuánto PR estamos perdiendo debido a las incidencias encontradas.
             </p>
             <p>
-                El objetivo será obtener un MAE bajo, lo cual nos indicará un correcto mantenimiento de la planta. Según la siguiente tabla, podemos clasificar el mantenimiento de una planta en:
+                El objetivo será obtener un MAE bajo, lo cual nos indicará un correcto mantenimiento de la planta.
             </p>
+            <p>
+                Teniendo en cuenta todas las plantas fotovoltaicas inspeccionadas por Solardrone, se puede hacer una clasificación estadística según el MAE. Según la siguiente tabla, podemos clasificar el mantenimiento de una planta en 3 tipos: muy bueno (por debajo
+                de la media), correcto (en la media) y 'mejorable' (por encima de la media):
+            </p>
+            <div class="text-center">
+                <img class="img-fluid" src="../../../assets/images/maeCurva.png" alt="">
+            </div>
 
             <table class="table table-striped">
                 <thead class="thead-dark">
@@ -222,18 +230,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr style="color: rgb(85, 156, 85)">
                         <th scope="row">
                             < {{global.mae[0]}}%</th>
                                 <td>Muy bueno</td>
 
                     </tr>
-                    <tr>
+                    <tr style="color: rgb(0, 132, 255)">
                         <th scope="row">{{global.mae[0]}}% - {{global.mae[1]}}%</th>
                         <td>Correcto</td>
 
                     </tr>
-                    <tr>
+                    <tr style="color: rgb(255, 136, 0)">
                         <th scope="row">> {{global.mae[1]}}%</th>
                         <td>Mejorable</td>
 
@@ -244,7 +252,7 @@
     </div>
     <div class="row">
         <div class="col-12">
-            <h4>1.5 Clasificación de las anomalías</h4>
+            <h4>1.6 Clasificación de las anomalías</h4>
 
             <p>
                 Según la norma UNE-62446-3 de inspección termográfica de instalaciones fotovoltaicas, las anomalías termográficas se clasifican en tres clases o CoA (Class of Abnormalitys):
@@ -260,7 +268,7 @@
 
     <div class="row">
         <div class="col-12">
-            <h4>1.8 Cómo localizar las incidencias</h4>
+            <h4>1.7 Cómo localizar las incidencias</h4>
 
             <p>
                 Todas las incidencias tienen asociada una localización GPS, cuyo margen de error es de unos pocos metros (0-2 metros). </p>
@@ -343,7 +351,7 @@
                 Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran (fila y columna) dentro de cada seguidor.
             </p>
 
-            <table class="table table-striped">
+            <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th scope="col"> </th>
@@ -361,17 +369,35 @@
         </div>
     </div>
 
-
-
     <div class="row">
         <div class="col-12">
-            <h4>2.4 Modulos Apagados Equivalentes (MAE)</h4>
-            El MAE de la planta es: {{informe.mae}}
+            <h3>Conclusiones y recomendaciones</h3>
         </div>
     </div>
+    <div class="row">
+        <div class="col-12">
+            <h4>3.1 MAE de la planta</h4>
+            <p>
+                El MAE (módulo apagados equivalentes) nos da medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.
+            </p>
+            <div class="text-center">
+                <h5> MAE = ∆PR / PR = {{informe.mae}} %</h5>
+            </div>
+            <p>
+                El MAE de {{planta.nombre}} en {{informe.fecha}} es {{informe.mae}} %, lo que nos indica un MAE {{calificacionMae(informe.mae) }}.
+            </p>
+
+
+        </div>
+    </div>
+
+
+
+
+
     <span class="html2pdf__page-break">.</span>
 
-    <div class="row ">
+    <div class="row">
         <div class="col-12">
             <h1>Anexo I: Listado de anomalías térmicas</h1>
             <table class="table table-striped">
@@ -381,9 +407,11 @@
                         <th>Clase</th>
                         <th>Categoría</th>
                         <th *ngIf="planta.tipo === '2 ejes'">Seguidor</th>
-                        <th *ngIf="planta.tipo === 'fija'">Pasillo</th>
-                        <th>Fila</th>
+                        <th *ngIf="planta.tipo === 'fija' || planta.tipo === '1 eje'">Pasillo</th>
+                        <th *ngIf="planta.tipo === '2 ejes'">Fila</th>
+                        <th *ngIf="planta.tipo === 'fija' || planta.tipo === '1 eje'">Altura</th>
                         <th>Columna</th>
+                        <th>Altura</th>
                         <th>Temperatura máx.</th>
                         <th>Gradiente (normalizado)</th>
                         <th>Archivo</th>
@@ -391,11 +419,11 @@
                 </thead>
                 <tr *ngFor="let pc of allPcs">
                     <td>{{pc.local_id}}</td>
-                    <td>{{pc.severidad}}</td>
+                    <td>CoA {{pc.severidad}}</td>
                     <td>{{global.pcDescripcion[pc.tipo]}}</td>
                     <td>{{pc.global_x}}</td>
-                    <td>{{pc.local_x}}</td>
                     <td>{{pc.local_y}}</td>
+                    <td>{{pc.local_x}}</td>
                     <td>{{pc.temperaturaMax}} ºC</td>
                     <td>{{pc.gradienteNormalizado}} ºC</td>
                     <td>{{pc.archivoPublico}}</td>
