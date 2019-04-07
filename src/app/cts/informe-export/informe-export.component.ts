@@ -30,7 +30,7 @@ export class InformeExportComponent implements OnInit {
 
 
   public titulo: string;
-  public pcs: PcInterface[];
+  public irradianciaMinima: number;
   public url: string;
   public dataTipos: any;
   public dataSeveridad: any;
@@ -46,6 +46,8 @@ export class InformeExportComponent implements OnInit {
   public portadaImg$: Observable<string | null>;
   public arrayFilas: Array<number>;
   public arrayColumnas: Array<number>;
+  public tempReflejada: number;
+  public emisividad: number;
 
   constructor(
     private storage: AngularFireStorage
@@ -66,6 +68,9 @@ export class InformeExportComponent implements OnInit {
   ngOnInit() {
     // Ordenar Pcs por seguidor:
     this.allPcs.sort(this.compare);
+    this.irradianciaMinima = this.allPcs.sort(this.compareIrradiancia)[0].irradiancia;
+    this.emisividad = this.allPcs[0].emisividad;
+    this.tempReflejada = this.allPcs[0].temperaturaReflejada;
 
     this.arrayFilas = Array(this.planta.filas).fill(0).map( (_, i) => i + 1);
     this.arrayColumnas = Array(this.planta.columnas).fill(0).map( (_, i) => i + 1);
@@ -155,6 +160,15 @@ export class InformeExportComponent implements OnInit {
       return -1;
     }
     if (a.global_x > b.global_x) {
+      return 1;
+    }
+    return 0;
+  }
+  compareIrradiancia(a: PcInterface, b: PcInterface) {
+    if (a.irradiancia < b.irradiancia) {
+      return -1;
+    }
+    if (a.irradiancia > b.irradiancia) {
       return 1;
     }
     return 0;

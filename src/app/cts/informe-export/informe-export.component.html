@@ -106,7 +106,7 @@
                     </tr>
                     <tr>
                         <th scope="row">Irradiancia</th>
-                        <td> > {{informe.irradiancia}} W/m2 (correcta según norma UNE-EN 62446:2011)</td>
+                        <td> > {{irradianciaMinima}} W/m<sup>2</sup> (correcta según norma IEC 62446-3)</td>
                     </tr>
                     <tr>
                         <th scope="row">Temperatura</th>
@@ -143,19 +143,29 @@
     <div class="row">
         <div class="col-12">
             <h4>1.4 Ajuste de parámetros térmicos</h4>
+            <p>
+                Con el fin de obtener medidas de temperaturas absolutas fiables, es necesario tener en cuenta distintas variables térmicas que afectan directamente al resultado de las medidas obtenidas por las cámaras. Las más importantes son la <b>emisividad</b>                y la <b>temperatura reflejada</b>.
+            </p>
             <h5>1.4.1 Emisividad</h5>
             <p>
                 La emisividad del material se mide de manera experimental en le campo. La emisivdad del mismo depende del tipo de vidrio de los paneles y de la suciedad que tengan. La emisividad escogida por el termógrafo tras el ensayo experimental es de:
             </p>
-            <span class="text-center"><strong>Emisividad = 0.85</strong></span>
+            <div class="text-center">
+                <span class="text-center"><strong>Emisividad = {{emisividad}}</strong></span>
+            </div>
+            <img id="imgSuciedad" class="img-fluid rounded" src="{{suciedadImg$ | async}}" alt="">
 
-            <h5>1.4.2 Irradiancia</h5>
+
+            <h5>1.4.2 Temperatura reflejada</h5>
             <p>
-                Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de {{planta.nombre}}, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde
-                el aire, de manera que cada imagen tiene una irradiancia asociada.
+                La temperatura reflejada nos depende de la atmosfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura
+                reflejada medida es:
             </p>
 
-            <img id="imgSuciedad" class="img-fluid rounded" src="{{suciedadImg$ | async}}" alt="">
+            <div class="text-center">
+                <span class="text-center"><strong>Temperatura reflejada = {{tempReflejada}} ºC</strong></span>
+            </div>
+
 
         </div>
     </div>
@@ -284,14 +294,14 @@
 
     <div class="row">
         <div class="col-12">
-            <h3>2. Resumen de los resultados de la inspección termográfica</h3>
+            <h3>2. Resultados de la inspección termográfica</h3>
         </div>
     </div>
 
 
     <div class="row">
         <div class="col-12">
-            <h4>2.1 Clasificación de incidencias por clase (CoA</h4>
+            <h4>2.1 Clasificación de incidencias por clase (CoA)</h4>
             <p>
                 A continuación se detallan la cantidad de incidencias registradas según su clase (1, 2 ó 3).
             </p>
@@ -341,14 +351,15 @@
 
         </div>
     </div>
+
     <div class="row">
         <div class="col-12">
             <h4>2.3 Anomalías térmicas por posición dentro del seguidor</h4>
             <p>
-                Esta clasificación tiene como fin detectar posibles problemas relacionados con la posición de cada módulo. De esta análisis podrían obtenerse problemas relacionados con la vegetación de la instalación, por ejemplo.
+                Esta clasificación tiene como fin detectar posibles problemas relacionados con la posición de cada módulo. De este análisis se obtienen problemas relacionados con la vegetación de la instalación, por ejemplo.
             </p>
             <p>
-                Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran (fila y columna) dentro de cada seguidor.
+                Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran (fila y columna) dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.
             </p>
 
             <table class="table table-bordered">
@@ -371,12 +382,7 @@
 
     <div class="row">
         <div class="col-12">
-            <h3>Conclusiones y recomendaciones</h3>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <h4>3.1 MAE de la planta</h4>
+            <h4>2.4 MAE de la planta</h4>
             <p>
                 El MAE (módulo apagados equivalentes) nos da medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.
             </p>
@@ -384,15 +390,16 @@
                 <h5> MAE = ∆PR / PR = {{informe.mae}} %</h5>
             </div>
             <p>
-                El MAE de {{planta.nombre}} en {{informe.fecha}} es {{informe.mae}} %, lo que nos indica un MAE {{calificacionMae(informe.mae) }}.
+                El MAE de {{planta.nombre}} en {{informe.fecha | date: 'dd/MM/y'}} es <b>{{informe.mae}} %</b>, lo que nos indica un MAE <b>{{calificacionMae(informe.mae) }}</b>.
+            </p>
+
+            <p>
+                Nuestro objetivo será siempre reducir el MAE, llevando a cabo las actuaciones recomendadas.
             </p>
 
 
         </div>
     </div>
-
-
-
 
 
     <span class="html2pdf__page-break">.</span>
@@ -407,12 +414,10 @@
                         <th>Clase</th>
                         <th>Categoría</th>
                         <th *ngIf="planta.tipo === '2 ejes'">Seguidor</th>
-                        <th *ngIf="planta.tipo === 'fija' || planta.tipo === '1 eje'">Pasillo</th>
                         <th *ngIf="planta.tipo === '2 ejes'">Fila</th>
+                        <th *ngIf="planta.tipo === 'fija' || planta.tipo === '1 eje'">Pasillo</th>
                         <th *ngIf="planta.tipo === 'fija' || planta.tipo === '1 eje'">Altura</th>
                         <th>Columna</th>
-                        <th>Altura</th>
-                        <th>Temperatura máx.</th>
                         <th>Gradiente (normalizado)</th>
                         <th>Archivo</th>
                     </tr>
@@ -424,12 +429,12 @@
                     <td>{{pc.global_x}}</td>
                     <td>{{pc.local_y}}</td>
                     <td>{{pc.local_x}}</td>
-                    <td>{{pc.temperaturaMax}} ºC</td>
-                    <td>{{pc.gradienteNormalizado}} ºC</td>
+                    <td>+ {{pc.gradienteNormalizado}} ºC</td>
                     <td>{{pc.archivoPublico}}</td>
 
                 </tr>
             </table>
         </div>
     </div>
-</div>
+
+    <span class="html2pdf__page-break">.</span>

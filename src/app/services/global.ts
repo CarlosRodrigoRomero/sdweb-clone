@@ -4,7 +4,7 @@ export let GLOBAL = {
   perdidas_tipo: [0.01, 0.03, 0.33, 0, 1, 0.33, 0.1, 0.01, 0.04],
   camaraTermica: 'DJI XT2 640 13mm (Numero de serie: 297106)',
   ultimaCalibracion: 'Enero 2019',
-  uav: 'Multirrotor Solardrone MKIV',
+  uav: 'DJI Matrice M200',
   mae: [0.1, 0.2],
   resolucionCamara: [512, 640],
   // labels_severidad: ['Leve', 'Media', 'Grave'],
