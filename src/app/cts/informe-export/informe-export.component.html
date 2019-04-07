@@ -288,7 +288,7 @@
                 A continuación se detallan la cantidad de incidencias registradas según su clase (1, 2 ó 3).
             </p>
             <p>
-                Se han registrado en total <b>{{countClase[1] + countClase[2]}} anomalías térmicas</b>, de las cuales <b>{{countClase[1]}}</b> son de <strong style="color:orange">clase 2</strong> y <b>{{countClase[2]}}</b> son de <strong style="color:red">>clase 3</strong>.
+                Se han registrado en total <b>{{countClase[1] + countClase[2]}} anomalías térmicas</b>, de las cuales <b>{{countClase[1]}}</b> son de <strong style="color:orange">clase 2</strong> y <b>{{countClase[2]}}</b> son de <strong style="color:red">clase 3</strong>.
             </p>
             <p>
                 Además, se han registrado {{countClase[0]}} incidencias de clase 1 (sin anomalía), con el fin de realizar un seguimiento a lo largo del tiempo de las mismas.
@@ -343,21 +343,21 @@
                 Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran (fila y columna) dentro de cada seguidor.
             </p>
 
-
-            <table class="table table-striped" *ngIf="countPosicion">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th scope="col"> </th>
-                        <th scope="col" *ngFor="let fila of countPosicion">{{fila}}</th>
+                        <th scope="col" *ngFor="let col of arrayColumnas">{{col}}</th>
                     </tr>
                 </thead>
                 <tbody>
-
+                    <tr *ngFor="let fila of arrayFilas">
+                        <th scope="row">{{fila}}</th>
+                        <td *ngFor="let num of countPosicion[fila-1]">{{num}}</td>
+                    </tr>
                 </tbody>
-                <tr *ngFor="let filas of countPosicion">
-                    <td *ngFor="let num of filas">{{num}}</td>
-                </tr>
             </table>
+
         </div>
     </div>
 
@@ -365,8 +365,8 @@
 
     <div class="row">
         <div class="col-12">
-            <h4>MAE</h4>
-            El MAE de la planta es: {{mae}}
+            <h4>2.4 Modulos Apagados Equivalentes (MAE)</h4>
+            El MAE de la planta es: {{informe.mae}}
         </div>
     </div>
     <span class="html2pdf__page-break">.</span>
@@ -379,8 +379,11 @@
                     <tr>
                         <th>#ID</th>
                         <th>Clase</th>
-                        <th>Categorías</th>
+                        <th>Categoría</th>
                         <th *ngIf="planta.tipo === '2 ejes'">Seguidor</th>
+                        <th *ngIf="planta.tipo === 'fija'">Pasillo</th>
+                        <th>Fila</th>
+                        <th>Columna</th>
                         <th>Temperatura máx.</th>
                         <th>Gradiente (normalizado)</th>
                         <th>Archivo</th>
@@ -390,7 +393,9 @@
                     <td>{{pc.local_id}}</td>
                     <td>{{pc.severidad}}</td>
                     <td>{{global.pcDescripcion[pc.tipo]}}</td>
-                    <td *ngIf="planta.tipo === '2 ejes'">{{pc.global_x}}</td>
+                    <td>{{pc.global_x}}</td>
+                    <td>{{pc.local_x}}</td>
+                    <td>{{pc.local_y}}</td>
                     <td>{{pc.temperaturaMax}} ºC</td>
                     <td>{{pc.gradienteNormalizado}} ºC</td>
                     <td>{{pc.archivoPublico}}</td>

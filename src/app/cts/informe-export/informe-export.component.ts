@@ -44,6 +44,8 @@ export class InformeExportComponent implements OnInit {
   public irradianciaImg$: Observable<string | null>;
   public suciedadImg$: Observable<string | null>;
   public portadaImg$: Observable<string | null>;
+  public arrayFilas: Array<number>;
+  public arrayColumnas: Array<number>;
 
   constructor(
     private storage: AngularFireStorage
@@ -62,8 +64,8 @@ export class InformeExportComponent implements OnInit {
   }
 
   ngOnInit() {
-    const arrayFilas = Array(this.planta.filas).fill(0).map( (_, i) => i + 1);
-    const arrayColumnas = Array(this.planta.columnas).fill(0).map( (_, i) => i + 1);
+    this.arrayFilas = Array(this.planta.filas).fill(0).map( (_, i) => i + 1);
+    this.arrayColumnas = Array(this.planta.columnas).fill(0).map( (_, i) => i + 1);
 
     this.irradianciaImg$ = this.storage.ref(`informes/${this.informe.id}/irradiancia.png`).getDownloadURL();
     this.suciedadImg$ = this.storage.ref(`informes/${this.informe.id}/suciedad.jpg`).getDownloadURL();
@@ -77,13 +79,15 @@ export class InformeExportComponent implements OnInit {
     // Calcular las perdidas y severidad(1 leve, 2 media, 3 grave, 4 muy grave)
 
     // Calcular las alturas
-    for (const y of arrayFilas) {
+    for (const y of this.arrayFilas) {
       const countColumnas = Array();
-      for (const x of arrayColumnas) {
-        countColumnas.push(this.allPcs.filter( pc => pc.local_x === x && pc.local_y === y && pc.severidad > 1).length);
+      for (const x of this.arrayColumnas) {
+        countColumnas.push(this.allPcs.filter( pc => pc.local_x === x && pc.local_y === y).length);
       }
       this.countPosicion.push(countColumnas);
     }
+    console.log('count posicion', this.countPosicion);
+    console.log('arrayFilas', this.arrayFilas);
 
     // Calcular los tipos de puntos calientes
     let filtroCategoria;
