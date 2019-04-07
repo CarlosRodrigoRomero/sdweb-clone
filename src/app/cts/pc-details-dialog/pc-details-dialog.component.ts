@@ -67,11 +67,11 @@ export class PcDetailsDialogComponent implements OnInit {
 
     this.pc.downloadUrl$.subscribe( url => {
       this.pc.downloadUrlString = url;
-      imagenTermica.src = this.pc.downloadUrlString;
+      imagenTermica.src = url;
     });
     this.pc.downloadUrlVisual$.subscribe( url => {
       this.pc.downloadUrlStringVisual = url;
-      imagenVisual.src = this.pc.downloadUrlStringVisual;
+      imagenVisual.src = url;
     });
 
     imagenVisual.onload = () => {

@@ -11,8 +11,9 @@ import { PlantaInterface } from '../../models/planta';
 import { InformeInterface } from '../../models/informe';
 import 'fabric';
 
-import * as jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import html2pdf from 'html2pdf.js';
+import { AngularFireStorage } from '@angular/fire/storage';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-informe-export',
@@ -33,30 +34,28 @@ export class InformeExportComponent implements OnInit {
   public url: string;
   public dataTipos: any;
   public dataSeveridad: any;
-  public numTipos;
-  public numSeveridad;
-  public countTipos;
+  public numCategorias;
+  public numClases;
+  public countCategoria;
   public countPosicion;
-  public countSeveridad;
+  public countClase;
   public mae;
-  public fechaVuelo: string;
-  public global = GLOBAL;
+  public global;
+  public irradianciaImg$: Observable<string | null>;
+  public suciedadImg$: Observable<string | null>;
+  public portadaImg$: Observable<string | null>;
 
   constructor(
-    // private _route: ActivatedRoute,
-    // private _router: Router,
-    // private _informeService: InformeService,
-    // private _plantaService: PlantaService,
-    // private _pcService: PcService
+    private storage: AngularFireStorage
   ) {
 
-    // GLOBAL.numTipos
-    this.numTipos = Array(GLOBAL.labels_tipos.length).fill(0).map( (_, i) => i + 1 );
-    this.numSeveridad = Array(GLOBAL.labels_severidad.length).fill(0).map( (_, i) => i + 1 );
+    this.numCategorias = Array(GLOBAL.labels_tipos.length).fill(0).map( (_, i) => i + 1 );
+    this.numClases = Array(GLOBAL.labels_severidad.length).fill(0).map( (_, i) => i + 1 );
 
-    this.countTipos = Array();
-    this.countSeveridad = Array();
+    this.countCategoria = Array();
+    this.countClase = Array();
     this.countPosicion = Array();
+    this.global = GLOBAL;
 
     this.url = GLOBAL.url;
     this.titulo = 'Vista de informe';
@@ -66,67 +65,39 @@ export class InformeExportComponent implements OnInit {
     const arrayFilas = Array(this.planta.filas).fill(0).map( (_, i) => i + 1);
     const arrayColumnas = Array(this.planta.columnas).fill(0).map( (_, i) => i + 1);
 
-    this.fechaVuelo = new Date(this.informe.fecha).toLocaleDateString();
+    this.irradianciaImg$ = this.storage.ref(`informes/${this.informe.id}/irradiancia.png`).getDownloadURL();
+    this.suciedadImg$ = this.storage.ref(`informes/${this.informe.id}/suciedad.jpg`).getDownloadURL();
+    this.portadaImg$ = this.storage.ref(`informes/${this.informe.id}/portada.jpg`).getDownloadURL();
 
+    document.getElementById('imgIrradiancia').setAttribute('crossOrigin', 'anonymous');
+    document.getElementById('imgPortada').setAttribute('crossOrigin', 'anonymous');
+    document.getElementById('imgSuciedad').setAttribute('crossOrigin', 'anonymous');
     //
 
     // Calcular las perdidas y severidad(1 leve, 2 media, 3 grave, 4 muy grave)
-    let perdidas = 0;
-    let contadorPcs = 0;
-    for (let pc of this.allPcs) {
-      if (pc.tipo === 3 || pc.tipo === 4 || pc.tipo === 5 || pc.tipo === 6 )  {
-        // Severidad: 3 grave
-        pc.severidad = 3;
-      } else if (pc.tipo === 1 || pc.tipo === 2 || pc.tipo === 8 || pc.tipo === 9) {
-        if ( pc.temperaturaMax > this.planta.temp_limite ) {
-          pc.severidad = 4; // muy grave
-
-        } else {
-          const dt = pc.gradienteNormalizado;
-          if (dt >= GLOBAL.severidad_dt[2]) {
-            pc.severidad = 3; // grave
- 
-          } else if (dt >= GLOBAL.severidad_dt[1]) {
-            pc.severidad = 2; // Media
-          } else {
-            pc.severidad = 1; // Leve
-          }
-        }
-      } else {
-        pc.severidad = 2; // Media
-      }
-      perdidas = perdidas + GLOBAL.perdidas_tipo[pc.tipo - 1];
-
-      this.allPcs[contadorPcs] = pc;
-      contadorPcs += 1;
-    }
-
 
     // Calcular las alturas
-    for (let y of arrayFilas) {
+    for (const y of arrayFilas) {
       const countColumnas = Array();
-      for (let x of arrayColumnas) {
-        countColumnas.push(this.allPcs.filter( pc => pc.local_x === x && pc.local_y === y).length);
+      for (const x of arrayColumnas) {
+        countColumnas.push(this.allPcs.filter( pc => pc.local_x === x && pc.local_y === y && pc.severidad > 1).length);
       }
       this.countPosicion.push(countColumnas);
     }
 
     // Calcular los tipos de puntos calientes
-    let filtroTipos;
-    for (let i of this.numTipos) {
-      filtroTipos = this.allPcs.filter( pc => pc.tipo === i);
-      this.countTipos.push(filtroTipos.length);
+    let filtroCategoria;
+    for (const i of this.numCategorias) {
+      filtroCategoria = this.allPcs.filter( pc => pc.tipo === i && pc.severidad > 1);
+      this.countCategoria.push(filtroCategoria.length);
     }
 
-    // Calcular la severidad
-    let filtroSeveridad;
-    // console.log('numSeveridad', this.numSeveridad);
-    // console.log('allPcs', this.allPcs);
-
-    for (let j of this.numSeveridad) {
-      filtroSeveridad = this.allPcs.filter( pc => pc.severidad === j);
-      // console.log('filtroSeveridad', filtroSeveridad);
-      this.countSeveridad.push(filtroSeveridad.length);
+    // Calcular la severidad //
+    let filtroClase;
+    for (const j of this.numClases) {
+      filtroClase = this.allPcs.filter( pc => pc.severidad === j);
+      // console.log('j, filtroClase', j, filtroClase.length);
+      this.countClase.push(filtroClase.length);
     }
 
 
@@ -137,7 +108,7 @@ export class InformeExportComponent implements OnInit {
               label: 'Tipos',
               backgroundColor: '#42A5F5',
               borderColor: '#1E88E5',
-              data: this.countTipos
+              data: this.countCategoria
           },
         ]
       };
@@ -158,7 +129,7 @@ export class InformeExportComponent implements OnInit {
             '#ff5722',
                   '#FF6384'
               ],
-                data: this.countSeveridad
+                data: this.countClase
             },
           ]
         };
@@ -166,43 +137,144 @@ export class InformeExportComponent implements OnInit {
   }
 
 
-
+  public downloadPDF0() {
+    const content = document.getElementById('pdfContent');
+    const opt = {
+      margin:       1,
+      pagebreak: { mode: 'avoid-all'},
+      filename:     'myfile.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(content.innerHTML).save();
+  }
   // downloadPDF() {
   //   const doc = new jsPDF();
+  //   window.html2canvas = html2canvas;
 
-  //   const specialElementHandlers = {
-  //     '#editor': function(element, renderer) {
-  //       return true;
+  //   const content = document.getElementById('pdfContent');
+  //   // console.log('content', content.innerHTML);
+
+  //   doc.html(content.innerHTML, {
+  //     callback: (d) => {
+  //       d.save('test.pdf');
   //     }
-  //   };
-
-  //   const content = this.content.nativeElement;
-
-  //   doc.fromHTML(content.innerHTML, 15, 15, {
-  //     'width': 190,
-  //     'elementHandlers': specialElementHandlers
   //   });
-
-  //   doc.save('test.pdf');
   // }
 
 
-  public downloadPDF2() {
-    const data = document.getElementById('content');
-    html2canvas(data).then(canvas => {
-      // Few necessary setting options
-      const imgWidth = 208;
-      const pageHeight = 295;
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      const heightLeft = imgHeight;
+  // public downloadPDF2() {
+  //   const data = document.getElementById('pdfContent');
+  //   html2canvas(data).then(canvas => {
+  //     // Few necessary setting options
+  //     const imgWidth = 208;
+  //     const pageHeight = 295;
+  //     const imgHeight = canvas.height * imgWidth / canvas.width;
+  //     const heightLeft = imgHeight;
 
-      const contentDataURL = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4'); // A4 size page of PDF
-      const position = 0;
-      pdf.addImage(contentDataURL, 'PNG', 0, position, imgWidth, imgHeight);
-      pdf.save('MYPdf.pdf'); // Generated PDF
-      });
-  }
+  //     const contentDataURL = canvas.toDataURL('image/png');
+  //     const pdf = new jsPDF('p', 'mm', 'a4'); // A4 size page of PDF
+  //     const position = 0;
+  //     pdf.addImage(contentDataURL, 'PNG', 0, position, imgWidth, imgHeight);
+  //     pdf.save('MYPdf.pdf'); // Generated PDF
+  //     });
+  // }
+  // public downloadPDF3() {
+  //   html2canvas(document.querySelector('#chart2'), {scale: 1}).then(canvas => {
+  //     const doc = new jsPDF();
+  //     doc.setFontSize(40);
+  //     doc.text(35, 25, 'Paranyan loves jsPDF');
+
+  //     console.log('canvas', canvas);
+  //     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 40, 180, 160);
+  //     doc.save('pdf3.pdf');
+  //   });
+  // }
+
+//   CSVToArray( strData: string, strDelimiter ) {
+//     // Check to see if the delimiter is defined. If not,
+//     // then default to comma.
+//     strDelimiter = (strDelimiter || ',');
+
+//     // Create a regular expression to parse the CSV values.
+//     const objPattern = new RegExp(
+//         (
+//             // Delimiters.
+//             '(\\' + strDelimiter + '|\\r?\\n|\\r|^)' +
+
+//             // Quoted fields.
+//             '(?:"([^"]*(?:""[^"]*)*)"|' +
+
+//             // Standard fields.
+//             '([^"\\' + strDelimiter + '\\r\\n]*))'
+//         ),
+//         'gi'
+//         );
+
+
+//     // Create an array to hold our data. Give the array
+//     // a default empty first row.
+//     const arrData = [[]];
+
+//     // Create an array to hold our individual pattern
+//     // matching groups.
+//     let arrMatches = null;
+
+
+//     // Keep looping over the regular expression matches
+//     // until we can no longer find a match.
+//     while (arrMatches = objPattern.exec( strData )) {
+
+//         // Get the delimiter that was found.
+//         const strMatchedDelimiter = arrMatches[ 1 ];
+
+//         // Check to see if the given delimiter has a length
+//         // (is not the start of string) and if it matches
+//         // field delimiter. If id does not, then we know
+//         // that this delimiter is a row delimiter.
+//         if (
+//             strMatchedDelimiter.length &&
+//             strMatchedDelimiter !== strDelimiter
+//             ) {
+
+//             // Since we have reached a new row of data,
+//             // add an empty row to our data array.
+//             arrData.push( [] );
+
+//         }
+
+//         let strMatchedValue;
+
+//         // Now that we have our delimiter out of the way,
+//         // let's check to see which kind of value we
+//         // captured (quoted or unquoted).
+//         if (arrMatches[ 2 ]) {
+
+//             // We found a quoted value. When we capture
+//             // this value, unescape any double quotes.
+//             strMatchedValue = arrMatches[ 2 ].replace(
+//                 new RegExp( '""', 'g' ),
+//                 '"'
+//                 );
+
+//         } else {
+
+//             // We found a non-quoted value.
+//             strMatchedValue = arrMatches[ 3 ];
+
+//         }
+
+
+//         // Now that we have our value string, let's add
+//         // it to the data array.
+//         arrData[ arrData.length - 1 ].push( strMatchedValue );
+//     }
+
+//     // Return the parsed data.
+//     return( arrData );
+// }
+
 
 }
 
