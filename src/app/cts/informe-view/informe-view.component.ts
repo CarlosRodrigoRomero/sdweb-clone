@@ -28,6 +28,7 @@ export class InformeViewComponent implements OnInit {
   private informeId: string;
   public informe: InformeInterface;
   public planta: PlantaInterface;
+  public irradianciaMinima: number;
 
   numSeveridad = new Array(GLOBAL.labels_severidad.length).fill(0).map( (_, i) => i + 1 );
   public countSeveridad: number[];
@@ -92,7 +93,10 @@ export class InformeViewComponent implements OnInit {
           });
           this.allPcs = this.allPcsConSeguidores.filter( (pc, i, a) => {
             return pc.tipo > 0;
+
           });
+          this.irradianciaMinima = this.allPcs.sort(this.compareIrradiancia)[0].irradiancia;
+
           for (let j of this.numSeveridad) {
             filtroSeveridad = this.allPcs.filter( pc => pc.severidad === j);
             this.countSeveridad.push(filtroSeveridad.length);
@@ -171,6 +175,16 @@ export class InformeViewComponent implements OnInit {
       xhr.open('GET', downloadUrl);
       xhr.send();
     });
+  }
+
+  compareIrradiancia(a: PcInterface, b: PcInterface) {
+    if (a.irradiancia < b.irradiancia) {
+      return -1;
+    }
+    if (a.irradiancia > b.irradiancia) {
+      return 1;
+    }
+    return 0;
   }
 
 }
