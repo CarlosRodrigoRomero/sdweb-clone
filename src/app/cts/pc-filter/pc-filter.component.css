@@ -43,3 +43,7 @@
 .info-severidad {
     margin-left: 0.5rem;
 }
+
+.filtro-numero {
+    color: grey;
+}

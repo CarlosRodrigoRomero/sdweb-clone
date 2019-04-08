@@ -5,9 +5,9 @@
             <mat-checkbox *ngFor="let ts of tiposSeveridad" [checked]=true (change)="onCheckBoxSeveridadChange($event)" value="{{ts}}">
                 <div class="filtros-severidad-circulo-texto">
                     <div class="circle circleSeveridad{{ts}}"></div>
-
-
                     <span class="filtro-severidad-text">{{labelsSeveridad[ts-1]}} </span>
+
+                    <span class="filtro-numero"> ({{countClase[ts-1]}}) </span>
                     <i matTooltip="{{descripcionSeveridad[ts-1]}}" class="info-severidad fas fa-info-circle"></i>
                 </div>
             </mat-checkbox>
@@ -15,16 +15,16 @@
 
         </div>
 
-        <h2 *ngIf="false"> Categería </h2>
-        <div *ngIf="false" class="filtro-severidad">
-            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="1">Célula caliente</mat-checkbox>
-            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="2">Varias células calientes</mat-checkbox>
-            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="3">Substring en CA</mat-checkbox>
-            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="4">Módulos en CA</mat-checkbox>
-            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="5">2 Substrings en CA</mat-checkbox>
-            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="6">Substring en CC</mat-checkbox>
-            <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="7">Rotura de vidrio</mat-checkbox>
+        <hr>
 
+        <h2> Categorías </h2>
+        <div class="filtro-severidad">
+            <span *ngFor="let cat of numCategorias">
+            <mat-checkbox  *ngIf="countCategoria[cat-1] > 0" [checked]="filtroCategoria.includes(cat)" (change)="onChangeCheckboxCategoria($event)" value="{{cat}}">
+                {{ nombreClases[cat] }}
+                <span class="filtro-numero">({{ countCategoria[cat-1] }})</span>
+            </mat-checkbox>
+            </span>
         </div>
 
     </mat-card-content>
