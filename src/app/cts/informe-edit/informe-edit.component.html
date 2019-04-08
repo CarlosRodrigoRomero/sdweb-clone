@@ -164,7 +164,8 @@
 
                     </div>
 
-                    <input type="text" id="correccion_gps" maxlength="5" size="5" value="0">
+                    <input *ngIf="selected_pc" [(ngModel)]="selected_pc.perdidas" type="text" id="perdidas" maxlength="5" size="5" value="0">
+                    <input *ngIf="selected_pc" [(ngModel)]="selected_pc.severidad" type="text" id="severidad" maxlength="5" size="5" value="1">
 
                 </div>
             </div>

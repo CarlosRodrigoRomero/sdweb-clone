@@ -54,7 +54,7 @@
 
                 <div class="pc-details-derecha-item-tabla">
                     <span class="text-center"><strong>Eficiencia del módulo</strong></span>
-                    <span style="color:red" class="text-center">{{ (1-pc.perdidas) * 100}} %</span>
+                    <span class="text-center">{{ (1-pc.perdidas) * 100 | number: '1.0-0'}} %</span>
                 </div>
 
             </div>

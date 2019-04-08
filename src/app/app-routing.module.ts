@@ -11,7 +11,7 @@ import { IndexComponent } from './cts/index/index.component';
 const routes: Routes = [
   {path: '', component: LoginComponent},
   {path: 'informe-view/:id', component: InformeViewComponent, canActivate: [AuthGuard]},
-  // {path: 'informe-edit/:id', component: InformeEditComponent},
+  {path: 'informe-edit/:id', component: InformeEditComponent},
   {path: 'informes', component: InformesComponent, canActivate: [AuthGuard]},
   // {path: 'orto', component: OrtophotoComponent },
   {path: 'login', component: LoginComponent},
