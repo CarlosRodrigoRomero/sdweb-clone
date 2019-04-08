@@ -26,7 +26,7 @@
         <ng-container matColumnDef="perdidas">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Eficiencia del módulo </th>
             <td mat-cell *matCellDef="let element">
-                <span style="color:red">- {{ (1-element.perdidas) * 100}} %</span> </td>
+                <span>{{ (1-element.perdidas) * 100 | number: '1.0-0'}} %</span> </td>
         </ng-container>
 
         <ng-container matColumnDef="local_id">

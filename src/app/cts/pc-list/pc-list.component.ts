@@ -38,6 +38,7 @@ export class PcListComponent implements OnInit {
   public profileUrl: Observable<string | null>;
   public pcDescripcion: string[];
   public pcPerdidas: string[];
+  public temperaturaLimite: number;
 
 
 
@@ -49,6 +50,7 @@ export class PcListComponent implements OnInit {
     this.informeId = this.route.snapshot.paramMap.get('id');
     this.pcDescripcion = GLOBAL.pcDescripcion;
     this.pcPerdidas = GLOBAL.pcPerdidas;
+    this.temperaturaLimite = GLOBAL.temperaturaLimiteFabricantes;
   }
 
   ngOnInit() {
@@ -82,8 +84,8 @@ export class PcListComponent implements OnInit {
   }
 
   getPercent(pc: PcInterface) {
-    let result = pc.temperaturaMax - pc.temperaturaMedia;
-    result /= (this.planta.temp_limite - pc.temperaturaMedia);
+    let result = pc.gradienteNormalizado;
+    result /= (this.temperaturaLimite - pc.temperaturaRef);
     result *= 100;
     result = Math.abs(result);
 
