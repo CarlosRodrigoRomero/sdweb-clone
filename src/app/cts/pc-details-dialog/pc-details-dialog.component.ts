@@ -176,15 +176,15 @@ export class PcDetailsDialogComponent implements OnInit {
       selectable: true
     });
     const textId = new fabric.Text(
-      ' #'.concat(pc.local_id.toString().concat(' ')), {
+      '#'.concat(pc.local_id.toString().concat(' ')), {
         left: pc.img_left,
         top: pc.img_top - 26,
         fontSize: 20,
-        textBackgroundColor: 'red',
+        // textBackgroundColor: 'red',
         ref: 'text',
         selectable: false,
         hoverCursor: 'default',
-        fill: 'black'
+        fill: 'white'
     });
 
     this.canvas.add(actObj1);
