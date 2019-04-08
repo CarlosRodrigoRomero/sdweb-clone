@@ -88,7 +88,7 @@
                 <a class="nav-link" id="ortophoto-tab" data-toggle="tab" href="#ortophoto" role="tab" aria-controls="ortophoto" aria-selected="false">Mapa térmico</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" style="color: tomato" (click)="downloadInforme()" href="javascript:void(0)">Descargar informe</a>
+                <a class="nav-link" style="color: tomato" href="{{ informeDownloadUrl | async }}" target="_blank">Descargar informe</a>
             </li>
             <li class="nav-item">
                 <a *ngIf="isLocalhost" class="nav-link" id="export-tab" data-toggle="tab" href="#export" role="tab" aria-controls="export" aria-selected="false">Export</a>
@@ -134,7 +134,7 @@
                         </div>
                     </div>
 
-                    <div class="tab-pane fade" id="export" role="tabpanel" aria-labelledby="export-tab">
+                    <div *ngIf="isLocalhost" class="tab-pane fade" id="export" role="tabpanel" aria-labelledby="export-tab">
                         <app-informe-export [allPcs]="allPcs" [informe]="informe" [planta]="planta"></app-informe-export>
                     </div>
                 </div>

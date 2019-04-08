@@ -8,6 +8,7 @@ import { InformeService } from '../../services/informe.service';
 import { PlantaService } from '../../services/planta.service';
 import { InformeInterface } from '../../models/informe';
 import { PlantaInterface } from '../../models/planta';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-informe-view',
@@ -30,6 +31,7 @@ export class InformeViewComponent implements OnInit {
   public planta: PlantaInterface;
   public irradianciaMinima: number;
   public isLocalhost: boolean;
+  public informeDownloadUrl: Observable<string>;
 
   numSeveridad = new Array(GLOBAL.labels_severidad.length).fill(0).map( (_, i) => i + 1 );
   public countSeveridad: number[];
@@ -46,6 +48,7 @@ export class InformeViewComponent implements OnInit {
     this.informeId = this.route.snapshot.paramMap.get('id');
     this.informeService.getInforme(this.informeId).subscribe( informe => {
       this.informe = informe;
+      this.informeDownloadUrl = this.storage.ref(`informes/${this.informe.id}/informe.zip`).getDownloadURL();
       this.plantaService.getPlanta(informe.plantaId).subscribe( planta => {
         this.planta = planta;
         this.isLoaded1 = true;
@@ -152,30 +155,6 @@ export class InformeViewComponent implements OnInit {
     xhr.open('GET', downloadUrl);
     xhr.send();
   });
-  }
-
-  downloadInformePdf() {
-    this.storage.ref(`informes/${this.informe.id}/informe.pdf`).getDownloadURL()
-      .subscribe( downloadUrl => {
-      const xhr = new XMLHttpRequest();
-      xhr.responseType = 'blob';
-      xhr.onload = (event) => {
-        /* Create a new Blob object using the response
-        *  data of the onload object.
-        */
-        const blob = new Blob([xhr.response], { type: 'image/jpg' });
-        const a: any = document.createElement('a');
-        a.style = 'display: none';
-        document.body.appendChild(a);
-        const url = window.URL.createObjectURL(blob);
-        a.href = url;
-        a.download = `${this.informe.fecha}_${this.planta.nombre}.pdf`;
-        a.click();
-        window.URL.revokeObjectURL(url);
-      };
-      xhr.open('GET', downloadUrl);
-      xhr.send();
-    });
   }
 
   downloadInformeExcel() {

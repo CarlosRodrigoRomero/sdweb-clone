@@ -5,7 +5,7 @@
             <h1>Análisis termográfico aéreo de módulos fotovoltaicos</h1>
             <div class="text-center">
                 <img id="imgPortada" class="img-fluid" src="{{portadaImg$ | async}}" alt="">
-                <img *ngIf="imgPortada === null" class="img-fluid" src="../../../assets/images/portada.jpg" alt="">
+                <img *ngIf="portadaImg$ === null" class="img-fluid" src="../../../assets/images/portada.jpg" alt="">
             </div>
 
             <h5 class="text-right"><b>Planta solar</b>: {{planta.nombre}} ({{planta.potencia}} MW - {{planta.tipo}})</h5>
