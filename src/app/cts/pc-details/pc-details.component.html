@@ -28,13 +28,7 @@
 
         </div>
 
-        <div class="pc-detail-botones">
-            <button (click)="downloadRjpg(pc)" mat-raised-button>JPG Radiométrico</button>
-            <button (click)="downloadJpgVisual(pc)" mat-raised-button>JPG Visual</button>
-            <button (click)="downloadJpg(pc)" mat-raised-button>JPG</button>
-            <!-- <button mat-raised-button>informe reclamacion</button> -->
-            <!-- <button (click)="pc.resuelto = !pc.resuelto" [disabled]="pc.resuelto" mat-raised-button> <i *ngIf="pc.resuelto" class="fas fa-check"></i>resuelto</button> -->
-        </div>
+
 
     </div>
 
@@ -118,7 +112,21 @@
                 <span>{{pc.irradiancia}} W/m<sup>2</sup> | Viento: {{pc.viento}} | {{pc.temperaturaAire}} ºC | Nubes: {{pc.nubosidad}} % okta | Emisividad: {{pc.emisividad}} | Temp. reflejada: {{pc.temperaturaReflejada}} ºC</span>
             </div>
         </div>
-
-
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <div class="pc-detail-botones">
+            <button (click)="downloadRjpg(pc)" mat-raised-button>JPG Radiométrico</button>
+            <button (click)="downloadJpgVisual(pc)" mat-raised-button>JPG Visual</button>
+            <button (click)="downloadJpg(pc)" mat-raised-button>JPG</button>
+            <!-- <button mat-raised-button>informe reclamacion</button> -->
+            <!-- <button (click)="pc.resuelto = !pc.resuelto" [disabled]="pc.resuelto" mat-raised-button> <i *ngIf="pc.resuelto" class="fas fa-check"></i>resuelto</button> -->
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="pc-details-derecha-item">
+            <button class="detallesButton" mat-raised-button (click)="onClickVerDetalles(pc)"> Ver detalles </button>
+        </div>
     </div>
 </div>

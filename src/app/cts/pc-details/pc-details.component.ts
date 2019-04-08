@@ -5,7 +5,16 @@ import { InformeInterface } from '../../models/informe';
 import { GLOBAL } from 'src/app/services/global';
 import { AngularFireStorage } from '@angular/fire/storage';
 import 'fabric';
+import { MatDialog } from '@angular/material';
+import { PcDetailsDialogComponent } from '../pc-details-dialog/pc-details-dialog.component';
+import { PcService } from 'src/app/services/pc.service';
 declare let fabric;
+
+
+export interface DialogData {
+  pc: PcInterface;
+  allPcs: PcInterface[];
+}
 
 @Component({
   selector: 'app-pc-details',
@@ -15,6 +24,7 @@ declare let fabric;
 export class PcDetailsComponent implements OnInit, OnChanges {
   @Input() pc: PcInterface;
   @Input() selectedPc: PcInterface;
+  @Input() allPcs: PcInterface[];
   @Input() informe: InformeInterface;
 
   public tooltipTemp: number;
@@ -32,6 +42,8 @@ export class PcDetailsComponent implements OnInit, OnChanges {
 
   constructor(
     private storage: AngularFireStorage,
+    public dialog: MatDialog,
+    public pcservice: PcService
   ) { }
 
   ngOnInit() {
@@ -266,6 +278,27 @@ downloadJpg(pc: PcInterface) {
     this.canvas.add(triangle);
     this.canvas.add(textTriangle);
     this.canvas.renderAll();
+  }
+
+  onClickVerDetalles(selectedPc: PcInterface): void {
+    // selectedPc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${selectedPc.archivoPublico}`).getDownloadURL();
+    if (!selectedPc.downloadUrl$) {
+      selectedPc.downloadUrl$ = this.storage.ref(`informes/${this.informe.id}/jpg/${selectedPc.archivoPublico}`).getDownloadURL();
+    }
+    if (!selectedPc.downloadUrlVisual$ ) {
+      selectedPc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informe.id}/jpgVisual/${selectedPc.archivoPublico}`)
+            .getDownloadURL();
+    }
+    const dialogRef = this.dialog.open(PcDetailsDialogComponent, {
+      width: '1100px',
+      // height: '600px',
+      hasBackdrop: true,
+      data: {pc: selectedPc, allPcs: this.allPcs}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+    });
+
   }
 
 }

@@ -11,7 +11,8 @@ import { map } from 'rxjs/operators';
 })
 export class PcService {
   private pcsCollection: AngularFirestoreCollection<PcInterface>;
-  private pcs: Observable<PcInterface[]>;
+  public allPcs$: Observable<PcInterface[]>;
+  // public allPcs: PcInterface[];
   private pcDoc: AngularFirestoreDocument<PcInterface>;
   public url: string;
   private filteredPcsSource = new BehaviorSubject<PcInterface[]>(new Array<PcInterface>());
@@ -19,6 +20,7 @@ export class PcService {
 
   constructor(public afs: AngularFirestore, private http: HttpClient) {
     this.pcsCollection = afs.collection<PcInterface>('pcs');
+
   }
 
   filteredPcs(pcs: PcInterface[]) {
@@ -32,13 +34,14 @@ export class PcService {
 
   getPcs(informeId: string) {
     const query$ = this.afs.collection<PcInterface>('pcs', ref => ref.where('informeId', '==', informeId));
-    return query$.snapshotChanges().pipe(
+    this.allPcs$ = query$.snapshotChanges().pipe(
       map(actions => actions.map(a => {
-    const data = a.payload.doc.data() as PcInterface;
-    data.id = a.payload.doc.id;
-    return data;
-  }))
-);
+        const data = a.payload.doc.data() as PcInterface;
+        data.id = a.payload.doc.id;
+        return data;
+        }))
+      );
+    return this.allPcs$;
   }
 
   getPc(id: string) {

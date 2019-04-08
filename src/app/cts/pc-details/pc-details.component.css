@@ -8,6 +8,11 @@
     margin-bottom: 0.5rem;
 }
 
+.detallesButton {
+    width: -webkit-fill-available;
+    background-color: tomato;
+}
+
 .imagen-termica-tooltip {
     display: none;
     background: #e7e1e1e3;

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { PcInterface } from '../../models/pc';
-import { MatTableDataSource, MatSort, MatPaginator} from '@angular/material';
+import { MatTableDataSource, MatSort, MatPaginator, MatDialog} from '@angular/material';
 import { PcService } from '../../services/pc.service';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -8,6 +8,8 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 import { InformeInterface } from '../../models/informe';
 import { PlantaInterface } from '../../models/planta';
 import { GLOBAL } from 'src/app/services/global';
+
+
 
 
 @Component({
@@ -28,9 +30,9 @@ export class PcListComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @Input() informe: InformeInterface;
   @Input() planta: PlantaInterface;
+  @Input() allPcs: PcInterface[];
 
   public expandedElement: PcInterface;
-  public allPcs: PcInterface[];
   public columnsToDisplay: string[];
   public informeId: string;
   public pcDataSource: MatTableDataSource<PcInterface>;
@@ -43,8 +45,9 @@ export class PcListComponent implements OnInit {
 
 
   constructor(
+
     private pcService: PcService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {
     this.columnsToDisplay = ['severidad', 'tipo', 'perdidas', 'local_id', 'global_x', 'temperaturaMax', 'gradienteNormalizado'];
     this.informeId = this.route.snapshot.paramMap.get('id');
@@ -95,5 +98,7 @@ export class PcListComponent implements OnInit {
 
     return result.toString();
   }
+
+
 
 }

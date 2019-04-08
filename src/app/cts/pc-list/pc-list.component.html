@@ -67,7 +67,7 @@
             <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length ">
                 <div class="example-element-detail" [@detailExpand]="element==expandedElement ? 'expanded' : 'collapsed' ">
 
-                    <app-pc-details [informe]="informe" [selectedPc]="expandedElement" [pc]="element"></app-pc-details>
+                    <app-pc-details [informe]="informe" [selectedPc]="expandedElement" [allPcs]="allPcs" [pc]="element"></app-pc-details>
 
                 </div>
             </td>
