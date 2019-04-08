@@ -26,8 +26,8 @@
             </div>
 
             <div class="pc-details-derecha-item-tabla">
-                <span class="text-center"><strong>Pérdidas</strong></span>
-                <span class="text-center">{{pc.perdidas * 100}} %</span>
+                <span class="text-center"><strong>Eficiencia del módulo</strong></span>
+                <span class="text-center">{{ (1 - pc.perdidas) * 100}} %</span>
             </div>
 
         </div>
@@ -66,7 +66,7 @@
             </div>
         </div>
 
-        <div class="pc-details-derecha-item">
+        <div *ngIf="pc.severidad > 1" class="pc-details-derecha-item">
             <div class="pc-details-derecha-icon">
                 <i class="fas fa-check-circle icon-success"></i>
             </div>

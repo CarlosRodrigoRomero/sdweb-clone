@@ -1,7 +1,6 @@
 export let GLOBAL = {
   url: 'http://localhost:3977/api',
   num_tipos: 14,
-  perdidas_tipo: [0.01, 0.03, 0.33, 0, 1, 0.33, 0.1, 0.01, 0.04],
   camaraTermica: 'DJI XT2 640 13mm (Numero de serie: 297106)',
   ultimaCalibracion: 'Enero 2019',
   uav: 'DJI Matrice M200',

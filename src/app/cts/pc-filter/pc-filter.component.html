@@ -1,6 +1,6 @@
 <mat-card>
     <mat-card-content>
-        <h2> Severidad</h2>
+        <h2 class="text-center"> Clase de Anomalía (CoA)</h2>
         <div class="filtro-severidad">
             <mat-checkbox *ngFor="let ts of tiposSeveridad" [checked]=true (change)="onCheckBoxSeveridadChange($event)" value="{{ts}}">
                 <div class="filtros-severidad-circulo-texto">
@@ -15,7 +15,7 @@
 
         </div>
 
-        <h2 *ngIf="false"> Tipo </h2>
+        <h2 *ngIf="false"> Categería </h2>
         <div *ngIf="false" class="filtro-severidad">
             <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="1">Célula caliente</mat-checkbox>
             <mat-checkbox [checked]=true (change)="onCheckBoxTipoChange($event)" class="example-margin" value="2">Varias células calientes</mat-checkbox>

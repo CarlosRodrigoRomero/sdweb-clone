@@ -6,6 +6,8 @@ import { GLOBAL } from 'src/app/services/global';
 import { AngularFireStorage } from '@angular/fire/storage';
 import 'fabric';
 declare let fabric;
+import Pica from 'pica';
+const pica = Pica();
 
 @Component({
   selector: 'app-pc-details-dialog',

@@ -8,8 +8,8 @@
                 <img *ngIf="imgPortada === null" class="img-fluid" src="../../../assets/images/portada.jpg" alt="">
             </div>
 
-            <h5 class="text-right">Planta solar: {{planta.nombre}} ({{planta.potencia}} MW - {{planta.tipo}})</h5>
-            <h5 class="html2pdf__page-break text-right">Fecha del vuelo: {{informe.fecha * 1000 | date: 'dd/MM/y' }} </h5>
+            <h5 class="text-right"><b>Planta solar</b>: {{planta.nombre}} ({{planta.potencia}} MW - {{planta.tipo}})</h5>
+            <h5 class="html2pdf__page-break text-right"><b>Fecha del vuelo</b>: {{informe.fecha * 1000 | date: 'dd/MM/y' }} </h5>
         </div>
     </div>
     <div class="row">
@@ -28,12 +28,12 @@
 
             <p>
                 Es importante que este mantenimiento sea llevado a cabo por profesionales, ya que una termografía mal realizada durante varios años puede afectar al estado general de la planta. El equipo de Solardrone cuenta con personal formado en Termografía Infrarroja
-                Nivel 1.
+                Nivel 1 y lleva realizando termografías aéreas desde 2015, habiendo volado más de 500 MW.
             </p>
 
             <p>
-                Entre las ventajas de realizar termografía infrarroja de manera regular por profesionales, permite aumentar la eficiencia de la planta (performance ratio), evitar reparaciones más costosas, aumentar la vida útil de los equipos, detectar problemas relacionados
-                con distintos fabricantes de paneles, problemas de conexión entre módulos… entre una larga lista de ventajas.
+                Entre las ventajas de realizar termografía infrarroja de manera regular, permite aumentar la eficiencia de la planta (performance ratio), evitar reparaciones más costosas, aumentar la vida útil de los equipos, detectar problemas relacionados con distintos
+                fabricantes de paneles, problemas de conexión entre módulos, problemas relacionados con la vegetación o la suciedad en los panels... entre una larga lista de ventajas.
             </p>
 
             <p>
@@ -43,9 +43,57 @@
     </div>
     <div class="row">
         <div class="col-12">
-            <h4>1.1 Criterios de operación</h4>
+            <h4>1.1 Criterio de operación</h4>
             <p>
-                El <b>criterio</b> base que Solardrone sigue para realizar inspecciones termográficas es la norma internacional para inspecciones termográficas <b>IEC 62446-3</b>.
+                El <b>criterio</b> base que Solardrone sigue para realizar inspecciones termográficas es la norma internacional para inspecciones termográficas <b>IEC 62446-3</b>. En la misma se define las termografías infrarrojas de módulos fotovoltaicos
+                en plantas durante su operación
+
+            </p>
+            <p>
+                Hay dos niveles de inspección termográfica según la norma IEC 62446-3:
+            </p>
+            <ol>
+                <li>
+                    <b>Inspección simplificada</b>: Esta es una inspección limitada para verificar que los módulos están funcionando, con requisitos reducidos para el personal. Este tipo de inspecciones se usan, por ejemplo, durante una puesta en marcha
+                    básica de una planta fotovoltaica.
+                </li>
+                <li><b>Inspección detallada</b>: Requiere una comprensión más profunda de las anomalías térmicas. Puede ser utilizado para inspecciones periódicas de acuerdo con a la serie IEC 62446 y para solucionar problemas en sistemas con un bajo rendimiento.
+                    Se realizan mediciones de temperatura absoluta. Un experto autorizado en plantas fotovoltaicas, junto con exportos termógrafos, pueden llevar a cabo este tipo de inspecciones.</li>
+            </ol>
+            <p>
+                Las termografías realizadas por Solardrone entran dentro de las <b>inspecciones detalladas</b> indicadas por la norma, ya que cumplen con los requisitos impuestos por las mismas, que son:
+            </p>
+            <ul>
+                <li>Medición absoluta de temperaturas: con un error menor de 2 ºC</li>
+                <li>Medición de temperatura máxima, media y gradiente.</li>
+                <li>Informe realizado por un experto en termografía infrarroja en conjunto con un experto en fotovoltaica.</li>
+                <li>Recomendación para cada tipo de anomalía registrada.</li>
+                <li>Resolución geométrica térmica: 25 pixeles<sup>2</sup> por cada célula fotovoltaica</li>
+                <li>Resolución geométrica visual: 2,5 pixeles<sup>2</sup> por cada célula fotovoltaica</li>
+                <li>Condiciones ambientales correctas: temperatura ambiente, viento, nubosidad e irradiancia</li>
+                <li>Calibración de los equipos: cada 2 años</li>
+                <li>Parámetros térmicos: el ajuste de la emisividad y la temperatura reflejada es imprescindible para una correcta medición de las temperaturas. Es necesario hacer las mediciones oportunas en campo para poder obtener estos parámetros, ya que
+                    dependen de la atmósfera, la meteorología, la suciedad en los módulos el día del vuelo y de los materiales del propio módulo. </li>
+                <li>Documentación: el entregable incluye las imágenes radiométricas y visuales originales junto con todos los datos que requiere la norma. </li>
+                <li>Trayectoria: que asegure el cumplimiento de la norma. </li>
+                <li>Velocidad: 10 km/h máximo. </li>
+
+            </ul>
+
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h4>1.2 Normalización de gradientes de temperatura</h4>
+
+            <p>
+                Con el fin de poder ver la <b>evolución de las anomalías térmicas</b> con el tiempo, comparando inspecciones termográficas llevadas a cabo en distintos meses o años (con condiciones ambientales distintas), es necesario contar con un procedimiento
+                que permita normalizar los gradientes de temperatura.
+            </p>
+            <p>
+                Por este motivo todas las anomalías registradas tienen asociada su "gradiente normalizado", que es el gradiente de temperatura equivalente a haber realizado la inspección con una irradiancia de 1000 W/m<sup>2</sup>. Esto permitirá poder
+                comparar los resultados de la presente inspección con otras futuras realizadas en condiciones ambientales diferentes y así poder tener una evolución fidedigna de cada una de las anomalías.
             </p>
         </div>
     </div>
@@ -56,12 +104,12 @@
             <h4>1.2 Datos del vuelo</h4>
 
             <table class="table table-sm">
-                <thead>
+                <!-- <thead>
                     <tr>
                         <th scope="col"></th>
                         <th scope="col"></th>
                     </tr>
-                </thead>
+                </thead> -->
                 <tbody>
                     <tr>
                         <th class="text-center" colspan="2">Vehículo aéreo no tripulado</th>
@@ -151,7 +199,7 @@
                 La emisividad del material se mide de manera experimental en le campo. La emisivdad del mismo depende del tipo de vidrio de los paneles y de la suciedad que tengan. La emisividad escogida por el termógrafo tras el ensayo experimental es de:
             </p>
             <div class="text-center">
-                <span class="text-center"><strong>Emisividad = {{emisividad}}</strong></span>
+                <span class="text-center square"><strong>Emisividad = {{emisividad}}</strong></span>
             </div>
             <img id="imgSuciedad" class="img-fluid rounded" src="{{suciedadImg$ | async}}" alt="">
 
@@ -163,7 +211,7 @@
             </p>
 
             <div class="text-center">
-                <span class="text-center"><strong>Temperatura reflejada = {{tempReflejada}} ºC</strong></span>
+                <span class="text-center square"><strong>Temperatura reflejada = {{tempReflejada}} ºC</strong></span>
             </div>
 
 
@@ -211,7 +259,7 @@
             </p>
 
             <div class="text-center">
-                <img class="img-fluid" src="../../../assets/images/formula_mae.png" alt="">
+                <img class="marginBottom img40 img-fluid" src="../../../assets/images/formula_mae.png" alt="">
             </div>
 
             <p>
@@ -229,7 +277,7 @@
                 de la media), correcto (en la media) y 'mejorable' (por encima de la media):
             </p>
             <div class="text-center">
-                <img class="img-fluid" src="../../../assets/images/maeCurva.png" alt="">
+                <img class="marginBottom img40 img-fluid" src="../../../assets/images/maeCurva.png" alt="">
             </div>
 
             <table class="table table-striped">
@@ -356,7 +404,7 @@
         <div class="col-12">
             <h4>2.3 Anomalías térmicas por posición dentro del seguidor</h4>
             <p>
-                Esta clasificación tiene como fin detectar posibles problemas relacionados con la posición de cada módulo. De este análisis se obtienen problemas relacionados con la vegetación de la instalación, por ejemplo.
+                Esta clasificación tiene como fin detectar posibles problemas relacionados con la posición de cada módulo. De este análisis se obtienen problemas relacionados con la vegetación de la instalación, deposiciones de pájaros, etc.
             </p>
             <p>
                 Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran (fila y columna) dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.
@@ -380,14 +428,14 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row html2pdf__page-break">
         <div class="col-12">
             <h4>2.4 MAE de la planta</h4>
             <p>
                 El MAE (módulo apagados equivalentes) nos da medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.
             </p>
             <div class="text-center">
-                <h5> MAE = ∆PR / PR = {{informe.mae}} %</h5>
+                <h5 class="square"> MAE = ∆PR / PR = {{informe.mae}} % (<b>{{calificacionMae(informe.mae) }}</b>)</h5>
             </div>
             <p>
                 El MAE de {{planta.nombre}} en {{informe.fecha | date: 'dd/MM/y'}} es <b>{{informe.mae}} %</b>, lo que nos indica un MAE <b>{{calificacionMae(informe.mae) }}</b>.
@@ -401,8 +449,6 @@
         </div>
     </div>
 
-
-    <span class="html2pdf__page-break">.</span>
 
     <div class="row">
         <div class="col-12">
