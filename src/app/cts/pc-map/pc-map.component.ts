@@ -72,7 +72,7 @@ export class PcMapComponent implements OnInit {
         selectedPc.downloadUrl$ = this.storage.ref(`informes/${this.informeId}/jpg/${selectedPc.archivoPublico}`).getDownloadURL();
       }
       if (!selectedPc.downloadUrlVisual$ ) {
-        selectedPc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/_mini_${selectedPc.archivoPublico}`)
+        selectedPc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/${selectedPc.archivoPublico}`)
               .getDownloadURL();
       }
       const dialogRef = this.dialog.open(PcDetailsDialogComponent, {

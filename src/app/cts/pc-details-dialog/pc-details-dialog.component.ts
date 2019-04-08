@@ -77,8 +77,12 @@ export class PcDetailsDialogComponent implements OnInit {
     });
 
     imagenVisual.onload = () => {
-      // pica.resize(imagenVisual, this.visualCanvas).then();
-      this.visualCanvas.getContext('2d').drawImage(imagenVisual, 0, 0 );
+      pica.resize(imagenVisual, this.visualCanvas, {
+        unsharpAmount: 80,
+        unsharpRadius: 0.6,
+        unsharpThreshold: 2
+      }).then();
+      // this.visualCanvas.getContext('2d').drawImage(imagenVisual, 0, 0 );
     };
 
     imagenTermica.onload = () => {
