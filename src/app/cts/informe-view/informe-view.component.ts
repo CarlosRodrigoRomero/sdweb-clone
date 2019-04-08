@@ -29,6 +29,7 @@ export class InformeViewComponent implements OnInit {
   public informe: InformeInterface;
   public planta: PlantaInterface;
   public irradianciaMinima: number;
+  public isLocalhost: boolean;
 
   numSeveridad = new Array(GLOBAL.labels_severidad.length).fill(0).map( (_, i) => i + 1 );
   public countSeveridad: number[];
@@ -40,6 +41,7 @@ export class InformeViewComponent implements OnInit {
     private pcService: PcService,
     private route: ActivatedRoute
   ) {
+    this.isLocalhost = location.hostname === 'localhost';
     this.countSeveridad = new Array();
     this.informeId = this.route.snapshot.paramMap.get('id');
     this.informeService.getInforme(this.informeId).subscribe( informe => {
@@ -53,7 +55,6 @@ export class InformeViewComponent implements OnInit {
 
   ngOnInit() {
     this.getPcsList();
-
     this.chartOptions = {
       legend: {display: false}
     };
@@ -129,6 +130,30 @@ export class InformeViewComponent implements OnInit {
     this.isLoaded3 = true;
   }
 
+  downloadInforme() {
+    this.storage.ref(`informes/${this.informe.id}/informe.zip`).getDownloadURL()
+    .subscribe( downloadUrl => {
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = 'blob';
+    xhr.onload = (event) => {
+      /* Create a new Blob object using the response
+      *  data of the onload object.
+      */
+      const blob = new Blob([xhr.response], { type: 'image/jpg' });
+      const a: any = document.createElement('a');
+      a.style = 'display: none';
+      document.body.appendChild(a);
+      const url = window.URL.createObjectURL(blob);
+      a.href = url;
+      a.download = `${this.informe.fecha} - ${this.planta.nombre}.zip`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    };
+    xhr.open('GET', downloadUrl);
+    xhr.send();
+  });
+  }
+
   downloadInformePdf() {
     this.storage.ref(`informes/${this.informe.id}/informe.pdf`).getDownloadURL()
       .subscribe( downloadUrl => {
@@ -185,6 +210,16 @@ export class InformeViewComponent implements OnInit {
       return 1;
     }
     return 0;
+  }
+
+  public calificacionMae(mae: number) {
+    if (mae <= 0.1) {
+      return 'muy bueno';
+    } else if (mae <= 0.2) {
+      return 'correcto';
+    } else {
+      return 'mejorable';
+    }
   }
 
 }

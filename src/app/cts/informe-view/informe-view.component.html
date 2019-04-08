@@ -17,7 +17,7 @@
                                 <i class="fas fa-sun"></i>
                             </div>
                             <div class="datos-meteo-texto">
-                                <span class="text-light datos-meteo-numero"> > {{irradianciaMinima}} W/m<sup>2</sup></span>
+                                <span class="text-light datos-meteo-numero"> > {{irradianciaMinima | number: '1.0-0'}} W/m<sup>2</sup></span>
                                 <span class="text-light">Irradiancia</span>
                             </div>
                         </div>
@@ -64,7 +64,7 @@
                                 <span class="text-light mae-pct-simbolo">%</span>
                             </div>
                             <div class="div-mae-3">
-                                <!-- <h4 class="text-center text-light">(muy bueno)</h4> -->
+                                <h4 class="text-center text-light">{{calificacionMae[informe?.mae]}}</h4>
                             </div>
 
                         </div>
@@ -88,13 +88,10 @@
                 <a class="nav-link" id="ortophoto-tab" data-toggle="tab" href="#ortophoto" role="tab" aria-controls="ortophoto" aria-selected="false">Mapa térmico</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" (click)="downloadInformePdf()" href="javascript:void(0)">Descargar PDF</a>
+                <a class="nav-link" style="color: tomato" (click)="downloadInforme()" href="javascript:void(0)">Descargar informe</a>
             </li>
             <li class="nav-item">
-                <a (click)="downloadInformeExcel()" href="javascript:void(0)" class="nav-link">Descargar EXCEL</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="export-tab" data-toggle="tab" href="#export" role="tab" aria-controls="export" aria-selected="false">Export</a>
+                <a *ngIf="isLocalhost" class="nav-link" id="export-tab" data-toggle="tab" href="#export" role="tab" aria-controls="export" aria-selected="false">Export</a>
             </li>
         </ul>
         <div class="row">
