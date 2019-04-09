@@ -110,6 +110,13 @@ header {
     width: 40%;
 }
 
+.acceso-clientes {
+    float: right;
+    margin: 1rem;
+    color: white;
+    font-weight: 400;
+}
+
 .seccion h4 {
     margin-bottom: 2rem;
 }

@@ -23,12 +23,12 @@ const routes: Routes = [
     component: ClienteslayoutComponent,
     children: [
       {path: 'informe-view/:id', component: InformeViewComponent, canActivate: [AuthGuard]},
-      {path: 'informe-edit/:id', component: InformeEditComponent, canActivate: [AuthGuard]},
+      // {path: 'informe-edit/:id', component: InformeEditComponent, canActivate: [AuthGuard]},
       {path: 'informes', component: InformesComponent, canActivate: [AuthGuard]},
       { path: 'clientes', component: LoginComponent },
     ]
   },
-    { path: '**', component: IndexComponent }
+  { path: '**', component: IndexComponent, pathMatch: 'full' }
   // {path: 'orto', component: OrtophotoComponent },
 ];
 
