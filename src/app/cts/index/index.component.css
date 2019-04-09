@@ -6,6 +6,7 @@ header {
 .logo {
     width: 200px;
     align-self: center;
+    margin-left: 6rem;
 }
 
 .imagen-principal-div {
@@ -22,10 +23,6 @@ header {
     /*	display:flex;
 	justify-content: center;
 	flex-direction: column;*/
-}
-
-.cabecera img {
-    margin: 0 auto;
 }
 
 .text-container {

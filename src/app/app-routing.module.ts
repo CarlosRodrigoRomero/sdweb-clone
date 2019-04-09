@@ -21,6 +21,7 @@ const routes: Routes = [
       { path: 'joseignacio', component: VideoComponent, data: { nombre: 'Jose Ignacio', codigo: 'dcxxa99ktf'} },
       { path: 'emilio', component: VideoComponent, data: { nombre: 'Emilio', codigo: '7uwh1qgbhw'} },
       { path: 'mauro', component: VideoComponent, data: { nombre: 'Mauro', codigo: 'dwkvnromp5'} },
+      { path: 'xabier', component: VideoComponent, data: { nombre: 'Xabier Real', codigo: 'h5khtjk8oq'} }
     ]
   },
   {
@@ -29,7 +30,7 @@ const routes: Routes = [
     children: [
       {path: 'informe-view/:id', component: InformeViewComponent, canActivate: [AuthGuard]},
       // {path: 'informe-edit/:id', component: InformeEditComponent, canActivate: [AuthGuard]},
-      {path: 'informes', component: InformesComponent, canActivate: [AuthGuard]},
+      { path: 'informes', component: InformesComponent, canActivate: [AuthGuard] },
       { path: 'clientes', component: LoginComponent },
     ]
   },
