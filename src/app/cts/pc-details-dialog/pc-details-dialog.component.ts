@@ -4,9 +4,12 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DialogData } from '../pc-map/pc-map.component';
 import { GLOBAL } from 'src/app/services/global';
 import { AngularFireStorage } from '@angular/fire/storage';
+
 import 'fabric';
 declare let fabric;
+
 import Pica from 'pica';
+import { take } from 'rxjs/operators';
 const pica = Pica();
 
 @Component({
@@ -59,7 +62,7 @@ export class PcDetailsDialogComponent implements OnInit {
   ngOnInit() {
     this.canvas = new fabric.Canvas('dialog-canvas');
     this.setEventListenersCanvas();
-    this.hiddenCanvas = new fabric.Canvas('hidden-canvas');
+    // this.hiddenCanvas = new fabric.Canvas('hidden-canvas');
     this.visualCanvas = new fabric.Canvas('visual-canvas');
 
     const imagenTermica = new Image();
@@ -67,14 +70,18 @@ export class PcDetailsDialogComponent implements OnInit {
     imagenTermica.crossOrigin = 'anonymous';
     imagenVisual.crossOrigin = 'anonymous';
 
-    this.pc.downloadUrl$.subscribe( url => {
-      this.pc.downloadUrlString = url;
-      imagenTermica.src = url;
-    });
-    this.pc.downloadUrlVisual$.subscribe( url => {
-      this.pc.downloadUrlStringVisual = url;
-      imagenVisual.src = url;
-    });
+    this.pc.downloadUrl$
+      .pipe(take(1))
+      .subscribe( url => {
+        this.pc.downloadUrlString = url;
+        imagenTermica.src = url;
+      });
+    this.pc.downloadUrlVisual$
+      .pipe(take(1))
+      .subscribe( url => {
+        this.pc.downloadUrlStringVisual = url;
+        imagenVisual.src = url;
+      });
 
     imagenVisual.onload = () => {
       pica.resize(imagenVisual, this.visualCanvas, {
@@ -86,18 +93,17 @@ export class PcDetailsDialogComponent implements OnInit {
     };
 
     imagenTermica.onload = () => {
-      this.hiddenCanvas.getContext('2d').drawImage(imagenTermica, 0, 0 );
-      const imagenTermicaCanvas = new fabric.Image(imagenTermica, {
-        left: 0,
-        top: 0,
-        angle: 0,
-        opacity: 1,
-        draggable: false,
-        lockMovementX: true,
-        lockMovementY: true
-      });
+      // this.hiddenCanvas.getContext('2d').drawImage(imagenTermica, 0, 0 );
       this.canvas.setBackgroundImage(
-        imagenTermicaCanvas,
+        new fabric.Image(imagenTermica, {
+          left: 0,
+          top: 0,
+          angle: 0,
+          opacity: 1,
+          draggable: false,
+          lockMovementX: true,
+          lockMovementY: true
+        }),
         this.canvas.renderAll.bind(this.canvas),
         {
           // scaleX: this.canvas.width / image.width,

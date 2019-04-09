@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col text-center">
-        <button mat-button color="primary" (click)="downloadPDF0()" mat-b>Generar PDF</button>
+        <button mat-button color="primary" (click)="downloadPDF()" mat-b>Generar PDF</button>
     </div>
 </div>
 
@@ -10,6 +10,12 @@
             <mat-button-toggle checked="tipoInforme === 1" value="1">Tipo 1</mat-button-toggle>
             <mat-button-toggle checked="tipoInforme === 2" value="2">Tipo 2</mat-button-toggle>
         </mat-button-toggle-group>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <h2>Vista previa</h2>
     </div>
 </div>
 
@@ -508,11 +514,23 @@
         </ng-template>
 
         <ng-template [ngSwitchCase]="2">
-            Tipo 2
+            <div class="row">
+                <div class="col-12">
+                    <h1>Anexo I: Listado de anomalías térmicas</h1>
+
+                    <ng-container *ngIf="pcListPorSeguidor">
+                        <canvas *ngFor="let seguidor of pcListPorSeguidor" id="imgSeguidorCanvas{{seguidor.global_x}}" width="640" height="512">
+                        </canvas>
+
+
+                    </ng-container>
 
 
 
+                </div>
+            </div>
         </ng-template>
     </div>
 
     <span class="html2pdf__page-break">.</span>
+</div>

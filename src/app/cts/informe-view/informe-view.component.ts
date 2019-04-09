@@ -9,6 +9,7 @@ import { PlantaService } from '../../services/planta.service';
 import { InformeInterface } from '../../models/informe';
 import { PlantaInterface } from '../../models/planta';
 import { Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-informe-view',
@@ -81,38 +82,37 @@ export class InformeViewComponent implements OnInit {
 
   getPcsList() {
     let filtroSeveridad;
-    this.pcService.getPcs(this.informeId).subscribe(
-      response => {
-          this.allPcsConSeguidores = response.map( (pc, i, a) => {
-            //  Les añadimos los observables de los archivos....
-            // Se ha eliminado ya que tardaba mucho en cargar...
-            // pc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${pc.archivoPublico}`).getDownloadURL();
-            // pc.downloadUrl$ = this.storage.ref(`informes/${this.informeId}/jpg/${pc.archivoPublico}`).getDownloadURL();
-            // pc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/_mini_${pc.archivoPublico}`).getDownloadURL();
+    this.pcService.getPcs(this.informeId)
+      .pipe(take(1))
+      .subscribe(
+        response => {
+            this.allPcsConSeguidores = response.map( (pc, i, a) => {
+              //  Les añadimos los observables de los archivos....
+              // Se ha eliminado ya que tardaba mucho en cargar...
+              // pc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${pc.archivoPublico}`).getDownloadURL();
+              pc.downloadUrl$ = this.storage.ref(`informes/${this.informeId}/jpg/${pc.archivoPublico}`).getDownloadURL();
+              // pc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/_mini_${pc.archivoPublico}`).getDownloadURL();
 
-            return pc;
-          });
-          this.seguidores = this.allPcsConSeguidores.filter( (pc, i, a) => {
-            return pc.tipo === 0;
-          });
-          this.allPcs = this.allPcsConSeguidores.filter( (pc, i, a) => {
-            return pc.tipo > 0;
+              return pc;
+            });
+            this.seguidores = this.allPcsConSeguidores.filter( (pc, i, a) => {
+              return pc.tipo === 0;
+            });
+            this.allPcs = this.allPcsConSeguidores.filter( (pc, i, a) => {
+              return pc.tipo > 0;
 
-          });
-          this.irradianciaMinima = this.allPcs.sort(this.compareIrradiancia)[0].irradiancia;
+            });
+            this.irradianciaMinima = this.allPcs.sort(this.compareIrradiancia)[0].irradiancia;
 
-          for (const j of this.numSeveridad) {
-            filtroSeveridad = this.allPcs.filter( pc => pc.severidad === j);
-            this.countSeveridad.push(filtroSeveridad.length);
-          }
-
-          this.initializeChart();
-          this.isLoaded2 = true;
-
-
-          this.pcService.filteredPcs(this.allPcs);
-      },
-    );
+            for (const j of this.numSeveridad) {
+              filtroSeveridad = this.allPcs.filter( pc => pc.severidad === j);
+              this.countSeveridad.push(filtroSeveridad.length);
+            }
+            this.initializeChart();
+            this.isLoaded2 = true;
+            this.pcService.filteredPcs(this.allPcs);
+        },
+      );
   }
 
 

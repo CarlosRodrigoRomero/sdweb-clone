@@ -28,11 +28,11 @@ export interface PcInterface {
      reparable?: boolean;
      color?: string;
      downloadUrl$?: Observable<string | null>;
-     downloadUrlString?: string;
+     downloadUrlString?: string | null;
      downloadUrlRjpg$?: Observable<string | null>;
-     downloadUrlStringRjpg?: string;
+     downloadUrlStringRjpg?: string | null;
      downloadUrlVisual$?: Observable<string | null>;
-     downloadUrlStringVisual?: string;
+     downloadUrlStringVisual?: string | null;
      resuelto: boolean;
      irradiancia?: number;
      gradiente?: number;

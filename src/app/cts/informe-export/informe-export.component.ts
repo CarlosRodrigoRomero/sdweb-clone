@@ -1,19 +1,21 @@
 import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { GLOBAL } from '../../services/global';
 
 import { PlantaService } from '../../services/planta.service';
 import { InformeService } from '../../services/informe.service';
-import { PcService } from '../../services/pc.service';
+import { PcService, SeguidorInterface } from '../../services/pc.service';
 
 import { PcInterface } from '../../models/pc';
 import { PlantaInterface } from '../../models/planta';
 import { InformeInterface } from '../../models/informe';
+
 import 'fabric';
+declare let fabric;
 
 import html2pdf from 'html2pdf.js';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-informe-export',
@@ -27,6 +29,7 @@ export class InformeExportComponent implements OnInit {
   @Input() public planta: PlantaInterface;
   @Input() public informe: InformeInterface;
   @Input() public allPcs: PcInterface[];
+  @Input() public allPcsConSeguidores: PcInterface[];
 
 
   public titulo: string;
@@ -49,9 +52,11 @@ export class InformeExportComponent implements OnInit {
   public tempReflejada: number;
   public emisividad: number;
   public tipoInforme: number;
+  public pcListPorSeguidor: SeguidorInterface[];
 
   constructor(
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private pcService: PcService
   ) {
 
     this.numCategorias = Array(GLOBAL.labels_tipos.length).fill(0).map( (_, i) => i + 1 );
@@ -64,11 +69,17 @@ export class InformeExportComponent implements OnInit {
 
     this.url = GLOBAL.url;
     this.titulo = 'Vista de informe';
-    this.tipoInforme = 1;
+    this.tipoInforme = 2;
   }
 
   ngOnInit() {
     // Ordenar Pcs por seguidor:
+    this.pcListPorSeguidor = this.pcService.getPcsPorSeguidor(this.allPcsConSeguidores);
+    for (const seguidor of this.pcListPorSeguidor) {
+      this.setImgSeguidorCanvas(seguidor);
+    }
+    // this.setImgSeguidorCanvas(this.pcListPorSeguidor[0]);
+
     this.allPcs.sort(this.compare);
     this.irradianciaMinima = this.allPcs.sort(this.compareIrradiancia)[0].irradiancia;
     this.emisividad = this.allPcs[0].emisividad;
@@ -157,6 +168,7 @@ export class InformeExportComponent implements OnInit {
     }
   }
 
+  // Ordena los pcs por localizacion
   compare(a: PcInterface, b: PcInterface) {
     if (a.global_x < b.global_x) {
       return -1;
@@ -177,7 +189,7 @@ export class InformeExportComponent implements OnInit {
   }
 
 
-  public downloadPDF0() {
+  public downloadPDF() {
     const content = document.getElementById('pdfContent');
     const opt = {
       margin:       1,
@@ -189,131 +201,47 @@ export class InformeExportComponent implements OnInit {
     };
     html2pdf().set(opt).from(content.innerHTML).save();
   }
-  // downloadPDF() {
-  //   const doc = new jsPDF();
-  //   window.html2canvas = html2canvas;
 
-  //   const content = document.getElementById('pdfContent');
-  //   // console.log('content', content.innerHTML);
+  private setImgSeguidorCanvas(seguidor: SeguidorInterface) {
+    const imagenTermica = new Image();
+    imagenTermica.crossOrigin = 'anonymous';
 
-  //   doc.html(content.innerHTML, {
-  //     callback: (d) => {
-  //       d.save('test.pdf');
-  //     }
-  //   });
-  // }
+    seguidor.pcs[0].downloadUrl$
+      .pipe(take(1))
+      .subscribe( url => {
+        seguidor.pcs[0].downloadUrlString = url;
 
+        imagenTermica.src = url;
 
-  // public downloadPDF2() {
-  //   const data = document.getElementById('pdfContent');
-  //   html2canvas(data).then(canvas => {
-  //     // Few necessary setting options
-  //     const imgWidth = 208;
-  //     const pageHeight = 295;
-  //     const imgHeight = canvas.height * imgWidth / canvas.width;
-  //     const heightLeft = imgHeight;
+        const canvas = new fabric.Canvas(`imgSeguidorCanvas${seguidor.global_x}`);
+        imagenTermica.onload = () => {
+          canvas.setBackgroundImage(
+            new fabric.Image(imagenTermica, {
+              left: 0,
+              top: 0,
+              angle: 0,
+              opacity: 1,
+              draggable: false,
+              lockMovementX: true,
+              lockMovementY: true
+            }),
+            canvas.renderAll.bind(canvas),
+            {
+              // scaleX: this.canvas.width / image.width,
+              // scaleY: this.canvas.height / image.height,
+              crossOrigin: 'anonymous',
+              left: 0,
+              top: 0,
+              // originX: 'top',
+              // originY: 'left'
+            }
+          );
+        };
+      });
+    }
 
-  //     const contentDataURL = canvas.toDataURL('image/png');
-  //     const pdf = new jsPDF('p', 'mm', 'a4'); // A4 size page of PDF
-  //     const position = 0;
-  //     pdf.addImage(contentDataURL, 'PNG', 0, position, imgWidth, imgHeight);
-  //     pdf.save('MYPdf.pdf'); // Generated PDF
-  //     });
-  // }
-  // public downloadPDF3() {
-  //   html2canvas(document.querySelector('#chart2'), {scale: 1}).then(canvas => {
-  //     const doc = new jsPDF();
-  //     doc.setFontSize(40);
-  //     doc.text(35, 25, 'Paranyan loves jsPDF');
-
-  //     console.log('canvas', canvas);
-  //     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 40, 180, 160);
-  //     doc.save('pdf3.pdf');
-  //   });
-  // }
-
-//   CSVToArray( strData: string, strDelimiter ) {
-//     // Check to see if the delimiter is defined. If not,
-//     // then default to comma.
-//     strDelimiter = (strDelimiter || ',');
-
-//     // Create a regular expression to parse the CSV values.
-//     const objPattern = new RegExp(
-//         (
-//             // Delimiters.
-//             '(\\' + strDelimiter + '|\\r?\\n|\\r|^)' +
-
-//             // Quoted fields.
-//             '(?:"([^"]*(?:""[^"]*)*)"|' +
-
-//             // Standard fields.
-//             '([^"\\' + strDelimiter + '\\r\\n]*))'
-//         ),
-//         'gi'
-//         );
-
-
-//     // Create an array to hold our data. Give the array
-//     // a default empty first row.
-//     const arrData = [[]];
-
-//     // Create an array to hold our individual pattern
-//     // matching groups.
-//     let arrMatches = null;
-
-
-//     // Keep looping over the regular expression matches
-//     // until we can no longer find a match.
-//     while (arrMatches = objPattern.exec( strData )) {
-
-//         // Get the delimiter that was found.
-//         const strMatchedDelimiter = arrMatches[ 1 ];
-
-//         // Check to see if the given delimiter has a length
-//         // (is not the start of string) and if it matches
-//         // field delimiter. If id does not, then we know
-//         // that this delimiter is a row delimiter.
-//         if (
-//             strMatchedDelimiter.length &&
-//             strMatchedDelimiter !== strDelimiter
-//             ) {
-
-//             // Since we have reached a new row of data,
-//             // add an empty row to our data array.
-//             arrData.push( [] );
-
-//         }
-
-//         let strMatchedValue;
-
-//         // Now that we have our delimiter out of the way,
-//         // let's check to see which kind of value we
-//         // captured (quoted or unquoted).
-//         if (arrMatches[ 2 ]) {
-
-//             // We found a quoted value. When we capture
-//             // this value, unescape any double quotes.
-//             strMatchedValue = arrMatches[ 2 ].replace(
-//                 new RegExp( '""', 'g' ),
-//                 '"'
-//                 );
-
-//         } else {
-
-//             // We found a non-quoted value.
-//             strMatchedValue = arrMatches[ 3 ];
-
-//         }
-
-
-//         // Now that we have our value string, let's add
-//         // it to the data array.
-//         arrData[ arrData.length - 1 ].push( strMatchedValue );
-//     }
-
-//     // Return the parsed data.
-//     return( arrData );
-// }
+    // imagenTermica.onload = () => {
+    //   console.log('imagenTermica', imagenTermica.src);
 
 
 }
