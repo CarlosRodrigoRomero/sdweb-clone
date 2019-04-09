@@ -1,5 +1,19 @@
-<button (click)="downloadPDF0()">Generar PDF</button>
-<div id="pdfContent" class="container">
+<div class="row">
+    <div class="col text-center">
+        <button mat-button color="primary" (click)="downloadPDF0()" mat-b>Generar PDF</button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col text-center">
+        <mat-button-toggle-group [(ngModel)]="tipoInforme" name="tipoInforme" aria-label="tipo informe">
+            <mat-button-toggle checked="tipoInforme === 1" value="1">Tipo 1</mat-button-toggle>
+            <mat-button-toggle checked="tipoInforme === 2" value="2">Tipo 2</mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+</div>
+
+<div id="pdfContent" class="ventanaInforme container">
     <div class="row">
         <div class="col-12 text-center">
             <h1>Análisis termográfico aéreo de módulos fotovoltaicos</h1>
@@ -438,7 +452,7 @@
                 <h5 class="square"> MAE = ∆PR / PR = {{informe.mae}} % (<b>{{calificacionMae(informe.mae) }}</b>)</h5>
             </div>
             <p>
-                El MAE de {{planta.nombre}} en {{informe.fecha | date: 'dd/MM/y'}} es <b>{{informe.mae}} %</b>, lo que nos indica un MAE <b>{{calificacionMae(informe.mae) }}</b>.
+                El MAE de {{planta.nombre}} en {{informe.fecha * 1000 | date: 'dd/MM/y'}} es <b>{{informe.mae}} %</b>, lo que nos indica un MAE <b>{{calificacionMae(informe.mae) }}</b>.
             </p>
 
             <p>
@@ -454,39 +468,51 @@
     <div class="html2pdf__page-break" style="color:white">_</div>
     <div class="html2pdf__page-break" style="color:white">_</div>
 
-    <div class="row">
-        <div class="col-12">
+    <div [ngSwitch]="tipoInforme">
+
+        <ng-template [ngSwitchCase]="1">
+            <div class="row">
+                <div class="col-12">
 
 
-            <h1>Anexo I: Listado de anomalías térmicas</h1>
-            <table class="table table-striped">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>#ID</th>
-                        <th>Clase</th>
-                        <th>Categoría</th>
-                        <th *ngIf="planta.tipo === '2 ejes'">Seguidor</th>
-                        <th *ngIf="planta.tipo === '2 ejes'">Fila</th>
-                        <th *ngIf="planta.tipo === 'fija' || planta.tipo === '1 eje'">Pasillo</th>
-                        <th *ngIf="planta.tipo === 'fija' || planta.tipo === '1 eje'">Altura</th>
-                        <th>Columna</th>
-                        <th>Gradiente (normalizado)</th>
-                        <th>Archivo</th>
-                    </tr>
-                </thead>
-                <tr *ngFor="let pc of allPcs">
-                    <td>{{pc.local_id}}</td>
-                    <td>CoA {{pc.severidad}}</td>
-                    <td>{{global.pcDescripcion[pc.tipo]}}</td>
-                    <td>{{pc.global_x}}</td>
-                    <td>{{pc.local_y}}</td>
-                    <td>{{pc.local_x}}</td>
-                    <td>+ {{pc.gradienteNormalizado}} ºC</td>
-                    <td>{{pc.archivoPublico}}</td>
+                    <h1>Anexo I: Listado de anomalías térmicas</h1>
+                    <table class="table table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>#ID</th>
+                                <th>Clase</th>
+                                <th>Categoría</th>
+                                <th *ngIf="planta.tipo === '2 ejes'">Seguidor</th>
+                                <th *ngIf="planta.tipo === '2 ejes'">Fila</th>
+                                <th *ngIf="planta.tipo === 'fija' || planta.tipo === '1 eje'">Pasillo</th>
+                                <th *ngIf="planta.tipo === 'fija' || planta.tipo === '1 eje'">Altura</th>
+                                <th>Columna</th>
+                                <th>Gradiente (normalizado)</th>
+                                <th>Archivo</th>
+                            </tr>
+                        </thead>
+                        <tr *ngFor="let pc of allPcs">
+                            <td>{{pc.local_id}}</td>
+                            <td>CoA {{pc.severidad}}</td>
+                            <td>{{global.pcDescripcion[pc.tipo]}}</td>
+                            <td>{{pc.global_x}}</td>
+                            <td>{{pc.local_y}}</td>
+                            <td>{{pc.local_x}}</td>
+                            <td>+ {{pc.gradienteNormalizado}} ºC</td>
+                            <td>{{pc.archivoPublico}}</td>
 
-                </tr>
-            </table>
-        </div>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template [ngSwitchCase]="2">
+            Tipo 2
+
+
+
+        </ng-template>
     </div>
 
     <span class="html2pdf__page-break">.</span>

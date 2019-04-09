@@ -48,6 +48,7 @@ export class InformeExportComponent implements OnInit {
   public arrayColumnas: Array<number>;
   public tempReflejada: number;
   public emisividad: number;
+  public tipoInforme: number;
 
   constructor(
     private storage: AngularFireStorage
@@ -63,6 +64,7 @@ export class InformeExportComponent implements OnInit {
 
     this.url = GLOBAL.url;
     this.titulo = 'Vista de informe';
+    this.tipoInforme = 1;
   }
 
   ngOnInit() {
