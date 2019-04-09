@@ -101,7 +101,7 @@ export class InformeViewComponent implements OnInit {
           });
           this.irradianciaMinima = this.allPcs.sort(this.compareIrradiancia)[0].irradiancia;
 
-          for (let j of this.numSeveridad) {
+          for (const j of this.numSeveridad) {
             filtroSeveridad = this.allPcs.filter( pc => pc.severidad === j);
             this.countSeveridad.push(filtroSeveridad.length);
           }

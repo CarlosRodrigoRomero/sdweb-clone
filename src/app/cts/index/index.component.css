@@ -38,8 +38,9 @@ header {
     margin: 0 2rem;
     color: white;
     align-self: center;
-    font-size: 5rem;
+    font-size: 4rem;
     text-align: center;
+    width: 50%;
     margin-top: 5rem;
 }
 
@@ -55,10 +56,6 @@ header {
 .propuesta-valor h3 {
     margin-top: 1rem;
     margin-bottom: 5rem;
-}
-
-.descripcion {
-    text-align: center;
 }
 
 .propuesta-imagen {
@@ -125,6 +122,10 @@ header {
 .img-competitivos {
     margin: 2rem auto;
     width: 60%;
+}
+
+.titulo-ppal {
+    font-size: 3rem;
 }
 
 .recorrido-titulo {

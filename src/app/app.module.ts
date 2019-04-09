@@ -4,7 +4,6 @@ import { NgModule } from '@angular/core';
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
-import { NavbarComponent } from './cts/navbar/navbar.component';
 import { InformesComponent } from './cts/informes/informes.component';
 import { InformeEditComponent } from './cts/informe-edit/informe-edit.component';
 import { InformeViewComponent } from './cts/informe-view/informe-view.component';
@@ -41,6 +40,9 @@ import { LoginComponent } from './cts/login/login.component';
 import { AuthService } from './services/auth.service';
 import { NgxAuthFirebaseUIModule } from 'ngx-auth-firebaseui';
 import { IndexComponent } from './cts/index/index.component';
+import { NavbarComponent } from './layout/navbar/navbar.component';
+import { PubliclayoutComponent } from './layout/publiclayout/publiclayout.component';
+import { ClienteslayoutComponent } from './layout/clienteslayout/clienteslayout.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +59,9 @@ import { IndexComponent } from './cts/index/index.component';
     InformeExportComponent,
     OrtophotoComponent,
     LoginComponent,
-    IndexComponent
+    IndexComponent,
+    PubliclayoutComponent,
+    ClienteslayoutComponent
   ],
   entryComponents: [
     PcDetailsDialogComponent

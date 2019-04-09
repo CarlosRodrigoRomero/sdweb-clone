@@ -7,14 +7,29 @@ import { OrtophotoComponent } from './cts/ortophoto/ortophoto.component';
 import { LoginComponent } from './cts/login/login.component';
 import { AuthGuard } from './services/auth.guard';
 import { IndexComponent } from './cts/index/index.component';
+import { ClienteslayoutComponent } from './layout/clienteslayout/clienteslayout.component';
+import { PubliclayoutComponent } from './layout/publiclayout/publiclayout.component';
 
 const routes: Routes = [
-  {path: '', component: LoginComponent},
-  {path: 'informe-view/:id', component: InformeViewComponent, canActivate: [AuthGuard]},
-  // {path: 'informe-edit/:id', component: InformeEditComponent},
-  {path: 'informes', component: InformesComponent, canActivate: [AuthGuard]},
+  {
+    path: '',
+    component: PubliclayoutComponent,
+    children: [
+      { path: '', component: IndexComponent, pathMatch: 'full'},
+    ]
+  },
+  {
+    path: '',
+    component: ClienteslayoutComponent,
+    children: [
+      {path: 'informe-view/:id', component: InformeViewComponent, canActivate: [AuthGuard]},
+      {path: 'informe-edit/:id', component: InformeEditComponent, canActivate: [AuthGuard]},
+      {path: 'informes', component: InformesComponent, canActivate: [AuthGuard]},
+      { path: 'clientes', component: LoginComponent },
+    ]
+  },
+    { path: '**', component: IndexComponent }
   // {path: 'orto', component: OrtophotoComponent },
-  {path: 'login', component: LoginComponent},
 ];
 
 @NgModule({
