@@ -1,3 +1,39 @@
-<p>
-  video works!
-</p>
+<script type="text/javascript" src="../../../assets/js/widgetCalendly.js"></script>
+<div class="header-sencilla">
+    <div class="header-sencilla-logo text-center">
+        <img src="assets/images/logo.png" class="logo img-responsive">
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center">{{nombre}} - Te he hecho un video para ayudarte a elegir una empresa de termografía aérea que las haga de manera correcta</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h3 class="text-center pasos"> <b>Paso 1</b>: Mira este vídeo que hecho para ti</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col text-center">
+            <iframe [src]="wistiaURL()" title="{{nombre}}" allowtransparency="true" frameborder="0" scrolling="no" class="wistia_embed" name="wistia_embed" allowfullscreen mozallowfullscreen webkitallowfullscreen oallowfullscreen msallowfullscreen width="640" height="360"></iframe>
+            <script src="https://fast.wistia.net/assets/external/E-v1.js" async></script>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col">
+            <h3 class="text-center pasos"> <b>Paso 2</b>: Organiza una llamada conmigo y te llamaré a la hora que indiques</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col calendario">
+            <iframe class="calendario-iframe" src="https://calendly.com/solardrone/30min?embed_domain=&amp;embed_type=Inline" width="100%" height="100%" frameborder="0"></iframe>
+        </div>
+    </div>
+
+</div>

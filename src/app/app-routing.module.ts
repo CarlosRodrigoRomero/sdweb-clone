@@ -9,6 +9,7 @@ import { AuthGuard } from './services/auth.guard';
 import { IndexComponent } from './cts/index/index.component';
 import { ClienteslayoutComponent } from './layout/clienteslayout/clienteslayout.component';
 import { PubliclayoutComponent } from './layout/publiclayout/publiclayout.component';
+import { VideoComponent } from './cts/video/video.component';
 
 const routes: Routes = [
   {
@@ -16,6 +17,10 @@ const routes: Routes = [
     component: PubliclayoutComponent,
     children: [
       { path: '', component: IndexComponent, pathMatch: 'full'},
+      { path: 'juangil', component: VideoComponent, data: { nombre: 'Juan Gil', codigo: 'nfs0lkgmy4'} },
+      { path: 'joseignacio', component: VideoComponent, data: { nombre: 'Jose Ignacio', codigo: 'dcxxa99ktf'} },
+      { path: 'emilio', component: VideoComponent, data: { nombre: 'Emilio', codigo: '7uwh1qgbhw'} },
+      { path: 'mauro', component: VideoComponent, data: { nombre: 'Mauro', codigo: 'dwkvnromp5'} },
     ]
   },
   {

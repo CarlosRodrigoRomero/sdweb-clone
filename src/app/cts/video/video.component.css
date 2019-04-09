@@ -1,0 +1,33 @@
+.header-sencilla {
+    border-bottom: 1px solid grey;
+    margin-bottom: 2rem;
+}
+
+.logo {
+    width: 200px;
+    align-self: center;
+    margin: 0 auto;
+}
+
+.video {
+    margin: 4rem auto;
+    width: 70%;
+}
+
+.calendly-inline-widget {
+    margin: 0 auto;
+}
+
+.calendario {
+    margin-top: 4rem;
+    margin-bottom: 15rem;
+}
+
+.pasos {
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+}
+
+.calendario-iframe {
+    height: 850px;
+}
