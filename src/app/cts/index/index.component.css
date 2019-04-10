@@ -3,10 +3,29 @@ header {
     border-bottom: 1px solid red;
 }
 
-.logo {
-    width: 200px;
-    align-self: center;
-    margin-left: 6rem;
+@media (min-width: 425px) {
+    .logo {
+        width: 200px;
+        align-self: center;
+        margin-left: 6rem;
+    }
+    .acceso-clientes {
+        float: right;
+        margin: 1rem;
+        color: white;
+        font-weight: 400;
+    }
+}
+
+@media (max-width: 425px) {
+    .logo {
+        width: 200px;
+        align-self: center;
+        margin-left: 0;
+    }
+    .acceso-clientes {
+        display: none;
+    }
 }
 
 .imagen-principal-div {
@@ -105,13 +124,6 @@ header {
 .img-certificados {
     margin: 2rem auto;
     width: 40%;
-}
-
-.acceso-clientes {
-    float: right;
-    margin: 1rem;
-    color: white;
-    font-weight: 400;
 }
 
 .seccion h4 {
