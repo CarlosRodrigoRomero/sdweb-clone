@@ -17,7 +17,8 @@
 .pc-filter-over-map {
     z-index: 10;
     left: 30px;
-    top: 50px
+    top: 50px;
+    width: 25%;
 }
 
 .pc-map {

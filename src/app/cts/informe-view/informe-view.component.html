@@ -139,7 +139,14 @@
                     </div>
 
                     <div *ngIf="isLocalhost" class="tab-pane fade" id="export" role="tabpanel" aria-labelledby="export-tab">
-                        <app-informe-export [allPcsConSeguidores]="allPcsConSeguidores" [allPcs]="allPcs" [informe]="informe" [planta]="planta"></app-informe-export>
+                        <div class="row">
+                            <div class="col-3 col-filtros">
+                                <app-pc-filter [allPcs]="allPcs"></app-pc-filter>
+                            </div>
+                            <div class="col-9">
+                                <app-informe-export [allPcsConSeguidores]="allPcsConSeguidores" [allPcs]="allPcs" [informe]="informe" [planta]="planta"></app-informe-export>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
