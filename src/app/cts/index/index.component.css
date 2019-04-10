@@ -40,8 +40,8 @@ header {
     background-repeat: no-repeat;
     height: 80vh;
     /*	display:flex;
-	justify-content: center;
-	flex-direction: column;*/
+    justify-content: center;
+    flex-direction: column;*/
 }
 
 .text-container {
@@ -118,7 +118,7 @@ header {
 
 
 /*.certificados {
-	margin-top:3rem;
+    margin-top:3rem;
 }*/
 
 .img-certificados {
@@ -214,6 +214,13 @@ header {
 .img-apoyo {
     margin: 0 auto;
     width: 75%;
+}
+
+@media (max-width: 425px) {
+    .img-apoyo {
+        width: 75%;
+        margin: 0.8rem auto;
+    }
 }
 
 footer img {
