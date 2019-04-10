@@ -89,5 +89,18 @@ export let GLOBAL = {
     '66',
     '15',
     '15',
+  ],
+  pcColumnas: [
+    { nombre: 'local_id', descripcion: '#ID'},
+    { nombre: 'severidad', descripcion: 'Clase (CoA)'},
+    { nombre: 'tipo', descripcion: 'Categoría'},
+    { nombre: 'local_x', descripcion: 'Columna'},
+    { nombre: 'local_y', descripcion: 'Fila'},
+    { nombre: 'global_x', descripcion: 'Seguidor', tipo: '2 ejes'},
+    { nombre: 'temperaturaMax', descripcion: 'Temp. máxima (ºC)'},
+    { nombre: 'gradienteNormalizado', descripcion: 'DT normalizado (ºC)'},
+    { nombre: 'archivoPublico', descripcion: 'Nombre archivo'},
+    { nombre: 'datetimeString', descripcion: 'Hora'},
+    { nombre: 'irradiancia', descripcion: 'Irradiancia (W/m2)'},
   ]
 };

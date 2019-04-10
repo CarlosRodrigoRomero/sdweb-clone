@@ -2,7 +2,7 @@
     <mat-card-content>
         <h2 class="text-center"> Clase de Anomalía (CoA)</h2>
         <div class="filtro-severidad">
-            <mat-checkbox *ngFor="let ts of tiposSeveridad" [checked]=true (change)="onCheckBoxSeveridadChange($event)" value="{{ts}}">
+            <mat-checkbox *ngFor="let ts of numClases" [checked]="filtroClase.includes(ts)" (change)="onCheckBoxClaseChange($event)" value="{{ts}}">
                 <div class="filtros-severidad-circulo-texto">
                     <div class="circle circleSeveridad{{ts}}"></div>
                     <span class="filtro-severidad-text">{{labelsSeveridad[ts-1]}} </span>
@@ -19,12 +19,12 @@
 
         <h2> Categorías </h2>
         <div class="filtro-severidad">
-            <span *ngFor="let cat of numCategorias">
-            <mat-checkbox  *ngIf="countCategoria[cat-1] > 0" [checked]="filtroCategoria.includes(cat)" (change)="onChangeCheckboxCategoria($event)" value="{{cat}}">
-                {{ nombreClases[cat] }}
-                <span class="filtro-numero">({{ countCategoria[cat-1] }})</span>
-            </mat-checkbox>
-            </span>
+            <ng-container *ngFor="let cat of numCategorias">
+                <mat-checkbox *ngIf="countCategoria[cat-1] > 0" [checked]="filtroCategoria.includes(cat)" (change)="onChangeCheckboxCategoria($event)" value="{{cat}}">
+                    {{ nombreClases[cat] }}
+                    <span class="filtro-numero">({{ countCategoria[cat-1] }})</span>
+                </mat-checkbox>
+            </ng-container>
         </div>
 
     </mat-card-content>

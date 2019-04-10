@@ -11,17 +11,18 @@ import { GLOBAL } from '../../services/global';
 })
 export class PcFilterComponent implements OnInit {
   @Input() public allPcs: PcInterface[];
+
   public severidad: MatButtonToggleGroup;
   public filtroClase: number[];
   public filtroCategoria: number[];
   public labelsSeveridad = GLOBAL.labels_severidad;
   public descripcionSeveridad = GLOBAL.descripcionSeveridad;
-  public tiposSeveridad = GLOBAL.tipos_severidad;
   public numCategorias: Array<number>;
   public numClases: Array<number>;
   public nombreClases: Array<string>;
   public countCategoria: Array<number>;
   public countClase: Array<number>;
+
 
   constructor(private pcService: PcService) {
     this.countCategoria = Array();
@@ -29,12 +30,18 @@ export class PcFilterComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.pcService.filtroClase$.subscribe( e => this.filtroClase = e);
+    this.pcService.filtroCategoria$.subscribe( (e) => {
+      this.filtroCategoria = e;
+    });
+
+
     this.numCategorias = Array(GLOBAL.labels_tipos.length).fill(0).map( (_, i) => i + 1 );
     this.numClases = Array(GLOBAL.labels_severidad.length).fill(0).map( (_, i) => i + 1 );
     this.nombreClases = GLOBAL.pcDescripcion;
 
-    this.filtroCategoria = this.numCategorias;
-    this.filtroClase = this.numClases;
+    // this.filtroCategoria = this.numCategorias;
+    // this.filtroClase = this.numClases;
 
     // Calcular los tipos de puntos calientes
     for (const i of this.numCategorias) {
@@ -48,29 +55,26 @@ export class PcFilterComponent implements OnInit {
     }
   }
 
-
-    onCheckBoxSeveridadChange($event: MatCheckboxChange) {
-
-      const numberChecked = parseInt($event.source.value, 10);
-      this.filtroClase = this.filtroClase.filter(i => i !== numberChecked);
-
-      if ($event.checked === true) {
-        this.filtroClase.push(numberChecked);
-      }
-      this.pcService.filteredPcs(this.allPcs.filter( (pc) => this.filtroClase.includes(pc.severidad)));
-
+  onCheckBoxClaseChange($event: MatCheckboxChange) {
+    const numberChecked = parseInt($event.source.value, 10);
+    this.filtroClase = this.filtroClase.filter(i => i !== numberChecked);
+    if ($event.checked === true) {
+      this.filtroClase.push(numberChecked);
     }
-
-    onChangeCheckboxCategoria($event: MatCheckboxChange) {
-
-      const numberChecked = parseInt($event.source.value, 10);
-      this.filtroCategoria = this.filtroCategoria.filter(i => i !== numberChecked);
-
-      if ($event.checked === true) {
-        this.filtroCategoria.push(numberChecked);
-      }
-      this.pcService.filteredPcs(this.allPcs.filter( (pc, i, a) => this.filtroCategoria.includes(pc.tipo)));
-
-    }
+    this.pcService.PushFiltroClase(this.filtroClase);
+    this.pcService.filteredPcs(this.allPcs.filter( (pc) => this.filtroClase.includes(pc.severidad)));
   }
+
+  onChangeCheckboxCategoria($event: MatCheckboxChange) {
+
+    const numberChecked = parseInt($event.source.value, 10);
+    this.filtroCategoria = this.filtroCategoria.filter(i => i !== numberChecked);
+    if ($event.checked === true) {
+      this.filtroCategoria.push(numberChecked);
+    }
+    this.pcService.PushFiltroCategoria(this.filtroCategoria);
+    this.pcService.filteredPcs(this.allPcs.filter( (pc, i, a) => this.filtroCategoria.includes(pc.tipo)));
+
+  }
+}
 

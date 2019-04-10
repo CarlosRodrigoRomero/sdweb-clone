@@ -14,8 +14,9 @@ declare let fabric;
 
 import html2pdf from 'html2pdf.js';
 import { AngularFireStorage } from '@angular/fire/storage';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { MatCheckboxChange } from '@angular/material';
 
 @Component({
   selector: 'app-informe-export',
@@ -53,6 +54,11 @@ export class InformeExportComponent implements OnInit {
   public emisividad: number;
   public tipoInforme: number;
   public pcListPorSeguidor: SeguidorInterface[];
+  public seguidor: SeguidorInterface;
+  public pcColumnas: any[];
+  public filtroColumnas: string[];
+  private filteredColumnasSource = new BehaviorSubject<any[]>(new Array<any>());
+  public currentFilteredColumnas$ = this.filteredColumnasSource.asObservable();
 
   constructor(
     private storage: AngularFireStorage,
@@ -73,10 +79,22 @@ export class InformeExportComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.pcColumnas = GLOBAL.pcColumnas;
+
+    this.filtroColumnas = this.pcColumnas.map( (element) => element.nombre);
+    this.filteredColumnasSource.next(this.pcColumnas);
+
     // Ordenar Pcs por seguidor:
+    let count = 0;
     this.pcListPorSeguidor = this.pcService.getPcsPorSeguidor(this.allPcsConSeguidores);
+    this.seguidor = this.pcListPorSeguidor[0];
+
     for (const seguidor of this.pcListPorSeguidor) {
       this.setImgSeguidorCanvas(seguidor);
+      count = count + 1;
+      if ( count === 2 ) {
+        break;
+      }
     }
     // this.setImgSeguidorCanvas(this.pcListPorSeguidor[0]);
 
@@ -196,8 +214,8 @@ export class InformeExportComponent implements OnInit {
       pagebreak: { mode: 'avoid-all'},
       filename:     'myfile.pdf',
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      html2canvas:  { scale: 1, useCORS: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     html2pdf().set(opt).from(content.innerHTML).save();
   }
@@ -211,39 +229,159 @@ export class InformeExportComponent implements OnInit {
       .subscribe( url => {
         seguidor.pcs[0].downloadUrlString = url;
 
-        imagenTermica.src = url;
-
         const canvas = new fabric.Canvas(`imgSeguidorCanvas${seguidor.global_x}`);
         imagenTermica.onload = () => {
-          canvas.setBackgroundImage(
-            new fabric.Image(imagenTermica, {
+
+          const fabricImage = new fabric.Image(imagenTermica, {
               left: 0,
               top: 0,
               angle: 0,
               opacity: 1,
+              scaleX: 1,
+              scaleY: 1,
               draggable: false,
               lockMovementX: true,
               lockMovementY: true
-            }),
-            canvas.renderAll.bind(canvas),
-            {
+            });
+
+          // fabricImage.scale(1);
+          canvas.add(fabricImage);
+          this.drawAllPcsInCanvas(seguidor, canvas);
+            // canvas.renderAll.bind(canvas),
+            // {
               // scaleX: this.canvas.width / image.width,
               // scaleY: this.canvas.height / image.height,
-              crossOrigin: 'anonymous',
-              left: 0,
-              top: 0,
+              // crossOrigin: 'anonymous',
+              // left: 0,
+              // top: 0,
               // originX: 'top',
               // originY: 'left'
-            }
-          );
+            // }
         };
+        imagenTermica.src = url;
+
       });
     }
 
-    // imagenTermica.onload = () => {
-    //   console.log('imagenTermica', imagenTermica.src);
+  drawAllPcsInCanvas(seguidor: SeguidorInterface, canvas) {
+    // console.log('this.filteredPcs', this.allPcs);
+    const seguidorPcs = this.allPcs.filter( (pc, i, pcArray) => {
+      return pc.global_x === seguidor.global_x;
+    });
+    seguidorPcs.forEach( (pc, i, a) => {
+      this.drawPc(pc, canvas);
+      this.drawTriangle(pc, canvas);
+    });
 
+    canvas.getElement().toBlob( (blob) => {
+      const urlCreator = window.URL;
+      const imageUrl = urlCreator.createObjectURL(blob);
+      const image = new Image();
+      image.src = imageUrl;
+      image.width = 640;
+      image.height = 512;
+      document.getElementById(`divSeguidor${seguidor.global_x}`).appendChild(image);
+    });
+  }
 
+  drawPc(pc: PcInterface, canvas: any) {
+    const actObj1 = new fabric.Rect({
+      left: pc.img_left,
+      top: pc.img_top,
+      fill: 'rgba(0,0,0,0)',
+        stroke: 'black',
+        strokeWidth: 1,
+        width: pc.img_width,
+        height: pc.img_height,
+        hasControls: false,
+        lockMovementY: true,
+        lockMovementX: true,
+        localId: pc.local_id,
+        ref: false,
+        selectable: false,
+        hoverCursor: 'default'
+    });
+    const actObj2 = new fabric.Rect({
+      left: pc.img_left - 1,
+      top: pc.img_top - 1,
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'red',
+      strokeWidth: 1,
+      width: pc.img_width + 2,
+      height: pc.img_height + 2,
+      hasControls: false,
+      lockMovementY: true,
+      lockMovementX: true,
+      localId: pc.local_id,
+      ref: false,
+      hoverCursor: 'pointer',
+      selectable: true
+    });
+    const textId = new fabric.Text(
+      '#'.concat(pc.local_id.toString().concat(' ')), {
+        left: pc.img_left,
+        top: pc.img_top - 26,
+        fontSize: 20,
+        // textBackgroundColor: 'red',
+        ref: 'text',
+        selectable: false,
+        hoverCursor: 'default',
+        fill: 'white'
+    });
+
+    canvas.add(actObj1);
+    canvas.add(actObj2);
+    canvas.add(textId);
+    canvas.renderAll();
+  }
+
+  private drawTriangle(pc: PcInterface, canvas: any) {
+    const x = pc.img_x;
+    const y = pc.img_y;
+
+    const squareBase = 12;
+    const triangle = new fabric.Triangle({
+      width: squareBase,
+      height: squareBase,
+      fill: 'red',
+      stroke: 'black',
+    left: Math.round(x - squareBase / 2),
+    top: y, // si no ponemos este 2, entonces no lee bien debajo del triangulo
+    selectable: false,
+    ref: 'triangle',
+    hoverCursor: 'default',
+  });
+
+    const textTriangle = new fabric.Text(
+      ' + '.concat(pc.gradienteNormalizado.toString().concat(' ºC ')), {
+        left: pc.img_left,
+        top: pc.img_top + pc.img_height + 5,
+        fontSize: 22,
+        textBackgroundColor: 'white',
+        ref: 'text',
+        selectable: false,
+        hoverCursor: 'default',
+        fill: 'red',
+      });
+
+    canvas.add(triangle);
+    canvas.add(textTriangle);
+    canvas.renderAll();
+  }
+
+  onCheckBoxColumnaChange($event: MatCheckboxChange) {
+    const columnaChecked = $event.source.value;
+    this.filtroColumnas = this.filtroColumnas.filter(nombre => nombre !== columnaChecked);
+    if ($event.checked === true) {
+      this.filtroColumnas.push(columnaChecked);
+    }
+
+    // Llamar al behaviourObject
+    this.filteredColumnasSource.next(
+      this.pcColumnas.filter( e => this.filtroColumnas.includes(e.nombre))
+      );
+    // this.pcService.filteredPcs(this.allPcs.filter( (pc) => this.filtroClase.includes(pc.severidad)));
+  }
 }
 
 

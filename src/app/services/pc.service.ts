@@ -4,6 +4,7 @@ import {PcInterface} from '../models/pc';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument, CollectionReference } from '@angular/fire/firestore';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map, take } from 'rxjs/operators';
+import { GLOBAL } from './global';
 
 export interface SeguidorInterface {
   pcs: PcInterface[];
@@ -22,11 +23,23 @@ export class PcService {
   public url: string;
   private filteredPcsSource = new BehaviorSubject<PcInterface[]>(new Array<PcInterface>());
   public currentFilteredPcs$ = this.filteredPcsSource.asObservable();
+  private filtroClase = new BehaviorSubject<number[]>(new Array<number>());
+  public filtroClase$ = this.filtroClase.asObservable();
+  private filtroCategoria = new BehaviorSubject<number[]>(new Array<number>());
+  public filtroCategoria$ = this.filtroCategoria.asObservable();
 
   constructor(public afs: AngularFirestore, private http: HttpClient) {
     this.pcsCollection = afs.collection<PcInterface>('pcs');
 
+    this.filtroCategoria.next(Array(GLOBAL.labels_tipos.length).fill(0).map( (_, i) => i + 1 ));
+    this.filtroClase.next(Array(GLOBAL.labels_severidad.length).fill(0).map( (_, i) => i + 1 ));
+  }
 
+  PushFiltroClase(filtro: number[]) {
+    this.filtroClase.next(filtro);
+  }
+  PushFiltroCategoria(filtro: number[]) {
+    this.filtroCategoria.next(filtro);
   }
 
   filteredPcs(pcs: PcInterface[]) {

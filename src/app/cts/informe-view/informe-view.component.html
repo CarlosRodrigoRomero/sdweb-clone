@@ -1,4 +1,8 @@
-<div *ngIf="isLoaded1 && isLoaded2 && isLoaded3">
+<ng-template #loading>
+    <h3 class="text-center">Cargando ... </h3>
+</ng-template>
+
+<div *ngIf="isLoaded1 && isLoaded2 && isLoaded3 else loading">
 
     <div class="container">
         <div class="header-informe">

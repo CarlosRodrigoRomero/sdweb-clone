@@ -38,7 +38,6 @@ import { OrtophotoComponent } from './cts/ortophoto/ortophoto.component';
 import { MapService } from './services/orto.service';
 import { LoginComponent } from './cts/login/login.component';
 import { AuthService } from './services/auth.service';
-import { NgxAuthFirebaseUIModule } from 'ngx-auth-firebaseui';
 import { IndexComponent } from './cts/index/index.component';
 import { NavbarComponent } from './layout/navbar/navbar.component';
 import { PubliclayoutComponent } from './layout/publiclayout/publiclayout.component';
@@ -131,14 +130,6 @@ import { VideoComponent } from './cts/video/video.component';
     MatToolbarModule,
     MatTooltipModule,
     MatTreeModule,
-    NgxAuthFirebaseUIModule.forRoot({
-        apiKey: 'AIzaSyAT1o9xo0dBaLjBFL2HFiG-r_ipKO6_tqc',
-        authDomain: 'sdweb-d33ce.firebaseapp.com',
-        databaseURL: 'https://sdweb-d33ce.firebaseio.com',
-        projectId: 'sdweb-d33ce',
-        storageBucket: 'sdweb-d33ce.appspot.com',
-        messagingSenderId: '229404593483',
-    }),
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM'
     })
