@@ -55,7 +55,8 @@ export class PcListComponent implements OnInit {
         this.pcDataSource = new MatTableDataSource(list);
         this.pcDataSource.filterPredicate = (pc, filter) =>
           (pc.local_id === parseInt(filter, 10)
-           ||  pc.global_x === parseInt(filter, 10) );
+           ||  pc.global_x === parseInt(filter, 10) ||
+           pc.global_x.toString() === filter);
 
         this.pcDataSource.sort = this.sort;
         this.pcDataSource.paginator = this.paginator;
