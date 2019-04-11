@@ -29,6 +29,7 @@ export class PcListComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @Input() informe: InformeInterface;
   @Input() planta: PlantaInterface;
+  @Input() allPcs: PcInterface[];
 
   public expandedElement: PcInterface;
   public columnsToDisplay: string[];

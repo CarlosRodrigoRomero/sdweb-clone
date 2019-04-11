@@ -1,25 +1,37 @@
-<div class="row">
-    <div class="col text-center">
-        <button mat-button color="primary" (click)="downloadPDF()" mat-b>Generar PDF</button>
-    </div>
-</div>
-
-<div class="row">
+<!-- <div class="row">
     <div class="col text-center">
         <mat-button-toggle-group [(ngModel)]="tipoInforme" name="tipoInforme" aria-label="tipo informe">
             <mat-button-toggle (click)="onClickTipoInforme()" checked="tipoInforme === '1'" value="1">Tipo 1</mat-button-toggle>
             <mat-button-toggle (click)="onClickTipoInforme()" checked="tipoInforme === '2'" value="2">Tipo 2</mat-button-toggle>
         </mat-button-toggle-group>
     </div>
-</div>
+</div> -->
 
-<div class="row">
-    <div class="col">
-        <mat-checkbox *ngFor="let col of pcColumnas" [checked]=true (change)="onCheckBoxColumnaChange($event)" value="{{col.nombre}}">
-            <span class="filtro-columna-text">{{col.descripcion}} </span>
-        </mat-checkbox>
+
+<mat-card class="col-columnas">
+    <mat-card-content>
+        <h3 class="text-center"> Columnas en el informe </h3>
+        <div class="columna-group">
+            <mat-checkbox class="columna-check" *ngFor="let col of pcColumnas" [checked]=true (change)="onCheckBoxColumnaChange($event)" value="{{col.nombre}}">
+                <span class="columnas-text">{{col.descripcion}} </span>
+            </mat-checkbox>
+        </div>
+    </mat-card-content>
+</mat-card>
+
+<div *ngIf="generandoPDF else boton">
+    <app-spinner></app-spinner>
+    <div class="text-center">
+        <p>Generando PDF ...</p>
     </div>
 </div>
+<ng-template #boton>
+    <div class="row">
+        <div class="col text-center ">
+            <button type="button" class="button-generarPdf btn btn-info btn-lg" (click)="downloadPDF()"> Generar PDF </button>
+        </div>
+    </div>
+</ng-template>
 
 <div class="row">
     <div class="col">
@@ -28,462 +40,584 @@
 </div>
 
 
-<div id="pdfContent" class="ventanaInforme container">
-    <ng-template #hola>
 
 
-        <div class="row">
-            <div class="col-12 text-center">
-                <h1>Análisis termográfico aéreo de módulos fotovoltaicos</h1>
-                <div class="text-center">
-                    <img id="imgPortada" class="img-fluid" src="{{portadaImg$ | async}}" alt="">
-                    <img *ngIf="portadaImg$ === null" class="img-fluid" src="../../../assets/images/portada.jpg" alt="">
+<div class="ventanaInforme container">
+    <div class="row">
+        <div [ngSwitch]="tipoInforme">
+            <ng-template [ngSwitchCase]="1">
+                <div class="row">
+                    <div class="col-12">
+                        <h1>Anexo I: Listado de anomalías térmicas</h1>
+                        <table class="table table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th *ngFor="let col of currentFilteredColumnas$ | async">{{col.descripcion}}</th>
+                                    <!-- <th>Clase</th>
+                                            <th>Categoría</th>
+                                            <th *ngIf="planta.tipo === '2 ejes'">Seguidor</th>
+                                            <th *ngIf="planta.tipo === '2 ejes'">Fila</th>
+                                            <th *ngIf="planta.tipo === 'fija' || planta.tipo === '1 eje'">Pasillo</th>
+                                            <th *ngIf="planta.tipo === 'fija' || planta.tipo === '1 eje'">Altura</th>
+                                            <th>Columna</th>
+                                            <th>Gradiente (normalizado)</th>
+                                            <th>Archivo</th> -->
+                                </tr>
+                            </thead>
+                            <tr *ngFor="let pc of filteredPcs$ | async">
+                                <td *ngFor="let col of currentFilteredColumnas$ | async">
+                                    <span *ngIf="col.nombre === 'tipo' else colNormal1">
+                                                {{pcDescripcion[pc.tipo]}}
+                                            </span>
+                                    <ng-template #colNormal1>
+                                        {{pc[col.nombre]}}
+                                    </ng-template>
+                                </td>
+
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template [ngSwitchCase]="2">
+                <div class="row">
+                    <div class="col-12">
+                        <h1>Anexo I: Listado de anomalías térmicas</h1>
+                    </div>
                 </div>
 
-                <h5 class="text-right"><b>Planta solar</b>: {{planta.nombre}} ({{planta.potencia}} MW - {{planta.tipo}})</h5>
-                <h5 class="text-right"><b>Fecha del vuelo</b>: {{informe.fecha * 1000 | date: 'dd/MM/y' }} </h5>
-            </div>
+                <ng-container *ngFor="let seguidor of filteredSeguidoresVistaPrevia">
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="hiddenCanvas">
+                                <canvas id="imgSeguidorCanvasVP{{seguidor.global_x}}" width="640" height="512">
+                                                            </canvas>
+                            </div>
+                            <div class="img-seguidor" id="divSeguidorVP{{seguidor.global_x}}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+
+
+                            <table class="table table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th *ngFor="let col of currentFilteredColumnas$ | async">{{col.descripcion}}</th>
+                                        <!-- <th>Clase</th>
+                                                            <th>Categoría</th>
+                                                            <th *ngIf="planta.tipo === '2 ejes'">Seguidor</th>
+                                                            <th *ngIf="planta.tipo === '2 ejes'">Fila</th>
+                                                            <th *ngIf="planta.tipo === 'fija' || planta.tipo === '1 eje'">Pasillo</th>
+                                                            <th *ngIf="planta.tipo === 'fija' || planta.tipo === '1 eje'">Altura</th>
+                                                            <th>Columna</th>
+                                                            <th>Gradiente (normalizado)</th>
+                                                            <th>Archivo</th> -->
+                                    </tr>
+                                </thead>
+
+                                <ng-container *ngIf="seguidor.pcs[0].tipo !== 0 else sinPcs">
+
+                                    <tr *ngFor="let pc of seguidor.pcs">
+                                        <td *ngFor="let col of currentFilteredColumnas$ | async">
+                                            <span *ngIf="col.nombre === 'tipo' else colNormal2">
+                                                        {{pcDescripcion[pc.tipo]}}
+                                                    </span>
+                                            <ng-template #colNormal2>
+                                                {{pc[col.nombre]}}
+                                            </ng-template>
+
+                                        </td>
+                                        <!-- <td>{{pc.local_id}}</td>
+                                                    <td>CoA {{pc.severidad}}</td>
+                                                    <td>{{global.pcDescripcion[pc.tipo]}}</td>
+                                                    <td>{{pc.global_x}}</td>
+                                                    <td>{{pc.local_y}}</td>
+                                                    <td>{{pc.local_x}}</td>
+                                                    <td>+ {{pc.gradienteNormalizado}} ºC</td>
+                                                    <td>{{pc.archivoPublico}}</td> -->
+                                    </tr>
+                                </ng-container>
+                                <ng-template #sinPcs>
+                                    <tr>
+                                        <td colspan="11"> Sin anomalías térmicas </td>
+                                    </tr>
+                                </ng-template>
+                            </table>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-template>
         </div>
-        <div class="row">
-            <div class="col-12">
-                <h3>1. Introducción</h3>
-                <p>
-                    Este documento contiene los resultados de la inspección termográfica realizada en la planta solar fotovoltaica de {{planta.nombre}} de {{planta.potencia}} MW ({{planta.tipo}}). </p>
-                <p>
-                    La inspección ha sido realizada mediante vehículos aéreos no tripulados operados y diseñados a tal efecto por Solardrone.
-                </p>
+    </div>
+</div>
 
-                <p>
-                    Las inspecciones termográficas en instalaciones solares fotovoltaicas forman parte del mantenimiento preventivo recomendado para este tipo de instalaciones y tiene como objetivo anticiparse a aquellos problemas en los paneles que no son detectables fácilmente
-                    de otra manera.
-                </p>
 
-                <p>
-                    Es importante que este mantenimiento sea llevado a cabo por profesionales, ya que una termografía mal realizada durante varios años puede afectar al estado general de la planta. El equipo de Solardrone cuenta con personal formado en Termografía Infrarroja
-                    Nivel 1 y lleva realizando termografías aéreas desde 2015, habiendo volado más de 500 MW.
-                </p>
 
-                <p>
-                    Entre las ventajas de realizar termografía infrarroja de manera regular, permite aumentar la eficiencia de la planta (performance ratio), evitar reparaciones más costosas, aumentar la vida útil de los equipos, detectar problemas relacionados con distintos
-                    fabricantes de paneles, problemas de conexión entre módulos, problemas relacionados con la vegetación o la suciedad en los panels... entre una larga lista de ventajas.
-                </p>
+<div id="pdfContent" style="display:none" class="container-fluid">
 
-                <p>
-                    Solardrone utiliza la más avanzada tecnología al servicio de la fotovoltaica con el fin de reducir al mínimo el tiempo y el coste de operación sin renunciar a la más alta calidad y fiabilidad.
-                </p>
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1>Análisis termográfico aéreo de módulos fotovoltaicos</h1>
+            <div class="text-center">
+                <img id="imgPortada" class="img-fluid" src="{{portadaImg$ | async}}" alt="">
+                <img *ngIf="portadaImg$ === null" class="img-fluid" src="../../../assets/images/portada.jpg" alt="">
             </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <h4>1.1 Criterio de operación</h4>
-                <p>
-                    El <b>criterio</b> base que Solardrone sigue para realizar inspecciones termográficas es la norma internacional para inspecciones termográficas <b>IEC 62446-3</b>. En la misma se define las termografías infrarrojas de módulos fotovoltaicos
-                    en plantas durante su operación
 
-                </p>
-                <p>
-                    Hay dos niveles de inspección termográfica según la norma IEC 62446-3:
-                </p>
-                <ol>
-                    <li>
-                        <b>Inspección simplificada</b>: Esta es una inspección limitada para verificar que los módulos están funcionando, con requisitos reducidos para el personal. Este tipo de inspecciones se usan, por ejemplo, durante una puesta en
-                        marcha básica de una planta fotovoltaica.
-                    </li>
-                    <li><b>Inspección detallada</b>: Requiere una comprensión más profunda de las anomalías térmicas. Puede ser utilizado para inspecciones periódicas de acuerdo con a la serie IEC 62446 y para solucionar problemas en sistemas con un bajo
-                        rendimiento. Se realizan mediciones de temperatura absoluta. Un experto autorizado en plantas fotovoltaicas, junto con exportos termógrafos, pueden llevar a cabo este tipo de inspecciones.</li>
-                </ol>
-                <p>
-                    Las termografías realizadas por Solardrone entran dentro de las <b>inspecciones detalladas</b> indicadas por la norma, ya que cumplen con los requisitos impuestos por las mismas, que son:
-                </p>
-                <ul>
-                    <li>Medición absoluta de temperaturas: con un error menor de 2 ºC</li>
-                    <li>Medición de temperatura máxima, media y gradiente.</li>
-                    <li>Informe realizado por un experto en termografía infrarroja en conjunto con un experto en fotovoltaica.</li>
-                    <li>Recomendación para cada tipo de anomalía registrada.</li>
-                    <li>Resolución geométrica térmica: 25 pixeles<sup>2</sup> por cada célula fotovoltaica</li>
-                    <li>Resolución geométrica visual: 2,5 pixeles<sup>2</sup> por cada célula fotovoltaica</li>
-                    <li>Condiciones ambientales correctas: temperatura ambiente, viento, nubosidad e irradiancia</li>
-                    <li>Calibración de los equipos: cada 2 años</li>
-                    <li>Parámetros térmicos: el ajuste de la emisividad y la temperatura reflejada es imprescindible para una correcta medición de las temperaturas. Es necesario hacer las mediciones oportunas en campo para poder obtener estos parámetros,
-                        ya que dependen de la atmósfera, la meteorología, la suciedad en los módulos el día del vuelo y de los materiales del propio módulo. </li>
-                    <li>Documentación: el entregable incluye las imágenes radiométricas y visuales originales junto con todos los datos que requiere la norma. </li>
-                    <li>Trayectoria: que asegure el cumplimiento de la norma. </li>
-                    <li>Velocidad: 10 km/h máximo. </li>
 
-                </ul>
+            <h5 class="text-right"><b>Planta solar</b>: {{planta.nombre}} ({{planta.potencia}} MW - {{planta.tipo}})</h5>
+            <h5 class="text-right"><b>Fecha del vuelo</b>: {{informe.fecha * 1000 | date: 'dd/MM/y' }} </h5>
 
+            <div class="text-center">
+                <img id="imgLogo" class="img-fluid" src="{{logoImg$ | async}}" alt="">
 
             </div>
+
         </div>
-        <div class="row">
-            <div class="col-12">
-                <h4>1.2 Normalización de gradientes de temperatura</h4>
+    </div>
 
-                <p>
-                    Con el fin de poder ver la <b>evolución de las anomalías térmicas</b> con el tiempo, comparando inspecciones termográficas llevadas a cabo en distintos meses o años (con condiciones ambientales distintas), es necesario contar con un
-                    procedimiento que permita normalizar los gradientes de temperatura.
-                </p>
-                <p>
-                    Por este motivo todas las anomalías registradas tienen asociada su "gradiente normalizado", que es el gradiente de temperatura equivalente a haber realizado la inspección con una irradiancia de 1000 W/m<sup>2</sup>. Esto permitirá
-                    poder comparar los resultados de la presente inspección con otras futuras realizadas en condiciones ambientales diferentes y así poder tener una evolución fidedigna de cada una de las anomalías.
-                </p>
-            </div>
+
+    <div class="row">
+        <div class="col">
+            <h3>1. Introducción</h3>
+            <p>
+                Este documento contiene los resultados de la inspección termográfica realizada en la planta solar fotovoltaica de {{planta.nombre}} de {{planta.potencia}} MW ({{planta.tipo}}). </p>
+            <p>
+                La inspección ha sido realizada mediante vehículos aéreos no tripulados operados y diseñados a tal efecto por Solardrone.
+            </p>
+
+            <p>
+                Las inspecciones termográficas en instalaciones solares fotovoltaicas forman parte del mantenimiento preventivo recomendado para este tipo de instalaciones y tiene como objetivo anticiparse a aquellos problemas en los paneles que no son detectables fácilmente
+                de otra manera.
+            </p>
+
+            <p>
+                Es importante que este mantenimiento sea llevado a cabo por profesionales, ya que una termografía mal realizada durante varios años puede afectar al estado general de la planta. El equipo de Solardrone cuenta con personal formado en Termografía Infrarroja
+                Nivel 1 y lleva realizando termografías aéreas desde 2015, habiendo volado más de 500 MW.
+            </p>
+
+            <p>
+                Entre las ventajas de realizar termografía infrarroja de manera regular, permite aumentar la eficiencia de la planta (performance ratio), evitar reparaciones más costosas, aumentar la vida útil de los equipos, detectar problemas relacionados con distintos
+                fabricantes de paneles, problemas de conexión entre módulos, problemas relacionados con la vegetación o la suciedad en los panels... entre una larga lista de ventajas.
+            </p>
+
+            <p>
+                Solardrone utiliza la más avanzada tecnología al servicio de la fotovoltaica con el fin de reducir al mínimo el tiempo y el coste de operación sin renunciar a la más alta calidad y fiabilidad.
+            </p>
         </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h4>1.1 Criterio de operación</h4>
+            <p>
+                El <b>criterio</b> base que Solardrone sigue para realizar inspecciones termográficas es la norma internacional para inspecciones termográficas <b>IEC 62446-3</b>. En la misma se define las termografías infrarrojas de módulos fotovoltaicos
+                en plantas durante su operación
 
-        <div class="row">
-            <div class="col-12">
+            </p>
+            <p>
+                Hay dos niveles de inspección termográfica según la norma IEC 62446-3:
+            </p>
+            <ol>
+                <li>
+                    <b>Inspección simplificada</b>: Esta es una inspección limitada para verificar que los módulos están funcionando, con requisitos reducidos para el personal. Este tipo de inspecciones se usan, por ejemplo, durante una puesta en marcha
+                    básica de una planta fotovoltaica.
+                </li>
+                <li><b>Inspección detallada</b>: Requiere una comprensión más profunda de las anomalías térmicas. Puede ser utilizado para inspecciones periódicas de acuerdo con a la serie IEC 62446 y para solucionar problemas en sistemas con un bajo rendimiento.
+                    Se realizan mediciones de temperatura absoluta. Un experto autorizado en plantas fotovoltaicas, junto con exportos termógrafos, pueden llevar a cabo este tipo de inspecciones.</li>
+            </ol>
+            <p>
+                Las termografías realizadas por Solardrone entran dentro de las <b>inspecciones detalladas</b> indicadas por la norma, ya que cumplen con los requisitos impuestos por las mismas, que son:
+            </p>
+            <ul>
+                <li>Medición absoluta de temperaturas: con un error menor de 2 ºC</li>
+                <li>Medición de temperatura máxima, media y gradiente.</li>
+                <li>Informe realizado por un experto en termografía infrarroja en conjunto con un experto en fotovoltaica.</li>
+                <li>Recomendación para cada tipo de anomalía registrada.</li>
+                <li>Resolución geométrica térmica: 25 pixeles<sup>2</sup> por cada célula fotovoltaica</li>
+                <li>Resolución geométrica visual: 2,5 pixeles<sup>2</sup> por cada célula fotovoltaica</li>
+                <li>Condiciones ambientales correctas: temperatura ambiente, viento, nubosidad e irradiancia</li>
+                <li>Calibración de los equipos: cada 2 años</li>
+                <li>Parámetros térmicos: el ajuste de la emisividad y la temperatura reflejada es imprescindible para una correcta medición de las temperaturas. Es necesario hacer las mediciones oportunas en campo para poder obtener estos parámetros, ya que
+                    dependen de la atmósfera, la meteorología, la suciedad en los módulos el día del vuelo y de los materiales del propio módulo. </li>
+                <li>Documentación: el entregable incluye las imágenes radiométricas y visuales originales junto con todos los datos que requiere la norma. </li>
+                <li>Trayectoria: que asegure el cumplimiento de la norma. </li>
+                <li>Velocidad: 10 km/h máximo. </li>
 
-                <h4>1.2 Datos del vuelo</h4>
+            </ul>
 
-                <table class="table table-sm">
-                    <!-- <thead>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h4>1.2 Normalización de gradientes de temperatura</h4>
+
+            <p>
+                Con el fin de poder ver la <b>evolución de las anomalías térmicas</b> con el tiempo, comparando inspecciones termográficas llevadas a cabo en distintos meses o años (con condiciones ambientales distintas), es necesario contar con un procedimiento
+                que permita normalizar los gradientes de temperatura.
+            </p>
+            <p>
+                Por este motivo todas las anomalías registradas tienen asociada su "gradiente normalizado", que es el gradiente de temperatura equivalente a haber realizado la inspección con una irradiancia de 1000 W/m<sup>2</sup>. Esto permitirá poder
+                comparar los resultados de la presente inspección con otras futuras realizadas en condiciones ambientales diferentes y así poder tener una evolución fidedigna de cada una de las anomalías.
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+
+            <h4>1.2 Datos del vuelo</h4>
+
+            <table class="table table-sm">
+                <!-- <thead>
                                     <tr>
                                         <th scope="col"></th>
                                         <th scope="col"></th>
                                     </tr>
                                 </thead> -->
-                    <tbody>
-                        <tr>
-                            <th class="text-center" colspan="2">Vehículo aéreo no tripulado</th>
-                        </tr>
-                        <tr>
-                            <th scope="row">Modelo</th>
-                            <td>{{global.uav}}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Cámara térmica</th>
-                            <td>{{global.camaraTermica}}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Última calibración</th>
-                            <td>{{global.ultimaCalibracion}}</td>
-                        </tr>
-                        <tr>
-                            <th class="text-center" colspan="2">Datos del vuelo</th>
-                        </tr>
-                        <tr>
-                            <th scope="row">Fecha</th>
-                            <td>{{informe.fecha * 1000 | date: 'dd/MM/y' }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Horario de los vuelos</th>
-                            <td>{{informe.hora_inicio}} - {{informe.hora_fin}}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Velocidad</th>
-                            <td>{{informe.velocidad}} km/h</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">GSD térmico</th>
-                            <td>{{informe.gsd | number: '1.1'}} cm/pixel</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">GSD visual</th>
-                            <td>{{informe.gsd / 25 | number: '1.1'}} cm/pixel</td>
-                        </tr>
-                        <tr>
-                            <th class="text-center" colspan="2">Datos meteorológicos</th>
-                        </tr>
-                        <tr>
-                            <th scope="row">Irradiancia</th>
-                            <td> > {{irradianciaMinima}} W/m<sup>2</sup> (correcta según norma IEC 62446-3)</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Temperatura</th>
-                            <td>{{informe.temperatura}} ºC</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Nubosidad</th>
-                            <td>{{informe.nubosidad}} okta</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <tbody>
+                    <tr>
+                        <th class="text-center" colspan="2">Vehículo aéreo no tripulado</th>
+                    </tr>
+                    <tr>
+                        <th scope="row">Modelo</th>
+                        <td>{{global.uav}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Cámara térmica</th>
+                        <td>{{global.camaraTermica}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Última calibración</th>
+                        <td>{{global.ultimaCalibracion}}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-center" colspan="2">Datos del vuelo</th>
+                    </tr>
+                    <tr>
+                        <th scope="row">Fecha</th>
+                        <td>{{informe.fecha * 1000 | date: 'dd/MM/y' }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Horario de los vuelos</th>
+                        <td>{{informe.hora_inicio}} - {{informe.hora_fin}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Velocidad</th>
+                        <td>{{informe.velocidad}} km/h</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">GSD térmico</th>
+                        <td>{{informe.gsd | number: '1.1'}} cm/pixel</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">GSD visual</th>
+                        <td>{{informe.gsd / 25 | number: '1.1'}} cm/pixel</td>
+                    </tr>
+                    <tr>
+                        <th class="text-center" colspan="2">Datos meteorológicos</th>
+                    </tr>
+                    <tr>
+                        <th scope="row">Irradiancia</th>
+                        <td> > {{irradianciaMinima}} W/m<sup>2</sup> (correcta según norma IEC 62446-3)</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Temperatura</th>
+                        <td>{{informe.temperatura}} ºC</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Nubosidad</th>
+                        <td>{{informe.nubosidad}} okta</td>
+                    </tr>
+                </tbody>
+            </table>
 
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h4>1.3 Irradiancia durante el vuelo</h4>
+
+            <p *ngIf="informe.irradiancia === 0">
+                Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de {{planta.nombre}}, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde
+                el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.
+            </p>
+            <p *ngIf="informe.irradiancia !== 0">
+                Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición que Solardrone ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el
+                aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.
+            </p>
+            <div class="text-center">
+                <img id="imgIrradiancia" class="img-fluid rounded" src="{{irradianciaImg$ | async}}" alt="">
             </div>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-12">
-                <h4>1.3 Irradiancia durante el vuelo</h4>
-
-                <p *ngIf="informe.irradiancia === 0">
-                    Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de {{planta.nombre}}, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde
-                    el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.
-                </p>
-                <p *ngIf="informe.irradiancia !== 0">
-                    Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición que Solardrone ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el
-                    aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.
-                </p>
-                <div class="text-center">
-                    <img id="imgIrradiancia" class="img-fluid rounded" src="{{irradianciaImg$ | async}}" alt="">
-                </div>
+    <div class="row">
+        <div class="col-12">
+            <h4>1.4 Ajuste de parámetros térmicos</h4>
+            <p>
+                Con el fin de obtener medidas de temperaturas absolutas fiables, es necesario tener en cuenta distintas variables térmicas que afectan directamente al resultado de las medidas obtenidas por las cámaras. Las más importantes son la <b>emisividad</b>                y la <b>temperatura reflejada</b>.
+            </p>
+            <h5>1.4.1 Emisividad</h5>
+            <p>
+                La emisividad del material se mide de manera experimental en le campo. La emisivdad del mismo depende del tipo de vidrio de los paneles y de la suciedad que tengan. La emisividad escogida por el termógrafo tras el ensayo experimental es de:
+            </p>
+            <div class="text-center">
+                <span class="text-center square"><strong>Emisividad = {{emisividad}}</strong></span>
             </div>
-        </div>
-
-        <div class="row">
-            <div class="col-12">
-                <h4>1.4 Ajuste de parámetros térmicos</h4>
-                <p>
-                    Con el fin de obtener medidas de temperaturas absolutas fiables, es necesario tener en cuenta distintas variables térmicas que afectan directamente al resultado de las medidas obtenidas por las cámaras. Las más importantes son la <b>emisividad</b>                    y la <b>temperatura reflejada</b>.
-                </p>
-                <h5>1.4.1 Emisividad</h5>
-                <p>
-                    La emisividad del material se mide de manera experimental en le campo. La emisivdad del mismo depende del tipo de vidrio de los paneles y de la suciedad que tengan. La emisividad escogida por el termógrafo tras el ensayo experimental es de:
-                </p>
-                <div class="text-center">
-                    <span class="text-center square"><strong>Emisividad = {{emisividad}}</strong></span>
-                </div>
-                <img id="imgSuciedad" class="img-fluid rounded" src="{{suciedadImg$ | async}}" alt="">
+            <img id="imgSuciedad" class="img-fluid rounded" src="{{suciedadImg$ | async}}" alt="">
 
 
-                <h5>1.4.2 Temperatura reflejada</h5>
-                <p>
-                    La temperatura reflejada nos depende de la atmosfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura
-                    reflejada medida es:
-                </p>
+            <h5>1.4.2 Temperatura reflejada</h5>
+            <p>
+                La temperatura reflejada nos depende de la atmosfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura
+                reflejada medida es:
+            </p>
 
-                <div class="text-center">
-                    <span class="text-center square"><strong>Temperatura reflejada = {{tempReflejada}} ºC</strong></span>
-                </div>
-
-
+            <div class="text-center">
+                <span class="text-center square"><strong>Temperatura reflejada = {{tempReflejada}} ºC</strong></span>
             </div>
+
+
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-12">
-                <h4>1.5 Pérdida de Performance Ratio (ΔPR)</h4>
+    <div class="row">
+        <div class="col-12">
+            <h4>1.5 Pérdida de Performance Ratio (ΔPR)</h4>
 
-                <p>
-                    El coeficiente de rendimiento de sistemas fotovoltaicos o Performance Ratio es un parámetro que tuvo su origen conceptual en la norma IES 61724 (1998) para ser utilizado como indicador de calidad en la evaluación de sistemas fotovoltaicos.
-                </p>
+            <p>
+                El coeficiente de rendimiento de sistemas fotovoltaicos o Performance Ratio es un parámetro que tuvo su origen conceptual en la norma IES 61724 (1998) para ser utilizado como indicador de calidad en la evaluación de sistemas fotovoltaicos.
+            </p>
 
-                <p>
-                    Este parámetro se utiliza para medir el rendimiento de cualquier sistema fotovoltaico. En otras palabras, si queremos saber si un módulo está generando la energía que debería bastaría con conocer su PR. No podemos conocer el PR de cada módulo con una
-                    termografía, pero lo que sí podemos conocer es la pérdida de PR (ΔPR) producida por anomalía térmica respecto a sus condiciones ideales. Es decir, un módulo con un punto caliente que causa una ΔPR = -1% tiene menos importancia que
-                    una anomalía que causa una ΔPR = -33%, el cual está haciendo caer la producción eléctrica del módulo en un 33%.
-                </p>
+            <p>
+                Este parámetro se utiliza para medir el rendimiento de cualquier sistema fotovoltaico. En otras palabras, si queremos saber si un módulo está generando la energía que debería bastaría con conocer su PR. No podemos conocer el PR de cada módulo con una
+                termografía, pero lo que sí podemos conocer es la pérdida de PR (ΔPR) producida por anomalía térmica respecto a sus condiciones ideales. Es decir, un módulo con un punto caliente que causa una ΔPR = -1% tiene menos importancia que una
+                anomalía que causa una ΔPR = -33%, el cual está haciendo caer la producción eléctrica del módulo en un 33%.
+            </p>
 
-                <p>
-                    La pérdida de PR nos indica, por tanto, lo perjudicial que es una anomalía térmica, identificando explícitamente los puntos sobre los que se debe actuar para optimizar la producción eléctrica. Es un parámetro indispensable en el diagnóstico termográfico
-                    de una instalación fotovoltaica, ya que nos permite tomar decisiones en base a un dato técnico-económico objetivo.
-                </p>
+            <p>
+                La pérdida de PR nos indica, por tanto, lo perjudicial que es una anomalía térmica, identificando explícitamente los puntos sobre los que se debe actuar para optimizar la producción eléctrica. Es un parámetro indispensable en el diagnóstico termográfico
+                de una instalación fotovoltaica, ya que nos permite tomar decisiones en base a un dato técnico-económico objetivo.
+            </p>
 
-                <p>
-                    Para poder evaluar la planta utilizaremos los siguientes dos sencillos conceptos:
-                </p>
+            <p>
+                Para poder evaluar la planta utilizaremos los siguientes dos sencillos conceptos:
+            </p>
 
-                <h5><u> Pérdidas de performance ratio (ΔPR)</u></h5>
+            <h5><u> Pérdidas de performance ratio (ΔPR)</u></h5>
 
-                <p>
-                    Cada incidencia tiene una variación de performance ratio asociado. Por ejemplo, un diodo bypass cortocircuitado produce un 33% de pérdidas en el módulo (ΔPR=33%), mientras que un punto caliente aislado produce de media &lt 5% de pérdidas.
-                </p>
+            <p>
+                Cada incidencia tiene una variación de performance ratio asociado. Por ejemplo, un diodo bypass cortocircuitado produce un 33% de pérdidas en el módulo (ΔPR=33%), mientras que un punto caliente aislado produce de media &lt 5% de pérdidas.
+            </p>
 
-                <h5><u> Módulos apagados equivalentes</u></h5>
+            <h5><u> Módulos apagados equivalentes</u></h5>
 
-                <p>
-                    El concepto “módulos apagados equivalentes” es la cantidad equivalente de módulos que no generan energía debido a las incidencias registradas en la planta. Por ejemplo, si tenemos tres módulos idénticos con un defecto en un diodo bypass cada uno, cada
-                    módulo genera un 33% menos de energía. Entonces, el número de módulos apagados equivalentes es 1.
-                </p>
+            <p>
+                El concepto “módulos apagados equivalentes” es la cantidad equivalente de módulos que no generan energía debido a las incidencias registradas en la planta. Por ejemplo, si tenemos tres módulos idénticos con un defecto en un diodo bypass cada uno, cada
+                módulo genera un 33% menos de energía. Entonces, el número de módulos apagados equivalentes es 1.
+            </p>
 
-                <p>
-                    Uniendo los dos conceptos anteriores, se puede hacer una estimación “grosso modo” de la variación de PR de la planta de la siguiente manera:
-                </p>
+            <p>
+                Uniendo los dos conceptos anteriores, se puede hacer una estimación “grosso modo” de la variación de PR de la planta de la siguiente manera:
+            </p>
 
-                <div class="text-center">
-                    <img class="marginBottom img40 img-fluid" src="../../../assets/images/formula_mae.png" alt="">
-                </div>
-
-                <p>
-                    Siendo N = Número de módulos; PR = Performance ratio; MAE = Módulos apagados equivalente calculados
-                </p>
-
-                <p>
-                    Por lo tanto, sabiendo el MAE sabremos cuánto PR estamos perdiendo debido a las incidencias encontradas.
-                </p>
-                <p>
-                    El objetivo será obtener un MAE bajo, lo cual nos indicará un correcto mantenimiento de la planta.
-                </p>
-                <p>
-                    Teniendo en cuenta todas las plantas fotovoltaicas inspeccionadas por Solardrone, se puede hacer una clasificación estadística según el MAE. Según la siguiente tabla, podemos clasificar el mantenimiento de una planta en 3 tipos: muy bueno (por debajo
-                    de la media), correcto (en la media) y 'mejorable' (por encima de la media):
-                </p>
-                <div class="text-center">
-                    <img class="marginBottom img40 img-fluid" src="../../../assets/images/maeCurva.png" alt="">
-                </div>
-
-                <table class="table table-striped">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th scope="col">%MAE de la planta</th>
-                            <th scope="col">Mantenimiento</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr style="color: rgb(85, 156, 85)">
-                            <th scope="row">
-                                < {{global.mae[0]}}%</th>
-                                    <td>Muy bueno</td>
-
-                        </tr>
-                        <tr style="color: rgb(0, 132, 255)">
-                            <th scope="row">{{global.mae[0]}}% - {{global.mae[1]}}%</th>
-                            <td>Correcto</td>
-
-                        </tr>
-                        <tr style="color: rgb(255, 136, 0)">
-                            <th scope="row">> {{global.mae[1]}}%</th>
-                            <td>Mejorable</td>
-
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="text-center">
+                <img class="marginBottom img40 img-fluid" src="../../../assets/images/formula_mae.png" alt="">
             </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <h4>1.6 Clasificación de las anomalías</h4>
 
-                <p>
-                    Según la norma UNE-62446-3 de inspección termográfica de instalaciones fotovoltaicas, las anomalías termográficas se clasifican en tres clases o CoA (Class of Abnormalitys):
-                </p>
-                <ul>
-                    <li><b>CoA 1 - sin anomalía</b>: hacemos seguimiento, pero no hay que actuar.</li>
-                    <li><b style="color: orange">CoA 2 - anomalía térmica</b>: ver la causa y, si es necesario, arreglar en un periodo razonable.</li>
-                    <li><b style="color:red">CoA 3 - anomalía térmica relevante para la seguridad</b>: próxima interrupción de la operación normal del módulo, detectar la causa y rectificar en un periodo razonable.</li>
-                </ul>
+            <p>
+                Siendo N = Número de módulos; PR = Performance ratio; MAE = Módulos apagados equivalente calculados
+            </p>
 
+            <p>
+                Por lo tanto, sabiendo el MAE sabremos cuánto PR estamos perdiendo debido a las incidencias encontradas.
+            </p>
+            <p>
+                El objetivo será obtener un MAE bajo, lo cual nos indicará un correcto mantenimiento de la planta.
+            </p>
+            <p>
+                Teniendo en cuenta todas las plantas fotovoltaicas inspeccionadas por Solardrone, se puede hacer una clasificación estadística según el MAE. Según la siguiente tabla, podemos clasificar el mantenimiento de una planta en 3 tipos: muy bueno (por debajo
+                de la media), correcto (en la media) y 'mejorable' (por encima de la media):
+            </p>
+            <div class="text-center">
+                <img class="marginBottom img40 img-fluid" src="../../../assets/images/maeCurva.png" alt="">
             </div>
+
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">%MAE de la planta</th>
+                        <th scope="col">Mantenimiento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="color: rgb(85, 156, 85)">
+                        <th scope="row">
+                            < {{global.mae[0]}}%</th>
+                                <td>Muy bueno</td>
+
+                    </tr>
+                    <tr style="color: rgb(0, 132, 255)">
+                        <th scope="row">{{global.mae[0]}}% - {{global.mae[1]}}%</th>
+                        <td>Correcto</td>
+
+                    </tr>
+                    <tr style="color: rgb(255, 136, 0)">
+                        <th scope="row">> {{global.mae[1]}}%</th>
+                        <td>Mejorable</td>
+
+                    </tr>
+                </tbody>
+            </table>
         </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h4>1.6 Clasificación de las anomalías</h4>
 
-        <div class="row">
-            <div class="col-12">
-                <h4>1.7 Cómo localizar las incidencias</h4>
+            <p>
+                Según la norma UNE-62446-3 de inspección termográfica de instalaciones fotovoltaicas, las anomalías termográficas se clasifican en tres clases o CoA (Class of Abnormalitys):
+            </p>
+            <ul>
+                <li><b>CoA 1 - sin anomalía</b>: hacemos seguimiento, pero no hay que actuar.</li>
+                <li><b style="color: orange">CoA 2 - anomalía térmica</b>: ver la causa y, si es necesario, arreglar en un periodo razonable.</li>
+                <li><b style="color:red">CoA 3 - anomalía térmica relevante para la seguridad</b>: próxima interrupción de la operación normal del módulo, detectar la causa y rectificar en un periodo razonable.</li>
+            </ul>
 
-                <p>
-                    Todas las incidencias tienen asociada una localización GPS, cuyo margen de error es de unos pocos metros (0-2 metros). </p>
-                <p *ngIf="planta.tipo === '2 ejes'">
-                    Además todos ellos tienen asociado los parámetros seguidor”, “fila” y “columna” según el mapa habitual de la planta. Las filas y las columnas tienen origen en la esquina superior izquierda del seguidor.
-                </p>
-                <p *ngIf="planta.tipo === 'fija'">
-                    Además todos ellos tienen asociado los parámetros "pasillo", "columna" y "altura" según el mapa habitual de la planta.
-                </p>
-
-            </div>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-12">
-                <h3>2. Resultados de la inspección termográfica</h3>
-            </div>
+    <div class="row">
+        <div class="col-12">
+            <h4>1.7 Cómo localizar las incidencias</h4>
+
+            <p>
+                Todas las incidencias tienen asociada una localización GPS, cuyo margen de error es de unos pocos metros (0-2 metros). </p>
+            <p *ngIf="planta.tipo === '2 ejes'">
+                Además todos ellos tienen asociado los parámetros seguidor”, “fila” y “columna” según el mapa habitual de la planta. Las filas y las columnas tienen origen en la esquina superior izquierda del seguidor.
+            </p>
+            <p *ngIf="planta.tipo === 'fija'">
+                Además todos ellos tienen asociado los parámetros "pasillo", "columna" y "altura" según el mapa habitual de la planta.
+            </p>
+
         </div>
+    </div>
 
-
-        <div class="row">
-            <div class="col-12">
-                <h4>2.1 Clasificación de incidencias por clase (CoA)</h4>
-                <p>
-                    A continuación se detallan la cantidad de incidencias registradas según su clase (1, 2 ó 3).
-                </p>
-                <p>
-                    Se han registrado en total <b>{{countClase[1] + countClase[2]}} anomalías térmicas</b>, de las cuales <b>{{countClase[1]}}</b> son de <strong style="color:orange">clase 2</strong> y <b>{{countClase[2]}}</b> son de <strong style="color:red">clase 3</strong>.
-                </p>
-                <p>
-                    Además, se han registrado {{countClase[0]}} incidencias de clase 1 (sin anomalía), con el fin de realizar un seguimiento a lo largo del tiempo de las mismas.
-                </p>
-
-            </div>
+    <div class="row">
+        <div class="col-12">
+            <h3>2. Resultados de la inspección termográfica</h3>
         </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+            <h4>2.1 Clasificación de incidencias por clase (CoA)</h4>
+            <p>
+                A continuación se detallan la cantidad de incidencias registradas según su clase (1, 2 ó 3).
+            </p>
+            <p>
+                Se han registrado en total <b>{{countClase[1] + countClase[2]}} anomalías térmicas</b>, de las cuales <b>{{countClase[1]}}</b> son de <strong style="color:orange">clase 2</strong> y <b>{{countClase[2]}}</b> son de <strong style="color:red">clase 3</strong>.
+            </p>
+            <p>
+                Además, se han registrado {{countClase[0]}} incidencias de clase 1 (sin anomalía), con el fin de realizar un seguimiento a lo largo del tiempo de las mismas.
+            </p>
+
+        </div>
+    </div>
 
 
 
-        <div class="row">
-            <div class="col-12">
-                <h4>2.2 Anomalías térmicas por categoría</h4>
+    <div class="row">
+        <div class="col-12">
+            <h4>2.2 Anomalías térmicas por categoría</h4>
 
-                <!-- <p-chart style="width: 600px" id="chart1" type="bar" [data]="dataTipos"></p-chart>
+            <!-- <p-chart style="width: 600px" id="chart1" type="bar" [data]="dataTipos"></p-chart>
                                         
                                         <p-chart id="chart2" type="doughnut" [data]="dataSeveridad"></p-chart> -->
 
-                <p>
-                    La siguiente tabla muestra la cantidad de anomalías térmicas por categoría. Sólo se incluyen las anomalías térmicas de clase 2 y 3.
-                </p>
-                <table class="table table-striped" *ngIf="numCategorias">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Categoría</th>
-                            <th>Cantidad</th>
-                            <th>%</th>
-                        </tr>
-                    </thead>
-                    <tr *ngFor="let i of numCategorias">
-                        <td *ngIf="countCategoria[i-1] > 0">{{global.pcDescripcion[i]}}</td>
-                        <td *ngIf="countCategoria[i-1] > 0">{{countCategoria[i-1]}}</td>
-                        <td *ngIf="countCategoria[i-1] > 0">{{countCategoria[i-1]/filteredPcs.length*100 | number: '1.0-1'}} %</td>
-                    </tr>
+            <p>
+                La siguiente tabla muestra la cantidad de anomalías térmicas por categoría. Sólo se incluyen las anomalías térmicas de clase 2 y 3.
+            </p>
+            <table class="table table-striped" *ngIf="numCategorias">
+                <thead class="thead-dark">
                     <tr>
-
-                        <td><b>TOTAL: </b></td>
-                        <td>{{countClase[1] + countClase[2]}}</td>
-                        <td>100 %</td>
+                        <th>Categoría</th>
+                        <th>Cantidad</th>
+                        <th>%</th>
                     </tr>
-                </table>
+                </thead>
+                <tr *ngFor="let i of numCategorias">
+                    <td *ngIf="countCategoria[i-1] > 0">{{global.pcDescripcion[i]}}</td>
+                    <td *ngIf="countCategoria[i-1] > 0">{{countCategoria[i-1]}}</td>
+                    <td *ngIf="countCategoria[i-1] > 0">{{countCategoria[i-1]/filteredPcs.length*100 | number: '1.0-1'}} %</td>
+                </tr>
+                <tr>
 
-            </div>
+                    <td><b>TOTAL: </b></td>
+                    <td>{{countClase[1] + countClase[2]}}</td>
+                    <td>100 %</td>
+                </tr>
+            </table>
+
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-12">
-                <h4>2.3 Anomalías térmicas por posición dentro del seguidor</h4>
-                <p>
-                    Esta clasificación tiene como fin detectar posibles problemas relacionados con la posición de cada módulo. De este análisis se obtienen problemas relacionados con la vegetación de la instalación, deposiciones de pájaros, etc.
-                </p>
-                <p>
-                    Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran (fila y columna) dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.
-                </p>
+    <div class="row">
+        <div class="col-12">
+            <h4>2.3 Anomalías térmicas por posición dentro del seguidor</h4>
+            <p>
+                Esta clasificación tiene como fin detectar posibles problemas relacionados con la posición de cada módulo. De este análisis se obtienen problemas relacionados con la vegetación de la instalación, deposiciones de pájaros, etc.
+            </p>
+            <p>
+                Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran (fila y columna) dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.
+            </p>
 
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th scope="col"> </th>
-                            <th scope="col" *ngFor="let col of arrayColumnas">{{col}}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let fila of arrayFilas">
-                            <th scope="row">{{fila}}</th>
-                            <td *ngFor="let num of countPosicion[fila-1]">{{num}}</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col"> </th>
+                        <th scope="col" *ngFor="let col of arrayColumnas">{{col}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let fila of arrayFilas">
+                        <th scope="row">{{fila}}</th>
+                        <td *ngFor="let num of countPosicion[fila-1]">{{num}}</td>
+                    </tr>
+                </tbody>
+            </table>
 
-            </div>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-12">
-                <h4>2.4 MAE de la planta</h4>
-                <p>
-                    El MAE (módulo apagados equivalentes) nos da medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.
-                </p>
-                <div class="text-center">
-                    <h5 class="square"> MAE = ∆PR / PR = {{informe.mae}} % (<b>{{calificacionMae(informe.mae) }}</b>)</h5>
-                </div>
-                <p>
-                    El MAE de {{planta.nombre}} en {{informe.fecha * 1000 | date: 'dd/MM/y'}} es <b>{{informe.mae}} %</b>, lo que nos indica un MAE <b>{{calificacionMae(informe.mae) }}</b>.
-                </p>
-
-                <p>
-                    Nuestro objetivo será siempre reducir el MAE, llevando a cabo las actuaciones recomendadas.
-                </p>
-
-
+    <div class="row">
+        <div class="col-12">
+            <h4>2.4 MAE de la planta</h4>
+            <p>
+                El MAE (módulo apagados equivalentes) nos da medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.
+            </p>
+            <div class="text-center">
+                <h5 class="square"> MAE = ∆PR / PR = {{informe.mae}} % (<b>{{calificacionMae(informe.mae) }}</b>)</h5>
             </div>
+            <p>
+                El MAE de {{planta.nombre}} en {{informe.fecha * 1000 | date: 'dd/MM/y'}} es <b>{{informe.mae}} %</b>, lo que nos indica un MAE <b>{{calificacionMae(informe.mae) }}</b>.
+            </p>
+
+            <p>
+                Nuestro objetivo será siempre reducir el MAE, llevando a cabo las actuaciones recomendadas.
+            </p>
+
+
         </div>
+    </div>
 
-    </ng-template>
 
-    <!-- <div class="html2pdf__page-break" style="color:rgba(255, 255, 255, 0)">_</div> -->
 
     <div [ngSwitch]="tipoInforme">
 
@@ -492,7 +626,7 @@
                 <div class="col-12">
 
 
-                    <h1>Anexo I: Listado de anomalías térmicas</h1>
+                    <h2>Anexo I: Listado de anomalías térmicas</h2>
                     <table class="table table-striped">
                         <thead class="thead-dark">
                             <tr>
@@ -527,19 +661,24 @@
         <ng-template [ngSwitchCase]="2">
             <div class="row">
                 <div class="col-12">
-                    <h1>Anexo I: Listado de anomalías térmicas</h1>
+                    <h2>Anexo I: Listado de anomalías térmicas</h2>
                 </div>
             </div>
 
             <ng-container *ngFor="let seguidor of filteredSeguidores$ | async">
-                <div class="seguidor row">
+
+                <div class="row">
                     <div class="col">
-                        <div id="hiddenCanvas{{seguidor.global_x}}" class="hiddenCanvas">
+                        <div class="hiddenCanvas">
                             <canvas id="imgSeguidorCanvas{{seguidor.global_x}}" width="640" height="512">
                                                 </canvas>
                         </div>
                         <div class="img-seguidor" id="divSeguidor{{seguidor.global_x}}">
                         </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
 
 
                         <table class="table table-striped">
@@ -591,5 +730,21 @@
             </ng-container>
         </ng-template>
     </div>
+    <<ng-container *ngIf="false">
 
+        <div class="row">
+            <div class="col">
+                <h2>Anexo II: Calibración de la cámara</h2>
+
+                <p>Las cámaras térmica de la marca FLIR vienen calibradas de fábrica, tal como indica en https://prod.flir.es/support-center/surveillance/infrared-camera-calibration/</p>
+                <img id="imgCalibracion" class="img-fluid" src="../../../assets/images/calibracion_fabrica.jpg" alt="">
+
+                <p>La cámara utilizada en el presente informe es DJI XT2 640 13mm con número de serie <strong>297106</strong> comprada en <b>marzo de 2019</b> tal como indica la factura de la siguiente imagen.</p>
+                <img id="imgCompra" class="img-fluid" src="../../../assets/images/compra_camara.jpg" alt="">
+
+
+
+            </div>
+        </div>
+        </ng-container>
 </div>

@@ -43,12 +43,13 @@ export class InformeExportComponent implements OnInit {
   public irradianciaImg$: Observable<string | null>;
   public suciedadImg$: Observable<string | null>;
   public portadaImg$: Observable<string | null>;
+  public logoImg$: Observable<string | null>;
   public arrayFilas: Array<number>;
   public arrayColumnas: Array<number>;
   public tempReflejada: number;
   public emisividad: number;
   public tipoInforme: string;
-  public pcListPorSeguidor: SeguidorInterface[];
+  public filteredSeguidores: SeguidorInterface[];
   public seguidor: SeguidorInterface;
   public pcColumnas: any[];
   public filtroColumnas: string[];
@@ -56,7 +57,14 @@ export class InformeExportComponent implements OnInit {
   public currentFilteredColumnas$ = this.filteredColumnasSource.asObservable();
   public pcDescripcion = GLOBAL.pcDescripcion;
   public filteredSeguidores$: Observable<SeguidorInterface[]>;
+  public filteredSeguidoresVistaPrevia: SeguidorInterface[];
   public filteredPcs$: Observable<PcInterface[]>;
+  public filteredPcs: PcInterface[];
+  public countLoadedImages = 0;
+  public countSeguidores: number;
+  public generandoPDF = false;
+
+  private countLoadedImages$ = new BehaviorSubject(0);
 
   constructor(
     private storage: AngularFireStorage,
@@ -88,7 +96,8 @@ export class InformeExportComponent implements OnInit {
 
     // Ordenar Pcs por seguidor:
     this.pcService.filteredSeguidores$.subscribe( seguidores => {
-      this.pcListPorSeguidor = seguidores;
+      this.filteredSeguidores = seguidores;
+      this.filteredSeguidoresVistaPrevia = seguidores.slice(0, 3);
     });
 
 
@@ -99,6 +108,7 @@ export class InformeExportComponent implements OnInit {
     this.irradianciaImg$ = this.storage.ref(`informes/${this.informe.id}/irradiancia.png`).getDownloadURL();
     this.suciedadImg$ = this.storage.ref(`informes/${this.informe.id}/suciedad.jpg`).getDownloadURL();
     this.portadaImg$ = this.storage.ref(`informes/${this.informe.id}/portada.jpg`).getDownloadURL();
+    this.logoImg$ = this.storage.ref(`informes/${this.informe.id}/logo.jpg`).getDownloadURL();
 
 
 
@@ -137,6 +147,7 @@ export class InformeExportComponent implements OnInit {
 
   }
   private calcularInforme(filteredPcs: PcInterface[]) {
+    this.filteredPcs = filteredPcs;
     const allPcs = filteredPcs;
     allPcs.sort(this.compare);
     this.irradianciaMinima = allPcs.sort(this.compareIrradiancia)[0].irradiancia;
@@ -197,33 +208,56 @@ export class InformeExportComponent implements OnInit {
 
 
   public downloadPDF() {
+    this.generandoPDF = true;
+
     // GENERAR VISTA
-    // document.getElementById('imgIrradiancia').setAttribute('crossOrigin', 'anonymous');
-    // document.getElementById('imgPortada').setAttribute('crossOrigin', 'anonymous');
-    // document.getElementById('imgSuciedad').setAttribute('crossOrigin', 'anonymous');
+    if (this.tipoInforme === '2') {
+      this.countSeguidores = 0;
+      for (const seguidor of this.filteredSeguidores) {
+        this.setImgSeguidorCanvas(seguidor, false);
+        this.countSeguidores++;
+        // if ( count === 5 ) {
+        //   break;
+        // }
+      }
+    }
+    document.getElementById('imgIrradiancia').setAttribute('crossOrigin', 'anonymous');
+    document.getElementById('imgPortada').setAttribute('crossOrigin', 'anonymous');
+    document.getElementById('imgSuciedad').setAttribute('crossOrigin', 'anonymous');
+    document.getElementById('imgLogo').setAttribute('crossOrigin', 'anonymous');
+    // document.getElementById('imgCalibracion').setAttribute('crossOrigin', 'anonymous');
+    // document.getElementById('imgCompra').setAttribute('crossOrigin', 'anonymous');
 
     // Calcular informe
-    // this.pcService.currentFilteredPcs$.subscribe( filteredPcs => {
-    //   this.calcularInforme(filteredPcs);
-    // });
+    this.pcService.currentFilteredPcs$.pipe(
+      take(1)
+    )
+    .subscribe( filteredPcs => {
+      this.calcularInforme(filteredPcs);
+    });
 
-
-    const content = document.getElementById('pdfContent');
-    const opt = {
-      margin:       10,
-      pagebreak: { mode: ['legacy']},
-      filename:     'informe.pdf',
-      image:        { type: 'jpeg', quality: 0.6 },
-      html2canvas:  { useCORS: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(content.innerHTML).save();
-
-
+    this.countLoadedImages$.subscribe( n => {
+      // console.log('subscription', n, this.countSeguidores);
+      if ( n === this.countSeguidores || this.tipoInforme === '1') {
+        setTimeout( () => {
+          const content = document.getElementById('pdfContent');
+          const opt = {
+            margin:       20,
+            pagebreak: { mode: 'avoid-all' },
+            filename:     'informe.pdf',
+            image:        { type: 'jpeg', quality: 1 },
+            html2canvas:  { scale: 1, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          };
+          html2pdf().set(opt).from(content.innerHTML).save();
+          this.generandoPDF = false;
+        }, 2000);
+      }
+    });
 
   }
 
-  private setImgSeguidorCanvas(seguidor: SeguidorInterface) {
+  private setImgSeguidorCanvas(seguidor: SeguidorInterface, vistaPrevia: boolean = false) {
     const imagenTermica = new Image();
     imagenTermica.crossOrigin = 'anonymous';
 
@@ -233,9 +267,17 @@ export class InformeExportComponent implements OnInit {
       .pipe(take(1))
       .subscribe( url => {
         seguidor.pcs[0].downloadUrlString = url;
+        let canvas = new fabric.Canvas(`imgSeguidorCanvas${seguidor.global_x}`);
 
-        const canvas = new fabric.Canvas(`imgSeguidorCanvas${seguidor.global_x}`);
+        if (vistaPrevia) {
+          canvas = new fabric.Canvas(`imgSeguidorCanvasVP${seguidor.global_x}`);
+        }
+
         imagenTermica.onload = () => {
+          if (!vistaPrevia) {
+            this.countLoadedImages++;
+            this.countLoadedImages$.next(this.countLoadedImages);
+          }
 
           const fabricImage = new fabric.Image(imagenTermica, {
               left: 0,
@@ -251,8 +293,7 @@ export class InformeExportComponent implements OnInit {
 
           // fabricImage.scale(1);
           canvas.add(fabricImage);
-          this.drawAllPcsInCanvas(seguidor, canvas);
-          // console.log('LOADEDD', seguidor);
+          this.drawAllPcsInCanvas(seguidor, canvas, vistaPrevia);
             // canvas.renderAll.bind(canvas),
             // {
               // scaleX: this.canvas.width / image.width,
@@ -269,7 +310,7 @@ export class InformeExportComponent implements OnInit {
       });
     }
 
-  drawAllPcsInCanvas(seguidor: SeguidorInterface, canvas) {
+  drawAllPcsInCanvas(seguidor: SeguidorInterface, canvas, vistaPrevia: boolean = false) {
     seguidor.pcs.forEach( (pc, i, a) => {
       this.drawPc(pc, canvas);
       this.drawTriangle(pc, canvas);
@@ -282,8 +323,16 @@ export class InformeExportComponent implements OnInit {
       image.src = imageUrl;
       image.width = 640;
       image.height = 512;
-      document.getElementById(`divSeguidor${seguidor.global_x}`).appendChild(image);
-    });
+      let list = document.getElementById(`divSeguidor${seguidor.global_x}`);
+      if (vistaPrevia) {
+        list = document.getElementById(`divSeguidorVP${seguidor.global_x}`);
+      }
+      // list.removeChild(list[0]);
+      list.appendChild(image);
+    },
+    'image/jpeg',
+    0.95 // calidad
+    );
   }
 
   drawPc(pc: PcInterface, canvas: any) {
@@ -386,13 +435,15 @@ export class InformeExportComponent implements OnInit {
 
 
 
+
+
   onClickTipoInforme() {
     if (this.tipoInforme === '2') {
-      let count = 0;
-      for (const seguidor of this.pcListPorSeguidor) {
-        this.setImgSeguidorCanvas(seguidor);
-        count = count + 1;
-        // if ( count === 50 ) {
+      // let count = 0;
+      for (const seguidor of this.filteredSeguidoresVistaPrevia) {
+        this.setImgSeguidorCanvas(seguidor, true);
+        // count = count + 1;
+        // if ( count === 5 ) {
         //   break;
         // }
       }

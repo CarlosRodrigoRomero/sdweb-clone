@@ -94,15 +94,16 @@
                 <a class="nav-link" id="ortophoto-tab" data-toggle="tab" href="#ortophoto" role="tab" aria-controls="ortophoto" aria-selected="false">Mapa térmico</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" style="color: tomato" href="{{ informeDownloadUrl | async }}" target="_blank">Descargar informe</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" id="export-tab" data-toggle="tab" href="#export" role="tab" aria-controls="export" aria-selected="false">Generar PDF</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" style="color: tomato" href="{{ informeDownloadUrl | async }}" target="_blank">Descargar informe</a>
+            </li>
+
         </ul>
+
+
         <div class="row">
-
-
             <div class="col-12">
                 <div class="tab-content" id="myTabContent">
 
@@ -112,7 +113,7 @@
                                 <app-pc-filter [allPcs]="allPcs"></app-pc-filter>
                             </div>
                             <div class="col-9">
-                                <app-pc-list [planta]="planta" [informe]="informe"></app-pc-list>
+                                <app-pc-list [allPcs]="allPcs" [planta]="planta" [informe]="informe"></app-pc-list>
                             </div>
                         </div>
                     </div>
@@ -140,7 +141,7 @@
                         </div>
                     </div>
 
-                    <div *ngIf="isLocalhost" class="tab-pane fade" id="export" role="tabpanel" aria-labelledby="export-tab">
+                    <div class="tab-pane fade" id="export" role="tabpanel" aria-labelledby="export-tab">
                         <div class="row">
                             <div class="col-3 col-filtros">
                                 <app-pc-filter [allPcs]="allPcs"></app-pc-filter>

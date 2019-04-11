@@ -13,11 +13,20 @@ h5 {
     width: 40%;
 }
 
+.col-columnas {
+    margin-top: 1rem;
+}
+
 .square {
     border: 1px solid grey;
     padding: 1rem;
     margin-bottom: 1.5rem;
     display: inline-block;
+}
+
+#imgLogo {
+    margin-top: 10rem;
+    margin-bottom: 20rem;
 }
 
 .marginBottom {
@@ -30,17 +39,31 @@ h5 {
     overflow: auto;
 }
 
+.columnas-group {
+    display: flex;
+    flex-direction: row;
+}
+
+.columna-check {
+    margin-right: 1rem;
+}
+
 .canvas-container {
     align-self: center;
     margin-bottom: 1rem;
 }
 
-.seguidor {
+.button-generarPdf {
+    margin-top: 2rem;
+}
+
+
+/* .seguidor {
     display: flex;
     justify-content: center;
     flex-direction: column;
     margin-bottom: 3rem;
-}
+} */
 
 .img-seguidor {
     display: flex;
