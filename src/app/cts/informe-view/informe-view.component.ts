@@ -59,6 +59,7 @@ export class InformeViewComponent implements OnInit {
 
   ngOnInit() {
     this.getPcsList();
+
     this.chartOptions = {
       legend: {display: false}
     };
@@ -91,7 +92,7 @@ export class InformeViewComponent implements OnInit {
               // Se ha eliminado ya que tardaba mucho en cargar...
               // pc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${pc.archivoPublico}`).getDownloadURL();
               pc.downloadUrl$ = this.storage.ref(`informes/${this.informeId}/jpg/${pc.archivoPublico}`).getDownloadURL();
-              // pc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/_mini_${pc.archivoPublico}`).getDownloadURL();
+// pc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/_mini_${pc.archivoPublico}`).getDownloadURL();
 
               return pc;
             });
@@ -110,7 +111,7 @@ export class InformeViewComponent implements OnInit {
             }
             this.initializeChart();
             this.isLoaded2 = true;
-            this.pcService.filteredPcs(this.allPcs);
+            // this.pcService.filteredPcs(this.allPcs);
         },
       );
   }

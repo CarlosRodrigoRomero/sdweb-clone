@@ -31,17 +31,12 @@ export class PcFilterComponent implements OnInit {
 
   ngOnInit() {
     this.pcService.filtroClase$.subscribe( e => this.filtroClase = e);
-    this.pcService.filtroCategoria$.subscribe( (e) => {
-      this.filtroCategoria = e;
-    });
-
+    this.pcService.filtroCategoria$.subscribe( (e) => this.filtroCategoria = e );
 
     this.numCategorias = Array(GLOBAL.labels_tipos.length).fill(0).map( (_, i) => i + 1 );
     this.numClases = Array(GLOBAL.labels_severidad.length).fill(0).map( (_, i) => i + 1 );
-    this.nombreClases = GLOBAL.pcDescripcion;
 
-    // this.filtroCategoria = this.numCategorias;
-    // this.filtroClase = this.numClases;
+    this.nombreClases = GLOBAL.pcDescripcion;
 
     // Calcular los tipos de puntos calientes
     for (const i of this.numCategorias) {
@@ -62,7 +57,7 @@ export class PcFilterComponent implements OnInit {
       this.filtroClase.push(numberChecked);
     }
     this.pcService.PushFiltroClase(this.filtroClase);
-    this.pcService.filteredPcs(this.allPcs.filter( (pc) => this.filtroClase.includes(pc.severidad)));
+    // this.pcService.filteredPcs(this.allPcs.filter( (pc) => this.filtroClase.includes(pc.severidad)));
   }
 
   onChangeCheckboxCategoria($event: MatCheckboxChange) {
@@ -73,7 +68,7 @@ export class PcFilterComponent implements OnInit {
       this.filtroCategoria.push(numberChecked);
     }
     this.pcService.PushFiltroCategoria(this.filtroCategoria);
-    this.pcService.filteredPcs(this.allPcs.filter( (pc, i, a) => this.filtroCategoria.includes(pc.tipo)));
+    // this.pcService.filteredPcs(this.allPcs.filter( (pc, i, a) => this.filtroCategoria.includes(pc.tipo)));
 
   }
 }

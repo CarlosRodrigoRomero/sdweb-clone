@@ -59,6 +59,8 @@ export class InformeExportComponent implements OnInit {
   public filtroColumnas: string[];
   private filteredColumnasSource = new BehaviorSubject<any[]>(new Array<any>());
   public currentFilteredColumnas$ = this.filteredColumnasSource.asObservable();
+  public pcDescripcion = GLOBAL.pcDescripcion;
+  public filteredSeguidores$: Observable<SeguidorInterface[]>;
 
   constructor(
     private storage: AngularFireStorage,
@@ -76,6 +78,8 @@ export class InformeExportComponent implements OnInit {
     this.url = GLOBAL.url;
     this.titulo = 'Vista de informe';
     this.tipoInforme = 2;
+
+    this.filteredSeguidores$ = this.pcService.filteredSeguidores$;
   }
 
   ngOnInit() {
@@ -88,11 +92,12 @@ export class InformeExportComponent implements OnInit {
     let count = 0;
     this.pcListPorSeguidor = this.pcService.getPcsPorSeguidor(this.allPcsConSeguidores);
     this.seguidor = this.pcListPorSeguidor[0];
+    this.pcListPorSeguidor = this.pcListPorSeguidor.slice(0, 5);
 
     for (const seguidor of this.pcListPorSeguidor) {
       this.setImgSeguidorCanvas(seguidor);
       count = count + 1;
-      if ( count === 2 ) {
+      if ( count === 6 ) {
         break;
       }
     }
@@ -210,11 +215,11 @@ export class InformeExportComponent implements OnInit {
   public downloadPDF() {
     const content = document.getElementById('pdfContent');
     const opt = {
-      margin:       1,
-      pagebreak: { mode: 'avoid-all'},
+      margin:       10,
+      pagebreak: { mode: ['legacy', 'css']},
       filename:     'myfile.pdf',
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 1, useCORS: true },
+      html2canvas:  { useCORS: true },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     html2pdf().set(opt).from(content.innerHTML).save();

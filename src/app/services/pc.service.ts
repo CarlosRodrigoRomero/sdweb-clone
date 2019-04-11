@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import {PcInterface} from '../models/pc';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument, CollectionReference } from '@angular/fire/firestore';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { map, take, switchMap, filter, mergeMap } from 'rxjs/operators';
 import { GLOBAL } from './global';
 
 export interface SeguidorInterface {
@@ -21,30 +21,67 @@ export class PcService {
   public allPcs: PcInterface[];
   private pcDoc: AngularFirestoreDocument<PcInterface>;
   public url: string;
-  private filteredPcsSource = new BehaviorSubject<PcInterface[]>(new Array<PcInterface>());
-  public currentFilteredPcs$ = this.filteredPcsSource.asObservable();
+
   private filtroClase = new BehaviorSubject<number[]>(new Array<number>());
   public filtroClase$ = this.filtroClase.asObservable();
   private filtroCategoria = new BehaviorSubject<number[]>(new Array<number>());
   public filtroCategoria$ = this.filtroCategoria.asObservable();
+
+  private currentFiltroClase: number[];
+  private currentFiltroCategoria: number[];
+
+  private filteredPcsSource = new BehaviorSubject<PcInterface[]>(new Array<PcInterface>());
+  public currentFilteredPcs$ = this.filteredPcsSource.asObservable();
+  private filteredSeguidores = new BehaviorSubject<SeguidorInterface[]>(new Array<SeguidorInterface>());
+  public filteredSeguidores$ = this.filteredSeguidores.asObservable();
+
 
   constructor(public afs: AngularFirestore, private http: HttpClient) {
     this.pcsCollection = afs.collection<PcInterface>('pcs');
 
     this.filtroCategoria.next(Array(GLOBAL.labels_tipos.length).fill(0).map( (_, i) => i + 1 ));
     this.filtroClase.next(Array(GLOBAL.labels_severidad.length).fill(0).map( (_, i) => i + 1 ));
+
+    this.filtroClase$.subscribe( filtro => {
+      this.currentFiltroClase = filtro;
+    });
+
+    this.filtroCategoria$.subscribe( filtro => {
+      this.currentFiltroCategoria = filtro;
+    });
+    // console.log('filtrosCategorias', this.filtroCategoria, this.filtroClase);
+        // this.currentFilteredPcs$ = this.filtroCategoria$
+    //   .mergeMap( filtro1 => this.filtroClase$
+    //     .mergeMap( filtro2 => this.allPcs$
+    //       .mergeMap( allPcs => allPcs.filter( (pc) => {
+    //         return filtro2.includes(pc.tipo) && filtro1.includes(pc.severidad);
+    //       }))));
+
+  }
+
+  private aplicarFiltros() {
+    this.filteredPcsSource.next(
+      this.allPcs.filter(pc => this.currentFiltroClase.includes(pc.severidad) && this.currentFiltroCategoria.includes(pc.tipo))
+      );
+    this.filteredSeguidores.next(
+      this.getPcsPorSeguidor(
+        this.allPcs.filter(pc => (this.currentFiltroClase.includes(pc.severidad) && this.currentFiltroCategoria.includes(pc.tipo))))
+        );
   }
 
   PushFiltroClase(filtro: number[]) {
     this.filtroClase.next(filtro);
-  }
+    // this.currentFiltroClase = filtro;
+    this.aplicarFiltros();
+
+    }
+
   PushFiltroCategoria(filtro: number[]) {
     this.filtroCategoria.next(filtro);
+    // this.currentFiltroCategoria = filtro;
+    this.aplicarFiltros();
   }
 
-  filteredPcs(pcs: PcInterface[]) {
-    this.filteredPcsSource.next(pcs);
-  }
 
   getPcsPorSeguidor(allPcsConSeguidores: PcInterface[]): Array<SeguidorInterface> {
     const arraySeguidores = Array();
@@ -76,10 +113,15 @@ export class PcService {
         return data;
         }))
       );
+
     this.allPcs$
       .pipe(take(1))
       .subscribe( pcs => {
         this.allPcs = pcs;
+        this.filteredPcsSource.next(this.allPcs);
+        // Aplicar filtros
+        this.aplicarFiltros();
+
     });
     return this.allPcs$;
   }

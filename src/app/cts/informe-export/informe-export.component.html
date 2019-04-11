@@ -483,14 +483,7 @@
 
     </ng-template>
 
-
-    <div class="html2pdf__page-break" style="color:white">_</div>
-    <div class="html2pdf__page-break" style="color:white">_</div>
-    <div class="html2pdf__page-break" style="color:white">_</div>
     <div class="html2pdf__page-break" style="color:rgba(255, 255, 255, 0)">_</div>
-
-
-
 
     <div [ngSwitch]="tipoInforme">
 
@@ -530,22 +523,25 @@
             <div class="row">
                 <div class="col-12">
                     <h1>Anexo I: Listado de anomalías térmicas</h1>
+                </div>
+            </div>
 
-                    <ng-container *ngIf="pcListPorSeguidor">
-                        <div class="seguidor html2pdf__page-break" *ngFor="let seguidor of pcListPorSeguidor">
-                            <div id="hiddenCanvas{{seguidor.global_x}}" class="hiddenCanvas">
-                                <canvas id="imgSeguidorCanvas{{seguidor.global_x}}" width="640" height="512">
+            <ng-container *ngFor="let seguidor of filteredSeguidores$ | async">
+                <div class="seguidor html2pdf__page-break row">
+                    <div class="col">
+                        <div id="hiddenCanvas{{seguidor.global_x}}" class="hiddenCanvas">
+                            <canvas id="imgSeguidorCanvas{{seguidor.global_x}}" width="640" height="512">
                                                 </canvas>
-                            </div>
-                            <div class="img-seguidor" id="divSeguidor{{seguidor.global_x}}">
-                            </div>
+                        </div>
+                        <div class="img-seguidor" id="divSeguidor{{seguidor.global_x}}">
+                        </div>
 
 
-                            <table class="table table-striped">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th *ngFor="let col of currentFilteredColumnas$ | async">{{col.descripcion}}</th>
-                                        <!-- <th>Clase</th>
+                        <table class="table table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th *ngFor="let col of currentFilteredColumnas$ | async">{{col.descripcion}}</th>
+                                    <!-- <th>Clase</th>
                                                 <th>Categoría</th>
                                                 <th *ngIf="planta.tipo === '2 ejes'">Seguidor</th>
                                                 <th *ngIf="planta.tipo === '2 ejes'">Fila</th>
@@ -554,16 +550,22 @@
                                                 <th>Columna</th>
                                                 <th>Gradiente (normalizado)</th>
                                                 <th>Archivo</th> -->
-                                    </tr>
-                                </thead>
+                                </tr>
+                            </thead>
 
-                                <ng-container *ngIf="seguidor.pcs[0].tipo !== 0 else sinPcs">
+                            <ng-container *ngIf="seguidor.pcs[0].tipo !== 0 else sinPcs">
 
-                                    <tr *ngFor="let pc of seguidor.pcs">
-                                        <td *ngFor="let col of currentFilteredColumnas$ | async">
+                                <tr *ngFor="let pc of seguidor.pcs">
+                                    <td *ngFor="let col of currentFilteredColumnas$ | async">
+                                        <span *ngIf="col.nombre === 'tipo' else colNormal">
+                                            {{pcDescripcion[pc.tipo]}}
+                                        </span>
+                                        <ng-template #colNormal>
                                             {{pc[col.nombre]}}
-                                        </td>
-                                        <!-- <td>{{pc.local_id}}</td>
+                                        </ng-template>
+
+                                    </td>
+                                    <!-- <td>{{pc.local_id}}</td>
                                         <td>CoA {{pc.severidad}}</td>
                                         <td>{{global.pcDescripcion[pc.tipo]}}</td>
                                         <td>{{pc.global_x}}</td>
@@ -571,21 +573,18 @@
                                         <td>{{pc.local_x}}</td>
                                         <td>+ {{pc.gradienteNormalizado}} ºC</td>
                                         <td>{{pc.archivoPublico}}</td> -->
-                                    </tr>
-                                </ng-container>
-                                <ng-template #sinPcs>
-                                    <tr>
-                                        <td colspan="11"> Sin anomalías térmicas </td>
-                                    </tr>
-                                </ng-template>
-                            </table>
-                        </div>
-                    </ng-container>
+                                </tr>
+                            </ng-container>
+                            <ng-template #sinPcs>
+                                <tr>
+                                    <td colspan="11"> Sin anomalías térmicas </td>
+                                </tr>
+                            </ng-template>
+                        </table>
+                    </div>
                 </div>
-            </div>
+            </ng-container>
         </ng-template>
-
     </div>
 
-    <span class="html2pdf__page-break">.</span>
 </div>
