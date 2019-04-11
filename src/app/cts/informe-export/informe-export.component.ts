@@ -1,8 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
 import { GLOBAL } from '../../services/global';
 
-import { PlantaService } from '../../services/planta.service';
-import { InformeService } from '../../services/informe.service';
 import { PcService, SeguidorInterface } from '../../services/pc.service';
 
 import { PcInterface } from '../../models/pc';
@@ -22,16 +20,13 @@ import { MatCheckboxChange } from '@angular/material';
   selector: 'app-informe-export',
   templateUrl: './informe-export.component.html',
   styleUrls: ['./informe-export.component.css'],
-  providers: [InformeService, PlantaService, PcService]
+  // providers: [InformeService, PlantaService, PcService]
 })
 
 export class InformeExportComponent implements OnInit {
   @ViewChild('content') content: ElementRef;
   @Input() public planta: PlantaInterface;
   @Input() public informe: InformeInterface;
-  @Input() public allPcs: PcInterface[];
-  @Input() public allPcsConSeguidores: PcInterface[];
-
 
   public titulo: string;
   public irradianciaMinima: number;
@@ -52,7 +47,7 @@ export class InformeExportComponent implements OnInit {
   public arrayColumnas: Array<number>;
   public tempReflejada: number;
   public emisividad: number;
-  public tipoInforme: number;
+  public tipoInforme: string;
   public pcListPorSeguidor: SeguidorInterface[];
   public seguidor: SeguidorInterface;
   public pcColumnas: any[];
@@ -61,6 +56,7 @@ export class InformeExportComponent implements OnInit {
   public currentFilteredColumnas$ = this.filteredColumnasSource.asObservable();
   public pcDescripcion = GLOBAL.pcDescripcion;
   public filteredSeguidores$: Observable<SeguidorInterface[]>;
+  public filteredPcs$: Observable<PcInterface[]>;
 
   constructor(
     private storage: AngularFireStorage,
@@ -77,37 +73,26 @@ export class InformeExportComponent implements OnInit {
 
     this.url = GLOBAL.url;
     this.titulo = 'Vista de informe';
-    this.tipoInforme = 2;
+    this.tipoInforme = '1';
 
-    this.filteredSeguidores$ = this.pcService.filteredSeguidores$;
   }
 
   ngOnInit() {
+
+    this.filteredSeguidores$ = this.pcService.filteredSeguidores$;
+    this.filteredPcs$ = this.pcService.currentFilteredPcs$;
     this.pcColumnas = GLOBAL.pcColumnas;
 
     this.filtroColumnas = this.pcColumnas.map( (element) => element.nombre);
     this.filteredColumnasSource.next(this.pcColumnas);
 
     // Ordenar Pcs por seguidor:
-    let count = 0;
-    this.pcListPorSeguidor = this.pcService.getPcsPorSeguidor(this.allPcsConSeguidores);
-    this.seguidor = this.pcListPorSeguidor[0];
-    this.pcListPorSeguidor = this.pcListPorSeguidor.slice(0, 5);
+    this.pcService.filteredSeguidores$.subscribe( seguidores => {
+      this.pcListPorSeguidor = seguidores;
+    });
 
-    for (const seguidor of this.pcListPorSeguidor) {
-      this.setImgSeguidorCanvas(seguidor);
-      count = count + 1;
-      if ( count === 6 ) {
-        break;
-      }
-    }
-    // this.setImgSeguidorCanvas(this.pcListPorSeguidor[0]);
 
-    this.allPcs.sort(this.compare);
-    this.irradianciaMinima = this.allPcs.sort(this.compareIrradiancia)[0].irradiancia;
-    this.emisividad = this.allPcs[0].emisividad;
-    this.tempReflejada = this.allPcs[0].temperaturaReflejada;
-
+    ////////////////////////
     this.arrayFilas = Array(this.planta.filas).fill(0).map( (_, i) => i + 1);
     this.arrayColumnas = Array(this.planta.columnas).fill(0).map( (_, i) => i + 1);
 
@@ -115,72 +100,71 @@ export class InformeExportComponent implements OnInit {
     this.suciedadImg$ = this.storage.ref(`informes/${this.informe.id}/suciedad.jpg`).getDownloadURL();
     this.portadaImg$ = this.storage.ref(`informes/${this.informe.id}/portada.jpg`).getDownloadURL();
 
-    document.getElementById('imgIrradiancia').setAttribute('crossOrigin', 'anonymous');
-    document.getElementById('imgPortada').setAttribute('crossOrigin', 'anonymous');
-    document.getElementById('imgSuciedad').setAttribute('crossOrigin', 'anonymous');
-    //
 
-    // Calcular las perdidas y severidad(1 leve, 2 media, 3 grave, 4 muy grave)
 
+    // this.dataTipos = {
+    //   labels: GLOBAL.labels_tipos,
+    //   datasets: [
+    //       {
+    //           label: 'Tipos',
+    //           backgroundColor: '#42A5F5',
+    //           borderColor: '#1E88E5',
+    //           data: this.countCategoria
+    //       },
+    //     ]
+    //   };
+    // this.dataSeveridad = {
+    //     labels: GLOBAL.labels_severidad,
+    //     datasets: [
+    //         {
+    //             label: 'Severidad',
+    //             backgroundColor: [
+    //               '#28a745',
+    //               '#FFCE56',
+    //               '#ff5722',
+    //               '#FF6384'
+    //           ],
+    //           hoverBackgroundColor: [
+    //             '#28a745',
+    //               '#FFCE56',
+    //         '#ff5722',
+    //               '#FF6384'
+    //           ],
+    //             data: this.countClase
+    //         },
+    //       ]
+    //     };
+
+  }
+  private calcularInforme(filteredPcs: PcInterface[]) {
+    const allPcs = filteredPcs;
+    allPcs.sort(this.compare);
+    this.irradianciaMinima = allPcs.sort(this.compareIrradiancia)[0].irradiancia;
+    this.emisividad = allPcs[0].emisividad;
+    this.tempReflejada = allPcs[0].temperaturaReflejada;
     // Calcular las alturas
     for (const y of this.arrayFilas) {
       const countColumnas = Array();
       for (const x of this.arrayColumnas) {
-        countColumnas.push(this.allPcs.filter( pc => pc.local_x === x && pc.local_y === y).length);
+        countColumnas.push(allPcs.filter(pc => pc.local_x === x && pc.local_y === y).length);
       }
       this.countPosicion.push(countColumnas);
     }
-
     // Calcular los tipos de puntos calientes
     let filtroCategoria;
     for (const i of this.numCategorias) {
-      filtroCategoria = this.allPcs.filter( pc => pc.tipo === i && pc.severidad > 1);
+      filtroCategoria = allPcs.filter(pc => pc.tipo === i && pc.severidad > 1);
       this.countCategoria.push(filtroCategoria.length);
     }
-
     // Calcular la severidad //
     let filtroClase;
     for (const j of this.numClases) {
-      filtroClase = this.allPcs.filter( pc => pc.severidad === j);
-      // console.log('j, filtroClase', j, filtroClase.length);
+      filtroClase = allPcs.filter(pc => pc.severidad === j);
+
       this.countClase.push(filtroClase.length);
     }
-
-
-    this.dataTipos = {
-      labels: GLOBAL.labels_tipos,
-      datasets: [
-          {
-              label: 'Tipos',
-              backgroundColor: '#42A5F5',
-              borderColor: '#1E88E5',
-              data: this.countCategoria
-          },
-        ]
-      };
-    this.dataSeveridad = {
-        labels: GLOBAL.labels_severidad,
-        datasets: [
-            {
-                label: 'Severidad',
-                backgroundColor: [
-                  '#28a745',
-                  '#FFCE56',
-                  '#ff5722',
-                  '#FF6384'
-              ],
-              hoverBackgroundColor: [
-                '#28a745',
-                  '#FFCE56',
-            '#ff5722',
-                  '#FF6384'
-              ],
-                data: this.countClase
-            },
-          ]
-        };
-
   }
+
   public calificacionMae(mae: number) {
     if (mae <= 0.1) {
       return 'muy bueno';
@@ -213,23 +197,39 @@ export class InformeExportComponent implements OnInit {
 
 
   public downloadPDF() {
+    // GENERAR VISTA
+    // document.getElementById('imgIrradiancia').setAttribute('crossOrigin', 'anonymous');
+    // document.getElementById('imgPortada').setAttribute('crossOrigin', 'anonymous');
+    // document.getElementById('imgSuciedad').setAttribute('crossOrigin', 'anonymous');
+
+    // Calcular informe
+    // this.pcService.currentFilteredPcs$.subscribe( filteredPcs => {
+    //   this.calcularInforme(filteredPcs);
+    // });
+
+
     const content = document.getElementById('pdfContent');
     const opt = {
       margin:       10,
-      pagebreak: { mode: ['legacy', 'css']},
-      filename:     'myfile.pdf',
-      image:        { type: 'jpeg', quality: 0.98 },
+      pagebreak: { mode: ['legacy']},
+      filename:     'informe.pdf',
+      image:        { type: 'jpeg', quality: 0.6 },
       html2canvas:  { useCORS: true },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     html2pdf().set(opt).from(content.innerHTML).save();
+
+
+
   }
 
   private setImgSeguidorCanvas(seguidor: SeguidorInterface) {
     const imagenTermica = new Image();
     imagenTermica.crossOrigin = 'anonymous';
 
-    seguidor.pcs[0].downloadUrl$
+    const seguidorObs = this.storage.ref(`informes/${this.informe.id}/jpg/${seguidor.pcs[0].archivoPublico}`).getDownloadURL();
+
+    seguidorObs
       .pipe(take(1))
       .subscribe( url => {
         seguidor.pcs[0].downloadUrlString = url;
@@ -252,6 +252,7 @@ export class InformeExportComponent implements OnInit {
           // fabricImage.scale(1);
           canvas.add(fabricImage);
           this.drawAllPcsInCanvas(seguidor, canvas);
+          // console.log('LOADEDD', seguidor);
             // canvas.renderAll.bind(canvas),
             // {
               // scaleX: this.canvas.width / image.width,
@@ -269,11 +270,7 @@ export class InformeExportComponent implements OnInit {
     }
 
   drawAllPcsInCanvas(seguidor: SeguidorInterface, canvas) {
-    // console.log('this.filteredPcs', this.allPcs);
-    const seguidorPcs = this.allPcs.filter( (pc, i, pcArray) => {
-      return pc.global_x === seguidor.global_x;
-    });
-    seguidorPcs.forEach( (pc, i, a) => {
+    seguidor.pcs.forEach( (pc, i, a) => {
       this.drawPc(pc, canvas);
       this.drawTriangle(pc, canvas);
     });
@@ -385,7 +382,21 @@ export class InformeExportComponent implements OnInit {
     this.filteredColumnasSource.next(
       this.pcColumnas.filter( e => this.filtroColumnas.includes(e.nombre))
       );
-    // this.pcService.filteredPcs(this.allPcs.filter( (pc) => this.filtroClase.includes(pc.severidad)));
+  }
+
+
+
+  onClickTipoInforme() {
+    if (this.tipoInforme === '2') {
+      let count = 0;
+      for (const seguidor of this.pcListPorSeguidor) {
+        this.setImgSeguidorCanvas(seguidor);
+        count = count + 1;
+        // if ( count === 50 ) {
+        //   break;
+        // }
+      }
+    }
   }
 }
 

@@ -43,6 +43,7 @@ import { NavbarComponent } from './layout/navbar/navbar.component';
 import { PubliclayoutComponent } from './layout/publiclayout/publiclayout.component';
 import { ClienteslayoutComponent } from './layout/clienteslayout/clienteslayout.component';
 import { VideoComponent } from './cts/video/video.component';
+import { SpinnerComponent } from './cts/spinner/spinner.component';
 
 @NgModule({
   declarations: [
@@ -62,7 +63,8 @@ import { VideoComponent } from './cts/video/video.component';
     IndexComponent,
     PubliclayoutComponent,
     ClienteslayoutComponent,
-    VideoComponent
+    VideoComponent,
+    SpinnerComponent
   ],
   entryComponents: [
     PcDetailsDialogComponent

@@ -2,7 +2,6 @@ import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { PcInterface } from '../../models/pc';
 import { MatTableDataSource, MatSort, MatPaginator, MatDialog} from '@angular/material';
 import { PcService } from '../../services/pc.service';
-import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import { InformeInterface } from '../../models/informe';
@@ -30,11 +29,9 @@ export class PcListComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @Input() informe: InformeInterface;
   @Input() planta: PlantaInterface;
-  @Input() allPcs: PcInterface[];
 
   public expandedElement: PcInterface;
   public columnsToDisplay: string[];
-  public informeId: string;
   public pcDataSource: MatTableDataSource<PcInterface>;
   public searchKey: string;
   public profileUrl: Observable<string | null>;
@@ -42,15 +39,10 @@ export class PcListComponent implements OnInit {
   public pcPerdidas: string[];
   public temperaturaLimite: number;
 
-
-
   constructor(
-
     private pcService: PcService,
-    private route: ActivatedRoute,
   ) {
     this.columnsToDisplay = ['severidad', 'tipo', 'perdidas', 'local_id', 'global_x', 'temperaturaMax', 'gradienteNormalizado'];
-    this.informeId = this.route.snapshot.paramMap.get('id');
     this.pcDescripcion = GLOBAL.pcDescripcion;
     this.pcPerdidas = GLOBAL.pcPerdidas;
     this.temperaturaLimite = GLOBAL.temperaturaLimiteFabricantes;

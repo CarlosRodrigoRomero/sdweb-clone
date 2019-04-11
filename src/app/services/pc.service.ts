@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import {PcInterface} from '../models/pc';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument, CollectionReference } from '@angular/fire/firestore';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map, take, switchMap, filter, mergeMap } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { GLOBAL } from './global';
 
 export interface SeguidorInterface {
@@ -32,6 +32,7 @@ export class PcService {
 
   private filteredPcsSource = new BehaviorSubject<PcInterface[]>(new Array<PcInterface>());
   public currentFilteredPcs$ = this.filteredPcsSource.asObservable();
+
   private filteredSeguidores = new BehaviorSubject<SeguidorInterface[]>(new Array<SeguidorInterface>());
   public filteredSeguidores$ = this.filteredSeguidores.asObservable();
 
@@ -61,12 +62,16 @@ export class PcService {
 
   private aplicarFiltros() {
     this.filteredPcsSource.next(
-      this.allPcs.filter(pc => this.currentFiltroClase.includes(pc.severidad) && this.currentFiltroCategoria.includes(pc.tipo))
+      this.allPcs
+      .filter(pc => this.currentFiltroClase.includes(pc.severidad) && this.currentFiltroCategoria.includes(pc.tipo))
+      .sort(this.compare)
       );
     this.filteredSeguidores.next(
       this.getPcsPorSeguidor(
-        this.allPcs.filter(pc => (this.currentFiltroClase.includes(pc.severidad) && this.currentFiltroCategoria.includes(pc.tipo))))
-        );
+        this.allPcs
+        .filter(pc => this.currentFiltroClase.includes(pc.severidad) && this.currentFiltroCategoria.includes(pc.tipo))
+        .sort(this.compare)
+      ));
   }
 
   PushFiltroClase(filtro: number[]) {
@@ -92,9 +97,8 @@ export class PcService {
       if ( pc.global_x !== oldGlobalX ) {
         oldGlobalX = pc.global_x;
 
-        const arrayPcsSeguidor = allPcsConSeguidores.filter(element => element.global_x === pc.global_x);
         const data = {
-          pcs: arrayPcsSeguidor,
+          pcs: allPcsConSeguidores.filter(element => element.global_x === pc.global_x),
           global_x: pc.global_x
         }
         arraySeguidores.push(data);
@@ -118,7 +122,7 @@ export class PcService {
       .pipe(take(1))
       .subscribe( pcs => {
         this.allPcs = pcs;
-        this.filteredPcsSource.next(this.allPcs);
+        this.filteredPcsSource.next(this.allPcs.sort(this.compare));
         // Aplicar filtros
         this.aplicarFiltros();
 
@@ -158,10 +162,10 @@ export class PcService {
   }
 
   private compare(a: PcInterface, b: PcInterface) {
-    if (a.global_x < b.global_x) {
+    if (a.local_id < b.local_id) {
       return -1;
     }
-    if (a.global_x > b.global_x) {
+    if (a.local_id > b.local_id) {
       return 1;
     }
     return 0;

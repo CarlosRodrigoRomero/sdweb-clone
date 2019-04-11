@@ -7,8 +7,8 @@
 <div class="row">
     <div class="col text-center">
         <mat-button-toggle-group [(ngModel)]="tipoInforme" name="tipoInforme" aria-label="tipo informe">
-            <mat-button-toggle checked="tipoInforme === 1" value="1">Tipo 1</mat-button-toggle>
-            <mat-button-toggle checked="tipoInforme === 2" value="2">Tipo 2</mat-button-toggle>
+            <mat-button-toggle (click)="onClickTipoInforme()" checked="tipoInforme === '1'" value="1">Tipo 1</mat-button-toggle>
+            <mat-button-toggle (click)="onClickTipoInforme()" checked="tipoInforme === '2'" value="2">Tipo 2</mat-button-toggle>
         </mat-button-toggle-group>
     </div>
 </div>
@@ -41,7 +41,7 @@
                 </div>
 
                 <h5 class="text-right"><b>Planta solar</b>: {{planta.nombre}} ({{planta.potencia}} MW - {{planta.tipo}})</h5>
-                <h5 class="html2pdf__page-break text-right"><b>Fecha del vuelo</b>: {{informe.fecha * 1000 | date: 'dd/MM/y' }} </h5>
+                <h5 class="text-right"><b>Fecha del vuelo</b>: {{informe.fecha * 1000 | date: 'dd/MM/y' }} </h5>
             </div>
         </div>
         <div class="row">
@@ -419,7 +419,7 @@
                     <tr *ngFor="let i of numCategorias">
                         <td *ngIf="countCategoria[i-1] > 0">{{global.pcDescripcion[i]}}</td>
                         <td *ngIf="countCategoria[i-1] > 0">{{countCategoria[i-1]}}</td>
-                        <td *ngIf="countCategoria[i-1] > 0">{{countCategoria[i-1]/allPcs.length*100 | number: '1.0-1'}} %</td>
+                        <td *ngIf="countCategoria[i-1] > 0">{{countCategoria[i-1]/filteredPcs.length*100 | number: '1.0-1'}} %</td>
                     </tr>
                     <tr>
 
@@ -460,7 +460,7 @@
             </div>
         </div>
 
-        <div class="row html2pdf__page-break">
+        <div class="row">
             <div class="col-12">
                 <h4>2.4 MAE de la planta</h4>
                 <p>
@@ -483,7 +483,7 @@
 
     </ng-template>
 
-    <div class="html2pdf__page-break" style="color:rgba(255, 255, 255, 0)">_</div>
+    <!-- <div class="html2pdf__page-break" style="color:rgba(255, 255, 255, 0)">_</div> -->
 
     <div [ngSwitch]="tipoInforme">
 
@@ -508,9 +508,14 @@
                                 <th>Archivo</th> -->
                             </tr>
                         </thead>
-                        <tr *ngFor="let pc of allPcs">
+                        <tr *ngFor="let pc of filteredPcs$ | async">
                             <td *ngFor="let col of currentFilteredColumnas$ | async">
-                                {{pc[col.nombre]}}
+                                <span *ngIf="col.nombre === 'tipo' else colNormal1">
+                                    {{pcDescripcion[pc.tipo]}}
+                                </span>
+                                <ng-template #colNormal1>
+                                    {{pc[col.nombre]}}
+                                </ng-template>
                             </td>
 
                         </tr>
@@ -527,7 +532,7 @@
             </div>
 
             <ng-container *ngFor="let seguidor of filteredSeguidores$ | async">
-                <div class="seguidor html2pdf__page-break row">
+                <div class="seguidor row">
                     <div class="col">
                         <div id="hiddenCanvas{{seguidor.global_x}}" class="hiddenCanvas">
                             <canvas id="imgSeguidorCanvas{{seguidor.global_x}}" width="640" height="512">
@@ -557,10 +562,10 @@
 
                                 <tr *ngFor="let pc of seguidor.pcs">
                                     <td *ngFor="let col of currentFilteredColumnas$ | async">
-                                        <span *ngIf="col.nombre === 'tipo' else colNormal">
+                                        <span *ngIf="col.nombre === 'tipo' else colNormal2">
                                             {{pcDescripcion[pc.tipo]}}
                                         </span>
-                                        <ng-template #colNormal>
+                                        <ng-template #colNormal2>
                                             {{pc[col.nombre]}}
                                         </ng-template>
 

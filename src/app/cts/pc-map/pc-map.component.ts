@@ -26,7 +26,6 @@ export interface DialogData {
 export class PcMapComponent implements OnInit {
   @Input() planta: PlantaInterface;
   @Input() informe: InformeInterface;
-  @Input() allPcs: PcInterface[];
   @ViewChild('agm-map') map: AgmMap;
 
 
@@ -79,7 +78,7 @@ export class PcMapComponent implements OnInit {
         width: '1100px',
         // height: '600px',
         hasBackdrop: true,
-        data: {pc: selectedPc, allPcs: this.allPcs}
+        data: {pc: selectedPc, allPcs: this.filteredPcs}
       });
 
       dialogRef.afterClosed().subscribe(result => {
