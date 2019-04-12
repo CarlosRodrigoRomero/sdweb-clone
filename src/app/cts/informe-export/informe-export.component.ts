@@ -71,9 +71,9 @@ export class InformeExportComponent implements OnInit {
   public countSeguidores: number;
   public generandoPDF = false;
   public isLocalhost: boolean;
-  public doc = new jsPDF();
+  public doc: jsPDF;
 
-  private countLoadedImages$ = new BehaviorSubject(0);
+  private countLoadedImages$ = new BehaviorSubject(null);
 
   constructor(
     private storage: AngularFireStorage,
@@ -218,10 +218,53 @@ export class InformeExportComponent implements OnInit {
     }
     return 0;
   }
+  
+  public downloadPDF3() {
+    this.generandoPDF = true;
+    this.doc = new jsPDF();
+    this.doc.setFontSize(10);
+
+    this.countLoadedImages$.subscribe( global_x => {
+      if (global_x !== null) {
+        console.log('global_x', global_x, 100 * this.countLoadedImages/this.countSeguidores, '%');
+        const canvas = $(`canvas[id="imgSeguidorCanvas${global_x}"]`)[0];
+  
+        const imgData = canvas.toDataURL('image/png');
+        const table = $(`table[id="tableSeguidor${global_x}"]`)[0];
+        this.doc.addImage(imgData, 'PNG', 10, 10);
+        this.doc.autoTable({
+          html: table,
+          startY: 150,
+        });
+        this.doc.addPage();
+          
+        if (this.countLoadedImages === this.countSeguidores) {
+          this.doc.save('table.pdf');
+          this.generandoPDF = false;
+        }
+      }
+
+    });
+    // Generar imagenes
+    if (this.tipoInforme === '2') {
+      this.countSeguidores = 0;
+      for (const seguidor of this.filteredSeguidores) {
+        this.setImgSeguidorCanvas(seguidor, false);
+        this.countSeguidores++;
+        // if ( count === 5 ) {
+        //   break;
+        // }
+      }
+    }
+  }
 
   public downloadPDF2() {
-    console.log('filteredSeguidoresVistaPrevia', this.filteredSeguidoresVistaPrevia);
+    this.generandoPDF = true;
+
     let contador = 0;
+    this.doc = new jsPDF();
+    this.doc.setFontSize(12);
+
     this.countSeguidores = 0;
     for (const seguidor of this.filteredSeguidoresVistaPrevia) {
       this.countSeguidores++;
@@ -235,9 +278,14 @@ export class InformeExportComponent implements OnInit {
           'image/png');
         const table = $(`table[id="tableSeguidorVP${seguidor.global_x}"]`)[0];
         this.doc.addImage(imgData, 'PNG', 10, 10);
-        this.doc.autoTable({html: table});
+        this.doc.autoTable({
+          html: table,
+          startY: 150,
+        });
+        this.doc.addPage();
         if (contador === this.countSeguidores ) {
           this.doc.save('table.pdf');
+          this.generandoPDF = false;
         }
           
       });
@@ -303,11 +351,11 @@ export class InformeExportComponent implements OnInit {
     imagenTermica.crossOrigin = 'anonymous';
 
     const seguidorObs = this.storage.ref(`informes/${this.informe.id}/jpg/${seguidor.pcs[0].archivoPublico}`).getDownloadURL();
-
     seguidorObs
       .pipe(take(1))
       .subscribe( url => {
         seguidor.pcs[0].downloadUrlString = url;
+        imagenTermica.src = url;
         let canvas = new fabric.Canvas(`imgSeguidorCanvas${seguidor.global_x}`);
 
         if (vistaPrevia) {
@@ -315,11 +363,6 @@ export class InformeExportComponent implements OnInit {
         }
 
         imagenTermica.onload = () => {
-          if (!vistaPrevia) {
-            this.countLoadedImages++;
-            this.countLoadedImages$.next(this.countLoadedImages);
-          }
-
           const fabricImage = new fabric.Image(imagenTermica, {
               left: 0,
               top: 0,
@@ -335,6 +378,11 @@ export class InformeExportComponent implements OnInit {
           // fabricImage.scale(1);
           canvas.add(fabricImage);
           this.drawAllPcsInCanvas(seguidor, canvas, vistaPrevia);
+
+          if (!vistaPrevia) {
+            this.countLoadedImages++;
+            this.countLoadedImages$.next(seguidor.global_x);
+          }
             // canvas.renderAll.bind(canvas),
             // {
               // scaleX: this.canvas.width / image.width,
@@ -346,7 +394,7 @@ export class InformeExportComponent implements OnInit {
               // originY: 'left'
             // }
         };
-        imagenTermica.src = url;
+        
 
       });
     }
@@ -357,24 +405,24 @@ export class InformeExportComponent implements OnInit {
       this.drawTriangle(pc, canvas);
     });
 
-    canvas.getElement().toBlob( (blob) => {
-      // console.log('blob', blob);
-      const urlCreator = window.URL;
-      const imageUrl = urlCreator.createObjectURL(blob);
-      const image = new Image();
-      image.src = imageUrl;
-      image.width = 640;
-      image.height = 512;
-      let list = document.getElementById(`divSeguidor${seguidor.global_x}`);
-      if (vistaPrevia) {
-        list = document.getElementById(`divSeguidorVP${seguidor.global_x}`);
-      }
-      // list.removeChild(list[0]);
-      list.appendChild(image);
-    },
-    'image/jpeg',
-    0.95 // calidad
-    );
+    // canvas.getElement().toBlob( (blob) => {
+    //   // console.log('blob', blob);
+    //   const urlCreator = window.URL;
+    //   const imageUrl = urlCreator.createObjectURL(blob);
+    //   const image = new Image();
+    //   image.src = imageUrl;
+    //   image.width = 640;
+    //   image.height = 512;
+    //   let list = document.getElementById(`divSeguidor${seguidor.global_x}`);
+    //   if (vistaPrevia) {
+    //     list = document.getElementById(`divSeguidorVP${seguidor.global_x}`);
+    //   }
+    //   // list.removeChild(list[0]);
+    //   list.appendChild(image);
+    // },
+    // 'image/jpeg',
+    // 0.95 // calidad
+    // );
   }
 
   drawPc(pc: PcInterface, canvas: any) {

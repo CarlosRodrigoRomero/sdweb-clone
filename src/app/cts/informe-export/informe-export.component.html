@@ -29,7 +29,7 @@
     <div class="row">
         <div class="col text-center ">
             <button *ngIf="tipoInforme === '1'" type="button" class="button-generarPdf btn btn-primary btn-lg" (click)="downloadPDF()"> Generar PDF </button>
-            <button *ngIf="isLocalhost" type="button" class="button-generarPdf btn btn-secondary btn-lg" (click)="downloadPDF2()"> Generar PDF 2 </button>
+            <button *ngIf="isLocalhost" type="button" class="button-generarPdf btn btn-secondary btn-lg" (click)="downloadPDF3()"> Generar PDF 2 </button>
             <button *ngIf="tipoInforme === '2'" type="button" class="button-generarPdf btn btn-secondary btn-lg" disabled> Generar PDF (en construccion) </button>
         </div>
     </div>
@@ -683,7 +683,7 @@
                         <div class="col">
 
 
-                            <table class="table table-striped">
+                            <table id="tableSeguidor{{seguidor.global_x}}" class="table table-striped">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th *ngFor="let col of currentFilteredColumnas$ | async">{{col.descripcion}}</th>
