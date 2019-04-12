@@ -58,6 +58,7 @@ export class InformeExportComponent implements OnInit {
   public pcDescripcion = GLOBAL.pcDescripcion;
   public filteredSeguidores$: Observable<SeguidorInterface[]>;
   public filteredSeguidoresVistaPrevia: SeguidorInterface[];
+  public filteredPcsVistaPrevia: PcInterface[];
   public filteredPcs$: Observable<PcInterface[]>;
   public filteredPcs: PcInterface[];
   public countLoadedImages = 0;
@@ -94,6 +95,10 @@ export class InformeExportComponent implements OnInit {
     this.filtroColumnas = this.pcColumnas.map( (element) => element.nombre);
     this.filteredColumnasSource.next(this.pcColumnas);
 
+    // Obtener pcs vista previa
+    this.filteredPcs$.subscribe( pcs => {
+      this.filteredPcsVistaPrevia = pcs.slice(0, 20);
+    });
     // Ordenar Pcs por seguidor:
     this.pcService.filteredSeguidores$.subscribe( seguidores => {
       this.filteredSeguidores = seguidores;
@@ -221,12 +226,12 @@ export class InformeExportComponent implements OnInit {
         // }
       }
     }
-    document.getElementById('imgIrradiancia').setAttribute('crossOrigin', 'anonymous');
-    document.getElementById('imgPortada').setAttribute('crossOrigin', 'anonymous');
-    document.getElementById('imgSuciedad').setAttribute('crossOrigin', 'anonymous');
-    document.getElementById('imgLogo').setAttribute('crossOrigin', 'anonymous');
-    // document.getElementById('imgCalibracion').setAttribute('crossOrigin', 'anonymous');
-    // document.getElementById('imgCompra').setAttribute('crossOrigin', 'anonymous');
+    // document.getElementById('imgIrradiancia').setAttribute('crossOrigin', 'anonymous');
+    // document.getElementById('imgPortada').setAttribute('crossOrigin', 'anonymous');
+    // document.getElementById('imgSuciedad').setAttribute('crossOrigin', 'anonymous');
+    // document.getElementById('imgLogo').setAttribute('crossOrigin', 'anonymous');
+    // // document.getElementById('imgCalibracion').setAttribute('crossOrigin', 'anonymous');
+    // // document.getElementById('imgCompra').setAttribute('crossOrigin', 'anonymous');
 
     // Calcular informe
     this.pcService.currentFilteredPcs$.pipe(
