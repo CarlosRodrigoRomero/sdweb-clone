@@ -10,11 +10,17 @@ import { InformeInterface } from '../../models/informe';
 import 'fabric';
 declare let fabric;
 
+import * as jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 import html2pdf from 'html2pdf.js';
+
 import { AngularFireStorage } from '@angular/fire/storage';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { MatCheckboxChange } from '@angular/material';
+
+declare var $: any;
 
 @Component({
   selector: 'app-informe-export',
@@ -64,6 +70,8 @@ export class InformeExportComponent implements OnInit {
   public countLoadedImages = 0;
   public countSeguidores: number;
   public generandoPDF = false;
+  public isLocalhost: boolean;
+  public doc = new jsPDF();
 
   private countLoadedImages$ = new BehaviorSubject(0);
 
@@ -83,7 +91,7 @@ export class InformeExportComponent implements OnInit {
     this.url = GLOBAL.url;
     this.titulo = 'Vista de informe';
     this.tipoInforme = '1';
-
+    this.isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
   }
 
   ngOnInit() {
@@ -211,6 +219,34 @@ export class InformeExportComponent implements OnInit {
     return 0;
   }
 
+  public downloadPDF2() {
+    console.log('filteredSeguidoresVistaPrevia', this.filteredSeguidoresVistaPrevia);
+    let contador = 0;
+    this.countSeguidores = 0;
+    for (const seguidor of this.filteredSeguidoresVistaPrevia) {
+      this.countSeguidores++;
+      const c = $(`div[id="divSeguidorVP${seguidor.global_x}"]`)[0];
+      console.log('seguidorCanvas', c);
+      html2canvas(c, { scale: 1, useCORS: true }).then( canvas => {
+        contador++;
+        console.log('contador', contador, this.countSeguidores);
+
+        const imgData = canvas.toDataURL(
+          'image/png');
+        const table = $(`table[id="tableSeguidorVP${seguidor.global_x}"]`)[0];
+        this.doc.addImage(imgData, 'PNG', 10, 10);
+        this.doc.autoTable({html: table});
+        if (contador === this.countSeguidores ) {
+          this.doc.save('table.pdf');
+        }
+          
+      });
+  
+  }
+}
+
+
+
 
   public downloadPDF() {
     this.generandoPDF = true;
@@ -322,6 +358,7 @@ export class InformeExportComponent implements OnInit {
     });
 
     canvas.getElement().toBlob( (blob) => {
+      // console.log('blob', blob);
       const urlCreator = window.URL;
       const imageUrl = urlCreator.createObjectURL(blob);
       const image = new Image();

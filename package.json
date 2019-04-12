@@ -32,10 +32,11 @@
         "firebase": "^5.8.5",
         "get-image-pixels": "^1.0.1",
         "hammerjs": "^2.0.8",
-        "html2canvas": "^1.0.0-alpha.12",
+        "html2canvas": "^1.0.0-rc.1",
         "html2pdf.js": "^0.9.1",
         "jquery": "^3.3.1",
         "jspdf": "^1.5.3",
+        "jspdf-autotable": "^3.1.1",
         "mapbox": "^1.0.0-beta10",
         "ng2-charts": "^1.6.0",
         "ol": "^5.3.1",
@@ -45,7 +46,7 @@
         "primeng": "^7.0.5",
         "rxjs": "~6.3.3",
         "tslib": "^1.9.0",
-        "zone.js": "~0.9.0"
+        "zone.js": "^0.9.0"
     },
     "devDependencies": {
         "@angular-devkit/build-angular": "~0.13.0",
@@ -67,6 +68,6 @@
         "protractor": "~5.4.0",
         "ts-node": "~7.0.0",
         "tslint": "~5.11.0",
-        "typescript": "~3.2.2"
+        "typescript": "^3.2.4"
     }
 }
