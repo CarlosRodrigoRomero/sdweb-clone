@@ -44,6 +44,7 @@ import { PubliclayoutComponent } from './layout/publiclayout/publiclayout.compon
 import { ClienteslayoutComponent } from './layout/clienteslayout/clienteslayout.component';
 import { VideoComponent } from './cts/video/video.component';
 import { SpinnerComponent } from './cts/spinner/spinner.component';
+import { PruebasComponent } from './cts/pruebas/pruebas.component';
 
 @NgModule({
   declarations: [
@@ -64,7 +65,8 @@ import { SpinnerComponent } from './cts/spinner/spinner.component';
     PubliclayoutComponent,
     ClienteslayoutComponent,
     VideoComponent,
-    SpinnerComponent
+    SpinnerComponent,
+    PruebasComponent
   ],
   entryComponents: [
     PcDetailsDialogComponent

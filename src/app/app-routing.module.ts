@@ -10,6 +10,7 @@ import { IndexComponent } from './cts/index/index.component';
 import { ClienteslayoutComponent } from './layout/clienteslayout/clienteslayout.component';
 import { PubliclayoutComponent } from './layout/publiclayout/publiclayout.component';
 import { VideoComponent } from './cts/video/video.component';
+import { PruebasComponent } from './cts/pruebas/pruebas.component';
 
 const routes: Routes = [
   {
@@ -17,6 +18,7 @@ const routes: Routes = [
     component: PubliclayoutComponent,
     children: [
       { path: '', component: IndexComponent, pathMatch: 'full'},
+      { path: 'pdf123', component: PruebasComponent},
       { path: 'juangil', component: VideoComponent, data: { nombre: 'Juan Gil', codigo: 'nfs0lkgmy4'} },
       { path: 'joseignacio', component: VideoComponent, data: { nombre: 'Jose Ignacio', codigo: 'dcxxa99ktf'} },
       { path: 'emilio', component: VideoComponent, data: { nombre: 'Emilio', codigo: '7uwh1qgbhw'} },
@@ -26,7 +28,8 @@ const routes: Routes = [
   },
   {
     path: '',
-    component: ClienteslayoutComponent,
+    component: ClienteslayoutComponent
+    ,
     children: [
       {path: 'informe-view/:id', component: InformeViewComponent, canActivate: [AuthGuard]},
       // {path: 'informe-edit/:id', component: InformeEditComponent, canActivate: [AuthGuard]},

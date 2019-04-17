@@ -16,4 +16,6 @@ export interface InformeInterface {
     nubosidad?: number;
     numeroModulos?: number;
     gsd?: number;
+    emisividad?: number;
+    tempReflejada?: number;
 }
