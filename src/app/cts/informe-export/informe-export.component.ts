@@ -69,6 +69,7 @@ export class InformeExportComponent implements OnInit {
   public filtroColumnas: string[];
   private filteredColumnasSource = new BehaviorSubject<any[]>(new Array<any>());
   public currentFilteredColumnas$ = this.filteredColumnasSource.asObservable();
+  public currentFilteredColumnas: Array<any>;
   public pcDescripcion = GLOBAL.pcDescripcion;
   public filteredSeguidores$: Observable<SeguidorInterface[]>;
   public filteredSeguidoresVistaPrevia: SeguidorInterface[];
@@ -83,10 +84,11 @@ export class InformeExportComponent implements OnInit {
   public imageList = {};
   public pages;
   public irradianciaImgBase64: string;
-  public portadaImgBase64: string;
+  public imgPortadaBase64: string;
   public imgSuciedadBase64: string;
   public imgFormulaMaeBase64: string;
   public imgCurvaMaeBase64: string;
+  public progresoPDF: string;
 
   private countLoadedImages$ = new BehaviorSubject(null);
 
@@ -119,6 +121,10 @@ export class InformeExportComponent implements OnInit {
 
     this.filtroColumnas = this.pcColumnas.map( (element) => element.nombre);
     this.filteredColumnasSource.next(this.pcColumnas);
+
+    this.currentFilteredColumnas$.subscribe( (filteredCols) => {
+        this.currentFilteredColumnas = filteredCols;
+    });
 
     // Obtener pcs vista previa
     this.filteredPcs$.subscribe( pcs => {
@@ -157,37 +163,53 @@ export class InformeExportComponent implements OnInit {
     //   };
     // });
 
-    // this.portadaImg$.pipe(take(1)).subscribe( url => {
-    //   const htmlImage = new Image();
-    //   htmlImage.src = url;
-    //   htmlImage.crossOrigin = 'anonymous';
-    //   const canvas = document.getElementById('portadaImg')  as HTMLCanvasElement;
 
-    //   htmlImage.onload = () => {
-    //     pica.resize(htmlImage, canvas).then( result => {
-    //       result.crossOrigin = 'anonymous';
-    //       const ctx = canvas.getContext('2d');
-    //       ctx.drawImage(result, 0 , 0);
-    //       this.portadaImgBase64 = canvas.toDataURL('image/jpeg', 0.85);
-    //     });
-    //   };
-    // });
+    this.portadaImg$.pipe(take(1)).subscribe( url => {
+      fabric.util.loadImage(url, (img) => {
+        const canvas = new fabric.Canvas('portadaImg');
+        const scale =  canvas.width / img.width;
+        const fabricImage = new fabric.Image(img, {
+          left: 0,
+          top: 0,
+          angle: 0,
+          opacity: 1,
+          scaleX: scale,
+          scaleY: scale,
+          draggable: false,
+          lockMovementX: true,
+          lockMovementY: true
+        },
+        );
+        // fabricImage.scale(1);
 
-    // this.suciedadImg$.pipe(take(1)).subscribe( url => {
-    //   const htmlImage = new Image();
-    //   htmlImage.src = url;
-    //   htmlImage.crossOrigin = 'anonymous';
-    //   const canvas = document.getElementById('imgSuciedad')  as HTMLCanvasElement;
+        canvas.add(fabricImage);
+        this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', 0.85);
 
-    //   htmlImage.onload = () => {
-    //     pica.resize(htmlImage, canvas).then( result => {
-    //       result.crossOrigin = 'anonymous';
-    //       const ctx = canvas.getContext('2d');
-    //       ctx.drawImage(result, 0 , 0);
-    //       this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', 0.85);
-    //     });
-    //   };
-    // });
+    }, null, { crossOrigin: 'anonymous'});
+    });
+
+    this.suciedadImg$.pipe(take(1)).subscribe( url => {
+      fabric.util.loadImage(url, (img) => {
+          const canvas = new fabric.Canvas('imgSuciedad');
+          const scale =  canvas.width / img.width;
+          const fabricImage = new fabric.Image(img, {
+          left: 0,
+          top: 0,
+          angle: 0,
+          opacity: 1,
+          scaleX: scale,
+          scaleY: scale,
+          draggable: false,
+          lockMovementX: true,
+          lockMovementY: true
+        },
+        );
+
+          canvas.add(fabricImage);
+          this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+    }, null, { crossOrigin: 'anonymous'});
+    });
 
     // const imgCurvaMae = new Image();
     // imgCurvaMae.src = '../../../assets/images/maeCurva.png'
@@ -318,27 +340,17 @@ export class InformeExportComponent implements OnInit {
 
 
 
-  public downloadPDF6() {
+  public downloadPDF() {
     this.generandoPDF = true;
 
-
-
-    const images = {};
+    const imageListBase64 = {};
     this.countLoadedImages$.subscribe( globalX => {
-      console.log('globalX1', globalX);
       if (globalX !== null) {
-        console.log('globalX2', globalX, 100 * this.countLoadedImages / this.countSeguidores, '%');
+        this.progresoPDF = this.decimalPipe.transform(100 * this.countLoadedImages / this.countSeguidores, '1.0-0');
+        const canvas = $(`canvas[id="imgSeguidorCanvas${globalX}"]`)[0] as HTMLCanvasElement;
+        imageListBase64[`imgSeguidorCanvas${globalX}`] = canvas.toDataURL('image/jpeg', 0.85);
 
-        const canvas = $(`canvas[id="imgSeguidorCanvas${globalX}"]`)[0];
-        console.log('canvas', canvas);
-
-        const imageBase64 = canvas.toDataURL('image/jpeg', 0.85);
-        this.imageList[globalX.toString()] = imageBase64;
-        images[`imgSeguidorCanvas${globalX}`] = imageBase64;
-
-
-
-// Si todo va bien...
+        // Si todo va bien...
         if (this.countLoadedImages === this.countSeguidores) {
           this.pcService.currentFilteredPcs$.pipe(
             take(1)
@@ -346,14 +358,16 @@ export class InformeExportComponent implements OnInit {
           .subscribe( filteredPcs => {
             this.calcularInforme(filteredPcs);
 
-            const pdfDocGenerator = pdfMake.createPdf(this.getDocDefinition(images));
+            console.log('100%', imageListBase64);
+            const pdfDocGenerator = pdfMake.createPdf(this.getDocDefinition(imageListBase64));
 
-            pdfDocGenerator.getDataUrl((dataUrl) => {
-                const iframe = document.createElement('iframe');
-                iframe.src = dataUrl;
-                iframe.setAttribute('style', 'position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;');
-                document.getElementById('vistaPrevia').appendChild(iframe);
-            });
+            pdfDocGenerator.download();
+            // pdfDocGenerator.getDataUrl((dataUrl) => {
+            //     const iframe = document.createElement('iframe');
+            //     iframe.src = dataUrl;
+            //     iframe.setAttribute('style', 'position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;');
+            //     document.getElementById('vistaPrevia').appendChild(iframe);
+            // });
             this.generandoPDF = false;
           });
 
@@ -372,9 +386,7 @@ export class InformeExportComponent implements OnInit {
     for (const seguidor of this.filteredSeguidores) {
       this.setImgSeguidorCanvas(seguidor, false);
       this.countSeguidores++;
-      // if ( count === 5 ) {
-      //   break;
-      // }
+
       }
     } else {
     // TODO
@@ -382,189 +394,23 @@ export class InformeExportComponent implements OnInit {
   }
   }
 
-  public downloadPDF5() {
 
-
-
-    this.generandoPDF = true;
-    const content2 = [];
-
-    this.countLoadedImages$.subscribe( globalX => {
-      console.log('glboal_x', globalX);
-      if (globalX !== null) {
-        console.log('global_x', globalX, 100 * this.countLoadedImages / this.countSeguidores, '%');
-
-        const canvas = $(`canvas[id="imgSeguidorCanvas${globalX}"]`)[0];
-
-        const imageBase64 = canvas.toDataURL('image/jpeg', 0.85);
-        this.imageList[globalX.toString()] = imageBase64;
-        content2.push({ image: imageBase64, width: 500});
-        // console.log('imageBase64', imageBase64 );
-
-        // Añadir a dd
-        if (this.countLoadedImages === this.countSeguidores) {
-          const dd = {
-            content: content2,
-            images: this.imageList
-          };
-
-
-          pdfMake.createPdf(dd).download();
-          this.generandoPDF = false;
-        }
-      }
-
-    });
-
-    // Generar imagenes
-    if (this.tipoInforme === '2') {
-      this.countSeguidores = 0;
-      for (const seguidor of this.filteredSeguidores) {
-        this.setImgSeguidorCanvas(seguidor, false);
-        this.countSeguidores++;
-        // if ( count === 5 ) {
-        //   break;
-        // }
-      }
-    }
-  }
-
-  public downloadPDF3() {
-    this.generandoPDF = true;
-    this.doc = new jsPDF();
-    this.doc.setFontSize(10);
-
-    this.countLoadedImages$.subscribe( globalX => {
-      if (globalX !== null) {
-        const canvas = $(`canvas[id="imgSeguidorCanvas${globalX}"]`)[0];
-
-        const imgData = canvas.toDataURL('image/png');
-        const table = $(`table[id="tableSeguidor${globalX}"]`)[0];
-        this.doc.addImage(imgData, 'PNG', 10, 10);
-        this.doc.autoTable({
-          html: table,
-          startY: 150,
-        });
-        this.doc.addPage();
-
-        if (this.countLoadedImages === this.countSeguidores) {
-          this.doc.save('table.pdf');
-          this.generandoPDF = false;
-        }
-      }
-
-    });
-    // Generar imagenes
-    if (this.tipoInforme === '2') {
-      this.countSeguidores = 0;
-      for (const seguidor of this.filteredSeguidores) {
-        this.setImgSeguidorCanvas(seguidor, false);
-        this.countSeguidores++;
-        // if ( count === 5 ) {
-        //   break;
-        // }
-      }
-    }
-  }
-
-  public downloadPDF2() {
-    this.generandoPDF = true;
-
-    let contador = 0;
-    this.doc = new jsPDF();
-    this.doc.setFontSize(12);
-
-    this.countSeguidores = 0;
-    for (const seguidor of this.filteredSeguidoresVistaPrevia) {
-      this.countSeguidores++;
-      const c = $(`div[id="divSeguidorVP${seguidor.global_x}"]`)[0];
-      console.log('seguidorCanvas', c);
-      html2canvas(c, { scale: 1, useCORS: true }).then( canvas => {
-        contador++;
-        console.log('contador', contador, this.countSeguidores);
-
-        const imgData = canvas.toDataURL(
-          'image/png');
-        const table = $(`table[id="tableSeguidorVP${seguidor.global_x}"]`)[0];
-        this.doc.addImage(imgData, 'PNG', 10, 10);
-        this.doc.autoTable({
-          html: table,
-          startY: 150,
-        });
-        this.doc.addPage();
-        if (contador === this.countSeguidores ) {
-          this.doc.save('table.pdf');
-          this.generandoPDF = false;
-        }
-      });
-  }
-}
-
-
-
-
-  public downloadPDF() {
-    this.generandoPDF = true;
-
-    // GENERAR VISTA
-    if (this.tipoInforme === '2') {
-      this.countSeguidores = 0;
-      for (const seguidor of this.filteredSeguidores) {
-        this.setImgSeguidorCanvas(seguidor, false);
-        this.countSeguidores++;
-        // if ( count === 5 ) {
-        //   break;
-        // }
-      }
-    }
-    // Calcular informe
-    this.pcService.currentFilteredPcs$.pipe(
-      take(1)
-    )
-    .subscribe( filteredPcs => {
-      this.calcularInforme(filteredPcs);
-    });
-
-    this.countLoadedImages$.subscribe( n => {
-
-      if ( n === this.countSeguidores || this.tipoInforme === '1') {
-        setTimeout( () => {
-          const content = document.getElementById('pdfContent');
-          const opt = {
-            margin:       20,
-            pagebreak: { mode: 'avoid-all' },
-            filename:     'informe.pdf',
-            image:        { type: 'jpeg', quality: 1 },
-            html2canvas:  { scale: 1, useCORS: true },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-          };
-          html2pdf().set(opt).from(content.innerHTML).save();
-          this.generandoPDF = false;
-        }, 2000);
-      }
-    });
-
-  }
 
   private setImgSeguidorCanvas(seguidor: SeguidorInterface, vistaPrevia: boolean = false) {
-    const imagenTermica = new Image();
-
     const seguidorObs = this.storage.ref(`informes/${this.informe.id}/jpg/${seguidor.pcs[0].archivoPublico}`).getDownloadURL();
     seguidorObs
       .pipe(take(1))
       .subscribe( url => {
         seguidor.pcs[0].downloadUrlString = url;
-        imagenTermica.src = url;
-        imagenTermica.crossOrigin = 'anonymous';
-        let canvas = new fabric.Canvas(`imgSeguidorCanvas${seguidor.global_x}`);
+        // imagenTermica.src = url;
 
+        let canvas = new fabric.Canvas(`imgSeguidorCanvas${seguidor.global_x}`);
         if (vistaPrevia) {
           canvas = new fabric.Canvas(`imgSeguidorCanvasVP${seguidor.global_x}`);
         }
 
-
-        imagenTermica.onload = () => {
-          const fabricImage = new fabric.Image(imagenTermica, {
+        fabric.util.loadImage(url, (img) => {
+            const fabricImage = new fabric.Image(img, {
               left: 0,
               top: 0,
               angle: 0,
@@ -574,30 +420,23 @@ export class InformeExportComponent implements OnInit {
               draggable: false,
               lockMovementX: true,
               lockMovementY: true
-            });
+            },
+            );
+            // fabricImage.scale(1);
+            canvas.add(fabricImage);
+            this.drawAllPcsInCanvas(seguidor, canvas, vistaPrevia);
 
-          // fabricImage.scale(1);
-          canvas.add(fabricImage);
-          this.drawAllPcsInCanvas(seguidor, canvas, vistaPrevia);
-          console.log('drawAllPcsInCanvas', canvas.toDataURL('image/jpeg', 0.85))
+            if (!vistaPrevia) {
+              this.countLoadedImages++;
+              this.countLoadedImages$.next(seguidor.global_x);
+            }
+        }, null, { crossOrigin: 'anonymous'});
+          // // this.imageList[globalX.toString()] = imageBase64;
+          // // images[`imgSeguidorCanvas${globalX}`] = imageBase64;
 
-          if (!vistaPrevia) {
-            this.countLoadedImages++;
-            this.countLoadedImages$.next(seguidor.global_x);
-          }
-            // canvas.renderAll.bind(canvas),
-            // {
-              // scaleX: this.canvas.width / image.width,
-              // scaleY: this.canvas.height / image.height,
-              // crossOrigin: 'anonymous',
-              // left: 0,
-              // top: 0,
-              // originX: 'top',
-              // originY: 'left'
-            // }
-        };
-      });
-    }
+
+    });
+  }
 
   drawAllPcsInCanvas(seguidor: SeguidorInterface, canvas, vistaPrevia: boolean = false) {
     seguidor.pcs.forEach( (pc, i, a) => {
@@ -672,7 +511,6 @@ export class InformeExportComponent implements OnInit {
     canvas.add(textId);
     canvas.renderAll();
 
-    
   }
 
   private drawTriangle(pc: PcInterface, canvas: any) {
@@ -765,7 +603,7 @@ getTablaCategoria() {
   }
 
   return array;
-};
+}
 
 
 
@@ -774,17 +612,18 @@ getTablaPosicion = function() {
   const arrayHeader = [];
   arrayHeader.push({});
 
-  for (let i of this.arrayColumnas) {
+  for (const i of this.arrayColumnas) {
 
       arrayHeader.push({
           text: i.toString(),
           style: 'tableHeader'
-      })
+      });
 
-  };
+  }
+
   array.push(arrayHeader);
 
-  for (let j of this.arrayFilas) {
+  for (const j of this.arrayFilas) {
       const arrayFila = [];
       arrayFila.push({
           text: j.toString(),
@@ -817,7 +656,7 @@ getTextoIrradiancia() {
   } else {
       return 'Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición que Solardrone ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.';
   }
-};
+}
 
 getTextoLocalizar() {
   if (this.planta.tipo === '2 ejes') {
@@ -825,7 +664,7 @@ getTextoLocalizar() {
   } else {
       return 'Además todos ellos tienen asociado los parámetros "pasillo", "columna" y "altura" según el mapa habitual de la planta.';
   }
-};
+}
 
 
 getPagesPDF() {
@@ -840,9 +679,9 @@ getPagesPDF() {
   '\n',
 
   {
-     image: 'imgPortada',
+    image: this.imgPortadaBase64,
     width: 600,
-   alignment: 'center'
+    alignment: 'center'
   },
 
   '\n\n',
@@ -1169,11 +1008,11 @@ getPagesPDF() {
 
   '\n',
 
-  {
-    image: 'imagenIrradiancia',
-    width: 500,
-    alignment: 'center'
-  },
+  // {
+  //   image: 'imagenIrradiancia',
+  //   width: 500,
+  //   alignment: 'center'
+  // },
 
   '\n\n',
 
@@ -1224,7 +1063,7 @@ getPagesPDF() {
 
   // Imagen suciedad
   {
-    image: 'imgSuciedad',
+    image: this.imgSuciedadBase64,
     width: 500,
     alignment: 'center'
   },
@@ -1317,11 +1156,11 @@ getPagesPDF() {
       style: 'p'
   },
 
-  {
-    image: 'imgFormulaMae',
-    width: 350,
-    alignment: 'center'
-  },
+  // {
+  //   image: 'imgFormulaMae',
+  //   width: 350,
+  //   alignment: 'center'
+  // },
 
   {
       text: 'Siendo N = Número de módulos; PR = Performance ratio; MAE = Módulos apagados equivalente calculados',
@@ -1353,11 +1192,11 @@ getPagesPDF() {
   '\n',
 
   // Imagen maeCurva
-  {
-    image: 'imgCurvaMae',
-    width: 350,
-    alignment: 'center'
-  },
+  // {
+  //   image: 'imgCurvaMae',
+  //   width: 350,
+  //   alignment: 'center'
+  // },
 
   '\n\n',
 
@@ -1654,7 +1493,7 @@ getPagesPDF() {
 
   {
       text: [
-          `El MAE de ${this.planta.nombre} el ${this.datePipe.transform(this.informe.fecha*1000, 'dd/MM/yyyy')} es `, {
+          `El MAE de ${this.planta.nombre} el ${this.datePipe.transform(this.informe.fecha * 1000, 'dd/MM/yyyy')} es `, {
               text: `${this.informe.mae} %`,
               style: 'bold'
           },
@@ -1666,32 +1505,100 @@ getPagesPDF() {
       style: 'p',
       pageBreak: 'after'
   }
+];
+}
+
+getPaginaSeguidor(seguidor) {
+    // Header
+    const cabecera = [];
+    for (const c of this.currentFilteredColumnas) {
+        cabecera.push({
+            text: c.descripcion,
+            style: 'tableHeader'
+        });
+    }
+
+    // Body
+    const body = [];
+    for (const pc of seguidor.pcs) {
+        const row = [];
+        for (const c of this.currentFilteredColumnas) {
+            row.push(
+                {
+                    text: pc[c.nombre],
+                    style: 'tableCell'
+                });
+        }
+        body.push(row);
+    }
+    console.log('cabecera', cabecera);
+    console.log('concat', cabecera.concat(body));
+    return [cabecera, body];
+}
 
 
+getAnexo() {
+    const allPagsAnexo = [];
+    for (const s of this.filteredSeguidores) {
+        const table = this.getPaginaSeguidor(s);
 
-]
-};
+        const pagAnexo = [
 
-getAnexo1() {
+            {
+                text: 'Seguidor ' + s.pcs[0].global_x.toString(),
+                style: 'h3',
+                alignment: 'center'
+            },
 
+            '\n',
 
+            {
+                image: `imgSeguidorCanvas${s.global_x}`,
+                width: 500
+            },
+
+            '\n',
+
+            {
+                columns: [
+
+                {
+                    width: '*',
+                    text: ''
+                }, {
+                    width: 'auto',
+                    table: {
+                        body: [
+                            table[0],
+                        ].concat(table[1])
+                    }
+                }, {
+                    width: '*',
+                    text: ''
+                }, ]
+            },
+
+            {
+                text: '',
+                pageBreak: 'after'
+            }
+        ];
+
+        allPagsAnexo.push(pagAnexo);
+}
+
+    return allPagsAnexo;
 }
 
 
 getDocDefinition(imagesSeguidores) {
-  const a = {
-    imgPortada: this.portadaImgBase64,
-    imagenIrradiancia: this.irradianciaImgBase64,
-    imgSuciedad: this.imgSuciedadBase64,
-    imgCurvaMae: this.imgCurvaMaeBase64,
-    imgFormulaMae: this.imgFormulaMaeBase64,
-  };
-  const imageList = Object.assign({}, a, imagesSeguidores);
+  const pages = this.getPagesPDF();
+  const anexo = this.getAnexo();
 
   return {
-    content: this.getPagesPDF(),
+    content: pages.concat(anexo),
 
-    images: imageList,
+    images: imagesSeguidores,
 
     footer: (currentPage, pageCount) => {
         return {

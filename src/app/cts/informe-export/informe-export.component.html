@@ -22,13 +22,13 @@
 <div *ngIf="generandoPDF else boton">
     <app-spinner></app-spinner>
     <div class="text-center">
-        <p>Generando PDF ...</p>
+        <p>Generando PDF ... {{progresoPDF}} % ...</p>
     </div>
 </div>
 <ng-template #boton>
     <div class="row">
         <div class="col text-center ">
-            <button type="button" class="button-generarPdf btn btn-primary btn-lg" (click)="downloadPDF6()"> Generar PDF </button>
+            <button type="button" class="button-generarPdf btn btn-primary btn-lg" (click)="downloadPDF()"> Generar PDF </button>
             <!-- <button *ngIf="isLocalhost" type="button" class="button-generarPdf btn btn-secondary btn-lg" (click)="downloadPDF5()"> Generar PDF 2 </button> -->
         </div>
     </div>
@@ -49,10 +49,11 @@
 
 
 
-<!-- <canvas style="display:none" id="portadaImg" width="600" height="250"></canvas>
+<canvas style="display:none" id="portadaImg" width="600" height="250"></canvas>
 <canvas style="display:none" id="irradianciaImg" width="500" height="250"></canvas>
 <canvas style="display:none" id="imgSuciedad" width="500" height="250"></canvas>
-<canvas style="display:none" id="imgCurvaMae" width="350" height="200"></canvas>
+
+<!-- <canvas style="display:none" id="imgCurvaMae" width="350" height="200"></canvas>
 <canvas style="display:none" id="imgLogo" width="500" height="250"></canvas>
 <canvas style="display:none" id="imgFormulaMae" width="350" height="150"></canvas> -->
 
@@ -65,3 +66,16 @@
         </div>
     </ng-container>
 </div>
+
+<ng-container *ngFor="let seguidor of filteredSeguidoresVistaPrevia">
+    <div class="row">
+        <div class="col">
+            <div class="hiddenCanvas">
+                <canvas id="imgSeguidorCanvasVP{{seguidor.global_x}}" width="640" height="512">
+                                                    </canvas>
+            </div>
+            <div class="img-seguidor" id="divSeguidorVP{{seguidor.global_x}}">
+            </div>
+        </div>
+    </div>
+</ng-container>
