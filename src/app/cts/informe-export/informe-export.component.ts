@@ -23,7 +23,7 @@ import { take } from 'rxjs/operators';
 import { MatCheckboxChange } from '@angular/material';
 
 import pdfMake from 'pdfmake/build/pdfmake.js';
-import  pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import { DatePipe, DecimalPipe } from '@angular/common';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -108,7 +108,7 @@ export class InformeExportComponent implements OnInit {
     this.url = GLOBAL.url;
     this.titulo = 'Vista de informe';
     this.tipoInforme = '1';
-    this.isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+    this.isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   }
 
   ngOnInit() {
@@ -139,71 +139,84 @@ export class InformeExportComponent implements OnInit {
     this.suciedadImg$ = this.storage.ref(`informes/${this.informe.id}/suciedad.jpg`).getDownloadURL();
     this.portadaImg$ = this.storage.ref(`informes/${this.informe.id}/portada.jpg`).getDownloadURL();
     this.logoImg$ = this.storage.ref(`informes/${this.informe.id}/logo.jpg`).getDownloadURL();
-    
-    this.irradianciaImg$.pipe(take(1)).subscribe( url => {
-      const htmlImage = new Image();
-      htmlImage.src = url;
-      htmlImage.crossOrigin = 'anonymous';
-      const canvas = document.getElementById('irradianciaImg')  as HTMLCanvasElement;
-      
-      htmlImage.onload = () => {
-        pica.resize(htmlImage, canvas).then( result => {
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(result, 0 , 0);
-          this.irradianciaImgBase64 = canvas.toDataURL('image/jpeg', 0.85)
-        });
-      }
-    });
 
-    this.portadaImg$.pipe(take(1)).subscribe( url => {
-      const htmlImage = new Image();
-      htmlImage.src = url;
-      htmlImage.crossOrigin = 'anonymous';
-      const canvas = document.getElementById('portadaImg')  as HTMLCanvasElement;
+    // this.irradianciaImg$.pipe(take(1)).subscribe( url => {
+    //   const htmlImage = new Image();
+    //   htmlImage.src = url;
+    //   htmlImage.crossOrigin = 'anonymous';
+    //   const canvas = document.getElementById('irradianciaImg')  as HTMLCanvasElement;
 
-      htmlImage.onload = () => {
-        pica.resize(htmlImage, canvas).then( result => {
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(result, 0 , 0);
-          this.portadaImgBase64 = canvas.toDataURL('image/jpeg', 0.85)
-        });
-      }
-    });
+    //   htmlImage.onload = () => {
 
-    this.suciedadImg$.pipe(take(1)).subscribe( url => {
-      const htmlImage = new Image();
-      htmlImage.src = url;
-      htmlImage.crossOrigin = 'anonymous';
-      const canvas = document.getElementById('imgSuciedad')  as HTMLCanvasElement;
+    //     pica.resize(htmlImage, canvas).then( result => {
+    //       result.crossOrigin = 'anonymous';
+    //       const ctx = canvas.getContext('2d');
+    //       ctx.drawImage(result, 0 , 0);
+    //       this.irradianciaImgBase64 = canvas.toDataURL('image/jpeg', 0.85);
+    //     });
+    //   };
+    // });
 
-      htmlImage.onload = () => {
-        pica.resize(htmlImage, canvas).then( result => {
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(result, 0 , 0);
-          this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', 0.85)
-        });
-      }
-    });
+    // this.portadaImg$.pipe(take(1)).subscribe( url => {
+    //   const htmlImage = new Image();
+    //   htmlImage.src = url;
+    //   htmlImage.crossOrigin = 'anonymous';
+    //   const canvas = document.getElementById('portadaImg')  as HTMLCanvasElement;
 
-    const imgCurvaMae = new Image();
-    imgCurvaMae.src = '../../../assets/images/maeCurva.png'
-    imgCurvaMae.crossOrigin = 'anonymous';
-    const canvas = document.getElementById('imgCurvaMae')  as HTMLCanvasElement;
-    
-    imgCurvaMae.onload = () => {
-      pica.resize(imgCurvaMae, canvas).then( result => {
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(result, 0 , 0);
-        this.imgCurvaMaeBase64 = canvas.toDataURL('image/jpeg', 0.85)
-      });
-    };
+    //   htmlImage.onload = () => {
+    //     pica.resize(htmlImage, canvas).then( result => {
+    //       result.crossOrigin = 'anonymous';
+    //       const ctx = canvas.getContext('2d');
+    //       ctx.drawImage(result, 0 , 0);
+    //       this.portadaImgBase64 = canvas.toDataURL('image/jpeg', 0.85);
+    //     });
+    //   };
+    // });
 
+    // this.suciedadImg$.pipe(take(1)).subscribe( url => {
+    //   const htmlImage = new Image();
+    //   htmlImage.src = url;
+    //   htmlImage.crossOrigin = 'anonymous';
+    //   const canvas = document.getElementById('imgSuciedad')  as HTMLCanvasElement;
 
+    //   htmlImage.onload = () => {
+    //     pica.resize(htmlImage, canvas).then( result => {
+    //       result.crossOrigin = 'anonymous';
+    //       const ctx = canvas.getContext('2d');
+    //       ctx.drawImage(result, 0 , 0);
+    //       this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', 0.85);
+    //     });
+    //   };
+    // });
 
+    // const imgCurvaMae = new Image();
+    // imgCurvaMae.src = '../../../assets/images/maeCurva.png'
+    // imgCurvaMae.crossOrigin = 'anonymous';
 
-    
+    // imgCurvaMae.onload = () => {
+    //   const canvas = document.getElementById('imgCurvaMae')  as HTMLCanvasElement;
+    //   pica.resize(imgCurvaMae, canvas).then( result => {
 
+    //     const ctx = canvas.getContext('2d');
+    //     ctx.drawImage(result, 0 , 0);
+    //     this.imgCurvaMaeBase64 = canvas.toDataURL('image/jpeg', 0.85)
+    //   });
+    // };
 
+    // const imgFormulaMae = new Image();
+    // imgFormulaMae.src = '../../../assets/images/formula_mae.png'
+    // imgFormulaMae.crossOrigin = 'anonymous';
+
+    // imgFormulaMae.onload = () => {
+    //   const canvas = document.getElementById('imgFormulaMae')  as HTMLCanvasElement;
+
+    //   pica.resize(imgFormulaMae, canvas).then( result => {
+
+    //     const ctx = canvas.getContext('2d');
+    //     ctx.drawImage(result, 0 , 0);
+    //     this.imgFormulaMaeBase64 = canvas.toDataURL('image/jpeg', 0.85)
+    //   });
+    // };
 
 
 
@@ -303,45 +316,70 @@ export class InformeExportComponent implements OnInit {
     return 0;
   }
 
-  private generateIntroPDF() {
-    const specialElementHandlers = {
-      'img': (element, renderer) => {
-          return false;
-      }
-  };
-    this.doc.fromHTML(
-      $('#newPdf').get(0),
-      15,
-      15,
-      {
-        'width': 170,
-        'elementHandlers': specialElementHandlers },
-      (cb) => { this.doc.save('intro.pdf') }
-    );
-    
-    this.generandoPDF = false;
-  }
+
 
   public downloadPDF6() {
     this.generandoPDF = true;
 
-    this.pcService.currentFilteredPcs$.pipe(
-      take(1)
-    )
-    .subscribe( filteredPcs => {
-      this.calcularInforme(filteredPcs);
 
-      const pdfDocGenerator = pdfMake.createPdf(this.getDocDefinition());
 
-      pdfDocGenerator.getDataUrl((dataUrl) => {
-          const iframe = document.createElement('iframe');
-          iframe.src = dataUrl;
-          iframe.setAttribute('style', 'position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;');
-          document.getElementById('vistaPrevia').appendChild(iframe);
-      });
-      this.generandoPDF = false;
+    const images = {};
+    this.countLoadedImages$.subscribe( globalX => {
+      console.log('globalX1', globalX);
+      if (globalX !== null) {
+        console.log('globalX2', globalX, 100 * this.countLoadedImages / this.countSeguidores, '%');
+
+        const canvas = $(`canvas[id="imgSeguidorCanvas${globalX}"]`)[0];
+        console.log('canvas', canvas);
+
+        const imageBase64 = canvas.toDataURL('image/jpeg', 0.85);
+        this.imageList[globalX.toString()] = imageBase64;
+        images[`imgSeguidorCanvas${globalX}`] = imageBase64;
+
+
+
+// Si todo va bien...
+        if (this.countLoadedImages === this.countSeguidores) {
+          this.pcService.currentFilteredPcs$.pipe(
+            take(1)
+          )
+          .subscribe( filteredPcs => {
+            this.calcularInforme(filteredPcs);
+
+            const pdfDocGenerator = pdfMake.createPdf(this.getDocDefinition(images));
+
+            pdfDocGenerator.getDataUrl((dataUrl) => {
+                const iframe = document.createElement('iframe');
+                iframe.src = dataUrl;
+                iframe.setAttribute('style', 'position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;');
+                document.getElementById('vistaPrevia').appendChild(iframe);
+            });
+            this.generandoPDF = false;
+          });
+
+
+          // pdfMake.createPdf(dd).download();
+          // this.generandoPDF = false;
+        }
+      }
+
     });
 
+
+   // Generar imagenes
+    if (this.tipoInforme === '2') {
+    this.countSeguidores = 0;
+    for (const seguidor of this.filteredSeguidores) {
+      this.setImgSeguidorCanvas(seguidor, false);
+      this.countSeguidores++;
+      // if ( count === 5 ) {
+      //   break;
+      // }
+      }
+    } else {
+    // TODO
+    this.generandoPDF = true;
+  }
   }
 
   public downloadPDF5() {
@@ -349,29 +387,26 @@ export class InformeExportComponent implements OnInit {
 
 
     this.generandoPDF = true;
-    let content_ = [];
+    const content2 = [];
 
-    this.countLoadedImages$.subscribe( global_x => {
-      console.log('glboal_x', global_x);
-      if (global_x !== null) {
-        console.log('global_x', global_x, 100 * this.countLoadedImages/this.countSeguidores, '%');
+    this.countLoadedImages$.subscribe( globalX => {
+      console.log('glboal_x', globalX);
+      if (globalX !== null) {
+        console.log('global_x', globalX, 100 * this.countLoadedImages / this.countSeguidores, '%');
 
-        const canvas = $(`canvas[id="imgSeguidorCanvas${global_x}"]`)[0];
-        
+        const canvas = $(`canvas[id="imgSeguidorCanvas${globalX}"]`)[0];
+
         const imageBase64 = canvas.toDataURL('image/jpeg', 0.85);
-        this.imageList[global_x.toString()] = imageBase64;
-        content_.push({ image: imageBase64, width: 500});
+        this.imageList[globalX.toString()] = imageBase64;
+        content2.push({ image: imageBase64, width: 500});
         // console.log('imageBase64', imageBase64 );
 
         // Añadir a dd
-
-
-
         if (this.countLoadedImages === this.countSeguidores) {
           const dd = {
-            content:content_,
+            content: content2,
             images: this.imageList
-          }
+          };
 
 
           pdfMake.createPdf(dd).download();
@@ -380,6 +415,7 @@ export class InformeExportComponent implements OnInit {
       }
 
     });
+
     // Generar imagenes
     if (this.tipoInforme === '2') {
       this.countSeguidores = 0;
@@ -393,34 +429,24 @@ export class InformeExportComponent implements OnInit {
     }
   }
 
-
-
-  public downloadPDF4() { // Intro
-    this.generandoPDF = true;
-    this.doc = new jsPDF();
-    this.doc.setFontSize(10);
-    this.generateIntroPDF();
-
- 
-  }
   public downloadPDF3() {
     this.generandoPDF = true;
     this.doc = new jsPDF();
     this.doc.setFontSize(10);
 
-    this.countLoadedImages$.subscribe( global_x => {
-      if (global_x !== null) {
-        const canvas = $(`canvas[id="imgSeguidorCanvas${global_x}"]`)[0];
-  
+    this.countLoadedImages$.subscribe( globalX => {
+      if (globalX !== null) {
+        const canvas = $(`canvas[id="imgSeguidorCanvas${globalX}"]`)[0];
+
         const imgData = canvas.toDataURL('image/png');
-        const table = $(`table[id="tableSeguidor${global_x}"]`)[0];
+        const table = $(`table[id="tableSeguidor${globalX}"]`)[0];
         this.doc.addImage(imgData, 'PNG', 10, 10);
         this.doc.autoTable({
           html: table,
           startY: 150,
         });
         this.doc.addPage();
-          
+
         if (this.countLoadedImages === this.countSeguidores) {
           this.doc.save('table.pdf');
           this.generandoPDF = false;
@@ -470,9 +496,7 @@ export class InformeExportComponent implements OnInit {
           this.doc.save('table.pdf');
           this.generandoPDF = false;
         }
-          
       });
-  
   }
 }
 
@@ -493,7 +517,6 @@ export class InformeExportComponent implements OnInit {
         // }
       }
     }
-  
     // Calcular informe
     this.pcService.currentFilteredPcs$.pipe(
       take(1)
@@ -525,7 +548,6 @@ export class InformeExportComponent implements OnInit {
 
   private setImgSeguidorCanvas(seguidor: SeguidorInterface, vistaPrevia: boolean = false) {
     const imagenTermica = new Image();
-    imagenTermica.crossOrigin = 'anonymous';
 
     const seguidorObs = this.storage.ref(`informes/${this.informe.id}/jpg/${seguidor.pcs[0].archivoPublico}`).getDownloadURL();
     seguidorObs
@@ -533,11 +555,13 @@ export class InformeExportComponent implements OnInit {
       .subscribe( url => {
         seguidor.pcs[0].downloadUrlString = url;
         imagenTermica.src = url;
+        imagenTermica.crossOrigin = 'anonymous';
         let canvas = new fabric.Canvas(`imgSeguidorCanvas${seguidor.global_x}`);
 
         if (vistaPrevia) {
           canvas = new fabric.Canvas(`imgSeguidorCanvasVP${seguidor.global_x}`);
         }
+
 
         imagenTermica.onload = () => {
           const fabricImage = new fabric.Image(imagenTermica, {
@@ -555,6 +579,7 @@ export class InformeExportComponent implements OnInit {
           // fabricImage.scale(1);
           canvas.add(fabricImage);
           this.drawAllPcsInCanvas(seguidor, canvas, vistaPrevia);
+          console.log('drawAllPcsInCanvas', canvas.toDataURL('image/jpeg', 0.85))
 
           if (!vistaPrevia) {
             this.countLoadedImages++;
@@ -571,8 +596,6 @@ export class InformeExportComponent implements OnInit {
               // originY: 'left'
             // }
         };
-        
-
       });
     }
 
@@ -583,7 +606,6 @@ export class InformeExportComponent implements OnInit {
     });
        // canvas.getElement().toBlob( (blob) => {
 
-      
     //   const urlCreator = window.URL;
     //   const imageUrl = urlCreator.createObjectURL(blob);
     //   const image = new Image();
@@ -649,6 +671,8 @@ export class InformeExportComponent implements OnInit {
     canvas.add(actObj2);
     canvas.add(textId);
     canvas.renderAll();
+
+    
   }
 
   private drawTriangle(pc: PcInterface, canvas: any) {
@@ -724,17 +748,17 @@ export class InformeExportComponent implements OnInit {
 
 
 getTablaCategoria() {
-  let array = [];
-  for (let i of this.numCategorias) {
-      if (this.countCategoria[i-1] > 0) {
+  const array = [];
+  for (const i of this.numCategorias) {
+      if (this.countCategoria[i - 1] > 0) {
           array.push(new Array(
 
               {
                   text: this.global.pcDescripcion[i]
               }, {
-                  text: this.countCategoria[i-1]
+                  text: this.countCategoria[i - 1]
               }, {
-                  text: this.decimalPipe.transform(this.countCategoria[i-1] / this.filteredPcs.length * 100, '1.0-1').toString() + ' %'
+                  text: this.decimalPipe.transform(this.countCategoria[i - 1] / this.filteredPcs.length * 100, '1.0-1').toString() + ' %'
               }));
       }
 
@@ -746,8 +770,8 @@ getTablaCategoria() {
 
 
 getTablaPosicion = function() {
-  let array = [];
-  let arrayHeader = [];
+  const array = [];
+  const arrayHeader = [];
   arrayHeader.push({});
 
   for (let i of this.arrayColumnas) {
@@ -761,13 +785,13 @@ getTablaPosicion = function() {
   array.push(arrayHeader);
 
   for (let j of this.arrayFilas) {
-      let arrayFila = [];
+      const arrayFila = [];
       arrayFila.push({
           text: j.toString(),
           style: 'tableHeader'
       });
       const countPosicionFila = this.countPosicion[j - 1];
-      for (let i of this.arrayColumnas) {
+      for (const i of this.arrayColumnas) {
 
           arrayFila.push({
                   text: countPosicionFila[i - 1].toString(),
@@ -777,13 +801,13 @@ getTablaPosicion = function() {
           );
 
 
-      };
+      }
 
       array.push(arrayFila);
-  };
+  }
 
   return array;
-}
+};
 
 
 
@@ -838,7 +862,7 @@ getPagesPDF() {
               text: `Fecha del vuelo: `,
               style: 'bold'
           },
-          this.datePipe.transform(this.informe.fecha * 1000, 'dd/mm/yyyy'),
+          this.datePipe.transform(this.informe.fecha * 1000, 'dd/MM/yyyy'),
       ],
       style: 'subtitulo',
       pageBreak: 'after'
@@ -916,14 +940,16 @@ getPagesPDF() {
                   bold: true
               },
               ': Esta es una inspección limitada para verificar que los módulos están funcionando, con requisitos reducidos para el personal. Este tipo de inspecciones se usan, por ejemplo, durante una puesta en marcha básica de una planta fotovoltaica.\n\n'
-          ]
+          ],
+          style: 'p'
       }, {
           text: [{
                   text: 'Inspección detallada',
                   bold: true
               },
               ': Requiere una comprensión más profunda de las anomalías térmicas. Puede ser utilizado para inspecciones periódicas de acuerdo con a la serie IEC 62446 y para solucionar problemas en sistemas con un bajo rendimiento. Se realizan mediciones de temperatura absoluta. Un experto autorizado en plantas fotovoltaicas, junto con exportos termógrafos, pueden llevar a cabo este tipo de inspecciones.'
-          ]
+          ],
+          style: 'p'
       }],
   },
 
@@ -938,7 +964,8 @@ getPagesPDF() {
   '\n',
 
   {
-      ul: [
+      ul: [{
+        text: [  
           'Medición absoluta de temperaturas: con un error menor de 2 ºC',
           'Medición de temperatura máxima, media y gradiente.',
           'Informe realizado por un experto en termografía infrarroja en conjunto con un experto en fotovoltaica.',
@@ -952,7 +979,11 @@ getPagesPDF() {
           'Trayectoria: que asegure el cumplimiento de la norma.',
           'Velocidad: 10 km/h máximo.',
       ],
-  },
+      style: 'p'
+  }],
+},
+
+'\n',
 
   {
       text: '\n\n'
@@ -1197,6 +1228,10 @@ getPagesPDF() {
     width: 500,
     alignment: 'center'
   },
+
+  '\n\n',
+
+
   {
       text: '1.4.2 Temperatura reflejada',
       style: 'h4'
@@ -1284,37 +1319,47 @@ getPagesPDF() {
 
   {
     image: 'imgFormulaMae',
-    width: 400,
+    width: 350,
     alignment: 'center'
   },
 
   {
-      text: 'Siendo N = Número de módulos; PR = Performance ratio; MAE = Módulos apagados equivalente calculados\n\n',
+      text: 'Siendo N = Número de módulos; PR = Performance ratio; MAE = Módulos apagados equivalente calculados',
       style: 'pieFoto'
   },
 
+  '\n\n',
+
   {
-      text: 'Por lo tanto, sabiendo el MAE sabremos cuánto PR estamos perdiendo debido a las incidencias encontradas.\n\n',
+      text: 'Por lo tanto, sabiendo el MAE sabremos cuánto PR estamos perdiendo debido a las incidencias encontradas.',
       style: 'p'
   },
 
+  '\n',
+
   {
-      text: 'El objetivo será obtener un MAE bajo, lo cual nos indicará un correcto mantenimiento de la planta.\n\n',
+      text: 'El objetivo será obtener un MAE bajo, lo cual nos indicará un correcto mantenimiento de la planta.',
       style: 'p'
   },
 
+  '\n',
+
   {
-      text: 'Teniendo en cuenta todas las plantas fotovoltaicas inspeccionadas por Solardrone, se puede hacer una clasificación estadística según el MAE. Según la siguiente tabla, podemos clasificar el mantenimiento de una planta en 3 tipos: muy bueno (por debajo de la media), correcto (en la media) y "mejorable" (por encima de la media):\n\n',
+      text: 'Teniendo en cuenta todas las plantas fotovoltaicas inspeccionadas por Solardrone, se puede hacer una clasificación estadística según el MAE. Según la siguiente tabla, podemos clasificar el mantenimiento de una planta en 3 tipos: muy bueno (por debajo de la media), correcto (en la media) y "mejorable" (por encima de la media):',
       style: 'p'
 
   },
+
+  '\n',
 
   // Imagen maeCurva
   {
     image: 'imgCurvaMae',
-    width: 400,
+    width: 350,
     alignment: 'center'
   },
+
+  '\n\n',
 
   {
       columns: [
@@ -1392,7 +1437,8 @@ getPagesPDF() {
                       style: ['coa1', 'bold']
                   },
                   ': hacemos seguimiento, pero no hay que actuar.',
-              ]
+              ],
+              style: 'p'
           }, {
               text: [
 
@@ -1401,7 +1447,8 @@ getPagesPDF() {
                       style: ['coa2', 'bold']
                   },
                   ': ver la causa y, si es necesario, arreglar en un periodo razonable.',
-              ]
+              ],
+              style: 'p'
           }, {
               text: [
 
@@ -1410,7 +1457,8 @@ getPagesPDF() {
                       style: ['coa3', 'bold']
                   },
                   ': próxima interrupción de la operación normal del módulo, detectar la causa y rectificar en un periodo razonable.',
-              ]
+              ],
+              style: 'p'
           },
 
       ],
@@ -1624,20 +1672,27 @@ getPagesPDF() {
 ]
 };
 
+getAnexo1() {
 
-getDocDefinition() {
+
+}
+
+
+getDocDefinition(imagesSeguidores) {
+  const a = {
+    imgPortada: this.portadaImgBase64,
+    imagenIrradiancia: this.irradianciaImgBase64,
+    imgSuciedad: this.imgSuciedadBase64,
+    imgCurvaMae: this.imgCurvaMaeBase64,
+    imgFormulaMae: this.imgFormulaMaeBase64,
+  };
+  const imageList = Object.assign({}, a, imagesSeguidores);
 
   return {
     content: this.getPagesPDF(),
-  
-    images: {
-      imgPortada: this.portadaImgBase64,
-      imagenIrradiancia: this.irradianciaImgBase64,
-      imgSuciedad: this.imgSuciedadBase64,
-      imgCurvaMae: this.imgCurvaMaeBase64,
-      imgFormulaMae: this.imgFormulaMaeBase64,
-    },
-  
+
+    images: imageList,
+
     footer: (currentPage, pageCount) => {
         return {
             table: {
@@ -1672,19 +1727,19 @@ getDocDefinition() {
         h5: {
             fontSize: 13,
             bold: false,
-            decoration: 'underline'
+            decoration: 'underline',
+            margin: [30, 0, 30, 0]
         },
         p: {
-            alignment: 'justify'
-  
+            alignment: 'justify',
+            margin: [30, 0, 30, 0]
         },
         tableHeader: {
             alignment: 'center',
             bold: true,
             fontSize: 13,
-  
         },
-  
+
         pieFoto: {
             alignment: 'center',
             fontSize: 11,
@@ -1692,19 +1747,19 @@ getDocDefinition() {
             color: 'gray'
         },
         subtitulo: {
-          alingment: 'right',
+          alignment: 'right',
           fontSize: 15,
         },
-  
+
         table: {
             alignment: 'center'
         },
-  
+
         param: {
             alignment: 'center',
             bold: true,
             decoration: 'underline'
-  
+
         },
         tableCell: {
             alignment: 'center'

@@ -28,9 +28,8 @@
 <ng-template #boton>
     <div class="row">
         <div class="col text-center ">
-            <button *ngIf="tipoInforme === '1'" type="button" class="button-generarPdf btn btn-primary btn-lg" (click)="downloadPDF6()"> Generar PDF </button>
+            <button type="button" class="button-generarPdf btn btn-primary btn-lg" (click)="downloadPDF6()"> Generar PDF </button>
             <!-- <button *ngIf="isLocalhost" type="button" class="button-generarPdf btn btn-secondary btn-lg" (click)="downloadPDF5()"> Generar PDF 2 </button> -->
-            <button *ngIf="tipoInforme === '2'" type="button" class="button-generarPdf btn btn-secondary btn-lg" disabled> Generar PDF (en construccion) </button>
         </div>
     </div>
 </ng-template>
@@ -49,9 +48,20 @@
 </div>
 
 
-<canvas style="display:none" id="portadaImg" width="600" height="250"></canvas>
+
+<!-- <canvas style="display:none" id="portadaImg" width="600" height="250"></canvas>
 <canvas style="display:none" id="irradianciaImg" width="500" height="250"></canvas>
 <canvas style="display:none" id="imgSuciedad" width="500" height="250"></canvas>
-<canvas style="display:none" id="imgCurvaMae" width="500" height="250"></canvas>
+<canvas style="display:none" id="imgCurvaMae" width="350" height="200"></canvas>
 <canvas style="display:none" id="imgLogo" width="500" height="250"></canvas>
-<canvas style="display:none" id="imgFormulaMae" width="500" height="250"></canvas>
+<canvas style="display:none" id="imgFormulaMae" width="350" height="150"></canvas> -->
+
+
+<div style="display:none" [ngSwitch]="tipoInforme">
+    <ng-container *ngFor="let seguidor of filteredSeguidores$ | async">
+        <div class="hiddenCanvas">
+            <canvas id="imgSeguidorCanvas{{seguidor.global_x}}" width="640" height="512">
+                                                </canvas>
+        </div>
+    </ng-container>
+</div>
