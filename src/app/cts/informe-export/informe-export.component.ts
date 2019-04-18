@@ -14,8 +14,7 @@ import Pica from 'pica';
 const pica = Pica();
 import * as jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import html2canvas from 'html2canvas';
-import html2pdf from 'html2pdf.js';
+
 
 import { AngularFireStorage } from '@angular/fire/storage';
 import { Observable, BehaviorSubject } from 'rxjs';
@@ -83,11 +82,12 @@ export class InformeExportComponent implements OnInit {
   public doc: jsPDF;
   public imageList = {};
   public pages;
-  public irradianciaImgBase64: string;
+  public imgIrradianciaBase64: string;
   public imgPortadaBase64: string;
   public imgSuciedadBase64: string;
   public imgFormulaMaeBase64: string;
   public imgCurvaMaeBase64: string;
+  public imgLogoBase64: string;
   public progresoPDF: string;
 
   private countLoadedImages$ = new BehaviorSubject(null);
@@ -109,11 +109,12 @@ export class InformeExportComponent implements OnInit {
 
     this.url = GLOBAL.url;
     this.titulo = 'Vista de informe';
-    this.tipoInforme = '1';
+    this.tipoInforme = '2';
     this.isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   }
 
   ngOnInit() {
+    this.progresoPDF = '0';
 
     this.filteredSeguidores$ = this.pcService.filteredSeguidores$;
     this.filteredPcs$ = this.pcService.currentFilteredPcs$;
@@ -146,22 +147,30 @@ export class InformeExportComponent implements OnInit {
     this.portadaImg$ = this.storage.ref(`informes/${this.informe.id}/portada.jpg`).getDownloadURL();
     this.logoImg$ = this.storage.ref(`informes/${this.informe.id}/logo.jpg`).getDownloadURL();
 
-    // this.irradianciaImg$.pipe(take(1)).subscribe( url => {
-    //   const htmlImage = new Image();
-    //   htmlImage.src = url;
-    //   htmlImage.crossOrigin = 'anonymous';
-    //   const canvas = document.getElementById('irradianciaImg')  as HTMLCanvasElement;
 
-    //   htmlImage.onload = () => {
+    this.irradianciaImg$.pipe(take(1)).subscribe( url => {
+        fabric.util.loadImage(url, (img) => {
+            const canvas = new fabric.Canvas('irradianciaImg');
+            const scale =  canvas.width / img.width;
+            const fabricImage = new fabric.Image(img, {
+              left: 0,
+              top: 0,
+              angle: 0,
+              opacity: 1,
+              scaleX: scale,
+              scaleY: scale,
+              draggable: false,
+              lockMovementX: true,
+              lockMovementY: true
+            },
+            );
+            // fabricImage.scale(1);
 
-    //     pica.resize(htmlImage, canvas).then( result => {
-    //       result.crossOrigin = 'anonymous';
-    //       const ctx = canvas.getContext('2d');
-    //       ctx.drawImage(result, 0 , 0);
-    //       this.irradianciaImgBase64 = canvas.toDataURL('image/jpeg', 0.85);
-    //     });
-    //   };
-    // });
+            canvas.add(fabricImage);
+            this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', 0.95);
+
+        }, null, { crossOrigin: 'anonymous'});
+    });
 
 
     this.portadaImg$.pipe(take(1)).subscribe( url => {
@@ -181,12 +190,33 @@ export class InformeExportComponent implements OnInit {
         },
         );
         // fabricImage.scale(1);
-
+        fabricImage.scaleToWidth(canvas.getWidth());
         canvas.add(fabricImage);
-        this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', 0.85);
+        this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', 0.95);
 
     }, null, { crossOrigin: 'anonymous'});
     });
+
+    // this.logoImg$.pipe(take(1)).subscribe( url => {
+    //     fabric.util.loadImage(url, (img) => {
+    //       const canvas = new fabric.Canvas('imgLogo');
+    //       const fabricImage = new fabric.Image(img, {
+    //         left: 0,
+    //         top: 0,
+    //         angle: 0,
+    //         opacity: 1,
+    //         draggable: false,
+    //         lockMovementX: true,
+    //         lockMovementY: true
+    //       },
+    //       );
+    //       // fabricImage.scale(1);
+    //       fabricImage.scaleToWidth(canvas.getWidth());
+    //       canvas.add(fabricImage);
+    //       this.imgLogoBase64 = canvas.toDataURL('image/jpeg', 0.95);
+
+    //   }, null, { crossOrigin: 'anonymous'});
+    //   });
 
     this.suciedadImg$.pipe(take(1)).subscribe( url => {
       fabric.util.loadImage(url, (img) => {
@@ -206,40 +236,53 @@ export class InformeExportComponent implements OnInit {
         );
 
           canvas.add(fabricImage);
-          this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', 0.85);
+          this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', 0.95);
 
     }, null, { crossOrigin: 'anonymous'});
     });
 
-    // const imgCurvaMae = new Image();
-    // imgCurvaMae.src = '../../../assets/images/maeCurva.png'
-    // imgCurvaMae.crossOrigin = 'anonymous';
+    fabric.util.loadImage('../../../assets/images/maeCurva.png', (img) => {
+        const canvas = new fabric.Canvas('imgCurvaMae');
+        const scale =  canvas.width / img.width;
+        const fabricImage = new fabric.Image(img, {
+        left: 0,
+        top: 0,
+        angle: 0,
+        opacity: 1,
+        scaleX: scale,
+        scaleY: scale,
+        draggable: false,
+        lockMovementX: true,
+        lockMovementY: true
+      },
+      );
 
-    // imgCurvaMae.onload = () => {
-    //   const canvas = document.getElementById('imgCurvaMae')  as HTMLCanvasElement;
-    //   pica.resize(imgCurvaMae, canvas).then( result => {
+        canvas.add(fabricImage);
+        this.imgCurvaMaeBase64 = canvas.toDataURL('image/jpeg', 0.95);
 
-    //     const ctx = canvas.getContext('2d');
-    //     ctx.drawImage(result, 0 , 0);
-    //     this.imgCurvaMaeBase64 = canvas.toDataURL('image/jpeg', 0.85)
-    //   });
-    // };
+      }, null, { crossOrigin: 'anonymous'});
 
-    // const imgFormulaMae = new Image();
-    // imgFormulaMae.src = '../../../assets/images/formula_mae.png'
-    // imgFormulaMae.crossOrigin = 'anonymous';
 
-    // imgFormulaMae.onload = () => {
-    //   const canvas = document.getElementById('imgFormulaMae')  as HTMLCanvasElement;
+    fabric.util.loadImage('../../../assets/images/formula_mae.png', (img) => {
+        const canvas = new fabric.Canvas('imgFormulaMae');
+        const scale =  canvas.width / img.width;
+        const fabricImage = new fabric.Image(img, {
+        left: 0,
+        top: 0,
+        angle: 0,
+        opacity: 1,
+        scaleX: scale,
+        scaleY: scale,
+        draggable: false,
+        lockMovementX: true,
+        lockMovementY: true
+      },
+      );
 
-    //   pica.resize(imgFormulaMae, canvas).then( result => {
+        canvas.add(fabricImage);
+        this.imgFormulaMaeBase64 = canvas.toDataURL('image/jpeg', 0.95);
 
-    //     const ctx = canvas.getContext('2d');
-    //     ctx.drawImage(result, 0 , 0);
-    //     this.imgFormulaMaeBase64 = canvas.toDataURL('image/jpeg', 0.85)
-    //   });
-    // };
-
+      }, null, { crossOrigin: 'anonymous'});
 
 
 
@@ -346,9 +389,9 @@ export class InformeExportComponent implements OnInit {
     const imageListBase64 = {};
     this.countLoadedImages$.subscribe( globalX => {
       if (globalX !== null) {
-        this.progresoPDF = this.decimalPipe.transform(100 * this.countLoadedImages / this.countSeguidores, '1.0-0');
         const canvas = $(`canvas[id="imgSeguidorCanvas${globalX}"]`)[0] as HTMLCanvasElement;
-        imageListBase64[`imgSeguidorCanvas${globalX}`] = canvas.toDataURL('image/jpeg', 0.85);
+        imageListBase64[`imgSeguidorCanvas${globalX}`] = canvas.toDataURL('image/jpeg', 1);
+        this.progresoPDF = this.decimalPipe.transform(100 * this.countLoadedImages / this.countSeguidores, '1.0-0');
 
         // Si todo va bien...
         if (this.countLoadedImages === this.countSeguidores) {
@@ -358,7 +401,7 @@ export class InformeExportComponent implements OnInit {
           .subscribe( filteredPcs => {
             this.calcularInforme(filteredPcs);
 
-            console.log('100%', imageListBase64);
+
             const pdfDocGenerator = pdfMake.createPdf(this.getDocDefinition(imageListBase64));
 
             pdfDocGenerator.download();
@@ -384,6 +427,7 @@ export class InformeExportComponent implements OnInit {
     if (this.tipoInforme === '2') {
     this.countSeguidores = 0;
     for (const seguidor of this.filteredSeguidores) {
+
       this.setImgSeguidorCanvas(seguidor, false);
       this.countSeguidores++;
 
@@ -616,7 +660,7 @@ getTablaPosicion = function() {
 
       arrayHeader.push({
           text: i.toString(),
-          style: 'tableHeader'
+          style: 'tableHeaderRed'
       });
 
   }
@@ -627,7 +671,7 @@ getTablaPosicion = function() {
       const arrayFila = [];
       arrayFila.push({
           text: j.toString(),
-          style: 'tableHeader'
+          style: 'tableHeaderRed'
       });
       const countPosicionFila = this.countPosicion[j - 1];
       for (const i of this.arrayColumnas) {
@@ -684,7 +728,7 @@ getPagesPDF() {
     alignment: 'center'
   },
 
-  '\n\n',
+  '\n',
 
   {
       text: [{
@@ -706,6 +750,13 @@ getPagesPDF() {
       style: 'subtitulo',
       pageBreak: 'after'
   },
+
+//   {
+//     image: this.imgLogoBase64,
+//     height: 350,
+//     alignment: 'center',
+//     pageBreak: 'after'
+//   },
 
   {
       text: '1. Introducción',
@@ -885,7 +936,7 @@ getPagesPDF() {
                   body: [
                       [{
                           text: 'Vehículo aéreo no tripulado',
-                          style: 'tableHeader',
+                          style: 'tableHeaderRed',
                           colSpan: 2,
                           alignment: 'center'
                       }, {}],
@@ -910,7 +961,7 @@ getPagesPDF() {
 
                       [{
                           text: 'Datos del vuelo',
-                          style: 'tableHeader',
+                          style: 'tableHeaderRed',
                           colSpan: 2,
                           alignment: 'center'
                       }, {}],
@@ -947,12 +998,12 @@ getPagesPDF() {
                           text: 'GSD visual',
                           style: 'tableLeft'
                       }, {
-                          text: `${this.informe.gsd / 0.16 } cm/pixel`
+                          text: `${this.informe.gsd * 0.16 } cm/pixel`
                       }],
 
                       [{
                           text: 'Datos meteorológicos',
-                          style: 'tableHeader',
+                          style: 'tableHeaderRed',
                           colSpan: 2,
                           alignment: 'center'
                       }, {}],
@@ -1008,11 +1059,11 @@ getPagesPDF() {
 
   '\n',
 
-  // {
-  //   image: 'imagenIrradiancia',
-  //   width: 500,
-  //   alignment: 'center'
-  // },
+  {
+    image: this.imgIrradianciaBase64,
+    width: 500,
+    alignment: 'center'
+  },
 
   '\n\n',
 
@@ -1156,11 +1207,11 @@ getPagesPDF() {
       style: 'p'
   },
 
-  // {
-  //   image: 'imgFormulaMae',
-  //   width: 350,
-  //   alignment: 'center'
-  // },
+  {
+    image: this.imgFormulaMaeBase64,
+    width: 350,
+    alignment: 'center'
+  },
 
   {
       text: 'Siendo N = Número de módulos; PR = Performance ratio; MAE = Módulos apagados equivalente calculados',
@@ -1192,11 +1243,11 @@ getPagesPDF() {
   '\n',
 
   // Imagen maeCurva
-  // {
-  //   image: 'imgCurvaMae',
-  //   width: 350,
-  //   alignment: 'center'
-  // },
+  {
+    image: this.imgCurvaMaeBase64,
+    width: 350,
+    alignment: 'center'
+  },
 
   '\n\n',
 
@@ -1384,18 +1435,18 @@ getPagesPDF() {
                   body: [
                       [{
                               text: 'Categoría',
-                              style: 'tableHeader',
+                              style: 'tableHeaderRed',
 
                           },
 
                           {
                               text: 'Cantidad',
-                              style: 'tableHeader',
+                              style: 'tableHeaderRed',
                           },
 
                           {
                               text: 'Porcentaje %',
-                              style: 'tableHeader',
+                              style: 'tableHeaderRed',
                           }
                       ]
                   ].concat(this.getTablaCategoria()).concat(
@@ -1514,7 +1565,7 @@ getPaginaSeguidor(seguidor) {
     for (const c of this.currentFilteredColumnas) {
         cabecera.push({
             text: c.descripcion,
-            style: 'tableHeader'
+            style: 'tableHeaderRed'
         });
     }
 
@@ -1523,22 +1574,32 @@ getPaginaSeguidor(seguidor) {
     for (const pc of seguidor.pcs) {
         const row = [];
         for (const c of this.currentFilteredColumnas) {
-            row.push(
+            if ( c.nombre === 'tipo' ) {
+                row.push(
                 {
-                    text: pc[c.nombre],
+                    text: this.pcDescripcion[pc[c.nombre]],
                     style: 'tableCell'
                 });
+            } else {
+                row.push(
+                    {
+                        text: pc[c.nombre],
+                        style: 'tableCell'
+                    });
+            }
         }
         body.push(row);
     }
-    console.log('cabecera', cabecera);
-    console.log('concat', cabecera.concat(body));
     return [cabecera, body];
 }
 
 
 getAnexo() {
     const allPagsAnexo = [];
+    // tslint:disable-next-line:max-line-length
+    const pag1Anexo = { text: '\n\n\n\n\n\n\n\n\n\n\n\n\n\n Anexo I: Listado de anomalías térmicas', style: 'h1', alignment: 'center', pageBreak: 'after'}
+
+    allPagsAnexo.push(pag1Anexo);
     for (const s of this.filteredSeguidores) {
         const table = this.getPaginaSeguidor(s);
 
@@ -1546,7 +1607,7 @@ getAnexo() {
 
             {
                 text: 'Seguidor ' + s.pcs[0].global_x.toString(),
-                style: 'h3',
+                style: 'h2',
                 alignment: 'center'
             },
 
@@ -1554,7 +1615,101 @@ getAnexo() {
 
             {
                 image: `imgSeguidorCanvas${s.global_x}`,
-                width: 500
+                width: 500,
+                alignment: 'center'
+            },
+
+            '\n',
+
+            {
+                columns: [
+
+                    {
+                        width: '*',
+                        text: ''
+                    },
+
+                    {
+                        width: 'auto',
+                        table: {
+                            body: [
+                                [{
+                                    text: 'Hora de captura',
+                                    style: 'tableHeaderBlue',
+
+                                },
+
+                                {
+                                    text: 'Irradiancia (W/m2)',
+                                    style: 'tableHeaderBlue',
+
+                                },
+
+                                {
+                                    text: 'Temperatura ambiente (ºC)',
+                                    style: 'tableHeaderBlue',
+
+                                },
+
+                                {
+                                    text: 'Viento',
+                                    style: 'tableHeaderBlue',
+
+                                },
+
+                                {
+                                    text: 'Emisividad',
+                                    style: 'tableHeaderBlue',
+
+                                },
+
+                                {
+                                    text: 'Temperatura reflejada (ºC)',
+                                    style: 'tableHeaderBlue',
+
+                                },
+
+                            ],
+                                [{
+                                    text: this.datePipe.transform(s.pcs[0].datetime, 'HH:mm:ss'),
+                                    style: 'tableCell'
+                                },
+
+                                {
+                                    text: s.pcs[0].irradiancia,
+                                    style: 'tableCell'
+                                },
+                                {
+                                    text: s.pcs[0].temperaturaAire,
+                                    style: 'tableCell'
+                                },
+
+                                {
+                                    text: s.pcs[0].viento,
+                                    style: 'tableCell'
+                                },
+
+                                {
+                                    text: s.pcs[0].emisividad,
+                                    style: 'tableCell'
+                                },
+
+                                {
+                                    text: s.pcs[0].temperaturaReflejada,
+                                    style: 'tableCell'
+                                }
+                            ],
+
+                            ]
+                        }
+                    },
+
+                    {
+                        width: '*',
+                        text: ''
+                    },
+                ]
+
             },
 
             '\n',
@@ -1641,6 +1796,20 @@ getDocDefinition(imagesSeguidores) {
             alignment: 'justify',
             margin: [30, 0, 30, 0]
         },
+        tableHeaderRed: {
+            alignment: 'center',
+            bold: true,
+            fontSize: 13,
+            fillColor: '#f46842'
+        },
+
+        tableHeaderBlue: {
+            alignment: 'center',
+            bold: true,
+            fontSize: 13,
+            fillColor: '#4cb6c9'
+        },
+
         tableHeader: {
             alignment: 'center',
             bold: true,
@@ -1694,6 +1863,10 @@ getDocDefinition(imagesSeguidores) {
         },
         coa3: {
             color: 'red'
+        },
+        tableLeft: {
+            bold: true,
+            alignment: 'right'
         }
     }
   };

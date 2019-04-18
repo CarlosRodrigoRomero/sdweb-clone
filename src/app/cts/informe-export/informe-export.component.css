@@ -39,9 +39,10 @@ h5 {
     overflow: auto;
 }
 
-.columnas-group {
+.columna-group {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap-reverse;
+    justify-content: center;
 }
 
 .columna-check {

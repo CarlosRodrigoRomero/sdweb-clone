@@ -1,4 +1,4 @@
-<div class="row">
+<div *ngIf='false' class="row">
     <div class="col text-center">
         <mat-button-toggle-group [(ngModel)]="tipoInforme" name="tipoInforme" aria-label="tipo informe">
             <mat-button-toggle (click)="onClickTipoInforme()" checked="tipoInforme === '1'" value="1">Tipo 1</mat-button-toggle>
@@ -11,6 +11,7 @@
 <mat-card class="col-columnas">
     <mat-card-content>
         <h3 class="text-center"> Columnas en el informe </h3>
+        <hr>
         <div class="columna-group">
             <mat-checkbox class="columna-check" *ngFor="let col of pcColumnas" [checked]=true (change)="onCheckBoxColumnaChange($event)" value="{{col.nombre}}">
                 <span class="columnas-text">{{col.descripcion}} </span>
@@ -29,18 +30,17 @@
     <div class="row">
         <div class="col text-center ">
             <button type="button" class="button-generarPdf btn btn-primary btn-lg" (click)="downloadPDF()"> Generar PDF </button>
-            <!-- <button *ngIf="isLocalhost" type="button" class="button-generarPdf btn btn-secondary btn-lg" (click)="downloadPDF5()"> Generar PDF 2 </button> -->
         </div>
     </div>
 </ng-template>
 
-<div class="row">
+<!-- <div class="row">
     <div class="col">
         <h2>Vista previa</h2>
 
 
     </div>
-</div>
+</div> -->
 
 
 <div style='left: 20px; top: 50px; bottom: 0; overflow: auto; width: 600px' id="vistaPrevia">
@@ -49,13 +49,13 @@
 
 
 
-<canvas style="display:none" id="portadaImg" width="600" height="250"></canvas>
-<canvas style="display:none" id="irradianciaImg" width="500" height="250"></canvas>
+<canvas style="display:none" id="portadaImg" width="600" height="300"></canvas>
+<canvas style="display:none" id="irradianciaImg" width="400" height="250"></canvas>
 <canvas style="display:none" id="imgSuciedad" width="500" height="250"></canvas>
 
-<!-- <canvas style="display:none" id="imgCurvaMae" width="350" height="200"></canvas>
-<canvas style="display:none" id="imgLogo" width="500" height="250"></canvas>
-<canvas style="display:none" id="imgFormulaMae" width="350" height="150"></canvas> -->
+<canvas style="display:none" id="imgCurvaMae" width="450" height="410"></canvas>
+<!-- <canvas style="display:none" id="imgLogo" width="300"></canvas> -->
+<canvas style="display:none" id="imgFormulaMae" width="350" height="150"></canvas>
 
 
 <div style="display:none" [ngSwitch]="tipoInforme">
