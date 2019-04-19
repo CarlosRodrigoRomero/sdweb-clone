@@ -35,7 +35,6 @@
         "jquery": "^3.3.1",
         "mapbox": "^1.0.0-beta10",
         "ng2-charts": "^1.6.0",
-        // "ol": "^5.3.1",
         "pdfmake": "^0.1.54",
         "pica": "^5.0.0",
         "popper.js": "^1.14.7",
@@ -47,7 +46,7 @@
     },
     "devDependencies": {
         "@angular-devkit/build-angular": "~0.13.0",
-        "@angular/cli": "~7.3.4",
+        "@angular/cli": "~7.3.8",
         "@angular/compiler-cli": "~7.2.0",
         "@angular/language-service": "~7.2.0",
         "@types/jasmine": "~2.8.8",
