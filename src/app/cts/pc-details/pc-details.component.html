@@ -1,10 +1,9 @@
 <div class="row">
     <div class="col-6">
 
-        <div class="imagen-termica-div">
+        <div (click)="onClickVerDetalles(pc)" class="imagen-termica-div">
             <canvas id={{pc.id}} width="{{canvasWidth}}" height="{{canvasHeight}}">
       </canvas>
-            <!-- <span class="imagen-termica-tooltip text-center" id='tooltip_{{pc.id}}'>{{tooltipTemp}} ºC</span> -->
         </div>
         <div class="pc-details-derecha-item">
             <div class="pc-details-derecha-icon">
