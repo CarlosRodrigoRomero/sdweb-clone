@@ -17,22 +17,26 @@
                 <span class="columnas-text">{{col.descripcion}} </span>
             </mat-checkbox>
         </div>
+        
+        <div *ngIf="generandoPDF else boton">
+            <app-spinner></app-spinner>
+            <div class="text-center">
+                <p>Generando PDF ... {{progresoPDF}} % ...</p>
+            </div>
+        </div>
+        <ng-template #boton>
+            <div class="row">
+                <div class="col text-center ">
+                    <button type="button" class="button-generarPdf btn btn-primary btn-lg" (click)="downloadPDF()"> Generar PDF </button>
+                </div>
+            </div>
+        </ng-template>
+
+
     </mat-card-content>
 </mat-card>
 
-<div *ngIf="generandoPDF else boton">
-    <app-spinner></app-spinner>
-    <div class="text-center">
-        <p>Generando PDF ... {{progresoPDF}} % ...</p>
-    </div>
-</div>
-<ng-template #boton>
-    <div class="row">
-        <div class="col text-center ">
-            <button type="button" class="button-generarPdf btn btn-primary btn-lg" (click)="downloadPDF()"> Generar PDF </button>
-        </div>
-    </div>
-</ng-template>
+
 
 <!-- <div class="row">
     <div class="col">
