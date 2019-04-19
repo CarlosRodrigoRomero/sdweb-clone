@@ -12,8 +12,6 @@ declare let fabric;
 
 import Pica from 'pica';
 const pica = Pica();
-import * as jsPDF from 'jspdf';
-import 'jspdf-autotable';
 
 
 import { AngularFireStorage } from '@angular/fire/storage';
@@ -79,7 +77,6 @@ export class InformeExportComponent implements OnInit {
   public countSeguidores: number;
   public generandoPDF = false;
   public isLocalhost: boolean;
-  public doc: jsPDF;
   public imageList = {};
   public pages;
   public imgIrradianciaBase64: string;
