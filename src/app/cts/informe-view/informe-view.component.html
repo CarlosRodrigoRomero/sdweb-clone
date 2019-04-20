@@ -1,158 +1,244 @@
 <ng-template #loading>
-    <div class="cargando text-center">
-        <app-spinner></app-spinner>
-    </div>
+  <div class="cargando text-center">
+    <app-spinner></app-spinner>
+  </div>
 </ng-template>
 
-<div *ngIf="isLoaded1 && isLoaded2 && isLoaded3 else loading">
-
-    <div class="container">
-        <div class="header-informe">
-            <div class="row">
-                <!-- Datos de la planta y del tiempo -->
-                <div class="col-sm-12 col-md-6">
-                    <div class="row">
-                        <div class="col-12">
-                            <span class="text-light titulo-informe">{{planta?.nombre}}</span>
-                            <span class="text-light subtitulo-informe">{{planta?.potencia}} MW / {{planta?.tipo}}</span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 datos-meteo">
-                            <div class="col-2 col-datos-meteo">
-                                <i class="fas fa-sun"></i>
-                            </div>
-                            <div class="datos-meteo-texto">
-                                <span class="text-light datos-meteo-numero"> > {{irradianciaMinima | number: '1.0-0'}} W/m<sup>2</sup></span>
-                                <span class="text-light">Irradiancia</span>
-                            </div>
-                        </div>
-                        <div class="col-12 datos-meteo">
-                            <div class="col-2 col-datos-meteo">
-                                <i class="fas fa-cloud"></i>
-                            </div>
-                            <div class="datos-meteo-texto">
-                                <span class="text-light datos-meteo-numero">{{informe?.nubosidad}} %</span>
-                                <span class="text-light">Nubosidad</span>
-                            </div>
-                        </div>
-                        <div class="col-12 datos-meteo">
-                            <div class="col-2 col-datos-meteo">
-                                <i class="fas fa-chess-board"></i>
-                            </div>
-                            <div class="datos-meteo-texto">
-                                <span class="text-light datos-meteo-numero">{{informe?.gsd}} cm/pixel</span>
-                                <span class="text-light">GSD (ground sample distance)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Datos de la inspeccion -->
-                <div class="col-6 header-derecha">
-                    <div class="text-right">
-                        <span class="text-light">Vuelo realizado el {{informe.fecha * 1000 | date:'dd/MM/yyyy'}}</span>
-                        <span class="text-light"> (de {{informe?.hora_inicio}} a {{informe?.hora_fin}})</span>
-                    </div>
-                    <div class="header-derecha-datos">
-                        <div class="header-derecha-datos-donut">
-
-                            <p-chart type="doughnut" [data]="dataSeveridad" [options]="chartOptions"></p-chart>
-                        </div>
-                        <div class="header-derecha-datos-mae">
-                            <div class="div-mae-texto text-center">
-                                <span class="mae-texto text-light">MAE</span>
-                            </div>
-                            <div class="div-mae-1">
-                                <div class="div-mae-2">
-                                    <span class="text-light mae-porcentaje">{{informe?.mae | number: '1.2'}}</span>
-                                </div>
-                                <span class="text-light mae-pct-simbolo">%</span>
-                            </div>
-                            <div class="div-mae-3">
-                                <h4 class="text-center text-light">{{calificacionMae[informe?.mae]}}</h4>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-            </div>
-
-        </div>
-
-
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Listado</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Mapa</a>
-            </li>
-            <li *ngIf="planta.tipo !== '2 ejes'" class="nav-item">
-                <a class="nav-link" id="ortophoto-tab" data-toggle="tab" href="#ortophoto" role="tab" aria-controls="ortophoto" aria-selected="false">Mapa térmico</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="export-tab" data-toggle="tab" href="#export" role="tab" aria-controls="export" aria-selected="false">Generar PDF</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" style="color: tomato" href="{{ informeDownloadUrl | async }}" target="_blank">Descargar informe</a>
-            </li>
-
-        </ul>
-
-
-        <div class="row">
+<div *ngIf="isLoaded1 && isLoaded2 && isLoaded3; else loading">
+  <div class="container">
+    <div class="header-informe">
+      <div class="row">
+        <!-- Datos de la planta y del tiempo -->
+        <div class="col-sm-12 col-md-6">
+          <div class="row">
             <div class="col-12">
-                <div class="tab-content" id="myTabContent">
-
-                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        <div class="row">
-                            <div class="col-3 col-filtros">
-                                <app-pc-filter [allPcs]="allPcs"></app-pc-filter>
-                            </div>
-                            <div class="col-9">
-                                <app-pc-list [allPcs]="allPcs" [planta]="planta" [informe]="informe"></app-pc-list>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                        <div class="row">
-
-                            <div class="col-12 div-pc-map-container">
-                                <app-pc-filter class="pc-filter-over-map" [allPcs]="allPcs"></app-pc-filter>
-
-                                <app-pc-map class="pc-map" [informe]="informe" [planta]="planta"></app-pc-map>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="tab-pane fade" id="ortophoto" role="tabpanel" aria-labelledby="ortophoto-tab">
-                        <div class="row">
-                            <div class="col-12 text-center">
-
-                                <app-ortophoto> </app-ortophoto>
-
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-pane fade" id="export" role="tabpanel" aria-labelledby="export-tab">
-                        <div class="row">
-                            <div class="col-3 col-filtros">
-                                <app-pc-filter [allPcs]="allPcs"></app-pc-filter>
-                            </div>
-                            <div class="col-9">
-                                <app-informe-export [informe]="informe" [planta]="planta"></app-informe-export>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+              <span class="text-light titulo-informe">{{
+                planta?.nombre
+              }}</span>
+              <span class="text-light subtitulo-informe"
+                >{{ planta?.potencia }} MW / {{ planta?.tipo }}</span
+              >
             </div>
+          </div>
+          <div class="row">
+            <div class="col-12 datos-meteo">
+              <div class="col-2 col-datos-meteo">
+                <i class="fas fa-sun"></i>
+              </div>
+              <div class="datos-meteo-texto">
+                <span class="text-light datos-meteo-numero">
+                  > {{ irradianciaMinima | number: "1.0-0" }} W/m<sup
+                    >2</sup
+                  ></span
+                >
+                <span class="text-light">Irradiancia</span>
+              </div>
+            </div>
+            <div class="col-12 datos-meteo">
+              <div class="col-2 col-datos-meteo">
+                <i class="fas fa-cloud"></i>
+              </div>
+              <div class="datos-meteo-texto">
+                <span class="text-light datos-meteo-numero"
+                  >{{ informe?.nubosidad }} %</span
+                >
+                <span class="text-light">Nubosidad</span>
+              </div>
+            </div>
+            <div class="col-12 datos-meteo">
+              <div class="col-2 col-datos-meteo">
+                <i class="fas fa-chess-board"></i>
+              </div>
+              <div class="datos-meteo-texto">
+                <span class="text-light datos-meteo-numero"
+                  >{{ informe?.gsd }} cm/pixel</span
+                >
+                <span class="text-light">GSD (ground sample distance)</span>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <!-- Datos de la inspeccion -->
+        <div class="col-6 header-derecha">
+          <div class="text-right">
+            <span class="text-light"
+              >Vuelo realizado el
+              {{ informe.fecha * 1000 | date: "dd/MM/yyyy" }}</span
+            >
+            <span class="text-light">
+              (de {{ informe?.hora_inicio }} a {{ informe?.hora_fin }})</span
+            >
+          </div>
+          <div class="header-derecha-datos">
+            <div class="header-derecha-datos-donut">
+              <p-chart
+                type="doughnut"
+                [data]="dataSeveridad"
+                [options]="chartOptions"
+              ></p-chart>
+            </div>
+            <div class="header-derecha-datos-mae">
+              <div class="div-mae-texto text-center">
+                <span class="mae-texto text-light">MAE</span>
+              </div>
+              <div class="div-mae-1">
+                <div class="div-mae-2">
+                  <span class="text-light mae-porcentaje">{{
+                    informe?.mae | number: "1.2"
+                  }}</span>
+                </div>
+                <span class="text-light mae-pct-simbolo">%</span>
+              </div>
+              <div class="div-mae-3">
+                <h4 class="text-center text-light">
+                  {{ calificacionMae[(informe?.mae)] }}
+                </h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item">
+        <a
+          class="nav-link active"
+          id="home-tab"
+          data-toggle="tab"
+          href="#home"
+          role="tab"
+          aria-controls="home"
+          aria-selected="true"
+          >Listado</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          id="profile-tab"
+          data-toggle="tab"
+          href="#profile"
+          role="tab"
+          aria-controls="profile"
+          aria-selected="false"
+          >Mapa</a
+        >
+      </li>
+      <li *ngIf="planta.tipo !== '2 ejes'" class="nav-item">
+        <a
+          class="nav-link"
+          id="ortophoto-tab"
+          data-toggle="tab"
+          href="#ortophoto"
+          role="tab"
+          aria-controls="ortophoto"
+          aria-selected="false"
+          >Mapa térmico</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          id="export-tab"
+          data-toggle="tab"
+          href="#export"
+          role="tab"
+          aria-controls="export"
+          aria-selected="false"
+          >Generar PDF</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          style="color: tomato"
+          href="{{ informeDownloadUrl | async }}"
+          target="_blank"
+          >Descargar informe</a
+        >
+      </li>
+    </ul>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="tab-content" id="myTabContent">
+          <div
+            class="tab-pane fade show active"
+            id="home"
+            role="tabpanel"
+            aria-labelledby="home-tab"
+          >
+            <div class="row">
+              <div class="col-3 col-filtros">
+                <app-pc-filter [allPcs]="allPcs"></app-pc-filter>
+              </div>
+              <div class="col-9">
+                <app-pc-list
+                  [allPcs]="allPcs"
+                  [planta]="planta"
+                  [informe]="informe"
+                ></app-pc-list>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="profile"
+            role="tabpanel"
+            aria-labelledby="profile-tab"
+          >
+            <div class="row">
+              <div class="col-12 div-pc-map-container">
+                <app-pc-filter
+                  class="pc-filter-over-map"
+                  [allPcs]="allPcs"
+                ></app-pc-filter>
+
+                <app-pc-map
+                  class="pc-map"
+                  [informe]="informe"
+                  [planta]="planta"
+                ></app-pc-map>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="ortophoto"
+            role="tabpanel"
+            aria-labelledby="ortophoto-tab"
+          >
+            <div class="row">
+              <div class="col-12 text-center">
+                <!-- <app-ortophoto> </app-ortophoto> -->
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="export"
+            role="tabpanel"
+            aria-labelledby="export-tab"
+          >
+            <div class="row">
+              <div class="col-3 col-filtros">
+                <app-pc-filter [allPcs]="allPcs"></app-pc-filter>
+              </div>
+              <div class="col-9">
+                <app-informe-export
+                  [informe]="informe"
+                  [planta]="planta"
+                ></app-informe-export>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
