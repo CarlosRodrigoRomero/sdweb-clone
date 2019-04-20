@@ -3,7 +3,7 @@
 
         <div (click)="onClickVerDetalles(pc)" class="imagen-termica-div">
             <canvas id={{pc.id}} width="{{canvasWidth}}" height="{{canvasHeight}}">
-      </canvas>
+            </canvas>
         </div>
         <div class="pc-details-derecha-item">
             <div class="pc-details-derecha-icon">
@@ -108,7 +108,9 @@
             </div>
             <div class="pc-texto">
                 <span class="detail-title">Meteo: </span>
-                <span>{{pc.irradiancia}} W/m<sup>2</sup> | Viento: {{pc.viento}} | {{pc.temperaturaAire}} ºC | Nubes: {{pc.nubosidad}} % okta | Emisividad: {{pc.emisividad}} | Temp. reflejada: {{pc.temperaturaReflejada}} ºC</span>
+                <span>{{pc.irradiancia}} W/m<sup>2</sup> | Viento: {{pc.viento}} | {{pc.temperaturaAire}} ºC | Nubes:
+                    {{pc.nubosidad}} % okta | Emisividad: {{pc.emisividad}} | Temp. reflejada:
+                    {{pc.temperaturaReflejada}} ºC</span>
             </div>
         </div>
     </div>

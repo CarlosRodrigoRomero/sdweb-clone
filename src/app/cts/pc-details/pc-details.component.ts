@@ -1,15 +1,20 @@
-import { Component, OnInit, Input, OnChanges, SimpleChange, SimpleChanges } from '@angular/core';
-import { PcInterface } from '../../models/pc';
-import 'get-image-pixels';
-import { InformeInterface } from '../../models/informe';
-import { GLOBAL } from 'src/app/services/global';
-import { AngularFireStorage } from '@angular/fire/storage';
-import 'fabric';
-import { MatDialog } from '@angular/material';
-import { PcDetailsDialogComponent } from '../pc-details-dialog/pc-details-dialog.component';
-import { PcService } from 'src/app/services/pc.service';
+import {
+  Component,
+  OnInit,
+  Input,
+  OnChanges,
+  SimpleChange,
+  SimpleChanges
+} from "@angular/core";
+import { PcInterface } from "../../models/pc";
+import { InformeInterface } from "../../models/informe";
+import { GLOBAL } from "src/app/services/global";
+import { AngularFireStorage } from "@angular/fire/storage";
+import "fabric";
+import { MatDialog } from "@angular/material";
+import { PcDetailsDialogComponent } from "../pc-details-dialog/pc-details-dialog.component";
+import { PcService } from "src/app/services/pc.service";
 declare let fabric;
-
 
 export interface DialogData {
   pc: PcInterface;
@@ -17,9 +22,9 @@ export interface DialogData {
 }
 
 @Component({
-  selector: 'app-pc-details',
-  templateUrl: './pc-details.component.html',
-  styleUrls: ['./pc-details.component.css']
+  selector: "app-pc-details",
+  templateUrl: "./pc-details.component.html",
+  styleUrls: ["./pc-details.component.css"]
 })
 export class PcDetailsComponent implements OnInit, OnChanges {
   @Input() pc: PcInterface;
@@ -44,12 +49,14 @@ export class PcDetailsComponent implements OnInit, OnChanges {
     private storage: AngularFireStorage,
     public dialog: MatDialog,
     public pcservice: PcService
-  ) { }
+  ) {}
 
   ngOnInit() {
     if (!this.pc.downloadUrl$) {
-      this.pc.downloadUrl$ = this.storage.ref(`informes/${this.informe.id}/jpg/${this.pc.archivoPublico}`).getDownloadURL();
-      this.pc.downloadUrl$.subscribe( url => {
+      this.pc.downloadUrl$ = this.storage
+        .ref(`informes/${this.informe.id}/jpg/${this.pc.archivoPublico}`)
+        .getDownloadURL();
+      this.pc.downloadUrl$.subscribe(url => {
         this.pc.downloadUrlString = url;
       });
     }
@@ -66,12 +73,11 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-
     if (this.selectedPc === this.pc) {
       this.canvas = new fabric.Canvas(this.pc.id);
       const imagenTermica = new Image();
 
-      imagenTermica.crossOrigin = 'anonymous';
+      imagenTermica.crossOrigin = "anonymous";
       imagenTermica.src = this.pc.downloadUrlString;
 
       imagenTermica.onload = () => {
@@ -85,7 +91,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
           lockMovementX: true,
           lockMovementY: true,
           selectable: false,
-          hoverCursor: 'default',
+          hoverCursor: "default"
         });
         imagenTermicaCanvas.scaleToHeight(this.canvasHeight);
         imagenTermicaCanvas.scaleToWidth(this.canvasWidth);
@@ -97,103 +103,109 @@ export class PcDetailsComponent implements OnInit, OnChanges {
         // this.tooltipElement = document.getElementById(`tooltip_${this.pc.id}`);
         // console.log('this.tooltipElement', this.tooltipElement);
       };
+    }
   }
-}
-downloadReclamacion() {
-  console.log('reclamacion');
-}
- downloadRjpg(pc: PcInterface) {
+  downloadReclamacion() {
+    console.log("reclamacion");
+  }
+  downloadRjpg(pc: PcInterface) {
+    this.storage
+      .ref(`informes/${this.pc.informeId}/rjpg/${pc.archivoPublico}`)
+      .getDownloadURL()
+      .subscribe(downloadUrl => {
+        this.pc.downloadUrlStringRjpg = downloadUrl;
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = "blob";
+        xhr.onload = event => {
+          /* Create a new Blob object using the response
+           *  data of the onload object.
+           */
+          const blob = new Blob([xhr.response], { type: "image/jpg" });
+          const a: any = document.createElement("a");
+          a.style = "display: none";
+          document.body.appendChild(a);
+          const url = window.URL.createObjectURL(blob);
+          a.href = url;
+          a.download = `radiometrico_${pc.archivoPublico}`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+        };
+        xhr.open("GET", downloadUrl);
+        xhr.send();
+      });
+  }
+  downloadJpgVisual(pc: PcInterface) {
+    this.storage
+      .ref(`informes/${this.pc.informeId}/jpgVisual/${pc.archivoPublico}`)
+      .getDownloadURL()
+      .subscribe(downloadUrl => {
+        this.pc.downloadUrlStringVisual = downloadUrl;
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = "blob";
+        xhr.onload = event => {
+          /* Create a new Blob object using the response
+           *  data of the onload object.
+           */
+          const blob = new Blob([xhr.response], { type: "image/jpg" });
+          const a: any = document.createElement("a");
+          a.style = "display: none";
+          document.body.appendChild(a);
+          const url = window.URL.createObjectURL(blob);
+          a.href = url;
+          a.download = `visual_${pc.archivoPublico}`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+        };
+        xhr.open("GET", downloadUrl);
+        xhr.send();
+      });
+  }
 
-  this.storage.ref(`informes/${this.pc.informeId}/rjpg/${pc.archivoPublico}`).getDownloadURL()
-  .subscribe( downloadUrl => {
-      this.pc.downloadUrlStringRjpg = downloadUrl;
-      const xhr = new XMLHttpRequest();
-      xhr.responseType = 'blob';
-      xhr.onload = (event) => {
-        /* Create a new Blob object using the response
-        *  data of the onload object.
-        */
-        const blob = new Blob([xhr.response], { type: 'image/jpg' });
-        const a: any = document.createElement('a');
-        a.style = 'display: none';
-        document.body.appendChild(a);
-        const url = window.URL.createObjectURL(blob);
-        a.href = url;
-        a.download = `radiometrico_${pc.archivoPublico}`;
-        a.click();
-        window.URL.revokeObjectURL(url);
-      };
-      xhr.open('GET', downloadUrl);
-      xhr.send();
-    });
- }
- downloadJpgVisual(pc: PcInterface) {
-
-  this.storage.ref(`informes/${this.pc.informeId}/jpgVisual/${pc.archivoPublico}`).getDownloadURL()
-    .subscribe( downloadUrl => {
-    this.pc.downloadUrlStringVisual = downloadUrl;
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = 'blob';
-    xhr.onload = (event) => {
-      /* Create a new Blob object using the response
-      *  data of the onload object.
-      */
-      const blob = new Blob([xhr.response], { type: 'image/jpg' });
-      const a: any = document.createElement('a');
-      a.style = 'display: none';
-      document.body.appendChild(a);
-      const url = window.URL.createObjectURL(blob);
-      a.href = url;
-      a.download = `visual_${pc.archivoPublico}`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    };
-    xhr.open('GET', downloadUrl);
-    xhr.send();
-  });
-}
-
-
-downloadJpg(pc: PcInterface) {
-
-  this.storage.ref(`informes/${this.pc.informeId}/jpg/${pc.archivoPublico}`).getDownloadURL()
-    .subscribe( downloadUrl => {
-    this.pc.downloadUrlString = downloadUrl;
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = 'blob';
-    xhr.onload = (event) => {
-      /* Create a new Blob object using the response
-      *  data of the onload object.
-      */
-      const blob = new Blob([xhr.response], { type: 'image/jpg' });
-      const a: any = document.createElement('a');
-      a.style = 'display: none';
-      document.body.appendChild(a);
-      const url = window.URL.createObjectURL(blob);
-      a.href = url;
-      a.download = `jpg_${pc.archivoPublico}`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    };
-    xhr.open('GET', downloadUrl);
-    xhr.send();
-  });
-}
+  downloadJpg(pc: PcInterface) {
+    this.storage
+      .ref(`informes/${this.pc.informeId}/jpg/${pc.archivoPublico}`)
+      .getDownloadURL()
+      .subscribe(downloadUrl => {
+        this.pc.downloadUrlString = downloadUrl;
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = "blob";
+        xhr.onload = event => {
+          /* Create a new Blob object using the response
+           *  data of the onload object.
+           */
+          const blob = new Blob([xhr.response], { type: "image/jpg" });
+          const a: any = document.createElement("a");
+          a.style = "display: none";
+          document.body.appendChild(a);
+          const url = window.URL.createObjectURL(blob);
+          a.href = url;
+          a.download = `jpg_${pc.archivoPublico}`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+        };
+        xhr.open("GET", downloadUrl);
+        xhr.send();
+      });
+  }
   onMouseLeaveCanvas($event) {
-    this.tooltipElement.style.display = 'none';
+    this.tooltipElement.style.display = "none";
   }
 
   onMouseMoveCanvas($event: MouseEvent) {
     // Temperatura puntual
-    const mousePositionData = this.canvas.getContext('2d')
-                               .getImageData($event.offsetX, $event.offsetY, 1, 1).data;
+    const mousePositionData = this.canvas
+      .getContext("2d")
+      .getImageData($event.offsetX, $event.offsetY, 1, 1).data;
 
-    this.tooltipTemp = this.rgb2temp(mousePositionData[0], mousePositionData[1], mousePositionData[2]);
+    this.tooltipTemp = this.rgb2temp(
+      mousePositionData[0],
+      mousePositionData[1],
+      mousePositionData[2]
+    );
 
-    this.tooltipElement.style.display = 'block';
-    this.tooltipElement.style.left = $event.layerX + 'px';
-    this.tooltipElement.style.top = $event.layerY + 'px';
-
+    this.tooltipElement.style.display = "block";
+    this.tooltipElement.style.left = $event.layerX + "px";
+    this.tooltipElement.style.top = $event.layerY + "px";
   }
 
   rgb2temp(red: number, green: number, blue: number) {
@@ -211,8 +223,8 @@ downloadJpg(pc: PcInterface) {
     const actObj1 = new fabric.Rect({
       left: pc.img_left * factor,
       top: pc.img_top * factor,
-      fill: 'rgba(0,0,0,0)',
-      stroke: 'black',
+      fill: "rgba(0,0,0,0)",
+      stroke: "black",
       strokeWidth: 1,
       width: pc.img_width * factor,
       height: pc.img_height * factor,
@@ -222,13 +234,13 @@ downloadJpg(pc: PcInterface) {
       localId: pc.local_id,
       ref: false,
       selectable: false,
-      hoverCursor: 'default'
+      hoverCursor: "default"
     });
     const actObj2 = new fabric.Rect({
       left: (pc.img_left - 1) * factor,
       top: (pc.img_top - 1) * factor,
-      fill: 'rgba(0,0,0,0)',
-      stroke: 'red',
+      fill: "rgba(0,0,0,0)",
+      stroke: "red",
       strokeWidth: 1,
       width: (pc.img_width + 2) * factor,
       height: (pc.img_height + 2) * factor,
@@ -237,7 +249,7 @@ downloadJpg(pc: PcInterface) {
       lockMovementX: true,
       localId: pc.local_id,
       ref: false,
-      hoverCursor: 'default',
+      hoverCursor: "default",
       selectable: true
     });
 
@@ -254,26 +266,28 @@ downloadJpg(pc: PcInterface) {
     const triangle = new fabric.Triangle({
       width: squareBase,
       height: squareBase,
-      fill: 'red',
-      stroke: 'black',
+      fill: "red",
+      stroke: "black",
       left: Math.round(x - squareBase / 2),
       top: y, // si no ponemos este 2, entonces no lee bien debajo del triangulo
       selectable: false,
-      ref: 'triangle',
-      hoverCursor: 'default',
+      ref: "triangle",
+      hoverCursor: "default"
     });
 
     const textTriangle = new fabric.Text(
-        ' + '.concat(pc.gradienteNormalizado.toString().concat(' ºC ')), {
+      " + ".concat(pc.gradienteNormalizado.toString().concat(" ºC ")),
+      {
         left: pc.img_left * factor,
         top: (pc.img_top + pc.img_height + 5) * factor,
         fontSize: 22 * factor,
-        textBackgroundColor: 'white',
-        ref: 'text',
+        textBackgroundColor: "white",
+        ref: "text",
         selectable: false,
-        hoverCursor: 'default',
-        fill: 'red',
-    });
+        hoverCursor: "default",
+        fill: "red"
+      }
+    );
 
     this.canvas.add(triangle);
     this.canvas.add(textTriangle);
@@ -283,22 +297,24 @@ downloadJpg(pc: PcInterface) {
   onClickVerDetalles(selectedPc: PcInterface): void {
     // selectedPc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${selectedPc.archivoPublico}`).getDownloadURL();
     if (!selectedPc.downloadUrl$) {
-      selectedPc.downloadUrl$ = this.storage.ref(`informes/${this.informe.id}/jpg/${selectedPc.archivoPublico}`).getDownloadURL();
+      selectedPc.downloadUrl$ = this.storage
+        .ref(`informes/${this.informe.id}/jpg/${selectedPc.archivoPublico}`)
+        .getDownloadURL();
     }
-    if (!selectedPc.downloadUrlVisual$ ) {
-      selectedPc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informe.id}/jpgVisual/${selectedPc.archivoPublico}`)
-            .getDownloadURL();
+    if (!selectedPc.downloadUrlVisual$) {
+      selectedPc.downloadUrlVisual$ = this.storage
+        .ref(
+          `informes/${this.informe.id}/jpgVisual/${selectedPc.archivoPublico}`
+        )
+        .getDownloadURL();
     }
     const dialogRef = this.dialog.open(PcDetailsDialogComponent, {
-      width: '1100px',
+      width: "1100px",
       // height: '600px',
       hasBackdrop: true,
-      data: {pc: selectedPc, allPcs: this.allPcs}
+      data: { pc: selectedPc, allPcs: this.allPcs }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-    });
-
+    dialogRef.afterClosed().subscribe(result => {});
   }
-
 }
