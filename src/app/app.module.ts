@@ -10,7 +10,7 @@ import { environment } from "../environments/environment";
 import { AngularFireModule } from "@angular/fire";
 import { AngularFireAuthModule } from "@angular/fire/auth";
 import { AngularFirestoreModule } from "@angular/fire/firestore";
-import { AngularFireStorageModule, StorageBucket } from "@angular/fire/storage";
+import { AngularFireStorageModule } from "@angular/fire/storage";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AgmCoreModule } from "@agm/core";
 import { ChartModule } from "primeng/chart";
@@ -58,7 +58,7 @@ import { PcDetailsComponent } from "./cts/pc-details/pc-details.component";
 import { PcMapComponent } from "./cts/pc-map/pc-map.component";
 import { PcDetailsDialogComponent } from "./cts/pc-details-dialog/pc-details-dialog.component";
 import { InformeExportComponent } from "./cts/informe-export/informe-export.component";
-// import { OrtophotoComponent } from './cts/ortophoto/ortophoto.component';
+import { OrtophotoComponent } from "./cts/ortophoto/ortophoto.component";
 import { MapService } from "./services/orto.service";
 import { LoginComponent } from "./cts/login/login.component";
 import { AuthService } from "./services/auth.service";
@@ -83,7 +83,7 @@ import { PruebasComponent } from "./cts/pruebas/pruebas.component";
     PcMapComponent,
     PcDetailsDialogComponent,
     InformeExportComponent,
-    // OrtophotoComponent,
+    OrtophotoComponent,
     LoginComponent,
     IndexComponent,
     PubliclayoutComponent,
