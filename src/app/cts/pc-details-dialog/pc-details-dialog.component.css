@@ -81,6 +81,10 @@
 .pc-details-derecha-icon {
   margin-right: 0.5rem;
   font-size: 2rem;
+  display: flex;
+}
+.pc-details-derecha-icon i {
+  align-self: center;
 }
 
 .pc-detail-botones-dialog {

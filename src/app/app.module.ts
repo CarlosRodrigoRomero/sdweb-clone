@@ -10,7 +10,7 @@ import { environment } from "../environments/environment";
 import { AngularFireModule } from "@angular/fire";
 import { AngularFireAuthModule } from "@angular/fire/auth";
 import { AngularFirestoreModule } from "@angular/fire/firestore";
-import { AngularFireStorageModule, StorageBucket } from "@angular/fire/storage";
+import { AngularFireStorageModule } from "@angular/fire/storage";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AgmCoreModule } from "@agm/core";
 import { ChartModule } from "primeng/chart";
