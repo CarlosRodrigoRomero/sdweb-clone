@@ -1,11 +1,4 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  OnChanges,
-  SimpleChange,
-  SimpleChanges
-} from "@angular/core";
+import { Component, OnInit, Input, OnChanges } from "@angular/core";
 import { PcInterface } from "../../models/pc";
 import { InformeInterface } from "../../models/informe";
 import { GLOBAL } from "src/app/services/global";

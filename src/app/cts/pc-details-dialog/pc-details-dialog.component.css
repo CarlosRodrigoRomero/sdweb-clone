@@ -1,175 +1,179 @@
 .imagen-termica-div:hover .imagen-termica-tooltip {
-    display: block;
+  display: block;
 }
 
 .imagen-termica-div {
-    position: relative;
-    margin-bottom: 1.5rem;
-    /* overflow: hidden; */
+  position: relative;
+  margin-bottom: 1.5rem;
+  /* overflow: hidden; */
 }
 
 #hidden-canvas {
-    display: none;
+  display: none;
 }
 
+#visual-zoom {
+  border: 1px black solid;
+  box-shadow: 5px 5px 10px #1e1e1e;
+  z-index: 99999;
+}
 #imagen-visual-div {
-    display: none;
+  display: none;
 }
 
 .imagen-termica-tooltip {
-    display: none;
-    background: #e7e1e1e3;
-    margin-left: 28px;
-    /* padding: 5px; */
-    position: absolute;
-    z-index: 100000;
-    width: 70px;
-    height: 28px;
-    border: 1px solid grey;
+  display: none;
+  background: #e7e1e1e3;
+  margin-left: 28px;
+  /* padding: 5px; */
+  position: absolute;
+  z-index: 100000;
+  width: 70px;
+  height: 28px;
+  border: 1px solid grey;
 }
 
 .pc-details-derecha {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .pc-details-derecha-item {
-    display: flex;
-    flex-direction: row;
-    margin-top: 0.6rem;
-    margin-left: 2rem;
-    vertical-align: center;
+  display: flex;
+  flex-direction: row;
+  margin-top: 0.6rem;
+  margin-left: 2rem;
+  vertical-align: center;
 }
 
 .pc-texto {
-    display: flex;
-    justify-content: center;
-    line-height: 1rem;
-    flex-direction: column;
+  display: flex;
+  justify-content: center;
+  line-height: 1rem;
+  flex-direction: column;
 }
 
 .detail-title {
-    font-weight: 800;
-    font-size: 1.5 rem;
-    margin-right: 1rem;
+  font-weight: 800;
+  font-size: 1.5 rem;
+  margin-right: 1rem;
 }
 
 .pc-details-derecha-item-tabla {
-    display: flex;
-    margin-left: 0.8rem;
-    flex-direction: column;
-    vertical-align: center;
+  display: flex;
+  margin-left: 0.8rem;
+  flex-direction: column;
+  vertical-align: center;
 }
 
 .icon-success {
-    color: green;
+  color: green;
 }
 
 .icon-error {
-    /* color: red; */
+  /* color: red; */
 }
 
 .icon-flag {
-    color: grey;
+  color: grey;
 }
 
 .pc-details-derecha-icon {
-    margin-right: 0.5rem;
-    font-size: 2rem;
+  margin-right: 0.5rem;
+  font-size: 2rem;
 }
 
 .pc-detail-botones-dialog {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 
 .switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
 }
 
 .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
 .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
 .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
-input:checked+.slider {
-    background-color: #2196F3;
+input:checked + .slider {
+  background-color: #2196f3;
 }
 
-input:focus+.slider {
-    box-shadow: 0 0 1px #2196F3;
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
 }
 
-input:checked+.slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
 }
-
 
 /* Rounded sliders */
 
 .slider.round {
-    border-radius: 34px;
+  border-radius: 34px;
 }
 
 .slider.round:before {
-    border-radius: 50%;
+  border-radius: 50%;
 }
 
 .dialog-title {
-    display: inline;
+  display: inline;
 }
 
 .mat-dialog-title {
-    margin: 0 !important;
+  margin: 0 !important;
 }
 
 .mat-dialog-content {
-    overflow: hidden !important;
+  overflow: hidden !important;
 }
 
 .colorSeveridad1 {
-    color: #20B2AA;
+  color: #20b2aa;
 }
 
 .colorSeveridad2 {
-    color: #FF4500;
+  color: #ff4500;
 }
 
 .colorSeveridad3 {
-    color: #b70000;
+  color: #b70000;
 }
 
 .severidad {
-    margin-right: 5rem;
+  margin-right: 5rem;
 }
