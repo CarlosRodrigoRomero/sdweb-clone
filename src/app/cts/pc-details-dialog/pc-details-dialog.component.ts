@@ -4,7 +4,6 @@ import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
 import { DialogData } from "../pc-map/pc-map.component";
 import { GLOBAL } from "src/app/services/global";
 import { AngularFireStorage } from "@angular/fire/storage";
-import * as JyMagnifier from "../../../assets/js/canvas.magnifier";
 import "fabric";
 declare let fabric;
 
