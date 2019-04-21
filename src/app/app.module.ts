@@ -1,6 +1,5 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
-
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { AppComponent } from "./app.component";
 import { InformesComponent } from "./cts/informes/informes.component";
@@ -58,10 +57,6 @@ import { PcDetailsComponent } from "./cts/pc-details/pc-details.component";
 import { PcMapComponent } from "./cts/pc-map/pc-map.component";
 import { PcDetailsDialogComponent } from "./cts/pc-details-dialog/pc-details-dialog.component";
 import { InformeExportComponent } from "./cts/informe-export/informe-export.component";
-<<<<<<< HEAD
-// import { OrtophotoComponent } from "./cts/ortophoto/ortophoto.component";
-=======
->>>>>>> ad1afcd560d49f5a1a1d9ddae350ccb70593c35a
 import { MapService } from "./services/orto.service";
 import { LoginComponent } from "./cts/login/login.component";
 import { AuthService } from "./services/auth.service";
@@ -86,10 +81,6 @@ import { PruebasComponent } from "./cts/pruebas/pruebas.component";
     PcMapComponent,
     PcDetailsDialogComponent,
     InformeExportComponent,
-<<<<<<< HEAD
-    // OrtophotoComponent,
-=======
->>>>>>> ad1afcd560d49f5a1a1d9ddae350ccb70593c35a
     LoginComponent,
     IndexComponent,
     PubliclayoutComponent,
