@@ -1,31 +1,59 @@
 <mat-card>
-    <mat-card-content>
-        <h2 class="text-center"> Clase de Anomalía (CoA)</h2>
-        <div class="filtro-severidad">
-            <mat-checkbox *ngFor="let ts of numClases" [checked]="filtroClase.includes(ts)" (change)="onCheckBoxClaseChange($event)" value="{{ts}}">
-                <div class="filtros-severidad-circulo-texto">
-                    <div class="circle circleSeveridad{{ts}}"></div>
-                    <span class="filtro-severidad-text">{{labelsSeveridad[ts-1]}} </span>
+  <mat-card-content>
+    <h3>Clase de Anomalía (CoA)</h3>
+    <div class="filtro-severidad">
+      <mat-checkbox
+        *ngFor="let ts of numClases"
+        [checked]="filtroClase.includes(ts)"
+        (change)="onCheckBoxClaseChange($event)"
+        value="{{ ts }}"
+      >
+        <div class="filtros-severidad-circulo-texto">
+          <div class="circle circleSeveridad{{ ts }}"></div>
+          <span class="filtro-severidad-text"
+            >{{ labelsSeveridad[ts - 1] }}
+          </span>
 
-                    <span class="filtro-numero"> ({{countClase[ts-1]}}) </span>
-                    <i matTooltip="{{descripcionSeveridad[ts-1]}}" class="info-severidad fas fa-info-circle"></i>
-                </div>
-            </mat-checkbox>
-
-
+          <span class="filtro-numero"> ({{ countClase[ts - 1] }}) </span>
+          <i
+            matTooltip="{{ descripcionSeveridad[ts - 1] }}"
+            class="info-severidad fas fa-info-circle"
+          ></i>
         </div>
+      </mat-checkbox>
+    </div>
 
-        <hr>
+    <hr />
 
-        <h2> Categorías </h2>
-        <div class="filtro-severidad">
-            <ng-container *ngFor="let cat of numCategorias">
-                <mat-checkbox *ngIf="countCategoria[cat-1] > 0" [checked]="filtroCategoria.includes(cat)" (change)="onChangeCheckboxCategoria($event)" value="{{cat}}">
-                    {{ nombreClases[cat] }}
-                    <span class="filtro-numero">({{ countCategoria[cat-1] }})</span>
-                </mat-checkbox>
-            </ng-container>
-        </div>
+    <h3>Gradiente</h3>
+    <div class="filtro-gradiente">
+      <mat-slider
+        thumbLabel
+        [displayWith]="formatLabel"
+        (input)="onInputFiltroGradiente($event)"
+        tickInterval="1"
+        min="1"
+        max="50"
+        [(ngModel)]="filtroGradiente"
+      ></mat-slider>
+      <span class="filtro-gradiente-numero">({{ filtroGradiente }} ºC)</span>
+    </div>
 
-    </mat-card-content>
+    <hr />
+
+    <h3>Categorías</h3>
+    <div class="filtro-severidad">
+      <ng-container *ngFor="let cat of numCategorias">
+        <mat-checkbox
+          *ngIf="countCategoria[cat - 1] > 0"
+          [checked]="filtroCategoria.includes(cat)"
+          (change)="onChangeCheckboxCategoria($event)"
+          value="{{ cat }}"
+        >
+          {{ nombreClases[cat] }}
+          <span class="filtro-numero">({{ countCategoria[cat - 1] }})</span>
+        </mat-checkbox>
+      </ng-container>
+    </div>
+  </mat-card-content>
 </mat-card>
