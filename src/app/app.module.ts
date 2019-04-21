@@ -58,7 +58,6 @@ import { PcDetailsComponent } from "./cts/pc-details/pc-details.component";
 import { PcMapComponent } from "./cts/pc-map/pc-map.component";
 import { PcDetailsDialogComponent } from "./cts/pc-details-dialog/pc-details-dialog.component";
 import { InformeExportComponent } from "./cts/informe-export/informe-export.component";
-// import { OrtophotoComponent } from "./cts/ortophoto/ortophoto.component";
 import { MapService } from "./services/orto.service";
 import { LoginComponent } from "./cts/login/login.component";
 import { AuthService } from "./services/auth.service";
@@ -83,7 +82,6 @@ import { PruebasComponent } from "./cts/pruebas/pruebas.component";
     PcMapComponent,
     PcDetailsDialogComponent,
     InformeExportComponent,
-    // OrtophotoComponent,
     LoginComponent,
     IndexComponent,
     PubliclayoutComponent,

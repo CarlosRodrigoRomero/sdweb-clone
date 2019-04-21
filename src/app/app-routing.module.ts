@@ -3,7 +3,6 @@ import { InformeViewComponent } from "./cts/informe-view/informe-view.component"
 import { InformeEditComponent } from "./cts/informe-edit/informe-edit.component";
 import { InformesComponent } from "./cts/informes/informes.component";
 import { NgModule } from "@angular/core";
-// import { OrtophotoComponent } from './cts/ortophoto/ortophoto.component';
 import { LoginComponent } from "./cts/login/login.component";
 import { AuthGuard } from "./services/auth.guard";
 import { IndexComponent } from "./cts/index/index.component";
@@ -65,7 +64,6 @@ const routes: Routes = [
     ]
   },
   { path: "**", component: IndexComponent, pathMatch: "full" }
-  // {path: 'orto', component: OrtophotoComponent },
 ];
 
 @NgModule({

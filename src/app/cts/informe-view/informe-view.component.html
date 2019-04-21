@@ -126,18 +126,7 @@
           >Mapa</a
         >
       </li>
-      <li *ngIf="planta.tipo !== '2 ejes'" class="nav-item">
-        <a
-          class="nav-link"
-          id="ortophoto-tab"
-          data-toggle="tab"
-          href="#ortophoto"
-          role="tab"
-          aria-controls="ortophoto"
-          aria-selected="false"
-          >Mapa térmico</a
-        >
-      </li>
+
       <li class="nav-item">
         <a
           class="nav-link"
@@ -202,19 +191,6 @@
                   [informe]="informe"
                   [planta]="planta"
                 ></app-pc-map>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="tab-pane fade"
-            id="ortophoto"
-            role="tabpanel"
-            aria-labelledby="ortophoto-tab"
-          >
-            <div class="row">
-              <div class="col-12 text-center">
-                <!-- <app-ortophoto> </app-ortophoto> -->
               </div>
             </div>
           </div>
