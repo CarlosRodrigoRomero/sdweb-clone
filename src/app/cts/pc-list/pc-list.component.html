@@ -54,10 +54,11 @@
                 <div class="progress">
                     <div class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" [style.width]="getPercent(element) + '%'">
                         + {{element.gradienteNormalizado | number: '1.0-1'}} ºC
+                        
                     </div>
+                    
                 </div>
-
-
+                <div class="flechita"> <i class="fas fa-arrow-right"></i> </div>
             </td>
         </ng-container>
 
@@ -76,7 +77,7 @@
 
 
         <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-        <tr mat-row *matRowDef="let element; columns: columnsToDisplay; " class="example-element-row" [class.example-expanded-row]="expandedElement=== element" (click)="onClickToggleDetail(element)">
+        <tr mat-row *matRowDef="let element; columns: columnsToDisplay; " class="element-row" [class.example-expanded-row]="expandedElement=== element" (click)="onClickToggleDetail(element)">
         </tr>
         <tr mat-row *matRowDef="let row; columns: [ 'expandedDetail'] " class="example-detail-row"></tr>
     </table>
