@@ -17,12 +17,6 @@ const routes: Routes = [
     component: PubliclayoutComponent,
     children: [
       { path: "", component: IndexComponent, pathMatch: "full" },
-      { path: "pdf123", component: PruebasComponent },
-      {
-        path: "juangil",
-        component: VideoComponent,
-        data: { nombre: "Juan Gil", codigo: "nfs0lkgmy4" }
-      },
       {
         path: "joseignacio",
         component: VideoComponent,
