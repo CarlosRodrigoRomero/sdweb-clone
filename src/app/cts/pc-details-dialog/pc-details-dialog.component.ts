@@ -243,11 +243,11 @@ export class PcDetailsDialogComponent implements OnInit {
       hoverCursor: "default"
     });
     const TextRef = new fabric.Text(
-      " ".concat(pc.temperaturaRef.toString().concat(" ºC ")),
+      "Ø ".concat(pc.temperaturaRef.toString().concat(" ºC ")),
       {
         left: pc.refLeft,
-        top: pc.refTop - 26,
-        fontSize: 22,
+        top: pc.refTop - 16,
+        fontSize: 13,
         textBackgroundColor: "white",
         ref: "text",
         selectable: false,
@@ -292,7 +292,7 @@ export class PcDetailsDialogComponent implements OnInit {
       {
         left: pc.img_left,
         top: pc.img_top + pc.img_height + 5,
-        fontSize: 22,
+        fontSize: 13,
         textBackgroundColor: "white",
         ref: "text",
         selectable: false,
