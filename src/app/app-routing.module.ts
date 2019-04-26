@@ -18,24 +18,44 @@ const routes: Routes = [
     children: [
       { path: "", component: IndexComponent, pathMatch: "full" },
       {
-        path: "joseignacio",
+        path: "manuelprodiel",
         component: VideoComponent,
-        data: { nombre: "Jose Ignacio", codigo: "dcxxa99ktf" }
+        data: { nombre: "Manuel Antonio Romero", codigo: "5lkuxrnj7w" }
       },
       {
-        path: "emilio",
+        path: "juanforestalia",
         component: VideoComponent,
-        data: { nombre: "Emilio", codigo: "7uwh1qgbhw" }
+        data: { nombre: "Juan J. De Lama", codigo: "wwmnaco1f3" }
       },
       {
-        path: "mauro",
+        path: "miguelangelsolaria",
         component: VideoComponent,
-        data: { nombre: "Mauro", codigo: "dwkvnromp5" }
+        data: { nombre: "Miguel A. Martí", codigo: "smiu0y3lql" }
       },
       {
-        path: "xabier",
+        path: "miguelacciona",
         component: VideoComponent,
-        data: { nombre: "Xabier Real", codigo: "h5khtjk8oq" }
+        data: { nombre: "Miguel de Antonio Unanua", codigo: "smiu0y3lql" }
+      },
+      {
+        path: "juanantonioenel",
+        component: VideoComponent,
+        data: { nombre: "Juan Antonio Tesón", codigo: "od2t4ok22h" }
+      },
+      {
+        path: "ivangpg",
+        component: VideoComponent,
+        data: { nombre: "Iván Villamarzo", codigo: "rzuivumzbk" }
+      },
+      {
+        path: "robertoxelio",
+        component: VideoComponent,
+        data: { nombre: "Roberto R.", codigo: "idaenwgz0x" }
+      },
+      {
+        path: "paulaopde",
+        component: VideoComponent,
+        data: { nombre: "Paula Renedo", codigo: "surb5xh9q1" }
       }
     ]
   },
