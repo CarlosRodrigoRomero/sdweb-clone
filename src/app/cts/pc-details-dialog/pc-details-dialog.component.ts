@@ -490,7 +490,7 @@ export class PcDetailsDialogComponent implements OnInit {
         this.zoomSquare * zoomFactor
       );
       // console.log(zoom.style);
-      zoom.style.top = e.pointer.y + 10 + "px";
+      zoom.style.top = e.pointer.y - this.zoomSquare / 2 + "px";
       zoom.style.left = e.pointer.x + 20 + "px";
       zoom.style.display = "block";
     });
