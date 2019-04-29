@@ -28,6 +28,11 @@ const routes: Routes = [
         data: { nombre: "Juan J. De Lama", codigo: "wwmnaco1f3" }
       },
       {
+        path: "juanjosevalsolar",
+        component: VideoComponent,
+        data: { nombre: "Juan José Montesinos", codigo: "p4g1rk4ew5" }
+      },
+      {
         path: "miguelangelsolaria",
         component: VideoComponent,
         data: { nombre: "Miguel A. Martí", codigo: "smiu0y3lql" }
