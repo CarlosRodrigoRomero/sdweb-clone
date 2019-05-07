@@ -1,13 +1,18 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import { PcInterface } from '../../models/pc';
-import { MatButtonToggleGroup, MatButtonToggleChange, MatCheckboxChange } from '@angular/material';
-import { PcService } from '../../services/pc.service';
-import { GLOBAL } from '../../services/global';
+import { Component, OnInit, Input, EventEmitter, Output } from "@angular/core";
+import { PcInterface } from "../../models/pc";
+import {
+  MatButtonToggleGroup,
+  MatButtonToggleChange,
+  MatCheckboxChange,
+  MatSliderChange
+} from "@angular/material";
+import { PcService } from "../../services/pc.service";
+import { GLOBAL } from "../../services/global";
 
 @Component({
-  selector: 'app-pc-filter',
-  templateUrl: './pc-filter.component.html',
-  styleUrls: ['./pc-filter.component.css']
+  selector: "app-pc-filter",
+  templateUrl: "./pc-filter.component.html",
+  styleUrls: ["./pc-filter.component.css"]
 })
 export class PcFilterComponent implements OnInit {
   @Input() public allPcs: PcInterface[];
@@ -22,7 +27,7 @@ export class PcFilterComponent implements OnInit {
   public nombreClases: Array<string>;
   public countCategoria: Array<number>;
   public countClase: Array<number>;
-
+  public filtroGradiente: number;
 
   constructor(private pcService: PcService) {
     this.countCategoria = Array();
@@ -30,23 +35,29 @@ export class PcFilterComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.pcService.filtroClase$.subscribe( e => this.filtroClase = e);
-    this.pcService.filtroCategoria$.subscribe( (e) => this.filtroCategoria = e );
+    this.pcService.filtroClase$.subscribe(e => (this.filtroClase = e));
+    this.pcService.filtroCategoria$.subscribe(e => (this.filtroCategoria = e));
+    this.pcService.filtroGradiente$.subscribe(e => (this.filtroGradiente = e));
 
-    this.numCategorias = Array(GLOBAL.labels_tipos.length).fill(0).map( (_, i) => i + 1 );
-    this.numClases = Array(GLOBAL.labels_severidad.length).fill(0).map( (_, i) => i + 1 );
+    this.numCategorias = Array(GLOBAL.labels_tipos.length)
+      .fill(0)
+      .map((_, i) => i + 1);
+    this.numClases = Array(GLOBAL.labels_severidad.length)
+      .fill(0)
+      .map((_, i) => i + 1);
 
     this.nombreClases = GLOBAL.pcDescripcion;
 
     // Calcular los tipos de puntos calientes
     for (const i of this.numCategorias) {
-      this.countCategoria.push(this.allPcs.filter( pc => pc.tipo === i && pc.severidad > 1).length);
-        }
+      this.countCategoria.push(
+        this.allPcs.filter(pc => pc.tipo === i && pc.severidad > 1).length
+      );
+    }
 
-
-   // Calcular la severidad //
+    // Calcular la severidad //
     for (const j of this.numClases) {
-      this.countClase.push(this.allPcs.filter( pc => pc.severidad === j).length);
+      this.countClase.push(this.allPcs.filter(pc => pc.severidad === j).length);
     }
   }
 
@@ -61,15 +72,30 @@ export class PcFilterComponent implements OnInit {
   }
 
   onChangeCheckboxCategoria($event: MatCheckboxChange) {
-
     const numberChecked = parseInt($event.source.value, 10);
-    this.filtroCategoria = this.filtroCategoria.filter(i => i !== numberChecked);
+    this.filtroCategoria = this.filtroCategoria.filter(
+      i => i !== numberChecked
+    );
     if ($event.checked === true) {
       this.filtroCategoria.push(numberChecked);
     }
     this.pcService.PushFiltroCategoria(this.filtroCategoria);
     // this.pcService.filteredPcs(this.allPcs.filter( (pc, i, a) => this.filtroCategoria.includes(pc.tipo)));
+  }
 
+  formatLabel(value: number | null) {
+    if (!value) {
+      return this.filtroGradiente;
+    }
+
+    if (value >= 1000) {
+      return Math.round(value / 1000) + " ºC";
+    }
+
+    return value;
+  }
+
+  onInputFiltroGradiente($event: MatSliderChange) {
+    this.pcService.PushFiltroGradiente($event.value);
   }
 }
-
