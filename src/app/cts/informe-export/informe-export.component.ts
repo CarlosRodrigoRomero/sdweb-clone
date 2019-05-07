@@ -584,7 +584,7 @@ export class InformeExportComponent implements OnInit {
       });
 
     canvas.add(triangle);
-    canvas.add(textTriangle);
+    // canvas.add(textTriangle);
     canvas.renderAll();
   }
 
@@ -1041,13 +1041,15 @@ getPagesPDF() {
 
   },
 
-  '\n',
+  '\n\n',
 
 
   {
-      text: '1.3 Irradiancia durante el vuelo\n\n',
+      text: '1.3 Irradiancia durante el vuelo',
       style: 'h3'
   },
+
+   '\n\n',
 
   {
       text: this.getTextoIrradiancia(),
@@ -1311,7 +1313,7 @@ getPagesPDF() {
   '\n',
 
   {
-      text: 'Según la norma UNE-62446-3 de inspección termográfica de instalaciones fotovoltaicas, las anomalías termográficas se clasifican en tres clases o CoA (Class of Abnormalitys):\n\n',
+      text: 'Según la norma internacional IEC 62446-3 de inspección termográfica de instalaciones fotovoltaicas, las anomalías térmicas se clasifican en tres clases o CoA (Class of Abnormalitys):\n\n',
       style: 'p'
   },
 
