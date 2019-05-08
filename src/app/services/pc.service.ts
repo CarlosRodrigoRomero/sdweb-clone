@@ -29,12 +29,12 @@ export class PcService {
   public filtroClase$ = this.filtroClase.asObservable();
   private filtroCategoria = new BehaviorSubject<number[]>(new Array<number>());
   public filtroCategoria$ = this.filtroCategoria.asObservable();
-  private filtroGradiente = new BehaviorSubject<number>(0);
+  private filtroGradiente = new BehaviorSubject<number>(10);
   public filtroGradiente$ = this.filtroGradiente.asObservable();
 
   private currentFiltroClase: number[];
   private currentFiltroCategoria: number[];
-  private currentFiltroGradiente: number;
+  public currentFiltroGradiente: number;
 
   private filteredPcsSource = new BehaviorSubject<PcInterface[]>(
     new Array<PcInterface>()
@@ -70,9 +70,8 @@ export class PcService {
 
     this.filtroGradiente$.subscribe(filtro => {
       this.currentFiltroGradiente = filtro;
+      console.log("TCL: PcService -> constructor -> filtro", filtro);
     });
-
-    this.currentFiltroGradiente = 0;
     // console.log('filtrosCategorias', this.filtroCategoria, this.filtroClase);
     // this.currentFilteredPcs$ = this.filtroCategoria$
     //   .mergeMap( filtro1 => this.filtroClase$
@@ -89,7 +88,10 @@ export class PcService {
           pc =>
             this.currentFiltroClase.includes(pc.severidad) &&
             this.currentFiltroCategoria.includes(pc.tipo) &&
-            pc.gradienteNormalizado >= this.currentFiltroGradiente
+            (pc.gradienteNormalizado >= this.currentFiltroGradiente ||
+              (pc.gradienteNormalizado < this.currentFiltroGradiente &&
+                pc.tipo !== 8 &&
+                pc.tipo !== 9))
         )
         .sort(this.compare)
     );
@@ -101,7 +103,10 @@ export class PcService {
             pc =>
               this.currentFiltroClase.includes(pc.severidad) &&
               this.currentFiltroCategoria.includes(pc.tipo) &&
-              pc.gradienteNormalizado >= this.currentFiltroGradiente
+              (pc.gradienteNormalizado >= this.currentFiltroGradiente ||
+                (pc.gradienteNormalizado < this.currentFiltroGradiente &&
+                  pc.tipo !== 8 &&
+                  pc.tipo !== 9))
           )
           .sort(this.compare)
       )
