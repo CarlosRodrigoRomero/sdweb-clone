@@ -961,7 +961,7 @@ export class InformeExportComponent implements OnInit {
         style: "p"
       },
 
-      "\n\n",
+      "\n",
 
       {
         columns: [
@@ -1021,18 +1021,6 @@ export class InformeExportComponent implements OnInit {
                   {}
                 ],
 
-
-  {
-      text: '1.3 Irradiancia durante el vuelo',
-      style: 'h3'
-  },
-
-   '\n\n',
-
-  {
-      text: this.getTextoIrradiancia(),
-      style: 'p'
-  },
                 [
                   {
                     text: "Fecha",
@@ -1141,9 +1129,11 @@ export class InformeExportComponent implements OnInit {
       "\n",
 
       {
-        text: "1.3 Irradiancia durante el vuelo\n\n",
+        text: "1.3 Irradiancia durante el vuelo",
         style: "h3"
       },
+
+      "\n\n",
 
       {
         text: this.getTextoIrradiancia(),
@@ -1358,13 +1348,7 @@ export class InformeExportComponent implements OnInit {
         alignment: "center"
       },
 
-  {
-      text: 'Según la norma internacional IEC 62446-3 de inspección termográfica de instalaciones fotovoltaicas, las anomalías térmicas se clasifican en tres clases o CoA (Class of Abnormalitys):\n\n',
-      style: 'p'
-  },
-
       "\n\n",
-
 
       {
         columns: [
@@ -1442,9 +1426,11 @@ export class InformeExportComponent implements OnInit {
 
       {
         text:
-          "Según la norma UNE-62446-3 de inspección termográfica de instalaciones fotovoltaicas, las anomalías termográficas se clasifican en tres clases o CoA (Class of Abnormalitys):\n\n",
+          "Según la norma internacional IEC 62446-3 para inspecciones termográficas de instalaciones fotovoltaicas, las anomalías térmicas se clasifican en tres clases o CoA (Class of Abnormalitys):",
         style: "p"
       },
+
+      "\n\n",
 
       {
         ul: [
@@ -1717,12 +1703,12 @@ export class InformeExportComponent implements OnInit {
         if (c.nombre === "tipo") {
           row.push({
             text: this.pcDescripcion[pc[c.nombre]],
-            style: "tableCell"
+            style: "tableCellAnexo1"
           });
         } else {
           row.push({
             text: pc[c.nombre],
-            style: "tableCell"
+            style: "tableCellAnexo1"
           });
         }
       }
@@ -1743,6 +1729,7 @@ export class InformeExportComponent implements OnInit {
     };
 
     allPagsAnexo.push(pag1Anexo);
+
     for (const s of this.filteredSeguidores) {
       const table = this.getPaginaSeguidor(s);
 
@@ -1757,7 +1744,7 @@ export class InformeExportComponent implements OnInit {
 
         {
           image: `imgSeguidorCanvas${s.global_x}`,
-          width: 500,
+          width: 450,
           alignment: "center"
         },
 
@@ -1776,66 +1763,68 @@ export class InformeExportComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: "Hora de captura",
-                      style: "tableHeaderBlue"
+                      text: "Hora",
+                      style: "tableHeaderImageData"
                     },
 
                     {
-                      text: "Irradiancia (W/m2)",
-                      style: "tableHeaderBlue"
+                      text: "Irradiancia",
+                      style: "tableHeaderImageData"
                     },
 
                     {
-                      text: "Temperatura ambiente (ºC)",
-                      style: "tableHeaderBlue"
+                      text: "Temp. ambiente",
+                      style: "tableHeaderImageData"
                     },
 
                     {
                       text: "Viento",
-                      style: "tableHeaderBlue"
+                      style: "tableHeaderImageData"
                     },
 
                     {
                       text: "Emisividad",
-                      style: "tableHeaderBlue"
+                      style: "tableHeaderImageData"
                     },
 
                     {
-                      text: "Temperatura reflejada (ºC)",
-                      style: "tableHeaderBlue"
+                      text: "Temp. reflejada",
+                      style: "tableHeaderImageData"
                     }
                   ],
                   [
                     {
                       text: this.datePipe.transform(
-                        s.pcs[0].datetime,
+                        s.pcs[0].datetime * 1000,
                         "HH:mm:ss"
                       ),
-                      style: "tableCell"
+                      style: "tableCellAnexo1"
                     },
 
                     {
-                      text: s.pcs[0].irradiancia,
-                      style: "tableCell"
+                      text: s.pcs[0].irradiancia.toString().concat(" W/m2"),
+                      style: "tableCellAnexo1"
                     },
                     {
-                      text: s.pcs[0].temperaturaAire,
-                      style: "tableCell"
+                      text: s.pcs[0].temperaturaAire.toString().concat(" ºC"),
+                      style: "tableCellAnexo1"
                     },
 
                     {
                       text: s.pcs[0].viento,
-                      style: "tableCell"
+                      style: "tableCellAnexo1"
                     },
 
                     {
                       text: s.pcs[0].emisividad,
-                      style: "tableCell"
+                      style: "tableCellAnexo1"
                     },
 
                     {
-                      text: s.pcs[0].temperaturaReflejada,
-                      style: "tableCell"
+                      text: s.pcs[0].temperaturaReflejada
+                        .toString()
+                        .concat(" ºC"),
+                      style: "tableCellAnexo1"
                     }
                   ]
                 ]
@@ -1937,15 +1926,20 @@ export class InformeExportComponent implements OnInit {
         tableHeaderRed: {
           alignment: "center",
           bold: true,
-          fontSize: 13,
+          fontSize: 10,
           fillColor: "#f46842"
         },
 
-        tableHeaderBlue: {
+        tableHeaderImageData: {
           alignment: "center",
           bold: true,
-          fontSize: 13,
+          fontSize: 10,
           fillColor: "#4cb6c9"
+        },
+
+        tableCellAnexo1: {
+          alignment: "center",
+          fontSize: 10
         },
 
         tableHeader: {
