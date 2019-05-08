@@ -70,7 +70,6 @@ export class PcService {
 
     this.filtroGradiente$.subscribe(filtro => {
       this.currentFiltroGradiente = filtro;
-      console.log("TCL: PcService -> constructor -> filtro", filtro);
     });
     // console.log('filtrosCategorias', this.filtroCategoria, this.filtroClase);
     // this.currentFilteredPcs$ = this.filtroCategoria$

@@ -15,7 +15,11 @@ const pica = Pica();
 import { AngularFireStorage } from "@angular/fire/storage";
 import { Observable, BehaviorSubject } from "rxjs";
 import { take } from "rxjs/operators";
-import { MatCheckboxChange } from "@angular/material";
+import {
+  MatCheckboxChange,
+  MatTableDataSource,
+  MatTable
+} from "@angular/material";
 
 import pdfMake from "pdfmake/build/pdfmake.js";
 import pdfFonts from "pdfmake/build/vfs_fonts.js";
@@ -23,6 +27,14 @@ import { DatePipe, DecimalPipe } from "@angular/common";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 declare var $: any;
+
+export interface PcsTable {
+  tipo: string;
+  coa1: number;
+  coa2: number;
+  coa3: number;
+  total: number;
+}
 
 @Component({
   selector: "app-informe-export",
@@ -33,6 +45,7 @@ declare var $: any;
 })
 export class InformeExportComponent implements OnInit {
   @ViewChild("content") content: ElementRef;
+  @ViewChild(MatTable) table: MatTable<PcsTable>;
   @Input() public planta: PlantaInterface;
   @Input() public informe: InformeInterface;
 
@@ -45,6 +58,7 @@ export class InformeExportComponent implements OnInit {
   public numClases;
   public countCategoria;
   public countPosicion;
+  public countCategoriaClase;
   public countClase;
   public mae;
   public global;
@@ -70,6 +84,7 @@ export class InformeExportComponent implements OnInit {
   public filteredPcsVistaPrevia: PcInterface[];
   public filteredPcs$: Observable<PcInterface[]>;
   public filteredPcs: PcInterface[];
+  public currentFiltroGradiente: number;
   public countLoadedImages = 0;
   public countSeguidores: number;
   public generandoPDF = false;
@@ -83,6 +98,15 @@ export class InformeExportComponent implements OnInit {
   public imgCurvaMaeBase64: string;
   public imgLogoBase64: string;
   public progresoPDF: string;
+  public informeCalculado: boolean;
+  public displayedColumns: string[] = [
+    "categoria",
+    "coa1",
+    "coa2",
+    "coa3",
+    "total"
+  ];
+  public dataSource: MatTableDataSource<PcsTable>;
 
   private countLoadedImages$ = new BehaviorSubject(null);
 
@@ -99,10 +123,9 @@ export class InformeExportComponent implements OnInit {
       .fill(0)
       .map((_, i) => i + 1);
 
-    this.countCategoria = Array();
-    this.countClase = Array();
-    this.countPosicion = Array();
     this.global = GLOBAL;
+
+    this.informeCalculado = false;
 
     this.url = GLOBAL.url;
     this.titulo = "Vista de informe";
@@ -125,17 +148,6 @@ export class InformeExportComponent implements OnInit {
       this.currentFilteredColumnas = filteredCols;
     });
 
-    // Obtener pcs vista previa
-    this.filteredPcs$.subscribe(pcs => {
-      this.filteredPcsVistaPrevia = pcs.slice(0, 20);
-    });
-    // Ordenar Pcs por seguidor:
-    this.pcService.filteredSeguidores$.subscribe(seguidores => {
-      this.filteredSeguidores = seguidores;
-      this.filteredSeguidoresVistaPrevia = seguidores.slice(0, 3);
-    });
-
-    ////////////////////////
     this.arrayFilas = Array(this.planta.filas)
       .fill(0)
       .map((_, i) => i + 1);
@@ -208,6 +220,19 @@ export class InformeExportComponent implements OnInit {
         null,
         { crossOrigin: "anonymous" }
       );
+    });
+
+    // Obtener pcs vista previa
+    this.filteredPcs$.subscribe(pcs => {
+      this.filteredPcsVistaPrevia = pcs.slice(0, 20);
+      this.filteredPcs = pcs;
+      this.currentFiltroGradiente = this.pcService.currentFiltroGradiente;
+      this.calcularInforme();
+    });
+    // Ordenar Pcs por seguidor:
+    this.pcService.filteredSeguidores$.subscribe(seguidores => {
+      this.filteredSeguidores = seguidores;
+      this.filteredSeguidoresVistaPrevia = seguidores.slice(0, 3);
     });
 
     // this.logoImg$.pipe(take(1)).subscribe( url => {
@@ -339,15 +364,21 @@ export class InformeExportComponent implements OnInit {
     //     };
   }
 
-  private calcularInforme(filteredPcs: PcInterface[]) {
-    this.filteredPcs = filteredPcs;
-    const allPcs = filteredPcs;
+  private calcularInforme() {
+    this.countCategoria = Array();
+    this.countCategoriaClase = Array();
+    this.countClase = Array();
+    this.countPosicion = Array();
+
+    this.informeCalculado = false;
+    const allPcs = this.filteredPcs;
     allPcs.sort(this.compare);
     this.irradianciaMinima = allPcs.sort(
       this.compareIrradiancia
     )[0].irradiancia;
     this.emisividad = this.informe.emisividad;
     this.tempReflejada = this.informe.tempReflejada;
+
     // Calcular las alturas
     for (const y of this.arrayFilas) {
       const countColumnas = Array();
@@ -358,19 +389,42 @@ export class InformeExportComponent implements OnInit {
       }
       this.countPosicion.push(countColumnas);
     }
-    // Calcular los tipos de puntos calientes
+    // CATEGORIAS //
     let filtroCategoria;
-    for (const i of this.numCategorias) {
-      filtroCategoria = allPcs.filter(pc => pc.tipo === i && pc.severidad > 1);
+    let filtroCategoriaClase;
+    for (const cat of this.numCategorias) {
+      filtroCategoria = allPcs.filter(pc => pc.tipo === cat);
       this.countCategoria.push(filtroCategoria.length);
+
+      let count1 = Array();
+      for (const clas of this.numClases) {
+        filtroCategoriaClase = allPcs.filter(
+          pc => pc.severidad === clas && pc.tipo === cat
+        );
+        count1.push(filtroCategoriaClase.length);
+      }
+      const totalPcsInFilter = count1[0] + count1[1] + count1[2];
+      if (totalPcsInFilter > 0) {
+        this.countCategoriaClase.push({
+          categoria: this.pcDescripcion[cat],
+          coa1: count1[0],
+          coa2: count1[1],
+          coa3: count1[2],
+          total: totalPcsInFilter
+        });
+      }
     }
-    // Calcular la severidad //
+
+    // CLASES //
     let filtroClase;
     for (const j of this.numClases) {
       filtroClase = allPcs.filter(pc => pc.severidad === j);
 
       this.countClase.push(filtroClase.length);
     }
+
+    this.informeCalculado = true;
+    this.dataSource = new MatTableDataSource(this.countCategoriaClase);
   }
 
   public calificacionMae(mae: number) {
@@ -426,7 +480,8 @@ export class InformeExportComponent implements OnInit {
           this.pcService.currentFilteredPcs$
             .pipe(take(1))
             .subscribe(filteredPcs => {
-              this.calcularInforme(filteredPcs);
+              this.filteredPcs = filteredPcs;
+              this.calcularInforme();
 
               const pdfDocGenerator = pdfMake.createPdf(
                 this.getDocDefinition(imageListBase64)
@@ -1532,8 +1587,9 @@ export class InformeExportComponent implements OnInit {
       "\n",
 
       {
-        text:
-          "La siguiente tabla muestra la cantidad de anomalías térmicas por categoría. Sólo se incluyen las anomalías térmicas de clase 2 y 3.",
+        text: `La siguiente tabla muestra la cantidad de anomalías térmicas por categoría. En el caso de células calientes, sólo se incluyen aquellas con gradientes mayores a ${
+          this.currentFiltroGradiente
+        } ºC`,
         style: "p"
       },
 
@@ -1574,7 +1630,7 @@ export class InformeExportComponent implements OnInit {
                       style: "bold"
                     },
                     {
-                      text: this.countClase[1] + this.countClase[2],
+                      text: this.filteredPcs.length.toString(),
                       style: "bold"
                     },
                     {
