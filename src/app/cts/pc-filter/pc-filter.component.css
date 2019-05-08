@@ -17,6 +17,13 @@
   align-self: center;
   color: grey;
 }
+.subtitulo-gradiente {
+  color: grey;
+  font-size: 1rem;
+}
+.titulo-gradiente {
+  margin-bottom: 0;
+}
 
 .circle {
   width: 15px;

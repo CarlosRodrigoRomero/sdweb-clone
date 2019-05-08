@@ -36,7 +36,7 @@ export let GLOBAL = {
   ],
   severidad_dt: [5, 20, 40],
   pcDescripcion: [
-    "0",
+    "0", // Para que coincida el indice con el tipo de anomalia
     "Punto caliente", // 1
     "Varios puntos calientes", // 2
     "Substring en CA", // 3
