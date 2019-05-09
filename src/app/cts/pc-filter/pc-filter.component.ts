@@ -2,7 +2,6 @@ import { Component, OnInit, Input, EventEmitter, Output } from "@angular/core";
 import { PcInterface } from "../../models/pc";
 import {
   MatButtonToggleGroup,
-  MatButtonToggleChange,
   MatCheckboxChange,
   MatSliderChange
 } from "@angular/material";
@@ -50,9 +49,7 @@ export class PcFilterComponent implements OnInit {
 
     // Calcular los tipos de puntos calientes
     for (const i of this.numCategorias) {
-      this.countCategoria.push(
-        this.allPcs.filter(pc => pc.tipo === i && pc.severidad > 1).length
-      );
+      this.countCategoria.push(this.allPcs.filter(pc => pc.tipo === i).length);
     }
 
     // Calcular la severidad //
