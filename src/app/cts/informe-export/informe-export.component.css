@@ -12,12 +12,15 @@ h5 {
 tr.mat-footer-row {
   font-weight: bold;
 }
+th.mat-header-cell {
+  padding-right: 1rem;
+}
 
 .img40 {
   width: 40%;
 }
 
-.col-columnas {
+.margintop {
   margin-top: 1rem;
 }
 
