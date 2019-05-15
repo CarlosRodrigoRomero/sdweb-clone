@@ -1,24 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { InformeService } from 'src/app/services/informe.service';
-import { PcService } from 'src/app/services/pc.service';
-import { PlantaService } from 'src/app/services/planta.service';
-import { InformeInterface } from 'src/app/models/informe';
-import { PlantaInterface } from 'src/app/models/planta';
-import { PcInterface } from 'src/app/models/pc';
-import { ActivatedRoute, Router } from '@angular/router';
-import { GLOBAL } from '../../services/global';
+import { Component, OnInit } from "@angular/core";
+import { InformeService } from "src/app/services/informe.service";
+import { PcService } from "src/app/services/pc.service";
+import { PlantaService } from "src/app/services/planta.service";
+import { InformeInterface } from "src/app/models/informe";
+import { PlantaInterface } from "src/app/models/planta";
+import { PcInterface } from "src/app/models/pc";
+import { ActivatedRoute, Router } from "@angular/router";
+import { GLOBAL } from "../../services/global";
 
-import 'fabric';
+import "fabric";
 declare let fabric;
 
-
 @Component({
-  selector: 'app-informe-edit',
-  templateUrl: './informe-edit.component.html',
-  styleUrls: ['./informe-edit.component.css'],
+  selector: "app-informe-edit",
+  templateUrl: "./informe-edit.component.html",
+  styleUrls: ["./informe-edit.component.css"],
   providers: [InformeService, PlantaService, PcService]
 })
-
 export class InformeEditComponent implements OnInit {
   public titulo: number;
   public informe: InformeInterface;
@@ -82,7 +80,7 @@ export class InformeEditComponent implements OnInit {
     private plantaService: PlantaService,
     private pcService: PcService
   ) {
-    this.mapType = 'satellite';
+    this.mapType = "satellite";
     this.defaultZoom = 18;
 
     this.localIdCount = 0;
@@ -95,12 +93,12 @@ export class InformeEditComponent implements OnInit {
 
     this.url = GLOBAL.url;
     this.current_gps_correction = 0;
-    this.currentFlight = '1';
+    this.currentFlight = "1";
     this.current_gps_lng = -5.880743;
     this.current_gps_lat = 39.453186;
     this.current_track_heading = 0;
     this.current_image_rotation = 0;
-    this.squareBase = 20;
+    this.squareBase = 37;
 
     this.image_width = 640;
     this.image_height = 512;
@@ -109,13 +107,51 @@ export class InformeEditComponent implements OnInit {
     this.manualRotation = false;
 
     this.allPcs = new Array<PcInterface>();
-
   }
 
   ngOnInit() {
     this.getInforme();
-    this.canvas = new fabric.Canvas('mainCanvas');
-    this.canvas2 = new fabric.Canvas('hiddenCanvas');
+    this.canvas = new fabric.Canvas("mainCanvas");
+    this.canvas2 = new fabric.Canvas("hiddenCanvas");
+
+    this.canvas.on("object:modified", options => {
+      if (options.target.type === "rect") {
+        const actObjRaw = this.transformActObjToRaw(options.target);
+        this.selectPcFromLocalId(options.target.local_id);
+
+        if (actObjRaw.ref === true) {
+          this.selected_pc.refTop = Math.round(actObjRaw.top);
+
+          this.selected_pc.refLeft = Math.round(actObjRaw.left);
+          this.selected_pc.refWidth = Math.round(
+            Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x)
+          );
+          this.selected_pc.refHeight = Math.round(
+            Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y)
+          );
+        } else {
+          this.selected_pc.img_top = Math.round(actObjRaw.top);
+          this.selected_pc.img_left = Math.round(actObjRaw.left);
+          console.log(
+            "TCL: onMouseUpCanvas -> actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x",
+            actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x
+          );
+          console.log(
+            "TCL: onMouseUpCanvas -> this.selected_pc.img_width",
+            this.selected_pc.img_width
+          );
+
+          this.selected_pc.img_width = Math.round(
+            Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x)
+          );
+          this.selected_pc.img_height = Math.round(
+            Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y)
+          );
+        }
+      }
+
+      this.updatePcInDb(this.selected_pc, false);
+    });
 
     // this.canvas.on('object:modified', this.onObjectModified);
   }
@@ -126,7 +162,7 @@ export class InformeEditComponent implements OnInit {
 
     // Get HS img coords and draw triangle
     if (actObj !== null && actObj !== undefined) {
-      if (actObj.get('type') === 'rect' && actObj.isMoving === true) {
+      if (actObj.get("type") === "rect" && actObj.isMoving === true) {
         const actObjRaw = this.transformActObjToRaw(actObj);
         // const max_temp = this.getMaxTempInActObj(actObj);
         // this.selected_pc.temperaturaMax = max_temp.max_temp;
@@ -136,22 +172,26 @@ export class InformeEditComponent implements OnInit {
           // console.log('actObjRaw ref', actObjRaw);
           this.selected_pc.refTop = Math.round(actObjRaw.top);
           this.selected_pc.refLeft = Math.round(actObjRaw.left);
-          this.selected_pc.refWidth = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
-          this.selected_pc.refHeight = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
-
+          this.selected_pc.refWidth = Math.round(
+            Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x)
+          );
+          this.selected_pc.refHeight = Math.round(
+            Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y)
+          );
         } else {
           // console.log('NoRef', this.selected_pc);
           this.selected_pc.img_top = Math.round(actObjRaw.top);
           this.selected_pc.img_left = Math.round(actObjRaw.left);
-          this.selected_pc.img_width = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
-          this.selected_pc.img_height = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
-
+          this.selected_pc.img_width = Math.round(
+            Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x)
+          );
+          this.selected_pc.img_height = Math.round(
+            Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y)
+          );
         }
       }
     }
   }
-
-
 
   getCurrentImageRotation(trackHeading: number) {
     // track_heading: en grados
@@ -183,7 +223,10 @@ export class InformeEditComponent implements OnInit {
     } else if (this.current_image_rotation === 180) {
       x_ = this.image_width - x;
       y_ = this.image_height - y;
-    } else if (this.current_image_rotation === 270 || this.current_image_rotation === -90) {
+    } else if (
+      this.current_image_rotation === 270 ||
+      this.current_image_rotation === -90
+    ) {
       x_ = y;
       y_ = this.image_width - x;
     } else {
@@ -191,8 +234,7 @@ export class InformeEditComponent implements OnInit {
       y_ = y;
     }
 
-    return {x: x_, y: y_};
-
+    return { x: x_, y: y_ };
   }
 
   transformCoordsToRaw(x_: number, y_: number) {
@@ -205,20 +247,23 @@ export class InformeEditComponent implements OnInit {
     let y: number;
 
     // Los angulos de rotacion son positivos en sentido horario
-    if (this.current_image_rotation === 270 || this.current_image_rotation === -90) {
+    if (
+      this.current_image_rotation === 270 ||
+      this.current_image_rotation === -90
+    ) {
       x = this.image_width - y_;
       y = x_;
     } else if (this.current_image_rotation === 180) {
       x = this.image_width - x_;
       y = this.image_height - y_;
-    } else if (this.current_image_rotation === 90 ) {
+    } else if (this.current_image_rotation === 90) {
       x = y_;
       y = this.image_height - x_;
     } else {
       x = x_;
       y = y_;
     }
-    return {x, y};
+    return { x, y };
   }
 
   transformActObjToRaw(act_obj) {
@@ -228,30 +273,29 @@ export class InformeEditComponent implements OnInit {
     let height: number;
 
     // Los angulos de rotacion son positivos en sentido horario
-    if (this.current_image_rotation === 270 || this.current_image_rotation === -90) {
+    if (
+      this.current_image_rotation === 270 ||
+      this.current_image_rotation === -90
+    ) {
       left = this.image_width - act_obj.top - act_obj.height;
       top = act_obj.left;
       width = act_obj.height;
       height = act_obj.width;
-
     } else if (this.current_image_rotation === 180) {
       left = this.image_width - act_obj.left - act_obj.width;
       top = this.image_height - act_obj.top - act_obj.height;
       width = act_obj.width;
       height = act_obj.height;
-
-    } else if (this.current_image_rotation === 90 ) {
+    } else if (this.current_image_rotation === 90) {
       left = act_obj.top;
       top = this.image_height - act_obj.left - act_obj.height;
       width = act_obj.height;
       height = act_obj.width;
-
     } else {
       left = act_obj.left;
       top = act_obj.top;
       width = act_obj.width;
       height = act_obj.height;
-
     }
     act_obj.left = left;
     act_obj.top = top;
@@ -268,42 +312,39 @@ export class InformeEditComponent implements OnInit {
     let height: number;
 
     // Los angulos de rotacion son positivos en sentido horario
-    if (this.current_image_rotation === 270 || this.current_image_rotation === -90) {
+    if (
+      this.current_image_rotation === 270 ||
+      this.current_image_rotation === -90
+    ) {
       top = this.image_width - act_obj.left - act_obj.width;
       left = act_obj.top;
       width = act_obj.height;
       height = act_obj.width;
-
     } else if (this.current_image_rotation === 180) {
       left = this.image_width - act_obj.left - act_obj.width;
       top = this.image_height - act_obj.top - act_obj.height;
       width = act_obj.width;
       height = act_obj.height;
-
-    } else if (this.current_image_rotation === 90 ) {
+    } else if (this.current_image_rotation === 90) {
       top = act_obj.left;
       left = this.image_height - act_obj.top - act_obj.width;
       width = act_obj.height;
       height = act_obj.width;
-
     } else {
       left = act_obj.left;
       top = act_obj.top;
       width = act_obj.width;
       height = act_obj.height;
-
     }
 
-    return {left, top, width, height};
+    return { left, top, width, height };
   }
   onMouseMoveCanvas(event: MouseEvent) {
-
     // const raw_coords = this.transformCoordsToRaw(event.offsetX, event.offsetY);
     // console.log('offsetX e y', event.offsetX, event.offsetY);
     // console.log('raw_coordsX e y', raw_coords.x, raw_coords.y);
     // const mouseX = raw_coords.x;
     // const mouseY = raw_coords.y;
-
     // Temperatura puntual
     // console.log('canvas2 size', this.canvas2.height, this.canvas2.width);
     // const mousePositionData = this.canvas2.getContext('2d').getImageData(mouseX , mouseY , 1, 1).data;
@@ -311,8 +352,6 @@ export class InformeEditComponent implements OnInit {
     // console.log('mousePositionData', mousePositionData);
     // const mouseTemp = this.rgb2temp(mousePositionData[0], mousePositionData[1], mousePositionData[2]);
     // console.log('mouse_temp', mouseTemp);
-
-
     // // Coger maxima temperatura de los alrededores
     // const mouseSquare = this.canvas2
     //   .getContext('2d')
@@ -322,7 +361,6 @@ export class InformeEditComponent implements OnInit {
     //     this.squareBase,
     //     this.squareBase
     //   );
-
     // Get max temp
     // const mouse_temps_array = [];
     // for (
@@ -342,16 +380,12 @@ export class InformeEditComponent implements OnInit {
     // const mouse_max_temp_array = this.indexOfMax(mouse_temps_array);
     // // console.log('index_of', mouse_max_temp_array);
     // this.tooltip_temp = mouse_max_temp_array[0];
-
-
     //
     // #############################
     // Modificación de HS
     // #############################
-
     // console.log('x,y', event.offsetX, event.offsetY, 'tx, ty', mouseX, mouseY);
     // const actObj = this.canvas.getActiveObject();
-
     // // Get HS img coords and draw triangle
     // if (actObj !== null && actObj !== undefined) {
     //   if (actObj.get('type') === 'rect' && actObj.isMoving === true) {
@@ -366,31 +400,24 @@ export class InformeEditComponent implements OnInit {
     //       this.selected_pc.refLeft = Math.round(actObjRaw.left);
     //       this.selected_pc.refWidth = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
     //       this.selected_pc.refHeight = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
-
     //     } else {
     //       // console.log('NoRef', this.selected_pc);
     //       this.selected_pc.img_top = Math.round(actObjRaw.top);
     //       this.selected_pc.img_left = Math.round(actObjRaw.left);
     //       this.selected_pc.img_width = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
     //       this.selected_pc.img_height = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
-
     //     }
-        // console.log('selected_pc_mod top, left', this.selected_pc.img_top, this.selected_pc.img_left);
-        // this.updatePcInDb(this.selected_pc, false);
-
-        // console.log('RAW: top,left,width, height', actObjRaw.top, actObjRaw.left, actObjRaw.width, actObjRaw.height);
-
-        // console.log('top: ', actObjRaw.top);
-        // $('#temp').html(Math.round(temperature*10)/10);
-        // $('#max_temp').html( Math.round(temps.max()*10)/10);
-        // $('#sq_height').html(squareHeight);
-        // $('#sq_width').html(squareWidth);
-
+    // console.log('selected_pc_mod top, left', this.selected_pc.img_top, this.selected_pc.img_left);
+    // this.updatePcInDb(this.selected_pc, false);
+    // console.log('RAW: top,left,width, height', actObjRaw.top, actObjRaw.left, actObjRaw.width, actObjRaw.height);
+    // console.log('top: ', actObjRaw.top);
+    // $('#temp').html(Math.round(temperature*10)/10);
+    // $('#max_temp').html( Math.round(temps.max()*10)/10);
+    // $('#sq_height').html(squareHeight);
+    // $('#sq_width').html(squareWidth);
     //   }
     // }
   }
-
-
 
   // getMaxTempInActObj(actObj) { // en la imagen rotada
 
@@ -452,7 +479,7 @@ export class InformeEditComponent implements OnInit {
     const triangle = new fabric.Triangle({
       width: this.squareBase,
       height: this.squareBase,
-      fill: 'red',
+      fill: "red",
       left: Math.round(x - this.squareBase / 2),
       top: y + 2, // si no ponemos este 2, entonces no lee bien debajo del triangulo
       selectable: false
@@ -462,17 +489,35 @@ export class InformeEditComponent implements OnInit {
     this.canvas.renderAll();
   }
 
-
   getLeftAndTop() {
     if (this.current_image_rotation === 90) {
-      return {left: this.image_height, top: 0, height: this.image_width, width: this.image_height};
+      return {
+        left: this.image_height,
+        top: 0,
+        height: this.image_width,
+        width: this.image_height
+      };
     } else if (this.current_image_rotation === 180) {
-      return {left: this.image_width, top: this.image_height, height: this.image_height, width: this.image_width};
+      return {
+        left: this.image_width,
+        top: this.image_height,
+        height: this.image_height,
+        width: this.image_width
+      };
     } else if (this.current_image_rotation === 270) {
-      return {left: 0, top: this.image_width, height: this.image_width, width: this.image_height};
+      return {
+        left: 0,
+        top: this.image_width,
+        height: this.image_width,
+        width: this.image_height
+      };
     } else {
-      return {left: 0, top: 0, height: this.image_height, width: this.image_width};
-
+      return {
+        left: 0,
+        top: 0,
+        height: this.image_height,
+        width: this.image_width
+      };
     }
   }
 
@@ -488,20 +533,19 @@ export class InformeEditComponent implements OnInit {
       // add background image
       if (this.fabImg) {
         this.canvas.remove(this.fabImg);
-        }
+      }
       this.canvas.setBackgroundImage(
         image,
         this.canvas.renderAll.bind(this.canvas),
         {
           // scaleX: this.canvas.width / image.width,
           // scaleY: this.canvas.height / image.height,
-          crossOrigin: 'anonymous',
+          crossOrigin: "anonymous",
           angle: this.current_image_rotation,
           left: leftAndTop.left,
-          top: leftAndTop.top,
+          top: leftAndTop.top
           // originX: 'top',
           // originY: 'left'
-
         }
       );
       this.fabImg = image;
@@ -510,22 +554,21 @@ export class InformeEditComponent implements OnInit {
     this.canvas2.clear();
     const img2 = new Image();
     img2.src = imgSrc;
-    img2.setAttribute('crossOrigin', 'anonymous');
+    img2.setAttribute("crossOrigin", "anonymous");
     img2.onload = ev => {
-         img2.setAttribute('crossOrigin', 'anonymous');
-         if (this.fabImg2) {
-          this.canvas2.remove(this.fabImg2);
-         }
-         this.fabImg2 = new fabric.Image(img2, {
-          // left: leftAndTop.left,
-          // top: leftAndTop.top,
-          // angle: this.current_image_rotation,
-          crossOrigin: 'Anonymous',
-          selectable: false
+      img2.setAttribute("crossOrigin", "anonymous");
+      if (this.fabImg2) {
+        this.canvas2.remove(this.fabImg2);
+      }
+      this.fabImg2 = new fabric.Image(img2, {
+        // left: leftAndTop.left,
+        // top: leftAndTop.top,
+        // angle: this.current_image_rotation,
+        crossOrigin: "Anonymous",
+        selectable: false
       });
-         this.canvas2.add(this.fabImg2);
-  };
-
+      this.canvas2.add(this.fabImg2);
+    };
   }
 
   onDblClickCanvas(event) {
@@ -535,38 +578,34 @@ export class InformeEditComponent implements OnInit {
     const actObj = new fabric.Rect({
       left: leftCoord,
       top: topCoord,
-      fill: 'rgba(0,0,0,0)',
-      stroke: 'red',
+      fill: "rgba(0,0,0,0)",
+      stroke: "red",
       strokeWidth: 1,
       width: this.squareWidth,
       height: this.squareHeight,
       hasControls: true,
       local_id: this.localIdCount,
       ref: false,
-      hasRotatingPoint: false,
-
+      hasRotatingPoint: false
     });
 
     const actObjRef = new fabric.Rect({
       left: leftCoord + this.squareWidth + 30,
       top: topCoord,
-      fill: 'rgba(0,0,0,0)',
-      stroke: 'blue',
+      fill: "rgba(0,0,0,0)",
+      stroke: "blue",
       strokeWidth: 1,
       width: this.squareWidth,
       height: this.squareHeight,
       hasControls: true,
       local_id: this.localIdCount,
       ref: true,
-      hasRotatingPoint: false,
+      hasRotatingPoint: false
     });
 
     this.canvas.add(actObj);
     this.canvas.add(actObjRef);
     this.canvas.setActiveObject(actObj);
-
-    // const max_temp = 0;
-    // const max_temp = this.getMaxTempInActObj(actObj);
 
     const actObjRawCoords = this.transformActObjToRaw(actObj);
     const actObjRefRawCoords = this.transformActObjToRaw(actObjRef);
@@ -585,13 +624,13 @@ export class InformeEditComponent implements OnInit {
     // this.canvas2.setActiveObject(act_obj_raw);
 
     const newPc: PcInterface = {
-      id: '',
+      id: "",
       archivo: this.currentFileName,
       tipo: 8, // tipo (celula caliente por defecto)
       local_x: 1, // local_x
       local_y: 0, // local_x
       global_x: 0, // global_x
-      global_y: '', // global_y
+      global_y: "", // global_y
       gps_lng: this.current_gps_lng,
       gps_lat: this.current_gps_lat,
       img_left: actObjRawCoords.left,
@@ -606,16 +645,19 @@ export class InformeEditComponent implements OnInit {
       informeId: this.informe.id,
       datetime: this.current_datetime,
       resuelto: false,
-      color: 'white',
+      color: "white",
       refTop: actObjRefRawCoords.top,
       refLeft: actObjRefRawCoords.left,
       refHeight: actObjRefRawCoords.height,
-      refWidth: actObjRefRawCoords.width,
+      refWidth: actObjRefRawCoords.width
     };
 
     if (this.selected_pc) {
-      this.selected_pc.color = 'black';
-      if (this.selected_pc.archivo === newPc.archivo) {
+      this.selected_pc.color = "black";
+      if (
+        this.selected_pc.archivo === newPc.archivo &&
+        this.planta.tipo === "2 ejes"
+      ) {
         newPc.global_x = this.selected_pc.global_x;
         newPc.global_y = this.selected_pc.global_y;
         newPc.gps_lng = this.selected_pc.gps_lng;
@@ -628,39 +670,14 @@ export class InformeEditComponent implements OnInit {
   }
 
   onMouseUpCanvas(event) {
-    if (this.selected_pc) {
-      this.updatePcInDb(this.selected_pc, false);
-    }
-
     const actObj = this.canvas.getActiveObject();
     // console.log('actObj', actObj);
     // console.log('top,left,width, height', actObj.top, actObj.left, actObj.width, actObj.height);
 
-
-
     if (actObj !== null && actObj !== undefined) {
-      if (actObj.get('type') === 'rect') {
+      if (actObj.get("type") === "rect") {
         const actObjRaw = this.transformActObjToRaw(actObj);
         this.selectPcFromLocalId(actObj.local_id);
-
-        if (actObjRaw.ref === true) {
-          // console.log('actObjRaw ref', actObjRaw);
-          this.selected_pc.refTop = Math.round(actObjRaw.top);
-          this.selected_pc.refLeft = Math.round(actObjRaw.left);
-          this.selected_pc.refWidth = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
-          this.selected_pc.refHeight = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
-
-        } else {
-          // console.log('NoRef', this.selected_pc);
-          this.selected_pc.img_top = Math.round(actObjRaw.top);
-          this.selected_pc.img_left = Math.round(actObjRaw.left);
-          this.selected_pc.img_width = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
-          this.selected_pc.img_height = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
-
-        }
-
-
-        this.updatePcInDb(this.selected_pc, false);
       }
     }
   }
@@ -705,392 +722,397 @@ export class InformeEditComponent implements OnInit {
   }
 
   getPlanta(plantaId: string) {
-      this.plantaService.getPlanta(plantaId).subscribe(
-        response => {
+    this.plantaService.getPlanta(plantaId).subscribe(
+      response => {
+        this.planta = response;
+        this.defaultZoom = this.planta.zoom;
 
-          this.planta = response;
-          this.defaultZoom = this.planta.zoom;
-
-          this.filas_array = [];
-          this.columnas_array = [];
-          for (let i = 1; i <= this.planta.columnas; i++) {
-            this.columnas_array.push(i);
-          }
-          for (let i = 1; i <= this.planta.filas; i++) {
-            this.filas_array.push(i);
-          }
-
-          if ( this.planta.vertical ) { // vertical
-            this.squareWidth = this.squareBase;
-            this.squareHeight = Math.round(this.squareWidth * 3 / 2);
-          } else {  // horizontal
-            this.squareHeight = this.squareBase;
-            this.squareWidth = Math.round(this.squareHeight * 3 / 2);
-          }
-
-
-        },
-        error => {
-          const errorMessage = error as any;
-          if (errorMessage != null) {
-            const body = JSON.parse(error._body);
-            this.alertMessage = body.message;
-
-            console.log(error);
-          }
+        this.filas_array = [];
+        this.columnas_array = [];
+        for (let i = 1; i <= this.planta.columnas; i++) {
+          this.columnas_array.push(i);
         }
-      );
+        for (let i = 1; i <= this.planta.filas; i++) {
+          this.filas_array.push(i);
+        }
 
+        if (this.planta.vertical) {
+          // vertical
+          this.squareWidth = this.squareBase;
+          this.squareHeight = Math.round((this.squareWidth * 3) / 2);
+        } else {
+          // horizontal
+          this.squareHeight = this.squareBase;
+          this.squareWidth = Math.round((this.squareHeight * 3) / 2);
+        }
+      },
+      error => {
+        const errorMessage = error as any;
+        if (errorMessage != null) {
+          const body = JSON.parse(error._body);
+          this.alertMessage = body.message;
+
+          console.log(error);
+        }
+      }
+    );
   }
 
   getInforme() {
-    const informeId = this.route.snapshot.paramMap.get('id');
+    const informeId = this.route.snapshot.paramMap.get("id");
     // this.route.params.forEach((params: Params) => {
     //   const id = params['id'];
 
     this.informeService.getInforme(informeId).subscribe(
-        response => {
-          if (!response) {
-            this.router.navigate(['/']);
-            console.log('errorrr 1');
-          } else {
-            this.informe = response;
-            // this.min_temp = this.informe.tempMin;
-            // this.max_temp = this.informe.tempMax;
+      response => {
+        if (!response) {
+          this.router.navigate(["/"]);
+          console.log("errorrr 1");
+        } else {
+          this.informe = response;
+          // this.min_temp = this.informe.tempMin;
+          // this.max_temp = this.informe.tempMax;
 
-            this.getPlanta(this.informe.plantaId);
-            // Cogemos todos los pcs de esta informe
-            this.getPcsList();
-            this.titulo = this.informe.fecha * 1000;
-            // Obtener lista de imagenes de la carpeta
-            this.informeService.getFileList(this.informe.carpeta).subscribe(
-              response2 => {
-                if (!response2) {
-                  this.alertMessage = 'No hay archivos';
-                } else {
-                  this.flights_data = response2;
-                  this.flights_list = Object.keys(this.flights_data);
-                  this.fileList = response2[Object.keys(this.flights_data)[0]].files;
-                  this.coords = response2[Object.keys(this.flights_data)[0]].coords;
-                  this.setImageFromRangeValue(1);
-                }
-              },
-              error => {
-                const errorMessage = error;
-                if (errorMessage != null) {
-                  const body = JSON.parse(error._body);
-                  this.alertMessage = body.message;
-                  console.log(error);
-                }
+          this.getPlanta(this.informe.plantaId);
+          // Cogemos todos los pcs de esta informe
+          this.getPcsList();
+          this.titulo = this.informe.fecha * 1000;
+          // Obtener lista de imagenes de la carpeta
+          this.informeService.getFileList(this.informe.carpeta).subscribe(
+            response2 => {
+              if (!response2) {
+                this.alertMessage = "No hay archivos";
+              } else {
+                this.flights_data = response2;
+                this.flights_list = Object.keys(this.flights_data);
+                this.fileList =
+                  response2[Object.keys(this.flights_data)[0]].files;
+                this.coords =
+                  response2[Object.keys(this.flights_data)[0]].coords;
+                this.setImageFromRangeValue(1);
               }
-            );
-
-          }
-        },
-        error => {
-          const errorMessage = error;
-          if (errorMessage != null) {
-            const body = JSON.parse(error._body);
-            this.alertMessage = body.message;
-
-            console.log(error);
-          }
+            },
+            error => {
+              const errorMessage = error;
+              if (errorMessage != null) {
+                const body = JSON.parse(error._body);
+                this.alertMessage = body.message;
+                console.log(error);
+              }
+            }
+          );
         }
-      );
-    }
+      },
+      error => {
+        const errorMessage = error;
+        if (errorMessage != null) {
+          const body = JSON.parse(error._body);
+          this.alertMessage = body.message;
+
+          console.log(error);
+        }
+      }
+    );
+  }
 
   sortPcs(array: PcInterface[]) {
-      array.sort((a: PcInterface, b: PcInterface) => {
-        if (a.local_id > b.local_id) {
-          return -1;
-        } else {
-          return 1;
-        }
-      });
-      return array;
-    }
+    array.sort((a: PcInterface, b: PcInterface) => {
+      if (a.local_id > b.local_id) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+    return array;
+  }
 
   filterPcsByFlight(currentFlight: string) {
-    if (typeof this.allPcs !== 'undefined') {
-      return this.allPcs.filter( x => x.vuelo === currentFlight);
-     }
+    if (typeof this.allPcs !== "undefined") {
+      return this.allPcs.filter(x => x.vuelo === currentFlight);
     }
+  }
 
   getPcsList(vuelo?: string) {
-      this.pcService.getPcs(this.informe.id).subscribe(
-        response => {
-          if (!response || response.length === 0) {
-            this.alertMessage = 'No hay puntos calientes';
-          } else {
-            this.alertMessage = null;
-            this.allPcs = response;
-            if (vuelo != null) {
-              this.allPcs = this.sortPcs(this.allPcs).filter(arr => {
-                return (arr.vuelo === vuelo);
+    this.pcService.getPcs(this.informe.id).subscribe(
+      response => {
+        if (!response || response.length === 0) {
+          this.alertMessage = "No hay puntos calientes";
+        } else {
+          this.alertMessage = null;
+          this.allPcs = response;
+          if (vuelo != null) {
+            this.allPcs = this.sortPcs(this.allPcs).filter(arr => {
+              return arr.vuelo === vuelo;
             });
-
-            } else {
-              this.allPcs = this.sortPcs(this.allPcs);
-            }
-
-            this.localIdCount = this.allPcs[0].local_id;
-            }
-
-          // if (this.DEFAULT_LAT == null || this.DEFAULT_LNG == null) {
-          //     this.DEFAULT_LAT = this.allPcs[0].gps_lat;
-          //     this.DEFAULT_LNG = this.allPcs[0].gps_lng;
-          // }
-        },
-        error => {
-          const errorMessage = error;
-          if (errorMessage != null) {
-            const body = JSON.parse(error._body);
-            this.alertMessage = body.message;
-            console.log(error);
+          } else {
+            this.allPcs = this.sortPcs(this.allPcs);
           }
+
+          this.localIdCount = this.allPcs[0].local_id;
         }
-      );
-    }
+
+        // if (this.DEFAULT_LAT == null || this.DEFAULT_LNG == null) {
+        //     this.DEFAULT_LAT = this.allPcs[0].gps_lat;
+        //     this.DEFAULT_LNG = this.allPcs[0].gps_lng;
+        // }
+      },
+      error => {
+        const errorMessage = error;
+        if (errorMessage != null) {
+          const body = JSON.parse(error._body);
+          this.alertMessage = body.message;
+          console.log(error);
+        }
+      }
+    );
+  }
 
   addPcToDb(pc: PcInterface) {
-      this.pcService.addPc(pc);
-      this.allPcs.push(pc);
-      this.allPcs = this.sortPcs(this.allPcs);
-      this.selected_pc = pc;
-    }
+    this.pcService.addPc(pc);
+    this.allPcs.push(pc);
+    this.allPcs = this.sortPcs(this.allPcs);
+    this.selected_pc = pc;
+  }
 
   onInputRange(event) {
+    this.selected_pc = null;
+    const value = parseInt(event.target.value, 10);
+    this.setImageFromRangeValue(value);
+  }
+  onClickNext(rangeValue) {
+    if (this.selected_pc !== null) {
       this.selected_pc = null;
-      const value = parseInt(event.target.value, 10);
-      this.setImageFromRangeValue(value);
     }
-    onClickNext(rangeValue) {
-      if (this.selected_pc !== null) {
-
-        this.selected_pc = null;
-      }
-      
-    }
+  }
 
   getDateTimeFromDateAndTime(date: string, time: string) {
-      const dateSplitted = date.split('.');
-      const year = parseInt(dateSplitted[2], 10);
-      const month = parseInt(dateSplitted[1], 10);
-      const day = parseInt(dateSplitted[0], 10);
+    const dateSplitted = date.split(".");
+    const year = parseInt(dateSplitted[2], 10);
+    const month = parseInt(dateSplitted[1], 10);
+    const day = parseInt(dateSplitted[0], 10);
 
-      const timeSplitted = time.split(':');
-      const hours = parseInt(timeSplitted[0], 10);
-      const minutes = parseInt(timeSplitted[1], 10);
-      const seconds = parseInt(timeSplitted[2], 10);
+    const timeSplitted = time.split(":");
+    const hours = parseInt(timeSplitted[0], 10);
+    const minutes = parseInt(timeSplitted[1], 10);
+    const seconds = parseInt(timeSplitted[2], 10);
 
-      return new Date(year, month - 1 , day, hours + this.gmt_hours_diff, minutes, seconds).getTime() / 1000;
-    }
+    return (
+      new Date(
+        year,
+        month - 1,
+        day,
+        hours + this.gmt_hours_diff,
+        minutes,
+        seconds
+      ).getTime() / 1000
+    );
+  }
 
   setImageFromRangeValue(value) {
-      value = parseInt(value, 10);
-      if (this.rangeValue !== value) {
-        this.rangeValue = value;
-      }
-      // El input es el 'value' del slider
-      // Para pasar del value del slider al indice de 'fileList' o '/coords' hay que restarle uno
-      const arrayIndex = value - 1;
-      this.current_datetime = this.getDateTimeFromDateAndTime(this.coords[arrayIndex].Date,
-                              this.coords[arrayIndex].Time);
-      this.current_gps_lat = parseFloat(
-        this.coords[arrayIndex + this.current_gps_correction].Latitude
-      );
-      this.current_gps_lng = parseFloat(
-        this.coords[arrayIndex + this.current_gps_correction].Longitude
-      );
-      this.current_track_heading = Math.round(this.coords[arrayIndex].TrackHeading);
-      this.current_image_rotation = this.getCurrentImageRotation(this.current_track_heading);
-
-      this.currentFileName = this.fileList[arrayIndex];
-      this.addFabricImage(
-        this.informeService.getImageUrl(
-          this.informe.carpeta,
-          this.currentFlight,
-          this.fileList[arrayIndex]
-        )
-      );
-
-      // Añadir cuadrados de los pc
-      for (let pc of this.allPcs) {
-        if (pc.archivo === this.currentFileName) {
-          this.drawPcInCanvas(pc);
-        }
-      }
-      this.canvas.discardActiveObject();
-      // Añadir numero de vuelo
-      // TODO
-
-      console.log('selected_pc', this.selected_pc);
+    value = parseInt(value, 10);
+    if (this.rangeValue !== value) {
+      this.rangeValue = value;
     }
+    // El input es el 'value' del slider
+    // Para pasar del value del slider al indice de 'fileList' o '/coords' hay que restarle uno
+    const arrayIndex = value - 1;
+    this.current_datetime = this.getDateTimeFromDateAndTime(
+      this.coords[arrayIndex].Date,
+      this.coords[arrayIndex].Time
+    );
+    this.current_gps_lat = parseFloat(
+      this.coords[arrayIndex + this.current_gps_correction].Latitude
+    );
+    this.current_gps_lng = parseFloat(
+      this.coords[arrayIndex + this.current_gps_correction].Longitude
+    );
+    this.current_track_heading = Math.round(
+      this.coords[arrayIndex].TrackHeading
+    );
+    this.current_image_rotation = this.getCurrentImageRotation(
+      this.current_track_heading
+    );
+
+    this.currentFileName = this.fileList[arrayIndex];
+    this.addFabricImage(
+      this.informeService.getImageUrl(
+        this.informe.carpeta,
+        this.currentFlight,
+        this.fileList[arrayIndex]
+      )
+    );
+
+    // Añadir cuadrados de los pc
+    for (let pc of this.allPcs) {
+      if (pc.archivo === this.currentFileName) {
+        this.drawPcInCanvas(pc);
+      }
+    }
+    this.canvas.discardActiveObject();
+    // Añadir numero de vuelo
+    // TODO
+
+    // console.log('selected_pc', this.selected_pc);
+  }
 
   onMapMarkerClick(pc: PcInterface) {
-      this.changeFlight(pc.vuelo);
-      if (this.selected_pc !== pc && this.selected_pc) {
-        this.selected_pc.color = 'black';
-      }
-      this.selected_pc = pc;
-      this.selected_pc.color = 'white';
-
-
-      // Cambiar el color del marker
-      // TODO
-
-      // Poner imagen del pc
-      // // Obtener el indice de la imagen
-      const sliderValue = this.fileList.indexOf(pc.archivo);
-      // // Sumar 1 y cambiar la imagen
-      this.setImageFromRangeValue(sliderValue + 1);
-
-      // Cambiar el 'value' del input slider
-      this.rangeValue = sliderValue + 1;
-      // Dibujar pc dentro de la imagen (recuadro y triangulo)
-      // transformar coordenadas a rotated
-      // const rotatedPcCoords = this.transformCoordsToRotated(pc.img_x, pc.img_y);
-
-      // this.drawTriangle(rotatedPcCoords.x, rotatedPcCoords.y);
+    this.changeFlight(pc.vuelo);
+    if (this.selected_pc !== pc && this.selected_pc) {
+      this.selected_pc.color = "black";
     }
+    this.selected_pc = pc;
+    this.selected_pc.color = "white";
+
+    // Cambiar el color del marker
+    // TODO
+
+    // Poner imagen del pc
+    // // Obtener el indice de la imagen
+    const sliderValue = this.fileList.indexOf(pc.archivo);
+    // // Sumar 1 y cambiar la imagen
+    this.setImageFromRangeValue(sliderValue + 1);
+
+    // Cambiar el 'value' del input slider
+    this.rangeValue = sliderValue + 1;
+    // Dibujar pc dentro de la imagen (recuadro y triangulo)
+    // transformar coordenadas a rotated
+    // const rotatedPcCoords = this.transformCoordsToRotated(pc.img_x, pc.img_y);
+
+    // this.drawTriangle(rotatedPcCoords.x, rotatedPcCoords.y);
+  }
   onClickDeletePc(pc: PcInterface) {
-
-      // Eliminamos el PC de la bbdd
-      this.delPcFromDb(pc);
-      // Eliminamos el cuadrado
-      this.selected_pc = null;
-      // Eliminamos el triangulo
-      if (this.oldTriangle !== null && this.oldTriangle !== undefined) {
-        this.canvas.remove(this.oldTriangle);
-      }
-
-      // TODO Eliminamos el cuadrado dentro de la
+    // Eliminamos el PC de la bbdd
+    this.delPcFromDb(pc);
+    // Eliminamos el cuadrado
+    this.selected_pc = null;
+    // Eliminamos el triangulo
+    if (this.oldTriangle !== null && this.oldTriangle !== undefined) {
+      this.canvas.remove(this.oldTriangle);
     }
+
+    // TODO Eliminamos el cuadrado dentro de la
+  }
 
   delPcFromDb(pc: PcInterface) {
-      this.pcService.delPc(pc);
-    }
+    this.pcService.delPc(pc);
+  }
 
   onMarkerDragEnd(pc: PcInterface, event) {
-      this.onMapMarkerClick(pc);
-      pc.gps_lat = event.coords.lat;
-      pc.gps_lng = event.coords.lng;
-      pc.image_rotation = this.current_image_rotation;
+    this.onMapMarkerClick(pc);
+    pc.gps_lat = event.coords.lat;
+    pc.gps_lng = event.coords.lng;
+    pc.image_rotation = this.current_image_rotation;
 
-      pc.datetime = this.current_datetime;
-      this.updatePcInDb(pc, false);
-    }
+    pc.datetime = this.current_datetime;
+    this.updatePcInDb(pc, false);
+  }
   onClickLocalCoordsTable(selectedPc: PcInterface, f: number, c: number) {
-      if (this.selected_pc === selectedPc) {
-        this.selected_pc.local_x = c;
-        this.selected_pc.local_y = f;
-      }
-      this.updatePcInDb(selectedPc, false);
+    if (this.selected_pc === selectedPc) {
+      this.selected_pc.local_x = c;
+      this.selected_pc.local_y = f;
     }
+    this.updatePcInDb(selectedPc, false);
+  }
 
   updatePcInDb(pc: PcInterface, updateAll: boolean = false) {
-      this.pcService.updatePc(pc);
+    this.pcService.updatePc(pc);
 
-      // if (updateAll) {
-      // Actualizar this.allPcs
-      this.allPcs = this.allPcs.map( (element) => {
-        if (pc.id === element.id) {
-          return pc;
-        } else {
-          return element;
-        }
-      });
+    // if (updateAll) {
+    // Actualizar this.allPcs
+    this.allPcs = this.allPcs.map(element => {
+      if (pc.id === element.id) {
+        return pc;
+      } else {
+        return element;
+      }
+    });
     // }
-    }
+  }
 
   drawPcInCanvas(pc: PcInterface) {
-      const rect2 = new fabric.Rect({
-        left: pc.img_left,
-        top: pc.img_top,
-        fill: 'rgba(0,0,0,0)',
-        stroke: 'red',
-        strokeWidth: 1,
-        hasControls: false,
-        width: pc.img_width,
-        height: pc.img_height,
-        local_id: pc.local_id,
-        ref: false,
-        hasRotatingPoint: false,
-      });
-      const rectRef2 = new fabric.Rect({
-        left: pc.refLeft,
-        top: pc.refTop,
-        fill: 'rgba(0,0,0,0)',
-        stroke: 'red',
-        strokeWidth: 1,
-        hasControls: false,
-        width: pc.refWidth,
-        height: pc.refHeight,
-        local_id: pc.local_id,
-        ref: false,
-        hasRotatingPoint: false,
-      });
+    const rect2 = new fabric.Rect({
+      left: pc.img_left,
+      top: pc.img_top,
+      fill: "rgba(0,0,0,0)",
+      stroke: "red",
+      strokeWidth: 1,
+      hasControls: false,
+      width: pc.img_width,
+      height: pc.img_height,
+      local_id: pc.local_id,
+      ref: false,
+      hasRotatingPoint: false
+    });
+    const rectRef2 = new fabric.Rect({
+      left: pc.refLeft,
+      top: pc.refTop,
+      fill: "rgba(0,0,0,0)",
+      stroke: "red",
+      strokeWidth: 1,
+      hasControls: false,
+      width: pc.refWidth,
+      height: pc.refHeight,
+      local_id: pc.local_id,
+      ref: false,
+      hasRotatingPoint: false
+    });
 
+    this.canvas2.add(rect2);
+    this.canvas2.setActiveObject(rect2);
 
+    const transformedRect = this.transformActObjToRotated(rect2);
+    const transformedRectRef = this.transformActObjToRotated(rectRef2);
 
-      this.canvas2.add(rect2);
-      this.canvas2.setActiveObject(rect2);
+    const rect = new fabric.Rect({
+      left: transformedRect.left,
+      top: transformedRect.top,
+      fill: "rgba(0,0,0,0)",
+      stroke: "red",
+      strokeWidth: 1,
+      hasControls: true,
+      width: transformedRect.width,
+      height: transformedRect.height,
+      local_id: pc.local_id,
+      ref: false
+    });
 
-      const transformedRect = this.transformActObjToRotated(rect2);
-      const transformedRectRef = this.transformActObjToRotated(rectRef2);
+    const rectRef = new fabric.Rect({
+      left: transformedRectRef.left,
+      top: transformedRectRef.top,
+      fill: "rgba(0,0,0,0)",
+      stroke: "blue",
+      strokeWidth: 1,
+      hasControls: true,
+      width: transformedRectRef.width,
+      height: transformedRectRef.height,
+      local_id: pc.local_id,
+      ref: true
+    });
 
-      const rect = new fabric.Rect({
-        left: transformedRect.left,
-        top: transformedRect.top,
-        fill: 'rgba(0,0,0,0)',
-        stroke: 'red',
-        strokeWidth: 1,
-        hasControls: true,
-        width: transformedRect.width,
-        height: transformedRect.height,
-        local_id: pc.local_id,
-        ref: false
-      });
+    this.canvas.add(rect);
+    this.canvas.add(rectRef);
 
-      const rectRef = new fabric.Rect({
-        left: transformedRectRef.left,
-        top: transformedRectRef.top,
-        fill: 'rgba(0,0,0,0)',
-        stroke: 'blue',
-        strokeWidth: 1,
-        hasControls: true,
-        width: transformedRectRef.width,
-        height: transformedRectRef.height,
-        local_id: pc.local_id,
-        ref: true
-      });
-
-      this.canvas.add(rect);
-      this.canvas.add(rectRef);
-
-      this.canvas.setActiveObject(rect);
-    }
+    this.canvas.setActiveObject(rect);
+  }
 
   onClickFlightsCheckbox(event) {
-      if (event.target) {
-        this.changeFlight(event.target.id);
-        this.setImageFromRangeValue(1);
-        this.rangeValue = 1;
-      }
+    if (event.target) {
+      this.changeFlight(event.target.id);
+      this.setImageFromRangeValue(1);
+      this.rangeValue = 1;
     }
+  }
 
   changeFlight(flightName) {
-      this.currentFlight = flightName;
-      this.fileList = this.flights_data[flightName].files;
-      this.coords = this.flights_data[flightName].coords;
-    }
+    this.currentFlight = flightName;
+    this.fileList = this.flights_data[flightName].files;
+    this.coords = this.flights_data[flightName].coords;
+  }
 
   onClickPcTable(event, pc: PcInterface) {
-      this.changeFlight(pc.vuelo);
-    }
-  onClickNextImage(event) {
-      this.rangeValue += 1;
-    }
-
-
+    this.changeFlight(pc.vuelo);
   }
+  onClickNextImage(event) {
+    this.rangeValue += 1;
+  }
+}
