@@ -32,7 +32,8 @@ export let GLOBAL = {
     "Células calientes debido a suciedad",
     "BRK",
     "Transfer resistance",
-    "Caja de conexiones caliente"
+    "Caja de conexiones caliente",
+    "Sombras"
   ],
   severidad_dt: [5, 20, 40],
   pcDescripcion: [
@@ -50,7 +51,8 @@ export let GLOBAL = {
     "Células calientes debido a suciedad", // 11
     "Vidrio roto", // 12
     "Transfer resistance", // 13
-    "Caja de conexiones caliente" // 14
+    "Caja de conexiones caliente", // 14
+    "Módulo afectado por sombras" // 14
   ],
   //   '0',
   //   'Célula caliente',
@@ -75,7 +77,8 @@ export let GLOBAL = {
     "La suciedad habitual (tierra o deposiciones de pájaros) suelen desaparecer con la lluvia.",
     "Vidrio roto",
     "La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta.",
-    "La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta."
+    "La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta.",
+    "Existe algún elemento que está provocando sombras que evitan el correcto funcionamiento del módulo o módulos afectados."
   ],
   pcRecomendacion: [
     "0",
@@ -92,7 +95,8 @@ export let GLOBAL = {
     "Se recomienda encarecidamente la limpieza del módulo si se estima que no va a llover pronto, con el fin de evitar daños al módulo.",
     "Tener cuidado con las subidas de voltaje debido a las pérdidas de aislamiento por altas temperaturas.",
     "Análisis en detalle por experto.",
-    "Análisis en detalle por experto."
+    "Análisis en detalle por experto.",
+    "Eliminación de la fuente de sombras",
   ],
   pcPerdidas: ["0", "3", "0", "33", "100", "66", "15", "15"],
   pcColumnas: [
