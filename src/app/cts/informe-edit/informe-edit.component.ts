@@ -1017,8 +1017,12 @@ export class InformeEditComponent implements OnInit {
   }
   onClickLocalCoordsTable(selectedPc: PcInterface, f: number, c: number) {
     if (this.selected_pc === selectedPc) {
-      this.selected_pc.local_x = c;
-      this.selected_pc.local_y = f;
+      if (this.planta === "2 ejes") {
+        this.selected_pc.local_x = c;
+        this.selected_pc.local_y = f;
+      } else {
+        this.selected_pc.local_y = f;
+      }
     }
     this.updatePcInDb(selectedPc, false);
   }
