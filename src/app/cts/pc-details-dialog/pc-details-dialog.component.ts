@@ -10,6 +10,7 @@ declare let fabric;
 import Pica from "pica";
 import { take } from "rxjs/operators";
 import { PlantaInterface } from "../../models/planta";
+import { InformeInterface } from "../../models/informe";
 const pica = Pica();
 
 @Component({
@@ -21,6 +22,7 @@ export class PcDetailsDialogComponent implements OnInit {
   @Input() pc: PcInterface;
   @Input() allPcs: PcInterface[];
   @Input() planta: PlantaInterface;
+  @Input() informe: InformeInterface;
 
   // public tooltipTemp: number;
   private maxTemp: number;
@@ -59,6 +61,7 @@ export class PcDetailsDialogComponent implements OnInit {
     this.pc = data.pc;
     this.allPcs = data.allPcs;
     this.planta = data.planta;
+    this.informe = data.informe;
   }
 
   onNoClick(): void {

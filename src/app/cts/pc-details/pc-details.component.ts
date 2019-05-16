@@ -307,7 +307,12 @@ export class PcDetailsComponent implements OnInit, OnChanges {
       width: "1100px",
       // height: '600px',
       hasBackdrop: true,
-      data: { pc: selectedPc, allPcs: this.allPcs, planta: this.planta }
+      data: {
+        pc: selectedPc,
+        allPcs: this.allPcs,
+        planta: this.planta,
+        informe: this.informe
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {});

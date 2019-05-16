@@ -14,6 +14,7 @@ export interface DialogData {
   pc: PcInterface;
   allPcs: PcInterface[];
   planta: PlantaInterface;
+  informe: InformeInterface;
 }
 
 @Component({
@@ -75,7 +76,12 @@ export class PcMapComponent implements OnInit {
       width: "1100px",
       // height: '600px',
       hasBackdrop: true,
-      data: { pc: selectedPc, allPcs: this.filteredPcs, planta: this.planta }
+      data: {
+        pc: selectedPc,
+        allPcs: this.filteredPcs,
+        planta: this.planta,
+        informe: this.informe
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {});
