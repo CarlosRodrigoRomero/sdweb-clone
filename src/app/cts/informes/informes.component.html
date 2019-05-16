@@ -1,22 +1,32 @@
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-4">
-            <mat-card *ngFor="let informe of informes" class="informe-card">
-                <mat-card-header>
-                    <div mat-card-avatar class="informe-header-image"></div>
-                    <mat-card-title>{{informe.nombre}}</mat-card-title>
-                    <mat-card-subtitle>2 MW - 2 ejes</mat-card-subtitle>
-                </mat-card-header>
-                <img mat-card-image src="../../../assets/images/puebla.jpg" alt="">
-                <mat-card-content>
-                    <p>
+  <div class="row justify-content-center">
+    <div class="col-4">
+      <mat-card *ngFor="let informe of informes" class="informe-card">
+        <mat-card-header>
+          <div mat-card-avatar class="informe-header-image"></div>
+          <mat-card-title>{{ informe.nombre }}</mat-card-title>
+          <mat-card-subtitle></mat-card-subtitle>
+        </mat-card-header>
 
-                    </p>
-                </mat-card-content>
-                <mat-card-actions class="cards-actions">
-                    <button class="boton-ver-informe" routerLink="/informe-view/{{informe.id}}" mat-button>Ver informe</button>
-                </mat-card-actions>
-            </mat-card>
-        </div>
+        <img
+          mat-card-image
+          src="../../../assets/images/imagen_principal.png"
+          alt=""
+        />
+
+        <mat-card-content>
+          <p></p>
+        </mat-card-content>
+        <mat-card-actions class="cards-actions">
+          <button
+            class="boton-ver-informe"
+            routerLink="/informe-view/{{ informe.id }}"
+            mat-button
+          >
+            Ver informe
+          </button>
+        </mat-card-actions>
+      </mat-card>
     </div>
+  </div>
 </div>
