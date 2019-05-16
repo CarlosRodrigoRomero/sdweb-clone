@@ -2,7 +2,16 @@
 
 
 <agm-map [latitude]="planta.latitud" [longitude]="planta.longitud" [mapTypeId]="mapType" [zoom]="planta.zoom" [disableDefaultUI]="false">
+    <ng-template *ngIf="planta.tipo === '2 ejes'; else fija" >
+    
     <agm-circle *ngFor="let pc of filteredPcs" (circleClick)="onMapCircleClick(pc)" [latitude]="pc.gps_lat" [longitude]="pc.gps_lng" [radius]="5" [strokeOpacity]="1" [strokePosition]="0" [strokeColor]="getStrokeColor(pc.severidad)" [strokeWeight]="3" [fillOpacity]="0.3"
         [editable]="false">
     </agm-circle>
+</ng-template>
+
+    <ng-template #fija>
+            <agm-circle *ngFor="let pc of filteredPcs" (circleClick)="onMapCircleClick(pc)" [latitude]="pc.gps_lat" [longitude]="pc.gps_lng" [radius]="2" [strokeOpacity]="1" [strokePosition]="0" [strokeColor]="getStrokeColor(pc.severidad)" [strokeWeight]="3" [fillOpacity]="0.3"
+        [editable]="false">
+    </agm-circle>
+    </ng-template>
 </agm-map>
