@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { GLOBAL } from "../../services/global";
 
 import "fabric";
+import { take, map } from "rxjs/operators";
 declare let fabric;
 
 @Component({
@@ -132,15 +133,6 @@ export class InformeEditComponent implements OnInit {
         } else {
           this.selected_pc.img_top = Math.round(actObjRaw.top);
           this.selected_pc.img_left = Math.round(actObjRaw.left);
-          console.log(
-            "TCL: onMouseUpCanvas -> actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x",
-            actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x
-          );
-          console.log(
-            "TCL: onMouseUpCanvas -> this.selected_pc.img_width",
-            this.selected_pc.img_width
-          );
-
           this.selected_pc.img_width = Math.round(
             Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x)
           );
@@ -169,7 +161,6 @@ export class InformeEditComponent implements OnInit {
         // this.selected_pc.img_x = max_temp.max_temp_x;
         // this.selected_pc.img_y = max_temp.max_temp_y;
         if (actObjRaw.ref === true) {
-          // console.log('actObjRaw ref', actObjRaw);
           this.selected_pc.refTop = Math.round(actObjRaw.top);
           this.selected_pc.refLeft = Math.round(actObjRaw.left);
           this.selected_pc.refWidth = Math.round(
@@ -179,7 +170,6 @@ export class InformeEditComponent implements OnInit {
             Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y)
           );
         } else {
-          // console.log('NoRef', this.selected_pc);
           this.selected_pc.img_top = Math.round(actObjRaw.top);
           this.selected_pc.img_left = Math.round(actObjRaw.left);
           this.selected_pc.img_width = Math.round(
@@ -197,7 +187,6 @@ export class InformeEditComponent implements OnInit {
     // track_heading: en grados
     // return: angulo de rotacion, sentido horario positivo
     if (this.manualRotation) {
-      // console.log(this.manualRotation, this.current_image_rotation);
       return this.current_image_rotation;
     }
 
@@ -645,7 +634,7 @@ export class InformeEditComponent implements OnInit {
       informeId: this.informe.id,
       datetime: this.current_datetime,
       resuelto: false,
-      color: "white",
+      color: "black",
       refTop: actObjRefRawCoords.top,
       refLeft: actObjRefRawCoords.left,
       refHeight: actObjRefRawCoords.height,
@@ -671,8 +660,6 @@ export class InformeEditComponent implements OnInit {
 
   onMouseUpCanvas(event) {
     const actObj = this.canvas.getActiveObject();
-    // console.log('actObj', actObj);
-    // console.log('top,left,width, height', actObj.top, actObj.left, actObj.width, actObj.height);
 
     if (actObj !== null && actObj !== undefined) {
       if (actObj.get("type") === "rect") {
@@ -721,6 +708,18 @@ export class InformeEditComponent implements OnInit {
     return [maxValue, maxIndex];
   }
 
+  setSquareBase() {
+    if (this.planta.vertical) {
+      // vertical
+      this.squareWidth = this.squareBase;
+      this.squareHeight = Math.round((this.squareWidth * 3) / 2);
+    } else {
+      // horizontal
+      this.squareHeight = this.squareBase;
+      this.squareWidth = Math.round((this.squareHeight * 3) / 2);
+    }
+  }
+
   getPlanta(plantaId: string) {
     this.plantaService.getPlanta(plantaId).subscribe(
       response => {
@@ -736,15 +735,7 @@ export class InformeEditComponent implements OnInit {
           this.filas_array.push(i);
         }
 
-        if (this.planta.vertical) {
-          // vertical
-          this.squareWidth = this.squareBase;
-          this.squareHeight = Math.round((this.squareWidth * 3) / 2);
-        } else {
-          // horizontal
-          this.squareHeight = this.squareBase;
-          this.squareWidth = Math.round((this.squareHeight * 3) / 2);
-        }
+        this.setSquareBase();
       },
       error => {
         const errorMessage = error as any;
@@ -833,38 +824,50 @@ export class InformeEditComponent implements OnInit {
   }
 
   getPcsList(vuelo?: string) {
-    this.pcService.getPcs(this.informe.id).subscribe(
-      response => {
-        if (!response || response.length === 0) {
-          this.alertMessage = "No hay puntos calientes";
-        } else {
-          this.alertMessage = null;
-          this.allPcs = response;
-          if (vuelo != null) {
-            this.allPcs = this.sortPcs(this.allPcs).filter(arr => {
-              return arr.vuelo === vuelo;
-            });
+    this.pcService
+      .getPcs(this.informe.id)
+      .pipe(
+        take(1),
+        map(pcList => {
+          pcList.map(pc => {
+            pc.color = "black";
+            return pc;
+          });
+          return pcList;
+        })
+      )
+      .subscribe(
+        response => {
+          if (!response || response.length === 0) {
+            this.alertMessage = "No hay puntos calientes";
           } else {
-            this.allPcs = this.sortPcs(this.allPcs);
+            this.alertMessage = null;
+            this.allPcs = response;
+            if (vuelo != null) {
+              this.allPcs = this.sortPcs(this.allPcs).filter(arr => {
+                return arr.vuelo === vuelo;
+              });
+            } else {
+              this.allPcs = this.sortPcs(this.allPcs);
+            }
+
+            this.localIdCount = this.allPcs[0].local_id;
           }
 
-          this.localIdCount = this.allPcs[0].local_id;
+          // if (this.DEFAULT_LAT == null || this.DEFAULT_LNG == null) {
+          //     this.DEFAULT_LAT = this.allPcs[0].gps_lat;
+          //     this.DEFAULT_LNG = this.allPcs[0].gps_lng;
+          // }
+        },
+        error => {
+          const errorMessage = error;
+          if (errorMessage != null) {
+            const body = JSON.parse(error._body);
+            this.alertMessage = body.message;
+            console.log(error);
+          }
         }
-
-        // if (this.DEFAULT_LAT == null || this.DEFAULT_LNG == null) {
-        //     this.DEFAULT_LAT = this.allPcs[0].gps_lat;
-        //     this.DEFAULT_LNG = this.allPcs[0].gps_lng;
-        // }
-      },
-      error => {
-        const errorMessage = error;
-        if (errorMessage != null) {
-          const body = JSON.parse(error._body);
-          this.alertMessage = body.message;
-          console.log(error);
-        }
-      }
-    );
+      );
   }
 
   addPcToDb(pc: PcInterface) {
@@ -955,16 +958,21 @@ export class InformeEditComponent implements OnInit {
     // console.log('selected_pc', this.selected_pc);
   }
 
-  onMapMarkerClick(pc: PcInterface) {
-    this.changeFlight(pc.vuelo);
+  onMapMarkerClick(pc: PcInterface, fetchPcs = false) {
     if (this.selected_pc !== pc && this.selected_pc) {
       this.selected_pc.color = "black";
     }
+    // Cambiar el color del marker
     this.selected_pc = pc;
     this.selected_pc.color = "white";
 
-    // Cambiar el color del marker
-    // TODO
+    if (pc.vuelo !== this.currentFlight) {
+      this.changeFlight(pc.vuelo);
+    }
+
+    if (fetchPcs) {
+      this.getPcsList(this.currentFlight);
+    }
 
     // Poner imagen del pc
     // // Obtener el indice de la imagen
@@ -980,6 +988,7 @@ export class InformeEditComponent implements OnInit {
 
     // this.drawTriangle(rotatedPcCoords.x, rotatedPcCoords.y);
   }
+
   onClickDeletePc(pc: PcInterface) {
     // Eliminamos el PC de la bbdd
     this.delPcFromDb(pc);

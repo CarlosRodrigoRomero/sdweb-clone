@@ -446,10 +446,21 @@
             *ngIf="selected_pc"
             [(ngModel)]="selected_pc.irradiancia"
             type="text"
-            id="severidad"
+            id="irradiancia"
             maxlength="5"
             size="5"
             value="1"
+          />
+          <span>SqBase</span>
+          <input
+            style="width: 3rem;"
+            *ngIf="selected_pc"
+            [(ngModel)]="squareBase"
+            type="number"
+            id="squareBase"
+            maxlength="2"
+            size="25"
+            (change)="setSquareBase()"
           />
         </div>
       </div>
@@ -471,10 +482,10 @@
           <th>ID (vuelo)</th>
           <!-- <th> Filename</th> -->
           <th>Tipo</th>
-          <th>Global Coords</th>
-          <th>Local Coords</th>
-          <th>Temp HS</th>
-          <th>Delete</th>
+          <th>Global</th>
+          <th>Local</th>
+          <th>Temp</th>
+          <th>Del</th>
         </tr>
 
         <tr
