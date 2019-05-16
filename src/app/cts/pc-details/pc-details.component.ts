@@ -7,6 +7,7 @@ import "fabric";
 import { MatDialog } from "@angular/material";
 import { PcDetailsDialogComponent } from "../pc-details-dialog/pc-details-dialog.component";
 import { PcService } from "src/app/services/pc.service";
+import { PlantaInterface } from "../../models/planta";
 declare let fabric;
 
 export interface DialogData {
@@ -24,6 +25,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   @Input() selectedPc: PcInterface;
   @Input() allPcs: PcInterface[];
   @Input() informe: InformeInterface;
+  @Input() planta: PlantaInterface;
 
   public tooltipTemp: number;
   private maxTemp: number;
@@ -305,9 +307,18 @@ export class PcDetailsComponent implements OnInit, OnChanges {
       width: "1100px",
       // height: '600px',
       hasBackdrop: true,
-      data: { pc: selectedPc, allPcs: this.allPcs }
+      data: { pc: selectedPc, allPcs: this.allPcs, planta: this.planta }
     });
 
     dialogRef.afterClosed().subscribe(result => {});
+  }
+
+  getAltura(local_y: number) {
+    // Por defecto, la altura alta es la numero 1
+    if (this.planta.alturaBajaPrimero) {
+      return this.planta.filas - (local_y - 1);
+    } else {
+      return local_y;
+    }
   }
 }

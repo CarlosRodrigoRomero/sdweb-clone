@@ -9,6 +9,7 @@ declare let fabric;
 
 import Pica from "pica";
 import { take } from "rxjs/operators";
+import { PlantaInterface } from "../../models/planta";
 const pica = Pica();
 
 @Component({
@@ -19,6 +20,7 @@ const pica = Pica();
 export class PcDetailsDialogComponent implements OnInit {
   @Input() pc: PcInterface;
   @Input() allPcs: PcInterface[];
+  @Input() planta: PlantaInterface;
 
   // public tooltipTemp: number;
   private maxTemp: number;
@@ -56,6 +58,7 @@ export class PcDetailsDialogComponent implements OnInit {
 
     this.pc = data.pc;
     this.allPcs = data.allPcs;
+    this.planta = data.planta;
   }
 
   onNoClick(): void {
@@ -540,6 +543,15 @@ export class PcDetailsDialogComponent implements OnInit {
     } else {
       document.getElementById("imagen-div").style.display = "block";
       document.getElementById("imagen-visual-div").style.display = "none";
+    }
+  }
+
+  getAltura(local_y: number) {
+    // Por defecto, la altura alta es la numero 1
+    if (this.planta.alturaBajaPrimero) {
+      return this.planta.filas - (local_y - 1);
+    } else {
+      return local_y;
     }
   }
 }

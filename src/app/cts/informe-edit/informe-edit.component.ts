@@ -31,7 +31,7 @@ export class InformeEditComponent implements OnInit {
   public defaultZoom: number;
   public fileList: string[];
   public canvas;
-  private canvas2;
+  // private canvas2;
   public fabImg;
   public fabImg2;
   public squareBase;
@@ -113,7 +113,7 @@ export class InformeEditComponent implements OnInit {
   ngOnInit() {
     this.getInforme();
     this.canvas = new fabric.Canvas("mainCanvas");
-    this.canvas2 = new fabric.Canvas("hiddenCanvas");
+    // this.canvas2 = new fabric.Canvas("hiddenCanvas");
 
     this.canvas.on("object:modified", options => {
       if (options.target.type === "rect") {
@@ -540,24 +540,24 @@ export class InformeEditComponent implements OnInit {
       this.fabImg = image;
     });
 
-    this.canvas2.clear();
-    const img2 = new Image();
-    img2.src = imgSrc;
-    img2.setAttribute("crossOrigin", "anonymous");
-    img2.onload = ev => {
-      img2.setAttribute("crossOrigin", "anonymous");
-      if (this.fabImg2) {
-        this.canvas2.remove(this.fabImg2);
-      }
-      this.fabImg2 = new fabric.Image(img2, {
-        // left: leftAndTop.left,
-        // top: leftAndTop.top,
-        // angle: this.current_image_rotation,
-        crossOrigin: "Anonymous",
-        selectable: false
-      });
-      this.canvas2.add(this.fabImg2);
-    };
+    // this.canvas2.clear();
+    // const img2 = new Image();
+    // img2.src = imgSrc;
+    // img2.setAttribute("crossOrigin", "anonymous");
+    // img2.onload = ev => {
+    //   img2.setAttribute("crossOrigin", "anonymous");
+    //   if (this.fabImg2) {
+    //     this.canvas2.remove(this.fabImg2);
+    //   }
+    //   this.fabImg2 = new fabric.Image(img2, {
+    //     // left: leftAndTop.left,
+    //     // top: leftAndTop.top,
+    //     // angle: this.current_image_rotation,
+    //     crossOrigin: "Anonymous",
+    //     selectable: false
+    //   });
+    //   this.canvas2.add(this.fabImg2);
+    // };
   }
 
   onDblClickCanvas(event) {
@@ -663,8 +663,9 @@ export class InformeEditComponent implements OnInit {
 
     if (actObj !== null && actObj !== undefined) {
       if (actObj.get("type") === "rect") {
-        const actObjRaw = this.transformActObjToRaw(actObj);
+        // const actObjRaw = this.transformActObjToRaw(actObj);
         this.selectPcFromLocalId(actObj.local_id);
+        // actObj.set("stroke", "green");
       }
     }
   }
@@ -1017,7 +1018,7 @@ export class InformeEditComponent implements OnInit {
   }
   onClickLocalCoordsTable(selectedPc: PcInterface, f: number, c: number) {
     if (this.selected_pc === selectedPc) {
-      if (this.planta === "2 ejes") {
+      if (this.planta.tipo === "2 ejes") {
         this.selected_pc.local_x = c;
         this.selected_pc.local_y = f;
       } else {
@@ -1070,8 +1071,8 @@ export class InformeEditComponent implements OnInit {
       hasRotatingPoint: false
     });
 
-    this.canvas2.add(rect2);
-    this.canvas2.setActiveObject(rect2);
+    // this.canvas2.add(rect2);
+    // this.canvas2.setActiveObject(rect2);
 
     const transformedRect = this.transformActObjToRotated(rect2);
     const transformedRectRef = this.transformActObjToRotated(rectRef2);
@@ -1099,13 +1100,20 @@ export class InformeEditComponent implements OnInit {
       width: transformedRectRef.width,
       height: transformedRectRef.height,
       local_id: pc.local_id,
-      ref: true
+      ref: true,
+      selectable: false
     });
+
+    if (pc === this.selected_pc) {
+      rect.set("stroke", "white");
+      rect.set("strokeWidth", 3);
+      rectRef.set("strokeWidth", 3);
+      rectRef.set("selectable", true);
+      this.canvas.setActiveObject(rect);
+    }
 
     this.canvas.add(rect);
     this.canvas.add(rectRef);
-
-    this.canvas.setActiveObject(rect);
   }
 
   onClickFlightsCheckbox(event) {

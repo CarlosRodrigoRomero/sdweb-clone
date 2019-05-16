@@ -1,7 +1,7 @@
 <div mat-dialog-title>
   <h4 class="dialog-title">Anomalía ID {{ pc.local_id }}</h4>
-  <span class="severidad colorSeveridad{{ pc.severidad }}"
-    > (CoA {{ pc.severidad }})</span
+  <span class="severidad colorSeveridad{{ pc.severidad }}">
+    (CoA {{ pc.severidad }})</span
   >
   <label class="switch">
     <input
@@ -54,11 +54,11 @@
         </div>
 
         <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"><strong>Temp. máx</strong></span>
+          <span class="text-center"><strong>Temp. máxima</strong></span>
           <span class="text-center">{{ pc.temperaturaMax }} ºC</span>
         </div>
         <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"><strong>Temp ref</strong></span>
+          <span class="text-center"><strong>Temp. referencia</strong></span>
           <span style="color:blue" class="text-center"
             >{{ pc.temperaturaRef }} ºC</span
           >
@@ -73,10 +73,8 @@
           >
         </div>
 
-        <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"
-            ><strong>Eficiencia del módulo</strong></span
-          >
+        <div *ngIf="false" class="pc-details-derecha-item-tabla">
+          <span class="text-center"><strong>Eficiencia</strong></span>
           <span class="text-center"
             >{{ (1 - pc.perdidas) * 100 | number: "1.0-0" }} %</span
           >
@@ -121,22 +119,41 @@
           <span class="detail-title">Localización:</span>
         </div>
 
-        <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"><strong>Seguidor</strong></span>
-          <span class="text-center">{{ pc.global_x }}</span>
-        </div>
-        <!-- <div class="pc-details-derecha-item-tabla">
-                    <span class="text-center"><strong>Fila</strong></span>
-                    <span class="text-center">{{pc.global_y}}</span>
-                </div> -->
-        <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"><strong>Columna</strong></span>
-          <span class="text-center">{{ pc.local_x }}</span>
-        </div>
-        <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"><strong>Fila</strong></span>
-          <span class="text-center">{{ pc.local_y }}</span>
-        </div>
+        <ng-template *ngIf="planta.tipo === '2 ejes'; else fija">
+          <div class="pc-details-derecha-item-tabla">
+            <span class="text-center"><strong>Seguidor</strong></span>
+            <span class="text-center">{{ pc.global_x }}</span>
+          </div>
+
+          <div class="pc-details-derecha-item-tabla">
+            <span class="text-center"><strong>Columna</strong></span>
+            <span class="text-center">{{ pc.local_x }}</span>
+          </div>
+          <div class="pc-details-derecha-item-tabla">
+            <span class="text-center"><strong>Fila</strong></span>
+            <span class="text-center">{{ pc.local_y }}</span>
+          </div>
+        </ng-template>
+
+        <ng-template #fija>
+          <div class="pc-details-derecha-item-tabla">
+            <span class="text-center"><strong>Coord 1</strong></span>
+            <span class="text-center">{{ pc.global_x }}</span>
+          </div>
+          <div class="pc-details-derecha-item-tabla">
+            <span class="text-center"><strong>Fila</strong></span>
+            <span class="text-center">{{ pc.global_y }}</span>
+          </div>
+
+          <div class="pc-details-derecha-item-tabla">
+            <span class="text-center"><strong>Columna</strong></span>
+            <span class="text-center">{{ pc.local_x }}</span>
+          </div>
+          <div class="pc-details-derecha-item-tabla">
+            <span class="text-center"><strong>Altura</strong></span>
+            <span class="text-center">{{ getAltura(pc.local_y) }}</span>
+          </div>
+        </ng-template>
       </div>
       <div class="pc-details-derecha-item">
         <div class="pc-details-derecha-icon">
@@ -144,7 +161,7 @@
         </div>
         <div class="pc-texto">
           <span class="detail-title">Fecha de captura: </span>
-          <span>{{ pc.datetime * 1000 | date: "dd/MM/yyyy HH:mm" }} UTC</span>
+          <span>{{ pc.datetime * 1000 | date: "HH:mm dd/MM/yyyy" }}</span>
         </div>
       </div>
       <div class="pc-details-derecha-item">
@@ -157,15 +174,12 @@
             >{{ pc.irradiancia }} W/m<sup>2</sup> | Viento: {{ pc.viento }} |
             {{ pc.temperaturaAire }} ºC | {{ pc.nubosidad }} % nubes |
             Emisividad: {{ pc.emisividad }} | Temp. Reflejada:
-            {{ pc.temperaturaReflejada }} ºC</span
+            {{ informe.tempReflejada }} ºC</span
           >
         </div>
       </div>
 
-      <div
-        style="justify-content: space-between"
-        class="pc-details-derecha-item"
-      >
+      <div style="justify-content: space-between" class="botones">
         <button (click)="downloadRjpg(pc)" mat-raised-button>
           JPG Radiométrico
         </button>

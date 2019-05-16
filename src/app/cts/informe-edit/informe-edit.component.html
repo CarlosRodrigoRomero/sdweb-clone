@@ -1,10 +1,10 @@
 <div class="hidden-canvas">
-  <canvas
+  <!-- <canvas
     class="hidden-canvas"
     id="hiddenCanvas"
     width="640"
     height="512"
-  ></canvas>
+  ></canvas> -->
 </div>
 <div class="container-fluid" id="container-ppal">
   <div class="row">
@@ -439,28 +439,33 @@
               />
             </div>
           </div>
-
+          <span>Pérdidas</span>
           <input
             *ngIf="selected_pc"
             [(ngModel)]="selected_pc.perdidas"
+            (change)="updatePcInDb(selected_pc, false)"
             type="text"
             id="perdidas"
             maxlength="5"
             size="5"
             value="0"
           />
+          <span>Severidad</span>
           <input
             *ngIf="selected_pc"
             [(ngModel)]="selected_pc.severidad"
-            type="text"
+            (change)="updatePcInDb(selected_pc, false)"
+            type="number"
             id="severidad"
-            maxlength="5"
-            size="5"
+            maxlength="3"
+            size="1"
             value="1"
           />
+          <span>Irradiancia</span>
           <input
             *ngIf="selected_pc"
             [(ngModel)]="selected_pc.irradiancia"
+            (change)="updatePcInDb(selected_pc, false)"
             type="text"
             id="irradiancia"
             maxlength="5"

@@ -20,6 +20,13 @@
 #imagen-visual-div {
   display: none;
 }
+.botones {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: row;
+  margin-left: 2rem;
+  vertical-align: center;
+}
 
 .imagen-termica-tooltip {
   display: none;

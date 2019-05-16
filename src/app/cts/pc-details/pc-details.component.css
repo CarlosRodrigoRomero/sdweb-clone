@@ -1,82 +1,82 @@
 .imagen-termica-div:hover .imagen-termica-tooltip {
-    display: block;
+  display: block;
 }
 
 .imagen-termica-div {
-    position: relative;
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
+  position: relative;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .detallesButton {
-    width: -webkit-fill-available;
-    background-color: tomato;
+  width: -webkit-fill-available;
+  background-color: tomato;
 }
 
 .imagen-termica-tooltip {
-    display: none;
-    background: #e7e1e1e3;
-    margin-left: 28px;
-    padding: 5px;
-    position: absolute;
-    z-index: 100000;
-    width: 60px;
-    height: 30px;
-    border: 1px solid grey;
+  display: none;
+  background: #e7e1e1e3;
+  margin-left: 28px;
+  padding: 5px;
+  position: absolute;
+  z-index: 100000;
+  width: 60px;
+  height: 30px;
+  border: 1px solid grey;
 }
 
 .pc-details-derecha {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .pc-details-derecha-item {
-    display: flex;
-    flex-direction: row;
-    vertical-align: center;
-    margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  vertical-align: center;
+  margin-bottom: 0.5rem;
 }
 
 .pc-texto {
-    display: flex;
-    justify-content: center;
-    line-height: 1rem;
-    flex-direction: column;
+  display: flex;
+  justify-content: center;
+  line-height: 1rem;
+  flex-direction: column;
 }
 
 .detail-title {
-    font-weight: 800;
-    font-size: 1.5 rem;
-    margin-right: 1rem;
+  font-weight: 800;
+  margin-right: 1rem;
+  margin-bottom: 0.2rem;
 }
 
 .pc-details-derecha-item-tabla {
-    display: flex;
-    margin-right: 0.5rem;
-    flex-direction: column;
-    vertical-align: center;
+  display: flex;
+  margin-right: 0.5rem;
+  flex-direction: column;
+  vertical-align: center;
 }
 
 .icon-success {
-    color: green;
+  color: green;
 }
 
 .icon-error {
-    /* color: red; */
+  /* color: red; */
 }
 
 .icon-flag {
-    color: grey;
+  color: grey;
 }
 
 .pc-details-derecha-icon {
-    margin-right: 0.5rem;
-    font-size: 2rem;
+  margin-right: 0.5rem;
+  font-size: 2rem;
 }
 
 .pc-detail-botones {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    margin-bottom: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-bottom: 1rem;
 }

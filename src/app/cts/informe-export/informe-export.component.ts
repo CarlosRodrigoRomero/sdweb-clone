@@ -459,14 +459,17 @@ export class InformeExportComponent implements OnInit {
         descripcion: "Anexo I: Listado resumen de anomalías",
         orden: 14,
         elegible: true
-      },
-      {
+      }
+    ];
+
+    if (this.planta.tipo === "2 ejes") {
+      this.apartadosInforme.push({
         nombre: "anexo2",
         descripcion: "Anexo II: Anomalías por seguidor",
         orden: 15,
         elegible: true
-      }
-    ];
+      });
+    }
 
     this.apartadosInforme = this.apartadosInforme.sort(
       (a: Apartado, b: Apartado) => {
@@ -526,15 +529,21 @@ export class InformeExportComponent implements OnInit {
     this.tempReflejada = this.informe.tempReflejada;
 
     // Calcular las alturas
+
     for (const y of this.arrayFilas) {
       const countColumnas = Array();
       for (const x of this.arrayColumnas) {
-        countColumnas.push(
-          allPcs.filter(pc => pc.local_x === x && pc.local_y === y).length
-        );
+        if (this.planta.tipo === "2 ejes") {
+          countColumnas.push(
+            allPcs.filter(pc => pc.local_x === x && pc.local_y === y).length
+          );
+        } else {
+          countColumnas.push(allPcs.filter(pc => pc.local_y === y).length);
+        }
+        this.countPosicion.push(countColumnas);
       }
-      this.countPosicion.push(countColumnas);
     }
+
     // CATEGORIAS //
     let filtroCategoria;
     let filtroCategoriaClase;
@@ -924,7 +933,7 @@ export class InformeExportComponent implements OnInit {
 
     for (const i of this.arrayColumnas) {
       arrayHeader.push({
-        text: i.toString(),
+        text: this.getAltura(i.toString()),
         style: "tableHeaderRed"
       });
     }
@@ -1339,7 +1348,7 @@ export class InformeExportComponent implements OnInit {
 
                   [
                     {
-                      text: "GSD térmico (medio)",
+                      text: "GSD térmico (máx)",
                       style: "tableLeft"
                     },
                     {
@@ -1920,6 +1929,14 @@ export class InformeExportComponent implements OnInit {
     };
 
     const resultadosPosicion = (index: string) => {
+      let texto1;
+      if (this.planta.tipo === "2 ejes") {
+        texto1 =
+          "Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran (fila y columna) dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.";
+      } else {
+        texto1 =
+          "Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.";
+      }
       return [
         {
           text: `${index} - Resultados por posición de la anomalía dentro del seguidor`,
@@ -1936,8 +1953,7 @@ export class InformeExportComponent implements OnInit {
         "\n",
 
         {
-          text:
-            "Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran (fila y columna) dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.",
+          text: texto1,
           style: "p"
         },
 
@@ -2626,5 +2642,14 @@ export class InformeExportComponent implements OnInit {
         }
       }
     };
+  }
+
+  getAltura(local_y: number) {
+    // Por defecto, la altura alta es la numero 1
+    if (this.planta.alturaBajaPrimero) {
+      return this.planta.filas - (local_y - 1);
+    } else {
+      return local_y;
+    }
   }
 }
