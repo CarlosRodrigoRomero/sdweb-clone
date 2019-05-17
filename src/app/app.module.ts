@@ -8,7 +8,10 @@ import { InformeViewComponent } from "./cts/informe-view/informe-view.component"
 import { environment } from "../environments/environment";
 import { AngularFireModule } from "@angular/fire";
 import { AngularFireAuthModule } from "@angular/fire/auth";
-import { AngularFirestoreModule } from "@angular/fire/firestore";
+import {
+  AngularFirestoreModule,
+  FirestoreSettingsToken
+} from "@angular/fire/firestore";
 import { AngularFireStorageModule } from "@angular/fire/storage";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AgmCoreModule } from "@agm/core";
@@ -67,6 +70,7 @@ import { ClienteslayoutComponent } from "./layout/clienteslayout/clienteslayout.
 import { VideoComponent } from "./cts/video/video.component";
 import { SpinnerComponent } from "./cts/spinner/spinner.component";
 import { PruebasComponent } from "./cts/pruebas/pruebas.component";
+import { PcOverviewComponent } from "./cts/pc-overview/pc-overview.component";
 
 @NgModule({
   declarations: [
@@ -87,7 +91,8 @@ import { PruebasComponent } from "./cts/pruebas/pruebas.component";
     ClienteslayoutComponent,
     VideoComponent,
     SpinnerComponent,
-    PruebasComponent
+    PruebasComponent,
+    PcOverviewComponent
   ],
   entryComponents: [PcDetailsDialogComponent],
   imports: [
@@ -153,7 +158,11 @@ import { PruebasComponent } from "./cts/pruebas/pruebas.component";
       apiKey: "AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM"
     })
   ],
-  providers: [MapService, AuthService],
+  providers: [
+    { provide: FirestoreSettingsToken, useValue: {} },
+    MapService,
+    AuthService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
