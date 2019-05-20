@@ -16,4 +16,5 @@ export interface PlantaInterface {
   temp_limite?: number;
   zoom?: number;
   alturaBajaPrimero?: boolean;
+  moduloPotencia?: number;
 }

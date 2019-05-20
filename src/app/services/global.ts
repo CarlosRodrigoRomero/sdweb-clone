@@ -22,15 +22,15 @@ export let GLOBAL = {
     "PC",
     "VPV",
     "Substring en CA",
-    "String",
-    "MOD. CA",
-    "Substring CC",
-    "MOD. CC",
-    "CC",
-    "VCC",
-    "2X substring en CA",
+    "String en CA",
+    "Modulo en CA",
+    "Substring en CC",
+    "Módulo en CC",
+    "Célula caliente",
+    "Varias células calientes",
+    "2x substring en CA",
     "Células calientes debido a suciedad",
-    "BRK",
+    "Vidrio roto",
     "Transfer resistance",
     "Caja de conexiones caliente",
     "Sombras"
@@ -96,9 +96,27 @@ export let GLOBAL = {
     "Tener cuidado con las subidas de voltaje debido a las pérdidas de aislamiento por altas temperaturas.",
     "Análisis en detalle por experto.",
     "Análisis en detalle por experto.",
-    "Eliminación de la fuente de sombras",
+    "Eliminación de la fuente de sombras"
   ],
-  pcPerdidas: ["0", "3", "0", "33", "100", "66", "15", "15"],
+  pcPerdidas: [
+    0, // Para que coincida el indice con el tipo de anomalia
+    0, // "Punto caliente", // 1
+    0, // "Varios puntos calientes", // 2
+    0.85, // "Substring en CA", // 3
+    1, // "String en CA", // 4
+    1, // "Módulo en CA", // 5
+    0.85, // "Substring en CC", // 6
+    0.85, // "Módulo en CC", // 7
+    0, // "Célula caliente", // 8
+    0, // "Varias células calientes", // 9
+    0.85, // "2X substring en CA", // 10
+    0, // "Células calientes debido a suciedad", // 11
+    0.85, // "Vidrio roto", // 12
+    0, // "Transfer resistance", // 13
+    0, // "Caja de conexiones caliente", // 14
+    0 // "Módulo afectado por sombras" // 15
+  ],
+
   pcColumnas: [
     { nombre: "local_id", descripcion: "#ID" },
     { nombre: "severidad", descripcion: "Clase (CoA)" },
