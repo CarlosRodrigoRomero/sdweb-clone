@@ -9,11 +9,9 @@ import { InformeInterface } from "../../models/informe";
 
 import "fabric";
 declare let fabric;
-import Pica from "pica";
-const pica = Pica();
 
 import { AngularFireStorage } from "@angular/fire/storage";
-import { Observable, BehaviorSubject, Subject } from "rxjs";
+import { Observable, BehaviorSubject } from "rxjs";
 import { take } from "rxjs/operators";
 import { MatCheckboxChange, MatTableDataSource } from "@angular/material";
 
@@ -478,39 +476,6 @@ export class InformeExportComponent implements OnInit {
     );
 
     this.filtroApartados = this.apartadosInforme.map(element => element.nombre);
-
-    // this.dataTipos = {
-    //   labels: GLOBAL.labels_tipos,
-    //   datasets: [
-    //       {
-    //           label: 'Tipos',
-    //           backgroundColor: '#42A5F5',
-    //           borderColor: '#1E88E5',
-    //           data: this.countCategoria
-    //       },
-    //     ]
-    //   };
-    // this.dataSeveridad = {
-    //     labels: GLOBAL.labels_severidad,
-    //     datasets: [
-    //         {
-    //             label: 'Severidad',
-    //             backgroundColor: [
-    //               '#28a745',
-    //               '#FFCE56',
-    //               '#ff5722',
-    //               '#FF6384'
-    //           ],
-    //           hoverBackgroundColor: [
-    //             '#28a745',
-    //               '#FFCE56',
-    //         '#ff5722',
-    //               '#FF6384'
-    //           ],
-    //             data: this.countClase
-    //         },
-    //       ]
-    //     };
   }
 
   private calcularInforme() {

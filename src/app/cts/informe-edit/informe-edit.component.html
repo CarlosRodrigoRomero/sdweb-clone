@@ -483,6 +483,18 @@
             size="25"
             (change)="setSquareBase()"
           />
+          <br />
+          <span>Modulos afectados</span>
+          <input
+            *ngIf="selected_pc"
+            [(ngModel)]="selected_pc.modulosAfectados"
+            (change)="updatePcInDb(selected_pc, false)"
+            type="number"
+            id="modulosAfectados"
+            maxlength="5"
+            size="2"
+            value="1"
+          />
         </div>
       </div>
     </div>
