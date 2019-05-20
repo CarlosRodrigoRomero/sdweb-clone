@@ -38,7 +38,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   public pcDescripcion: string[];
   public pcCausa: string[];
   public pcRecomendacion: string[];
-  public pcPerdidas: string[];
+  public pcPerdidas: number[];
 
   constructor(
     private storage: AngularFireStorage,

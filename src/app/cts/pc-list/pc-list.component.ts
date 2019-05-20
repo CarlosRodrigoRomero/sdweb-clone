@@ -1,11 +1,6 @@
 import { Component, OnInit, Input, ViewChild } from "@angular/core";
 import { PcInterface } from "../../models/pc";
-import {
-  MatTableDataSource,
-  MatSort,
-  MatPaginator,
-  MatDialog
-} from "@angular/material";
+import { MatTableDataSource, MatSort, MatPaginator } from "@angular/material";
 import { PcService } from "../../services/pc.service";
 import { Observable } from "rxjs";
 import {
@@ -47,7 +42,7 @@ export class PcListComponent implements OnInit {
   public searchKey: string;
   public profileUrl: Observable<string | null>;
   public pcDescripcion: string[];
-  public pcPerdidas: string[];
+  public pcPerdidas: number[];
   public temperaturaLimite: number;
 
   constructor(private pcService: PcService) {

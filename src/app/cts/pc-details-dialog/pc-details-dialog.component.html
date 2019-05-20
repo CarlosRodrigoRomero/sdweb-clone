@@ -1,17 +1,5 @@
 <div mat-dialog-title>
-  <h4 class="dialog-title">Anomalía ID {{ pc.local_id }}</h4>
-  <span class="severidad colorSeveridad{{ pc.severidad }}">
-    (CoA {{ pc.severidad }})</span
-  >
-  <label class="switch">
-    <input
-      [(ngModel)]="slider"
-      type="checkbox"
-      id="changeImage"
-      (ngModelChange)="onSliderChange($event)"
-    />
-    <span class="slider round"></span>
-  </label>
+  <h3 class="text-center dialog-title">Visor de anomalías térmicas</h3>
 </div>
 <div mat-dialog-content>
   <div class="row">
@@ -44,6 +32,27 @@
     </div>
 
     <div class="col-5 pc-details-derecha">
+      <h4 class="text-center">
+        Anomalía #{{ pc.local_id }}
+        <span class="text-center colorSeveridad{{ pc.severidad }}">
+          (CoA {{ pc.severidad }})</span
+        >
+      </h4>
+
+      <div class="termico-visual">
+        <label class="switch">
+          <input
+            [(ngModel)]="slider"
+            type="checkbox"
+            id="changeImage"
+            (ngModelChange)="onSliderChange($event)"
+          />
+          <span class="slider round"></span>
+        </label>
+
+        <span class="termico-visual-text"> térmico / visual</span>
+      </div>
+
       <div *ngIf="true" class="pc-details-derecha-item">
         <div class="pc-details-derecha-icon">
           <i class="fas fa-info-circle"></i>

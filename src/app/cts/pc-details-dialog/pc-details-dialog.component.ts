@@ -33,7 +33,7 @@ export class PcDetailsDialogComponent implements OnInit {
   public pcDescripcion: string[];
   public pcCausa: string[];
   public pcRecomendacion: string[];
-  public pcPerdidas: string[];
+  public pcPerdidas: number[];
   public oldTriangle;
   public oldActObjRef1;
   public oldActObjRef2;
