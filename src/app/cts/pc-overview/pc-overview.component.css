@@ -1,0 +1,21 @@
+.margin-top {
+  margin-top: 1rem;
+}
+
+.colflex {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.flexchart {
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: column;
+}
+.flexchart ul {
+  margin-top: 1.5rem;
+  list-style: none;
+  font-size: 1.2rem;
+}

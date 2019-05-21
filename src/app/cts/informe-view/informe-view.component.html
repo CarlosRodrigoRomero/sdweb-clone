@@ -72,15 +72,15 @@
           </div>
           <div class="header-derecha-datos">
             <div class="header-derecha-datos-donut">
-              <p-chart
+              <!-- <p-chart
                 type="doughnut"
                 [data]="dataSeveridad"
                 [options]="chartOptions"
-              ></p-chart>
+              ></p-chart> -->
             </div>
             <div class="header-derecha-datos-mae">
               <div class="div-mae-texto text-center">
-                <span class="mae-texto text-light">MAE</span>
+                <span class="mae-texto text-light">Pérdidas</span>
               </div>
               <div class="div-mae-1">
                 <div class="div-mae-2">
@@ -105,23 +105,35 @@
       <li class="nav-item">
         <a
           class="nav-link active"
+          id="overview-tab"
+          data-toggle="tab"
+          href="#overview"
+          role="tab"
+          aria-controls="overview"
+          aria-selected="true"
+          >Resumen</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
           id="home-tab"
           data-toggle="tab"
           href="#home"
           role="tab"
           aria-controls="home"
-          aria-selected="true"
+          aria-selected="false"
           >Listado</a
         >
       </li>
       <li class="nav-item">
         <a
           class="nav-link"
-          id="profile-tab"
+          id="map-tab"
           data-toggle="tab"
-          href="#profile"
+          href="#map"
           role="tab"
-          aria-controls="profile"
+          aria-controls="map"
           aria-selected="false"
           >Mapa</a
         >
@@ -155,6 +167,24 @@
         <div class="tab-content" id="myTabContent">
           <div
             class="tab-pane fade show active"
+            id="overview"
+            role="tabpanel"
+            aria-labelledby="overview-tab"
+          >
+            <div class="row">
+              <div class="col-12">
+                <app-pc-overview
+                  [allPcs]="allPcs"
+                  [planta]="planta"
+                  [informe]="informe"
+                >
+                </app-pc-overview>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
             id="home"
             role="tabpanel"
             aria-labelledby="home-tab"
@@ -175,9 +205,9 @@
 
           <div
             class="tab-pane fade"
-            id="profile"
+            id="map"
             role="tabpanel"
-            aria-labelledby="profile-tab"
+            aria-labelledby="map-tab"
           >
             <div class="row">
               <div class="col-12 div-pc-map-container">

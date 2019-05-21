@@ -1,26 +1,18 @@
 <mat-card>
   <mat-card-content>
-    <h3>Clase de Anomalía (CoA)</h3>
+    <h3>Categorías</h3>
     <div class="filtro-severidad">
-      <mat-checkbox
-        *ngFor="let ts of numClases"
-        [checked]="filtroClase.includes(ts)"
-        (change)="onCheckBoxClaseChange($event)"
-        value="{{ ts }}"
-      >
-        <div class="filtros-severidad-circulo-texto">
-          <div class="circle circleSeveridad{{ ts }}"></div>
-          <span class="filtro-severidad-text"
-            >{{ labelsSeveridad[ts - 1] }}
-          </span>
-
-          <span class="filtro-numero"> ({{ countClase[ts - 1] }}) </span>
-          <i
-            matTooltip="{{ descripcionSeveridad[ts - 1] }}"
-            class="info-severidad fas fa-info-circle"
-          ></i>
-        </div>
-      </mat-checkbox>
+      <ng-container *ngFor="let cat of numCategorias">
+        <mat-checkbox
+          *ngIf="countCategoria[cat - 1] > 0"
+          [checked]="filtroCategoria.includes(cat)"
+          (change)="onChangeCheckboxCategoria($event)"
+          value="{{ cat }}"
+        >
+          {{ nombreClases[cat] }}
+          <span class="filtro-numero">({{ countCategoria[cat - 1] }})</span>
+        </mat-checkbox>
+      </ng-container>
     </div>
 
     <hr />
@@ -44,19 +36,27 @@
 
     <hr />
 
-    <h3>Categorías</h3>
+    <h3>Clase de Anomalía (CoA)</h3>
     <div class="filtro-severidad">
-      <ng-container *ngFor="let cat of numCategorias">
-        <mat-checkbox
-          *ngIf="countCategoria[cat - 1] > 0"
-          [checked]="filtroCategoria.includes(cat)"
-          (change)="onChangeCheckboxCategoria($event)"
-          value="{{ cat }}"
-        >
-          {{ nombreClases[cat] }}
-          <span class="filtro-numero">({{ countCategoria[cat - 1] }})</span>
-        </mat-checkbox>
-      </ng-container>
+      <mat-checkbox
+        *ngFor="let ts of numClases"
+        [checked]="filtroClase.includes(ts)"
+        (change)="onCheckBoxClaseChange($event)"
+        value="{{ ts }}"
+      >
+        <div class="filtros-severidad-circulo-texto">
+          <div class="circle circleSeveridad{{ ts }}"></div>
+          <span class="filtro-severidad-text"
+            >{{ labelsSeveridad[ts - 1] }}
+          </span>
+
+          <span class="filtro-numero"> ({{ countClase[ts - 1] }}) </span>
+          <i
+            matTooltip="{{ descripcionSeveridad[ts - 1] }}"
+            class="info-severidad fas fa-info-circle"
+          ></i>
+        </div>
+      </mat-checkbox>
     </div>
   </mat-card-content>
 </mat-card>

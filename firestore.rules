@@ -2,7 +2,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
     	allow write: if request.auth.uid == "R2V08aQmi4g1eoaW11RVseqkUZg2";
-      allow delete: request.auth.uid == "R2V08aQmi4g1eoaW11RVseqkUZg2";
+      allow delete: if request.auth.uid == "R2V08aQmi4g1eoaW11RVseqkUZg2";
       allow read: if request.auth != null;
     }
   }
