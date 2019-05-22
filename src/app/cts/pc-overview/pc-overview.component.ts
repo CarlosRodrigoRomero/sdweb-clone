@@ -83,8 +83,7 @@ export class PcOverviewComponent implements OnInit {
     for (const i of this.numClases) {
       filtroClase = this.allPcs.filter(pc => pc.severidad === i);
 
-      perdidasClase = this.allPcs
-        .filter(pc => pc.severidad === i)
+      perdidasClase = filtroClase
         .map(pc => {
           let numeroModulos;
           if (pc.modulosAfectados) {
