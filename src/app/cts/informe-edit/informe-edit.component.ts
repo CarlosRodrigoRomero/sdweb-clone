@@ -10,6 +10,7 @@ import { GLOBAL } from "../../services/global";
 
 import "fabric";
 import { take, map } from "rxjs/operators";
+import { Estructura } from "../../models/estructura";
 declare let fabric;
 
 @Component({
@@ -59,8 +60,8 @@ export class InformeEditComponent implements OnInit {
   public flights_names: string[];
   public flights_numbers: number[];
   public currentFlight: string;
-  private columnas: number;
-  private filas: number;
+  public columnasEstructura: number;
+  public filasEstructura: number;
   public columnas_array: number[];
   public filas_array: number[];
   public max_temp: number;
@@ -73,6 +74,9 @@ export class InformeEditComponent implements OnInit {
   public lastRef: number[];
   public currentGlobalX: number;
   public currentGlobalY: string;
+  public estructura: Estructura;
+  public buildingEstructura = false;
+  public estructuraMatrix: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -108,6 +112,10 @@ export class InformeEditComponent implements OnInit {
     this.manualRotation = false;
 
     this.allPcs = new Array<PcInterface>();
+    this.estructura = <Estructura>{
+      filename: "",
+      coords: []
+    };
   }
 
   ngOnInit() {
@@ -330,17 +338,11 @@ export class InformeEditComponent implements OnInit {
   }
   onMouseMoveCanvas(event: MouseEvent) {
     // const raw_coords = this.transformCoordsToRaw(event.offsetX, event.offsetY);
-    // console.log('offsetX e y', event.offsetX, event.offsetY);
-    // console.log('raw_coordsX e y', raw_coords.x, raw_coords.y);
     // const mouseX = raw_coords.x;
     // const mouseY = raw_coords.y;
     // Temperatura puntual
-    // console.log('canvas2 size', this.canvas2.height, this.canvas2.width);
     // const mousePositionData = this.canvas2.getContext('2d').getImageData(mouseX , mouseY , 1, 1).data;
-    // console.log('mouseX', mouseX, 'mouseY', mouseY);
-    // console.log('mousePositionData', mousePositionData);
     // const mouseTemp = this.rgb2temp(mousePositionData[0], mousePositionData[1], mousePositionData[2]);
-    // console.log('mouse_temp', mouseTemp);
     // // Coger maxima temperatura de los alrededores
     // const mouseSquare = this.canvas2
     //   .getContext('2d')
@@ -365,15 +367,12 @@ export class InformeEditComponent implements OnInit {
     //     )
     //   ); // i+3 is alpha (the fourth element)
     // }
-    // // console.log('mouse_temps_array', mouse_temps_array);
     // const mouse_max_temp_array = this.indexOfMax(mouse_temps_array);
-    // // console.log('index_of', mouse_max_temp_array);
     // this.tooltip_temp = mouse_max_temp_array[0];
     //
     // #############################
     // Modificación de HS
     // #############################
-    // console.log('x,y', event.offsetX, event.offsetY, 'tx, ty', mouseX, mouseY);
     // const actObj = this.canvas.getActiveObject();
     // // Get HS img coords and draw triangle
     // if (actObj !== null && actObj !== undefined) {
@@ -384,22 +383,17 @@ export class InformeEditComponent implements OnInit {
     //     // this.selected_pc.img_x = max_temp.max_temp_x;
     //     // this.selected_pc.img_y = max_temp.max_temp_y;
     //     if (actObjRaw.ref === true) {
-    //       // console.log('actObjRaw ref', actObjRaw);
     //       this.selected_pc.refTop = Math.round(actObjRaw.top);
     //       this.selected_pc.refLeft = Math.round(actObjRaw.left);
     //       this.selected_pc.refWidth = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
     //       this.selected_pc.refHeight = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
     //     } else {
-    //       // console.log('NoRef', this.selected_pc);
     //       this.selected_pc.img_top = Math.round(actObjRaw.top);
     //       this.selected_pc.img_left = Math.round(actObjRaw.left);
     //       this.selected_pc.img_width = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
     //       this.selected_pc.img_height = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
     //     }
-    // console.log('selected_pc_mod top, left', this.selected_pc.img_top, this.selected_pc.img_left);
     // this.updatePcInDb(this.selected_pc, false);
-    // console.log('RAW: top,left,width, height', actObjRaw.top, actObjRaw.left, actObjRaw.width, actObjRaw.height);
-    // console.log('top: ', actObjRaw.top);
     // $('#temp').html(Math.round(temperature*10)/10);
     // $('#max_temp').html( Math.round(temps.max()*10)/10);
     // $('#sq_height').html(squareHeight);
@@ -412,8 +406,6 @@ export class InformeEditComponent implements OnInit {
 
   //   // get the color array for the pixels around the mouse
   //   const actObjRaw = this.transformActObjToRaw(actObj);
-  //   // console.log('RAW. left, top, width, height', actObjRaw.left, actObjRaw.top, actObjRaw.width, actObjRaw.height);
-  //   // console.log('ROT. left, top, width, height', actObj.left, actObj.top, actObj.width, actObj.height);
 
   //   const actObjData = this.canvas2
   //     .getContext('2d')
@@ -561,6 +553,7 @@ export class InformeEditComponent implements OnInit {
   }
 
   onDblClickCanvas(event) {
+    this.calcularFilaColumna(event.offsetX, event.offsetY);
     const leftCoord = event.offsetX - this.squareWidth / 2;
     const topCoord = event.offsetY - this.squareHeight / 2;
     this.localIdCount += 1;
@@ -737,6 +730,10 @@ export class InformeEditComponent implements OnInit {
         }
 
         this.setSquareBase();
+
+        this.filasEstructura = this.planta.filas;
+        // this.columnasEstructura = this.planta.columnas;
+        this.columnasEstructura = 5; // TODO
       },
       error => {
         const errorMessage = error as any;
@@ -955,8 +952,6 @@ export class InformeEditComponent implements OnInit {
     this.canvas.discardActiveObject();
     // Añadir numero de vuelo
     // TODO
-
-    // console.log('selected_pc', this.selected_pc);
   }
 
   onMapMarkerClick(pc: PcInterface, fetchPcs = false) {
@@ -1135,5 +1130,222 @@ export class InformeEditComponent implements OnInit {
   }
   onClickNextImage(event) {
     this.rangeValue += 1;
+  }
+  onClickEstructura() {
+    console.log("buildingEstructura", this.buildingEstructura);
+  }
+
+  onClickBuildEstructura(event) {
+    if (this.buildingEstructura) {
+      if (this.currentFileName !== this.estructura.filename) {
+        this.estructura.filename = this.currentFileName;
+        this.estructura.coords = Array();
+      }
+      this.estructura.coords.push({ x: event.offsetX, y: event.offsetY });
+
+      if (this.estructura.coords.length === 4) {
+        this.buildingEstructura = false;
+        this.buildEstructura(this.estructura);
+        this.getAllPointsEstructura(this.estructura);
+        this.estructura.coords = Array();
+      }
+    }
+  }
+
+  buildEstructura(estructura) {
+    const pol = new fabric.Polygon(estructura.coords, {
+      selectable: false,
+      fill: "rgba(0,0,0,0)",
+      stroke: "grey",
+      strokeWidth: 1,
+      hasControls: false
+    });
+
+    this.canvas.add(pol);
+  }
+
+  getAllPointsEstructura(estructura) {
+    // crear array[fila][columna]
+    this.estructuraMatrix = [];
+    for (let i = 0; i < this.filasEstructura + 1; i++) {
+      this.estructuraMatrix[i] = new Array(this.columnasEstructura + 1);
+    }
+
+    // 1 - Obtenemos la ecuacion de los cuatro lados
+    // [0, 1, 2, 3]; // [tl, tr, br, bl] el poligono tiene 4 esquinas
+
+    let p2: any;
+    for (let i = 0; i < 4; i++) {
+      // para cada esquina ...
+      const p1 = estructura.coords[i];
+      p2 = estructura.coords[i + 1];
+
+      let numeroDivisiones: number;
+      if (i === 0) {
+        // top-left/bottom-right, inicio de columna
+        numeroDivisiones = this.columnasEstructura;
+        this.estructuraMatrix[0][0] = p1;
+      } else if (i === 1) {
+        numeroDivisiones = this.filasEstructura;
+        this.estructuraMatrix[0][this.columnasEstructura] = p1;
+      } else if (i === 2) {
+        numeroDivisiones = this.columnasEstructura;
+        this.estructuraMatrix[this.filasEstructura][
+          this.columnasEstructura
+        ] = p1;
+      } else if (i === 3) {
+        numeroDivisiones = this.filasEstructura;
+        this.estructuraMatrix[this.filasEstructura][0] = p1;
+        // si la esquina es la numero 3 (bottom-left)
+        p2 = estructura.coords[0];
+      }
+
+      // Obtenemos la ecuacion de la recta (y = mx+b)
+      const m = (p2.y - p1.y) / (p2.x - p1.x);
+      const b = p2.y - m * p2.x;
+
+      // Para dividir el segmento por Tales, elegimos el eje x o el eje y
+      // segun nos convenga
+      if (Math.abs(p1.x - p2.x) > Math.abs(p1.y - p2.y)) {
+        // utilizamos el eje x.
+
+        const x0 = Math.min(p1.x, p2.x);
+        const distancia = Math.abs(p1.x - p2.x) / numeroDivisiones;
+
+        for (let div = 1; div < numeroDivisiones; div++) {
+          const x = x0 + div * distancia;
+          const point = { x: Math.round(x), y: Math.round(m * x + b) };
+          let y_: number;
+          let x_: number;
+          if (i === 0) {
+            y_ = 0;
+            x_ = div;
+          } else if (i === 1) {
+            y_ = div;
+            x_ = this.columnasEstructura;
+          } else if (i === 2) {
+            y_ = this.filasEstructura;
+            x_ = div;
+          } else if (i === 3) {
+            y_ = div;
+            x_ = 0;
+          }
+
+          this.estructuraMatrix[y_][x_] = point;
+        }
+      } else {
+        const y0 = Math.min(p1.y, p2.y);
+        const distancia = Math.abs(p1.y - p2.y) / numeroDivisiones;
+
+        for (let div = 1; div < numeroDivisiones; div++) {
+          const y = y0 + div * distancia;
+          const point = { x: Math.round((y - b) / m), y: Math.round(y) };
+          let y_: number;
+          let x_: number;
+          if (i === 0) {
+            y_ = 0;
+            x_ = div;
+          } else if (i === 1) {
+            y_ = div;
+            x_ = this.columnasEstructura;
+          } else if (i === 2) {
+            y_ = this.filasEstructura;
+            x_ = div;
+          } else if (i === 3) {
+            y_ = div;
+            x_ = 0;
+          }
+
+          this.estructuraMatrix[y_][x_] = point;
+        }
+      }
+    }
+
+    // 2 - Obtener puntos interseccion de las lineas rectas
+
+    for (let col = 1; col < this.columnasEstructura; col++) {
+      // obtener la recta
+      const p1a = this.estructuraMatrix[0][col];
+      const p2a = this.estructuraMatrix[this.filasEstructura][col];
+      const ma = (p2a.y - p1a.y) / (p2a.x - p1a.x);
+      const ba = p2a.y - ma * p2a.x;
+
+      // para cada fila ...
+      for (let fila = 1; fila < this.filasEstructura; fila++) {
+        // obtener la recta
+        const p1b = this.estructuraMatrix[fila][0];
+        const p2b = this.estructuraMatrix[fila][this.columnasEstructura];
+
+        const mb = (p2b.y - p1b.y) / (p2b.x - p1b.x);
+        const bb = p2b.y - mb * p2b.x;
+
+        // hallar interseccion
+        const xInterseccion = (ba - bb) / (mb - ma);
+
+        const yInterseccion = ma * xInterseccion + ba;
+
+        // almacenar en arrayEstructura
+        this.estructuraMatrix[fila][col] = {
+          x: Math.round(xInterseccion),
+          y: Math.round(yInterseccion)
+        };
+      }
+    }
+
+    this.dibujarEstructuraMatrix(this.estructuraMatrix);
+  }
+
+  dibujarEstructuraMatrix(estructuraMatrix: any[]) {
+    estructuraMatrix.forEach(fila => {
+      fila.forEach(punto => {
+        this.canvas.add(
+          new fabric.Circle({
+            left: punto.x,
+            top: punto.y,
+            radius: 2,
+            fill: "red",
+            selectable: false
+          })
+        );
+      });
+    });
+  }
+
+  calcularFilaColumna(x, y) {
+    let distanciaMinima = 999999;
+    let columnaDistMin;
+    let filaDistMin;
+    console.log(
+      "TCL: calcularFilaColumna -> this.estructuraMatrix",
+      this.estructuraMatrix
+    );
+
+    for (let fila = 1; fila < this.filasEstructura + 1; fila++) {
+      for (let col = 1; col < this.columnasEstructura + 1; col++) {
+        // Para cada modulo ...
+        let distancia = 0;
+        for (let i = 0; i < 2; i++) {
+          //horizontal
+          for (let j = 0; j < 2; j++) {
+            //vertical
+            // para cada esquina, sumamos distancia
+
+            const p = this.estructuraMatrix[fila - 1 + i][col - 1 + j];
+
+            distancia =
+              distancia +
+              Math.sqrt(Math.pow(p.x - x, 2) + Math.pow(p.y - y, 2));
+          }
+        }
+
+        if (distancia < distanciaMinima) {
+          distanciaMinima = distancia;
+          columnaDistMin = col;
+          filaDistMin = fila;
+        }
+      }
+    }
+    console.log("[filaDistMin, columnaDistMin]", filaDistMin, columnaDistMin);
+    return [filaDistMin, columnaDistMin];
   }
 }
