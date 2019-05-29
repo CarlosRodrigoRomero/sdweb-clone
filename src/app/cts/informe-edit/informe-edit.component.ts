@@ -77,6 +77,7 @@ export class InformeEditComponent implements OnInit {
   public estructura: Estructura;
   public buildingEstructura = false;
   public estructuraMatrix: any;
+  public estructuraOn: boolean;
 
   constructor(
     private route: ActivatedRoute,
@@ -121,7 +122,6 @@ export class InformeEditComponent implements OnInit {
   ngOnInit() {
     this.getInforme();
     this.canvas = new fabric.Canvas("mainCanvas");
-    // this.canvas2 = new fabric.Canvas("hiddenCanvas");
 
     this.canvas.on("object:modified", options => {
       if (options.target.type === "rect") {
@@ -524,47 +524,66 @@ export class InformeEditComponent implements OnInit {
           crossOrigin: "anonymous",
           angle: this.current_image_rotation,
           left: leftAndTop.left,
-          top: leftAndTop.top
+          top: leftAndTop.top,
+          selectable: false
           // originX: 'top',
           // originY: 'left'
         }
       );
       this.fabImg = image;
     });
-
-    // this.canvas2.clear();
-    // const img2 = new Image();
-    // img2.src = imgSrc;
-    // img2.setAttribute("crossOrigin", "anonymous");
-    // img2.onload = ev => {
-    //   img2.setAttribute("crossOrigin", "anonymous");
-    //   if (this.fabImg2) {
-    //     this.canvas2.remove(this.fabImg2);
-    //   }
-    //   this.fabImg2 = new fabric.Image(img2, {
-    //     // left: leftAndTop.left,
-    //     // top: leftAndTop.top,
-    //     // angle: this.current_image_rotation,
-    //     crossOrigin: "Anonymous",
-    //     selectable: false
-    //   });
-    //   this.canvas2.add(this.fabImg2);
-    // };
   }
 
   onDblClickCanvas(event) {
-    this.calcularFilaColumna(event.offsetX, event.offsetY);
-    const leftCoord = event.offsetX - this.squareWidth / 2;
-    const topCoord = event.offsetY - this.squareHeight / 2;
+    let fila: number;
+    let columna: number;
+    let height: number;
+    let width: number;
+    let top: number;
+    let left: number;
+
+    if (this.estructuraOn) {
+      [fila, columna] = this.calcularFilaColumna(event.offsetX, event.offsetY);
+
+      const topLeftModulo = this.estructuraMatrix[fila - 1][columna - 1];
+      const topRightModulo = this.estructuraMatrix[fila - 1][columna];
+      const bottomRightModulo = this.estructuraMatrix[fila][columna];
+      const bottomLeftModulo = this.estructuraMatrix[fila][columna - 1];
+
+      top = topLeftModulo.y;
+      left = topLeftModulo.x;
+      height =
+        0.5 *
+        (-topLeftModulo.y +
+          bottomLeftModulo.y -
+          topRightModulo.y +
+          bottomRightModulo.y);
+
+      width =
+        0.5 *
+        (topRightModulo.x -
+          topLeftModulo.x +
+          bottomRightModulo.x -
+          bottomLeftModulo.x);
+    } else {
+      fila = 0;
+      columna = 1;
+
+      top = event.offsetY - this.squareHeight / 2;
+      left = event.offsetX - this.squareWidth / 2;
+      height = this.squareHeight;
+      width = this.squareWidth;
+    }
+
     this.localIdCount += 1;
     const actObj = new fabric.Rect({
-      left: leftCoord,
-      top: topCoord,
+      left: left,
+      top: top,
       fill: "rgba(0,0,0,0)",
       stroke: "red",
       strokeWidth: 1,
-      width: this.squareWidth,
-      height: this.squareHeight,
+      width: width,
+      height: height,
       hasControls: true,
       local_id: this.localIdCount,
       ref: false,
@@ -572,13 +591,13 @@ export class InformeEditComponent implements OnInit {
     });
 
     const actObjRef = new fabric.Rect({
-      left: leftCoord + this.squareWidth + 30,
-      top: topCoord,
+      left: left + width,
+      top: top,
       fill: "rgba(0,0,0,0)",
       stroke: "blue",
       strokeWidth: 1,
-      width: this.squareWidth,
-      height: this.squareHeight,
+      width: width,
+      height: height,
       hasControls: true,
       local_id: this.localIdCount,
       ref: true,
@@ -609,8 +628,8 @@ export class InformeEditComponent implements OnInit {
       id: "",
       archivo: this.currentFileName,
       tipo: 8, // tipo (celula caliente por defecto)
-      local_x: 1, // local_x
-      local_y: 0, // local_x
+      local_x: columna, // local_x
+      local_y: fila, // local_x
       global_x: 0, // global_x
       global_y: "", // global_y
       gps_lng: this.current_gps_lng,
@@ -619,8 +638,8 @@ export class InformeEditComponent implements OnInit {
       img_top: actObjRawCoords.top,
       img_width: actObjRawCoords.width,
       img_height: actObjRawCoords.height,
-      img_x: 0, // coordenadas raw
-      img_y: 0, // coordenadas raw
+      img_x: 0, // coordenadas raw del punto mas caliente
+      img_y: 0, // coordenadas raw del punto mas caliente
       local_id: this.localIdCount,
       vuelo: this.currentFlight,
       image_rotation: this.current_image_rotation,
@@ -911,6 +930,7 @@ export class InformeEditComponent implements OnInit {
 
   setImageFromRangeValue(value) {
     value = parseInt(value, 10);
+    this.buildingEstructura = false;
     if (this.rangeValue !== value) {
       this.rangeValue = value;
     }
@@ -950,8 +970,21 @@ export class InformeEditComponent implements OnInit {
       }
     }
     this.canvas.discardActiveObject();
-    // Añadir numero de vuelo
-    // TODO
+
+    // Añadir Estructura
+    this.informeService
+      .getEstructuraInforme(this.informe.id, this.currentFileName)
+      .subscribe(est => {
+        if (est.length > 0) {
+          this.estructuraOn = true;
+          this.estructura = est[0];
+          this.getAllPointsEstructura(this.estructura);
+        } else {
+          this.estructuraOn = false;
+        }
+      });
+
+    // TODO - Añadir numero de vuelo
   }
 
   onMapMarkerClick(pc: PcInterface, fetchPcs = false) {
@@ -988,6 +1021,7 @@ export class InformeEditComponent implements OnInit {
   onClickDeletePc(pc: PcInterface) {
     // Eliminamos el PC de la bbdd
     this.delPcFromDb(pc);
+
     // Eliminamos el cuadrado
     this.selected_pc = null;
     // Eliminamos el triangulo
@@ -995,7 +1029,12 @@ export class InformeEditComponent implements OnInit {
       this.canvas.remove(this.oldTriangle);
     }
 
-    // TODO Eliminamos el cuadrado dentro de la
+    // TODO Eliminamos el pc del canvas
+    // Elimminamos el pc de la lista
+    const index: number = this.allPcs.indexOf(pc);
+    if (index !== -1) {
+      this.allPcs.splice(index, 1);
+    }
   }
 
   delPcFromDb(pc: PcInterface) {
@@ -1143,32 +1182,43 @@ export class InformeEditComponent implements OnInit {
       }
       this.estructura.coords.push({ x: event.offsetX, y: event.offsetY });
 
+      this.canvas.add(
+        new fabric.Circle({
+          left: event.offsetX - 1,
+          top: event.offsetY - 1,
+          radius: 2,
+          fill: "red",
+          selectable: false
+        })
+      );
+
       if (this.estructura.coords.length === 4) {
         this.buildingEstructura = false;
-        this.buildEstructura(this.estructura);
+        this.estructura.filas = this.filasEstructura;
+        this.estructura.columnas = this.columnasEstructura;
         this.getAllPointsEstructura(this.estructura);
+
+        this.informeService.addEstructuraInforme(
+          this.informe.id,
+          this.estructura
+        );
         this.estructura.coords = Array();
       }
     }
   }
 
-  buildEstructura(estructura) {
-    const pol = new fabric.Polygon(estructura.coords, {
-      selectable: false,
-      fill: "rgba(0,0,0,0)",
-      stroke: "grey",
-      strokeWidth: 1,
-      hasControls: false
-    });
-
-    this.canvas.add(pol);
+  onClickDeleteEstructura() {
+    this.informeService.deleteEstructuraInforme(
+      this.informe.id,
+      this.currentFileName
+    );
   }
 
   getAllPointsEstructura(estructura) {
     // crear array[fila][columna]
     this.estructuraMatrix = [];
-    for (let i = 0; i < this.filasEstructura + 1; i++) {
-      this.estructuraMatrix[i] = new Array(this.columnasEstructura + 1);
+    for (let i = 0; i < estructura.filas + 1; i++) {
+      this.estructuraMatrix[i] = new Array(estructura.columnas + 1);
     }
 
     // 1 - Obtenemos la ecuacion de los cuatro lados
@@ -1183,19 +1233,17 @@ export class InformeEditComponent implements OnInit {
       let numeroDivisiones: number;
       if (i === 0) {
         // top-left/bottom-right, inicio de columna
-        numeroDivisiones = this.columnasEstructura;
+        numeroDivisiones = estructura.columnas;
         this.estructuraMatrix[0][0] = p1;
       } else if (i === 1) {
-        numeroDivisiones = this.filasEstructura;
-        this.estructuraMatrix[0][this.columnasEstructura] = p1;
+        numeroDivisiones = estructura.filas;
+        this.estructuraMatrix[0][estructura.columnas] = p1;
       } else if (i === 2) {
-        numeroDivisiones = this.columnasEstructura;
-        this.estructuraMatrix[this.filasEstructura][
-          this.columnasEstructura
-        ] = p1;
+        numeroDivisiones = estructura.columnas;
+        this.estructuraMatrix[estructura.filas][estructura.columnas] = p1;
       } else if (i === 3) {
-        numeroDivisiones = this.filasEstructura;
-        this.estructuraMatrix[this.filasEstructura][0] = p1;
+        numeroDivisiones = estructura.filas;
+        this.estructuraMatrix[estructura.filas][0] = p1;
         // si la esquina es la numero 3 (bottom-left)
         p2 = estructura.coords[0];
       }
@@ -1222,9 +1270,9 @@ export class InformeEditComponent implements OnInit {
             x_ = div;
           } else if (i === 1) {
             y_ = div;
-            x_ = this.columnasEstructura;
+            x_ = estructura.columnas;
           } else if (i === 2) {
-            y_ = this.filasEstructura;
+            y_ = estructura.filas;
             x_ = div;
           } else if (i === 3) {
             y_ = div;
@@ -1247,9 +1295,9 @@ export class InformeEditComponent implements OnInit {
             x_ = div;
           } else if (i === 1) {
             y_ = div;
-            x_ = this.columnasEstructura;
+            x_ = estructura.columnas;
           } else if (i === 2) {
-            y_ = this.filasEstructura;
+            y_ = estructura.filas;
             x_ = div;
           } else if (i === 3) {
             y_ = div;
@@ -1263,18 +1311,18 @@ export class InformeEditComponent implements OnInit {
 
     // 2 - Obtener puntos interseccion de las lineas rectas
 
-    for (let col = 1; col < this.columnasEstructura; col++) {
+    for (let col = 1; col < estructura.columnas; col++) {
       // obtener la recta
       const p1a = this.estructuraMatrix[0][col];
-      const p2a = this.estructuraMatrix[this.filasEstructura][col];
+      const p2a = this.estructuraMatrix[estructura.filas][col];
       const ma = (p2a.y - p1a.y) / (p2a.x - p1a.x);
       const ba = p2a.y - ma * p2a.x;
 
       // para cada fila ...
-      for (let fila = 1; fila < this.filasEstructura; fila++) {
+      for (let fila = 1; fila < estructura.filas; fila++) {
         // obtener la recta
         const p1b = this.estructuraMatrix[fila][0];
-        const p2b = this.estructuraMatrix[fila][this.columnasEstructura];
+        const p2b = this.estructuraMatrix[fila][estructura.columnas];
 
         const mb = (p2b.y - p1b.y) / (p2b.x - p1b.x);
         const bb = p2b.y - mb * p2b.x;
@@ -1300,8 +1348,8 @@ export class InformeEditComponent implements OnInit {
       fila.forEach(punto => {
         this.canvas.add(
           new fabric.Circle({
-            left: punto.x,
-            top: punto.y,
+            left: punto.x - 1,
+            top: punto.y - 1,
             radius: 2,
             fill: "red",
             selectable: false
@@ -1309,16 +1357,53 @@ export class InformeEditComponent implements OnInit {
         );
       });
     });
+
+    this.canvas.on("object:moving", options => {
+      if (this.estructuraOn) {
+        const puntoDistMin = this.getPointDistanciaMin(
+          options.pointer.x,
+          options.pointer.y,
+          estructuraMatrix
+        );
+        options.target.set({
+          left: puntoDistMin.x,
+          top: puntoDistMin.y
+        });
+      }
+    });
   }
 
-  calcularFilaColumna(x, y) {
+  getPointDistanciaMin(x: number, y: number, estructuraMatrix: any[]) {
+    let distanciaMinima = 99999;
+    let puntoDistanciaMin;
+
+    estructuraMatrix.forEach(fila => {
+      fila.forEach(punto => {
+        const distancia = Math.abs(punto.x - x) + Math.abs(punto.y - y);
+        if (distancia < distanciaMinima) {
+          distanciaMinima = distancia;
+          puntoDistanciaMin = punto;
+        }
+      });
+    });
+    let fila;
+    let columna;
+
+    [fila, columna] = this.calcularFilaColumna(
+      puntoDistanciaMin.x + 10,
+      puntoDistanciaMin.y + 10
+    );
+
+    this.selected_pc.local_x = columna;
+    this.selected_pc.local_y = fila;
+
+    return puntoDistanciaMin;
+  }
+
+  calcularFilaColumna(x: number, y: number) {
     let distanciaMinima = 999999;
     let columnaDistMin;
     let filaDistMin;
-    console.log(
-      "TCL: calcularFilaColumna -> this.estructuraMatrix",
-      this.estructuraMatrix
-    );
 
     for (let fila = 1; fila < this.filasEstructura + 1; fila++) {
       for (let col = 1; col < this.columnasEstructura + 1; col++) {
@@ -1345,7 +1430,16 @@ export class InformeEditComponent implements OnInit {
         }
       }
     }
-    console.log("[filaDistMin, columnaDistMin]", filaDistMin, columnaDistMin);
     return [filaDistMin, columnaDistMin];
+  }
+
+  updateEstructura(event) {
+    this.onClickDeleteEstructura();
+    this.estructura.filas = this.filasEstructura;
+    this.estructura.columnas = this.columnasEstructura;
+
+    this.informeService.addEstructuraInforme(this.informe.id, this.estructura);
+
+    this.setImageFromRangeValue(this.rangeValue);
   }
 }

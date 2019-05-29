@@ -97,8 +97,31 @@
               height="512"
             ></canvas>
 
-            <mat-checkbox (click)="onClickEstructura($event)" [(ngModel)]="buildingEstructura">estructura</mat-checkbox>
-      
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="onClickDeleteEstructura($event)"
+            >
+              DEL
+            </button>
+
+            <mat-checkbox
+              (click)="onClickEstructura($event)"
+              [(ngModel)]="buildingEstructura"
+              >estructura</mat-checkbox
+            >
+            <input
+              [(ngModel)]="filasEstructura"
+              type="number"
+              id="filasEstructura"
+              (change)="updateEstructura($event)"
+            />
+            <input
+              [(ngModel)]="columnasEstructura"
+              type="number"
+              id="columnasEstructura"
+              (change)="updateEstructura($event)"
+            />
           </div>
         </div>
 
