@@ -1,0 +1,89 @@
+<div class="container">
+  <div class="row">
+    <div class="col-9">
+      <div class="row">
+        <div class="col">
+          <h2>
+            <h2>{{ planta?.nombre }}</h2>
+          </h2>
+          <h3 id="info"></h3>
+
+          <agm-map
+            [latitude]="plantaLocation.lat"
+            [longitude]="plantaLocation.lng"
+            [mapTypeId]="mapType"
+            [zoom]="defaultZoom"
+            (mapReady)="onMapReady($event)"
+          >
+          </agm-map>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="row">
+            <div class="col-6" *ngIf="selectedLocationArea">
+              <h3>Location Area seleccionado</h3>
+              <ul>
+                <li>
+                  globalX:
+                  <input
+                    (change)="updateLocationArea(selectedLocationArea)"
+                    [(ngModel)]="selectedLocationArea.globalX"
+                    type="text"
+                    name="globalX"
+                  />
+                </li>
+                <li>
+                  globalY:
+                  <input
+                    (change)="updateLocationArea(selectedLocationArea)"
+                    [(ngModel)]="selectedLocationArea.globalY"
+                    type="text"
+                    name="globalY"
+                  />
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-eliminar"
+                    (click)="deleteLocationArea(selectedLocationArea)"
+                  >
+                    X
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-3 col-locationareas">
+      <table class="table" id="tabla_locationareas">
+        <tr>
+          <th>GlobX</th>
+          <!-- <th> Filename</th> -->
+          <th>GlobY</th>
+          <th>sel</th>
+        </tr>
+
+        <tr
+          style="cursor:  pointer"
+          (click)="selectLocationArea(locArea)"
+          *ngFor="let locArea of locationAreaList"
+          [ngClass]="{ seleccionado: locArea === selectedLocationArea }"
+        >
+          <th>{{ locArea.globalX }}</th>
+          <th>{{ locArea.globalY }}</th>
+          <!-- <th> {{pc.archivo}}</th> -->
+          <th>
+            <mat-checkbox
+              (click)="changeVisibilityPolygon(locArea)"
+              [(ngModel)]="locArea.visible"
+            ></mat-checkbox>
+          </th>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

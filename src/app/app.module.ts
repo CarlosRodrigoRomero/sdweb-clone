@@ -71,6 +71,7 @@ import { VideoComponent } from "./cts/video/video.component";
 import { SpinnerComponent } from "./cts/spinner/spinner.component";
 import { PruebasComponent } from "./cts/pruebas/pruebas.component";
 import { PcOverviewComponent } from "./cts/pc-overview/pc-overview.component";
+import { AutoLocComponent } from "./cts/auto-loc/auto-loc.component";
 
 @NgModule({
   declarations: [
@@ -92,7 +93,8 @@ import { PcOverviewComponent } from "./cts/pc-overview/pc-overview.component";
     VideoComponent,
     SpinnerComponent,
     PruebasComponent,
-    PcOverviewComponent
+    PcOverviewComponent,
+    AutoLocComponent
   ],
   entryComponents: [PcDetailsDialogComponent],
   imports: [
@@ -155,7 +157,8 @@ import { PcOverviewComponent } from "./cts/pc-overview/pc-overview.component";
     MatTooltipModule,
     MatTreeModule,
     AgmCoreModule.forRoot({
-      apiKey: "AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM"
+      apiKey: "AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM",
+      libraries: ["drawing"]
     })
   ],
   providers: [

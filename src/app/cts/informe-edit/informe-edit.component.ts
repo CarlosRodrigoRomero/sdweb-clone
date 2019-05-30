@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { InformeService } from "src/app/services/informe.service";
 import { PcService } from "src/app/services/pc.service";
 import { PlantaService } from "src/app/services/planta.service";
@@ -11,7 +11,9 @@ import { GLOBAL } from "../../services/global";
 import "fabric";
 import { take, map } from "rxjs/operators";
 import { Estructura } from "../../models/estructura";
+import { AgmMap } from "@agm/core";
 declare let fabric;
+declare const google: any;
 
 @Component({
   selector: "app-informe-edit",
@@ -20,6 +22,8 @@ declare let fabric;
   providers: [InformeService, PlantaService, PcService]
 })
 export class InformeEditComponent implements OnInit {
+  @ViewChild(AgmMap) map: any;
+
   public titulo: number;
   public informe: InformeInterface;
   public planta: PlantaInterface;
@@ -78,6 +82,7 @@ export class InformeEditComponent implements OnInit {
   public buildingEstructura = false;
   public estructuraMatrix: any;
   public estructuraOn: boolean;
+  public polygonList: any[];
 
   constructor(
     private route: ActivatedRoute,
@@ -117,6 +122,7 @@ export class InformeEditComponent implements OnInit {
       filename: "",
       coords: []
     };
+    this.polygonList = [];
   }
 
   ngOnInit() {
@@ -623,6 +629,13 @@ export class InformeEditComponent implements OnInit {
     // });
     // this.canvas2.add(act_obj_raw);
     // this.canvas2.setActiveObject(act_obj_raw);
+    let globalX;
+    let globalY;
+
+    [globalX, globalY] = this.getGlobalCoordsFromLocationArea({
+      lat: this.current_gps_lat,
+      lng: this.current_gps_lng
+    });
 
     const newPc: PcInterface = {
       id: "",
@@ -630,8 +643,8 @@ export class InformeEditComponent implements OnInit {
       tipo: 8, // tipo (celula caliente por defecto)
       local_x: columna, // local_x
       local_y: fila, // local_x
-      global_x: 0, // global_x
-      global_y: "", // global_y
+      global_x: globalX, // global_x
+      global_y: globalY, // global_y
       gps_lng: this.current_gps_lng,
       gps_lat: this.current_gps_lat,
       img_left: actObjRawCoords.left,
@@ -752,7 +765,11 @@ export class InformeEditComponent implements OnInit {
 
         this.filasEstructura = this.planta.filas;
         // this.columnasEstructura = this.planta.columnas;
-        this.columnasEstructura = 5; // TODO
+        if (this.planta.tipo !== "2 ejes") {
+          this.columnasEstructura = 6; // temporal
+        } else {
+          this.columnasEstructura = this.planta.columnas;
+        }
       },
       error => {
         const errorMessage = error as any;
@@ -781,6 +798,7 @@ export class InformeEditComponent implements OnInit {
           // this.min_temp = this.informe.tempMin;
           // this.max_temp = this.informe.tempMax;
 
+          this.getPolygonList(this.informe.plantaId);
           this.getPlanta(this.informe.plantaId);
           // Cogemos todos los pcs de esta informe
           this.getPcsList();
@@ -1045,6 +1063,18 @@ export class InformeEditComponent implements OnInit {
     this.onMapMarkerClick(pc);
     pc.gps_lat = event.coords.lat;
     pc.gps_lng = event.coords.lng;
+    let globalX;
+    let globalY;
+
+    [globalX, globalY] = this.getGlobalCoordsFromLocationArea(event.coords);
+
+    if (globalX.length > 0) {
+      pc.global_x = globalX;
+    }
+
+    if (globalY.length > 0) {
+      pc.global_y = globalY;
+    }
     pc.image_rotation = this.current_image_rotation;
 
     pc.datetime = this.current_datetime;
@@ -1441,5 +1471,54 @@ export class InformeEditComponent implements OnInit {
     this.informeService.addEstructuraInforme(this.informe.id, this.estructura);
 
     this.setImageFromRangeValue(this.rangeValue);
+  }
+
+  getPolygonList(plantaId: string) {
+    this.plantaService
+      .getLocationsArea(plantaId)
+      .pipe(take(1))
+      .subscribe(items => {
+        items.forEach(locationArea => {
+          this.map._mapsWrapper
+            .createPolygon({
+              paths: locationArea.path,
+              strokeColor: "#FF0000",
+              visible: false,
+              strokeOpacity: 0,
+              strokeWeight: 0,
+              fillColor: "grey",
+              fillOpacity: 0,
+              editable: false,
+              draggable: false,
+              id: locationArea.id,
+              globalX: locationArea.globalX,
+              globalY: locationArea.globalY
+            })
+            .then((polygon: any) => {
+              this.polygonList.push(polygon);
+            });
+        });
+      });
+  }
+
+  getGlobalCoordsFromLocationArea(coords: any) {
+    const latLng = new google.maps.LatLng(coords.lat, coords.lng);
+    let globalX = "";
+    let globalY = "";
+
+    for (let i = 0; i < this.polygonList.length; i++) {
+      if (
+        google.maps.geometry.poly.containsLocation(latLng, this.polygonList[i])
+      ) {
+        if (this.polygonList[i].globalX.length > 0) {
+          globalX = this.polygonList[i].globalX;
+        }
+        if (this.polygonList[i].globalY.length > 0) {
+          globalY = this.polygonList[i].globalY;
+        }
+      }
+    }
+
+    return [globalX, globalY];
   }
 }
