@@ -1476,8 +1476,8 @@ export class InformeEditComponent implements OnInit {
   getPolygonList(plantaId: string) {
     this.plantaService
       .getLocationsArea(plantaId)
-      .pipe(take(1))
       .subscribe(items => {
+        this.polygonList = []
         items.forEach(locationArea => {
           this.map._mapsWrapper
             .createPolygon({
