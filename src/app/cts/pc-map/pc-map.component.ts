@@ -31,6 +31,7 @@ export class PcMapComponent implements OnInit {
   public informeId: string;
 
   public mapType = "satellite";
+  public circleRadius: number;
 
   constructor(
     private storage: AngularFireStorage,
@@ -42,8 +43,11 @@ export class PcMapComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.circleRadius = 5;
+    if (this.planta.tipo === "fija") {
+      this.circleRadius = 2;
+    }
     this.pcService.currentFilteredPcs$.subscribe(list => {
-      // console.log('list', list, this.planta);
       this.filteredPcs = list;
       // this.map.triggerResize();
       // this.pcDataSource.filterPredicate = (data, filter) => {
