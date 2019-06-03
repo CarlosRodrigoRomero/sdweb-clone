@@ -29,6 +29,7 @@ export class PcMapComponent implements OnInit {
 
   public filteredPcs: PcInterface[];
   public informeId: string;
+  public circleRadius: number;
 
   public mapType = "satellite";
 
@@ -42,6 +43,10 @@ export class PcMapComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.circleRadius = 5;
+    if (this.planta.tipo === "fija") {
+      this.circleRadius = 2;
+    }
     this.pcService.currentFilteredPcs$.subscribe(list => {
       // console.log('list', list, this.planta);
       this.filteredPcs = list;
