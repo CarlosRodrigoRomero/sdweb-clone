@@ -17,3 +17,7 @@ agm-map {
 .seleccionado {
   background-color: grey;
 }
+.table th {
+  padding: 0;
+  vertical-align: center !important;
+}

@@ -81,10 +81,10 @@ export class AutoLocComponent implements OnInit {
         this.map._mapsWrapper
           .createPolygon({
             paths: locationArea.path,
-            strokeColor: "#FF0000",
+            strokeColor: locationArea.globalX.length > 0 ? "green" : "red",
             strokeOpacity: this._strokeOpacity,
             strokeWeight: 2,
-            fillColor: "grey",
+            fillColor: locationArea.globalX.length > 0 ? "green" : "grey",
             fillOpacity: this._fillOpacity,
             editable: true,
             draggable: true,
@@ -124,7 +124,9 @@ export class AutoLocComponent implements OnInit {
     const polygon = this.polygonList.find(item => {
       return item.id === locationArea.id;
     });
+
     polygon.setOptions({ fillColor: "#FF0000" });
+
     this.selectedLocationArea = locationArea;
     this.selectedPolygon = polygon;
   }
@@ -145,37 +147,7 @@ export class AutoLocComponent implements OnInit {
     const drawingManager = new google.maps.drawing.DrawingManager(options);
     drawingManager.setMap(map);
 
-    google.maps.event.addListener(
-      drawingManager,
-      "polygoncomplete",
-      polygon => {
-        let path: LatLngLiteral[] = [];
-        let locationArea = {} as LocationAreaInterface;
-        for (var i = 0; i < polygon.getPath().getLength(); i++) {
-          path.push({
-            lat: polygon
-              .getPath()
-              .getAt(i)
-              .lat() as number,
-            lng: polygon
-              .getPath()
-              .getAt(i)
-              .lng() as number
-          });
-        }
-        locationArea.path = path;
-        locationArea.visible = true;
-        locationArea.globalX = "";
-        locationArea.globalY = "";
-        locationArea.plantaId = this.plantaId;
-
-        this.locationAreaList.push(locationArea);
-        this.selectedLocationArea = locationArea;
-        // DB: Añadir a coleccion 'locations' dentro de 'planta'
-
-        this.plantaService.addLocationArea(this.plantaId, locationArea);
-      }
-    );
+    this.addEventListeners(drawingManager);
   }
   deleteLocationArea(selectedLocationArea: LocationAreaInterface) {
     this.plantaService.delLocationArea(selectedLocationArea);
@@ -203,5 +175,75 @@ export class AutoLocComponent implements OnInit {
       polygon.strokeOpacity = this._strokeOpacity;
       polygon.fillOpacity = this._fillOpacity;
     }
+  }
+
+  addEventListeners(drawingManager: any) {
+    google.maps.event.addListener(
+      drawingManager,
+      "polygoncomplete",
+      polygon => {
+        let path: LatLngLiteral[] = [];
+        let locationArea = {} as LocationAreaInterface;
+        for (var i = 0; i < polygon.getPath().getLength(); i++) {
+          path.push({
+            lat: polygon
+              .getPath()
+              .getAt(i)
+              .lat() as number,
+            lng: polygon
+              .getPath()
+              .getAt(i)
+              .lng() as number
+          });
+        }
+        locationArea.path = path;
+        locationArea.visible = true;
+        locationArea.globalX = "";
+        locationArea.globalY = "";
+        locationArea.plantaId = this.plantaId;
+        this.locationAreaList.push(locationArea);
+        this.selectedLocationArea = locationArea;
+        // DB: Añadir a coleccion 'locations' dentro de 'planta'
+        google.maps.event.addListener(polygon, "mouseup", event => {
+          this.selectLocationArea(locationArea);
+          this.modifyLocationArea(locationArea);
+        });
+        this.polygonList.push(polygon);
+        this.plantaService.addLocationArea(this.plantaId, locationArea);
+      }
+    );
+    google.maps.event.addListener(
+      drawingManager,
+      "rectanglecomplete",
+      rectangle => {
+        let path: LatLngLiteral[] = [];
+        let locationArea = {} as LocationAreaInterface;
+        const bounds = rectangle.getBounds();
+
+        const getNorthEast = bounds.getNorthEast();
+
+        const getSouthWest = bounds.getSouthWest();
+
+        path.push({ lat: getNorthEast.lat(), lng: getNorthEast.lng() });
+        path.push({ lat: getNorthEast.lat(), lng: getSouthWest.lng() });
+        path.push({ lat: getSouthWest.lat(), lng: getSouthWest.lng() });
+        path.push({ lat: getSouthWest.lat(), lng: getNorthEast.lng() });
+
+        locationArea.path = path;
+        locationArea.visible = true;
+        locationArea.globalX = "";
+        locationArea.globalY = "";
+        locationArea.plantaId = this.plantaId;
+        this.locationAreaList.push(locationArea);
+        this.selectedLocationArea = locationArea;
+        // DB: Añadir a coleccion 'locations' dentro de 'planta'
+        // google.maps.event.addListener(polygon, "mouseup", event => {
+        //   this.selectLocationArea(locationArea);
+        //   this.modifyLocationArea(locationArea);
+        // });
+        // this.polygonList.push(polygon);
+        this.plantaService.addLocationArea(this.plantaId, locationArea);
+      }
+    );
   }
 }

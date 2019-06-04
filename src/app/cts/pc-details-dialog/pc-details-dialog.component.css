@@ -63,6 +63,7 @@
 .detail-title {
   font-weight: 800;
   font-size: 1.5 rem;
+  margin-bottom: 0.2rem;
   margin-right: 1rem;
 }
 
@@ -193,8 +194,7 @@ input:checked + .slider:before {
 }
 
 .termico-visual-text {
-  align-self: center;
+  align-self: end;
   margin-right: 1rem;
   font-size: 1.3rem;
-  font-weight: 600;
 }
