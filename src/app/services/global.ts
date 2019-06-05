@@ -1,6 +1,6 @@
 export let GLOBAL = {
   url: "http://localhost:3977/api",
-  num_tipos: 14,
+  num_tipos: 16,
   camaraTermica: "DJI XT2 640 13mm (Numero de serie: 297106)",
   ultimaCalibracion: "Enero 2019",
   uav: "DJI Matrice M200",
@@ -33,7 +33,8 @@ export let GLOBAL = {
     "Vidrio roto",
     "Transfer resistance",
     "Caja de conexiones caliente",
-    "Sombras"
+    "Sombras",
+    "Yellowing" // 16
   ],
   severidad_dt: [5, 20, 40],
   pcDescripcion: [
@@ -52,7 +53,8 @@ export let GLOBAL = {
     "Vidrio roto", // 12
     "Transfer resistance", // 13
     "Caja de conexiones caliente", // 14
-    "Módulo afectado por sombras" // 14
+    "Módulo afectado por sombras", // 15
+    "Yellowing" // 16
   ],
   //   '0',
   //   'Célula caliente',
@@ -78,7 +80,8 @@ export let GLOBAL = {
     "Vidrio roto",
     "La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta.",
     "La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta.",
-    "Existe algún elemento que está provocando sombras que evitan el correcto funcionamiento del módulo o módulos afectados."
+    "Existe algún elemento que está provocando sombras que evitan el correcto funcionamiento del módulo o módulos afectados.",
+    ""
   ],
   pcRecomendacion: [
     "0",
@@ -96,7 +99,8 @@ export let GLOBAL = {
     "Tener cuidado con las subidas de voltaje debido a las pérdidas de aislamiento por altas temperaturas.",
     "Análisis en detalle por experto.",
     "Análisis en detalle por experto.",
-    "Eliminación de la fuente de sombras"
+    "Eliminación de la fuente de sombras",
+    ""
   ],
   pcPerdidas: [
     0, // Para que coincida el indice con el tipo de anomalia
@@ -114,7 +118,8 @@ export let GLOBAL = {
     0.85, // "Vidrio roto", // 12
     0, // "Transfer resistance", // 13
     0, // "Caja de conexiones caliente", // 14
-    0 // "Módulo afectado por sombras" // 15
+    0, // "Módulo afectado por sombras" // 15
+    0 // Yellowing //16
   ],
 
   pcColumnas: [
