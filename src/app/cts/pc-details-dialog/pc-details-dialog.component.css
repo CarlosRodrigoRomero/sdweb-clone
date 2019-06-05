@@ -198,3 +198,6 @@ input:checked + .slider:before {
   margin-right: 1rem;
   font-size: 1.3rem;
 }
+.displayFlex {
+  display: flex;
+}
