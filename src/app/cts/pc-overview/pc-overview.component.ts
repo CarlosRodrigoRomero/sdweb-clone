@@ -3,6 +3,7 @@ import { InformeInterface } from "src/app/models/informe";
 import { PlantaInterface } from "src/app/models/planta";
 import { PcInterface } from "src/app/models/pc";
 import { GLOBAL } from "src/app/services/global";
+import { InformeService } from "../../services/informe.service";
 
 @Component({
   selector: "app-pc-overview",
@@ -28,7 +29,7 @@ export class PcOverviewComponent implements OnInit {
   public countCategoria: number[];
   public countCategoriaLabels: string[];
 
-  constructor() {}
+  constructor(public informeService: InformeService) {}
 
   ngOnInit() {
     this.perdidasPorClase = Array();
@@ -126,6 +127,8 @@ export class PcOverviewComponent implements OnInit {
     this.perdidasTotales = Math.round(
       this.perdidasPorCategoria.reduce((a, b) => a + b, 0)
     );
+    this.informe.mae = this.perdidasTotales / 10 / this.planta.potencia;
+    this.informeService.updateInforme(this.informe);
 
     this.dataPerdidasTotales = {
       labels: ["Pérdidas nominales (kW)", "Potencia nominal no afectada"],

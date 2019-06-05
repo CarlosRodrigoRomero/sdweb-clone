@@ -151,6 +151,10 @@ export class InformeService {
 
     return result;
   }
+  updateInforme(informe: InformeInterface) {
+    const informeDoc = this.afs.doc("informes/" + informe.id);
+    informeDoc.update(informe);
+  }
 
   addInforme() {}
   editInforme() {}
