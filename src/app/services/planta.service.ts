@@ -97,4 +97,19 @@ export class PlantaService {
 
     return result;
   }
+
+  getPlantasDeEmpresa(empresaId: string) {
+    const query$ = this.afs.collection<PlantaInterface>("plantas", ref =>
+      ref.where("empresa", "==", empresaId)
+    );
+    return query$.snapshotChanges().pipe(
+      map(actions =>
+        actions.map(a => {
+          const data = a.payload.doc.data() as PlantaInterface;
+          data.id = a.payload.doc.id;
+          return data;
+        })
+      )
+    );
+  }
 }

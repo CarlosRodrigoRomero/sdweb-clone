@@ -40,9 +40,9 @@ export class InformeService {
       )
     );
   }
-  getInformesDeEmpresa(uid: string) {
+  getInformesDePlanta(plantaId: string) {
     const query$ = this.afs.collection<InformeInterface>("informes", ref =>
-      ref.where("empresa", "==", uid)
+      ref.where("plantaId", "==", plantaId)
     );
     return query$.snapshotChanges().pipe(
       map(actions =>

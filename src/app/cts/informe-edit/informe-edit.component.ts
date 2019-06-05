@@ -955,6 +955,7 @@ export class InformeEditComponent implements OnInit {
     // El input es el 'value' del slider
     // Para pasar del value del slider al indice de 'fileList' o '/coords' hay que restarle uno
     const arrayIndex = value - 1;
+
     this.current_datetime = this.getDateTimeFromDateAndTime(
       this.coords[arrayIndex].Date,
       this.coords[arrayIndex].Time
@@ -1389,7 +1390,7 @@ export class InformeEditComponent implements OnInit {
     });
 
     this.canvas.on("object:moving", options => {
-      if (this.estructuraOn) {
+      if (this.estructuraOn && options.target.ref === false) {
         const puntoDistMin = this.getPointDistanciaMin(
           options.pointer.x,
           options.pointer.y,
@@ -1474,31 +1475,29 @@ export class InformeEditComponent implements OnInit {
   }
 
   getPolygonList(plantaId: string) {
-    this.plantaService
-      .getLocationsArea(plantaId)
-      .subscribe(items => {
-        this.polygonList = []
-        items.forEach(locationArea => {
-          this.map._mapsWrapper
-            .createPolygon({
-              paths: locationArea.path,
-              strokeColor: "#FF0000",
-              visible: false,
-              strokeOpacity: 0,
-              strokeWeight: 0,
-              fillColor: "grey",
-              fillOpacity: 0,
-              editable: false,
-              draggable: false,
-              id: locationArea.id,
-              globalX: locationArea.globalX,
-              globalY: locationArea.globalY
-            })
-            .then((polygon: any) => {
-              this.polygonList.push(polygon);
-            });
-        });
+    this.plantaService.getLocationsArea(plantaId).subscribe(items => {
+      this.polygonList = [];
+      items.forEach(locationArea => {
+        this.map._mapsWrapper
+          .createPolygon({
+            paths: locationArea.path,
+            strokeColor: "#FF0000",
+            visible: false,
+            strokeOpacity: 0,
+            strokeWeight: 0,
+            fillColor: "grey",
+            fillOpacity: 0,
+            editable: false,
+            draggable: false,
+            id: locationArea.id,
+            globalX: locationArea.globalX,
+            globalY: locationArea.globalY
+          })
+          .then((polygon: any) => {
+            this.polygonList.push(polygon);
+          });
       });
+    });
   }
 
   getGlobalCoordsFromLocationArea(coords: any) {

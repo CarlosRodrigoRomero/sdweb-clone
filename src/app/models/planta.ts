@@ -1,3 +1,5 @@
+import { InformeInterface } from './informe';
+
 export interface PlantaInterface {
   id?: string;
   nombre?: string;
@@ -7,7 +9,7 @@ export interface PlantaInterface {
   latitud?: number;
   tipo?: string;
   potencia?: number;
-  empresaId?: string;
+  empresa?: string;
   notas?: string;
   filas?: number;
   columnas?: number;
@@ -17,4 +19,5 @@ export interface PlantaInterface {
   zoom?: number;
   alturaBajaPrimero?: boolean;
   moduloPotencia?: number;
+  informes?: InformeInterface[];
 }
