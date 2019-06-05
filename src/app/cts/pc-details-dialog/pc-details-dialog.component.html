@@ -128,7 +128,7 @@
           <span class="detail-title">Localización:</span>
         </div>
 
-        <ng-template *ngIf="planta.tipo === '2 ejes'; else fija">
+        <div *ngIf="planta.tipo === '2 ejes'; else fija">
           <div class="pc-details-derecha-item-tabla">
             <span class="text-center"><strong>Seguidor</strong></span>
             <span class="text-center">{{ pc.global_x }}</span>
@@ -142,7 +142,7 @@
             <span class="text-center"><strong>Fila</strong></span>
             <span class="text-center">{{ pc.local_y }}</span>
           </div>
-        </ng-template>
+        </div>
 
         <ng-template #fija>
           <div class="pc-details-derecha-item-tabla">
