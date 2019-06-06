@@ -29,7 +29,9 @@ export class PcService {
   public filtroClase$ = this.filtroClase.asObservable();
   private filtroCategoria = new BehaviorSubject<number[]>(new Array<number>());
   public filtroCategoria$ = this.filtroCategoria.asObservable();
-  private filtroGradiente = new BehaviorSubject<number>(10);
+  private filtroGradiente = new BehaviorSubject<number>(
+    GLOBAL.filtroGradientePorDefecto
+  );
   public filtroGradiente$ = this.filtroGradiente.asObservable();
 
   private currentFiltroClase: number[];
@@ -159,11 +161,19 @@ export class PcService {
     );
     this.allPcs$ = query$.snapshotChanges().pipe(
       map(actions =>
-        actions.map(a => {
-          const data = a.payload.doc.data() as PcInterface;
-          data.id = a.payload.doc.id;
-          return data;
-        })
+        actions
+          .map(a => {
+            const data = a.payload.doc.data() as PcInterface;
+            data.id = a.payload.doc.id;
+            return data;
+          })
+          .filter(
+            pc =>
+              pc.gradienteNormalizado >= GLOBAL.filtroGradientePorDefecto ||
+              (pc.gradienteNormalizado < GLOBAL.filtroGradientePorDefecto &&
+                pc.tipo !== 8 &&
+                pc.tipo !== 9)
+          )
       )
     );
 

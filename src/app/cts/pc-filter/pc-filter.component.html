@@ -27,7 +27,7 @@
         [displayWith]="formatLabel"
         (input)="onInputFiltroGradiente($event)"
         tickInterval="1"
-        min="1"
+        min="{{ global.filtroGradientePorDefecto }}"
         max="50"
         [(ngModel)]="filtroGradiente"
       ></mat-slider>

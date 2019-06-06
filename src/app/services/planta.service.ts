@@ -7,6 +7,10 @@ import {
 import { PlantaInterface } from "src/app/models/planta";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
+<<<<<<< HEAD
+=======
+import { LocationAreaInterface } from "../models/location";
+>>>>>>> informe-edit2
 
 @Injectable({
   providedIn: "root"
@@ -48,5 +52,70 @@ export class PlantaService {
         })
       )
     );
+<<<<<<< HEAD
+=======
+  }
+
+  addLocationArea(plantaId: string, locationArea: LocationAreaInterface) {
+    const id = this.afs.createId();
+    locationArea.id = id;
+
+    this.afs
+      .collection("plantas")
+      .doc(plantaId)
+      .collection("locationAreas")
+      .doc(id)
+      .set(locationArea);
+  }
+
+  updateLocationArea(locationArea: LocationAreaInterface) {
+    const LocAreaDoc = this.afs.doc(
+      `plantas/${locationArea.plantaId}/locationAreas/${locationArea.id}`
+    );
+    LocAreaDoc.update(locationArea);
+  }
+
+  delLocationArea(locationArea: LocationAreaInterface) {
+    this.afs
+      .collection("plantas")
+      .doc(locationArea.plantaId)
+      .collection("locationAreas")
+      .doc(locationArea.id)
+      .delete();
+  }
+
+  getLocationsArea(plantaId: string): Observable<LocationAreaInterface[]> {
+    const query$ = this.afs
+      .collection("plantas")
+      .doc(plantaId)
+      .collection("locationAreas");
+
+    const result = query$.snapshotChanges().pipe(
+      map(actions =>
+        actions.map(a => {
+          const data = a.payload.doc.data() as LocationAreaInterface;
+          data.id = a.payload.doc.id;
+          return data;
+        })
+      )
+    );
+
+    return result;
+  }
+
+  getPlantasDeEmpresa(empresaId: string) {
+    const query$ = this.afs.collection<PlantaInterface>("plantas", ref =>
+      ref.where("empresa", "==", empresaId)
+    );
+    return query$.snapshotChanges().pipe(
+      map(actions =>
+        actions.map(a => {
+          const data = a.payload.doc.data() as PlantaInterface;
+          data.id = a.payload.doc.id;
+          return data;
+        })
+      )
+    );
+>>>>>>> informe-edit2
   }
 }

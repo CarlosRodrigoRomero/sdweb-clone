@@ -88,6 +88,7 @@
             (dblclick)="onDblClickCanvas($event)"
             (mouseup)="onMouseUpCanvas($event)"
             (mousemove)="onMouseMoveCanvas($event)"
+            (click)="onClickBuildEstructura($event)"
           >
             <canvas
               class="imagen-termica"
@@ -95,6 +96,32 @@
               width="640"
               height="512"
             ></canvas>
+
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="onClickDeleteEstructura($event)"
+            >
+              DEL
+            </button>
+
+            <mat-checkbox
+              (click)="onClickEstructura($event)"
+              [(ngModel)]="buildingEstructura"
+              >estructura</mat-checkbox
+            >
+            <input
+              [(ngModel)]="filasEstructura"
+              type="number"
+              id="filasEstructura"
+              (change)="updateEstructura($event)"
+            />
+            <input
+              [(ngModel)]="columnasEstructura"
+              type="number"
+              id="columnasEstructura"
+              (change)="updateEstructura($event)"
+            />
           </div>
         </div>
 
@@ -370,6 +397,19 @@
                     [(ngModel)]="selected_pc.tipo"
                     type="radio"
                     name="tipo"
+                    [value]="16"
+                  />
+                  <img
+                    class="img-fluid"
+                    src="../../../assets/images/tipo_16.png"
+                  />
+                </label>
+                <label class="selected-pc-tipo-label">
+                  <input
+                    (change)="updatePcInDb(selected_pc, false)"
+                    [(ngModel)]="selected_pc.tipo"
+                    type="radio"
+                    name="tipo"
                     [value]="1"
                   />
                   <img
@@ -495,6 +535,7 @@
             size="2"
             value="1"
           />
+          <button (click)="recalcularLocs()">Recalcular locs</button>
         </div>
       </div>
     </div>

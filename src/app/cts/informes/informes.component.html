@@ -1,11 +1,13 @@
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-4">
-      <mat-card *ngFor="let informe of informes" class="informe-card">
+      <mat-card *ngFor="let planta of plantas" class="informe-card">
         <mat-card-header>
           <div mat-card-avatar class="informe-header-image"></div>
-          <mat-card-title>{{ informe.nombre }}</mat-card-title>
-          <mat-card-subtitle></mat-card-subtitle>
+          <mat-card-title>{{ planta.nombre }}</mat-card-title>
+          <mat-card-subtitle
+            >{{ planta?.potencia }} MW / {{ planta?.tipo }}</mat-card-subtitle
+          >
         </mat-card-header>
 
         <img
@@ -14,17 +16,17 @@
           alt=""
         />
 
-        <mat-card-content>
-          <p></p>
-        </mat-card-content>
+        <mat-card-content> </mat-card-content>
         <mat-card-actions class="cards-actions">
-          <button
-            class="boton-ver-informe"
-            routerLink="/informe-view/{{ informe.id }}"
-            mat-button
-          >
-            Ver informe
-          </button>
+          <div *ngFor="let informe of planta.informes">
+            <button
+              mat-stroked-button
+              color="primary"
+              routerLink="/informe-view/{{ informe.id }}"
+            >
+              Inspección del {{ informe.fecha * 1000 | date: "dd/MM/yyyy" }}
+            </button>
+          </div>
         </mat-card-actions>
       </mat-card>
     </div>

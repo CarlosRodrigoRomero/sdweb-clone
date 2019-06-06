@@ -71,7 +71,7 @@
         <!-- <a href="#">(ver en el mapa)</a> -->
       </div>
 
-      <ng-template *ngIf="planta.tipo === '2 ejes'; else fija">
+      <div class="displayFlex" *ngIf="planta.tipo === '2 ejes'; else fija">
         <div class="pc-details-derecha-item-tabla">
           <span class="text-center"><strong>Seguidor</strong></span>
           <span class="text-center">{{ pc.global_x }}</span>
@@ -84,9 +84,9 @@
           <span class="text-center"><strong>Fila</strong></span>
           <span class="text-center">{{ pc.local_y }}</span>
         </div>
-      </ng-template>
+      </div>
 
-      <ng-template #fija>
+      <ng-template class="displayFlex" #fija>
         <div class="pc-details-derecha-item-tabla">
           <span class="text-center"><strong>Coord 1</strong></span>
           <span class="text-center">{{ pc.global_x }}</span>
@@ -111,7 +111,7 @@
       </div>
       <div class="pc-texto">
         <span class="detail-title">Fecha de captura: </span>
-        <span>{{ pc.datetime * 1000 | date: "HH:mm dd/MM/yyyy" }}</span>
+        <span>{{ pc.datetime * 1000 | date: "dd/MM/yyyy HH:mm" }}</span>
       </div>
     </div>
     <div class="pc-details-derecha-item">

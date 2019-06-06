@@ -10,6 +10,7 @@ import { ClienteslayoutComponent } from "./layout/clienteslayout/clienteslayout.
 import { PubliclayoutComponent } from "./layout/publiclayout/publiclayout.component";
 import { VideoComponent } from "./cts/video/video.component";
 import { PruebasComponent } from "./cts/pruebas/pruebas.component";
+import { AutoLocComponent } from "./cts/auto-loc/auto-loc.component";
 
 const routes: Routes = [
   {
@@ -73,7 +74,16 @@ const routes: Routes = [
         component: InformeViewComponent,
         canActivate: [AuthGuard]
       },
-      // {path: 'informe-edit/:id', component: InformeEditComponent, canActivate: [AuthGuard]},
+      {
+        path: "informe-edit/:id",
+        component: InformeEditComponent,
+        canActivate: [AuthGuard]
+      },
+      {
+        path: "auto-loc/:id",
+        component: AutoLocComponent,
+        canActivate: [AuthGuard]
+      },
       {
         path: "informes",
         component: InformesComponent,
