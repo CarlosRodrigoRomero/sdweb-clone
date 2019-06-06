@@ -71,11 +71,8 @@ import { VideoComponent } from "./cts/video/video.component";
 import { SpinnerComponent } from "./cts/spinner/spinner.component";
 import { PruebasComponent } from "./cts/pruebas/pruebas.component";
 import { PcOverviewComponent } from "./cts/pc-overview/pc-overview.component";
-<<<<<<< HEAD
-import { PlantaListComponent } from './cts/planta-list/planta-list.component';
-=======
 import { AutoLocComponent } from "./cts/auto-loc/auto-loc.component";
->>>>>>> informe-edit2
+import { PlantaListComponent } from "./cts/planta-list/planta-list.component";
 
 @NgModule({
   declarations: [
@@ -98,11 +95,8 @@ import { AutoLocComponent } from "./cts/auto-loc/auto-loc.component";
     SpinnerComponent,
     PruebasComponent,
     PcOverviewComponent,
-<<<<<<< HEAD
-    PlantaListComponent
-=======
+    PlantaListComponent,
     AutoLocComponent
->>>>>>> informe-edit2
   ],
   entryComponents: [PcDetailsDialogComponent],
   imports: [

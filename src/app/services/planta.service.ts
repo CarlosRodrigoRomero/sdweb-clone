@@ -7,10 +7,7 @@ import {
 import { PlantaInterface } from "src/app/models/planta";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-<<<<<<< HEAD
-=======
 import { LocationAreaInterface } from "../models/location";
->>>>>>> informe-edit2
 
 @Injectable({
   providedIn: "root"
@@ -52,8 +49,6 @@ export class PlantaService {
         })
       )
     );
-<<<<<<< HEAD
-=======
   }
 
   addLocationArea(plantaId: string, locationArea: LocationAreaInterface) {
@@ -116,6 +111,5 @@ export class PlantaService {
         })
       )
     );
->>>>>>> informe-edit2
   }
 }
