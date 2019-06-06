@@ -12,7 +12,7 @@
 
     <div class="colflex">
       <div class="flexchart">
-        <h4 class="text-center">Pérdidas (kW) totales</h4>
+        <h4 class="text-center perdidasTotales">Pérdidas (kW) totales</h4>
         <p-chart
           height="250"
           type="doughnut"
@@ -37,9 +37,7 @@
           <li>
             <b>Potencia nominal no afectada</b>:
             <span style="color:#3CB371">
-              {{
-                planta.potencia * 1000 - perdidasTotales | number: "1.0-1"
-              }}
+              {{ planta.potencia * 1000 - perdidasTotales | number: "1.0-1" }}
               kW
             </span>
           </li>
