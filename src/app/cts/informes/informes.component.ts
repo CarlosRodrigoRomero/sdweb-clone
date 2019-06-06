@@ -35,18 +35,10 @@ export class InformesComponent implements OnInit {
       this.plantaService
         .getPlantasDeEmpresa(planta.empresa)
         .subscribe(plantas => {
-          console.log(
-            "TCL: InformesComponent -> getInformesDePlantas -> plantas",
-            plantas
-          );
           plantas.forEach(planta => {
             this.informeService
               .getInformesDePlanta(planta.id)
               .subscribe(informes => {
-                console.log(
-                  "TCL: InformesComponent -> getInformesDePlantas -> informes",
-                  informes
-                );
                 planta.informes = informes;
                 plantasConInformes.push(planta);
                 this.plantas = plantasConInformes;

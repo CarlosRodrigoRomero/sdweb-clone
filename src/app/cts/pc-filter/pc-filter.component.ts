@@ -27,6 +27,7 @@ export class PcFilterComponent implements OnInit {
   public countCategoria: Array<number>;
   public countClase: Array<number>;
   public filtroGradiente: number;
+  public global = GLOBAL;
 
   constructor(private pcService: PcService) {
     this.countCategoria = Array();
