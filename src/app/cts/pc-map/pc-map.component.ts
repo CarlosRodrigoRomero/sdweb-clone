@@ -30,9 +30,7 @@ export class PcMapComponent implements OnInit {
   public filteredPcs: PcInterface[];
   public informeId: string;
   public circleRadius: number;
-
   public mapType = "satellite";
-  public circleRadius: number;
 
   constructor(
     private storage: AngularFireStorage,
