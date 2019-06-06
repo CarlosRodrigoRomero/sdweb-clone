@@ -81,7 +81,7 @@ export class InformeExportComponent implements OnInit {
   private filteredColumnasSource = new BehaviorSubject<any[]>(new Array<any>());
   public currentFilteredColumnas$ = this.filteredColumnasSource.asObservable();
   public currentFilteredColumnas: Array<any>;
-  public pcDescripcion = GLOBAL.pcDescripcion;
+  public pcDescripcion = GLOBAL.labels_tipos;
   public filteredSeguidores$: Observable<SeguidorInterface[]>;
   public filteredSeguidoresVistaPrevia: SeguidorInterface[];
   public filteredPcsVistaPrevia: PcInterface[];
