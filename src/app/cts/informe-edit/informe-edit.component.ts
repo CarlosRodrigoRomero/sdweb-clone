@@ -1500,6 +1500,20 @@ export class InformeEditComponent implements OnInit {
     });
   }
 
+  recalcularLocs() {
+    this.allPcs.forEach(pc => {
+      let globalX;
+      let globalY;
+      [globalX, globalY] = this.getGlobalCoordsFromLocationArea({
+        lat: pc.gps_lat,
+        lng: pc.gps_lng
+      });
+      pc.global_x = globalX;
+      pc.global_y = globalY;
+      this.updatePcInDb(pc);
+    });
+  }
+
   getGlobalCoordsFromLocationArea(coords: any) {
     const latLng = new google.maps.LatLng(coords.lat, coords.lng);
     let globalX = "";
