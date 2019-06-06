@@ -128,6 +128,7 @@ export class PcOverviewComponent implements OnInit {
       this.perdidasPorCategoria.reduce((a, b) => a + b, 0)
     );
     this.informe.mae = this.perdidasTotales / 10 / this.planta.potencia;
+
     this.informeService.updateInforme(this.informe);
 
     this.dataPerdidasTotales = {

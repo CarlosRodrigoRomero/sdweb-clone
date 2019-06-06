@@ -36,7 +36,12 @@
           </li>
           <li>
             <b>Potencia nominal no afectada</b>:
-            {{ planta.potencia * 1000 - perdidasTotales | number: "1.0-1" }} kW
+            <span style="color:#3CB371">
+              {{
+                planta.potencia * 1000 - perdidasTotales | number: "1.0-1"
+              }}
+              kW
+            </span>
           </li>
         </ul>
       </div>
