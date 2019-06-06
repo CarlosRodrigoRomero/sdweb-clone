@@ -161,11 +161,19 @@ export class PcService {
     );
     this.allPcs$ = query$.snapshotChanges().pipe(
       map(actions =>
-        actions.map(a => {
-          const data = a.payload.doc.data() as PcInterface;
-          data.id = a.payload.doc.id;
-          return data;
-        })
+        actions
+          .map(a => {
+            const data = a.payload.doc.data() as PcInterface;
+            data.id = a.payload.doc.id;
+            return data;
+          })
+          .filter(
+            pc =>
+              pc.gradienteNormalizado >= GLOBAL.filtroGradientePorDefecto ||
+              (pc.gradienteNormalizado < GLOBAL.filtroGradientePorDefecto &&
+                pc.tipo !== 8 &&
+                pc.tipo !== 9)
+          )
       )
     );
 
