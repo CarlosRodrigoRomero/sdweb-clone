@@ -5,6 +5,7 @@ export let GLOBAL = {
   ultimaCalibracion: "Enero 2019",
   uav: "DJI Matrice M200",
   temperaturaLimiteFabricantes: 90,
+  filtroGradientePorDefecto: 15,
   mae: [0.1, 0.2],
   resolucionCamara: [512, 640],
   // labels_severidad: ['Leve', 'Media', 'Grave'],

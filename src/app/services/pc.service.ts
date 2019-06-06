@@ -29,7 +29,9 @@ export class PcService {
   public filtroClase$ = this.filtroClase.asObservable();
   private filtroCategoria = new BehaviorSubject<number[]>(new Array<number>());
   public filtroCategoria$ = this.filtroCategoria.asObservable();
-  private filtroGradiente = new BehaviorSubject<number>(10);
+  private filtroGradiente = new BehaviorSubject<number>(
+    GLOBAL.filtroGradientePorDefecto
+  );
   public filtroGradiente$ = this.filtroGradiente.asObservable();
 
   private currentFiltroClase: number[];
