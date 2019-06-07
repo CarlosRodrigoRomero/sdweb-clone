@@ -1,22 +1,45 @@
-<div class="container">
+<div class="container" *ngIf="auth.user$ | async as user; else login">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="text-center">{{ user.empresaNombre }}</h1>
+      <button
+        mat-button
+        *ngIf="user.role === 1"
+        routerLink="planta-add/{{ user.uid }}"
+      >
+        Añadir planta
+      </button>
+    </div>
+  </div>
   <div class="row justify-content-center">
-    <div class="col-4">
-      <mat-card *ngFor="let planta of plantas" class="informe-card">
+    <div class="col-4" *ngFor="let planta of plantas">
+      <mat-card class="informe-card">
         <mat-card-header>
           <div mat-card-avatar class="informe-header-image"></div>
           <mat-card-title>{{ planta.nombre }}</mat-card-title>
           <mat-card-subtitle
-            >{{ planta?.potencia }} MW / {{ planta?.tipo }}</mat-card-subtitle
-          >
+            >{{ planta?.potencia }} MW / {{ planta?.tipo }}
+            <a *ngIf="user.role === 1" routerLink="planta-edit/{{ planta.id }}">
+              <i class="far fa-edit"></i>
+            </a>
+          </mat-card-subtitle>
         </mat-card-header>
 
-        <img
+        <!-- <img
           mat-card-image
           src="../../../assets/images/imagen_principal.png"
           alt=""
-        />
+        /> -->
 
-        <mat-card-content> </mat-card-content>
+        <mat-card-content>
+          <button
+            mat-button
+            *ngIf="user.role === 1"
+            routerLink="informe-add/{{ planta.id }}"
+          >
+            Añadir informe
+          </button>
+        </mat-card-content>
         <mat-card-actions class="cards-actions">
           <div *ngFor="let informe of planta.informes">
             <button

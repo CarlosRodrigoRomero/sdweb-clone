@@ -8,6 +8,8 @@ import { PlantaInterface } from "src/app/models/planta";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { LocationAreaInterface } from "../models/location";
+import { GLOBAL } from "./global";
+import { UserInterface } from "../models/user";
 
 @Injectable({
   providedIn: "root"
@@ -98,10 +100,16 @@ export class PlantaService {
     return result;
   }
 
-  getPlantasDeEmpresa(empresaId: string) {
-    const query$ = this.afs.collection<PlantaInterface>("plantas", ref =>
-      ref.where("empresa", "==", empresaId)
-    );
+  getPlantasDeEmpresa(user: UserInterface) {
+    let query$: AngularFirestoreCollection<PlantaInterface>;
+    if (user.role === 1) {
+      query$ = this.afs.collection<PlantaInterface>("plantas");
+    } else {
+      query$ = this.afs.collection<PlantaInterface>("plantas", ref =>
+        ref.where("empresa", "==", user.uid)
+      );
+    }
+
     return query$.snapshotChanges().pipe(
       map(actions =>
         actions.map(a => {
