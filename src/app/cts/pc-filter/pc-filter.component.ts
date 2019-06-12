@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter, Output } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 import { PcInterface } from "../../models/pc";
 import {
   MatButtonToggleGroup,
@@ -28,6 +28,8 @@ export class PcFilterComponent implements OnInit {
   public nombreClases: Array<string>;
   public countCategoria: Array<number>;
   public countClase: Array<number>;
+  public countCategoriaFiltrada: Array<number>;
+  public countClaseFiltrada: Array<number>;
   public filtroGradiente: number;
   public global = GLOBAL;
 
@@ -58,6 +60,52 @@ export class PcFilterComponent implements OnInit {
     // Calcular la severidad //
     for (const j of this.numClases) {
       this.countClase.push(this.allPcs.filter(pc => pc.severidad === j).length);
+    }
+
+    this.pcService.currentFilteredPcs$.subscribe(pcs => {
+      this.calcularInforme(pcs);
+    });
+  }
+
+  private compare(a: PcInterface, b: PcInterface) {
+    if (a.global_x < b.global_x) {
+      return -1;
+    }
+    if (a.global_x > b.global_x) {
+      return 1;
+    }
+    return 0;
+  }
+
+  private calcularInforme(pcs: PcInterface[]) {
+    this.countCategoriaFiltrada = Array();
+    this.countClaseFiltrada = Array();
+
+    const allPcs = pcs;
+    allPcs.sort(this.compare);
+
+    // CATEGORIAS //
+    let filtroCategoria;
+    let filtroCategoriaClase;
+    for (const cat of this.numCategorias) {
+      filtroCategoria = allPcs.filter(pc => pc.tipo === cat);
+      this.countCategoriaFiltrada.push(filtroCategoria.length);
+
+      let count1 = Array();
+      for (const clas of this.numClases) {
+        filtroCategoriaClase = allPcs.filter(
+          pc => pc.severidad === clas && pc.tipo === cat
+        );
+        count1.push(filtroCategoriaClase.length);
+      }
+    }
+
+    // CLASES //
+    let filtroClase;
+    for (const j of this.numClases) {
+      filtroClase = allPcs.filter(pc => pc.severidad === j);
+
+      this.countClaseFiltrada.push(filtroClase.length);
     }
   }
 

@@ -31,7 +31,8 @@ export class InformeViewComponent implements OnInit {
   public planta: PlantaInterface;
   public irradianciaMinima: number;
   public isLocalhost: boolean;
-  public informeDownloadUrl: Observable<string>;
+  public imagenesDownloadUrl: Observable<string>;
+  public excelDownloadUrl: Observable<string>;
 
   numSeveridad = new Array(GLOBAL.labels_severidad.length)
     .fill(0)
@@ -50,7 +51,10 @@ export class InformeViewComponent implements OnInit {
     this.informeId = this.route.snapshot.paramMap.get("id");
     this.informeService.getInforme(this.informeId).subscribe(informe => {
       this.informe = informe;
-      this.informeDownloadUrl = this.storage
+      this.excelDownloadUrl = this.storage
+        .ref(`informes/${this.informe.id}/informe.xlsx`)
+        .getDownloadURL();
+      this.imagenesDownloadUrl = this.storage
         .ref(`informes/${this.informe.id}/informe.zip`)
         .getDownloadURL();
       this.plantaService.getPlanta(informe.plantaId).subscribe(planta => {

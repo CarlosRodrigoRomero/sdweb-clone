@@ -10,7 +10,10 @@
           value="{{ cat }}"
         >
           {{ nombreClases[cat] }}
-          <span class="filtro-numero">({{ countCategoria[cat - 1] }})</span>
+          <span class="filtro-numero"
+            >({{ countCategoriaFiltrada[cat - 1] }} /
+            {{ countCategoria[cat - 1] }})</span
+          >
         </mat-checkbox>
       </ng-container>
     </div>
@@ -27,8 +30,8 @@
         [displayWith]="formatLabel"
         (input)="onInputFiltroGradiente($event)"
         tickInterval="1"
-        min="{{ global.filtroGradientePorDefecto }}"
-        max="50"
+        min="{{ global.minGradiente }}"
+        max="{{ global.maxGradiente }}"
         [(ngModel)]="filtroGradiente"
       ></mat-slider>
       <span class="filtro-gradiente-numero">({{ filtroGradiente }} ºC)</span>
@@ -50,7 +53,9 @@
             >{{ labelsSeveridad[ts - 1] }}
           </span>
 
-          <span class="filtro-numero"> ({{ countClase[ts - 1] }}) </span>
+          <span class="filtro-numero">
+            ( {{ countClaseFiltrada[ts - 1] }} / {{ countClase[ts - 1] }})
+          </span>
           <i
             matTooltip="{{ descripcionSeveridad[ts - 1] }}"
             class="info-severidad fas fa-info-circle"

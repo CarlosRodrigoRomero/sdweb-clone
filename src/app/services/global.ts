@@ -5,7 +5,9 @@ export let GLOBAL = {
   ultimaCalibracion: "Enero 2019",
   uav: "DJI Matrice M200",
   temperaturaLimiteFabricantes: 90,
-  filtroGradientePorDefecto: 15,
+  filtroGradientePorDefecto: 10,
+  minGradiente: 10,
+  maxGradiente: 50,
   mae: [0.1, 0.2],
   resolucionCamara: [512, 640],
   // labels_severidad: ['Leve', 'Media', 'Grave'],
@@ -49,12 +51,12 @@ export let GLOBAL = {
     "Módulo en cortocircuito", // 7
     "Célula caliente", // 8
     "Varias células calientes", // 9
-    "2 substrings en circuito abierto en el mismo módulo", // 10
+    "2x substrings en circuito abierto", // 10
     "Células calientes debido a suciedad", // 11
     "Vidrio roto", // 12
     "Transfer resistance", // 13
     "Caja de conexiones caliente", // 14
-    "Módulo afectado por sombras", // 15
+    "Módulo con sombras", // 15
     "Yellowing" // 16
   ],
   //   '0',

@@ -1368,7 +1368,7 @@ export class InformeExportComponent implements OnInit {
                       style: "tableLeft"
                     },
                     {
-                      text: `${this.informe.nubosidad} okta`
+                      text: `${this.informe.nubosidad} octavas`
                     }
                   ]
                 ]

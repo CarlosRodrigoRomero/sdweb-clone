@@ -178,8 +178,8 @@ export class PcService {
           })
           .filter(
             pc =>
-              pc.gradienteNormalizado >= GLOBAL.filtroGradientePorDefecto ||
-              (pc.gradienteNormalizado < GLOBAL.filtroGradientePorDefecto &&
+              pc.gradienteNormalizado >= GLOBAL.minGradiente ||
+              (pc.gradienteNormalizado < GLOBAL.minGradiente &&
                 pc.tipo !== 8 &&
                 pc.tipo !== 9)
           )
