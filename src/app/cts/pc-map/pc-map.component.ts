@@ -15,6 +15,7 @@ export interface DialogData {
   allPcs: PcInterface[];
   planta: PlantaInterface;
   informe: InformeInterface;
+  sinPcs: boolean;
 }
 
 @Component({
@@ -31,6 +32,7 @@ export class PcMapComponent implements OnInit {
   public informeId: string;
   public circleRadius: number;
   public mapType = "satellite";
+  public seguidoresSinPcs: PcInterface[];
 
   constructor(
     private storage: AngularFireStorage,
@@ -55,13 +57,19 @@ export class PcMapComponent implements OnInit {
       //   });
       // };
     });
+
+    this.pcService
+      .getSeguidoresSinPcs(this.informe.id)
+      .subscribe(seguidores => {
+        this.seguidoresSinPcs = seguidores;
+      });
   }
 
   getStrokeColor(severidad: number) {
     return GLOBAL.colores_severidad[severidad - 1];
   }
 
-  onMapCircleClick(selectedPc: PcInterface): void {
+  onMapCircleClick(selectedPc: PcInterface, sinPcs: boolean = false): void {
     // selectedPc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${selectedPc.archivoPublico}`).getDownloadURL();
     if (!selectedPc.downloadUrl$) {
       selectedPc.downloadUrl$ = this.storage
@@ -83,7 +91,8 @@ export class PcMapComponent implements OnInit {
         pc: selectedPc,
         allPcs: this.filteredPcs,
         planta: this.planta,
-        informe: this.informe
+        informe: this.informe,
+        sinPcs: sinPcs
       }
     });
 

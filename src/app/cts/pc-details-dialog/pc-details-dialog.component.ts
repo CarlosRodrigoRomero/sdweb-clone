@@ -19,11 +19,6 @@ const pica = Pica();
   styleUrls: ["./pc-details-dialog.component.css"]
 })
 export class PcDetailsDialogComponent implements OnInit {
-  @Input() pc: PcInterface;
-  @Input() allPcs: PcInterface[];
-  @Input() planta: PlantaInterface;
-  @Input() informe: InformeInterface;
-
   // public tooltipTemp: number;
   private maxTemp: number;
   private minTemp: number;
@@ -45,6 +40,11 @@ export class PcDetailsDialogComponent implements OnInit {
   public imagenVisual;
   public imagenTermica;
   public zoomSquare = 200;
+  public pc: PcInterface;
+  public allPcs: PcInterface[];
+  public planta: PlantaInterface;
+  public informe: InformeInterface;
+  public sinPcs: boolean;
 
   constructor(
     private storage: AngularFireStorage,
@@ -62,6 +62,7 @@ export class PcDetailsDialogComponent implements OnInit {
     this.allPcs = data.allPcs;
     this.planta = data.planta;
     this.informe = data.informe;
+    this.sinPcs = data.sinPcs;
   }
 
   onNoClick(): void {
@@ -129,11 +130,12 @@ export class PcDetailsDialogComponent implements OnInit {
     };
     // this.tooltipElement = document.getElementById("dialog-tooltip");
 
-    // Dibujar all pcs
-    this.drawAllPcsInCanvas();
-
-    // Seleccionar pc
-    this.selectPc(this.pc);
+    if (!this.sinPcs) {
+      // Dibujar all pcs
+      this.drawAllPcsInCanvas();
+      // Seleccionar pc
+      this.selectPc(this.pc);
+    }
   }
 
   selectPc(pc: PcInterface) {

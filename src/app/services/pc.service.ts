@@ -56,6 +56,7 @@ export class PcService {
         .fill(0)
         .map((_, i) => i + 1)
     );
+
     this.filtroClase.next(
       Array(GLOBAL.labels_severidad.length)
         .fill(0)
@@ -153,6 +154,14 @@ export class PcService {
       }
     }
     return arraySeguidores;
+  }
+
+  getSeguidoresSinPcs(informeId: string): Observable<PcInterface[]> {
+    const query$ = this.afs.collection<PcInterface>("pcs", ref =>
+      ref.where("informeId", "==", informeId).where("tipo", "==", 0)
+    );
+
+    return query$.valueChanges();
   }
 
   getPcs(informeId: string): Observable<PcInterface[]> {

@@ -33,7 +33,7 @@ export interface PcInterface {
   downloadUrlStringRjpg?: string | null;
   downloadUrlVisual$?: Observable<string | null>;
   downloadUrlStringVisual?: string | null;
-  resuelto: boolean;
+  resuelto?: boolean;
   irradiancia?: number;
   gradiente?: number;
   gradienteNormalizado?: number;

@@ -19,6 +19,20 @@
     [strokeWeight]="3"
     [fillOpacity]="0.3"
     [editable]="false"
+  ></agm-circle>
+
+  <agm-circle
+    *ngFor="let seguidor of seguidoresSinPcs"
+    (circleClick)="onMapCircleClick(seguidor, true)"
+    [latitude]="seguidor.gps_lat"
+    [longitude]="seguidor.gps_lng"
+    [radius]="circleRadius"
+    [strokeOpacity]="1"
+    [strokePosition]="0"
+    [strokeColor]="grey"
+    [strokeWeight]="2"
+    [fillOpacity]="0.3"
+    [editable]="false"
   >
   </agm-circle>
 </agm-map>

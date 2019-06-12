@@ -1,5 +1,10 @@
 <div mat-dialog-title>
-  <h3 class="text-center dialog-title">Visor de anomalías térmicas</h3>
+  <h3 *ngIf="!sinPcs" class="text-center dialog-title">
+    Visor de anomalías térmicas
+  </h3>
+  <h3 *ngIf="sinPcs" class="text-center dialog-title">
+    Vista de seguidor sin anomalías
+  </h3>
 </div>
 <div mat-dialog-content>
   <div class="row">
@@ -32,11 +37,14 @@
     </div>
 
     <div class="col-5 pc-details-derecha">
-      <h4 class="text-center">
-        Anomalía #{{ pc.local_id }}
+      <h4 *ngIf="!sinPcs" class="text-center">
+        Anomalía <b>#{{ pc.local_id }}</b>
         <span class="text-center colorSeveridad{{ pc.severidad }}">
           (CoA {{ pc.severidad }})</span
         >
+      </h4>
+      <h4 *ngIf="sinPcs" class="text-center">
+        Seguidor <b>{{ pc.global_x }}</b>
       </h4>
 
       <div class="termico-visual">
@@ -53,7 +61,7 @@
         </label>
       </div>
 
-      <div *ngIf="true" class="pc-details-derecha-item">
+      <div *ngIf="!sinPcs" class="pc-details-derecha-item">
         <div class="pc-details-derecha-icon">
           <i class="fas fa-info-circle"></i>
         </div>
@@ -90,7 +98,7 @@
         </div>
       </div>
 
-      <div class="pc-details-derecha-item">
+      <div *ngIf="!sinPcs" class="pc-details-derecha-item">
         <div class="pc-details-derecha-icon">
           <i style="color:red" class="fas fa-exclamation-circle icon-error"></i>
         </div>
@@ -100,7 +108,7 @@
         </div>
       </div>
 
-      <div class="pc-details-derecha-item">
+      <div *ngIf="!sinPcs" class="pc-details-derecha-item">
         <div class="pc-details-derecha-icon">
           <i style="color:orange" class="fas fa-flag icon-flag"></i>
         </div>

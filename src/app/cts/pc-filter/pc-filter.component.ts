@@ -7,6 +7,7 @@ import {
 } from "@angular/material";
 import { PcService } from "../../services/pc.service";
 import { GLOBAL } from "../../services/global";
+import { PlantaInterface } from "../../models/planta";
 
 @Component({
   selector: "app-pc-filter",
@@ -15,6 +16,7 @@ import { GLOBAL } from "../../services/global";
 })
 export class PcFilterComponent implements OnInit {
   @Input() public allPcs: PcInterface[];
+  @Input() public planta: PlantaInterface;
 
   public severidad: MatButtonToggleGroup;
   public filtroClase: number[];
