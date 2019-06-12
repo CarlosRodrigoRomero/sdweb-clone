@@ -2,11 +2,7 @@
   <div class="row">
     <div class="col-12">
       <h1 class="text-center">{{ user.empresaNombre }}</h1>
-      <button
-        mat-button
-        *ngIf="user.role === 1"
-        routerLink="planta-add/{{ user.uid }}"
-      >
+      <button mat-button *ngIf="user.role === 1" routerLink="/planta-add">
         Añadir planta
       </button>
     </div>
@@ -19,8 +15,14 @@
           <mat-card-title>{{ planta.nombre }}</mat-card-title>
           <mat-card-subtitle
             >{{ planta?.potencia }} MW / {{ planta?.tipo }}
-            <a *ngIf="user.role === 1" routerLink="planta-edit/{{ planta.id }}">
+            <a
+              *ngIf="user.role === 1"
+              routerLink="/planta-edit/{{ planta.id }}"
+            >
               <i class="far fa-edit"></i>
+            </a>
+            <a *ngIf="user.role === 1" routerLink="/auto-loc/{{ planta.id }}">
+              <i class="fas fa-map-marker-alt"></i>
             </a>
           </mat-card-subtitle>
         </mat-card-header>
