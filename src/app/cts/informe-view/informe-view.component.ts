@@ -55,7 +55,7 @@ export class InformeViewComponent implements OnInit {
         .ref(`informes/${this.informe.id}/informe.xlsx`)
         .getDownloadURL();
       this.imagenesDownloadUrl = this.storage
-        .ref(`informes/${this.informe.id}/informe.zip`)
+        .ref(`informes/${this.informe.id}/imagenes.zip`)
         .getDownloadURL();
       this.plantaService.getPlanta(informe.plantaId).subscribe(planta => {
         this.planta = planta;
