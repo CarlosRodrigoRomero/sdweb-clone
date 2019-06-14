@@ -4,6 +4,8 @@ import { AuthService } from "src/app/services/auth.service";
 import { PlantaService } from "../../services/planta.service";
 import { PlantaInterface } from "../../models/planta";
 import { InformeService } from "src/app/services/informe.service";
+import { Observable } from "rxjs";
+import { UserInterface } from "src/app/models/user";
 
 @Component({
   selector: "app-informes",
@@ -13,6 +15,7 @@ import { InformeService } from "src/app/services/informe.service";
 export class InformesComponent implements OnInit {
   public informes: InformeInterface[];
   public plantas: PlantaInterface[];
+  public user$: Observable<UserInterface>;
 
   constructor(
     private auth: AuthService,
@@ -22,7 +25,7 @@ export class InformesComponent implements OnInit {
 
   ngOnInit() {
     this.auth.user$.subscribe(user => {
-      this.plantaService.getPlantasDeEmpresa(user.uid).subscribe(plantas => {
+      this.plantaService.getPlantasDeEmpresa(user).subscribe(plantas => {
         this.getInformesDePlantas(plantas);
       });
     });
@@ -32,19 +35,11 @@ export class InformesComponent implements OnInit {
     let plantasConInformes = [];
     plantas.forEach(planta => {
       planta.informes = [] as InformeInterface[];
-      this.plantaService
-        .getPlantasDeEmpresa(planta.empresa)
-        .subscribe(plantas => {
-          plantas.forEach(planta => {
-            this.informeService
-              .getInformesDePlanta(planta.id)
-              .subscribe(informes => {
-                planta.informes = informes;
-                plantasConInformes.push(planta);
-                this.plantas = plantasConInformes;
-              });
-          });
-        });
+      this.informeService.getInformesDePlanta(planta.id).subscribe(informes => {
+        planta.informes = informes;
+        plantasConInformes.push(planta);
+        this.plantas = plantasConInformes;
+      });
     });
   }
 }

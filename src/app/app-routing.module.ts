@@ -11,6 +11,7 @@ import { PubliclayoutComponent } from "./layout/publiclayout/publiclayout.compon
 import { VideoComponent } from "./cts/video/video.component";
 import { PruebasComponent } from "./cts/pruebas/pruebas.component";
 import { AutoLocComponent } from "./cts/auto-loc/auto-loc.component";
+import { PlantaAddComponent } from "./cts/planta-add/planta-add.component";
 
 const routes: Routes = [
   {
@@ -87,6 +88,11 @@ const routes: Routes = [
       {
         path: "informes",
         component: InformesComponent,
+        canActivate: [AuthGuard]
+      },
+      {
+        path: "planta-add",
+        component: PlantaAddComponent,
         canActivate: [AuthGuard]
       },
       { path: "clientes", component: LoginComponent }
