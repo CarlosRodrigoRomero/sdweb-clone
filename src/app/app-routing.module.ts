@@ -9,9 +9,9 @@ import { IndexComponent } from "./cts/index/index.component";
 import { ClienteslayoutComponent } from "./layout/clienteslayout/clienteslayout.component";
 import { PubliclayoutComponent } from "./layout/publiclayout/publiclayout.component";
 import { VideoComponent } from "./cts/video/video.component";
-import { PruebasComponent } from "./cts/pruebas/pruebas.component";
 import { AutoLocComponent } from "./cts/auto-loc/auto-loc.component";
 import { PlantaAddComponent } from "./cts/planta-add/planta-add.component";
+import { InformeAddComponent } from "./cts/informe-add/informe-add.component";
 
 const routes: Routes = [
   {
@@ -93,6 +93,11 @@ const routes: Routes = [
       {
         path: "planta-add",
         component: PlantaAddComponent,
+        canActivate: [AuthGuard]
+      },
+      {
+        path: "informe-add/:plantaId",
+        component: InformeAddComponent,
         canActivate: [AuthGuard]
       },
       { path: "clientes", component: LoginComponent }

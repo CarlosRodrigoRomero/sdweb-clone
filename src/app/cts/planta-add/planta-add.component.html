@@ -12,22 +12,20 @@
       </mat-form-field>
 
       <mat-form-field>
-        <label>Longitud GPS</label>
-        <input
-          matInput
-          type="number"
-          formControlName="longitud"
-          placeholder=""
-        />
-      </mat-form-field>
-
-      <mat-form-field>
-        <label>Latitud GPS</label>
         <input
           matInput
           type="number"
           formControlName="latitud"
-          placeholder=""
+          placeholder="Latitud GPS"
+        />
+      </mat-form-field>
+
+      <mat-form-field>
+        <input
+          matInput
+          type="number"
+          formControlName="longitud"
+          placeholder="Longitud GPS"
         />
       </mat-form-field>
 
@@ -38,43 +36,51 @@
       </mat-radio-group>
 
       <mat-form-field>
-        <label>Potencia (MW)</label>
         <input
           matInput
           type="number"
           formControlName="potencia"
-          placeholder=""
+          placeholder="Potencia (MW)"
         />
       </mat-form-field>
 
       <mat-form-field>
-        <label>Empresa</label>
-        <input matInput formControlName="empresa" placeholder="" />
+        <input matInput formControlName="empresa" placeholder="Empresa (id)" />
       </mat-form-field>
 
       <mat-form-field>
-        <label>Filas</label>
-        <input matInput type="number" formControlName="filas" placeholder="" />
+        <input
+          matInput
+          type="number"
+          formControlName="filas"
+          placeholder="Filas"
+        />
       </mat-form-field>
 
       <mat-form-field>
-        <label>Columnas</label>
         <input
           matInput
           type="number"
           formControlName="columnas"
-          placeholder=""
+          placeholder="Columnas"
         />
       </mat-form-field>
       <mat-form-field>
-        <label>Número de modulos</label>
         <input
           matInput
           type="number"
           formControlName="num_modulos"
-          placeholder=""
+          placeholder="Número de módulos"
         />
       </mat-form-field>
+
+      <mat-radio-group
+        formControlName="vertical"
+        aria-label="Modulos orientados verticalmente"
+      >
+        <mat-radio-button [value]="true">Vertical</mat-radio-button>
+        <mat-radio-button [value]="false">Horizontal</mat-radio-button>
+      </mat-radio-group>
 
       <button
         mat-button
@@ -85,14 +91,6 @@
         Guardar
       </button>
 
-      <mat-radio-group
-        formControlName="vertical"
-        aria-label="Modulos orientados verticalmente"
-      >
-        <mat-radio-button [value]="true">Vertical</mat-radio-button>
-        <mat-radio-button [value]="false">Horizontal</mat-radio-button>
-      </mat-radio-group>
-
       <!-- <mat-form-field>
         <mat-radio-group formControlName="tipo" placeholder="Tipo">
           <mat-radio-button value="fija">fija</mat-radio-button>
@@ -102,6 +100,6 @@
       </mat-form-field> -->
     </form>
 
-    <div *ngIf="success">Planta guardada</div>
+    <div *ngIf="success">Informe guardado</div>
   </div>
 </div>
