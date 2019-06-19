@@ -18,7 +18,7 @@ export class InformesComponent implements OnInit {
   public user$: Observable<UserInterface>;
 
   constructor(
-    private auth: AuthService,
+    public auth: AuthService,
     private plantaService: PlantaService,
     private informeService: InformeService
   ) {}

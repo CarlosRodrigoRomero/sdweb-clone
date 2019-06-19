@@ -1,8 +1,12 @@
-<div class="container" *ngIf="auth.user$ | async as user; else login">
+<div class="container" *ngIf="auth.user$ | async as user">
   <div class="row">
     <div class="col-12">
       <h1 class="text-center">{{ user.empresaNombre }}</h1>
-      <button mat-button *ngIf="user.role === 1" routerLink="/planta-add">
+      <button
+        mat-raised-button
+        *ngIf="user.role === 1"
+        routerLink="/planta-add"
+      >
         Añadir planta
       </button>
     </div>
@@ -35,7 +39,7 @@
 
         <mat-card-content>
           <button
-            mat-button
+            mat-raised-button
             *ngIf="user.role === 1"
             routerLink="informe-add/{{ planta.id }}"
           >

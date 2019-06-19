@@ -45,8 +45,6 @@ export class PlantaAddComponent implements OnInit {
       zoom: 18,
       alturaBajaPrimero: true
     });
-
-    this.form.valueChanges.subscribe(console.log);
   }
   async submitForm() {
     this.loading = true;
