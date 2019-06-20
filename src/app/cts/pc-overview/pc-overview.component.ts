@@ -71,13 +71,15 @@ export class PcOverviewComponent implements OnInit {
 
       if (perdidasCategoria > 0) {
         this.perdidasPorCategoria.push(
+          // en kW (/1000)
           Math.round(
-            ((this.planta.moduloPotencia / 1000) * perdidasCategoria * 10) / 10
-          )
+            (this.planta.moduloPotencia / 1000) * perdidasCategoria * 10
+          ) / 10
         );
         this.perdidasPorCategoriaLabels.push(GLOBAL.labels_tipos[i]);
       }
     }
+
     // Pérdidas por clase
     let perdidasClase: number;
     let filtroClase;
@@ -124,10 +126,12 @@ export class PcOverviewComponent implements OnInit {
     };
 
     // Pérdidas totales en kW
-    this.perdidasTotales = Math.round(
-      this.perdidasPorCategoria.reduce((a, b) => a + b, 0)
-    );
-    this.informe.mae = this.perdidasTotales / 10 / this.planta.potencia;
+    this.perdidasTotales =
+      Math.round(this.perdidasPorCategoria.reduce((a, b) => a + b, 0) * 10) /
+      10;
+    this.informe.mae =
+      Math.round((this.perdidasTotales / 10 / this.planta.potencia) * 100) /
+      100;
 
     this.informeService.updateInforme(this.informe);
 
@@ -147,7 +151,20 @@ export class PcOverviewComponent implements OnInit {
     };
 
     this.chartOptions = {
-      legend: { display: false }
+      legend: { display: false },
+      scales: {
+        yAxes: [
+          {
+            display: true,
+            ticks: {
+              stepSize: 1,
+              suggestedMin: 0, // minimum will be 0, unless there is a lower value.
+              // OR //
+              beginAtZero: true // minimum value will be 0.
+            }
+          }
+        ]
+      }
     };
   }
 }
