@@ -37,6 +37,7 @@ export class PlantaAddComponent implements OnInit {
       filas: [2, [Validators.required]],
       columnas: [1, [Validators.required]],
       num_modulos: [1, [Validators.required]],
+      moduloPotencia: [200, [Validators.required]],
       vertical: [true, [Validators.required]],
       zoom: 18,
       alturaBajaPrimero: true

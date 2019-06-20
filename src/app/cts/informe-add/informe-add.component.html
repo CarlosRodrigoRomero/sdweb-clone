@@ -1,8 +1,8 @@
 <div class="container">
   <div class="col-12 example-container">
-    Value: {{ form.value | json }}
+    Value: {{ form?.value | json }}
     <hr />
-    <ng-template *ngIf="this.planta">
+    <ng-container *ngIf="this.planta">
       <form class="formContainer" [formGroup]="form" (ngSubmit)="submitForm()">
         <mat-form-field>
           <input matInput formControlName="plantaId" placeholder="Planta" />
@@ -125,7 +125,7 @@
           Guardar
         </button>
       </form>
-    </ng-template>
+    </ng-container>
 
     <div *ngIf="success">Informe guardado</div>
   </div>
