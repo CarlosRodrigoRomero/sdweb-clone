@@ -26,29 +26,30 @@ export class InformeAddComponent implements OnInit {
     private plantaService: PlantaService
   ) {
     this.plantaId = this.route.snapshot.paramMap.get("plantaId");
-    this.plantaService.getPlanta(this.plantaId).subscribe(planta => {
-      this.planta = planta;
-    });
   }
 
   ngOnInit() {
-    this.form = this.fb.group({
-      plantaId: [this.plantaId, [Validators.required]],
-      fecha: [null, [Validators.required]],
-      hora_inicio: ["12:00", [Validators.required]],
-      hora_fin: ["12:40", [Validators.required]],
-      carpeta: ["", [Validators.required]],
-      carpetaBase: ["", [Validators.required]],
-      alturaVuelo: [23, [Validators.required]],
-      gsd: [3, [Validators.required]],
-      correccHoraSrt: [8, [Validators.required]],
-      emisividad: [0.85, [Validators.required]],
-      tempReflejada: [-30, [Validators.required]],
-      temperatura: [25, [Validators.required]],
-      viento: ["", [Validators.required]],
-      velocidad: [10, [Validators.required]],
-      nubosidad: [0, [Validators.required]],
-      numeroModulos: [this.planta.num_modulos, [Validators.required]]
+    this.plantaService.getPlanta(this.plantaId).subscribe(planta => {
+      this.planta = planta;
+
+      this.form = this.fb.group({
+        plantaId: [this.plantaId, [Validators.required]],
+        fecha: [null, [Validators.required]],
+        hora_inicio: ["12:00", [Validators.required]],
+        hora_fin: ["12:40", [Validators.required]],
+        carpeta: ["", [Validators.required]],
+        carpetaBase: ["", [Validators.required]],
+        alturaVuelo: [23, [Validators.required]],
+        gsd: [3, [Validators.required]],
+        correccHoraSrt: [8, [Validators.required]],
+        emisividad: [0.85, [Validators.required]],
+        tempReflejada: [-30, [Validators.required]],
+        temperatura: [25, [Validators.required]],
+        viento: ["", [Validators.required]],
+        velocidad: [10, [Validators.required]],
+        nubosidad: [0, [Validators.required]],
+        numeroModulos: [this.planta.num_modulos, [Validators.required]]
+      });
     });
   }
   async submitForm() {

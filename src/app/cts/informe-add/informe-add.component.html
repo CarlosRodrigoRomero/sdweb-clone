@@ -2,126 +2,131 @@
   <div class="col-12 example-container">
     Value: {{ form.value | json }}
     <hr />
-    <form class="formContainer" [formGroup]="form" (ngSubmit)="submitForm()">
-      <mat-form-field>
-        <input matInput formControlName="plantaId" placeholder="Planta" />
-      </mat-form-field>
+    <ng-template *ngIf="this.planta">
+      <form class="formContainer" [formGroup]="form" (ngSubmit)="submitForm()">
+        <mat-form-field>
+          <input matInput formControlName="plantaId" placeholder="Planta" />
+        </mat-form-field>
 
-      <mat-form-field>
-        <input
-          matInput
-          formControlName="fecha"
-          [matDatepicker]="picker"
-          placeholder="Choose a date"
-        />
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            formControlName="fecha"
+            [matDatepicker]="picker"
+            placeholder="Choose a date"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
 
-      <mat-form-field>
-        <input
-          matInput
-          formControlName="hora_inicio"
-          placeholder="Hora inicio"
-        />
-      </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            formControlName="hora_inicio"
+            placeholder="Hora inicio"
+          />
+        </mat-form-field>
 
-      <mat-form-field>
-        <input matInput formControlName="hora_fin" placeholder="Hora fin" />
-      </mat-form-field>
+        <mat-form-field>
+          <input matInput formControlName="hora_fin" placeholder="Hora fin" />
+        </mat-form-field>
 
-      <mat-form-field>
-        <input
-          matInput
-          formControlName="carpeta"
-          placeholder="Carpeta imagenes jpg gray"
-        />
-      </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            formControlName="carpeta"
+            placeholder="Carpeta imagenes jpg gray"
+          />
+        </mat-form-field>
 
-      <mat-form-field>
-        <input
-          matInput
-          formControlName="carpetaBase"
-          placeholder="Carpeta base"
-        />
-      </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            formControlName="carpetaBase"
+            placeholder="Carpeta base"
+          />
+        </mat-form-field>
 
-      <mat-form-field>
-        <input
-          matInput
-          type="number"
-          formControlName="alturaVuelo"
-          placeholder="Altura de vuelo"
-        />
-      </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            type="number"
+            formControlName="alturaVuelo"
+            placeholder="Altura de vuelo"
+          />
+        </mat-form-field>
 
-      <mat-form-field>
-        <input
-          matInput
-          type="number"
-          formControlName="gsd"
-          placeholder="GSD (cm/pixel)"
-        />
-      </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            type="number"
+            formControlName="gsd"
+            placeholder="GSD (cm/pixel)"
+          />
+        </mat-form-field>
 
-      <mat-form-field>
-        <input
-          matInput
-          type="number"
-          formControlName="correccHoraSrt"
-          placeholder="Correccion hora SRT"
-        />
-      </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            type="number"
+            formControlName="correccHoraSrt"
+            placeholder="Correccion hora SRT"
+          />
+        </mat-form-field>
 
-      <mat-form-field>
-        <input
-          matInput
-          type="number"
-          formControlName="emisividad"
-          placeholder="Emisividad"
-        />
-      </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            type="number"
+            formControlName="emisividad"
+            placeholder="Emisividad"
+          />
+        </mat-form-field>
 
-      <mat-form-field>
-        <input
-          matInput
-          type="number"
-          formControlName="tempReflejada"
-          placeholder="Temperatura Reflejada (ºC)"
-        />
-      </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            type="number"
+            formControlName="tempReflejada"
+            placeholder="Temperatura Reflejada (ºC)"
+          />
+        </mat-form-field>
 
-      <mat-form-field>
-        <input
-          matInput
-          type="number"
-          formControlName="temperatura"
-          placeholder="Temperatura ambiente (ºC)"
-        />
-      </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            type="number"
+            formControlName="temperatura"
+            placeholder="Temperatura ambiente (ºC)"
+          />
+        </mat-form-field>
 
-      <mat-form-field>
-        <input
-          matInput
-          formControlName="nubosidad"
-          placeholder="Nubosidad (octavas)"
-        />
-      </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            formControlName="nubosidad"
+            placeholder="Nubosidad (octavas)"
+          />
+        </mat-form-field>
 
-      <mat-form-field>
-        <input matInput formControlName="viento" placeholder="Viento" />
-      </mat-form-field>
+        <mat-form-field>
+          <input matInput formControlName="viento" placeholder="Viento" />
+        </mat-form-field>
 
-      <button
-        mat-button
-        color="primary"
-        type="submit"
-        [disabled]="form.invalid"
-      >
-        Guardar
-      </button>
-    </form>
+        <button
+          mat-button
+          color="primary"
+          type="submit"
+          [disabled]="form.invalid"
+        >
+          Guardar
+        </button>
+      </form>
+    </ng-template>
 
-    <div *ngIf="success">Planta guardada</div>
+    <div *ngIf="success">Informe guardado</div>
   </div>
 </div>
