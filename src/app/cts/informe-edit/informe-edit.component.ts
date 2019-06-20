@@ -860,7 +860,7 @@ export class InformeEditComponent implements OnInit {
 
   getPcsList(vuelo?: string) {
     this.pcService
-      .getPcs(this.informe.id)
+      .getPcsInformeEdit(this.informe.id)
       .pipe(
         take(1),
         map(pcList => {

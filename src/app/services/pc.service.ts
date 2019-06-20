@@ -195,6 +195,23 @@ export class PcService {
     return this.allPcs$;
   }
 
+  getPcsInformeEdit(informeId: string): Observable<PcInterface[]> {
+    const query$ = this.afs.collection<PcInterface>("pcs", ref =>
+      ref.where("informeId", "==", informeId)
+    );
+    this.allPcs$ = query$.snapshotChanges().pipe(
+      map(actions =>
+        actions.map(a => {
+          const data = a.payload.doc.data() as PcInterface;
+          data.id = a.payload.doc.id;
+          return data;
+        })
+      )
+    );
+
+    return this.allPcs$;
+  }
+
   getPc(id: string) {
     this.pcDoc = this.afs.doc<PcInterface>("pcs/" + id);
 
