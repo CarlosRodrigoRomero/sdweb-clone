@@ -487,9 +487,14 @@ export class InformeExportComponent implements OnInit {
     this.informeCalculado = false;
     const allPcs = this.filteredPcs;
     allPcs.sort(this.compare);
-    this.irradianciaMinima = Math.round(
-      allPcs.sort(this.compareIrradiancia)[0].irradiancia
-    );
+    if (allPcs.length > 0) {
+      this.irradianciaMinima = Math.round(
+        allPcs.sort(this.compareIrradiancia)[0].irradiancia
+      );
+    } else {
+      this.irradianciaMinima = 800;
+    }
+    
     this.emisividad = this.informe.emisividad;
     this.tempReflejada = this.informe.tempReflejada;
 

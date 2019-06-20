@@ -9,8 +9,8 @@
     <ng-template #boton>
       <div class="row">
         <div class="col text-center ">
-          <button mat-flat-button color="primary" (click)="downloadPDF()">
-            Crear PDF
+          <button mat-flat-button color="primary" (click)="downloadPDF()" *ngIf="filteredPcs.length > 0">
+            Generar PDF
           </button>
         </div>
       </div>
@@ -20,7 +20,7 @@
 
 <div class="row">
   <div class="col-6">
-    <ng-container *ngIf="informeCalculado">
+    <ng-container *ngIf="informeCalculado && filteredPcs.length > 0">
       <mat-card class="margintop">
         <mat-card-content>
           <h3 class="text-center">Anomalías en el informe</h3>
