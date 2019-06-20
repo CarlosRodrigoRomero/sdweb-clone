@@ -811,6 +811,7 @@ export class InformeEditComponent implements OnInit {
               } else {
                 this.flights_data = response2;
                 this.flights_list = Object.keys(this.flights_data);
+                this.flights_list.sort();
                 this.fileList =
                   response2[Object.keys(this.flights_data)[0]].files;
                 this.coords =
