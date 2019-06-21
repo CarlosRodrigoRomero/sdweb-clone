@@ -95,3 +95,6 @@ th.mat-header-cell {
 .hiddenCanvas {
   display: none;
 }
+.notPcs {
+  margin-top: 1rem;
+}
