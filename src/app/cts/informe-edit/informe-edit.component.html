@@ -535,6 +535,17 @@
             size="2"
             value="1"
           />
+          <span>Nubosidad</span>
+          <input
+            *ngIf="selected_pc"
+            [(ngModel)]="selected_pc.nubosidad"
+            (change)="updatePcInDb(selected_pc, false)"
+            type="number"
+            id="nubosidad"
+            maxlength="1"
+            size="2"
+            value="1"
+          />
           <button (click)="recalcularLocs()">Recalcular locs</button>
         </div>
       </div>
