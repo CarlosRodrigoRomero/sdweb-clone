@@ -111,7 +111,7 @@ export class InformeViewComponent implements OnInit {
         this.allPcs = this.allPcsConSeguidores.filter((pc, i, a) => {
           return pc.tipo > 0;
         });
-        this.irradianciaMinima = this.allPcs.sort(
+        this.irradianciaMinima = this.allPcsConSeguidores.sort(
           this.compareIrradiancia
         )[0].irradiancia;
 
