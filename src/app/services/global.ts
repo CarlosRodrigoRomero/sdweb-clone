@@ -133,6 +133,10 @@ export let GLOBAL = {
     { nombre: "local_y", descripcion: "Fila" },
     { nombre: "temperaturaMax", descripcion: "Temp. máxima (ºC)" },
     { nombre: "gradienteNormalizado", descripcion: "DT normalizado (ºC)" },
-    { nombre: "archivoPublico", descripcion: "Nombre archivo" }
+    // { nombre: "archivoPublico", descripcion: "Nombre archivo" },
+    { nombre: "irradiancia", descripcion: "Irradiancia (W/m2)" },
+    { nombre: "viento", descripcion: "Viento (Beaufort)" },
+    { nombre: "temperaturaAire", descripcion: "Temp. ambiente (ºC)" },
+    { nombre: "datetimeString", descripcion: "Fecha y hora" }
   ]
 };
