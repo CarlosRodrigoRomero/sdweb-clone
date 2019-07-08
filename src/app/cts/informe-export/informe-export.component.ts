@@ -647,10 +647,7 @@ export class InformeExportComponent implements OnInit {
         .pipe(take(1))
         .subscribe(filteredPcs => {
           this.filteredPcs = filteredPcs.sort(this.sortByLocalId);
-          console.log(
-            "TCL: InformeExportComponent -> downloadPDF ->  this.filteredPcs",
-            this.filteredPcs
-          );
+
           this.calcularInforme();
 
           const pdfDocGenerator = pdfMake.createPdf(

@@ -38,23 +38,26 @@
         /> -->
 
         <mat-card-content>
-          <button
-            mat-raised-button
-            *ngIf="user.role === 1"
-            routerLink="/informe-add/{{ planta.id }}"
-          >
+          <a *ngIf="user.role === 1" routerLink="/informe-add/{{ planta.id }}">
             Añadir informe
-          </button>
+          </a>
+          <span *ngIf="planta.informes.length > 0; else sinInforme"></span>
+          <ng-template #sinInforme
+            ><span>
+              Informe en proceso ...
+            </span></ng-template
+          >
         </mat-card-content>
         <mat-card-actions class="cards-actions">
           <div *ngFor="let informe of planta.informes">
-            <button
+            <a
+              *ngIf="checkInformeDisponible(informe); else sinInforme"
               mat-stroked-button
               color="primary"
               routerLink="/informe-view/{{ informe.id }}"
             >
               Inspección del {{ informe.fecha * 1000 | date: "dd/MM/yyyy" }}
-            </button>
+            </a>
           </div>
         </mat-card-actions>
       </mat-card>

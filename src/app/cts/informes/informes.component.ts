@@ -42,4 +42,11 @@ export class InformesComponent implements OnInit {
       });
     });
   }
+
+  checkInformeDisponible(informe: InformeInterface) {
+    return (
+      ("disponible" in informe && informe.disponible === true) ||
+      !("disponible" in informe)
+    );
+  }
 }
