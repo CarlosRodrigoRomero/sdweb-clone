@@ -494,7 +494,7 @@ export class InformeExportComponent implements OnInit {
     } else {
       this.irradianciaMinima = 800;
     }
-    
+
     this.emisividad = this.informe.emisividad;
     this.tempReflejada = this.informe.tempReflejada;
 
@@ -2165,6 +2165,11 @@ export class InformeExportComponent implements OnInit {
         text: "Seguidor",
         style: "tableHeaderRed"
       });
+    } else {
+      cabecera.push({
+        text: "Pasillo",
+        style: "tableHeaderRed"
+      });
     }
 
     for (const c of this.currentFilteredColumnas) {
@@ -2185,6 +2190,21 @@ export class InformeExportComponent implements OnInit {
           text: pc["global_x"],
           style: "tableCellAnexo1"
         });
+      } else {
+        if (Number.isNaN(pc["global_x"])) {
+          row.push({
+            text: pc["global_x"],
+            style: "tableCellAnexo1"
+          });
+        } else {
+          row.push({
+            text: pc["global_x"]
+              .toString()
+              .concat(" ")
+              .concat(pc["global_y"]),
+            style: "tableCellAnexo1"
+          });
+        }
       }
 
       for (const c of this.currentFilteredColumnas) {

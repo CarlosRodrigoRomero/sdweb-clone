@@ -131,12 +131,15 @@ export let GLOBAL = {
     { nombre: "tipo", descripcion: "Categoría" },
     { nombre: "local_x", descripcion: "Columna" },
     { nombre: "local_y", descripcion: "Fila" },
-    { nombre: "temperaturaMax", descripcion: "Temp. máxima (ºC)" },
-    { nombre: "gradienteNormalizado", descripcion: "DT normalizado (ºC)" },
+    { nombre: "temperaturaMax", descripcion: "Temp. máx (ºC)" },
+    {
+      nombre: "gradienteNormalizado",
+      descripcion: "Gradiente normalizado (ºC)"
+    },
     // { nombre: "archivoPublico", descripcion: "Nombre archivo" },
     { nombre: "irradiancia", descripcion: "Irradiancia (W/m2)" },
-    { nombre: "viento", descripcion: "Viento (Beaufort)" },
+    { nombre: "viento", descripcion: "Viento" },
     { nombre: "temperaturaAire", descripcion: "Temp. ambiente (ºC)" },
-    { nombre: "datetimeString", descripcion: "Fecha y hora" }
+    { nombre: "datetimeString", descripcion: "Fecha/hora" }
   ]
 };
