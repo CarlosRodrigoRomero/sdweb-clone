@@ -486,7 +486,7 @@ export class InformeExportComponent implements OnInit {
 
     this.informeCalculado = false;
     const allPcs = this.filteredPcs;
-    allPcs.sort(this.compare);
+
     if (allPcs.length > 0) {
       this.irradianciaMinima = Math.round(
         allPcs.sort(this.compareIrradiancia)[0].irradiancia
@@ -561,9 +561,18 @@ export class InformeExportComponent implements OnInit {
       return "mejorable";
     }
   }
+  // Ordena los pcs por global_y (pasillo)
+  // TODO: no funciona bien
+  sortByGlobalY(a: PcInterface, b: PcInterface) {
+    return parseFloat(a.global_y) - parseFloat(b.global_y);
+  }
 
-  // Ordena los pcs por localizacion
-  compare(a: PcInterface, b: PcInterface) {
+  sortByLocalId(a: PcInterface, b: PcInterface) {
+    return a.local_id - b.local_id;
+  }
+
+  // Ordena los pcs por seguidor
+  sortByGlobalX(a: PcInterface, b: PcInterface) {
     if (a.global_x < b.global_x) {
       return -1;
     }
@@ -610,7 +619,8 @@ export class InformeExportComponent implements OnInit {
             this.pcService.currentFilteredPcs$
               .pipe(take(1))
               .subscribe(filteredPcs => {
-                this.filteredPcs = filteredPcs;
+                this.filteredPcs = filteredPcs.sort(this.sortByGlobalX);
+
                 this.calcularInforme();
 
                 const pdfDocGenerator = pdfMake.createPdf(
@@ -636,7 +646,11 @@ export class InformeExportComponent implements OnInit {
       this.pcService.currentFilteredPcs$
         .pipe(take(1))
         .subscribe(filteredPcs => {
-          this.filteredPcs = filteredPcs;
+          this.filteredPcs = filteredPcs.sort(this.sortByLocalId);
+          console.log(
+            "TCL: InformeExportComponent -> downloadPDF ->  this.filteredPcs",
+            this.filteredPcs
+          );
           this.calcularInforme();
 
           const pdfDocGenerator = pdfMake.createPdf(
@@ -2161,11 +2175,13 @@ export class InformeExportComponent implements OnInit {
     // Header
     const cabecera = [];
     if (this.planta.tipo === "2 ejes") {
+      this.filteredPcs = this.filteredPcs.sort(this.sortByGlobalX);
       cabecera.push({
         text: "Seguidor",
         style: "tableHeaderRed"
       });
     } else {
+      this.filteredPcs = this.filteredPcs.sort(this.sortByGlobalY);
       cabecera.push({
         text: "Pasillo",
         style: "tableHeaderRed"
@@ -2193,7 +2209,7 @@ export class InformeExportComponent implements OnInit {
       } else {
         if (Number.isNaN(pc["global_x"])) {
           row.push({
-            text: pc["global_x"],
+            text: pc["global_y"],
             style: "tableCellAnexo1"
           });
         } else {
