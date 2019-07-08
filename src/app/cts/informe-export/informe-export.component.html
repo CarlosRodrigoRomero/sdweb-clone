@@ -42,26 +42,40 @@
 
               <ng-container matColumnDef="coa1">
                 <th mat-header-cell *matHeaderCellDef>CoA1</th>
-                <td mat-cell *matCellDef="let element">{{ element.coa1 }}</td>
-                <td mat-footer-cell *matFooterCellDef>{{ countClase[0] }}</td>
+                <td mat-cell class="text-right" *matCellDef="let element">
+                  {{ element.coa1 }}
+                </td>
+                <td mat-footer-cell class="text-right" *matFooterCellDef>
+                  {{ countClase[0] }}
+                </td>
               </ng-container>
 
               <ng-container matColumnDef="coa2">
                 <th mat-header-cell *matHeaderCellDef>CoA2</th>
-                <td mat-cell *matCellDef="let element">{{ element.coa2 }}</td>
-                <td mat-footer-cell *matFooterCellDef>{{ countClase[1] }}</td>
+                <td mat-cell class="text-right" *matCellDef="let element">
+                  {{ element.coa2 }}
+                </td>
+                <td mat-footer-cell class="text-right" *matFooterCellDef>
+                  {{ countClase[1] }}
+                </td>
               </ng-container>
 
               <ng-container matColumnDef="coa3">
                 <th mat-header-cell *matHeaderCellDef>CoA3</th>
-                <td mat-cell *matCellDef="let element">{{ element.coa3 }}</td>
-                <td mat-footer-cell *matFooterCellDef>{{ countClase[2] }}</td>
+                <td mat-cell class="text-right" *matCellDef="let element">
+                  {{ element.coa3 }}
+                </td>
+                <td mat-footer-cell class="text-right" *matFooterCellDef>
+                  {{ countClase[2] }}
+                </td>
               </ng-container>
 
               <ng-container matColumnDef="total">
                 <th mat-header-cell *matHeaderCellDef>TOTAL</th>
-                <td mat-cell *matCellDef="let element">{{ element.total }}</td>
-                <td mat-footer-cell *matFooterCellDef>
+                <td mat-cell class="text-right" *matCellDef="let element">
+                  {{ element.total }}
+                </td>
+                <td mat-footer-cell class="text-right" *matFooterCellDef>
                   {{ filteredPcs.length }}
                 </td>
               </ng-container>
