@@ -559,4 +559,7 @@ export class PcDetailsDialogComponent implements OnInit {
       return local_y;
     }
   }
+  checkIsNaN(item: any) {
+    return Number.isNaN(item);
+  }
 }

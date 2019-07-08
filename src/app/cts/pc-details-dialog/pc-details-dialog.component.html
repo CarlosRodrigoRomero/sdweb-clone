@@ -153,7 +153,10 @@
         </div>
 
         <ng-template class="displayFlex" #fija>
-          <div class="pc-details-derecha-item-tabla">
+          <div
+            *ngIf="!checkIsNaN(pc.global_x)"
+            class="pc-details-derecha-item-tabla"
+          >
             <span class="text-center"><strong>Coord 1</strong></span>
             <span class="text-center">{{ pc.global_x }}</span>
           </div>

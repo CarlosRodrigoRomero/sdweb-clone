@@ -326,4 +326,8 @@ export class PcDetailsComponent implements OnInit, OnChanges {
       return local_y;
     }
   }
+
+  checkIsNaN(item: any) {
+    return Number.isNaN(item);
+  }
 }
