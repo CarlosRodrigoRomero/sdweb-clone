@@ -6,5 +6,7 @@ export interface LocationAreaInterface {
   path?: LatLngLiteral[];
   globalX: any;
   globalY: string;
+  potenciaModulo: number;
+  nombreModulo: string;
   visible?: boolean;
 }

@@ -5,7 +5,7 @@
         matInput
         [(ngModel)]="searchKey"
         type="text"
-        placeholder="Buscar por ID/seguidor"
+        placeholder="Buscar por ID/seguidor/pasillo"
         autocomplete="off"
         (keyup)="applyFilter()"
       />
@@ -51,7 +51,7 @@
         Pérdidas módulo
       </th>
       <td mat-cell *matCellDef="let element">
-        <span class="text-center"
+        <span class="text-perdidas"
           >{{ element.perdidas * 100 | number: "1.0-0" }} %</span
         >
       </td>
@@ -78,7 +78,9 @@
       <ng-container matColumnDef="global_x">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Coord 1</th>
         <td mat-cell *matCellDef="let element">
-          <span>{{ element.global_x }}</span>
+          <span *ngIf="!checkIsNaN(element.global_x)">{{
+            element.global_x
+          }}</span>
         </td>
       </ng-container>
 

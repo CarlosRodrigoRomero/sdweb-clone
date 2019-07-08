@@ -57,6 +57,8 @@ export class PcListComponent implements OnInit {
       this.pcDataSource.filterPredicate = (pc, filter) =>
         pc.local_id === parseInt(filter, 10) ||
         pc.global_x === parseInt(filter, 10) ||
+        pc.global_y === filter ||
+        parseInt(pc.global_y, 10) === parseInt(filter, 10) ||
         pc.global_x.toString() === filter;
 
       this.pcDataSource.sort = this.sort;
@@ -116,5 +118,9 @@ export class PcListComponent implements OnInit {
     result = Math.abs(result);
 
     return result.toString();
+  }
+
+  checkIsNaN(item: any) {
+    return Number.isNaN(item);
   }
 }

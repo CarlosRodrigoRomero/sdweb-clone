@@ -43,6 +43,24 @@
                   />
                 </li>
                 <li>
+                  Nombre Modulo:
+                  <input
+                    (change)="updateLocationArea(selectedLocationArea)"
+                    [(ngModel)]="selectedLocationArea.nombreModulo"
+                    type="text"
+                    name="nombreModulo"
+                  />
+                </li>
+                <li>
+                  Potencia módulo:
+                  <input
+                    (change)="updateLocationArea(selectedLocationArea)"
+                    [(ngModel)]="selectedLocationArea.potenciaModulo"
+                    type="number"
+                    name="potenciaModulo"
+                  />
+                </li>
+                <li>
                   <button
                     type="button"
                     class="btn btn-danger btn-eliminar"
