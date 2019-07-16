@@ -314,15 +314,22 @@ export class AutoLocComponent implements OnInit {
         locationArea.globalX = "";
         locationArea.globalY = "";
         locationArea.plantaId = this.plantaId;
+
+        // DB: Añadir a coleccion 'locations' dentro de 'planta'
+        locationArea = this.plantaService.addLocationArea(this.plantaId, locationArea);
         this.locationAreaList.push(locationArea);
         this.selectedLocationArea = locationArea;
-        // DB: Añadir a coleccion 'locations' dentro de 'planta'
-        // google.maps.event.addListener(polygon, "mouseup", event => {
-        //   this.selectLocationArea(locationArea);
-        //   this.modifyLocationArea(locationArea);
-        // });
-        this.polygonList.push(polygon);
-        this.plantaService.addLocationArea(this.plantaId, locationArea);
+        polygon.id = locationArea.id
+        // this.polygonList.push(rectangle);
+
+        if (this.polygonList.filter(item => item.visible === true).length > this.maxPolygonsVisibles || this.lastLocationArea === undefined) {
+          this.lastLocationArea = locationArea;
+          this.showCloserPolygons();
+        } else {
+          this.lastLocationArea = locationArea;
+          this.addPolygonToMap(locationArea);
+        }
+        document.getElementById('globalX').focus();
       }
     );
     google.maps.event.addListener(
@@ -370,6 +377,7 @@ export class AutoLocComponent implements OnInit {
           this.lastLocationArea = locationArea;
           this.addPolygonToMap(locationArea);
         }
+        document.getElementById('globalX').focus();
       }
     );
   }
