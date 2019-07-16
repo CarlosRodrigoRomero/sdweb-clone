@@ -12,6 +12,7 @@ import "fabric";
 import { take, map } from "rxjs/operators";
 import { Estructura } from "../../models/estructura";
 import { AgmMap } from "@agm/core";
+import { ModuloInterface } from '../../models/modulo';
 declare let fabric;
 declare const google: any;
 
@@ -631,8 +632,9 @@ export class InformeEditComponent implements OnInit {
     // this.canvas2.setActiveObject(act_obj_raw);
     let globalX;
     let globalY;
+    let modulo_;
 
-    [globalX, globalY] = this.getGlobalCoordsFromLocationArea({
+    [globalX, globalY, modulo_] = this.getGlobalCoordsFromLocationArea({
       lat: this.current_gps_lat,
       lng: this.current_gps_lng
     });
@@ -663,7 +665,8 @@ export class InformeEditComponent implements OnInit {
       refTop: actObjRefRawCoords.top,
       refLeft: actObjRefRawCoords.left,
       refHeight: actObjRefRawCoords.height,
-      refWidth: actObjRefRawCoords.width
+      refWidth: actObjRefRawCoords.width,
+      modulo: modulo_,
     };
 
     if (this.selected_pc) {
@@ -1067,15 +1070,18 @@ export class InformeEditComponent implements OnInit {
     pc.gps_lng = event.coords.lng;
     let globalX;
     let globalY;
+    let modulo;
 
-    [globalX, globalY] = this.getGlobalCoordsFromLocationArea(event.coords);
+    [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea(event.coords);
 
     if (globalX.length > 0) {
       pc.global_x = globalX;
     }
-
     if (globalY.length > 0) {
       pc.global_y = globalY;
+    }
+    if (Object.entries(modulo).length === 0 && modulo.constructor === Object) {
+      pc.modulo = modulo;
     }
     pc.image_rotation = this.current_image_rotation;
 
@@ -1492,7 +1498,8 @@ export class InformeEditComponent implements OnInit {
             draggable: false,
             id: locationArea.id,
             globalX: locationArea.globalX,
-            globalY: locationArea.globalY
+            globalY: locationArea.globalY,
+            modulo: locationArea.modulo
           })
           .then((polygon: any) => {
             this.polygonList.push(polygon);
@@ -1505,12 +1512,15 @@ export class InformeEditComponent implements OnInit {
     this.allPcs.forEach(pc => {
       let globalX;
       let globalY;
-      [globalX, globalY] = this.getGlobalCoordsFromLocationArea({
+      let modulo;
+
+      [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea({
         lat: pc.gps_lat,
         lng: pc.gps_lng
       });
       pc.global_x = globalX;
       pc.global_y = globalY;
+      pc.modulo = modulo;
       this.updatePcInDb(pc);
     });
   }
@@ -1519,6 +1529,7 @@ export class InformeEditComponent implements OnInit {
     const latLng = new google.maps.LatLng(coords.lat, coords.lng);
     let globalX = "";
     let globalY = "";
+    let modulo: ModuloInterface = {};
 
     for (let i = 0; i < this.polygonList.length; i++) {
       if (
@@ -1530,9 +1541,12 @@ export class InformeEditComponent implements OnInit {
         if (this.polygonList[i].globalY.length > 0) {
           globalY = this.polygonList[i].globalY;
         }
+        if (Object.entries(this.polygonList[i].modulo).length === 0 && this.polygonList[i].modulo.constructor === Object) {
+          modulo = this.polygonList[i].modulo;
+        }
       }
     }
 
-    return [globalX, globalY];
+    return [globalX, globalY, modulo];
   }
 }

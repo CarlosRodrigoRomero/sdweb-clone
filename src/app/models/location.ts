@@ -1,4 +1,5 @@
 import { LatLngLiteral } from "@agm/core/map-types";
+import { ModuloInterface } from './modulo';
 
 export interface LocationAreaInterface {
   id?: string;
@@ -7,4 +8,6 @@ export interface LocationAreaInterface {
   globalX: any;
   globalY: string;
   visible?: boolean;
+  moduloId?: string;
+  modulo?: ModuloInterface;
 }

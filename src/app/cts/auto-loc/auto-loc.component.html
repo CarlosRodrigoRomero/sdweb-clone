@@ -22,9 +22,9 @@
         <div class="col">
           <div class="row">
             <div class="col-6" *ngIf="selectedLocationArea">
-              <h3>Location Area seleccionado</h3>
-              <ul>
-                <li>
+        
+              <ul class="propiedadesLocArea">
+                <li class="liPropiedadesLocArea">
                   globalX:
                   <input
                     (change)="updateLocationArea(selectedLocationArea)"
@@ -43,12 +43,22 @@
                   />
                 </li>
                 <li>
+                    <mat-form-field>
+                        <mat-label>Modulo</mat-label>
+                        <mat-select [(ngModel)]="selectedLocationArea.modulo" name="m" (selectionChange)="updateLocationArea(selectedLocationArea)" >
+                          <mat-option *ngFor="let m of modulos" [value]="m.id">
+                            {{m.marca}} {{m.modelo}} ({{m.potencia}} W)
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                </li>
+                <li>
                   <button
                     type="button"
                     class="btn btn-danger btn-eliminar"
                     (click)="deleteLocationArea(selectedLocationArea)"
                   >
-                    X
+                  <i class="fa fa-trash" aria-hidden="true"></i>
                   </button>
                 </li>
               </ul>
@@ -59,6 +69,8 @@
     </div>
 
     <div class="col-3 col-locationareas">
+      <button (click)="showOrHideAllPolygons()">Show/hide all</button>
+      <button (click)="showCloserPolygons()">Show closer</button>
       <table class="table" id="tabla_locationareas">
         <tr>
           <th>GlobX</th>
