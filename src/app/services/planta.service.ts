@@ -10,6 +10,7 @@ import { map } from "rxjs/operators";
 import { LocationAreaInterface } from "../models/location";
 import { GLOBAL } from "./global";
 import { UserInterface } from "../models/user";
+import { ModuloInterface } from '../models/modulo';
 
 @Injectable({
   providedIn: "root"
@@ -63,6 +64,8 @@ export class PlantaService {
       .collection("locationAreas")
       .doc(id)
       .set(locationArea);
+
+      return locationArea;
   }
 
   updateLocationArea(locationArea: LocationAreaInterface) {
@@ -100,7 +103,7 @@ export class PlantaService {
     return result;
   }
 
-  getPlantasDeEmpresa(user: UserInterface) {
+  getPlantasDeEmpresa(user: UserInterface): Observable<PlantaInterface[]> {
     let query$: AngularFirestoreCollection<PlantaInterface>;
     if (user.role === 1) {
       query$ = this.afs.collection<PlantaInterface>("plantas");
@@ -114,6 +117,24 @@ export class PlantaService {
       map(actions =>
         actions.map(a => {
           const data = a.payload.doc.data() as PlantaInterface;
+          data.id = a.payload.doc.id;
+          return data;
+        })
+      )
+    );
+  }
+
+  getModulos(plantaId: string): Observable<ModuloInterface[]> {
+    let query$: AngularFirestoreCollection<ModuloInterface>;
+
+    // TODO: que devuelva sólo los modulos presentes en dicha planta
+    // De momento, va a devolver todos lo modulos que encuentre
+    query$ = this.afs.collection<ModuloInterface>("modulos");
+
+    return query$.snapshotChanges().pipe(
+      map(actions =>
+        actions.map(a => {
+          const data = a.payload.doc.data() as ModuloInterface;
           data.id = a.payload.doc.id;
           return data;
         })

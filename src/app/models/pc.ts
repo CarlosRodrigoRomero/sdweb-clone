@@ -1,4 +1,5 @@
 import { Observable } from "rxjs";
+import { ModuloInterface } from './modulo';
 export interface PcInterface {
   id?: string;
   archivo?: string;
@@ -57,4 +58,5 @@ export interface PcInterface {
   rangeMin?: number;
   nubosidad?: string;
   modulosAfectados?: number;
+  modulo: ModuloInterface;
 }
