@@ -57,8 +57,8 @@ export class AutoLocComponent implements OnInit {
     this.getPlanta(this.plantaId);
     this.locationAreaList = [];
     this.polygonList = [];
-    this.minPolygonsVisibles = 25;
-    this.maxPolygonsVisibles = 50;
+    this.minPolygonsVisibles = 30;
+    this.maxPolygonsVisibles = 45;
     this.polygonsAllHidden = false;
     this.lastLocationArea = undefined;
   }
@@ -105,7 +105,7 @@ export class AutoLocComponent implements OnInit {
     this.map._mapsWrapper
       .createPolygon({
         paths: locationArea.path,
-        strokeColor: locationArea.globalX.length > 0 ? "green" : "red",
+        strokeColor: locationArea.hasOwnProperty('modulo') ? "yellow" : "grey",
         strokeOpacity: this._strokeOpacity,
         strokeWeight: 2,
         fillColor: locationArea.globalX.length > 0 ? "green" : "grey",
@@ -254,7 +254,7 @@ export class AutoLocComponent implements OnInit {
     }
   }
 
-  changeVisibilityPolygon(locArea: LocationAreaInterface) {
+  changeVisibilityPolygon(locArea: LocationAreaInterface, fromCheckbox= false) {
     const polygon = this.polygonList.find(item => {
       return item.id === locArea.id;
     });
@@ -276,7 +276,10 @@ export class AutoLocComponent implements OnInit {
       polygon.fillOpacity = this._fillOpacity;
     }
   }
+  if (!fromCheckbox) { 
     locArea.visible = !locArea.visible;
+  }
+    
   }
 
   sortByGlobalX(a: LocationAreaInterface, b: LocationAreaInterface) {
@@ -372,6 +375,7 @@ export class AutoLocComponent implements OnInit {
 
         if (this.polygonList.filter(item => item.visible === true).length > this.maxPolygonsVisibles || this.lastLocationArea === undefined) {
           this.lastLocationArea = locationArea;
+          console.log("TCL: AutoLocComponent -> addEventListeners -> this.lastLocationArea", this.lastLocationArea)
           this.showCloserPolygons();
         } else {
           this.lastLocationArea = locationArea;
@@ -379,6 +383,12 @@ export class AutoLocComponent implements OnInit {
         }
         document.getElementById('globalX').focus();
       }
+
+      
     );
+    
+  }
+  getRowColor(locArea: LocationAreaInterface) {
+    return locArea.hasOwnProperty('modulo') ? 'yellow' : 'black';
   }
 }

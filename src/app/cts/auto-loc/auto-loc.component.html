@@ -78,7 +78,7 @@
           <th>GlobX</th>
           <!-- <th> Filename</th> -->
           <th>GlobY</th>
-          <th>sel</th>
+          <th>Ver</th>
         </tr>
 
         <tr
@@ -86,13 +86,14 @@
           (click)="selectLocationArea(locArea)"
           *ngFor="let locArea of locationAreaList"
           [ngClass]="{ seleccionado: locArea === selectedLocationArea }"
+          [style.color]="getRowColor(locArea)"
         >
           <th>{{ locArea.globalX }}</th>
           <th>{{ locArea.globalY }}</th>
           <!-- <th> {{pc.archivo}}</th> -->
           <th>
             <mat-checkbox
-              (click)="changeVisibilityPolygon(locArea)"
+              (click)="changeVisibilityPolygon(locArea, true)"
               [(ngModel)]="locArea.visible"
             ></mat-checkbox>
           </th>
