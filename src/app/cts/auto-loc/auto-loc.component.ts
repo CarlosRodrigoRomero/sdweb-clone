@@ -99,11 +99,6 @@ export class AutoLocComponent implements OnInit {
       this.locationAreaList = list;
       this.locAreaDataSource.data = list;
 
-      // this.pcDataSource.filterPredicate = (data, filter) => {
-      //   return ['local_id'].some(ele => {
-      //     return data[ele].toLowerCase().indexOf(filter) !== -1;
-      //   });
-      // };
     });
 
     const initialSelection = [];
@@ -134,20 +129,6 @@ export class AutoLocComponent implements OnInit {
 
   onMapReady(map) {
     this.initDrawingManager(map);
-
-    // this.locationAreaList.forEach( (locationArea, idx, arr) => {
-    //     this.locationAreaList[idx].visible = true;
-    //     this.addPolygonToMap(locationArea);
-    // });
-    // this.locationAreaList$.pipe(take(1)).subscribe(locationAreaList => {
-    // locationAreaList.sort(this.sortByGlobalX);
-    // this.locationAreaList = locationAreaList;
-
-    // this.locationAreaList.forEach( (locationArea, idx, arr) => {
-    //     this.locationAreaList[idx].visible = true;
-    //     this.addPolygonToMap(locationArea);
-    // });
-    // });
   }
 
   private addPolygonToMap(locArea: LocationAreaInterface, isNew = false) {
@@ -155,7 +136,7 @@ export class AutoLocComponent implements OnInit {
     this.map._mapsWrapper
       .createPolygon({
         paths: locArea.path,
-        strokeColor: locArea.hasOwnProperty("modulo") ? "yellow" : "grey",
+        strokeColor: locArea.hasOwnProperty('modulo') ? 'yellow' : 'grey',
         strokeOpacity: this._strokeOpacity,
         strokeWeight: 2,
         fillColor: this.getFillColor(locArea),
@@ -166,7 +147,7 @@ export class AutoLocComponent implements OnInit {
       })
       .then((polygon: any) => {
         this.polygonList.push(polygon);
-        google.maps.event.addListener(polygon, "mouseup", event => {
+        google.maps.event.addListener(polygon, 'mouseup', event => {
           this.selectLocationArea(locArea);
           this.modifyLocationArea(locArea);
         });
@@ -177,11 +158,11 @@ export class AutoLocComponent implements OnInit {
     const polygon = this.polygonList.find(item => {
       return item.id === locationArea.id;
     });
-    var vertices = polygon.getPath();
+    const vertices = polygon.getPath();
     // Iterate over the vertices.
     let newPath: LatLngLiteral[] = [];
     for (var i = 0; i < vertices.getLength(); i++) {
-      var xy = vertices.getAt(i);
+      let xy = vertices.getAt(i);
       newPath.push({ lat: xy.lat(), lng: xy.lng() });
     }
     locationArea.path = newPath;
