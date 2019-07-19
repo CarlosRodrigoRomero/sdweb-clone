@@ -28,3 +28,16 @@ agm-map {
   list-style: none;
   margin-right: 1rem;
 }
+tr.mat-row {
+  height: 20px;
+}
+.mat-column-select {
+  overflow: initial;
+}
+table {
+  width: 100%;
+}
+.cabecera {
+  display: flex;
+justify-content: space-between
+}

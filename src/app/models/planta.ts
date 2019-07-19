@@ -20,4 +20,5 @@ export interface PlantaInterface {
   alturaBajaPrimero?: boolean;
   moduloPotencia?: number;
   informes?: InformeInterface[];
+  modulos: string[];
 }

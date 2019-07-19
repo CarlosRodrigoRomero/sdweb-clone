@@ -2,7 +2,6 @@ import { Component, OnInit } from "@angular/core";
 import { PlantaInterface } from "../../models/planta";
 import { FormGroup, Validators, FormBuilder } from "@angular/forms";
 import { AngularFirestore } from "@angular/fire/firestore";
-import { ActivatedRoute } from "@angular/router";
 
 @Component({
   selector: "app-planta-add",

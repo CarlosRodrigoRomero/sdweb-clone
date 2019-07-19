@@ -5,25 +5,33 @@ import {
   AngularFirestoreCollection
 } from "@angular/fire/firestore";
 import { PlantaInterface } from "src/app/models/planta";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { Observable, BehaviorSubject } from "rxjs";
+import { map, switchMap } from "rxjs/operators";
 import { LocationAreaInterface } from "../models/location";
 import { GLOBAL } from "./global";
 import { UserInterface } from "../models/user";
-import { ModuloInterface } from '../models/modulo';
+import { ModuloInterface } from "../models/modulo";
 
 @Injectable({
   providedIn: "root"
 })
 export class PlantaService {
   public itemDoc: AngularFirestoreDocument<PlantaInterface>;
-  private plantas: Observable<PlantaInterface[]>;
+  public plantas: Observable<PlantaInterface[]>;
   public planta: Observable<PlantaInterface>;
   private plantaDoc: AngularFirestoreDocument<PlantaInterface>;
   public plantasCollection: AngularFirestoreCollection<PlantaInterface>;
+  public modulos: ModuloInterface[];
+  private filteredLocAreasSource = new BehaviorSubject<LocationAreaInterface[]>(
+    new Array<LocationAreaInterface>()
+  );
+  public currentFilteredLocAreas$ = this.filteredLocAreasSource.asObservable();
 
   constructor(private afs: AngularFirestore) {
-    this.plantas = afs.collection("plantas").valueChanges();
+    // this.plantas = afs.collection("plantas").valueChanges();
+    this.getModulos().subscribe(modulos => {
+      this.modulos = modulos;
+    });
   }
 
   getPlanta(id: string) {
@@ -40,6 +48,11 @@ export class PlantaService {
         }
       })
     ));
+  }
+
+  updatePlanta(planta: PlantaInterface) {
+    const plantaDoc = this.afs.doc(`plantas/${planta.id}`);
+    plantaDoc.update(planta);
   }
 
   getPlantas() {
@@ -65,7 +78,7 @@ export class PlantaService {
       .doc(id)
       .set(locationArea);
 
-      return locationArea;
+    return locationArea;
   }
 
   updateLocationArea(locationArea: LocationAreaInterface) {
@@ -124,11 +137,20 @@ export class PlantaService {
     );
   }
 
-  getModulos(plantaId: string): Observable<ModuloInterface[]> {
+  getModulosPlanta(planta: PlantaInterface): ModuloInterface[] {
+    if (planta.hasOwnProperty('modulos')) {
+      if (planta.modulos.length > 0) {
+        return this.modulos.filter(item => {
+          return planta.modulos.indexOf(item.id) >= 0;
+        });
+      }
+    }
+    return this.modulos;
+  }
+
+  getModulos(): Observable<ModuloInterface[]> {
     let query$: AngularFirestoreCollection<ModuloInterface>;
 
-    // TODO: que devuelva sólo los modulos presentes en dicha planta
-    // De momento, va a devolver todos lo modulos que encuentre
     query$ = this.afs.collection<ModuloInterface>("modulos");
 
     return query$.snapshotChanges().pipe(

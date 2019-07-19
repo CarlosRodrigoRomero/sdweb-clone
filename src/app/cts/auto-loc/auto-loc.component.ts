@@ -11,9 +11,15 @@ import { PlantaInterface } from "../../models/planta";
 import { LocationAreaInterface } from "src/app/models/location";
 import { LatLngLiteral } from "@agm/core/map-types";
 import { Observable } from "rxjs";
-import { take } from "rxjs/operators";
 import { AgmPolygon, AgmMap } from "@agm/core";
-import { ModuloInterface } from '../../models/modulo';
+import { ModuloInterface } from "../../models/modulo";
+import {
+  MatSort,
+  MatTableDataSource,
+  MatPaginator,
+  getMatIconFailedToSanitizeUrlError
+} from "@angular/material";
+import { SelectionModel } from "@angular/cdk/collections";
 declare const google: any;
 
 @Component({
@@ -24,6 +30,8 @@ declare const google: any;
 export class AutoLocComponent implements OnInit {
   @ViewChildren(AgmPolygon) polygonData: QueryList<AgmPolygon>;
   @ViewChild(AgmMap) map: any;
+  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   public planta: PlantaInterface;
   public defaultZoom: number;
@@ -42,6 +50,10 @@ export class AutoLocComponent implements OnInit {
   public minPolygonsVisibles: number;
   public polygonsAllHidden: boolean;
   public lastLocationArea: LocationAreaInterface;
+  public displayedColumns: string[];
+  public selection: SelectionModel<LocationAreaInterface>;
+  public locAreaDataSource: MatTableDataSource<LocationAreaInterface>;
+  public moduloSelecLista: ModuloInterface;
 
   constructor(
     private route: ActivatedRoute,
@@ -55,12 +67,51 @@ export class AutoLocComponent implements OnInit {
 
     this.plantaId = this.route.snapshot.paramMap.get("id");
     this.getPlanta(this.plantaId);
-    this.locationAreaList = [];
     this.polygonList = [];
     this.minPolygonsVisibles = 30;
-    this.maxPolygonsVisibles = 45;
+    this.maxPolygonsVisibles = 1000;
     this.polygonsAllHidden = false;
     this.lastLocationArea = undefined;
+    this.displayedColumns = ["select", "globalX", "globalY", "modulo"];
+
+    this.locAreaDataSource = new MatTableDataSource([]);
+    this.locAreaDataSource.sortData = (data, sort: MatSort) => {
+      if (sort.active === "globalX") {
+        data.sort(this.sortByGlobalX);
+      }
+      return data;
+    };
+    this.locAreaDataSource.filterPredicate = (locArea, filter) =>
+      locArea.globalX === parseInt(filter, 10) ||
+      locArea.globalY === filter ||
+      locArea.globalX.toLowerCase().startsWith(filter) ||
+      locArea.globalY.toLowerCase().startsWith(filter) ||
+      parseInt(locArea.globalY, 10) === parseInt(filter, 10) ||
+      locArea.globalX.toString().toLowerCase() === filter;
+
+    this.locAreaDataSource.sort = this.sort;
+    this.locAreaDataSource.paginator = this.paginator;
+    this.locationAreaList$ = this.plantaService.getLocationsArea(this.plantaId);
+    this.locationAreaList$.subscribe(list => {
+      list.forEach(item => {
+        delete item.visible;
+      });
+      this.locationAreaList = list;
+      this.locAreaDataSource.data = list;
+
+      // this.pcDataSource.filterPredicate = (data, filter) => {
+      //   return ['local_id'].some(ele => {
+      //     return data[ele].toLowerCase().indexOf(filter) !== -1;
+      //   });
+      // };
+    });
+
+    const initialSelection = [];
+    const allowMultiSelect = true;
+    this.selection = new SelectionModel<LocationAreaInterface>(
+      allowMultiSelect,
+      initialSelection
+    );
   }
 
   getPlanta(plantaId: string) {
@@ -70,11 +121,7 @@ export class AutoLocComponent implements OnInit {
         this.defaultZoom = this.planta.zoom;
         this.plantaLocation.lat = this.planta.latitud;
         this.plantaLocation.lng = this.planta.longitud;
-
-        this.plantaService.getModulos(this.planta.id).subscribe(
-          modulos => {
-          this.modulos = modulos;
-                });
+        this.modulos = this.plantaService.getModulosPlanta(response);
       },
       error => {
         const errorMessage = error as any;
@@ -88,37 +135,40 @@ export class AutoLocComponent implements OnInit {
   onMapReady(map) {
     this.initDrawingManager(map);
 
-    this.locationAreaList$ = this.plantaService.getLocationsArea(this.plantaId);
-    this.locationAreaList$.pipe(take(1)).subscribe(locationAreaList => {
-      locationAreaList.sort(this.sortByGlobalX);
-      this.locationAreaList = locationAreaList;
+    // this.locationAreaList.forEach( (locationArea, idx, arr) => {
+    //     this.locationAreaList[idx].visible = true;
+    //     this.addPolygonToMap(locationArea);
+    // });
+    // this.locationAreaList$.pipe(take(1)).subscribe(locationAreaList => {
+    // locationAreaList.sort(this.sortByGlobalX);
+    // this.locationAreaList = locationAreaList;
 
-      this.locationAreaList.forEach( (locationArea, idx, arr) => {
-          this.locationAreaList[idx].visible = true;
-          this.addPolygonToMap(locationArea);
-      });
-    });
+    // this.locationAreaList.forEach( (locationArea, idx, arr) => {
+    //     this.locationAreaList[idx].visible = true;
+    //     this.addPolygonToMap(locationArea);
+    // });
+    // });
   }
 
-  private addPolygonToMap(locationArea: LocationAreaInterface) {
-    locationArea.visible = true;
+  private addPolygonToMap(locArea: LocationAreaInterface, isNew = false) {
+    // locArea.visible = true;
     this.map._mapsWrapper
       .createPolygon({
-        paths: locationArea.path,
-        strokeColor: locationArea.hasOwnProperty('modulo') ? "yellow" : "grey",
+        paths: locArea.path,
+        strokeColor: locArea.hasOwnProperty("modulo") ? "yellow" : "grey",
         strokeOpacity: this._strokeOpacity,
         strokeWeight: 2,
-        fillColor: locationArea.globalX.length > 0 ? "green" : "grey",
+        fillColor: this.getFillColor(locArea),
         fillOpacity: this._fillOpacity,
-        editable: true,
-        draggable: true,
-        id: locationArea.id
+        editable: isNew,
+        draggable: isNew,
+        id: locArea.id
       })
       .then((polygon: any) => {
         this.polygonList.push(polygon);
         google.maps.event.addListener(polygon, "mouseup", event => {
-          this.selectLocationArea(locationArea);
-          this.modifyLocationArea(locationArea);
+          this.selectLocationArea(locArea);
+          this.modifyLocationArea(locArea);
         });
       });
   }
@@ -138,20 +188,32 @@ export class AutoLocComponent implements OnInit {
     this.updateLocationArea(locationArea);
   }
 
-  public selectLocationArea(locationArea: LocationAreaInterface) {
-
+  public selectLocationArea(locArea: LocationAreaInterface) {
     if (this.selectedPolygon !== undefined) {
-      this.selectedPolygon.setOptions({ fillColor: "grey" });
+      this.selectedPolygon.setOptions({
+        fillColor: this.getFillColor(locArea),
+        editable: false,
+        draggable: false
+      });
     }
 
     const polygon = this.polygonList.find(item => {
-      return item.id === locationArea.id;
+      return item.id === locArea.id;
     });
 
-    polygon.setOptions({ fillColor: "#FF0000" });
+    if (polygon === undefined) {
+      this.addPolygonToMap(locArea);
+    } else {
+      polygon.setOptions({
+        fillColor: "white",
+        editable: true,
+        draggable: true
+      });
+    }
 
-    this.selectedLocationArea = locationArea;
+    this.selectedLocationArea = locArea;
     this.selectedPolygon = polygon;
+    this.selection.select(locArea);
   }
 
   initDrawingManager(map: any) {
@@ -178,20 +240,21 @@ export class AutoLocComponent implements OnInit {
       return item.id === selectedLocationArea.id;
     });
     polygon.setMap(null);
-    this.polygonList = this.polygonList.filter(item => item.id !== polygon.id );
+    this.polygonList = this.polygonList.filter(item => item.id !== polygon.id);
 
-
-    // Eliminar de la lista
-    this.locationAreaList = this.locationAreaList.filter(item => item.id !== selectedLocationArea.id );
-    
     // Eliminar de la BD
     this.plantaService.delLocationArea(selectedLocationArea);
   }
 
-  updateLocationArea(selectedLocationArea: LocationAreaInterface) {
-    this.plantaService.updateLocationArea(selectedLocationArea);
+  updateLocationArea(locArea: LocationAreaInterface, moduleChange = false) {
+    this.plantaService.updateLocationArea(locArea);
+
+    if (moduleChange) {
+      this.changeVisibilityPolygon(locArea);
+      this.changeVisibilityPolygon(locArea);
+    }
   }
-  
+
   sortByDistancia(a, b) {
     if (a.distancia < b.distancia) {
       return -1;
@@ -204,82 +267,82 @@ export class AutoLocComponent implements OnInit {
 
   showCloserPolygons() {
     let locAreasYDistancias = [];
-    if ( this.lastLocationArea ) {
-      this.locationAreaList.forEach( locArea => {
-        locAreasYDistancias.push({locArea: locArea, distancia: this.calculateDistance(this.lastLocationArea, locArea)}) 
-        locArea.path[0].lat
+    if (this.lastLocationArea) {
+      this.locationAreaList.forEach(locArea => {
+        locAreasYDistancias.push({
+          locArea: locArea,
+          distancia: this.calculateDistance(this.lastLocationArea, locArea)
+        });
+        locArea.path[0].lat;
       });
       locAreasYDistancias.sort(this.sortByDistancia);
-
 
       // Ocultar todos
       this.showOrHideAllPolygons(true);
       // 1 - ordenamos por distacia
 
       let contarMaxPoylgonsVisibles = 0;
-      locAreasYDistancias.forEach( locAreaYDist => {
+      locAreasYDistancias.forEach(locAreaYDist => {
         const locArea = locAreaYDist.locArea;
         contarMaxPoylgonsVisibles += 1;
-        if ( contarMaxPoylgonsVisibles <= this.minPolygonsVisibles) {
+        if (contarMaxPoylgonsVisibles <= this.minPolygonsVisibles) {
           this.addPolygonToMap(locArea);
         }
-    });    
-  }
-}
-
-  calculateDistance(locArea1: LocationAreaInterface, locArea2: LocationAreaInterface) {
-
-    const p1 = new google.maps.LatLng(locArea1.path[0].lat, locArea1.path[0].lng);
-    const p2 = new google.maps.LatLng(locArea2.path[0].lat, locArea2.path[0].lng);
-    return Math.round(google.maps.geometry.spherical.computeDistanceBetween(p1, p2));
-  }
-
-  showOrHideAllPolygons(hideAll = false) {    
-    if (this.polygonsAllHidden || !hideAll) {
-      this.polygonsAllHidden = false;
-      this.locationAreaList.forEach(locArea => {
-        this.changeVisibilityPolygon(locArea);
-      })
-
-    } else {
-    this.polygonsAllHidden = true;
-    this.polygonList.forEach(polygon => {
-      polygon.setMap(null);
-    });
-    this.polygonList = [];
-    this.locationAreaList.map(locArea => {
-      locArea.visible = false;
-      return locArea;
       });
     }
   }
 
-  changeVisibilityPolygon(locArea: LocationAreaInterface, fromCheckbox= false) {
-    const polygon = this.polygonList.find(item => {
-      return item.id === locArea.id;
-    });
-    if ( polygon == undefined ) {
-      this.addPolygonToMap(locArea);
+  calculateDistance(
+    locArea1: LocationAreaInterface,
+    locArea2: LocationAreaInterface
+  ) {
+    const p1 = new google.maps.LatLng(
+      locArea1.path[0].lat,
+      locArea1.path[0].lng
+    );
+    const p2 = new google.maps.LatLng(
+      locArea2.path[0].lat,
+      locArea2.path[0].lng
+    );
+    return Math.round(
+      google.maps.geometry.spherical.computeDistanceBetween(p1, p2)
+    );
+  }
+
+  showOrHideAllPolygons(hideAll = false) {
+    if (this.polygonsAllHidden || !hideAll) {
+      this.polygonsAllHidden = false;
+      this.locationAreaList.forEach(locArea => {
+        this.changeVisibilityPolygon(locArea);
+      });
     } else {
-    // this will save opacity values and set them to 0, and rebound the polygon to the map
-    if (locArea.visible) {
-      polygon.visible = false;
-      polygon.clickable = false;
-      polygon.setEditable(false);
-      polygon.strokeOpacity = 0;
-      polygon.fillOpacity = 0;
-    } else {
-      polygon.visible = true;
-      polygon.clickable = true;
-      polygon.setEditable(true);
-      polygon.strokeOpacity = this._strokeOpacity;
-      polygon.fillOpacity = this._fillOpacity;
+      this.polygonsAllHidden = true;
+      this.polygonList.forEach(polygon => {
+        polygon.setMap(null);
+      });
+      this.polygonList = [];
     }
   }
-  if (!fromCheckbox) { 
-    locArea.visible = !locArea.visible;
-  }
-    
+
+  changeVisibilityPolygon(
+    locArea: LocationAreaInterface,
+    fromCheckbox = false
+  ) {
+    const polygon = this.polygonList.find((item, idx) => {
+      return item.id === locArea.id;
+    });
+
+    if (polygon === undefined) {
+      this.addPolygonToMap(locArea);
+    } else {
+      const idx = this.polygonList.indexOf(polygon);
+      this.polygonList.splice(idx, 1);
+      polygon.setMap(null);
+    }
+
+    if (!fromCheckbox) {
+      // locArea.visible = !locArea.visible;
+    }
   }
 
   sortByGlobalX(a: LocationAreaInterface, b: LocationAreaInterface) {
@@ -313,26 +376,25 @@ export class AutoLocComponent implements OnInit {
           });
         }
         locationArea.path = path;
-        locationArea.visible = true;
+        // locationArea.visible = true;
         locationArea.globalX = "";
         locationArea.globalY = "";
         locationArea.plantaId = this.plantaId;
 
         // DB: Añadir a coleccion 'locations' dentro de 'planta'
-        locationArea = this.plantaService.addLocationArea(this.plantaId, locationArea);
+        locationArea = this.plantaService.addLocationArea(
+          this.plantaId,
+          locationArea
+        );
         this.locationAreaList.push(locationArea);
         this.selectedLocationArea = locationArea;
-        polygon.id = locationArea.id
+        polygon.id = locationArea.id;
         // this.polygonList.push(rectangle);
 
-        if (this.polygonList.filter(item => item.visible === true).length > this.maxPolygonsVisibles || this.lastLocationArea === undefined) {
-          this.lastLocationArea = locationArea;
-          this.showCloserPolygons();
-        } else {
-          this.lastLocationArea = locationArea;
-          this.addPolygonToMap(locationArea);
-        }
-        document.getElementById('globalX').focus();
+        this.lastLocationArea = locationArea;
+        this.addPolygonToMap(locationArea, true);
+
+        document.getElementById("globalX").focus();
       }
     );
     google.maps.event.addListener(
@@ -354,41 +416,94 @@ export class AutoLocComponent implements OnInit {
         path.push({ lat: getSouthWest.lat(), lng: getNorthEast.lng() });
 
         locationArea.path = path;
-        locationArea.visible = true;
+        // locationArea.visible = true;
         locationArea.globalX = "";
         locationArea.globalY = "";
         locationArea.plantaId = this.plantaId;
-                
-        
-        // google.maps.event.addListener(rectangle, "mouseup", event => {
-        //   this.selectLocationArea(locationArea);
-        //   this.modifyLocationArea(locationArea);
-        // });
-        // this.polygonList.push(rectangle);
 
         // DB: Añadir a coleccion 'locations' dentro de 'planta'
-        locationArea = this.plantaService.addLocationArea(this.plantaId, locationArea);
+        locationArea = this.plantaService.addLocationArea(
+          this.plantaId,
+          locationArea
+        );
         this.locationAreaList.push(locationArea);
         this.selectedLocationArea = locationArea;
-        rectangle.id = locationArea.id
+        rectangle.id = locationArea.id;
         // this.polygonList.push(rectangle);
 
-        if (this.polygonList.filter(item => item.visible === true).length > this.maxPolygonsVisibles || this.lastLocationArea === undefined) {
-          this.lastLocationArea = locationArea;
-          console.log("TCL: AutoLocComponent -> addEventListeners -> this.lastLocationArea", this.lastLocationArea)
-          this.showCloserPolygons();
-        } else {
-          this.lastLocationArea = locationArea;
-          this.addPolygonToMap(locationArea);
-        }
-        document.getElementById('globalX').focus();
-      }
+        this.lastLocationArea = locationArea;
+        this.addPolygonToMap(locationArea, true);
 
-      
+        document.getElementById("globalX").focus();
+      }
     );
-    
   }
   getRowColor(locArea: LocationAreaInterface) {
-    return locArea.hasOwnProperty('modulo') ? 'yellow' : 'black';
+    return locArea.hasOwnProperty("modulo") ? "yellow" : "black";
+  }
+  getFillColor(locArea: LocationAreaInterface) {
+    if (locArea.globalX.length > 0) {
+      return "green";
+    } else if (locArea.globalY.length > 0) {
+      return "blue";
+    }
+    return "grey";
+  }
+
+  applyFilter(filterValue: string) {
+    this.locAreaDataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  /** Whether the number of selected elements matches the total number of rows. */
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.locAreaDataSource.data.length;
+    return numSelected === numRows;
+  }
+
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  masterToggle() {
+    this.isAllSelected()
+      ? this.clearSelection()
+      : this.locAreaDataSource.filteredData.forEach(locArea => {
+          if (!this.isSelected(locArea)) {
+            this.addPolygonToMap(locArea);
+            this.selection.select(locArea);
+          }
+        });
+  }
+
+  clearSelection() {
+    this.selection.clear();
+    this.showOrHideAllPolygons(true);
+  }
+
+  aplicarModulosSeleccion() {
+    if (this.selection.selected.length > 0) {
+      this.selection.selected.forEach(locArea => {
+        if (this.moduloSelecLista) {
+          locArea.modulo = this.moduloSelecLista;
+          this.updateLocationArea(locArea, true);
+        }
+      });
+    }
+  }
+
+  onSelectCheckboxChange(event, locArea: LocationAreaInterface) {
+    event.stopPropagation();
+    this.changeVisibilityPolygon(locArea, true);
+  }
+
+  isSelected(locArea: LocationAreaInterface) {
+    const exists = this.selection.selected.find(item => {
+      return item.id === locArea.id;
+    });
+
+    return exists !== undefined;
+  }
+  clearModulo(locArea: LocationAreaInterface) {
+    delete locArea.modulo;
+
+    this.updateLocationArea(locArea, true);
   }
 }
