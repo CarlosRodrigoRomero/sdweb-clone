@@ -3,11 +3,21 @@
     <div class="col-9">
       <div class="row">
         <div class="col">
-          <h2>
+          <div class="cabecera">
             <h2>{{ planta?.nombre }}</h2>
-          </h2>
-          <h3 id="info"></h3>
+            <mat-form-field>
+              <mat-label>Modulo</mat-label>
+              <mat-select [(ngModel)]="moduloSelecLista" name="m">
+                <mat-option *ngFor="let m of modulos" [value]="m">
+                  {{ m.marca }} {{ m.modelo }} ({{ m.potencia }} W)
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
 
+            <button (click)="aplicarModulosSeleccion()">
+              Aplicar módulo a selección ->
+            </button>
+          </div>
           <agm-map
             [latitude]="plantaLocation.lat"
             [longitude]="plantaLocation.lng"
@@ -22,18 +32,18 @@
         <div class="col">
           <div class="row">
             <div class="col-6" *ngIf="selectedLocationArea">
-              <h3>Location Area seleccionado</h3>
-              <ul>
-                <li>
+              <ul class="propiedadesLocArea">
+                <li class="liPropiedadesLocArea">
                   globalX:
                   <input
                     (change)="updateLocationArea(selectedLocationArea)"
                     [(ngModel)]="selectedLocationArea.globalX"
                     type="text"
                     name="globalX"
+                    id="globalX"
                   />
                 </li>
-                <li>
+                <li class="liPropiedadesLocArea">
                   globalY:
                   <input
                     (change)="updateLocationArea(selectedLocationArea)"
@@ -42,31 +52,46 @@
                     name="globalY"
                   />
                 </li>
-                <li>
-                  Nombre Modulo:
-                  <input
-                    (change)="updateLocationArea(selectedLocationArea)"
-                    [(ngModel)]="selectedLocationArea.nombreModulo"
-                    type="text"
-                    name="nombreModulo"
-                  />
+                <li class="liPropiedadesLocArea">
+                  <mat-form-field>
+                    <mat-label
+                      >{{ selectedLocationArea.modulo?.marca }}
+                      {{ selectedLocationArea.modulo?.modelo }} ({{
+                        selectedLocationArea.modulo?.potencia
+                      }}
+                      W)</mat-label
+                    >
+                    <mat-select
+                      [(ngModel)]="selectedLocationArea.modulo"
+                      name="m"
+                      (selectionChange)="
+                        updateLocationArea(selectedLocationArea, true)
+                      "
+                    >
+                      <mat-option *ngFor="let m of modulos" [value]="m">
+                        {{ m.marca }} {{ m.modelo }} ({{ m.potencia }} W)
+                      </mat-option>
+                    </mat-select>
+
+                    <button
+                      mat-button
+                      *ngIf="selectedLocationArea.hasOwnProperty('modulo')"
+                      matSuffix
+                      mat-icon-button
+                      aria-label="Clear"
+                      (click)="clearModulo(selectedLocationArea)"
+                    >
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </mat-form-field>
                 </li>
-                <li>
-                  Potencia módulo:
-                  <input
-                    (change)="updateLocationArea(selectedLocationArea)"
-                    [(ngModel)]="selectedLocationArea.potenciaModulo"
-                    type="number"
-                    name="potenciaModulo"
-                  />
-                </li>
-                <li>
+                <li class="liPropiedadesLocArea">
                   <button
                     type="button"
                     class="btn btn-danger btn-eliminar"
                     (click)="deleteLocationArea(selectedLocationArea)"
                   >
-                    X
+                    <i class="fa fa-trash" aria-hidden="true"></i>
                   </button>
                 </li>
               </ul>
@@ -77,12 +102,67 @@
     </div>
 
     <div class="col-3 col-locationareas">
-      <table class="table" id="tabla_locationareas">
+      <mat-form-field>
+        <input
+          matInput
+          (keyup)="applyFilter($event.target.value)"
+          placeholder="Filter"
+        />
+      </mat-form-field>
+
+      <table matSort mat-table [dataSource]="locAreaDataSource" class="mat-z8">
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
+            >
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox
+              (change)="$event ? selection.toggle(row) : null"
+              [checked]="isSelected(row)"
+              (click)="onSelectCheckboxChange($event, row)"
+            >
+            </mat-checkbox>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="globalX">
+          <th mat-header-cell mat-sort-header *matHeaderCellDef>globalX</th>
+          <td mat-cell *matCellDef="let element">{{ element.globalX }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="globalY">
+          <th mat-header-cell mat-sort-header *matHeaderCellDef>globalY</th>
+          <td mat-cell *matCellDef="let element">{{ element.globalY }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="modulo">
+          <th mat-header-cell mat-sort-header *matHeaderCellDef>Modulo</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.marca }} ({{ element.modulo?.potencia }} W)
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr
+          style="cursor: pointer"
+          (click)="selectLocationArea(locArea)"
+          [ngClass]="{ seleccionado: locArea === selectedLocationArea }"
+          [style.color]="getRowColor(locArea)"
+          mat-row
+          *matRowDef="let locArea; columns: displayedColumns"
+        ></tr>
+      </table>
+
+      <table style="display: none" class="table" id="tabla_locationareas">
         <tr>
           <th>GlobX</th>
           <!-- <th> Filename</th> -->
           <th>GlobY</th>
-          <th>sel</th>
+          <th>Ver</th>
         </tr>
 
         <tr
@@ -90,13 +170,14 @@
           (click)="selectLocationArea(locArea)"
           *ngFor="let locArea of locationAreaList"
           [ngClass]="{ seleccionado: locArea === selectedLocationArea }"
+          [style.color]="getRowColor(locArea)"
         >
           <th>{{ locArea.globalX }}</th>
           <th>{{ locArea.globalY }}</th>
           <!-- <th> {{pc.archivo}}</th> -->
           <th>
             <mat-checkbox
-              (click)="changeVisibilityPolygon(locArea)"
+              (click)="changeVisibilityPolygon(locArea, true)"
               [(ngModel)]="locArea.visible"
             ></mat-checkbox>
           </th>
