@@ -37,10 +37,10 @@ export class InformeEditComponent implements OnInit {
   public defaultZoom: number;
   public fileList: string[];
   public canvas;
-  // private canvas2;
   public fabImg;
   public fabImg2;
   public squareBase;
+  public squareProp;
   public squareHeight;
   public squareWidth;
   public tooltip_temp;
@@ -84,6 +84,7 @@ export class InformeEditComponent implements OnInit {
   public estructuraMatrix: any;
   public estructuraOn: boolean;
   public polygonList: any[];
+  private _selectedStrokeWidth: number;
 
   constructor(
     private route: ActivatedRoute,
@@ -111,6 +112,8 @@ export class InformeEditComponent implements OnInit {
     this.current_track_heading = 0;
     this.current_image_rotation = 0;
     this.squareBase = 37;
+    this.squareProp = 2.3;
+    this._selectedStrokeWidth = 3;
 
     this.image_width = 640;
     this.image_height = 512;
@@ -343,122 +346,7 @@ export class InformeEditComponent implements OnInit {
 
     return { left, top, width, height };
   }
-  onMouseMoveCanvas(event: MouseEvent) {
-    // const raw_coords = this.transformCoordsToRaw(event.offsetX, event.offsetY);
-    // const mouseX = raw_coords.x;
-    // const mouseY = raw_coords.y;
-    // Temperatura puntual
-    // const mousePositionData = this.canvas2.getContext('2d').getImageData(mouseX , mouseY , 1, 1).data;
-    // const mouseTemp = this.rgb2temp(mousePositionData[0], mousePositionData[1], mousePositionData[2]);
-    // // Coger maxima temperatura de los alrededores
-    // const mouseSquare = this.canvas2
-    //   .getContext('2d')
-    //   .getImageData(
-    //     Math.max(0, Math.round(mouseX - this.squareBase / 2)),
-    //     Math.max(0, Math.round(mouseY - this.squareBase / 2)),
-    //     this.squareBase,
-    //     this.squareBase
-    //   );
-    // Get max temp
-    // const mouse_temps_array = [];
-    // for (
-    //   let i = 0, n = mouseSquare.height * mouseSquare.width * 4;
-    //   i < n;
-    //   i += 4
-    // ) {
-    //   mouse_temps_array.push(
-    //     this.rgb2temp(
-    //       mouseSquare.data[i],
-    //       mouseSquare.data[i + 1],
-    //       mouseSquare.data[i + 2]
-    //     )
-    //   ); // i+3 is alpha (the fourth element)
-    // }
-    // const mouse_max_temp_array = this.indexOfMax(mouse_temps_array);
-    // this.tooltip_temp = mouse_max_temp_array[0];
-    //
-    // #############################
-    // Modificación de HS
-    // #############################
-    // const actObj = this.canvas.getActiveObject();
-    // // Get HS img coords and draw triangle
-    // if (actObj !== null && actObj !== undefined) {
-    //   if (actObj.get('type') === 'rect' && actObj.isMoving === true) {
-    //     const actObjRaw = this.transformActObjToRaw(actObj);
-    //     // const max_temp = this.getMaxTempInActObj(actObj);
-    //     // this.selected_pc.temperaturaMax = max_temp.max_temp;
-    //     // this.selected_pc.img_x = max_temp.max_temp_x;
-    //     // this.selected_pc.img_y = max_temp.max_temp_y;
-    //     if (actObjRaw.ref === true) {
-    //       this.selected_pc.refTop = Math.round(actObjRaw.top);
-    //       this.selected_pc.refLeft = Math.round(actObjRaw.left);
-    //       this.selected_pc.refWidth = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
-    //       this.selected_pc.refHeight = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
-    //     } else {
-    //       this.selected_pc.img_top = Math.round(actObjRaw.top);
-    //       this.selected_pc.img_left = Math.round(actObjRaw.left);
-    //       this.selected_pc.img_width = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
-    //       this.selected_pc.img_height = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
-    //     }
-    // this.updatePcInDb(this.selected_pc, false);
-    // $('#temp').html(Math.round(temperature*10)/10);
-    // $('#max_temp').html( Math.round(temps.max()*10)/10);
-    // $('#sq_height').html(squareHeight);
-    // $('#sq_width').html(squareWidth);
-    //   }
-    // }
-  }
-
-  // getMaxTempInActObj(actObj) { // en la imagen rotada
-
-  //   // get the color array for the pixels around the mouse
-  //   const actObjRaw = this.transformActObjToRaw(actObj);
-
-  //   const actObjData = this.canvas2
-  //     .getContext('2d')
-  //     .getImageData(actObjRaw.left, actObjRaw.top, actObjRaw.width, actObjRaw.height)
-  //     .data;
-  //   // let square_pixel_data = this.canvas2.getContext('2d').getImageData(x, y, 1, 1).data;
-  //   const act_obj_temps_array = [];
-
-  //   for (let i = 0, n = actObjRaw.height * actObjRaw.width * 4; i < n; i += 4) {
-  //     act_obj_temps_array.push(
-  //       this.rgb2temp(actObjData[i], actObjData[i + 1], actObjData[i + 2])
-  //     );
-  //     // i+3 is alpha (the fourth element)
-  //   }
-
-  //   const act_obj_max_temp_arr = this.indexOfMax(act_obj_temps_array);
-  //   const act_obj_max_temp = act_obj_max_temp_arr[0];
-  //   const act_obj_max_index = act_obj_max_temp_arr[1];
-  //   const act_obj_max_temp_y_raw = Math.round(
-  //     actObjRaw.top + Math.trunc(act_obj_max_index / actObjRaw.width)
-  //   );
-  //   const act_obj_max_temp_x_raw = Math.round(
-  //     actObjRaw.left +
-  //       act_obj_max_index -
-  //       Math.trunc(act_obj_max_index / actObjRaw.width) * actObjRaw.width
-  //   );
-
-  //   // draw triangle
-  //   // convertir a coordenadas de canvas1
-  //   const act_obj_max_temp_rotated = this.transformCoordsToRotated(act_obj_max_temp_x_raw, act_obj_max_temp_y_raw);
-
-  //   // console.log('TRIANGLE RAW: rotated_x: ', act_obj_max_temp_x_raw, 'rotated_y: ', act_obj_max_temp_y_raw);
-  //   // console.log('TRIANGLE: rotated_x: ', act_obj_max_temp_rotated.x, 'rotated_y: ', act_obj_max_temp_rotated.y);
-  //   // this.drawTriangle(act_obj_max_temp_rotated.x, act_obj_max_temp_rotated.y);
-  //   // this.drawTriangle2(act_obj_max_temp_x_raw, act_obj_max_temp_y_raw);
-  //   // console.log('max_temp:', act_obj_max_temp, 'x, y: ', act_obj_max_temp_x_raw, act_obj_max_temp_y_raw);
-
-  //   this.pc_temp = Math.round(act_obj_max_temp * 10) / 10;
-
-  //   // report that pixel data
-  //   return {
-  //     max_temp: act_obj_max_temp,
-  //     max_temp_x: act_obj_max_temp_x_raw,
-  //     max_temp_y: act_obj_max_temp_y_raw
-  //   };
-  // }
+  onMouseMoveCanvas(event: MouseEvent) {}
 
   private drawTriangle(x: number, y: number) {
     if (this.oldTriangle !== null && this.oldTriangle !== undefined) {
@@ -741,11 +629,11 @@ export class InformeEditComponent implements OnInit {
     if (this.planta.vertical) {
       // vertical
       this.squareWidth = this.squareBase;
-      this.squareHeight = Math.round((this.squareWidth * 3) / 2);
+      this.squareHeight = Math.round(this.squareWidth * this.squareProp);
     } else {
       // horizontal
       this.squareHeight = this.squareBase;
-      this.squareWidth = Math.round((this.squareHeight * 3) / 2);
+      this.squareWidth = Math.round(this.squareHeight * this.squareProp);
     }
   }
 
@@ -1154,16 +1042,17 @@ export class InformeEditComponent implements OnInit {
 
     const transformedRect = this.transformActObjToRotated(rect2);
     const transformedRectRef = this.transformActObjToRotated(rectRef2);
+    const strokWidth = pc === this.selected_pc ? this._selectedStrokeWidth : 1;
 
     const rect = new fabric.Rect({
       left: transformedRect.left,
       top: transformedRect.top,
       fill: "rgba(0,0,0,0)",
-      stroke: "red",
-      strokeWidth: 1,
+      stroke: pc === this.selected_pc ? "white" : "red",
+      strokeWidth: strokWidth,
       hasControls: true,
-      width: transformedRect.width,
-      height: transformedRect.height,
+      width: transformedRect.width - strokWidth,
+      height: transformedRect.height - strokWidth,
       local_id: pc.local_id,
       ref: false
     });
@@ -1173,20 +1062,16 @@ export class InformeEditComponent implements OnInit {
       top: transformedRectRef.top,
       fill: "rgba(0,0,0,0)",
       stroke: "blue",
-      strokeWidth: 1,
+      strokeWidth: strokWidth,
       hasControls: true,
-      width: transformedRectRef.width,
-      height: transformedRectRef.height,
+      width: transformedRectRef.width - strokWidth,
+      height: transformedRectRef.height - strokWidth,
       local_id: pc.local_id,
       ref: true,
-      selectable: false
+      selectable: pc === this.selected_pc
     });
 
     if (pc === this.selected_pc) {
-      rect.set("stroke", "white");
-      rect.set("strokeWidth", 3);
-      rectRef.set("strokeWidth", 3);
-      rectRef.set("selectable", true);
       this.canvas.setActiveObject(rect);
     }
 
