@@ -12,7 +12,7 @@ import "fabric";
 import { take, map } from "rxjs/operators";
 import { Estructura } from "../../models/estructura";
 import { AgmMap } from "@agm/core";
-import { ModuloInterface } from '../../models/modulo';
+import { ModuloInterface } from "../../models/modulo";
 declare let fabric;
 declare const google: any;
 
@@ -666,7 +666,7 @@ export class InformeEditComponent implements OnInit {
       refLeft: actObjRefRawCoords.left,
       refHeight: actObjRefRawCoords.height,
       refWidth: actObjRefRawCoords.width,
-      modulo: modulo_,
+      modulo: modulo_
     };
 
     if (this.selected_pc) {
@@ -807,30 +807,34 @@ export class InformeEditComponent implements OnInit {
           this.getPcsList();
           this.titulo = this.informe.fecha * 1000;
           // Obtener lista de imagenes de la carpeta
-          this.informeService.getFileList(this.informe.carpeta).subscribe(
-            response2 => {
-              if (!response2) {
-                this.alertMessage = "No hay archivos";
-              } else {
-                this.flights_data = response2;
-                this.flights_list = Object.keys(this.flights_data);
-                this.flights_list.sort();
-                this.fileList =
-                  response2[Object.keys(this.flights_data)[0]].files;
-                this.coords =
-                  response2[Object.keys(this.flights_data)[0]].coords;
-                this.setImageFromRangeValue(1);
+          this.informeService
+            .getFileList(
+              this.pathJoin([this.informe.carpetaBase, GLOBAL.carpetaJpgGray])
+            )
+            .subscribe(
+              response2 => {
+                if (!response2) {
+                  this.alertMessage = "No hay archivos";
+                } else {
+                  this.flights_data = response2;
+                  this.flights_list = Object.keys(this.flights_data);
+                  this.flights_list.sort();
+                  this.fileList =
+                    response2[Object.keys(this.flights_data)[0]].files;
+                  this.coords =
+                    response2[Object.keys(this.flights_data)[0]].coords;
+                  this.setImageFromRangeValue(1);
+                }
+              },
+              error => {
+                const errorMessage = error;
+                if (errorMessage != null) {
+                  const body = JSON.parse(error._body);
+                  this.alertMessage = body.message;
+                  console.log(error);
+                }
               }
-            },
-            error => {
-              const errorMessage = error;
-              if (errorMessage != null) {
-                const body = JSON.parse(error._body);
-                this.alertMessage = body.message;
-                console.log(error);
-              }
-            }
-          );
+            );
         }
       },
       error => {
@@ -980,7 +984,7 @@ export class InformeEditComponent implements OnInit {
     this.currentFileName = this.fileList[arrayIndex];
     this.addFabricImage(
       this.informeService.getImageUrl(
-        this.informe.carpeta,
+        this.pathJoin([this.informe.carpetaBase, GLOBAL.carpetaJpgGray]),
         this.currentFlight,
         this.fileList[arrayIndex]
       )
@@ -1072,7 +1076,9 @@ export class InformeEditComponent implements OnInit {
     let globalY;
     let modulo;
 
-    [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea(event.coords);
+    [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea(
+      event.coords
+    );
 
     if (globalX.length > 0) {
       pc.global_x = globalX;
@@ -1541,12 +1547,21 @@ export class InformeEditComponent implements OnInit {
         if (this.polygonList[i].globalY.length > 0) {
           globalY = this.polygonList[i].globalY;
         }
-        if (Object.entries(this.polygonList[i].modulo).length === 0 && this.polygonList[i].modulo.constructor === Object) {
-          modulo = this.polygonList[i].modulo;
+        if (this.polygonList[i].hasOwnProperty("modulo")) {
+          if (this.polygonList[i].modulo !== undefined) {
+            modulo = this.polygonList[i].modulo;
+          }
         }
       }
     }
 
     return [globalX, globalY, modulo];
+  }
+
+  private pathJoin(parts: string[], sep = "\\") {
+    const separator = sep || "\\";
+    let replace = new RegExp(separator + "{1,}", "g");
+    const result = parts.join(separator).replace(replace, separator);
+    return result;
   }
 }

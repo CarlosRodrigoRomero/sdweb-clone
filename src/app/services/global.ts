@@ -3,6 +3,7 @@ export let GLOBAL = {
   num_tipos: 16,
   camaraTermica: "DJI XT2 640 13mm (Numero de serie: 297106)",
   ultimaCalibracion: "Enero 2019",
+  carpetaJpgGray: "gray\\",
   uav: "DJI Matrice M200",
   temperaturaLimiteFabricantes: 90,
   filtroGradientePorDefecto: 10,
