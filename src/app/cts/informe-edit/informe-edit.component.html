@@ -520,7 +520,19 @@
             type="number"
             id="squareBase"
             maxlength="2"
-            size="25"
+            size="20"
+            (change)="setSquareBase()"
+          />
+          <br />
+          <span>SqProp</span>
+          <input
+            style="width: 3rem;"
+            *ngIf="selected_pc"
+            [(ngModel)]="squareProp"
+            type="number"
+            id="squareProp"
+            maxlength="2"
+            size="20"
             (change)="setSquareBase()"
           />
           <br />
