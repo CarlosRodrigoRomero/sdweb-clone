@@ -168,7 +168,7 @@ export class InformeExportComponent implements OnInit {
       .ref(`informes/${this.informe.id}/portada.jpg`)
       .getDownloadURL();
     this.logoImg$ = this.storage
-      .ref(`informes/${this.informe.id}/logo.jpg`)
+      .ref(`empresas/${this.planta.empresa}/logo.jpg`)
       .getDownloadURL();
 
     this.irradianciaImg$.pipe(take(1)).subscribe(url => {
