@@ -98,7 +98,6 @@ export class AutoLocComponent implements OnInit {
       });
       this.locationAreaList = list;
       this.locAreaDataSource.data = list;
-
     });
 
     const initialSelection = [];
@@ -136,7 +135,7 @@ export class AutoLocComponent implements OnInit {
     this.map._mapsWrapper
       .createPolygon({
         paths: locArea.path,
-        strokeColor: locArea.hasOwnProperty('modulo') ? 'yellow' : 'grey',
+        strokeColor: locArea.hasOwnProperty("modulo") ? "yellow" : "grey",
         strokeOpacity: this._strokeOpacity,
         strokeWeight: 2,
         fillColor: this.getFillColor(locArea),
@@ -147,7 +146,7 @@ export class AutoLocComponent implements OnInit {
       })
       .then((polygon: any) => {
         this.polygonList.push(polygon);
-        google.maps.event.addListener(polygon, 'mouseup', event => {
+        google.maps.event.addListener(polygon, "mouseup", event => {
           this.selectLocationArea(locArea);
           this.modifyLocationArea(locArea);
         });
@@ -441,6 +440,25 @@ export class AutoLocComponent implements OnInit {
     const numRows = this.locAreaDataSource.data.length;
     return numSelected === numRows;
   }
+  getLocAreaListConModulos() {
+    return this.locationAreaList.filter(locArea => {
+      if (locArea.hasOwnProperty("modulo")) {
+        if (locArea.modulo !== undefined) {
+          return true;
+        }
+      }
+      return false;
+    });
+  }
+
+  isAllModulesSelected() {
+    const locAreaConModulos = this.getLocAreaListConModulos();
+
+    const numSelected = this.selection.selected.length;
+    const numRows = locAreaConModulos.length;
+
+    return numSelected === numRows;
+  }
 
   /** Selects all rows if they are not all selected; otherwise clear selection. */
   masterToggle() {
@@ -486,5 +504,16 @@ export class AutoLocComponent implements OnInit {
     delete locArea.modulo;
 
     this.updateLocationArea(locArea, true);
+  }
+
+  selectConModulo() {
+    this.isAllModulesSelected()
+      ? this.clearSelection()
+      : this.getLocAreaListConModulos().forEach(locArea => {
+          if (!this.isSelected(locArea)) {
+            this.addPolygonToMap(locArea);
+            this.selection.select(locArea);
+          }
+        });
   }
 }
