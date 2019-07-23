@@ -51,13 +51,23 @@
         <mat-card-actions class="cards-actions">
           <div *ngFor="let informe of planta.informes">
             <a
-              *ngIf="checkInformeDisponible(informe); else sinInforme"
+              *ngIf="checkInformeDisponible(informe); else sinInforme2"
               mat-stroked-button
               color="primary"
               routerLink="/informe-view/{{ informe.id }}"
             >
               Inspección del {{ informe.fecha * 1000 | date: "dd/MM/yyyy" }}
             </a>
+
+            <ng-template #sinInforme2
+              ><span> Informe en proceso ... </span
+              ><span *ngIf="user.role === 1"
+                >({{ informe.id }})
+                <a routerLink="/informe-edit/{{ informe.id }}">
+                  <i class="far fa-edit"></i>
+                </a>
+              </span>
+            </ng-template>
           </div>
         </mat-card-actions>
       </mat-card>
