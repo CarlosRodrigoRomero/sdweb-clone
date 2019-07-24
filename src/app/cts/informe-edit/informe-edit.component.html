@@ -190,7 +190,7 @@
                         }"
                         (click)="onClickLocalCoordsTable(selected_pc, f, c)"
                       >
-                        {{ f }}
+                        {{ f }}/{{ c }}
                       </div>
                       <ng-template #dosejes>
                         <div
@@ -204,7 +204,7 @@
                           }"
                           (click)="onClickLocalCoordsTable(selected_pc, f, c)"
                         >
-                          {{ f }}
+                          {{ f }}/{{ c }}
                         </div>
                       </ng-template>
                     </td>
@@ -597,7 +597,7 @@
           <th>{{ pc.global_x }}, {{ pc.global_y }}</th>
           <th>{{ pc.local_x }}, {{ pc.local_y }}</th>
 
-          <th>{{ pc.modulo.potencia}} W</th>
+          <th>{{ pc.modulo.potencia }} W</th>
           <th>
             <button
               type="button"

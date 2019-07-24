@@ -974,7 +974,8 @@ export class InformeEditComponent implements OnInit {
     if (globalY.length > 0) {
       pc.global_y = globalY;
     }
-    if (Object.entries(modulo).length === 0 && modulo.constructor === Object) {
+
+    if (Object.entries(modulo).length > 0 && modulo.constructor === Object) {
       pc.modulo = modulo;
     }
     pc.image_rotation = this.current_image_rotation;
@@ -1409,9 +1410,16 @@ export class InformeEditComponent implements OnInit {
         lat: pc.gps_lat,
         lng: pc.gps_lng
       });
-      pc.global_x = globalX;
-      pc.global_y = globalY;
-      pc.modulo = modulo;
+      if (globalX.length > 0) {
+        pc.global_x = globalX;
+      }
+      if (globalY.length > 0) {
+        pc.global_y = globalY;
+      }
+
+      if (Object.entries(modulo).length > 0 && modulo.constructor === Object) {
+        pc.modulo = modulo;
+      }
       this.updatePcInDb(pc);
     });
   }
@@ -1432,6 +1440,7 @@ export class InformeEditComponent implements OnInit {
         if (this.polygonList[i].globalY.length > 0) {
           globalY = this.polygonList[i].globalY;
         }
+
         if (this.polygonList[i].hasOwnProperty("modulo")) {
           if (this.polygonList[i].modulo !== undefined) {
             modulo = this.polygonList[i].modulo;
