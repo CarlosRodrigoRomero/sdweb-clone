@@ -110,14 +110,14 @@ export let GLOBAL = {
     0, // Para que coincida el indice con el tipo de anomalia
     0, // "Punto caliente", // 1
     0, // "Varios puntos calientes", // 2
-    0.85, // "Substring en CA", // 3
+    0.35, // "Substring en CA", // 3
     1, // "String en CA", // 4
     1, // "Módulo en CA", // 5
-    0.85, // "Substring en CC", // 6
+    0.35, // "Substring en CC", // 6
     0.85, // "Módulo en CC", // 7
     0, // "Célula caliente", // 8
     0, // "Varias células calientes", // 9
-    0.85, // "2X substring en CA", // 10
+    0.75, // "2X substring en CA", // 10
     0, // "Células calientes debido a suciedad", // 11
     0.85, // "Vidrio roto", // 12
     0, // "Transfer resistance", // 13

@@ -160,7 +160,7 @@ export class InformeEditComponent implements OnInit {
         }
       }
 
-      this.updatePcInDb(this.selected_pc, false);
+      this.updatePcInDb(this.selected_pc);
     });
 
     // this.canvas.on('object:modified', this.onObjectModified);
@@ -570,7 +570,6 @@ export class InformeEditComponent implements OnInit {
       }
     }
     this.addPcToDb(newPc);
-    // this.updatePcInDb(newPc, true);
     this.onMapMarkerClick(newPc);
   }
 
@@ -964,10 +963,16 @@ export class InformeEditComponent implements OnInit {
     let globalY;
     let modulo;
 
+    pc.image_rotation = this.current_image_rotation;
+
     [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea(
       event.coords
     );
 
+    this.updateLocalAreaInPc(pc, globalX, globalY, modulo);
+  }
+
+  updateLocalAreaInPc(pc, globalX, globalY, modulo) {
     if (globalX.length > 0) {
       pc.global_x = globalX;
     }
@@ -978,11 +983,11 @@ export class InformeEditComponent implements OnInit {
     if (Object.entries(modulo).length > 0 && modulo.constructor === Object) {
       pc.modulo = modulo;
     }
-    pc.image_rotation = this.current_image_rotation;
 
     pc.datetime = this.current_datetime;
-    this.updatePcInDb(pc, false);
+    this.updatePcInDb(pc);
   }
+
   onClickLocalCoordsTable(selectedPc: PcInterface, f: number, c: number) {
     if (this.selected_pc === selectedPc) {
       if (this.planta.tipo === "2 ejes") {
@@ -992,13 +997,12 @@ export class InformeEditComponent implements OnInit {
         this.selected_pc.local_y = f;
       }
     }
-    this.updatePcInDb(selectedPc, false);
+    this.updatePcInDb(selectedPc);
   }
 
-  updatePcInDb(pc: PcInterface, updateAll: boolean = false) {
+  updatePcInDb(pc: PcInterface) {
     this.pcService.updatePc(pc);
 
-    // if (updateAll) {
     // Actualizar this.allPcs
     this.allPcs = this.allPcs.map(element => {
       if (pc.id === element.id) {
@@ -1007,7 +1011,6 @@ export class InformeEditComponent implements OnInit {
         return element;
       }
     });
-    // }
   }
 
   drawPcInCanvas(pc: PcInterface) {
@@ -1410,17 +1413,7 @@ export class InformeEditComponent implements OnInit {
         lat: pc.gps_lat,
         lng: pc.gps_lng
       });
-      if (globalX.length > 0) {
-        pc.global_x = globalX;
-      }
-      if (globalY.length > 0) {
-        pc.global_y = globalY;
-      }
-
-      if (Object.entries(modulo).length > 0 && modulo.constructor === Object) {
-        pc.modulo = modulo;
-      }
-      this.updatePcInDb(pc);
+      this.updateLocalAreaInPc(pc, globalX, globalY, modulo);
     });
   }
 
