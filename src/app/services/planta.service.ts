@@ -2,15 +2,18 @@ import { Injectable } from "@angular/core";
 import {
   AngularFirestore,
   AngularFirestoreDocument,
-  AngularFirestoreCollection
+  AngularFirestoreCollection,
+
 } from "@angular/fire/firestore";
 import { PlantaInterface } from "src/app/models/planta";
 import { Observable, BehaviorSubject } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
+import { map } from "rxjs/operators";
 import { LocationAreaInterface } from "../models/location";
-import { GLOBAL } from "./global";
+
 import { UserInterface } from "../models/user";
 import { ModuloInterface } from "../models/modulo";
+import * as firebase from 'firebase/app';
+
 
 @Injectable({
   providedIn: "root"
@@ -81,11 +84,17 @@ export class PlantaService {
     return locationArea;
   }
 
-  updateLocationArea(locationArea: LocationAreaInterface) {
+  updateLocationArea(locArea: LocationAreaInterface) {
     const LocAreaDoc = this.afs.doc(
-      `plantas/${locationArea.plantaId}/locationAreas/${locationArea.id}`
+      `plantas/${locArea.plantaId}/locationAreas/${locArea.id}`
     );
-    LocAreaDoc.update(locationArea);
+    if (locArea.hasOwnProperty('modulo')) {
+      LocAreaDoc.update(locArea);
+    } else {
+      LocAreaDoc.update({
+        modulo: firebase.firestore.FieldValue.delete()
+    });
+    }
   }
 
   delLocationArea(locationArea: LocationAreaInterface) {
