@@ -142,7 +142,6 @@ export class InformeEditComponent implements OnInit {
             item => item.local_id === options.target.local_id
           );
           this.canvas.setActiveObject(options.target);
-          console.log("TCL: ngOnInit -> selectedPc", selectedPc);
           this.onMapMarkerClick(selectedPc);
         }
       }
