@@ -88,13 +88,13 @@ export class PlantaService {
     const LocAreaDoc = this.afs.doc(
       `plantas/${locArea.plantaId}/locationAreas/${locArea.id}`
     );
-    if (locArea.hasOwnProperty('modulo')) {
-      LocAreaDoc.update(locArea);
-    } else {
+    if (!locArea.hasOwnProperty('modulo')) {
       LocAreaDoc.update({
         modulo: firebase.firestore.FieldValue.delete()
     });
     }
+    LocAreaDoc.update(locArea);
+
   }
 
   delLocationArea(locationArea: LocationAreaInterface) {
