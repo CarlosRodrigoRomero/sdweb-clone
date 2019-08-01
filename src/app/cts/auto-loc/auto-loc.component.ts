@@ -227,7 +227,6 @@ export class AutoLocComponent implements OnInit {
   }
 
   updateLocationArea(locArea: LocationAreaInterface, moduleChange = false) {
-    console.log("TCL: AutoLocComponent -> updateLocationArea -> locArea", locArea)
     this.plantaService.updateLocationArea(locArea);
 
     if (moduleChange) {
