@@ -85,6 +85,7 @@ export class InformeEditComponent implements OnInit {
   public estructuraOn: boolean;
   public polygonList: any[];
   private _selectedStrokeWidth: number;
+  private rectRefReduction: number;
 
   constructor(
     private route: ActivatedRoute,
@@ -100,6 +101,7 @@ export class InformeEditComponent implements OnInit {
     this.rangeValue = 0;
     this.fileList = new Array();
     this.coords = new Array();
+    this.rectRefReduction = 0.1;
 
     // this.max_temp = 70;
     // this.min_temp = 41;
@@ -132,6 +134,19 @@ export class InformeEditComponent implements OnInit {
   ngOnInit() {
     this.getInforme();
     this.canvas = new fabric.Canvas("mainCanvas");
+
+    this.canvas.on("mouse:up", options => {
+      if (options.target !== null) {
+        if (options.target.hasOwnProperty("local_id")) {
+          const selectedPc = this.allPcs.find(
+            item => item.local_id === options.target.local_id
+          );
+          this.canvas.setActiveObject(options.target);
+          console.log("TCL: ngOnInit -> selectedPc", selectedPc);
+          this.onMapMarkerClick(selectedPc);
+        }
+      }
+    });
 
     this.canvas.on("object:modified", options => {
       if (options.target.type === "rect") {
@@ -436,6 +451,15 @@ export class InformeEditComponent implements OnInit {
     let width: number;
     let top: number;
     let left: number;
+    // Referencia
+    let topLeftRef;
+    let topRightRef;
+    let bottomLeftRef;
+    let bottomRightRef;
+    let topRef;
+    let leftRef;
+    let heightRef;
+    let widthRef;
 
     if (this.estructuraOn) {
       [fila, columna] = this.calcularFilaColumna(event.offsetX, event.offsetY);
@@ -445,6 +469,17 @@ export class InformeEditComponent implements OnInit {
       const bottomRightModulo = this.estructuraMatrix[fila][columna];
       const bottomLeftModulo = this.estructuraMatrix[fila][columna - 1];
 
+      if (columna == this.planta.columnas) {
+        topLeftRef = this.estructuraMatrix[fila - 1][columna - 2];
+        bottomLeftRef = this.estructuraMatrix[fila][columna - 2];
+        topRightRef = topLeftModulo;
+        bottomRightRef = bottomLeftModulo;
+      } else {
+        topLeftRef = topRightModulo;
+        bottomLeftRef = bottomRightModulo;
+        topRightRef = this.estructuraMatrix[fila - 1][columna + 1];
+        bottomRightRef = this.estructuraMatrix[fila][columna + 1];
+      }
       top = topLeftModulo.y;
       left = topLeftModulo.x;
       height =
@@ -460,6 +495,17 @@ export class InformeEditComponent implements OnInit {
           topLeftModulo.x +
           bottomRightModulo.x -
           bottomLeftModulo.x);
+
+      // Ref
+      topRef = topLeftRef.y;
+      leftRef = topLeftRef.x;
+      heightRef =
+        0.5 *
+        (-topLeftRef.y + bottomLeftRef.y - topRightRef.y + bottomRightRef.y);
+
+      widthRef =
+        0.5 *
+        (topRightRef.x - topLeftRef.x + bottomRightRef.x - bottomLeftRef.x);
     } else {
       fila = 0;
       columna = 1;
@@ -468,6 +514,11 @@ export class InformeEditComponent implements OnInit {
       left = event.offsetX - this.squareWidth / 2;
       height = this.squareHeight;
       width = this.squareWidth;
+
+      leftRef = left + width;
+      topRef = top;
+      widthRef = width;
+      heightRef = height;
     }
 
     this.localIdCount += 1;
@@ -486,13 +537,13 @@ export class InformeEditComponent implements OnInit {
     });
 
     const actObjRef = new fabric.Rect({
-      left: left + width,
-      top: top,
+      left: leftRef + widthRef * this.rectRefReduction,
+      top: topRef + heightRef * this.rectRefReduction,
       fill: "rgba(0,0,0,0)",
       stroke: "blue",
       strokeWidth: 1,
-      width: width,
-      height: height,
+      width: widthRef * (1 - this.rectRefReduction),
+      height: heightRef * (1 - this.rectRefReduction),
       hasControls: true,
       local_id: this.localIdCount,
       ref: true,
@@ -505,19 +556,7 @@ export class InformeEditComponent implements OnInit {
 
     const actObjRawCoords = this.transformActObjToRaw(actObj);
     const actObjRefRawCoords = this.transformActObjToRaw(actObjRef);
-    // const act_obj_raw = new fabric.Rect({
-    //   left: actObjRawCoords.left,
-    //   top: actObjRawCoords.top,
-    //   fill: 'rgba(0,0,0,0)',
-    //   stroke: 'red',
-    //   strokeWidth: 1,
-    //   hasControls: false,
-    //   width: actObjRawCoords.width,
-    //   height: actObjRawCoords.height,
-    //   local_id: this.localIdCount
-    // });
-    // this.canvas2.add(act_obj_raw);
-    // this.canvas2.setActiveObject(act_obj_raw);
+
     let globalX;
     let globalY;
     let modulo_;
@@ -883,7 +922,6 @@ export class InformeEditComponent implements OnInit {
         this.drawPcInCanvas(pc);
       }
     }
-    this.canvas.discardActiveObject();
 
     // Añadir Estructura
     this.informeService
@@ -918,13 +956,45 @@ export class InformeEditComponent implements OnInit {
     }
 
     // Poner imagen del pc
-    // // Obtener el indice de la imagen
+
     const sliderValue = this.fileList.indexOf(pc.archivo);
+    if (sliderValue === this.rangeValue - 1) {
+      this.canvas.getObjects().forEach(object => {
+        if (object.isType("rect")) {
+          object.set(
+            "strokeWidth",
+            object.local_id === this.selected_pc.local_id
+              ? this._selectedStrokeWidth
+              : 1
+          );
+          object.set(
+            "selectable",
+            object.local_id === this.selected_pc.local_id
+          );
+
+          if (!object.ref) {
+            // Si no es referencia
+            if (object.local_id === this.selected_pc.local_id) {
+              // this.canvas.setActiveObject(object);
+            }
+            object.set(
+              "stroke",
+              object.local_id === this.selected_pc.local_id ? "white" : "red"
+            );
+          }
+        }
+      });
+
+      this.canvas.renderAll();
+    } else {
+      this.rangeValue = sliderValue + 1;
+      this.setImageFromRangeValue(this.rangeValue);
+    }
+
     // // Sumar 1 y cambiar la imagen
-    this.setImageFromRangeValue(sliderValue + 1);
 
     // Cambiar el 'value' del input slider
-    this.rangeValue = sliderValue + 1;
+
     // Dibujar pc dentro de la imagen (recuadro y triangulo)
     // transformar coordenadas a rotated
     // const rotatedPcCoords = this.transformCoordsToRotated(pc.img_x, pc.img_y);
@@ -1041,18 +1111,16 @@ export class InformeEditComponent implements OnInit {
       hasRotatingPoint: false
     });
 
-    // this.canvas2.add(rect2);
-    // this.canvas2.setActiveObject(rect2);
-
     const transformedRect = this.transformActObjToRotated(rect2);
     const transformedRectRef = this.transformActObjToRotated(rectRef2);
-    const strokWidth = pc === this.selected_pc ? this._selectedStrokeWidth : 1;
+    const strokWidth =
+      pc.local_id === this.selected_pc.local_id ? this._selectedStrokeWidth : 1;
 
     const rect = new fabric.Rect({
       left: transformedRect.left,
       top: transformedRect.top,
       fill: "rgba(0,0,0,0)",
-      stroke: pc === this.selected_pc ? "white" : "red",
+      stroke: pc.local_id === this.selected_pc.local_id ? "white" : "red",
       strokeWidth: strokWidth,
       hasControls: true,
       width: transformedRect.width - strokWidth,
@@ -1068,19 +1136,20 @@ export class InformeEditComponent implements OnInit {
       stroke: "blue",
       strokeWidth: strokWidth,
       hasControls: true,
-      width: transformedRectRef.width - strokWidth,
-      height: transformedRectRef.height - strokWidth,
+      width:
+        (transformedRectRef.width - strokWidth) * (1 - this.rectRefReduction),
+      height:
+        (transformedRectRef.height - strokWidth) * (1 - this.rectRefReduction),
       local_id: pc.local_id,
       ref: true,
-      selectable: pc === this.selected_pc
+      selectable: pc.local_id === this.selected_pc.local_id
     });
-
-    if (pc === this.selected_pc) {
-      this.canvas.setActiveObject(rect);
-    }
 
     this.canvas.add(rect);
     this.canvas.add(rectRef);
+    if (pc.local_id === this.selected_pc.local_id) {
+      this.canvas.setActiveObject(rect);
+    }
   }
 
   onClickFlightsCheckbox(event) {
@@ -1154,8 +1223,8 @@ export class InformeEditComponent implements OnInit {
       this.estructuraMatrix[i] = new Array(estructura.columnas + 1);
     }
 
-    // 1 - Obtenemos la ecuacion de los cuatro lados
-    // [0, 1, 2, 3]; // [tl, tr, br, bl] el poligono tiene 4 esquinas
+    // 1 - Obtenemos coords (x,y) de los cuatro lados
+    // [0, 1, 2, 3] == [tl, tr, br, bl] el poligono tiene 4 esquinas
 
     let p2: any;
     for (let i = 0; i < 4; i++) {
@@ -1169,12 +1238,15 @@ export class InformeEditComponent implements OnInit {
         numeroDivisiones = estructura.columnas;
         this.estructuraMatrix[0][0] = p1;
       } else if (i === 1) {
+        // top-right
         numeroDivisiones = estructura.filas;
         this.estructuraMatrix[0][estructura.columnas] = p1;
       } else if (i === 2) {
+        // bottom-right
         numeroDivisiones = estructura.columnas;
         this.estructuraMatrix[estructura.filas][estructura.columnas] = p1;
       } else if (i === 3) {
+        // bottom-left
         numeroDivisiones = estructura.filas;
         this.estructuraMatrix[estructura.filas][0] = p1;
         // si la esquina es la numero 3 (bottom-left)
