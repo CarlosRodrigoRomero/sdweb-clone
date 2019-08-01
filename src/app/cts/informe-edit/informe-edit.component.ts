@@ -1,25 +1,25 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { InformeService } from "src/app/services/informe.service";
-import { PcService } from "src/app/services/pc.service";
-import { PlantaService } from "src/app/services/planta.service";
-import { InformeInterface } from "src/app/models/informe";
-import { PlantaInterface } from "src/app/models/planta";
-import { PcInterface } from "src/app/models/pc";
-import { ActivatedRoute, Router } from "@angular/router";
-import { GLOBAL } from "../../services/global";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { InformeService } from 'src/app/services/informe.service';
+import { PcService } from 'src/app/services/pc.service';
+import { PlantaService } from 'src/app/services/planta.service';
+import { InformeInterface } from 'src/app/models/informe';
+import { PlantaInterface } from 'src/app/models/planta';
+import { PcInterface } from 'src/app/models/pc';
+import { ActivatedRoute, Router } from '@angular/router';
+import { GLOBAL } from '../../services/global';
 
-import "fabric";
-import { take, map } from "rxjs/operators";
-import { Estructura } from "../../models/estructura";
-import { AgmMap } from "@agm/core";
-import { ModuloInterface } from "../../models/modulo";
+import 'fabric';
+import { take, map } from 'rxjs/operators';
+import { Estructura } from '../../models/estructura';
+import { AgmMap } from '@agm/core';
+import { ModuloInterface } from '../../models/modulo';
 declare let fabric;
 declare const google: any;
 
 @Component({
-  selector: "app-informe-edit",
-  templateUrl: "./informe-edit.component.html",
-  styleUrls: ["./informe-edit.component.css"],
+  selector: 'app-informe-edit',
+  templateUrl: './informe-edit.component.html',
+  styleUrls: ['./informe-edit.component.css'],
   providers: [InformeService, PlantaService, PcService]
 })
 export class InformeEditComponent implements OnInit {
@@ -94,7 +94,7 @@ export class InformeEditComponent implements OnInit {
     private plantaService: PlantaService,
     private pcService: PcService
   ) {
-    this.mapType = "satellite";
+    this.mapType = 'satellite';
     this.defaultZoom = 18;
 
     this.localIdCount = 0;
@@ -108,7 +108,7 @@ export class InformeEditComponent implements OnInit {
 
     this.url = GLOBAL.url;
     this.current_gps_correction = 0;
-    this.currentFlight = "1";
+    this.currentFlight = '1';
     this.current_gps_lng = -5.880743;
     this.current_gps_lat = 39.453186;
     this.current_track_heading = 0;
@@ -125,7 +125,7 @@ export class InformeEditComponent implements OnInit {
 
     this.allPcs = new Array<PcInterface>();
     this.estructura = <Estructura>{
-      filename: "",
+      filename: '',
       coords: []
     };
     this.polygonList = [];
@@ -133,11 +133,11 @@ export class InformeEditComponent implements OnInit {
 
   ngOnInit() {
     this.getInforme();
-    this.canvas = new fabric.Canvas("mainCanvas");
+    this.canvas = new fabric.Canvas('mainCanvas');
 
-    this.canvas.on("mouse:up", options => {
+    this.canvas.on('mouse:up', options => {
       if (options.target !== null) {
-        if (options.target.hasOwnProperty("local_id")) {
+        if (options.target.hasOwnProperty('local_id')) {
           const selectedPc = this.allPcs.find(
             item => item.local_id === options.target.local_id
           );
@@ -147,8 +147,8 @@ export class InformeEditComponent implements OnInit {
       }
     });
 
-    this.canvas.on("object:modified", options => {
-      if (options.target.type === "rect") {
+    this.canvas.on('object:modified', options => {
+      if (options.target.type === 'rect') {
         const actObjRaw = this.transformActObjToRaw(options.target);
         this.selectPcFromLocalId(options.target.local_id);
 
@@ -186,7 +186,7 @@ export class InformeEditComponent implements OnInit {
 
     // Get HS img coords and draw triangle
     if (actObj !== null && actObj !== undefined) {
-      if (actObj.get("type") === "rect" && actObj.isMoving === true) {
+      if (actObj.get('type') === 'rect' && actObj.isMoving === true) {
         const actObjRaw = this.transformActObjToRaw(actObj);
         // const max_temp = this.getMaxTempInActObj(actObj);
         // this.selected_pc.temperaturaMax = max_temp.max_temp;
@@ -369,7 +369,7 @@ export class InformeEditComponent implements OnInit {
     const triangle = new fabric.Triangle({
       width: this.squareBase,
       height: this.squareBase,
-      fill: "red",
+      fill: 'red',
       left: Math.round(x - this.squareBase / 2),
       top: y + 2, // si no ponemos este 2, entonces no lee bien debajo del triangulo
       selectable: false
@@ -430,7 +430,7 @@ export class InformeEditComponent implements OnInit {
         {
           // scaleX: this.canvas.width / image.width,
           // scaleY: this.canvas.height / image.height,
-          crossOrigin: "anonymous",
+          crossOrigin: 'anonymous',
           angle: this.current_image_rotation,
           left: leftAndTop.left,
           top: leftAndTop.top,
@@ -524,8 +524,8 @@ export class InformeEditComponent implements OnInit {
     const actObj = new fabric.Rect({
       left: left,
       top: top,
-      fill: "rgba(0,0,0,0)",
-      stroke: "red",
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'red',
       strokeWidth: 1,
       width: width,
       height: height,
@@ -538,8 +538,8 @@ export class InformeEditComponent implements OnInit {
     const actObjRef = new fabric.Rect({
       left: leftRef + widthRef * this.rectRefReduction,
       top: topRef + heightRef * this.rectRefReduction,
-      fill: "rgba(0,0,0,0)",
-      stroke: "blue",
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'blue',
       strokeWidth: 1,
       width: widthRef * (1 - this.rectRefReduction),
       height: heightRef * (1 - this.rectRefReduction),
@@ -566,7 +566,7 @@ export class InformeEditComponent implements OnInit {
     });
 
     const newPc: PcInterface = {
-      id: "",
+      id: '',
       archivo: this.currentFileName,
       tipo: 8, // tipo (celula caliente por defecto)
       local_x: columna, // local_x
@@ -587,7 +587,7 @@ export class InformeEditComponent implements OnInit {
       informeId: this.informe.id,
       datetime: this.current_datetime,
       resuelto: false,
-      color: "black",
+      color: 'black',
       refTop: actObjRefRawCoords.top,
       refLeft: actObjRefRawCoords.left,
       refHeight: actObjRefRawCoords.height,
@@ -596,10 +596,10 @@ export class InformeEditComponent implements OnInit {
     };
 
     if (this.selected_pc) {
-      this.selected_pc.color = "black";
+      this.selected_pc.color = 'black';
       if (
         this.selected_pc.archivo === newPc.archivo &&
-        this.planta.tipo === "2 ejes"
+        this.planta.tipo === '2 ejes'
       ) {
         newPc.global_x = this.selected_pc.global_x;
         newPc.global_y = this.selected_pc.global_y;
@@ -615,7 +615,7 @@ export class InformeEditComponent implements OnInit {
     const actObj = this.canvas.getActiveObject();
 
     if (actObj !== null && actObj !== undefined) {
-      if (actObj.get("type") === "rect") {
+      if (actObj.get('type') === 'rect') {
         // const actObjRaw = this.transformActObjToRaw(actObj);
         this.selectPcFromLocalId(actObj.local_id);
         // actObj.set("stroke", "green");
@@ -693,7 +693,7 @@ export class InformeEditComponent implements OnInit {
 
         this.filasEstructura = this.planta.filas;
         // this.columnasEstructura = this.planta.columnas;
-        if (this.planta.tipo !== "2 ejes") {
+        if (this.planta.tipo !== '2 ejes') {
           this.columnasEstructura = 6; // temporal
         } else {
           this.columnasEstructura = this.planta.columnas;
@@ -712,15 +712,15 @@ export class InformeEditComponent implements OnInit {
   }
 
   getInforme() {
-    const informeId = this.route.snapshot.paramMap.get("id");
+    const informeId = this.route.snapshot.paramMap.get('id');
     // this.route.params.forEach((params: Params) => {
     //   const id = params['id'];
 
     this.informeService.getInforme(informeId).subscribe(
       response => {
         if (!response) {
-          this.router.navigate(["/"]);
-          console.log("errorrr 1");
+          this.router.navigate(['/']);
+          console.log('errorrr 1');
         } else {
           this.informe = response;
           // this.min_temp = this.informe.tempMin;
@@ -739,7 +739,7 @@ export class InformeEditComponent implements OnInit {
             .subscribe(
               response2 => {
                 if (!response2) {
-                  this.alertMessage = "No hay archivos";
+                  this.alertMessage = 'No hay archivos';
                 } else {
                   this.flights_data = response2;
                   this.flights_list = Object.keys(this.flights_data);
@@ -786,7 +786,7 @@ export class InformeEditComponent implements OnInit {
   }
 
   filterPcsByFlight(currentFlight: string) {
-    if (typeof this.allPcs !== "undefined") {
+    if (typeof this.allPcs !== 'undefined') {
       return this.allPcs.filter(x => x.vuelo === currentFlight);
     }
   }
@@ -798,7 +798,7 @@ export class InformeEditComponent implements OnInit {
         take(1),
         map(pcList => {
           pcList.map(pc => {
-            pc.color = "black";
+            pc.color = 'black';
             return pc;
           });
           return pcList;
@@ -807,7 +807,7 @@ export class InformeEditComponent implements OnInit {
       .subscribe(
         response => {
           if (!response || response.length === 0) {
-            this.alertMessage = "No hay puntos calientes";
+            this.alertMessage = 'No hay puntos calientes';
           } else {
             this.alertMessage = null;
             this.allPcs = response;
@@ -857,12 +857,12 @@ export class InformeEditComponent implements OnInit {
   }
 
   getDateTimeFromDateAndTime(date: string, time: string) {
-    const dateSplitted = date.split(".");
+    const dateSplitted = date.split('.');
     const year = parseInt(dateSplitted[2], 10);
     const month = parseInt(dateSplitted[1], 10);
     const day = parseInt(dateSplitted[0], 10);
 
-    const timeSplitted = time.split(":");
+    const timeSplitted = time.split(':');
     const hours = parseInt(timeSplitted[0], 10);
     const minutes = parseInt(timeSplitted[1], 10);
     const seconds = parseInt(timeSplitted[2], 10);
@@ -940,11 +940,11 @@ export class InformeEditComponent implements OnInit {
 
   onMapMarkerClick(pc: PcInterface, fetchPcs = false) {
     if (this.selected_pc !== pc && this.selected_pc) {
-      this.selected_pc.color = "black";
+      this.selected_pc.color = 'black';
     }
     // Cambiar el color del marker
     this.selected_pc = pc;
-    this.selected_pc.color = "white";
+    this.selected_pc.color = 'white';
 
     if (pc.vuelo !== this.currentFlight) {
       this.changeFlight(pc.vuelo);
@@ -959,15 +959,15 @@ export class InformeEditComponent implements OnInit {
     const sliderValue = this.fileList.indexOf(pc.archivo);
     if (sliderValue === this.rangeValue - 1) {
       this.canvas.getObjects().forEach(object => {
-        if (object.isType("rect")) {
+        if (object.isType('rect')) {
           object.set(
-            "strokeWidth",
+            'strokeWidth',
             object.local_id === this.selected_pc.local_id
               ? this._selectedStrokeWidth
               : 1
           );
           object.set(
-            "selectable",
+            'selectable',
             object.local_id === this.selected_pc.local_id
           );
 
@@ -977,8 +977,8 @@ export class InformeEditComponent implements OnInit {
               // this.canvas.setActiveObject(object);
             }
             object.set(
-              "stroke",
-              object.local_id === this.selected_pc.local_id ? "white" : "red"
+              'stroke',
+              object.local_id === this.selected_pc.local_id ? 'white' : 'red'
             );
           }
         }
@@ -1059,7 +1059,7 @@ export class InformeEditComponent implements OnInit {
 
   onClickLocalCoordsTable(selectedPc: PcInterface, f: number, c: number) {
     if (this.selected_pc === selectedPc) {
-      if (this.planta.tipo === "2 ejes") {
+      if (this.planta.tipo === '2 ejes') {
         this.selected_pc.local_x = c;
         this.selected_pc.local_y = f;
       } else {
@@ -1086,8 +1086,8 @@ export class InformeEditComponent implements OnInit {
     const rect2 = new fabric.Rect({
       left: pc.img_left,
       top: pc.img_top,
-      fill: "rgba(0,0,0,0)",
-      stroke: "red",
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'red',
       strokeWidth: 1,
       hasControls: false,
       width: pc.img_width,
@@ -1099,8 +1099,8 @@ export class InformeEditComponent implements OnInit {
     const rectRef2 = new fabric.Rect({
       left: pc.refLeft,
       top: pc.refTop,
-      fill: "rgba(0,0,0,0)",
-      stroke: "red",
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'red',
       strokeWidth: 1,
       hasControls: false,
       width: pc.refWidth,
@@ -1118,8 +1118,8 @@ export class InformeEditComponent implements OnInit {
     const rect = new fabric.Rect({
       left: transformedRect.left,
       top: transformedRect.top,
-      fill: "rgba(0,0,0,0)",
-      stroke: pc.local_id === this.selected_pc.local_id ? "white" : "red",
+      fill: 'rgba(0,0,0,0)',
+      stroke: pc.local_id === this.selected_pc.local_id ? 'white' : 'red',
       strokeWidth: strokWidth,
       hasControls: true,
       width: transformedRect.width - strokWidth,
@@ -1131,8 +1131,8 @@ export class InformeEditComponent implements OnInit {
     const rectRef = new fabric.Rect({
       left: transformedRectRef.left,
       top: transformedRectRef.top,
-      fill: "rgba(0,0,0,0)",
-      stroke: "blue",
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'blue',
       strokeWidth: strokWidth,
       hasControls: true,
       width:
@@ -1172,7 +1172,7 @@ export class InformeEditComponent implements OnInit {
     this.rangeValue += 1;
   }
   onClickEstructura() {
-    console.log("buildingEstructura", this.buildingEstructura);
+    console.log('buildingEstructura', this.buildingEstructura);
   }
 
   onClickBuildEstructura(event) {
@@ -1188,7 +1188,7 @@ export class InformeEditComponent implements OnInit {
           left: event.offsetX - 1,
           top: event.offsetY - 1,
           radius: 2,
-          fill: "red",
+          fill: 'red',
           selectable: false
         })
       );
@@ -1216,7 +1216,7 @@ export class InformeEditComponent implements OnInit {
   }
 
   getAllPointsEstructura(estructura) {
-    // crear array[fila][columna]
+    // crear estructuraMatrix[fila][columna]
     this.estructuraMatrix = [];
     for (let i = 0; i < estructura.filas + 1; i++) {
       this.estructuraMatrix[i] = new Array(estructura.columnas + 1);
@@ -1258,60 +1258,51 @@ export class InformeEditComponent implements OnInit {
 
       // Para dividir el segmento por Tales, elegimos el eje x o el eje y
       // segun nos convenga
+      if (i === 0 || i === 2) { // Calcular las divisiones de las rectas paralelas
+      let eje: string;
       if (Math.abs(p1.x - p2.x) > Math.abs(p1.y - p2.y)) {
         // utilizamos el eje x.
-
-        const x0 = Math.min(p1.x, p2.x);
-        const distancia = Math.abs(p1.x - p2.x) / numeroDivisiones;
-
-        for (let div = 1; div < numeroDivisiones; div++) {
-          const x = x0 + div * distancia;
-          const point = { x: Math.round(x), y: Math.round(m * x + b) };
-          let y_: number;
-          let x_: number;
-          if (i === 0) {
-            y_ = 0;
-            x_ = div;
-          } else if (i === 1) {
-            y_ = div;
-            x_ = estructura.columnas;
-          } else if (i === 2) {
-            y_ = estructura.filas;
-            x_ = div;
-          } else if (i === 3) {
-            y_ = div;
-            x_ = 0;
-          }
-
-          this.estructuraMatrix[y_][x_] = point;
-        }
+        eje = 'x';
       } else {
-        const y0 = Math.min(p1.y, p2.y);
-        const distancia = Math.abs(p1.y - p2.y) / numeroDivisiones;
+          eje = 'y';
+        }
 
-        for (let div = 1; div < numeroDivisiones; div++) {
-          const y = y0 + div * distancia;
-          const point = { x: Math.round((y - b) / m), y: Math.round(y) };
+      const x0 = Math.min(p1[eje], p2[eje]);
+      const distancia = Math.abs(p1[eje] - p2[eje]) / numeroDivisiones;
+
+      for (let div = 1; div < numeroDivisiones; div++) {
+          const x = x0 + div * distancia;
+
           let y_: number;
           let x_: number;
-          if (i === 0) {
+          if (i === 0) { // top-left
             y_ = 0;
             x_ = div;
-          } else if (i === 1) {
-            y_ = div;
-            x_ = estructura.columnas;
-          } else if (i === 2) {
+          } else if (i === 2) { // bottom-right
             y_ = estructura.filas;
             x_ = div;
-          } else if (i === 3) {
-            y_ = div;
-            x_ = 0;
           }
-
-          this.estructuraMatrix[y_][x_] = point;
+          if (eje === 'x') {
+            this.estructuraMatrix[y_][x_] = { x: Math.round(x), y: Math.round(m * x + b) };
+          } else {
+            this.estructuraMatrix[y_][x_] = { x: Math.round((x - b) / m), y: Math.round(x) };;
+          }
         }
       }
-    }
+      }
+       // Calcular las divisiones de lados no paralelos
+        // 1. Calcular el punto medio de tl-tr
+        // const pm = {x:  this.estructuraMatrix[0][estructura.columnas].x - this.estructuraMatrix[0][0].x,
+        //             Y: }
+
+
+        // 2. Trazar una recta vertical/horizontal con las 'f' subdivisiones iguales (f=filas)
+
+        // 3. Bucle: para cada fila
+        // // recta que une el punto medio con la subdivision f
+        // // punto intereseccion de dicha recta con el lado no paralelo
+        // // paralela a la division paralela que pase por el punto anterior
+
 
     // 2 - Obtener puntos interseccion de las lineas rectas
 
@@ -1344,10 +1335,11 @@ export class InformeEditComponent implements OnInit {
       }
     }
 
-    this.dibujarEstructuraMatrix(this.estructuraMatrix);
+
+this.dibujarEstructuraMatrix(this.estructuraMatrix);
   }
 
-  dibujarEstructuraMatrix(estructuraMatrix: any[]) {
+dibujarEstructuraMatrix(estructuraMatrix: any[]) {
     estructuraMatrix.forEach(fila => {
       fila.forEach(punto => {
         this.canvas.add(
@@ -1355,14 +1347,14 @@ export class InformeEditComponent implements OnInit {
             left: punto.x - 1,
             top: punto.y - 1,
             radius: 2,
-            fill: "red",
+            fill: 'red',
             selectable: false
           })
         );
       });
     });
 
-    this.canvas.on("object:moving", options => {
+    this.canvas.on('object:moving', options => {
       if (this.estructuraOn && options.target.ref === false) {
         const puntoDistMin = this.getPointDistanciaMin(
           options.pointer.x,
@@ -1377,7 +1369,7 @@ export class InformeEditComponent implements OnInit {
     });
   }
 
-  getPointDistanciaMin(x: number, y: number, estructuraMatrix: any[]) {
+getPointDistanciaMin(x: number, y: number, estructuraMatrix: any[]) {
     let distanciaMinima = 99999;
     let puntoDistanciaMin;
 
@@ -1404,7 +1396,7 @@ export class InformeEditComponent implements OnInit {
     return puntoDistanciaMin;
   }
 
-  calcularFilaColumna(x: number, y: number) {
+calcularFilaColumna(x: number, y: number) {
     let distanciaMinima = 999999;
     let columnaDistMin;
     let filaDistMin;
@@ -1437,7 +1429,7 @@ export class InformeEditComponent implements OnInit {
     return [filaDistMin, columnaDistMin];
   }
 
-  updateEstructura(event) {
+updateEstructura(event) {
     this.onClickDeleteEstructura();
     this.estructura.filas = this.filasEstructura;
     this.estructura.columnas = this.columnasEstructura;
@@ -1447,18 +1439,18 @@ export class InformeEditComponent implements OnInit {
     this.setImageFromRangeValue(this.rangeValue);
   }
 
-  getPolygonList(plantaId: string) {
+getPolygonList(plantaId: string) {
     this.plantaService.getLocationsArea(plantaId).subscribe(items => {
       this.polygonList = [];
       items.forEach(locationArea => {
         this.map._mapsWrapper
           .createPolygon({
             paths: locationArea.path,
-            strokeColor: "#FF0000",
+            strokeColor: '#FF0000',
             visible: false,
             strokeOpacity: 0,
             strokeWeight: 0,
-            fillColor: "grey",
+            fillColor: 'grey',
             fillOpacity: 0,
             editable: false,
             draggable: false,
@@ -1474,7 +1466,7 @@ export class InformeEditComponent implements OnInit {
     });
   }
 
-  recalcularLocs() {
+recalcularLocs() {
     this.allPcs.forEach(pc => {
       let globalX;
       let globalY;
@@ -1488,10 +1480,10 @@ export class InformeEditComponent implements OnInit {
     });
   }
 
-  getGlobalCoordsFromLocationArea(coords: any) {
+getGlobalCoordsFromLocationArea(coords: any) {
     const latLng = new google.maps.LatLng(coords.lat, coords.lng);
-    let globalX = "";
-    let globalY = "";
+    let globalX = '';
+    let globalY = '';
     let modulo: ModuloInterface = {};
 
     for (let i = 0; i < this.polygonList.length; i++) {
@@ -1505,7 +1497,7 @@ export class InformeEditComponent implements OnInit {
           globalY = this.polygonList[i].globalY;
         }
 
-        if (this.polygonList[i].hasOwnProperty("modulo")) {
+        if (this.polygonList[i].hasOwnProperty('modulo')) {
           if (this.polygonList[i].modulo !== undefined) {
             modulo = this.polygonList[i].modulo;
           }
@@ -1516,9 +1508,9 @@ export class InformeEditComponent implements OnInit {
     return [globalX, globalY, modulo];
   }
 
-  private pathJoin(parts: string[], sep = "\\") {
-    const separator = sep || "\\";
-    let replace = new RegExp(separator + "{1,}", "g");
+  private pathJoin(parts: string[], sep = '\\') {
+    const separator = sep || '\\';
+    let replace = new RegExp(separator + '{1,}', 'g');
     const result = parts.join(separator).replace(replace, separator);
     return result;
   }
