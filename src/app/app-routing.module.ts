@@ -12,6 +12,7 @@ import { VideoComponent } from "./cts/video/video.component";
 import { AutoLocComponent } from "./cts/auto-loc/auto-loc.component";
 import { PlantaAddComponent } from "./cts/planta-add/planta-add.component";
 import { InformeAddComponent } from "./cts/informe-add/informe-add.component";
+import { PlantaEditComponent } from './cts/planta-edit/planta-edit.component';
 
 const routes: Routes = [
   {
@@ -93,6 +94,11 @@ const routes: Routes = [
       {
         path: "planta-add",
         component: PlantaAddComponent,
+        canActivate: [AuthGuard]
+      },
+      {
+        path: "planta-edit/:plantaId",
+        component: PlantaEditComponent,
         canActivate: [AuthGuard]
       },
       {

@@ -1,0 +1,120 @@
+<div class="container">
+  <div class="col-12 example-container">
+    Value: {{ form.value | json }}
+    <hr />
+    <form class="formContainer" [formGroup]="form" (ngSubmit)="submitForm()">
+      <mat-form-field style="display: none">
+        <input matInput formControlName="id" placeholder="id" />
+      </mat-form-field>
+      <mat-form-field>
+        <input
+          matInput
+          formControlName="nombre"
+          placeholder="Nombre de la planta"
+        />
+      </mat-form-field>
+
+      <mat-form-field>
+        <input
+          matInput
+          type="number"
+          formControlName="latitud"
+          placeholder="Latitud GPS"
+        />
+      </mat-form-field>
+
+      <mat-form-field>
+        <input
+          matInput
+          type="number"
+          formControlName="longitud"
+          placeholder="Longitud GPS"
+        />
+      </mat-form-field>
+
+      <mat-radio-group formControlName="tipo" aria-label="Tipo">
+        <mat-radio-button value="fija">Fija</mat-radio-button>
+        <mat-radio-button value="1 ejes">1 eje</mat-radio-button>
+        <mat-radio-button value="2 ejes">2 ejes</mat-radio-button>
+      </mat-radio-group>
+
+      <mat-form-field>
+        <input
+          matInput
+          type="number"
+          formControlName="potencia"
+          placeholder="Potencia (MW)"
+        />
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput formControlName="empresa" placeholder="Empresa (id)" />
+      </mat-form-field>
+
+      <mat-form-field>
+        <input
+          matInput
+          type="number"
+          formControlName="filas"
+          placeholder="Filas"
+        />
+      </mat-form-field>
+
+      <mat-form-field>
+        <input
+          matInput
+          type="number"
+          formControlName="columnas"
+          placeholder="Columnas"
+        />
+      </mat-form-field>
+      <mat-form-field>
+        <input
+          matInput
+          type="number"
+          formControlName="num_modulos"
+          placeholder="Número de módulos"
+        />
+      </mat-form-field>
+
+      <mat-form-field *ngIf="planta">
+        <mat-label>Módulos</mat-label>
+        <mat-select formControlName="modulos" multiple>
+          <mat-option *ngFor="let modulo of allModulos" [value]="modulo.id"
+            >{{ modulo.marca }} {{ modulo.modelo }} ({{
+              modulo.potencia
+            }}
+            W)</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+
+      <mat-radio-group
+        formControlName="vertical"
+        aria-label="Modulos orientados verticalmente"
+      >
+        <mat-radio-button [value]="true">Vertical</mat-radio-button>
+        <mat-radio-button [value]="false">Horizontal</mat-radio-button>
+      </mat-radio-group>
+
+      <button
+        mat-button
+        color="primary"
+        type="submit"
+        [disabled]="form.invalid"
+      >
+        Actualizar
+      </button>
+
+      <!-- <mat-form-field>
+          <mat-radio-group formControlName="tipo" placeholder="Tipo">
+            <mat-radio-button value="fija">fija</mat-radio-button>
+            <mat-radio-button value="2 ejes">2 ejes</mat-radio-button>
+            <mat-radio-button value="1 ejes">1 eje</mat-radio-button>
+          </mat-radio-group>
+        </mat-form-field> -->
+    </form>
+
+    <div *ngIf="success">Planta actualizada</div>
+  </div>
+</div>

@@ -81,11 +81,11 @@
         </div>
         <div class="pc-details-derecha-item-tabla">
           <span class="text-center"><strong>Columna</strong></span>
-          <span class="text-center">{{ pc.local_x }}</span>
+          <span class="text-center">{{ getEtiquetaLocalX(pc.local_x) }}</span>
         </div>
         <div class="pc-details-derecha-item-tabla">
           <span class="text-center"><strong>Fila</strong></span>
-          <span class="text-center">{{ pc.local_y }}</span>
+          <span class="text-center">{{ getEtiquetaLocalY(pc.local_y) }}</span>
         </div>
       </div>
 
@@ -103,11 +103,11 @@
         </div>
         <div class="pc-details-derecha-item-tabla">
           <span class="text-center"><strong>Columna</strong></span>
-          <span class="text-center">{{ pc.local_x }}</span>
+          <span class="text-center">{{ getEtiquetaLocalX(pc.local_x) }}</span>
         </div>
         <div class="pc-details-derecha-item-tabla">
           <span class="text-center"><strong>Altura</strong></span>
-          <span class="text-center">{{ getAltura(pc.local_y) }}</span>
+          <span class="text-center">{{ getEtiquetaLocalY(pc.local_y) }}</span>
         </div>
       </ng-template>
     </div>
@@ -120,6 +120,22 @@
         <span>{{ pc.datetime * 1000 | date: "dd/MM/yyyy HH:mm" }}</span>
       </div>
     </div>
+
+    <div *ngIf="checkHasModule(pc)" class="pc-details-derecha-item">
+      <div class="pc-details-derecha-icon">
+        <i class="far fa-square"></i>
+      </div>
+      <div class="pc-texto">
+        <span class="detail-title">Módulo: </span>
+        <span
+          >{{ pc.modulo.marca }} {{ pc.modulo.modelo }} ({{
+            pc.modulo.potencia
+          }}
+          W)</span
+        >
+      </div>
+    </div>
+
     <div class="pc-details-derecha-item">
       <div class="pc-details-derecha-icon">
         <i class="fas fa-sun"></i>

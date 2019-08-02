@@ -6,7 +6,7 @@ import {
 } from "@angular/fire/firestore";
 import { Observable } from "rxjs";
 import { InformeInterface } from "../models/informe";
-import { map, take } from "rxjs/operators";
+import { map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { HttpHeaders } from "@angular/common/http";
 import { GLOBAL } from "./global";
@@ -81,14 +81,6 @@ export class InformeService {
       { headers: header }
     );
   }
-
-  // getImage(carpeta: string, fileName: string): Observable<any> {
-  //   const header = new HttpHeaders({
-  //     'Content-Type' : 'application/json'
-  //   });
-
-  //   return this.http.get(this.url + '/get-image2/' + encodeURIComponent(carpeta) + '/' + fileName, {headers: header});
-  // }
 
   getImageUrl(carpeta: string, currentFlight: string, fileName: string) {
     const response =

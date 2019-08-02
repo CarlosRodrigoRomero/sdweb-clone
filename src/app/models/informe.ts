@@ -6,12 +6,9 @@ export interface InformeInterface {
   hora_fin?: any;
   temperatura?: number;
   irradiancia?: number;
-  tempMediaModulos?: number;
   velocidad?: number;
-  carpeta?: string;
   carpetaBase?: string;
   mae?: number;
-  tempLimite?: number;
   alturaVuelo?: number;
   nubosidad?: number;
   numeroModulos?: number;
@@ -19,4 +16,11 @@ export interface InformeInterface {
   emisividad?: number;
   tempReflejada?: number;
   disponible?: boolean;
+  rangeMin?: number;
+  rangeMax?: number;
+  distancia?: number;
+  prefijo?: string;
+  viento?: string;
+  correccHoraSrt?: number;
+  humedadRelativa?: number;
 }

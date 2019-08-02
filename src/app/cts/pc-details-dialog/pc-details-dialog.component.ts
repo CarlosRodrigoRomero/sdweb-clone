@@ -562,4 +562,27 @@ export class PcDetailsDialogComponent implements OnInit {
   checkIsNaN(item: any) {
     return Number.isNaN(item);
   }
+
+  checkHasModule(pc: PcInterface) {
+    if (pc.modulo && pc.modulo !== undefined) {
+      return pc.modulo.hasOwnProperty("potencia");
+    }
+    return false;
+  }
+
+  getEtiquetaLocalX(localX: number) {
+    if (this.planta.hasOwnProperty("etiquetasLocalX")) {
+      return this.planta.etiquetasLocalX[localX - 1];
+    }
+    return localX;
+  }
+  getEtiquetaLocalY(localY: number) {
+    if (this.planta.hasOwnProperty("etiquetasLocalY")) {
+      if (this.planta.alturaBajaPrimero) {
+        return this.planta.etiquetasLocalY[localY - 1];
+      }
+      return this.planta.etiquetasLocalY[this.planta.filas - localY];
+    }
+    return this.getAltura(localY);
+  }
 }

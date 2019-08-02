@@ -2,27 +2,39 @@ import { Injectable } from "@angular/core";
 import {
   AngularFirestore,
   AngularFirestoreDocument,
-  AngularFirestoreCollection
+  AngularFirestoreCollection,
+
 } from "@angular/fire/firestore";
 import { PlantaInterface } from "src/app/models/planta";
-import { Observable } from "rxjs";
+import { Observable, BehaviorSubject } from "rxjs";
 import { map } from "rxjs/operators";
 import { LocationAreaInterface } from "../models/location";
-import { GLOBAL } from "./global";
+
 import { UserInterface } from "../models/user";
+import { ModuloInterface } from "../models/modulo";
+import * as firebase from 'firebase/app';
+
 
 @Injectable({
   providedIn: "root"
 })
 export class PlantaService {
   public itemDoc: AngularFirestoreDocument<PlantaInterface>;
-  private plantas: Observable<PlantaInterface[]>;
+  public plantas: Observable<PlantaInterface[]>;
   public planta: Observable<PlantaInterface>;
   private plantaDoc: AngularFirestoreDocument<PlantaInterface>;
   public plantasCollection: AngularFirestoreCollection<PlantaInterface>;
+  public modulos: ModuloInterface[];
+  private filteredLocAreasSource = new BehaviorSubject<LocationAreaInterface[]>(
+    new Array<LocationAreaInterface>()
+  );
+  public currentFilteredLocAreas$ = this.filteredLocAreasSource.asObservable();
 
   constructor(private afs: AngularFirestore) {
-    this.plantas = afs.collection("plantas").valueChanges();
+    // this.plantas = afs.collection("plantas").valueChanges();
+    this.getModulos().subscribe(modulos => {
+      this.modulos = modulos;
+    });
   }
 
   getPlanta(id: string) {
@@ -39,6 +51,11 @@ export class PlantaService {
         }
       })
     ));
+  }
+
+  updatePlanta(planta: PlantaInterface) {
+    const plantaDoc = this.afs.doc(`plantas/${planta.id}`);
+    plantaDoc.update(planta);
   }
 
   getPlantas() {
@@ -63,13 +80,21 @@ export class PlantaService {
       .collection("locationAreas")
       .doc(id)
       .set(locationArea);
+
+    return locationArea;
   }
 
-  updateLocationArea(locationArea: LocationAreaInterface) {
+  updateLocationArea(locArea: LocationAreaInterface) {
     const LocAreaDoc = this.afs.doc(
-      `plantas/${locationArea.plantaId}/locationAreas/${locationArea.id}`
+      `plantas/${locArea.plantaId}/locationAreas/${locArea.id}`
     );
-    LocAreaDoc.update(locationArea);
+    if (!locArea.hasOwnProperty('modulo')) {
+      LocAreaDoc.update({
+        modulo: firebase.firestore.FieldValue.delete()
+    });
+    }
+    LocAreaDoc.update(locArea);
+
   }
 
   delLocationArea(locationArea: LocationAreaInterface) {
@@ -100,7 +125,7 @@ export class PlantaService {
     return result;
   }
 
-  getPlantasDeEmpresa(user: UserInterface) {
+  getPlantasDeEmpresa(user: UserInterface): Observable<PlantaInterface[]> {
     let query$: AngularFirestoreCollection<PlantaInterface>;
     if (user.role === 1) {
       query$ = this.afs.collection<PlantaInterface>("plantas");
@@ -114,6 +139,33 @@ export class PlantaService {
       map(actions =>
         actions.map(a => {
           const data = a.payload.doc.data() as PlantaInterface;
+          data.id = a.payload.doc.id;
+          return data;
+        })
+      )
+    );
+  }
+
+  getModulosPlanta(planta: PlantaInterface): ModuloInterface[] {
+    if (planta.hasOwnProperty('modulos')) {
+      if (planta.modulos.length > 0) {
+        return this.modulos.filter(item => {
+          return planta.modulos.indexOf(item.id) >= 0;
+        });
+      }
+    }
+    return this.modulos;
+  }
+
+  getModulos(): Observable<ModuloInterface[]> {
+    let query$: AngularFirestoreCollection<ModuloInterface>;
+
+    query$ = this.afs.collection<ModuloInterface>("modulos");
+
+    return query$.snapshotChanges().pipe(
+      map(actions =>
+        actions.map(a => {
+          const data = a.payload.doc.data() as ModuloInterface;
           data.id = a.payload.doc.id;
           return data;
         })

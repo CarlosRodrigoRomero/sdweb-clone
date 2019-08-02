@@ -1,4 +1,4 @@
-import { InformeInterface } from './informe';
+import { InformeInterface } from "./informe";
 
 export interface PlantaInterface {
   id?: string;
@@ -20,4 +20,7 @@ export interface PlantaInterface {
   alturaBajaPrimero?: boolean;
   moduloPotencia?: number;
   informes?: InformeInterface[];
+  modulos: string[];
+  etiquetasLocalX: string[];
+  etiquetasLocalY: string[];
 }

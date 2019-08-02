@@ -75,6 +75,7 @@ import { AutoLocComponent } from "./cts/auto-loc/auto-loc.component";
 import { PlantaListComponent } from "./cts/planta-list/planta-list.component";
 import { PlantaAddComponent } from './cts/planta-add/planta-add.component';
 import { InformeAddComponent } from './cts/informe-add/informe-add.component';
+import { PlantaEditComponent } from './cts/planta-edit/planta-edit.component';
 
 @NgModule({
   declarations: [
@@ -100,7 +101,8 @@ import { InformeAddComponent } from './cts/informe-add/informe-add.component';
     PlantaListComponent,
     AutoLocComponent,
     PlantaAddComponent,
-    InformeAddComponent
+    InformeAddComponent,
+    PlantaEditComponent
   ],
   entryComponents: [PcDetailsDialogComponent],
   imports: [

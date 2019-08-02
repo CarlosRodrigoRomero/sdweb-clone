@@ -123,4 +123,8 @@ export class PcListComponent implements OnInit {
   checkIsNaN(item: any) {
     return Number.isNaN(item);
   }
+
+  getPerdidas(tipoPc: number) {
+    return GLOBAL.pcPerdidas[tipoPc];
+  }
 }

@@ -3,11 +3,8 @@
     Value: {{ form?.value | json }}
     <hr />
     <ng-container *ngIf="this.planta">
+      <h3>{{ planta.nombre }}</h3>
       <form class="formContainer" [formGroup]="form" (ngSubmit)="submitForm()">
-        <mat-form-field>
-          <input matInput formControlName="plantaId" placeholder="Planta" />
-        </mat-form-field>
-
         <mat-form-field>
           <input
             matInput
@@ -37,8 +34,47 @@
         <mat-form-field>
           <input
             matInput
-            formControlName="carpeta"
-            placeholder="Carpeta imagenes jpg gray"
+            type="number"
+            formControlName="tempReflejada"
+            placeholder="Temperatura Reflejada (ºC)"
+          />
+        </mat-form-field>
+
+        <mat-form-field>
+          <input
+            matInput
+            formControlName="prefijo"
+            placeholder="Prefijo nombre de archivos"
+          />
+        </mat-form-field>
+
+        <mat-form-field>
+          <input
+            matInput
+            type="number"
+            formControlName="temperatura"
+            placeholder="Temperatura ambiente (ºC)"
+          />
+        </mat-form-field>
+
+        <mat-form-field>
+          <input
+            matInput
+            type="number"
+            formControlName="humedadRelativa"
+            placeholder="Humedad Relativa (menor que 1)"
+          />
+        </mat-form-field>
+
+        <mat-form-field>
+          <input matInput formControlName="viento" placeholder="Viento" />
+        </mat-form-field>
+
+        <mat-form-field>
+          <input
+            matInput
+            formControlName="nubosidad"
+            placeholder="Nubosidad (octavas)"
           />
         </mat-form-field>
 
@@ -50,12 +86,16 @@
           />
         </mat-form-field>
 
+        <!-- <mat-form-field>
+          <mat-checkbox formControlName="disponible">Disponible</mat-checkbox>
+        </mat-form-field> -->
+
         <mat-form-field>
           <input
             matInput
             type="number"
-            formControlName="alturaVuelo"
-            placeholder="Altura de vuelo"
+            formControlName="emisividad"
+            placeholder="Emisividad"
           />
         </mat-form-field>
 
@@ -72,6 +112,15 @@
           <input
             matInput
             type="number"
+            formControlName="alturaVuelo"
+            placeholder="Altura de vuelo"
+          />
+        </mat-form-field>
+
+        <mat-form-field>
+          <input
+            matInput
+            type="number"
             formControlName="correccHoraSrt"
             placeholder="Correccion hora SRT"
           />
@@ -81,8 +130,8 @@
           <input
             matInput
             type="number"
-            formControlName="emisividad"
-            placeholder="Emisividad"
+            formControlName="rangeMin"
+            placeholder="rangeMin"
           />
         </mat-form-field>
 
@@ -90,8 +139,8 @@
           <input
             matInput
             type="number"
-            formControlName="tempReflejada"
-            placeholder="Temperatura Reflejada (ºC)"
+            formControlName="rangeMax"
+            placeholder="rangeMax"
           />
         </mat-form-field>
 
@@ -99,21 +148,9 @@
           <input
             matInput
             type="number"
-            formControlName="temperatura"
-            placeholder="Temperatura ambiente (ºC)"
+            formControlName="distancia"
+            placeholder="distancia"
           />
-        </mat-form-field>
-
-        <mat-form-field>
-          <input
-            matInput
-            formControlName="nubosidad"
-            placeholder="Nubosidad (octavas)"
-          />
-        </mat-form-field>
-
-        <mat-form-field>
-          <input matInput formControlName="viento" placeholder="Viento" />
         </mat-form-field>
 
         <button

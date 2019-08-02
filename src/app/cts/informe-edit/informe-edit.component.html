@@ -190,7 +190,7 @@
                         }"
                         (click)="onClickLocalCoordsTable(selected_pc, f, c)"
                       >
-                        {{ f }}
+                        {{ f }}/{{ c }}
                       </div>
                       <ng-template #dosejes>
                         <div
@@ -204,7 +204,7 @@
                           }"
                           (click)="onClickLocalCoordsTable(selected_pc, f, c)"
                         >
-                          {{ f }}
+                          {{ f }}/{{ c }}
                         </div>
                       </ng-template>
                     </td>
@@ -520,7 +520,19 @@
             type="number"
             id="squareBase"
             maxlength="2"
-            size="25"
+            size="20"
+            (change)="setSquareBase()"
+          />
+          <br />
+          <span>SqProp</span>
+          <input
+            style="width: 3rem;"
+            *ngIf="selected_pc"
+            [(ngModel)]="squareProp"
+            type="number"
+            id="squareProp"
+            maxlength="2"
+            size="20"
             (change)="setSquareBase()"
           />
           <br />
@@ -551,7 +563,7 @@
       </div>
     </div>
 
-    <!--     <div class="row">
+    <!--     <div class="ow">
          <div class="col col-xs-6">
            <br>Sq [left,top]: [<span id="square_left"></span>,
            <span id="square_top"></span>]
@@ -569,7 +581,7 @@
           <th>Tipo</th>
           <th>Global</th>
           <th>Local</th>
-          <th>Temp</th>
+          <th>Modulo</th>
           <th>Del</th>
         </tr>
 
@@ -585,7 +597,7 @@
           <th>{{ pc.global_x }}, {{ pc.global_y }}</th>
           <th>{{ pc.local_x }}, {{ pc.local_y }}</th>
 
-          <th>{{ pc.temperaturaMax }}</th>
+          <th>{{ pc.modulo.potencia }} W</th>
           <th>
             <button
               type="button"
