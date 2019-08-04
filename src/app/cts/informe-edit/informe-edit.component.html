@@ -114,13 +114,11 @@
               [(ngModel)]="filasEstructura"
               type="number"
               id="filasEstructura"
-              (change)="updateEstructura($event)"
             />
             <input
               [(ngModel)]="columnasEstructura"
               type="number"
               id="columnasEstructura"
-              (change)="updateEstructura($event)"
             />
           </div>
         </div>
@@ -589,7 +587,14 @@
           style="cursor:  pointer"
           (click)="onMapMarkerClick(pc)"
           *ngFor="let pc of filterPcsByFlight(currentFlight)"
-          [ngClass]="{ pc_seleccionado: selected_pc === pc }"
+          [ngClass]="{
+            pc_seleccionado: selected_pc === pc,
+            pc_error:
+              pc.tipo !== 0 &&
+              pc.tipo !== 4 &&
+              (pc.local_x === 0 || pc.local_y === 0),
+            pc_error_loc: pc.global_x.length === 0 && pc.global_y.length === 0
+          }"
         >
           <th>{{ pc.local_id }} ({{ pc.vuelo }})</th>
           <!-- <th> {{pc.archivo}}</th> -->

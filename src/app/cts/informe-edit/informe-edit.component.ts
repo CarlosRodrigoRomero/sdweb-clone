@@ -1,25 +1,30 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { InformeService } from 'src/app/services/informe.service';
-import { PcService } from 'src/app/services/pc.service';
-import { PlantaService } from 'src/app/services/planta.service';
-import { InformeInterface } from 'src/app/models/informe';
-import { PlantaInterface } from 'src/app/models/planta';
-import { PcInterface } from 'src/app/models/pc';
-import { ActivatedRoute, Router } from '@angular/router';
-import { GLOBAL } from '../../services/global';
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { InformeService } from "src/app/services/informe.service";
+import { PcService } from "src/app/services/pc.service";
+import { PlantaService } from "src/app/services/planta.service";
+import { InformeInterface } from "src/app/models/informe";
+import { PlantaInterface } from "src/app/models/planta";
+import { PcInterface } from "src/app/models/pc";
+import { ActivatedRoute, Router } from "@angular/router";
+import { GLOBAL } from "../../services/global";
 
-import 'fabric';
-import { take, map } from 'rxjs/operators';
-import { Estructura } from '../../models/estructura';
-import { AgmMap } from '@agm/core';
-import { ModuloInterface } from '../../models/modulo';
+import "fabric";
+import { take, map } from "rxjs/operators";
+import { Estructura } from "../../models/estructura";
+import { AgmMap } from "@agm/core";
+import { ModuloInterface } from "../../models/modulo";
 declare let fabric;
 declare const google: any;
 
+export interface Punto {
+  x: number;
+  y: number;
+}
+
 @Component({
-  selector: 'app-informe-edit',
-  templateUrl: './informe-edit.component.html',
-  styleUrls: ['./informe-edit.component.css'],
+  selector: "app-informe-edit",
+  templateUrl: "./informe-edit.component.html",
+  styleUrls: ["./informe-edit.component.css"],
   providers: [InformeService, PlantaService, PcService]
 })
 export class InformeEditComponent implements OnInit {
@@ -94,7 +99,7 @@ export class InformeEditComponent implements OnInit {
     private plantaService: PlantaService,
     private pcService: PcService
   ) {
-    this.mapType = 'satellite';
+    this.mapType = "satellite";
     this.defaultZoom = 18;
 
     this.localIdCount = 0;
@@ -108,7 +113,7 @@ export class InformeEditComponent implements OnInit {
 
     this.url = GLOBAL.url;
     this.current_gps_correction = 0;
-    this.currentFlight = '1';
+    this.currentFlight = "1";
     this.current_gps_lng = -5.880743;
     this.current_gps_lat = 39.453186;
     this.current_track_heading = 0;
@@ -125,7 +130,7 @@ export class InformeEditComponent implements OnInit {
 
     this.allPcs = new Array<PcInterface>();
     this.estructura = <Estructura>{
-      filename: '',
+      filename: "",
       coords: []
     };
     this.polygonList = [];
@@ -133,11 +138,11 @@ export class InformeEditComponent implements OnInit {
 
   ngOnInit() {
     this.getInforme();
-    this.canvas = new fabric.Canvas('mainCanvas');
+    this.canvas = new fabric.Canvas("mainCanvas");
 
-    this.canvas.on('mouse:up', options => {
+    this.canvas.on("mouse:up", options => {
       if (options.target !== null) {
-        if (options.target.hasOwnProperty('local_id')) {
+        if (options.target.hasOwnProperty("local_id")) {
           const selectedPc = this.allPcs.find(
             item => item.local_id === options.target.local_id
           );
@@ -147,8 +152,8 @@ export class InformeEditComponent implements OnInit {
       }
     });
 
-    this.canvas.on('object:modified', options => {
-      if (options.target.type === 'rect') {
+    this.canvas.on("object:modified", options => {
+      if (options.target.type === "rect") {
         const actObjRaw = this.transformActObjToRaw(options.target);
         this.selectPcFromLocalId(options.target.local_id);
 
@@ -186,7 +191,7 @@ export class InformeEditComponent implements OnInit {
 
     // Get HS img coords and draw triangle
     if (actObj !== null && actObj !== undefined) {
-      if (actObj.get('type') === 'rect' && actObj.isMoving === true) {
+      if (actObj.get("type") === "rect" && actObj.isMoving === true) {
         const actObjRaw = this.transformActObjToRaw(actObj);
         // const max_temp = this.getMaxTempInActObj(actObj);
         // this.selected_pc.temperaturaMax = max_temp.max_temp;
@@ -369,7 +374,7 @@ export class InformeEditComponent implements OnInit {
     const triangle = new fabric.Triangle({
       width: this.squareBase,
       height: this.squareBase,
-      fill: 'red',
+      fill: "red",
       left: Math.round(x - this.squareBase / 2),
       top: y + 2, // si no ponemos este 2, entonces no lee bien debajo del triangulo
       selectable: false
@@ -430,7 +435,7 @@ export class InformeEditComponent implements OnInit {
         {
           // scaleX: this.canvas.width / image.width,
           // scaleY: this.canvas.height / image.height,
-          crossOrigin: 'anonymous',
+          crossOrigin: "anonymous",
           angle: this.current_image_rotation,
           left: leftAndTop.left,
           top: leftAndTop.top,
@@ -467,8 +472,7 @@ export class InformeEditComponent implements OnInit {
       const topRightModulo = this.estructuraMatrix[fila - 1][columna];
       const bottomRightModulo = this.estructuraMatrix[fila][columna];
       const bottomLeftModulo = this.estructuraMatrix[fila][columna - 1];
-
-      if (columna == this.planta.columnas) {
+      if (columna == this.estructura.columnas) {
         topLeftRef = this.estructuraMatrix[fila - 1][columna - 2];
         bottomLeftRef = this.estructuraMatrix[fila][columna - 2];
         topRightRef = topLeftModulo;
@@ -479,8 +483,9 @@ export class InformeEditComponent implements OnInit {
         topRightRef = this.estructuraMatrix[fila - 1][columna + 1];
         bottomRightRef = this.estructuraMatrix[fila][columna + 1];
       }
-      top = topLeftModulo.y;
-      left = topLeftModulo.x;
+
+      top = 0.5 * (topLeftModulo.y + topRightModulo.y);
+      left = 0.5 * (topLeftModulo.x + bottomLeftModulo.x);
       height =
         0.5 *
         (-topLeftModulo.y +
@@ -495,16 +500,11 @@ export class InformeEditComponent implements OnInit {
           bottomRightModulo.x -
           bottomLeftModulo.x);
 
-      // Ref
-      topRef = topLeftRef.y;
-      leftRef = topLeftRef.x;
-      heightRef =
-        0.5 *
-        (-topLeftRef.y + bottomLeftRef.y - topRightRef.y + bottomRightRef.y);
-
-      widthRef =
-        0.5 *
-        (topRightRef.x - topLeftRef.x + bottomRightRef.x - bottomLeftRef.x);
+      //   Ref
+      topRef = Math.max(topLeftRef.y, topRightRef.y);
+      leftRef = Math.max(topLeftRef.x, bottomLeftRef.x);
+      heightRef = Math.min(bottomLeftRef.y, bottomRightRef.y) - topRef;
+      widthRef = Math.min(topRightRef.x, bottomRightRef.x) - leftRef;
     } else {
       fila = 0;
       columna = 1;
@@ -524,8 +524,8 @@ export class InformeEditComponent implements OnInit {
     const actObj = new fabric.Rect({
       left: left,
       top: top,
-      fill: 'rgba(0,0,0,0)',
-      stroke: 'red',
+      fill: "rgba(0,0,0,0)",
+      stroke: "red",
       strokeWidth: 1,
       width: width,
       height: height,
@@ -538,8 +538,8 @@ export class InformeEditComponent implements OnInit {
     const actObjRef = new fabric.Rect({
       left: leftRef + widthRef * this.rectRefReduction,
       top: topRef + heightRef * this.rectRefReduction,
-      fill: 'rgba(0,0,0,0)',
-      stroke: 'blue',
+      fill: "rgba(0,0,0,0)",
+      stroke: "blue",
       strokeWidth: 1,
       width: widthRef * (1 - this.rectRefReduction),
       height: heightRef * (1 - this.rectRefReduction),
@@ -566,7 +566,7 @@ export class InformeEditComponent implements OnInit {
     });
 
     const newPc: PcInterface = {
-      id: '',
+      id: "",
       archivo: this.currentFileName,
       tipo: 8, // tipo (celula caliente por defecto)
       local_x: columna, // local_x
@@ -587,7 +587,7 @@ export class InformeEditComponent implements OnInit {
       informeId: this.informe.id,
       datetime: this.current_datetime,
       resuelto: false,
-      color: 'black',
+      color: "black",
       refTop: actObjRefRawCoords.top,
       refLeft: actObjRefRawCoords.left,
       refHeight: actObjRefRawCoords.height,
@@ -596,10 +596,10 @@ export class InformeEditComponent implements OnInit {
     };
 
     if (this.selected_pc) {
-      this.selected_pc.color = 'black';
+      this.selected_pc.color = "black";
       if (
         this.selected_pc.archivo === newPc.archivo &&
-        this.planta.tipo === '2 ejes'
+        this.planta.tipo === "2 ejes"
       ) {
         newPc.global_x = this.selected_pc.global_x;
         newPc.global_y = this.selected_pc.global_y;
@@ -615,7 +615,7 @@ export class InformeEditComponent implements OnInit {
     const actObj = this.canvas.getActiveObject();
 
     if (actObj !== null && actObj !== undefined) {
-      if (actObj.get('type') === 'rect') {
+      if (actObj.get("type") === "rect") {
         // const actObjRaw = this.transformActObjToRaw(actObj);
         this.selectPcFromLocalId(actObj.local_id);
         // actObj.set("stroke", "green");
@@ -693,7 +693,7 @@ export class InformeEditComponent implements OnInit {
 
         this.filasEstructura = this.planta.filas;
         // this.columnasEstructura = this.planta.columnas;
-        if (this.planta.tipo !== '2 ejes') {
+        if (this.planta.tipo !== "2 ejes") {
           this.columnasEstructura = 6; // temporal
         } else {
           this.columnasEstructura = this.planta.columnas;
@@ -712,15 +712,15 @@ export class InformeEditComponent implements OnInit {
   }
 
   getInforme() {
-    const informeId = this.route.snapshot.paramMap.get('id');
+    const informeId = this.route.snapshot.paramMap.get("id");
     // this.route.params.forEach((params: Params) => {
     //   const id = params['id'];
 
     this.informeService.getInforme(informeId).subscribe(
       response => {
         if (!response) {
-          this.router.navigate(['/']);
-          console.log('errorrr 1');
+          this.router.navigate(["/"]);
+          console.log("errorrr 1");
         } else {
           this.informe = response;
           // this.min_temp = this.informe.tempMin;
@@ -739,7 +739,7 @@ export class InformeEditComponent implements OnInit {
             .subscribe(
               response2 => {
                 if (!response2) {
-                  this.alertMessage = 'No hay archivos';
+                  this.alertMessage = "No hay archivos";
                 } else {
                   this.flights_data = response2;
                   this.flights_list = Object.keys(this.flights_data);
@@ -786,7 +786,7 @@ export class InformeEditComponent implements OnInit {
   }
 
   filterPcsByFlight(currentFlight: string) {
-    if (typeof this.allPcs !== 'undefined') {
+    if (typeof this.allPcs !== "undefined") {
       return this.allPcs.filter(x => x.vuelo === currentFlight);
     }
   }
@@ -798,7 +798,7 @@ export class InformeEditComponent implements OnInit {
         take(1),
         map(pcList => {
           pcList.map(pc => {
-            pc.color = 'black';
+            pc.color = "black";
             return pc;
           });
           return pcList;
@@ -807,7 +807,7 @@ export class InformeEditComponent implements OnInit {
       .subscribe(
         response => {
           if (!response || response.length === 0) {
-            this.alertMessage = 'No hay puntos calientes';
+            this.alertMessage = "No hay puntos calientes";
           } else {
             this.alertMessage = null;
             this.allPcs = response;
@@ -857,12 +857,12 @@ export class InformeEditComponent implements OnInit {
   }
 
   getDateTimeFromDateAndTime(date: string, time: string) {
-    const dateSplitted = date.split('.');
+    const dateSplitted = date.split(".");
     const year = parseInt(dateSplitted[2], 10);
     const month = parseInt(dateSplitted[1], 10);
     const day = parseInt(dateSplitted[0], 10);
 
-    const timeSplitted = time.split(':');
+    const timeSplitted = time.split(":");
     const hours = parseInt(timeSplitted[0], 10);
     const minutes = parseInt(timeSplitted[1], 10);
     const seconds = parseInt(timeSplitted[2], 10);
@@ -882,6 +882,10 @@ export class InformeEditComponent implements OnInit {
   setImageFromRangeValue(value) {
     value = parseInt(value, 10);
     this.buildingEstructura = false;
+    this.estructura = <Estructura>{
+      filename: "",
+      coords: []
+    };
     if (this.rangeValue !== value) {
       this.rangeValue = value;
     }
@@ -940,11 +944,11 @@ export class InformeEditComponent implements OnInit {
 
   onMapMarkerClick(pc: PcInterface, fetchPcs = false) {
     if (this.selected_pc !== pc && this.selected_pc) {
-      this.selected_pc.color = 'black';
+      this.selected_pc.color = "black";
     }
     // Cambiar el color del marker
     this.selected_pc = pc;
-    this.selected_pc.color = 'white';
+    this.selected_pc.color = "white";
 
     if (pc.vuelo !== this.currentFlight) {
       this.changeFlight(pc.vuelo);
@@ -959,15 +963,15 @@ export class InformeEditComponent implements OnInit {
     const sliderValue = this.fileList.indexOf(pc.archivo);
     if (sliderValue === this.rangeValue - 1) {
       this.canvas.getObjects().forEach(object => {
-        if (object.isType('rect')) {
+        if (object.isType("rect")) {
           object.set(
-            'strokeWidth',
+            "strokeWidth",
             object.local_id === this.selected_pc.local_id
               ? this._selectedStrokeWidth
               : 1
           );
           object.set(
-            'selectable',
+            "selectable",
             object.local_id === this.selected_pc.local_id
           );
 
@@ -977,8 +981,8 @@ export class InformeEditComponent implements OnInit {
               // this.canvas.setActiveObject(object);
             }
             object.set(
-              'stroke',
-              object.local_id === this.selected_pc.local_id ? 'white' : 'red'
+              "stroke",
+              object.local_id === this.selected_pc.local_id ? "white" : "red"
             );
           }
         }
@@ -1012,7 +1016,13 @@ export class InformeEditComponent implements OnInit {
       this.canvas.remove(this.oldTriangle);
     }
 
-    // TODO Eliminamos el pc del canvas
+    // Eliminamos el pc del canvas
+    this.canvas.getObjects().forEach(object => {
+      if (object.local_id === pc.local_id) {
+        this.canvas.remove(object);
+      }
+    });
+
     // Elimminamos el pc de la lista
     const index: number = this.allPcs.indexOf(pc);
     if (index !== -1) {
@@ -1059,7 +1069,7 @@ export class InformeEditComponent implements OnInit {
 
   onClickLocalCoordsTable(selectedPc: PcInterface, f: number, c: number) {
     if (this.selected_pc === selectedPc) {
-      if (this.planta.tipo === '2 ejes') {
+      if (this.planta.tipo === "2 ejes") {
         this.selected_pc.local_x = c;
         this.selected_pc.local_y = f;
       } else {
@@ -1086,8 +1096,8 @@ export class InformeEditComponent implements OnInit {
     const rect2 = new fabric.Rect({
       left: pc.img_left,
       top: pc.img_top,
-      fill: 'rgba(0,0,0,0)',
-      stroke: 'red',
+      fill: "rgba(0,0,0,0)",
+      stroke: "red",
       strokeWidth: 1,
       hasControls: false,
       width: pc.img_width,
@@ -1099,8 +1109,8 @@ export class InformeEditComponent implements OnInit {
     const rectRef2 = new fabric.Rect({
       left: pc.refLeft,
       top: pc.refTop,
-      fill: 'rgba(0,0,0,0)',
-      stroke: 'red',
+      fill: "rgba(0,0,0,0)",
+      stroke: "red",
       strokeWidth: 1,
       hasControls: false,
       width: pc.refWidth,
@@ -1118,8 +1128,8 @@ export class InformeEditComponent implements OnInit {
     const rect = new fabric.Rect({
       left: transformedRect.left,
       top: transformedRect.top,
-      fill: 'rgba(0,0,0,0)',
-      stroke: pc.local_id === this.selected_pc.local_id ? 'white' : 'red',
+      fill: "rgba(0,0,0,0)",
+      stroke: pc.local_id === this.selected_pc.local_id ? "white" : "red",
       strokeWidth: strokWidth,
       hasControls: true,
       width: transformedRect.width - strokWidth,
@@ -1131,8 +1141,8 @@ export class InformeEditComponent implements OnInit {
     const rectRef = new fabric.Rect({
       left: transformedRectRef.left,
       top: transformedRectRef.top,
-      fill: 'rgba(0,0,0,0)',
-      stroke: 'blue',
+      fill: "rgba(0,0,0,0)",
+      stroke: "blue",
       strokeWidth: strokWidth,
       hasControls: true,
       width:
@@ -1172,7 +1182,7 @@ export class InformeEditComponent implements OnInit {
     this.rangeValue += 1;
   }
   onClickEstructura() {
-    console.log('buildingEstructura', this.buildingEstructura);
+    console.log("buildingEstructura", this.buildingEstructura);
   }
 
   onClickBuildEstructura(event) {
@@ -1188,7 +1198,7 @@ export class InformeEditComponent implements OnInit {
           left: event.offsetX - 1,
           top: event.offsetY - 1,
           radius: 2,
-          fill: 'red',
+          fill: "red",
           selectable: false
         })
       );
@@ -1216,20 +1226,20 @@ export class InformeEditComponent implements OnInit {
   }
 
   getAllPointsEstructura(estructura) {
-    // crear estructuraMatrix[fila][columna]
     this.estructuraMatrix = [];
     for (let i = 0; i < estructura.filas + 1; i++) {
       this.estructuraMatrix[i] = new Array(estructura.columnas + 1);
     }
 
+    let ladosEstructura = [];
+
     // 1 - Obtenemos coords (x,y) de los cuatro lados
     // [0, 1, 2, 3] == [tl, tr, br, bl] el poligono tiene 4 esquinas
 
-    let p2: any;
     for (let i = 0; i < 4; i++) {
       // para cada esquina ...
       const p1 = estructura.coords[i];
-      p2 = estructura.coords[i + 1];
+      let p2 = estructura.coords[i + 1];
 
       let numeroDivisiones: number;
       if (i === 0) {
@@ -1248,70 +1258,147 @@ export class InformeEditComponent implements OnInit {
         // bottom-left
         numeroDivisiones = estructura.filas;
         this.estructuraMatrix[estructura.filas][0] = p1;
-        // si la esquina es la numero 3 (bottom-left)
+        // si la esquina es la numero 3 (bottom-left), entonces p2 es top-left
         p2 = estructura.coords[0];
       }
 
       // Obtenemos la ecuacion de la recta (y = mx+b)
+
       const m = (p2.y - p1.y) / (p2.x - p1.x);
-      const b = p2.y - m * p2.x;
+      const b = isFinite(m) ? p2.y - m * p2.x : p1.x;
 
-      // Para dividir el segmento por Tales, elegimos el eje x o el eje y
-      // segun nos convenga
-      if (i === 0 || i === 2) { // Calcular las divisiones de las rectas paralelas
-      let eje: string;
-      if (Math.abs(p1.x - p2.x) > Math.abs(p1.y - p2.y)) {
-        // utilizamos el eje x.
-        eje = 'x';
-      } else {
-          eje = 'y';
-        }
+      ladosEstructura[i] = [m, b];
+    }
 
-      const x0 = Math.min(p1[eje], p2[eje]);
-      const distancia = Math.abs(p1[eje] - p2[eje]) / numeroDivisiones;
+    // Creamos estas variables auxiliars más faciles de manejar
+    const bl = this.estructuraMatrix[estructura.filas][0];
+    const br = this.estructuraMatrix[estructura.filas][estructura.columnas];
+    const tl = this.estructuraMatrix[0][0];
+    const tr = this.estructuraMatrix[0][estructura.columnas];
 
-      for (let div = 1; div < numeroDivisiones; div++) {
-          const x = x0 + div * distancia;
+    // 2 - Hayar los puntos de intersección de los lados no contiguos 'pf1' y 'pf2' (pf=punto de fuga)
+    const pf1 = this.interseccionRectas(
+      ladosEstructura[0][0],
+      ladosEstructura[0][1],
+      ladosEstructura[2][0],
+      ladosEstructura[2][1]
+    );
 
-          let y_: number;
-          let x_: number;
-          if (i === 0) { // top-left
-            y_ = 0;
-            x_ = div;
-          } else if (i === 2) { // bottom-right
-            y_ = estructura.filas;
-            x_ = div;
-          }
-          if (eje === 'x') {
-            this.estructuraMatrix[y_][x_] = { x: Math.round(x), y: Math.round(m * x + b) };
-          } else {
-            this.estructuraMatrix[y_][x_] = { x: Math.round((x - b) / m), y: Math.round(x) };;
-          }
-        }
-      }
-      }
-       // Calcular las divisiones de lados no paralelos
-        // 1. Calcular el punto medio de tl-tr
-        // const pm = {x:  this.estructuraMatrix[0][estructura.columnas].x - this.estructuraMatrix[0][0].x,
-        //             Y: }
+    const pf2 = this.interseccionRectas(
+      ladosEstructura[1][0],
+      ladosEstructura[1][1],
+      ladosEstructura[3][0],
+      ladosEstructura[3][1]
+    );
 
+    // 3 - Hallar Recta1 que pasa por pf1 y pf2 (linea de tierra).
+    const [r1_m, r1_b] = this.rectaPor2Puntos(pf1, pf2);
 
-        // 2. Trazar una recta vertical/horizontal con las 'f' subdivisiones iguales (f=filas)
+    // 4 - Hallar Recta2 paralela a Recta1 y que paso por un punto interno a la estructura
+    const pInterno = {
+      x: (Math.max(tl.x, bl.x) + Math.min(tr.x, br.x)) * 0.5,
+      y: (Math.max(tl.y, tr.y) + Math.min(br.y, bl.y)) * 0.5
+    };
+    const r2_m = r1_m;
+    const r2_b = pInterno.y - r2_m * pInterno.x;
 
-        // 3. Bucle: para cada fila
-        // // recta que une el punto medio con la subdivision f
-        // // punto intereseccion de dicha recta con el lado no paralelo
-        // // paralela a la division paralela que pase por el punto anterior
+    // 5 - Hallar interseccion de Recta2 con lado superior (p0), lado derecho (p1), lado inferior (p2) y lado izquierdo(p3)
+    const p0 = this.interseccionRectas(
+      r2_m,
+      r2_b,
+      ladosEstructura[0][0],
+      ladosEstructura[0][1]
+    );
+    const p1 = this.interseccionRectas(
+      r2_m,
+      r2_b,
+      ladosEstructura[1][0],
+      ladosEstructura[1][1]
+    );
+    const p2 = this.interseccionRectas(
+      r2_m,
+      r2_b,
+      ladosEstructura[2][0],
+      ladosEstructura[2][1]
+    );
+    const p3 = this.interseccionRectas(
+      r2_m,
+      r2_b,
+      ladosEstructura[3][0],
+      ladosEstructura[3][1]
+    );
 
+    // 6a - Para cada filas
+    // 6a.1 Dividir en f=filas partes iguales el segmento p0-p2
+    const divFilas = Math.abs(p0.x - p2.x) / estructura.filas;
+    for (let fila = 1; fila < estructura.filas; fila++) {
+      // 6a.2 Hallar Recta3 interseccion de dicho punto con pf1
+      const sentido = p0.x > p2.x ? -1 : 1;
 
-    // 2 - Obtener puntos interseccion de las lineas rectas
+      const xDiv = p0.x + sentido * fila * divFilas;
+      const yDiv = xDiv * r2_m + r2_b;
+      const pDiv = { x: xDiv, y: yDiv };
+
+      const [r3_m, r3_b] = this.rectaPor2Puntos(pf1, pDiv);
+
+      // 6a.2 Hallar interseccion de Recta3 con lado izquierdo (p5) y lado derecho (p6)
+      const p5 = this.interseccionRectas(
+        r3_m,
+        r3_b,
+        ladosEstructura[3][0],
+        ladosEstructura[3][1]
+      );
+      const p6 = this.interseccionRectas(
+        r3_m,
+        r3_b,
+        ladosEstructura[1][0],
+        ladosEstructura[1][1]
+      );
+
+      // const filaAux = p0.y < p2.y ? fila : estructura.filas - fila;
+
+      this.estructuraMatrix[fila][0] = p5;
+      this.estructuraMatrix[fila][estructura.columnas] = p6;
+    }
+
+    // 6b - Para cada columna
+    // 6b.1 Dividir en c=columnas partes iguales el segmento p1-p3
+    const divColumnas = Math.abs(p1.x - p3.x) / estructura.columnas;
+    for (let col = 1; col < estructura.columnas; col++) {
+      // 6b.2 Hallar Recta4 interseccion de dicho punto con pf2
+      const sentido = p3.x > p1.x ? -1 : 1;
+
+      const xDiv = p3.x + sentido * col * divColumnas;
+      const yDiv = xDiv * r2_m + r2_b;
+      const pDiv = { x: xDiv, y: yDiv };
+
+      const [r4_m, r4_b] = this.rectaPor2Puntos(pf2, pDiv);
+      // 6b.2 Hallar interseccion de Recta4 con lado inferior (p7) y lado superior (p8)
+      const p7 = this.interseccionRectas(
+        r4_m,
+        r4_b,
+        ladosEstructura[2][0],
+        ladosEstructura[2][1]
+      );
+      const p8 = this.interseccionRectas(
+        r4_m,
+        r4_b,
+        ladosEstructura[0][0],
+        ladosEstructura[0][1]
+      );
+
+      this.estructuraMatrix[0][col] = p8;
+      this.estructuraMatrix[estructura.filas][col] = p7;
+    }
+
+    // 7 - Obtener puntos interseccion de las lineas rectas
 
     for (let col = 1; col < estructura.columnas; col++) {
       // obtener la recta
       const p1a = this.estructuraMatrix[0][col];
       const p2a = this.estructuraMatrix[estructura.filas][col];
-      const ma = (p2a.y - p1a.y) / (p2a.x - p1a.x);
-      const ba = p2a.y - ma * p2a.x;
+
+      const [ma, ba] = this.rectaPor2Puntos(p1a, p2a);
 
       // para cada fila ...
       for (let fila = 1; fila < estructura.filas; fila++) {
@@ -1319,27 +1406,50 @@ export class InformeEditComponent implements OnInit {
         const p1b = this.estructuraMatrix[fila][0];
         const p2b = this.estructuraMatrix[fila][estructura.columnas];
 
-        const mb = (p2b.y - p1b.y) / (p2b.x - p1b.x);
-        const bb = p2b.y - mb * p2b.x;
+        const [mb, bb] = this.rectaPor2Puntos(p1b, p2b);
 
         // hallar interseccion
-        const xInterseccion = (ba - bb) / (mb - ma);
-
-        const yInterseccion = ma * xInterseccion + ba;
+        const pInterseccion = this.interseccionRectas(ma, ba, mb, bb);
 
         // almacenar en arrayEstructura
         this.estructuraMatrix[fila][col] = {
-          x: Math.round(xInterseccion),
-          y: Math.round(yInterseccion)
+          x: Math.round(pInterseccion.x),
+          y: Math.round(pInterseccion.y)
         };
       }
     }
 
-
-this.dibujarEstructuraMatrix(this.estructuraMatrix);
+    this.dibujarEstructuraMatrix(this.estructuraMatrix);
   }
 
-dibujarEstructuraMatrix(estructuraMatrix: any[]) {
+  private interseccionRectas(
+    m1: number,
+    b1: number,
+    m2: number,
+    b2: number
+  ): Punto {
+    if (!isFinite(m1)) {
+      return { x: b1, y: m2 * b1 + b2 };
+    } else if (!isFinite(m2)) {
+      return { x: b2, y: m1 * b2 + b1 };
+    }
+    let x = (b1 - b2) / (m2 - m1);
+    const y = Math.round(m1 * x + b1);
+    x = Math.round(x);
+    return { x, y };
+  }
+
+  private rectaPor2Puntos(p1: Punto, p2: Punto) {
+    const m = (p2.y - p1.y) / (p2.x - p1.x);
+    if (!isFinite(m)) {
+      const b = p1.x;
+      return [m, b];
+    }
+    const b = p2.y - m * p2.x;
+    return [m, b]; // y = m * x + b
+  }
+
+  dibujarEstructuraMatrix(estructuraMatrix: any[]) {
     estructuraMatrix.forEach(fila => {
       fila.forEach(punto => {
         this.canvas.add(
@@ -1347,14 +1457,14 @@ dibujarEstructuraMatrix(estructuraMatrix: any[]) {
             left: punto.x - 1,
             top: punto.y - 1,
             radius: 2,
-            fill: 'red',
+            fill: "red",
             selectable: false
           })
         );
       });
     });
 
-    this.canvas.on('object:moving', options => {
+    this.canvas.on("object:moving", options => {
       if (this.estructuraOn && options.target.ref === false) {
         const puntoDistMin = this.getPointDistanciaMin(
           options.pointer.x,
@@ -1369,7 +1479,7 @@ dibujarEstructuraMatrix(estructuraMatrix: any[]) {
     });
   }
 
-getPointDistanciaMin(x: number, y: number, estructuraMatrix: any[]) {
+  getPointDistanciaMin(x: number, y: number, estructuraMatrix: any[]) {
     let distanciaMinima = 99999;
     let puntoDistanciaMin;
 
@@ -1396,13 +1506,13 @@ getPointDistanciaMin(x: number, y: number, estructuraMatrix: any[]) {
     return puntoDistanciaMin;
   }
 
-calcularFilaColumna(x: number, y: number) {
+  calcularFilaColumna(x: number, y: number) {
     let distanciaMinima = 999999;
     let columnaDistMin;
     let filaDistMin;
 
-    for (let fila = 1; fila < this.filasEstructura + 1; fila++) {
-      for (let col = 1; col < this.columnasEstructura + 1; col++) {
+    for (let fila = 1; fila < this.estructura.filas + 1; fila++) {
+      for (let col = 1; col < this.estructura.columnas + 1; col++) {
         // Para cada modulo ...
         let distancia = 0;
         for (let i = 0; i < 2; i++) {
@@ -1429,7 +1539,7 @@ calcularFilaColumna(x: number, y: number) {
     return [filaDistMin, columnaDistMin];
   }
 
-updateEstructura(event) {
+  updateEstructura(event) {
     this.onClickDeleteEstructura();
     this.estructura.filas = this.filasEstructura;
     this.estructura.columnas = this.columnasEstructura;
@@ -1439,18 +1549,18 @@ updateEstructura(event) {
     this.setImageFromRangeValue(this.rangeValue);
   }
 
-getPolygonList(plantaId: string) {
+  getPolygonList(plantaId: string) {
     this.plantaService.getLocationsArea(plantaId).subscribe(items => {
       this.polygonList = [];
       items.forEach(locationArea => {
         this.map._mapsWrapper
           .createPolygon({
             paths: locationArea.path,
-            strokeColor: '#FF0000',
+            strokeColor: "#FF0000",
             visible: false,
             strokeOpacity: 0,
             strokeWeight: 0,
-            fillColor: 'grey',
+            fillColor: "grey",
             fillOpacity: 0,
             editable: false,
             draggable: false,
@@ -1466,7 +1576,7 @@ getPolygonList(plantaId: string) {
     });
   }
 
-recalcularLocs() {
+  recalcularLocs() {
     this.allPcs.forEach(pc => {
       let globalX;
       let globalY;
@@ -1480,10 +1590,10 @@ recalcularLocs() {
     });
   }
 
-getGlobalCoordsFromLocationArea(coords: any) {
+  getGlobalCoordsFromLocationArea(coords: any) {
     const latLng = new google.maps.LatLng(coords.lat, coords.lng);
-    let globalX = '';
-    let globalY = '';
+    let globalX = "";
+    let globalY = "";
     let modulo: ModuloInterface = {};
 
     for (let i = 0; i < this.polygonList.length; i++) {
@@ -1497,7 +1607,7 @@ getGlobalCoordsFromLocationArea(coords: any) {
           globalY = this.polygonList[i].globalY;
         }
 
-        if (this.polygonList[i].hasOwnProperty('modulo')) {
+        if (this.polygonList[i].hasOwnProperty("modulo")) {
           if (this.polygonList[i].modulo !== undefined) {
             modulo = this.polygonList[i].modulo;
           }
@@ -1508,9 +1618,9 @@ getGlobalCoordsFromLocationArea(coords: any) {
     return [globalX, globalY, modulo];
   }
 
-  private pathJoin(parts: string[], sep = '\\') {
-    const separator = sep || '\\';
-    let replace = new RegExp(separator + '{1,}', 'g');
+  private pathJoin(parts: string[], sep = "\\") {
+    const separator = sep || "\\";
+    let replace = new RegExp(separator + "{1,}", "g");
     const result = parts.join(separator).replace(replace, separator);
     return result;
   }

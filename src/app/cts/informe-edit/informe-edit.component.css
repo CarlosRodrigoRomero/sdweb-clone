@@ -84,6 +84,12 @@ agm-map {
 .pc_seleccionado {
     background-color: grey;
 }
+.pc_error {
+    background-color: orangered;
+}
+.pc_error_loc {
+    background-color: yellow;
+}
 
 .selected-pc-div {
     margin-top: 1rem;
