@@ -106,6 +106,11 @@ export class InformeService {
       .set(estructura);
   }
 
+  updateEstructura(informeId: string, estructura: Estructura) {
+    const estructuraDoc = this.afs.doc("informes/" + informeId + "/estructuras/" + estructura.id);
+    estructuraDoc.update(estructura);
+  }
+
   deleteEstructuraInforme(informeId: string, currentFileName: string) {
     this.afs
       .collection("informes")

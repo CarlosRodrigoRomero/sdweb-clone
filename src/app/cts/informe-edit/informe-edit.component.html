@@ -114,11 +114,13 @@
               [(ngModel)]="filasEstructura"
               type="number"
               id="filasEstructura"
+              (change)="updateEstructura()"
             />
             <input
               [(ngModel)]="columnasEstructura"
               type="number"
               id="columnasEstructura"
+              (change)="updateEstructura()"
             />
           </div>
         </div>
