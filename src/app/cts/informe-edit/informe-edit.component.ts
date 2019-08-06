@@ -13,6 +13,7 @@ import { take, map } from "rxjs/operators";
 import { Estructura } from "../../models/estructura";
 import { AgmMap } from "@agm/core";
 import { ModuloInterface } from "../../models/modulo";
+import { Point } from "@agm/core/services/google-maps-types";
 declare let fabric;
 declare const google: any;
 
@@ -456,14 +457,14 @@ export class InformeEditComponent implements OnInit {
     let top: number;
     let left: number;
     // Referencia
-    let topLeftRef;
-    let topRightRef;
-    let bottomLeftRef;
-    let bottomRightRef;
-    let topRef;
-    let leftRef;
-    let heightRef;
-    let widthRef;
+    let topLeftRef: Point;
+    let topRightRef: Point;
+    let bottomLeftRef: Point;
+    let bottomRightRef: Point;
+    let topRef: number;
+    let leftRef: number;
+    let heightRef: number;
+    let widthRef: number;
 
     if (this.estructuraOn) {
       [fila, columna] = this.calcularFilaColumna(event.offsetX, event.offsetY);
@@ -505,6 +506,11 @@ export class InformeEditComponent implements OnInit {
       leftRef = Math.max(topLeftRef.x, bottomLeftRef.x);
       heightRef = Math.min(bottomLeftRef.y, bottomRightRef.y) - topRef;
       widthRef = Math.min(topRightRef.x, bottomRightRef.x) - leftRef;
+
+      leftRef = Math.round(leftRef + widthRef * this.rectRefReduction);
+      topRef = Math.round(topRef + heightRef * this.rectRefReduction);
+      widthRef = Math.round(widthRef * (1 - this.rectRefReduction));
+      heightRef = Math.round(heightRef * (1 - this.rectRefReduction));
     } else {
       fila = 0;
       columna = 1;
@@ -520,42 +526,7 @@ export class InformeEditComponent implements OnInit {
       heightRef = height;
     }
 
-    this.localIdCount += 1;
-    const actObj = new fabric.Rect({
-      left: left,
-      top: top,
-      fill: "rgba(0,0,0,0)",
-      stroke: "red",
-      strokeWidth: 1,
-      width: width,
-      height: height,
-      hasControls: true,
-      local_id: this.localIdCount,
-      ref: false,
-      hasRotatingPoint: false
-    });
-
-    const actObjRef = new fabric.Rect({
-      left: leftRef + widthRef * this.rectRefReduction,
-      top: topRef + heightRef * this.rectRefReduction,
-      fill: "rgba(0,0,0,0)",
-      stroke: "blue",
-      strokeWidth: 1,
-      width: widthRef * (1 - this.rectRefReduction),
-      height: heightRef * (1 - this.rectRefReduction),
-      hasControls: true,
-      local_id: this.localIdCount,
-      ref: true,
-      hasRotatingPoint: false
-    });
-
-    this.canvas.add(actObj);
-    this.canvas.add(actObjRef);
-    this.canvas.setActiveObject(actObj);
-
-    const actObjRawCoords = this.transformActObjToRaw(actObj);
-    const actObjRefRawCoords = this.transformActObjToRaw(actObjRef);
-
+    // Localizaciones
     let globalX;
     let globalY;
     let modulo_;
@@ -564,6 +535,9 @@ export class InformeEditComponent implements OnInit {
       lat: this.current_gps_lat,
       lng: this.current_gps_lng
     });
+
+    // Creamos el nuevo PC
+    this.localIdCount += 1;
 
     const newPc: PcInterface = {
       id: "",
@@ -575,10 +549,10 @@ export class InformeEditComponent implements OnInit {
       global_y: globalY, // global_y
       gps_lng: this.current_gps_lng,
       gps_lat: this.current_gps_lat,
-      img_left: actObjRawCoords.left,
-      img_top: actObjRawCoords.top,
-      img_width: actObjRawCoords.width,
-      img_height: actObjRawCoords.height,
+      img_left: left,
+      img_top: top,
+      img_width: width,
+      img_height: height,
       img_x: 0, // coordenadas raw del punto mas caliente
       img_y: 0, // coordenadas raw del punto mas caliente
       local_id: this.localIdCount,
@@ -588,12 +562,14 @@ export class InformeEditComponent implements OnInit {
       datetime: this.current_datetime,
       resuelto: false,
       color: "black",
-      refTop: actObjRefRawCoords.top,
-      refLeft: actObjRefRawCoords.left,
-      refHeight: actObjRefRawCoords.height,
-      refWidth: actObjRefRawCoords.width,
+      refTop: topRef,
+      refLeft: leftRef,
+      refHeight: heightRef,
+      refWidth: widthRef,
       modulo: modulo_
     };
+
+    //
 
     if (this.selected_pc) {
       this.selected_pc.color = "black";
@@ -608,6 +584,8 @@ export class InformeEditComponent implements OnInit {
       }
     }
     this.addPcToDb(newPc);
+    this.drawPcInCanvas(newPc);
+
     this.onMapMarkerClick(newPc);
   }
 
@@ -1132,10 +1110,11 @@ export class InformeEditComponent implements OnInit {
       stroke: pc.local_id === this.selected_pc.local_id ? "white" : "red",
       strokeWidth: strokWidth,
       hasControls: true,
-      width: transformedRect.width - strokWidth,
-      height: transformedRect.height - strokWidth,
+      width: transformedRect.width,
+      height: transformedRect.height,
       local_id: pc.local_id,
-      ref: false
+      ref: false,
+      hasRotatingPoint: false
     });
 
     const rectRef = new fabric.Rect({
@@ -1145,13 +1124,12 @@ export class InformeEditComponent implements OnInit {
       stroke: "blue",
       strokeWidth: strokWidth,
       hasControls: true,
-      width:
-        (transformedRectRef.width - strokWidth) * (1 - this.rectRefReduction),
-      height:
-        (transformedRectRef.height - strokWidth) * (1 - this.rectRefReduction),
+      width: transformedRectRef.width,
+      height: transformedRectRef.height,
       local_id: pc.local_id,
       ref: true,
-      selectable: pc.local_id === this.selected_pc.local_id
+      selectable: pc.local_id === this.selected_pc.local_id,
+      hasRotatingPoint: false
     });
 
     this.canvas.add(rect);
@@ -1223,6 +1201,7 @@ export class InformeEditComponent implements OnInit {
       this.informe.id,
       this.currentFileName
     );
+    this.setImageFromRangeValue(this.rangeValue);
   }
 
   getAllPointsEstructura(estructura) {
@@ -1540,13 +1519,12 @@ export class InformeEditComponent implements OnInit {
   }
 
   updateEstructura(event) {
-    this.onClickDeleteEstructura();
-    this.estructura.filas = this.filasEstructura;
-    this.estructura.columnas = this.columnasEstructura;
-
-    this.informeService.addEstructuraInforme(this.informe.id, this.estructura);
-
-    this.setImageFromRangeValue(this.rangeValue);
+    if (this.estructura.filename === this.currentFileName) {
+      this.estructura.filas = this.filasEstructura;
+      this.estructura.columnas = this.columnasEstructura;
+      this.informeService.updateEstructura(this.informe.id, this.estructura);
+      this.setImageFromRangeValue(this.rangeValue);
+    }
   }
 
   getPolygonList(plantaId: string) {
