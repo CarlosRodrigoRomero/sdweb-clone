@@ -21,6 +21,12 @@ export interface Punto {
   x: number;
   y: number;
 }
+export interface Rectangulo {
+  tl: Punto;
+  tr: Punto;
+  bl: Punto;
+  br: Punto;
+}
 
 @Component({
   selector: "app-informe-edit",
@@ -92,6 +98,8 @@ export class InformeEditComponent implements OnInit {
   public polygonList: any[];
   private _selectedStrokeWidth: number;
   private rectRefReduction: number;
+  public sentidoEstructura: boolean;
+  public columnaInicioEstructura: number = 1;
 
   constructor(
     private route: ActivatedRoute,
@@ -130,10 +138,7 @@ export class InformeEditComponent implements OnInit {
     this.manualRotation = false;
 
     this.allPcs = new Array<PcInterface>();
-    this.estructura = <Estructura>{
-      filename: "",
-      coords: []
-    };
+    this.estructura = this.crearNuevaEstructura("");
     this.polygonList = [];
   }
 
@@ -449,6 +454,22 @@ export class InformeEditComponent implements OnInit {
     });
   }
 
+  getLocalCoordsFromEstructura(columna, fila, estructura) {
+    let columnaReal = columna;
+    let filaReal = fila;
+
+    if (estructura.hasOwnProperty("sentido")) {
+      columnaReal = estructura.sentido
+        ? estructura.columnas - columna + 1
+        : columna;
+    }
+    if (this.estructura.hasOwnProperty("columnaInicio")) {
+      columnaReal = columnaReal + estructura.columnaInicio - 1;
+    }
+
+    return [columnaReal, filaReal];
+  }
+
   onDblClickCanvas(event) {
     let fila: number;
     let columna: number;
@@ -465,9 +486,16 @@ export class InformeEditComponent implements OnInit {
     let leftRef: number;
     let heightRef: number;
     let widthRef: number;
+    let columnaReal: number;
+    let filaReal: number;
 
     if (this.estructuraOn) {
       [fila, columna] = this.calcularFilaColumna(event.offsetX, event.offsetY);
+      [columnaReal, filaReal] = this.getLocalCoordsFromEstructura(
+        columna,
+        fila,
+        this.estructura
+      );
 
       const topLeftModulo = this.estructuraMatrix[fila - 1][columna - 1];
       const topRightModulo = this.estructuraMatrix[fila - 1][columna];
@@ -512,8 +540,8 @@ export class InformeEditComponent implements OnInit {
       widthRef = Math.round(widthRef * (1 - this.rectRefReduction));
       heightRef = Math.round(heightRef * (1 - this.rectRefReduction));
     } else {
-      fila = 0;
-      columna = 1;
+      filaReal = 0;
+      columnaReal = 1;
 
       top = event.offsetY - this.squareHeight / 2;
       left = event.offsetX - this.squareWidth / 2;
@@ -543,8 +571,8 @@ export class InformeEditComponent implements OnInit {
       id: "",
       archivo: this.currentFileName,
       tipo: 8, // tipo (celula caliente por defecto)
-      local_x: columna, // local_x
-      local_y: fila, // local_x
+      local_x: columnaReal, // local_x
+      local_y: filaReal, // local_x
       global_x: globalX, // global_x
       global_y: globalY, // global_y
       gps_lng: this.current_gps_lng,
@@ -583,9 +611,9 @@ export class InformeEditComponent implements OnInit {
         newPc.gps_lat = this.selected_pc.gps_lat;
       }
     }
+
     this.addPcToDb(newPc);
     this.drawPcInCanvas(newPc);
-
     this.onMapMarkerClick(newPc);
   }
 
@@ -860,10 +888,7 @@ export class InformeEditComponent implements OnInit {
   setImageFromRangeValue(value) {
     value = parseInt(value, 10);
     this.buildingEstructura = false;
-    this.estructura = <Estructura>{
-      filename: "",
-      coords: []
-    };
+
     if (this.rangeValue !== value) {
       this.rangeValue = value;
     }
@@ -905,6 +930,8 @@ export class InformeEditComponent implements OnInit {
     }
 
     // Añadir Estructura
+    this.estructura = this.crearNuevaEstructura("");
+
     this.informeService
       .getEstructuraInforme(this.informe.id, this.currentFileName)
       .subscribe(est => {
@@ -1162,12 +1189,20 @@ export class InformeEditComponent implements OnInit {
   onClickEstructura() {
     console.log("buildingEstructura", this.buildingEstructura);
   }
+  crearNuevaEstructura(fileName): Estructura {
+    this.columnaInicioEstructura = 1;
+    return <Estructura>{
+      filename: fileName,
+      coords: Array(),
+      sentido: this.sentidoEstructura,
+      columnaInicio: this.columnaInicioEstructura
+    };
+  }
 
   onClickBuildEstructura(event) {
     if (this.buildingEstructura) {
       if (this.currentFileName !== this.estructura.filename) {
-        this.estructura.filename = this.currentFileName;
-        this.estructura.coords = Array();
+        this.estructura = this.crearNuevaEstructura(this.currentFileName);
       }
       this.estructura.coords.push({ x: event.offsetX, y: event.offsetY });
 
@@ -1515,6 +1550,7 @@ export class InformeEditComponent implements OnInit {
         }
       }
     }
+
     return [filaDistMin, columnaDistMin];
   }
 
@@ -1522,6 +1558,8 @@ export class InformeEditComponent implements OnInit {
     if (this.estructura.filename === this.currentFileName) {
       this.estructura.filas = this.filasEstructura;
       this.estructura.columnas = this.columnasEstructura;
+      this.estructura.columnaInicio = this.columnaInicioEstructura;
+      this.estructura.sentido = this.sentidoEstructura;
       this.informeService.updateEstructura(this.informe.id, this.estructura);
       this.setImageFromRangeValue(this.rangeValue);
     }

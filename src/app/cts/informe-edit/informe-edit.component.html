@@ -115,12 +115,34 @@
               type="number"
               id="filasEstructura"
               (change)="updateEstructura()"
+              maxlength="2"
+              size="4"
             />
             <input
               [(ngModel)]="columnasEstructura"
               type="number"
               id="columnasEstructura"
               (change)="updateEstructura()"
+              maxlength="2"
+              size="4"
+            />
+
+            <mat-checkbox
+              (change)="updateEstructura()"
+              *ngIf="planta?.tipo !== '2 ejes'"
+              [(ngModel)]="sentidoEstructura"
+              >{{
+                sentidoEstructura ? "dcha->izq" : "izq->drcha"
+              }}</mat-checkbox
+            >
+            <input
+              *ngIf="planta?.tipo !== '2 ejes'"
+              [(ngModel)]="columnaInicioEstructura"
+              type="number"
+              id="columnaInicioEstructura"
+              (change)="updateEstructura()"
+              maxlength="2"
+              size="4"
             />
           </div>
         </div>
@@ -595,7 +617,10 @@
               pc.tipo !== 0 &&
               pc.tipo !== 4 &&
               (pc.local_x === 0 || pc.local_y === 0),
-            pc_error_loc: pc.global_x.length === 0 && pc.global_y.length === 0
+            pc_error_loc:
+              (pc.global_x.length === 0 && pc.global_y.length === 0) ||
+              (planta.tipo === 'fija' &&
+                (pc.local_x === 1 || pc.gps_lat === current_gps_lat))
           }"
         >
           <th>{{ pc.local_id }} ({{ pc.vuelo }})</th>
