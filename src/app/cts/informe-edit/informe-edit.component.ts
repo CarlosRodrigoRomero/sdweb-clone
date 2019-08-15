@@ -140,6 +140,8 @@ export class InformeEditComponent implements OnInit {
     this.allPcs = new Array<PcInterface>();
     this.estructura = this.crearNuevaEstructura("");
     this.polygonList = [];
+
+    this.sentidoEstructura = false;
   }
 
   ngOnInit() {
