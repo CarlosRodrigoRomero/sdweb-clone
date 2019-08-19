@@ -100,6 +100,9 @@ export class InformeEditComponent implements OnInit {
   private rectRefReduction: number;
   public sentidoEstructura: boolean;
   public columnaInicioEstructura: number = 1;
+  public rectSeparation: number = 0.1;
+  public filteredPcs: PcInterface[];
+  public maxMarkersShow: number = 50;
 
   constructor(
     private route: ActivatedRoute,
@@ -537,8 +540,8 @@ export class InformeEditComponent implements OnInit {
       heightRef = Math.min(bottomLeftRef.y, bottomRightRef.y) - topRef;
       widthRef = Math.min(topRightRef.x, bottomRightRef.x) - leftRef;
 
-      leftRef = Math.round(leftRef + widthRef * this.rectRefReduction);
-      topRef = Math.round(topRef + heightRef * this.rectRefReduction);
+      leftRef = Math.round(leftRef + (widthRef * this.rectRefReduction) / 2);
+      topRef = Math.round(topRef + (heightRef * this.rectRefReduction) / 2);
       widthRef = Math.round(widthRef * (1 - this.rectRefReduction));
       heightRef = Math.round(heightRef * (1 - this.rectRefReduction));
     } else {
@@ -550,10 +553,13 @@ export class InformeEditComponent implements OnInit {
       height = this.squareHeight;
       width = this.squareWidth;
 
-      leftRef = left + width;
-      topRef = top;
-      widthRef = width;
-      heightRef = height;
+      leftRef =
+        left +
+        width * (1 + this.rectSeparation) +
+        (width * this.rectRefReduction) / 2;
+      topRef = top + (height * this.rectRefReduction) / 2;
+      widthRef = width * (1 - this.rectRefReduction);
+      heightRef = height * (1 - this.rectRefReduction);
     }
 
     // Localizaciones
@@ -592,8 +598,8 @@ export class InformeEditComponent implements OnInit {
       datetime: this.current_datetime,
       resuelto: false,
       color: "black",
-      refTop: topRef,
       refLeft: leftRef,
+      refTop: topRef,
       refHeight: heightRef,
       refWidth: widthRef,
       modulo: modulo_
@@ -795,7 +801,11 @@ export class InformeEditComponent implements OnInit {
 
   filterPcsByFlight(currentFlight: string) {
     if (typeof this.allPcs !== "undefined") {
-      return this.allPcs.filter(x => x.vuelo === currentFlight);
+      const filteredPcs: PcInterface[] = this.sortPcs(
+        this.allPcs.filter(x => x.vuelo === currentFlight)
+      );
+
+      return filteredPcs.slice(0, this.maxMarkersShow);
     }
   }
 
@@ -891,9 +901,8 @@ export class InformeEditComponent implements OnInit {
     value = parseInt(value, 10);
     this.buildingEstructura = false;
 
-    if (this.rangeValue !== value) {
-      this.rangeValue = value;
-    }
+    this.rangeValue = value;
+
     // El input es el 'value' del slider
     // Para pasar del value del slider al indice de 'fileList' o '/coords' hay que restarle uno
     const arrayIndex = value - 1;
@@ -1223,6 +1232,7 @@ export class InformeEditComponent implements OnInit {
         this.estructura.filas = this.filasEstructura;
         this.estructura.columnas = this.columnasEstructura;
         this.getAllPointsEstructura(this.estructura);
+        this.estructura.columnaInicio = this.columnaInicioEstructura;
 
         this.informeService.addEstructuraInforme(
           this.informe.id,
