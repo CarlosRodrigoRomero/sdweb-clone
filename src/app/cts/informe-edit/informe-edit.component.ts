@@ -102,7 +102,7 @@ export class InformeEditComponent implements OnInit {
   public columnaInicioEstructura: number = 1;
   public rectSeparation: number = 0.1;
   public filteredPcs: PcInterface[];
-  public maxMarkersShow: number = 50;
+  public maxMarkersShow: number = 25;
 
   constructor(
     private route: ActivatedRoute,
@@ -131,7 +131,7 @@ export class InformeEditComponent implements OnInit {
     this.current_track_heading = 0;
     this.current_image_rotation = 0;
     this.squareBase = 37;
-    this.squareProp = 2.3;
+    this.squareProp = 1.8;
     this._selectedStrokeWidth = 3;
 
     this.image_width = 640;
@@ -534,6 +534,8 @@ export class InformeEditComponent implements OnInit {
           bottomRightModulo.x -
           bottomLeftModulo.x);
 
+      this.setSquareBase(Math.min(height, width));
+
       //   Ref
       topRef = Math.max(topLeftRef.y, topRightRef.y);
       leftRef = Math.max(topLeftRef.x, bottomLeftRef.x);
@@ -676,7 +678,8 @@ export class InformeEditComponent implements OnInit {
     return [maxValue, maxIndex];
   }
 
-  setSquareBase() {
+  setSquareBase(squareBase: number) {
+    this.squareBase = squareBase;
     if (this.planta.vertical) {
       // vertical
       this.squareWidth = this.squareBase;
@@ -703,7 +706,7 @@ export class InformeEditComponent implements OnInit {
           this.filas_array.push(i);
         }
 
-        this.setSquareBase();
+        this.setSquareBase(this.squareBase);
 
         this.filasEstructura = this.planta.filas;
         // this.columnasEstructura = this.planta.columnas;
