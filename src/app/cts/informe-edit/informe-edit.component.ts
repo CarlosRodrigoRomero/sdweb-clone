@@ -99,7 +99,6 @@ export class InformeEditComponent implements OnInit {
   private _selectedStrokeWidth: number;
   private rectRefReduction: number;
   public sentidoEstructura: boolean;
-  public columnaInicioEstructura: number = 1;
   public rectSeparation: number = 0.1;
   public filteredPcs: PcInterface[];
   public maxMarkersShow: number = 25;
@@ -1204,12 +1203,11 @@ export class InformeEditComponent implements OnInit {
     console.log("buildingEstructura", this.buildingEstructura);
   }
   crearNuevaEstructura(fileName): Estructura {
-    this.columnaInicioEstructura = 1;
     return <Estructura>{
       filename: fileName,
       coords: Array(),
       sentido: this.sentidoEstructura,
-      columnaInicio: this.columnaInicioEstructura
+      columnaInicio: 1
     };
   }
 
@@ -1235,7 +1233,7 @@ export class InformeEditComponent implements OnInit {
         this.estructura.filas = this.filasEstructura;
         this.estructura.columnas = this.columnasEstructura;
         this.getAllPointsEstructura(this.estructura);
-        this.estructura.columnaInicio = this.columnaInicioEstructura;
+        this.estructura.columnaInicio = 1;
 
         this.informeService.addEstructuraInforme(
           this.informe.id,
@@ -1573,7 +1571,6 @@ export class InformeEditComponent implements OnInit {
     if (this.estructura.filename === this.currentFileName) {
       this.estructura.filas = this.filasEstructura;
       this.estructura.columnas = this.columnasEstructura;
-      this.estructura.columnaInicio = this.columnaInicioEstructura;
       this.estructura.sentido = this.sentidoEstructura;
       this.informeService.updateEstructura(this.informe.id, this.estructura);
       this.setImageFromRangeValue(this.rangeValue);

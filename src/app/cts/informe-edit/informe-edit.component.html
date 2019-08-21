@@ -137,7 +137,7 @@
             >
             <input
               *ngIf="planta?.tipo !== '2 ejes'"
-              [(ngModel)]="columnaInicioEstructura"
+              [(ngModel)]="estructura.columnaInicio"
               type="number"
               id="columnaInicioEstructura"
               (change)="updateEstructura()"
