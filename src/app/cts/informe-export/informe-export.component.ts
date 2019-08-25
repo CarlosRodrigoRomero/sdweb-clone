@@ -52,7 +52,7 @@ export class InformeExportComponent implements OnInit {
   @Input() public informe: InformeInterface;
 
   public titulo: string;
-  public irradianciaMinima: number;
+  public irradianciaMedia: number;
   public url: string;
   public dataTipos: any;
   public dataSeveridad: any;
@@ -488,11 +488,12 @@ export class InformeExportComponent implements OnInit {
     const allPcs = this.filteredPcs;
 
     if (allPcs.length > 0) {
-      this.irradianciaMinima = Math.round(
-        allPcs.sort(this.compareIrradiancia)[0].irradiancia
+      this.irradianciaMedia = Math.round(
+        allPcs.sort(this.compareIrradiancia)[Math.round(allPcs.length / 2)]
+          .irradiancia
       );
     } else {
-      this.irradianciaMinima = 800;
+      this.irradianciaMedia = 800;
     }
 
     this.emisividad = this.informe.emisividad;
@@ -1329,11 +1330,11 @@ export class InformeExportComponent implements OnInit {
 
                   [
                     {
-                      text: "GSD térmico (máx)",
+                      text: "GSD térmico (medio)",
                       style: "tableLeft"
                     },
                     {
-                      text: `${this.informe.gsd} cm/pixel`
+                      text: `${this.informe.gsd} cm/pixel (+- 0.5cm/pixel )`
                     }
                   ],
 
@@ -1360,11 +1361,11 @@ export class InformeExportComponent implements OnInit {
 
                   [
                     {
-                      text: "Irradiancia (mínima)",
+                      text: "Irradiancia (media)",
                       style: "tableLeft"
                     },
                     {
-                      text: `${this.irradianciaMinima} W/m2`
+                      text: `${this.irradianciaMedia} W/m2`
                     }
                   ],
 

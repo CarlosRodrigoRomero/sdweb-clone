@@ -29,7 +29,7 @@ export class InformeViewComponent implements OnInit {
   private informeId: string;
   public informe: InformeInterface;
   public planta: PlantaInterface;
-  public irradianciaMinima: number;
+  public irradianciaMedia: number;
   public isLocalhost: boolean;
   public imagenesDownloadUrl: Observable<string>;
   public excelDownloadUrl: Observable<string>;
@@ -98,9 +98,9 @@ export class InformeViewComponent implements OnInit {
           //  Les añadimos los observables de los archivos....
           // Se ha eliminado ya que tardaba mucho en cargar...
           // pc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${pc.archivoPublico}`).getDownloadURL();
-          pc.downloadUrl$ = this.storage
-            .ref(`informes/${this.informeId}/jpg/${pc.archivoPublico}`)
-            .getDownloadURL();
+          // pc.downloadUrl$ = this.storage
+          //   .ref(`informes/${this.informeId}/jpg/${pc.archivoPublico}`)
+          //   .getDownloadURL();
           // pc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/_mini_${pc.archivoPublico}`).getDownloadURL();
 
           return pc;
@@ -111,9 +111,9 @@ export class InformeViewComponent implements OnInit {
         this.allPcs = this.allPcsConSeguidores.filter((pc, i, a) => {
           return pc.tipo > 0;
         });
-        this.irradianciaMinima = this.allPcsConSeguidores.sort(
+        this.irradianciaMedia = this.allPcsConSeguidores.sort(
           this.compareIrradiancia
-        )[0].irradiancia;
+        )[Math.round(this.allPcs.length / 2)].irradiancia;
 
         for (const j of this.numSeveridad) {
           filtroSeveridad = this.allPcs.filter(pc => pc.severidad === j);
