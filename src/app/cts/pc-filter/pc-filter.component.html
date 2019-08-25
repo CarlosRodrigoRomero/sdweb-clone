@@ -11,11 +11,10 @@
         >
           <span class="checkbox-filtro-severidad">
             <span class="filtro-texto"> {{ nombreClases[cat] }} </span>
-            <span class="filtro-numero"
-              >({{ countCategoriaFiltrada[cat - 1] }} /
-              {{ countCategoria[cat - 1] }})</span
-            >
-          </span>
+            <span class="filtro-numero filtro-numero-categoria"></span>
+            ({{ countCategoriaFiltrada[cat - 1] }} /
+            {{ countCategoria[cat - 1] }})</span
+          >
         </mat-checkbox>
       </ng-container>
     </div>
@@ -55,7 +54,7 @@
             <span class="filtro-severidad-text"
               >{{ labelsSeveridad[ts - 1] }}
             </span>
-
+            <span> </span>
             <span class="filtro-numero">
               ({{ countClaseFiltrada[ts - 1] }} / {{ countClase[ts - 1] }})
             </span>
