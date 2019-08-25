@@ -17,6 +17,18 @@
   align-self: center;
   color: grey;
 }
+
+.checkbox-filtro-severidad {
+  display: flex;
+  flex-direction: column;
+}
+.filtro-numero {
+  line-height: 1;
+}
+.filtro-texto {
+  line-height: 1;
+}
+
 .subtitulo-gradiente {
   color: grey;
   font-size: 1rem;

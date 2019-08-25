@@ -2411,9 +2411,7 @@ export class InformeExportComponent implements OnInit {
                     },
 
                     {
-                      text: Math.round(s.pcs[0].irradiancia)
-                        .toString()
-                        .concat(" W/m2"),
+                      text: Math.round(s.pcs[0].irradiancia).toString(),
                       style: "tableCellAnexo1"
                     },
                     {

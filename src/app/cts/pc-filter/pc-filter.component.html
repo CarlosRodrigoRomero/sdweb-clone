@@ -9,11 +9,13 @@
           (change)="onChangeCheckboxCategoria($event)"
           value="{{ cat }}"
         >
-          {{ nombreClases[cat] }}
-          <span class="filtro-numero"
-            >({{ countCategoriaFiltrada[cat - 1] }} /
-            {{ countCategoria[cat - 1] }})</span
-          >
+          <span class="checkbox-filtro-severidad">
+            <span class="filtro-texto"> {{ nombreClases[cat] }} </span>
+            <span class="filtro-numero"
+              >({{ countCategoriaFiltrada[cat - 1] }} /
+              {{ countCategoria[cat - 1] }})</span
+            >
+          </span>
         </mat-checkbox>
       </ng-container>
     </div>
