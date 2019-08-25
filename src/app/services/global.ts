@@ -139,8 +139,8 @@ export let GLOBAL = {
     },
     // { nombre: "archivoPublico", descripcion: "Nombre archivo" },
     { nombre: "irradiancia", descripcion: "Irradiancia (W/m2)" },
-    { nombre: "viento", descripcion: "Viento" },
-    { nombre: "temperaturaAire", descripcion: "Temp. ambiente (ºC)" },
+    // { nombre: "viento", descripcion: "Viento" },
+    // { nombre: "temperaturaAire", descripcion: "Temp. ambiente (ºC)" },
     { nombre: "datetimeString", descripcion: "Fecha/hora" }
   ]
 };
