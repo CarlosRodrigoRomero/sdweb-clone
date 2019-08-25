@@ -45,7 +45,7 @@
 }
 
 .detail-title {
-  font-weight: 800;
+  font-weight: 500;
   margin-right: 1rem;
   margin-bottom: 0.2rem;
   margin-bottom: 0.2rem;
@@ -76,7 +76,7 @@
   display: flex;
 }
 .pc-details-derecha-icon i {
-align-self: center;
+  align-self: center;
 }
 
 .pc-detail-botones {
