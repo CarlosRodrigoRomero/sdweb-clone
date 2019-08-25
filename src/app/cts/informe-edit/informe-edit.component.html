@@ -627,13 +627,12 @@
           [ngClass]="{
             pc_seleccionado: selected_pc === pc,
             pc_error:
-              pc.tipo !== 0 &&
-              pc.tipo !== 4 &&
-              (pc.local_x === 0 || pc.local_y === 0),
-            pc_error_loc:
-              (pc.global_x.length === 0 && pc.global_y.length === 0) ||
-              (planta.tipo === 'fija' &&
-                (pc.local_x === 1 || pc.gps_lat === current_gps_lat))
+              (pc.tipo !== 0 &&
+                pc.tipo !== 4 &&
+                (pc.local_x === 0 || pc.local_y === 0)) ||
+              pc.gps_lat === current_gps_lat ||
+              (pc.global_x.length === 0 && pc.global_y.length === 0),
+            pc_error_local_x: planta.tipo === 'fija' && pc.local_x === 1
           }"
         >
           <th>{{ pc.local_id }} ({{ pc.vuelo }})</th>

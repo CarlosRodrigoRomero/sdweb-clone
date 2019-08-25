@@ -9,7 +9,6 @@ import { InformeInterface } from "../../models/informe";
 
 import "fabric";
 declare let fabric;
-
 import { AngularFireStorage } from "@angular/fire/storage";
 import { Observable, BehaviorSubject } from "rxjs";
 import { take } from "rxjs/operators";

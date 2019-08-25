@@ -91,7 +91,7 @@ agm-map {
 .pc_error {
   background-color: orangered;
 }
-.pc_error_loc {
+.pc_error_local_x {
   background-color: yellow;
 }
 
