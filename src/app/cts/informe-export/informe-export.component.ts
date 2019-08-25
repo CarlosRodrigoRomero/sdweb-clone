@@ -628,7 +628,9 @@ export class InformeExportComponent implements OnInit {
                   this.getDocDefinition(imageListBase64)
                 );
 
-                pdfDocGenerator.download();
+                pdfDocGenerator.download(
+                  this.informe.prefijo.concat("informe")
+                );
                 // pdfDocGenerator.getDataUrl((dataUrl) => {
                 //     const iframe = document.createElement('iframe');
                 //     iframe.src = dataUrl;
@@ -655,14 +657,19 @@ export class InformeExportComponent implements OnInit {
             this.getDocDefinition(imageListBase64)
           );
 
-          pdfDocGenerator.download();
+          pdfDocGenerator.download(
+            this.informe.prefijo.concat("informe"),
+            cb => {
+              this.generandoPDF = false;
+            }
+          );
+
           // pdfDocGenerator.getDataUrl((dataUrl) => {
           //     const iframe = document.createElement('iframe');
           //     iframe.src = dataUrl;
           //     iframe.setAttribute('style', 'position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;');
           //     document.getElementById('vistaPrevia').appendChild(iframe);
           // });
-          this.generandoPDF = false;
         });
     }
 
@@ -2229,16 +2236,17 @@ export class InformeExportComponent implements OnInit {
           });
         } else if (c.nombre === "gradienteNormalizado") {
           row.push({
-            text: Math.round(pc[c.nombre])
-              .toString()
-              .concat(" ºC"),
+            text: (Math.round(pc[c.nombre] * 10) / 10).toString().concat(" ºC"),
             style: "tableCellAnexo1"
           });
         } else if (c.nombre === "temperaturaMax") {
           row.push({
-            text: Math.round(pc[c.nombre])
-              .toString()
-              .concat(" ºC"),
+            text: (Math.round(pc[c.nombre] * 10) / 10).toString().concat(" ºC"),
+            style: "tableCellAnexo1"
+          });
+        } else if (c.nombre === "irradiancia") {
+          row.push({
+            text: Math.round(pc[c.nombre]).toString(),
             style: "tableCellAnexo1"
           });
         } else {

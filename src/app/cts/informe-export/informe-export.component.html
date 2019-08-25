@@ -4,7 +4,10 @@
       <div *ngIf="generandoPDF; else boton">
         <app-spinner></app-spinner>
         <div class="text-center">
-          <p>Creando PDF ... {{ progresoPDF }} % ...</p>
+          <p>
+            Creando PDF ...
+            <span *ngIf="planta.tipo !== 'fija'">{{ progresoPDF }} %</span> ...
+          </p>
         </div>
       </div>
       <ng-template #boton>
