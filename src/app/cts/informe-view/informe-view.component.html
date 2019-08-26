@@ -151,20 +151,20 @@
           >Generar PDF</a
         >
       </li>
-      <li class="nav-item">
+      <li class="nav-item" *ngIf="excelDownloadUrl">
         <a
           class="nav-link"
           style="color: green"
-          href="{{ excelDownloadUrl | async }}"
+          href="{{ excelDownloadUrl }}"
           target="_blank"
           >Descargar EXCEL</a
         >
       </li>
-      <li class="nav-item">
+      <li class="nav-item" *ngIf="imagenesDownloadUrl">
         <a
           class="nav-link"
           style="color: green"
-          href="{{ imagenesDownloadUrl | async }}"
+          href="{{ imagenesDownloadUrl }}"
           target="_blank"
           >Descargar imágenes</a
         >

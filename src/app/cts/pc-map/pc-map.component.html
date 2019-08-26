@@ -6,6 +6,7 @@
   [mapTypeId]="mapType"
   [zoom]="planta.zoom"
   [disableDefaultUI]="false"
+  (mapReady)="mapIsReady(map)"
 >
   <agm-circle
     *ngFor="let pc of filteredPcs"

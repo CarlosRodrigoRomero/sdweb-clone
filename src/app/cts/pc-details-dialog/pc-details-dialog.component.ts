@@ -45,6 +45,7 @@ export class PcDetailsDialogComponent implements OnInit {
   public planta: PlantaInterface;
   public informe: InformeInterface;
   public sinPcs: boolean;
+  public imagenCargada: boolean;
 
   constructor(
     private storage: AngularFireStorage,
@@ -74,6 +75,7 @@ export class PcDetailsDialogComponent implements OnInit {
   ngAfterViewInit() {}
 
   ngOnInit() {
+    this.imagenCargada = false;
     this.canvas = new fabric.Canvas("dialog-canvas");
     this.visualCanvas = new fabric.Canvas("visual-canvas");
     this.setEventListenersCanvas();
@@ -100,7 +102,9 @@ export class PcDetailsDialogComponent implements OnInit {
           unsharpRadius: 0.6,
           unsharpThreshold: 2
         })
-        .then();
+        .then(res => {
+          this.imagenCargada = true;
+        });
       // this.visualCanvas.getContext('2d').drawImage(this.imagenVisual, 0, 0 );
     };
 

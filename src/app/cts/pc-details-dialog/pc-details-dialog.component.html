@@ -32,6 +32,9 @@
         <!-- <canvas id="hidden-canvas" width="640" height="512"></canvas> -->
       </div>
       <div id="imagen-visual-div" class="imagen-termica-div">
+        <div *ngIf="!imagenCargada" class="cargando text-center">
+          <app-spinner></app-spinner>
+        </div>
         <canvas id="visual-canvas" width="640" height="512"></canvas>
       </div>
     </div>

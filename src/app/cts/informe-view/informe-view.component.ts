@@ -8,7 +8,6 @@ import { InformeService } from "../../services/informe.service";
 import { PlantaService } from "../../services/planta.service";
 import { InformeInterface } from "../../models/informe";
 import { PlantaInterface } from "../../models/planta";
-import { Observable } from "rxjs";
 import { take } from "rxjs/operators";
 
 @Component({
@@ -31,8 +30,8 @@ export class InformeViewComponent implements OnInit {
   public planta: PlantaInterface;
   public irradianciaMedia: number;
   public isLocalhost: boolean;
-  public imagenesDownloadUrl: Observable<string>;
-  public excelDownloadUrl: Observable<string>;
+  public imagenesDownloadUrl: string;
+  public excelDownloadUrl: string;
 
   numSeveridad = new Array(GLOBAL.labels_severidad.length)
     .fill(0)
@@ -51,12 +50,18 @@ export class InformeViewComponent implements OnInit {
     this.informeId = this.route.snapshot.paramMap.get("id");
     this.informeService.getInforme(this.informeId).subscribe(informe => {
       this.informe = informe;
-      this.excelDownloadUrl = this.storage
+      this.storage
         .ref(`informes/${this.informe.id}/informe.xlsx`)
-        .getDownloadURL();
-      this.imagenesDownloadUrl = this.storage
+        .getDownloadURL()
+        .subscribe(res => {
+          this.excelDownloadUrl = res;
+        });
+      this.storage
         .ref(`informes/${this.informe.id}/imagenes.zip`)
-        .getDownloadURL();
+        .getDownloadURL()
+        .subscribe(res => {
+          this.imagenesDownloadUrl = res;
+        });
       this.plantaService.getPlanta(informe.plantaId).subscribe(planta => {
         this.planta = planta;
         this.isLoaded1 = true;
@@ -98,9 +103,9 @@ export class InformeViewComponent implements OnInit {
           //  Les añadimos los observables de los archivos....
           // Se ha eliminado ya que tardaba mucho en cargar...
           // pc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${pc.archivoPublico}`).getDownloadURL();
-          pc.downloadUrl$ = this.storage
-            .ref(`informes/${this.informeId}/jpg/${pc.archivoPublico}`)
-            .getDownloadURL();
+          // pc.downloadUrl$ = this.storage
+          //   .ref(`informes/${this.informeId}/jpg/${pc.archivoPublico}`)
+          //   .getDownloadURL();
           // pc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/_mini_${pc.archivoPublico}`).getDownloadURL();
 
           return pc;

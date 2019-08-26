@@ -26,7 +26,7 @@ export let GLOBAL = {
     "PC",
     "VPV",
     "Substring en CA",
-    "String en CA",
+    "String",
     "Modulo en CA",
     "Substring en CC",
     "Módulo en CC",
@@ -46,7 +46,7 @@ export let GLOBAL = {
     "Punto caliente", // 1
     "Varios puntos calientes", // 2
     "Substring en circuito abierto", // 3
-    "String en circuito abierto", // 4
+    "String", // 4
     "Módulo en circuito abierto", // 5
     "Substring en cortocircuito", // 6
     "Módulo en cortocircuito", // 7
@@ -73,7 +73,7 @@ export let GLOBAL = {
     "La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en daño un irreversible en la célula, aislamiento o diodo bypass.",
     "La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en daño un irreversible en la célula, aislamiento o diodo bypass.",
     "Problema de conexión entre células o diodo bypass defectuoso.",
-    "Distintas causas, seguir recomendaciones. Podría conducir a un arco en serie visible en la superficie posterior del módulo.",
+    "Los módulos que componen el string se encuentran a una temperatura varios grados superior a la temperatura normal de operación del módulo. Es posible que el string esté en circuito abierto.",
     "Problema de conexión entre células o diodo bypass defectuoso. Puede derivar en un arco en serie visible en la superficie posterior del módulo.",
     "Diodo bypass defectuoso.",
     "Posible impacto o defecto de fabricación.",
