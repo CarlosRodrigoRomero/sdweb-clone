@@ -23,15 +23,18 @@ export class PcOverviewComponent implements OnInit {
   public dataCountCategoria: any;
   public dataPerdidasTotales: any;
   public perdidasPorCategoriaLabels: string[];
-  public chartOptions: any;
+  public chartOptionsCount: any;
+  public chartOptionsPerdidas: any;
   public perdidasTotales: number;
   public dataSeveridad: any;
   public countCategoria: number[];
   public countCategoriaLabels: string[];
+  private stepSize: number;
 
   constructor(public informeService: InformeService) {}
 
   ngOnInit() {
+    this.stepSize = 4;
     this.perdidasPorClase = Array();
 
     this.numCategorias = Array(GLOBAL.labels_tipos.length)
@@ -54,12 +57,7 @@ export class PcOverviewComponent implements OnInit {
 
       perdidasCategoria = filtroCategoria
         .map(pc => {
-          let numeroModulos;
-          if (pc.modulosAfectados) {
-            numeroModulos = pc.modulosAfectados;
-          } else {
-            numeroModulos = 1;
-          }
+          const numeroModulos = pc.modulosAfectados ? pc.modulosAfectados : 1;
           return GLOBAL.pcPerdidas[i] * numeroModulos;
         })
         .reduce((a, b) => a + b, 0);
@@ -102,7 +100,7 @@ export class PcOverviewComponent implements OnInit {
     }
 
     this.dataPerdidasCategoria = {
-      labels: this.countCategoriaLabels,
+      labels: this.perdidasPorCategoriaLabels,
       datasets: [
         {
           label: "Pérdidas (kW)",
@@ -150,14 +148,37 @@ export class PcOverviewComponent implements OnInit {
       ]
     };
 
-    this.chartOptions = {
+    const max1 = this.perdidasPorCategoria.reduce((a, b) => {
+      return Math.max(a, b);
+    });
+    const max2 = this.countCategoria.reduce((a, b) => {
+      return Math.max(a, b);
+    });
+
+    this.chartOptionsPerdidas = {
       legend: { display: false },
       scales: {
         yAxes: [
           {
             display: true,
             ticks: {
-              stepSize: 1,
+              stepSize: Math.round(max1 / this.stepSize),
+              suggestedMin: 0, // minimum will be 0, unless there is a lower value.
+              // OR //
+              beginAtZero: true // minimum value will be 0.
+            }
+          }
+        ]
+      }
+    };
+    this.chartOptionsCount = {
+      legend: { display: false },
+      scales: {
+        yAxes: [
+          {
+            display: true,
+            ticks: {
+              stepSize: Math.round(max2 / this.stepSize),
               suggestedMin: 0, // minimum will be 0, unless there is a lower value.
               // OR //
               beginAtZero: true // minimum value will be 0.
