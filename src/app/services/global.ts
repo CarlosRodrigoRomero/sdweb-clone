@@ -26,7 +26,7 @@ export let GLOBAL = {
     "PC",
     "VPV",
     "Substring en CA",
-    "String en CA",
+    "String",
     "Modulo en CA",
     "Substring en CC",
     "Módulo en CC",
@@ -46,7 +46,7 @@ export let GLOBAL = {
     "Punto caliente", // 1
     "Varios puntos calientes", // 2
     "Substring en circuito abierto", // 3
-    "String en circuito abierto", // 4
+    "String", // 4
     "Módulo en circuito abierto", // 5
     "Substring en cortocircuito", // 6
     "Módulo en cortocircuito", // 7
@@ -72,46 +72,46 @@ export let GLOBAL = {
     "0",
     "La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en daño un irreversible en la célula, aislamiento o diodo bypass.",
     "La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en daño un irreversible en la célula, aislamiento o diodo bypass.",
-    "Problema de conexión entre células o diodo bypass defectuoso.",
-    "Distintas causas, seguir recomendaciones. Podría conducir a un arco en serie visible en la superficie posterior del módulo.",
+    "Diodo bypass actuando en el módulo. Puede ser debido a que una o varias células calientes están produciendo que el diodo se active. También puede ser debido a un problema de conexión entre células o diodo bypass defectuoso.",
+    "Los módulos que componen el string se encuentran a una temperatura varios grados superior a la temperatura normal de operación del módulo. Es posible que el string esté en circuito abierto.",
     "Problema de conexión entre células o diodo bypass defectuoso. Puede derivar en un arco en serie visible en la superficie posterior del módulo.",
     "Diodo bypass defectuoso.",
     "Posible impacto o defecto de fabricación.",
     "La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en daño un irreversible en la célula, aislamiento o diodo bypass.",
     "La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en daño un irreversible en la célula, aislamiento o diodo bypass.",
-    "Fallo en una conexion entre células o fallo del diodo bypass. Puede derivar en un arco visible en la superficie posterior del módulo.",
+    "Diodo bypass actuando en el módulo. Puede ser debido a que una o varias células calientes están produciendo que el diodo se active. También puede ser debido a un problema de conexión entre células o diodo bypass defectuoso.",
     "La suciedad habitual (tierra o deposiciones de pájaros) suelen desaparecer con la lluvia.",
-    "Vidrio roto",
+    "Puede haber sido causado por una célula altas temperaturas.",
     "La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta.",
     "La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta.",
     "Existe algún elemento que está provocando sombras que evitan el correcto funcionamiento del módulo o módulos afectados.",
-    ""
+    "Suelen aparecer por defectos en la fabricación. No suele afectar al rendimiento del módulo."
   ],
   pcRecomendacion: [
     "0",
     "Ver si no hay sombras o suciedad.",
     "",
-    "Sustituir diodo bypass o arreglar defecto de conexiones.",
+    "Sustituir diodo bypass en su caso.",
     "Revisar módulos, estado de operación del inversor, cableado, conectores y fusibles",
-    "Cambiar el diodo bypass en caso de que se este el motivo.",
+    "Cambiar el diodo bypass afectado.",
     "Revisar módulo y diodos bypass para un correcto funcionamiento con polaridad inversa.",
     "Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.",
     "Reclamar a garantía en su caso.",
     "Reclamar a garantía en su caso.",
-    "Cambiar el diodo bypass en caso de que se este el motivo.",
-    "Se recomienda encarecidamente la limpieza del módulo si se estima que no va a llover pronto, con el fin de evitar daños al módulo.",
+    "Cambiar el diodo bypass en caso de que sea este el motivo.",
+    "Se recomienda la limpieza del módulo si se estima que no va a llover pronto, con el fin de evitar daños al módulo.",
     "Tener cuidado con las subidas de voltaje debido a las pérdidas de aislamiento por altas temperaturas.",
     "Análisis en detalle por experto.",
     "Análisis en detalle por experto.",
     "Eliminación de la fuente de sombras",
-    ""
+    "Hacer seguimiento de le evolución"
   ],
   pcPerdidas: [
     0, // Para que coincida el indice con el tipo de anomalia
     0, // "Punto caliente", // 1
     0, // "Varios puntos calientes", // 2
     0.35, // "Substring en CA", // 3
-    1, // "String en CA", // 4
+    0, // "String en CA", // 4
     1, // "Módulo en CA", // 5
     0.35, // "Substring en CC", // 6
     0.85, // "Módulo en CC", // 7
@@ -139,8 +139,8 @@ export let GLOBAL = {
     },
     // { nombre: "archivoPublico", descripcion: "Nombre archivo" },
     { nombre: "irradiancia", descripcion: "Irradiancia (W/m2)" },
-    { nombre: "viento", descripcion: "Viento" },
-    { nombre: "temperaturaAire", descripcion: "Temp. ambiente (ºC)" },
+    // { nombre: "viento", descripcion: "Viento" },
+    // { nombre: "temperaturaAire", descripcion: "Temp. ambiente (ºC)" },
     { nombre: "datetimeString", descripcion: "Fecha/hora" }
   ]
 };

@@ -201,3 +201,8 @@ input:checked + .slider:before {
 .displayFlex {
   display: flex;
 }
+.cargando {
+  position: absolute;
+  margin-top: 30%;
+  margin-left: 50%;
+}

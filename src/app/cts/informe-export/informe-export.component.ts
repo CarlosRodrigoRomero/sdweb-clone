@@ -51,7 +51,7 @@ export class InformeExportComponent implements OnInit {
   @Input() public informe: InformeInterface;
 
   public titulo: string;
-  public irradianciaMinima: number;
+  public irradianciaMedia: number;
   public url: string;
   public dataTipos: any;
   public dataSeveridad: any;
@@ -487,11 +487,12 @@ export class InformeExportComponent implements OnInit {
     const allPcs = this.filteredPcs;
 
     if (allPcs.length > 0) {
-      this.irradianciaMinima = Math.round(
-        allPcs.sort(this.compareIrradiancia)[0].irradiancia
+      this.irradianciaMedia = Math.round(
+        allPcs.sort(this.compareIrradiancia)[Math.round(allPcs.length / 2)]
+          .irradiancia
       );
     } else {
-      this.irradianciaMinima = 800;
+      this.irradianciaMedia = 800;
     }
 
     this.emisividad = this.informe.emisividad;
@@ -626,7 +627,9 @@ export class InformeExportComponent implements OnInit {
                   this.getDocDefinition(imageListBase64)
                 );
 
-                pdfDocGenerator.download();
+                pdfDocGenerator.download(
+                  this.informe.prefijo.concat("informe")
+                );
                 // pdfDocGenerator.getDataUrl((dataUrl) => {
                 //     const iframe = document.createElement('iframe');
                 //     iframe.src = dataUrl;
@@ -653,14 +656,19 @@ export class InformeExportComponent implements OnInit {
             this.getDocDefinition(imageListBase64)
           );
 
-          pdfDocGenerator.download();
+          pdfDocGenerator.download(
+            this.informe.prefijo.concat("informe"),
+            cb => {
+              this.generandoPDF = false;
+            }
+          );
+
           // pdfDocGenerator.getDataUrl((dataUrl) => {
           //     const iframe = document.createElement('iframe');
           //     iframe.src = dataUrl;
           //     iframe.setAttribute('style', 'position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;');
           //     document.getElementById('vistaPrevia').appendChild(iframe);
           // });
-          this.generandoPDF = false;
         });
     }
 
@@ -1328,11 +1336,11 @@ export class InformeExportComponent implements OnInit {
 
                   [
                     {
-                      text: "GSD térmico (máx)",
+                      text: "GSD térmico (medio)",
                       style: "tableLeft"
                     },
                     {
-                      text: `${this.informe.gsd} cm/pixel`
+                      text: `${this.informe.gsd} cm/pixel (+- 0.5cm/pixel )`
                     }
                   ],
 
@@ -1359,11 +1367,11 @@ export class InformeExportComponent implements OnInit {
 
                   [
                     {
-                      text: "Irradiancia (mínima)",
+                      text: "Irradiancia (media)",
                       style: "tableLeft"
                     },
                     {
-                      text: `${this.irradianciaMinima} W/m2`
+                      text: `${this.irradianciaMedia} W/m2`
                     }
                   ],
 
@@ -2227,16 +2235,17 @@ export class InformeExportComponent implements OnInit {
           });
         } else if (c.nombre === "gradienteNormalizado") {
           row.push({
-            text: Math.round(pc[c.nombre])
-              .toString()
-              .concat(" ºC"),
+            text: (Math.round(pc[c.nombre] * 10) / 10).toString().concat(" ºC"),
             style: "tableCellAnexo1"
           });
         } else if (c.nombre === "temperaturaMax") {
           row.push({
-            text: Math.round(pc[c.nombre])
-              .toString()
-              .concat(" ºC"),
+            text: (Math.round(pc[c.nombre] * 10) / 10).toString().concat(" ºC"),
+            style: "tableCellAnexo1"
+          });
+        } else if (c.nombre === "irradiancia") {
+          row.push({
+            text: Math.round(pc[c.nombre]).toString(),
             style: "tableCellAnexo1"
           });
         } else {
@@ -2409,9 +2418,7 @@ export class InformeExportComponent implements OnInit {
                     },
 
                     {
-                      text: Math.round(s.pcs[0].irradiancia)
-                        .toString()
-                        .concat(" W/m2"),
+                      text: Math.round(s.pcs[0].irradiancia).toString(),
                       style: "tableCellAnexo1"
                     },
                     {

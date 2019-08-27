@@ -1,4 +1,10 @@
-import { Component, OnInit, ViewChild, Input, Inject } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  Input,
+  AfterViewChecked
+} from "@angular/core";
 import { PcInterface } from "../../models/pc";
 import { PcService } from "../../services/pc.service";
 import { PlantaInterface } from "../../models/planta";
@@ -97,5 +103,9 @@ export class PcMapComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {});
+  }
+
+  mapIsReady(map: AgmMap) {
+    console.log("map ready", map);
   }
 }

@@ -45,6 +45,8 @@ export class PcDetailsDialogComponent implements OnInit {
   public planta: PlantaInterface;
   public informe: InformeInterface;
   public sinPcs: boolean;
+  public imagenVisualCargada: boolean;
+  public imagenTermicaCargada: boolean;
 
   constructor(
     private storage: AngularFireStorage,
@@ -74,6 +76,8 @@ export class PcDetailsDialogComponent implements OnInit {
   ngAfterViewInit() {}
 
   ngOnInit() {
+    this.imagenVisualCargada = false;
+    this.imagenTermicaCargada = false;
     this.canvas = new fabric.Canvas("dialog-canvas");
     this.visualCanvas = new fabric.Canvas("visual-canvas");
     this.setEventListenersCanvas();
@@ -100,11 +104,20 @@ export class PcDetailsDialogComponent implements OnInit {
           unsharpRadius: 0.6,
           unsharpThreshold: 2
         })
-        .then();
+        .then(res => {
+          this.imagenVisualCargada = true;
+        });
       // this.visualCanvas.getContext('2d').drawImage(this.imagenVisual, 0, 0 );
     };
 
     this.imagenTermica.onload = () => {
+      this.imagenTermicaCargada = true;
+      if (!this.sinPcs) {
+        // Dibujar all pcs
+        this.drawAllPcsInCanvas();
+        // Seleccionar pc
+        this.selectPc(this.pc);
+      }
       // this.hiddenCanvas.getContext('2d').drawImage(this.imagenTermica, 0, 0 );
       this.canvas.setBackgroundImage(
         new fabric.Image(this.imagenTermica, {
@@ -129,13 +142,6 @@ export class PcDetailsDialogComponent implements OnInit {
       );
     };
     // this.tooltipElement = document.getElementById("dialog-tooltip");
-
-    if (!this.sinPcs) {
-      // Dibujar all pcs
-      this.drawAllPcsInCanvas();
-      // Seleccionar pc
-      this.selectPc(this.pc);
-    }
   }
 
   selectPc(pc: PcInterface) {

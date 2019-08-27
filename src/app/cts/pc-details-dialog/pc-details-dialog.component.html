@@ -21,6 +21,9 @@
         class="imagen-termica-div"
         (mouseleave)="onMouseLeaveCanvas($event)"
       >
+        <div *ngIf="!imagenTermicaCargada" class="cargando text-center">
+          <app-spinner></app-spinner>
+        </div>
         <canvas
           (mousemove)="onMouseMoveCanvas($event)"
           id="dialog-canvas"
@@ -32,6 +35,9 @@
         <!-- <canvas id="hidden-canvas" width="640" height="512"></canvas> -->
       </div>
       <div id="imagen-visual-div" class="imagen-termica-div">
+        <div *ngIf="!imagenVisualCargada" class="cargando text-center">
+          <app-spinner></app-spinner>
+        </div>
         <canvas id="visual-canvas" width="640" height="512"></canvas>
       </div>
     </div>
@@ -174,7 +180,8 @@
           </div>
           <div class="pc-details-derecha-item-tabla">
             <span class="text-center"><strong>Altura</strong></span>
-            <span class="text-center">{{ getEtiquetaLocalY(pc.local_y) }}</span>          </div>
+            <span class="text-center">{{ getEtiquetaLocalY(pc.local_y) }}</span>
+          </div>
         </ng-template>
       </div>
       <div class="pc-details-derecha-item">
@@ -209,9 +216,9 @@
         <div class="pc-texto">
           <span class="detail-title">Meteo: </span>
           <span
-            >{{ pc.irradiancia }} W/m<sup>2</sup> | Viento: {{ pc.viento }} |
-            {{ pc.temperaturaAire }} ºC | {{ pc.nubosidad }} % nubes |
-            Emisividad: {{ pc.emisividad }} | Temp. Reflejada:
+            >{{ pc.irradiancia | number: "1.0-0" }} W/m<sup>2</sup> | Viento:
+            {{ pc.viento }} | {{ pc.temperaturaAire }} ºC | {{ pc.nubosidad }} %
+            nubes | Emisividad: {{ pc.emisividad }} | Temp. Reflejada:
             {{ informe.tempReflejada }} ºC</span
           >
         </div>

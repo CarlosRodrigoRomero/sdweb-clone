@@ -77,6 +77,15 @@
         />
       </mat-form-field>
 
+      <mat-form-field>
+        <input
+          matInput
+          type="number"
+          formControlName="moduloPotencia"
+          placeholder="Potencia media modulos (W)"
+        />
+      </mat-form-field>
+
       <mat-form-field *ngIf="planta">
         <mat-label>Módulos</mat-label>
         <mat-select formControlName="modulos" multiple>
