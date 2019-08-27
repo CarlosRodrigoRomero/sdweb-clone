@@ -25,6 +25,7 @@ export class PcOverviewComponent implements OnInit {
   public perdidasPorCategoriaLabels: string[];
   public chartOptionsCount: any;
   public chartOptionsPerdidas: any;
+  public chartOptionsDonut: any;
   public perdidasTotales: number;
   public dataSeveridad: any;
   public countCategoria: number[];
@@ -163,6 +164,22 @@ export class PcOverviewComponent implements OnInit {
             display: true,
             ticks: {
               stepSize: Math.round(max1 / this.stepSize),
+              suggestedMin: 0, // minimum will be 0, unless there is a lower value.
+              // OR //
+              beginAtZero: true // minimum value will be 0.
+            }
+          }
+        ]
+      }
+    };
+    this.chartOptionsDonut = {
+      legend: { display: false },
+      scales: {
+        yAxes: [
+          {
+            display: true,
+            ticks: {
+              stepSize: 100,
               suggestedMin: 0, // minimum will be 0, unless there is a lower value.
               // OR //
               beginAtZero: true // minimum value will be 0.
