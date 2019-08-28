@@ -1567,7 +1567,7 @@ export class InformeEditComponent implements OnInit {
     return [filaDistMin, columnaDistMin];
   }
 
-  updateEstructura(event) {
+  updateEstructura() {
     if (this.estructura.filename === this.currentFileName) {
       this.estructura.filas = this.filasEstructura;
       this.estructura.columnas = this.columnasEstructura;

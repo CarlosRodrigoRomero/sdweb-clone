@@ -603,6 +603,9 @@ export class PcDetailsDialogComponent implements OnInit {
     return this.getAltura(localY);
   }
   updatePcInDb(pc: PcInterface) {
+    delete pc.downloadUrlVisual$;
+    delete pc.downloadUrl$;
+    delete pc.downloadUrlRjpg$;
     this.pcService.updatePc(pc);
   }
 }
