@@ -11,6 +11,10 @@ import Pica from "pica";
 import { take } from "rxjs/operators";
 import { PlantaInterface } from "../../models/planta";
 import { InformeInterface } from "../../models/informe";
+import { AuthService } from "src/app/services/auth.service";
+import { UserInterface } from "src/app/models/user";
+import { PcService } from "../../services/pc.service";
+
 const pica = Pica();
 
 @Component({
@@ -23,6 +27,8 @@ export class PcDetailsDialogComponent implements OnInit {
   private maxTemp: number;
   private minTemp: number;
   private canvas: any;
+  public user: UserInterface;
+
   // private hiddenCanvas: any;
   // private tooltipElement: any;
   public pcDescripcion: string[];
@@ -49,6 +55,8 @@ export class PcDetailsDialogComponent implements OnInit {
   public imagenTermicaCargada: boolean;
 
   constructor(
+    private pcService: PcService,
+    public auth: AuthService,
     private storage: AngularFireStorage,
     public dialogRef: MatDialogRef<PcDetailsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
@@ -76,6 +84,9 @@ export class PcDetailsDialogComponent implements OnInit {
   ngAfterViewInit() {}
 
   ngOnInit() {
+    this.auth.user$.subscribe(user => {
+      this.user = user;
+    });
     this.imagenVisualCargada = false;
     this.imagenTermicaCargada = false;
     this.canvas = new fabric.Canvas("dialog-canvas");
@@ -590,5 +601,8 @@ export class PcDetailsDialogComponent implements OnInit {
       return this.planta.etiquetasLocalY[this.planta.filas - localY];
     }
     return this.getAltura(localY);
+  }
+  updatePcInDb(pc: PcInterface) {
+    this.pcService.updatePc(pc);
   }
 }

@@ -105,7 +105,5 @@ export class PcMapComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {});
   }
 
-  mapIsReady(map: AgmMap) {
-    console.log("map ready", map);
-  }
+  mapIsReady(map: AgmMap) {}
 }

@@ -235,6 +235,18 @@
         <!-- <button mat-raised-button>reclamacion</button> -->
         <!-- <button (click)="pc.resuelto = !pc.resuelto" [disabled]="pc.resuelto" mat-raised-button> <i *ngIf="pc.resuelto" class="fas fa-check"></i> resuelto</button> -->
       </div>
+      <div *ngIf="user?.role === 1" class="pc-edit">
+        <span>Tipo</span>
+        <input
+          style="width: 3rem;"
+          [(ngModel)]="pc.tipo"
+          type="number"
+          id="pcTipo"
+          maxlength="2"
+          size="20"
+          (change)="updatePcInDb(pc)"
+        />
+      </div>
     </div>
   </div>
   <!-- <button mat-button (click)="onNoClick()">Cerrar</button> -->
