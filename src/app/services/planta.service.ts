@@ -2,18 +2,16 @@ import { Injectable } from "@angular/core";
 import {
   AngularFirestore,
   AngularFirestoreDocument,
-  AngularFirestoreCollection,
-
+  AngularFirestoreCollection
 } from "@angular/fire/firestore";
 import { PlantaInterface } from "src/app/models/planta";
 import { Observable, BehaviorSubject } from "rxjs";
-import { map } from "rxjs/operators";
+import { map, filter } from "rxjs/operators";
 import { LocationAreaInterface } from "../models/location";
 
 import { UserInterface } from "../models/user";
 import { ModuloInterface } from "../models/modulo";
-import * as firebase from 'firebase/app';
-
+import * as firebase from "firebase/app";
 
 @Injectable({
   providedIn: "root"
@@ -88,13 +86,12 @@ export class PlantaService {
     const LocAreaDoc = this.afs.doc(
       `plantas/${locArea.plantaId}/locationAreas/${locArea.id}`
     );
-    if (!locArea.hasOwnProperty('modulo')) {
+    if (!locArea.hasOwnProperty("modulo")) {
       LocAreaDoc.update({
         modulo: firebase.firestore.FieldValue.delete()
-    });
+      });
     }
     LocAreaDoc.update(locArea);
-
   }
 
   delLocationArea(locationArea: LocationAreaInterface) {
@@ -127,7 +124,23 @@ export class PlantaService {
 
   getPlantasDeEmpresa(user: UserInterface): Observable<PlantaInterface[]> {
     let query$: AngularFirestoreCollection<PlantaInterface>;
-    if (user.role === 1) {
+    if (user.role === 2) {
+      query$ = this.afs.collection<PlantaInterface>("plantas");
+      return query$.snapshotChanges().pipe(
+        map(actions =>
+          actions.map(a => {
+            const data = a.payload.doc.data() as PlantaInterface;
+            data.id = a.payload.doc.id;
+            return data;
+          })
+        ),
+        map(plantas => {
+          return plantas.filter(planta => {
+            return user.plantas.includes(planta.id);
+          });
+        })
+      );
+    } else if (user.role === 1) {
       query$ = this.afs.collection<PlantaInterface>("plantas");
     } else {
       query$ = this.afs.collection<PlantaInterface>("plantas", ref =>
@@ -147,7 +160,7 @@ export class PlantaService {
   }
 
   getModulosPlanta(planta: PlantaInterface): ModuloInterface[] {
-    if (planta.hasOwnProperty('modulos')) {
+    if (planta.hasOwnProperty("modulos")) {
       if (planta.modulos.length > 0) {
         return this.modulos.filter(item => {
           return planta.modulos.indexOf(item.id) >= 0;

@@ -2,5 +2,6 @@ export interface UserInterface {
   email?: string;
   uid?: string;
   empresaNombre?: string;
-  role?: number; // 0:usuario | 1:admin
+  role?: number; // 0:usuario | 1:admin | 2: externo
+  plantas?: string[];
 }
