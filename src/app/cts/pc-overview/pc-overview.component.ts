@@ -75,7 +75,6 @@ export class PcOverviewComponent implements OnInit {
               return GLOBAL.pcPerdidas[i] * numeroModulos * pc.modulo.potencia;
             }
           }
-          console.log(numeroModulos, this.planta.moduloPotencia);
           return (
             GLOBAL.pcPerdidas[i] * numeroModulos * this.planta.moduloPotencia
           );
