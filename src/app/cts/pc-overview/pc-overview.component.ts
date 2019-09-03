@@ -52,14 +52,33 @@ export class PcOverviewComponent implements OnInit {
     this.countCategoria = Array();
     this.countCategoriaLabels = Array();
 
-    let filtroCategoria;
+    let filtroCategoria: PcInterface[];
+
     for (const i of this.numCategorias) {
       filtroCategoria = this.allPcs.filter(pc => pc.tipo === i);
 
       perdidasCategoria = filtroCategoria
         .map(pc => {
-          const numeroModulos = pc.modulosAfectados ? pc.modulosAfectados : 1;
-          return GLOBAL.pcPerdidas[i] * numeroModulos;
+          let numeroModulos: number;
+          if (pc.hasOwnProperty("modulosAfectados")) {
+            if (isNaN(pc.modulosAfectados)) {
+              numeroModulos = 1;
+            } else {
+              numeroModulos = pc.modulosAfectados;
+            }
+          } else {
+            numeroModulos = 1;
+          }
+
+          if (pc.hasOwnProperty("modulo")) {
+            if (pc.modulo.hasOwnProperty("potencia")) {
+              return GLOBAL.pcPerdidas[i] * numeroModulos * pc.modulo.potencia;
+            }
+          }
+          console.log(numeroModulos, this.planta.moduloPotencia);
+          return (
+            GLOBAL.pcPerdidas[i] * numeroModulos * this.planta.moduloPotencia
+          );
         })
         .reduce((a, b) => a + b, 0);
 
@@ -67,13 +86,15 @@ export class PcOverviewComponent implements OnInit {
         this.countCategoria.push(filtroCategoria.length);
         this.countCategoriaLabels.push(GLOBAL.labels_tipos[i]);
       }
+      console.log(
+        "TCL: PcOverviewComponent -> ngOnInit -> perdidasCategoria",
+        perdidasCategoria
+      );
 
       if (perdidasCategoria > 0) {
+        // En KW (dividimos entre 1000)
         this.perdidasPorCategoria.push(
-          // en kW (/1000)
-          Math.round(
-            (this.planta.moduloPotencia / 1000) * perdidasCategoria * 10
-          ) / 10
+          Math.round((perdidasCategoria * 10) / 1000) / 10
         );
         this.perdidasPorCategoriaLabels.push(GLOBAL.labels_tipos[i]);
       }
@@ -132,7 +153,7 @@ export class PcOverviewComponent implements OnInit {
       Math.round((this.perdidasTotales / 10 / this.planta.potencia) * 100) /
       100;
 
-    this.informeService.updateInforme(this.informe);
+    // this.informeService.updateInforme(this.informe);
 
     this.dataPerdidasTotales = {
       labels: ["Pérdidas nominales (kW)", "Potencia nominal no afectada"],

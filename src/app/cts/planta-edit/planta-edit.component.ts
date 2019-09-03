@@ -47,7 +47,9 @@ export class PlantaEditComponent implements OnInit {
         filas: planta.filas,
         columnas: planta.columnas,
         num_modulos: planta.num_modulos,
-        moduloPotencia: planta.moduloPotencia,
+        moduloPotencia: planta.hasOwnProperty("moduloPotencia")
+          ? planta.moduloPotencia
+          : 0,
         vertical: planta.vertical,
         zoom: planta.zoom,
         alturaBajaPrimero: planta.alturaBajaPrimero

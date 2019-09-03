@@ -1081,7 +1081,8 @@ export class InformeEditComponent implements OnInit {
       pc.modulo = modulo;
     }
 
-    pc.datetime = this.current_datetime;
+    // pc.datetime = this.current_datetime;
+
     this.updatePcInDb(pc);
   }
 
@@ -1614,6 +1615,7 @@ export class InformeEditComponent implements OnInit {
         lat: pc.gps_lat,
         lng: pc.gps_lng
       });
+
       this.updateLocalAreaInPc(pc, globalX, globalY, modulo);
     });
   }
