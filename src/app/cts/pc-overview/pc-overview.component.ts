@@ -85,13 +85,7 @@ export class PcOverviewComponent implements OnInit {
       if (filtroCategoria.length > 0) {
         this.countCategoria.push(filtroCategoria.length);
         this.countCategoriaLabels.push(GLOBAL.labels_tipos[i]);
-      }
-      console.log(
-        "TCL: PcOverviewComponent -> ngOnInit -> perdidasCategoria",
-        perdidasCategoria
-      );
 
-      if (perdidasCategoria > 0) {
         // En KW (dividimos entre 1000)
         this.perdidasPorCategoria.push(
           Math.round((perdidasCategoria * 10) / 1000) / 10
