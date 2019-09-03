@@ -510,8 +510,8 @@ export class InformeExportComponent implements OnInit {
         } else {
           countColumnas.push(allPcs.filter(pc => pc.local_y === y).length);
         }
-        this.countPosicion.push(countColumnas);
       }
+      this.countPosicion.push(countColumnas);
     }
 
     // CATEGORIAS //
@@ -921,7 +921,7 @@ export class InformeExportComponent implements OnInit {
 
     for (const i of this.arrayColumnas) {
       arrayHeader.push({
-        text: this.getAltura(i.toString()),
+        text: i.toString(),
         style: "tableHeaderRed"
       });
     }
@@ -931,7 +931,7 @@ export class InformeExportComponent implements OnInit {
     for (const j of this.arrayFilas) {
       const arrayFila = [];
       arrayFila.push({
-        text: j.toString(),
+        text: this.getAltura(j.toString()),
         style: "tableHeaderRed"
       });
       const countPosicionFila = this.countPosicion[j - 1];
@@ -950,9 +950,7 @@ export class InformeExportComponent implements OnInit {
 
   private getTextoIrradiancia() {
     if (this.informe.irradiancia === 0) {
-      return `Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de ${
-        this.planta.nombre
-      }, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.`;
+      return `Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de ${this.planta.nombre}, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.`;
     } else {
       return "Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición que Solardrone ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.";
     }
@@ -991,9 +989,7 @@ export class InformeExportComponent implements OnInit {
             text: `Planta solar: `,
             style: "bold"
           },
-          `${this.planta.nombre} (${this.planta.potencia} MW - ${
-            this.planta.tipo
-          })`
+          `${this.planta.nombre} (${this.planta.potencia} MW - ${this.planta.tipo})`
         ],
         style: "subtitulo"
       },
@@ -1022,9 +1018,7 @@ export class InformeExportComponent implements OnInit {
     const introduccion = (index: string) => {
       return [
         {
-          text: `Este documento contiene los resultados de la inspección termográfica realizada en la planta solar fotovoltaica de ${
-            this.planta.nombre
-          } de ${this.planta.potencia} MW (${this.planta.tipo}).`,
+          text: `Este documento contiene los resultados de la inspección termográfica realizada en la planta solar fotovoltaica de ${this.planta.nombre} de ${this.planta.potencia} MW (${this.planta.tipo}).`,
           style: "p"
         },
 
@@ -1318,9 +1312,7 @@ export class InformeExportComponent implements OnInit {
                       style: "tableLeft"
                     },
                     {
-                      text: `${this.informe.hora_inicio} - ${
-                        this.informe.hora_fin
-                      }`
+                      text: `${this.informe.hora_inicio} - ${this.informe.hora_fin}`
                     }
                   ],
 
@@ -1829,9 +1821,7 @@ export class InformeExportComponent implements OnInit {
           text: [
             `Se han registrado un total de `,
             { text: this.countClase[1] + this.countClase[2], style: "bold" },
-            ` anomalías térmicas, de las cuales ${
-              this.countClase[1]
-            } son de clase 2 y ${this.countClase[2]} son de clase 3.`
+            ` anomalías térmicas, de las cuales ${this.countClase[1]} son de clase 2 y ${this.countClase[2]} son de clase 3.`
           ],
           style: "p"
         },
@@ -1850,9 +1840,7 @@ export class InformeExportComponent implements OnInit {
         "\n",
 
         {
-          text: `La siguiente tabla muestra la cantidad de anomalías térmicas por categoría. En el caso de células calientes, sólo se incluyen aquellas con gradientes mayores a ${
-            this.currentFiltroGradiente
-          } ºC`,
+          text: `La siguiente tabla muestra la cantidad de anomalías térmicas por categoría. En el caso de células calientes, sólo se incluyen aquellas con gradientes mayores a ${this.currentFiltroGradiente} ºC`,
           style: "p"
         },
 
