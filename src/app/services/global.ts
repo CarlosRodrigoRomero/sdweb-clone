@@ -38,7 +38,8 @@ export let GLOBAL = {
     "Transfer resistance",
     "Caja de conexiones caliente",
     "Sombras",
-    "Yellowing" // 16
+    "Yellowing", // 16
+    "String en CA"
   ],
   severidad_dt: [5, 20, 40],
   pcDescripcion: [
@@ -58,7 +59,8 @@ export let GLOBAL = {
     "Transfer resistance", // 13
     "Caja de conexiones caliente", // 14
     "Módulo con sombras", // 15
-    "Yellowing" // 16
+    "Yellowing", // 16
+    "String en circuito abierto"
   ],
   //   '0',
   //   'Célula caliente',
@@ -76,7 +78,7 @@ export let GLOBAL = {
     "Los módulos que componen el string se encuentran a una temperatura varios grados superior a la temperatura normal de operación del módulo. Es posible que el string esté en circuito abierto.",
     "Problema de conexión entre células o diodo bypass defectuoso. Puede derivar en un arco en serie visible en la superficie posterior del módulo.",
     "Diodo bypass defectuoso.",
-    "Posible impacto o defecto de fabricación.",
+    "Posible subida repentina de tensión o defecto de fabricación.",
     "La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en daño un irreversible en la célula, aislamiento o diodo bypass.",
     "La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en daño un irreversible en la célula, aislamiento o diodo bypass.",
     "Diodo bypass actuando en el módulo. Puede ser debido a que una o varias células calientes están produciendo que el diodo se active. También puede ser debido a un problema de conexión entre células o diodo bypass defectuoso.",
@@ -85,7 +87,8 @@ export let GLOBAL = {
     "La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta.",
     "La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta.",
     "Existe algún elemento que está provocando sombras que evitan el correcto funcionamiento del módulo o módulos afectados.",
-    "Suelen aparecer por defectos en la fabricación. No suele afectar al rendimiento del módulo."
+    "Suelen aparecer por defectos en la fabricación. No suele afectar al rendimiento del módulo.",
+    "Los módulos que componen el string se encuentran a una temperatura varios grados superior a la temperatura normal de operación del módulo. Es posible que el string esté en circuito abierto."
   ],
   pcRecomendacion: [
     "0",
@@ -104,7 +107,8 @@ export let GLOBAL = {
     "Análisis en detalle por experto.",
     "Análisis en detalle por experto.",
     "Eliminación de la fuente de sombras",
-    "Hacer seguimiento de le evolución"
+    "Hacer seguimiento de le evolución",
+    "Revisar módulos, estado de operación del inversor, cableado, conectores y fusibles"
   ],
   pcPerdidas: [
     0, // Para que coincida el indice con el tipo de anomalia
@@ -123,7 +127,8 @@ export let GLOBAL = {
     0, // "Transfer resistance", // 13
     0, // "Caja de conexiones caliente", // 14
     0, // "Módulo afectado por sombras" // 15
-    0 // Yellowing //16
+    0, // Yellowing //16
+    1
   ],
 
   pcColumnas: [

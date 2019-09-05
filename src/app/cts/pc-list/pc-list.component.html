@@ -53,6 +53,9 @@
       <td mat-cell *matCellDef="let element">
         <span class="text-perdidas"
           >{{ getPerdidas(element.tipo) * 100 | number: "1.0-0" }} %
+          <span *ngIf="!checkIsNaN(element.modulosAfectados)">
+            ({{ element.modulosAfectados }})
+          </span>
         </span>
       </td>
     </ng-container>
