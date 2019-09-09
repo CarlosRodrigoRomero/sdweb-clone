@@ -292,6 +292,7 @@
                   />
                   <img
                     class="img-fluid"
+                    alt="String"
                     src="../../../assets/images/tipo_4.png"
                   />
                 </label>
@@ -424,6 +425,21 @@
                   <img
                     class="img-fluid"
                     src="../../../assets/images/tipo_16.png"
+                  />
+                </label>
+
+                <label class="selected-pc-tipo-label">
+                  <input
+                    (change)="updatePcInDb(selected_pc, false)"
+                    [(ngModel)]="selected_pc.tipo"
+                    type="radio"
+                    name="tipo"
+                    [value]="17"
+                  />
+                  <img
+                    class="img-fluid"
+                    alt="String en CA"
+                    src="../../../assets/images/tipo_4.png"
                   />
                 </label>
                 <!-- <label class="selected-pc-tipo-label">
@@ -629,6 +645,7 @@
             pc_error:
               (pc.tipo !== 0 &&
                 pc.tipo !== 4 &&
+                pc.tipo !== 17 &&
                 (pc.local_x === 0 || pc.local_y === 0)) ||
               pc.gps_lat === current_gps_lat ||
               (pc.global_x.length === 0 && pc.global_y.length === 0),

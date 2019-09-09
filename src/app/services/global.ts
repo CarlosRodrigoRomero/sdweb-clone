@@ -39,7 +39,7 @@ export let GLOBAL = {
     "Caja de conexiones caliente",
     "Sombras",
     "Yellowing", // 16
-    "String en CA"
+    "String en CA" //17
   ],
   severidad_dt: [5, 20, 40],
   pcDescripcion: [
