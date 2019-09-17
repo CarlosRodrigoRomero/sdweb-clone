@@ -43,7 +43,7 @@ export class InformeAddComponent implements OnInit {
         alturaVuelo: [23, [Validators.required]],
         gsd: [3, [Validators.required]],
         correccHoraSrt: [8, [Validators.required]],
-        emisividad: [0.9, [Validators.required]],
+        emisividad: [0.85, [Validators.required]],
         tempReflejada: [-30, [Validators.required]],
         viento: ["", [Validators.required]],
         prefijo: ["", [Validators.required]],

@@ -144,6 +144,16 @@
               maxlength="2"
               size="4"
             />
+            
+            <input
+            *ngIf="planta?.tipo == '2 ejes'"
+            [(ngModel)]="estructura.filaInicio"
+            type="number"
+            id="filaInicioEstructura"
+            (change)="updateEstructura()"
+            maxlength="2"
+            size="3"
+          />
           </div>
         </div>
 

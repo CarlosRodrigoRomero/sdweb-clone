@@ -470,6 +470,9 @@ export class InformeEditComponent implements OnInit {
     if (this.estructura.hasOwnProperty("columnaInicio")) {
       columnaReal = columnaReal + estructura.columnaInicio - 1;
     }
+    if (this.estructura.hasOwnProperty("filaInicio")) {
+      filaReal = filaReal + estructura.filaInicio - 1;
+    }
 
     return [columnaReal, filaReal];
   }
@@ -1208,7 +1211,8 @@ export class InformeEditComponent implements OnInit {
       filename: fileName,
       coords: Array(),
       sentido: this.sentidoEstructura,
-      columnaInicio: 1
+      columnaInicio: 1,
+      filaInicio: 1
     };
   }
 
@@ -1235,6 +1239,7 @@ export class InformeEditComponent implements OnInit {
         this.estructura.columnas = this.columnasEstructura;
         this.getAllPointsEstructura(this.estructura);
         this.estructura.columnaInicio = 1;
+        this.estructura.filaInicio = 1;
 
         this.informeService.addEstructuraInforme(
           this.informe.id,
