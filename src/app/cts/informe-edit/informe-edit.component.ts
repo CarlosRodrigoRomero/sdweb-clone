@@ -174,10 +174,12 @@ export class InformeEditComponent implements OnInit {
 
           this.selected_pc.refLeft = Math.round(actObjRaw.left);
           this.selected_pc.refWidth = Math.round(
-            Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x)
+            Math.abs(actObjRaw.aCoords.tr.x - actObjRaw.aCoords.tl.x) -
+              actObjRaw.strokeWidth / 2
           );
           this.selected_pc.refHeight = Math.round(
-            Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y)
+            Math.abs(actObjRaw.aCoords.bl.y - actObjRaw.aCoords.tl.y) -
+              actObjRaw.strokeWidth / 2
           );
         } else {
           this.selected_pc.img_top = Math.round(actObjRaw.top);
