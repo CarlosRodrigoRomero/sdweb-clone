@@ -131,7 +131,7 @@ export class InformeEditComponent implements OnInit {
     this.current_image_rotation = 0;
     this.squareBase = 37;
     this.squareProp = 1.8;
-    this._selectedStrokeWidth = 3;
+    this._selectedStrokeWidth = 2; // Tiene que ser par
 
     this.image_width = 640;
     this.image_height = 512;
@@ -165,7 +165,9 @@ export class InformeEditComponent implements OnInit {
     this.canvas.on("object:modified", options => {
       if (options.target.type === "rect") {
         const actObjRaw = this.transformActObjToRaw(options.target);
+        console.log("TCL: ngOnInit -> actObjRaw", actObjRaw);
         this.selectPcFromLocalId(options.target.local_id);
+        console.log("selected_pc witdth", this.selected_pc.img_width);
 
         if (actObjRaw.ref === true) {
           this.selected_pc.refTop = Math.round(actObjRaw.top);
@@ -181,14 +183,16 @@ export class InformeEditComponent implements OnInit {
           this.selected_pc.img_top = Math.round(actObjRaw.top);
           this.selected_pc.img_left = Math.round(actObjRaw.left);
           this.selected_pc.img_width = Math.round(
-            Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x)
+            Math.abs(actObjRaw.aCoords.tr.x - actObjRaw.aCoords.tl.x) -
+              actObjRaw.strokeWidth / 2
           );
           this.selected_pc.img_height = Math.round(
-            Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y)
+            Math.abs(actObjRaw.aCoords.bl.y - actObjRaw.aCoords.tl.y) -
+              actObjRaw.strokeWidth / 2
           );
         }
       }
-
+      console.log("selected_pc witdth2", this.selected_pc.img_width);
       this.updatePcInDb(this.selected_pc);
     });
 
@@ -1120,7 +1124,7 @@ export class InformeEditComponent implements OnInit {
       top: pc.img_top,
       fill: "rgba(0,0,0,0)",
       stroke: "red",
-      strokeWidth: 1,
+      strokeWidth: 0,
       hasControls: false,
       width: pc.img_width,
       height: pc.img_height,
@@ -1133,7 +1137,7 @@ export class InformeEditComponent implements OnInit {
       top: pc.refTop,
       fill: "rgba(0,0,0,0)",
       stroke: "red",
-      strokeWidth: 1,
+      strokeWidth: 0,
       hasControls: false,
       width: pc.refWidth,
       height: pc.refHeight,
@@ -1144,7 +1148,7 @@ export class InformeEditComponent implements OnInit {
 
     const transformedRect = this.transformActObjToRotated(rect2);
     const transformedRectRef = this.transformActObjToRotated(rectRef2);
-    const strokWidth =
+    const strokeWidth =
       pc.local_id === this.selected_pc.local_id ? this._selectedStrokeWidth : 1;
 
     const rect = new fabric.Rect({
@@ -1152,10 +1156,10 @@ export class InformeEditComponent implements OnInit {
       top: transformedRect.top,
       fill: "rgba(0,0,0,0)",
       stroke: pc.local_id === this.selected_pc.local_id ? "white" : "red",
-      strokeWidth: strokWidth,
+      strokeWidth: strokeWidth,
       hasControls: true,
-      width: transformedRect.width,
-      height: transformedRect.height,
+      width: transformedRect.width - strokeWidth,
+      height: transformedRect.height - strokeWidth,
       local_id: pc.local_id,
       ref: false,
       hasRotatingPoint: false
@@ -1166,7 +1170,7 @@ export class InformeEditComponent implements OnInit {
       top: transformedRectRef.top,
       fill: "rgba(0,0,0,0)",
       stroke: "blue",
-      strokeWidth: strokWidth,
+      strokeWidth: strokeWidth,
       hasControls: true,
       width: transformedRectRef.width,
       height: transformedRectRef.height,
