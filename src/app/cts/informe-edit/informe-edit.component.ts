@@ -165,9 +165,7 @@ export class InformeEditComponent implements OnInit {
     this.canvas.on("object:modified", options => {
       if (options.target.type === "rect") {
         const actObjRaw = this.transformActObjToRaw(options.target);
-        console.log("TCL: ngOnInit -> actObjRaw", actObjRaw);
         this.selectPcFromLocalId(options.target.local_id);
-        console.log("selected_pc witdth", this.selected_pc.img_width);
 
         if (actObjRaw.ref === true) {
           this.selected_pc.refTop = Math.round(actObjRaw.top);
@@ -194,7 +192,6 @@ export class InformeEditComponent implements OnInit {
           );
         }
       }
-      console.log("selected_pc witdth2", this.selected_pc.img_width);
       this.updatePcInDb(this.selected_pc);
     });
 
@@ -489,7 +486,9 @@ export class InformeEditComponent implements OnInit {
     let height: number;
     let width: number;
     let top: number;
+    let bottom: number;
     let left: number;
+    let right: number;
     // Referencia
     let topLeftRef: Point;
     let topRightRef: Point;
@@ -526,21 +525,12 @@ export class InformeEditComponent implements OnInit {
         bottomRightRef = this.estructuraMatrix[fila][columna + 1];
       }
 
-      top = 0.5 * (topLeftModulo.y + topRightModulo.y);
-      left = 0.5 * (topLeftModulo.x + bottomLeftModulo.x);
-      height =
-        0.5 *
-        (-topLeftModulo.y +
-          bottomLeftModulo.y -
-          topRightModulo.y +
-          bottomRightModulo.y);
-
-      width =
-        0.5 *
-        (topRightModulo.x -
-          topLeftModulo.x +
-          bottomRightModulo.x -
-          bottomLeftModulo.x);
+      top = Math.round(0.5 * (topLeftModulo.y + topRightModulo.y));
+      bottom = Math.round(0.5 * (bottomLeftModulo.y + bottomRightModulo.y));
+      left = Math.round(0.5 * (topLeftModulo.x + bottomLeftModulo.x));
+      right = Math.round(0.5 * (topRightModulo.x + bottomRightModulo.x));
+      height = Math.round(Math.abs(bottom - top) + 2);
+      width = Math.round(Math.abs(right - left));
 
       this.setSquareBase(Math.min(height, width));
 
@@ -1174,8 +1164,8 @@ export class InformeEditComponent implements OnInit {
       stroke: "blue",
       strokeWidth: strokeWidth,
       hasControls: true,
-      width: transformedRectRef.width,
-      height: transformedRectRef.height,
+      width: transformedRectRef.width - strokeWidth,
+      height: transformedRectRef.height - strokeWidth,
       local_id: pc.local_id,
       ref: true,
       selectable: pc.local_id === this.selected_pc.local_id,
@@ -1493,9 +1483,9 @@ export class InformeEditComponent implements OnInit {
       fila.forEach(punto => {
         this.canvas.add(
           new fabric.Circle({
-            left: punto.x - 1,
-            top: punto.y - 1,
-            radius: 2,
+            left: punto.x,
+            top: punto.y,
+            radius: 1,
             fill: "red",
             selectable: false
           })
