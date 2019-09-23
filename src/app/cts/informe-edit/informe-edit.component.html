@@ -212,7 +212,7 @@
                       class="local-coords-col"
                     >
                       <div
-                        *ngIf="planta.tipo === '2 ejes'; else dosejes"
+                        *ngIf="planta.tipo !== 'fija'; else dosejes"
                         [ngClass]="{
                           'local-coords-selected':
                             selected_pc.local_x === c &&
@@ -226,7 +226,7 @@
                       </div>
                       <ng-template #dosejes>
                         <div
-                          *ngIf="planta.tipo !== '2 ejes'"
+                          
                           [ngClass]="{
                             'local-coords-selected': selected_pc.local_y === f,
                             'local-coords-table-cell-v':

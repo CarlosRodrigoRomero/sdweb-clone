@@ -117,7 +117,7 @@ export class InformeEditComponent implements OnInit {
     this.rangeValue = 0;
     this.fileList = new Array();
     this.coords = new Array();
-    this.rectRefReduction = 0.1;
+    this.rectRefReduction = 0.2;
 
     // this.max_temp = 70;
     // this.min_temp = 41;
@@ -529,21 +529,21 @@ export class InformeEditComponent implements OnInit {
       bottom = Math.round(0.5 * (bottomLeftModulo.y + bottomRightModulo.y));
       left = Math.round(0.5 * (topLeftModulo.x + bottomLeftModulo.x));
       right = Math.round(0.5 * (topRightModulo.x + bottomRightModulo.x));
-      height = Math.round(Math.abs(bottom - top) + 2);
-      width = Math.round(Math.abs(right - left));
+      height = Math.round(Math.abs(bottom - top) + 2) + 1;
+      width = Math.round(Math.abs(right - left)) + 1;
 
       this.setSquareBase(Math.min(height, width));
 
       //   Ref
       topRef = Math.max(topLeftRef.y, topRightRef.y);
       leftRef = Math.max(topLeftRef.x, bottomLeftRef.x);
-      heightRef = Math.min(bottomLeftRef.y, bottomRightRef.y) - topRef;
-      widthRef = Math.min(topRightRef.x, bottomRightRef.x) - leftRef;
+      heightRef = Math.min(bottomLeftRef.y, bottomRightRef.y) - topRef + 1;
+      widthRef = Math.min(topRightRef.x, bottomRightRef.x) - leftRef + 1;
 
       leftRef = Math.round(leftRef + (widthRef * this.rectRefReduction) / 2);
       topRef = Math.round(topRef + (heightRef * this.rectRefReduction) / 2);
-      widthRef = Math.round(widthRef * (1 - this.rectRefReduction));
-      heightRef = Math.round(heightRef * (1 - this.rectRefReduction));
+      widthRef = Math.round(widthRef * (1 - this.rectRefReduction)) + 1;
+      heightRef = Math.round(heightRef * (1 - this.rectRefReduction)) + 1;
     } else {
       filaReal = 0;
       columnaReal = 1;
@@ -1087,7 +1087,7 @@ export class InformeEditComponent implements OnInit {
 
   onClickLocalCoordsTable(selectedPc: PcInterface, f: number, c: number) {
     if (this.selected_pc === selectedPc) {
-      if (this.planta.tipo === "2 ejes") {
+      if (this.planta.tipo !== "fija") {
         this.selected_pc.local_x = c;
         this.selected_pc.local_y = f;
       } else {
