@@ -249,6 +249,16 @@
           size="20"
           (change)="updatePcInDb(pc)"
         />
+        <span>Num.modulos</span>
+        <input
+          style="width: 3rem;"
+          [(ngModel)]="pc.modulosAfectados"
+          type="number"
+          id="pcModulosAfectados"
+          maxlength="2"
+          size="20"
+          (change)="updatePcInDb(pc)"
+        />
       </div>
     </div>
   </div>
