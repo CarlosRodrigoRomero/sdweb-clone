@@ -580,6 +580,13 @@ export class PcDetailsDialogComponent implements OnInit {
     return Number.isNaN(item);
   }
 
+  checkIsMoreThanOne(item: any) {
+    if (Number.isNaN(item)) {
+      return true;
+    }
+    return item > 1;
+  }
+
   checkHasModule(pc: PcInterface) {
     if (pc.modulo && pc.modulo !== undefined) {
       return pc.modulo.hasOwnProperty("potencia");

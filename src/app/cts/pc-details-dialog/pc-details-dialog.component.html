@@ -110,7 +110,7 @@
         </div>
         <div class="pc-texto">
           <span class="detail-title">Incidencia: </span>
-          <span *ngIf="!checkIsNaN(pc.modulosAfectados)">
+          <span *ngIf="checkIsMoreThanOne(pc.modulosAfectados)">
             Módulos afectados: {{ pc.modulosAfectados }}.
           </span>
           <span>{{ pcDescripcion[pc.tipo] }}</span>

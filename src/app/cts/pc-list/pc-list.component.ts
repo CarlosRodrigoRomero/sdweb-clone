@@ -124,6 +124,13 @@ export class PcListComponent implements OnInit {
     return Number.isNaN(item);
   }
 
+  checkIsMoreThanOne(item: any) {
+    if (Number.isNaN(item)) {
+      return true;
+    }
+    return item > 1;
+  }
+
   getPerdidas(tipoPc: number) {
     return GLOBAL.pcPerdidas[tipoPc];
   }
