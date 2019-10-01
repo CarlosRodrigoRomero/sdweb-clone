@@ -125,8 +125,8 @@ export class PcListComponent implements OnInit {
   }
 
   checkIsMoreThanOne(item: any) {
-    if (Number.isNaN(item)) {
-      return true;
+    if (Number.isNaN(item) || typeof item === "string") {
+      return false;
     }
     return item > 1;
   }
