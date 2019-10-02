@@ -50,6 +50,13 @@
         </mat-card-content>
         <mat-card-actions class="cards-actions">
           <div *ngFor="let informe of planta.informes">
+            <span *ngIf="user.role === 1">
+              <input
+                type="checkbox"
+                (click)="updateInforme(informe)"
+                [checked]="informe.disponible"
+              />
+            </span>
             <a
               *ngIf="checkInformeDisponible(informe); else sinInforme2"
               mat-stroked-button
@@ -58,12 +65,6 @@
             >
               Inspección del {{ informe.fecha * 1000 | date: "dd/MM/yyyy" }}
             </a>
-            <span *ngIf="user.role === 1">
-              <mat-checkbox
-                (click)="updateInforme(informe)"
-                [(ngModel)]="informe.disponible"
-              ></mat-checkbox>
-            </span>
 
             <ng-template #sinInforme2
               ><span> Informe en proceso ... </span

@@ -6,6 +6,7 @@ import { PlantaInterface } from "../../models/planta";
 import { InformeService } from "src/app/services/informe.service";
 import { Observable } from "rxjs";
 import { UserInterface } from "src/app/models/user";
+import { take } from "rxjs/operators";
 
 @Component({
   selector: "app-informes",
@@ -25,9 +26,12 @@ export class InformesComponent implements OnInit {
 
   ngOnInit() {
     this.auth.user$.subscribe(user => {
-      this.plantaService.getPlantasDeEmpresa(user).subscribe(plantas => {
-        this.getInformesDePlantas(plantas);
-      });
+      this.plantaService
+        .getPlantasDeEmpresa(user)
+        .pipe(take(1))
+        .subscribe(plantas => {
+          this.getInformesDePlantas(plantas);
+        });
     });
   }
 
@@ -35,11 +39,14 @@ export class InformesComponent implements OnInit {
     let plantasConInformes = [];
     plantas.forEach(planta => {
       planta.informes = [] as InformeInterface[];
-      this.informeService.getInformesDePlanta(planta.id).subscribe(informes => {
-        planta.informes = informes;
-        plantasConInformes.push(planta);
-        this.plantas = plantasConInformes;
-      });
+      this.informeService
+        .getInformesDePlanta(planta.id)
+        .pipe(take(1))
+        .subscribe(informes => {
+          planta.informes = informes;
+          plantasConInformes.push(planta);
+          this.plantas = plantasConInformes;
+        });
     });
   }
 
@@ -51,6 +58,7 @@ export class InformesComponent implements OnInit {
   }
 
   updateInforme(informe: InformeInterface) {
+    informe.disponible = !informe.disponible;
     this.informeService.updateInforme(informe);
   }
 }
