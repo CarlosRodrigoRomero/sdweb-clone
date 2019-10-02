@@ -1464,7 +1464,7 @@ export class InformeExportComponent implements OnInit {
 
         {
           text:
-            "La emisividad del material se mide de manera experimental en campoy y depende del tipo de vidrio de los módulos y de la suciedad que presenten el día del vuelo. La emisividad escogida por el termógrafo tras el ensayo experimental es la siguiente:",
+            "La emisividad del material se mide de manera experimental en campo y depende del tipo de vidrio de los módulos y de la suciedad que presenten el día del vuelo. La emisividad escogida por el termógrafo tras el ensayo experimental es la siguiente:",
           style: "p"
         },
 

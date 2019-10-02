@@ -49,4 +49,8 @@ export class InformesComponent implements OnInit {
       !("disponible" in informe)
     );
   }
+
+  updateInforme(informe: InformeInterface) {
+    this.informeService.updateInforme(informe);
+  }
 }
