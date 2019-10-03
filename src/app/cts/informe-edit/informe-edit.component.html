@@ -44,19 +44,38 @@
       />º -
       <input type="checkbox" [(ngModel)]="manualRotation" />
 
+      <button
+        class="btn btn-secondary input-range-button"
+        (click)="setImageFromRangeValue(rangeValue - 4)"
+      >
+        &lt; | &lt;
+      </button>
+      <button
+        class="btn btn-secondary input-range-button"
+        (click)="setImageFromRangeValue(rangeValue - 1)"
+      >
+        &lt;
+      </button>
+
+      <button class="btn btn-danger input-range-button" (click)="setSeguidor()">
+        ##
+      </button>
+
+      <button
+        class="btn btn-secondary input-range-button"
+        (click)="setImageFromRangeValue(rangeValue + 1)"
+      >
+        &gt;
+      </button>
+
+      <button
+        class="btn btn-secondary input-range-button"
+        (click)="setImageFromRangeValue(rangeValue + 4)"
+      >
+        &gt; | &gt;
+      </button>
+
       <div class="input-range-div">
-        <button
-          class="btn btn-secondary input-range-button"
-          (click)="setImageFromRangeValue(rangeValue - 4)"
-        >
-          &lt; | &lt;
-        </button>
-        <button
-          class="btn btn-secondary input-range-button"
-          (click)="setImageFromRangeValue(rangeValue - 1)"
-        >
-          &lt;
-        </button>
         <input
           type="range"
           id="slider"
@@ -67,18 +86,6 @@
           (input)="onInputRange($event)"
         />
         <!-- hay que restarle 1 -->
-        <button
-          class="btn btn-secondary input-range-button"
-          (click)="setImageFromRangeValue(rangeValue + 1)"
-        >
-          &gt;
-        </button>
-        <button
-          class="btn btn-secondary input-range-button"
-          (click)="setImageFromRangeValue(rangeValue + 4)"
-        >
-          &gt; | &gt;
-        </button>
       </div>
 
       <div class="row">
@@ -144,16 +151,16 @@
               maxlength="2"
               size="4"
             />
-            
+
             <input
-            *ngIf="planta?.tipo == '2 ejes'"
-            [(ngModel)]="estructura.filaInicio"
-            type="number"
-            id="filaInicioEstructura"
-            (change)="updateEstructura()"
-            maxlength="2"
-            size="3"
-          />
+              *ngIf="planta?.tipo == '2 ejes'"
+              [(ngModel)]="estructura.filaInicio"
+              type="number"
+              id="filaInicioEstructura"
+              (change)="updateEstructura()"
+              maxlength="2"
+              size="3"
+            />
           </div>
         </div>
 
@@ -226,7 +233,6 @@
                       </div>
                       <ng-template #dosejes>
                         <div
-                          
                           [ngClass]="{
                             'local-coords-selected': selected_pc.local_y === f,
                             'local-coords-table-cell-v':

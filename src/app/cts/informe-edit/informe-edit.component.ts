@@ -28,6 +28,11 @@ export interface Rectangulo {
   br: Punto;
 }
 
+export interface EventInterface {
+  offsetX: number;
+  offsetY: number;
+}
+
 @Component({
   selector: "app-informe-edit",
   templateUrl: "./informe-edit.component.html",
@@ -480,7 +485,16 @@ export class InformeEditComponent implements OnInit {
     return [columnaReal, filaReal];
   }
 
-  onDblClickCanvas(event) {
+  setSeguidor() {
+    let event: EventInterface = {
+      offsetX: Math.round(this.image_width / 2),
+      offsetY: Math.round(this.image_height / 2)
+    };
+
+    this.onDblClickCanvas(event, 0);
+  }
+
+  onDblClickCanvas(event, tipoPc = -1) {
     let fila: number;
     let columna: number;
     let height: number;
@@ -578,7 +592,7 @@ export class InformeEditComponent implements OnInit {
     const newPc: PcInterface = {
       id: "",
       archivo: this.currentFileName,
-      tipo: 8, // tipo (celula caliente por defecto)
+      tipo: tipoPc === -1 ? 8 : tipoPc, // tipo (celula caliente por defecto)
       local_x: columnaReal, // local_x
       local_y: filaReal, // local_x
       global_x: globalX, // global_x
