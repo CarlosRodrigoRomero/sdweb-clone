@@ -960,6 +960,7 @@ export class InformeEditComponent implements OnInit {
 
     this.informeService
       .getEstructuraInforme(this.informe.id, this.currentFileName)
+      .pipe(take(1))
       .subscribe(est => {
         if (est.length > 0) {
           this.estructuraOn = true;
