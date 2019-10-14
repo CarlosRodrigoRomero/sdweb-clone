@@ -625,7 +625,7 @@ export class InformeEditComponent implements OnInit {
       this.selected_pc.color = "black";
       if (
         this.selected_pc.archivo === newPc.archivo &&
-        this.planta.tipo === "2 ejes"
+        this.planta.tipo === "seguidores"
       ) {
         newPc.global_x = this.selected_pc.global_x;
         newPc.global_y = this.selected_pc.global_y;
@@ -722,7 +722,7 @@ export class InformeEditComponent implements OnInit {
 
         this.filasEstructura = this.planta.filas;
         // this.columnasEstructura = this.planta.columnas;
-        if (this.planta.tipo !== "2 ejes") {
+        if (this.planta.tipo !== "seguidores") {
           this.columnasEstructura = 6; // temporal
         } else {
           this.columnasEstructura = this.planta.columnas;

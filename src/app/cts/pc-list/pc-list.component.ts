@@ -74,7 +74,7 @@ export class PcListComponent implements OnInit {
       // };
     });
 
-    if (this.planta.tipo === "2 ejes") {
+    if (this.planta.tipo === "seguidores") {
       this.columnsToDisplay = [
         "severidad",
         "tipo",

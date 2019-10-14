@@ -462,7 +462,7 @@ export class InformeExportComponent implements OnInit {
       }
     ];
 
-    if (this.planta.tipo === "2 ejes") {
+    if (this.planta.tipo === "seguidores") {
       this.apartadosInforme.push({
         nombre: "anexo2",
         descripcion: "Anexo II: Anomalías por seguidor",
@@ -506,7 +506,7 @@ export class InformeExportComponent implements OnInit {
     for (const y of this.arrayFilas) {
       const countColumnas = Array();
       for (const x of this.arrayColumnas) {
-        if (this.planta.tipo === "2 ejes") {
+        if (this.planta.tipo === "seguidores") {
           countColumnas.push(
             allPcs.filter(pc => pc.local_x === x && pc.local_y === y).length
           );
@@ -603,15 +603,14 @@ export class InformeExportComponent implements OnInit {
     this.countSeguidores = 1;
 
     if (this.filtroApartados.includes("anexo2")) {
-      this.countLoadedImages$.subscribe(globalX => {
-        if (globalX !== null) {
+      this.countLoadedImages$.subscribe(nombreSeguidor => {
+        if (nombreSeguidor !== null) {
           const canvas = $(
-            `canvas[id="imgSeguidorCanvas${globalX}"]`
+            `canvas[id="imgSeguidorCanvas${nombreSeguidor}"]`
           )[0] as HTMLCanvasElement;
-          imageListBase64[`imgSeguidorCanvas${globalX}`] = canvas.toDataURL(
-            "image/jpeg",
-            1
-          );
+          imageListBase64[
+            `imgSeguidorCanvas${nombreSeguidor}`
+          ] = canvas.toDataURL("image/jpeg", 1);
           this.progresoPDF = this.decimalPipe.transform(
             (100 * this.countLoadedImages) / this.countSeguidores,
             "1.0-0"
@@ -696,9 +695,17 @@ export class InformeExportComponent implements OnInit {
       seguidor.pcs[0].downloadUrlString = url;
       // imagenTermica.src = url;
 
-      let canvas = new fabric.Canvas(`imgSeguidorCanvas${this.plantaService.getNombreSeguidor(seguidor.pcs[0])}`);
+      let canvas = new fabric.Canvas(
+        `imgSeguidorCanvas${this.plantaService.getNombreSeguidor(
+          seguidor.pcs[0]
+        )}`
+      );
       if (vistaPrevia) {
-        canvas = new fabric.Canvas(`imgSeguidorCanvasVP${this.plantaService.getNombreSeguidor(seguidor.pcs[0])}`);
+        canvas = new fabric.Canvas(
+          `imgSeguidorCanvasVP${this.plantaService.getNombreSeguidor(
+            seguidor.pcs[0]
+          )}`
+        );
       }
 
       fabric.util.loadImage(
@@ -721,7 +728,7 @@ export class InformeExportComponent implements OnInit {
 
           if (!vistaPrevia) {
             this.countLoadedImages++;
-            this.countLoadedImages$.next(this.plantaService.getNombreSeguidor(seguidor.pcs[0]));
+            this.countLoadedImages$.next(seguidor.nombre);
           }
         },
         null,
@@ -960,7 +967,7 @@ export class InformeExportComponent implements OnInit {
   }
 
   private getTextoLocalizar() {
-    if (this.planta.tipo === "2 ejes") {
+    if (this.planta.tipo === "seguidores") {
       return "Además todos ellos tienen asociado los parámetros “seguidor”, “fila” y “columna” según el mapa habitual de la planta. Las filas y las columnas tienen origen en la esquina superior izquierda del seguidor.";
     } else {
       return "Además todos ellos tienen asociado los parámetros “pasillo”, “columna” y “altura” según el mapa habitual de la planta.";
@@ -1909,7 +1916,7 @@ export class InformeExportComponent implements OnInit {
 
     const resultadosPosicion = (index: string) => {
       let texto1;
-      if (this.planta.tipo === "2 ejes") {
+      if (this.planta.tipo === "seguidores") {
         texto1 =
           "Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran (fila y columna) dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.";
       } else {
@@ -2152,7 +2159,7 @@ export class InformeExportComponent implements OnInit {
 
   // getTextoSeguidor(pc: PcInterface, planta: PlantaInterface) {
   //   let seguidor: string;
-  //   if (planta.tipo === "2 ejes") {
+  //   if (planta.tipo === "seguidores") {
   //     // Columna 'globalX'
   //     seguidor =
   //       !pc.hasOwnProperty("global_y") || pc["global_y"] === "NaN"
@@ -2193,7 +2200,7 @@ export class InformeExportComponent implements OnInit {
 
     // Header
     const cabecera = [];
-    if (this.planta.tipo === "2 ejes") {
+    if (this.planta.tipo === "seguidores") {
       this.filteredPcs = this.filteredPcs.sort(this.sortByGlobalX);
       cabecera.push({
         text: "Seguidor",
@@ -2283,15 +2290,24 @@ export class InformeExportComponent implements OnInit {
     }
   }
 
+  getEncabezadoTablaSeguidor(columna) {
+    if (columna.nombre === "local_xy") {
+      if (this.planta.hasOwnProperty("etiquetasLocalXY")) {
+        return "Nº Módulo";
+      }
+    }
+    return columna.descripcion;
+  }
+
   getPaginaSeguidor(seguidor) {
     // Header
     const cabecera = [];
     const columnasAnexoSeguidor = this.currentFilteredColumnas.filter(col => {
       return !GLOBAL.columnasAnexoSeguidor.includes(col.nombre);
     });
-    for (const c of columnasAnexoSeguidor) {
+    for (const col of columnasAnexoSeguidor) {
       cabecera.push({
-        text: c.descripcion,
+        text: this.getEncabezadoTablaSeguidor(col),
         style: "tableHeaderRed"
       });
     }
@@ -2301,9 +2317,9 @@ export class InformeExportComponent implements OnInit {
     for (const pc of seguidor.pcs) {
       const row = [];
 
-      for (const c of columnasAnexoSeguidor) {
+      for (const col of columnasAnexoSeguidor) {
         row.push({
-          text: this.getTextoColumnaPc(pc, c.nombre),
+          text: this.getTextoColumnaPc(pc, col.nombre),
           style: "tableCellAnexo1"
         });
       }
@@ -2311,8 +2327,6 @@ export class InformeExportComponent implements OnInit {
     }
     return [cabecera, body];
   }
-
-
 
   getAnexoSeguidores(numAnexo: string) {
     const allPagsAnexo = [];
@@ -2340,7 +2354,9 @@ export class InformeExportComponent implements OnInit {
         "\n",
 
         {
-          image: `imgSeguidorCanvas${this.plantaService.getNombreSeguidor(s.pcs[0])}`,
+          image: `imgSeguidorCanvas${this.plantaService.getNombreSeguidor(
+            s.pcs[0]
+          )}`,
           width: 450,
           alignment: "center"
         },

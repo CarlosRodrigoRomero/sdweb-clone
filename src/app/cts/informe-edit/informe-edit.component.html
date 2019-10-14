@@ -136,14 +136,14 @@
 
             <mat-checkbox
               (change)="updateEstructura()"
-              *ngIf="planta?.tipo !== '2 ejes'"
+              *ngIf="planta?.tipo !== 'seguidores'"
               [(ngModel)]="sentidoEstructura"
               >{{
                 sentidoEstructura ? "dcha->izq" : "izq->drcha"
               }}</mat-checkbox
             >
             <input
-              *ngIf="planta?.tipo !== '2 ejes'"
+              *ngIf="planta?.tipo !== 'seguidores'"
               [(ngModel)]="estructura.columnaInicio"
               type="number"
               id="columnaInicioEstructura"
@@ -153,7 +153,7 @@
             />
 
             <input
-              *ngIf="planta?.tipo == '2 ejes'"
+              *ngIf="planta?.tipo == 'seguidores'"
               [(ngModel)]="estructura.filaInicio"
               type="number"
               id="filaInicioEstructura"

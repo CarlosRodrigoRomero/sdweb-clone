@@ -69,7 +69,7 @@
 
     <ng-container
       matColumnDef="global_x"
-      *ngIf="planta.tipo === '2 ejes'; else fija"
+      *ngIf="planta.tipo === 'seguidores'; else fija"
     >
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Seguidor</th>
       <td mat-cell *matCellDef="let element">

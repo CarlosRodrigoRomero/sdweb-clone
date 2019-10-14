@@ -74,7 +74,7 @@
         <!-- <a href="#">(ver en el mapa)</a> -->
       </div>
 
-      <div class="displayFlex" *ngIf="planta.tipo === '2 ejes'; else fija">
+      <div class="displayFlex" *ngIf="planta.tipo === 'seguidores'; else fija">
         <div
           *ngIf="!checkIsNaN(pc.global_x)"
           class="pc-details-derecha-item-tabla"
