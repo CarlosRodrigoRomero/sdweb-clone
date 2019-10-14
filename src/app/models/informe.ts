@@ -23,4 +23,5 @@ export interface InformeInterface {
   viento?: string;
   correccHoraSrt?: number;
   humedadRelativa?: number;
+  jpgVisual?: boolean;
 }

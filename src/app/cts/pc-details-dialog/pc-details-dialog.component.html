@@ -34,6 +34,7 @@
         <!-- <span class="imagen-termica-tooltip text-center" id="dialog-tooltip">{{tooltipTemp}} ºC</span> -->
         <!-- <canvas id="hidden-canvas" width="640" height="512"></canvas> -->
       </div>
+
       <div id="imagen-visual-div" class="imagen-termica-div">
         <div *ngIf="!imagenVisualCargada" class="cargando text-center">
           <app-spinner></app-spinner>
@@ -53,9 +54,11 @@
         Seguidor <b>{{ pc.global_x }}</b>
       </h4>
 
-      <div class="termico-visual">
+      <div
+        class="termico-visual"
+        *ngIf="!informe.hasOwnProperty('jpgVisual') || informe.jpgVisual"
+      >
         <span class="termico-visual-text">térmico / visual</span>
-
         <label class="switch">
           <input
             [(ngModel)]="slider"
@@ -231,7 +234,11 @@
         <button (click)="downloadRjpg(pc)" mat-raised-button>
           JPG Radiométrico
         </button>
-        <button (click)="downloadJpgVisual(pc)" mat-raised-button>
+        <button
+          *ngIf="!informe.hasOwnProperty('jpgVisual') || informe.jpgVisual"
+          (click)="downloadJpgVisual(pc)"
+          mat-raised-button
+        >
           JPG Visual
         </button>
         <button (click)="downloadJpg(pc)" mat-raised-button>JPG</button>

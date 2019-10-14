@@ -82,7 +82,10 @@ export class PcMapComponent implements OnInit {
         .ref(`informes/${this.informeId}/jpg/${selectedPc.archivoPublico}`)
         .getDownloadURL();
     }
-    if (!selectedPc.downloadUrlVisual$) {
+    if (
+      !selectedPc.downloadUrlVisual$ &&
+      (!this.informe.hasOwnProperty("jpgVisual") || this.informe.jpgVisual)
+    ) {
       selectedPc.downloadUrlVisual$ = this.storage
         .ref(
           `informes/${this.informeId}/jpgVisual/${selectedPc.archivoPublico}`

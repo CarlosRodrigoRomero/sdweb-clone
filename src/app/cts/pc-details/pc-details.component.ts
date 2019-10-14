@@ -8,6 +8,7 @@ import { MatDialog } from "@angular/material";
 import { PcDetailsDialogComponent } from "../pc-details-dialog/pc-details-dialog.component";
 import { PcService } from "src/app/services/pc.service";
 import { PlantaInterface } from "../../models/planta";
+import { take } from "rxjs/operators";
 declare let fabric;
 
 export interface DialogData {
@@ -107,6 +108,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
     this.storage
       .ref(`informes/${this.pc.informeId}/rjpg/${pc.archivoPublico}`)
       .getDownloadURL()
+      .pipe(take(1))
       .subscribe(downloadUrl => {
         this.pc.downloadUrlStringRjpg = downloadUrl;
         const xhr = new XMLHttpRequest();
@@ -133,6 +135,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
     this.storage
       .ref(`informes/${this.pc.informeId}/jpgVisual/${pc.archivoPublico}`)
       .getDownloadURL()
+      .pipe(take(1))
       .subscribe(downloadUrl => {
         this.pc.downloadUrlStringVisual = downloadUrl;
         const xhr = new XMLHttpRequest();
@@ -296,7 +299,10 @@ export class PcDetailsComponent implements OnInit, OnChanges {
         .ref(`informes/${this.informe.id}/jpg/${selectedPc.archivoPublico}`)
         .getDownloadURL();
     }
-    if (!selectedPc.downloadUrlVisual$) {
+    if (
+      !selectedPc.downloadUrlVisual$ &&
+      (!this.informe.hasOwnProperty("jpgVisual") || this.informe.jpgVisual)
+    ) {
       selectedPc.downloadUrlVisual$ = this.storage
         .ref(
           `informes/${this.informe.id}/jpgVisual/${selectedPc.archivoPublico}`

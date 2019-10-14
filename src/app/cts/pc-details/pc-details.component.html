@@ -161,7 +161,11 @@
       <button (click)="downloadRjpg(pc)" mat-raised-button>
         JPG Radiométrico
       </button>
-      <button (click)="downloadJpgVisual(pc)" mat-raised-button>
+      <button
+        *ngIf="!informe.hasOwnProperty('jpgVisual') || informe.jpgVisual"
+        (click)="downloadJpgVisual(pc)"
+        mat-raised-button
+      >
         JPG Visual
       </button>
       <button (click)="downloadJpg(pc)" mat-raised-button>JPG</button>
