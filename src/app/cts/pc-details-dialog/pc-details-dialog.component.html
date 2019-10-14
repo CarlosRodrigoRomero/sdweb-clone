@@ -51,7 +51,7 @@
         >
       </h4>
       <h4 *ngIf="sinPcs" class="text-center">
-        Seguidor <b>{{ pc.global_x }}</b>
+        Seguidor <b>{{ plantaService.getNombreSeguidor(pc) }}</b>
       </h4>
 
       <div
@@ -154,17 +154,15 @@
             class="pc-details-derecha-item-tabla"
           >
             <span class="text-center"><strong>Seguidor</strong></span>
-            <span class="text-center">{{ pc.global_x }}</span>
+            <span class="text-center">{{ plantaService.getNombreSeguidor(pc) }}</span>
           </div>
 
           <div class="pc-details-derecha-item-tabla">
-            <span class="text-center"><strong>Columna</strong></span>
-            <span class="text-center">{{ getEtiquetaLocalX(pc.local_x) }}</span>
+            <span *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"><strong>Fila/Columna</strong></span>
+            <span *ngIf="planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"><strong>Nº Módulo</strong></span>
+            <span class="text-center">{{ plantaService.getNumeroModulo(planta, pc) }}</span>
           </div>
-          <div class="pc-details-derecha-item-tabla">
-            <span class="text-center"><strong>Fila</strong></span>
-            <span class="text-center">{{ getEtiquetaLocalY(pc.local_y) }}</span>
-          </div>
+
         </div>
 
         <ng-template class="displayFlex" #fija>

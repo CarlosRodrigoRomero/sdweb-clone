@@ -9,10 +9,13 @@ import {
 import { Observable, BehaviorSubject } from "rxjs";
 import { map, take } from "rxjs/operators";
 import { GLOBAL } from "./global";
+import { PlantaService } from './planta.service';
 
 export interface SeguidorInterface {
   pcs: PcInterface[];
-  global_x: number;
+  global_x?: number;
+  global_y?: number;
+  nombre?: string;
 }
 
 @Injectable({
@@ -48,7 +51,7 @@ export class PcService {
   );
   public filteredSeguidores$ = this.filteredSeguidores.asObservable();
 
-  constructor(public afs: AngularFirestore, private http: HttpClient) {
+  constructor(public afs: AngularFirestore, public plantaService: PlantaService) {
     this.pcsCollection = afs.collection<PcInterface>("pcs");
 
     this.filtroCategoria.next(
@@ -95,7 +98,7 @@ export class PcService {
                 pc.tipo !== 8 &&
                 pc.tipo !== 9))
         )
-        .sort(this.compare)
+        .sort(this.sortByLocalId)
     );
 
     this.filteredSeguidores.next(
@@ -110,7 +113,7 @@ export class PcService {
                   pc.tipo !== 8 &&
                   pc.tipo !== 9))
           )
-          .sort(this.compare)
+          .sort(this.sortByLocalId)
       )
     );
   }
@@ -136,20 +139,22 @@ export class PcService {
   getPcsPorSeguidor(
     allPcsConSeguidores: PcInterface[]
   ): Array<SeguidorInterface> {
-    const arraySeguidores = Array();
-    allPcsConSeguidores.sort(this.compare);
+    const arraySeguidores = Array<SeguidorInterface>();
+    allPcsConSeguidores.sort(this.sortByLocalId);
 
     let oldGlobalX = 981768;
     for (const pc of allPcsConSeguidores) {
       if (pc.global_x !== oldGlobalX) {
         oldGlobalX = pc.global_x;
 
+        
         const data = {
           pcs: allPcsConSeguidores.filter(
             element => element.global_x === pc.global_x
           ),
-          global_x: pc.global_x
-        };
+          global_x: pc.global_x,
+          nombre: this.plantaService.getNombreSeguidor(pc)
+        }  as SeguidorInterface;
         arraySeguidores.push(data);
       }
     }
@@ -188,7 +193,7 @@ export class PcService {
 
     this.allPcs$.pipe(take(1)).subscribe(pcs => {
       this.allPcs = pcs;
-      this.filteredPcsSource.next(this.allPcs.sort(this.compare));
+      this.filteredPcsSource.next(this.allPcs.sort(this.sortByLocalId));
       // Aplicar filtros
       this.aplicarFiltros();
     });
@@ -244,7 +249,7 @@ export class PcService {
     this.pcDoc.delete();
   }
 
-  private compare(a: PcInterface, b: PcInterface) {
+  private sortByLocalId(a: PcInterface, b: PcInterface) {
     if (a.local_id < b.local_id) {
       return -1;
     }

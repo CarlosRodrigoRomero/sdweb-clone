@@ -1,5 +1,5 @@
 import { Observable } from "rxjs";
-import { ModuloInterface } from './modulo';
+import { ModuloInterface } from "./modulo";
 export interface PcInterface {
   id?: string;
   archivo?: string;
@@ -7,8 +7,8 @@ export interface PcInterface {
   tipo?: number;
   local_x?: number;
   local_y?: number;
-  global_x?: number;
-  global_y?: string;
+  global_x?: any;
+  global_y?: any;
   gps_lng?: number;
   gps_lat?: number;
   temperaturaMax?: number;
@@ -59,5 +59,4 @@ export interface PcInterface {
   nubosidad?: string;
   modulosAfectados?: number;
   modulo: ModuloInterface;
-
 }

@@ -6,9 +6,9 @@ import { AngularFireStorage } from "@angular/fire/storage";
 import "fabric";
 import { MatDialog } from "@angular/material";
 import { PcDetailsDialogComponent } from "../pc-details-dialog/pc-details-dialog.component";
-import { PcService } from "src/app/services/pc.service";
 import { PlantaInterface } from "../../models/planta";
 import { take } from "rxjs/operators";
+import { PlantaService } from "../../services/planta.service";
 declare let fabric;
 
 export interface DialogData {
@@ -44,7 +44,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   constructor(
     private storage: AngularFireStorage,
     public dialog: MatDialog,
-    public pcservice: PcService
+    public plantaService: PlantaService
   ) {}
 
   ngOnInit() {
@@ -293,6 +293,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   }
 
   onClickVerDetalles(selectedPc: PcInterface): void {
+    this.plantaService.getNumeroModulo(this.planta, selectedPc);
     // selectedPc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${selectedPc.archivoPublico}`).getDownloadURL();
     if (!selectedPc.downloadUrl$) {
       selectedPc.downloadUrl$ = this.storage
@@ -324,15 +325,6 @@ export class PcDetailsComponent implements OnInit, OnChanges {
     dialogRef.afterClosed().subscribe(result => {});
   }
 
-  getAltura(local_y: number) {
-    // Por defecto, la altura alta es la numero 1
-    if (this.planta.alturaBajaPrimero) {
-      return this.planta.filas - (local_y - 1);
-    } else {
-      return local_y;
-    }
-  }
-
   checkIsNaN(item: any) {
     return Number.isNaN(item);
   }
@@ -349,21 +341,5 @@ export class PcDetailsComponent implements OnInit, OnChanges {
       return pc.modulo.hasOwnProperty("potencia");
     }
     return false;
-  }
-
-  getEtiquetaLocalX(localX: number) {
-    if (this.planta.hasOwnProperty("etiquetasLocalX")) {
-      return this.planta.etiquetasLocalX[localX - 1];
-    }
-    return localX;
-  }
-  getEtiquetaLocalY(localY: number) {
-    if (this.planta.hasOwnProperty("etiquetasLocalY")) {
-      if (this.planta.alturaBajaPrimero) {
-        return this.planta.etiquetasLocalY[localY - 1];
-      }
-      return this.planta.etiquetasLocalY[this.planta.filas - localY];
-    }
-    return this.getAltura(localY);
   }
 }

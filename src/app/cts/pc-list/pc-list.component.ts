@@ -13,6 +13,7 @@ import {
 import { InformeInterface } from "../../models/informe";
 import { PlantaInterface } from "../../models/planta";
 import { GLOBAL } from "src/app/services/global";
+import { PlantaService } from "../../services/planta.service";
 
 @Component({
   selector: "app-pc-list",
@@ -45,7 +46,10 @@ export class PcListComponent implements OnInit {
   public pcPerdidas: number[];
   public temperaturaLimite: number;
 
-  constructor(private pcService: PcService) {
+  constructor(
+    private pcService: PcService,
+    public plantaService: PlantaService
+  ) {
     this.pcDescripcion = GLOBAL.pcDescripcion;
     this.pcPerdidas = GLOBAL.pcPerdidas;
     this.temperaturaLimite = GLOBAL.temperaturaLimiteFabricantes;

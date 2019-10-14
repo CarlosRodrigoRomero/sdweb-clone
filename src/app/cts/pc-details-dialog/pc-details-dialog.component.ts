@@ -14,6 +14,7 @@ import { InformeInterface } from "../../models/informe";
 import { AuthService } from "src/app/services/auth.service";
 import { UserInterface } from "src/app/models/user";
 import { PcService } from "../../services/pc.service";
+import { PlantaService } from "../../services/planta.service";
 
 const pica = Pica();
 
@@ -59,6 +60,7 @@ export class PcDetailsDialogComponent implements OnInit {
     public auth: AuthService,
     private storage: AngularFireStorage,
     public dialogRef: MatDialogRef<PcDetailsDialogComponent>,
+    public plantaService: PlantaService,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
   ) {
     this.minTemp = 41;
@@ -568,14 +570,6 @@ export class PcDetailsDialogComponent implements OnInit {
     }
   }
 
-  getAltura(local_y: number) {
-    // Por defecto, la altura alta es la numero 1
-    if (this.planta.alturaBajaPrimero) {
-      return this.planta.filas - (local_y - 1);
-    } else {
-      return local_y;
-    }
-  }
   checkIsNaN(item: any) {
     return Number.isNaN(item);
   }
@@ -607,7 +601,7 @@ export class PcDetailsDialogComponent implements OnInit {
       }
       return this.planta.etiquetasLocalY[this.planta.filas - localY];
     }
-    return this.getAltura(localY);
+    return this.plantaService.getAltura(this.planta, localY);
   }
   updatePcInDb(pc: PcInterface) {
     delete pc.downloadUrlVisual$;

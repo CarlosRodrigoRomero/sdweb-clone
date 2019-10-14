@@ -30,13 +30,13 @@ export let GLOBAL = {
     "Modulo en CA",
     "Substring en CC",
     "Módulo en CC",
-    "Célula caliente",
-    "Varias células calientes",
+    "Célula",
+    "Varias células",
     "2x substring en CA",
-    "Células calientes debido a suciedad",
+    "Suciedad",
     "Vidrio roto",
     "Transfer resistance",
-    "Caja de conexiones caliente",
+    "Caja de conexiones",
     "Sombras",
     "Yellowing", // 16
     "String en CA" //17
@@ -135,17 +135,27 @@ export let GLOBAL = {
     { nombre: "local_id", descripcion: "#ID" },
     { nombre: "severidad", descripcion: "Clase (CoA)" },
     { nombre: "tipo", descripcion: "Categoría" },
-    { nombre: "local_x", descripcion: "Columna" },
-    { nombre: "local_y", descripcion: "Fila" },
-    { nombre: "temperaturaMax", descripcion: "Temp. máx (ºC)" },
+    // { nombre: "local_x", descripcion: "Columna" },
+    // { nombre: "local_y", descripcion: "Fila" },
+    { nombre: "local_xy", descripcion: "Fila/Columna" },
+    { nombre: "temperaturaMax", descripcion: "Temp. máx" },
     {
       nombre: "gradienteNormalizado",
-      descripcion: "Gradiente normalizado (ºC)"
+      descripcion: "Gradiente normalizado"
     },
     // { nombre: "archivoPublico", descripcion: "Nombre archivo" },
-    { nombre: "irradiancia", descripcion: "Irradiancia (W/m2)" },
+    { nombre: "irradiancia", descripcion: "Irradiancia" }
     // { nombre: "viento", descripcion: "Viento" },
     // { nombre: "temperaturaAire", descripcion: "Temp. ambiente (ºC)" },
-    { nombre: "datetimeString", descripcion: "Fecha/hora" }
+    // { nombre: "datetimeString", descripcion: "Fecha/hora" }
+  ],
+
+  columnasAnexoSeguidor: [
+    "datetimeString",
+    "irradiancia",
+    "temperaturaAire",
+    "viento",
+    "emisividad",
+    "temperaturaReflejada"
   ]
 };

@@ -80,15 +80,24 @@
           class="pc-details-derecha-item-tabla"
         >
           <span class="text-center"><strong>Seguidor</strong></span>
-          <span class="text-center">{{ pc.global_x }}</span>
+          <span class="text-center">{{
+            plantaService.getNombreSeguidor(pc)
+          }}</span>
         </div>
         <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"><strong>Columna</strong></span>
-          <span class="text-center">{{ getEtiquetaLocalX(pc.local_x) }}</span>
-        </div>
-        <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"><strong>Fila</strong></span>
-          <span class="text-center">{{ getEtiquetaLocalY(pc.local_y) }}</span>
+          <span
+            *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')"
+            class="text-center"
+            ><strong>Fila/Columna</strong></span
+          >
+          <span
+            *ngIf="planta.hasOwnProperty('etiquetasLocalXY')"
+            class="text-center"
+            ><strong>Nº Módulo</strong></span
+          >
+          <span class="text-center">{{
+            plantaService.getNumeroModulo(planta, pc)
+          }}</span>
         </div>
       </div>
 
@@ -106,11 +115,15 @@
         </div>
         <div class="pc-details-derecha-item-tabla">
           <span class="text-center"><strong>Columna</strong></span>
-          <span class="text-center">{{ getEtiquetaLocalX(pc.local_x) }}</span>
+          <span class="text-center">{{
+            plantaService.getEtiquetaLocalX(planta, pc.local_x)
+          }}</span>
         </div>
         <div class="pc-details-derecha-item-tabla">
           <span class="text-center"><strong>Altura</strong></span>
-          <span class="text-center">{{ getEtiquetaLocalY(pc.local_y) }}</span>
+          <span class="text-center">{{
+            plantaService.getEtiquetaLocalY(planta, pc.local_y)
+          }}</span>
         </div>
       </ng-template>
     </div>

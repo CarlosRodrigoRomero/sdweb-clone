@@ -12,6 +12,7 @@ import { LocationAreaInterface } from "../models/location";
 import { UserInterface } from "../models/user";
 import { ModuloInterface } from "../models/modulo";
 import * as firebase from "firebase/app";
+import { PcInterface } from "../models/pc";
 
 @Injectable({
   providedIn: "root"
@@ -184,5 +185,57 @@ export class PlantaService {
         })
       )
     );
+  }
+
+  getNumeroModulo(planta: PlantaInterface, pc: PcInterface) {
+    if (planta.hasOwnProperty("etiquetasLocalXY")) {
+      if (planta.etiquetasLocalXY[pc.local_y][pc.local_x] !== undefined) {
+        return planta.etiquetasLocalXY[pc.local_y][pc.local_x];
+      }
+    }
+    return this.getEtiquetaLocalY(planta, pc.local_y)
+      .toString()
+      .concat("/")
+      .concat(this.getEtiquetaLocalX(planta, pc.local_x).toString());
+  }
+
+  getAltura(planta: PlantaInterface, local_y: number) {
+    // Por defecto, la altura alta es la numero 1
+    if (planta.alturaBajaPrimero) {
+      return planta.filas - (local_y - 1);
+    } else {
+      return local_y;
+    }
+  }
+
+  getEtiquetaLocalX(planta: PlantaInterface, localX: number) {
+    if (this.planta.hasOwnProperty("etiquetasLocalX")) {
+      return planta.etiquetasLocalX[localX - 1];
+    }
+    return localX;
+  }
+  getEtiquetaLocalY(planta: PlantaInterface, localY: number) {
+    if (planta.hasOwnProperty("etiquetasLocalY")) {
+      if (planta.alturaBajaPrimero) {
+        return planta.etiquetasLocalY[localY - 1];
+      }
+      return planta.etiquetasLocalY[planta.filas - localY];
+    }
+    return this.getAltura(planta, localY);
+  }
+
+  getNombreSeguidor(pc: PcInterface) {
+    let nombreSeguidor = "";
+    if (pc.hasOwnProperty("global_x")) {
+      if (!Number.isNaN(pc.global_x)) {
+        nombreSeguidor = nombreSeguidor.concat(pc.global_x.toString());
+      }
+    }
+    if (pc.hasOwnProperty("global_y")) {
+      if (!Number.isNaN(pc.global_y)) {
+        nombreSeguidor = nombreSeguidor.concat(pc.global_y.toString());
+      }
+    }
+    return nombreSeguidor;
   }
 }

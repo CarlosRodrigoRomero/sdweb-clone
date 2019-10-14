@@ -17,6 +17,7 @@ import { MatCheckboxChange, MatTableDataSource } from "@angular/material";
 import pdfMake from "pdfmake/build/pdfmake.js";
 import pdfFonts from "pdfmake/build/vfs_fonts.js";
 import { DatePipe, DecimalPipe } from "@angular/common";
+import { PlantaService } from "../../services/planta.service";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 declare var $: any;
@@ -116,7 +117,8 @@ export class InformeExportComponent implements OnInit {
     private decimalPipe: DecimalPipe,
     private datePipe: DatePipe,
     private storage: AngularFireStorage,
-    private pcService: PcService
+    private pcService: PcService,
+    private plantaService: PlantaService
   ) {
     this.numCategorias = Array(GLOBAL.labels_tipos.length)
       .fill(0)
@@ -202,22 +204,23 @@ export class InformeExportComponent implements OnInit {
         url,
         img => {
           const canvas = new fabric.Canvas("portadaImg");
-          const scale = canvas.width / img.width;
+          const scaleX = canvas.width / img.width;
+          const scaleY = canvas.height / img.height;
           const fabricImage = new fabric.Image(img, {
             left: 0,
             top: 0,
             angle: 0,
             opacity: 1,
-            scaleX: scale,
-            scaleY: scale,
+            scaleX: scaleX,
+            scaleY: scaleY,
             draggable: false,
             lockMovementX: true,
             lockMovementY: true
           });
           // fabricImage.scale(1);
-          fabricImage.scaleToWidth(canvas.getWidth());
+          // fabricImage.scaleToWidth(canvas.getWidth());
           canvas.add(fabricImage);
-          this.imgPortadaBase64 = canvas.toDataURL("image/jpeg", 0.95);
+          this.imgPortadaBase64 = canvas.toDataURL("image/jpeg", 1);
         },
         null,
         { crossOrigin: "anonymous" }
@@ -244,7 +247,7 @@ export class InformeExportComponent implements OnInit {
           // fabricImage.scale(1);
           // fabricImage.scaleToWidth(canvas.getWidth());
           canvas.add(fabricImage);
-          this.imgLogoBase64 = canvas.toDataURL("image/jpeg", 0.85);
+          this.imgLogoBase64 = canvas.toDataURL("image/jpeg", 1);
         },
         null,
         { crossOrigin: "anonymous" }
@@ -353,7 +356,7 @@ export class InformeExportComponent implements OnInit {
         });
 
         canvas.add(fabricImage);
-        this.imgFormulaMaeBase64 = canvas.toDataURL("image/jpeg", 0.95);
+        this.imgFormulaMaeBase64 = canvas.toDataURL("image/jpeg", 1);
       },
       null,
       { crossOrigin: "anonymous" }
@@ -693,9 +696,9 @@ export class InformeExportComponent implements OnInit {
       seguidor.pcs[0].downloadUrlString = url;
       // imagenTermica.src = url;
 
-      let canvas = new fabric.Canvas(`imgSeguidorCanvas${seguidor.global_x}`);
+      let canvas = new fabric.Canvas(`imgSeguidorCanvas${this.plantaService.getNombreSeguidor(seguidor.pcs[0])}`);
       if (vistaPrevia) {
-        canvas = new fabric.Canvas(`imgSeguidorCanvasVP${seguidor.global_x}`);
+        canvas = new fabric.Canvas(`imgSeguidorCanvasVP${this.plantaService.getNombreSeguidor(seguidor.pcs[0])}`);
       }
 
       fabric.util.loadImage(
@@ -718,7 +721,7 @@ export class InformeExportComponent implements OnInit {
 
           if (!vistaPrevia) {
             this.countLoadedImages++;
-            this.countLoadedImages$.next(seguidor.global_x);
+            this.countLoadedImages$.next(this.plantaService.getNombreSeguidor(seguidor.pcs[0]));
           }
         },
         null,
@@ -931,7 +934,7 @@ export class InformeExportComponent implements OnInit {
     for (const j of this.arrayFilas) {
       const arrayFila = [];
       arrayFila.push({
-        text: this.getAltura(j.toString()),
+        text: this.plantaService.getAltura(this.planta, j).toString(),
         style: "tableHeaderRed"
       });
       const countPosicionFila = this.countPosicion[j - 1];
@@ -950,17 +953,17 @@ export class InformeExportComponent implements OnInit {
 
   private getTextoIrradiancia() {
     if (this.informe.irradiancia === 0) {
-      return `Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de ${this.planta.nombre}, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.`;
-    } else {
       return "Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición que Solardrone ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.";
+    } else {
+      return `Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de ${this.planta.nombre}, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.`;
     }
   }
 
   private getTextoLocalizar() {
     if (this.planta.tipo === "2 ejes") {
-      return "Además todos ellos tienen asociado los parámetros seguidor”, “fila” y “columna” según el mapa habitual de la planta. Las filas y las columnas tienen origen en la esquina superior izquierda del seguidor.";
+      return "Además todos ellos tienen asociado los parámetros “seguidor”, “fila” y “columna” según el mapa habitual de la planta. Las filas y las columnas tienen origen en la esquina superior izquierda del seguidor.";
     } else {
-      return 'Además todos ellos tienen asociado los parámetros "pasillo", "columna" y "altura" según el mapa habitual de la planta.';
+      return "Además todos ellos tienen asociado los parámetros “pasillo”, “columna” y “altura” según el mapa habitual de la planta.";
     }
   }
 
@@ -2147,6 +2150,30 @@ export class InformeExportComponent implements OnInit {
     return result;
   }
 
+  // getTextoSeguidor(pc: PcInterface, planta: PlantaInterface) {
+  //   let seguidor: string;
+  //   if (planta.tipo === "2 ejes") {
+  //     // Columna 'globalX'
+  //     seguidor =
+  //       !pc.hasOwnProperty("global_y") || pc["global_y"] === "NaN"
+  //         ? String(pc["global_x"])
+  //         : String(pc["global_x"])
+  //             .concat(" ")
+  //             .concat(String(pc["global_y"]));
+  //   } else {
+  //     if (Number.isNaN(pc["global_x"])) {
+  //       seguidor = pc["global_y"];
+  //     } else {
+  //       seguidor = pc["global_x"]
+  //         .toString()
+  //         .concat(" ")
+  //         .concat(pc["global_y"]);
+  //     }
+  //   }
+
+  //   return seguidor;
+  // }
+
   getAnexoLista(numAnexo: string) {
     const allPagsAnexoLista = [];
     // tslint:disable-next-line:max-line-length
@@ -2191,57 +2218,15 @@ export class InformeExportComponent implements OnInit {
     const body = [];
     for (const pc of this.filteredPcs) {
       const row = [];
-      if (this.planta.tipo === "2 ejes") {
-        // Columna 'globalX'
-
+      row.push({
+        text: this.plantaService.getNombreSeguidor(pc),
+        style: "tableCellAnexo1"
+      });
+      for (let c of this.currentFilteredColumnas) {
         row.push({
-          text: pc["global_x"],
+          text: this.getTextoColumnaPc(pc, c.nombre),
           style: "tableCellAnexo1"
         });
-      } else {
-        if (Number.isNaN(pc["global_x"])) {
-          row.push({
-            text: pc["global_y"],
-            style: "tableCellAnexo1"
-          });
-        } else {
-          row.push({
-            text: pc["global_x"]
-              .toString()
-              .concat(" ")
-              .concat(pc["global_y"]),
-            style: "tableCellAnexo1"
-          });
-        }
-      }
-
-      for (const c of this.currentFilteredColumnas) {
-        if (c.nombre === "tipo") {
-          row.push({
-            text: this.pcDescripcion[pc[c.nombre]],
-            style: "tableCellAnexo1"
-          });
-        } else if (c.nombre === "gradienteNormalizado") {
-          row.push({
-            text: (Math.round(pc[c.nombre] * 10) / 10).toString().concat(" ºC"),
-            style: "tableCellAnexo1"
-          });
-        } else if (c.nombre === "temperaturaMax") {
-          row.push({
-            text: (Math.round(pc[c.nombre] * 10) / 10).toString().concat(" ºC"),
-            style: "tableCellAnexo1"
-          });
-        } else if (c.nombre === "irradiancia") {
-          row.push({
-            text: Math.round(pc[c.nombre]).toString(),
-            style: "tableCellAnexo1"
-          });
-        } else {
-          row.push({
-            text: pc[c.nombre],
-            style: "tableCellAnexo1"
-          });
-        }
       }
       body.push(row);
     }
@@ -2274,10 +2259,37 @@ export class InformeExportComponent implements OnInit {
     return allPagsAnexoLista.concat(tablaAnexo);
   }
 
+  getTextoColumnaPc(pc: PcInterface, columnaNombre: string) {
+    if (columnaNombre === "tipo") {
+      return this.pcDescripcion[pc["tipo"]];
+    } else if (
+      columnaNombre === "gradienteNormalizado" ||
+      columnaNombre === "temperaturaMax"
+    ) {
+      return (Math.round(pc[columnaNombre] * 10) / 10).toString().concat(" ºC");
+    } else if (columnaNombre === "irradiancia") {
+      return Math.round(pc["irradiancia"])
+        .toString()
+        .concat(" W/m2");
+    } else if (columnaNombre === "datetimeString") {
+      return this.datePipe
+        .transform(this.informe.fecha * 1000, "dd/MM/yyyy")
+        .concat(" ")
+        .concat(this.datePipe.transform(pc.datetime * 1000, "HH:mm:ss"));
+    } else if (columnaNombre === "local_xy") {
+      return this.plantaService.getNumeroModulo(this.planta, pc).toString();
+    } else {
+      return pc[columnaNombre];
+    }
+  }
+
   getPaginaSeguidor(seguidor) {
     // Header
     const cabecera = [];
-    for (const c of this.currentFilteredColumnas) {
+    const columnasAnexoSeguidor = this.currentFilteredColumnas.filter(col => {
+      return !GLOBAL.columnasAnexoSeguidor.includes(col.nombre);
+    });
+    for (const c of columnasAnexoSeguidor) {
       cabecera.push({
         text: c.descripcion,
         style: "tableHeaderRed"
@@ -2289,37 +2301,18 @@ export class InformeExportComponent implements OnInit {
     for (const pc of seguidor.pcs) {
       const row = [];
 
-      for (const c of this.currentFilteredColumnas) {
-        if (c.nombre === "tipo") {
-          row.push({
-            text: this.pcDescripcion[pc[c.nombre]],
-            style: "tableCellAnexo1"
-          });
-        } else if (c.nombre === "gradienteNormalizado") {
-          row.push({
-            text: Math.round(pc[c.nombre])
-              .toString()
-              .concat(" ºC"),
-            style: "tableCellAnexo1"
-          });
-        } else if (c.nombre === "temperaturaMax") {
-          row.push({
-            text: Math.round(pc[c.nombre])
-              .toString()
-              .concat(" ºC"),
-            style: "tableCellAnexo1"
-          });
-        } else {
-          row.push({
-            text: pc[c.nombre],
-            style: "tableCellAnexo1"
-          });
-        }
+      for (const c of columnasAnexoSeguidor) {
+        row.push({
+          text: this.getTextoColumnaPc(pc, c.nombre),
+          style: "tableCellAnexo1"
+        });
       }
       body.push(row);
     }
     return [cabecera, body];
   }
+
+
 
   getAnexoSeguidores(numAnexo: string) {
     const allPagsAnexo = [];
@@ -2338,7 +2331,7 @@ export class InformeExportComponent implements OnInit {
 
       const pagAnexo = [
         {
-          text: "Seguidor " + s.pcs[0].global_x.toString(),
+          text: "Seguidor " + this.plantaService.getNombreSeguidor(s.pcs[0]),
           style: "h2",
           alignment: "center",
           pageBreak: "before"
@@ -2347,7 +2340,7 @@ export class InformeExportComponent implements OnInit {
         "\n",
 
         {
-          image: `imgSeguidorCanvas${s.global_x}`,
+          image: `imgSeguidorCanvas${this.plantaService.getNombreSeguidor(s.pcs[0])}`,
           width: 450,
           alignment: "center"
         },
@@ -2367,7 +2360,7 @@ export class InformeExportComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: "Hora",
+                      text: "Fecha/Hora",
                       style: "tableHeaderImageData"
                     },
 
@@ -2398,15 +2391,22 @@ export class InformeExportComponent implements OnInit {
                   ],
                   [
                     {
-                      text: this.datePipe.transform(
-                        s.pcs[0].datetime * 1000,
-                        "HH:mm:ss"
-                      ),
+                      text: this.datePipe
+                        .transform(this.informe.fecha * 1000, "dd/MM/yyyy")
+                        .concat(" ")
+                        .concat(
+                          this.datePipe.transform(
+                            s.pcs[0].datetime * 1000,
+                            "HH:mm:ss"
+                          )
+                        ),
                       style: "tableCellAnexo1"
                     },
 
                     {
-                      text: Math.round(s.pcs[0].irradiancia).toString(),
+                      text: Math.round(s.pcs[0].irradiancia)
+                        .toString()
+                        .concat(" W/m2"),
                       style: "tableCellAnexo1"
                     },
                     {
@@ -2577,7 +2577,7 @@ export class InformeExportComponent implements OnInit {
 
         tableCellAnexo1: {
           alignment: "center",
-          fontSize: 10
+          fontSize: 9
         },
 
         tableHeader: {
@@ -2639,14 +2639,5 @@ export class InformeExportComponent implements OnInit {
         }
       }
     };
-  }
-
-  getAltura(local_y: number) {
-    // Por defecto, la altura alta es la numero 1
-    if (this.planta.alturaBajaPrimero) {
-      return this.planta.filas - (local_y - 1);
-    } else {
-      return local_y;
-    }
   }
 }

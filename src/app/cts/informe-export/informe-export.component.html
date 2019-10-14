@@ -195,7 +195,7 @@
     <ng-container *ngFor="let seguidor of filteredSeguidores$ | async">
       <div class="hiddenCanvas">
         <canvas
-          id="imgSeguidorCanvas{{ seguidor.global_x }}"
+          id="imgSeguidorCanvas{{ seguidor.nombre }}"
           width="640"
           height="512"
         >
@@ -209,16 +209,13 @@
       <div class="col">
         <div class="hiddenCanvas">
           <canvas
-            id="imgSeguidorCanvasVP{{ seguidor.global_x }}"
+            id="imgSeguidorCanvasVP{{ seguidor.nombre }}"
             width="640"
             height="512"
           >
           </canvas>
         </div>
-        <div
-          class="img-seguidor"
-          id="divSeguidorVP{{ seguidor.global_x }}"
-        ></div>
+        <div class="img-seguidor" id="divSeguidorVP{{ seguidor.nombre }}"></div>
       </div>
     </div>
   </ng-container>
