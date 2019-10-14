@@ -58,13 +58,36 @@ export class PcListComponent implements OnInit {
   ngOnInit() {
     this.pcService.currentFilteredPcs$.subscribe(list => {
       this.pcDataSource = new MatTableDataSource(list);
-      this.pcDataSource.filterPredicate = (pc, filter) =>
-        pc.local_id === parseInt(filter, 10) ||
-        pc.global_x === parseInt(filter, 10) ||
-        pc.global_y === filter ||
-        parseInt(pc.global_y, 10) === parseInt(filter, 10) ||
-        pc.global_x.toString() === filter;
-
+      this.pcDataSource.filterPredicate = (pc, filter) => {
+        filter = filter.toLowerCase();
+        if (this.planta.tipo === "seguidores") {
+          return (
+            this.plantaService
+              .getNombreSeguidor(pc)
+              .toLowerCase()
+              .includes(filter) ||
+            pc.local_id
+              .toString()
+              .toLowerCase()
+              .includes(filter)
+          );
+        } else {
+          return (
+            pc.local_id
+              .toString()
+              .toLowerCase()
+              .includes(filter) ||
+            pc.global_x
+              .toString()
+              .toLowerCase()
+              .includes(filter) ||
+            pc.global_y
+              .toString()
+              .toLowerCase()
+              .includes(filter)
+          );
+        }
+      };
       this.pcDataSource.sort = this.sort;
       this.pcDataSource.paginator = this.paginator;
       // this.pcDataSource.filterPredicate = (data, filter) => {
