@@ -159,13 +159,13 @@
     id="vistaPrevia"
   ></div>
 
-  <canvas
+  <!-- <canvas
     style="display:none"
     id="portadaImg"
     width="600"
     height="300"
-  ></canvas>
-  <canvas
+  ></canvas> -->
+  <!-- <canvas
     style="display:none"
     id="irradianciaImg"
     width="400"
@@ -177,19 +177,22 @@
     width="500"
     height="250"
   ></canvas>
+    <canvas style="display:none" id="imgLogo" width="300" height="300"></canvas>
+
+  -->
   <canvas
     style="display:none"
     id="imgCurvaMae"
     width="450"
     height="410"
   ></canvas>
-  <canvas style="display:none" id="imgLogo" width="300" height="300"></canvas>
   <canvas
-    style="display:none"
-    id="imgFormulaMae"
-    width="350"
-    height="150"
-  ></canvas>
+  style="display:none"
+  id="imgFormulaMae"
+  width="350"
+  height="150"
+></canvas>
+
 
   <div style="display:none" [ngSwitch]="tipoInforme">
     <ng-container *ngFor="let seguidor of filteredSeguidores$ | async">

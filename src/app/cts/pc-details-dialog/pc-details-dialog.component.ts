@@ -105,7 +105,7 @@ export class PcDetailsDialogComponent implements OnInit {
       this.pc.downloadUrlString = url;
       this.imagenTermica.src = url;
     });
-    if (!this.informe.hasOwnProperty("jpgVisual") || !this.informe.jpgVisual)
+    if (!this.informe.hasOwnProperty("jpgVisual") || this.informe.jpgVisual)
       this.pc.downloadUrlVisual$.pipe(take(1)).subscribe(url => {
         this.pc.downloadUrlStringVisual = url;
         this.imagenVisual.src = url;
