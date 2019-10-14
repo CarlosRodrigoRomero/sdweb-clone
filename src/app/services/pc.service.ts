@@ -9,7 +9,7 @@ import {
 import { Observable, BehaviorSubject } from "rxjs";
 import { map, take } from "rxjs/operators";
 import { GLOBAL } from "./global";
-import { PlantaService } from './planta.service';
+import { PlantaService } from "./planta.service";
 
 export interface SeguidorInterface {
   pcs: PcInterface[];
@@ -51,7 +51,10 @@ export class PcService {
   );
   public filteredSeguidores$ = this.filteredSeguidores.asObservable();
 
-  constructor(public afs: AngularFirestore, public plantaService: PlantaService) {
+  constructor(
+    public afs: AngularFirestore,
+    public plantaService: PlantaService
+  ) {
     this.pcsCollection = afs.collection<PcInterface>("pcs");
 
     this.filtroCategoria.next(
@@ -142,19 +145,22 @@ export class PcService {
     const arraySeguidores = Array<SeguidorInterface>();
     allPcsConSeguidores.sort(this.sortByLocalId);
 
-    let oldGlobalX = 981768;
+    let oldNombreSeguidor = "981768";
     for (const pc of allPcsConSeguidores) {
-      if (pc.global_x !== oldGlobalX) {
-        oldGlobalX = pc.global_x;
+      const nombreSeguidor = this.plantaService.getNombreSeguidor(pc);
+      if (nombreSeguidor !== oldNombreSeguidor) {
+        oldNombreSeguidor = nombreSeguidor;
 
-        
         const data = {
-          pcs: allPcsConSeguidores.filter(
-            element => element.global_x === pc.global_x
-          ),
+          pcs: allPcsConSeguidores.filter(element => {
+            return (
+              this.plantaService.getNombreSeguidor(element) === nombreSeguidor
+            );
+          }),
           global_x: pc.global_x,
-          nombre: this.plantaService.getNombreSeguidor(pc)
-        }  as SeguidorInterface;
+          global_y: pc.global_y,
+          nombre: nombreSeguidor
+        } as SeguidorInterface;
         arraySeguidores.push(data);
       }
     }
