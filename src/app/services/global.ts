@@ -84,7 +84,7 @@ export let GLOBAL = {
     "Diodo bypass actuando en el módulo. Puede ser debido a que una o varias células calientes están produciendo que el diodo se active. También puede ser debido a un problema de conexión entre células o diodo bypass defectuoso.",
     "La suciedad habitual (tierra o deposiciones de pájaros) suelen desaparecer con la lluvia.",
     "Puede haber sido causado por una célula altas temperaturas.",
-    "Existe una resistencia eléctrica anómala en una o varias de las de las conexiones entre las células del módulo que está provocando un calentamiento anómalo.",
+    "Existe un calentamiento anómalo en una o varias de las de las conexiones entre células del módulo.",
     "La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta.",
     "Existe algún elemento que está provocando sombras que evitan el correcto funcionamiento del módulo o módulos afectados.",
     "Suelen aparecer por defectos en la fabricación. No suele afectar al rendimiento del módulo.",
