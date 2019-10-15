@@ -159,41 +159,6 @@
     id="vistaPrevia"
   ></div>
 
-  <!-- <canvas
-    style="display:none"
-    id="portadaImg"
-    width="600"
-    height="300"
-  ></canvas> -->
-  <!-- <canvas
-    style="display:none"
-    id="irradianciaImg"
-    width="400"
-    height="250"
-  ></canvas>
-  <canvas
-    style="display:none"
-    id="imgSuciedad"
-    width="500"
-    height="250"
-  ></canvas>
-    <canvas style="display:none" id="imgLogo" width="300" height="300"></canvas>
-
-  -->
-  <canvas
-    style="display:none"
-    id="imgCurvaMae"
-    width="450"
-    height="410"
-  ></canvas>
-  <canvas
-  style="display:none"
-  id="imgFormulaMae"
-  width="350"
-  height="150"
-></canvas>
-
-
   <div style="display:none" [ngSwitch]="tipoInforme">
     <ng-container *ngFor="let seguidor of filteredSeguidores$ | async">
       <div class="hiddenCanvas">
@@ -207,7 +172,7 @@
     </ng-container>
   </div>
 
-  <ng-container *ngFor="let seguidor of filteredSeguidoresVistaPrevia">
+  <!-- <ng-container *ngFor="let seguidor of filteredSeguidoresVistaPrevia">
     <div class="row">
       <div class="col">
         <div class="hiddenCanvas">
@@ -222,14 +187,15 @@
       </div>
     </div>
   </ng-container>
-</ng-container>
+</ng-container> -->
 
-<ng-template #notPcs>
-  <div class="row notPcs">
-    <div class="col-12">
-      <div class="alert alert-warning" role="alert">
-        No hay anomalías seleccionadas
+  <ng-template #notPcs>
+    <div class="row notPcs">
+      <div class="col-12">
+        <div class="alert alert-warning" role="alert">
+          No hay anomalías seleccionadas
+        </div>
       </div>
     </div>
-  </div>
-</ng-template>
+  </ng-template>
+</ng-container>

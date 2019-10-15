@@ -18,6 +18,7 @@ import pdfMake from "pdfmake/build/pdfmake.js";
 import pdfFonts from "pdfmake/build/vfs_fonts.js";
 import { DatePipe, DecimalPipe } from "@angular/common";
 import { PlantaService } from "../../services/planta.service";
+import { ModuloInterface } from "../../models/modulo";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 declare var $: any;
@@ -113,11 +114,17 @@ export class InformeExportComponent implements OnInit {
   public dataSource: MatTableDataSource<PcsTable>;
   private countLoadedImages$ = new BehaviorSubject(null);
   widthLogo: number;
+  widthLogoOriginal: number;
   widthSuciedad: number;
   widthCurvaMae: number;
   widthFormulaMae: number;
   widthPortada: number;
   widthIrradiancia: number;
+  imgQuality: number;
+  scaleImgLogoHeader: number;
+  heightLogoHeader: number;
+  jpgQuality: number;
+  widthSeguidor: number;
 
   constructor(
     private decimalPipe: DecimalPipe,
@@ -146,12 +153,16 @@ export class InformeExportComponent implements OnInit {
 
   ngOnInit() {
     this.progresoPDF = "0";
-    this.widthLogo = 250;
-    this.widthPortada = 599;
-    this.widthSuciedad = 550;
+    this.widthLogo = 200;
+    this.widthPortada = 600; //=600 es el ancho de pagina completo
+    this.widthSuciedad = 500;
     this.widthCurvaMae = 300;
-    this.widthFormulaMae = 350;
-    this.widthIrradiancia = 550;
+    this.widthFormulaMae = 200;
+    this.widthIrradiancia = 500;
+    this.imgQuality = 3.5;
+    this.heightLogoHeader = 40;
+    this.jpgQuality = 0.95;
+    this.widthSeguidor = 450;
 
     this.filteredSeguidores$ = this.pcService.filteredSeguidores$;
     this.filteredPcs$ = this.pcService.currentFilteredPcs$;
@@ -185,18 +196,23 @@ export class InformeExportComponent implements OnInit {
       .getDownloadURL();
 
     this.irradianciaImg$.pipe(take(1)).subscribe(url => {
-      const width = this.widthIrradiancia;
-
       fabric.util.loadImage(
         url,
         img => {
-          const canvas = document.createElement("canvas"); // Use Angular's Renderer2 method
+          const canvas = document.createElement("canvas");
+          const width =
+            this.widthIrradiancia * this.imgQuality > img.width
+              ? img.width
+              : this.widthIrradiancia * this.imgQuality;
           const scaleFactor = width / img.width;
           canvas.width = width;
           canvas.height = img.height * scaleFactor;
           const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-          this.imgIrradianciaBase64 = canvas.toDataURL("image/jpeg", 1);
+          this.imgIrradianciaBase64 = canvas.toDataURL(
+            "image/jpeg",
+            this.jpgQuality
+          );
         },
         null,
         { crossOrigin: "anonymous" }
@@ -204,18 +220,23 @@ export class InformeExportComponent implements OnInit {
     });
 
     this.portadaImg$.pipe(take(1)).subscribe(url => {
-      const width = this.widthPortada;
-
       fabric.util.loadImage(
         url,
         img => {
-          const canvas = document.createElement("canvas"); // Use Angular's Renderer2 method
+          const canvas = document.createElement("canvas");
+          const width =
+            this.widthPortada * this.imgQuality > img.width
+              ? img.width
+              : this.widthPortada * this.imgQuality;
           const scaleFactor = width / img.width;
           canvas.width = width;
           canvas.height = img.height * scaleFactor;
           const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-          this.imgPortadaBase64 = canvas.toDataURL("image/jpeg", 1);
+          this.imgPortadaBase64 = canvas.toDataURL(
+            "image/jpeg",
+            this.jpgQuality
+          );
         },
         null,
         { crossOrigin: "anonymous" }
@@ -223,18 +244,23 @@ export class InformeExportComponent implements OnInit {
     });
 
     this.logoImg$.pipe(take(1)).subscribe(url => {
-      const width = this.widthLogo;
-
       fabric.util.loadImage(
         url,
         img => {
-          const canvas = document.createElement("canvas"); // Use Angular's Renderer2 method
-          const scaleFactor = width / img.width;
-          canvas.width = width;
-          canvas.height = img.height * scaleFactor;
+          const canvas = document.createElement("canvas");
+          const newWidth =
+            this.widthLogo * this.imgQuality > img.width
+              ? img.width
+              : this.widthLogo * this.imgQuality;
+          this.widthLogoOriginal = newWidth;
+          const scaleFactor = newWidth / img.width;
+          const newHeight = img.height * scaleFactor;
+          canvas.width = newWidth;
+          canvas.height = newHeight;
+          this.scaleImgLogoHeader = this.heightLogoHeader / newHeight;
           const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-          this.imgLogoBase64 = canvas.toDataURL("image/jpeg", 1);
+          ctx.drawImage(img, 0, 0, newWidth, newHeight);
+          this.imgLogoBase64 = canvas.toDataURL("image/jpeg", this.jpgQuality);
         },
         null,
         { crossOrigin: "anonymous" }
@@ -255,18 +281,23 @@ export class InformeExportComponent implements OnInit {
     });
 
     this.suciedadImg$.pipe(take(1)).subscribe(url => {
-      const width = this.widthSuciedad;
-
       fabric.util.loadImage(
         url,
         img => {
-          const canvas = document.createElement("canvas"); // Use Angular's Renderer2 method
+          const canvas = document.createElement("canvas");
+          const width =
+            this.widthIrradiancia * this.imgQuality > img.width
+              ? img.width
+              : this.widthIrradiancia * this.imgQuality;
           const scaleFactor = width / img.width;
           canvas.width = width;
           canvas.height = img.height * scaleFactor;
           const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-          this.imgSuciedadBase64 = canvas.toDataURL("image/jpeg", 1);
+          this.imgSuciedadBase64 = canvas.toDataURL(
+            "image/jpeg",
+            this.jpgQuality
+          );
         },
         null,
         { crossOrigin: "anonymous" }
@@ -276,22 +307,20 @@ export class InformeExportComponent implements OnInit {
     fabric.util.loadImage(
       "../../../assets/images/maeCurva.png",
       img => {
-        const canvas = new fabric.Canvas("imgCurvaMae");
-        const scale = canvas.width / img.width;
-        const fabricImage = new fabric.Image(img, {
-          left: 0,
-          top: 0,
-          angle: 0,
-          opacity: 1,
-          scaleX: scale,
-          scaleY: scale,
-          draggable: false,
-          lockMovementX: true,
-          lockMovementY: true
-        });
-
-        canvas.add(fabricImage);
-        this.imgCurvaMaeBase64 = canvas.toDataURL("image/jpeg", 1);
+        const canvas = document.createElement("canvas");
+        const width =
+          this.widthCurvaMae * this.imgQuality > img.width
+            ? img.width
+            : this.widthCurvaMae * this.imgQuality;
+        const scaleFactor = width / img.width;
+        canvas.width = width;
+        canvas.height = img.height * scaleFactor;
+        const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+        this.imgCurvaMaeBase64 = canvas.toDataURL(
+          "image/jpeg",
+          this.jpgQuality
+        );
       },
       null,
       { crossOrigin: "anonymous" }
@@ -300,22 +329,20 @@ export class InformeExportComponent implements OnInit {
     fabric.util.loadImage(
       "../../../assets/images/formula_mae.png",
       img => {
-        const canvas = new fabric.Canvas("imgFormulaMae");
-        const scale = canvas.width / img.width;
-        const fabricImage = new fabric.Image(img, {
-          left: 0,
-          top: 0,
-          angle: 0,
-          opacity: 1,
-          scaleX: scale,
-          scaleY: scale,
-          draggable: false,
-          lockMovementX: true,
-          lockMovementY: true
-        });
-
-        canvas.add(fabricImage);
-        this.imgFormulaMaeBase64 = canvas.toDataURL("image/jpeg", 1);
+        const canvas = document.createElement("canvas");
+        const width =
+          this.widthFormulaMae * this.imgQuality > img.width
+            ? img.width
+            : this.widthFormulaMae * this.imgQuality;
+        const scaleFactor = width / img.width;
+        canvas.width = width;
+        canvas.height = img.height * scaleFactor;
+        const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+        this.imgFormulaMaeBase64 = canvas.toDataURL(
+          "image/jpeg",
+          this.jpgQuality
+        );
       },
       null,
       { crossOrigin: "anonymous" }
@@ -415,7 +442,7 @@ export class InformeExportComponent implements OnInit {
       },
       {
         nombre: "anexo1",
-        descripcion: "Anexo I: Listado resumen de anomalías",
+        descripcion: "Anexo I: Listado resumen de anomalías térmicas",
         orden: 14,
         elegible: true
       }
@@ -424,7 +451,7 @@ export class InformeExportComponent implements OnInit {
     if (this.planta.tipo === "seguidores") {
       this.apartadosInforme.push({
         nombre: "anexo2",
-        descripcion: "Anexo II: Anomalías por seguidor",
+        descripcion: "Anexo II: Anomalías térmicas por seguidor",
         orden: 15,
         elegible: true
       });
@@ -586,7 +613,7 @@ export class InformeExportComponent implements OnInit {
           )[0] as HTMLCanvasElement;
           imageListBase64[
             `imgSeguidorCanvas${nombreSeguidor}`
-          ] = canvas.toDataURL("image/jpeg", 1);
+          ] = canvas.toDataURL("image/jpeg", this.jpgQuality);
           this.progresoPDF = this.decimalPipe.transform(
             (100 * this.countLoadedImages) / this.countSeguidores,
             "1.0-0"
@@ -683,33 +710,45 @@ export class InformeExportComponent implements OnInit {
           )}`
         );
       }
-
-      fabric.util.loadImage(
+      fabric.Image.fromURL(
         url,
         img => {
-          const fabricImage = new fabric.Image(img, {
-            left: 0,
-            top: 0,
-            angle: 0,
-            opacity: 1,
-            scaleX: 1,
-            scaleY: 1,
-            draggable: false,
-            lockMovementX: true,
-            lockMovementY: true
-          });
-          // fabricImage.scale(1);
-          canvas.add(fabricImage);
+          //i create an extra var for to change some image properties
+          canvas.add(img);
           this.drawAllPcsInCanvas(seguidor, canvas, vistaPrevia);
-
           if (!vistaPrevia) {
             this.countLoadedImages++;
             this.countLoadedImages$.next(seguidor.nombre);
           }
         },
-        null,
-        { crossOrigin: "anonymous" }
+        { crossOrigin: "Anonymous" }
       );
+      // fabric.util.loadImage(
+      //   url,
+      //   img => {
+      //     const fabricImage = new fabric.Image(img, {
+      //       left: 0,
+      //       top: 0,
+      //       angle: 0,
+      //       opacity: 1,
+      //       scaleX: 1,
+      //       scaleY: 1,
+      //       draggable: false,
+      //       lockMovementX: true,
+      //       lockMovementY: true
+      //     });
+      //     // fabricImage.scale(1);
+      //     canvas.add(fabricImage);
+      //     this.drawAllPcsInCanvas(seguidor, canvas, vistaPrevia);
+
+      //     if (!vistaPrevia) {
+      //       this.countLoadedImages++;
+      //       this.countLoadedImages$.next(seguidor.nombre);
+      //     }
+      //   },
+      //   null,
+      //   { crossOrigin: "anonymous" }
+      // );
       // // this.imageList[globalX.toString()] = imageBase64;
       // // images[`imgSeguidorCanvas${globalX}`] = imageBase64;
     });
@@ -2186,17 +2225,24 @@ export class InformeExportComponent implements OnInit {
 
     // Header
     const cabecera = [];
+    cabecera.push({
+      text: "Número",
+      style: "tableHeaderRed"
+    });
+
     if (this.planta.tipo === "seguidores") {
       this.filteredPcs = this.filteredPcs.sort(this.sortByGlobalX);
       cabecera.push({
         text: "Seguidor",
-        style: "tableHeaderRed"
+        style: "tableHeaderRed",
+        noWrap: true
       });
     } else {
       this.filteredPcs = this.filteredPcs.sort(this.sortByGlobalY);
       cabecera.push({
         text: "Pasillo",
-        style: "tableHeaderRed"
+        style: "tableHeaderRed",
+        noWrap: true
       });
     }
 
@@ -2209,15 +2255,26 @@ export class InformeExportComponent implements OnInit {
 
     // Body
     const body = [];
+    let contadorPcs = 0;
+    const totalPcs = this.filteredPcs.length;
     for (const pc of this.filteredPcs) {
+      contadorPcs += 1;
+
       const row = [];
       row.push({
+        text: `${contadorPcs}/${totalPcs}`,
+        noWrap: true,
+        style: "tableCellAnexo1"
+      });
+      row.push({
         text: this.plantaService.getNombreSeguidor(pc),
+        noWrap: true,
         style: "tableCellAnexo1"
       });
       for (let c of this.currentFilteredColumnas) {
         row.push({
           text: this.getTextoColumnaPc(pc, c.nombre),
+          noWrap: true,
           style: "tableCellAnexo1"
         });
       }
@@ -2286,11 +2343,16 @@ export class InformeExportComponent implements OnInit {
     return columna.descripcion;
   }
 
-  getPaginaSeguidor(seguidor) {
+  getPaginaSeguidor(seguidor: SeguidorInterface) {
     // Header
     const cabecera = [];
     const columnasAnexoSeguidor = this.currentFilteredColumnas.filter(col => {
       return !GLOBAL.columnasAnexoSeguidor.includes(col.nombre);
+    });
+
+    cabecera.push({
+      text: "Número",
+      style: "tableHeaderRed"
     });
     for (const col of columnasAnexoSeguidor) {
       cabecera.push({
@@ -2301,18 +2363,46 @@ export class InformeExportComponent implements OnInit {
 
     // Body
     const body = [];
+    let contadorPcs = 0;
+    const totalPcsSeguidor = seguidor.pcs.length;
     for (const pc of seguidor.pcs) {
+      contadorPcs += 1;
       const row = [];
+      row.push({
+        text: `${contadorPcs}/${totalPcsSeguidor}`,
+        noWrap: true,
+        style: "tableCellAnexo1"
+      });
 
       for (const col of columnasAnexoSeguidor) {
         row.push({
           text: this.getTextoColumnaPc(pc, col.nombre),
+          noWrap: true,
           style: "tableCellAnexo1"
         });
       }
       body.push(row);
     }
     return [cabecera, body];
+  }
+
+  writeModulo(pc: PcInterface) {
+    if (!pc.hasOwnProperty("modulo")) {
+      return "-";
+    }
+    const modulo = pc.modulo;
+    let new_row = "";
+    if (modulo.hasOwnProperty("marca")) {
+      new_row = new_row.concat(modulo["marca"].toString()).concat(" ");
+    }
+    if (modulo.hasOwnProperty("modelo")) {
+      new_row = new_row.concat(modulo["modelo"].toString()).concat(" ");
+    }
+    if (modulo.hasOwnProperty("potencia")) {
+      new_row = new_row.concat(modulo["potencia"].toString()).concat(" W");
+    }
+
+    return new_row;
   }
 
   getAnexoSeguidores(numAnexo: string) {
@@ -2342,7 +2432,7 @@ export class InformeExportComponent implements OnInit {
 
         {
           image: `imgSeguidorCanvas${s.nombre}`,
-          width: 450,
+          width: this.widthSeguidor,
           alignment: "center"
         },
 
@@ -2388,6 +2478,10 @@ export class InformeExportComponent implements OnInit {
                     {
                       text: "Temp. reflejada",
                       style: "tableHeaderImageData"
+                    },
+                    {
+                      text: "Módulo",
+                      style: "tableHeaderImageData"
                     }
                   ],
                   [
@@ -2401,37 +2495,49 @@ export class InformeExportComponent implements OnInit {
                             "HH:mm:ss"
                           )
                         ),
-                      style: "tableCellAnexo1"
+                      style: "tableCellAnexo1",
+                      noWrap: true
                     },
 
                     {
                       text: Math.round(s.pcs[0].irradiancia)
                         .toString()
                         .concat(" W/m2"),
-                      style: "tableCellAnexo1"
+                      style: "tableCellAnexo1",
+                      noWrap: true
                     },
                     {
                       text: Math.round(s.pcs[0].temperaturaAire)
                         .toString()
                         .concat(" ºC"),
-                      style: "tableCellAnexo1"
+                      style: "tableCellAnexo1",
+                      noWrap: true
                     },
 
                     {
                       text: s.pcs[0].viento,
-                      style: "tableCellAnexo1"
+                      style: "tableCellAnexo1",
+                      noWrap: true
                     },
 
                     {
                       text: s.pcs[0].emisividad,
-                      style: "tableCellAnexo1"
+                      style: "tableCellAnexo1",
+                      noWrap: true
                     },
 
                     {
                       text: Math.round(s.pcs[0].temperaturaReflejada)
                         .toString()
                         .concat(" ºC"),
-                      style: "tableCellAnexo1"
+                      style: "tableCellAnexo1",
+                      noWrap: true
+                    },
+
+                    {
+                      text: this.writeModulo(s.pcs[0]),
+                      style: "tableCellAnexo1",
+                      noWrap: true
                     }
                   ]
                 ]
@@ -2498,9 +2604,14 @@ export class InformeExportComponent implements OnInit {
                 {
                   // usually you would use a dataUri instead of the name for client-side printing
                   // sampleImage.jpg however works inside playground so you can play with it
-                  margin: [260, 0, 0, 0],
+                  margin: [
+                    300 - this.widthLogo * this.scaleImgLogoHeader,
+                    0,
+                    0,
+                    0
+                  ],
                   image: this.imgLogoBase64,
-                  width: 40
+                  width: this.scaleImgLogoHeader * this.widthLogo
                 }
               ]
             }
@@ -2566,7 +2677,7 @@ export class InformeExportComponent implements OnInit {
           alignment: "center",
           bold: true,
           fontSize: 10,
-          fillColor: "#f46842",
+          fillColor: "#003b73",
           color: "white"
         },
 

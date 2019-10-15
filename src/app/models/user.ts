@@ -4,4 +4,5 @@ export interface UserInterface {
   empresaNombre?: string;
   role?: number; // 0:usuario | 1:admin | 2: externo
   plantas?: string[];
+  color?: string;
 }
