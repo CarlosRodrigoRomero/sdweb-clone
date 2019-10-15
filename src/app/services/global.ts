@@ -35,8 +35,8 @@ export let GLOBAL = {
     "2x substring en CA",
     "Suciedad",
     "Vidrio roto",
-    "Transfer resistance",
-    "Caja de conexiones",
+    "Conexión células",
+    "Caja conexiones",
     "Sombras",
     "Yellowing", // 16
     "String en CA" //17
@@ -56,7 +56,7 @@ export let GLOBAL = {
     "2x substrings en circuito abierto", // 10
     "Células calientes debido a suciedad", // 11
     "Vidrio roto", // 12
-    "Transfer resistance", // 13
+    "Resistencia anómala en conexión interna entre células del módulo", // 13
     "Caja de conexiones caliente", // 14
     "Módulo con sombras", // 15
     "Yellowing", // 16
@@ -84,7 +84,7 @@ export let GLOBAL = {
     "Diodo bypass actuando en el módulo. Puede ser debido a que una o varias células calientes están produciendo que el diodo se active. También puede ser debido a un problema de conexión entre células o diodo bypass defectuoso.",
     "La suciedad habitual (tierra o deposiciones de pájaros) suelen desaparecer con la lluvia.",
     "Puede haber sido causado por una célula altas temperaturas.",
-    "La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta.",
+    "Existe una resistencia eléctrica anómala en una o varias de las de las conexiones entre las células del módulo que está provocando un calentamiento anómalo.",
     "La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta.",
     "Existe algún elemento que está provocando sombras que evitan el correcto funcionamiento del módulo o módulos afectados.",
     "Suelen aparecer por defectos en la fabricación. No suele afectar al rendimiento del módulo.",

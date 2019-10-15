@@ -2193,7 +2193,7 @@ export class InformeExportComponent implements OnInit {
 
     for (const c of this.currentFilteredColumnas) {
       cabecera.push({
-        text: c.descripcion,
+        text: this.getEncabezadoTablaSeguidor(c),
         style: "tableHeaderRed"
       });
     }
