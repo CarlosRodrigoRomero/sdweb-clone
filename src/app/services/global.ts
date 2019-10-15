@@ -35,7 +35,7 @@ export let GLOBAL = {
     "2x substring en CA",
     "Suciedad",
     "Vidrio roto",
-    "Conexión células",
+    "Resist. anómala",
     "Caja conexiones",
     "Sombras",
     "Yellowing", // 16
@@ -56,7 +56,7 @@ export let GLOBAL = {
     "2x substrings en circuito abierto", // 10
     "Células calientes debido a suciedad", // 11
     "Vidrio roto", // 12
-    "Resistencia anómala en conexión interna entre células del módulo", // 13
+    "Resistencia anómala", // 13
     "Caja de conexiones caliente", // 14
     "Módulo con sombras", // 15
     "Yellowing", // 16
