@@ -936,7 +936,7 @@ export class InformeExportComponent implements OnInit {
 
   private getTextoIrradiancia() {
     if (this.informe.irradiancia === 0) {
-      return "Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición que Solardrone ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.";
+      return `Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición el equipo ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.`;
     } else {
       return `Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de ${this.planta.nombre}, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.`;
     }
@@ -1036,8 +1036,11 @@ export class InformeExportComponent implements OnInit {
         "\n",
 
         {
-          text:
-            "La inspección ha sido realizada mediante vehículos aéreos no tripulados operados y diseñados a tal efecto por Solardrone. Se ha utilizado la más avanzada tecnología al servicio de la fotovoltaica con el fin de reducir al mínimo el tiempo y el coste de operación sin renunciar a la más alta calidad y fiabilidad.  El equipo de que ha realizado el presente documento cuenta con personal formado en Termografía Infrarroja Nivel 1 y lleva realizando termografías aéreas desde 2015, habiendo volado más de 500 MW.",
+          text: `La inspección ha sido realizada mediante vehículos aéreos no tripulados operados y diseñados a tal efecto${
+            this.plantaService.getReferenciaSolardrone(this.planta)
+              ? " por Solardrone."
+              : "."
+          } Se ha utilizado la más avanzada tecnología al servicio de la fotovoltaica con el fin de reducir al mínimo el tiempo y el coste de operación sin renunciar a la más alta calidad y fiabilidad. El equipo de que ha realizado el presente documento cuenta con personal formado en Termografía Infrarroja Nivel 1.`,
           style: "p"
         },
 
@@ -1055,8 +1058,11 @@ export class InformeExportComponent implements OnInit {
         "\n",
 
         {
-          text:
-            "El criterio base que Solardrone sigue para realizar inspecciones termográficas es la norma internacional para inspecciones termográficas IEC 62446-3. En la misma se define las termografías infrarrojas de módulos fotovoltaicos en plantas durante su operación",
+          text: `El criterio base que${
+            this.plantaService.getReferenciaSolardrone(this.planta)
+              ? " Solardrone"
+              : " se"
+          } ha seguido para realizar esta inspección termográfica es la norma internacional para inspecciones termográficas IEC 62446-3. En la misma se define cómo deben realizarse las termografías infrarrojas de módulos fotovoltaicos en plantas durante su operación`,
           style: "p"
         },
 
@@ -1099,7 +1105,7 @@ export class InformeExportComponent implements OnInit {
 
         {
           text:
-            "Las termografías realizadas por Solardrone entran dentro de las inspecciones detalladas indicadas por la norma, cumpliendo con los requisitos que indica la misma, que son:",
+            "La termografía realizada entra dentro de las inspecciones detalladas indicadas por la norma, cumpliendo con los requisitos que indica la misma, que son:",
           style: "p"
         },
 
@@ -1604,8 +1610,11 @@ export class InformeExportComponent implements OnInit {
         "\n",
 
         {
-          text:
-            'Teniendo en cuenta todas las plantas fotovoltaicas inspeccionadas por Solardrone, se puede hacer una clasificación estadística según el MAE. Según la siguiente tabla, podemos clasificar el mantenimiento de una planta en 3 tipos: muy bueno (por debajo de la media), correcto (en la media) y "mejorable" (por encima de la media):',
+          text: `Teniendo en cuenta todas las plantas fotovoltaicas inspeccionadas${
+            this.plantaService.getReferenciaSolardrone(this.planta)
+              ? " por Solardrone,"
+              : ","
+          } se puede hacer una clasificación estadística según el MAE. Según la siguiente tabla, podemos clasificar el mantenimiento de una planta en 3 tipos: muy bueno (por debajo de la media), correcto (en la media) y "mejorable" (por encima de la media):`,
           style: "p"
         },
 

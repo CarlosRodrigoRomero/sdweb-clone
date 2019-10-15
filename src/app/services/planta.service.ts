@@ -239,4 +239,8 @@ export class PlantaService {
     }
     return nombreSeguidor;
   }
+
+  getReferenciaSolardrone(planta: PlantaInterface) {
+    return !planta.hasOwnProperty('referenciaSolardrone') || planta.referenciaSolardrone 
+  }
 }

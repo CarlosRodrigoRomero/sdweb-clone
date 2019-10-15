@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { PlantaInterface } from '../../models/planta';
-import { AngularFirestore } from '@angular/fire/firestore';
-import { PlantaService } from 'src/app/services/planta.service';
-import { ModuloInterface } from '../../models/modulo';
+import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { FormGroup, Validators, FormBuilder } from "@angular/forms";
+import { PlantaInterface } from "../../models/planta";
+import { AngularFirestore } from "@angular/fire/firestore";
+import { PlantaService } from "src/app/services/planta.service";
+import { ModuloInterface } from "../../models/modulo";
 
 @Component({
-  selector: 'app-planta-edit',
-  templateUrl: './planta-edit.component.html',
-  styleUrls: ['./planta-edit.component.css']
+  selector: "app-planta-edit",
+  templateUrl: "./planta-edit.component.html",
+  styleUrls: ["./planta-edit.component.css"]
 })
 export class PlantaEditComponent implements OnInit {
   public plantaId: string;
@@ -29,7 +29,7 @@ export class PlantaEditComponent implements OnInit {
 
   ngOnInit() {
     this.initializeForm();
-    this.plantaId = this.route.snapshot.paramMap.get('plantaId');
+    this.plantaId = this.route.snapshot.paramMap.get("plantaId");
     this.plantaService.getModulos().subscribe(allModulos => {
       this.allModulos = allModulos;
     });
@@ -47,23 +47,24 @@ export class PlantaEditComponent implements OnInit {
         filas: planta.filas,
         columnas: planta.columnas,
         num_modulos: planta.num_modulos,
-        moduloPotencia: planta.hasOwnProperty('moduloPotencia')
+        moduloPotencia: planta.hasOwnProperty("moduloPotencia")
           ? planta.moduloPotencia
           : 0,
         vertical: planta.vertical,
         zoom: planta.zoom,
-        alturaBajaPrimero: planta.alturaBajaPrimero
-          ? true
-          : false,
+        alturaBajaPrimero: planta.alturaBajaPrimero ? true : false,
         id: planta.id,
-        modulos: planta.hasOwnProperty('modulos') ? planta.modulos : []
+        modulos: planta.hasOwnProperty("modulos") ? planta.modulos : [],
+        referenciaSolardrone: planta.hasOwnProperty("referenciaSolardrone")
+          ? planta.referenciaSolardrone
+          : true
       });
     });
   }
   initializeForm() {
     this.form = this.fb.group({
-      nombre: ['', [Validators.required]],
-      tipo: ['fija', [Validators.required]],
+      nombre: ["", [Validators.required]],
+      tipo: ["fija", [Validators.required]],
       longitud: [
         0,
         [Validators.required, Validators.min(-90), Validators.max(90)]
@@ -76,7 +77,7 @@ export class PlantaEditComponent implements OnInit {
         null,
         [Validators.required, Validators.min(0), Validators.max(100)]
       ],
-      empresa: ['', [Validators.required]],
+      empresa: ["", [Validators.required]],
       filas: [2, [Validators.required]],
       columnas: [1, [Validators.required]],
       num_modulos: [1, [Validators.required]],
@@ -85,7 +86,8 @@ export class PlantaEditComponent implements OnInit {
       zoom: 18,
       alturaBajaPrimero: false,
       id: null,
-      modulos: []
+      modulos: [],
+      referenciaSolardrone: true
     });
   }
 
@@ -93,7 +95,7 @@ export class PlantaEditComponent implements OnInit {
     this.loading = true;
 
     const planta = this.form.value;
-    console.log('TCL: PlantaEditComponent -> submitForm -> planta', planta);
+    console.log("TCL: PlantaEditComponent -> submitForm -> planta", planta);
 
     try {
       this.plantaService.updatePlanta(planta);

@@ -24,4 +24,5 @@ export interface PlantaInterface {
   etiquetasLocalX?: string[];
   etiquetasLocalY?: string[];
   etiquetasLocalXY?: string[];
+  referenciaSolardrone?: boolean;
 }

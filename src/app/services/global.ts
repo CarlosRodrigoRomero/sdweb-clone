@@ -32,7 +32,7 @@ export let GLOBAL = {
     "Módulo en CC",
     "Célula",
     "Varias células",
-    "2x substring en CA",
+    "2x Substring CA", // nunca más largo que esto, por estética en tabla anexos
     "Suciedad",
     "Vidrio roto",
     "Resist. anómala",

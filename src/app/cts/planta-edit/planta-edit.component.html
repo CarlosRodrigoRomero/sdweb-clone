@@ -98,6 +98,7 @@
         </mat-select>
       </mat-form-field>
 
+      <span>Módulos:</span>
       <mat-radio-group
         formControlName="vertical"
         aria-label="Modulos orientados verticalmente"
@@ -106,12 +107,22 @@
         <mat-radio-button [value]="false">Horizontal</mat-radio-button>
       </mat-radio-group>
 
+      <span>Alturas:</span>
       <mat-radio-group
         formControlName="alturaBajaPrimero"
         aria-label="Altura baja primero"
       >
         <mat-radio-button [value]="true">Altura baja primero</mat-radio-button>
         <mat-radio-button [value]="false">Altura alta primero</mat-radio-button>
+      </mat-radio-group>
+
+      <span>Referencia a Solardrone:</span>
+      <mat-radio-group
+        formControlName="referenciaSolardrone"
+        aria-label="Referencia a Solardrone"
+      >
+        <mat-radio-button [value]="true">Sí</mat-radio-button>
+        <mat-radio-button [value]="false">No</mat-radio-button>
       </mat-radio-group>
 
       <button
