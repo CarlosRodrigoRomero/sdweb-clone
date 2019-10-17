@@ -9,6 +9,7 @@ import { PlantaService } from "../../services/planta.service";
 import { InformeInterface } from "../../models/informe";
 import { PlantaInterface } from "../../models/planta";
 import { take } from "rxjs/operators";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: "app-informe-view",
@@ -32,6 +33,8 @@ export class InformeViewComponent implements OnInit {
   public isLocalhost: boolean;
   public imagenesDownloadUrl: string;
   public excelDownloadUrl: string;
+  public allowDownloads: boolean;
+  public empresaNombre: string;
 
   numSeveridad = new Array(GLOBAL.labels_severidad.length)
     .fill(0)
@@ -43,35 +46,49 @@ export class InformeViewComponent implements OnInit {
     private plantaService: PlantaService,
     private storage: AngularFireStorage,
     private pcService: PcService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private auth: AuthService
   ) {
+    this.allowDownloads = true;
     this.isLocalhost = location.hostname === "localhost";
     this.countSeveridad = new Array();
     this.informeId = this.route.snapshot.paramMap.get("id");
-    this.informeService.getInforme(this.informeId).subscribe(informe => {
-      this.informe = informe;
-      this.storage
-        .ref(`informes/${this.informe.id}/informe.xlsx`)
-        .getDownloadURL()
-        .subscribe(res => {
-          this.excelDownloadUrl = res;
-        });
-      this.storage
-        .ref(`informes/${this.informe.id}/imagenes.zip`)
-        .getDownloadURL()
-        .subscribe(res => {
-          this.imagenesDownloadUrl = res;
-        });
-      this.plantaService.getPlanta(informe.plantaId).subscribe(planta => {
-        this.planta = planta;
-        this.isLoaded1 = true;
+    this.informeService
+      .getInforme(this.informeId)
+      .pipe(take(1))
+      .subscribe(informe => {
+        this.getPcsList(informe);
+        this.informe = informe;
+        this.storage
+          .ref(`informes/${this.informe.id}/informe.xlsx`)
+          .getDownloadURL()
+          .pipe(take(1))
+          .subscribe(res => {
+            this.excelDownloadUrl = res;
+          });
+        this.storage
+          .ref(`informes/${this.informe.id}/imagenes.zip`)
+          .getDownloadURL()
+          .pipe(take(1))
+          .subscribe(res => {
+            this.imagenesDownloadUrl = res;
+          });
+        this.plantaService
+          .getPlanta(informe.plantaId)
+          .pipe(take(1))
+          .subscribe(planta => {
+            this.planta = planta;
+            this.isLoaded1 = true;
+            this.plantaService.getUserAreas$(planta.id).subscribe(userAreas => {
+              if (userAreas.length > 0) {
+                this.allowDownloads = false;
+              }
+            });
+          });
       });
-    });
   }
 
   ngOnInit() {
-    this.getPcsList();
-
     this.chartOptions = {
       legend: { display: false }
     };
@@ -86,6 +103,9 @@ export class InformeViewComponent implements OnInit {
         }
       ]
     };
+    this.auth.user$.subscribe(
+      user => (this.empresaNombre = user.empresaNombre)
+    );
   }
 
   // receivePcs($event) {
@@ -93,10 +113,10 @@ export class InformeViewComponent implements OnInit {
   //   console.log('receive pcs', $event);
   // }
 
-  getPcsList() {
+  getPcsList(informe: InformeInterface) {
     let filtroSeveridad;
     this.pcService
-      .getPcs(this.informeId)
+      .getPcs(informe.id, informe.plantaId)
       .pipe(take(1))
       .subscribe(response => {
         this.allPcsConSeguidores = response.map((pc, i, a) => {
@@ -126,7 +146,6 @@ export class InformeViewComponent implements OnInit {
         }
         this.initializeChart();
         this.isLoaded2 = true;
-        // this.pcService.filteredPcs(this.allPcs);
       });
   }
 

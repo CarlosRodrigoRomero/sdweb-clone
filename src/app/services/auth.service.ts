@@ -9,7 +9,7 @@ import { UserInterface } from "../models/user";
   providedIn: "root"
 })
 export class AuthService {
-  public user$: Observable<firebase.User>;
+  public user$: Observable<UserInterface>;
 
   constructor(private afAuth: AngularFireAuth, private afs: AngularFirestore) {
     this.user$ = this.afAuth.authState.pipe(

@@ -1,10 +1,4 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  Input,
-  AfterViewChecked
-} from "@angular/core";
+import { Component, OnInit, ViewChild, Input } from "@angular/core";
 import { PcInterface } from "../../models/pc";
 import { PcService } from "../../services/pc.service";
 import { PlantaInterface } from "../../models/planta";
@@ -15,6 +9,8 @@ import { GLOBAL } from "src/app/services/global";
 import { MatDialog } from "@angular/material";
 import { PcDetailsDialogComponent } from "../pc-details-dialog/pc-details-dialog.component";
 import { AngularFireStorage } from "@angular/fire/storage";
+import { UserAreaInterface } from "../../models/userArea";
+import { PlantaService } from "../../services/planta.service";
 
 export interface DialogData {
   pc: PcInterface;
@@ -39,11 +35,13 @@ export class PcMapComponent implements OnInit {
   public circleRadius: number;
   public mapType = "satellite";
   public seguidoresSinPcs: PcInterface[];
+  public userAreaList: UserAreaInterface[];
 
   constructor(
     private storage: AngularFireStorage,
     public dialog: MatDialog,
     private pcService: PcService,
+    private plantaService: PlantaService,
     private route: ActivatedRoute
   ) {
     this.informeId = this.route.snapshot.paramMap.get("id");
@@ -69,6 +67,10 @@ export class PcMapComponent implements OnInit {
       .subscribe(seguidores => {
         this.seguidoresSinPcs = seguidores;
       });
+
+    this.plantaService.getUserAreas$(this.planta.id).subscribe(userAreas => {
+      this.userAreaList = userAreas;
+    });
   }
 
   getStrokeColor(severidad: number) {

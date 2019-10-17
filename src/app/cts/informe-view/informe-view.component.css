@@ -25,6 +25,12 @@
     width: 25%;
 }
 
+.titulo-informe-empresa {
+    font-size: 2rem;
+    font-weight: 200;
+    color: gainsboro;
+}
+
 .pc-map {
     width: 97%;
     left: 20px;

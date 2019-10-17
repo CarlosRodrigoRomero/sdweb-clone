@@ -13,13 +13,10 @@ import { LatLngLiteral } from "@agm/core/map-types";
 import { Observable } from "rxjs";
 import { AgmPolygon, AgmMap } from "@agm/core";
 import { ModuloInterface } from "../../models/modulo";
-import {
-  MatSort,
-  MatTableDataSource,
-  MatPaginator,
-  getMatIconFailedToSanitizeUrlError
-} from "@angular/material";
+import { MatSort, MatTableDataSource, MatPaginator } from "@angular/material";
 import { SelectionModel } from "@angular/cdk/collections";
+import { UserAreaInterface } from "../../models/userArea";
+import { AreaInterface } from "../../models/area";
 declare const google: any;
 
 @Component({
@@ -39,8 +36,11 @@ export class AutoLocComponent implements OnInit {
   public plantaLocation: LatLngLiteral;
   public plantaId: string;
   public selectedLocationArea: LocationAreaInterface;
+  public selectedUserArea: UserAreaInterface;
   public locationAreaList: LocationAreaInterface[];
   public locationAreaList$: Observable<LocationAreaInterface[]>;
+  public userAreaList: UserAreaInterface[];
+  public userAreaList$: Observable<UserAreaInterface[]>;
   public polygonList: any[];
   public selectedPolygon: any;
   private _strokeOpacity: number;
@@ -53,7 +53,9 @@ export class AutoLocComponent implements OnInit {
   public displayedColumns: string[];
   public selection: SelectionModel<LocationAreaInterface>;
   public locAreaDataSource: MatTableDataSource<LocationAreaInterface>;
+  public userAreaDataSource: MatTableDataSource<UserAreaInterface>;
   public moduloSelecLista: ModuloInterface;
+  public isUserArea: boolean;
 
   constructor(
     private route: ActivatedRoute,
@@ -64,6 +66,7 @@ export class AutoLocComponent implements OnInit {
     this.mapType = "satellite";
     this.defaultZoom = 18;
     this.plantaLocation = { lng: -5.880743, lat: 39.453186 };
+    this.isUserArea = false;
 
     this.plantaId = this.route.snapshot.paramMap.get("id");
     this.getPlanta(this.plantaId);
@@ -75,8 +78,15 @@ export class AutoLocComponent implements OnInit {
     this.displayedColumns = ["select", "globalX", "globalY", "modulo"];
 
     this.locAreaDataSource = new MatTableDataSource([]);
+    this.userAreaDataSource = new MatTableDataSource([]);
     this.locAreaDataSource.sortData = (data, sort: MatSort) => {
       if (sort.active === "globalX") {
+        data.sort(this.sortByGlobalX);
+      }
+      return data;
+    };
+    this.userAreaDataSource.sortData = (data, sort: MatSort) => {
+      if (sort.active === "userId") {
         data.sort(this.sortByGlobalX);
       }
       return data;
@@ -92,12 +102,20 @@ export class AutoLocComponent implements OnInit {
     this.locAreaDataSource.sort = this.sort;
     this.locAreaDataSource.paginator = this.paginator;
     this.locationAreaList$ = this.plantaService.getLocationsArea(this.plantaId);
+    this.userAreaList$ = this.plantaService.getAllUserAreas(this.plantaId);
     this.locationAreaList$.subscribe(list => {
       list.forEach(item => {
         delete item.visible;
       });
       this.locationAreaList = list;
       this.locAreaDataSource.data = list;
+    });
+    this.userAreaList$.subscribe(list => {
+      list.forEach(item => {
+        delete item.visible;
+      });
+      this.userAreaList = list;
+      this.userAreaDataSource.data = list;
     });
 
     const initialSelection = [];
@@ -130,32 +148,36 @@ export class AutoLocComponent implements OnInit {
     this.initDrawingManager(map);
   }
 
-  private addPolygonToMap(locArea: LocationAreaInterface, isNew = false) {
-    // locArea.visible = true;
+  private addPolygonToMap(area: AreaInterface, isNew = false) {
+    // area.visible = true;
     this.map._mapsWrapper
       .createPolygon({
-        paths: locArea.path,
-        strokeColor: locArea.hasOwnProperty("modulo") ? "yellow" : "grey",
+        paths: area.path,
+        strokeColor: area.hasOwnProperty("modulo") ? "yellow" : "grey",
         strokeOpacity: this._strokeOpacity,
         strokeWeight: 2,
-        fillColor: this.getFillColor(locArea),
+        fillColor: this.getFillColor(area),
         fillOpacity: this._fillOpacity,
         editable: isNew,
         draggable: isNew,
-        id: locArea.id
+        id: area.id
       })
       .then((polygon: any) => {
         this.polygonList.push(polygon);
+        if (isNew) {
+          this.selectArea(area);
+        }
+
         google.maps.event.addListener(polygon, "mouseup", event => {
-          this.selectLocationArea(locArea);
-          this.modifyLocationArea(locArea);
+          this.selectArea(area);
+          this.modifyArea(area);
         });
       });
   }
 
-  private modifyLocationArea(locationArea: LocationAreaInterface) {
+  private modifyArea(area: AreaInterface) {
     const polygon = this.polygonList.find(item => {
-      return item.id === locationArea.id;
+      return item.id === area.id;
     });
     const vertices = polygon.getPath();
     // Iterate over the vertices.
@@ -164,25 +186,28 @@ export class AutoLocComponent implements OnInit {
       let xy = vertices.getAt(i);
       newPath.push({ lat: xy.lat(), lng: xy.lng() });
     }
-    locationArea.path = newPath;
-    this.updateLocationArea(locationArea);
+    area.path = newPath;
+    this.updateArea(area);
   }
 
-  public selectLocationArea(locArea: LocationAreaInterface) {
+  public selectArea(area: AreaInterface) {
+    this.selectedLocationArea = undefined;
+    this.selectedUserArea = undefined;
+
     if (this.selectedPolygon !== undefined) {
       this.selectedPolygon.setOptions({
-        fillColor: this.getFillColor(locArea),
+        fillColor: this.getFillColor(area),
         editable: false,
         draggable: false
       });
     }
 
     const polygon = this.polygonList.find(item => {
-      return item.id === locArea.id;
+      return item.id === area.id;
     });
 
     if (polygon === undefined) {
-      this.addPolygonToMap(locArea);
+      this.addPolygonToMap(area);
     } else {
       polygon.setOptions({
         fillColor: "white",
@@ -190,10 +215,13 @@ export class AutoLocComponent implements OnInit {
         draggable: true
       });
     }
-
-    this.selectedLocationArea = locArea;
     this.selectedPolygon = polygon;
-    this.selection.select(locArea);
+    if (this.checkIfUserArea(area)) {
+      this.selectedUserArea = area as UserAreaInterface;
+    } else {
+      this.selectedLocationArea = area as LocationAreaInterface;
+      this.selection.select(area as LocationAreaInterface);
+    }
   }
 
   initDrawingManager(map: any) {
@@ -214,24 +242,42 @@ export class AutoLocComponent implements OnInit {
 
     this.addEventListeners(drawingManager);
   }
-  deleteLocationArea(selectedLocationArea: LocationAreaInterface) {
+  deleteArea(area: AreaInterface) {
     // Eliminar del mapa
     const polygon = this.polygonList.find(item => {
-      return item.id === selectedLocationArea.id;
+      return item.id === area.id;
     });
     polygon.setMap(null);
     this.polygonList = this.polygonList.filter(item => item.id !== polygon.id);
 
     // Eliminar de la BD
-    this.plantaService.delLocationArea(selectedLocationArea);
+    this.deleteAreaFromDb(area);
   }
 
-  updateLocationArea(locArea: LocationAreaInterface, moduleChange = false) {
-    this.plantaService.updateLocationArea(locArea);
+  checkIfUserArea(area: AreaInterface) {
+    return "userId" in area;
+  }
 
-    if (moduleChange) {
-      this.changeVisibilityPolygon(locArea);
-      this.changeVisibilityPolygon(locArea);
+  deleteAreaFromDb(area: AreaInterface) {
+    if (this.checkIfUserArea(area)) {
+      // UserAreaInterface
+      this.plantaService.delUserArea(area as UserAreaInterface);
+    } else {
+      //LocationAreaInterface
+      this.plantaService.delLocationArea(area as LocationAreaInterface);
+    }
+  }
+
+  updateArea(area: AreaInterface, moduleChange = false) {
+    if (this.checkIfUserArea(area)) {
+      this.plantaService.updateUserArea(area as UserAreaInterface);
+    } else {
+      this.plantaService.updateLocationArea(area as LocationAreaInterface);
+
+      if (moduleChange) {
+        this.changeVisibilityPolygon(area as LocationAreaInterface);
+        this.changeVisibilityPolygon(area as LocationAreaInterface);
+      }
     }
   }
 
@@ -342,7 +388,6 @@ export class AutoLocComponent implements OnInit {
       polygon => {
         polygon.setMap(null);
         let path: LatLngLiteral[] = [];
-        let locationArea = {} as LocationAreaInterface;
         for (var i = 0; i < polygon.getPath().getLength(); i++) {
           path.push({
             lat: polygon
@@ -355,26 +400,12 @@ export class AutoLocComponent implements OnInit {
               .lng() as number
           });
         }
-        locationArea.path = path;
-        // locationArea.visible = true;
-        locationArea.globalX = "";
-        locationArea.globalY = "";
-        locationArea.plantaId = this.plantaId;
-
-        // DB: Añadir a coleccion 'locations' dentro de 'planta'
-        locationArea = this.plantaService.addLocationArea(
-          this.plantaId,
-          locationArea
-        );
-        this.locationAreaList.push(locationArea);
-        this.selectedLocationArea = locationArea;
-        polygon.id = locationArea.id;
-        // this.polygonList.push(rectangle);
-
-        this.lastLocationArea = locationArea;
-        this.addPolygonToMap(locationArea, true);
-
-        document.getElementById("globalX").focus();
+        if (this.isUserArea) {
+          this.createUserArea(path);
+        } else {
+          this.createLocArea(path);
+          document.getElementById("globalX").focus();
+        }
       }
     );
     google.maps.event.addListener(
@@ -383,11 +414,8 @@ export class AutoLocComponent implements OnInit {
       rectangle => {
         rectangle.setMap(null);
         let path: LatLngLiteral[] = [];
-        let locationArea = {} as LocationAreaInterface;
         const bounds = rectangle.getBounds();
-
         const getNorthEast = bounds.getNorthEast();
-
         const getSouthWest = bounds.getSouthWest();
 
         path.push({ lat: getNorthEast.lat(), lng: getNorthEast.lng() });
@@ -395,33 +423,59 @@ export class AutoLocComponent implements OnInit {
         path.push({ lat: getSouthWest.lat(), lng: getSouthWest.lng() });
         path.push({ lat: getSouthWest.lat(), lng: getNorthEast.lng() });
 
-        locationArea.path = path;
-        // locationArea.visible = true;
-        locationArea.globalX = "";
-        locationArea.globalY = "";
-        locationArea.plantaId = this.plantaId;
-
-        // DB: Añadir a coleccion 'locations' dentro de 'planta'
-        locationArea = this.plantaService.addLocationArea(
-          this.plantaId,
-          locationArea
-        );
-        this.locationAreaList.push(locationArea);
-        this.selectedLocationArea = locationArea;
-        rectangle.id = locationArea.id;
-        // this.polygonList.push(rectangle);
-
-        this.lastLocationArea = locationArea;
-        this.addPolygonToMap(locationArea, true);
-
-        document.getElementById("globalX").focus();
+        if (this.isUserArea) {
+          this.createUserArea(path);
+        } else {
+          this.createLocArea(path);
+          document.getElementById("globalX").focus();
+        }
       }
     );
   }
+
+  private createUserArea(path: LatLngLiteral[]) {
+    let userArea = {} as UserAreaInterface;
+    userArea.plantaId = this.plantaId;
+    userArea.userId = "";
+    userArea.path = path;
+
+    userArea = this.plantaService.addUserArea(this.plantaId, userArea);
+    this.userAreaList.push(userArea);
+    // this.selectArea(userArea);
+
+    this.addPolygonToMap(userArea, true);
+  }
+
+  private createLocArea(path: LatLngLiteral[]) {
+    let locationArea = {} as LocationAreaInterface;
+    locationArea.path = path;
+    locationArea.globalX = "";
+    locationArea.globalY = "";
+    locationArea.plantaId = this.plantaId;
+
+    locationArea = this.plantaService.addLocationArea(
+      this.plantaId,
+      locationArea
+    );
+    this.locationAreaList.push(locationArea);
+    // this.selectArea(locationArea);
+
+    this.lastLocationArea = locationArea;
+    this.addPolygonToMap(locationArea, true);
+  }
+
   getRowColor(locArea: LocationAreaInterface) {
     return locArea.hasOwnProperty("modulo") ? "yellow" : "black";
   }
-  getFillColor(locArea: LocationAreaInterface) {
+  getFillColor(area: AreaInterface) {
+    if (this.checkIfUserArea(area)) {
+      return "green";
+    } else {
+      return this.getFillColorLocArea(area as LocationAreaInterface);
+    }
+  }
+
+  getFillColorLocArea(locArea: LocationAreaInterface) {
     if (locArea.globalX.length > 0) {
       return "green";
     } else if (locArea.globalY.length > 0) {
@@ -482,7 +536,7 @@ export class AutoLocComponent implements OnInit {
       this.selection.selected.forEach(locArea => {
         if (this.moduloSelecLista) {
           locArea.modulo = this.moduloSelecLista;
-          this.updateLocationArea(locArea, true);
+          this.updateArea(locArea, true);
         }
       });
     }
@@ -503,7 +557,7 @@ export class AutoLocComponent implements OnInit {
   clearModulo(locArea: LocationAreaInterface) {
     delete locArea.modulo;
 
-    this.updateLocationArea(locArea, true);
+    this.updateArea(locArea, true);
   }
 
   selectConModulo() {

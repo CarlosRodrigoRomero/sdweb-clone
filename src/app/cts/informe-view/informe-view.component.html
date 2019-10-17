@@ -9,12 +9,15 @@
     <div class="header-informe">
       <div class="row">
         <!-- Datos de la planta y del tiempo -->
-        <div class="col-sm-12 col-md-6">
+        <div class="col-sm-12 col-md-8">
           <div class="row">
             <div class="col-12">
               <span class="text-light titulo-informe">{{
                 planta?.nombre
               }}</span>
+              <span class="titulo-informe-empresa" *ngIf="!allowDownloads"
+                > ({{ empresaNombre }}) </span
+              >
               <span class="text-light subtitulo-informe"
                 >{{ planta?.potencia }} MW / {{ planta?.tipo }}</span
               >
@@ -60,7 +63,7 @@
         </div>
 
         <!-- Datos de la inspeccion -->
-        <div class="col-6 header-derecha">
+        <div class="col-4 header-derecha">
           <div class="text-right">
             <span class="text-light"
               >Vuelo realizado el
@@ -78,7 +81,7 @@
                 [options]="chartOptions"
               ></p-chart> -->
             </div>
-            <div class="header-derecha-datos-mae">
+            <div *ngIf="allowDownloads" class="header-derecha-datos-mae">
               <div class="div-mae-texto text-center">
                 <span class="mae-texto text-light">Pérdidas</span>
               </div>
@@ -105,6 +108,7 @@
       <li class="nav-item">
         <a
           class="nav-link active"
+          *ngIf="allowDownloads"
           id="overview-tab"
           data-toggle="tab"
           href="#overview"
@@ -116,13 +120,16 @@
       </li>
       <li class="nav-item">
         <a
+          [ngClass]="{
+            active: !allowDownloads
+          }"
           class="nav-link"
           id="home-tab"
           data-toggle="tab"
           href="#home"
           role="tab"
           aria-controls="home"
-          aria-selected="false"
+          aria-selected="!allowDownloads"
           >Listado</a
         >
       </li>
@@ -151,7 +158,7 @@
           >Generar PDF</a
         >
       </li>
-      <li class="nav-item" *ngIf="excelDownloadUrl">
+      <li class="nav-item" *ngIf="excelDownloadUrl && allowDownloads">
         <a
           class="nav-link"
           style="color: green"
@@ -160,7 +167,7 @@
           >Descargar EXCEL</a
         >
       </li>
-      <li class="nav-item" *ngIf="imagenesDownloadUrl">
+      <li class="nav-item" *ngIf="imagenesDownloadUrl && allowDownloads">
         <a
           class="nav-link"
           style="color: green"
@@ -175,7 +182,12 @@
       <div class="col-12">
         <div class="tab-content" id="myTabContent">
           <div
-            class="tab-pane fade show active"
+            *ngIf="allowDownloads"
+            [ngClass]="{
+              show: allowDownloads,
+              active: allowDownloads
+            }"
+            class="tab-pane fade"
             id="overview"
             role="tabpanel"
             aria-labelledby="overview-tab"
@@ -193,6 +205,10 @@
           </div>
 
           <div
+            [ngClass]="{
+              show: !allowDownloads,
+              active: !allowDownloads
+            }"
             class="tab-pane fade"
             id="home"
             role="tabpanel"

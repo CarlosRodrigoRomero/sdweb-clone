@@ -20,9 +20,24 @@
     [strokeWeight]="3"
     [fillOpacity]="0.3"
     [editable]="false"
+    [zIndex]="1"
   ></agm-circle>
 
-  <!-- <agm-circle
+  <agm-polygon
+    *ngFor="let area of userAreaList"
+    [paths]="area.path"
+    [fillOpacity]="0"
+    [strokeColor]="'#ffd04a'"
+    [strokeOpacity]="1"
+    [strokeWeight]="1"
+    [visible]="true"
+    [zIndex]="0.5"
+    [clickable]="false"
+  >
+  </agm-polygon>
+</agm-map>
+
+<!-- <agm-circle
     *ngFor="let seguidor of seguidoresSinPcs"
     (circleClick)="onMapCircleClick(seguidor, true)"
     [latitude]="seguidor.gps_lat"
@@ -36,4 +51,3 @@
     [editable]="false"
   >
   </agm-circle> -->
-</agm-map>

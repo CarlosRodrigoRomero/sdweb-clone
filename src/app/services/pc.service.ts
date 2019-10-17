@@ -1,5 +1,4 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
 import { PcInterface } from "../models/pc";
 import {
   AngularFirestore,
@@ -7,9 +6,11 @@ import {
   AngularFirestoreDocument
 } from "@angular/fire/firestore";
 import { Observable, BehaviorSubject } from "rxjs";
-import { map, take } from "rxjs/operators";
+import { map, take, switchMap, filter } from "rxjs/operators";
 import { GLOBAL } from "./global";
 import { PlantaService } from "./planta.service";
+import { AuthService } from "./auth.service";
+import { UserAreaInterface } from "../models/userArea";
 
 export interface SeguidorInterface {
   pcs: PcInterface[];
@@ -53,7 +54,8 @@ export class PcService {
 
   constructor(
     public afs: AngularFirestore,
-    public plantaService: PlantaService
+    public plantaService: PlantaService,
+    public auth: AuthService
   ) {
     this.pcsCollection = afs.collection<PcInterface>("pcs");
 
@@ -175,26 +177,65 @@ export class PcService {
     return query$.valueChanges();
   }
 
-  getPcs(informeId: string): Observable<PcInterface[]> {
-    const query$ = this.afs.collection<PcInterface>("pcs", ref =>
-      ref.where("informeId", "==", informeId)
-    );
-    this.allPcs$ = query$.snapshotChanges().pipe(
-      map(actions =>
-        actions
-          .map(a => {
-            const data = a.payload.doc.data() as PcInterface;
-            data.id = a.payload.doc.id;
-            return data;
-          })
-          .filter(
-            pc =>
-              pc.gradienteNormalizado >= GLOBAL.minGradiente ||
-              (pc.gradienteNormalizado < GLOBAL.minGradiente &&
-                pc.tipo !== 8 &&
-                pc.tipo !== 9)
-          )
+  getPcs(informeId: string, plantaId: string): Observable<PcInterface[]> {
+    const query$ = this.afs
+      .collection<PcInterface>("pcs", ref =>
+        ref.where("informeId", "==", informeId)
       )
+      .snapshotChanges()
+      .pipe(
+        map(actions =>
+          actions
+            .map(doc => {
+              const data = doc.payload.doc.data() as PcInterface;
+              data.id = doc.payload.doc.id;
+              return data;
+            })
+            .filter(
+              pc =>
+                pc.gradienteNormalizado >= GLOBAL.minGradiente ||
+                (pc.gradienteNormalizado < GLOBAL.minGradiente &&
+                  pc.tipo !== 8 &&
+                  pc.tipo !== 9)
+            )
+        )
+      );
+
+    this.allPcs$ = this.auth.user$.pipe(
+      map(user => {
+        return user.uid;
+      }),
+      switchMap(userId => {
+        return this.afs
+          .collection<UserAreaInterface>(
+            `plantas/${plantaId}/userAreas/`,
+            ref => ref.where("userId", "==", userId)
+          )
+          .valueChanges();
+      }),
+      switchMap(userAreas => {
+        return query$.pipe(
+          map(pcs => {
+            if (userAreas.length > 0) {
+              return pcs.filter(pc => {
+                for (let i = 0; i < userAreas.length; i++) {
+                  if (
+                    this.containsLatLng(
+                      [pc.gps_lat, pc.gps_lng],
+                      userAreas[i].path
+                    )
+                  ) {
+                    return true;
+                  }
+                }
+                return false;
+              });
+            } else {
+              return pcs;
+            }
+          })
+        );
+      })
     );
 
     this.allPcs$.pipe(take(1)).subscribe(pcs => {
@@ -263,5 +304,29 @@ export class PcService {
       return 1;
     }
     return 0;
+  }
+
+  containsLatLng(point, polygonPath) {
+    const vs = polygonPath;
+
+    const x = point[0];
+    const y = point[1];
+
+    // ray-casting algorithm based on
+    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+
+    var inside = false;
+    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+      var xi = vs[i].lat,
+        yi = vs[i].lng;
+      var xj = vs[j].lat,
+        yj = vs[j].lng;
+
+      var intersect =
+        yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+      if (intersect) inside = !inside;
+    }
+
+    return inside;
   }
 }

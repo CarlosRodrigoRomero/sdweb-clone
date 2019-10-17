@@ -6,13 +6,15 @@ import {
 } from "@angular/fire/firestore";
 import { PlantaInterface } from "src/app/models/planta";
 import { Observable, BehaviorSubject } from "rxjs";
-import { map, filter } from "rxjs/operators";
+import { map, filter, switchMap } from "rxjs/operators";
 import { LocationAreaInterface } from "../models/location";
 
 import { UserInterface } from "../models/user";
 import { ModuloInterface } from "../models/modulo";
 import * as firebase from "firebase/app";
 import { PcInterface } from "../models/pc";
+import { UserAreaInterface } from "../models/userArea";
+import { AuthService } from "./auth.service";
 
 @Injectable({
   providedIn: "root"
@@ -29,7 +31,7 @@ export class PlantaService {
   );
   public currentFilteredLocAreas$ = this.filteredLocAreasSource.asObservable();
 
-  constructor(private afs: AngularFirestore) {
+  constructor(private afs: AngularFirestore, public auth: AuthService) {
     // this.plantas = afs.collection("plantas").valueChanges();
     this.getModulos().subscribe(modulos => {
       this.modulos = modulos;
@@ -67,6 +69,69 @@ export class PlantaService {
         })
       )
     );
+  }
+  addUserArea(plantaId: string, userArea: UserAreaInterface) {
+    const id = this.afs.createId();
+    userArea.id = id;
+
+    this.afs
+      .collection("plantas")
+      .doc(plantaId)
+      .collection("userAreas")
+      .doc(id)
+      .set(userArea);
+
+    return userArea;
+  }
+  updateUserArea(userArea: UserAreaInterface) {
+    const userAreaDoc = this.afs.doc(
+      `plantas/${userArea.plantaId}/userAreas/${userArea.id}`
+    );
+    userAreaDoc.update(userArea);
+  }
+
+  getAllUserAreas(plantaId: string): Observable<UserAreaInterface[]> {
+    const query$ = this.afs
+      .collection("plantas")
+      .doc(plantaId)
+      .collection("userAreas");
+
+    const result = query$.snapshotChanges().pipe(
+      map(actions =>
+        actions.map(a => {
+          const data = a.payload.doc.data() as LocationAreaInterface;
+          data.id = a.payload.doc.id;
+          return data;
+        })
+      )
+    );
+
+    return result;
+  }
+
+  getUserAreas$(plantaId: string): Observable<UserAreaInterface[]> {
+    return this.auth.user$.pipe(
+      map(user => {
+        return user.uid;
+      }),
+      switchMap(userId => {
+        return this.afs
+          .collection<UserAreaInterface>(
+            `plantas/${plantaId}/userAreas/`,
+            ref => ref.where("userId", "==", userId)
+          )
+          .valueChanges();
+      })
+    );
+  }
+
+  delUserArea(userArea: UserAreaInterface) {
+    this.afs
+      .collection("plantas")
+      .doc(userArea.plantaId)
+      .collection("userAreas")
+      .doc(userArea.id)
+      .delete();
   }
 
   addLocationArea(plantaId: string, locationArea: LocationAreaInterface) {
@@ -241,6 +306,9 @@ export class PlantaService {
   }
 
   getReferenciaSolardrone(planta: PlantaInterface) {
-    return !planta.hasOwnProperty('referenciaSolardrone') || planta.referenciaSolardrone 
+    return (
+      !planta.hasOwnProperty("referenciaSolardrone") ||
+      planta.referenciaSolardrone
+    );
   }
 }

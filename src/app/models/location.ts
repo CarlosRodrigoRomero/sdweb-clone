@@ -1,15 +1,11 @@
-import { LatLngLiteral } from "@agm/core/map-types";
-import { ModuloInterface } from './modulo';
+import { ModuloInterface } from "./modulo";
+import { AreaInterface } from "./area";
 
-export interface LocationAreaInterface {
-  id?: string;
-  plantaId?: string;
-  path?: LatLngLiteral[];
+export interface LocationAreaInterface extends AreaInterface {
   globalX: any;
   globalY: string;
   potenciaModulo: number;
   nombreModulo: string;
-  visible?: boolean;
   moduloId?: string;
   modulo?: ModuloInterface;
 }
