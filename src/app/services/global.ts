@@ -9,6 +9,7 @@ export let GLOBAL = {
   filtroGradientePorDefecto: 10,
   minGradiente: 10,
   maxGradiente: 50,
+  stringParaDesconocido: "-",
   mae: [0.1, 0.2],
   resolucionCamara: [512, 640],
   // labels_severidad: ['Leve', 'Media', 'Grave'],

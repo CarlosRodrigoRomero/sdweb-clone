@@ -664,7 +664,8 @@
                 pc.tipo !== 17 &&
                 (pc.local_x === 0 || pc.local_y === 0)) ||
               pc.gps_lat === current_gps_lat ||
-              (pc.global_x.length === 0 && pc.global_y.length === 0),
+              (pc.global_x.length === 0 && pc.global_y.length === 0) ||
+              pc.local_y > planta.filas,
             pc_error_local_x: planta.tipo === 'fija' && pc.local_x === 1
           }"
         >

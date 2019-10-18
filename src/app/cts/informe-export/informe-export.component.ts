@@ -18,7 +18,6 @@ import pdfMake from "pdfmake/build/pdfmake.js";
 import pdfFonts from "pdfmake/build/vfs_fonts.js";
 import { DatePipe, DecimalPipe } from "@angular/common";
 import { PlantaService } from "../../services/planta.service";
-import { ModuloInterface } from "../../models/modulo";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 declare var $: any;
@@ -125,6 +124,7 @@ export class InformeExportComponent implements OnInit {
   heightLogoHeader: number;
   jpgQuality: number;
   widthSeguidor: number;
+  public hasUserArea: boolean;
 
   constructor(
     private decimalPipe: DecimalPipe,
@@ -163,6 +163,13 @@ export class InformeExportComponent implements OnInit {
     this.heightLogoHeader = 40;
     this.jpgQuality = 0.95;
     this.widthSeguidor = 450;
+    this.hasUserArea = false;
+
+    this.plantaService.getUserAreas$(this.planta.id).subscribe(userAreas => {
+      if (userAreas.length > 0) {
+        this.hasUserArea = true;
+      }
+    });
 
     this.filteredSeguidores$ = this.pcService.filteredSeguidores$;
     this.filteredPcs$ = this.pcService.currentFilteredPcs$;
@@ -1002,7 +1009,6 @@ export class InformeExportComponent implements OnInit {
 
       {
         image: this.imgPortadaBase64,
-        // fit: [600, 400],
         width: this.widthPortada,
         alignment: "center"
       },
@@ -2170,7 +2176,7 @@ export class InformeExportComponent implements OnInit {
       subtitulo = subtitulo + 1;
     }
 
-    if (this.filtroApartados.includes("resultadosMAE")) {
+    if (this.filtroApartados.includes("resultadosMAE") && !this.hasUserArea) {
       apartado = titulo
         .toString()
         .concat(".")
@@ -2310,7 +2316,7 @@ export class InformeExportComponent implements OnInit {
     return allPagsAnexoLista.concat(tablaAnexo);
   }
 
-  getTextoColumnaPc(pc: PcInterface, columnaNombre: string) {
+  getTextoColumnaPc(pc: PcInterface, columnaNombre: string): string {
     if (columnaNombre === "tipo") {
       return this.pcDescripcion[pc["tipo"]];
     } else if (

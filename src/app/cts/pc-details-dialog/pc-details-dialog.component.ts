@@ -589,20 +589,11 @@ export class PcDetailsDialogComponent implements OnInit {
     return false;
   }
 
-  getEtiquetaLocalX(localX: number) {
-    if (this.planta.hasOwnProperty("etiquetasLocalX")) {
-      return this.planta.etiquetasLocalX[localX - 1];
-    }
-    return localX;
+  getEtiquetaLocalX(pc: PcInterface) {
+    return this.plantaService.getEtiquetaLocalX(this.planta, pc)
   }
-  getEtiquetaLocalY(localY: number) {
-    if (this.planta.hasOwnProperty("etiquetasLocalY")) {
-      if (this.planta.alturaBajaPrimero) {
-        return this.planta.etiquetasLocalY[localY - 1];
-      }
-      return this.planta.etiquetasLocalY[this.planta.filas - localY];
-    }
-    return this.plantaService.getAltura(this.planta, localY);
+  getEtiquetaLocalY(pc: PcInterface) {
+    return this.plantaService.getEtiquetaLocalY(this.planta, pc)
   }
   updatePcInDb(pc: PcInterface) {
     delete pc.downloadUrlVisual$;

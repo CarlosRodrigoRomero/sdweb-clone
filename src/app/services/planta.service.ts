@@ -15,6 +15,7 @@ import * as firebase from "firebase/app";
 import { PcInterface } from "../models/pc";
 import { UserAreaInterface } from "../models/userArea";
 import { AuthService } from "./auth.service";
+import { GLOBAL } from "./global";
 
 @Injectable({
   providedIn: "root"
@@ -259,10 +260,10 @@ export class PlantaService {
           return planta.etiquetasLocalXY[pc.local_y][pc.local_x - 1];
       }
     }
-    return this.getEtiquetaLocalY(planta, pc.local_y)
+    return this.getEtiquetaLocalY(planta, pc)
       .toString()
       .concat("/")
-      .concat(this.getEtiquetaLocalX(planta, pc.local_x).toString());
+      .concat(this.getEtiquetaLocalX(planta, pc).toString());
   }
 
   getAltura(planta: PlantaInterface, local_y: number) {
@@ -274,20 +275,34 @@ export class PlantaService {
     }
   }
 
-  getEtiquetaLocalX(planta: PlantaInterface, localX: number) {
+  getEtiquetaLocalX(planta: PlantaInterface, pc: PcInterface) {
+    if (pc.local_x <= 0) {
+      return GLOBAL.stringParaDesconocido;
+    }
     if (this.planta.hasOwnProperty("etiquetasLocalX")) {
+      const localX =
+        pc.local_x > planta.etiquetasLocalX.length
+          ? planta.etiquetasLocalX.length
+          : pc.local_x;
       return planta.etiquetasLocalX[localX - 1];
     }
-    return localX;
+    return pc.local_x;
   }
-  getEtiquetaLocalY(planta: PlantaInterface, localY: number) {
+  getEtiquetaLocalY(planta: PlantaInterface, pc: PcInterface) {
+    if (pc.local_y <= 0) {
+      return GLOBAL.stringParaDesconocido;
+    }
     if (planta.hasOwnProperty("etiquetasLocalY")) {
+      const localY =
+        pc.local_y > planta.etiquetasLocalY.length
+          ? planta.etiquetasLocalY.length
+          : pc.local_y;
       if (planta.alturaBajaPrimero) {
         return planta.etiquetasLocalY[localY - 1];
       }
-      return planta.etiquetasLocalY[planta.filas - localY];
+      return planta.etiquetasLocalY[planta.etiquetasLocalY.length - localY];
     }
-    return this.getAltura(planta, localY);
+    return this.getAltura(planta, pc.local_y);
   }
 
   getNombreSeguidor(pc: PcInterface) {
