@@ -180,7 +180,7 @@
 
           <div class="pc-details-derecha-item-tabla">
             <span class="text-center"><strong>Columna</strong></span>
-            <span class="text-center">{{ getEtiquetaLocalX(pc.local_x) }}</span>
+            <span class="text-center">{{ getEtiquetaLocalX(pc) }}</span>
           </div>
           <div class="pc-details-derecha-item-tabla">
             <span class="text-center"><strong>Altura</strong></span>
@@ -251,7 +251,7 @@
           type="number"
           id="pcTipo"
           maxlength="2"
-          size="20"
+          size="10"
           (change)="updatePcInDb(pc)"
         />
         <span>Num.modulos</span>
@@ -261,7 +261,17 @@
           type="number"
           id="pcModulosAfectados"
           maxlength="2"
-          size="20"
+          size="10"
+          (change)="updatePcInDb(pc)"
+        />
+        <span>CoA</span>
+        <input
+          style="width: 3rem;"
+          [(ngModel)]="pc.severidad"
+          type="number"
+          id="severidad"
+          maxlength="2"
+          size="10"
           (change)="updatePcInDb(pc)"
         />
       </div>

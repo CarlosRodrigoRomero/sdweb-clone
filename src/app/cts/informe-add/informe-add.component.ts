@@ -52,7 +52,7 @@ export class InformeAddComponent implements OnInit {
         numeroModulos: [this.planta.num_modulos, [Validators.required]],
         disponible: [false, [Validators.required]],
         rangeMin: [-10, [Validators.required]],
-        rangeMax: [30, [Validators.required]],
+        rangeMax: [40, [Validators.required]],
         distancia: [18, [Validators.required]],
         humedadRelativa: [0, [Validators.required]]
       });
