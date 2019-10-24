@@ -11,6 +11,8 @@ import { GLOBAL } from "./global";
 import { PlantaService } from "./planta.service";
 import { AuthService } from "./auth.service";
 import { UserAreaInterface } from "../models/userArea";
+import { CriteriosClasificacion } from "../models/criteriosClasificacion";
+import { CritCoA } from "../models/critCoA";
 
 export interface SeguidorInterface {
   pcs: PcInterface[];
@@ -87,7 +89,7 @@ export class PcService {
     //   .mergeMap( filtro1 => this.filtroClase$
     //     .mergeMap( filtro2 => this.allPcs$
     //       .mergeMap( allPcs => allPcs.filter( (pc) => {
-    //         return filtro2.includes(pc.tipo) && filtro1.includes(pc.severidad);
+    //         return filtro2.includes(pc.tipo) && filtro1.includes(this.getPcCoA(pc));
     //       }))));
   }
 
@@ -96,7 +98,7 @@ export class PcService {
       this.allPcs
         .filter(
           pc =>
-            this.currentFiltroClase.includes(pc.severidad) &&
+            this.currentFiltroClase.includes(this.getPcCoA(pc)) &&
             this.currentFiltroCategoria.includes(pc.tipo) &&
             (pc.gradienteNormalizado >= this.currentFiltroGradiente ||
               (pc.gradienteNormalizado < this.currentFiltroGradiente &&
@@ -111,7 +113,7 @@ export class PcService {
         this.allPcs
           .filter(
             pc =>
-              this.currentFiltroClase.includes(pc.severidad) &&
+              this.currentFiltroClase.includes(this.getPcCoA(pc)) &&
               this.currentFiltroCategoria.includes(pc.tipo) &&
               (pc.gradienteNormalizado >= this.currentFiltroGradiente ||
                 (pc.gradienteNormalizado < this.currentFiltroGradiente &&
@@ -123,13 +125,13 @@ export class PcService {
     );
   }
 
-  PushFiltroClase(filtro: number[]) {
+  PushFiltroClase(filtro: number[]): void {
     this.filtroClase.next(filtro);
     // this.currentFiltroClase = filtro;
     this.aplicarFiltros();
   }
 
-  PushFiltroCategoria(filtro: number[]) {
+  PushFiltroCategoria(filtro: number[]): void {
     this.filtroCategoria.next(filtro);
     // this.currentFiltroCategoria = filtro;
     this.aplicarFiltros();
@@ -177,6 +179,25 @@ export class PcService {
     return query$.valueChanges();
   }
 
+  getPcsSinFiltros(informeId: string): Observable<PcInterface[]> {
+    const query$ = this.afs
+      .collection<PcInterface>("pcs", ref =>
+        ref.where("informeId", "==", informeId)
+      )
+      .snapshotChanges()
+      .pipe(
+        map(actions =>
+          actions.map(doc => {
+            const data = doc.payload.doc.data() as PcInterface;
+            data.id = doc.payload.doc.id;
+            return data;
+          })
+        )
+      );
+
+    return query$;
+  }
+
   getPcs(informeId: string, plantaId: string): Observable<PcInterface[]> {
     const query$ = this.afs
       .collection<PcInterface>("pcs", ref =>
@@ -191,13 +212,17 @@ export class PcService {
               data.id = doc.payload.doc.id;
               return data;
             })
-            .filter(
-              pc =>
+            .filter(pc => {
+              if (pc.hasOwnProperty("clase")) {
+                return pc.clase > 0;
+              }
+              return (
                 pc.gradienteNormalizado >= GLOBAL.minGradiente ||
                 (pc.gradienteNormalizado < GLOBAL.minGradiente &&
                   pc.tipo !== 8 &&
                   pc.tipo !== 9)
-            )
+              );
+            })
         )
       );
 
@@ -328,5 +353,53 @@ export class PcService {
     }
 
     return inside;
+  }
+
+  getCoA(pc: PcInterface, critCoA: CritCoA): number {
+    // Los que siempre son CoA 3, tengan la temperatura que tengan
+    if (critCoA.hasOwnProperty("siempreCoA3")) {
+      if (critCoA.siempreCoA3.includes(pc.tipo)) {
+        return 3;
+      }
+    }
+
+    // El resto
+    // Si superan tempCoA3
+    if (critCoA.hasOwnProperty("tempCoA3")) {
+      if (pc.temperaturaMax >= critCoA.tempCoA3) {
+        return 3;
+      }
+    }
+
+    // Si no la supera, la clasificamos según su gradiente
+    if (pc.gradienteNormalizado >= critCoA.rangosDT[2]) {
+      return 3;
+    } else {
+      if (critCoA.hasOwnProperty("siempreCoA2")) {
+        if (critCoA.siempreCoA2.includes(pc.tipo)) {
+          return 2;
+        }
+      }
+      if (pc.gradienteNormalizado >= critCoA.rangosDT[1]) {
+        return 2;
+      } else if (pc.gradienteNormalizado >= critCoA.rangosDT[0]) {
+        return 1;
+      }
+    }
+
+    if (critCoA.hasOwnProperty("siempreVisible")) {
+      if (critCoA.siempreVisible.includes(pc.tipo)) {
+        return 1;
+      }
+    }
+
+    return 0;
+  }
+
+  getPcCoA(pc): number {
+    if (pc.hasOwnProperty("clase")) {
+      return pc.clase;
+    }
+    return pc.severidad;
   }
 }

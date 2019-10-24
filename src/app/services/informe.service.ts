@@ -40,7 +40,7 @@ export class InformeService {
       )
     );
   }
-  getInformesDePlanta(plantaId: string) {
+  getInformesDePlanta(plantaId: string): Observable<InformeInterface[]> {
     const query$ = this.afs.collection<InformeInterface>("informes", ref =>
       ref.where("plantaId", "==", plantaId)
     );
@@ -107,7 +107,9 @@ export class InformeService {
   }
 
   updateEstructura(informeId: string, estructura: Estructura) {
-    const estructuraDoc = this.afs.doc("informes/" + informeId + "/estructuras/" + estructura.id);
+    const estructuraDoc = this.afs.doc(
+      "informes/" + informeId + "/estructuras/" + estructura.id
+    );
     estructuraDoc.update(estructura);
   }
 

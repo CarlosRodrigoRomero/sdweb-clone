@@ -59,4 +59,5 @@ export interface PcInterface {
   nubosidad?: string;
   modulosAfectados?: number;
   modulo: ModuloInterface;
+  clase?: number;
 }

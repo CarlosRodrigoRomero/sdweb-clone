@@ -16,6 +16,7 @@ import { PcInterface } from "../models/pc";
 import { UserAreaInterface } from "../models/userArea";
 import { AuthService } from "./auth.service";
 import { GLOBAL } from "./global";
+import { CriteriosClasificacion } from "../models/criteriosClasificacion";
 
 @Injectable({
   providedIn: "root"
@@ -324,6 +325,24 @@ export class PlantaService {
     return (
       !planta.hasOwnProperty("referenciaSolardrone") ||
       planta.referenciaSolardrone
+    );
+  }
+
+  getCriterios(): Observable<CriteriosClasificacion[]> {
+    let query$: AngularFirestoreCollection<CriteriosClasificacion>;
+
+    query$ = this.afs.collection<CriteriosClasificacion>(
+      "criteriosClasificacion"
+    );
+
+    return query$.snapshotChanges().pipe(
+      map(actions =>
+        actions.map(a => {
+          const data = a.payload.doc.data() as CriteriosClasificacion;
+          data.id = a.payload.doc.id;
+          return data;
+        })
+      )
     );
   }
 }

@@ -144,5 +144,30 @@
     </form>
 
     <div *ngIf="success">Planta actualizada</div>
+
+    <h4>Criterios para Anomalías</h4>
+    <mat-form-field>
+      <mat-label>Criterio</mat-label>
+      <mat-select [(value)]="critSeleccionado">
+        <mat-option *ngFor="let crit of criterios" [value]="crit">
+          {{ crit.nombre }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button
+      mat-button
+      color="secondary"
+      (click)="simularCriteriosClasificacion(critSeleccionado)"
+    >
+      SIMULAR criterios
+    </button>
+    <button
+      mat-button
+      color="danger"
+      (click)="aplicarCriteriosClasificacion(critSeleccionado)"
+    >
+      APLICAR criterios
+    </button>
   </div>
 </div>

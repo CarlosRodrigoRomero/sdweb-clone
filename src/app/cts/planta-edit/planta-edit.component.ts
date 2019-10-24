@@ -5,6 +5,12 @@ import { PlantaInterface } from "../../models/planta";
 import { AngularFirestore } from "@angular/fire/firestore";
 import { PlantaService } from "src/app/services/planta.service";
 import { ModuloInterface } from "../../models/modulo";
+import { CriteriosClasificacion } from "../../models/criteriosClasificacion";
+import { InformeService } from "../../services/informe.service";
+import { take } from "rxjs/operators";
+import { forEach } from "@angular/router/src/utils/collection";
+import { PcService } from "../../services/pc.service";
+import { GLOBAL } from "src/app/services/global";
 
 @Component({
   selector: "app-planta-edit",
@@ -19,12 +25,15 @@ export class PlantaEditComponent implements OnInit {
   success: boolean;
   public modulos: ModuloInterface[];
   public allModulos: ModuloInterface[];
+  public criterios: CriteriosClasificacion[];
+  public critSeleccionado: CriteriosClasificacion;
 
   constructor(
     private plantaService: PlantaService,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private afs: AngularFirestore
+    private informeService: InformeService,
+    private pcService: PcService
   ) {}
 
   ngOnInit() {
@@ -59,6 +68,10 @@ export class PlantaEditComponent implements OnInit {
           ? planta.referenciaSolardrone
           : true
       });
+    });
+
+    this.plantaService.getCriterios().subscribe(criterios => {
+      this.criterios = criterios;
     });
   }
   initializeForm() {
@@ -104,5 +117,76 @@ export class PlantaEditComponent implements OnInit {
     }
 
     this.loading = false;
+  }
+
+  simularCriteriosClasificacion(criterio: CriteriosClasificacion) {
+    //Obtener informes de la planta
+    this.informeService
+      .getInformesDePlanta(this.plantaId)
+      .pipe(take(1))
+      .subscribe(informes => {
+        informes.forEach(informe => {
+          // Obtener pcs del informe
+          this.pcService
+            .getPcsSinFiltros(informe.id)
+            .pipe(take(1))
+            .subscribe(pcs => {
+              pcs.forEach(pc => {
+                if (criterio.hasOwnProperty("critCoA")) {
+                  const newCoA = this.pcService.getCoA(pc, criterio.critCoA);
+
+                  if (newCoA !== pc.severidad && pc.tipo !== 0) {
+                    console.log(
+                      "Tipo: ",
+                      GLOBAL.labels_tipos[pc.tipo],
+                      "| Temp: ",
+                      pc.temperaturaMax,
+                      " | DT(n): ",
+                      pc.gradienteNormalizado,
+                      " | Old CoA: ",
+                      pc.severidad,
+                      " | New CoA: ",
+                      newCoA
+                    );
+                  }
+
+                  // pc.severidad = newCoA;
+                  // this.pcService.updatePc(pc);
+                }
+              });
+            });
+        });
+      });
+
+    // if (criterios.hasOwnProperty('critCategoria')) {
+
+    // }
+  }
+
+  aplicarCriteriosClasificacion(criterio: CriteriosClasificacion) {
+    //Obtener informes de la planta
+    this.informeService
+      .getInformesDePlanta(this.plantaId)
+      .pipe(take(1))
+      .subscribe(informes => {
+        informes.forEach(informe => {
+          // Obtener pcs del informe
+          this.pcService
+            .getPcsSinFiltros(informe.id)
+            .pipe(take(1))
+            .subscribe(pcs => {
+              pcs.forEach(pc => {
+                if (criterio.hasOwnProperty("critCoA")) {
+                  pc.clase = this.pcService.getCoA(pc, criterio.critCoA);
+                  this.pcService.updatePc(pc);
+                }
+              });
+            });
+        });
+      });
+
+    // if (criterios.hasOwnProperty('critCategoria')) {
+
+    // }
   }
 }
