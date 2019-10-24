@@ -11,7 +11,6 @@ import { GLOBAL } from "./global";
 import { PlantaService } from "./planta.service";
 import { AuthService } from "./auth.service";
 import { UserAreaInterface } from "../models/userArea";
-import { CriteriosClasificacion } from "../models/criteriosClasificacion";
 import { CritCoA } from "../models/critCoA";
 
 export interface SeguidorInterface {

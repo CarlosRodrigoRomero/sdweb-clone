@@ -40,8 +40,8 @@ export class PlantaService {
     });
   }
 
-  getPlanta(id: string) {
-    this.plantaDoc = this.afs.doc<PlantaInterface>("plantas/" + id);
+  getPlanta(plantaId: string): Observable<PlantaInterface> {
+    this.plantaDoc = this.afs.doc<PlantaInterface>("plantas/" + plantaId);
 
     return (this.planta = this.plantaDoc.snapshotChanges().pipe(
       map(action => {
@@ -56,7 +56,7 @@ export class PlantaService {
     ));
   }
 
-  updatePlanta(planta: PlantaInterface) {
+  updatePlanta(planta: PlantaInterface): void {
     const plantaDoc = this.afs.doc(`plantas/${planta.id}`);
     plantaDoc.update(planta);
   }
@@ -325,6 +325,24 @@ export class PlantaService {
     return (
       !planta.hasOwnProperty("referenciaSolardrone") ||
       planta.referenciaSolardrone
+    );
+  }
+
+  getCriterioPlanta(criterioId: string): Observable<CriteriosClasificacion> {
+    const criterioDoc = this.afs.doc<CriteriosClasificacion>(
+      "criteriosClasificacion/" + criterioId
+    );
+
+    return criterioDoc.snapshotChanges().pipe(
+      map(action => {
+        if (action.payload.exists === false) {
+          return null;
+        } else {
+          const data = action.payload.data() as CriteriosClasificacion;
+          data.id = action.payload.id;
+          return data;
+        }
+      })
     );
   }
 

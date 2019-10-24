@@ -45,6 +45,14 @@ export class PlantaEditComponent implements OnInit {
 
     this.plantaService.getPlanta(this.plantaId).subscribe(planta => {
       this.planta = planta;
+      if (planta.hasOwnProperty("criterioId")) {
+        this.plantaService
+          .getCriterioPlanta(planta.criterioId)
+          .pipe(take(1))
+          .subscribe(criterio => {
+            this.critSeleccionado = criterio;
+          });
+      }
 
       this.form.setValue({
         nombre: planta.nombre,
@@ -164,6 +172,9 @@ export class PlantaEditComponent implements OnInit {
   }
 
   aplicarCriteriosClasificacion(criterio: CriteriosClasificacion) {
+    this.planta.criterioId = criterio.id;
+    this.plantaService.updatePlanta(this.planta);
+
     //Obtener informes de la planta
     this.informeService
       .getInformesDePlanta(this.plantaId)
