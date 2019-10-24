@@ -42,7 +42,6 @@ export let GLOBAL = {
     "Yellowing", // 16
     "String en CA" //17
   ],
-  severidad_dt: [5, 20, 40],
   pcDescripcion: [
     "0", // Para que coincida el indice con el tipo de anomalia
     "Punto caliente", // 1
@@ -61,7 +60,7 @@ export let GLOBAL = {
     "Caja de conexiones caliente", // 14
     "Módulo con sombras", // 15
     "Yellowing", // 16
-    "String en circuito abierto"
+    "String en circuito abierto" //17
   ],
   //   '0',
   //   'Célula caliente',
@@ -158,5 +157,26 @@ export let GLOBAL = {
     "viento",
     "emisividad",
     "temperaturaReflejada"
+  ],
+  columnasExcluirCSV: [
+    "color",
+    "archivo",
+    "distancia",
+    "id",
+    "image_rotation",
+    "resuelto",
+    "vuelo",
+    "informeId",
+    "img_width",
+    "img_height",
+    "rangeMin",
+    "rangeMax",
+    "datetime",
+    "img_top",
+    "img_left",
+    "refTop",
+    "refWidth",
+    "refLeft",
+    "refHeight"
   ]
 };

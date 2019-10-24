@@ -7,7 +7,7 @@ import {
 } from "@angular/material";
 import { PcService } from "../../services/pc.service";
 import { GLOBAL } from "../../services/global";
-import { PlantaInterface } from "../../models/planta";
+import { PlantaService } from "../../services/planta.service";
 
 @Component({
   selector: "app-pc-filter",
@@ -16,7 +16,7 @@ import { PlantaInterface } from "../../models/planta";
 })
 export class PcFilterComponent implements OnInit {
   @Input() public allPcs: PcInterface[];
-  @Input() public planta: PlantaInterface;
+  @Input() public plantaId: string;
 
   public severidad: MatButtonToggleGroup;
   public filtroClase: number[];
@@ -31,9 +31,13 @@ export class PcFilterComponent implements OnInit {
   public countCategoriaFiltrada: Array<number>;
   public countClaseFiltrada: Array<number>;
   public filtroGradiente: number;
-  public global = GLOBAL;
+  public minGradiente: number;
+  public maxGradiente: number;
 
-  constructor(private pcService: PcService) {
+  constructor(
+    private pcService: PcService,
+    private plantaService: PlantaService
+  ) {
     this.countCategoria = Array();
     this.countClase = Array();
   }
@@ -59,11 +63,28 @@ export class PcFilterComponent implements OnInit {
 
     // Calcular la severidad //
     for (const j of this.numClases) {
-      this.countClase.push(this.allPcs.filter(pc => pc.severidad === j).length);
+      this.countClase.push(
+        this.allPcs.filter(pc => this.pcService.getPcCoA(pc) === j).length
+      );
     }
 
     this.pcService.currentFilteredPcs$.subscribe(pcs => {
       this.calcularInforme(pcs);
+    });
+
+    //Setear min y max gradiente
+    this.maxGradiente = GLOBAL.maxGradiente;
+    this.minGradiente = GLOBAL.minGradiente;
+
+    this.plantaService.getPlanta(this.plantaId).subscribe(planta => {
+      if (planta.hasOwnProperty("criterioId")) {
+        this.plantaService
+          .getCriterioPlanta(planta.criterioId)
+          .subscribe(criterio => {
+            this.minGradiente = criterio.critCoA.rangosDT[0];
+            this.pcService.PushFiltroGradiente(this.minGradiente);
+          });
+      }
     });
   }
 
@@ -94,7 +115,7 @@ export class PcFilterComponent implements OnInit {
       let count1 = Array();
       for (const clas of this.numClases) {
         filtroCategoriaClase = allPcs.filter(
-          pc => pc.severidad === clas && pc.tipo === cat
+          pc => this.pcService.getPcCoA(pc) === clas && pc.tipo === cat
         );
         count1.push(filtroCategoriaClase.length);
       }
@@ -103,7 +124,7 @@ export class PcFilterComponent implements OnInit {
     // CLASES //
     let filtroClase;
     for (const j of this.numClases) {
-      filtroClase = allPcs.filter(pc => pc.severidad === j);
+      filtroClase = allPcs.filter(pc => this.pcService.getPcCoA(pc) === j);
 
       this.countClaseFiltrada.push(filtroClase.length);
     }
@@ -116,7 +137,7 @@ export class PcFilterComponent implements OnInit {
       this.filtroClase.push(numberChecked);
     }
     this.pcService.PushFiltroClase(this.filtroClase);
-    // this.pcService.filteredPcs(this.allPcs.filter( (pc) => this.filtroClase.includes(pc.severidad)));
+    // this.pcService.filteredPcs(this.allPcs.filter( (pc) => this.filtroClase.includes(this.pcService.getPcCoA(pc))));
   }
 
   onChangeCheckboxCategoria($event: MatCheckboxChange) {

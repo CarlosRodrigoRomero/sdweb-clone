@@ -48,7 +48,6 @@ export class PlantaEditComponent implements OnInit {
       if (planta.hasOwnProperty("criterioId")) {
         this.plantaService
           .getCriterioPlanta(planta.criterioId)
-          .pipe(take(1))
           .subscribe(criterio => {
             this.critSeleccionado = criterio;
           });

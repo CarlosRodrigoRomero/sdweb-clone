@@ -96,7 +96,7 @@ export class InformeViewComponent implements OnInit {
       labels: GLOBAL.labels_severidad,
       datasets: [
         {
-          label: "Severidad",
+          label: "Clase",
           backgroundColor: GLOBAL.colores_severidad,
           hoverBackgroundColor: GLOBAL.colores_severidad,
           data: [1, 1, 1, 1]
@@ -141,7 +141,9 @@ export class InformeViewComponent implements OnInit {
         )[Math.round(this.allPcs.length / 2)].irradiancia;
 
         for (const j of this.numSeveridad) {
-          filtroSeveridad = this.allPcs.filter(pc => pc.severidad === j);
+          filtroSeveridad = this.allPcs.filter(
+            pc => this.pcService.getPcCoA(pc) === j
+          );
           this.countSeveridad.push(filtroSeveridad.length);
         }
         this.initializeChart();
@@ -234,5 +236,55 @@ export class InformeViewComponent implements OnInit {
     } else {
       return "mejorable";
     }
+  }
+
+  //DOWNLOAD
+  downloadEXCEL2() {
+    //Elimninar columnas
+    const exportData = this.allPcs.map(pc => {
+      GLOBAL.columnasExcluirCSV.forEach(col => {
+        delete pc[col];
+      });
+      return pc;
+    });
+
+    //
+    let csvData = this.ConvertToCSV(exportData);
+    let aux = document.createElement("a");
+    aux.setAttribute("style", "display:none;");
+    document.body.appendChild(aux);
+    var blob = new Blob([csvData], { type: "text/csv" });
+    var url = window.URL.createObjectURL(blob);
+    aux.href = url;
+    var x: Date = new Date();
+    var link: string = "filename_" + x.getMonth() + "_" + x.getDay() + ".csv";
+    aux.download = link.toLocaleLowerCase();
+    aux.click();
+  }
+
+  // convert Json to CSV data in Angular2
+  ConvertToCSV(objArray) {
+    var array = typeof objArray != "object" ? JSON.parse(objArray) : objArray;
+    var str = "";
+    var row = "";
+
+    for (var index in objArray[0]) {
+      //Now convert each value to string and comma-separated
+      row += index + ",";
+    }
+    row = row.slice(0, -1);
+    //append Label row with line break
+    str += row + "\r\n";
+
+    for (var i = 0; i < array.length; i++) {
+      var line = "";
+      for (var index in array[i]) {
+        if (line != "") line += ",";
+
+        line += array[i][index];
+      }
+      str += line + "\r\n";
+    }
+    return str;
   }
 }

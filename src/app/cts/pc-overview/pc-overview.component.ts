@@ -4,6 +4,7 @@ import { PlantaInterface } from "src/app/models/planta";
 import { PcInterface } from "src/app/models/pc";
 import { GLOBAL } from "src/app/services/global";
 import { InformeService } from "../../services/informe.service";
+import { PcService } from '../../services/pc.service';
 
 @Component({
   selector: "app-pc-overview",
@@ -32,7 +33,7 @@ export class PcOverviewComponent implements OnInit {
   public countCategoriaLabels: string[];
   private stepSize: number;
 
-  constructor(public informeService: InformeService) {}
+  constructor(public informeService: InformeService, public pcService: PcService) {}
 
   ngOnInit() {
     this.stepSize = 4;
@@ -97,7 +98,7 @@ export class PcOverviewComponent implements OnInit {
     let perdidasClase: number;
     let filtroClase;
     for (const i of this.numClases) {
-      filtroClase = this.allPcs.filter(pc => pc.severidad === i);
+      filtroClase = this.allPcs.filter(pc => this.pcService.getPcCoA(pc) === i);
 
       perdidasClase = filtroClase
         .map(pc => {

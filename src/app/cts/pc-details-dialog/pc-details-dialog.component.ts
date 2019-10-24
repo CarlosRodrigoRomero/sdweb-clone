@@ -56,7 +56,7 @@ export class PcDetailsDialogComponent implements OnInit {
   public imagenTermicaCargada: boolean;
 
   constructor(
-    private pcService: PcService,
+    public pcService: PcService,
     public auth: AuthService,
     private storage: AngularFireStorage,
     public dialogRef: MatDialogRef<PcDetailsDialogComponent>,

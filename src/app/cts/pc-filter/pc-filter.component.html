@@ -32,8 +32,8 @@
         [displayWith]="formatLabel"
         (input)="onInputFiltroGradiente($event)"
         tickInterval="1"
-        min="{{ global.minGradiente }}"
-        max="{{ global.maxGradiente }}"
+        min="{{ minGradiente }}"
+        max="{{ maxGradiente }}"
         [(ngModel)]="filtroGradiente"
       ></mat-slider>
       <span class="filtro-gradiente-numero">({{ filtroGradiente }} ºC)</span>

@@ -33,7 +33,7 @@
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Clase</th>
       <td mat-cell *matCellDef="let element">
         <div
-          class="circleSeveridad circleSeveridad{{ element.severidad }}"
+          class="circleSeveridad circleSeveridad{{ this.pcService.getPcCoA(element) }}"
         ></div>
         <!-- <span *ngIf="column !== 'severidad'">{{element[column]}}</span> </td> -->
       </td></ng-container

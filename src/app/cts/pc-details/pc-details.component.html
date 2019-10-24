@@ -55,7 +55,7 @@
       </div>
     </div>
 
-    <div *ngIf="pc.severidad > 1" class="pc-details-derecha-item">
+    <div *ngIf="pcService.getPcCoA(pc) > 1" class="pc-details-derecha-item">
       <div class="pc-details-derecha-icon">
         <i class="fas fa-check-circle icon-success"></i>
       </div>

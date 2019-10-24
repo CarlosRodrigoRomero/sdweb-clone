@@ -9,6 +9,7 @@ import { PcDetailsDialogComponent } from "../pc-details-dialog/pc-details-dialog
 import { PlantaInterface } from "../../models/planta";
 import { take } from "rxjs/operators";
 import { PlantaService } from "../../services/planta.service";
+import { PcService } from '../../services/pc.service';
 declare let fabric;
 
 export interface DialogData {
@@ -44,7 +45,8 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   constructor(
     private storage: AngularFireStorage,
     public dialog: MatDialog,
-    public plantaService: PlantaService
+    public plantaService: PlantaService,
+    public pcService: PcService
   ) {}
 
   ngOnInit() {

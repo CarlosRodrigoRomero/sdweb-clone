@@ -46,8 +46,8 @@
     <div class="col-5 pc-details-derecha">
       <h4 *ngIf="!sinPcs" class="text-center">
         Anomalía <b>#{{ pc.local_id }}</b>
-        <span class="text-center colorSeveridad{{ pc.severidad }}">
-          (CoA {{ pc.severidad }})</span
+        <span class="text-center colorSeveridad{{ pcService.getPcCoA(pc) }}">
+          (CoA {{ pcService.getPcCoA(pc) }})</span
         >
       </h4>
       <h4 *ngIf="sinPcs" class="text-center">
@@ -130,7 +130,7 @@
         </div>
       </div>
 
-      <div *ngIf="pc.severidad > 1" class="pc-details-derecha-item">
+      <div *ngIf="pcService.getPcCoA(pc) > 1" class="pc-details-derecha-item">
         <div class="pc-details-derecha-icon">
           <i class="fas fa-check-circle icon-success"></i>
         </div>

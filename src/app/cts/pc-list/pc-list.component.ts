@@ -47,7 +47,7 @@ export class PcListComponent implements OnInit {
   public temperaturaLimite: number;
 
   constructor(
-    private pcService: PcService,
+    public pcService: PcService,
     public plantaService: PlantaService
   ) {
     this.pcDescripcion = GLOBAL.pcDescripcion;

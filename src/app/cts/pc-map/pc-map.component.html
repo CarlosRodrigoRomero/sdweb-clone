@@ -16,7 +16,7 @@
     [radius]="circleRadius"
     [strokeOpacity]="1"
     [strokePosition]="0"
-    [strokeColor]="getStrokeColor(pc.severidad)"
+    [strokeColor]="getStrokeColor(pcService.getPcCoA(pc))"
     [strokeWeight]="3"
     [fillOpacity]="0.3"
     [editable]="false"

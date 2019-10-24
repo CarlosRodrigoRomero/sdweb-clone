@@ -40,7 +40,7 @@ export class PcMapComponent implements OnInit {
   constructor(
     private storage: AngularFireStorage,
     public dialog: MatDialog,
-    private pcService: PcService,
+    public pcService: PcService,
     private plantaService: PlantaService,
     private route: ActivatedRoute
   ) {

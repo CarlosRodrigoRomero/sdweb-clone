@@ -56,8 +56,8 @@ export class InformeExportComponent implements OnInit {
   public url: string;
   public dataTipos: any;
   public dataSeveridad: any;
-  public numCategorias;
-  public numClases;
+  public numCategorias: number[];
+  public numClases: number[];
   public countCategoria;
   public countPosicion;
   public countCategoriaClase;
@@ -537,7 +537,7 @@ export class InformeExportComponent implements OnInit {
       let count1 = Array();
       for (const clas of this.numClases) {
         filtroCategoriaClase = allPcs.filter(
-          pc => pc.severidad === clas && pc.tipo === cat
+          pc => this.pcService.getPcCoA(pc) === clas && pc.tipo === cat
         );
         count1.push(filtroCategoriaClase.length);
       }
@@ -556,7 +556,7 @@ export class InformeExportComponent implements OnInit {
     // CLASES //
     let filtroClase;
     for (const j of this.numClases) {
-      filtroClase = allPcs.filter(pc => pc.severidad === j);
+      filtroClase = allPcs.filter(pc => this.pcService.getPcCoA(pc) === j);
 
       this.countClase.push(filtroClase.length);
     }
