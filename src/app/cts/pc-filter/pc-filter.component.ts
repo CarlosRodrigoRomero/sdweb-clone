@@ -164,7 +164,11 @@ export class PcFilterComponent implements OnInit {
     return value;
   }
 
-  onInputFiltroGradiente($event: MatSliderChange) {
-    this.pcService.PushFiltroGradiente($event.value);
+  onInputFiltroGradiente(event: MatSliderChange) {
+    this.filtroGradiente = event.value;
+  }
+
+  onChangeFiltroGradiente() {
+    this.pcService.PushFiltroGradiente(this.filtroGradiente);
   }
 }
