@@ -118,32 +118,34 @@
               >estructura</mat-checkbox
             >
             <input
-              [(ngModel)]="filasEstructura"
+              [(ngModel)]="estructura.filas"
               type="number"
               id="filasEstructura"
               (change)="updateEstructura()"
               maxlength="2"
               size="4"
+              *ngIf="estructuraOn"
             />
             <input
-              [(ngModel)]="columnasEstructura"
+              [(ngModel)]="estructura.columnas"
               type="number"
               id="columnasEstructura"
               (change)="updateEstructura()"
               maxlength="2"
               size="4"
+              *ngIf="estructuraOn"
             />
 
             <mat-checkbox
               (change)="updateEstructura()"
-              *ngIf="planta?.tipo !== 'seguidores'"
-              [(ngModel)]="sentidoEstructura"
+              *ngIf="planta?.tipo !== 'seguidores' && estructuraOn"
+              [(ngModel)]="estructura.sentido"
               >{{
                 sentidoEstructura ? "dcha->izq" : "izq->drcha"
               }}</mat-checkbox
             >
             <input
-              *ngIf="planta?.tipo !== 'seguidores'"
+              *ngIf="planta?.tipo !== 'seguidores' && estructuraOn"
               [(ngModel)]="estructura.columnaInicio"
               type="number"
               id="columnaInicioEstructura"
@@ -153,7 +155,7 @@
             />
 
             <input
-              *ngIf="planta?.tipo == 'seguidores'"
+              *ngIf="planta?.tipo == 'seguidores' && estructuraOn"
               [(ngModel)]="estructura.filaInicio"
               type="number"
               id="filaInicioEstructura"
@@ -626,6 +628,8 @@
             value="1"
           />
           <button (click)="recalcularLocs()">Recalcular locs</button>
+
+          <!-- <button (click)="aux()">Aux</button> -->
         </div>
       </div>
     </div>

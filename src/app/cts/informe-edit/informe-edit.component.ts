@@ -84,6 +84,7 @@ export class InformeEditComponent implements OnInit {
   public currentFlight: string;
   public columnasEstructura: number;
   public filasEstructura: number;
+  public columnaInicio: number;
   public columnas_array: number[];
   public filas_array: number[];
   public max_temp: number;
@@ -1249,14 +1250,17 @@ export class InformeEditComponent implements OnInit {
         this.estructura.filas = this.filasEstructura;
         this.estructura.columnas = this.columnasEstructura;
         this.getAllPointsEstructura(this.estructura);
-        this.estructura.columnaInicio = 1;
+        this.columnaInicio = 1;
+        this.estructura.columnaInicio = this.columnaInicio;
         this.estructura.filaInicio = 1;
+        this.estructura.sentido = this.sentidoEstructura;
 
         this.informeService.addEstructuraInforme(
           this.informe.id,
           this.estructura
         );
-        this.estructura.coords = Array();
+        this.estructuraOn = true;
+        // this.estructura.coords = Array();
       }
     }
   }
@@ -1586,9 +1590,10 @@ export class InformeEditComponent implements OnInit {
 
   updateEstructura() {
     if (this.estructura.filename === this.currentFileName) {
-      this.estructura.filas = this.filasEstructura;
-      this.estructura.columnas = this.columnasEstructura;
-      this.estructura.sentido = this.sentidoEstructura;
+      this.filasEstructura = this.estructura.filas;
+      this.columnasEstructura = this.estructura.columnas;
+      this.columnaInicio = this.estructura.columnaInicio;
+      this.sentidoEstructura = this.estructura.sentido;
       this.informeService.updateEstructura(this.informe.id, this.estructura);
       this.setImageFromRangeValue(this.rangeValue);
     }
@@ -1669,5 +1674,13 @@ export class InformeEditComponent implements OnInit {
     let replace = new RegExp(separator + "{1,}", "g");
     const result = parts.join(separator).replace(replace, separator);
     return result;
+  }
+
+  aux() {
+    this.allPcs.forEach(pc => {
+      pc.archivo = pc.archivo.replace("190626_alconchel", "190628_alconchel");
+      this.pcService.updatePc(pc);
+    });
+    // console.log(this.allPcs);
   }
 }
