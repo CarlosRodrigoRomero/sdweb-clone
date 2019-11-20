@@ -37,9 +37,11 @@ export class PcListComponent implements OnInit {
   @Input() planta: PlantaInterface;
   @Input() allPcs: PcInterface[];
 
+  public pcDataSource: MatTableDataSource<
+    PcInterface
+  > = new MatTableDataSource();
   public expandedElement: PcInterface;
   public columnsToDisplay: string[];
-  public pcDataSource: MatTableDataSource<PcInterface>;
   public searchKey: string;
   public profileUrl: Observable<string | null>;
   public pcDescripcion: string[];
@@ -56,8 +58,37 @@ export class PcListComponent implements OnInit {
   }
 
   ngOnInit() {
+    if (this.planta.tipo === "seguidores") {
+      this.columnsToDisplay = [
+        "severidad",
+        "tipo",
+        "perdidas",
+        "local_id",
+        "global_x",
+        "temperaturaMax",
+        "gradienteNormalizado"
+      ];
+    } else {
+      this.columnsToDisplay = [
+        "severidad",
+        "tipo",
+        "perdidas",
+        "local_id",
+        "global_x",
+        "global_y",
+        "temperaturaMax",
+        "gradienteNormalizado"
+      ];
+    }
+  }
+
+  ngAfterViewInit() {
+    this.pcDataSource.sort = this.sort;
+    this.pcDataSource.paginator = this.paginator;
+
+    /* now it's okay to set large data source... */
     this.pcService.currentFilteredPcs$.subscribe(list => {
-      this.pcDataSource = new MatTableDataSource(list);
+      this.pcDataSource.data = list;
       this.pcDataSource.filterPredicate = (pc, filter) => {
         filter = filter.toLowerCase();
         if (this.planta.tipo === "seguidores") {
@@ -88,37 +119,7 @@ export class PcListComponent implements OnInit {
           );
         }
       };
-      this.pcDataSource.sort = this.sort;
-      this.pcDataSource.paginator = this.paginator;
-      // this.pcDataSource.filterPredicate = (data, filter) => {
-      //   return ['local_id'].some(ele => {
-      //     return data[ele].toLowerCase().indexOf(filter) !== -1;
-      //   });
-      // };
     });
-
-    if (this.planta.tipo === "seguidores") {
-      this.columnsToDisplay = [
-        "severidad",
-        "tipo",
-        "perdidas",
-        "local_id",
-        "global_x",
-        "temperaturaMax",
-        "gradienteNormalizado"
-      ];
-    } else {
-      this.columnsToDisplay = [
-        "severidad",
-        "tipo",
-        "perdidas",
-        "local_id",
-        "global_x",
-        "global_y",
-        "temperaturaMax",
-        "gradienteNormalizado"
-      ];
-    }
   }
 
   onClickToggleDetail(element) {
