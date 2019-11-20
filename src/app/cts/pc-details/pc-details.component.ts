@@ -24,18 +24,17 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   @Input() informe: InformeInterface;
   @Input() planta: PlantaInterface;
 
-  public tooltipTemp: number;
-  private maxTemp: number;
-  private minTemp: number;
+  // public tooltipTemp: number;
+  public global = GLOBAL;
+  // private maxTemp: number;
+  // private minTemp: number;
   public canvasWidth: number;
   public canvasHeight: number;
   private fResize: number;
   private canvas: any;
-  private tooltipElement: any;
-  public pcDescripcion: string[];
-  public pcCausa: string[];
-  public pcRecomendacion: string[];
-  public pcPerdidas: number[];
+  public alreadyOpened: boolean;
+  public imageLoaded: boolean;
+  // private tooltipElement: any;
 
   constructor(
     private storage: AngularFireStorage,
@@ -45,62 +44,72 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit() {
-    if (!this.pc.downloadUrl$) {
-      this.pc.downloadUrl$ = this.storage
-        .ref(`informes/${this.informe.id}/jpg/${this.pc.archivoPublico}`)
-        .getDownloadURL();
-      this.pc.downloadUrl$.subscribe(url => {
-        this.pc.downloadUrlString = url;
-      });
-    }
-    this.minTemp = this.pc.rangeMin;
-    this.maxTemp = this.pc.rangeMax;
-
-    this.pcDescripcion = GLOBAL.pcDescripcion;
-    this.pcCausa = GLOBAL.pcCausa;
-    this.pcRecomendacion = GLOBAL.pcRecomendacion;
-    this.pcPerdidas = GLOBAL.pcPerdidas;
     this.canvasWidth = 360;
     this.canvasHeight = 256;
     this.fResize = this.canvasWidth / GLOBAL.resolucionCamara[1];
+    this.alreadyOpened = false;
+    this.imageLoaded = false;
+
+    // if (!this.pc.downloadUrl$) {
+    //   this.pc.downloadUrl$ = this.storage
+    //     .ref(`informes/${this.informe.id}/jpg/${this.pc.archivoPublico}`)
+    //     .getDownloadURL();
+    //   this.pc.downloadUrl$.subscribe(url => {
+    //     this.pc.downloadUrlString = url;
+    //   });
+    // }
+    // this.minTemp = this.pc.rangeMin;
+    // this.maxTemp = this.pc.rangeMax;
   }
 
   ngOnChanges() {
     if (this.selectedPc === this.pc) {
-      this.canvas = new fabric.Canvas(this.pc.id);
-      const imagenTermica = new Image();
+      if (!this.alreadyOpened) {
+        this.alreadyOpened = true;
+        this.canvas = new fabric.Canvas(this.pc.id);
+        const imagenTermica = new Image();
+        imagenTermica.crossOrigin = "anonymous";
 
-      imagenTermica.crossOrigin = "anonymous";
-      imagenTermica.src = this.pc.downloadUrlString;
+        if (!this.selectedPc.downloadUrl$) {
+          this.selectedPc.downloadUrl$ = this.storage
+            .ref(
+              `informes/${this.informe.id}/jpg/${this.selectedPc.archivoPublico}`
+            )
+            .getDownloadURL();
+          this.selectedPc.downloadUrl$.pipe(take(1)).subscribe(url => {
+            this.selectedPc.downloadUrlString = url;
+            imagenTermica.src = this.pc.downloadUrlString;
+          });
+        }
 
-      imagenTermica.onload = () => {
-        // pica.resize(imagenTermica, this.canvas).then();
-        const imagenTermicaCanvas = new fabric.Image(imagenTermica, {
-          left: 0,
-          top: 0,
-          angle: 0,
-          opacity: 1,
-          draggable: false,
-          lockMovementX: true,
-          lockMovementY: true,
-          selectable: false,
-          hoverCursor: "default"
-        });
-        imagenTermicaCanvas.scaleToHeight(this.canvasHeight);
-        imagenTermicaCanvas.scaleToWidth(this.canvasWidth);
-        this.canvas.add(imagenTermicaCanvas);
-        this.drawPc(this.selectedPc, this.fResize);
-        this.drawTriangle(this.selectedPc, this.fResize);
+        imagenTermica.onload = () => {
+          this.imageLoaded = true;
+          // pica.resize(imagenTermica, this.canvas).then();
+          const imagenTermicaCanvas = new fabric.Image(imagenTermica, {
+            left: 0,
+            top: 0,
+            angle: 0,
+            opacity: 1,
+            draggable: false,
+            lockMovementX: true,
+            lockMovementY: true,
+            selectable: false,
+            hoverCursor: "default"
+          });
+          imagenTermicaCanvas.scaleToHeight(this.canvasHeight);
+          imagenTermicaCanvas.scaleToWidth(this.canvasWidth);
+          this.canvas.add(imagenTermicaCanvas);
+          this.drawPc(this.selectedPc, this.fResize);
+          this.drawTriangle(this.selectedPc, this.fResize);
+        };
 
         // this.canvas.getContext('2d').drawImage(imagenTermica, 0, 0 );
         // this.tooltipElement = document.getElementById(`tooltip_${this.pc.id}`);
         // console.log('this.tooltipElement', this.tooltipElement);
-      };
+      }
     }
   }
-  downloadReclamacion() {
-    console.log("reclamacion");
-  }
+
   downloadRjpg(pc: PcInterface) {
     this.storage
       .ref(`informes/${this.pc.informeId}/rjpg/${pc.archivoPublico}`)
@@ -182,37 +191,37 @@ export class PcDetailsComponent implements OnInit, OnChanges {
         xhr.send();
       });
   }
-  onMouseLeaveCanvas($event) {
-    this.tooltipElement.style.display = "none";
-  }
+  // onMouseLeaveCanvas($event) {
+  //   this.tooltipElement.style.display = "none";
+  // }
 
-  onMouseMoveCanvas($event: MouseEvent) {
-    // Temperatura puntual
-    const mousePositionData = this.canvas
-      .getContext("2d")
-      .getImageData($event.offsetX, $event.offsetY, 1, 1).data;
+  // onMouseMoveCanvas($event: MouseEvent) {
+  //   // Temperatura puntual
+  //   const mousePositionData = this.canvas
+  //     .getContext("2d")
+  //     .getImageData($event.offsetX, $event.offsetY, 1, 1).data;
 
-    this.tooltipTemp = this.rgb2temp(
-      mousePositionData[0],
-      mousePositionData[1],
-      mousePositionData[2]
-    );
+  //   this.tooltipTemp = this.rgb2temp(
+  //     mousePositionData[0],
+  //     mousePositionData[1],
+  //     mousePositionData[2]
+  //   );
 
-    this.tooltipElement.style.display = "block";
-    this.tooltipElement.style.left = $event.layerX + "px";
-    this.tooltipElement.style.top = $event.layerY + "px";
-  }
+  //   this.tooltipElement.style.display = "block";
+  //   this.tooltipElement.style.left = $event.layerX + "px";
+  //   this.tooltipElement.style.top = $event.layerY + "px";
+  // }
 
-  rgb2temp(red: number, green: number, blue: number) {
-    // a = (max_temp - min_temp) / 255
-    // b= min_temp
+  // rgb2temp(red: number, green: number, blue: number) {
+  //   // a = (max_temp - min_temp) / 255
+  //   // b= min_temp
 
-    const b = this.minTemp;
-    const a = (this.maxTemp - this.minTemp) / 255;
+  //   const b = this.minTemp;
+  //   const a = (this.maxTemp - this.minTemp) / 255;
 
-    const x = (red + green + blue) / 3;
-    return Math.round((x * a + b) * 10) / 10;
-  }
+  //   const x = (red + green + blue) / 3;
+  //   return Math.round((x * a + b) * 10) / 10;
+  // }
 
   drawPc(pc: PcInterface, factor = 1) {
     const actObj1 = new fabric.Rect({
@@ -290,7 +299,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   }
 
   onClickVerDetalles(selectedPc: PcInterface): void {
-    this.plantaService.getNumeroModulo(this.planta, selectedPc);
+    // this.plantaService.getNumeroModulo(this.planta, selectedPc);
     // selectedPc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${selectedPc.archivoPublico}`).getDownloadURL();
     if (!selectedPc.downloadUrl$) {
       selectedPc.downloadUrl$ = this.storage

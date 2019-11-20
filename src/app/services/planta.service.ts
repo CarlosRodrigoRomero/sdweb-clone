@@ -254,7 +254,7 @@ export class PlantaService {
     );
   }
 
-  getNumeroModulo(planta: PlantaInterface, pc: PcInterface) {
+  getNumeroModulo(planta: PlantaInterface, pc: PcInterface): string {
     if (planta.hasOwnProperty("etiquetasLocalXY")) {
       if (planta.etiquetasLocalXY[pc.local_y] !== undefined) {
         if (planta.etiquetasLocalXY[pc.local_y][pc.local_x - 1] !== undefined)
