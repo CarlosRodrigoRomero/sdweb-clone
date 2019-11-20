@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Inject } from "@angular/core";
+import { Component, OnInit, Inject } from "@angular/core";
 import { PcInterface } from "src/app/models/pc";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
 import { DialogData } from "../pc-map/pc-map.component";
@@ -590,10 +590,10 @@ export class PcDetailsDialogComponent implements OnInit {
   }
 
   getEtiquetaLocalX(pc: PcInterface) {
-    return this.plantaService.getEtiquetaLocalX(this.planta, pc)
+    return this.plantaService.getEtiquetaLocalX(this.planta, pc);
   }
   getEtiquetaLocalY(pc: PcInterface) {
-    return this.plantaService.getEtiquetaLocalY(this.planta, pc)
+    return this.plantaService.getEtiquetaLocalY(this.planta, pc);
   }
   updatePcInDb(pc: PcInterface) {
     delete pc.downloadUrlVisual$;

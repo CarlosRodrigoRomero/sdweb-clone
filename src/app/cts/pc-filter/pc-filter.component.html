@@ -42,7 +42,14 @@
 
     <hr />
 
-    <h3>Clase de Anomalía (CoA)</h3>
+    <h3>
+      Clase de Anomalía (CoA)
+      <i
+        class="fas fa-info-circle info-coa"
+        (click)="onClickExplicacionCoA()"
+      ></i>
+    </h3>
+
     <div class="filtro-severidad">
       <ng-container *ngFor="let ts of numClases">
         <mat-checkbox
@@ -60,10 +67,6 @@
             <span class="filtro-numero">
               ({{ countClaseFiltrada[ts - 1] }} / {{ countClase[ts - 1] }})
             </span>
-            <i
-              matTooltip="{{ descripcionSeveridad[ts - 1] }}"
-              class="info-severidad fas fa-info-circle"
-            ></i>
           </div>
         </mat-checkbox>
       </ng-container>

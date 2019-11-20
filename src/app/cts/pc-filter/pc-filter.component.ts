@@ -3,11 +3,16 @@ import { PcInterface } from "../../models/pc";
 import {
   MatButtonToggleGroup,
   MatCheckboxChange,
-  MatSliderChange
+  MatSliderChange,
+  MatDialog
 } from "@angular/material";
 import { PcService } from "../../services/pc.service";
 import { GLOBAL } from "../../services/global";
 import { PlantaService } from "../../services/planta.service";
+import { ExplicacionCoaComponent } from "../explicacion-coa/explicacion-coa.component";
+import { CriteriosClasificacion } from "../../models/criteriosClasificacion";
+import { take } from "rxjs/operators";
+import { PlantaInterface } from "../../models/planta";
 
 @Component({
   selector: "app-pc-filter",
@@ -16,7 +21,7 @@ import { PlantaService } from "../../services/planta.service";
 })
 export class PcFilterComponent implements OnInit {
   @Input() public allPcs: PcInterface[];
-  @Input() public plantaId: string;
+  @Input() public planta: PlantaInterface;
 
   public severidad: MatButtonToggleGroup;
   public filtroClase: number[];
@@ -33,8 +38,10 @@ export class PcFilterComponent implements OnInit {
   public filtroGradiente: number;
   public minGradiente: number;
   public maxGradiente: number;
+  public criterio: CriteriosClasificacion;
 
   constructor(
+    public dialog: MatDialog,
     private pcService: PcService,
     private plantaService: PlantaService
   ) {
@@ -76,13 +83,24 @@ export class PcFilterComponent implements OnInit {
     this.maxGradiente = GLOBAL.maxGradiente;
     this.minGradiente = GLOBAL.minGradiente;
 
-    this.plantaService.getPlanta(this.plantaId).subscribe(planta => {
+    this.plantaService.getPlanta(this.planta.id).subscribe(planta => {
       if (planta.hasOwnProperty("criterioId")) {
         this.plantaService
-          .getCriterioPlanta(planta.criterioId)
+          .getCriterio(planta.criterioId)
+          .pipe(take(1))
           .subscribe(criterio => {
             this.minGradiente = criterio.critCoA.rangosDT[0];
             this.pcService.PushFiltroGradiente(this.minGradiente);
+            this.criterio = criterio;
+          });
+      } else {
+        this.plantaService
+          .getCriterio(GLOBAL.criterioSolardroneId)
+          .pipe(take(1))
+          .subscribe(criterio => {
+            this.minGradiente = criterio.critCoA.rangosDT[0];
+            this.pcService.PushFiltroGradiente(this.minGradiente);
+            this.criterio = criterio;
           });
       }
     });
@@ -170,5 +188,18 @@ export class PcFilterComponent implements OnInit {
 
   onChangeFiltroGradiente() {
     this.pcService.PushFiltroGradiente(this.filtroGradiente);
+  }
+
+  onClickExplicacionCoA() {
+    const dialogRef = this.dialog.open(ExplicacionCoaComponent, {
+      width: "1000px",
+      // height: '600px',
+      hasBackdrop: true,
+      data: {
+        criterio: this.criterio
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {});
   }
 }

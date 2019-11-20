@@ -95,7 +95,7 @@
               </div>
               <div class="div-mae-3">
                 <h4 class="text-center text-light">
-                  {{ calificacionMae[(informe?.mae)] }}
+                  {{ calificacionMae[informe?.mae] }}
                 </h4>
               </div>
             </div>
@@ -226,7 +226,7 @@
             <div class="row">
               <div class="col-3 col-filtros">
                 <app-pc-filter
-                  [plantaId]="planta.id"
+                  [planta]="planta"
                   [allPcs]="allPcs"
                 ></app-pc-filter>
               </div>
@@ -251,7 +251,7 @@
                 <app-pc-filter
                   class="pc-filter-over-map"
                   [allPcs]="allPcs"
-                  [plantaId]="planta.id"
+                  [planta]="planta"
                 ></app-pc-filter>
 
                 <app-pc-map
@@ -273,7 +273,7 @@
               <div class="col-3 col-filtros">
                 <app-pc-filter
                   [allPcs]="allPcs"
-                  [plantaId]="planta.id"
+                  [planta]="planta"
                 ></app-pc-filter>
               </div>
               <div class="col-9">

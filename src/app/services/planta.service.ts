@@ -328,7 +328,7 @@ export class PlantaService {
     );
   }
 
-  getCriterioPlanta(criterioId: string): Observable<CriteriosClasificacion> {
+  getCriterio(criterioId: string): Observable<CriteriosClasificacion> {
     const criterioDoc = this.afs.doc<CriteriosClasificacion>(
       "criteriosClasificacion/" + criterioId
     );

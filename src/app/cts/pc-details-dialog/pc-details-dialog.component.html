@@ -92,7 +92,7 @@
 
         <div class="pc-details-derecha-item-tabla">
           <span class="text-center"
-            ><strong>Gradiente (normalizado)</strong></span
+            ><strong>&Delta;T (normalizado)</strong></span
           >
           <span style="color:red" class="text-center"
             >+ {{ pc.gradienteNormalizado | number: "1.0-1" }} ºC</span
@@ -148,21 +148,35 @@
           <span class="detail-title">Localización:</span>
         </div>
 
-        <div class="displayFlex" *ngIf="planta.tipo === 'seguidores'; else fija">
+        <div
+          class="displayFlex"
+          *ngIf="planta.tipo === 'seguidores'; else fija"
+        >
           <div
             *ngIf="!checkIsNaN(pc.global_x)"
             class="pc-details-derecha-item-tabla"
           >
             <span class="text-center"><strong>Seguidor</strong></span>
-            <span class="text-center">{{ plantaService.getNombreSeguidor(pc) }}</span>
+            <span class="text-center">{{
+              plantaService.getNombreSeguidor(pc)
+            }}</span>
           </div>
 
           <div class="pc-details-derecha-item-tabla">
-            <span *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"><strong>Fila/Columna</strong></span>
-            <span *ngIf="planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"><strong>Nº Módulo</strong></span>
-            <span class="text-center">{{ plantaService.getNumeroModulo(planta, pc) }}</span>
+            <span
+              *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')"
+              class="text-center"
+              ><strong>Fila/Columna</strong></span
+            >
+            <span
+              *ngIf="planta.hasOwnProperty('etiquetasLocalXY')"
+              class="text-center"
+              ><strong>Nº Módulo</strong></span
+            >
+            <span class="text-center">{{
+              plantaService.getNumeroModulo(planta, pc)
+            }}</span>
           </div>
-
         </div>
 
         <ng-template class="displayFlex" #fija>
@@ -222,8 +236,7 @@
           <span
             >{{ pc.irradiancia | number: "1.0-0" }} W/m<sup>2</sup> | Viento:
             {{ pc.viento }} | {{ pc.temperaturaAire }} ºC | Nubes:
-            {{ pc.nubosidad }} octavas | Emisividad: {{ pc.emisividad }} | Temp.
-            Reflejada: {{ informe.tempReflejada }} ºC</span
+            {{ pc.nubosidad }} octavas</span
           >
         </div>
       </div>

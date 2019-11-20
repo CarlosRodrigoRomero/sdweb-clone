@@ -1,0 +1,33 @@
+.circleSeveridad {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.circleSeveridad1 {
+  background: #20b2aa;
+}
+
+.circleSeveridad2 {
+  background: #ff4500;
+}
+
+.circleSeveridad3 {
+  background: #b70000;
+}
+
+.lista-coa {
+  list-style-type: none;
+}
+.coa1 {
+  color: #20b2aa;
+}
+
+.coa2 {
+  color: #ff4500;
+}
+
+.coa3 {
+  color: #b70000;
+}

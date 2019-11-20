@@ -73,9 +73,10 @@ import { PruebasComponent } from "./cts/pruebas/pruebas.component";
 import { PcOverviewComponent } from "./cts/pc-overview/pc-overview.component";
 import { AutoLocComponent } from "./cts/auto-loc/auto-loc.component";
 import { PlantaListComponent } from "./cts/planta-list/planta-list.component";
-import { PlantaAddComponent } from './cts/planta-add/planta-add.component';
-import { InformeAddComponent } from './cts/informe-add/informe-add.component';
-import { PlantaEditComponent } from './cts/planta-edit/planta-edit.component';
+import { PlantaAddComponent } from "./cts/planta-add/planta-add.component";
+import { InformeAddComponent } from "./cts/informe-add/informe-add.component";
+import { PlantaEditComponent } from "./cts/planta-edit/planta-edit.component";
+import { ExplicacionCoaComponent } from "./cts/explicacion-coa/explicacion-coa.component";
 
 @NgModule({
   declarations: [
@@ -102,9 +103,10 @@ import { PlantaEditComponent } from './cts/planta-edit/planta-edit.component';
     AutoLocComponent,
     PlantaAddComponent,
     InformeAddComponent,
-    PlantaEditComponent
+    PlantaEditComponent,
+    ExplicacionCoaComponent
   ],
-  entryComponents: [PcDetailsDialogComponent],
+  entryComponents: [PcDetailsDialogComponent, ExplicacionCoaComponent],
   imports: [
     BrowserModule,
     MatCardModule,

@@ -15,9 +15,9 @@ export let GLOBAL = {
   // labels_severidad: ['Leve', 'Media', 'Grave'],
   labels_severidad: ["CoA 1", "CoA 2", "CoA 3"],
   descripcionSeveridad: [
-    "Tipo 1: sin anomalía. Hacemos seguimiento, pero no hay que actuar",
-    "Tipo 2: anomalía térmica: ver la causa y, si es necesario, arreglar en un periodo razonable.",
-    "Tipo 3: anomalía relevante para la seguridad: próxima interrupción de la operación normal del módulo, actuar cuanto antes."
+    "CoA 1: no es considerada una anomalía térmica. Hacemos seguimiento pero no hay que actuar.",
+    "CoA 2: anomalía térmica: ver la causa y, si es necesario, arreglar en un periodo razonable.",
+    "CoA 3: anomalía térmica relevante: posible interrupción de la operación normal del módulo, actuar en el corto plazo."
   ],
   tipos_severidad: [1, 2, 3],
   // colores_severidad: ['#20B2AA', '#FFD700', '#FF4500', '#800000'],
@@ -178,5 +178,6 @@ export let GLOBAL = {
     "refWidth",
     "refLeft",
     "refHeight"
-  ]
+  ],
+  criterioSolardroneId: "ZHSp2yNdpORe3XMDAxoA"
 };

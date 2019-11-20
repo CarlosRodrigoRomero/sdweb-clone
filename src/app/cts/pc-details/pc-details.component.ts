@@ -9,13 +9,8 @@ import { PcDetailsDialogComponent } from "../pc-details-dialog/pc-details-dialog
 import { PlantaInterface } from "../../models/planta";
 import { take } from "rxjs/operators";
 import { PlantaService } from "../../services/planta.service";
-import { PcService } from '../../services/pc.service';
+import { PcService } from "../../services/pc.service";
 declare let fabric;
-
-export interface DialogData {
-  pc: PcInterface;
-  allPcs: PcInterface[];
-}
 
 @Component({
   selector: "app-pc-details",
