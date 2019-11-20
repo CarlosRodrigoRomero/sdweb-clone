@@ -42,6 +42,7 @@ export let GLOBAL = {
     "Yellowing", // 16
     "String en CA" //17
   ],
+  labels_bloqueadas: [0, 1, 2, 4, 16],
   pcDescripcion: [
     "0", // Para que coincida el indice con el tipo de anomalia
     "Punto caliente", // 1

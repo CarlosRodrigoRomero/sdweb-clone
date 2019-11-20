@@ -1,6 +1,6 @@
 <mat-card>
   <mat-card-content>
-    <h3>Categorías</h3>
+    <h4>Categorías</h4>
     <div class="filtro-severidad">
       <ng-container *ngFor="let cat of numCategorias">
         <mat-checkbox
@@ -22,7 +22,7 @@
 
     <hr />
 
-    <h3 class="titulo-gradiente">Gradiente mínimo</h3>
+    <h4 class="titulo-gradiente">Gradiente mínimo</h4>
     <span class="subtitulo-gradiente"
       >(sólo se aplica a células calientes)</span
     >
@@ -42,13 +42,13 @@
 
     <hr />
 
-    <h3>
-      Clase de Anomalía (CoA)
+    <h4>
+      Clase de Anomalía
       <i
         class="fas fa-info-circle info-coa"
         (click)="onClickExplicacionCoA()"
       ></i>
-    </h3>
+    </h4>
 
     <div class="filtro-severidad">
       <ng-container *ngFor="let ts of numClases">
@@ -63,7 +63,7 @@
             <span class="filtro-severidad-text"
               >{{ labelsSeveridad[ts - 1] }}
             </span>
-            <span> </span>
+            &nbsp;
             <span class="filtro-numero">
               ({{ countClaseFiltrada[ts - 1] }} / {{ countClase[ts - 1] }})
             </span>

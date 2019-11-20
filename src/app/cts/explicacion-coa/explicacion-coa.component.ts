@@ -36,11 +36,8 @@ export class ExplicacionCoaComponent implements OnInit {
         return (
           !this.criterio.critCoA.siempreCoA3.includes(cat) &&
           !this.criterio.critCoA.siempreCoA2.includes(cat) &&
-          cat !== 1 &&
-          cat !== 2 &&
-          cat !== 16 &&
-          cat !== 0 &&
-          cat !== 4
+          !this.global.labels_bloqueadas.includes(cat) &&
+          !this.criterio.critCoA.siempreVisible.includes(cat)
         );
       });
   }

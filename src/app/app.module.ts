@@ -77,6 +77,8 @@ import { PlantaAddComponent } from "./cts/planta-add/planta-add.component";
 import { InformeAddComponent } from "./cts/informe-add/informe-add.component";
 import { PlantaEditComponent } from "./cts/planta-edit/planta-edit.component";
 import { ExplicacionCoaComponent } from "./cts/explicacion-coa/explicacion-coa.component";
+import { GetNumeroModulosPipe } from "./pipes/get-numero-modulos.pipe";
+import { GetNombreSeguidorPipe } from "./pipes/get-nombre-seguidor.pipe";
 
 @NgModule({
   declarations: [
@@ -104,7 +106,9 @@ import { ExplicacionCoaComponent } from "./cts/explicacion-coa/explicacion-coa.c
     PlantaAddComponent,
     InformeAddComponent,
     PlantaEditComponent,
-    ExplicacionCoaComponent
+    ExplicacionCoaComponent,
+    GetNumeroModulosPipe,
+    GetNombreSeguidorPipe
   ],
   entryComponents: [PcDetailsDialogComponent, ExplicacionCoaComponent],
   imports: [
