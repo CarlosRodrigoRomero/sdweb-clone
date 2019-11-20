@@ -80,11 +80,11 @@
         </div>
 
         <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"><strong>Temp. máxima</strong></span>
+          <span class="text-center"><strong>T. máxima</strong></span>
           <span class="text-center">{{ pc.temperaturaMax }} ºC</span>
         </div>
         <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"><strong>Temp. referencia</strong></span>
+          <span class="text-center"><strong>T. referencia</strong></span>
           <span style="color:blue" class="text-center"
             >{{ pc.temperaturaRef }} ºC</span
           >
@@ -112,7 +112,7 @@
           <i style="color:red" class="fas fa-exclamation-circle icon-error"></i>
         </div>
         <div class="pc-texto">
-          <span class="detail-title">Incidencia: </span>
+          <span class="detail-title">Anomalía: </span>
           <span *ngIf="checkIsMoreThanOne(pc.modulosAfectados)">
             Módulos afectados: {{ pc.modulosAfectados }}.
           </span>
@@ -240,19 +240,21 @@
           >
         </div>
       </div>
+      <hr />
+      <h4 class="texto-descargas">Descargas:</h4>
 
-      <div style="justify-content: space-between" class="botones">
-        <button (click)="downloadRjpg(pc)" mat-raised-button>
-          JPG Radiométrico
-        </button>
-        <button
+      <div class="descargas">
+        <a href="" (click)="downloadRjpg(pc)">
+          Imagen radiométrica
+        </a>
+        <a
+          href=""
           *ngIf="!informe.hasOwnProperty('jpgVisual') || informe.jpgVisual"
           (click)="downloadJpgVisual(pc)"
-          mat-raised-button
         >
-          JPG Visual
-        </button>
-        <button (click)="downloadJpg(pc)" mat-raised-button>JPG</button>
+          Imagen visual
+        </a>
+        <!-- <a (click)="downloadJpg(pc)" n>JPG</a> -->
         <!-- <button mat-raised-button>reclamacion</button> -->
         <!-- <button (click)="pc.resuelto = !pc.resuelto" [disabled]="pc.resuelto" mat-raised-button> <i *ngIf="pc.resuelto" class="fas fa-check"></i> resuelto</button> -->
       </div>

@@ -104,3 +104,7 @@ tr.element-row:not(.example-expanded-row):active {
 .text-perdidas {
   margin-left: 2rem;
 }
+
+.mat-row {
+  height: 30px;
+}

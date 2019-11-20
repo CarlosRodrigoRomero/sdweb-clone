@@ -8,36 +8,15 @@
       >
       </canvas>
     </div>
-    <div class="pc-details-derecha-item">
-      <div class="pc-details-derecha-icon">
-        <i class="fas fa-info-circle"></i>
-      </div>
-      <div class="pc-texto">
-        <span class="detail-title">Temperaturas: </span>
-        <span></span>
-      </div>
-
-      <div class="pc-details-derecha-item-tabla">
-        <span class="text-center"><strong>Temp. referencia</strong></span>
-        <span class="text-center">{{ pc.temperaturaRef }} ºC</span>
-      </div>
-
-      <div class="pc-details-derecha-item-tabla">
-        <span class="text-center"><strong>Gradiente normalizado</strong></span>
-        <span style="color:red" class="text-center"
-          >+ {{ pc.gradienteNormalizado | number: "1.0-1" }} ºC</span
-        >
-      </div>
-    </div>
   </div>
 
   <div class="col-6 pc-details-derecha">
     <div class="pc-details-derecha-item">
       <div class="pc-details-derecha-icon">
-        <i style="color: red" class="fas fa-exclamation-circle icon-error"></i>
+        <i class="fas fa-exclamation-circle icon-error"></i>
       </div>
       <div class="pc-texto">
-        <span class="detail-title">Incidencia: </span>
+        <span class="detail-title">Anomalía: </span>
         <span *ngIf="checkIsMoreThanOne(pc.modulosAfectados)">
           Módulos afectados: {{ pc.modulosAfectados }}.
         </span>
@@ -47,21 +26,27 @@
 
     <div class="pc-details-derecha-item">
       <div class="pc-details-derecha-icon">
-        <i style="color: orange" class="fas fa-flag icon-flag"></i>
+        <i class="fas fa-info-circle"></i>
       </div>
       <div class="pc-texto">
-        <span class="detail-title">Causa: </span>
-        <span>{{ pcCausa[pc.tipo] }}</span>
+        <span class="detail-title">Temperaturas: </span>
+        <span></span>
       </div>
-    </div>
 
-    <div *ngIf="pcService.getPcCoA(pc) > 1" class="pc-details-derecha-item">
-      <div class="pc-details-derecha-icon">
-        <i class="fas fa-check-circle icon-success"></i>
-      </div>
-      <div class="pc-texto">
-        <span class="detail-title">Actuación recomendada: </span>
-        <span>{{ pcRecomendacion[pc.tipo] }}</span>
+      <div class="item-group">
+        <div class="pc-details-derecha-item-tabla">
+          <span class="text-center"><strong>T. referencia</strong></span>
+          <span class="text-center">{{ pc.temperaturaRef }} ºC</span>
+        </div>
+
+        <div class="pc-details-derecha-item-tabla">
+          <span class="text-center"
+            ><strong>&Delta;T (normalizado)</strong></span
+          >
+          <span style="color:red" class="text-center"
+            >+ {{ pc.gradienteNormalizado | number: "1.0-1" }} ºC</span
+          >
+        </div>
       </div>
     </div>
 
@@ -168,23 +153,7 @@
   </div>
 </div>
 <div class="row">
-  <div class="col-6">
-    <div class="pc-detail-botones">
-      <button (click)="downloadRjpg(pc)" mat-raised-button>
-        JPG Radiométrico
-      </button>
-      <button
-        *ngIf="!informe.hasOwnProperty('jpgVisual') || informe.jpgVisual"
-        (click)="downloadJpgVisual(pc)"
-        mat-raised-button
-      >
-        JPG Visual
-      </button>
-      <button (click)="downloadJpg(pc)" mat-raised-button>JPG</button>
-      <!-- <button mat-raised-button>informe reclamacion</button> -->
-      <!-- <button (click)="pc.resuelto = !pc.resuelto" [disabled]="pc.resuelto" mat-raised-button> <i *ngIf="pc.resuelto" class="fas fa-check"></i>resuelto</button> -->
-    </div>
-  </div>
+  <div class="col-6"></div>
   <div class="col-6">
     <div class="pc-details-derecha-item">
       <button

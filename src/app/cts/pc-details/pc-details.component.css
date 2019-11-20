@@ -28,6 +28,7 @@
 .pc-details-derecha {
   display: flex;
   flex-direction: column;
+  margin-top: 1rem;
 }
 
 .pc-details-derecha-item {
@@ -53,9 +54,9 @@
 
 .pc-details-derecha-item-tabla {
   display: flex;
-  margin-right: 0.5rem;
   flex-direction: column;
   vertical-align: center;
+  margin-right: 2rem;
 }
 
 .icon-success {
@@ -77,6 +78,7 @@
 }
 .pc-details-derecha-icon i {
   align-self: center;
+  font-size: 1.5rem;
 }
 
 .pc-detail-botones {
@@ -87,4 +89,11 @@
 }
 .displayFlex {
   display: flex;
+}
+.circle-detail {
+  font-size: 1.5rem;
+}
+.item-group {
+  display: flex;
+  justify-content: space-between;
 }

@@ -20,10 +20,9 @@
 #imagen-visual-div {
   display: none;
 }
-.botones {
-  margin-top: 2rem;
+.descargas {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   margin-left: 2rem;
   vertical-align: center;
 }
@@ -205,4 +204,7 @@ input:checked + .slider:before {
   position: absolute;
   margin-top: 30%;
   margin-left: 50%;
+}
+.texto-descargas {
+  margin-left: 2rem;
 }
