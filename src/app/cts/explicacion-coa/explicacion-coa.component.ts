@@ -39,7 +39,8 @@ export class ExplicacionCoaComponent implements OnInit {
           cat !== 1 &&
           cat !== 2 &&
           cat !== 16 &&
-          cat !== 0
+          cat !== 0 &&
+          cat !== 4
         );
       });
   }
