@@ -208,3 +208,12 @@ input:checked + .slider:before {
 .texto-descargas {
   margin-left: 2rem;
 }
+.link-descarga:hover {
+  text-decoration: underline !important;
+  color: #007ad9 !important;
+}
+
+.link-descarga {
+  color: #007ad9 !important;
+  cursor: pointer;
+}

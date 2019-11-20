@@ -241,14 +241,14 @@
         </div>
       </div>
       <hr />
-      <h4 class="texto-descargas">Descargas:</h4>
+      <h5 class="texto-descargas">Descargas:</h5>
 
       <div class="descargas">
-        <a href="" (click)="downloadRjpg(pc)">
+        <a class="link-descarga" (click)="downloadRjpg(pc)">
           Imagen radiométrica
         </a>
         <a
-          href=""
+          class="link-descarga"
           *ngIf="!informe.hasOwnProperty('jpgVisual') || informe.jpgVisual"
           (click)="downloadJpgVisual(pc)"
         >
