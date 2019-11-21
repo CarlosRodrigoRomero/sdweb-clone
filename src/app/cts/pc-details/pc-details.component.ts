@@ -76,8 +76,8 @@ export class PcDetailsComponent implements OnInit, OnChanges {
               `informes/${this.informe.id}/jpg/${this.selectedPc.archivoPublico}`
             )
             .getDownloadURL();
-          this.selectedPc.downloadUrl$.pipe(take(1)).subscribe(url => {
-            this.selectedPc.downloadUrlString = url;
+          this.pc.downloadUrl$.pipe(take(1)).subscribe(url => {
+            this.pc.downloadUrlString = url;
             imagenTermica.src = this.pc.downloadUrlString;
           });
         }
@@ -99,8 +99,8 @@ export class PcDetailsComponent implements OnInit, OnChanges {
           imagenTermicaCanvas.scaleToHeight(this.canvasHeight);
           imagenTermicaCanvas.scaleToWidth(this.canvasWidth);
           this.canvas.add(imagenTermicaCanvas);
-          this.drawPc(this.selectedPc, this.fResize);
-          this.drawTriangle(this.selectedPc, this.fResize);
+          this.drawPc(this.pc, this.fResize);
+          this.drawTriangle(this.pc, this.fResize);
         };
 
         // this.canvas.getContext('2d').drawImage(imagenTermica, 0, 0 );
@@ -108,6 +108,13 @@ export class PcDetailsComponent implements OnInit, OnChanges {
         // console.log('this.tooltipElement', this.tooltipElement);
       }
     }
+  }
+
+  getDisplay() {
+    if (this.imageLoaded) {
+      return "block";
+    }
+    return "none";
   }
 
   downloadRjpg(pc: PcInterface) {

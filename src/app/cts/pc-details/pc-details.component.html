@@ -1,6 +1,13 @@
 <div class="row">
   <div class="col-6">
-    <div (click)="onClickVerDetalles(pc)" class="imagen-termica-div">
+    <div class="spinner" *ngIf="!imageLoaded">
+      <app-spinner> </app-spinner>
+    </div>
+    <div
+      (click)="onClickVerDetalles(pc)"
+      [style.display]="getDisplay()"
+      class="imagen-termica-div"
+    >
       <canvas
         id="{{ pc.id }}"
         width="{{ canvasWidth }}"

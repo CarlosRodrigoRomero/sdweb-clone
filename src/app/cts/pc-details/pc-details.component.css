@@ -6,6 +6,7 @@
   position: relative;
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
+  cursor: pointer;
 }
 
 .detallesButton {
@@ -97,6 +98,10 @@
   display: flex;
   justify-content: space-between;
 }
-.cargando {
-  margin-top: 15rem;
+
+.spinner {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  height: 100%;
 }
