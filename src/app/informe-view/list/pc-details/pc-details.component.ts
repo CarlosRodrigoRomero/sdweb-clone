@@ -1,15 +1,18 @@
 import { Component, OnInit, Input, OnChanges } from "@angular/core";
-import { PcInterface } from "../../models/pc";
-import { InformeInterface } from "../../models/informe";
+
 import { GLOBAL } from "src/app/services/global";
 import { AngularFireStorage } from "@angular/fire/storage";
 import "fabric";
 import { MatDialog } from "@angular/material";
-import { PcDetailsDialogComponent } from "../pc-details-dialog/pc-details-dialog.component";
-import { PlantaInterface } from "../../models/planta";
+
 import { take } from "rxjs/operators";
-import { PlantaService } from "../../services/planta.service";
-import { PcService } from "../../services/pc.service";
+import { PcInterface } from "src/app/models/pc";
+import { InformeInterface } from "src/app/models/informe";
+import { PlantaInterface } from "src/app/models/planta";
+import { PlantaService } from "src/app/services/planta.service";
+import { PcService } from "src/app/services/pc.service";
+import { PcDetailsDialogComponent } from "src/app/cts/pc-details-dialog/pc-details-dialog.component";
+
 declare let fabric;
 
 @Component({

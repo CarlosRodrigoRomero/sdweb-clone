@@ -83,27 +83,30 @@ export class PcFilterComponent implements OnInit {
     this.maxGradiente = GLOBAL.maxGradiente;
     this.minGradiente = GLOBAL.minGradiente;
 
-    this.plantaService.getPlanta(this.planta.id).subscribe(planta => {
-      if (planta.hasOwnProperty("criterioId")) {
-        this.plantaService
-          .getCriterio(planta.criterioId)
-          .pipe(take(1))
-          .subscribe(criterio => {
-            this.minGradiente = criterio.critCoA.rangosDT[0];
-            this.pcService.PushFiltroGradiente(this.minGradiente);
-            this.criterio = criterio;
-          });
-      } else {
-        this.plantaService
-          .getCriterio(GLOBAL.criterioSolardroneId)
-          .pipe(take(1))
-          .subscribe(criterio => {
-            this.minGradiente = criterio.critCoA.rangosDT[0];
-            this.pcService.PushFiltroGradiente(this.minGradiente);
-            this.criterio = criterio;
-          });
-      }
-    });
+    this.plantaService
+      .getPlanta(this.planta.id)
+      .pipe(take(1))
+      .subscribe(planta => {
+        if (planta.hasOwnProperty("criterioId")) {
+          this.plantaService
+            .getCriterio(planta.criterioId)
+            .pipe(take(1))
+            .subscribe(criterio => {
+              this.minGradiente = criterio.critCoA.rangosDT[0];
+              this.pcService.PushFiltroGradiente(this.minGradiente);
+              this.criterio = criterio;
+            });
+        } else {
+          this.plantaService
+            .getCriterio(GLOBAL.criterioSolardroneId)
+            .pipe(take(1))
+            .subscribe(criterio => {
+              this.minGradiente = criterio.critCoA.rangosDT[0];
+              this.pcService.PushFiltroGradiente(this.minGradiente);
+              this.criterio = criterio;
+            });
+        }
+      });
   }
 
   private compare(a: PcInterface, b: PcInterface) {

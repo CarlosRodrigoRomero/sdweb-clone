@@ -1,16 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
-
+import { Component, OnInit } from "@angular/core";
+import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { AuthService } from "../../services/auth.service";
+import { Router } from "@angular/router";
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  selector: "app-login",
+  templateUrl: "./login.component.html",
+  styleUrls: ["./login.component.css"]
 })
 export class LoginComponent implements OnInit {
-
   public form: FormGroup;
   public user$ = this.authService.user$;
   public userLogged: boolean;
@@ -26,24 +24,24 @@ export class LoginComponent implements OnInit {
     //   email: ['', Validators.required],
     //   password: ['', Validators.required],
     // });
-    this.authService.isAuthenticated().subscribe( success => this.userLogged = success);
+    this.authService
+      .isAuthenticated()
+      .subscribe(success => (this.userLogged = success));
   }
 
   ngOnInit() {
     if (this.authService.isAuthenticated) {
-      this.router.navigate(['informes']);
+      this.router.navigate(["clientes/informes"]);
     }
   }
 
   login() {
     this.authService.login(this.username, this.password).subscribe(
-      success => this.router.navigate(['/informes']),
+      success => this.router.navigate(["clientes/informes"]),
       error => console.log(error)
     );
-
   }
   logout() {
     this.authService.logout();
   }
-
 }

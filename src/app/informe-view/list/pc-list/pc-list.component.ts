@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, ViewChild } from "@angular/core";
-import { PcInterface } from "../../models/pc";
 import { MatTableDataSource, MatSort, MatPaginator } from "@angular/material";
-import { PcService } from "../../services/pc.service";
+
 import { Observable } from "rxjs";
 import {
   animate,
@@ -10,10 +9,14 @@ import {
   transition,
   trigger
 } from "@angular/animations";
-import { InformeInterface } from "../../models/informe";
-import { PlantaInterface } from "../../models/planta";
+
 import { GLOBAL } from "src/app/services/global";
-import { PlantaService } from "../../services/planta.service";
+import { InformeInterface } from "src/app/models/informe";
+import { PlantaInterface } from "src/app/models/planta";
+import { PcInterface } from "src/app/models/pc";
+import { PcService } from "src/app/services/pc.service";
+import { PlantaService } from "src/app/services/planta.service";
+import { InformeService } from "../../../services/informe.service";
 
 @Component({
   selector: "app-pc-list",
@@ -33,8 +36,7 @@ import { PlantaService } from "../../services/planta.service";
 export class PcListComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  @Input() informe: InformeInterface;
-  @Input() planta: PlantaInterface;
+
   @Input() allPcs: PcInterface[];
 
   public pcDataSource: MatTableDataSource<
@@ -47,10 +49,13 @@ export class PcListComponent implements OnInit {
   public pcDescripcion: string[];
   public pcPerdidas: number[];
   public temperaturaLimite: number;
+  public informe: InformeInterface;
+  public planta: PlantaInterface;
 
   constructor(
     public pcService: PcService,
-    public plantaService: PlantaService
+    public plantaService: PlantaService,
+    private informeService: InformeService
   ) {
     this.pcDescripcion = GLOBAL.pcDescripcion;
     this.pcPerdidas = GLOBAL.pcPerdidas;
@@ -58,6 +63,9 @@ export class PcListComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.planta = this.plantaService.get();
+    this.informe = this.informeService.get();
+    this.allPcs = this.pcService.get();
     if (this.planta.tipo === "seguidores") {
       this.columnsToDisplay = [
         "severidad",

@@ -1,15 +1,17 @@
 import { Component, OnInit } from "@angular/core";
-import { GLOBAL } from "../../services/global";
-import { PcInterface } from "../../models/pc";
+
 import { PcService } from "src/app/services/pc.service";
 import { ActivatedRoute } from "@angular/router";
 import { AngularFireStorage } from "@angular/fire/storage";
-import { InformeService } from "../../services/informe.service";
-import { PlantaService } from "../../services/planta.service";
-import { InformeInterface } from "../../models/informe";
-import { PlantaInterface } from "../../models/planta";
+
 import { take } from "rxjs/operators";
-import { AuthService } from "../../services/auth.service";
+import { PcInterface } from "src/app/models/pc";
+import { InformeInterface } from "src/app/models/informe";
+import { GLOBAL } from "src/app/services/global";
+import { PlantaInterface } from "src/app/models/planta";
+import { InformeService } from "src/app/services/informe.service";
+import { PlantaService } from "src/app/services/planta.service";
+import { AuthService } from "src/app/services/auth.service";
 
 @Component({
   selector: "app-informe-view",
@@ -57,6 +59,7 @@ export class InformeViewComponent implements OnInit {
       .getInforme(this.informeId)
       .pipe(take(1))
       .subscribe(informe => {
+        this.informeService.set(informe);
         this.getPcsList(informe);
         this.informe = informe;
         this.storage
@@ -77,6 +80,7 @@ export class InformeViewComponent implements OnInit {
           .getPlanta(informe.plantaId)
           .pipe(take(1))
           .subscribe(planta => {
+            this.plantaService.set(planta);
             this.planta = planta;
             this.isLoaded1 = true;
             this.plantaService.getUserAreas$(planta.id).subscribe(userAreas => {
@@ -119,23 +123,25 @@ export class InformeViewComponent implements OnInit {
       .getPcs(informe.id, informe.plantaId)
       .pipe(take(1))
       .subscribe(response => {
-        this.allPcsConSeguidores = response.map((pc, i, a) => {
-          //  Les añadimos los observables de los archivos....
-          // Se ha eliminado ya que tardaba mucho en cargar...
-          // pc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${pc.archivoPublico}`).getDownloadURL();
-          // pc.downloadUrl$ = this.storage
-          //   .ref(`informes/${this.informeId}/jpg/${pc.archivoPublico}`)
-          //   .getDownloadURL();
-          // pc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/_mini_${pc.archivoPublico}`).getDownloadURL();
+        this.allPcsConSeguidores = response;
+        // this.allPcsConSeguidores = response.map((pc, i, a) => {
+        //  Les añadimos los observables de los archivos....
+        // Se ha eliminado ya que tardaba mucho en cargar...
+        // pc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${pc.archivoPublico}`).getDownloadURL();
+        // pc.downloadUrl$ = this.storage
+        //   .ref(`informes/${this.informeId}/jpg/${pc.archivoPublico}`)
+        //   .getDownloadURL();
+        // pc.downloadUrlVisual$ = this.storage.ref(`informes/${this.informeId}/jpgVisual/_mini_${pc.archivoPublico}`).getDownloadURL();
 
-          return pc;
-        });
+        //   return pc;
+        // });
         this.seguidores = this.allPcsConSeguidores.filter((pc, i, a) => {
           return pc.tipo === 0;
         });
         this.allPcs = this.allPcsConSeguidores.filter((pc, i, a) => {
           return pc.tipo > 0;
         });
+        this.pcService.set(this.allPcs);
         this.irradianciaMedia = this.allPcsConSeguidores.sort(
           this.compareIrradiancia
         )[Math.round(this.allPcs.length / 2)].irradiancia;

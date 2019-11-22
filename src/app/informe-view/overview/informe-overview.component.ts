@@ -1,20 +1,21 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { InformeInterface } from "src/app/models/informe";
 import { PlantaInterface } from "src/app/models/planta";
 import { PcInterface } from "src/app/models/pc";
 import { GLOBAL } from "src/app/services/global";
-import { InformeService } from "../../services/informe.service";
-import { PcService } from '../../services/pc.service';
+import { PcService } from "src/app/services/pc.service";
+import { PlantaService } from "src/app/services/planta.service";
+import { InformeService } from "src/app/services/informe.service";
 
 @Component({
-  selector: "app-pc-overview",
-  templateUrl: "./pc-overview.component.html",
-  styleUrls: ["./pc-overview.component.css"]
+  selector: "app-informe-overview",
+  templateUrl: "./informe-overview.component.html",
+  styleUrls: ["./informe-overview.component.css"]
 })
-export class PcOverviewComponent implements OnInit {
-  @Input() informe: InformeInterface;
-  @Input() planta: PlantaInterface;
-  @Input() allPcs: PcInterface[];
+export class InformeOverviewComponent implements OnInit {
+  public informe: InformeInterface;
+  public planta: PlantaInterface;
+  public allPcs: PcInterface[];
 
   public numCategorias: Array<number>;
   public numClases: Array<number>;
@@ -33,9 +34,16 @@ export class PcOverviewComponent implements OnInit {
   public countCategoriaLabels: string[];
   private stepSize: number;
 
-  constructor(public informeService: InformeService, public pcService: PcService) {}
+  constructor(
+    public pcService: PcService,
+    private plantaService: PlantaService,
+    private informeService: InformeService
+  ) {}
 
   ngOnInit() {
+    this.planta = this.plantaService.get();
+    this.informe = this.informeService.get();
+    this.allPcs = this.pcService.get();
     this.stepSize = 4;
     this.perdidasPorClase = Array();
 
@@ -120,7 +128,7 @@ export class PcOverviewComponent implements OnInit {
       datasets: [
         {
           label: "Pérdidas (kW)",
-          backgroundColor: "#FF6347",
+          backgroundColor: "#ffd04a",
 
           data: this.perdidasPorCategoria
         }
@@ -154,7 +162,7 @@ export class PcOverviewComponent implements OnInit {
       datasets: [
         {
           label: "Pérdidas",
-          backgroundColor: ["#FF6347", "#3CB371"],
+          backgroundColor: ["#FF6347", "grey"],
           // hoverBackgroundColor: GLOBAL.colores_severidad,
           data: [
             this.perdidasTotales,

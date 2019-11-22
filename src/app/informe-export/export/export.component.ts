@@ -18,6 +18,7 @@ import pdfMake from "pdfmake/build/pdfmake.js";
 import pdfFonts from "pdfmake/build/vfs_fonts.js";
 import { DatePipe, DecimalPipe } from "@angular/common";
 import { PlantaService } from "../../services/planta.service";
+import { InformeService } from "../../services/informe.service";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 declare var $: any;
@@ -39,17 +40,16 @@ export interface Apartado {
 }
 
 @Component({
-  selector: "app-informe-export",
-  templateUrl: "./informe-export.component.html",
-  styleUrls: ["./informe-export.component.css"],
-  providers: [DatePipe, DecimalPipe]
-  // providers: [InformeService, PlantaService, PcService]
+  selector: "app-export",
+  templateUrl: "./export.component.html",
+  styleUrls: ["./export.component.css"],
+  providers: [DecimalPipe, DatePipe]
 })
-export class InformeExportComponent implements OnInit {
+export class ExportComponent implements OnInit {
   @ViewChild("content") content: ElementRef;
 
-  @Input() public planta: PlantaInterface;
-  @Input() public informe: InformeInterface;
+  public planta: PlantaInterface;
+  public informe: InformeInterface;
 
   public titulo: string;
   public irradianciaMedia: number;
@@ -131,7 +131,8 @@ export class InformeExportComponent implements OnInit {
     private datePipe: DatePipe,
     private storage: AngularFireStorage,
     private pcService: PcService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private informeService: InformeService
   ) {
     this.numCategorias = Array(GLOBAL.labels_tipos.length)
       .fill(0)
@@ -152,6 +153,8 @@ export class InformeExportComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.planta = this.plantaService.get();
+    this.informe = this.informeService.get();
     this.progresoPDF = "0";
     this.widthLogo = 200;
     this.widthPortada = 600; //=600 es el ancho de pagina completo

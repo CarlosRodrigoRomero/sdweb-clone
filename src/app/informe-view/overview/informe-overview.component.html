@@ -1,18 +1,18 @@
-<mat-card class="margin-top">
+<mat-card>
   <mat-card-content>
     <div class="row">
       <div class="col-12">
-        <h2 class="text-center">
+        <h3 class="text-center">
           Resumen de la inspección termográfica aérea ({{
             informe.fecha * 1000 | date: "dd/MM/yyyy"
           }})
-        </h2>
+        </h3>
       </div>
     </div>
 
     <div class="colflex">
       <div class="flexchart">
-        <h4 class="text-center perdidasTotales">Pérdidas (kW) totales</h4>
+        <h5 class="text-center perdidasTotales">Pérdidas (kW) totales</h5>
         <p-chart
           height="250"
           type="doughnut"
@@ -45,23 +45,23 @@
       </div>
       <div class="flexchart">
         <div class="flexsubchat">
-          <h4 class="text-center">Pérdidas (kW) por categoría</h4>
+          <h5 class="text-center">Pérdidas (kW) por categoría</h5>
           <p-chart
-            height="350"
-            width="500"
+            height="300"
+            width="450"
             type="bar"
             [data]="dataPerdidasCategoria"
             [options]="chartOptionsPerdidas"
           ></p-chart>
         </div>
         <div class="flexsubchat">
-          <h4 class="text-center">
+          <h5 class="text-center">
             Número de anomalías por categoría
-          </h4>
+          </h5>
           <p-chart
             [options]="chartOptionsCount"
-            height="350"
-            width="500"
+            height="300"
+            width="450"
             type="bar"
             [data]="dataCountCategoria"
           ></p-chart>

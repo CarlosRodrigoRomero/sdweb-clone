@@ -7,10 +7,11 @@ import { InformeInterface } from "../../models/informe";
 import { AgmMap } from "@agm/core";
 import { GLOBAL } from "src/app/services/global";
 import { MatDialog } from "@angular/material";
-import { PcDetailsDialogComponent } from "../pc-details-dialog/pc-details-dialog.component";
 import { AngularFireStorage } from "@angular/fire/storage";
 import { UserAreaInterface } from "../../models/userArea";
 import { PlantaService } from "../../services/planta.service";
+import { PcDetailsDialogComponent } from "src/app/cts/pc-details-dialog/pc-details-dialog.component";
+import { InformeService } from "../../services/informe.service";
 
 export interface DialogData {
   pc: PcInterface;
@@ -21,33 +22,33 @@ export interface DialogData {
 }
 
 @Component({
-  selector: "app-pc-map",
-  templateUrl: "./pc-map.component.html",
-  styleUrls: ["./pc-map.component.css"]
+  selector: "app-map",
+  templateUrl: "./map.component.html",
+  styleUrls: ["./map.component.css"]
 })
-export class PcMapComponent implements OnInit {
-  @Input() planta: PlantaInterface;
-  @Input() informe: InformeInterface;
+export class MapComponent implements OnInit {
   @ViewChild("agm-map") map: AgmMap;
 
   public filteredPcs: PcInterface[];
-  public informeId: string;
   public circleRadius: number;
   public mapType = "satellite";
   public seguidoresSinPcs: PcInterface[];
   public userAreaList: UserAreaInterface[];
+  public planta: PlantaInterface;
+  public informe: InformeInterface;
+  public mapLoaded = false;
 
   constructor(
     private storage: AngularFireStorage,
     public dialog: MatDialog,
     public pcService: PcService,
     private plantaService: PlantaService,
-    private route: ActivatedRoute
-  ) {
-    this.informeId = this.route.snapshot.paramMap.get("id");
-  }
+    private informeService: InformeService
+  ) {}
 
   ngOnInit() {
+    this.planta = this.plantaService.get();
+    this.informe = this.informeService.get();
     this.circleRadius = 5;
     if (this.planta.tipo === "fija") {
       this.circleRadius = 2;
@@ -78,10 +79,10 @@ export class PcMapComponent implements OnInit {
   }
 
   onMapCircleClick(selectedPc: PcInterface, sinPcs: boolean = false): void {
-    // selectedPc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${selectedPc.archivoPublico}`).getDownloadURL();
+    // selectedPc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informe.id}/rjpg/${selectedPc.archivoPublico}`).getDownloadURL();
     if (!selectedPc.downloadUrl$) {
       selectedPc.downloadUrl$ = this.storage
-        .ref(`informes/${this.informeId}/jpg/${selectedPc.archivoPublico}`)
+        .ref(`informes/${this.informe.id}/jpg/${selectedPc.archivoPublico}`)
         .getDownloadURL();
     }
     if (
@@ -90,7 +91,7 @@ export class PcMapComponent implements OnInit {
     ) {
       selectedPc.downloadUrlVisual$ = this.storage
         .ref(
-          `informes/${this.informeId}/jpgVisual/${selectedPc.archivoPublico}`
+          `informes/${this.informe.id}/jpgVisual/${selectedPc.archivoPublico}`
         )
         .getDownloadURL();
     }
@@ -110,5 +111,11 @@ export class PcMapComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {});
   }
 
-  mapIsReady(map: AgmMap) {}
+  mapIsReady(map: AgmMap) {
+    this.mapLoaded = true;
+    console.log(
+      "TCL: MapComponent -> mapIsReady -> this.mapLoaded",
+      this.mapLoaded
+    );
+  }
 }

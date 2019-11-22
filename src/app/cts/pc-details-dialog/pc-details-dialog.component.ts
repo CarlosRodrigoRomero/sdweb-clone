@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject } from "@angular/core";
 import { PcInterface } from "src/app/models/pc";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
-import { DialogData } from "../pc-map/pc-map.component";
 import { GLOBAL } from "src/app/services/global";
 import { AngularFireStorage } from "@angular/fire/storage";
 import "fabric";
@@ -15,6 +14,7 @@ import { AuthService } from "src/app/services/auth.service";
 import { UserInterface } from "src/app/models/user";
 import { PcService } from "../../services/pc.service";
 import { PlantaService } from "../../services/planta.service";
+import { DialogData } from "src/app/informe-map/map/map.component";
 
 const pica = Pica();
 
