@@ -37,7 +37,7 @@ export class PcListComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  @Input() allPcs: PcInterface[];
+  public allPcs: PcInterface[];
 
   public pcDataSource: MatTableDataSource<
     PcInterface

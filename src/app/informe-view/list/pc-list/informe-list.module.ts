@@ -7,7 +7,7 @@ import {
   MatPaginatorModule,
   MatInputModule,
   MatButtonModule,
-  MatCheckboxModule
+  MatSortModule
 } from "@angular/material";
 import { PcListComponent } from "./pc-list.component";
 import { PcDetailsComponent } from "../pc-details/pc-details.component";
@@ -19,7 +19,6 @@ import {
   MatSliderModule
 } from "@angular/material";
 import { SpinnerModule } from "../../../spinner/spinner.module";
-import { PcFilterComponent } from "src/app/cts/pc-filter/pc-filter.component";
 
 @NgModule({
   declarations: [PcListComponent, PcDetailsComponent],
@@ -35,7 +34,11 @@ import { PcFilterComponent } from "src/app/cts/pc-filter/pc-filter.component";
     MatCardModule,
     SpinnerModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    MatSliderModule,
+    MatTableModule,
+    MatSortModule,
+    MatPaginatorModule
   ]
 })
 export class InformeListModule {}

@@ -11,7 +11,7 @@ import { InformeInterface } from "src/app/models/informe";
 import { PlantaInterface } from "src/app/models/planta";
 import { PlantaService } from "src/app/services/planta.service";
 import { PcService } from "src/app/services/pc.service";
-import { PcDetailsDialogComponent } from "src/app/cts/pc-details-dialog/pc-details-dialog.component";
+import { PcDetailsDialogComponent } from "src/app/informe-view/pc-details-dialog/pc-details-dialog.component";
 
 declare let fabric;
 

@@ -1,8 +1,7 @@
-import { Component, OnInit, ViewChild, Input } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { PcInterface } from "../../models/pc";
 import { PcService } from "../../services/pc.service";
 import { PlantaInterface } from "../../models/planta";
-import { ActivatedRoute } from "@angular/router";
 import { InformeInterface } from "../../models/informe";
 import { AgmMap } from "@agm/core";
 import { GLOBAL } from "src/app/services/global";
@@ -10,7 +9,7 @@ import { MatDialog } from "@angular/material";
 import { AngularFireStorage } from "@angular/fire/storage";
 import { UserAreaInterface } from "../../models/userArea";
 import { PlantaService } from "../../services/planta.service";
-import { PcDetailsDialogComponent } from "src/app/cts/pc-details-dialog/pc-details-dialog.component";
+import { PcDetailsDialogComponent } from "src/app/informe-view/pc-details-dialog/pc-details-dialog.component";
 import { InformeService } from "../../services/informe.service";
 
 export interface DialogData {
@@ -32,7 +31,6 @@ export class MapComponent implements OnInit {
   public filteredPcs: PcInterface[];
   public circleRadius: number;
   public mapType = "satellite";
-  public seguidoresSinPcs: PcInterface[];
   public userAreaList: UserAreaInterface[];
   public planta: PlantaInterface;
   public informe: InformeInterface;
@@ -63,11 +61,11 @@ export class MapComponent implements OnInit {
       // };
     });
 
-    this.pcService
-      .getSeguidoresSinPcs(this.informe.id)
-      .subscribe(seguidores => {
-        this.seguidoresSinPcs = seguidores;
-      });
+    // this.pcService
+    //   .getSeguidoresSinPcs(this.informe.id)
+    //   .subscribe(seguidores => {
+    //     this.seguidoresSinPcs = seguidores;
+    //   });
 
     this.plantaService.getUserAreas$(this.planta.id).subscribe(userAreas => {
       this.userAreaList = userAreas;
@@ -113,9 +111,5 @@ export class MapComponent implements OnInit {
 
   mapIsReady(map: AgmMap) {
     this.mapLoaded = true;
-    console.log(
-      "TCL: MapComponent -> mapIsReady -> this.mapLoaded",
-      this.mapLoaded
-    );
   }
 }

@@ -61,7 +61,7 @@
         thumbLabel
         [displayWith]="formatLabel"
         (input)="onInputFiltroGradiente($event)"
-        (mouseup)="onChangeFiltroGradiente()"
+        (change)="onChangeFiltroGradiente()"
         tickInterval="1"
         min="{{ minGradiente }}"
         max="{{ maxGradiente }}"

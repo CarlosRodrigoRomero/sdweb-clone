@@ -162,7 +162,7 @@ export class InformeOverviewComponent implements OnInit {
       datasets: [
         {
           label: "Pérdidas",
-          backgroundColor: ["#FF6347", "grey"],
+          backgroundColor: ["#ffd04a", "grey"],
           // hoverBackgroundColor: GLOBAL.colores_severidad,
           data: [
             this.perdidasTotales,

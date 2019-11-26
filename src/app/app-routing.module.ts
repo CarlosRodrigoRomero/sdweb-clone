@@ -1,5 +1,4 @@
 import { Routes, RouterModule, PreloadAllModules } from "@angular/router";
-import { InformeViewComponent } from "./informe-view/informe-view.component";
 import { InformeEditComponent } from "./cts/informe-edit/informe-edit.component";
 import { InformesComponent } from "./cts/informes/informes.component";
 import { NgModule } from "@angular/core";
@@ -13,10 +12,7 @@ import { AutoLocComponent } from "./cts/auto-loc/auto-loc.component";
 import { PlantaAddComponent } from "./cts/planta-add/planta-add.component";
 import { InformeAddComponent } from "./cts/informe-add/informe-add.component";
 import { PlantaEditComponent } from "./cts/planta-edit/planta-edit.component";
-import { InformeOverviewComponent } from "./informe-view/overview/informe-overview.component";
-import { InformeMapModule } from "./informe-map/informe-map.module";
-import { InformeExportModule } from "./informe-export/informe-export.module";
-import { InformeListModule } from "./informe-view/list/pc-list/informe-list.module";
+import { InformeViewModule } from "./informe-view/informe-view.module";
 
 const routes: Routes = [
   // {
@@ -85,39 +81,7 @@ const routes: Routes = [
       },
       {
         path: "informe-view/:id",
-        component: InformeViewComponent,
-        canActivate: [AuthGuard],
-        children: [
-          {
-            path: "",
-            pathMatch: "full",
-            redirectTo: "informe-overview",
-            canActivate: [AuthGuard]
-          },
-          {
-            path: "informe-overview",
-            component: InformeOverviewComponent,
-            canActivate: [AuthGuard]
-          },
-          {
-            path: "informe-map",
-            data: { preload: true },
-            loadChildren: () => InformeMapModule,
-            canActivate: [AuthGuard]
-          },
-          {
-            path: "informe-export",
-            data: { preload: false },
-            loadChildren: () => InformeExportModule,
-            canActivate: [AuthGuard]
-          },
-          {
-            path: "informe-list",
-            data: { preload: false },
-            loadChildren: () => InformeListModule,
-            canActivate: [AuthGuard]
-          }
-        ]
+        loadChildren: () => InformeViewModule
       },
       {
         path: "informe-edit/:id",
@@ -150,7 +114,10 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  providers: [PreloadAllModules],
+  imports: [
+    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
+  ],
   exports: [RouterModule]
 })
 export class AppRoutingModule {}
