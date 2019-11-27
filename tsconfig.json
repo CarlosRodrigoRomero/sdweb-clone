@@ -6,6 +6,7 @@
     "sourceMap": true,
     "declaration": false,
     "module": "esnext", // add this line
+    // "module": "es2015",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
