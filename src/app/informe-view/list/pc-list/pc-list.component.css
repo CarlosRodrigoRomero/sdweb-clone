@@ -60,6 +60,7 @@ tr.element-row:not(.example-expanded-row):active {
 .progress-bar {
   color: black !important;
   background-color: #007bff47 !important;
+  overflow: visible !important;
 }
 
 .example-element-diagram {
