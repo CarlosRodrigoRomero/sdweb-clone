@@ -5,12 +5,13 @@ import { MapComponent } from "../informe-map/map/map.component";
 import { InformeViewComponent } from "./informe-view.component";
 import { PcListComponent } from "./list/pc-list/pc-list.component";
 import { ExportComponent } from "../informe-export/export/export.component";
+import { AuthGuard } from "../services/auth.guard";
 
 const routes: Routes = [
   {
-    path: "",
+    path: "clientes/informe-view/:id",
     component: InformeViewComponent,
-
+    canActivate: [AuthGuard],
     children: [
       {
         path: "",
@@ -30,7 +31,6 @@ const routes: Routes = [
         data: {
           shouldReuse: true
         }
-        // loadChildren: () => InformeMapModule
       },
       {
         path: "informe-export",
@@ -38,11 +38,9 @@ const routes: Routes = [
         data: {
           shouldReuse: true
         }
-        // loadChildren: () => InformeExportModule
       },
       {
         path: "informe-list",
-        // loadChildren: () => InformeListModule,
         component: PcListComponent,
         data: {
           shouldReuse: true

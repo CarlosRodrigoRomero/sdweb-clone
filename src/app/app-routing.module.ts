@@ -6,13 +6,13 @@ import { LoginComponent } from "./cts/login/login.component";
 import { AuthGuard } from "./services/auth.guard";
 import { IndexComponent } from "./cts/index/index.component";
 import { ClienteslayoutComponent } from "./layout/clienteslayout/clienteslayout.component";
-import { PubliclayoutComponent } from "./layout/publiclayout/publiclayout.component";
+// import { PubliclayoutComponent } from "./layout/publiclayout/publiclayout.component";
 // import { VideoComponent } from "./cts/video/video.component";
 import { AutoLocComponent } from "./cts/auto-loc/auto-loc.component";
 import { PlantaAddComponent } from "./cts/planta-add/planta-add.component";
 import { InformeAddComponent } from "./cts/informe-add/informe-add.component";
 import { PlantaEditComponent } from "./cts/planta-edit/planta-edit.component";
-import { InformeViewModule } from "./informe-view/informe-view.module";
+import { InformeViewComponent } from "./informe-view/informe-view.component";
 
 const routes: Routes = [
   // {
@@ -69,48 +69,51 @@ const routes: Routes = [
   // },
   // { path: "**", component: IndexComponent, pathMatch: "full" },
   { path: "", component: IndexComponent },
+
   {
     path: "clientes",
     component: ClienteslayoutComponent,
+    canActivate: [AuthGuard],
     children: [
       { path: "", component: LoginComponent },
       {
         path: "informes",
-        component: InformesComponent,
-        canActivate: [AuthGuard]
+        component: InformesComponent
       },
-      {
-        path: "informe-view/:id",
-        loadChildren: () => InformeViewModule
-      },
+
+      // {
+      //   path: "informe-view/:id",
+      //   component: InformeViewComponent
+
+      //   // loadChildren: () =>
+      //   //   import("src/app/informe-view/informe-view.module").then(
+      //   //     m => m.InformeViewModule
+      //   //   )
+      // },
       {
         path: "informe-edit/:id",
-        component: InformeEditComponent,
-        canActivate: [AuthGuard]
+        component: InformeEditComponent
       },
       {
         path: "auto-loc/:id",
-        component: AutoLocComponent,
-        canActivate: [AuthGuard]
+        component: AutoLocComponent
       },
 
       {
         path: "planta-add",
-        component: PlantaAddComponent,
-        canActivate: [AuthGuard]
+        component: PlantaAddComponent
       },
       {
         path: "planta-edit/:plantaId",
-        component: PlantaEditComponent,
-        canActivate: [AuthGuard]
+        component: PlantaEditComponent
       },
       {
         path: "informe-add/:plantaId",
-        component: InformeAddComponent,
-        canActivate: [AuthGuard]
+        component: InformeAddComponent
       }
     ]
   }
+  // { path: "**", redirectTo: "" }
 ];
 
 @NgModule({

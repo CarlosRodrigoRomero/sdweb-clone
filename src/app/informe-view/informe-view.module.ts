@@ -25,6 +25,7 @@ import { RouteReuseStrategy } from "@angular/router";
 import { CustomReuseStrategy } from "./routeReuse";
 import { PcDetailsDialogComponent } from "./pc-details-dialog/pc-details-dialog.component";
 import { InformeMapModule } from "../informe-map/informe-map.module";
+import { NavbarModule } from "../layout/navbar/navbar.module";
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { InformeMapModule } from "../informe-map/informe-map.module";
     MatCheckboxModule,
     SpinnerModule,
     InformeMapModule,
+    NavbarModule,
     AgmCoreModule.forRoot({
       apiKey: "AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM",
       libraries: ["drawing"]

@@ -35,7 +35,6 @@ import { CdkTreeModule } from "@angular/cdk/tree";
 import { LoginComponent } from "./cts/login/login.component";
 import { AuthService } from "./services/auth.service";
 import { IndexComponent } from "./cts/index/index.component";
-import { NavbarComponent } from "./layout/navbar/navbar.component";
 import { PubliclayoutComponent } from "./layout/publiclayout/publiclayout.component";
 import { ClienteslayoutComponent } from "./layout/clienteslayout/clienteslayout.component";
 import { VideoComponent } from "./cts/video/video.component";
@@ -46,10 +45,10 @@ import { InformeAddComponent } from "./cts/informe-add/informe-add.component";
 import { PlantaEditComponent } from "./cts/planta-edit/planta-edit.component";
 import { AgmCoreModule } from "@agm/core";
 import { InformeViewModule } from "./informe-view/informe-view.module";
+import { NavbarModule } from "./layout/navbar/navbar.module";
 @NgModule({
   declarations: [
     AppComponent,
-    NavbarComponent,
     InformesComponent,
     InformeEditComponent,
     LoginComponent,
@@ -91,12 +90,12 @@ import { InformeViewModule } from "./informe-view/informe-view.module";
     AngularFireStorageModule,
     CdkTableModule,
     CdkTreeModule,
-
+    InformeViewModule,
+    NavbarModule,
     AgmCoreModule.forRoot({
       apiKey: "AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM",
       libraries: ["drawing"]
-    }),
-    InformeViewModule
+    })
   ],
   providers: [{ provide: FirestoreSettingsToken, useValue: {} }, AuthService],
   bootstrap: [AppComponent]
