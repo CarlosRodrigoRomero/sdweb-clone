@@ -80,11 +80,9 @@ const routes: Routes = [
         path: "informes",
         component: InformesComponent
       },
-
       // {
       //   path: "informe-view/:id",
       //   component: InformeViewComponent
-
       //   // loadChildren: () =>
       //   //   import("src/app/informe-view/informe-view.module").then(
       //   //     m => m.InformeViewModule

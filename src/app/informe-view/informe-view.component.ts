@@ -57,7 +57,7 @@ export class InformeViewComponent implements OnInit {
     this.informeId = this.route.snapshot.paramMap.get("id");
     this.informeService
       .getInforme(this.informeId)
-      .pipe(take(1))
+      // .pipe(take(1))
       .subscribe(informe => {
         this.informeService.set(informe);
         this.getPcsList(informe);

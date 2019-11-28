@@ -1,4 +1,10 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ChangeDetectionStrategy,
+  Input
+} from "@angular/core";
 import { PcInterface } from "../../models/pc";
 import { PcService } from "../../services/pc.service";
 import { PlantaInterface } from "../../models/planta";
@@ -22,13 +28,14 @@ export interface DialogData {
 
 @Component({
   selector: "app-map",
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./map.component.html",
   styleUrls: ["./map.component.css"]
 })
 export class MapComponent implements OnInit {
   @ViewChild("agm-map") map: AgmMap;
 
-  public filteredPcs: PcInterface[];
+  @Input() filteredPcs: PcInterface[];
   public circleRadius: number;
   public mapType = "satellite";
   public userAreaList: UserAreaInterface[];
@@ -51,15 +58,6 @@ export class MapComponent implements OnInit {
     if (this.planta.tipo === "fija") {
       this.circleRadius = 2;
     }
-    this.pcService.currentFilteredPcs$.subscribe(list => {
-      this.filteredPcs = list;
-      // this.map.triggerResize();
-      // this.pcDataSource.filterPredicate = (data, filter) => {
-      //   return ['local_id'].some(ele => {
-      //     return data[ele].toLowerCase().indexOf(filter) !== -1;
-      //   });
-      // };
-    });
 
     // this.pcService
     //   .getSeguidoresSinPcs(this.informe.id)

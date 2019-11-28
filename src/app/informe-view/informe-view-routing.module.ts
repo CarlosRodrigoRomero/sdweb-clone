@@ -1,11 +1,11 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
 import { InformeOverviewComponent } from "./overview/informe-overview.component";
-import { MapComponent } from "../informe-map/map/map.component";
 import { InformeViewComponent } from "./informe-view.component";
 import { PcListComponent } from "./list/pc-list/pc-list.component";
 import { ExportComponent } from "../informe-export/export/export.component";
 import { AuthGuard } from "../services/auth.guard";
+import { InformeMapComponent } from "../informe-map/informe-map.component";
 
 const routes: Routes = [
   {
@@ -27,7 +27,7 @@ const routes: Routes = [
       },
       {
         path: "informe-map",
-        component: MapComponent,
+        component: InformeMapComponent,
         data: {
           shouldReuse: true
         }

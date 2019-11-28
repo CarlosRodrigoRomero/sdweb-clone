@@ -7,10 +7,11 @@ import { FormsModule } from "@angular/forms";
 import { MatDialogModule, MatSliderModule } from "@angular/material";
 import { MapRoutingModule } from "./map-routing.module";
 import { SpinnerModule } from "../spinner/spinner.module";
+import { InformeMapComponent } from "./informe-map.component";
 // import { AgmJsMarkerClustererModule } from "@agm/js-marker-clusterer";
 
 @NgModule({
-  declarations: [MapComponent],
+  declarations: [MapComponent, InformeMapComponent],
   entryComponents: [PcDetailsDialogComponent],
 
   imports: [
