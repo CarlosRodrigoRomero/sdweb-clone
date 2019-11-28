@@ -12,7 +12,6 @@ import { AutoLocComponent } from "./cts/auto-loc/auto-loc.component";
 import { PlantaAddComponent } from "./cts/planta-add/planta-add.component";
 import { InformeAddComponent } from "./cts/informe-add/informe-add.component";
 import { PlantaEditComponent } from "./cts/planta-edit/planta-edit.component";
-import { InformeViewComponent } from "./informe-view/informe-view.component";
 
 const routes: Routes = [
   // {
@@ -73,12 +72,12 @@ const routes: Routes = [
   {
     path: "clientes",
     component: ClienteslayoutComponent,
-    canActivate: [AuthGuard],
     children: [
       { path: "", component: LoginComponent },
       {
         path: "informes",
-        component: InformesComponent
+        component: InformesComponent,
+        canActivate: [AuthGuard]
       },
       // {
       //   path: "informe-view/:id",
@@ -90,23 +89,28 @@ const routes: Routes = [
       // },
       {
         path: "informe-edit/:id",
+        canActivate: [AuthGuard],
         component: InformeEditComponent
       },
       {
         path: "auto-loc/:id",
+        canActivate: [AuthGuard],
         component: AutoLocComponent
       },
 
       {
         path: "planta-add",
+        canActivate: [AuthGuard],
         component: PlantaAddComponent
       },
       {
         path: "planta-edit/:plantaId",
+        canActivate: [AuthGuard],
         component: PlantaEditComponent
       },
       {
         path: "informe-add/:plantaId",
+        canActivate: [AuthGuard],
         component: InformeAddComponent
       }
     ]
