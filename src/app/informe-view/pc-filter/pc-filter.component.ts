@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter } from "@angular/core";
+import { Component, OnInit, Input, OnDestroy } from "@angular/core";
 import { PcInterface } from "../../models/pc";
 import {
   MatButtonToggleGroup,
@@ -19,7 +19,7 @@ import { PlantaInterface } from "../../models/planta";
   templateUrl: "./pc-filter.component.html",
   styleUrls: ["./pc-filter.component.css"]
 })
-export class PcFilterComponent implements OnInit {
+export class PcFilterComponent implements OnInit, OnDestroy {
   @Input() public allPcs: PcInterface[];
   @Input() public planta: PlantaInterface;
 
@@ -47,6 +47,16 @@ export class PcFilterComponent implements OnInit {
   ) {
     this.countCategoria = Array();
     this.countClase = Array();
+  }
+  ngOnDestroy() {
+    const numCategorias = Array(GLOBAL.labels_tipos.length)
+      .fill(0)
+      .map((_, i) => i + 1);
+    const numClases = Array(GLOBAL.labels_severidad.length)
+      .fill(0)
+      .map((_, i) => i + 1);
+    this.pcService.PushFiltroClase(numClases);
+    this.pcService.PushFiltroCategoria(numCategorias);
   }
 
   ngOnInit() {

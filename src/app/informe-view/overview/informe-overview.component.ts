@@ -151,9 +151,12 @@ export class InformeOverviewComponent implements OnInit {
     this.perdidasTotales =
       Math.round(this.perdidasPorCategoria.reduce((a, b) => a + b, 0) * 10) /
       10;
-    this.informe.mae =
-      Math.round((this.perdidasTotales / 10 / this.planta.potencia) * 100) /
-      100;
+    if (!this.informe.hasOwnProperty("mae")) {
+      this.informe.mae =
+        Math.round((this.perdidasTotales / 10 / this.planta.potencia) * 100) /
+        100;
+      this.informeService.updateInforme(this.informe);
+    }
 
     // this.informeService.updateInforme(this.informe);
 
