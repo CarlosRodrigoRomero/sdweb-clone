@@ -79,7 +79,9 @@
 
     <ng-template #fija>
       <ng-container matColumnDef="global_x">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Coord 1</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ plantaService.getNombreGlobalX(planta) }}
+        </th>
         <td mat-cell *matCellDef="let element">
           <span *ngIf="!checkIsNaN(element.global_x)">{{
             element.global_x
@@ -88,7 +90,9 @@
       </ng-container>
 
       <ng-container matColumnDef="global_y">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Pasillo</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ plantaService.getNombreGlobalY(planta) }}
+        </th>
         <td mat-cell *matCellDef="let element">
           <span>{{ element.global_y }}</span>
         </td>

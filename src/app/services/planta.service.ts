@@ -368,4 +368,40 @@ export class PlantaService {
   get() {
     return this.planta;
   }
+  getNombreGlobalX(planta: PlantaInterface): string {
+    if (planta.tipo !== "2 ejes") {
+      if (planta.hasOwnProperty("nombreGlobalX")) {
+        return planta.nombreGlobalX;
+      }
+      return GLOBAL.nombreGlobalXFija;
+    }
+    return "";
+  }
+  getNombreGlobalY(planta: PlantaInterface): string {
+    if (planta.tipo !== "2 ejes") {
+      if (planta.hasOwnProperty("nombreGlobalY")) {
+        return planta.nombreGlobalY;
+      }
+      return GLOBAL.nombreGlobalYFija;
+    }
+    return "";
+  }
+  getNombreLocalX(planta: PlantaInterface): string {
+    if (planta.tipo !== "2 ejes") {
+      if (planta.hasOwnProperty("nombreLocalX")) {
+        return planta.nombreLocalX;
+      }
+      return GLOBAL.nombreLocalXFija;
+    }
+    return "";
+  }
+  getNombreLocalY(planta: PlantaInterface): string {
+    if (planta.tipo !== "2 ejes") {
+      if (planta.hasOwnProperty("nombreLocalY")) {
+        return planta.nombreLocalY;
+      }
+      return GLOBAL.nombreLocalYFija;
+    }
+    return "";
+  }
 }

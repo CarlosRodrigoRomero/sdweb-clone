@@ -42,14 +42,12 @@
 
       <div class="item-group">
         <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"><strong>T. referencia</strong></span>
+          <span class="text-center"><u>T. referencia</u></span>
           <span class="text-center">{{ pc.temperaturaRef }} ºC</span>
         </div>
 
         <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"
-            ><strong>&Delta;T (normalizado)</strong></span
-          >
+          <span class="text-center"><u>&Delta;T (normalizado)</u></span>
           <span style="color:red" class="text-center"
             >+ {{ pc.gradienteNormalizado | number: "1.0-1" }} ºC</span
           >
@@ -71,7 +69,7 @@
           *ngIf="!checkIsNaN(pc.global_x)"
           class="pc-details-derecha-item-tabla"
         >
-          <span class="text-center"><strong>Seguidor</strong></span>
+          <span class="text-center"><u>Seguidor</u></span>
           <span class="text-center">{{
             plantaService.getNombreSeguidor(pc)
           }}</span>
@@ -80,7 +78,7 @@
           <span
             *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')"
             class="text-center"
-            ><strong>Fila/Columna</strong></span
+            ><u>Fila/Columna</u></span
           >
           <span
             *ngIf="planta.hasOwnProperty('etiquetasLocalXY')"
@@ -98,21 +96,29 @@
           *ngIf="!checkIsNaN(pc.global_x)"
           class="pc-details-derecha-item-tabla"
         >
-          <span class="text-center"><strong>Coord 1</strong></span>
+          <span class="text-center"
+            ><u>{{ plantaService.getNombreGlobalX(planta) }}</u></span
+          >
           <span class="text-center">{{ pc.global_x }}</span>
         </div>
         <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"><strong>Pasillo</strong></span>
+          <span class="text-center"
+            ><u>{{ plantaService.getNombreGlobalY(planta) }}</u></span
+          >
           <span class="text-center">{{ pc.global_y }}</span>
         </div>
         <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"><strong>Columna</strong></span>
+          <span class="text-center"
+            ><u>{{ plantaService.getNombreLocalX(planta) }}</u></span
+          >
           <span class="text-center">{{
             plantaService.getEtiquetaLocalX(planta, pc)
           }}</span>
         </div>
         <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"><strong>Altura</strong></span>
+          <span class="text-center"
+            ><u>{{ plantaService.getNombreLocalY(planta) }}</u></span
+          >
           <span class="text-center">{{
             plantaService.getEtiquetaLocalY(planta, pc)
           }}</span>
