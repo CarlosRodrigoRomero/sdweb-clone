@@ -57,6 +57,8 @@ export class MapComponent implements OnInit {
     this.circleRadius = 5;
     if (this.planta.tipo === "fija") {
       this.circleRadius = 2;
+    } else if (this.planta.tipo === "1 eje") {
+      this.circleRadius = 2;
     }
 
     // this.pcService
