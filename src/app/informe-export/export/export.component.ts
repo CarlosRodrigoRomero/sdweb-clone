@@ -2338,6 +2338,8 @@ export class ExportComponent implements OnInit {
         .concat(this.datePipe.transform(pc.datetime * 1000, "HH:mm:ss"));
     } else if (columnaNombre === "local_xy") {
       return this.plantaService.getNumeroModulo(this.planta, pc).toString();
+    } else if (columnaNombre === "severidad") {
+      return this.pcService.getPcCoA(pc).toString();
     } else {
       return pc[columnaNombre];
     }
