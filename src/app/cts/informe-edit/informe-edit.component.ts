@@ -350,6 +350,8 @@ export class InformeEditComponent implements OnInit {
     return act_obj;
   }
 
+  onMouseMoveCanvas(event: MouseEvent) {}
+
   transformActObjToRotated(act_obj) {
     let left: number;
     let top: number;
