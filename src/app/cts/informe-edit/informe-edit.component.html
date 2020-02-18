@@ -164,6 +164,100 @@
               size="3"
             />
           </div>
+          <div>
+            <span>Pérdidas</span>
+          <input
+            *ngIf="selected_pc"
+            style="width: 3rem;"
+            [(ngModel)]="selected_pc.perdidas"
+            (change)="updatePcInDb(selected_pc, false)"
+            type="text"
+            id="perdidas"
+            maxlength="5"
+            size="5"
+            value="0"
+          />
+          <span>Severidad</span>
+          <input
+            *ngIf="selected_pc"
+            style="width: 3rem;"
+            [(ngModel)]="selected_pc.severidad"
+            (change)="updatePcInDb(selected_pc, false)"
+            type="number"
+            id="severidad"
+            maxlength="3"
+            size="1"
+            value="1"
+          />
+          <span>Irradiancia</span>
+          <input
+            *ngIf="selected_pc"
+            style="width: 6rem;"
+            [(ngModel)]="selected_pc.irradiancia"
+            (change)="updatePcInDb(selected_pc, false)"
+            type="text"
+            id="irradiancia"
+            maxlength="5"
+            size="5"
+            value="1"
+          />
+          <span>SqBase</span>
+          <input
+            style="width: 3rem;"
+            *ngIf="selected_pc"
+            [(ngModel)]="squareBase"
+            type="number"
+            id="squareBase"
+            maxlength="2"
+            size="20"
+            (change)="setSquareBase(squareBase)"
+          />
+          <br />
+          <span>SqProp</span>
+          <input
+            style="width: 3rem;"
+            *ngIf="selected_pc"
+            [(ngModel)]="squareProp"
+            type="number"
+            id="squareProp"
+            maxlength="2"
+            size="20"
+            (change)="setSquareBase()"
+          />
+          <br />
+          <span>maxMarkersShow</span>
+          <input
+            style="width: 3rem;"
+            [(ngModel)]="maxMarkersShow"
+            type="number"
+            id="maxMarkersShow"
+            maxlength="2"
+            size="20"
+          />
+          <br />
+          <span>Modulos afectados</span>
+          <input
+            *ngIf="selected_pc"
+            [(ngModel)]="selected_pc.modulosAfectados"
+            (change)="updatePcInDb(selected_pc, false)"
+            type="number"
+            id="modulosAfectados"
+            maxlength="5"
+            size="2"
+            value="1"
+          />
+          <span>Nubosidad</span>
+          <input
+            *ngIf="selected_pc"
+            [(ngModel)]="selected_pc.nubosidad"
+            (change)="updatePcInDb(selected_pc, false)"
+            type="number"
+            id="nubosidad"
+            maxlength="1"
+            size="2"
+            value="1"
+          />
+          </div>
         </div>
 
         <div class="col col-xs-6 mapa">
@@ -535,98 +629,7 @@
               />
             </div>
           </div>
-          <span>Pérdidas</span>
-          <input
-            *ngIf="selected_pc"
-            style="width: 3rem;"
-            [(ngModel)]="selected_pc.perdidas"
-            (change)="updatePcInDb(selected_pc, false)"
-            type="text"
-            id="perdidas"
-            maxlength="5"
-            size="5"
-            value="0"
-          />
-          <span>Severidad</span>
-          <input
-            *ngIf="selected_pc"
-            style="width: 3rem;"
-            [(ngModel)]="selected_pc.severidad"
-            (change)="updatePcInDb(selected_pc, false)"
-            type="number"
-            id="severidad"
-            maxlength="3"
-            size="1"
-            value="1"
-          />
-          <span>Irradiancia</span>
-          <input
-            *ngIf="selected_pc"
-            style="width: 6rem;"
-            [(ngModel)]="selected_pc.irradiancia"
-            (change)="updatePcInDb(selected_pc, false)"
-            type="text"
-            id="irradiancia"
-            maxlength="5"
-            size="5"
-            value="1"
-          />
-          <span>SqBase</span>
-          <input
-            style="width: 3rem;"
-            *ngIf="selected_pc"
-            [(ngModel)]="squareBase"
-            type="number"
-            id="squareBase"
-            maxlength="2"
-            size="20"
-            (change)="setSquareBase(squareBase)"
-          />
-          <br />
-          <span>SqProp</span>
-          <input
-            style="width: 3rem;"
-            *ngIf="selected_pc"
-            [(ngModel)]="squareProp"
-            type="number"
-            id="squareProp"
-            maxlength="2"
-            size="20"
-            (change)="setSquareBase()"
-          />
-          <br />
-          <span>maxMarkersShow</span>
-          <input
-            style="width: 3rem;"
-            [(ngModel)]="maxMarkersShow"
-            type="number"
-            id="maxMarkersShow"
-            maxlength="2"
-            size="20"
-          />
-          <br />
-          <span>Modulos afectados</span>
-          <input
-            *ngIf="selected_pc"
-            [(ngModel)]="selected_pc.modulosAfectados"
-            (change)="updatePcInDb(selected_pc, false)"
-            type="number"
-            id="modulosAfectados"
-            maxlength="5"
-            size="2"
-            value="1"
-          />
-          <span>Nubosidad</span>
-          <input
-            *ngIf="selected_pc"
-            [(ngModel)]="selected_pc.nubosidad"
-            (change)="updatePcInDb(selected_pc, false)"
-            type="number"
-            id="nubosidad"
-            maxlength="1"
-            size="2"
-            value="1"
-          />
+
           <button (click)="recalcularLocs()">Recalcular locs</button>
 
           <!-- <button (click)="aux()">Aux</button> -->
