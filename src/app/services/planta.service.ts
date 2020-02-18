@@ -1,25 +1,25 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import {
   AngularFirestore,
   AngularFirestoreDocument,
   AngularFirestoreCollection
-} from "@angular/fire/firestore";
-import { PlantaInterface } from "src/app/models/planta";
-import { Observable, BehaviorSubject } from "rxjs";
-import { map, filter, switchMap } from "rxjs/operators";
-import { LocationAreaInterface } from "../models/location";
+} from '@angular/fire/firestore';
+import { PlantaInterface } from 'src/app/models/planta';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { map, filter, switchMap } from 'rxjs/operators';
+import { LocationAreaInterface } from '../models/location';
 
-import { UserInterface } from "../models/user";
-import { ModuloInterface } from "../models/modulo";
-import * as firebase from "firebase/app";
-import { PcInterface } from "../models/pc";
-import { UserAreaInterface } from "../models/userArea";
-import { AuthService } from "./auth.service";
-import { GLOBAL } from "./global";
-import { CriteriosClasificacion } from "../models/criteriosClasificacion";
+import { UserInterface } from '../models/user';
+import { ModuloInterface } from '../models/modulo';
+import * as firebase from 'firebase/app';
+import { PcInterface } from '../models/pc';
+import { UserAreaInterface } from '../models/userArea';
+import { AuthService } from './auth.service';
+import { GLOBAL } from './global';
+import { CriteriosClasificacion } from '../models/criteriosClasificacion';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
 export class PlantaService {
   public itemDoc: AngularFirestoreDocument<PlantaInterface>;
@@ -41,7 +41,7 @@ export class PlantaService {
   }
 
   getPlanta(plantaId: string): Observable<PlantaInterface> {
-    this.plantaDoc = this.afs.doc<PlantaInterface>("plantas/" + plantaId);
+    this.plantaDoc = this.afs.doc<PlantaInterface>('plantas/' + plantaId);
 
     return (this.planta = this.plantaDoc.snapshotChanges().pipe(
       map(action => {
@@ -77,9 +77,9 @@ export class PlantaService {
     userArea.id = id;
 
     this.afs
-      .collection("plantas")
+      .collection('plantas')
       .doc(plantaId)
-      .collection("userAreas")
+      .collection('userAreas')
       .doc(id)
       .set(userArea);
 
@@ -94,9 +94,9 @@ export class PlantaService {
 
   getAllUserAreas(plantaId: string): Observable<UserAreaInterface[]> {
     const query$ = this.afs
-      .collection("plantas")
+      .collection('plantas')
       .doc(plantaId)
-      .collection("userAreas");
+      .collection('userAreas');
 
     const result = query$.snapshotChanges().pipe(
       map(actions =>
@@ -120,7 +120,7 @@ export class PlantaService {
         return this.afs
           .collection<UserAreaInterface>(
             `plantas/${plantaId}/userAreas/`,
-            ref => ref.where("userId", "==", userId)
+            ref => ref.where('userId', '==', userId)
           )
           .valueChanges();
       })
@@ -129,9 +129,9 @@ export class PlantaService {
 
   delUserArea(userArea: UserAreaInterface) {
     this.afs
-      .collection("plantas")
+      .collection('plantas')
       .doc(userArea.plantaId)
-      .collection("userAreas")
+      .collection('userAreas')
       .doc(userArea.id)
       .delete();
   }
@@ -141,9 +141,9 @@ export class PlantaService {
     locationArea.id = id;
 
     this.afs
-      .collection("plantas")
+      .collection('plantas')
       .doc(plantaId)
-      .collection("locationAreas")
+      .collection('locationAreas')
       .doc(id)
       .set(locationArea);
 
@@ -154,7 +154,7 @@ export class PlantaService {
     const LocAreaDoc = this.afs.doc(
       `plantas/${locArea.plantaId}/locationAreas/${locArea.id}`
     );
-    if (!locArea.hasOwnProperty("modulo")) {
+    if (!locArea.hasOwnProperty('modulo')) {
       LocAreaDoc.update({
         modulo: firebase.firestore.FieldValue.delete()
       });
@@ -164,18 +164,18 @@ export class PlantaService {
 
   delLocationArea(locationArea: LocationAreaInterface) {
     this.afs
-      .collection("plantas")
+      .collection('plantas')
       .doc(locationArea.plantaId)
-      .collection("locationAreas")
+      .collection('locationAreas')
       .doc(locationArea.id)
       .delete();
   }
 
   getLocationsArea(plantaId: string): Observable<LocationAreaInterface[]> {
     const query$ = this.afs
-      .collection("plantas")
+      .collection('plantas')
       .doc(plantaId)
-      .collection("locationAreas");
+      .collection('locationAreas');
 
     const result = query$.snapshotChanges().pipe(
       map(actions =>
@@ -193,7 +193,7 @@ export class PlantaService {
   getPlantasDeEmpresa(user: UserInterface): Observable<PlantaInterface[]> {
     let query$: AngularFirestoreCollection<PlantaInterface>;
     if (user.role === 2) {
-      query$ = this.afs.collection<PlantaInterface>("plantas");
+      query$ = this.afs.collection<PlantaInterface>('plantas');
       return query$.snapshotChanges().pipe(
         map(actions =>
           actions.map(a => {
@@ -209,10 +209,10 @@ export class PlantaService {
         })
       );
     } else if (user.role === 1) {
-      query$ = this.afs.collection<PlantaInterface>("plantas");
+      query$ = this.afs.collection<PlantaInterface>('plantas');
     } else {
-      query$ = this.afs.collection<PlantaInterface>("plantas", ref =>
-        ref.where("empresa", "==", user.uid)
+      query$ = this.afs.collection<PlantaInterface>('plantas', ref =>
+        ref.where('empresa', '==', user.uid)
       );
     }
 
@@ -228,7 +228,7 @@ export class PlantaService {
   }
 
   getModulosPlanta(planta: PlantaInterface): ModuloInterface[] {
-    if (planta.hasOwnProperty("modulos")) {
+    if (planta.hasOwnProperty('modulos')) {
       if (planta.modulos.length > 0) {
         return this.modulos.filter(item => {
           return planta.modulos.indexOf(item.id) >= 0;
@@ -241,7 +241,7 @@ export class PlantaService {
   getModulos(): Observable<ModuloInterface[]> {
     let query$: AngularFirestoreCollection<ModuloInterface>;
 
-    query$ = this.afs.collection<ModuloInterface>("modulos");
+    query$ = this.afs.collection<ModuloInterface>('modulos');
 
     return query$.snapshotChanges().pipe(
       map(actions =>
@@ -255,24 +255,25 @@ export class PlantaService {
   }
 
   getNumeroModulo(planta: PlantaInterface, pc: PcInterface): string {
-    if (planta.hasOwnProperty("etiquetasLocalXY")) {
+    if (planta.hasOwnProperty('etiquetasLocalXY')) {
       if (planta.etiquetasLocalXY[pc.local_y] !== undefined) {
-        if (planta.etiquetasLocalXY[pc.local_y][pc.local_x - 1] !== undefined)
+        if (planta.etiquetasLocalXY[pc.local_y][pc.local_x - 1] !== undefined) {
           return planta.etiquetasLocalXY[pc.local_y][pc.local_x - 1];
+        }
       }
+      return this.getEtiquetaLocalY(planta, pc)
+        .toString()
+        .concat('/')
+        .concat(this.getEtiquetaLocalX(planta, pc).toString());
     }
-    return this.getEtiquetaLocalY(planta, pc)
-      .toString()
-      .concat("/")
-      .concat(this.getEtiquetaLocalX(planta, pc).toString());
   }
 
-  getAltura(planta: PlantaInterface, local_y: number) {
+  getAltura(planta: PlantaInterface, localY: number) {
     // Por defecto, la altura alta es la numero 1
     if (planta.alturaBajaPrimero) {
-      return planta.filas - (local_y - 1);
+      return planta.filas - (localY - 1);
     } else {
-      return local_y;
+      return localY;
     }
   }
 
@@ -280,7 +281,7 @@ export class PlantaService {
     if (pc.local_x <= 0) {
       return GLOBAL.stringParaDesconocido;
     }
-    if (this.planta.hasOwnProperty("etiquetasLocalX")) {
+    if (this.planta.hasOwnProperty('etiquetasLocalX')) {
       const localX =
         pc.local_x > planta.etiquetasLocalX.length
           ? planta.etiquetasLocalX.length
@@ -293,7 +294,7 @@ export class PlantaService {
     if (pc.local_y <= 0) {
       return GLOBAL.stringParaDesconocido;
     }
-    if (planta.hasOwnProperty("etiquetasLocalY")) {
+    if (planta.hasOwnProperty('etiquetasLocalY')) {
       const localY =
         pc.local_y > planta.etiquetasLocalY.length
           ? planta.etiquetasLocalY.length
@@ -307,14 +308,15 @@ export class PlantaService {
   }
 
   getNombreSeguidor(pc: PcInterface) {
-    let nombreSeguidor = "";
-    if (pc.hasOwnProperty("global_x")) {
+    let nombreSeguidor = '';
+    if (pc.hasOwnProperty('global_x')) {
       if (!Number.isNaN(pc.global_x)) {
         nombreSeguidor = nombreSeguidor.concat(pc.global_x.toString());
       }
     }
-    if (pc.hasOwnProperty("global_y")) {
+    if (pc.hasOwnProperty('global_y')) {
       if (!Number.isNaN(pc.global_y)) {
+        nombreSeguidor = '-'.concat(pc.global_y.toString());
         nombreSeguidor = nombreSeguidor.concat(pc.global_y.toString());
       }
     }
@@ -323,14 +325,14 @@ export class PlantaService {
 
   getReferenciaSolardrone(planta: PlantaInterface) {
     return (
-      !planta.hasOwnProperty("referenciaSolardrone") ||
+      !planta.hasOwnProperty('referenciaSolardrone') ||
       planta.referenciaSolardrone
     );
   }
 
   getCriterio(criterioId: string): Observable<CriteriosClasificacion> {
     const criterioDoc = this.afs.doc<CriteriosClasificacion>(
-      "criteriosClasificacion/" + criterioId
+      'criteriosClasificacion/' + criterioId
     );
 
     return criterioDoc.snapshotChanges().pipe(
@@ -350,7 +352,7 @@ export class PlantaService {
     let query$: AngularFirestoreCollection<CriteriosClasificacion>;
 
     query$ = this.afs.collection<CriteriosClasificacion>(
-      "criteriosClasificacion"
+      'criteriosClasificacion'
     );
 
     return query$.snapshotChanges().pipe(
