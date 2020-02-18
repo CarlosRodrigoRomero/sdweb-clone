@@ -10,7 +10,7 @@ export let GLOBAL = {
   minGradiente: 10,
   maxGradiente: 50,
   stringParaDesconocido: "-",
-  nombreGlobalXFija: "Coord 1",
+  nombreGlobalXFija: "C1",
   nombreGlobalYFija: "Pasillo",
   nombreLocalXFija: "Columna",
   nombreLocalYFija: "Fila",

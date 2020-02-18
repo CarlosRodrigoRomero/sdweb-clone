@@ -176,7 +176,7 @@ export class ExportComponent implements OnInit {
 
     this.filteredSeguidores$ = this.pcService.filteredSeguidores$;
     this.filteredPcs$ = this.pcService.currentFilteredPcs$;
-    this.pcColumnas = GLOBAL.pcColumnas;
+    this.pcColumnas = this.getPcColumnas(this.planta);
 
     this.filtroColumnas = this.pcColumnas.map(element => element.nombre);
     this.filteredColumnasSource.next(this.pcColumnas);
@@ -474,6 +474,17 @@ export class ExportComponent implements OnInit {
     );
 
     this.filtroApartados = this.apartadosInforme.map(element => element.nombre);
+  }
+
+  getPcColumnas(planta: PlantaInterface): any[] {
+    let pcColumnasTemp = GLOBAL.pcColumnas;
+    const i = pcColumnasTemp.findIndex( (e) => e.nombre == 'local_xy')
+    pcColumnasTemp[i].descripcion = this.plantaService
+      .getNombreLocalX(planta)
+      .concat("/")
+      .concat(this.plantaService.getNombreLocalY(planta));
+
+    return pcColumnasTemp;
   }
 
   loadImage(width: number, url: string) {
@@ -2249,7 +2260,7 @@ export class ExportComponent implements OnInit {
     } else {
       this.filteredPcs = this.filteredPcs.sort(this.sortByGlobalY);
       cabecera.push({
-        text: "Pasillo",
+        text: this.plantaService.getNombreColsGlobal(this.planta),
         style: "tableHeaderRed",
         noWrap: true
       });
@@ -2276,7 +2287,7 @@ export class ExportComponent implements OnInit {
         style: "tableCellAnexo1"
       });
       row.push({
-        text: this.plantaService.getNombreSeguidor(pc),
+        text: this.plantaService.getEtiquetaGlobals(pc),
         noWrap: true,
         style: "tableCellAnexo1"
       });

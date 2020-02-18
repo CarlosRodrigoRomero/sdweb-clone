@@ -259,11 +259,11 @@ export class PlantaService {
           return planta.etiquetasLocalXY[pc.local_y][pc.local_x - 1];
         }
       }
-      return this.getEtiquetaLocalY(planta, pc)
-        .toString()
-        .concat('/')
-        .concat(this.getEtiquetaLocalX(planta, pc).toString());
     }
+    return this.getEtiquetaLocalX(planta, pc)
+      .toString()
+      .concat('/')
+      .concat(this.getEtiquetaLocalY(planta, pc).toString());
   }
 
   getAltura(planta: PlantaInterface, localY: number) {
@@ -279,7 +279,7 @@ export class PlantaService {
     if (pc.local_x <= 0) {
       return GLOBAL.stringParaDesconocido;
     }
-    if (planta.hasOwnProperty("etiquetasLocalX")) {
+    if (planta.hasOwnProperty('etiquetasLocalX')) {
       const localX =
         pc.local_x > planta.etiquetasLocalX.length
           ? planta.etiquetasLocalX.length
@@ -314,11 +314,53 @@ export class PlantaService {
     }
     if (pc.hasOwnProperty('global_y')) {
       if (!Number.isNaN(pc.global_y)) {
-        nombreSeguidor = '-'.concat(pc.global_y.toString());
+        if (nombreSeguidor.length > 0) {
+          nombreSeguidor = nombreSeguidor.concat('/');
+        }
         nombreSeguidor = nombreSeguidor.concat(pc.global_y.toString());
       }
     }
     return nombreSeguidor;
+  }
+
+  getEtiquetaGlobals(pc: PcInterface): string {
+    let nombreEtiqueta = '';
+    if (pc.hasOwnProperty('global_x')) {
+      if (!Number.isNaN(pc.global_x)) {
+      nombreEtiqueta = nombreEtiqueta.concat(pc.global_x.toString());
+      }
+    }
+    if (pc.hasOwnProperty('global_y')) {
+      if (nombreEtiqueta.length > 0) {
+        if (!Number.isNaN(pc.global_y)) {
+        nombreEtiqueta = nombreEtiqueta.concat('/');
+        }
+      }
+      nombreEtiqueta = nombreEtiqueta.concat(pc.global_y.toString());
+    }
+    return nombreEtiqueta;
+  }
+
+  getNombreColsGlobal(planta: PlantaInterface) {
+    let nombreCol = this.getNombreGlobalX(planta);
+    if (nombreCol.length > 0) {
+      nombreCol = nombreCol.concat('/');
+    }
+    nombreCol = nombreCol.concat(this.getNombreGlobalY(planta));
+    // let nombreCol = "";
+    // if (planta.hasOwnProperty("nombreGlobalX")) {
+    //   nombreCol = nombreCol.concat(planta.nombreGlobalX.toString());
+    // }
+    // if (planta.hasOwnProperty("nombreGlobalY")) {
+    //   if (nombreCol.length > 0) {
+    //     nombreCol = nombreCol.concat("/");
+    //   }
+    //   nombreCol = nombreCol.concat(planta.nombreGlobalY.toString());
+    // }
+    // if (nombreCol.length === 0) {
+    //   nombreCol = "Pasillo"
+    // }
+    return nombreCol;
   }
 
   getReferenciaSolardrone(planta: PlantaInterface) {
@@ -371,39 +413,39 @@ export class PlantaService {
     return this.planta;
   }
   getNombreGlobalX(planta: PlantaInterface): string {
-    if (planta.tipo !== "2 ejes") {
-      if (planta.hasOwnProperty("nombreGlobalX")) {
+    if (planta.tipo !== '2 ejes') {
+      if (planta.hasOwnProperty('nombreGlobalX')) {
         return planta.nombreGlobalX;
       }
       return GLOBAL.nombreGlobalXFija;
     }
-    return "";
+    return '';
   }
   getNombreGlobalY(planta: PlantaInterface): string {
-    if (planta.tipo !== "2 ejes") {
-      if (planta.hasOwnProperty("nombreGlobalY")) {
+    if (planta.tipo !== '2 ejes') {
+      if (planta.hasOwnProperty('nombreGlobalY')) {
         return planta.nombreGlobalY;
       }
       return GLOBAL.nombreGlobalYFija;
     }
-    return "";
+    return '';
   }
   getNombreLocalX(planta: PlantaInterface): string {
-    if (planta.tipo !== "2 ejes") {
-      if (planta.hasOwnProperty("nombreLocalX")) {
+    if (planta.tipo !== '2 ejes') {
+      if (planta.hasOwnProperty('nombreLocalX')) {
         return planta.nombreLocalX;
       }
       return GLOBAL.nombreLocalXFija;
     }
-    return "";
+    return '';
   }
   getNombreLocalY(planta: PlantaInterface): string {
-    if (planta.tipo !== "2 ejes") {
-      if (planta.hasOwnProperty("nombreLocalY")) {
+    if (planta.tipo !== '2 ejes') {
+      if (planta.hasOwnProperty('nombreLocalY')) {
         return planta.nombreLocalY;
       }
       return GLOBAL.nombreLocalYFija;
     }
-    return "";
+    return '';
   }
 }
