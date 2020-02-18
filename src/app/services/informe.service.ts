@@ -17,16 +17,17 @@ import { Estructura } from "../models/estructura";
 })
 export class InformeService {
   private informesCollection: AngularFirestoreCollection<InformeInterface>;
-  private informes: Observable<InformeInterface[]>;
   private informeDoc: AngularFirestoreDocument<InformeInterface>;
-  private informe: Observable<InformeInterface>;
+  private informe: InformeInterface;
+  public informes$: Observable<InformeInterface[]>;
+  public informe$: Observable<InformeInterface>;
   public url: string;
 
   constructor(public afs: AngularFirestore, private http: HttpClient) {
     this.url = GLOBAL.url;
     // this.informes = afs.collection('informes').valueChanges();
     this.informesCollection = afs.collection<InformeInterface>("informes");
-    this.informes = this.informesCollection.valueChanges();
+    this.informes$ = this.informesCollection.valueChanges();
   }
 
   getInformes() {
@@ -58,7 +59,7 @@ export class InformeService {
   getInforme(id: string) {
     this.informeDoc = this.afs.doc<InformeInterface>("informes/" + id);
 
-    return (this.informe = this.informeDoc.snapshotChanges().pipe(
+    return (this.informe$ = this.informeDoc.snapshotChanges().pipe(
       map(action => {
         if (action.payload.exists === false) {
           return null;
@@ -157,4 +158,10 @@ export class InformeService {
 
   addInforme() {}
   editInforme() {}
+  set(informe: InformeInterface) {
+    this.informe = informe;
+  }
+  get() {
+    return this.informe;
+  }
 }

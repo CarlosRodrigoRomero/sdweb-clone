@@ -1,0 +1,135 @@
+.col-filtros {
+  background-color: transparent;
+  margin-top: 1rem;
+}
+
+.cargando {
+  margin-top: 15rem;
+}
+
+.div-pc-map-container {
+  position: relative;
+}
+
+.pc-filter-over-map,
+.pc-map {
+  position: absolute;
+  top: 0;
+  height: 100%;
+}
+
+.margin-top {
+  margin-top: 1rem;
+}
+
+.pc-filter-over-map {
+  z-index: 10;
+  left: 30px;
+  top: 50px;
+  width: 25%;
+}
+
+.titulo-informe-empresa {
+  font-size: 2rem;
+  font-weight: 200;
+  color: gainsboro;
+}
+
+.pc-map {
+  width: 97%;
+  left: 20px;
+}
+
+.header-informe {
+  background-image: url("src/assets/images/informe-portada.jpg");
+  border: 1px solid grey;
+  margin-top: 1rem;
+  padding: 1rem;
+  background-repeat: round;
+}
+
+.header-derecha {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.header-derecha-datos {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.header-derecha-datos-mae {
+}
+
+.titulo-informe {
+  font-size: 3rem;
+}
+
+.subtitulo-informe {
+  font-size: 1.5rem;
+  font-weight: 300;
+  margin-left: 1rem;
+}
+
+.datos-meteo-texto {
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.datos-meteo-numero {
+  font-weight: 500;
+  font-size: 1.5rem;
+}
+
+.datos-meteo {
+  display: flex;
+  margin-top: 0.5rem;
+}
+
+.datos-meteo i {
+  font-size: 2.7rem;
+  color: white;
+}
+
+.col-datos-meteo {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.div-mae-1 {
+  display: flex;
+  flex-direction: row;
+}
+
+.div-mae-2 {
+  display: flex;
+  flex-direction: column;
+}
+
+.mae-porcentaje {
+  font-size: 6rem;
+  line-height: 1;
+}
+
+.mae-pct-simbolo {
+  font-size: 3rem;
+}
+
+.mae-texto {
+  font-size: 1.7rem;
+}
+
+p-chart div {
+  padding: 0;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+}
+.download-button {
+  margin-left: 1rem;
+}

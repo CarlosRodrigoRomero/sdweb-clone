@@ -1,0 +1,71 @@
+<mat-card>
+  <mat-card-content>
+    <div class="row">
+      <div class="col-12">
+        <h3 class="text-center">
+          Resumen de la inspección termográfica aérea ({{
+            informe.fecha * 1000 | date: "dd/MM/yyyy"
+          }})
+        </h3>
+      </div>
+    </div>
+
+    <div class="colflex">
+      <div class="flexchart">
+        <h5 class="text-center perdidasTotales">Pérdidas (kW) totales</h5>
+        <p-chart
+          height="250"
+          type="doughnut"
+          [data]="dataPerdidasTotales"
+          [options]="chartOptionsDonut"
+        ></p-chart>
+
+        <ul>
+          <li>
+            <b>Porcentaje de pérdidas</b>:
+            <span style="color:tomato">
+              {{ perdidasTotales / 10 / planta.potencia | number: "1.0-2" }}
+              %</span
+            >
+          </li>
+          <li>
+            <b>Pérdidas nominales</b>:
+            <span style="color:tomato"
+              >{{ perdidasTotales | number: "1.0-1" }} kW</span
+            >
+          </li>
+          <li>
+            <b>Potencia nominal no afectada</b>:
+            <span style="color:#3CB371">
+              {{ planta.potencia * 1000 - perdidasTotales | number: "1.0-1" }}
+              kW
+            </span>
+          </li>
+        </ul>
+      </div>
+      <div class="flexchart">
+        <div class="flexsubchat">
+          <h5 class="text-center">Pérdidas (kW) por categoría</h5>
+          <p-chart
+            height="300"
+            width="450"
+            type="bar"
+            [data]="dataPerdidasCategoria"
+            [options]="chartOptionsPerdidas"
+          ></p-chart>
+        </div>
+        <div class="flexsubchat">
+          <h5 class="text-center">
+            Número de anomalías por categoría
+          </h5>
+          <p-chart
+            [options]="chartOptionsCount"
+            height="300"
+            width="450"
+            type="bar"
+            [data]="dataCountCategoria"
+          ></p-chart>
+        </div>
+      </div>
+    </div> </mat-card-content
+></mat-card>

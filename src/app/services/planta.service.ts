@@ -22,9 +22,8 @@ import { CriteriosClasificacion } from '../models/criteriosClasificacion';
   providedIn: 'root'
 })
 export class PlantaService {
-  public itemDoc: AngularFirestoreDocument<PlantaInterface>;
-  public plantas: Observable<PlantaInterface[]>;
-  public planta: Observable<PlantaInterface>;
+  public planta$: Observable<PlantaInterface>;
+  public planta: PlantaInterface;
   private plantaDoc: AngularFirestoreDocument<PlantaInterface>;
   public plantasCollection: AngularFirestoreCollection<PlantaInterface>;
   public modulos: ModuloInterface[];
@@ -34,7 +33,6 @@ export class PlantaService {
   public currentFilteredLocAreas$ = this.filteredLocAreasSource.asObservable();
 
   constructor(private afs: AngularFirestore, public auth: AuthService) {
-    // this.plantas = afs.collection("plantas").valueChanges();
     this.getModulos().subscribe(modulos => {
       this.modulos = modulos;
     });
@@ -43,7 +41,7 @@ export class PlantaService {
   getPlanta(plantaId: string): Observable<PlantaInterface> {
     this.plantaDoc = this.afs.doc<PlantaInterface>('plantas/' + plantaId);
 
-    return (this.planta = this.plantaDoc.snapshotChanges().pipe(
+    return (this.planta$ = this.plantaDoc.snapshotChanges().pipe(
       map(action => {
         if (action.payload.exists === false) {
           return null;
@@ -281,7 +279,7 @@ export class PlantaService {
     if (pc.local_x <= 0) {
       return GLOBAL.stringParaDesconocido;
     }
-    if (this.planta.hasOwnProperty('etiquetasLocalX')) {
+    if (planta.hasOwnProperty("etiquetasLocalX")) {
       const localX =
         pc.local_x > planta.etiquetasLocalX.length
           ? planta.etiquetasLocalX.length
@@ -364,5 +362,48 @@ export class PlantaService {
         })
       )
     );
+  }
+
+  set(planta: PlantaInterface) {
+    this.planta = planta;
+  }
+  get() {
+    return this.planta;
+  }
+  getNombreGlobalX(planta: PlantaInterface): string {
+    if (planta.tipo !== "2 ejes") {
+      if (planta.hasOwnProperty("nombreGlobalX")) {
+        return planta.nombreGlobalX;
+      }
+      return GLOBAL.nombreGlobalXFija;
+    }
+    return "";
+  }
+  getNombreGlobalY(planta: PlantaInterface): string {
+    if (planta.tipo !== "2 ejes") {
+      if (planta.hasOwnProperty("nombreGlobalY")) {
+        return planta.nombreGlobalY;
+      }
+      return GLOBAL.nombreGlobalYFija;
+    }
+    return "";
+  }
+  getNombreLocalX(planta: PlantaInterface): string {
+    if (planta.tipo !== "2 ejes") {
+      if (planta.hasOwnProperty("nombreLocalX")) {
+        return planta.nombreLocalX;
+      }
+      return GLOBAL.nombreLocalXFija;
+    }
+    return "";
+  }
+  getNombreLocalY(planta: PlantaInterface): string {
+    if (planta.tipo !== "2 ejes") {
+      if (planta.hasOwnProperty("nombreLocalY")) {
+        return planta.nombreLocalY;
+      }
+      return GLOBAL.nombreLocalYFija;
+    }
+    return "";
   }
 }

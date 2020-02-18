@@ -401,4 +401,11 @@ export class PcService {
     }
     return pc.severidad;
   }
+
+  set(pcs: PcInterface[]) {
+    this.allPcs = pcs;
+  }
+  get() {
+    return this.allPcs;
+  }
 }
