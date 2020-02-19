@@ -164,7 +164,7 @@
             <span
               *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')"
               class="text-center"
-              ><u>Fila/Columna</u></span
+              ><u>{{ plantaService.getNombreLocalX(planta) }}/{{plantaService.getNombreLocalY(planta)}}</u></span
             >
             <span
               *ngIf="planta.hasOwnProperty('etiquetasLocalXY')"
