@@ -1,24 +1,24 @@
-import { Component, OnInit, ViewChild, ElementRef, Input } from "@angular/core";
-import { GLOBAL } from "../../services/global";
+import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
+import { GLOBAL } from '../../services/global';
 
-import { PcService, SeguidorInterface } from "../../services/pc.service";
+import { PcService, SeguidorInterface } from '../../services/pc.service';
 
-import { PcInterface } from "../../models/pc";
-import { PlantaInterface } from "../../models/planta";
-import { InformeInterface } from "../../models/informe";
+import { PcInterface } from '../../models/pc';
+import { PlantaInterface } from '../../models/planta';
+import { InformeInterface } from '../../models/informe';
 
-import "fabric";
+import 'fabric';
 declare let fabric;
-import { AngularFireStorage } from "@angular/fire/storage";
-import { Observable, BehaviorSubject } from "rxjs";
-import { take } from "rxjs/operators";
-import { MatCheckboxChange, MatTableDataSource } from "@angular/material";
+import { AngularFireStorage } from '@angular/fire/storage';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { MatCheckboxChange, MatTableDataSource } from '@angular/material';
 
-import pdfMake from "pdfmake/build/pdfmake.js";
-import pdfFonts from "pdfmake/build/vfs_fonts.js";
-import { DatePipe, DecimalPipe } from "@angular/common";
-import { PlantaService } from "../../services/planta.service";
-import { InformeService } from "../../services/informe.service";
+import pdfMake from 'pdfmake/build/pdfmake.js';
+import pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { PlantaService } from '../../services/planta.service';
+import { InformeService } from '../../services/informe.service';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 declare var $: any;
@@ -40,13 +40,13 @@ export interface Apartado {
 }
 
 @Component({
-  selector: "app-export",
-  templateUrl: "./export.component.html",
-  styleUrls: ["./export.component.css"],
+  selector: 'app-export',
+  templateUrl: './export.component.html',
+  styleUrls: ['./export.component.css'],
   providers: [DecimalPipe, DatePipe]
 })
 export class ExportComponent implements OnInit {
-  @ViewChild("content") content: ElementRef;
+  @ViewChild('content') content: ElementRef;
 
   public planta: PlantaInterface;
   public informe: InformeInterface;
@@ -104,11 +104,11 @@ export class ExportComponent implements OnInit {
   public informeCalculado: boolean;
   public apartadosInforme: Apartado[];
   public displayedColumns: string[] = [
-    "categoria",
-    "coa1",
-    "coa2",
-    "coa3",
-    "total"
+    'categoria',
+    'coa1',
+    'coa2',
+    'coa3',
+    'total'
   ];
   public dataSource: MatTableDataSource<PcsTable>;
   private countLoadedImages$ = new BehaviorSubject(null);
@@ -146,22 +146,22 @@ export class ExportComponent implements OnInit {
     this.informeCalculado = false;
 
     this.url = GLOBAL.url;
-    this.titulo = "Vista de informe";
-    this.tipoInforme = "2";
+    this.titulo = 'Vista de informe';
+    this.tipoInforme = '2';
     this.isLocalhost =
-      location.hostname === "localhost" || location.hostname === "127.0.0.1";
+      location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   }
 
   ngOnInit() {
     this.planta = this.plantaService.get();
     this.informe = this.informeService.get();
-    this.progresoPDF = "0";
+    this.progresoPDF = '0';
     this.widthLogo = 200;
     this.widthPortada = 600; //=600 es el ancho de pagina completo
-    this.widthSuciedad = 500;
+    this.widthSuciedad = 501;
     this.widthCurvaMae = 300;
     this.widthFormulaMae = 200;
-    this.widthIrradiancia = 500;
+    this.widthIrradiancia = 499;
     this.imgQuality = 3.5;
     this.heightLogoHeader = 40;
     this.jpgQuality = 0.95;
@@ -209,7 +209,7 @@ export class ExportComponent implements OnInit {
       fabric.util.loadImage(
         url,
         img => {
-          const canvas = document.createElement("canvas");
+          const canvas = document.createElement('canvas');
           const width =
             this.widthIrradiancia * this.imgQuality > img.width
               ? img.width
@@ -217,15 +217,15 @@ export class ExportComponent implements OnInit {
           const scaleFactor = width / img.width;
           canvas.width = width;
           canvas.height = img.height * scaleFactor;
-          const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+          const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
           this.imgIrradianciaBase64 = canvas.toDataURL(
-            "image/jpeg",
+            'image/jpeg',
             this.jpgQuality
           );
         },
         null,
-        { crossOrigin: "anonymous" }
+        { crossOrigin: 'anonymous' }
       );
     });
 
@@ -233,7 +233,7 @@ export class ExportComponent implements OnInit {
       fabric.util.loadImage(
         url,
         img => {
-          const canvas = document.createElement("canvas");
+          const canvas = document.createElement('canvas');
           const width =
             this.widthPortada * this.imgQuality > img.width
               ? img.width
@@ -241,15 +241,15 @@ export class ExportComponent implements OnInit {
           const scaleFactor = width / img.width;
           canvas.width = width;
           canvas.height = img.height * scaleFactor;
-          const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+          const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
           this.imgPortadaBase64 = canvas.toDataURL(
-            "image/jpeg",
+            'image/jpeg',
             this.jpgQuality
           );
         },
         null,
-        { crossOrigin: "anonymous" }
+        { crossOrigin: 'anonymous' }
       );
     });
 
@@ -257,7 +257,7 @@ export class ExportComponent implements OnInit {
       fabric.util.loadImage(
         url,
         img => {
-          const canvas = document.createElement("canvas");
+          const canvas = document.createElement('canvas');
           const newWidth =
             this.widthLogo * this.imgQuality > img.width
               ? img.width
@@ -268,12 +268,12 @@ export class ExportComponent implements OnInit {
           canvas.width = newWidth;
           canvas.height = newHeight;
           this.scaleImgLogoHeader = this.heightLogoHeader / newHeight;
-          const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+          const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, newWidth, newHeight);
-          this.imgLogoBase64 = canvas.toDataURL("image/jpeg", this.jpgQuality);
+          this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
         },
         null,
-        { crossOrigin: "anonymous" }
+        { crossOrigin: 'anonymous' }
       );
     });
 
@@ -294,7 +294,7 @@ export class ExportComponent implements OnInit {
       fabric.util.loadImage(
         url,
         img => {
-          const canvas = document.createElement("canvas");
+          const canvas = document.createElement('canvas');
           const width =
             this.widthIrradiancia * this.imgQuality > img.width
               ? img.width
@@ -302,22 +302,22 @@ export class ExportComponent implements OnInit {
           const scaleFactor = width / img.width;
           canvas.width = width;
           canvas.height = img.height * scaleFactor;
-          const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+          const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
           this.imgSuciedadBase64 = canvas.toDataURL(
-            "image/jpeg",
+            'image/jpeg',
             this.jpgQuality
           );
         },
         null,
-        { crossOrigin: "anonymous" }
+        { crossOrigin: 'anonymous' }
       );
     });
 
     fabric.util.loadImage(
-      "../../../assets/images/maeCurva.png",
+      '../../../assets/images/maeCurva.png',
       img => {
-        const canvas = document.createElement("canvas");
+        const canvas = document.createElement('canvas');
         const width =
           this.widthCurvaMae * this.imgQuality > img.width
             ? img.width
@@ -325,21 +325,21 @@ export class ExportComponent implements OnInit {
         const scaleFactor = width / img.width;
         canvas.width = width;
         canvas.height = img.height * scaleFactor;
-        const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
         this.imgCurvaMaeBase64 = canvas.toDataURL(
-          "image/jpeg",
+          'image/jpeg',
           this.jpgQuality
         );
       },
       null,
-      { crossOrigin: "anonymous" }
+      { crossOrigin: 'anonymous' }
     );
 
     fabric.util.loadImage(
-      "../../../assets/images/formula_mae.png",
+      '../../../assets/images/formula_mae.png',
       img => {
-        const canvas = document.createElement("canvas");
+        const canvas = document.createElement('canvas');
         const width =
           this.widthFormulaMae * this.imgQuality > img.width
             ? img.width
@@ -347,121 +347,121 @@ export class ExportComponent implements OnInit {
         const scaleFactor = width / img.width;
         canvas.width = width;
         canvas.height = img.height * scaleFactor;
-        const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
         this.imgFormulaMaeBase64 = canvas.toDataURL(
-          "image/jpeg",
+          'image/jpeg',
           this.jpgQuality
         );
       },
       null,
-      { crossOrigin: "anonymous" }
+      { crossOrigin: 'anonymous' }
     );
 
     this.apartadosInforme = [
       {
-        nombre: "introduccion",
-        descripcion: "Introducción",
+        nombre: 'introduccion',
+        descripcion: 'Introducción',
         orden: 1,
         apt: 1,
         elegible: false
       },
       {
-        nombre: "criterios",
-        descripcion: "Criterios de operación",
+        nombre: 'criterios',
+        descripcion: 'Criterios de operación',
         orden: 2,
         apt: 1,
         elegible: true
       },
       {
-        nombre: "normalizacion",
-        descripcion: "Normalización de gradientes de temperatura",
+        nombre: 'normalizacion',
+        descripcion: 'Normalización de gradientes de temperatura',
         orden: 3,
         apt: 1,
         elegible: true
       },
       {
-        nombre: "datosVuelo",
-        descripcion: "Datos del vuelo",
+        nombre: 'datosVuelo',
+        descripcion: 'Datos del vuelo',
         orden: 4,
         apt: 1,
         elegible: true
       },
       {
-        nombre: "irradiancia",
-        descripcion: "Irradiancia durante el vuelo",
+        nombre: 'irradiancia',
+        descripcion: 'Irradiancia durante el vuelo',
         orden: 5,
         apt: 1,
         elegible: true
       },
       {
-        nombre: "paramsTermicos",
-        descripcion: "Ajuste de parámetros térmicos",
+        nombre: 'paramsTermicos',
+        descripcion: 'Ajuste de parámetros térmicos',
         orden: 6,
         apt: 1,
         elegible: true
       },
       {
-        nombre: "perdidaPR",
-        descripcion: "Pérdida de Performance Ratio",
+        nombre: 'perdidaPR',
+        descripcion: 'Pérdida de Performance Ratio',
         orden: 7,
         apt: 1,
         elegible: true
       },
       {
-        nombre: "clasificacion",
-        descripcion: "Cómo se clasifican las anomalías",
+        nombre: 'clasificacion',
+        descripcion: 'Cómo se clasifican las anomalías',
         orden: 8,
         apt: 1,
         elegible: true
       },
       {
-        nombre: "localizar",
-        descripcion: "Cómo localizar las anomalías",
+        nombre: 'localizar',
+        descripcion: 'Cómo localizar las anomalías',
         orden: 9,
         apt: 1,
         elegible: true
       },
       {
-        nombre: "resultadosClase",
-        descripcion: "Resultados por clase",
+        nombre: 'resultadosClase',
+        descripcion: 'Resultados por clase',
         orden: 10,
         apt: 2,
         elegible: true
       },
       {
-        nombre: "resultadosCategoria",
-        descripcion: "Resultados por categoría",
+        nombre: 'resultadosCategoria',
+        descripcion: 'Resultados por categoría',
         orden: 11,
         apt: 2,
         elegible: true
       },
       {
-        nombre: "resultadosPosicion",
-        descripcion: "Resultados por posición",
+        nombre: 'resultadosPosicion',
+        descripcion: 'Resultados por posición',
         orden: 12,
         apt: 2,
         elegible: true
       },
       {
-        nombre: "resultadosMAE",
-        descripcion: "MAE de la planta",
+        nombre: 'resultadosMAE',
+        descripcion: 'MAE de la planta',
         orden: 13,
         apt: 2,
         elegible: true
       },
       {
-        nombre: "anexo1",
-        descripcion: "Anexo I: Listado resumen de anomalías térmicas",
+        nombre: 'anexo1',
+        descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
         orden: 14,
         elegible: true
       }
     ];
 
-    if (this.planta.tipo === "seguidores") {
+    if (this.planta.tipo === 'seguidores') {
       this.apartadosInforme.push({
-        nombre: "anexo2",
-        descripcion: "Anexo II: Anomalías térmicas por seguidor",
+        nombre: 'anexo2',
+        descripcion: 'Anexo II: Anomalías térmicas por seguidor',
         orden: 15,
         elegible: true
       });
@@ -478,17 +478,17 @@ export class ExportComponent implements OnInit {
 
   getPcColumnas(planta: PlantaInterface): any[] {
     let pcColumnasTemp = GLOBAL.pcColumnas;
-    const i = pcColumnasTemp.findIndex( (e) => e.nombre == 'local_xy')
+    const i = pcColumnasTemp.findIndex(e => e.nombre === 'local_xy');
     pcColumnasTemp[i].descripcion = this.plantaService
       .getNombreLocalX(planta)
-      .concat("/")
+      .concat('/')
       .concat(this.plantaService.getNombreLocalY(planta));
 
     return pcColumnasTemp;
   }
 
   loadImage(width: number, url: string) {
-    const canvas = document.createElement("canvas"); // Use Angular's Renderer2 method
+    const canvas = document.createElement('canvas'); // Use Angular's Renderer2 method
 
     fabric.util.loadImage(
       url,
@@ -496,11 +496,11 @@ export class ExportComponent implements OnInit {
         const scaleFactor = width / img.width;
         canvas.width = width;
         canvas.height = img.height * scaleFactor;
-        const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
       },
       null,
-      { crossOrigin: "anonymous" }
+      { crossOrigin: 'anonymous' }
     );
   }
 
@@ -530,7 +530,7 @@ export class ExportComponent implements OnInit {
     for (const y of this.arrayFilas) {
       const countColumnas = Array();
       for (const x of this.arrayColumnas) {
-        if (this.planta.tipo === "seguidores") {
+        if (this.planta.tipo === 'seguidores') {
           countColumnas.push(
             allPcs.filter(pc => pc.local_x === x && pc.local_y === y).length
           );
@@ -581,11 +581,11 @@ export class ExportComponent implements OnInit {
 
   public calificacionMae(mae: number) {
     if (mae <= 0.1) {
-      return "muy bueno";
+      return 'muy bueno';
     } else if (mae <= 0.2) {
-      return "correcto";
+      return 'correcto';
     } else {
-      return "mejorable";
+      return 'mejorable';
     }
   }
   // Ordena los pcs por global_y (pasillo)
@@ -626,7 +626,7 @@ export class ExportComponent implements OnInit {
     this.countLoadedImages = 0;
     this.countSeguidores = 1;
 
-    if (this.filtroApartados.includes("anexo2")) {
+    if (this.filtroApartados.includes('anexo2')) {
       this.countLoadedImages$.subscribe(nombreSeguidor => {
         if (nombreSeguidor !== null) {
           const canvas = $(
@@ -634,10 +634,10 @@ export class ExportComponent implements OnInit {
           )[0] as HTMLCanvasElement;
           imageListBase64[
             `imgSeguidorCanvas${nombreSeguidor}`
-          ] = canvas.toDataURL("image/jpeg", this.jpgQuality);
+          ] = canvas.toDataURL('image/jpeg', this.jpgQuality);
           this.progresoPDF = this.decimalPipe.transform(
             (100 * this.countLoadedImages) / this.countSeguidores,
-            "1.0-0"
+            '1.0-0'
           );
 
           // Si todo va bien...
@@ -649,13 +649,17 @@ export class ExportComponent implements OnInit {
 
                 this.calcularInforme();
 
-                const pdfDocGenerator = pdfMake.createPdf(
-                  this.getDocDefinition(imageListBase64)
-                );
+                // let docDefinition = this.getDocDefinition(imageListBase64);
+                // docDefinition.dom = JSON.stringify(docDefinition);
+                // docDefinition.dom = JSON.parse(docDefinition.dom);
+                // pdfMake
+                //   .createPdf(docDefinition.dom)
+                //   .download(this.informe.prefijo.concat('informe'));
 
-                pdfDocGenerator.download(
-                  this.informe.prefijo.concat("informe")
-                );
+                pdfMake
+                  .createPdf(this.getDocDefinition(imageListBase64))
+                  .download(this.informe.prefijo.concat('informe'));
+
                 // pdfDocGenerator.getDataUrl((dataUrl) => {
                 //     const iframe = document.createElement('iframe');
                 //     iframe.src = dataUrl;
@@ -678,16 +682,19 @@ export class ExportComponent implements OnInit {
 
           this.calcularInforme();
 
-          const pdfDocGenerator = pdfMake.createPdf(
-            this.getDocDefinition(imageListBase64)
-          );
+          // let docDefinition = this.getDocDefinition(imageListBase64);
+          // docDefinition.dom = JSON.stringify(docDefinition);
+          // docDefinition.dom = JSON.parse(docDefinition.dom);
 
-          pdfDocGenerator.download(
-            this.informe.prefijo.concat("informe"),
-            cb => {
+          // const pdfDocGenerator = pdfMake.createPdf(
+          //   this.getDocDefinition(imageListBase64)
+          // );
+
+          pdfMake
+            .createPdf(this.getDocDefinition(imageListBase64))
+            .download(this.informe.prefijo.concat('informe'), cb => {
               this.generandoPDF = false;
-            }
-          );
+            });
 
           // pdfDocGenerator.getDataUrl((dataUrl) => {
           //     const iframe = document.createElement('iframe');
@@ -699,7 +706,7 @@ export class ExportComponent implements OnInit {
     }
 
     // Generar imagenes
-    if (this.filtroApartados.includes("anexo2")) {
+    if (this.filtroApartados.includes('anexo2')) {
       this.countSeguidores = 0;
       for (const seguidor of this.filteredSeguidores) {
         this.setImgSeguidorCanvas(seguidor, false);
@@ -742,7 +749,7 @@ export class ExportComponent implements OnInit {
             this.countLoadedImages$.next(seguidor.nombre);
           }
         },
-        { crossOrigin: "Anonymous" }
+        { crossOrigin: 'Anonymous' }
       );
       // fabric.util.loadImage(
       //   url,
@@ -806,8 +813,8 @@ export class ExportComponent implements OnInit {
     const actObj1 = new fabric.Rect({
       left: pc.img_left,
       top: pc.img_top,
-      fill: "rgba(0,0,0,0)",
-      stroke: "black",
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'black',
       strokeWidth: 1,
       width: pc.img_width,
       height: pc.img_height,
@@ -817,13 +824,13 @@ export class ExportComponent implements OnInit {
       localId: pc.local_id,
       ref: false,
       selectable: false,
-      hoverCursor: "default"
+      hoverCursor: 'default'
     });
     const actObj2 = new fabric.Rect({
       left: pc.img_left - 1,
       top: pc.img_top - 1,
-      fill: "rgba(0,0,0,0)",
-      stroke: "red",
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'red',
       strokeWidth: 1,
       width: pc.img_width + 2,
       height: pc.img_height + 2,
@@ -832,20 +839,20 @@ export class ExportComponent implements OnInit {
       lockMovementX: true,
       localId: pc.local_id,
       ref: false,
-      hoverCursor: "pointer",
+      hoverCursor: 'pointer',
       selectable: true
     });
     const textId = new fabric.Text(
-      "#".concat(pc.local_id.toString().concat(" ")),
+      '#'.concat(pc.local_id.toString().concat(' ')),
       {
         left: pc.img_left,
         top: pc.img_top - 26,
         fontSize: 20,
         // textBackgroundColor: 'red',
-        ref: "text",
+        ref: 'text',
         selectable: false,
-        hoverCursor: "default",
-        fill: "white"
+        hoverCursor: 'default',
+        fill: 'white'
       }
     );
 
@@ -863,26 +870,26 @@ export class ExportComponent implements OnInit {
     const triangle = new fabric.Triangle({
       width: squareBase,
       height: squareBase,
-      fill: "red",
-      stroke: "black",
+      fill: 'red',
+      stroke: 'black',
       left: Math.round(x - squareBase / 2),
       top: y, // si no ponemos este 2, entonces no lee bien debajo del triangulo
       selectable: false,
-      ref: "triangle",
-      hoverCursor: "default"
+      ref: 'triangle',
+      hoverCursor: 'default'
     });
 
     const textTriangle = new fabric.Text(
-      " + ".concat(pc.gradienteNormalizado.toString().concat(" ºC ")),
+      ' + '.concat(pc.gradienteNormalizado.toString().concat(' ºC ')),
       {
         left: pc.img_left,
         top: pc.img_top + pc.img_height + 5,
         fontSize: 22,
-        textBackgroundColor: "white",
-        ref: "text",
+        textBackgroundColor: 'white',
+        ref: 'text',
         selectable: false,
-        hoverCursor: "default",
-        fill: "red"
+        hoverCursor: 'default',
+        fill: 'red'
       }
     );
 
@@ -916,7 +923,7 @@ export class ExportComponent implements OnInit {
   }
 
   onClickTipoInforme() {
-    if (this.tipoInforme === "2") {
+    if (this.tipoInforme === '2') {
       // let count = 0;
       for (const seguidor of this.filteredSeguidoresVistaPrevia) {
         this.setImgSeguidorCanvas(seguidor, true);
@@ -948,9 +955,9 @@ export class ExportComponent implements OnInit {
                   .transform(
                     (this.countCategoria[i - 1] / this.filteredPcs.length) *
                       100,
-                    "1.0-1"
+                    '1.0-1'
                   )
-                  .toString() + " %"
+                  .toString() + ' %'
             }
           )
         );
@@ -968,7 +975,7 @@ export class ExportComponent implements OnInit {
     for (const i of this.arrayColumnas) {
       arrayHeader.push({
         text: i.toString(),
-        style: "tableHeaderRed"
+        style: 'tableHeaderRed'
       });
     }
 
@@ -978,13 +985,13 @@ export class ExportComponent implements OnInit {
       const arrayFila = [];
       arrayFila.push({
         text: this.plantaService.getAltura(this.planta, j).toString(),
-        style: "tableHeaderRed"
+        style: 'tableHeaderRed'
       });
       const countPosicionFila = this.countPosicion[j - 1];
       for (const i of this.arrayColumnas) {
         arrayFila.push({
           text: countPosicionFila[i - 1].toString(),
-          style: "tableCell"
+          style: 'tableCell'
         });
       }
 
@@ -1003,10 +1010,10 @@ export class ExportComponent implements OnInit {
   }
 
   private getTextoLocalizar() {
-    if (this.planta.tipo === "seguidores") {
-      return "Además todos ellos tienen asociado los parámetros “seguidor”, “fila” y “columna” según el mapa habitual de la planta. Las filas y las columnas tienen origen en la esquina superior izquierda del seguidor.";
+    if (this.planta.tipo === 'seguidores') {
+      return 'Además todos ellos tienen asociado los parámetros “seguidor”, “fila” y “columna” según el mapa habitual de la planta. Las filas y las columnas tienen origen en la esquina superior izquierda del seguidor.';
     } else {
-      return "Además todos ellos tienen asociado los parámetros “pasillo”, “columna” y “altura” según el mapa habitual de la planta.";
+      return 'Además todos ellos tienen asociado los parámetros “pasillo”, “columna” y “altura” según el mapa habitual de la planta.';
     }
   }
 
@@ -1014,50 +1021,50 @@ export class ExportComponent implements OnInit {
     // PORTADA //
     const portada: any[] = [
       {
-        text: "Análisis termográfico aéreo de módulos fotovoltaicos",
-        style: "h1",
-        alignment: "center"
+        text: 'Análisis termográfico aéreo de módulos fotovoltaicos',
+        style: 'h1',
+        alignment: 'center'
       },
 
-      "\n",
+      '\n',
 
       {
         image: this.imgPortadaBase64,
         width: this.widthPortada,
-        alignment: "center"
+        alignment: 'center'
       },
 
-      "\n",
+      '\n',
 
       {
         text: [
           {
             text: `Planta solar: `,
-            style: "bold"
+            style: 'bold'
           },
           `${this.planta.nombre} (${this.planta.potencia} MW - ${this.planta.tipo})`
         ],
-        style: "subtitulo"
+        style: 'subtitulo'
       },
 
       {
         text: [
           {
             text: `Fecha del vuelo: `,
-            style: "bold"
+            style: 'bold'
           },
-          this.datePipe.transform(this.informe.fecha * 1000, "dd/MM/yyyy")
+          this.datePipe.transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
         ],
-        style: "subtitulo"
+        style: 'subtitulo'
       },
 
-      "\n\n",
+      '\n\n',
 
       {
         image: this.imgLogoBase64,
         width: this.widthLogo,
-        alignment: "center",
-        pageBreak: "after"
+        alignment: 'center',
+        pageBreak: 'after'
       }
     ];
 
@@ -1065,45 +1072,45 @@ export class ExportComponent implements OnInit {
       return [
         {
           text: `Este documento contiene los resultados de la inspección termográfica realizada en la planta solar fotovoltaica de ${this.planta.nombre} de ${this.planta.potencia} MW (${this.planta.tipo}).`,
-          style: "p"
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "Las inspecciones termográficas en instalaciones solares fotovoltaicas forman parte del mantenimiento preventivo recomendado para este tipo de instalaciones y tienen como objetivo anticiparse a aquellos problemas en los paneles que no son detectables fácilmente de otra manera.",
-          style: "p"
+            'Las inspecciones termográficas en instalaciones solares fotovoltaicas forman parte del mantenimiento preventivo recomendado para este tipo de instalaciones y tienen como objetivo anticiparse a aquellos problemas en los paneles que no son detectables fácilmente de otra manera.',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "Es importante que este mantenimiento sea llevado a cabo por profesionales, ya que una termografía mal realizada durante varios años puede afectar al estado general de la planta.",
-          style: "p"
+            'Es importante que este mantenimiento sea llevado a cabo por profesionales, ya que una termografía mal realizada durante varios años puede afectar al estado general de la planta.',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "Entre las ventajas de realizar termografía infrarroja de manera regular: permite aumentar la eficiencia de la planta (performance ratio) en el medio plazo, evitar reparaciones más costosas, aumentar la vida útil de los equipos, detectar problemas relacionados con distintos fabricantes de paneles, problemas de conexión entre módulos, problemas relacionados con la vegetación o la suciedad en los módulos... entre una larga lista de ventajas.",
-          style: "p"
+            'Entre las ventajas de realizar termografía infrarroja de manera regular: permite aumentar la eficiencia de la planta (performance ratio) en el medio plazo, evitar reparaciones más costosas, aumentar la vida útil de los equipos, detectar problemas relacionados con distintos fabricantes de paneles, problemas de conexión entre módulos, problemas relacionados con la vegetación o la suciedad en los módulos... entre una larga lista de ventajas.',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text: `La inspección ha sido realizada mediante vehículos aéreos no tripulados operados y diseñados a tal efecto${
             this.plantaService.getReferenciaSolardrone(this.planta)
-              ? " por Solardrone."
-              : "."
+              ? ' por Solardrone.'
+              : '.'
           } Se ha utilizado la más avanzada tecnología al servicio de la fotovoltaica con el fin de reducir al mínimo el tiempo y el coste de operación sin renunciar a la más alta calidad y fiabilidad. El equipo de que ha realizado el presente documento cuenta con personal formado en Termografía Infrarroja Nivel 1.`,
-          style: "p"
+          style: 'p'
         },
 
-        "\n\n"
+        '\n\n'
       ];
     };
 
@@ -1111,129 +1118,129 @@ export class ExportComponent implements OnInit {
       return [
         {
           text: `${index} - Criterios de operación`,
-          style: "h3"
+          style: 'h3'
         },
 
-        "\n",
+        '\n',
 
         {
           text: `El criterio base que${
             this.plantaService.getReferenciaSolardrone(this.planta)
-              ? " Solardrone"
-              : " se"
+              ? ' Solardrone'
+              : ' se'
           } ha seguido para realizar esta inspección termográfica es la norma internacional para inspecciones termográficas IEC 62446-3. En la misma se define cómo deben realizarse las termografías infrarrojas de módulos fotovoltaicos en plantas durante su operación`,
-          style: "p"
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "Hay dos niveles de inspección termográfica según la norma IEC 62446-3:",
-          style: "p"
+            'Hay dos niveles de inspección termográfica según la norma IEC 62446-3:',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           ul: [
             {
               text: [
                 {
-                  text: "Inspección simplificada",
+                  text: 'Inspección simplificada',
                   bold: true
                 },
-                ": Esta es una inspección limitada para verificar que los módulos están funcionando, con requisitos reducidos para el personal. Este tipo de inspecciones se usan, por ejemplo, durante una puesta en marcha básica de una planta fotovoltaica.\n\n"
+                ': Esta es una inspección limitada para verificar que los módulos están funcionando, con requisitos reducidos para el personal. Este tipo de inspecciones se usan, por ejemplo, durante una puesta en marcha básica de una planta fotovoltaica.\n\n'
               ],
-              style: "p"
+              style: 'p'
             },
             {
               text: [
                 {
-                  text: "Inspección detallada",
+                  text: 'Inspección detallada',
                   bold: true
                 },
-                ": Requiere una comprensión más profunda de las anomalías térmicas. Puede ser utilizado para inspecciones periódicas de acuerdo con a la serie IEC 62446 y para solucionar problemas en sistemas con un bajo rendimiento. Se realizan mediciones de temperatura absoluta. Un experto autorizado en plantas fotovoltaicas, junto con exportos termógrafos, pueden llevar a cabo este tipo de inspecciones."
+                ': Requiere una comprensión más profunda de las anomalías térmicas. Puede ser utilizado para inspecciones periódicas de acuerdo con a la serie IEC 62446 y para solucionar problemas en sistemas con un bajo rendimiento. Se realizan mediciones de temperatura absoluta. Un experto autorizado en plantas fotovoltaicas, junto con exportos termógrafos, pueden llevar a cabo este tipo de inspecciones.'
               ],
-              style: "p"
+              style: 'p'
             }
           ]
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "La termografía realizada entra dentro de las inspecciones detalladas indicadas por la norma, cumpliendo con los requisitos que indica la misma, que son:",
-          style: "p"
+            'La termografía realizada entra dentro de las inspecciones detalladas indicadas por la norma, cumpliendo con los requisitos que indica la misma, que son:',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           ul: [
             {
               text:
-                "Medición absoluta de temperaturas: con un error menor de 2 ºC.",
-              style: "p"
+                'Medición absoluta de temperaturas: con un error menor de 2 ºC.',
+              style: 'p'
             },
             {
-              text: "Medición de temperatura máxima, media y gradiente.",
-              style: "p"
-            },
-            {
-              text:
-                "Informe realizado por un experto en termografía infrarroja en conjunto con un experto en fotovoltaica.",
-              style: "p"
-            },
-            {
-              text: "Recomendación para cada tipo de anomalía registrada.",
-              style: "p"
+              text: 'Medición de temperatura máxima, media y gradiente.',
+              style: 'p'
             },
             {
               text:
-                "Resolución geométrica térmica: 5x5 pixels por cada célula fotovoltaica.",
-              style: "p"
+                'Informe realizado por un experto en termografía infrarroja en conjunto con un experto en fotovoltaica.',
+              style: 'p'
+            },
+            {
+              text: 'Recomendación para cada tipo de anomalía registrada.',
+              style: 'p'
             },
             {
               text:
-                "Resolución geométrica visual: 25x25 pixels por cada célula fotovoltaica.",
-              style: "p"
+                'Resolución geométrica térmica: 5x5 pixels por cada célula fotovoltaica.',
+              style: 'p'
             },
             {
               text:
-                "Condiciones ambientales correctas: temperatura ambiente, viento, nubosidad e irradiancia.",
-              style: "p"
-            },
-            {
-              text: "Calibración de los equipos: cada 2 años.",
-              style: "p"
+                'Resolución geométrica visual: 25x25 pixels por cada célula fotovoltaica.',
+              style: 'p'
             },
             {
               text:
-                "Parámetros térmicos: el ajuste de la emisividad y la temperatura reflejada es imprescindible para una correcta medición de las temperaturas. Es necesario hacer las mediciones oportunas en campo para poder obtener estos parámetros, ya que dependen de la atmósfera, la meteorología, la suciedad en los módulos el día del vuelo y de los materiales del propio módulo.",
-              style: "p"
+                'Condiciones ambientales correctas: temperatura ambiente, viento, nubosidad e irradiancia.',
+              style: 'p'
+            },
+            {
+              text: 'Calibración de los equipos: cada 2 años.',
+              style: 'p'
             },
             {
               text:
-                "Documentación: el entregable incluye las imágenes radiométricas y visuales originales junto con todos los datos que requiere la norma. ",
-              style: "p"
+                'Parámetros térmicos: el ajuste de la emisividad y la temperatura reflejada es imprescindible para una correcta medición de las temperaturas. Es necesario hacer las mediciones oportunas en campo para poder obtener estos parámetros, ya que dependen de la atmósfera, la meteorología, la suciedad en los módulos el día del vuelo y de los materiales del propio módulo.',
+              style: 'p'
             },
             {
-              text: "Trayectoria: que asegure el cumplimiento de la norma.",
-              style: "p"
+              text:
+                'Documentación: el entregable incluye las imágenes radiométricas y visuales originales junto con todos los datos que requiere la norma. ',
+              style: 'p'
             },
             {
-              text: "Velocidad: 10 km/h máximo.",
-              style: "p"
+              text: 'Trayectoria: que asegure el cumplimiento de la norma.',
+              style: 'p'
+            },
+            {
+              text: 'Velocidad: 10 km/h máximo.',
+              style: 'p'
             }
           ]
         },
 
-        "\n",
+        '\n',
 
         {
-          text: "\n\n"
+          text: '\n\n'
         }
       ];
     };
@@ -1242,32 +1249,32 @@ export class ExportComponent implements OnInit {
       return [
         {
           text: `${index} - Normalización de gradientes de temperatura`,
-          style: "h3"
+          style: 'h3'
         },
 
-        "\n",
+        '\n',
 
         {
           text: [
-            "Con el fin de poder ver la ",
+            'Con el fin de poder ver la ',
             {
-              text: "evolución de las anomalías térmicas con el tiempo",
-              style: "bold"
+              text: 'evolución de las anomalías térmicas con el tiempo',
+              style: 'bold'
             },
-            " comparando inspecciones termográficas llevadas a cabo en distintos meses o años (con condiciones ambientales distintas), es necesario contar con un procedimiento que permita normalizar los gradientes de temperatura."
+            ' comparando inspecciones termográficas llevadas a cabo en distintos meses o años (con condiciones ambientales distintas), es necesario contar con un procedimiento que permita normalizar los gradientes de temperatura.'
           ],
-          style: "p"
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
             'Por este motivo todas las anomalías registradas tienen asociada su "gradiente normalizado", que es el gradiente de temperatura equivalente a haber realizado la inspección con una irradiancia de 1000 W/m2. Esto permitirá poder comparar los resultados de la presente inspección con otras futuras realizadas en condiciones ambientales diferentes y así poder tener una evolución fidedigna de cada una de las anomalías.',
-          style: "p"
+          style: 'p'
         },
 
-        "\n\n"
+        '\n\n'
       ];
     };
 
@@ -1275,42 +1282,42 @@ export class ExportComponent implements OnInit {
       return [
         {
           text: `${index} - Datos del vuelo`,
-          style: "h3"
+          style: 'h3'
         },
 
-        "\n",
+        '\n',
 
         {
-          text: "Las condiciones durante le vuelo han sido las siguientes:",
-          style: "p"
+          text: 'Las condiciones durante le vuelo han sido las siguientes:',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           columns: [
             {
-              width: "*",
-              text: ""
+              width: '*',
+              text: ''
             },
 
             {
-              width: "auto",
+              width: 'auto',
               table: {
                 body: [
                   [
                     {
-                      text: "Vehículo aéreo no tripulado",
-                      style: "tableHeaderRed",
+                      text: 'Vehículo aéreo no tripulado',
+                      style: 'tableHeaderRed',
                       colSpan: 2,
-                      alignment: "center"
+                      alignment: 'center'
                     },
                     {}
                   ],
                   [
                     {
-                      text: "Aeronave",
-                      style: "tableLeft"
+                      text: 'Aeronave',
+                      style: 'tableLeft'
                     },
                     {
                       text: `${this.global.uav}`
@@ -1318,8 +1325,8 @@ export class ExportComponent implements OnInit {
                   ],
                   [
                     {
-                      text: "Cámara térmica",
-                      style: "tableLeft"
+                      text: 'Cámara térmica',
+                      style: 'tableLeft'
                     },
                     {
                       text: `${this.global.camaraTermica}`
@@ -1327,8 +1334,8 @@ export class ExportComponent implements OnInit {
                   ],
                   [
                     {
-                      text: "Última calibración",
-                      style: "tableLeft"
+                      text: 'Última calibración',
+                      style: 'tableLeft'
                     },
                     {
                       text: `${this.global.ultimaCalibracion}`
@@ -1337,31 +1344,31 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: "Datos del vuelo",
-                      style: "tableHeaderRed",
+                      text: 'Datos del vuelo',
+                      style: 'tableHeaderRed',
                       colSpan: 2,
-                      alignment: "center"
+                      alignment: 'center'
                     },
                     {}
                   ],
 
                   [
                     {
-                      text: "Fecha",
-                      style: "tableLeft"
+                      text: 'Fecha',
+                      style: 'tableLeft'
                     },
                     {
                       text: this.datePipe.transform(
                         this.informe.fecha * 1000,
-                        "dd/MM/yyyy"
+                        'dd/MM/yyyy'
                       )
                     }
                   ],
 
                   [
                     {
-                      text: "Horario de los vuelos",
-                      style: "tableLeft"
+                      text: 'Horario de los vuelos',
+                      style: 'tableLeft'
                     },
                     {
                       text: `${this.informe.hora_inicio} - ${this.informe.hora_fin}`
@@ -1370,8 +1377,8 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: "Velocidad",
-                      style: "tableLeft"
+                      text: 'Velocidad',
+                      style: 'tableLeft'
                     },
                     {
                       text: `${this.informe.velocidad} km/h`
@@ -1380,8 +1387,8 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: "GSD térmico (medio)",
-                      style: "tableLeft"
+                      text: 'GSD térmico (medio)',
+                      style: 'tableLeft'
                     },
                     {
                       text: `${this.informe.gsd} cm/pixel (+- 0.5cm/pixel )`
@@ -1390,8 +1397,8 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: "GSD visual",
-                      style: "tableLeft"
+                      text: 'GSD visual',
+                      style: 'tableLeft'
                     },
                     {
                       text: `${Math.round(this.informe.gsd * 0.16 * 100) /
@@ -1401,18 +1408,18 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: "Datos meteorológicos",
-                      style: "tableHeaderRed",
+                      text: 'Datos meteorológicos',
+                      style: 'tableHeaderRed',
                       colSpan: 2,
-                      alignment: "center"
+                      alignment: 'center'
                     },
                     {}
                   ],
 
                   [
                     {
-                      text: "Irradiancia (media)",
-                      style: "tableLeft"
+                      text: 'Irradiancia (media)',
+                      style: 'tableLeft'
                     },
                     {
                       text: `${this.irradianciaMedia} W/m2`
@@ -1421,8 +1428,8 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: "Temperatura ambiente",
-                      style: "tableLeft"
+                      text: 'Temperatura ambiente',
+                      style: 'tableLeft'
                     },
                     {
                       text: `${this.informe.temperatura} ºC`
@@ -1431,8 +1438,8 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: "Nubosidad",
-                      style: "tableLeft"
+                      text: 'Nubosidad',
+                      style: 'tableLeft'
                     },
                     {
                       text: `${this.informe.nubosidad} octavas`
@@ -1443,13 +1450,13 @@ export class ExportComponent implements OnInit {
             },
 
             {
-              width: "*",
-              text: ""
+              width: '*',
+              text: ''
             }
           ]
         },
 
-        "\n\n"
+        '\n\n'
       ];
     };
 
@@ -1457,25 +1464,25 @@ export class ExportComponent implements OnInit {
       return [
         {
           text: `${index} - Irradiancia durante el vuelo`,
-          style: "h3"
+          style: 'h3'
         },
 
-        "\n\n",
+        '\n\n',
 
         {
           text: this.getTextoIrradiancia(),
-          style: "p"
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           image: this.imgIrradianciaBase64,
           width: this.widthIrradiancia,
-          alignment: "center"
+          alignment: 'center'
         },
 
-        "\n\n"
+        '\n\n'
       ];
     };
 
@@ -1483,85 +1490,85 @@ export class ExportComponent implements OnInit {
       return [
         {
           text: `${index} - Ajuste de parámetros térmicos`,
-          style: "h3"
+          style: 'h3'
         },
 
-        "\n",
+        '\n',
 
         {
           text: [
-            "Con el fin de obtener medidas de temperaturas absolutas fiables, es necesario tener en cuenta distintas variables térmicas que afectan directamente al resultado de las medidas obtenidas por las cámaras. Las más importantes son ",
+            'Con el fin de obtener medidas de temperaturas absolutas fiables, es necesario tener en cuenta distintas variables térmicas que afectan directamente al resultado de las medidas obtenidas por las cámaras. Las más importantes son ',
             {
-              text: "la emisividad",
-              style: "bold"
+              text: 'la emisividad',
+              style: 'bold'
             },
-            " y la ",
+            ' y la ',
             {
-              text: "temperatura reflejada",
-              style: "bold"
+              text: 'temperatura reflejada',
+              style: 'bold'
             },
-            "."
+            '.'
           ],
-          style: "p"
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text: `${index}.1 - Emisividad`,
-          style: "h4"
+          style: 'h4'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "La emisividad del material se mide de manera experimental en campo y depende del tipo de vidrio de los módulos y de la suciedad que presenten el día del vuelo. La emisividad escogida por el termógrafo tras el ensayo experimental es la siguiente:",
-          style: "p"
+            'La emisividad del material se mide de manera experimental en campo y depende del tipo de vidrio de los módulos y de la suciedad que presenten el día del vuelo. La emisividad escogida por el termógrafo tras el ensayo experimental es la siguiente:',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
-          text: "Emisividad = " + this.informe.emisividad.toString(),
-          style: "param"
+          text: 'Emisividad = ' + this.informe.emisividad.toString(),
+          style: 'param'
         },
 
-        "\n",
+        '\n',
 
         // Imagen suciedad
         {
           image: this.imgSuciedadBase64,
           width: this.widthSuciedad,
-          alignment: "center"
+          alignment: 'center'
         },
 
-        "\n\n",
+        '\n\n',
 
         {
           text: `${index}.2 - Temperatura reflejada`,
-          style: "h4"
+          style: 'h4'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "La temperatura reflejada nos depende de la atmosfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura reflejada medida es:",
-          style: "p"
+            'La temperatura reflejada nos depende de la atmosfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura reflejada medida es:',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "Temperatura reflejada = " +
+            'Temperatura reflejada = ' +
             this.informe.tempReflejada.toString() +
-            " ºC",
-          style: "param"
+            ' ºC',
+          style: 'param'
         },
 
-        "\n\n"
+        '\n\n'
       ];
     };
 
@@ -1569,177 +1576,177 @@ export class ExportComponent implements OnInit {
       return [
         {
           text: `${index} - Pérdida de Performance Ratio (ΔPR)`,
-          style: "h3"
+          style: 'h3'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "El coeficiente de rendimiento de sistemas fotovoltaicos o Performance Ratio es un parámetro que tuvo su origen conceptual en la norma IES 61724 (1998) para ser utilizado como indicador de calidad en la evaluación de sistemas fotovoltaicos.\n\n",
-          style: "p"
+            'El coeficiente de rendimiento de sistemas fotovoltaicos o Performance Ratio es un parámetro que tuvo su origen conceptual en la norma IES 61724 (1998) para ser utilizado como indicador de calidad en la evaluación de sistemas fotovoltaicos.\n\n',
+          style: 'p'
         },
 
         {
           text:
-            "Este parámetro se utiliza para medir el rendimiento de cualquier sistema fotovoltaico. En otras palabras, si queremos saber si un módulo está generando la energía que debería bastaría con conocer su PR. No podemos conocer el PR de cada módulo con una termografía, pero lo que sí podemos conocer es la pérdida de PR (ΔPR) producida por anomalía térmica respecto a sus condiciones ideales. Es decir, un módulo con un punto caliente que causa una ΔPR = -1% tiene menos importancia que una anomalía que causa una ΔPR = -33%, el cual está haciendo caer la producción eléctrica del módulo en un 33%.",
-          style: "p"
+            'Este parámetro se utiliza para medir el rendimiento de cualquier sistema fotovoltaico. En otras palabras, si queremos saber si un módulo está generando la energía que debería bastaría con conocer su PR. No podemos conocer el PR de cada módulo con una termografía, pero lo que sí podemos conocer es la pérdida de PR (ΔPR) producida por anomalía térmica respecto a sus condiciones ideales. Es decir, un módulo con un punto caliente que causa una ΔPR = -1% tiene menos importancia que una anomalía que causa una ΔPR = -33%, el cual está haciendo caer la producción eléctrica del módulo en un 33%.',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "La pérdida de PR nos indica, por tanto, lo perjudicial que es una anomalía térmica, identificando explícitamente los puntos sobre los que se debe actuar para optimizar la producción eléctrica. Es un parámetro indispensable en el diagnóstico termográfico de una instalación fotovoltaica, ya que nos permite tomar decisiones en base a un dato técnico-económico objetivo.",
-          style: "p"
+            'La pérdida de PR nos indica, por tanto, lo perjudicial que es una anomalía térmica, identificando explícitamente los puntos sobre los que se debe actuar para optimizar la producción eléctrica. Es un parámetro indispensable en el diagnóstico termográfico de una instalación fotovoltaica, ya que nos permite tomar decisiones en base a un dato técnico-económico objetivo.',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "Para poder evaluar la planta utilizaremos los siguientes dos sencillos conceptos:",
-          style: "p"
+            'Para poder evaluar la planta utilizaremos los siguientes dos sencillos conceptos:',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text: `${index}.1 - Pérdidas de performance ratio (ΔPR)`,
-          style: "h4"
+          style: 'h4'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "Cada incidencia tiene una variación de performance ratio asociado. Por ejemplo, un diodo bypass en circuito abierto produce que el módulo trabaje al 15% de eficiencia en un caso típico (ΔPR=85%), mientras que una célula caliente aislada produce de media < 1% de pérdidas.",
-          style: "p"
+            'Cada incidencia tiene una variación de performance ratio asociado. Por ejemplo, un diodo bypass en circuito abierto produce que el módulo trabaje al 15% de eficiencia en un caso típico (ΔPR=85%), mientras que una célula caliente aislada produce de media < 1% de pérdidas.',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text: `${index}.2 - Módulos apagados equivalentes`,
-          style: "h4"
+          style: 'h4'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "El concepto “módulos apagados equivalentes” es la cantidad equivalente de módulos que no generan energía debido a las incidencias registradas en la planta. Por ejemplo, si tenemos tres módulos idénticos con un defecto en un diodo bypass cada uno, cada módulo genera un 33% menos de energía. Entonces, el número de módulos apagados equivalentes es 1.",
-          style: "p"
+            'El concepto “módulos apagados equivalentes” es la cantidad equivalente de módulos que no generan energía debido a las incidencias registradas en la planta. Por ejemplo, si tenemos tres módulos idénticos con un defecto en un diodo bypass cada uno, cada módulo genera un 33% menos de energía. Entonces, el número de módulos apagados equivalentes es 1.',
+          style: 'p'
         },
 
         {
           text:
-            "Uniendo los dos conceptos anteriores, se puede hacer una estimación “grosso modo” de la variación de PR de la planta de la siguiente manera:",
-          style: "p"
+            'Uniendo los dos conceptos anteriores, se puede hacer una estimación “grosso modo” de la variación de PR de la planta de la siguiente manera:',
+          style: 'p'
         },
 
         {
           image: this.imgFormulaMaeBase64,
           width: this.widthFormulaMae,
-          alignment: "center"
+          alignment: 'center'
         },
 
         {
           text:
-            "Siendo N = Número de módulos; PR = Performance ratio; MAE = Módulos apagados equivalente calculados",
-          style: "pieFoto"
+            'Siendo N = Número de módulos; PR = Performance ratio; MAE = Módulos apagados equivalente calculados',
+          style: 'pieFoto'
         },
 
-        "\n\n",
+        '\n\n',
 
         {
           text:
-            "Por lo tanto, sabiendo el MAE sabremos cuánto PR estamos perdiendo debido a las incidencias encontradas.",
-          style: "p"
+            'Por lo tanto, sabiendo el MAE sabremos cuánto PR estamos perdiendo debido a las incidencias encontradas.',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "El objetivo será obtener un MAE bajo, lo cual nos indicará un correcto mantenimiento de la planta.",
-          style: "p"
+            'El objetivo será obtener un MAE bajo, lo cual nos indicará un correcto mantenimiento de la planta.',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text: `Teniendo en cuenta todas las plantas fotovoltaicas inspeccionadas${
             this.plantaService.getReferenciaSolardrone(this.planta)
-              ? " por Solardrone,"
-              : ","
+              ? ' por Solardrone,'
+              : ','
           } se puede hacer una clasificación estadística según el MAE. Según la siguiente tabla, podemos clasificar el mantenimiento de una planta en 3 tipos: muy bueno (por debajo de la media), correcto (en la media) y "mejorable" (por encima de la media):`,
-          style: "p"
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         // Imagen maeCurva
         {
           image: this.imgCurvaMaeBase64,
           width: this.widthCurvaMae,
-          alignment: "center"
+          alignment: 'center'
         },
 
-        "\n\n",
+        '\n\n',
 
         {
           columns: [
             {
-              width: "*",
-              text: ""
+              width: '*',
+              text: ''
             },
 
             {
-              width: "auto",
+              width: 'auto',
               table: {
                 body: [
                   [
                     {
-                      text: "MAE de la planta",
-                      style: "tableHeader"
+                      text: 'MAE de la planta',
+                      style: 'tableHeader'
                     },
                     {
-                      text: "Estado",
-                      style: "tableHeader"
+                      text: 'Estado',
+                      style: 'tableHeader'
                     }
                   ],
                   [
                     {
-                      text: "% MAE < " + this.global.mae[0],
-                      style: ["mae1", "bold"]
+                      text: '% MAE < ' + this.global.mae[0],
+                      style: ['mae1', 'bold']
                     },
                     {
-                      text: "Muy bueno",
-                      style: "mae1"
+                      text: 'Muy bueno',
+                      style: 'mae1'
                     }
                   ],
                   [
                     {
                       text:
                         this.global.mae[0].toString() +
-                        " < % MAE <  " +
+                        ' < % MAE <  ' +
                         this.global.mae[1].toString(),
-                      style: ["mae2", "bold"]
+                      style: ['mae2', 'bold']
                     },
                     {
-                      text: "Correcto",
-                      style: "mae2"
+                      text: 'Correcto',
+                      style: 'mae2'
                     }
                   ],
                   [
                     {
-                      text: "% MAE > 0.2",
-                      style: ["mae3", "bold"]
+                      text: '% MAE > 0.2',
+                      style: ['mae3', 'bold']
                     },
                     {
-                      text: "Mejorable",
-                      style: "mae3"
+                      text: 'Mejorable',
+                      style: 'mae3'
                     }
                   ]
                 ]
@@ -1747,13 +1754,13 @@ export class ExportComponent implements OnInit {
             },
 
             {
-              width: "*",
-              text: ""
+              width: '*',
+              text: ''
             }
           ]
         },
 
-        "\n\n"
+        '\n\n'
       ];
     };
 
@@ -1761,55 +1768,55 @@ export class ExportComponent implements OnInit {
       return [
         {
           text: `${index} - Cómo se clasifican las anomalías térmicas (según IEC 62446-3)`,
-          style: "h3"
+          style: 'h3'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "Según la norma internacional IEC 62446-3 para inspecciones termográficas de instalaciones fotovoltaicas, las anomalías térmicas se clasifican en tres clases o CoA (Class of Abnormalitys):",
-          style: "p"
+            'Según la norma internacional IEC 62446-3 para inspecciones termográficas de instalaciones fotovoltaicas, las anomalías térmicas se clasifican en tres clases o CoA (Class of Abnormalitys):',
+          style: 'p'
         },
 
-        "\n\n",
+        '\n\n',
 
         {
           ul: [
             {
               text: [
                 {
-                  text: "CoA 1 - sin anomalía",
-                  style: ["coa1", "bold"]
+                  text: 'CoA 1 - sin anomalía',
+                  style: ['coa1', 'bold']
                 },
-                ": hacemos seguimiento, pero no hay que actuar."
+                ': hacemos seguimiento, pero no hay que actuar.'
               ],
-              style: "p"
+              style: 'p'
             },
             {
               text: [
                 {
-                  text: "CoA 2 - anomalía térmica",
-                  style: ["coa2", "bold"]
+                  text: 'CoA 2 - anomalía térmica',
+                  style: ['coa2', 'bold']
                 },
-                ": ver la causa y, si es necesario, arreglar en un periodo razonable."
+                ': ver la causa y, si es necesario, arreglar en un periodo razonable.'
               ],
-              style: "p"
+              style: 'p'
             },
             {
               text: [
                 {
-                  text: "CoA 3 - anomalía térmica relevante para la seguridad",
-                  style: ["coa3", "bold"]
+                  text: 'CoA 3 - anomalía térmica relevante para la seguridad',
+                  style: ['coa3', 'bold']
                 },
-                ": próxima interrupción de la operación normal del módulo, detectar la causa y rectificar en un periodo razonable."
+                ': próxima interrupción de la operación normal del módulo, detectar la causa y rectificar en un periodo razonable.'
               ],
-              style: "p"
+              style: 'p'
             }
           ]
         },
 
-        "\n\n"
+        '\n\n'
       ];
     };
 
@@ -1817,25 +1824,25 @@ export class ExportComponent implements OnInit {
       return [
         {
           text: `${index} - Cómo localizar las anomalías`,
-          style: "h3"
+          style: 'h3'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "Todas las incidencias tienen asociada una localización GPS, cuyo margen de error es de unos pocos metros (0-2 metros).",
-          style: "p"
+            'Todas las incidencias tienen asociada una localización GPS, cuyo margen de error es de unos pocos metros (0-2 metros).',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text: this.getTextoLocalizar(),
-          style: "p"
+          style: 'p'
         },
 
-        "\n\n"
+        '\n\n'
       ];
     };
 
@@ -1843,17 +1850,17 @@ export class ExportComponent implements OnInit {
       return [
         {
           text: `${index} - Resultados de la inspección termográfica`,
-          style: "h2",
-          pageBreak: "before",
-          alignment: "center"
+          style: 'h2',
+          pageBreak: 'before',
+          alignment: 'center'
         },
 
         {
-          text: "",
-          style: "p"
+          text: '',
+          style: 'p'
         },
 
-        "\n"
+        '\n'
       ];
     };
 
@@ -1861,27 +1868,27 @@ export class ExportComponent implements OnInit {
       return [
         {
           text: `${index} - Resultados por clase de anomalía (CoA)`,
-          style: "h3"
+          style: 'h3'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "A continuación se detallan la cantidad de incidencias registradas según su clase (1, 2 ó 3).",
-          style: "p"
+            'A continuación se detallan la cantidad de incidencias registradas según su clase (1, 2 ó 3).',
+          style: 'p'
         },
 
         {
           text: [
             `Se han registrado un total de `,
-            { text: this.countClase[1] + this.countClase[2], style: "bold" },
+            { text: this.countClase[1] + this.countClase[2], style: 'bold' },
             ` anomalías térmicas, de las cuales ${this.countClase[1]} son de clase 2 y ${this.countClase[2]} son de clase 3.`
           ],
-          style: "p"
+          style: 'p'
         },
 
-        "\n"
+        '\n'
       ];
     };
 
@@ -1889,42 +1896,42 @@ export class ExportComponent implements OnInit {
       return [
         {
           text: `${index} - Resultados por categoría de la anomalía`,
-          style: "h3"
+          style: 'h3'
         },
 
-        "\n",
+        '\n',
 
         {
           text: `La siguiente tabla muestra la cantidad de anomalías térmicas por categoría. En el caso de células calientes, sólo se incluyen aquellas con gradientes mayores a ${this.currentFiltroGradiente} ºC`,
-          style: "p"
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           columns: [
             {
-              width: "*",
-              text: ""
+              width: '*',
+              text: ''
             },
             {
-              width: "auto",
+              width: 'auto',
               table: {
                 body: [
                   [
                     {
-                      text: "Categoría",
-                      style: "tableHeaderRed"
+                      text: 'Categoría',
+                      style: 'tableHeaderRed'
                     },
 
                     {
-                      text: "Cantidad",
-                      style: "tableHeaderRed"
+                      text: 'Cantidad',
+                      style: 'tableHeaderRed'
                     },
 
                     {
-                      text: "Porcentaje %",
-                      style: "tableHeaderRed"
+                      text: 'Porcentaje %',
+                      style: 'tableHeaderRed'
                     }
                   ]
                 ]
@@ -1932,16 +1939,16 @@ export class ExportComponent implements OnInit {
                   .concat([
                     [
                       {
-                        text: "TOTAL",
-                        style: "bold"
+                        text: 'TOTAL',
+                        style: 'bold'
                       },
                       {
                         text: this.filteredPcs.length.toString(),
-                        style: "bold"
+                        style: 'bold'
                       },
                       {
-                        text: "100%",
-                        style: "bold"
+                        text: '100%',
+                        style: 'bold'
                       }
                     ]
                   ])
@@ -1949,68 +1956,68 @@ export class ExportComponent implements OnInit {
             },
 
             {
-              width: "*",
-              text: ""
+              width: '*',
+              text: ''
             }
           ]
         },
 
-        "\n\n"
+        '\n\n'
       ];
     };
 
     const resultadosPosicion = (index: string) => {
       let texto1;
-      if (this.planta.tipo === "seguidores") {
+      if (this.planta.tipo === 'seguidores') {
         texto1 =
-          "Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran (fila y columna) dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.";
+          'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran (fila y columna) dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.';
       } else {
         texto1 =
-          "Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.";
+          'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.';
       }
       return [
         {
           text: `${index} - Resultados por posición de la anomalía dentro del seguidor`,
-          style: "h3"
+          style: 'h3'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "Esta clasificación tiene como fin detectar posibles problemas relacionados con la posición de cada módulo. De este análisis se obtienen problemas relacionados con la vegetación de la instalación, deposiciones de pájaros, etc.",
-          style: "p"
+            'Esta clasificación tiene como fin detectar posibles problemas relacionados con la posición de cada módulo. De este análisis se obtienen problemas relacionados con la vegetación de la instalación, deposiciones de pájaros, etc.',
+          style: 'p'
         },
-        "\n",
+        '\n',
 
         {
           text: texto1,
-          style: "p"
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           columns: [
             {
-              width: "*",
-              text: ""
+              width: '*',
+              text: ''
             },
 
             {
-              width: "auto",
+              width: 'auto',
               table: {
                 body: this.getTablaPosicion()
               }
             },
             {
-              width: "*",
-              text: ""
+              width: '*',
+              text: ''
             }
           ]
         },
 
-        "\n"
+        '\n'
       ];
     };
 
@@ -2018,45 +2025,45 @@ export class ExportComponent implements OnInit {
       return [
         {
           text: `${index} - MAE de la planta`,
-          style: "h3"
+          style: 'h3'
         },
 
-        "\n",
+        '\n',
 
         {
           text:
-            "El MAE (módulo apagados equivalentes) nos da medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.",
-          style: "p"
+            'El MAE (módulo apagados equivalentes) nos da medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.',
+          style: 'p'
         },
 
-        "\n",
+        '\n',
 
         {
           text: `MAE = ∆PR / PR = ${this.informe.mae} % (${this.calificacionMae(
             this.informe.mae
           )})`,
-          style: "param"
+          style: 'param'
         },
 
-        "\n",
+        '\n',
 
         {
           text: [
             `El MAE de ${this.planta.nombre} el ${this.datePipe.transform(
               this.informe.fecha * 1000,
-              "dd/MM/yyyy"
+              'dd/MM/yyyy'
             )} es `,
             {
               text: `${this.informe.mae} %`,
-              style: "bold"
+              style: 'bold'
             },
             ` lo que nos indica un MAE `,
             {
               text: `${this.calificacionMae(this.informe.mae)}.`,
-              style: "bold"
+              style: 'bold'
             }
           ],
-          style: "p"
+          style: 'p'
         }
       ];
     };
@@ -2069,89 +2076,89 @@ export class ExportComponent implements OnInit {
 
     result = result.concat([
       {
-        text: "1 - Introducción",
-        style: "h2",
-        alignment: "center"
+        text: '1 - Introducción',
+        style: 'h2',
+        alignment: 'center'
       },
 
-      "\n"
+      '\n'
     ]);
 
-    if (this.filtroApartados.includes("introduccion")) {
+    if (this.filtroApartados.includes('introduccion')) {
       apartado = titulo
         .toString()
-        .concat(".")
+        .concat('.')
         .concat(subtitulo.toString());
       result = result.concat(introduccion(apartado));
     }
 
-    if (this.filtroApartados.includes("criterios")) {
+    if (this.filtroApartados.includes('criterios')) {
       apartado = titulo
         .toString()
-        .concat(".")
+        .concat('.')
         .concat(subtitulo.toString());
       result = result.concat(criterios(apartado));
       subtitulo = subtitulo + 1;
     }
 
-    if (this.filtroApartados.includes("normalizacion")) {
+    if (this.filtroApartados.includes('normalizacion')) {
       apartado = titulo
         .toString()
-        .concat(".")
+        .concat('.')
         .concat(subtitulo.toString());
       result = result.concat(normalizacion(apartado));
       subtitulo = subtitulo + 1;
     }
 
-    if (this.filtroApartados.includes("datosVuelo")) {
+    if (this.filtroApartados.includes('datosVuelo')) {
       apartado = titulo
         .toString()
-        .concat(".")
+        .concat('.')
         .concat(subtitulo.toString());
       result = result.concat(datosVuelo(apartado));
       subtitulo = subtitulo + 1;
     }
 
-    if (this.filtroApartados.includes("irradiancia")) {
+    if (this.filtroApartados.includes('irradiancia')) {
       apartado = titulo
         .toString()
-        .concat(".")
+        .concat('.')
         .concat(subtitulo.toString());
       result = result.concat(irradiancia(apartado));
       subtitulo = subtitulo + 1;
     }
 
-    if (this.filtroApartados.includes("paramsTermicos")) {
+    if (this.filtroApartados.includes('paramsTermicos')) {
       apartado = titulo
         .toString()
-        .concat(".")
+        .concat('.')
         .concat(subtitulo.toString());
       result = result.concat(paramsTermicos(apartado));
       subtitulo = subtitulo + 1;
     }
 
-    if (this.filtroApartados.includes("perdidaPR")) {
+    if (this.filtroApartados.includes('perdidaPR')) {
       apartado = titulo
         .toString()
-        .concat(".")
+        .concat('.')
         .concat(subtitulo.toString());
       result = result.concat(perdidaPR(apartado));
       subtitulo = subtitulo + 1;
     }
 
-    if (this.filtroApartados.includes("clasificacion")) {
+    if (this.filtroApartados.includes('clasificacion')) {
       apartado = titulo
         .toString()
-        .concat(".")
+        .concat('.')
         .concat(subtitulo.toString());
       result = result.concat(clasificacion(apartado));
       subtitulo = subtitulo + 1;
     }
 
-    if (this.filtroApartados.includes("localizar")) {
+    if (this.filtroApartados.includes('localizar')) {
       apartado = titulo
         .toString()
-        .concat(".")
+        .concat('.')
         .concat(subtitulo.toString());
       result = result.concat(localizar(apartado));
       subtitulo = subtitulo + 1;
@@ -2159,41 +2166,41 @@ export class ExportComponent implements OnInit {
 
     titulo = titulo + 1;
     subtitulo = 1;
-    apartado = "2";
+    apartado = '2';
 
     result = result.concat(resultados(apartado));
 
-    if (this.filtroApartados.includes("resultadosClase")) {
+    if (this.filtroApartados.includes('resultadosClase')) {
       apartado = titulo
         .toString()
-        .concat(".")
+        .concat('.')
         .concat(subtitulo.toString());
       result = result.concat(resultadosClase(apartado));
       subtitulo = subtitulo + 1;
     }
 
-    if (this.filtroApartados.includes("resultadosCategoria")) {
+    if (this.filtroApartados.includes('resultadosCategoria')) {
       apartado = titulo
         .toString()
-        .concat(".")
+        .concat('.')
         .concat(subtitulo.toString());
       result = result.concat(resultadosCategoria(apartado));
       subtitulo = subtitulo + 1;
     }
 
-    if (this.filtroApartados.includes("resultadosPosicion")) {
+    if (this.filtroApartados.includes('resultadosPosicion')) {
       apartado = titulo
         .toString()
-        .concat(".")
+        .concat('.')
         .concat(subtitulo.toString());
       result = result.concat(resultadosPosicion(apartado));
       subtitulo = subtitulo + 1;
     }
 
-    if (this.filtroApartados.includes("resultadosMAE") && !this.hasUserArea) {
+    if (this.filtroApartados.includes('resultadosMAE') && !this.hasUserArea) {
       apartado = titulo
         .toString()
-        .concat(".")
+        .concat('.')
         .concat(subtitulo.toString());
       result = result.concat(resultadosMAE(apartado));
       subtitulo = subtitulo + 1;
@@ -2231,37 +2238,37 @@ export class ExportComponent implements OnInit {
     // tslint:disable-next-line:max-line-length
     const pag1Anexo = {
       text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n Anexo ${numAnexo}: Listado de anomalías térmicas`,
-      style: "h1",
-      alignment: "center",
-      pageBreak: "before"
+      style: 'h1',
+      alignment: 'center',
+      pageBreak: 'before'
     };
 
     allPagsAnexoLista.push(pag1Anexo);
 
     allPagsAnexoLista.push({
-      text: "",
-      pageBreak: "after"
+      text: '',
+      pageBreak: 'after'
     });
 
     // Header
     const cabecera = [];
     cabecera.push({
-      text: "Número",
-      style: "tableHeaderRed"
+      text: 'Número',
+      style: 'tableHeaderRed'
     });
 
-    if (this.planta.tipo === "seguidores") {
+    if (this.planta.tipo === 'seguidores') {
       this.filteredPcs = this.filteredPcs.sort(this.sortByGlobalX);
       cabecera.push({
-        text: "Seguidor",
-        style: "tableHeaderRed",
+        text: 'Seguidor',
+        style: 'tableHeaderRed',
         noWrap: true
       });
     } else {
       this.filteredPcs = this.filteredPcs.sort(this.sortByGlobalY);
       cabecera.push({
         text: this.plantaService.getNombreColsGlobal(this.planta),
-        style: "tableHeaderRed",
+        style: 'tableHeaderRed',
         noWrap: true
       });
     }
@@ -2269,7 +2276,7 @@ export class ExportComponent implements OnInit {
     for (const c of this.currentFilteredColumnas) {
       cabecera.push({
         text: this.getEncabezadoTablaSeguidor(c),
-        style: "tableHeaderRed"
+        style: 'tableHeaderRed'
       });
     }
 
@@ -2284,18 +2291,18 @@ export class ExportComponent implements OnInit {
       row.push({
         text: `${contadorPcs}/${totalPcs}`,
         noWrap: true,
-        style: "tableCellAnexo1"
+        style: 'tableCellAnexo1'
       });
       row.push({
         text: this.plantaService.getEtiquetaGlobals(pc),
         noWrap: true,
-        style: "tableCellAnexo1"
+        style: 'tableCellAnexo1'
       });
       for (let c of this.currentFilteredColumnas) {
         row.push({
           text: this.getTextoColumnaPc(pc, c.nombre),
           noWrap: true,
-          style: "tableCellAnexo1"
+          style: 'tableCellAnexo1'
         });
       }
       body.push(row);
@@ -2305,25 +2312,25 @@ export class ExportComponent implements OnInit {
       {
         columns: [
           {
-            width: "*",
-            text: ""
+            width: '*',
+            text: ''
           },
           {
-            width: "auto",
+            width: 'auto',
             table: {
               headerRows: 1,
               body: [cabecera].concat(body)
             }
           },
           {
-            width: "*",
-            text: ""
+            width: '*',
+            text: ''
           }
         ]
       },
 
       {
-        text: ""
+        text: ''
       }
     ];
 
@@ -2331,25 +2338,25 @@ export class ExportComponent implements OnInit {
   }
 
   getTextoColumnaPc(pc: PcInterface, columnaNombre: string): string {
-    if (columnaNombre === "tipo") {
-      return this.pcDescripcion[pc["tipo"]];
+    if (columnaNombre === 'tipo') {
+      return this.pcDescripcion[pc['tipo']];
     } else if (
-      columnaNombre === "gradienteNormalizado" ||
-      columnaNombre === "temperaturaMax"
+      columnaNombre === 'gradienteNormalizado' ||
+      columnaNombre === 'temperaturaMax'
     ) {
-      return (Math.round(pc[columnaNombre] * 10) / 10).toString().concat(" ºC");
-    } else if (columnaNombre === "irradiancia") {
-      return Math.round(pc["irradiancia"])
+      return (Math.round(pc[columnaNombre] * 10) / 10).toString().concat(' ºC');
+    } else if (columnaNombre === 'irradiancia') {
+      return Math.round(pc['irradiancia'])
         .toString()
-        .concat(" W/m2");
-    } else if (columnaNombre === "datetimeString") {
+        .concat(' W/m2');
+    } else if (columnaNombre === 'datetimeString') {
       return this.datePipe
-        .transform(this.informe.fecha * 1000, "dd/MM/yyyy")
-        .concat(" ")
-        .concat(this.datePipe.transform(pc.datetime * 1000, "HH:mm:ss"));
-    } else if (columnaNombre === "local_xy") {
+        .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
+        .concat(' ')
+        .concat(this.datePipe.transform(pc.datetime * 1000, 'HH:mm:ss'));
+    } else if (columnaNombre === 'local_xy') {
       return this.plantaService.getNumeroModulo(this.planta, pc).toString();
-    } else if (columnaNombre === "severidad") {
+    } else if (columnaNombre === 'severidad') {
       return this.pcService.getPcCoA(pc).toString();
     } else {
       return pc[columnaNombre];
@@ -2357,9 +2364,9 @@ export class ExportComponent implements OnInit {
   }
 
   getEncabezadoTablaSeguidor(columna) {
-    if (columna.nombre === "local_xy") {
-      if (this.planta.hasOwnProperty("etiquetasLocalXY")) {
-        return "Nº Módulo";
+    if (columna.nombre === 'local_xy') {
+      if (this.planta.hasOwnProperty('etiquetasLocalXY')) {
+        return 'Nº Módulo';
       }
     }
     return columna.descripcion;
@@ -2373,13 +2380,13 @@ export class ExportComponent implements OnInit {
     });
 
     cabecera.push({
-      text: "Número",
-      style: "tableHeaderRed"
+      text: 'Número',
+      style: 'tableHeaderRed'
     });
     for (const col of columnasAnexoSeguidor) {
       cabecera.push({
         text: this.getEncabezadoTablaSeguidor(col),
-        style: "tableHeaderRed"
+        style: 'tableHeaderRed'
       });
     }
 
@@ -2393,14 +2400,14 @@ export class ExportComponent implements OnInit {
       row.push({
         text: `${contadorPcs}/${totalPcsSeguidor}`,
         noWrap: true,
-        style: "tableCellAnexo1"
+        style: 'tableCellAnexo1'
       });
 
       for (const col of columnasAnexoSeguidor) {
         row.push({
           text: this.getTextoColumnaPc(pc, col.nombre),
           noWrap: true,
-          style: "tableCellAnexo1"
+          style: 'tableCellAnexo1'
         });
       }
       body.push(row);
@@ -2409,19 +2416,19 @@ export class ExportComponent implements OnInit {
   }
 
   writeModulo(pc: PcInterface) {
-    if (!pc.hasOwnProperty("modulo")) {
-      return "-";
+    if (!pc.hasOwnProperty('modulo')) {
+      return '-';
     }
     const modulo = pc.modulo;
-    let new_row = "";
-    if (modulo.hasOwnProperty("marca")) {
-      new_row = new_row.concat(modulo["marca"].toString()).concat(" ");
+    let new_row = '';
+    if (modulo.hasOwnProperty('marca')) {
+      new_row = new_row.concat(modulo['marca'].toString()).concat(' ');
     }
-    if (modulo.hasOwnProperty("modelo")) {
-      new_row = new_row.concat(modulo["modelo"].toString()).concat(" ");
+    if (modulo.hasOwnProperty('modelo')) {
+      new_row = new_row.concat(modulo['modelo'].toString()).concat(' ');
     }
-    if (modulo.hasOwnProperty("potencia")) {
-      new_row = new_row.concat(modulo["potencia"].toString()).concat(" W");
+    if (modulo.hasOwnProperty('potencia')) {
+      new_row = new_row.concat(modulo['potencia'].toString()).concat(' W');
     }
 
     return new_row;
@@ -2432,9 +2439,9 @@ export class ExportComponent implements OnInit {
     // tslint:disable-next-line:max-line-length
     const pag1Anexo = {
       text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n Anexo ${numAnexo}: Anomalías térmicas por seguidor`,
-      style: "h1",
-      alignment: "center",
-      pageBreak: "before"
+      style: 'h1',
+      alignment: 'center',
+      pageBreak: 'before'
     };
 
     allPagsAnexo.push(pag1Anexo);
@@ -2444,121 +2451,121 @@ export class ExportComponent implements OnInit {
 
       const pagAnexo = [
         {
-          text: "Seguidor " + s.nombre,
-          style: "h2",
-          alignment: "center",
-          pageBreak: "before"
+          text: 'Seguidor ' + s.nombre,
+          style: 'h2',
+          alignment: 'center',
+          pageBreak: 'before'
         },
 
-        "\n",
+        '\n',
 
         {
           image: `imgSeguidorCanvas${s.nombre}`,
           width: this.widthSeguidor,
-          alignment: "center"
+          alignment: 'center'
         },
 
-        "\n",
+        '\n',
 
         {
           columns: [
             {
-              width: "*",
-              text: ""
+              width: '*',
+              text: ''
             },
 
             {
-              width: "auto",
+              width: 'auto',
               table: {
                 body: [
                   [
                     {
-                      text: "Fecha/Hora",
-                      style: "tableHeaderImageData"
+                      text: 'Fecha/Hora',
+                      style: 'tableHeaderImageData'
                     },
 
                     {
-                      text: "Irradiancia",
-                      style: "tableHeaderImageData"
+                      text: 'Irradiancia',
+                      style: 'tableHeaderImageData'
                     },
 
                     {
-                      text: "Temp. ambiente",
-                      style: "tableHeaderImageData"
+                      text: 'Temp. ambiente',
+                      style: 'tableHeaderImageData'
                     },
 
                     {
-                      text: "Viento",
-                      style: "tableHeaderImageData"
+                      text: 'Viento',
+                      style: 'tableHeaderImageData'
                     },
 
                     {
-                      text: "Emisividad",
-                      style: "tableHeaderImageData"
+                      text: 'Emisividad',
+                      style: 'tableHeaderImageData'
                     },
 
                     {
-                      text: "Temp. reflejada",
-                      style: "tableHeaderImageData"
+                      text: 'Temp. reflejada',
+                      style: 'tableHeaderImageData'
                     },
                     {
-                      text: "Módulo",
-                      style: "tableHeaderImageData"
+                      text: 'Módulo',
+                      style: 'tableHeaderImageData'
                     }
                   ],
                   [
                     {
                       text: this.datePipe
-                        .transform(this.informe.fecha * 1000, "dd/MM/yyyy")
-                        .concat(" ")
+                        .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
+                        .concat(' ')
                         .concat(
                           this.datePipe.transform(
                             s.pcs[0].datetime * 1000,
-                            "HH:mm:ss"
+                            'HH:mm:ss'
                           )
                         ),
-                      style: "tableCellAnexo1",
+                      style: 'tableCellAnexo1',
                       noWrap: true
                     },
 
                     {
                       text: Math.round(s.pcs[0].irradiancia)
                         .toString()
-                        .concat(" W/m2"),
-                      style: "tableCellAnexo1",
+                        .concat(' W/m2'),
+                      style: 'tableCellAnexo1',
                       noWrap: true
                     },
                     {
                       text: Math.round(s.pcs[0].temperaturaAire)
                         .toString()
-                        .concat(" ºC"),
-                      style: "tableCellAnexo1",
+                        .concat(' ºC'),
+                      style: 'tableCellAnexo1',
                       noWrap: true
                     },
 
                     {
                       text: s.pcs[0].viento,
-                      style: "tableCellAnexo1",
+                      style: 'tableCellAnexo1',
                       noWrap: true
                     },
 
                     {
                       text: s.pcs[0].emisividad,
-                      style: "tableCellAnexo1",
+                      style: 'tableCellAnexo1',
                       noWrap: true
                     },
 
                     {
                       text: Math.round(s.pcs[0].temperaturaReflejada)
                         .toString()
-                        .concat(" ºC"),
-                      style: "tableCellAnexo1",
+                        .concat(' ºC'),
+                      style: 'tableCellAnexo1',
                       noWrap: true
                     },
 
                     {
                       text: this.writeModulo(s.pcs[0]),
-                      style: "tableCellAnexo1",
+                      style: 'tableCellAnexo1',
                       noWrap: true
                     }
                   ]
@@ -2567,30 +2574,30 @@ export class ExportComponent implements OnInit {
             },
 
             {
-              width: "*",
-              text: ""
+              width: '*',
+              text: ''
             }
           ]
         },
 
-        "\n",
+        '\n',
 
         {
           columns: [
             {
-              width: "*",
-              text: ""
+              width: '*',
+              text: ''
             },
             {
-              width: "auto",
+              width: 'auto',
               table: {
                 headerRows: 1,
                 body: [table[0]].concat(table[1])
               }
             },
             {
-              width: "*",
-              text: ""
+              width: '*',
+              text: ''
             }
           ]
         }
@@ -2606,13 +2613,13 @@ export class ExportComponent implements OnInit {
     const pages = this.getPagesPDF();
     let anexo1 = [];
     let anexo2 = [];
-    let numAnexo = "I";
+    let numAnexo = 'I';
 
-    if (this.filtroApartados.includes("anexo1")) {
+    if (this.filtroApartados.includes('anexo1')) {
       anexo1 = this.getAnexoLista(numAnexo);
-      numAnexo = "II";
+      numAnexo = 'II';
     }
-    if (this.filtroApartados.includes("anexo2")) {
+    if (this.filtroApartados.includes('anexo2')) {
       anexo2 = this.getAnexoSeguidores(numAnexo);
     }
 
@@ -2650,19 +2657,19 @@ export class ExportComponent implements OnInit {
           return [
             {
               table: {
-                widths: ["*"],
+                widths: ['*'],
                 body: [
                   [
                     {
                       text: currentPage,
-                      alignment: "center",
-                      color: "grey",
+                      alignment: 'center',
+                      color: 'grey',
                       margin: [0, 10, 0, 0]
                     }
                   ]
                 ]
               },
-              layout: "noBorders"
+              layout: 'noBorders'
             }
           ];
         }
@@ -2688,89 +2695,89 @@ export class ExportComponent implements OnInit {
         h5: {
           fontSize: 13,
           bold: false,
-          decoration: "underline",
+          decoration: 'underline',
           margin: [30, 0, 30, 0]
         },
         p: {
-          alignment: "justify",
+          alignment: 'justify',
           margin: [30, 0, 30, 0]
         },
         tableHeaderRed: {
-          alignment: "center",
+          alignment: 'center',
           bold: true,
           fontSize: 10,
-          fillColor: "#003b73",
-          color: "white"
+          fillColor: '#003b73',
+          color: 'white'
         },
 
         tableHeaderImageData: {
-          alignment: "center",
+          alignment: 'center',
           bold: true,
           fontSize: 10,
-          fillColor: "#4cb6c9"
+          fillColor: '#4cb6c9'
         },
 
         tableCellAnexo1: {
-          alignment: "center",
+          alignment: 'center',
           fontSize: 9
         },
 
         tableHeader: {
-          alignment: "center",
+          alignment: 'center',
           bold: true,
           fontSize: 13
         },
 
         pieFoto: {
-          alignment: "center",
+          alignment: 'center',
           fontSize: 11,
           italics: true,
-          color: "gray"
+          color: 'gray'
         },
         subtitulo: {
-          alignment: "right",
+          alignment: 'right',
           fontSize: 15
         },
 
         table: {
-          alignment: "center"
+          alignment: 'center'
         },
 
         param: {
-          alignment: "center",
+          alignment: 'center',
           bold: true,
-          decoration: "underline"
+          decoration: 'underline'
         },
         tableCell: {
-          alignment: "center"
+          alignment: 'center'
         },
         mae1: {
-          fillColor: "#559c55",
-          alignment: "center"
+          fillColor: '#559c55',
+          alignment: 'center'
         },
         bold: {
           bold: true
         },
         mae2: {
-          fillColor: "#00a0ea",
-          alignment: "center"
+          fillColor: '#00a0ea',
+          alignment: 'center'
         },
         mae3: {
-          fillColor: "#fdc400",
-          alignment: "center"
+          fillColor: '#fdc400',
+          alignment: 'center'
         },
         coa1: {
-          color: "black"
+          color: 'black'
         },
         coa2: {
-          color: "orange"
+          color: 'orange'
         },
         coa3: {
-          color: "red"
+          color: 'red'
         },
         tableLeft: {
           bold: true,
-          alignment: "right"
+          alignment: 'right'
         }
       }
     };
