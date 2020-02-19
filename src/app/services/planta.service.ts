@@ -6,7 +6,7 @@ import {
 } from '@angular/fire/firestore';
 import { PlantaInterface } from 'src/app/models/planta';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map, filter, switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { LocationAreaInterface } from '../models/location';
 
 import { UserInterface } from '../models/user';
@@ -325,18 +325,14 @@ export class PlantaService {
 
   getEtiquetaGlobals(pc: PcInterface): string {
     let nombreEtiqueta = '';
-    if (pc.hasOwnProperty('global_x')) {
-      if (!Number.isNaN(pc.global_x)) {
-      nombreEtiqueta = nombreEtiqueta.concat(pc.global_x.toString());
-      }
+    if (pc.hasOwnProperty('global_x') && !Number.isNaN(pc.global_x)) {
+        nombreEtiqueta = nombreEtiqueta.concat(pc.global_x.toString());
     }
     if (pc.hasOwnProperty('global_y')) {
-      if (nombreEtiqueta.length > 0) {
-        if (!Number.isNaN(pc.global_y)) {
+      if (nombreEtiqueta.length > 0 && !Number.isNaN(pc.global_y)) {
         nombreEtiqueta = nombreEtiqueta.concat('/');
-        }
+        nombreEtiqueta = nombreEtiqueta.concat(pc.global_y.toString());
       }
-      nombreEtiqueta = nombreEtiqueta.concat(pc.global_y.toString());
     }
     return nombreEtiqueta;
   }
@@ -431,21 +427,16 @@ export class PlantaService {
     return '';
   }
   getNombreLocalX(planta: PlantaInterface): string {
-    if (planta.tipo !== '2 ejes') {
-      if (planta.hasOwnProperty('nombreLocalX')) {
-        return planta.nombreLocalX;
-      }
-      return GLOBAL.nombreLocalXFija;
+    if (planta.hasOwnProperty('nombreLocalX')) {
+      return planta.nombreLocalX;
     }
-    return '';
+    return GLOBAL.nombreLocalXFija;
   }
+
   getNombreLocalY(planta: PlantaInterface): string {
-    if (planta.tipo !== '2 ejes') {
-      if (planta.hasOwnProperty('nombreLocalY')) {
-        return planta.nombreLocalY;
-      }
-      return GLOBAL.nombreLocalYFija;
+    if (planta.hasOwnProperty('nombreLocalY')) {
+      return planta.nombreLocalY;
     }
-    return '';
+    return GLOBAL.nombreLocalYFija;
   }
 }
