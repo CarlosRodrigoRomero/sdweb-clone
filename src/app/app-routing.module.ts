@@ -12,6 +12,7 @@ import { AutoLocComponent } from "./cts/auto-loc/auto-loc.component";
 import { PlantaAddComponent } from "./cts/planta-add/planta-add.component";
 import { InformeAddComponent } from "./cts/informe-add/informe-add.component";
 import { PlantaEditComponent } from "./cts/planta-edit/planta-edit.component";
+import { AvisoLegalComponent } from './cts/aviso-legal/aviso-legal.component';
 
 const routes: Routes = [
   // {
@@ -68,6 +69,9 @@ const routes: Routes = [
   // },
   // { path: "**", component: IndexComponent, pathMatch: "full" },
   { path: "", component: IndexComponent },
+  { path: "aviso-legal", component: AvisoLegalComponent },
+
+
 
   {
     path: "clientes",

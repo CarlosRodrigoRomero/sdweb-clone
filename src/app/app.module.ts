@@ -46,6 +46,7 @@ import { PlantaEditComponent } from "./cts/planta-edit/planta-edit.component";
 import { AgmCoreModule } from "@agm/core";
 import { InformeViewModule } from "./informe-view/informe-view.module";
 import { NavbarModule } from "./layout/navbar/navbar.module";
+import { AvisoLegalComponent } from './cts/aviso-legal/aviso-legal.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -60,7 +61,8 @@ import { NavbarModule } from "./layout/navbar/navbar.module";
     AutoLocComponent,
     PlantaAddComponent,
     InformeAddComponent,
-    PlantaEditComponent
+    PlantaEditComponent,
+    AvisoLegalComponent
   ],
 
   imports: [

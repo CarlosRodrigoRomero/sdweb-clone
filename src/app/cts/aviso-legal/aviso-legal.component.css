@@ -1,0 +1,10 @@
+.header-sencilla {
+  border-bottom: 1px solid grey;
+  margin-bottom: 2rem;
+}
+
+.logo {
+  width: 200px;
+  align-self: center;
+  margin: 0 auto;
+}

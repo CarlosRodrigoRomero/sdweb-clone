@@ -48,3 +48,4 @@ testem.log
 Thumbs.db
 .firebase/*.cache
 package-lock.json
+.firebase/hosting.*.cache
