@@ -436,13 +436,7 @@ export class ExportComponent implements OnInit {
         apt: 2,
         elegible: true
       },
-      {
-        nombre: 'resultadosPosicion',
-        descripcion: 'Resultados por posición',
-        orden: 12,
-        apt: 2,
-        elegible: true
-      },
+
       {
         nombre: 'resultadosMAE',
         descripcion: 'MAE de la planta',
@@ -464,7 +458,15 @@ export class ExportComponent implements OnInit {
         descripcion: 'Anexo II: Anomalías térmicas por seguidor',
         orden: 15,
         elegible: true
-      });
+      },
+      {
+        nombre: 'resultadosPosicion',
+        descripcion: 'Resultados por posición',
+        orden: 12,
+        apt: 2,
+        elegible: true
+      }
+      );
     }
 
     this.apartadosInforme = this.apartadosInforme.sort(
@@ -1882,8 +1884,8 @@ export class ExportComponent implements OnInit {
         {
           text: [
             `Se han registrado un total de `,
-            { text: this.countClase[1] + this.countClase[2], style: 'bold' },
-            ` anomalías térmicas, de las cuales ${this.countClase[1]} son de clase 2 y ${this.countClase[2]} son de clase 3.`
+            { text: this.countClase[0] + this.countClase[1] + this.countClase[2], style: 'bold' },
+            ` anomalías térmicas, de las cuales ${this.countClase[0]} son de clase 1, ${this.countClase[1]} son de clase 2,  y ${this.countClase[2]} son de clase 3.`
           ],
           style: 'p'
         },
