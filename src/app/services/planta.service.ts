@@ -253,10 +253,11 @@ export class PlantaService {
   }
 
   getNumeroModulo(planta: PlantaInterface, pc: PcInterface): string {
+    const altura = this.getAltura(planta, pc.local_y);
     if (planta.hasOwnProperty('etiquetasLocalXY')) {
-      if (planta.etiquetasLocalXY[pc.local_y] !== undefined) {
-        if (planta.etiquetasLocalXY[pc.local_y][pc.local_x - 1] !== undefined) {
-          return planta.etiquetasLocalXY[pc.local_y][pc.local_x - 1];
+      if (planta.etiquetasLocalXY[altura] !== undefined) {
+        if (planta.etiquetasLocalXY[altura][pc.local_x - 1] !== undefined) {
+          return planta.etiquetasLocalXY[altura][pc.local_x - 1];
         }
       }
     }

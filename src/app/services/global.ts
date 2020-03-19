@@ -15,6 +15,7 @@ export let GLOBAL = {
   nombreLocalXFija: "Columna",
   nombreLocalYFija: "Fila",
   mae: [0.1, 0.2],
+  anomaliaPorDefecto: 9,
   resolucionCamara: [512, 640],
   // labels_severidad: ['Leve', 'Media', 'Grave'],
   labels_severidad: ["CoA 1", "CoA 2", "CoA 3"],

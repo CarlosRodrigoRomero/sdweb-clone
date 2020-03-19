@@ -83,7 +83,7 @@
           <span
             *ngIf="planta.hasOwnProperty('etiquetasLocalXY')"
             class="text-center"
-            ><strong>Nº Módulo</strong></span
+            ><u>Nº Módulo</u></span
           >
           <span class="text-center">{{
             plantaService.getNumeroModulo(planta, pc)
@@ -108,21 +108,21 @@
           <span class="text-center">{{ pc.global_y }}</span>
         </div>
         <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"
-            ><u>{{ plantaService.getNombreLocalX(planta) }}</u></span
+          <span
+            *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')"
+            class="text-center"
+            ><u>{{ plantaService.getNombreLocalX(planta) }}/{{plantaService.getNombreLocalY(planta)}}</u></span
+          >
+          <span
+            *ngIf="planta.hasOwnProperty('etiquetasLocalXY')"
+            class="text-center"
+            ><u>Nº Módulo</u></span
           >
           <span class="text-center">{{
-            plantaService.getEtiquetaLocalX(planta, pc)
+            plantaService.getNumeroModulo(planta, pc)
           }}</span>
         </div>
-        <div class="pc-details-derecha-item-tabla">
-          <span class="text-center"
-            ><u>{{ plantaService.getNombreLocalY(planta) }}</u></span
-          >
-          <span class="text-center">{{
-            plantaService.getEtiquetaLocalY(planta, pc)
-          }}</span>
-        </div>
+
       </ng-template>
     </div>
     <div class="pc-details-derecha-item">

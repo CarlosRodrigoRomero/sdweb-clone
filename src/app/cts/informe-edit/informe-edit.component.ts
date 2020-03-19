@@ -495,10 +495,10 @@ export class InformeEditComponent implements OnInit {
       offsetY: Math.round(this.image_height / 2)
     };
 
-    this.onDblClickCanvas(event, 0);
+    this.onDblClickCanvas(event);
   }
 
-  onDblClickCanvas(event, tipoPc = -1) {
+  onDblClickCanvas(event) {
     let fila: number;
     let columna: number;
     let height: number;
@@ -614,7 +614,7 @@ export class InformeEditComponent implements OnInit {
     const newPc: PcInterface = {
       id: '',
       archivo: this.currentFileName,
-      tipo: tipoPc === -1 ? 3 : tipoPc, // tipo (diodo bypass por defecto)
+      tipo: GLOBAL.anomaliaPorDefecto, // tipo (diodo bypass por defecto)
       local_x: columnaReal, // local_x
       local_y: filaReal, // local_x
       global_x: globalX, // global_x

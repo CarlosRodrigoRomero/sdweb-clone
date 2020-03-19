@@ -174,7 +174,7 @@ export class PlantaEditComponent implements OnInit {
     this.planta.criterioId = criterio.id;
     this.plantaService.updatePlanta(this.planta);
 
-    //Obtener informes de la planta
+    // Obtener informes de la planta
     this.informeService
       .getInformesDePlanta(this.plantaId)
       .pipe(take(1))
