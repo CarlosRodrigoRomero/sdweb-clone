@@ -329,11 +329,11 @@ export class PlantaService {
     if (pc.hasOwnProperty('global_x') && !Number.isNaN(pc.global_x)) {
         nombreEtiqueta = nombreEtiqueta.concat(pc.global_x.toString());
     }
-    if (pc.hasOwnProperty('global_y')) {
-      if (nombreEtiqueta.length > 0 && !Number.isNaN(pc.global_y)) {
+    if (pc.hasOwnProperty('global_y') && !Number.isNaN(pc.global_y)) {
+      if (nombreEtiqueta.length > 0 ) {
         nombreEtiqueta = nombreEtiqueta.concat('/');
-        nombreEtiqueta = nombreEtiqueta.concat(pc.global_y.toString());
       }
+      nombreEtiqueta = nombreEtiqueta.concat(pc.global_y.toString());
     }
     return nombreEtiqueta;
   }

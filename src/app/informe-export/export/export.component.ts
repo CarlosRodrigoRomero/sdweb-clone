@@ -19,6 +19,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { PlantaService } from '../../services/planta.service';
 import { InformeService } from '../../services/informe.service';
+import { Translation } from './translations';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 declare var $: any;
@@ -50,7 +51,8 @@ export class ExportComponent implements OnInit {
 
   public planta: PlantaInterface;
   public informe: InformeInterface;
-
+  public lan: string;
+  public lanSwitch: boolean;
   public titulo: string;
   public irradianciaMedia: number;
   public url: string;
@@ -110,6 +112,7 @@ export class ExportComponent implements OnInit {
     'coa3',
     'total'
   ];
+  public t: Translation;
   public dataSource: MatTableDataSource<PcsTable>;
   private countLoadedImages$ = new BehaviorSubject(null);
   widthLogo: number;
@@ -144,7 +147,7 @@ export class ExportComponent implements OnInit {
     this.global = GLOBAL;
 
     this.informeCalculado = false;
-
+    this.lan = 'es';
     this.url = GLOBAL.url;
     this.titulo = 'Vista de informe';
     this.tipoInforme = '2';
@@ -152,7 +155,18 @@ export class ExportComponent implements OnInit {
       location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   }
 
+  onSliderChange($event) {
+    // $event = false: español   | True: english
+    if ($event) {
+      this.lan = 'en';
+    } else {
+      this.lan = 'es';
+    }
+  }
+
   ngOnInit() {
+
+
     this.planta = this.plantaService.get();
     this.informe = this.informeService.get();
     this.progresoPDF = '0';
@@ -479,7 +493,7 @@ export class ExportComponent implements OnInit {
   }
 
   getPcColumnas(planta: PlantaInterface): any[] {
-    let pcColumnasTemp = GLOBAL.pcColumnas;
+    const pcColumnasTemp = GLOBAL.pcColumnas;
     const i = pcColumnasTemp.findIndex(e => e.nombre === 'local_xy');
     pcColumnasTemp[i].descripcion = this.plantaService
       .getNombreLocalX(planta)
@@ -507,6 +521,7 @@ export class ExportComponent implements OnInit {
   }
 
   private calcularInforme() {
+    this.t = new Translation(this.lan);
     this.countCategoria = Array();
     this.countCategoriaClase = Array();
     this.countClase = Array();
@@ -583,11 +598,11 @@ export class ExportComponent implements OnInit {
 
   public calificacionMae(mae: number) {
     if (mae <= 0.1) {
-      return 'muy bueno';
+      return this.t.t('muy bueno');
     } else if (mae <= 0.2) {
-      return 'correcto';
+      return this.t.t('correcto');
     } else {
-      return 'mejorable';
+      return this.t.t('mejorable');
     }
   }
   // Ordena los pcs por global_y (pasillo)
@@ -619,6 +634,9 @@ export class ExportComponent implements OnInit {
     }
     return 0;
   }
+  public capFirstLetter(text: string): string {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+}
 
   public downloadPDF() {
     this.generandoPDF = true;
@@ -946,7 +964,7 @@ export class ExportComponent implements OnInit {
         array.push(
           new Array(
             {
-              text: this.global.pcDescripcion[i]
+              text: this.t.t(this.global.pcDescripcion[i])
             },
             {
               text: this.countCategoria[i - 1]
@@ -1005,17 +1023,17 @@ export class ExportComponent implements OnInit {
 
   private getTextoIrradiancia() {
     if (this.informe.irradiancia === 0) {
-      return `Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición el equipo ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.`;
+      return `${this.t.t("Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición el equipo ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.")}`;
     } else {
-      return `Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de ${this.planta.nombre}, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.`;
+      return `${this.t.t("Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de")} ${this.planta.nombre}, ${this.t.t("los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.")}`;
     }
   }
 
   private getTextoLocalizar() {
     if (this.planta.tipo === 'seguidores') {
-      return 'Además todos ellos tienen asociado los parámetros “seguidor”, “fila” y “columna” según el mapa habitual de la planta. Las filas y las columnas tienen origen en la esquina superior izquierda del seguidor.';
+      return `${this.t.t('Además todos ellos tienen asociado los parámetros')} '${this.t.t(this.plantaService.getNombreGlobalX(this.planta))}', '${this.t.t(this.plantaService.getNombreLocalX(this.planta))}' ${this.t.t("y")} '${this.t.t(this.plantaService.getNombreLocalY(this.planta))}' ${this.t.t("según el mapa habitual de la planta")}.`;
     } else {
-      return 'Además todos ellos tienen asociado los parámetros “pasillo”, “columna” y “altura” según el mapa habitual de la planta.';
+      return `${this.t.t('Además todos ellos tienen asociado los parámetros')} '${this.t.t(this.plantaService.getNombreGlobalX(this.planta))}', '${this.t.t(this.plantaService.getNombreGlobalY(this.planta))}', '${this.t.t(this.plantaService.getNombreLocalX(this.planta))}' ${this.t.t("y")} '${this.t.t(this.plantaService.getNombreLocalY(this.planta))}' ${this.t.t("según el mapa habitual de la planta")}.`;
     }
   }
 
@@ -1023,7 +1041,7 @@ export class ExportComponent implements OnInit {
     // PORTADA //
     const portada: any[] = [
       {
-        text: 'Análisis termográfico aéreo de módulos fotovoltaicos',
+        text: this.t.t('Análisis termográfico aéreo de módulos fotovoltaicos'),
         style: 'h1',
         alignment: 'center'
       },
@@ -1041,10 +1059,11 @@ export class ExportComponent implements OnInit {
       {
         text: [
           {
-            text: `Planta solar: `,
+            text: this.t.t(`Planta solar:`),
             style: 'bold'
           },
-          `${this.planta.nombre} (${this.planta.potencia} MW - ${this.planta.tipo})`
+          ' ',
+          `${this.planta.nombre} (${this.planta.potencia} MW - ${this.t.t(this.planta.tipo)})`
         ],
         style: 'subtitulo'
       },
@@ -1052,9 +1071,10 @@ export class ExportComponent implements OnInit {
       {
         text: [
           {
-            text: `Fecha del vuelo: `,
+            text: this.t.t(`Fecha del vuelo:`),
             style: 'bold'
           },
+          ' ',
           this.datePipe.transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
         ],
         style: 'subtitulo'
@@ -1073,7 +1093,7 @@ export class ExportComponent implements OnInit {
     const introduccion = (index: string) => {
       return [
         {
-          text: `Este documento contiene los resultados de la inspección termográfica realizada en la planta solar fotovoltaica de ${this.planta.nombre} de ${this.planta.potencia} MW (${this.planta.tipo}).`,
+          text: `${this.t.t("Este documento contiene los resultados de la inspección termográfica realizada en la planta solar fotovoltaica de")} ${this.planta.nombre} (${this.planta.potencia} MW - ${this.t.t(this.planta.tipo)}).`,
           style: 'p'
         },
 
@@ -1081,7 +1101,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'Las inspecciones termográficas en instalaciones solares fotovoltaicas forman parte del mantenimiento preventivo recomendado para este tipo de instalaciones y tienen como objetivo anticiparse a aquellos problemas en los paneles que no son detectables fácilmente de otra manera.',
+          this.t.t('Las inspecciones termográficas en instalaciones solares fotovoltaicas forman parte del mantenimiento preventivo recomendado para este tipo de instalaciones y tienen como objetivo anticiparse a aquellos problemas en los paneles que no son detectables fácilmente de otra manera.'),
           style: 'p'
         },
 
@@ -1089,7 +1109,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'Es importante que este mantenimiento sea llevado a cabo por profesionales, ya que una termografía mal realizada durante varios años puede afectar al estado general de la planta.',
+          this.t.t('Es importante que este mantenimiento sea llevado a cabo por profesionales, ya que una termografía mal realizada durante varios años puede afectar al estado general de la planta.'),
           style: 'p'
         },
 
@@ -1097,18 +1117,18 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'Entre las ventajas de realizar termografía infrarroja de manera regular: permite aumentar la eficiencia de la planta (performance ratio) en el medio plazo, evitar reparaciones más costosas, aumentar la vida útil de los equipos, detectar problemas relacionados con distintos fabricantes de paneles, problemas de conexión entre módulos, problemas relacionados con la vegetación o la suciedad en los módulos... entre una larga lista de ventajas.',
+          this.t.t('Entre las ventajas de realizar termografía infrarroja de manera regular: permite aumentar la eficiencia de la planta (performance ratio) en el medio plazo, evitar reparaciones más costosas, aumentar la vida útil de los equipos, detectar problemas relacionados con distintos fabricantes de paneles, problemas de conexión entre módulos, problemas relacionados con la vegetación o la suciedad en los módulos... entre una larga lista de ventajas.'),
           style: 'p'
         },
 
         '\n',
 
         {
-          text: `La inspección ha sido realizada mediante vehículos aéreos no tripulados operados y diseñados a tal efecto${
+          text: `${this.t.t("La inspección ha sido realizada mediante vehículos aéreos no tripulados operados y diseñados a tal efecto")} ${
             this.plantaService.getReferenciaSolardrone(this.planta)
-              ? ' por Solardrone.'
-              : '.'
-          } Se ha utilizado la más avanzada tecnología al servicio de la fotovoltaica con el fin de reducir al mínimo el tiempo y el coste de operación sin renunciar a la más alta calidad y fiabilidad. El equipo de que ha realizado el presente documento cuenta con personal formado en Termografía Infrarroja Nivel 1.`,
+              ? ` ${this.t.t('por')} Solardrone. `
+              : '. '
+          } ${this.t.t("Se ha utilizado la más avanzada tecnología al servicio de la fotovoltaica con el fin de reducir al mínimo el tiempo y el coste de operación sin renunciar a la más alta calidad y fiabilidad. El equipo de que ha realizado el presente documento cuenta con personal formado en Termografía Infrarroja Nivel 1.")}`,
           style: 'p'
         },
 
@@ -1119,18 +1139,18 @@ export class ExportComponent implements OnInit {
     const criterios = (index: string) => {
       return [
         {
-          text: `${index} - Criterios de operación`,
+          text: `${index} - ${this.t.t('Criterios de operación')}`,
           style: 'h3'
         },
 
         '\n',
 
         {
-          text: `El criterio base que${
+          text: `${this.t.t("El criterio base que")} ${
             this.plantaService.getReferenciaSolardrone(this.planta)
               ? ' Solardrone'
-              : ' se'
-          } ha seguido para realizar esta inspección termográfica es la norma internacional para inspecciones termográficas IEC 62446-3. En la misma se define cómo deben realizarse las termografías infrarrojas de módulos fotovoltaicos en plantas durante su operación`,
+              : this.t.t(' se')
+          } ${this.t.t("ha seguido para realizar esta inspección termográfica es la norma internacional para inspecciones termográficas IEC 62446-3. En la misma se define cómo deben realizarse las termografías infrarrojas de módulos fotovoltaicos en plantas durante su operación")}`,
           style: 'p'
         },
 
@@ -1138,7 +1158,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'Hay dos niveles de inspección termográfica según la norma IEC 62446-3:',
+          this.t.t('Hay dos niveles de inspección termográfica según la norma IEC 62446-3:'),
           style: 'p'
         },
 
@@ -1149,20 +1169,20 @@ export class ExportComponent implements OnInit {
             {
               text: [
                 {
-                  text: 'Inspección simplificada',
+                  text: this.t.t('Inspección simplificada'),
                   bold: true
                 },
-                ': Esta es una inspección limitada para verificar que los módulos están funcionando, con requisitos reducidos para el personal. Este tipo de inspecciones se usan, por ejemplo, durante una puesta en marcha básica de una planta fotovoltaica.\n\n'
+                `: ${this.t.t("Esta es una inspección limitada para verificar que los módulos están funcionando, con requisitos reducidos para el personal. Este tipo de inspecciones se usan, por ejemplo, durante una puesta en marcha básica de una planta fotovoltaica")}.\n\n`,
               ],
               style: 'p'
             },
             {
               text: [
                 {
-                  text: 'Inspección detallada',
+                  text: this.t.t('Inspección detallada'),
                   bold: true
                 },
-                ': Requiere una comprensión más profunda de las anomalías térmicas. Puede ser utilizado para inspecciones periódicas de acuerdo con a la serie IEC 62446 y para solucionar problemas en sistemas con un bajo rendimiento. Se realizan mediciones de temperatura absoluta. Un experto autorizado en plantas fotovoltaicas, junto con exportos termógrafos, pueden llevar a cabo este tipo de inspecciones.'
+                `: ${this.t.t("Requiere una comprensión más profunda de las anomalías térmicas. Puede ser utilizado para inspecciones periódicas de acuerdo con a la serie IEC 62446 y para solucionar problemas en sistemas con un bajo rendimiento. Se realizan mediciones de temperatura absoluta. Un experto autorizado en plantas fotovoltaicas, junto con exportos termógrafos, pueden llevar a cabo este tipo de inspecciones")} .`,
               ],
               style: 'p'
             }
@@ -1173,7 +1193,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'La termografía realizada entra dentro de las inspecciones detalladas indicadas por la norma, cumpliendo con los requisitos que indica la misma, que son:',
+            this.t.t('La termografía realizada entra dentro de las inspecciones detalladas indicadas por la norma, cumpliendo con los requisitos que indica la misma, que son:'),
           style: 'p'
         },
 
@@ -1183,64 +1203,61 @@ export class ExportComponent implements OnInit {
           ul: [
             {
               text:
-                'Medición absoluta de temperaturas: con un error menor de 2 ºC.',
+                this.t.t('Medición absoluta de temperaturas: con un error menor de 2 ºC.'),
               style: 'p'
             },
             {
-              text: 'Medición de temperatura máxima, media y gradiente.',
-              style: 'p'
-            },
-            {
-              text:
-                'Informe realizado por un experto en termografía infrarroja en conjunto con un experto en fotovoltaica.',
-              style: 'p'
-            },
-            {
-              text: 'Recomendación para cada tipo de anomalía registrada.',
+              text: this.t.t('Medición de temperatura máxima, media y gradiente.'),
               style: 'p'
             },
             {
               text:
-                'Resolución geométrica térmica: 5x5 pixels por cada célula fotovoltaica.',
+              this.t.t('Informe realizado por un experto en termografía infrarroja en conjunto con un experto en fotovoltaica.'),
+              style: 'p'
+            },
+            {
+              text: this.t.t('Recomendación para cada tipo de anomalía registrada.'),
               style: 'p'
             },
             {
               text:
-                'Resolución geométrica visual: 25x25 pixels por cada célula fotovoltaica.',
+              this.t.t('Resolución geométrica térmica: 5x5 pixels por cada célula fotovoltaica.'),
               style: 'p'
             },
             {
               text:
-                'Condiciones ambientales correctas: temperatura ambiente, viento, nubosidad e irradiancia.',
-              style: 'p'
-            },
-            {
-              text: 'Calibración de los equipos: cada 2 años.',
+              this.t.t('Resolución geométrica visual: 25x25 pixels por cada célula fotovoltaica.'),
               style: 'p'
             },
             {
               text:
-                'Parámetros térmicos: el ajuste de la emisividad y la temperatura reflejada es imprescindible para una correcta medición de las temperaturas. Es necesario hacer las mediciones oportunas en campo para poder obtener estos parámetros, ya que dependen de la atmósfera, la meteorología, la suciedad en los módulos el día del vuelo y de los materiales del propio módulo.',
+              this.t.t('Condiciones ambientales correctas: temperatura ambiente, viento, nubosidad e irradiancia.'),
+              style: 'p'
+            },
+            {
+              text: this.t.t('Calibración de los equipos: cada 2 años.'),
               style: 'p'
             },
             {
               text:
-                'Documentación: el entregable incluye las imágenes radiométricas y visuales originales junto con todos los datos que requiere la norma. ',
+              this.t.t('Parámetros térmicos: el ajuste de la emisividad y la temperatura reflejada es imprescindible para una correcta medición de las temperaturas. Es necesario hacer las mediciones oportunas en campo para poder obtener estos parámetros, ya que dependen de la atmósfera, la meteorología, la suciedad en los módulos el día del vuelo y de los materiales del propio módulo.'),
               style: 'p'
             },
             {
-              text: 'Trayectoria: que asegure el cumplimiento de la norma.',
+              text:
+              this.t.t('Documentación: el entregable incluye las imágenes radiométricas y visuales originales junto con todos los datos que requiere la norma.'),
               style: 'p'
             },
             {
-              text: 'Velocidad: 10 km/h máximo.',
+              text: this.t.t('Trayectoria: que asegure el cumplimiento de la norma.'),
+              style: 'p'
+            },
+            {
+              text: this.t.t('Velocidad: 10 km/h máximo.'),
               style: 'p'
             }
           ]
         },
-
-        '\n',
-
         {
           text: '\n\n'
         }
@@ -1250,7 +1267,7 @@ export class ExportComponent implements OnInit {
     const normalizacion = (index: string) => {
       return [
         {
-          text: `${index} - Normalización de gradientes de temperatura`,
+          text: `${index} - ${this.t.t("Normalización de gradientes de temperatura")}`,
           style: 'h3'
         },
 
@@ -1258,12 +1275,13 @@ export class ExportComponent implements OnInit {
 
         {
           text: [
-            'Con el fin de poder ver la ',
+            this.t.t('Con el fin de poder ver la '),
             {
-              text: 'evolución de las anomalías térmicas con el tiempo',
+              text: this.t.t('evolución de las anomalías térmicas con el tiempo'),
               style: 'bold'
             },
-            ' comparando inspecciones termográficas llevadas a cabo en distintos meses o años (con condiciones ambientales distintas), es necesario contar con un procedimiento que permita normalizar los gradientes de temperatura.'
+            ' ',
+            this.t.t('comparando inspecciones termográficas llevadas a cabo en distintos meses o años (con condiciones ambientales distintas), es necesario contar con un procedimiento que permita normalizar los gradientes de temperatura.')
           ],
           style: 'p'
         },
@@ -1272,7 +1290,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'Por este motivo todas las anomalías registradas tienen asociada su "gradiente normalizado", que es el gradiente de temperatura equivalente a haber realizado la inspección con una irradiancia de 1000 W/m2. Esto permitirá poder comparar los resultados de la presente inspección con otras futuras realizadas en condiciones ambientales diferentes y así poder tener una evolución fidedigna de cada una de las anomalías.',
+          this.t.t("Por este motivo todas las anomalías registradas tienen asociada su 'gradiente normalizado', que es el gradiente de temperatura equivalente a haber realizado la inspección con una irradiancia de 1000 W/m2. Esto permitirá poder comparar los resultados de la presente inspección con otras futuras realizadas en condiciones ambientales diferentes y así poder tener una evolución fidedigna de cada una de las anomalías."),
           style: 'p'
         },
 
@@ -1283,14 +1301,14 @@ export class ExportComponent implements OnInit {
     const datosVuelo = (index: string) => {
       return [
         {
-          text: `${index} - Datos del vuelo`,
+          text: `${index} - ${this.t.t("Datos del vuelo")}`,
           style: 'h3'
         },
 
         '\n',
 
         {
-          text: 'Las condiciones durante le vuelo han sido las siguientes:',
+          text: this.t.t('Las condiciones durante le vuelo han sido las siguientes:'),
           style: 'p'
         },
 
@@ -1309,7 +1327,7 @@ export class ExportComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: 'Vehículo aéreo no tripulado',
+                      text: this.t.t('Vehículo aéreo no tripulado'),
                       style: 'tableHeaderRed',
                       colSpan: 2,
                       alignment: 'center'
@@ -1318,7 +1336,7 @@ export class ExportComponent implements OnInit {
                   ],
                   [
                     {
-                      text: 'Aeronave',
+                      text: this.t.t('Aeronave'),
                       style: 'tableLeft'
                     },
                     {
@@ -1327,7 +1345,7 @@ export class ExportComponent implements OnInit {
                   ],
                   [
                     {
-                      text: 'Cámara térmica',
+                      text: this.t.t('Cámara térmica'),
                       style: 'tableLeft'
                     },
                     {
@@ -1336,7 +1354,7 @@ export class ExportComponent implements OnInit {
                   ],
                   [
                     {
-                      text: 'Última calibración',
+                      text: this.t.t('Última calibración'),
                       style: 'tableLeft'
                     },
                     {
@@ -1346,7 +1364,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: 'Datos del vuelo',
+                      text: this.t.t('Datos del vuelo'),
                       style: 'tableHeaderRed',
                       colSpan: 2,
                       alignment: 'center'
@@ -1356,7 +1374,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: 'Fecha',
+                      text: this.t.t('Fecha'),
                       style: 'tableLeft'
                     },
                     {
@@ -1369,7 +1387,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: 'Horario de los vuelos',
+                      text: this.t.t('Horario de los vuelos'),
                       style: 'tableLeft'
                     },
                     {
@@ -1379,7 +1397,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: 'Velocidad',
+                      text: this.t.t('Velocidad'),
                       style: 'tableLeft'
                     },
                     {
@@ -1389,17 +1407,17 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: 'GSD térmico (medio)',
+                      text: this.t.t('GSD térmico (medio)'),
                       style: 'tableLeft'
                     },
                     {
-                      text: `${this.informe.gsd} cm/pixel (+- 0.5cm/pixel )`
+                      text: `${this.informe.gsd} cm/pixel (+- 0.5cm/pixel)`
                     }
                   ],
 
                   [
                     {
-                      text: 'GSD visual',
+                      text: this.t.t('GSD visual'),
                       style: 'tableLeft'
                     },
                     {
@@ -1410,7 +1428,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: 'Datos meteorológicos',
+                      text: this.t.t('Datos meteorológicos'),
                       style: 'tableHeaderRed',
                       colSpan: 2,
                       alignment: 'center'
@@ -1420,7 +1438,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: 'Irradiancia (media)',
+                      text: this.t.t('Irradiancia (media)'),
                       style: 'tableLeft'
                     },
                     {
@@ -1430,7 +1448,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: 'Temperatura ambiente',
+                      text: this.t.t('Temperatura del aire'),
                       style: 'tableLeft'
                     },
                     {
@@ -1440,11 +1458,11 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: 'Nubosidad',
+                      text: this.t.t('Nubosidad'),
                       style: 'tableLeft'
                     },
                     {
-                      text: `${this.informe.nubosidad} octavas`
+                      text: `${this.informe.nubosidad}/8 ${this.t.t('octavas')}`
                     }
                   ]
                 ]
@@ -1465,11 +1483,11 @@ export class ExportComponent implements OnInit {
     const irradiancia = (index: string) => {
       return [
         {
-          text: `${index} - Irradiancia durante el vuelo`,
+          text: `${index} - ${this.t.t('Irradiancia durante el vuelo')}`,
           style: 'h3'
         },
 
-        '\n\n',
+        '\n',
 
         {
           text: this.getTextoIrradiancia(),
@@ -1491,7 +1509,7 @@ export class ExportComponent implements OnInit {
     const paramsTermicos = (index: string) => {
       return [
         {
-          text: `${index} - Ajuste de parámetros térmicos`,
+          text: `${index} - ${this.t.t('Ajuste de parámetros térmicos')}`,
           style: 'h3'
         },
 
@@ -1499,14 +1517,17 @@ export class ExportComponent implements OnInit {
 
         {
           text: [
-            'Con el fin de obtener medidas de temperaturas absolutas fiables, es necesario tener en cuenta distintas variables térmicas que afectan directamente al resultado de las medidas obtenidas por las cámaras. Las más importantes son ',
+            this.t.t('Con el fin de obtener medidas de temperaturas absolutas fiables, es necesario tener en cuenta distintas variables térmicas que afectan directamente al resultado de las medidas obtenidas por las cámaras. Las más importantes son'),
+            ' ',
             {
-              text: 'la emisividad',
+              text: this.t.t('la emisividad'),
               style: 'bold'
             },
-            ' y la ',
+            " ",
+            this.t.t('y la'),,
+            ' ',
             {
-              text: 'temperatura reflejada',
+              text: this.t.t('temperatura reflejada'),
               style: 'bold'
             },
             '.'
@@ -1517,7 +1538,7 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: `${index}.1 - Emisividad`,
+          text: `${index}.1 - ${this.t.t('Emisividad')}`,
           style: 'h4'
         },
 
@@ -1525,14 +1546,14 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'La emisividad del material se mide de manera experimental en campo y depende del tipo de vidrio de los módulos y de la suciedad que presenten el día del vuelo. La emisividad escogida por el termógrafo tras el ensayo experimental es la siguiente:',
+          this.t.t('La emisividad del material se mide de manera experimental en campo y depende del tipo de vidrio de los módulos y de la suciedad que presenten el día del vuelo. La emisividad escogida por el termógrafo tras el ensayo experimental es la siguiente:'),
           style: 'p'
         },
 
         '\n',
 
         {
-          text: 'Emisividad = ' + this.informe.emisividad.toString(),
+          text: this.t.t('Emisividad') + '  = ' + this.informe.emisividad.toString(),
           style: 'param'
         },
 
@@ -1548,7 +1569,7 @@ export class ExportComponent implements OnInit {
         '\n\n',
 
         {
-          text: `${index}.2 - Temperatura reflejada`,
+          text: `${index}.2 - ${this.capFirstLetter(this.t.t('temperatura reflejada'))}`,
           style: 'h4'
         },
 
@@ -1556,7 +1577,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'La temperatura reflejada nos depende de la atmosfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura reflejada medida es:',
+          this.t.t('La temperatura reflejada nos depende de la atmosfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura reflejada medida es:'),
           style: 'p'
         },
 
@@ -1564,7 +1585,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'Temperatura reflejada = ' +
+          this.capFirstLetter(this.t.t('temperatura reflejada')) + ' = ' +
             this.informe.tempReflejada.toString() +
             ' ºC',
           style: 'param'
@@ -1577,7 +1598,7 @@ export class ExportComponent implements OnInit {
     const perdidaPR = (index: string) => {
       return [
         {
-          text: `${index} - Pérdida de Performance Ratio (ΔPR)`,
+          text: `${index} - ${this.t.t('Pérdida de Performance Ratio')} (ΔPR)`,
           style: 'h3'
         },
 
@@ -1585,13 +1606,13 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'El coeficiente de rendimiento de sistemas fotovoltaicos o Performance Ratio es un parámetro que tuvo su origen conceptual en la norma IES 61724 (1998) para ser utilizado como indicador de calidad en la evaluación de sistemas fotovoltaicos.\n\n',
+          this.t.t('El coeficiente de rendimiento de sistemas fotovoltaicos o Performance Ratio es un parámetro que tuvo su origen conceptual en la norma IES 61724 (1998) para ser utilizado como indicador de calidad en la evaluación de sistemas fotovoltaicos') + '.\n\n',
           style: 'p'
         },
 
         {
           text:
-            'Este parámetro se utiliza para medir el rendimiento de cualquier sistema fotovoltaico. En otras palabras, si queremos saber si un módulo está generando la energía que debería bastaría con conocer su PR. No podemos conocer el PR de cada módulo con una termografía, pero lo que sí podemos conocer es la pérdida de PR (ΔPR) producida por anomalía térmica respecto a sus condiciones ideales. Es decir, un módulo con un punto caliente que causa una ΔPR = -1% tiene menos importancia que una anomalía que causa una ΔPR = -33%, el cual está haciendo caer la producción eléctrica del módulo en un 33%.',
+          this.t.t('Este parámetro se utiliza para medir el rendimiento de cualquier sistema fotovoltaico. En otras palabras, si queremos saber si un módulo está generando la energía que debería bastaría con conocer su PR. No podemos conocer el PR de cada módulo con una termografía, pero lo que sí podemos conocer es la pérdida de PR (ΔPR) producida por anomalía térmica respecto a sus condiciones ideales. Es decir, un módulo con un punto caliente que causa una ΔPR = -1% tiene menos importancia que una anomalía que causa una ΔPR = -33%, el cual está haciendo caer la producción eléctrica del módulo en un 33%.'),
           style: 'p'
         },
 
@@ -1599,7 +1620,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'La pérdida de PR nos indica, por tanto, lo perjudicial que es una anomalía térmica, identificando explícitamente los puntos sobre los que se debe actuar para optimizar la producción eléctrica. Es un parámetro indispensable en el diagnóstico termográfico de una instalación fotovoltaica, ya que nos permite tomar decisiones en base a un dato técnico-económico objetivo.',
+          this.t.t('La pérdida de PR nos indica, por tanto, lo perjudicial que es una anomalía térmica, identificando explícitamente los puntos sobre los que se debe actuar para optimizar la producción eléctrica. Es un parámetro indispensable en el diagnóstico termográfico de una instalación fotovoltaica, ya que nos permite tomar decisiones en base a un dato técnico-económico objetivo.'),
           style: 'p'
         },
 
@@ -1607,14 +1628,14 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'Para poder evaluar la planta utilizaremos los siguientes dos sencillos conceptos:',
+          this.t.t('Para poder evaluar la planta utilizaremos los siguientes dos sencillos conceptos:'),
           style: 'p'
         },
 
         '\n',
 
         {
-          text: `${index}.1 - Pérdidas de performance ratio (ΔPR)`,
+          text: `${index}.1 - ${this.t.t('Pérdidas de performance ratio')} (ΔPR)`,
           style: 'h4'
         },
 
@@ -1622,14 +1643,14 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'Cada incidencia tiene una variación de performance ratio asociado. Por ejemplo, un diodo bypass en circuito abierto produce que el módulo trabaje al 15% de eficiencia en un caso típico (ΔPR=85%), mientras que una célula caliente aislada produce de media < 1% de pérdidas.',
+          this.t.t('Cada incidencia tiene una variación de performance ratio asociado. Por ejemplo, un diodo bypass en circuito abierto produce que el módulo trabaje al 15% de eficiencia en un caso típico (ΔPR=85%), mientras que una célula caliente aislada produce de media < 1% de pérdidas.'),
           style: 'p'
         },
 
         '\n',
 
         {
-          text: `${index}.2 - Módulos apagados equivalentes`,
+          text: `${index}.2 - ${this.t.t('Módulos apagados equivalentes')}`,
           style: 'h4'
         },
 
@@ -1637,13 +1658,13 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'El concepto “módulos apagados equivalentes” es la cantidad equivalente de módulos que no generan energía debido a las incidencias registradas en la planta. Por ejemplo, si tenemos tres módulos idénticos con un defecto en un diodo bypass cada uno, cada módulo genera un 33% menos de energía. Entonces, el número de módulos apagados equivalentes es 1.',
+          this.t.t("El concepto 'módulos apagados equivalentes' es la cantidad equivalente de módulos que no generan energía debido a las incidencias registradas en la planta. Por ejemplo, si tenemos tres módulos idénticos con un defecto en un diodo bypass cada uno, cada módulo genera un 33% menos de energía. Entonces, el número de módulos apagados equivalentes es 1."),
           style: 'p'
         },
 
         {
           text:
-            'Uniendo los dos conceptos anteriores, se puede hacer una estimación “grosso modo” de la variación de PR de la planta de la siguiente manera:',
+          this.t.t('Uniendo los dos conceptos anteriores, se puede hacer una estimación “grosso modo” de la variación de PR de la planta de la siguiente manera:'),
           style: 'p'
         },
 
@@ -1655,7 +1676,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'Siendo N = Número de módulos; PR = Performance ratio; MAE = Módulos apagados equivalente calculados',
+          this.t.t('Siendo N = Número de módulos; PR = Performance ratio; MAE = Módulos apagados equivalente calculados'),
           style: 'pieFoto'
         },
 
@@ -1663,7 +1684,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'Por lo tanto, sabiendo el MAE sabremos cuánto PR estamos perdiendo debido a las incidencias encontradas.',
+          this.t.t('Por lo tanto, sabiendo el MAE sabremos cuánto PR estamos perdiendo debido a las incidencias encontradas.'),
           style: 'p'
         },
 
@@ -1671,18 +1692,18 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'El objetivo será obtener un MAE bajo, lo cual nos indicará un correcto mantenimiento de la planta.',
+          this.t.t('El objetivo será obtener un MAE bajo, lo cual nos indicará un correcto mantenimiento de la planta.'),
           style: 'p'
         },
 
         '\n',
 
         {
-          text: `Teniendo en cuenta todas las plantas fotovoltaicas inspeccionadas${
+          text: `${this.t.t('Teniendo en cuenta todas las plantas fotovoltaicas inspeccionadas')}  ${
             this.plantaService.getReferenciaSolardrone(this.planta)
-              ? ' por Solardrone,'
+              ? ` ${this.t.t('por')} Solardrone,`
               : ','
-          } se puede hacer una clasificación estadística según el MAE. Según la siguiente tabla, podemos clasificar el mantenimiento de una planta en 3 tipos: muy bueno (por debajo de la media), correcto (en la media) y "mejorable" (por encima de la media):`,
+          } ${this.t.t("se puede hacer una clasificación estadística según el MAE. Según la siguiente tabla, podemos clasificar el mantenimiento de una planta en 3 tipos: muy bueno (por debajo de la media), correcto (en la media) y 'mejorable' (por encima de la media):")}`,
           style: 'p'
         },
 
@@ -1710,11 +1731,11 @@ export class ExportComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: 'MAE de la planta',
+                      text: this.t.t('MAE de la planta'),
                       style: 'tableHeader'
                     },
                     {
-                      text: 'Estado',
+                      text: this.capFirstLetter(this.t.t('estado')),
                       style: 'tableHeader'
                     }
                   ],
@@ -1724,7 +1745,7 @@ export class ExportComponent implements OnInit {
                       style: ['mae1', 'bold']
                     },
                     {
-                      text: 'Muy bueno',
+                      text: this.capFirstLetter(this.t.t('muy bueno')),
                       style: 'mae1'
                     }
                   ],
@@ -1737,7 +1758,7 @@ export class ExportComponent implements OnInit {
                       style: ['mae2', 'bold']
                     },
                     {
-                      text: 'Correcto',
+                      text: this.capFirstLetter(this.t.t('correcto')),
                       style: 'mae2'
                     }
                   ],
@@ -1747,7 +1768,7 @@ export class ExportComponent implements OnInit {
                       style: ['mae3', 'bold']
                     },
                     {
-                      text: 'Mejorable',
+                      text: this.capFirstLetter(this.t.t('mejorable')),
                       style: 'mae3'
                     }
                   ]
@@ -1769,7 +1790,7 @@ export class ExportComponent implements OnInit {
     const clasificacion = (index: string) => {
       return [
         {
-          text: `${index} - Cómo se clasifican las anomalías térmicas (según IEC 62446-3)`,
+          text: `${index} - ${this.t.t('Cómo se clasifican las anomalías térmicas (según IEC 62446-3)')}`,
           style: 'h3'
         },
 
@@ -1777,41 +1798,42 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'Según la norma internacional IEC 62446-3 para inspecciones termográficas de instalaciones fotovoltaicas, las anomalías térmicas se clasifican en tres clases o CoA (Class of Abnormalitys):',
+          this.t.t('Según la norma internacional IEC 62446-3 para inspecciones termográficas de instalaciones fotovoltaicas, las anomalías térmicas se clasifican en tres clases o CoA (Class of Abnormalitys):'),
           style: 'p'
         },
 
-        '\n\n',
+        '\n',
 
         {
           ul: [
             {
               text: [
                 {
-                  text: 'CoA 1 - sin anomalía',
+                  text: `CoA 1 - ${(this.t.t('sin anomalía'))}`,
                   style: ['coa1', 'bold']
                 },
-                ': hacemos seguimiento, pero no hay que actuar.'
+                `: ${this.t.t('hacemos seguimiento, pero no hay que actuar.')}`
               ],
               style: 'p'
             },
             {
               text: [
                 {
-                  text: 'CoA 2 - anomalía térmica',
+                  text: `CoA 2 - ${this.t.t('anomalía térmica')}`,
                   style: ['coa2', 'bold']
                 },
-                ': ver la causa y, si es necesario, arreglar en un periodo razonable.'
+                ': ',
+                this.t.t('ver la causa y, si es necesario, arreglar en un periodo razonable.')
               ],
               style: 'p'
             },
             {
               text: [
                 {
-                  text: 'CoA 3 - anomalía térmica relevante para la seguridad',
+                  text: `CoA 3 - ${this.t.t('anomalía térmica relevante para la seguridad')}`,
                   style: ['coa3', 'bold']
                 },
-                ': próxima interrupción de la operación normal del módulo, detectar la causa y rectificar en un periodo razonable.'
+                `: ${this.t.t('próxima interrupción de la operación normal del módulo, detectar la causa y rectificar en un periodo razonable.')}`
               ],
               style: 'p'
             }
@@ -1825,7 +1847,7 @@ export class ExportComponent implements OnInit {
     const localizar = (index: string) => {
       return [
         {
-          text: `${index} - Cómo localizar las anomalías`,
+          text: `${index} - ${this.t.t('Cómo localizar las anomalías')}`,
           style: 'h3'
         },
 
@@ -1833,7 +1855,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'Todas las incidencias tienen asociada una localización GPS, cuyo margen de error es de unos pocos metros (0-2 metros).',
+            this.t.t('Todas las incidencias tienen asociada una localización GPS, cuyo margen de error es de unos pocos metros (0-2 metros).'),
           style: 'p'
         },
 
@@ -1851,7 +1873,7 @@ export class ExportComponent implements OnInit {
     const resultados = (index: string) => {
       return [
         {
-          text: `${index} - Resultados de la inspección termográfica`,
+          text: `${index} - ${this.t.t('Resultados de la inspección termográfica')}`,
           style: 'h2',
           pageBreak: 'before',
           alignment: 'center'
@@ -1862,14 +1884,14 @@ export class ExportComponent implements OnInit {
           style: 'p'
         },
 
-        '\n'
+        '\n\n'
       ];
     };
 
     const resultadosClase = (index: string) => {
       return [
         {
-          text: `${index} - Resultados por clase de anomalía (CoA)`,
+          text: `${index} - ${this.t.t('Resultados por clase de anomalía')} (CoA)`,
           style: 'h3'
         },
 
@@ -1877,34 +1899,34 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'A continuación se detallan la cantidad de incidencias registradas según su clase (1, 2 ó 3).',
+          this.t.t('A continuación se detallan la cantidad de incidencias registradas según su clase (1, 2 ó 3).'),
           style: 'p'
         },
 
         {
           text: [
-            `Se han registrado un total de `,
+            `${this.t.t('Se han registrado un total de')} `,
             { text: this.countClase[0] + this.countClase[1] + this.countClase[2], style: 'bold' },
-            ` anomalías térmicas, de las cuales ${this.countClase[0]} son de clase 1, ${this.countClase[1]} son de clase 2,  y ${this.countClase[2]} son de clase 3.`
+            ` ${this.t.t('anomalías térmicas, de las cuales')} ${this.countClase[0]} ${this.t.t('son de clase')} 1, ${this.countClase[1]} ${this.t.t('son de clase')} 2  ${this.t.t('y')} ${this.countClase[2]} ${this.t.t('son de clase')} 3.`
           ],
           style: 'p'
         },
 
-        '\n'
+        '\n\n'
       ];
     };
 
     const resultadosCategoria = (index: string) => {
       return [
         {
-          text: `${index} - Resultados por categoría de la anomalía`,
+          text: `${index} - ${this.t.t('Resultados por categoría de la anomalía')}`,
           style: 'h3'
         },
 
         '\n',
 
         {
-          text: `La siguiente tabla muestra la cantidad de anomalías térmicas por categoría. En el caso de células calientes, sólo se incluyen aquellas con gradientes mayores a ${this.currentFiltroGradiente} ºC`,
+          text: `${this.t.t('La siguiente tabla muestra la cantidad de anomalías térmicas por categoría. En el caso de células calientes, sólo se incluyen aquellas con gradientes mayores a')} ${this.currentFiltroGradiente} ºC`,
           style: 'p'
         },
 
@@ -1922,17 +1944,17 @@ export class ExportComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: 'Categoría',
+                      text: this.t.t('Categoría'),
                       style: 'tableHeaderRed'
                     },
 
                     {
-                      text: 'Cantidad',
+                      text: this.t.t('Cantidad'),
                       style: 'tableHeaderRed'
                     },
 
                     {
-                      text: 'Porcentaje %',
+                      text: this.t.t('Porcentaje %'),
                       style: 'tableHeaderRed'
                     }
                   ]
@@ -1972,14 +1994,14 @@ export class ExportComponent implements OnInit {
       let texto1;
       if (this.planta.tipo === 'seguidores') {
         texto1 =
-          'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran (fila y columna) dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.';
+          `${this.t.t('Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran')} (${this.plantaService.getNombreLocalX(this.planta)} ${this.t.t('y')} ${this.plantaService.getNombreLocalY(this.planta)}) ${this.t.t('dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.')}`;
       } else {
         texto1 =
-          'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.';
+        this.t.t('Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.');
       }
       return [
         {
-          text: `${index} - Resultados por posición de la anomalía dentro del seguidor`,
+          text: `${index} - ${this.t.t('Resultados por posición de la anomalía dentro del seguidor')}`,
           style: 'h3'
         },
 
@@ -1987,7 +2009,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'Esta clasificación tiene como fin detectar posibles problemas relacionados con la posición de cada módulo. De este análisis se obtienen problemas relacionados con la vegetación de la instalación, deposiciones de pájaros, etc.',
+          this.t.t('Esta clasificación tiene como fin detectar posibles problemas relacionados con la posición de cada módulo. De este análisis se obtienen problemas relacionados con la vegetación de la instalación, deposiciones de pájaros, etc.'),
           style: 'p'
         },
         '\n',
@@ -2026,7 +2048,7 @@ export class ExportComponent implements OnInit {
     const resultadosMAE = (index: string) => {
       return [
         {
-          text: `${index} - MAE de la planta`,
+          text: `${index} - ${this.t.t('MAE de la planta')}`,
           style: 'h3'
         },
 
@@ -2034,7 +2056,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            'El MAE (módulo apagados equivalentes) nos da medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.',
+          this.t.t('El MAE (módulo apagados equivalentes) nos da medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.'),
           style: 'p'
         },
 
@@ -2051,19 +2073,21 @@ export class ExportComponent implements OnInit {
 
         {
           text: [
-            `El MAE de ${this.planta.nombre} el ${this.datePipe.transform(
+            `${this.t.t('El MAE de')} ${this.planta.nombre} (${this.datePipe.transform(
               this.informe.fecha * 1000,
               'dd/MM/yyyy'
-            )} es `,
+            )}) ${this.t.t('es')} `,
             {
               text: `${this.informe.mae} %`,
               style: 'bold'
             },
-            ` lo que nos indica un MAE `,
+            ' ',
+            '(',
             {
-              text: `${this.calificacionMae(this.informe.mae)}.`,
+              text: `${this.calificacionMae(this.informe.mae)}`,
               style: 'bold'
-            }
+            },
+            ')'
           ],
           style: 'p'
         }
@@ -2078,7 +2102,7 @@ export class ExportComponent implements OnInit {
 
     result = result.concat([
       {
-        text: '1 - Introducción',
+        text: `1 - ${this.t.t('Introducción')}`,
         style: 'h2',
         alignment: 'center'
       },
@@ -2239,7 +2263,7 @@ export class ExportComponent implements OnInit {
     const allPagsAnexoLista = [];
     // tslint:disable-next-line:max-line-length
     const pag1Anexo = {
-      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n Anexo ${numAnexo}: Listado de anomalías térmicas`,
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.t.t('Anexo')} ${numAnexo}: ${this.t.t('Listado de anomalías térmicas')}`,
       style: 'h1',
       alignment: 'center',
       pageBreak: 'before'
@@ -2255,21 +2279,26 @@ export class ExportComponent implements OnInit {
     // Header
     const cabecera = [];
     cabecera.push({
-      text: 'Número',
+      text: this.t.t('Número'),
       style: 'tableHeaderRed'
     });
 
     if (this.planta.tipo === 'seguidores') {
       this.filteredPcs = this.filteredPcs.sort(this.sortByGlobalX);
       cabecera.push({
-        text: 'Seguidor',
+        text: this.t.t('Seguidor'),
         style: 'tableHeaderRed',
         noWrap: true
       });
     } else {
       this.filteredPcs = this.filteredPcs.sort(this.sortByGlobalY);
+      let nombreCol = this.t.t(this.plantaService.getNombreGlobalX(this.planta));
+      if (nombreCol.length > 0) {
+        nombreCol = nombreCol.concat('/');
+      }
+      nombreCol = nombreCol.concat(this.t.t(this.plantaService.getNombreGlobalY(this.planta)));
       cabecera.push({
-        text: this.plantaService.getNombreColsGlobal(this.planta),
+        text: nombreCol,
         style: 'tableHeaderRed',
         noWrap: true
       });
@@ -2277,7 +2306,7 @@ export class ExportComponent implements OnInit {
 
     for (const c of this.currentFilteredColumnas) {
       cabecera.push({
-        text: this.getEncabezadoTablaSeguidor(c),
+        text: this.t.t(this.getEncabezadoTablaSeguidor(c)),
         style: 'tableHeaderRed'
       });
     }
@@ -2302,7 +2331,7 @@ export class ExportComponent implements OnInit {
       });
       for (let c of this.currentFilteredColumnas) {
         row.push({
-          text: this.getTextoColumnaPc(pc, c.nombre),
+          text: this.t.t(this.getTextoColumnaPc(pc, c.nombre)),
           noWrap: true,
           style: 'tableCellAnexo1'
         });
@@ -2382,12 +2411,12 @@ export class ExportComponent implements OnInit {
     });
 
     cabecera.push({
-      text: 'Número',
+      text: this.t.t('Número'),
       style: 'tableHeaderRed'
     });
     for (const col of columnasAnexoSeguidor) {
       cabecera.push({
-        text: this.getEncabezadoTablaSeguidor(col),
+        text: this.t.t(this.getEncabezadoTablaSeguidor(col)),
         style: 'tableHeaderRed'
       });
     }
@@ -2407,7 +2436,7 @@ export class ExportComponent implements OnInit {
 
       for (const col of columnasAnexoSeguidor) {
         row.push({
-          text: this.getTextoColumnaPc(pc, col.nombre),
+          text: this.t.t(this.getTextoColumnaPc(pc, col.nombre)),
           noWrap: true,
           style: 'tableCellAnexo1'
         });
@@ -2440,7 +2469,7 @@ export class ExportComponent implements OnInit {
     const allPagsAnexo = [];
     // tslint:disable-next-line:max-line-length
     const pag1Anexo = {
-      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n Anexo ${numAnexo}: Anomalías térmicas por seguidor`,
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.t.t('Anexo')} ${numAnexo}: ${this.t.t('Anomalías térmicas por seguidor')}`,
       style: 'h1',
       alignment: 'center',
       pageBreak: 'before'
@@ -2453,7 +2482,7 @@ export class ExportComponent implements OnInit {
 
       const pagAnexo = [
         {
-          text: 'Seguidor ' + s.nombre,
+          text: this.t.t('Seguidor') + ' ' + s.nombre,
           style: 'h2',
           alignment: 'center',
           pageBreak: 'before'
@@ -2482,36 +2511,36 @@ export class ExportComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: 'Fecha/Hora',
+                      text: this.t.t('Fecha/Hora'),
                       style: 'tableHeaderImageData'
                     },
 
                     {
-                      text: 'Irradiancia',
+                      text: this.t.t('Irradiancia'),
                       style: 'tableHeaderImageData'
                     },
 
                     {
-                      text: 'Temp. ambiente',
+                      text: this.t.t('Temp. aire'),
                       style: 'tableHeaderImageData'
                     },
 
                     {
-                      text: 'Viento',
+                      text: this.t.t('Viento'),
                       style: 'tableHeaderImageData'
                     },
 
                     {
-                      text: 'Emisividad',
+                      text: this.t.t('Emisividad'),
                       style: 'tableHeaderImageData'
                     },
 
                     {
-                      text: 'Temp. reflejada',
+                      text: this.t.t('Temp. reflejada'),
                       style: 'tableHeaderImageData'
                     },
                     {
-                      text: 'Módulo',
+                      text: this.t.t('Módulo'),
                       style: 'tableHeaderImageData'
                     }
                   ],

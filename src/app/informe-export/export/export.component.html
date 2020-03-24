@@ -13,7 +13,7 @@
       </div>
       <ng-template #boton>
         <div class="row">
-          <div class="col text-center ">
+          <div class="col text-center">
             <button
               mat-flat-button
               color="primary"
@@ -22,6 +22,21 @@
             >
               Generar PDF
             </button>
+
+            <div class="lan-div">
+
+            <label class="switch">
+              <input
+                [(ngModel)]="lanSwitch"
+                type="checkbox"
+                id="changeLan"
+                (ngModelChange)="onSliderChange($event)"
+              />
+              <span class="slider round"></span>
+            </label>
+            <div class=" text-center termico-visual-text">español/english</div>
+
+          </div>
           </div>
         </div>
       </ng-template>

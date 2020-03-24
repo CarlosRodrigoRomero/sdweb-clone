@@ -2,7 +2,7 @@ export let GLOBAL = {
   url: "http://localhost:3977/api",
   num_tipos: 16,
   camaraTermica: "DJI XT2 640 13mm (Numero de serie: 297106)",
-  ultimaCalibracion: "Enero 2019",
+  ultimaCalibracion: "03/2020",
   carpetaJpgGray: "gray\\",
   uav: "DJI Matrice M200",
   temperaturaLimiteFabricantes: 90,
@@ -33,7 +33,7 @@ export let GLOBAL = {
     "VPV",
     "Substring en CA",
     "String",
-    "Modulo en CA",
+    "Módulo en CA",
     "Substring en CC",
     "Módulo en CC",
     "Célula",
@@ -66,7 +66,7 @@ export let GLOBAL = {
     "Caja de conexiones caliente", // 14
     "Módulo con sombras", // 15
     "Yellowing", // 16
-    "String en circuito abierto" //17
+    "Módulos en circuito abierto" //17
   ],
   //   '0',
   //   'Célula caliente',
