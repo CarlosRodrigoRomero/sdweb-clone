@@ -2002,6 +2002,12 @@ export class ExportComponent implements OnInit {
 
     const resultadosSeguidor = (index: string) => {
       const numAnomaliasMedia = new Intl.NumberFormat("en-IN", {maximumSignificantDigits: 2}).format(this.filteredPcs.length/this.filteredSeguidores.length);
+      let numeroSeguidores = 0;
+      let porcentajeSeguidores = 0;
+      if (this.planta.hasOwnProperty('numeroSeguidores')) {
+        numeroSeguidores = this.planta.numeroSeguidores;
+        porcentajeSeguidores = this.filteredSeguidores.length / numeroSeguidores * 100;
+      }
       return [
         {
           text: `${index} - ${this.t.t('Resultados por seguidores')}`,
@@ -2009,12 +2015,11 @@ export class ExportComponent implements OnInit {
         },
 
         '\n',
-
-        {
-          text:
-          `${this.t.t('El número de seguidores afectados por anomalías térmicas es')} ${this.filteredSeguidores.length}. ${this.t.t('El número medio de módulos con anomalías por seguidor es de')} ${numAnomaliasMedia}.`,
-          style: 'p'
-        },
+        `${this.t.t('El número de seguidores afectados por anomalías térmicas es')} ${this.filteredSeguidores.length}${
+          numeroSeguidores === 0 ? '. ' : `/${numeroSeguidores} (${porcentajeSeguidores.toFixed(2)}%). `
+        } ${this.t.t('El número medio de módulos con anomalías por seguidor es de')} ${numAnomaliasMedia} ${this.t.t('módulos/seguidor')}.`
+        ,
+        '\n',
         '\n'
       ]
     };

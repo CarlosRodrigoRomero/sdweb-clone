@@ -173,5 +173,6 @@
     "Sombras" : "Shadows",
     "String en CA" : "Substring in OC",
     "El número de seguidores afectados por anomalías térmicas es" : "The number of trackers affected by thermal anomalies is",
-    "El número medio de módulos con anomalías por seguidor es de" : "The average number of modules with anomalies per tracker is"
+    "El número medio de módulos con anomalías por seguidor es de" : "The average number of modules with anomalies per tracker is",
+    "módulos/seguidor" : "modules/tracker"
   }

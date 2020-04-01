@@ -32,4 +32,5 @@ export interface PlantaInterface {
   nombreLocalY?: string;
   stringConectorGlobals?: string;
   numerosSerie?: boolean;
+  numeroSeguidores?: number;
 }
