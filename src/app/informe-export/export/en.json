@@ -148,7 +148,7 @@
     "Caja de conexiones caliente" : "Heated module junction box",
     "Módulo con sombras" : "Modules with shadows",
     "Yellowing" : "Yellowing",
-    "Módulos en circuito abierto" : "Modules in open circuit",
+    "String en circuito abierto" : "String in open circuit",
     "es" : "is",
     "Clase (CoA)" : "Class (CoA)",
     "Fila/Columna" : "Row/Column",
@@ -168,8 +168,10 @@
     "Varias células" : "Multiple cells",
     "2x Substring CA" : "2x substring in OC",
     "Suciedad" : "Dirt",
-    "Resist. anómala" : "abnormal resistance",
+    "Resist. anómala" : "Abnormal resistance",
     "Caja conexiones" : "Junction box",
     "Sombras" : "Shadows",
-    "String en CA" : "Substring in OC"
+    "String en CA" : "Substring in OC",
+    "El número de seguidores afectados por anomalías térmicas es" : "The number of trackers affected by thermal anomalies is",
+    "El número medio de módulos con anomalías por seguidor es de" : "The average number of modules with anomalies per tracker is"
   }

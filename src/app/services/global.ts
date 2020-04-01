@@ -67,7 +67,7 @@ export let GLOBAL = {
     "Caja de conexiones caliente", // 14
     "Módulo con sombras", // 15
     "Yellowing", // 16
-    "Módulos en circuito abierto" //17
+    "String en circuito abierto" //17
   ],
   //   '0',
   //   'Célula caliente',

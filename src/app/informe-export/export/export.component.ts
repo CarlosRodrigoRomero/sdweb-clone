@@ -171,7 +171,7 @@ export class ExportComponent implements OnInit {
     this.informe = this.informeService.get();
     this.progresoPDF = '0';
     this.widthLogo = 200;
-    this.widthPortada = 600; //=600 es el ancho de pagina completo
+    this.widthPortada = 600; // =600 es el ancho de pagina completo
     this.widthSuciedad = 501;
     this.widthCurvaMae = 300;
     this.widthFormulaMae = 200;
@@ -454,14 +454,14 @@ export class ExportComponent implements OnInit {
       {
         nombre: 'resultadosMAE',
         descripcion: 'MAE de la planta',
-        orden: 13,
+        orden: 14,
         apt: 2,
         elegible: true
       },
       {
         nombre: 'anexo1',
         descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
-        orden: 14,
+        orden: 15,
         elegible: true
       }
     ];
@@ -470,13 +470,36 @@ export class ExportComponent implements OnInit {
       this.apartadosInforme.push({
         nombre: 'anexo2',
         descripcion: 'Anexo II: Anomalías térmicas por seguidor',
-        orden: 15,
+        orden: 16,
         elegible: true
       },
       {
         nombre: 'resultadosPosicion',
         descripcion: 'Resultados por posición',
         orden: 12,
+        apt: 2,
+        elegible: true
+      }
+      );
+    }
+    if (this.planta.tipo === '1 eje') {
+      this.apartadosInforme.push({
+        nombre: 'anexo2b',
+        descripcion: 'Anexo II: Anomalías térmicas por seguidor',
+        orden: 16,
+        elegible: true
+      },
+      {
+        nombre: 'resultadosPosicionB',
+        descripcion: 'Resultados por posición',
+        orden: 12,
+        apt: 2,
+        elegible: true
+      },
+      {
+        nombre: 'resultadosSeguidor',
+        descripcion: 'Resultados por seguidor',
+        orden: 13,
         apt: 2,
         elegible: true
       }
@@ -493,7 +516,8 @@ export class ExportComponent implements OnInit {
   }
 
   getPcColumnas(planta: PlantaInterface): any[] {
-    const pcColumnasTemp = GLOBAL.pcColumnas;
+    let pcColumnasTemp = GLOBAL.pcColumnas;
+
     const i = pcColumnasTemp.findIndex(e => e.nombre === 'local_xy');
     pcColumnasTemp[i].descripcion = this.plantaService
       .getNombreLocalX(planta)
@@ -605,26 +629,12 @@ export class ExportComponent implements OnInit {
       return this.t.t('mejorable');
     }
   }
-  // Ordena los pcs por global_y (pasillo)
-  // TODO: no funciona bien
-  sortByGlobalY(a: PcInterface, b: PcInterface) {
-    return parseFloat(a.global_y) - parseFloat(b.global_y);
-  }
 
   sortByLocalId(a: PcInterface, b: PcInterface) {
     return a.local_id - b.local_id;
   }
 
-  // Ordena los pcs por seguidor
-  sortByGlobalX(a: PcInterface, b: PcInterface) {
-    if (a.global_x < b.global_x) {
-      return -1;
-    }
-    if (a.global_x > b.global_x) {
-      return 1;
-    }
-    return 0;
-  }
+
   compareIrradiancia(a: PcInterface, b: PcInterface) {
     if (a.irradiancia < b.irradiancia) {
       return -1;
@@ -665,7 +675,7 @@ export class ExportComponent implements OnInit {
             this.pcService.currentFilteredPcs$
               .pipe(take(1))
               .subscribe(filteredPcs => {
-                this.filteredPcs = filteredPcs.sort(this.sortByGlobalX);
+                this.filteredPcs = filteredPcs.sort(this.pcService.sortByGlobals);
 
                 this.calcularInforme();
 
@@ -698,7 +708,7 @@ export class ExportComponent implements OnInit {
       this.pcService.currentFilteredPcs$
         .pipe(take(1))
         .subscribe(filteredPcs => {
-          this.filteredPcs = filteredPcs.sort(this.sortByLocalId);
+          this.filteredPcs = filteredPcs.sort(this.pcService.sortByLocalId);
 
           this.calcularInforme();
 
@@ -1990,6 +2000,25 @@ export class ExportComponent implements OnInit {
       ];
     };
 
+    const resultadosSeguidor = (index: string) => {
+      const numAnomaliasMedia = new Intl.NumberFormat("en-IN", {maximumSignificantDigits: 2}).format(this.filteredPcs.length/this.filteredSeguidores.length);
+      return [
+        {
+          text: `${index} - ${this.t.t('Resultados por seguidores')}`,
+          style: 'h3'
+        },
+
+        '\n',
+
+        {
+          text:
+          `${this.t.t('El número de seguidores afectados por anomalías térmicas es')} ${this.filteredSeguidores.length}. ${this.t.t('El número medio de módulos con anomalías por seguidor es de')} ${numAnomaliasMedia}.`,
+          style: 'p'
+        },
+        '\n'
+      ]
+    };
+
     const resultadosPosicion = (index: string) => {
       let texto1;
       if (this.planta.tipo === 'seguidores') {
@@ -2222,6 +2251,14 @@ export class ExportComponent implements OnInit {
       result = result.concat(resultadosPosicion(apartado));
       subtitulo = subtitulo + 1;
     }
+    if (this.filtroApartados.includes('resultadosSeguidor')) {
+      apartado = titulo
+        .toString()
+        .concat('.')
+        .concat(subtitulo.toString());
+      result = result.concat(resultadosSeguidor(apartado));
+      subtitulo = subtitulo + 1;
+    }
 
     if (this.filtroApartados.includes('resultadosMAE') && !this.hasUserArea) {
       apartado = titulo
@@ -2284,17 +2321,17 @@ export class ExportComponent implements OnInit {
     });
 
     if (this.planta.tipo === 'seguidores') {
-      this.filteredPcs = this.filteredPcs.sort(this.sortByGlobalX);
+      this.filteredPcs = this.filteredPcs.sort(this.pcService.sortByGlobals);
       cabecera.push({
         text: this.t.t('Seguidor'),
         style: 'tableHeaderRed',
         noWrap: true
       });
     } else {
-      this.filteredPcs = this.filteredPcs.sort(this.sortByGlobalY);
+      this.filteredPcs = this.filteredPcs.sort(this.pcService.sortByGlobals);
       let nombreCol = this.t.t(this.plantaService.getNombreGlobalX(this.planta));
       if (nombreCol.length > 0) {
-        nombreCol = nombreCol.concat('/');
+        nombreCol = nombreCol.concat(this.plantaService.getGlobalsConector());
       }
       nombreCol = nombreCol.concat(this.t.t(this.plantaService.getNombreGlobalY(this.planta)));
       cabecera.push({
@@ -2386,7 +2423,7 @@ export class ExportComponent implements OnInit {
         .concat(' ')
         .concat(this.datePipe.transform(pc.datetime * 1000, 'HH:mm:ss'));
     } else if (columnaNombre === 'local_xy') {
-      return this.plantaService.getNumeroModulo(this.planta, pc).toString();
+      return this.plantaService.getNumeroModulo(pc).toString();
     } else if (columnaNombre === 'severidad') {
       return this.pcService.getPcCoA(pc).toString();
     } else {
@@ -2406,9 +2443,14 @@ export class ExportComponent implements OnInit {
   getPaginaSeguidor(seguidor: SeguidorInterface) {
     // Header
     const cabecera = [];
-    const columnasAnexoSeguidor = this.currentFilteredColumnas.filter(col => {
+    let columnasAnexoSeguidor = this.currentFilteredColumnas.filter(col => {
       return !GLOBAL.columnasAnexoSeguidor.includes(col.nombre);
     });
+    if (this.planta.hasOwnProperty('numerosSerie')) {
+      if (this.planta.numerosSerie) {
+        columnasAnexoSeguidor.push({ nombre: "numeroSerie", descripcion: "N/S" });
+      }
+    }
 
     cabecera.push({
       text: this.t.t('Número'),
@@ -2459,7 +2501,7 @@ export class ExportComponent implements OnInit {
       new_row = new_row.concat(modulo['modelo'].toString()).concat(' ');
     }
     if (modulo.hasOwnProperty('potencia')) {
-      new_row = new_row.concat(modulo['potencia'].toString()).concat(' W');
+      new_row = new_row.concat('(').concat(modulo['potencia'].toString()).concat(' W)');
     }
 
     return new_row;
@@ -2482,7 +2524,7 @@ export class ExportComponent implements OnInit {
 
       const pagAnexo = [
         {
-          text: this.t.t('Seguidor') + ' ' + s.nombre,
+          text: `${this.t.t('Seguidor')} ${s.nombre}`,
           style: 'h2',
           alignment: 'center',
           pageBreak: 'before'
@@ -2495,6 +2537,180 @@ export class ExportComponent implements OnInit {
           width: this.widthSeguidor,
           alignment: 'center'
         },
+
+        '\n',
+
+        {
+          columns: [
+            {
+              width: '*',
+              text: ''
+            },
+
+            {
+              width: 'auto',
+              table: {
+                body: [
+                  [
+                    {
+                      text: this.t.t('Fecha/Hora'),
+                      style: 'tableHeaderImageData'
+                    },
+
+                    {
+                      text: this.t.t('Irradiancia'),
+                      style: 'tableHeaderImageData'
+                    },
+
+                    {
+                      text: this.t.t('Temp. aire'),
+                      style: 'tableHeaderImageData'
+                    },
+
+                    {
+                      text: this.t.t('Viento'),
+                      style: 'tableHeaderImageData'
+                    },
+
+                    {
+                      text: this.t.t('Emisividad'),
+                      style: 'tableHeaderImageData'
+                    },
+
+                    {
+                      text: this.t.t('Temp. reflejada'),
+                      style: 'tableHeaderImageData'
+                    },
+                    {
+                      text: this.t.t('Módulo'),
+                      style: 'tableHeaderImageData'
+                    }
+                  ],
+                  [
+                    {
+                      text: this.datePipe
+                        .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
+                        .concat(' ')
+                        .concat(
+                          this.datePipe.transform(
+                            s.pcs[0].datetime * 1000,
+                            'HH:mm:ss'
+                          )
+                        ),
+                      style: 'tableCellAnexo1',
+                      noWrap: true
+                    },
+
+                    {
+                      text: Math.round(s.pcs[0].irradiancia)
+                        .toString()
+                        .concat(' W/m2'),
+                      style: 'tableCellAnexo1',
+                      noWrap: true
+                    },
+                    {
+                      text: Math.round(s.pcs[0].temperaturaAire)
+                        .toString()
+                        .concat(' ºC'),
+                      style: 'tableCellAnexo1',
+                      noWrap: true
+                    },
+
+                    {
+                      text: s.pcs[0].viento,
+                      style: 'tableCellAnexo1',
+                      noWrap: true
+                    },
+
+                    {
+                      text: s.pcs[0].emisividad,
+                      style: 'tableCellAnexo1',
+                      noWrap: true
+                    },
+
+                    {
+                      text: Math.round(s.pcs[0].temperaturaReflejada)
+                        .toString()
+                        .concat(' ºC'),
+                      style: 'tableCellAnexo1',
+                      noWrap: true
+                    },
+
+                    {
+                      text: this.writeModulo(s.pcs[0]),
+                      style: 'tableCellAnexo1',
+                      noWrap: true
+                    }
+                  ]
+                ]
+              }
+            },
+
+            {
+              width: '*',
+              text: ''
+            }
+          ]
+        },
+
+        '\n',
+
+        {
+          columns: [
+            {
+              width: '*',
+              text: ''
+            },
+            {
+              width: 'auto',
+              table: {
+                headerRows: 1,
+                body: [table[0]].concat(table[1])
+              }
+            },
+            {
+              width: '*',
+              text: ''
+            }
+          ]
+        }
+      ];
+
+      allPagsAnexo.push(pagAnexo);
+    }
+
+    return allPagsAnexo;
+  }
+  getAnexoSeguidores1eje(numAnexo: string) {
+    const allPagsAnexo = [];
+    // tslint:disable-next-line:max-line-length
+    const pag1Anexo = {
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.t.t('Anexo')} ${numAnexo}: ${this.t.t('Anomalías térmicas por seguidor')}`,
+      style: 'h1',
+      alignment: 'center',
+      pageBreak: 'before'
+    };
+
+    allPagsAnexo.push(pag1Anexo);
+
+    for (const s of this.filteredSeguidores) {
+      const table = this.getPaginaSeguidor(s);
+
+      const pagAnexo = [
+        {
+          text: `${this.t.t('Seguidor')} ${s.nombre}`,
+          style: 'h2',
+          alignment: 'center',
+          pageBreak: 'before'
+        },
+
+        // '\n',
+
+        // {
+        //   image: `imgSeguidorCanvas${s.nombre}`,
+        //   width: this.widthSeguidor,
+        //   alignment: 'center'
+        // },
 
         '\n',
 
@@ -2652,6 +2868,9 @@ export class ExportComponent implements OnInit {
     }
     if (this.filtroApartados.includes('anexo2')) {
       anexo2 = this.getAnexoSeguidores(numAnexo);
+    }
+    if (this.filtroApartados.includes('anexo2b')) {
+      anexo2 = this.getAnexoSeguidores1eje(numAnexo);
     }
 
     return {
