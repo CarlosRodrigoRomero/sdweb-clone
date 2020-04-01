@@ -60,4 +60,5 @@ export interface PcInterface {
   modulosAfectados?: number;
   modulo: ModuloInterface;
   clase?: number;
+  numeroSerie?: string;
 }

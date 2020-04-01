@@ -172,7 +172,7 @@
               ><u>Nº Módulo</u></span
             >
             <span class="text-center">{{
-              plantaService.getNumeroModulo(planta, pc)
+              plantaService.getNumeroModulo(pc)
             }}</span>
           </div>
         </div>
@@ -206,7 +206,7 @@
               ><u>Nº Módulo</u></span
             >
             <span class="text-center">{{
-              plantaService.getNumeroModulo(planta, pc)
+              plantaService.getNumeroModulo(pc)
             }}</span>
           </div>
         </ng-template>
@@ -232,7 +232,7 @@
               pc.modulo.potencia
             }}
             W)</span
-          >
+          ><span *ngIf="pc.hasOwnProperty('numeroSerie')"> (S/N: {{ pc.numeroSerie }})</span>
         </div>
       </div>
 

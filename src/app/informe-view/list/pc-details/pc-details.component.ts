@@ -309,7 +309,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   }
 
   onClickVerDetalles(selectedPc: PcInterface): void {
-    // this.plantaService.getNumeroModulo(this.planta, selectedPc);
+    // this.plantaService.getNumeroModulo(selectedPc);
     // selectedPc.downloadUrlRjpg$ = this.storage.ref(`informes/${this.informeId}/rjpg/${selectedPc.archivoPublico}`).getDownloadURL();
     if (!selectedPc.downloadUrl$) {
       selectedPc.downloadUrl$ = this.storage
