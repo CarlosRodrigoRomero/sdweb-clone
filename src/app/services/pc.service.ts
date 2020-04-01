@@ -119,7 +119,7 @@ export class PcService {
                   pc.tipo !== 8 &&
                   pc.tipo !== 9))
           )
-          .sort(this.sortByLocalId)
+          .sort(this.sortByGlobals)
       )
     );
   }
@@ -143,19 +143,19 @@ export class PcService {
   }
 
   getPcsPorSeguidor(
-    allPcsConSeguidores: PcInterface[]
+    pcList: PcInterface[]
   ): Array<SeguidorInterface> {
     const arraySeguidores = Array<SeguidorInterface>();
-    allPcsConSeguidores.sort(this.sortByLocalId);
+    pcList.sort(this.sortByGlobals);
 
     let oldNombreSeguidor = "981768";
-    for (const pc of allPcsConSeguidores) {
+    for (const pc of pcList) {
       const nombreSeguidor = this.plantaService.getNombreSeguidor(pc);
       if (nombreSeguidor !== oldNombreSeguidor) {
         oldNombreSeguidor = nombreSeguidor;
 
         const data = {
-          pcs: allPcsConSeguidores.filter(element => {
+          pcs: pcList.filter(element => {
             return (
               this.plantaService.getNombreSeguidor(element) === nombreSeguidor
             );
@@ -311,16 +311,16 @@ export class PcService {
   }
 
   updatePc(pc: PcInterface) {
-    this.pcDoc = this.afs.doc("pcs/" + pc.id);
+    this.pcDoc = this.afs.doc('pcs/' + pc.id);
     this.pcDoc.update(pc);
   }
 
   delPc(pc: PcInterface) {
-    this.pcDoc = this.afs.doc("pcs/" + pc.id);
+    this.pcDoc = this.afs.doc('pcs/' + pc.id);
     this.pcDoc.delete();
   }
 
-  private sortByLocalId(a: PcInterface, b: PcInterface) {
+  sortByLocalId(a: PcInterface, b: PcInterface) {
     if (a.local_id < b.local_id) {
       return -1;
     }
@@ -329,6 +329,43 @@ export class PcService {
     }
     return 0;
   }
+
+  sortByGlobals(a: PcInterface, b: PcInterface): number {
+
+    if (a.global_x < b.global_x) {
+      return -1;
+    }
+    if (a.global_x > b.global_x) {
+      return 1;
+    }
+    // Mismo global_x
+    if (a.global_y < b.global_y) {
+      return -1;
+    }
+    if (a.global_y > b.global_y) {
+      return 1;
+    }
+
+
+    // Mismo global_x y global_y
+    if (a.local_y < b.local_y) {
+      return -1;
+    }
+    if (a.local_y > b.local_y) {
+      return 1;
+    }
+    // Mismo local_y
+    if (a.local_x < b.local_x) {
+      return -1;
+    }
+    if (a.local_x > b.local_x) {
+      return 1;
+    }
+    // Mismo local_x y local_y
+    return 0;
+
+  }
+
 
   containsLatLng(point, polygonPath) {
     const vs = polygonPath;
