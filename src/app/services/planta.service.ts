@@ -252,19 +252,18 @@ export class PlantaService {
     );
   }
 
-  getNumeroModulo(planta: PlantaInterface, pc: PcInterface): string {
-    const altura = this.getAltura(planta, pc.local_y);
-    if (planta.hasOwnProperty('etiquetasLocalXY')) {
-      if (planta.etiquetasLocalXY[altura] !== undefined) {
-        if (planta.etiquetasLocalXY[altura][pc.local_x - 1] !== undefined) {
-          return planta.etiquetasLocalXY[altura][pc.local_x - 1];
-        }
-      }
+  getNumeroModulo(pc: PcInterface): string {
+    const altura = this.getAltura(this.planta, pc.local_y);
+    if (this.planta.hasOwnProperty('etiquetasLocalXY') &&
+        this.planta.etiquetasLocalXY[altura] !== undefined &&
+        this.planta.etiquetasLocalXY[altura][pc.local_x - 1] !== undefined) {
+          return this.planta.etiquetasLocalXY[altura][pc.local_x - 1];
     }
-    return this.getEtiquetaLocalX(planta, pc)
+
+    return this.getEtiquetaLocalX(this.planta, pc)
       .toString()
       .concat('/')
-      .concat(this.getEtiquetaLocalY(planta, pc).toString());
+      .concat(this.getEtiquetaLocalY(this.planta, pc).toString());
   }
 
   getAltura(planta: PlantaInterface, localY: number) {
@@ -316,7 +315,8 @@ export class PlantaService {
     if (pc.hasOwnProperty('global_y')) {
       if (!Number.isNaN(pc.global_y)) {
         if (nombreSeguidor.length > 0) {
-          nombreSeguidor = nombreSeguidor.concat('/');
+
+          nombreSeguidor = nombreSeguidor.concat(this.getGlobalsConector());
         }
         nombreSeguidor = nombreSeguidor.concat(pc.global_y.toString());
       }
@@ -331,17 +331,25 @@ export class PlantaService {
     }
     if (pc.hasOwnProperty('global_y') && !Number.isNaN(pc.global_y)) {
       if (nombreEtiqueta.length > 0 ) {
-        nombreEtiqueta = nombreEtiqueta.concat('/');
+        nombreEtiqueta = nombreEtiqueta.concat(this.getGlobalsConector());
       }
       nombreEtiqueta = nombreEtiqueta.concat(pc.global_y.toString());
     }
     return nombreEtiqueta;
   }
 
+  getGlobalsConector(): string {
+    if (this.planta.hasOwnProperty('stringConectorGlobals')) {
+      return this.planta.stringConectorGlobals;
+    }
+
+    return GLOBAL.stringConectorGlobalsDefault;
+  }
+
   getNombreColsGlobal(planta: PlantaInterface) {
     let nombreCol = this.getNombreGlobalX(planta);
     if (nombreCol.length > 0) {
-      nombreCol = nombreCol.concat('/');
+      nombreCol = nombreCol.concat(this.getGlobalsConector());
     }
     nombreCol = nombreCol.concat(this.getNombreGlobalY(planta));
     // let nombreCol = "";
