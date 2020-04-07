@@ -165,8 +165,6 @@ export class ExportComponent implements OnInit {
   }
 
   ngOnInit() {
-
-
     this.planta = this.plantaService.get();
     this.informe = this.informeService.get();
     this.progresoPDF = '0';
@@ -656,7 +654,7 @@ export class ExportComponent implements OnInit {
     this.countLoadedImages = 0;
     this.countSeguidores = 1;
 
-    if (this.filtroApartados.includes('anexo2')) {
+    if (this.filtroApartados.includes('anexo2') ) {
       this.countLoadedImages$.subscribe(nombreSeguidor => {
         if (nombreSeguidor !== null) {
           const canvas = $(
@@ -670,7 +668,7 @@ export class ExportComponent implements OnInit {
             '1.0-0'
           );
 
-          // Si todo va bien...
+          // Cuando se carguen todas las imágenes
           if (this.countLoadedImages === this.countSeguidores) {
             this.pcService.currentFilteredPcs$
               .pipe(take(1))
@@ -679,32 +677,17 @@ export class ExportComponent implements OnInit {
 
                 this.calcularInforme();
 
-                // let docDefinition = this.getDocDefinition(imageListBase64);
-                // docDefinition.dom = JSON.stringify(docDefinition);
-                // docDefinition.dom = JSON.parse(docDefinition.dom);
-                // pdfMake
-                //   .createPdf(docDefinition.dom)
-                //   .download(this.informe.prefijo.concat('informe'));
-
                 pdfMake
                   .createPdf(this.getDocDefinition(imageListBase64))
                   .download(this.informe.prefijo.concat('informe'));
 
-                // pdfDocGenerator.getDataUrl((dataUrl) => {
-                //     const iframe = document.createElement('iframe');
-                //     iframe.src = dataUrl;
-                //     iframe.setAttribute('style', 'position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;');
-                //     document.getElementById('vistaPrevia').appendChild(iframe);
-                // });
                 this.generandoPDF = false;
               });
 
-            // pdfMake.createPdf(dd).download();
-            // this.generandoPDF = false;
           }
         }
       });
-    } else {
+  } else {
       this.pcService.currentFilteredPcs$
         .pipe(take(1))
         .subscribe(filteredPcs => {
@@ -712,31 +695,17 @@ export class ExportComponent implements OnInit {
 
           this.calcularInforme();
 
-          // let docDefinition = this.getDocDefinition(imageListBase64);
-          // docDefinition.dom = JSON.stringify(docDefinition);
-          // docDefinition.dom = JSON.parse(docDefinition.dom);
-
-          // const pdfDocGenerator = pdfMake.createPdf(
-          //   this.getDocDefinition(imageListBase64)
-          // );
-
           pdfMake
             .createPdf(this.getDocDefinition(imageListBase64))
             .download(this.informe.prefijo.concat('informe'), cb => {
               this.generandoPDF = false;
             });
 
-          // pdfDocGenerator.getDataUrl((dataUrl) => {
-          //     const iframe = document.createElement('iframe');
-          //     iframe.src = dataUrl;
-          //     iframe.setAttribute('style', 'position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;');
-          //     document.getElementById('vistaPrevia').appendChild(iframe);
-          // });
         });
     }
 
     // Generar imagenes
-    if (this.filtroApartados.includes('anexo2')) {
+    if (this.filtroApartados.includes('anexo2') ) {
       this.countSeguidores = 0;
       for (const seguidor of this.filteredSeguidores) {
         this.setImgSeguidorCanvas(seguidor, false);
@@ -745,109 +714,110 @@ export class ExportComponent implements OnInit {
     }
   }
 
+    private onlyUnique(pcs: PcInterface[]): PcInterface[] {
+      const archivosList = pcs.map( (v, i, a) => {
+        return v.archivo;
+      });
+
+
+      const archivosListUnique = archivosList.filter( (v, i, s) => {
+        return s.indexOf(v) === i;
+      });
+
+      const archivosListUniqueIndex = archivosList.map( (v, i, s) => {
+        return s.indexOf(v);
+      });
+
+
+      return pcs.filter( (v,i, s) => {
+        return archivosListUniqueIndex.includes(i);
+      })
+}
+
   private setImgSeguidorCanvas(
     seguidor: SeguidorInterface,
     vistaPrevia: boolean = false
   ) {
-    const seguidorObs = this.storage
-      .ref(`informes/${this.informe.id}/jpg/${seguidor.pcs[0].archivoPublico}`)
-      .getDownloadURL();
-    seguidorObs.pipe(take(1)).subscribe(url => {
-      seguidor.pcs[0].downloadUrlString = url;
-      // imagenTermica.src = url;
+    const uniquePcs = this.onlyUnique(seguidor.pcs);
+    const maxImagesPerPage = 2;
+    const numImagesSeguidor = uniquePcs.length;
+    const separacionImagenes = 2; //en pixeles
 
-      let canvas = new fabric.Canvas(
-        `imgSeguidorCanvas${this.plantaService.getNombreSeguidor(
-          seguidor.pcs[0]
-        )}`
-      );
-      if (vistaPrevia) {
-        canvas = new fabric.Canvas(
-          `imgSeguidorCanvasVP${this.plantaService.getNombreSeguidor(
-            seguidor.pcs[0]
-          )}`
-        );
+    const scale = Math.max(1 / numImagesSeguidor, 0.5);
+
+    const canvas = new fabric.Canvas(
+      `imgSeguidorCanvas${this.plantaService.getNombreSeguidor(
+        seguidor.pcs[0]
+      )}`
+    );
+    canvas.height = canvas.height + separacionImagenes;
+    canvas.backgroundColor = 'white';
+
+    const imagesWidth = GLOBAL.resolucionCamara[1] / Math.min(maxImagesPerPage, numImagesSeguidor);
+    const left0 = GLOBAL.resolucionCamara[1] / 2 - imagesWidth / 2;
+    let loadedImages = 0;
+
+    uniquePcs.forEach( (pc, index, array) => {
+
+      index++; // index empieza en 0. Le sumamos 1 para que empiece en 1.
+      if (index <= maxImagesPerPage) {
+        const pcs = seguidor.pcs.filter ( value => {
+          return value.archivo === pc.archivo;
+        });
+        this.storage
+          .ref(`informes/${this.informe.id}/jpg/${pc.archivoPublico}`)
+          .getDownloadURL().pipe(take(1)).subscribe(url => {
+          fabric.Image.fromURL(
+            url,
+            img => {
+              loadedImages++;
+              const top0 = (index - 1) * ( GLOBAL.resolucionCamara[0] / numImagesSeguidor + separacionImagenes );
+
+              img.set({
+                  top: top0,
+                  left: left0,
+                  // width :  GLOBAL.resolucionCamara[0] * scale,
+                  // height : GLOBAL.resolucionCamara[1] * scale,
+                  scaleX: scale,
+                  scaleY: scale
+                })
+              //i create an extra var for to change some image properties
+              canvas.add(img);
+              this.drawAllPcsInCanvas(pcs, canvas, vistaPrevia, scale, top0, left0);
+
+              if (!vistaPrevia && loadedImages === Math.min(numImagesSeguidor, maxImagesPerPage) ) {
+                this.countLoadedImages++;
+                this.countLoadedImages$.next(seguidor.nombre);
+              }
+            },
+            { crossOrigin: 'Anonymous' }
+          );
+
+        });
       }
-      fabric.Image.fromURL(
-        url,
-        img => {
-          //i create an extra var for to change some image properties
-          canvas.add(img);
-          this.drawAllPcsInCanvas(seguidor, canvas, vistaPrevia);
-          if (!vistaPrevia) {
-            this.countLoadedImages++;
-            this.countLoadedImages$.next(seguidor.nombre);
-          }
-        },
-        { crossOrigin: 'Anonymous' }
-      );
-      // fabric.util.loadImage(
-      //   url,
-      //   img => {
-      //     const fabricImage = new fabric.Image(img, {
-      //       left: 0,
-      //       top: 0,
-      //       angle: 0,
-      //       opacity: 1,
-      //       scaleX: 1,
-      //       scaleY: 1,
-      //       draggable: false,
-      //       lockMovementX: true,
-      //       lockMovementY: true
-      //     });
-      //     // fabricImage.scale(1);
-      //     canvas.add(fabricImage);
-      //     this.drawAllPcsInCanvas(seguidor, canvas, vistaPrevia);
-
-      //     if (!vistaPrevia) {
-      //       this.countLoadedImages++;
-      //       this.countLoadedImages$.next(seguidor.nombre);
-      //     }
-      //   },
-      //   null,
-      //   { crossOrigin: "anonymous" }
-      // );
-      // // this.imageList[globalX.toString()] = imageBase64;
-      // // images[`imgSeguidorCanvas${globalX}`] = imageBase64;
     });
   }
 
-  drawAllPcsInCanvas(
-    seguidor: SeguidorInterface,
+  private drawAllPcsInCanvas(
+    pcs: PcInterface[],
     canvas,
-    vistaPrevia: boolean = false
+    vistaPrevia: boolean = false, scale = 1, top0 = 0, left0 = 0
   ) {
-    seguidor.pcs.forEach((pc, i, a) => {
-      this.drawPc(pc, canvas);
-      this.drawTriangle(pc, canvas);
+    pcs.forEach((pc, i, a) => {
+      this.drawPc(pc, canvas, scale, top0, left0);
+      this.drawTriangle(pc, canvas, scale, top0, left0);
     });
-    // canvas.getElement().toBlob( (blob) => {
-
-    //   const urlCreator = window.URL;
-    //   const imageUrl = urlCreator.createObjectURL(blob);
-    //   const image = new Image();
-    //   image.src = imageUrl;
-    //   image.width = 640;
-    //   image.height = 512;
-    //   const list = document.getElementById(`divSeguidorVP${seguidor.global_x}`);
-
-    //   // list.removeChild(list[0]);
-    //   list.appendChild(image);
-    // },
-    // 'image/jpeg',
-    // 0.95 // calidad
-    // );
   }
 
-  drawPc(pc: PcInterface, canvas: any) {
+  private drawPc(pc: PcInterface, canvas: any, scale = 1, top0 = 0, left0 = 0) {
     const actObj1 = new fabric.Rect({
-      left: pc.img_left,
-      top: pc.img_top,
+      left: pc.img_left * scale + left0,
+      top: pc.img_top * scale + top0,
       fill: 'rgba(0,0,0,0)',
       stroke: 'black',
-      strokeWidth: 1,
-      width: pc.img_width,
-      height: pc.img_height,
+      strokeWidth: 1 * scale,
+      width: pc.img_width * scale,
+      height: pc.img_height * scale,
       hasControls: false,
       lockMovementY: true,
       lockMovementX: true,
@@ -857,13 +827,13 @@ export class ExportComponent implements OnInit {
       hoverCursor: 'default'
     });
     const actObj2 = new fabric.Rect({
-      left: pc.img_left - 1,
-      top: pc.img_top - 1,
+      left: pc.img_left * scale - 1 + left0,
+      top: pc.img_top * scale - 1  + top0,
       fill: 'rgba(0,0,0,0)',
       stroke: 'red',
       strokeWidth: 1,
-      width: pc.img_width + 2,
-      height: pc.img_height + 2,
+      width: pc.img_width * scale + 2,
+      height: pc.img_height * scale + 2,
       hasControls: false,
       lockMovementY: true,
       lockMovementX: true,
@@ -875,9 +845,9 @@ export class ExportComponent implements OnInit {
     const textId = new fabric.Text(
       '#'.concat(pc.local_id.toString().concat(' ')),
       {
-        left: pc.img_left,
-        top: pc.img_top - 26,
-        fontSize: 20,
+        left: pc.img_left * scale + left0,
+        top: (pc.img_top - 26) * scale  + top0,
+        fontSize: 20* scale,
         // textBackgroundColor: 'red',
         ref: 'text',
         selectable: false,
@@ -892,36 +862,36 @@ export class ExportComponent implements OnInit {
     canvas.renderAll();
   }
 
-  private drawTriangle(pc: PcInterface, canvas: any) {
-    const x = pc.img_x;
-    const y = pc.img_y;
+  private drawTriangle(pc: PcInterface, canvas: any, scale = 1, top0 = 0, left0 = 0) {
+    const x = pc.img_x * scale;
+    const y = pc.img_y * scale;
 
-    const squareBase = 12;
+    const squareBase = 12 * scale;
     const triangle = new fabric.Triangle({
       width: squareBase,
       height: squareBase,
       fill: 'red',
       stroke: 'black',
-      left: Math.round(x - squareBase / 2),
-      top: y, // si no ponemos este 2, entonces no lee bien debajo del triangulo
+      left: Math.round(x - squareBase / 2) + left0,
+      top: y  + top0, // si no ponemos este 2, entonces no lee bien debajo del triangulo
       selectable: false,
       ref: 'triangle',
       hoverCursor: 'default'
     });
 
-    const textTriangle = new fabric.Text(
-      ' + '.concat(pc.gradienteNormalizado.toString().concat(' ºC ')),
-      {
-        left: pc.img_left,
-        top: pc.img_top + pc.img_height + 5,
-        fontSize: 22,
-        textBackgroundColor: 'white',
-        ref: 'text',
-        selectable: false,
-        hoverCursor: 'default',
-        fill: 'red'
-      }
-    );
+    // const textTriangle = new fabric.Text(
+    //   ' + '.concat(pc.gradienteNormalizado.toString().concat(' ºC ')),
+    //   {
+    //     left: pc.img_left * scale,
+    //     top: (pc.img_top + pc.img_height + 5)  * scale,
+    //     fontSize: 22 * scale,
+    //     textBackgroundColor: 'white',
+    //     ref: 'text',
+    //     selectable: false,
+    //     hoverCursor: 'default',
+    //     fill: 'red'
+    //   }
+    // );
 
     canvas.add(triangle);
     // canvas.add(textTriangle);
@@ -2709,7 +2679,7 @@ export class ExportComponent implements OnInit {
           pageBreak: 'before'
         },
 
-        // '\n',
+        '\n',
 
         // {
         //   image: `imgSeguidorCanvas${s.nombre}`,
@@ -2717,7 +2687,7 @@ export class ExportComponent implements OnInit {
         //   alignment: 'center'
         // },
 
-        '\n',
+        // '\n',
 
         {
           columns: [
