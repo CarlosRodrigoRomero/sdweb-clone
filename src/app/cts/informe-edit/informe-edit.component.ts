@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { InformeService } from 'src/app/services/informe.service';
 import { PcService } from 'src/app/services/pc.service';
 import { PlantaService } from 'src/app/services/planta.service';
@@ -35,6 +35,7 @@ export interface EventInterface {
 
 @Component({
   selector: 'app-informe-edit',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './informe-edit.component.html',
   styleUrls: ['./informe-edit.component.css'],
   providers: [InformeService, PlantaService, PcService]
@@ -107,7 +108,7 @@ export class InformeEditComponent implements OnInit {
   public sentidoEstructura: boolean;
   public rectSeparation = 0.1;
   public filteredPcs: PcInterface[];
-  public maxMarkersShow = 25;
+  public maxMarkersShow = 500;
 
   constructor(
     private route: ActivatedRoute,
