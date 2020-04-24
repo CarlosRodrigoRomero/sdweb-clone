@@ -10,16 +10,16 @@
   </agm-circle>
 
   <agm-circle
-    *ngFor="let est of allEstructuras"
-    [latitude]="est.latitud"
-    [longitude]="est.longitud"
+    *ngFor="let elemPlant of allElementosPlanta"
+    [latitude]="elemPlant.getLatLng().lat"
+    [longitude]="elemPlant.getLatLng().lng"
     [radius]="5"
     [fillColor]="'yellow'"
     [circleDraggable]="true"
     [editable]="false"
-    [id]="est.id"
-    (circleClick)="onMapEstClick(est)"
-    (dragEnd)="onMapEstDragEnd(est, $event)"
+    [id]="elemPlant.id"
+    (circleClick)="onMapElementoPlantaClick(elemPlant)"
+    (dragEnd)="onMapElementoPlantaDragEnd(elemPlant, $event)"
   >
   </agm-circle>
 

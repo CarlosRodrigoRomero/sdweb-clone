@@ -1,11 +1,13 @@
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild, Input } from '@angular/core';
 import { AgmMap, LatLngLiteral } from '@agm/core';
 import { PcInterface } from 'src/app/models/pc';
-import { EstructuraInterface } from '../../models/estructura';
+import { EstructuraInterface, Estructura } from '../../models/estructura';
 import { InformeService } from '../../services/informe.service';
 import { ModuloInterface } from 'src/app/models/modulo';
 import { PlantaService } from '../../services/planta.service';
 import { take } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
+import { ElementoPlantaInterface } from '../../models/elementoPlanta';
 declare const google: any;
 
 @Component({
@@ -17,16 +19,20 @@ declare const google: any;
 export class EditMapComponent implements OnInit {
   @ViewChild(AgmMap) map: any;
   @Input() pcsOrEstructuras: boolean;
-  @Input() informeId: string;
   @Input() currentLatLng: LatLngLiteral;
 
   mapType: string;
   defaultZoom: number;
-  allEstructuras: EstructuraInterface[];
-  selectedElementoPlanta: PcInterface | EstructuraInterface;
+  allElementosPlanta: ElementoPlantaInterface[];
+  selectedElementoPlanta: ElementoPlantaInterface;
   polygonList: any[];
+  informeId: string;
 
-  constructor(private informeService: InformeService, private plantaService: PlantaService) {
+  constructor(
+    private route: ActivatedRoute,
+    private informeService: InformeService,
+    private plantaService: PlantaService
+  ) {
     this.mapType = 'satellite';
     this.defaultZoom = 18;
     this.currentLatLng = { lat: 39.453186, lng: -5.880743 };
@@ -34,6 +40,7 @@ export class EditMapComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.informeId = this.route.snapshot.paramMap.get('id');
     // this.informeService.selectedElementoPlanta$.subscribe((elementoPlanta) => {
     //   if (elementoPlanta !== this.elementoPlanta) {
     //     this.selectElementoPlanta(elementoPlanta);
@@ -44,20 +51,18 @@ export class EditMapComponent implements OnInit {
       .getAllEstructuras(this.informeId)
       .pipe(take(1))
       .subscribe((estArray) => {
-        this.allEstructuras = estArray;
+        this.allElementosPlanta = estArray;
       });
 
     this.informeService.avisadorNuevoElemento$.subscribe((elem) => {
-      console.log('EditMapComponent -> ngOnInit -> elem', elem);
       if (elem.hasOwnProperty('filaInicio')) {
-        const elemPos = this.allEstructuras.findIndex((est) => {
+        const elemPos = this.allElementosPlanta.findIndex((est) => {
           return est.id === elem.id;
         });
-        console.log('EditMapComponent -> ngOnInit -> elemPos', elemPos);
         if (elemPos > 0) {
-          this.allEstructuras.splice(elemPos, 1);
+          this.allElementosPlanta.splice(elemPos, 1);
         } else {
-          this.allEstructuras.push(elem);
+          this.allElementosPlanta.push(elem);
         }
       }
     });
@@ -69,7 +74,7 @@ export class EditMapComponent implements OnInit {
   //   console.log('EditMapComponent -> selectElementoPlanta -> elementoPlanta', elementoPlanta);
   // }
 
-  onMapEstClick(elementoPlanta: PcInterface | EstructuraInterface): void {
+  onMapElementoPlantaClick(elementoPlanta: ElementoPlantaInterface): void {
     this.selectedElementoPlanta = elementoPlanta;
     console.log('EditMapComponent -> onMapEstClick -> elementoPlanta', elementoPlanta);
     this.informeService.selectElementoPlanta(elementoPlanta);
@@ -115,33 +120,16 @@ export class EditMapComponent implements OnInit {
     // }
   }
 
-  onMapEstDragEnd(est: EstructuraInterface, event) {
-    this.onMapEstClick(est);
-    est.latitud = event.coords.lat;
-    est.longitud = event.coords.lng;
-
+  onMapElementoPlantaDragEnd(elementoPlanta: ElementoPlantaInterface, event) {
+    elementoPlanta.setLatLng({ lat: event.coords.lat, lng: event.coords.lng });
+    this.onMapElementoPlantaClick(elementoPlanta);
     // TODO: implementar globalCoordsFromLocation
     // let globalX;
     // let globalY;
     // let modulo;
     // [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea(event.coords);
-    this.informeService.updateEstructura(this.informeId, est);
+    this.informeService.updateElementoPlanta(this.informeId, elementoPlanta);
   }
-
-  // onMarkerDragEnd(pc: PcInterface, event) {
-  //   this.onMapMarkerClick(pc);
-  //   pc.gps_lat = event.coords.lat;
-  //   pc.gps_lng = event.coords.lng;
-  //   let globalX;
-  //   let globalY;
-  //   let modulo;
-
-  //   pc.image_rotation = this.current_image_rotation;
-
-  //   [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea(event.coords);
-
-  //   this.updateLocalAreaInPc(pc, globalX, globalY, modulo);
-  // }
 
   recalcularLocs() {
     console.log('TODO: implementar...');

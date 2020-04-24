@@ -6,9 +6,9 @@ import { map, take, switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { GLOBAL } from './global';
-import { EstructuraInterface } from '../models/estructura';
+import { EstructuraInterface, Estructura } from '../models/estructura';
 import { ArchivoVueloInterface } from '../models/archivoVuelo';
-import { PcInterface } from '../models/pc';
+import { ElementoPlantaInterface } from '../models/elementoPlanta';
 
 @Injectable({
   providedIn: 'root',
@@ -20,11 +20,11 @@ export class InformeService {
   public informes$: Observable<InformeInterface[]>;
   public informe$: Observable<InformeInterface>;
   public url: string;
-  private elementoPlantaSource = new Subject<PcInterface | EstructuraInterface>();
+  private elementoPlantaSource = new Subject<ElementoPlantaInterface>();
   selectedElementoPlanta$ = this.elementoPlantaSource.asObservable();
   private archivoVueloSource = new Subject<ArchivoVueloInterface>();
   selectedArchivoVuelo$ = this.archivoVueloSource.asObservable();
-  avisadorNuevoElementoSource = new Subject<PcInterface | EstructuraInterface>();
+  avisadorNuevoElementoSource = new Subject<ElementoPlantaInterface>();
   avisadorNuevoElemento$ = this.avisadorNuevoElementoSource.asObservable();
 
   constructor(public afs: AngularFirestore, private http: HttpClient) {
@@ -34,7 +34,7 @@ export class InformeService {
     this.informes$ = this.informesCollection.valueChanges();
   }
 
-  selectElementoPlanta(elementoPlanta: PcInterface | EstructuraInterface) {
+  selectElementoPlanta(elementoPlanta: ElementoPlantaInterface) {
     this.elementoPlantaSource.next(elementoPlanta);
   }
   selectArchivoVuelo(archivoVuelo: ArchivoVueloInterface) {
@@ -95,7 +95,7 @@ export class InformeService {
     return response;
   }
 
-  addEstructuraInforme(informeId: string, estructura: EstructuraInterface) {
+  addEstructuraInforme(informeId: string, estructura: Estructura) {
     // Primero vemos que no haya ninguna otra estructura en el archivo
     this.deleteEstructuraInforme(informeId, estructura.archivo)
       .pipe(take(1))
@@ -117,9 +117,17 @@ export class InformeService {
       });
   }
 
+  updateElementoPlanta(informeId: string, elementoPlanta: ElementoPlantaInterface): void {
+    if (elementoPlanta.constructor.name === Estructura.name) {
+      this.updateEstructura(informeId, elementoPlanta as Estructura);
+    }
+  }
+
   updateEstructura(informeId: string, estructura: EstructuraInterface) {
+    const estructuraObj = Object.assign({}, estructura);
+    console.log('InformeService -> updateEstructura -> estructuraObj', estructuraObj);
     const estructuraDoc = this.afs.doc('informes/' + informeId + '/estructuras/' + estructura.id);
-    estructuraDoc.update(estructura);
+    estructuraDoc.update(estructuraObj);
   }
 
   deleteEstructuraInforme(informeId: string, currentFileName: string): Observable<boolean> {
@@ -141,7 +149,7 @@ export class InformeService {
     return response;
   }
 
-  getEstructuraInforme(informeId: string, currentFileName: string): Observable<EstructuraInterface[]> {
+  getEstructuraInforme(informeId: string, currentFileName: string): Observable<Estructura[]> {
     const query$ = this.afs
       .collection('informes')
       .doc(informeId)
@@ -152,7 +160,7 @@ export class InformeService {
         actions.map((a) => {
           const data = a.payload.doc.data() as EstructuraInterface;
           data.id = a.payload.doc.id;
-          return data;
+          return new Estructura(data);
         })
       )
     );
@@ -160,7 +168,7 @@ export class InformeService {
     return result;
   }
 
-  getAllEstructuras(informeId: string): Observable<EstructuraInterface[]> {
+  getAllEstructuras(informeId: string): Observable<Estructura[]> {
     const query$ = this.afs.collection('informes').doc(informeId).collection('estructuras');
 
     return query$.snapshotChanges().pipe(
@@ -168,7 +176,7 @@ export class InformeService {
         actions.map((a) => {
           const data = a.payload.doc.data() as EstructuraInterface;
           data.id = a.payload.doc.id;
-          return data;
+          return new Estructura(data);
         })
       )
     );

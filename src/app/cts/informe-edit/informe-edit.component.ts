@@ -16,6 +16,7 @@ import { Observable } from 'rxjs';
 
 import { ArchivoVueloInterface } from 'src/app/models/archivoVuelo';
 import { LatLngLiteral } from '@agm/core';
+import { ElementoPlantaInterface } from '../../models/elementoPlanta';
 
 export interface EventInterface {
   offsetX: number;
@@ -170,7 +171,7 @@ export class InformeEditComponent implements OnInit {
     this.currentImageRotation = this.getCurrentImageRotation(this.currentTrackheading);
   }
 
-  setElementoPlanta(elementoPlanta: PcInterface | EstructuraInterface) {
+  setElementoPlanta(elementoPlanta: ElementoPlantaInterface) {
     this.setArchivoVuelo({ archivo: elementoPlanta.archivo, vuelo: elementoPlanta.vuelo } as ArchivoVueloInterface);
   }
 

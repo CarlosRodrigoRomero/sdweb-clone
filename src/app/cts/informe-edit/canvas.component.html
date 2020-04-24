@@ -71,7 +71,7 @@
     <div class="row">
       <div class="col-12">
         <label *ngFor="let gc of globalCoordsEstructura">
-          G_<b>{{ gc }}</b>
+          G_<b>{{ gc }}: </b>
           <input
             [(ngModel)]="estructura.globalCoords[gc]"
             id="global{{ gc }}"

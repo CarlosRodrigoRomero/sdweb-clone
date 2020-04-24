@@ -10,6 +10,9 @@ import { EstructuraInterface } from 'src/app/models/estructura';
 import { LatLngLiteral } from '@agm/core/map-types';
 import { PlantaInterface } from '../../models/planta';
 import { Observable } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { ElementoPlantaInterface } from 'src/app/models/elementoPlanta';
+import { Estructura } from '../../models/estructura';
 
 declare let fabric;
 
@@ -20,7 +23,6 @@ declare let fabric;
 })
 export class CanvasComponent implements OnInit {
   @Input() pcsOrEstructuras: boolean;
-  @Input() informeId: string;
   @Input() carpetaJpgGray: string;
   @Input() allPcs: PcInterface[];
   @Input() currentLatLng: LatLngLiteral;
@@ -37,13 +39,14 @@ export class CanvasComponent implements OnInit {
   private currentImageRotation: number;
   private backgroundImage: any;
   private selectedStrokeWidth: number;
+  informeId: string;
   rectRefReduction: number;
   filasPorDefecto: number;
   columnasPorDefecto: number;
   canvas: any;
   imageWidth: number;
   imageHeight: number;
-  selectedElement: PcInterface | EstructuraInterface;
+  selectedElement: ElementoPlantaInterface;
   selectedPc: PcInterface;
   estructuraMatrix: any[];
   currentArchivoVuelo: ArchivoVueloInterface;
@@ -55,15 +58,16 @@ export class CanvasComponent implements OnInit {
   activeLine;
   activeShape: any = false;
   sentidoEstructura = true;
-  estructura: EstructuraInterface;
+  estructura: Estructura;
   planta: PlantaInterface;
   globalCoordsEstructura: number[];
 
-  constructor(private informeService: InformeService) {
+  constructor(private informeService: InformeService, private route: ActivatedRoute) {
     this.imageWidth = GLOBAL.resolucionCamara[1];
     this.imageHeight = GLOBAL.resolucionCamara[0];
     this.selectedStrokeWidth = 2; // Tiene que ser par
     this.rectRefReduction = 0.2;
+    this.informeId = this.route.snapshot.paramMap.get('id');
   }
 
   ngOnInit(): void {
@@ -91,9 +95,8 @@ export class CanvasComponent implements OnInit {
     });
   }
 
-  selectElementoPlanta(elementoPlanta: PcInterface | EstructuraInterface): void {
+  selectElementoPlanta(elementoPlanta: ElementoPlantaInterface): void {
     this.selectedElement = elementoPlanta;
-    console.log('CanvasComponent -> selectElementoPlanta -> elementoPlanta', elementoPlanta);
     const archivoVuelo = { archivo: elementoPlanta.archivo, vuelo: elementoPlanta.vuelo } as ArchivoVueloInterface;
     this.selectArchivoVuelo(archivoVuelo);
     // Dibujar los elementos correspondientes en el canvas
@@ -102,11 +105,7 @@ export class CanvasComponent implements OnInit {
 
   selectArchivoVuelo(archivoVuelo: ArchivoVueloInterface): void {
     this.currentArchivoVuelo = archivoVuelo;
-    console.log('CanvasComponent -> selectArchivoVuelo -> archivoVuelo', archivoVuelo);
-
-    this.currentArchivoVuelo = archivoVuelo;
     // Borramos todos los elementos que pudiera haber si es necesario
-
     this.canvas.clear();
 
     // Ponemos la imagen de fondo
@@ -276,7 +275,7 @@ export class CanvasComponent implements OnInit {
     this.informeService.updateEstructura(this.informeId, this.estructura);
   }
 
-  dibujarEstructura(estructura: EstructuraInterface) {
+  dibujarEstructura(estructura: Estructura) {
     this.estructura = estructura;
     // Dibujar poligono exterior
     const polygon = new fabric.Polygon(estructura.coords, {
@@ -1059,14 +1058,16 @@ export class CanvasComponent implements OnInit {
       vuelo: this.currentArchivoVuelo.vuelo,
       latitud: this.currentLatLng.lat,
       longitud: this.currentLatLng.lng,
-      globalCoords: [0, 0, 0],
+      globalCoords: [null, null, null],
     } as EstructuraInterface;
 
+    const nuevaEstructuraObj = new Estructura(nuevaEstructura);
+
     // Dibujar dicha estructura
-    this.dibujarEstructura(nuevaEstructura);
+    this.dibujarEstructura(nuevaEstructuraObj);
 
     // Añadir a la base de datos
-    this.informeService.addEstructuraInforme(this.informeId, nuevaEstructura);
+    this.informeService.addEstructuraInforme(this.informeId, nuevaEstructuraObj);
 
     this.activeLine = null;
     this.activeShape = null;

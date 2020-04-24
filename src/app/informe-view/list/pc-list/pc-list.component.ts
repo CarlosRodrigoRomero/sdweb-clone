@@ -1,47 +1,36 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { MatTableDataSource, MatSort, MatPaginator } from "@angular/material";
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 
-import { Observable } from "rxjs";
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger
-} from "@angular/animations";
+import { Observable } from 'rxjs';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
-import { GLOBAL } from "src/app/services/global";
-import { InformeInterface } from "src/app/models/informe";
-import { PlantaInterface } from "src/app/models/planta";
-import { PcInterface } from "src/app/models/pc";
-import { PcService } from "src/app/services/pc.service";
-import { PlantaService } from "src/app/services/planta.service";
-import { InformeService } from "../../../services/informe.service";
+import { GLOBAL } from 'src/app/services/global';
+import { InformeInterface } from 'src/app/models/informe';
+import { PlantaInterface } from 'src/app/models/planta';
+import { PcInterface } from 'src/app/models/pc';
+import { PcService } from 'src/app/services/pc.service';
+import { PlantaService } from 'src/app/services/planta.service';
+import { InformeService } from '../../../services/informe.service';
 
 @Component({
-  selector: "app-pc-list",
-  templateUrl: "./pc-list.component.html",
-  styleUrls: ["./pc-list.component.css"],
+  selector: 'app-pc-list',
+  templateUrl: './pc-list.component.html',
+  styleUrls: ['./pc-list.component.css'],
   animations: [
-    trigger("detailExpand", [
-      state(
-        "collapsed, void",
-        style({ height: "0px", minHeight: "0", display: "none" })
-      ),
-      state("expanded", style({ height: "*" })),
-      transition("* <=> *", animate("225ms cubic-bezier(0.4, 0.0, 0.2, 1)"))
-    ])
-  ]
+    trigger('detailExpand', [
+      state('collapsed, void', style({ height: '0px', minHeight: '0', display: 'none' })),
+      state('expanded', style({ height: '*' })),
+      transition('* <=> *', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
-export class PcListComponent implements OnInit {
+export class PcListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   public allPcs: PcInterface[];
 
-  public pcDataSource: MatTableDataSource<
-    PcInterface
-  > = new MatTableDataSource();
+  public pcDataSource: MatTableDataSource<PcInterface> = new MatTableDataSource();
   public expandedElement: PcInterface;
   public columnsToDisplay: string[];
   public searchKey: string;
@@ -66,26 +55,26 @@ export class PcListComponent implements OnInit {
     this.planta = this.plantaService.get();
     this.informe = this.informeService.get();
     this.allPcs = this.pcService.get();
-    if (this.planta.tipo === "seguidores") {
+    if (this.planta.tipo === 'seguidores') {
       this.columnsToDisplay = [
-        "severidad",
-        "tipo",
-        "perdidas",
-        "local_id",
-        "global_x",
-        "temperaturaMax",
-        "gradienteNormalizado"
+        'severidad',
+        'tipo',
+        'perdidas',
+        'local_id',
+        'global_x',
+        'temperaturaMax',
+        'gradienteNormalizado',
       ];
     } else {
       this.columnsToDisplay = [
-        "severidad",
-        "tipo",
-        "perdidas",
-        "local_id",
-        "global_x",
-        "global_y",
-        "temperaturaMax",
-        "gradienteNormalizado"
+        'severidad',
+        'tipo',
+        'perdidas',
+        'local_id',
+        'global_x',
+        'global_y',
+        'temperaturaMax',
+        'gradienteNormalizado',
       ];
     }
   }
@@ -95,35 +84,20 @@ export class PcListComponent implements OnInit {
     this.pcDataSource.paginator = this.paginator;
 
     /* now it's okay to set large data source... */
-    this.pcService.currentFilteredPcs$.subscribe(list => {
+    this.pcService.currentFilteredPcs$.subscribe((list) => {
       this.pcDataSource.data = list;
       this.pcDataSource.filterPredicate = (pc, filter) => {
         filter = filter.toLowerCase();
-        if (this.planta.tipo === "seguidores") {
+        if (this.planta.tipo === 'seguidores') {
           return (
-            this.plantaService
-              .getNombreSeguidor(pc)
-              .toLowerCase()
-              .includes(filter) ||
-            pc.local_id
-              .toString()
-              .toLowerCase()
-              .includes(filter)
+            this.plantaService.getNombreSeguidor(pc).toLowerCase().includes(filter) ||
+            pc.local_id.toString().toLowerCase().includes(filter)
           );
         } else {
           return (
-            pc.local_id
-              .toString()
-              .toLowerCase()
-              .includes(filter) ||
-            pc.global_x
-              .toString()
-              .toLowerCase()
-              .includes(filter) ||
-            pc.global_y
-              .toString()
-              .toLowerCase()
-              .includes(filter)
+            pc.local_id.toString().toLowerCase().includes(filter) ||
+            pc.global_x.toString().toLowerCase().includes(filter) ||
+            pc.global_y.toString().toLowerCase().includes(filter)
           );
         }
       };
@@ -139,7 +113,7 @@ export class PcListComponent implements OnInit {
   }
 
   onSearchClear() {
-    this.searchKey = "";
+    this.searchKey = '';
     this.applyFilter();
   }
 
@@ -161,7 +135,7 @@ export class PcListComponent implements OnInit {
   }
 
   checkIsMoreThanOne(item: any) {
-    if (Number.isNaN(item) || typeof item === "string") {
+    if (Number.isNaN(item) || typeof item === 'string') {
       return false;
     }
     return item > 1;

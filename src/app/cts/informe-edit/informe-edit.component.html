@@ -69,7 +69,6 @@
           <app-canvas
             *ngIf="planta$"
             [pcsOrEstructuras]="pcsOrEstructuras"
-            [informeId]="informeId"
             [carpetaJpgGray]="carpetaJpgGray"
             [allPcs]="allPcs"
             [currentLatLng]="currentLatLng"
@@ -173,7 +172,7 @@
         </div>
 
         <div class="col col-xs-6 mapa">
-          <app-edit-map [informeId]="informeId" [currentLatLng]="currentLatLng"> </app-edit-map>
+          <app-edit-map [currentLatLng]="currentLatLng"> </app-edit-map>
 
           <div *ngIf="selected_pc" class="selected-pc-div">
             <div class="selected-pc-header">
@@ -468,7 +467,7 @@
        </div>-->
 
     <div class="col col-xs-12 col-lg-3 col-pcs">
-      <app-edit-list [pcsOrEstructuras]="pcsOrEstructuras" [informeId]="informeId"> </app-edit-list>
+      <app-edit-list [pcsOrEstructuras]="pcsOrEstructuras"> </app-edit-list>
     </div>
   </div>
 </div>
