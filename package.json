@@ -11,7 +11,7 @@
   },
   "private": true,
   "dependencies": {
-    "@agm/core": "^1.1.0",
+    "@agm/core": "^1.0.0-beta.7",
     "@angular/animations": "^7.2.15",
     "@angular/cdk": "^7.3.7",
     "@angular/common": "^7.2.15",
@@ -27,7 +27,7 @@
     "@fortawesome/angular-fontawesome": "^0.3.0",
     "angular-progress-bar": "^1.0.9",
     "bootstrap": "^4.4.0",
-    "core-js": "^2.5.4",
+    "core-js": "^2.6.5",
     "fabric": "^2.7.0",
     "firebase": "^5.11.1",
     "hammerjs": "^2.0.8",
@@ -41,18 +41,19 @@
     "primeicons": "^1.0.0",
     "primeng": "^7.1.3",
     "rxjs": "~6.3.3",
-    "tslib": "^1.10.0",
-    "zone.js": "^0.9.1"
+    "tslib": "^1.10.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.13.9",
+    "@angular-devkit/build-angular": "^0.13.10",
     "@angular/cli": "^7.3.9",
     "@angular/compiler-cli": "^7.2.15",
     "@angular/language-service": "^7.2.15",
+    "@fortawesome/fontawesome-svg-core": "^1.2.0",
     "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "^2.0.8",
     "@types/node": "~8.9.4",
     "@types/ol": "^4.6.5",
+    "acorn": "^6.0.0",
     "codelyzer": "~4.5.0",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
@@ -64,6 +65,7 @@
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
-    "typescript": "~3.2.0"
+    "typescript": "~3.2.0",
+    "zone.js": "^0.8.29"
   }
 }
