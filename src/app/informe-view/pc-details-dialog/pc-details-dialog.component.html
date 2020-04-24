@@ -13,7 +13,7 @@
         id="visual-zoom"
         width="{{ zoomSquare }}"
         height="{{ zoomSquare }}"
-        style="position:absolute; top:0; left:0; display:none"
+        style="position: absolute; top: 0; left: 0; display: none;"
       ></canvas>
 
       <div
@@ -85,14 +85,14 @@
         </div>
         <div class="pc-details-derecha-item-tabla">
           <span class="text-center"><u>Temp. referencia</u></span>
-          <span style="color:blue" class="text-center"
+          <span style="color: blue;" class="text-center"
             >{{ pc.temperaturaRef }} ºC</span
           >
         </div>
 
         <div class="pc-details-derecha-item-tabla">
           <span class="text-center"><u>&Delta;T (normalizado)</u></span>
-          <span style="color:red" class="text-center"
+          <span style="color: red;" class="text-center"
             >+ {{ pc.gradienteNormalizado | number: "1.0-1" }} ºC</span
           >
         </div>
@@ -107,7 +107,10 @@
 
       <div *ngIf="!sinPcs" class="pc-details-derecha-item">
         <div class="pc-details-derecha-icon">
-          <i style="color:red" class="fas fa-exclamation-circle icon-error"></i>
+          <i
+            style="color: red;"
+            class="fas fa-exclamation-circle icon-error"
+          ></i>
         </div>
         <div class="pc-texto">
           <span class="detail-title">Anomalía: </span>
@@ -120,7 +123,7 @@
 
       <div *ngIf="!sinPcs" class="pc-details-derecha-item">
         <div class="pc-details-derecha-icon">
-          <i style="color:orange" class="fas fa-flag icon-flag"></i>
+          <i style="color: orange;" class="fas fa-flag icon-flag"></i>
         </div>
         <div class="pc-texto">
           <span class="detail-title">Causa: </span>
@@ -164,7 +167,11 @@
             <span
               *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')"
               class="text-center"
-              ><u>{{ plantaService.getNombreLocalX(planta) }}/{{plantaService.getNombreLocalY(planta)}}</u></span
+              ><u
+                >{{ plantaService.getNombreLocalX(planta) }}/{{
+                  plantaService.getNombreLocalY(planta)
+                }}</u
+              ></span
             >
             <span
               *ngIf="planta.hasOwnProperty('etiquetasLocalXY')"
@@ -198,7 +205,11 @@
             <span
               *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')"
               class="text-center"
-              ><u>{{ plantaService.getNombreLocalX(planta) }}/{{plantaService.getNombreLocalY(planta)}}</u></span
+              ><u
+                >{{ plantaService.getNombreLocalX(planta) }}/{{
+                  plantaService.getNombreLocalY(planta)
+                }}</u
+              ></span
             >
             <span
               *ngIf="planta.hasOwnProperty('etiquetasLocalXY')"
@@ -232,7 +243,9 @@
               pc.modulo.potencia
             }}
             W)</span
-          ><span *ngIf="pc.hasOwnProperty('numeroSerie')"> (S/N: {{ pc.numeroSerie }})</span>
+          ><span *ngIf="pc.hasOwnProperty('numeroSerie')">
+            (S/N: {{ pc.numeroSerie }})</span
+          >
         </div>
       </div>
 

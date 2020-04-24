@@ -1,16 +1,17 @@
-import { NgModule } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { ExportComponent } from "./export/export.component";
-import { SpinnerModule } from "../spinner/spinner.module";
-import { FormsModule } from "@angular/forms";
-import { ExportRoutingModule } from "./export-routing.module";
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ExportComponent } from './export/export.component';
+import { SpinnerModule } from '../spinner/spinner.module';
+import { FormsModule } from '@angular/forms';
+import { ExportRoutingModule } from './export-routing.module';
 import {
   MatTableModule,
   MatCardModule,
   MatCheckboxModule,
   MatButtonToggleModule,
-  MatButtonModule
-} from "@angular/material";
+  MatButtonModule,
+  MatSortModule,
+} from '@angular/material';
 
 @NgModule({
   declarations: [ExportComponent],
@@ -22,8 +23,9 @@ import {
     MatCardModule,
     MatTableModule,
     FormsModule,
+    MatSortModule,
     ExportRoutingModule,
-    MatButtonModule
-  ]
+    MatButtonModule,
+  ],
 })
 export class InformeExportModule {}

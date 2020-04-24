@@ -1,15 +1,8 @@
-<div class="hidden-canvas">
-  <!-- <canvas
-    class="hidden-canvas"
-    id="hiddenCanvas"
-    width="640"
-    height="512"
-  ></canvas> -->
-</div>
 <div class="container-fluid" id="container-ppal">
   <div class="row">
     <div class="col-xs-12 col-lg-9">
       <h2>{{ planta?.nombre }} - {{ titulo | date }}</h2>
+      <span> <input type="text" [(ngModel)]="carpetaJpgGray" (change)="onChangeCarpetaJpgGray($event)" />) - </span>
       <div *ngIf="alertMessage" class="alert alert-warning" role="alert">
         {{ alertMessage }}
       </div>
@@ -17,7 +10,7 @@
       <div class="btn-group btn-group-toggle btn-group-vuelos">
         <label
           [ngClass]="{ selected_flight: currentFlight === flight }"
-          *ngFor="let flight of flights_list"
+          *ngFor="let flight of flightsList"
           [for]="flight"
           class="btn btn-secondary"
         >
@@ -30,48 +23,31 @@
           />{{ flight }}
         </label>
       </div>
-      ( {{ currentFileName }} -
+      ( {{ currentArchivoVuelo?.archivo }} -
       <input
         class="input-rangevalue"
         type="text"
         (change)="setImageFromRangeValue(rangeValue)"
         [(ngModel)]="rangeValue"
-      />) -
-      <input
-        class="input-rangevalue"
-        type="text"
-        [(ngModel)]="current_image_rotation"
-      />º -
+      />) - <input class="input-rangevalue" type="text" [(ngModel)]="currentImageRotation" />º -
       <input type="checkbox" [(ngModel)]="manualRotation" />
 
-      <button
-        class="btn btn-secondary input-range-button"
-        (click)="setImageFromRangeValue(rangeValue - 4)"
-      >
+      <button class="btn btn-secondary input-range-button" (click)="setImageFromRangeValue(rangeValue - 4)">
         &lt; | &lt;
       </button>
-      <button
-        class="btn btn-secondary input-range-button"
-        (click)="setImageFromRangeValue(rangeValue - 1)"
-      >
+      <button class="btn btn-secondary input-range-button" (click)="setImageFromRangeValue(rangeValue - 1)">
         &lt;
       </button>
 
-      <button class="btn btn-danger input-range-button" (click)="setSeguidor()">
+      <!-- <button class="btn btn-danger input-range-button" (click)="setSeguidor($event)">
         ##
-      </button>
+      </button> -->
 
-      <button
-        class="btn btn-secondary input-range-button"
-        (click)="setImageFromRangeValue(rangeValue + 1)"
-      >
+      <button class="btn btn-secondary input-range-button" (click)="setImageFromRangeValue(rangeValue + 1)">
         &gt;
       </button>
 
-      <button
-        class="btn btn-secondary input-range-button"
-        (click)="setImageFromRangeValue(rangeValue + 4)"
-      >
+      <button class="btn btn-secondary input-range-button" (click)="setImageFromRangeValue(rangeValue + 4)">
         &gt; | &gt;
       </button>
 
@@ -83,213 +59,121 @@
           [max]="fileList.length || 1"
           step="1"
           [(value)]="rangeValue"
-          (input)="onInputRange($event)"
+          (input)="setImageFromRangeValue($event.target.value)"
         />
         <!-- hay que restarle 1 -->
       </div>
 
       <div class="row">
         <div class="col col-xs-6">
-          <!-- <span id="tooltip"> {{tooltip_temp}} </span> -->
-          <div
-            (dblclick)="onDblClickCanvas($event)"
-            (mouseup)="onMouseUpCanvas($event)"
-            (mousemove)="onMouseMoveCanvas($event)"
-            (click)="onClickBuildEstructura($event)"
+          <app-canvas
+            *ngIf="planta$"
+            [pcsOrEstructuras]="pcsOrEstructuras"
+            [informeId]="informeId"
+            [carpetaJpgGray]="carpetaJpgGray"
+            [allPcs]="allPcs"
+            [currentLatLng]="currentLatLng"
+            [planta$]="planta$"
           >
-            <canvas
-              class="imagen-termica"
-              id="mainCanvas"
-              width="640"
-              height="512"
-            ></canvas>
-
-            <button
-              mat-raised-button
-              color="primary"
-              (click)="onClickDeleteEstructura()"
-            >
-              DEL
-            </button>
-
-            <mat-checkbox
-              (click)="onClickEstructura()"
-              [(ngModel)]="buildingEstructura"
-              >estructura</mat-checkbox
-            >
-            <input
-              [(ngModel)]="estructura.filas"
-              type="number"
-              id="filasEstructura"
-              (change)="updateEstructura()"
-              maxlength="2"
-              size="4"
-              *ngIf="estructuraOn"
-            />
-            <input
-              [(ngModel)]="estructura.columnas"
-              type="number"
-              id="columnasEstructura"
-              (change)="updateEstructura()"
-              maxlength="2"
-              size="4"
-              *ngIf="estructuraOn"
-            />
-
-            <mat-checkbox
-              (change)="updateEstructura()"
-              *ngIf="planta?.tipo !== 'seguidores' && estructuraOn"
-              [(ngModel)]="estructura.sentido"
-              >{{
-                sentidoEstructura ? "dcha->izq" : "izq->drcha"
-              }}</mat-checkbox
-            >
-            <input
-              *ngIf="estructuraOn"
-              [(ngModel)]="estructura.columnaInicio"
-              type="number"
-              id="columnaInicioEstructura"
-              (change)="updateEstructura()"
-              maxlength="2"
-              size="4"
-            />
-
-            <!-- <input
-              *ngIf="estructuraOn"
-              [(ngModel)]="estructura.filaInicio"
-              type="number"
-              id="filaInicioEstructura"
-              (change)="updateEstructura()"
-              maxlength="2"
-              size="3"
-            /> -->
-          </div>
+          </app-canvas>
           <div>
             <span>Pérdidas</span>
-          <input
-            *ngIf="selected_pc"
-            style="width: 3rem;"
-            [(ngModel)]="selected_pc.perdidas"
-            (change)="updatePcInDb(selected_pc, false)"
-            type="text"
-            id="perdidas"
-            maxlength="5"
-            size="5"
-            value="0"
-          />
-          <span>Severidad</span>
-          <input
-            *ngIf="selected_pc"
-            style="width: 3rem;"
-            [(ngModel)]="selected_pc.severidad"
-            (change)="updatePcInDb(selected_pc, false)"
-            type="number"
-            id="severidad"
-            maxlength="3"
-            size="1"
-            value="1"
-          />
-          <span>Irradiancia</span>
-          <input
-            *ngIf="selected_pc"
-            style="width: 6rem;"
-            [(ngModel)]="selected_pc.irradiancia"
-            (change)="updatePcInDb(selected_pc, false)"
-            type="text"
-            id="irradiancia"
-            maxlength="5"
-            size="5"
-            value="1"
-          />
-          <span>SqBase</span>
-          <input
-            style="width: 3rem;"
-            *ngIf="selected_pc"
-            [(ngModel)]="squareBase"
-            type="number"
-            id="squareBase"
-            maxlength="2"
-            size="20"
-            (change)="setSquareBase(squareBase)"
-          />
-          <br />
-          <span>SqProp</span>
-          <input
-            style="width: 3rem;"
-            *ngIf="selected_pc"
-            [(ngModel)]="squareProp"
-            type="number"
-            id="squareProp"
-            maxlength="2"
-            size="20"
-            (change)="setSquareBase()"
-          />
-          <br />
-          <span>maxMarkersShow</span>
-          <input
-            style="width: 3rem;"
-            [(ngModel)]="maxMarkersShow"
-            type="number"
-            id="maxMarkersShow"
-            maxlength="2"
-            size="20"
-          />
-          <br />
-          <span>Modulos afectados</span>
-          <input
-            *ngIf="selected_pc"
-            [(ngModel)]="selected_pc.modulosAfectados"
-            (change)="updatePcInDb(selected_pc, false)"
-            type="number"
-            id="modulosAfectados"
-            maxlength="5"
-            size="2"
-            value="1"
-          />
-          <span>Nubosidad</span>
-          <input
-            *ngIf="selected_pc"
-            [(ngModel)]="selected_pc.nubosidad"
-            (change)="updatePcInDb(selected_pc, false)"
-            type="number"
-            id="nubosidad"
-            maxlength="1"
-            size="2"
-            value="1"
-          />
+            <input
+              *ngIf="selected_pc"
+              style="width: 3rem;"
+              [(ngModel)]="selected_pc.perdidas"
+              (change)="updatePcInDb(selected_pc, false)"
+              type="text"
+              id="perdidas"
+              maxlength="5"
+              size="5"
+              value="0"
+            />
+            <span>Severidad</span>
+            <input
+              *ngIf="selected_pc"
+              style="width: 3rem;"
+              [(ngModel)]="selected_pc.severidad"
+              (change)="updatePcInDb(selected_pc, false)"
+              type="number"
+              id="severidad"
+              maxlength="3"
+              size="1"
+              value="1"
+            />
+            <span>Irradiancia</span>
+            <input
+              *ngIf="selected_pc"
+              style="width: 6rem;"
+              [(ngModel)]="selected_pc.irradiancia"
+              (change)="updatePcInDb(selected_pc, false)"
+              type="text"
+              id="irradiancia"
+              maxlength="5"
+              size="5"
+              value="1"
+            />
+            <span>SqBase</span>
+            <input
+              style="width: 3rem;"
+              *ngIf="selected_pc"
+              [(ngModel)]="squareBase"
+              type="number"
+              id="squareBase"
+              maxlength="2"
+              size="20"
+              (change)="setSquareBase(squareBase)"
+            />
+            <br />
+            <span>SqProp</span>
+            <input
+              style="width: 3rem;"
+              *ngIf="selected_pc"
+              [(ngModel)]="squareProp"
+              type="number"
+              id="squareProp"
+              maxlength="2"
+              size="20"
+              (change)="setSquareBase()"
+            />
+            <br />
+            <span>maxMarkersShow</span>
+            <input
+              style="width: 3rem;"
+              [(ngModel)]="maxMarkersShow"
+              type="number"
+              id="maxMarkersShow"
+              maxlength="2"
+              size="20"
+            />
+            <br />
+            <span>Modulos afectados</span>
+            <input
+              *ngIf="selected_pc"
+              [(ngModel)]="selected_pc.modulosAfectados"
+              (change)="updatePcInDb(selected_pc, false)"
+              type="number"
+              id="modulosAfectados"
+              maxlength="5"
+              size="2"
+              value="1"
+            />
+            <span>Nubosidad</span>
+            <input
+              *ngIf="selected_pc"
+              [(ngModel)]="selected_pc.nubosidad"
+              (change)="updatePcInDb(selected_pc, false)"
+              type="number"
+              id="nubosidad"
+              maxlength="1"
+              size="2"
+              value="1"
+            />
           </div>
         </div>
 
         <div class="col col-xs-6 mapa">
-          <agm-map
-            [latitude]="current_gps_lat"
-            [longitude]="current_gps_lng"
-            [mapTypeId]="mapType"
-            [zoom]="defaultZoom"
-          >
-            <agm-circle
-              [latitude]="current_gps_lat"
-              [longitude]="current_gps_lng"
-              [radius]="5"
-              [fillColor]="'red'"
-              [circleDraggable]="false"
-              [editable]="false"
-            >
-            </agm-circle>
-
-            <agm-marker
-              [ngClass]="{ selected_marker: selected_pc === pc }"
-              *ngFor="let pc of filterPcsByFlight(currentFlight)"
-              [id]="pc.local_id"
-              (markerClick)="onMapMarkerClick(pc)"
-              [latitude]="pc.gps_lat"
-              [longitude]="pc.gps_lng"
-              [label]="{ text: pc.local_id + '', color: pc.color }"
-              [markerDraggable]="true"
-              (dragEnd)="onMarkerDragEnd(pc, $event)"
-            >
-            </agm-marker>
-          </agm-map>
+          <app-edit-map [informeId]="informeId" [currentLatLng]="currentLatLng"> </app-edit-map>
 
           <div *ngIf="selected_pc" class="selected-pc-div">
             <div class="selected-pc-header">
@@ -299,10 +183,7 @@
               </div>
               <div>- {{ selected_pc.image_rotation }} º -</div>
 
-              <button
-                class="btn btn-danger"
-                (click)="onClickDeletePc(selected_pc)"
-              >
+              <button class="btn btn-danger" (click)="onClickDeletePc(selected_pc)">
                 X
               </button>
             </div>
@@ -310,16 +191,11 @@
               <div class="selected-pc-local-coords">
                 <table id="tabla_local_x" class="tabla_local_coords">
                   <tr *ngFor="let f of filas_array" class="local-coords-row">
-                    <td
-                      *ngFor="let c of columnas_array"
-                      class="local-coords-col"
-                    >
+                    <td *ngFor="let c of columnas_array" class="local-coords-col">
                       <div
                         *ngIf="planta.tipo !== 'fija'; else dosejes"
                         [ngClass]="{
-                          'local-coords-selected':
-                            selected_pc.local_x === c &&
-                            selected_pc.local_y === f,
+                          'local-coords-selected': selected_pc.local_x === c && selected_pc.local_y === f,
                           'local-coords-table-cell-v': planta.vertical === true,
                           'local-coords-table-cell-h': planta.vertical === false
                         }"
@@ -331,10 +207,8 @@
                         <div
                           [ngClass]="{
                             'local-coords-selected': selected_pc.local_y === f,
-                            'local-coords-table-cell-v':
-                              planta.vertical === true,
-                            'local-coords-table-cell-h':
-                              planta.vertical === false
+                            'local-coords-table-cell-v': planta.vertical === true,
+                            'local-coords-table-cell-h': planta.vertical === false
                           }"
                           (click)="onClickLocalCoordsTable(selected_pc, f, c)"
                         >
@@ -362,10 +236,7 @@
                     name="tipo"
                     [value]="8"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_8.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_8.png" />
                 </label>
                 <label class="selected-pc-tipo-label">
                   <input
@@ -375,10 +246,7 @@
                     name="tipo"
                     [value]="9"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_9.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_9.png" />
                 </label>
 
                 <label class="selected-pc-tipo-label">
@@ -389,10 +257,7 @@
                     name="tipo"
                     [value]="3"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_3.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_3.png" />
                 </label>
                 <label class="selected-pc-tipo-label">
                   <input
@@ -402,11 +267,7 @@
                     name="tipo"
                     [value]="4"
                   />
-                  <img
-                    class="img-fluid"
-                    alt="String"
-                    src="../../../assets/images/tipo_4.png"
-                  />
+                  <img class="img-fluid" alt="String" src="../../../assets/images/tipo_4.png" />
                 </label>
                 <label class="selected-pc-tipo-label">
                   <input
@@ -416,10 +277,7 @@
                     name="tipo"
                     [value]="5"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_5.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_5.png" />
                 </label>
                 <label class="selected-pc-tipo-label">
                   <input
@@ -429,10 +287,7 @@
                     name="tipo"
                     [value]="6"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_6.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_6.png" />
                 </label>
                 <label class="selected-pc-tipo-label">
                   <input
@@ -442,10 +297,7 @@
                     name="tipo"
                     [value]="7"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_7.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_7.png" />
                 </label>
 
                 <label class="selected-pc-tipo-label">
@@ -456,10 +308,7 @@
                     name="tipo"
                     [value]="10"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_10.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_10.png" />
                 </label>
                 <label class="selected-pc-tipo-label">
                   <input
@@ -469,10 +318,7 @@
                     name="tipo"
                     [value]="11"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_11.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_11.png" />
                 </label>
                 <label class="selected-pc-tipo-label">
                   <input
@@ -482,10 +328,7 @@
                     name="tipo"
                     [value]="12"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_12.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_12.png" />
                 </label>
                 <label class="selected-pc-tipo-label">
                   <input
@@ -495,10 +338,7 @@
                     name="tipo"
                     [value]="13"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_13.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_13.png" />
                 </label>
                 <label class="selected-pc-tipo-label">
                   <input
@@ -508,10 +348,7 @@
                     name="tipo"
                     [value]="14"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_14.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_14.png" />
                 </label>
                 <label class="selected-pc-tipo-label">
                   <input
@@ -521,10 +358,7 @@
                     name="tipo"
                     [value]="15"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_15.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_15.png" />
                 </label>
                 <label class="selected-pc-tipo-label">
                   <input
@@ -534,10 +368,7 @@
                     name="tipo"
                     [value]="16"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_16.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_16.png" />
                 </label>
 
                 <label class="selected-pc-tipo-label">
@@ -548,11 +379,7 @@
                     name="tipo"
                     [value]="17"
                   />
-                  <img
-                    class="img-fluid"
-                    alt="String en CA"
-                    src="../../../assets/images/tipo_4.png"
-                  />
+                  <img class="img-fluid" alt="String en CA" src="../../../assets/images/tipo_4.png" />
                 </label>
                 <!-- <label class="selected-pc-tipo-label">
                   <input
@@ -589,10 +416,7 @@
                     name="tipo"
                     [value]="0"
                   />
-                  <img
-                    class="img-fluid"
-                    src="../../../assets/images/tipo_0.png"
-                  />
+                  <img class="img-fluid" src="../../../assets/images/tipo_0.png" />
                 </label>
               </div>
             </div>
@@ -629,10 +453,6 @@
               />
             </div>
           </div>
-
-          <button (click)="recalcularLocs()">Recalcular locs</button>
-
-          <!-- <button (click)="aux()">Aux</button> -->
         </div>
       </div>
     </div>
@@ -648,52 +468,7 @@
        </div>-->
 
     <div class="col col-xs-12 col-lg-3 col-pcs">
-      <table class="table" id="tabla_pcs">
-        <tr>
-          <th>ID (vuelo)</th>
-          <!-- <th> Filename</th> -->
-          <th>Tipo</th>
-          <th>Global</th>
-          <th>Local</th>
-          <th>Modulo</th>
-          <th>Del</th>
-        </tr>
-
-        <tr
-          style="cursor:  pointer"
-          (click)="onMapMarkerClick(pc)"
-          *ngFor="let pc of filterPcsByFlight(currentFlight)"
-          [ngClass]="{
-            pc_seleccionado: selected_pc === pc,
-            pc_error:
-              (pc.tipo !== 0 &&
-                pc.tipo !== 4 &&
-                pc.tipo !== 17 &&
-                (pc.local_x === 0 || pc.local_y === 0)) ||
-              pc.gps_lat === current_gps_lat ||
-              (pc.global_x.length === 0 && pc.global_y.length === 0) ||
-              pc.local_y > planta.filas,
-            pc_error_local_x: planta.tipo === 'fija' && pc.local_x === 1
-          }"
-        >
-          <th>{{ pc.local_id }} ({{ pc.vuelo }})</th>
-          <!-- <th> {{pc.archivo}}</th> -->
-          <th>{{ pc.tipo }}</th>
-          <th>{{ pc.global_x }}, {{ pc.global_y }}</th>
-          <th>{{ pc.local_x }}, {{ pc.local_y }}</th>
-
-          <th>{{ pc.modulo.potencia }} W</th>
-          <th>
-            <button
-              type="button"
-              class="btn btn-danger btn-eliminar"
-              (click)="onClickDeletePc(pc)"
-            >
-              X
-            </button>
-          </th>
-        </tr>
-      </table>
+      <app-edit-list [pcsOrEstructuras]="pcsOrEstructuras" [informeId]="informeId"> </app-edit-list>
     </div>
   </div>
 </div>

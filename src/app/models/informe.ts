@@ -24,4 +24,5 @@ export interface InformeInterface {
   correccHoraSrt?: number;
   humedadRelativa?: number;
   jpgVisual?: boolean;
+  carpetaJpgGray?: string;
 }

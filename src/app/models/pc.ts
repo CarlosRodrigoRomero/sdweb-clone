@@ -1,5 +1,5 @@
-import { Observable } from "rxjs";
-import { ModuloInterface } from "./modulo";
+import { Observable } from 'rxjs';
+import { ModuloInterface } from './modulo';
 export interface PcInterface {
   id?: string;
   archivo?: string;

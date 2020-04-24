@@ -206,7 +206,7 @@ export class PlantaService {
           });
         })
       );
-    } else if (user.role === 1) {
+    } else if (user.role === 1 || user.role === 3) {
       query$ = this.afs.collection<PlantaInterface>('plantas');
     } else {
       query$ = this.afs.collection<PlantaInterface>('plantas', ref =>
