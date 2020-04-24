@@ -111,6 +111,7 @@ export class InformeService {
             .set(estructura)
             .then((v) => {
               this.avisadorNuevoElementoSource.next(estructura);
+              this.selectElementoPlanta(estructura);
             });
         }
       });
