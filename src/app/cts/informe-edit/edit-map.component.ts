@@ -53,6 +53,9 @@ export class EditMapComponent implements OnInit {
     this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
       this.currentArchivoVuelo = archivoVuelo;
     });
+    this.informeService.selectedElementoPlanta$.subscribe((elementoPlanta) => {
+      this.selectedElementoPlanta = elementoPlanta;
+    });
 
     this.informeService
       .getAllEstructuras(this.informeId)
@@ -99,12 +102,23 @@ export class EditMapComponent implements OnInit {
     return 'grey';
   }
   getStrokeColor(elementoPlanta: ElementoPlantaInterface): string {
+    if (this.selectedElementoPlanta) {
+      if (this.selectedElementoPlanta.archivo === elementoPlanta.archivo) {
+        return 'white';
+      }
+    }
+
     if (elementoPlanta.vuelo === this.currentArchivoVuelo.vuelo) {
       return '#7CFC00';
     }
     return 'grey';
   }
   getStrokeWeight(elementoPlanta: ElementoPlantaInterface): number {
+    if (this.selectedElementoPlanta) {
+      if (this.selectedElementoPlanta.archivo === elementoPlanta.archivo) {
+        return 3;
+      }
+    }
     if (elementoPlanta.vuelo === this.currentArchivoVuelo.vuelo) {
       return 2;
     }

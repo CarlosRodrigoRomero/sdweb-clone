@@ -9,7 +9,7 @@
     [latitude]="currentLatLng.lat"
     [longitude]="currentLatLng.lng"
     [radius]="5"
-    [fillColor]="'red'"
+    [fillColor]="'white'"
     [circleDraggable]="false"
     [editable]="false"
   >
@@ -19,7 +19,7 @@
     *ngFor="let elemPlant of allElementosPlanta"
     [latitude]="elemPlant.getLatLng().lat"
     [longitude]="elemPlant.getLatLng().lng"
-    [radius]="5"
+    [radius]="4"
     [fillColor]="getFillColor(elemPlant)"
     [strokeColor]="getStrokeColor(elemPlant)"
     [strokeWeight]="getStrokeWeight(elemPlant)"
