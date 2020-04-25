@@ -12,5 +12,9 @@ tr.mat-row:hover {
   background-color: #80808040;
 }
 .selectedElement {
-  border: 2px solid red;
+  border: 3px solid rgba(19, 18, 18, 0.326);
+  background-color: #80808040;
+}
+.errorGlobalCoords {
+  color: red;
 }

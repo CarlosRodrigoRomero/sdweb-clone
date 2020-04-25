@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { InformeService } from 'src/app/services/informe.service';
 import { PcService } from 'src/app/services/pc.service';
 import { PlantaService } from 'src/app/services/planta.service';
@@ -96,7 +96,9 @@ export class InformeEditComponent implements OnInit {
     private plantaService: PlantaService,
     private pcService: PcService,
     public auth: AuthService
-  ) {
+  ) {}
+
+  ngOnInit() {
     this.currentLatLng = { lat: 39.453186, lng: -5.880743 };
     this.informeId = this.route.snapshot.paramMap.get('id');
 
@@ -124,9 +126,7 @@ export class InformeEditComponent implements OnInit {
     this.manualRotation = false;
 
     this.allPcs = new Array<PcInterface>();
-  }
 
-  ngOnInit() {
     this.user$ = this.auth.user$;
     this.user$.pipe(take(1)).subscribe((user) => {
       this.user = user;

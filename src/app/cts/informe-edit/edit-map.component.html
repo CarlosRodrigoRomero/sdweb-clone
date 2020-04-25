@@ -1,4 +1,10 @@
-<agm-map [latitude]="currentLatLng.lat" [longitude]="currentLatLng.lng" [mapTypeId]="mapType" [zoom]="defaultZoom">
+<agm-map
+  *ngIf="currentArchivoVuelo"
+  [latitude]="currentLatLng.lat"
+  [longitude]="currentLatLng.lng"
+  [mapTypeId]="mapType"
+  [zoom]="defaultZoom"
+>
   <agm-circle
     [latitude]="currentLatLng.lat"
     [longitude]="currentLatLng.lng"
@@ -14,7 +20,10 @@
     [latitude]="elemPlant.getLatLng().lat"
     [longitude]="elemPlant.getLatLng().lng"
     [radius]="5"
-    [fillColor]="'yellow'"
+    [fillColor]="getFillColor(elemPlant)"
+    [strokeColor]="getStrokeColor(elemPlant)"
+    [strokeWeight]="getStrokeWeight(elemPlant)"
+    [strokePosition]="'INSIDE'"
     [circleDraggable]="true"
     [editable]="false"
     [id]="elemPlant.id"

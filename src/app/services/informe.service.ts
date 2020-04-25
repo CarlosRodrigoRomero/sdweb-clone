@@ -36,6 +36,7 @@ export class InformeService {
 
   selectElementoPlanta(elementoPlanta: ElementoPlantaInterface) {
     this.elementoPlantaSource.next(elementoPlanta);
+    this.selectArchivoVuelo({ archivo: elementoPlanta.archivo, vuelo: elementoPlanta.vuelo } as ArchivoVueloInterface);
   }
   selectArchivoVuelo(archivoVuelo: ArchivoVueloInterface) {
     this.archivoVueloSource.next(archivoVuelo);

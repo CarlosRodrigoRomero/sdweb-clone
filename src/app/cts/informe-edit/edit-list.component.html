@@ -1,29 +1,38 @@
-<div class="mat-elevation-z8">
-  <table *ngIf="!pcsOrEstructuras" mat-table matSort [dataSource]="dataSourceEst">
+<div *ngIf="dataSourceEst.data" class="mat-elevation-z8">
+  <table *ngIf="!pcsOrEstructuras" mat-table [dataSource]="dataSourceEst">
+    <ng-container matColumnDef="error">
+      <th mat-header-cell *matHeaderCellDef>!</th>
+      <td mat-cell *matCellDef="let est">
+        <span *ngIf="est | validateEstructura"><i class="fas fa-exclamation-circle errorGlobalCoords"></i></span>
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="vuelo">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Vuelo</th>
+      <th mat-header-cell *matHeaderCellDef>Vuelo</th>
       <td mat-cell *matCellDef="let est">{{ est.vuelo }}</td>
     </ng-container>
     <ng-container matColumnDef="globalCoords">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>globalCoords</th>
+      <th mat-header-cell *matHeaderCellDef>globalCoords</th>
       <td mat-cell *matCellDef="let est">[{{ est.globalCoords }}]</td>
     </ng-container>
 
     <ng-container matColumnDef="archivo">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Archivo</th>
+      <th mat-header-cell *matHeaderCellDef>Archivo</th>
       <td mat-cell *matCellDef="let est">[{{ est.archivo }}]</td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumnsEst"></tr>
     <tr
       mat-row
-      [ngClass]="{ selectedElement: est?.archivo === selectedElementoPlanta?.archivo }"
+      [ngClass]="{
+        selectedElement: est?.archivo === selectedElementoPlanta?.archivo
+      }"
       (click)="onClickRowEstList(est)"
       *matRowDef="let est; columns: displayedColumnsEst"
     ></tr>
   </table>
-  <mat-paginator [pageSizeOptions]="[25, 100, 500]" showFirstLastButtons></mat-paginator>
 </div>
+<mat-paginator [pageSizeOptions]="[25, 100, 500]" showFirstLastButtons></mat-paginator>
 
 <!-- <table *ngIf="pcsOrEstructuras" class="table" id="tabla_pcs">
   <tr>

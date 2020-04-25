@@ -1,13 +1,13 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { PcInterface } from 'src/app/models/pc';
-import { EstructuraInterface } from 'src/app/models/estructura';
+import { EstructuraInterface, Estructura } from 'src/app/models/estructura';
 import { InformeService } from '../../services/informe.service';
 import { MatTableDataSource } from '@angular/material';
-import { MatSort, MatPaginator } from '@angular/material';
+import { MatPaginator } from '@angular/material';
 import { ArchivoVueloInterface } from '../../models/archivoVuelo';
 import { ActivatedRoute } from '@angular/router';
-import { Estructura } from '../../models/estructura';
 import { ElementoPlantaInterface } from '../../models/elementoPlanta';
+import { map } from 'rxjs/operators';
+import { LoginComponent } from '../login/login.component';
 
 @Component({
   selector: 'app-edit-list',
@@ -17,7 +17,6 @@ import { ElementoPlantaInterface } from '../../models/elementoPlanta';
 export class EditListComponent implements OnInit {
   @Input() pcsOrEstructuras: boolean;
 
-  @ViewChild(MatSort, { read: true }) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   selectedElementoPlanta: ElementoPlantaInterface;
@@ -26,19 +25,19 @@ export class EditListComponent implements OnInit {
   allEstructuras: EstructuraInterface[];
   dataSourceEst = new MatTableDataSource(this.allEstructuras);
   informeId: string;
+  loadedElementos = false;
 
-  constructor(private route: ActivatedRoute, private informeService: InformeService) {
-    this.displayedColumnsEst = ['vuelo', 'globalCoords', 'archivo'];
-    this.informeId = this.route.snapshot.paramMap.get('id');
-  }
+  constructor(private route: ActivatedRoute, private informeService: InformeService) {}
 
   ngOnInit() {
-    this.dataSourceEst.sort = this.sort;
+    this.displayedColumnsEst = ['error', 'globalCoords', 'archivo'];
+    this.informeId = this.route.snapshot.paramMap.get('id');
     this.dataSourceEst.paginator = this.paginator;
 
     this.informeService.getAllEstructuras(this.informeId).subscribe((estArray) => {
       estArray.sort(this.dynamicSort('archivo'));
       this.dataSourceEst.data = estArray;
+      this.loadedElementos = true;
     });
 
     this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {

@@ -1,13 +1,15 @@
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild, Input } from '@angular/core';
 import { AgmMap, LatLngLiteral } from '@agm/core';
 import { PcInterface } from 'src/app/models/pc';
-import { EstructuraInterface, Estructura } from '../../models/estructura';
+import { Estructura } from '../../models/estructura';
 import { InformeService } from '../../services/informe.service';
 import { ModuloInterface } from 'src/app/models/modulo';
 import { PlantaService } from '../../services/planta.service';
 import { take } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from '../../models/elementoPlanta';
+import { ArchivoVueloInterface } from 'src/app/models/archivoVuelo';
+import { ValidateEstructuraPipe } from '../../pipes/validate-estructura.pipe';
 declare const google: any;
 
 @Component({
@@ -27,25 +29,30 @@ export class EditMapComponent implements OnInit {
   selectedElementoPlanta: ElementoPlantaInterface;
   polygonList: any[];
   informeId: string;
+  currentArchivoVuelo: ArchivoVueloInterface;
 
   constructor(
     private route: ActivatedRoute,
     private informeService: InformeService,
-    private plantaService: PlantaService
-  ) {
+    private plantaService: PlantaService,
+    private validateEst: ValidateEstructuraPipe
+  ) {}
+
+  ngOnInit() {
     this.mapType = 'satellite';
     this.defaultZoom = 18;
     this.currentLatLng = { lat: 39.453186, lng: -5.880743 };
     this.polygonList = [];
-  }
-
-  ngOnInit() {
     this.informeId = this.route.snapshot.paramMap.get('id');
     // this.informeService.selectedElementoPlanta$.subscribe((elementoPlanta) => {
     //   if (elementoPlanta !== this.elementoPlanta) {
     //     this.selectElementoPlanta(elementoPlanta);
     //   }
     // });
+
+    this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
+      this.currentArchivoVuelo = archivoVuelo;
+    });
 
     this.informeService
       .getAllEstructuras(this.informeId)
@@ -76,7 +83,6 @@ export class EditMapComponent implements OnInit {
 
   onMapElementoPlantaClick(elementoPlanta: ElementoPlantaInterface): void {
     this.selectedElementoPlanta = elementoPlanta;
-    console.log('EditMapComponent -> onMapEstClick -> elementoPlanta', elementoPlanta);
     this.informeService.selectElementoPlanta(elementoPlanta);
 
     // if (elementoPlanta.vuelo !== this.currentFlight) {
@@ -85,6 +91,24 @@ export class EditMapComponent implements OnInit {
     // const sliderValue = this.fileList.indexOf(elementoPlanta.archivo);
     // this.rangeValue = sliderValue + 1;
     // this.setImageFromRangeValue(this.rangeValue);
+  }
+  getFillColor(elementoPlanta: PcInterface & Estructura): string {
+    if (this.validateEst.transform(elementoPlanta)) {
+      return 'red';
+    }
+    return 'grey';
+  }
+  getStrokeColor(elementoPlanta: ElementoPlantaInterface): string {
+    if (elementoPlanta.vuelo === this.currentArchivoVuelo.vuelo) {
+      return '#7CFC00';
+    }
+    return 'grey';
+  }
+  getStrokeWeight(elementoPlanta: ElementoPlantaInterface): number {
+    if (elementoPlanta.vuelo === this.currentArchivoVuelo.vuelo) {
+      return 2;
+    }
+    return 1;
   }
 
   onMapMarkerClick(pc: PcInterface): void {

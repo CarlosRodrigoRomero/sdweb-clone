@@ -47,6 +47,7 @@ import { AvisoLegalComponent } from './cts/aviso-legal/aviso-legal.component';
 import { CanvasComponent } from './cts/informe-edit/canvas.component';
 import { EditMapComponent } from './cts/informe-edit/edit-map.component';
 import { EditListComponent } from './cts/informe-edit/edit-list.component';
+import { ValidateEstructuraPipe } from './pipes/validate-estructura.pipe';
 @NgModule({
   declarations: [
     AppComponent,
@@ -66,6 +67,7 @@ import { EditListComponent } from './cts/informe-edit/edit-list.component';
     CanvasComponent,
     EditMapComponent,
     EditListComponent,
+    ValidateEstructuraPipe,
   ],
 
   imports: [
@@ -102,7 +104,7 @@ import { EditListComponent } from './cts/informe-edit/edit-list.component';
       libraries: ['drawing'],
     }),
   ],
-  providers: [{ provide: FirestoreSettingsToken, useValue: {} }, AuthService],
+  providers: [ValidateEstructuraPipe, { provide: FirestoreSettingsToken, useValue: {} }, AuthService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
