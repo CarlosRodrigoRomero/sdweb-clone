@@ -135,36 +135,30 @@ export class InformeEditComponent implements OnInit {
     this.getInforme();
 
     this.informeService.selectedElementoPlanta$.subscribe((elementoPlanta) => {
-      console.log('InformeEditComponent -> ngOnInit -> elementoPlanta', elementoPlanta);
       this.setElementoPlanta(elementoPlanta);
     });
 
     this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
       if (this.currentArchivoVuelo !== archivoVuelo) {
-        console.log('InformeEditComponent -> ngOnInit -> archivoVuelo', archivoVuelo);
         this.setArchivoVuelo(archivoVuelo);
       }
     });
   }
 
   setArchivoVuelo(archivoVuelo: ArchivoVueloInterface): void {
-    console.log('InformeEditComponent -> setArchivoVuelo -> archivoVuelo', archivoVuelo);
     this.currentArchivoVuelo = archivoVuelo;
     this.changeFlight(archivoVuelo.vuelo);
 
     // Averiguar donde esta en fileList
     const arrayIndex = this.fileList.indexOf(archivoVuelo.archivo);
     this.rangeValue = arrayIndex + 1;
-    console.log('InformeEditComponent -> setArchivoVuelo -> arrayIndex', arrayIndex);
 
     const coords = this.coords[arrayIndex];
-    console.log('InformeEditComponent -> setArchivoVuelo -> coords', coords);
     // Setear this.currentLatLng (para que se extienda a todos los childs)
     this.currentLatLng = {
       lat: parseFloat(coords.Latitude),
       lng: parseFloat(coords.Longitude),
     };
-    console.log('InformeEditComponent -> setArchivoVuelo -> currentLatLng', this.currentLatLng);
 
     this.currentDatetime = this.getDateTimeFromDateAndTime(this.coords[arrayIndex].Date, this.coords[arrayIndex].Time);
     this.currentTrackheading = Math.round(this.coords[arrayIndex].TrackHeading);

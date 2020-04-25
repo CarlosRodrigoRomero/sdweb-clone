@@ -96,6 +96,7 @@ export class InformeService {
   }
 
   addEstructuraInforme(informeId: string, estructura: Estructura) {
+    const estructuraObj = Object.assign({}, estructura);
     // Primero vemos que no haya ninguna otra estructura en el archivo
     this.deleteEstructuraInforme(informeId, estructura.archivo)
       .pipe(take(1))
@@ -103,12 +104,13 @@ export class InformeService {
         if (res) {
           const id = this.afs.createId();
           estructura.id = id;
+          estructuraObj.id = id;
           this.afs
             .collection('informes')
             .doc(informeId)
             .collection('estructuras')
             .doc(id)
-            .set(estructura)
+            .set(estructuraObj)
             .then((v) => {
               this.avisadorNuevoElementoSource.next(estructura);
               this.selectElementoPlanta(estructura);

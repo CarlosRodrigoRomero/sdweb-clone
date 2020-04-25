@@ -2,7 +2,7 @@ import { GLOBAL } from '../services/global';
 import { ElementoPlantaInterface } from './elementoPlanta';
 import { LatLngLiteral } from '@agm/core';
 export interface EstructuraInterface {
-  id: string;
+  id?: string;
   archivo: string;
   coords: any[];
   filas: number;

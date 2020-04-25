@@ -75,7 +75,7 @@
             [planta$]="planta$"
           >
           </app-canvas>
-          <div>
+          <div *ngIf="pcsOrEstructuras">
             <span>Pérdidas</span>
             <input
               *ngIf="selected_pc"
@@ -136,15 +136,6 @@
               (change)="setSquareBase()"
             />
             <br />
-            <span>maxMarkersShow</span>
-            <input
-              style="width: 3rem;"
-              [(ngModel)]="maxMarkersShow"
-              type="number"
-              id="maxMarkersShow"
-              maxlength="2"
-              size="20"
-            />
             <br />
             <span>Modulos afectados</span>
             <input

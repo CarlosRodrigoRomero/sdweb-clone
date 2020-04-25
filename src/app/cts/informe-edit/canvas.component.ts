@@ -269,7 +269,6 @@ export class CanvasComponent implements OnInit {
     }
 
     // Borramos del canvas la estructura anterior.
-
     this.limpiarEstructuraCanvas();
     this.dibujarEstructura(this.estructura);
     this.informeService.updateEstructura(this.informeId, this.estructura);

@@ -11,11 +11,10 @@
 <div class="row">
   <div class="col-6">
     <button mat-raised-button color="primary" *ngIf="!estructura" (click)="drawPolygon()">CREAR EST</button>
-    <button mat-raised-button color="danger" *ngIf="estructura" (click)="deleteEstructura()">BORRAR EST</button>
   </div>
-  <div class="col-6" *ngIf="estructura">
+  <div class="col-6 propiedadesEstructura" *ngIf="estructura">
     <div class="row">
-      <div class="col-12">
+      <div class="col-6">
         <i class="fas fa-arrows-alt-v"></i>
 
         <input
@@ -36,6 +35,11 @@
           size="3"
           class="inputInicio"
         />
+      </div>
+      <div class="col-6">
+        <button mat-raised-button color="warn" *ngIf="estructura" (click)="deleteEstructura()">
+          <i class="fa fa-trash" aria-hidden="true"></i>
+        </button>
       </div>
     </div>
     <div class="row">
