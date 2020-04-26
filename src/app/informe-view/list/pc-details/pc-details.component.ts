@@ -1,24 +1,24 @@
-import { Component, OnInit, Input, OnChanges } from "@angular/core";
+import { Component, OnInit, Input, OnChanges } from '@angular/core';
 
-import { GLOBAL } from "src/app/services/global";
-import { AngularFireStorage } from "@angular/fire/storage";
-import "fabric";
-import { MatDialog } from "@angular/material/dialog";
+import { GLOBAL } from 'src/app/services/global';
+import { AngularFireStorage } from '@angular/fire/storage';
+import 'fabric';
+import { MatDialog } from '@angular/material/dialog';
 
-import { take } from "rxjs/operators";
-import { PcInterface } from "src/app/models/pc";
-import { InformeInterface } from "src/app/models/informe";
-import { PlantaInterface } from "src/app/models/planta";
-import { PlantaService } from "src/app/services/planta.service";
-import { PcService } from "src/app/services/pc.service";
-import { PcDetailsDialogComponent } from "src/app/informe-view/pc-details-dialog/pc-details-dialog.component";
+import { take } from 'rxjs/operators';
+import { PcInterface } from 'src/app/models/pc';
+import { InformeInterface } from 'src/app/models/informe';
+import { PlantaInterface } from 'src/app/models/planta';
+import { PlantaService } from 'src/app/services/planta.service';
+import { PcService } from 'src/app/services/pc.service';
+import { PcDetailsDialogComponent } from 'src/app/informe-view/pc-details-dialog/pc-details-dialog.component';
 
 declare let fabric;
 
 @Component({
-  selector: "app-pc-details",
-  templateUrl: "./pc-details.component.html",
-  styleUrls: ["./pc-details.component.css"]
+  selector: 'app-pc-details',
+  templateUrl: './pc-details.component.html',
+  styleUrls: ['./pc-details.component.css'],
 })
 export class PcDetailsComponent implements OnInit, OnChanges {
   @Input() pc: PcInterface;
@@ -71,15 +71,13 @@ export class PcDetailsComponent implements OnInit, OnChanges {
         this.alreadyOpened = true;
         this.canvas = new fabric.Canvas(this.pc.id);
         const imagenTermica = new Image();
-        imagenTermica.crossOrigin = "anonymous";
+        imagenTermica.crossOrigin = 'anonymous';
 
         if (!this.selectedPc.downloadUrl$) {
           this.selectedPc.downloadUrl$ = this.storage
-            .ref(
-              `informes/${this.informe.id}/jpg/${this.selectedPc.archivoPublico}`
-            )
+            .ref(`informes/${this.informe.id}/jpg/${this.selectedPc.archivoPublico}`)
             .getDownloadURL();
-          this.pc.downloadUrl$.pipe(take(1)).subscribe(url => {
+          this.pc.downloadUrl$.pipe(take(1)).subscribe((url) => {
             this.pc.downloadUrlString = url;
             imagenTermica.src = this.pc.downloadUrlString;
           });
@@ -97,7 +95,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
             lockMovementX: true,
             lockMovementY: true,
             selectable: false,
-            hoverCursor: "default"
+            hoverCursor: 'default',
           });
           imagenTermicaCanvas.scaleToHeight(this.canvasHeight);
           imagenTermicaCanvas.scaleToWidth(this.canvasWidth);
@@ -115,9 +113,9 @@ export class PcDetailsComponent implements OnInit, OnChanges {
 
   getDisplay() {
     if (this.imageLoaded) {
-      return "block";
+      return 'block';
     }
-    return "none";
+    return 'none';
   }
 
   downloadRjpg(pc: PcInterface) {
@@ -125,17 +123,17 @@ export class PcDetailsComponent implements OnInit, OnChanges {
       .ref(`informes/${this.pc.informeId}/rjpg/${pc.archivoPublico}`)
       .getDownloadURL()
       .pipe(take(1))
-      .subscribe(downloadUrl => {
+      .subscribe((downloadUrl) => {
         this.pc.downloadUrlStringRjpg = downloadUrl;
         const xhr = new XMLHttpRequest();
-        xhr.responseType = "blob";
-        xhr.onload = event => {
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
           /* Create a new Blob object using the response
            *  data of the onload object.
            */
-          const blob = new Blob([xhr.response], { type: "image/jpg" });
-          const a: any = document.createElement("a");
-          a.style = "display: none";
+          const blob = new Blob([xhr.response], { type: 'image/jpg' });
+          const a: any = document.createElement('a');
+          a.style = 'display: none';
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
@@ -143,7 +141,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
           a.click();
           window.URL.revokeObjectURL(url);
         };
-        xhr.open("GET", downloadUrl);
+        xhr.open('GET', downloadUrl);
         xhr.send();
       });
   }
@@ -152,17 +150,17 @@ export class PcDetailsComponent implements OnInit, OnChanges {
       .ref(`informes/${this.pc.informeId}/jpgVisual/${pc.archivoPublico}`)
       .getDownloadURL()
       .pipe(take(1))
-      .subscribe(downloadUrl => {
+      .subscribe((downloadUrl) => {
         this.pc.downloadUrlStringVisual = downloadUrl;
         const xhr = new XMLHttpRequest();
-        xhr.responseType = "blob";
-        xhr.onload = event => {
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
           /* Create a new Blob object using the response
            *  data of the onload object.
            */
-          const blob = new Blob([xhr.response], { type: "image/jpg" });
-          const a: any = document.createElement("a");
-          a.style = "display: none";
+          const blob = new Blob([xhr.response], { type: 'image/jpg' });
+          const a: any = document.createElement('a');
+          a.style = 'display: none';
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
@@ -170,7 +168,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
           a.click();
           window.URL.revokeObjectURL(url);
         };
-        xhr.open("GET", downloadUrl);
+        xhr.open('GET', downloadUrl);
         xhr.send();
       });
   }
@@ -179,17 +177,17 @@ export class PcDetailsComponent implements OnInit, OnChanges {
     this.storage
       .ref(`informes/${this.pc.informeId}/jpg/${pc.archivoPublico}`)
       .getDownloadURL()
-      .subscribe(downloadUrl => {
+      .subscribe((downloadUrl) => {
         this.pc.downloadUrlString = downloadUrl;
         const xhr = new XMLHttpRequest();
-        xhr.responseType = "blob";
-        xhr.onload = event => {
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
           /* Create a new Blob object using the response
            *  data of the onload object.
            */
-          const blob = new Blob([xhr.response], { type: "image/jpg" });
-          const a: any = document.createElement("a");
-          a.style = "display: none";
+          const blob = new Blob([xhr.response], { type: 'image/jpg' });
+          const a: any = document.createElement('a');
+          a.style = 'display: none';
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
@@ -197,7 +195,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
           a.click();
           window.URL.revokeObjectURL(url);
         };
-        xhr.open("GET", downloadUrl);
+        xhr.open('GET', downloadUrl);
         xhr.send();
       });
   }
@@ -237,8 +235,8 @@ export class PcDetailsComponent implements OnInit, OnChanges {
     const actObj1 = new fabric.Rect({
       left: pc.img_left * factor,
       top: pc.img_top * factor,
-      fill: "rgba(0,0,0,0)",
-      stroke: "black",
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'black',
       strokeWidth: 1,
       width: pc.img_width * factor,
       height: pc.img_height * factor,
@@ -248,13 +246,13 @@ export class PcDetailsComponent implements OnInit, OnChanges {
       localId: pc.local_id,
       ref: false,
       selectable: false,
-      hoverCursor: "default"
+      hoverCursor: 'default',
     });
     const actObj2 = new fabric.Rect({
       left: (pc.img_left - 1) * factor,
       top: (pc.img_top - 1) * factor,
-      fill: "rgba(0,0,0,0)",
-      stroke: "red",
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'red',
       strokeWidth: 1,
       width: (pc.img_width + 2) * factor,
       height: (pc.img_height + 2) * factor,
@@ -263,8 +261,8 @@ export class PcDetailsComponent implements OnInit, OnChanges {
       lockMovementX: true,
       localId: pc.local_id,
       ref: false,
-      hoverCursor: "default",
-      selectable: true
+      hoverCursor: 'default',
+      selectable: true,
     });
 
     this.canvas.add(actObj1);
@@ -280,28 +278,25 @@ export class PcDetailsComponent implements OnInit, OnChanges {
     const triangle = new fabric.Triangle({
       width: squareBase,
       height: squareBase,
-      fill: "red",
-      stroke: "black",
+      fill: 'red',
+      stroke: 'black',
       left: Math.round(x - squareBase / 2),
       top: y, // si no ponemos este 2, entonces no lee bien debajo del triangulo
       selectable: false,
-      ref: "triangle",
-      hoverCursor: "default"
+      ref: 'triangle',
+      hoverCursor: 'default',
     });
 
-    const textTriangle = new fabric.Text(
-      " + ".concat(pc.gradienteNormalizado.toString().concat(" ºC ")),
-      {
-        left: pc.img_left * factor,
-        top: (pc.img_top + pc.img_height + 5) * factor,
-        fontSize: 22 * factor,
-        textBackgroundColor: "white",
-        ref: "text",
-        selectable: false,
-        hoverCursor: "default",
-        fill: "red"
-      }
-    );
+    const textTriangle = new fabric.Text(' + '.concat(pc.gradienteNormalizado.toString().concat(' ºC ')), {
+      left: pc.img_left * factor,
+      top: (pc.img_top + pc.img_height + 5) * factor,
+      fontSize: 22 * factor,
+      textBackgroundColor: 'white',
+      ref: 'text',
+      selectable: false,
+      hoverCursor: 'default',
+      fill: 'red',
+    });
 
     this.canvas.add(triangle);
     this.canvas.add(textTriangle);
@@ -316,29 +311,23 @@ export class PcDetailsComponent implements OnInit, OnChanges {
         .ref(`informes/${this.informe.id}/jpg/${selectedPc.archivoPublico}`)
         .getDownloadURL();
     }
-    if (
-      !selectedPc.downloadUrlVisual$ &&
-      (!this.informe.hasOwnProperty("jpgVisual") || this.informe.jpgVisual)
-    ) {
+    if (!selectedPc.downloadUrlVisual$ && (!this.informe.hasOwnProperty('jpgVisual') || this.informe.jpgVisual)) {
       selectedPc.downloadUrlVisual$ = this.storage
-        .ref(
-          `informes/${this.informe.id}/jpgVisual/${selectedPc.archivoPublico}`
-        )
+        .ref(`informes/${this.informe.id}/jpgVisual/${selectedPc.archivoPublico}`)
         .getDownloadURL();
     }
     const dialogRef = this.dialog.open(PcDetailsDialogComponent, {
-      width: "1100px",
+      width: '1100px',
       // height: '600px',
       hasBackdrop: true,
       data: {
         pc: selectedPc,
-        allPcs: this.allPcs,
         planta: this.planta,
-        informe: this.informe
-      }
+        informe: this.informe,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {});
+    dialogRef.afterClosed().subscribe((result) => {});
   }
 
   checkIsNaN(item: any) {
@@ -346,7 +335,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   }
 
   checkIsMoreThanOne(item: any) {
-    if (Number.isNaN(item) || typeof item === "string") {
+    if (Number.isNaN(item) || typeof item === 'string') {
       return false;
     }
     return item > 1;
@@ -354,7 +343,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
 
   checkHasModule(pc: PcInterface) {
     if (pc.modulo && pc.modulo !== undefined) {
-      return pc.modulo.hasOwnProperty("potencia");
+      return pc.modulo.hasOwnProperty('potencia');
     }
     return false;
   }

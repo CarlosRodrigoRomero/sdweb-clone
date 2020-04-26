@@ -7,7 +7,7 @@ import 'fabric';
 declare let fabric;
 
 import Pica from 'pica';
-import { take, filter, map } from 'rxjs/operators';
+import { take, map } from 'rxjs/operators';
 import { PlantaInterface } from '../../models/planta';
 import { InformeInterface } from '../../models/informe';
 import { AuthService } from 'src/app/services/auth.service';
@@ -71,7 +71,6 @@ export class PcDetailsDialogComponent implements OnInit {
     this.pcPerdidas = GLOBAL.pcPerdidas;
 
     this.pc = data.pc;
-    this.allPcs = data.allPcs;
     this.planta = data.planta;
     this.informe = data.informe;
     this.sinPcs = data.sinPcs;

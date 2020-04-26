@@ -14,7 +14,6 @@ import { PcDetailsDialogComponent } from '../informe-view/pc-details-dialog/pc-d
 
 export interface DialogData {
   pc: PcInterface;
-  allPcs: PcInterface[];
   planta: PlantaInterface;
   informe: InformeInterface;
   sinPcs: boolean;
