@@ -11,7 +11,7 @@ import { PlantaInterface } from "../../models/planta";
 import { InformeInterface } from "../../models/informe";
 import { AgmMap } from "@agm/core";
 import { GLOBAL } from "src/app/services/global";
-import { MatDialog } from "@angular/material";
+import { MatDialog } from "@angular/material/dialog";
 import { AngularFireStorage } from "@angular/fire/storage";
 import { UserAreaInterface } from "../../models/userArea";
 import { PlantaService } from "../../services/planta.service";

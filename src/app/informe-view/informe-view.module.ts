@@ -14,13 +14,11 @@ import { AgmCoreModule } from "@agm/core";
 import { FormsModule } from "@angular/forms";
 import { InformeViewComponent } from "./informe-view.component";
 import { SpinnerModule } from "../spinner/spinner.module";
-import {
-  MatSliderModule,
-  MatCardModule,
-  MatDialogModule,
-  MatCheckboxModule,
-  MatButtonModule
-} from "@angular/material";
+import { MatButtonModule } from "@angular/material/button";
+import { MatCardModule } from "@angular/material/card";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatDialogModule } from "@angular/material/dialog";
+import { MatSliderModule } from "@angular/material/slider";
 import { RouteReuseStrategy } from "@angular/router";
 import { CustomReuseStrategy } from "./routeReuse";
 import { PcDetailsDialogComponent } from "./pc-details-dialog/pc-details-dialog.component";

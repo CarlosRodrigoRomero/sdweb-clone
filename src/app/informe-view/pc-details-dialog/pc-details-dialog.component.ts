@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from "@angular/core";
 import { PcInterface } from "src/app/models/pc";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { GLOBAL } from "src/app/services/global";
 import { AngularFireStorage } from "@angular/fire/storage";
 import "fabric";

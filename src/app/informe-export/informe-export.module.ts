@@ -4,14 +4,12 @@ import { ExportComponent } from './export/export.component';
 import { SpinnerModule } from '../spinner/spinner.module';
 import { FormsModule } from '@angular/forms';
 import { ExportRoutingModule } from './export-routing.module';
-import {
-  MatTableModule,
-  MatCardModule,
-  MatCheckboxModule,
-  MatButtonToggleModule,
-  MatButtonModule,
-  MatSortModule,
-} from '@angular/material';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
 
 @NgModule({
   declarations: [ExportComponent],

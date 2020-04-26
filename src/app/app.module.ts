@@ -12,21 +12,18 @@ import { AngularFireStorageModule } from '@angular/fire/storage';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
-import {
-  MatButtonModule,
-  MatNativeDateModule,
-  MatIconModule,
-  MatFormFieldModule,
-  MatInputModule,
-  MatCardModule,
-  MatOptionModule,
-  MatSelectModule,
-  MatRadioModule,
-  MatDatepickerModule,
-  MatCheckboxModule,
-  MatTableModule,
-  MatPaginatorModule,
-} from '@angular/material';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTableModule } from '@angular/material/table';
 import { CdkTableModule } from '@angular/cdk/table';
 import { CdkTreeModule } from '@angular/cdk/tree';
 import { LoginComponent } from './cts/login/login.component';

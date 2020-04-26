@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { EstructuraInterface, Estructura } from 'src/app/models/estructura';
 import { InformeService } from '../../services/informe.service';
-import { MatTableDataSource } from '@angular/material';
-import { MatPaginator } from '@angular/material';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
 import { ArchivoVueloInterface } from '../../models/archivoVuelo';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from '../../models/elementoPlanta';

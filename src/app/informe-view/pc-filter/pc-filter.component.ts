@@ -1,11 +1,9 @@
 import { Component, OnInit, Input, OnDestroy } from "@angular/core";
 import { PcInterface } from "../../models/pc";
-import {
-  MatButtonToggleGroup,
-  MatCheckboxChange,
-  MatSliderChange,
-  MatDialog
-} from "@angular/material";
+import { MatButtonToggleGroup } from "@angular/material/button-toggle";
+import { MatCheckboxChange } from "@angular/material/checkbox";
+import { MatDialog } from "@angular/material/dialog";
+import { MatSliderChange } from "@angular/material/slider";
 import { PcService } from "../../services/pc.service";
 import { GLOBAL } from "../../services/global";
 import { PlantaService } from "../../services/planta.service";

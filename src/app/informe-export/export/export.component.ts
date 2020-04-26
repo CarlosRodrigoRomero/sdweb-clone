@@ -12,7 +12,8 @@ declare let fabric;
 import { AngularFireStorage } from '@angular/fire/storage';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { MatCheckboxChange, MatTableDataSource } from '@angular/material';
+import { MatCheckboxChange } from '@angular/material/checkbox';
+import { MatTableDataSource } from '@angular/material/table';
 
 import pdfMake from 'pdfmake/build/pdfmake.js';
 import pdfFonts from 'pdfmake/build/vfs_fonts.js';

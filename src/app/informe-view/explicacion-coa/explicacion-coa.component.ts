@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from "@angular/core";
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { PcDetailsDialogComponent } from "../pc-details-dialog/pc-details-dialog.component";
 import { GLOBAL } from "src/app/services/global";
 import { CriteriosClasificacion } from "../../models/criteriosClasificacion";
