@@ -1,1 +1,36 @@
-<app-map [filteredPcs]="filteredPcs"></app-map>
+<agm-map
+  [latitude]="planta.latitud"
+  [longitude]="planta.longitud"
+  [mapTypeId]="mapType"
+  [zoom]="planta.zoom"
+  [streetViewControl]="false"
+  (mapReady)="mapIsReady(map)"
+>
+  <agm-circle
+    *ngFor="let pc of pcService.currentFilteredPcs$ | async"
+    (circleClick)="onMapCircleClick(pc)"
+    [latitude]="pc.gps_lat"
+    [longitude]="pc.gps_lng"
+    [radius]="circleRadius"
+    [strokeOpacity]="1"
+    [strokePosition]="0"
+    [strokeColor]="getStrokeColor(pcService.getPcCoA(pc))"
+    [strokeWeight]="3"
+    [fillOpacity]="0.3"
+    [editable]="false"
+    [zIndex]="1"
+  ></agm-circle>
+
+  <agm-polygon
+    *ngFor="let area of userAreaList"
+    [paths]="area.path"
+    [fillOpacity]="0"
+    [strokeColor]="'#ffd04a'"
+    [strokeOpacity]="1"
+    [strokeWeight]="1"
+    [visible]="true"
+    [zIndex]="0.5"
+    [clickable]="false"
+  >
+  </agm-polygon>
+</agm-map>

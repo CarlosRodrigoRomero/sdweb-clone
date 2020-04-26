@@ -12,10 +12,11 @@ import { RouteReuseStrategy } from '@angular/router';
 import { CustomReuseStrategy } from './routeReuse';
 import { PcDetailsDialogComponent } from './pc-details-dialog/pc-details-dialog.component';
 import { SharedModule } from '../shared/shared.module';
-import { InformeMapComponent } from '../informe-map/informe-map.component';
 import { PcListComponent } from './list/pc-list/pc-list.component';
 import { PcDetailsComponent } from './list/pc-details/pc-details.component';
 import { ExportComponent } from '../informe-export/export/export.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SpinnerModule } from '../spinner/spinner.module';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,6 @@ import { ExportComponent } from '../informe-export/export/export.component';
     PcDetailsDialogComponent,
     GetNumeroModulosPipe,
     GetNombreSeguidorPipe,
-    InformeMapComponent,
     PcListComponent,
     PcDetailsComponent,
     ExportComponent,
@@ -35,6 +35,6 @@ import { ExportComponent } from '../informe-export/export/export.component';
   entryComponents: [ExplicacionCoaComponent, PcDetailsDialogComponent],
   providers: [],
   // providers: [{ provide: RouteReuseStrategy, useClass: CustomReuseStrategy }],
-  imports: [SharedModule, InformeViewRoutingModule, ChartModule],
+  imports: [SharedModule, SpinnerModule, InformeViewRoutingModule, ChartModule, FormsModule, ReactiveFormsModule],
 })
 export class InformeViewModule {}

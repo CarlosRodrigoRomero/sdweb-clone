@@ -1,27 +1,27 @@
-import { Component, OnInit, Inject } from "@angular/core";
-import { PcInterface } from "src/app/models/pc";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { GLOBAL } from "src/app/services/global";
-import { AngularFireStorage } from "@angular/fire/storage";
-import "fabric";
+import { Component, OnInit, Inject } from '@angular/core';
+import { PcInterface } from 'src/app/models/pc';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { GLOBAL } from 'src/app/services/global';
+import { AngularFireStorage } from '@angular/fire/storage';
+import 'fabric';
 declare let fabric;
 
-import Pica from "pica";
-import { take } from "rxjs/operators";
-import { PlantaInterface } from "../../models/planta";
-import { InformeInterface } from "../../models/informe";
-import { AuthService } from "src/app/services/auth.service";
-import { UserInterface } from "src/app/models/user";
-import { PcService } from "../../services/pc.service";
-import { PlantaService } from "../../services/planta.service";
-import { DialogData } from "src/app/informe-map/map/map.component";
+import Pica from 'pica';
+import { take, filter, map } from 'rxjs/operators';
+import { PlantaInterface } from '../../models/planta';
+import { InformeInterface } from '../../models/informe';
+import { AuthService } from 'src/app/services/auth.service';
+import { UserInterface } from 'src/app/models/user';
+import { PcService } from '../../services/pc.service';
+import { PlantaService } from '../../services/planta.service';
+import { DialogData } from 'src/app/informe-map/informe-map.component';
 
 const pica = Pica();
 
 @Component({
-  selector: "app-pc-details-dialog",
-  templateUrl: "./pc-details-dialog.component.html",
-  styleUrls: ["./pc-details-dialog.component.css"]
+  selector: 'app-pc-details-dialog',
+  templateUrl: './pc-details-dialog.component.html',
+  styleUrls: ['./pc-details-dialog.component.css'],
 })
 export class PcDetailsDialogComponent implements OnInit {
   // public tooltipTemp: number;
@@ -81,44 +81,41 @@ export class PcDetailsDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  ngOnDestroy() {}
-
-  ngAfterViewInit() {}
-
   ngOnInit() {
-    this.auth.user$.subscribe(user => {
+    this.auth.user$.subscribe((user) => {
       this.user = user;
     });
     this.imagenVisualCargada = false;
     this.imagenTermicaCargada = false;
-    this.canvas = new fabric.Canvas("dialog-canvas");
-    this.visualCanvas = new fabric.Canvas("visual-canvas");
+    this.canvas = new fabric.Canvas('dialog-canvas');
+    this.visualCanvas = new fabric.Canvas('visual-canvas');
     this.setEventListenersCanvas();
     // this.hiddenCanvas = new fabric.Canvas('hidden-canvas');
 
     this.imagenTermica = new Image();
     this.imagenVisual = new Image();
-    this.imagenTermica.crossOrigin = "anonymous";
-    this.imagenVisual.crossOrigin = "anonymous";
+    this.imagenTermica.crossOrigin = 'anonymous';
+    this.imagenVisual.crossOrigin = 'anonymous';
 
-    this.pc.downloadUrl$.pipe(take(1)).subscribe(url => {
+    this.pc.downloadUrl$.pipe(take(1)).subscribe((url) => {
       this.pc.downloadUrlString = url;
       this.imagenTermica.src = url;
     });
-    if (!this.informe.hasOwnProperty("jpgVisual") || this.informe.jpgVisual)
-      this.pc.downloadUrlVisual$.pipe(take(1)).subscribe(url => {
+    if (!this.informe.hasOwnProperty('jpgVisual') || this.informe.jpgVisual) {
+      this.pc.downloadUrlVisual$.pipe(take(1)).subscribe((url) => {
         this.pc.downloadUrlStringVisual = url;
         this.imagenVisual.src = url;
       });
+    }
 
     this.imagenVisual.onload = () => {
       pica
         .resize(this.imagenVisual, this.visualCanvas, {
           unsharpAmount: 80,
           unsharpRadius: 0.6,
-          unsharpThreshold: 2
+          unsharpThreshold: 2,
         })
-        .then(res => {
+        .then((res) => {
           this.imagenVisualCargada = true;
         });
       // this.visualCanvas.getContext('2d').drawImage(this.imagenVisual, 0, 0 );
@@ -141,15 +138,15 @@ export class PcDetailsDialogComponent implements OnInit {
           opacity: 1,
           draggable: false,
           lockMovementX: true,
-          lockMovementY: true
+          lockMovementY: true,
         }),
         this.canvas.renderAll.bind(this.canvas),
         {
           // scaleX: this.canvas.width / image.width,
           // scaleY: this.canvas.height / image.height,
-          crossOrigin: "anonymous",
+          crossOrigin: 'anonymous',
           left: 0,
-          top: 0
+          top: 0,
           // originX: 'top',
           // originY: 'left'
         }
@@ -165,21 +162,28 @@ export class PcDetailsDialogComponent implements OnInit {
   }
 
   drawAllPcsInCanvas() {
-    const seguidorPcs = this.allPcs.filter((pc, i, pcArray) => {
-      return pc.archivo === this.pc.archivo;
-    });
-
-    seguidorPcs.forEach((pc, i, a) => {
-      this.drawPc(pc);
-    });
+    this.pcService.currentFilteredPcs$
+      .pipe(
+        map((pcArray) => {
+          return pcArray.filter((pc) => {
+            return pc.archivo === this.pc.archivo;
+          });
+        })
+      )
+      .subscribe((pcArray) => {
+        this.allPcs = pcArray;
+        pcArray.forEach((pc, i, a) => {
+          this.drawPc(pc);
+        });
+      });
   }
 
   drawPc(pc: PcInterface) {
     const actObj1 = new fabric.Rect({
       left: pc.img_left,
       top: pc.img_top,
-      fill: "rgba(0,0,0,0)",
-      stroke: "black",
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'black',
       strokeWidth: 1,
       width: pc.img_width,
       height: pc.img_height,
@@ -189,13 +193,13 @@ export class PcDetailsDialogComponent implements OnInit {
       localId: pc.local_id,
       ref: false,
       selectable: false,
-      hoverCursor: "default"
+      hoverCursor: 'default',
     });
     const actObj2 = new fabric.Rect({
       left: pc.img_left - 1,
       top: pc.img_top - 1,
-      fill: "rgba(0,0,0,0)",
-      stroke: "red",
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'red',
       strokeWidth: 1,
       width: pc.img_width + 2,
       height: pc.img_height + 2,
@@ -204,22 +208,19 @@ export class PcDetailsDialogComponent implements OnInit {
       lockMovementX: true,
       localId: pc.local_id,
       ref: false,
-      hoverCursor: "pointer",
-      selectable: true
+      hoverCursor: 'pointer',
+      selectable: true,
     });
-    const textId = new fabric.Text(
-      "#".concat(pc.local_id.toString().concat(" ")),
-      {
-        left: pc.img_left,
-        top: pc.img_top - 26,
-        fontSize: 20,
-        // textBackgroundColor: 'red',
-        ref: "text",
-        selectable: false,
-        hoverCursor: "default",
-        fill: "white"
-      }
-    );
+    const textId = new fabric.Text('#'.concat(pc.local_id.toString().concat(' ')), {
+      left: pc.img_left,
+      top: pc.img_top - 26,
+      fontSize: 20,
+      // textBackgroundColor: 'red',
+      ref: 'text',
+      selectable: false,
+      hoverCursor: 'default',
+      fill: 'white',
+    });
 
     this.canvas.add(actObj1);
     this.canvas.add(actObj2);
@@ -241,8 +242,8 @@ export class PcDetailsDialogComponent implements OnInit {
     const actObjRef1 = new fabric.Rect({
       left: pc.refLeft,
       top: pc.refTop,
-      fill: "rgba(0,0,0,0)",
-      stroke: "blue",
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'blue',
       strokeWidth: 1,
       width: pc.refWidth,
       height: pc.refHeight,
@@ -252,13 +253,13 @@ export class PcDetailsDialogComponent implements OnInit {
       selectable: false,
       localId: pc.local_id,
       ref: true,
-      hoverCursor: "default"
+      hoverCursor: 'default',
     });
     const actObjRef2 = new fabric.Rect({
       left: pc.refLeft - 1,
       top: pc.refTop - 1,
-      fill: "rgba(0,0,0,0)",
-      stroke: "white",
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'white',
       strokeWidth: 1,
       width: pc.refWidth + 2,
       height: pc.refHeight + 2,
@@ -268,21 +269,18 @@ export class PcDetailsDialogComponent implements OnInit {
       selectable: false,
       localId: pc.local_id,
       ref: true,
-      hoverCursor: "default"
+      hoverCursor: 'default',
     });
-    const TextRef = new fabric.Text(
-      "Ø ".concat(pc.temperaturaRef.toString().concat(" ºC ")),
-      {
-        left: pc.refLeft,
-        top: pc.refTop - 16,
-        fontSize: 13,
-        textBackgroundColor: "white",
-        ref: "text",
-        selectable: false,
-        hoverCursor: "default",
-        fill: "blue"
-      }
-    );
+    const TextRef = new fabric.Text('Ø '.concat(pc.temperaturaRef.toString().concat(' ºC ')), {
+      left: pc.refLeft,
+      top: pc.refTop - 16,
+      fontSize: 13,
+      textBackgroundColor: 'white',
+      ref: 'text',
+      selectable: false,
+      hoverCursor: 'default',
+      fill: 'blue',
+    });
 
     this.oldActObjRef1 = actObjRef1;
     this.oldActObjRef2 = actObjRef2;
@@ -306,28 +304,25 @@ export class PcDetailsDialogComponent implements OnInit {
     const triangle = new fabric.Triangle({
       width: squareBase,
       height: squareBase,
-      fill: "red",
-      stroke: "black",
+      fill: 'red',
+      stroke: 'black',
       left: Math.round(x - squareBase / 2),
       top: y, // si no ponemos este 2, entonces no lee bien debajo del triangulo
       selectable: false,
-      ref: "triangle",
-      hoverCursor: "default"
+      ref: 'triangle',
+      hoverCursor: 'default',
     });
 
-    const textTriangle = new fabric.Text(
-      " + ".concat(pc.gradienteNormalizado.toString().concat(" ºC ")),
-      {
-        left: pc.img_left,
-        top: pc.img_top + pc.img_height + 5,
-        fontSize: 13,
-        textBackgroundColor: "white",
-        ref: "text",
-        selectable: false,
-        hoverCursor: "default",
-        fill: "red"
-      }
-    );
+    const textTriangle = new fabric.Text(' + '.concat(pc.gradienteNormalizado.toString().concat(' ºC ')), {
+      left: pc.img_left,
+      top: pc.img_top + pc.img_height + 5,
+      fontSize: 13,
+      textBackgroundColor: 'white',
+      ref: 'text',
+      selectable: false,
+      hoverCursor: 'default',
+      fill: 'red',
+    });
 
     this.oldTriangle = triangle;
     this.oldTextTriangle = textTriangle;
@@ -371,17 +366,17 @@ export class PcDetailsDialogComponent implements OnInit {
     this.storage
       .ref(`informes/${this.pc.informeId}/rjpg/${pc.archivoPublico}`)
       .getDownloadURL()
-      .subscribe(downloadUrl => {
+      .subscribe((downloadUrl) => {
         this.pc.downloadUrlStringRjpg = downloadUrl;
         const xhr = new XMLHttpRequest();
-        xhr.responseType = "blob";
-        xhr.onload = event => {
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
           /* Create a new Blob object using the response
            *  data of the onload object.
            */
-          const blob = new Blob([xhr.response], { type: "image/jpg" });
-          const a: any = document.createElement("a");
-          a.style = "display: none";
+          const blob = new Blob([xhr.response], { type: 'image/jpg' });
+          const a: any = document.createElement('a');
+          a.style = 'display: none';
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
@@ -389,7 +384,7 @@ export class PcDetailsDialogComponent implements OnInit {
           a.click();
           window.URL.revokeObjectURL(url);
         };
-        xhr.open("GET", downloadUrl);
+        xhr.open('GET', downloadUrl);
         xhr.send();
       });
   }
@@ -398,17 +393,17 @@ export class PcDetailsDialogComponent implements OnInit {
     this.storage
       .ref(`informes/${this.pc.informeId}/jpgVisual/${pc.archivoPublico}`)
       .getDownloadURL()
-      .subscribe(downloadUrl => {
+      .subscribe((downloadUrl) => {
         this.pc.downloadUrlStringVisual = downloadUrl;
         const xhr = new XMLHttpRequest();
-        xhr.responseType = "blob";
-        xhr.onload = event => {
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
           /* Create a new Blob object using the response
            *  data of the onload object.
            */
-          const blob = new Blob([xhr.response], { type: "image/jpg" });
-          const a: any = document.createElement("a");
-          a.style = "display: none";
+          const blob = new Blob([xhr.response], { type: 'image/jpg' });
+          const a: any = document.createElement('a');
+          a.style = 'display: none';
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
@@ -416,7 +411,7 @@ export class PcDetailsDialogComponent implements OnInit {
           a.click();
           window.URL.revokeObjectURL(url);
         };
-        xhr.open("GET", downloadUrl);
+        xhr.open('GET', downloadUrl);
         xhr.send();
       });
   }
@@ -425,17 +420,17 @@ export class PcDetailsDialogComponent implements OnInit {
     this.storage
       .ref(`informes/${this.pc.informeId}/jpg/${pc.archivoPublico}`)
       .getDownloadURL()
-      .subscribe(downloadUrl => {
+      .subscribe((downloadUrl) => {
         this.pc.downloadUrlString = downloadUrl;
         const xhr = new XMLHttpRequest();
-        xhr.responseType = "blob";
-        xhr.onload = event => {
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
           /* Create a new Blob object using the response
            *  data of the onload object.
            */
-          const blob = new Blob([xhr.response], { type: "image/jpg" });
-          const a: any = document.createElement("a");
-          a.style = "display: none";
+          const blob = new Blob([xhr.response], { type: 'image/jpg' });
+          const a: any = document.createElement('a');
+          a.style = 'display: none';
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
@@ -443,38 +438,29 @@ export class PcDetailsDialogComponent implements OnInit {
           a.click();
           window.URL.revokeObjectURL(url);
         };
-        xhr.open("GET", downloadUrl);
+        xhr.open('GET', downloadUrl);
         xhr.send();
       });
   }
 
   setEventListenersCanvas() {
-    this.canvas.on("mouse:over", e => {
+    this.canvas.on('mouse:over', (e) => {
       if (e.target !== null) {
-        if (
-          e.target.ref !== "triangle" &&
-          e.target.ref !== "text" &&
-          e.target.ref !== true
-        ) {
-          e.target.set("fill", "rgba(255,255,255,0.3)"),
-            this.canvas.renderAll();
+        if (e.target.ref !== 'triangle' && e.target.ref !== 'text' && e.target.ref !== true) {
+          e.target.set('fill', 'rgba(255,255,255,0.3)'), this.canvas.renderAll();
         }
       }
     });
 
-    this.canvas.on("mouse:out", e => {
+    this.canvas.on('mouse:out', (e) => {
       if (e.target !== null) {
-        if (
-          e.target.ref !== "triangle" &&
-          e.target.ref !== "text" &&
-          e.target.ref !== true
-        ) {
-          e.target.set("fill", "rgba(255,255,255,0)"), this.canvas.renderAll();
+        if (e.target.ref !== 'triangle' && e.target.ref !== 'text' && e.target.ref !== true) {
+          e.target.set('fill', 'rgba(255,255,255,0)'), this.canvas.renderAll();
         }
       }
     });
 
-    this.canvas.on("selection:updated", e => {
+    this.canvas.on('selection:updated', (e) => {
       const actObj = e.selected[0];
       const selectedPc = this.allPcs.filter((pc, i, a) => {
         return pc.local_id === actObj.localId;
@@ -482,7 +468,7 @@ export class PcDetailsDialogComponent implements OnInit {
       this.selectPc(selectedPc[0]);
     });
 
-    this.canvas.on("selection:created", e => {
+    this.canvas.on('selection:created', (e) => {
       const actObj = e.selected[0];
       const selectedPc = this.allPcs.filter((pc, i, a) => {
         return pc.local_id === actObj.localId;
@@ -490,13 +476,13 @@ export class PcDetailsDialogComponent implements OnInit {
       this.selectPc(selectedPc[0]);
     });
 
-    const zoom = document.getElementById("visual-zoom") as HTMLCanvasElement;
-    const zoomCtx = zoom.getContext("2d");
+    const zoom = document.getElementById('visual-zoom') as HTMLCanvasElement;
+    const zoomCtx = zoom.getContext('2d');
 
-    this.canvas.on("mouse:move", e => {
-      zoomCtx.fillStyle = "white";
-      //zoomCtx.clearRect(0,0, zoom.width, zoom.height);
-      //zoomCtx.fillStyle = "transparent";
+    this.canvas.on('mouse:move', (e) => {
+      zoomCtx.fillStyle = 'white';
+      // zoomCtx.clearRect(0,0, zoom.width, zoom.height);
+      // zoomCtx.fillStyle = "transparent";
       zoomCtx.fillRect(0, 0, zoom.width, zoom.height);
       // const visualCanvas = document.getElementById(
       //   "visual-canvas"
@@ -518,19 +504,19 @@ export class PcDetailsDialogComponent implements OnInit {
         this.zoomSquare * zoomFactor
       );
       // console.log(zoom.style);
-      zoom.style.top = e.pointer.y - this.zoomSquare / 2 + "px";
-      zoom.style.left = e.pointer.x + 20 + "px";
-      zoom.style.display = "block";
+      zoom.style.top = e.pointer.y - this.zoomSquare / 2 + 'px';
+      zoom.style.left = e.pointer.x + 20 + 'px';
+      zoom.style.display = 'block';
     });
 
-    this.canvas.on("mouse:out", e => {
-      zoom.style.display = "none";
+    this.canvas.on('mouse:out', (e) => {
+      zoom.style.display = 'none';
     });
 
-    this.visualCanvas.on("mouse:move", e => {
-      zoomCtx.fillStyle = "white";
-      //zoomCtx.clearRect(0,0, zoom.width, zoom.height);
-      //zoomCtx.fillStyle = "transparent";
+    this.visualCanvas.on('mouse:move', (e) => {
+      zoomCtx.fillStyle = 'white';
+      // zoomCtx.clearRect(0,0, zoom.width, zoom.height);
+      // zoomCtx.fillStyle = "transparent";
       zoomCtx.fillRect(0, 0, zoom.width, zoom.height);
       // const visualCanvas = document.getElementById(
       //   "visual-canvas"
@@ -549,13 +535,13 @@ export class PcDetailsDialogComponent implements OnInit {
         this.zoomSquare
       );
       // console.log(zoom.style);
-      zoom.style.top = e.pointer.y + 10 + "px";
-      zoom.style.left = e.pointer.x + 20 + "px";
-      zoom.style.display = "block";
+      zoom.style.top = e.pointer.y + 10 + 'px';
+      zoom.style.left = e.pointer.x + 20 + 'px';
+      zoom.style.display = 'block';
     });
 
-    this.visualCanvas.on("mouse:out", e => {
-      zoom.style.display = "none";
+    this.visualCanvas.on('mouse:out', (e) => {
+      zoom.style.display = 'none';
     });
   }
 
@@ -563,11 +549,11 @@ export class PcDetailsDialogComponent implements OnInit {
     // $event = false: termico | True: visual
     if ($event) {
       // Visual
-      document.getElementById("imagen-div").style.display = "none";
-      document.getElementById("imagen-visual-div").style.display = "block";
+      document.getElementById('imagen-div').style.display = 'none';
+      document.getElementById('imagen-visual-div').style.display = 'block';
     } else {
-      document.getElementById("imagen-div").style.display = "block";
-      document.getElementById("imagen-visual-div").style.display = "none";
+      document.getElementById('imagen-div').style.display = 'block';
+      document.getElementById('imagen-visual-div').style.display = 'none';
     }
   }
 
@@ -576,7 +562,7 @@ export class PcDetailsDialogComponent implements OnInit {
   }
 
   checkIsMoreThanOne(item: any) {
-    if (Number.isNaN(item) || typeof item === "string") {
+    if (Number.isNaN(item) || typeof item === 'string') {
       return false;
     }
     return item > 1;
@@ -584,7 +570,7 @@ export class PcDetailsDialogComponent implements OnInit {
 
   checkHasModule(pc: PcInterface) {
     if (pc.modulo && pc.modulo !== undefined) {
-      return pc.modulo.hasOwnProperty("potencia");
+      return pc.modulo.hasOwnProperty('potencia');
     }
     return false;
   }

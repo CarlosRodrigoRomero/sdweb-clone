@@ -4,13 +4,12 @@ import { InformeOverviewComponent } from './overview/informe-overview.component'
 import { InformeViewComponent } from './informe-view.component';
 import { PcListComponent } from './list/pc-list/pc-list.component';
 import { ExportComponent } from '../informe-export/export/export.component';
-import { InformeMapComponent } from '../informe-map/informe-map.component';
 
 const routes: Routes = [
   {
-    path: 'clientes/informe-view/:id',
+    path: ':id',
     component: InformeViewComponent,
-    pathMatch: 'full',
+
     children: [
       {
         path: '',
@@ -26,7 +25,7 @@ const routes: Routes = [
       },
       {
         path: 'informe-map',
-        component: InformeMapComponent,
+        loadChildren: () => import('../informe-map/informe-map.module').then((m) => m.InformeMapModule),
         data: {
           shouldReuse: true,
         },

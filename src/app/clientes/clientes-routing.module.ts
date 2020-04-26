@@ -21,7 +21,7 @@ const routes: Routes = [
         component: AutoLocComponent,
       },
       {
-        path: 'informe-view/:id',
+        path: 'informe-view',
         loadChildren: () => import('../informe-view/informe-view.module').then((m) => m.InformeViewModule),
       },
     ],
