@@ -23,8 +23,6 @@
     "@angular/platform-browser": "^8.2.14",
     "@angular/platform-browser-dynamic": "^8.2.14",
     "@angular/router": "^8.2.14",
-    "@fortawesome/angular-fontawesome": "^0.3.0",
-    "angular-progress-bar": "^1.0.9",
     "bootstrap": "^4.4.0",
     "core-js": "^2.6.5",
     "fabric": "^2.7.0",
