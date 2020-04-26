@@ -22,7 +22,6 @@ export class InformesComponent implements OnInit {
   constructor(public auth: AuthService, private plantaService: PlantaService, private informeService: InformeService) {}
 
   ngOnInit() {
-    console.log('informes.component     ');
     this.auth.user$.subscribe((user) => {
       this.user = user;
       this.plantaService

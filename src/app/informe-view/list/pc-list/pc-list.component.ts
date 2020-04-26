@@ -79,9 +79,7 @@ export class PcListComponent implements OnInit, AfterViewInit {
         'gradienteNormalizado',
       ];
     }
-  }
 
-  ngAfterViewInit() {
     this.pcDataSource.sort = this.sort;
     this.pcDataSource.paginator = this.paginator;
 
@@ -105,6 +103,8 @@ export class PcListComponent implements OnInit, AfterViewInit {
       };
     });
   }
+
+  ngAfterViewInit() {}
 
   onClickToggleDetail(element) {
     if (this.expandedElement === element) {

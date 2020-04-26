@@ -128,7 +128,6 @@ export class InformeService {
 
   updateEstructura(informeId: string, estructura: EstructuraInterface) {
     const estructuraObj = Object.assign({}, estructura);
-    console.log('InformeService -> updateEstructura -> estructuraObj', estructuraObj);
     const estructuraDoc = this.afs.doc('informes/' + informeId + '/estructuras/' + estructura.id);
     estructuraDoc.update(estructuraObj);
   }
@@ -188,7 +187,6 @@ export class InformeService {
   updateInforme(informe: InformeInterface) {
     const informeDoc = this.afs.doc('informes/' + informe.id);
     informeDoc.update(informe);
-    console.log('updated');
   }
 
   addInforme() {}
