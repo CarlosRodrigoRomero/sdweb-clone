@@ -9,10 +9,21 @@ import { ClientesComponent } from './clientes.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { PlantaEditComponent } from './planta-edit/planta-edit.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AgmCoreModule } from '@agm/core';
+import { AutoLocComponent } from './auto-loc/auto-loc.component';
 
 @NgModule({
-  declarations: [InformesComponent, ClientesComponent, NavbarComponent, PlantaEditComponent],
-  imports: [ClientesRoutingModule, SharedModule, FormsModule, ReactiveFormsModule],
+  declarations: [AutoLocComponent, InformesComponent, ClientesComponent, NavbarComponent, PlantaEditComponent],
+  imports: [
+    AgmCoreModule.forRoot({
+      apiKey: 'AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM',
+      libraries: ['drawing'],
+    }),
+    ClientesRoutingModule,
+    SharedModule,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
   providers: [ValidateEstructuraPipe, AuthService],
 })
 export class ClientesModule {}

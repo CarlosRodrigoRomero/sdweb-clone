@@ -22,7 +22,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
-import { AgmCoreModule } from '@agm/core';
 @NgModule({
   declarations: [AppComponent, LoginComponent, IndexComponent, VideoComponent, AvisoLegalComponent],
 
@@ -42,10 +41,6 @@ import { AgmCoreModule } from '@agm/core';
     MatInputModule,
     MatButtonModule,
     CommonModule,
-    AgmCoreModule.forRoot({
-      apiKey: 'AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM',
-      libraries: ['drawing'],
-    }),
   ],
   providers: [{ provide: FirestoreSettingsToken, useValue: {} }, AuthService],
   bootstrap: [AppComponent],

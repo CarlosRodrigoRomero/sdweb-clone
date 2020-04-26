@@ -5,7 +5,6 @@ import { PcDetailsDialogComponent } from 'src/app/informe-view/pc-details-dialog
 import { FormsModule } from '@angular/forms';
 
 import { InformeMapComponent } from './informe-map.component';
-// import { AgmJsMarkerClustererModule } from "@agm/js-marker-clusterer";
 import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
@@ -14,11 +13,11 @@ import { SharedModule } from '../shared/shared.module';
 
   imports: [
     SharedModule,
-    FormsModule
-    AgmCoreModule.forRoot({
-      apiKey: 'AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM',
-      libraries: ['drawing'],
-    }),
+    FormsModule,
+    // AgmCoreModule.forRoot({
+    //   apiKey: 'AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM',
+    //   libraries: ['drawing'],
+    // }),
     // AgmJsMarkerClustererModule
   ],
 })

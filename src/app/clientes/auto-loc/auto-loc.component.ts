@@ -135,6 +135,7 @@ export class AutoLocComponent implements OnInit {
   }
 
   onMapReady(map) {
+    console.log('mapready');
     this.initDrawingManager(map);
   }
 

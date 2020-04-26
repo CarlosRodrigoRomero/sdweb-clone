@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { InformesComponent } from './informes/informes.component';
 import { ClientesComponent } from './clientes.component';
 import { PlantaEditComponent } from './planta-edit/planta-edit.component';
+import { AutoLocComponent } from './auto-loc/auto-loc.component';
 
 const routes: Routes = [
   {
@@ -15,14 +16,14 @@ const routes: Routes = [
         path: 'planta-edit/:plantaId',
         component: PlantaEditComponent,
       },
-      // {
-      //   path: 'auto-loc/:id',
-      //   component: AutoLocComponent,
-      // },
-      // {
-      //   path: 'informe-view/:id',
-      //   loadChildren: () => import('../informe-view/informe-view.module').then((m) => m.InformeViewModule),
-      // },
+      {
+        path: 'auto-loc/:id',
+        component: AutoLocComponent,
+      },
+      {
+        path: 'informe-view/:id',
+        loadChildren: () => import('../informe-view/informe-view.module').then((m) => m.InformeViewModule),
+      },
     ],
   },
 ];
