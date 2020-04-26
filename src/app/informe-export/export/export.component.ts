@@ -47,7 +47,7 @@ export interface Apartado {
   providers: [DecimalPipe, DatePipe]
 })
 export class ExportComponent implements OnInit {
-  @ViewChild('content', { static: false }) content: ElementRef;
+  @ViewChild('content') content: ElementRef;
 
   public planta: PlantaInterface;
   public informe: InformeInterface;
