@@ -1,29 +1,21 @@
-import { NgModule } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { NgModule } from '@angular/core';
 
-import { InformeViewRoutingModule } from "./informe-view-routing.module";
-import { InformeExportModule } from "../informe-export/informe-export.module";
-import { InformeListModule } from "./list/pc-list/informe-list.module";
-import { InformeOverviewComponent } from "./overview/informe-overview.component";
-import { ExplicacionCoaComponent } from "./explicacion-coa/explicacion-coa.component";
-import { GetNumeroModulosPipe } from "../pipes/get-numero-modulos.pipe";
-import { GetNombreSeguidorPipe } from "../pipes/get-nombre-seguidor.pipe";
-import { PcFilterComponent } from "./pc-filter/pc-filter.component";
-import { ChartModule } from "primeng/chart";
-import { AgmCoreModule } from "@agm/core";
-import { FormsModule } from "@angular/forms";
-import { InformeViewComponent } from "./informe-view.component";
-import { SpinnerModule } from "../spinner/spinner.module";
-import { MatButtonModule } from "@angular/material/button";
-import { MatCardModule } from "@angular/material/card";
-import { MatCheckboxModule } from "@angular/material/checkbox";
-import { MatDialogModule } from "@angular/material/dialog";
-import { MatSliderModule } from "@angular/material/slider";
-import { RouteReuseStrategy } from "@angular/router";
-import { CustomReuseStrategy } from "./routeReuse";
-import { PcDetailsDialogComponent } from "./pc-details-dialog/pc-details-dialog.component";
-import { InformeMapModule } from "../informe-map/informe-map.module";
-import { NavbarModule } from "../layout/navbar/navbar.module";
+import { InformeViewRoutingModule } from './informe-view-routing.module';
+import { InformeOverviewComponent } from './overview/informe-overview.component';
+import { ExplicacionCoaComponent } from './explicacion-coa/explicacion-coa.component';
+import { GetNumeroModulosPipe } from '../pipes/get-numero-modulos.pipe';
+import { GetNombreSeguidorPipe } from '../pipes/get-nombre-seguidor.pipe';
+import { PcFilterComponent } from './pc-filter/pc-filter.component';
+import { ChartModule } from 'primeng/chart';
+import { InformeViewComponent } from './informe-view.component';
+import { RouteReuseStrategy } from '@angular/router';
+import { CustomReuseStrategy } from './routeReuse';
+import { PcDetailsDialogComponent } from './pc-details-dialog/pc-details-dialog.component';
+import { SharedModule } from '../shared/shared.module';
+import { InformeMapComponent } from '../informe-map/informe-map.component';
+import { PcListComponent } from './list/pc-list/pc-list.component';
+import { PcDetailsComponent } from './list/pc-details/pc-details.component';
+import { ExportComponent } from '../informe-export/export/export.component';
 
 @NgModule({
   declarations: [
@@ -33,29 +25,16 @@ import { NavbarModule } from "../layout/navbar/navbar.module";
     ExplicacionCoaComponent,
     PcDetailsDialogComponent,
     GetNumeroModulosPipe,
-    GetNombreSeguidorPipe
+    GetNombreSeguidorPipe,
+    InformeMapComponent,
+    PcListComponent,
+    PcDetailsComponent,
+    ExportComponent,
+    PcFilterComponent,
   ],
   entryComponents: [ExplicacionCoaComponent, PcDetailsDialogComponent],
-  providers: [{ provide: RouteReuseStrategy, useClass: CustomReuseStrategy }],
-  imports: [
-    CommonModule,
-    InformeViewRoutingModule,
-    InformeExportModule,
-    InformeListModule,
-    ChartModule,
-    MatDialogModule,
-    MatCardModule,
-    MatButtonModule,
-    FormsModule,
-    MatSliderModule,
-    MatCheckboxModule,
-    SpinnerModule,
-    InformeMapModule,
-    NavbarModule,
-    AgmCoreModule.forRoot({
-      apiKey: "AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM",
-      libraries: ["drawing"]
-    })
-  ]
+  providers: [],
+  // providers: [{ provide: RouteReuseStrategy, useClass: CustomReuseStrategy }],
+  imports: [SharedModule, InformeViewRoutingModule, ChartModule],
 })
 export class InformeViewModule {}

@@ -6,8 +6,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { ArchivoVueloInterface } from '../../models/archivoVuelo';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from '../../models/elementoPlanta';
-import { map } from 'rxjs/operators';
-import { LoginComponent } from '../login/login.component';
 
 @Component({
   selector: 'app-edit-list',

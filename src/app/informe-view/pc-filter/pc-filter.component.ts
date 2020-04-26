@@ -1,21 +1,21 @@
-import { Component, OnInit, Input, OnDestroy } from "@angular/core";
-import { PcInterface } from "../../models/pc";
-import { MatButtonToggleGroup } from "@angular/material/button-toggle";
-import { MatCheckboxChange } from "@angular/material/checkbox";
-import { MatDialog } from "@angular/material/dialog";
-import { MatSliderChange } from "@angular/material/slider";
-import { PcService } from "../../services/pc.service";
-import { GLOBAL } from "../../services/global";
-import { PlantaService } from "../../services/planta.service";
-import { ExplicacionCoaComponent } from "../explicacion-coa/explicacion-coa.component";
-import { CriteriosClasificacion } from "../../models/criteriosClasificacion";
-import { take } from "rxjs/operators";
-import { PlantaInterface } from "../../models/planta";
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { PcInterface } from '../../models/pc';
+import { MatButtonToggleGroup } from '@angular/material/button-toggle';
+import { MatCheckboxChange } from '@angular/material/checkbox';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSliderChange } from '@angular/material/slider';
+import { PcService } from '../../services/pc.service';
+import { GLOBAL } from '../../services/global';
+import { PlantaService } from '../../services/planta.service';
+import { ExplicacionCoaComponent } from '../explicacion-coa/explicacion-coa.component';
+import { CriteriosClasificacion } from '../../models/criteriosClasificacion';
+import { take } from 'rxjs/operators';
+import { PlantaInterface } from '../../models/planta';
 
 @Component({
-  selector: "app-pc-filter",
-  templateUrl: "./pc-filter.component.html",
-  styleUrls: ["./pc-filter.component.css"]
+  selector: 'app-pc-filter',
+  templateUrl: './pc-filter.component.html',
+  styleUrls: ['./pc-filter.component.css'],
 })
 export class PcFilterComponent implements OnInit, OnDestroy {
   @Input() public allPcs: PcInterface[];
@@ -38,11 +38,7 @@ export class PcFilterComponent implements OnInit, OnDestroy {
   public maxGradiente: number;
   public criterio: CriteriosClasificacion;
 
-  constructor(
-    public dialog: MatDialog,
-    private pcService: PcService,
-    private plantaService: PlantaService
-  ) {
+  constructor(public dialog: MatDialog, private pcService: PcService, private plantaService: PlantaService) {
     this.countCategoria = Array();
     this.countClase = Array();
   }
@@ -58,9 +54,9 @@ export class PcFilterComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.pcService.filtroClase$.subscribe(e => (this.filtroClase = e));
-    this.pcService.filtroCategoria$.subscribe(e => (this.filtroCategoria = e));
-    this.pcService.filtroGradiente$.subscribe(e => (this.filtroGradiente = e));
+    this.pcService.filtroClase$.subscribe((e) => (this.filtroClase = e));
+    this.pcService.filtroCategoria$.subscribe((e) => (this.filtroCategoria = e));
+    this.pcService.filtroGradiente$.subscribe((e) => (this.filtroGradiente = e));
 
     this.numCategorias = Array(GLOBAL.labels_tipos.length)
       .fill(0)
@@ -73,33 +69,31 @@ export class PcFilterComponent implements OnInit, OnDestroy {
 
     // Calcular los tipos de puntos calientes
     for (const i of this.numCategorias) {
-      this.countCategoria.push(this.allPcs.filter(pc => pc.tipo === i).length);
+      this.countCategoria.push(this.allPcs.filter((pc) => pc.tipo === i).length);
     }
 
     // Calcular la severidad //
     for (const j of this.numClases) {
-      this.countClase.push(
-        this.allPcs.filter(pc => this.pcService.getPcCoA(pc) === j).length
-      );
+      this.countClase.push(this.allPcs.filter((pc) => this.pcService.getPcCoA(pc) === j).length);
     }
 
-    this.pcService.currentFilteredPcs$.subscribe(pcs => {
+    this.pcService.currentFilteredPcs$.subscribe((pcs) => {
       this.calcularInforme(pcs);
     });
 
-    //Setear min y max gradiente
+    // Setear min y max gradiente
     this.maxGradiente = GLOBAL.maxGradiente;
     this.minGradiente = GLOBAL.minGradiente;
 
     this.plantaService
       .getPlanta(this.planta.id)
       .pipe(take(1))
-      .subscribe(planta => {
-        if (planta.hasOwnProperty("criterioId")) {
+      .subscribe((planta) => {
+        if (planta.hasOwnProperty('criterioId')) {
           this.plantaService
             .getCriterio(planta.criterioId)
             .pipe(take(1))
-            .subscribe(criterio => {
+            .subscribe((criterio) => {
               this.minGradiente = criterio.critCoA.rangosDT[0];
               this.pcService.PushFiltroGradiente(this.minGradiente);
               this.criterio = criterio;
@@ -108,7 +102,7 @@ export class PcFilterComponent implements OnInit, OnDestroy {
           this.plantaService
             .getCriterio(GLOBAL.criterioSolardroneId)
             .pipe(take(1))
-            .subscribe(criterio => {
+            .subscribe((criterio) => {
               this.minGradiente = criterio.critCoA.rangosDT[0];
               this.pcService.PushFiltroGradiente(this.minGradiente);
               this.criterio = criterio;
@@ -138,14 +132,12 @@ export class PcFilterComponent implements OnInit, OnDestroy {
     let filtroCategoria;
     let filtroCategoriaClase;
     for (const cat of this.numCategorias) {
-      filtroCategoria = allPcs.filter(pc => pc.tipo === cat);
+      filtroCategoria = allPcs.filter((pc) => pc.tipo === cat);
       this.countCategoriaFiltrada.push(filtroCategoria.length);
 
-      let count1 = Array();
+      const count1 = Array();
       for (const clas of this.numClases) {
-        filtroCategoriaClase = allPcs.filter(
-          pc => this.pcService.getPcCoA(pc) === clas && pc.tipo === cat
-        );
+        filtroCategoriaClase = allPcs.filter((pc) => this.pcService.getPcCoA(pc) === clas && pc.tipo === cat);
         count1.push(filtroCategoriaClase.length);
       }
     }
@@ -153,7 +145,7 @@ export class PcFilterComponent implements OnInit, OnDestroy {
     // CLASES //
     let filtroClase;
     for (const j of this.numClases) {
-      filtroClase = allPcs.filter(pc => this.pcService.getPcCoA(pc) === j);
+      filtroClase = allPcs.filter((pc) => this.pcService.getPcCoA(pc) === j);
 
       this.countClaseFiltrada.push(filtroClase.length);
     }
@@ -161,7 +153,7 @@ export class PcFilterComponent implements OnInit, OnDestroy {
 
   onCheckBoxClaseChange($event: MatCheckboxChange) {
     const numberChecked = parseInt($event.source.value, 10);
-    this.filtroClase = this.filtroClase.filter(i => i !== numberChecked);
+    this.filtroClase = this.filtroClase.filter((i) => i !== numberChecked);
     if ($event.checked === true) {
       this.filtroClase.push(numberChecked);
     }
@@ -171,9 +163,7 @@ export class PcFilterComponent implements OnInit, OnDestroy {
 
   onChangeCheckboxCategoria($event: MatCheckboxChange) {
     const numberChecked = parseInt($event.source.value, 10);
-    this.filtroCategoria = this.filtroCategoria.filter(
-      i => i !== numberChecked
-    );
+    this.filtroCategoria = this.filtroCategoria.filter((i) => i !== numberChecked);
     if ($event.checked === true) {
       this.filtroCategoria.push(numberChecked);
     }
@@ -187,7 +177,7 @@ export class PcFilterComponent implements OnInit, OnDestroy {
     }
 
     if (value >= 1000) {
-      return Math.round(value / 1000) + " ºC";
+      return Math.round(value / 1000) + ' ºC';
     }
 
     return value;
@@ -203,14 +193,14 @@ export class PcFilterComponent implements OnInit, OnDestroy {
 
   onClickExplicacionCoA() {
     const dialogRef = this.dialog.open(ExplicacionCoaComponent, {
-      width: "1000px",
+      width: '1000px',
       // height: '600px',
       hasBackdrop: true,
       data: {
-        criterio: this.criterio
-      }
+        criterio: this.criterio,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {});
+    dialogRef.afterClosed().subscribe((result) => {});
   }
 }

@@ -1,23 +1,22 @@
-import { Injectable } from "@angular/core";
-import { AngularFireAuth } from "@angular/fire/auth";
-import { Observable, from, of } from "rxjs";
-import { switchMap } from "rxjs/operators";
-import { AngularFirestore } from "@angular/fire/firestore";
-import { UserInterface } from "../models/user";
+import { Injectable } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { Observable, from, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { AngularFirestore } from '@angular/fire/firestore';
+import { UserInterface } from '../models/user';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root',
 })
 export class AuthService {
   public user$: Observable<UserInterface>;
 
   constructor(private afAuth: AngularFireAuth, private afs: AngularFirestore) {
+    console.log('autoServiceConstructor');
     this.user$ = this.afAuth.authState.pipe(
-      switchMap(user => {
+      switchMap((user) => {
         if (user) {
-          return this.afs
-            .doc<UserInterface>(`users/${user.uid}`)
-            .valueChanges();
+          return this.afs.doc<UserInterface>(`users/${user.uid}`).valueChanges();
         } else {
           return of(null);
         }
@@ -34,7 +33,7 @@ export class AuthService {
 
   isAuthenticated(): Observable<boolean> {
     return this.user$.pipe(
-      switchMap(user => {
+      switchMap((user) => {
         if (user) {
           return of(true);
         } else {
