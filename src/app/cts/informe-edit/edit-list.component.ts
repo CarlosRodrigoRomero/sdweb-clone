@@ -17,7 +17,7 @@ import { LoginComponent } from '../login/login.component';
 export class EditListComponent implements OnInit {
   @Input() pcsOrEstructuras: boolean;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   selectedElementoPlanta: ElementoPlantaInterface;
   displayedColumnsEst: string[];

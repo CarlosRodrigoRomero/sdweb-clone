@@ -33,7 +33,7 @@ export interface DialogData {
   styleUrls: ["./map.component.css"]
 })
 export class MapComponent implements OnInit {
-  @ViewChild("agm-map") map: AgmMap;
+  @ViewChild("agm-map", { static: false }) map: AgmMap;
 
   @Input() filteredPcs: PcInterface[];
   public circleRadius: number;

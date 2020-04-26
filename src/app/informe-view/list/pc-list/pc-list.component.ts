@@ -25,8 +25,8 @@ import { InformeService } from '../../../services/informe.service';
   ],
 })
 export class PcListComponent implements OnInit, AfterViewInit {
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   public allPcs: PcInterface[];
 

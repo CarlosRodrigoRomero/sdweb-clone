@@ -26,9 +26,9 @@ declare const google: any;
 })
 export class AutoLocComponent implements OnInit {
   @ViewChildren(AgmPolygon) polygonData: QueryList<AgmPolygon>;
-  @ViewChild(AgmMap) map: any;
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(AgmMap, { static: true }) map: any;
+  @ViewChild(MatSort, { static: false }) sort: MatSort;
+  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
 
   public planta: PlantaInterface;
   public defaultZoom: number;

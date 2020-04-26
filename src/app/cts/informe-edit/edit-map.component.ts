@@ -19,7 +19,7 @@ declare const google: any;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditMapComponent implements OnInit {
-  @ViewChild(AgmMap) map: any;
+  @ViewChild(AgmMap, { static: false }) map: any;
   @Input() pcsOrEstructuras: boolean;
   @Input() currentLatLng: LatLngLiteral;
 
