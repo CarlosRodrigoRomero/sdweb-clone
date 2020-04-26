@@ -6,17 +6,17 @@ import { InformeInterface } from 'src/app/models/informe';
 import { PlantaInterface } from 'src/app/models/planta';
 import { PcInterface } from 'src/app/models/pc';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GLOBAL } from '../../services/global';
+import { GLOBAL } from '../services/global';
 import { take, map } from 'rxjs/operators';
-import { EstructuraInterface } from '../../models/estructura';
+import { EstructuraInterface } from '../models/estructura';
 
 import { AuthService } from 'src/app/services/auth.service';
-import { UserInterface } from '../../models/user';
+import { UserInterface } from '../models/user';
 import { Observable } from 'rxjs';
 
 import { ArchivoVueloInterface } from 'src/app/models/archivoVuelo';
 import { LatLngLiteral } from '@agm/core';
-import { ElementoPlantaInterface } from '../../models/elementoPlanta';
+import { ElementoPlantaInterface } from '../models/elementoPlanta';
 
 export interface EventInterface {
   offsetX: number;

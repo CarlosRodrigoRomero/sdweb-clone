@@ -27,7 +27,6 @@ export interface DialogData {
 export class InformeMapComponent implements OnInit {
   @ViewChild('agm-map') map: AgmMap;
 
-  public filteredPcs: PcInterface[];
   public circleRadius: number;
   public mapType = 'satellite';
   public userAreaList: UserAreaInterface[];
@@ -86,10 +85,9 @@ export class InformeMapComponent implements OnInit {
       hasBackdrop: true,
       data: {
         pc: selectedPc,
-        allPcs: this.filteredPcs,
         planta: this.planta,
         informe: this.informe,
-        sinPcs: sinPcs,
+        sinPcs,
       },
     });
 

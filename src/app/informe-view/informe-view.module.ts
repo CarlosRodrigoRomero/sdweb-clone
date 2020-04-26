@@ -8,15 +8,13 @@ import { GetNombreSeguidorPipe } from '../pipes/get-nombre-seguidor.pipe';
 import { PcFilterComponent } from './pc-filter/pc-filter.component';
 import { ChartModule } from 'primeng/chart';
 import { InformeViewComponent } from './informe-view.component';
-import { RouteReuseStrategy } from '@angular/router';
-import { CustomReuseStrategy } from './routeReuse';
 import { PcDetailsDialogComponent } from './pc-details-dialog/pc-details-dialog.component';
 import { SharedModule } from '../shared/shared.module';
 import { PcListComponent } from './list/pc-list/pc-list.component';
 import { PcDetailsComponent } from './list/pc-details/pc-details.component';
 import { ExportComponent } from '../informe-export/export/export.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { SpinnerModule } from '../spinner/spinner.module';
+import { SpinnerModule } from '../shared/spinner/spinner.module';
 
 @NgModule({
   declarations: [

@@ -32,7 +32,6 @@ export class CanvasComponent implements OnInit {
       this.planta = planta;
       this.filasPorDefecto = planta.filas;
       this.columnasPorDefecto = planta.columnas;
-      console.log('asdasd');
     });
   }
 

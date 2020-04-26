@@ -20,7 +20,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
-import { SpinnerModule } from '../spinner/spinner.module';
+import { SpinnerModule } from './spinner/spinner.module';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 const components = [];

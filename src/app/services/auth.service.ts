@@ -12,7 +12,6 @@ export class AuthService {
   public user$: Observable<UserInterface>;
 
   constructor(private afAuth: AngularFireAuth, private afs: AngularFirestore) {
-    console.log('autoServiceConstructor');
     this.user$ = this.afAuth.authState.pipe(
       switchMap((user) => {
         if (user) {
