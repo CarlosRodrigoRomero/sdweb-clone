@@ -1,23 +1,23 @@
 <div *ngIf="dataSourceEst.data" class="mat-elevation-z8">
-  <table *ngIf="!pcsOrEstructuras" mat-table [dataSource]="dataSourceEst">
+  <table matSort *ngIf="!pcsOrEstructuras" mat-table [dataSource]="dataSourceEst">
     <ng-container matColumnDef="error">
-      <th mat-header-cell *matHeaderCellDef>!</th>
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>!</th>
       <td mat-cell *matCellDef="let est">
         <span *ngIf="est | validateEstructura"><i class="fas fa-exclamation-circle errorGlobalCoords"></i></span>
       </td>
     </ng-container>
 
     <ng-container matColumnDef="vuelo">
-      <th mat-header-cell *matHeaderCellDef>Vuelo</th>
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>Vuelo</th>
       <td mat-cell *matCellDef="let est">{{ est.vuelo }}</td>
     </ng-container>
     <ng-container matColumnDef="globalCoords">
-      <th mat-header-cell *matHeaderCellDef>globalCoords</th>
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>globalCoords</th>
       <td mat-cell *matCellDef="let est">[{{ est.globalCoords }}]</td>
     </ng-container>
 
     <ng-container matColumnDef="archivo">
-      <th mat-header-cell *matHeaderCellDef>Archivo</th>
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>Archivo</th>
       <td mat-cell *matCellDef="let est">[{{ est.archivo }}]</td>
     </ng-container>
 

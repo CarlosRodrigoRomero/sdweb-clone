@@ -42,7 +42,7 @@ export class InformeService {
     this.archivoVueloSource.next(archivoVuelo);
   }
 
-  getInformes() {
+  getInformes(): Observable<InformeInterface[]> {
     return this.informesCollection.snapshotChanges().pipe(
       map((actions) =>
         actions.map((a) => {

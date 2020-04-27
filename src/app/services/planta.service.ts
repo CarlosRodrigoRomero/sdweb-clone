@@ -1,9 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  AngularFirestore,
-  AngularFirestoreDocument,
-  AngularFirestoreCollection
-} from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { PlantaInterface } from 'src/app/models/planta';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
@@ -19,7 +15,7 @@ import { GLOBAL } from './global';
 import { CriteriosClasificacion } from '../models/criteriosClasificacion';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PlantaService {
   public planta$: Observable<PlantaInterface>;
@@ -27,13 +23,11 @@ export class PlantaService {
   private plantaDoc: AngularFirestoreDocument<PlantaInterface>;
   public plantasCollection: AngularFirestoreCollection<PlantaInterface>;
   public modulos: ModuloInterface[];
-  private filteredLocAreasSource = new BehaviorSubject<LocationAreaInterface[]>(
-    new Array<LocationAreaInterface>()
-  );
+  private filteredLocAreasSource = new BehaviorSubject<LocationAreaInterface[]>(new Array<LocationAreaInterface>());
   public currentFilteredLocAreas$ = this.filteredLocAreasSource.asObservable();
 
   constructor(private afs: AngularFirestore, public auth: AuthService) {
-    this.getModulos().subscribe(modulos => {
+    this.getModulos().subscribe((modulos) => {
       this.modulos = modulos;
     });
   }
@@ -42,7 +36,7 @@ export class PlantaService {
     this.plantaDoc = this.afs.doc<PlantaInterface>('plantas/' + plantaId);
 
     return (this.planta$ = this.plantaDoc.snapshotChanges().pipe(
-      map(action => {
+      map((action) => {
         if (action.payload.exists === false) {
           return null;
         } else {
@@ -61,8 +55,8 @@ export class PlantaService {
 
   getPlantas() {
     return this.plantasCollection.snapshotChanges().pipe(
-      map(actions =>
-        actions.map(a => {
+      map((actions) =>
+        actions.map((a) => {
           const data = a.payload.doc.data() as PlantaInterface;
           data.id = a.payload.doc.id;
           return data;
@@ -74,31 +68,21 @@ export class PlantaService {
     const id = this.afs.createId();
     userArea.id = id;
 
-    this.afs
-      .collection('plantas')
-      .doc(plantaId)
-      .collection('userAreas')
-      .doc(id)
-      .set(userArea);
+    this.afs.collection('plantas').doc(plantaId).collection('userAreas').doc(id).set(userArea);
 
     return userArea;
   }
   updateUserArea(userArea: UserAreaInterface) {
-    const userAreaDoc = this.afs.doc(
-      `plantas/${userArea.plantaId}/userAreas/${userArea.id}`
-    );
+    const userAreaDoc = this.afs.doc(`plantas/${userArea.plantaId}/userAreas/${userArea.id}`);
     userAreaDoc.update(userArea);
   }
 
   getAllUserAreas(plantaId: string): Observable<UserAreaInterface[]> {
-    const query$ = this.afs
-      .collection('plantas')
-      .doc(plantaId)
-      .collection('userAreas');
+    const query$ = this.afs.collection('plantas').doc(plantaId).collection('userAreas');
 
     const result = query$.snapshotChanges().pipe(
-      map(actions =>
-        actions.map(a => {
+      map((actions) =>
+        actions.map((a) => {
           const data = a.payload.doc.data() as LocationAreaInterface;
           data.id = a.payload.doc.id;
           return data;
@@ -111,73 +95,50 @@ export class PlantaService {
 
   getUserAreas$(plantaId: string): Observable<UserAreaInterface[]> {
     return this.auth.user$.pipe(
-      map(user => {
+      map((user) => {
         return user.uid;
       }),
-      switchMap(userId => {
+      switchMap((userId) => {
         return this.afs
-          .collection<UserAreaInterface>(
-            `plantas/${plantaId}/userAreas/`,
-            ref => ref.where('userId', '==', userId)
-          )
+          .collection<UserAreaInterface>(`plantas/${plantaId}/userAreas/`, (ref) => ref.where('userId', '==', userId))
           .valueChanges();
       })
     );
   }
 
   delUserArea(userArea: UserAreaInterface) {
-    this.afs
-      .collection('plantas')
-      .doc(userArea.plantaId)
-      .collection('userAreas')
-      .doc(userArea.id)
-      .delete();
+    this.afs.collection('plantas').doc(userArea.plantaId).collection('userAreas').doc(userArea.id).delete();
   }
 
   addLocationArea(plantaId: string, locationArea: LocationAreaInterface) {
     const id = this.afs.createId();
     locationArea.id = id;
 
-    this.afs
-      .collection('plantas')
-      .doc(plantaId)
-      .collection('locationAreas')
-      .doc(id)
-      .set(locationArea);
+    this.afs.collection('plantas').doc(plantaId).collection('locationAreas').doc(id).set(locationArea);
 
     return locationArea;
   }
 
   updateLocationArea(locArea: LocationAreaInterface) {
-    const LocAreaDoc = this.afs.doc(
-      `plantas/${locArea.plantaId}/locationAreas/${locArea.id}`
-    );
+    const LocAreaDoc = this.afs.doc(`plantas/${locArea.plantaId}/locationAreas/${locArea.id}`);
     if (!locArea.hasOwnProperty('modulo')) {
       LocAreaDoc.update({
-        modulo: firebase.firestore.FieldValue.delete()
+        modulo: firebase.firestore.FieldValue.delete(),
       });
     }
     LocAreaDoc.update(locArea);
   }
 
   delLocationArea(locationArea: LocationAreaInterface) {
-    this.afs
-      .collection('plantas')
-      .doc(locationArea.plantaId)
-      .collection('locationAreas')
-      .doc(locationArea.id)
-      .delete();
+    this.afs.collection('plantas').doc(locationArea.plantaId).collection('locationAreas').doc(locationArea.id).delete();
   }
 
   getLocationsArea(plantaId: string): Observable<LocationAreaInterface[]> {
-    const query$ = this.afs
-      .collection('plantas')
-      .doc(plantaId)
-      .collection('locationAreas');
+    const query$ = this.afs.collection('plantas').doc(plantaId).collection('locationAreas');
 
     const result = query$.snapshotChanges().pipe(
-      map(actions =>
-        actions.map(a => {
+      map((actions) =>
+        actions.map((a) => {
           const data = a.payload.doc.data() as LocationAreaInterface;
           data.id = a.payload.doc.id;
           return data;
@@ -193,15 +154,15 @@ export class PlantaService {
     if (user.role === 2) {
       query$ = this.afs.collection<PlantaInterface>('plantas');
       return query$.snapshotChanges().pipe(
-        map(actions =>
-          actions.map(a => {
+        map((actions) =>
+          actions.map((a) => {
             const data = a.payload.doc.data() as PlantaInterface;
             data.id = a.payload.doc.id;
             return data;
           })
         ),
-        map(plantas => {
-          return plantas.filter(planta => {
+        map((plantas) => {
+          return plantas.filter((planta) => {
             return user.plantas.includes(planta.id);
           });
         })
@@ -209,14 +170,12 @@ export class PlantaService {
     } else if (user.role === 1 || user.role === 3) {
       query$ = this.afs.collection<PlantaInterface>('plantas');
     } else {
-      query$ = this.afs.collection<PlantaInterface>('plantas', ref =>
-        ref.where('empresa', '==', user.uid)
-      );
+      query$ = this.afs.collection<PlantaInterface>('plantas', (ref) => ref.where('empresa', '==', user.uid));
     }
 
     return query$.snapshotChanges().pipe(
-      map(actions =>
-        actions.map(a => {
+      map((actions) =>
+        actions.map((a) => {
           const data = a.payload.doc.data() as PlantaInterface;
           data.id = a.payload.doc.id;
           return data;
@@ -228,7 +187,7 @@ export class PlantaService {
   getModulosPlanta(planta: PlantaInterface): ModuloInterface[] {
     if (planta.hasOwnProperty('modulos')) {
       if (planta.modulos.length > 0) {
-        return this.modulos.filter(item => {
+        return this.modulos.filter((item) => {
           return planta.modulos.indexOf(item.id) >= 0;
         });
       }
@@ -242,8 +201,8 @@ export class PlantaService {
     query$ = this.afs.collection<ModuloInterface>('modulos');
 
     return query$.snapshotChanges().pipe(
-      map(actions =>
-        actions.map(a => {
+      map((actions) =>
+        actions.map((a) => {
           const data = a.payload.doc.data() as ModuloInterface;
           data.id = a.payload.doc.id;
           return data;
@@ -254,10 +213,12 @@ export class PlantaService {
 
   getNumeroModulo(pc: PcInterface): string {
     const altura = this.getAltura(this.planta, pc.local_y);
-    if (this.planta.hasOwnProperty('etiquetasLocalXY') &&
-        this.planta.etiquetasLocalXY[altura] !== undefined &&
-        this.planta.etiquetasLocalXY[altura][pc.local_x - 1] !== undefined) {
-          return this.planta.etiquetasLocalXY[altura][pc.local_x - 1];
+    if (
+      this.planta.hasOwnProperty('etiquetasLocalXY') &&
+      this.planta.etiquetasLocalXY[altura] !== undefined &&
+      this.planta.etiquetasLocalXY[altura][pc.local_x - 1] !== undefined
+    ) {
+      return this.planta.etiquetasLocalXY[altura][pc.local_x - 1];
     }
 
     return this.getEtiquetaLocalX(this.planta, pc)
@@ -280,10 +241,7 @@ export class PlantaService {
       return GLOBAL.stringParaDesconocido;
     }
     if (planta.hasOwnProperty('etiquetasLocalX')) {
-      const localX =
-        pc.local_x > planta.etiquetasLocalX.length
-          ? planta.etiquetasLocalX.length
-          : pc.local_x;
+      const localX = pc.local_x > planta.etiquetasLocalX.length ? planta.etiquetasLocalX.length : pc.local_x;
       return planta.etiquetasLocalX[localX - 1];
     }
     return pc.local_x;
@@ -293,10 +251,7 @@ export class PlantaService {
       return GLOBAL.stringParaDesconocido;
     }
     if (planta.hasOwnProperty('etiquetasLocalY')) {
-      const localY =
-        pc.local_y > planta.etiquetasLocalY.length
-          ? planta.etiquetasLocalY.length
-          : pc.local_y;
+      const localY = pc.local_y > planta.etiquetasLocalY.length ? planta.etiquetasLocalY.length : pc.local_y;
       if (planta.alturaBajaPrimero) {
         return planta.etiquetasLocalY[localY - 1];
       }
@@ -315,7 +270,6 @@ export class PlantaService {
     if (pc.hasOwnProperty('global_y')) {
       if (!Number.isNaN(pc.global_y)) {
         if (nombreSeguidor.length > 0) {
-
           nombreSeguidor = nombreSeguidor.concat(this.getGlobalsConector());
         }
         nombreSeguidor = nombreSeguidor.concat(pc.global_y.toString());
@@ -327,10 +281,10 @@ export class PlantaService {
   getEtiquetaGlobals(pc: PcInterface): string {
     let nombreEtiqueta = '';
     if (pc.hasOwnProperty('global_x') && !Number.isNaN(pc.global_x)) {
-        nombreEtiqueta = nombreEtiqueta.concat(pc.global_x.toString());
+      nombreEtiqueta = nombreEtiqueta.concat(pc.global_x.toString());
     }
     if (pc.hasOwnProperty('global_y') && !Number.isNaN(pc.global_y)) {
-      if (nombreEtiqueta.length > 0 ) {
+      if (nombreEtiqueta.length > 0) {
         nombreEtiqueta = nombreEtiqueta.concat(this.getGlobalsConector());
       }
       nombreEtiqueta = nombreEtiqueta.concat(pc.global_y.toString());
@@ -369,19 +323,14 @@ export class PlantaService {
   }
 
   getReferenciaSolardrone(planta: PlantaInterface) {
-    return (
-      !planta.hasOwnProperty('referenciaSolardrone') ||
-      planta.referenciaSolardrone
-    );
+    return !planta.hasOwnProperty('referenciaSolardrone') || planta.referenciaSolardrone;
   }
 
   getCriterio(criterioId: string): Observable<CriteriosClasificacion> {
-    const criterioDoc = this.afs.doc<CriteriosClasificacion>(
-      'criteriosClasificacion/' + criterioId
-    );
+    const criterioDoc = this.afs.doc<CriteriosClasificacion>('criteriosClasificacion/' + criterioId);
 
     return criterioDoc.snapshotChanges().pipe(
-      map(action => {
+      map((action) => {
         if (action.payload.exists === false) {
           return null;
         } else {
@@ -396,13 +345,11 @@ export class PlantaService {
   getCriterios(): Observable<CriteriosClasificacion[]> {
     let query$: AngularFirestoreCollection<CriteriosClasificacion>;
 
-    query$ = this.afs.collection<CriteriosClasificacion>(
-      'criteriosClasificacion'
-    );
+    query$ = this.afs.collection<CriteriosClasificacion>('criteriosClasificacion');
 
     return query$.snapshotChanges().pipe(
-      map(actions =>
-        actions.map(a => {
+      map((actions) =>
+        actions.map((a) => {
           const data = a.payload.doc.data() as CriteriosClasificacion;
           data.id = a.payload.doc.id;
           return data;

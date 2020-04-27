@@ -6,6 +6,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { ArchivoVueloInterface } from '../../models/archivoVuelo';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from '../../models/elementoPlanta';
+import { MatSort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-edit-list',
@@ -16,6 +17,7 @@ export class EditListComponent implements OnInit {
   @Input() pcsOrEstructuras: boolean;
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort: MatSort;
 
   selectedElementoPlanta: ElementoPlantaInterface;
   displayedColumnsEst: string[];
@@ -31,6 +33,7 @@ export class EditListComponent implements OnInit {
     this.displayedColumnsEst = ['error', 'globalCoords', 'archivo'];
     this.informeId = this.route.snapshot.paramMap.get('id');
     this.dataSourceEst.paginator = this.paginator;
+    this.dataSourceEst.sort = this.sort;
 
     this.informeService.getAllEstructuras(this.informeId).subscribe((estArray) => {
       estArray.sort(this.dynamicSort('archivo'));

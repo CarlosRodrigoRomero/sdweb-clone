@@ -7,8 +7,8 @@
       </button>
     </div>
   </div>
-  <div class="row justify-content-center">
-    <div class="col-4" *ngFor="let planta of plantas">
+  <div *ngIf="user.role !== 3; else informeListTable" class="row justify-content-center">
+    <div class="col-4" *ngFor="let planta of plantasList$ | async">
       <mat-card class="informe-card">
         <mat-card-header>
           <div mat-card-avatar class="informe-header-image"></div>
@@ -41,7 +41,7 @@
               <input type="checkbox" (click)="updateInforme(informe)" [checked]="informe.disponible" />
             </span>
             <a
-              *ngIf="checkInformeDisponible(informe) && user.role !== 3; else sinInforme2"
+              *ngIf="checkInformeDisponible(informe); else sinInforme2"
               mat-stroked-button
               color="primary"
               routerLink="../informe-view/{{ informe.id }}"
@@ -67,4 +67,7 @@
       </mat-card>
     </div>
   </div>
+  <ng-template #informeListTable>
+    <app-informe-list-table [plantasConInformes]="plantas"> </app-informe-list-table>
+  </ng-template>
 </div>

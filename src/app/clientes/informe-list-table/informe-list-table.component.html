@@ -1,0 +1,33 @@
+<table *ngIf="dataSource.data" mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+  <!-- Nombre Column -->
+  <ng-container matColumnDef="nombre">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
+    <td mat-cell *matCellDef="let element">{{ element.nombre }}</td>
+  </ng-container>
+
+  <!-- Potencia Column -->
+  <ng-container matColumnDef="potencia">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencia</th>
+    <td mat-cell *matCellDef="let element">{{ element.potencia }}</td>
+  </ng-container>
+
+  <!-- Tipo Column -->
+  <ng-container matColumnDef="tipo">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
+    <td mat-cell *matCellDef="let element">{{ element.tipo }}</td>
+  </ng-container>
+
+  <!-- Fecha Column -->
+  <ng-container matColumnDef="fecha">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
+    <td mat-cell *matCellDef="let element">
+      {{ element.informes[0].fecha * 1000 | date: 'dd/MM/yyyy' }}
+      <a routerLink="../informe-edit/{{ element.informes[0].id }}">
+        <i class="far fa-edit"></i>
+      </a>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>

@@ -6,7 +6,7 @@ import { PlantaInterface } from '../../models/planta';
 import { InformeService } from 'src/app/services/informe.service';
 import { Observable } from 'rxjs';
 import { UserInterface } from 'src/app/models/user';
-import { take } from 'rxjs/operators';
+import { take, switchMap, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-informes',
@@ -15,37 +15,53 @@ import { take } from 'rxjs/operators';
 })
 export class InformesComponent implements OnInit {
   public informes: InformeInterface[];
-  public plantas: PlantaInterface[];
+  public plantasConInformes: PlantaInterface[];
+  public allPlantas: PlantaInterface[];
   public user$: Observable<UserInterface>;
   public user: UserInterface;
+  plantasList$: Observable<PlantaInterface[]>;
 
   constructor(public auth: AuthService, private plantaService: PlantaService, private informeService: InformeService) {}
 
   ngOnInit() {
-    this.auth.user$.subscribe((user) => {
-      this.user = user;
-      this.plantaService
-        .getPlantasDeEmpresa(user)
-        .pipe(take(1))
-        .subscribe((plantas) => {
-          this.getInformesDePlantas(plantas);
-        });
-    });
-  }
+    const plantas$ = this.auth.user$.pipe(
+      switchMap((user) => {
+        this.user = user;
+        return this.plantaService.getPlantasDeEmpresa(user);
+      }),
+      take(1)
+    );
 
-  getInformesDePlantas(plantas: PlantaInterface[]) {
-    const plantasConInformes = [];
-    plantas.forEach((planta) => {
-      planta.informes = [] as InformeInterface[];
-      this.informeService
-        .getInformesDePlanta(planta.id)
-        .pipe(take(1))
-        .subscribe((informes) => {
-          planta.informes = informes;
-          plantasConInformes.push(planta);
-          this.plantas = plantasConInformes;
-        });
-    });
+    const allInformes$ = this.informeService.getInformes();
+
+    const allPlantas$ = allInformes$.pipe(
+      switchMap((informesArray) => {
+        return plantas$.pipe(
+          map((plantasArray) => {
+            return plantasArray.map((planta) => {
+              planta.informes = informesArray.filter((informe) => {
+                return informe.plantaId === planta.id;
+              });
+              return planta;
+            });
+          })
+        );
+      })
+    );
+    this.plantasList$ = allPlantas$.pipe(
+      map((plantasArray) => {
+        if (this.user.role === 1) {
+          return plantasArray;
+        } else {
+          return plantasArray.filter((planta) => {
+            planta.informes = planta.informes.filter((informe) => {
+              return informe.disponible;
+            });
+            return planta.informes.length > 0;
+          });
+        }
+      })
+    );
   }
 
   checkInformeDisponible(informe: InformeInterface) {

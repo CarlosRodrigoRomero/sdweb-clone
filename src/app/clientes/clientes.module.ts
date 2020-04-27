@@ -12,6 +12,7 @@ import { AgmCoreModule } from '@agm/core';
 import { AutoLocComponent } from './auto-loc/auto-loc.component';
 import { PlantaAddComponent } from './planta-add/planta-add.component';
 import { InformeAddComponent } from './informe-add/informe-add.component';
+import { InformeListTableComponent } from './informe-list-table/informe-list-table.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { InformeAddComponent } from './informe-add/informe-add.component';
     ClientesComponent,
     NavbarComponent,
     PlantaEditComponent,
+    InformeListTableComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({
