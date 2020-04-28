@@ -1,22 +1,21 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { AgmMap, LatLngLiteral } from '@agm/core';
 import { PcInterface } from 'src/app/models/pc';
 import { Estructura } from '../../models/estructura';
 import { InformeService } from '../../services/informe.service';
-import { ModuloInterface } from 'src/app/models/modulo';
 import { PlantaService } from '../../services/planta.service';
-import { take } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from '../../models/elementoPlanta';
 import { ArchivoVueloInterface } from 'src/app/models/archivoVuelo';
 import { ValidateEstructuraPipe } from '../../pipes/validate-estructura.pipe';
-declare const google: any;
+import { take } from 'rxjs/operators';
+import { InformeInterface } from '../../models/informe';
 
 @Component({
   selector: 'app-edit-map',
   templateUrl: './edit-map.component.html',
   styleUrls: ['./edit-map.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditMapComponent implements OnInit {
   @ViewChild(AgmMap) map: any;
@@ -29,6 +28,7 @@ export class EditMapComponent implements OnInit {
   selectedElementoPlanta: ElementoPlantaInterface;
   polygonList: any[];
   informeId: string;
+  informe: InformeInterface;
   currentArchivoVuelo: ArchivoVueloInterface;
 
   constructor(
@@ -61,8 +61,23 @@ export class EditMapComponent implements OnInit {
       .getAllEstructuras(this.informeId)
       .pipe(take(1))
       .subscribe((estArray) => {
-        this.allElementosPlanta = estArray;
+        if (!this.allElementosPlanta) {
+          this.allElementosPlanta = estArray;
+        }
       });
+
+    this.informeService.avisadorChangeElemento$.subscribe((elem) => {
+      if (elem.hasOwnProperty('filaInicio')) {
+        const elemPos = this.allElementosPlanta.findIndex((est) => {
+          return est.id === elem.id;
+        });
+        if (elemPos > 0) {
+          this.allElementosPlanta.splice(elemPos, 1);
+          // Si no está, le añadimos
+          this.allElementosPlanta.push(elem);
+        }
+      }
+    });
 
     this.informeService.avisadorNuevoElemento$.subscribe((elem) => {
       if (elem.hasOwnProperty('filaInicio')) {
@@ -72,12 +87,18 @@ export class EditMapComponent implements OnInit {
         if (elemPos > 0) {
           this.allElementosPlanta.splice(elemPos, 1);
         } else {
+          // Si no está, le añadimos
           this.allElementosPlanta.push(elem);
         }
       }
     });
-
-    // this.getPolygonList(this.informe.plantaId);
+    this.informeService
+      .getInforme(this.informeId)
+      .pipe(take(1))
+      .subscribe((informe) => {
+        this.informe = informe;
+        this.getPolygonList(this.informe.plantaId);
+      });
   }
 
   // selectElementoPlanta(elementoPlanta: PcInterface | EstructuraInterface): void {
@@ -161,26 +182,31 @@ export class EditMapComponent implements OnInit {
   onMapElementoPlantaDragEnd(elementoPlanta: ElementoPlantaInterface, event) {
     elementoPlanta.setLatLng({ lat: event.coords.lat, lng: event.coords.lng });
     this.onMapElementoPlantaClick(elementoPlanta);
+    // this.informeService.avisadorNuevoElementoSource.next(elementoPlanta);
     // TODO: implementar globalCoordsFromLocation
-    // let globalX;
-    // let globalY;
-    // let modulo;
-    // [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea(event.coords);
+    let globalX;
+    let globalY;
+    let modulo;
+    [globalX, globalY, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(event.coords, this.polygonList);
+    console.log('EditMapComponent -> onMapElementoPlantaDragEnd -> [globalX, globalY, modulo]', [
+      globalX,
+      globalY,
+      modulo,
+    ]);
+    elementoPlanta.setGlobals([globalX, globalY]);
+
     this.informeService.updateElementoPlanta(this.informeId, elementoPlanta);
   }
 
   recalcularLocs() {
-    console.log('TODO: implementar...');
     // this.allPcs.forEach((pc) => {
     //   let globalX;
     //   let globalY;
     //   let modulo;
-
     //   [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea({
     //     lat: pc.gps_lat,
     //     lng: pc.gps_lng,
     //   });
-
     //   this.updateLocalAreaInPc(pc, globalX, globalY, modulo);
     // });
   }
@@ -210,31 +236,5 @@ export class EditMapComponent implements OnInit {
           });
       });
     });
-  }
-
-  getGlobalCoordsFromLocationArea(coords: any) {
-    const latLng = new google.maps.LatLng(coords.lat, coords.lng);
-    let globalX = '';
-    let globalY = '';
-    let modulo: ModuloInterface = {};
-
-    for (let i = 0; i < this.polygonList.length; i++) {
-      if (google.maps.geometry.poly.containsLocation(latLng, this.polygonList[i])) {
-        if (this.polygonList[i].globalX.length > 0) {
-          globalX = this.polygonList[i].globalX;
-        }
-        if (this.polygonList[i].globalY.length > 0) {
-          globalY = this.polygonList[i].globalY;
-        }
-
-        if (this.polygonList[i].hasOwnProperty('modulo')) {
-          if (this.polygonList[i].modulo !== undefined) {
-            modulo = this.polygonList[i].modulo;
-          }
-        }
-      }
-    }
-
-    return [globalX, globalY, modulo];
   }
 }

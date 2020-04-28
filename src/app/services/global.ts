@@ -47,7 +47,7 @@ export let GLOBAL = {
     'Caja conexiones',
     'Sombras',
     'Yellowing', // 16
-    'String en CA', //17
+    'String en CA', // 17
   ],
   labels_bloqueadas: [0, 1, 2, 4, 16],
   pcDescripcion: [
@@ -68,7 +68,7 @@ export let GLOBAL = {
     'Caja de conexiones caliente', // 14
     'Módulo con sombras', // 15
     'Yellowing', // 16
-    'String en circuito abierto', //17
+    'String en circuito abierto', // 17
   ],
   //   '0',
   //   'Célula caliente',

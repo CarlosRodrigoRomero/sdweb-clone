@@ -373,8 +373,8 @@ export class InformeEditComponent implements OnInit {
   getPlanta(plantaId: string) {
     this.planta$ = this.plantaService.getPlanta(plantaId);
     this.plantaService.getPlanta(plantaId).subscribe(
-      (response) => {
-        this.planta = response;
+      (planta) => {
+        this.planta = planta;
         this.defaultZoom = this.planta.zoom;
 
         this.filas_array = [];

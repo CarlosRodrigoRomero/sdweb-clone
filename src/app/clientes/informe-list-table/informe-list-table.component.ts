@@ -48,7 +48,6 @@ export class InformeListTableComponent implements OnInit {
     );
     plantasConInformes$.subscribe((plantas) => {
       this.dataSource.data = plantas;
-      console.log('InformeListTableComponent -> ngOnInit -> plantas', plantas);
     });
   }
 

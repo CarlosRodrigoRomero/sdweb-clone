@@ -55,7 +55,7 @@ export class EditListComponent implements OnInit {
   }
 
   dynamicSort(property) {
-    let sortOrder = 1;
+    let sortOrder = -1;
 
     if (property[0] === '-') {
       sortOrder = -1;

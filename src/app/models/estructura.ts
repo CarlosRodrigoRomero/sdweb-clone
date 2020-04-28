@@ -1,6 +1,7 @@
 import { GLOBAL } from '../services/global';
 import { ElementoPlantaInterface } from './elementoPlanta';
 import { LatLngLiteral } from '@agm/core';
+import { ModuloInterface } from './modulo';
 export interface EstructuraInterface {
   id?: string;
   archivo: string;
@@ -14,6 +15,7 @@ export interface EstructuraInterface {
   latitud: number;
   longitud: number;
   globalCoords?: any[];
+  modulo?: ModuloInterface;
 }
 
 export class Estructura implements EstructuraInterface, ElementoPlantaInterface {
@@ -29,6 +31,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   latitud: number;
   longitud: number;
   globalCoords: any[];
+  modulo?: ModuloInterface;
 
   constructor(est: EstructuraInterface) {
     this.id = est.id;
@@ -42,6 +45,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     this.vuelo = est.vuelo;
     this.latitud = est.latitud;
     this.longitud = est.longitud;
+    this.modulo = est.modulo;
 
     let globalCoords;
     if (!est.hasOwnProperty('globalCoords')) {
@@ -61,5 +65,10 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   setLatLng(latLng: LatLngLiteral): void {
     this.latitud = latLng.lat;
     this.longitud = latLng.lng;
+  }
+  setGlobals(globals: any[]) {
+    globals.forEach((v, i, array) => {
+      this.globalCoords[i] = v;
+    });
   }
 }

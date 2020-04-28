@@ -193,7 +193,6 @@ export class CanvasComponent implements OnInit {
     });
 
     this.canvas.on('object:modified', (options) => {
-      // console.log('object moving desconocido');
       if (this.estructura !== null && options.target.ref === false) {
         const puntoDistMin = this.getPointDistanciaMin(options.pointer.x, options.pointer.y, estructuraMatrix);
         options.target.set({
@@ -262,6 +261,7 @@ export class CanvasComponent implements OnInit {
   }
 
   updateEstructura(filasColumnas = false) {
+    console.log('CanvasComponent -> updateEstructura -> this.estructura', this.estructura);
     if (filasColumnas) {
       this.filasPorDefecto = this.estructura.filas;
       this.columnasPorDefecto = this.estructura.columnas;
@@ -270,7 +270,7 @@ export class CanvasComponent implements OnInit {
     // Borramos del canvas la estructura anterior.
     this.limpiarEstructuraCanvas();
     this.dibujarEstructura(this.estructura);
-    this.informeService.updateEstructura(this.informeId, this.estructura);
+    this.informeService.updateElementoPlanta(this.informeId, this.estructura);
   }
 
   dibujarEstructura(estructura: Estructura) {
@@ -317,7 +317,7 @@ export class CanvasComponent implements OnInit {
         if (p.estructuraId === estructura.id) {
           polygon.points[p.name] = { x: p.getCenterPoint().x, y: p.getCenterPoint().y };
           estructura.coords = polygon.points;
-          this.informeService.updateEstructura(this.informeId, estructura);
+          this.informeService.updateElementoPlanta(this.informeId, estructura);
 
           this.dibujarPuntosInterioresEst(estructura);
         }
@@ -1027,6 +1027,7 @@ export class CanvasComponent implements OnInit {
     this.canvas.add(circle);
     this.canvas.selection = false;
   }
+
   private generatePolygon(pointArray) {
     const points = new Array();
     pointArray.forEach((point) => {
@@ -1043,7 +1044,6 @@ export class CanvasComponent implements OnInit {
 
     // Aqui ya tenemos los punts de la estructura (points)
     // Crear nueva estructura en la base de datos
-    // TODO: arreglar globalCoords, filaInicio y columnaInicio
 
     const nuevaEstructura = {
       archivo: this.currentArchivoVuelo.archivo,
@@ -1060,6 +1060,17 @@ export class CanvasComponent implements OnInit {
     } as EstructuraInterface;
 
     const nuevaEstructuraObj = new Estructura(nuevaEstructura);
+
+    // let globalX;
+    // let globalY;
+    // let modulo;
+    // [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea(event.coords, this.polygonList);
+    // console.log('EditMapComponent -> onMapElementoPlantaDragEnd -> [globalX, globalY, modulo]', [
+    //   globalX,
+    //   globalY,
+    //   modulo,
+    // ]);
+    // elementoPlanta.setGlobals([globalX, globalY]);
 
     // Dibujar dicha estructura
     this.dibujarEstructura(nuevaEstructuraObj);

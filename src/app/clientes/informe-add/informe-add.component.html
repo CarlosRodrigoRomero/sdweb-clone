@@ -6,25 +6,13 @@
       <h3>{{ planta.nombre }}</h3>
       <form class="formContainer" [formGroup]="form" (ngSubmit)="submitForm()">
         <mat-form-field>
-          <input
-            matInput
-            formControlName="fecha"
-            [matDatepicker]="picker"
-            placeholder="Choose a date"
-          />
-          <mat-datepicker-toggle
-            matSuffix
-            [for]="picker"
-          ></mat-datepicker-toggle>
+          <input matInput formControlName="fecha" [matDatepicker]="picker" placeholder="Choose a date" />
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field>
-          <input
-            matInput
-            formControlName="hora_inicio"
-            placeholder="Hora inicio"
-          />
+          <input matInput formControlName="hora_inicio" placeholder="Hora inicio" />
         </mat-form-field>
 
         <mat-form-field>
@@ -32,29 +20,15 @@
         </mat-form-field>
 
         <mat-form-field>
-          <input
-            matInput
-            type="number"
-            formControlName="tempReflejada"
-            placeholder="Temperatura Reflejada (ºC)"
-          />
+          <input matInput type="number" formControlName="tempReflejada" placeholder="Temperatura Reflejada (ºC)" />
         </mat-form-field>
 
         <mat-form-field>
-          <input
-            matInput
-            formControlName="prefijo"
-            placeholder="Prefijo nombre de archivos"
-          />
+          <input matInput formControlName="prefijo" placeholder="Prefijo nombre de archivos" />
         </mat-form-field>
 
         <mat-form-field>
-          <input
-            matInput
-            type="number"
-            formControlName="temperatura"
-            placeholder="Temperatura ambiente (ºC)"
-          />
+          <input matInput type="number" formControlName="temperatura" placeholder="Temperatura ambiente (ºC)" />
         </mat-form-field>
 
         <mat-form-field>
@@ -71,19 +45,11 @@
         </mat-form-field>
 
         <mat-form-field>
-          <input
-            matInput
-            formControlName="nubosidad"
-            placeholder="Nubosidad (octavas)"
-          />
+          <input matInput formControlName="nubosidad" placeholder="Nubosidad (octavas)" />
         </mat-form-field>
 
         <mat-form-field>
-          <input
-            matInput
-            formControlName="carpetaBase"
-            placeholder="Carpeta base"
-          />
+          <input matInput formControlName="carpetaBase" placeholder="Carpeta base" />
         </mat-form-field>
 
         <!-- <mat-form-field>
@@ -91,74 +57,34 @@
         </mat-form-field> -->
 
         <mat-form-field>
-          <input
-            matInput
-            type="number"
-            formControlName="emisividad"
-            placeholder="Emisividad"
-          />
+          <input matInput type="number" formControlName="emisividad" placeholder="Emisividad" />
         </mat-form-field>
 
         <mat-form-field>
-          <input
-            matInput
-            type="number"
-            formControlName="gsd"
-            placeholder="GSD (cm/pixel)"
-          />
+          <input matInput type="number" formControlName="gsd" placeholder="GSD (cm/pixel)" />
         </mat-form-field>
 
         <mat-form-field>
-          <input
-            matInput
-            type="number"
-            formControlName="alturaVuelo"
-            placeholder="Altura de vuelo"
-          />
+          <input matInput type="number" formControlName="alturaVuelo" placeholder="Altura de vuelo" />
         </mat-form-field>
 
         <mat-form-field>
-          <input
-            matInput
-            type="number"
-            formControlName="correccHoraSrt"
-            placeholder="Correccion hora SRT"
-          />
+          <input matInput type="number" formControlName="correccHoraSrt" placeholder="Correccion hora SRT" />
         </mat-form-field>
 
         <mat-form-field>
-          <input
-            matInput
-            type="number"
-            formControlName="rangeMin"
-            placeholder="rangeMin"
-          />
+          <input matInput type="number" formControlName="rangeMin" placeholder="rangeMin" />
         </mat-form-field>
 
         <mat-form-field>
-          <input
-            matInput
-            type="number"
-            formControlName="rangeMax"
-            placeholder="rangeMax"
-          />
+          <input matInput type="number" formControlName="rangeMax" placeholder="rangeMax" />
         </mat-form-field>
 
         <mat-form-field>
-          <input
-            matInput
-            type="number"
-            formControlName="distancia"
-            placeholder="distancia"
-          />
+          <input matInput type="number" formControlName="distancia" placeholder="distancia" />
         </mat-form-field>
 
-        <button
-          mat-button
-          color="primary"
-          type="submit"
-          [disabled]="form.invalid"
-        >
+        <button mat-button color="primary" type="submit" [disabled]="form.invalid">
           Guardar
         </button>
       </form>

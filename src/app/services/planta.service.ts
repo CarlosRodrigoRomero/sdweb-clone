@@ -13,6 +13,7 @@ import { UserAreaInterface } from '../models/userArea';
 import { AuthService } from './auth.service';
 import { GLOBAL } from './global';
 import { CriteriosClasificacion } from '../models/criteriosClasificacion';
+declare const google: any;
 
 @Injectable({
   providedIn: 'root',
@@ -394,5 +395,31 @@ export class PlantaService {
       return planta.nombreLocalY;
     }
     return GLOBAL.nombreLocalYFija;
+  }
+
+  getGlobalCoordsFromLocationArea(coords: any, polygonList: any[]) {
+    const latLng = new google.maps.LatLng(coords.lat, coords.lng);
+    let globalX = '';
+    let globalY = '';
+    let modulo: ModuloInterface = {};
+
+    polygonList.forEach((polygon, i, array) => {
+      if (google.maps.geometry.poly.containsLocation(latLng, polygon)) {
+        if (polygon.globalX.length > 0) {
+          globalX = polygon.globalX;
+        }
+        if (polygon.globalY.length > 0) {
+          globalY = polygon.globalY;
+        }
+
+        if (polygon.hasOwnProperty('modulo')) {
+          if (polygon.modulo !== undefined) {
+            modulo = polygon.modulo;
+          }
+        }
+      }
+    });
+
+    return [globalX, globalY, modulo];
   }
 }

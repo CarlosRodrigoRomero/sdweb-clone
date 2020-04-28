@@ -13,7 +13,8 @@ import { AutoLocComponent } from './auto-loc/auto-loc.component';
 import { PlantaAddComponent } from './planta-add/planta-add.component';
 import { InformeAddComponent } from './informe-add/informe-add.component';
 import { InformeListTableComponent } from './informe-list-table/informe-list-table.component';
-
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 @NgModule({
   declarations: [
     PlantaAddComponent,
@@ -35,7 +36,9 @@ import { InformeListTableComponent } from './informe-list-table/informe-list-tab
     SharedModule,
     FormsModule,
     ReactiveFormsModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
-  providers: [AuthService],
+  providers: [AuthService, MatDatepickerModule],
 })
 export class ClientesModule {}

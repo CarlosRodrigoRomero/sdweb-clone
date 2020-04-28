@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { InformeInterface } from '../models/informe';
-import { map, take, switchMap } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { GLOBAL } from './global';
@@ -24,8 +24,12 @@ export class InformeService {
   selectedElementoPlanta$ = this.elementoPlantaSource.asObservable();
   private archivoVueloSource = new Subject<ArchivoVueloInterface>();
   selectedArchivoVuelo$ = this.archivoVueloSource.asObservable();
+
   avisadorNuevoElementoSource = new Subject<ElementoPlantaInterface>();
   avisadorNuevoElemento$ = this.avisadorNuevoElementoSource.asObservable();
+
+  avisadorChangeElementoSource = new Subject<ElementoPlantaInterface>();
+  avisadorChangeElemento$ = this.avisadorChangeElementoSource.asObservable();
 
   constructor(public afs: AngularFirestore, private http: HttpClient) {
     this.url = GLOBAL.url;
@@ -121,6 +125,7 @@ export class InformeService {
   }
 
   updateElementoPlanta(informeId: string, elementoPlanta: ElementoPlantaInterface): void {
+    this.avisadorChangeElementoSource.next(elementoPlanta);
     if (elementoPlanta.constructor.name === Estructura.name) {
       this.updateEstructura(informeId, elementoPlanta as Estructura);
     }
