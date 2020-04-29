@@ -910,7 +910,6 @@ export class CanvasComponent implements OnInit {
         this.drawPolygon();
       }
       if (this.pointArray.length === 3) {
-        console.log('ENDED 4 LADOS');
         this.addPoint(options);
         this.generatePolygon(this.pointArray);
       } else if (options.target && options.target.id === this.pointArray[0].id) {

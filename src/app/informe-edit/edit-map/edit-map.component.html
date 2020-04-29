@@ -1,5 +1,5 @@
 <agm-map
-  *ngIf="currentArchivoVuelo"
+  *ngIf="informeService.selectedArchivoVuelo"
   [latitude]="currentLatLng.lat"
   [longitude]="currentLatLng.lng"
   [mapTypeId]="mapType"

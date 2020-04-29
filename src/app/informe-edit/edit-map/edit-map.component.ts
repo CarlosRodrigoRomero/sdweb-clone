@@ -29,7 +29,6 @@ export class EditMapComponent implements OnInit {
   polygonList: any[];
   informeId: string;
   informe: InformeInterface;
-  currentArchivoVuelo: ArchivoVueloInterface;
 
   constructor(
     private route: ActivatedRoute,
@@ -45,9 +44,8 @@ export class EditMapComponent implements OnInit {
     this.polygonList = [];
     this.informeId = this.route.snapshot.paramMap.get('id');
 
-    this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
-      this.currentArchivoVuelo = archivoVuelo;
-    });
+    // this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
+    // });
 
     this.informeService
       .getAllEstructuras(this.informeId)
@@ -114,14 +112,14 @@ export class EditMapComponent implements OnInit {
   getStrokeColor(elementoPlanta: ElementoPlantaInterface): string {
     if (this.informeService.selectedElementoPlanta) {
       if (this.informeService.selectedElementoPlanta.archivo === elementoPlanta.archivo) {
-        return 'white';
+        return '#7CFC00';
       }
     }
 
-    if (elementoPlanta.vuelo === this.currentArchivoVuelo.vuelo) {
-      return '#7CFC00';
+    if (elementoPlanta.vuelo === this.informeService.selectedArchivoVuelo.vuelo) {
+      return 'white';
     }
-    return 'grey';
+    return 'aqua';
   }
   getStrokeWeight(elementoPlanta: ElementoPlantaInterface): number {
     if (this.informeService.selectedElementoPlanta) {
@@ -129,7 +127,7 @@ export class EditMapComponent implements OnInit {
         return 3;
       }
     }
-    if (elementoPlanta.vuelo === this.currentArchivoVuelo.vuelo) {
+    if (elementoPlanta.vuelo === this.informeService.selectedArchivoVuelo.vuelo) {
       return 2;
     }
     return 1;
