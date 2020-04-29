@@ -10,7 +10,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-8 propiedadesEstructura" *ngIf="estructura">
+    <div class="col-12 propiedadesEstructura" *ngIf="estructura">
       <div class="row">
         <div class="col-6">
           <i class="fas fa-arrows-alt-v"></i>
@@ -35,7 +35,7 @@
           />
         </div>
         <div class="col-6">
-          <button mat-raised-button color="warn" *ngIf="estructura" (click)="deleteEstructura()">
+          <button mat-raised-button color="warn" *ngIf="estructura" (click)="deleteEstructura(estructura)">
             <i class="fa fa-trash" aria-hidden="true"></i>
           </button>
         </div>
@@ -85,9 +85,6 @@
           </label>
         </div>
       </div>
-    </div>
-    <div class="col-4">
-      <button mat-raised-button color="primary" *ngIf="!estructura" (click)="drawPolygon()">CREAR EST</button>
     </div>
   </div>
 </div>

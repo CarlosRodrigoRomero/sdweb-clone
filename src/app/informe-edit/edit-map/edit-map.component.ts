@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, AfterViewInit } from '@angular/core';
 import { AgmMap, LatLngLiteral } from '@agm/core';
 import { PcInterface } from 'src/app/models/pc';
 import { Estructura } from '../../models/estructura';
@@ -10,6 +10,7 @@ import { ArchivoVueloInterface } from 'src/app/models/archivoVuelo';
 import { ValidateEstructuraPipe } from '../../pipes/validate-estructura.pipe';
 import { take } from 'rxjs/operators';
 import { InformeInterface } from '../../models/informe';
+import { LocationAreaInterface } from 'src/app/models/location';
 
 @Component({
   selector: 'app-edit-map',
@@ -25,7 +26,6 @@ export class EditMapComponent implements OnInit {
   mapType: string;
   defaultZoom: number;
   allElementosPlanta: ElementoPlantaInterface[];
-  selectedElementoPlanta: ElementoPlantaInterface;
   polygonList: any[];
   informeId: string;
   informe: InformeInterface;
@@ -33,7 +33,7 @@ export class EditMapComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private informeService: InformeService,
+    public informeService: InformeService,
     private plantaService: PlantaService,
     private validateEst: ValidateEstructuraPipe
   ) {}
@@ -44,17 +44,9 @@ export class EditMapComponent implements OnInit {
     this.currentLatLng = { lat: 39.453186, lng: -5.880743 };
     this.polygonList = [];
     this.informeId = this.route.snapshot.paramMap.get('id');
-    // this.informeService.selectedElementoPlanta$.subscribe((elementoPlanta) => {
-    //   if (elementoPlanta !== this.elementoPlanta) {
-    //     this.selectElementoPlanta(elementoPlanta);
-    //   }
-    // });
 
     this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
       this.currentArchivoVuelo = archivoVuelo;
-    });
-    this.informeService.selectedElementoPlanta$.subscribe((elementoPlanta) => {
-      this.selectedElementoPlanta = elementoPlanta;
     });
 
     this.informeService
@@ -67,11 +59,11 @@ export class EditMapComponent implements OnInit {
       });
 
     this.informeService.avisadorChangeElemento$.subscribe((elem) => {
-      if (elem.hasOwnProperty('filaInicio')) {
+      if (elem.constructor.name === Estructura.name) {
         const elemPos = this.allElementosPlanta.findIndex((est) => {
           return est.id === elem.id;
         });
-        if (elemPos > 0) {
+        if (elemPos >= 0) {
           this.allElementosPlanta.splice(elemPos, 1);
           // Si no está, le añadimos
           this.allElementosPlanta.push(elem);
@@ -80,11 +72,12 @@ export class EditMapComponent implements OnInit {
     });
 
     this.informeService.avisadorNuevoElemento$.subscribe((elem) => {
-      if (elem.hasOwnProperty('filaInicio')) {
+      if (elem.constructor.name === Estructura.name) {
         const elemPos = this.allElementosPlanta.findIndex((est) => {
           return est.id === elem.id;
         });
-        if (elemPos > 0) {
+
+        if (elemPos >= 0) {
           this.allElementosPlanta.splice(elemPos, 1);
         } else {
           // Si no está, le añadimos
@@ -96,17 +89,13 @@ export class EditMapComponent implements OnInit {
       .getInforme(this.informeId)
       .pipe(take(1))
       .subscribe((informe) => {
+        this.setLocAreaList(informe.plantaId);
         this.informe = informe;
-        this.getPolygonList(this.informe.plantaId);
       });
   }
 
-  // selectElementoPlanta(elementoPlanta: PcInterface | EstructuraInterface): void {
-  //   console.log('EditMapComponent -> selectElementoPlanta -> elementoPlanta', elementoPlanta);
-  // }
-
   onMapElementoPlantaClick(elementoPlanta: ElementoPlantaInterface): void {
-    this.selectedElementoPlanta = elementoPlanta;
+    // this.selectedElementoPlanta = elementoPlanta;
     this.informeService.selectElementoPlanta(elementoPlanta);
 
     // if (elementoPlanta.vuelo !== this.currentFlight) {
@@ -123,8 +112,8 @@ export class EditMapComponent implements OnInit {
     return 'grey';
   }
   getStrokeColor(elementoPlanta: ElementoPlantaInterface): string {
-    if (this.selectedElementoPlanta) {
-      if (this.selectedElementoPlanta.archivo === elementoPlanta.archivo) {
+    if (this.informeService.selectedElementoPlanta) {
+      if (this.informeService.selectedElementoPlanta.archivo === elementoPlanta.archivo) {
         return 'white';
       }
     }
@@ -135,8 +124,8 @@ export class EditMapComponent implements OnInit {
     return 'grey';
   }
   getStrokeWeight(elementoPlanta: ElementoPlantaInterface): number {
-    if (this.selectedElementoPlanta) {
-      if (this.selectedElementoPlanta.archivo === elementoPlanta.archivo) {
+    if (this.informeService.selectedElementoPlanta) {
+      if (this.informeService.selectedElementoPlanta.archivo === elementoPlanta.archivo) {
         return 3;
       }
     }
@@ -182,59 +171,51 @@ export class EditMapComponent implements OnInit {
   onMapElementoPlantaDragEnd(elementoPlanta: ElementoPlantaInterface, event) {
     elementoPlanta.setLatLng({ lat: event.coords.lat, lng: event.coords.lng });
     this.onMapElementoPlantaClick(elementoPlanta);
-    // this.informeService.avisadorNuevoElementoSource.next(elementoPlanta);
+
     // TODO: implementar globalCoordsFromLocation
     let globalX;
     let globalY;
     let modulo;
-    [globalX, globalY, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(event.coords, this.polygonList);
-    console.log('EditMapComponent -> onMapElementoPlantaDragEnd -> [globalX, globalY, modulo]', [
-      globalX,
-      globalY,
-      modulo,
-    ]);
+    [globalX, globalY, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(event.coords);
+
     elementoPlanta.setGlobals([globalX, globalY]);
+    elementoPlanta.setModulo(modulo);
 
     this.informeService.updateElementoPlanta(this.informeId, elementoPlanta);
   }
 
-  recalcularLocs() {
-    // this.allPcs.forEach((pc) => {
-    //   let globalX;
-    //   let globalY;
-    //   let modulo;
-    //   [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea({
-    //     lat: pc.gps_lat,
-    //     lng: pc.gps_lng,
-    //   });
-    //   this.updateLocalAreaInPc(pc, globalX, globalY, modulo);
-    // });
-  }
-
-  getPolygonList(plantaId: string) {
-    this.plantaService.getLocationsArea(plantaId).subscribe((items) => {
-      this.polygonList = [];
-      items.forEach((locationArea) => {
-        this.map._mapsWrapper
-          .createPolygon({
-            paths: locationArea.path,
-            strokeColor: '#FF0000',
-            visible: false,
-            strokeOpacity: 0,
-            strokeWeight: 0,
-            fillColor: 'grey',
-            fillOpacity: 0,
-            editable: false,
-            draggable: false,
-            id: locationArea.id,
-            globalX: locationArea.globalX,
-            globalY: locationArea.globalY,
-            modulo: locationArea.modulo,
-          })
-          .then((polygon: any) => {
-            this.polygonList.push(polygon);
-          });
+  private setLocAreaList(plantaId: string): LocationAreaInterface[] {
+    const locAreaList = [];
+    this.plantaService
+      .getLocationsArea(plantaId)
+      .pipe(take(1))
+      .subscribe((locAreaArray) => {
+        locAreaArray.forEach((locationArea) => {
+          this.map._mapsWrapper
+            .createPolygon({
+              paths: locationArea.path,
+              strokeColor: '#FF0000',
+              visible: false,
+              strokeOpacity: 0,
+              strokeWeight: 0,
+              fillColor: 'grey',
+              fillOpacity: 0,
+              editable: false,
+              draggable: false,
+              id: locationArea.id,
+              globalX: locationArea.globalX,
+              globalY: locationArea.globalY,
+              modulo: locationArea.modulo,
+            })
+            .then((polygon: any) => {
+              locAreaList.push(polygon);
+              if (locAreaList.length === locAreaArray.length) {
+                this.plantaService.setLocAreaList(locAreaList);
+              }
+            });
+        });
       });
-    });
+
+    return locAreaList;
   }
 }

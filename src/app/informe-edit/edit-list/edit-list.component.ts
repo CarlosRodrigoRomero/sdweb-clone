@@ -19,15 +19,13 @@ export class EditListComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
-  selectedElementoPlanta: ElementoPlantaInterface;
   displayedColumnsEst: string[];
-  currentArchivoVuelo: ArchivoVueloInterface;
   allEstructuras: EstructuraInterface[];
   dataSourceEst = new MatTableDataSource(this.allEstructuras);
   informeId: string;
   loadedElementos = false;
 
-  constructor(private route: ActivatedRoute, private informeService: InformeService) {}
+  constructor(private route: ActivatedRoute, public informeService: InformeService) {}
 
   ngOnInit() {
     this.displayedColumnsEst = ['error', 'globalCoords', 'archivo'];
@@ -42,13 +40,11 @@ export class EditListComponent implements OnInit {
     });
 
     this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
-      if (this.currentArchivoVuelo !== archivoVuelo) {
-        this.setArchivoVuelo(archivoVuelo);
-      }
+      this.setArchivoVuelo(archivoVuelo);
     });
 
     this.informeService.selectedElementoPlanta$.subscribe((elementoPlanta) => {
-      if (this.selectedElementoPlanta !== elementoPlanta) {
+      if (elementoPlanta !== null) {
         this.setElementoPlanta(elementoPlanta);
       }
     });
@@ -72,13 +68,11 @@ export class EditListComponent implements OnInit {
   }
 
   setArchivoVuelo(archivoVuelo: ArchivoVueloInterface): void {
-    this.currentArchivoVuelo = archivoVuelo;
     this.applyFilter(archivoVuelo.vuelo);
   }
 
   setElementoPlanta(elementoPlanta: ElementoPlantaInterface): void {
     this.setArchivoVuelo({ archivo: elementoPlanta.archivo, vuelo: elementoPlanta.vuelo } as ArchivoVueloInterface);
-    this.selectedElementoPlanta = elementoPlanta;
   }
 
   onClickRowEstList(elementoPlanta: ElementoPlantaInterface): void {

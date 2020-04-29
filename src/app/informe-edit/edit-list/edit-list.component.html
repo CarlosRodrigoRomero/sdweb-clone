@@ -25,7 +25,7 @@
     <tr
       mat-row
       [ngClass]="{
-        selectedElement: est?.archivo === selectedElementoPlanta?.archivo
+        selectedElement: est?.archivo === informeService.selectedElementoPlanta?.archivo
       }"
       (click)="onClickRowEstList(est)"
       *matRowDef="let est; columns: displayedColumnsEst"

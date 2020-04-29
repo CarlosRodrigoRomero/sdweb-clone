@@ -51,7 +51,6 @@ export class InformeEditComponent implements OnInit {
   public oldTriangle2;
   public coords;
   public event: MouseEvent;
-  public currentArchivoVuelo: ArchivoVueloInterface;
   public currentTrackheading: number;
   public currentImageRotation: number;
   public currentGpsCorrection: number;
@@ -92,7 +91,7 @@ export class InformeEditComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private informeService: InformeService,
+    public informeService: InformeService,
     private plantaService: PlantaService,
     private pcService: PcService,
     public auth: AuthService
@@ -135,18 +134,17 @@ export class InformeEditComponent implements OnInit {
     this.getInforme();
 
     this.informeService.selectedElementoPlanta$.subscribe((elementoPlanta) => {
-      this.setElementoPlanta(elementoPlanta);
+      if (elementoPlanta !== null) {
+        this.setElementoPlanta(elementoPlanta);
+      }
     });
 
     this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
-      if (this.currentArchivoVuelo !== archivoVuelo) {
-        this.setArchivoVuelo(archivoVuelo);
-      }
+      this.setArchivoVuelo(archivoVuelo);
     });
   }
 
   setArchivoVuelo(archivoVuelo: ArchivoVueloInterface): void {
-    this.currentArchivoVuelo = archivoVuelo;
     this.changeFlight(archivoVuelo.vuelo);
 
     // Averiguar donde esta en fileList
@@ -154,6 +152,7 @@ export class InformeEditComponent implements OnInit {
     this.rangeValue = arrayIndex + 1;
 
     const coords = this.coords[arrayIndex];
+
     // Setear this.currentLatLng (para que se extienda a todos los childs)
     this.currentLatLng = {
       lat: parseFloat(coords.Latitude),
@@ -425,7 +424,6 @@ export class InformeEditComponent implements OnInit {
             this.getPlanta(this.informe.plantaId);
             // Cogemos todos los pcs de esta informe
             this.getPcsList();
-            // this.getEstructurasList();
             this.titulo = this.informe.fecha * 1000;
             // Obtener lista de imagenes de la carpeta
             this.getFileList();
@@ -458,7 +456,6 @@ export class InformeEditComponent implements OnInit {
 
             this.changeFlight(this.flightsList[0]);
             this.setImageFromRangeValue(1);
-            // this.getEstructurasList();
           }
         },
         (error) => {
@@ -493,29 +490,6 @@ export class InformeEditComponent implements OnInit {
       return filteredPcs.slice(0, this.maxMarkersShow);
     }
   }
-
-  // getEstructurasList() {
-  //   this.informeService
-  //     .getAllEstructuras(this.informe.id)
-  //     .pipe(take(1))
-  //     .subscribe((estArray) => {
-  // estArray.map((est) => {
-  // if (!est.hasOwnProperty('latitud') || !est.hasOwnProperty('longitud')) {
-  //   const gpsCoords = this.getGpsFromFilename(est.archivo);
-  //   est.latitud = gpsCoords.lat;
-  //   est.longitud = gpsCoords.lng;
-  // }
-  // if (!est.hasOwnProperty('vuelo')) {
-  //   est.vuelo = this.getFlightFromFilename(est.archivo);
-  // }
-  // Hace que se ralentice muchisimo la carga:
-
-  //   return est;
-  // });
-
-  //       this.dataSourceEst.data = estArray;
-  //     });
-  // }
 
   getPcsList(vuelo?: string) {
     this.pcService
@@ -712,5 +686,18 @@ export class InformeEditComponent implements OnInit {
     this.informe.carpetaJpgGray = this.carpetaJpgGray;
     this.informeService.updateInforme(this.informe);
     this.getFileList();
+  }
+
+  recalcularLocs() {
+    // this.allPcs.forEach((pc) => {
+    //   let globalX;
+    //   let globalY;
+    //   let modulo;
+    //   [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea({
+    //     lat: pc.gps_lat,
+    //     lng: pc.gps_lng,
+    //   });
+    //   this.updateLocalAreaInPc(pc, globalX, globalY, modulo);
+    // });
   }
 }

@@ -71,4 +71,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
       this.globalCoords[i] = v;
     });
   }
+  setModulo(modulo: ModuloInterface) {
+    this.modulo = modulo;
+  }
 }

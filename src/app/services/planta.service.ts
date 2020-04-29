@@ -13,6 +13,7 @@ import { UserAreaInterface } from '../models/userArea';
 import { AuthService } from './auth.service';
 import { GLOBAL } from './global';
 import { CriteriosClasificacion } from '../models/criteriosClasificacion';
+import { LatLngLiteral } from '@agm/core/map-types';
 declare const google: any;
 
 @Injectable({
@@ -26,6 +27,7 @@ export class PlantaService {
   public modulos: ModuloInterface[];
   private filteredLocAreasSource = new BehaviorSubject<LocationAreaInterface[]>(new Array<LocationAreaInterface>());
   public currentFilteredLocAreas$ = this.filteredLocAreasSource.asObservable();
+  public locAreaList: LocationAreaInterface[];
 
   constructor(private afs: AngularFirestore, public auth: AuthService) {
     this.getModulos().subscribe((modulos) => {
@@ -396,14 +398,18 @@ export class PlantaService {
     }
     return GLOBAL.nombreLocalYFija;
   }
+  setLocAreaList(locAreaList: LocationAreaInterface[]) {
+    this.locAreaList = locAreaList;
+  }
 
-  getGlobalCoordsFromLocationArea(coords: any, polygonList: any[]) {
+  getGlobalCoordsFromLocationArea(coords: LatLngLiteral) {
     const latLng = new google.maps.LatLng(coords.lat, coords.lng);
+
     let globalX = '';
     let globalY = '';
     let modulo: ModuloInterface = {};
 
-    polygonList.forEach((polygon, i, array) => {
+    this.locAreaList.forEach((polygon, i, array) => {
       if (google.maps.geometry.poly.containsLocation(latLng, polygon)) {
         if (polygon.globalX.length > 0) {
           globalX = polygon.globalX;

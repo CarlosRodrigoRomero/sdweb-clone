@@ -25,7 +25,7 @@
           />{{ flight }}
         </label>
       </div>
-      ( {{ currentArchivoVuelo?.archivo }} -
+      ( {{ informeService.selectedArchivoVuelo?.archivo }} -
       <input
         class="input-rangevalue"
         type="text"
@@ -166,6 +166,7 @@
 
         <div class="col col-xs-6 mapa">
           <app-edit-map [currentLatLng]="currentLatLng"> </app-edit-map>
+          <!-- <button *ngIf="(user | async).role === 1" (click)="recalcularLocs()">Recalcular locs</button> -->
 
           <div *ngIf="selected_pc" class="selected-pc-div">
             <div class="selected-pc-header">

@@ -20,6 +20,8 @@ export class InformeService {
   public informes$: Observable<InformeInterface[]>;
   public informe$: Observable<InformeInterface>;
   public url: string;
+  public selectedElementoPlanta: ElementoPlantaInterface;
+  public selectedArchivoVuelo: ArchivoVueloInterface;
   private elementoPlantaSource = new Subject<ElementoPlantaInterface>();
   selectedElementoPlanta$ = this.elementoPlantaSource.asObservable();
   private archivoVueloSource = new Subject<ArchivoVueloInterface>();
@@ -39,11 +41,25 @@ export class InformeService {
   }
 
   selectElementoPlanta(elementoPlanta: ElementoPlantaInterface) {
-    this.elementoPlantaSource.next(elementoPlanta);
-    this.selectArchivoVuelo({ archivo: elementoPlanta.archivo, vuelo: elementoPlanta.vuelo } as ArchivoVueloInterface);
+    if (elementoPlanta !== this.selectedElementoPlanta) {
+      this.selectedElementoPlanta = elementoPlanta;
+      this.elementoPlantaSource.next(elementoPlanta);
+
+      if (elementoPlanta !== null) {
+        const archivoVuelo = { archivo: elementoPlanta.archivo, vuelo: elementoPlanta.vuelo } as ArchivoVueloInterface;
+        if (this.selectedArchivoVuelo !== archivoVuelo) {
+          this.selectedArchivoVuelo = archivoVuelo;
+        }
+      }
+    }
   }
+
   selectArchivoVuelo(archivoVuelo: ArchivoVueloInterface) {
-    this.archivoVueloSource.next(archivoVuelo);
+    if (this.selectedArchivoVuelo !== archivoVuelo && archivoVuelo !== null) {
+      this.selectElementoPlanta(null);
+      this.selectedArchivoVuelo = archivoVuelo;
+      this.archivoVueloSource.next(archivoVuelo);
+    }
   }
 
   getInformes(): Observable<InformeInterface[]> {
@@ -102,25 +118,19 @@ export class InformeService {
 
   addEstructuraInforme(informeId: string, estructura: Estructura) {
     const estructuraObj = Object.assign({}, estructura);
-    // Primero vemos que no haya ninguna otra estructura en el archivo
-    this.deleteEstructuraInforme(informeId, estructura.archivo)
-      .pipe(take(1))
-      .subscribe((res) => {
-        if (res) {
-          const id = this.afs.createId();
-          estructura.id = id;
-          estructuraObj.id = id;
-          this.afs
-            .collection('informes')
-            .doc(informeId)
-            .collection('estructuras')
-            .doc(id)
-            .set(estructuraObj)
-            .then((v) => {
-              this.avisadorNuevoElementoSource.next(estructura);
-              this.selectElementoPlanta(estructura);
-            });
-        }
+
+    const id = this.afs.createId();
+    estructura.id = id;
+    estructuraObj.id = id;
+    this.afs
+      .collection('informes')
+      .doc(informeId)
+      .collection('estructuras')
+      .doc(id)
+      .set(estructuraObj)
+      .then((v) => {
+        this.avisadorNuevoElementoSource.next(estructura);
+        // this.selectElementoPlanta(estructura);
       });
   }
 
@@ -137,23 +147,12 @@ export class InformeService {
     estructuraDoc.update(estructuraObj);
   }
 
-  deleteEstructuraInforme(informeId: string, currentFileName: string): Observable<boolean> {
-    const response = new Subject<boolean>();
-
-    this.afs
-      .collection('informes')
-      .doc(informeId)
-      .collection('estructuras')
-      .ref.where('archivo', '==', currentFileName)
-      .get()
-      .then((query) => {
-        query.forEach((est) => {
-          est.ref.delete();
-        });
-        response.next(true);
-      });
-
-    return response;
+  deleteEstructuraInforme(informeId: string, estructura: Estructura): void {
+    // const response = new Subject<boolean>();
+    const estructuraDoc = this.afs.doc('informes/' + informeId + '/estructuras/' + estructura.id);
+    estructuraDoc.delete().then(() => {
+      this.avisadorNuevoElementoSource.next(estructura);
+    });
   }
 
   getEstructuraInforme(informeId: string, currentFileName: string): Observable<Estructura[]> {

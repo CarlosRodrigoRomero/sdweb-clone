@@ -13,6 +13,8 @@ import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from 'src/app/models/elementoPlanta';
 import { Estructura } from '../../models/estructura';
+import { PlantaService } from '../../services/planta.service';
+import { ModuloInterface } from '../../models/modulo';
 
 declare let fabric;
 
@@ -45,10 +47,8 @@ export class CanvasComponent implements OnInit {
   canvas: any;
   imageWidth: number;
   imageHeight: number;
-  selectedElement: ElementoPlantaInterface;
   selectedPc: PcInterface;
   estructuraMatrix: any[];
-  currentArchivoVuelo: ArchivoVueloInterface;
   min = 99;
   max = 999999;
   polygonMode = false;
@@ -61,7 +61,11 @@ export class CanvasComponent implements OnInit {
   planta: PlantaInterface;
   globalCoordsEstructura: number[];
 
-  constructor(private informeService: InformeService, private route: ActivatedRoute) {
+  constructor(
+    public informeService: InformeService,
+    private route: ActivatedRoute,
+    private plantaService: PlantaService
+  ) {
     this.imageWidth = GLOBAL.resolucionCamara[1];
     this.imageHeight = GLOBAL.resolucionCamara[0];
     this.selectedStrokeWidth = 2; // Tiene que ser par
@@ -80,30 +84,43 @@ export class CanvasComponent implements OnInit {
 
     // Selección de elemento de planta
     this.informeService.selectedElementoPlanta$.subscribe((elementoPlanta) => {
-      if (this.selectedElement !== elementoPlanta) {
-        this.selectElementoPlanta(elementoPlanta);
-      }
+      this.selectElementoPlanta(elementoPlanta);
     });
 
     // Selección de archivo vuelo
 
     this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
-      if (this.currentArchivoVuelo !== archivoVuelo) {
-        this.selectArchivoVuelo(archivoVuelo);
+      this.selectArchivoVuelo(archivoVuelo);
+    });
+
+    this.informeService.avisadorChangeElemento$.subscribe((elem) => {
+      if (elem.constructor.name === Estructura.name && this.informeService.selectedElementoPlanta.id === elem.id) {
+        this.estructura = elem as Estructura;
       }
     });
   }
 
   selectElementoPlanta(elementoPlanta: ElementoPlantaInterface): void {
-    this.selectedElement = elementoPlanta;
-    const archivoVuelo = { archivo: elementoPlanta.archivo, vuelo: elementoPlanta.vuelo } as ArchivoVueloInterface;
-    this.selectArchivoVuelo(archivoVuelo);
+    if (elementoPlanta == null) {
+      this.estructura = null;
+    } else {
+      this.selectArchivoVuelo({
+        archivo: elementoPlanta.archivo,
+        vuelo: elementoPlanta.vuelo,
+      } as ArchivoVueloInterface);
+
+      if (elementoPlanta.constructor.name === Estructura.name) {
+        if (this.estructura !== elementoPlanta) {
+          this.estructura = elementoPlanta as Estructura;
+        }
+      }
+    }
+
     // Dibujar los elementos correspondientes en el canvas
     // Si es un PC:
   }
 
   selectArchivoVuelo(archivoVuelo: ArchivoVueloInterface): void {
-    this.currentArchivoVuelo = archivoVuelo;
     // Borramos todos los elementos que pudiera haber si es necesario
     this.canvas.clear();
 
@@ -117,10 +134,13 @@ export class CanvasComponent implements OnInit {
       .getEstructuraInforme(this.informeId, archivoVuelo.archivo)
       .pipe(take(1))
       .subscribe((est) => {
-        if (est.length > 0 && this.currentArchivoVuelo.archivo === est[0].archivo) {
+        if (est.length > 0) {
           this.dibujarEstructura(est[0]);
-        } else {
-          this.estructura = null;
+          if (this.informeService.selectedElementoPlanta == null) {
+            this.informeService.selectElementoPlanta(est[0]);
+          } else if (this.informeService.selectedElementoPlanta.id !== est[0].id) {
+            this.informeService.selectElementoPlanta(est[0]);
+          }
         }
       });
 
@@ -261,7 +281,6 @@ export class CanvasComponent implements OnInit {
   }
 
   updateEstructura(filasColumnas = false) {
-    console.log('CanvasComponent -> updateEstructura -> this.estructura', this.estructura);
     if (filasColumnas) {
       this.filasPorDefecto = this.estructura.filas;
       this.columnasPorDefecto = this.estructura.columnas;
@@ -274,7 +293,7 @@ export class CanvasComponent implements OnInit {
   }
 
   dibujarEstructura(estructura: Estructura) {
-    this.estructura = estructura;
+    // this.estructura = estructura;
     // Dibujar poligono exterior
     const polygon = new fabric.Polygon(estructura.coords, {
       fill: 'rgba(0,0,0,0)',
@@ -838,9 +857,8 @@ export class CanvasComponent implements OnInit {
   //   // ESTRUCTURAS
   // }
 
-  deleteEstructura() {
-    this.informeService.avisadorNuevoElementoSource.next(this.estructura);
-    this.informeService.deleteEstructuraInforme(this.informeId, this.currentArchivoVuelo.archivo);
+  deleteEstructura(estructura: Estructura) {
+    this.informeService.deleteEstructuraInforme(this.informeId, estructura);
     // Borrar estructura de
     this.estructura = null;
     this.limpiarEstructuraCanvas();
@@ -888,7 +906,7 @@ export class CanvasComponent implements OnInit {
 
   initCanvas() {
     this.canvas.on('mouse:down', (options) => {
-      if (options.button === 3 && !this.polygonMode) {
+      if (options.button === 3 && !this.polygonMode && this.estructura === null) {
         this.drawPolygon();
       }
       if (this.pointArray.length === 3) {
@@ -925,7 +943,7 @@ export class CanvasComponent implements OnInit {
   public drawPolygon() {
     // Borrar posibles restos de polígonos anteriores
     if (this.estructura) {
-      this.deleteEstructura();
+      this.deleteEstructura(this.estructura);
     }
     //
 
@@ -1046,14 +1064,14 @@ export class CanvasComponent implements OnInit {
     // Crear nueva estructura en la base de datos
 
     const nuevaEstructura = {
-      archivo: this.currentArchivoVuelo.archivo,
+      archivo: this.informeService.selectedArchivoVuelo.archivo,
       coords: points,
       filas: this.filasPorDefecto,
       columnas: this.columnasPorDefecto,
       sentido: this.sentidoEstructura, // false: izq->drcha | true: drcha -> izq
       columnaInicio: 1,
       filaInicio: 1,
-      vuelo: this.currentArchivoVuelo.vuelo,
+      vuelo: this.informeService.selectedArchivoVuelo.vuelo,
       latitud: this.currentLatLng.lat,
       longitud: this.currentLatLng.lng,
       globalCoords: [null, null, null],
@@ -1061,22 +1079,17 @@ export class CanvasComponent implements OnInit {
 
     const nuevaEstructuraObj = new Estructura(nuevaEstructura);
 
-    // let globalX;
-    // let globalY;
-    // let modulo;
-    // [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea(event.coords, this.polygonList);
-    // console.log('EditMapComponent -> onMapElementoPlantaDragEnd -> [globalX, globalY, modulo]', [
-    //   globalX,
-    //   globalY,
-    //   modulo,
-    // ]);
-    // elementoPlanta.setGlobals([globalX, globalY]);
+    const [globalX, globalY, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.currentLatLng);
+
+    nuevaEstructuraObj.setGlobals([globalX, globalY]);
+    nuevaEstructuraObj.setModulo(modulo as ModuloInterface);
 
     // Dibujar dicha estructura
     this.dibujarEstructura(nuevaEstructuraObj);
 
     // Añadir a la base de datos
     this.informeService.addEstructuraInforme(this.informeId, nuevaEstructuraObj);
+    this.informeService.selectElementoPlanta(nuevaEstructuraObj);
 
     this.activeLine = null;
     this.activeShape = null;
