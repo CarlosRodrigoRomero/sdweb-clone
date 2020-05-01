@@ -9,7 +9,7 @@ import { take } from 'rxjs/operators';
 import { EstructuraInterface } from 'src/app/models/estructura';
 import { LatLngLiteral } from '@agm/core/map-types';
 import { PlantaInterface } from '../../models/planta';
-import { Observable } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from 'src/app/models/elementoPlanta';
 import { Estructura } from '../../models/estructura';
@@ -38,7 +38,6 @@ export class CanvasComponent implements OnInit {
   }
 
   private currentImageRotation: number;
-  private backgroundImage: any;
   private selectedStrokeWidth: number;
   informeId: string;
   rectRefReduction: number;
@@ -103,6 +102,7 @@ export class CanvasComponent implements OnInit {
   selectElementoPlanta(elementoPlanta: ElementoPlantaInterface): void {
     if (elementoPlanta == null) {
       this.estructura = null;
+      this.selectedPc = null;
     } else {
       this.selectArchivoVuelo({
         archivo: elementoPlanta.archivo,
@@ -121,30 +121,28 @@ export class CanvasComponent implements OnInit {
   }
 
   selectArchivoVuelo(archivoVuelo: ArchivoVueloInterface): void {
-    // Borramos todos los elementos que pudiera haber si es necesario
-    this.canvas.clear();
-
     // Ponemos la imagen de fondo
-    this.setBackgroundImage(
+    this.setNextImage(
       this.informeService.getImageUrl(this.carpetaJpgGray, archivoVuelo.vuelo, archivoVuelo.archivo)
-    );
-
-    // Añadir Estructura
-    this.informeService
-      .getEstructuraInforme(this.informeId, archivoVuelo.archivo)
-      .pipe(take(1))
-      .subscribe((est) => {
-        if (est.length > 0) {
-          this.dibujarEstructura(est[0]);
-          if (this.informeService.selectedElementoPlanta == null) {
-            this.informeService.selectElementoPlanta(est[0]);
-          } else if (this.informeService.selectedElementoPlanta.id !== est[0].id) {
-            this.informeService.selectElementoPlanta(est[0]);
-          }
-        }
-      });
-
-    this.selectedPc = null;
+    ).subscribe((bool) => {
+      if (bool) {
+        console.log('CanvasComponent -> selectArchivoVuelo -> bool', bool);
+        // Añadir Estructura
+        this.informeService
+          .getEstructuraInforme(this.informeId, archivoVuelo.archivo)
+          .pipe(take(1))
+          .subscribe((est) => {
+            if (est.length > 0) {
+              this.dibujarEstructura(est[0]);
+              if (this.informeService.selectedElementoPlanta == null) {
+                this.informeService.selectElementoPlanta(est[0]);
+              } else if (this.informeService.selectedElementoPlanta.id !== est[0].id) {
+                this.informeService.selectElementoPlanta(est[0]);
+              }
+            }
+          });
+      }
+    });
 
     // Dibujamos los elementosPlanta que haya...
     // Añadir cuadrados de los pc
@@ -159,18 +157,13 @@ export class CanvasComponent implements OnInit {
     // }
   }
 
-  setBackgroundImage(imgSrc) {
+  setNextImage(imgSrc): Observable<boolean> {
+    const result = new BehaviorSubject(false);
     const leftAndTop = this.getLeftAndTop(0);
-
-    this.canvas.getObjects().forEach((obj) => {
-      this.canvas.remove(obj);
-    });
 
     fabric.Image.fromURL(imgSrc, (image) => {
       // add background image
-      if (this.backgroundImage) {
-        this.canvas.remove(this.backgroundImage);
-      }
+      this.canvas.clear();
       this.canvas.setBackgroundImage(image, this.canvas.renderAll.bind(this.canvas), {
         // scaleX: this.canvas.width / image.width,
         // scaleY: this.canvas.height / image.height,
@@ -179,11 +172,11 @@ export class CanvasComponent implements OnInit {
         left: leftAndTop.left,
         top: leftAndTop.top,
         selectable: false,
-        // originX: 'top',
-        // originY: 'left'
       });
-      this.backgroundImage = image;
+      result.next(true);
     });
+
+    return result;
   }
 
   private dibujarPuntosInterioresEst(estructura: EstructuraInterface): void {
