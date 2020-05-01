@@ -5,5 +5,13 @@ service cloud.firestore {
       allow delete: if request.auth.uid == "R2V08aQmi4g1eoaW11RVseqkUZg2";
       allow read: if request.auth != null;
     }
+
+    match /informes/{informeId}/estructuras/{estructuraId} {
+    	allow write, delete, read: if request.auth.uid == "dgYtPws1dQPv8aZ24G940tstCZI3";
+  	}
+    match /informes/{informeId} {
+    	allow update: if request.auth.uid == "dgYtPws1dQPv8aZ24G940tstCZI3";
+  	}
   }
+
 }
