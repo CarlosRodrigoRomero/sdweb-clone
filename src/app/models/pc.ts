@@ -29,7 +29,6 @@ export interface PcInterface {
   datetime?: number;
   severidad?: number;
   reparable?: boolean;
-  color?: string;
   downloadUrl$?: Observable<string | null>;
   downloadUrlString?: string | null;
   downloadUrlRjpg$?: Observable<string | null>;
@@ -92,7 +91,6 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   datetime?: number;
   severidad?: number;
   reparable?: boolean;
-  color?: string;
   downloadUrl$?: Observable<string | null>;
   downloadUrlString?: string | null;
   downloadUrlRjpg$?: Observable<string | null>;
