@@ -9,8 +9,8 @@
       <canvas class="imagen-termica" id="mainCanvas" width="640" height="512"></canvas>
     </div>
   </div>
-  <div class="row">
-    <div class="col-12 propiedadesEstructura" *ngIf="estructura">
+  <div class="row" *ngIf="estructura; else crearEstructura">
+    <div class="col-12 propiedadesEstructura">
       <div class="row">
         <div class="col-6">
           <i class="fas fa-arrows-alt-v"></i>
@@ -87,4 +87,11 @@
       </div>
     </div>
   </div>
+  <ng-template #crearEstructura>
+    <div class="row">
+      <div class="col">
+        <button (click)="onClickCrearEstructura()" mat-raised-button color="primary">Crear Estructura</button>
+      </div>
+    </div>
+  </ng-template>
 </div>

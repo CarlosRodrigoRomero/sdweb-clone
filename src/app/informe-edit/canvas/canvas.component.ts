@@ -9,7 +9,7 @@ import { take } from 'rxjs/operators';
 import { EstructuraInterface } from 'src/app/models/estructura';
 import { LatLngLiteral } from '@agm/core/map-types';
 import { PlantaInterface } from '../../models/planta';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from 'src/app/models/elementoPlanta';
 import { Estructura } from '../../models/estructura';
@@ -126,7 +126,6 @@ export class CanvasComponent implements OnInit {
       this.informeService.getImageUrl(this.carpetaJpgGray, archivoVuelo.vuelo, archivoVuelo.archivo)
     ).subscribe((bool) => {
       if (bool) {
-        console.log('CanvasComponent -> selectArchivoVuelo -> bool', bool);
         // Añadir Estructura
         this.informeService
           .getEstructuraInforme(this.informeId, archivoVuelo.archivo)
@@ -897,9 +896,20 @@ export class CanvasComponent implements OnInit {
     });
   }
 
+  onClickCrearEstructura() {
+    if (!this.polygonMode && this.estructura === null) {
+      this.drawPolygon();
+    }
+  }
+
   initCanvas() {
     this.canvas.on('mouse:down', (options) => {
-      if (options.button === 3 && !this.polygonMode && this.estructura === null) {
+      console.log('CanvasComponent -> initCanvas -> options', options);
+      if (
+        (options.button === 3 || (options.button === 1 && options.e.ctrlKey)) &&
+        !this.polygonMode &&
+        this.estructura === null
+      ) {
         this.drawPolygon();
       }
       if (this.pointArray.length === 3) {
