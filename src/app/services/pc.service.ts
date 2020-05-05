@@ -1,17 +1,13 @@
-import { Injectable } from "@angular/core";
-import { PcInterface } from "../models/pc";
-import {
-  AngularFirestore,
-  AngularFirestoreCollection,
-  AngularFirestoreDocument
-} from "@angular/fire/firestore";
-import { Observable, BehaviorSubject } from "rxjs";
-import { map, take, switchMap, filter } from "rxjs/operators";
-import { GLOBAL } from "./global";
-import { PlantaService } from "./planta.service";
-import { AuthService } from "./auth.service";
-import { UserAreaInterface } from "../models/userArea";
-import { CritCoA } from "../models/critCoA";
+import { Injectable } from '@angular/core';
+import { PcInterface, Pc } from '../models/pc';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { map, take, switchMap, filter } from 'rxjs/operators';
+import { GLOBAL } from './global';
+import { PlantaService } from './planta.service';
+import { AuthService } from './auth.service';
+import { UserAreaInterface } from '../models/userArea';
+import { CritCoA } from '../models/critCoA';
 
 export interface SeguidorInterface {
   pcs: PcInterface[];
@@ -21,10 +17,11 @@ export interface SeguidorInterface {
 }
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root',
 })
 export class PcService {
   private pcsCollection: AngularFirestoreCollection<PcInterface>;
+  public allPcsInformeEdit$: Observable<Pc[]>;
   public allPcs$: Observable<PcInterface[]>;
   public allPcs: PcInterface[];
   private pcDoc: AngularFirestoreDocument<PcInterface>;
@@ -34,31 +31,21 @@ export class PcService {
   public filtroClase$ = this.filtroClase.asObservable();
   private filtroCategoria = new BehaviorSubject<number[]>(new Array<number>());
   public filtroCategoria$ = this.filtroCategoria.asObservable();
-  private filtroGradiente = new BehaviorSubject<number>(
-    GLOBAL.filtroGradientePorDefecto
-  );
+  private filtroGradiente = new BehaviorSubject<number>(GLOBAL.filtroGradientePorDefecto);
   public filtroGradiente$ = this.filtroGradiente.asObservable();
 
   private currentFiltroClase: number[];
   private currentFiltroCategoria: number[];
   public currentFiltroGradiente: number;
 
-  private filteredPcsSource = new BehaviorSubject<PcInterface[]>(
-    new Array<PcInterface>()
-  );
+  private filteredPcsSource = new BehaviorSubject<PcInterface[]>(new Array<PcInterface>());
   public currentFilteredPcs$ = this.filteredPcsSource.asObservable();
 
-  private filteredSeguidores = new BehaviorSubject<SeguidorInterface[]>(
-    new Array<SeguidorInterface>()
-  );
+  private filteredSeguidores = new BehaviorSubject<SeguidorInterface[]>(new Array<SeguidorInterface>());
   public filteredSeguidores$ = this.filteredSeguidores.asObservable();
 
-  constructor(
-    public afs: AngularFirestore,
-    public plantaService: PlantaService,
-    public auth: AuthService
-  ) {
-    this.pcsCollection = afs.collection<PcInterface>("pcs");
+  constructor(public afs: AngularFirestore, public plantaService: PlantaService, public auth: AuthService) {
+    this.pcsCollection = afs.collection<PcInterface>('pcs');
 
     this.filtroCategoria.next(
       Array(GLOBAL.labels_tipos.length)
@@ -72,15 +59,15 @@ export class PcService {
         .map((_, i) => i + 1)
     );
 
-    this.filtroClase$.subscribe(filtro => {
+    this.filtroClase$.subscribe((filtro) => {
       this.currentFiltroClase = filtro;
     });
 
-    this.filtroCategoria$.subscribe(filtro => {
+    this.filtroCategoria$.subscribe((filtro) => {
       this.currentFiltroCategoria = filtro;
     });
 
-    this.filtroGradiente$.subscribe(filtro => {
+    this.filtroGradiente$.subscribe((filtro) => {
       this.currentFiltroGradiente = filtro;
     });
     // console.log('filtrosCategorias', this.filtroCategoria, this.filtroClase);
@@ -96,13 +83,11 @@ export class PcService {
     this.filteredPcsSource.next(
       this.allPcs
         .filter(
-          pc =>
+          (pc) =>
             this.currentFiltroClase.includes(this.getPcCoA(pc)) &&
             this.currentFiltroCategoria.includes(pc.tipo) &&
             (pc.gradienteNormalizado >= this.currentFiltroGradiente ||
-              (pc.gradienteNormalizado < this.currentFiltroGradiente &&
-                pc.tipo !== 8 &&
-                pc.tipo !== 9))
+              (pc.gradienteNormalizado < this.currentFiltroGradiente && pc.tipo !== 8 && pc.tipo !== 9))
         )
         .sort(this.sortByLocalId)
     );
@@ -111,13 +96,11 @@ export class PcService {
       this.getPcsPorSeguidor(
         this.allPcs
           .filter(
-            pc =>
+            (pc) =>
               this.currentFiltroClase.includes(this.getPcCoA(pc)) &&
               this.currentFiltroCategoria.includes(pc.tipo) &&
               (pc.gradienteNormalizado >= this.currentFiltroGradiente ||
-                (pc.gradienteNormalizado < this.currentFiltroGradiente &&
-                  pc.tipo !== 8 &&
-                  pc.tipo !== 9))
+                (pc.gradienteNormalizado < this.currentFiltroGradiente && pc.tipo !== 8 && pc.tipo !== 9))
           )
           .sort(this.sortByGlobals)
       )
@@ -142,27 +125,23 @@ export class PcService {
     this.aplicarFiltros();
   }
 
-  getPcsPorSeguidor(
-    pcList: PcInterface[]
-  ): Array<SeguidorInterface> {
+  getPcsPorSeguidor(pcList: PcInterface[]): Array<SeguidorInterface> {
     const arraySeguidores = Array<SeguidorInterface>();
     pcList.sort(this.sortByGlobals);
 
-    let oldNombreSeguidor = "981768";
+    let oldNombreSeguidor = '981768';
     for (const pc of pcList) {
       const nombreSeguidor = this.plantaService.getNombreSeguidor(pc);
       if (nombreSeguidor !== oldNombreSeguidor) {
         oldNombreSeguidor = nombreSeguidor;
 
         const data = {
-          pcs: pcList.filter(element => {
-            return (
-              this.plantaService.getNombreSeguidor(element) === nombreSeguidor
-            );
+          pcs: pcList.filter((element) => {
+            return this.plantaService.getNombreSeguidor(element) === nombreSeguidor;
           }),
           global_x: pc.global_x,
           global_y: pc.global_y,
-          nombre: nombreSeguidor
+          nombre: nombreSeguidor,
         } as SeguidorInterface;
         arraySeguidores.push(data);
       }
@@ -171,8 +150,8 @@ export class PcService {
   }
 
   getSeguidoresSinPcs(informeId: string): Observable<PcInterface[]> {
-    const query$ = this.afs.collection<PcInterface>("pcs", ref =>
-      ref.where("informeId", "==", informeId).where("tipo", "==", 0)
+    const query$ = this.afs.collection<PcInterface>('pcs', (ref) =>
+      ref.where('informeId', '==', informeId).where('tipo', '==', 0)
     );
 
     return query$.valueChanges();
@@ -180,13 +159,11 @@ export class PcService {
 
   getPcsSinFiltros(informeId: string): Observable<PcInterface[]> {
     const query$ = this.afs
-      .collection<PcInterface>("pcs", ref =>
-        ref.where("informeId", "==", informeId)
-      )
+      .collection<PcInterface>('pcs', (ref) => ref.where('informeId', '==', informeId))
       .snapshotChanges()
       .pipe(
-        map(actions =>
-          actions.map(doc => {
+        map((actions) =>
+          actions.map((doc) => {
             const data = doc.payload.doc.data() as PcInterface;
             data.id = doc.payload.doc.id;
             return data;
@@ -199,56 +176,44 @@ export class PcService {
 
   getPcs(informeId: string, plantaId: string): Observable<PcInterface[]> {
     const query$ = this.afs
-      .collection<PcInterface>("pcs", ref =>
-        ref.where("informeId", "==", informeId)
-      )
+      .collection<PcInterface>('pcs', (ref) => ref.where('informeId', '==', informeId))
       .snapshotChanges()
       .pipe(
-        map(actions =>
+        map((actions) =>
           actions
-            .map(doc => {
+            .map((doc) => {
               const data = doc.payload.doc.data() as PcInterface;
               data.id = doc.payload.doc.id;
               return data;
             })
-            .filter(pc => {
-              if (pc.hasOwnProperty("clase")) {
+            .filter((pc) => {
+              if (pc.hasOwnProperty('clase')) {
                 return pc.clase > 0;
               }
               return (
                 pc.gradienteNormalizado >= GLOBAL.minGradiente ||
-                (pc.gradienteNormalizado < GLOBAL.minGradiente &&
-                  pc.tipo !== 8 &&
-                  pc.tipo !== 9)
+                (pc.gradienteNormalizado < GLOBAL.minGradiente && pc.tipo !== 8 && pc.tipo !== 9)
               );
             })
         )
       );
 
     this.allPcs$ = this.auth.user$.pipe(
-      map(user => {
+      map((user) => {
         return user.uid;
       }),
-      switchMap(userId => {
+      switchMap((userId) => {
         return this.afs
-          .collection<UserAreaInterface>(
-            `plantas/${plantaId}/userAreas/`,
-            ref => ref.where("userId", "==", userId)
-          )
+          .collection<UserAreaInterface>(`plantas/${plantaId}/userAreas/`, (ref) => ref.where('userId', '==', userId))
           .valueChanges();
       }),
-      switchMap(userAreas => {
+      switchMap((userAreas) => {
         return query$.pipe(
-          map(pcs => {
+          map((pcs) => {
             if (userAreas.length > 0) {
-              return pcs.filter(pc => {
+              return pcs.filter((pc) => {
                 for (let i = 0; i < userAreas.length; i++) {
-                  if (
-                    this.containsLatLng(
-                      [pc.gps_lat, pc.gps_lng],
-                      userAreas[i].path
-                    )
-                  ) {
+                  if (this.containsLatLng([pc.gps_lat, pc.gps_lng], userAreas[i].path)) {
                     return true;
                   }
                 }
@@ -262,7 +227,7 @@ export class PcService {
       })
     );
 
-    this.allPcs$.pipe(take(1)).subscribe(pcs => {
+    this.allPcs$.pipe(take(1)).subscribe((pcs) => {
       this.allPcs = pcs;
       this.filteredPcsSource.next(this.allPcs.sort(this.sortByLocalId));
       // Aplicar filtros
@@ -271,28 +236,26 @@ export class PcService {
     return this.allPcs$;
   }
 
-  getPcsInformeEdit(informeId: string): Observable<PcInterface[]> {
-    const query$ = this.afs.collection<PcInterface>("pcs", ref =>
-      ref.where("informeId", "==", informeId)
-    );
-    this.allPcs$ = query$.snapshotChanges().pipe(
-      map(actions =>
-        actions.map(a => {
+  getPcsInformeEdit(informeId: string): Observable<Pc[]> {
+    const query$ = this.afs.collection<PcInterface>('pcs', (ref) => ref.where('informeId', '==', informeId));
+    this.allPcsInformeEdit$ = query$.snapshotChanges().pipe(
+      map((actions) =>
+        actions.map((a) => {
           const data = a.payload.doc.data() as PcInterface;
           data.id = a.payload.doc.id;
-          return data;
+          return new Pc(data);
         })
       )
     );
 
-    return this.allPcs$;
+    return this.allPcsInformeEdit$;
   }
 
   getPc(id: string) {
-    this.pcDoc = this.afs.doc<PcInterface>("pcs/" + id);
+    this.pcDoc = this.afs.doc<PcInterface>('pcs/' + id);
 
     return this.pcDoc.snapshotChanges().pipe(
-      map(action => {
+      map((action) => {
         if (action.payload.exists === false) {
           return null;
         } else {
@@ -331,7 +294,6 @@ export class PcService {
   }
 
   sortByGlobals(a: PcInterface, b: PcInterface): number {
-
     if (a.global_x < b.global_x) {
       return -1;
     }
@@ -345,7 +307,6 @@ export class PcService {
     if (a.global_y > b.global_y) {
       return 1;
     }
-
 
     // Mismo global_x y global_y
     if (a.local_y < b.local_y) {
@@ -363,9 +324,7 @@ export class PcService {
     }
     // Mismo local_x y local_y
     return 0;
-
   }
-
 
   containsLatLng(point, polygonPath) {
     const vs = polygonPath;
@@ -383,8 +342,7 @@ export class PcService {
       var xj = vs[j].lat,
         yj = vs[j].lng;
 
-      var intersect =
-        yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+      var intersect = yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
       if (intersect) inside = !inside;
     }
 
@@ -393,7 +351,7 @@ export class PcService {
 
   getCoA(pc: PcInterface, critCoA: CritCoA): number {
     // Los que siempre son CoA 3, tengan la temperatura que tengan
-    if (critCoA.hasOwnProperty("siempreCoA3")) {
+    if (critCoA.hasOwnProperty('siempreCoA3')) {
       if (critCoA.siempreCoA3.includes(pc.tipo)) {
         return 3;
       }
@@ -401,7 +359,7 @@ export class PcService {
 
     // El resto
     // Si superan tempCoA3
-    if (critCoA.hasOwnProperty("tempCoA3")) {
+    if (critCoA.hasOwnProperty('tempCoA3')) {
       if (pc.temperaturaMax >= critCoA.tempCoA3) {
         return 3;
       }
@@ -411,7 +369,7 @@ export class PcService {
     if (pc.gradienteNormalizado >= critCoA.rangosDT[2]) {
       return 3;
     } else {
-      if (critCoA.hasOwnProperty("siempreCoA2")) {
+      if (critCoA.hasOwnProperty('siempreCoA2')) {
         if (critCoA.siempreCoA2.includes(pc.tipo)) {
           return 2;
         }
@@ -423,7 +381,7 @@ export class PcService {
       }
     }
 
-    if (critCoA.hasOwnProperty("siempreVisible")) {
+    if (critCoA.hasOwnProperty('siempreVisible')) {
       if (critCoA.siempreVisible.includes(pc.tipo)) {
         return 1;
       }
@@ -433,7 +391,7 @@ export class PcService {
   }
 
   getPcCoA(pc): number {
-    if (pc.hasOwnProperty("clase")) {
+    if (pc.hasOwnProperty('clase')) {
       return pc.clase;
     }
     return pc.severidad;

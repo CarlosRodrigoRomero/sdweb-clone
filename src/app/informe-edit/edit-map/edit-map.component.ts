@@ -6,8 +6,7 @@ import { InformeService } from '../../services/informe.service';
 import { PlantaService } from '../../services/planta.service';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from '../../models/elementoPlanta';
-import { ArchivoVueloInterface } from 'src/app/models/archivoVuelo';
-import { ValidateEstructuraPipe } from '../../pipes/validate-estructura.pipe';
+import { ValidateElementoPlantaPipe } from '../../pipes/validate-elemento-planta.pipe';
 import { take } from 'rxjs/operators';
 import { InformeInterface } from '../../models/informe';
 import { LocationAreaInterface } from 'src/app/models/location';
@@ -34,7 +33,7 @@ export class EditMapComponent implements OnInit {
     private route: ActivatedRoute,
     public informeService: InformeService,
     private plantaService: PlantaService,
-    private validateEst: ValidateEstructuraPipe
+    private validateElem: ValidateElementoPlantaPipe
   ) {}
 
   ngOnInit() {
@@ -47,7 +46,7 @@ export class EditMapComponent implements OnInit {
     // this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
     // });
 
-    this.informeService
+    const obsEstructuras$ = this.informeService
       .getAllEstructuras(this.informeId)
       .pipe(take(1))
       .subscribe((estArray) => {
@@ -104,7 +103,7 @@ export class EditMapComponent implements OnInit {
     // this.setImageFromRangeValue(this.rangeValue);
   }
   getFillColor(elementoPlanta: PcInterface & Estructura): string {
-    if (this.validateEst.transform(elementoPlanta)) {
+    if (this.validateElem.transform(elementoPlanta)) {
       return 'red';
     }
     return 'grey';
