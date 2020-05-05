@@ -1,10 +1,13 @@
 <div class="container-fluid" id="container-ppal">
   <div class="row">
     <div class="col-xs-12 col-lg-9">
-      <h2>
-        {{ planta?.nombre }} - {{ titulo | date }}
-        <span> <input type="text" [(ngModel)]="carpetaJpgGray" (change)="onChangeCarpetaJpgGray($event)" />) - </span>
-      </h2>
+      <div class="header">
+        <h2>
+          {{ planta?.nombre }} - {{ titulo | date }}
+          <span> <input type="text" [(ngModel)]="carpetaJpgGray" (change)="onChangeCarpetaJpgGray($event)" />) - </span>
+        </h2>
+        <mat-slide-toggle *ngIf="user?.role == 1" [(ngModel)]="pcsOrEstructuras"> est/pc </mat-slide-toggle>
+      </div>
       <!-- <div *ngIf="alertMessage" class="alert alert-warning" role="alert"> -->
       <!-- {{ alertMessage }} -->
       <!-- </div> -->

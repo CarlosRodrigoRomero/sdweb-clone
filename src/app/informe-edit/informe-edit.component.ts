@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { InformeService } from 'src/app/services/informe.service';
 import { PcService } from 'src/app/services/pc.service';
 import { PlantaService } from 'src/app/services/planta.service';
@@ -7,7 +7,7 @@ import { PlantaInterface } from 'src/app/models/planta';
 import { PcInterface } from 'src/app/models/pc';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GLOBAL } from '../services/global';
-import { take, map } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { EstructuraInterface } from '../models/estructura';
 
 import { AuthService } from 'src/app/services/auth.service';
@@ -423,7 +423,7 @@ export class InformeEditComponent implements OnInit {
 
             this.getPlanta(this.informe.plantaId);
             // Cogemos todos los pcs de esta informe
-            this.getPcsList();
+            // this.getPcsList();
             this.titulo = this.informe.fecha * 1000;
             // Obtener lista de imagenes de la carpeta
             this.getFileList();
@@ -494,16 +494,7 @@ export class InformeEditComponent implements OnInit {
   getPcsList(vuelo?: string) {
     this.pcService
       .getPcsInformeEdit(this.informe.id)
-      .pipe(
-        take(1),
-        map((pcList) => {
-          pcList.map((pc) => {
-            pc.color = 'black';
-            return pc;
-          });
-          return pcList;
-        })
-      )
+      .pipe(take(1))
       .subscribe(
         (response) => {
           if (!response || response.length === 0) {
