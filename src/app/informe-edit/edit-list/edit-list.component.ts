@@ -54,7 +54,6 @@ export class EditListComponent implements OnInit {
     combineLatest([allEstructuras$, allPcs$]).subscribe((elem) => {
       let data = new Array<ElementoPlantaInterface>();
       data = data.concat([...elem[0], ...elem[1]]);
-      console.log('EditListComponent -> ngOnInit -> data', data);
       this.dataSource.data = data;
     });
 
@@ -90,7 +89,6 @@ export class EditListComponent implements OnInit {
   }
 
   onChangePcsOrEstructuras(val: boolean) {
-    console.log('EditListComponent -> onChangePcsOrEstructuras -> val', val);
     this.displayedColumns = val ? this.displayedColumnsPc : this.displayedColumnsEst;
     this.dataSource.filter = '';
   }

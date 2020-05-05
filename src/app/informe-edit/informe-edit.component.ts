@@ -41,12 +41,7 @@ export class InformeEditComponent implements OnInit {
   public mapType: string;
   public defaultZoom: number;
   public fileList: string[];
-  public canvas;
-  public squareBase;
-  public squareProp;
-  public squareHeight;
-  public squareWidth;
-  public localIdCount: number;
+
   public oldTriangle;
   public oldTriangle2;
   public coords;
@@ -77,7 +72,6 @@ export class InformeEditComponent implements OnInit {
 
   public estructuraOn: boolean;
 
-  public rectSeparation = 0.1;
   public filteredPcs: PcInterface[];
   public maxMarkersShow = 500;
   public user$: Observable<UserInterface>;
@@ -101,7 +95,6 @@ export class InformeEditComponent implements OnInit {
     this.currentLatLng = { lat: 39.453186, lng: -5.880743 };
     this.informeId = this.route.snapshot.paramMap.get('id');
 
-    this.localIdCount = 0;
     this.rangeValue = 0;
     this.fileList = new Array();
     this.coords = new Array();
@@ -115,8 +108,6 @@ export class InformeEditComponent implements OnInit {
 
     this.currentTrackheading = 0;
     this.currentImageRotation = 0;
-    this.squareBase = 37;
-    this.squareProp = 1.8;
 
     this.imageWidth = 640;
     this.imageHeight = 512;
@@ -166,33 +157,6 @@ export class InformeEditComponent implements OnInit {
 
   setElementoPlanta(elementoPlanta: ElementoPlantaInterface) {
     this.setArchivoVuelo({ archivo: elementoPlanta.archivo, vuelo: elementoPlanta.vuelo } as ArchivoVueloInterface);
-  }
-
-  onObjectModified(event) {
-    // const actObj = this.canvas.getActiveObject();
-    const actObj = event.target;
-
-    // Get HS img coords and draw triangle
-    if (actObj !== null && actObj !== undefined) {
-      if (actObj.get('type') === 'rect' && actObj.isMoving === true) {
-        const actObjRaw = this.transformActObjToRaw(actObj);
-        // const max_temp = this.getMaxTempInActObj(actObj);
-        // this.selected_pc.temperaturaMax = max_temp.max_temp;
-        // this.selected_pc.img_x = max_temp.max_temp_x;
-        // this.selected_pc.img_y = max_temp.max_temp_y;
-        if (actObjRaw.ref === true) {
-          this.selected_pc.refTop = Math.round(actObjRaw.top);
-          this.selected_pc.refLeft = Math.round(actObjRaw.left);
-          this.selected_pc.refWidth = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
-          this.selected_pc.refHeight = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
-        } else {
-          this.selected_pc.img_top = Math.round(actObjRaw.top);
-          this.selected_pc.img_left = Math.round(actObjRaw.left);
-          this.selected_pc.img_width = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
-          this.selected_pc.img_height = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
-        }
-      }
-    }
   }
 
   getCurrentImageRotation(trackHeading: number) {
@@ -297,25 +261,6 @@ export class InformeEditComponent implements OnInit {
     return actObj;
   }
 
-  onMouseMoveCanvas(event: MouseEvent) {}
-
-  getLocalCoordsFromEstructura(columna, fila, estructura) {
-    let columnaReal = columna;
-    let filaReal = fila;
-
-    if (estructura.hasOwnProperty('sentido')) {
-      columnaReal = estructura.sentido ? estructura.columnas - columna + 1 : columna;
-    }
-    if (this.estructura.hasOwnProperty('columnaInicio')) {
-      columnaReal = columnaReal + estructura.columnaInicio - 1;
-    }
-    if (this.estructura.hasOwnProperty('filaInicio')) {
-      filaReal = filaReal + estructura.filaInicio - 1;
-    }
-
-    return [columnaReal, filaReal];
-  }
-
   // setSeguidor() {
   //   // TODO: fix this
   //   let event: EventInterface = {
@@ -356,19 +301,6 @@ export class InformeEditComponent implements OnInit {
     return [maxValue, maxIndex];
   }
 
-  setSquareBase(squareBase: number) {
-    this.squareBase = squareBase;
-    if (this.planta.vertical) {
-      // vertical
-      this.squareWidth = this.squareBase;
-      this.squareHeight = Math.round(this.squareWidth * this.squareProp);
-    } else {
-      // horizontal
-      this.squareHeight = this.squareBase;
-      this.squareWidth = Math.round(this.squareHeight * this.squareProp);
-    }
-  }
-
   getPlanta(plantaId: string) {
     this.planta$ = this.plantaService.getPlanta(plantaId);
     this.plantaService.getPlanta(plantaId).subscribe(
@@ -384,8 +316,6 @@ export class InformeEditComponent implements OnInit {
         for (let i = 1; i <= this.planta.filas; i++) {
           this.filas_array.push(i);
         }
-
-        this.setSquareBase(this.squareBase);
       },
       (error) => {
         const errorMessage = error as any;
@@ -418,12 +348,7 @@ export class InformeEditComponent implements OnInit {
             } else {
               this.carpetaJpgGray = this.pathJoin([this.informe.carpetaBase, GLOBAL.carpetaJpgGray]);
             }
-            // this.min_temp = this.informe.tempMin;
-            // this.max_temp = this.informe.tempMax;
-
             this.getPlanta(this.informe.plantaId);
-            // Cogemos todos los pcs de esta informe
-            // this.getPcsList();
             this.titulo = this.informe.fecha * 1000;
             // Obtener lista de imagenes de la carpeta
             this.getFileList();
@@ -480,65 +405,15 @@ export class InformeEditComponent implements OnInit {
     return array;
   }
 
-  filterPcsByFlight(currentFlight: string): PcInterface[] {
-    if (!this.pcsOrEstructuras) {
-      return null;
-    }
-    if (typeof this.allPcs !== 'undefined') {
-      const filteredPcs = this.sortPcs(this.allPcs.filter((x) => x.vuelo === currentFlight));
+  // filterPcsByFlight(currentFlight: string): PcInterface[] {
+  //   if (!this.pcsOrEstructuras) {
+  //     return null;
+  //   }
+  //   if (typeof this.allPcs !== 'undefined') {
+  //     const filteredPcs = this.sortPcs(this.allPcs.filter((x) => x.vuelo === currentFlight));
 
-      return filteredPcs.slice(0, this.maxMarkersShow);
-    }
-  }
-
-  getPcsList(vuelo?: string) {
-    this.pcService
-      .getPcsInformeEdit(this.informe.id)
-      .pipe(take(1))
-      .subscribe(
-        (response) => {
-          if (!response || response.length === 0) {
-            this.alertMessage = 'No hay puntos calientes';
-          } else {
-            this.alertMessage = null;
-            this.allPcs = response;
-            if (vuelo != null) {
-              this.allPcs = this.sortPcs(this.allPcs).filter((arr) => {
-                return arr.vuelo === vuelo;
-              });
-            } else {
-              this.allPcs = this.sortPcs(this.allPcs);
-            }
-
-            this.localIdCount = this.allPcs[0].local_id;
-          }
-
-          // if (this.DEFAULT_LAT == null || this.DEFAULT_LNG == null) {
-          //     this.DEFAULT_LAT = this.allPcs[0].gps_lat;
-          //     this.DEFAULT_LNG = this.allPcs[0].gps_lng;
-          // }
-        },
-        (error) => {
-          const errorMessage = error;
-          if (errorMessage != null) {
-            const body = JSON.parse(error._body);
-            this.alertMessage = body.message;
-            console.log(error);
-          }
-        }
-      );
-  }
-
-  addPcToDb(pc: PcInterface) {
-    this.pcService.addPc(pc);
-    this.allPcs.push(pc);
-    this.allPcs = this.sortPcs(this.allPcs);
-    this.selected_pc = pc;
-  }
-
-  // onInputRange(event) {
-  //   this.selected_pc = null;
-  //   this.setImageFromRangeValue(parseInt(event.target.value, 10));
+  //     return filteredPcs.slice(0, this.maxMarkersShow);
+  //   }
   // }
 
   private getDateTimeFromDateAndTime(date: string, time: string) {
@@ -580,31 +455,6 @@ export class InformeEditComponent implements OnInit {
       vuelo: this.currentFlight,
       archivo: this.fileList[arrayIndex],
     } as ArchivoVueloInterface);
-  }
-
-  onClickDeletePc(pc: PcInterface) {
-    // Eliminamos el PC de la bbdd
-    this.delPcFromDb(pc);
-
-    // Eliminamos el cuadrado
-    this.selected_pc = null;
-    // Eliminamos el triangulo
-    if (this.oldTriangle !== null && this.oldTriangle !== undefined) {
-      this.canvas.remove(this.oldTriangle);
-    }
-
-    // Eliminamos el pc del canvas
-    this.canvas.getObjects().forEach((object) => {
-      if (object.local_id === pc.local_id) {
-        this.canvas.remove(object);
-      }
-    });
-
-    // Elimminamos el pc de la lista
-    const index: number = this.allPcs.indexOf(pc);
-    if (index !== -1) {
-      this.allPcs.splice(index, 1);
-    }
   }
 
   delPcFromDb(pc: PcInterface) {
