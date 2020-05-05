@@ -5,13 +5,13 @@ import { ModuloInterface } from './modulo';
 export interface EstructuraInterface {
   id?: string;
   archivo: string;
+  vuelo: string;
   coords: any[];
   filas: number;
   columnas: number;
   sentido: boolean; // false: izq->drcha | true: drcha -> izq
   columnaInicio: number;
   filaInicio: number;
-  vuelo: string;
   latitud: number;
   longitud: number;
   globalCoords?: any[];
@@ -21,13 +21,14 @@ export interface EstructuraInterface {
 export class Estructura implements EstructuraInterface, ElementoPlantaInterface {
   id: string;
   archivo: string;
+  vuelo: string;
   coords: any[];
   filas: number;
   columnas: number;
   sentido: boolean; // false: izq->drcha | true: drcha -> izq
   columnaInicio: number;
   filaInicio: number;
-  vuelo: string;
+
   latitud: number;
   longitud: number;
   globalCoords: any[];
@@ -36,13 +37,13 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   constructor(est: EstructuraInterface) {
     this.id = est.id;
     this.archivo = est.archivo;
+    this.vuelo = est.vuelo;
     this.coords = est.coords;
     this.filas = est.filas;
     this.columnas = est.columnas;
     this.sentido = est.sentido;
     this.columnaInicio = est.columnaInicio;
     this.filaInicio = est.filaInicio;
-    this.vuelo = est.vuelo;
     this.latitud = est.latitud;
     this.longitud = est.longitud;
     this.modulo = est.modulo;

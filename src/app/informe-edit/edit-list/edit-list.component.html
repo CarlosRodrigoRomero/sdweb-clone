@@ -1,43 +1,82 @@
-<div *ngIf="dataSourceEst.data" class="mat-elevation-z8">
-  <table matSort *ngIf="!pcsOrEstructuras" mat-table [dataSource]="dataSourceEst">
-    <ng-container matColumnDef="error">
-      <th mat-sort-header mat-header-cell *matHeaderCellDef>!</th>
-      <td mat-cell *matCellDef="let est">
-        <span *ngIf="est | validateEstructura"><i class="fas fa-exclamation-circle errorGlobalCoords"></i></span>
-      </td>
-    </ng-container>
+<div *ngIf="dataSource.data" class="mat-elevation-z8">
+  <table matSort mat-table [dataSource]="dataSource">
+    <div *ngIf="!pcsOrEstructuras2; else pcs">
+      <ng-container matColumnDef="error">
+        <th mat-sort-header mat-header-cell *matHeaderCellDef>!</th>
+        <td mat-cell *matCellDef="let est">
+          <span *ngIf="est | validateElem"><i class="fas fa-exclamation-circle errorGlobalCoords"></i></span>
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="vuelo">
-      <th mat-sort-header mat-header-cell *matHeaderCellDef>Vuelo</th>
-      <td mat-cell *matCellDef="let est">{{ est.vuelo }}</td>
-    </ng-container>
-    <ng-container matColumnDef="globalCoords">
-      <th mat-sort-header mat-header-cell *matHeaderCellDef>globalCoords</th>
-      <td mat-cell *matCellDef="let est">[{{ est.globalCoords }}]</td>
-    </ng-container>
+      <ng-container matColumnDef="vuelo">
+        <th mat-sort-header mat-header-cell *matHeaderCellDef>Vuelo</th>
+        <td mat-cell *matCellDef="let est">{{ est.vuelo }}</td>
+      </ng-container>
+      <ng-container matColumnDef="globalCoords">
+        <th mat-sort-header mat-header-cell *matHeaderCellDef>globalCoords</th>
+        <td mat-cell *matCellDef="let est">[{{ est.globalCoords }}]</td>
+      </ng-container>
 
-    <ng-container matColumnDef="archivo">
-      <th mat-sort-header mat-header-cell *matHeaderCellDef>Archivo</th>
-      <td mat-cell *matCellDef="let est">[{{ est.archivo }}]</td>
-    </ng-container>
+      <ng-container matColumnDef="archivo">
+        <th mat-sort-header mat-header-cell *matHeaderCellDef>Archivo</th>
+        <td mat-cell *matCellDef="let est">[{{ est.archivo }}]</td>
+      </ng-container>
+    </div>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumnsEst"></tr>
+    <ng-template #pcs>
+      <ng-container matColumnDef="error">
+        <th mat-sort-header mat-header-cell *matHeaderCellDef>!</th>
+        <td mat-cell *matCellDef="let pc">
+          <span *ngIf="pc | validateElem"><i class="fas fa-exclamation-circle errorGlobalCoords"></i></span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="localId">
+        <th mat-sort-header mat-header-cell *matHeaderCellDef>id (vuelo)</th>
+        <td mat-cell *matCellDef="let pc">{{ pc.local_id }} ({{ pc.vuelo }})</td>
+      </ng-container>
+      <ng-container matColumnDef="tipo">
+        <th mat-sort-header mat-header-cell *matHeaderCellDef>tipo</th>
+        <td mat-cell *matCellDef="let pc">[{{ pc.tipo }}]</td>
+      </ng-container>
+
+      <ng-container matColumnDef="globalCoords">
+        <th mat-sort-header mat-header-cell *matHeaderCellDef>G</th>
+        <td mat-cell *matCellDef="let pc">[{{ pc.globalCoords }}]</td>
+      </ng-container>
+
+      <ng-container matColumnDef="localCoords">
+        <th mat-sort-header mat-header-cell *matHeaderCellDef>L</th>
+        <td mat-cell *matCellDef="let pc">{{ pc.local_x }}/{{ pc.local_y }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="modulo">
+        <th mat-sort-header mat-header-cell *matHeaderCellDef>Mod</th>
+        <td mat-cell *matCellDef="let pc">- W</td>
+      </ng-container>
+
+      <ng-container matColumnDef="archivo">
+        <th mat-sort-header mat-header-cell *matHeaderCellDef>Archivo</th>
+        <td mat-cell *matCellDef="let pc">[{{ pc.archivo }}]</td>
+      </ng-container>
+    </ng-template>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr
       mat-row
       [ngClass]="{
-        selectedElement: est?.archivo === informeService.selectedElementoPlanta?.archivo
+        selectedElement: elem?.archivo === informeService.selectedElementoPlanta?.archivo
       }"
-      (click)="onClickRowEstList(est)"
-      *matRowDef="let est; columns: displayedColumnsEst"
+      (click)="onClickRowList(elem)"
+      *matRowDef="let elem; columns: displayedColumns"
     ></tr>
   </table>
+  <mat-paginator [pageSizeOptions]="[25, 100, 500]" showFirstLastButtons></mat-paginator>
 </div>
-<mat-paginator [pageSizeOptions]="[25, 100, 500]" showFirstLastButtons></mat-paginator>
 
 <!-- <table *ngIf="pcsOrEstructuras" class="table" id="tabla_pcs">
   <tr>
     <th>ID (vuelo)</th>
-    <th> Filename</th>
+    <th>Filename</th>
     <th>Tipo</th>
     <th>Global</th>
     <th>Local</th>

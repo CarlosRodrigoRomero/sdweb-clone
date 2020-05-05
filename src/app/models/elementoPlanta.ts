@@ -5,7 +5,7 @@ export interface ElementoPlantaInterface {
   archivo: string;
   vuelo: string;
   id: string;
-  plantaId?: string;
+  modulo?: ModuloInterface;
 
   getLatLng(): LatLngLiteral;
   setLatLng(latLng: LatLngLiteral): void;
