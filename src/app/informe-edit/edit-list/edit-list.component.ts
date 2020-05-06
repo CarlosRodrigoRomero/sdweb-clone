@@ -9,6 +9,8 @@ import { MatSort } from '@angular/material/sort';
 import { map } from 'rxjs/operators';
 import { PcService } from '../../services/pc.service';
 import { combineLatest } from 'rxjs';
+import { Pc } from 'src/app/models/pc';
+import { Estructura } from 'src/app/models/estructura';
 
 @Component({
   selector: 'app-edit-list',
@@ -41,7 +43,7 @@ export class EditListComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
     this.dataSource.filterPredicate = (data: ElementoPlantaInterface, filter: string) => {
-      return !this.pcsOrEstructuras2;
+      return this.pcsOrEstructuras2 ? data.constructor.name === Pc.name : data.constructor.name === Estructura.name;
     };
 
     const allEstructuras$ = this.informeService.getAllEstructuras(this.informeId).pipe(
