@@ -48,7 +48,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   longitud: number;
   globalCoords: any[];
   modulo?: ModuloInterface;
-  estructuraMatrix: any[];
+  private estructuraMatrix: any[];
 
   constructor(est: EstructuraInterface) {
     this.id = est.id;
@@ -62,7 +62,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     this.filaInicio = est.filaInicio;
     this.latitud = est.latitud;
     this.longitud = est.longitud;
-    this.modulo = est.modulo;
+    this.modulo = est.modulo !== undefined ? est.modulo : null;
 
     let globalCoords;
     if (!est.hasOwnProperty('globalCoords')) {
@@ -74,6 +74,11 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
       globalCoords.push('');
     }
     this.globalCoords = globalCoords;
+
+    Object.defineProperty(this, 'estructuraMatrix', {
+      enumerable: false,
+      writable: true,
+    });
     this.estructuraMatrix = this.getEstructuraMatrix();
   }
 
@@ -90,7 +95,9 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     });
   }
   setModulo(modulo: ModuloInterface) {
-    this.modulo = modulo;
+    if (modulo !== undefined) {
+      this.modulo = modulo;
+    }
   }
   calcularFilaColumna(x: number, y: number) {
     let distanciaMinima = 999999;
@@ -249,7 +256,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     return [columnaReal, filaReal];
   }
 
-  private getEstructuraMatrix() {
+  getEstructuraMatrix() {
     const estructuraMatrix = [];
     for (let i = 0; i < this.filas + 1; i++) {
       estructuraMatrix[i] = new Array(this.columnas + 1);
