@@ -12,6 +12,7 @@ import { AgmCoreModule } from '@agm/core';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { EditPcDetailComponent } from './edit-pc-detail/edit-pc-detail.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     EditMapComponent,
     EditListComponent,
     CanvasComponent,
+    EditPcDetailComponent,
   ],
   imports: [
     SharedModule,

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { InformeService } from 'src/app/services/informe.service';
-import { PcService } from 'src/app/services/pc.service';
 import { PlantaService } from 'src/app/services/planta.service';
 import { InformeInterface } from 'src/app/models/informe';
 import { PlantaInterface } from 'src/app/models/planta';
@@ -27,13 +26,12 @@ export interface EventInterface {
   selector: 'app-informe-edit',
   templateUrl: './informe-edit.component.html',
   styleUrls: ['./informe-edit.component.css'],
-  providers: [InformeService, PlantaService, PcService],
+  providers: [InformeService, PlantaService],
 })
 export class InformeEditComponent implements OnInit {
   public titulo: number;
   public informe: InformeInterface;
   public planta: PlantaInterface;
-  public allPcs: PcInterface[];
   public url: string;
   public alertMessage: string;
   public DEFAULT_LAT: number;
@@ -42,8 +40,6 @@ export class InformeEditComponent implements OnInit {
   public defaultZoom: number;
   public fileList: string[];
 
-  public oldTriangle;
-  public oldTriangle2;
   public coords;
   public event: MouseEvent;
   public currentTrackheading: number;
@@ -54,10 +50,8 @@ export class InformeEditComponent implements OnInit {
   public flightsData: any;
   public flightsList: string[];
   public currentFlight: string;
-  public columnas_array: number[];
-  public filas_array: number[];
-  public max_temp: number;
-  public min_temp: number;
+  // public max_temp: number;
+  // public min_temp: number;
   public imageWidth: number;
   public imageHeight: number;
   public currentDatetime: number;
@@ -87,7 +81,6 @@ export class InformeEditComponent implements OnInit {
     private router: Router,
     public informeService: InformeService,
     private plantaService: PlantaService,
-    private pcService: PcService,
     public auth: AuthService
   ) {}
 
@@ -114,8 +107,6 @@ export class InformeEditComponent implements OnInit {
 
     this.gmtHoursDiff = 2;
     this.manualRotation = false;
-
-    this.allPcs = new Array<PcInterface>();
 
     this.user$ = this.auth.user$;
     this.user$.pipe(take(1)).subscribe((user) => {
@@ -225,41 +216,7 @@ export class InformeEditComponent implements OnInit {
     return { x, y };
   }
 
-  transformActObjToRaw(actObj) {
-    let left: number;
-    let top: number;
-    let width: number;
-    let height: number;
 
-    // Los angulos de rotacion son positivos en sentido horario
-    if (this.currentImageRotation === 270 || this.currentImageRotation === -90) {
-      left = this.imageWidth - actObj.top - actObj.height;
-      top = actObj.left;
-      width = actObj.height;
-      height = actObj.width;
-    } else if (this.currentImageRotation === 180) {
-      left = this.imageWidth - actObj.left - actObj.width;
-      top = this.imageHeight - actObj.top - actObj.height;
-      width = actObj.width;
-      height = actObj.height;
-    } else if (this.currentImageRotation === 90) {
-      left = actObj.top;
-      top = this.imageHeight - actObj.left - actObj.height;
-      width = actObj.height;
-      height = actObj.width;
-    } else {
-      left = actObj.left;
-      top = actObj.top;
-      width = actObj.width;
-      height = actObj.height;
-    }
-    actObj.left = left;
-    actObj.top = top;
-    actObj.width = width;
-    actObj.height = height;
-
-    return actObj;
-  }
 
   // setSeguidor() {
   //   // TODO: fix this
@@ -307,15 +264,6 @@ export class InformeEditComponent implements OnInit {
       (planta) => {
         this.planta = planta;
         this.defaultZoom = this.planta.zoom;
-
-        this.filas_array = [];
-        this.columnas_array = [];
-        for (let i = 1; i <= this.planta.columnas; i++) {
-          this.columnas_array.push(i);
-        }
-        for (let i = 1; i <= this.planta.filas; i++) {
-          this.filas_array.push(i);
-        }
       },
       (error) => {
         const errorMessage = error as any;
@@ -405,17 +353,6 @@ export class InformeEditComponent implements OnInit {
     return array;
   }
 
-  // filterPcsByFlight(currentFlight: string): PcInterface[] {
-  //   if (!this.pcsOrEstructuras) {
-  //     return null;
-  //   }
-  //   if (typeof this.allPcs !== 'undefined') {
-  //     const filteredPcs = this.sortPcs(this.allPcs.filter((x) => x.vuelo === currentFlight));
-
-  //     return filteredPcs.slice(0, this.maxMarkersShow);
-  //   }
-  // }
-
   private getDateTimeFromDateAndTime(date: string, time: string) {
     const dateSplitted = date.split('.');
     const year = parseInt(dateSplitted[2], 10);
@@ -455,52 +392,6 @@ export class InformeEditComponent implements OnInit {
       vuelo: this.currentFlight,
       archivo: this.fileList[arrayIndex],
     } as ArchivoVueloInterface);
-  }
-
-  delPcFromDb(pc: PcInterface) {
-    this.pcService.delPc(pc);
-  }
-
-  updateLocalAreaInPc(pc, globalX, globalY, modulo) {
-    if (globalX.length > 0) {
-      pc.global_x = globalX;
-    }
-    if (globalY.length > 0) {
-      pc.global_y = globalY;
-    }
-
-    if (Object.entries(modulo).length > 0 && modulo.constructor === Object) {
-      pc.modulo = modulo;
-    }
-
-    // pc.datetime = this.current_datetime;
-
-    this.updatePcInDb(pc);
-  }
-
-  onClickLocalCoordsTable(selectedPc: PcInterface, f: number, c: number) {
-    if (this.selected_pc === selectedPc) {
-      if (this.planta.tipo !== 'fija') {
-        this.selected_pc.local_x = c;
-        this.selected_pc.local_y = f;
-      } else {
-        this.selected_pc.local_y = f;
-      }
-    }
-    this.updatePcInDb(selectedPc);
-  }
-
-  updatePcInDb(pc: PcInterface) {
-    this.pcService.updatePc(pc);
-
-    // Actualizar this.allPcs
-    this.allPcs = this.allPcs.map((element) => {
-      if (pc.id === element.id) {
-        return pc;
-      } else {
-        return element;
-      }
-    });
   }
 
   onClickFlightsCheckbox(event) {
