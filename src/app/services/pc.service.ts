@@ -267,20 +267,19 @@ export class PcService {
     );
   }
 
-  addPc(pc: PcInterface) {
+  async addPc(pc: PcInterface) {
     const id = this.afs.createId();
     pc.id = id;
-    this.pcsCollection.doc(id).set(pc);
+    return this.pcsCollection.doc(id).set(pc);
   }
 
-  updatePc(pc: PcInterface) {
-    this.pcDoc = this.afs.doc('pcs/' + pc.id);
-    this.pcDoc.update(pc);
+  async updatePc(pc: PcInterface | Pc) {
+    const pcObj = Object.assign({}, pc);
+    return this.afs.doc('pcs/' + pc.id).update(pcObj);
   }
 
-  delPc(pc: PcInterface) {
-    this.pcDoc = this.afs.doc('pcs/' + pc.id);
-    this.pcDoc.delete();
+  async delPc(pc: PcInterface) {
+    return this.afs.doc('pcs/' + pc.id).delete();
   }
 
   sortByLocalId(a: PcInterface, b: PcInterface) {
