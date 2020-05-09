@@ -13,6 +13,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { EditPcDetailComponent } from './edit-pc-detail/edit-pc-detail.component';
+import { HotkeyModule } from 'angular2-hotkeys';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { EditPcDetailComponent } from './edit-pc-detail/edit-pc-detail.component
     InformeEditRoutingModule,
     FormsModule,
     ReactiveFormsModule,
+    HotkeyModule,
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM',
       libraries: ['drawing'],

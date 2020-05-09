@@ -16,6 +16,7 @@ import { Observable } from 'rxjs';
 import { ArchivoVueloInterface } from 'src/app/models/archivoVuelo';
 import { LatLngLiteral } from '@agm/core';
 import { ElementoPlantaInterface } from '../models/elementoPlanta';
+import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 
 export interface EventInterface {
   offsetX: number;
@@ -81,8 +82,34 @@ export class InformeEditComponent implements OnInit {
     private router: Router,
     public informeService: InformeService,
     private plantaService: PlantaService,
-    public auth: AuthService
-  ) {}
+    public auth: AuthService,
+    private hotkeysService: HotkeysService
+  ) {
+    this.hotkeysService.add(
+      new Hotkey('a', (event: KeyboardEvent): boolean => {
+        this.setImageFromRangeValue(this.rangeValue - 4);
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
+      new Hotkey('s', (event: KeyboardEvent): boolean => {
+        this.setImageFromRangeValue(this.rangeValue - 1);
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
+      new Hotkey('d', (event: KeyboardEvent): boolean => {
+        this.setImageFromRangeValue(this.rangeValue + 1);
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
+      new Hotkey('f', (event: KeyboardEvent): boolean => {
+        this.setImageFromRangeValue(this.rangeValue + 4);
+        return false; // Prevent bubbling
+      })
+    );
+  }
 
   ngOnInit() {
     this.currentLatLng = { lat: 39.453186, lng: -5.880743 };
@@ -215,8 +242,6 @@ export class InformeEditComponent implements OnInit {
     }
     return { x, y };
   }
-
-
 
   // setSeguidor() {
   //   // TODO: fix this
@@ -382,6 +407,8 @@ export class InformeEditComponent implements OnInit {
   setImageFromRangeValue(value) {
     // El input es el 'value' del slider
     value = parseInt(value, 10);
+    value = Math.max(value, 1);
+    value = Math.min(value, this.fileList.length);
 
     // Para pasar del value del slider al indice de 'fileList' o 'coords' hay que restarle uno
     this.rangeValue = value;

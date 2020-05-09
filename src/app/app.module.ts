@@ -22,6 +22,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
+import { HotkeyModule } from 'angular2-hotkeys';
 @NgModule({
   declarations: [AppComponent, LoginComponent, IndexComponent, VideoComponent, AvisoLegalComponent],
 
@@ -41,6 +42,7 @@ import { CommonModule } from '@angular/common';
     MatInputModule,
     MatButtonModule,
     CommonModule,
+    HotkeyModule.forRoot(),
   ],
   providers: [{ provide: FirestoreSettingsToken, useValue: {} }, AuthService],
   bootstrap: [AppComponent],
