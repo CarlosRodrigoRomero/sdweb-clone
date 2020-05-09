@@ -6,7 +6,13 @@
 <div class="container">
   <div class="row">
     <div class="col">
-      <canvas class="imagen-termica" id="mainCanvas" width="640" height="512"></canvas>
+      <canvas
+        (dblclick)="onDblClickCanvas($event)"
+        class="imagen-termica"
+        id="mainCanvas"
+        width="640"
+        height="512"
+      ></canvas>
     </div>
   </div>
   <div class="row" *ngIf="estructura; else crearEstructura">

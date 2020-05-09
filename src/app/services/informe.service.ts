@@ -55,6 +55,7 @@ export class InformeService {
   }
 
   selectArchivoVuelo(archivoVuelo: ArchivoVueloInterface) {
+    console.log('InformeService -> selectArchivoVuelo -> archivoVuelo', archivoVuelo);
     if (this.selectedArchivoVuelo !== archivoVuelo && archivoVuelo !== null) {
       this.selectElementoPlanta(null);
       this.selectedArchivoVuelo = archivoVuelo;
@@ -116,20 +117,17 @@ export class InformeService {
     return response;
   }
 
-  addEstructuraInforme(informeId: string, estructura: Estructura) {
-    const estructuraObj = Object.assign({}, estructura);
-
+  addEstructuraInforme(informeId: string, estructura: EstructuraInterface) {
     const id = this.afs.createId();
     estructura.id = id;
-    estructuraObj.id = id;
     this.afs
       .collection('informes')
       .doc(informeId)
       .collection('estructuras')
       .doc(id)
-      .set(estructuraObj)
+      .set(estructura)
       .then((v) => {
-        this.avisadorNuevoElementoSource.next(estructura);
+        this.avisadorNuevoElementoSource.next(new Estructura(estructura));
         // this.selectElementoPlanta(estructura);
       });
   }
@@ -141,10 +139,10 @@ export class InformeService {
     }
   }
 
-  updateEstructura(informeId: string, estructura: EstructuraInterface) {
+  async updateEstructura(informeId: string, estructura: EstructuraInterface) {
     const estructuraObj = Object.assign({}, estructura);
     const estructuraDoc = this.afs.doc('informes/' + informeId + '/estructuras/' + estructura.id);
-    estructuraDoc.update(estructuraObj);
+    return estructuraDoc.update(estructuraObj);
   }
 
   deleteEstructuraInforme(informeId: string, estructura: Estructura): void {

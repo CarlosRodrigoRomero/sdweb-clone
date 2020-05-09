@@ -9,7 +9,7 @@ import { take } from 'rxjs/operators';
 import { EstructuraInterface } from 'src/app/models/estructura';
 import { LatLngLiteral } from '@agm/core/map-types';
 import { PlantaInterface } from '../../models/planta';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, Subscription, Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from 'src/app/models/elementoPlanta';
 import { Estructura, RectanguloInterface } from '../../models/estructura';
@@ -27,7 +27,6 @@ declare let fabric;
 export class CanvasComponent implements OnInit {
   @Input() pcsOrEstructuras: boolean;
   @Input() carpetaJpgGray: string;
-  @Input() allPcs: PcInterface[];
   @Input() currentLatLng: LatLngLiteral;
   @Input() currentDatetime: number;
   @Input() currentTrackheading: number;
@@ -43,6 +42,8 @@ export class CanvasComponent implements OnInit {
   }
 
   private selectedStrokeWidth: number;
+  private currentArchivoVuelo: ArchivoVueloInterface;
+  private setBackgroundImage$: Subscription;
   informeId: string;
   rectRefReduction: number;
   filasPorDefecto: number;
@@ -51,7 +52,6 @@ export class CanvasComponent implements OnInit {
   imageWidth: number;
   imageHeight: number;
   selectedPc: PcInterface;
-  estructuraMatrix: any[];
   min = 99;
   max = 999999;
   polygonMode = false;
@@ -63,6 +63,7 @@ export class CanvasComponent implements OnInit {
   estructura: Estructura;
   planta: PlantaInterface;
   globalCoordsEstructura: number[];
+  allPcs: Pc[];
   private squareBase: number;
   private squareProp: number;
   private squareHeight: number;
@@ -87,9 +88,14 @@ export class CanvasComponent implements OnInit {
     this.squareProp = 1.8;
     this.localIdCount = 0;
 
+    this.pcService.getPcsInformeEdit(this.informeId).subscribe((allPcs) => {
+      this.allPcs = allPcs;
+    });
+
     this.estructura = null;
 
     this.initCanvas();
+    this.currentArchivoVuelo = { archivo: '', vuelo: '' };
     this.globalCoordsEstructura = [0, 1, 2];
 
     // Selección de elemento de planta
@@ -111,6 +117,7 @@ export class CanvasComponent implements OnInit {
   }
 
   selectElementoPlanta(elementoPlanta: ElementoPlantaInterface): void {
+    console.log('CanvasComponent -> selectElementoPlanta -> elementoPlanta', elementoPlanta);
     if (elementoPlanta == null) {
       this.estructura = null;
       this.selectedPc = null;
@@ -124,6 +131,10 @@ export class CanvasComponent implements OnInit {
         if (this.estructura !== elementoPlanta) {
           this.estructura = elementoPlanta as Estructura;
         }
+      } else if (elementoPlanta.constructor.name === Pc.name) {
+        if (this.selectedPc !== elementoPlanta) {
+          this.selectedPc = elementoPlanta as Pc;
+        }
       }
     }
 
@@ -131,44 +142,67 @@ export class CanvasComponent implements OnInit {
     // Si es un PC:
   }
 
-  selectArchivoVuelo(archivoVuelo: ArchivoVueloInterface): void {
-    // Ponemos la imagen de fondo
-    this.setNextImage(
-      this.informeService.getImageUrl(this.carpetaJpgGray, archivoVuelo.vuelo, archivoVuelo.archivo)
-    ).subscribe((bool) => {
-      if (bool) {
-        // Añadir Estructura
-        this.informeService
-          .getEstructuraInforme(this.informeId, archivoVuelo.archivo)
-          .pipe(take(1))
-          .subscribe((est) => {
-            if (est.length > 0) {
-              this.dibujarEstructura(est[0]);
-              if (this.informeService.selectedElementoPlanta == null) {
-                this.informeService.selectElementoPlanta(est[0]);
-              } else if (this.informeService.selectedElementoPlanta.id !== est[0].id) {
-                this.informeService.selectElementoPlanta(est[0]);
-              }
-            }
-          });
-      }
-    });
-
-    // Dibujamos los elementosPlanta que haya...
-    // Añadir cuadrados de los pc
-    // if (this.pcsOrEstructuras) {
-    //   this.allPcs
-    //     .filter((pc) => {
-    //       return pc.archivo === archivoVuelo.archivo;
-    //     })
-    //     .forEach((pc) => {
-    //       this.drawPcInCanvas(pc);
-    //     });
-    // }
+  addEstructuraCanvas(archivoVuelo: ArchivoVueloInterface) {
+    this.informeService
+      .getEstructuraInforme(this.informeId, archivoVuelo.archivo)
+      .pipe(take(1))
+      .subscribe((est) => {
+        if (est.length > 0) {
+          this.dibujarEstructura(est[0]);
+          if (this.informeService.selectedElementoPlanta == null) {
+            this.informeService.selectElementoPlanta(est[0]);
+          } else if (this.informeService.selectedElementoPlanta.id !== est[0].id) {
+            this.informeService.selectElementoPlanta(est[0]);
+          }
+        }
+      });
   }
 
-  setNextImage(imgSrc): Observable<boolean> {
-    const result = new BehaviorSubject(false);
+  addPcsCanvas(archivoVuelo: ArchivoVueloInterface) {
+    // Dibujamos los elementosPlanta que haya...
+    // Añadir cuadrados de los pc
+    if (this.pcsOrEstructuras) {
+      console.log('CanvasComponent -> addPcsCanvas -> this.allPcs', this.allPcs);
+
+      this.allPcs
+        .filter((pc) => {
+          return pc.archivo === archivoVuelo.archivo;
+        })
+        .forEach((pc) => {
+          this.drawPcInCanvas(pc);
+        });
+    }
+  }
+
+  selectArchivoVuelo(archivoVuelo: ArchivoVueloInterface): void {
+    console.log('CanvasComponent -> selectArchivoVuelo -> archivoVuelo', archivoVuelo);
+
+    // Quitamos nuestra suscripcion
+    if (this.setBackgroundImage$ !== undefined) {
+      this.setBackgroundImage$.unsubscribe();
+    }
+
+    // Ponemos la imagen de fondo
+    if (this.currentArchivoVuelo.archivo !== archivoVuelo.archivo) {
+      console.log('CanvasComponent -> selectArchivoVuelo -> currentArchivoVuelo', this.currentArchivoVuelo);
+      this.currentArchivoVuelo = archivoVuelo;
+      this.setBackgroundImage$ = this.setBackgroundImage(
+        this.informeService.getImageUrl(this.carpetaJpgGray, archivoVuelo.vuelo, archivoVuelo.archivo)
+      )
+        .pipe(take(1))
+        .subscribe((bool) => {
+          console.log('CanvasComponent -> selectArchivoVuelo -> bool', bool);
+          if (bool) {
+            // Añadir Estructura
+            this.addEstructuraCanvas(archivoVuelo);
+            this.addPcsCanvas(archivoVuelo);
+          }
+        });
+    }
+  }
+
+  setBackgroundImage(imgSrc: string): Observable<boolean> {
+    const result = new Subject<boolean>();
     const leftAndTop = this.getLeftAndTop(0);
 
     fabric.Image.fromURL(imgSrc, (image) => {
@@ -189,7 +223,7 @@ export class CanvasComponent implements OnInit {
     return result;
   }
 
-  private dibujarPuntosInterioresEst(estructura: EstructuraInterface): void {
+  private dibujarPuntosInterioresEst(estructura: Estructura): void {
     this.canvas.getObjects().forEach((obj) => {
       if (obj.hasOwnProperty('puntoInteriorEst')) {
         this.canvas.remove(obj);
@@ -197,7 +231,7 @@ export class CanvasComponent implements OnInit {
       this.canvas.renderAll();
     });
     // Dibujar los puntos interiores
-    this.estructura.estructuraMatrix.forEach((fila) => {
+    estructura.getEstructuraMatrix().forEach((fila) => {
       fila.forEach((punto: Point) => {
         this.canvas.add(
           new fabric.Circle({
@@ -238,6 +272,7 @@ export class CanvasComponent implements OnInit {
   }
 
   dibujarEstructura(estructura: Estructura) {
+    console.log('CanvasComponent -> dibujarEstructura -> estructura', estructura);
     // this.estructura = estructura;
     // Dibujar poligono exterior
     const polygon = new fabric.Polygon(estructura.coords, {
@@ -299,6 +334,7 @@ export class CanvasComponent implements OnInit {
   // }
 
   private drawPcInCanvas(pc: PcInterface) {
+    console.log('CanvasComponent -> drawPcInCanvas -> pc', pc);
     const rect2 = new fabric.Rect({
       left: pc.img_left,
       top: pc.img_top,
@@ -328,13 +364,13 @@ export class CanvasComponent implements OnInit {
 
     const transformedRect = this.transformActObjToRotated(rect2);
     const transformedRectRef = this.transformActObjToRotated(rectRef2);
-    const strokeWidth = pc.local_id === this.selectedPc.local_id ? this.selectedStrokeWidth : 1;
+    const strokeWidth = 1;
 
     const rect = new fabric.Rect({
       left: transformedRect.left,
       top: transformedRect.top,
       fill: 'rgba(0,0,0,0)',
-      stroke: pc.local_id === this.selectedPc.local_id ? 'white' : 'red',
+      stroke: 'white',
       strokeWidth,
       hasControls: true,
       width: transformedRect.width - strokeWidth,
@@ -355,15 +391,13 @@ export class CanvasComponent implements OnInit {
       height: transformedRectRef.height - strokeWidth,
       local_id: pc.local_id,
       ref: true,
-      selectable: pc.local_id === this.selectedPc.local_id,
+      selectable: false,
       hasRotatingPoint: false,
     });
 
     this.canvas.add(rect);
     this.canvas.add(rectRef);
-    if (pc.local_id === this.selectedPc.local_id) {
-      this.canvas.setActiveObject(rect);
-    }
+    this.canvas.renderAll();
   }
 
   private transformActObjToRotated(actObj) {
@@ -402,51 +436,95 @@ export class CanvasComponent implements OnInit {
   ////////////////////// CANVAS LISTENERS //////////////////////
   //////////////////////////////////////////////////////////////////
 
-  // initCanvasListeners() {
-  //   this.canvas.on('mouse:up', (options) => {
-  //     if (options.target !== null) {
-  //       if (options.target.hasOwnProperty('local_id')) {
-  //         const selectedPc = this.allPcs.find((item) => item.local_id === options.target.local_id);
-  //         this.canvas.setActiveObject(options.target);
-  //         this.onMapMarkerClick(selectedPc);
-  //       }
-  //     }
-  //   });
+  initCanvasListeners() {
+    // Creacion de pcs con dobleClick
+    this.canvas.on('mouse:dblclick', (options) => {
+      if (this.pcsOrEstructuras) {
+        this.onDblClickCanvas(options.e);
+      }
+    });
 
-  //   this.canvas.on('object:modified', (options) => {
-  //     // En el caso de que sea un
-  //     if (options.target.type === 'rect') {
-  //       const actObjRaw = this.transformActObjToRaw(options.target);
-  //       this.selectPcFromLocalId(options.target.local_id);
+    // Creacion de Est con boton derecho
+    this.canvas.on('mouse:down', (options) => {
+      if (options.target !== null && options.target.hasOwnProperty('local_id')) {
+        const selectedPc = this.allPcs.find((item) => item.local_id === options.target.local_id);
+        this.informeService.selectElementoPlanta(selectedPc);
+      } else {
+        if (
+          (options.button === 3 || (options.button === 1 && options.e.ctrlKey)) &&
+          !this.polygonMode &&
+          this.estructura === null
+        ) {
+          this.drawPolygon();
+        }
+        if (this.pointArray.length === 3) {
+          this.addPoint(options);
+          this.generatePolygon(this.pointArray);
+        } else if (options.target && options.target.id === this.pointArray[0].id) {
+          this.generatePolygon(this.pointArray);
+        }
+        if (this.polygonMode) {
+          this.addPoint(options);
+        }
+      }
+    });
+    this.canvas.on('mouse:move', (options) => {
+      if (this.activeLine && this.activeLine.class === 'line') {
+        const pointer = this.canvas.getPointer(options.e);
+        this.activeLine.set({ x2: pointer.x, y2: pointer.y });
 
-  //       if (actObjRaw.ref === true) {
-  //         this.selected_pc.refTop = Math.round(actObjRaw.top);
+        const points = this.activeShape.get('points');
+        points[this.pointArray.length] = {
+          x: pointer.x,
+          y: pointer.y,
+        };
+        this.activeShape.set({
+          points,
+        });
+        this.canvas.renderAll();
+      }
+      this.canvas.renderAll();
+    });
+    ///////////////////////////////////////////////////
 
-  //         this.selected_pc.refLeft = Math.round(actObjRaw.left);
-  //         this.selected_pc.refWidth = Math.round(
-  //           Math.abs(actObjRaw.aCoords.tr.x - actObjRaw.aCoords.tl.x) - actObjRaw.strokeWidth / 2
-  //         );
-  //         this.selected_pc.refHeight = Math.round(
-  //           Math.abs(actObjRaw.aCoords.bl.y - actObjRaw.aCoords.tl.y) - actObjRaw.strokeWidth / 2
-  //         );
-  //       } else {
-  //         this.selected_pc.img_top = Math.round(actObjRaw.top);
-  //         this.selected_pc.img_left = Math.round(actObjRaw.left);
-  //         this.selected_pc.img_width = Math.round(
-  //           Math.abs(actObjRaw.aCoords.tr.x - actObjRaw.aCoords.tl.x) - actObjRaw.strokeWidth / 2
-  //         );
-  //         this.selected_pc.img_height = Math.round(
-  //           Math.abs(actObjRaw.aCoords.bl.y - actObjRaw.aCoords.tl.y) - actObjRaw.strokeWidth / 2
-  //         );
-  //       }
-  //       this.updatePcInDb(this.selected_pc);
-  //     } else if (options.target.type === 'polygon') {
-  //       console.log('options.target', options.target);
-  //     }
+    // Seleccionar al hacer click
+    this.canvas.on('mouse:up', (options) => {});
 
-  //     // this.canvas.on('object:modified', this.onObjectModified);
-  //   });
-  // }
+    this.canvas.on('object:modified', (options) => {
+      console.log('CanvasComponent -> initCanvasListeners -> options', options);
+      // En el caso de que sea un
+      if (options.target !== null && options.target.hasOwnProperty('local_id')) {
+        const actObjRaw = this.transformActObjToRaw(options.target);
+        // this.selectPcFromLocalId(options.target.local_id);
+
+        if (actObjRaw.ref === true) {
+          this.selectedPc.refTop = Math.round(actObjRaw.top);
+
+          this.selectedPc.refLeft = Math.round(actObjRaw.left);
+          this.selectedPc.refWidth = Math.round(
+            Math.abs(actObjRaw.aCoords.tr.x - actObjRaw.aCoords.tl.x) - actObjRaw.strokeWidth / 2
+          );
+          this.selectedPc.refHeight = Math.round(
+            Math.abs(actObjRaw.aCoords.bl.y - actObjRaw.aCoords.tl.y) - actObjRaw.strokeWidth / 2
+          );
+        } else {
+          this.selectedPc.img_top = Math.round(actObjRaw.top);
+          this.selectedPc.img_left = Math.round(actObjRaw.left);
+          this.selectedPc.img_width = Math.round(
+            Math.abs(actObjRaw.aCoords.tr.x - actObjRaw.aCoords.tl.x) - actObjRaw.strokeWidth / 2
+          );
+          this.selectedPc.img_height = Math.round(
+            Math.abs(actObjRaw.aCoords.bl.y - actObjRaw.aCoords.tl.y) - actObjRaw.strokeWidth / 2
+          );
+        }
+        this.pcService.updatePc(this.selectedPc);
+      } else if (options.target.type === 'polygon') {
+        console.log('options.target', options.target);
+      }
+
+      // this.canvas.on('object:modified', this.onObjectModified);
+    });
+  }
 
   onDblClickCanvas(event) {
     console.log('CanvasComponent -> onDblClickCanvas -> event', event);
@@ -485,10 +563,10 @@ export class CanvasComponent implements OnInit {
       const width = this.squareWidth;
       rectInteriorPc = { top, left, bottom: top + height, right: left + width };
 
-      const leftRef = left + width * (1 + this.rectSeparation) + (width * this.rectRefReduction) / 2;
-      const topRef = top + (height * this.rectRefReduction) / 2;
-      const widthRef = width * (1 - this.rectRefReduction);
-      const heightRef = height * (1 - this.rectRefReduction);
+      const leftRef = Math.round(left + width * (1 + this.rectSeparation) + (width * this.rectRefReduction) / 2);
+      const topRef = Math.round(top + (height * this.rectRefReduction) / 2);
+      const widthRef = Math.round(width * (1 - this.rectRefReduction));
+      const heightRef = Math.round(height * (1 - this.rectRefReduction));
       rectInteriorRef = { top: topRef, left: leftRef, bottom: topRef + heightRef, right: leftRef + widthRef };
     }
 
@@ -552,10 +630,11 @@ export class CanvasComponent implements OnInit {
         }
       }
     }
-    const newPcObj = new Pc(newPc);
-    this.pcService.addPc(newPc);
-    this.drawPcInCanvas(newPc);
-    this.informeService.selectElementoPlanta(newPcObj);
+
+    this.pcService.addPc(newPc).then((res) => {
+      this.drawPcInCanvas(newPc);
+      this.informeService.selectElementoPlanta(new Pc(newPc));
+    });
   }
 
   // onMouseUpCanvas(event) {
@@ -669,42 +748,7 @@ export class CanvasComponent implements OnInit {
       stopContextMenu: true,
     });
 
-    this.canvas.on('mouse:down', (options) => {
-      if (
-        (options.button === 3 || (options.button === 1 && options.e.ctrlKey)) &&
-        !this.polygonMode &&
-        this.estructura === null
-      ) {
-        this.drawPolygon();
-      }
-      if (this.pointArray.length === 3) {
-        this.addPoint(options);
-        this.generatePolygon(this.pointArray);
-      } else if (options.target && options.target.id === this.pointArray[0].id) {
-        this.generatePolygon(this.pointArray);
-      }
-      if (this.polygonMode) {
-        this.addPoint(options);
-      }
-    });
-    this.canvas.on('mouse:up', (options) => {});
-    this.canvas.on('mouse:move', (options) => {
-      if (this.activeLine && this.activeLine.class === 'line') {
-        const pointer = this.canvas.getPointer(options.e);
-        this.activeLine.set({ x2: pointer.x, y2: pointer.y });
-
-        const points = this.activeShape.get('points');
-        points[this.pointArray.length] = {
-          x: pointer.x,
-          y: pointer.y,
-        };
-        this.activeShape.set({
-          points,
-        });
-        this.canvas.renderAll();
-      }
-      this.canvas.renderAll();
-    });
+    this.initCanvasListeners();
   }
 
   public drawPolygon() {
@@ -829,6 +873,7 @@ export class CanvasComponent implements OnInit {
 
     // Aqui ya tenemos los punts de la estructura (points)
     // Crear nueva estructura en la base de datos
+    const [globalX, globalY, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.currentLatLng);
 
     const nuevaEstructura = {
       archivo: this.informeService.selectedArchivoVuelo.archivo,
@@ -845,9 +890,6 @@ export class CanvasComponent implements OnInit {
     } as EstructuraInterface;
 
     const nuevaEstructuraObj = new Estructura(nuevaEstructura);
-
-    const [globalX, globalY, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.currentLatLng);
-
     nuevaEstructuraObj.setGlobals([globalX, globalY]);
     nuevaEstructuraObj.setModulo(modulo as ModuloInterface);
 
@@ -855,7 +897,7 @@ export class CanvasComponent implements OnInit {
     this.dibujarEstructura(nuevaEstructuraObj);
 
     // Añadir a la base de datos
-    this.informeService.addEstructuraInforme(this.informeId, nuevaEstructuraObj);
+    this.informeService.addEstructuraInforme(this.informeId, nuevaEstructura);
     this.informeService.selectElementoPlanta(nuevaEstructuraObj);
 
     this.activeLine = null;
@@ -874,6 +916,42 @@ export class CanvasComponent implements OnInit {
       this.squareHeight = this.squareBase;
       this.squareWidth = Math.round(this.squareHeight * this.squareProp);
     }
+  }
+
+  private transformActObjToRaw(actObj) {
+    let left: number;
+    let top: number;
+    let width: number;
+    let height: number;
+
+    // Los angulos de rotacion son positivos en sentido horario
+    if (this.currentImageRotation === 270 || this.currentImageRotation === -90) {
+      left = this.imageWidth - actObj.top - actObj.height;
+      top = actObj.left;
+      width = actObj.height;
+      height = actObj.width;
+    } else if (this.currentImageRotation === 180) {
+      left = this.imageWidth - actObj.left - actObj.width;
+      top = this.imageHeight - actObj.top - actObj.height;
+      width = actObj.width;
+      height = actObj.height;
+    } else if (this.currentImageRotation === 90) {
+      left = actObj.top;
+      top = this.imageHeight - actObj.left - actObj.height;
+      width = actObj.height;
+      height = actObj.width;
+    } else {
+      left = actObj.left;
+      top = actObj.top;
+      width = actObj.width;
+      height = actObj.height;
+    }
+    actObj.left = left;
+    actObj.top = top;
+    actObj.width = width;
+    actObj.height = height;
+
+    return actObj;
   }
 
   // onClickDeletePc(pc: PcInterface) {
