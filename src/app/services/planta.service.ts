@@ -408,23 +408,24 @@ export class PlantaService {
     let globalX = '';
     let globalY = '';
     let modulo: ModuloInterface = {};
+    if (this.locAreaList !== undefined) {
+      this.locAreaList.forEach((polygon, i, array) => {
+        if (google.maps.geometry.poly.containsLocation(latLng, polygon)) {
+          if (polygon.globalX.length > 0) {
+            globalX = polygon.globalX;
+          }
+          if (polygon.globalY.length > 0) {
+            globalY = polygon.globalY;
+          }
 
-    this.locAreaList.forEach((polygon, i, array) => {
-      if (google.maps.geometry.poly.containsLocation(latLng, polygon)) {
-        if (polygon.globalX.length > 0) {
-          globalX = polygon.globalX;
-        }
-        if (polygon.globalY.length > 0) {
-          globalY = polygon.globalY;
-        }
-
-        if (polygon.hasOwnProperty('modulo')) {
-          if (polygon.modulo !== undefined) {
-            modulo = polygon.modulo;
+          if (polygon.hasOwnProperty('modulo')) {
+            if (polygon.modulo !== undefined) {
+              modulo = polygon.modulo;
+            }
           }
         }
-      }
-    });
+      });
+    }
 
     return [globalX, globalY, modulo];
   }
