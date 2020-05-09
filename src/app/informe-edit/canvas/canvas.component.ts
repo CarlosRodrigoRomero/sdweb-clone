@@ -235,8 +235,8 @@ export class CanvasComponent implements OnInit {
       fila.forEach((punto: Point) => {
         this.canvas.add(
           new fabric.Circle({
-            left: punto.x - 1,
-            top: punto.y - 1,
+            left: punto.x - 2,
+            top: punto.y - 2,
             radius: 2,
             fill: '#72FD03 ',
             selectable: false,
