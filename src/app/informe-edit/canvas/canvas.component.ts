@@ -460,8 +460,10 @@ export class CanvasComponent implements OnInit {
         if (this.pointArray.length === 3) {
           this.addPoint(options);
           this.generatePolygon(this.pointArray);
-        } else if (options.target && options.target.id === this.pointArray[0].id) {
-          this.generatePolygon(this.pointArray);
+        } else if (options.target && options.target.hasOwnProperty('id')) {
+          if (options.target.id === this.pointArray[0].id) {
+            this.generatePolygon(this.pointArray);
+          }
         }
         if (this.polygonMode) {
           this.addPoint(options);

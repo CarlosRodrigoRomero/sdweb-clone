@@ -108,8 +108,10 @@ export class EditMapComponent implements OnInit {
     }
     return 'grey';
   }
-  getStrokeColor(elementoPlanta: ElementoPlantaInterface): string {
-    if (this.informeService.selectedElementoPlanta) {
+  getStrokeColor(elementoPlanta: PcInterface & Estructura): string {
+    if (this.validateElem.transform(elementoPlanta)) {
+      return 'red';
+    } else if (this.informeService.selectedElementoPlanta) {
       if (this.informeService.selectedElementoPlanta.archivo === elementoPlanta.archivo) {
         return '#7CFC00';
       }
