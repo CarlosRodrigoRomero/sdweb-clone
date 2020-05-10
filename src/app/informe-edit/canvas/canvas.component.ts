@@ -59,7 +59,7 @@ export class CanvasComponent implements OnInit {
   lineArray = new Array();
   private activeLine;
   private activeShape: any = false;
-  sentidoEstructura = true;
+  sentidoPorDefecto = false;
   estructura: Estructura;
   planta: PlantaInterface;
   globalCoordsEstructura: number[];
@@ -289,6 +289,7 @@ export class CanvasComponent implements OnInit {
     if (filasColumnas) {
       this.filasPorDefecto = this.estructura.filas;
       this.columnasPorDefecto = this.estructura.columnas;
+      this.sentidoPorDefecto = this.estructura.sentido;
     }
 
     // Borramos del canvas la estructura anterior.
@@ -354,7 +355,7 @@ export class CanvasComponent implements OnInit {
   //   if (this.estructura.archivo === this.currentFileName) {
   //     this.filasEstructura = this.estructura.filas;
   //     this.columnasEstructura = this.estructura.columnas;
-  //     this.sentidoEstructura = this.estructura.sentido;
+  //     this.sentidoPorDefecto = this.estructura.sentido;
   //     this.informeService.updateEstructura(this.informe.id, this.estructura);
   //     this.setImageFromRangeValue(this.rangeValue);
   //   }
@@ -920,7 +921,7 @@ export class CanvasComponent implements OnInit {
       coords: points,
       filas: this.filasPorDefecto,
       columnas: this.columnasPorDefecto,
-      sentido: this.sentidoEstructura, // false: izq->drcha | true: drcha -> izq
+      sentido: this.sentidoPorDefecto, // false: izq->drcha | true: drcha -> izq
       columnaInicio: 1,
       filaInicio: 1,
       vuelo: this.informeService.selectedArchivoVuelo.vuelo,

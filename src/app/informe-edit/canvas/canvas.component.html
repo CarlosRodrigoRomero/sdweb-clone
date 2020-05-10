@@ -68,12 +68,9 @@
             size="4"
             class="inputInicio"
           />
-          <mat-checkbox
-            (change)="updateEstructura()"
-            *ngIf="planta?.tipo !== 'seguidores'"
-            [(ngModel)]="estructura.sentido"
-            >{{ estructura.sentido ? 'dcha->izq' : 'izq->drcha' }}</mat-checkbox
-          >
+          <mat-checkbox (change)="updateEstructura(true)" [(ngModel)]="estructura.sentido">{{
+            estructura.sentido ? 'dcha->izq' : 'izq->drcha'
+          }}</mat-checkbox>
         </div>
       </div>
       <div class="row">
