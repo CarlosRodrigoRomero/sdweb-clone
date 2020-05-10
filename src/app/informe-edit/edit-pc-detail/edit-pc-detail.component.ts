@@ -43,7 +43,6 @@ export class EditPcDetailComponent implements OnInit {
   }
 
   setElementoPlanta(elementoPlanta: ElementoPlantaInterface) {
-    console.log('EditPcDetailComponent -> setElementoPlanta -> elementoPlanta', elementoPlanta);
     if (elementoPlanta == null) {
       this.selectedPc = null;
     } else {
@@ -56,6 +55,7 @@ export class EditPcDetailComponent implements OnInit {
   }
   onClickDeletePc(pc: Pc) {
     // Avisamos de que estamos eliminando
+    this.informeService.avisadorNuevoElementoSource.next(pc);
 
     // Eliminamos el PC de la bbdd
     this.pcService.delPc(pc);
@@ -92,7 +92,6 @@ export class EditPcDetailComponent implements OnInit {
 
   updatePcInDb(pc: Pc) {
     this.pcService.updatePc(pc).then((res) => {
-      console.log('EditPcDetailComponent -> updatePcInDb -> res', res);
       // Avisar de que se ha añadido un nuevo elemento
       this.informeService.avisadorChangeElementoSource.next(pc);
     });

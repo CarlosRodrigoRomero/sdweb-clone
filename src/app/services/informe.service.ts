@@ -55,7 +55,6 @@ export class InformeService {
   }
 
   selectArchivoVuelo(archivoVuelo: ArchivoVueloInterface) {
-    console.log('InformeService -> selectArchivoVuelo -> archivoVuelo', archivoVuelo);
     if (this.selectedArchivoVuelo !== archivoVuelo && archivoVuelo !== null) {
       this.selectElementoPlanta(null);
       this.selectedArchivoVuelo = archivoVuelo;

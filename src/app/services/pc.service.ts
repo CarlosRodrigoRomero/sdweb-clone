@@ -268,9 +268,7 @@ export class PcService {
   }
 
   async addPc(pc: PcInterface) {
-    const id = this.afs.createId();
-    pc.id = id;
-    return this.pcsCollection.doc(id).set(pc);
+    return this.pcsCollection.add(pc);
   }
 
   async updatePc(pc: PcInterface | Pc) {

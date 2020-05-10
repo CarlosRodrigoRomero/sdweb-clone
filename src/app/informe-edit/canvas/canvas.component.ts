@@ -86,10 +86,14 @@ export class CanvasComponent implements OnInit {
     this.informeId = this.route.snapshot.paramMap.get('id');
     this.squareBase = 37;
     this.squareProp = 1.8;
-    this.localIdCount = 0;
 
     this.pcService.getPcsInformeEdit(this.informeId).subscribe((allPcs) => {
       this.allPcs = allPcs;
+      if (this.allPcs.length > 0) {
+        this.localIdCount = allPcs.sort(this.pcService.sortByLocalId)[allPcs.length - 1].local_id;
+      } else {
+        this.localIdCount = 0;
+      }
     });
 
     this.estructura = null;
@@ -114,6 +118,21 @@ export class CanvasComponent implements OnInit {
         this.estructura = elem as Estructura;
       }
     });
+
+    this.informeService.avisadorNuevoElemento$.subscribe((elem) => {
+      if (elem.constructor.name === Pc.name) {
+        this.nuevoPc(elem as Pc);
+      }
+    });
+  }
+  nuevoPc(pc: Pc) {
+    this.canvas.getObjects().forEach((obj) => {
+      if (obj.hasOwnProperty('ref')) {
+        if (obj.id === pc.id) {
+          this.canvas.remove(obj);
+        }
+      }
+    });
   }
 
   selectElementoPlanta(elementoPlanta: ElementoPlantaInterface): void {
@@ -134,12 +153,25 @@ export class CanvasComponent implements OnInit {
       } else if (elementoPlanta.constructor.name === Pc.name) {
         if (this.selectedPc !== elementoPlanta) {
           this.selectedPc = elementoPlanta as Pc;
+          this.selectPcInCanvas(elementoPlanta as Pc);
         }
       }
     }
 
     // Dibujar los elementos correspondientes en el canvas
     // Si es un PC:
+  }
+
+  selectPcInCanvas(elem: Pc) {
+    this.canvas.getObjects().forEach((obj) => {
+      if (obj.id === elem.id) {
+        obj.set('strokeWidth', 3);
+        console.log('CanvasComponent -> selectPcInCanvas -> obj', obj);
+      } else {
+        obj.set('strokeWidth', 1);
+      }
+      this.canvas.renderAll();
+    });
   }
 
   addEstructuraCanvas(archivoVuelo: ArchivoVueloInterface) {
@@ -162,8 +194,6 @@ export class CanvasComponent implements OnInit {
     // Dibujamos los elementosPlanta que haya...
     // Añadir cuadrados de los pc
     if (this.pcsOrEstructuras) {
-      console.log('CanvasComponent -> addPcsCanvas -> this.allPcs', this.allPcs);
-
       this.allPcs
         .filter((pc) => {
           return pc.archivo === archivoVuelo.archivo;
@@ -175,8 +205,6 @@ export class CanvasComponent implements OnInit {
   }
 
   selectArchivoVuelo(archivoVuelo: ArchivoVueloInterface): void {
-    console.log('CanvasComponent -> selectArchivoVuelo -> archivoVuelo', archivoVuelo);
-
     // Quitamos nuestra suscripcion
     if (this.setBackgroundImage$ !== undefined) {
       this.setBackgroundImage$.unsubscribe();
@@ -184,14 +212,12 @@ export class CanvasComponent implements OnInit {
 
     // Ponemos la imagen de fondo
     if (this.currentArchivoVuelo.archivo !== archivoVuelo.archivo) {
-      console.log('CanvasComponent -> selectArchivoVuelo -> currentArchivoVuelo', this.currentArchivoVuelo);
       this.currentArchivoVuelo = archivoVuelo;
       this.setBackgroundImage$ = this.setBackgroundImage(
         this.informeService.getImageUrl(this.carpetaJpgGray, archivoVuelo.vuelo, archivoVuelo.archivo)
       )
         .pipe(take(1))
         .subscribe((bool) => {
-          console.log('CanvasComponent -> selectArchivoVuelo -> bool', bool);
           if (bool) {
             // Añadir Estructura
             this.addEstructuraCanvas(archivoVuelo);
@@ -233,18 +259,18 @@ export class CanvasComponent implements OnInit {
     // Dibujar los puntos interiores
     estructura.getEstructuraMatrix().forEach((fila) => {
       fila.forEach((punto: Point) => {
-        this.canvas.add(
-          new fabric.Circle({
-            left: punto.x - 2,
-            top: punto.y - 2,
-            radius: 2,
-            fill: '#72FD03 ',
-            selectable: false,
-            estructura: true,
-            hoverCursor: 'default',
-            puntoInteriorEst: true,
-          })
-        );
+        const circle = new fabric.Circle({
+          left: punto.x - 2,
+          top: punto.y - 2,
+          radius: 2,
+          fill: '#72FD03 ',
+          selectable: false,
+          estructura: true,
+          hoverCursor: 'default',
+          puntoInteriorEst: true,
+        });
+        this.canvas.add(circle);
+        this.canvas.moveTo(circle, 2);
       });
     });
 
@@ -272,7 +298,6 @@ export class CanvasComponent implements OnInit {
   }
 
   dibujarEstructura(estructura: Estructura) {
-    console.log('CanvasComponent -> dibujarEstructura -> estructura', estructura);
     // this.estructura = estructura;
     // Dibujar poligono exterior
     const polygon = new fabric.Polygon(estructura.coords, {
@@ -286,6 +311,7 @@ export class CanvasComponent implements OnInit {
     });
 
     this.canvas.add(polygon);
+    this.canvas.moveTo(polygon, 2);
 
     estructura.coords.forEach((point, index) => {
       const circle = new fabric.Circle({
@@ -303,6 +329,7 @@ export class CanvasComponent implements OnInit {
         estructuraId: estructura.id,
       });
       this.canvas.add(circle);
+      this.canvas.moveTo(circle, 2);
     });
     this.canvas.renderAll();
 
@@ -334,7 +361,6 @@ export class CanvasComponent implements OnInit {
   // }
 
   private drawPcInCanvas(pc: PcInterface) {
-    console.log('CanvasComponent -> drawPcInCanvas -> pc', pc);
     const rect2 = new fabric.Rect({
       left: pc.img_left,
       top: pc.img_top,
@@ -344,7 +370,7 @@ export class CanvasComponent implements OnInit {
       hasControls: false,
       width: pc.img_width,
       height: pc.img_height,
-      local_id: pc.local_id,
+      id: pc.id,
       ref: false,
       hasRotatingPoint: false,
     });
@@ -357,7 +383,7 @@ export class CanvasComponent implements OnInit {
       hasControls: false,
       width: pc.refWidth,
       height: pc.refHeight,
-      local_id: pc.local_id,
+      id: pc.id,
       ref: false,
       hasRotatingPoint: false,
     });
@@ -375,8 +401,9 @@ export class CanvasComponent implements OnInit {
       hasControls: true,
       width: transformedRect.width - strokeWidth,
       height: transformedRect.height - strokeWidth,
-      local_id: pc.local_id,
+      id: pc.id,
       ref: false,
+      selectable: true,
       hasRotatingPoint: false,
     });
 
@@ -389,14 +416,17 @@ export class CanvasComponent implements OnInit {
       hasControls: true,
       width: transformedRectRef.width - strokeWidth,
       height: transformedRectRef.height - strokeWidth,
-      local_id: pc.local_id,
+      id: pc.id,
       ref: true,
       selectable: false,
       hasRotatingPoint: false,
     });
 
     this.canvas.add(rect);
+    console.log('CanvasComponent -> drawPcInCanvas -> rect', rect);
     this.canvas.add(rectRef);
+    this.canvas.moveTo(rect, 3);
+    this.canvas.moveTo(rectRef, 3);
     this.canvas.renderAll();
   }
 
@@ -446,28 +476,24 @@ export class CanvasComponent implements OnInit {
 
     // Creacion de Est con boton derecho
     this.canvas.on('mouse:down', (options) => {
-      if (options.target !== null && options.target.hasOwnProperty('local_id')) {
-        const selectedPc = this.allPcs.find((item) => item.local_id === options.target.local_id);
-        this.informeService.selectElementoPlanta(selectedPc);
-      } else {
-        if (
-          (options.button === 3 || (options.button === 1 && options.e.ctrlKey)) &&
-          !this.polygonMode &&
-          this.estructura === null
-        ) {
-          this.drawPolygon();
-        }
-        if (this.pointArray.length === 3) {
-          this.addPoint(options);
-          this.generatePolygon(this.pointArray);
-        } else if (options.target && options.target.hasOwnProperty('id')) {
-          if (options.target.id === this.pointArray[0].id) {
-            this.generatePolygon(this.pointArray);
-          }
-        }
-        if (this.polygonMode) {
-          this.addPoint(options);
-        }
+      if (
+        (options.button === 3 || (options.button === 1 && options.e.ctrlKey)) &&
+        !this.polygonMode &&
+        this.estructura === null
+      ) {
+        this.drawPolygon();
+      }
+      if (this.pointArray.length === 3) {
+        this.addPoint(options);
+        this.generatePolygon(this.pointArray);
+      }
+      // else if (options.target && options.target.hasOwnProperty('id')) {
+      //   if (options.target.id === this.pointArray[0].id) {
+      //     this.generatePolygon(this.pointArray);
+      //   }
+      // }
+      if (this.polygonMode) {
+        this.addPoint(options);
       }
     });
     this.canvas.on('mouse:move', (options) => {
@@ -488,14 +514,24 @@ export class CanvasComponent implements OnInit {
       this.canvas.renderAll();
     });
     ///////////////////////////////////////////////////
+    this.canvas.on('mouse:down', (options) => {
+      // Si es un pc/ref
+      if (options.target !== null && options.target.hasOwnProperty('ref')) {
+        const selectedPc = this.allPcs.find((item) => item.id === options.target.id);
+        console.log('CanvasComponent -> initCanvasListeners -> selectedPc', selectedPc);
+        this.informeService.selectElementoPlanta(selectedPc);
+
+        ///////////////////
+      }
+    });
+    ///////////////////////////////////////////////////
 
     // Seleccionar al hacer click
     this.canvas.on('mouse:up', (options) => {});
 
     this.canvas.on('object:modified', (options) => {
-      console.log('CanvasComponent -> initCanvasListeners -> options', options);
       // En el caso de que sea un
-      if (options.target !== null && options.target.hasOwnProperty('local_id')) {
+      if (options.target !== null && options.target.hasOwnProperty('ref')) {
         const actObjRaw = this.transformActObjToRaw(options.target);
         // this.selectPcFromLocalId(options.target.local_id);
 
@@ -521,7 +557,6 @@ export class CanvasComponent implements OnInit {
         }
         this.pcService.updatePc(this.selectedPc);
       } else if (options.target.type === 'polygon') {
-        console.log('options.target', options.target);
       }
 
       // this.canvas.on('object:modified', this.onObjectModified);
@@ -529,7 +564,6 @@ export class CanvasComponent implements OnInit {
   }
 
   onDblClickCanvas(event) {
-    console.log('CanvasComponent -> onDblClickCanvas -> event', event);
     let fila: number;
     let columna: number;
     let columnaReal: number;
@@ -543,11 +577,13 @@ export class CanvasComponent implements OnInit {
 
     if (this.estructura !== null) {
       [fila, columna] = this.estructura.calcularFilaColumna(event.offsetX, event.offsetY);
+
       [columnaReal, filaReal] = this.estructura.getLocalCoordsFromEstructura(columna, fila);
 
       // const cuadrilateroPc = this.estructura.getCuadrilatero(columna, fila);
       rectInteriorPc = this.estructura.getRectanguloInterior(columna, fila);
       [columnaRef, filaRef] = this.estructura.getFilaColumnaRef(columna, fila);
+
       // const cuadrilateroRef = this.estructura.getCuadrilatero(columnaRef, filaRef);
       rectInteriorRef = this.estructura.getRectanguloInterior(columnaRef, filaRef);
 
@@ -633,7 +669,9 @@ export class CanvasComponent implements OnInit {
       }
     }
 
-    this.pcService.addPc(newPc).then((res) => {
+    this.pcService.addPc(newPc).then((pcRef) => {
+      console.log('CanvasComponent -> onDblClickCanvas -> pcRef', pcRef);
+      newPc.id = pcRef.id;
       this.drawPcInCanvas(newPc);
       this.informeService.selectElementoPlanta(new Pc(newPc));
     });
