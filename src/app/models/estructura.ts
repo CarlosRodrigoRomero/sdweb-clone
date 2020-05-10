@@ -179,7 +179,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
         columnaRef = columna + 1;
       }
     }
-    return [columna, fila];
+    return [columnaRef, filaRef];
   }
 
   // getCuadrilateroRef(columna: number, fila: number): CuadrilateroInterface {
