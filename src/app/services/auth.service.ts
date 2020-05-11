@@ -41,4 +41,11 @@ export class AuthService {
       })
     );
   }
+
+  canAddPlantas(user: UserInterface) {
+    return user.role === 1 || user.role === 4;
+  }
+  userIsAdmin(user: UserInterface) {
+    return user.role === 1 || user.role === 3 || user.role === 4;
+  }
 }

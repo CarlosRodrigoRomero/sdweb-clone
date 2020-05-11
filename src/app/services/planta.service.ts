@@ -170,7 +170,7 @@ export class PlantaService {
           });
         })
       );
-    } else if (user.role === 1 || user.role === 3) {
+    } else if (this.auth.userIsAdmin(user)) {
       query$ = this.afs.collection<PlantaInterface>('plantas');
     } else {
       query$ = this.afs.collection<PlantaInterface>('plantas', (ref) => ref.where('empresa', '==', user.uid));

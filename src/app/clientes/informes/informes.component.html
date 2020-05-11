@@ -2,12 +2,15 @@
   <div class="row">
     <div class="col-12">
       <h1 class="text-center">{{ user.empresaNombre }}</h1>
-      <button mat-raised-button *ngIf="user.role === 1" routerLink="../planta-add">
+      <button mat-raised-button *ngIf="auth.canAddPlantas(user)" routerLink="../planta-add">
         Añadir planta
       </button>
     </div>
   </div>
-  <div *ngIf="user.role !== 3; else informeListTable" class="row justify-content-center">
+  <div
+    *ngIf="user.role == 0 || user.role == 1 || user.role == 2; else informeListTable"
+    class="row justify-content-center"
+  >
     <div class="col-4" *ngFor="let planta of plantasList$ | async">
       <mat-card class="informe-card">
         <mat-card-header>
@@ -21,6 +24,13 @@
             <a *ngIf="user.role === 1 || user.role === 3" routerLink="../auto-loc/{{ planta.id }}">
               <i class="fas fa-map-marker-alt"></i>
             </a>
+            <span *ngIf="user.role === 1">
+              <input
+                type="checkbox"
+                (click)="updateAutoLocReady(planta, $event)"
+                [checked]="checkAutoLocReady(planta)"
+              />
+            </span>
           </mat-card-subtitle>
         </mat-card-header>
 
@@ -68,6 +78,6 @@
     </div>
   </div>
   <ng-template #informeListTable>
-    <app-informe-list-table [plantasConInformes]="plantas"> </app-informe-list-table>
+    <app-informe-list-table> </app-informe-list-table>
   </ng-template>
 </div>
