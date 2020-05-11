@@ -170,8 +170,8 @@ export class CanvasComponent implements OnInit {
       } else {
         obj.set('strokeWidth', 1);
       }
-      this.canvas.renderAll();
     });
+    this.canvas.renderAll();
   }
 
   addEstructuraCanvas(archivoVuelo: ArchivoVueloInterface) {
@@ -270,7 +270,7 @@ export class CanvasComponent implements OnInit {
           puntoInteriorEst: true,
         });
         this.canvas.add(circle);
-        this.canvas.moveTo(circle, 2);
+        this.canvas.sendToBack(circle);
       });
     });
 
@@ -312,7 +312,7 @@ export class CanvasComponent implements OnInit {
     });
 
     this.canvas.add(polygon);
-    this.canvas.moveTo(polygon, 2);
+    this.canvas.sendToBack(polygon);
 
     estructura.coords.forEach((point, index) => {
       const circle = new fabric.Circle({
@@ -330,7 +330,7 @@ export class CanvasComponent implements OnInit {
         estructuraId: estructura.id,
       });
       this.canvas.add(circle);
-      this.canvas.moveTo(circle, 2);
+      this.canvas.sendToBack(circle);
     });
     this.canvas.renderAll();
 
@@ -419,15 +419,13 @@ export class CanvasComponent implements OnInit {
       height: transformedRectRef.height - strokeWidth,
       id: pc.id,
       ref: true,
-      selectable: false,
+      selectable: true,
       hasRotatingPoint: false,
     });
 
     this.canvas.add(rect);
-    console.log('CanvasComponent -> drawPcInCanvas -> rect', rect);
     this.canvas.add(rectRef);
-    this.canvas.moveTo(rect, 3);
-    this.canvas.moveTo(rectRef, 3);
+
     this.canvas.renderAll();
   }
 
@@ -671,7 +669,6 @@ export class CanvasComponent implements OnInit {
     }
 
     this.pcService.addPc(newPc).then((pcRef) => {
-      console.log('CanvasComponent -> onDblClickCanvas -> pcRef', pcRef);
       newPc.id = pcRef.id;
       this.drawPcInCanvas(newPc);
       this.informeService.selectElementoPlanta(new Pc(newPc));

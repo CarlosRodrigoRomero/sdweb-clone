@@ -224,8 +224,8 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   getRectanguloInterior(columna: number, fila: number): RectanguloInterface {
     const cuadrilatero = this.getCuadrilatero(columna, fila);
 
-    const top = Math.round(Math.min(cuadrilatero.tr.y, cuadrilatero.tl.y));
-    const left = Math.round(Math.min(cuadrilatero.bl.x, cuadrilatero.tl.x));
+    const top = Math.round(Math.max(cuadrilatero.tr.y, cuadrilatero.tl.y));
+    const left = Math.round(Math.max(cuadrilatero.bl.x, cuadrilatero.tl.x));
     const bottom = Math.round(Math.min(cuadrilatero.br.y, cuadrilatero.bl.y));
     const right = Math.round(Math.min(cuadrilatero.tr.x, cuadrilatero.br.x));
 
