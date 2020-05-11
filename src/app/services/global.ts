@@ -18,6 +18,7 @@ export let GLOBAL = {
   mae: [0.1, 0.2],
   anomaliaPorDefecto: 9,
   resolucionCamara: [512, 640],
+  globalCoordsEstructura: [0, 1, 2],
   numGlobalCoords: 3,
   // labels_severidad: ['Leve', 'Media', 'Grave'],
   labels_severidad: ['CoA 1', 'CoA 2', 'CoA 3'],

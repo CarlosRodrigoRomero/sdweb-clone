@@ -13,6 +13,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 import { UserAreaInterface } from '../../models/userArea';
 import { AreaInterface } from '../../models/area';
+import { GLOBAL } from 'src/app/services/global';
 declare const google: any;
 
 @Component({
@@ -52,6 +53,7 @@ export class AutoLocComponent implements OnInit {
   public userAreaDataSource: MatTableDataSource<UserAreaInterface>;
   public moduloSelecLista: ModuloInterface;
   public isUserArea: boolean;
+  public global = GLOBAL;
 
   constructor(private route: ActivatedRoute, private plantaService: PlantaService) {}
 
@@ -68,7 +70,7 @@ export class AutoLocComponent implements OnInit {
     this.maxPolygonsVisibles = 1000;
     this.polygonsAllHidden = false;
     this.lastLocationArea = undefined;
-    this.displayedColumns = ['select', 'globalX', 'globalY', 'modulo'];
+    this.displayedColumns = ['select', 'globalCoords', 'modulo'];
 
     this.locAreaDataSource = new MatTableDataSource([]);
     this.userAreaDataSource = new MatTableDataSource([]);
@@ -260,6 +262,7 @@ export class AutoLocComponent implements OnInit {
   }
 
   updateArea(area: AreaInterface, moduleChange = false) {
+    console.log('AutoLocComponent -> updateArea -> area', area);
     if (this.checkIfUserArea(area)) {
       this.plantaService.updateUserArea(area as UserAreaInterface);
     } else {
@@ -409,11 +412,13 @@ export class AutoLocComponent implements OnInit {
   }
 
   private createLocArea(path: LatLngLiteral[]) {
-    let locationArea = {} as LocationAreaInterface;
-    locationArea.path = path;
-    locationArea.globalX = '';
-    locationArea.globalY = '';
-    locationArea.plantaId = this.plantaId;
+    let locationArea = {
+      path,
+      globalX: '',
+      globalY: '',
+      plantaId: this.plantaId,
+      globalCoords: [null, null, null],
+    } as LocationAreaInterface;
 
     locationArea = this.plantaService.addLocationArea(this.plantaId, locationArea);
     this.locationAreaList.push(locationArea);

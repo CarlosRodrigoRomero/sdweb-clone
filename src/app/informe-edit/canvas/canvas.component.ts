@@ -62,7 +62,6 @@ export class CanvasComponent implements OnInit {
   sentidoPorDefecto = false;
   estructura: Estructura;
   planta: PlantaInterface;
-  globalCoordsEstructura: number[];
   allPcs: Pc[];
   private squareBase: number;
   private squareProp: number;
@@ -70,6 +69,7 @@ export class CanvasComponent implements OnInit {
   private squareWidth: number;
   private rectSeparation = 0.1;
   private localIdCount: number;
+  global = GLOBAL;
 
   constructor(
     public informeService: InformeService,
@@ -100,7 +100,6 @@ export class CanvasComponent implements OnInit {
 
     this.initCanvas();
     this.currentArchivoVuelo = { archivo: '', vuelo: '' };
-    this.globalCoordsEstructura = [0, 1, 2];
 
     // Selección de elemento de planta
     this.informeService.selectedElementoPlanta$.subscribe((elementoPlanta) => {
