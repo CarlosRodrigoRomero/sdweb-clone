@@ -1,11 +1,12 @@
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { PlantaInterface } from 'src/app/models/planta';
 import { PlantaService } from '../../services/planta.service';
-import { switchMap, map } from 'rxjs/operators';
+import { switchMap, map, take } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth.service';
 import { InformeService } from 'src/app/services/informe.service';
+import { UserInterface } from 'src/app/models/user';
 
 @Component({
   selector: 'app-informe-list-table',
@@ -14,22 +15,42 @@ import { InformeService } from 'src/app/services/informe.service';
 })
 export class InformeListTableComponent implements OnInit {
   displayedColumns: string[] = ['nombre', 'potencia', 'tipo', 'fecha'];
+  displayedColumnsLocs: string[] = ['nombre', 'potencia', 'tipo', 'localizaciones'];
   dataSource = new MatTableDataSource<PlantaInterface>();
+  dataSourceLocs = new MatTableDataSource<PlantaInterface>();
+  public user: UserInterface;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
-  @Input() plantasConInformes: PlantaInterface[];
 
   constructor(public auth: AuthService, private informeService: InformeService, private plantaService: PlantaService) {}
 
   ngOnInit(): void {
     const plantas$ = this.auth.user$.pipe(
+      take(1),
       switchMap((user) => {
+        this.user = user;
         return this.plantaService.getPlantasDeEmpresa(user);
       })
     );
+    plantas$
+      .pipe(
+        map((result) => {
+          return result.filter((planta) => {
+            if (!planta.hasOwnProperty('autoLocReady')) {
+              return false;
+            } else {
+              return !planta.autoLocReady;
+            }
+          });
+        })
+      )
+      .subscribe((plantasArray) => {
+        this.dataSourceLocs.data = plantasArray;
+      });
 
     const allInformes$ = this.informeService.getInformes();
 
     const plantasConInformes$ = allInformes$.pipe(
+      take(1),
       switchMap((informesArray) => {
         return plantas$.pipe(
           map((plantasArray) => {

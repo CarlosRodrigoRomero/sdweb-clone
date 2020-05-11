@@ -1,4 +1,4 @@
-import { InformeInterface } from "./informe";
+import { InformeInterface } from './informe';
 
 export interface PlantaInterface {
   id?: string;
@@ -33,4 +33,5 @@ export interface PlantaInterface {
   stringConectorGlobals?: string;
   numerosSerie?: boolean;
   numeroSeguidores?: number;
+  autoLocReady?: boolean;
 }

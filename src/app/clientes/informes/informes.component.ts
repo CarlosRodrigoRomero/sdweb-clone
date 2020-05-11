@@ -17,7 +17,6 @@ export class InformesComponent implements OnInit {
   public informes: InformeInterface[];
   public plantasConInformes: PlantaInterface[];
   public allPlantas: PlantaInterface[];
-  public user$: Observable<UserInterface>;
   public user: UserInterface;
   plantasList$: Observable<PlantaInterface[]>;
 
@@ -25,11 +24,11 @@ export class InformesComponent implements OnInit {
 
   ngOnInit() {
     const plantas$ = this.auth.user$.pipe(
+      take(1),
       switchMap((user) => {
         this.user = user;
         return this.plantaService.getPlantasDeEmpresa(user);
-      }),
-      take(1)
+      })
     );
 
     const allInformes$ = this.informeService.getInformes();
@@ -68,8 +67,20 @@ export class InformesComponent implements OnInit {
     return ('disponible' in informe && informe.disponible === true) || !('disponible' in informe);
   }
 
-  updateInforme(informe: InformeInterface) {
+  updateInforme(informe: InformeInterface): void {
     informe.disponible = !informe.disponible;
     this.informeService.updateInforme(informe);
+  }
+
+  updateAutoLocReady(planta: PlantaInterface): void {
+    planta.autoLocReady = !planta.autoLocReady;
+    this.plantaService.updatePlanta(planta);
+  }
+  checkAutoLocReady(planta: PlantaInterface) {
+    if (!planta.hasOwnProperty('autoLocReady')) {
+      return false;
+    } else {
+      return planta.autoLocReady;
+    }
   }
 }
