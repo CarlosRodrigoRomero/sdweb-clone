@@ -1,137 +1,173 @@
 <div class="container">
-    <div class="row">
-        <div class="col-9">
-            <div class="row">
-                <div class="col">
-                    <div class="cabecera">
-                        <h2>{{ planta?.nombre }}</h2>
-                        <mat-form-field>
-                            <mat-label>Modulo</mat-label>
-                            <mat-select [(ngModel)]="moduloSelecLista" name="m">
-                                <mat-option *ngFor="let m of modulos" [value]="m">
-                                    {{ m.marca }} {{ m.modelo }} ({{ m.potencia }} W)
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-
-                        <mat-checkbox [(ngModel)]="isUserArea">
-                            isUserArea {{ isUserArea }}
-                        </mat-checkbox>
-
-                        <button (click)="aplicarModulosSeleccion()">
-              Aplicar módulo a selección ->
-            </button>
-                    </div>
-                    <agm-map [latitude]="plantaLocation.lat" [longitude]="plantaLocation.lng" [mapTypeId]="mapType" [zoom]="defaultZoom" (mapReady)="onMapReady($event)">
-                    </agm-map>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-6" *ngIf="selectedLocationArea">
-                    <ul class="propiedadesLocArea">
-                        <li class="liPropiedadesLocArea">
-                            globalX:
-                            <input (change)="updateArea(selectedLocationArea)" [(ngModel)]="selectedLocationArea.globalX" type="text" name="globalX" id="globalX" />
-                        </li>
-                        <li class="liPropiedadesLocArea">
-                            globalY:
-                            <input (change)="updateArea(selectedLocationArea)" [(ngModel)]="selectedLocationArea.globalY" type="text" name="globalY" />
-                        </li>
-                        <li class="liPropiedadesLocArea">
-                            <mat-form-field>
-                                <mat-label>{{ selectedLocationArea.modulo?.marca }} {{ selectedLocationArea.modulo?.modelo }} ({{ selectedLocationArea.modulo?.potencia }} W)
-                                </mat-label>
-                                <mat-select [(ngModel)]="selectedLocationArea.modulo" name="m" (selectionChange)="updateArea(selectedLocationArea, true)">
-                                    <mat-option *ngFor="let m of modulos" [value]="m">
-                                        {{ m.marca }} {{ m.modelo }} ({{ m.potencia }} W)
-                                    </mat-option>
-                                </mat-select>
-
-                                <button mat-button *ngIf="selectedLocationArea.hasOwnProperty('modulo')" matSuffix mat-icon-button aria-label="Clear" (click)="clearModulo(selectedLocationArea)">
-                  <mat-icon>close</mat-icon>
-                </button>
-                            </mat-form-field>
-                        </li>
-                        <li class="liPropiedadesLocArea">
-                            <button type="button" class="btn btn-danger btn-eliminar" (click)="deleteArea(selectedLocationArea)">
-                <i class="fa fa-trash" aria-hidden="true"></i>
-              </button>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-6" *ngIf="selectedUserArea">
-                    <ul class="propiedadesLocArea">
-                        <li class="liPropiedadesLocArea">
-                            userId:
-                            <input (change)="updateArea(selectedUserArea)" [(ngModel)]="selectedUserArea.userId" type="text" name="userId" id="userId" />
-                        </li>
-                        <li class="liPropiedadesLocArea">
-                            <button type="button" class="btn btn-danger btn-eliminar" (click)="deleteArea(selectedUserArea)">
-                <i class="fa fa-trash" aria-hidden="true"></i>
-              </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-3 col-locationareas">
+  <div class="row">
+    <div class="col-9">
+      <div class="row">
+        <div class="col">
+          <div class="cabecera">
+            <h2>{{ planta?.nombre }}</h2>
             <mat-form-field>
-                <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter" />
+              <mat-label>Modulo</mat-label>
+              <mat-select [(ngModel)]="moduloSelecLista" name="m">
+                <mat-option *ngFor="let m of modulos" [value]="m">
+                  {{ m.marca }} {{ m.modelo }} ({{ m.potencia }} W)
+                </mat-option>
+              </mat-select>
             </mat-form-field>
 
-            <mat-checkbox (change)="$event ? selectConModulo() : null" [checked]="selection.hasValue() && isAllModulesSelected()">
-            </mat-checkbox>
+            <mat-checkbox [(ngModel)]="isUserArea"> isUserArea {{ isUserArea }} </mat-checkbox>
 
-            <table matSort mat-table [dataSource]="locAreaDataSource" class="mat-z8">
-                <ng-container matColumnDef="select">
-                    <th mat-header-cell *matHeaderCellDef>
-                        <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()">
-                        </mat-checkbox>
-                    </th>
-                    <td mat-cell *matCellDef="let row">
-                        <mat-checkbox (change)="$event ? selection.toggle(row) : null" [checked]="isSelected(row)" (click)="onSelectCheckboxChange($event, row)">
-                        </mat-checkbox>
-                    </td>
-                </ng-container>
-                <ng-container matColumnDef="globalX">
-                    <th mat-header-cell mat-sort-header *matHeaderCellDef>globalX</th>
-                    <td mat-cell *matCellDef="let element">{{ element.globalX }}</td>
-                </ng-container>
-
-                <ng-container matColumnDef="globalY">
-                    <th mat-header-cell mat-sort-header *matHeaderCellDef>globalY</th>
-                    <td mat-cell *matCellDef="let element">{{ element.globalY }}</td>
-                </ng-container>
-
-                <ng-container matColumnDef="modulo">
-                    <th mat-header-cell mat-sort-header *matHeaderCellDef>Modulo</th>
-                    <td mat-cell *matCellDef="let element">
-                        {{ element.marca }} ({{ element.modulo?.potencia }} W)
-                    </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr style="cursor: pointer" (click)="selectArea(locArea)" [ngClass]="{ seleccionado: locArea === selectedLocationArea }" [style.color]="getRowColor(locArea)" mat-row *matRowDef="let locArea; columns: displayedColumns"></tr>
-            </table>
-
-            <table style="display: none" class="table" id="tabla_locationareas">
-                <tr>
-                    <th>GlobX</th>
-                    <!-- <th> Filename</th> -->
-                    <th>GlobY</th>
-                    <th>Ver</th>
-                </tr>
-
-                <tr style="cursor:  pointer" (click)="selectArea(locArea)" *ngFor="let locArea of locationAreaList" [ngClass]="{ seleccionado: locArea === selectedLocationArea }" [style.color]="getRowColor(locArea)">
-                    <th>{{ locArea.globalX }}</th>
-                    <th>{{ locArea.globalY }}</th>
-                    <!-- <th> {{pc.archivo}}</th> -->
-                    <th>
-                        <mat-checkbox (click)="changeVisibilityPolygon(locArea, true)" [(ngModel)]="locArea.visible"></mat-checkbox>
-                    </th>
-                </tr>
-            </table>
+            <button (click)="aplicarModulosSeleccion()">
+              Aplicar módulo a selección ->
+            </button>
+          </div>
+          <agm-map
+            [latitude]="plantaLocation.lat"
+            [longitude]="plantaLocation.lng"
+            [mapTypeId]="mapType"
+            [zoom]="defaultZoom"
+            (mapReady)="onMapReady($event)"
+          >
+          </agm-map>
         </div>
+      </div>
+      <div class="row">
+        <div class="col-6" *ngIf="selectedLocationArea">
+          <ul class="propiedadesLocArea">
+            <li *ngFor="let gc of global.globalCoordsEstructura" class="liPropiedadesLocArea">
+              <label>
+                G_<b>{{ gc }}: </b>
+                <input
+                  [(ngModel)]="selectedLocationArea.globalCoords[gc]"
+                  id="global{{ gc }}"
+                  (change)="updateArea(selectedLocationArea)"
+                  maxlength="4"
+                  name="global{{ gc }}"
+                  id="global{{ gc }}"
+                  type="text"
+                  size="4"
+                  class="inputInicio"
+                />
+              </label>
+            </li>
+            <li class="liPropiedadesLocArea">
+              <mat-form-field>
+                <mat-label
+                  >{{ selectedLocationArea.modulo?.marca }} {{ selectedLocationArea.modulo?.modelo }} ({{
+                    selectedLocationArea.modulo?.potencia
+                  }}
+                  W)
+                </mat-label>
+                <mat-select
+                  [(ngModel)]="selectedLocationArea.modulo"
+                  name="m"
+                  (selectionChange)="updateArea(selectedLocationArea, true)"
+                >
+                  <mat-option *ngFor="let m of modulos" [value]="m">
+                    {{ m.marca }} {{ m.modelo }} ({{ m.potencia }} W)
+                  </mat-option>
+                </mat-select>
+
+                <button
+                  mat-button
+                  *ngIf="selectedLocationArea.hasOwnProperty('modulo')"
+                  matSuffix
+                  mat-icon-button
+                  aria-label="Clear"
+                  (click)="clearModulo(selectedLocationArea)"
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+            </li>
+            <li class="liPropiedadesLocArea">
+              <button type="button" class="btn btn-danger btn-eliminar" (click)="deleteArea(selectedLocationArea)">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="col-6" *ngIf="selectedUserArea">
+          <ul class="propiedadesLocArea">
+            <li class="liPropiedadesLocArea">
+              userId:
+              <input
+                (change)="updateArea(selectedUserArea)"
+                [(ngModel)]="selectedUserArea.userId"
+                type="text"
+                name="userId"
+                id="userId"
+              />
+            </li>
+            <li class="liPropiedadesLocArea">
+              <button type="button" class="btn btn-danger btn-eliminar" (click)="deleteArea(selectedUserArea)">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
+
+    <div class="col-3 col-locationareas">
+      <mat-form-field>
+        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter" />
+      </mat-form-field>
+
+      <mat-checkbox
+        (change)="$event ? selectConModulo() : null"
+        [checked]="selection.hasValue() && isAllModulesSelected()"
+      >
+      </mat-checkbox>
+
+      <table matSort mat-table [dataSource]="locAreaDataSource" class="mat-z8">
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
+            >
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox
+              (change)="$event ? selection.toggle(row) : null"
+              [checked]="isSelected(row)"
+              (click)="onSelectCheckboxChange($event, row)"
+            >
+            </mat-checkbox>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="globalX">
+          <th mat-header-cell mat-sort-header *matHeaderCellDef>globalX</th>
+          <td mat-cell *matCellDef="let element">{{ element.globalX }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="globalY">
+          <th mat-header-cell mat-sort-header *matHeaderCellDef>globalY</th>
+          <td mat-cell *matCellDef="let element">{{ element.globalY }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="globalCoords">
+          <th mat-header-cell mat-sort-header *matHeaderCellDef>GlobalCoords</th>
+          <td mat-cell *matCellDef="let element">[{{ element.globalCoords }}]</td>
+        </ng-container>
+
+        <ng-container matColumnDef="modulo">
+          <th mat-header-cell mat-sort-header *matHeaderCellDef>Modulo</th>
+          <td mat-cell *matCellDef="let element">{{ element.marca }} ({{ element.modulo?.potencia }} W)</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr
+          style="cursor: pointer;"
+          (click)="selectArea(locArea)"
+          [ngClass]="{ seleccionado: locArea === selectedLocationArea }"
+          [style.color]="getRowColor(locArea)"
+          mat-row
+          *matRowDef="let locArea; columns: displayedColumns"
+        ></tr>
+      </table>
+    </div>
+  </div>
 </div>
