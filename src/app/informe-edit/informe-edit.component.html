@@ -8,9 +8,9 @@
         </h2>
         <mat-slide-toggle *ngIf="user?.role == 1" [(ngModel)]="pcsOrEstructuras"> est/pc </mat-slide-toggle>
       </div>
-      <!-- <div *ngIf="alertMessage" class="alert alert-warning" role="alert"> -->
-      <!-- {{ alertMessage }} -->
-      <!-- </div> -->
+      <div *ngIf="alertMessage" class="alert alert-warning" role="alert">
+        {{ alertMessage }}
+      </div>
 
       <div class="btn-group btn-group-toggle btn-group-vuelos">
         <label

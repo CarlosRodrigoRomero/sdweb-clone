@@ -70,6 +70,8 @@ export class CanvasComponent implements OnInit {
   private rectSeparation = 0.1;
   private localIdCount: number;
   global = GLOBAL;
+  public successMessage: string;
+  public alertMessage: string;
 
   constructor(
     public informeService: InformeService,
@@ -121,6 +123,15 @@ export class CanvasComponent implements OnInit {
     this.informeService.avisadorNuevoElemento$.subscribe((elem) => {
       if (elem.constructor.name === Pc.name) {
         this.nuevoPc(elem as Pc);
+      } else if (elem.constructor.name === Estructura.name) {
+        if (this.estructura === elem) {
+          // Borrar estructura del Canvas
+          this.estructura = null;
+          this.limpiarEstructuraCanvas();
+        } else {
+          this.dibujarEstructura(elem as Estructura);
+          this.informeService.selectElementoPlanta(elem);
+        }
       }
     });
   }
@@ -135,7 +146,6 @@ export class CanvasComponent implements OnInit {
   }
 
   selectElementoPlanta(elementoPlanta: ElementoPlantaInterface): void {
-    console.log('CanvasComponent -> selectElementoPlanta -> elementoPlanta', elementoPlanta);
     if (elementoPlanta == null) {
       this.estructura = null;
       this.selectedPc = null;
@@ -294,7 +304,18 @@ export class CanvasComponent implements OnInit {
     // Borramos del canvas la estructura anterior.
     this.limpiarEstructuraCanvas();
     this.dibujarEstructura(this.estructura);
-    this.informeService.updateElementoPlanta(this.informeId, this.estructura);
+    this.informeService
+      .updateElementoPlanta(this.informeId, this.estructura)
+      .then((res) => {
+        this.successMessage = 'Estructura actualizada - OK';
+        setTimeout(() => {
+          this.successMessage = undefined;
+        }, 2000);
+        this.alertMessage = undefined;
+      })
+      .catch((res) => {
+        this.alertMessage = 'Error actualizando estructura';
+      });
   }
 
   dibujarEstructura(estructura: Estructura) {
@@ -728,9 +749,6 @@ export class CanvasComponent implements OnInit {
 
   deleteEstructura(estructura: Estructura) {
     this.informeService.deleteEstructuraInforme(this.informeId, estructura);
-    // Borrar estructura de
-    this.estructura = null;
-    this.limpiarEstructuraCanvas();
   }
 
   private getLeftAndTop(imageRotation: number) {
@@ -931,11 +949,23 @@ export class CanvasComponent implements OnInit {
     nuevaEstructuraObj.setModulo(modulo as ModuloInterface);
 
     // Dibujar dicha estructura
-    this.dibujarEstructura(nuevaEstructuraObj);
+    // this.dibujarEstructura(nuevaEstructuraObj);
 
     // Añadir a la base de datos
-    this.informeService.addEstructuraInforme(this.informeId, nuevaEstructura);
-    this.informeService.selectElementoPlanta(nuevaEstructuraObj);
+    this.informeService
+      .addEstructuraInforme(this.informeId, nuevaEstructura)
+      .then(() => {
+        this.successMessage = 'Estructura añadida - OK';
+        setTimeout(() => {
+          this.successMessage = undefined;
+        }, 2000);
+        this.alertMessage = undefined;
+      })
+      .catch((res) => {
+        console.log('ERROR', res);
+        this.alertMessage = 'ERROR';
+      });
+    // this.informeService.selectElementoPlanta(nuevaEstructuraObj);
 
     this.activeLine = null;
     this.activeShape = null;

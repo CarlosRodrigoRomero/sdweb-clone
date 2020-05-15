@@ -151,6 +151,9 @@ export class InformeEditComponent implements OnInit {
     this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
       this.setArchivoVuelo(archivoVuelo);
     });
+
+    window.addEventListener('online', (e) => (this.alertMessage = undefined));
+    window.addEventListener('offline', (e) => (this.alertMessage = 'ERROR Internet conection'));
   }
 
   setArchivoVuelo(archivoVuelo: ArchivoVueloInterface): void {

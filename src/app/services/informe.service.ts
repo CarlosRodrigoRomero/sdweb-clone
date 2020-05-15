@@ -116,25 +116,22 @@ export class InformeService {
     return response;
   }
 
-  addEstructuraInforme(informeId: string, estructura: EstructuraInterface) {
+  async addEstructuraInforme(informeId: string, estructura: EstructuraInterface) {
     const id = this.afs.createId();
     estructura.id = id;
-    this.afs
-      .collection('informes')
-      .doc(informeId)
-      .collection('estructuras')
-      .doc(id)
-      .set(estructura)
-      .then((v) => {
-        this.avisadorNuevoElementoSource.next(new Estructura(estructura));
-        // this.selectElementoPlanta(estructura);
-      });
+    const promesa = this.afs.collection('informes').doc(informeId).collection('estructuras').doc(id).set(estructura);
+
+    promesa.then((v) => {
+      this.avisadorNuevoElementoSource.next(new Estructura(estructura));
+      // this.selectElementoPlanta(estructura);
+    });
+    return promesa;
   }
 
-  updateElementoPlanta(informeId: string, elementoPlanta: ElementoPlantaInterface): void {
+  async updateElementoPlanta(informeId: string, elementoPlanta: ElementoPlantaInterface) {
     this.avisadorChangeElementoSource.next(elementoPlanta);
     if (elementoPlanta.constructor.name === Estructura.name) {
-      this.updateEstructura(informeId, elementoPlanta as Estructura);
+      return this.updateEstructura(informeId, elementoPlanta as Estructura);
     }
   }
 
