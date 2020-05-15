@@ -38,7 +38,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-6" *ngIf="selectedLocationArea">
+        <div class="col-8" *ngIf="selectedLocationArea">
           <ul class="propiedadesLocArea">
             <li *ngFor="let gc of global.globalCoordsEstructura" class="liPropiedadesLocArea">
               <label>
@@ -92,6 +92,11 @@
               </button>
             </li>
           </ul>
+        </div>
+        <div class="col-4">
+          <div *ngIf="successMessage" class="alert alert-success" role="alert">
+            {{ successMessage }}
+          </div>
         </div>
         <div class="col-6" *ngIf="selectedUserArea">
           <ul class="propiedadesLocArea">

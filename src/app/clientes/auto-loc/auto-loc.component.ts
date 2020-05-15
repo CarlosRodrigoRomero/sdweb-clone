@@ -55,6 +55,7 @@ export class AutoLocComponent implements OnInit {
   public isUserArea: boolean;
   public global = GLOBAL;
   public alertMessage: string;
+  public successMessage: string;
 
   constructor(private route: ActivatedRoute, private plantaService: PlantaService) {}
 
@@ -150,7 +151,7 @@ export class AutoLocComponent implements OnInit {
     this.map._mapsWrapper
       .createPolygon({
         paths: area.path,
-        strokeColor: area.hasOwnProperty('modulo') ? 'yellow' : 'grey',
+        strokeColor: area.hasOwnProperty('modulo') ? 'yellow' : 'white',
         strokeOpacity: this._strokeOpacity,
         strokeWeight: 2,
         fillColor: this.getFillColor(area),
@@ -435,10 +436,14 @@ export class AutoLocComponent implements OnInit {
     this.plantaService
       .addLocationArea(this.plantaId, locationArea)
       .then(() => {
+        this.successMessage = 'Area añadida - OK';
+        setTimeout(() => {
+          this.successMessage = undefined;
+        }, 2000);
         this.alertMessage = undefined;
       })
       .catch((res) => {
-        console.log('AutoLocComponent -> createLocArea -> res', res);
+        console.log('ERROR', res);
         this.alertMessage = 'ERROR';
       });
     this.locationAreaList.push(locationArea);
