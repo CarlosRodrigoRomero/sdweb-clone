@@ -54,6 +54,7 @@ export class AutoLocComponent implements OnInit {
   public moduloSelecLista: ModuloInterface;
   public isUserArea: boolean;
   public global = GLOBAL;
+  public alertMessage: string;
 
   constructor(private route: ActivatedRoute, private plantaService: PlantaService) {}
 
@@ -116,6 +117,9 @@ export class AutoLocComponent implements OnInit {
     const initialSelection = [];
     const allowMultiSelect = true;
     this.selection = new SelectionModel<LocationAreaInterface>(allowMultiSelect, initialSelection);
+
+    window.addEventListener('online', (e) => (this.alertMessage = undefined));
+    window.addEventListener('offline', (e) => (this.alertMessage = 'ERROR Internet conection'));
   }
 
   getPlanta(plantaId: string) {
@@ -266,7 +270,15 @@ export class AutoLocComponent implements OnInit {
     if (this.checkIfUserArea(area)) {
       this.plantaService.updateUserArea(area as UserAreaInterface);
     } else {
-      this.plantaService.updateLocationArea(area as LocationAreaInterface);
+      this.plantaService
+        .updateLocationArea(area as LocationAreaInterface)
+        .then((res) => {
+          this.alertMessage = undefined;
+        })
+        .catch((res) => {
+          console.log('AutoLocComponent -> updateArea -> res', res);
+          this.alertMessage = 'ERROR';
+        });
 
       if (moduleChange) {
         this.changeVisibilityPolygon(area as LocationAreaInterface);
@@ -374,7 +386,7 @@ export class AutoLocComponent implements OnInit {
         this.createUserArea(path);
       } else {
         this.createLocArea(path);
-        document.getElementById('globalX').focus();
+        // document.getElementById('globalX').focus();
       }
     });
     google.maps.event.addListener(drawingManager, 'rectanglecomplete', (rectangle) => {
@@ -393,7 +405,7 @@ export class AutoLocComponent implements OnInit {
         this.createUserArea(path);
       } else {
         this.createLocArea(path);
-        document.getElementById('globalX').focus();
+        // document.getElementById('globalX').focus();
       }
     });
   }
@@ -412,7 +424,7 @@ export class AutoLocComponent implements OnInit {
   }
 
   private createLocArea(path: LatLngLiteral[]) {
-    let locationArea = {
+    const locationArea = {
       path,
       globalX: '',
       globalY: '',
@@ -420,7 +432,15 @@ export class AutoLocComponent implements OnInit {
       globalCoords: [null, null, null],
     } as LocationAreaInterface;
 
-    locationArea = this.plantaService.addLocationArea(this.plantaId, locationArea);
+    this.plantaService
+      .addLocationArea(this.plantaId, locationArea)
+      .then(() => {
+        this.alertMessage = undefined;
+      })
+      .catch((res) => {
+        console.log('AutoLocComponent -> createLocArea -> res', res);
+        this.alertMessage = 'ERROR';
+      });
     this.locationAreaList.push(locationArea);
     // this.selectArea(locationArea);
 

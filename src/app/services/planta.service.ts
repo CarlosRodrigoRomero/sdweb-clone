@@ -109,27 +109,25 @@ export class PlantaService {
     );
   }
 
-  delUserArea(userArea: UserAreaInterface) {
-    this.afs.collection('plantas').doc(userArea.plantaId).collection('userAreas').doc(userArea.id).delete();
+  async delUserArea(userArea: UserAreaInterface) {
+    return this.afs.collection('plantas').doc(userArea.plantaId).collection('userAreas').doc(userArea.id).delete();
   }
 
-  addLocationArea(plantaId: string, locationArea: LocationAreaInterface) {
+  async addLocationArea(plantaId: string, locationArea: LocationAreaInterface) {
     const id = this.afs.createId();
     locationArea.id = id;
 
-    this.afs.collection('plantas').doc(plantaId).collection('locationAreas').doc(id).set(locationArea);
-
-    return locationArea;
+    return this.afs.collection('plantas').doc(plantaId).collection('locationAreas').doc(id).set(locationArea);
   }
 
-  updateLocationArea(locArea: LocationAreaInterface) {
+  async updateLocationArea(locArea: LocationAreaInterface) {
     const LocAreaDoc = this.afs.doc(`plantas/${locArea.plantaId}/locationAreas/${locArea.id}`);
     if (!locArea.hasOwnProperty('modulo')) {
       LocAreaDoc.update({
         modulo: firebase.firestore.FieldValue.delete(),
       });
     }
-    LocAreaDoc.update(locArea);
+    return LocAreaDoc.update(locArea);
   }
 
   delLocationArea(locationArea: LocationAreaInterface) {
