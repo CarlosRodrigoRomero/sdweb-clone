@@ -1,39 +1,34 @@
-<agm-map
-  *ngIf="informeService.selectedArchivoVuelo"
-  [latitude]="currentLatLng.lat"
-  [longitude]="currentLatLng.lng"
-  [mapTypeId]="mapType"
-  [zoom]="defaultZoom"
->
-  <agm-circle
-    [latitude]="currentLatLng.lat"
-    [longitude]="currentLatLng.lng"
-    [radius]="5"
-    [fillColor]="'white'"
-    [circleDraggable]="false"
-    [editable]="false"
-    [clickable]="false"
-  >
-  </agm-circle>
+<div *ngIf="informeService.selectedArchivoVuelo">
+  <agm-map [latitude]="currentLatLng.lat" [longitude]="currentLatLng.lng" [mapTypeId]="mapType" [zoom]="defaultZoom">
+    <agm-circle
+      [latitude]="currentLatLng.lat"
+      [longitude]="currentLatLng.lng"
+      [radius]="5"
+      [fillColor]="'white'"
+      [circleDraggable]="false"
+      [editable]="false"
+      [clickable]="false"
+    >
+    </agm-circle>
 
-  <agm-circle
-    *ngFor="let elemPlant of allElementosPlanta"
-    [latitude]="elemPlant.getLatLng().lat"
-    [longitude]="elemPlant.getLatLng().lng"
-    [radius]="4"
-    [fillColor]="getFillColor(elemPlant)"
-    [strokeColor]="getStrokeColor(elemPlant)"
-    [strokeWeight]="getStrokeWeight(elemPlant)"
-    [strokePosition]="'INSIDE'"
-    [circleDraggable]="true"
-    [editable]="false"
-    [id]="elemPlant.id"
-    (circleClick)="onMapElementoPlantaClick(elemPlant)"
-    (dragEnd)="onMapElementoPlantaDragEnd(elemPlant, $event)"
-  >
-  </agm-circle>
+    <agm-circle
+      *ngFor="let elemPlant of allElementosPlanta"
+      [latitude]="elemPlant.getLatLng().lat"
+      [longitude]="elemPlant.getLatLng().lng"
+      [radius]="getCircleRadius()"
+      [fillColor]="getFillColor(elemPlant)"
+      [strokeColor]="getStrokeColor(elemPlant)"
+      [strokeWeight]="getStrokeWeight(elemPlant)"
+      [strokePosition]="'INSIDE'"
+      [circleDraggable]="true"
+      [editable]="false"
+      [id]="elemPlant.id"
+      (circleClick)="onMapElementoPlantaClick(elemPlant)"
+      (dragEnd)="onMapElementoPlantaDragEnd(elemPlant, $event)"
+    >
+    </agm-circle>
 
-  <!-- <agm-marker
+    <!-- <agm-marker
     [ngClass]="{ selected_marker: selected_pc === pc }"
     *ngFor="let pc of filterPcsByFlight(currentFlight)"
     [id]="pc.local_id"
@@ -45,4 +40,5 @@
     (dragEnd)="onMarkerDragEnd(pc, $event)"
   >
   </agm-marker> -->
-</agm-map>
+  </agm-map>
+</div>

@@ -34,4 +34,5 @@ export interface PlantaInterface {
   numerosSerie?: boolean;
   numeroSeguidores?: number;
   autoLocReady?: boolean;
+  numeroGlobalCoords?: number;
 }

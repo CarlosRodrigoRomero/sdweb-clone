@@ -1,34 +1,57 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Estructura } from '../models/estructura';
 import { PcInterface, Pc } from '../models/pc';
+import { PlantaInterface } from '../models/planta';
 
 @Pipe({
   name: 'validateElem',
 })
 export class ValidateElementoPlantaPipe implements PipeTransform {
-  transform(elem: Estructura & PcInterface, args?: any): boolean {
+  transform(elem: Estructura & PcInterface, planta?: PlantaInterface): boolean {
+    let numeroGlobalCoords = 2;
+    let globalCoords = [];
+    if (elem.hasOwnProperty('globalCoords')) {
+      globalCoords = elem.globalCoords;
+    } else {
+      globalCoords = [elem.global_x, elem.global_y];
+    }
+    if (planta !== undefined) {
+      if (planta.hasOwnProperty('numeroGlobalCoords')) {
+        numeroGlobalCoords = planta.numeroGlobalCoords;
+      }
+    }
     if (elem.constructor.name === Estructura.name) {
-      if (elem.globalCoords[0] === null || elem.globalCoords[1] == null) {
-        return true;
-      } else if (elem.globalCoords[0].toString().length === 0 || elem.globalCoords[1].toString().length === 0) {
-        return true;
-      } else if (elem.columnaInicio < 1 || elem.filaInicio < 1) {
-        return true;
+      if (elem.columnaInicio < 1 || elem.filaInicio < 1) {
+        return false;
       } else if (elem.columnas < 1 || elem.filas < 1) {
+        return false;
+      }
+      if (numeroGlobalCoords === 1) {
+        if (globalCoords[0] === null && globalCoords[1] === null) {
+          return false;
+        } else if (globalCoords[0].toString().length === 0 && globalCoords[1].toString().length === 0) {
+          return false;
+        }
+        return true;
+      } else {
+        if (globalCoords[0] === null || globalCoords[1] == null) {
+          return false;
+        } else if (globalCoords[0].toString().length === 0 || globalCoords[1].toString().length === 0) {
+          return false;
+        }
         return true;
       }
-      return false;
     } else if (elem.constructor.name === Pc.name) {
       if (elem.tipo !== 0 && elem.tipo !== 4 && elem.tipo !== 17 && (elem.local_x === 0 || elem.local_y === 0)) {
-        return true;
-      } else if (elem.global_x.length === 0 && elem.global_y.length === 0) {
-        return true;
+        return false;
+      } else if (globalCoords[0].length === 0 && globalCoords[1].length === 0) {
+        return false;
       }
       //   else if (planta.tipo === 'fija' && elem.local_x === 1
       // pc_error_local_x: planta.tipo === 'fija' && elem.local_x === 1
       //   return true;
     }
 
-    return false;
+    return true;
   }
 }

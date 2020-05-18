@@ -7,9 +7,10 @@ import { PlantaService } from '../../services/planta.service';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from '../../models/elementoPlanta';
 import { ValidateElementoPlantaPipe } from '../../pipes/validate-elemento-planta.pipe';
-import { take } from 'rxjs/operators';
-import { InformeInterface } from '../../models/informe';
+import { take, switchMap } from 'rxjs/operators';
 import { LocationAreaInterface } from 'src/app/models/location';
+import { PlantaInterface } from 'src/app/models/planta';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-edit-map',
@@ -27,7 +28,7 @@ export class EditMapComponent implements OnInit {
   allElementosPlanta: ElementoPlantaInterface[];
   polygonList: any[];
   informeId: string;
-  informe: InformeInterface;
+  planta: PlantaInterface;
 
   constructor(
     private route: ActivatedRoute,
@@ -84,10 +85,14 @@ export class EditMapComponent implements OnInit {
     });
     this.informeService
       .getInforme(this.informeId)
-      .pipe(take(1))
-      .subscribe((informe) => {
-        this.setLocAreaList(informe.plantaId);
-        this.informe = informe;
+      .pipe(
+        switchMap((informe) => {
+          return this.plantaService.getPlanta(informe.plantaId);
+        })
+      )
+      .subscribe((planta) => {
+        this.setLocAreaList(planta.id);
+        this.planta = planta;
       });
   }
 
@@ -103,13 +108,19 @@ export class EditMapComponent implements OnInit {
     // this.setImageFromRangeValue(this.rangeValue);
   }
   getFillColor(elementoPlanta: PcInterface & Estructura): string {
-    if (this.validateElem.transform(elementoPlanta)) {
-      return 'red';
+    if (this.validateElem.transform(elementoPlanta, this.planta)) {
+      return 'grey';
     }
-    return 'grey';
+    return 'red';
+  }
+  getCircleRadius() {
+    if (this.planta !== undefined) {
+      return this.planta.tipo === 'seguidores' ? 4 : 2;
+    }
+    return 2;
   }
   getStrokeColor(elementoPlanta: PcInterface & Estructura): string {
-    if (this.validateElem.transform(elementoPlanta)) {
+    if (!this.validateElem.transform(elementoPlanta, this.planta)) {
       return 'red';
     } else if (this.informeService.selectedElementoPlanta) {
       if (this.informeService.selectedElementoPlanta.archivo === elementoPlanta.archivo) {

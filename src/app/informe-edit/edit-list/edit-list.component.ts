@@ -6,11 +6,13 @@ import { ArchivoVueloInterface } from '../../models/archivoVuelo';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from '../../models/elementoPlanta';
 import { MatSort } from '@angular/material/sort';
-import { map } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 import { PcService } from '../../services/pc.service';
 import { combineLatest } from 'rxjs';
 import { Pc } from 'src/app/models/pc';
 import { Estructura } from 'src/app/models/estructura';
+import { PlantaService } from 'src/app/services/planta.service';
+import { PlantaInterface } from '../../models/planta';
 
 @Component({
   selector: 'app-edit-list',
@@ -32,8 +34,14 @@ export class EditListComponent implements OnInit {
   dataSource = new MatTableDataSource<ElementoPlantaInterface>();
   informeId: string;
   pcsOrEstructuras2: boolean;
+  planta: PlantaInterface;
 
-  constructor(private route: ActivatedRoute, public informeService: InformeService, public pcService: PcService) {}
+  constructor(
+    private route: ActivatedRoute,
+    public informeService: InformeService,
+    public pcService: PcService,
+    private plantaService: PlantaService
+  ) {}
 
   ngOnInit() {
     this.displayedColumnsEst = ['error', 'globalCoords', 'archivo'];
@@ -68,6 +76,17 @@ export class EditListComponent implements OnInit {
         this.setElementoPlanta(elementoPlanta);
       }
     });
+
+    this.informeService
+      .getInforme(this.informeId)
+      .pipe(
+        switchMap((informe) => {
+          return this.plantaService.getPlanta(informe.plantaId);
+        })
+      )
+      .subscribe((planta) => {
+        this.planta = planta;
+      });
   }
 
   setArchivoVuelo(archivoVuelo: ArchivoVueloInterface): void {

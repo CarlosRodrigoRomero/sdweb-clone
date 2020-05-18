@@ -7,7 +7,6 @@ import { LatLngLiteral } from '@agm/core/map-types';
 import { Observable } from 'rxjs';
 import { AgmPolygon, AgmMap } from '@agm/core';
 import { ModuloInterface } from '../../models/modulo';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -25,7 +24,6 @@ export class AutoLocComponent implements OnInit {
   @ViewChildren(AgmPolygon) polygonData: QueryList<AgmPolygon>;
   @ViewChild(AgmMap, { static: true }) map: any;
   @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   public planta: PlantaInterface;
   public defaultZoom: number;
@@ -97,7 +95,6 @@ export class AutoLocComponent implements OnInit {
       locArea.globalX.toString().toLowerCase() === filter;
 
     this.locAreaDataSource.sort = this.sort;
-    this.locAreaDataSource.paginator = this.paginator;
     this.locationAreaList$ = this.plantaService.getLocationsArea(this.plantaId);
     this.userAreaList$ = this.plantaService.getAllUserAreas(this.plantaId);
     this.locationAreaList$.subscribe((list) => {

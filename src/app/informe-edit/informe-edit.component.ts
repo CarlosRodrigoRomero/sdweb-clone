@@ -444,10 +444,15 @@ export class InformeEditComponent implements OnInit {
     return result;
   }
 
-  onChangeCarpetaJpgGray(event) {
+  onChangeCarpetaJpgGray() {
     this.informe.carpetaJpgGray = this.carpetaJpgGray;
     this.informeService.updateInforme(this.informe);
     this.getFileList();
+  }
+
+  onChangeNumGlobalCoords() {
+    console.log(this.planta.numeroGlobalCoords);
+    this.plantaService.updatePlanta(this.planta);
   }
 
   recalcularLocs() {

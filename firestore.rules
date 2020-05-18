@@ -14,6 +14,7 @@ service cloud.firestore {
   	}
     match /plantas/{plantaId} {
     	allow write, update: if request.auth.uid == "7h7k18OVARW0faC4tvjBMCblxlg2";
+      allow update: if request.auth.uid == "dgYtPws1dQPv8aZ24G940tstCZI3";
   	}
     match /plantas/{plantaId}/locationAreas/{locAreaId} {
     	allow write, update, delete: if request.auth.uid == "7h7k18OVARW0faC4tvjBMCblxlg2";
