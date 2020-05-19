@@ -473,15 +473,20 @@ export class InformeEditComponent implements OnInit {
   setCoordsList(list: any[]) {
     let gpsCoordsList = [];
     Object.keys(list).forEach((key) => {
-      const coords = list[key].coords.map((data) => {
-        return {
-          altitude: data.Altitude,
-          vuelo: key,
-          fileName: data.FileName,
-          lat: parseFloat(data.Latitude),
-          lng: parseFloat(data.Longitude),
-        };
-      });
+      const coords = list[key].coords
+        .map((data) => {
+          return {
+            altitude: data.Altitude,
+            vuelo: key,
+            fileName: data.FileName,
+            lat: parseFloat(data.Latitude),
+            lng: parseFloat(data.Longitude),
+          };
+        })
+        .filter((item, i, array) => {
+          // Esto hace mucho mas fluida la app
+          return i % 10 === 0;
+        });
       gpsCoordsList = gpsCoordsList.concat({ vuelo: key, coords });
     });
     this.gpsCoordsList = gpsCoordsList;
