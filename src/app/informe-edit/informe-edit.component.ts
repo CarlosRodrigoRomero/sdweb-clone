@@ -74,6 +74,7 @@ export class InformeEditComponent implements OnInit {
   public pcsOrEstructuras: boolean;
   public carpetaJpgGray: string;
   public planta$: Observable<PlantaInterface>;
+  public gpsCoordsList: LatLngLiteral[];
 
   informeId: string;
 
@@ -124,7 +125,7 @@ export class InformeEditComponent implements OnInit {
 
     this.url = GLOBAL.url;
     this.currentGpsCorrection = 0;
-    this.currentFlight = 'DJI_0001';
+    this.currentFlight = '';
 
     this.currentTrackheading = 0;
     this.currentImageRotation = 0;
@@ -163,16 +164,16 @@ export class InformeEditComponent implements OnInit {
     const arrayIndex = this.fileList.indexOf(archivoVuelo.archivo);
     this.rangeValue = arrayIndex + 1;
 
-    const coords = this.coords[arrayIndex];
+    const currentCcoords = this.coords[arrayIndex];
 
     // Setear this.currentLatLng (para que se extienda a todos los childs)
     this.currentLatLng = {
-      lat: parseFloat(coords.Latitude),
-      lng: parseFloat(coords.Longitude),
+      lat: parseFloat(currentCcoords.Latitude),
+      lng: parseFloat(currentCcoords.Longitude),
     };
 
-    this.currentDatetime = this.getDateTimeFromDateAndTime(this.coords[arrayIndex].Date, this.coords[arrayIndex].Time);
-    this.currentTrackheading = Math.round(this.coords[arrayIndex].TrackHeading);
+    this.currentDatetime = this.getDateTimeFromDateAndTime(currentCcoords.Date, currentCcoords.Time);
+    this.currentTrackheading = Math.round(currentCcoords.TrackHeading);
     this.currentImageRotation = this.getCurrentImageRotation(this.currentTrackheading);
   }
 
@@ -357,6 +358,7 @@ export class InformeEditComponent implements OnInit {
 
             this.changeFlight(this.flightsList[0]);
             this.setImageFromRangeValue(1);
+            this.setCoordsList(response2);
           }
         },
         (error) => {
@@ -432,9 +434,11 @@ export class InformeEditComponent implements OnInit {
   }
 
   changeFlight(flightName) {
-    this.currentFlight = flightName;
-    this.fileList = this.flightsData[flightName].files;
-    this.coords = this.flightsData[flightName].coords;
+    if (this.currentFlight !== flightName) {
+      this.currentFlight = flightName;
+      this.fileList = this.flightsData[flightName].files;
+      this.coords = this.flightsData[flightName].coords;
+    }
   }
 
   private pathJoin(parts: string[], sep = '\\') {
@@ -451,7 +455,6 @@ export class InformeEditComponent implements OnInit {
   }
 
   onChangeNumGlobalCoords() {
-    console.log(this.planta.numeroGlobalCoords);
     this.plantaService.updatePlanta(this.planta);
   }
 
@@ -466,5 +469,21 @@ export class InformeEditComponent implements OnInit {
     //   });
     //   this.updateLocalAreaInPc(pc, globalX, globalY, modulo);
     // });
+  }
+  setCoordsList(list: any[]) {
+    let gpsCoordsList = [];
+    Object.keys(list).forEach((key) => {
+      const coords = list[key].coords.map((data) => {
+        return {
+          altitude: data.Altitude,
+          vuelo: key,
+          fileName: data.FileName,
+          lat: parseFloat(data.Latitude),
+          lng: parseFloat(data.Longitude),
+        };
+      });
+      gpsCoordsList = gpsCoordsList.concat({ vuelo: key, coords });
+    });
+    this.gpsCoordsList = gpsCoordsList;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Input, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { AgmMap, LatLngLiteral } from '@agm/core';
 import { PcInterface } from 'src/app/models/pc';
 import { Estructura } from '../../models/estructura';
@@ -10,7 +10,6 @@ import { ValidateElementoPlantaPipe } from '../../pipes/validate-elemento-planta
 import { take, switchMap } from 'rxjs/operators';
 import { LocationAreaInterface } from 'src/app/models/location';
 import { PlantaInterface } from 'src/app/models/planta';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-edit-map',
@@ -20,7 +19,9 @@ import { Observable } from 'rxjs';
 })
 export class EditMapComponent implements OnInit {
   @ViewChild(AgmMap) map: any;
-  @Input() pcsOrEstructuras: boolean;
+  @Input() set gpsCoordsList(list: any) {
+    this.coordsList = list;
+  }
   @Input() currentLatLng: LatLngLiteral;
 
   mapType: string;
@@ -29,6 +30,9 @@ export class EditMapComponent implements OnInit {
   polygonList: any[];
   informeId: string;
   planta: PlantaInterface;
+  coordsList: LatLngLiteral[];
+  colorSameFlight: string;
+  colorOtherFlight: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -39,6 +43,8 @@ export class EditMapComponent implements OnInit {
 
   ngOnInit() {
     this.mapType = 'satellite';
+    this.colorSameFlight = 'white';
+    this.colorOtherFlight = 'aqua';
     this.defaultZoom = 18;
     this.currentLatLng = { lat: 39.453186, lng: -5.880743 };
     this.polygonList = [];
@@ -129,9 +135,9 @@ export class EditMapComponent implements OnInit {
     }
 
     if (elementoPlanta.vuelo === this.informeService.selectedArchivoVuelo.vuelo) {
-      return 'white';
+      return this.colorSameFlight;
     }
-    return 'aqua';
+    return this.colorOtherFlight;
   }
   getStrokeWeight(elementoPlanta: ElementoPlantaInterface): number {
     if (this.informeService.selectedElementoPlanta) {
@@ -143,6 +149,21 @@ export class EditMapComponent implements OnInit {
       return 2;
     }
     return 1;
+  }
+  getTrayectoryColor(vuelo: string) {
+    if (this.informeService.selectedArchivoVuelo.vuelo === vuelo) {
+      return this.colorSameFlight;
+    }
+    return this.colorOtherFlight;
+  }
+  getTrayectoryStrokeWeight(vuelo: string) {
+    if (this.informeService.selectedArchivoVuelo.vuelo === vuelo) {
+      return 2;
+    }
+    return 1;
+  }
+  onTrayectoryRightClick(event) {
+    console.log('EditMapComponent -> onTrayectoryRightClick -> event', event);
   }
 
   onMapMarkerClick(pc: PcInterface): void {

@@ -28,6 +28,16 @@
     >
     </agm-circle>
 
+    <agm-polyline
+      *ngFor="let item of coordsList"
+      [strokeWeight]="getTrayectoryStrokeWeight(item.vuelo)"
+      [strokeColor]="getTrayectoryColor(item.vuelo)"
+      (lineRightClick)="onTrayectoryRightClick($event)"
+    >
+      <agm-polyline-point *ngFor="let point of item.coords" [latitude]="point.lat" [longitude]="point.lng">
+      </agm-polyline-point>
+    </agm-polyline>
+
     <!-- <agm-marker
     [ngClass]="{ selected_marker: selected_pc === pc }"
     *ngFor="let pc of filterPcsByFlight(currentFlight)"
