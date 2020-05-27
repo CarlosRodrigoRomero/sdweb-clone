@@ -186,6 +186,7 @@ export class AutoLocComponent implements OnInit {
   }
 
   public selectArea(area: AreaInterface) {
+    console.log('AutoLocComponent -> selectArea -> area', area);
     this.selectedLocationArea = undefined;
     this.selectedUserArea = undefined;
 
@@ -249,6 +250,11 @@ export class AutoLocComponent implements OnInit {
     this.deleteAreaFromDb(area);
   }
 
+  copyArea(area: LocationAreaInterface) {
+    console.log('AutoLocComponent -> copyArea -> area', area);
+    this.createLocArea(area.path);
+  }
+
   checkIfUserArea(area: AreaInterface) {
     return 'userId' in area;
   }
@@ -264,7 +270,6 @@ export class AutoLocComponent implements OnInit {
   }
 
   updateArea(area: AreaInterface, moduleChange = false) {
-    console.log('AutoLocComponent -> updateArea -> area', area);
     if (this.checkIfUserArea(area)) {
       this.plantaService.updateUserArea(area as UserAreaInterface);
     } else {

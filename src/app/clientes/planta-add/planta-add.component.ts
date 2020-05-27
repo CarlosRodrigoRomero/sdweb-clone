@@ -29,7 +29,7 @@ export class PlantaAddComponent implements OnInit {
       num_modulos: [1, [Validators.required]],
       moduloPotencia: [1, [Validators.required]],
       vertical: [true, [Validators.required]],
-      zoom: 18,
+      zoom: 17,
       autoLocReady: false,
       alturaBajaPrimero: true,
     });
