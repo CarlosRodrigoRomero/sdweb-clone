@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PlantaInterface } from '../../models/planta';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-planta-add',
@@ -14,7 +15,7 @@ export class PlantaAddComponent implements OnInit {
   loading: boolean;
   success: boolean;
 
-  constructor(private fb: FormBuilder, private afs: AngularFirestore) {}
+  constructor(private fb: FormBuilder, private afs: AngularFirestore, private router: Router) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -44,6 +45,7 @@ export class PlantaAddComponent implements OnInit {
       nuevaPlanta.id = id;
       await this.afs.collection('plantas').doc(id).set(nuevaPlanta);
       this.success = true;
+      this.router.navigate(['/clientes']);
     } catch (err) {
       console.log(err);
     }

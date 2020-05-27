@@ -186,7 +186,6 @@ export class AutoLocComponent implements OnInit {
   }
 
   public selectArea(area: AreaInterface) {
-    console.log('AutoLocComponent -> selectArea -> area', area);
     this.selectedLocationArea = undefined;
     this.selectedUserArea = undefined;
 
@@ -251,7 +250,6 @@ export class AutoLocComponent implements OnInit {
   }
 
   copyArea(area: LocationAreaInterface) {
-    console.log('AutoLocComponent -> copyArea -> area', area);
     this.createLocArea(area.path);
   }
 

@@ -17,7 +17,7 @@
       <mat-radio-group formControlName="tipo" aria-label="Tipo">
         <mat-radio-button value="fija">Fija</mat-radio-button>
         <mat-radio-button value="1 eje">1 eje</mat-radio-button>
-        <mat-radio-button value="seguidores">Seguidores</mat-radio-button>
+        <mat-radio-button value="seguidores">Seguidores (2 ejes)</mat-radio-button>
       </mat-radio-group>
 
       <mat-form-field>
@@ -28,13 +28,6 @@
         <input matInput formControlName="empresa" placeholder="Empresa (id)" />
       </mat-form-field>
 
-      <mat-form-field>
-        <input matInput type="number" formControlName="filas" placeholder="Filas" />
-      </mat-form-field>
-
-      <mat-form-field>
-        <input matInput type="number" formControlName="columnas" placeholder="Columnas" />
-      </mat-form-field>
       <!-- <mat-form-field>
         <input matInput type="number" formControlName="num_modulos" placeholder="Número de módulos" />
       </mat-form-field>
@@ -43,8 +36,8 @@
       </mat-form-field> -->
 
       <mat-radio-group formControlName="vertical" aria-label="Modulos orientados verticalmente">
-        <mat-radio-button [value]="true">Vertical</mat-radio-button>
-        <mat-radio-button [value]="false">Horizontal</mat-radio-button>
+        <mat-radio-button [value]="true">Modulos orientados verticalmente</mat-radio-button>
+        <mat-radio-button [value]="false">Modulos orientados horizontalmente</mat-radio-button>
       </mat-radio-group>
 
       <button mat-button color="primary" type="submit" [disabled]="form.invalid">
