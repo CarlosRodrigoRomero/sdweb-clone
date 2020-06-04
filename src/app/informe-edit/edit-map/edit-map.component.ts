@@ -204,12 +204,11 @@ export class EditMapComponent implements OnInit {
     this.onMapElementoPlantaClick(elementoPlanta);
 
     // TODO: implementar globalCoordsFromLocation
-    let globalX;
-    let globalY;
+    let globalCoords;
     let modulo;
-    [globalX, globalY, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(event.coords);
+    [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(elementoPlanta.getLatLng());
 
-    elementoPlanta.setGlobals([globalX, globalY]);
+    elementoPlanta.setGlobals(globalCoords);
     elementoPlanta.setModulo(modulo);
 
     this.informeService.updateElementoPlanta(this.informeId, elementoPlanta);
@@ -236,6 +235,7 @@ export class EditMapComponent implements OnInit {
               id: locationArea.id,
               globalX: locationArea.globalX,
               globalY: locationArea.globalY,
+              globalCoords: locationArea.globalCoords,
               modulo: locationArea.modulo,
             })
             .then((polygon: any) => {

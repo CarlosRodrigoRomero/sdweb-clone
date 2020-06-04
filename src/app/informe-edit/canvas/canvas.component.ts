@@ -628,10 +628,9 @@ export class CanvasComponent implements OnInit {
     }
 
     // Localizaciones
-    let globalX;
-    let globalY;
+    let globalCoords;
     let modulo;
-    [globalX, globalY, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.currentLatLng);
+    [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.currentLatLng);
 
     // Creamos el nuevo PC
     this.localIdCount += 1;
@@ -643,8 +642,7 @@ export class CanvasComponent implements OnInit {
       tipo: GLOBAL.anomaliaPorDefecto, // tipo (diodo bypass por defecto)
       local_x: columnaReal, // local_x
       local_y: filaReal, // local_x
-      global_x: globalX, // global_x
-      global_y: globalY, // global_y
+      globalCoords, //
       gps_lng: this.currentLatLng.lng,
       gps_lat: this.currentLatLng.lat,
       img_left: rectInteriorPc.left,
@@ -928,7 +926,9 @@ export class CanvasComponent implements OnInit {
 
     // Aqui ya tenemos los punts de la estructura (points)
     // Crear nueva estructura en la base de datos
-    const [globalX, globalY, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.currentLatLng);
+    let globalCoords;
+    let modulo;
+    [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.currentLatLng);
 
     const nuevaEstructura = {
       archivo: this.informeService.selectedArchivoVuelo.archivo,
@@ -941,11 +941,10 @@ export class CanvasComponent implements OnInit {
       vuelo: this.informeService.selectedArchivoVuelo.vuelo,
       latitud: this.currentLatLng.lat,
       longitud: this.currentLatLng.lng,
-      globalCoords: [null, null, null],
+      globalCoords,
     } as EstructuraInterface;
 
     const nuevaEstructuraObj = new Estructura(nuevaEstructura);
-    nuevaEstructuraObj.setGlobals([globalX, globalY]);
     nuevaEstructuraObj.setModulo(modulo as ModuloInterface);
 
     // Dibujar dicha estructura

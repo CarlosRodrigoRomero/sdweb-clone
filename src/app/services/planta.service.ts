@@ -403,17 +403,30 @@ export class PlantaService {
   getGlobalCoordsFromLocationArea(coords: LatLngLiteral) {
     const latLng = new google.maps.LatLng(coords.lat, coords.lng);
 
-    let globalX = '';
-    let globalY = '';
+    let globalCoords = [null, null, null];
     let modulo: ModuloInterface = {};
+
     if (this.locAreaList !== undefined) {
       this.locAreaList.forEach((polygon, i, array) => {
         if (google.maps.geometry.poly.containsLocation(latLng, polygon)) {
+          console.log('PlantaService -> getGlobalCoordsFromLocationArea -> polygon', polygon);
+
           if (polygon.globalX.length > 0) {
-            globalX = polygon.globalX;
+            globalCoords[0] = polygon.globalX;
           }
           if (polygon.globalY.length > 0) {
-            globalY = polygon.globalY;
+            globalCoords[1] = polygon.globalY;
+          }
+          if (polygon.hasOwnProperty('globalCoords') && polygon.globalCoords !== undefined) {
+            let bool = false;
+            polygon.globalCoords.forEach((item) => {
+              if (item !== null && item.length > 0) {
+                bool = true;
+              }
+            });
+            if (bool) {
+              globalCoords = polygon.globalCoords;
+            }
           }
 
           if (polygon.hasOwnProperty('modulo')) {
@@ -425,6 +438,6 @@ export class PlantaService {
       });
     }
 
-    return [globalX, globalY, modulo];
+    return [globalCoords, modulo];
   }
 }

@@ -62,6 +62,7 @@ export interface PcInterface {
   modulo: ModuloInterface;
   clase?: number;
   numeroSerie?: string;
+  globalCoords?: any[];
 }
 
 export class Pc implements PcInterface, ElementoPlantaInterface {

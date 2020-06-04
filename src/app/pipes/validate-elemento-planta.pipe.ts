@@ -11,7 +11,9 @@ export class ValidateElementoPlantaPipe implements PipeTransform {
     let numeroGlobalCoords = 2;
     let globalCoords = [];
     if (elem.hasOwnProperty('globalCoords')) {
-      globalCoords = elem.globalCoords;
+      globalCoords = elem.globalCoords.map((element) => {
+        return element === null ? '' : element;
+      });
     } else {
       globalCoords = [elem.global_x, elem.global_y];
     }
@@ -27,16 +29,12 @@ export class ValidateElementoPlantaPipe implements PipeTransform {
         return false;
       }
       if (numeroGlobalCoords === 1) {
-        if (globalCoords[0] === null && globalCoords[1] === null) {
-          return false;
-        } else if (globalCoords[0].toString().length === 0 && globalCoords[1].toString().length === 0) {
+        if (globalCoords[0].toString().length === 0 && globalCoords[1].toString().length === 0) {
           return false;
         }
         return true;
       } else {
-        if (globalCoords[0] === null || globalCoords[1] == null) {
-          return false;
-        } else if (globalCoords[0].toString().length === 0 || globalCoords[1].toString().length === 0) {
+        if (globalCoords[0].toString().length === 0 || globalCoords[1].toString().length === 0) {
           return false;
         }
         return true;
