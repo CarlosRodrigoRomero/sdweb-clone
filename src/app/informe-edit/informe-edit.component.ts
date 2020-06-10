@@ -353,12 +353,15 @@ export class InformeEditComponent implements OnInit {
             this.alertMessage = 'No hay archivos';
           } else {
             this.flightsData = response2;
-            this.flightsList = Object.keys(this.flightsData);
-            this.flightsList.sort();
-
-            this.changeFlight(this.flightsList[0]);
-            this.setImageFromRangeValue(1);
-            this.setCoordsList(response2);
+            if (this.checkCorrectFileList(this.flightsData)) {
+              this.flightsList = Object.keys(this.flightsData);
+              this.flightsList.sort();
+              this.changeFlight(this.flightsList[0]);
+              this.setImageFromRangeValue(1);
+              this.setCoordsList(response2);
+            } else {
+              this.alertMessage = 'Carpeta de vuelo incorrecta';
+            }
           }
         },
         (error) => {
@@ -370,6 +373,16 @@ export class InformeEditComponent implements OnInit {
           }
         }
       );
+  }
+
+  private checkCorrectFileList(flightsData): boolean {
+    const flightsList = Object.keys(this.flightsData);
+    const fileName = flightsData[flightsList[0]].files[0] as string;
+    if (fileName.startsWith(this.informe.prefijo)) {
+      console.log('InformeEditComponent -> checkCorrectFileList -> fileName', fileName);
+      return true;
+    }
+    return false;
   }
 
   sortPcs(array: PcInterface[]) {
