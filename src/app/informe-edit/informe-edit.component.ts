@@ -379,7 +379,6 @@ export class InformeEditComponent implements OnInit {
     const flightsList = Object.keys(this.flightsData);
     const fileName = flightsData[flightsList[0]].files[0] as string;
     if (fileName.startsWith(this.informe.prefijo)) {
-      console.log('InformeEditComponent -> checkCorrectFileList -> fileName', fileName);
       return true;
     }
     return false;
