@@ -582,7 +582,7 @@ export class CanvasComponent implements OnInit {
     });
   }
 
-  onDblClickCanvas(event) {
+  onDblClickCanvas(event: MouseEvent) {
     let fila: number;
     let columna: number;
     let columnaReal: number;
@@ -598,13 +598,15 @@ export class CanvasComponent implements OnInit {
       [fila, columna] = this.estructura.calcularFilaColumna(event.offsetX, event.offsetY);
 
       [columnaReal, filaReal] = this.estructura.getLocalCoordsFromEstructura(columna, fila);
-
-      // const cuadrilateroPc = this.estructura.getCuadrilatero(columna, fila);
-      rectInteriorPc = this.estructura.getRectanguloInterior(columna, fila);
       [columnaRef, filaRef] = this.estructura.getFilaColumnaRef(columna, fila);
 
-      // const cuadrilateroRef = this.estructura.getCuadrilatero(columnaRef, filaRef);
-      rectInteriorRef = this.estructura.getRectanguloInterior(columnaRef, filaRef);
+      if (event.ctrlKey) {
+        rectInteriorPc = this.estructura.getRectanguloExterior(columna, fila);
+        rectInteriorRef = this.estructura.getRectanguloExterior(columnaRef, filaRef);
+      } else {
+        rectInteriorPc = this.estructura.getRectanguloInterior(columna, fila);
+        rectInteriorRef = this.estructura.getRectanguloInterior(columnaRef, filaRef);
+      }
 
       this.setSquareBase(
         this.planta,
@@ -675,8 +677,7 @@ export class CanvasComponent implements OnInit {
           newPc.refLeft = selectedPc.refLeft;
         }
         if (this.selectedPc.archivo === newPc.archivo && this.planta.tipo === 'seguidores') {
-          newPc.global_x = selectedPc.global_x;
-          newPc.global_y = selectedPc.global_y;
+          newPc.globalCoords = selectedPc.globalCoords;
           newPc.gps_lng = selectedPc.gps_lng;
           newPc.gps_lat = selectedPc.gps_lat;
         }
