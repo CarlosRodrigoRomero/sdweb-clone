@@ -275,4 +275,18 @@
       [(ngModel)]="selectedPc.local_y"
     />
   </div>
+  <div class="row">
+    <div class="col selected-pc-coord-list">
+      <label *ngFor="let gc of global.globalCoordsEstructura">
+        G_<b>{{ gc }}: </b>
+        <input
+          [(ngModel)]="selectedPc.globalCoords[gc]"
+          id="global{{ gc }}"
+          (change)="updatePcInDb(selectedPc, false)"
+          maxlength="4"
+          size="4"
+        />
+      </label>
+    </div>
+  </div>
 </div>

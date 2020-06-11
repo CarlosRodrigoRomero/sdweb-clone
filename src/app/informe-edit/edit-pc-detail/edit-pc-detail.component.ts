@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { PlantaInterface } from 'src/app/models/planta';
 import { take } from 'rxjs/operators';
 import { PcService } from '../../services/pc.service';
+import { GLOBAL } from 'src/app/services/global';
 
 @Component({
   selector: 'app-edit-pc-detail',
@@ -17,6 +18,7 @@ export class EditPcDetailComponent implements OnInit {
   planta: PlantaInterface;
   filasArray: number[];
   columnasArray: number[];
+  global = GLOBAL;
 
   @Input() set planta$(obs: Observable<PlantaInterface>) {
     obs.pipe(take(1)).subscribe((planta) => {
@@ -73,22 +75,22 @@ export class EditPcDetailComponent implements OnInit {
     this.updatePcInDb(selectedPc);
   }
 
-  updateLocAreaInPc(pc, globalX, globalY, modulo) {
-    if (globalX.length > 0) {
-      pc.global_x = globalX;
-    }
-    if (globalY.length > 0) {
-      pc.global_y = globalY;
-    }
+  // updateLocAreaInPc(pc, globalX, globalY, modulo) {
+  //   if (globalX.length > 0) {
+  //     pc.global_x = globalX;
+  //   }
+  //   if (globalY.length > 0) {
+  //     pc.global_y = globalY;
+  //   }
 
-    if (Object.entries(modulo).length > 0 && modulo.constructor === Object) {
-      pc.modulo = modulo;
-    }
+  //   if (Object.entries(modulo).length > 0 && modulo.constructor === Object) {
+  //     pc.modulo = modulo;
+  //   }
 
-    // pc.datetime = this.current_datetime;
+  //   // pc.datetime = this.current_datetime;
 
-    this.updatePcInDb(pc);
-  }
+  //   this.updatePcInDb(pc);
+  // }
 
   updatePcInDb(pc: Pc) {
     this.pcService.updatePc(pc).then((res) => {
