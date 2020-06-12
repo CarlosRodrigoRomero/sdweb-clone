@@ -537,7 +537,6 @@ export class CanvasComponent implements OnInit {
       // Si es un pc/ref
       if (options.target !== null && options.target.hasOwnProperty('ref')) {
         const selectedPc = this.allPcs.find((item) => item.id === options.target.id);
-        console.log('CanvasComponent -> initCanvasListeners -> selectedPc', selectedPc);
         this.informeService.selectElementoPlanta(selectedPc);
 
         ///////////////////
@@ -675,6 +674,10 @@ export class CanvasComponent implements OnInit {
           newPc.refWidth = selectedPc.refWidth;
           newPc.refTop = selectedPc.refTop;
           newPc.refLeft = selectedPc.refLeft;
+          if (event.shiftKey) {
+            newPc.img_width = selectedPc.img_width;
+            newPc.img_height = selectedPc.img_height;
+          }
         }
         if (this.selectedPc.archivo === newPc.archivo && this.planta.tipo === 'seguidores') {
           newPc.globalCoords = selectedPc.globalCoords;

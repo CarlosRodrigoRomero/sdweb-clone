@@ -7,6 +7,7 @@ import { PlantaInterface } from 'src/app/models/planta';
 import { take } from 'rxjs/operators';
 import { PcService } from '../../services/pc.service';
 import { GLOBAL } from 'src/app/services/global';
+import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 
 @Component({
   selector: 'app-edit-pc-detail',
@@ -34,8 +35,70 @@ export class EditPcDetailComponent implements OnInit {
     });
   }
 
-  constructor(public informeService: InformeService, public pcService: PcService) {}
-
+  constructor(
+    public informeService: InformeService,
+    public pcService: PcService,
+    private hotkeysService: HotkeysService
+  ) {
+    this.hotkeysService.add(
+      new Hotkey('1', (event: KeyboardEvent): boolean => {
+        if (this.checkSelectedPc()) {
+          this.selectedPc.tipo = 8;
+          this.updatePcInDb(this.selectedPc);
+        }
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
+      new Hotkey('2', (event: KeyboardEvent): boolean => {
+        if (this.checkSelectedPc()) {
+          this.selectedPc.tipo = 9;
+          this.updatePcInDb(this.selectedPc);
+        }
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
+      new Hotkey('3', (event: KeyboardEvent): boolean => {
+        if (this.checkSelectedPc()) {
+          this.selectedPc.tipo = 3;
+          this.updatePcInDb(this.selectedPc);
+        }
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
+      new Hotkey('4', (event: KeyboardEvent): boolean => {
+        if (this.checkSelectedPc()) {
+          this.selectedPc.tipo = 17;
+          this.updatePcInDb(this.selectedPc);
+        }
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
+      new Hotkey('5', (event: KeyboardEvent): boolean => {
+        if (this.checkSelectedPc()) {
+          this.selectedPc.tipo = 5;
+          this.updatePcInDb(this.selectedPc);
+        }
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
+      new Hotkey('q', (event: KeyboardEvent): boolean => {
+        if (this.checkSelectedPc()) {
+          this.onClickDeletePc(this.selectedPc);
+        }
+        return false; // Prevent bubbling
+      })
+    );
+  }
+  checkSelectedPc() {
+    return (
+      this.selectedPc !== undefined && this.selectedPc.archivo === this.informeService.selectedArchivoVuelo.archivo
+    );
+  }
   ngOnInit(): void {
     this.informeService.selectedElementoPlanta$.subscribe((elementoPlanta) => {
       if (elementoPlanta !== null) {
