@@ -6,11 +6,11 @@ import { ArchivoVueloInterface } from '../../models/archivoVuelo';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from '../../models/elementoPlanta';
 import { MatSort } from '@angular/material/sort';
-import { map, switchMap, take } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { PcService } from '../../services/pc.service';
 import { combineLatest } from 'rxjs';
 import { Pc } from 'src/app/models/pc';
-import { Estructura } from 'src/app/models/estructura';
+import { EstructuraConPcs, Estructura } from 'src/app/models/estructura';
 import { PlantaService } from 'src/app/services/planta.service';
 import { PlantaInterface } from '../../models/planta';
 
@@ -22,16 +22,16 @@ import { PlantaInterface } from '../../models/planta';
 export class EditListComponent implements OnInit {
   @Input() set pcsOrEstructuras(value: boolean) {
     this.pcsOrEstructuras2 = value;
-    this.onChangePcsOrEstructuras(value);
+    // this.onChangePcsOrEstructuras(value);
   }
 
-  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+  // @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
-  private displayedColumnsEst: string[];
-  private displayedColumnsPc: string[];
-  displayedColumns: string[];
-  dataSource = new MatTableDataSource<ElementoPlantaInterface>();
+  displayedColumnsEst: string[];
+  displayedColumnsPc: string[];
+  dataSourceEst = new MatTableDataSource<EstructuraConPcs>();
+  dataSourcePcs = new MatTableDataSource<Pc>();
   informeId: string;
   pcsOrEstructuras2: boolean;
   planta: PlantaInterface;
@@ -44,14 +44,15 @@ export class EditListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.displayedColumnsEst = ['error', 'globalCoords', 'archivo'];
-    this.displayedColumnsPc = ['error', 'localId', 'tipo', 'globalCoords', 'localCoords', 'modulo', 'archivo'];
-    this.displayedColumns = this.displayedColumnsEst;
     this.informeId = this.route.snapshot.paramMap.get('id');
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-    this.dataSource.filterPredicate = (data: ElementoPlantaInterface, filter: string) => {
-      return this.pcsOrEstructuras2 ? data.constructor.name === Pc.name : data.constructor.name === Estructura.name;
+    this.displayedColumnsPc = ['error', 'localId', 'tipo', 'globalCoords', 'localCoords', 'modulo'];
+
+    this.displayedColumnsEst = ['error', 'vuelo', 'globalCoords', 'archivo'];
+    // this.dataSourceEst.paginator = this.paginator;
+    this.dataSourceEst.sort = this.sort;
+    this.dataSourceEst.filterPredicate = (data: EstructuraConPcs, filter: string) => {
+      // return this.pcsOrEstructuras2 ? data.constructor.name === Pc.name : data.constructor.name === Estructura.name;
+      return true;
     };
 
     const allEstructuras$ = this.informeService.getAllEstructuras(this.informeId).pipe(
@@ -62,9 +63,14 @@ export class EditListComponent implements OnInit {
     const allPcs$ = this.pcService.getPcsInformeEdit(this.informeId);
 
     combineLatest([allEstructuras$, allPcs$]).subscribe((elem) => {
-      let data = new Array<ElementoPlantaInterface>();
-      data = data.concat([...elem[0], ...elem[1]]);
-      this.dataSource.data = data;
+      const estConPcs = elem[0].map((est) => {
+        const pcs = elem[1].filter((pc) => {
+          return pc.archivo === est.archivo;
+        });
+        return { estructura: est, pcs };
+      });
+
+      this.dataSourceEst.data = estConPcs;
     });
 
     this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
@@ -101,17 +107,27 @@ export class EditListComponent implements OnInit {
     // Comunicar al componente principal que el elemento seleccionado cambia
     this.setElementoPlanta(elementoPlanta);
     this.informeService.selectElementoPlanta(elementoPlanta);
+
+    if (elementoPlanta.constructor.name === Estructura.name) {
+      this.dataSourcePcs.data = this.dataSourceEst.data
+        .filter((item) => {
+          return item.estructura.id === elementoPlanta.id;
+        })
+        .map((item) => {
+          return item.pcs;
+        })[0];
+    }
   }
 
   applyFilter(filterValue: string) {
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-    this.dataSource.filter = filterValue;
+    this.dataSourceEst.filter = filterValue;
   }
 
   onChangePcsOrEstructuras(val: boolean) {
-    this.displayedColumns = val ? this.displayedColumnsPc : this.displayedColumnsEst;
-    this.dataSource.filter = '';
+    // this.displayedColumns = val ? this.displayedColumnsPc : this.displayedColumnsEst;
+    // this.dataSource.filter = '';
   }
 
   private dynamicSort(property) {

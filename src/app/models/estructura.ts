@@ -3,6 +3,7 @@ import { ElementoPlantaInterface } from './elementoPlanta';
 import { LatLngLiteral } from '@agm/core';
 import { ModuloInterface } from './modulo';
 import { Point } from '@agm/core/services/google-maps-types';
+import { Pc } from './pc';
 
 export interface RectanguloInterface {
   top: number;
@@ -15,6 +16,10 @@ export interface CuadrilateroInterface {
   tr: Point;
   br: Point;
   bl: Point;
+}
+export interface EstructuraConPcs {
+  estructura: Estructura;
+  pcs: Pc[];
 }
 
 export interface EstructuraInterface {
@@ -48,6 +53,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   longitud: number;
   globalCoords: any[];
   modulo?: ModuloInterface;
+
   private estructuraMatrix: any[];
 
   constructor(est: EstructuraInterface) {
