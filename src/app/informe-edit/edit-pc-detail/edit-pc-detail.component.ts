@@ -86,6 +86,15 @@ export class EditPcDetailComponent implements OnInit {
       })
     );
     this.hotkeysService.add(
+      new Hotkey('0', (event: KeyboardEvent): boolean => {
+        if (this.checkSelectedPc()) {
+          this.selectedPc.tipo = 15;
+          this.updatePcInDb(this.selectedPc);
+        }
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
       new Hotkey('q', (event: KeyboardEvent): boolean => {
         if (this.checkSelectedPc()) {
           this.onClickDeletePc(this.selectedPc);

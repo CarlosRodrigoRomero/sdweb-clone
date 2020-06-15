@@ -175,7 +175,6 @@ export class CanvasComponent implements OnInit {
     this.canvas.getObjects().forEach((obj) => {
       if (obj.id === elem.id) {
         obj.set('strokeWidth', 3);
-        console.log('CanvasComponent -> selectPcInCanvas -> obj', obj);
       } else {
         obj.set('strokeWidth', 1);
       }
@@ -631,7 +630,7 @@ export class CanvasComponent implements OnInit {
     // Localizaciones
     let globalCoords;
     let modulo;
-    [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.currentLatLng);
+    [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.estructura.getLatLng());
 
     // Creamos el nuevo PC
     this.localIdCount += 1;

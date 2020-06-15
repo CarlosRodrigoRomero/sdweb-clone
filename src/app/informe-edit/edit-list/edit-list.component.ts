@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { InformeService } from '../../services/informe.service';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
 import { ArchivoVueloInterface } from '../../models/archivoVuelo';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from '../../models/elementoPlanta';
@@ -22,7 +21,6 @@ import { PlantaInterface } from '../../models/planta';
 export class EditListComponent implements OnInit {
   @Input() set pcsOrEstructuras(value: boolean) {
     this.pcsOrEstructuras2 = value;
-    // this.onChangePcsOrEstructuras(value);
   }
 
   // @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -123,11 +121,6 @@ export class EditListComponent implements OnInit {
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
     this.dataSourceEst.filter = filterValue;
-  }
-
-  onChangePcsOrEstructuras(val: boolean) {
-    // this.displayedColumns = val ? this.displayedColumnsPc : this.displayedColumnsEst;
-    // this.dataSource.filter = '';
   }
 
   private dynamicSort(property) {
