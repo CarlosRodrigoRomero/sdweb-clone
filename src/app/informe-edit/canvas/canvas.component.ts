@@ -678,13 +678,15 @@ export class CanvasComponent implements OnInit {
             newPc.img_height = selectedPc.img_height;
           }
         }
-        if (this.selectedPc.archivo === newPc.archivo && this.planta.tipo === 'seguidores') {
-          newPc.globalCoords = selectedPc.globalCoords;
-          newPc.gps_lng = selectedPc.gps_lng;
-          newPc.gps_lat = selectedPc.gps_lat;
-        }
-        if (selectedPc.archivo === newPc.archivo && this.estructura.columnas === 1) {
-          newPc.local_x = selectedPc.local_x;
+        if (!this.estructura) {
+          if (this.selectedPc.archivo === newPc.archivo && this.planta.tipo === 'seguidores') {
+            newPc.globalCoords = selectedPc.globalCoords;
+            newPc.gps_lng = selectedPc.gps_lng;
+            newPc.gps_lat = selectedPc.gps_lat;
+          }
+          // if (selectedPc.archivo === newPc.archivo && this.estructura.columnas === 1) {
+          //   newPc.local_x = selectedPc.local_x;
+          // }
         }
       }
     }

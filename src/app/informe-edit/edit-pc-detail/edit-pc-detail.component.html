@@ -225,7 +225,7 @@
         G_<b>{{ gc }}: </b>
         <input
           [(ngModel)]="selectedPc.globalCoords[gc]"
-          id="global{{ gc }}"
+          id="global{{ gc }}-pc-detail"
           (change)="updatePcInDb(selectedPc, false)"
           maxlength="4"
           size="4"

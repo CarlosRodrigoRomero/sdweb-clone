@@ -182,8 +182,6 @@
 
         <div class="col col-xs-6 mapa">
           <app-edit-map [currentLatLng]="currentLatLng" [gpsCoordsList]="gpsCoordsList"> </app-edit-map>
-          <!-- <button *ngIf="(user | async).role === 1" (click)="recalcularLocs()">Recalcular locs</button> -->
-
           <app-edit-pc-detail *ngIf="pcsOrEstructuras"></app-edit-pc-detail>
         </div>
       </div>

@@ -47,7 +47,6 @@ export class InformeEditComponent implements OnInit {
   public currentImageRotation: number;
   public currentGpsCorrection: number;
   public rangeValue: number;
-  public selected_pc: PcInterface;
   public flightsData: any;
   public flightsList: string[];
   public currentFlight: string;
@@ -470,18 +469,6 @@ export class InformeEditComponent implements OnInit {
     this.plantaService.updatePlanta(this.planta);
   }
 
-  recalcularLocs() {
-    // this.allPcs.forEach((pc) => {
-    //   let globalX;
-    //   let globalY;
-    //   let modulo;
-    //   [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea({
-    //     lat: pc.gps_lat,
-    //     lng: pc.gps_lng,
-    //   });
-    //   this.updateLocalAreaInPc(pc, globalX, globalY, modulo);
-    // });
-  }
   setCoordsList(list: any[]) {
     let gpsCoordsList = [];
     Object.keys(list).forEach((key) => {

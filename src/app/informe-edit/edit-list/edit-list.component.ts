@@ -33,6 +33,7 @@ export class EditListComponent implements OnInit {
   informeId: string;
   pcsOrEstructuras2: boolean;
   planta: PlantaInterface;
+  estConPcs: EstructuraConPcs[];
 
   constructor(
     private route: ActivatedRoute,
@@ -61,14 +62,14 @@ export class EditListComponent implements OnInit {
     const allPcs$ = this.pcService.getPcsInformeEdit(this.informeId);
 
     combineLatest([allEstructuras$, allPcs$]).subscribe((elem) => {
-      const estConPcs = elem[0].map((est) => {
+      this.estConPcs = elem[0].map((est) => {
         const pcs = elem[1].filter((pc) => {
           return pc.archivo === est.archivo;
         });
         return { estructura: est, pcs };
       });
 
-      this.dataSourceEst.data = estConPcs;
+      this.dataSourceEst.data = this.estConPcs;
     });
 
     this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
@@ -91,6 +92,24 @@ export class EditListComponent implements OnInit {
       .subscribe((planta) => {
         this.planta = planta;
       });
+  }
+
+  recalcularLocs() {
+    this.estConPcs.forEach((estConPcs: EstructuraConPcs) => {
+      const estructura = estConPcs.estructura;
+      let globalCoords;
+      let modulo;
+      [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(estructura.getLatLng());
+      estructura.globalCoords = globalCoords;
+      estructura.modulo = modulo;
+      this.informeService.updateEstructura(this.informeId, estructura);
+      estConPcs.pcs.forEach((pc) => {
+        pc.globalCoords = globalCoords;
+        pc.modulo = modulo;
+        this.pcService.updatePc(pc);
+        console.log('EditListComponent -> recalcularLocs -> pc', pc);
+      });
+    });
   }
 
   setArchivoVuelo(archivoVuelo: ArchivoVueloInterface): void {
