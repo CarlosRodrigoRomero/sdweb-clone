@@ -94,11 +94,18 @@ export class PcListComponent implements OnInit, AfterViewInit {
             pc.local_id.toString().toLowerCase().includes(filter)
           );
         } else {
-          return (
-            pc.local_id.toString().toLowerCase().includes(filter) ||
-            pc.global_x.toString().toLowerCase().includes(filter) ||
-            pc.global_y.toString().toLowerCase().includes(filter)
-          );
+          if (pc.hasOwnProperty('globalCoords')) {
+            return (
+              pc.local_id.toString().toLowerCase().includes(filter) ||
+              pc.globalCoords.toString().toLowerCase().includes(filter)
+            );
+          } else {
+            return (
+              pc.local_id.toString().toLowerCase().includes(filter) ||
+              pc.global_x.toString().toLowerCase().includes(filter) ||
+              pc.global_y.toString().toLowerCase().includes(filter)
+            );
+          }
         }
       };
     });
