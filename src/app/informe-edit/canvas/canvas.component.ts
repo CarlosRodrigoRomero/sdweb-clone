@@ -96,6 +96,10 @@ export class CanvasComponent implements OnInit {
       } else {
         this.localIdCount = 0;
       }
+      // this.allPcs.forEach((pc) => {
+      //   console.log('CanvasComponent -> ngOnInit -> pc', pc.id);
+      //   this.pcService.updatePc(pc);
+      // });
     });
 
     this.estructura = null;
@@ -692,7 +696,6 @@ export class CanvasComponent implements OnInit {
     }
 
     this.pcService.addPc(newPc).then((pcRef) => {
-      newPc.id = pcRef.id;
       this.drawPcInCanvas(newPc);
       this.informeService.selectElementoPlanta(new Pc(newPc));
     });
