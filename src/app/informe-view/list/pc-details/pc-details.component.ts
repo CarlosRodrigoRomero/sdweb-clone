@@ -37,6 +37,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
   private canvas: any;
   public alreadyOpened: boolean;
   public imageLoaded: boolean;
+  public columnsToDisplay: string[];
   // private tooltipElement: any;
 
   constructor(
@@ -52,6 +53,7 @@ export class PcDetailsComponent implements OnInit, OnChanges {
     this.fResize = this.canvasWidth / GLOBAL.resolucionCamara[1];
     this.alreadyOpened = false;
     this.imageLoaded = false;
+    this.columnsToDisplay = this.plantaService.getGlobalCoordsColumns(this.planta, []);
 
     // if (!this.pc.downloadUrl$) {
     //   this.pc.downloadUrl$ = this.storage

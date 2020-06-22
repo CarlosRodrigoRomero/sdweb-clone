@@ -120,9 +120,9 @@ export class EditMapComponent implements OnInit {
     return 'red';
   }
   getCircleRadius() {
-    if (this.planta !== undefined) {
-      return this.planta.tipo === 'seguidores' ? 4 : 2;
-    }
+    // if (this.planta !== undefined) {
+    //   return this.planta.tipo === 'seguidores' ? 4 : 2;
+    // }
     return 2;
   }
   getStrokeColor(elementoPlanta: PcInterface & Estructura): string {
