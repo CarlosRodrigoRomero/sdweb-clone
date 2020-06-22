@@ -107,7 +107,6 @@ export class EditListComponent implements OnInit {
         pc.globalCoords = globalCoords;
         pc.modulo = modulo;
         this.pcService.updatePc(pc);
-        console.log('EditListComponent -> recalcularLocs -> pc', pc);
       });
     });
   }

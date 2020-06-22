@@ -264,12 +264,12 @@ export class PlantaService {
   getNombreSeguidor(pc: PcInterface) {
     let nombreSeguidor = '';
     if (pc.hasOwnProperty('global_x')) {
-      if (!Number.isNaN(pc.global_x)) {
+      if (!Number.isNaN(pc.global_x) && pc.global_x !== null) {
         nombreSeguidor = nombreSeguidor.concat(pc.global_x.toString());
       }
     }
     if (pc.hasOwnProperty('global_y')) {
-      if (!Number.isNaN(pc.global_y)) {
+      if (!Number.isNaN(pc.global_y) && pc.global_y !== null) {
         if (nombreSeguidor.length > 0) {
           nombreSeguidor = nombreSeguidor.concat(this.getGlobalsConector());
         }
@@ -291,6 +291,24 @@ export class PlantaService {
       nombreEtiqueta = nombreEtiqueta.concat(pc.global_y.toString());
     }
     return nombreEtiqueta;
+  }
+  getGlobalCoordsColumns(planta: PlantaInterface, columnsToDisplay: string[]): string[] {
+    if (planta.tipo === 'seguidores') {
+      columnsToDisplay.push('seguidor');
+    } else {
+      columnsToDisplay.push('global_x');
+      if (planta.hasOwnProperty('numeroGlobalCoords')) {
+        if (planta.numeroGlobalCoords >= 2) {
+          columnsToDisplay.push('global_y');
+        }
+        if (planta.numeroGlobalCoords === 3) {
+          columnsToDisplay.push('global_z');
+        }
+      } else {
+        columnsToDisplay.push('global_y');
+      }
+    }
+    return columnsToDisplay;
   }
 
   getGlobalsConector(): string {

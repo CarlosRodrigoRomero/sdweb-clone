@@ -11,6 +11,7 @@ export interface PcInterface {
   local_y?: number;
   global_x?: any;
   global_y?: any;
+  global_z?: any;
   gps_lng?: number;
   gps_lat?: number;
   temperaturaMax?: number;
@@ -74,6 +75,7 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   local_y?: number;
   global_x?: any;
   global_y?: any;
+  global_z?: any;
   gps_lng?: number;
   gps_lat?: number;
   temperaturaMax?: number;

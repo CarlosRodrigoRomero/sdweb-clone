@@ -130,7 +130,8 @@ export class PcService {
     pcList.sort(this.sortByGlobals);
 
     let oldNombreSeguidor = '981768';
-    for (const pc of pcList) {
+    for (let pc of pcList) {
+      pc = this.globalCoordsToClasic(pc);
       const nombreSeguidor = this.plantaService.getNombreSeguidor(pc);
       if (nombreSeguidor !== oldNombreSeguidor) {
         oldNombreSeguidor = nombreSeguidor;
@@ -164,14 +165,33 @@ export class PcService {
       .pipe(
         map((actions) =>
           actions.map((doc) => {
-            const data = doc.payload.doc.data() as PcInterface;
+            let data = doc.payload.doc.data() as PcInterface;
             data.id = doc.payload.doc.id;
+            data = this.globalCoordsToClasic(data);
             return data;
           })
         )
       );
 
     return query$;
+  }
+
+  checkIsCoord(coord: any) {}
+
+  private globalCoordsToClasic(pc: PcInterface): PcInterface {
+    if (pc.hasOwnProperty('globalCoords')) {
+      pc.globalCoords.forEach((coord, i, array) => {
+        if (i === 0) {
+          pc.global_x = coord;
+        } else if (i === 1) {
+          pc.global_y = coord;
+        } else if (i === 2) {
+          pc.global_z = coord;
+        }
+        return pc;
+      });
+    }
+    return pc;
   }
 
   getPcs(informeId: string, plantaId: string): Observable<PcInterface[]> {
@@ -182,8 +202,9 @@ export class PcService {
         map((actions) =>
           actions
             .map((doc) => {
-              const data = doc.payload.doc.data() as PcInterface;
+              let data = doc.payload.doc.data() as PcInterface;
               data.id = doc.payload.doc.id;
+              data = this.globalCoordsToClasic(data);
               return data;
             })
             .filter((pc) => {
@@ -241,8 +262,9 @@ export class PcService {
     this.allPcsInformeEdit$ = query$.snapshotChanges().pipe(
       map((actions) =>
         actions.map((a) => {
-          const data = a.payload.doc.data() as PcInterface;
+          let data = a.payload.doc.data() as PcInterface;
           data.id = a.payload.doc.id;
+          data = this.globalCoordsToClasic(data);
           return new Pc(data);
         })
       )
@@ -259,8 +281,9 @@ export class PcService {
         if (action.payload.exists === false) {
           return null;
         } else {
-          const data = action.payload.data() as PcInterface;
+          let data = action.payload.data() as PcInterface;
           data.id = action.payload.id;
+          data = this.globalCoordsToClasic(data);
           return data;
         }
       })
