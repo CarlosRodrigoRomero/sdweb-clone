@@ -596,6 +596,9 @@ export class CanvasComponent implements OnInit {
     let filaRef: number;
     let columnaRef: number;
 
+    let gps_lat: number;
+    let gps_lng: number;
+
     if (this.estructura !== null) {
       [fila, columna] = this.estructura.calcularFilaColumna(event.offsetX, event.offsetY);
 
@@ -614,6 +617,8 @@ export class CanvasComponent implements OnInit {
         this.planta,
         Math.min(rectInteriorPc.bottom - rectInteriorPc.top, rectInteriorPc.right - rectInteriorPc.left)
       );
+      gps_lat = this.estructura.getLatLng().lat;
+      gps_lng = this.estructura.getLatLng().lng;
     } else {
       filaReal = 0;
       columnaReal = 1;
@@ -629,6 +634,9 @@ export class CanvasComponent implements OnInit {
       const widthRef = Math.round(width * (1 - this.rectRefReduction));
       const heightRef = Math.round(height * (1 - this.rectRefReduction));
       rectInteriorRef = { top: topRef, left: leftRef, bottom: topRef + heightRef, right: leftRef + widthRef };
+
+      gps_lat = this.currentLatLng.lat;
+      gps_lng = this.currentLatLng.lng;
     }
 
     // Localizaciones
@@ -647,8 +655,8 @@ export class CanvasComponent implements OnInit {
       local_x: columnaReal, // local_x
       local_y: filaReal, // local_x
       globalCoords, //
-      gps_lng: this.currentLatLng.lng,
-      gps_lat: this.currentLatLng.lat,
+      gps_lng,
+      gps_lat,
       img_left: rectInteriorPc.left,
       img_top: rectInteriorPc.top,
       img_width: rectInteriorPc.right - rectInteriorPc.left,
