@@ -104,6 +104,8 @@ export class EditListComponent implements OnInit {
       estructura.modulo = modulo;
       this.informeService.updateEstructura(this.informeId, estructura);
       estConPcs.pcs.forEach((pc) => {
+        pc.gps_lat = estructura.getLatLng().lat;
+        pc.gps_lng = estructura.getLatLng().lng;
         pc.globalCoords = globalCoords;
         pc.modulo = modulo;
         this.pcService.updatePc(pc);
