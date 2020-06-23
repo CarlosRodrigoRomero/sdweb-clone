@@ -14,7 +14,7 @@
     </agm-circle>
 
     <agm-circle
-      *ngFor="let elemPlant of allElementosPlanta"
+      *ngFor="let elemPlant of getEstructurasMostrarEnMapa(allElementosPlanta)"
       [latitude]="elemPlant.getLatLng().lat"
       [longitude]="elemPlant.getLatLng().lng"
       [radius]="getCircleRadius()"
@@ -39,18 +39,6 @@
       <agm-polyline-point *ngFor="let point of item.coords" [latitude]="point.lat" [longitude]="point.lng">
       </agm-polyline-point>
     </agm-polyline>
-
-    <!-- <agm-marker
-    [ngClass]="{ selected_marker: selected_pc === pc }"
-    *ngFor="let pc of filterPcsByFlight(currentFlight)"
-    [id]="pc.local_id"
-    (markerClick)="onMapMarkerClick(pc)"
-    [latitude]="pc.gps_lat"
-    [longitude]="pc.gps_lng"
-    [label]="{ text: pc.local_id + '', color: pc.color }"
-    [markerDraggable]="true"
-    (dragEnd)="onMarkerDragEnd(pc, $event)"
-  >
-  </agm-marker> -->
   </agm-map>
 </div>
+<mat-checkbox [(ngModel)]="soloEstructurasVuelo">Ocultar estructuras otros vuelos</mat-checkbox>

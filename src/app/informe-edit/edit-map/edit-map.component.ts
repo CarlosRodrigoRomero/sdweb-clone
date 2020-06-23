@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, ChangeDetectionStrategy } from '@angular/core';
 import { AgmMap, LatLngLiteral } from '@agm/core';
 import { PcInterface } from 'src/app/models/pc';
 import { Estructura } from '../../models/estructura';
@@ -15,7 +15,7 @@ import { PlantaInterface } from 'src/app/models/planta';
   selector: 'app-edit-map',
   templateUrl: './edit-map.component.html',
   styleUrls: ['./edit-map.component.css'],
-  // changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditMapComponent implements OnInit {
   @ViewChild(AgmMap) map: any;
@@ -33,6 +33,7 @@ export class EditMapComponent implements OnInit {
   coordsList: LatLngLiteral[];
   colorSameFlight: string;
   colorOtherFlight: string;
+  soloEstructurasVuelo: boolean;
 
   constructor(
     private route: ActivatedRoute,
@@ -49,6 +50,7 @@ export class EditMapComponent implements OnInit {
     this.currentLatLng = { lat: 39.453186, lng: -5.880743 };
     this.polygonList = [];
     this.informeId = this.route.snapshot.paramMap.get('id');
+    this.soloEstructurasVuelo = false;
 
     // this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
     // });
@@ -68,8 +70,8 @@ export class EditMapComponent implements OnInit {
           return est.id === elem.id;
         });
         if (elemPos >= 0) {
+          // Le borramos y le volvemos a añadir
           this.allElementosPlanta.splice(elemPos, 1);
-          // Si no está, le añadimos
           this.allElementosPlanta.push(elem);
         }
       }
@@ -82,6 +84,7 @@ export class EditMapComponent implements OnInit {
         });
 
         if (elemPos >= 0) {
+          // Si está, le borramos
           this.allElementosPlanta.splice(elemPos, 1);
         } else {
           // Si no está, le añadimos
@@ -100,6 +103,15 @@ export class EditMapComponent implements OnInit {
         this.setLocAreaList(planta.id);
         this.planta = planta;
       });
+  }
+
+  getEstructurasMostrarEnMapa(allElementosPlanta: ElementoPlantaInterface[]): ElementoPlantaInterface[] {
+    if (this.soloEstructurasVuelo) {
+      return this.allElementosPlanta.filter((elemn) => {
+        return elemn.vuelo === this.informeService.selectedArchivoVuelo.vuelo;
+      });
+    }
+    return allElementosPlanta;
   }
 
   onMapElementoPlantaClick(elementoPlanta: ElementoPlantaInterface): void {
@@ -166,44 +178,11 @@ export class EditMapComponent implements OnInit {
     console.log('EditMapComponent -> onTrayectoryRightClick -> event', event);
   }
 
-  onMapMarkerClick(pc: PcInterface): void {
-    // if (this.selected_pc !== pc && this.selected_pc) {
-    //   this.selected_pc.color = 'black';
-    // }
-    // // Cambiar el color del marker
-    // this.selected_pc = pc;
-    // this.selected_pc.color = 'white';
-    // if (pc.vuelo !== this.currentFlight) {
-    //   this.changeFlight(pc.vuelo);
-    // }
-    // // Poner imagen del pc
-    // const sliderValue = this.fileList.indexOf(pc.archivo);
-    // if (sliderValue === this.rangeValue - 1) {
-    //   this.canvas.getObjects().forEach((object) => {
-    //     if (object.isType('rect')) {
-    //       object.set('strokeWidth', object.local_id === this.selected_pc.local_id ? this._selectedStrokeWidth : 1);
-    //       object.set('selectable', object.local_id === this.selected_pc.local_id);
-    //       if (!object.ref) {
-    //         // Si no es referencia
-    //         if (object.local_id === this.selected_pc.local_id) {
-    //           // this.canvas.setActiveObject(object);
-    //         }
-    //         object.set('stroke', object.local_id === this.selected_pc.local_id ? 'white' : 'red');
-    //       }
-    //     }
-    //   });
-    //   this.canvas.renderAll();
-    // } else {
-    //   this.rangeValue = sliderValue + 1;
-    //   this.setImageFromRangeValue(this.rangeValue);
-    // }
-  }
-
   onMapElementoPlantaDragEnd(elementoPlanta: ElementoPlantaInterface, event) {
     elementoPlanta.setLatLng({ lat: event.coords.lat, lng: event.coords.lng });
     this.onMapElementoPlantaClick(elementoPlanta);
 
-    // TODO: implementar globalCoordsFromLocation
+    // globalCoordsFromLocation
     let globalCoords;
     let modulo;
     [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(elementoPlanta.getLatLng());
