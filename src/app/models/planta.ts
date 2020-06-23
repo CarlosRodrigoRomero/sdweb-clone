@@ -28,6 +28,7 @@ export interface PlantaInterface {
   criterioId?: string;
   nombreGlobalX?: string;
   nombreGlobalY?: string;
+  nombreGlobalZ?: string;
   nombreLocalX?: string;
   nombreLocalY?: string;
   stringConectorGlobals?: string;

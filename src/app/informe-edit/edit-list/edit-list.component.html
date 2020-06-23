@@ -69,7 +69,7 @@
 
     <ng-container matColumnDef="modulo">
       <th mat-sort-header mat-header-cell *matHeaderCellDef>Mod</th>
-      <td mat-cell *matCellDef="let pc">- W</td>
+      <td mat-cell *matCellDef="let pc">{{ pc.modulo.potencia }} W</td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumnsPc"></tr>
