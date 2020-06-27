@@ -281,10 +281,10 @@ export class PlantaService {
 
   getEtiquetaGlobals(pc: PcInterface): string {
     let nombreEtiqueta = '';
-    if (pc.hasOwnProperty('global_x') && !Number.isNaN(pc.global_x)) {
+    if (pc.hasOwnProperty('global_x') && !Number.isNaN(pc.global_x) && pc.global_x !== null) {
       nombreEtiqueta = nombreEtiqueta.concat(pc.global_x.toString());
     }
-    if (pc.hasOwnProperty('global_y') && !Number.isNaN(pc.global_y)) {
+    if (pc.hasOwnProperty('global_y') && !Number.isNaN(pc.global_y) && pc.global_y !== null) {
       if (nombreEtiqueta.length > 0) {
         nombreEtiqueta = nombreEtiqueta.concat(this.getGlobalsConector());
       }
