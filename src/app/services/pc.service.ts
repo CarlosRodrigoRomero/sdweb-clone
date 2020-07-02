@@ -87,7 +87,12 @@ export class PcService {
             this.currentFiltroClase.includes(this.getPcCoA(pc)) &&
             this.currentFiltroCategoria.includes(pc.tipo) &&
             (pc.gradienteNormalizado >= this.currentFiltroGradiente ||
-              (pc.gradienteNormalizado < this.currentFiltroGradiente && pc.tipo !== 8 && pc.tipo !== 9))
+              (pc.gradienteNormalizado === 10 && (pc.tipo === 11 || pc.tipo === 15)) ||
+              (pc.gradienteNormalizado < this.currentFiltroGradiente &&
+                pc.tipo !== 8 &&
+                pc.tipo !== 9 &&
+                pc.tipo !== 11 &&
+                pc.tipo !== 15))
         )
         .sort(this.sortByLocalId)
     );

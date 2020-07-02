@@ -23,7 +23,6 @@ export class EditListComponent implements OnInit {
     this.pcsOrEstructuras2 = value;
   }
 
-  // @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
   displayedColumnsEst: string[];
