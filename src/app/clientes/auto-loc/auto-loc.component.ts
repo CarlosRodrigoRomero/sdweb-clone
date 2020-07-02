@@ -13,6 +13,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { UserAreaInterface } from '../../models/userArea';
 import { AreaInterface } from '../../models/area';
 import { GLOBAL } from 'src/app/services/global';
+import { MatPaginator } from '@angular/material/paginator';
 declare const google: any;
 
 @Component({
@@ -24,6 +25,7 @@ export class AutoLocComponent implements OnInit {
   @ViewChildren(AgmPolygon) polygonData: QueryList<AgmPolygon>;
   @ViewChild(AgmMap, { static: true }) map: any;
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   public planta: PlantaInterface;
   public defaultZoom: number;
@@ -54,6 +56,7 @@ export class AutoLocComponent implements OnInit {
   public global = GLOBAL;
   public alertMessage: string;
   public successMessage: string;
+  public lastGlobalChanged: string;
 
   constructor(private route: ActivatedRoute, private plantaService: PlantaService) {}
 
@@ -62,6 +65,7 @@ export class AutoLocComponent implements OnInit {
     this.defaultZoom = 18;
     this.plantaLocation = { lng: -5.880743, lat: 39.453186 };
     this.isUserArea = false;
+    this.lastGlobalChanged = 'global1';
 
     this.plantaId = this.route.snapshot.paramMap.get('id');
     this.getPlanta(this.plantaId);
@@ -73,6 +77,7 @@ export class AutoLocComponent implements OnInit {
     this.displayedColumns = ['select', 'globalCoords', 'modulo'];
 
     this.locAreaDataSource = new MatTableDataSource([]);
+    this.locAreaDataSource.paginator = this.paginator;
     this.userAreaDataSource = new MatTableDataSource([]);
     this.locAreaDataSource.sortData = (data, sort: MatSort) => {
       if (sort.active === 'globalX') {
@@ -267,6 +272,11 @@ export class AutoLocComponent implements OnInit {
     }
   }
 
+  updateAreaFromGlobals(area: AreaInterface, gc: number) {
+    this.lastGlobalChanged = 'global'.concat(gc.toString());
+    this.updateArea(area);
+  }
+
   updateArea(area: AreaInterface, moduleChange = false) {
     if (this.checkIfUserArea(area)) {
       this.plantaService.updateUserArea(area as UserAreaInterface);
@@ -387,7 +397,6 @@ export class AutoLocComponent implements OnInit {
         this.createUserArea(path);
       } else {
         this.createLocArea(path);
-        // document.getElementById('globalX').focus();
       }
     });
     google.maps.event.addListener(drawingManager, 'rectanglecomplete', (rectangle) => {
@@ -406,7 +415,6 @@ export class AutoLocComponent implements OnInit {
         this.createUserArea(path);
       } else {
         this.createLocArea(path);
-        // document.getElementById('globalX').focus();
       }
     });
   }
@@ -441,6 +449,7 @@ export class AutoLocComponent implements OnInit {
           this.successMessage = undefined;
         }, 2000);
         this.alertMessage = undefined;
+        document.getElementById(this.lastGlobalChanged).focus();
       })
       .catch((res) => {
         console.log('ERROR', res);
@@ -529,6 +538,10 @@ export class AutoLocComponent implements OnInit {
         }
       });
     }
+  }
+
+  onSelectCheckbox(event, locArea: LocationAreaInterface) {
+    this.changeVisibilityPolygon(locArea, true);
   }
 
   onSelectCheckboxChange(event, locArea: LocationAreaInterface) {

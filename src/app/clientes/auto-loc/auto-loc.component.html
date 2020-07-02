@@ -45,8 +45,7 @@
                 G_<b>{{ gc }}: </b>
                 <input
                   [(ngModel)]="selectedLocationArea.globalCoords[gc]"
-                  id="global{{ gc }}"
-                  (change)="updateArea(selectedLocationArea)"
+                  (change)="updateAreaFromGlobals(selectedLocationArea, gc)"
                   maxlength="4"
                   name="global{{ gc }}"
                   id="global{{ gc }}"
@@ -93,6 +92,11 @@
               <button type="button" class="btn btn-info btn-eliminar" (click)="copyArea(selectedLocationArea)">
                 <i class="fas fa-copy"></i>
               </button>
+              <mat-checkbox
+                [checked]="isSelected(selectedLocationArea)"
+                (click)="onSelectCheckbox($event, selectedLocationArea)"
+              >
+              </mat-checkbox>
             </li>
           </ul>
         </div>
@@ -183,6 +187,7 @@
           *matRowDef="let locArea; columns: displayedColumns"
         ></tr>
       </table>
+      <mat-paginator [pageSizeOptions]="[50, 100, 200]" showFirstLastButtons></mat-paginator>
     </div>
   </div>
 </div>

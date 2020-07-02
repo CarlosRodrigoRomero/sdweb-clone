@@ -33,8 +33,17 @@ export class ValidateElementoPlantaPipe implements PipeTransform {
           return false;
         }
         return true;
-      } else {
+      } else if (numeroGlobalCoords === 2) {
         if (globalCoords[0].toString().length === 0 || globalCoords[1].toString().length === 0) {
+          return false;
+        }
+        return true;
+      } else {
+        if (
+          globalCoords[0].toString().length === 0 ||
+          globalCoords[1].toString().length === 0 ||
+          globalCoords[2].toString().length === 0
+        ) {
           return false;
         }
         return true;
