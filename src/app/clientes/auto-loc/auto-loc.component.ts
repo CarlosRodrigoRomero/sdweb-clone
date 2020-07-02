@@ -474,12 +474,23 @@ export class AutoLocComponent implements OnInit {
   }
 
   getFillColorLocArea(locArea: LocationAreaInterface) {
-    if (locArea.globalX.length > 0) {
-      return 'green';
-    } else if (locArea.globalY.length > 0) {
-      return 'blue';
+    if (locArea.hasOwnProperty('modulo')) {
+      return 'grey';
     }
-    return 'grey';
+    if (locArea.hasOwnProperty('globalCoords')) {
+      if (this.validateGlobalCoords(locArea.globalCoords)) {
+        return 'grey';
+      } else {
+        return 'red';
+      }
+    } else {
+      if (locArea.globalX.length > 0) {
+        return 'green';
+      } else if (locArea.globalY.length > 0) {
+        return 'blue';
+      }
+      return 'grey';
+    }
   }
 
   applyFilter(filterValue: string) {
@@ -571,5 +582,20 @@ export class AutoLocComponent implements OnInit {
             this.selection.select(locArea);
           }
         });
+  }
+
+  validateGlobalCoords(globalCoords) {
+    globalCoords = globalCoords.map((element) => {
+      return element === null ? '' : element;
+    });
+    if (
+      globalCoords[0].toString().length === 0 &&
+      globalCoords[1].toString().length === 0 &&
+      globalCoords[2].toString().length === 0
+    ) {
+      return false;
+    } else {
+      return true;
+    }
   }
 }
