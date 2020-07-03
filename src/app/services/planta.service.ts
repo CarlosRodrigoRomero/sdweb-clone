@@ -276,6 +276,14 @@ export class PlantaService {
         nombreSeguidor = nombreSeguidor.concat(pc.global_y.toString());
       }
     }
+    if (pc.hasOwnProperty('global_z')) {
+      if (!Number.isNaN(pc.global_z) && pc.global_z !== null) {
+        if (nombreSeguidor.length > 0) {
+          nombreSeguidor = nombreSeguidor.concat(this.getGlobalsConector());
+        }
+        nombreSeguidor = nombreSeguidor.concat(pc.global_z.toString());
+      }
+    }
     return nombreSeguidor;
   }
 
