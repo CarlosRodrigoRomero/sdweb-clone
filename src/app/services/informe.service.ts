@@ -9,6 +9,8 @@ import { GLOBAL } from './global';
 import { EstructuraInterface, Estructura } from '../models/estructura';
 import { ArchivoVueloInterface } from '../models/archivoVuelo';
 import { ElementoPlantaInterface } from '../models/elementoPlanta';
+import { element } from 'protractor';
+import { PcInterface } from '../models/pc';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +26,8 @@ export class InformeService {
   public selectedArchivoVuelo: ArchivoVueloInterface;
   private elementoPlantaSource = new Subject<ElementoPlantaInterface>();
   selectedElementoPlanta$ = this.elementoPlantaSource.asObservable();
+  private selectedPcSource = new Subject<PcInterface>();
+  selectedPc$ = this.selectedPcSource.asObservable();
   private archivoVueloSource = new Subject<ArchivoVueloInterface>();
   selectedArchivoVuelo$ = this.archivoVueloSource.asObservable();
 
@@ -38,6 +42,10 @@ export class InformeService {
     // this.informes = afs.collection('informes').valueChanges();
     this.informesCollection = afs.collection<InformeInterface>('informes');
     this.informes$ = this.informesCollection.valueChanges();
+  }
+
+  uncheckPc() {
+    this.selectedPcSource.next(null);
   }
 
   selectElementoPlanta(elementoPlanta: ElementoPlantaInterface) {

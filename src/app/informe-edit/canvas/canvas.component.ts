@@ -585,6 +585,9 @@ export class CanvasComponent implements OnInit {
   }
 
   onDblClickCanvas(event: MouseEvent) {
+    // Deseleccionar elemento anterior para evitar sobrescribir
+    this.informeService.uncheckPc();
+
     let fila: number;
     let columna: number;
     let columnaReal: number;

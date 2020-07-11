@@ -114,6 +114,11 @@ export class EditPcDetailComponent implements OnInit {
         this.setElementoPlanta(elementoPlanta);
       }
     });
+    this.informeService.selectedPc$.subscribe((pc) => {
+      if (pc === null) {
+        this.selectedPc = null;
+      }
+    });
   }
 
   setElementoPlanta(elementoPlanta: ElementoPlantaInterface) {
