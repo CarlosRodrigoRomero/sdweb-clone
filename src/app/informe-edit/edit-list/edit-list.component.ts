@@ -52,6 +52,12 @@ export class EditListComponent implements OnInit {
         return false; // Prevent bubbling
       })
     );
+    this.hotkeysService.add(
+      new Hotkey('w', (event: KeyboardEvent): boolean => {
+        this.previousEstructura();
+        return false; // Prevent bubbling
+      })
+    );
   }
 
   ngOnInit() {
@@ -106,12 +112,19 @@ export class EditListComponent implements OnInit {
         this.planta = planta;
       });
   }
-  nextEstructura() {
+  private nextEstructura() {
     const isSameEstructura = (estructuraConPcs: EstructuraConPcs) =>
       estructuraConPcs.estructura.id === this.selectedEstructura.id;
     const nextEstructuraIndex = 1 + this.dataSourceEst.data.findIndex(isSameEstructura);
     const nextEstructura = this.dataSourceEst.data[nextEstructuraIndex].estructura;
     this.onClickRowList(nextEstructura);
+  }
+  private previousEstructura() {
+    const isSameEstructura = (estructuraConPcs: EstructuraConPcs) =>
+      estructuraConPcs.estructura.id === this.selectedEstructura.id;
+    const prevEstructuraIndex = -1 + this.dataSourceEst.data.findIndex(isSameEstructura);
+    const prevEstructura = this.dataSourceEst.data[prevEstructuraIndex].estructura;
+    this.onClickRowList(prevEstructura);
   }
 
   recalcularLocs() {

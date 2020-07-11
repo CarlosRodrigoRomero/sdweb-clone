@@ -50,6 +50,15 @@ export class EditPcDetailComponent implements OnInit {
       })
     );
     this.hotkeysService.add(
+      new Hotkey('ctrl+1', (event: KeyboardEvent): boolean => {
+        if (this.checkSelectedPc()) {
+          this.selectedPc.tipo = 13;
+          this.updatePcInDb(this.selectedPc);
+        }
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
       new Hotkey('2', (event: KeyboardEvent): boolean => {
         if (this.checkSelectedPc()) {
           this.selectedPc.tipo = 9;
@@ -62,6 +71,15 @@ export class EditPcDetailComponent implements OnInit {
       new Hotkey('3', (event: KeyboardEvent): boolean => {
         if (this.checkSelectedPc()) {
           this.selectedPc.tipo = 3;
+          this.updatePcInDb(this.selectedPc);
+        }
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
+      new Hotkey('ctrl+3', (event: KeyboardEvent): boolean => {
+        if (this.checkSelectedPc()) {
+          this.selectedPc.tipo = 10;
           this.updatePcInDb(this.selectedPc);
         }
         return false; // Prevent bubbling
@@ -86,9 +104,27 @@ export class EditPcDetailComponent implements OnInit {
       })
     );
     this.hotkeysService.add(
-      new Hotkey('0', (event: KeyboardEvent): boolean => {
+      new Hotkey('shift+3', (event: KeyboardEvent): boolean => {
         if (this.checkSelectedPc()) {
-          this.selectedPc.tipo = 15;
+          this.selectedPc.tipo = 6;
+          this.updatePcInDb(this.selectedPc);
+        }
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
+      new Hotkey('shift+3', (event: KeyboardEvent): boolean => {
+        if (this.checkSelectedPc()) {
+          this.selectedPc.tipo = 6;
+          this.updatePcInDb(this.selectedPc);
+        }
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
+      new Hotkey('shift+1', (event: KeyboardEvent): boolean => {
+        if (this.checkSelectedPc()) {
+          this.selectedPc.tipo = 0;
           this.updatePcInDb(this.selectedPc);
         }
         return false; // Prevent bubbling
