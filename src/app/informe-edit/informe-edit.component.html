@@ -1,12 +1,14 @@
 <div class="container-fluid" id="container-ppal">
   <div class="row">
-    <div class="col-xs-12 col-lg-9">
+    <div class="col">
       <div class="header" *ngIf="planta">
         <h2>
           {{ planta.nombre }} - {{ titulo | date }}
           <span> <input type="text" [(ngModel)]="carpetaJpgGray" (change)="onChangeCarpetaJpgGray()" />) - </span>
         </h2>
         <mat-slide-toggle *ngIf="user?.role == 1" [(ngModel)]="pcsOrEstructuras"> est/pc </mat-slide-toggle>
+        <mat-slide-toggle [(ngModel)]="showTable"> Mostrar tabla </mat-slide-toggle>
+
         numGlobalCoords:
         <input
           type="number"
@@ -187,7 +189,7 @@
       </div>
     </div>
 
-    <div class="col col-xs-12 col-lg-3 col-pcs">
+    <div *ngIf="showTable" class="col col-xs-12 col-lg-3 col-pcs">
       <app-edit-list [pcsOrEstructuras]="pcsOrEstructuras"> </app-edit-list>
     </div>
   </div>
