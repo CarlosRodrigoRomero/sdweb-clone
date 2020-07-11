@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { InformeService } from '../../services/informe.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { ArchivoVueloInterface } from '../../models/archivoVuelo';
@@ -12,11 +12,13 @@ import { Pc } from 'src/app/models/pc';
 import { EstructuraConPcs, Estructura } from 'src/app/models/estructura';
 import { PlantaService } from 'src/app/services/planta.service';
 import { PlantaInterface } from '../../models/planta';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-edit-list',
   templateUrl: './edit-list.component.html',
   styleUrls: ['./edit-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditListComponent implements OnInit {
   @Input() set pcsOrEstructuras(value: boolean) {
@@ -24,6 +26,7 @@ export class EditListComponent implements OnInit {
   }
 
   @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   displayedColumnsEst: string[];
   displayedColumnsPc: string[];
@@ -48,6 +51,7 @@ export class EditListComponent implements OnInit {
     this.displayedColumnsEst = ['error', 'vuelo', 'globalCoords', 'archivo'];
     // this.dataSourceEst.paginator = this.paginator;
     this.dataSourceEst.sort = this.sort;
+    this.dataSourceEst.paginator = this.paginator;
     this.dataSourceEst.filterPredicate = (data: EstructuraConPcs, filter: string) => {
       // return this.pcsOrEstructuras2 ? data.constructor.name === Pc.name : data.constructor.name === Estructura.name;
       return true;

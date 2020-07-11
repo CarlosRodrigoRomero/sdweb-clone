@@ -37,6 +37,7 @@
       *matRowDef="let elem; columns: displayedColumnsEst"
     ></tr>
   </table>
+  <mat-paginator [pageSizeOptions]="[25, 50, 100]" showFirstLastButtons></mat-paginator>
 </div>
 
 <div *ngIf="pcsOrEstructuras2" class="mat-elevation-z8 tablaPcs">
