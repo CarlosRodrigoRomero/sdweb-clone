@@ -13,6 +13,7 @@ import { EstructuraConPcs, Estructura } from 'src/app/models/estructura';
 import { PlantaService } from 'src/app/services/planta.service';
 import { PlantaInterface } from '../../models/planta';
 import { MatPaginator } from '@angular/material/paginator';
+import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 
 @Component({
   selector: 'app-edit-list',
@@ -36,13 +37,22 @@ export class EditListComponent implements OnInit {
   pcsOrEstructuras2: boolean;
   planta: PlantaInterface;
   estConPcs: EstructuraConPcs[];
+  selectedEstructura: ElementoPlantaInterface;
 
   constructor(
     private route: ActivatedRoute,
     public informeService: InformeService,
     public pcService: PcService,
-    private plantaService: PlantaService
-  ) {}
+    private plantaService: PlantaService,
+    private hotkeysService: HotkeysService
+  ) {
+    this.hotkeysService.add(
+      new Hotkey('e', (event: KeyboardEvent): boolean => {
+        this.nextEstructura();
+        return false; // Prevent bubbling
+      })
+    );
+  }
 
   ngOnInit() {
     this.informeId = this.route.snapshot.paramMap.get('id');
@@ -96,6 +106,13 @@ export class EditListComponent implements OnInit {
         this.planta = planta;
       });
   }
+  nextEstructura() {
+    const isSameEstructura = (estructuraConPcs: EstructuraConPcs) =>
+      estructuraConPcs.estructura.id === this.selectedEstructura.id;
+    const nextEstructuraIndex = 1 + this.dataSourceEst.data.findIndex(isSameEstructura);
+    const nextEstructura = this.dataSourceEst.data[nextEstructuraIndex].estructura;
+    this.onClickRowList(nextEstructura);
+  }
 
   recalcularLocs() {
     this.estConPcs.forEach(async (estConPcs: EstructuraConPcs) => {
@@ -121,6 +138,10 @@ export class EditListComponent implements OnInit {
 
   setElementoPlanta(elementoPlanta: ElementoPlantaInterface): void {
     this.setArchivoVuelo({ archivo: elementoPlanta.archivo, vuelo: elementoPlanta.vuelo } as ArchivoVueloInterface);
+
+    if (elementoPlanta.constructor.name === Estructura.name) {
+      this.selectedEstructura = elementoPlanta;
+    }
   }
 
   onClickRowList(elementoPlanta: ElementoPlantaInterface): void {
