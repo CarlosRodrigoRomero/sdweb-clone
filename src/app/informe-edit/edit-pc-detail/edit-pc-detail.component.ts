@@ -116,14 +116,14 @@ export class EditPcDetailComponent implements OnInit {
     });
     this.informeService.selectedPc$.subscribe((pc) => {
       if (pc === null) {
-        this.selectedPc = null;
+        this.selectedPc = undefined;
       }
     });
   }
 
   setElementoPlanta(elementoPlanta: ElementoPlantaInterface) {
     if (elementoPlanta == null) {
-      this.selectedPc = null;
+      this.selectedPc = undefined;
     } else {
       if (elementoPlanta.constructor.name === Pc.name) {
         if (this.selectedPc !== elementoPlanta) {
