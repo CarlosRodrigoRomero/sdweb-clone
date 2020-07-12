@@ -113,6 +113,15 @@ export class EditPcDetailComponent implements OnInit {
       })
     );
     this.hotkeysService.add(
+      new Hotkey('shift+2', (): boolean => {
+        if (this.checkSelectedPc()) {
+          this.selectedPc.tipo = 15;
+          this.updatePcInDb(this.selectedPc);
+        }
+        return false; // Prevent bubbling
+      })
+    );
+    this.hotkeysService.add(
       new Hotkey('shift+3', (event: KeyboardEvent): boolean => {
         if (this.checkSelectedPc()) {
           this.selectedPc.tipo = 6;

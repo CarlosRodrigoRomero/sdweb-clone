@@ -10,6 +10,7 @@ import { ValidateElementoPlantaPipe } from '../../pipes/validate-elemento-planta
 import { take, switchMap } from 'rxjs/operators';
 import { LocationAreaInterface } from 'src/app/models/location';
 import { PlantaInterface } from 'src/app/models/planta';
+import { element } from 'protractor';
 
 @Component({
   selector: 'app-edit-map',
@@ -138,6 +139,10 @@ export class EditMapComponent implements OnInit {
     return 2;
   }
   getStrokeColor(elementoPlanta: PcInterface & Estructura): string {
+    if (this.planta.tipo === 'fija' && elementoPlanta.columnaInicio === 1) {
+      return 'orange';
+    }
+
     if (!this.validateElem.transform(elementoPlanta, this.planta)) {
       return 'red';
     } else if (this.informeService.selectedElementoPlanta) {
