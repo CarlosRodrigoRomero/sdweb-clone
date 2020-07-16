@@ -8,7 +8,9 @@
           {{ planta.nombre }} - {{ titulo | date }}
           <span> <input type="text" [(ngModel)]="carpetaJpgGray" (change)="onChangeCarpetaJpgGray()" />) - </span>
         </h2>
-        <mat-slide-toggle *ngIf="user?.role == 1" [(ngModel)]="pcsOrEstructuras"> est/pc </mat-slide-toggle>
+        <mat-slide-toggle *ngIf="user?.role == 1 || user?.role == 5" [(ngModel)]="pcsOrEstructuras">
+          est/pc
+        </mat-slide-toggle>
         <mat-slide-toggle [(ngModel)]="showTable"> Mostrar tabla </mat-slide-toggle>
 
         numGlobalCoords:
