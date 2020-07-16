@@ -46,7 +46,7 @@ export let GLOBAL = {
     'Vidrio roto',
     'Resist. anómala',
     'Caja conexiones',
-    'Sombras',
+    'Sombras', // 15
     'Yellowing', // 16
     'String en CA', // 17
   ],
