@@ -87,28 +87,48 @@ export class InformeEditComponent implements OnInit {
     private hotkeysService: HotkeysService
   ) {
     this.hotkeysService.add(
-      new Hotkey('a', (event: KeyboardEvent): boolean => {
-        this.setImageFromRangeValue(this.rangeValue - 4);
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'a',
+        (event: KeyboardEvent): boolean => {
+          this.setImageFromRangeValue(this.rangeValue - 4);
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '<---- retroceder 4 frames'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('s', (event: KeyboardEvent): boolean => {
-        this.setImageFromRangeValue(this.rangeValue - 1);
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        's',
+        (event: KeyboardEvent): boolean => {
+          this.setImageFromRangeValue(this.rangeValue - 1);
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '<- retroceder 1 frame'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('d', (event: KeyboardEvent): boolean => {
-        this.setImageFromRangeValue(this.rangeValue + 1);
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'd',
+        (event: KeyboardEvent): boolean => {
+          this.setImageFromRangeValue(this.rangeValue + 1);
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '-> avanzar 1 frame'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('f', (event: KeyboardEvent): boolean => {
-        this.setImageFromRangeValue(this.rangeValue + 4);
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'f',
+        (event: KeyboardEvent): boolean => {
+          this.setImageFromRangeValue(this.rangeValue + 4);
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '----> avanzar 4 frames'
+      )
     );
   }
 

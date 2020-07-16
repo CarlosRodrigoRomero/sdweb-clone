@@ -47,16 +47,26 @@ export class EditListComponent implements OnInit {
     private hotkeysService: HotkeysService
   ) {
     this.hotkeysService.add(
-      new Hotkey('e', (event: KeyboardEvent): boolean => {
-        this.nextEstructura();
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'e',
+        (event: KeyboardEvent): boolean => {
+          this.nextEstructura();
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'siguiente estructura'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('w', (event: KeyboardEvent): boolean => {
-        this.previousEstructura();
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'w',
+        (event: KeyboardEvent): boolean => {
+          this.previousEstructura();
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'anterior estructura'
+      )
     );
   }
 
@@ -64,7 +74,7 @@ export class EditListComponent implements OnInit {
     this.informeId = this.route.snapshot.paramMap.get('id');
     this.displayedColumnsPc = ['error', 'localId', 'tipo', 'globalCoords', 'localCoords', 'modulo'];
 
-    this.displayedColumnsEst = ['error', 'vuelo', 'globalCoords', 'archivo'];
+    this.displayedColumnsEst = ['error', 'vuelo', 'globalCoords'];
     // this.dataSourceEst.paginator = this.paginator;
     this.dataSourceEst.sort = this.sort;
     this.dataSourceEst.paginator = this.paginator;

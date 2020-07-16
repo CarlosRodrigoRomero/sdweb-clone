@@ -61,8 +61,33 @@
       </label>
 
       <label class="selected-pc-tipo-label">
+        <input
+          (change)="updatePcInDb(selectedPc)"
+          [(ngModel)]="selectedPc.tipo"
+          type="radio"
+          name="tipo"
+          [value]="15"
+        />
+        <img class="img-fluid" src="../../../assets/images/tipo_15.png" />
+      </label>
+
+      <label class="selected-pc-tipo-label">
         <input (change)="updatePcInDb(selectedPc)" [(ngModel)]="selectedPc.tipo" type="radio" name="tipo" [value]="3" />
         <img class="img-fluid" src="../../../assets/images/tipo_3.png" />
+      </label>
+      <label class="selected-pc-tipo-label">
+        <input (change)="updatePcInDb(selectedPc)" [(ngModel)]="selectedPc.tipo" type="radio" name="tipo" [value]="6" />
+        <img class="img-fluid" src="../../../assets/images/tipo_6.png" />
+      </label>
+      <label class="selected-pc-tipo-label">
+        <input
+          (change)="updatePcInDb(selectedPc)"
+          [(ngModel)]="selectedPc.tipo"
+          type="radio"
+          name="tipo"
+          [value]="10"
+        />
+        <img class="img-fluid" src="../../../assets/images/tipo_10.png" />
       </label>
       <label class="selected-pc-tipo-label">
         <input
@@ -78,25 +103,12 @@
         <input (change)="updatePcInDb(selectedPc)" [(ngModel)]="selectedPc.tipo" type="radio" name="tipo" [value]="5" />
         <img class="img-fluid" src="../../../assets/images/tipo_5.png" />
       </label>
-      <label class="selected-pc-tipo-label">
-        <input (change)="updatePcInDb(selectedPc)" [(ngModel)]="selectedPc.tipo" type="radio" name="tipo" [value]="6" />
-        <img class="img-fluid" src="../../../assets/images/tipo_6.png" />
-      </label>
+
       <label class="selected-pc-tipo-label">
         <input (change)="updatePcInDb(selectedPc)" [(ngModel)]="selectedPc.tipo" type="radio" name="tipo" [value]="7" />
         <img class="img-fluid" src="../../../assets/images/tipo_7.png" />
       </label>
 
-      <label class="selected-pc-tipo-label">
-        <input
-          (change)="updatePcInDb(selectedPc)"
-          [(ngModel)]="selectedPc.tipo"
-          type="radio"
-          name="tipo"
-          [value]="10"
-        />
-        <img class="img-fluid" src="../../../assets/images/tipo_10.png" />
-      </label>
       <label class="selected-pc-tipo-label">
         <input
           (change)="updatePcInDb(selectedPc)"
@@ -137,16 +149,7 @@
         />
         <img class="img-fluid" src="../../../assets/images/tipo_14.png" />
       </label>
-      <label class="selected-pc-tipo-label">
-        <input
-          (change)="updatePcInDb(selectedPc)"
-          [(ngModel)]="selectedPc.tipo"
-          type="radio"
-          name="tipo"
-          [value]="15"
-        />
-        <img class="img-fluid" src="../../../assets/images/tipo_15.png" />
-      </label>
+
       <label class="selected-pc-tipo-label">
         <input
           (change)="updatePcInDb(selectedPc)"

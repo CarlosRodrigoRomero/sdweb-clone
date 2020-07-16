@@ -41,111 +41,158 @@ export class EditPcDetailComponent implements OnInit {
     private hotkeysService: HotkeysService
   ) {
     this.hotkeysService.add(
-      new Hotkey('1', (event: KeyboardEvent): boolean => {
-        if (this.checkSelectedPc()) {
-          this.selectedPc.tipo = 8;
-          this.updatePcInDb(this.selectedPc);
-        }
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        '1',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 8;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '1: una célula caliente'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('ctrl+1', (event: KeyboardEvent): boolean => {
-        if (this.checkSelectedPc()) {
-          this.selectedPc.tipo = 13;
-          this.updatePcInDb(this.selectedPc);
-        }
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'shift+1',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 0;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'shift+1: Sin anomalias'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('2', (event: KeyboardEvent): boolean => {
-        if (this.checkSelectedPc()) {
-          this.selectedPc.tipo = 9;
-          this.updatePcInDb(this.selectedPc);
-        }
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'ctrl+1',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 13;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'ctrl+1: cross-connection'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('3', (event: KeyboardEvent): boolean => {
-        if (this.checkSelectedPc()) {
-          this.selectedPc.tipo = 3;
-          this.updatePcInDb(this.selectedPc);
-        }
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        '2',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 9;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '2: varias células caliente (por defecto)'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('ctrl+3', (event: KeyboardEvent): boolean => {
-        if (this.checkSelectedPc()) {
-          this.selectedPc.tipo = 10;
-          this.updatePcInDb(this.selectedPc);
-        }
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'shift+2',
+        (): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 15;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'shift+2: Módulo con sombras'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('4', (event: KeyboardEvent): boolean => {
-        if (this.checkSelectedPc()) {
-          this.selectedPc.tipo = 17;
-          this.updatePcInDb(this.selectedPc);
-        }
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        '3',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 3;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '3: varias células caliente (por defecto)'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('5', (event: KeyboardEvent): boolean => {
-        if (this.checkSelectedPc()) {
-          this.selectedPc.tipo = 5;
-          this.updatePcInDb(this.selectedPc);
-        }
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'ctrl+3',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 10;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'ctrl+3: 2x substring en circuito abierto'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('shift+3', (event: KeyboardEvent): boolean => {
-        if (this.checkSelectedPc()) {
-          this.selectedPc.tipo = 6;
-          this.updatePcInDb(this.selectedPc);
-        }
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'shift+3',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 6;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'shift+3: Substring en cortocircuito'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('shift+2', (): boolean => {
-        if (this.checkSelectedPc()) {
-          this.selectedPc.tipo = 15;
-          this.updatePcInDb(this.selectedPc);
-        }
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        '4',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 17;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '4: String en circuito abierto'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('shift+3', (event: KeyboardEvent): boolean => {
-        if (this.checkSelectedPc()) {
-          this.selectedPc.tipo = 6;
-          this.updatePcInDb(this.selectedPc);
-        }
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        '5',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 5;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '5: Módulo en circuito abierto'
+      )
     );
+
     this.hotkeysService.add(
-      new Hotkey('shift+1', (event: KeyboardEvent): boolean => {
-        if (this.checkSelectedPc()) {
-          this.selectedPc.tipo = 0;
-          this.updatePcInDb(this.selectedPc);
-        }
-        return false; // Prevent bubbling
-      })
-    );
-    this.hotkeysService.add(
-      new Hotkey('q', (event: KeyboardEvent): boolean => {
-        if (this.checkSelectedPc()) {
-          this.onClickDeletePc(this.selectedPc);
-        }
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'q',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.onClickDeletePc(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'q: eliminar anomalia'
+      )
     );
   }
   checkSelectedPc() {
