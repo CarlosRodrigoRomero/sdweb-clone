@@ -20,7 +20,7 @@ export class ModuloAddComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group({
       marca: ['', [Validators.required]],
-      modelo: ['', [Validators.required]],
+      modelo: '',
       potencia: [0, [Validators.required, Validators.min(0), Validators.max(1000)]],
     });
   }
