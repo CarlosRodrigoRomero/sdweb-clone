@@ -1,4 +1,5 @@
 import { InformeInterface } from './informe';
+import { OrtofotoInterface } from './ortofoto';
 
 export interface PlantaInterface {
   id?: string;
@@ -36,4 +37,5 @@ export interface PlantaInterface {
   numeroSeguidores?: number;
   autoLocReady?: boolean;
   numeroGlobalCoords?: number;
+  ortofoto?: OrtofotoInterface;
 }
