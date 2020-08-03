@@ -7,10 +7,14 @@ service cloud.firestore {
     }
 
     match /informes/{informeId}/estructuras/{estructuraId} {
-    	allow write, delete, read: if request.auth.uid == "dgYtPws1dQPv8aZ24G940tstCZI3";
+    	allow write, delete, read, update: if request.auth.uid == "dgYtPws1dQPv8aZ24G940tstCZI3";
   	}
     match /informes/{informeId} {
     	allow update: if request.auth.uid == "dgYtPws1dQPv8aZ24G940tstCZI3";
+  	}
+    match /pcs/{pcId} {
+    	allow write: if request.auth.uid == "E1EvApBm83aDYkUvXh8YhfT03pe2";
+      allow delete: if request.auth.uid == "E1EvApBm83aDYkUvXh8YhfT03pe2";
   	}
     match /plantas/{plantaId} {
     	allow write, update: if request.auth.uid == "7h7k18OVARW0faC4tvjBMCblxlg2";
@@ -19,6 +23,9 @@ service cloud.firestore {
     match /plantas/{plantaId}/locationAreas/{locAreaId} {
     	allow write, update, delete: if request.auth.uid == "7h7k18OVARW0faC4tvjBMCblxlg2";
   	}
+    match /modulos/{moduloId} {
+    allow write: if request.auth.uid == "7h7k18OVARW0faC4tvjBMCblxlg2";
+    }
   }
 
 }
