@@ -11,6 +11,7 @@ import { PlantaService } from '../services/planta.service';
 import { InformeService } from '../services/informe.service';
 import { GLOBAL } from '../services/global';
 import { PcDetailsDialogComponent } from '../informe-view/pc-details-dialog/pc-details-dialog.component';
+declare const google: any;
 
 export interface DialogData {
   pc: PcInterface;
@@ -62,6 +63,41 @@ export class InformeMapComponent implements OnInit {
     });
   }
 
+  initMap(map) {
+    if (this.planta.hasOwnProperty('ortofoto')) {
+      const ortofoto = this.planta.ortofoto;
+      map.setOptions({ maxZoom: ortofoto.mapMaxZoom });
+      map.setOptions({ minZoom: ortofoto.mapMinZoom });
+      map.mapTypeId = 'roadmap';
+      const mapBounds = new google.maps.LatLngBounds(
+        new google.maps.LatLng(ortofoto.bounds.south, ortofoto.bounds.west),
+        new google.maps.LatLng(ortofoto.bounds.north, ortofoto.bounds.east)
+      );
+
+      const imageMapType = new google.maps.ImageMapType({
+        getTileUrl(coord, zoom) {
+          const proj = map.getProjection();
+          const z2 = Math.pow(2, zoom);
+          const tileXSize = 256 / z2;
+          const tileYSize = 256 / z2;
+          const tileBounds = new google.maps.LatLngBounds(
+            proj.fromPointToLatLng(new google.maps.Point(coord.x * tileXSize, (coord.y + 1) * tileYSize)),
+            proj.fromPointToLatLng(new google.maps.Point((coord.x + 1) * tileXSize, coord.y * tileYSize))
+          );
+          if (!mapBounds.intersects(tileBounds) || zoom < ortofoto.mapMinZoom || zoom > ortofoto.mapMaxZoom) {
+            return null;
+          }
+          return `${ortofoto.url}/${zoom}/${coord.x}/${coord.y}.png`;
+        },
+        tileSize: new google.maps.Size(256, 256),
+        name: 'Tiles',
+      });
+
+      map.overlayMapTypes.push(imageMapType);
+      map.fitBounds(mapBounds);
+    }
+  }
+
   getStrokeColor(severidad: number) {
     return GLOBAL.colores_severidad[severidad - 1];
   }
@@ -93,7 +129,8 @@ export class InformeMapComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {});
   }
 
-  mapIsReady(map: AgmMap) {
+  mapIsReady(map) {
     this.mapLoaded = true;
+    this.initMap(map);
   }
 }
