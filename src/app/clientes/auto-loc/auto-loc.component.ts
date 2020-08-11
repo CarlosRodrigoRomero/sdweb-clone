@@ -23,7 +23,7 @@ declare const google: any;
 })
 export class AutoLocComponent implements OnInit {
   @ViewChildren(AgmPolygon) polygonData: QueryList<AgmPolygon>;
-  @ViewChild(AgmMap, { static: true }) map: any;
+  @ViewChild(AgmMap, { static: true }) agmMap: any;
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
@@ -57,7 +57,7 @@ export class AutoLocComponent implements OnInit {
   public alertMessage: string;
   public successMessage: string;
   public lastGlobalChanged: string;
-
+  public map: any;
   constructor(private route: ActivatedRoute, private plantaService: PlantaService) {}
 
   ngOnInit() {
@@ -129,6 +129,7 @@ export class AutoLocComponent implements OnInit {
     this.plantaService.getPlanta(plantaId).subscribe(
       (response) => {
         this.planta = response;
+        this.plantaService.set(response);
         this.defaultZoom = this.planta.zoom;
         this.plantaLocation.lat = this.planta.latitud;
         this.plantaLocation.lng = this.planta.longitud;
@@ -144,35 +145,33 @@ export class AutoLocComponent implements OnInit {
   }
 
   onMapReady(map) {
-    console.log('mapready');
+    this.map = map;
     this.initDrawingManager(map);
+    this.plantaService.initMap(this.planta, map);
   }
 
   private addPolygonToMap(area: AreaInterface, isNew = false) {
     // area.visible = true;
-    this.map._mapsWrapper
-      .createPolygon({
-        paths: area.path,
-        strokeColor: area.hasOwnProperty('modulo') ? 'yellow' : 'white',
-        strokeOpacity: this._strokeOpacity,
-        strokeWeight: 2,
-        fillColor: this.getFillColor(area),
-        fillOpacity: this._fillOpacity,
-        editable: isNew,
-        draggable: isNew,
-        id: area.id,
-      })
-      .then((polygon: any) => {
-        this.polygonList.push(polygon);
-        if (isNew) {
-          this.selectArea(area);
-        }
-
-        google.maps.event.addListener(polygon, 'mouseup', (event) => {
-          this.selectArea(area);
-          this.modifyArea(area);
-        });
-      });
+    const polygon = new google.maps.Polygon({
+      paths: area.path,
+      strokeColor: area.hasOwnProperty('modulo') ? 'yellow' : 'white',
+      strokeOpacity: this._strokeOpacity,
+      strokeWeight: 2,
+      fillColor: this.getFillColor(area),
+      fillOpacity: this._fillOpacity,
+      editable: isNew,
+      draggable: isNew,
+      id: area.id,
+    });
+    polygon.setMap(this.map);
+    this.polygonList.push(polygon);
+    if (isNew) {
+      this.selectArea(area);
+    }
+    google.maps.event.addListener(polygon, 'mouseup', (event) => {
+      this.selectArea(area);
+      this.modifyArea(area);
+    });
   }
 
   private modifyArea(area: AreaInterface) {

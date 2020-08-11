@@ -27,14 +27,17 @@
               Aplicar módulo a selección ->
             </button>
           </div>
-          <agm-map
-            [latitude]="plantaLocation.lat"
-            [longitude]="plantaLocation.lng"
-            [mapTypeId]="mapType"
-            [zoom]="defaultZoom"
-            (mapReady)="onMapReady($event)"
-          >
-          </agm-map>
+          <div *ngIf="planta">
+            <agm-map
+              [latitude]="plantaLocation.lat"
+              [longitude]="plantaLocation.lng"
+              [mapTypeId]="mapType"
+              [zoom]="defaultZoom"
+              (mapReady)="onMapReady($event)"
+              mapTypeControl="true"
+            >
+            </agm-map>
+          </div>
         </div>
       </div>
       <div class="row">

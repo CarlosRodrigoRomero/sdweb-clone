@@ -7,7 +7,6 @@ import { PcInterface } from 'src/app/models/pc';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GLOBAL } from '../services/global';
 import { take } from 'rxjs/operators';
-import { EstructuraInterface } from '../models/estructura';
 
 import { AuthService } from 'src/app/services/auth.service';
 import { UserInterface } from '../models/user';
@@ -60,7 +59,6 @@ export class InformeEditComponent implements OnInit {
   public lastRef: number[];
   public currentGlobalX: number;
   public currentGlobalY: string;
-  public estructura: EstructuraInterface;
   public buildingEstructura = false;
   public currentLatLng: LatLngLiteral;
 

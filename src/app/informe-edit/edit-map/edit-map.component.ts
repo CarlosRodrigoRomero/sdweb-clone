@@ -10,7 +10,7 @@ import { ValidateElementoPlantaPipe } from '../../pipes/validate-elemento-planta
 import { take, switchMap } from 'rxjs/operators';
 import { LocationAreaInterface } from 'src/app/models/location';
 import { PlantaInterface } from 'src/app/models/planta';
-import { element } from 'protractor';
+declare const google: any;
 
 @Component({
   selector: 'app-edit-map',
@@ -205,32 +205,56 @@ export class EditMapComponent implements OnInit {
       .pipe(take(1))
       .subscribe((locAreaArray) => {
         locAreaArray.forEach((locationArea) => {
-          this.map._mapsWrapper
-            .createPolygon({
-              paths: locationArea.path,
-              strokeColor: '#FF0000',
-              visible: false,
-              strokeOpacity: 0,
-              strokeWeight: 0,
-              fillColor: 'grey',
-              fillOpacity: 0,
-              editable: false,
-              draggable: false,
-              id: locationArea.id,
-              globalX: locationArea.globalX,
-              globalY: locationArea.globalY,
-              globalCoords: locationArea.globalCoords,
-              modulo: locationArea.modulo,
-            })
-            .then((polygon: any) => {
-              locAreaList.push(polygon);
-              if (locAreaList.length === locAreaArray.length) {
-                this.plantaService.setLocAreaList(locAreaList);
-              }
-            });
+          const polygon = new google.maps.Polygon({
+            paths: locationArea.path,
+            strokeColor: '#FF0000',
+            visible: false,
+            strokeOpacity: 0,
+            strokeWeight: 0,
+            fillColor: 'grey',
+            fillOpacity: 0,
+            editable: false,
+            draggable: false,
+            id: locationArea.id,
+            globalX: locationArea.globalX,
+            globalY: locationArea.globalY,
+            globalCoords: locationArea.globalCoords,
+            modulo: locationArea.modulo,
+          });
+          polygon.setMap(this.map);
+          locAreaList.push(polygon);
+          if (locAreaList.length === locAreaArray.length) {
+            this.plantaService.setLocAreaList(locAreaList);
+          }
+          // this.map._mapsWrapper
+          //   .createPolygon({
+          //     paths: locationArea.path,
+          //     strokeColor: '#FF0000',
+          //     visible: false,
+          //     strokeOpacity: 0,
+          //     strokeWeight: 0,
+          //     fillColor: 'grey',
+          //     fillOpacity: 0,
+          //     editable: false,
+          //     draggable: false,
+          //     id: locationArea.id,
+          //     globalX: locationArea.globalX,
+          //     globalY: locationArea.globalY,
+          //     globalCoords: locationArea.globalCoords,
+          //     modulo: locationArea.modulo,
+          //   })
+          //   .then((polygon: any) => {
+          //     locAreaList.push(polygon);
+          //     if (locAreaList.length === locAreaArray.length) {
+          //       this.plantaService.setLocAreaList(locAreaList);
+          //     }
+          //   });
         });
       });
 
     return locAreaList;
+  }
+  mapIsReady(map) {
+    this.plantaService.initMap(this.planta, map);
   }
 }
