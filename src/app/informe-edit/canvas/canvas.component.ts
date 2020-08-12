@@ -16,7 +16,6 @@ import { Estructura, RectanguloInterface } from '../../models/estructura';
 import { PlantaService } from '../../services/planta.service';
 import { ModuloInterface } from '../../models/modulo';
 import { PcService } from '../../services/pc.service';
-
 declare let fabric;
 
 @Component({
@@ -61,6 +60,7 @@ export class CanvasComponent implements OnInit {
   private activeShape: any = false;
   sentidoPorDefecto = false;
   estructura: Estructura;
+  estructuraList: Estructura[];
   planta: PlantaInterface;
   allPcs: Pc[];
   private squareBase: number;
@@ -96,10 +96,6 @@ export class CanvasComponent implements OnInit {
       } else {
         this.localIdCount = 0;
       }
-      // this.allPcs.forEach((pc) => {
-      //   console.log('CanvasComponent -> ngOnInit -> pc', pc.id);
-      //   this.pcService.updatePc(pc);
-      // });
     });
 
     this.estructura = null;
@@ -129,9 +125,10 @@ export class CanvasComponent implements OnInit {
         this.nuevoPc(elem as Pc);
       } else if (elem.constructor.name === Estructura.name) {
         if (this.estructura === elem) {
+          // Si ya existe, le eliminamo
           // Borrar estructura del Canvas
+          this.limpiarEstructuraCanvas(this.estructura);
           this.estructura = null;
-          this.limpiarEstructuraCanvas();
         } else {
           this.dibujarEstructura(elem as Estructura);
           this.informeService.selectElementoPlanta(elem);
@@ -162,6 +159,7 @@ export class CanvasComponent implements OnInit {
       if (elementoPlanta.constructor.name === Estructura.name) {
         if (this.estructura !== elementoPlanta) {
           this.estructura = elementoPlanta as Estructura;
+          this.selectEstructuraInCanvas(this.estructura);
         }
       } else if (elementoPlanta.constructor.name === Pc.name) {
         if (this.selectedPc !== elementoPlanta) {
@@ -175,6 +173,18 @@ export class CanvasComponent implements OnInit {
     // Si es un PC:
   }
 
+  selectEstructuraInCanvas(estructura: Estructura) {
+    this.canvas.getObjects().forEach((obj) => {
+      if (obj.hasOwnProperty('estructura') && obj.estructura.id === estructura.id) {
+        // this.canvas.remove(obj);
+        obj.set('strokeWidth', 3);
+      } else {
+        obj.set('strokeWidth', 1);
+      }
+      this.canvas.renderAll();
+    });
+  }
+
   selectPcInCanvas(elem: Pc) {
     this.canvas.getObjects().forEach((obj) => {
       if (obj.id === elem.id) {
@@ -186,20 +196,26 @@ export class CanvasComponent implements OnInit {
     this.canvas.renderAll();
   }
 
-  addEstructuraCanvas(archivoVuelo: ArchivoVueloInterface) {
+  getEstList(archivoVuelo: ArchivoVueloInterface) {
     this.informeService
       .getEstructuraInforme(this.informeId, archivoVuelo.archivo)
       .pipe(take(1))
-      .subscribe((est) => {
-        if (est.length > 0) {
-          this.dibujarEstructura(est[0]);
+      .subscribe((estList) => {
+        if (estList.length > 0) {
+          this.estructuraList = estList;
+          this.dibujarEstructuraList(estList);
           if (this.informeService.selectedElementoPlanta == null) {
-            this.informeService.selectElementoPlanta(est[0]);
-          } else if (this.informeService.selectedElementoPlanta.id !== est[0].id) {
-            this.informeService.selectElementoPlanta(est[0]);
+            this.informeService.selectElementoPlanta(estList[0]);
+          } else if (this.informeService.selectedElementoPlanta.id !== estList[0].id) {
+            this.informeService.selectElementoPlanta(estList[0]);
           }
         }
       });
+  }
+  dibujarEstructuraList(estList: Estructura[]) {
+    estList.forEach((est) => {
+      this.dibujarEstructura(est);
+    });
   }
 
   addPcsCanvas(archivoVuelo: ArchivoVueloInterface) {
@@ -232,7 +248,7 @@ export class CanvasComponent implements OnInit {
         .subscribe((bool) => {
           if (bool) {
             // Añadir Estructura
-            this.addEstructuraCanvas(archivoVuelo);
+            this.getEstList(archivoVuelo);
             this.addPcsCanvas(archivoVuelo);
           }
         });
@@ -263,7 +279,7 @@ export class CanvasComponent implements OnInit {
 
   private dibujarPuntosInterioresEst(estructura: Estructura): void {
     this.canvas.getObjects().forEach((obj) => {
-      if (obj.hasOwnProperty('puntoInteriorEst')) {
+      if (obj.hasOwnProperty('puntoInteriorEst') && obj.estructura.id === estructura.id) {
         this.canvas.remove(obj);
       }
       this.canvas.renderAll();
@@ -277,7 +293,7 @@ export class CanvasComponent implements OnInit {
           radius: 2,
           fill: '#72FD03 ',
           selectable: false,
-          estructura: true,
+          estructura,
           hoverCursor: 'default',
           puntoInteriorEst: true,
         });
@@ -305,7 +321,7 @@ export class CanvasComponent implements OnInit {
     }
 
     // Borramos del canvas la estructura anterior.
-    this.limpiarEstructuraCanvas();
+    this.limpiarEstructuraCanvas(this.estructura);
     this.dibujarEstructura(this.estructura);
     this.informeService
       .updateElementoPlanta(this.informeId, this.estructura)
@@ -330,8 +346,8 @@ export class CanvasComponent implements OnInit {
       strokeWidth: 2,
       selectable: false,
       objectCaching: false,
-      estructura: true,
-      hoverCursor: 'default',
+      estructura,
+      hoverCursor: 'pointer',
     });
 
     this.canvas.add(polygon);
@@ -348,9 +364,8 @@ export class CanvasComponent implements OnInit {
         hasBorders: false,
         hasControls: false,
         name: index,
-        estructura: true,
+        estructura,
         esquinaEstructura: true,
-        estructuraId: estructura.id,
       });
       this.canvas.add(circle);
       this.canvas.sendToBack(circle);
@@ -363,8 +378,8 @@ export class CanvasComponent implements OnInit {
     // Event Listener: Cuando se modifique el objeto...
     this.canvas.on('object:modified', (options) => {
       const p = options.target;
-      if (p.hasOwnProperty('estructuraId')) {
-        if (p.estructuraId === estructura.id) {
+      if (p.hasOwnProperty('estructura')) {
+        if (p.estructura.id === estructura.id) {
           polygon.points[p.name] = { x: p.getCenterPoint().x, y: p.getCenterPoint().y };
           estructura.coords = polygon.points;
           this.informeService.updateElementoPlanta(this.informeId, estructura);
@@ -374,15 +389,6 @@ export class CanvasComponent implements OnInit {
       }
     });
   }
-  // private updateEstructura() {
-  //   if (this.estructura.archivo === this.currentFileName) {
-  //     this.filasEstructura = this.estructura.filas;
-  //     this.columnasEstructura = this.estructura.columnas;
-  //     this.sentidoPorDefecto = this.estructura.sentido;
-  //     this.informeService.updateEstructura(this.informe.id, this.estructura);
-  //     this.setImageFromRangeValue(this.rangeValue);
-  //   }
-  // }
 
   private drawPcInCanvas(pc: PcInterface) {
     const rect2 = new fabric.Rect({
@@ -496,13 +502,17 @@ export class CanvasComponent implements OnInit {
       }
     });
 
+    this.canvas.on('mouse:down', (options) => {
+      if (options.button === 1 && options.hasOwnProperty('target') && options.target !== null) {
+        if (options.target.hasOwnProperty('estructura')) {
+          this.selectElementoPlanta(options.target.estructura);
+        }
+      }
+    });
+
     // Creacion de Est con boton derecho
     this.canvas.on('mouse:down', (options) => {
-      if (
-        (options.button === 3 || (options.button === 1 && options.e.ctrlKey)) &&
-        !this.polygonMode &&
-        this.estructura === null
-      ) {
+      if (options.button === 3 && !this.polygonMode) {
         this.drawPolygon();
       }
       if (this.pointArray.length === 3) {
@@ -584,6 +594,27 @@ export class CanvasComponent implements OnInit {
     });
   }
 
+  private PointToCoords(puntos: Point[]) {
+    return puntos.map((p) => {
+      return [p.x, p.y];
+    });
+  }
+
+  private getEstructuraPunto(punto: Point) {
+    let estEncontrada = null;
+    if (this.estructuraList !== null) {
+      const inside = require('point-in-polygon');
+      this.estructuraList.forEach((est) => {
+        const coords = this.PointToCoords(est.coords);
+        if (inside([punto.x, punto.y], this.PointToCoords(est.coords))) {
+          estEncontrada = est;
+        }
+      });
+    }
+
+    return estEncontrada;
+  }
+
   onDblClickCanvas(event: MouseEvent) {
     // Deseleccionar elemento anterior para evitar sobrescribir
     this.informeService.uncheckPc();
@@ -602,26 +633,28 @@ export class CanvasComponent implements OnInit {
     let gps_lat: number;
     let gps_lng: number;
 
-    if (this.estructura !== null) {
-      [fila, columna] = this.estructura.calcularFilaColumna(event.offsetX, event.offsetY);
+    const point = { x: event.offsetX, y: event.offsetY } as Point;
+    const estructura = this.getEstructuraPunto(point);
+    if (estructura !== null) {
+      [fila, columna] = estructura.calcularFilaColumna(event.offsetX, event.offsetY);
 
-      [columnaReal, filaReal] = this.estructura.getLocalCoordsFromEstructura(columna, fila);
-      [columnaRef, filaRef] = this.estructura.getFilaColumnaRef(columna, fila);
+      [columnaReal, filaReal] = estructura.getLocalCoordsFromEstructura(columna, fila);
+      [columnaRef, filaRef] = estructura.getFilaColumnaRef(columna, fila);
 
       if (event.ctrlKey) {
-        rectInteriorPc = this.estructura.getRectanguloExterior(columna, fila);
-        rectInteriorRef = this.estructura.getRectanguloExterior(columnaRef, filaRef);
+        rectInteriorPc = estructura.getRectanguloExterior(columna, fila);
+        rectInteriorRef = estructura.getRectanguloExterior(columnaRef, filaRef);
       } else {
-        rectInteriorPc = this.estructura.getRectanguloInterior(columna, fila);
-        rectInteriorRef = this.estructura.getRectanguloInterior(columnaRef, filaRef);
+        rectInteriorPc = estructura.getRectanguloInterior(columna, fila);
+        rectInteriorRef = estructura.getRectanguloInterior(columnaRef, filaRef);
       }
 
       this.setSquareBase(
         this.planta,
         Math.min(rectInteriorPc.bottom - rectInteriorPc.top, rectInteriorPc.right - rectInteriorPc.left)
       );
-      gps_lat = this.estructura.getLatLng().lat;
-      gps_lng = this.estructura.getLatLng().lng;
+      gps_lat = estructura.getLatLng().lat;
+      gps_lng = estructura.getLatLng().lng;
     } else {
       filaReal = 0;
       columnaReal = 1;
@@ -756,7 +789,7 @@ export class CanvasComponent implements OnInit {
   //       (error) => {
   //         const errorMessage = error;
   //         if (errorMessage != null) {
-  //           const body = JSON.parse(error._body);
+  //           const body = JSON.parse(error._body)
   //           this.alertMessage = body.message;
   //           console.log(error);
   //         }
@@ -800,9 +833,9 @@ export class CanvasComponent implements OnInit {
     }
   }
 
-  private limpiarEstructuraCanvas() {
+  private limpiarEstructuraCanvas(estructura: EstructuraInterface) {
     this.canvas.getObjects().forEach((obj) => {
-      if (obj.hasOwnProperty('estructura')) {
+      if (obj.hasOwnProperty('estructura') && obj.estructura.id === estructura.id) {
         this.canvas.remove(obj);
       }
     });
@@ -825,9 +858,9 @@ export class CanvasComponent implements OnInit {
 
   public drawPolygon() {
     // Borrar posibles restos de polígonos anteriores
-    if (this.estructura) {
-      this.deleteEstructura(this.estructura);
-    }
+    // if (this.estructura) {
+    //   this.deleteEstructura(this.estructura);
+    // }
     //
 
     this.polygonMode = true;

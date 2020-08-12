@@ -124,14 +124,14 @@ export class EditListComponent implements OnInit {
   }
   private nextEstructura() {
     const isSameEstructura = (estructuraConPcs: EstructuraConPcs) =>
-      estructuraConPcs.estructura.id === this.selectedEstructura.id;
+      estructuraConPcs.estructura.archivo === this.selectedEstructura.archivo;
     const nextEstructuraIndex = 1 + this.dataSourceEst.data.findIndex(isSameEstructura);
     const nextEstructura = this.dataSourceEst.data[nextEstructuraIndex].estructura;
     this.onClickRowList(nextEstructura);
   }
   private previousEstructura() {
     const isSameEstructura = (estructuraConPcs: EstructuraConPcs) =>
-      estructuraConPcs.estructura.id === this.selectedEstructura.id;
+      estructuraConPcs.estructura.archivo === this.selectedEstructura.archivo;
     const prevEstructuraIndex = -1 + this.dataSourceEst.data.findIndex(isSameEstructura);
     const prevEstructura = this.dataSourceEst.data[prevEstructuraIndex].estructura;
     this.onClickRowList(prevEstructura);
