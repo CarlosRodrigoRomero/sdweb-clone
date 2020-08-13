@@ -501,7 +501,7 @@ export class CanvasComponent implements OnInit {
         this.onDblClickCanvas(options.e);
       }
     });
-
+    // Seleccionar estructura
     this.canvas.on('mouse:down', (options) => {
       if (options.button === 1 && options.hasOwnProperty('target') && options.target !== null) {
         if (options.target.hasOwnProperty('estructura')) {
@@ -512,7 +512,8 @@ export class CanvasComponent implements OnInit {
 
     // Creacion de Est con boton derecho
     this.canvas.on('mouse:down', (options) => {
-      if (options.button === 3 && !this.polygonMode) {
+      console.log('CanvasComponent -> initCanvasListeners -> options', options);
+      if ((options.button === 3 || (options.button === 1 && options.e.ctrlKey)) && !this.polygonMode) {
         this.drawPolygon();
       }
       if (this.pointArray.length === 3) {
@@ -641,7 +642,7 @@ export class CanvasComponent implements OnInit {
       [columnaReal, filaReal] = estructura.getLocalCoordsFromEstructura(columna, fila);
       [columnaRef, filaRef] = estructura.getFilaColumnaRef(columna, fila);
 
-      if (event.ctrlKey) {
+      if (event.altKey) {
         rectInteriorPc = estructura.getRectanguloExterior(columna, fila);
         rectInteriorRef = estructura.getRectanguloExterior(columnaRef, filaRef);
       } else {

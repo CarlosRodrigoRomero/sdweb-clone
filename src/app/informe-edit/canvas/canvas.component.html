@@ -22,7 +22,7 @@
       ></canvas>
     </div>
   </div>
-  <div class="row" *ngIf="estructura; else crearEstructura">
+  <div class="row" *ngIf="estructura">
     <div class="col-9 propiedadesEstructura">
       <div class="row">
         <div class="col-6">
@@ -103,11 +103,11 @@
       </div>
     </div>
   </div>
-  <ng-template #crearEstructura>
+  <div>
     <div class="row">
       <div class="col">
         <button (click)="onClickCrearEstructura()" mat-raised-button color="primary">Crear Estructura</button>
       </div>
     </div>
-  </ng-template>
+  </div>
 </div>
