@@ -800,7 +800,7 @@ export class CanvasComponent implements OnInit {
   }
 
   onClickCrearEstructura() {
-    if (!this.polygonMode && this.estructura === null) {
+    if (!this.polygonMode) {
       this.drawPolygon();
     }
   }
