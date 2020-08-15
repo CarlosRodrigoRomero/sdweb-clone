@@ -139,16 +139,17 @@ export class EditMapComponent implements OnInit {
     return 2;
   }
   getStrokeColor(elementoPlanta: PcInterface & Estructura): string {
+    if (this.informeService.selectedElementoPlanta) {
+      if (this.informeService.selectedElementoPlanta.id === elementoPlanta.id) {
+        return '#7CFC00';
+      }
+    }
     if (this.planta.tipo === 'fija' && elementoPlanta.columnaInicio === 1) {
       return 'orange';
     }
 
     if (!this.validateElem.transform(elementoPlanta, this.planta)) {
       return 'red';
-    } else if (this.informeService.selectedElementoPlanta) {
-      if (this.informeService.selectedElementoPlanta.archivo === elementoPlanta.archivo) {
-        return '#7CFC00';
-      }
     }
 
     if (elementoPlanta.vuelo === this.informeService.selectedArchivoVuelo.vuelo) {
@@ -183,9 +184,8 @@ export class EditMapComponent implements OnInit {
     console.log('EditMapComponent -> onTrayectoryRightClick -> event', event);
   }
 
-  onMapElementoPlantaDragEnd(elementoPlanta: ElementoPlantaInterface, event) {
-    elementoPlanta.setLatLng({ lat: event.coords.lat, lng: event.coords.lng });
-    this.onMapElementoPlantaClick(elementoPlanta);
+  private changeLocationElementoPlanta(elementoPlanta: ElementoPlantaInterface, coords: LatLngLiteral) {
+    elementoPlanta.setLatLng({ lat: coords.lat, lng: coords.lng });
 
     // globalCoordsFromLocation
     let globalCoords;
@@ -195,7 +195,23 @@ export class EditMapComponent implements OnInit {
     elementoPlanta.setGlobals(globalCoords);
     elementoPlanta.setModulo(modulo);
 
-    this.informeService.updateElementoPlanta(this.informeId, elementoPlanta);
+    this.informeService.updateElementoPlanta(this.informeId, elementoPlanta).then((res) => {
+      console.log(res);
+    });
+  }
+
+  onMapElementoPlantaDragEnd(elementoPlanta: ElementoPlantaInterface, event) {
+    if (this.planta.tipo === 'seguidores') {
+      this.allElementosPlanta
+        .filter((elem) => {
+          return elem.archivo === elementoPlanta.archivo;
+        })
+        .forEach((elem) => {
+          console.log('EditMapComponent -> onMapElementoPlantaDragEnd -> elem', elem);
+          this.changeLocationElementoPlanta(elem, event.coords);
+        });
+    }
+    this.onMapElementoPlantaClick(elementoPlanta);
   }
 
   private setLocAreaList(plantaId: string): LocationAreaInterface[] {

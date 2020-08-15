@@ -178,8 +178,17 @@ export class CanvasComponent implements OnInit {
       if (obj.hasOwnProperty('estructura') && obj.estructura.id === estructura.id) {
         // this.canvas.remove(obj);
         obj.set('strokeWidth', 3);
+        if (obj.hasOwnProperty('esquinaEstructura')) {
+          obj.set('selectable', true);
+          obj.set('radius', 5);
+        }
       } else {
         obj.set('strokeWidth', 1);
+
+        if (obj.hasOwnProperty('esquinaEstructura')) {
+          obj.set('selectable', false);
+          obj.set('radius', 0);
+        }
       }
       this.canvas.renderAll();
     });
@@ -291,7 +300,7 @@ export class CanvasComponent implements OnInit {
           left: punto.x - 2,
           top: punto.y - 2,
           radius: 2,
-          fill: '#72FD03 ',
+          fill: '#72FD03',
           selectable: false,
           estructura,
           hoverCursor: 'default',
@@ -366,9 +375,10 @@ export class CanvasComponent implements OnInit {
         name: index,
         estructura,
         esquinaEstructura: true,
+        selectable: true,
+        hoverCursor: 'pointer',
       });
       this.canvas.add(circle);
-      this.canvas.sendToBack(circle);
     });
     this.canvas.renderAll();
 
@@ -512,7 +522,6 @@ export class CanvasComponent implements OnInit {
 
     // Creacion de Est con boton derecho
     this.canvas.on('mouse:down', (options) => {
-      console.log('CanvasComponent -> initCanvasListeners -> options', options);
       if ((options.button === 3 || (options.button === 1 && options.e.ctrlKey)) && !this.polygonMode) {
         this.drawPolygon();
       }
@@ -746,58 +755,6 @@ export class CanvasComponent implements OnInit {
     });
   }
 
-  // onMouseUpCanvas(event) {
-  //   const actObj = this.canvas.getActiveObject();
-
-  //   // PCS
-  //   if (actObj !== null && actObj !== undefined) {
-  //     if (actObj.get('type') === 'rect') {
-  //       this.selectedElement = this.allPcs.find((pc) => pc.local_id === actObj.localId);
-
-  //     }
-  //   }
-
-  //   // ESTRUCTURAS
-  // }
-
-  // getPcsList(vuelo?: string) {
-  //   this.pcService
-  //     .getPcsInformeEdit(this.informe.id)
-  //     .pipe(take(1))
-  //     .subscribe(
-  //       (response) => {
-  //         if (!response || response.length === 0) {
-  //           this.alertMessage = 'No hay puntos calientes';
-  //         } else {
-  //           this.alertMessage = null;
-  //           this.allPcs = response;
-  //           if (vuelo != null) {
-  //             this.allPcs = this.sortPcs(this.allPcs).filter((arr) => {
-  //               return arr.vuelo === vuelo;
-  //             });
-  //           } else {
-  //             this.allPcs = this.sortPcs(this.allPcs);
-  //           }
-
-  //           this.localIdCount = this.allPcs[0].local_id;
-  //         }
-
-  //         // if (this.DEFAULT_LAT == null || this.DEFAULT_LNG == null) {
-  //         //     this.DEFAULT_LAT = this.allPcs[0].gps_lat;
-  //         //     this.DEFAULT_LNG = this.allPcs[0].gps_lng;
-  //         // }
-  //       },
-  //       (error) => {
-  //         const errorMessage = error;
-  //         if (errorMessage != null) {
-  //           const body = JSON.parse(error._body)
-  //           this.alertMessage = body.message;
-  //           console.log(error);
-  //         }
-  //       }
-  //     );
-  // }
-
   deleteEstructura(estructura: Estructura) {
     this.informeService.deleteEstructuraInforme(this.informeId, estructura);
   }
@@ -858,12 +815,6 @@ export class CanvasComponent implements OnInit {
   }
 
   public drawPolygon() {
-    // Borrar posibles restos de polígonos anteriores
-    // if (this.estructura) {
-    //   this.deleteEstructura(this.estructura);
-    // }
-    //
-
     this.polygonMode = true;
     this.pointArray = new Array();
     this.lineArray = new Array();
@@ -992,8 +943,9 @@ export class CanvasComponent implements OnInit {
       columnaInicio: 1,
       filaInicio: 1,
       vuelo: this.informeService.selectedArchivoVuelo.vuelo,
-      latitud: this.currentLatLng.lat,
-      longitud: this.currentLatLng.lng,
+      latitud: this.estructura && this.planta.tipo === 'seguidores' ? this.estructura.latitud : this.currentLatLng.lat,
+      longitud:
+        this.estructura && this.planta.tipo === 'seguidores' ? this.estructura.longitud : this.currentLatLng.lng,
       globalCoords,
     } as EstructuraInterface;
 
