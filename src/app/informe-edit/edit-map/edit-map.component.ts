@@ -195,9 +195,7 @@ export class EditMapComponent implements OnInit {
     elementoPlanta.setGlobals(globalCoords);
     elementoPlanta.setModulo(modulo);
 
-    this.informeService.updateElementoPlanta(this.informeId, elementoPlanta).then((res) => {
-      console.log(res);
-    });
+    this.informeService.updateElementoPlanta(this.informeId, elementoPlanta);
   }
 
   onMapElementoPlantaDragEnd(elementoPlanta: ElementoPlantaInterface, event) {
@@ -207,7 +205,6 @@ export class EditMapComponent implements OnInit {
           return elem.archivo === elementoPlanta.archivo;
         })
         .forEach((elem) => {
-          console.log('EditMapComponent -> onMapElementoPlantaDragEnd -> elem', elem);
           this.changeLocationElementoPlanta(elem, event.coords);
         });
     }
