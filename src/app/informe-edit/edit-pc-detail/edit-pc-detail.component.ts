@@ -183,6 +183,21 @@ export class EditPcDetailComponent implements OnInit {
 
     this.hotkeysService.add(
       new Hotkey(
+        '8',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 18;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '8: Posible PID'
+      )
+    );
+
+    this.hotkeysService.add(
+      new Hotkey(
         'q',
         (event: KeyboardEvent): boolean => {
           if (this.checkSelectedPc()) {

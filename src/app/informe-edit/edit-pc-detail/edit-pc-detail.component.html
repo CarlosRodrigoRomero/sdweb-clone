@@ -160,6 +160,16 @@
         />
         <img class="img-fluid" src="../../../assets/images/tipo_16.png" />
       </label>
+      <label class="selected-pc-tipo-label">
+        <input
+          (change)="updatePcInDb(selectedPc)"
+          [(ngModel)]="selectedPc.tipo"
+          type="radio"
+          name="tipo"
+          [value]="18"
+        />
+        <img class="img-fluid" src="../../../assets/images/tipo_18.png" />
+      </label>
 
       <!-- <label class="selected-pc-tipo-label">
         <input
