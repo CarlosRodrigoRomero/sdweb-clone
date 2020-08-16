@@ -130,7 +130,7 @@ export class EditListComponent implements OnInit {
       return this.selectedEstructura.archivo === est.estructura.archivo;
     }).length;
 
-    const nextEstructuraIndex = 1 + this.dataSourceEst.data.findIndex(isSameEstructura) + estructurasMismoArchivo;
+    const nextEstructuraIndex = this.dataSourceEst.data.findIndex(isSameEstructura) + estructurasMismoArchivo;
     const nextEstructura = this.dataSourceEst.data[nextEstructuraIndex].estructura;
     this.onClickRowList(nextEstructura);
   }
