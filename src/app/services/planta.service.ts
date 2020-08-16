@@ -463,7 +463,7 @@ export class PlantaService {
 
   initMap(planta: PlantaInterface, map: any) {
     if (planta.hasOwnProperty('ortofoto')) {
-      const ortofoto = this.planta.ortofoto;
+      const ortofoto = planta.ortofoto;
       map.setOptions({ maxZoom: ortofoto.mapMaxZoom });
       map.setOptions({ minZoom: ortofoto.mapMinZoom });
       map.mapTypeId = 'roadmap';

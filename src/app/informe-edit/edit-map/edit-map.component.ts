@@ -268,6 +268,7 @@ export class EditMapComponent implements OnInit {
     return locAreaList;
   }
   mapIsReady(map) {
+    this.map = map;
     this.plantaService.initMap(this.planta, map);
   }
 }
