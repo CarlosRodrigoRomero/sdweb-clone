@@ -1,6 +1,5 @@
-<div *ngIf="informeService.selectedArchivoVuelo">
+<div *ngIf="informeService.selectedArchivoVuelo && planta">
   <agm-map
-    *ngIf="planta"
     mapTypeControl="true"
     [latitude]="currentLatLng.lat"
     [longitude]="currentLatLng.lng"

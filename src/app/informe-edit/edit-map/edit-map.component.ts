@@ -101,7 +101,6 @@ export class EditMapComponent implements OnInit {
         })
       )
       .subscribe((planta) => {
-        this.setLocAreaList(planta.id);
         this.planta = planta;
       });
   }
@@ -207,6 +206,8 @@ export class EditMapComponent implements OnInit {
         .forEach((elem) => {
           this.changeLocationElementoPlanta(elem, event.coords);
         });
+    } else {
+      this.changeLocationElementoPlanta(elementoPlanta, event.coords);
     }
     this.onMapElementoPlantaClick(elementoPlanta);
   }
@@ -270,5 +271,6 @@ export class EditMapComponent implements OnInit {
   mapIsReady(map) {
     this.map = map;
     this.plantaService.initMap(this.planta, map);
+    this.setLocAreaList(this.planta.id);
   }
 }
