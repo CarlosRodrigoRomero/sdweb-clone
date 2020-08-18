@@ -73,6 +73,7 @@ export class InformeEditComponent implements OnInit {
   public carpetaJpgGray: string;
   public planta$: Observable<PlantaInterface>;
   public gpsCoordsList: LatLngLiteral[];
+  public autoLoc: boolean;
 
   informeId: string;
 
@@ -132,6 +133,7 @@ export class InformeEditComponent implements OnInit {
 
   ngOnInit() {
     this.showTable = true;
+    this.autoLoc = true;
     this.currentLatLng = { lat: 39.453186, lng: -5.880743 };
     this.informeId = this.route.snapshot.paramMap.get('id');
 

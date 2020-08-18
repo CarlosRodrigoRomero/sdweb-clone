@@ -12,8 +12,8 @@
           est/pc
         </mat-slide-toggle>
         <mat-slide-toggle [(ngModel)]="showTable"> Mostrar tabla </mat-slide-toggle>
-
-        numGlobalCoords:
+        <mat-slide-toggle [(ngModel)]="autoLoc"> Auto Loc </mat-slide-toggle>
+        || numGlobalCoords:
         <input
           type="number"
           [(ngModel)]="planta.numeroGlobalCoords"
@@ -187,7 +187,8 @@
         </div>
 
         <div class="col col-xs-6 mapa">
-          <app-edit-map [currentLatLng]="currentLatLng" [gpsCoordsList]="gpsCoordsList"> </app-edit-map>
+          <app-edit-map [autoLoc]="autoLoc" [currentLatLng]="currentLatLng" [gpsCoordsList]="gpsCoordsList">
+          </app-edit-map>
           <app-edit-pc-detail *ngIf="pcsOrEstructuras"></app-edit-pc-detail>
         </div>
       </div>

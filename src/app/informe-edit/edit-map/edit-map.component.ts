@@ -24,6 +24,7 @@ export class EditMapComponent implements OnInit {
     this.coordsList = list;
   }
   @Input() currentLatLng: LatLngLiteral;
+  @Input() autoLoc: boolean;
 
   mapType: string;
   defaultZoom: number;
@@ -187,12 +188,15 @@ export class EditMapComponent implements OnInit {
     elementoPlanta.setLatLng({ lat: coords.lat, lng: coords.lng });
 
     // globalCoordsFromLocation
-    let globalCoords;
-    let modulo;
-    [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(elementoPlanta.getLatLng());
+    console.log('EditMapComponent -> changeLocationElementoPlanta -> this.autoLoc', this.autoLoc);
+    if (this.autoLoc) {
+      let globalCoords;
+      let modulo;
+      [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(elementoPlanta.getLatLng());
 
-    elementoPlanta.setGlobals(globalCoords);
-    elementoPlanta.setModulo(modulo);
+      elementoPlanta.setGlobals(globalCoords);
+      elementoPlanta.setModulo(modulo);
+    }
 
     this.informeService.updateElementoPlanta(this.informeId, elementoPlanta);
   }
