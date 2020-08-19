@@ -188,7 +188,6 @@ export class EditMapComponent implements OnInit {
     elementoPlanta.setLatLng({ lat: coords.lat, lng: coords.lng });
 
     // globalCoordsFromLocation
-    console.log('EditMapComponent -> changeLocationElementoPlanta -> this.autoLoc', this.autoLoc);
     if (this.autoLoc) {
       let globalCoords;
       let modulo;
@@ -244,29 +243,6 @@ export class EditMapComponent implements OnInit {
           if (locAreaList.length === locAreaArray.length) {
             this.plantaService.setLocAreaList(locAreaList);
           }
-          // this.map._mapsWrapper
-          //   .createPolygon({
-          //     paths: locationArea.path,
-          //     strokeColor: '#FF0000',
-          //     visible: false,
-          //     strokeOpacity: 0,
-          //     strokeWeight: 0,
-          //     fillColor: 'grey',
-          //     fillOpacity: 0,
-          //     editable: false,
-          //     draggable: false,
-          //     id: locationArea.id,
-          //     globalX: locationArea.globalX,
-          //     globalY: locationArea.globalY,
-          //     globalCoords: locationArea.globalCoords,
-          //     modulo: locationArea.modulo,
-          //   })
-          //   .then((polygon: any) => {
-          //     locAreaList.push(polygon);
-          //     if (locAreaList.length === locAreaArray.length) {
-          //       this.plantaService.setLocAreaList(locAreaList);
-          //     }
-          //   });
         });
       });
 
