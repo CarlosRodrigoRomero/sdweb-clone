@@ -11,6 +11,7 @@ import { ArchivoVueloInterface } from '../models/archivoVuelo';
 import { ElementoPlantaInterface } from '../models/elementoPlanta';
 import { element } from 'protractor';
 import { PcInterface } from '../models/pc';
+import { LatLngLiteral } from '@agm/core';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +31,8 @@ export class InformeService {
   selectedPc$ = this.selectedPcSource.asObservable();
   private archivoVueloSource = new Subject<ArchivoVueloInterface>();
   selectedArchivoVuelo$ = this.archivoVueloSource.asObservable();
+  droneLatLng = new Subject<LatLngLiteral>();
+  droneLatLng$ = this.droneLatLng.asObservable();
 
   avisadorNuevoElementoSource = new Subject<ElementoPlantaInterface>();
   avisadorNuevoElemento$ = this.avisadorNuevoElementoSource.asObservable();

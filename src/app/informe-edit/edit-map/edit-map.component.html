@@ -1,42 +1,12 @@
 <div *ngIf="informeService.selectedArchivoVuelo && planta">
   <agm-map
     mapTypeControl="true"
-    [latitude]="currentLatLng.lat"
-    [longitude]="currentLatLng.lng"
+    [latitude]="droneLatLng.lat"
+    [longitude]="droneLatLng.lng"
     [mapTypeId]="mapType"
     [zoom]="defaultZoom"
     (mapReady)="mapIsReady($event)"
   >
-    <agm-circle
-      [latitude]="currentLatLng.lat"
-      [longitude]="currentLatLng.lng"
-      [radius]="5"
-      [fillColor]="'yellow'"
-      [circleDraggable]="false"
-      [editable]="false"
-      [clickable]="false"
-      [strokeColor]="'orange'"
-      [strokeWeight]="2"
-    >
-    </agm-circle>
-
-    <agm-circle
-      *ngFor="let elemPlant of getEstructurasMostrarEnMapa(allElementosPlanta)"
-      [latitude]="elemPlant.getLatLng().lat"
-      [longitude]="elemPlant.getLatLng().lng"
-      [radius]="getCircleRadius()"
-      [fillColor]="getFillColor(elemPlant)"
-      [strokeColor]="getStrokeColor(elemPlant)"
-      [strokeWeight]="getStrokeWeight(elemPlant)"
-      [strokePosition]="'INSIDE'"
-      [circleDraggable]="true"
-      [editable]="false"
-      [id]="elemPlant.id"
-      (circleClick)="onMapElementoPlantaClick(elemPlant)"
-      (dragEnd)="onMapElementoPlantaDragEnd(elemPlant, $event)"
-    >
-    </agm-circle>
-
     <agm-polyline
       *ngFor="let item of coordsList"
       [strokeWeight]="getTrayectoryStrokeWeight(item.vuelo)"
@@ -48,4 +18,3 @@
     </agm-polyline>
   </agm-map>
 </div>
-<mat-checkbox [(ngModel)]="soloEstructurasVuelo">Ocultar estructuras otros vuelos</mat-checkbox>

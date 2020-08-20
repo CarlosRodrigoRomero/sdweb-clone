@@ -187,8 +187,7 @@
         </div>
 
         <div class="col col-xs-6 mapa">
-          <app-edit-map [autoLoc]="autoLoc" [currentLatLng]="currentLatLng" [gpsCoordsList]="gpsCoordsList">
-          </app-edit-map>
+          <app-edit-map [gpsCoordsList]="gpsCoordsList"> </app-edit-map>
           <app-edit-pc-detail *ngIf="pcsOrEstructuras"></app-edit-pc-detail>
         </div>
       </div>

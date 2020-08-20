@@ -60,7 +60,7 @@ export interface PcInterface {
   rangeMin?: number;
   nubosidad?: string;
   modulosAfectados?: number;
-  modulo: ModuloInterface;
+  modulo?: ModuloInterface;
   clase?: number;
   numeroSerie?: string;
   globalCoords?: any[];

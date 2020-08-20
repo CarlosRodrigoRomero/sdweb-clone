@@ -26,7 +26,6 @@ declare let fabric;
 export class CanvasComponent implements OnInit {
   @Input() pcsOrEstructuras: boolean;
   @Input() carpetaJpgGray: string;
-  @Input() currentLatLng: LatLngLiteral;
   @Input() currentDatetime: number;
   @Input() currentTrackheading: number;
   @Input() currentImageRotation: number;
@@ -72,6 +71,7 @@ export class CanvasComponent implements OnInit {
   global = GLOBAL;
   public successMessage: string;
   public alertMessage: string;
+  currentLatLng: LatLngLiteral;
 
   constructor(
     public informeService: InformeService,
@@ -134,6 +134,10 @@ export class CanvasComponent implements OnInit {
           this.informeService.selectElementoPlanta(elem);
         }
       }
+    });
+
+    this.informeService.droneLatLng$.subscribe((latLng) => {
+      this.currentLatLng = latLng;
     });
   }
   nuevoPc(pc: Pc) {

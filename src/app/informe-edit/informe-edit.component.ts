@@ -60,7 +60,6 @@ export class InformeEditComponent implements OnInit {
   public currentGlobalX: number;
   public currentGlobalY: string;
   public buildingEstructura = false;
-  public currentLatLng: LatLngLiteral;
 
   public estructuraOn: boolean;
 
@@ -73,7 +72,6 @@ export class InformeEditComponent implements OnInit {
   public carpetaJpgGray: string;
   public planta$: Observable<PlantaInterface>;
   public gpsCoordsList: LatLngLiteral[];
-  public autoLoc: boolean;
 
   informeId: string;
 
@@ -133,8 +131,6 @@ export class InformeEditComponent implements OnInit {
 
   ngOnInit() {
     this.showTable = true;
-    this.autoLoc = true;
-    this.currentLatLng = { lat: 39.453186, lng: -5.880743 };
     this.informeId = this.route.snapshot.paramMap.get('id');
 
     this.rangeValue = 0;
@@ -187,11 +183,11 @@ export class InformeEditComponent implements OnInit {
 
     const currentCcoords = this.coords[arrayIndex];
 
-    // Setear this.currentLatLng (para que se extienda a todos los childs)
-    this.currentLatLng = {
+    // Setear droneLatLng (para que se extienda a todos los childs)
+    this.informeService.droneLatLng.next({
       lat: parseFloat(currentCcoords.Latitude),
       lng: parseFloat(currentCcoords.Longitude),
-    };
+    });
 
     this.currentDatetime = this.getDateTimeFromDateAndTime(currentCcoords.Date, currentCcoords.Time);
     this.currentTrackheading = Math.round(currentCcoords.TrackHeading);
