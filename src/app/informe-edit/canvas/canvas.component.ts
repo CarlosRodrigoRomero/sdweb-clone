@@ -89,14 +89,17 @@ export class CanvasComponent implements OnInit {
     this.squareBase = 37;
     this.squareProp = 1.8;
 
-    this.pcService.getPcsInformeEdit(this.informeId).subscribe((allPcs) => {
-      this.allPcs = allPcs;
-      if (this.allPcs.length > 0) {
-        this.localIdCount = allPcs.sort(this.pcService.sortByLocalId)[allPcs.length - 1].local_id;
-      } else {
-        this.localIdCount = 0;
-      }
-    });
+    this.pcService
+      .getPcsInformeEdit(this.informeId)
+      .pipe(take(1))
+      .subscribe((allPcs) => {
+        this.allPcs = allPcs;
+        if (this.allPcs.length > 0) {
+          this.localIdCount = allPcs.sort(this.pcService.sortByLocalId)[allPcs.length - 1].local_id;
+        } else {
+          this.localIdCount = 0;
+        }
+      });
 
     this.estructura = null;
 
@@ -122,12 +125,23 @@ export class CanvasComponent implements OnInit {
 
     this.informeService.avisadorNuevoElemento$.subscribe((elem) => {
       if (elem.constructor.name === Pc.name) {
-        this.nuevoPc(elem as Pc);
+        const elemPos = this.allPcs.findIndex((val) => {
+          return val.id === elem.id;
+        });
+
+        if (elemPos >= 0) {
+          // Si existe, le eliminamos
+          this.allPcs.splice(elemPos, 1);
+          this.deletePcCanvas(elem as Pc);
+        } else {
+          this.allPcs.push(elem as Pc);
+        }
       } else if (elem.constructor.name === Estructura.name) {
         if (this.estructura === elem) {
           // Si ya existe, le eliminamo
           // Borrar estructura del Canvas
           this.limpiarEstructuraCanvas(this.estructura);
+          this.borrarPcsEstructura(this.estructura);
           this.estructura = null;
         } else {
           this.dibujarEstructura(elem as Estructura);
@@ -140,7 +154,21 @@ export class CanvasComponent implements OnInit {
       this.currentLatLng = latLng;
     });
   }
-  nuevoPc(pc: Pc) {
+  private borrarPcsEstructura(estructura: Estructura) {
+    if (this.estructuraList.length === 1) {
+      this.allPcs
+        .filter((val) => {
+          return val.archivo === estructura.archivo;
+        })
+        .forEach((pc) => {
+          this.pcService.delPc(pc).then((v) => {
+            this.informeService.avisadorNuevoElementoSource.next(pc);
+            this.deletePcCanvas(pc);
+          });
+        });
+    }
+  }
+  deletePcCanvas(pc: Pc) {
     this.canvas.getObjects().forEach((obj) => {
       if (obj.hasOwnProperty('ref')) {
         if (obj.id === pc.id) {
@@ -669,96 +697,100 @@ export class CanvasComponent implements OnInit {
       );
       gpsLat = estructura.getLatLng().lat;
       gpsLng = estructura.getLatLng().lng;
-    } else {
-      filaReal = 0;
-      columnaReal = 1;
 
-      const top = event.offsetY - this.squareHeight / 2;
-      const left = event.offsetX - this.squareWidth / 2;
-      const height = this.squareHeight;
-      const width = this.squareWidth;
-      rectInteriorPc = { top, left, bottom: top + height, right: left + width };
+      // else {
+      //   filaReal = 0;
+      //   columnaReal = 1;
 
-      const leftRef = Math.round(left + width * (1 + this.rectSeparation) + (width * this.rectRefReduction) / 2);
-      const topRef = Math.round(top + (height * this.rectRefReduction) / 2);
-      const widthRef = Math.round(width * (1 - this.rectRefReduction));
-      const heightRef = Math.round(height * (1 - this.rectRefReduction));
-      rectInteriorRef = { top: topRef, left: leftRef, bottom: topRef + heightRef, right: leftRef + widthRef };
+      //   const top = event.offsetY - this.squareHeight / 2;
+      //   const left = event.offsetX - this.squareWidth / 2;
+      //   const height = this.squareHeight;
+      //   const width = this.squareWidth;
+      //   rectInteriorPc = { top, left, bottom: top + height, right: left + width };
 
-      gpsLat = this.currentLatLng.lat;
-      gpsLng = this.currentLatLng.lng;
-    }
+      //   const leftRef = Math.round(left + width * (1 + this.rectSeparation) + (width * this.rectRefReduction) / 2);
+      //   const topRef = Math.round(top + (height * this.rectRefReduction) / 2);
+      //   const widthRef = Math.round(width * (1 - this.rectRefReduction));
+      //   const heightRef = Math.round(height * (1 - this.rectRefReduction));
+      //   rectInteriorRef = { top: topRef, left: leftRef, bottom: topRef + heightRef, right: leftRef + widthRef };
 
-    // Localizaciones
-    let globalCoords;
-    let modulo;
-    [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.estructura.getLatLng());
+      //   gpsLat = this.currentLatLng.lat;
+      //   gpsLng = this.currentLatLng.lng;
+      // }
 
-    // Creamos el nuevo PC
-    this.localIdCount += 1;
+      // Localizaciones
+      let globalCoords;
+      let modulo;
+      [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.estructura.getLatLng());
 
-    const newPc: PcInterface = {
-      id: '',
-      archivo: this.informeService.selectedArchivoVuelo.archivo,
-      vuelo: this.informeService.selectedArchivoVuelo.vuelo,
-      tipo: GLOBAL.anomaliaPorDefecto, // tipo (diodo bypass por defecto)
-      local_x: columnaReal, // local_x
-      local_y: filaReal, // local_x
-      globalCoords, //
-      gps_lng: gpsLng,
-      gps_lat: gpsLat,
-      img_left: rectInteriorPc.left,
-      img_top: rectInteriorPc.top,
-      img_width: rectInteriorPc.right - rectInteriorPc.left,
-      img_height: rectInteriorPc.bottom - rectInteriorPc.top,
-      img_x: 0, // coordenadas raw del punto mas caliente
-      img_y: 0, // coordenadas raw del punto mas caliente
-      local_id: this.localIdCount,
-      image_rotation: this.currentImageRotation,
-      informeId: this.informeId,
-      datetime: this.currentDatetime,
-      resuelto: false,
-      refLeft: rectInteriorRef.left,
-      refTop: rectInteriorRef.top,
-      refWidth: rectInteriorRef.right - rectInteriorRef.left,
-      refHeight: rectInteriorRef.bottom - rectInteriorRef.top,
-      modulo,
-    };
+      // Creamos el nuevo PC
+      this.localIdCount += 1;
 
-    //
-    const selectedElem = this.informeService.selectedElementoPlanta;
-    if (selectedElem) {
-      if (selectedElem.constructor.name === Pc.name) {
-        const selectedPc = selectedElem as Pc;
-        if (selectedElem.archivo === newPc.archivo) {
-          newPc.refHeight = selectedPc.refHeight;
-          newPc.refWidth = selectedPc.refWidth;
-          newPc.refTop = selectedPc.refTop;
-          newPc.refLeft = selectedPc.refLeft;
-          if (event.shiftKey) {
-            newPc.img_width = selectedPc.img_width;
-            newPc.img_height = selectedPc.img_height;
+      const newPc: PcInterface = {
+        id: '',
+        archivo: this.informeService.selectedArchivoVuelo.archivo,
+        vuelo: this.informeService.selectedArchivoVuelo.vuelo,
+        tipo: GLOBAL.anomaliaPorDefecto, // tipo (diodo bypass por defecto)
+        local_x: columnaReal, // local_x
+        local_y: filaReal, // local_x
+        globalCoords, //
+        gps_lng: gpsLng,
+        gps_lat: gpsLat,
+        img_left: rectInteriorPc.left,
+        img_top: rectInteriorPc.top,
+        img_width: rectInteriorPc.right - rectInteriorPc.left,
+        img_height: rectInteriorPc.bottom - rectInteriorPc.top,
+        img_x: 0, // coordenadas raw del punto mas caliente
+        img_y: 0, // coordenadas raw del punto mas caliente
+        local_id: this.localIdCount,
+        image_rotation: this.currentImageRotation,
+        informeId: this.informeId,
+        datetime: this.currentDatetime,
+        resuelto: false,
+        refLeft: rectInteriorRef.left,
+        refTop: rectInteriorRef.top,
+        refWidth: rectInteriorRef.right - rectInteriorRef.left,
+        refHeight: rectInteriorRef.bottom - rectInteriorRef.top,
+        modulo,
+      };
+
+      //
+      const selectedElem = this.informeService.selectedElementoPlanta;
+      if (selectedElem) {
+        if (selectedElem.constructor.name === Pc.name) {
+          const selectedPc = selectedElem as Pc;
+          if (selectedElem.archivo === newPc.archivo) {
+            newPc.refHeight = selectedPc.refHeight;
+            newPc.refWidth = selectedPc.refWidth;
+            newPc.refTop = selectedPc.refTop;
+            newPc.refLeft = selectedPc.refLeft;
+            if (event.shiftKey) {
+              newPc.img_width = selectedPc.img_width;
+              newPc.img_height = selectedPc.img_height;
+            }
           }
-        }
-        if (!this.estructura) {
-          if (this.selectedPc.archivo === newPc.archivo && this.planta.tipo === 'seguidores') {
-            newPc.globalCoords = selectedPc.globalCoords;
-            newPc.gps_lng = selectedPc.gps_lng;
-            newPc.gps_lat = selectedPc.gps_lat;
+          if (!this.estructura) {
+            if (this.selectedPc.archivo === newPc.archivo && this.planta.tipo === 'seguidores') {
+              newPc.globalCoords = selectedPc.globalCoords;
+              newPc.gps_lng = selectedPc.gps_lng;
+              newPc.gps_lat = selectedPc.gps_lat;
+            }
+            // if (selectedPc.archivo === newPc.archivo && this.estructura.columnas === 1) {
+            //   newPc.local_x = selectedPc.local_x;
+            // }
           }
-          // if (selectedPc.archivo === newPc.archivo && this.estructura.columnas === 1) {
-          //   newPc.local_x = selectedPc.local_x;
-          // }
         }
       }
+
+      this.pcService.addPc(newPc).then((pcRef) => {
+        this.drawPcInCanvas(newPc);
+        const pc = new Pc(newPc);
+        this.informeService.avisadorNuevoElementoSource.next(pc);
+        this.informeService.selectElementoPlanta(pc);
+      });
     }
-
-    this.pcService.addPc(newPc).then((pcRef) => {
-      this.drawPcInCanvas(newPc);
-      this.informeService.selectElementoPlanta(new Pc(newPc));
-    });
   }
-
+  deletePc(pc: PcInterface) {}
   deleteEstructura(estructura: Estructura) {
     this.informeService.deleteEstructuraInforme(this.informeId, estructura);
   }

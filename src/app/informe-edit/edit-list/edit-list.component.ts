@@ -158,18 +158,20 @@ export class EditListComponent implements OnInit {
         const arrayPosition = this.estConPcs.findIndex((val) => {
           return val.estructura.archivo === elem.archivo;
         });
-        const pcPosition = this.estConPcs[arrayPosition].pcs.findIndex((val) => {
-          return val.id === pc.id;
-        });
+        if (arrayPosition >= 0) {
+          const pcPosition = this.estConPcs[arrayPosition].pcs.findIndex((val) => {
+            return val.id === pc.id;
+          });
 
-        if (pcPosition >= 0) {
-          // Si existe, entonces le eliminamos
+          if (pcPosition >= 0) {
+            // Si existe, entonces le eliminamos
 
-          // Si existe, entonces le estamos borrando
-          this.estConPcs[arrayPosition].pcs.splice(pcPosition, 1);
-        } else {
-          // Si no existe, entonces le añadimos
-          this.estConPcs[arrayPosition].pcs.push(pc);
+            // Si existe, entonces le estamos borrando
+            this.estConPcs[arrayPosition].pcs.splice(pcPosition, 1);
+          } else {
+            // Si no existe, entonces le añadimos
+            this.estConPcs[arrayPosition].pcs.push(pc);
+          }
         }
       }
 
