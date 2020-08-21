@@ -27,14 +27,17 @@
               Aplicar módulo a selección ->
             </button>
           </div>
-          <agm-map
-            [latitude]="plantaLocation.lat"
-            [longitude]="plantaLocation.lng"
-            [mapTypeId]="mapType"
-            [zoom]="defaultZoom"
-            (mapReady)="onMapReady($event)"
-          >
-          </agm-map>
+          <div *ngIf="planta">
+            <agm-map
+              [latitude]="plantaLocation.lat"
+              [longitude]="plantaLocation.lng"
+              [mapTypeId]="mapType"
+              [zoom]="defaultZoom"
+              (mapReady)="onMapReady($event)"
+              mapTypeControl="true"
+            >
+            </agm-map>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -45,13 +48,12 @@
                 G_<b>{{ gc }}: </b>
                 <input
                   [(ngModel)]="selectedLocationArea.globalCoords[gc]"
-                  id="global{{ gc }}"
-                  (change)="updateArea(selectedLocationArea)"
-                  maxlength="4"
+                  (change)="updateAreaFromGlobals(selectedLocationArea, gc)"
+                  maxlength="8"
                   name="global{{ gc }}"
                   id="global{{ gc }}"
                   type="text"
-                  size="4"
+                  size="5"
                   class="inputInicio"
                 />
               </label>
@@ -93,6 +95,11 @@
               <button type="button" class="btn btn-info btn-eliminar" (click)="copyArea(selectedLocationArea)">
                 <i class="fas fa-copy"></i>
               </button>
+              <mat-checkbox
+                [checked]="isSelected(selectedLocationArea)"
+                (click)="onSelectCheckbox($event, selectedLocationArea)"
+              >
+              </mat-checkbox>
             </li>
           </ul>
         </div>
@@ -183,6 +190,7 @@
           *matRowDef="let locArea; columns: displayedColumns"
         ></tr>
       </table>
+      <mat-paginator [pageSizeOptions]="[50, 100, 200]" showFirstLastButtons></mat-paginator>
     </div>
   </div>
 </div>

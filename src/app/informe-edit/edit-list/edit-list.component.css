@@ -18,3 +18,14 @@ tr.mat-row:hover {
 .errorGlobalCoords {
   color: red;
 }
+.errorGlobalCoords2 {
+  color: orange;
+}
+.tablaEstructuras {
+  height: 60%;
+  overflow: auto;
+}
+.tablaPcs {
+  height: 30%;
+  overflow: auto;
+}

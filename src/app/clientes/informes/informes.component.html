@@ -5,10 +5,13 @@
       <button mat-raised-button *ngIf="auth.canAddPlantas(user)" routerLink="../planta-add">
         Añadir planta
       </button>
+      <button mat-raised-button *ngIf="auth.canAddPlantas(user)" routerLink="../modulo-add">
+        Añadir modulo
+      </button>
     </div>
   </div>
   <div
-    *ngIf="user.role == 0 || user.role == 1 || user.role == 2; else informeListTable"
+    *ngIf="user?.role == 0 || user?.role == 1 || user.role == 2; else informeListTable"
     class="row justify-content-center"
   >
     <div class="col-4" *ngFor="let planta of plantasList$ | async">

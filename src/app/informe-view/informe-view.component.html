@@ -65,12 +65,15 @@
               ></p-chart> -->
             </div>
             <div *ngIf="allowDownloads" class="header-derecha-datos-mae">
-              <div class="div-mae-texto text-center">
-                <span class="mae-texto text-light">Pérdidas</span>
+              <div class="text-center">
+                <span class="mae-texto text-light">MAE</span>
+              </div>
+              <div class="text-center">
+                <span class="mae-texto-desc text-light">(Módulos Apagados Equivalentes)</span>
               </div>
               <div class="div-mae-1">
                 <div class="div-mae-2">
-                  <span class="text-light mae-porcentaje">{{ informe?.mae | number: '1.2' }}</span>
+                  <span class="text-center text-light mae-porcentaje">{{ informe?.mae | number: '1.2' }}</span>
                 </div>
                 <span class="text-light mae-pct-simbolo">%</span>
               </div>

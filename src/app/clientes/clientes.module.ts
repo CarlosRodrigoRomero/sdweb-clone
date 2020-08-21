@@ -15,6 +15,7 @@ import { InformeAddComponent } from './informe-add/informe-add.component';
 import { InformeListTableComponent } from './informe-list-table/informe-list-table.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { ModuloAddComponent } from './modulo-add/modulo-add.component';
 @NgModule({
   declarations: [
     PlantaAddComponent,
@@ -26,6 +27,7 @@ import { MatNativeDateModule } from '@angular/material/core';
     NavbarComponent,
     PlantaEditComponent,
     InformeListTableComponent,
+    ModuloAddComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({

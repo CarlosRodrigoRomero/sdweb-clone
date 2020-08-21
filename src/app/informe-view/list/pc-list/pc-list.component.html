@@ -9,14 +9,7 @@
         autocomplete="off"
         (keyup)="applyFilter()"
       />
-      <button
-        mat-button
-        *ngIf="searchKey"
-        matSuffix
-        mat-icon-button
-        aria-label="Clear"
-        (click)="onSearchClear()"
-      >
+      <button mat-button *ngIf="searchKey" matSuffix mat-icon-button aria-label="Clear" (click)="onSearchClear()">
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
@@ -28,11 +21,7 @@
     <ng-container matColumnDef="severidad">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Clase</th>
       <td mat-cell *matCellDef="let element">
-        <div
-          class="circleSeveridad circleSeveridad{{
-            pcService.getPcCoA(element)
-          }}"
-        ></div>
+        <div class="circleSeveridad circleSeveridad{{ pcService.getPcCoA(element) }}"></div>
         <!-- <span *ngIf="column !== 'severidad'">{{element[column]}}</span> </td> -->
       </td></ng-container
     >
@@ -50,10 +39,8 @@
       </th>
       <td mat-cell *matCellDef="let element">
         <span class="text-perdidas"
-          >{{ getPerdidas(element.tipo) * 100 | number: "1.0-0" }} %
-          <span *ngIf="checkIsMoreThanOne(element.modulosAfectados)">
-            ({{ element.modulosAfectados }})
-          </span>
+          >{{ getPerdidas(element.tipo) * 100 | number: '1.0-0' }} %
+          <span *ngIf="checkIsMoreThanOne(element.modulosAfectados)"> ({{ element.modulosAfectados }}) </span>
         </span>
       </td>
     </ng-container>
@@ -65,39 +52,30 @@
       </td>
     </ng-container>
 
-    <ng-container
-      matColumnDef="global_x"
-      *ngIf="planta.tipo === 'seguidores'; else fija"
-    >
+    <ng-container matColumnDef="seguidor">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Seguidor</th>
       <td mat-cell *matCellDef="let element">
-        <span *ngIf="!checkIsNaN(element.global_x)">{{
-          plantaService.getNombreSeguidor(element)
-        }}</span>
+        <span *ngIf="!checkIsNaN(element.global_x)">{{ plantaService.getNombreSeguidor(element) }}</span>
       </td>
     </ng-container>
 
-    <ng-template #fija>
-      <ng-container matColumnDef="global_x">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>
-          {{ plantaService.getNombreGlobalX(planta) }}
-        </th>
-        <td mat-cell *matCellDef="let element">
-          <span *ngIf="!checkIsNaN(element.global_x)">{{
-            element.global_x
-          }}</span>
-        </td>
-      </ng-container>
+    <ng-container matColumnDef="global_x">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        {{ plantaService.getNombreGlobalX(planta) }}
+      </th>
+      <td mat-cell *matCellDef="let element">
+        <span *ngIf="!checkIsNaN(element.global_x)">{{ element.global_x }}</span>
+      </td>
+    </ng-container>
 
-      <ng-container matColumnDef="global_y">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>
-          {{ plantaService.getNombreGlobalY(planta) }}
-        </th>
-        <td mat-cell *matCellDef="let element">
-          <span>{{ element.global_y }}</span>
-        </td>
-      </ng-container>
-    </ng-template>
+    <ng-container matColumnDef="global_y">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        {{ plantaService.getNombreGlobalY(planta) }}
+      </th>
+      <td mat-cell *matCellDef="let element">
+        <span>{{ element.global_y }}</span>
+      </td>
+    </ng-container>
 
     <ng-container matColumnDef="temperaturaMax">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -122,7 +100,7 @@
             aria-valuemax="100"
             [style.width]="getPercent(element) + '%'"
           >
-            + {{ element.gradienteNormalizado | number: "1.0-1" }} ºC
+            + {{ element.gradienteNormalizado | number: '1.0-1' }} ºC
           </div>
         </div>
         <div class="flechita"><i class="fas fa-arrow-right"></i></div>
@@ -131,17 +109,8 @@
 
     <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
     <ng-container matColumnDef="expandedDetail">
-      <td
-        mat-cell
-        *matCellDef="let element"
-        [attr.colspan]="columnsToDisplay.length"
-      >
-        <div
-          class="example-element-detail"
-          [@detailExpand]="
-            element == expandedElement ? 'expanded' : 'collapsed'
-          "
-        >
+      <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length">
+        <div class="example-element-detail" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
           <app-pc-details
             [informe]="informe"
             [selectedPc]="expandedElement"
@@ -161,15 +130,8 @@
       [class.example-expanded-row]="expandedElement === element"
       (click)="onClickToggleDetail(element)"
     ></tr>
-    <tr
-      mat-row
-      *matRowDef="let row; columns: ['expandedDetail']"
-      class="example-detail-row"
-    ></tr>
+    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
   </table>
 
-  <mat-paginator
-    [pageSizeOptions]="[10, 25, 50]"
-    showFirstLastButtons
-  ></mat-paginator>
+  <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
 </div>

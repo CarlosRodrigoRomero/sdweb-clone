@@ -6,6 +6,7 @@ import { PlantaEditComponent } from './planta-edit/planta-edit.component';
 import { AutoLocComponent } from './auto-loc/auto-loc.component';
 import { PlantaAddComponent } from './planta-add/planta-add.component';
 import { InformeAddComponent } from './informe-add/informe-add.component';
+import { ModuloAddComponent } from './modulo-add/modulo-add.component';
 
 const routes: Routes = [
   {
@@ -25,6 +26,10 @@ const routes: Routes = [
       {
         path: 'planta-add',
         component: PlantaAddComponent,
+      },
+      {
+        path: 'modulo-add',
+        component: ModuloAddComponent,
       },
       {
         path: 'planta-edit/:plantaId',

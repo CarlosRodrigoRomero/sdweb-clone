@@ -4,7 +4,9 @@
   [mapTypeId]="mapType"
   [zoom]="planta.zoom"
   [streetViewControl]="false"
-  (mapReady)="mapIsReady(map)"
+  (mapReady)="mapIsReady($event)"
+  [fullscreenControl]="true"
+  mapTypeControl="true"
 >
   <agm-circle
     *ngFor="let pc of pcService.currentFilteredPcs$ | async"

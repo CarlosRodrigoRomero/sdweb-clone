@@ -11,6 +11,7 @@ import { PlantaService } from '../services/planta.service';
 import { InformeService } from '../services/informe.service';
 import { GLOBAL } from '../services/global';
 import { PcDetailsDialogComponent } from '../informe-view/pc-details-dialog/pc-details-dialog.component';
+declare const google: any;
 
 export interface DialogData {
   pc: PcInterface;
@@ -93,7 +94,8 @@ export class InformeMapComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {});
   }
 
-  mapIsReady(map: AgmMap) {
+  mapIsReady(map) {
     this.mapLoaded = true;
+    this.plantaService.initMap(this.planta, map);
   }
 }

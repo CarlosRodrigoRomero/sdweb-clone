@@ -1,114 +1,87 @@
-<div *ngIf="dataSource.data" class="mat-elevation-z8">
-  <table matSort mat-table [dataSource]="dataSource">
-    <div *ngIf="!pcsOrEstructuras2; else pcs">
-      <ng-container matColumnDef="error">
-        <th mat-sort-header mat-header-cell *matHeaderCellDef>!</th>
-        <td mat-cell *matCellDef="let est">
-          <span *ngIf="!(est | validateElem: planta)"><i class="fas fa-exclamation-circle errorGlobalCoords"></i></span>
-        </td>
-      </ng-container>
+<div class="mat-elevation-z8 tablaEstructuras">
+  <table matSort mat-table [dataSource]="dataSourceEst">
+    <!-- <div *ngIf="!pcsOrEstructuras2; else pcs"> -->
+    <ng-container matColumnDef="error">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>!</th>
+      <td mat-cell *matCellDef="let elem">
+        <span *ngIf="!(elem.estructura | validateElem: planta)"
+          ><i class="fas fa-exclamation-circle errorGlobalCoords"></i
+        ></span>
+        <span *ngIf="elem.pcs.length === 0 && pcsOrEstructuras"
+          ><i class="fas fa-exclamation-circle errorGlobalCoords2"></i
+        ></span>
+      </td>
+    </ng-container>
 
-      <ng-container matColumnDef="vuelo">
-        <th mat-sort-header mat-header-cell *matHeaderCellDef>Vuelo</th>
-        <td mat-cell *matCellDef="let est">{{ est.vuelo }}</td>
-      </ng-container>
-      <ng-container matColumnDef="globalCoords">
-        <th mat-sort-header mat-header-cell *matHeaderCellDef>globalCoords</th>
-        <td mat-cell *matCellDef="let est">[{{ est.globalCoords }}]</td>
-      </ng-container>
+    <ng-container matColumnDef="vuelo">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>Vuelo</th>
+      <td mat-cell *matCellDef="let est">{{ est.estructura.vuelo }}</td>
+    </ng-container>
+    <ng-container matColumnDef="globalCoords">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>globalCoords</th>
+      <td mat-cell *matCellDef="let est">[{{ est.estructura.globalCoords }}]</td>
+    </ng-container>
 
-      <ng-container matColumnDef="archivo">
-        <th mat-sort-header mat-header-cell *matHeaderCellDef>Archivo</th>
-        <td mat-cell *matCellDef="let est">[{{ est.archivo }}]</td>
-      </ng-container>
-    </div>
+    <ng-container matColumnDef="archivo">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>Archivo</th>
+      <td mat-cell *matCellDef="let est">[{{ est.estructura.archivo }}]</td>
+    </ng-container>
 
-    <ng-template #pcs>
-      <ng-container matColumnDef="error">
-        <th mat-sort-header mat-header-cell *matHeaderCellDef>!</th>
-        <td mat-cell *matCellDef="let pc">
-          <span *ngIf="!(pc | validateElem: planta)"><i class="fas fa-exclamation-circle errorGlobalCoords"></i></span>
-        </td>
-      </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumnsEst"></tr>
+    <tr
+      mat-row
+      [ngClass]="{
+        selectedElement: elem?.estructura.archivo === informeService.selectedElementoPlanta?.archivo
+      }"
+      (click)="onClickRowList(elem.estructura)"
+      *matRowDef="let elem; columns: displayedColumnsEst"
+    ></tr>
+  </table>
+  <mat-paginator [pageSizeOptions]="[25, 50, 100]" showFirstLastButtons></mat-paginator>
+</div>
 
-      <ng-container matColumnDef="localId">
-        <th mat-sort-header mat-header-cell *matHeaderCellDef>id (vuelo)</th>
-        <td mat-cell *matCellDef="let pc">{{ pc.local_id }} ({{ pc.vuelo }})</td>
-      </ng-container>
-      <ng-container matColumnDef="tipo">
-        <th mat-sort-header mat-header-cell *matHeaderCellDef>tipo</th>
-        <td mat-cell *matCellDef="let pc">[{{ pc.tipo }}]</td>
-      </ng-container>
+<div *ngIf="pcsOrEstructuras" class="mat-elevation-z8 tablaPcs">
+  <table matSort mat-table [dataSource]="dataSourcePcs">
+    <ng-container matColumnDef="error">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>!</th>
+      <td mat-cell *matCellDef="let pc">
+        <span *ngIf="!(pc | validateElem: planta)"><i class="fas fa-exclamation-circle errorGlobalCoords"></i></span>
+      </td>
+    </ng-container>
 
-      <ng-container matColumnDef="globalCoords">
-        <th mat-sort-header mat-header-cell *matHeaderCellDef>G</th>
-        <td mat-cell *matCellDef="let pc">[{{ pc.globalCoords }}]</td>
-      </ng-container>
+    <ng-container matColumnDef="localId">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>id (vuelo)</th>
+      <td mat-cell *matCellDef="let pc">{{ pc.local_id }} ({{ pc.vuelo }})</td>
+    </ng-container>
+    <ng-container matColumnDef="tipo">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>tipo</th>
+      <td mat-cell *matCellDef="let pc">[{{ pc.tipo }}]</td>
+    </ng-container>
 
-      <ng-container matColumnDef="localCoords">
-        <th mat-sort-header mat-header-cell *matHeaderCellDef>L</th>
-        <td mat-cell *matCellDef="let pc">{{ pc.local_x }}/{{ pc.local_y }}</td>
-      </ng-container>
+    <ng-container matColumnDef="globalCoords">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>G</th>
+      <td mat-cell *matCellDef="let pc">[{{ pc.globalCoords }}]</td>
+    </ng-container>
 
-      <ng-container matColumnDef="modulo">
-        <th mat-sort-header mat-header-cell *matHeaderCellDef>Mod</th>
-        <td mat-cell *matCellDef="let pc">- W</td>
-      </ng-container>
+    <ng-container matColumnDef="localCoords">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>L</th>
+      <td mat-cell *matCellDef="let pc">{{ pc.local_x }}/{{ pc.local_y }}</td>
+    </ng-container>
 
-      <ng-container matColumnDef="archivo">
-        <th mat-sort-header mat-header-cell *matHeaderCellDef>Archivo</th>
-        <td mat-cell *matCellDef="let pc">[{{ pc.archivo }}]</td>
-      </ng-container>
-    </ng-template>
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <ng-container matColumnDef="modulo">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef>Mod</th>
+      <td mat-cell *matCellDef="let pc">{{ pc.modulo.potencia }} W</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumnsPc"></tr>
     <tr
       mat-row
       [ngClass]="{
         selectedElement: elem?.id === informeService.selectedElementoPlanta?.id
       }"
       (click)="onClickRowList(elem)"
-      *matRowDef="let elem; columns: displayedColumns"
+      *matRowDef="let elem; columns: displayedColumnsPc"
     ></tr>
   </table>
-  <mat-paginator [pageSizeOptions]="[25, 100, 500]" showFirstLastButtons></mat-paginator>
+  <button *ngIf="pcsOrEstructuras" (click)="recalcularLocs()">Recalcular locs</button>
 </div>
-
-<!-- <table *ngIf="pcsOrEstructuras" class="table" id="tabla_pcs">
-  <tr>
-    <th>ID (vuelo)</th>
-    <th>Filename</th>
-    <th>Tipo</th>
-    <th>Global</th>
-    <th>Local</th>
-    <th>Modulo</th>
-    <th>Del</th>
-  </tr>
-
-  <tr
-    style="cursor: pointer;"
-    (click)="onMapMarkerClick(pc)"
-    *ngFor="let pc of filterPcsByFlight(currentFlight)"
-    [ngClass]="{
-      pc_seleccionado: selected_pc === pc,
-      pc_error:
-        (pc.tipo !== 0 && pc.tipo !== 4 && pc.tipo !== 17 && (pc.local_x === 0 || pc.local_y === 0)) ||
-        pc.gps_lat === currentLatLng.lat ||
-        (pc.global_x.length === 0 && pc.global_y.length === 0) ||
-        pc.local_y > planta.filas,
-      pc_error_local_x: planta.tipo === 'fija' && pc.local_x === 1
-    }"
-  >
-    <th>{{ pc.local_id }} ({{ pc.vuelo }})</th>
-    <th> {{pc.archivo}}</th>
-    <th>{{ pc.tipo }}</th>
-    <th>{{ pc.global_x }}, {{ pc.global_y }}</th>
-    <th>{{ pc.local_x }}, {{ pc.local_y }}</th>
-
-    <th>{{ pc.modulo.potencia }} W</th>
-    <th>
-      <button type="button" class="btn btn-danger btn-eliminar" (click)="onClickDeletePc(pc)">
-        X
-      </button>
-    </th>
-  </tr>
-</table> -->

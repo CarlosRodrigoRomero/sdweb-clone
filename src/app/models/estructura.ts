@@ -3,6 +3,7 @@ import { ElementoPlantaInterface } from './elementoPlanta';
 import { LatLngLiteral } from '@agm/core';
 import { ModuloInterface } from './modulo';
 import { Point } from '@agm/core/services/google-maps-types';
+import { Pc } from './pc';
 
 export interface RectanguloInterface {
   top: number;
@@ -15,6 +16,10 @@ export interface CuadrilateroInterface {
   tr: Point;
   br: Point;
   bl: Point;
+}
+export interface EstructuraConPcs {
+  estructura: Estructura;
+  pcs: Pc[];
 }
 
 export interface EstructuraInterface {
@@ -48,6 +53,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   longitud: number;
   globalCoords: any[];
   modulo?: ModuloInterface;
+
   private estructuraMatrix: any[];
 
   constructor(est: EstructuraInterface) {
@@ -152,12 +158,41 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
 
   //   return puntoDistanciaMin;
   // }
+  private kClosest(points: Point[], k) {
+    // sorts the array in place
+    points.sort((point1, point2) => {
+      const distanceFromOrigin1 = this.getDistanceFromOrigin(point1);
+      const distanceFromOrigin2 = this.getDistanceFromOrigin(point2);
+
+      // sort by distance from origin, lowest first
+      return distanceFromOrigin1 - distanceFromOrigin2;
+    });
+
+    // returns first k elements
+    return points.slice(0, k);
+  }
+
+  private getDistanceFromOrigin(p: Point) {
+    return p.x * p.x + p.y * p.y;
+  }
+  private getTrBl(points: Point[]): Point[] {
+    return points.sort((p1, p2) => {
+      return p1.x - p2.x;
+    });
+  }
 
   getCuadrilatero(columna: number, fila: number): CuadrilateroInterface {
-    const topLeft = this.estructuraMatrix[fila - 1][columna - 1];
-    const topRight = this.estructuraMatrix[fila - 1][columna];
-    const bottomRight = this.estructuraMatrix[fila][columna];
-    const bottomLeft = this.estructuraMatrix[fila][columna - 1];
+    const p1 = this.estructuraMatrix[fila - 1][columna - 1] as Point;
+    const p2 = this.estructuraMatrix[fila - 1][columna] as Point;
+    const p3 = this.estructuraMatrix[fila][columna] as Point;
+    const p4 = this.estructuraMatrix[fila][columna - 1] as Point;
+    const points = [p1, p2, p3, p4];
+    const sorted = this.kClosest(points, 4);
+    const topLeft = sorted[0];
+    const bottomRight = sorted[3];
+    const others = [sorted[1], sorted[2]];
+    const bottomLeft = this.getTrBl(others)[0];
+    const topRight = this.getTrBl(others)[1];
 
     return { tl: topLeft, tr: topRight, br: bottomRight, bl: bottomLeft } as CuadrilateroInterface;
   }
@@ -220,6 +255,17 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
 
   //   return { tl: topLeftRef, tr: topRightRef, br: bottomRightRef, bl: bottomLeftRef } as CuadrilateroInterface;
   // }
+
+  getRectanguloExterior(columna: number, fila: number): RectanguloInterface {
+    const cuadrilatero = this.getCuadrilatero(columna, fila);
+
+    const top = Math.round(Math.min(cuadrilatero.tr.y, cuadrilatero.tl.y));
+    const left = Math.round(Math.min(cuadrilatero.bl.x, cuadrilatero.tl.x));
+    const bottom = Math.round(Math.max(cuadrilatero.br.y, cuadrilatero.bl.y));
+    const right = Math.round(Math.max(cuadrilatero.tr.x, cuadrilatero.br.x));
+
+    return { top, bottom, left, right } as RectanguloInterface;
+  }
 
   getRectanguloInterior(columna: number, fila: number): RectanguloInterface {
     const cuadrilatero = this.getCuadrilatero(columna, fila);

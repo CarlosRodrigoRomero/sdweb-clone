@@ -22,7 +22,7 @@
       ></canvas>
     </div>
   </div>
-  <div class="row" *ngIf="estructura; else crearEstructura">
+  <div class="row" *ngIf="estructura">
     <div class="col-9 propiedadesEstructura">
       <div class="row">
         <div class="col-6">
@@ -71,8 +71,8 @@
             type="number"
             id="columnaInicioEstructura"
             (change)="updateEstructura()"
-            maxlength="2"
-            size="4"
+            maxlength="4"
+            size="6"
             class="inputInicio"
           />
           <mat-checkbox (change)="updateEstructura(true)" [(ngModel)]="estructura.sentido">{{
@@ -91,7 +91,7 @@
               maxlength="4"
               size="4"
               class="inputInicio"
-              disabled="!pcsOrEstructuras"
+              disabled
             />
           </label>
         </div>
@@ -103,11 +103,5 @@
       </div>
     </div>
   </div>
-  <ng-template #crearEstructura>
-    <div class="row">
-      <div class="col">
-        <button (click)="onClickCrearEstructura()" mat-raised-button color="primary">Crear Estructura</button>
-      </div>
-    </div>
-  </ng-template>
+  <div></div>
 </div>

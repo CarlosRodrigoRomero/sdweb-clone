@@ -1,4 +1,12 @@
 export let GLOBAL = {
+  // Roles:
+  // 0: Empresa sin plantas en su user
+  // 1: ADMIN
+  // 2: Empresa con plantas en su user
+  // 3: Estructuras
+  // 4: Localizaciones
+  // 5: Clasificación
+
   url: 'http://localhost:3977/api',
   num_tipos: 16,
   camaraTermica: 'DJI XT2 640 13mm (Numero de serie: 297106)',
@@ -46,9 +54,10 @@ export let GLOBAL = {
     'Vidrio roto',
     'Resist. anómala',
     'Caja conexiones',
-    'Sombras',
+    'Sombras', // 15
     'Yellowing', // 16
     'String en CA', // 17
+    'Posible PID', // 18
   ],
   labels_bloqueadas: [0, 1, 2, 4, 16],
   pcDescripcion: [
@@ -70,6 +79,7 @@ export let GLOBAL = {
     'Módulo con sombras', // 15
     'Yellowing', // 16
     'String en circuito abierto', // 17
+    'Posible PID', // 18
   ],
   //   '0',
   //   'Célula caliente',
@@ -98,6 +108,7 @@ export let GLOBAL = {
     'Existe algún elemento que está provocando sombras que evitan el correcto funcionamiento del módulo o módulos afectados.',
     'Suelen aparecer por defectos en la fabricación. No suele afectar al rendimiento del módulo.',
     'Los módulos que componen el string se encuentran a una temperatura varios grados superior a la temperatura normal de operación del módulo. Es posible que el string esté en circuito abierto.',
+    'Es posible que el módulo sufra de PID',
   ],
   pcRecomendacion: [
     '0',
@@ -118,6 +129,7 @@ export let GLOBAL = {
     'Eliminación de la fuente de sombras',
     'Hacer seguimiento de le evolución',
     'Revisar módulos, estado de operación del inversor, cableado, conectores y fusibles',
+    'Revisar módulos',
   ],
   pcPerdidas: [
     0, // Para que coincida el indice con el tipo de anomalia
@@ -138,6 +150,7 @@ export let GLOBAL = {
     0, // "Módulo afectado por sombras" // 15
     0, // Yellowing //16
     1,
+    0,
   ],
 
   pcColumnas: [

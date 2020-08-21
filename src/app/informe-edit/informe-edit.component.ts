@@ -7,7 +7,6 @@ import { PcInterface } from 'src/app/models/pc';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GLOBAL } from '../services/global';
 import { take } from 'rxjs/operators';
-import { EstructuraInterface } from '../models/estructura';
 
 import { AuthService } from 'src/app/services/auth.service';
 import { UserInterface } from '../models/user';
@@ -47,7 +46,6 @@ export class InformeEditComponent implements OnInit {
   public currentImageRotation: number;
   public currentGpsCorrection: number;
   public rangeValue: number;
-  public selected_pc: PcInterface;
   public flightsData: any;
   public flightsList: string[];
   public currentFlight: string;
@@ -61,9 +59,7 @@ export class InformeEditComponent implements OnInit {
   public lastRef: number[];
   public currentGlobalX: number;
   public currentGlobalY: string;
-  public estructura: EstructuraInterface;
   public buildingEstructura = false;
-  public currentLatLng: LatLngLiteral;
 
   public estructuraOn: boolean;
 
@@ -87,33 +83,52 @@ export class InformeEditComponent implements OnInit {
     private hotkeysService: HotkeysService
   ) {
     this.hotkeysService.add(
-      new Hotkey('a', (event: KeyboardEvent): boolean => {
-        this.setImageFromRangeValue(this.rangeValue - 4);
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'a',
+        (event: KeyboardEvent): boolean => {
+          this.setImageFromRangeValue(this.rangeValue - 4);
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '<---- retroceder 4 frames'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('s', (event: KeyboardEvent): boolean => {
-        this.setImageFromRangeValue(this.rangeValue - 1);
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        's',
+        (event: KeyboardEvent): boolean => {
+          this.setImageFromRangeValue(this.rangeValue - 1);
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '<- retroceder 1 frame'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('d', (event: KeyboardEvent): boolean => {
-        this.setImageFromRangeValue(this.rangeValue + 1);
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'd',
+        (event: KeyboardEvent): boolean => {
+          this.setImageFromRangeValue(this.rangeValue + 1);
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '-> avanzar 1 frame'
+      )
     );
     this.hotkeysService.add(
-      new Hotkey('f', (event: KeyboardEvent): boolean => {
-        this.setImageFromRangeValue(this.rangeValue + 4);
-        return false; // Prevent bubbling
-      })
+      new Hotkey(
+        'f',
+        (event: KeyboardEvent): boolean => {
+          this.setImageFromRangeValue(this.rangeValue + 4);
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '----> avanzar 4 frames'
+      )
     );
   }
 
   ngOnInit() {
-    this.currentLatLng = { lat: 39.453186, lng: -5.880743 };
     this.informeId = this.route.snapshot.paramMap.get('id');
 
     this.rangeValue = 0;
@@ -166,11 +181,11 @@ export class InformeEditComponent implements OnInit {
 
     const currentCcoords = this.coords[arrayIndex];
 
-    // Setear this.currentLatLng (para que se extienda a todos los childs)
-    this.currentLatLng = {
+    // Setear droneLatLng (para que se extienda a todos los childs)
+    this.informeService.droneLatLng.next({
       lat: parseFloat(currentCcoords.Latitude),
       lng: parseFloat(currentCcoords.Longitude),
-    };
+    });
 
     this.currentDatetime = this.getDateTimeFromDateAndTime(currentCcoords.Date, currentCcoords.Time);
     this.currentTrackheading = Math.round(currentCcoords.TrackHeading);
@@ -353,12 +368,15 @@ export class InformeEditComponent implements OnInit {
             this.alertMessage = 'No hay archivos';
           } else {
             this.flightsData = response2;
-            this.flightsList = Object.keys(this.flightsData);
-            this.flightsList.sort();
-
-            this.changeFlight(this.flightsList[0]);
-            this.setImageFromRangeValue(1);
-            this.setCoordsList(response2);
+            if (this.checkCorrectFileList(this.flightsData)) {
+              this.flightsList = Object.keys(this.flightsData);
+              this.flightsList.sort();
+              this.changeFlight(this.flightsList[0]);
+              this.setImageFromRangeValue(1);
+              this.setCoordsList(response2);
+            } else {
+              this.alertMessage = 'Carpeta de vuelo incorrecta';
+            }
           }
         },
         (error) => {
@@ -370,6 +388,15 @@ export class InformeEditComponent implements OnInit {
           }
         }
       );
+  }
+
+  private checkCorrectFileList(flightsData): boolean {
+    const flightsList = Object.keys(this.flightsData);
+    const fileName = flightsData[flightsList[0]].files[0] as string;
+    if (fileName.startsWith(this.informe.prefijo)) {
+      return true;
+    }
+    return false;
   }
 
   sortPcs(array: PcInterface[]) {
@@ -458,18 +485,6 @@ export class InformeEditComponent implements OnInit {
     this.plantaService.updatePlanta(this.planta);
   }
 
-  recalcularLocs() {
-    // this.allPcs.forEach((pc) => {
-    //   let globalX;
-    //   let globalY;
-    //   let modulo;
-    //   [globalX, globalY, modulo] = this.getGlobalCoordsFromLocationArea({
-    //     lat: pc.gps_lat,
-    //     lng: pc.gps_lng,
-    //   });
-    //   this.updateLocalAreaInPc(pc, globalX, globalY, modulo);
-    // });
-  }
   setCoordsList(list: any[]) {
     let gpsCoordsList = [];
     Object.keys(list).forEach((key) => {

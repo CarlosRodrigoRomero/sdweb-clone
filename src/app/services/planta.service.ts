@@ -264,16 +264,24 @@ export class PlantaService {
   getNombreSeguidor(pc: PcInterface) {
     let nombreSeguidor = '';
     if (pc.hasOwnProperty('global_x')) {
-      if (!Number.isNaN(pc.global_x)) {
+      if (!Number.isNaN(pc.global_x) && pc.global_x !== null) {
         nombreSeguidor = nombreSeguidor.concat(pc.global_x.toString());
       }
     }
     if (pc.hasOwnProperty('global_y')) {
-      if (!Number.isNaN(pc.global_y)) {
+      if (!Number.isNaN(pc.global_y) && pc.global_y !== null) {
         if (nombreSeguidor.length > 0) {
           nombreSeguidor = nombreSeguidor.concat(this.getGlobalsConector());
         }
         nombreSeguidor = nombreSeguidor.concat(pc.global_y.toString());
+      }
+    }
+    if (pc.hasOwnProperty('global_z')) {
+      if (!Number.isNaN(pc.global_z) && pc.global_z !== null) {
+        if (nombreSeguidor.length > 0) {
+          nombreSeguidor = nombreSeguidor.concat(this.getGlobalsConector());
+        }
+        nombreSeguidor = nombreSeguidor.concat(pc.global_z.toString());
       }
     }
     return nombreSeguidor;
@@ -281,16 +289,34 @@ export class PlantaService {
 
   getEtiquetaGlobals(pc: PcInterface): string {
     let nombreEtiqueta = '';
-    if (pc.hasOwnProperty('global_x') && !Number.isNaN(pc.global_x)) {
+    if (pc.hasOwnProperty('global_x') && !Number.isNaN(pc.global_x) && pc.global_x !== null) {
       nombreEtiqueta = nombreEtiqueta.concat(pc.global_x.toString());
     }
-    if (pc.hasOwnProperty('global_y') && !Number.isNaN(pc.global_y)) {
+    if (pc.hasOwnProperty('global_y') && !Number.isNaN(pc.global_y) && pc.global_y !== null) {
       if (nombreEtiqueta.length > 0) {
         nombreEtiqueta = nombreEtiqueta.concat(this.getGlobalsConector());
       }
       nombreEtiqueta = nombreEtiqueta.concat(pc.global_y.toString());
     }
     return nombreEtiqueta;
+  }
+  getGlobalCoordsColumns(planta: PlantaInterface, columnsToDisplay: string[]): string[] {
+    if (planta.tipo === 'seguidores') {
+      columnsToDisplay.push('seguidor');
+    } else {
+      columnsToDisplay.push('global_x');
+      if (planta.hasOwnProperty('numeroGlobalCoords')) {
+        if (planta.numeroGlobalCoords >= 2) {
+          columnsToDisplay.push('global_y');
+        }
+        if (planta.numeroGlobalCoords === 3) {
+          columnsToDisplay.push('global_z');
+        }
+      } else {
+        columnsToDisplay.push('global_y');
+      }
+    }
+    return columnsToDisplay;
   }
 
   getGlobalsConector(): string {
@@ -403,14 +429,12 @@ export class PlantaService {
   getGlobalCoordsFromLocationArea(coords: LatLngLiteral) {
     const latLng = new google.maps.LatLng(coords.lat, coords.lng);
 
-    let globalCoords = [null, null, null];
+    const globalCoords = [null, null, null];
     let modulo: ModuloInterface = {};
 
     if (this.locAreaList !== undefined) {
       this.locAreaList.forEach((polygon, i, array) => {
         if (google.maps.geometry.poly.containsLocation(latLng, polygon)) {
-          console.log('PlantaService -> getGlobalCoordsFromLocationArea -> polygon', polygon);
-
           if (polygon.globalX.length > 0) {
             globalCoords[0] = polygon.globalX;
           }
@@ -418,15 +442,11 @@ export class PlantaService {
             globalCoords[1] = polygon.globalY;
           }
           if (polygon.hasOwnProperty('globalCoords') && polygon.globalCoords !== undefined) {
-            let bool = false;
-            polygon.globalCoords.forEach((item) => {
+            polygon.globalCoords.forEach((item, index) => {
               if (item !== null && item.length > 0) {
-                bool = true;
+                globalCoords[index] = item;
               }
             });
-            if (bool) {
-              globalCoords = polygon.globalCoords;
-            }
           }
 
           if (polygon.hasOwnProperty('modulo')) {
@@ -439,5 +459,40 @@ export class PlantaService {
     }
 
     return [globalCoords, modulo];
+  }
+
+  initMap(planta: PlantaInterface, map: any) {
+    if (planta.hasOwnProperty('ortofoto')) {
+      const ortofoto = planta.ortofoto;
+      map.setOptions({ maxZoom: ortofoto.mapMaxZoom });
+      map.setOptions({ minZoom: ortofoto.mapMinZoom });
+      map.mapTypeId = 'roadmap';
+      const mapBounds = new google.maps.LatLngBounds(
+        new google.maps.LatLng(ortofoto.bounds.south, ortofoto.bounds.west),
+        new google.maps.LatLng(ortofoto.bounds.north, ortofoto.bounds.east)
+      );
+
+      const imageMapType = new google.maps.ImageMapType({
+        getTileUrl(coord, zoom) {
+          const proj = map.getProjection();
+          const z2 = Math.pow(2, zoom);
+          const tileXSize = 256 / z2;
+          const tileYSize = 256 / z2;
+          const tileBounds = new google.maps.LatLngBounds(
+            proj.fromPointToLatLng(new google.maps.Point(coord.x * tileXSize, (coord.y + 1) * tileYSize)),
+            proj.fromPointToLatLng(new google.maps.Point((coord.x + 1) * tileXSize, coord.y * tileYSize))
+          );
+          if (!mapBounds.intersects(tileBounds) || zoom < ortofoto.mapMinZoom || zoom > ortofoto.mapMaxZoom) {
+            return null;
+          }
+          return `${ortofoto.url}/${zoom}/${coord.x}/${coord.y}.png`;
+        },
+        tileSize: new google.maps.Size(256, 256),
+        name: 'Tiles',
+      });
+
+      map.overlayMapTypes.push(imageMapType);
+      map.fitBounds(mapBounds);
+    }
   }
 }

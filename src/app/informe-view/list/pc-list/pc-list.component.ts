@@ -26,7 +26,7 @@ import { InformeService } from '../../../services/informe.service';
     ]),
   ],
 })
-export class PcListComponent implements OnInit, AfterViewInit {
+export class PcListComponent implements OnInit {
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
@@ -57,28 +57,10 @@ export class PcListComponent implements OnInit, AfterViewInit {
     this.planta = this.plantaService.get();
     this.informe = this.informeService.get();
     this.allPcs = this.pcService.get();
-    if (this.planta.tipo === 'seguidores') {
-      this.columnsToDisplay = [
-        'severidad',
-        'tipo',
-        'perdidas',
-        'local_id',
-        'global_x',
-        'temperaturaMax',
-        'gradienteNormalizado',
-      ];
-    } else {
-      this.columnsToDisplay = [
-        'severidad',
-        'tipo',
-        'perdidas',
-        'local_id',
-        'global_x',
-        'global_y',
-        'temperaturaMax',
-        'gradienteNormalizado',
-      ];
-    }
+    this.columnsToDisplay = ['severidad', 'tipo', 'perdidas', 'local_id'];
+    this.columnsToDisplay = this.plantaService.getGlobalCoordsColumns(this.planta, this.columnsToDisplay);
+
+    this.columnsToDisplay.push('temperaturaMax', 'gradienteNormalizado');
 
     this.pcDataSource.sort = this.sort;
     this.pcDataSource.paginator = this.paginator;
@@ -94,17 +76,22 @@ export class PcListComponent implements OnInit, AfterViewInit {
             pc.local_id.toString().toLowerCase().includes(filter)
           );
         } else {
-          return (
-            pc.local_id.toString().toLowerCase().includes(filter) ||
-            pc.global_x.toString().toLowerCase().includes(filter) ||
-            pc.global_y.toString().toLowerCase().includes(filter)
-          );
+          if (pc.hasOwnProperty('globalCoords')) {
+            return (
+              pc.local_id.toString().toLowerCase().includes(filter) ||
+              pc.globalCoords.toString().toLowerCase().includes(filter)
+            );
+          } else {
+            return (
+              pc.local_id.toString().toLowerCase().includes(filter) ||
+              pc.global_x.toString().toLowerCase().includes(filter) ||
+              pc.global_y.toString().toLowerCase().includes(filter)
+            );
+          }
         }
       };
     });
   }
-
-  ngAfterViewInit() {}
 
   onClickToggleDetail(element) {
     if (this.expandedElement === element) {

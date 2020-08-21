@@ -16,7 +16,6 @@ import { Estructura, RectanguloInterface } from '../../models/estructura';
 import { PlantaService } from '../../services/planta.service';
 import { ModuloInterface } from '../../models/modulo';
 import { PcService } from '../../services/pc.service';
-
 declare let fabric;
 
 @Component({
@@ -27,7 +26,6 @@ declare let fabric;
 export class CanvasComponent implements OnInit {
   @Input() pcsOrEstructuras: boolean;
   @Input() carpetaJpgGray: string;
-  @Input() currentLatLng: LatLngLiteral;
   @Input() currentDatetime: number;
   @Input() currentTrackheading: number;
   @Input() currentImageRotation: number;
@@ -61,6 +59,7 @@ export class CanvasComponent implements OnInit {
   private activeShape: any = false;
   sentidoPorDefecto = false;
   estructura: Estructura;
+  estructuraList: Estructura[];
   planta: PlantaInterface;
   allPcs: Pc[];
   private squareBase: number;
@@ -72,6 +71,7 @@ export class CanvasComponent implements OnInit {
   global = GLOBAL;
   public successMessage: string;
   public alertMessage: string;
+  currentLatLng: LatLngLiteral;
 
   constructor(
     public informeService: InformeService,
@@ -125,14 +125,19 @@ export class CanvasComponent implements OnInit {
         this.nuevoPc(elem as Pc);
       } else if (elem.constructor.name === Estructura.name) {
         if (this.estructura === elem) {
+          // Si ya existe, le eliminamo
           // Borrar estructura del Canvas
+          this.limpiarEstructuraCanvas(this.estructura);
           this.estructura = null;
-          this.limpiarEstructuraCanvas();
         } else {
           this.dibujarEstructura(elem as Estructura);
           this.informeService.selectElementoPlanta(elem);
         }
       }
+    });
+
+    this.informeService.droneLatLng$.subscribe((latLng) => {
+      this.currentLatLng = latLng;
     });
   }
   nuevoPc(pc: Pc) {
@@ -158,6 +163,7 @@ export class CanvasComponent implements OnInit {
       if (elementoPlanta.constructor.name === Estructura.name) {
         if (this.estructura !== elementoPlanta) {
           this.estructura = elementoPlanta as Estructura;
+          this.selectEstructuraInCanvas(this.estructura);
         }
       } else if (elementoPlanta.constructor.name === Pc.name) {
         if (this.selectedPc !== elementoPlanta) {
@@ -171,11 +177,31 @@ export class CanvasComponent implements OnInit {
     // Si es un PC:
   }
 
+  selectEstructuraInCanvas(estructura: Estructura) {
+    this.canvas.getObjects().forEach((obj) => {
+      if (obj.hasOwnProperty('estructura') && obj.estructura.id === estructura.id) {
+        // this.canvas.remove(obj);
+        obj.set('strokeWidth', 3);
+        if (obj.hasOwnProperty('esquinaEstructura')) {
+          obj.set('selectable', true);
+          obj.set('radius', 5);
+        }
+      } else {
+        obj.set('strokeWidth', 1);
+
+        if (obj.hasOwnProperty('esquinaEstructura')) {
+          obj.set('selectable', false);
+          obj.set('radius', 0);
+        }
+      }
+      this.canvas.renderAll();
+    });
+  }
+
   selectPcInCanvas(elem: Pc) {
     this.canvas.getObjects().forEach((obj) => {
       if (obj.id === elem.id) {
         obj.set('strokeWidth', 3);
-        console.log('CanvasComponent -> selectPcInCanvas -> obj', obj);
       } else {
         obj.set('strokeWidth', 1);
       }
@@ -183,20 +209,26 @@ export class CanvasComponent implements OnInit {
     this.canvas.renderAll();
   }
 
-  addEstructuraCanvas(archivoVuelo: ArchivoVueloInterface) {
+  getEstList(archivoVuelo: ArchivoVueloInterface) {
     this.informeService
       .getEstructuraInforme(this.informeId, archivoVuelo.archivo)
       .pipe(take(1))
-      .subscribe((est) => {
-        if (est.length > 0) {
-          this.dibujarEstructura(est[0]);
+      .subscribe((estList) => {
+        if (estList.length > 0) {
+          this.estructuraList = estList;
+          this.dibujarEstructuraList(estList);
           if (this.informeService.selectedElementoPlanta == null) {
-            this.informeService.selectElementoPlanta(est[0]);
-          } else if (this.informeService.selectedElementoPlanta.id !== est[0].id) {
-            this.informeService.selectElementoPlanta(est[0]);
+            this.informeService.selectElementoPlanta(estList[0]);
+          } else if (this.informeService.selectedElementoPlanta.id !== estList[0].id) {
+            this.informeService.selectElementoPlanta(estList[0]);
           }
         }
       });
+  }
+  dibujarEstructuraList(estList: Estructura[]) {
+    estList.forEach((est) => {
+      this.dibujarEstructura(est);
+    });
   }
 
   addPcsCanvas(archivoVuelo: ArchivoVueloInterface) {
@@ -229,7 +261,7 @@ export class CanvasComponent implements OnInit {
         .subscribe((bool) => {
           if (bool) {
             // Añadir Estructura
-            this.addEstructuraCanvas(archivoVuelo);
+            this.getEstList(archivoVuelo);
             this.addPcsCanvas(archivoVuelo);
           }
         });
@@ -260,7 +292,7 @@ export class CanvasComponent implements OnInit {
 
   private dibujarPuntosInterioresEst(estructura: Estructura): void {
     this.canvas.getObjects().forEach((obj) => {
-      if (obj.hasOwnProperty('puntoInteriorEst')) {
+      if (obj.hasOwnProperty('puntoInteriorEst') && obj.estructura.id === estructura.id) {
         this.canvas.remove(obj);
       }
       this.canvas.renderAll();
@@ -272,9 +304,9 @@ export class CanvasComponent implements OnInit {
           left: punto.x - 2,
           top: punto.y - 2,
           radius: 2,
-          fill: '#72FD03 ',
+          fill: '#72FD03',
           selectable: false,
-          estructura: true,
+          estructura,
           hoverCursor: 'default',
           puntoInteriorEst: true,
         });
@@ -302,7 +334,7 @@ export class CanvasComponent implements OnInit {
     }
 
     // Borramos del canvas la estructura anterior.
-    this.limpiarEstructuraCanvas();
+    this.limpiarEstructuraCanvas(this.estructura);
     this.dibujarEstructura(this.estructura);
     this.informeService
       .updateElementoPlanta(this.informeId, this.estructura)
@@ -327,8 +359,8 @@ export class CanvasComponent implements OnInit {
       strokeWidth: 2,
       selectable: false,
       objectCaching: false,
-      estructura: true,
-      hoverCursor: 'default',
+      estructura,
+      hoverCursor: 'pointer',
     });
 
     this.canvas.add(polygon);
@@ -345,12 +377,12 @@ export class CanvasComponent implements OnInit {
         hasBorders: false,
         hasControls: false,
         name: index,
-        estructura: true,
+        estructura,
         esquinaEstructura: true,
-        estructuraId: estructura.id,
+        selectable: true,
+        hoverCursor: 'pointer',
       });
       this.canvas.add(circle);
-      this.canvas.sendToBack(circle);
     });
     this.canvas.renderAll();
 
@@ -360,8 +392,8 @@ export class CanvasComponent implements OnInit {
     // Event Listener: Cuando se modifique el objeto...
     this.canvas.on('object:modified', (options) => {
       const p = options.target;
-      if (p.hasOwnProperty('estructuraId')) {
-        if (p.estructuraId === estructura.id) {
+      if (p.hasOwnProperty('estructura')) {
+        if (p.estructura.id === estructura.id) {
           polygon.points[p.name] = { x: p.getCenterPoint().x, y: p.getCenterPoint().y };
           estructura.coords = polygon.points;
           this.informeService.updateElementoPlanta(this.informeId, estructura);
@@ -371,15 +403,6 @@ export class CanvasComponent implements OnInit {
       }
     });
   }
-  // private updateEstructura() {
-  //   if (this.estructura.archivo === this.currentFileName) {
-  //     this.filasEstructura = this.estructura.filas;
-  //     this.columnasEstructura = this.estructura.columnas;
-  //     this.sentidoPorDefecto = this.estructura.sentido;
-  //     this.informeService.updateEstructura(this.informe.id, this.estructura);
-  //     this.setImageFromRangeValue(this.rangeValue);
-  //   }
-  // }
 
   private drawPcInCanvas(pc: PcInterface) {
     const rect2 = new fabric.Rect({
@@ -492,14 +515,18 @@ export class CanvasComponent implements OnInit {
         this.onDblClickCanvas(options.e);
       }
     });
+    // Seleccionar estructura
+    this.canvas.on('mouse:down', (options) => {
+      if (options.button === 1 && options.hasOwnProperty('target') && options.target !== null) {
+        if (options.target.hasOwnProperty('estructura')) {
+          this.selectElementoPlanta(options.target.estructura);
+        }
+      }
+    });
 
     // Creacion de Est con boton derecho
     this.canvas.on('mouse:down', (options) => {
-      if (
-        (options.button === 3 || (options.button === 1 && options.e.ctrlKey)) &&
-        !this.polygonMode &&
-        this.estructura === null
-      ) {
+      if ((options.button === 3 || (options.button === 1 && options.e.ctrlKey)) && !this.polygonMode) {
         this.drawPolygon();
       }
       if (this.pointArray.length === 3) {
@@ -537,7 +564,6 @@ export class CanvasComponent implements OnInit {
       // Si es un pc/ref
       if (options.target !== null && options.target.hasOwnProperty('ref')) {
         const selectedPc = this.allPcs.find((item) => item.id === options.target.id);
-        console.log('CanvasComponent -> initCanvasListeners -> selectedPc', selectedPc);
         this.informeService.selectElementoPlanta(selectedPc);
 
         ///////////////////
@@ -582,7 +608,31 @@ export class CanvasComponent implements OnInit {
     });
   }
 
-  onDblClickCanvas(event) {
+  private PointToCoords(puntos: Point[]) {
+    return puntos.map((p) => {
+      return [p.x, p.y];
+    });
+  }
+
+  private getEstructuraPunto(punto: Point) {
+    let estEncontrada = null;
+    if (this.estructuraList !== null) {
+      const inside = require('point-in-polygon');
+      this.estructuraList.forEach((est) => {
+        const coords = this.PointToCoords(est.coords);
+        if (inside([punto.x, punto.y], this.PointToCoords(est.coords))) {
+          estEncontrada = est;
+        }
+      });
+    }
+
+    return estEncontrada;
+  }
+
+  onDblClickCanvas(event: MouseEvent) {
+    // Deseleccionar elemento anterior para evitar sobrescribir
+    this.informeService.uncheckPc();
+
     let fila: number;
     let columna: number;
     let columnaReal: number;
@@ -594,22 +644,31 @@ export class CanvasComponent implements OnInit {
     let filaRef: number;
     let columnaRef: number;
 
-    if (this.estructura !== null) {
-      [fila, columna] = this.estructura.calcularFilaColumna(event.offsetX, event.offsetY);
+    let gpsLat: number;
+    let gpsLng: number;
 
-      [columnaReal, filaReal] = this.estructura.getLocalCoordsFromEstructura(columna, fila);
+    const point = { x: event.offsetX, y: event.offsetY } as Point;
+    const estructura = this.getEstructuraPunto(point);
+    if (estructura !== null) {
+      [fila, columna] = estructura.calcularFilaColumna(event.offsetX, event.offsetY);
 
-      // const cuadrilateroPc = this.estructura.getCuadrilatero(columna, fila);
-      rectInteriorPc = this.estructura.getRectanguloInterior(columna, fila);
-      [columnaRef, filaRef] = this.estructura.getFilaColumnaRef(columna, fila);
+      [columnaReal, filaReal] = estructura.getLocalCoordsFromEstructura(columna, fila);
+      [columnaRef, filaRef] = estructura.getFilaColumnaRef(columna, fila);
 
-      // const cuadrilateroRef = this.estructura.getCuadrilatero(columnaRef, filaRef);
-      rectInteriorRef = this.estructura.getRectanguloInterior(columnaRef, filaRef);
+      if (event.altKey) {
+        rectInteriorPc = estructura.getRectanguloExterior(columna, fila);
+        rectInteriorRef = estructura.getRectanguloExterior(columnaRef, filaRef);
+      } else {
+        rectInteriorPc = estructura.getRectanguloInterior(columna, fila);
+        rectInteriorRef = estructura.getRectanguloInterior(columnaRef, filaRef);
+      }
 
       this.setSquareBase(
         this.planta,
         Math.min(rectInteriorPc.bottom - rectInteriorPc.top, rectInteriorPc.right - rectInteriorPc.left)
       );
+      gpsLat = estructura.getLatLng().lat;
+      gpsLng = estructura.getLatLng().lng;
     } else {
       filaReal = 0;
       columnaReal = 1;
@@ -625,12 +684,15 @@ export class CanvasComponent implements OnInit {
       const widthRef = Math.round(width * (1 - this.rectRefReduction));
       const heightRef = Math.round(height * (1 - this.rectRefReduction));
       rectInteriorRef = { top: topRef, left: leftRef, bottom: topRef + heightRef, right: leftRef + widthRef };
+
+      gpsLat = this.currentLatLng.lat;
+      gpsLng = this.currentLatLng.lng;
     }
 
     // Localizaciones
     let globalCoords;
     let modulo;
-    [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.currentLatLng);
+    [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.estructura.getLatLng());
 
     // Creamos el nuevo PC
     this.localIdCount += 1;
@@ -643,8 +705,8 @@ export class CanvasComponent implements OnInit {
       local_x: columnaReal, // local_x
       local_y: filaReal, // local_x
       globalCoords, //
-      gps_lng: this.currentLatLng.lng,
-      gps_lat: this.currentLatLng.lat,
+      gps_lng: gpsLng,
+      gps_lat: gpsLat,
       img_left: rectInteriorPc.left,
       img_top: rectInteriorPc.top,
       img_width: rectInteriorPc.right - rectInteriorPc.left,
@@ -673,77 +735,29 @@ export class CanvasComponent implements OnInit {
           newPc.refWidth = selectedPc.refWidth;
           newPc.refTop = selectedPc.refTop;
           newPc.refLeft = selectedPc.refLeft;
+          if (event.shiftKey) {
+            newPc.img_width = selectedPc.img_width;
+            newPc.img_height = selectedPc.img_height;
+          }
         }
-        if (this.selectedPc.archivo === newPc.archivo && this.planta.tipo === 'seguidores') {
-          newPc.global_x = selectedPc.global_x;
-          newPc.global_y = selectedPc.global_y;
-          newPc.gps_lng = selectedPc.gps_lng;
-          newPc.gps_lat = selectedPc.gps_lat;
-        }
-        if (selectedPc.archivo === newPc.archivo && this.estructura.columnas === 1) {
-          newPc.local_x = selectedPc.local_x;
+        if (!this.estructura) {
+          if (this.selectedPc.archivo === newPc.archivo && this.planta.tipo === 'seguidores') {
+            newPc.globalCoords = selectedPc.globalCoords;
+            newPc.gps_lng = selectedPc.gps_lng;
+            newPc.gps_lat = selectedPc.gps_lat;
+          }
+          // if (selectedPc.archivo === newPc.archivo && this.estructura.columnas === 1) {
+          //   newPc.local_x = selectedPc.local_x;
+          // }
         }
       }
     }
 
     this.pcService.addPc(newPc).then((pcRef) => {
-      newPc.id = pcRef.id;
       this.drawPcInCanvas(newPc);
       this.informeService.selectElementoPlanta(new Pc(newPc));
     });
   }
-
-  // onMouseUpCanvas(event) {
-  //   const actObj = this.canvas.getActiveObject();
-
-  //   // PCS
-  //   if (actObj !== null && actObj !== undefined) {
-  //     if (actObj.get('type') === 'rect') {
-  //       this.selectedElement = this.allPcs.find((pc) => pc.local_id === actObj.localId);
-
-  //     }
-  //   }
-
-  //   // ESTRUCTURAS
-  // }
-
-  // getPcsList(vuelo?: string) {
-  //   this.pcService
-  //     .getPcsInformeEdit(this.informe.id)
-  //     .pipe(take(1))
-  //     .subscribe(
-  //       (response) => {
-  //         if (!response || response.length === 0) {
-  //           this.alertMessage = 'No hay puntos calientes';
-  //         } else {
-  //           this.alertMessage = null;
-  //           this.allPcs = response;
-  //           if (vuelo != null) {
-  //             this.allPcs = this.sortPcs(this.allPcs).filter((arr) => {
-  //               return arr.vuelo === vuelo;
-  //             });
-  //           } else {
-  //             this.allPcs = this.sortPcs(this.allPcs);
-  //           }
-
-  //           this.localIdCount = this.allPcs[0].local_id;
-  //         }
-
-  //         // if (this.DEFAULT_LAT == null || this.DEFAULT_LNG == null) {
-  //         //     this.DEFAULT_LAT = this.allPcs[0].gps_lat;
-  //         //     this.DEFAULT_LNG = this.allPcs[0].gps_lng;
-  //         // }
-  //       },
-  //       (error) => {
-  //         const errorMessage = error;
-  //         if (errorMessage != null) {
-  //           const body = JSON.parse(error._body);
-  //           this.alertMessage = body.message;
-  //           console.log(error);
-  //         }
-  //       }
-  //     );
-  // }
 
   deleteEstructura(estructura: Estructura) {
     this.informeService.deleteEstructuraInforme(this.informeId, estructura);
@@ -781,16 +795,16 @@ export class CanvasComponent implements OnInit {
     }
   }
 
-  private limpiarEstructuraCanvas() {
+  private limpiarEstructuraCanvas(estructura: EstructuraInterface) {
     this.canvas.getObjects().forEach((obj) => {
-      if (obj.hasOwnProperty('estructura')) {
+      if (obj.hasOwnProperty('estructura') && obj.estructura.id === estructura.id) {
         this.canvas.remove(obj);
       }
     });
   }
 
   onClickCrearEstructura() {
-    if (!this.polygonMode && this.estructura === null) {
+    if (!this.polygonMode) {
       this.drawPolygon();
     }
   }
@@ -805,12 +819,6 @@ export class CanvasComponent implements OnInit {
   }
 
   public drawPolygon() {
-    // Borrar posibles restos de polígonos anteriores
-    if (this.estructura) {
-      this.deleteEstructura(this.estructura);
-    }
-    //
-
     this.polygonMode = true;
     this.pointArray = new Array();
     this.lineArray = new Array();
@@ -939,8 +947,9 @@ export class CanvasComponent implements OnInit {
       columnaInicio: 1,
       filaInicio: 1,
       vuelo: this.informeService.selectedArchivoVuelo.vuelo,
-      latitud: this.currentLatLng.lat,
-      longitud: this.currentLatLng.lng,
+      latitud: this.estructura && this.planta.tipo === 'seguidores' ? this.estructura.latitud : this.currentLatLng.lat,
+      longitud:
+        this.estructura && this.planta.tipo === 'seguidores' ? this.estructura.longitud : this.currentLatLng.lng,
       globalCoords,
     } as EstructuraInterface;
 

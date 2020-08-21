@@ -1,13 +1,18 @@
+<hotkeys-cheatsheet title="Atajos de teclado"></hotkeys-cheatsheet>
+
 <div class="container-fluid" id="container-ppal">
   <div class="row">
-    <div class="col-xs-12 col-lg-9">
+    <div class="col">
       <div class="header" *ngIf="planta">
         <h2>
           {{ planta.nombre }} - {{ titulo | date }}
           <span> <input type="text" [(ngModel)]="carpetaJpgGray" (change)="onChangeCarpetaJpgGray()" />) - </span>
         </h2>
-        <mat-slide-toggle *ngIf="user?.role == 1" [(ngModel)]="pcsOrEstructuras"> est/pc </mat-slide-toggle>
-        numGlobalCoords:
+        <mat-slide-toggle *ngIf="user?.role == 1 || user?.role == 5" [(ngModel)]="pcsOrEstructuras">
+          est/pc
+        </mat-slide-toggle>
+
+        || numGlobalCoords:
         <input
           type="number"
           [(ngModel)]="planta.numeroGlobalCoords"
@@ -83,13 +88,14 @@
             *ngIf="planta$"
             [pcsOrEstructuras]="pcsOrEstructuras"
             [carpetaJpgGray]="carpetaJpgGray"
-            [currentLatLng]="currentLatLng"
             [currentDatetime]="currentDatetime"
             [currentTrackheading]="currentTrackheading"
             [currentImageRotation]="currentImageRotation"
             [planta$]="planta$"
           >
           </app-canvas>
+
+          <!--
           <div *ngIf="pcsOrEstructuras">
             <span>Pérdidas</span>
             <input
@@ -174,19 +180,18 @@
               size="2"
               value="1"
             />
-          </div>
+            </div>
+            -->
         </div>
 
         <div class="col col-xs-6 mapa">
-          <app-edit-map [currentLatLng]="currentLatLng" [gpsCoordsList]="gpsCoordsList"> </app-edit-map>
-          <!-- <button *ngIf="(user | async).role === 1" (click)="recalcularLocs()">Recalcular locs</button> -->
-
+          <app-edit-map [gpsCoordsList]="gpsCoordsList"> </app-edit-map>
           <app-edit-pc-detail *ngIf="pcsOrEstructuras"></app-edit-pc-detail>
         </div>
       </div>
     </div>
 
-    <div class="col col-xs-12 col-lg-3 col-pcs">
+    <div class="col col-xs-12 col-lg-2 col-pcs">
       <app-edit-list [pcsOrEstructuras]="pcsOrEstructuras"> </app-edit-list>
     </div>
   </div>
