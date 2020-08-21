@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { InformeService } from '../../services/informe.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { ArchivoVueloInterface } from '../../models/archivoVuelo';
@@ -19,7 +19,6 @@ import { HotkeysService, Hotkey } from 'angular2-hotkeys';
   selector: 'app-edit-list',
   templateUrl: './edit-list.component.html',
   styleUrls: ['./edit-list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditListComponent implements OnInit {
   @Input() pcsOrEstructuras: boolean;
@@ -128,6 +127,7 @@ export class EditListComponent implements OnInit {
           return estConPcs;
         });
       }
+      this.dataSourceEst.data = this.estConPcs;
     });
 
     this.informeService.avisadorNuevoElemento$.subscribe((elem) => {
@@ -138,28 +138,39 @@ export class EditListComponent implements OnInit {
         const estPos = this.estConPcs.findIndex((val) => {
           return val.estructura.id === elem.id;
         });
+
         // Si existe, entonces le estamos borrando:
         if (estPos >= 0) {
-          this.estConPcs.filter((val) => {
-            return val.estructura.id !== estructura.id;
-          });
           // Cuando borramos la estructura, borramos tambien todos sus pcs
           this.borrarPcsEstructura(estructura);
+
+          this.estConPcs.splice(estPos, 1);
         } else {
           // Si no existe, le añadimos al array sin ningun pc
-          const newEstConPcs = { estructura, pcs: [] };
+          this.estConPcs.push({ estructura, pcs: [] });
+          this.estConPcs.sort((a, b) =>
+            a.estructura.archivo > b.estructura.archivo ? 1 : b.estructura.archivo > a.estructura.archivo ? -1 : 0
+          );
+          this.selectedEstructura = estructura;
         }
       } else if (elem.constructor.name === Pc.name) {
         const pc = elem as Pc;
         const arrayPosition = this.estConPcs.findIndex((val) => {
           return val.estructura.archivo === elem.archivo;
         });
-        if (arrayPosition >= 0) {
+        const pcPosition = this.estConPcs[arrayPosition].pcs.findIndex((val) => {
+          return val.id === pc.id;
+        });
+
+        if (pcPosition >= 0) {
+          // Si existe, entonces le eliminamos
+
           // Si existe, entonces le estamos borrando
-          this.estConPcs[arrayPosition].pcs = this.estConPcs[arrayPosition].pcs.filter((val) => {
-            return val.id !== pc.id;
-          });
-        } // Si no hay ninguna estructura con pc, No hacer nada
+          this.estConPcs[arrayPosition].pcs.splice(pcPosition, 1);
+        } else {
+          // Si no existe, entonces le añadimos
+          this.estConPcs[arrayPosition].pcs.push(pc);
+        }
       }
 
       this.dataSourceEst.data = this.estConPcs;
@@ -223,15 +234,15 @@ export class EditListComponent implements OnInit {
       return this.selectedEstructura.archivo === est.estructura.archivo;
     }).length;
 
-    const nextEstructuraIndex = this.dataSourceEst.data.findIndex(isSameEstructura) + estructurasMismoArchivo;
-    const nextEstructura = this.dataSourceEst.data[nextEstructuraIndex].estructura;
+    const nextEstructuraIndex = this.estConPcs.findIndex(isSameEstructura) + estructurasMismoArchivo;
+    const nextEstructura = this.estConPcs[nextEstructuraIndex].estructura;
     this.onClickRowList(nextEstructura);
   }
   private previousEstructura() {
     const isSameEstructura = (estructuraConPcs: EstructuraConPcs) =>
       estructuraConPcs.estructura.archivo === this.selectedEstructura.archivo;
-    const prevEstructuraIndex = -1 + this.dataSourceEst.data.findIndex(isSameEstructura);
-    const prevEstructura = this.dataSourceEst.data[prevEstructuraIndex].estructura;
+    const prevEstructuraIndex = -1 + this.estConPcs.findIndex(isSameEstructura);
+    const prevEstructura = this.estConPcs[prevEstructuraIndex].estructura;
     this.onClickRowList(prevEstructura);
   }
 
