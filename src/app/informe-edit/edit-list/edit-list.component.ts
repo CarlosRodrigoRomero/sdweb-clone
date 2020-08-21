@@ -5,7 +5,7 @@ import { ArchivoVueloInterface } from '../../models/archivoVuelo';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from '../../models/elementoPlanta';
 import { MatSort } from '@angular/material/sort';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 import { PcService } from '../../services/pc.service';
 import { combineLatest } from 'rxjs';
 import { Pc } from 'src/app/models/pc';
@@ -22,9 +22,7 @@ import { HotkeysService, Hotkey } from 'angular2-hotkeys';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditListComponent implements OnInit {
-  @Input() set pcsOrEstructuras(value: boolean) {
-    this.pcsOrEstructuras2 = value;
-  }
+  @Input() pcsOrEstructuras: boolean;
 
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -34,7 +32,6 @@ export class EditListComponent implements OnInit {
   dataSourceEst = new MatTableDataSource<EstructuraConPcs>();
   dataSourcePcs = new MatTableDataSource<Pc>();
   informeId: string;
-  pcsOrEstructuras2: boolean;
   planta: PlantaInterface;
   estConPcs: EstructuraConPcs[];
   selectedEstructura: ElementoPlantaInterface;
@@ -90,13 +87,80 @@ export class EditListComponent implements OnInit {
     );
     const allPcs$ = this.pcService.getPcsInformeEdit(this.informeId);
 
-    combineLatest([allEstructuras$, allPcs$]).subscribe((elem) => {
-      this.estConPcs = elem[0].map((est) => {
-        const pcs = elem[1].filter((pc) => {
-          return pc.archivo === est.archivo;
+    combineLatest([allEstructuras$, allPcs$])
+      .pipe(take(1))
+      .subscribe((elem) => {
+        this.estConPcs = elem[0].map((est) => {
+          const pcs = elem[1].filter((pc) => {
+            return pc.archivo === est.archivo;
+          });
+          return { estructura: est, pcs };
         });
-        return { estructura: est, pcs };
+
+        this.dataSourceEst.data = this.estConPcs;
       });
+
+    this.informeService.avisadorChangeElemento$.subscribe((elem) => {
+      if (elem.constructor.name === Estructura.name) {
+        const estructura = elem as Estructura;
+        this.estConPcs = this.estConPcs.map((estConPcs) => {
+          if (estConPcs.estructura.id === estructura.id) {
+            return { estructura, pcs: estConPcs.pcs };
+          } else {
+            return estConPcs;
+          }
+        });
+
+        this.updatePcsDeEstructura(estructura);
+      } else if (elem.constructor.name === Pc.name) {
+        const pc = elem as Pc;
+        this.estConPcs = this.estConPcs.map((estConPcs) => {
+          if (estConPcs.estructura.archivo === elem.archivo) {
+            const elemPos = estConPcs.pcs.findIndex((val) => {
+              return val.id === pc.id;
+            });
+            if (elemPos >= 0) {
+              estConPcs.pcs.splice(elemPos, 1);
+              estConPcs.pcs.push(pc);
+              return estConPcs;
+            }
+          }
+          return estConPcs;
+        });
+      }
+    });
+
+    this.informeService.avisadorNuevoElemento$.subscribe((elem) => {
+      if (elem.constructor.name === Estructura.name) {
+        const estructura = elem as Estructura;
+
+        // Comprobar si ya existía
+        const estPos = this.estConPcs.findIndex((val) => {
+          return val.estructura.id === elem.id;
+        });
+        // Si existe, entonces le estamos borrando:
+        if (estPos >= 0) {
+          this.estConPcs.filter((val) => {
+            return val.estructura.id !== estructura.id;
+          });
+          // Cuando borramos la estructura, borramos tambien todos sus pcs
+          this.borrarPcsEstructura(estructura);
+        } else {
+          // Si no existe, le añadimos al array sin ningun pc
+          const newEstConPcs = { estructura, pcs: [] };
+        }
+      } else if (elem.constructor.name === Pc.name) {
+        const pc = elem as Pc;
+        const arrayPosition = this.estConPcs.findIndex((val) => {
+          return val.estructura.archivo === elem.archivo;
+        });
+        if (arrayPosition >= 0) {
+          // Si existe, entonces le estamos borrando
+          this.estConPcs[arrayPosition].pcs = this.estConPcs[arrayPosition].pcs.filter((val) => {
+            return val.id !== pc.id;
+          });
+        } // Si no hay ninguna estructura con pc, No hacer nada
+      }
 
       this.dataSourceEst.data = this.estConPcs;
     });
@@ -120,6 +184,35 @@ export class EditListComponent implements OnInit {
       )
       .subscribe((planta) => {
         this.planta = planta;
+      });
+  }
+
+  private updatePcsDeEstructura(estructura: Estructura) {
+    // Update modulo, latitud, longitud y globalCoords
+    this.estConPcs
+      .filter((elem) => {
+        return elem.estructura.id === estructura.id;
+      })
+      .forEach((item) => {
+        item.pcs.forEach((pc) => {
+          pc.setLatLng({ lat: estructura.latitud, lng: estructura.longitud });
+          pc.setGlobals(estructura.globalCoords);
+          pc.setModulo(estructura.modulo);
+
+          this.pcService.updatePc(pc);
+        });
+      });
+  }
+
+  private borrarPcsEstructura(estructura: Estructura) {
+    this.estConPcs
+      .filter((val) => {
+        return val.estructura.id === estructura.id;
+      })
+      .forEach((elem) => {
+        elem.pcs.forEach((pc) => {
+          this.pcService.delPc(pc).then((v) => {});
+        });
       });
   }
   private nextEstructura() {
