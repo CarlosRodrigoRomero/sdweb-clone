@@ -7,7 +7,7 @@
         <span *ngIf="!(elem.estructura | validateElem: planta)"
           ><i class="fas fa-exclamation-circle errorGlobalCoords"></i
         ></span>
-        <span *ngIf="elem.pcs.length === 0 && pcsOrEstructuras2"
+        <span *ngIf="elem.pcs.length === 0 && pcsOrEstructuras"
           ><i class="fas fa-exclamation-circle errorGlobalCoords2"></i
         ></span>
       </td>
@@ -40,7 +40,7 @@
   <mat-paginator [pageSizeOptions]="[25, 50, 100]" showFirstLastButtons></mat-paginator>
 </div>
 
-<div *ngIf="pcsOrEstructuras2" class="mat-elevation-z8 tablaPcs">
+<div *ngIf="pcsOrEstructuras" class="mat-elevation-z8 tablaPcs">
   <table matSort mat-table [dataSource]="dataSourcePcs">
     <ng-container matColumnDef="error">
       <th mat-sort-header mat-header-cell *matHeaderCellDef>!</th>
@@ -83,5 +83,5 @@
       *matRowDef="let elem; columns: displayedColumnsPc"
     ></tr>
   </table>
-  <button *ngIf="pcsOrEstructuras2" (click)="recalcularLocs()">Recalcular locs</button>
+  <button *ngIf="pcsOrEstructuras" (click)="recalcularLocs()">Recalcular locs</button>
 </div>
