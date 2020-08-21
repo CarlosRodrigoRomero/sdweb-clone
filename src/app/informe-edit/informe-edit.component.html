@@ -11,8 +11,7 @@
         <mat-slide-toggle *ngIf="user?.role == 1 || user?.role == 5" [(ngModel)]="pcsOrEstructuras">
           est/pc
         </mat-slide-toggle>
-        <mat-slide-toggle [(ngModel)]="showTable"> Mostrar tabla </mat-slide-toggle>
-        <mat-slide-toggle [(ngModel)]="autoLoc"> Auto Loc </mat-slide-toggle>
+
         || numGlobalCoords:
         <input
           type="number"
@@ -89,7 +88,6 @@
             *ngIf="planta$"
             [pcsOrEstructuras]="pcsOrEstructuras"
             [carpetaJpgGray]="carpetaJpgGray"
-            [currentLatLng]="currentLatLng"
             [currentDatetime]="currentDatetime"
             [currentTrackheading]="currentTrackheading"
             [currentImageRotation]="currentImageRotation"
@@ -193,7 +191,7 @@
       </div>
     </div>
 
-    <div *ngIf="showTable" class="col col-xs-12 col-lg-2 col-pcs">
+    <div class="col col-xs-12 col-lg-2 col-pcs">
       <app-edit-list [pcsOrEstructuras]="pcsOrEstructuras"> </app-edit-list>
     </div>
   </div>

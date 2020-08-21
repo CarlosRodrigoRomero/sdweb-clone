@@ -644,8 +644,8 @@ export class CanvasComponent implements OnInit {
     let filaRef: number;
     let columnaRef: number;
 
-    let gps_lat: number;
-    let gps_lng: number;
+    let gpsLat: number;
+    let gpsLng: number;
 
     const point = { x: event.offsetX, y: event.offsetY } as Point;
     const estructura = this.getEstructuraPunto(point);
@@ -667,8 +667,8 @@ export class CanvasComponent implements OnInit {
         this.planta,
         Math.min(rectInteriorPc.bottom - rectInteriorPc.top, rectInteriorPc.right - rectInteriorPc.left)
       );
-      gps_lat = estructura.getLatLng().lat;
-      gps_lng = estructura.getLatLng().lng;
+      gpsLat = estructura.getLatLng().lat;
+      gpsLng = estructura.getLatLng().lng;
     } else {
       filaReal = 0;
       columnaReal = 1;
@@ -685,8 +685,8 @@ export class CanvasComponent implements OnInit {
       const heightRef = Math.round(height * (1 - this.rectRefReduction));
       rectInteriorRef = { top: topRef, left: leftRef, bottom: topRef + heightRef, right: leftRef + widthRef };
 
-      gps_lat = this.currentLatLng.lat;
-      gps_lng = this.currentLatLng.lng;
+      gpsLat = this.currentLatLng.lat;
+      gpsLng = this.currentLatLng.lng;
     }
 
     // Localizaciones
@@ -705,8 +705,8 @@ export class CanvasComponent implements OnInit {
       local_x: columnaReal, // local_x
       local_y: filaReal, // local_x
       globalCoords, //
-      gps_lng,
-      gps_lat,
+      gps_lng: gpsLng,
+      gps_lat: gpsLat,
       img_left: rectInteriorPc.left,
       img_top: rectInteriorPc.top,
       img_width: rectInteriorPc.right - rectInteriorPc.left,

@@ -68,7 +68,6 @@ export class InformeEditComponent implements OnInit {
   public user$: Observable<UserInterface>;
   public user: UserInterface;
   public pcsOrEstructuras: boolean;
-  public showTable: boolean;
   public carpetaJpgGray: string;
   public planta$: Observable<PlantaInterface>;
   public gpsCoordsList: LatLngLiteral[];
@@ -130,7 +129,6 @@ export class InformeEditComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.showTable = true;
     this.informeId = this.route.snapshot.paramMap.get('id');
 
     this.rangeValue = 0;

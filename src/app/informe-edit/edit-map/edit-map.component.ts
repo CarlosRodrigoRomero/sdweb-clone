@@ -30,7 +30,7 @@ export class EditMapComponent implements OnInit {
   polygonList: any[];
   informeId: string;
   planta: PlantaInterface;
-  coordsList: LatLngLiteral[];
+  coordsList: any[];
   colorSameFlight: string;
   colorOtherFlight: string;
   soloEstructurasVuelo: boolean;
