@@ -251,17 +251,33 @@ export class EditListComponent implements OnInit {
   recalcularLocs() {
     this.estConPcs.forEach(async (estConPcs: EstructuraConPcs) => {
       const estructura = estConPcs.estructura;
-      let globalCoords;
-      let modulo;
-      [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(estructura.getLatLng());
-      estructura.setModulo(modulo);
-      estructura.setGlobals(globalCoords);
-      await this.informeService.updateEstructura(this.informeId, estructura);
+
+      if (this.planta.autoLocReady) {
+        let globalCoords;
+        let modulo;
+        [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(estructura.getLatLng());
+        estructura.setModulo(modulo);
+        estructura.setGlobals(globalCoords);
+
+        await this.informeService.updateEstructura(this.informeId, estructura);
+      } else {
+        let globalCoords;
+        let modulo;
+        [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(estructura.getLatLng());
+        if (modulo !== null) {
+          estructura.setModulo(modulo);
+        }
+      }
+
       estConPcs.pcs.forEach(async (pc) => {
         pc.setLatLng(estructura.getLatLng());
-        pc.setGlobals(globalCoords);
-        pc.setModulo(modulo);
+        pc.setGlobals(estructura.globalCoords);
+        if (estructura.modulo !== null) {
+          pc.setModulo(estructura.modulo);
+        }
+
         await this.pcService.updatePc(pc);
+        console.log('pc updated');
       });
     });
   }
