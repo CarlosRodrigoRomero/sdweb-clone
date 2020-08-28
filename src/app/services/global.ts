@@ -116,7 +116,7 @@ export let GLOBAL = {
     '',
     'Sustituir diodo bypass en su caso.',
     'Revisar módulos, estado de operación del inversor, cableado, conectores y fusibles',
-    'Cambiar el diodo bypass afectado.',
+    'Revisar módulo en campo para determinar causa.',
     'Revisar módulo y diodos bypass para un correcto funcionamiento con polaridad inversa.',
     'Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.',
     'Reclamar a garantía en su caso.',
