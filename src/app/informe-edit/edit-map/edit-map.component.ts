@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { AgmMap, LatLngLiteral, LatLng } from '@agm/core';
 import { PcInterface } from 'src/app/models/pc';
 import { Estructura } from '../../models/estructura';
@@ -16,7 +16,6 @@ declare const google: any;
   selector: 'app-edit-map',
   templateUrl: './edit-map.component.html',
   styleUrls: ['./edit-map.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditMapComponent implements OnInit {
   @ViewChild(AgmMap) map: any;
