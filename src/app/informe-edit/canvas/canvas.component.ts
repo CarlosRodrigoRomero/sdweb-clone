@@ -755,30 +755,26 @@ export class CanvasComponent implements OnInit {
       };
 
       //
-      const selectedElem = this.informeService.selectedElementoPlanta;
-      if (selectedElem) {
-        if (selectedElem.constructor.name === Pc.name) {
-          const selectedPc = selectedElem as Pc;
-          if (selectedElem.archivo === newPc.archivo) {
-            newPc.refHeight = selectedPc.refHeight;
-            newPc.refWidth = selectedPc.refWidth;
-            newPc.refTop = selectedPc.refTop;
-            newPc.refLeft = selectedPc.refLeft;
-            if (event.shiftKey) {
-              newPc.img_width = selectedPc.img_width;
-              newPc.img_height = selectedPc.img_height;
-            }
+      const pcInCanvas = this.checkIfPcInCanvas();
+      if (pcInCanvas) {
+        const selectedPc = pcInCanvas as Pc;
+        newPc.refHeight = selectedPc.refHeight;
+        newPc.refWidth = selectedPc.refWidth;
+        newPc.refTop = selectedPc.refTop;
+        newPc.refLeft = selectedPc.refLeft;
+        if (event.shiftKey) {
+          newPc.img_width = selectedPc.img_width;
+          newPc.img_height = selectedPc.img_height;
+        }
+        if (!this.estructura) {
+          if (selectedPc.archivo === newPc.archivo && this.planta.tipo === 'seguidores') {
+            newPc.globalCoords = selectedPc.globalCoords;
+            newPc.gps_lng = selectedPc.gps_lng;
+            newPc.gps_lat = selectedPc.gps_lat;
           }
-          if (!this.estructura) {
-            if (this.selectedPc.archivo === newPc.archivo && this.planta.tipo === 'seguidores') {
-              newPc.globalCoords = selectedPc.globalCoords;
-              newPc.gps_lng = selectedPc.gps_lng;
-              newPc.gps_lat = selectedPc.gps_lat;
-            }
-            // if (selectedPc.archivo === newPc.archivo && this.estructura.columnas === 1) {
-            //   newPc.local_x = selectedPc.local_x;
-            // }
-          }
+          // if (selectedPc.archivo === newPc.archivo && this.estructura.columnas === 1) {
+          //   newPc.local_x = selectedPc.local_x;
+          // }
         }
       }
 
@@ -790,6 +786,16 @@ export class CanvasComponent implements OnInit {
       });
     }
   }
+  checkIfPcInCanvas() {
+    const pcsInCanvas = this.allPcs.filter((pc) => {
+      return pc.archivo === this.informeService.selectedArchivoVuelo.archivo;
+    });
+    if (pcsInCanvas.length > 0) {
+      return pcsInCanvas[0];
+    }
+    return false;
+  }
+
   deletePc(pc: PcInterface) {}
   deleteEstructura(estructura: Estructura) {
     this.informeService.deleteEstructuraInforme(this.informeId, estructura);

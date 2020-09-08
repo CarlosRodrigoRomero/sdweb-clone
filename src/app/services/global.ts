@@ -56,7 +56,7 @@ export let GLOBAL = {
     'Caja conexiones',
     'Sombras', // 15
     'Yellowing', // 16
-    'String en CA', // 17
+    'String con baja producción', // 17
     'Posible PID', // 18
   ],
   labels_bloqueadas: [0, 1, 2, 4, 16],
@@ -78,7 +78,7 @@ export let GLOBAL = {
     'Caja de conexiones caliente', // 14
     'Módulo con sombras', // 15
     'Yellowing', // 16
-    'String en circuito abierto', // 17
+    'String con baja producción', // 17
     'Posible PID', // 18
   ],
   //   '0',
@@ -136,7 +136,7 @@ export let GLOBAL = {
     0, // "Punto caliente", // 1
     0, // "Varios puntos calientes", // 2
     0.35, // "Substring en CA", // 3
-    0, // "String en CA", // 4
+    0, // "String", // 4
     1, // "Módulo en CA", // 5
     0.35, // "Substring en CC", // 6
     0.85, // "Módulo en CC", // 7
@@ -149,7 +149,7 @@ export let GLOBAL = {
     0, // "Caja de conexiones caliente", // 14
     0, // "Módulo afectado por sombras" // 15
     0, // Yellowing //16
-    1,
+    1, // "String en CA", // 17
     0,
   ],
 
