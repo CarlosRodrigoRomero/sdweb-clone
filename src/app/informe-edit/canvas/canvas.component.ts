@@ -237,9 +237,9 @@ export class CanvasComponent implements OnInit {
     this.canvas.renderAll();
   }
 
-  getEstList(archivoVuelo: ArchivoVueloInterface) {
+  getEstList(archivo: string) {
     this.informeService
-      .getEstructuraInforme(this.informeId, archivoVuelo.archivo)
+      .getEstructuraInforme(this.informeId, archivo)
       .pipe(take(1))
       .subscribe((estList) => {
         if (estList.length > 0) {
@@ -289,7 +289,7 @@ export class CanvasComponent implements OnInit {
         .subscribe((bool) => {
           if (bool) {
             // Añadir Estructura
-            this.getEstList(archivoVuelo);
+            this.getEstList(archivoVuelo.archivo);
             this.addPcsCanvas(archivoVuelo);
           }
         });
@@ -372,6 +372,7 @@ export class CanvasComponent implements OnInit {
           this.successMessage = undefined;
         }, 2000);
         this.alertMessage = undefined;
+        this.getEstList(this.estructura.archivo);
       })
       .catch((res) => {
         this.alertMessage = 'Error actualizando estructura';
