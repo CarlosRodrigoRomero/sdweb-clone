@@ -1,10 +1,6 @@
 <div mat-dialog-title>
-  <h3 *ngIf="!sinPcs" class="text-center dialog-title">
-    Visor de anomalías térmicas
-  </h3>
-  <h3 *ngIf="sinPcs" class="text-center dialog-title">
-    Vista de seguidor sin anomalías
-  </h3>
+  <h3 *ngIf="!sinPcs" class="text-center dialog-title">Visor de anomalías térmicas</h3>
+  <h3 *ngIf="sinPcs" class="text-center dialog-title">Vista de seguidor sin anomalías</h3>
 </div>
 <div mat-dialog-content>
   <div class="row">
@@ -13,24 +9,14 @@
         id="visual-zoom"
         width="{{ zoomSquare }}"
         height="{{ zoomSquare }}"
-        style="position: absolute; top: 0; left: 0; display: none;"
+        style="position: absolute; top: 0; left: 0; display: none"
       ></canvas>
 
-      <div
-        id="imagen-div"
-        class="imagen-termica-div"
-        (mouseleave)="onMouseLeaveCanvas($event)"
-      >
+      <div id="imagen-div" class="imagen-termica-div" (mouseleave)="onMouseLeaveCanvas($event)">
         <div *ngIf="!imagenTermicaCargada" class="cargando text-center">
           <app-spinner></app-spinner>
         </div>
-        <canvas
-          (mousemove)="onMouseMoveCanvas($event)"
-          id="dialog-canvas"
-          width="640"
-          height="512"
-        >
-        </canvas>
+        <canvas (mousemove)="onMouseMoveCanvas($event)" id="dialog-canvas" width="640" height="512"> </canvas>
         <!-- <span class="imagen-termica-tooltip text-center" id="dialog-tooltip">{{tooltipTemp}} ºC</span> -->
         <!-- <canvas id="hidden-canvas" width="640" height="512"></canvas> -->
       </div>
@@ -46,26 +32,16 @@
     <div class="col-5 pc-details-derecha">
       <h4 *ngIf="!sinPcs" class="text-center">
         Anomalía <b>#{{ pc.local_id }}</b>
-        <span class="text-center colorSeveridad{{ pcService.getPcCoA(pc) }}">
-          (CoA {{ pcService.getPcCoA(pc) }})</span
-        >
+        <span class="text-center colorSeveridad{{ pcService.getPcCoA(pc) }}"> (CoA {{ pcService.getPcCoA(pc) }})</span>
       </h4>
       <h4 *ngIf="sinPcs" class="text-center">
         Seguidor <b>{{ plantaService.getNombreSeguidor(pc) }}</b>
       </h4>
 
-      <div
-        class="termico-visual"
-        *ngIf="!informe.hasOwnProperty('jpgVisual') || informe.jpgVisual"
-      >
+      <div class="termico-visual" *ngIf="!informe.hasOwnProperty('jpgVisual') || informe.jpgVisual">
         <span class="termico-visual-text">térmico / visual</span>
         <label class="switch">
-          <input
-            [(ngModel)]="slider"
-            type="checkbox"
-            id="changeImage"
-            (ngModelChange)="onSliderChange($event)"
-          />
+          <input [(ngModel)]="slider" type="checkbox" id="changeImage" (ngModelChange)="onSliderChange($event)" />
           <span class="slider round"></span>
         </label>
       </div>
@@ -85,45 +61,34 @@
         </div>
         <div class="pc-details-derecha-item-tabla">
           <span class="text-center"><u>Temp. referencia</u></span>
-          <span style="color: blue;" class="text-center"
-            >{{ pc.temperaturaRef }} ºC</span
-          >
+          <span style="color: blue" class="text-center">{{ pc.temperaturaRef }} ºC</span>
         </div>
 
         <div class="pc-details-derecha-item-tabla">
           <span class="text-center"><u>&Delta;T (normalizado)</u></span>
-          <span style="color: red;" class="text-center"
-            >+ {{ pc.gradienteNormalizado | number: "1.0-1" }} ºC</span
-          >
+          <span style="color: red" class="text-center">+ {{ pc.gradienteNormalizado | number: '1.0-1' }} ºC</span>
         </div>
 
         <div *ngIf="false" class="pc-details-derecha-item-tabla">
           <span class="text-center"><strong>Eficiencia</strong></span>
-          <span class="text-center"
-            >{{ (1 - pc.perdidas) * 100 | number: "1.0-0" }} %</span
-          >
+          <span class="text-center">{{ (1 - pc.perdidas) * 100 | number: '1.0-0' }} %</span>
         </div>
       </div>
 
       <div *ngIf="!sinPcs" class="pc-details-derecha-item">
         <div class="pc-details-derecha-icon">
-          <i
-            style="color: red;"
-            class="fas fa-exclamation-circle icon-error"
-          ></i>
+          <i style="color: red" class="fas fa-exclamation-circle icon-error"></i>
         </div>
         <div class="pc-texto">
           <span class="detail-title">Anomalía: </span>
-          <span *ngIf="checkIsMoreThanOne(pc.modulosAfectados)">
-            Módulos afectados: {{ pc.modulosAfectados }}.
-          </span>
+          <span *ngIf="checkIsMoreThanOne(pc.modulosAfectados)"> Módulos afectados: {{ pc.modulosAfectados }}. </span>
           <span>{{ pcDescripcion[pc.tipo] }}</span>
         </div>
       </div>
 
       <div *ngIf="!sinPcs" class="pc-details-derecha-item">
         <div class="pc-details-derecha-icon">
-          <i style="color: orange;" class="fas fa-flag icon-flag"></i>
+          <i style="color: orange" class="fas fa-flag icon-flag"></i>
         </div>
         <div class="pc-texto">
           <span class="detail-title">Causa: </span>
@@ -149,46 +114,23 @@
           <span class="detail-title">Localización:</span>
         </div>
 
-        <div
-          class="displayFlex"
-          *ngIf="planta.tipo === 'seguidores'; else fija"
-        >
-          <div
-            *ngIf="!checkIsNaN(pc.global_x)"
-            class="pc-details-derecha-item-tabla"
-          >
+        <div class="displayFlex" *ngIf="planta.tipo === 'seguidores'; else fija">
+          <div *ngIf="!checkIsNaN(pc.global_x)" class="pc-details-derecha-item-tabla">
             <span class="text-center"><u>Seguidor</u></span>
-            <span class="text-center">{{
-              plantaService.getNombreSeguidor(pc)
-            }}</span>
+            <span class="text-center">{{ plantaService.getNombreSeguidor(pc) }}</span>
           </div>
 
           <div class="pc-details-derecha-item-tabla">
-            <span
-              *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')"
-              class="text-center"
-              ><u
-                >{{ plantaService.getNombreLocalX(planta) }}/{{
-                  plantaService.getNombreLocalY(planta)
-                }}</u
-              ></span
+            <span *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"
+              ><u>{{ plantaService.getNombreLocalX(planta) }}/{{ plantaService.getNombreLocalY(planta) }}</u></span
             >
-            <span
-              *ngIf="planta.hasOwnProperty('etiquetasLocalXY')"
-              class="text-center"
-              ><u>Nº Módulo</u></span
-            >
-            <span class="text-center">{{
-              plantaService.getNumeroModulo(pc)
-            }}</span>
+            <span *ngIf="planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"><u>Nº Módulo</u></span>
+            <span class="text-center">{{ plantaService.getNumeroModulo(pc) }}</span>
           </div>
         </div>
 
         <ng-template class="displayFlex" #fija>
-          <div
-            *ngIf="!checkIsNaN(pc.global_x)"
-            class="pc-details-derecha-item-tabla"
-          >
+          <div *ngIf="!checkIsNaN(pc.global_x)" class="pc-details-derecha-item-tabla">
             <span class="text-center"
               ><u>{{ plantaService.getNombreGlobalX(planta) }}</u></span
             >
@@ -202,23 +144,11 @@
           </div>
 
           <div class="pc-details-derecha-item-tabla">
-            <span
-              *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')"
-              class="text-center"
-              ><u
-                >{{ plantaService.getNombreLocalX(planta) }}/{{
-                  plantaService.getNombreLocalY(planta)
-                }}</u
-              ></span
+            <span *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"
+              ><u>{{ plantaService.getNombreLocalX(planta) }}/{{ plantaService.getNombreLocalY(planta) }}</u></span
             >
-            <span
-              *ngIf="planta.hasOwnProperty('etiquetasLocalXY')"
-              class="text-center"
-              ><u>Nº Módulo</u></span
-            >
-            <span class="text-center">{{
-              plantaService.getNumeroModulo(pc)
-            }}</span>
+            <span *ngIf="planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"><u>Nº Módulo</u></span>
+            <span class="text-center">{{ plantaService.getNumeroModulo(pc) }}</span>
           </div>
         </ng-template>
       </div>
@@ -228,7 +158,7 @@
         </div>
         <div class="pc-texto">
           <span class="detail-title">Fecha de captura: </span>
-          <span>{{ pc.datetime * 1000 | date: "dd/MM/yyyy HH:mm" }}</span>
+          <span>{{ pc.datetime * 1000 | date: 'dd/MM/yyyy HH:mm' }}</span>
         </div>
       </div>
 
@@ -238,14 +168,8 @@
         </div>
         <div class="pc-texto">
           <span class="detail-title">Módulo: </span>
-          <span
-            >{{ pc.modulo.marca }} {{ pc.modulo.modelo }} ({{
-              pc.modulo.potencia
-            }}
-            W)</span
-          ><span *ngIf="pc.hasOwnProperty('numeroSerie')">
-            (S/N: {{ pc.numeroSerie }})</span
-          >
+          <span>{{ pc.modulo.marca }} {{ pc.modulo.modelo }} ({{ pc.modulo.potencia }} W)</span
+          ><span *ngIf="pc.hasOwnProperty('numeroSerie')"> (S/N: {{ pc.numeroSerie }})</span>
         </div>
       </div>
 
@@ -256,9 +180,8 @@
         <div class="pc-texto">
           <span class="detail-title">Meteo: </span>
           <span
-            >{{ pc.irradiancia | number: "1.0-0" }} W/m<sup>2</sup> | Viento:
-            {{ pc.viento }} | {{ pc.temperaturaAire }} ºC | Nubes:
-            {{ pc.nubosidad }}/8 octavas</span
+            >{{ pc.irradiancia | number: '1.0-0' }} W/m<sup>2</sup> | Viento: {{ pc.viento }} |
+            {{ pc.temperaturaAire }} ºC | Nubes: {{ pc.nubosidad }}/8 octavas</span
           >
         </div>
       </div>
@@ -266,9 +189,7 @@
       <h5 class="texto-descargas">Descargas:</h5>
 
       <div class="descargas">
-        <a class="link-descarga" (click)="downloadRjpg(pc)">
-          Imagen radiométrica
-        </a>
+        <a class="link-descarga" (click)="downloadRjpg(pc)"> Imagen radiométrica </a>
         <a
           class="link-descarga"
           *ngIf="!informe.hasOwnProperty('jpgVisual') || informe.jpgVisual"
@@ -283,7 +204,7 @@
       <div *ngIf="user?.role === 1" class="pc-edit">
         <span>Tipo</span>
         <input
-          style="width: 3rem;"
+          style="width: 3rem"
           [(ngModel)]="pc.tipo"
           type="number"
           id="pcTipo"
@@ -293,7 +214,7 @@
         />
         <span>Num.modulos</span>
         <input
-          style="width: 3rem;"
+          style="width: 3rem"
           [(ngModel)]="pc.modulosAfectados"
           type="number"
           id="pcModulosAfectados"
@@ -303,11 +224,20 @@
         />
         <span>CoA</span>
         <input
-          style="width: 3rem;"
+          style="width: 3rem"
           [(ngModel)]="pc.severidad"
           type="number"
           id="severidad"
           maxlength="2"
+          size="10"
+          (change)="updatePcInDb(pc)"
+        />
+        <span>LocalId</span>
+        <input
+          style="width: 10rem"
+          [(ngModel)]="pc.local_id"
+          type="text"
+          id="local_id"
           size="10"
           (change)="updatePcInDb(pc)"
         />
