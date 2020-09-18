@@ -34,9 +34,7 @@
     </ng-container>
 
     <ng-container matColumnDef="perdidas">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-        Pérdidas módulo
-      </th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Pérdidas módulo</th>
       <td mat-cell *matCellDef="let element">
         <span class="text-perdidas"
           >{{ getPerdidas(element.tipo) * 100 | number: '1.0-0' }} %
@@ -77,19 +75,24 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="temperaturaMax">
+    <ng-container matColumnDef="global_z">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
-        Temperatura máx.
+        {{ plantaService.getNombreGlobalZ(planta) }}
       </th>
+      <td mat-cell *matCellDef="let element">
+        <span>{{ element.global_z }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="temperaturaMax">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Temperatura máx.</th>
       <td mat-cell *matCellDef="let element">
         <span>{{ element.temperaturaMax }} ºC</span>
       </td>
     </ng-container>
 
     <ng-container matColumnDef="gradienteNormalizado">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-        &Delta;T (normalizado)
-      </th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>&Delta;T (normalizado)</th>
       <td mat-cell *matCellDef="let element">
         <div class="progress">
           <div

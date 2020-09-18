@@ -309,9 +309,9 @@ export class PlantaService {
         if (planta.numeroGlobalCoords >= 2) {
           columnsToDisplay.push('global_y');
         }
-        if (planta.numeroGlobalCoords === 3) {
-          columnsToDisplay.push('global_z');
-        }
+        // if (planta.numeroGlobalCoords === 3) {
+        //   columnsToDisplay.push('global_z');
+        // }
       } else {
         columnsToDisplay.push('global_y');
       }
@@ -406,6 +406,16 @@ export class PlantaService {
         return planta.nombreGlobalY;
       }
       return GLOBAL.nombreGlobalYFija;
+    }
+    return '';
+  }
+
+  getNombreGlobalZ(planta: PlantaInterface): string {
+    if (planta.tipo !== '2 ejes') {
+      if (planta.hasOwnProperty('nombreGlobalZ')) {
+        return planta.nombreGlobalZ;
+      }
+      return GLOBAL.nombreGlobalZFija;
     }
     return '';
   }

@@ -312,7 +312,6 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
 
     // 1 - Obtenemos coords (x,y) de los cuatro lados
     // [0, 1, 2, 3] == [tl, tr, br, bl] el poligono tiene 4 esquinas
-
     for (let i = 0; i < 4; i++) {
       // para cada esquina ...
       const p1a = this.coords[i];

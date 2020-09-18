@@ -21,6 +21,7 @@ export let GLOBAL = {
   stringConectorGlobalsDefault: '/',
   nombreGlobalXFija: 'C1',
   nombreGlobalYFija: 'Pasillo',
+  nombreGlobalZFija: 'C3',
   nombreLocalXFija: 'Columna',
   nombreLocalYFija: 'Fila',
   mae: [0.1, 0.2],
