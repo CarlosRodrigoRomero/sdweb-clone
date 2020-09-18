@@ -302,7 +302,22 @@ export class PlantaService {
   }
   getGlobalCoordsColumns(planta: PlantaInterface, columnsToDisplay: string[]): string[] {
     if (planta.tipo === 'seguidores') {
-      columnsToDisplay.push('seguidor');
+      let count = 0;
+      if (planta.hasOwnProperty('nombreGlobalX')) {
+        count += 1;
+        columnsToDisplay.push('global_x');
+      }
+      if (planta.hasOwnProperty('nombreGlobalY')) {
+        count += 1;
+        columnsToDisplay.push('global_y');
+      }
+      if (planta.hasOwnProperty('nombreGlobalZ')) {
+        count += 1;
+        columnsToDisplay.push('global_z');
+      }
+      if (count === 0) {
+        columnsToDisplay.push('seguidor');
+      }
     } else {
       columnsToDisplay.push('global_x');
       if (planta.hasOwnProperty('numeroGlobalCoords')) {
