@@ -23,8 +23,16 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { HotkeyModule } from 'angular2-hotkeys';
+import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
 @NgModule({
-  declarations: [AppComponent, LoginComponent, IndexComponent, VideoComponent, AvisoLegalComponent],
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    IndexComponent,
+    VideoComponent,
+    AvisoLegalComponent,
+    PubliclayoutComponent,
+  ],
 
   imports: [
     BrowserModule,
