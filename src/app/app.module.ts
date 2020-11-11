@@ -5,7 +5,7 @@ import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
-import { AngularFirestoreModule, FirestoreSettingsToken } from '@angular/fire/firestore';
+import { AngularFirestoreModule, SETTINGS } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
@@ -52,7 +52,7 @@ import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
     CommonModule,
     HotkeyModule.forRoot(),
   ],
-  providers: [{ provide: FirestoreSettingsToken, useValue: {} }, AuthService],
+  providers: [{ provide: SETTINGS, useValue: {} }, AuthService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

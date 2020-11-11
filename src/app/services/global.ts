@@ -23,7 +23,7 @@ export let GLOBAL = {
   nombreGlobalYFija: 'Pasillo',
   nombreGlobalZFija: 'C3',
   nombreLocalXFija: 'Columna',
-  nombreLocalYFija: 'Fila',
+  nombreLocalYFija: 'Altura',
   mae: [0.1, 0.2],
   anomaliaPorDefecto: 9,
   resolucionCamara: [512, 640],

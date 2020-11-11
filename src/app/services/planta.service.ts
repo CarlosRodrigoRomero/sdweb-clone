@@ -7,7 +7,6 @@ import { LocationAreaInterface } from '../models/location';
 
 import { UserInterface } from '../models/user';
 import { ModuloInterface } from '../models/modulo';
-import * as firebase from 'firebase/app';
 import { PcInterface } from '../models/pc';
 import { UserAreaInterface } from '../models/userArea';
 import { AuthService } from './auth.service';
@@ -122,12 +121,8 @@ export class PlantaService {
 
   async updateLocationArea(locArea: LocationAreaInterface) {
     const LocAreaDoc = this.afs.doc(`plantas/${locArea.plantaId}/locationAreas/${locArea.id}`);
-    if (!locArea.hasOwnProperty('modulo')) {
-      LocAreaDoc.update({
-        modulo: firebase.firestore.FieldValue.delete(),
-      });
-    }
-    return LocAreaDoc.update(locArea);
+
+    return LocAreaDoc.set(locArea);
   }
 
   delLocationArea(locationArea: LocationAreaInterface) {
