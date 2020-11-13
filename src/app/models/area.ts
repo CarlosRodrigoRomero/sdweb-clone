@@ -1,4 +1,4 @@
-import { LatLngLiteral } from "@agm/core/map-types";
+import { LatLngLiteral } from '@agm/core/map-types';
 
 export interface AreaInterface {
   id?: string;
