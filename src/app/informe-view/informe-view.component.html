@@ -114,13 +114,14 @@
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" [routerLink]="['informe-export']">Generar PDF</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" [routerLink]="['informe-map-filter']">Mapa con filtros</a>
+          </li>
         </ul>
       </div>
       <div class="nav-group">
         <a href="{{ excelDownloadUrl }}" *ngIf="excelDownloadUrl && allowDownloads">
-          <button class="download-button" mat-flat-button color="primary">
-            Descargar excel
-          </button>
+          <button class="download-button" mat-flat-button color="primary">Descargar excel</button>
         </a>
 
         <a *ngIf="imagenesDownloadUrl && allowDownloads" href="{{ imagenesDownloadUrl }}" class="download-button">

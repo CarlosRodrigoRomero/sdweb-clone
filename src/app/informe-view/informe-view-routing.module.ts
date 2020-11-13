@@ -30,6 +30,14 @@ const routes: Routes = [
         },
       },
       {
+        path: 'informe-map-filter',
+        loadChildren: () =>
+          import('../informe-map-filter/informe-map-filter.module').then((m) => m.InformeMapFilterModule),
+        data: {
+          shouldReuse: true,
+        },
+      },
+      {
         path: 'informe-export',
         component: ExportComponent,
         data: {

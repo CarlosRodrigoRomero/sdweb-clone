@@ -24,10 +24,10 @@ export class AuthService {
   }
 
   login(email, password): Observable<any> {
-    return from(this.afAuth.signInWithEmailAndPassword(email, password));
+    return from(this.afAuth.auth.signInWithEmailAndPassword(email, password));
   }
   logout() {
-    this.afAuth.signOut();
+    this.afAuth.auth.signOut();
   }
 
   isAuthenticated(): Observable<boolean> {

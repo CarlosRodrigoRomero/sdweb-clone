@@ -24,6 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { HotkeyModule } from 'angular2-hotkeys';
 import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
+
 @NgModule({
   declarations: [
     AppComponent,

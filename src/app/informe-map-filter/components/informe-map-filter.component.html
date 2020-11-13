@@ -1,0 +1,11 @@
+<agm-map
+  [latitude]="planta.latitud"
+  [longitude]="planta.longitud"
+  [mapTypeId]="mapType"
+  [zoom]="planta.zoom"
+  [streetViewControl]="false"
+  (mapReady)="mapIsReady($event)"
+  [fullscreenControl]="true"
+  [mapTypeControl]="true"
+>
+</agm-map>
