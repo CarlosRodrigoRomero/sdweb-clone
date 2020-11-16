@@ -5,12 +5,10 @@ import { PcService } from '../../../services/pc.service';
 import { PlantaInterface } from '../../../models/planta';
 import { InformeInterface } from '../../../models/informe';
 import { UserAreaInterface } from '../../../models/userArea';
-import { SelectionModel } from '@angular/cdk/collections';
 
 import { PlantaService } from '../../../services/planta.service';
 import { InformeService } from '../../../services/informe.service';
 import { GLOBAL } from 'src/app/services/global';
-import { LocationAreaInterface } from 'src/app/models/location';
 
 declare const google: any;
 
@@ -25,11 +23,11 @@ export class InformeMapFilterComponent implements OnInit {
   public informe: InformeInterface;
   public circleRadius: number;
   public userAreaList: UserAreaInterface[];
-  public mapLoaded = false;
   public mapType = 'satellite';
   public drawingManager: any;
   public pointList: { lat: number; lng: number }[] = [];
   public selectedArea = 0;
+  selectedShape: any;
 
   constructor(
     private plantaService: PlantaService,
@@ -48,13 +46,13 @@ export class InformeMapFilterComponent implements OnInit {
       this.circleRadius = 2;
     }
 
-    this.plantaService.getUserAreas$(this.planta.id).subscribe((userAreas) => {
+    /* this.plantaService.getUserAreas$(this.planta.id).subscribe((userAreas) => {
       this.userAreaList = userAreas;
-    });
+    }); */
   }
 
-  mapIsReady(map) {
-    this.mapLoaded = true;
+  onMapReady(map) {
+    this.map = map;
     this.plantaService.initMap(this.planta, map);
   }
 
@@ -62,13 +60,9 @@ export class InformeMapFilterComponent implements OnInit {
     return GLOBAL.colores_severidad[severidad - 1];
   }
 
-  initDrawingManager(map: any) {
-    const self = this;
+  initDrawingManager() {
     const options = {
-      drawingControl: true,
-      drawingControlOptions: {
-        drawingModes: ['polygon'],
-      },
+      drawingControl: false,
       polygonOptions: {
         draggable: true,
         editable: true,
@@ -76,37 +70,45 @@ export class InformeMapFilterComponent implements OnInit {
       drawingMode: google.maps.drawing.OverlayType.POLYGON,
     };
 
-    this.drawingManager = new google.maps.drawing.drawingManager(options);
-    this.drawingManager.setMap(map);
-    google.maps.event.addListener(this.drawingManager, 'overlatecomplete', (event) => {
+    this.drawingManager = new google.maps.drawing.DrawingManager(options);
+    this.drawingManager.setMap(this.map);
+    google.maps.event.addListener(this.drawingManager, 'overlaycomplete', (event) => {
       if (event.type === google.maps.drawing.OverlayType.POLYGON) {
         const paths = event.overlay.getPaths();
         for (let p = 0; p < paths.getLength(); p++) {
           google.maps.event.addListener(paths.getAt(p), 'set_at', () => {
             if (!event.overlay.drag) {
-              self.updatePointList(event.overlay.getPath());
+              this.updatePointList(event.overlay.getPath());
             }
           });
           google.maps.event.addListener(paths.getAt(p), 'insert_at', () => {
-            self.updatePointList(event.overlay.getPath());
+            this.updatePointList(event.overlay.getPath());
           });
           google.maps.event.addListener(paths.getAt(p), 'remove_at', () => {
-            self.updatePointList(event.overlay.getPath());
+            this.updatePointList(event.overlay.getPath());
           });
         }
-        self.updatePointList(event.overlay.getPath());
+        this.updatePointList(event.overlay.getPath());
+        this.selectedShape = event.overlay;
+        this.selectedShape.type = event.type;
       }
       if (event.type !== google.maps.drawing.OverlayType.MARKER) {
         // Switch back to non-drawing mode after drawing a shape.
-        self.drawingManager.setDrawingMode(null);
-        // To hide:
-        self.drawingManager.setOptions({
-          drawingControl: false,
-        });
+        this.drawingManager.setDrawingMode(null);
       }
     });
+  }
 
-    // this.addEventListeners(drawingManager);
+  deleteSelectedShape() {
+    if (this.selectedShape) {
+      this.selectedShape.setMap(null);
+      this.selectedArea = 0;
+      this.pointList = [];
+      // To show:
+      this.drawingManager.setOptions({
+        drawingControl: true,
+      });
+    }
   }
 
   updatePointList(path) {

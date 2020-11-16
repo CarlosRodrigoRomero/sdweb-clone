@@ -1,10 +1,10 @@
-<agm-map
+<agm-map class="mapa"
   [latitude]="planta.latitud"
   [longitude]="planta.longitud"
   [mapTypeId]="mapType"
   [zoom]="planta.zoom"
   [streetViewControl]="false"
-  (mapReady)="mapIsReady($event)"
+  (mapReady)="onMapReady($event)"
   [fullscreenControl]="true"
   [mapTypeControl]="true"
 >
@@ -23,5 +23,5 @@
   ></agm-circle>
 </agm-map>
 <div class="button-row">
-  <button mat-raised-button color="basic" (click)="initDrawingManager($event)">Nuevo area</button>
+  <button mat-raised-button color="basic" (click)="initDrawingManager()">Nuevo area</button>
 </div>
