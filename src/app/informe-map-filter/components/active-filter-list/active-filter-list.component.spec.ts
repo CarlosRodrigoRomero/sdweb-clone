@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InformeMapAreaComponent } from './informe-map-area.component';
+import { ActiveFilterListComponent } from './active-filter-list.component';
 
-describe('InformeMapAreaComponent', () => {
-  let component: InformeMapAreaComponent;
-  let fixture: ComponentFixture<InformeMapAreaComponent>;
+describe('ActiveFilterListComponent', () => {
+  let component: ActiveFilterListComponent;
+  let fixture: ComponentFixture<ActiveFilterListComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ InformeMapAreaComponent ]
+      declarations: [ ActiveFilterListComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(InformeMapAreaComponent);
+    fixture = TestBed.createComponent(ActiveFilterListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

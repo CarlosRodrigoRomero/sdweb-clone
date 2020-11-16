@@ -8,6 +8,7 @@ import { UserAreaInterface } from '../../../models/userArea';
 
 import { PlantaService } from '../../../services/planta.service';
 import { InformeService } from '../../../services/informe.service';
+import { FilterService } from '../../../services/filter.service';
 import { GLOBAL } from 'src/app/services/global';
 
 declare const google: any;
@@ -22,16 +23,18 @@ export class InformeMapFilterComponent implements OnInit {
   public planta: PlantaInterface;
   public informe: InformeInterface;
   public circleRadius: number;
-  public userAreaList: UserAreaInterface[];
+  public area: UserAreaInterface;
+  public areas: UserAreaInterface[];
   public mapType = 'satellite';
   public drawingManager: any;
   public pointList: { lat: number; lng: number }[] = [];
   public selectedArea = 0;
-  selectedShape: any;
+  public selectedShape: any;
 
   constructor(
     private plantaService: PlantaService,
     private informeService: InformeService,
+    private filterService: FilterService,
     public pcService: PcService
   ) {}
 
@@ -45,10 +48,6 @@ export class InformeMapFilterComponent implements OnInit {
     } else if (this.planta.tipo === '1 eje') {
       this.circleRadius = 2;
     }
-
-    /* this.plantaService.getUserAreas$(this.planta.id).subscribe((userAreas) => {
-      this.userAreaList = userAreas;
-    }); */
   }
 
   onMapReady(map) {
@@ -95,6 +94,7 @@ export class InformeMapFilterComponent implements OnInit {
       if (event.type !== google.maps.drawing.OverlayType.MARKER) {
         // Switch back to non-drawing mode after drawing a shape.
         this.drawingManager.setDrawingMode(null);
+        this.addArea(event.overlay.getPath());
       }
     });
   }
@@ -111,12 +111,23 @@ export class InformeMapFilterComponent implements OnInit {
     }
   }
 
+  addArea(path) {
+    this.filterService.addArea(path);
+  }
+
+  updateAreas() {
+    this.areas = this.filterService.getAllAreas();
+    for (let i = 0; i <= this.areas.length; i++) {
+      google.maps.geometry.spherical.computeArea(this.areas[i]);
+    }
+  }
+
   updatePointList(path) {
     this.pointList = [];
     const len = path.getLength();
     for (let i = 0; i < len; i++) {
       this.pointList.push(path.getAt(i).toJSON());
     }
-    this.selectedArea = google.maps.geometry.spherical.computeArea(path);
+    // google.maps.geometry.spherical.computeArea(path);
   }
 }
