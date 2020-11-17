@@ -241,6 +241,7 @@ export class AutoLocComponent implements OnInit {
 
     this.addEventListeners(drawingManager);
   }
+  
   deleteArea(area: AreaInterface) {
     // Eliminar del mapa
     const polygon = this.polygonList.find((item) => {

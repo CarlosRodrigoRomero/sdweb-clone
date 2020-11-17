@@ -11,16 +11,14 @@ export class FilterService {
   public pointList: { lat: number; lng: number }[] = [];
   public area: UserAreaInterface;
   public areas: UserAreaInterface[] = [];
+  public polygonList: any = [];
 
   constructor() {}
 
-  addArea(path: any) {
-    this.pointList = [];
-    const len = path.getLength();
-    for (let i = 0; i < len; i++) {
-      this.pointList.push(path.getAt(i).toJSON());
-    }
-    this.areas.push((this.area = { userId: 'Área ' + (this.areas.length + 1) }));
+  addArea(path: any, polygon: any) {
+    this.area = { userId: 'Área ' + (this.areas.length + 1), path: path };
+    this.areas.push(this.area);
+    this.polygonList.push(polygon);
   }
 
   getAllAreas() {
@@ -33,8 +31,5 @@ export class FilterService {
     if (index >= 0) {
       this.areas.splice(index, 1);
     }
-  }
-  updateAreas() {
-    google.maps.geometry.spherical.computeArea(this.areas);
   }
 }

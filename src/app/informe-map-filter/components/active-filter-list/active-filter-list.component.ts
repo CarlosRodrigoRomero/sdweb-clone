@@ -23,6 +23,5 @@ export class ActiveFilterListComponent implements OnInit {
 
   deleteArea(area: UserAreaInterface) {
     this.filterService.deleteArea(area);
-    this.filterService.updateAreas();
   }
 }
