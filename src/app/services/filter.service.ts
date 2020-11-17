@@ -9,15 +9,16 @@ declare const google: any;
 })
 export class FilterService {
   public pointList: { lat: number; lng: number }[] = [];
-  public area: UserAreaInterface;
   public areas: UserAreaInterface[] = [];
-  public polygonList: any = [];
+  public polygonList: any[] = [];
 
   constructor() {}
 
-  addArea(path: any, polygon: any) {
-    this.area = { userId: 'Área ' + (this.areas.length + 1), path: path };
-    this.areas.push(this.area);
+  addArea(area: UserAreaInterface) {
+    this.areas.push(area);
+  }
+
+  addPolygon(polygon: any) {
     this.polygonList.push(polygon);
   }
 
@@ -25,11 +26,21 @@ export class FilterService {
     return this.areas;
   }
 
+  getAllPolygons() {
+    return this.polygonList;
+  }
+
+  deletePolygons() {
+    this.polygonList = [];
+  }
+
   deleteArea(area: UserAreaInterface) {
     const index = this.areas.indexOf(area);
 
     if (index >= 0) {
       this.areas.splice(index, 1);
+      this.polygonList[index].setMap(null);
+      this.polygonList.splice(index, 1);
     }
   }
 }

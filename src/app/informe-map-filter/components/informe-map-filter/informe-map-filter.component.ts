@@ -24,7 +24,6 @@ export class InformeMapFilterComponent implements OnInit {
   public planta: PlantaInterface;
   public informe: InformeInterface;
   public circleRadius: number;
-  public area: UserAreaInterface;
   public areas: UserAreaInterface[];
   public mapType = 'satellite';
   public pointList: { lat: number; lng: number }[] = [];
@@ -71,35 +70,8 @@ export class InformeMapFilterComponent implements OnInit {
 
     const drawingManager = new google.maps.drawing.DrawingManager(options);
     drawingManager.setMap(this.map);
-    
+
     this.addEventListeners(drawingManager);
-    
-    /* google.maps.event.addListener(drawingManager, 'overlaycomplete', (event) => {
-      if (event.type === google.maps.drawing.OverlayType.POLYGON) {
-        const paths = event.overlay.getPaths();
-        for (let p = 0; p < paths.getLength(); p++) {
-          google.maps.event.addListener(paths.getAt(p), 'set_at', () => {
-            if (!event.overlay.drag) {
-              this.updatePointList(event.overlay.getPath());
-            }
-          });
-          google.maps.event.addListener(paths.getAt(p), 'insert_at', () => {
-            this.updatePointList(event.overlay.getPath());
-          });
-          google.maps.event.addListener(paths.getAt(p), 'remove_at', () => {
-            this.updatePointList(event.overlay.getPath());
-          });
-        }
-        this.updatePointList(event.overlay.getPath());
-        this.selectedShape = event.overlay;
-        this.selectedShape.type = event.type;
-      }
-      if (event.type !== google.maps.drawing.OverlayType.MARKER) {
-        // Switch back to non-drawing mode after drawing a shape.
-        drawingManager.setDrawingMode(null);
-        this.addArea(event.overlay.getPath());
-      }
-    }); */
   }
 
   addEventListeners(drawingManager: any) {
@@ -112,73 +84,43 @@ export class InformeMapFilterComponent implements OnInit {
           lng: polygon.getPath().getAt(i).lng() as number,
         });
       }
-      this.addArea(path, polygon);
-      this.updateAreas();
+      this.createArea(path);
+      if (polygon.type !== google.maps.drawing.OverlayType.MARKER) {
+        // cambio a modo no-dibujo
+        drawingManager.setDrawingMode(null);
+      }
     });
   }
 
-  private createUserArea(path: LatLngLiteral[]) {
-    let userArea = {} as UserAreaInterface;
-    userArea.userId = '';
-    userArea.path = path;
-
-    // userArea = this.plantaService.addUserArea(this.plantaId, userArea);
-    this.areas.push(userArea);
-    // this.selectArea(userArea);
-
-    //this.addPolygonToMap(userArea, true);
+  addArea(area: UserAreaInterface) {
+    this.filterService.addArea(area);
   }
 
-  deleteSelectedShape() {
-    if (this.selectedShape) {
-      this.selectedShape.setMap(null);
-      this.selectedArea = 0;
-      this.pointList = [];
-    }
+  createArea(path: LatLngLiteral[]) {
+    this.areas = this.filterService.getAllAreas();
+    const area = {} as UserAreaInterface;
+    area.userId = 'Área ' + (this.areas.length + 1);
+    area.path = path;
+
+    this.addArea(area);
+
+    this.addPolygonToMap(area);
   }
 
-  addArea(path, polygon: any) {
-    this.filterService.addArea(path, polygon);
-  }
-
-  /* private addPolygonToMap(area: AreaInterface, isNew = false) {
+  private addPolygonToMap(area: UserAreaInterface) {
     // area.visible = true;
     const polygon = new google.maps.Polygon({
       paths: area.path,
-      strokeColor: area.hasOwnProperty('modulo') ? 'yellow' : 'white',
-      strokeOpacity: this._strokeOpacity,
+      // strokeColor: area.hasOwnProperty('modulo') ? 'yellow' : 'white',
+      // strokeOpacity: this._strokeOpacity,
       strokeWeight: 2,
-      fillColor: this.getFillColor(area),
-      fillOpacity: this._fillOpacity,
-      editable: isNew,
-      draggable: isNew,
+      // fillColor: this.getFillColor(area),
+      // fillOpacity: this._fillOpacity,
+      editable: false,
+      draggable: false,
       id: area.id,
     });
     polygon.setMap(this.map);
-    this.polygonList.push(polygon);
-    if (isNew) {
-      this.selectArea(area);
-    }
-    google.maps.event.addListener(polygon, 'mouseup', (event) => {
-      this.selectArea(area);
-      this.modifyArea(area);
-    });
-  } */
-
-  updateAreas() {
-    this.areas = this.filterService.getAllAreas();
-    console.log(this.areas);
-    for (let i = 0; i <= this.areas.length; i++) {
-      const polygon = new google.maps.Polygon({paths: this.areas[i].path});
-      polygon.setMap(this.map);
-    }
-  }
-
-  updatePointList(path) {
-    this.pointList = [];
-    const len = path.getLength();
-    for (let i = 0; i < len; i++) {
-      this.pointList.push(path.getAt(i).toJSON());
-    }
+    this.filterService.addPolygon(polygon);
   }
 }
