@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
-import { PlantaInterface } from 'src/app/models/planta';
+import { PlantaInterface } from '@core/models/planta';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { LocationAreaInterface } from '../models/location';

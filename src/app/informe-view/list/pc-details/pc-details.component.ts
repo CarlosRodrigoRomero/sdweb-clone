@@ -1,16 +1,16 @@
 import { Component, OnInit, Input, OnChanges } from '@angular/core';
 
-import { GLOBAL } from 'src/app/services/global';
+import { GLOBAL } from '@core/services/global';
 import { AngularFireStorage } from '@angular/fire/storage';
 import 'fabric';
 import { MatDialog } from '@angular/material/dialog';
 
 import { take } from 'rxjs/operators';
-import { PcInterface } from 'src/app/models/pc';
-import { InformeInterface } from 'src/app/models/informe';
-import { PlantaInterface } from 'src/app/models/planta';
-import { PlantaService } from 'src/app/services/planta.service';
-import { PcService } from 'src/app/services/pc.service';
+import { PcInterface } from '@core/models/pc';
+import { InformeInterface } from '@core//models/informe';
+import { PlantaInterface } from '@core/models/planta';
+import { PlantaService } from '@core/services/planta.service';
+import { PcService } from '@core/services/pc.service';
 import { PcDetailsDialogComponent } from 'src/app/informe-view/pc-details-dialog/pc-details-dialog.component';
 
 declare let fabric;

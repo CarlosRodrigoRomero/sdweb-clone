@@ -11,7 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 
 import { LoginComponent } from './cts/login/login.component';
-import { AuthService } from './services/auth.service';
+import { AuthService } from '@core/services/auth.service';
 import { IndexComponent } from './cts/index/index.component';
 import { VideoComponent } from './cts/video/video.component';
 

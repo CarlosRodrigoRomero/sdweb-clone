@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModuloInterface } from '../../models/modulo';
+import { ModuloInterface } from '@core/models/modulo';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Router } from '@angular/router';

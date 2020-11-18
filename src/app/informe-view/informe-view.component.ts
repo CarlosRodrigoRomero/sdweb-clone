@@ -1,17 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 
-import { PcService } from 'src/app/services/pc.service';
+import { PcService } from '@core/services/pc.service';
 import { ActivatedRoute } from '@angular/router';
 import { AngularFireStorage } from '@angular/fire/storage';
 
 import { take } from 'rxjs/operators';
-import { PcInterface } from 'src/app/models/pc';
-import { InformeInterface } from 'src/app/models/informe';
-import { GLOBAL } from 'src/app/services/global';
-import { PlantaInterface } from 'src/app/models/planta';
-import { InformeService } from 'src/app/services/informe.service';
-import { PlantaService } from 'src/app/services/planta.service';
-import { AuthService } from 'src/app/services/auth.service';
+import { PcInterface } from '@core/models/pc';
+import { InformeInterface } from '@core/models/informe';
+import { GLOBAL } from '@core/services/global';
+import { PlantaInterface } from '@core/models/planta';
+import { InformeService } from '@core/services/informe.service';
+import { PlantaService } from '@core/services/planta.service';
+import { AuthService } from '@core/services/auth.service';
 
 @Component({
   selector: 'app-informe-view',

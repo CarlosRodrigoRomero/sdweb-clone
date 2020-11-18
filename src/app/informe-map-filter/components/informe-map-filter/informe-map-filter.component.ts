@@ -1,15 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { GLOBAL } from 'src/app/services/global';
+import { GLOBAL } from '@core/services/global';
 import { LatLngLiteral } from '@agm/core';
 
-import { PlantaInterface } from '../../../models/planta';
-import { InformeInterface } from '../../../models/informe';
-import { UserAreaInterface } from '../../../models/userArea';
+import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
+import { UserAreaInterface } from '@core/models/userArea';
 
-import { PcService } from '../../../services/pc.service';
-import { PlantaService } from '../../../services/planta.service';
-import { InformeService } from '../../../services/informe.service';
-import { FilterService } from '../../../services/filter.service';
+import { PcService } from '@core/services/pc.service';
+import { PlantaService } from '@core/services/planta.service';
+import { InformeService } from '@core/services/informe.service';
+import { FilterService } from '@core/services/filter.service';
 
 declare const google: any;
 

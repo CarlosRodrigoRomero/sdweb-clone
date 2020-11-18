@@ -1,21 +1,21 @@
 import { Component, OnInit, Input } from '@angular/core';
 import 'fabric';
-import { GLOBAL } from '../../services/global';
+import { GLOBAL } from '@core/services/global';
 import { Point } from '@agm/core/services/google-maps-types';
-import { PcInterface, Pc } from '../../models/pc';
-import { InformeService } from '../../services/informe.service';
-import { ArchivoVueloInterface } from '../../models/archivoVuelo';
+import { PcInterface, Pc } from '@core/models/pc';
+import { InformeService } from '@core/services/informe.service';
+import { ArchivoVueloInterface } from '@core/models/archivoVuelo';
 import { take } from 'rxjs/operators';
-import { EstructuraInterface } from 'src/app/models/estructura';
+import { EstructuraInterface } from '@core/models/estructura';
 import { LatLngLiteral } from '@agm/core/map-types';
-import { PlantaInterface } from '../../models/planta';
+import { PlantaInterface } from '@core/models/planta';
 import { Observable, Subscription, Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { ElementoPlantaInterface } from 'src/app/models/elementoPlanta';
-import { Estructura, RectanguloInterface } from '../../models/estructura';
-import { PlantaService } from '../../services/planta.service';
-import { ModuloInterface } from '../../models/modulo';
-import { PcService } from '../../services/pc.service';
+import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
+import { Estructura, RectanguloInterface } from '@core/models/estructura';
+import { PlantaService } from '@core/services/planta.service';
+import { ModuloInterface } from '@core/models/modulo';
+import { PcService } from '@core/services/pc.service';
 declare let fabric;
 
 @Component({

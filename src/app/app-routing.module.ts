@@ -1,7 +1,7 @@
 import { Routes, RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { LoginComponent } from './cts/login/login.component';
-import { AuthGuard } from './services/auth.guard';
+import { AuthGuard } from '@core/services/auth.guard';
 import { IndexComponent } from './cts/index/index.component';
 // import { PubliclayoutComponent } from "./layout/publiclayout/publiclayout.component";
 // import { VideoComponent } from "./cts/video/video.component";

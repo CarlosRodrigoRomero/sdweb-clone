@@ -1,15 +1,15 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { AgmMap, LatLngLiteral, LatLng } from '@agm/core';
-import { PcInterface } from 'src/app/models/pc';
-import { Estructura } from '../../models/estructura';
-import { InformeService } from '../../services/informe.service';
-import { PlantaService } from '../../services/planta.service';
+import { PcInterface } from '@core/models/pc';
+import { Estructura } from '@core/models/estructura';
+import { InformeService } from '@core/services/informe.service';
+import { PlantaService } from '@core/services/planta.service';
 import { ActivatedRoute } from '@angular/router';
-import { ElementoPlantaInterface } from '../../models/elementoPlanta';
+import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
 import { ValidateElementoPlantaPipe } from '../../pipes/validate-elemento-planta.pipe';
 import { take, switchMap } from 'rxjs/operators';
-import { LocationAreaInterface } from 'src/app/models/location';
-import { PlantaInterface } from 'src/app/models/planta';
+import { LocationAreaInterface } from '@core/models/location';
+import { PlantaInterface } from '@core/models/planta';
 declare const google: any;
 
 @Component({

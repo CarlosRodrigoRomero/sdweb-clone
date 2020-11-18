@@ -1,16 +1,16 @@
-import { Component, OnInit } from "@angular/core";
-import { InformeInterface } from "src/app/models/informe";
-import { PlantaInterface } from "src/app/models/planta";
-import { PcInterface } from "src/app/models/pc";
-import { GLOBAL } from "src/app/services/global";
-import { PcService } from "src/app/services/pc.service";
-import { PlantaService } from "src/app/services/planta.service";
-import { InformeService } from "src/app/services/informe.service";
+import { Component, OnInit } from '@angular/core';
+import { InformeInterface } from '@core/models/informe';
+import { PlantaInterface } from '@core/models/planta';
+import { PcInterface } from '@core/models/pc';
+import { GLOBAL } from '@core/services/global';
+import { PcService } from '@core/services/pc.service';
+import { PlantaService } from '@core/services/planta.service';
+import { InformeService } from '@core/services/informe.service';
 
 @Component({
-  selector: "app-informe-overview",
-  templateUrl: "./informe-overview.component.html",
-  styleUrls: ["./informe-overview.component.css"]
+  selector: 'app-informe-overview',
+  templateUrl: './informe-overview.component.html',
+  styleUrls: ['./informe-overview.component.css'],
 })
 export class InformeOverviewComponent implements OnInit {
   public informe: InformeInterface;
@@ -64,12 +64,12 @@ export class InformeOverviewComponent implements OnInit {
     let filtroCategoria: PcInterface[];
 
     for (const i of this.numCategorias) {
-      filtroCategoria = this.allPcs.filter(pc => pc.tipo === i);
+      filtroCategoria = this.allPcs.filter((pc) => pc.tipo === i);
 
       perdidasCategoria = filtroCategoria
-        .map(pc => {
+        .map((pc) => {
           let numeroModulos: number;
-          if (pc.hasOwnProperty("modulosAfectados")) {
+          if (pc.hasOwnProperty('modulosAfectados')) {
             if (isNaN(pc.modulosAfectados)) {
               numeroModulos = 1;
             } else {
@@ -79,14 +79,12 @@ export class InformeOverviewComponent implements OnInit {
             numeroModulos = 1;
           }
 
-          if (pc.hasOwnProperty("modulo")) {
-            if (pc.modulo.hasOwnProperty("potencia")) {
+          if (pc.hasOwnProperty('modulo')) {
+            if (pc.modulo.hasOwnProperty('potencia')) {
               return GLOBAL.pcPerdidas[i] * numeroModulos * pc.modulo.potencia;
             }
           }
-          return (
-            GLOBAL.pcPerdidas[i] * numeroModulos * this.planta.moduloPotencia
-          );
+          return GLOBAL.pcPerdidas[i] * numeroModulos * this.planta.moduloPotencia;
         })
         .reduce((a, b) => a + b, 0);
 
@@ -95,9 +93,7 @@ export class InformeOverviewComponent implements OnInit {
         this.countCategoriaLabels.push(GLOBAL.labels_tipos[i]);
 
         // En KW (dividimos entre 1000)
-        this.perdidasPorCategoria.push(
-          Math.round((perdidasCategoria * 10) / 1000) / 10
-        );
+        this.perdidasPorCategoria.push(Math.round((perdidasCategoria * 10) / 1000) / 10);
         this.perdidasPorCategoriaLabels.push(GLOBAL.labels_tipos[i]);
       }
     }
@@ -106,10 +102,10 @@ export class InformeOverviewComponent implements OnInit {
     let perdidasClase: number;
     let filtroClase;
     for (const i of this.numClases) {
-      filtroClase = this.allPcs.filter(pc => this.pcService.getPcCoA(pc) === i);
+      filtroClase = this.allPcs.filter((pc) => this.pcService.getPcCoA(pc) === i);
 
       perdidasClase = filtroClase
-        .map(pc => {
+        .map((pc) => {
           let numeroModulos;
           if (pc.modulosAfectados) {
             numeroModulos = pc.modulosAfectados;
@@ -127,51 +123,44 @@ export class InformeOverviewComponent implements OnInit {
       labels: this.perdidasPorCategoriaLabels,
       datasets: [
         {
-          label: "Pérdidas (kW)",
-          backgroundColor: "#ffd04a",
+          label: 'Pérdidas (kW)',
+          backgroundColor: '#ffd04a',
 
-          data: this.perdidasPorCategoria
-        }
-      ]
+          data: this.perdidasPorCategoria,
+        },
+      ],
     };
 
     this.dataCountCategoria = {
       labels: this.countCategoriaLabels,
       datasets: [
         {
-          label: "Número de anomalías",
-          backgroundColor: "grey",
+          label: 'Número de anomalías',
+          backgroundColor: 'grey',
 
-          data: this.countCategoria
-        }
-      ]
+          data: this.countCategoria,
+        },
+      ],
     };
 
     // Pérdidas totales en kW
-    this.perdidasTotales =
-      Math.round(this.perdidasPorCategoria.reduce((a, b) => a + b, 0) * 10) /
-      10;
+    this.perdidasTotales = Math.round(this.perdidasPorCategoria.reduce((a, b) => a + b, 0) * 10) / 10;
 
-    this.informe.mae =
-      Math.round((this.perdidasTotales / 10 / this.planta.potencia) * 100) /
-      100;
+    this.informe.mae = Math.round((this.perdidasTotales / 10 / this.planta.potencia) * 100) / 100;
     this.informeService.updateInforme(this.informe);
 
     // this.informeService.updateInforme(this.informe);
 
     this.dataPerdidasTotales = {
-      labels: ["Pérdidas nominales (kW)", "Potencia nominal no afectada"],
+      labels: ['Pérdidas nominales (kW)', 'Potencia nominal no afectada'],
       datasets: [
         {
-          label: "Pérdidas",
-          backgroundColor: ["#ffd04a", "grey"],
+          label: 'Pérdidas',
+          backgroundColor: ['#ffd04a', 'grey'],
           // hoverBackgroundColor: GLOBAL.colores_severidad,
-          data: [
-            this.perdidasTotales,
-            this.planta.potencia * 1000 - this.perdidasTotales
-          ]
-        }
-      ]
+          data: [this.perdidasTotales, this.planta.potencia * 1000 - this.perdidasTotales],
+        },
+      ],
     };
 
     const max1 = this.perdidasPorCategoria.reduce((a, b) => {
@@ -191,11 +180,11 @@ export class InformeOverviewComponent implements OnInit {
               stepSize: Math.round(max1 / this.stepSize),
               suggestedMin: 0, // minimum will be 0, unless there is a lower value.
               // OR //
-              beginAtZero: true // minimum value will be 0.
-            }
-          }
-        ]
-      }
+              beginAtZero: true, // minimum value will be 0.
+            },
+          },
+        ],
+      },
     };
     this.chartOptionsDonut = {
       legend: { display: false },
@@ -207,11 +196,11 @@ export class InformeOverviewComponent implements OnInit {
               stepSize: 100,
               suggestedMin: 0, // minimum will be 0, unless there is a lower value.
               // OR //
-              beginAtZero: true // minimum value will be 0.
-            }
-          }
-        ]
-      }
+              beginAtZero: true, // minimum value will be 0.
+            },
+          },
+        ],
+      },
     };
     this.chartOptionsCount = {
       legend: { display: false },
@@ -223,11 +212,11 @@ export class InformeOverviewComponent implements OnInit {
               stepSize: Math.round(max2 / this.stepSize),
               suggestedMin: 0, // minimum will be 0, unless there is a lower value.
               // OR //
-              beginAtZero: true // minimum value will be 0.
-            }
-          }
-        ]
-      }
+              beginAtZero: true, // minimum value will be 0.
+            },
+          },
+        ],
+      },
     };
   }
 }

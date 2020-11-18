@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
-import { FilterService } from '../../../services/filter.service';
+import { FilterService } from '@core/services/filter.service';
 
-import { UserAreaInterface } from '../../../models/userArea';
+import { UserAreaInterface } from '@core/models/userArea';
 
 @Component({
   selector: 'app-active-filter-list',

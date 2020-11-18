@@ -1,17 +1,17 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { InformeService } from '../../services/informe.service';
+import { InformeService } from '@core/services/informe.service';
 import { MatTableDataSource } from '@angular/material/table';
-import { ArchivoVueloInterface } from '../../models/archivoVuelo';
+import { ArchivoVueloInterface } from '@core/models/archivoVuelo';
 import { ActivatedRoute } from '@angular/router';
-import { ElementoPlantaInterface } from '../../models/elementoPlanta';
+import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
 import { MatSort } from '@angular/material/sort';
 import { map, switchMap, take } from 'rxjs/operators';
-import { PcService } from '../../services/pc.service';
+import { PcService } from '@core/services/pc.service';
 import { combineLatest } from 'rxjs';
-import { Pc } from 'src/app/models/pc';
-import { EstructuraConPcs, Estructura } from 'src/app/models/estructura';
-import { PlantaService } from 'src/app/services/planta.service';
-import { PlantaInterface } from '../../models/planta';
+import { Pc } from '@core/models/pc';
+import { EstructuraConPcs, Estructura } from '@core/models/estructura';
+import { PlantaService } from '@core/services/planta.service';
+import { PlantaInterface } from '@core/models/planta';
 import { MatPaginator } from '@angular/material/paginator';
 import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 

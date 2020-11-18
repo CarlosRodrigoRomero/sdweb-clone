@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { PlantaInterface } from '../../models/planta';
+import { PlantaInterface } from '@core/models/planta';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { InformeInterface } from 'src/app/models/informe';
+import { InformeInterface } from '@core/models/informe';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PlantaService } from 'src/app/services/planta.service';
+import { PlantaService } from '@core/services/planta.service';
 
 @Component({
   selector: 'app-informe-add',

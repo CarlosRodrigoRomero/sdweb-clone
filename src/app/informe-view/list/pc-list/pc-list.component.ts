@@ -6,13 +6,13 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Observable } from 'rxjs';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
-import { GLOBAL } from 'src/app/services/global';
-import { InformeInterface } from 'src/app/models/informe';
-import { PlantaInterface } from 'src/app/models/planta';
-import { PcInterface } from 'src/app/models/pc';
-import { PcService } from 'src/app/services/pc.service';
-import { PlantaService } from 'src/app/services/planta.service';
-import { InformeService } from '../../../services/informe.service';
+import { GLOBAL } from '@core/services/global';
+import { InformeInterface } from '@core/models/informe';
+import { PlantaInterface } from '@core/models/planta';
+import { PcInterface } from '@core/models/pc';
+import { PcService } from '@core/services/pc.service';
+import { PlantaService } from '@core/services/planta.service';
+import { InformeService } from '@core/services/informe.service';
 
 @Component({
   selector: 'app-pc-list',

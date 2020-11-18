@@ -1,20 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { InformeService } from 'src/app/services/informe.service';
-import { PlantaService } from 'src/app/services/planta.service';
-import { InformeInterface } from 'src/app/models/informe';
-import { PlantaInterface } from 'src/app/models/planta';
-import { PcInterface } from 'src/app/models/pc';
+import { InformeService } from '@core/services/informe.service';
+import { PlantaService } from '@core/services/planta.service';
+import { InformeInterface } from '@core/models/informe';
+import { PlantaInterface } from '@core/models/planta';
+import { PcInterface } from '@core/models/pc';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GLOBAL } from '../services/global';
+import { GLOBAL } from '@core/services/global';
 import { take } from 'rxjs/operators';
 
-import { AuthService } from 'src/app/services/auth.service';
-import { UserInterface } from '../models/user';
+import { AuthService } from '@core/services/auth.service';
+import { UserInterface } from '@core/models/user';
 import { Observable } from 'rxjs';
 
-import { ArchivoVueloInterface } from 'src/app/models/archivoVuelo';
+import { ArchivoVueloInterface } from '@core/models/archivoVuelo';
 import { LatLngLiteral } from '@agm/core';
-import { ElementoPlantaInterface } from '../models/elementoPlanta';
+import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
 import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 
 export interface EventInterface {

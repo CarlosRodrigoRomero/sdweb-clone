@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { InformeInterface } from '../../models/informe';
-import { AuthService } from 'src/app/services/auth.service';
-import { PlantaService } from '../../services/planta.service';
-import { PlantaInterface } from '../../models/planta';
-import { InformeService } from 'src/app/services/informe.service';
+import { InformeInterface } from '../../core/models/informe';
+import { AuthService } from '../../core/services/auth.service';
+import { PlantaService } from '../../core/services/planta.service';
+import { PlantaInterface } from '../../core/models/planta';
+import { InformeService } from '../../core/services/informe.service';
 import { Observable } from 'rxjs';
-import { UserInterface } from 'src/app/models/user';
+import { UserInterface } from '../../core/models/user';
 import { take, switchMap, map } from 'rxjs/operators';
 
 @Component({

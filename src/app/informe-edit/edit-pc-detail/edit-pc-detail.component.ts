@@ -1,12 +1,12 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { InformeService } from '../../services/informe.service';
-import { ElementoPlantaInterface } from '../../models/elementoPlanta';
-import { Pc } from 'src/app/models/pc';
+import { InformeService } from '@core/services/informe.service';
+import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
+import { Pc } from '@core/models/pc';
 import { Observable } from 'rxjs';
-import { PlantaInterface } from 'src/app/models/planta';
+import { PlantaInterface } from '@core/models/planta';
 import { take } from 'rxjs/operators';
-import { PcService } from '../../services/pc.service';
-import { GLOBAL } from 'src/app/services/global';
+import { PcService } from '@core/services/pc.service';
+import { GLOBAL } from '@core/services/global';
 import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 
 @Component({

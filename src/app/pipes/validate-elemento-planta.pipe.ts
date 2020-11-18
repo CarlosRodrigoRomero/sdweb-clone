@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Estructura } from '../models/estructura';
-import { PcInterface, Pc } from '../models/pc';
-import { PlantaInterface } from '../models/planta';
+import { Estructura } from '@core/models/estructura';
+import { PcInterface, Pc } from '@core/models/pc';
+import { PlantaInterface } from '@core/models/planta';
 
 @Pipe({
   name: 'validateElem',

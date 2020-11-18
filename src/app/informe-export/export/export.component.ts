@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
-import { GLOBAL } from '../../services/global';
+import { GLOBAL } from '@core/services/global';
 
-import { PcService, SeguidorInterface } from '../../services/pc.service';
+import { PcService, SeguidorInterface } from '@core/services/pc.service';
 
-import { PcInterface } from '../../models/pc';
-import { PlantaInterface } from '../../models/planta';
-import { InformeInterface } from '../../models/informe';
+import { PcInterface } from '@core/models/pc';
+import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
 
 import 'fabric';
 declare let fabric;
@@ -18,8 +18,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import pdfMake from 'pdfmake/build/pdfmake.js';
 import pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { PlantaService } from '../../services/planta.service';
-import { InformeService } from '../../services/informe.service';
+import { PlantaService } from '@core/services/planta.service';
+import { InformeService } from '@core/services/informe.service';
 import { Translation } from './translations';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;

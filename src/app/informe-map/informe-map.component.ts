@@ -1,15 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { PcService } from '../services/pc.service';
-import { PcInterface } from '../models/pc';
+import { PcService } from '@core/services/pc.service';
+import { PcInterface } from '@core/models/pc';
 import { AgmMap } from '@agm/core';
-import { UserAreaInterface } from '../models/userArea';
-import { PlantaInterface } from '../models/planta';
-import { InformeInterface } from '../models/informe';
+import { UserAreaInterface } from '@core/models/userArea';
+import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { MatDialog } from '@angular/material/dialog';
-import { PlantaService } from '../services/planta.service';
-import { InformeService } from '../services/informe.service';
-import { GLOBAL } from '../services/global';
+import { PlantaService } from '@core/services/planta.service';
+import { InformeService } from '@core/services/informe.service';
+import { GLOBAL } from '@core/services/global';
 import { PcDetailsDialogComponent } from '../informe-view/pc-details-dialog/pc-details-dialog.component';
 declare const google: any;
 

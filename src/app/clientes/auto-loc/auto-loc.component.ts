@@ -1,18 +1,18 @@
 import { Component, OnInit, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PlantaService } from 'src/app/services/planta.service';
-import { PlantaInterface } from '../../models/planta';
-import { LocationAreaInterface } from 'src/app/models/location';
+import { PlantaService } from '../../core/services/planta.service';
+import { PlantaInterface } from '../../core/models/planta';
+import { LocationAreaInterface } from '../../core/models/location';
 import { LatLngLiteral } from '@agm/core/map-types';
 import { Observable } from 'rxjs';
 import { AgmPolygon, AgmMap } from '@agm/core';
-import { ModuloInterface } from '../../models/modulo';
+import { ModuloInterface } from '../../core/models/modulo';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
-import { UserAreaInterface } from '../../models/userArea';
-import { AreaInterface } from '../../models/area';
-import { GLOBAL } from 'src/app/services/global';
+import { UserAreaInterface } from '../../core/models/userArea';
+import { AreaInterface } from '../../core/models/area';
+import { GLOBAL } from '../../core/services/global';
 import { MatPaginator } from '@angular/material/paginator';
 declare const google: any;
 

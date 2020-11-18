@@ -1,19 +1,19 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { PcInterface } from 'src/app/models/pc';
+import { PcInterface } from '@core/models/pc';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { GLOBAL } from 'src/app/services/global';
+import { GLOBAL } from '@core/services/global';
 import { AngularFireStorage } from '@angular/fire/storage';
 import 'fabric';
 declare let fabric;
 
 import Pica from 'pica';
 import { take, map } from 'rxjs/operators';
-import { PlantaInterface } from '../../models/planta';
-import { InformeInterface } from '../../models/informe';
-import { AuthService } from 'src/app/services/auth.service';
-import { UserInterface } from 'src/app/models/user';
-import { PcService } from '../../services/pc.service';
-import { PlantaService } from '../../services/planta.service';
+import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
+import { AuthService } from '@core/services/auth.service';
+import { UserInterface } from '@core/models/user';
+import { PcService } from '@core/services/pc.service';
+import { PlantaService } from '@core/services/planta.service';
 import { DialogData } from 'src/app/informe-map/informe-map.component';
 
 const pica = Pica();

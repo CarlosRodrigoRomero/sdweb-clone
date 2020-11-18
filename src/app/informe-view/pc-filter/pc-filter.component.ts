@@ -1,17 +1,17 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { PcInterface } from '../../models/pc';
+import { PcInterface } from '@core/models/pc';
 import { MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSliderChange } from '@angular/material/slider';
-import { PcService } from '../../services/pc.service';
-import { FilterService } from '../../services/filter.service';
-import { GLOBAL } from '../../services/global';
-import { PlantaService } from '../../services/planta.service';
+import { PcService } from '@core/services/pc.service';
+import { FilterService } from '@core/services/filter.service';
+import { GLOBAL } from '@core/services/global';
+import { PlantaService } from '@core/services/planta.service';
 import { ExplicacionCoaComponent } from '../explicacion-coa/explicacion-coa.component';
-import { CriteriosClasificacion } from '../../models/criteriosClasificacion';
+import { CriteriosClasificacion } from '@core/models/criteriosClasificacion';
 import { take, map } from 'rxjs/operators';
-import { PlantaInterface } from '../../models/planta';
+import { PlantaInterface } from '@core/models/planta';
 import { LatLngLiteral } from '@agm/core';
 
 @Component({

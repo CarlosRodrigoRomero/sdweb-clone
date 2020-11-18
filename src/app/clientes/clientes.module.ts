@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 
 import { ClientesRoutingModule } from './clientes-routing.module';
-import { SharedModule } from '../shared/shared.module';
-import { AuthService } from '../services/auth.service';
+import { SharedModule } from '@shared/shared.module';
+import { AuthService } from '@core/services/auth.service';
 import { InformesComponent } from './informes/informes.component';
 import { ClientesComponent } from './clientes.component';
 import { NavbarComponent } from './navbar/navbar.component';

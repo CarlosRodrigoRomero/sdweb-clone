@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { PlantaInterface } from '../../models/planta';
-import { PlantaService } from 'src/app/services/planta.service';
-import { ModuloInterface } from '../../models/modulo';
-import { CriteriosClasificacion } from '../../models/criteriosClasificacion';
-import { InformeService } from '../../services/informe.service';
+import { PlantaInterface } from '../../core/models/planta';
+import { PlantaService } from '../../core/services/planta.service';
+import { ModuloInterface } from '../../core/models/modulo';
+import { CriteriosClasificacion } from '../../core/models/criteriosClasificacion';
+import { InformeService } from '../../core/services/informe.service';
 import { take } from 'rxjs/operators';
-import { PcService } from '../../services/pc.service';
-import { GLOBAL } from 'src/app/services/global';
+import { PcService } from '../../core/services/pc.service';
+import { GLOBAL } from '../../core/services/global';
 
 @Component({
   selector: 'app-planta-edit',

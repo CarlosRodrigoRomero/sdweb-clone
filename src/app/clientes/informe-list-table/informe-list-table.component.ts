@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { PlantaInterface } from 'src/app/models/planta';
-import { PlantaService } from '../../services/planta.service';
+import { PlantaInterface } from '@core/models/planta';
+import { PlantaService } from '@core/services/planta.service';
 import { switchMap, map, take } from 'rxjs/operators';
-import { AuthService } from 'src/app/services/auth.service';
-import { InformeService } from 'src/app/services/informe.service';
-import { UserInterface } from 'src/app/models/user';
+import { AuthService } from '@core/services/auth.service';
+import { InformeService } from '@core/services/informe.service';
+import { UserInterface } from '@core/models/user';
 
 @Component({
   selector: 'app-informe-list-table',
