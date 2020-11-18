@@ -1,16 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-
-import { PcService } from '../../../services/pc.service';
+import { GLOBAL } from 'src/app/services/global';
+import { LatLngLiteral } from '@agm/core';
 
 import { PlantaInterface } from '../../../models/planta';
 import { InformeInterface } from '../../../models/informe';
 import { UserAreaInterface } from '../../../models/userArea';
 
+import { PcService } from '../../../services/pc.service';
 import { PlantaService } from '../../../services/planta.service';
 import { InformeService } from '../../../services/informe.service';
 import { FilterService } from '../../../services/filter.service';
-import { GLOBAL } from 'src/app/services/global';
-import { LatLngLiteral } from '@agm/core';
 
 declare const google: any;
 
@@ -26,14 +25,11 @@ export class InformeMapFilterComponent implements OnInit {
   public circleRadius: number;
   public areas: UserAreaInterface[];
   public mapType = 'satellite';
-  public pointList: { lat: number; lng: number }[] = [];
-  public selectedArea = 0;
-  public selectedShape: any;
 
   constructor(
     private plantaService: PlantaService,
     private informeService: InformeService,
-    private filterService: FilterService,
+    public filterService: FilterService,
     public pcService: PcService
   ) {}
 
