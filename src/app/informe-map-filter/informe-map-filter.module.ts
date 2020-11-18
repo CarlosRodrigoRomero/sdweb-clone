@@ -10,10 +10,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { InformeMapFilterRoutingModule } from './informe-map-filter-routing.module';
 import { InformeMapFilterComponent } from './components/informe-map-filter/informe-map-filter.component';
 import { ActiveFilterListComponent } from './components/active-filter-list/active-filter-list.component';
-import { PcMapFilterComponent } from './components/pc-map-filter/pc-map-filter.component';
 
 @NgModule({
-  declarations: [InformeMapFilterComponent, ActiveFilterListComponent, PcMapFilterComponent],
+  declarations: [InformeMapFilterComponent, ActiveFilterListComponent],
   imports: [
     CommonModule,
     InformeMapFilterRoutingModule,

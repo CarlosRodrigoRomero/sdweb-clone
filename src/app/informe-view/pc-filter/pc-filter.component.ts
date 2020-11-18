@@ -5,12 +5,14 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSliderChange } from '@angular/material/slider';
 import { PcService } from '../../services/pc.service';
+import { FilterService } from '../../services/filter.service';
 import { GLOBAL } from '../../services/global';
 import { PlantaService } from '../../services/planta.service';
 import { ExplicacionCoaComponent } from '../explicacion-coa/explicacion-coa.component';
 import { CriteriosClasificacion } from '../../models/criteriosClasificacion';
-import { take } from 'rxjs/operators';
+import { take, map } from 'rxjs/operators';
 import { PlantaInterface } from '../../models/planta';
+import { LatLngLiteral } from '@agm/core';
 
 @Component({
   selector: 'app-pc-filter',
@@ -38,7 +40,12 @@ export class PcFilterComponent implements OnInit, OnDestroy {
   public maxGradiente: number;
   public criterio: CriteriosClasificacion;
 
-  constructor(public dialog: MatDialog, private pcService: PcService, private plantaService: PlantaService) {
+  constructor(
+    public dialog: MatDialog,
+    private pcService: PcService,
+    private plantaService: PlantaService,
+    private filterService: FilterService
+  ) {
     this.countCategoria = Array();
     this.countClase = Array();
   }
@@ -202,5 +209,26 @@ export class PcFilterComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe((result) => {});
+  }
+
+  areaToFilteredPcs() {
+    const path: LatLngLiteral[] = []; // recorrer con un for
+
+    let point: LatLngLiteral;
+    if (this.filterService.areas.length > 0) {
+      this.pcService.currentFilteredPcs$
+        .pipe(
+          map((pcs) =>
+            pcs.filter((pc) => this.filterService.isContained((point = { lat: pc.gps_lat, lng: pc.gps_lng }), path))
+          )
+        )
+        .subscribe((pcs) => {
+          this.calcularInforme(pcs);
+        });
+    } else {
+      this.pcService.currentFilteredPcs$.subscribe((pcs) => {
+        this.calcularInforme(pcs);
+      });
+    }
   }
 }
