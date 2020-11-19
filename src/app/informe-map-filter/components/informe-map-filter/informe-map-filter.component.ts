@@ -1,15 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { GLOBAL } from '@core/services/global';
-import { LatLngLiteral } from '@agm/core';
+import { LatLngLiteral, Polygon } from '@agm/core';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 import { UserAreaInterface } from '@core/models/userArea';
+import { FilterInterface } from '@core/models/filter';
+import { FilterAreaInterface } from '@core/models/filterArea';
 
 import { PcService } from '@core/services/pc.service';
 import { PlantaService } from '@core/services/planta.service';
 import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '@core/services/filter.service';
+import { Observable } from 'rxjs';
 
 declare const google: any;
 
@@ -23,7 +26,10 @@ export class InformeMapFilterComponent implements OnInit {
   public planta: PlantaInterface;
   public informe: InformeInterface;
   public circleRadius: number;
-  public areas: UserAreaInterface[];
+  public areas: UserAreaInterface[] = [];
+  public areas$: Observable<UserAreaInterface[]>;
+  public filters: UserAreaInterface[] = [];
+  public filters$: Observable<UserAreaInterface[]>;
   public mapType = 'satellite';
 
   constructor(
@@ -80,7 +86,12 @@ export class InformeMapFilterComponent implements OnInit {
           lng: polygon.getPath().getAt(i).lng() as number,
         });
       }
-      this.createArea(path);
+      const area = this.createArea(path);
+      const filter = this.createFilter(area);
+      this.addFilter(filter);
+      // this.addArea(area);
+      this.addPolygonToMap(area);
+
       if (polygon.type !== google.maps.drawing.OverlayType.MARKER) {
         // cambio a modo no-dibujo
         drawingManager.setDrawingMode(null);
@@ -88,35 +99,46 @@ export class InformeMapFilterComponent implements OnInit {
     });
   }
 
-  addArea(area: UserAreaInterface) {
-    this.filterService.addArea(area);
+  private createFilter(area: FilterAreaInterface): FilterInterface {
+    const filter = {} as FilterInterface;
+    filter.id = area.userId;
+    filter.type = 'area';
+    filter.area = area;
+
+    return filter;
   }
 
-  createArea(path: LatLngLiteral[]) {
-    this.areas = this.filterService.getAllAreas();
-    const area = {} as UserAreaInterface;
-    area.userId = 'Área ' + (this.areas.length + 1);
+  addFilter(filter: FilterInterface) {
+    this.filterService.addFilter(filter);
+  }
+
+  /* addArea(area: FilterAreaInterface) {
+    this.filterService.addArea(area);
+  } */
+
+  createArea(path: LatLngLiteral[]): FilterAreaInterface {
+    this.filters$ = this.filterService.getAllFilters();
+    this.filters$.subscribe((filters) => (this.filters = filters));
+    const area = {} as FilterAreaInterface;
+    area.userId = 'Área ' + (this.filters.length + 1);
     area.path = path;
 
-    this.addArea(area);
+    this.addPolygonToArea(area);
 
-    this.addPolygonToMap(area);
+    return area;
   }
 
-  private addPolygonToMap(area: UserAreaInterface) {
-    // area.visible = true;
-    const polygon = new google.maps.Polygon({
+  private addPolygonToMap(area: FilterAreaInterface) {
+    area.polygon.setMap(this.map);
+  }
+
+  private addPolygonToArea(area: FilterAreaInterface) {
+    area.polygon = new google.maps.Polygon({
       paths: area.path,
-      // strokeColor: area.hasOwnProperty('modulo') ? 'yellow' : 'white',
-      // strokeOpacity: this._strokeOpacity,
       strokeWeight: 2,
-      // fillColor: this.getFillColor(area),
-      // fillOpacity: this._fillOpacity,
       editable: false,
       draggable: false,
       id: area.id,
     });
-    polygon.setMap(this.map);
-    this.filterService.addPolygon(polygon);
   }
 }

@@ -2,8 +2,10 @@ import { Injectable } from '@angular/core';
 
 import { PcService } from './pc.service';
 
-import { UserAreaInterface } from '../models/userArea';
-import { Observable } from 'rxjs';
+import { FilterInterface } from '@core/models/filter';
+import { FilterAreaInterface } from '@core/models/filterArea';
+
+import { Observable, Subject } from 'rxjs';
 import { PcInterface } from '../models/pc';
 import { LatLngLiteral } from '@agm/core';
 
@@ -13,45 +15,46 @@ declare const google: any;
   providedIn: 'root',
 })
 export class FilterService {
+  private filters: FilterInterface[] = [];
+  private filters$ = new Subject<FilterInterface[]>();
+
   public pointList: { lat: number; lng: number }[] = [];
-  public areas: UserAreaInterface[] = [];
+  public areas: FilterAreaInterface[] = [];
+  private areas$ = new Subject<FilterAreaInterface[]>();
   public polygonList: any[] = [];
   public pcs$: Observable<PcInterface[]>;
   public arrayPcs: PcInterface[] = [];
 
   constructor(private pcService: PcService) {}
 
-  addArea(area: UserAreaInterface) {
+  /* addArea(area: FilterAreaInterface) {
     this.areas.push(area);
+    this.areas$.next(this.areas);
+  } */
+
+  addFilter(filter: FilterInterface) {
+    this.filters.push(filter);
+    this.filters$.next(this.filters);
+  }
+  /* 
+  getAreas() {
+    return this.areas$.asObservable();
+  } */
+
+  getAllFilters() {
+    return this.filters$.asObservable();
   }
 
-  addPolygon(polygon: any) {
-    this.polygonList.push(polygon);
-  }
-
-  getAllAreas() {
-    return this.areas;
-  }
-
-  getAllPolygons() {
-    return this.polygonList;
-  }
-
-  deletePolygons() {
-    this.polygonList = [];
-  }
-
-  deleteArea(area: UserAreaInterface) {
-    const index = this.areas.indexOf(area);
+  deleteFilter(filter: FilterInterface) {
+    const index = this.filters.indexOf(filter);
 
     if (index >= 0) {
-      this.areas.splice(index, 1);
-      this.polygonList[index].setMap(null);
-      this.polygonList.splice(index, 1);
+      this.filters[index].area.polygon.setMap(null);
+      this.filters.splice(index, 1);
     }
   }
 
- /*  areaToFilteredPcs(path: LatLngLiteral[]) {
+  /*  areaToFilteredPcs(path: LatLngLiteral[]) {
     let point: LatLngLiteral;
     if (this.areas.length > 0) {
       this.pcService.currentFilteredPcs$

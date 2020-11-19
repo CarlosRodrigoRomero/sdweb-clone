@@ -1,6 +1,6 @@
 <mat-chip-list>
-  <mat-chip *ngFor="let area of areas" [removable]="removable" (removed)="deleteArea(area)"
-    >{{ area.userId }}
+  <mat-chip *ngFor="let filter of filter$ | async" [removable]="removable" (removed)="deleteFilter(filter)"
+    >{{ filter.id }}
     <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
   </mat-chip>
 </mat-chip-list>

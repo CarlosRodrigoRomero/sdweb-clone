@@ -1,4 +1,4 @@
-import { CritCoA } from "./critCoA";
+import { CritCoA } from './critCoA';
 
 export interface CriteriosClasificacion {
   id?: string;
