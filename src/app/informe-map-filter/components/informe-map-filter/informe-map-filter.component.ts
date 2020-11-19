@@ -13,6 +13,7 @@ import { PlantaService } from '@core/services/planta.service';
 import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '@core/services/filter.service';
 import { Observable } from 'rxjs';
+import { filter, map, count, take } from 'rxjs/operators';
 
 declare const google: any;
 
@@ -26,11 +27,12 @@ export class InformeMapFilterComponent implements OnInit {
   public planta: PlantaInterface;
   public informe: InformeInterface;
   public circleRadius: number;
-  public areas: UserAreaInterface[] = [];
-  public areas$: Observable<UserAreaInterface[]>;
-  public filters: UserAreaInterface[] = [];
-  public filters$: Observable<UserAreaInterface[]>;
+  public areaFilters: FilterInterface[] = [];
+  public areaFilters$: Observable<FilterInterface[]>;
+  public filters: FilterInterface[] = [];
+  public filters$: Observable<FilterInterface[]>;
   public mapType = 'satellite';
+  public numAreas = 0;
 
   constructor(
     private plantaService: PlantaService,
@@ -49,6 +51,10 @@ export class InformeMapFilterComponent implements OnInit {
     } else if (this.planta.tipo === '1 eje') {
       this.circleRadius = 2;
     }
+
+    // filtro de prueba
+    const areaFilter = { id: 'Filtro 1', type: 'otro' } as FilterInterface;
+    this.addFilter(areaFilter);
   }
 
   onMapReady(map) {
@@ -61,6 +67,7 @@ export class InformeMapFilterComponent implements OnInit {
   }
 
   initDrawingManager() {
+    this.numAreas++;
     const options = {
       drawingControl: false,
       polygonOptions: {
@@ -87,9 +94,10 @@ export class InformeMapFilterComponent implements OnInit {
         });
       }
       const area = this.createArea(path);
-      const filter = this.createFilter(area);
-      this.addFilter(filter);
-      // this.addArea(area);
+      const areaFilter = this.createFilter(area);
+
+      this.addFilter(areaFilter);
+
       this.addPolygonToMap(area);
 
       if (polygon.type !== google.maps.drawing.OverlayType.MARKER) {
@@ -100,27 +108,31 @@ export class InformeMapFilterComponent implements OnInit {
   }
 
   private createFilter(area: FilterAreaInterface): FilterInterface {
-    const filter = {} as FilterInterface;
-    filter.id = area.userId;
-    filter.type = 'area';
-    filter.area = area;
+    const areaFilter = {} as FilterInterface;
+    areaFilter.id = area.userId;
+    areaFilter.type = 'area';
+    areaFilter.area = area;
 
-    return filter;
+    return areaFilter;
   }
 
-  addFilter(filter: FilterInterface) {
-    this.filterService.addFilter(filter);
+  addFilter(areaFilter: FilterInterface) {
+    this.filterService.addFilter(areaFilter);
   }
 
   /* addArea(area: FilterAreaInterface) {
     this.filterService.addArea(area);
   } */
 
-  createArea(path: LatLngLiteral[]): FilterAreaInterface {
+  getAllAreaFilters(): Observable<FilterInterface[]> {
     this.filters$ = this.filterService.getAllFilters();
-    this.filters$.subscribe((filters) => (this.filters = filters));
+
+    return this.filters$.pipe(map((filters) => filters.filter((f) => f.type === 'area')));
+  }
+
+  createArea(path: LatLngLiteral[]): FilterAreaInterface {
     const area = {} as FilterAreaInterface;
-    area.userId = 'Área ' + (this.filters.length + 1);
+    area.userId = 'Área ' + this.numAreas;
     area.path = path;
 
     this.addPolygonToArea(area);

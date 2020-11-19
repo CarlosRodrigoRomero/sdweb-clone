@@ -6,6 +6,8 @@ import { FilterInterface } from '@core/models/filter';
 import { FilterAreaInterface } from '@core/models/filterArea';
 
 import { Observable, Subject } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
+
 import { PcInterface } from '../models/pc';
 import { LatLngLiteral } from '@agm/core';
 
@@ -27,19 +29,10 @@ export class FilterService {
 
   constructor(private pcService: PcService) {}
 
-  /* addArea(area: FilterAreaInterface) {
-    this.areas.push(area);
-    this.areas$.next(this.areas);
-  } */
-
   addFilter(filter: FilterInterface) {
     this.filters.push(filter);
     this.filters$.next(this.filters);
   }
-  /* 
-  getAreas() {
-    return this.areas$.asObservable();
-  } */
 
   getAllFilters() {
     return this.filters$.asObservable();
@@ -54,20 +47,21 @@ export class FilterService {
     }
   }
 
-  /*  areaToFilteredPcs(path: LatLngLiteral[]) {
-    let point: LatLngLiteral;
-    if (this.areas.length > 0) {
-      this.pcService.currentFilteredPcs$
-        .pipe(map((pcs) => pcs.filter((pc) => this.isContained((point = { lat: pc.gps_lat, lng: pc.gps_lng }), path))))
-        .subscribe((pcs) => {
-          this.pcService.calcularInforme(pcs);  
-        });
-    } else {
-      this.pcService.currentFilteredPcs$.subscribe((pcs) => {
-        this.calcularInforme(pcs);
-      });
-    }
-  } */
+  pcsByAreaFiltered(): Observable<PcInterface[]> {
+    return this.getAllPcs().pipe(
+      map((pcs) =>
+        pcs.filter((pc) => {
+          for (let i = 0; i <= this.filters.length; i++) {
+            this.isContained({ lat: pc.gps_lat, lng: pc.gps_lng }, this.filters[i].area.path);
+          }
+        })
+      )
+    );
+  }
+
+  getAllPcs(): Observable<PcInterface[]> {
+    return this.pcService.allPcs$;
+  }
 
   isContained(point: LatLngLiteral, path: LatLngLiteral[]) {
     let crossings = 0;
