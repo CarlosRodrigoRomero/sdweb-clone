@@ -55,6 +55,8 @@ export class InformeMapFilterComponent implements OnInit {
     // filtro de prueba
     const areaFilter = { id: 'Filtro 1', type: 'otro' } as FilterInterface;
     this.addFilter(areaFilter);
+
+    
   }
 
   onMapReady(map) {
@@ -67,6 +69,8 @@ export class InformeMapFilterComponent implements OnInit {
   }
 
   initDrawingManager() {
+    // this.filterService.pcsByAreaFiltered().subscribe(pcs => console.log(pcs));
+    
     this.numAreas++;
     const options = {
       drawingControl: false,
@@ -94,7 +98,9 @@ export class InformeMapFilterComponent implements OnInit {
         });
       }
       const area = this.createArea(path);
+      console.log(this.filterService.inside({lat: 38.37578562286604, lng: -6.460535617179303}, path));
       const areaFilter = this.createFilter(area);
+      this.filterService.pcsByAreaFiltered();
 
       this.addFilter(areaFilter);
 
@@ -125,9 +131,7 @@ export class InformeMapFilterComponent implements OnInit {
   } */
 
   getAllAreaFilters(): Observable<FilterInterface[]> {
-    this.filters$ = this.filterService.getAllFilters();
-
-    return this.filters$.pipe(map((filters) => filters.filter((f) => f.type === 'area')));
+    return this.filterService.getByTypeAllFilters('area');
   }
 
   createArea(path: LatLngLiteral[]): FilterAreaInterface {

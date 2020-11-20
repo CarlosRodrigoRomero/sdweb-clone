@@ -13,7 +13,7 @@
         [mapTypeControl]="true"
       >
         <agm-circle
-          *ngFor="let pc of pcService.allPcs$ | async"
+          *ngFor="let pc of filterService.pcsAreas$ | async"
           [latitude]="pc.gps_lat"
           [longitude]="pc.gps_lng"
           [radius]="circleRadius"
