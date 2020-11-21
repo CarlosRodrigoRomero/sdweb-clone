@@ -211,7 +211,7 @@ export class PcFilterComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe((result) => {});
   }
 
-  areaToFilteredPcs() {
+  /* areaToFilteredPcs() {
     const path: LatLngLiteral[] = []; // recorrer con un for
 
     let point: LatLngLiteral;
@@ -230,5 +230,5 @@ export class PcFilterComponent implements OnInit, OnDestroy {
         this.calcularInforme(pcs);
       });
     }
-  }
+  } */
 }

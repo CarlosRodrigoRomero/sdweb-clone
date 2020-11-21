@@ -55,8 +55,6 @@ export class InformeMapFilterComponent implements OnInit {
     // filtro de prueba
     const areaFilter = { id: 'Filtro 1', type: 'otro' } as FilterInterface;
     this.addFilter(areaFilter);
-
-    
   }
 
   onMapReady(map) {
@@ -69,8 +67,8 @@ export class InformeMapFilterComponent implements OnInit {
   }
 
   initDrawingManager() {
-    // this.filterService.pcsByAreaFiltered().subscribe(pcs => console.log(pcs));
-    
+    this.filterService.getByTypeFilters('area').pipe(map((fs) => console.log(fs.length)));
+
     this.numAreas++;
     const options = {
       drawingControl: false,
@@ -98,13 +96,12 @@ export class InformeMapFilterComponent implements OnInit {
         });
       }
       const area = this.createArea(path);
-      console.log(this.filterService.inside({lat: 38.37578562286604, lng: -6.460535617179303}, path));
       const areaFilter = this.createFilter(area);
-      this.filterService.pcsByAreaFiltered();
+      this.filterService.filterPcsByArea(path);
 
       this.addFilter(areaFilter);
-
       this.addPolygonToMap(area);
+      
 
       if (polygon.type !== google.maps.drawing.OverlayType.MARKER) {
         // cambio a modo no-dibujo
@@ -131,7 +128,7 @@ export class InformeMapFilterComponent implements OnInit {
   } */
 
   getAllAreaFilters(): Observable<FilterInterface[]> {
-    return this.filterService.getByTypeAllFilters('area');
+    return this.filterService.getByTypeFilters('area');
   }
 
   createArea(path: LatLngLiteral[]): FilterAreaInterface {
