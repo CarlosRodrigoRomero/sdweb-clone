@@ -3,15 +3,12 @@ import { Injectable } from '@angular/core';
 import { PcService } from './pc.service';
 
 import { FilterInterface } from '@core/models/filter';
-import { FilterAreaInterface } from '@core/models/filterArea';
 import { PcInterface } from '../models/pc';
 
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { LatLngLiteral } from '@agm/core';
-
-declare const google: any;
 
 @Injectable({
   providedIn: 'root',
@@ -22,11 +19,6 @@ export class FilterService {
   private pcsAreas: PcInterface[] = [];
   public pcsAreas$ = new Subject<PcInterface[]>();
   public areaFilters: FilterInterface[] = [];
-
-  public pointList: { lat: number; lng: number }[] = [];
-  private areas$ = new Subject<FilterAreaInterface[]>();
-  public polygonList: any[] = [];
-  public arrayPcs: PcInterface[] = [];
 
   constructor(private pcService: PcService) {}
 
@@ -46,29 +38,41 @@ export class FilterService {
       this.filters[index].area.polygon.setMap(null);
       this.filters.splice(index, 1);
     }
+
+    this.deletePcsByArea(filter.area.path);
   }
 
   getByTypeFilters(type: string): Observable<FilterInterface[]> {
-    // this.pcsAreas.next(this.filters.filter((pc) => (pc.type = type)));
     return this.filters$.pipe(map((filters) => filters.filter((f) => f.type === type)));
   }
 
   filterPcsByArea(path: LatLngLiteral[]) {
-    const areas = this.filters.filter((f) => (f.type = 'area'));
     this.getAllPcs()
-          .pipe(
-            map((pcs) => pcs.filter((pc) => this.isContained({ lat: pc.gps_lat, lng: pc.gps_lng }, path)))
-          )
-          .subscribe((pcs) => pcs.map(pc => this.pcsAreas.push(pc)));
-    /* if (areas.length > 0) {
-      for (let i = 0; i <= areas.length; i++) {
-        this.getAllPcs()
-          .pipe(
-            map((pcs) => pcs.filter((pc) => this.isContained({ lat: pc.gps_lat, lng: pc.gps_lng }, areas[i].area.path)))
-          )
-          .subscribe((pcs) => (this.pcsAreas = pcs));
+      .pipe(map((pcs) => pcs.filter((pc) => this.isContained({ lat: pc.gps_lat, lng: pc.gps_lng }, path))))
+      .subscribe((pcs) => pcs.map((pc) => this.pcsAreas.push(pc)));
+
+    this.pcsAreas$.next(this.pcsAreas);
+    /* this.getAllPcs()
+      .pipe(map((pcs) => pcs.filter((pc) => this.isContained({ lat: pc.gps_lat, lng: pc.gps_lng }, path))))
+      .subscribe((pcs) => pcs.map((pc) => this.filters.map((f) => f.area.pcs.push(pc))));
+
+    this.allPcsByAreaFiltered(); */
+  }
+
+  /* allPcsByAreaFiltered() {
+    const areaFilter: FilterInterface[] = this.filters.filter((f) => (f.type = 'area'));
+    for (let i = 0; i <= areaFilter.length; i++) {
+      for (let j = 0; j <= areaFilter[i].area.pcs.length; j++) {
+        this.pcsAreas.push(areaFilter[i].area.pcs[j]);
       }
-    } */
+    }
+    this.pcsAreas$.next(this.pcsAreas);
+  } */
+
+  deletePcsByArea(path: LatLngLiteral[]) {
+    this.getAllPcs()
+      .pipe(map((pcs) => pcs.filter((pc) => this.isContained({ lat: pc.gps_lat, lng: pc.gps_lng }, path))))
+      .subscribe((pcs) => pcs.map((pc) => this.pcsAreas.splice(this.pcsAreas.indexOf(pc), 1)));
     this.pcsAreas$.next(this.pcsAreas);
   }
 
@@ -76,7 +80,7 @@ export class FilterService {
     return this.pcService.allPcs$;
   }
 
-  isContained(point: LatLngLiteral, path: LatLngLiteral[]) {
+  private isContained(point: LatLngLiteral, path: LatLngLiteral[]) {
     // ray-casting algorithm based on
     // https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html/pnpoly.html
 

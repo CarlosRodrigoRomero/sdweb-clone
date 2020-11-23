@@ -6,13 +6,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
 
 import { InformeMapFilterRoutingModule } from './informe-map-filter-routing.module';
 import { InformeMapFilterComponent } from './components/informe-map-filter/informe-map-filter.component';
 import { ActiveFilterListComponent } from './components/active-filter-list/active-filter-list.component';
+import { FilterPcsListComponent } from './components/filter-pcs-list/filter-pcs-list.component';
 
 @NgModule({
-  declarations: [InformeMapFilterComponent, ActiveFilterListComponent],
+  declarations: [InformeMapFilterComponent, ActiveFilterListComponent, FilterPcsListComponent],
   imports: [
     CommonModule,
     InformeMapFilterRoutingModule,
@@ -24,6 +26,7 @@ import { ActiveFilterListComponent } from './components/active-filter-list/activ
     MatChipsModule,
     MatCardModule,
     MatIconModule,
+    MatListModule,
   ],
 })
 export class InformeMapFilterModule {}

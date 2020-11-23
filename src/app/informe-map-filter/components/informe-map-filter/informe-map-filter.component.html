@@ -1,38 +1,54 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-9">
-      <agm-map
-        class="mapa"
-        [latitude]="planta.latitud"
-        [longitude]="planta.longitud"
-        [mapTypeId]="mapType"
-        [zoom]="planta.zoom"
-        [streetViewControl]="false"
-        (mapReady)="onMapReady($event)"
-        [fullscreenControl]="true"
-        [mapTypeControl]="true"
-      >
-        <agm-circle
-          *ngFor="let pc of filterService.pcsAreas$ | async"
-          [latitude]="pc.gps_lat"
-          [longitude]="pc.gps_lng"
-          [radius]="circleRadius"
-          [strokeOpacity]="1"
-          [strokePosition]="0"
-          [strokeColor]="getStrokeColor(pcService.getPcCoA(pc))"
-          [strokeWeight]="3"
-          [fillOpacity]="0.3"
-          [editable]="false"
-          [zIndex]="1"
-        ></agm-circle>
-      </agm-map>
+      <div class="row">
+        <div class="col-xs-12">
+          <agm-map
+            class="mapa"
+            [latitude]="planta.latitud"
+            [longitude]="planta.longitud"
+            [mapTypeId]="mapType"
+            [zoom]="planta.zoom"
+            [streetViewControl]="false"
+            (mapReady)="onMapReady($event)"
+            [fullscreenControl]="true"
+            [mapTypeControl]="true"
+          >
+            <agm-circle
+              *ngFor="let pc of filterService.pcsAreas$ | async"
+              [latitude]="pc.gps_lat"
+              [longitude]="pc.gps_lng"
+              [radius]="circleRadius"
+              [strokeOpacity]="1"
+              [strokePosition]="0"
+              [strokeColor]="getStrokeColor(pcService.getPcCoA(pc))"
+              [strokeWeight]="3"
+              [fillOpacity]="0.3"
+              [editable]="false"
+              [zIndex]="1"
+            ></agm-circle>
+          </agm-map>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="button-row">
+            <button mat-raised-button color="basic" (click)="initDrawingManager()">Nuevo área</button>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="col-xs-3">
-      <app-active-filter-list></app-active-filter-list>
+      <div class="row">
+        <div class="col-xs-12">
+          <app-active-filter-list></app-active-filter-list>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <app-filter-pcs-list></app-filter-pcs-list>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-
-<div class="button-row">
-  <button mat-raised-button color="basic" (click)="initDrawingManager()">Nuevo área</button>
 </div>

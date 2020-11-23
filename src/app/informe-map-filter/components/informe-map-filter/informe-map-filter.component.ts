@@ -53,8 +53,8 @@ export class InformeMapFilterComponent implements OnInit {
     }
 
     // filtro de prueba
-    const areaFilter = { id: 'Filtro 1', type: 'otro' } as FilterInterface;
-    this.addFilter(areaFilter);
+    /* const areaFilter = { id: 'Filtro 1', type: 'otro' } as FilterInterface;
+    this.addFilter(areaFilter); */
   }
 
   onMapReady(map) {
@@ -67,8 +67,6 @@ export class InformeMapFilterComponent implements OnInit {
   }
 
   initDrawingManager() {
-    this.filterService.getByTypeFilters('area').pipe(map((fs) => console.log(fs.length)));
-
     this.numAreas++;
     const options = {
       drawingControl: false,
@@ -101,7 +99,6 @@ export class InformeMapFilterComponent implements OnInit {
 
       this.addFilter(areaFilter);
       this.addPolygonToMap(area);
-      
 
       if (polygon.type !== google.maps.drawing.OverlayType.MARKER) {
         // cambio a modo no-dibujo
