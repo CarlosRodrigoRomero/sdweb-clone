@@ -1,5 +1,5 @@
 <mat-list>
-  <mat-list-item *ngFor="let pc of filterService.pcsAreas$ | async">
+  <mat-list-item *ngFor="let pc of filterService.filteredPcs$ | async">
     {{ pc.id }}
   </mat-list-item>
 </mat-list>
