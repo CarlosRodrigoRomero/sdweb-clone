@@ -59,6 +59,7 @@ export class InformeMapFilterComponent implements OnInit {
     this.plantaService.initMap(this.planta, map);
 
     this.filterService.filters$.subscribe((filtros) => {
+
       // 1. Borramos todos los poligonos del mapa
       this.areaFilterList.forEach((filtroArea) => {
         filtroArea.polygon.setMap(null);
@@ -110,14 +111,14 @@ export class InformeMapFilterComponent implements OnInit {
           lng: polygon.getPath().getAt(i).lng() as number,
         });
       }
+      // polygon.setMap(this.map);
 
       // Creamos el filtro
-      const areaFilter = new AreaFilter(path);
+      const areaFilter = new AreaFilter('Área ' + this.numAreas, path);
       this.filterService.addFilter(areaFilter);
 
       // Desactiva del modo dibujo
       if (polygon.type !== google.maps.drawing.OverlayType.MARKER) {
-        // cambio a modo no-dibujo
         drawingManager.setDrawingMode(null);
       }
     });

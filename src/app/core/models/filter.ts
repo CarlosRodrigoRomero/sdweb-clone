@@ -4,5 +4,5 @@ export interface FilterInterface {
   id?: string;
 
   applyFilter(pcs: PcInterface[]): PcInterface[];
-  desaplicarFiltro(pcs: PcInterface[]): PcInterface[];
+  unapplyFilter(pcs: PcInterface[]): PcInterface[];
 }

@@ -10,5 +10,6 @@ import { FilterService } from '@core/services/filter.service';
 export class FilterPcsListComponent implements OnInit {
   constructor(public filterService: FilterService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
 }
