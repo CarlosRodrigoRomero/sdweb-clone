@@ -15,7 +15,7 @@ import { LatLngLiteral } from '@agm/core';
 })
 export class FilterService {
   private filters: FilterInterface[] = [];
-  private filters$ = new Subject<FilterInterface[]>();
+  public filters$ = new Subject<FilterInterface[]>();
   private filteredPcs: PcInterface[] = [];
   public filteredPcs$ = new Subject<PcInterface[]>();
   public areaFilters: FilterInterface[] = [];

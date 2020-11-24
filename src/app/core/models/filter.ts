@@ -1,4 +1,3 @@
-import { FilterAreaInterface } from './filterArea';
 import { PcInterface } from './pc';
 
 export interface FilterInterface {

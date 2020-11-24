@@ -4,16 +4,14 @@ import { LatLngLiteral, Polygon } from '@agm/core';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
-import { UserAreaInterface } from '@core/models/userArea';
 import { FilterInterface } from '@core/models/filter';
-import { FilterAreaInterface } from '@core/models/filterArea';
 
 import { PcService } from '@core/services/pc.service';
 import { PlantaService } from '@core/services/planta.service';
 import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '@core/services/filter.service';
 import { Observable } from 'rxjs';
-import { filter, map, count, take } from 'rxjs/operators';
+import { AreaFilter } from '@core/models/areaFilter';
 
 declare const google: any;
 
@@ -27,8 +25,7 @@ export class InformeMapFilterComponent implements OnInit {
   public planta: PlantaInterface;
   public informe: InformeInterface;
   public circleRadius: number;
-  public areaFilters: FilterInterface[] = [];
-  public areaFilters$: Observable<FilterInterface[]>;
+  public areaFilterList: AreaFilter[] = [];
   public filters: FilterInterface[] = [];
   public filters$: Observable<FilterInterface[]>;
   public mapType = 'satellite';
@@ -60,6 +57,26 @@ export class InformeMapFilterComponent implements OnInit {
   onMapReady(map) {
     this.map = map;
     this.plantaService.initMap(this.planta, map);
+
+    this.filterService.filters$.subscribe((filtros) => {
+      // 1. Borramos todos los poligonos del mapa
+      this.areaFilterList.forEach((filtroArea) => {
+        filtroArea.polygon.setMap(null);
+      });
+      this.areaFilterList = [];
+
+      // 2. Los dibujamos de nuevo
+      filtros
+        .map((filtro) => {
+          if (filtro instanceof AreaFilter) {
+            return filtro as AreaFilter;
+          }
+        })
+        .forEach((filtro) => {
+          this.areaFilterList.push(filtro);
+          filtro.polygon.setMap(this.map);
+        });
+    });
   }
 
   getStrokeColor(severidad: number) {
@@ -93,62 +110,16 @@ export class InformeMapFilterComponent implements OnInit {
           lng: polygon.getPath().getAt(i).lng() as number,
         });
       }
-      const area = this.createArea(path);
-      const areaFilter = this.createFilter(area);
-      this.filterService.filterPcsByArea(path);
 
-      this.addFilter(areaFilter);
-      this.addPolygonToMap(area);
+      // Creamos el filtro
+      const areaFilter = new AreaFilter(path);
+      this.filterService.addFilter(areaFilter);
 
+      // Desactiva del modo dibujo
       if (polygon.type !== google.maps.drawing.OverlayType.MARKER) {
         // cambio a modo no-dibujo
         drawingManager.setDrawingMode(null);
       }
-    });
-  }
-
-  private createFilter(area: FilterAreaInterface): FilterInterface {
-    const areaFilter = {} as FilterInterface;
-    areaFilter.id = area.userId;
-    areaFilter.type = 'area';
-    areaFilter.area = area;
-
-    return areaFilter;
-  }
-
-  addFilter(areaFilter: FilterInterface) {
-    this.filterService.addFilter(areaFilter);
-  }
-
-  /* addArea(area: FilterAreaInterface) {
-    this.filterService.addArea(area);
-  } */
-
-  getAllAreaFilters(): Observable<FilterInterface[]> {
-    return this.filterService.getByTypeFilters('area');
-  }
-
-  createArea(path: LatLngLiteral[]): FilterAreaInterface {
-    const area = {} as FilterAreaInterface;
-    area.userId = 'Área ' + this.numAreas;
-    area.path = path;
-
-    this.addPolygonToArea(area);
-
-    return area;
-  }
-
-  private addPolygonToMap(area: FilterAreaInterface) {
-    area.polygon.setMap(this.map);
-  }
-
-  private addPolygonToArea(area: FilterAreaInterface) {
-    area.polygon = new google.maps.Polygon({
-      paths: area.path,
-      strokeWeight: 2,
-      editable: false,
-      draggable: false,
-      id: area.id,
     });
   }
 }
