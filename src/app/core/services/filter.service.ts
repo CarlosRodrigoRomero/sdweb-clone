@@ -57,12 +57,15 @@ export class FilterService {
       this.filteredPcs = this.pcService.allPcs;
     } else {
       // ... si no era el último, eliminamos solo el filtro
-      const newFilteredPcs = filter.unapplyFilter(this.filteredPcs);
+      let newFilteredPcs = filter.unapplyFilter(this.filteredPcs);
+
+      // comprobamos que no se eliminen pcs que pertenezcan a otros filtros
+      this.filters.forEach((f) => {
+        const coincidentPcs = f.applyFilter(this.filteredPcs).filter((pc) => !newFilteredPcs.includes(pc));
+        newFilteredPcs = newFilteredPcs.concat(coincidentPcs);
+      });
+
       this.filteredPcs = newFilteredPcs;
-      
-      /* this.filters.forEach(filter => {
-        filter.applyFilter(this.filteredPcs).filter(pc => !newFilteredPcs.includes(pc), newFilteredPcs.push(pc));
-      }); */
     }
     this.filteredPcs$.next(this.filteredPcs);
   }
