@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InformeMapFilterComponent } from './informe-map-filter.component';
 
-describe('InformeMapFilterComponent', () => {
+xdescribe('InformeMapFilterComponent', () => {
   let component: InformeMapFilterComponent;
   let fixture: ComponentFixture<InformeMapFilterComponent>;
 

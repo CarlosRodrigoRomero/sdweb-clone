@@ -1,6 +1,6 @@
 import { GetNumeroModulosPipe } from './get-numero-modulos.pipe';
 
-describe('GetNumeroModulosPipe', () => {
+xdescribe('GetNumeroModulosPipe', () => {
   it('create an instance', () => {
     const pipe = new GetNumeroModulosPipe();
     expect(pipe).toBeTruthy();

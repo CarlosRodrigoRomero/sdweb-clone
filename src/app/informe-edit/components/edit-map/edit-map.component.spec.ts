@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EditMapComponent } from './edit-map.component';
 
-describe('EditMapComponent', () => {
+xdescribe('EditMapComponent', () => {
     let component: EditMapComponent;
     let fixture: ComponentFixture<EditMapComponent>;
 
