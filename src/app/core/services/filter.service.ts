@@ -11,7 +11,7 @@ import { Observable, Subject, BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class FilterService {
-  private filters: FilterInterface[] = [];
+  public filters: FilterInterface[] = [];
   public filters$ = new Subject<FilterInterface[]>();
   public filteredPcs: PcInterface[] = [];
   public filteredPcs$ = new BehaviorSubject<PcInterface[]>(this.filteredPcs);
@@ -40,10 +40,6 @@ export class FilterService {
     this.filteredPcs$.next(this.filteredPcs);
   }
 
-  getAllFilters() {
-    return this.filters$.asObservable();
-  }
-
   deleteFilter(filter: FilterInterface) {
     // Elimina el filtro y lo desactiva
     this.filters.splice(this.filters.indexOf(filter), 1);
@@ -65,6 +61,18 @@ export class FilterService {
       this.filteredPcs = newFilteredPcs;
     }
     this.filteredPcs$.next(this.filteredPcs);
+  }
+
+  deleteAllFilters() {
+    this.filters = [];
+    this.filters$.next(this.filters);
+
+    this.filteredPcs = this.pcService.allPcs;
+    this.filteredPcs$.next(this.filteredPcs);
+  }
+
+  getAllFilters() {
+    return this.filters$.asObservable();
   }
 
   getAllPcs(): Observable<PcInterface[]> {

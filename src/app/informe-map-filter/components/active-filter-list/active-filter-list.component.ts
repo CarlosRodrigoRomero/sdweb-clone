@@ -15,7 +15,7 @@ export class ActiveFilterListComponent implements OnInit {
   removable = true;
   public filter$: Observable<FilterInterface[]>;
 
-  constructor(private filterService: FilterService) {}
+  constructor(public filterService: FilterService) {}
 
   ngOnInit(): void {
     this.filter$ = this.filterService.getAllFilters();
