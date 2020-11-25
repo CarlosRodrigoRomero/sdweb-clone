@@ -1,6 +1,7 @@
 import { FilterInterface } from './filter';
 import { PcInterface } from './pc';
 import { LatLngLiteral, Polygon } from '@agm/core';
+
 declare const google: any;
 
 export class AreaFilter implements FilterInterface {

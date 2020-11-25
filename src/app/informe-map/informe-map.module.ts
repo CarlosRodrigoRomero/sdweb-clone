@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
-import { PcDetailsDialogComponent } from 'src/app/informe-view/pc-details-dialog/pc-details-dialog.component';
+import { PcDetailsDialogComponent } from '../informe-view/components/pc-details-dialog/pc-details-dialog.component';
 import { FormsModule } from '@angular/forms';
 
-import { InformeMapComponent } from './informe-map.component';
+import { InformeMapComponent } from './components/informe-map/informe-map.component';
 import { SharedModule } from '../shared/shared.module';
 import { AgmCoreModule } from '@agm/core';
 import { InformeMapRoutingModule } from './informe-map-routing.component';

@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { InformeOverviewComponent } from './overview/informe-overview.component';
-import { InformeViewComponent } from './informe-view.component';
-import { PcListComponent } from './list/pc-list/pc-list.component';
-import { ExportComponent } from '../informe-export/export/export.component';
+import { InformeOverviewComponent } from './components/overview/informe-overview.component';
+import { InformeViewComponent } from './components/informe-view/informe-view.component';
+import { PcListComponent } from './components/pc-list/pc-list.component';
+import { ExportComponent } from '../informe-export/components/export/export.component';
 
 const routes: Routes = [
   {

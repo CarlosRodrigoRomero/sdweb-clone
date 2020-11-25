@@ -14,7 +14,6 @@ import { Observable } from 'rxjs';
 import { AreaFilter } from '@core/models/areaFilter';
 
 declare const google: any;
-
 @Component({
   selector: 'app-informe-map-filter',
   templateUrl: './informe-map-filter.component.html',
@@ -48,10 +47,6 @@ export class InformeMapFilterComponent implements OnInit {
     } else if (this.planta.tipo === '1 eje') {
       this.circleRadius = 2;
     }
-
-    // filtro de prueba
-    /* const areaFilter = { id: 'Filtro 1', type: 'otro' } as FilterInterface;
-    this.addFilter(areaFilter); */
   }
 
   onMapReady(map) {
@@ -59,7 +54,6 @@ export class InformeMapFilterComponent implements OnInit {
     this.plantaService.initMap(this.planta, map);
 
     this.filterService.filters$.subscribe((filtros) => {
-
       // 1. Borramos todos los poligonos del mapa
       this.areaFilterList.forEach((filtroArea) => {
         filtroArea.polygon.setMap(null);
@@ -111,7 +105,6 @@ export class InformeMapFilterComponent implements OnInit {
           lng: polygon.getPath().getAt(i).lng() as number,
         });
       }
-      // polygon.setMap(this.map);
 
       // Creamos el filtro
       const areaFilter = new AreaFilter('Área ' + this.numAreas, path);

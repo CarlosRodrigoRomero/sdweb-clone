@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { InformeEditComponent } from './informe-edit.component';
+import { InformeEditComponent } from './components/informe-edit/informe-edit.component';
 
 const routes: Routes = [
   {

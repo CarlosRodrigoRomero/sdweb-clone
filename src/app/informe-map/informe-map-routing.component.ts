@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { InformeMapComponent } from './informe-map.component';
+import { InformeMapComponent } from './components/informe-map/informe-map.component';
 
 const routes: Routes = [
   {
