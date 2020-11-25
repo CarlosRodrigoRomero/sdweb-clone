@@ -19,7 +19,8 @@
     "esModuleInterop": true,
     "paths": {
       "@core/*": ["src/app/core/*"],
-      "@shared/*": ["src/app/shared/*"]
+      "@shared/*": ["src/app/shared/*"],
+      "@material/*": ["src/app/material/*"]
     }
   }
 }

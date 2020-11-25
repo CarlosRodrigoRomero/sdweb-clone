@@ -9,11 +9,10 @@ import { EditListComponent } from './components/edit-list/edit-list.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
 import { ValidateElementoPlantaPipe } from '../pipes/validate-elemento-planta.pipe';
 import { AgmCoreModule } from '@agm/core';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatSliderModule } from '@angular/material/slider';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { EditPcDetailComponent } from './components/edit-pc-detail/edit-pc-detail.component';
 import { HotkeyModule } from 'angular2-hotkeys';
+
+import { MaterialModule } from '@material/material.module';
 
 @NgModule({
   declarations: [
@@ -26,9 +25,7 @@ import { HotkeyModule } from 'angular2-hotkeys';
   ],
   imports: [
     SharedModule,
-    MatButtonToggleModule,
-    MatSlideToggleModule,
-    MatSliderModule,
+    MaterialModule,
     InformeEditRoutingModule,
     FormsModule,
     ReactiveFormsModule,

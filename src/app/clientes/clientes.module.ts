@@ -14,8 +14,9 @@ import { PlantaAddComponent } from './components/planta-add/planta-add.component
 import { InformeAddComponent } from './components/informe-add/informe-add.component';
 import { InformeListTableComponent } from './components/informe-list-table/informe-list-table.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { ModuloAddComponent } from './components/modulo-add/modulo-add.component';
+
+import { MaterialModule } from '@material/material.module';
 @NgModule({
   declarations: [
     PlantaAddComponent,
@@ -39,7 +40,7 @@ import { ModuloAddComponent } from './components/modulo-add/modulo-add.component
     FormsModule,
     ReactiveFormsModule,
     MatDatepickerModule,
-    MatNativeDateModule,
+    MaterialModule,
   ],
   providers: [AuthService, MatDatepickerModule],
 })
