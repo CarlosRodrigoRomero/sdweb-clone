@@ -7,7 +7,7 @@ import { InformeEditComponent } from './components/informe-edit/informe-edit.com
 import { EditMapComponent } from './components/edit-map/edit-map.component';
 import { EditListComponent } from './components/edit-list/edit-list.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
-import { ValidateElementoPlantaPipe } from '../pipes/validate-elemento-planta.pipe';
+import { ValidateElementoPlantaPipe } from '../shared/pipes/validate-elemento-planta.pipe';
 import { AgmCoreModule } from '@agm/core';
 import { EditPcDetailComponent } from './components/edit-pc-detail/edit-pc-detail.component';
 import { HotkeyModule } from 'angular2-hotkeys';
@@ -16,7 +16,6 @@ import { MaterialModule } from '@material/material.module';
 
 @NgModule({
   declarations: [
-    ValidateElementoPlantaPipe,
     InformeEditComponent,
     EditMapComponent,
     EditListComponent,
