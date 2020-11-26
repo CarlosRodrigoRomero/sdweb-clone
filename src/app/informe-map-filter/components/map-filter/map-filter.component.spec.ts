@@ -1,20 +1,19 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InformeMapFilterComponent } from './informe-map-filter.component';
+import { MapFilterComponent } from './map-filter.component';
 
 xdescribe('InformeMapFilterComponent', () => {
-  let component: InformeMapFilterComponent;
-  let fixture: ComponentFixture<InformeMapFilterComponent>;
+  let component: MapFilterComponent;
+  let fixture: ComponentFixture<MapFilterComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ InformeMapFilterComponent ]
-    })
-    .compileComponents();
+      declarations: [MapFilterComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(InformeMapFilterComponent);
+    fixture = TestBed.createComponent(MapFilterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

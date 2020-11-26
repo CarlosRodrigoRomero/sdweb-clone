@@ -15,11 +15,11 @@ import { AreaFilter } from '@core/models/areaFilter';
 
 declare const google: any;
 @Component({
-  selector: 'app-informe-map-filter',
-  templateUrl: './informe-map-filter.component.html',
-  styleUrls: ['./informe-map-filter.component.css'],
+  selector: 'app-map-filter',
+  templateUrl: './map-filter.component.html',
+  styleUrls: ['./map-filter.component.css'],
 })
-export class InformeMapFilterComponent implements OnInit {
+export class MapFilterComponent implements OnInit {
   public map: any;
   public planta: PlantaInterface;
   public informe: InformeInterface;
