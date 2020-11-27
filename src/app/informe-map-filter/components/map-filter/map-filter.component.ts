@@ -24,11 +24,12 @@ export class MapFilterComponent implements OnInit {
   public planta: PlantaInterface;
   public informe: InformeInterface;
   public circleRadius: number;
+  public mapType = 'satellite';
+  public numAreas = 0;
+
   public areaFilterList: AreaFilter[] = [];
   public filters: FilterInterface[] = [];
   public filters$: Observable<FilterInterface[]>;
-  public mapType = 'satellite';
-  public numAreas = 0;
 
   constructor(
     private plantaService: PlantaService,

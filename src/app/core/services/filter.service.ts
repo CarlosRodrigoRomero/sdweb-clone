@@ -64,9 +64,11 @@ export class FilterService {
   }
 
   deleteAllFilters() {
+    // Elimina todos los filtros
     this.filters = [];
     this.filters$.next(this.filters);
 
+    // Vuelve a mostrar todos los pcs
     this.filteredPcs = this.pcService.allPcs;
     this.filteredPcs$.next(this.filteredPcs);
   }
