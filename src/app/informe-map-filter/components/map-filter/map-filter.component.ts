@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { GLOBAL } from '@core/services/global';
-import { LatLngLiteral, Polygon } from '@agm/core';
+import { LatLngLiteral } from '@agm/core';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
@@ -36,7 +36,11 @@ export class MapFilterComponent implements OnInit {
     private informeService: InformeService,
     public filterService: FilterService,
     public pcService: PcService
-  ) {}
+  ) {
+    // mostramos todos los pcs al inicio
+    this.filterService.filteredPcs = this.pcService.allPcs;
+    this.filterService.filteredPcs$.next(this.filterService.filteredPcs);
+  }
 
   ngOnInit(): void {
     this.planta = this.plantaService.get();

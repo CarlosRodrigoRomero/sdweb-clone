@@ -15,12 +15,8 @@ export class FilterService {
   public filters$ = new Subject<FilterInterface[]>();
   public filteredPcs: PcInterface[] = [];
   public filteredPcs$ = new BehaviorSubject<PcInterface[]>(this.filteredPcs);
-  public areaFilters: FilterInterface[] = [];
 
-  constructor(private pcService: PcService) {
-    this.filteredPcs$.next(this.pcService.allPcs);
-    this.filteredPcs = this.pcService.allPcs;
-  }
+  constructor(private pcService: PcService) {}
 
   addFilter(filter: FilterInterface) {
     // Añade el filtro y lo aplica
