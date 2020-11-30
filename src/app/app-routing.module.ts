@@ -9,7 +9,7 @@ import { AvisoLegalComponent } from './cts/aviso-legal/aviso-legal.component';
 import { VideoComponent } from './cts/video/video.component';
 import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: '', component: IndexComponent },
   { path: 'aviso-legal', component: AvisoLegalComponent },
   { path: 'login', component: LoginComponent },
