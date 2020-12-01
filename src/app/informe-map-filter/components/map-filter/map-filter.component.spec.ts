@@ -46,6 +46,12 @@ xdescribe('InformeMapFilterComponent', () => {
   });
 
   describe('When component is inicializated', () => {
-    it('Should ');
+    const planta = require('./map-filter.component');
+    const informe = require('./map-filter.component');
+    const circleRadius = require('./map-filter.component');
+
+    it('Should assign initial values', () => {
+      expect(circleRadius).toEqual(5);
+    });
   });
 });
