@@ -69,7 +69,7 @@ export class FilterService {
     this.filteredPcs$.next(this.filteredPcs);
   }
 
-  getAllFilters() {
+  getAllFilters(): Observable<FilterInterface[]> {
     return this.filters$.asObservable();
   }
 
