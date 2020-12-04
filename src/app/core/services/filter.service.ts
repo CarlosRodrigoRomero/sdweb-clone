@@ -73,7 +73,7 @@ export class FilterService {
     return this.filters$.asObservable();
   }
 
-  getAllPcs(): Observable<PcInterface[]> {
+/*   getAllPcs(): Observable<PcInterface[]> {
     return this.pcService.allPcs$;
-  }
+  } */
 }
