@@ -5,23 +5,34 @@ import { AuthService } from './auth.service';
 import { take, map, tap } from 'rxjs/operators';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
-  canActivate(
+  /* canActivate(
     next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    state: RouterStateSnapshot
+  ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return this.auth.user$.pipe(
       take(1),
-      map(user => !!user),
-      tap(loggedIn => {
+      map((user) => !!user),
+      tap((loggedIn) => {
         if (!loggedIn) {
           // console.log('access denied');
           this.router.navigate(['/clientes']);
         }
       })
     );
+  } */
+
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean {
+    if (this.authService.isLoggedIn !== true) {
+      this.router.navigate(['sign-in']);
+    }
+    return true;
   }
 }

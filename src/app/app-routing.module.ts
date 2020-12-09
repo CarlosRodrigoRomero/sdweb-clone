@@ -12,11 +12,12 @@ import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
 export const routes: Routes = [
   { path: '', component: IndexComponent },
   { path: 'aviso-legal', component: AvisoLegalComponent },
-  { path: 'login', component: LoginComponent },
+  // { path: 'login', component: LoginComponent },
+  { path: 'auth', loadChildren: () => import('./auth/auth.module').then((m) => m.AuthenticationModule) },
   {
     path: 'clientes',
     loadChildren: () => import('./clientes/clientes.module').then((m) => m.ClientesModule),
-    canActivate: [AuthGuard],
+    // canActivate: [AuthGuard],
   },
   {
     path: 'v',
