@@ -1,3 +1,32 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Iniciar sesión</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-form-field>
+      <input matInput placeholder="email" formControlName="email" type="email" #userName />
+    </mat-form-field>
+    <!-- <div *ngIf="emailField.errors && emailField.dirty">
+        <mat-error *ngIf="emailField.hasError('email')">Introduzca un mail válido</mat-error>
+        <mat-error *ngIf="emailField.hasError('required')">Este campo es obligatorio</mat-error>
+      </div> -->
+    <mat-form-field>
+      <input matInput placeholder="Contraseña" formControlName="password" type="text" />
+    </mat-form-field>
+    <!-- <div *ngIf="passwordField.errors && emailField.dirty">
+        <mat-error *ngIf="passwordField.hasError('required')">Este campo es obligatorio</mat-error>
+        <mat-error *ngIf="passwordField.hasError('minLength')"
+            >La constraseña debe tener mínimo 6 carácteres</mat-error
+          >
+      </div> -->
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button color="warn" (click)="authService.signIn(userName.value, userPassword.value)">
+      Entrar
+    </button>
+  </mat-card-actions>
+</mat-card>
+
 <div class="displayTable">
   <div class="displayTableCell">
     <div class="authBlock">
@@ -19,7 +48,7 @@
         />
       </div>
 
-     <!--  <div class="formGroup">
+      <!--  <div class="formGroup">
         <span class="or"><span class="orInner">Or</span></span>
       </div> -->
 

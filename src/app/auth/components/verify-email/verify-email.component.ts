@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { UserInterface } from '@core/models/user';
 import { AuthService } from '@core/services/auth.service';
 
 @Component({
@@ -7,7 +8,11 @@ import { AuthService } from '@core/services/auth.service';
   styleUrls: ['./verify-email.component.css'],
 })
 export class VerifyEmailComponent implements OnInit {
-  constructor(public authService: AuthService) {}
+  user: UserInterface;
+
+  constructor(public authService: AuthService) {
+    this.authService.user$.subscribe((data) => (this.user = data));
+  }
 
   ngOnInit(): void {}
 }

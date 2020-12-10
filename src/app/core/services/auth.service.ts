@@ -1,42 +1,20 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { Observable, from, of, BehaviorSubject } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { UserInterface } from '../models/user';
 import { Router } from '@angular/router';
-import { auth } from 'firebase';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   userData: UserInterface; // Guarda los datos de usuario registrado
-  public user$ = new BehaviorSubject<UserInterface>(null);
-  // public user$: Observable<UserInterface>;
+  public user$: Observable<UserInterface>;
 
-  constructor(
-    private afAuth: AngularFireAuth,
-    private afs: AngularFirestore,
-    private router: Router,
-    private ngZone: NgZone // NgZone service para eliminar la advertencia de alcance externo
-  ) {
-    /* Guarda datos de usuario en almacenamiento local cuando ha iniciado sesión
-    y lo configura como nulo al cerrar sesión */
-    this.afAuth.authState.subscribe((user) => {
-      if (user) {
-        this.userData = user;
-        localStorage.setItem('user', JSON.stringify(this.userData));
-        JSON.parse(localStorage.getItem('user'));
-      } else {
-        localStorage.setItem('user', null);
-        JSON.parse(localStorage.getItem('user'));
-      }
-    });
-
-    this.user$.next(this.userData);
-
-    /* this.user$ = this.afAuth.authState.pipe(
+  constructor(private afAuth: AngularFireAuth, private afs: AngularFirestore, private router: Router) {
+    this.user$ = this.afAuth.authState.pipe(
       switchMap((user) => {
         if (user) {
           return this.afs.doc<UserInterface>(`users/${user.uid}`).valueChanges();
@@ -44,18 +22,15 @@ export class AuthService {
           return of(null);
         }
       })
-    ); */
+    );
   }
 
   signIn(email: string, password: string) {
+    // comprueba que usuario y contraseña son correctos y permite acceder
     return this.afAuth.auth
       .signInWithEmailAndPassword(email, password)
-      .then((result) => {
-        this.ngZone.run(() => {
-          this.router.navigate(['clientes']);
-          console.log(this.isLoggedIn);
-        });
-        this.setUserData(result.user);
+      .then(() => {
+        this.router.navigate(['clientes']);
       })
       .catch((error) => {
         window.alert(error.message);
@@ -73,7 +48,7 @@ export class AuthService {
       .signInWithPopup(provider)
       .then((result) => {
         this.ngZone.run(() => {
-          this.router.navigate(['dashboard']);
+          this.router.navigate(['clientes']);
         });
         this.setUserData(result.user);
       })
@@ -96,7 +71,7 @@ export class AuthService {
 
   sendVerificationMail() {
     return this.afAuth.auth.currentUser.sendEmailVerification().then(() => {
-      this.router.navigate(['verify-email-address']);
+      this.router.navigate(['../auth/verify-email-address']);
     });
   }
 
@@ -123,6 +98,7 @@ export class AuthService {
       uid: user.uid,
       email: user.email,
       emailVerified: user.emailVerified,
+      role: 0,
     };
     return userRef.set(userData, {
       merge: true,
@@ -130,17 +106,7 @@ export class AuthService {
   }
 
   signOut() {
-    return this.afAuth.auth.signOut().then(() => {
-      localStorage.removeItem('user');
-      this.router.navigate(['sign-in']);
-    });
-  }
-
-  /* login(email, password): Observable<any> {
-    return from(this.afAuth.auth.signInWithEmailAndPassword(email, password));
-  }
-  logout() {
-    this.afAuth.auth.signOut();
+    return this.afAuth.auth.signOut();
   }
 
   isAuthenticated(): Observable<boolean> {
@@ -153,12 +119,31 @@ export class AuthService {
         }
       })
     );
-  } */
+  }
 
   canAddPlantas(user: UserInterface) {
     return user.role === 1 || user.role === 4;
   }
   userIsAdmin(user: UserInterface) {
     return user.role === 1 || user.role === 3 || user.role === 4 || user.role === 5;
+  }
+
+  comprobaciones() {
+    // recibe todos los usuarios
+    /* this.afs
+      .collection('users')
+      .valueChanges()
+      .subscribe((user) => console.log(user)); */
+
+    // recibe un usurio
+    // console.log(this.afs.doc(`users/${'FCeySm9ZBEeRXg7wRbIrTvwfFvE3'}`));
+
+
+    /* this.afs
+      .collection('users')
+      .doc('FCeySm9ZBEeRXg7wRbIrTvwfFvE3')
+      .delete()
+      .then((f) => console.log('Usuario eliminado con exito'))
+      .catch((error) => console.log(error)); */
   }
 }

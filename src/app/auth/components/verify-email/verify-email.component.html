@@ -3,10 +3,10 @@
     <div class="authBlock">
       <h3>Gracias por registrarte</h3>
 
-      <div class="formGroup" *ngIf="authService.userData as user">
+      <div class="formGroup" *ngIf="user">
         <p class="text-center">
-          Te hemos enviado un email de verificación a <strong>{{ user.email }}</strong
-          >.
+          Te hemos enviado un email de verificación a
+          <strong>{{ user.email }}</strong>
         </p>
         <p class="text-center">
           Por favor, revisa tu bandeja de entrada y haz click en el enlace para verificar tu dirección de correo.
@@ -23,7 +23,7 @@
     </div>
 
     <div class="redirectToLogin">
-      <span>¿Volver atrás?<span class="redirect" routerLink="/sign-in"> Iniciar sesión</span></span>
+      <span>¿Volver atrás?<span class="redirect" routerLink="../sign-in"> Iniciar sesión</span></span>
     </div>
   </div>
 </div>
