@@ -11,8 +11,8 @@ import { auth } from 'firebase';
   providedIn: 'root',
 })
 export class AuthService {
-  userData: any = new UserInterface(); // Guarda los datos de usuario registrado
-  public user$ = new BehaviorSubject<any>(this.userData);
+  userData: UserInterface; // Guarda los datos de usuario registrado
+  public user$ = new BehaviorSubject<UserInterface>(null);
   // public user$: Observable<UserInterface>;
 
   constructor(
@@ -34,6 +34,8 @@ export class AuthService {
       }
     });
 
+    this.user$.next(this.userData);
+
     /* this.user$ = this.afAuth.authState.pipe(
       switchMap((user) => {
         if (user) {
@@ -51,6 +53,7 @@ export class AuthService {
       .then((result) => {
         this.ngZone.run(() => {
           this.router.navigate(['clientes']);
+          console.log(this.isLoggedIn);
         });
         this.setUserData(result.user);
       })
@@ -111,7 +114,7 @@ export class AuthService {
   // devuelve true si el usuario esta logeado y su email verificado
   get isLoggedIn(): boolean {
     const user = JSON.parse(localStorage.getItem('user'));
-    return user !== null && user.emailVerified !== false ? true : false;
+    return user !== null /* && user.emailVerified !== false */ ? true : false;
   }
 
   setUserData(user: UserInterface) {
