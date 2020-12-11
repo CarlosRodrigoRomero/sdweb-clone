@@ -1,45 +1,107 @@
-<div class="displayTable">
-    <div class="displayTableCell">
-  
-      <div class="authBlock">
-        <h3>Crear cuenta</h3>
-  
-        <div class="formGroup">
-          <input type="email" class="formControl" placeholder="Email" #userEmail required>
+<form [formGroup]="form">
+  <mat-card class="sign-up-card">
+    <mat-card-header>
+      <mat-card-title>Crear cuenta</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div>
+        <mat-form-field>
+          <input matInput placeholder="email" formControlName="email" type="email" #userName />
+        </mat-form-field>
+        <div *ngIf="emailField.errors && emailField.dirty">
+          <mat-error *ngIf="emailField.hasError('email')">Introduzca un mail válido</mat-error>
+          <mat-error *ngIf="emailField.hasError('required')">Este campo es obligatorio</mat-error>
         </div>
-  
-        <div class="formGroup">
-          <input type="password" class="formControl" placeholder="Contraseña" #userPwd required>
+      </div>
+      <div>
+        <mat-form-field>
+          <input
+            matInput
+            [type]="hide ? 'password' : 'text'"
+            placeholder="Contraseña"
+            formControlName="password"
+            #userPassword
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="hide = !hide"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hide"
+          >
+            <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+        <div *ngIf="passwordField.errors && passwordField.dirty">
+          <mat-error *ngIf="passwordField.hasError('required')">Este campo es obligatorio</mat-error>
+          <mat-error *ngIf="passwordField.hasError('minlength')"
+            >La constraseña debe tener mínimo 6 carácteres</mat-error
+          >
         </div>
-  
-        <div class="formGroup">
-          <input type="button" class="btn btnPrimary" value="Crear cuenta" (click)="authService.signUp(userEmail.value, userPwd.value)">
+      </div>
+      <div>
+        <mat-form-field>
+          <input
+            matInput
+            [type]="hide ? 'password' : 'text'"
+            placeholder="Confirma tu contraseña"
+            formControlName="confirm_password"
+            #userPassword
+          />
+          <!-- <button
+            mat-icon-button
+            matSuffix
+            (click)="hide = !hide"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hide"
+          >
+            <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button> -->
+        </mat-form-field>
+        <div *ngIf="passwordField.errors && passwordField.dirty">
+          <mat-error *ngIf="confirmPasswordField.hasError('required')">Este campo es obligatorio</mat-error>
+          <mat-error *ngIf="form.errors['notEquivalent']">Las contraseñas no coinciden</mat-error>
         </div>
-  <!-- 
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button
+        mat-raised-button
+        color="warn"
+        [disabled]="form.invalid"
+        (click)="authService.signUp(userName.value, userPassword.value)"
+      >
+        Crear cuenta
+      </button>
+    </mat-card-actions>
+    <mat-card-footer>
+      <div class="redirectToLogin">
+        <span
+          >Ya tengo una cuenta.
+          <a mat-button color="primary" class="redirect" routerLink="../sign-in">Iniciar sesión</a></span
+        >
+      </div>
+    </mat-card-footer>
+  </mat-card>
+</form>
+
+<!-- 
         <div class="formGroup">
           <span class="or"><span class="orInner">Or</span></span>
         </div> -->
-  
-        <!-- Continue with Google -->
-        <!-- <div class="formGroup">
+
+<!-- Continue with Google -->
+<!-- <div class="formGroup">
           <button type="button" class="btn googleBtn" (click)="authService.GoogleAuth()">
             <i class="fab fa-google-plus-g"></i>
             Entrar con Google
           </button>
         </div> -->
-  
-        <!-- Continue with Facebook -->
-        <!-- <div class="formGroup">
+
+<!-- Continue with Facebook -->
+<!-- <div class="formGroup">
           <button type="button" class="btn facebookBtn" (click)="authService.FacebookAuth()">
             <i class="fab fa-facebook"></i>
             Continue with Facebook
           </button>
         </div> -->
-      </div>
-  
-      <div class="redirectToLogin">
-        <span>Ya tengo una cuenta<span class="redirect" routerLink="../sign-in">Iniciar sesión</span></span>
-      </div>
-    </div>
-  
-  </div>

@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
-import { MaterialModule } from '@material/material.module';
+import { SharedModule } from '@shared/shared.module';
 
 import { AuthenticationRoutingModule } from './auth-routing.module';
 import { SignInComponent } from './components/sign-in/sign-in.component';
@@ -12,6 +12,6 @@ import { VerifyEmailComponent } from './components/verify-email/verify-email.com
 
 @NgModule({
   declarations: [SignInComponent, SignUpComponent, ForgotPasswordComponent, VerifyEmailComponent],
-  imports: [CommonModule, AuthenticationRoutingModule, RouterModule, MaterialModule],
+  imports: [CommonModule, AuthenticationRoutingModule, RouterModule, SharedModule],
 })
 export class AuthenticationModule {}
