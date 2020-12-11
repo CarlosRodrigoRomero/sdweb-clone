@@ -1,65 +1,59 @@
-<form [formGroup]="form" class="sign-in-form">
-  <mat-card class="sign-in-card">
-    <mat-card-header>
-      <mat-card-title>Iniciar sesión</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div>
-        <mat-form-field>
-          <input matInput placeholder="email" formControlName="email" type="email" #userName />
-        </mat-form-field>
-        <div *ngIf="emailField.errors && emailField.dirty">
-          <mat-error *ngIf="emailField.hasError('email')">Introduzca un mail válido</mat-error>
-          <mat-error *ngIf="emailField.hasError('required')">Este campo es obligatorio</mat-error>
-        </div>
-      </div>
-      <div>
-        <mat-form-field>
-          <input
-            matInput
-            [type]="hide ? 'password' : 'text'"
-            placeholder="Contraseña"
-            formControlName="password"
-            #userPassword
-          />
+<div class="logo">
+  <img src="../../../assets/images/logo_sd.png" height="60" class="d-inline-block align-top" alt="" />
+</div>
+
+<div class="container" style="background: grey">
+  <div class="row justify-content-center">
+    <form [formGroup]="form" class="sign-in-form">
+      <mat-card class="sign-in-card">
+        <mat-card-header>
+          <mat-card-title>Iniciar sesión</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div>
+            <mat-form-field appearance="outline">
+              <mat-label>Correo electrónico</mat-label>
+              <input matInput placeholder="Correo electrónico" formControlName="email" type="email" #userName />
+            </mat-form-field>
+          </div>
+          <div>
+            <mat-form-field appearance="outline">
+              <mat-label>Contraseña</mat-label>
+              <input
+                matInput
+                [type]="hide ? 'password' : 'text'"
+                placeholder="Contraseña"
+                formControlName="password"
+                #userPassword
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                (click)="hide = !hide"
+                [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hide"
+              >
+                <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
           <button
-            mat-icon-button
-            matSuffix
-            (click)="hide = !hide"
-            [attr.aria-label]="'Hide password'"
-            [attr.aria-pressed]="hide"
+            mat-raised-button
+            color="warn"
+            [disabled]="form.invalid"
+            (click)="authService.signIn(userName.value, userPassword.value)"
           >
-            <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+            Entrar
           </button>
-        </mat-form-field>
-        <div *ngIf="passwordField.errors && passwordField.dirty">
-          <mat-error *ngIf="passwordField.hasError('required')">Este campo es obligatorio</mat-error>
-          <mat-error *ngIf="passwordField.hasError('minlength')"
-            >La constraseña debe tener mínimo 6 carácteres</mat-error
-          >
-        </div>
-      </div>
-    </mat-card-content>
-    <mat-card-actions>
-      <button
-        mat-raised-button
-        color="warn"
-        [disabled]="form.invalid"
-        (click)="authService.signIn(userName.value, userPassword.value)"
-      >
-        Entrar
-      </button>
-    </mat-card-actions>
-    <mat-card-footer>
-      <div class="forgotPassword">
-        <a mat-button color="primary" routerLink="../forgot-password">¿Has olvidado la contraseña?</a>
-      </div>
-      <div class="redirectToLogin">
-        <span
-          >¿No tienes cuenta?
-          <a mat-button color="primary" class="redirect" routerLink="../register-user">Crea una</a></span
-        >
-      </div>
-    </mat-card-footer>
-  </mat-card>
-</form>
+        </mat-card-actions>
+        <mat-card-footer>
+          <div class="forgotPassword">
+            <a mat-button color="primary" routerLink="../forgot-password">¿Has olvidado la contraseña?</a>
+          </div>
+        </mat-card-footer>
+      </mat-card>
+    </form>
+  </div>
+</div>

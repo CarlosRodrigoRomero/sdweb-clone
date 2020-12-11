@@ -1,4 +1,22 @@
-.sign-in-form {
+mat-card-title {
+  font-size: 20;
+}
+
+button {
+  width: 100%;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.forgotPassword {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.logo{
   display: flex;
   justify-content: center;
+  margin-top: 15px;
 }

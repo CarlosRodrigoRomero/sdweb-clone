@@ -79,7 +79,7 @@ export class AuthService {
     return this.afAuth.auth
       .sendPasswordResetEmail(passwordResetEmail)
       .then(() => {
-        window.alert('Password reset email sent, check your inbox.');
+        window.alert('Hemos enviado un email para restablecer su contraseña. Revise su correo.');
       })
       .catch((error) => {
         window.alert(error);
@@ -130,10 +130,10 @@ export class AuthService {
 
   comprobaciones() {
     // recibe todos los usuarios
-    /* this.afs
+    this.afs
       .collection('users')
       .valueChanges()
-      .subscribe((user) => console.log(user)); */
+      .subscribe((user) => console.log(user));
 
     // recibe un usurio
     // console.log(this.afs.doc(`users/${'FCeySm9ZBEeRXg7wRbIrTvwfFvE3'}`));
