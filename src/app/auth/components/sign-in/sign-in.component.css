@@ -2,12 +2,12 @@ mat-card-title {
   font-size: 20;
 }
 
-button {
+mat-form-field {
   width: 100%;
 }
 
-mat-form-field {
-  width: 100%;
+button {
+  width: 10em;
 }
 
 .forgotPassword {
