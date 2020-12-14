@@ -1,22 +1,65 @@
-mat-card-title {
-  font-size: 20;
+.signin {
+  display: flex;
+  align-items: center;
 }
 
-mat-form-field {
+.form-signin {
+  width: 100%;
+  max-width: 330px;
+  padding: 15px;
+  margin: auto;
+  margin-top: 60px;
+}
+
+.logo {
+  margin-top: 15px;
+  margin-bottom: 15px;
   width: 100%;
 }
 
+@media (max-width: 250px) {
+  .logo {
+    display: none;
+  }
+}
+
+.titulo {
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+.form-signin .checkbox {
+  /*  */
+  font-weight: 400;
+}
+.form-signin .form-control {
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+
+.form-signin input[type='email'] {
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+.form-signin input[type='password'] {
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+
 button {
-  width: 10em;
+  width: 50%;
+  margin-top: 15px;
+  border-radius: 10px;
 }
 
 .forgotPassword {
   text-align: center;
-  margin-bottom: 10px;
-}
-
-.logo{
-  display: flex;
-  justify-content: center;
-  margin-top: 15px;
+  margin-top: 25px;
 }

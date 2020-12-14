@@ -14,10 +14,11 @@ export const routes: Routes = [
   { path: 'aviso-legal', component: AvisoLegalComponent },
   // { path: 'login', component: LoginComponent },
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then((m) => m.AuthenticationModule) },
+  { path: 'admin', loadChildren: () => import('./admin/admin.module').then((m) => m.AdminModule) },
   {
     path: 'clientes',
     loadChildren: () => import('./clientes/clientes.module').then((m) => m.ClientesModule),
-    // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
   },
   {
     path: 'v',

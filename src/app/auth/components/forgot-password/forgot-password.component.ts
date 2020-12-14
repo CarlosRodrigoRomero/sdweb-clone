@@ -22,8 +22,4 @@ export class ForgotPasswordComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
     });
   }
-
-  get emailField(): any {
-    return this.form.get('email');
-  }
 }

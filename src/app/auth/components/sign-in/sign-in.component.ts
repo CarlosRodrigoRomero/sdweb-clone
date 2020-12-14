@@ -9,7 +9,6 @@ import { AuthService } from '@core/services/auth.service';
 })
 export class SignInComponent implements OnInit {
   form: FormGroup;
-  hide = true;
 
   constructor(public authService: AuthService, private formBuilder: FormBuilder) {
     this.buildForm();
@@ -22,13 +21,5 @@ export class SignInComponent implements OnInit {
       email: ['', [Validators.required]],
       password: ['', [Validators.required]],
     });
-  }
-
-  get emailField(): any {
-    return this.form.get('email');
-  }
-
-  get passwordField(): any {
-    return this.form.get('password');
   }
 }

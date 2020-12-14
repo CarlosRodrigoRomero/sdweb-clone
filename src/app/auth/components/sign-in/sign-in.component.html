@@ -1,59 +1,38 @@
-<div class="logo">
-  <img src="../../../assets/images/logo_sd.png" height="60" class="d-inline-block align-top" alt="" />
-</div>
-
-<div class="container pt-4 pb-4">
-  <div class="row justify-content-center">
-    <form [formGroup]="form" class="sign-in-form">
-      <mat-card style="width: 30em;">
-        <mat-card-header>
-          <mat-card-title class="pt-2 pb-4" style="font-size: 2em">Iniciar sesión</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div>
-            <mat-form-field appearance="outline">
-              <mat-label>Correo electrónico</mat-label>
-              <input matInput placeholder="Correo electrónico" formControlName="email" type="email" #userName />
-            </mat-form-field>
-          </div>
-          <div>
-            <mat-form-field appearance="outline">
-              <mat-label>Contraseña</mat-label>
-              <input
-                matInput
-                [type]="hide ? 'password' : 'text'"
-                placeholder="Contraseña"
-                formControlName="password"
-                #userPassword
-              />
-              <button
-                mat-icon-button
-                matSuffix
-                (click)="hide = !hide"
-                [attr.aria-label]="'Hide password'"
-                [attr.aria-pressed]="hide"
-              >
-                <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
-              </button>
-            </mat-form-field>
-          </div>
-        </mat-card-content>
-        <mat-card-actions align="center">
-          <button
-            mat-raised-button
-            color="warn"
-            [disabled]="form.invalid"
-            (click)="authService.signIn(userName.value, userPassword.value)"
-          >
-            Entrar
-          </button>
-        </mat-card-actions>
-        <mat-card-footer>
-          <div class="forgotPassword">
-            <a mat-button routerLink="../forgot-password">¿Has olvidado la contraseña?</a>
-          </div>
-        </mat-card-footer>
-      </mat-card>
+<div class="signin">
+  <div class="form-signin">
+    <img class="logo" src="../../../assets/images/logo_sd.png" alt="" />
+    <form [formGroup]="form" align="center">
+      <h1 class="titulo fw-normal">Iniciar sesión</h1>
+      <input
+        type="email"
+        id="inputEmail"
+        formControlName="email"
+        class="form-control"
+        placeholder="Correo electrónico"
+        #userName
+        required
+        autofocus
+      />
+      <input
+        type="password"
+        id="inputPassword"
+        formControlName="password"
+        class="form-control"
+        placeholder="Constraseña"
+        #userPassword
+        required
+      />
+      <button
+        class="btn btn-lg btn-danger"
+        type="submit"
+        [disabled]="form.invalid"
+        (click)="authService.signIn(userName.value, userPassword.value)"
+      >
+        Entrar
+      </button>
+      <div class="forgotPassword">
+        <a routerLink="../forgot-password">¿Has olvidado la contraseña?</a>
+      </div>
     </form>
   </div>
 </div>

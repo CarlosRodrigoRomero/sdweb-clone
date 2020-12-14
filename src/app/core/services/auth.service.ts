@@ -130,14 +130,15 @@ export class AuthService {
 
   comprobaciones() {
     // recibe todos los usuarios
-    this.afs
+    /* this.afs
       .collection('users')
       .valueChanges()
-      .subscribe((user) => console.log(user));
+      .subscribe((user) => console.log(user)); */
 
     // recibe un usurio
     // console.log(this.afs.doc(`users/${'FCeySm9ZBEeRXg7wRbIrTvwfFvE3'}`));
 
+    this.router.navigate(['admin']);
 
     /* this.afs
       .collection('users')
