@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+
 import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFirestore } from '@angular/fire/firestore';
+
 import { Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
+
 import { UserInterface } from '../models/user';
-import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -37,45 +40,7 @@ export class AuthService {
       });
   }
 
-  /* // Sign in with Google
-  GoogleAuth() {
-    return this.AuthLogin(new auth.GoogleAuthProvider());
-  }
-
-  // Auth logic to run auth providers
-  AuthLogin(provider) {
-    return this.afAuth.auth
-      .signInWithPopup(provider)
-      .then((result) => {
-        this.ngZone.run(() => {
-          this.router.navigate(['clientes']);
-        });
-        this.setUserData(result.user);
-      })
-      .catch((error) => {
-        window.alert(error);
-      });
-  } */
-
-  signUp(email: string, password: string) {
-    return this.afAuth.auth
-      .createUserWithEmailAndPassword(email, password)
-      .then((result) => {
-        this.sendVerificationMail();
-        this.setUserData(result.user);
-      })
-      .catch((error) => {
-        window.alert(error.message);
-      });
-  }
-
-  sendVerificationMail() {
-    return this.afAuth.auth.currentUser.sendEmailVerification().then(() => {
-      this.router.navigate(['../auth/verify-email-address']);
-    });
-  }
-
-  ForgotPassword(passwordResetEmail) {
+  forgotPassword(passwordResetEmail) {
     return this.afAuth.auth
       .sendPasswordResetEmail(passwordResetEmail)
       .then(() => {
@@ -84,25 +49,6 @@ export class AuthService {
       .catch((error) => {
         window.alert(error);
       });
-  }
-
-  // devuelve true si el usuario esta logeado y su email verificado
-  get isLoggedIn(): boolean {
-    const user = JSON.parse(localStorage.getItem('user'));
-    return user !== null /* && user.emailVerified !== false */ ? true : false;
-  }
-
-  setUserData(user: UserInterface) {
-    const userRef: AngularFirestoreDocument<any> = this.afs.doc(`users/${user.uid}`);
-    const userData: UserInterface = {
-      uid: user.uid,
-      email: user.email,
-      emailVerified: user.emailVerified,
-      role: 0,
-    };
-    return userRef.set(userData, {
-      merge: true,
-    });
   }
 
   signOut() {
@@ -126,25 +72,5 @@ export class AuthService {
   }
   userIsAdmin(user: UserInterface) {
     return user.role === 1 || user.role === 3 || user.role === 4 || user.role === 5;
-  }
-
-  comprobaciones() {
-    // recibe todos los usuarios
-    /* this.afs
-      .collection('users')
-      .valueChanges()
-      .subscribe((user) => console.log(user)); */
-
-    // recibe un usurio
-    // console.log(this.afs.doc(`users/${'FCeySm9ZBEeRXg7wRbIrTvwfFvE3'}`));
-
-    this.router.navigate(['admin']);
-
-    /* this.afs
-      .collection('users')
-      .doc('FCeySm9ZBEeRXg7wRbIrTvwfFvE3')
-      .delete()
-      .then((f) => console.log('Usuario eliminado con exito'))
-      .catch((error) => console.log(error)); */
   }
 }

@@ -14,7 +14,10 @@ export class NavbarComponent implements OnInit {
     //   password: ['', Validators.required],
     // });
     // this.authService.isAuthenticated().subscribe((success) => (this.userLogged = success));
-    this.userLogged = this.authService.isLoggedIn;
+
+    this.authService.isAuthenticated().subscribe((isAuth) => (this.userLogged = isAuth));
+
+    // this.userLogged = this.authService.isLoggedIn;
   }
 
   ngOnInit() {}

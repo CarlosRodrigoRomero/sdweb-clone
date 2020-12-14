@@ -10,11 +10,23 @@ import { take, map, tap } from 'rxjs/operators';
 export class AuthGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router) {}
 
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean {
+    this.authService.isAuthenticated().subscribe((b) => {
+      if (b !== true) {
+        this.router.navigate(['auth/sign-in']);
+      }
+    });
+    return true;
+  }
+
   /* canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    return this.auth.user$.pipe(
+    return this.authService.user$.pipe(
       take(1),
       map((user) => !!user),
       tap((loggedIn) => {
@@ -25,14 +37,4 @@ export class AuthGuard implements CanActivate {
       })
     );
   } */
-
-  canActivate(
-    next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<boolean> | Promise<boolean> | boolean {
-    if (this.authService.isLoggedIn !== true) {
-      this.router.navigate(['sign-in']);
-    }
-    return true;
-  }
 }
