@@ -29,26 +29,11 @@ export class AuthService {
   }
 
   signIn(email: string, password: string) {
-    // comprueba que usuario y contraseña son correctos y permite acceder
-    return this.afAuth.auth
-      .signInWithEmailAndPassword(email, password)
-      .then(() => {
-        this.router.navigate(['clientes']);
-      })
-      .catch((error) => {
-        window.alert(error.message);
-      });
+    return this.afAuth.auth.signInWithEmailAndPassword(email, password);
   }
 
-  forgotPassword(passwordResetEmail) {
-    return this.afAuth.auth
-      .sendPasswordResetEmail(passwordResetEmail)
-      .then(() => {
-        window.alert('Hemos enviado un email para restablecer su contraseña. Revise su correo.');
-      })
-      .catch((error) => {
-        window.alert(error);
-      });
+  forgotPassword(passwordResetEmail: string) {
+    return this.afAuth.auth.sendPasswordResetEmail(passwordResetEmail);
   }
 
   signOut() {

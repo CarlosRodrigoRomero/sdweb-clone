@@ -10,6 +10,8 @@ import { AuthService } from '@core/services/auth.service';
 })
 export class ForgotPasswordComponent implements OnInit {
   form: FormGroup;
+  warningHide = true;
+  successHide = true;
 
   constructor(public authService: AuthService, private formBuilder: FormBuilder) {
     this.buildForm();
@@ -21,5 +23,19 @@ export class ForgotPasswordComponent implements OnInit {
     this.form = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
     });
+  }
+
+  forgotPassword(passwordResetEmail: string) {
+    this.authService
+      .forgotPassword(passwordResetEmail)
+      .then(() => {
+        this.warningHide = true;
+        this.successHide = false;
+      })
+      .catch((error) => {
+        this.successHide = true;
+        this.warningHide = false;
+        console.log(error);
+      });
   }
 }

@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+
 import { AuthService } from '@core/services/auth.service';
 
 @Component({
@@ -9,8 +11,9 @@ import { AuthService } from '@core/services/auth.service';
 })
 export class SignInComponent implements OnInit {
   form: FormGroup;
+  hide = true;
 
-  constructor(public authService: AuthService, private formBuilder: FormBuilder) {
+  constructor(public authService: AuthService, private formBuilder: FormBuilder, private router: Router) {
     this.buildForm();
   }
 
@@ -21,5 +24,17 @@ export class SignInComponent implements OnInit {
       email: ['', [Validators.required]],
       password: ['', [Validators.required]],
     });
+  }
+
+  signIn(email: string, password: string) {
+    this.authService
+      .signIn(email, password)
+      .then(() => {
+        this.router.navigate(['clientes']);
+      })
+      .catch((error) => {
+        console.log(error);
+        this.hide = false;
+      });
   }
 }

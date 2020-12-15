@@ -9,7 +9,7 @@
         formControlName="email"
         class="form-control"
         placeholder="Correo electrónico"
-        #userName
+        #email
         required
         autofocus
       />
@@ -22,11 +22,12 @@
         #userPassword
         required
       />
+      <div *ngIf="!hide" class="alert alert-danger">ID o contraseña incorrectos</div>
       <button
         class="btn btn-lg btn-danger"
         type="submit"
         [disabled]="form.invalid"
-        (click)="authService.signIn(userName.value, userPassword.value)"
+        (click)="signIn(email.value, userPassword.value)"
       >
         Entrar
       </button>

@@ -53,6 +53,10 @@
   border-radius: 10px;
 }
 
+.alert {
+  border-radius: 10px;
+}
+
 button {
   width: 50%;
   margin-top: 15px;
