@@ -1,22 +1,25 @@
+<h2>Listado de usuarios</h2>
+<button>Añadir usuario</button>
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
   <div class="table-responsive">
     <table class="table table-striped table-sm">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>email</th>
           <th>Empresa</th>
-          <th>Role</th>
-          <th>Plantas</th>
+          <th>email</th>
+          <th>ID</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let user of users">
-          <td>{{ user.uid }}</td>
-          <td>{{ user.email }}</td>
           <td>{{ user.empresaNombre }}</td>
-          <td>{{ user.role }}</td>
-          <td>plantas</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.uid }}</td>
+          <td>
+            <button [routerLink]="['../edit', user.uid]">Editar</button>
+            <button>Eliminar</button>
+          </td>
         </tr>
       </tbody>
     </table>
