@@ -1,16 +1,17 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { LayoutModule } from '@angular/cdk/layout';
 
 import { SharedModule } from '@shared/shared.module';
 
 import { AdminRoutingModule } from './admin-routing.module';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { AllUsersComponent } from './components/all-users/all-users.component';
 import { EditUserComponent } from './components/edit-user/edit-user.component';
+import { SideBarComponent } from './components/side-bar/side-bar.component';
+import { UsersComponent } from './components/users/users.component';
 
 @NgModule({
-  declarations: [DashboardComponent, AllUsersComponent, EditUserComponent],
-  imports: [CommonModule, RouterModule, AdminRoutingModule, SharedModule],
+  declarations: [EditUserComponent, SideBarComponent, UsersComponent],
+  imports: [CommonModule, RouterModule, AdminRoutingModule, SharedModule, LayoutModule],
 })
 export class AdminModule {}

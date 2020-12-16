@@ -49,4 +49,12 @@ export class EditUserComponent implements OnInit {
       role: ['', Validators.required],
     });
   }
+
+  updateUser(event: Event) {
+    event.preventDefault();
+    if (this.form.valid) {
+      const user = this.form.value;
+      console.log(user);
+    }
+  }
 }

@@ -1,18 +1,18 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { AllUsersComponent } from './components/all-users/all-users.component';
+import { UsersComponent } from './components/users/users.component';
 import { EditUserComponent } from './components/edit-user/edit-user.component';
+import { SideBarComponent } from './components/side-bar/side-bar.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: DashboardComponent,
+    component: SideBarComponent,
     children: [
       {
         path: 'users',
-        component: AllUsersComponent,
+        component: UsersComponent,
       },
       {
         path: 'edit/:id',
