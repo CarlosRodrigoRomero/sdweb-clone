@@ -1,7 +1,7 @@
 <div class="container">
   <h2>Editar usuario</h2>
   <form [formGroup]="form">
-    <div>
+    <!-- <div>
       <label for="username" class="form-label">Nombre de usuario</label>
       <div class="input-group">
         <span class="input-group-text">@</span>
@@ -15,30 +15,42 @@
         />
         <div class="invalid-feedback">Campo obligatorio</div>
       </div>
-    </div>
+    </div> -->
     <div>
       <label for="email" class="form-label">Correo electrónico</label>
-      <input type="email" formControlName="email" class="form-control" id="email" placeholder="mail@mail.com" />
-      <div class="invalid-feedback">Campo obligatorio</div>
+      <input
+        type="email"
+        formControlName="email"
+        class="form-control"
+        placeholder="mail@mail.com"
+        ngModel="{{ user.email }}"
+      />
+      <!-- <div class="invalid-feedback">Campo obligatorio</div> -->
     </div>
+    <div *ngIf="!emailVerified" class="alert alert-warning">Correo electrónico no verificado</div>
+    <div *ngIf="emailVerified" class="alert alert-primary">Correo electrónico verificado</div>
     <div>
       <label for="empresa" class="form-label">Empresa</label>
-      <input type="text" formControlName="empresa" class="form-control" id="empresa" placeholder="Empresa" required />
+      <input
+        type="text"
+        formControlName="empresa"
+        class="form-control"
+        placeholder="Empresa"
+        ngModel="{{ user.empresaNombre }}"
+        required
+      />
       <div class="invalid-feedback">Campo obligatorio</div>
     </div>
     <div>
       <label for="role" class="form-label">Tipo de usuario</label>
       <select class="form-select" formControlName="role" id="role" required>
-        <option value="">...</option>
-        <option>Usuario</option>
+        <option value="">Usuario</option>
         <option>Administrador</option>
         <option>Externo</option>
         <option>Procesamiento</option>
       </select>
       <div class="invalid-feedback">Elija un tipo de usuario</div>
     </div>
-    <div *ngIf="!emailVerified" class="alert alert-warning">Correo electrónico no verificado</div>
-    <div *ngIf="emailVerified" class="alert alert-primary">Correo electrónico verificado</div>
   </form>
 </div>
 

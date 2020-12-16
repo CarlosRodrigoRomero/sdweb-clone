@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreDocument, docChanges } from '@angular/fire/firestore';
 
 import { UserInterface } from '@core/models/user';
 import { Observable } from 'rxjs';
@@ -36,6 +36,10 @@ export class AdminService {
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  getUser(id: string): any {
+    return this.firestore.doc<UserInterface>(`users/${id}`);
   }
 
   getAllUsers(): Observable<UserInterface[]> {

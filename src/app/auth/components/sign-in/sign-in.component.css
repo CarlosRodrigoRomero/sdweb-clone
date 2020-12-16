@@ -46,21 +46,21 @@
 
 .form-signin input[type='email'] {
   margin-bottom: 10px;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 .form-signin input[type='password'] {
   margin-bottom: 10px;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .alert {
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 button {
   width: 50%;
   margin-top: 15px;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .forgotPassword {
