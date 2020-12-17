@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 
 import { AdminService } from '@core/services/admin.service';
 
@@ -19,7 +19,6 @@ export class EditUserComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private router: Router,
     private activatedRoute: ActivatedRoute,
     private adminService: AdminService
   ) {
@@ -34,12 +33,10 @@ export class EditUserComponent implements OnInit {
       users.filter((user) => {
         if (user.uid === this.id) {
           this.user = user;
-          console.log(this.user);
+          this.form.patchValue({ email: user.email, empresa: user.empresaNombre });
         }
       });
     });
-
-    // this.form.patchValue(this.user);
   }
 
   private buildForm() {
@@ -50,11 +47,12 @@ export class EditUserComponent implements OnInit {
     });
   }
 
-  updateUser(event: Event) {
+  onSubmit(event: Event) {
     event.preventDefault();
     if (this.form.valid) {
       const user = this.form.value;
       console.log(user);
+      console.log(this.user);
     }
   }
 }
