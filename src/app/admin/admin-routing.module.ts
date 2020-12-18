@@ -4,6 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { UsersComponent } from './components/users/users.component';
 import { EditUserComponent } from './components/edit-user/edit-user.component';
 import { SideBarComponent } from './components/side-bar/side-bar.component';
+import { CreateUserComponent } from './components/create-user/create-user.component';
 
 const routes: Routes = [
   {
@@ -17,6 +18,10 @@ const routes: Routes = [
       {
         path: 'users/edit/:id',
         component: EditUserComponent,
+      },
+      {
+        path: 'users/create',
+        component: CreateUserComponent,
       },
     ],
   },

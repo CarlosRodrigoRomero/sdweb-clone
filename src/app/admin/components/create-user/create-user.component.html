@@ -1,4 +1,4 @@
-<div class="edit-user">
+<div class="create-user">
   <h2>Editar usuario</h2>
 
   <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
@@ -22,7 +22,7 @@
 
         <mat-form-field appearance="fill">
           <mat-label>Tipo de usuario</mat-label>
-          <mat-select formControlName="role" ngModel="{{ user.role }}">
+          <mat-select formControlName="role">
             <mat-option value="0">Usuario</mat-option>
             <mat-option value="1">Administrador</mat-option>
             <mat-option value="2">Externo</mat-option>
@@ -32,11 +32,11 @@
 
         <!-- Selector de plantas -->
 
-        <app-plantas-table [user]="user" (newPlantasUser)="user.plantas = $event"></app-plantas-table>
+        <app-plantas-table (newPlantasUser)="user.plantas = $event"></app-plantas-table>
       </mat-card-content>
       <mat-card-actions>
         <button mat-raised-button routerLink="../../">Cancelar</button>
-        <button mat-raised-button type="submit">Actualizar</button>
+        <button mat-raised-button type="submit">Crear</button>
       </mat-card-actions>
     </mat-card>
   </form>

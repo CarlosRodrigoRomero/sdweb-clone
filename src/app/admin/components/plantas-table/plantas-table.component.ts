@@ -9,6 +9,7 @@ import { PlantaService } from '@core/services/planta.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { UserInterface } from '@core/models/user';
+import { StringifyOptions } from 'querystring';
 
 @Component({
   selector: 'app-plantas-table',
@@ -21,7 +22,8 @@ export class PlantasTableComponent implements OnInit, AfterViewInit {
   dataSource = new MatTableDataSource<any>();
 
   selection = new SelectionModel<any[]>(true, []);
-  plantasUser: string[] = [];
+  plantasUserId: string[] = [];
+  plantasUserName: string[] = [];
 
   @Input() user: UserInterface;
   @Output() newPlantasUser = new EventEmitter<string[]>();
@@ -49,15 +51,20 @@ export class PlantasTableComponent implements OnInit, AfterViewInit {
       });
       this.dataSource.data = plantasTable;
 
-      // Marca como seleccionadas las plantas del usuario
-      this.dataSource.data.forEach((row) => {
-        this.user.plantas.forEach((planta) => {
-          if (row['id'] === planta) {
-            this.selection.select(row);
-            this.plantasUser.push(row['id']);
-          }
+      if (this.user !== undefined) {
+        // Marca como seleccionadas las plantas del usuario
+        this.dataSource.data.forEach((row) => {
+          this.user.plantas.forEach((planta) => {
+            if (row.id === planta) {
+              this.selection.select(row);
+              this.plantasUserId.push(row.id);
+            }
+          });
         });
-      });
+
+        // Inicializada los chips con las plantas del usuario
+        this.plantasUsuario();
+      }
     });
   }
 
@@ -84,13 +91,15 @@ export class PlantasTableComponent implements OnInit, AfterViewInit {
   }
 
   plantasUsuario() {
-    this.plantasUser = [];
+    this.plantasUserId = [];
+    this.plantasUserName = [];
     this.dataSource.data.forEach((row) => {
       if (this.selection.isSelected(row)) {
-        this.plantasUser.push(row['id']);
+        this.plantasUserId.push(row.id);
+        this.plantasUserName.push(row.name);
       }
     });
-    console.log(this.plantasUser);
-    this.newPlantasUser.emit(this.plantasUser);
+    console.log(this.plantasUserId);
+    this.newPlantasUser.emit(this.plantasUserId);
   }
 }

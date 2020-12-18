@@ -14,22 +14,11 @@ export class AdminService {
   constructor(private afAuth: AngularFireAuth, private firestore: AngularFirestore, private router: Router) {}
 
   createUser(user: UserInterface) {
-    this.firestore
-      .collection('users')
-      .add(user)
-      .then(() => {
-        console.log('Usuario creado correctamente');
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    return this.firestore.collection('users').add(user);
   }
 
   updateUser(user: UserInterface) {
-    return this.firestore
-      .collection('users')
-      .doc(user.uid)
-      .update(user);
+    return this.firestore.collection('users').doc(user.uid).update(user);
   }
 
   getUser(id: string): any {
