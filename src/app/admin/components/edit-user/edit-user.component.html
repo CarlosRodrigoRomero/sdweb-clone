@@ -31,7 +31,10 @@
 
       <!-- Selector de plantas -->
 
-      <app-plantas-table [user]="user" (newPlantasUser)="user.plantas = $event"></app-plantas-table>
+      <app-plantas-table
+        [user]="user"
+        (newPlantasUser)="user.plantas = $event"
+      ></app-plantas-table>
     </mat-card-content>
     <mat-card-actions>
       <button mat-raised-button routerLink="../../">Cancelar</button>

@@ -15,13 +15,13 @@ import { UserInterface } from '@core/models/user';
   templateUrl: './plantas-table.component.html',
   styleUrls: ['./plantas-table.component.css'],
 })
-export class PlantasTableComponent implements OnInit, AfterViewInit, OnChanges {
+export class PlantasTableComponent implements OnInit, AfterViewInit {
   plantas: PlantaInterface[];
   displayedColumns: string[] = ['select', 'name', 'power', 'type', 'id'];
   dataSource = new MatTableDataSource<any>();
 
   selection = new SelectionModel<any[]>(true, []);
-  plantasUser: string[];
+  plantasUser: string[] = [];
 
   @Input() user: UserInterface;
   @Output() newPlantasUser = new EventEmitter<string[]>();
@@ -71,7 +71,7 @@ export class PlantasTableComponent implements OnInit, AfterViewInit, OnChanges {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  /** Whether the number of selected elements matches the total number of rows. */
+  // Si el número de elementos seleccionados coincide con el número total de filas
   isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.length;

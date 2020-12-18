@@ -26,16 +26,10 @@ export class AdminService {
   }
 
   updateUser(user: UserInterface) {
-    this.firestore
+    return this.firestore
       .collection('users')
       .doc(user.uid)
-      .update(user)
-      .then(() => {
-        console.log('Usuario actualizado correctamente');
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      .update(user);
   }
 
   getUser(id: string): any {
