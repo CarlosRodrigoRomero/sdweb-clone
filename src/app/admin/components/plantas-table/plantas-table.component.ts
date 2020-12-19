@@ -36,7 +36,6 @@ export class PlantasTableComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // Guarda todas las plantas en un array local
     this.plantaService.getAllPlantas().subscribe((plantas) => (this.plantas = plantas));
-    console.log(this.user);
 
     // Filtra en un array los datos a mostrar en la tabla
     const plantasTable: any[] = [];

@@ -43,7 +43,8 @@ export class CreateUserComponent implements OnInit {
       this.user.role = this.form.get('role').value as number;
       console.log(this.user);
       // Crea el usuario en la DB
-      this.signUp().then(() => this.createUser(this.user));
+      this.signUp().then(() => console.log(this.user));
+      // this.createUser(this.user);
       // this.crear();
     }
   }
@@ -60,7 +61,7 @@ export class CreateUserComponent implements OnInit {
   }
 
   createUser(user: UserInterface) {
-    this.adminService
+    return this.adminService
       .createUser(user)
       .then(() => {
         console.log('Usuario creado correctamente');
@@ -69,5 +70,12 @@ export class CreateUserComponent implements OnInit {
       .catch((err) => {
         console.error('Error al crear documento: ', err);
       });
+  }
+
+  create(user: UserInterface) {
+    return this.authService.signUp(this.user.email, 'password').then((userAuth) => {
+      // user.uid = userAuth.user.uid;
+      this.createUser(user);
+    });
   }
 }
