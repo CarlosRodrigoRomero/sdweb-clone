@@ -12,6 +12,7 @@ import { AuthService } from '@core/services/auth.service';
 export class SignInComponent implements OnInit {
   form: FormGroup;
   hide = true;
+  warningHide = true;
 
   constructor(public authService: AuthService, private formBuilder: FormBuilder, private router: Router) {
     this.buildForm();
@@ -21,20 +22,23 @@ export class SignInComponent implements OnInit {
 
   private buildForm() {
     this.form = this.formBuilder.group({
-      email: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
     });
   }
 
-  signIn(email: string, password: string) {
-    this.authService
-      .signIn(email, password)
-      .then(() => {
-        this.router.navigate(['clientes']);
-      })
-      .catch((error) => {
-        console.log(error);
-        this.hide = false;
-      });
+  signIn(event: Event) {
+    if (this.form.valid) {
+      const value = this.form.value;
+      this.authService
+        .signIn(value.email, value.password)
+        .then(() => {
+          this.router.navigate(['clientes']);
+        })
+        .catch((error) => {
+          console.log(error);
+          this.warningHide = false;
+        });
+    }
   }
 }
