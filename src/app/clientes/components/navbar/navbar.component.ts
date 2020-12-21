@@ -8,16 +8,12 @@ import { AuthService } from '@core/services/auth.service';
 })
 export class NavbarComponent implements OnInit {
   userLogged: boolean;
+  isAdmin: boolean;
   constructor(public authService: AuthService) {
-    // this.form = this.formBuilder.group({
-    //   email: ['', Validators.required],
-    //   password: ['', Validators.required],
-    // });
-    // this.authService.isAuthenticated().subscribe((success) => (this.userLogged = success));
-
     this.authService.isAuthenticated().subscribe((isAuth) => (this.userLogged = isAuth));
-
-    // this.userLogged = this.authService.isLoggedIn;
+    this.authService.user$.subscribe((user) => {
+      this.isAdmin = this.authService.userIsAdmin(user);
+    });
   }
 
   ngOnInit() {}

@@ -34,8 +34,8 @@
           <a class="dropdown-item" href="#">Planta 2</a>
         </div>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/admin">Comprobaciones</a>
+      <li *ngIf="isAdmin" class="nav-item">
+        <a class="nav-link" routerLink="/admin">Admin</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" (click)="singOut()" routerLink="../auth" tabindex="-1">Cerrar sesión</a>
