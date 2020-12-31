@@ -42,34 +42,9 @@ export class AdminService {
       });
   }
 
-  signUp(email: string, password: string) {
-    return this.afAuth.auth
-      .createUserWithEmailAndPassword(email, password)
-      .then((result) => {
-        this.sendVerificationMail();
-        this.setUserData(result.user);
-      })
-      .catch((error) => {
-        window.alert(error.message);
-      });
-  }
-
   sendVerificationMail() {
     return this.afAuth.auth.currentUser.sendEmailVerification().then(() => {
       this.router.navigate(['../auth/verify-email-address']);
-    });
-  }
-
-  setUserData(user: UserInterface) {
-    const userRef: AngularFirestoreDocument<any> = this.firestore.doc(`users/${user.uid}`);
-    const userData: UserInterface = {
-      uid: user.uid,
-      email: user.email,
-      emailVerified: user.emailVerified,
-      role: 0,
-    };
-    return userRef.set(userData, {
-      merge: true,
     });
   }
 }

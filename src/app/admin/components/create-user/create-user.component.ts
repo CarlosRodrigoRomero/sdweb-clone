@@ -29,6 +29,7 @@ export class CreateUserComponent implements OnInit {
 
   private buildForm() {
     this.form = this.formBuilder.group({
+      uid: ['', [Validators.required]],
       email: ['', [Validators.required]],
       empresa: ['', [Validators.required]],
       role: ['', Validators.required],
@@ -38,28 +39,17 @@ export class CreateUserComponent implements OnInit {
   onSubmit(event: Event) {
     event.preventDefault();
     if (this.form.valid) {
+      this.user.uid = this.form.get('uid').value;
       this.user.email = this.form.get('email').value;
       this.user.empresaNombre = this.form.get('empresa').value;
       this.user.role = this.form.get('role').value as number;
-      console.log(this.user);
-      // Crea el usuario en la DB
-      this.signUp();
-      // this.createUser(this.user);
-    }
-  }
 
-  signUp() {
-    return this.authService
-      .signUp(this.user.email, 'password')
-      .then((userAuth) => {
-        this.user.uid = userAuth.user.uid;
-      })
-      .then(() => {
-        console.log(this.user);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      // Crea el usuario en la DB
+      this.createUser(this.user);
+
+      // Enviamos un email para que el usuario cambie su contraseña
+      this.authService.forgotPassword(this.user.email);
+    }
   }
 
   createUser(user: UserInterface) {
@@ -70,7 +60,7 @@ export class CreateUserComponent implements OnInit {
         this.router.navigate(['./admin/users']);
       })
       .catch((err) => {
-        console.error('Error al crear documento: ', err);
+        console.error('Error al crear usuario: ', err);
       });
   }
 }

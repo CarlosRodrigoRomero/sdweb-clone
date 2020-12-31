@@ -26,13 +26,8 @@
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <span>Panel de administrador</span>
-      <div class="container">
-        <div class="row">
-          <div class="col">
-            <button type="button" mat-button (click)="signOut()" routerLink="../auth">Cerrar sesión</button>
-          </div>
-        </div>
-      </div>
+      <span class="spacer"></span>
+      <button type="button" mat-button (click)="signOut()" routerLink="../auth">Cerrar sesión</button>
     </mat-toolbar>
     <router-outlet></router-outlet>
   </mat-sidenav-content>

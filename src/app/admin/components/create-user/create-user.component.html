@@ -4,6 +4,13 @@
   <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
     <mat-card>
       <mat-card-content>
+        <!-- Campo uid -->
+
+        <mat-form-field class="example-full-width">
+          <mat-label>ID</mat-label>
+          <input matInput formControlName="uid" />
+        </mat-form-field>
+
         <!-- Campo email -->
 
         <mat-form-field class="example-full-width">
