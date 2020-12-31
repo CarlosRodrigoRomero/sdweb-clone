@@ -1,7 +1,7 @@
 <mat-toolbar [class.mat-elevation-z2]="true" class="nb">
-  <button mat-icon-button color="warn" class="example-icon" aria-label="Example icon-button with menu icon">
+  <!-- <button mat-icon-button color="warn" class="example-icon" aria-label="Example icon-button with menu icon">
     <mat-icon>menu</mat-icon>
-  </button>
+  </button> -->
   <a class="navbar-brand" routerLink="/clientes/informes">
     <img src="../../../assets/images/logo_sd.png" height="60" class="d-inline-block align-top" alt="" />
   </a>
@@ -13,10 +13,11 @@
   </button>
   <mat-menu #menu="matMenu">
     <button *ngIf="isAdmin" mat-menu-item routerLink="/admin/users">Admin</button>
-    <button mat-menu-item (click)="singOut()" routerLink="../auth">Cerrar sesión</button>
+    <button mat-menu-item (click)="signOut()" routerLink="../auth">
+      <strong> Cerrar sesión </strong>
+    </button>
   </mat-menu>
 </mat-toolbar>
-
 
 <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" routerLink="/clientes/informes">
@@ -63,4 +64,3 @@
     </ul>
   </div>
 </nav> -->
-
