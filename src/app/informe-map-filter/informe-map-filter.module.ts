@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AgmCoreModule } from '@agm/core';
 
-import { MaterialModule } from '@material/material.module';
+import { SharedModule } from '@shared/shared.module';
 
 import { InformeMapFilterRoutingModule } from './informe-map-filter-routing.module';
 import { MapFilterComponent } from './components/map-filter/map-filter.component';
@@ -18,7 +18,7 @@ import { FilterPcsListComponent } from './components/filter-pcs-list/filter-pcs-
       apiKey: 'AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM',
       libraries: ['places', 'drawing', 'geometry'],
     }),
-    MaterialModule,
+    SharedModule,
   ],
 })
 export class InformeMapFilterModule {}

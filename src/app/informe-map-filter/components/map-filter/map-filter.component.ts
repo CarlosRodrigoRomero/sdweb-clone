@@ -10,6 +10,7 @@ import { PcService } from '@core/services/pc.service';
 import { PlantaService } from '@core/services/planta.service';
 import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '@core/services/filter.service';
+
 import { Observable } from 'rxjs';
 import { AreaFilter } from '@core/models/areaFilter';
 
@@ -120,5 +121,18 @@ export class MapFilterComponent implements OnInit {
         drawingManager.setDrawingMode(null);
       }
     });
+  }
+
+  numberToLatLng(paths: Array<Array<number>>): Array<Array<LatLngLiteral>> {
+    console.log(paths);
+    const newPaths = [];
+    for (let i = 0; i <= paths.length; i++) {
+      const path = [];
+      for (let j = 0; j <= paths[i].length; j++) {
+        path.push(new google.maps.LatLng(paths[i][j][0], paths[i][j][1]));
+      }
+      newPaths.push(path);
+    }
+    return newPaths;
   }
 }
