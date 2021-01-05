@@ -5,6 +5,40 @@
 </ng-template>
 
 <div *ngIf="isLoaded1 && isLoaded2 && isLoaded3; else loading">
+  <div class="row_1">
+    <div>
+      <mat-icon aria-hidden="false" aria-label="Example home icon">home</mat-icon>
+      <span>{{ planta?.nombre }}</span>
+    </div>
+    <div class="meteo">
+      <div>
+        <mat-icon>calendar_today</mat-icon>
+        <span>Vuelo {{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}</span>
+      </div>
+      <div>
+        <mat-icon>brightness_5</mat-icon>
+        <span>Irradiancia &empty; {{ irradianciaMedia | number: '1.0-0' }} W/m<sup>2</sup></span>
+      </div>
+      <div>
+        <mat-icon>local_fire_department</mat-icon>
+        <span>Temperatura {{ informe?.temperatura }}ºC</span>
+      </div>
+      <div>
+        <mat-icon>outlined_flag</mat-icon>
+        <span>Viento {{ informe?.nubosidad }}/8 octavas</span>
+      </div>
+    </div>
+  </div>
+  <div class="row_2">
+    <img src="../../../assets/icons/seguidor.png" alt="" />
+    <span style="font-size: 32px;">{{ planta?.nombre }}</span>
+    <span class="potencia">{{ planta?.potencia }} MW / {{ planta?.tipo }}</span>
+  </div>
+  <!-- <div class="row_3">
+    <div></div>
+    
+  </div> -->
+
   <div class="container">
     <div class="header-informe">
       <div class="row">
