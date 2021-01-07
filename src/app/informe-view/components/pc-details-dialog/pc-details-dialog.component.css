@@ -127,7 +127,7 @@
 
 .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 26px;
   width: 26px;
   left: 4px;
@@ -187,15 +187,15 @@ input:checked + .slider:before {
 
 .termico-visual {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: flex-end;
 }
 
 .termico-visual-text {
-  align-self: end;
+  align-self: flex-end;
   margin-right: 1rem;
-  font-size: 1.3rem;
+  font-size: 1rem;
 }
 .displayFlex {
   display: flex;

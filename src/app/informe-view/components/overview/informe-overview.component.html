@@ -2,42 +2,33 @@
   <mat-card-content>
     <div class="row">
       <div class="col-12">
-        <h3 class="text-center">
-          Resumen de la inspección termográfica aérea ({{
-            informe.fecha * 1000 | date: "dd/MM/yyyy"
-          }})
-        </h3>
+        <h2 class="text-center">
+          Resumen de la inspección termográfica aérea ({{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }})
+        </h2>
       </div>
     </div>
 
     <div class="colflex">
       <div class="flexchart">
-        <h5 class="text-center perdidasTotales">Pérdidas (kW) totales</h5>
-        <p-chart
-          height="250"
-          type="doughnut"
-          [data]="dataPerdidasTotales"
-          [options]="chartOptionsDonut"
-        ></p-chart>
+        <h3 class="text-center perdidasTotales">Pérdidas totales (kW)</h3>
+        <p-chart height="250" type="doughnut" [data]="dataPerdidasTotales" [options]="chartOptionsDonut"></p-chart>
 
         <ul>
           <li>
             <b>Porcentaje de pérdidas</b>:
-            <span style="color:tomato">
-              {{ perdidasTotales / 10 / planta.potencia | number: "1.0-2" }}
+            <span style="color: tomato">
+              {{ perdidasTotales / 10 / planta.potencia | number: '1.0-2' }}
               %</span
             >
           </li>
           <li>
             <b>Pérdidas nominales</b>:
-            <span style="color:tomato"
-              >{{ perdidasTotales | number: "1.0-1" }} kW</span
-            >
+            <span style="color: tomato">{{ perdidasTotales | number: '1.0-1' }} kW</span>
           </li>
           <li>
             <b>Potencia nominal no afectada</b>:
-            <span style="color:#3CB371">
-              {{ planta.potencia * 1000 - perdidasTotales | number: "1.0-1" }}
+            <span style="color: #3cb371">
+              {{ planta.potencia * 1000 - perdidasTotales | number: '1.0-1' }}
               kW
             </span>
           </li>
@@ -45,7 +36,7 @@
       </div>
       <div class="flexchart">
         <div class="flexsubchat">
-          <h5 class="text-center">Pérdidas (kW) por categoría</h5>
+          <h3 class="text-center">Pérdidas (kW) por categoría</h3>
           <p-chart
             height="300"
             width="450"
@@ -55,9 +46,7 @@
           ></p-chart>
         </div>
         <div class="flexsubchat">
-          <h5 class="text-center">
-            Número de anomalías por categoría
-          </h5>
+          <h3 class="text-center">Número de anomalías por categoría</h3>
           <p-chart
             [options]="chartOptionsCount"
             height="300"
