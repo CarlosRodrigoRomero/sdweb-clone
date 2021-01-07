@@ -1,6 +1,6 @@
 <div mat-dialog-title>
-  <h3 *ngIf="!sinPcs" class="text-center dialog-title">Visor de anomalías térmicas</h3>
-  <h3 *ngIf="sinPcs" class="text-center dialog-title">Vista de seguidor sin anomalías</h3>
+  <h1 *ngIf="!sinPcs" class="text-center dialog-title">Visor de anomalías térmicas</h1>
+  <h1 *ngIf="sinPcs" class="text-center dialog-title">Vista de seguidor sin anomalías</h1>
 </div>
 <div mat-dialog-content>
   <div class="row">
@@ -30,10 +30,10 @@
     </div>
 
     <div class="col-5 pc-details-derecha">
-      <h4 *ngIf="!sinPcs" class="text-center">
+      <h2 *ngIf="!sinPcs" class="text-center">
         Anomalía <b>#{{ pc.local_id }}</b>
         <span class="text-center colorSeveridad{{ pcService.getPcCoA(pc) }}"> (CoA {{ pcService.getPcCoA(pc) }})</span>
-      </h4>
+      </h2>
       <h4 *ngIf="sinPcs" class="text-center">
         Seguidor <b>{{ plantaService.getNombreSeguidor(pc) }}</b>
       </h4>

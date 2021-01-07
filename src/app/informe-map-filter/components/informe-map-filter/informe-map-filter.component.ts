@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { GLOBAL } from '@core/services/global';
-import { LatLngLiteral, Polygon } from '@agm/core';
+import { LatLngLiteral } from '@agm/core';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
@@ -12,6 +12,8 @@ import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '@core/services/filter.service';
 import { Observable } from 'rxjs';
 import { AreaFilter } from '@core/models/areaFilter';
+import { MatDialog } from '@angular/material/dialog';
+import { ShareDialogComponent } from './share-dialog-component';
 
 declare const google: any;
 @Component({
@@ -34,7 +36,8 @@ export class InformeMapFilterComponent implements OnInit {
     private plantaService: PlantaService,
     private informeService: InformeService,
     public filterService: FilterService,
-    public pcService: PcService
+    public pcService: PcService,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -114,6 +117,15 @@ export class InformeMapFilterComponent implements OnInit {
       if (polygon.type !== google.maps.drawing.OverlayType.MARKER) {
         drawingManager.setDrawingMode(null);
       }
+    });
+  }
+  openDialog(): void {
+    const dialogRef = this.dialog.open(ShareDialogComponent, {
+      width: '350px',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log('The dialog was closed');
     });
   }
 }
