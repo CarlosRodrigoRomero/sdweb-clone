@@ -57,7 +57,7 @@ export let GLOBAL = {
     'Caja conexiones',
     'Sombras', // 15
     'Yellowing', // 16
-    'String con baja producción', // 17
+    'Módulo en CA (string)', // 17
     'Posible PID', // 18
   ],
   labels_bloqueadas: [0, 1, 2, 4, 16],
@@ -79,7 +79,7 @@ export let GLOBAL = {
     'Caja de conexiones caliente', // 14
     'Módulo con sombras', // 15
     'Yellowing', // 16
-    'String con baja producción', // 17
+    'Módulo en string con baja producción', // 17
     'Posible PID', // 18
   ],
   //   '0',
