@@ -14,6 +14,7 @@ import { UserAreaInterface } from '@core/models/userArea';
 import { AreaInterface } from '@core/models/area';
 import { GLOBAL } from '@core/services/global';
 import { MatPaginator } from '@angular/material/paginator';
+declare const google: any;
 @Component({
   selector: 'app-auto-loc',
   templateUrl: './auto-loc.component.html',
@@ -231,7 +232,8 @@ export class AutoLocComponent implements OnInit {
   }
 
   initDrawingManager(map: any) {
-    const options: google.maps.drawing.DrawingManagerOptions = {
+    // const options: google.maps.drawing.DrawingManagerOptions = {
+    const options = {
       drawingControl: true,
       drawingControlOptions: {
         drawingModes: [google.maps.drawing.OverlayType.POLYGON, google.maps.drawing.OverlayType.RECTANGLE],
