@@ -94,7 +94,7 @@ export class PortfolioBenchmarkComponent implements OnInit {
       console.log(y, data);
       datasets.push({
         label: y.toString(),
-        backgroundColor: 'red',
+        backgroundColor: 'grey',
         data,
       });
     });
