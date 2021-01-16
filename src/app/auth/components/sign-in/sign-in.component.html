@@ -1,0 +1,39 @@
+<div class="signin">
+  <div class="form-signin">
+    <img class="logo" src="../../../assets/images/logo_sd.png" alt="" />
+    <form [formGroup]="form" align="center">
+      <h1 class="titulo fw-normal">Iniciar sesión</h1>
+      <input
+        type="email"
+        id="inputEmail"
+        formControlName="email"
+        class="form-control"
+        placeholder="Correo electrónico"
+        #email
+        required
+        autofocus
+      />
+      <input
+        type="password"
+        id="inputPassword"
+        formControlName="password"
+        class="form-control"
+        placeholder="Constraseña"
+        #userPassword
+        required
+      />
+      <div *ngIf="!hide" class="alert alert-danger">ID o contraseña incorrectos</div>
+      <button
+        class="btn btn-lg btn-danger"
+        type="submit"
+        [disabled]="form.invalid"
+        (click)="signIn(email.value, userPassword.value)"
+      >
+        Entrar
+      </button>
+      <div class="forgotPassword">
+        <a routerLink="../forgot-password">¿Has olvidado la contraseña?</a>
+      </div>
+    </form>
+  </div>
+</div>

@@ -3,8 +3,6 @@ import { NgModule } from '@angular/core';
 import { InformeViewRoutingModule } from './informe-view-routing.module';
 import { InformeOverviewComponent } from './components/overview/informe-overview.component';
 import { ExplicacionCoaComponent } from './components/explicacion-coa/explicacion-coa.component';
-import { GetNumeroModulosPipe } from '../pipes/get-numero-modulos.pipe';
-import { GetNombreSeguidorPipe } from '../pipes/get-nombre-seguidor.pipe';
 import { PcFilterComponent } from './components/pc-filter/pc-filter.component';
 import { ChartModule } from 'primeng/chart';
 import { InformeViewComponent } from './components/informe-view/informe-view.component';
@@ -23,8 +21,6 @@ import { SpinnerModule } from '../shared/spinner/spinner.module';
     PcFilterComponent,
     ExplicacionCoaComponent,
     PcDetailsDialogComponent,
-    GetNumeroModulosPipe,
-    GetNombreSeguidorPipe,
     PcListComponent,
     PcDetailsComponent,
     ExportComponent,

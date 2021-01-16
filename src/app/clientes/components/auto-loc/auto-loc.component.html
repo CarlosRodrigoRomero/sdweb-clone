@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container-fluid">
   <div class="row">
     <div class="col">
       <div *ngIf="alertMessage" class="alert alert-warning" role="alert">
@@ -23,9 +23,7 @@
 
             <mat-checkbox [(ngModel)]="isUserArea"> isUserArea {{ isUserArea }} </mat-checkbox>
 
-            <button (click)="aplicarModulosSeleccion()">
-              Aplicar módulo a selección ->
-            </button>
+            <button (click)="aplicarModulosSeleccion()">Aplicar módulo a selección -></button>
           </div>
           <div *ngIf="planta">
             <agm-map
@@ -182,7 +180,7 @@
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr
-          style="cursor: pointer;"
+          style="cursor: pointer"
           (click)="selectArea(locArea)"
           [ngClass]="{ seleccionado: locArea === selectedLocationArea }"
           [style.color]="getRowColor(locArea)"

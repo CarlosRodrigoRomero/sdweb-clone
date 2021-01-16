@@ -66,6 +66,11 @@ export class PlantaService {
       )
     );
   }
+
+  getAllPlantas(): Observable<PlantaInterface[]> {
+    return this.afs.collection('plantas').valueChanges();
+  }
+
   addUserArea(plantaId: string, userArea: UserAreaInterface) {
     const id = this.afs.createId();
     userArea.id = id;

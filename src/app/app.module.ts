@@ -24,6 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { HotkeyModule } from 'angular2-hotkeys';
 import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
     MatButtonModule,
     CommonModule,
     HotkeyModule.forRoot(),
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
   providers: [{ provide: SETTINGS, useValue: {} }, AuthService],
   bootstrap: [AppComponent],

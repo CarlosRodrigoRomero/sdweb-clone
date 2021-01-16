@@ -11,16 +11,12 @@ import { Observable, Subject, BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class FilterService {
-  private filters: FilterInterface[] = [];
+  public filters: FilterInterface[] = [];
   public filters$ = new Subject<FilterInterface[]>();
   public filteredPcs: PcInterface[] = [];
   public filteredPcs$ = new BehaviorSubject<PcInterface[]>(this.filteredPcs);
-  public areaFilters: FilterInterface[] = [];
 
-  constructor(private pcService: PcService) {
-    this.filteredPcs$.next(this.pcService.allPcs);
-    this.filteredPcs = this.pcService.allPcs;
-  }
+  constructor(private pcService: PcService) {}
 
   addFilter(filter: FilterInterface) {
     // Añade el filtro y lo aplica
@@ -38,10 +34,6 @@ export class FilterService {
       this.filteredPcs = this.filteredPcs.concat(newFilteredPcs.filter((newPc) => !this.filteredPcs.includes(newPc)));
     }
     this.filteredPcs$.next(this.filteredPcs);
-  }
-
-  getAllFilters() {
-    return this.filters$.asObservable();
   }
 
   deleteFilter(filter: FilterInterface) {
@@ -67,7 +59,21 @@ export class FilterService {
     this.filteredPcs$.next(this.filteredPcs);
   }
 
-  getAllPcs(): Observable<PcInterface[]> {
-    return this.pcService.allPcs$;
+  deleteAllFilters() {
+    // Elimina todos los filtros
+    this.filters = [];
+    this.filters$.next(this.filters);
+
+    // Vuelve a mostrar todos los pcs
+    this.filteredPcs = this.pcService.allPcs;
+    this.filteredPcs$.next(this.filteredPcs);
   }
+
+  getAllFilters(): Observable<FilterInterface[]> {
+    return this.filters$.asObservable();
+  }
+
+/*   getAllPcs(): Observable<PcInterface[]> {
+    return this.pcService.allPcs$;
+  } */
 }

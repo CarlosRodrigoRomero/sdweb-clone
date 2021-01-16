@@ -17,6 +17,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { ModuloAddComponent } from './components/modulo-add/modulo-add.component';
 
 import { MaterialModule } from '@material/material.module';
+import { PortfolioBenchmarkComponent } from './components/portfolio-benchmark/portfolio-benchmark.component';
+import { ChartModule } from 'primeng/chart';
 @NgModule({
   declarations: [
     PlantaAddComponent,
@@ -29,6 +31,7 @@ import { MaterialModule } from '@material/material.module';
     PlantaEditComponent,
     InformeListTableComponent,
     ModuloAddComponent,
+    PortfolioBenchmarkComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({
@@ -37,6 +40,7 @@ import { MaterialModule } from '@material/material.module';
     }),
     ClientesRoutingModule,
     SharedModule,
+    ChartModule,
     FormsModule,
     ReactiveFormsModule,
     MatDatepickerModule,

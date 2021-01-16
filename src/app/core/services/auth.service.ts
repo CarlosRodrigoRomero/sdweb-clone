@@ -1,17 +1,22 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+
 import { AngularFireAuth } from '@angular/fire/auth';
-import { Observable, from, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 import { AngularFirestore } from '@angular/fire/firestore';
+
+import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+
 import { UserInterface } from '../models/user';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  userData: UserInterface; // Guarda los datos de usuario registrado
   public user$: Observable<UserInterface>;
 
-  constructor(private afAuth: AngularFireAuth, private afs: AngularFirestore) {
+  constructor(private afAuth: AngularFireAuth, private afs: AngularFirestore, private router: Router) {
     this.user$ = this.afAuth.authState.pipe(
       switchMap((user) => {
         if (user) {
@@ -23,11 +28,16 @@ export class AuthService {
     );
   }
 
-  login(email, password): Observable<any> {
-    return from(this.afAuth.auth.signInWithEmailAndPassword(email, password));
+  signIn(email: string, password: string) {
+    return this.afAuth.auth.signInWithEmailAndPassword(email, password);
   }
-  logout() {
-    this.afAuth.auth.signOut();
+
+  forgotPassword(passwordResetEmail: string) {
+    return this.afAuth.auth.sendPasswordResetEmail(passwordResetEmail);
+  }
+
+  signOut() {
+    return this.afAuth.auth.signOut();
   }
 
   isAuthenticated(): Observable<boolean> {

@@ -2,82 +2,79 @@
   <div class="row">
     <div class="col-12">
       <h1 class="text-center">{{ user.empresaNombre }}</h1>
-      <button mat-raised-button *ngIf="auth.canAddPlantas(user)" routerLink="../planta-add">
-        Añadir planta
-      </button>
-      <button mat-raised-button *ngIf="auth.canAddPlantas(user)" routerLink="../modulo-add">
-        Añadir modulo
-      </button>
+      <button mat-raised-button *ngIf="auth.canAddPlantas(user)" routerLink="../planta-add">Añadir planta</button>
+      <button mat-raised-button *ngIf="auth.canAddPlantas(user)" routerLink="../modulo-add">Añadir modulo</button>
     </div>
   </div>
-  <div
-    *ngIf="user?.role == 0 || user?.role == 1 || user.role == 2; else informeListTable"
-    class="row justify-content-center"
-  >
-    <div class="col-4" *ngFor="let planta of plantasList$ | async">
-      <mat-card class="informe-card">
-        <mat-card-header>
-          <div mat-card-avatar class="informe-header-image"></div>
-          <mat-card-title>{{ planta.nombre }}</mat-card-title>
-          <mat-card-subtitle
-            >{{ planta?.potencia }} MW / {{ planta?.tipo }}
-            <a *ngIf="user.role === 1" routerLink="../planta-edit/{{ planta.id }}">
-              <i class="far fa-edit"></i>
-            </a>
-            <a *ngIf="user.role === 1 || user.role === 3" routerLink="../auto-loc/{{ planta.id }}">
-              <i class="fas fa-map-marker-alt"></i>
-            </a>
-            <span *ngIf="user.role === 1">
-              <input
-                type="checkbox"
-                (click)="updateAutoLocReady(planta, $event)"
-                [checked]="checkAutoLocReady(planta)"
-              />
-            </span>
-          </mat-card-subtitle>
-        </mat-card-header>
+  <div class="row">
+    <div class="col">
+      <app-portfolio-benchmark></app-portfolio-benchmark>
+    </div>
+  </div>
+  <div class="row">
+    <div
+      *ngIf="user?.role == 0 || user?.role == 1 || user.role == 2; else informeListTable"
+      class="row justify-content-center"
+    >
+      <div class="col-4" *ngFor="let planta of plantasList$ | async">
+        <mat-card class="informe-card">
+          <mat-card-header>
+            <div mat-card-avatar class="informe-header-image"></div>
+            <mat-card-title>{{ planta.nombre }}</mat-card-title>
+            <mat-card-subtitle
+              >{{ planta?.potencia }} MW / {{ planta?.tipo }}
+              <a *ngIf="user.role === 1" routerLink="../planta-edit/{{ planta.id }}">
+                <i class="far fa-edit"></i>
+              </a>
+              <a *ngIf="user.role === 1 || user.role === 3" routerLink="../auto-loc/{{ planta.id }}">
+                <i class="fas fa-map-marker-alt"></i>
+              </a>
+              <span *ngIf="user.role === 1">
+                <input
+                  type="checkbox"
+                  (click)="updateAutoLocReady(planta, $event)"
+                  [checked]="checkAutoLocReady(planta)"
+                />
+              </span>
+            </mat-card-subtitle>
+          </mat-card-header>
 
-        <mat-card-content>
-          <a *ngIf="user.role === 1" routerLink="../informe-add/{{ planta.id }}">
-            Añadir informe
-          </a>
-          <span *ngIf="planta.informes.length > 0; else sinInforme"></span>
-          <ng-template #sinInforme
-            ><span>
-              Informe en proceso ...
-            </span></ng-template
-          >
-        </mat-card-content>
-        <mat-card-actions class="cards-actions">
-          <div *ngFor="let informe of planta.informes">
-            <span *ngIf="user.role === 1">
-              <input type="checkbox" (click)="updateInforme(informe)" [checked]="informe.disponible" />
-            </span>
-            <a
-              *ngIf="checkInformeDisponible(informe); else sinInforme2"
-              mat-stroked-button
-              color="primary"
-              routerLink="../informe-view/{{ informe.id }}"
-            >
-              Inspección del {{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}
-            </a>
-            <ng-template #sinInforme2
-              ><span> editar informe del ({{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}) </span
-              ><span *ngIf="user.role === 1"
-                >({{ informe.id }})
-                <a routerLink="../informe-view/{{ informe.id }}">
-                  <i class="fas fa-eye"></i>
-                </a>
+          <mat-card-content>
+            <a *ngIf="user.role === 1" routerLink="../informe-add/{{ planta.id }}"> Añadir informe </a>
+            <span *ngIf="planta.informes.length > 0; else sinInforme"></span>
+            <ng-template #sinInforme><span> Informe en proceso ... </span></ng-template>
+          </mat-card-content>
+          <mat-card-actions class="cards-actions">
+            <div *ngFor="let informe of planta.informes">
+              <span *ngIf="user.role === 1">
+                <input type="checkbox" (click)="updateInforme(informe)" [checked]="informe.disponible" />
               </span>
-              <span *ngIf="user.role === 1 || user.role === 3">
-                <a routerLink="../informe-edit/{{ informe.id }}">
-                  <i class="far fa-edit"></i>
-                </a>
-              </span>
-            </ng-template>
-          </div>
-        </mat-card-actions>
-      </mat-card>
+              <a
+                *ngIf="checkInformeDisponible(informe); else sinInforme2"
+                mat-stroked-button
+                color="primary"
+                routerLink="../informe-view/{{ informe.id }}"
+              >
+                Inspección del {{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}
+              </a>
+              <ng-template #sinInforme2
+                ><span> editar informe del ({{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}) </span
+                ><span *ngIf="user.role === 1"
+                  >({{ informe.id }})
+                  <a routerLink="../informe-view/{{ informe.id }}">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                </span>
+                <span *ngIf="user.role === 1 || user.role === 3">
+                  <a routerLink="../informe-edit/{{ informe.id }}">
+                    <i class="far fa-edit"></i>
+                  </a>
+                </span>
+              </ng-template>
+            </div>
+          </mat-card-actions>
+        </mat-card>
+      </div>
     </div>
   </div>
   <ng-template #informeListTable>

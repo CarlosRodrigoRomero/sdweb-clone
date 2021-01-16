@@ -5,4 +5,6 @@ export interface UserInterface {
   role?: number; // 0:usuario | 1:admin | 2: externo | 3: procesamiento
   plantas?: string[];
   color?: string;
+  photoURL?: string;
+  emailVerified?: boolean;
 }

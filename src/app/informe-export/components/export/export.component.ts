@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { GLOBAL } from '@core/services/global';
 
 import { PcService, SeguidorInterface } from '@core/services/pc.service';
@@ -421,7 +421,6 @@ export class ExportComponent implements OnInit {
         elegible: true,
       },
     ];
-
     if (this.planta.tipo === 'seguidores') {
       this.apartadosInforme.push(
         {
@@ -438,6 +437,16 @@ export class ExportComponent implements OnInit {
           elegible: true,
         }
       );
+      // const fecha_informe = new Date(this.informe.fecha * 1000);
+
+      // if (fecha_informe.getFullYear() >= 2020) {
+      //   this.apartadosInforme.push({
+      //     nombre: 'anexo3',
+      //     descripcion: 'Anexo III: Seguidores sin anomalías',
+      //     orden: 17,
+      //     elegible: true,
+      //   });
+      // }
     }
     if (this.planta.tipo === '1 eje') {
       this.apartadosInforme.push(
@@ -2597,6 +2606,7 @@ export class ExportComponent implements OnInit {
 
         '\n',
 
+        // Si son segudores de 1 eje, le quitamos la imagen (porque)
         // {
         //   image: `imgSeguidorCanvas${s.nombre}`,
         //   width: this.widthSeguidor,
