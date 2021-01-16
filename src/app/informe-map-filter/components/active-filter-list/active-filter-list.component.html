@@ -1,0 +1,16 @@
+<mat-chip-list>
+  <mat-chip *ngFor="let filter of filter$ | async" [removable]="removable" (removed)="deleteFilter(filter)"
+    >{{ filter.id }}
+    <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+  </mat-chip>
+</mat-chip-list>
+<button
+  class="button-clear"
+  style="float: right"
+  mat-button
+  color="primary"
+  [hidden]="filterService.filters.length == 0"
+  (click)="filterService.deleteAllFilters()"
+>
+  Limpiar filtros
+</button>

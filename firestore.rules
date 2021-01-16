@@ -8,6 +8,7 @@ service cloud.firestore {
 
     match /informes/{informeId}/estructuras/{estructuraId} {
     	allow write, delete, read, update: if request.auth.uid == "dgYtPws1dQPv8aZ24G940tstCZI3";
+      allow write, delete, read, update: if request.auth.uid == "E1EvApBm83aDYkUvXh8YhfT03pe2";
   	}
     match /informes/{informeId} {
     	allow update: if request.auth.uid == "dgYtPws1dQPv8aZ24G940tstCZI3";

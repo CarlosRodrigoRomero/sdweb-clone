@@ -5,13 +5,13 @@ import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
-import { AngularFirestoreModule, FirestoreSettingsToken } from '@angular/fire/firestore';
+import { AngularFirestoreModule, SETTINGS } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 
 import { LoginComponent } from './cts/login/login.component';
-import { AuthService } from './services/auth.service';
+import { AuthService } from '@core/services/auth.service';
 import { IndexComponent } from './cts/index/index.component';
 import { VideoComponent } from './cts/video/video.component';
 
@@ -23,8 +23,18 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { HotkeyModule } from 'angular2-hotkeys';
+import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+
 @NgModule({
-  declarations: [AppComponent, LoginComponent, IndexComponent, VideoComponent, AvisoLegalComponent],
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    IndexComponent,
+    VideoComponent,
+    AvisoLegalComponent,
+    PubliclayoutComponent,
+  ],
 
   imports: [
     BrowserModule,
@@ -43,8 +53,9 @@ import { HotkeyModule } from 'angular2-hotkeys';
     MatButtonModule,
     CommonModule,
     HotkeyModule.forRoot(),
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
-  providers: [{ provide: FirestoreSettingsToken, useValue: {} }, AuthService],
+  providers: [{ provide: SETTINGS, useValue: {} }, AuthService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

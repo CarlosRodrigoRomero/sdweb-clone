@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent implements OnInit {
   public form: FormGroup;
-  public user$ = this.authService.user$;
+  // public user$ = this.authService.user$;
   public userLogged: boolean;
   username: string;
   password: string;
@@ -20,16 +20,18 @@ export class LoginComponent implements OnInit {
     //   email: ['', Validators.required],
     //   password: ['', Validators.required],
     // });
-    this.authService.isAuthenticated().subscribe((success) => (this.userLogged = success));
+    
+    
+    // this.authService.isAuthenticated().subscribe((success) => (this.userLogged = success));
   }
 
   ngOnInit() {
-    if (this.authService.isAuthenticated) {
+    /* if (this.authService.isAuthenticated) {
       this.router.navigate(['clientes']);
-    }
+    } */
   }
 
-  login() {
+  /* login() {
     this.authService.login(this.username, this.password).subscribe(
       (success) => this.router.navigate(['clientes']),
       (error) => console.log(error)
@@ -37,5 +39,5 @@ export class LoginComponent implements OnInit {
   }
   logout() {
     this.authService.logout();
-  }
+  } */
 }

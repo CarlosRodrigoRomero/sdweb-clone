@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { InformesComponent } from './informes/informes.component';
-import { ClientesComponent } from './clientes.component';
-import { PlantaEditComponent } from './planta-edit/planta-edit.component';
-import { AutoLocComponent } from './auto-loc/auto-loc.component';
-import { PlantaAddComponent } from './planta-add/planta-add.component';
-import { InformeAddComponent } from './informe-add/informe-add.component';
-import { ModuloAddComponent } from './modulo-add/modulo-add.component';
+import { InformesComponent } from './components/informes/informes.component';
+import { ClientesComponent } from './components/clientes/clientes.component';
+import { PlantaEditComponent } from './components/planta-edit/planta-edit.component';
+import { AutoLocComponent } from './components/auto-loc/auto-loc.component';
+import { PlantaAddComponent } from './components/planta-add/planta-add.component';
+import { InformeAddComponent } from './components/informe-add/informe-add.component';
+import { ModuloAddComponent } from './components/modulo-add/modulo-add.component';
 
 const routes: Routes = [
   {

@@ -1,33 +1,33 @@
 .header-sencilla {
-    border-bottom: 1px solid grey;
-    margin-bottom: 2rem;
+  border-bottom: 1px solid grey;
+  margin-bottom: 2rem;
 }
 
 .logo {
-    width: 200px;
-    align-self: center;
-    margin: 0 auto;
+  width: 200px;
+  align-self: center;
+  margin: 0 auto;
 }
 
 .video {
-    margin: 4rem auto;
-    width: 70%;
+  margin: 0.5rem auto;
+  width: 100%;
 }
 
 .calendly-inline-widget {
-    margin: 0 auto;
+  margin: 0 auto;
 }
 
 .calendario {
-    margin-top: 4rem;
-    margin-bottom: 15rem;
+  margin-top: 4rem;
+  margin-bottom: 15rem;
 }
 
 .pasos {
-    margin-top: 3rem;
-    margin-bottom: 2rem;
+  margin-top: 3rem;
+  margin-bottom: 2rem;
 }
 
 .calendario-iframe {
-    height: 850px;
+  height: 850px;
 }

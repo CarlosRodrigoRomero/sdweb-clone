@@ -1,0 +1,141 @@
+<ng-template #loading>
+  <div class="cargando text-center">
+    <app-spinner></app-spinner>
+  </div>
+</ng-template>
+
+<div *ngIf="isLoaded1 && isLoaded2 && isLoaded3; else loading">
+  <div class="container">
+    <div class="header-informe">
+      <div class="row">
+        <!-- Datos de la planta y del tiempo -->
+        <div class="col-sm-12 col-md-10">
+          <div class="row">
+            <div class="col-12 nombre-planta">
+              <span class="text-light titulo-informe">{{ planta?.nombre }}</span>
+              <span class="titulo-informe-empresa" *ngIf="!allowDownloads"> ({{ empresaNombre }}) </span>
+              <span class="text-light subtitulo-informe">{{ planta?.potencia }} MW / {{ planta?.tipo }}</span>
+            </div>
+          </div>
+          <div class="header-derecha">
+            <div class="datos-meteo">
+              <div class="col-2 col-datos-meteo">
+                <i class="fas fa-sun"></i>
+              </div>
+              <div class="datos-meteo-texto">
+                <span class="text-light datos-meteo-numero">
+                  &empty; {{ irradianciaMedia | number: '1.0-0' }} W/m<sup>2</sup></span
+                >
+                <span class="text-light">Irradiancia media</span>
+              </div>
+            </div>
+            <div class="datos-meteo">
+              <div class="col-2 col-datos-meteo">
+                <i class="fas fa-cloud"></i>
+              </div>
+              <div class="datos-meteo-texto">
+                <span class="text-light datos-meteo-numero">{{ informe?.nubosidad }}/8 octavas</span>
+                <span class="text-light">Nubosidad</span>
+              </div>
+            </div>
+            <div class="datos-meteo">
+              <div class="col-2 col-datos-meteo">
+                <i class="fas fa-chess-board"></i>
+              </div>
+              <div class="datos-meteo-texto">
+                <span class="text-light datos-meteo-numero"> {{ informe?.gsd }} &plusmn; 0.5 cm/pixel</span>
+                <span class="text-light">GSD (ground sample distance)</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="vuelo-fecha">
+              <span class="text-light">Vuelo realizado el {{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Datos de la inspeccion -->
+        <div class="col-2 header-derecha">
+          <div class="header-derecha-datos">
+            <div class="header-derecha-datos-donut">
+              <!-- <p-chart
+                type="doughnut"
+                [data]="dataSeveridad"
+                [options]="chartOptions"
+              ></p-chart> -->
+            </div>
+
+            <div *ngIf="allowDownloads" class="header-derecha-datos-mae">
+              <div class="text-center">
+                <span class="mae-texto text-light">MAE</span>
+              </div>
+              <div class="text-center">
+                <span class="mae-texto-desc text-light">(Módulos Apagados Equivalentes)</span>
+              </div>
+              <div class="div-mae-1">
+                <div class="div-mae-2">
+                  <span class="text-center text-light mae-porcentaje">{{ informe?.mae | number: '1.2' }}</span>
+                </div>
+                <span class="text-light mae-pct-simbolo">%</span>
+              </div>
+              <div class="div-mae-3">
+                <h4 class="text-center text-light">
+                  {{ calificacionMae[informe?.mae] }}
+                </h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="nav">
+      <div class="nav-group">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" *ngIf="allowDownloads" [routerLink]="['informe-overview']" data-toggle="tab"
+              >Resumen</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              [ngClass]="{
+                active: !allowDownloads
+              }"
+              class="nav-link"
+              data-toggle="tab"
+              aria-selected="!allowDownloads"
+              [routerLink]="['informe-list']"
+              >Listado</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" [routerLink]="['informe-map']">Mapa</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" [routerLink]="['informe-export']">Generar PDF</a>
+          </li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <a href="{{ excelDownloadUrl }}" *ngIf="excelDownloadUrl && allowDownloads">
+          <button class="download-button" mat-flat-button color="primary">Descargar excel</button>
+        </a>
+
+        <a *ngIf="imagenesDownloadUrl && allowDownloads" href="{{ imagenesDownloadUrl }}" class="download-button">
+          <button mat-flat-button color="primary">Descargar imágenes</button></a
+        >
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-3">
+        <app-pc-filter [allPcs]="allPcs" [planta]="planta"> </app-pc-filter>
+      </div>
+      <div class="col-9">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</div>
