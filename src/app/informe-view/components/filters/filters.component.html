@@ -1,0 +1,21 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Filtros</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <h4>Gradiente</h4>
+    <span>(sólo se aplica a células calientes)</span>
+    <div class="filtro-gradiente">
+      <mat-slider
+        thumbLabel
+        [displayWith]="formatLabel"
+        (input)="onInputFiltroGradiente($event)"
+        (change)="onChangeFiltroGradiente()"
+        tickInterval="1"
+        min="{{ minGradiente }}"
+        max="{{ maxGradiente }}"
+        [(ngModel)]="valorGradiente"
+      ></mat-slider>
+    </div>
+  </mat-card-content>
+</mat-card>

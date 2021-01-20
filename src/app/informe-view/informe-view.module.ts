@@ -13,6 +13,7 @@ import { PcDetailsComponent } from './components/pc-details/pc-details.component
 import { ExportComponent } from '../informe-export/components/export/export.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SpinnerModule } from '../shared/spinner/spinner.module';
+import { FiltersComponent } from './components/filters/filters.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { SpinnerModule } from '../shared/spinner/spinner.module';
     PcDetailsComponent,
     ExportComponent,
     PcFilterComponent,
+    FiltersComponent,
   ],
   entryComponents: [ExplicacionCoaComponent, PcDetailsDialogComponent],
   providers: [],

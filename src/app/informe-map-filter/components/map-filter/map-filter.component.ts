@@ -115,6 +115,7 @@ export class MapFilterComponent implements OnInit {
       // Creamos el filtro
       const areaFilter = new AreaFilter('Área ' + this.numAreas, path);
       this.filterService.addFilter(areaFilter);
+      this.filterService.applyFilters();
 
       // Desactiva del modo dibujo
       if (polygon.type !== google.maps.drawing.OverlayType.MARKER) {
