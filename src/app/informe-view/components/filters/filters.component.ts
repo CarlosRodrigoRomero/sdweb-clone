@@ -50,6 +50,6 @@ export class FiltersComponent implements OnInit {
     // this.pcService.PushFiltroGradiente(this.valorGradiente);
 
     this.filtroGradiente = new GradientFilter(this.valorGradiente);
-    this.filterService.applyFilter(this.filtroGradiente);
+    this.filterService.addFilter(this.filtroGradiente);
   }
 }

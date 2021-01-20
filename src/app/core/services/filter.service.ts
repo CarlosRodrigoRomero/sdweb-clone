@@ -21,20 +21,31 @@ export class FilterService {
   constructor(private pcService: PcService) {}
 
   addFilter(filter: FilterInterface) {
-    // si existe un filtro de su tipo lo sustituimos
-
+    // comprobamos el tipo del filtro que llega
     if (filter instanceof GradientFilter) {
-      this.filters.map((f) => {
-        if (f instanceof GradientFilter) {
-          f = filter;
-        }
-      });
+      /* // si existe un filtro de su tipo lo sustituimos ...
+      const c = this.filters.filter((f) => f instanceof GradientFilter).length;
+      if (c > 0) {
+        this.filters.map((f) => {
+          if (f instanceof GradientFilter) {
+            f = filter;
+          }
+        });
+      } else {
+        // ... si no, se añade el filtro a la lista de filtros
+        this.filters.push(filter);
+      } */
+      // eliminamos anteriores filtros Gradient
+      this.filters.filter((f) => !(f instanceof GradientFilter));
+      this.filters.push(filter);
     } else {
-      // si no, se añade el filtro a la lista de filtros
+      // si no es del tipo Gradient se añade al array
       this.filters.push(filter);
     }
 
     this.filters$.next(this.filters);
+
+    this.applyFilters();
 
     /* const newFilteredPcs = filter.applyFilter(this.pcService.allPcs);
 
@@ -47,11 +58,6 @@ export class FilterService {
       this.filteredPcs = this.filteredPcs.concat(newFilteredPcs.filter((newPc) => !this.filteredPcs.includes(newPc)));
     }
     this.filteredPcs$.next(this.filteredPcs); */
-  }
-
-  applyFilter(filter: FilterInterface) {
-    this.filteredPcs = filter.applyFilter(this.filteredPcs);
-    this.filteredPcs$.next(this.filteredPcs);
   }
 
   applyFilters() {
@@ -68,15 +74,14 @@ export class FilterService {
             newFilteredPcs.filter((newPc) => !this.filteredPcs.includes(newPc))
           );
         }
-        this.filteredPcs$.next(this.filteredPcs);
       }
     });
     this.filters.forEach((filter) => {
-      if (filter instanceof AreaFilter) {
+      if (filter instanceof GradientFilter) {
         this.filteredPcs = filter.applyFilter(this.filteredPcs);
-        this.filteredPcs$.next(this.filteredPcs);
       }
     });
+    this.filteredPcs$.next(this.filteredPcs);
   }
 
   deleteFilter(filter: FilterInterface) {
