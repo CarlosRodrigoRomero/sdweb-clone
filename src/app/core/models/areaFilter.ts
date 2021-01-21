@@ -6,11 +6,13 @@ declare const google: any;
 
 export class AreaFilter implements FilterInterface {
   id: string;
+  type: string;
   path: LatLngLiteral[];
   polygon: Polygon;
 
-  constructor(id: string, path: LatLngLiteral[]) {
+  constructor(id: string, type: string, path: LatLngLiteral[]) {
     this.id = id;
+    this.type = type;
     this.path = path;
     this.polygon = this.getGooglePolygonFromPath(path);
   }

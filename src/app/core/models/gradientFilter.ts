@@ -2,10 +2,14 @@ import { FilterInterface } from './filter';
 import { PcInterface } from './pc';
 
 export class GradientFilter implements FilterInterface {
-  valorGradiente: number;
+  type: string;
+  rangoMin: number;
+  rangoMax: number;
 
-  constructor(valorGradiente: number) {
-    this.valorGradiente = valorGradiente;
+  constructor(type: string, rangoMin: number, rangoMax: number) {
+    this.type = type;
+    this.rangoMin = rangoMin;
+    this.rangoMax = rangoMax;
   }
 
   applyFilter(pcs: PcInterface[]): PcInterface[] {
@@ -21,8 +25,8 @@ export class GradientFilter implements FilterInterface {
     ); */
     return pcs.filter(
       (pc) =>
-        pc.gradienteNormalizado >= this.valorGradiente ||
-        (pc.gradienteNormalizado < this.valorGradiente && pc.tipo !== 8 && pc.tipo !== 9)
+        pc.gradienteNormalizado >= this.rangoMin ||
+        (pc.gradienteNormalizado < this.rangoMin && pc.tipo !== 8 && pc.tipo !== 9)
     );
   }
   unapplyFilter(pcs: PcInterface[]): PcInterface[] {

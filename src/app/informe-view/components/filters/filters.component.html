@@ -3,8 +3,7 @@
     <mat-card-title>Filtros</mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <h4>Gradiente</h4>
-    <span>(sólo se aplica a células calientes)</span>
+    <h5>Gradiente</h5>
     <div class="filtro-gradiente">
       <mat-slider
         thumbLabel
@@ -14,7 +13,32 @@
         tickInterval="1"
         min="{{ minGradiente }}"
         max="{{ maxGradiente }}"
-        [(ngModel)]="valorGradiente"
+        [(ngModel)]="rangoMinGradiente"
+      ></mat-slider>
+    </div>
+    <h5>Temperatura max</h5>
+    <div class="filtro-temperatura">
+      <mat-slider
+        thumbLabel
+        [displayWith]="formatLabel"
+        (input)="onInputFiltroTempMax($event)"
+        (change)="onChangeFiltroTempMax()"
+        tickInterval="1"
+        min="{{ minTemp }}"
+        max="{{ maxTemp }}"
+        [(ngModel)]="rangoMinTemp"
+      ></mat-slider>
+    </div>
+    <h5>Pérdidas</h5>
+    <div class="filtro-perdidas">
+      <mat-slider
+        thumbLabel
+        [displayWith]="formatLabelPerdidas"
+        (input)="onInputFiltroPerdidas($event)"
+        (change)="onChangeFiltroPerdidas()"
+        min="0"
+        max="100"
+        [(ngModel)]="rangoMinPerdidas"
       ></mat-slider>
     </div>
   </mat-card-content>

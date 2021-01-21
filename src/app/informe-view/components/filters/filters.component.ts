@@ -7,7 +7,8 @@ import { FilterService } from '@core/services/filter.service';
 import { MatSliderChange } from '@angular/material/slider';
 
 import { GradientFilter } from '@core/models/gradientFilter';
-import { Console } from 'console';
+import { TempMaxFilter } from '@core/models/tempMaxFilter';
+import { PerdidasFilter } from '@core/models/perdidasFilter';
 
 @Component({
   selector: 'app-filters',
@@ -15,41 +16,69 @@ import { Console } from 'console';
   styleUrls: ['./filters.component.css'],
 })
 export class FiltersComponent implements OnInit {
-  public minGradiente: number;
-  public maxGradiente: number;
-  public valorGradiente: number;
-  public filtroGradiente: GradientFilter;
+  minGradiente: number;
+  maxGradiente: number;
+  rangoMinGradiente: number;
+  filtroGradiente: GradientFilter;
+
+  minTemp: number;
+  maxTemp: number;
+  rangoMinTemp: number;
+  filtroTempMax: TempMaxFilter;
+
+  rangoMinPerdidas: number;
+  filtroPerdidas: PerdidasFilter;
 
   constructor(private pcService: PcService, private filterService: FilterService) {}
 
   ngOnInit(): void {
-    // Setear min y max gradiente
+    // Setear datos min y max
     this.maxGradiente = GLOBAL.maxGradiente;
     this.minGradiente = GLOBAL.minGradiente;
-
-    // this.pcService.filtroGradiente$.subscribe((e) => (this.valorGradiente = e));
+    this.maxTemp = this.pcService.getTempMaxAllPcs();
+    this.minTemp = 0;
   }
 
   formatLabel(value: number | null) {
     if (!value) {
-      return this.valorGradiente;
+      return this.rangoMinGradiente;
     }
 
-    if (value >= 1000) {
-      return Math.round(value / 1000) + ' ºC';
-    }
-
-    return value;
+    return value + 'ºC';
   }
 
   onInputFiltroGradiente(event: MatSliderChange) {
-    this.valorGradiente = event.value;
+    this.rangoMinGradiente = event.value;
   }
 
   onChangeFiltroGradiente() {
-    // this.pcService.PushFiltroGradiente(this.valorGradiente);
-
-    this.filtroGradiente = new GradientFilter(this.valorGradiente);
+    this.filtroGradiente = new GradientFilter('gradient', this.rangoMinGradiente, this.maxGradiente);
     this.filterService.addFilter(this.filtroGradiente);
+  }
+
+  onInputFiltroTempMax(event: MatSliderChange) {
+    this.rangoMinTemp = event.value;
+  }
+
+  onChangeFiltroTempMax() {
+    this.filtroTempMax = new TempMaxFilter('tempMax', this.rangoMinTemp, this.maxTemp);
+    this.filterService.addFilter(this.filtroTempMax);
+  }
+
+  onInputFiltroPerdidas(event: MatSliderChange) {
+    this.rangoMinPerdidas = event.value;
+  }
+
+  onChangeFiltroPerdidas() {
+    this.filtroPerdidas = new PerdidasFilter('perdidas', this.rangoMinPerdidas, 100);
+    this.filterService.addFilter(this.filtroPerdidas);
+  }
+
+  formatLabelPerdidas(value: number | null) {
+    if (!value) {
+      return this.rangoMinGradiente;
+    }
+
+    return value + ' %';
   }
 }

@@ -430,4 +430,12 @@ export class PcService {
   get() {
     return this.allPcs;
   }
+
+  getTempMaxAllPcs(): number {
+    return Math.max(
+      ...this.allPcs.map((pc) => {
+        return pc.temperaturaMax as number;
+      })
+    );
+  }
 }

@@ -14,73 +14,75 @@ import { GradientFilter } from '@core/models/gradientFilter';
 })
 export class FilterService {
   public filters: FilterInterface[] = [];
-  public filters$ = new Subject<FilterInterface[]>();
+  public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
   public filteredPcs: PcInterface[] = [];
   public filteredPcs$ = new BehaviorSubject<PcInterface[]>(this.filteredPcs);
+  public areaFilteredPcs: PcInterface[] = [];
 
   constructor(private pcService: PcService) {}
 
   addFilter(filter: FilterInterface) {
-    // comprobamos el tipo del filtro que llega
-    if (filter instanceof GradientFilter) {
-      /* // si existe un filtro de su tipo lo sustituimos ...
-      const c = this.filters.filter((f) => f instanceof GradientFilter).length;
-      if (c > 0) {
-        this.filters.map((f) => {
-          if (f instanceof GradientFilter) {
-            f = filter;
-          }
-        });
-      } else {
-        // ... si no, se añade el filtro a la lista de filtros
-        this.filters.push(filter);
-      } */
-      // eliminamos anteriores filtros Gradient
-      this.filters.filter((f) => !(f instanceof GradientFilter));
+    // comprobamos que no es de tipo 'area'
+    if (filter.type !== 'area') {
+      // eliminamos, si lo hubiera, el filtro anterior del mismo tipo que el recibido
+      // this.filters.forEach(f => console.log(f.type));
+      this.filters = this.filters.filter((f) => f.type !== filter.type);
+      // añadimos el nuevo filtro
       this.filters.push(filter);
     } else {
-      // si no es del tipo Gradient se añade al array
+      // si es del tipo 'area' se añade al array
       this.filters.push(filter);
     }
-
     this.filters$.next(this.filters);
 
     this.applyFilters();
-
-    /* const newFilteredPcs = filter.applyFilter(this.pcService.allPcs);
-
-    // Si es el primer filtro sustituimos todos los filtros por los nuevos...
-    if (this.filters.length === 1) {
-      this.filteredPcs = newFilteredPcs;
-    } else {
-      // ...si no es el primero, añadimos los nuevos
-      // revisamos tambien si ya se están mostrando esos pcs para no repetirlos
-      this.filteredPcs = this.filteredPcs.concat(newFilteredPcs.filter((newPc) => !this.filteredPcs.includes(newPc)));
-    }
-    this.filteredPcs$.next(this.filteredPcs); */
   }
 
   applyFilters() {
-    this.filters.forEach((filter) => {
-      if (filter instanceof AreaFilter) {
+    const everyFilterFilteredPcs: Array<PcInterface[]> = new Array<PcInterface[]>();
+    everyFilterFilteredPcs.push(this.pcService.allPcs);
+    this.filters
+      .filter((filter) => filter.type === 'area')
+      .forEach((filter) => {
         const newFilteredPcs = filter.applyFilter(this.pcService.allPcs);
+        console.log(this.filters.filter((f) => f.type === 'area').length);
         // Si es el primer filtro sustituimos todos los filtros por los nuevos...
-        if (this.filters.length === 1) {
-          this.filteredPcs = newFilteredPcs;
+        if (this.filters.filter((f) => f.type === 'area').length === 1) {
+          // this.filteredPcs = newFilteredPcs;
+          everyFilterFilteredPcs.push(newFilteredPcs);
         } else {
           // ...si no es el primero, añadimos los nuevos
           // revisamos tambien si ya se están mostrando esos pcs para no repetirlos
-          this.filteredPcs = this.filteredPcs.concat(
+          /* this.filteredPcs = this.filteredPcs.concat(
             newFilteredPcs.filter((newPc) => !this.filteredPcs.includes(newPc))
+          ); */
+          everyFilterFilteredPcs.push(
+            this.filteredPcs.concat(newFilteredPcs.filter((newPc) => !this.filteredPcs.includes(newPc)))
           );
         }
-      }
-    });
-    this.filters.forEach((filter) => {
-      if (filter instanceof GradientFilter) {
-        this.filteredPcs = filter.applyFilter(this.filteredPcs);
-      }
-    });
+      });
+
+    this.filters
+      .filter((filter) => filter.type !== 'area')
+      .forEach((filter) => {
+        const newFilteredPcs = filter.applyFilter(this.pcService.allPcs);
+        everyFilterFilteredPcs.push(filter.applyFilter(newFilteredPcs));
+        // this.filteredPcs = this.areaFilteredPcs.filter((pc) => newFilteredPcs.includes(pc));
+        /* if (this.filters.length === 1) {
+          this.filteredPcs = newFilteredPcs;
+        } else {
+          this.filteredPcs = newFilteredPcs.filter((pc) => this.filteredPcs.includes(pc));
+          // this.filteredPcs = this.filteredPcs.filter((pc) => newFilteredPcs.includes(pc));
+        } */
+      });
+    console.log(everyFilterFilteredPcs);
+
+    this.filteredPcs = everyFilterFilteredPcs.reduce((anterior, actual) =>
+      anterior.filter((pc) => actual.includes(pc))
+    );
+
+    // this.filters$.next(this.filters);
+
     this.filteredPcs$.next(this.filteredPcs);
   }
 
@@ -120,8 +122,4 @@ export class FilterService {
   getAllFilters(): Observable<FilterInterface[]> {
     return this.filters$.asObservable();
   }
-
-  /*   getAllPcs(): Observable<PcInterface[]> {
-    return this.pcService.allPcs$;
-  } */
 }

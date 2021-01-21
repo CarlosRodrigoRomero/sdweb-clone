@@ -73,6 +73,7 @@ export class MapFilterComponent implements OnInit {
             return filtro as AreaFilter;
           }
         })
+        .filter((filtro) => filtro as AreaFilter)
         .forEach((filtro) => {
           this.areaFilterList.push(filtro);
           filtro.polygon.setMap(this.map);
@@ -113,7 +114,7 @@ export class MapFilterComponent implements OnInit {
       }
 
       // Creamos el filtro
-      const areaFilter = new AreaFilter('Área ' + this.numAreas, path);
+      const areaFilter = new AreaFilter('Área ' + this.numAreas, 'area', path);
       this.filterService.addFilter(areaFilter);
 
       // Desactiva del modo dibujo
