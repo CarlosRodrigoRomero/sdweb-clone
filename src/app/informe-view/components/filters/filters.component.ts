@@ -125,14 +125,22 @@ export class FiltersComponent implements OnInit {
 
   /* FILTROS DE TIPO DE ANOMALÍA */
 
-  /* someComplete(): boolean {
-    if (this.task.subtasks == null) {
+  someComplete(): boolean {
+    if (this.tiposTask.tiposPcs == null) {
       return false;
     }
-    return this.task.subtasks.filter((t) => t.completed).length > 0 && !this.allComplete;
+    return this.tiposTask.tiposPcs.filter((t) => t.completed).length > 0 && !this.allComplete;
   }
 
   updateAllComplete() {
-    this.allComplete = this.tiposPcs != null && this.tiposPcs.every((t) => t.completed);
-  } */
+    this.allComplete = this.tiposTask.tiposPcs != null && this.tiposTask.tiposPcs.every((t) => t.completed);
+  }
+
+  setAll(completed: boolean) {
+    this.allComplete = completed;
+    if (this.tiposTask.tiposPcs == null) {
+      return;
+    }
+    this.tiposTask.tiposPcs.forEach(t => t.completed = completed);
+  }
 }

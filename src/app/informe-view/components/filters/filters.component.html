@@ -42,8 +42,8 @@
       ></mat-slider>
     </div>
     <h5>Tipo</h5>
-    <!-- <div>
-      <section class="example-section">
+    <div>
+      <!-- <section class="example-section">
         <span class="example-list-section">
           <mat-checkbox
             class="example-margin"
@@ -51,22 +51,19 @@
             [indeterminate]="someComplete()"
             (change)="setAll($event.checked)"
           >
-            Todos
+            {{ tiposTask.label }}
           </mat-checkbox>
         </span>
         <span class="example-list-section">
           <ul>
             <li *ngFor="let tipo of tiposPcs">
-              <mat-checkbox
-                [(ngModel)]="tipo"
-                (ngModelChange)="updateAllComplete()"
-              >
-                {{ tipo }}
+              <mat-checkbox [(ngModel)]="tipo.completed" (ngModelChange)="updateAllComplete()">
+                {{ tipo.label }}
               </mat-checkbox>
             </li>
           </ul>
         </span>
-      </section>
-    </div> -->
+      </section> -->
+    </div>
   </mat-card-content>
 </mat-card>

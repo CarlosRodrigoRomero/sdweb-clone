@@ -17,7 +17,7 @@ export class FilterService {
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
   public filteredPcs: PcInterface[] = [];
   public filteredPcs$ = new BehaviorSubject<PcInterface[]>(this.filteredPcs);
-  areaFilteredPcs: PcInterface[] = [];
+  public areaFilteredPcs: PcInterface[] = [];
 
   constructor(private pcService: PcService) {}
 
@@ -57,8 +57,8 @@ export class FilterService {
           );
         }
       });
-
-    if (this.areaFilteredPcs.length > 0) {
+    // comprobamos si hay algun filtro de 'area'
+    if (this.filters.filter((f) => f.type === 'area').length > 0) {
       everyFilterFilteredPcs.push(this.areaFilteredPcs);
     }
 
@@ -70,6 +70,7 @@ export class FilterService {
         everyFilterFilteredPcs.push(filter.applyFilter(newFilteredPcs));
       });
     console.log(everyFilterFilteredPcs);
+    console.log(this.filters);
 
     if (everyFilterFilteredPcs.length > 0) {
       this.filteredPcs = everyFilterFilteredPcs.reduce((anterior, actual) =>
@@ -92,23 +93,6 @@ export class FilterService {
     this.filters$.next(this.filters);
 
     this.applyFilters();
-    /* 
-    // Si era el último filtro mostramos todas las pcs...
-    if (this.filters.length === 0) {
-      this.filteredPcs = this.pcService.allPcs;
-    } else {
-      // ... si no era el último, eliminamos solo el filtro
-      let newFilteredPcs = filter.unapplyFilter(this.filteredPcs);
-
-      // comprobamos que no se eliminen pcs que pertenezcan a otros filtros
-      this.filters.forEach((f) => {
-        const coincidentPcs = f.applyFilter(this.filteredPcs).filter((pc) => !newFilteredPcs.includes(pc));
-        newFilteredPcs = newFilteredPcs.concat(coincidentPcs);
-      });
-
-      this.filteredPcs = newFilteredPcs;
-    }
-    this.filteredPcs$.next(this.filteredPcs); */
   }
 
   deleteAllFilters() {
