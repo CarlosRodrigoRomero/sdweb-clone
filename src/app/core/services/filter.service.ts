@@ -106,8 +106,16 @@ export class FilterService {
     this.filters$.next(this.filters);
 
     // Vuelve a mostrar todos los pcs
-    this.filteredPcs = this.pcService.allPcs;
-    this.filteredPcs$.next(this.filteredPcs);
+    /* this.filteredPcs = this.pcService.allPcs;
+    this.filteredPcs$.next(this.filteredPcs); */
+  }
+
+  deleteAllTypeFilters(type: string) {
+    // Elimina los filtros del tipo recibido
+    this.filters = this.filters.filter((filter) => filter.type !== type);
+    this.filters$.next(this.filters);
+
+    this.applyFilters();
   }
 
   getAllFilters(): Observable<FilterInterface[]> {

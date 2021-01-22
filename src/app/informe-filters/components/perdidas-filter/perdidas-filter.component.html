@@ -1,0 +1,12 @@
+<h5>Pérdidas</h5>
+<div class="filtro-perdidas">
+  <mat-slider
+    thumbLabel
+    [displayWith]="formatLabelPerdidas"
+    (input)="onInputFiltroPerdidas($event)"
+    (change)="onChangeFiltroPerdidas()"
+    min="0"
+    max="100"
+    [(ngModel)]="rangoMinPerdidas"
+  ></mat-slider>
+</div>

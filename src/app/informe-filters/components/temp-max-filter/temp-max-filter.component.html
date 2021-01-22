@@ -1,0 +1,13 @@
+<h5>Temperatura max</h5>
+    <div class="filtro-temperatura">
+      <mat-slider
+        thumbLabel
+        [displayWith]="formatLabel"
+        (input)="onInputFiltroTempMax($event)"
+        (change)="onChangeFiltroTempMax()"
+        tickInterval="1"
+        min="{{ minTemp }}"
+        max="{{ maxTemp }}"
+        [(ngModel)]="rangoMinTemp"
+      ></mat-slider>
+    </div>
