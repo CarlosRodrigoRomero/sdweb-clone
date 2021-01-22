@@ -43,27 +43,25 @@
     </div>
     <h5>Tipo</h5>
     <div>
-      <!-- <section class="example-section">
-        <span class="example-list-section">
-          <mat-checkbox
-            class="example-margin"
-            [checked]="allComplete"
-            [indeterminate]="someComplete()"
-            (change)="setAll($event.checked)"
-          >
-            {{ tiposTask.label }}
-          </mat-checkbox>
-        </span>
-        <span class="example-list-section">
-          <ul>
-            <li *ngFor="let tipo of tiposPcs">
-              <mat-checkbox [(ngModel)]="tipo.completed" (ngModelChange)="updateAllComplete()">
-                {{ tipo.label }}
-              </mat-checkbox>
-            </li>
-          </ul>
-        </span>
-      </section> -->
+      <mat-checkbox
+        class="example-margin"
+        [checked]="allComplete"
+        [indeterminate]="someComplete()"
+        (change)="setAll($event.checked)"
+      >
+        {{ tiposTask.label }}
+      </mat-checkbox>
+      <li *ngFor="let tipo of tiposPcs; index as i">
+        <mat-checkbox
+          [(ngModel)]="tipo.completed"
+          [id]="i"
+          [name]="tipo.label"
+          (ngModelChange)="updateAllComplete()"
+          (change)="onChangeFiltroTipo($event)"
+        >
+          {{ tipo.label }}
+        </mat-checkbox>
+      </li>
     </div>
   </mat-card-content>
 </mat-card>

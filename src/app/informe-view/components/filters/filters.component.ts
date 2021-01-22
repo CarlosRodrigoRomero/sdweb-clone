@@ -9,6 +9,8 @@ import { MatSliderChange } from '@angular/material/slider';
 import { GradientFilter } from '@core/models/gradientFilter';
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
 import { PerdidasFilter } from '@core/models/perdidasFilter';
+import { TipoPcFilter } from '@core/models/tipoPcFilter';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 
 export interface TipoPc {
   label: string;
@@ -36,12 +38,11 @@ export class FiltersComponent implements OnInit {
   filtroPerdidas: PerdidasFilter;
 
   tiposTask: TipoPc;
-  tiposPcs: TipoPc[];
+  tiposPcs: TipoPc[] = [];
   allComplete: boolean;
+  filtroTipo: TipoPcFilter;
 
-  constructor(private pcService: PcService, private filterService: FilterService) {
-    console.log(this.pcService.getLabelsTipoPcs());
-  }
+  constructor(private pcService: PcService, private filterService: FilterService) {}
 
   ngOnInit(): void {
     // Setear datos min y max
@@ -52,16 +53,17 @@ export class FiltersComponent implements OnInit {
     this.pcService.getLabelsTipoPcs().forEach((label) =>
       this.tiposPcs.push({
         label,
-        completed: false,
+        completed: true,
       })
     );
+    console.log(this.tiposPcs);
     this.tiposTask = {
       label: 'Todos',
-      completed: false,
+      completed: true,
       tiposPcs: this.tiposPcs,
     };
 
-    this.allComplete = false;
+    this.allComplete = true;
   }
 
   formatLabel(value: number | null) {
@@ -141,6 +143,27 @@ export class FiltersComponent implements OnInit {
     if (this.tiposTask.tiposPcs == null) {
       return;
     }
-    this.tiposTask.tiposPcs.forEach(t => t.completed = completed);
+    this.tiposTask.tiposPcs.forEach((t) => {
+      t.completed = completed;
+      /* this.filtroTipo = new TipoPcFilter('tipo', GLOBAL.labels_tipos.indexOf(t.label));
+      this.filterService.addFilter(this.filtroTipo); */
+    });
+  }
+
+  onChangeFiltroTipo(event: MatCheckboxChange) {
+    console.log(event.source.id);
+
+    if (event.checked) {
+      this.filtroTipo = new TipoPcFilter(event.source.id, 'tipo', GLOBAL.labels_tipos.indexOf(event.source.name));
+      this.filterService.addFilter(this.filtroTipo);
+    } else {
+      this.filterService.filters
+        .filter((filter) => (filter.type = 'tipo'))
+        .forEach((filter) => {
+          if (filter.id === event.source.id) {
+            this.filterService.deleteFilter(filter);
+          }
+        });
+    }
   }
 }

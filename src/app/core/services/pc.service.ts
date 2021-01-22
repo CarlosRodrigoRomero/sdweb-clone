@@ -448,6 +448,9 @@ export class PcService {
       }
     });
     indices.forEach((i) => labels.push(GLOBAL.labels_tipos[i]));
+    // los ordena como estan en GLOBAL
+    labels.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));
+
     return labels;
   }
 }

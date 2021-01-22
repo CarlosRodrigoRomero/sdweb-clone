@@ -2,10 +2,12 @@ import { FilterInterface } from './filter';
 import { PcInterface } from './pc';
 
 export class TipoPcFilter implements FilterInterface {
+  id: string;
   type: string;
   tipo: number;
 
-  constructor(type: string, tipo: number) {
+  constructor(id: string, type: string, tipo: number) {
+    this.id = id;
     this.type = type;
     this.tipo = tipo;
   }
