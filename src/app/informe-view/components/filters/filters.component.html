@@ -41,5 +41,32 @@
         [(ngModel)]="rangoMinPerdidas"
       ></mat-slider>
     </div>
+    <h5>Tipo</h5>
+    <!-- <div>
+      <section class="example-section">
+        <span class="example-list-section">
+          <mat-checkbox
+            class="example-margin"
+            [checked]="allComplete"
+            [indeterminate]="someComplete()"
+            (change)="setAll($event.checked)"
+          >
+            Todos
+          </mat-checkbox>
+        </span>
+        <span class="example-list-section">
+          <ul>
+            <li *ngFor="let tipo of tiposPcs">
+              <mat-checkbox
+                [(ngModel)]="tipo"
+                (ngModelChange)="updateAllComplete()"
+              >
+                {{ tipo }}
+              </mat-checkbox>
+            </li>
+          </ul>
+        </span>
+      </section>
+    </div> -->
   </mat-card-content>
 </mat-card>

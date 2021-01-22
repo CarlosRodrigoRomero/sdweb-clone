@@ -10,6 +10,12 @@ import { GradientFilter } from '@core/models/gradientFilter';
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
 import { PerdidasFilter } from '@core/models/perdidasFilter';
 
+export interface TipoPc {
+  label: string;
+  completed: boolean;
+  tiposPcs?: TipoPc[];
+}
+
 @Component({
   selector: 'app-filters',
   templateUrl: './filters.component.html',
@@ -29,7 +35,13 @@ export class FiltersComponent implements OnInit {
   rangoMinPerdidas: number;
   filtroPerdidas: PerdidasFilter;
 
-  constructor(private pcService: PcService, private filterService: FilterService) {}
+  tiposTask: TipoPc;
+  tiposPcs: TipoPc[];
+  allComplete: boolean;
+
+  constructor(private pcService: PcService, private filterService: FilterService) {
+    console.log(this.pcService.getLabelsTipoPcs());
+  }
 
   ngOnInit(): void {
     // Setear datos min y max
@@ -37,13 +49,25 @@ export class FiltersComponent implements OnInit {
     this.minGradiente = GLOBAL.minGradiente;
     this.maxTemp = this.pcService.getTempMaxAllPcs();
     this.minTemp = 0;
+    this.pcService.getLabelsTipoPcs().forEach((label) =>
+      this.tiposPcs.push({
+        label,
+        completed: false,
+      })
+    );
+    this.tiposTask = {
+      label: 'Todos',
+      completed: false,
+      tiposPcs: this.tiposPcs,
+    };
+
+    this.allComplete = false;
   }
 
   formatLabel(value: number | null) {
     if (!value) {
       return this.rangoMinGradiente;
     }
-
     return value + 'ºC';
   }
 
@@ -53,7 +77,13 @@ export class FiltersComponent implements OnInit {
 
   onChangeFiltroGradiente() {
     this.filtroGradiente = new GradientFilter('gradient', this.rangoMinGradiente, this.maxGradiente);
-    this.filterService.addFilter(this.filtroGradiente);
+    if (this.rangoMinGradiente === this.minGradiente) {
+      // si se selecciona el mínimo desactivamos el filtro ...
+      this.filterService.deleteFilter(this.filtroGradiente);
+    } else {
+      // ... si no, lo añadimos
+      this.filterService.addFilter(this.filtroGradiente);
+    }
   }
 
   onInputFiltroTempMax(event: MatSliderChange) {
@@ -62,7 +92,13 @@ export class FiltersComponent implements OnInit {
 
   onChangeFiltroTempMax() {
     this.filtroTempMax = new TempMaxFilter('tempMax', this.rangoMinTemp, this.maxTemp);
-    this.filterService.addFilter(this.filtroTempMax);
+    if (this.rangoMinTemp === this.minTemp) {
+      // si se selecciona el mínimo desactivamos el filtro ...
+      this.filterService.deleteFilter(this.filtroTempMax);
+    } else {
+      // ... si no, lo añadimos
+      this.filterService.addFilter(this.filtroTempMax);
+    }
   }
 
   onInputFiltroPerdidas(event: MatSliderChange) {
@@ -71,14 +107,32 @@ export class FiltersComponent implements OnInit {
 
   onChangeFiltroPerdidas() {
     this.filtroPerdidas = new PerdidasFilter('perdidas', this.rangoMinPerdidas, 100);
-    this.filterService.addFilter(this.filtroPerdidas);
+    if (this.rangoMinPerdidas === 0) {
+      // si se selecciona el mínimo desactivamos el filtro ...
+      this.filterService.deleteFilter(this.filtroPerdidas);
+    } else {
+      // ... si no, lo añadimos
+      this.filterService.addFilter(this.filtroPerdidas);
+    }
   }
 
   formatLabelPerdidas(value: number | null) {
     if (!value) {
-      return this.rangoMinGradiente;
+      return this.rangoMinPerdidas;
     }
-
     return value + ' %';
   }
+
+  /* FILTROS DE TIPO DE ANOMALÍA */
+
+  /* someComplete(): boolean {
+    if (this.task.subtasks == null) {
+      return false;
+    }
+    return this.task.subtasks.filter((t) => t.completed).length > 0 && !this.allComplete;
+  }
+
+  updateAllComplete() {
+    this.allComplete = this.tiposPcs != null && this.tiposPcs.every((t) => t.completed);
+  } */
 }

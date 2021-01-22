@@ -438,4 +438,16 @@ export class PcService {
       })
     );
   }
+
+  getLabelsTipoPcs(): string[] {
+    const indices: number[] = [];
+    const labels: string[] = [];
+    this.allPcs.forEach((pc) => {
+      if (!indices.includes(pc.tipo)) {
+        indices.push(pc.tipo);
+      }
+    });
+    indices.forEach((i) => labels.push(GLOBAL.labels_tipos[i]));
+    return labels;
+  }
 }

@@ -17,7 +17,7 @@ export class FilterService {
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
   public filteredPcs: PcInterface[] = [];
   public filteredPcs$ = new BehaviorSubject<PcInterface[]>(this.filteredPcs);
-  public areaFilteredPcs: PcInterface[] = [];
+  areaFilteredPcs: PcInterface[] = [];
 
   constructor(private pcService: PcService) {}
 
@@ -25,7 +25,6 @@ export class FilterService {
     // comprobamos que no es de tipo 'area'
     if (filter.type !== 'area') {
       // eliminamos, si lo hubiera, el filtro anterior del mismo tipo que el recibido
-      // this.filters.forEach(f => console.log(f.type));
       this.filters = this.filters.filter((f) => f.type !== filter.type);
       // añadimos el nuevo filtro
       this.filters.push(filter);
@@ -40,57 +39,60 @@ export class FilterService {
 
   applyFilters() {
     const everyFilterFilteredPcs: Array<PcInterface[]> = new Array<PcInterface[]>();
-    everyFilterFilteredPcs.push(this.pcService.allPcs);
+
+    // añadimos al array un array de pcs del conjuntos de los filtros 'area'
     this.filters
       .filter((filter) => filter.type === 'area')
       .forEach((filter) => {
         const newFilteredPcs = filter.applyFilter(this.pcService.allPcs);
-        console.log(this.filters.filter((f) => f.type === 'area').length);
-        // Si es el primer filtro sustituimos todos los filtros por los nuevos...
+        // Si es el primer filtro sustituimos por los nuevos pcs ...
         if (this.filters.filter((f) => f.type === 'area').length === 1) {
           // this.filteredPcs = newFilteredPcs;
-          everyFilterFilteredPcs.push(newFilteredPcs);
+          this.areaFilteredPcs = newFilteredPcs;
         } else {
-          // ...si no es el primero, añadimos los nuevos
+          // ...si no es el primero, añadimos los nuevos pcs
           // revisamos tambien si ya se están mostrando esos pcs para no repetirlos
-          /* this.filteredPcs = this.filteredPcs.concat(
-            newFilteredPcs.filter((newPc) => !this.filteredPcs.includes(newPc))
-          ); */
-          everyFilterFilteredPcs.push(
-            this.filteredPcs.concat(newFilteredPcs.filter((newPc) => !this.filteredPcs.includes(newPc)))
+          this.areaFilteredPcs = this.areaFilteredPcs.concat(
+            newFilteredPcs.filter((newPc) => !this.areaFilteredPcs.includes(newPc))
           );
         }
       });
 
+    if (this.areaFilteredPcs.length > 0) {
+      everyFilterFilteredPcs.push(this.areaFilteredPcs);
+    }
+
+    // añadimos al array los pcs filtrados de los filtros no 'area'
     this.filters
       .filter((filter) => filter.type !== 'area')
       .forEach((filter) => {
         const newFilteredPcs = filter.applyFilter(this.pcService.allPcs);
         everyFilterFilteredPcs.push(filter.applyFilter(newFilteredPcs));
-        // this.filteredPcs = this.areaFilteredPcs.filter((pc) => newFilteredPcs.includes(pc));
-        /* if (this.filters.length === 1) {
-          this.filteredPcs = newFilteredPcs;
-        } else {
-          this.filteredPcs = newFilteredPcs.filter((pc) => this.filteredPcs.includes(pc));
-          // this.filteredPcs = this.filteredPcs.filter((pc) => newFilteredPcs.includes(pc));
-        } */
       });
     console.log(everyFilterFilteredPcs);
 
-    this.filteredPcs = everyFilterFilteredPcs.reduce((anterior, actual) =>
-      anterior.filter((pc) => actual.includes(pc))
-    );
+    if (everyFilterFilteredPcs.length > 0) {
+      this.filteredPcs = everyFilterFilteredPcs.reduce((anterior, actual) =>
+        anterior.filter((pc) => actual.includes(pc))
+      );
 
-    // this.filters$.next(this.filters);
-
-    this.filteredPcs$.next(this.filteredPcs);
+      this.filteredPcs$.next(this.filteredPcs);
+    }
   }
 
   deleteFilter(filter: FilterInterface) {
-    // Elimina el filtro y lo desactiva
-    this.filters.splice(this.filters.indexOf(filter), 1);
+    // comprobamos que no es de tipo 'area'
+    if (filter.type !== 'area') {
+      // eliminamos el filtro anterior del mismo tipo que el recibido
+      this.filters = this.filters.filter((f) => f.type !== filter.type);
+    } else {
+      this.filters.splice(this.filters.indexOf(filter), 1);
+    }
+
     this.filters$.next(this.filters);
 
+    this.applyFilters();
+    /* 
     // Si era el último filtro mostramos todas las pcs...
     if (this.filters.length === 0) {
       this.filteredPcs = this.pcService.allPcs;
@@ -106,7 +108,7 @@ export class FilterService {
 
       this.filteredPcs = newFilteredPcs;
     }
-    this.filteredPcs$.next(this.filteredPcs);
+    this.filteredPcs$.next(this.filteredPcs); */
   }
 
   deleteAllFilters() {
