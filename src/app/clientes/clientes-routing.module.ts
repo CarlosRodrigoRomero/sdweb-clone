@@ -44,6 +44,10 @@ const routes: Routes = [
         loadChildren: () => import('../informe-view/informe-view.module').then((m) => m.InformeViewModule),
       },
       {
+        path: 'planta-report',
+        loadChildren: () => import('../planta-report/planta-report.module').then((m) => m.PlantaReportModule),
+      },
+      {
         path: 'informe-edit',
         loadChildren: () => import('../informe-edit/informe-edit.module').then((m) => m.InformeEditModule),
       },

@@ -10,7 +10,6 @@ import { AngularFireStorageModule } from '@angular/fire/storage';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 
-import { LoginComponent } from './cts/login/login.component';
 import { AuthService } from '@core/services/auth.service';
 import { IndexComponent } from './cts/index/index.component';
 import { VideoComponent } from './cts/video/video.component';
@@ -27,14 +26,7 @@ import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    LoginComponent,
-    IndexComponent,
-    VideoComponent,
-    AvisoLegalComponent,
-    PubliclayoutComponent,
-  ],
+  declarations: [AppComponent, IndexComponent, VideoComponent, AvisoLegalComponent, PubliclayoutComponent],
 
   imports: [
     BrowserModule,
