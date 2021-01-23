@@ -10,7 +10,6 @@ import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
 export const routes: Routes = [
   { path: '', loadChildren: () => import('./auth/auth.module').then((m) => m.AuthenticationModule) },
   { path: 'aviso-legal', component: AvisoLegalComponent },
-  // { path: 'login', component: LoginComponent },
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then((m) => m.AuthenticationModule) },
   {
     path: 'admin',
