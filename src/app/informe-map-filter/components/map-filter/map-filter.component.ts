@@ -12,6 +12,7 @@ import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '@core/services/filter.service';
 
 import { Observable } from 'rxjs';
+
 import { AreaFilter } from '@core/models/areaFilter';
 
 declare const google: any;
@@ -55,6 +56,10 @@ export class MapFilterComponent implements OnInit {
     }
   }
 
+  getStrokeColor(severidad: number) {
+    return GLOBAL.colores_severidad[severidad - 1];
+  }
+
   onMapReady(map) {
     this.map = map;
     this.plantaService.initMap(this.planta, map);
@@ -79,10 +84,6 @@ export class MapFilterComponent implements OnInit {
           filtro.polygon.setMap(this.map);
         });
     });
-  }
-
-  getStrokeColor(severidad: number) {
-    return GLOBAL.colores_severidad[severidad - 1];
   }
 
   initDrawingManager() {

@@ -5,13 +5,13 @@ import { PcService } from './pc.service';
 import { FilterInterface } from '@core/models/filter';
 import { PcInterface } from '../models/pc';
 
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject, of, from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FilterService {
-  public typeAddFilters = ['area', 'tipo', 'clase', 'modulo'];
+  public typeAddFilters = ['area', 'tipo', 'clase', 'modulo', 'zona'];
   public filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
   public filteredPcs: PcInterface[] = [];
@@ -31,8 +31,6 @@ export class FilterService {
       // si es del tipo 'Add' se añade al array
       this.filters.push(filter);
     }
-    console.log(this.filters);
-
     this.filters$.next(this.filters);
 
     this.applyFilters();
@@ -40,25 +38,21 @@ export class FilterService {
 
   applyFilters() {
     const everyFilterFilteredPcs: Array<PcInterface[]> = new Array<PcInterface[]>();
-    // añadimos al array un array de pcs del conjuntos de los filtros 'Add'
-    this.filters
-      .filter((filter) => this.typeAddFilters.includes(filter.type))
-      .forEach((filter) => {
-        const newFilteredPcs = filter.applyFilter(this.pcService.allPcs);
-        // Si es el primer filtro sustituimos por los nuevos pcs ...
-        if (this.filters.filter((f) => this.typeAddFilters.includes(f.type)).length === 1) {
-          this.typeAddFilteredPcs = newFilteredPcs;
-        } else {
-          // ...si no es el primero, añadimos los nuevos pcs
-          // revisamos tambien si ya se están mostrando esos pcs para no repetirlos
-          this.typeAddFilteredPcs = this.typeAddFilteredPcs.concat(
-            newFilteredPcs.filter((newPc) => !this.typeAddFilteredPcs.includes(newPc))
-          );
+    // comprobamos si hay filtros de tipo 'Add'
+    if (this.filters.filter((filter) => this.typeAddFilters.includes(filter.type)).length > 0) {
+      // separamos los pcs por tipo de filtro
+      this.typeAddFilters.forEach((type) => {
+        const newFilteredPcs: PcInterface[] = [];
+        if (this.filters.filter((filter) => filter.type === type).length > 0) {
+          this.filters
+            .filter((filter) => filter.type === type)
+            .forEach((filter) => {
+              filter.applyFilter(this.pcService.allPcs).forEach((pc) => newFilteredPcs.push(pc));
+            });
+          // añadimos un array de cada tipo
+          everyFilterFilteredPcs.push(newFilteredPcs);
         }
       });
-    // comprobamos si hay algun filtro de 'area'
-    if (this.filters.filter((filter) => this.typeAddFilters.includes(filter.type)).length > 0) {
-      everyFilterFilteredPcs.push(this.typeAddFilteredPcs);
     }
 
     // añadimos al array los pcs filtrados de los filtros no 'Add'
@@ -66,20 +60,30 @@ export class FilterService {
       .filter((filter) => !this.typeAddFilters.includes(filter.type))
       .forEach((filter) => {
         const newFilteredPcs = filter.applyFilter(this.pcService.allPcs);
-        everyFilterFilteredPcs.push(filter.applyFilter(newFilteredPcs));
+        everyFilterFilteredPcs.push(newFilteredPcs);
       });
 
+    // calculamos la interseccion de los array de los diferentes tipos
     if (everyFilterFilteredPcs.length > 0) {
       this.filteredPcs = everyFilterFilteredPcs.reduce((anterior, actual) =>
         anterior.filter((pc) => actual.includes(pc))
       );
     }
 
+    // comprobamos que hay algun filtro activo
     if (everyFilterFilteredPcs.length === 0) {
       this.filteredPcs = this.pcService.allPcs;
     }
 
     this.filteredPcs$.next(this.filteredPcs);
+  }
+
+  getAllTypeFilters(type: string) {
+    return from(this.filters.filter((filter) => filter.type === type));
+  }
+
+  getAllFilters(): Observable<FilterInterface[]> {
+    return this.filters$.asObservable();
   }
 
   deleteFilter(filter: FilterInterface) {
@@ -100,10 +104,6 @@ export class FilterService {
     // Elimina todos los filtros
     this.filters = [];
     this.filters$.next(this.filters);
-
-    // Vuelve a mostrar todos los pcs
-    /* this.filteredPcs = this.pcService.allPcs;
-    this.filteredPcs$.next(this.filteredPcs); */
   }
 
   deleteAllTypeFilters(type: string) {
@@ -113,9 +113,5 @@ export class FilterService {
     this.filters$.next(this.filters);
 
     this.applyFilters();
-  }
-
-  getAllFilters(): Observable<FilterInterface[]> {
-    return this.filters$.asObservable();
   }
 }

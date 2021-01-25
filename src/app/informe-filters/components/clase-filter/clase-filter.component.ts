@@ -45,7 +45,6 @@ export class ClaseFilterComponent implements OnInit {
         'clase',
         GLOBAL.labels_severidad.indexOf(event.source.name) + 1
       );
-      console.log(this.filtroClase);
       this.filterService.addFilter(this.filtroClase);
     } else {
       this.filterService.filters

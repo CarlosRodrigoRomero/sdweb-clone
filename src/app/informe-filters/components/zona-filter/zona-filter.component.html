@@ -1,0 +1,13 @@
+<h5>Zona</h5>
+<div>
+  <li *ngFor="let zona of zonasPcs; index as i">
+    <mat-checkbox
+      [(ngModel)]="zona.completed"
+      [id]="'zona_' + (i + 1)"
+      [name]="zona.label"
+      (change)="onChangeFiltroZona($event)"
+    >
+      {{ zona.label }}
+    </mat-checkbox>
+  </li>
+</div>

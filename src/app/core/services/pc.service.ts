@@ -482,29 +482,16 @@ export class PcService {
       }
     });
 
-    /* this.allPcs.forEach((pc) => {
-      if (pc.modulo.marca === undefined) {
-        if (pc.modulo.modelo === undefined) {
-          if (!modulos.includes(pc.modulo.potencia + 'W')) {
-            modulos.push(pc.modulo.potencia + 'W');
-          }
-        } else if (modulos.includes(pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W')) {
-          modulos.push(pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W');
-        }
-      } else {
-        if (pc.modulo.modelo === undefined) {
-          if (!modulos.includes(pc.modulo.marca + ' ' + pc.modulo.potencia + 'W')) {
-            modulos.push(pc.modulo.marca + ' ' + pc.modulo.potencia + 'W');
-          }
-        } else if (!modulos.includes(pc.modulo.marca + ' ' + pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W')) {
-          modulos.push(pc.modulo.marca + ' ' + pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W');
-        }
-      }
-    }); */
     return modulos;
   }
 
-  showPcModulo() {
-    this.allPcs.forEach((pc) => console.log(pc.modulo.marca + ' ' + pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W'));
+  getZonasPcs(): string[] {
+    const zonas: string[] = [];
+    this.allPcs.forEach((pc) => {
+      if (!zonas.includes(pc.global_x)) {
+        zonas.push(pc.global_x);
+      }
+    });
+    return zonas.sort();
   }
 }

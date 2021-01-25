@@ -11,9 +11,11 @@ import { GradientFilterComponent } from './components/gradient-filter/gradient-f
 import { TipoFilterComponent } from './components/tipo-filter/tipo-filter.component';
 import { ClaseFilterComponent } from './components/clase-filter/clase-filter.component';
 import { ModuloFilterComponent } from './components/modulo-filter/modulo-filter.component';
+import { ZonaFilterComponent } from './components/zona-filter/zona-filter.component';
+import { AreaFilterComponent } from './components/area-filter/area-filter.component';
 
 @NgModule({
-  declarations: [FiltersPanelComponent, PerdidasFilterComponent, TempMaxFilterComponent, GradientFilterComponent, TipoFilterComponent, ClaseFilterComponent, ModuloFilterComponent],
+  declarations: [FiltersPanelComponent, PerdidasFilterComponent, TempMaxFilterComponent, GradientFilterComponent, TipoFilterComponent, ClaseFilterComponent, ModuloFilterComponent, ZonaFilterComponent, AreaFilterComponent],
   imports: [CommonModule, SharedModule, FormsModule, ReactiveFormsModule],
   exports: [FiltersPanelComponent],
 })
