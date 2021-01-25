@@ -13,7 +13,7 @@ export class ClasePcFilter implements FilterInterface {
   }
 
   applyFilter(pcs: PcInterface[]): PcInterface[] {
-    return pcs.filter((pc) => pc.clase === this.clase);
+    return pcs.filter((pc) => pc.severidad === this.clase);
   }
   unapplyFilter(pcs: PcInterface[]): PcInterface[] {
     return null;

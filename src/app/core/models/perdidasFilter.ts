@@ -14,6 +14,8 @@ export class PerdidasFilter implements FilterInterface {
 
   applyFilter(pcs: PcInterface[]): PcInterface[] {
     return pcs.filter((pc) => pc.perdidas >= this.rangoMin / 100 && pc.perdidas <= this.rangoMax / 100);
+
+    
   }
   unapplyFilter(pcs: PcInterface[]): PcInterface[] {
     return null;

@@ -25,6 +25,7 @@ export class PerdidasFilterComponent implements OnInit {
 
   onChangeFiltroPerdidas() {
     this.filtroPerdidas = new PerdidasFilter('perdidas', this.rangoMinPerdidas, 100);
+    
     if (this.rangoMinPerdidas === 0) {
       // si se selecciona el mínimo desactivamos el filtro ...
       this.filterService.deleteFilter(this.filtroPerdidas);

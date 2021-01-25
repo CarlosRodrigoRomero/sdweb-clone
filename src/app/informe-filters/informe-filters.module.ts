@@ -10,9 +10,10 @@ import { TempMaxFilterComponent } from './components/temp-max-filter/temp-max-fi
 import { GradientFilterComponent } from './components/gradient-filter/gradient-filter.component';
 import { TipoFilterComponent } from './components/tipo-filter/tipo-filter.component';
 import { ClaseFilterComponent } from './components/clase-filter/clase-filter.component';
+import { ModuloFilterComponent } from './components/modulo-filter/modulo-filter.component';
 
 @NgModule({
-  declarations: [FiltersPanelComponent, PerdidasFilterComponent, TempMaxFilterComponent, GradientFilterComponent, TipoFilterComponent, ClaseFilterComponent],
+  declarations: [FiltersPanelComponent, PerdidasFilterComponent, TempMaxFilterComponent, GradientFilterComponent, TipoFilterComponent, ClaseFilterComponent, ModuloFilterComponent],
   imports: [CommonModule, SharedModule, FormsModule, ReactiveFormsModule],
   exports: [FiltersPanelComponent],
 })

@@ -9,8 +9,8 @@ import { FilterService } from '@core/services/filter.service';
 import { TipoPcFilter } from '@core/models/tipoPcFilter';
 
 interface TipoPc {
-  label: string;
-  completed: boolean;
+  label?: string;
+  completed?: boolean;
   tiposPcs?: TipoPc[];
 }
 
@@ -34,10 +34,8 @@ export class TipoFilterComponent implements OnInit {
         completed: false,
       })
     );
-    console.log(this.tiposPcs);
+
     this.tiposTask = {
-      label: 'Todos',
-      completed: true,
       tiposPcs: this.tiposPcs,
     };
   }
@@ -48,7 +46,7 @@ export class TipoFilterComponent implements OnInit {
       this.filterService.addFilter(this.filtroTipo);
     } else {
       this.filterService.filters
-        .filter((filter) => (filter.type = 'tipo'))
+        .filter((filter) => filter.type === 'tipo')
         .forEach((filter) => {
           if (filter.id === event.source.id) {
             this.filterService.deleteFilter(filter);

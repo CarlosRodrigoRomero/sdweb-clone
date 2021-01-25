@@ -8,6 +8,7 @@ import { PlantaService } from './planta.service';
 import { AuthService } from './auth.service';
 import { UserAreaInterface } from '../models/userArea';
 import { CritCoA } from '../models/critCoA';
+import { stringify } from '@angular/compiler/src/util';
 
 export interface SeguidorInterface {
   pcs: PcInterface[];
@@ -452,5 +453,58 @@ export class PcService {
     labels.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));
 
     return labels;
+  }
+
+  getModuloLabelPc(pc: PcInterface): string {
+    let moduloLabel: string;
+    if (pc.modulo.marca === undefined) {
+      if (pc.modulo.modelo === undefined) {
+        moduloLabel = pc.modulo.potencia + 'W';
+      } else {
+        moduloLabel = pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W';
+      }
+    } else {
+      if (pc.modulo.modelo === undefined) {
+        moduloLabel = pc.modulo.marca + ' ' + pc.modulo.potencia + 'W';
+      } else {
+        moduloLabel = pc.modulo.marca + ' ' + pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W';
+      }
+    }
+    return moduloLabel;
+  }
+
+  getModulosPcs(): string[] {
+    const modulos: string[] = [];
+
+    this.allPcs.forEach((pc) => {
+      if (!modulos.includes(this.getModuloLabelPc(pc))) {
+        modulos.push(this.getModuloLabelPc(pc));
+      }
+    });
+
+    /* this.allPcs.forEach((pc) => {
+      if (pc.modulo.marca === undefined) {
+        if (pc.modulo.modelo === undefined) {
+          if (!modulos.includes(pc.modulo.potencia + 'W')) {
+            modulos.push(pc.modulo.potencia + 'W');
+          }
+        } else if (modulos.includes(pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W')) {
+          modulos.push(pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W');
+        }
+      } else {
+        if (pc.modulo.modelo === undefined) {
+          if (!modulos.includes(pc.modulo.marca + ' ' + pc.modulo.potencia + 'W')) {
+            modulos.push(pc.modulo.marca + ' ' + pc.modulo.potencia + 'W');
+          }
+        } else if (!modulos.includes(pc.modulo.marca + ' ' + pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W')) {
+          modulos.push(pc.modulo.marca + ' ' + pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W');
+        }
+      }
+    }); */
+    return modulos;
+  }
+
+  showPcModulo() {
+    this.allPcs.forEach((pc) => console.log(pc.modulo.marca + ' ' + pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W'));
   }
 }
