@@ -1,4 +1,12 @@
 .map {
-  height: 89%;
+  height: 800px;
   width: 100%;
+}
+#slider {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+.rel {
+  position: relative;
 }
