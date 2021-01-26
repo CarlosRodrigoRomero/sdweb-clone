@@ -1,0 +1,9 @@
+::ng-deep {
+  .custom-slider .ngx-slider .ngx-slider-selection {
+    background: red;
+  }
+
+  .custom-slider .ngx-slider .ngx-slider-pointer:after {
+    display: none;
+  }
+}

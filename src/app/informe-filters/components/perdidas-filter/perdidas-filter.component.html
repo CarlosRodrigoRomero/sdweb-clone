@@ -1,13 +1,10 @@
 <h5>Pérdidas</h5>
-<div class="filtro-perdidas">
-  <mat-slider
-    thumbLabel
-    [displayWith]="formatLabelPerdidas"
-    (input)="onInputFiltroPerdidas($event)"
-    (change)="onChangeFiltroPerdidas()"
-    min="0"
-    max="100"
-    [(ngModel)]="rangoMinPerdidas"
-  ></mat-slider>
+<div class="custom-slider">
+  <ngx-slider
+    [(value)]="rangoMinPerdidas"
+    [(highValue)]="rangoMaxPerdidas"
+    (valueChange)="onChangeFiltroPerdidas()"
+    (highValueChange)="onChangeFiltroPerdidas()"
+    [options]="options"
+  ></ngx-slider>
 </div>
-<ngx-slider [(value)]="rangoMinPerdidas" [options]="options"></ngx-slider>
