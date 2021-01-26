@@ -15,7 +15,17 @@ import { ZonaFilterComponent } from './components/zona-filter/zona-filter.compon
 import { AreaFilterComponent } from './components/area-filter/area-filter.component';
 
 @NgModule({
-  declarations: [FiltersPanelComponent, PerdidasFilterComponent, TempMaxFilterComponent, GradientFilterComponent, TipoFilterComponent, ClaseFilterComponent, ModuloFilterComponent, ZonaFilterComponent, AreaFilterComponent],
+  declarations: [
+    FiltersPanelComponent,
+    PerdidasFilterComponent,
+    TempMaxFilterComponent,
+    GradientFilterComponent,
+    TipoFilterComponent,
+    ClaseFilterComponent,
+    ModuloFilterComponent,
+    ZonaFilterComponent,
+    AreaFilterComponent,
+  ],
   imports: [CommonModule, SharedModule, FormsModule, ReactiveFormsModule],
   exports: [FiltersPanelComponent],
 })
