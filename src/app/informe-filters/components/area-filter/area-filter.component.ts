@@ -17,14 +17,14 @@ declare const google: any;
 })
 export class AreaFilterComponent implements OnInit {
   removable = true;
-  public areaFilter$: Observable<FilterInterface[]>;
+  public areaFilters$: Observable<FilterInterface[]>;
   public map: any;
   public numAreas = 0;
 
   constructor(private filterService: FilterService) {}
 
   ngOnInit(): void {
-    this.areaFilter$ = this.filterService.getAllFilters();
+    this.areaFilters$ = this.filterService.getAllFilters();
   }
 
   deleteFilter(filter: FilterInterface) {

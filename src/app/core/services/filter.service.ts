@@ -14,6 +14,8 @@ export class FilterService {
   public typeAddFilters = ['area', 'tipo', 'clase', 'modulo', 'zona'];
   public filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
+  public filtersByType: FilterInterface[] = [];
+  public filtersByType$ = new BehaviorSubject<FilterInterface[]>(this.filtersByType);
   public filteredPcs: PcInterface[] = [];
   public filteredPcs$ = new BehaviorSubject<PcInterface[]>(this.filteredPcs);
   public typeAddFilteredPcs: PcInterface[] = [];
@@ -79,7 +81,11 @@ export class FilterService {
   }
 
   getAllTypeFilters(type: string) {
-    return from(this.filters.filter((filter) => filter.type === type));
+    this.filtersByType = this.filters.filter((filter) => filter.type === type);
+    console.log(this.filters);
+    console.log(this.filtersByType);
+    this.filtersByType$.next(this.filtersByType);
+    return this.filtersByType$.asObservable();
   }
 
   getAllFilters(): Observable<FilterInterface[]> {
