@@ -28,15 +28,16 @@
               [editable]="false"
               [zIndex]="1"
             ></agm-circle>
-            <button mat-raised-button color="basic" (click)="initDrawingManager()">Nuevo área</button>
           </agm-map>
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-12">
-          <div class="button-row">
-            <button mat-raised-button color="basic" (click)="initDrawingManager()">Nuevo área</button>
-          </div>
+        <div class="button-row">
+          <button mat-raised-button color="basic" (click)="initDrawingManager()">Nuevo área</button>
+        </div>
+        <span class="spacer"></span>
+        <div>
+          <app-share-map></app-share-map>
         </div>
       </div>
     </div>

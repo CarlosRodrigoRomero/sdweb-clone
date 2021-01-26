@@ -25,6 +25,10 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'share',
+    loadChildren: () => import('./share/share.module').then((m) => m.ShareModule),
+  },
+  {
     path: 'v',
     component: PubliclayoutComponent,
     children: [

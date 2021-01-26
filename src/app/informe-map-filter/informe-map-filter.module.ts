@@ -8,9 +8,10 @@ import { InformeMapFilterRoutingModule } from './informe-map-filter-routing.modu
 import { MapFilterComponent } from './components/map-filter/map-filter.component';
 import { ActiveFilterListComponent } from './components/active-filter-list/active-filter-list.component';
 import { FilterPcsListComponent } from './components/filter-pcs-list/filter-pcs-list.component';
+import { ShareMapComponent } from './components/share-map/share-map.component';
 
 @NgModule({
-  declarations: [MapFilterComponent, ActiveFilterListComponent, FilterPcsListComponent],
+  declarations: [MapFilterComponent, ActiveFilterListComponent, FilterPcsListComponent, ShareMapComponent],
   imports: [
     CommonModule,
     InformeMapFilterRoutingModule,
