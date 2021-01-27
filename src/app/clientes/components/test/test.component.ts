@@ -164,11 +164,11 @@ export class TestComponent implements OnInit {
     return 0;
   }
 
-  closeLeft(reason: string) {
+  closeLeft() {
     this.sidenavLeft.close();
   }
 
-  closeRight(reason: string) {
+  closeRight() {
     this.sidenavRight.close();
   }
 }

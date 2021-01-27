@@ -5,20 +5,22 @@
 </ng-template>
 
 <div *ngIf="isLoaded1 && isLoaded2 && isLoaded3; else loading">
-  <mat-sidenav-container class="example-container" (backdropClick)="closeLeft('backdrop')" [hasBackdrop]="false">
-    <mat-sidenav #sidenavLeft (keydown.escape)="closeLeft('escape')" disableClose>
+  <mat-sidenav-container class="example-container" [hasBackdrop]="false">
+    <mat-sidenav #sidenavLeft [fixedInViewport]="true" [fixedTopGap]="142" position="start" disableClose>
       <p><button mat-button (click)="closeLeft('toggle button')">Toggle</button></p>
       <app-filters-panel></app-filters-panel>
     </mat-sidenav>
-    <mat-sidenav #sidenavRight position="end" (keydown.escape)="closeRight('escape')" disableClose>
+    <mat-sidenav #sidenavRight [fixedInViewport]="true" [fixedTopGap]="142" position="end" disableClose>
       <p><button mat-button (click)="closeRight('toggle button')">Toggle</button></p>
       <app-filter-pcs-list></app-filter-pcs-list>
     </mat-sidenav>
 
     <mat-sidenav-content>
-      <p><button mat-button (click)="sidenavLeft.open()">Open</button></p>
-      <p><button mat-button (click)="sidenavRight.open()">Open</button></p>
       <app-map-filter></app-map-filter>
+      <div>
+        <p><button class="btn-left" mat-button (click)="sidenavLeft.open()">Open</button></p>
+        <p><button class="btn-right" mat-button (click)="sidenavRight.open()">Open</button></p>
+      </div>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>
