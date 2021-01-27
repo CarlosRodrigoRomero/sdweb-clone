@@ -27,10 +27,11 @@ export class GradientFilterComponent implements OnInit {
     this.maxGradiente = this.pcService.getMaxGradienteNormalizado();
     this.rangoMinGradiente = this.minGradiente;
     this.rangoMaxGradiente = this.maxGradiente;
-    this.options = { floor: this.minGradiente, ceil: this.maxGradiente };
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.options = { floor: this.minGradiente, ceil: this.maxGradiente };
+  }
 
   onChangeFiltroGradiente() {
     this.filtroGradiente = new GradientFilter('gradient', this.rangoMinGradiente, this.rangoMaxGradiente);

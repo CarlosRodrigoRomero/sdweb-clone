@@ -433,27 +433,30 @@ export class PcService {
   }
 
   getTempMaxAllPcs(): number {
-    return Math.max(
+    const tMax = Math.max(
       ...this.allPcs.map((pc) => {
         return pc.temperaturaMax as number;
       })
     );
+    return Math.ceil(tMax);
   }
 
   getMinGradienteNormalizado(): number {
-    return Math.min(
+    const min = Math.min(
       ...this.allPcs.map((pc) => {
         return pc.gradienteNormalizado as number;
       })
     );
+    return Math.floor(min);
   }
 
   getMaxGradienteNormalizado(): number {
-    return Math.max(
+    const max = Math.max(
       ...this.allPcs.map((pc) => {
-        return pc.gradienteNormalizado as number;
+        return pc.gradienteNormalizado;
       })
     );
+    return Math.ceil(max);
   }
 
   getLabelsTipoPcs(): string[] {

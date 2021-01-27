@@ -123,4 +123,8 @@ export class FilterService {
 
     this.applyFilters();
   }
+
+  setFiltersParams() {
+    
+  }
 }

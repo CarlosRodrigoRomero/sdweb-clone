@@ -21,5 +21,6 @@ import { ShareMapComponent } from './components/share-map/share-map.component';
     }),
     SharedModule,
   ],
+  exports: [FilterPcsListComponent, MapFilterComponent],
 })
 export class InformeMapFilterModule {}

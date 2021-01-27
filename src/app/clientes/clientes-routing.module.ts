@@ -7,6 +7,7 @@ import { AutoLocComponent } from './components/auto-loc/auto-loc.component';
 import { PlantaAddComponent } from './components/planta-add/planta-add.component';
 import { InformeAddComponent } from './components/informe-add/informe-add.component';
 import { ModuloAddComponent } from './components/modulo-add/modulo-add.component';
+import { TestComponent } from './components/test/test.component';
 
 const routes: Routes = [
   {
@@ -46,6 +47,10 @@ const routes: Routes = [
       {
         path: 'informe-edit',
         loadChildren: () => import('../informe-edit/informe-edit.module').then((m) => m.InformeEditModule),
+      },
+      {
+        path: ':id',
+        component: TestComponent,
       },
     ],
   },

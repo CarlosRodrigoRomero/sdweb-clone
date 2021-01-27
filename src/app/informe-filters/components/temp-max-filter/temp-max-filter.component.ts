@@ -23,10 +23,8 @@ export class TempMaxFilterComponent implements OnInit {
   constructor(private pcService: PcService, private filterService: FilterService) {
     this.minTemp = 0;
     this.maxTemp = this.pcService.getTempMaxAllPcs();
-    console.log(this.maxTemp);
     this.rangoMinTemp = this.minTemp;
     this.rangoMaxTemp = this.maxTemp;
-    console.log(this.rangoMaxTemp);
     this.options = { floor: this.minTemp, ceil: this.maxTemp };
   }
 

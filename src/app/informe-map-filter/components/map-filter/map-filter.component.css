@@ -2,8 +2,11 @@
   width: 100%;
 }
 
+.map {
+  height: 80vh;
+}
 agm-map {
-  height: 500px;
+  height: 100%;
 }
 
 .spacer {

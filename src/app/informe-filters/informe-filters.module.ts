@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { SharedModule } from '@shared/shared.module';
+import { InformeMapFilterModule } from '../informe-map-filter/informe-map-filter.module';
 
 import { FiltersPanelComponent } from './components/filters-panel/filters-panel.component';
 import { PerdidasFilterComponent } from './components/perdidas-filter/perdidas-filter.component';
@@ -26,7 +27,7 @@ import { AreaFilterComponent } from './components/area-filter/area-filter.compon
     ZonaFilterComponent,
     AreaFilterComponent,
   ],
-  imports: [CommonModule, SharedModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, SharedModule, FormsModule, ReactiveFormsModule, InformeMapFilterModule],
   exports: [FiltersPanelComponent],
 })
 export class InformeFiltersModule {}
