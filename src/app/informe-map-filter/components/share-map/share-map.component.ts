@@ -15,8 +15,6 @@ import { GradientFilterComponent } from 'src/app/informe-filters/components/grad
 export class ShareMapComponent implements OnInit, AfterViewInit {
   items: Observable<any[]>;
 
-  @ViewChildren(GradientFilterComponent) gradientComponent: GradientFilterComponent;
-
   constructor(private firestore: AngularFirestore, private filterService: FilterService) {
     /* this.items = firestore.collection('plantas').valueChanges();
     this.items.subscribe((items) => console.log(items)); */
@@ -27,6 +25,6 @@ export class ShareMapComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {}
 
   getActiveFilters() {
-    console.log(this.gradientComponent.rangoMinGradiente);
+    
   }
 }

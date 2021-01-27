@@ -1,13 +1,10 @@
 <h5>Gradiente</h5>
-<div class="filtro-gradiente">
-  <mat-slider
-    thumbLabel
-    [displayWith]="formatLabel"
-    (input)="onInputFiltroGradiente($event)"
-    (change)="onChangeFiltroGradiente()"
-    tickInterval="1"
-    min="{{ minGradiente }}"
-    max="{{ maxGradiente }}"
-    [(ngModel)]="rangoMinGradiente"
-  ></mat-slider>
+<div class="custom-slider">
+  <ngx-slider
+    [(value)]="rangoMinGradiente"
+    [(highValue)]="rangoMaxGradiente"
+    (valueChange)="onChangeFiltroGradiente()"
+    (highValueChange)="onChangeFiltroGradiente()"
+    [options]="options"
+  ></ngx-slider>
 </div>

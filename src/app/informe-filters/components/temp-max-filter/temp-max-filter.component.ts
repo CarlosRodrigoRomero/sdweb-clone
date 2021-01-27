@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
-import { MatSliderChange } from '@angular/material/slider';
-
 import { PcService } from '@core/services/pc.service';
 import { FilterService } from '@core/services/filter.service';
 
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
+
+import { Options } from '@angular-slider/ngx-slider';
 
 @Component({
   selector: 'app-temp-max-filter',
@@ -16,29 +16,25 @@ export class TempMaxFilterComponent implements OnInit {
   minTemp: number;
   maxTemp: number;
   rangoMinTemp: number;
+  rangoMaxTemp: number;
   filtroTempMax: TempMaxFilter;
+  options: Options;
 
-  constructor(private pcService: PcService, private filterService: FilterService) {}
-
-  ngOnInit(): void {
-    this.maxTemp = this.pcService.getTempMaxAllPcs();
+  constructor(private pcService: PcService, private filterService: FilterService) {
     this.minTemp = 0;
+    this.maxTemp = this.pcService.getTempMaxAllPcs();
+    console.log(this.maxTemp);
+    this.rangoMinTemp = this.minTemp;
+    this.rangoMaxTemp = this.maxTemp;
+    console.log(this.rangoMaxTemp);
+    this.options = { floor: this.minTemp, ceil: this.maxTemp };
   }
 
-  formatLabel(value: number | null) {
-    if (!value) {
-      return this.rangoMinTemp;
-    }
-    return value + 'ºC';
-  }
-
-  onInputFiltroTempMax(event: MatSliderChange) {
-    this.rangoMinTemp = event.value;
-  }
+  ngOnInit(): void {}
 
   onChangeFiltroTempMax() {
-    this.filtroTempMax = new TempMaxFilter('tempMax', this.rangoMinTemp, this.maxTemp);
-    if (this.rangoMinTemp === this.minTemp) {
+    this.filtroTempMax = new TempMaxFilter('tempMax', this.rangoMinTemp, this.rangoMaxTemp);
+    if (this.rangoMinTemp === this.minTemp && this.rangoMaxTemp === this.maxTemp) {
       // si se selecciona el mínimo desactivamos el filtro ...
       this.filterService.deleteFilter(this.filtroTempMax);
     } else {

@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 
-import { MatSliderChange } from '@angular/material/slider';
-
 import { PerdidasFilter } from '@core/models/perdidasFilter';
 
 import { FilterService } from '@core/services/filter.service';
@@ -26,10 +24,6 @@ export class PerdidasFilterComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  /* onInputFiltroPerdidas(event: MatSliderChange) {
-    this.rangoMinPerdidas = event.value;
-  } */
-
   onChangeFiltroPerdidas() {
     this.filtroPerdidas = new PerdidasFilter('perdidas', this.rangoMinPerdidas, this.rangoMaxPerdidas);
 
@@ -40,12 +34,5 @@ export class PerdidasFilterComponent implements OnInit {
       // ... si no, lo añadimos
       this.filterService.addFilter(this.filtroPerdidas);
     }
-  }
-
-  formatLabelPerdidas(value: number | null) {
-    if (!value) {
-      return this.rangoMinPerdidas;
-    }
-    return value + ' %';
   }
 }

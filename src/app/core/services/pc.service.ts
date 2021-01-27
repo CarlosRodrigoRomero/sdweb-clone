@@ -440,6 +440,22 @@ export class PcService {
     );
   }
 
+  getMinGradienteNormalizado(): number {
+    return Math.min(
+      ...this.allPcs.map((pc) => {
+        return pc.gradienteNormalizado as number;
+      })
+    );
+  }
+
+  getMaxGradienteNormalizado(): number {
+    return Math.max(
+      ...this.allPcs.map((pc) => {
+        return pc.gradienteNormalizado as number;
+      })
+    );
+  }
+
   getLabelsTipoPcs(): string[] {
     const indices: number[] = [];
     const labels: string[] = [];
