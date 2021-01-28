@@ -1,13 +1,15 @@
-<h5>Clase</h5>
-<div>
-  <li *ngFor="let clase of clasesPcs; index as i">
-    <mat-checkbox
-      [(ngModel)]="clase.completed"
-      [id]="'CoA_' + (i + 1)"
-      [name]="clase.label"
-      (change)="onChangeFiltroClase($event)"
-    >
-      {{ clase.label }}
-    </mat-checkbox>
-  </li>
+<div class="filtro">
+  <h4>Clase</h4>
+  <div>
+    <li *ngFor="let clase of clasesPcs; index as i">
+      <mat-checkbox
+        [(ngModel)]="clase.completed"
+        [id]="'CoA_' + (i + 1)"
+        [name]="clase.label"
+        (change)="onChangeFiltroClase($event)"
+      >
+        {{ clase.label }}
+      </mat-checkbox>
+    </li>
+  </div>
 </div>

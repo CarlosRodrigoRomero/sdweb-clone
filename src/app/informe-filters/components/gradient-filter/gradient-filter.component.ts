@@ -7,7 +7,7 @@ import { PcService } from '@core/services/pc.service';
 
 import { GradientFilter } from '@core/models/gradientFilter';
 
-import { Options } from '@angular-slider/ngx-slider';
+import { LabelType, Options } from '@angular-slider/ngx-slider';
 
 @Component({
   selector: 'app-gradient-filter',
@@ -30,7 +30,20 @@ export class GradientFilterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.options = { floor: this.minGradiente, ceil: this.maxGradiente };
+    this.options = {
+      floor: this.minGradiente,
+      ceil: this.maxGradiente,
+      translate: (value: number, label: LabelType): string => {
+        switch (label) {
+          case LabelType.Low:
+            return value + 'ºC';
+          case LabelType.High:
+            return value + 'ºC';
+          default:
+            return value + 'ºC';
+        }
+      },
+    };
   }
 
   onChangeFiltroGradiente() {

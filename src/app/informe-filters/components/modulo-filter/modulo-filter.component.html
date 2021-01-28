@@ -1,13 +1,15 @@
-<h5>Tipo de módulo</h5>
-<div>
-  <li *ngFor="let modulo of modulosPcs; index as i">
-    <mat-checkbox
-      [(ngModel)]="modulo.completed"
-      [id]="'modulo_' + (i + 1)"
-      [name]="modulo.label"
-      (change)="onChangeFiltroModulo($event)"
-    >
-      {{ modulo.label }}
-    </mat-checkbox>
-  </li>
+<div class="filtro">
+  <h4>Tipo de módulo</h4>
+  <div>
+    <li *ngFor="let modulo of modulosPcs; index as i">
+      <mat-checkbox
+        [(ngModel)]="modulo.completed"
+        [id]="'modulo_' + (i + 1)"
+        [name]="modulo.label"
+        (change)="onChangeFiltroModulo($event)"
+      >
+        {{ modulo.label }}
+      </mat-checkbox>
+    </li>
+  </div>
 </div>

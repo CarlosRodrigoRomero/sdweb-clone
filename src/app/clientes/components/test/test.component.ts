@@ -42,6 +42,9 @@ export class TestComponent implements OnInit {
   public allowDownloads: boolean;
   public empresaNombre: string;
 
+  leftOpened: boolean;
+  rightOpened: boolean;
+
   numSeveridad = new Array(GLOBAL.labels_severidad.length).fill(0).map((_, i) => i + 1);
   public countSeveridad: number[];
 

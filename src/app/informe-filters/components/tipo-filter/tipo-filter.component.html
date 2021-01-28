@@ -1,13 +1,15 @@
-<h5>Tipo</h5>
-<div>
-  <li *ngFor="let tipo of tiposPcs; index as i">
-    <mat-checkbox
-      [(ngModel)]="tipo.completed"
-      [id]="'tipo_' + (i + 1)"
-      [name]="tipo.label"
-      (change)="onChangeFiltroTipo($event)"
-    >
-      {{ tipo.label }}
-    </mat-checkbox>
-  </li>
+<div class="filtro">
+  <h4>Tipo</h4>
+  <div>
+    <li *ngFor="let tipo of tiposPcs; index as i">
+      <mat-checkbox
+        [(ngModel)]="tipo.completed"
+        [id]="'tipo_' + (i + 1)"
+        [name]="tipo.label"
+        (change)="onChangeFiltroTipo($event)"
+      >
+        {{ tipo.label }}
+      </mat-checkbox>
+    </li>
+  </div>
 </div>

@@ -4,7 +4,7 @@ import { PerdidasFilter } from '@core/models/perdidasFilter';
 
 import { FilterService } from '@core/services/filter.service';
 
-import { Options } from '@angular-slider/ngx-slider';
+import { LabelType, Options } from '@angular-slider/ngx-slider';
 
 @Component({
   selector: 'app-perdidas-filter',
@@ -15,7 +15,20 @@ export class PerdidasFilterComponent implements OnInit {
   rangoMinPerdidas: number;
   rangoMaxPerdidas: number;
   filtroPerdidas: PerdidasFilter;
-  options: Options = { floor: 0, ceil: 100 };
+  options: Options = {
+    floor: 0,
+    ceil: 100,
+    translate: (value: number, label: LabelType): string => {
+      switch (label) {
+        case LabelType.Low:
+          return value + '%';
+        case LabelType.High:
+          return value + '%';
+        default:
+          return value + '%';
+      }
+    },
+  };
 
   constructor(private filterService: FilterService) {
     this.rangoMinPerdidas = 0;

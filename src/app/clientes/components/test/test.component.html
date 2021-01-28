@@ -6,21 +6,43 @@
 
 <div *ngIf="isLoaded1 && isLoaded2 && isLoaded3; else loading">
   <mat-sidenav-container class="example-container" [hasBackdrop]="false">
-    <mat-sidenav #sidenavLeft [fixedInViewport]="true" [fixedTopGap]="142" position="start" disableClose>
-      <p><button mat-button (click)="closeLeft('toggle button')">Toggle</button></p>
+    <mat-sidenav
+      #sidenavLeft
+      [(opened)]="leftOpened"
+      class="left-sidenav"
+      [fixedInViewport]="true"
+      [fixedTopGap]="192"
+      position="start"
+      disableClose
+    >
+      <h3 align="center">Filtros</h3>
       <app-filters-panel></app-filters-panel>
     </mat-sidenav>
-    <mat-sidenav #sidenavRight [fixedInViewport]="true" [fixedTopGap]="142" position="end" disableClose>
-      <p><button mat-button (click)="closeRight('toggle button')">Toggle</button></p>
+    <mat-sidenav
+      #sidenavRight
+      [(opened)]="rightOpened"
+      class="right-sidenav"
+      [fixedInViewport]="true"
+      [fixedTopGap]="192"
+      position="end"
+      disableClose
+    >
+      <h3 align="center">Listado de anomalías</h3>
       <app-filter-pcs-list></app-filter-pcs-list>
     </mat-sidenav>
 
     <mat-sidenav-content>
       <app-map-filter></app-map-filter>
-      <div>
-        <p><button class="btn-left" mat-button (click)="sidenavLeft.open()">Open</button></p>
-        <p><button class="btn-right" mat-button (click)="sidenavRight.open()">Open</button></p>
-      </div>
+      <button mat-raised-button class="btn-left" (click)="sidenavLeft.toggle()">
+        <mat-icon *ngIf="!leftOpened">keyboard_arrow_right</mat-icon>
+        <mat-icon *ngIf="leftOpened">keyboard_arrow_left</mat-icon>
+        <mat-icon>filter_alt</mat-icon>
+      </button>
+      <button mat-raised-button class="btn-right" (click)="sidenavRight.toggle()">
+        <mat-icon>list_alt</mat-icon>
+        <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
+        <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon>
+      </button>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>

@@ -5,7 +5,7 @@ import { FilterService } from '@core/services/filter.service';
 
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
 
-import { Options } from '@angular-slider/ngx-slider';
+import { LabelType, Options } from '@angular-slider/ngx-slider';
 
 @Component({
   selector: 'app-temp-max-filter',
@@ -25,7 +25,17 @@ export class TempMaxFilterComponent implements OnInit {
     this.maxTemp = this.pcService.getTempMaxAllPcs();
     this.rangoMinTemp = this.minTemp;
     this.rangoMaxTemp = this.maxTemp;
-    this.options = { floor: this.minTemp, ceil: this.maxTemp };
+    this.options = { floor: this.minTemp, ceil: this.maxTemp, translate: (value: number, label: LabelType): string => {
+      switch (label) {
+        case LabelType.Low:
+          return value + 'ºC';
+        case LabelType.High:
+          return value + 'ºC';
+        default:
+          return value + 'ºC';
+      }
+    },
+  };
   }
 
   ngOnInit(): void {}

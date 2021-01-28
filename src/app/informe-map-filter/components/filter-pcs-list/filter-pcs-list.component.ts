@@ -18,7 +18,7 @@ interface PcData {
   styleUrls: ['./filter-pcs-list.component.css'],
 })
 export class FilterPcsListComponent implements AfterViewInit {
-  displayedColumns: string[] = ['tipo', 'temp'];
+  displayedColumns: string[] = ['tipo', 'perdidas', 'temp', 'gradiente'];
   dataSource: MatTableDataSource<PcData>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -27,7 +27,14 @@ export class FilterPcsListComponent implements AfterViewInit {
   constructor(public filterService: FilterService) {
     const filteredPcs = [];
     this.filterService.filteredPcs$.subscribe((pcs) =>
-      pcs.forEach((pc) => filteredPcs.push({ tipo: GLOBAL.labels_tipos[pc.tipo], temp: pc.temperaturaMax }))
+      pcs.forEach((pc) =>
+        filteredPcs.push({
+          tipo: GLOBAL.labels_tipos[pc.tipo],
+          perdidas: pc.perdidas,
+          temp: pc.temperaturaMax,
+          gradiente: pc.gradienteNormalizado,
+        })
+      )
     );
     this.dataSource = new MatTableDataSource(filteredPcs);
   }
