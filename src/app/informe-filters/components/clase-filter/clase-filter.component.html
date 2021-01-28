@@ -1,6 +1,6 @@
 <div class="filtro">
   <h4>Clase</h4>
-  <div>
+  <div class="grupo">
     <li *ngFor="let clase of clasesPcs; index as i">
       <mat-checkbox
         [(ngModel)]="clase.completed"
@@ -8,7 +8,12 @@
         [name]="clase.label"
         (change)="onChangeFiltroClase($event)"
       >
-        {{ clase.label }}
+        <div class="label">
+          <mat-icon [ngStyle]="{ color: coloresSeveridad[i] }">stop_circle</mat-icon>
+          <span style="font-size: 15px">
+            {{ clase.label }}
+          </span>
+        </div>
       </mat-checkbox>
     </li>
   </div>

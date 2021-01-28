@@ -23,6 +23,7 @@ export class ClaseFilterComponent implements OnInit {
   clasesPcs: ClasePc[] = [];
   allComplete: boolean;
   filtroClase: ClasePcFilter;
+  coloresSeveridad: string[];
 
   constructor(private filterService: FilterService) {}
 
@@ -36,6 +37,7 @@ export class ClaseFilterComponent implements OnInit {
     this.clasesTask = {
       clasesPcs: this.clasesPcs,
     };
+    this.coloresSeveridad = GLOBAL.colores_severidad;
   }
 
   onChangeFiltroClase(event: MatCheckboxChange) {
