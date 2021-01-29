@@ -6,9 +6,10 @@ import { SpinnerModule } from '@shared/spinner/spinner.module';
 import { ChartModule } from 'primeng/chart';
 import { MapViewComponent } from './map-view/map-view.component';
 import { PlantaReportRoutingModule } from './planta-repot-routing.module';
+import { MapControlComponent } from './map-control/map-control.component';
 
 @NgModule({
-  declarations: [MapViewComponent],
+  declarations: [MapViewComponent, MapControlComponent],
   imports: [
     SharedModule,
     NgxSliderModule,

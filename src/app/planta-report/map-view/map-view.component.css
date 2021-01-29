@@ -8,6 +8,13 @@
   left: 10px;
   width: 250px;
 }
+#popup {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 250px;
+  background-color: white;
+}
 .rel {
   position: relative;
 }

@@ -1,10 +1,6 @@
 <div class="rel">
   <div id="map" class="map"></div>
-  <ngx-slider
-    id="slider"
-    (valueChange)="onChangeSlider(value)"
-    [(value)]="value"
-    [(highValue)]="highValue"
-    [options]="options"
-  ></ngx-slider>
+  <div id="popup"></div>
+
+  <app-map-control></app-map-control>
 </div>
