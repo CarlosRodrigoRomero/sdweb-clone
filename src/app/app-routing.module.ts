@@ -25,6 +25,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'clients',
+    loadChildren: () => import('./clients/clients.module').then((m) => m.ClientsModule),
+    canActivate: [AuthGuard],
+  },
+  {
     path: 'share',
     loadChildren: () => import('./share/share.module').then((m) => m.ShareModule),
   },

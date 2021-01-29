@@ -30,7 +30,7 @@ export class FilterPcsListComponent implements AfterViewInit {
       pcs.forEach((pc) =>
         filteredPcs.push({
           tipo: GLOBAL.labels_tipos[pc.tipo],
-          perdidas: pc.perdidas,
+          perdidas: pc.perdidas * 100,
           temp: pc.temperaturaMax,
           gradiente: pc.gradienteNormalizado,
         })

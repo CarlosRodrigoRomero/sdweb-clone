@@ -1,3 +1,5 @@
+<app-plant-list></app-plant-list>
+
 <div class="container" *ngIf="auth.user$ | async as user">
   <div class="row">
     <div class="col-12">
@@ -43,11 +45,19 @@
             <span *ngIf="user.role === 1">
               <input type="checkbox" (click)="updateInforme(informe)" [checked]="informe.disponible" />
             </span>
-            <a
+            <!-- <a
               *ngIf="checkInformeDisponible(informe); else sinInforme2"
               mat-stroked-button
               color="primary"
               routerLink="../informe-view/{{ informe.id }}"
+            >
+              Inspección del {{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}
+            </a> -->
+            <a
+              *ngIf="checkInformeDisponible(informe); else sinInforme2"
+              mat-stroked-button
+              color="primary"
+              routerLink="./{{ informe.id }}"
             >
               Inspección del {{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}
             </a>
@@ -71,6 +81,6 @@
     </div>
   </div>
   <ng-template #informeListTable>
-    <app-informe-list-table> </app-informe-list-table>
+    <app-list-table-report></app-list-table-report>
   </ng-template>
 </div>

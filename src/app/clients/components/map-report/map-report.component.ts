@@ -18,11 +18,11 @@ import { PcService } from '@core/services/pc.service';
 import { MatSidenav } from '@angular/material/sidenav';
 
 @Component({
-  selector: 'app-test',
-  templateUrl: './test.component.html',
-  styleUrls: ['./test.component.css'],
+  selector: 'app-map-report',
+  templateUrl: './map-report.component.html',
+  styleUrls: ['./map-report.component.css'],
 })
-export class TestComponent implements OnInit {
+export class MapReportComponent implements OnInit {
   public isLoaded1: boolean;
   public isLoaded2: boolean;
   public isLoaded3: boolean;
