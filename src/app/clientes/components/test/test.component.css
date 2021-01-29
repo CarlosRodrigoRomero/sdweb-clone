@@ -6,6 +6,14 @@
   right: 0;
 }
 
+app-share-map {
+  position: absolute;
+  right: 60px;
+  top: 75px;
+  margin: 10px;
+  z-index: 999;
+}
+
 .left-sidenav {
   margin-left: 10px;
   border-radius: 4px;
@@ -26,6 +34,7 @@
 .right-sidenav {
   display: flex;
   margin-right: 10px;
+  margin-bottom: 35px;
   border-radius: 4px;
 }
 

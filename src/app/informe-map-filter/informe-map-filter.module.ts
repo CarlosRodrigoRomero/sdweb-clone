@@ -9,6 +9,7 @@ import { MapFilterComponent } from './components/map-filter/map-filter.component
 import { ActiveFilterListComponent } from './components/active-filter-list/active-filter-list.component';
 import { FilterPcsListComponent } from './components/filter-pcs-list/filter-pcs-list.component';
 import { ShareMapComponent } from './components/share-map/share-map.component';
+import { ShareModule } from '../share/share.module';
 
 @NgModule({
   declarations: [MapFilterComponent, ActiveFilterListComponent, FilterPcsListComponent, ShareMapComponent],
@@ -21,6 +22,6 @@ import { ShareMapComponent } from './components/share-map/share-map.component';
     }),
     SharedModule,
   ],
-  exports: [FilterPcsListComponent, MapFilterComponent],
+  exports: [FilterPcsListComponent, MapFilterComponent, ShareMapComponent],
 })
 export class InformeMapFilterModule {}

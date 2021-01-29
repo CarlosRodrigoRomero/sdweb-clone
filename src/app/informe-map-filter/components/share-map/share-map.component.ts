@@ -5,7 +5,6 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
 import { FilterService } from '@core/services/filter.service';
-import { GradientFilterComponent } from 'src/app/informe-filters/components/gradient-filter/gradient-filter.component';
 
 @Component({
   selector: 'app-share-map',
@@ -24,7 +23,9 @@ export class ShareMapComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {}
 
-  getActiveFilters() {
-    
+  getActiveFilters() {}
+
+  stopPropagation(event) {
+    event.stopPropagation();
   }
 }

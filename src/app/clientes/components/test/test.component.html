@@ -5,6 +5,8 @@
 </ng-template>
 
 <div *ngIf="isLoaded1 && isLoaded2 && isLoaded3; else loading">
+  <app-share-map></app-share-map>
+
   <mat-sidenav-container class="example-container" [hasBackdrop]="false">
     <mat-sidenav
       #sidenavLeft
@@ -20,6 +22,7 @@
       </div>
       <app-filters-panel></app-filters-panel>
     </mat-sidenav>
+
     <mat-sidenav
       #sidenavRight
       [(opened)]="rightOpened"
@@ -29,12 +32,16 @@
       position="end"
       disableClose
     >
-      <h3 align="center">Listado de anomalías</h3>
+      <div class="titulo">
+        <h3 align="center">Listado de anomalías</h3>
+      </div>
+
       <app-filter-pcs-list></app-filter-pcs-list>
     </mat-sidenav>
 
     <mat-sidenav-content>
       <app-map-filter></app-map-filter>
+
       <button mat-raised-button class="btn-left" (click)="sidenavLeft.toggle()">
         <mat-icon *ngIf="!leftOpened">keyboard_arrow_right</mat-icon>
         <mat-icon *ngIf="leftOpened">keyboard_arrow_left</mat-icon>
