@@ -14,7 +14,7 @@ export let GLOBAL = {
   carpetaJpgGray: 'gray\\',
   uav: 'DJI Matrice M200',
   temperaturaLimiteFabricantes: 90,
-  filtroGradientePorDefecto: 10,
+  filtroGradientePorDef9ecto: 10,
   minGradiente: 10,
   maxGradiente: 50,
   stringParaDesconocido: '-',
@@ -59,11 +59,35 @@ export let GLOBAL = {
     'Yellowing', // 16
     'Módulo en CA (string)', // 17
     'Posible PID', // 18
+    'Falta módulo', // 19
+  ],
+  colores_tipos: [
+    [0, 0, 0], // '0',
+    [0, 200, 0], // 'PC',
+    [0, 135, 0], // 'VPV',
+    [255, 153, 0], // 'Substring en CA',
+    [255, 0, 0], // 'String',
+    [255, 112, 112], // 'Módulo en CA',
+    [220, 255, 0], // 'Substring en CC',
+    [170, 100, 0], // 'Módulo en CC',
+    [0, 200, 0], // 'Célula',
+    [0, 135, 0], // 'Varias células',
+    [255, 200, 0], // '2x Substring CA', // nunca más largo que esto, por estética en tabla anexos
+    [170, 0, 255], // 'Suciedad',
+    ,
+    [0, 0, 0], // 'Vidrio roto',
+    [0, 190, 190], // 'Resist. anómala',
+    [40, 0, 240], // 'Caja conexiones',
+    [170, 0, 255], // 'Sombras', // 15
+    [255, 255, 255], // 'Yellowing', // 16
+    [255, 0, 0], // 'Módulo en CA (string)', // 17
+    [255, 255, 255], // 'Posible PID', // 18
+    [196, 196, 196], // 'Falta módulo', // 19
   ],
   labels_bloqueadas: [0, 1, 2, 4, 16],
   pcDescripcion: [
     '0', // Para que coincida el indice con el tipo de anomalia
-    'Punto caliente', // 1
+    'Punto caliente', // 1 - Nos
     'Varios puntos calientes', // 2
     'Substring en circuito abierto', // 3
     'String', // 4
@@ -81,6 +105,7 @@ export let GLOBAL = {
     'Yellowing', // 16
     'Módulo en string con baja producción', // 17
     'Posible PID', // 18
+    'Falta módulo', // 19
   ],
   //   '0',
   //   'Célula caliente',
