@@ -14,9 +14,10 @@ import { ReportsComponent } from './components/reports/reports.component';
 import { ListTableReportComponent } from './components/list-table-report/list-table-report.component';
 import { MapReportComponent } from './components/map-report/map-report.component';
 import { PlantListComponent } from './components/plant-list/plant-list.component';
+import { MapAllPlantsComponent } from './components/map-all-plants/map-all-plants.component';
 
 @NgModule({
-  declarations: [ClientsComponent, NavbarComponent, ReportsComponent, ListTableReportComponent, MapReportComponent, PlantListComponent],
+  declarations: [ClientsComponent, NavbarComponent, ReportsComponent, ListTableReportComponent, MapReportComponent, PlantListComponent, MapAllPlantsComponent],
   imports: [
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM',

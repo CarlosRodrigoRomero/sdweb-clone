@@ -27,21 +27,36 @@
       <!-- Fecha última inspección -->
       <ng-container matColumnDef="ultima-inspeccion">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Última inspección</th>
-        <td mat-cell *matCellDef="let row">{{ row.ultimaInspeccion }}</td>
+        <td mat-cell *matCellDef="let row">{{ row.ultimaInspeccion * 1000 | date: 'dd/MM/yyyy' }}</td>
       </ng-container>
 
       <!-- Compartir -->
       <ng-container matColumnDef="compartir">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Compartir</th>
-        <td mat-cell *matCellDef="let row">compartir</td>
+        <td mat-cell *matCellDef="let row">
+          <button mat-icon-button [matMenuTriggerFor]="menu">
+            <mat-icon>share</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu" class="menu">
+            <h4>Compartir</h4>
+            <mat-form-field class="email" appearance="outline" (click)="stopPropagation($event)">
+              <mat-label>email</mat-label>
+              <input matInput />
+            </mat-form-field>
+            <button mat-menu-item type="submit" class="btn-enviar">
+              <mat-icon>send</mat-icon>
+              <span>Enviar</span>
+            </button>
+          </mat-menu>
+        </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
-      <!-- Row shown when there is no matching data. -->
+      <!-- Se muestra cuando no hay resultados en la búsqueda -->
       <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell" colspan="4">No data matching the filter "{{ input.value }}"</td>
+        <td class="mat-cell" colspan="4">No hay resultados que conincidan con la búsqueda "{{ input.value }}"</td>
       </tr>
     </table>
 

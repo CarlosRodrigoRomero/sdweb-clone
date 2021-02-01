@@ -37,66 +37,29 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(public auth: AuthService, private plantaService: PlantaService, private informeService: InformeService) {
-    const plantas$ = this.auth.user$.pipe(
-      take(1),
-      switchMap((user) => {
-        this.user = user;
-        return this.plantaService.getPlantasDeEmpresa(user);
-      })
-    );
+  constructor(public auth: AuthService, private plantaService: PlantaService, private informeService: InformeService) {}
 
-    const allInformes$ = this.informeService.getInformes();
-
-    const allPlantas$ = allInformes$.pipe(
-      switchMap((informesArray) => {
-        return plantas$.pipe(
-          map((plantasArray) => {
-            return plantasArray.map((planta) => {
-              planta.informes = informesArray.filter((informe) => {
-                return informe.plantaId === planta.id;
-              });
-              return planta;
+  ngOnInit(): void {
+    const plantsData = [];
+    this.auth.user$.subscribe((user) =>
+      this.plantaService.getPlantasDeEmpresa(user).subscribe((plantas) => {
+        plantas.forEach((planta) => {
+          if (planta.informes !== undefined && planta.informes.length > 0) {
+            plantsData.push({
+              nombre: planta.nombre,
+              potencia: planta.potencia,
+              mae: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae,
+              ultimaInspeccion: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current))
+                .fecha,
             });
-          })
-        );
-      })
-    );
-
-    this.plantasList$ = allPlantas$.pipe(
-      map((plantasArray) => {
-        if (this.user.role === 1) {
-          return plantasArray;
-        } else {
-          return plantasArray.filter((planta) => {
-            planta.informes = planta.informes.filter((informe) => {
-              return informe.disponible;
-            });
-            return planta.informes.length > 0;
-          });
-        }
-      })
-    );
-
-    const data = [];
-    this.plantasList$.subscribe((plantas) =>
-      plantas.forEach((planta) => {
-        // this.getFechaUltimoInforme(planta.id);
-        data.push({
-          nombre: planta.nombre,
-          potencia: planta.potencia,
-          mae: 1,
-          ultimaInspeccion: 2,
+          }
         });
+        console.log(plantsData);
       })
     );
 
-    console.log(data);
-
-    this.dataSource = new MatTableDataSource(data);
+    this.dataSource = new MatTableDataSource(plantsData);
   }
-
-  ngOnInit(): void {}
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
@@ -112,15 +75,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getFechaUltimoInforme(plantaId: string) {
-    const fechas: number[] = [];
-    this.informeService
-      .getInformesDePlanta(plantaId)
-      .subscribe((informes) => informes.forEach((informe) => fechas.push(informe.fecha)));
-    if (fechas.length > 1) {
-      console.log(Math.max(...fechas));
-    } else {
-      console.log(fechas[0]);
-    }
+  stopPropagation(event) {
+    event.stopPropagation();
   }
 }

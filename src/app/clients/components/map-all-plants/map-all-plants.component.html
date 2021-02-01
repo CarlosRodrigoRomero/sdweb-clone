@@ -1,0 +1,18 @@
+<agm-map
+  [latitude]="40.35935640447193"
+  [longitude]="-4.74571484761688"
+  [zoom]="6"
+  [disableDefaultUI]="false"
+  [zoomControl]="false"
+>
+  <agm-marker
+    *ngFor="let planta of plantas; let i = index"
+    (markerClick)="clickedMarker(planta.nombre, i)"
+    [latitude]="planta.latitud"
+    [longitude]="planta.longitud"
+  >
+    <agm-info-window>
+      <strong>InfoWindow content</strong>
+    </agm-info-window>
+  </agm-marker>
+</agm-map>

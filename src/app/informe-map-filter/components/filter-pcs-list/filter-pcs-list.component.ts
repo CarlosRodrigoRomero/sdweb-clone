@@ -9,7 +9,9 @@ import { FilterService } from '@core/services/filter.service';
 
 interface PcData {
   tipo: string;
+  perdidas: number;
   temp: number;
+  gradiente: number;
 }
 
 @Component({
