@@ -1,7 +1,14 @@
-<ngx-slider
-  id="slider"
-  (valueChange)="onChangeSlider(highValue, lowValue)"
-  [(value)]="lowValue"
-  [(highValue)]="highValue"
-  [options]="options"
-></ngx-slider>
+<mat-card>
+  <div class="map-control-subdiv">
+    <span class="texto-label">Térmico</span>
+    <mat-slider id="slider-opacidad-termico" (input)="onChangeYearSlider($event)"></mat-slider>
+
+    <ngx-slider
+      id="temp-slider"
+      (valueChange)="onChangeSlider(highValue, lowValue)"
+      [(value)]="lowValue"
+      [(highValue)]="highValue"
+      [options]="options"
+    ></ngx-slider>
+  </div>
+</mat-card>

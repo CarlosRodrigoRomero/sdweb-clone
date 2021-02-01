@@ -1,13 +1,8 @@
 .map {
-  height: 800px;
+  height: 90vh;
   width: 100%;
 }
-#slider {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  width: 250px;
-}
+
 #popup {
   position: absolute;
   top: 0px;
@@ -17,4 +12,11 @@
 }
 .rel {
   position: relative;
+}
+#map-control {
+  position: absolute;
+  bottom: 0px;
+  left: 20%;
+  width: 60%;
+  background-color: white;
 }

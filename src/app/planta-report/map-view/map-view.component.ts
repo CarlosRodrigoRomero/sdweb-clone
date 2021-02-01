@@ -25,7 +25,7 @@ import SimpleGeometry from 'ol/geom/SimpleGeometry';
 import { AnomaliaService } from '../../core/services/anomalia.service';
 import { Feature, Overlay } from 'ol';
 import Polygon from 'ol/geom/Polygon';
-
+import { Control, defaults as defaultControls } from 'ol/control';
 import OverlayPositioning from 'ol/OverlayPositioning';
 import { GLOBAL } from '../../core/services/global';
 
@@ -47,6 +47,9 @@ export class MapViewComponent implements OnInit {
   public thermalSource;
   public anomaliaSeleccionada: Anomalia;
   public listaAnomalias: Anomalia[];
+  public sliderYear: number;
+  public thermalLayer: TileLayer;
+  public rgbLayer: TileLayer;
 
   constructor(
     private anomaliaService: AnomaliaService,
@@ -91,14 +94,19 @@ export class MapViewComponent implements OnInit {
     });
     const extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
-    let thermalLayer = new TileLayer({
+    this.thermalLayer = new TileLayer({
       source: this.thermalSource,
+      extent: extent1,
+    });
+    this.rgbLayer = new TileLayer({
+      source: aerial,
       extent: extent1,
     });
 
     // MAPA
     this.map = new Map({
       target: 'map',
+      controls: defaultControls({ attribution: false }),
 
       layers: [
         new TileLayer({
@@ -106,11 +114,8 @@ export class MapViewComponent implements OnInit {
           source: new OSM(),
           // extent: extent1,
         }),
-        new TileLayer({
-          source: aerial,
-          extent: extent1,
-        }),
-        thermalLayer,
+        this.rgbLayer,
+        this.thermalLayer,
         // }),
       ],
       view: new View({
@@ -130,6 +135,10 @@ export class MapViewComponent implements OnInit {
     });
     this.mapControlService.sliderMinSource.subscribe((v) => {
       this.thermalSource.changed();
+    });
+    this.mapControlService.sliderYearSource.subscribe((v) => {
+      this.thermalLayer.setOpacity(v / 100);
+      // this.thermalLayer2.setOpacity(v / 100);
     });
 
     this.mostrarTodasAnomalias(this.activeInformeId);
