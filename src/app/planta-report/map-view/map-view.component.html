@@ -1,6 +1,8 @@
 <div class="rel">
   <div id="map" class="map"></div>
-  <div id="popup"></div>
+  <div *ngIf="anomaliaSeleccionada" id="popup">
+    <app-anomalia-info [anomalia]="anomaliaSeleccionada"></app-anomalia-info>
+  </div>
 
   <app-map-control></app-map-control>
 </div>

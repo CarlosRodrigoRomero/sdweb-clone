@@ -1,0 +1,88 @@
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+  <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+  <ng-container matColumnDef="clase">
+    <th mat-header-cell *matHeaderCellDef>Clase</th>
+    <div *ngIf="!editable; else templateEditable1">
+      <td mat-cell *matCellDef="let element">{{ element.clase }}</td>
+    </div>
+    <ng-template #templateEditable1>
+      <td mat-cell *matCellDef="let element">
+        <input
+          (change)="onEdit($event, element, 'clase')"
+          type="{{ dataType['clase'] }}"
+          matInput
+          value="{{ element.clase }}"
+        />
+      </td>
+    </ng-template>
+  </ng-container>
+  <ng-container matColumnDef="tipo">
+    <th mat-header-cell *matHeaderCellDef>Tipo</th>
+    <div class="header" *ngIf="!editable; else templateEditable2">
+      <td mat-cell *matCellDef="let element">{{ pcDescripcion[element.tipo] }}</td>
+    </div>
+    <ng-template #templateEditable2>
+      <td mat-cell *matCellDef="let element">
+        <input
+          (change)="onEdit($event, element, 'tipo')"
+          type="{{ dataType['tipo'] }}"
+          matInput
+          value="{{ element.tipo }}"
+        />
+      </td>
+    </ng-template>
+  </ng-container>
+  <ng-container matColumnDef="tempMax">
+    <th mat-header-cell *matHeaderCellDef>T. Max</th>
+    <div *ngIf="!editable; else templateEditable2">
+      <td mat-cell *matCellDef="let element">{{ element.temperaturaMax }} ºC</td>
+    </div>
+    <ng-template #templateEditable2>
+      <td mat-cell *matCellDef="let element">
+        <input
+          (change)="onEdit($event, element, 'tipo')"
+          type="{{ dataType['tipo'] }}"
+          matInput
+          value="{{ element.tipo }}"
+        />
+      </td>
+    </ng-template>
+  </ng-container>
+  <ng-container matColumnDef="gradienteNormalizado">
+    <th mat-header-cell *matHeaderCellDef>&Delta; T</th>
+    <div *ngIf="!editable; else templateEditable3">
+      <td mat-cell *matCellDef="let element">{{ element.gradienteNormalizado }} ºC</td>
+    </div>
+    <ng-template #templateEditable3>
+      <td mat-cell *matCellDef="let element">
+        <input
+          (change)="onEdit($event, element, 'tipo')"
+          type="{{ dataType['tipo'] }}"
+          matInput
+          value="{{ element.tipo }}"
+        />
+      </td>
+    </ng-template>
+  </ng-container>
+
+  <ng-container matColumnDef="perdidas">
+    <th mat-header-cell *matHeaderCellDef>Pérdidas (%)</th>
+    <div *ngIf="!editable; else templateEditable4">
+      <td mat-cell *matCellDef="let element">{{ element.perdidas * 100 }} %</td>
+    </div>
+    <ng-template #templateEditable4>
+      <td mat-cell *matCellDef="let element">
+        <input
+          (change)="onEdit($event, element, 'tipo')"
+          type="{{ dataType['tipo'] }}"
+          matInput
+          value="{{ element.tipo }}"
+        />
+      </td>
+    </ng-template>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>

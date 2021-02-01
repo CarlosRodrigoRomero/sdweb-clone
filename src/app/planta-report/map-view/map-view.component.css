@@ -10,9 +10,9 @@
 }
 #popup {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
-  width: 250px;
+  top: 0px;
+  left: 40%;
+  width: 500px;
   background-color: white;
 }
 .rel {

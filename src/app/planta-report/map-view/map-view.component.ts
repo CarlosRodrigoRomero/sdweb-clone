@@ -20,15 +20,14 @@ import Select from 'ol/interaction/Select';
 import { Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import GeometryType from 'ol/geom/GeometryType';
-import { Anomalia } from '@core/models/anomalia.js';
+import { Anomalia } from '@core/models/anomalia';
 import SimpleGeometry from 'ol/geom/SimpleGeometry';
 import { AnomaliaService } from '../../core/services/anomalia.service';
 import { Feature, Overlay } from 'ol';
 import Polygon from 'ol/geom/Polygon';
-import { take } from 'rxjs/operators';
 
 import OverlayPositioning from 'ol/OverlayPositioning';
-import { Options } from '@angular-slider/ngx-slider';
+import { GLOBAL } from '../../core/services/global';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -46,6 +45,8 @@ export class MapViewComponent implements OnInit {
   public activeInformeId: string;
   public anomaliasVectorSource: VectorSource;
   public thermalSource;
+  public anomaliaSeleccionada: Anomalia;
+  public listaAnomalias: Anomalia[];
 
   constructor(
     private anomaliaService: AnomaliaService,
@@ -60,9 +61,8 @@ export class MapViewComponent implements OnInit {
 
     this.plantaService.getPlanta(this.plantaId).subscribe((planta) => {
       this.planta = planta;
-      this.anomaliasVectorSource = new VectorSource({ wrapX: false });
       this.initMap();
-      this.permitirCrearAnomalias();
+      // this.permitirCrearAnomalias();
     });
   }
   onChangeSlider(highValue: number, lowValue: number) {
@@ -116,11 +116,15 @@ export class MapViewComponent implements OnInit {
       view: new View({
         center: fromLonLat([this.planta.longitud, this.planta.latitud]),
         zoom: 18,
-        maxZoom: 25,
+        maxZoom: 24,
         extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
       }),
     });
+    this.addCursorOnHover();
+    this.addLocationAreas();
+    this.addOverlayInfoAnomalia();
 
+    // Slider para la capa termica
     this.mapControlService.sliderMaxSource.subscribe((v) => {
       this.thermalSource.changed();
     });
@@ -128,14 +132,11 @@ export class MapViewComponent implements OnInit {
       this.thermalSource.changed();
     });
 
-    this.addLocationAreas();
     this.mostrarTodasAnomalias(this.activeInformeId);
-    const vectorDrawingLayer = new VectorLayer({
-      source: this.anomaliasVectorSource,
-    });
-    this.map.addLayer(vectorDrawingLayer);
 
-    this.addOverlayInfoAnomalia();
+    this.map.on('pointermove', (e) => {
+      console.log('event', e);
+    });
   }
   addOverlayInfoAnomalia() {
     //Overlay para los detalles de cada anomalia
@@ -157,7 +158,7 @@ export class MapViewComponent implements OnInit {
         var coordinate = geometry.getCoordinates();
         popup.setPosition(undefined);
         popup.setPosition(clickedCoord);
-        element.innerHTML = 'hola probando';
+        // element.innerHTML = 'hola probando';
 
         // $(element).popover('show');
       } else {
@@ -166,7 +167,7 @@ export class MapViewComponent implements OnInit {
     });
   }
 
-  addCursorOnHover() {
+  private addCursorOnHover() {
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
         this.map.getViewport().style.cursor = 'pointer';
@@ -176,12 +177,20 @@ export class MapViewComponent implements OnInit {
     });
   }
 
-  transform(extent) {
+  private transform(extent) {
     return transformExtent(extent, 'EPSG:4326', 'EPSG:3857');
   }
   addLocationAreas() {
     this.plantaService.getLocationsArea(this.plantaId).subscribe((locAreas) => {
+      console.log(
+        '🚀 ~ file: map-view.component.ts ~ line 180 ~ this.plantaService.getLocationsArea ~ locAreas',
+        locAreas
+      );
       const geojsonObject = this.locAreasToGeoJSON(locAreas);
+      console.log(
+        '🚀 ~ file: map-view.component.ts ~ line 187 ~ this.plantaService.getLocationsArea ~ geojsonObject',
+        geojsonObject
+      );
 
       var vectorSource = new VectorSource({
         features: new GeoJSON().readFeatures(geojsonObject),
@@ -192,10 +201,10 @@ export class MapViewComponent implements OnInit {
           stroke: new Stroke({
             color: 'blue',
             lineDash: [4],
-            width: 3,
+            width: 2,
           }),
           fill: new Fill({
-            color: 'rgba(0, 0, 255, 0.1)',
+            color: 'rgba(0, 0, 255, 0)',
           }),
           text: new Text({
             font: '16px "Open Sans", "Arial Unicode MS", "sans-serif"',
@@ -207,7 +216,7 @@ export class MapViewComponent implements OnInit {
           }),
         }),
       };
-      var styleFunction = (feature) => {
+      const styleFunction = (feature) => {
         if (feature != undefined) {
           let style = styles[feature.getGeometry().getType()];
           // style.getText().setText(feature.get('globalCoords'));
@@ -216,18 +225,16 @@ export class MapViewComponent implements OnInit {
         }
       };
 
-      var vectorLayer = new VectorLayer({
-        source: vectorSource,
-        visible: true,
-        style: styleFunction,
-
-        // style: styleFunction,
-      });
-
-      this.map.addLayer(vectorLayer);
+      this.map.addLayer(
+        new VectorLayer({
+          source: vectorSource,
+          visible: true,
+          style: styleFunction,
+        })
+      );
     });
   }
-  locAreasToGeoJSON(locAreas: LocationAreaInterface[]) {
+  private locAreasToGeoJSON(locAreas: LocationAreaInterface[]) {
     let listOfFeatures = [];
     locAreas.forEach((locArea) => {
       let coordsList = [];
@@ -244,7 +251,7 @@ export class MapViewComponent implements OnInit {
         },
         geometry: {
           type: 'LineString',
-          coordinates: [coordsList],
+          coordinates: coordsList,
         },
       });
     });
@@ -273,7 +280,7 @@ export class MapViewComponent implements OnInit {
       this.addAnomaliaToDb(event.feature);
     });
   }
-  addAnomaliaToDb(feature: Feature) {
+  private addAnomaliaToDb(feature: Feature) {
     const geometry = feature.getGeometry() as SimpleGeometry;
 
     const anomalia = new Anomalia(
@@ -293,22 +300,59 @@ export class MapViewComponent implements OnInit {
     // Guardar en la base de datos
     this.anomaliaService.addAnomalia(anomalia);
   }
+
+  private getColorAnomalia(feature: Feature) {
+    const tipo = parseInt(feature.getProperties().properties.tipo);
+
+    return GLOBAL.colores_tipos[tipo];
+  }
+  private getStyleAnomaliasMapa(selected = false) {
+    return (feature) => {
+      if (feature != undefined) {
+        return new Style({
+          stroke: new Stroke({
+            color: this.getColorAnomalia(feature),
+
+            width: selected ? 6 : 4,
+          }),
+          fill: new Fill({
+            color: 'rgba(0, 0, 255, 0)',
+          }),
+          text: new Text({
+            font: '16px "Open Sans", "Arial Unicode MS", "sans-serif"',
+            placement: 'line',
+            fill: new Fill({
+              color: 'white',
+            }),
+            text: '',
+          }),
+        });
+      }
+    };
+  }
   mostrarTodasAnomalias(informeId: string) {
-    this.anomaliaService
-      .getAnomalias(this.plantaId, informeId)
-      .pipe(take(5))
-      .subscribe((anomalias) => {
-        // Dibujar anomalias
-        this.dibujarAnomalias(anomalias);
-      });
+    this.anomaliasVectorSource = new VectorSource({ wrapX: false });
+
+    this.map.addLayer(
+      new VectorLayer({
+        source: this.anomaliasVectorSource,
+        style: this.getStyleAnomaliasMapa(false),
+      })
+    );
+    this.anomaliaService.getAnomalias$(this.plantaId, informeId).subscribe((anomalias) => {
+      // Dibujar anomalias
+      this.dibujarAnomalias(anomalias);
+      this.listaAnomalias = anomalias;
+    });
   }
   dibujarAnomalias(anomalias: Anomalia[]) {
     this.anomaliasVectorSource.clear();
     anomalias.forEach((anom) => {
-      const feature = this.anomaliasVectorSource.addFeature(
+      this.anomaliasVectorSource.addFeature(
         new Feature({
           geometry: new Polygon([anom.featureCoords]),
           properties: {
+            anomaliaId: anom.id,
             tipo: anom.tipo,
             clase: anom.clase,
             temperaturaMax: anom.temperaturaMax,
@@ -321,20 +365,30 @@ export class MapViewComponent implements OnInit {
   }
   addSelectInteraction() {
     const select = new Select({
+      style: this.getStyleAnomaliasMapa(true),
       // condition: 'pointermove'
     });
     this.map.addInteraction(select);
-    select.on('select', function (e) {
-      console.log('🚀 ~ file: map-view.component.ts ~ line 285 ~ e', e);
-      //   document.getElementById('status').innerHTML =
-      //     '&nbsp;' +
-      //     e.target.getFeatures().getLength() +
-      //     ' selected features (last operation selected ' +
-      //     e.selected.length +
-      //     ' and deselected ' +
-      //     e.deselected.length +
-      //     ' features)';
-      // });
+    select.on('select', (e) => {
+      console.log('🚀 ~ file: map-view.component.ts ~ line 331 ~ select.on ~ e', e);
+      if (e.selected.length > 0) {
+        const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
+        const anomalia = this.listaAnomalias.filter((anom) => {
+          return anom.id == anomaliaId;
+        })[0];
+        this.anomaliaSeleccionada = anomalia;
+        //   document.getElementById('status').innerHTML =
+        //     '&nbsp;' +
+        //     e.target.getFeatures().getLength() +
+        //     ' selected features (last operation selected ' +
+        //     e.selected.length +
+        //     ' and deselected ' +
+        //     e.deselected.length +
+        //     ' features)';
+        // });
+      } else {
+        this.anomaliaSeleccionada = undefined;
+      }
     });
   }
 }

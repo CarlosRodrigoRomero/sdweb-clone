@@ -62,27 +62,26 @@ export let GLOBAL = {
     'Falta módulo', // 19
   ],
   colores_tipos: [
-    [0, 0, 0], // '0',
-    [0, 200, 0], // 'PC',
-    [0, 135, 0], // 'VPV',
-    [255, 153, 0], // 'Substring en CA',
-    [255, 0, 0], // 'String',
-    [255, 112, 112], // 'Módulo en CA',
-    [220, 255, 0], // 'Substring en CC',
-    [170, 100, 0], // 'Módulo en CC',
-    [0, 200, 0], // 'Célula',
-    [0, 135, 0], // 'Varias células',
-    [255, 200, 0], // '2x Substring CA', // nunca más largo que esto, por estética en tabla anexos
-    [170, 0, 255], // 'Suciedad',
-    ,
-    [0, 0, 0], // 'Vidrio roto',
-    [0, 190, 190], // 'Resist. anómala',
-    [40, 0, 240], // 'Caja conexiones',
-    [170, 0, 255], // 'Sombras', // 15
-    [255, 255, 255], // 'Yellowing', // 16
-    [255, 0, 0], // 'Módulo en CA (string)', // 17
-    [255, 255, 255], // 'Posible PID', // 18
-    [196, 196, 196], // 'Falta módulo', // 19
+    'rgba(0, 0, 0, 1)', // '0',
+    'rgba(0, 200, 0)', // 'PC',
+    'rgba(0, 135, 0)', // 'VPV',
+    'rgba(255, 153, 0,1)', // 'Substring en CA',
+    'rgba(255, 0, 0,1)', // 'String',
+    'rgba(255, 112, 112,1)', // 'Módulo en CA',
+    'rgba(220, 255, 0,1)', // 'Substring en CC',
+    'rgba(170, 100, 0,1)', // 'Módulo en CC',
+    'rgba(0, 200, 0, 1)', // 'Célula',
+    'rgba(0, 135, 0, 1)', // 'Varias células',
+    'rgba(255, 200, 0,1)', // '2x Substring CA', // nunca más largo que esto, por estética en tabla anexos
+    'rgba(170, 0, 255,1)', // 'Suciedad',
+    'rgba(0, 0, 0,1)', // 'Vidrio roto',
+    'rgba(0, 190, 190,1)', // 'Resist. anómala',
+    'rgba(40, 0, 240,1)', // 'Caja conexiones',
+    'rgba(170, 0, 255,1)', // 'Sombras', // 15
+    'rgba(255, 255, 255,1)', // 'Yellowing', // 16
+    'rgba(255, 0, 0,1)', // 'Módulo en CA (string)', // 17
+    'rgba(255, 255, 255,1)', // 'Posible PID', // 18
+    'rgba(196, 196, 196,1)', // 'Falta módulo', // 19
   ],
   labels_bloqueadas: [0, 1, 2, 4, 16],
   pcDescripcion: [

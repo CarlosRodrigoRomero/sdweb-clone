@@ -7,9 +7,10 @@ import { ChartModule } from 'primeng/chart';
 import { MapViewComponent } from './map-view/map-view.component';
 import { PlantaReportRoutingModule } from './planta-repot-routing.module';
 import { MapControlComponent } from './map-control/map-control.component';
+import { AnomaliaInfoComponent } from './anomalia-info/anomalia-info.component';
 
 @NgModule({
-  declarations: [MapViewComponent, MapControlComponent],
+  declarations: [MapViewComponent, MapControlComponent, AnomaliaInfoComponent],
   imports: [
     SharedModule,
     NgxSliderModule,
