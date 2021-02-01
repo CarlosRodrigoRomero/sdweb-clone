@@ -133,10 +133,6 @@ export class MapViewComponent implements OnInit {
     });
 
     this.mostrarTodasAnomalias(this.activeInformeId);
-
-    this.map.on('pointermove', (e) => {
-      console.log('event', e);
-    });
   }
   addOverlayInfoAnomalia() {
     //Overlay para los detalles de cada anomalia
@@ -182,15 +178,7 @@ export class MapViewComponent implements OnInit {
   }
   addLocationAreas() {
     this.plantaService.getLocationsArea(this.plantaId).subscribe((locAreas) => {
-      console.log(
-        '🚀 ~ file: map-view.component.ts ~ line 180 ~ this.plantaService.getLocationsArea ~ locAreas',
-        locAreas
-      );
       const geojsonObject = this.locAreasToGeoJSON(locAreas);
-      console.log(
-        '🚀 ~ file: map-view.component.ts ~ line 187 ~ this.plantaService.getLocationsArea ~ geojsonObject',
-        geojsonObject
-      );
 
       var vectorSource = new VectorSource({
         features: new GeoJSON().readFeatures(geojsonObject),
@@ -370,7 +358,6 @@ export class MapViewComponent implements OnInit {
     });
     this.map.addInteraction(select);
     select.on('select', (e) => {
-      console.log('🚀 ~ file: map-view.component.ts ~ line 331 ~ select.on ~ e', e);
       if (e.selected.length > 0) {
         const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
         const anomalia = this.listaAnomalias.filter((anom) => {
