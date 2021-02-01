@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AgmCoreModule } from '@agm/core';
+import { ChartsModule } from 'ng2-charts';
 
 import { ClientsRoutingModule } from './clients-routing.module';
 import { SharedModule } from '@shared/shared.module';
@@ -15,9 +16,19 @@ import { ListTableReportComponent } from './components/list-table-report/list-ta
 import { MapReportComponent } from './components/map-report/map-report.component';
 import { PlantListComponent } from './components/plant-list/plant-list.component';
 import { MapAllPlantsComponent } from './components/map-all-plants/map-all-plants.component';
+import { BarChartComponent } from './components/bar-chart/bar-chart.component';
 
 @NgModule({
-  declarations: [ClientsComponent, NavbarComponent, ReportsComponent, ListTableReportComponent, MapReportComponent, PlantListComponent, MapAllPlantsComponent],
+  declarations: [
+    ClientsComponent,
+    NavbarComponent,
+    ReportsComponent,
+    ListTableReportComponent,
+    MapReportComponent,
+    PlantListComponent,
+    MapAllPlantsComponent,
+    BarChartComponent,
+  ],
   imports: [
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyAD8uljEDpNHrLWi2e7HYzAE207Q4uyHIM',
@@ -30,6 +41,7 @@ import { MapAllPlantsComponent } from './components/map-all-plants/map-all-plant
     ReactiveFormsModule,
     InformeFiltersModule,
     InformeMapFilterModule,
+    ChartsModule,
   ],
 })
 export class ClientsModule {}

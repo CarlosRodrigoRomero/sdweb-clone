@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Observable } from 'rxjs';
-
 import { AuthService } from '@core/services/auth.service';
 import { PlantaService } from '@core/services/planta.service';
 
