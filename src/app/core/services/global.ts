@@ -14,7 +14,7 @@ export let GLOBAL = {
   carpetaJpgGray: 'gray\\',
   uav: 'DJI Matrice M200',
   temperaturaLimiteFabricantes: 90,
-  filtroGradientePorDef9ecto: 10,
+  filtroGradientePorDefecto: 10,
   minGradiente: 10,
   maxGradiente: 50,
   stringParaDesconocido: '-',
