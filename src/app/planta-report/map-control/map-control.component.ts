@@ -9,8 +9,8 @@ import { MatSliderChange } from '@angular/material/slider';
   styleUrls: ['./map-control.component.css'],
 })
 export class MapControlComponent implements OnInit {
-  lowValue: number = 25;
-  highValue: number = 70;
+  lowValue: number = 47;
+  highValue: number = 65;
   options: Options = {
     floor: 25,
     ceil: 100,

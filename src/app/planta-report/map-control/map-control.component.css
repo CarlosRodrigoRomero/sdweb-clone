@@ -30,8 +30,10 @@
   height: 100px;
   display: flex;
   flex-direction: column;
-  border: 1px solid grey;
+  border: 1px solid #8080807a;
+  border-radius: 10px;
   padding: 10px;
+  background-color: white;
 }
 
 .texto-label {
@@ -45,4 +47,9 @@
 }
 #slider-opacidad-termico {
   padding: 0;
+}
+mat-card {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none !important;
 }

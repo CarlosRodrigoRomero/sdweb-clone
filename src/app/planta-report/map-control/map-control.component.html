@@ -1,7 +1,7 @@
 <mat-card>
   <div class="map-control-subdiv">
     <span class="texto-label">Térmico</span>
-    <mat-slider id="slider-opacidad-termico" (input)="onChangeYearSlider($event)"></mat-slider>
+    <mat-slider [value]="100" id="slider-opacidad-termico" (input)="onChangeYearSlider($event)">a</mat-slider>
 
     <ngx-slider
       id="temp-slider"
