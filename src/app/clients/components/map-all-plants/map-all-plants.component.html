@@ -1,15 +1,18 @@
 <agm-map
-  [latitude]="40.35935640447193"
-  [longitude]="-4.74571484761688"
-  [zoom]="6"
+  [latitude]="40"
+  [longitude]="-4"
+  [zoom]="6.3"
   [disableDefaultUI]="false"
   [zoomControl]="false"
+  [mapDraggable]="false"
+  [streetViewControl]="false"
 >
   <agm-marker
     *ngFor="let planta of plantas; let i = index"
     (markerClick)="clickedMarker(planta.nombre, i)"
     [latitude]="planta.latitud"
     [longitude]="planta.longitud"
+    [iconUrl]="'./assets/icons/chincheta-36x36.png'"
   >
     <agm-info-window>
       <strong>InfoWindow content</strong>

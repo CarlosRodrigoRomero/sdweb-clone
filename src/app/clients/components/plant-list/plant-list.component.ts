@@ -32,7 +32,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   plantasList$: Observable<PlantaInterface[]>;
 
   displayedColumns: string[] = ['nombre', 'potencia', 'mae', 'ultima-inspeccion', 'compartir'];
-  dataSource: MatTableDataSource<PlantsData>;
+  dataSource = new MatTableDataSource<PlantsData>();
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -45,20 +45,22 @@ export class PlantListComponent implements OnInit, AfterViewInit {
       this.plantaService.getPlantasDeEmpresa(user).subscribe((plantas) => {
         plantas.forEach((planta) => {
           if (planta.informes !== undefined && planta.informes.length > 0) {
-            plantsData.push({
-              nombre: planta.nombre,
-              potencia: planta.potencia,
-              mae: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae,
-              ultimaInspeccion: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current))
-                .fecha,
-            });
+            const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+            if (mae !== undefined) {
+              plantsData.push({
+                nombre: planta.nombre,
+                potencia: planta.potencia,
+                mae,
+                ultimaInspeccion: planta.informes.reduce((prev, current) =>
+                  prev.fecha > current.fecha ? prev : current
+                ).fecha,
+              });
+            }
           }
         });
-        console.log(plantsData);
+        this.dataSource.data = plantsData;
       })
     );
-
-    this.dataSource = new MatTableDataSource(plantsData);
   }
 
   ngAfterViewInit() {

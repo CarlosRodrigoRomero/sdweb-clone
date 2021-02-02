@@ -71,23 +71,4 @@ export class ListTableReportComponent implements OnInit {
       this.dataSource.data = plantas;
     });
   }
-
-  // getInformesDePlantas(plantas: PlantaInterface[]) {
-  //   const plantasConInformes = [] as PlantaInterface[];
-  //   plantas.forEach((planta) => {
-  //     planta.informes = [] as InformeInterface[];
-  //     this.informeService
-  //       .getInformesDePlanta(planta.id)
-  //       .pipe(take(1))
-  //       .subscribe((informes) => {
-  //         planta.informes = informes;
-  //         plantasConInformes.push(planta);
-  //         this.plantas = plantasConInformes;
-  //       });
-  //   });
-  // }
-
-  //   this.dataSource.sort = this.sort;
-  //   console.log('InformeListTableComponent -> plantasConInformes', plantasConInformes);
-  // }
 }

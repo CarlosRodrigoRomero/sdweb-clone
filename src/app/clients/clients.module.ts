@@ -17,6 +17,7 @@ import { MapReportComponent } from './components/map-report/map-report.component
 import { PlantListComponent } from './components/plant-list/plant-list.component';
 import { MapAllPlantsComponent } from './components/map-all-plants/map-all-plants.component';
 import { BarChartComponent } from './components/bar-chart/bar-chart.component';
+import { AssetSummaryComponent } from './components/asset-summary/asset-summary.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { BarChartComponent } from './components/bar-chart/bar-chart.component';
     PlantListComponent,
     MapAllPlantsComponent,
     BarChartComponent,
+    AssetSummaryComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({
