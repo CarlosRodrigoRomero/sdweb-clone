@@ -1,6 +1,29 @@
-<h4>Nº de plantas</h4>
-<h4>{{numPlantas}}</h4>
-<h4>MW totales</h4>
-<h4>{{potenciaTotal}} MW</h4>
-<h4>MAE medio</h4>
-<h4>{{maeMedio | number: '1.2-3'}}%</h4>
+<div class="componente">
+  <h4>Datos principales</h4>
+  <div class="grid">
+    <div>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Plantas</mat-card-subtitle>
+          <mat-card-title>{{ numPlantas }}</mat-card-title>
+        </mat-card-header>
+      </mat-card>
+    </div>
+    <div>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Potencia</mat-card-subtitle>
+          <mat-card-title>{{ potenciaTotal }} MW</mat-card-title>
+        </mat-card-header>
+      </mat-card>
+    </div>
+    <div>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>MAE medio</mat-card-subtitle>
+          <mat-card-title>{{ maeMedio | number: '1.2-3' }}%</mat-card-title>
+        </mat-card-header>
+      </mat-card>
+    </div>
+  </div>
+</div>

@@ -12,15 +12,31 @@
 }
 
 .grid {
+  padding-left: 2em;
+  padding-right: 2em;
+}
+
+.row_1 {
   display: grid;
-  grid-template-columns: 50% 50%;
 }
 
-.grid div {
-  padding: 1em;
+.row_2 {
+  display: grid;
 }
 
-.informe-card {
+@media (min-width: 900px) {
+  .row_1 {
+    grid-template-columns: 60% 40%;
+  }
+}
+
+@media (min-width: 900px) {
+  .row_2 {
+    grid-template-columns: 40% 60%;
+  }
+}
+
+/* .informe-card {
   max-width: 400px;
   margin-bottom: 1rem;
 }
@@ -41,3 +57,4 @@
   justify-content: space-around;
   flex-direction: column;
 }
+ */

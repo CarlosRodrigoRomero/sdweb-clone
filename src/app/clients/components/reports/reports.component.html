@@ -1,26 +1,30 @@
 <div class="titulo">
   <mat-icon>home</mat-icon>
-  <span>Resumen de plantas</span>
+  <h4>Resumen de plantas</h4>
   <span class="spacer"></span>
   <button mat-raised-button>Descargar Portfolio Completo</button>
 </div>
 
 <div class="grid">
-  <div>
-    <app-bar-chart></app-bar-chart>
+  <div class="row_1">
+    <div>
+      <app-bar-chart></app-bar-chart>
+    </div>
+    <div>
+      <app-asset-summary></app-asset-summary>
+    </div>
   </div>
-  <div>
-    <app-asset-summary></app-asset-summary>
-  </div>
-  <div>
-    <app-plant-list></app-plant-list>
-  </div>
-  <div>
-    <app-map-all-plants></app-map-all-plants>
+  <div class="row_2">
+    <div>
+      <app-plant-list></app-plant-list>
+    </div>
+    <div>
+      <app-map-all-plants></app-map-all-plants>
+    </div>
   </div>
 </div>
 
-<div class="container" *ngIf="auth.user$ | async as user">
+<!-- <div class="container" *ngIf="auth.user$ | async as user">
   <div class="row">
     <div class="col-12">
       <h1 class="text-center">{{ user.empresaNombre }}</h1>
@@ -65,14 +69,6 @@
             <span *ngIf="user.role === 1">
               <input type="checkbox" (click)="updateInforme(informe)" [checked]="informe.disponible" />
             </span>
-            <!-- <a
-              *ngIf="checkInformeDisponible(informe); else sinInforme2"
-              mat-stroked-button
-              color="primary"
-              routerLink="../informe-view/{{ informe.id }}"
-            >
-              Inspección del {{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}
-            </a> -->
             <a
               *ngIf="checkInformeDisponible(informe); else sinInforme2"
               mat-stroked-button
@@ -104,3 +100,4 @@
     <app-list-table-report></app-list-table-report>
   </ng-template>
 </div>
+ -->

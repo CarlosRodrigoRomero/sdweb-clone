@@ -1,65 +1,68 @@
-<div class="filtro">
-  <mat-form-field>
-    <mat-label>Buscar</mat-label>
-    <input matInput (keyup)="applyFilter($event)" #input />
-  </mat-form-field>
+<div class="componente">
+  <h4 class="titulo">Listado de plantas</h4>
+  <div class="filtro">
+    <!-- <mat-form-field>
+      <mat-label>Buscar</mat-label>
+      <input matInput (keyup)="applyFilter($event)" #input />
+    </mat-form-field> -->
 
-  <div class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" matSort>
-      <!-- Nombre -->
-      <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-        <td mat-cell *matCellDef="let row">{{ row.nombre }}</td>
-      </ng-container>
+    <div class="mat-elevation-z8">
+      <table mat-table [dataSource]="dataSource" matSort>
+        <!-- Nombre -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Planta</th>
+          <td mat-cell *matCellDef="let row">{{ row.nombre }}</td>
+        </ng-container>
 
-      <!-- Potencia -->
-      <ng-container matColumnDef="potencia">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencia</th>
-        <td mat-cell *matCellDef="let row">{{ row.potencia }} MW</td>
-      </ng-container>
+        <!-- Potencia -->
+        <ng-container matColumnDef="potencia">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencia</th>
+          <td mat-cell *matCellDef="let row">{{ row.potencia }} MW</td>
+        </ng-container>
 
-      <!-- MAE -->
-      <ng-container matColumnDef="mae">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>MAE</th>
-        <td mat-cell *matCellDef="let row">{{ row.mae }}%</td>
-      </ng-container>
+        <!-- MAE -->
+        <ng-container matColumnDef="mae">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>MAE</th>
+          <td mat-cell *matCellDef="let row">{{ row.mae }}%</td>
+        </ng-container>
 
-      <!-- Fecha última inspección -->
-      <ng-container matColumnDef="ultima-inspeccion">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Última inspección</th>
-        <td mat-cell *matCellDef="let row">{{ row.ultimaInspeccion * 1000 | date: 'dd/MM/yyyy' }}</td>
-      </ng-container>
+        <!-- Fecha última inspección -->
+        <ng-container matColumnDef="ultima-inspeccion">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Última inspección</th>
+          <td mat-cell *matCellDef="let row">{{ row.ultimaInspeccion * 1000 | date: 'dd/MM/yyyy' }}</td>
+        </ng-container>
 
-      <!-- Compartir -->
-      <ng-container matColumnDef="compartir">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Compartir</th>
-        <td mat-cell *matCellDef="let row">
-          <button mat-icon-button [matMenuTriggerFor]="menu">
-            <mat-icon>share</mat-icon>
-          </button>
-          <mat-menu #menu="matMenu" class="menu">
-            <h4>Compartir</h4>
-            <mat-form-field class="email" appearance="outline" (click)="stopPropagation($event)">
-              <mat-label>email</mat-label>
-              <input matInput />
-            </mat-form-field>
-            <button mat-menu-item type="submit" class="btn-enviar">
-              <mat-icon>send</mat-icon>
-              <span>Enviar</span>
+        <!-- Compartir -->
+        <ng-container matColumnDef="compartir">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>share</mat-icon>
             </button>
-          </mat-menu>
-        </td>
-      </ng-container>
+            <mat-menu #menu="matMenu" class="menu">
+              <h4>Compartir</h4>
+              <mat-form-field class="email" appearance="outline" (click)="stopPropagation($event)">
+                <mat-label>email</mat-label>
+                <input matInput />
+              </mat-form-field>
+              <button mat-menu-item type="submit" class="btn-enviar">
+                <mat-icon>send</mat-icon>
+                <span>Enviar</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
-      <!-- Se muestra cuando no hay resultados en la búsqueda -->
-      <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell" colspan="4">No hay resultados que conincidan con la búsqueda "{{ input.value }}"</td>
-      </tr>
-    </table>
+        <!-- Se muestra cuando no hay resultados en la búsqueda -->
+        <!-- <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="4">No hay resultados que conincidan con la búsqueda "{{ input.value }}"</td>
+        </tr> -->
+      </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+      <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+    </div>
   </div>
 </div>

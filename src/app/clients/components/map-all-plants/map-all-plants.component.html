@@ -1,21 +1,24 @@
-<agm-map
-  [latitude]="40"
-  [longitude]="-4"
-  [zoom]="6.3"
-  [disableDefaultUI]="false"
-  [zoomControl]="false"
-  [mapDraggable]="false"
-  [streetViewControl]="false"
->
-  <agm-marker
-    *ngFor="let planta of plantas; let i = index"
-    (markerClick)="clickedMarker(planta.nombre, i)"
-    [latitude]="planta.latitud"
-    [longitude]="planta.longitud"
-    [iconUrl]="'./assets/icons/chincheta-36x36.png'"
+<div class="componente">
+  <h4>Localizaciones</h4>
+  <agm-map
+    [latitude]="40"
+    [longitude]="-4"
+    [zoom]="6.3"
+    [disableDefaultUI]="false"
+    [zoomControl]="false"
+    [mapDraggable]="false"
+    [streetViewControl]="false"
   >
-    <agm-info-window>
-      <strong>InfoWindow content</strong>
-    </agm-info-window>
-  </agm-marker>
-</agm-map>
+    <agm-marker
+      *ngFor="let planta of plantas; let i = index"
+      (markerClick)="clickedMarker(planta.nombre, i)"
+      [latitude]="planta.latitud"
+      [longitude]="planta.longitud"
+      [iconUrl]="'./assets/icons/chincheta-18x18.png'"
+    >
+      <agm-info-window>
+        <strong>InfoWindow content</strong>
+      </agm-info-window>
+    </agm-marker>
+  </agm-map>
+</div>
