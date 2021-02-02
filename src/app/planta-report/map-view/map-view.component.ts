@@ -83,7 +83,7 @@ export class MapViewComponent implements OnInit {
 
     // Iniciar mapa térmico
     this.thermalSource = new XYZ_mod({
-      url: 'http://solardrontech.es/tileserver.php?/index.json?/demo_thermal/{z}/{x}/{y}.png',
+      url: 'http://solardrontech.es/tileserver.php?/index.json?/demo_thermal_2020/{z}/{x}/{y}.png',
       crossOrigin: '',
       tileClass: ImageTileMod,
       transition: 255,
@@ -305,7 +305,7 @@ export class MapViewComponent implements OnInit {
   }
   private getStyleAnomaliasMapa(selected = false) {
     return (feature) => {
-      if (feature != undefined) {
+      if (feature != undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
             color: this.getColorAnomalia(feature),
@@ -367,23 +367,18 @@ export class MapViewComponent implements OnInit {
     });
     this.map.addInteraction(select);
     select.on('select', (e) => {
+      console.log('🚀 ~ file: map-view.component.ts ~ line 370 ~ select.on ~ e', e);
+
+      this.anomaliaSeleccionada = undefined;
+
       if (e.selected.length > 0) {
-        const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
-        const anomalia = this.listaAnomalias.filter((anom) => {
-          return anom.id == anomaliaId;
-        })[0];
-        this.anomaliaSeleccionada = anomalia;
-        //   document.getElementById('status').innerHTML =
-        //     '&nbsp;' +
-        //     e.target.getFeatures().getLength() +
-        //     ' selected features (last operation selected ' +
-        //     e.selected.length +
-        //     ' and deselected ' +
-        //     e.deselected.length +
-        //     ' features)';
-        // });
-      } else {
-        this.anomaliaSeleccionada = undefined;
+        if (e.selected[0].getProperties().hasOwnProperty('properties')) {
+          const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
+          const anomalia = this.listaAnomalias.filter((anom) => {
+            return anom.id == anomaliaId;
+          })[0];
+          this.anomaliaSeleccionada = anomalia;
+        }
       }
     });
   }

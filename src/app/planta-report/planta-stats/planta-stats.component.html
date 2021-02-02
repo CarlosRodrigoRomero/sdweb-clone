@@ -1,0 +1,64 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div class="chart">
+  <apx-chart
+    [series]="chartOptionsMAE.series"
+    [chart]="chartOptionsMAE.chart"
+    [xaxis]="chartOptionsMAE.xaxis"
+    [stroke]="chartOptionsMAE.stroke"
+    [colors]="chartOptionsMAE.colors"
+    [dataLabels]="chartOptionsMAE.dataLabels"
+    [legend]="chartOptionsMAE.legend"
+    [markers]="chartOptionsMAE.markers"
+    [grid]="chartOptionsMAE.grid"
+    [yaxis]="chartOptionsMAE.yaxis"
+    [title]="chartOptionsMAE.title"
+    [annotations]="chartOptionsMAE.annotations"
+  ></apx-chart>
+</div>
+<!-- <div id="chartMAE">
+  <apx-chart
+    [series]="chartOptionsNumYPer.series"
+    [chart]="chartOptionsNumYPer.chart"
+    [xaxis]="chartOptionsNumYPer.xaxis"
+    [stroke]="chartOptionsNumYPer.stroke"
+    [colors]="chartOptionsNumYPer.colors"
+    [dataLabels]="chartOptionsNumYPer.dataLabels"
+    [legend]="chartOptionsNumYPer.legend"
+    [markers]="chartOptionsNumYPer.markers"
+    [grid]="chartOptionsNumYPer.grid"
+    [yaxis]="chartOptionsNumYPer.yaxis"
+    [title]="chartOptionsNumYPer.title"
+    [annotations]="chartOptionsNumYPer.annotations"
+  ></apx-chart>
+</div> -->
+<div class="chart-num-per-group">
+  <div class="chart-num-per">
+    <apx-chart
+      [series]="chartOptionsNumYPer1.series"
+      [chart]="chartOptionsNumYPer1.chart"
+      [colors]="chartOptionsNumYPer1.colors"
+      [yaxis]="chartOptionsNumYPer1.yaxis"
+      [dataLabels]="chartOptionsNumYPer1.dataLabels"
+      [markers]="chartOptionsNumYPer1.markers"
+      [stroke]="chartOptionsNumYPer1.stroke"
+      [grid]="chartOptionsNumYPer1.grid"
+      [xaxis]="chartOptionsNumYPer1.xaxis"
+      [tooltip]="chartOptionsNumYPer1.tooltip"
+    ></apx-chart>
+  </div>
+  <div class="chart-num-per">
+    <apx-chart
+      [series]="chartOptionsNumYPer2.series"
+      [chart]="chartOptionsNumYPer2.chart"
+      [colors]="chartOptionsNumYPer2.colors"
+      [yaxis]="chartOptionsNumYPer2.yaxis"
+      [dataLabels]="chartOptionsNumYPer2.dataLabels"
+      [markers]="chartOptionsNumYPer2.markers"
+      [stroke]="chartOptionsNumYPer2.stroke"
+      [grid]="chartOptionsNumYPer2.grid"
+      [xaxis]="chartOptionsNumYPer2.xaxis"
+      [tooltip]="chartOptionsNumYPer2.tooltip"
+    ></apx-chart>
+  </div>
+</div>
+<app-chart-altura></app-chart-altura>

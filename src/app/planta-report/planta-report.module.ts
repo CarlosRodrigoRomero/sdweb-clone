@@ -8,9 +8,12 @@ import { MapViewComponent } from './map-view/map-view.component';
 import { PlantaReportRoutingModule } from './planta-repot-routing.module';
 import { MapControlComponent } from './map-control/map-control.component';
 import { AnomaliaInfoComponent } from './anomalia-info/anomalia-info.component';
+import { PlantaStatsComponent } from './planta-stats/planta-stats.component';
+import { NgApexchartsModule } from 'ng-apexcharts';
+import { ChartAlturaComponent } from './planta-stats/chart-altura/chart-altura.component';
 
 @NgModule({
-  declarations: [MapViewComponent, MapControlComponent, AnomaliaInfoComponent],
+  declarations: [MapViewComponent, MapControlComponent, AnomaliaInfoComponent, PlantaStatsComponent, ChartAlturaComponent],
   imports: [
     SharedModule,
     NgxSliderModule,
@@ -19,6 +22,7 @@ import { AnomaliaInfoComponent } from './anomalia-info/anomalia-info.component';
     ChartModule,
     FormsModule,
     ReactiveFormsModule,
+    NgApexchartsModule,
   ],
 })
 export class PlantaReportModule {}
