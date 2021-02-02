@@ -18,10 +18,12 @@
 
 .row_1 {
   display: grid;
+  grid-template-columns: 100%;
 }
 
 .row_2 {
   display: grid;
+  grid-template-columns: 100%;
 }
 
 @media (min-width: 900px) {
