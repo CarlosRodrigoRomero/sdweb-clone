@@ -27,6 +27,12 @@ export class BarChartComponent implements OnInit {
   public barChartLabels: Label[] = [];
   public barChartType: ChartType = 'bar';
   public barChartLegend = true;
+  public color: Array<any> = [
+    {
+      // red
+      backgroundColor: '#D32F2F',
+    },
+  ];
 
   public barChartData: ChartDataSets[];
 
