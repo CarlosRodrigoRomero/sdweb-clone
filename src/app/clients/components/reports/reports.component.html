@@ -1,6 +1,16 @@
-<div class="titulo">
-  <mat-icon>home</mat-icon>
-  <h4>Resumen de plantas</h4>
+<div class="barra-titulo">
+  <mat-icon color="primary">home</mat-icon>
+  <h4 class="titulo">Resumen</h4>
+  <div>
+    <mat-icon color="primary">tag</mat-icon>
+    <span>Nº plantas</span>
+    <h4>{{ numPlantas }}</h4>
+  </div>
+  <div>
+    <mat-icon color="primary">bolt</mat-icon>
+    <span>Potencia total</span>
+    <h4>{{ potenciaTotal | number: '1.0-0' }} MW</h4>
+  </div>
   <span class="spacer"></span>
   <app-download-excel-portfolio></app-download-excel-portfolio>
 </div>
@@ -10,9 +20,9 @@
     <div>
       <app-bar-chart></app-bar-chart>
     </div>
-    <div>
+    <!-- <div>
       <app-asset-summary></app-asset-summary>
-    </div>
+    </div> -->
   </div>
   <div class="row_2">
     <div>
@@ -23,81 +33,3 @@
     </div>
   </div>
 </div>
-
-<!-- <div class="container" *ngIf="auth.user$ | async as user">
-  <div class="row">
-    <div class="col-12">
-      <h1 class="text-center">{{ user.empresaNombre }}</h1>
-      <button mat-raised-button *ngIf="auth.canAddPlantas(user)" routerLink="../planta-add">Añadir planta</button>
-      <button mat-raised-button *ngIf="auth.canAddPlantas(user)" routerLink="../modulo-add">Añadir modulo</button>
-    </div>
-  </div>
-  <div
-    *ngIf="user?.role == 0 || user?.role == 1 || user.role == 2; else informeListTable"
-    class="row justify-content-center"
-  >
-    <div class="col-4" *ngFor="let planta of plantasList$ | async">
-      <mat-card class="informe-card">
-        <mat-card-header>
-          <div mat-card-avatar class="informe-header-image"></div>
-          <mat-card-title>{{ planta.nombre }}</mat-card-title>
-          <mat-card-subtitle
-            >{{ planta?.potencia }} MW / {{ planta?.tipo }}
-            <a *ngIf="user.role === 1" routerLink="../planta-edit/{{ planta.id }}">
-              <i class="far fa-edit"></i>
-            </a>
-            <a *ngIf="user.role === 1 || user.role === 3" routerLink="../auto-loc/{{ planta.id }}">
-              <i class="fas fa-map-marker-alt"></i>
-            </a>
-            <span *ngIf="user.role === 1">
-              <input
-                type="checkbox"
-                (click)="updateAutoLocReady(planta, $event)"
-                [checked]="checkAutoLocReady(planta)"
-              />
-            </span>
-          </mat-card-subtitle>
-        </mat-card-header>
-
-        <mat-card-content>
-          <a *ngIf="user.role === 1" routerLink="../informe-add/{{ planta.id }}"> Añadir informe </a>
-          <span *ngIf="planta.informes.length > 0; else sinInforme"></span>
-          <ng-template #sinInforme><span> Informe en proceso ... </span></ng-template>
-        </mat-card-content>
-        <mat-card-actions class="cards-actions">
-          <div *ngFor="let informe of planta.informes">
-            <span *ngIf="user.role === 1">
-              <input type="checkbox" (click)="updateInforme(informe)" [checked]="informe.disponible" />
-            </span>
-            <a
-              *ngIf="checkInformeDisponible(informe); else sinInforme2"
-              mat-stroked-button
-              color="primary"
-              routerLink="./{{ informe.id }}"
-            >
-              Inspección del {{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}
-            </a>
-            <ng-template #sinInforme2
-              ><span> editar informe del ({{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}) </span
-              ><span *ngIf="user.role === 1"
-                >({{ informe.id }})
-                <a routerLink="../informe-view/{{ informe.id }}">
-                  <i class="fas fa-eye"></i>
-                </a>
-              </span>
-              <span *ngIf="user.role === 1 || user.role === 3">
-                <a routerLink="../informe-edit/{{ informe.id }}">
-                  <i class="far fa-edit"></i>
-                </a>
-              </span>
-            </ng-template>
-          </div>
-        </mat-card-actions>
-      </mat-card>
-    </div>
-  </div>
-  <ng-template #informeListTable>
-    <app-list-table-report></app-list-table-report>
-  </ng-template>
-</div>
- -->

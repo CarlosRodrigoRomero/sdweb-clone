@@ -20,6 +20,7 @@ interface PlantsData {
   potencia: number;
   mae: number;
   ultimaInspeccion: number;
+  informeId: string;
 }
 
 @Component({
@@ -54,6 +55,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
                 ultimaInspeccion: planta.informes.reduce((prev, current) =>
                   prev.fecha > current.fecha ? prev : current
                 ).fecha,
+                informeId: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).id,
               });
             }
           }
@@ -79,5 +81,9 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
   stopPropagation(event) {
     event.stopPropagation();
+  }
+
+  clickEvent() {
+    console.log('clickado');
   }
 }

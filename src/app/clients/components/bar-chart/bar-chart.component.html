@@ -1,15 +1,22 @@
 <div class="componente">
-  <h4 class="titulo">MAE</h4>
-  <div style="display: block;">
-    <canvas
-      baseChart
-      [datasets]="barChartData"
-      [labels]="barChartLabels"
-      [options]="barChartOptions"
-      [legend]="barChartLegend"
-      [chartType]="barChartType"
-      [colors]="color"
-    >
-    </canvas>
+  <div class="titulo">
+    <h4>MAE </h4>
+    <span>(Modulos Apagados Equivales)</span>
+  </div>
+  <div *ngIf="dataLoaded" id="chart">
+    <apx-chart
+      [series]="chartOptions.series"
+      [chart]="chartOptions.chart"
+      [dataLabels]="chartOptions.dataLabels"
+      [plotOptions]="chartOptions.plotOptions"
+      [yaxis]="chartOptions.yaxis"
+      [legend]="chartOptions.legend"
+      [fill]="chartOptions.fill"
+      [stroke]="chartOptions.stroke"
+      [tooltip]="chartOptions.tooltip"
+      [xaxis]="chartOptions.xaxis"
+      [annotations]="chartOptions.annotations"
+      [colors]="chartOptions.colors"
+    ></apx-chart>
   </div>
 </div>

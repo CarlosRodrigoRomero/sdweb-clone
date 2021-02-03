@@ -2,7 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AgmCoreModule } from '@agm/core';
-import { ChartsModule } from 'ng2-charts';
+/* import { ChartsModule } from 'ng2-charts'; */
+import { NgApexchartsModule } from 'ng-apexcharts';
 
 import { ClientsRoutingModule } from './clients-routing.module';
 import { SharedModule } from '@shared/shared.module';
@@ -42,10 +43,11 @@ import { DownloadExcelPortfolioComponent } from './components/download-excel-por
     ClientsRoutingModule,
     SharedModule,
     FormsModule,
+    NgApexchartsModule,
     ReactiveFormsModule,
     InformeFiltersModule,
-    InformeMapFilterModule,
-    ChartsModule,
+    InformeMapFilterModule
+    // /* ChartsModule, */
   ],
 })
 export class ClientsModule {}

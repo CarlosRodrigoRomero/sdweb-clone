@@ -2,6 +2,16 @@
   margin: 1em;
 }
 
+.buscar-input {
+  width: 100%;
+}
+
+.tabla-container {
+  position: relative;
+  max-height: 30vh;
+  overflow: auto;
+}
+
 .titulo {
   padding-left: 1em;
   padding-bottom: 1em;

@@ -41,8 +41,6 @@ export class FilterService {
   applyFilters() {
     const everyFilterFilteredPcs: Array<PcInterface[]> = new Array<PcInterface[]>();
 
-    console.log(this.filters);
-
     // comprobamos si hay filtros de tipo 'Add'
     if (this.filters.filter((filter) => this.typeAddFilters.includes(filter.type)).length > 0) {
       // separamos los pcs por tipo de filtro
