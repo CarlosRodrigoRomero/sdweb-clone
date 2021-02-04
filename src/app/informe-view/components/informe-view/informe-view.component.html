@@ -43,16 +43,16 @@
     <div class="header-informe">
       <div class="row">
         <!-- Datos de la planta y del tiempo -->
-        <div class="col-sm-12 col-md-8">
+        <div class="col-sm-12 col-md-10">
           <div class="row">
-            <div class="col-12">
+            <div class="col-12 nombre-planta">
               <span class="text-light titulo-informe">{{ planta?.nombre }}</span>
               <span class="titulo-informe-empresa" *ngIf="!allowDownloads"> ({{ empresaNombre }}) </span>
               <span class="text-light subtitulo-informe">{{ planta?.potencia }} MW / {{ planta?.tipo }}</span>
             </div>
           </div>
-          <div class="row">
-            <div class="col-12 datos-meteo">
+          <div class="header-derecha">
+            <div class="datos-meteo">
               <div class="col-2 col-datos-meteo">
                 <i class="fas fa-sun"></i>
               </div>
@@ -63,7 +63,7 @@
                 <span class="text-light">Irradiancia media</span>
               </div>
             </div>
-            <div class="col-12 datos-meteo">
+            <div class="datos-meteo">
               <div class="col-2 col-datos-meteo">
                 <i class="fas fa-cloud"></i>
               </div>
@@ -72,7 +72,7 @@
                 <span class="text-light">Nubosidad</span>
               </div>
             </div>
-            <div class="col-12 datos-meteo">
+            <div class="datos-meteo">
               <div class="col-2 col-datos-meteo">
                 <i class="fas fa-chess-board"></i>
               </div>
@@ -82,14 +82,15 @@
               </div>
             </div>
           </div>
+          <div class="col-12">
+            <div class="vuelo-fecha">
+              <span class="text-light">Vuelo realizado el {{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
         </div>
 
         <!-- Datos de la inspeccion -->
-        <div class="col-4 header-derecha">
-          <div class="text-right">
-            <span class="text-light">Vuelo realizado el {{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}</span>
-            <span class="text-light"> (de {{ informe?.hora_inicio }} a {{ informe?.hora_fin }})</span>
-          </div>
+        <div class="col-2 header-derecha">
           <div class="header-derecha-datos">
             <div class="header-derecha-datos-donut">
               <!-- <p-chart
@@ -98,6 +99,7 @@
                 [options]="chartOptions"
               ></p-chart> -->
             </div>
+
             <div *ngIf="allowDownloads" class="header-derecha-datos-mae">
               <div class="text-center">
                 <span class="mae-texto text-light">MAE</span>
@@ -147,12 +149,6 @@
 
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" [routerLink]="['informe-export']">Generar PDF</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" [routerLink]="['informe-map-filter']">Mapa con filtros</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" [routerLink]="['informe-seguidor']">Seguidor</a>
           </li>
         </ul>
       </div>
