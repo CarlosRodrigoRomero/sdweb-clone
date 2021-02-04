@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { PcInterface, Pc } from '../models/pc';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map, take, switchMap, filter } from 'rxjs/operators';
+import { map, take, switchMap } from 'rxjs/operators';
 import { GLOBAL } from './global';
 import { PlantaService } from './planta.service';
 import { AuthService } from './auth.service';

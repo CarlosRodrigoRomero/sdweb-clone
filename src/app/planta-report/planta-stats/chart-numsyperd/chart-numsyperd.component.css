@@ -1,0 +1,8 @@
+.chart-num-per-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.chart-num-per {
+  width: 600px;
+}

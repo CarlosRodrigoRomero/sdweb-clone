@@ -60,7 +60,7 @@ export class MapViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.plantaId = this.route.snapshot.paramMap.get('id');
-    this.activeInformeId = 'AAA';
+    this.mapControlService.selectedInformeId = '62dvYbGgoMkMNCuNCOEc'; //Alconchel 2020
 
     this.plantaService.getPlanta(this.plantaId).subscribe((planta) => {
       this.planta = planta;
@@ -140,8 +140,11 @@ export class MapViewComponent implements OnInit {
       this.thermalLayer.setOpacity(v / 100);
       // this.thermalLayer2.setOpacity(v / 100);
     });
-
-    this.mostrarTodasAnomalias(this.activeInformeId);
+    this.mapControlService.selectedInformeId$.subscribe((informeId) => {
+      // this.activeInformeId = informeId;
+      this.activeInformeId = 'AAA';
+      this.mostrarTodasAnomalias(this.activeInformeId);
+    });
   }
   addOverlayInfoAnomalia() {
     //Overlay para los detalles de cada anomalia
@@ -336,7 +339,7 @@ export class MapViewComponent implements OnInit {
         style: this.getStyleAnomaliasMapa(false),
       })
     );
-    this.anomaliaService.getAnomalias$(this.plantaId, informeId).subscribe((anomalias) => {
+    this.anomaliaService.getAnomalias$(informeId).subscribe((anomalias) => {
       // Dibujar anomalias
       this.dibujarAnomalias(anomalias);
       this.listaAnomalias = anomalias;

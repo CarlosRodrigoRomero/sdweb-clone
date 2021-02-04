@@ -39,11 +39,7 @@ export type ChartOptions = {
 })
 export class PlantaStatsComponent implements OnInit {
   @ViewChild('chartMAE') chartMAE: ChartComponent;
-  @ViewChild('charNumYPer') chartNumYPer: ChartComponent;
   public chartOptionsMAE: Partial<ChartOptions>;
-  public chartOptionsNumYPerComun: Partial<ChartOptions>;
-  public chartOptionsNumYPer1: Partial<ChartOptions>;
-  public chartOptionsNumYPer2: Partial<ChartOptions>;
 
   constructor() {
     this.chartOptionsMAE = {
@@ -147,118 +143,6 @@ export class PlantaStatsComponent implements OnInit {
     };
   }
 
-  ngOnInit(): void {
-    this.initChartNumYPer();
-  }
-
-  //////////////////////////////////////////////////////////////////
-  initChartNumYPer() {
-    this.chartOptionsNumYPerComun = {
-      dataLabels: {
-        enabled: false,
-      },
-      stroke: {
-        curve: 'straight',
-      },
-      toolbar: {
-        tools: {
-          selection: false,
-        },
-      },
-      markers: {
-        size: 6,
-        hover: {
-          size: 10,
-        },
-      },
-
-      // tooltip: {
-      //   followCursor: false,
-      //   theme: 'dark',
-      //   x: {
-      //     show: false,
-      //   },
-      //   marker: {
-      //     show: false,
-      //   },
-      //   y: {
-      //     title: {
-      //       formatter: (s) => {
-      //         return s;
-      //       },
-      //     },
-      //   },
-      // },
-      // grid: {
-      //   clipMarkers: false
-      // },
-    };
-
-    this.chartOptionsNumYPer1 = {
-      series: [
-        {
-          name: '# Anomalias',
-          data: [0, 20, 10, 50],
-        },
-      ],
-      title: {
-        text: '# Anomalías',
-        align: 'left',
-      },
-      xaxis: {
-        categories: ['Substring en CA', 'String', 'Módulo en CA', 'Célula caliente'],
-        type: 'category',
-        labels: {
-          rotate: 0,
-        },
-      },
-      chart: {
-        id: 'fb',
-        group: 'social',
-        type: 'bar',
-        // height: 160,
-      },
-
-      colors: ['#008FFB'],
-      yaxis: {
-        tickAmount: 2,
-        labels: {
-          minWidth: 40,
-        },
-      },
-    };
-
-    this.chartOptionsNumYPer2 = {
-      series: [
-        {
-          name: '% Pérdidas',
-          data: [0, 3, 2, 1],
-        },
-      ],
-      title: {
-        text: '% Anomalías',
-        align: 'left',
-      },
-      xaxis: {
-        categories: ['Substring en CA', 'String', 'Módulo en CA', 'Célula caliente'],
-        type: 'category',
-        labels: {
-          rotate: 0,
-        },
-      },
-      chart: {
-        id: 'tw',
-        group: 'social',
-        type: 'bar',
-        // height: 160,
-      },
-      colors: ['#546E7A'],
-      yaxis: {
-        tickAmount: 2,
-        labels: {
-          minWidth: 40,
-        },
-      },
-    };
-  }
+  ngOnInit(): void {}
 }
+//////////////////////////////////////////////////////////////////

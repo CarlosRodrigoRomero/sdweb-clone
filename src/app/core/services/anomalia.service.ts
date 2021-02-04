@@ -15,13 +15,11 @@ export class AnomaliaService {
     anomalia.id = id;
     // Para que Firestore admita "featureCoords", lo transformamos en un objeto
     const anomaliaObj = this.prepararParaDb(anomalia);
-    return this.afs.collection('anomalias').doc(id).set(anomaliaObj);
+    return this.afs.collection('pcs').doc(id).set(anomaliaObj);
   }
-  getAnomalias$(plantaId: string, informeId: string): Observable<Anomalia[]> {
+  getAnomalias$(informeId: string): Observable<Anomalia[]> {
     const query$ = this.afs
-      .collection<Anomalia>('anomalias', (ref) =>
-        ref.where('informeId', '==', informeId).where('plantaId', '==', plantaId)
-      )
+      .collection<Anomalia>('pcs', (ref) => ref.where('informeId', '==', informeId))
       .snapshotChanges()
       .pipe(
         map((actions) =>
@@ -29,7 +27,10 @@ export class AnomaliaService {
             let data = doc.payload.doc.data() as Anomalia;
             data.id = doc.payload.doc.id;
             // Convertimos el objetjo en un array
-            data.featureCoords = Object.values(data.featureCoords);
+            if (data.hasOwnProperty('featureCoords')) {
+              data.featureCoords = Object.values(data.featureCoords);
+            }
+
             return data;
           })
         )
@@ -38,7 +39,7 @@ export class AnomaliaService {
   }
   async updateAnomalia(anomalia: Anomalia) {
     const anomaliaObj = this.prepararParaDb(anomalia);
-    return this.afs.doc('anomalias/' + anomalia.id).update(anomaliaObj);
+    return this.afs.doc('pcs/' + anomalia.id).update(anomaliaObj);
   }
 
   private prepararParaDb(anomalia: Anomalia) {

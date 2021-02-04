@@ -11,9 +11,17 @@ import { AnomaliaInfoComponent } from './anomalia-info/anomalia-info.component';
 import { PlantaStatsComponent } from './planta-stats/planta-stats.component';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { ChartAlturaComponent } from './planta-stats/chart-altura/chart-altura.component';
+import { ChartNumsyperdComponent } from './planta-stats/chart-numsyperd/chart-numsyperd.component';
 
 @NgModule({
-  declarations: [MapViewComponent, MapControlComponent, AnomaliaInfoComponent, PlantaStatsComponent, ChartAlturaComponent],
+  declarations: [
+    MapViewComponent,
+    MapControlComponent,
+    AnomaliaInfoComponent,
+    PlantaStatsComponent,
+    ChartAlturaComponent,
+    ChartNumsyperdComponent,
+  ],
   imports: [
     SharedModule,
     NgxSliderModule,
