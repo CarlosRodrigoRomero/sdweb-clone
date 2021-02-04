@@ -35,32 +35,32 @@
   </ng-container>
   <ng-container matColumnDef="tempMax">
     <th mat-header-cell *matHeaderCellDef>T. Max</th>
-    <div *ngIf="!editable; else templateEditable2">
+    <div *ngIf="!editable; else templateEditable3">
       <td mat-cell *matCellDef="let element">{{ element.temperaturaMax }} ºC</td>
     </div>
-    <ng-template #templateEditable2>
+    <ng-template #templateEditable3>
       <td mat-cell *matCellDef="let element">
         <input
-          (change)="onEdit($event, element, 'tipo')"
-          type="{{ dataType['tipo'] }}"
+          (change)="onEdit($event, element, 'temperaturaMax')"
+          type="{{ dataType['temperaturaMax'] }}"
           matInput
-          value="{{ element.tipo }}"
+          value="{{ element.temperaturaMax }}"
         />
       </td>
     </ng-template>
   </ng-container>
   <ng-container matColumnDef="gradienteNormalizado">
     <th mat-header-cell *matHeaderCellDef>&Delta; T</th>
-    <div *ngIf="!editable; else templateEditable3">
+    <div *ngIf="!editable; else templateEditable4">
       <td mat-cell *matCellDef="let element">{{ element.gradienteNormalizado }} ºC</td>
     </div>
-    <ng-template #templateEditable3>
+    <ng-template #templateEditable4>
       <td mat-cell *matCellDef="let element">
         <input
-          (change)="onEdit($event, element, 'tipo')"
-          type="{{ dataType['tipo'] }}"
+          (change)="onEdit($event, element, 'gradienteNormalizado')"
+          type="{{ dataType['gradienteNormalizado'] }}"
           matInput
-          value="{{ element.tipo }}"
+          value="{{ element.gradienteNormalizado }}"
         />
       </td>
     </ng-template>
@@ -68,16 +68,16 @@
 
   <ng-container matColumnDef="perdidas">
     <th mat-header-cell *matHeaderCellDef>Pérdidas (%)</th>
-    <div *ngIf="!editable; else templateEditable4">
+    <div *ngIf="!editable; else templateEditable5">
       <td mat-cell *matCellDef="let element">{{ element.perdidas * 100 }} %</td>
     </div>
-    <ng-template #templateEditable4>
+    <ng-template #templateEditable5>
       <td mat-cell *matCellDef="let element">
         <input
-          (change)="onEdit($event, element, 'tipo')"
-          type="{{ dataType['tipo'] }}"
+          (change)="onEdit($event, element, 'perdidas')"
+          type="{{ dataType['perdidas'] }}"
           matInput
-          value="{{ element.tipo }}"
+          value="{{ element.perdidas }}"
         />
       </td>
     </ng-template>

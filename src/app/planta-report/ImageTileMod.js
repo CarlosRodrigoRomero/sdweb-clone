@@ -32,8 +32,9 @@ class ImageTileMod extends Tile {
      */
     this.crossOrigin_ = crossOrigin;
     this.palette = GLOBAL.ironPalette;
-    this.rangeMin = 25;
-    this.rangeMax = 100;
+    this.rangeTempMin = 10;
+    this.rangeTempMax = 100;
+    this.prueba = false;
 
 
     /**
@@ -138,6 +139,9 @@ class ImageTileMod extends Tile {
     if (index > this.palette.length - 1) {
       return this.palette[this.palette.length - 1];
     }
+    if (temperatura < this.sliderMin) {
+      return this.palette[0]
+    }
 
     return this.palette[index];
   }
@@ -148,24 +152,29 @@ class ImageTileMod extends Tile {
     let max;
     let min;
     let val;
+    let maxVal = 0;
+    if (pixel[0]> maxVal ) { maxVal = pixel[0]}
+    if (pixel[1]> maxVal ) { maxVal = pixel[1]}
+    if (pixel[2]> maxVal ) { maxVal = pixel[2]}
 
-    const subrango = 0.1 * Math.round(10 * Math.min(gradosMantenerPrecision, (this.rangeMax - this.rangeMin) / 3));
+
+    const subrango = Math.round(10 * gradosMantenerPrecision) / 10;
 
     if (pixel[0] == 0 && pixel[1] == 0 && pixel[2] == 0) {
-      return this.rangeMin;
+      return this.rangeTempMin;
     } else if (pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 255) {
-      return this.rangeMax;
-    } else if (pixel[0] != 0) {
-      max = this.rangeMin + subrango;
-      min = this.rangeMin;
+      return this.rangeTempMax;
+    } else if (pixel[0] == maxVal) {
+      max = this.rangeTempMin + subrango;
+      min = this.rangeTempMin;
       val = pixel[0];
-    } else if (pixel[1] != 0) {
-      min = this.rangeMin + subrango;
-      max = this.rangeMin + 0.1 * Math.round(10 * 2 * subrango);
+    } else if (pixel[1] == maxVal) {
+      min = this.rangeTempMin + subrango;
+      max = this.rangeTempMin + 0.1 * Math.round(10 * 2 * subrango);
       val = pixel[1];
     } else {
-      max = this.rangeMax;
-      min = this.rangeMin + 0.1 * Math.round(10 * 2 * subrango);
+      max = this.rangeTempMax;
+      min = this.rangeTempMin + 0.1 * Math.round(10 * 2 * subrango);
       val = pixel[2];
     }
     const temp = 0.1 * Math.round(10 * ((val * (max - min)) / 255 + min));

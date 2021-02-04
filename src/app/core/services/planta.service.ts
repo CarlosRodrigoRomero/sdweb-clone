@@ -13,6 +13,7 @@ import { AuthService } from './auth.service';
 import { GLOBAL } from './global';
 import { CriteriosClasificacion } from '../models/criteriosClasificacion';
 import { LatLngLiteral } from '@agm/core/map-types';
+import { ThermalLayerInterface } from '../models/thermalLayer';
 declare const google: any;
 
 @Injectable({
@@ -519,5 +520,21 @@ export class PlantaService {
       map.overlayMapTypes.push(imageMapType);
       map.fitBounds(mapBounds);
     }
+  }
+
+  getThermalLayers$(plantaId: string): Observable<ThermalLayerInterface[]> {
+    const query$ = this.afs
+      .collection<ThermalLayerInterface>('thermalLayers', (ref) => ref.where('plantaId', '==', plantaId))
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((doc) => {
+            let data = doc.payload.doc.data() as ThermalLayerInterface;
+            data.id = doc.payload.doc.id;
+            return data;
+          })
+        )
+      );
+    return query$;
   }
 }

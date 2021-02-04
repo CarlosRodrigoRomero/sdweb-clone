@@ -12,7 +12,7 @@ export class AnomaliaInfoComponent implements OnInit {
   @Input() anomalia: Anomalia;
   public displayedColumns: string[] = ['clase', 'tipo', 'tempMax', 'gradienteNormalizado', 'perdidas'];
   public dataSource: Anomalia[];
-  public editable = false;
+  public editable = true;
   public dataType: any;
   public pcDescripcion: string[];
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -11,11 +11,18 @@ export class MapControlService {
   private _sliderMax: number = 70;
   public sliderMaxSource = new BehaviorSubject<number>(this._sliderMax);
 
-  private _sliderYear: number = 100;
-  public sliderYearSource = new BehaviorSubject<number>(this._sliderYear);
+  private _sliderTemporal: number = 100;
+  public sliderTemporalSource = new BehaviorSubject<number>(this._sliderTemporal);
+
+  private _sliderThermalOpacity: number = 100;
+  public sliderThermalOpacitySource = new BehaviorSubject<number>(this._sliderThermalOpacity);
+
+  private _selectedInformeId: string = '';
+  private selectedInformeIdSource = new BehaviorSubject<string>(this._selectedInformeId);
+  public selectedInformeId$ = this.selectedInformeIdSource.asObservable();
 
   constructor() {}
-
+  /////////////////
   get sliderMin() {
     return this._sliderMin;
   }
@@ -23,6 +30,7 @@ export class MapControlService {
     this._sliderMin = value;
     this.sliderMaxSource.next(value);
   }
+  /////////////////
   get sliderMax() {
     return this._sliderMax;
   }
@@ -31,12 +39,31 @@ export class MapControlService {
 
     this.sliderMinSource.next(value);
   }
-  get sliderYear() {
-    return this._sliderYear;
+  /////////////////
+  get sliderTemporal() {
+    return this._sliderTemporal;
   }
-  set sliderYear(value: number) {
-    this._sliderYear = value;
+  set sliderTemporal(value: number) {
+    this._sliderTemporal = value;
 
-    this.sliderYearSource.next(value);
+    this.sliderTemporalSource.next(value);
+  }
+  /////////////////
+  get sliderThermalOpacity() {
+    return this._sliderThermalOpacity;
+  }
+  set sliderThermalOpacity(value: number) {
+    this._sliderThermalOpacity = value;
+
+    this.sliderThermalOpacitySource.next(value);
+  }
+  /////////////////
+  get selectedInformeId() {
+    return this._selectedInformeId;
+  }
+  set selectedInformeId(informeId: string) {
+    this._selectedInformeId = informeId;
+
+    this.selectedInformeIdSource.next(informeId);
   }
 }

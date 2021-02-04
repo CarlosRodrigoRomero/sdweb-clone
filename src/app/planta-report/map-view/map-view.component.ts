@@ -9,7 +9,6 @@ import View from 'ol/View';
 import { PlantaService } from '../../core/services/planta.service';
 import { PlantaInterface } from '../../core/models/planta';
 import { transformExtent } from 'ol/proj';
-
 import ImageTileMod from '../ImageTileMod.js';
 import { MapControlService } from '../services/map-control.service';
 import { LocationAreaInterface } from '../../core/models/location';
@@ -25,9 +24,13 @@ import SimpleGeometry from 'ol/geom/SimpleGeometry';
 import { AnomaliaService } from '../../core/services/anomalia.service';
 import { Feature, Overlay } from 'ol';
 import Polygon from 'ol/geom/Polygon';
-import { Control, defaults as defaultControls } from 'ol/control';
+import { defaults as defaultControls } from 'ol/control';
 import OverlayPositioning from 'ol/OverlayPositioning';
 import { GLOBAL } from '../../core/services/global';
+import { InformeService } from '../../core/services/informe.service';
+import { take } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
+import { ThermalLayerInterface } from '../../core/models/thermalLayer';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -50,24 +53,74 @@ export class MapViewComponent implements OnInit {
   public sliderYear: number;
   public thermalLayer: TileLayer;
   public rgbLayer: TileLayer;
+  private extent1: any;
+  private thermalLayers: TileLayer[];
 
   constructor(
     private anomaliaService: AnomaliaService,
     public mapControlService: MapControlService,
     private route: ActivatedRoute,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private informeService: InformeService
   ) {}
 
   ngOnInit(): void {
-    this.plantaId = this.route.snapshot.paramMap.get('id');
-    this.mapControlService.selectedInformeId = '62dvYbGgoMkMNCuNCOEc'; //Alconchel 2020
+    // Para la demo, agregamos un extent a todas las capas:
+    this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
-    this.plantaService.getPlanta(this.plantaId).subscribe((planta) => {
-      this.planta = planta;
-      this.initMap();
-      // this.permitirCrearAnomalias();
-    });
+    this.plantaId = this.route.snapshot.paramMap.get('id');
+
+    // Obtenemos todas las capas termicas para esta planta y las almacenamos en this.thermalLayers
+    combineLatest([
+      this.plantaService.getThermalLayers$(this.plantaId),
+      this.informeService.getInformesDePlanta(this.plantaId),
+      this.plantaService.getPlanta(this.plantaId),
+    ])
+      .pipe(take(1))
+      .subscribe(([thermalLayers, informes, planta]) => {
+        this.thermalLayers = Array<TileLayer>();
+        // Para cada informe, hay que crear 2 capas: térmica y vectorial
+        informes.forEach((informe) => {
+          // Crear capa térmica
+          const tl = thermalLayers.filter((item) => item.informeId == informe.id);
+          // TODO: Comprobar que existe...
+          if (tl.length > 0) {
+            this.thermalLayers.push(this.createThermalLayer(tl[0], informe.id));
+          }
+
+          // Crear capa vectorial
+        });
+
+        this.planta = planta;
+        this.initMap();
+      });
+
+    this.mapControlService.selectedInformeId = '62dvYbGgoMkMNCuNCOEc'; //Alconchel 2020
   }
+  private createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {
+    // Iniciar mapa térmico
+    const tl = new TileLayer({
+      source: new XYZ_mod({
+        url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',
+        crossOrigin: '',
+        tileClass: ImageTileMod,
+        transition: 255,
+        tileLoadFunction: (imageTile, src) => {
+          imageTile.rangeTempMax = thermalLayer.rangeTempMax;
+          imageTile.rangeTempMin = thermalLayer.rangeTempMin;
+          imageTile.mapControlService = this.mapControlService;
+          imageTile.getImage().src = src;
+        },
+      }),
+      extent: this.extent1,
+    });
+    tl.setProperties({
+      informeId: informeId,
+    });
+
+    return tl;
+  }
+
   onChangeSlider(highValue: number, lowValue: number) {
     this.mapControlService.sliderMax = highValue;
     this.mapControlService.sliderMin = lowValue;
@@ -81,43 +134,26 @@ export class MapViewComponent implements OnInit {
       url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
     });
 
-    // Iniciar mapa térmico
-    this.thermalSource = new XYZ_mod({
-      url: 'http://solardrontech.es/tileserver.php?/index.json?/demo_thermal_2020/{z}/{x}/{y}.png',
-      crossOrigin: '',
-      tileClass: ImageTileMod,
-      transition: 255,
-      tileLoadFunction: (imageTile, src) => {
-        imageTile.mapControlService = this.mapControlService;
-        imageTile.getImage().src = src;
-      },
-    });
-    const extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
-
-    this.thermalLayer = new TileLayer({
-      source: this.thermalSource,
-      extent: extent1,
-    });
     this.rgbLayer = new TileLayer({
       source: aerial,
-      extent: extent1,
+      extent: this.extent1,
     });
+
+    const layers = [
+      new TileLayer({
+        // source: satellite,
+        source: new OSM(),
+        // extent: this.extent1,
+      }),
+      this.rgbLayer,
+    ].concat(this.thermalLayers);
 
     // MAPA
     this.map = new Map({
       target: 'map',
       controls: defaultControls({ attribution: false }),
 
-      layers: [
-        new TileLayer({
-          // source: satellite,
-          source: new OSM(),
-          // extent: extent1,
-        }),
-        this.rgbLayer,
-        this.thermalLayer,
-        // }),
-      ],
+      layers: layers,
       view: new View({
         center: fromLonLat([this.planta.longitud, this.planta.latitud]),
         zoom: 18,
@@ -131,14 +167,30 @@ export class MapViewComponent implements OnInit {
 
     // Slider para la capa termica
     this.mapControlService.sliderMaxSource.subscribe((v) => {
-      this.thermalSource.changed();
+      this.thermalLayers.forEach((tl) => {
+        tl.getSource().changed();
+      });
     });
     this.mapControlService.sliderMinSource.subscribe((v) => {
-      this.thermalSource.changed();
+      this.thermalLayers.forEach((tl) => {
+        tl.getSource().changed();
+      });
     });
-    this.mapControlService.sliderYearSource.subscribe((v) => {
-      this.thermalLayer.setOpacity(v / 100);
-      // this.thermalLayer2.setOpacity(v / 100);
+    this.mapControlService.sliderThermalOpacitySource.subscribe((v) => {
+      this.thermalLayers.forEach((layer) => {
+        // TODO
+        // const val = v/100;
+
+        // const dif = layer.getOpacity()-v/100
+        layer.setOpacity(v / 100);
+      });
+    });
+    this.mapControlService.sliderTemporalSource.subscribe((v) => {
+      this.thermalLayers[1].setOpacity(v / 100); // 2020
+      this.thermalLayers[0].setOpacity(1 - v / 100); // 2019
+      // this.thermalLayers.forEach(layer => {
+      //   layer.setOpacity(v / 100);
+      // })
     });
     this.mapControlService.selectedInformeId$.subscribe((informeId) => {
       // this.activeInformeId = informeId;
@@ -370,8 +422,6 @@ export class MapViewComponent implements OnInit {
     });
     this.map.addInteraction(select);
     select.on('select', (e) => {
-      console.log('🚀 ~ file: map-view.component.ts ~ line 370 ~ select.on ~ e', e);
-
       this.anomaliaSeleccionada = undefined;
 
       if (e.selected.length > 0) {

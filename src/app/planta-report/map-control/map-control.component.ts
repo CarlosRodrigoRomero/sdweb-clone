@@ -9,8 +9,9 @@ import { MatSliderChange } from '@angular/material/slider';
   styleUrls: ['./map-control.component.css'],
 })
 export class MapControlComponent implements OnInit {
-  lowValue: number = 47;
-  highValue: number = 65;
+  temporalValue: number = 100;
+  lowValue: number = 25;
+  highValue: number = 75;
   options: Options = {
     floor: 25,
     ceil: 100,
@@ -25,6 +26,10 @@ export class MapControlComponent implements OnInit {
       }
     },
   };
+  optionsTemporalSlider: Options = {
+    floor: 0,
+    ceil: 100,
+  };
 
   constructor(private mapControlService: MapControlService) {}
 
@@ -33,7 +38,10 @@ export class MapControlComponent implements OnInit {
     this.mapControlService.sliderMax = highValue;
     this.mapControlService.sliderMin = lowValue;
   }
-  onChangeYearSlider(e: MatSliderChange) {
-    this.mapControlService.sliderYear = e.value;
+  onChangeThermalOpacitySlider(e: MatSliderChange) {
+    this.mapControlService.sliderThermalOpacity = e.value;
+  }
+  onChangeTemporalSlider(value: number) {
+    this.mapControlService.sliderTemporal = value;
   }
 }
