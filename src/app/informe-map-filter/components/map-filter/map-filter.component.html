@@ -1,4 +1,33 @@
-<div class="container">
+<div class="map">
+  <agm-map
+    class="mapa"
+    [latitude]="planta.latitud"
+    [longitude]="planta.longitud"
+    [mapTypeId]="mapType"
+    [zoom]="planta.zoom"
+    [streetViewControl]="false"
+    (mapReady)="onMapReady($event)"
+    [fullscreenControl]="true"
+    [mapTypeControl]="true"
+  >
+    <agm-circle
+      *ngFor="let pc of filterService.filteredPcs$ | async"
+      [latitude]="pc.gps_lat"
+      [longitude]="pc.gps_lng"
+      [radius]="circleRadius"
+      [fillColor]="getStrokeColor(pcService.getPcCoA(pc))"
+      [fillOpacity]="0.5"
+      [strokeColor]="getStrokeColor(pcService.getPcCoA(pc))"
+      [strokeOpacity]="1"
+      [strokePosition]="'OUTSIDE'"
+      [strokeWeight]="2"
+      [editable]="false"
+      [zIndex]="1"
+    ></agm-circle>
+  </agm-map>
+</div>
+
+<!-- <div class="container">
   <div class="row">
     <div class="col-xs-9">
       <div class="row">
@@ -19,11 +48,12 @@
               [latitude]="pc.gps_lat"
               [longitude]="pc.gps_lng"
               [radius]="circleRadius"
+              [fillColor]="getStrokeColor(pcService.getPcCoA(pc))"
+              [fillOpacity]="1"
+              [strokeColor]="'white'"
               [strokeOpacity]="1"
-              [strokePosition]="0"
-              [strokeColor]="getStrokeColor(pcService.getPcCoA(pc))"
-              [strokeWeight]="3"
-              [fillOpacity]="0.3"
+              [strokePosition]="'OUTSIDE'"
+              [strokeWeight]="1"
               [editable]="false"
               [zIndex]="1"
             ></agm-circle>
@@ -31,10 +61,12 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-12">
-          <div class="button-row">
-            <button mat-raised-button color="basic" (click)="initDrawingManager()">Nuevo área</button>
-          </div>
+        <div class="button-row">
+          <button mat-raised-button color="basic" (click)="initDrawingManager()">Nuevo área</button>
+        </div>
+        <span class="spacer"></span>
+        <div>
+          <app-share-map></app-share-map>
         </div>
       </div>
     </div>
@@ -51,4 +83,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->

@@ -1,0 +1,17 @@
+<div class="filtro">
+  <h4>Zona</h4>
+  <div>
+    <li *ngFor="let zona of zonasPcs; index as i">
+      <mat-checkbox
+        [(ngModel)]="zona.completed"
+        [id]="'zona_' + (i + 1)"
+        [name]="zona.label"
+        (change)="onChangeFiltroZona($event)"
+      >
+        <span style="font-size: 15px">
+          {{ zona.label }}
+        </span>
+      </mat-checkbox>
+    </li>
+  </div>
+</div>

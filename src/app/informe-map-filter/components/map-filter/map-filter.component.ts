@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { GLOBAL } from '@core/services/global';
 import { LatLngLiteral } from '@agm/core';
 
@@ -10,7 +10,9 @@ import { PcService } from '@core/services/pc.service';
 import { PlantaService } from '@core/services/planta.service';
 import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '@core/services/filter.service';
+
 import { Observable } from 'rxjs';
+
 import { AreaFilter } from '@core/models/areaFilter';
 
 declare const google: any;
@@ -38,8 +40,8 @@ export class MapFilterComponent implements OnInit {
     public pcService: PcService
   ) {
     // mostramos todos los pcs al inicio
-    this.filterService.filteredPcs = this.pcService.allPcs;
-    this.filterService.filteredPcs$.next(this.filterService.filteredPcs);
+    // this.filterService.filteredPcs = this.pcService.allPcs;
+    // this.filterService.filteredPcs$.next(this.filterService.filteredPcs);
   }
 
   ngOnInit(): void {
@@ -52,6 +54,10 @@ export class MapFilterComponent implements OnInit {
     } else if (this.planta.tipo === '1 eje') {
       this.circleRadius = 2;
     }
+  }
+
+  getStrokeColor(severidad: number) {
+    return GLOBAL.colores_severidad[severidad - 1];
   }
 
   onMapReady(map) {
@@ -72,15 +78,12 @@ export class MapFilterComponent implements OnInit {
             return filtro as AreaFilter;
           }
         })
+        .filter((filtro) => filtro as AreaFilter)
         .forEach((filtro) => {
           this.areaFilterList.push(filtro);
           filtro.polygon.setMap(this.map);
         });
     });
-  }
-
-  getStrokeColor(severidad: number) {
-    return GLOBAL.colores_severidad[severidad - 1];
   }
 
   initDrawingManager() {
@@ -112,7 +115,7 @@ export class MapFilterComponent implements OnInit {
       }
 
       // Creamos el filtro
-      const areaFilter = new AreaFilter('Área ' + this.numAreas, path);
+      const areaFilter = new AreaFilter('Área ' + this.numAreas, 'area', path);
       this.filterService.addFilter(areaFilter);
 
       // Desactiva del modo dibujo
@@ -120,5 +123,18 @@ export class MapFilterComponent implements OnInit {
         drawingManager.setDrawingMode(null);
       }
     });
+  }
+
+  numberToLatLng(paths: Array<Array<number>>): Array<Array<LatLngLiteral>> {
+    console.log(paths);
+    const newPaths = [];
+    for (let i = 0; i <= paths.length; i++) {
+      const path = [];
+      for (let j = 0; j <= paths[i].length; j++) {
+        path.push(new google.maps.LatLng(paths[i][j][0], paths[i][j][1]));
+      }
+      newPaths.push(path);
+    }
+    return newPaths;
   }
 }

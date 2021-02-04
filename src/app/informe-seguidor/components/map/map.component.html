@@ -1,0 +1,26 @@
+<agm-map
+  [latitude]="planta.latitud"
+  [longitude]="planta.longitud"
+  [mapTypeId]="'satellite'"
+  [zoom]="planta.zoom"
+  [streetViewControl]="false"
+  (mapReady)="onMapReady($event)"
+  [fullscreenControl]="true"
+  [mapTypeControl]="true"
+>
+  <agm-circle
+    *ngFor="let seg of seguidores"
+    [latitude]="seg.lat"
+    [longitude]="seg.lng"
+    [radius]="5"
+    [fillColor]="'red'"
+    [fillOpacity]="1"
+    [strokeColor]="'white'"
+    [strokeOpacity]="1"
+    [strokePosition]="'OUTSIDE'"
+    [strokeWeight]="2"
+    [editable]="false"
+    [zIndex]="1"
+    (circleClick)="getMaeSeguidor(seg.lng)"
+  ></agm-circle>
+</agm-map>

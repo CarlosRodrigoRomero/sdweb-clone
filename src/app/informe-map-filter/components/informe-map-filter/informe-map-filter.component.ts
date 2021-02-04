@@ -13,7 +13,7 @@ import { FilterService } from '@core/services/filter.service';
 import { Observable } from 'rxjs';
 import { AreaFilter } from '@core/models/areaFilter';
 import { MatDialog } from '@angular/material/dialog';
-import { ShareDialogComponent } from './share-dialog-component';
+/* import { ShareDialogComponent } from './share-dialog-component'; */
 
 declare const google: any;
 @Component({

@@ -1,22 +1,24 @@
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AgmCoreModule } from '@agm/core';
+
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 import { ClientesRoutingModule } from './clientes-routing.module';
+import { ModuloAddComponent } from './components/modulo-add/modulo-add.component';
 import { SharedModule } from '@shared/shared.module';
+
 import { AuthService } from '@core/services/auth.service';
+
 import { InformesComponent } from './components/informes/informes.component';
 import { ClientesComponent } from './components/clientes/clientes.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { PlantaEditComponent } from './components/planta-edit/planta-edit.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AgmCoreModule } from '@agm/core';
 import { AutoLocComponent } from './components/auto-loc/auto-loc.component';
 import { PlantaAddComponent } from './components/planta-add/planta-add.component';
 import { InformeAddComponent } from './components/informe-add/informe-add.component';
 import { InformeListTableComponent } from './components/informe-list-table/informe-list-table.component';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { ModuloAddComponent } from './components/modulo-add/modulo-add.component';
 
-import { MaterialModule } from '@material/material.module';
 import { PortfolioBenchmarkComponent } from './components/portfolio-benchmark/portfolio-benchmark.component';
 import { ChartModule } from 'primeng/chart';
 @NgModule({
@@ -44,7 +46,6 @@ import { ChartModule } from 'primeng/chart';
     FormsModule,
     ReactiveFormsModule,
     MatDatepickerModule,
-    MaterialModule,
   ],
   providers: [AuthService, MatDatepickerModule],
 })

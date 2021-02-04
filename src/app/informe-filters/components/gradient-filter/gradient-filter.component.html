@@ -1,0 +1,12 @@
+<div class="filtro">
+  <h4>Gradiente normalizado</h4>
+  <div class="custom-slider">
+    <ngx-slider
+      [(value)]="rangoMinGradiente"
+      [(highValue)]="rangoMaxGradiente"
+      (valueChange)="onChangeFiltroGradiente()"
+      (highValueChange)="onChangeFiltroGradiente()"
+      [options]="options"
+    ></ngx-slider>
+  </div>
+</div>

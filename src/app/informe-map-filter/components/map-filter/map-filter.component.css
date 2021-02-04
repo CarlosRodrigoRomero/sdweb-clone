@@ -2,6 +2,14 @@
   width: 100%;
 }
 
+.map {
+  height: 90vh;
+}
+
 agm-map {
-  height: 500px;
+  height: 100%;
+}
+
+.spacer {
+  flex: 1 1 auto;
 }

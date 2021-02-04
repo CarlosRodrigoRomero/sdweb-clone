@@ -1,0 +1,17 @@
+<div class="filtro">
+  <h4>Tipo</h4>
+  <div>
+    <li *ngFor="let tipo of tiposPcs; index as i">
+      <mat-checkbox
+        [(ngModel)]="tipo.completed"
+        [id]="'tipo_' + (i + 1)"
+        [name]="tipo.label"
+        (change)="onChangeFiltroTipo($event)"
+      >
+        <span style="font-size: 15px">
+          {{ tipo.label }}
+        </span>
+      </mat-checkbox>
+    </li>
+  </div>
+</div>

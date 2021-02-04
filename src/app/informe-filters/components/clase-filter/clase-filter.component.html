@@ -1,0 +1,20 @@
+<div class="filtro">
+  <h4>Clase</h4>
+  <div class="grupo">
+    <li *ngFor="let clase of clasesPcs; index as i">
+      <mat-checkbox
+        [(ngModel)]="clase.completed"
+        [id]="'CoA_' + (i + 1)"
+        [name]="clase.label"
+        (change)="onChangeFiltroClase($event)"
+      >
+        <div class="label">
+          <mat-icon [ngStyle]="{ color: coloresSeveridad[i] }">stop_circle</mat-icon>
+          <span style="font-size: 15px">
+            {{ clase.label }}
+          </span>
+        </div>
+      </mat-checkbox>
+    </li>
+  </div>
+</div>

@@ -1,44 +1,43 @@
-<h2>Editar usuario</h2>
+<div class="edit-user">
+  <h2>Editar usuario</h2>
 
-<form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
-  <mat-card>
-    <mat-card-content>
-      <!-- Campo email -->
+  <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
+    <mat-card>
+      <mat-card-content>
+        <!-- Campo email -->
 
-      <mat-form-field class="example-full-width">
-        <mat-label>email</mat-label>
-        <input matInput formControlName="email" />
-      </mat-form-field>
+        <mat-form-field class="example-full-width">
+          <mat-label>email</mat-label>
+          <input matInput formControlName="email" />
+        </mat-form-field>
 
-      <!-- Campo Empresa -->
+        <!-- Campo Empresa -->
 
-      <mat-form-field class="example-full-width">
-        <mat-label>Empresa</mat-label>
-        <input matInput formControlName="empresa" />
-      </mat-form-field>
+        <mat-form-field class="example-full-width">
+          <mat-label>Empresa</mat-label>
+          <input matInput formControlName="empresa" />
+        </mat-form-field>
 
-      <!-- Selecctor de tipo de usuario -->
+        <!-- Selecctor de tipo de usuario -->
 
-      <mat-form-field appearance="fill">
-        <mat-label>Tipo de usuario</mat-label>
-        <mat-select formControlName="role" ngModel="{{ user.role }}">
-          <mat-option value="0">Usuario</mat-option>
-          <mat-option value="1">Administrador</mat-option>
-          <mat-option value="2">Externo</mat-option>
-          <mat-option value="3">Procesamiento</mat-option>
-        </mat-select>
-      </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Tipo de usuario</mat-label>
+          <mat-select formControlName="role" ngModel="{{ user.role }}">
+            <mat-option value="0">Usuario</mat-option>
+            <mat-option value="1">Administrador</mat-option>
+            <mat-option value="2">Externo</mat-option>
+            <mat-option value="3">Procesamiento</mat-option>
+          </mat-select>
+        </mat-form-field>
 
-      <!-- Selector de plantas -->
+        <!-- Selector de plantas -->
 
-      <app-plantas-table
-        [user]="user"
-        (newPlantasUser)="user.plantas = $event"
-      ></app-plantas-table>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-raised-button routerLink="../../">Cancelar</button>
-      <button mat-raised-button type="submit">Actualizar</button>
-    </mat-card-actions>
-  </mat-card>
-</form>
+        <app-plantas-table [user]="user" (newPlantasUser)="user.plantas = $event"></app-plantas-table>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button routerLink="../../">Cancelar</button>
+        <button mat-raised-button type="submit">Actualizar</button>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+</div>

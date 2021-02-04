@@ -1,9 +1,7 @@
 import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 import { NgModule } from '@angular/core';
-import { AuthGuard } from '@core/services/auth.guard';
-// import { PubliclayoutComponent } from "./layout/publiclayout/publiclayout.component";
-// import { VideoComponent } from "./cts/video/video.component";
 import { AvisoLegalComponent } from './cts/aviso-legal/aviso-legal.component';
+import { AuthGuard } from './core/services/auth.guard';
 
 export const routes: Routes = [
   { path: '', loadChildren: () => import('./auth/auth.module').then((m) => m.AuthenticationModule) },
@@ -19,17 +17,15 @@ export const routes: Routes = [
     loadChildren: () => import('./clientes/clientes.module').then((m) => m.ClientesModule),
     canActivate: [AuthGuard],
   },
-  // {
-  //   path: 'v',
-  //   component: PubliclayoutComponent,
-  //   children: [
-  //     {
-  //       path: 'davidignis',
-  //       component: VideoComponent,
-  //       data: { nombre: 'David Parra', codigo: 'd0ekj87q0d' },
-  //     },
-  //   ],
-  // },
+  {
+    path: 'clients',
+    loadChildren: () => import('./clients/clients.module').then((m) => m.ClientsModule),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'share',
+    loadChildren: () => import('./share/share.module').then((m) => m.ShareModule),
+  },
 
   // // { path: "**", redirectTo: "" }
 ];

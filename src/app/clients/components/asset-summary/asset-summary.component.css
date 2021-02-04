@@ -1,0 +1,14 @@
+.componente {
+  margin: 1em;
+}
+
+h4 {
+  padding-left: 1em;
+  padding-bottom: 2em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1em;
+}

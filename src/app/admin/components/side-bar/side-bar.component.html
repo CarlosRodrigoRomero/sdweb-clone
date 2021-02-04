@@ -7,7 +7,7 @@
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="(isHandset$ | async) === false"
   >
-    <mat-toolbar style="color: red">Solardrone</mat-toolbar>
+    <mat-toolbar style="color: red">Menu</mat-toolbar>
     <mat-nav-list>
       <a mat-list-item routerLink="users">Usuarios</a>
       <a mat-list-item>Plantas</a>
@@ -26,6 +26,18 @@
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <span>Panel de administrador</span>
+      <span class="spacer"></span>
+
+      <!-- botón menu derecha -->
+      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item routerLink="../clientes">Salir</button>
+        <button mat-menu-item (click)="signOut()" routerLink="../auth">
+          <strong> Cerrar sesión </strong>
+        </button>
+      </mat-menu>
     </mat-toolbar>
     <router-outlet></router-outlet>
   </mat-sidenav-content>

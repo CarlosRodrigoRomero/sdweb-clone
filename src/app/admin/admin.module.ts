@@ -10,9 +10,10 @@ import { EditUserComponent } from './components/edit-user/edit-user.component';
 import { SideBarComponent } from './components/side-bar/side-bar.component';
 import { UsersComponent } from './components/users/users.component';
 import { PlantasTableComponent } from './components/plantas-table/plantas-table.component';
+import { CreateUserComponent } from './components/create-user/create-user.component';
 
 @NgModule({
-  declarations: [EditUserComponent, SideBarComponent, UsersComponent, PlantasTableComponent],
+  declarations: [EditUserComponent, SideBarComponent, UsersComponent, PlantasTableComponent, CreateUserComponent],
   imports: [CommonModule, RouterModule, AdminRoutingModule, SharedModule, LayoutModule],
 })
 export class AdminModule {}

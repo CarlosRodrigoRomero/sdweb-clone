@@ -15,7 +15,7 @@ export class EditUserComponent implements OnInit {
   form: FormGroup;
   emailVerified: boolean;
   id: string;
-  user: UserInterface;
+  user: UserInterface = {};
 
   constructor(
     private formBuilder: FormBuilder,
@@ -27,6 +27,7 @@ export class EditUserComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Recoge el ID del usuario de la ruta
     this.activatedRoute.params.subscribe((params: Params) => {
       this.id = params.id;
     });

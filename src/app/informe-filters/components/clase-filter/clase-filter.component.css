@@ -1,0 +1,20 @@
+.filtro {
+  margin-bottom: 15px;
+}
+
+h4 {
+  margin-bottom: 15px;
+}
+
+li {
+  list-style-type: none;
+}
+
+.label {
+  display: inline-flex;
+  vertical-align: bottom;
+}
+
+mat-icon {
+  margin-right: 7px;
+}

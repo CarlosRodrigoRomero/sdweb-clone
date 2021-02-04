@@ -1,3 +1,36 @@
+.row_1 {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: 60px;
+  align-items: center;
+}
+
+.meteo {
+  justify-self: end;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 1em;
+}
+
+.meteo div {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 1em;
+}
+
+.row_2 {
+  display: grid;
+  grid-template-columns: 60px auto;
+  align-items: center;
+}
+
+.potencia {
+  grid-column: 2/3;
+}
+
+/* /////////////////// */
+
 .col-filtros {
   background-color: transparent;
   margin-top: 1rem;

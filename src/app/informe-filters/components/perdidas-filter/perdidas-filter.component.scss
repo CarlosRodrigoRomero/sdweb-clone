@@ -1,0 +1,20 @@
+.filtro {
+  margin-bottom: 15px;
+}
+
+::ng-deep {
+  .custom-slider .ngx-slider .ngx-slider-selection {
+    background: #546e7a;
+  }
+
+  .custom-slider .ngx-slider .ngx-slider-pointer {
+    background-color: #455a64;
+    width: 16px;
+    height: 16px;
+    top: -6px;
+  }
+
+  .custom-slider .ngx-slider .ngx-slider-pointer:after {
+    display: none;
+  }
+}

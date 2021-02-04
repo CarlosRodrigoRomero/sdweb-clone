@@ -1,0 +1,14 @@
+.componente {
+  margin: 1em;
+}
+
+.titulo {
+  display: flex;
+  width: fit-content;
+  padding-left: 1em;
+}
+
+.titulo span {
+  font-size: medium;
+  margin-left: 1em;
+}

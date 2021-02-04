@@ -3,77 +3,128 @@ import { Injectable } from '@angular/core';
 import { PcService } from './pc.service';
 
 import { FilterInterface } from '@core/models/filter';
-import { PcInterface } from '../models/pc';
 
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { FiltrableInterface } from '@core/models/filtrableInterface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FilterService {
+  public typeAddFilters = ['area', 'tipo', 'clase', 'modulo', 'zona'];
   public filters: FilterInterface[] = [];
-  public filters$ = new Subject<FilterInterface[]>();
-  public filteredPcs: PcInterface[] = [];
-  public filteredPcs$ = new BehaviorSubject<PcInterface[]>(this.filteredPcs);
+  public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
+  public filtersByType: FilterInterface[] = [];
+  public filtersByType$ = new BehaviorSubject<FilterInterface[]>(this.filtersByType);
+  public filteredPcs: FiltrableInterface[] = [];
+  public filteredPcs$ = new BehaviorSubject<FiltrableInterface[]>(this.filteredPcs);
+  public typeAddFilteredPcs: FiltrableInterface[] = [];
+  private allFiltrableElements: FiltrableInterface[];
 
-  constructor(private pcService: PcService) {}
+  constructor(private pcService: PcService) {
+    this.pcService.allPcs$.pipe(take(1)).subscribe((pcs) => {
+      this.allFiltrableElements = pcs as FiltrableInterface[];
+    });
+  }
 
   addFilter(filter: FilterInterface) {
-    // Añade el filtro y lo aplica
-    this.filters.push(filter);
+    // comprobamos que no es de tipo 'Add'
+    if (!this.typeAddFilters.includes(filter.type)) {
+      // eliminamos, si lo hubiera, el filtro anterior del mismo tipo que el recibido
+      this.filters = this.filters.filter((f) => f.type !== filter.type);
+      // añadimos el nuevo filtro
+      this.filters.push(filter);
+    } else {
+      // si es del tipo 'Add' se añade al array
+      this.filters.push(filter);
+    }
     this.filters$.next(this.filters);
 
-    const newFilteredPcs = filter.applyFilter(this.pcService.allPcs);
-
-    // Si es el primer filtro sustituimos todos los filtros por los nuevos...
-    if (this.filters.length === 1) {
-      this.filteredPcs = newFilteredPcs;
-    } else {
-      // ...si no es el primero, añadimos los nuevos
-      // revisamos tambien si ya se están mostrando esos pcs para no repetirlos
-      this.filteredPcs = this.filteredPcs.concat(newFilteredPcs.filter((newPc) => !this.filteredPcs.includes(newPc)));
-    }
-    this.filteredPcs$.next(this.filteredPcs);
+    this.applyFilters();
   }
 
-  deleteFilter(filter: FilterInterface) {
-    // Elimina el filtro y lo desactiva
-    this.filters.splice(this.filters.indexOf(filter), 1);
-    this.filters$.next(this.filters);
+  private applyFilters() {
+    const everyFilterFilteredPcs: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
 
-    // Si era el último filtro mostramos todas las pcs...
-    if (this.filters.length === 0) {
-      this.filteredPcs = this.pcService.allPcs;
-    } else {
-      // ... si no era el último, eliminamos solo el filtro
-      let newFilteredPcs = filter.unapplyFilter(this.filteredPcs);
+    // comprobamos si hay filtros de tipo 'Add'
+    if (this.filters.filter((filter) => this.typeAddFilters.includes(filter.type)).length > 0) {
+      // separamos los pcs por tipo de filtro
+      this.typeAddFilters.forEach((type) => {
+        const newFilteredPcs: FiltrableInterface[] = [];
+        if (this.filters.filter((filter) => filter.type === type).length > 0) {
+          this.filters
+            .filter((filter) => filter.type === type)
+            .forEach((filter) => {
+              filter.applyFilter(this.allFiltrableElements).forEach((pc) => newFilteredPcs.push(pc));
+            });
+          // añadimos un array de cada tipo
+          everyFilterFilteredPcs.push(newFilteredPcs);
+        }
+      });
+    }
 
-      // comprobamos que no se eliminen pcs que pertenezcan a otros filtros
-      this.filters.forEach((f) => {
-        const coincidentPcs = f.applyFilter(this.filteredPcs).filter((pc) => !newFilteredPcs.includes(pc));
-        newFilteredPcs = newFilteredPcs.concat(coincidentPcs);
+    // añadimos al array los pcs filtrados de los filtros no 'Add'
+    this.filters
+      .filter((filter) => !this.typeAddFilters.includes(filter.type))
+      .forEach((filter) => {
+        const newFilteredPcs = filter.applyFilter(this.allFiltrableElements);
+        everyFilterFilteredPcs.push(newFilteredPcs);
       });
 
-      this.filteredPcs = newFilteredPcs;
+    // calculamos la interseccion de los array de los diferentes tipos
+    if (everyFilterFilteredPcs.length > 0) {
+      this.filteredPcs = everyFilterFilteredPcs.reduce((anterior, actual) =>
+        anterior.filter((pc) => actual.includes(pc))
+      );
     }
+
+    // comprobamos que hay algun filtro activo
+    if (everyFilterFilteredPcs.length === 0) {
+      this.filteredPcs = this.allFiltrableElements;
+    }
+
     this.filteredPcs$.next(this.filteredPcs);
   }
 
-  deleteAllFilters() {
-    // Elimina todos los filtros
-    this.filters = [];
-    this.filters$.next(this.filters);
-
-    // Vuelve a mostrar todos los pcs
-    this.filteredPcs = this.pcService.allPcs;
-    this.filteredPcs$.next(this.filteredPcs);
+  getAllTypeFilters(type: string) {
+    this.filtersByType = this.filters.filter((filter) => filter.type === type);
+    console.log(this.filters);
+    console.log(this.filtersByType);
+    this.filtersByType$.next(this.filtersByType);
+    return this.filtersByType$.asObservable();
   }
 
   getAllFilters(): Observable<FilterInterface[]> {
     return this.filters$.asObservable();
   }
 
-/*   getAllPcs(): Observable<PcInterface[]> {
-    return this.pcService.allPcs$;
-  } */
+  deleteFilter(filter: FilterInterface) {
+    // comprobamos que no es de tipo 'area'
+    if (!this.typeAddFilters.includes(filter.type)) {
+      // eliminamos el filtro anterior del mismo tipo que el recibido
+      this.filters = this.filters.filter((f) => f.type !== filter.type);
+    } else {
+      this.filters.splice(this.filters.indexOf(filter), 1);
+    }
+
+    this.filters$.next(this.filters);
+
+    this.applyFilters();
+  }
+
+  deleteAllFilters() {
+    // Elimina todos los filtros
+    this.filters = [];
+    this.filters$.next(this.filters);
+  }
+
+  deleteAllTypeFilters(type: string) {
+    // Elimina los filtros del tipo recibido
+    this.filters = this.filters.filter((filter) => filter.type !== type);
+
+    this.filters$.next(this.filters);
+
+    this.applyFilters();
+  }
 }

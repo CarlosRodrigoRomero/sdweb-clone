@@ -1,0 +1,12 @@
+<div class="filtro">
+  <h4>Temperatura máxima</h4>
+  <div class="custom-slider">
+    <ngx-slider
+      [(value)]="rangoMinTemp"
+      [(highValue)]="rangoMaxTemp"
+      (valueChange)="onChangeFiltroTempMax()"
+      (highValueChange)="onChangeFiltroTempMax()"
+      [options]="options"
+    ></ngx-slider>
+  </div>
+</div>

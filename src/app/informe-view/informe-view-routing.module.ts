@@ -38,6 +38,13 @@ const routes: Routes = [
         },
       },
       {
+        path: 'informe-seguidor',
+        loadChildren: () => import('../informe-seguidor/informe-seguidor.module').then((m) => m.InformeSeguidorModule),
+        data: {
+          shouldReuse: true,
+        },
+      },
+      {
         path: 'informe-export',
         component: ExportComponent,
         data: {

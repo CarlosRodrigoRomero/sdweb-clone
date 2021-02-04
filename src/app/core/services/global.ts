@@ -7,6 +7,7 @@ export let GLOBAL = {
   // 4: Localizaciones
   // 5: Clasificación
   GIS: 'http://solardrontech.es/tileserver.php?/index.json?/',
+  colores_mae: ['#00FF0A', '#FF8A00', '#FF0000'], // verde, naranja, rojo
   url: 'http://localhost:3977/api',
   num_tipos: 16,
   camaraTermica: 'DJI XT2 640 13mm (Numero de serie: 297106)',
