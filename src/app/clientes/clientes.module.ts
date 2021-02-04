@@ -19,12 +19,8 @@ import { PlantaAddComponent } from './components/planta-add/planta-add.component
 import { InformeAddComponent } from './components/informe-add/informe-add.component';
 import { InformeListTableComponent } from './components/informe-list-table/informe-list-table.component';
 
-<<<<<<< HEAD
-=======
-import { MaterialModule } from '@material/material.module';
 import { PortfolioBenchmarkComponent } from './components/portfolio-benchmark/portfolio-benchmark.component';
 import { ChartModule } from 'primeng/chart';
->>>>>>> db9765821729366c745b4d13ee4bee736e9d2cfe
 @NgModule({
   declarations: [
     PlantaAddComponent,
