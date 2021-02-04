@@ -15,7 +15,6 @@ import { AreaInterface } from '@core/models/area';
 import { GLOBAL } from '@core/services/global';
 import { MatPaginator } from '@angular/material/paginator';
 declare const google: any;
-
 @Component({
   selector: 'app-auto-loc',
   templateUrl: './auto-loc.component.html',
@@ -58,6 +57,7 @@ export class AutoLocComponent implements OnInit {
   public successMessage: string;
   public lastGlobalChanged: string;
   public map: any;
+
   constructor(private route: ActivatedRoute, private plantaService: PlantaService) {}
 
   ngOnInit() {
@@ -66,6 +66,11 @@ export class AutoLocComponent implements OnInit {
     this.plantaLocation = { lng: -5.880743, lat: 39.453186 };
     this.isUserArea = false;
     this.lastGlobalChanged = 'global1';
+    // this.mapService.initMap(this.agmMap).then(_ => {
+    //   //At this time, google API has been loaded and assigned MyOverlay as MyOverlayCls
+    //   let overlay= new MyOverlay(...)
+
+    // })
 
     this.plantaId = this.route.snapshot.paramMap.get('id');
     this.getPlanta(this.plantaId);
@@ -147,7 +152,10 @@ export class AutoLocComponent implements OnInit {
   onMapReady(map) {
     this.map = map;
     this.initDrawingManager(map);
+    // Agregar ortofoto
     this.plantaService.initMap(this.planta, map);
+    //Overlay con imagen
+    // this.initOverlay();
   }
 
   private addPolygonToMap(area: AreaInterface, isNew = false) {
@@ -211,7 +219,7 @@ export class AutoLocComponent implements OnInit {
       polygon.setOptions({
         fillColor: 'white',
         editable: true,
-        draggable: true,
+        draggable: false,
       });
     }
     this.selectedPolygon = polygon;
@@ -224,10 +232,11 @@ export class AutoLocComponent implements OnInit {
   }
 
   initDrawingManager(map: any) {
+    // const options: google.maps.drawing.DrawingManagerOptions = {
     const options = {
       drawingControl: true,
       drawingControlOptions: {
-        drawingModes: ['polygon', 'rectangle'],
+        drawingModes: [google.maps.drawing.OverlayType.POLYGON, google.maps.drawing.OverlayType.RECTANGLE],
       },
       polygonOptions: {
         draggable: true,
@@ -597,5 +606,130 @@ export class AutoLocComponent implements OnInit {
     } else {
       return true;
     }
+  }
+  ///////////////////////////////////////////
+  ///////////////////////////////////////////
+  ///////////////////////////////////////////
+  ///////////////////////////////////////////
+
+  initOverlay() {
+    class DebugOverlay extends google.maps.OverlayView {
+      bounds_: any;
+      image_: any;
+      map_: any;
+      div_: any;
+      constructor(bounds, image, private map) {
+        super();
+        // Initialize all properties.
+        this.bounds_ = bounds;
+        this.image_ = image;
+        this.map_ = map;
+        // Define a property to hold the image's div. We'll
+        // actually create this div upon receipt of the onAdd()
+        // method so we'll leave it null for now.
+        this.div_ = null;
+        // Explicitly call setMap on this overlay.
+        this.setMap(map);
+        this.set;
+      }
+      /**
+       * onAdd is called when the map's panes are ready and the overlay has been
+       * added to the map.
+       */
+      onAdd() {
+        const div = document.createElement('div');
+        div.style.borderStyle = 'none';
+        div.style.borderWidth = '0px';
+        div.style.position = 'absolute';
+        // Create the img element and attach it to the div.
+        const img = document.createElement('img');
+        img.src = this.image_;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.opacity = '0.5';
+        img.style.position = 'absolute';
+        div.appendChild(img);
+        this.div_ = div;
+        // Add the element to the "overlayLayer" pane.
+        const panes = this.getPanes();
+        panes.overlayLayer.appendChild(div);
+      }
+      draw() {
+        // We use the south-west and north-east
+        // coordinates of the overlay to peg it to the correct position and size.
+        // To do this, we need to retrieve the projection from the overlay.
+        const overlayProjection = this.getProjection();
+        // Retrieve the south-west and north-east coordinates of this overlay
+        // in LatLngs and convert them to pixel coordinates.
+        // We'll use these coordinates to resize the div.
+        const sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
+        const ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());
+        // Resize the image's div to fit the indicated dimensions.
+        const div = this.div_;
+        div.style.left = sw.x + 'px';
+        div.style.top = ne.y + 'px';
+        div.style.width = ne.x - sw.x + 'px';
+        div.style.height = sw.y - ne.y + 'px';
+      }
+      // The onRemove() method will be called automatically from the API if
+      // we ever set the overlay's map property to 'null'.
+      onRemove() {
+        this.div_.parentNode.removeChild(this.div_);
+        this.div_ = null;
+      }
+      updateBounds(bounds) {
+        this.bounds_ = bounds;
+        this.draw();
+      }
+    }
+
+    // var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    var swBound = new google.maps.LatLng(this.planta.latitud - 0.00004, this.planta.longitud - 0.0002);
+    var neBound = new google.maps.LatLng(this.planta.latitud + 0.00004, this.planta.longitud + 0.0002);
+    var bounds = new google.maps.LatLngBounds(swBound, neBound);
+
+    const srcImage = 'https://solardrontech.es/mapa.png';
+
+    const overlay = new DebugOverlay(bounds, srcImage, this.map);
+
+    var markerA = new google.maps.Marker({
+      position: swBound,
+      map: this.map,
+      draggable: true,
+    });
+
+    var markerB = new google.maps.Marker({
+      position: neBound,
+      map: this.map,
+      draggable: true,
+    });
+
+    google.maps.event.addListener(markerA, 'drag', function () {
+      var newPointA = markerA.getPosition();
+      var newPointB = markerB.getPosition();
+      var newBounds = new google.maps.LatLngBounds(newPointA, newPointB);
+      overlay.updateBounds(newBounds);
+    });
+
+    google.maps.event.addListener(markerB, 'drag', function () {
+      var newPointA = markerA.getPosition();
+      var newPointB = markerB.getPosition();
+      var newBounds = new google.maps.LatLngBounds(newPointA, newPointB);
+      overlay.updateBounds(newBounds);
+    });
+
+    google.maps.event.addListener(markerA, 'dragend', function () {
+      var newPointA = markerA.getPosition();
+      var newPointB = markerB.getPosition();
+      console.log('point1' + newPointA);
+      console.log('point2' + newPointB);
+    });
+
+    google.maps.event.addListener(markerB, 'dragend', function () {
+      var newPointA = markerA.getPosition();
+      var newPointB = markerB.getPosition();
+      console.log('point1' + newPointA);
+      console.log('point2' + newPointB);
+    });
   }
 }

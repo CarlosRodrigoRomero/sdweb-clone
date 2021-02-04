@@ -43,6 +43,9 @@
 .div-pc-map-container {
   position: relative;
 }
+.header-derecha {
+  display: flex;
+}
 
 .pc-filter-over-map,
 .pc-map {
@@ -77,27 +80,27 @@
   background-image: url('src/assets/images/informe-portada.jpg');
   border: 1px solid grey;
   margin-top: 1rem;
-  padding: 1rem;
+  padding: 1rem 0rem 0rem 1rem;
   background-repeat: round;
 }
 
 .header-derecha {
   display: flex;
-  flex-direction: column;
-  justify-content: space-around;
+  flex-direction: row;
+  justify-content: center;
 }
 
 .header-derecha-datos {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .header-derecha-datos-mae {
 }
 
 .titulo-informe {
-  font-size: 3rem;
+  font-size: 2.5rem;
 }
 
 .subtitulo-informe {
@@ -113,13 +116,14 @@
 }
 
 .datos-meteo-numero {
-  font-weight: 500;
-  font-size: 1.5rem;
+  font-weight: 300;
+  font-size: 1.2rem;
 }
 
 .datos-meteo {
   display: flex;
   margin-top: 0.5rem;
+  margin-right: 4rem;
 }
 
 .datos-meteo i {
@@ -136,19 +140,24 @@
   display: flex;
   flex-direction: row;
 }
-
+.nombre-planta {
+  margin-top: 0.5rem;
+}
 .div-mae-2 {
   display: flex;
   flex-direction: column;
 }
 
 .mae-porcentaje {
-  font-size: 6rem;
+  font-size: 4rem;
   line-height: 1;
 }
-
+.vuelo-fecha {
+  margin-top: 1rem;
+}
 .mae-pct-simbolo {
-  font-size: 3rem;
+  font-size: 2rem;
+  margin-top: 1rem;
 }
 
 .mae-texto {
