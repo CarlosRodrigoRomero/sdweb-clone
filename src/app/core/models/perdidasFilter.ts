@@ -1,5 +1,5 @@
 import { FilterInterface } from './filter';
-import { PcInterface } from './pc';
+import { FiltrableInterface } from './filtrableInterface';
 
 export class PerdidasFilter implements FilterInterface {
   type: string;
@@ -12,12 +12,12 @@ export class PerdidasFilter implements FilterInterface {
     this.rangoMax = rangoMax;
   }
 
-  applyFilter(pcs: PcInterface[]): PcInterface[] {
+  applyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
     return pcs.filter((pc) => pc.perdidas >= this.rangoMin / 100 && pc.perdidas <= this.rangoMax / 100);
 
     
   }
-  unapplyFilter(pcs: PcInterface[]): PcInterface[] {
+  unapplyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
     return null;
   }
 }

@@ -1,6 +1,6 @@
 import { FilterInterface } from './filter';
-import { PcInterface } from './pc';
 import { LatLngLiteral, Polygon } from '@agm/core';
+import { FiltrableInterface } from './filtrableInterface';
 
 declare const google: any;
 
@@ -17,10 +17,10 @@ export class AreaFilter implements FilterInterface {
     this.polygon = this.getGooglePolygonFromPath(path);
   }
 
-  applyFilter(pcs: PcInterface[]): PcInterface[] {
+  applyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
     return pcs.filter((pc) => this.isContained({ lat: pc.gps_lat, lng: pc.gps_lng }, this.path));
   }
-  unapplyFilter(pcs: PcInterface[]): PcInterface[] {
+  unapplyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
     return pcs.filter(pc => !this.isContained({ lat: pc.gps_lat, lng: pc.gps_lng }, this.path));
   }
 

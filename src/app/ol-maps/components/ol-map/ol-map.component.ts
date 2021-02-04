@@ -1,32 +1,26 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit } from '@angular/core';
-
+import { Component, OnInit, AfterViewInit, Input, ElementRef } from '@angular/core';
 import 'ol/ol.css';
 import Map from 'ol/Map';
 import View from 'ol/View';
+import TileLayer from 'ol/layer/Tile';
+import VectorLayer from 'ol/layer/Vector';
+import XYZ from 'ol/source/XYZ';
 import { OSM } from 'ol/source';
-import { Tile as TileLayer } from 'ol/layer';
 import * as Proj from 'ol/proj.js';
-import { defaults as defaultControls } from 'ol/control.js';
-
-import { AuthService } from '@core/services/auth.service';
-import { PlantaService } from '@core/services/planta.service';
-
-import { PlantaInterface } from '@core/models/planta';
+import { defaults as defaultControls, Control } from 'ol/control.js';
 
 export const DEFAULT_HEIGHT = '500px';
 export const DEFAULT_WIDTH = '500px';
 
-export const DEFAULT_LAT = 40;
-export const DEFAULT_LON = -4;
+export const DEFAULT_LAT = -34.603490361131385;
+export const DEFAULT_LON = -58.382037891217465;
 
 @Component({
-  selector: 'app-map-all-plants',
-  templateUrl: './map-all-plants.component.html',
-  styleUrls: ['./map-all-plants.component.css'],
+  selector: 'ol-map',
+  templateUrl: './ol-map.component.html',
+  styleUrls: ['./ol-map.component.css'],
 })
-export class MapAllPlantsComponent implements OnInit, AfterViewInit {
-  plantas: PlantaInterface[];
-
+export class OlMapComponent implements OnInit, AfterViewInit {
   @Input() lat: number = DEFAULT_LAT;
   @Input() lon: number = DEFAULT_LON;
   @Input() zoom: number;
@@ -38,15 +32,11 @@ export class MapAllPlantsComponent implements OnInit, AfterViewInit {
 
   private mapEl: HTMLElement;
 
-  constructor(private plantaService: PlantaService, public auth: AuthService, private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef) {}
 
-  ngOnInit(): void {
-    this.auth.user$.subscribe((user) =>
-      this.plantaService.getPlantasDeEmpresa(user).subscribe((plantas) => (this.plantas = plantas))
-    );
-  }
+  ngOnInit(): void {}
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.mapEl = this.elementRef.nativeElement.querySelector('#' + this.target);
     this.setSize();
 
@@ -73,8 +63,12 @@ export class MapAllPlantsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  clickedMarker(label: string, index: number) {
-    console.log(`clicked the marker: ${label || index}`);
+  public setMarker(vector: VectorLayer) {
+    this.map.addLayer(vector);
+  }
+
+  public setControl(control: Control) {
+    this.map.addControl(control);
   }
 }
 

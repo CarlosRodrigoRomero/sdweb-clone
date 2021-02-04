@@ -9,6 +9,7 @@ import { ClientsRoutingModule } from './clients-routing.module';
 import { SharedModule } from '@shared/shared.module';
 import { InformeFiltersModule } from '../informe-filters/informe-filters.module';
 import { InformeMapFilterModule } from '../informe-map-filter/informe-map-filter.module';
+import { OlMapsModule } from '../ol-maps/ol-maps.module';
 
 import { ClientsComponent } from './components/clients/clients.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -46,7 +47,8 @@ import { DownloadExcelPortfolioComponent } from './components/download-excel-por
     NgApexchartsModule,
     ReactiveFormsModule,
     InformeFiltersModule,
-    InformeMapFilterModule
+    InformeMapFilterModule,
+    OlMapsModule,
     // /* ChartsModule, */
   ],
 })

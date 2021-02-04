@@ -1,9 +1,10 @@
-import { PcInterface } from './pc';
+import { FiltrableInterface } from './filtrableInterface';
+
 
 export interface FilterInterface {
   id?: string;
   type?: string;
 
-  applyFilter(pcs: PcInterface[]): PcInterface[];
-  unapplyFilter(pcs: PcInterface[]): PcInterface[];
+  applyFilter(pcs: FiltrableInterface[]): FiltrableInterface[];
+  unapplyFilter(pcs: FiltrableInterface[]): FiltrableInterface[];
 }

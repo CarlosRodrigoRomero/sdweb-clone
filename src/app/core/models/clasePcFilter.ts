@@ -1,5 +1,5 @@
 import { FilterInterface } from './filter';
-import { PcInterface } from './pc';
+import { FiltrableInterface } from './filtrableInterface';
 
 export class ClasePcFilter implements FilterInterface {
   id: string;
@@ -12,10 +12,10 @@ export class ClasePcFilter implements FilterInterface {
     this.clase = clase;
   }
 
-  applyFilter(pcs: PcInterface[]): PcInterface[] {
+  applyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
     return pcs.filter((pc) => pc.severidad === this.clase);
   }
-  unapplyFilter(pcs: PcInterface[]): PcInterface[] {
+  unapplyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
     return null;
   }
 }

@@ -2,11 +2,12 @@ import { Observable } from 'rxjs';
 import { ModuloInterface } from './modulo';
 import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
 import { LatLngLiteral } from '@agm/core';
+import { FiltrableInterface } from './filtrableInterface';
 export interface PcInterface {
   id?: string;
   archivo?: string;
   archivoPublico?: string;
-  tipo?: number;
+  tipo: number;
   local_x?: number;
   local_y?: number;
   global_x?: any;
@@ -66,11 +67,11 @@ export interface PcInterface {
   globalCoords?: any[];
 }
 
-export class Pc implements PcInterface, ElementoPlantaInterface {
+export class Pc implements PcInterface, ElementoPlantaInterface, FiltrableInterface {
   id: string;
   archivo: string;
   archivoPublico?: string;
-  tipo?: number;
+  tipo: number;
   local_x?: number;
   local_y?: number;
   global_x?: any;
@@ -78,9 +79,9 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   global_z?: any;
   gps_lng?: number;
   gps_lat?: number;
-  temperaturaMax?: number;
+  temperaturaMax: number;
   temperaturaMedia?: number;
-  temperaturaRef?: number;
+  temperaturaRef: number;
   img_left?: number;
   img_top?: number;
   img_width?: number;
@@ -103,7 +104,7 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   resuelto?: boolean;
   irradiancia?: number;
   gradiente?: number;
-  gradienteNormalizado?: number;
+  gradienteNormalizado: number;
   polygonCoords?: Array<Array<number>>;
   refTop?: number;
   refLeft?: number;
@@ -118,16 +119,16 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   viento?: string;
   temperaturaAire?: number;
   distancia?: number;
-  perdidas?: number;
+  perdidas: number;
   datetimeString?: string;
   rangeMax?: number;
   rangeMin?: number;
   nubosidad?: string;
   modulosAfectados?: number;
   modulo: ModuloInterface;
-  clase?: number;
+  clase: number;
   numeroSerie?: string;
-  globalCoords?: any[];
+  globalCoords: any[];
 
   constructor(pc: PcInterface) {
     Object.assign(this, pc);

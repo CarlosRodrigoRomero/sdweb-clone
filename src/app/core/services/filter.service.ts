@@ -3,9 +3,10 @@ import { Injectable } from '@angular/core';
 import { PcService } from './pc.service';
 
 import { FilterInterface } from '@core/models/filter';
-import { PcInterface } from '../models/pc';
 
-import { Observable, Subject, BehaviorSubject, of, from } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { FiltrableInterface } from '@core/models/filtrableInterface';
 
 @Injectable({
   providedIn: 'root',
@@ -16,11 +17,16 @@ export class FilterService {
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
   public filtersByType: FilterInterface[] = [];
   public filtersByType$ = new BehaviorSubject<FilterInterface[]>(this.filtersByType);
-  public filteredPcs: PcInterface[] = [];
-  public filteredPcs$ = new BehaviorSubject<PcInterface[]>(this.filteredPcs);
-  public typeAddFilteredPcs: PcInterface[] = [];
+  public filteredPcs: FiltrableInterface[] = [];
+  public filteredPcs$ = new BehaviorSubject<FiltrableInterface[]>(this.filteredPcs);
+  public typeAddFilteredPcs: FiltrableInterface[] = [];
+  private allFiltrableElements: FiltrableInterface[];
 
-  constructor(private pcService: PcService) {}
+  constructor(private pcService: PcService) {
+    this.pcService.allPcs$.pipe(take(1)).subscribe((pcs) => {
+      this.allFiltrableElements = pcs as FiltrableInterface[];
+    });
+  }
 
   addFilter(filter: FilterInterface) {
     // comprobamos que no es de tipo 'Add'
@@ -38,19 +44,19 @@ export class FilterService {
     this.applyFilters();
   }
 
-  applyFilters() {
-    const everyFilterFilteredPcs: Array<PcInterface[]> = new Array<PcInterface[]>();
+  private applyFilters() {
+    const everyFilterFilteredPcs: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
 
     // comprobamos si hay filtros de tipo 'Add'
     if (this.filters.filter((filter) => this.typeAddFilters.includes(filter.type)).length > 0) {
       // separamos los pcs por tipo de filtro
       this.typeAddFilters.forEach((type) => {
-        const newFilteredPcs: PcInterface[] = [];
+        const newFilteredPcs: FiltrableInterface[] = [];
         if (this.filters.filter((filter) => filter.type === type).length > 0) {
           this.filters
             .filter((filter) => filter.type === type)
             .forEach((filter) => {
-              filter.applyFilter(this.pcService.allPcs).forEach((pc) => newFilteredPcs.push(pc));
+              filter.applyFilter(this.allFiltrableElements).forEach((pc) => newFilteredPcs.push(pc));
             });
           // añadimos un array de cada tipo
           everyFilterFilteredPcs.push(newFilteredPcs);
@@ -62,7 +68,7 @@ export class FilterService {
     this.filters
       .filter((filter) => !this.typeAddFilters.includes(filter.type))
       .forEach((filter) => {
-        const newFilteredPcs = filter.applyFilter(this.pcService.allPcs);
+        const newFilteredPcs = filter.applyFilter(this.allFiltrableElements);
         everyFilterFilteredPcs.push(newFilteredPcs);
       });
 
@@ -75,7 +81,7 @@ export class FilterService {
 
     // comprobamos que hay algun filtro activo
     if (everyFilterFilteredPcs.length === 0) {
-      this.filteredPcs = this.pcService.allPcs;
+      this.filteredPcs = this.allFiltrableElements;
     }
 
     this.filteredPcs$.next(this.filteredPcs);
@@ -120,9 +126,5 @@ export class FilterService {
     this.filters$.next(this.filters);
 
     this.applyFilters();
-  }
-
-  setFiltersParams() {
-    
   }
 }
