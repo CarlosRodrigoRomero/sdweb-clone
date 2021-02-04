@@ -33,7 +33,7 @@ export class MapComponent implements OnInit {
     public filterService: FilterService,
     public pcService: PcService
   ) {
-    this.filterService.filteredPcs = this.pcService.allPcs;
+    // this.filterService.filteredPcs = this.pcService.allPcs;
     this.filterService.filteredPcs$.next(this.filterService.filteredPcs);
     this.getSeguidores();
   }
