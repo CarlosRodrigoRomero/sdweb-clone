@@ -35,11 +35,13 @@ export class FilterService {
     if (initType == 'planta') {
       this.anomaliaService.getAnomaliasPlanta$(id).subscribe((array) => {
         this._allFiltrableElements = array;
+        this.filteredElements$.next(array);
         this.initialized$.next(true);
       });
     } else {
       this.anomaliaService.getAnomalias$(id).subscribe((array) => {
         this._allFiltrableElements = array;
+        this.filteredElements$.next(array);
         this.initialized$.next(true);
       });
     }
