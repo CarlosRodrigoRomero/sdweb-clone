@@ -33,6 +33,7 @@ import { ThermalLayerInterface } from '../../core/models/thermalLayer';
 import { ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { FilterService } from '../../core/services/filter.service';
+import { FiltrableInterface } from '../../core/models/filtrableInterface';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -210,7 +211,7 @@ export class MapViewComponent implements OnInit {
       this.mostrarTodasAnomalias(this.activeInformeId);
     });
   }
-  addOverlayInfoAnomalia() {
+  private addOverlayInfoAnomalia() {
     //Overlay para los detalles de cada anomalia
     const element = document.getElementById('popup');
 
@@ -403,10 +404,10 @@ export class MapViewComponent implements OnInit {
         style: this.getStyleAnomaliasMapa(false),
       })
     );
-    this.anomaliaService.getAnomalias$(informeId).subscribe((anomalias) => {
+    this.filterService.filteredElements$.subscribe((anomalias) => {
       // Dibujar anomalias
-      this.dibujarAnomalias(anomalias);
-      this.listaAnomalias = anomalias;
+      this.dibujarAnomalias(anomalias as Anomalia[]);
+      this.listaAnomalias = anomalias as Anomalia[];
     });
   }
   dibujarAnomalias(anomalias: Anomalia[]) {
