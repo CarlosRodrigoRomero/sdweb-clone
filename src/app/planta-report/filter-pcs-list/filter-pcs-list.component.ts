@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -19,16 +19,19 @@ interface PcData {
   templateUrl: './filter-pcs-list.component.html',
   styleUrls: ['./filter-pcs-list.component.css'],
 })
-export class FilterPcsListComponent implements AfterViewInit {
+export class FilterPcsListComponent implements OnInit {
   displayedColumns: string[] = ['tipo', 'perdidas', 'temp', 'gradiente'];
   dataSource: MatTableDataSource<PcData>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(public filterService: FilterService) {
-    const filteredElements = [];
-    this.filterService.filteredElements$.subscribe((elem) =>
+  constructor(public filterService: FilterService) {}
+
+  ngOnInit() {
+    this.filterService.filteredElements$.subscribe((elem) => {
+      const filteredElements = [];
+
       elem.forEach((pc) =>
         filteredElements.push({
           tipo: GLOBAL.labels_tipos[pc.tipo],
@@ -36,14 +39,12 @@ export class FilterPcsListComponent implements AfterViewInit {
           temp: pc.temperaturaMax,
           gradiente: pc.gradienteNormalizado,
         })
-      )
-    );
-    this.dataSource = new MatTableDataSource(filteredElements);
-  }
+      );
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+      this.dataSource = new MatTableDataSource(filteredElements);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    });
   }
 
   applyFilter(event: Event) {

@@ -1,7 +1,6 @@
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { NgModule } from '@angular/core';
 import { SharedModule } from '@shared/shared.module';
-import { SpinnerModule } from '@shared/spinner/spinner.module';
 import { MapViewComponent } from './map-view/map-view.component';
 import { PlantaReportRoutingModule } from './planta-repot-routing.module';
 import { MapControlComponent } from './map-control/map-control.component';
@@ -23,13 +22,6 @@ import { FilterPcsListComponent } from './filter-pcs-list/filter-pcs-list.compon
     ChartNumsyperdComponent,
     FilterPcsListComponent,
   ],
-  imports: [
-    SharedModule,
-    NgxSliderModule,
-    // SpinnerModule,
-    PlantaReportRoutingModule,
-    NgApexchartsModule,
-    InformeFiltersModule,
-  ],
+  imports: [SharedModule, NgxSliderModule, PlantaReportRoutingModule, NgApexchartsModule, InformeFiltersModule],
 })
 export class PlantaReportModule {}

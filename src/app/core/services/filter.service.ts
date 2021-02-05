@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { FilterInterface } from '@core/models/filter';
 
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, of } from 'rxjs';
 import { FiltrableInterface } from '@core/models/filtrableInterface';
 import { AnomaliaService } from './anomalia.service';
 import { GLOBAL } from './global';
@@ -20,7 +20,8 @@ export class FilterService {
   public filteredElements$ = new BehaviorSubject<FiltrableInterface[]>(this.filteredElements);
   public typeAddFilteredPcs: FiltrableInterface[] = [];
   public _allFiltrableElements: FiltrableInterface[];
-  public initialized = false;
+  private _initialized = false;
+  public initialized$ = new BehaviorSubject<boolean>(this._initialized);
 
   constructor(private anomaliaService: AnomaliaService) {
     // this.anomaliaService
@@ -30,18 +31,21 @@ export class FilterService {
     //     this.filteredElements$.next(anomalias);
     //   });
   }
-  async initFilterService(id: string, initType: 'informe' | 'planta' = 'informe') {
+  initFilterService(id: string, initType: 'informe' | 'planta' = 'informe') {
     if (initType == 'planta') {
       this.anomaliaService.getAnomaliasPlanta$(id).subscribe((array) => {
         this._allFiltrableElements = array;
-        this.initialized = true;
+        this.filteredElements$.next(array);
+        this.initialized$.next(true);
       });
     } else {
       this.anomaliaService.getAnomalias$(id).subscribe((array) => {
         this._allFiltrableElements = array;
-        this.initialized = true;
+        this.filteredElements$.next(array);
+        this.initialized$.next(true);
       });
     }
+    return this.initialized$;
   }
   addFilter(filter: FilterInterface) {
     // comprobamos que no es de tipo 'Add'

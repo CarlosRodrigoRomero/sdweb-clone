@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { RouterModule } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { SpinnerModule } from './spinner/spinner.module';
 
 import { GetNombreSeguidorPipe } from './pipes/get-nombre-seguidor.pipe';
@@ -14,7 +14,15 @@ import { MaterialModule } from '@material/material.module';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 
 const components = [];
-const modules = [CommonModule, RouterModule, SpinnerModule, MaterialModule, ReactiveFormsModule, NgxSliderModule];
+const modules = [
+  CommonModule,
+  RouterModule,
+  SpinnerModule,
+  MaterialModule,
+  NgxSliderModule,
+  FormsModule,
+  ReactiveFormsModule,
+];
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];
 
 @NgModule({
