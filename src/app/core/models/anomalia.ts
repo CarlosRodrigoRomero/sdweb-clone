@@ -1,4 +1,4 @@
-import { Coordinate } from 'ol/coordinate';
+import { Coordinate } from 'ol/coordinate.js';
 import { FiltrableInterface } from './filtrableInterface';
 import { ModuloInterface } from './modulo';
 
