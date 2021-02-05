@@ -2,16 +2,25 @@
   margin-bottom: 15px;
 }
 
+h5 {
+  font-weight: 400;
+}
+
 ::ng-deep {
   .custom-slider .ngx-slider .ngx-slider-selection {
-    background: #546e7a;
+    background: grey;
+    height: 2px;
+  }
+
+  .custom-slider .ngx-slider .ngx-slider-bar {
+    height: 2px;
   }
 
   .custom-slider .ngx-slider .ngx-slider-pointer {
     background-color: #455a64;
-    width: 16px;
-    height: 16px;
-    top: -6px;
+    width: 15px;
+    height: 15px;
+    top: -7px;
   }
 
   .custom-slider .ngx-slider .ngx-slider-pointer:after {

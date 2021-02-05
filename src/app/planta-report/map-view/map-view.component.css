@@ -13,6 +13,7 @@
 .rel {
   position: relative;
 }
+
 #map-control {
   position: absolute;
   bottom: 0px;
@@ -42,6 +43,7 @@ app-share-map {
   padding: 15px;
   width: fit-content;
   max-width: 350px;
+  height: fit-content;
 }
 
 .btn-left {
@@ -71,6 +73,7 @@ app-share-map {
 }
 
 .titulo {
-  margin-top: 20px;
+  margin-top: 15px;
+  margin-left: 15px;
   width: 100%;
 }
