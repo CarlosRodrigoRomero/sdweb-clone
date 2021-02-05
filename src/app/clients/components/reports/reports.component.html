@@ -1,15 +1,17 @@
 <div class="barra-titulo">
-  <mat-icon color="primary">home</mat-icon>
-  <h4 class="titulo">Resumen</h4>
-  <div>
-    <mat-icon color="primary">tag</mat-icon>
-    <span>Nº plantas</span>
-    <h4>{{ numPlantas }}</h4>
+  <div class="titulo">
+    <mat-icon color="primary">home</mat-icon>
+    <h4>Resumen</h4>
   </div>
-  <div>
+  <div class="plantas">
+    <mat-icon color="primary">tag</mat-icon>
+    <h5 class="subtitulo">Nº plantas</h5>
+    <h5>{{ numPlantas }}</h5>
+  </div>
+  <div class="potencia">
     <mat-icon color="primary">bolt</mat-icon>
-    <span>Potencia total</span>
-    <h4>{{ potenciaTotal | number: '1.0-0' }} MW</h4>
+    <h5 class="subtitulo">Potencia total</h5>
+    <h5>{{ potenciaTotal | number: '1.0-0' }} MW</h5>
   </div>
   <span class="spacer"></span>
   <app-download-excel-portfolio></app-download-excel-portfolio>
@@ -20,9 +22,6 @@
     <div>
       <app-bar-chart></app-bar-chart>
     </div>
-    <!-- <div>
-      <app-asset-summary></app-asset-summary>
-    </div> -->
   </div>
   <div class="row_2">
     <div>

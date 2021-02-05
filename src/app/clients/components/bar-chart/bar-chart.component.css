@@ -1,14 +1,5 @@
-.componente {
-  margin: 1em;
-}
-
-.titulo {
-  display: flex;
-  width: fit-content;
-  padding-left: 1em;
-}
-
-.titulo span {
+.subtitulo {
   font-size: medium;
+  font-weight: 400;
   margin-left: 1em;
 }
