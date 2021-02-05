@@ -78,7 +78,9 @@ export class MapViewComponent implements OnInit {
     this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
     this.plantaId = this.route.snapshot.paramMap.get('id');
-    this.filterService.initFilterService(this.plantaId, 'planta');
+    this.filterService.initFilterService(this.plantaId, 'planta').subscribe((v) => {
+      this.anomaliasLoaded = v;
+    });
 
     // Obtenemos todas las capas termicas para esta planta y las almacenamos en this.thermalLayers
     combineLatest([
