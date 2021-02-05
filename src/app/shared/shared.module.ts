@@ -12,18 +12,9 @@ import { ValidateElementoPlantaPipe } from './pipes/validate-elemento-planta.pip
 import { MaterialModule } from '@material/material.module';
 
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
-import { SimplebarAngularModule } from 'simplebar-angular';
 
 const components = [];
-const modules = [
-  CommonModule,
-  RouterModule,
-  SpinnerModule,
-  MaterialModule,
-  ReactiveFormsModule,
-  NgxSliderModule,
-  SimplebarAngularModule,
-];
+const modules = [CommonModule, RouterModule, SpinnerModule, MaterialModule, ReactiveFormsModule, NgxSliderModule];
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];
 
 @NgModule({

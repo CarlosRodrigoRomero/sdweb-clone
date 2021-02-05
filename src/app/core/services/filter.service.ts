@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 import { FilterInterface } from '@core/models/filter';
 
 import { Observable, BehaviorSubject } from 'rxjs';
-import { take } from 'rxjs/operators';
 import { FiltrableInterface } from '@core/models/filtrableInterface';
 import { AnomaliaService } from './anomalia.service';
+import { GLOBAL } from './global';
 
 @Injectable({
   providedIn: 'root',
@@ -19,17 +19,30 @@ export class FilterService {
   public filteredElements: FiltrableInterface[] = [];
   public filteredElements$ = new BehaviorSubject<FiltrableInterface[]>(this.filteredElements);
   public typeAddFilteredPcs: FiltrableInterface[] = [];
-  private allFiltrableElements: FiltrableInterface[];
+  public _allFiltrableElements: FiltrableInterface[];
+  public initialized = false;
 
   constructor(private anomaliaService: AnomaliaService) {
-    this.anomaliaService
-      .getAnomalias$('vfMHFBPvNFnOFgfCgM9L')
-      .pipe(take(1))
-      .subscribe((anomalias) => {
-        this.filteredElements$.next(anomalias);
-      });
+    // this.anomaliaService
+    //   .getAnomalias$('vfMHFBPvNFnOFgfCgM9L')
+    //   .pipe(take(1))
+    //   .subscribe((anomalias) => {
+    //     this.filteredElements$.next(anomalias);
+    //   });
   }
-
+  async initFilterService(id: string, initType: 'informe' | 'planta' = 'informe') {
+    if (initType == 'planta') {
+      this.anomaliaService.getAnomaliasPlanta$(id).subscribe((array) => {
+        this._allFiltrableElements = array;
+        this.initialized = true;
+      });
+    } else {
+      this.anomaliaService.getAnomalias$(id).subscribe((array) => {
+        this._allFiltrableElements = array;
+        this.initialized = true;
+      });
+    }
+  }
   addFilter(filter: FilterInterface) {
     // comprobamos que no es de tipo 'Add'
     if (!this.typeAddFilters.includes(filter.type)) {
@@ -58,7 +71,7 @@ export class FilterService {
           this.filters
             .filter((filter) => filter.type === type)
             .forEach((filter) => {
-              filter.applyFilter(this.allFiltrableElements).forEach((pc) => newFilteredPcs.push(pc));
+              filter.applyFilter(this._allFiltrableElements).forEach((pc) => newFilteredPcs.push(pc));
             });
           // añadimos un array de cada tipo
           everyFilterFilteredPcs.push(newFilteredPcs);
@@ -70,7 +83,7 @@ export class FilterService {
     this.filters
       .filter((filter) => !this.typeAddFilters.includes(filter.type))
       .forEach((filter) => {
-        const newFilteredPcs = filter.applyFilter(this.allFiltrableElements);
+        const newFilteredPcs = filter.applyFilter(this._allFiltrableElements);
         everyFilterFilteredPcs.push(newFilteredPcs);
       });
 
@@ -83,7 +96,7 @@ export class FilterService {
 
     // comprobamos que hay algun filtro activo
     if (everyFilterFilteredPcs.length === 0) {
-      this.filteredElements = this.allFiltrableElements;
+      this.filteredElements = this._allFiltrableElements;
     }
 
     this.filteredElements$.next(this.filteredElements);
@@ -128,5 +141,20 @@ export class FilterService {
     this.filters$.next(this.filters);
 
     this.applyFilters();
+  }
+
+  getLabelsTipoPcs(): string[] {
+    const indices: number[] = [];
+    const labels: string[] = [];
+    this._allFiltrableElements.forEach((elem) => {
+      if (!indices.includes(elem.tipo)) {
+        indices.push(elem.tipo);
+      }
+    });
+    indices.forEach((i) => labels.push(GLOBAL.labels_tipos[i]));
+    // los ordena como estan en GLOBAL
+    labels.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));
+
+    return labels;
   }
 }

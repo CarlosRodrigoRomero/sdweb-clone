@@ -28,7 +28,7 @@ export class TipoFilterComponent implements OnInit {
   constructor(private anomaliaService: AnomaliaService, private filterService: FilterService) {}
 
   ngOnInit(): void {
-    this.anomaliaService.getLabelsTipoPcs().forEach((label) =>
+    this.filterService.getLabelsTipoPcs().forEach((label) =>
       this.tiposPcs.push({
         label,
         completed: false,

@@ -33,6 +33,7 @@ import { combineLatest } from 'rxjs';
 import { ThermalLayerInterface } from '../../core/models/thermalLayer';
 import { ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
+import { FilterService } from '../../core/services/filter.service';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -59,6 +60,7 @@ export class MapViewComponent implements OnInit {
   private thermalLayers: TileLayer[];
   public leftOpened: boolean;
   public rightOpened: boolean;
+  public anomaliasLoaded = false;
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
@@ -68,7 +70,8 @@ export class MapViewComponent implements OnInit {
     public mapControlService: MapControlService,
     private route: ActivatedRoute,
     private plantaService: PlantaService,
-    private informeService: InformeService
+    private informeService: InformeService,
+    public filterService: FilterService
   ) {}
 
   ngOnInit(): void {
@@ -76,6 +79,7 @@ export class MapViewComponent implements OnInit {
     this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
     this.plantaId = this.route.snapshot.paramMap.get('id');
+    this.filterService.initFilterService(this.plantaId, 'planta');
 
     // Obtenemos todas las capas termicas para esta planta y las almacenamos en this.thermalLayers
     combineLatest([

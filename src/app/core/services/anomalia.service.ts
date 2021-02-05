@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { Observable, combineLatest } from 'rxjs';
+import { map, take, switchMap } from 'rxjs/operators';
 import { Anomalia } from '../models/anomalia';
-import { GLOBAL } from './global';
+import { InformeService } from './informe.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +11,7 @@ import { GLOBAL } from './global';
 export class AnomaliaService {
   private _selectedInformeId: string;
   public allAnomaliasInforme: Anomalia[];
-  constructor(public afs: AngularFirestore) {}
+  constructor(public afs: AngularFirestore, private informeService: InformeService) {}
 
   set selectedInformeId(informeId: string) {
     this._selectedInformeId = informeId;
@@ -32,9 +32,27 @@ export class AnomaliaService {
     const anomaliaObj = this.prepararParaDb(anomalia);
     return this.afs.collection('pcs').doc(id).set(anomaliaObj);
   }
-  getAnomalias$(informeId: string): Observable<Anomalia[]> {
+  getAnomaliasPlanta$(plantaId: string): Observable<Anomalia[]> {
+    const query$ = this.informeService.getInformesDePlanta(plantaId).pipe(
+      take(1),
+      switchMap((informes) => {
+        const anomaliaObsList = Array<Observable<Anomalia[]>>();
+        informes.forEach((informe) => {
+          anomaliaObsList.push(this.getAnomalias$(informe.id));
+        });
+        return combineLatest(anomaliaObsList);
+      }),
+      map((arr) => {
+        return arr.flat();
+      })
+    );
+
+    return query$;
+  }
+
+  getAnomalias$(informeId: string, tipo: 'anomalias' | 'pcs' = 'anomalias'): Observable<Anomalia[]> {
     const query$ = this.afs
-      .collection<Anomalia>('pcs', (ref) => ref.where('informeId', '==', informeId))
+      .collection<Anomalia>(tipo, (ref) => ref.where('informeId', '==', informeId))
       .snapshotChanges()
       .pipe(
         map((actions) =>
@@ -60,21 +78,6 @@ export class AnomaliaService {
   private prepararParaDb(anomalia: Anomalia) {
     anomalia.featureCoords = { ...anomalia.featureCoords };
     return Object.assign({}, anomalia);
-  }
-
-  getLabelsTipoPcs(): string[] {
-    const indices: number[] = [];
-    const labels: string[] = [];
-    this.allAnomaliasInforme.forEach((pc) => {
-      if (!indices.includes(pc.tipo)) {
-        indices.push(pc.tipo);
-      }
-    });
-    indices.forEach((i) => labels.push(GLOBAL.labels_tipos[i]));
-    // los ordena como estan en GLOBAL
-    labels.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));
-
-    return labels;
   }
 
   // getTempMaxAll(): number {
