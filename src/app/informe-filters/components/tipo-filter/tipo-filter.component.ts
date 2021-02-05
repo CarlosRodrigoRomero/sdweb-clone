@@ -3,10 +3,10 @@ import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 
 import { GLOBAL } from '@core/services/global';
-import { PcService } from '@core/services/pc.service';
 import { FilterService } from '@core/services/filter.service';
 
 import { TipoPcFilter } from '@core/models/tipoPcFilter';
+import { AnomaliaService } from '../../../core/services/anomalia.service';
 
 interface TipoPc {
   label?: string;
@@ -25,10 +25,10 @@ export class TipoFilterComponent implements OnInit {
   allComplete: boolean;
   filtroTipo: TipoPcFilter;
 
-  constructor(private pcService: PcService, private filterService: FilterService) {}
+  constructor(private anomaliaService: AnomaliaService, private filterService: FilterService) {}
 
   ngOnInit(): void {
-    this.pcService.getLabelsTipoPcs().forEach((label) =>
+    this.anomaliaService.getLabelsTipoPcs().forEach((label) =>
       this.tiposPcs.push({
         label,
         completed: false,

@@ -1,6 +1,7 @@
 import { ModuloInterface } from './modulo';
 
 export interface FiltrableInterface {
+  id?: string;
   tipo: number;
   globalCoords: string[];
   clase: number;
@@ -16,6 +17,8 @@ export interface FiltrableInterface {
   severidad?: number;
   reparable?: boolean;
   gradiente?: number;
+  global_x?: string;
+  global_y?: string;
   local_x?: number;
   local_y?: number;
 }

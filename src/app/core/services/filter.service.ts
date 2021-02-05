@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 
-import { PcService } from './pc.service';
-
 import { FilterInterface } from '@core/models/filter';
 
 import { Observable, BehaviorSubject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { FiltrableInterface } from '@core/models/filtrableInterface';
+import { AnomaliaService } from './anomalia.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,15 +16,18 @@ export class FilterService {
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
   public filtersByType: FilterInterface[] = [];
   public filtersByType$ = new BehaviorSubject<FilterInterface[]>(this.filtersByType);
-  public filteredPcs: FiltrableInterface[] = [];
-  public filteredPcs$ = new BehaviorSubject<FiltrableInterface[]>(this.filteredPcs);
+  public filteredElements: FiltrableInterface[] = [];
+  public filteredElements$ = new BehaviorSubject<FiltrableInterface[]>(this.filteredElements);
   public typeAddFilteredPcs: FiltrableInterface[] = [];
   private allFiltrableElements: FiltrableInterface[];
 
-  constructor(private pcService: PcService) {
-    this.pcService.allPcs$.pipe(take(1)).subscribe((pcs) => {
-      this.allFiltrableElements = pcs as FiltrableInterface[];
-    });
+  constructor(private anomaliaService: AnomaliaService) {
+    this.anomaliaService
+      .getAnomalias$('vfMHFBPvNFnOFgfCgM9L')
+      .pipe(take(1))
+      .subscribe((anomalias) => {
+        this.filteredElements$.next(anomalias);
+      });
   }
 
   addFilter(filter: FilterInterface) {
@@ -74,17 +76,17 @@ export class FilterService {
 
     // calculamos la interseccion de los array de los diferentes tipos
     if (everyFilterFilteredPcs.length > 0) {
-      this.filteredPcs = everyFilterFilteredPcs.reduce((anterior, actual) =>
+      this.filteredElements = everyFilterFilteredPcs.reduce((anterior, actual) =>
         anterior.filter((pc) => actual.includes(pc))
       );
     }
 
     // comprobamos que hay algun filtro activo
     if (everyFilterFilteredPcs.length === 0) {
-      this.filteredPcs = this.allFiltrableElements;
+      this.filteredElements = this.allFiltrableElements;
     }
 
-    this.filteredPcs$.next(this.filteredPcs);
+    this.filteredElements$.next(this.filteredElements);
   }
 
   getAllTypeFilters(type: string) {

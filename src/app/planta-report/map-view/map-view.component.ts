@@ -31,6 +31,8 @@ import { InformeService } from '../../core/services/informe.service';
 import { take } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 import { ThermalLayerInterface } from '../../core/models/thermalLayer';
+import { ViewChild } from '@angular/core';
+import { MatSidenav } from '@angular/material/sidenav';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -55,6 +57,11 @@ export class MapViewComponent implements OnInit {
   public rgbLayer: TileLayer;
   private extent1: any;
   private thermalLayers: TileLayer[];
+  public leftOpened: boolean;
+  public rightOpened: boolean;
+
+  @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
+  @ViewChild('sidenavRight') sidenavRight: MatSidenav;
 
   constructor(
     private anomaliaService: AnomaliaService,

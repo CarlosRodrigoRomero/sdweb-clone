@@ -4,7 +4,7 @@
     <mat-slider [value]="100" id="slider-opacidad-termico" (input)="onChangeThermalOpacitySlider($event)">a</mat-slider>
 
     <ngx-slider
-      id="temp-slider"
+      id="temperature-slider"
       (valueChange)="onChangeSlider(highValue, lowValue)"
       [(value)]="lowValue"
       [(highValue)]="highValue"
@@ -15,7 +15,7 @@
 
 <mat-card>
   <ngx-slider
-    id="temporal-slider"
+    class="temporal-slider"
     (valueChange)="onChangeTemporalSlider($event)"
     [(value)]="temporalValue"
     [options]="optionsTemporalSlider"

@@ -23,8 +23,10 @@ export class GradientFilterComponent implements OnInit {
   options: Options;
 
   constructor(private filterService: FilterService, private pcService: PcService) {
-    this.minGradiente = this.pcService.getMinGradienteNormalizado();
-    this.maxGradiente = this.pcService.getMaxGradienteNormalizado();
+    // this.minGradiente = this.pcService.getMinGradienteNormalizado();
+    this.minGradiente = 0;
+    // this.maxGradiente = this.pcService.getMaxGradienteNormalizado();
+    this.maxGradiente = 50;
     this.rangoMinGradiente = this.minGradiente;
     this.rangoMaxGradiente = this.maxGradiente;
   }
