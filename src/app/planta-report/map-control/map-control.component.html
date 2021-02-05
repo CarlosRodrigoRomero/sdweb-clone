@@ -1,24 +1,32 @@
 <mat-card>
   <div class="map-control-subdiv">
     <span class="texto-label">Térmico</span>
-    <mat-slider class="transparencia-slider" [value]="100" id="slider-opacidad-termico" (input)="onChangeThermalOpacitySlider($event)">a</mat-slider>
+    <mat-slider
+      class="transparencia-slider"
+      [value]="100"
+      id="slider-opacidad-termico"
+      (input)="onChangeThermalOpacitySlider($event)"
+      >a</mat-slider
+    >
     <div class="temperature-slider">
       <ngx-slider
-        (valueChange)="onChangeSlider(highValue, lowValue)"
-        [(value)]="lowValue"
-        [(highValue)]="highValue"
-        [options]="options"
+        (valueChange)="onChangeSlider(highTemp, lowTemp)"
+        [(value)]="lowTemp"
+        [(highValue)]="highTemp"
+        [options]="optionsTemp"
       ></ngx-slider>
     </div>
   </div>
 </mat-card>
 
 <mat-card>
-  <div class="temporal-slider">
-    <ngx-slider
-      (valueChange)="onChangeTemporalSlider($event)"
-      [(value)]="temporalValue"
-      [options]="optionsTemporalSlider"
-    ></ngx-slider>
-  </div>
+  <mat-card-content>
+    <div class="temporal-slider">
+      <ngx-slider
+        (valueChange)="onChangeTemporalSlider($event)"
+        [(value)]="currentYear"
+        [options]="optionsTemporalSlider"
+      ></ngx-slider>
+    </div>
+  </mat-card-content>
 </mat-card>
