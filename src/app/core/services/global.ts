@@ -6,7 +6,7 @@ export let GLOBAL = {
   // 3: Estructuras
   // 4: Localizaciones
   // 5: Clasificación
-  GIS: 'http://solardrontech.es/tileserver.php?/index.json?/',
+  GIS: 'https://solardrontech.es/tileserver.php?/index.json?/',
   colores_mae: ['#00FF0A', '#FF8A00', '#FF0000'], // verde, naranja, rojo
   color_rojo_interfaz: '#d32f2f', // red 700 material
   url: 'http://localhost:3977/api',

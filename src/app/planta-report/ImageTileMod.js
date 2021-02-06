@@ -30,7 +30,7 @@ class ImageTileMod extends Tile {
      * @private
      * @type {?string}
      */
-    this.crossOrigin_ = crossOrigin;
+    this.crossOrigin_ = 'Anonymous';
     this.palette = GLOBAL.ironPalette;
     this.rangeTempMin = 10;
     this.rangeTempMax = 100;
