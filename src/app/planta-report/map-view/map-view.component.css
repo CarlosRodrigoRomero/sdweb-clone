@@ -13,16 +13,17 @@
 .rel {
   position: relative;
 }
+
 #map-control {
   position: absolute;
-  bottom: 0px;
-  left: 25%;
-
+  bottom: 50px;
+  left: 50%;
+  transform: translate(-50%, 0%);
   /* width: 60%; */
 }
 .example-container {
   position: relative;
-  top: 0;
+  top: 2px;
   bottom: 0;
   left: 0;
   right: 0;
@@ -30,7 +31,7 @@
 
 app-share-map {
   position: absolute;
-  right: 60px;
+  right: 0px;
   top: 75px;
   margin: 10px;
   z-index: 999;
@@ -46,7 +47,7 @@ app-share-map {
 
 .btn-left {
   position: absolute;
-  top: 70px;
+  top: 75px;
   left: 0;
   margin-left: 10px;
   padding-left: 0;
@@ -55,8 +56,8 @@ app-share-map {
 
 .right-sidenav {
   display: flex;
+  padding: 10px;
   margin-right: 10px;
-  margin-bottom: 35px;
   border-radius: 4px;
 }
 .stats-sidenav {
@@ -68,7 +69,7 @@ app-share-map {
 
 .btn-right {
   position: absolute;
-  top: 70px;
+  top: 65px;
   right: 0;
   left: auto;
   margin-right: 10px;
@@ -86,8 +87,9 @@ app-share-map {
 }
 
 .titulo {
-  margin-top: 20px;
-  width: 100%;
+  margin-top: 15px;
+  margin-left: 15px;
+  margin-bottom: 15px;
 }
 #sidenavStats {
   top: 140px;

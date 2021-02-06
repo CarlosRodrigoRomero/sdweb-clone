@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AssetSummaryComponent } from './asset-summary.component';
+import { ShareMapComponent } from './share-map.component';
 
-describe('AssetSummaryComponent', () => {
-  let component: AssetSummaryComponent;
-  let fixture: ComponentFixture<AssetSummaryComponent>;
+describe('ShareComponent', () => {
+  let component: ShareMapComponent;
+  let fixture: ComponentFixture<ShareMapComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AssetSummaryComponent ]
+      declarations: [ ShareMapComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AssetSummaryComponent);
+    fixture = TestBed.createComponent(ShareMapComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

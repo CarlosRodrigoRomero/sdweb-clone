@@ -32,7 +32,7 @@ export class FilterService {
     //   });
   }
   initFilterService(id: string, initType: 'informe' | 'planta' = 'informe') {
-    if (initType == 'planta') {
+    if (initType === 'planta') {
       this.anomaliaService.getAnomaliasPlanta$(id).subscribe((array) => {
         this._allFiltrableElements = array;
         this.filteredElements$.next(array);
@@ -150,11 +150,17 @@ export class FilterService {
   getLabelsTipoPcs(): string[] {
     const indices: number[] = [];
     const labels: string[] = [];
+    /* console.log(this._allFiltrableElements); */
     this._allFiltrableElements.forEach((elem) => {
-      if (!indices.includes(elem.tipo)) {
-        indices.push(elem.tipo);
+      if (typeof elem.tipo === 'number') {
+        if (!indices.includes(elem.tipo)) {
+          indices.push(elem.tipo);
+        }
+      } else if (!indices.includes(parseInt(elem.tipo, 0))) {
+        indices.push(parseInt(elem.tipo, 0));
       }
     });
+    console.log(indices);
     indices.forEach((i) => labels.push(GLOBAL.labels_tipos[i]));
     // los ordena como estan en GLOBAL
     labels.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));

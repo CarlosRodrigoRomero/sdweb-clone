@@ -6,7 +6,7 @@ import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
 
 import { TipoPcFilter } from '@core/models/tipoPcFilter';
-import { AnomaliaService } from '../../../core/services/anomalia.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 interface TipoPc {
   label?: string;
@@ -28,6 +28,7 @@ export class TipoFilterComponent implements OnInit {
   constructor(private anomaliaService: AnomaliaService, private filterService: FilterService) {}
 
   ngOnInit(): void {
+    /* console.log(this.filterService.getLabelsTipoPcs()); */
     this.filterService.getLabelsTipoPcs().forEach((label) =>
       this.tiposPcs.push({
         label,

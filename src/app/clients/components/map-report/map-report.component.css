@@ -31,6 +31,10 @@ app-share-map {
   padding-right: 0;
 }
 
+h4 {
+  font-weight: 400;
+}
+
 .right-sidenav {
   display: flex;
   margin-right: 10px;

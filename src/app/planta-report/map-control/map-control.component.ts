@@ -9,10 +9,10 @@ import { MatSliderChange } from '@angular/material/slider';
   styleUrls: ['./map-control.component.scss'],
 })
 export class MapControlComponent implements OnInit {
-  temporalValue: number = 100;
-  lowValue: number = 25;
-  highValue: number = 75;
-  options: Options = {
+  /* Slider Temperatura */
+  lowTemp = 25;
+  highTemp = 75;
+  optionsTemp: Options = {
     floor: 25,
     ceil: 100,
     translate: (value: number, label: LabelType): string => {
@@ -26,14 +26,24 @@ export class MapControlComponent implements OnInit {
       }
     },
   };
+
+  /* Slider Año */
+  currentYear = 100;
+  dates = ['Julio 2019', 'Agosto 2020'];
   optionsTemporalSlider: Options = {
     floor: 0,
     ceil: 100,
+    showTicksValues: true,
+    step: 100,
+    translate: (value: number, label: LabelType): string => {
+      return this.dates[value / 100];
+    },
   };
 
   constructor(private mapControlService: MapControlService) {}
 
   ngOnInit(): void {}
+
   onChangeSlider(highValue: number, lowValue: number) {
     this.mapControlService.sliderMax = highValue;
     this.mapControlService.sliderMin = lowValue;
@@ -44,4 +54,6 @@ export class MapControlComponent implements OnInit {
   onChangeTemporalSlider(value: number) {
     this.mapControlService.sliderTemporal = value;
   }
+
+  indexToDate(index: number) {}
 }

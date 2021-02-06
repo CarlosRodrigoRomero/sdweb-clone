@@ -12,6 +12,7 @@ import { ChartNumsyperdComponent } from './planta-stats/chart-numsyperd/chart-nu
 import { InformeFiltersModule } from '../informe-filters/informe-filters.module';
 import { FilterPcsListComponent } from './filter-pcs-list/filter-pcs-list.component';
 import { ChartSankeyComponent } from './planta-stats/chart-sankey/chart-sankey.component';
+import { ShareMapComponent } from './share-map/share-map.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { ChartSankeyComponent } from './planta-stats/chart-sankey/chart-sankey.c
     ChartNumsyperdComponent,
     FilterPcsListComponent,
     ChartSankeyComponent,
+    ShareMapComponent,
   ],
   imports: [SharedModule, NgxSliderModule, PlantaReportRoutingModule, NgApexchartsModule, InformeFiltersModule],
 })
