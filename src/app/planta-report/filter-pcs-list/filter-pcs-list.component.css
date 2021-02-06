@@ -2,8 +2,18 @@
   margin: 10px;
 }
 
+.buscar-input {
+  width: 100%;
+}
+
 table {
   width: 100%;
+}
+
+.tabla-container {
+  position: relative;
+  max-height: 60vh;
+  overflow: auto;
 }
 
 .mat-column-tipo {
