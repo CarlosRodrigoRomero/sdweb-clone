@@ -33,7 +33,7 @@ import { ThermalLayerInterface } from '../../core/models/thermalLayer';
 import { ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { FilterService } from '../../core/services/filter.service';
-import { FiltrableInterface } from '../../core/models/filtrableInterface';
+import { getRenderPixel } from 'ol/render';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -54,13 +54,15 @@ export class MapViewComponent implements OnInit {
   public anomaliaSeleccionada: Anomalia;
   public listaAnomalias: Anomalia[];
   public sliderYear: number;
-  public thermalLayer: TileLayer;
-  public rgbLayer: TileLayer;
+  public aerialLayer: TileLayer;
   private extent1: any;
   private thermalLayers: TileLayer[];
+  private anomaliaLayers: VectorLayer[];
   public leftOpened: boolean;
   public rightOpened: boolean;
   public anomaliasLoaded = false;
+  public mousePosition;
+  public informesList: string[];
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
@@ -75,6 +77,8 @@ export class MapViewComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.mousePosition = null;
+    this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
     // Para la demo, agregamos un extent a todas las capas:
     this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
@@ -92,10 +96,14 @@ export class MapViewComponent implements OnInit {
       .pipe(take(1))
       .subscribe(([thermalLayers, informes, planta]) => {
         this.thermalLayers = Array<TileLayer>();
+        this.anomaliaLayers = Array<VectorLayer>();
         // Para cada informe, hay que crear 2 capas: térmica y vectorial
         informes.forEach((informe) => {
           // Crear capa térmica
           const tl = thermalLayers.filter((item) => item.informeId == informe.id);
+
+          //crear capa de las anomalias
+          // const al = this.anomaliaLayers.push(al);
           // TODO: Comprobar que existe...
           if (tl.length > 0) {
             this.thermalLayers.push(this.createThermalLayer(tl[0], informe.id));
@@ -108,7 +116,7 @@ export class MapViewComponent implements OnInit {
         this.initMap();
       });
 
-    this.mapControlService.selectedInformeId = '62dvYbGgoMkMNCuNCOEc'; //Alconchel 2020
+    this.mapControlService.selectedInformeId = this.informesList[0];
   }
   private createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {
     // Iniciar mapa térmico
@@ -125,6 +133,7 @@ export class MapViewComponent implements OnInit {
           imageTile.getImage().src = src;
         },
       }),
+
       extent: this.extent1,
     });
     tl.setProperties({
@@ -142,24 +151,106 @@ export class MapViewComponent implements OnInit {
   initMap() {
     const satellite = new XYZ({
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      crossOrigin: '',
     });
     const aerial = new XYZ({
       url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
+      crossOrigin: '',
     });
 
-    this.rgbLayer = new TileLayer({
+    this.aerialLayer = new TileLayer({
       source: aerial,
       extent: this.extent1,
     });
+    const osmLayer = new TileLayer({
+      // source: satellite,
+      source: new OSM(),
+      // extent: this.extent1,
+    });
 
-    const layers = [
-      new TileLayer({
-        // source: satellite,
-        source: new OSM(),
-        // extent: this.extent1,
-      }),
-      this.rgbLayer,
-    ].concat(this.thermalLayers);
+    const layers = [osmLayer, this.aerialLayer].concat(this.thermalLayers);
+
+    // Escuchar el postrender
+    this.thermalLayers[1].on('postrender', (event) => {
+      if (this.anomaliaSeleccionada) {
+        const coords = this.anomaliaSeleccionada.featureCoords;
+        var pixel = getRenderPixel(event, coords[0]);
+
+        var context = event.context;
+        var centerX = coords[0][0];
+        var centerY = coords[0][1];
+        const sx = this._distance(coords[0], coords[1]);
+        const sy = this._distance(coords[2], coords[1]);
+        const tiles = event.target.renderer_.layer_.renderer_.renderedTiles;
+
+        const canvas = event.context.canvas;
+        // tiles.forEach((tile) => {
+        //   if (tile.lastCanvas == canvas) {
+        //     console.log('tile', tile);
+        //   }
+        // });
+
+        // var sourceData = context.getImageData(centerX, centerY, sx, sy).data;
+        // const;
+      }
+    });
+
+    // get the pixel position with every move
+    // var container = document.getElementById('map');
+    // container.addEventListener('mousemove', (event) => {
+    //   this.mousePosition = this.map.getEventPixel(event);
+    //   this.map.render();
+    // });
+
+    // container.addEventListener('mouseout', () => {
+    //   this.mousePosition = null;
+    //   this.map.render();
+    // });
+    // const radius = 75;
+
+    // // after rendering the layer, show an oversampled version around the pointer
+    // this.thermalLayers[1].on('postrender', (event) => {
+    //   if (this.mousePosition) {
+    //     var pixel = getRenderPixel(event, this.mousePosition);
+    //     var offset = getRenderPixel(event, [this.mousePosition[0] + radius, this.mousePosition[1]]);
+    //     var half = Math.sqrt(Math.pow(offset[0] - pixel[0], 2) + Math.pow(offset[1] - pixel[1], 2));
+    //     var context = event.context;
+    //     var centerX = pixel[0];
+    //     var centerY = pixel[1];
+    //     var originX = centerX - half;
+    //     var originY = centerY - half;
+    //     var size = Math.round(2 * half + 1);
+    //     var sourceData = context.getImageData(originX, originY, size, size).data;
+    //     var dest = context.createImageData(size, size);
+    //     var destData = dest.data;
+    //     for (var j = 0; j < size; ++j) {
+    //       for (var i = 0; i < size; ++i) {
+    //         var dI = i - half;
+    //         var dJ = j - half;
+    //         var dist = Math.sqrt(dI * dI + dJ * dJ);
+    //         var sourceI = i;
+    //         var sourceJ = j;
+    //         if (dist < half) {
+    //           sourceI = Math.round(half + dI / 2);
+    //           sourceJ = Math.round(half + dJ / 2);
+    //         }
+    //         var destOffset = (j * size + i) * 4;
+    //         var sourceOffset = (sourceJ * size + sourceI) * 4;
+    //         destData[destOffset] = sourceData[sourceOffset];
+    //         destData[destOffset + 1] = sourceData[sourceOffset + 1];
+    //         destData[destOffset + 2] = sourceData[sourceOffset + 2];
+    //         destData[destOffset + 3] = sourceData[sourceOffset + 3];
+    //       }
+    //     }
+    //     context.beginPath();
+    //     context.arc(centerX, centerY, half, 0, 2 * Math.PI);
+    //     context.lineWidth = (3 * half) / radius;
+    //     context.strokeStyle = 'rgba(255,255,255,0.5)';
+    //     context.putImageData(dest, originX, originY);
+    //     context.stroke();
+    //     context.restore();
+    //   }
+    // });
 
     // MAPA
     this.map = new Map({
@@ -177,6 +268,7 @@ export class MapViewComponent implements OnInit {
     this.addCursorOnHover();
     this.addLocationAreas();
     this.addOverlayInfoAnomalia();
+    // this.permitirCrearAnomalias();
 
     // Slider para la capa termica
     this.mapControlService.sliderMaxSource.subscribe((v) => {
@@ -207,7 +299,7 @@ export class MapViewComponent implements OnInit {
     });
     this.mapControlService.selectedInformeId$.subscribe((informeId) => {
       // this.activeInformeId = informeId;
-      this.activeInformeId = 'AAA';
+      this.activeInformeId = informeId;
       this.mostrarTodasAnomalias(this.activeInformeId);
     });
   }
@@ -238,6 +330,10 @@ export class MapViewComponent implements OnInit {
         popup.setPosition(undefined);
       }
     });
+  }
+
+  private _distance(x, y) {
+    return Math.sqrt(Math.pow(x[0] - y[0], 2) + Math.pow(x[1] - y[1], 2));
   }
 
   private addCursorOnHover() {
@@ -426,9 +522,9 @@ export class MapViewComponent implements OnInit {
         })
       );
     });
-    this.addSelectInteraction();
+    this._addSelectInteraction();
   }
-  addSelectInteraction() {
+  private _addSelectInteraction() {
     const select = new Select({
       style: this.getStyleAnomaliasMapa(true),
       // condition: 'pointermove'

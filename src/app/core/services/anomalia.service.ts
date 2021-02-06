@@ -30,12 +30,13 @@ export class AnomaliaService {
     anomalia.id = id;
     // Para que Firestore admita "featureCoords", lo transformamos en un objeto
     const anomaliaObj = this.prepararParaDb(anomalia);
-    return this.afs.collection('pcs').doc(id).set(anomaliaObj);
+    return this.afs.collection('anomalias').doc(id).set(anomaliaObj);
   }
   getAnomaliasPlanta$(plantaId: string): Observable<Anomalia[]> {
     const query$ = this.informeService.getInformesDePlanta(plantaId).pipe(
       take(1),
       switchMap((informes) => {
+        console.log('🚀 ~ file: anomalia.service.ts ~ line 39 ~ AnomaliaService ~ switchMap ~ informes', informes);
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
         informes.forEach((informe) => {
           anomaliaObsList.push(this.getAnomalias$(informe.id));
@@ -72,7 +73,7 @@ export class AnomaliaService {
   }
   async updateAnomalia(anomalia: Anomalia) {
     const anomaliaObj = this.prepararParaDb(anomalia);
-    return this.afs.doc('pcs/' + anomalia.id).update(anomaliaObj);
+    return this.afs.doc('anomalias/' + anomalia.id).update(anomaliaObj);
   }
 
   private prepararParaDb(anomalia: Anomalia) {
