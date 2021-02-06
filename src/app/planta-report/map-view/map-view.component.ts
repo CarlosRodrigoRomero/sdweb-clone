@@ -62,12 +62,14 @@ export class MapViewComponent implements OnInit {
   private anomaliaLayers: VectorLayer[];
   public leftOpened: boolean;
   public rightOpened: boolean;
+  public statsOpened: boolean;
   public anomaliasLoaded = false;
   public mousePosition;
   public informesList: string[];
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
+  @ViewChild('sidenavStats') sidenavStats: MatSidenav;
 
   constructor(
     private anomaliaService: AnomaliaService,

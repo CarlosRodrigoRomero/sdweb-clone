@@ -59,6 +59,12 @@ app-share-map {
   margin-bottom: 35px;
   border-radius: 4px;
 }
+.stats-sidenav {
+  display: flex;
+  margin-right: 10px;
+  margin-bottom: 35px;
+  border-radius: 4px;
+}
 
 .btn-right {
   position: absolute;
@@ -69,8 +75,20 @@ app-share-map {
   padding-left: 0;
   padding-right: 0;
 }
+.btn-right-stats {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  left: auto;
+  margin-right: 10px;
+  padding-left: 0;
+  padding-right: 0;
+}
 
 .titulo {
   margin-top: 20px;
   width: 100%;
+}
+#sidenavStats {
+  top: 140px;
 }

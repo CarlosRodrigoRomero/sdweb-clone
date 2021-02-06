@@ -1,21 +1,23 @@
-<app-chart-sankey></app-chart-sankey>
-
-<div class="chart">
-  <apx-chart
-    [series]="chartOptionsMAE.series"
-    [chart]="chartOptionsMAE.chart"
-    [xaxis]="chartOptionsMAE.xaxis"
-    [stroke]="chartOptionsMAE.stroke"
-    [colors]="chartOptionsMAE.colors"
-    [dataLabels]="chartOptionsMAE.dataLabels"
-    [legend]="chartOptionsMAE.legend"
-    [markers]="chartOptionsMAE.markers"
-    [grid]="chartOptionsMAE.grid"
-    [yaxis]="chartOptionsMAE.yaxis"
-    [title]="chartOptionsMAE.title"
-    [annotations]="chartOptionsMAE.annotations"
-  ></apx-chart>
-</div>
-
-<app-chart-numsyperd></app-chart-numsyperd>
-<app-chart-altura></app-chart-altura>
+<mat-tab-group>
+  <mat-tab label="MAE">
+    <div class="chart">
+      <apx-chart
+        [series]="chartOptionsMAE.series"
+        [chart]="chartOptionsMAE.chart"
+        [xaxis]="chartOptionsMAE.xaxis"
+        [stroke]="chartOptionsMAE.stroke"
+        [colors]="chartOptionsMAE.colors"
+        [dataLabels]="chartOptionsMAE.dataLabels"
+        [legend]="chartOptionsMAE.legend"
+        [markers]="chartOptionsMAE.markers"
+        [grid]="chartOptionsMAE.grid"
+        [yaxis]="chartOptionsMAE.yaxis"
+        [title]="chartOptionsMAE.title"
+        [annotations]="chartOptionsMAE.annotations"
+      ></apx-chart>
+    </div>
+    <app-chart-numsyperd></app-chart-numsyperd>
+  </mat-tab>
+  <mat-tab label="Células calientes"></mat-tab>
+  <mat-tab label="Avanzado"><app-chart-sankey></app-chart-sankey> <app-chart-altura></app-chart-altura></mat-tab>
+</mat-tab-group>

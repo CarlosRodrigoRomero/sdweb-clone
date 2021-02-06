@@ -109,11 +109,6 @@ export class ChartNumsyperdComponent implements OnInit {
             numeroModulos = 1;
           }
 
-          if (anom.hasOwnProperty('modulo')) {
-            if (anom.modulo.hasOwnProperty('potencia')) {
-              return GLOBAL.pcPerdidas[i] * numeroModulos;
-            }
-          }
           return GLOBAL.pcPerdidas[i] * numeroModulos;
         })
         .reduce((a, b) => a + b, 0);

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { GLOBAL } from '@core/services/global';
 declare let google;
 
@@ -7,10 +7,10 @@ declare let google;
   templateUrl: './chart-sankey.component.html',
   styleUrls: ['./chart-sankey.component.css'],
 })
-export class ChartSankeyComponent implements OnInit {
+export class ChartSankeyComponent implements AfterViewInit {
   constructor() {}
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
     // this.drawChart();
     google.charts.load('current', { packages: ['sankey'] });
     google.charts.setOnLoadCallback(this.drawChart);
@@ -21,16 +21,18 @@ export class ChartSankeyComponent implements OnInit {
     data.addColumn('string', 'To');
     data.addColumn('number', 'Weight');
     data.addRows([
-      ['Célula caliente', 'Célula caliente.', 5],
-      ['Célula caliente', 'Varias células calientes.', 7],
-      ['Célula caliente', 'String', 1],
-      ['Varias células calientes', 'Varias células calientes.', 1],
+      ['Célula caliente', 'Célula caliente.', 170],
+      ['Célula caliente', 'Varias células calientes.', 26],
+      ['Célula caliente', 'String', 2],
+      ['Varias células calientes', 'Varias células calientes.', 8],
       ['Varias células calientes', 'Substring en CA.', 1],
-      ['Substring en CA', 'Substring en CA.', 2],
+      ['Substring en CA', 'Substring en CA.', 9],
       ['Substring en CA', '2x Substring en CA.', 1],
-      ['Nuevas', 'Célula caliente.', 4],
+      ['Nuevas', 'Célula caliente.', 20],
       ['Nuevas', 'Varias células calientes.', 4],
-      ['Nuevas', 'String', 4],
+      ['Nuevas', 'String', 15],
+      ['Nuevas', 'Substring en CA.', 1],
+      ['Célula caliente', 'unknown', 25],
     ]);
 
     // Sets chart options.
@@ -55,6 +57,7 @@ export class ChartSankeyComponent implements OnInit {
       GLOBAL.colores_tiopos_hex[3], // 'Substring en CA',
       GLOBAL.colores_tiopos_hex[10], // '2x Substring en CA.',
       '#fff', // 'Nuevas',
+      '#fff', // 'Unknown',
     ];
     const colors = [
       '#bfbfbf', // 'Célula caliente',
@@ -66,6 +69,7 @@ export class ChartSankeyComponent implements OnInit {
       '#bfbfbf', // 'Substring en CA',
       '#bfbfbf', // '2x Substring en CA.',
       '#fff', // 'Nuevas',
+      '#fff', // 'unknown',
     ];
 
     const options = {
@@ -73,7 +77,8 @@ export class ChartSankeyComponent implements OnInit {
       interactivity: true,
       sankey: {
         node: {
-          nodePadding: 40,
+          nodePadding: 60,
+          width: 10,
           colors: colors_nodes,
           label: { fontSize: 14, color: '#000', bold: false, italic: false },
         },
