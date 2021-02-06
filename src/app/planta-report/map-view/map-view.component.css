@@ -16,9 +16,9 @@
 
 #map-control {
   position: absolute;
-  bottom: 100px;
-  left: 25%;
-
+  bottom: 50px;
+  left: 50%;
+  transform: translate(-50%, 0%);
   /* width: 60%; */
 }
 .example-container {
