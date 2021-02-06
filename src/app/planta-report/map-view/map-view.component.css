@@ -31,7 +31,7 @@
 
 app-share-map {
   position: absolute;
-  right: 60px;
+  right: 0px;
   top: 75px;
   margin: 10px;
   z-index: 999;
@@ -43,12 +43,11 @@ app-share-map {
   padding: 15px;
   width: fit-content;
   max-width: 350px;
-  height: fit-content;
 }
 
 .btn-left {
   position: absolute;
-  top: 70px;
+  top: 75px;
   left: 0;
   margin-left: 10px;
   padding-left: 0;
@@ -64,7 +63,7 @@ app-share-map {
 
 .btn-right {
   position: absolute;
-  top: 70px;
+  top: 65px;
   right: 0;
   left: auto;
   margin-right: 10px;
@@ -75,5 +74,4 @@ app-share-map {
 .titulo {
   margin-top: 15px;
   margin-left: 15px;
-  width: 100%;
 }

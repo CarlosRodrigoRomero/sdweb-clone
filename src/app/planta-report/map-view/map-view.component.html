@@ -1,4 +1,4 @@
-<!-- <app-share-map></app-share-map> -->
+<app-share-map></app-share-map>
 
 <mat-sidenav-container class="example-container" [hasBackdrop]="false">
   <mat-sidenav
@@ -6,12 +6,12 @@
     [(opened)]="leftOpened"
     class="left-sidenav"
     [fixedInViewport]="true"
-    [fixedTopGap]="192"
+    [fixedTopGap]="195"
     position="start"
     disableClose
   >
     <div class="titulo">
-      <h4 class="align-center" position="fixed">Filtros</h4>
+      <h4>Filtros</h4>
     </div>
     <app-filters-panel *ngIf="anomaliasLoaded"></app-filters-panel>
   </mat-sidenav>
@@ -21,7 +21,7 @@
     [(opened)]="rightOpened"
     class="right-sidenav"
     [fixedInViewport]="true"
-    [fixedTopGap]="192"
+    [fixedTopGap]="185"
     position="end"
     disableClose
   >
