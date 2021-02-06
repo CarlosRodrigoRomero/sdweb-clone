@@ -34,6 +34,8 @@ import { ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { FilterService } from '../../core/services/filter.service';
 import { getRenderPixel } from 'ol/render';
+import { mouseOnly } from 'ol/events/condition';
+import { click } from 'ol/events/condition';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -48,7 +50,7 @@ export class MapViewComponent implements OnInit {
   public rangeMin: number;
   public rangeMax: number;
   public palleteJSON: string;
-  public activeInformeId: string;
+  public selectedInformeId: string;
   public anomaliasVectorSource: VectorSource;
   public thermalSource;
   public anomaliaSeleccionada: Anomalia;
@@ -79,6 +81,7 @@ export class MapViewComponent implements OnInit {
   ngOnInit(): void {
     this.mousePosition = null;
     this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
+    this.selectedInformeId = this.informesList[1];
     // Para la demo, agregamos un extent a todas las capas:
     this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
@@ -106,8 +109,9 @@ export class MapViewComponent implements OnInit {
           // const al = this.anomaliaLayers.push(al);
           // TODO: Comprobar que existe...
           if (tl.length > 0) {
-            this.thermalLayers.push(this.createThermalLayer(tl[0], informe.id));
+            this.thermalLayers.push(this._createThermalLayer(tl[0], informe.id));
           }
+          this.anomaliaLayers.push(this._createAnomaliaLayer(informe.id));
 
           // Crear capa vectorial
         });
@@ -116,9 +120,10 @@ export class MapViewComponent implements OnInit {
         this.initMap();
       });
 
-    this.mapControlService.selectedInformeId = this.informesList[0];
+    this.mapControlService.selectedInformeId = this.informesList[1];
   }
-  private createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {
+
+  private _createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {
     // Iniciar mapa térmico
     const tl = new TileLayer({
       source: new XYZ_mod({
@@ -141,6 +146,18 @@ export class MapViewComponent implements OnInit {
     });
 
     return tl;
+  }
+  private _createAnomaliaLayer(informeId: string): VectorLayer {
+    const vl = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleAnomaliasMapa(false),
+    });
+
+    vl.setProperties({
+      informeId: informeId,
+    });
+
+    return vl;
   }
 
   onChangeSlider(highValue: number, lowValue: number) {
@@ -265,6 +282,7 @@ export class MapViewComponent implements OnInit {
         extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
       }),
     });
+    this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
     this.addCursorOnHover();
     this.addLocationAreas();
     this.addOverlayInfoAnomalia();
@@ -292,15 +310,21 @@ export class MapViewComponent implements OnInit {
     });
     this.mapControlService.sliderTemporalSource.subscribe((v) => {
       this.thermalLayers[1].setOpacity(v / 100); // 2020
+      this.anomaliaLayers[1].setOpacity(v / 100);
+      this.anomaliaLayers[0].setOpacity(1 - v / 100);
       this.thermalLayers[0].setOpacity(1 - v / 100); // 2019
       // this.thermalLayers.forEach(layer => {
       //   layer.setOpacity(v / 100);
       // })
+      if (v >= 50) {
+        this.selectedInformeId = this.informesList[1];
+      } else {
+        this.selectedInformeId = this.informesList[0];
+      }
     });
     this.mapControlService.selectedInformeId$.subscribe((informeId) => {
-      // this.activeInformeId = informeId;
-      this.activeInformeId = informeId;
-      this.mostrarTodasAnomalias(this.activeInformeId);
+      this.selectedInformeId = informeId;
+      this.mostrarTodasAnomalias(this.selectedInformeId);
     });
   }
   private addOverlayInfoAnomalia() {
@@ -339,7 +363,15 @@ export class MapViewComponent implements OnInit {
   private addCursorOnHover() {
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
-        this.map.getViewport().style.cursor = 'pointer';
+        let feature = this.map
+          .getFeaturesAtPixel(event.pixel)
+          .filter((item) => item.getProperties().properties !== undefined);
+        feature = feature.filter((item) => item.getProperties().properties.informeId == this.selectedInformeId);
+        if (feature.length > 0) {
+          this.map.getViewport().style.cursor = 'pointer';
+        } else {
+          this.map.getViewport().style.cursor = 'inherit';
+        }
       } else {
         this.map.getViewport().style.cursor = 'inherit';
       }
@@ -456,7 +488,7 @@ export class MapViewComponent implements OnInit {
       geometry.getCoordinates()[0],
       geometry.getType(),
       this.plantaId,
-      this.activeInformeId
+      this.selectedInformeId
     );
     // Guardar en la base de datos
     this.anomaliaService.addAnomalia(anomalia);
@@ -492,14 +524,6 @@ export class MapViewComponent implements OnInit {
     };
   }
   mostrarTodasAnomalias(informeId: string) {
-    this.anomaliasVectorSource = new VectorSource({ wrapX: false });
-
-    this.map.addLayer(
-      new VectorLayer({
-        source: this.anomaliasVectorSource,
-        style: this.getStyleAnomaliasMapa(false),
-      })
-    );
     this.filterService.filteredElements$.subscribe((anomalias) => {
       // Dibujar anomalias
       this.dibujarAnomalias(anomalias as Anomalia[]);
@@ -507,10 +531,14 @@ export class MapViewComponent implements OnInit {
     });
   }
   dibujarAnomalias(anomalias: Anomalia[]) {
-    this.anomaliasVectorSource.clear();
-    anomalias.forEach((anom) => {
-      this.anomaliasVectorSource.addFeature(
-        new Feature({
+    // Para cada vector layer (que corresponde a un informe)
+
+    this.anomaliaLayers.forEach((l) => {
+      const filtered = anomalias.filter((item) => item.informeId == l.getProperties().informeId);
+      const source = l.getSource();
+      source.clear();
+      filtered.forEach((anom) => {
+        const feature = new Feature({
           geometry: new Polygon([anom.featureCoords]),
           properties: {
             anomaliaId: anom.id,
@@ -518,16 +546,33 @@ export class MapViewComponent implements OnInit {
             clase: anom.clase,
             temperaturaMax: anom.temperaturaMax,
             temperaturaRef: anom.temperaturaRef,
+            informeId: anom.informeId,
           },
-        })
-      );
+        });
+        // feature.setProperties({
+        //   anomaliaId: anom.id,
+        //   tipo: anom.tipo,
+        //   clase: anom.clase,
+        //   temperaturaMax: anom.temperaturaMax,
+        //   temperaturaRef: anom.temperaturaRef,
+        //   informeId: anom.informeId,
+        // });
+        source.addFeature(feature);
+      });
     });
+
     this._addSelectInteraction();
   }
   private _addSelectInteraction() {
     const select = new Select({
       style: this.getStyleAnomaliasMapa(true),
-      // condition: 'pointermove'
+      condition: click,
+      layers: (l) => {
+        if (l.getProperties().informeId == this.selectedInformeId) {
+          return true;
+        }
+        return false;
+      },
     });
     this.map.addInteraction(select);
     select.on('select', (e) => {
@@ -536,10 +581,13 @@ export class MapViewComponent implements OnInit {
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().hasOwnProperty('properties')) {
           const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
+
           const anomalia = this.listaAnomalias.filter((anom) => {
             return anom.id == anomaliaId;
           })[0];
-          this.anomaliaSeleccionada = anomalia;
+          if (this.selectedInformeId == anomalia.informeId) {
+            this.anomaliaSeleccionada = anomalia;
+          }
         }
       }
     });
