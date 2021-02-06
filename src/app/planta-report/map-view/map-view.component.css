@@ -16,14 +16,14 @@
 
 #map-control {
   position: absolute;
-  bottom: 0px;
+  bottom: 100px;
   left: 25%;
 
   /* width: 60%; */
 }
 .example-container {
   position: relative;
-  top: 0;
+  top: 2px;
   bottom: 0;
   left: 0;
   right: 0;

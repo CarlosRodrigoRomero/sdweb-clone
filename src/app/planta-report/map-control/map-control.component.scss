@@ -62,20 +62,19 @@
   height: 100px;
   display: flex;
   flex-direction: column;
-  border: 1px solid #8080807a;
-  border-radius: 10px;
+  border-radius: 4px;
   padding: 10px;
-  background-color: white;
+  background-color: rgba($color: white, $alpha: 0.8);
 }
 
 .texto-label {
   position: absolute;
-  top: 5px;
+  top: -15px;
   font-size: 1.2rem;
   border: 1px solid #8080806b;
   padding: 3px;
   border-radius: 3px;
-  background-color: white;
+  background-color: rgba($color: white, $alpha: 0.8);
 }
 
 #slider-opacidad-termico {
@@ -83,9 +82,16 @@
 }
 
 mat-card {
-  background-color: rgba($color: white, $alpha: 0.5);
+  background-color: rgba($color: white, $alpha: 0.8);
   border-color: transparent;
   box-shadow: none !important;
   padding-left: 50px;
   padding-right: 50px;
+  height: 100px;
+}
+
+.map-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
 }
