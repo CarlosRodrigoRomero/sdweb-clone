@@ -1,0 +1,12 @@
+<div *ngIf="dataLoaded" id="chart">
+  <apx-chart
+    [series]="chartOptions.series"
+    [chart]="chartOptions.chart"
+    [xaxis]="chartOptions.xaxis"
+    [yaxis]="chartOptions.yaxis"
+    [dataLabels]="chartOptions.dataLabels"
+    [colors]="chartOptions.colors"
+    [fill]="chartOptions.fill"
+    [legend]="chartOptions.legend"
+  ></apx-chart>
+</div>
