@@ -36,7 +36,6 @@ export class AnomaliaService {
     const query$ = this.informeService.getInformesDePlanta(plantaId).pipe(
       take(1),
       switchMap((informes) => {
-        console.log('🚀 ~ file: anomalia.service.ts ~ line 39 ~ AnomaliaService ~ switchMap ~ informes', informes);
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
         informes.forEach((informe) => {
           anomaliaObsList.push(this.getAnomalias$(informe.id));
@@ -73,11 +72,13 @@ export class AnomaliaService {
   }
   async updateAnomalia(anomalia: Anomalia) {
     const anomaliaObj = this._prepararParaDb(anomalia);
-    return this.afs.doc('anomalias/' + anomalia.id).update(anomaliaObj);
+    const anomaliaDoc = this.afs.doc('anomalias/' + anomalia.id);
+    return anomaliaDoc.set(anomaliaObj);
   }
 
   private _prepararParaDb(anomalia: Anomalia) {
     anomalia.featureCoords = { ...anomalia.featureCoords };
+    anomalia.globalCoords = { ...anomalia.globalCoords };
     const tipo: any = anomalia.tipo;
     anomalia.tipo = parseInt(tipo);
     return Object.assign({}, anomalia);
