@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { GLOBAL } from '@core/services/global';
 import {
   ChartComponent,
   ApexAxisChartSeries,
@@ -46,7 +47,8 @@ export class PlantaStatsComponent implements OnInit {
       series: [
         {
           name: 'MAE %',
-          data: [0.2, 0.5, 0.9],
+          data: [0.04, 0.4],
+          color: GLOBAL.colores_mae[0],
         },
       ],
       chart: {
@@ -76,7 +78,7 @@ export class PlantaStatsComponent implements OnInit {
           },
         },
       },
-      colors: ['#77B6EA', '#545454'],
+      colors: ['#77B6EA', GLOBAL.colores_mae[0]],
       dataLabels: {
         enabled: true,
       },
@@ -98,10 +100,10 @@ export class PlantaStatsComponent implements OnInit {
         size: 1,
       },
       xaxis: {
-        categories: ['2018', '2019', '2020'],
-        title: {
-          text: 'Año',
-        },
+        categories: ['Jul 2019', 'Ago 2020'],
+        // title: {
+        //   text: 'Año',
+        // },
       },
       yaxis: {
         title: {
@@ -122,20 +124,29 @@ export class PlantaStatsComponent implements OnInit {
       annotations: {
         yaxis: [
           {
-            y: 1,
-            borderColor: '#77b6ea',
+            y: 1.3,
+            borderColor: '#5b5b5c',
             borderWidth: 2,
             strokeDashArray: 10,
 
             label: {
               offsetX: -100,
-              borderColor: '#77b6ea',
+              borderColor: '#5b5b5c',
               style: {
                 fontSize: '12px',
                 color: '#fff',
-                background: '#77b6ea',
+                background: '#5b5b5c',
               },
               text: 'Media MAE Portfolio',
+            },
+          },
+          {
+            y: 1.3 + 0.5,
+            y2: 1.3 - 0.5,
+            borderColor: '#000',
+            fillColor: '#FEB019',
+            label: {
+              text: 'desviación std.',
             },
           },
         ],

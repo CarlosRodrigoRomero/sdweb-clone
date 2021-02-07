@@ -1,7 +1,8 @@
 <mat-tab-group>
   <mat-tab label="MAE">
-    <div class="chart">
+    <div class="chart-div">
       <apx-chart
+        id="mae-chart"
         [series]="chartOptionsMAE.series"
         [chart]="chartOptionsMAE.chart"
         [xaxis]="chartOptionsMAE.xaxis"
@@ -15,9 +16,15 @@
         [title]="chartOptionsMAE.title"
         [annotations]="chartOptionsMAE.annotations"
       ></apx-chart>
+
+      <app-chart-numsyperd></app-chart-numsyperd>
     </div>
-    <app-chart-numsyperd></app-chart-numsyperd>
   </mat-tab>
   <mat-tab label="Células calientes"></mat-tab>
-  <mat-tab label="Avanzado"><app-chart-sankey></app-chart-sankey> <app-chart-altura></app-chart-altura></mat-tab>
+  <mat-tab label="Avanzado">
+    <ng-template matTabContent>
+      <app-chart-sankey *ngIf="true"></app-chart-sankey>
+      <app-chart-altura></app-chart-altura>
+    </ng-template>
+  </mat-tab>
 </mat-tab-group>

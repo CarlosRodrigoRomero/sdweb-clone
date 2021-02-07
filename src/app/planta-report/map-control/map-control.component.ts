@@ -30,7 +30,7 @@ export class MapControlComponent implements OnInit {
 
   /* Slider Año */
   currentYear = 100;
-  dates = ['Julio 2019', 'Agosto 2020'];
+  dates = ['Jul 2019', 'Jun 2020'];
   optionsTemporalSlider: Options = {
     floor: 0,
     ceil: 100,

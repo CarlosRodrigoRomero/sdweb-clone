@@ -23,49 +23,50 @@ export class ChartAlturaComponent {
       series: [
         {
           name: 'A',
-          data: this.generateData(20, {
+          data: this.generateData(1, {
             min: 0,
-            max: 90,
+            max: 50,
           }),
         },
         {
           name: 'B',
-          data: this.generateData(20, {
+          data: this.generateData(1, {
             min: 0,
-            max: 90,
+            max: 50,
           }),
         },
         {
           name: 'C',
-          data: this.generateData(20, {
+          data: this.generateData(1, {
             min: 0,
-            max: 90,
+            max: 50,
           }),
         },
         {
           name: 'D',
-          data: this.generateData(20, {
+          data: this.generateData(1, {
             min: 0,
-            max: 90,
+            max: 50,
           }),
         },
         {
           name: 'E',
-          data: this.generateData(20, {
+          data: this.generateData(1, {
             min: 0,
-            max: 90,
+            max: 50,
           }),
         },
         {
           name: 'F',
-          data: this.generateData(20, {
+          data: this.generateData(1, {
             min: 0,
-            max: 90,
+            max: 50,
           }),
         },
       ],
       chart: {
-        height: 350,
+        height: 250,
+        width: 250,
         type: 'heatmap',
       },
       dataLabels: {
@@ -73,7 +74,7 @@ export class ChartAlturaComponent {
       },
       colors: ['#FB0000'],
       title: {
-        text: '# anomalías por posición',
+        text: '# anomalías por altura',
       },
     };
   }

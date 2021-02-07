@@ -1,30 +1,32 @@
 <div *ngIf="chartLoaded" class="chart-num-per-group">
   <div class="chart-num-per">
     <apx-chart
+      [title]="chartOptions1.title"
       [series]="chartOptions1.series"
       [chart]="chartOptions1.chart"
       [colors]="chartOptions1.colors"
       [yaxis]="chartOptions1.yaxis"
       [dataLabels]="chartOptionsComun.dataLabels"
       [stroke]="chartOptionsComun.stroke"
-      [grid]="chartOptions1.grid"
-      [xaxis]="chartOptions1.xaxis"
-      [tooltip]="chartOptions1.tooltip"
+      [grid]="chartOptionsComun.grid"
+      [xaxis]="chartOptionsComun.xaxis"
+      [tooltip]="chartOptionsComun.tooltip"
       [plotOptions]="chartOptionsComun.plotOptions"
       [legend]="chartOptionsComun.legend"
     ></apx-chart>
   </div>
   <div class="chart-num-per">
     <apx-chart
+      [title]="chartOptions2.title"
       [series]="chartOptions2.series"
       [chart]="chartOptions2.chart"
       [colors]="chartOptions2.colors"
       [yaxis]="chartOptions2.yaxis"
       [dataLabels]="chartOptionsComun.dataLabels"
       [stroke]="chartOptionsComun.stroke"
-      [grid]="chartOptions2.grid"
-      [xaxis]="chartOptions2.xaxis"
-      [tooltip]="chartOptions2.tooltip"
+      [grid]="chartOptionsComun.grid"
+      [xaxis]="chartOptionsComun.xaxis"
+      [tooltip]="chartOptionsComun.tooltip"
       [plotOptions]="chartOptionsComun.plotOptions"
       [legend]="chartOptionsComun.legend"
     ></apx-chart>

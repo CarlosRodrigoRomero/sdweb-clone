@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MapControlService } from '../../services/map-control.service';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { AnomaliaService } from '../../../core/services/anomalia.service';
 import { FiltrableInterface } from '../../../core/models/filtrableInterface';
 import {
@@ -21,6 +21,9 @@ import {
 } from 'ng-apexcharts';
 import { GLOBAL } from '@core/services/global';
 import { Anomalia } from '../../../core/models/anomalia';
+import { ActivatedRoute } from '@angular/router';
+import { InformeService } from '@core/services/informe.service';
+import { InformeInterface } from '../../../core/models/informe';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -40,6 +43,15 @@ export type ChartOptions = {
   plotOptions: ApexPlotOptions;
 };
 
+export interface DataPlot {
+  anomalias: Anomalia[];
+  informeId: string;
+  numPorCategoria: number[];
+  perdidasPorCategoria: number[];
+  labelsCategoria: string[];
+  coloresCategoria: string[];
+}
+
 @Component({
   selector: 'app-chart-numsyperd',
   templateUrl: './chart-numsyperd.component.html',
@@ -50,76 +62,121 @@ export class ChartNumsyperdComponent implements OnInit {
   public chartOptionsComun: Partial<ChartOptions>;
   public chartOptions1: Partial<ChartOptions>;
   public chartOptions2: Partial<ChartOptions>;
-  private numCategorias: Array<number>;
   public selectedAnomalias: Anomalia[];
-  public perdidasPorCategoria: number[];
-  public potenciaModuloPorDefecto: number;
-  public countCategoria: number[];
-  public countCategoriaLabels: string[];
-  public chartLoaded = false;
-  public coloresCategorias: string[];
 
-  constructor(private mapControlService: MapControlService, private anomaliaService: AnomaliaService) {}
+  public labelsCategoria: string[];
+  public coloresCategoria: string[];
+  public numsCategoria: number[];
+
+  public chartLoaded = false;
+  public plantaId: string;
+  public selectedInformeId: string;
+  public informesList: string[];
+  public dataPlot: DataPlot[];
+  public allAnomalias: Anomalia[];
+
+  constructor(
+    private informeService: InformeService,
+    private route: ActivatedRoute,
+    private mapControlService: MapControlService,
+    private anomaliaService: AnomaliaService
+  ) {}
 
   ngOnInit(): void {
-    this.potenciaModuloPorDefecto = 240;
-    // Obtener informeId de map control. Con SwitchMap obtener anomalias
-    this.mapControlService.selectedInformeId$
-      .pipe(
-        switchMap((informeId) => {
-          return this.anomaliaService.getAnomalias$(informeId);
-        })
-      )
+    this.plantaId = this.route.snapshot.paramMap.get('id');
+    this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
+
+    this.anomaliaService
+      .getAnomaliasPlanta$(this.plantaId)
+      .pipe(take(1))
       .subscribe((anomalias) => {
-        console.log(
-          '🚀 ~ file: chart-numsyperd.component.ts ~ line 64 ~ ChartNumsyperdComponent ~ .subscribe ~ anomalias',
-          anomalias
-        );
-        this.selectedAnomalias = anomalias;
-        this.initDataChart(anomalias);
+        this.allAnomalias = anomalias;
+        this.dataPlot = [];
+        this._getAllCategorias(anomalias);
+
+        this.informesList.forEach((informeId) => {
+          const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId == informeId);
+          this.dataPlot.push(this._calculateDataPlot(anomaliasInforme, informeId));
+        });
         this.initChart();
       });
+
+    // Obtener informeId de map control. Con SwitchMap obtener anomalias
+    //   this.mapControlService.selectedInformeId$
+    //     .pipe(
+    //       switchMap((informeId) => {
+    //         this.selectedInformeId = informeId;
+    //         return this.anomaliaService.getAnomalias$(informeId);
+    //       })
+    //     )
+    //     .subscribe((anomalias) => {
+    //       this.selectedAnomalias = anomalias;
+    //     });
+    // }
   }
-  initDataChart(anomalias) {
-    this.numCategorias = Array(GLOBAL.labels_tipos.length)
+  private _getAllCategorias(anomalias): void {
+    const allNumCategorias = Array(GLOBAL.labels_tipos.length)
       .fill(0)
       .map((_, i) => i + 1);
 
-    let filtroCategoria: Anomalia[];
-    this.perdidasPorCategoria = Array();
+    const labelsCategoria = Array<string>();
+    const coloresCategoria = Array<string>();
+    const numsCategoria = Array<number>();
 
-    let perdidasCategoria: number;
-    this.countCategoria = Array();
-    this.countCategoriaLabels = Array();
-    this.coloresCategorias = Array();
-
-    this.numCategorias.forEach((i) => {
-      filtroCategoria = anomalias.filter((anom) => anom.tipo === i);
-
-      perdidasCategoria = filtroCategoria
-        .map((anom) => {
-          let numeroModulos: number;
-          if (anom.hasOwnProperty('modulosAfectados')) {
-            if (isNaN(anom.modulosAfectados)) {
-              numeroModulos = 1;
-            } else {
-              numeroModulos = anom.modulosAfectados;
-            }
-          } else {
-            numeroModulos = 1;
-          }
-
-          return GLOBAL.pcPerdidas[i] * numeroModulos;
-        })
-        .reduce((a, b) => a + b, 0);
-
-      if (filtroCategoria.length > 0) {
-        this.countCategoria.push(filtroCategoria.length);
-        this.countCategoriaLabels.push(GLOBAL.labels_tipos[i]);
-        this.coloresCategorias.push(GLOBAL.colores_tipos[i]);
-        this.perdidasPorCategoria.push(Math.round(perdidasCategoria * 10) / 10);
+    allNumCategorias.forEach((i) => {
+      if (anomalias.filter((anom) => anom.tipo === i).length > 0) {
+        labelsCategoria.push(GLOBAL.labels_tipos[i]);
+        coloresCategoria.push(GLOBAL.colores_tipos[i]);
+        numsCategoria.push(i);
       }
     });
+    this.labelsCategoria = labelsCategoria;
+    this.coloresCategoria = coloresCategoria;
+    this.numsCategoria = numsCategoria;
+  }
+
+  private _calculateDataPlot(anomalias, informeId: string): DataPlot {
+    let filtroCategoria: Anomalia[];
+    let perdidasCategoria: number;
+
+    const numPorCategoria = Array();
+    const perdidasPorCategoria = Array();
+
+    this.numsCategoria.forEach((i) => {
+      filtroCategoria = anomalias.filter((anom) => anom.tipo === i);
+      if (filtroCategoria.length > 0) {
+        perdidasCategoria = filtroCategoria
+          .map((anom) => {
+            let numeroModulos: number;
+            if (anom.hasOwnProperty('modulosAfectados')) {
+              if (isNaN(anom.modulosAfectados)) {
+                numeroModulos = 1;
+              } else {
+                numeroModulos = anom.modulosAfectados;
+              }
+            } else {
+              numeroModulos = 1;
+            }
+
+            return GLOBAL.pcPerdidas[i] * numeroModulos;
+          })
+          .reduce((a, b) => a + b, 0);
+
+        perdidasPorCategoria.push(Math.round(perdidasCategoria * 10) / 10);
+        numPorCategoria.push(filtroCategoria.length);
+      } else {
+        numPorCategoria.push(0);
+        perdidasPorCategoria.push(0);
+      }
+    });
+    return {
+      anomalias,
+      informeId,
+      numPorCategoria,
+      perdidasPorCategoria,
+      labelsCategoria: this.labelsCategoria,
+      coloresCategoria: this.coloresCategoria,
+    };
   }
 
   initChart() {
@@ -135,7 +192,9 @@ export class ChartNumsyperdComponent implements OnInit {
       },
 
       stroke: {
-        curve: 'straight',
+        show: true,
+        width: 2,
+        colors: ['transparent'],
       },
       toolbar: {
         tools: {
@@ -148,7 +207,9 @@ export class ChartNumsyperdComponent implements OnInit {
       plotOptions: {
         bar: {
           barHeight: '100%',
-          columnWidth: '75%',
+
+          columnWidth: '45%',
+
           distributed: true,
           endingShape: 'rounded',
           dataLabels: {
@@ -157,51 +218,47 @@ export class ChartNumsyperdComponent implements OnInit {
         },
       },
       xaxis: {
-        categories: this.countCategoriaLabels,
+        categories: this.labelsCategoria,
         type: 'category',
         labels: {
           // rotate: 0,
         },
       },
 
-      // tooltip: {
-      //   followCursor: false,
-      //   theme: 'dark',
-      //   x: {
-      //     show: false,
-      //   },
-      //   marker: {
-      //     show: false,
-      //   },
-      //   y: {
-      //     title: {
-      //       formatter: (s) => {
-      //         return s;
-      //       },
-      //     },
-      //   },
-      // },
+      tooltip: {
+        followCursor: false,
+        theme: 'dark',
+        x: {
+          show: false,
+        },
+        marker: {
+          show: false,
+        },
+        y: {
+          title: {
+            formatter: (s) => {
+              return s;
+            },
+          },
+        },
+      },
       // grid: {
-      //   clipMarkers: false
+      //   clipMarkers: false,
       // },
     };
 
     this.chartOptions1 = {
-      xaxis: {
-        categories: this.countCategoriaLabels,
-        type: 'category',
-        labels: {
-          show: false,
-          // rotate: 0,
-        },
-      },
       series: [
         {
-          name: '# Anomalias',
-          data: this.countCategoria,
+          name: '# Anomalias 2019',
+          data: this.dataPlot[0].numPorCategoria,
+        },
+        {
+          name: '# Anomalias 2020',
+          data: this.dataPlot[1].numPorCategoria,
         },
       ],
-      colors: this.coloresCategorias,
+      colors: this.coloresCategoria,
       title: {
         text: '# Anomalías',
         align: 'left',
@@ -212,7 +269,7 @@ export class ChartNumsyperdComponent implements OnInit {
         group: 'social',
         type: 'bar',
         width: '100%',
-        height: 160,
+        // height: 160,
       },
 
       yaxis: {
@@ -221,7 +278,7 @@ export class ChartNumsyperdComponent implements OnInit {
         },
         tickAmount: 3,
         labels: {
-          // minWidth: 100,
+          minWidth: 100,
         },
       },
     };
@@ -229,8 +286,12 @@ export class ChartNumsyperdComponent implements OnInit {
     this.chartOptions2 = {
       series: [
         {
-          name: 'MAE',
-          data: this.perdidasPorCategoria,
+          name: 'MAE 2019',
+          data: this.dataPlot[0].perdidasPorCategoria,
+        },
+        {
+          name: 'MAE 2020',
+          data: this.dataPlot[1]['perdidasPorCategoria'],
         },
       ],
       title: {
@@ -245,15 +306,8 @@ export class ChartNumsyperdComponent implements OnInit {
 
         // height: 160,
       },
-      xaxis: {
-        categories: this.countCategoriaLabels,
-        type: 'category',
-        labels: {
-          // show: false,
-          // rotate: 0,
-        },
-      },
-      colors: ['#B50202'],
+
+      colors: ['#999999'],
       yaxis: {
         max: (v) => {
           return Math.round(1.1 * v);
@@ -261,7 +315,7 @@ export class ChartNumsyperdComponent implements OnInit {
         forceNiceScale: true,
         tickAmount: 3,
         labels: {
-          minWidth: 10,
+          minWidth: 100,
         },
       },
     };
