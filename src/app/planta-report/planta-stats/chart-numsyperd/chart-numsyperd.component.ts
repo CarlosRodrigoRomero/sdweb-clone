@@ -1,8 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MapControlService } from '../../services/map-control.service';
-import { switchMap, take } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { AnomaliaService } from '../../../core/services/anomalia.service';
-import { FiltrableInterface } from '../../../core/models/filtrableInterface';
 import {
   ChartComponent,
   ApexAxisChartSeries,
@@ -22,8 +20,6 @@ import {
 import { GLOBAL } from '@core/services/global';
 import { Anomalia } from '../../../core/models/anomalia';
 import { ActivatedRoute } from '@angular/router';
-import { InformeService } from '@core/services/informe.service';
-import { InformeInterface } from '../../../core/models/informe';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -74,13 +70,9 @@ export class ChartNumsyperdComponent implements OnInit {
   public informesList: string[];
   public dataPlot: DataPlot[];
   public allAnomalias: Anomalia[];
+  public chartHeight = 295;
 
-  constructor(
-    private informeService: InformeService,
-    private route: ActivatedRoute,
-    private mapControlService: MapControlService,
-    private anomaliaService: AnomaliaService
-  ) {}
+  constructor(private route: ActivatedRoute, private anomaliaService: AnomaliaService) {}
 
   ngOnInit(): void {
     this.plantaId = this.route.snapshot.paramMap.get('id');
@@ -145,22 +137,7 @@ export class ChartNumsyperdComponent implements OnInit {
     this.numsCategoria.forEach((i) => {
       filtroCategoria = anomalias.filter((anom) => anom.tipo === i);
       if (filtroCategoria.length > 0) {
-        perdidasCategoria = filtroCategoria
-          .map((anom) => {
-            let numeroModulos: number;
-            if (anom.hasOwnProperty('modulosAfectados')) {
-              if (isNaN(anom.modulosAfectados)) {
-                numeroModulos = 1;
-              } else {
-                numeroModulos = anom.modulosAfectados;
-              }
-            } else {
-              numeroModulos = 1;
-            }
-
-            return GLOBAL.pcPerdidas[i] * numeroModulos;
-          })
-          .reduce((a, b) => a + b, 0);
+        perdidasCategoria = this._getMAEAnomalias(filtroCategoria);
 
         perdidasPorCategoria.push(Math.round(perdidasCategoria * 10) / 10);
         numPorCategoria.push(filtroCategoria.length);
@@ -177,6 +154,24 @@ export class ChartNumsyperdComponent implements OnInit {
       labelsCategoria: this.labelsCategoria,
       coloresCategoria: this.coloresCategoria,
     };
+  }
+  private _getMAEAnomalias(anomalias: Anomalia[]): number {
+    return anomalias
+      .map((anom) => {
+        let numeroModulos: number;
+        if (anom.hasOwnProperty('modulosAfectados')) {
+          if (isNaN(anom.modulosAfectados)) {
+            numeroModulos = 1;
+          } else {
+            numeroModulos = anom.modulosAfectados;
+          }
+        } else {
+          numeroModulos = 1;
+        }
+
+        return GLOBAL.pcPerdidas[anom.tipo] * numeroModulos;
+      })
+      .reduce((a, b) => a + b, 0);
   }
 
   initChart() {
@@ -269,7 +264,7 @@ export class ChartNumsyperdComponent implements OnInit {
         group: 'social',
         type: 'bar',
         width: '100%',
-        // height: 160,
+        height: this.chartHeight,
       },
 
       yaxis: {
@@ -295,7 +290,7 @@ export class ChartNumsyperdComponent implements OnInit {
         },
       ],
       title: {
-        text: 'Módulos Apagados Equivalentes (MAE)',
+        text: 'MAE',
         align: 'left',
       },
       chart: {
@@ -304,7 +299,7 @@ export class ChartNumsyperdComponent implements OnInit {
         type: 'bar',
         width: '100%',
 
-        // height: 160,
+        height: this.chartHeight,
       },
 
       colors: [GLOBAL.gris],

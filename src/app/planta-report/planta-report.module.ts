@@ -14,6 +14,9 @@ import { FilterPcsListComponent } from './filter-pcs-list/filter-pcs-list.compon
 import { ChartSankeyComponent } from './planta-stats/chart-sankey/chart-sankey.component';
 import { ShareMapComponent } from './share-map/share-map.component';
 import { BarraResumenPlantaComponent } from './barra-resumen-planta/barra-resumen-planta.component';
+import { ChartAnomaliasZonasComponent } from './planta-stats/chart-anomalias-zonas/chart-anomalias-zonas.component';
+import { ChartPctCelsComponent } from './planta-stats/chart-pct-cels/chart-pct-cels.component';
+import { ChartCelsTempsComponent } from './planta-stats/chart-cels-temps/chart-cels-temps.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +30,9 @@ import { BarraResumenPlantaComponent } from './barra-resumen-planta/barra-resume
     ChartSankeyComponent,
     ShareMapComponent,
     BarraResumenPlantaComponent,
+    ChartAnomaliasZonasComponent,
+    ChartPctCelsComponent,
+    ChartCelsTempsComponent,
   ],
   imports: [SharedModule, NgxSliderModule, PlantaReportRoutingModule, NgApexchartsModule, InformeFiltersModule],
 })

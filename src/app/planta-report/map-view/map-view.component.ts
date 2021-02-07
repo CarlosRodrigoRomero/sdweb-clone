@@ -34,8 +34,8 @@ import { ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { FilterService } from '../../core/services/filter.service';
 import { getRenderPixel } from 'ol/render';
-import { mouseOnly } from 'ol/events/condition';
 import { click } from 'ol/events/condition';
+import { containsCoordinate } from 'ol/extent';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -52,6 +52,7 @@ export class MapViewComponent implements OnInit {
   public palleteJSON: string;
   public selectedInformeId: string;
   public anomaliasVectorSource: VectorSource;
+  public locAreasVectorSource: VectorSource;
   public thermalSource;
   public anomaliaSeleccionada: Anomalia;
   public listaAnomalias: Anomalia[];
@@ -329,6 +330,26 @@ export class MapViewComponent implements OnInit {
       this.mostrarTodasAnomalias(this.selectedInformeId);
     });
   }
+
+  private _prueba() {
+    this.filterService.filteredElements$.pipe(take(1)).subscribe((anomalias) => {
+      anomalias.forEach((anom) => {
+        const anomalia = anom as Anomalia;
+        const anomaliaCoord = anomalia.featureCoords;
+        this.locAreasVectorSource.getFeatures().forEach((feature) => {
+          const globalExtent = feature.getGeometry().getExtent();
+          const contains = containsCoordinate(globalExtent, anomaliaCoord[0]);
+          if (contains) {
+            anomalia.globalCoords = feature.getProperties().globalCoords;
+            this.anomaliaService.updateAnomalia(anomalia).then((v) => {
+              console.log('anomalia actualizada');
+            });
+          }
+        });
+      });
+    });
+  }
+
   private addOverlayInfoAnomalia() {
     //Overlay para los detalles de cada anomalia
     const element = document.getElementById('popup');
@@ -384,49 +405,48 @@ export class MapViewComponent implements OnInit {
     return transformExtent(extent, 'EPSG:4326', 'EPSG:3857');
   }
   addLocationAreas() {
-    this.plantaService.getLocationsArea(this.plantaId).subscribe((locAreas) => {
-      const geojsonObject = this.locAreasToGeoJSON(locAreas);
-
-      var vectorSource = new VectorSource({
-        features: new GeoJSON().readFeatures(geojsonObject),
-      });
-
-      var styles = {
-        LineString: new Style({
-          stroke: new Stroke({
-            color: 'blue',
-            lineDash: [4],
-            width: 2,
-          }),
-          fill: new Fill({
-            color: 'rgba(0, 0, 255, 0)',
-          }),
-          text: new Text({
-            font: '16px "Open Sans", "Arial Unicode MS", "sans-serif"',
-            placement: 'line',
-            fill: new Fill({
-              color: 'white',
-            }),
-            text: '',
-          }),
+    const styles = {
+      LineString: new Style({
+        stroke: new Stroke({
+          color: '#dbdbdb',
+          lineDash: [4],
+          width: 2,
         }),
-      };
-      const styleFunction = (feature) => {
-        if (feature != undefined) {
-          let style = styles[feature.getGeometry().getType()];
-          // style.getText().setText(feature.get('globalCoords'));
-          style.getText().setText(feature.get('globalCoords')[1]);
-          return style;
-        }
-      };
+        fill: new Fill({
+          color: 'rgba(0, 0, 255, 0)',
+        }),
+        text: new Text({
+          font: '16px "Open Sans", "Arial Unicode MS", "sans-serif"',
+          placement: 'line',
+          fill: new Fill({
+            color: 'white',
+          }),
+          text: '',
+        }),
+      }),
+    };
+    const styleFunction = (feature) => {
+      if (feature != undefined) {
+        let style = styles[feature.getGeometry().getType()];
+        // style.getText().setText(feature.get('globalCoords'));
+        style.getText().setText(feature.get('globalCoords')[1]);
+        return style;
+      }
+    };
+
+    this.plantaService.getLocationsArea(this.plantaId).subscribe((locAreas) => {
+      this.locAreasVectorSource = new VectorSource({
+        features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(locAreas)),
+      });
 
       this.map.addLayer(
         new VectorLayer({
-          source: vectorSource,
+          source: this.locAreasVectorSource,
           visible: true,
           style: styleFunction,
         })
       );
+      // this._prueba();
     });
   }
   private locAreasToGeoJSON(locAreas: LocationAreaInterface[]) {
