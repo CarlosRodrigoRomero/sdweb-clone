@@ -5,3 +5,27 @@
 #mae-chart {
   width: 450px;
 }
+
+.columna {
+  display: flex;
+  flex-direction: column;
+  max-width: 60%;
+}
+.columna-izq {
+  width: 40%;
+}
+.fila {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+mat-card {
+  margin: 0.3rem;
+}
+mat-tab {
+  background-color: grey;
+}
+
+.mat-tab-stats {
+  background-color: '#8080802b' !important;
+}

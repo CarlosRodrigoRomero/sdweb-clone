@@ -1,27 +1,62 @@
 <mat-tab-group>
-  <mat-tab label="MAE">
-    <div class="chart-div">
-      <apx-chart
-        id="mae-chart"
-        [series]="chartOptionsMAE.series"
-        [chart]="chartOptionsMAE.chart"
-        [xaxis]="chartOptionsMAE.xaxis"
-        [stroke]="chartOptionsMAE.stroke"
-        [colors]="chartOptionsMAE.colors"
-        [dataLabels]="chartOptionsMAE.dataLabels"
-        [legend]="chartOptionsMAE.legend"
-        [markers]="chartOptionsMAE.markers"
-        [grid]="chartOptionsMAE.grid"
-        [yaxis]="chartOptionsMAE.yaxis"
-        [title]="chartOptionsMAE.title"
-        [annotations]="chartOptionsMAE.annotations"
-      ></apx-chart>
+  <mat-tab class="mat-tab-stats" label="MAE">
+    <div class="fila">
+      <div class="columna columna-izq">
+        <mat-card class="chart-mae">
+          <mat-card-header>
+            <mat-card-title>MAE global</mat-card-title>
+            <mat-card-subtitle>Módulos Apagados Equivalentes por año</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <apx-chart
+              id="mae-chart"
+              [series]="chartOptionsMAE.series"
+              [chart]="chartOptionsMAE.chart"
+              [xaxis]="chartOptionsMAE.xaxis"
+              [stroke]="chartOptionsMAE.stroke"
+              [colors]="chartOptionsMAE.colors"
+              [dataLabels]="chartOptionsMAE.dataLabels"
+              [legend]="chartOptionsMAE.legend"
+              [markers]="chartOptionsMAE.markers"
+              [grid]="chartOptionsMAE.grid"
+              [yaxis]="chartOptionsMAE.yaxis"
+              [title]="chartOptionsMAE.title"
+              [annotations]="chartOptionsMAE.annotations"
+            ></apx-chart>
+          </mat-card-content>
+        </mat-card>
 
-      <app-chart-numsyperd></app-chart-numsyperd>
+        <mat-card class="chart-mae">
+          <mat-card-header>
+            <mat-card-title>MAE por zonas</mat-card-title>
+            <mat-card-subtitle>Para visualizar dónde están los problemas de rendimiento</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <app-chart-anomalias-zonas></app-chart-anomalias-zonas>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div class="columna">
+        <mat-card class="chart-mae">
+          <mat-card-header>
+            <mat-card-title>MAE por tipo de anomalía</mat-card-title>
+            <mat-card-subtitle
+              >Encuentra la relación entre el tipo de anomalía y las pérdidas que provoca</mat-card-subtitle
+            >
+          </mat-card-header>
+          <mat-card-content>
+            <app-chart-numsyperd></app-chart-numsyperd>
+          </mat-card-content>
+        </mat-card>
+      </div>
     </div>
   </mat-tab>
-  <mat-tab label="Células calientes"></mat-tab>
-  <mat-tab label="Avanzado">
+
+  <mat-tab class="mat-tab-stats" label="Células calientes">
+    <app-chart-pct-cels></app-chart-pct-cels>
+    <app-chart-cels-temps></app-chart-cels-temps>
+  </mat-tab>
+  <mat-tab class="mat-tab-stats" label="Avanzado">
     <ng-template matTabContent>
       <app-chart-sankey *ngIf="true"></app-chart-sankey>
       <app-chart-altura></app-chart-altura>

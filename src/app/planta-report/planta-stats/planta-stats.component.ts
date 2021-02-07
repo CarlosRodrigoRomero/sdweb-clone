@@ -52,7 +52,8 @@ export class PlantaStatsComponent implements OnInit {
         },
       ],
       chart: {
-        height: 350,
+        height: 240,
+        width: '100%',
         type: 'line',
         dropShadow: {
           enabled: true,
@@ -85,10 +86,10 @@ export class PlantaStatsComponent implements OnInit {
       stroke: {
         // curve: 'smooth',
       },
-      title: {
-        text: 'Evolución MAE',
-        align: 'left',
-      },
+      // title: {
+      //   text: 'Evolución MAE',
+      //   align: 'left',
+      // },
       grid: {
         borderColor: '#e7e7e7',
         row: {
