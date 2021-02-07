@@ -40,6 +40,13 @@
 }
 .grupo2 .subtitulo {
   font-weight: 300;
+  font-size: 1.1rem;
+}
+.grupo2 mat-icon {
+  font-size: 1.5rem;
+}
+.grupo2 .elemento {
+  margin-left: 1rem;
 }
 
 .spacer {

@@ -17,24 +17,24 @@
   </div>
   <!-- <span class="spacer"></span> -->
   <div class="grupo grupo2">
-    <div class="potencia">
+    <div class="elemento">
       <mat-icon color="secondary">today</mat-icon>
       <h5 class="subtitulo">{{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}</h5>
     </div>
-    <div class="potencia">
+    <div class="elemento">
       <mat-icon color="secondary">wb_sunny</mat-icon>
       <h5 class="subtitulo">{{ informe.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></h5>
     </div>
-    <div class="potencia">
+    <div class="elemento">
       <mat-icon color="secondary">cloud_queue</mat-icon>
       <h5 class="subtitulo">{{ informe.nubosidad | number: '1.0-0' }}/8 octavas</h5>
     </div>
-    <div class="potencia">
+    <div class="elemento">
       <mat-icon color="secondary">window</mat-icon>
       <h5 class="subtitulo">{{ informe.gsd | number: '1.0-0' }} &plusmn; 0.5 cm/pixel</h5>
       <!-- <h5></h5> -->
     </div>
-    <div class="potencia">
+    <div class="elemento">
       <mat-icon color="secondary">east</mat-icon>
       <h5 class="subtitulo">{{ informe.viento }}</h5>
       <!-- <h5></h5> -->
@@ -42,10 +42,10 @@
   </div>
   <div class="grupo grupo3">
     <span class="spacer2">|</span>
-    <div class="potencia">
+    <div class="elemento">
       <h5 class="subtitulo mae">MAE</h5>
       <h5>{{ informe.mae | number: '1.0-2' }} %</h5>
-      <mat-icon color="primary">arrow_circle_up</mat-icon>
+      <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon>
     </div>
   </div>
 </div>
