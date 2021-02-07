@@ -10,7 +10,7 @@
     >
     <div class="temperature-slider">
       <ngx-slider
-        (valueChange)="onChangeSlider(highTemp, lowTemp)"
+        (valueChange)="onChangeTemperatureSlider(highTemp, lowTemp)"
         [(value)]="lowTemp"
         [(highValue)]="highTemp"
         [options]="optionsTemp"

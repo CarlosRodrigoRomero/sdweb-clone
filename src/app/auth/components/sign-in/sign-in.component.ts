@@ -33,7 +33,7 @@ export class SignInComponent implements OnInit {
       this.authService
         .signIn(value.email, value.password)
         .then(() => {
-          this.router.navigate(['clientes']);
+          this.router.navigate(['clients']);
         })
         .catch((error) => {
           console.log(error);

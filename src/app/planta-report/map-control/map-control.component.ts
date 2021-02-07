@@ -9,6 +9,7 @@ import { MatSliderChange } from '@angular/material/slider';
   styleUrls: ['./map-control.component.scss'],
 })
 export class MapControlComponent implements OnInit {
+  private informesList: string[];
   /* Slider Temperatura */
   lowTemp = 25;
   highTemp = 75;
@@ -42,9 +43,11 @@ export class MapControlComponent implements OnInit {
 
   constructor(private mapControlService: MapControlService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
+  }
 
-  onChangeSlider(highValue: number, lowValue: number) {
+  onChangeTemperatureSlider(highValue: number, lowValue: number) {
     this.mapControlService.sliderMax = highValue;
     this.mapControlService.sliderMin = lowValue;
   }
@@ -53,6 +56,8 @@ export class MapControlComponent implements OnInit {
   }
   onChangeTemporalSlider(value: number) {
     this.mapControlService.sliderTemporal = value;
+    const roundedValue = Math.round(value / 100);
+    this.mapControlService.selectedInformeId = this.informesList[roundedValue];
   }
 
   indexToDate(index: number) {}

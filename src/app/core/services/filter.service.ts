@@ -108,8 +108,6 @@ export class FilterService {
 
   getAllTypeFilters(type: string) {
     this.filtersByType = this.filters.filter((filter) => filter.type === type);
-    console.log(this.filters);
-    console.log(this.filtersByType);
     this.filtersByType$.next(this.filtersByType);
     return this.filtersByType$.asObservable();
   }
@@ -150,7 +148,6 @@ export class FilterService {
   getLabelsTipoPcs(): string[] {
     const indices: number[] = [];
     const labels: string[] = [];
-    /* console.log(this._allFiltrableElements); */
     this._allFiltrableElements.forEach((elem) => {
       if (typeof elem.tipo === 'number') {
         if (!indices.includes(elem.tipo)) {
@@ -160,7 +157,6 @@ export class FilterService {
         indices.push(parseInt(elem.tipo, 0));
       }
     });
-    console.log(indices);
     indices.forEach((i) => labels.push(GLOBAL.labels_tipos[i]));
     // los ordena como estan en GLOBAL
     labels.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));

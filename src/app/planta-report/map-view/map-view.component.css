@@ -31,10 +31,18 @@
 
 app-share-map {
   position: absolute;
-  right: 0px;
   top: 75px;
+  right: 80px;
   margin: 10px;
   z-index: 999;
+}
+app-barra-resumen-planta {
+  position: absolute;
+  top: 75px;
+  left: 80px;
+  margin: 10px;
+  z-index: 999;
+  width: 80%;
 }
 
 .left-sidenav {
@@ -65,6 +73,7 @@ app-share-map {
   margin-right: 10px;
   margin-bottom: 35px;
   border-radius: 4px;
+  width: 1300px;
 }
 
 .btn-right {
