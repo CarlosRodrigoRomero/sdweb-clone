@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 
 import { ApexAxisChartSeries, ApexTitleSubtitle, ApexDataLabels, ApexChart, ChartComponent } from 'ng-apexcharts';
+import { GLOBAL } from '../../../core/services/global';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -72,7 +73,7 @@ export class ChartAlturaComponent {
       dataLabels: {
         enabled: false,
       },
-      colors: ['#FB0000'],
+      colors: [GLOBAL.gris],
       title: {
         text: '# anomalías por altura',
       },

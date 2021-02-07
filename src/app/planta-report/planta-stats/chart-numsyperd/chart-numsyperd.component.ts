@@ -307,7 +307,7 @@ export class ChartNumsyperdComponent implements OnInit {
         // height: 160,
       },
 
-      colors: ['#999999'],
+      colors: [GLOBAL.gris],
       yaxis: {
         max: (v) => {
           return Math.round(1.1 * v);

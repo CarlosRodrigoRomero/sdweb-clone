@@ -48,18 +48,18 @@ export class ChartSankeyComponent implements AfterViewInit {
     //   'Nuevas',
     // ];
     const colors_nodes = [
-      GLOBAL.colores_tiopos_hex[8], // 'Célula caliente',
-      GLOBAL.colores_tiopos_hex[8], // 'Célula caliente.',
-      GLOBAL.colores_tiopos_hex[9], // 'Varias células calientes.',
-      GLOBAL.colores_tiopos_hex[17], // 'String',
-      GLOBAL.colores_tiopos_hex[9], // 'Varias células calientes',
-      GLOBAL.colores_tiopos_hex[3], // 'Substring en CA.',
-      GLOBAL.colores_tiopos_hex[3], // 'Substring en CA',
-      GLOBAL.colores_tiopos_hex[10], // '2x Substring en CA.',
+      GLOBAL.colores_tipos_hex[8], // 'Célula caliente',
+      GLOBAL.colores_tipos_hex[8], // 'Célula caliente.',
+      GLOBAL.colores_tipos_hex[9], // 'Varias células calientes.',
+      GLOBAL.colores_tipos_hex[17], // 'String',
+      GLOBAL.colores_tipos_hex[9], // 'Varias células calientes',
+      GLOBAL.colores_tipos_hex[3], // 'Substring en CA.',
+      GLOBAL.colores_tipos_hex[3], // 'Substring en CA',
+      GLOBAL.colores_tipos_hex[10], // '2x Substring en CA.',
       '#fff', // 'Nuevas',
       '#fff', // 'Unknown',
     ];
-    const colors = [
+    const colors_link = [
       '#bfbfbf', // 'Célula caliente',
       '#bfbfbf', // 'Célula caliente.',
       '#bfbfbf', // 'Varias células calientes.',
@@ -89,7 +89,7 @@ export class ChartSankeyComponent implements AfterViewInit {
             // stroke: 'black', // Color of the link border.
             // strokeWidth: 1, // Thickness of the link border (default 0).
           },
-          colors: colors,
+          colors: colors_nodes,
           colorMode: 'gradient',
         },
       },

@@ -78,7 +78,7 @@ export class PlantaStatsComponent implements OnInit {
           },
         },
       },
-      colors: ['#77B6EA', GLOBAL.colores_mae[0]],
+      colors: ['#77B6EA', '#999999'],
       dataLabels: {
         enabled: true,
       },
@@ -100,7 +100,7 @@ export class PlantaStatsComponent implements OnInit {
         size: 1,
       },
       xaxis: {
-        categories: ['Jul 2019', 'Ago 2020'],
+        categories: ['Jul 2019', 'Jun 2020'],
         // title: {
         //   text: 'Año',
         // },
