@@ -191,29 +191,29 @@ export class MapViewComponent implements OnInit {
     const layers = [osmLayer, this.aerialLayer].concat(this.thermalLayers);
 
     // Escuchar el postrender
-    this.thermalLayers[1].on('postrender', (event) => {
-      if (this.anomaliaSeleccionada) {
-        const coords = this.anomaliaSeleccionada.featureCoords;
-        var pixel = getRenderPixel(event, coords[0]);
+    // this.thermalLayers[1].on('postrender', (event) => {
+    //   if (this.anomaliaSeleccionada) {
+    //     const coords = this.anomaliaSeleccionada.featureCoords;
+    //     var pixel = getRenderPixel(event, coords[0]);
 
-        var context = event.context;
-        var centerX = coords[0][0];
-        var centerY = coords[0][1];
-        const sx = this._distance(coords[0], coords[1]);
-        const sy = this._distance(coords[2], coords[1]);
-        const tiles = event.target.renderer_.layer_.renderer_.renderedTiles;
+    //     var context = event.context;
+    //     var centerX = coords[0][0];
+    //     var centerY = coords[0][1];
+    //     const sx = this._distance(coords[0], coords[1]);
+    //     const sy = this._distance(coords[2], coords[1]);
+    //     const tiles = event.target.renderer_.layer_.renderer_.renderedTiles;
 
-        const canvas = event.context.canvas;
-        // tiles.forEach((tile) => {
-        //   if (tile.lastCanvas == canvas) {
-        //     console.log('tile', tile);
-        //   }
-        // });
+    //     const canvas = event.context.canvas;
+    //     // tiles.forEach((tile) => {
+    //     //   if (tile.lastCanvas == canvas) {
+    //     //     console.log('tile', tile);
+    //     //   }
+    //     // });
 
-        // var sourceData = context.getImageData(centerX, centerY, sx, sy).data;
-        // const;
-      }
-    });
+    //     // var sourceData = context.getImageData(centerX, centerY, sx, sy).data;
+    //     // const;
+    //   }
+    // });
 
     // get the pixel position with every move
     // var container = document.getElementById('map');
@@ -302,15 +302,33 @@ export class MapViewComponent implements OnInit {
         tl.getSource().changed();
       });
     });
+    // this.thermalLayers.forEach((layer) => {
+    //   layer.setOpacity(0);
+    // });
+    // this.anomaliaLayers.forEach((layer) => {
+    //   layer.setOpacity(0);
+    // });
     this.mapControlService.sliderThermalOpacitySource.subscribe((v) => {
       this.thermalLayers.forEach((layer) => {
+        if (layer.getProperties().informeId == this.selectedInformeId) {
+          layer.setOpacity(v / 100);
+        } else {
+          layer.setOpacity(0);
+        }
         // TODO
         // const val = v/100;
 
         // const dif = layer.getOpacity()-v/100
-        layer.setOpacity(v / 100);
+      });
+      this.anomaliaLayers.forEach((layer) => {
+        if (layer.getProperties().informeId == this.selectedInformeId) {
+          layer.setOpacity(v / 100);
+        } else {
+          layer.setOpacity(0);
+        }
       });
     });
+
     this.mapControlService.sliderTemporalSource.subscribe((v) => {
       this.thermalLayers[1].setOpacity(v / 100); // 2020
       this.anomaliaLayers[1].setOpacity(v / 100);
