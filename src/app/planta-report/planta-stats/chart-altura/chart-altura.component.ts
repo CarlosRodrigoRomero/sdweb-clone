@@ -24,45 +24,45 @@ export class ChartAlturaComponent {
       series: [
         {
           name: 'A',
-          data: this.generateData(1, {
-            min: 0,
-            max: 50,
-          }),
+          data: [
+            { x: 'Jul 2019', y: 35 },
+            { x: 'Jun 2020', y: 25 },
+          ],
         },
         {
           name: 'B',
-          data: this.generateData(1, {
-            min: 0,
-            max: 50,
-          }),
+          data: [
+            { x: 'Jul 2019', y: 20 },
+            { x: 'Jun 2020', y: 17 },
+          ],
         },
         {
           name: 'C',
-          data: this.generateData(1, {
-            min: 0,
-            max: 50,
-          }),
+          data: [
+            { x: 'Jul 2019', y: 20 },
+            { x: 'Jun 2020', y: 15 },
+          ],
         },
         {
           name: 'D',
-          data: this.generateData(1, {
-            min: 0,
-            max: 50,
-          }),
+          data: [
+            { x: 'Jul 2019', y: 15 },
+            { x: 'Jun 2020', y: 25 },
+          ],
         },
         {
           name: 'E',
-          data: this.generateData(1, {
-            min: 0,
-            max: 50,
-          }),
+          data: [
+            { x: 'Jul 2019', y: 18 },
+            { x: 'Jun 2020', y: 20 },
+          ],
         },
         {
           name: 'F',
-          data: this.generateData(1, {
-            min: 0,
-            max: 50,
-          }),
+          data: [
+            { x: 'Jul 2019', y: 36 },
+            { x: 'Jun 2020', y: 18 },
+          ],
         },
       ],
       chart: {

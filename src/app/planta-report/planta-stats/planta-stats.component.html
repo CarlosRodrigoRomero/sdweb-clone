@@ -52,14 +52,68 @@
     </div>
   </mat-tab>
 
-  <mat-tab class="mat-tab-stats" label="Células calientes">
-    <app-chart-pct-cels></app-chart-pct-cels>
-    <app-chart-cels-temps></app-chart-cels-temps>
+  <mat-tab class="mat-tab-stats" label="Células calientes (CC)">
+    <div class="fila">
+      <div class="columna columna-izq">
+        <mat-card class="chart-mae">
+          <mat-card-header>
+            <mat-card-title>Módulos con células calientes</mat-card-title>
+            <mat-card-subtitle>% de módulos con CC y gradiente medio (ºC) </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <app-chart-pct-cels></app-chart-pct-cels>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div class="columna columna-drcha">
+        <mat-card class="chart-mae">
+          <mat-card-header>
+            <mat-card-title>Módulos con cel. calientes por gradiente</mat-card-title>
+            <mat-card-subtitle>Clasificación de los módulos con céls calientes por gradiente</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <app-chart-cels-temps></app-chart-cels-temps>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="chart-mae">
+          <mat-card-header>
+            <mat-card-title>Céls. calientes por zonas</mat-card-title>
+            <mat-card-subtitle>Para visualizar dónde se generan las céls. calientes</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <app-chart-cels-por-zonas></app-chart-cels-por-zonas>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
   </mat-tab>
   <mat-tab class="mat-tab-stats" label="Avanzado">
     <ng-template matTabContent>
-      <app-chart-sankey *ngIf="true"></app-chart-sankey>
-      <app-chart-altura></app-chart-altura>
+      <div class="fila-avanzado">
+        <mat-card class="chart-sankey">
+          <mat-card-header>
+            <mat-card-title>Evolución de las anomalías con el tiempo</mat-card-title>
+            <mat-card-subtitle>Ayuda a responder al qué ocurre con las anomalías y al cuándo ocurren</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <app-chart-sankey></app-chart-sankey>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="chart-altura">
+          <mat-card-header>
+            <mat-card-title>Céls. calientes por altura</mat-card-title>
+            <mat-card-subtitle
+              >Para detectar posibles problemas relacionados con vegetación y desposiciones de
+              pájaros</mat-card-subtitle
+            >
+          </mat-card-header>
+          <mat-card-content>
+            <app-chart-altura></app-chart-altura>
+          </mat-card-content>
+        </mat-card>
+      </div>
     </ng-template>
   </mat-tab>
 </mat-tab-group>

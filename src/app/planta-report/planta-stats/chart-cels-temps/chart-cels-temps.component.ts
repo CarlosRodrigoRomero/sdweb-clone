@@ -75,17 +75,17 @@ export class ChartCelsTempsComponent implements OnInit {
           ]);
           let sum = 0;
           let res = 0;
-          pcs.forEach((pc) => {
-            if (!isNaN(pc.gradienteNormalizado)) {
-              sum += pc.gradienteNormalizado; //don't forget to add the base
-            } else {
-              res += 1;
-            }
-          });
-          dataGrads.push(Math.round((sum / (pcs.length - res)) * 10) / 10);
+          // pcs.forEach((pc) => {
+          //   if (!isNaN(pc.gradienteNormalizado)) {
+          //     sum += pc.gradienteNormalizado; //don't forget to add the base
+          //   } else {
+          //     res += 1;
+          //   }
+          // });
+          // dataGrads.push(Math.round((sum / (pcs.length - res)) * 10) / 10);
         });
         this._initChartData(data);
-        console.log('dataGrad', dataGrads);
+        // console.log('dataGrad', dataGrads);
       });
   }
 
@@ -103,8 +103,9 @@ export class ChartCelsTempsComponent implements OnInit {
       ],
       chart: {
         type: 'bar',
-        height: 350,
+        height: 250,
       },
+      legend: { show: false },
       colors: [GLOBAL.gris, GLOBAL.gris],
       plotOptions: {
         bar: {

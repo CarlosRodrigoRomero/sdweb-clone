@@ -3,37 +3,84 @@ import { ActivatedRoute } from '@angular/router';
 import { AnomaliaService } from '@core/services/anomalia.service';
 
 import {
-  ChartComponent,
   ApexAxisChartSeries,
-  ApexChart,
-  ApexXAxis,
+  ApexTitleSubtitle,
   ApexDataLabels,
-  ApexYAxis,
-  ApexLegend,
   ApexFill,
+  ApexMarkers,
+  ApexYAxis,
+  ApexXAxis,
+  ApexTooltip,
+  ApexStroke,
 } from 'ng-apexcharts';
-import { take } from 'rxjs/operators';
-import { Anomalia } from '../../../core/models/anomalia';
-import { GLOBAL } from '../../../core/services/global';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
-  chart: ApexChart;
-  xaxis: ApexXAxis;
+  chart: any; //ApexChart;
   dataLabels: ApexDataLabels;
-  yaxis: ApexYAxis;
-  colors: string[];
-  legend: ApexLegend;
+  markers: ApexMarkers;
+  title: ApexTitleSubtitle;
   fill: ApexFill;
+  yaxis: ApexYAxis;
+  xaxis: ApexXAxis;
+  tooltip: ApexTooltip;
+  stroke: ApexStroke;
+  grid: any; //ApexGrid;
+  colors: any;
+  toolbar: any;
+  annotations: any;
 };
+import { take } from 'rxjs/operators';
+import { Anomalia } from '../../../core/models/anomalia';
+
 @Component({
   selector: 'app-chart-pct-cels',
   templateUrl: './chart-pct-cels.component.html',
   styleUrls: ['./chart-pct-cels.component.css'],
 })
 export class ChartPctCelsComponent implements OnInit {
-  @ViewChild('chart') chart: ChartComponent;
-  public chartOptions: Partial<ChartOptions>;
+  public chart1options: Partial<ChartOptions>;
+  public chart2options: Partial<ChartOptions>;
+  public chart3options: Partial<ChartOptions>;
+  public commonOptions: Partial<ChartOptions> = {
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      curve: 'straight',
+    },
+
+    markers: {
+      size: 6,
+      hover: {
+        size: 10,
+      },
+    },
+    tooltip: {
+      followCursor: false,
+      theme: 'dark',
+      x: {
+        show: false,
+      },
+      marker: {
+        show: false,
+      },
+      y: {
+        title: {
+          formatter: function () {
+            return '';
+          },
+        },
+      },
+    },
+    grid: {
+      clipMarkers: false,
+    },
+    xaxis: {
+      type: 'category',
+      categories: ['Jul 2019', 'Jun 2020'],
+    },
+  };
   public plantaId: string;
   informesList: string[];
   allAnomalias: Anomalia[];
@@ -63,48 +110,170 @@ export class ChartPctCelsComponent implements OnInit {
   }
 
   private _iniitChartData(data): void {
-    this.chartOptions = {
+    this.chart1options = {
       series: [
         {
-          name: 'Central',
-          data: data,
+          name: '% celulas calientes',
+          data,
         },
       ],
       chart: {
+        id: 'fb',
+        group: 'social',
         type: 'area',
-        height: 350,
-        stacked: false,
-        events: {
-          selection: function (chart, e) {
-            console.log(new Date(e.xaxis.min));
+        width: '100%',
+        height: 160,
+        toolbar: {
+          show: true,
+          offsetX: 0,
+          offsetY: 0,
+          tools: {
+            download: true,
+            selection: false,
+            zoom: false,
+            zoomin: false,
+            zoomout: false,
+            pan: false,
+            reset: false,
+            customIcons: [],
           },
         },
       },
-      colors: [GLOBAL.gris],
-      dataLabels: {
-        enabled: false,
-      },
-      fill: {
-        type: 'gradient',
-        gradient: {
-          opacityFrom: 0.6,
-          opacityTo: 0.8,
-        },
-      },
-      legend: {
-        show: false,
-        position: 'top',
-        horizontalAlign: 'left',
-      },
-      xaxis: {
-        type: 'category',
-        categories: ['Jul 2019', 'Jun 2020'],
-      },
+      title: {},
+      colors: ['#008FFB'],
       yaxis: {
         min: 0,
         max: 5,
+        tickAmount: 2,
+        labels: {
+          minWidth: 40,
+          formatter: (value) => {
+            return value + '%';
+          },
+        },
+      },
+
+      tooltip: {
+        followCursor: false,
+        theme: 'dark',
+        x: {
+          show: false,
+        },
+        marker: {
+          show: false,
+        },
+        y: {
+          title: {
+            formatter: (s) => {
+              return ':' + s;
+            },
+          },
+        },
+      },
+      annotations: {
+        yaxis: [
+          {
+            y: 1.8,
+            borderColor: '#5b5b5c',
+            borderWidth: 2,
+            strokeDashArray: 10,
+
+            label: {
+              offsetX: -100,
+              borderColor: '#5b5b5c',
+              style: {
+                fontSize: '12px',
+                color: '#fff',
+                background: '#5b5b5c',
+              },
+              text: '% Céls. medio portfolio',
+            },
+          },
+        ],
       },
     };
+
+    this.chart2options = {
+      series: [
+        {
+          name: 'gradiente medio',
+          data: [15.4, 20],
+        },
+      ],
+      chart: {
+        id: 'tw',
+        group: 'social',
+        type: 'area',
+        width: '100%',
+        height: 160,
+        toolbar: {
+          show: true,
+          offsetX: 0,
+          offsetY: 0,
+          tools: {
+            download: true,
+            selection: false,
+            zoom: false,
+            zoomin: false,
+            zoomout: false,
+            pan: false,
+            reset: false,
+            customIcons: [],
+          },
+        },
+      },
+      colors: ['#546E7A'],
+      yaxis: {
+        min: 0,
+        max: 40,
+        tickAmount: 2,
+        labels: {
+          minWidth: 40,
+          formatter: (value) => {
+            return value + ' ºC';
+          },
+        },
+      },
+      tooltip: {
+        followCursor: false,
+        theme: 'dark',
+        x: {
+          show: false,
+        },
+        marker: {
+          show: false,
+        },
+        y: {
+          title: {
+            formatter: (s) => {
+              return ': ' + s;
+            },
+          },
+        },
+      },
+      annotations: {
+        yaxis: [
+          {
+            y: 12.1,
+            borderColor: '#5b5b5c',
+            borderWidth: 2,
+            strokeDashArray: 10,
+
+            label: {
+              offsetX: -100,
+              borderColor: '#5b5b5c',
+              style: {
+                fontSize: '12px',
+                color: '#fff',
+                background: '#5b5b5c',
+              },
+              text: 'DT medio portfolio (ºC)',
+            },
+          },
+        ],
+      },
+    };
+
     this.dataLoaded = true;
   }
 }
