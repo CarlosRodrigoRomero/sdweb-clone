@@ -18,6 +18,7 @@ import { ChartAnomaliasZonasComponent } from './planta-stats/chart-anomalias-zon
 import { ChartPctCelsComponent } from './planta-stats/chart-pct-cels/chart-pct-cels.component';
 import { ChartCelsTempsComponent } from './planta-stats/chart-cels-temps/chart-cels-temps.component';
 import { ChartCelsPorZonasComponent } from './planta-stats/chart-cels-por-zonas/chart-cels-por-zonas.component';
+import { DownloadReportComponent } from './download-report/download-report.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { ChartCelsPorZonasComponent } from './planta-stats/chart-cels-por-zonas/
     ChartPctCelsComponent,
     ChartCelsTempsComponent,
     ChartCelsPorZonasComponent,
+    DownloadReportComponent,
   ],
   imports: [SharedModule, NgxSliderModule, PlantaReportRoutingModule, NgApexchartsModule, InformeFiltersModule],
 })
