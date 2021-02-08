@@ -573,6 +573,8 @@ export class MapViewComponent implements OnInit {
 
   mostrarTodasAnomalias(informeId: string) {
     this.filterService.filteredElements$.subscribe((anomalias) => {
+      console.log(anomalias);
+
       // Dibujar anomalias
       this.dibujarAnomalias(anomalias as Anomalia[]);
       this.listaAnomalias = anomalias as Anomalia[];

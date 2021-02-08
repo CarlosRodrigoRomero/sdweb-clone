@@ -49,6 +49,7 @@ export class FilterService {
         this.initialized$.next(true);
       });
     }
+
     return this.initialized$;
   }
 
@@ -59,6 +60,10 @@ export class FilterService {
       this.filters = this.filters.filter((f) => f.type !== filter.type);
       // añadimos el nuevo filtro
       this.filters.push(filter);
+
+      if (filter.type !== 'tipo') {
+        this.updateNumberOfTipoPc();
+      }
     } else {
       // si es del tipo 'Add' se añade al array
       this.filters.push(filter);
@@ -69,21 +74,21 @@ export class FilterService {
   }
 
   private applyFilters() {
-    const everyFilterFilteredPcs: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
+    const everyFilterFiltrableElements: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
 
     // comprobamos si hay filtros de tipo 'Add'
     if (this.filters.filter((filter) => this.typeAddFilters.includes(filter.type)).length > 0) {
       // separamos los pcs por tipo de filtro
       this.typeAddFilters.forEach((type) => {
-        const newFilteredPcs: FiltrableInterface[] = [];
+        const newFiltrableElements: FiltrableInterface[] = [];
         if (this.filters.filter((filter) => filter.type === type).length > 0) {
           this.filters
             .filter((filter) => filter.type === type)
             .forEach((filter) => {
-              filter.applyFilter(this._allFiltrableElements).forEach((pc) => newFilteredPcs.push(pc));
+              filter.applyFilter(this._allFiltrableElements).forEach((pc) => newFiltrableElements.push(pc));
             });
           // añadimos un array de cada tipo
-          everyFilterFilteredPcs.push(newFilteredPcs);
+          everyFilterFiltrableElements.push(newFiltrableElements);
         }
       });
     }
@@ -92,25 +97,23 @@ export class FilterService {
     this.filters
       .filter((filter) => !this.typeAddFilters.includes(filter.type))
       .forEach((filter) => {
-        const newFilteredPcs = filter.applyFilter(this._allFiltrableElements);
-        everyFilterFilteredPcs.push(newFilteredPcs);
+        const newFiltrableElements = filter.applyFilter(this._allFiltrableElements);
+        everyFilterFiltrableElements.push(newFiltrableElements);
       });
 
     // calculamos la interseccion de los array de los diferentes tipos
-    if (everyFilterFilteredPcs.length > 0) {
-      this.filteredElements = everyFilterFilteredPcs.reduce((anterior, actual) =>
+    if (everyFilterFiltrableElements.length > 0) {
+      this.filteredElements = everyFilterFiltrableElements.reduce((anterior, actual) =>
         anterior.filter((pc) => actual.includes(pc))
       );
     }
 
     // comprobamos que hay algun filtro activo
-    if (everyFilterFilteredPcs.length === 0) {
+    if (everyFilterFiltrableElements.length === 0) {
       this.filteredElements = this._allFiltrableElements;
     }
 
     this.filteredElements$.next(this.filteredElements);
-
-    this.updateNumberOfTipoPc();
   }
 
   getAllTypeFilters(type: string) {
