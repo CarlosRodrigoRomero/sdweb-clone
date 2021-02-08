@@ -163,4 +163,8 @@ export class FilterService {
 
     return labels;
   }
+
+  getNumberOfTipoPc(label: string): number {
+    return this._allFiltrableElements.filter((elem) => elem.tipo == GLOBAL.labels_tipos.indexOf(label)).length;
+  }
 }

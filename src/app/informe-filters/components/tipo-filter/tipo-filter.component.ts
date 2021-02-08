@@ -10,6 +10,7 @@ import { AnomaliaService } from '@core/services/anomalia.service';
 
 interface TipoPc {
   label?: string;
+  count?: number;
   completed?: boolean;
   tiposPcs?: TipoPc[];
 }
@@ -35,6 +36,8 @@ export class TipoFilterComponent implements OnInit {
         completed: false,
       })
     );
+
+    this.tiposPcs.forEach((pc) => (pc.count = this.filterService.getNumberOfTipoPc(pc.label)));
 
     this.tiposTask = {
       tiposPcs: this.tiposPcs,

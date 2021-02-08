@@ -10,3 +10,8 @@ h5 {
 li {
   list-style-type: none;
 }
+
+.count {
+  position: absolute;
+  right: 25px;
+}
