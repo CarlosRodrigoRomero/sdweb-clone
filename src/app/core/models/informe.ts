@@ -25,4 +25,5 @@ export interface InformeInterface {
   humedadRelativa?: number;
   jpgVisual?: boolean;
   carpetaJpgGray?: string;
+  pc_pct?: number;
 }

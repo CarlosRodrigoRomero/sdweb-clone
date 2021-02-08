@@ -57,3 +57,12 @@
   color: grey;
   font-weight: 500;
 }
+.grupo3 .elemento {
+  margin-left: 1.3rem;
+}
+.grupo3 .subtitulo {
+  margin-right: 0.3rem;
+}
+.success {
+  color: green;
+}
