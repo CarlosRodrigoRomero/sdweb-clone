@@ -108,7 +108,7 @@ export class MapViewComponent implements OnInit {
           // Crear capa térmica
           const tl = thermalLayers.filter((item) => item.informeId == informe.id);
 
-          //crear capa de las anomalias
+          // crear capa de las anomalias
           // const al = this.anomaliaLayers.push(al);
           // TODO: Comprobar que existe...
           if (tl.length > 0) {
@@ -150,6 +150,7 @@ export class MapViewComponent implements OnInit {
 
     return tl;
   }
+
   private _createAnomaliaLayer(informeId: string): VectorLayer {
     const vl = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
@@ -168,6 +169,7 @@ export class MapViewComponent implements OnInit {
     this.mapControlService.sliderMin = lowValue;
     // this.mapControlService.sliderMin = this.value;
   }
+
   initMap() {
     const satellite = new XYZ({
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -422,6 +424,7 @@ export class MapViewComponent implements OnInit {
   private transform(extent) {
     return transformExtent(extent, 'EPSG:4326', 'EPSG:3857');
   }
+
   addLocationAreas() {
     const styles = {
       LineString: new Style({
@@ -467,6 +470,7 @@ export class MapViewComponent implements OnInit {
       // this._prueba();
     });
   }
+
   private locAreasToGeoJSON(locAreas: LocationAreaInterface[]) {
     let listOfFeatures = [];
     locAreas.forEach((locArea) => {
@@ -501,6 +505,7 @@ export class MapViewComponent implements OnInit {
 
     return geojsonObject;
   }
+
   permitirCrearAnomalias() {
     const draw = new Draw({
       source: this.anomaliasVectorSource,
@@ -513,6 +518,7 @@ export class MapViewComponent implements OnInit {
       this.addAnomaliaToDb(event.feature);
     });
   }
+
   private addAnomaliaToDb(feature: Feature) {
     const geometry = feature.getGeometry() as SimpleGeometry;
 
@@ -539,6 +545,7 @@ export class MapViewComponent implements OnInit {
 
     return GLOBAL.colores_tipos[tipo];
   }
+
   private getStyleAnomaliasMapa(selected = false) {
     return (feature) => {
       if (feature != undefined && feature.getProperties().hasOwnProperty('properties')) {
@@ -563,6 +570,7 @@ export class MapViewComponent implements OnInit {
       }
     };
   }
+
   mostrarTodasAnomalias(informeId: string) {
     this.filterService.filteredElements$.subscribe((anomalias) => {
       // Dibujar anomalias
@@ -570,6 +578,7 @@ export class MapViewComponent implements OnInit {
       this.listaAnomalias = anomalias as Anomalia[];
     });
   }
+
   dibujarAnomalias(anomalias: Anomalia[]) {
     // Para cada vector layer (que corresponde a un informe)
 
@@ -603,6 +612,7 @@ export class MapViewComponent implements OnInit {
 
     this._addSelectInteraction();
   }
+
   private _addSelectInteraction() {
     const select = new Select({
       style: this.getStyleAnomaliasMapa(true),

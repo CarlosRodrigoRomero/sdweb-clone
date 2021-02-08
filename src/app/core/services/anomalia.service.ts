@@ -32,6 +32,7 @@ export class AnomaliaService {
     const anomaliaObj = this._prepararParaDb(anomalia);
     return this.afs.collection('anomalias').doc(id).set(anomaliaObj);
   }
+
   getAnomaliasPlanta$(plantaId: string): Observable<Anomalia[]> {
     const query$ = this.informeService.getInformesDePlanta(plantaId).pipe(
       take(1),
@@ -70,6 +71,7 @@ export class AnomaliaService {
       );
     return query$;
   }
+  
   async updateAnomalia(anomalia: Anomalia) {
     const anomaliaObj = this._prepararParaDb(anomalia);
     const anomaliaDoc = this.afs.doc('anomalias/' + anomalia.id);

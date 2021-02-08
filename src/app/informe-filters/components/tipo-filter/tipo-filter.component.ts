@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { Observable } from 'rxjs';
+
 import { MatCheckboxChange } from '@angular/material/checkbox';
 
 import { GLOBAL } from '@core/services/global';
@@ -29,15 +31,18 @@ export class TipoFilterComponent implements OnInit {
   constructor(private anomaliaService: AnomaliaService, private filterService: FilterService) {}
 
   ngOnInit(): void {
-    /* console.log(this.filterService.getLabelsTipoPcs()); */
-    this.filterService.getLabelsTipoPcs().forEach((label) =>
+    this.filterService.getLabelsTipoPcs();
+
+    this.filterService.labelsTipoPcs.forEach((label) =>
       this.tiposPcs.push({
         label,
         completed: false,
       })
     );
 
-    this.tiposPcs.forEach((pc) => (pc.count = this.filterService.getNumberOfTipoPc(pc.label)));
+    this.filterService.countTipoPcs$.subscribe((counts) =>
+      counts.forEach((count, i) => (this.tiposPcs[i].count = count))
+    );
 
     this.tiposTask = {
       tiposPcs: this.tiposPcs,

@@ -22,6 +22,9 @@ export class FilterService {
   public _allFiltrableElements: FiltrableInterface[];
   private _initialized = false;
   public initialized$ = new BehaviorSubject<boolean>(this._initialized);
+  public labelsTipoPcs: string[] = [];
+  private countTipoPcs: number[] = [];
+  public countTipoPcs$ = new BehaviorSubject<number[]>(this.countTipoPcs);
 
   constructor(private anomaliaService: AnomaliaService) {
     // this.anomaliaService
@@ -31,15 +34,16 @@ export class FilterService {
     //     this.filteredElements$.next(anomalias);
     //   });
   }
-  initFilterService(id: string, initType: 'informe' | 'planta' = 'informe') {
+
+  initFilterService(plantaId: string, initType: 'informe' | 'planta' = 'informe') {
     if (initType === 'planta') {
-      this.anomaliaService.getAnomaliasPlanta$(id).subscribe((array) => {
+      this.anomaliaService.getAnomaliasPlanta$(plantaId).subscribe((array) => {
         this._allFiltrableElements = array;
         this.filteredElements$.next(array);
         this.initialized$.next(true);
       });
     } else {
-      this.anomaliaService.getAnomalias$(id).subscribe((array) => {
+      this.anomaliaService.getAnomalias$(plantaId).subscribe((array) => {
         this._allFiltrableElements = array;
         this.filteredElements$.next(array);
         this.initialized$.next(true);
@@ -47,6 +51,7 @@ export class FilterService {
     }
     return this.initialized$;
   }
+
   addFilter(filter: FilterInterface) {
     // comprobamos que no es de tipo 'Add'
     if (!this.typeAddFilters.includes(filter.type)) {
@@ -104,6 +109,8 @@ export class FilterService {
     }
 
     this.filteredElements$.next(this.filteredElements);
+
+    this.updateNumberOfTipoPc();
   }
 
   getAllTypeFilters(type: string) {
@@ -145,9 +152,8 @@ export class FilterService {
     this.applyFilters();
   }
 
-  getLabelsTipoPcs(): string[] {
+  getLabelsTipoPcs() {
     const indices: number[] = [];
-    const labels: string[] = [];
     this._allFiltrableElements.forEach((elem) => {
       if (typeof elem.tipo === 'number') {
         if (!indices.includes(elem.tipo)) {
@@ -157,14 +163,26 @@ export class FilterService {
         indices.push(parseInt(elem.tipo, 0));
       }
     });
-    indices.forEach((i) => labels.push(GLOBAL.labels_tipos[i]));
+    indices.forEach((i) => this.labelsTipoPcs.push(GLOBAL.labels_tipos[i]));
     // los ordena como estan en GLOBAL
-    labels.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));
+    this.labelsTipoPcs.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));
 
-    return labels;
+    // contamos cuantos pcs hay de cada tipo
+    this.labelsTipoPcs.forEach((label) => this.countTipoPcs.push(this.getNumberOfTipoPc(label)));
+    this.countTipoPcs$.next(this.countTipoPcs);
   }
 
   getNumberOfTipoPc(label: string): number {
     return this._allFiltrableElements.filter((elem) => elem.tipo == GLOBAL.labels_tipos.indexOf(label)).length;
+  }
+
+  updateNumberOfTipoPc() {
+    this.countTipoPcs = [];
+    this.labelsTipoPcs.forEach((label) =>
+      this.countTipoPcs.push(
+        this.filteredElements.filter((elem) => elem.tipo == GLOBAL.labels_tipos.indexOf(label)).length
+      )
+    );
+    this.countTipoPcs$.next(this.countTipoPcs);
   }
 }
