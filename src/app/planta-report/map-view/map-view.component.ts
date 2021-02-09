@@ -36,6 +36,8 @@ import { FilterService } from '../../core/services/filter.service';
 import { getRenderPixel } from 'ol/render';
 import { click } from 'ol/events/condition';
 import { containsCoordinate } from 'ol/extent';
+import CircleStyle from 'ol/style/Circle';
+import { DoubleClickZoom } from 'ol/interaction';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -58,6 +60,8 @@ export class MapViewComponent implements OnInit {
   public listaAnomalias: Anomalia[];
   public sliderYear: number;
   public aerialLayer: TileLayer;
+  private sourceArea: VectorSource;
+  private vectorArea: VectorLayer;
   private extent1: any;
   private thermalLayers: TileLayer[];
   private anomaliaLayers: VectorLayer[];
@@ -190,7 +194,27 @@ export class MapViewComponent implements OnInit {
       // extent: this.extent1,
     });
 
-    const layers = [osmLayer, this.aerialLayer].concat(this.thermalLayers);
+    this.sourceArea = new VectorSource();
+    this.vectorArea = new VectorLayer({
+      source: this.sourceArea,
+      style: new Style({
+        fill: new Fill({
+          color: 'rgba(255, 255, 255, 0.2)',
+        }),
+        stroke: new Stroke({
+          color: '#ffcc33',
+          width: 2,
+        }),
+        image: new CircleStyle({
+          radius: 7,
+          fill: new Fill({
+            color: '#ffcc33',
+          }),
+        }),
+      }),
+    });
+
+    const layers = [osmLayer, this.aerialLayer, this.vectorArea].concat(this.thermalLayers);
 
     // Escuchar el postrender
     // this.thermalLayers[1].on('postrender', (event) => {
@@ -278,8 +302,7 @@ export class MapViewComponent implements OnInit {
     this.map = new Map({
       target: 'map',
       controls: defaultControls({ attribution: false }),
-
-      layers: layers,
+      layers,
       view: new View({
         center: fromLonLat([this.planta.longitud, this.planta.latitud]),
         zoom: 18,
@@ -287,6 +310,7 @@ export class MapViewComponent implements OnInit {
         extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
       }),
     });
+
     this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
     this.addCursorOnHover();
     this.addLocationAreas();
@@ -374,7 +398,7 @@ export class MapViewComponent implements OnInit {
   }
 
   private addOverlayInfoAnomalia() {
-    //Overlay para los detalles de cada anomalia
+    // Overlay para los detalles de cada anomalia
     const element = document.getElementById('popup');
 
     var popup = new Overlay({
@@ -644,5 +668,44 @@ export class MapViewComponent implements OnInit {
         }
       }
     });
+  }
+
+  drawArea() {
+    let startDrawing = true;
+    const draw = new Draw({
+      source: this.sourceArea,
+      type: GeometryType.POLYGON,
+    });
+    this.map.addInteraction(draw);
+
+    draw.on('drawstart', (evt) => {
+      startDrawing = true;
+      console.log('start');
+    });
+
+    draw.on('drawend', (evt) => {
+      startDrawing = false;
+      console.log('end');
+      // desactivamos el dobleclick para que no interfiera al cerrar poligono
+      this.map.getInteractions().forEach((interaction) => {
+        if (interaction instanceof DoubleClickZoom) {
+          this.map.removeInteraction(interaction);
+        }
+      });
+      this.map.removeInteraction(draw);
+    });
+
+    /* this.map.on('dblclick', (evt) => {
+      if (startDrawing) {
+        draw.finishDrawing();
+      }
+    }); */
+
+    /* this.addAreaFilter(); */
+  }
+
+  addAreaFilter() {
+    this.sourceArea.getFeatures().forEach((feature) => console.log(feature.getGeometry()));
+    /* this.filterService.addFilter(); */
   }
 }

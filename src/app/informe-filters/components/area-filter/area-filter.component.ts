@@ -3,6 +3,8 @@ import { LatLngLiteral } from '@agm/core';
 
 import { BehaviorSubject, Observable } from 'rxjs';
 
+import {Draw, Modify, Snap} from 'ol/interaction';
+
 import { FilterService } from '@core/services/filter.service';
 
 import { AreaFilter } from '@core/models/areaFilter';
@@ -21,6 +23,8 @@ export class AreaFilterComponent implements OnInit {
   public map: any;
   public numAreas = 0;
 
+  draw: Draw;
+
   constructor(private filterService: FilterService) {}
 
   ngOnInit(): void {
@@ -35,7 +39,7 @@ export class AreaFilterComponent implements OnInit {
     this.filterService.deleteAllTypeFilters(type);
   }
 
-  initDrawingManager() {
+  /* initDrawingManager() {
     this.numAreas++;
     const options = {
       drawingControl: false,
@@ -85,5 +89,5 @@ export class AreaFilterComponent implements OnInit {
       newPaths.push(path);
     }
     return newPaths;
-  }
+  } */
 }

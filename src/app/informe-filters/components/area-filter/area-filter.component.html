@@ -1,4 +1,5 @@
 <h5>Área</h5>
+<!-- <button mat-raised-button>Crear área</button> -->
 <mat-chip-list>
   <mat-chip *ngFor="let filter of areaFilters$ | async" [removable]="removable" (removed)="deleteFilter(filter)"
     >{{ filter.id }}

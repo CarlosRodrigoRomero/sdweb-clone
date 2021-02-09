@@ -53,8 +53,6 @@ export class FilterService {
       });
     }
 
-    console.log(this._allFiltrableElements);
-
     return this.initialized$;
   }
 
