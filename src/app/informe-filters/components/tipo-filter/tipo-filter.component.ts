@@ -23,7 +23,6 @@ interface TipoPc {
   styleUrls: ['./tipo-filter.component.css'],
 })
 export class TipoFilterComponent implements OnInit {
-  tiposTask: TipoPc;
   tiposPcs: TipoPc[] = [];
   allComplete: boolean;
   filtroTipo: TipoPcFilter;
@@ -31,22 +30,20 @@ export class TipoFilterComponent implements OnInit {
   constructor(private anomaliaService: AnomaliaService, private filterService: FilterService) {}
 
   ngOnInit(): void {
-    this.filterService.getLabelsTipoPcs();
-
-    this.filterService.labelsTipoPcs.forEach((label) =>
-      this.tiposPcs.push({
-        label,
-        completed: false,
-      })
-    );
+    this.filterService.labelsTipoPcs$.subscribe((labels) => {
+      this.tiposPcs = [];
+      labels.forEach((label) =>
+        this.tiposPcs.push({
+          label,
+          count: this.filterService.getNumberOfTipoPc(label),
+          completed: false,
+        })
+      );
+    });
 
     this.filterService.countTipoPcs$.subscribe((counts) =>
       counts.forEach((count, i) => (this.tiposPcs[i].count = count))
     );
-
-    this.tiposTask = {
-      tiposPcs: this.tiposPcs,
-    };
   }
 
   onChangeFiltroTipo(event: MatCheckboxChange) {

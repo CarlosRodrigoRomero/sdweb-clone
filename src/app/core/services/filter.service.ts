@@ -23,6 +23,7 @@ export class FilterService {
   private _initialized = false;
   public initialized$ = new BehaviorSubject<boolean>(this._initialized);
   public labelsTipoPcs: string[] = [];
+  public labelsTipoPcs$ = new BehaviorSubject<string[]>(this.labelsTipoPcs);
   private countTipoPcs: number[] = [];
   public countTipoPcs$ = new BehaviorSubject<number[]>(this.countTipoPcs);
 
@@ -35,20 +36,24 @@ export class FilterService {
     //   });
   }
 
-  initFilterService(plantaId: string, initType: 'informe' | 'planta' = 'informe') {
+  initFilterService(id: string, initType: 'informe' | 'planta' = 'informe') {
     if (initType === 'planta') {
-      this.anomaliaService.getAnomaliasPlanta$(plantaId).subscribe((array) => {
+      this.anomaliaService.getAnomaliasPlanta$(id).subscribe((array) => {
         this._allFiltrableElements = array;
         this.filteredElements$.next(array);
+        this.getLabelFilterTipoPcs();
         this.initialized$.next(true);
       });
     } else {
-      this.anomaliaService.getAnomalias$(plantaId).subscribe((array) => {
+      this.anomaliaService.getAnomalias$(id).subscribe((array) => {
         this._allFiltrableElements = array;
         this.filteredElements$.next(array);
+        this.getLabelFilterTipoPcs();
         this.initialized$.next(true);
       });
     }
+
+    console.log(this._allFiltrableElements);
 
     return this.initialized$;
   }
@@ -135,6 +140,10 @@ export class FilterService {
       this.filters.splice(this.filters.indexOf(filter), 1);
     }
 
+    if (filter.type !== 'tipo') {
+      this.updateNumberOfTipoPc();
+    }
+
     this.filters$.next(this.filters);
 
     this.applyFilters();
@@ -155,7 +164,7 @@ export class FilterService {
     this.applyFilters();
   }
 
-  getLabelsTipoPcs() {
+  getLabelFilterTipoPcs() {
     const indices: number[] = [];
     this._allFiltrableElements.forEach((elem) => {
       if (typeof elem.tipo === 'number') {
@@ -166,13 +175,16 @@ export class FilterService {
         indices.push(parseInt(elem.tipo, 0));
       }
     });
+    this.labelsTipoPcs = [];
     indices.forEach((i) => this.labelsTipoPcs.push(GLOBAL.labels_tipos[i]));
     // los ordena como estan en GLOBAL
     this.labelsTipoPcs.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));
 
+    this.labelsTipoPcs$.next(this.labelsTipoPcs);
+
     // contamos cuantos pcs hay de cada tipo
-    this.labelsTipoPcs.forEach((label) => this.countTipoPcs.push(this.getNumberOfTipoPc(label)));
-    this.countTipoPcs$.next(this.countTipoPcs);
+    /* this.labelsTipoPcs.forEach((label) => this.countTipoPcs.push(this.getNumberOfTipoPc(label)));
+    this.countTipoPcs$.next(this.countTipoPcs); */
   }
 
   getNumberOfTipoPc(label: string): number {

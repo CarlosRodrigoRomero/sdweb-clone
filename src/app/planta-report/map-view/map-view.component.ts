@@ -348,6 +348,9 @@ export class MapViewComponent implements OnInit {
     this.mapControlService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInformeId = informeId;
       this.mostrarTodasAnomalias(this.selectedInformeId);
+
+      // reiniciamos filter service
+      this.filterService.initFilterService(informeId, 'informe');
     });
   }
 
@@ -573,8 +576,6 @@ export class MapViewComponent implements OnInit {
 
   mostrarTodasAnomalias(informeId: string) {
     this.filterService.filteredElements$.subscribe((anomalias) => {
-      console.log(anomalias);
-
       // Dibujar anomalias
       this.dibujarAnomalias(anomalias as Anomalia[]);
       this.listaAnomalias = anomalias as Anomalia[];
