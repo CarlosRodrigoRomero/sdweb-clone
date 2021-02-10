@@ -1,44 +1,51 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+
+import { take } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
+
+import { MatSidenav } from '@angular/material/sidenav';
+
 import Map from 'ol/Map';
-import XYZ from 'ol/source/XYZ';
 import OSM from 'ol/source/OSM';
 import XYZ_mod from '../xyz_mod.js';
 import { fromLonLat, transformExtent } from 'ol/proj.js';
 import View from 'ol/View';
-import { PlantaService } from '../../core/services/planta.service';
-import { PlantaInterface } from '../../core/models/planta';
-import ImageTileMod from '../ImageTileMod.js';
-import { MapControlService } from '../services/map-control.service';
-import { LocationAreaInterface } from '../../core/models/location';
 import GeoJSON from 'ol/format/GeoJSON';
-import { Fill, Stroke, Style, Text } from 'ol/style';
+import { Fill, Icon, RegularShape, Stroke, Style, Text } from 'ol/style';
 import Draw, { createBox, DrawEvent } from 'ol/interaction/Draw';
 import Select from 'ol/interaction/Select';
 import { Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import GeometryType from 'ol/geom/GeometryType';
-import { Anomalia } from '@core/models/anomalia';
 import SimpleGeometry from 'ol/geom/SimpleGeometry';
-import { AnomaliaService } from '../../core/services/anomalia.service';
 import { Feature, Overlay } from 'ol';
 import Polygon from 'ol/geom/Polygon';
 import { defaults as defaultControls } from 'ol/control.js';
 import OverlayPositioning from 'ol/OverlayPositioning';
-import { GLOBAL } from '../../core/services/global';
-import { InformeService } from '../../core/services/informe.service';
-import { take } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
-import { ThermalLayerInterface } from '../../core/models/thermalLayer';
-import { ViewChild } from '@angular/core';
-import { MatSidenav } from '@angular/material/sidenav';
-import { FilterService } from '../../core/services/filter.service';
-import { getRenderPixel } from 'ol/render';
 import { click } from 'ol/events/condition';
 import { containsCoordinate } from 'ol/extent';
 import CircleStyle from 'ol/style/Circle';
+import { getRenderPixel } from 'ol/render';
 import { DoubleClickZoom } from 'ol/interaction';
+
+import XYZ from 'ol/source/XYZ';
+import ImageTileMod from '../ImageTileMod.js';
+
+import { PlantaService } from '../../core/services/planta.service';
+import { MapControlService } from '../services/map-control.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
+import { GLOBAL } from '@core/services/global';
+import { InformeService } from '@core/services/informe.service';
+import { FilterService } from '../../core/services/filter.service';
+
+import { PlantaInterface } from '../../core/models/planta';
+import { LocationAreaInterface } from '../../core/models/location';
+import { Anomalia } from '@core/models/anomalia';
+import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { AreaFilter } from '@core/models/areaFilter.js';
+import Point from 'ol/geom/Point';
+import { Coordinate } from 'ol/coordinate';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -195,27 +202,27 @@ export class MapViewComponent implements OnInit {
       // extent: this.extent1,
     });
 
-    this.sourceArea = new VectorSource();
+    /* this.sourceArea = new VectorSource();
     this.vectorArea = new VectorLayer({
       source: this.sourceArea,
       style: new Style({
         fill: new Fill({
-          color: 'rgba(255, 255, 255, 0.2)',
+          color: 'rgba(0, 0, 0, 0.2)',
         }),
         stroke: new Stroke({
-          color: '#ffcc33',
+          color: 'black',
           width: 2,
         }),
         image: new CircleStyle({
           radius: 7,
           fill: new Fill({
-            color: '#ffcc33',
+            color: 'black',
           }),
         }),
       }),
-    });
+    }); */
 
-    const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers, this.vectorArea];
+    const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers, /* this.vectorArea */];
 
     // Escuchar el postrender
     // this.thermalLayers[1].on('postrender', (event) => {
@@ -672,43 +679,81 @@ export class MapViewComponent implements OnInit {
   }
 
   drawArea() {
-    let startDrawing = true;
+    const sourceArea = new VectorSource();
+    const vectorArea = new VectorLayer({
+      source: sourceArea,
+      style: new Style({
+        fill: new Fill({
+          color: 'rgba(0, 0, 0, 0.2)',
+        }),
+        stroke: new Stroke({
+          color: 'black',
+          width: 2,
+        }),
+        image: new CircleStyle({
+          radius: 7,
+          fill: new Fill({
+            color: 'black',
+          }),
+        }),
+      }),
+    });
+    this.map.addLayer(vectorArea);
+
     const draw = new Draw({
-      source: this.sourceArea,
+      source: sourceArea,
       type: GeometryType.POLYGON,
     });
     this.map.addInteraction(draw);
 
-    draw.on('drawstart', (evt) => {
-      startDrawing = true;
-      console.log('start');
-    });
-
     draw.on('drawend', (evt) => {
-      startDrawing = false;
-      console.log('end');
       // desactivamos el dobleclick para que no interfiera al cerrar poligono
       this.map.getInteractions().forEach((interaction) => {
         if (interaction instanceof DoubleClickZoom) {
           this.map.removeInteraction(interaction);
         }
       });
+      // obtenemos coordenadas del poligono
+      const coords = this.getCoords(evt);
+
+      // añadimos botón delete
+      this.createDeleteButton(coords[0][0]);
 
       // añadimos el filtro de area
-      this.addAreaFilter(evt);
+      this.addAreaFilter(coords);
 
       // terminamos el modo draw
       this.map.removeInteraction(draw);
     });
   }
 
-  addAreaFilter(event: DrawEvent) {
-    const polygon = event.feature.getGeometry() as Polygon;
-    const coords = polygon.getCoordinates();
-    /* const p = new Polygon(polygon.getCoordinates()); */
+  createDeleteButton(coords: number[]) {
+    const styleDelete = new Style({
+      image: new Icon({
+        src: 'assets/icons/delete-36x36.png',
+      }),
+    });
+    const feature = Array(1);
+    feature[0] = new Feature(new Point(coords));
+    feature[0].setStyle(styleDelete);
+    const sourceDelete = new VectorSource({
+      features: feature,
+    });
+    const vectorDelete = new VectorLayer({
+      source: sourceDelete,
+    });
+    this.map.addLayer(vectorDelete);
+  }
 
-    // Creamos el filtro
+  addAreaFilter(coords: Coordinate[][]) {
     const areaFilter = new AreaFilter('Área', 'area', coords);
     this.filterService.addFilter(areaFilter);
+  }
+
+  getCoords(event: DrawEvent): Coordinate[][] {
+    const polygon = event.feature.getGeometry() as Polygon;
+    const coords = polygon.getCoordinates();
+
+    return coords;
   }
 }
