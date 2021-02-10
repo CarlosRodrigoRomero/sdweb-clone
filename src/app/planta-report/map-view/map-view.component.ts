@@ -13,7 +13,7 @@ import { MapControlService } from '../services/map-control.service';
 import { LocationAreaInterface } from '../../core/models/location';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Fill, Stroke, Style, Text } from 'ol/style';
-import Draw, { createBox } from 'ol/interaction/Draw';
+import Draw, { createBox, DrawEvent } from 'ol/interaction/Draw';
 import Select from 'ol/interaction/Select';
 import { Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
@@ -38,6 +38,7 @@ import { click } from 'ol/events/condition';
 import { containsCoordinate } from 'ol/extent';
 import CircleStyle from 'ol/style/Circle';
 import { DoubleClickZoom } from 'ol/interaction';
+import { AreaFilter } from '@core/models/areaFilter.js';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -55,7 +56,6 @@ export class MapViewComponent implements OnInit {
   public selectedInformeId: string;
   public anomaliasVectorSource: VectorSource;
   public locAreasVectorSource: VectorSource;
-  public thermalSource;
   public anomaliaSeleccionada: Anomalia;
   public listaAnomalias: Anomalia[];
   public sliderYear: number;
@@ -63,6 +63,7 @@ export class MapViewComponent implements OnInit {
   private sourceArea: VectorSource;
   private vectorArea: VectorLayer;
   private extent1: any;
+  public thermalSource;
   private thermalLayers: TileLayer[];
   private anomaliaLayers: VectorLayer[];
   public leftOpened: boolean;
@@ -214,7 +215,7 @@ export class MapViewComponent implements OnInit {
       }),
     });
 
-    const layers = [osmLayer, this.aerialLayer, this.vectorArea].concat(this.thermalLayers);
+    const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers, this.vectorArea];
 
     // Escuchar el postrender
     // this.thermalLayers[1].on('postrender', (event) => {
@@ -692,20 +693,22 @@ export class MapViewComponent implements OnInit {
           this.map.removeInteraction(interaction);
         }
       });
+
+      // añadimos el filtro de area
+      this.addAreaFilter(evt);
+
+      // terminamos el modo draw
       this.map.removeInteraction(draw);
     });
-
-    /* this.map.on('dblclick', (evt) => {
-      if (startDrawing) {
-        draw.finishDrawing();
-      }
-    }); */
-
-    /* this.addAreaFilter(); */
   }
 
-  addAreaFilter() {
-    this.sourceArea.getFeatures().forEach((feature) => console.log(feature.getGeometry()));
-    /* this.filterService.addFilter(); */
+  addAreaFilter(event: DrawEvent) {
+    const polygon = event.feature.getGeometry() as Polygon;
+    const coords = polygon.getCoordinates();
+    /* const p = new Polygon(polygon.getCoordinates()); */
+
+    // Creamos el filtro
+    const areaFilter = new AreaFilter('Área', 'area', coords);
+    this.filterService.addFilter(areaFilter);
   }
 }
