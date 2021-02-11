@@ -9,6 +9,7 @@ import { FilterService } from '@core/services/filter.service';
 
 import { TipoPcFilter } from '@core/models/tipoPcFilter';
 import { AnomaliaService } from '@core/services/anomalia.service';
+import { FormControl } from '@angular/forms';
 
 interface TipoPc {
   label?: string;
@@ -26,6 +27,8 @@ export class TipoFilterComponent implements OnInit {
   tiposPcs: TipoPc[] = [];
   allComplete: boolean;
   filtroTipo: TipoPcFilter;
+
+  selected = 'Tipo de anomalía';
 
   constructor(private anomaliaService: AnomaliaService, private filterService: FilterService) {}
 
@@ -50,6 +53,15 @@ export class TipoFilterComponent implements OnInit {
     if (event.checked) {
       this.filtroTipo = new TipoPcFilter(event.source.id, 'tipo', GLOBAL.labels_tipos.indexOf(event.source.name));
       this.filterService.addFilter(this.filtroTipo);
+
+      // añadimos el tipo seleccionado a la variable
+      if (this.selected !== 'Tipo de anomalía') {
+        console.log(event.source.name);
+        console.log(this.selected.concat(', ' + event.source.name));
+        this.selected = this.selected.concat(', ' + event.source.name);
+      } else {
+        this.selected = event.source.name;
+      }
     } else {
       this.filterService.filters
         .filter((filter) => filter.type === 'tipo')
@@ -58,6 +70,16 @@ export class TipoFilterComponent implements OnInit {
             this.filterService.deleteFilter(filter);
           }
         });
+
+      this.selected = this.selected.replace(event.source.name, '');
+      // eliminamos el tipo de la variable
+      if (this.selected === '') {
+        this.selected = 'Tipo de anomalía';
+      }
     }
+  }
+
+  stopPropagation(event) {
+    event.stopPropagation();
   }
 }
