@@ -130,7 +130,7 @@ export class FilterService {
   }
 
   deleteFilter(filter: FilterInterface) {
-    // comprobamos que no es de tipo 'area'
+    // comprobamos que no es de tipo 'Add'
     if (!this.typeAddFilters.includes(filter.type)) {
       // eliminamos el filtro anterior del mismo tipo que el recibido
       this.filters = this.filters.filter((f) => f.type !== filter.type);
@@ -138,6 +138,7 @@ export class FilterService {
       this.filters.splice(this.filters.indexOf(filter), 1);
     }
 
+    // comprueba que cantidad de filtros "tipo" no se afecten unos a otros
     if (filter.type !== 'tipo') {
       this.updateNumberOfTipoPc();
     }

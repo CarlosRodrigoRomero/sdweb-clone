@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import Map from 'ol/Map';
-import { DoubleClickZoom, Draw, Modify, Snap } from 'ol/interaction';
+import { DoubleClickZoom, Draw, Modify, Select, Snap } from 'ol/interaction';
 import { Fill, Icon, Stroke, Style } from 'ol/style';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
@@ -20,6 +20,10 @@ import { OlMapService } from '@core/services/ol-map.service';
 
 import { AreaFilter } from '@core/models/areaFilter';
 import { FilterInterface } from '@core/models/filter';
+import { click } from 'ol/events/condition';
+import Geometry from 'ol/geom/Geometry';
+import { Layer } from 'ol/layer';
+import { AreaInterface } from '@core/models/area';
 
 @Component({
   selector: 'app-area-filter',
@@ -32,6 +36,7 @@ export class AreaFilterComponent implements OnInit {
   public map: Map;
   public numAreas = 0;
 
+  areaFilter: AreaFilter;
   vectorArea: VectorLayer;
   deleteButton: VectorLayer;
 
@@ -62,15 +67,9 @@ export class AreaFilterComponent implements OnInit {
           color: 'black',
           width: 2,
         }),
-        image: new CircleStyle({
-          radius: 7,
-          fill: new Fill({
-            color: 'black',
-          }),
-        }),
       }),
     });
-    (this.map as Map).addLayer(this.vectorArea);
+    this.map.addLayer(this.vectorArea);
 
     const draw = new Draw({
       source: sourceArea,
@@ -107,6 +106,7 @@ export class AreaFilterComponent implements OnInit {
     });
     const feature = Array(1);
     feature[0] = new Feature(new Point(coords));
+    feature[0].setId('deleteButton');
     feature[0].setStyle(styleDelete);
     const sourceDelete = new VectorSource({
       features: feature,
@@ -115,14 +115,42 @@ export class AreaFilterComponent implements OnInit {
       source: sourceDelete,
     });
     this.map.addLayer(this.deleteButton);
+
+    const select = new Select({
+      condition: click,
+    });
+
+    this.map.addInteraction(select);
+    select.on('select', (elem) => {
+      if (elem.selected.length > 0) {
+        if (elem.selected[0].getId() === 'deleteButton') {
+          this.deleteAreaFilter();
+        }
+      }
+    });
+
+    // cambia cursor al pasar por encima del boton
+    this.map.on(
+      'pointermove',
+      (evt) =>
+        (this.map.getTargetElement().style.cursor = this.map.hasFeatureAtPixel(evt.pixel, {
+          layerFilter: (layer) => layer === this.deleteButton,
+        })
+          ? 'pointer'
+          : '')
+    );
   }
 
   addAreaFilter(coords: Coordinate[][]) {
-    const areaFilter = new AreaFilter('Área', 'area', coords);
-    this.filterService.addFilter(areaFilter);
+    this.areaFilter = new AreaFilter('Área', 'area', coords);
+    this.filterService.addFilter(this.areaFilter);
   }
 
   deleteAreaFilter() {
+    // eliminamos el filtro
+    this.filterService.deleteFilter(this.areaFilter);
+
+    // eliminamos las capas del mapa
     this.map.removeLayer(this.vectorArea);
     this.map.removeLayer(this.deleteButton);
   }
