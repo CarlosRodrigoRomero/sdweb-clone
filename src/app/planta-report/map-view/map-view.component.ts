@@ -28,8 +28,10 @@ import { containsCoordinate } from 'ol/extent';
 import CircleStyle from 'ol/style/Circle';
 import { getRenderPixel } from 'ol/render';
 import { DoubleClickZoom } from 'ol/interaction';
-
+import Point from 'ol/geom/Point';
+import { Coordinate } from 'ol/coordinate';
 import XYZ from 'ol/source/XYZ';
+
 import ImageTileMod from '../ImageTileMod.js';
 
 import { PlantaService } from '../../core/services/planta.service';
@@ -38,14 +40,13 @@ import { AnomaliaService } from '@core/services/anomalia.service';
 import { GLOBAL } from '@core/services/global';
 import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '../../core/services/filter.service';
+import { OlMapService } from '@core/services/ol-map.service';
 
 import { PlantaInterface } from '../../core/models/planta';
 import { LocationAreaInterface } from '../../core/models/location';
 import { Anomalia } from '@core/models/anomalia';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { AreaFilter } from '@core/models/areaFilter.js';
-import Point from 'ol/geom/Point';
-import { Coordinate } from 'ol/coordinate';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -90,7 +91,8 @@ export class MapViewComponent implements OnInit {
     private route: ActivatedRoute,
     private plantaService: PlantaService,
     private informeService: InformeService,
-    public filterService: FilterService
+    public filterService: FilterService,
+    private olMapService: OlMapService
   ) {}
 
   ngOnInit(): void {
@@ -202,27 +204,7 @@ export class MapViewComponent implements OnInit {
       // extent: this.extent1,
     });
 
-    /* this.sourceArea = new VectorSource();
-    this.vectorArea = new VectorLayer({
-      source: this.sourceArea,
-      style: new Style({
-        fill: new Fill({
-          color: 'rgba(0, 0, 0, 0.2)',
-        }),
-        stroke: new Stroke({
-          color: 'black',
-          width: 2,
-        }),
-        image: new CircleStyle({
-          radius: 7,
-          fill: new Fill({
-            color: 'black',
-          }),
-        }),
-      }),
-    }); */
-
-    const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers, /* this.vectorArea */];
+    const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers];
 
     // Escuchar el postrender
     // this.thermalLayers[1].on('postrender', (event) => {
@@ -307,7 +289,7 @@ export class MapViewComponent implements OnInit {
     // });
 
     // MAPA
-    this.map = new Map({
+    /* this.map = new Map({
       target: 'map',
       controls: defaultControls({ attribution: false }),
       layers,
@@ -317,7 +299,17 @@ export class MapViewComponent implements OnInit {
         maxZoom: 24,
         extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
       }),
+    }); */
+    const view = new View({
+      center: fromLonLat([this.planta.longitud, this.planta.latitud]),
+      zoom: 18,
+      maxZoom: 24,
+      extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
     });
+
+    this.olMapService
+      .createMap('map', layers, view, defaultControls({ attribution: false }))
+      .subscribe((map) => (this.map = map));
 
     this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
     this.addCursorOnHover();
@@ -676,84 +668,5 @@ export class MapViewComponent implements OnInit {
         }
       }
     });
-  }
-
-  drawArea() {
-    const sourceArea = new VectorSource();
-    const vectorArea = new VectorLayer({
-      source: sourceArea,
-      style: new Style({
-        fill: new Fill({
-          color: 'rgba(0, 0, 0, 0.2)',
-        }),
-        stroke: new Stroke({
-          color: 'black',
-          width: 2,
-        }),
-        image: new CircleStyle({
-          radius: 7,
-          fill: new Fill({
-            color: 'black',
-          }),
-        }),
-      }),
-    });
-    this.map.addLayer(vectorArea);
-
-    const draw = new Draw({
-      source: sourceArea,
-      type: GeometryType.POLYGON,
-    });
-    this.map.addInteraction(draw);
-
-    draw.on('drawend', (evt) => {
-      // desactivamos el dobleclick para que no interfiera al cerrar poligono
-      this.map.getInteractions().forEach((interaction) => {
-        if (interaction instanceof DoubleClickZoom) {
-          this.map.removeInteraction(interaction);
-        }
-      });
-      // obtenemos coordenadas del poligono
-      const coords = this.getCoords(evt);
-
-      // añadimos botón delete
-      this.createDeleteButton(coords[0][0]);
-
-      // añadimos el filtro de area
-      this.addAreaFilter(coords);
-
-      // terminamos el modo draw
-      this.map.removeInteraction(draw);
-    });
-  }
-
-  createDeleteButton(coords: number[]) {
-    const styleDelete = new Style({
-      image: new Icon({
-        src: 'assets/icons/delete-36x36.png',
-      }),
-    });
-    const feature = Array(1);
-    feature[0] = new Feature(new Point(coords));
-    feature[0].setStyle(styleDelete);
-    const sourceDelete = new VectorSource({
-      features: feature,
-    });
-    const vectorDelete = new VectorLayer({
-      source: sourceDelete,
-    });
-    this.map.addLayer(vectorDelete);
-  }
-
-  addAreaFilter(coords: Coordinate[][]) {
-    const areaFilter = new AreaFilter('Área', 'area', coords);
-    this.filterService.addFilter(areaFilter);
-  }
-
-  getCoords(event: DrawEvent): Coordinate[][] {
-    const polygon = event.feature.getGeometry() as Polygon;
-    const coords = polygon.getCoordinates();
-
-    return coords;
   }
 }
