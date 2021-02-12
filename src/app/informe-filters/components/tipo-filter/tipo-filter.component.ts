@@ -1,15 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Observable } from 'rxjs';
-
 import { MatCheckboxChange } from '@angular/material/checkbox';
 
 import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
 
 import { TipoPcFilter } from '@core/models/tipoPcFilter';
-import { AnomaliaService } from '@core/services/anomalia.service';
-import { FormControl } from '@angular/forms';
 
 interface TipoPc {
   label?: string;
@@ -28,9 +24,10 @@ export class TipoFilterComponent implements OnInit {
   allComplete: boolean;
   filtroTipo: TipoPcFilter;
 
-  selected = 'Tipo de anomalía';
+  defaultSelect = 'Tipo de anomalía';
+  selected: string[] = [this.defaultSelect];
 
-  constructor(private anomaliaService: AnomaliaService, private filterService: FilterService) {}
+  constructor(private filterService: FilterService) {}
 
   ngOnInit(): void {
     this.filterService.labelsTipoPcs$.subscribe((labels) => {
@@ -55,12 +52,10 @@ export class TipoFilterComponent implements OnInit {
       this.filterService.addFilter(this.filtroTipo);
 
       // añadimos el tipo seleccionado a la variable
-      if (this.selected !== 'Tipo de anomalía') {
-        console.log(event.source.name);
-        console.log(this.selected.concat(', ' + event.source.name));
-        this.selected = this.selected.concat(', ' + event.source.name);
+      if (this.selected[0] !== this.defaultSelect) {
+        this.selected.push(event.source.name);
       } else {
-        this.selected = event.source.name;
+        this.selected = [event.source.name];
       }
     } else {
       this.filterService.filters
@@ -71,10 +66,11 @@ export class TipoFilterComponent implements OnInit {
           }
         });
 
-      this.selected = this.selected.replace(event.source.name, '');
-      // eliminamos el tipo de la variable
-      if (this.selected === '') {
-        this.selected = 'Tipo de anomalía';
+      // eliminamos el 'tipo' de seleccionados
+      this.selected = this.selected.filter((sel) => sel !== event.source.name);
+      // si era el último ponemos el label por defecto
+      if (this.selected.length === 0) {
+        this.selected.push(this.defaultSelect);
       }
     }
   }

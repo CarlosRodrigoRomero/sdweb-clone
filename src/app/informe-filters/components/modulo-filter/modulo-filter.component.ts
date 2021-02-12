@@ -25,6 +25,9 @@ export class ModuloFilterComponent implements OnInit {
   allComplete: boolean;
   filtroModulo: ModuloPcFilter;
 
+  defaultSelect = 'Tipo módulo';
+  selected: string[] = [this.defaultSelect];
+
   constructor(private pcService: PcService, private filterService: FilterService) {}
 
   ngOnInit(): void {
@@ -44,6 +47,13 @@ export class ModuloFilterComponent implements OnInit {
     if (event.checked) {
       this.filtroModulo = new ModuloPcFilter(event.source.id, 'modulo', event.source.name);
       this.filterService.addFilter(this.filtroModulo);
+
+      // añadimos el modulo seleccionado a la variable
+      if (this.selected[0] !== this.defaultSelect) {
+        this.selected.push(event.source.name);
+      } else {
+        this.selected = [event.source.name];
+      }
     } else {
       this.filterService.filters
         .filter((filter) => filter.type === 'modulo')
@@ -52,6 +62,13 @@ export class ModuloFilterComponent implements OnInit {
             this.filterService.deleteFilter(filter);
           }
         });
+
+      // eliminamos el 'tipo' de seleccionados
+      this.selected = this.selected.filter((sel) => sel !== event.source.name);
+      // si era el último ponemos el label por defecto
+      if (this.selected.length === 0) {
+        this.selected.push(this.defaultSelect);
+      }
     }
   }
 }

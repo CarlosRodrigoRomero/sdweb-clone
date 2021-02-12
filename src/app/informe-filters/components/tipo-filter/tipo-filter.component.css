@@ -11,6 +11,14 @@ h5 {
   width: 100%;
 }
 
+.filter-selected {
+  display: inline-block;
+  width: 170px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 li {
   list-style-type: none;
   margin-left: 10px;
