@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Anomalia } from '@core/models/anomalia';
 import { GLOBAL } from '../../core/services/global';
 import { AnomaliaService } from '../../core/services/anomalia.service';
+import { FindValueSubscriber } from 'rxjs/internal/operators/find';
 
 @Component({
   selector: 'app-anomalia-info',
@@ -12,7 +13,7 @@ export class AnomaliaInfoComponent implements OnInit {
   @Input() anomalia: Anomalia;
   public displayedColumns: string[] = ['clase', 'tipo', 'tempMax', 'gradienteNormalizado', 'perdidas'];
   public dataSource: Anomalia[];
-  public editable = true;
+  public editable = false;
   public dataType: any;
   public pcDescripcion: string[];
 
@@ -31,5 +32,8 @@ export class AnomaliaInfoComponent implements OnInit {
   onEdit(event, anomalia: Anomalia, field: string) {
     anomalia[field] = event.target.value;
     this.anomaliaService.updateAnomalia(anomalia);
+  }
+  deleteAnomalia(anomalia: Anomalia) {
+    console.log('anom', anomalia);
   }
 }
