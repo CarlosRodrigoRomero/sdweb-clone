@@ -24,6 +24,7 @@ export class TipoFilterComponent implements OnInit {
   allComplete: boolean;
   filtroTipo: TipoPcFilter;
 
+  defaultStatus = true;
   defaultSelect = 'Tipo de anomalía';
   selected: string[] = [this.defaultSelect];
 
@@ -55,6 +56,7 @@ export class TipoFilterComponent implements OnInit {
       if (this.selected[0] !== this.defaultSelect) {
         this.selected.push(event.source.name);
       } else {
+        this.defaultStatus = false;
         this.selected = [event.source.name];
       }
     } else {
@@ -70,6 +72,7 @@ export class TipoFilterComponent implements OnInit {
       this.selected = this.selected.filter((sel) => sel !== event.source.name);
       // si era el último ponemos el label por defecto
       if (this.selected.length === 0) {
+        this.defaultStatus = true;
         this.selected.push(this.defaultSelect);
       }
     }

@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
-import { MatSliderChange } from '@angular/material/slider';
-
 import { FilterService } from '@core/services/filter.service';
 import { PcService } from '@core/services/pc.service';
 
 import { GradientFilter } from '@core/models/gradientFilter';
 
-import { LabelType, Options } from '@angular-slider/ngx-slider';
+import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
 
 @Component({
   selector: 'app-gradient-filter',
@@ -43,6 +41,19 @@ export class GradientFilterComponent implements OnInit {
             return value + 'ºC';
           default:
             return value + 'ºC';
+        }
+      },
+      getSelectionBarColor: (minValue: number, maxValue: number): string => {
+        if (minValue === this.minGradiente && maxValue === this.maxGradiente) {
+          return '#c4c4c4';
+        }
+        return '#455a64';
+      },
+      getPointerColor: (value: number, pointerType: PointerType.Min | PointerType.Max): string => {
+        if (value !== this.minGradiente) {
+          if (value !== this.maxGradiente) {
+            return '#455a64';
+          }
         }
       },
     };

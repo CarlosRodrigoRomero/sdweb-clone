@@ -180,10 +180,6 @@ export class FilterService {
     this.labelsTipoPcs.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));
 
     this.labelsTipoPcs$.next(this.labelsTipoPcs);
-
-    // contamos cuantos pcs hay de cada tipo
-    /* this.labelsTipoPcs.forEach((label) => this.countTipoPcs.push(this.getNumberOfTipoPc(label)));
-    this.countTipoPcs$.next(this.countTipoPcs); */
   }
 
   getNumberOfTipoPc(label: string): number {

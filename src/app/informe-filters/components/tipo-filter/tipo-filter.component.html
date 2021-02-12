@@ -1,7 +1,8 @@
 <div class="filtro">
   <h5>Tipo</h5>
   <button class="tipo-select" mat-stroked-button [matMenuTriggerFor]="menu">
-    <span class="filter-selected">{{selected.toString()}}</span>
+    <span *ngIf="defaultStatus" class="filter-default">{{ defaultSelect }}</span>
+    <span *ngIf="!defaultStatus" class="filter-selected">{{ selected.toString() }}</span>
     <mat-icon>keyboard_arrow_down</mat-icon>
   </button>
   <mat-menu #menu="matMenu">

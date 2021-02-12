@@ -4,7 +4,7 @@ import { FilterService } from '@core/services/filter.service';
 
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
 
-import { LabelType, Options } from '@angular-slider/ngx-slider';
+import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
 import { AnomaliaService } from '../../../core/services/anomalia.service';
 
 @Component({
@@ -37,6 +37,19 @@ export class TempMaxFilterComponent implements OnInit {
             return value + 'ºC';
           default:
             return value + 'ºC';
+        }
+      },
+      getSelectionBarColor: (minValue: number, maxValue: number): string => {
+        if (minValue === this.minTemp && maxValue === this.maxTemp) {
+          return '#c4c4c4';
+        }
+        return '#455a64';
+      },
+      getPointerColor: (value: number, pointerType: PointerType.Min | PointerType.Max): string => {
+        if (value !== this.minTemp) {
+          if (value !== this.maxTemp) {
+            return '#455a64';
+          }
         }
       },
     };

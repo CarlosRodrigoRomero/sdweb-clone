@@ -7,23 +7,19 @@ import { DoubleClickZoom, Draw, Modify, Select, Snap } from 'ol/interaction';
 import { Fill, Icon, Stroke, Style } from 'ol/style';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import CircleStyle from 'ol/style/Circle';
 import GeometryType from 'ol/geom/GeometryType';
 import { Feature } from 'ol';
 import Point from 'ol/geom/Point';
 import { Coordinate } from 'ol/coordinate';
 import { DrawEvent } from 'ol/interaction/Draw';
 import Polygon from 'ol/geom/Polygon';
+import { click } from 'ol/events/condition';
 
 import { FilterService } from '@core/services/filter.service';
 import { OlMapService } from '@core/services/ol-map.service';
 
 import { AreaFilter } from '@core/models/areaFilter';
 import { FilterInterface } from '@core/models/filter';
-import { click } from 'ol/events/condition';
-import Geometry from 'ol/geom/Geometry';
-import { Layer } from 'ol/layer';
-import { AreaInterface } from '@core/models/area';
 
 @Component({
   selector: 'app-area-filter',
@@ -31,10 +27,9 @@ import { AreaInterface } from '@core/models/area';
   styleUrls: ['./area-filter.component.css'],
 })
 export class AreaFilterComponent implements OnInit {
-  removable = true;
   public areaFilters$: Observable<FilterInterface[]>;
   public map: Map;
-  public numAreas = 0;
+  activeFilter = false;
 
   areaFilter: AreaFilter;
   vectorArea: VectorLayer;
@@ -142,11 +137,14 @@ export class AreaFilterComponent implements OnInit {
   }
 
   addAreaFilter(coords: Coordinate[][]) {
+    this.activeFilter = true;
     this.areaFilter = new AreaFilter('Área', 'area', coords);
     this.filterService.addFilter(this.areaFilter);
   }
 
   deleteAreaFilter() {
+    this.activeFilter = false;
+
     // eliminamos el filtro
     this.filterService.deleteFilter(this.areaFilter);
 
