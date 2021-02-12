@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 
 import { Collection, Map, View } from 'ol';
 import { Control } from 'ol/control';
-import { Interaction } from 'ol/interaction';
 import BaseLayer from 'ol/layer/Base';
 import LayerGroup from 'ol/layer/Group';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -13,6 +14,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class OlMapService {
   private map = {};
   private map$ = new BehaviorSubject<any>(this.map);
+  private drawLayers: VectorLayer[] = [];
 
   constructor() {}
 
@@ -34,5 +36,16 @@ export class OlMapService {
 
   getMap(): Observable<any> {
     return this.map$.asObservable();
+  }
+
+  createVectorLayer(source: VectorSource): VectorLayer {
+    const layer = new VectorLayer({ source });
+    this.drawLayers.push(layer);
+
+    return layer;
+  }
+
+  deleteAllDrawLayers() {
+    this.drawLayers.forEach((layer) => (this.map as Map).removeLayer(layer));
   }
 }

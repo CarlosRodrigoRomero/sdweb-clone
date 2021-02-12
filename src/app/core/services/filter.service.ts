@@ -152,6 +152,8 @@ export class FilterService {
     // Elimina todos los filtros
     this.filters = [];
     this.filters$.next(this.filters);
+
+    this.applyFilters();
   }
 
   deleteAllTypeFilters(type: string) {

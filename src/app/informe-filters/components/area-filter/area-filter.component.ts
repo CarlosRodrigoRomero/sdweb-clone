@@ -52,18 +52,19 @@ export class AreaFilterComponent implements OnInit {
 
   drawArea() {
     const sourceArea = new VectorSource();
-    this.vectorArea = new VectorLayer({
-      source: sourceArea,
-      style: new Style({
-        fill: new Fill({
-          color: 'rgba(0, 0, 0, 0.2)',
-        }),
-        stroke: new Stroke({
-          color: 'black',
-          width: 2,
-        }),
+    const style = new Style({
+      fill: new Fill({
+        color: 'rgba(0, 0, 0, 0.2)',
+      }),
+      stroke: new Stroke({
+        color: 'black',
+        width: 2,
       }),
     });
+
+    this.vectorArea = this.olMapService.createVectorLayer(sourceArea);
+    this.vectorArea.setStyle(style);
+
     this.map.addLayer(this.vectorArea);
 
     const draw = new Draw({
@@ -106,9 +107,10 @@ export class AreaFilterComponent implements OnInit {
     const sourceDelete = new VectorSource({
       features: feature,
     });
-    this.deleteButton = new VectorLayer({
+    this.deleteButton = this.olMapService.createVectorLayer(sourceDelete);
+    /* this.deleteButton = new VectorLayer({
       source: sourceDelete,
-    });
+    }); */
     this.map.addLayer(this.deleteButton);
 
     const select = new Select({
@@ -148,9 +150,8 @@ export class AreaFilterComponent implements OnInit {
     // eliminamos el filtro
     this.filterService.deleteFilter(this.areaFilter);
 
-    // eliminamos las capas del mapa
-    this.map.removeLayer(this.vectorArea);
-    this.map.removeLayer(this.deleteButton);
+    // eliminamos el poligono del mapa
+    this.olMapService.deleteAllDrawLayers();
   }
 
   getCoords(event: DrawEvent): Coordinate[][] {

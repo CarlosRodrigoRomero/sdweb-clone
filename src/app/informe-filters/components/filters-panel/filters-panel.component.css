@@ -2,3 +2,11 @@ div {
     padding: 10px;
     min-width: 250px;
 }
+
+.clean-filters {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    font-size: 16px;
+    color: darkblue;
+}
