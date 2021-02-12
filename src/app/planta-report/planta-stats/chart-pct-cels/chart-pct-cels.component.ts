@@ -197,7 +197,7 @@ export class ChartPctCelsComponent implements OnInit {
       series: [
         {
           name: 'gradiente medio',
-          data: [15.4, 20],
+          data: [15.4, 15.9],
         },
       ],
       chart: {
