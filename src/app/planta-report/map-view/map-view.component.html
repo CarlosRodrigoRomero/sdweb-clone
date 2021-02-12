@@ -15,6 +15,10 @@
       <h4>Filtros</h4>
     </div>
     <app-filters-panel *ngIf="anomaliasLoaded"></app-filters-panel>
+    <!-- <button mat-raised-button (click)="drawArea()">
+      <img src="assets/icons/draw-area-black.png" style="height: 20px;" />
+      <span>Dibujar área</span>
+    </button> -->
   </mat-sidenav>
 
   <mat-sidenav
@@ -52,6 +56,7 @@
         <app-anomalia-info [anomalia]="anomaliaSeleccionada"></app-anomalia-info>
       </div>
 
+      <!-- MAPA -->
       <app-map-control id="map-control"></app-map-control>
     </div>
 

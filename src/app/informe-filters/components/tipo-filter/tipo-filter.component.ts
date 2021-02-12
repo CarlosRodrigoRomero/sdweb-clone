@@ -6,10 +6,10 @@ import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
 
 import { TipoPcFilter } from '@core/models/tipoPcFilter';
-import { AnomaliaService } from '@core/services/anomalia.service';
 
 interface TipoPc {
   label?: string;
+  count?: number;
   completed?: boolean;
   tiposPcs?: TipoPc[];
 }
@@ -20,31 +20,43 @@ interface TipoPc {
   styleUrls: ['./tipo-filter.component.css'],
 })
 export class TipoFilterComponent implements OnInit {
-  tiposTask: TipoPc;
   tiposPcs: TipoPc[] = [];
   allComplete: boolean;
   filtroTipo: TipoPcFilter;
 
-  constructor(private anomaliaService: AnomaliaService, private filterService: FilterService) {}
+  defaultSelect = 'Tipo de anomalía';
+  selected: string[] = [this.defaultSelect];
+
+  constructor(private filterService: FilterService) {}
 
   ngOnInit(): void {
-    /* console.log(this.filterService.getLabelsTipoPcs()); */
-    this.filterService.getLabelsTipoPcs().forEach((label) =>
-      this.tiposPcs.push({
-        label,
-        completed: false,
-      })
-    );
+    this.filterService.labelsTipoPcs$.subscribe((labels) => {
+      this.tiposPcs = [];
+      labels.forEach((label) =>
+        this.tiposPcs.push({
+          label,
+          count: this.filterService.getNumberOfTipoPc(label),
+          completed: false,
+        })
+      );
+    });
 
-    this.tiposTask = {
-      tiposPcs: this.tiposPcs,
-    };
+    this.filterService.countTipoPcs$.subscribe((counts) =>
+      counts.forEach((count, i) => (this.tiposPcs[i].count = count))
+    );
   }
 
   onChangeFiltroTipo(event: MatCheckboxChange) {
     if (event.checked) {
       this.filtroTipo = new TipoPcFilter(event.source.id, 'tipo', GLOBAL.labels_tipos.indexOf(event.source.name));
       this.filterService.addFilter(this.filtroTipo);
+
+      // añadimos el tipo seleccionado a la variable
+      if (this.selected[0] !== this.defaultSelect) {
+        this.selected.push(event.source.name);
+      } else {
+        this.selected = [event.source.name];
+      }
     } else {
       this.filterService.filters
         .filter((filter) => filter.type === 'tipo')
@@ -53,6 +65,17 @@ export class TipoFilterComponent implements OnInit {
             this.filterService.deleteFilter(filter);
           }
         });
+
+      // eliminamos el 'tipo' de seleccionados
+      this.selected = this.selected.filter((sel) => sel !== event.source.name);
+      // si era el último ponemos el label por defecto
+      if (this.selected.length === 0) {
+        this.selected.push(this.defaultSelect);
+      }
     }
+  }
+
+  stopPropagation(event) {
+    event.stopPropagation();
   }
 }

@@ -1,0 +1,9 @@
+button {
+    width: 100%;
+}
+
+span {
+    margin-left: 1rem;
+    font-size: 1.1rem;
+    font-weight: 400;
+}

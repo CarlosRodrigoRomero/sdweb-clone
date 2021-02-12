@@ -1,14 +1,29 @@
 import { Component, OnInit } from '@angular/core';
-import { LatLngLiteral } from '@agm/core';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
+
+import Map from 'ol/Map';
+import { DoubleClickZoom, Draw, Modify, Select, Snap } from 'ol/interaction';
+import { Fill, Icon, Stroke, Style } from 'ol/style';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import CircleStyle from 'ol/style/Circle';
+import GeometryType from 'ol/geom/GeometryType';
+import { Feature } from 'ol';
+import Point from 'ol/geom/Point';
+import { Coordinate } from 'ol/coordinate';
+import { DrawEvent } from 'ol/interaction/Draw';
+import Polygon from 'ol/geom/Polygon';
 
 import { FilterService } from '@core/services/filter.service';
+import { OlMapService } from '@core/services/ol-map.service';
 
 import { AreaFilter } from '@core/models/areaFilter';
 import { FilterInterface } from '@core/models/filter';
-
-declare const google: any;
+import { click } from 'ol/events/condition';
+import Geometry from 'ol/geom/Geometry';
+import { Layer } from 'ol/layer';
+import { AreaInterface } from '@core/models/area';
 
 @Component({
   selector: 'app-area-filter',
@@ -18,12 +33,17 @@ declare const google: any;
 export class AreaFilterComponent implements OnInit {
   removable = true;
   public areaFilters$: Observable<FilterInterface[]>;
-  public map: any;
+  public map: Map;
   public numAreas = 0;
 
-  constructor(private filterService: FilterService) {}
+  areaFilter: AreaFilter;
+  vectorArea: VectorLayer;
+  deleteButton: VectorLayer;
+
+  constructor(private filterService: FilterService, private olMapService: OlMapService) {}
 
   ngOnInit(): void {
+    this.olMapService.getMap().subscribe((map) => (this.map = map));
     this.areaFilters$ = this.filterService.getAllFilters();
   }
 
@@ -35,55 +55,110 @@ export class AreaFilterComponent implements OnInit {
     this.filterService.deleteAllTypeFilters(type);
   }
 
-  initDrawingManager() {
-    this.numAreas++;
-    const options = {
-      drawingControl: false,
-      polygonOptions: {
-        draggable: false,
-        editable: false,
-      },
-      drawingMode: google.maps.drawing.OverlayType.POLYGON,
-    };
+  drawArea() {
+    const sourceArea = new VectorSource();
+    this.vectorArea = new VectorLayer({
+      source: sourceArea,
+      style: new Style({
+        fill: new Fill({
+          color: 'rgba(0, 0, 0, 0.2)',
+        }),
+        stroke: new Stroke({
+          color: 'black',
+          width: 2,
+        }),
+      }),
+    });
+    this.map.addLayer(this.vectorArea);
 
-    const drawingManager = new google.maps.drawing.DrawingManager(options);
-    drawingManager.setMap(this.map);
+    const draw = new Draw({
+      source: sourceArea,
+      type: GeometryType.POLYGON,
+    });
+    this.map.addInteraction(draw);
 
-    this.addEventListeners(drawingManager);
-  }
+    draw.on('drawend', (evt) => {
+      // desactivamos el dobleclick para que no interfiera al cerrar poligono
+      this.map.getInteractions().forEach((interaction) => {
+        if (interaction instanceof DoubleClickZoom) {
+          this.map.removeInteraction(interaction);
+        }
+      });
+      // obtenemos coordenadas del poligono
+      const coords = this.getCoords(evt);
 
-  addEventListeners(drawingManager: any) {
-    google.maps.event.addListener(drawingManager, 'polygoncomplete', (polygon) => {
-      polygon.setMap(null);
-      const path: LatLngLiteral[] = [];
-      for (let i = 0; i < polygon.getPath().getLength(); i++) {
-        path.push({
-          lat: polygon.getPath().getAt(i).lat() as number,
-          lng: polygon.getPath().getAt(i).lng() as number,
-        });
-      }
+      // añadimos botón delete
+      this.createDeleteButton(coords[0][0]);
 
-      // Creamos el filtro
-      const areaFilter = new AreaFilter('Área ' + this.numAreas, 'area', path);
-      this.filterService.addFilter(areaFilter);
+      // añadimos el filtro de area
+      this.addAreaFilter(coords);
 
-      // Desactiva del modo dibujo
-      if (polygon.type !== google.maps.drawing.OverlayType.MARKER) {
-        drawingManager.setDrawingMode(null);
-      }
+      // terminamos el modo draw
+      this.map.removeInteraction(draw);
     });
   }
 
-  numberToLatLng(paths: Array<Array<number>>): Array<Array<LatLngLiteral>> {
-    console.log(paths);
-    const newPaths = [];
-    for (let i = 0; i <= paths.length; i++) {
-      const path = [];
-      for (let j = 0; j <= paths[i].length; j++) {
-        path.push(new google.maps.LatLng(paths[i][j][0], paths[i][j][1]));
+  createDeleteButton(coords: number[]) {
+    const styleDelete = new Style({
+      image: new Icon({
+        src: 'assets/icons/delete-36x36.png',
+      }),
+    });
+    const feature = Array(1);
+    feature[0] = new Feature(new Point(coords));
+    feature[0].setId('deleteButton');
+    feature[0].setStyle(styleDelete);
+    const sourceDelete = new VectorSource({
+      features: feature,
+    });
+    this.deleteButton = new VectorLayer({
+      source: sourceDelete,
+    });
+    this.map.addLayer(this.deleteButton);
+
+    const select = new Select({
+      condition: click,
+    });
+
+    this.map.addInteraction(select);
+    select.on('select', (elem) => {
+      if (elem.selected.length > 0) {
+        if (elem.selected[0].getId() === 'deleteButton') {
+          this.deleteAreaFilter();
+        }
       }
-      newPaths.push(path);
-    }
-    return newPaths;
+    });
+
+    // cambia cursor al pasar por encima del boton
+    this.map.on(
+      'pointermove',
+      (evt) =>
+        (this.map.getTargetElement().style.cursor = this.map.hasFeatureAtPixel(evt.pixel, {
+          layerFilter: (layer) => layer === this.deleteButton,
+        })
+          ? 'pointer'
+          : '')
+    );
+  }
+
+  addAreaFilter(coords: Coordinate[][]) {
+    this.areaFilter = new AreaFilter('Área', 'area', coords);
+    this.filterService.addFilter(this.areaFilter);
+  }
+
+  deleteAreaFilter() {
+    // eliminamos el filtro
+    this.filterService.deleteFilter(this.areaFilter);
+
+    // eliminamos las capas del mapa
+    this.map.removeLayer(this.vectorArea);
+    this.map.removeLayer(this.deleteButton);
+  }
+
+  getCoords(event: DrawEvent): Coordinate[][] {
+    const polygon = event.feature.getGeometry() as Polygon;
+    const coords = polygon.getCoordinates();
+
+    return coords;
   }
 }

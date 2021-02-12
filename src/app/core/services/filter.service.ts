@@ -22,6 +22,10 @@ export class FilterService {
   public _allFiltrableElements: FiltrableInterface[];
   private _initialized = false;
   public initialized$ = new BehaviorSubject<boolean>(this._initialized);
+  public labelsTipoPcs: string[] = [];
+  public labelsTipoPcs$ = new BehaviorSubject<string[]>(this.labelsTipoPcs);
+  private countTipoPcs: number[] = [];
+  public countTipoPcs$ = new BehaviorSubject<number[]>(this.countTipoPcs);
 
   constructor(private anomaliaService: AnomaliaService) {
     // this.anomaliaService
@@ -31,22 +35,27 @@ export class FilterService {
     //     this.filteredElements$.next(anomalias);
     //   });
   }
+
   initFilterService(id: string, initType: 'informe' | 'planta' = 'informe') {
     if (initType === 'planta') {
       this.anomaliaService.getAnomaliasPlanta$(id).subscribe((array) => {
         this._allFiltrableElements = array;
         this.filteredElements$.next(array);
+        this.getLabelFilterTipoPcs();
         this.initialized$.next(true);
       });
     } else {
       this.anomaliaService.getAnomalias$(id).subscribe((array) => {
         this._allFiltrableElements = array;
         this.filteredElements$.next(array);
+        this.getLabelFilterTipoPcs();
         this.initialized$.next(true);
       });
     }
+
     return this.initialized$;
   }
+
   addFilter(filter: FilterInterface) {
     // comprobamos que no es de tipo 'Add'
     if (!this.typeAddFilters.includes(filter.type)) {
@@ -54,6 +63,10 @@ export class FilterService {
       this.filters = this.filters.filter((f) => f.type !== filter.type);
       // añadimos el nuevo filtro
       this.filters.push(filter);
+
+      if (filter.type !== 'tipo') {
+        this.updateNumberOfTipoPc();
+      }
     } else {
       // si es del tipo 'Add' se añade al array
       this.filters.push(filter);
@@ -64,21 +77,21 @@ export class FilterService {
   }
 
   private applyFilters() {
-    const everyFilterFilteredPcs: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
+    const everyFilterFiltrableElements: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
 
     // comprobamos si hay filtros de tipo 'Add'
     if (this.filters.filter((filter) => this.typeAddFilters.includes(filter.type)).length > 0) {
       // separamos los pcs por tipo de filtro
       this.typeAddFilters.forEach((type) => {
-        const newFilteredPcs: FiltrableInterface[] = [];
+        const newFiltrableElements: FiltrableInterface[] = [];
         if (this.filters.filter((filter) => filter.type === type).length > 0) {
           this.filters
             .filter((filter) => filter.type === type)
             .forEach((filter) => {
-              filter.applyFilter(this._allFiltrableElements).forEach((pc) => newFilteredPcs.push(pc));
+              filter.applyFilter(this._allFiltrableElements).forEach((pc) => newFiltrableElements.push(pc));
             });
           // añadimos un array de cada tipo
-          everyFilterFilteredPcs.push(newFilteredPcs);
+          everyFilterFiltrableElements.push(newFiltrableElements);
         }
       });
     }
@@ -87,19 +100,19 @@ export class FilterService {
     this.filters
       .filter((filter) => !this.typeAddFilters.includes(filter.type))
       .forEach((filter) => {
-        const newFilteredPcs = filter.applyFilter(this._allFiltrableElements);
-        everyFilterFilteredPcs.push(newFilteredPcs);
+        const newFiltrableElements = filter.applyFilter(this._allFiltrableElements);
+        everyFilterFiltrableElements.push(newFiltrableElements);
       });
 
     // calculamos la interseccion de los array de los diferentes tipos
-    if (everyFilterFilteredPcs.length > 0) {
-      this.filteredElements = everyFilterFilteredPcs.reduce((anterior, actual) =>
+    if (everyFilterFiltrableElements.length > 0) {
+      this.filteredElements = everyFilterFiltrableElements.reduce((anterior, actual) =>
         anterior.filter((pc) => actual.includes(pc))
       );
     }
 
     // comprobamos que hay algun filtro activo
-    if (everyFilterFilteredPcs.length === 0) {
+    if (everyFilterFiltrableElements.length === 0) {
       this.filteredElements = this._allFiltrableElements;
     }
 
@@ -117,12 +130,17 @@ export class FilterService {
   }
 
   deleteFilter(filter: FilterInterface) {
-    // comprobamos que no es de tipo 'area'
+    // comprobamos que no es de tipo 'Add'
     if (!this.typeAddFilters.includes(filter.type)) {
       // eliminamos el filtro anterior del mismo tipo que el recibido
       this.filters = this.filters.filter((f) => f.type !== filter.type);
     } else {
       this.filters.splice(this.filters.indexOf(filter), 1);
+    }
+
+    // comprueba que cantidad de filtros "tipo" no se afecten unos a otros
+    if (filter.type !== 'tipo') {
+      this.updateNumberOfTipoPc();
     }
 
     this.filters$.next(this.filters);
@@ -145,9 +163,8 @@ export class FilterService {
     this.applyFilters();
   }
 
-  getLabelsTipoPcs(): string[] {
+  getLabelFilterTipoPcs() {
     const indices: number[] = [];
-    const labels: string[] = [];
     this._allFiltrableElements.forEach((elem) => {
       if (typeof elem.tipo === 'number') {
         if (!indices.includes(elem.tipo)) {
@@ -157,10 +174,29 @@ export class FilterService {
         indices.push(parseInt(elem.tipo, 0));
       }
     });
-    indices.forEach((i) => labels.push(GLOBAL.labels_tipos[i]));
+    this.labelsTipoPcs = [];
+    indices.forEach((i) => this.labelsTipoPcs.push(GLOBAL.labels_tipos[i]));
     // los ordena como estan en GLOBAL
-    labels.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));
+    this.labelsTipoPcs.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));
 
-    return labels;
+    this.labelsTipoPcs$.next(this.labelsTipoPcs);
+
+    // contamos cuantos pcs hay de cada tipo
+    /* this.labelsTipoPcs.forEach((label) => this.countTipoPcs.push(this.getNumberOfTipoPc(label)));
+    this.countTipoPcs$.next(this.countTipoPcs); */
+  }
+
+  getNumberOfTipoPc(label: string): number {
+    return this._allFiltrableElements.filter((elem) => elem.tipo == GLOBAL.labels_tipos.indexOf(label)).length;
+  }
+
+  updateNumberOfTipoPc() {
+    this.countTipoPcs = [];
+    this.labelsTipoPcs.forEach((label) =>
+      this.countTipoPcs.push(
+        this.filteredElements.filter((elem) => elem.tipo == GLOBAL.labels_tipos.indexOf(label)).length
+      )
+    );
+    this.countTipoPcs$.next(this.countTipoPcs);
   }
 }

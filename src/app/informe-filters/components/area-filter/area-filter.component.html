@@ -1,19 +1,4 @@
-<h5>Área</h5>
-<mat-chip-list>
-  <mat-chip *ngFor="let filter of areaFilters$ | async" [removable]="removable" (removed)="deleteFilter(filter)"
-    >{{ filter.id }}
-    <div *ngIf="filter.type == 'area'">
-      <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-    </div>
-  </mat-chip>
-</mat-chip-list>
-<!-- <button
-  class="button-clear"
-  style="float: right"
-  mat-button
-  color="primary"
-  [hidden]="areaFilters$.length == 0"
-  (click)="deleteAllTypeFilters('area')"
->
-  Borrar todas
-</button> -->
+<button mat-raised-button (click)="drawArea()">
+  <mat-icon>format_shapes</mat-icon>
+  <span>Dibujar área</span>
+</button>

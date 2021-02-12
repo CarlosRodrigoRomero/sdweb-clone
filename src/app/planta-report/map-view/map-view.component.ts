@@ -1,41 +1,52 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+
+import { take } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
+
+import { MatSidenav } from '@angular/material/sidenav';
+
 import Map from 'ol/Map';
-import XYZ from 'ol/source/XYZ';
 import OSM from 'ol/source/OSM';
 import XYZ_mod from '../xyz_mod.js';
 import { fromLonLat, transformExtent } from 'ol/proj.js';
 import View from 'ol/View';
-import { PlantaService } from '../../core/services/planta.service';
-import { PlantaInterface } from '../../core/models/planta';
-import ImageTileMod from '../ImageTileMod.js';
-import { MapControlService } from '../services/map-control.service';
-import { LocationAreaInterface } from '../../core/models/location';
 import GeoJSON from 'ol/format/GeoJSON';
-import { Fill, Stroke, Style, Text } from 'ol/style';
-import Draw, { createBox } from 'ol/interaction/Draw';
+import { Fill, Icon, RegularShape, Stroke, Style, Text } from 'ol/style';
+import Draw, { createBox, DrawEvent } from 'ol/interaction/Draw';
 import Select from 'ol/interaction/Select';
 import { Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import GeometryType from 'ol/geom/GeometryType';
-import { Anomalia } from '@core/models/anomalia';
 import SimpleGeometry from 'ol/geom/SimpleGeometry';
-import { AnomaliaService } from '../../core/services/anomalia.service';
 import { Feature, Overlay } from 'ol';
 import Polygon from 'ol/geom/Polygon';
 import { defaults as defaultControls } from 'ol/control.js';
 import OverlayPositioning from 'ol/OverlayPositioning';
-import { GLOBAL } from '../../core/services/global';
-import { InformeService } from '../../core/services/informe.service';
-import { take } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
-import { ThermalLayerInterface } from '../../core/models/thermalLayer';
-import { ViewChild } from '@angular/core';
-import { MatSidenav } from '@angular/material/sidenav';
-import { FilterService } from '../../core/services/filter.service';
-import { getRenderPixel } from 'ol/render';
 import { click } from 'ol/events/condition';
 import { containsCoordinate } from 'ol/extent';
+import CircleStyle from 'ol/style/Circle';
+import { getRenderPixel } from 'ol/render';
+import { DoubleClickZoom } from 'ol/interaction';
+import Point from 'ol/geom/Point';
+import { Coordinate } from 'ol/coordinate';
+import XYZ from 'ol/source/XYZ';
+
+import ImageTileMod from '../ImageTileMod.js';
+
+import { PlantaService } from '../../core/services/planta.service';
+import { MapControlService } from '../services/map-control.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
+import { GLOBAL } from '@core/services/global';
+import { InformeService } from '@core/services/informe.service';
+import { FilterService } from '../../core/services/filter.service';
+import { OlMapService } from '@core/services/ol-map.service';
+
+import { PlantaInterface } from '../../core/models/planta';
+import { LocationAreaInterface } from '../../core/models/location';
+import { Anomalia } from '@core/models/anomalia';
+import { ThermalLayerInterface } from '@core/models/thermalLayer';
+import { AreaFilter } from '@core/models/areaFilter.js';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -53,12 +64,14 @@ export class MapViewComponent implements OnInit {
   public selectedInformeId: string;
   public anomaliasVectorSource: VectorSource;
   public locAreasVectorSource: VectorSource;
-  public thermalSource;
   public anomaliaSeleccionada: Anomalia;
   public listaAnomalias: Anomalia[];
   public sliderYear: number;
   public aerialLayer: TileLayer;
+  private sourceArea: VectorSource;
+  private vectorArea: VectorLayer;
   private extent1: any;
+  public thermalSource;
   private thermalLayers: TileLayer[];
   private anomaliaLayers: VectorLayer[];
   public leftOpened: boolean;
@@ -78,7 +91,8 @@ export class MapViewComponent implements OnInit {
     private route: ActivatedRoute,
     private plantaService: PlantaService,
     private informeService: InformeService,
-    public filterService: FilterService
+    public filterService: FilterService,
+    private olMapService: OlMapService
   ) {}
 
   ngOnInit(): void {
@@ -108,7 +122,7 @@ export class MapViewComponent implements OnInit {
           // Crear capa térmica
           const tl = thermalLayers.filter((item) => item.informeId == informe.id);
 
-          //crear capa de las anomalias
+          // crear capa de las anomalias
           // const al = this.anomaliaLayers.push(al);
           // TODO: Comprobar que existe...
           if (tl.length > 0) {
@@ -150,6 +164,7 @@ export class MapViewComponent implements OnInit {
 
     return tl;
   }
+
   private _createAnomaliaLayer(informeId: string): VectorLayer {
     const vl = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
@@ -168,6 +183,7 @@ export class MapViewComponent implements OnInit {
     this.mapControlService.sliderMin = lowValue;
     // this.mapControlService.sliderMin = this.value;
   }
+
   initMap() {
     const satellite = new XYZ({
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -188,7 +204,7 @@ export class MapViewComponent implements OnInit {
       // extent: this.extent1,
     });
 
-    const layers = [osmLayer, this.aerialLayer].concat(this.thermalLayers);
+    const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers];
 
     // Escuchar el postrender
     // this.thermalLayers[1].on('postrender', (event) => {
@@ -273,18 +289,28 @@ export class MapViewComponent implements OnInit {
     // });
 
     // MAPA
-    this.map = new Map({
+    /* this.map = new Map({
       target: 'map',
       controls: defaultControls({ attribution: false }),
-
-      layers: layers,
+      layers,
       view: new View({
         center: fromLonLat([this.planta.longitud, this.planta.latitud]),
         zoom: 18,
         maxZoom: 24,
         extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
       }),
+    }); */
+    const view = new View({
+      center: fromLonLat([this.planta.longitud, this.planta.latitud]),
+      zoom: 18,
+      maxZoom: 24,
+      extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
     });
+
+    this.olMapService
+      .createMap('map', layers, view, defaultControls({ attribution: false }))
+      .subscribe((map) => (this.map = map));
+
     this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
     this.addCursorOnHover();
     this.addLocationAreas();
@@ -346,6 +372,9 @@ export class MapViewComponent implements OnInit {
     this.mapControlService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInformeId = informeId;
       this.mostrarTodasAnomalias(this.selectedInformeId);
+
+      // reiniciamos filter service
+      this.filterService.initFilterService(informeId, 'informe');
     });
   }
 
@@ -381,7 +410,7 @@ export class MapViewComponent implements OnInit {
   }
 
   private addOverlayInfoAnomalia() {
-    //Overlay para los detalles de cada anomalia
+    // Overlay para los detalles de cada anomalia
     const element = document.getElementById('popup');
 
     var popup = new Overlay({
@@ -434,6 +463,7 @@ export class MapViewComponent implements OnInit {
   private transform(extent) {
     return transformExtent(extent, 'EPSG:4326', 'EPSG:3857');
   }
+
   addLocationAreas() {
     const styles = {
       LineString: new Style({
@@ -479,6 +509,7 @@ export class MapViewComponent implements OnInit {
       // this._prueba();
     });
   }
+
   private locAreasToGeoJSON(locAreas: LocationAreaInterface[]) {
     let listOfFeatures = [];
     locAreas.forEach((locArea) => {
@@ -513,6 +544,7 @@ export class MapViewComponent implements OnInit {
 
     return geojsonObject;
   }
+
   permitirCrearAnomalias() {
     const draw = new Draw({
       source: this.anomaliasVectorSource,
@@ -525,6 +557,7 @@ export class MapViewComponent implements OnInit {
       this.addAnomaliaToDb(event.feature);
     });
   }
+
   private addAnomaliaToDb(feature: Feature) {
     const geometry = feature.getGeometry() as SimpleGeometry;
 
@@ -551,6 +584,7 @@ export class MapViewComponent implements OnInit {
 
     return GLOBAL.colores_tipos[tipo];
   }
+
   private getStyleAnomaliasMapa(selected = false) {
     return (feature) => {
       if (feature != undefined && feature.getProperties().hasOwnProperty('properties')) {
@@ -575,6 +609,7 @@ export class MapViewComponent implements OnInit {
       }
     };
   }
+
   mostrarTodasAnomalias(informeId: string) {
     this.filterService.filteredElements$.subscribe((anomalias) => {
       // Dibujar anomalias
@@ -582,6 +617,7 @@ export class MapViewComponent implements OnInit {
       this.listaAnomalias = anomalias as Anomalia[];
     });
   }
+
   dibujarAnomalias(anomalias: Anomalia[]) {
     // Para cada vector layer (que corresponde a un informe)
 
@@ -615,6 +651,7 @@ export class MapViewComponent implements OnInit {
 
     this._addSelectInteraction();
   }
+
   private _addSelectInteraction() {
     const select = new Select({
       style: this.getStyleAnomaliasMapa(true),

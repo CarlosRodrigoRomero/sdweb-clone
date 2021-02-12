@@ -1,7 +1,11 @@
 <div class="filtro">
   <h5>Tipo</h5>
-  <div>
-    <li *ngFor="let tipo of tiposPcs; index as i">
+  <button class="tipo-select" mat-stroked-button [matMenuTriggerFor]="menu">
+    <span class="filter-selected">{{selected.toString()}}</span>
+    <mat-icon>keyboard_arrow_down</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <li *ngFor="let tipo of tiposPcs; index as i" (click)="stopPropagation($event)">
       <mat-checkbox
         [(ngModel)]="tipo.completed"
         [id]="'tipo_' + (i + 1)"
@@ -11,7 +15,8 @@
         <span style="font-size: 15px">
           {{ tipo.label }}
         </span>
+        <span class="count" style="font-size: 13px">{{ tipo.count }}</span>
       </mat-checkbox>
     </li>
-  </div>
+  </mat-menu>
 </div>
