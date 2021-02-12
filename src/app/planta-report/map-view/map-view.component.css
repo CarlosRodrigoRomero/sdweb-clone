@@ -5,8 +5,8 @@
 
 #popup {
   position: absolute;
-  top: 0px;
-  left: 40%;
+  top: 10px;
+  left: 50%;
   width: 500px;
   background-color: white;
 }
@@ -46,10 +46,9 @@ app-download-report {
 app-barra-resumen-planta {
   position: absolute;
   top: 75px;
-  left: 80px;
+  left: 60px;
   margin: 10px;
   z-index: 999;
-  width: 83%;
 }
 
 .left-sidenav {
@@ -78,7 +77,6 @@ app-barra-resumen-planta {
 .stats-sidenav {
   display: flex;
   margin-right: 10px;
-  margin-bottom: 35px;
   border-radius: 4px;
   width: 1100px;
 }

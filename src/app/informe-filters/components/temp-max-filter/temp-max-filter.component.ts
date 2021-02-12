@@ -21,7 +21,7 @@ export class TempMaxFilterComponent implements OnInit {
   options: Options;
 
   constructor(private anomaliaService: AnomaliaService, private filterService: FilterService) {
-    this.minTemp = 0;
+    this.minTemp = 50;
     // this.maxTemp = this.anomaliaService.getTempMaxAll();
     this.maxTemp = 100;
     this.rangoMinTemp = this.minTemp;

@@ -2,13 +2,15 @@
   <mat-icon>share</mat-icon>
 </button>
 <mat-menu #menu="matMenu" class="menu">
-  <h5>Compartir</h5>
-  <mat-form-field class="email" appearance="outline" (click)="stopPropagation($event)">
-    <mat-label>email</mat-label>
-    <input matInput />
-  </mat-form-field>
-  <button mat-menu-item type="submit" class="btn-enviar">
-    <mat-icon>send</mat-icon>
-    <span>Enviar</span>
-  </button>
+  <div class="contenedor-menu">
+    <h5>Compartir</h5>
+    <mat-form-field class="email" appearance="outline" (click)="stopPropagation($event)">
+      <mat-label>email</mat-label>
+      <input matInput />
+    </mat-form-field>
+    <button mat-menu-item type="submit" class="btn-enviar">
+      <mat-icon>send</mat-icon>
+      <span>Enviar</span>
+    </button>
+  </div>
 </mat-menu>

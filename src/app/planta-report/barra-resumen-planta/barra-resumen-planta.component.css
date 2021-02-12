@@ -1,3 +1,8 @@
+.container-barra-titulo {
+  display: flex;
+  justify-content: space-between;
+}
+
 .barra-titulo {
   display: flex;
   padding: 0.5rem 2rem;
@@ -26,7 +31,7 @@
 }
 
 .plantas {
-  margin-right: 1rem;
+  margin-right: 0rem;
 }
 
 .titulo h4 {
@@ -44,8 +49,10 @@
 }
 .grupo2 mat-icon {
   font-size: 1.5rem;
+  margin-right: 1rem;
 }
 .grupo2 .elemento {
+  display: flex;
   margin-left: 1rem;
 }
 
@@ -65,4 +72,10 @@
 }
 .success {
   color: green;
+}
+.btn-info {
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  color: grey;
 }

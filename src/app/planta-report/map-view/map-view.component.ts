@@ -378,23 +378,35 @@ export class MapViewComponent implements OnInit {
     });
   }
 
-  private _prueba() {
-    this.filterService.filteredElements$.pipe(take(1)).subscribe((anomalias) => {
-      anomalias.forEach((anom) => {
-        const anomalia = anom as Anomalia;
-        const anomaliaCoord = anomalia.featureCoords;
-        this.locAreasVectorSource.getFeatures().forEach((feature) => {
-          const globalExtent = feature.getGeometry().getExtent();
-          const contains = containsCoordinate(globalExtent, anomaliaCoord[0]);
-          if (contains) {
-            anomalia.globalCoords = feature.getProperties().globalCoords;
-            this.anomaliaService.updateAnomalia(anomalia).then((v) => {
-              console.log('anomalia actualizada');
-            });
-          }
-        });
-      });
-    });
+  // private _prueba() {
+  //   this.filterService.filteredElements$.pipe(take(1)).subscribe((anomalias) => {
+  //     anomalias.forEach((anom) => {
+  //       const anomalia = anom as Anomalia;
+
+  //       if (anomalia.temperaturaMax == 0 && (anomalia.tipo == 9 || anomalia.tipo == 8)) {
+  //         const newGrad = this.getRandomArbitrary(4, 50);
+  //         anomalia.gradienteNormalizado = newGrad;
+  //         anomalia.temperaturaRef = 50;
+  //         anomalia.temperaturaMax = anomalia.temperaturaRef + newGrad;
+  //         // this.anomaliaService.updateAnomalia(anomalia).then((v) => {
+  //         //   console.log('anomalia actualizada');
+  //         // });
+  //       }
+  //       // this.locAreasVectorSource.getFeatures().forEach((feature) => {
+  //       //   const globalExtent = feature.getGeometry().getExtent();
+  //       //   const contains = containsCoordinate(globalExtent, anomaliaCoord[0]);
+  //       //   if (contains) {
+  //       //     anomalia.globalCoords = feature.getProperties().globalCoords;
+  //       //     this.anomaliaService.updateAnomalia(anomalia).then((v) => {
+  //       //       console.log('anomalia actualizada');
+  //       //     });
+  //       //   }
+  //       // });
+  //     });
+  //   });
+  // }
+  getRandomArbitrary(min, max) {
+    return Math.round(10 * (Math.random() * (max - min) + min)) / 10;
   }
 
   private addOverlayInfoAnomalia() {
