@@ -21,18 +21,19 @@ export class ChartSankeyComponent implements AfterViewInit {
     data.addColumn('string', 'To');
     data.addColumn('number', 'Weight');
     data.addRows([
-      ['Célula caliente', 'Célula caliente.', 170],
-      ['Célula caliente', 'Varias células calientes.', 26],
+      ['Célula caliente', 'Célula caliente.', 101],
+      ['Célula caliente', 'Varias células calientes.', 2],
       ['Célula caliente', 'String', 2],
-      ['Varias células calientes', 'Varias células calientes.', 8],
+      ['Varias células calientes', 'Varias células calientes.', 28],
       ['Varias células calientes', 'Substring en CA.', 1],
       ['Substring en CA', 'Substring en CA.', 9],
-      ['Substring en CA', '2x Substring en CA.', 1],
-      ['Nuevas', 'Célula caliente.', 20],
+      ['Substring en CA', '2x Substring en CA.', 2],
+      ['Nuevas', 'Célula caliente.', 10],
       ['Nuevas', 'Varias células calientes.', 4],
       ['Nuevas', 'String', 15],
       ['Nuevas', 'Substring en CA.', 1],
-      ['Célula caliente', 'unknown', 25],
+      ['Célula caliente', 'unknown', 30],
+      ['Varias células calientes', 'unknown', 2],
     ]);
 
     // Sets chart options.
