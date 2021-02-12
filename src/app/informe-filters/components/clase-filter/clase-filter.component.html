@@ -1,20 +1,18 @@
 <div class="filtro">
   <h5>Clase</h5>
-  <div class="grupo">
-    <li *ngFor="let clase of clasesPcs; index as i">
-      <mat-checkbox
-        [(ngModel)]="clase.completed"
-        [id]="'CoA_' + (i + 1)"
-        [name]="clase.label"
-        (change)="onChangeFiltroClase($event)"
-      >
-        <div class="label">
-          <mat-icon [ngStyle]="{ color: coloresSeveridad[i] }">stop_circle</mat-icon>
-          <span style="font-size: 15px">
-            {{ clase.label }}
-          </span>
-        </div>
-      </mat-checkbox>
-    </li>
-  </div>
+  <mat-button-toggle-group #group="matButtonToggleGroup" multiple="true">
+    <mat-button-toggle
+      *ngFor="let clase of clasesPcs; index as i"
+      [id]="'CoA_' + (i + 1)"
+      [name]="clase.label"
+      (change)="onChangeClaseFilter($event)"
+    >
+      <div class="label">
+        <mat-icon [ngStyle]="{ color: coloresSeveridad[i] }">stop_circle</mat-icon>
+        <span class="text-label" style="font-size: 15px">
+          {{ clase.label }}
+        </span>
+      </div>
+    </mat-button-toggle>
+  </mat-button-toggle-group>
 </div>

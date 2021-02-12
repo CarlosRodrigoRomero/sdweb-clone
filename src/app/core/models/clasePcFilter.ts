@@ -12,10 +12,10 @@ export class ClasePcFilter implements FilterInterface {
     this.clase = clase;
   }
 
-  applyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
-    return pcs.filter((pc) => pc.clase == this.clase); // antes pc.severidad
+  applyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
+    return elems.filter((elem) => elem.clase == this.clase); // antes pc.severidad
   }
-  unapplyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
+  unapplyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
     return null;
   }
 }

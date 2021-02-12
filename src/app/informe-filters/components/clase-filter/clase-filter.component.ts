@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { MatCheckboxChange } from '@angular/material/checkbox';
+import { MatButtonToggleChange } from '@angular/material/button-toggle';
 
 import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
@@ -40,8 +40,8 @@ export class ClaseFilterComponent implements OnInit {
     this.coloresSeveridad = GLOBAL.colores_severidad;
   }
 
-  onChangeFiltroClase(event: MatCheckboxChange) {
-    if (event.checked) {
+  onChangeClaseFilter(event: MatButtonToggleChange) {
+    if (event.source.checked) {
       this.filtroClase = new ClasePcFilter(
         event.source.id,
         'clase',

@@ -7,6 +7,8 @@ import { PcService } from '@core/services/pc.service';
 import { FilterService } from '@core/services/filter.service';
 
 import { ModuloPcFilter } from '@core/models/moduloFilter';
+import { FiltrableInterface } from '@core/models/filtrableInterface';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 interface ModuloPc {
   label?: string;
@@ -28,10 +30,14 @@ export class ModuloFilterComponent implements OnInit {
   defaultSelect = 'Tipo módulo';
   selected: string[] = [this.defaultSelect];
 
-  constructor(private pcService: PcService, private filterService: FilterService) {}
+  constructor(
+    private pcService: PcService,
+    private filterService: FilterService,
+    private anomaliaService: AnomaliaService
+  ) {}
 
   ngOnInit(): void {
-    this.pcService.getModulosPcs().forEach((modulo) =>
+    this.getModulos().forEach((modulo) =>
       this.modulosPcs.push({
         label: modulo,
         completed: false,
@@ -70,5 +76,38 @@ export class ModuloFilterComponent implements OnInit {
         this.selected.push(this.defaultSelect);
       }
     }
+  }
+
+  getModulos(): string[] {
+    const modulos: string[] = [];
+
+    this.filterService.filteredElements$.subscribe((elems) =>
+      elems.forEach((elem) => {
+        console.log(elem);
+        /* if (!modulos.includes(this.getModuloLabel(elem))) {
+          modulos.push(this.getModuloLabel(elem));
+        } */
+      })
+    );
+
+    return modulos;
+  }
+
+  getModuloLabel(elem: FiltrableInterface): string {
+    let moduloLabel: string;
+    if (elem.modulo.marca === undefined) {
+      if (elem.modulo.modelo === undefined) {
+        moduloLabel = elem.modulo.potencia + 'W';
+      } else {
+        moduloLabel = elem.modulo.modelo + ' ' + elem.modulo.potencia + 'W';
+      }
+    } else {
+      if (elem.modulo.modelo === undefined) {
+        moduloLabel = elem.modulo.marca + ' ' + elem.modulo.potencia + 'W';
+      } else {
+        moduloLabel = elem.modulo.marca + ' ' + elem.modulo.modelo + ' ' + elem.modulo.potencia + 'W';
+      }
+    }
+    return moduloLabel;
   }
 }
