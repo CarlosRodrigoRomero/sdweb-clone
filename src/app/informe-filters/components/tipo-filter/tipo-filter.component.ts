@@ -60,13 +60,15 @@ export class TipoFilterComponent implements OnInit {
         this.selected = [event.source.name];
       }
     } else {
-      this.filterService.filters
-        .filter((filter) => filter.type === 'tipo')
-        .forEach((filter) => {
-          if (filter.id === event.source.id) {
-            this.filterService.deleteFilter(filter);
-          }
-        });
+      this.filterService.filters$.subscribe((filters) =>
+        filters
+          .filter((filter) => filter.type === 'tipo')
+          .forEach((filter) => {
+            if (filter.id === event.source.id) {
+              this.filterService.deleteFilter(filter);
+            }
+          })
+      );
 
       // eliminamos el 'tipo' de seleccionados
       this.selected = this.selected.filter((sel) => sel !== event.source.name);

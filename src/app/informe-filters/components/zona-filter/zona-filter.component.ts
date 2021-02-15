@@ -44,13 +44,15 @@ export class ZonaFilterComponent implements OnInit {
       this.filtroZona = new ZonaFilter(event.source.id, 'zona', event.source.name);
       this.filterService.addFilter(this.filtroZona);
     } else {
-      this.filterService.filters
-        .filter((filter) => filter.type === 'zona')
-        .forEach((filter) => {
-          if (filter.id === event.source.id) {
-            this.filterService.deleteFilter(filter);
-          }
-        });
+      this.filterService.filters$.subscribe((filters) =>
+        filters
+          .filter((filter) => filter.type === 'zona')
+          .forEach((filter) => {
+            if (filter.id === event.source.id) {
+              this.filterService.deleteFilter(filter);
+            }
+          })
+      );
     }
   }
 }

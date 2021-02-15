@@ -1,11 +1,13 @@
-<div *ngIf="anomaliasLoaded">
-  <app-share-map></app-share-map>
-  <app-download-report></app-download-report>
-  <app-barra-resumen-planta></app-barra-resumen-planta>
+<div *ngIf="!sharedReport">
+  <div *ngIf="anomaliasLoaded">
+    <app-share-map></app-share-map>
+    <app-download-report></app-download-report>
+    <app-barra-resumen-planta></app-barra-resumen-planta>
+  </div>
 </div>
 
 <mat-sidenav-container class="example-container" [hasBackdrop]="false">
-  <mat-sidenav
+  <mat-sidenav *ngIf="!sharedReport"
     #sidenavLeft
     [(opened)]="leftOpened"
     class="left-sidenav"
@@ -36,7 +38,7 @@
     <app-filter-pcs-list></app-filter-pcs-list>
   </mat-sidenav>
 
-  <mat-sidenav
+  <mat-sidenav *ngIf="!sharedReport"
     #sidenavStats
     [(opened)]="statsOpened"
     class="stats-sidenav"
@@ -51,16 +53,16 @@
   <mat-sidenav-content>
     <div class="rel">
       <div id="map" class="map"></div>
+
       <div *ngIf="anomaliaSeleccionada" id="popup">
         <app-anomalia-info [anomalia]="anomaliaSeleccionada"></app-anomalia-info>
       </div>
 
-      <!-- MAPA -->
-      <app-map-control id="map-control"></app-map-control>
+      <app-map-control *ngIf="!sharedReport" id="map-control"></app-map-control>
     </div>
 
     <div *ngIf="anomaliasLoaded">
-      <button mat-raised-button class="btn-left" (click)="sidenavLeft.toggle()">
+      <button mat-raised-button *ngIf="!sharedReport" class="btn-left" (click)="sidenavLeft.toggle()">
         <mat-icon *ngIf="!leftOpened">keyboard_arrow_right</mat-icon>
         <mat-icon *ngIf="leftOpened">keyboard_arrow_left</mat-icon>
         <mat-icon>filter_alt</mat-icon>
@@ -70,7 +72,7 @@
         <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
         <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon>
       </button>
-      <button mat-raised-button class="btn-right-stats" (click)="sidenavStats.toggle()">
+      <button mat-raised-button *ngIf="!sharedReport" class="btn-right-stats" (click)="sidenavStats.toggle()">
         <mat-icon>query_stats</mat-icon>
         <mat-icon *ngIf="!statsOpened">keyboard_arrow_left</mat-icon>
         <mat-icon *ngIf="statsOpened">keyboard_arrow_right</mat-icon>

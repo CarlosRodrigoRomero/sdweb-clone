@@ -39,5 +39,6 @@ import { DownloadReportComponent } from './download-report/download-report.compo
     DownloadReportComponent,
   ],
   imports: [SharedModule, NgxSliderModule, PlantaReportRoutingModule, NgApexchartsModule, InformeFiltersModule],
+  exports: [MapViewComponent],
 })
 export class PlantaReportModule {}

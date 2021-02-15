@@ -49,13 +49,15 @@ export class ClaseFilterComponent implements OnInit {
       );
       this.filterService.addFilter(this.filtroClase);
     } else {
-      this.filterService.filters
-        .filter((filter) => filter.type === 'clase')
-        .forEach((filter) => {
-          if (filter.id === event.source.id) {
-            this.filterService.deleteFilter(filter);
-          }
-        });
+      this.filterService.filters$.subscribe((filters) =>
+        filters
+          .filter((filter) => filter.type === 'clase')
+          .forEach((filter) => {
+            if (filter.id === event.source.id) {
+              this.filterService.deleteFilter(filter);
+            }
+          })
+      );
     }
   }
 }

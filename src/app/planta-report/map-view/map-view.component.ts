@@ -80,6 +80,7 @@ export class MapViewComponent implements OnInit {
   public anomaliasLoaded = false;
   public mousePosition;
   public informesList: string[];
+  public sharedReport = true;
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
@@ -134,7 +135,12 @@ export class MapViewComponent implements OnInit {
         });
 
         this.planta = planta;
-        this.initMap();
+
+        if (this.sharedReport) {
+          this.initSharedMap();
+        } else {
+          this.initMap();
+        }
       });
 
     this.mapControlService.selectedInformeId = this.informesList[1];
@@ -159,7 +165,7 @@ export class MapViewComponent implements OnInit {
       extent: this.extent1,
     });
     tl.setProperties({
-      informeId: informeId,
+      informeId,
     });
 
     return tl;
@@ -172,7 +178,7 @@ export class MapViewComponent implements OnInit {
     });
 
     vl.setProperties({
-      informeId: informeId,
+      informeId,
     });
 
     return vl;
@@ -206,100 +212,7 @@ export class MapViewComponent implements OnInit {
 
     const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers];
 
-    // Escuchar el postrender
-    // this.thermalLayers[1].on('postrender', (event) => {
-    //   if (this.anomaliaSeleccionada) {
-    //     const coords = this.anomaliaSeleccionada.featureCoords;
-    //     var pixel = getRenderPixel(event, coords[0]);
-
-    //     var context = event.context;
-    //     var centerX = coords[0][0];
-    //     var centerY = coords[0][1];
-    //     const sx = this._distance(coords[0], coords[1]);
-    //     const sy = this._distance(coords[2], coords[1]);
-    //     const tiles = event.target.renderer_.layer_.renderer_.renderedTiles;
-
-    //     const canvas = event.context.canvas;
-    //     // tiles.forEach((tile) => {
-    //     //   if (tile.lastCanvas == canvas) {
-    //     //     console.log('tile', tile);
-    //     //   }
-    //     // });
-
-    //     // var sourceData = context.getImageData(centerX, centerY, sx, sy).data;
-    //     // const;
-    //   }
-    // });
-
-    // get the pixel position with every move
-    // var container = document.getElementById('map');
-    // container.addEventListener('mousemove', (event) => {
-    //   this.mousePosition = this.map.getEventPixel(event);
-    //   this.map.render();
-    // });
-
-    // container.addEventListener('mouseout', () => {
-    //   this.mousePosition = null;
-    //   this.map.render();
-    // });
-    // const radius = 75;
-
-    // // after rendering the layer, show an oversampled version around the pointer
-    // this.thermalLayers[1].on('postrender', (event) => {
-    //   if (this.mousePosition) {
-    //     var pixel = getRenderPixel(event, this.mousePosition);
-    //     var offset = getRenderPixel(event, [this.mousePosition[0] + radius, this.mousePosition[1]]);
-    //     var half = Math.sqrt(Math.pow(offset[0] - pixel[0], 2) + Math.pow(offset[1] - pixel[1], 2));
-    //     var context = event.context;
-    //     var centerX = pixel[0];
-    //     var centerY = pixel[1];
-    //     var originX = centerX - half;
-    //     var originY = centerY - half;
-    //     var size = Math.round(2 * half + 1);
-    //     var sourceData = context.getImageData(originX, originY, size, size).data;
-    //     var dest = context.createImageData(size, size);
-    //     var destData = dest.data;
-    //     for (var j = 0; j < size; ++j) {
-    //       for (var i = 0; i < size; ++i) {
-    //         var dI = i - half;
-    //         var dJ = j - half;
-    //         var dist = Math.sqrt(dI * dI + dJ * dJ);
-    //         var sourceI = i;
-    //         var sourceJ = j;
-    //         if (dist < half) {
-    //           sourceI = Math.round(half + dI / 2);
-    //           sourceJ = Math.round(half + dJ / 2);
-    //         }
-    //         var destOffset = (j * size + i) * 4;
-    //         var sourceOffset = (sourceJ * size + sourceI) * 4;
-    //         destData[destOffset] = sourceData[sourceOffset];
-    //         destData[destOffset + 1] = sourceData[sourceOffset + 1];
-    //         destData[destOffset + 2] = sourceData[sourceOffset + 2];
-    //         destData[destOffset + 3] = sourceData[sourceOffset + 3];
-    //       }
-    //     }
-    //     context.beginPath();
-    //     context.arc(centerX, centerY, half, 0, 2 * Math.PI);
-    //     context.lineWidth = (3 * half) / radius;
-    //     context.strokeStyle = 'rgba(255,255,255,0.5)';
-    //     context.putImageData(dest, originX, originY);
-    //     context.stroke();
-    //     context.restore();
-    //   }
-    // });
-
     // MAPA
-    /* this.map = new Map({
-      target: 'map',
-      controls: defaultControls({ attribution: false }),
-      layers,
-      view: new View({
-        center: fromLonLat([this.planta.longitud, this.planta.latitud]),
-        zoom: 18,
-        maxZoom: 24,
-        extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
-      }),
-    }); */
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
       zoom: 18,
@@ -378,33 +291,42 @@ export class MapViewComponent implements OnInit {
     });
   }
 
-  // private _prueba() {
-  //   this.filterService.filteredElements$.pipe(take(1)).subscribe((anomalias) => {
-  //     anomalias.forEach((anom) => {
-  //       const anomalia = anom as Anomalia;
+  initSharedMap() {
+    const aerial = new XYZ({
+      url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
+      crossOrigin: '',
+    });
 
-  //       if (anomalia.temperaturaMax == 0 && (anomalia.tipo == 9 || anomalia.tipo == 8)) {
-  //         const newGrad = this.getRandomArbitrary(4, 50);
-  //         anomalia.gradienteNormalizado = newGrad;
-  //         anomalia.temperaturaRef = 50;
-  //         anomalia.temperaturaMax = anomalia.temperaturaRef + newGrad;
-  //         // this.anomaliaService.updateAnomalia(anomalia).then((v) => {
-  //         //   console.log('anomalia actualizada');
-  //         // });
-  //       }
-  //       // this.locAreasVectorSource.getFeatures().forEach((feature) => {
-  //       //   const globalExtent = feature.getGeometry().getExtent();
-  //       //   const contains = containsCoordinate(globalExtent, anomaliaCoord[0]);
-  //       //   if (contains) {
-  //       //     anomalia.globalCoords = feature.getProperties().globalCoords;
-  //       //     this.anomaliaService.updateAnomalia(anomalia).then((v) => {
-  //       //       console.log('anomalia actualizada');
-  //       //     });
-  //       //   }
-  //       // });
-  //     });
-  //   });
-  // }
+    this.aerialLayer = new TileLayer({
+      source: aerial,
+      extent: this.extent1,
+    });
+    const osmLayer = new TileLayer({
+      source: new OSM(),
+    });
+
+    const layers = [osmLayer, this.aerialLayer];
+
+    // MAPA
+    const view = new View({
+      center: fromLonLat([this.planta.longitud, this.planta.latitud]),
+      zoom: 18,
+      maxZoom: 24,
+      extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
+    });
+
+    this.olMapService
+      .createMap('map', layers, view, defaultControls({ attribution: false }))
+      .subscribe((map) => (this.map = map));
+
+    this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
+    this.addCursorOnHover();
+    this.addOverlayInfoAnomalia();
+    // this.permitirCrearAnomalias();
+
+    this.mostrarTodasAnomalias(this.selectedInformeId);
+  }
+
   getRandomArbitrary(min, max) {
     return Math.round(10 * (Math.random() * (max - min) + min)) / 10;
   }
@@ -413,8 +335,8 @@ export class MapViewComponent implements OnInit {
     // Overlay para los detalles de cada anomalia
     const element = document.getElementById('popup');
 
-    var popup = new Overlay({
-      element: element,
+    const popup = new Overlay({
+      element,
       positioning: OverlayPositioning.BOTTOM_CENTER,
       stopEvent: false,
       offset: [0, -50],
@@ -423,10 +345,10 @@ export class MapViewComponent implements OnInit {
 
     this.map.on('click', (event) => {
       const clickedCoord = event.coordinate;
-      var feature = this.map.getFeaturesAtPixel(event.pixel);
+      const feature = this.map.getFeaturesAtPixel(event.pixel);
       if (feature.length > 0) {
         const geometry = feature[0].getGeometry() as Polygon;
-        var coordinate = geometry.getCoordinates();
+        const coordinate = geometry.getCoordinates();
         popup.setPosition(undefined);
         popup.setPosition(clickedCoord);
         // element.innerHTML = 'hola probando';
@@ -486,8 +408,8 @@ export class MapViewComponent implements OnInit {
       }),
     };
     const styleFunction = (feature) => {
-      if (feature != undefined) {
-        let style = styles[feature.getGeometry().getType()];
+      if (feature !== undefined) {
+        const style = styles[feature.getGeometry().getType()];
         // style.getText().setText(feature.get('globalCoords'));
         style.getText().setText(feature.get('globalCoords')[1]);
         return style;

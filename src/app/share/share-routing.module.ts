@@ -5,7 +5,7 @@ import { MapSharedComponent } from './components/map-shared/map-shared.component
 
 const routes: Routes = [
   {
-    path: ':id',
+    path: '',
     component: MapSharedComponent,
   },
 ];

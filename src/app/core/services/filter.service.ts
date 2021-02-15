@@ -11,18 +11,17 @@ import { GLOBAL } from './global';
   providedIn: 'root',
 })
 export class FilterService {
-  public typeAddFilters = ['area', 'tipo', 'clase', 'modulo', 'zona'];
-  public filters: FilterInterface[] = [];
+  private typeAddFilters = ['area', 'tipo', 'clase', 'modulo', 'zona'];
+  private filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
-  public filtersByType: FilterInterface[] = [];
-  public filtersByType$ = new BehaviorSubject<FilterInterface[]>(this.filtersByType);
-  public filteredElements: FiltrableInterface[] = [];
+  private filtersByType: FilterInterface[] = [];
+  private filtersByType$ = new BehaviorSubject<FilterInterface[]>(this.filtersByType);
+  private filteredElements: FiltrableInterface[] = [];
   public filteredElements$ = new BehaviorSubject<FiltrableInterface[]>(this.filteredElements);
-  public typeAddFilteredPcs: FiltrableInterface[] = [];
-  public _allFiltrableElements: FiltrableInterface[];
+  private _allFiltrableElements: FiltrableInterface[];
   private _initialized = false;
-  public initialized$ = new BehaviorSubject<boolean>(this._initialized);
-  public labelsTipoPcs: string[] = [];
+  private initialized$ = new BehaviorSubject<boolean>(this._initialized);
+  private labelsTipoPcs: string[] = [];
   public labelsTipoPcs$ = new BehaviorSubject<string[]>(this.labelsTipoPcs);
   private countTipoPcs: number[] = [];
   public countTipoPcs$ = new BehaviorSubject<number[]>(this.countTipoPcs);
