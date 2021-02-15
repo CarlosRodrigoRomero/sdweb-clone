@@ -17,6 +17,7 @@ import { PlantaService } from '@core/services/planta.service';
 import { ModuloInterface } from '@core/models/modulo';
 import { PcService } from '@core/services/pc.service';
 declare let fabric;
+declare var require: any;
 
 @Component({
   selector: 'app-canvas',
