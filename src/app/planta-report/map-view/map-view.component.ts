@@ -388,9 +388,10 @@ export class MapViewComponent implements OnInit {
   //         anomalia.gradienteNormalizado = newGrad;
   //         anomalia.temperaturaRef = 50;
   //         anomalia.temperaturaMax = anomalia.temperaturaRef + newGrad;
-  //         // this.anomaliaService.updateAnomalia(anomalia).then((v) => {
-  //         //   console.log('anomalia actualizada');
-  //         // });
+  //         console.log(anomalia.temperaturaMax);
+  //         this.anomaliaService.updateAnomalia(anomalia).then((v) => {
+  //           console.log('anomalia actualizada');
+  //         });
   //       }
   //       // this.locAreasVectorSource.getFeatures().forEach((feature) => {
   //       //   const globalExtent = feature.getGeometry().getExtent();

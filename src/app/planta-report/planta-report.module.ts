@@ -19,6 +19,7 @@ import { ChartPctCelsComponent } from './planta-stats/chart-pct-cels/chart-pct-c
 import { ChartCelsTempsComponent } from './planta-stats/chart-cels-temps/chart-cels-temps.component';
 import { ChartCelsPorZonasComponent } from './planta-stats/chart-cels-por-zonas/chart-cels-por-zonas.component';
 import { DownloadReportComponent } from './download-report/download-report.component';
+import { ChartSankeyPotenciaComponent } from './planta-stats/chart-sankey-potencia/chart-sankey-potencia.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { DownloadReportComponent } from './download-report/download-report.compo
     ChartCelsTempsComponent,
     ChartCelsPorZonasComponent,
     DownloadReportComponent,
+    ChartSankeyPotenciaComponent,
   ],
   imports: [SharedModule, NgxSliderModule, PlantaReportRoutingModule, NgApexchartsModule, InformeFiltersModule],
 })
