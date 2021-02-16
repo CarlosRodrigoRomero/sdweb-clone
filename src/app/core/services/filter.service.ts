@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-
-import { FilterInterface } from '@core/models/filter';
-
 import { Observable, BehaviorSubject, of } from 'rxjs';
-import { FiltrableInterface } from '@core/models/filtrableInterface';
+
 import { AnomaliaService } from './anomalia.service';
+import { ShareReportService } from '@core/services/share-report.service';
+
+import { FiltrableInterface } from '@core/models/filtrableInterface';
+import { FilterInterface } from '@core/models/filter';
 import { GLOBAL } from './global';
 
 @Injectable({
@@ -26,7 +27,7 @@ export class FilterService {
   private countTipoPcs: number[] = [];
   public countTipoPcs$ = new BehaviorSubject<number[]>(this.countTipoPcs);
 
-  constructor(private anomaliaService: AnomaliaService) {
+  constructor(private anomaliaService: AnomaliaService, private shareReportService: ShareReportService) {
     // this.anomaliaService
     //   .getAnomalias$('vfMHFBPvNFnOFgfCgM9L')
     //   .pipe(take(1))
@@ -71,6 +72,9 @@ export class FilterService {
       this.filters.push(filter);
     }
     this.filters$.next(this.filters);
+
+    // añadimos parametros para compartir
+    this.shareReportService.setParams(filter);
 
     this.applyFilters();
   }
@@ -141,8 +145,10 @@ export class FilterService {
     if (filter.type !== 'tipo') {
       this.updateNumberOfTipoPc();
     }
-
     this.filters$.next(this.filters);
+
+    // reseteamos parametros para compartir
+    this.shareReportService.resetParams(filter);
 
     this.applyFilters();
   }
@@ -151,6 +157,9 @@ export class FilterService {
     // Elimina todos los filtros
     this.filters = [];
     this.filters$.next(this.filters);
+
+    // reseteamos todos los parametros para compartir
+    this.shareReportService.resetAllParams();
 
     this.applyFilters();
   }

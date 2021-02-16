@@ -23,8 +23,8 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    path: 'share',
-    loadChildren: () => import('./share/share.module').then((m) => m.ShareModule),
+    path: 'shared',
+    loadChildren: () => import('./shared-report/shared-report.module').then((m) => m.SharedReportModule),
   },
 
   // // { path: "**", redirectTo: "" }

@@ -136,11 +136,7 @@ export class MapViewComponent implements OnInit {
 
         this.planta = planta;
 
-        if (this.sharedReport) {
-          this.initSharedMap();
-        } else {
-          this.initMap();
-        }
+        this.initMap();
       });
 
     this.mapControlService.selectedInformeId = this.informesList[1];

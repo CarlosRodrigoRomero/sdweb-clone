@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 
+import { BehaviorSubject } from 'rxjs';
+
 import { FilterInterface } from '@core/models/filter';
 import { GradientFilter } from '@core/models/gradientFilter';
 import { PerdidasFilter } from '@core/models/perdidasFilter';
@@ -10,7 +12,6 @@ import { ModuloPcFilter } from '@core/models/moduloFilter';
 import { TipoPcFilter } from '@core/models/tipoPcFilter';
 import { ZonaFilter } from '@core/models/zonaFilter';
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
-import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,11 @@ export class ShareReportService {
   public params$ = new BehaviorSubject<ParamsFilterShare>(this.params);
 
   constructor() {}
+
+  setInformeID(id: string) {
+    this.params.informeID = id;
+    this.params$.next(this.params);
+  }
 
   setParams(filter: FilterInterface) {
     switch (filter.type) {
@@ -51,6 +57,47 @@ export class ShareReportService {
         this.params.zona = (filter as ZonaFilter).zona;
         break;
     }
+  }
+
+  resetParams(filter: FilterInterface) {
+    switch (filter.type) {
+      case 'gradient':
+        this.params.minGradient = undefined;
+        this.params.maxGradient = undefined;
+        break;
+      case 'perdidas':
+        this.params.minPerdidas = undefined;
+        this.params.maxPerdidas = undefined;
+        break;
+      case 'tempMax':
+        this.params.minTempMax = undefined;
+        this.params.maxTempMax = undefined;
+        break;
+      case 'area':
+        this.params.coordsArea = undefined;
+        break;
+      case 'clase':
+        this.params.clase = undefined;
+        break;
+      case 'modulo':
+        this.params.modulo = undefined;
+        break;
+      case 'tipo':
+        this.params.tipo = undefined;
+        break;
+      case 'zona':
+        this.params.zona = undefined;
+        break;
+    }
+  }
+
+  resetAllParams() {
+    // resetea todos los parametros excepto el informeID
+    Object.keys(this.params).forEach((i) => {
+      if (this.params[i] !== this.params.informeID) {
+        this.params[i] = undefined;
+      }
+    });
   }
 
   getParams() {

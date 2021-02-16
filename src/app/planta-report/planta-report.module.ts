@@ -9,7 +9,7 @@ import { PlantaStatsComponent } from './planta-stats/planta-stats.component';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { ChartAlturaComponent } from './planta-stats/chart-altura/chart-altura.component';
 import { ChartNumsyperdComponent } from './planta-stats/chart-numsyperd/chart-numsyperd.component';
-import { InformeFiltersModule } from '../informe-filters/informe-filters.module';
+import { FiltersModule } from '../filters/filters.module';
 import { FilterPcsListComponent } from './filter-pcs-list/filter-pcs-list.component';
 import { ChartSankeyComponent } from './planta-stats/chart-sankey/chart-sankey.component';
 import { ShareMapComponent } from './share-map/share-map.component';
@@ -38,7 +38,7 @@ import { DownloadReportComponent } from './download-report/download-report.compo
     ChartCelsPorZonasComponent,
     DownloadReportComponent,
   ],
-  imports: [SharedModule, NgxSliderModule, PlantaReportRoutingModule, NgApexchartsModule, InformeFiltersModule],
+  imports: [SharedModule, NgxSliderModule, PlantaReportRoutingModule, NgApexchartsModule, FiltersModule],
   exports: [MapViewComponent],
 })
 export class PlantaReportModule {}

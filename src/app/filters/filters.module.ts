@@ -28,4 +28,4 @@ import { AreaFilterComponent } from './components/area-filter/area-filter.compon
   imports: [CommonModule, SharedModule],
   exports: [FiltersPanelComponent],
 })
-export class InformeFiltersModule {}
+export class FiltersModule {}

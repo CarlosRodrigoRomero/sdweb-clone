@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { OlControlComponent } from './components/ol-control/ol-control.component';
-import { OlMapMarkerComponent } from './components/ol-map-maker/ol-map-marker.component';
+import { OlMapMarkerComponent } from './components/ol-map-marker/ol-map-marker.component';
 import { OlMapComponent } from './components/ol-map/ol-map.component';
 
 const COMPONENTS = [OlMapComponent, OlMapMarkerComponent, OlControlComponent];
