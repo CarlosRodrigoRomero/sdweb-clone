@@ -1,0 +1,18 @@
+<div class="map-control">
+  <span class="texto-label">Térmico</span>
+  <mat-slider
+    class="transparencia-slider"
+    [value]="100"
+    id="slider-opacidad-termico"
+    (input)="onChangeThermalOpacitySlider($event)"
+    >a</mat-slider
+  >
+  <div class="temperature-slider">
+    <ngx-slider
+      (valueChange)="onChangeTemperatureSlider(highTemp, lowTemp)"
+      [(value)]="lowTemp"
+      [(highValue)]="highTemp"
+      [options]="optionsTemp"
+    ></ngx-slider>
+  </div>
+</div>

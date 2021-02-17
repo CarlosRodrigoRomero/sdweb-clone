@@ -1,0 +1,11 @@
+<mat-card>
+  <mat-card-content>
+    <div class="temporal-slider">
+      <ngx-slider
+        (valueChange)="onChangeTemporalSlider($event)"
+        [(value)]="currentYear"
+        [options]="optionsTemporalSlider"
+      ></ngx-slider>
+    </div>
+  </mat-card-content>
+</mat-card>

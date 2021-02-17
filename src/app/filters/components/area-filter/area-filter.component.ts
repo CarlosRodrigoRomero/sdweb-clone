@@ -140,7 +140,7 @@ export class AreaFilterComponent implements OnInit {
 
   addAreaFilter(coords: Coordinate[][]) {
     this.activeFilter = true;
-    this.areaFilter = new AreaFilter('Área', 'area', coords);
+    this.areaFilter = new AreaFilter('area', coords);
     this.filterService.addFilter(this.areaFilter);
   }
 

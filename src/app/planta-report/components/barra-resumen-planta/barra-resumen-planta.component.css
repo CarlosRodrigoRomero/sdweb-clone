@@ -5,7 +5,7 @@
 
 .barra-titulo {
   display: flex;
-  padding: 0.5rem 2rem;
+  padding: 0.8rem 2rem 0.5rem;
   background-color: white;
   border-radius: 4px;
   justify-content: space-between;

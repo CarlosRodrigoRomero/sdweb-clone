@@ -79,6 +79,13 @@ export class FilterService {
     this.applyFilters();
   }
 
+  addFilters(filters: FilterInterface[]) {
+    this.filters = filters;
+    this.filters$.next(this.filters);
+
+    this.applyFilters();
+  }
+
   private applyFilters() {
     const everyFilterFiltrableElements: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
 

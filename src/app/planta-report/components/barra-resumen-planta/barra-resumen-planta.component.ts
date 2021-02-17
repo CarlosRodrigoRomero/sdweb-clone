@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { MapControlService } from '../services/map-control.service';
+import { MapControlService } from '../../services/map-control.service';
 import { switchMap } from 'rxjs/operators';
-import { InformeService } from '../../core/services/informe.service';
-import { InformeInterface } from '../../core/models/informe';
+import { InformeService } from '@core/services/informe.service';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-barra-resumen-planta',

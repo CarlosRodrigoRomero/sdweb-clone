@@ -5,13 +5,11 @@ import Polygon from 'ol/geom/Polygon';
 import { Anomalia } from './anomalia';
 
 export class AreaFilter implements FilterInterface {
-  id: string;
   type: string;
   coords: Coordinate[][];
   polygon: Polygon;
 
-  constructor(id: string, type: string, coords: Coordinate[][]) {
-    this.id = id;
+  constructor(type: string, coords: Coordinate[][]) {
     this.type = type;
     this.coords = coords;
     this.polygon = new Polygon(coords);

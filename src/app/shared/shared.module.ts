@@ -12,6 +12,7 @@ import { ValidateElementoPlantaPipe } from './pipes/validate-elemento-planta.pip
 import { MaterialModule } from '@material/material.module';
 
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
+import { ClipboardModule } from 'ngx-clipboard';
 
 const components = [];
 const modules = [
@@ -27,7 +28,7 @@ const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlan
 
 @NgModule({
   declarations: [...components, ...pipes],
-  imports: [...modules],
+  imports: [...modules, ClipboardModule],
   exports: [...components, ...modules, ...pipes],
 })
 export class SharedModule {}

@@ -1,11 +1,6 @@
-<div *ngIf="anomaliasLoaded">
-  <app-share-map></app-share-map>
-  <app-download-report></app-download-report>
-  <app-barra-resumen-planta></app-barra-resumen-planta>
-</div>
-
 <mat-sidenav-container class="example-container" [hasBackdrop]="false">
   <mat-sidenav
+    *ngIf="!sharedReport"
     #sidenavLeft
     [(opened)]="leftOpened"
     class="left-sidenav"
@@ -25,7 +20,7 @@
     [(opened)]="rightOpened"
     class="right-sidenav"
     [fixedInViewport]="true"
-    [fixedTopGap]="185"
+    [fixedTopGap]="145"
     position="end"
     disableClose
   >
@@ -37,11 +32,12 @@
   </mat-sidenav>
 
   <mat-sidenav
+    *ngIf="!sharedReport"
     #sidenavStats
     [(opened)]="statsOpened"
     class="stats-sidenav"
     [fixedInViewport]="true"
-    [fixedTopGap]="140"
+    [fixedTopGap]="185"
     position="end"
     disableClose
   >
@@ -50,17 +46,21 @@
 
   <mat-sidenav-content>
     <div class="rel">
-      <div id="map" class="map"></div>
+      <app-map></app-map>
 
-      <div *ngIf="anomaliaSeleccionada" id="popup">
-        <app-anomalia-info [anomalia]="anomaliaSeleccionada"></app-anomalia-info>
+      <div *ngIf="anomaliasLoaded">
+        <app-share-map *ngIf="!sharedReport"></app-share-map>
+        <app-download-report></app-download-report>
+        <app-barra-resumen-planta></app-barra-resumen-planta>
+        <div class="map-sliders">
+          <app-slider-termico></app-slider-termico>
+          <app-slider-temporal *ngIf="!sharedReport"></app-slider-temporal>
+        </div>
       </div>
-
-      <app-map-control id="map-control"></app-map-control>
     </div>
 
     <div *ngIf="anomaliasLoaded">
-      <button mat-raised-button class="btn-left" (click)="sidenavLeft.toggle()">
+      <button *ngIf="!sharedReport" mat-raised-button class="btn-left" (click)="sidenavLeft.toggle()">
         <mat-icon *ngIf="!leftOpened">keyboard_arrow_right</mat-icon>
         <mat-icon *ngIf="leftOpened">keyboard_arrow_left</mat-icon>
         <mat-icon>filter_alt</mat-icon>
@@ -70,7 +70,7 @@
         <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
         <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon>
       </button>
-      <button mat-raised-button class="btn-right-stats" (click)="sidenavStats.toggle()">
+      <button *ngIf="!sharedReport" mat-raised-button class="btn-right-stats" (click)="sidenavStats.toggle()">
         <mat-icon>query_stats</mat-icon>
         <mat-icon *ngIf="!statsOpened">keyboard_arrow_left</mat-icon>
         <mat-icon *ngIf="statsOpened">keyboard_arrow_right</mat-icon>

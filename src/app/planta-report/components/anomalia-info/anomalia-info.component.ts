@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Anomalia } from '@core/models/anomalia';
-import { GLOBAL } from '../../core/services/global';
-import { AnomaliaService } from '../../core/services/anomalia.service';
+import { GLOBAL } from '@core/services/global';
+import { AnomaliaService } from '@core/services/anomalia.service';
 import { FindValueSubscriber } from 'rxjs/internal/operators/find';
 
 @Component({
