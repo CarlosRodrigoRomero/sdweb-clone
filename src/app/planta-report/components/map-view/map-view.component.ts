@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 
 import { MatSidenav } from '@angular/material/sidenav';
 
@@ -13,6 +13,7 @@ import { FilterService } from '@core/services/filter.service';
 })
 export class MapViewComponent implements OnInit {
   public plantaId: string;
+  private sharedId: string;
   public leftOpened: boolean;
   public rightOpened: boolean;
   public statsOpened: boolean;
@@ -23,17 +24,24 @@ export class MapViewComponent implements OnInit {
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
 
-  constructor(private filterService: FilterService, private router: Router) {
+  constructor(private filterService: FilterService, private router: Router, private activatedRoute: ActivatedRoute) {
     if (this.router.url.includes('shared')) {
       this.sharedReport = true;
+      this.activatedRoute.params.subscribe((params: Params) => (this.sharedId = params.id));
     }
   }
 
   ngOnInit(): void {
     this.plantaId = 'egF0cbpXnnBnjcrusoeR';
 
-    this.filterService.initFilterService(this.plantaId, 'planta').subscribe((v) => {
-      this.anomaliasLoaded = v;
-    });
+    if (this.sharedReport) {
+      this.filterService.initFilterService(this.sharedReport, this.plantaId, this.sharedId).subscribe((v) => {
+        this.anomaliasLoaded = v;
+      });
+    } else {
+      this.filterService.initFilterService(this.sharedReport, this.plantaId).subscribe((v) => {
+        this.anomaliasLoaded = v;
+      });
+    }
   }
 }

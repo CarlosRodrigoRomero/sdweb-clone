@@ -155,6 +155,7 @@ export class ChartNumsyperdComponent implements OnInit {
       coloresCategoria: this.coloresCategoria,
     };
   }
+
   private _getMAEAnomalias(anomalias: Anomalia[]): number {
     return anomalias
       .map((anom) => {

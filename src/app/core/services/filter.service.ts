@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, of } from 'rxjs';
+
+import { Observable, BehaviorSubject } from 'rxjs';
 
 import { AnomaliaService } from './anomalia.service';
 import { ShareReportService } from '@core/services/share-report.service';
 
 import { FiltrableInterface } from '@core/models/filtrableInterface';
 import { FilterInterface } from '@core/models/filter';
-import { GLOBAL } from './global';
 
 @Injectable({
   providedIn: 'root',
@@ -22,21 +22,24 @@ export class FilterService {
   private _allFiltrableElements: FiltrableInterface[];
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
-  private labelsTipoPcs: string[] = [];
-  public labelsTipoPcs$ = new BehaviorSubject<string[]>(this.labelsTipoPcs);
-  private countTipoPcs: number[] = [];
-  public countTipoPcs$ = new BehaviorSubject<number[]>(this.countTipoPcs);
 
-  constructor(private anomaliaService: AnomaliaService, private shareReportService: ShareReportService) {
-    // this.anomaliaService
-    //   .getAnomalias$('vfMHFBPvNFnOFgfCgM9L')
-    //   .pipe(take(1))
-    //   .subscribe((anomalias) => {
-    //     this.filteredElements$.next(anomalias);
-    //   });
+  constructor(private anomaliaService: AnomaliaService, private shareReportService: ShareReportService) {}
+
+  initFilterService(shared: boolean, plantaId: string, sharedId?: string) {
+    this.anomaliaService.getAnomaliasPlanta$(plantaId).subscribe((array) => {
+      this._allFiltrableElements = array;
+      this.filteredElements$.next(array);
+      if (shared) {
+        // obtenemos lo filtros guardados en al DB y los añadimos
+        this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => this.addFilters(filters));
+      }
+      this.initialized$.next(true);
+    });
+
+    return this.initialized$;
   }
 
-  initFilterService(id: string, initType: 'informe' | 'planta' = 'informe') {
+  /* initFilterService(id: string, initType: 'informe' | 'planta' = 'informe') {
     if (initType === 'planta') {
       this.anomaliaService.getAnomaliasPlanta$(id).subscribe((array) => {
         this._allFiltrableElements = array;
@@ -54,7 +57,7 @@ export class FilterService {
     }
 
     return this.initialized$;
-  }
+  } */
 
   addFilter(filter: FilterInterface) {
     // comprobamos que no es de tipo 'Add'
@@ -63,10 +66,6 @@ export class FilterService {
       this.filters = this.filters.filter((f) => f.type !== filter.type);
       // añadimos el nuevo filtro
       this.filters.push(filter);
-
-      if (filter.type !== 'tipo') {
-        this.updateNumberOfTipoPc();
-      }
     } else {
       // si es del tipo 'Add' se añade al array
       this.filters.push(filter);
@@ -147,11 +146,6 @@ export class FilterService {
     } else {
       this.filters.splice(this.filters.indexOf(filter), 1);
     }
-
-    // comprueba que cantidad de filtros "tipo" no se afecten unos a otros
-    if (filter.type !== 'tipo') {
-      this.updateNumberOfTipoPc();
-    }
     this.filters$.next(this.filters);
 
     // reseteamos parametros para compartir
@@ -178,38 +172,5 @@ export class FilterService {
     this.filters$.next(this.filters);
 
     this.applyFilters();
-  }
-
-  getLabelFilterTipoPcs() {
-    const indices: number[] = [];
-    this._allFiltrableElements.forEach((elem) => {
-      if (typeof elem.tipo === 'number') {
-        if (!indices.includes(elem.tipo)) {
-          indices.push(elem.tipo);
-        }
-      } else if (!indices.includes(parseInt(elem.tipo, 0))) {
-        indices.push(parseInt(elem.tipo, 0));
-      }
-    });
-    this.labelsTipoPcs = [];
-    indices.forEach((i) => this.labelsTipoPcs.push(GLOBAL.labels_tipos[i]));
-    // los ordena como estan en GLOBAL
-    this.labelsTipoPcs.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));
-
-    this.labelsTipoPcs$.next(this.labelsTipoPcs);
-  }
-
-  getNumberOfTipoPc(label: string): number {
-    return this._allFiltrableElements.filter((elem) => elem.tipo == GLOBAL.labels_tipos.indexOf(label)).length;
-  }
-
-  updateNumberOfTipoPc() {
-    this.countTipoPcs = [];
-    this.labelsTipoPcs.forEach((label) =>
-      this.countTipoPcs.push(
-        this.filteredElements.filter((elem) => elem.tipo == GLOBAL.labels_tipos.indexOf(label)).length
-      )
-    );
-    this.countTipoPcs$.next(this.countTipoPcs);
   }
 }

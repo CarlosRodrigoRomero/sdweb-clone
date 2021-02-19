@@ -1,17 +1,31 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { MatCheckboxChange } from '@angular/material/checkbox';
 
+import { take } from 'rxjs/operators';
+
 import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
+import { MapControlService } from 'src/app/planta-report/services/map-control.service';
 
 import { TipoPcFilter } from '@core/models/tipoPcFilter';
+import { Anomalia } from '@core/models/anomalia';
 
 interface TipoPc {
   label?: string;
   count?: number;
   completed?: boolean;
-  tiposPcs?: TipoPc[];
+}
+
+export interface DataTiposPc {
+  anomalias: Anomalia[];
+  informeId: string;
+  numPorCategoria: number[];
+  perdidasPorCategoria: number[];
+  labelsCategoria: string[];
+  coloresCategoria: string[];
 }
 
 @Component({
@@ -28,23 +42,81 @@ export class TipoFilterComponent implements OnInit {
   defaultSelect = 'Tipo de anomalía';
   selected: string[] = [this.defaultSelect];
 
-  constructor(private filterService: FilterService) {}
+  public plantaId: string;
+  public informesList: string[];
+  public allAnomalias: Anomalia[];
+  public dataTiposPc: DataTiposPc[];
+
+  public labelsCategoria: string[];
+  public coloresCategoria: string[];
+  public numsCategoria: number[];
+
+  constructor(
+    private filterService: FilterService,
+    private route: ActivatedRoute,
+    private anomaliaService: AnomaliaService,
+    private mapControlService: MapControlService
+  ) {}
 
   ngOnInit(): void {
-    this.filterService.labelsTipoPcs$.subscribe((labels) => {
-      this.tiposPcs = [];
-      labels.forEach((label) =>
-        this.tiposPcs.push({
-          label,
-          count: this.filterService.getNumberOfTipoPc(label),
-          completed: false,
-        })
-      );
+    this.plantaId = this.route.snapshot.paramMap.get('id');
+    this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
+
+    this.mapControlService.selectedInformeId$.subscribe((informeID) => {
+      this.filterService.filteredElements$.subscribe((elems) => {
+        this.anomaliaService.getAnomaliasPlanta$(this.plantaId).subscribe((anomalias) => {
+          // obtenermos los labels de todas las anomalias
+          this._getAllCategorias(anomalias);
+          this.tiposPcs = [];
+          this.labelsCategoria.forEach((label) => {
+            this.tiposPcs.push({ label });
+          });
+          // estas anomalias son las anomalias filtradas
+          this.allAnomalias = elems as Anomalia[];
+          this.allAnomalias
+            .filter((elem) => elem.informeId === informeID)
+            .map(() => {
+              this.numsCategoria.forEach((num, i) => {
+                this.tiposPcs[i].count = this.allAnomalias
+                  .filter((elem) => elem.informeId === informeID)
+                  .filter((elem) => elem.tipo === num).length;
+              });
+              /* this.tiposPcs.forEach((tipoPc) => (tipoPc.completed = false)); */
+            });
+        });
+      });
     });
 
-    this.filterService.countTipoPcs$.subscribe((counts) =>
-      counts.forEach((count, i) => (this.tiposPcs[i].count = count))
-    );
+    /* this.anomaliaService
+      .getAnomaliasPlanta$(this.plantaId)
+      .pipe(take(1))
+      .subscribe((anomalias) => {
+        this.allAnomalias = anomalias;
+        this.dataTiposPc = [];
+        this._getAllCategorias(anomalias);
+
+        this.informesList.forEach((informeId) => {
+          const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId == informeId);
+          this.dataTiposPc.push(this._calculateDataPlot(anomaliasInforme, informeId));
+        });
+
+        console.log(this.dataTiposPc);
+
+        this.mapControlService.selectedInformeId$.subscribe((informeId) =>
+          this.dataTiposPc
+            .filter((data) => data.informeId === informeId)
+            .map((data) => {
+              this.tiposPcs = [];
+              data.labelsCategoria.forEach((label) => {
+                this.tiposPcs.push({ label });
+              });
+              data.numPorCategoria.forEach((num, i) => {
+                this.tiposPcs[i].count = num;
+              });
+              this.tiposPcs.forEach((tipoPc) => (tipoPc.completed = false));
+            })
+        );
+      }); */
   }
 
   onChangeFiltroTipo(event: MatCheckboxChange) {
@@ -82,5 +154,26 @@ export class TipoFilterComponent implements OnInit {
 
   stopPropagation(event) {
     event.stopPropagation();
+  }
+
+  private _getAllCategorias(anomalias): void {
+    const allNumCategorias = Array(GLOBAL.labels_tipos.length)
+      .fill(0)
+      .map((_, i) => i + 1);
+
+    const labelsCategoria = Array<string>();
+    const coloresCategoria = Array<string>();
+    const numsCategoria = Array<number>();
+
+    allNumCategorias.forEach((i) => {
+      if (anomalias.filter((anom) => anom.tipo === i).length > 0) {
+        labelsCategoria.push(GLOBAL.labels_tipos[i]);
+        coloresCategoria.push(GLOBAL.colores_tipos[i]);
+        numsCategoria.push(i);
+      }
+    });
+    this.labelsCategoria = labelsCategoria;
+    this.coloresCategoria = coloresCategoria;
+    this.numsCategoria = numsCategoria;
   }
 }

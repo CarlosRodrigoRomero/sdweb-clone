@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { take } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
@@ -74,8 +74,7 @@ export class MapComponent implements OnInit {
     public filterService: FilterService,
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute
+    private router: Router
   ) {
     if (this.router.url.includes('shared')) {
       this.sharedReport = true;
@@ -95,9 +94,6 @@ export class MapComponent implements OnInit {
 
     this.plantaId = 'egF0cbpXnnBnjcrusoeR';
     /* this.plantaId = this.route.snapshot.paramMap.get('id'); */
-    this.filterService.initFilterService(this.plantaId, 'planta').subscribe((v) => {
-      this.anomaliasLoaded = v;
-    });
 
     // Obtenemos todas las capas termicas para esta planta y las almacenamos en this.thermalLayers
     combineLatest([
@@ -204,21 +200,16 @@ export class MapComponent implements OnInit {
 
     this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
     this.addCursorOnHover();
-    this.addLocationAreas();
     this.addOverlayInfoAnomalia();
+    if (!this.sharedReport) {
+      this.addLocationAreas();
+    }
     // this.permitirCrearAnomalias();
 
-    if (this.sharedReport) {
-      this.mostrarAnomaliasCompartidas();
-    } else {
-      this.mapControlService.selectedInformeId$.subscribe((informeId) => {
-        this.selectedInformeId = informeId;
-        this.mostrarTodasAnomalias();
-
-        // reiniciamos filter service
-        this.filterService.initFilterService(informeId, 'informe');
-      });
-    }
+    this.mapControlService.selectedInformeId$.subscribe((informeId) => {
+      this.selectedInformeId = informeId;
+      this.mostrarAnomalias();
+    });
   }
 
   private addOverlayInfoAnomalia() {
@@ -415,27 +406,7 @@ export class MapComponent implements OnInit {
     };
   }
 
-  mostrarAnomaliasCompartidas() {
-    this.activatedRoute.params.subscribe((params: Params) => {
-      this.shareReportService.getParamsById(params.id);
-
-      // obtenemos lo filtros guardados en al DB
-      const filters = this.shareReportService.getFiltersByParams();
-
-      console.log(filters);
-
-      // añadimos filtros
-      this.filterService.addFilters(filters);
-
-      this.filterService.filteredElements$.subscribe((anomalias) => {
-        // Dibujar anomalias
-        this.dibujarAnomalias(anomalias as Anomalia[]);
-        this.listaAnomalias = anomalias as Anomalia[];
-      });
-    });
-  }
-
-  mostrarTodasAnomalias() {
+  mostrarAnomalias() {
     this.filterService.filteredElements$.subscribe((anomalias) => {
       // Dibujar anomalias
       this.dibujarAnomalias(anomalias as Anomalia[]);
@@ -445,8 +416,8 @@ export class MapComponent implements OnInit {
 
   dibujarAnomalias(anomalias: Anomalia[]) {
     // Para cada vector layer (que corresponde a un informe)
-
     this.anomaliaLayers.forEach((l) => {
+      // filtra las anomalías correspondientes al informe
       const filtered = anomalias.filter((item) => item.informeId == l.getProperties().informeId);
       const source = l.getSource();
       source.clear();
