@@ -24,7 +24,7 @@ mat-card {
   background-color: rgba($color: white, $alpha: 0.8);
   border-color: transparent;
   box-shadow: none !important;
-  padding-left: 50px;
-  padding-right: 50px;
-  height: 100px;
+  padding: 30px 50px 10px 50px;
+  height: 100%;
+  min-width: 250px;
 }

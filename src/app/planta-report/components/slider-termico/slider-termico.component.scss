@@ -1,3 +1,10 @@
+mat-card {
+  background-color: rgba($color: white, $alpha: 0.8);
+  border-color: transparent;
+  box-shadow: none !important;
+  padding: 2px 16px;
+}
+
 ::ng-deep {
   .temperature-slider .ngx-slider .ngx-slider-selection {
     z-index: 2 !important;
@@ -27,26 +34,31 @@
   color: #010106;
 }
 
-.temperature-slider {
-  padding-top: 35px;
+.opacity-slider {
+  display: inline-flex;
+}
+
+.opacity-slider span {
+  align-self: center;
+  margin-right: 0.5em;
 }
 
 .map-control {
-    width: 250px;
-    height: 100px;
-    display: flex;
-    flex-direction: column;
-    border-radius: 4px;
-    padding: 10px;
-    background-color: rgba($color: white, $alpha: 0.8);
-  }
-  
-  .texto-label {
-    position: absolute;
-    top: -15px;
-    font-size: 1.2rem;
-    border: 1px solid #8080806b;
-    padding: 3px;
-    border-radius: 3px;
-    background-color: rgba($color: white, $alpha: 0.8);
-  }
+  width: 250px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: rgba($color: white, $alpha: 0.8);
+}
+
+.texto-label {
+  position: absolute;
+  top: -15px;
+  font-size: 1.2rem;
+  border: 1px solid #8080806b;
+  padding: 3px;
+  border-radius: 3px;
+  background-color: rgba($color: white, $alpha: 0.8);
+}

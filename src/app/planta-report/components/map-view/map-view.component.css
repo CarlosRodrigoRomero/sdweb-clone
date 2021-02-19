@@ -10,12 +10,22 @@
   /* width: 60%; */
 }
 
-.example-container {
+.grid-sliders {
+  display: grid;
+  grid-template-columns: 100%;
+  gap: 1rem;
+}
+
+@media (min-width: 600px) {
+  .grid-sliders {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+}
+
+.main-container {
   position: relative;
-  top: 2px;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  height: 100%;
 }
 
 app-share-map {

@@ -1,4 +1,4 @@
-<mat-sidenav-container class="example-container" [hasBackdrop]="false">
+<mat-sidenav-container class="main-container" [hasBackdrop]="false">
   <mat-sidenav
     *ngIf="!sharedReport"
     #sidenavLeft
@@ -53,8 +53,10 @@
         <app-download-report></app-download-report>
         <app-barra-resumen-planta></app-barra-resumen-planta>
         <div class="map-sliders">
-          <app-slider-termico></app-slider-termico>
-          <app-slider-temporal *ngIf="!sharedReport"></app-slider-temporal>
+          <div class="grid-sliders">
+            <app-slider-termico></app-slider-termico>
+            <app-slider-temporal *ngIf="!sharedReport"></app-slider-temporal>
+          </div>
         </div>
       </div>
     </div>

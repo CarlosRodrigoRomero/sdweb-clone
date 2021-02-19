@@ -8,6 +8,8 @@ nav {
 }
 
 .nb {
-    height: 72px;
-    background: white;
+  position: relative;
+  height: 8vh;
+  background: white;
+  z-index: 999;
 }

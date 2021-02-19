@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 
-import { PlantaReportRoutingModule } from './planta-repot-routing.module';
+import { PlantaReportRoutingModule } from './planta-report-routing.module';
 import { SharedModule } from '@shared/shared.module';
 import { FiltersModule } from '../filters/filters.module';
 
