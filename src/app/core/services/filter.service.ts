@@ -22,6 +22,10 @@ export class FilterService {
   private _allFiltrableElements: FiltrableInterface[];
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
+  private filteredElementsWithoutFilterTipo: FiltrableInterface[] = [];
+  public filteredElementsWithoutFilterTipo$ = new BehaviorSubject<FiltrableInterface[]>(
+    this.filteredElementsWithoutFilterTipo
+  );
 
   constructor(private anomaliaService: AnomaliaService, private shareReportService: ShareReportService) {}
 
@@ -34,6 +38,10 @@ export class FilterService {
         this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => this.addFilters(filters));
       }
       this.initialized$.next(true);
+
+      // para contabilizar los diferentes filtros 'tipo'
+      this.filteredElementsWithoutFilterTipo = array;
+      this.filteredElementsWithoutFilterTipo$.next(this.filteredElementsWithoutFilterTipo);
     });
 
     return this.initialized$;
@@ -126,6 +134,9 @@ export class FilterService {
     }
 
     this.filteredElements$.next(this.filteredElements);
+
+    // para calcular el numero de anomalias por filtro tipo
+    this.excludeTipoFilters();
   }
 
   getAllTypeFilters(type: string) {
@@ -172,5 +183,50 @@ export class FilterService {
     this.filters$.next(this.filters);
 
     this.applyFilters();
+  }
+
+  excludeTipoFilters() {
+    const everyFilterFiltrableElements: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
+
+    // comprobamos si hay filtros de tipo 'Add'
+    if (this.filters.filter((filter) => this.typeAddFilters.includes(filter.type)).length > 0) {
+      // separamos los pcs por tipo de filtro
+      this.typeAddFilters
+        .filter((type) => type !== 'tipo')
+        .forEach((type) => {
+          const newFiltrableElements: FiltrableInterface[] = [];
+          if (this.filters.filter((filter) => filter.type === type).length > 0) {
+            this.filters
+              .filter((filter) => filter.type === type)
+              .forEach((filter) => {
+                filter.applyFilter(this._allFiltrableElements).forEach((pc) => newFiltrableElements.push(pc));
+              });
+            // añadimos un array de cada tipo
+            everyFilterFiltrableElements.push(newFiltrableElements);
+          }
+        });
+    }
+
+    // añadimos al array los pcs filtrados de los filtros no 'Add'
+    this.filters
+      .filter((filter) => !this.typeAddFilters.includes(filter.type))
+      .forEach((filter) => {
+        const newFiltrableElements = filter.applyFilter(this._allFiltrableElements);
+        everyFilterFiltrableElements.push(newFiltrableElements);
+      });
+
+    // calculamos la interseccion de los array de los diferentes tipos
+    if (everyFilterFiltrableElements.length > 0) {
+      this.filteredElementsWithoutFilterTipo = everyFilterFiltrableElements.reduce((anterior, actual) =>
+        anterior.filter((pc) => actual.includes(pc))
+      );
+    }
+
+    // comprobamos que hay algun filtro activo
+    if (everyFilterFiltrableElements.length === 0) {
+      this.filteredElementsWithoutFilterTipo = this._allFiltrableElements;
+    }
+
+    this.filteredElementsWithoutFilterTipo$.next(this.filteredElementsWithoutFilterTipo);
   }
 }

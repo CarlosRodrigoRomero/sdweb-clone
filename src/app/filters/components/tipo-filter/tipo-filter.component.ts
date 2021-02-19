@@ -13,19 +13,10 @@ import { MapControlService } from 'src/app/planta-report/services/map-control.se
 import { TipoPcFilter } from '@core/models/tipoPcFilter';
 import { Anomalia } from '@core/models/anomalia';
 
-interface TipoPc {
+interface LabelTipo {
   label?: string;
   count?: number;
   completed?: boolean;
-}
-
-export interface DataTiposPc {
-  anomalias: Anomalia[];
-  informeId: string;
-  numPorCategoria: number[];
-  perdidasPorCategoria: number[];
-  labelsCategoria: string[];
-  coloresCategoria: string[];
 }
 
 @Component({
@@ -34,9 +25,10 @@ export interface DataTiposPc {
   styleUrls: ['./tipo-filter.component.css'],
 })
 export class TipoFilterComponent implements OnInit {
-  tiposPcs: TipoPc[] = [];
+  tiposPcs: LabelTipo[] = [];
   allComplete: boolean;
   filtroTipo: TipoPcFilter;
+  filterTipoCounts: number[] = [];
 
   defaultStatus = true;
   defaultSelect = 'Tipo de anomalía';
@@ -45,7 +37,6 @@ export class TipoFilterComponent implements OnInit {
   public plantaId: string;
   public informesList: string[];
   public allAnomalias: Anomalia[];
-  public dataTiposPc: DataTiposPc[];
 
   public labelsCategoria: string[];
   public coloresCategoria: string[];
@@ -61,62 +52,49 @@ export class TipoFilterComponent implements OnInit {
   ngOnInit(): void {
     this.plantaId = this.route.snapshot.paramMap.get('id');
     this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
+    const informeId = this.informesList[1];
+
+    this.anomaliaService.getAnomaliasPlanta$(this.plantaId).subscribe((anomalias) => {
+      this.tiposPcs = [];
+      // obtenermos los labels de todas las anomalias
+      this._getAllCategorias(anomalias);
+      this.labelsCategoria.forEach((label) => {
+        this.tiposPcs.push({ label });
+      });
+      this.numsCategoria.forEach((num) => {
+        this.filterTipoCounts.push(
+          this.allAnomalias.filter((elem) => elem.informeId === informeId).filter((elem) => elem.tipo === num).length
+        );
+      });
+      /* this.numsCategoria.forEach((num, i) => {
+        this.tiposPcs[i].count = this.allAnomalias
+          .filter((elem) => elem.informeId === informeId)
+          .filter((elem) => elem.tipo === num).length;
+      }); */
+    });
 
     this.mapControlService.selectedInformeId$.subscribe((informeID) => {
-      this.filterService.filteredElements$.subscribe((elems) => {
-        this.anomaliaService.getAnomaliasPlanta$(this.plantaId).subscribe((anomalias) => {
-          // obtenermos los labels de todas las anomalias
-          this._getAllCategorias(anomalias);
-          this.tiposPcs = [];
-          this.labelsCategoria.forEach((label) => {
-            this.tiposPcs.push({ label });
-          });
-          // estas anomalias son las anomalias filtradas
-          this.allAnomalias = elems as Anomalia[];
-          this.allAnomalias
-            .filter((elem) => elem.informeId === informeID)
-            .map(() => {
+      this.filterService.filteredElementsWithoutFilterTipo$.subscribe((elems) => {
+        // estas anomalias son las anomalias filtradas
+        this.allAnomalias = elems as Anomalia[];
+        this.allAnomalias
+          .filter((elem) => elem.informeId === informeID)
+          .map(() => {
+            if (this.numsCategoria !== undefined) {
               this.numsCategoria.forEach((num, i) => {
-                this.tiposPcs[i].count = this.allAnomalias
+                this.filterTipoCounts[i] = this.allAnomalias
                   .filter((elem) => elem.informeId === informeID)
                   .filter((elem) => elem.tipo === num).length;
               });
-              /* this.tiposPcs.forEach((tipoPc) => (tipoPc.completed = false)); */
-            });
-        });
+              /* this.numsCategoria.forEach((num, i) => {
+                this.tiposPcs[i].count = this.allAnomalias
+                  .filter((elem) => elem.informeId === informeID)
+                  .filter((elem) => elem.tipo === num).length;
+              }); */
+            }
+          });
       });
     });
-
-    /* this.anomaliaService
-      .getAnomaliasPlanta$(this.plantaId)
-      .pipe(take(1))
-      .subscribe((anomalias) => {
-        this.allAnomalias = anomalias;
-        this.dataTiposPc = [];
-        this._getAllCategorias(anomalias);
-
-        this.informesList.forEach((informeId) => {
-          const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId == informeId);
-          this.dataTiposPc.push(this._calculateDataPlot(anomaliasInforme, informeId));
-        });
-
-        console.log(this.dataTiposPc);
-
-        this.mapControlService.selectedInformeId$.subscribe((informeId) =>
-          this.dataTiposPc
-            .filter((data) => data.informeId === informeId)
-            .map((data) => {
-              this.tiposPcs = [];
-              data.labelsCategoria.forEach((label) => {
-                this.tiposPcs.push({ label });
-              });
-              data.numPorCategoria.forEach((num, i) => {
-                this.tiposPcs[i].count = num;
-              });
-              this.tiposPcs.forEach((tipoPc) => (tipoPc.completed = false));
-            })
-        );
-      }); */
   }
 
   onChangeFiltroTipo(event: MatCheckboxChange) {
@@ -132,7 +110,7 @@ export class TipoFilterComponent implements OnInit {
         this.selected = [event.source.name];
       }
     } else {
-      this.filterService.filters$.subscribe((filters) =>
+      this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
         filters
           .filter((filter) => filter.type === 'tipo')
           .forEach((filter) => {

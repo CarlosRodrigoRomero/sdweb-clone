@@ -8,7 +8,6 @@
   <mat-menu #menu="matMenu">
     <li *ngFor="let tipo of tiposPcs; index as i" (click)="stopPropagation($event)">
       <mat-checkbox
-        [disabled]="tipo.count === 0"
         [(ngModel)]="tipo.completed"
         [id]="'tipo_' + (i + 1)"
         [name]="tipo.label"
@@ -17,8 +16,11 @@
         <span style="font-size: 15px">
           {{ tipo.label }}
         </span>
-        <span class="count" style="font-size: 13px">{{ tipo.count }}</span>
+        <!-- <span class="count" style="font-size: 13px">{{ tipo.count }}</span> -->
       </mat-checkbox>
+    </li>
+    <li *ngFor="let count of filterTipoCounts">
+      <span style="font-size: 13px">{{ count }}</span>
     </li>
   </mat-menu>
 </div>
