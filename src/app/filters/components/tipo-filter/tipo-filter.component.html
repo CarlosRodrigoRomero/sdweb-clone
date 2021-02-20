@@ -5,22 +5,30 @@
     <span *ngIf="!defaultStatus" class="filter-selected">{{ selected.toString() }}</span>
     <mat-icon>keyboard_arrow_down</mat-icon>
   </button>
-  <mat-menu #menu="matMenu">
-    <li *ngFor="let tipo of tiposPcs; index as i" (click)="stopPropagation($event)">
-      <mat-checkbox
-        [(ngModel)]="tipo.completed"
-        [id]="'tipo_' + (i + 1)"
-        [name]="tipo.label"
-        (change)="onChangeFiltroTipo($event)"
-      >
-        <span style="font-size: 15px">
-          {{ tipo.label }}
-        </span>
-        <!-- <span class="count" style="font-size: 13px">{{ tipo.count }}</span> -->
-      </mat-checkbox>
-    </li>
-    <li *ngFor="let count of filterTipoCounts">
-      <span style="font-size: 13px">{{ count }}</span>
-    </li>
+  <mat-menu class="menu" #menu="matMenu">
+    <div class="grid">
+      <div class="labels-tipo">
+        <li *ngFor="let tipo of tiposPcs; index as i" (click)="stopPropagation($event)">
+          <mat-checkbox
+            [(ngModel)]="tipo.completed"
+            [id]="'tipo_' + (i + 1)"
+            [name]="tipo.label"
+            (change)="onChangeFiltroTipo($event)"
+          >
+            <div class="label-tipo">
+              <mat-icon [ngStyle]="{ color: tipo.color }" class="icon">crop_16_9</mat-icon>
+              <span style="font-size: 15px">
+                {{ tipo.label }}
+              </span>
+            </div>
+          </mat-checkbox>
+        </li>
+      </div>
+      <div class="counts-tipo">
+        <li *ngFor="let count of filterTipoCounts">
+          <span style="font-size: 13px">{{ count }}</span>
+        </li>
+      </div>
+    </div>
   </mat-menu>
 </div>

@@ -25,8 +25,32 @@ h5 {
   font-size: 15px;
 }
 
+::ng-deep .menu .mat-menu-content:not(:empty) {
+  min-width: 280px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 80% 20%;
+}
+
 li {
   list-style-type: none;
   margin-left: 10px;
   margin-right: 10px;
+}
+
+.counts-tipo {
+  line-height: 2.9;
+  margin-top: -6px;
+  text-align: end;
+}
+
+.label-tipo {
+  display: inline-flex;
+  margin-top: 0.4rem;
+}
+
+.label-tipo mat-icon {
+  margin-right: 0.5rem;
 }

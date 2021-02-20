@@ -9,7 +9,12 @@
       <!-- Tipo de anomalía -->
       <ng-container matColumnDef="tipo" class="col-anomalia">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
-        <td mat-cell *matCellDef="let row">{{ row.tipo }}</td>
+        <td mat-cell *matCellDef="let row">
+          <div class="label-tipo">
+            <mat-icon [ngStyle]="{ color: row.color }" class="icon">crop_16_9</mat-icon>
+            {{ row.tipo }}
+          </div>
+        </td>
       </ng-container>
 
       <!-- Pérdidas -->

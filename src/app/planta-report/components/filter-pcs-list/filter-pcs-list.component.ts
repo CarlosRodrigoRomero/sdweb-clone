@@ -15,6 +15,7 @@ interface PcData {
   perdidas: number;
   temp: number;
   gradiente: number;
+  color?: string;
 }
 
 @Component({
@@ -38,12 +39,13 @@ export class FilterPcsListComponent implements OnInit {
 
         elems
           .filter((elem) => (elem as Anomalia).informeId === informeId)
-          .forEach((pc) =>
+          .forEach((pc) => 
             filteredElements.push({
               tipo: GLOBAL.labels_tipos[pc.tipo],
               perdidas: pc.perdidas * 100,
               temp: pc.temperaturaMax,
               gradiente: pc.gradienteNormalizado,
+              color: GLOBAL.colores_tipos_hex[pc.tipo],
             })
           );
 

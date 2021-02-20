@@ -16,6 +16,15 @@ table {
   overflow: auto;
 }
 
+.label-tipo {
+  display: inline-flex;
+  margin-top: 0.5rem;
+}
+
+.label-tipo mat-icon {
+  margin-right: 0.5rem;
+}
+
 .mat-column-tipo {
   word-wrap: break-word !important;
   white-space: unset !important;

@@ -17,6 +17,7 @@ interface LabelTipo {
   label?: string;
   count?: number;
   completed?: boolean;
+  color?: string;
 }
 
 @Component({
@@ -58,19 +59,14 @@ export class TipoFilterComponent implements OnInit {
       this.tiposPcs = [];
       // obtenermos los labels de todas las anomalias
       this._getAllCategorias(anomalias);
-      this.labelsCategoria.forEach((label) => {
-        this.tiposPcs.push({ label });
+      this.labelsCategoria.forEach((label, i) => {
+        this.tiposPcs.push({ label, color: this.coloresCategoria[i] });
       });
       this.numsCategoria.forEach((num) => {
         this.filterTipoCounts.push(
           this.allAnomalias.filter((elem) => elem.informeId === informeId).filter((elem) => elem.tipo === num).length
         );
       });
-      /* this.numsCategoria.forEach((num, i) => {
-        this.tiposPcs[i].count = this.allAnomalias
-          .filter((elem) => elem.informeId === informeId)
-          .filter((elem) => elem.tipo === num).length;
-      }); */
     });
 
     this.mapControlService.selectedInformeId$.subscribe((informeID) => {
@@ -86,11 +82,6 @@ export class TipoFilterComponent implements OnInit {
                   .filter((elem) => elem.informeId === informeID)
                   .filter((elem) => elem.tipo === num).length;
               });
-              /* this.numsCategoria.forEach((num, i) => {
-                this.tiposPcs[i].count = this.allAnomalias
-                  .filter((elem) => elem.informeId === informeID)
-                  .filter((elem) => elem.tipo === num).length;
-              }); */
             }
           });
       });
