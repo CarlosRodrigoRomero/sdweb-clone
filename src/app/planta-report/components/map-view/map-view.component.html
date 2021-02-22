@@ -5,10 +5,12 @@
     [(opened)]="leftOpened"
     class="left-sidenav"
     [fixedInViewport]="true"
-    [fixedTopGap]="195"
     position="start"
     disableClose
   >
+    <button mat-icon-button class="btn-close" (click)="sidenavLeft.toggle()">
+      <mat-icon>close</mat-icon>
+    </button>
     <div class="titulo">
       <h4>Filtros</h4>
     </div>
@@ -20,14 +22,15 @@
     [(opened)]="rightOpened"
     class="right-sidenav"
     [fixedInViewport]="true"
-    [fixedTopGap]="145"
     position="end"
     disableClose
   >
+    <button mat-icon-button class="btn-close" (click)="sidenavRight.toggle()">
+      <mat-icon>close</mat-icon>
+    </button>
     <div class="titulo">
       <h4>Listado de anomalías</h4>
     </div>
-
     <app-filter-pcs-list></app-filter-pcs-list>
   </mat-sidenav>
 
@@ -37,10 +40,12 @@
     [(opened)]="statsOpened"
     class="stats-sidenav"
     [fixedInViewport]="true"
-    [fixedTopGap]="185"
     position="end"
     disableClose
   >
+    <button mat-icon-button class="btn-close" (click)="sidenavStats.toggle()">
+      <mat-icon>close</mat-icon>
+    </button>
     <app-planta-stats></app-planta-stats>
   </mat-sidenav>
 
@@ -62,20 +67,32 @@
     </div>
 
     <div *ngIf="anomaliasLoaded">
-      <button *ngIf="!sharedReport" mat-raised-button class="btn-left" (click)="sidenavLeft.toggle()">
-        <mat-icon *ngIf="!leftOpened">keyboard_arrow_right</mat-icon>
-        <mat-icon *ngIf="leftOpened">keyboard_arrow_left</mat-icon>
+      <button
+        *ngIf="!sharedReport"
+        mat-icon-button
+        class="btn-left"
+        (click)="sidenavLeft.toggle()"
+        [class.mat-elevation-z2]="true"
+      >
+        <!-- <mat-icon *ngIf="!leftOpened">keyboard_arrow_right</mat-icon> -->
+        <!-- <mat-icon *ngIf="leftOpened">keyboard_arrow_left</mat-icon> -->
         <mat-icon>filter_alt</mat-icon>
       </button>
-      <button mat-raised-button class="btn-right" (click)="sidenavRight.toggle()">
+      <button mat-icon-button class="btn-right" (click)="sidenavRight.toggle()" [class.mat-elevation-z2]="true">
         <mat-icon>list_alt</mat-icon>
-        <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
-        <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon>
+        <!-- <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
+        <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon> -->
       </button>
-      <button *ngIf="!sharedReport" mat-raised-button class="btn-right-stats" (click)="sidenavStats.toggle()">
+      <button
+        *ngIf="!sharedReport"
+        mat-icon-button
+        class="btn-right-stats"
+        (click)="sidenavStats.toggle()"
+        [class.mat-elevation-z2]="true"
+      >
         <mat-icon>query_stats</mat-icon>
-        <mat-icon *ngIf="!statsOpened">keyboard_arrow_left</mat-icon>
-        <mat-icon *ngIf="statsOpened">keyboard_arrow_right</mat-icon>
+        <!-- <mat-icon *ngIf="!statsOpened">keyboard_arrow_left</mat-icon>
+        <mat-icon *ngIf="statsOpened">keyboard_arrow_right</mat-icon> -->
       </button>
     </div>
   </mat-sidenav-content>
