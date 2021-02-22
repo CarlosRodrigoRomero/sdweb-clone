@@ -1,68 +1,59 @@
-<div class="container-barra-titulo">
-  <div *ngIf="informe" class="barra-titulo" [class.mat-elevation-z2]="true">
-    <!-- <div class="titulo">
-    <mat-icon color="primary">home</mat-icon>
-    <h4>Resumen</h4>
-  </div> -->
-    <div class="grupo grupo1">
-      <div class="plantas">
+<mat-card *ngIf="informe">
+  <mat-card-content>
+    <div class="content">
+      <div class="grupo1">
         <mat-icon color="primary">home</mat-icon>
         <h5 class="titulo">
           {{ nombrePlanta }}
           <span class="subtitulo">({{ potenciaPlanta | number: '1.0-0' }} MW / {{ tipoPlanta }})</span>
         </h5>
       </div>
-      <!-- <div class="potencia">
-      <mat-icon color="primary">bolt</mat-icon>
-
-    </div> -->
-
-      <a class="btn-info" [matMenuTriggerFor]="menu">
-        <mat-icon>info</mat-icon>
-      </a>
-      <mat-menu #menu="matMenu" class="menu">
-        <div class="grupo grupo2">
-          <div class="elemento">
-            <h5>Datos del vuelo</h5>
+      <div>
+        <a class="btn-info" [matMenuTriggerFor]="menu">
+          <mat-icon>info</mat-icon>
+        </a>
+        <mat-menu #menu="matMenu" class="menu">
+          <div class="grupo2">
+            <div class="elemento">
+              <h5>Datos del vuelo</h5>
+            </div>
+            <div class="elemento">
+              <mat-icon color="secondary">today</mat-icon>
+              <h5 class="subtitulo">{{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}</h5>
+            </div>
+            <div class="elemento">
+              <mat-icon color="secondary">wb_sunny</mat-icon>
+              <h5 class="subtitulo">{{ informe.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></h5>
+            </div>
+            <div class="elemento">
+              <mat-icon color="secondary">cloud_queue</mat-icon>
+              <h5 class="subtitulo">{{ informe.nubosidad | number: '1.0-0' }}/8 octavas</h5>
+            </div>
+            <div class="elemento">
+              <mat-icon color="secondary">window</mat-icon>
+              <h5 class="subtitulo">{{ informe.gsd | number: '1.0-0' }} &plusmn; 0.5 cm/pixel</h5>
+              <!-- <h5></h5> -->
+            </div>
+            <div class="elemento">
+              <mat-icon color="secondary">east</mat-icon>
+              <h5 class="subtitulo">{{ informe.viento }}</h5>
+              <!-- <h5></h5> -->
+            </div>
           </div>
-          <div class="elemento">
-            <mat-icon color="secondary">today</mat-icon>
-            <h5 class="subtitulo">{{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}</h5>
-          </div>
-          <div class="elemento">
-            <mat-icon color="secondary">wb_sunny</mat-icon>
-            <h5 class="subtitulo">{{ informe.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></h5>
-          </div>
-          <div class="elemento">
-            <mat-icon color="secondary">cloud_queue</mat-icon>
-            <h5 class="subtitulo">{{ informe.nubosidad | number: '1.0-0' }}/8 octavas</h5>
-          </div>
-          <div class="elemento">
-            <mat-icon color="secondary">window</mat-icon>
-            <h5 class="subtitulo">{{ informe.gsd | number: '1.0-0' }} &plusmn; 0.5 cm/pixel</h5>
-            <!-- <h5></h5> -->
-          </div>
-          <div class="elemento">
-            <mat-icon color="secondary">east</mat-icon>
-            <h5 class="subtitulo">{{ informe.viento }}</h5>
-            <!-- <h5></h5> -->
-          </div>
+        </mat-menu>
+      </div>
+      <div class="grupo3">
+        <div class="elemento">
+          <h5 class="subtitulo">MAE</h5>
+          <h5>{{ informe.mae | number: '1.0-2' }} %</h5>
+          <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon>
         </div>
-      </mat-menu>
-    </div>
-    <!-- <span class="spacer"></span> -->
-
-    <div class="grupo grupo3">
-      <div class="elemento">
-        <h5 class="subtitulo">MAE</h5>
-        <h5>{{ informe.mae | number: '1.0-2' }} %</h5>
-        <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon>
-      </div>
-      <div class="elemento">
-        <h5 class="subtitulo">CC</h5>
-        <h5>{{ informe.pc_pct | number: '1.0-1' }} %</h5>
-        <mat-icon *ngIf="informe.pc_pct < 3" class="success">arrow_circle_down</mat-icon>
+        <div class="elemento">
+          <h5 class="subtitulo">CC</h5>
+          <h5>{{ informe.pc_pct | number: '1.0-1' }} %</h5>
+          <mat-icon *ngIf="informe.pc_pct < 3" class="success">arrow_circle_down</mat-icon>
+        </div>
       </div>
     </div>
-  </div>
-</div>
+  </mat-card-content>
+</mat-card>

@@ -4,7 +4,7 @@
 
 .map-sliders {
   position: absolute;
-  bottom: 50px;
+  bottom: 3rem;
   left: 50%;
   transform: translate(-50%, 0%);
   /* width: 60%; */
@@ -12,14 +12,18 @@
 
 .grid-sliders {
   display: grid;
-  grid-template-columns: 100%;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
 
-@media (min-width: 600px) {
+@media (max-width: 600px) {
   .grid-sliders {
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
+    grid-template-columns: 100%;
+    gap: 0.5rem;
+  }
+
+  .map-sliders {
+    bottom: 1rem;
   }
 }
 
@@ -43,7 +47,8 @@ app-download-report {
 app-barra-resumen-planta {
   position: absolute;
   top: 0px;
-  left: 60px;
+  left: 40%;
+  transform: translate(-50%, 0%);
   margin: 10px;
   z-index: 999;
 }
@@ -51,7 +56,7 @@ app-barra-resumen-planta {
 .left-sidenav {
   position: absolute;
   display: flex;
-  margin: 74px 10px 10px 10px;
+  margin: 10px;
   border-radius: 4px;
   padding: 15px;
   width: fit-content;
@@ -62,7 +67,7 @@ app-barra-resumen-planta {
   position: absolute;
   background: white;
   border-radius: 4px;
-  top: 74px;
+  top: 10px;
   left: 0;
   margin-left: 10px;
   padding-left: 0;
@@ -133,8 +138,12 @@ app-barra-resumen-planta {
   top: 140px;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 900px) {
   .btn-right {
+    top: 74px;
+  }
+
+  .btn-left {
     top: 74px;
   }
 
@@ -148,5 +157,12 @@ app-barra-resumen-planta {
 
   app-download-report {
     top: 74px;
+  }
+
+  app-barra-resumen-planta {
+    left: 0;
+    transform: none;
+    width: -webkit-fill-available;
+    width: fill-available;
   }
 }

@@ -16,6 +16,7 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { Feature, Overlay } from 'ol';
 import Polygon from 'ol/geom/Polygon';
 import { defaults as defaultControls } from 'ol/control.js';
+import Zoom from 'ol/control/Zoom';
 import OverlayPositioning from 'ol/OverlayPositioning';
 import { click } from 'ol/events/condition';
 import XYZ from 'ol/source/XYZ';
@@ -39,7 +40,7 @@ import { ThermalLayerInterface } from '@core/models/thermalLayer';
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css'],
+  styleUrls: ['./map.component.scss'],
 })
 export class MapComponent implements OnInit {
   public plantaId: string;
@@ -205,6 +206,9 @@ export class MapComponent implements OnInit {
       this.addLocationAreas();
     }
     // this.permitirCrearAnomalias();
+
+    const customZoom = new Zoom({ className: 'custom-zoom' });
+    /* this.map.addControl(customZoom); */
 
     this.mapControlService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInformeId = informeId;

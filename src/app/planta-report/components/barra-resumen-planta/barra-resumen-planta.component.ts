@@ -14,6 +14,7 @@ export class BarraResumenPlantaComponent implements OnInit {
   potenciaPlanta = 1;
   tipoPlanta = 'fija';
   public informe: InformeInterface = null;
+
   constructor(private mapControl: MapControlService, private informeService: InformeService) {}
 
   ngOnInit(): void {
