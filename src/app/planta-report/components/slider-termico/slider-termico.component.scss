@@ -28,19 +28,28 @@ mat-card {
     border-top-left-radius: 3px !important;
     border-top-right-radius: 3px !important;
   }
+
+  .opacity-slider {
+    .mat-slider-thumb {
+      background-color: grey !important;
+    }
+    .mat-slider-track-fill {
+      background-color: grey !important;
+    }
+  }
 }
 
-.transparencia-slider {
-  color: #010106;
-}
-
-.opacity-slider {
+.opacity-slider-group {
   display: inline-flex;
 }
 
-.opacity-slider span {
+.opacity-slider-group span {
   align-self: center;
   margin-right: 0.5em;
+}
+
+.opacity-slider {
+  width: 150px;
 }
 
 .map-control {
