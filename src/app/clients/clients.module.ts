@@ -34,5 +34,6 @@ import { DownloadExcelPortfolioComponent } from './components/download-excel-por
     NgApexchartsModule,
     OlMapsModule,
   ],
+  exports: [NavbarComponent],
 })
 export class ClientsModule {}

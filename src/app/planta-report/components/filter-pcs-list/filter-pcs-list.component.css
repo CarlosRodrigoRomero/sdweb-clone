@@ -1,4 +1,4 @@
-.filtro {
+.lista {
   margin: 10px;
 }
 
@@ -33,7 +33,7 @@ table {
   overflow-wrap: break-word;
   word-wrap: break-word;
 
-  word-break: break-word;
+  /* word-break: break-word; */
 
   -ms-hyphens: auto;
   -moz-hyphens: auto;
@@ -49,7 +49,7 @@ table {
   overflow-wrap: break-word;
   word-wrap: break-word;
 
-  word-break: break-word;
+  /* word-break: break-word; */
 
   -ms-hyphens: auto;
   -moz-hyphens: auto;
@@ -65,7 +65,7 @@ table {
   overflow-wrap: break-word;
   word-wrap: break-word;
 
-  word-break: break-word;
+  /* word-break: break-word; */
 
   -ms-hyphens: auto;
   -moz-hyphens: auto;
@@ -81,7 +81,7 @@ table {
   overflow-wrap: break-word;
   word-wrap: break-word;
 
-  word-break: break-word;
+  /* word-break: break-word; */
 
   -ms-hyphens: auto;
   -moz-hyphens: auto;

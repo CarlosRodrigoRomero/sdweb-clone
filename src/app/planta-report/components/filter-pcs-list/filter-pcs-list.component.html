@@ -1,4 +1,4 @@
-<div class="filtro">
+<div class="lista">
   <mat-form-field class="buscar-input" appearance="outline">
     <mat-label>Buscar</mat-label>
     <input matInput (keyup)="applyFilter($event)" #input />
@@ -25,13 +25,13 @@
 
       <!-- Temperatura Máxima -->
       <ng-container matColumnDef="temp">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Temp. Max</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>T Max</th>
         <td mat-cell *matCellDef="let row">{{ row.temp }}ºC</td>
       </ng-container>
 
       <!-- Temperatura Máxima -->
       <ng-container matColumnDef="gradiente">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Gradiente Norm.</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>&nabla;T Norm.</th>
         <td mat-cell *matCellDef="let row">{{ row.gradiente }}ºC</td>
       </ng-container>
 
