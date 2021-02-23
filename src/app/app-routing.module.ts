@@ -12,11 +12,11 @@ export const routes: Routes = [
     loadChildren: () => import('./admin/admin.module').then((m) => m.AdminModule),
     canActivate: [AuthGuard],
   },
-  // {
-  //   path: 'clientes',
-  //   loadChildren: () => import('./clientes/clientes.module').then((m) => m.ClientesModule),
-  //   canActivate: [AuthGuard],
-  // },
+  {
+    path: 'clientes',
+    loadChildren: () => import('./clientes/clientes.module').then((m) => m.ClientesModule),
+    canActivate: [AuthGuard],
+  },
   {
     path: 'clients',
     loadChildren: () => import('./clients/clients.module').then((m) => m.ClientsModule),

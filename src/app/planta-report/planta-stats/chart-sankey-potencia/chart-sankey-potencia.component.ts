@@ -21,7 +21,7 @@ export class ChartSankeyPotenciaComponent implements AfterViewInit {
     data.addColumn('string', 'To');
     data.addColumn('number', 'Weight');
     data.addRows([
-      ['Célula caliente', 'Célula caliente.', 5],
+      ['Célula caliente', 'Célula caliente.', 3.5],
       ['Célula caliente', 'Varias células calientes.', 0],
       ['Célula caliente', 'String', 2],
       ['Varias células calientes', 'Varias células calientes.', 1],

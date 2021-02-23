@@ -190,8 +190,8 @@ export let GLOBAL = {
     1, // "Módulo en CA", // 5
     0.35, // "Substring en CC", // 6
     0.85, // "Módulo en CC", // 7
-    0, // "Célula caliente", // 8
-    0, // "Varias células calientes", // 9
+    0.02, // "Célula caliente", // 8
+    0.03, // "Varias células calientes", // 9
     0.75, // "2X substring en CA", // 10
     0, // "Células calientes debido a suciedad", // 11
     0.85, // "Vidrio roto", // 12
