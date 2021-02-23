@@ -3,11 +3,11 @@ import { GLOBAL } from '@core/services/global';
 declare let google;
 
 @Component({
-  selector: 'app-chart-sankey',
-  templateUrl: './chart-sankey.component.html',
-  styleUrls: ['./chart-sankey.component.css'],
+  selector: 'app-chart-sankey-potencia',
+  templateUrl: './chart-sankey-potencia.component.html',
+  styleUrls: ['./chart-sankey-potencia.component.css'],
 })
-export class ChartSankeyComponent implements AfterViewInit {
+export class ChartSankeyPotenciaComponent implements AfterViewInit {
   constructor() {}
 
   ngAfterViewInit(): void {
@@ -21,19 +21,19 @@ export class ChartSankeyComponent implements AfterViewInit {
     data.addColumn('string', 'To');
     data.addColumn('number', 'Weight');
     data.addRows([
-      ['Célula caliente', 'Célula caliente.', 101],
-      ['Célula caliente', 'Varias células calientes.', 2],
+      ['Célula caliente', 'Célula caliente.', 5],
+      ['Célula caliente', 'Varias células calientes.', 0],
       ['Célula caliente', 'String', 2],
-      ['Varias células calientes', 'Varias células calientes.', 28],
-      ['Varias células calientes', 'Substring en CA.', 1],
-      ['Substring en CA', 'Substring en CA.', 9],
-      ['Substring en CA', '2x Substring en CA.', 2],
-      ['Nuevas', 'Célula caliente.', 10],
-      ['Nuevas', 'Varias células calientes.', 4],
+      ['Varias células calientes', 'Varias células calientes.', 1],
+      ['Varias células calientes', 'Substring en CA.', 0.33],
+      ['Substring en CA', 'Substring en CA.', 3],
+      ['Substring en CA', '2x Substring en CA.', 0.66],
+      ['Nuevas', 'Célula caliente.', 0],
+      ['Nuevas', 'Varias células calientes.', 0],
       ['Nuevas', 'String', 15],
       ['Nuevas', 'Substring en CA.', 1],
-      ['Célula caliente', 'unknown', 30],
-      ['Varias células calientes', 'unknown', 2],
+      ['Célula caliente', 'unknown', 0.5],
+      ['Varias células calientes', 'unknown', 0],
     ]);
 
     // Sets chart options.
@@ -64,7 +64,7 @@ export class ChartSankeyComponent implements AfterViewInit {
       '#bfbfbf', // 'Célula caliente',
       '#bfbfbf', // 'Célula caliente.',
       '#bfbfbf', // 'Varias células calientes.',
-      '#bfbfbf', // 'String',
+      GLOBAL.gris, // 'String',
       '#bfbfbf', // 'Varias células calientes',
       '#bfbfbf', // 'Substring en CA.',
       '#bfbfbf', // 'Substring en CA',
@@ -90,14 +90,14 @@ export class ChartSankeyComponent implements AfterViewInit {
             // stroke: 'black', // Color of the link border.
             // strokeWidth: 1, // Thickness of the link border (default 0).
           },
-          colors: colors_nodes,
-          colorMode: 'gradient',
+          colors: colors_link,
+          // colorMode: 'gradient',
         },
       },
     };
 
     // Instantiates and draws our chart, passing in some options.
-    var chart = new google.visualization.Sankey(document.getElementById('sankey_basic'));
+    var chart = new google.visualization.Sankey(document.getElementById('sankey_potencia'));
     chart.draw(data, options);
   }
 }

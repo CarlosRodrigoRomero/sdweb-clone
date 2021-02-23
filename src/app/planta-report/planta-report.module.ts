@@ -24,6 +24,7 @@ import { ChartAlturaComponent } from './planta-stats/chart-altura/chart-altura.c
 import { ChartNumsyperdComponent } from './planta-stats/chart-numsyperd/chart-numsyperd.component';
 import { SliderTermicoComponent } from './components/slider-termico/slider-termico.component';
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
+import { ChartSankeyPotenciaComponent } from './planta-stats/chart-sankey-potencia/chart-sankey-potencia.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { SliderTemporalComponent } from './components/slider-temporal/slider-tem
     MapComponent,
     SliderTermicoComponent,
     SliderTemporalComponent,
+    ChartSankeyPotenciaComponent,
   ],
   imports: [SharedModule, NgxSliderModule, PlantaReportRoutingModule, NgApexchartsModule, FiltersModule],
   exports: [MapViewComponent],
