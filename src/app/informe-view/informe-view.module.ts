@@ -5,7 +5,6 @@ import { InformeViewRoutingModule } from './informe-view-routing.module';
 import { ChartModule } from 'primeng/chart';
 import { SharedModule } from '../shared/shared.module';
 import { SpinnerModule } from '../shared/spinner/spinner.module';
-import { InformeFiltersModule } from '../informe-filters/informe-filters.module';
 
 import { InformeOverviewComponent } from './components/overview/informe-overview.component';
 import { ExplicacionCoaComponent } from './components/explicacion-coa/explicacion-coa.component';
@@ -15,6 +14,7 @@ import { PcDetailsDialogComponent } from './components/pc-details-dialog/pc-deta
 import { PcListComponent } from './components/pc-list/pc-list.component';
 import { PcDetailsComponent } from './components/pc-details/pc-details.component';
 import { ExportComponent } from '../informe-export/components/export/export.component';
+import { FiltersModule } from '../filters/filters.module';
 
 @NgModule({
   declarations: [
@@ -38,7 +38,7 @@ import { ExportComponent } from '../informe-export/components/export/export.comp
     ChartModule,
     FormsModule,
     ReactiveFormsModule,
-    InformeFiltersModule,
+    FiltersModule,
   ],
 })
 export class InformeViewModule {}
