@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 
 import { take } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
@@ -36,6 +36,7 @@ import { PlantaInterface } from '@core/models/planta';
 import { LocationAreaInterface } from '@core/models/location';
 import { Anomalia } from '@core/models/anomalia';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
+import { PlantaAddComponent } from 'src/app/clientes/components/planta-add/planta-add.component.js';
 
 @Component({
   selector: 'app-map',
@@ -65,7 +66,7 @@ export class MapComponent implements OnInit {
   public statsOpened: boolean;
   public anomaliasLoaded = false;
   public mousePosition;
-  public informesList: string[];
+  public informesList: string[] = [];
   public sharedReport = false;
 
   constructor(
@@ -75,7 +76,8 @@ export class MapComponent implements OnInit {
     public filterService: FilterService,
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
-    private router: Router
+    private router: Router,
+    private activatedRoute: ActivatedRoute
   ) {
     if (this.router.url.includes('shared')) {
       this.sharedReport = true;
@@ -84,19 +86,14 @@ export class MapComponent implements OnInit {
 
   ngOnInit(): void {
     this.mousePosition = null;
-    this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
-    this.selectedInformeId = this.informesList[1];
-
-    // asignamos el informe para compartir
-    this.shareReportService.setInformeID(this.informesList[1]);
 
     // Para la demo, agregamos un extent a todas las capas:
-    this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
+    /* this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]); */
 
-    this.plantaId = 'egF0cbpXnnBnjcrusoeR';
-    /* this.plantaId = this.route.snapshot.paramMap.get('id'); */
-
-    // Obtenemos todas las capas termicas para esta planta y las almacenamos en this.thermalLayers
+    /* this.plantaId = 'egF0cbpXnnBnjcrusoeR'; */
+    /* this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L']; */
+    this.plantaId = this.activatedRoute.snapshot.paramMap.get('id');
+    // Obtenemos todas las capas para esta planta, incluidas las termicas si es tipo "fija" y las almacenamos en this.thermalLayers
     combineLatest([
       this.plantaService.getThermalLayers$(this.plantaId),
       this.informeService.getInformesDePlanta(this.plantaId),
@@ -108,24 +105,36 @@ export class MapComponent implements OnInit {
         this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers));
 
         // Para cada informe, hay que crear 2 capas: térmica y vectorial
-        informes.forEach((informe) => {
-          // Crear capa térmica
-          const tl = thermalLayers.filter((item) => item.informeId == informe.id);
+        informes
+          .sort((a, b) => a.fecha - b.fecha)
+          .forEach((informe) => {
+            // Crear capa térmica si es planta tipo "fija"
+            if (planta.tipo !== 'seguidores') {
+              const tl = thermalLayers.filter((item) => item.informeId === informe.id);
 
-          // TODO: Comprobar que existe...
-          if (tl.length > 0) {
-            this.olMapService.addThermalLayer(this._createThermalLayer(tl[0], informe.id));
-          }
-          // crear capa de las anomalias
-          this.olMapService.addAnomaliaLayer(this._createAnomaliaLayer(informe.id));
-        });
+              // TODO: Comprobar que existe...
+              if (tl.length > 0) {
+                this.olMapService.addThermalLayer(this._createThermalLayer(tl[0], informe.id));
+              }
+            }
+            this.informesList.push(informe.id);
+
+            // crear capa de las anomalias
+            this.olMapService.addAnomaliaLayer(this._createAnomaliaLayer(informe.id));
+          });
 
         this.planta = planta;
 
+        // seleccionamos el informe mas reciente de la planta
+        this.selectedInformeId = this.informesList[this.informesList.length];
+
+        // asignamos el informe para compartir
+        this.shareReportService.setInformeID(this.informesList[this.informesList.length]);
+
+        this.mapControlService.selectedInformeId = this.informesList[this.informesList.length];
+
         this.initMap();
       });
-
-    this.mapControlService.selectedInformeId = this.informesList[1];
   }
 
   private _createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {
@@ -144,7 +153,7 @@ export class MapComponent implements OnInit {
         },
       }),
 
-      extent: this.extent1,
+      /* extent: this.extent1, */
     });
     tl.setProperties({
       informeId,
@@ -182,7 +191,7 @@ export class MapComponent implements OnInit {
       // extent: this.extent1,
     });
 
-    const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers];
+    const layers = [osmLayer, /* this.aerialLayer, */ ...this.thermalLayers];
 
     // MAPA
     const view = new View({

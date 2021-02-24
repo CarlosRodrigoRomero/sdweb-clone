@@ -4,6 +4,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { FilterService } from '@core/services/filter.service';
+import { PlantaService } from '@core/services/planta.service';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -29,10 +30,11 @@ export class MapViewComponent implements OnInit {
       this.sharedReport = true;
       this.activatedRoute.params.subscribe((params: Params) => (this.sharedId = params.id));
     }
+    this.activatedRoute.params.subscribe((params: Params) => (this.plantaId = params.id));
   }
 
   ngOnInit(): void {
-    this.plantaId = 'egF0cbpXnnBnjcrusoeR';
+    /* this.plantaId = 'egF0cbpXnnBnjcrusoeR'; */
 
     if (this.sharedReport) {
       this.filterService.initFilterService(this.sharedReport, this.plantaId, this.sharedId).subscribe((v) => {

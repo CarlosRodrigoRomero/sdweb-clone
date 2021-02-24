@@ -1,26 +1,18 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 
-import { Observable } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
-
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { AuthService } from '@core/services/auth.service';
 import { PlantaService } from '@core/services/planta.service';
-import { InformeService } from '@core/services/informe.service';
-
-import { UserInterface } from '@core/models/user';
-import { PlantaInterface } from '@core/models/planta';
-import { InformeInterface } from '@core/models/informe';
 
 interface PlantsData {
   nombre: string;
   potencia: number;
   mae: number;
   ultimaInspeccion: number;
-  informeId: string;
+  plantaId: string;
 }
 
 @Component({
@@ -29,16 +21,13 @@ interface PlantsData {
   styleUrls: ['./plant-list.component.css'],
 })
 export class PlantListComponent implements OnInit, AfterViewInit {
-  public user: UserInterface;
-  plantasList$: Observable<PlantaInterface[]>;
-
-  displayedColumns: string[] = ['nombre', 'potencia', 'mae', 'ultima-inspeccion', 'compartir'];
-  dataSource = new MatTableDataSource<PlantsData>();
+  public displayedColumns: string[] = ['nombre', 'potencia', 'mae', 'ultima-inspeccion', 'compartir'];
+  public dataSource = new MatTableDataSource<PlantsData>();
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(public auth: AuthService, private plantaService: PlantaService, private informeService: InformeService) {}
+  constructor(public auth: AuthService, private plantaService: PlantaService) {}
 
   ngOnInit(): void {
     const plantsData = [];
@@ -55,7 +44,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
                 ultimaInspeccion: planta.informes.reduce((prev, current) =>
                   prev.fecha > current.fecha ? prev : current
                 ).fecha,
-                informeId: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).id,
+                plantaId: planta.id,
               });
             }
           }

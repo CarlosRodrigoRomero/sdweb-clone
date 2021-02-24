@@ -1,16 +1,16 @@
 import { ModuloInterface } from './modulo';
 
 export interface FiltrableInterface {
-  id?: string;
-  tipo: number;
   globalCoords: string[];
-  clase: number;
   perdidas: number;
-  gradienteNormalizado: number;
   temperaturaMax: number;
   modulo: ModuloInterface;
-  temperaturaRef: number;
 
+  id?: string;
+  tipo?: number;
+  clase?: number;
+  gradienteNormalizado?: number;
+  temperaturaRef?: number;
   gps_lng?: number;
   gps_lat?: number;
   local_id?: number;

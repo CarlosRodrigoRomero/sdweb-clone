@@ -3,7 +3,7 @@ import { FiltrableInterface } from './filtrableInterface';
 import { ModuloInterface } from './modulo';
 
 export class Anomalia implements FiltrableInterface {
-  //FiltrableInterface
+  // FiltrableInterface
   tipo: number;
   globalCoords: string[];
   clase: number;
