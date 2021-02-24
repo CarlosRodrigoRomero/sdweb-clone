@@ -3,10 +3,21 @@
   border-radius: 4px;
 }
 
-h4 {
+h5 {
   margin-left: 10px;
 }
 
 .contenedor-menu {
-  padding: 1rem;
+  padding: 0.5rem 1rem 0 1rem;
+}
+
+li {
+  list-style-type: none;
+  display: inline-flex;
+}
+
+.btn-enviar {
+  text-align: center;
+  color: darkblue;
+  font-size: medium;
 }

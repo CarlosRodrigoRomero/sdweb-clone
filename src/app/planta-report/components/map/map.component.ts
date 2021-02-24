@@ -112,15 +112,12 @@ export class MapComponent implements OnInit {
           // Crear capa térmica
           const tl = thermalLayers.filter((item) => item.informeId == informe.id);
 
-          // crear capa de las anomalias
-          // const al = this.anomaliaLayers.push(al);
           // TODO: Comprobar que existe...
           if (tl.length > 0) {
             this.olMapService.addThermalLayer(this._createThermalLayer(tl[0], informe.id));
           }
+          // crear capa de las anomalias
           this.olMapService.addAnomaliaLayer(this._createAnomaliaLayer(informe.id));
-
-          // Crear capa vectorial
         });
 
         this.planta = planta;
