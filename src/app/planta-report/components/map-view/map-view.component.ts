@@ -14,6 +14,7 @@ import { PlantaService } from '@core/services/planta.service';
 })
 export class MapViewComponent implements OnInit {
   public plantaId: string;
+  public plantaFija = false;
   private sharedId: string;
   public leftOpened: boolean;
   public rightOpened: boolean;
@@ -25,25 +26,42 @@ export class MapViewComponent implements OnInit {
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
 
-  constructor(private filterService: FilterService, private router: Router, private activatedRoute: ActivatedRoute) {
+  constructor(
+    private filterService: FilterService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private plantaService: PlantaService
+  ) {
     if (this.router.url.includes('shared')) {
       this.sharedReport = true;
       this.activatedRoute.params.subscribe((params: Params) => (this.sharedId = params.id));
     }
     this.activatedRoute.params.subscribe((params: Params) => (this.plantaId = params.id));
+
+    this.getTipoPlanta();
   }
 
   ngOnInit(): void {
     /* this.plantaId = 'egF0cbpXnnBnjcrusoeR'; */
 
     if (this.sharedReport) {
-      this.filterService.initFilterService(this.sharedReport, this.plantaId, this.sharedId).subscribe((v) => {
-        this.anomaliasLoaded = v;
-      });
+      this.filterService
+        .initFilterService(this.sharedReport, this.plantaId, this.plantaFija, this.sharedId)
+        .subscribe((v) => {
+          this.anomaliasLoaded = v;
+        });
     } else {
-      this.filterService.initFilterService(this.sharedReport, this.plantaId).subscribe((v) => {
+      this.filterService.initFilterService(this.sharedReport, this.plantaId, this.plantaFija).subscribe((v) => {
         this.anomaliasLoaded = v;
       });
     }
+  }
+
+  getTipoPlanta() {
+    this.plantaService.getPlanta(this.plantaId).subscribe((planta) => {
+      if (planta.tipo === 'fija') {
+        this.plantaFija = true;
+      }
+    });
   }
 }

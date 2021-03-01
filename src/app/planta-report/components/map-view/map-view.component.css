@@ -156,7 +156,7 @@ app-barra-resumen-planta {
     left: 0;
     transform: none;
     width: -webkit-fill-available;
-    width: fill-available;
+    width: stretch;
   }
 }
 

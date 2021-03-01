@@ -39,7 +39,8 @@ export class AnomaliaService {
       switchMap((informes) => {
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
         informes.forEach((informe) => {
-          anomaliaObsList.push(this.getAnomalias$(informe.id));
+          // this.getAnomalias$(informe.id).subscribe((anomalias) => console.log(anomalias));
+          anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs'));
         });
         return combineLatest(anomaliaObsList);
       }),
@@ -51,16 +52,19 @@ export class AnomaliaService {
     return query$;
   }
 
-  getAnomalias$(informeId: string, tipo: 'anomalias' | 'pcs' = 'anomalias'): Observable<Anomalia[]> {
+  getAnomalias$(informeId: string, tipo?: 'anomalias' | 'pcs'): Observable<Anomalia[]> {
+    if (tipo !== 'pcs') {
+      tipo = 'anomalias';
+    }
     const query$ = this.afs
       .collection<Anomalia>(tipo, (ref) => ref.where('informeId', '==', informeId))
       .snapshotChanges()
       .pipe(
         map((actions) =>
           actions.map((doc) => {
-            let data = doc.payload.doc.data() as Anomalia;
+            const data = doc.payload.doc.data() as Anomalia;
             data.id = doc.payload.doc.id;
-            // Convertimos el objetjo en un array
+            // Convertimos el objeto en un array
             if (data.hasOwnProperty('featureCoords')) {
               data.featureCoords = Object.values(data.featureCoords);
             }
@@ -71,7 +75,7 @@ export class AnomaliaService {
       );
     return query$;
   }
-  
+
   async updateAnomalia(anomalia: Anomalia) {
     const anomaliaObj = this._prepararParaDb(anomalia);
     const anomaliaDoc = this.afs.doc('anomalias/' + anomalia.id);

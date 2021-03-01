@@ -1,5 +1,6 @@
 import { Anomalia } from './anomalia';
 import { FiltrableInterface } from './filtrableInterface';
+import { LocationAreaInterface } from './location';
 import { ModuloInterface } from './modulo';
 
 export class Seguidor implements FiltrableInterface {
@@ -10,16 +11,18 @@ export class Seguidor implements FiltrableInterface {
   temperaturaMax: number; // temperatura máxima en el seguidor
   modulo: ModuloInterface;
   //
+  id?: string;
   mae: number; // modulos apagados equivalentes en el seguidor
   gradienteNormMax: number; // gradiente maximo en el seguidor
   plantaId?: string;
   informeId?: string;
   filas: number;
   columnas: number;
+  locArea: LocationAreaInterface;
 
-  constructor(anomalias: Anomalia[], filas: number, columnas: number) {
+  constructor(anomalias: Anomalia[], filas: number, columnas: number, locArea: LocationAreaInterface) {
     this.anomalias = anomalias;
-    this.plantaId = this.anomalias[0].plantaId;
+    this.plantaId = this.getPlantaId(this.anomalias[0]);
     this.informeId = this.anomalias[0].informeId;
     this.filas = filas;
     this.columnas = columnas;
@@ -29,6 +32,7 @@ export class Seguidor implements FiltrableInterface {
     this.mae = this.getMae();
     this.gradienteNormMax = this.getGradienteNormMax();
     this.modulo = anomalias[0].modulo;
+    this.locArea = locArea;
   }
 
   private getMae(): number {
@@ -38,7 +42,16 @@ export class Seguidor implements FiltrableInterface {
   private getTempMax(): number {
     return Math.max(...this.anomalias.map((anomalia) => anomalia.temperaturaMax));
   }
-  getGradienteNormMax(): number {
+
+  private getGradienteNormMax(): number {
     return Math.max(...this.anomalias.map((anomalia) => anomalia.gradienteNormalizado));
+  }
+
+  private getPlantaId(anomalia: Anomalia): string {
+    if (anomalia.plantaId !== undefined) {
+      return anomalia.plantaId;
+    } else {
+      return undefined;
+    }
   }
 }

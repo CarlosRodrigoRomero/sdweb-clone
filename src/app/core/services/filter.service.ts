@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 
 import { AnomaliaService } from './anomalia.service';
 import { ShareReportService } from '@core/services/share-report.service';
+import { SeguidorService } from '@core/services/seguidor.service';
 
 import { FiltrableInterface } from '@core/models/filtrableInterface';
 import { FilterInterface } from '@core/models/filter';
@@ -27,22 +28,34 @@ export class FilterService {
     this.filteredElementsWithoutFilterTipo
   );
 
-  constructor(private anomaliaService: AnomaliaService, private shareReportService: ShareReportService) {}
+  constructor(
+    private anomaliaService: AnomaliaService,
+    private shareReportService: ShareReportService,
+    private seguidorService: SeguidorService
+  ) {}
 
-  initFilterService(shared: boolean, plantaId: string, sharedId?: string) {
-    this.anomaliaService.getAnomaliasPlanta$(plantaId).subscribe((array) => {
-      this._allFiltrableElements = array;
-      this.filteredElements$.next(array);
-      if (shared) {
-        // obtenemos lo filtros guardados en al DB y los añadimos
-        this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => this.addFilters(filters));
-      }
-      this.initialized$.next(true);
+  initFilterService(shared: boolean, plantaId: string, plantaFija: boolean, sharedId?: string) {
+    if (plantaFija) {
+      this.anomaliaService.getAnomaliasPlanta$(plantaId).subscribe((array) => {
+        this._allFiltrableElements = array;
+        this.filteredElements$.next(array);
+        if (shared) {
+          // obtenemos lo filtros guardados en al DB y los añadimos
+          this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => this.addFilters(filters));
+        }
+        this.initialized$.next(true);
 
-      // para contabilizar los diferentes filtros 'tipo'
-      this.filteredElementsWithoutFilterTipo = array;
-      this.filteredElementsWithoutFilterTipo$.next(this.filteredElementsWithoutFilterTipo);
-    });
+        // para contabilizar los diferentes filtros 'tipo'
+        this.filteredElementsWithoutFilterTipo = array;
+        this.filteredElementsWithoutFilterTipo$.next(this.filteredElementsWithoutFilterTipo);
+      });
+    } else {
+      this.seguidorService.getSeguidoresPlanta$(plantaId).subscribe((seguidores) => {
+        // console.log(seguidores);
+        this._allFiltrableElements = seguidores;
+        this.filteredElements$.next(seguidores);
+      });
+    }
 
     return this.initialized$;
   }

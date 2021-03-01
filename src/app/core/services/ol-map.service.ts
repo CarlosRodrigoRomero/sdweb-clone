@@ -21,6 +21,8 @@ export class OlMapService {
   private thermalLayers$ = new BehaviorSubject<TileLayer[]>(this.thermalLayers);
   private anomaliaLayers: VectorLayer[] = [];
   private anomaliaLayers$ = new BehaviorSubject<VectorLayer[]>(this.anomaliaLayers);
+  private seguidorLayers: VectorLayer[] = [];
+  private seguidorLayers$ = new BehaviorSubject<VectorLayer[]>(this.seguidorLayers);
 
   constructor() {}
 
@@ -71,5 +73,14 @@ export class OlMapService {
 
   deleteAllDrawLayers() {
     this.drawLayers.forEach((layer) => (this.map as Map).removeLayer(layer));
+  }
+
+  addSeguidorLayer(layer: VectorLayer) {
+    this.seguidorLayers.push(layer);
+    this.seguidorLayers$.next(this.seguidorLayers);
+  }
+
+  getSeguidorLayers() {
+    return this.seguidorLayers$.asObservable();
   }
 }

@@ -25,6 +25,7 @@ import { ChartNumsyperdComponent } from './planta-stats/chart-numsyperd/chart-nu
 import { SliderTermicoComponent } from './components/slider-termico/slider-termico.component';
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
 import { ChartSankeyPotenciaComponent } from './planta-stats/chart-sankey-potencia/chart-sankey-potencia.component';
+import { MapSeguidoresComponent } from './components/map-seguidores/map-seguidores.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { ChartSankeyPotenciaComponent } from './planta-stats/chart-sankey-potenc
     SliderTermicoComponent,
     SliderTemporalComponent,
     ChartSankeyPotenciaComponent,
+    MapSeguidoresComponent,
   ],
   imports: [SharedModule, NgxSliderModule, PlantaReportRoutingModule, NgApexchartsModule, FiltersModule],
   exports: [MapViewComponent],

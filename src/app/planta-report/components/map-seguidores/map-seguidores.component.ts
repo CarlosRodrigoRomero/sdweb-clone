@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { take } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 
 import Map from 'ol/Map';
-import OSM from 'ol/source/OSM';
 import { fromLonLat, transformExtent } from 'ol/proj.js';
 import View from 'ol/View';
 import GeoJSON from 'ol/format/GeoJSON';
@@ -16,13 +15,9 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { Feature, Overlay } from 'ol';
 import Polygon from 'ol/geom/Polygon';
 import { defaults as defaultControls } from 'ol/control.js';
-import Zoom from 'ol/control/Zoom';
 import OverlayPositioning from 'ol/OverlayPositioning';
 import { click } from 'ol/events/condition';
 import XYZ from 'ol/source/XYZ';
-
-import ImageTileMod from '../../ImageTileMod.js';
-import XYZ_mod from '../../xyz_mod.js';
 
 import { PlantaService } from '@core/services/planta.service';
 import { MapControlService } from '../../services/map-control.service';
@@ -35,15 +30,14 @@ import { ShareReportService } from '@core/services/share-report.service';
 import { PlantaInterface } from '@core/models/planta';
 import { LocationAreaInterface } from '@core/models/location';
 import { Anomalia } from '@core/models/anomalia';
-import { ThermalLayerInterface } from '@core/models/thermalLayer';
-import { PlantaAddComponent } from 'src/app/clientes/components/planta-add/planta-add.component.js';
+import { Seguidor } from '@core/models/seguidor';
 
 @Component({
-  selector: 'app-map',
-  templateUrl: './map.component.html',
-  styleUrls: ['./map.component.scss'],
+  selector: 'app-map-seguidores',
+  templateUrl: './map-seguidores.component.html',
+  styleUrls: ['./map-seguidores.component.scss'],
 })
-export class MapComponent implements OnInit {
+export class MapSeguidoresComponent implements OnInit {
   public plantaId: string;
   public planta: PlantaInterface;
   public map: Map;
@@ -55,12 +49,12 @@ export class MapComponent implements OnInit {
   public locAreasVectorSource: VectorSource;
   public anomaliaSeleccionada: Anomalia;
   public listaAnomalias: Anomalia[];
+  public listaSeguidores: Seguidor[];
   public sliderYear: number;
   public aerialLayer: TileLayer;
-  private extent1: any;
   public thermalSource;
-  private thermalLayers: TileLayer[];
   private anomaliaLayers: VectorLayer[];
+  private seguidorLayers: VectorLayer[];
   public leftOpened: boolean;
   public rightOpened: boolean;
   public statsOpened: boolean;
@@ -86,41 +80,21 @@ export class MapComponent implements OnInit {
 
   ngOnInit(): void {
     this.mousePosition = null;
-
-    // Para la demo, agregamos un extent a todas las capas:
-    /* this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]); */
-
-    /* this.plantaId = 'egF0cbpXnnBnjcrusoeR'; */
-    /* this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L']; */
     this.plantaId = this.activatedRoute.snapshot.paramMap.get('id');
-    // Obtenemos todas las capas para esta planta, incluidas las termicas si es tipo "fija" y las almacenamos en this.thermalLayers
-    combineLatest([
-      this.plantaService.getThermalLayers$(this.plantaId),
-      this.informeService.getInformesDePlanta(this.plantaId),
-      this.plantaService.getPlanta(this.plantaId),
-    ])
-      .pipe(take(1))
-      .subscribe(([thermalLayers, informes, planta]) => {
-        this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers));
-        this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers));
 
-        // Para cada informe, hay que crear 2 capas: térmica y vectorial
+    // Obtenemos todas las capas para esta planta
+    combineLatest([this.informeService.getInformesDePlanta(this.plantaId), this.plantaService.getPlanta(this.plantaId)])
+      .pipe(take(1))
+      .subscribe(([informes, planta]) => {
+        this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers));
+
         informes
           .sort((a, b) => a.fecha - b.fecha)
           .forEach((informe) => {
-            // Crear capa térmica si es planta tipo "fija"
-            if (planta.tipo !== 'seguidores') {
-              const tl = thermalLayers.filter((item) => item.informeId === informe.id);
-
-              // TODO: Comprobar que existe...
-              if (tl.length > 0) {
-                this.olMapService.addThermalLayer(this._createThermalLayer(tl[0], informe.id));
-              }
-            }
             this.informesList.push(informe.id);
 
-            // crear capa de las anomalias
-            this.olMapService.addAnomaliaLayer(this._createAnomaliaLayer(informe.id));
+            // crear capa de los seguidores
+            this.olMapService.addSeguidorLayer(this._createSeguidorLayer(informe.id));
           });
 
         this.planta = planta;
@@ -129,7 +103,7 @@ export class MapComponent implements OnInit {
         this.selectedInformeId = this.informesList[this.informesList.length];
 
         // asignamos el informe para compartir
-        this.shareReportService.setInformeID(this.informesList[this.informesList.length]);
+        // this.shareReportService.setInformeID(this.informesList[this.informesList.length]);
 
         this.mapControlService.selectedInformeId = this.informesList[this.informesList.length];
 
@@ -137,35 +111,10 @@ export class MapComponent implements OnInit {
       });
   }
 
-  private _createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {
-    // Iniciar mapa térmico
-    const tl = new TileLayer({
-      source: new XYZ_mod({
-        url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',
-        crossOrigin: '',
-        tileClass: ImageTileMod,
-        transition: 255,
-        tileLoadFunction: (imageTile, src) => {
-          imageTile.rangeTempMax = thermalLayer.rangeTempMax;
-          imageTile.rangeTempMin = thermalLayer.rangeTempMin;
-          imageTile.mapControlService = this.mapControlService;
-          imageTile.getImage().src = src;
-        },
-      }),
-
-      /* extent: this.extent1, */
-    });
-    tl.setProperties({
-      informeId,
-    });
-
-    return tl;
-  }
-
-  private _createAnomaliaLayer(informeId: string): VectorLayer {
+  private _createSeguidorLayer(informeId: string): VectorLayer {
     const vl = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleAnomaliasMapa(false),
+      /* style: this.getStyleAnomaliasMapa(false), */
     });
 
     vl.setProperties({
@@ -180,49 +129,45 @@ export class MapComponent implements OnInit {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       crossOrigin: '',
     });
-    const aerial = new XYZ({
-      url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
+
+    /* const aerial = new XYZ({
+      // url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
+      url: this.planta.ortofoto.url,
       crossOrigin: '',
     });
 
     this.aerialLayer = new TileLayer({
       source: aerial,
-      extent: this.extent1,
-    });
+    }); */
+
     const osmLayer = new TileLayer({
       source: satellite,
       // source: new OSM(),
-      // extent: this.extent1,
     });
 
-    const layers = [osmLayer, /* this.aerialLayer, */ ...this.thermalLayers];
+    const layers = [osmLayer /* this.aerialLayer */];
 
     // MAPA
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
       zoom: this.planta.zoom,
       maxZoom: 20,
-      // extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
     });
 
     this.olMapService
       .createMap('map', layers, view, defaultControls({ attribution: false }))
       .subscribe((map) => (this.map = map));
 
-    this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
+    this.seguidorLayers.forEach((l) => this.map.addLayer(l));
     this.addCursorOnHover();
-    this.addOverlayInfoAnomalia();
-    if (!this.sharedReport) {
+    // this.addOverlayInfoAnomalia();
+    /* if (!this.sharedReport) {
       this.addLocationAreas();
-    }
-    // this.permitirCrearAnomalias();
-
-    const customZoom = new Zoom({ className: 'custom-zoom' });
-    /* this.map.addControl(customZoom); */
+    } */
 
     this.mapControlService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInformeId = informeId;
-      this.mostrarAnomalias();
+      this.mostrarSeguidores();
     });
   }
 
@@ -271,16 +216,12 @@ export class MapComponent implements OnInit {
     });
   }
 
-  private transform(extent) {
-    return transformExtent(extent, 'EPSG:4326', 'EPSG:3857');
-  }
-
   addLocationAreas() {
     const styles = {
       LineString: new Style({
         stroke: new Stroke({
           // color: '#dbdbdb',
-          color: 'green',
+          color: 'red',
           // lineDash: [4],
           width: 2,
         }),
@@ -317,20 +258,15 @@ export class MapComponent implements OnInit {
           source: this.locAreasVectorSource,
           visible: true,
           style: styleFunction,
-          /* style: new Style({
-            stroke: new Stroke({
-              color: 'red',
-            }),
-          }), */
         })
       );
     });
   }
 
   private locAreasToGeoJSON(locAreas: LocationAreaInterface[]) {
-    let listOfFeatures = [];
+    const listOfFeatures = [];
     locAreas.forEach((locArea) => {
-      let coordsList = [];
+      const coordsList = [];
       locArea.path.forEach((coords) => {
         coordsList.push(fromLonLat([coords.lng, coords.lat]));
       });
@@ -341,8 +277,7 @@ export class MapComponent implements OnInit {
         type: 'Feature',
         properties: {
           // globalCoords: locArea.globalCoords,
-          // globalCoords: locArea.globalX,
-          globalCoords: this.getGlobalCoords(locArea),
+          globalCoords: locArea.globalX,
         },
         geometry: {
           type: 'LineString',
@@ -363,48 +298,6 @@ export class MapComponent implements OnInit {
 
     return geojsonObject;
   }
-
-  private getGlobalCoords(locArea: LocationAreaInterface): string {
-    const locs = [...locArea.globalCoords, locArea.globalX, locArea.globalY];
-
-    const globalCoord = locs.find((loc) => loc !== '');
-
-    return globalCoord;
-  }
-
-  /* permitirCrearAnomalias() {
-    const draw = new Draw({
-      source: this.anomaliasVectorSource,
-      type: GeometryType.CIRCLE,
-      geometryFunction: createBox(),
-    });
-
-    this.map.addInteraction(draw);
-    draw.on('drawend', (event) => {
-      this.addAnomaliaToDb(event.feature);
-    });
-  }
-
-  private addAnomaliaToDb(feature: Feature) {
-    const geometry = feature.getGeometry() as SimpleGeometry;
-
-    const anomalia = new Anomalia(
-      0,
-      ['', '', ''],
-      0,
-      0,
-      0,
-      0,
-      null,
-      0,
-      geometry.getCoordinates()[0],
-      geometry.getType(),
-      this.plantaId,
-      this.selectedInformeId
-    );
-    // Guardar en la base de datos
-    this.anomaliaService.addAnomalia(anomalia);
-  } */
 
   private getColorAnomalia(feature: Feature) {
     const tipo = parseInt(feature.getProperties().properties.tipo);
@@ -437,38 +330,49 @@ export class MapComponent implements OnInit {
     };
   }
 
-  mostrarAnomalias() {
-    this.filterService.filteredElements$.subscribe((anomalias) => {
-      // Dibujar anomalias
-      this.dibujarAnomalias(anomalias as Anomalia[]);
-      this.listaAnomalias = anomalias as Anomalia[];
+  mostrarSeguidores() {
+    this.filterService.filteredElements$.subscribe((seguidores) => {
+      // Dibujar seguidores
+      this.dibujarSeguidores(seguidores as Seguidor[]);
+      this.listaSeguidores = seguidores as Seguidor[];
     });
   }
 
-  dibujarAnomalias(anomalias: Anomalia[]) {
+  dibujarSeguidores(seguidores: Seguidor[]) {
     // Para cada vector layer (que corresponde a un informe)
-    this.anomaliaLayers.forEach((l) => {
-      // filtra las anomalías correspondientes al informe
-      const filtered = anomalias.filter((item) => item.informeId == l.getProperties().informeId);
+    this.seguidorLayers.forEach((l) => {
+      // filtra los seguidores correspondientes al informe
+      const filtered = seguidores.filter((seguidor) => seguidor.informeId === l.getProperties().informeId);
       const source = l.getSource();
       source.clear();
-      filtered.forEach((anom) => {
+      filtered.forEach((seguidor) => {
         const feature = new Feature({
-          geometry: new Polygon([anom.featureCoords]),
+          geometry: {
+            type: 'LineString',
+            coordinates: this.locAreaToLonLat(seguidor.locArea),
+          },
           properties: {
-            anomaliaId: anom.id,
-            tipo: anom.tipo,
-            clase: anom.clase,
-            temperaturaMax: anom.temperaturaMax,
-            temperaturaRef: anom.temperaturaRef,
-            informeId: anom.informeId,
+            seguidorId: seguidor.id,
+            informeId: seguidor.informeId,
           },
         });
         source.addFeature(feature);
       });
     });
 
-    this._addSelectInteraction();
+    // this._addSelectInteraction();
+  }
+
+  private locAreaToLonLat(locArea: LocationAreaInterface) {
+    const coordsList = [];
+    locArea.path.forEach((coords) => {
+      coordsList.push(fromLonLat([coords.lng, coords.lat]));
+    });
+
+    // Al ser un poligono, la 1era y ultima coord deben ser iguales:
+    coordsList.push(coordsList[0]);
+
+    return coordsList;
   }
 
   private _addSelectInteraction() {

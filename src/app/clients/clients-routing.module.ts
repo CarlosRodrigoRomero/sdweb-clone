@@ -11,16 +11,16 @@ const routes: Routes = [
     path: '',
     component: ClientsComponent,
     children: [
-      { path: 'reports', component: ReportsComponent },
+      { path: 'plants', component: ReportsComponent },
       {
         path: 'planta-report',
         loadChildren: () => import('../planta-report/planta-report.module').then((m) => m.PlantaReportModule),
         canActivate: [AuthGuard],
       },
-      { path: '', redirectTo: 'reports', pathMatch: 'full' },
+      { path: '', redirectTo: 'plants', pathMatch: 'full' },
 
       {
-        path: 'reports/:id',
+        path: 'plants/:id',
         loadChildren: () => import('../planta-report/planta-report.module').then((m) => m.PlantaReportModule),
         canActivate: [AuthGuard],
       },

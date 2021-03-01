@@ -51,7 +51,8 @@
 
   <mat-sidenav-content>
     <div class="rel">
-      <app-map></app-map>
+      <app-map *ngIf="plantaFija"></app-map>
+      <app-map-seguidores *ngIf="!plantaFija"></app-map-seguidores>
 
       <div *ngIf="anomaliasLoaded">
         <app-share-map *ngIf="!sharedReport"></app-share-map>
@@ -59,7 +60,7 @@
         <app-barra-resumen-planta></app-barra-resumen-planta>
         <div class="map-sliders">
           <div class="grid-sliders">
-            <app-slider-termico></app-slider-termico>
+            <app-slider-termico *ngIf="plantaFija"></app-slider-termico>
             <app-slider-temporal *ngIf="!sharedReport"></app-slider-temporal>
           </div>
         </div>

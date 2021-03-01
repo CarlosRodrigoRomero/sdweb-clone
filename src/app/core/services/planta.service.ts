@@ -1,19 +1,25 @@
 import { Injectable } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
-import { PlantaInterface } from '@core/models/planta';
+
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { LocationAreaInterface } from '../models/location';
 
+import { LatLngLiteral } from '@agm/core/map-types';
+
+import { AuthService } from './auth.service';
+import { GLOBAL } from './global';
+
+import { ThermalLayerInterface } from '../models/thermalLayer';
+import { PlantaInterface } from '@core/models/planta';
+import { CriteriosClasificacion } from '../models/criteriosClasificacion';
+import { LocationAreaInterface } from '../models/location';
 import { UserInterface } from '../models/user';
 import { ModuloInterface } from '../models/modulo';
 import { PcInterface } from '../models/pc';
 import { UserAreaInterface } from '../models/userArea';
-import { AuthService } from './auth.service';
-import { GLOBAL } from './global';
-import { CriteriosClasificacion } from '../models/criteriosClasificacion';
-import { LatLngLiteral } from '@agm/core/map-types';
-import { ThermalLayerInterface } from '../models/thermalLayer';
+
 declare const google: any;
 
 @Injectable({
@@ -22,6 +28,8 @@ declare const google: any;
 export class PlantaService {
   public planta$: Observable<PlantaInterface>;
   public planta: PlantaInterface;
+  private currentPlantId = '';
+  public currentPlantId$ = new BehaviorSubject<string>(this.currentPlantId);
   private plantaDoc: AngularFirestoreDocument<PlantaInterface>;
   public plantasCollection: AngularFirestoreCollection<PlantaInterface>;
   public modulos: ModuloInterface[];
@@ -29,7 +37,10 @@ export class PlantaService {
   public currentFilteredLocAreas$ = this.filteredLocAreasSource.asObservable();
   public locAreaList: LocationAreaInterface[];
 
-  constructor(private afs: AngularFirestore, public auth: AuthService) {
+  constructor(private afs: AngularFirestore, public auth: AuthService, private activatedRoute: ActivatedRoute) {
+    this.currentPlantId = this.activatedRoute.snapshot.paramMap.get('id');
+    this.currentPlantId$.next(this.currentPlantId);
+
     this.getModulos().subscribe((modulos) => {
       this.modulos = modulos;
     });
@@ -49,6 +60,22 @@ export class PlantaService {
         }
       })
     ));
+  }
+
+  getCurrentPlant(): Observable<PlantaInterface> {
+    this.plantaDoc = this.afs.doc<PlantaInterface>('plantas/' + this.currentPlantId);
+
+    return this.plantaDoc.snapshotChanges().pipe(
+      map((action) => {
+        if (action.payload.exists === false) {
+          return null;
+        } else {
+          const data = action.payload.data() as PlantaInterface;
+          data.id = action.payload.id;
+          return data;
+        }
+      })
+    );
   }
 
   updatePlanta(planta: PlantaInterface): void {
