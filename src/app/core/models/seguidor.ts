@@ -1,6 +1,7 @@
+import { LatLngLiteral } from '@agm/core';
+
 import { Anomalia } from './anomalia';
 import { FiltrableInterface } from './filtrableInterface';
-import { LocationAreaInterface } from './location';
 import { ModuloInterface } from './modulo';
 
 export class Seguidor implements FiltrableInterface {
@@ -18,21 +19,31 @@ export class Seguidor implements FiltrableInterface {
   informeId?: string;
   filas: number;
   columnas: number;
-  locArea: LocationAreaInterface;
+  path: LatLngLiteral[];
 
-  constructor(anomalias: Anomalia[], filas: number, columnas: number, locArea: LocationAreaInterface) {
+  constructor(anomalias: Anomalia[], filas: number, columnas: number, path: LatLngLiteral[], plantaId: string) {
     this.anomalias = anomalias;
-    this.plantaId = this.getPlantaId(this.anomalias[0]);
-    this.informeId = this.anomalias[0].informeId;
+    this.plantaId = plantaId;
     this.filas = filas;
     this.columnas = columnas;
-    this.globalCoords = anomalias[0].globalCoords;
-    this.perdidas = anomalias.reduce((acum, current) => acum + current.perdidas, 0);
+    this.perdidas = this.getPerdidas(anomalias);
     this.temperaturaMax = this.getTempMax();
     this.mae = this.getMae();
     this.gradienteNormMax = this.getGradienteNormMax();
-    this.modulo = anomalias[0].modulo;
-    this.locArea = locArea;
+    this.informeId = this.getInformeId();
+    this.modulo = this.getModulo();
+    this.globalCoords = this.getGlobalCoords();
+    this.path = path;
+  }
+
+  private getPerdidas(anomalias: Anomalia[]): number {
+    let suma = 0;
+    anomalias.forEach((anomalia) => {
+      if (anomalia.perdidas !== undefined) {
+        suma += anomalia.perdidas;
+      }
+    });
+    return suma;
   }
 
   private getMae(): number {
@@ -40,18 +51,31 @@ export class Seguidor implements FiltrableInterface {
   }
 
   private getTempMax(): number {
-    return Math.max(...this.anomalias.map((anomalia) => anomalia.temperaturaMax));
+    return Math.max(
+      ...this.anomalias
+        .filter((anomalia) => anomalia.temperaturaMax !== undefined)
+        .map((anomalia) => anomalia.temperaturaMax)
+    );
   }
 
   private getGradienteNormMax(): number {
-    return Math.max(...this.anomalias.map((anomalia) => anomalia.gradienteNormalizado));
+    return Math.max(
+      ...this.anomalias
+        .filter((anomalia) => anomalia.gradienteNormalizado !== undefined)
+        .map((anomalia) => anomalia.gradienteNormalizado)
+    );
   }
 
-  private getPlantaId(anomalia: Anomalia): string {
-    if (anomalia.plantaId !== undefined) {
-      return anomalia.plantaId;
-    } else {
-      return undefined;
-    }
+  private getInformeId(): string {
+    return this.anomalias.find((anomalia) => anomalia.informeId !== undefined).informeId;
+  }
+
+  private getModulo(): ModuloInterface {
+    return this.anomalias.find((anomalia) => anomalia.modulo !== undefined).modulo;
+  }
+
+  private getGlobalCoords(): string[] {
+    return this.anomalias[0].globalCoords;
+    // return this.anomalias.find((anomalia) => anomalia.globalCoords !== undefined).globalCoords;
   }
 }

@@ -48,6 +48,7 @@ export class MapSeguidoresComponent implements OnInit {
   public anomaliasVectorSource: VectorSource;
   public locAreasVectorSource: VectorSource;
   public anomaliaSeleccionada: Anomalia;
+  public seguidorSeleccionado: Seguidor;
   public listaAnomalias: Anomalia[];
   public listaSeguidores: Seguidor[];
   public sliderYear: number;
@@ -113,8 +114,8 @@ export class MapSeguidoresComponent implements OnInit {
 
   private _createSeguidorLayer(informeId: string): VectorLayer {
     const vl = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      /* style: this.getStyleAnomaliasMapa(false), */
+      source: new VectorSource(/* { wrapX: false } */),
+      style: this.getStyleSeguidoresMapa(false),
     });
 
     vl.setProperties({
@@ -216,101 +217,25 @@ export class MapSeguidoresComponent implements OnInit {
     });
   }
 
-  addLocationAreas() {
-    const styles = {
-      LineString: new Style({
-        stroke: new Stroke({
-          // color: '#dbdbdb',
-          color: 'red',
-          // lineDash: [4],
-          width: 2,
-        }),
-        fill: new Fill({
-          color: 'rgba(0, 0, 255, 0)',
-        }),
-        text: new Text({
-          font: '16px "Open Sans", "Arial Unicode MS", "sans-serif"',
-          placement: 'line',
-          fill: new Fill({
-            color: 'white',
-          }),
-          text: '',
-        }),
-      }),
-    };
+  private getColorSeguidor(feature: Feature) {
+    const mae = feature.getProperties().properties.mae as number;
 
-    const styleFunction = (feature) => {
-      if (feature !== undefined) {
-        const style = styles[feature.getGeometry().getType()];
-        style.getText().setText(feature.get('globalCoords'));
-        // style.getText().setText(feature.get('globalCoords')[1]);
-        return style;
-      }
-    };
-
-    this.plantaService.getLocationsArea(this.plantaId).subscribe((locAreas) => {
-      this.locAreasVectorSource = new VectorSource({
-        features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(locAreas)),
-      });
-
-      this.map.addLayer(
-        new VectorLayer({
-          source: this.locAreasVectorSource,
-          visible: true,
-          style: styleFunction,
-        })
-      );
-    });
+    if (mae <= 0.25) {
+      return GLOBAL.colores_mae[0];
+    } else if (mae <= 0.5) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
   }
 
-  private locAreasToGeoJSON(locAreas: LocationAreaInterface[]) {
-    const listOfFeatures = [];
-    locAreas.forEach((locArea) => {
-      const coordsList = [];
-      locArea.path.forEach((coords) => {
-        coordsList.push(fromLonLat([coords.lng, coords.lat]));
-      });
-      // Al ser un poligono, la 1era y utlima coord deben ser iguales:
-      coordsList.push(coordsList[0]);
-
-      listOfFeatures.push({
-        type: 'Feature',
-        properties: {
-          // globalCoords: locArea.globalCoords,
-          globalCoords: locArea.globalX,
-        },
-        geometry: {
-          type: 'LineString',
-          coordinates: coordsList,
-        },
-      });
-    });
-    const geojsonObject = {
-      type: 'FeatureCollection',
-      // crs: {
-      //   type: 'name',
-      //   properties: {
-      //     name: 'EPSG:3857',
-      //   },
-      // },
-      features: listOfFeatures,
-    };
-
-    return geojsonObject;
-  }
-
-  private getColorAnomalia(feature: Feature) {
-    const tipo = parseInt(feature.getProperties().properties.tipo);
-
-    return GLOBAL.colores_tipos[tipo];
-  }
-
-  private getStyleAnomaliasMapa(selected = false) {
+  private getStyleSeguidoresMapa(selected) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        console.log(this.getColorSeguidor(feature));
         return new Style({
           stroke: new Stroke({
-            color: this.getColorAnomalia(feature),
+            color: this.getColorSeguidor(feature),
 
             width: selected ? 6 : 4,
           }),
@@ -349,18 +274,19 @@ export class MapSeguidoresComponent implements OnInit {
         const feature = new Feature({
           geometry: {
             type: 'LineString',
-            coordinates: this.locAreaToLonLat(seguidor.locArea),
+            /* coordinates: this.locAreaToLonLat(seguidor.path), */
           },
           properties: {
             seguidorId: seguidor.id,
             informeId: seguidor.informeId,
+            mae: seguidor.mae,
           },
         });
         source.addFeature(feature);
       });
     });
 
-    // this._addSelectInteraction();
+    this._addSelectInteraction();
   }
 
   private locAreaToLonLat(locArea: LocationAreaInterface) {
@@ -377,7 +303,7 @@ export class MapSeguidoresComponent implements OnInit {
 
   private _addSelectInteraction() {
     const select = new Select({
-      style: this.getStyleAnomaliasMapa(true),
+      style: this.getStyleSeguidoresMapa(true),
       condition: click,
       layers: (l) => {
         if (l.getProperties().informeId == this.selectedInformeId) {
@@ -388,17 +314,17 @@ export class MapSeguidoresComponent implements OnInit {
     });
     this.map.addInteraction(select);
     select.on('select', (e) => {
-      this.anomaliaSeleccionada = undefined;
+      this.seguidorSeleccionado = undefined;
 
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().hasOwnProperty('properties')) {
-          const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
+          const seguidorId = e.selected[0].getProperties().properties.seguidorId;
 
-          const anomalia = this.listaAnomalias.filter((anom) => {
-            return anom.id == anomaliaId;
+          const seguidor = this.listaSeguidores.filter((seg) => {
+            return seg.id == seguidorId;
           })[0];
-          if (this.selectedInformeId == anomalia.informeId) {
-            this.anomaliaSeleccionada = anomalia;
+          if (this.selectedInformeId == seguidor.informeId) {
+            this.seguidorSeleccionado = seguidor;
           }
         }
       }

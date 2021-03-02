@@ -37,7 +37,7 @@ export class SeguidorService {
         this.plantaService.getPlanta(plantaId).subscribe((planta) => (this.planta = planta));
         const anomaliaObsList = Array<Observable<Seguidor[]>>();
         informes.forEach((informe) => {
-          anomaliaObsList.push(this.getSeguidores$(informe.id, 'pcs'));
+          anomaliaObsList.push(this.getSeguidores$(informe.id, plantaId, 'pcs'));
         });
         return combineLatest(anomaliaObsList);
       }),
@@ -47,34 +47,69 @@ export class SeguidorService {
     );
   }
 
-  getSeguidores$(informeId: string, tipo?: 'anomalias' | 'pcs'): Observable<Seguidor[]> {
-    return this.anomaliaService.getAnomalias$(informeId, tipo).pipe(
-      take(1),
-      map((anomalias) => {
-        const coordSeguidores = [
-          ...new Set(
-            anomalias.map((anomalia) => (anomalia as PcInterface).global_x).filter((coords) => coords !== undefined)
-          ),
-        ];
+  getSeguidores$(informeId: string, plantaId: string, tipo?: 'anomalias' | 'pcs'): Observable<Seguidor[]> {
+    // Obtener todas las locArea de la planta
+    const locAreaList$ = this.plantaService.getLocationsArea(plantaId).pipe(take(1));
+    const anomaliaList$ = this.anomaliaService.getAnomalias$(informeId, tipo).pipe(take(1));
+
+    // obtenemos todas las anomalias y las locAreas
+    return combineLatest([locAreaList$, anomaliaList$]).pipe(
+      map(([locAreaList, anomaliaList]) => {
         const seguidores: Seguidor[] = [];
-        coordSeguidores.forEach((coords) => {
-          const anomaliasSeguidor: Anomalia[] = anomalias.filter(
-            (anomalia) => (anomalia as PcInterface).global_x === coords
-          );
-          this.getLocAreaBySeguidor(coords).subscribe((locArea) => {
-            const seguidor = new Seguidor(anomaliasSeguidor, this.planta.filas, this.planta.columnas, locArea);
+
+        // comprobamos si tiene globalCoords o globaX, globalY
+        if (locAreaList.filter((locArea) => locArea.globalCoords !== undefined).length > 0) {
+          // si tiene globalCoords detectamos la mas pequeña que es la utilizaremos para el seguidor
+          const contador = [1, 2];
+          let indiceSeleccionado = 0;
+          contador.forEach((c) => {
+            const numItems = locAreaList.filter((locArea) => locArea.globalCoords[c] !== null).length;
+            if (numItems > 0) {
+              indiceSeleccionado = c;
+            }
+          });
+          // filtramos las areas seleccionadas para los seguidores
+          const locAreaSeguidores = locAreaList.filter((locArea) => locArea.globalCoords[indiceSeleccionado] !== null);
+
+          // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
+          locAreaSeguidores.forEach((locArea) => {
+            const anomaliasSeguidor = anomaliaList.filter(
+              (anomalia) => anomalia.globalCoords[indiceSeleccionado] === locArea.globalCoords[indiceSeleccionado]
+            );
+            const seguidor = new Seguidor(
+              anomaliasSeguidor,
+              this.planta.filas,
+              this.planta.columnas,
+              locArea.path,
+              plantaId
+            );
             seguidores.push(seguidor);
           });
-        });
+        } else {
+          // filtramos las areas seleccionadas para los seguidores
+          const locAreaSeguidores = locAreaList.filter((locArea) => locArea.globalX !== null);
+
+          // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
+          locAreaSeguidores.forEach((locArea) => {
+            const anomaliasSeguidor = anomaliaList.filter(
+              (anomalia) => (anomalia as PcInterface).global_x === locArea.globalX
+            );
+            // comprobamos que haya anomalías dentro del seguidor
+            if (anomaliasSeguidor.length > 0) {
+              const seguidor = new Seguidor(
+                anomaliasSeguidor,
+                this.planta.filas,
+                this.planta.columnas,
+                locArea.path,
+                plantaId
+              );
+              seguidores.push(seguidor);
+            }
+          });
+        }
+
         return seguidores;
       })
-    );
-  }
-
-  getLocAreaBySeguidor(coords: any): Observable<LocationAreaInterface> {
-    return this.plantaService.getLocationsArea(this.planta.id).pipe(
-      take(1),
-      map((locAreas) => locAreas.find((locA) => locA.globalX === coords))
     );
   }
 }
