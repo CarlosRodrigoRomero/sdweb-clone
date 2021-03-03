@@ -57,7 +57,14 @@
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns" [routerLink]="['../planta-report/', row.plantaId]"></tr>
+          <tr
+            mat-row
+            class="table-row"
+            *matRowDef="let row; columns: displayedColumns"
+            [routerLink]="
+              row.tipo === 'fija' ? ['../planta-report/', row.plantaId] : ['../planta-seguidores/', row.plantaId]
+            "
+          ></tr>
 
           <!-- Se muestra cuando no hay resultados en la búsqueda -->
           <tr class="mat-row" *matNoDataRow>

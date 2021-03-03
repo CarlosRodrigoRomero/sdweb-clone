@@ -31,6 +31,8 @@ import { PlantaInterface } from '@core/models/planta';
 import { LocationAreaInterface } from '@core/models/location';
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
+import { LatLngLiteral } from '@agm/core';
+import LineString from 'ol/geom/LineString';
 
 @Component({
   selector: 'app-map-seguidores',
@@ -112,19 +114,6 @@ export class MapSeguidoresComponent implements OnInit {
       });
   }
 
-  private _createSeguidorLayer(informeId: string): VectorLayer {
-    const vl = new VectorLayer({
-      source: new VectorSource(/* { wrapX: false } */),
-      style: this.getStyleSeguidoresMapa(false),
-    });
-
-    vl.setProperties({
-      informeId,
-    });
-
-    return vl;
-  }
-
   initMap() {
     const satellite = new XYZ({
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -155,13 +144,14 @@ export class MapSeguidoresComponent implements OnInit {
       maxZoom: 20,
     });
 
+    // creamos el mapa a traves del servicio y nos subscribimos a el
     this.olMapService
       .createMap('map', layers, view, defaultControls({ attribution: false }))
       .subscribe((map) => (this.map = map));
 
     this.seguidorLayers.forEach((l) => this.map.addLayer(l));
     this.addCursorOnHover();
-    // this.addOverlayInfoAnomalia();
+    this.addOverlayInfoAnomalia();
     /* if (!this.sharedReport) {
       this.addLocationAreas();
     } */
@@ -172,8 +162,39 @@ export class MapSeguidoresComponent implements OnInit {
     });
   }
 
+  private _createSeguidorLayer(informeId: string): VectorLayer {
+    const vl = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleSeguidoresMapa(false),
+    });
+
+    vl.setProperties({
+      informeId,
+    });
+
+    return vl;
+  }
+
+  private addCursorOnHover() {
+    this.map.on('pointermove', (event) => {
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        let feature = this.map
+          .getFeaturesAtPixel(event.pixel)
+          .filter((item) => item.getProperties().properties !== undefined);
+        feature = feature.filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
+        if (feature.length > 0) {
+          this.map.getViewport().style.cursor = 'pointer';
+        } else {
+          this.map.getViewport().style.cursor = 'inherit';
+        }
+      } else {
+        this.map.getViewport().style.cursor = 'inherit';
+      }
+    });
+  }
+
   private addOverlayInfoAnomalia() {
-    // Overlay para los detalles de cada anomalia
+    // Overlay para los detalles de cada seguidor
     const element = document.getElementById('popup');
 
     const popup = new Overlay({
@@ -190,69 +211,61 @@ export class MapSeguidoresComponent implements OnInit {
       if (feature.length > 0) {
         popup.setPosition(undefined);
         popup.setPosition(clickedCoord);
-        // element.innerHTML = 'hola probando';
-
-        // $(element).popover('show');
       } else {
         popup.setPosition(undefined);
       }
     });
   }
 
-  private addCursorOnHover() {
-    this.map.on('pointermove', (event) => {
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        let feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties().properties !== undefined);
-        feature = feature.filter((item) => item.getProperties().properties.informeId == this.selectedInformeId);
-        if (feature.length > 0) {
-          this.map.getViewport().style.cursor = 'pointer';
-        } else {
-          this.map.getViewport().style.cursor = 'inherit';
-        }
-      } else {
-        this.map.getViewport().style.cursor = 'inherit';
-      }
-    });
-  }
-
-  private getColorSeguidor(feature: Feature) {
-    const mae = feature.getProperties().properties.mae as number;
-
-    if (mae <= 0.25) {
-      return GLOBAL.colores_mae[0];
-    } else if (mae <= 0.5) {
-      return GLOBAL.colores_mae[1];
-    } else {
-      return GLOBAL.colores_mae[2];
-    }
-  }
-
   private getStyleSeguidoresMapa(selected) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        console.log(this.getColorSeguidor(feature));
         return new Style({
           stroke: new Stroke({
             color: this.getColorSeguidor(feature),
-
             width: selected ? 6 : 4,
           }),
-          fill: new Fill({
-            color: 'rgba(0, 0, 255, 0)',
-          }),
-          text: new Text({
+          /* fill: new Fill({
+            color: this.hexToRgb(this.getColorSeguidor(feature), 0.5),
+          }), */
+          /* text: new Text({
             font: '16px "Open Sans", "Arial Unicode MS", "sans-serif"',
             placement: 'line',
             fill: new Fill({
               color: 'white',
             }),
             text: '',
-          }),
+          }), */
         });
       }
     };
+  }
+
+  private getColorSeguidor(feature: Feature) {
+    const mae = feature.getProperties().properties.mae as number;
+
+    if (mae <= 0.01) {
+      return GLOBAL.colores_mae[0];
+    } else if (mae <= 0.02) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
+  }
+
+  private hexToRgb(hex: string, opacity: number): string {
+    return (
+      'rgba(' +
+      hex
+        .replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, (m, r, g, b) => '#' + r + r + g + g + b + b)
+        .substring(1)
+        .match(/.{2}/g)
+        .map((x) => parseInt(x, 16))
+        .toString() +
+      ',' +
+      opacity.toString() +
+      ')'
+    );
   }
 
   mostrarSeguidores() {
@@ -272,10 +285,7 @@ export class MapSeguidoresComponent implements OnInit {
       source.clear();
       filtered.forEach((seguidor) => {
         const feature = new Feature({
-          geometry: {
-            type: 'LineString',
-            /* coordinates: this.locAreaToLonLat(seguidor.path), */
-          },
+          geometry: new LineString(this.latLonLiteralToLonLat(seguidor.path)),
           properties: {
             seguidorId: seguidor.id,
             informeId: seguidor.informeId,
@@ -289,9 +299,9 @@ export class MapSeguidoresComponent implements OnInit {
     this._addSelectInteraction();
   }
 
-  private locAreaToLonLat(locArea: LocationAreaInterface) {
+  private latLonLiteralToLonLat(path: LatLngLiteral[]) {
     const coordsList = [];
-    locArea.path.forEach((coords) => {
+    path.forEach((coords) => {
       coordsList.push(fromLonLat([coords.lng, coords.lat]));
     });
 
@@ -306,7 +316,7 @@ export class MapSeguidoresComponent implements OnInit {
       style: this.getStyleSeguidoresMapa(true),
       condition: click,
       layers: (l) => {
-        if (l.getProperties().informeId == this.selectedInformeId) {
+        if (l.getProperties().informeId === this.selectedInformeId) {
           return true;
         }
         return false;

@@ -45,6 +45,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
                   prev.fecha > current.fecha ? prev : current
                 ).fecha,
                 plantaId: planta.id,
+                tipo: planta.tipo,
               });
             }
           }

@@ -51,7 +51,6 @@ export class FilterService {
       });
     } else {
       this.seguidorService.getSeguidoresPlanta$(plantaId).subscribe((seguidores) => {
-        console.log(seguidores);
         this._allFiltrableElements = seguidores;
         this.filteredElements$.next(seguidores);
       });

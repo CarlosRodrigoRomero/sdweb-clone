@@ -101,3 +101,7 @@ h4 {
   -webkit-hyphens: auto;
   hyphens: auto;
 }
+
+tr.table-row:not(.example-expanded-row):hover {
+  background: whitesmoke;
+}

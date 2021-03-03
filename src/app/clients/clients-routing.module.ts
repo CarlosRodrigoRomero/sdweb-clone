@@ -17,6 +17,12 @@ const routes: Routes = [
         loadChildren: () => import('../planta-report/planta-report.module').then((m) => m.PlantaReportModule),
         canActivate: [AuthGuard],
       },
+      {
+        path: 'planta-seguidores',
+        loadChildren: () =>
+          import('../planta-seguidores/planta-seguidores.module').then((m) => m.PlantaSeguidoresModule),
+        canActivate: [AuthGuard],
+      },
       { path: '', redirectTo: 'plants', pathMatch: 'full' },
 
       {
