@@ -20,7 +20,7 @@ import { click } from 'ol/events/condition';
 import XYZ from 'ol/source/XYZ';
 
 import { PlantaService } from '@core/services/planta.service';
-import { MapControlService } from '../../services/map-control.service';
+import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { GLOBAL } from '@core/services/global';
 import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '@core/services/filter.service';
@@ -67,7 +67,7 @@ export class MapSeguidoresComponent implements OnInit {
   public sharedReport = false;
 
   constructor(
-    public mapControlService: MapControlService,
+    public mapSeguidoresService: MapSeguidoresService,
     private plantaService: PlantaService,
     private informeService: InformeService,
     public filterService: FilterService,
@@ -96,9 +96,16 @@ export class MapSeguidoresComponent implements OnInit {
           .forEach((informe) => {
             this.informesList.push(informe.id);
 
-            // crear capa de los seguidores
-            this.olMapService.addSeguidorLayer(this._createSeguidorLayer(informe.id));
+            // creamos las capas de los seguidores para las 2 diferentes vistas
+            this._createSeguidorLayers(informe.id).forEach((layer) => this.olMapService.addSeguidorLayer(layer));
           });
+
+        this.mapSeguidoresService.toggleView$.subscribe((v) => {
+          // ocultamos las 3 capas de las vistas
+          this.seguidorLayers.forEach((layer) => layer.setOpacity(0));
+          // mostramos la capa seleccionada
+          this.seguidorLayers[v].setOpacity(1);
+        });
 
         this.planta = planta;
 
@@ -108,7 +115,7 @@ export class MapSeguidoresComponent implements OnInit {
         // asignamos el informe para compartir
         // this.shareReportService.setInformeID(this.informesList[this.informesList.length]);
 
-        this.mapControlService.selectedInformeId = this.informesList[this.informesList.length];
+        this.mapSeguidoresService.selectedInformeId = this.informesList[this.informesList.length];
 
         this.initMap();
       });
@@ -156,23 +163,36 @@ export class MapSeguidoresComponent implements OnInit {
       this.addLocationAreas();
     } */
 
-    this.mapControlService.selectedInformeId$.subscribe((informeId) => {
+    this.mapSeguidoresService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInformeId = informeId;
       this.mostrarSeguidores();
     });
   }
 
-  private _createSeguidorLayer(informeId: string): VectorLayer {
-    const vl = new VectorLayer({
+  private _createSeguidorLayers(informeId: string): VectorLayer[] {
+    const maeLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleSeguidoresMapa(false),
+      style: this.getStyleSeguidoresMae(false),
     });
-
-    vl.setProperties({
+    maeLayer.setProperties({
+      informeId,
+    });
+    const celsCalientesLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleSeguidoresCelsCalientes(false),
+    });
+    celsCalientesLayer.setProperties({
+      informeId,
+    });
+    const gradNormMaxLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleSeguidoresGradienteNormMax(false),
+    });
+    gradNormMaxLayer.setProperties({
       informeId,
     });
 
-    return vl;
+    return [maeLayer, celsCalientesLayer, gradNormMaxLayer];
   }
 
   private addCursorOnHover() {
@@ -217,12 +237,13 @@ export class MapSeguidoresComponent implements OnInit {
     });
   }
 
-  private getStyleSeguidoresMapa(selected) {
+  // ESTILOS MAE
+  private getStyleSeguidoresMae(selected) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: this.getColorSeguidor(feature),
+            color: this.getColorSeguidorMae(feature),
             width: selected ? 6 : 4,
           }),
           /* fill: new Fill({
@@ -241,12 +262,68 @@ export class MapSeguidoresComponent implements OnInit {
     };
   }
 
-  private getColorSeguidor(feature: Feature) {
+  private getColorSeguidorMae(feature: Feature) {
     const mae = feature.getProperties().properties.mae as number;
 
     if (mae <= 0.01) {
       return GLOBAL.colores_mae[0];
     } else if (mae <= 0.02) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
+  }
+
+  // ESTILOS CELS CALIENTES
+  private getStyleSeguidoresCelsCalientes(selected) {
+    return (feature) => {
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        return new Style({
+          stroke: new Stroke({
+            color: this.getColorSeguidorCelsCalientes(feature),
+            width: selected ? 6 : 4,
+          }),
+        });
+      }
+    };
+  }
+
+  private getColorSeguidorCelsCalientes(feature: Feature) {
+    const numModulos = feature.getProperties().properties.filas * feature.getProperties().properties.columnas;
+    const celsCalientes = feature
+      .getProperties()
+      .properties.anomalias.filter((anomalia) => anomalia.tipo == 8 || anomalia.tipo == 9).length;
+    const porcentCelsCalientes = celsCalientes / numModulos;
+
+    if (porcentCelsCalientes <= 0.1) {
+      return GLOBAL.colores_mae[0];
+    } else if (porcentCelsCalientes <= 0.2) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
+  }
+
+  // ESTILOS GRADIENTE NORMALIZADO MAX
+  private getStyleSeguidoresGradienteNormMax(selected) {
+    return (feature) => {
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        return new Style({
+          stroke: new Stroke({
+            color: this.getColorSeguidorGradienteNormMax(feature),
+            width: selected ? 6 : 4,
+          }),
+        });
+      }
+    };
+  }
+
+  private getColorSeguidorGradienteNormMax(feature: Feature) {
+    const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
+
+    if (gradNormMax <= 10) {
+      return GLOBAL.colores_mae[0];
+    } else if (gradNormMax <= 20) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -290,13 +367,18 @@ export class MapSeguidoresComponent implements OnInit {
             seguidorId: seguidor.id,
             informeId: seguidor.informeId,
             mae: seguidor.mae,
+            /* temperaturaMax: seguidor.temperaturaMax, */
+            gradienteNormalizado: seguidor.gradienteNormalizado,
+            anomalias: seguidor.anomalias,
+            filas: seguidor.filas,
+            columnas: seguidor.columnas,
           },
         });
         source.addFeature(feature);
       });
     });
 
-    this._addSelectInteraction();
+    // this._addSelectInteraction();
   }
 
   private latLonLiteralToLonLat(path: LatLngLiteral[]) {
@@ -311,9 +393,11 @@ export class MapSeguidoresComponent implements OnInit {
     return coordsList;
   }
 
-  private _addSelectInteraction() {
+  /*  private _addSelectInteraction() {
     const select = new Select({
-      style: this.getStyleSeguidoresMapa(true),
+      // style: this.getStyleSeguidoresMae(true),
+      // style: this.getStyleSeguidoresCelsCalientes(true),
+      style: this.getStyleSeguidoresGradienteNormMax(true),
       condition: click,
       layers: (l) => {
         if (l.getProperties().informeId === this.selectedInformeId) {
@@ -339,5 +423,5 @@ export class MapSeguidoresComponent implements OnInit {
         }
       }
     });
-  }
+  } */
 }

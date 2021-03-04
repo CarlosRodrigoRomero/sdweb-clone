@@ -31,7 +31,7 @@
     <div class="titulo">
       <h4>Listado de anomalías</h4>
     </div>
-    <app-filter-pcs-list></app-filter-pcs-list>
+    <app-seguidores-list></app-seguidores-list>
   </mat-sidenav>
 
   <mat-sidenav
@@ -51,22 +51,20 @@
 
   <mat-sidenav-content>
     <div class="rel">
-      <app-map></app-map>
+      <app-map-seguidores></app-map-seguidores>
 
-      <div *ngIf="anomaliasLoaded">
+      <div *ngIf="seguidoresLoaded$ | async">
+        <app-view-toggle></app-view-toggle>
         <app-share-map *ngIf="!sharedReport"></app-share-map>
         <app-download-report></app-download-report>
         <app-barra-resumen-planta></app-barra-resumen-planta>
         <div class="map-sliders">
-          <div class="grid-sliders">
-            <app-slider-termico></app-slider-termico>
-            <app-slider-temporal *ngIf="!sharedReport"></app-slider-temporal>
-          </div>
+          <app-slider-temporal *ngIf="!sharedReport"></app-slider-temporal>
         </div>
       </div>
     </div>
 
-    <div *ngIf="anomaliasLoaded">
+    <div *ngIf="seguidoresLoaded">
       <button
         *ngIf="!sharedReport"
         mat-icon-button
@@ -81,7 +79,7 @@
       <button mat-icon-button class="btn-right" (click)="sidenavRight.toggle()" [class.mat-elevation-z2]="true">
         <mat-icon>list_alt</mat-icon>
         <!-- <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
-        <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon> -->
+          <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon> -->
       </button>
       <button
         *ngIf="!sharedReport"
@@ -92,7 +90,7 @@
       >
         <mat-icon>query_stats</mat-icon>
         <!-- <mat-icon *ngIf="!statsOpened">keyboard_arrow_left</mat-icon>
-        <mat-icon *ngIf="statsOpened">keyboard_arrow_right</mat-icon> -->
+          <mat-icon *ngIf="statsOpened">keyboard_arrow_right</mat-icon> -->
       </button>
     </div>
   </mat-sidenav-content>

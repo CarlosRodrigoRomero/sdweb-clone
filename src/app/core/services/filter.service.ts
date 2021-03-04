@@ -53,6 +53,8 @@ export class FilterService {
       this.seguidorService.getSeguidoresPlanta$(plantaId).subscribe((seguidores) => {
         this._allFiltrableElements = seguidores;
         this.filteredElements$.next(seguidores);
+
+        this.initialized$.next(true);
       });
     }
 

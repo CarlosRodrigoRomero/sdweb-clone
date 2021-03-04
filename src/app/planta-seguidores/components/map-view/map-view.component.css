@@ -1,0 +1,154 @@
+.rel {
+    position: relative;
+  }
+  
+  .map-sliders {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    /* width: 60%; */
+  }
+  
+  .main-container {
+    position: relative;
+    height: 100%;
+  }
+  
+  app-share-map {
+    position: absolute;
+    top: 10px;
+    right: 160px;
+    z-index: 999;
+  }
+  app-download-report {
+    position: absolute;
+    top: 10px;
+    right: 60px;
+    z-index: 999;
+  }
+  app-barra-resumen-planta {
+    position: absolute;
+    top: 0px;
+    left: 40%;
+    transform: translate(-50%, 0%);
+    margin: 10px;
+    z-index: 999;
+  }
+
+  app-view-toggle {
+    position: absolute;
+    top: 10px;
+    margin-left: 80px;
+  }
+  
+  .left-sidenav {
+    position: absolute;
+    display: flex;
+    margin: 10px;
+    border-radius: 4px;
+    padding: 15px;
+    width: fit-content;
+    max-width: 350px;
+  }
+  
+  .btn-left {
+    position: absolute;
+    background: white;
+    border-radius: 4px;
+    top: 10px;
+    left: 0;
+    margin-left: 10px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  .right-sidenav {
+    position: absolute;
+    display: flex;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 4px;
+  }
+  
+  .btn-close {
+    position: absolute;
+    right: 10px;
+    z-index: 999;
+  }
+  
+  .stats-sidenav {
+    position: absolute;
+    display: flex;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 4px;
+    width: 1100px;
+  }
+  
+  .btn-right {
+    position: absolute;
+    background: white;
+    border-radius: 4px;
+    top: 10px;
+    right: 0;
+    left: auto;
+    margin-right: 10px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  .btn-right-stats {
+    position: absolute;
+    background: white;
+    border-radius: 4px;
+    top: 10px;
+    right: 0;
+    left: auto;
+    margin-right: 110px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  .titulo {
+    margin-top: 15px;
+    margin-left: 15px;
+    margin-bottom: 15px;
+  }
+  
+  #sidenavStats {
+    top: 140px;
+  }
+  
+  @media (max-width: 900px) {
+    .btn-right {
+      top: 74px;
+    }
+  
+    .btn-left {
+      top: 74px;
+    }
+  
+    .btn-right-stats {
+      top: 74px;
+    }
+  
+    app-share-map {
+      top: 74px;
+    }
+  
+    app-download-report {
+      top: 74px;
+    }
+  
+    app-barra-resumen-planta {
+      left: 0;
+      transform: none;
+      width: -webkit-fill-available;
+      width: stretch;
+    }
+  }
+  
+  app-filter-pcs-list {
+    height: 100%;
+  }

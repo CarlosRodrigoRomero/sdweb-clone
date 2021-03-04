@@ -1,12 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 
+import { BehaviorSubject, combineLatest } from 'rxjs';
+
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { FilterService } from '@core/services/filter.service';
-import { PlantaService } from '@core/services/planta.service';
+import { MapSeguidoresService } from '../../services/map-seguidores.service';
 
-// planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
   selector: 'app-map-view',
   templateUrl: './map-view.component.html',
@@ -14,12 +15,13 @@ import { PlantaService } from '@core/services/planta.service';
 })
 export class MapViewComponent implements OnInit {
   public plantaId: string;
-  public plantaFija = true;
+  public plantaFija = false;
   private sharedId: string;
   public leftOpened: boolean;
   public rightOpened: boolean;
   public statsOpened: boolean;
-  public anomaliasLoaded = false;
+  public seguidoresLoaded = false;
+  public seguidoresLoaded$ = new BehaviorSubject<boolean>(this.seguidoresLoaded);
   public sharedReport = false;
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
@@ -30,7 +32,7 @@ export class MapViewComponent implements OnInit {
     private filterService: FilterService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private plantaService: PlantaService
+    private mapSeguidoresService: MapSeguidoresService
   ) {
     if (this.router.url.includes('shared')) {
       this.sharedReport = true;
@@ -40,17 +42,26 @@ export class MapViewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    /* this.plantaId = 'egF0cbpXnnBnjcrusoeR'; */
+    const initMapSegService = this.mapSeguidoresService.initService(this.plantaId);
 
     if (this.sharedReport) {
-      this.filterService
-        .initFilterService(this.sharedReport, this.plantaId, this.plantaFija, this.sharedId)
-        .subscribe((v) => {
-          this.anomaliasLoaded = v;
-        });
+      const initFilterService = this.filterService.initFilterService(
+        this.sharedReport,
+        this.plantaId,
+        this.plantaFija,
+        this.sharedId
+      );
+
+      combineLatest([initMapSegService, initFilterService]).subscribe(([mapSerInit, filtSerInit]) => {
+        this.seguidoresLoaded = mapSerInit && filtSerInit;
+        this.seguidoresLoaded$.next(this.seguidoresLoaded);
+      });
     } else {
-      this.filterService.initFilterService(this.sharedReport, this.plantaId, this.plantaFija).subscribe((v) => {
-        this.anomaliasLoaded = v;
+      const initFilterService = this.filterService.initFilterService(this.sharedReport, this.plantaId, this.plantaFija);
+
+      combineLatest([initMapSegService, initFilterService]).subscribe(([mapSerInit, filtSerInit]) => {
+        this.seguidoresLoaded = mapSerInit && filtSerInit;
+        this.seguidoresLoaded$.next(this.seguidoresLoaded);
       });
     }
   }

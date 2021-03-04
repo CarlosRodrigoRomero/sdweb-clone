@@ -11,10 +11,10 @@ export class Seguidor implements FiltrableInterface {
   perdidas: number; // sumatorio de perdidas de los modulos del seguidor
   temperaturaMax: number; // temperatura máxima en el seguidor
   modulo: ModuloInterface;
+  gradienteNormalizado: number; // gradiente maximo en el seguidor
   //
   id?: string;
   mae: number; // modulos apagados equivalentes en el seguidor
-  gradienteNormMax: number; // gradiente maximo en el seguidor
   plantaId?: string;
   informeId?: string;
   filas: number;
@@ -29,7 +29,7 @@ export class Seguidor implements FiltrableInterface {
     this.perdidas = this.getPerdidas(anomalias);
     this.temperaturaMax = this.getTempMax();
     this.mae = this.getMae();
-    this.gradienteNormMax = this.getGradienteNormMax();
+    this.gradienteNormalizado = this.getGradienteNormMax();
     this.informeId = this.getInformeId();
     this.modulo = this.getModulo();
     this.globalCoords = this.getGlobalCoords();
