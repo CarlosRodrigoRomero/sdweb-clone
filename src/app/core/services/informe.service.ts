@@ -96,7 +96,7 @@ export class InformeService {
     );
   }
 
-  getInforme(id: string) {
+  getInforme(id: string): Observable<InformeInterface> {
     this.informeDoc = this.afs.doc<InformeInterface>('informes/' + id);
 
     return (this.informe$ = this.informeDoc.snapshotChanges().pipe(

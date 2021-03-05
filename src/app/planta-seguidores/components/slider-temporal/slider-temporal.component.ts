@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import { map, take } from 'rxjs/operators';
+
 import { LabelType, Options } from '@angular-slider/ngx-slider';
 
 import VectorLayer from 'ol/layer/Vector';
@@ -7,8 +10,6 @@ import VectorLayer from 'ol/layer/Vector';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { InformeService } from '@core/services/informe.service';
-import { combineLatest, Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-slider-temporal',
@@ -16,10 +17,11 @@ import { map, switchMap } from 'rxjs/operators';
   styleUrls: ['./slider-temporal.component.scss'],
 })
 export class SliderTemporalComponent implements OnInit {
-  private plantaId: string;
   private seguidorLayers: VectorLayer[];
   public selectedInformeId: string;
   private informesList: string[];
+  private sliderLoaded = false;
+  public sliderLoaded$ = new BehaviorSubject<boolean>(this.sliderLoaded);
 
   /* Slider Año */
   currentYear = 100;
@@ -38,16 +40,18 @@ export class SliderTemporalComponent implements OnInit {
     private mapSeguidoresService: MapSeguidoresService,
     private olMapService: OlMapService,
     private informeService: InformeService
-  ) {
-    this.mapSeguidoresService.getPlantaId().subscribe((plantaId) => (this.plantaId = plantaId));
-
-    this.getDatesInformes();
-  }
+  ) {}
 
   ngOnInit(): void {
-    // this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
-    this.mapSeguidoresService.getInformesList().subscribe((informes) => {
-      this.informesList = informes;
+    this.mapSeguidoresService.getInformesList().subscribe((informesId) => {
+      this.informesList = informesId;
+      this.getDatesInformes(informesId).subscribe((dates) => {
+        this.dates = dates;
+
+        // ya tenemos los labels y ahora mostramos el slider
+        this.sliderLoaded = true;
+        this.sliderLoaded$.next(this.sliderLoaded);
+      });
     });
 
     this.mapSeguidoresService.selectedInformeId$.subscribe((informeID) => (this.selectedInformeId = informeID));
@@ -64,18 +68,9 @@ export class SliderTemporalComponent implements OnInit {
 
       // mostramos la seleccionada por ambos selectores
       const index = Number(viewToggValue) + Number(3 * (sliderTempValue / (100 / (this.informesList.length - 1))));
-      console.log(index);
       this.seguidorLayers[index].setOpacity(1);
 
-      /* switch (sliderTempValue) {
-        case 100:
-          this.selectedInformeId = this.informesList[this.informesList.length];
-          break;
-        case 100 / this.informesList.length:
-          this.selectedInformeId = this.informesList[0];
-          break;
-      } */
-
+      // TODO no funciona para más de 2 informes
       if (sliderTempValue >= 50) {
         this.selectedInformeId = this.informesList[1];
       } else {
@@ -90,15 +85,21 @@ export class SliderTemporalComponent implements OnInit {
     this.mapSeguidoresService.selectedInformeId = this.informesList[roundedValue];
   }
 
-  getDatesInformes() {
-    this.informeService.getInformesDePlanta(this.plantaId).subscribe((informes) => {
-      informes
-        .sort((a, b) => a.fecha - b.fecha)
-        .map((informe) => {
-          console.log(this.unixToDateLabel(informe.fecha));
-          this.unixToDateLabel(informe.fecha);
-        });
-    });
+  getDatesInformes(informesId: string[]) {
+    return combineLatest(
+      informesId.map((informeId) =>
+        this.informeService.getInforme(informeId).pipe(
+          take(1),
+          map((informe) => this.unixToDateLabel(informe.fecha))
+        )
+      )
+    );
+
+    /* informesId.forEach((informeId) =>
+      this.informeService.getInforme(informeId).subscribe((informe) => {
+        this.dates.push(this.unixToDateLabel(informe.fecha));
+      })
+    ); */
   }
 
   unixToDateLabel(unix: number): string {
