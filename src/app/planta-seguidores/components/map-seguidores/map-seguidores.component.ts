@@ -33,6 +33,7 @@ import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { LatLngLiteral } from '@agm/core';
 import LineString from 'ol/geom/LineString';
+import { Coordinate } from 'ol/coordinate';
 
 @Component({
   selector: 'app-map-seguidores',
@@ -56,7 +57,6 @@ export class MapSeguidoresComponent implements OnInit {
   public sliderYear: number;
   public aerialLayer: TileLayer;
   public thermalSource;
-  private anomaliaLayers: VectorLayer[];
   private seguidorLayers: VectorLayer[];
   public leftOpened: boolean;
   public rightOpened: boolean;
@@ -110,12 +110,12 @@ export class MapSeguidoresComponent implements OnInit {
         this.planta = planta;
 
         // seleccionamos el informe mas reciente de la planta
-        this.selectedInformeId = this.informesList[this.informesList.length];
+        this.selectedInformeId = this.informesList[this.informesList.length - 1];
 
         // asignamos el informe para compartir
-        // this.shareReportService.setInformeID(this.informesList[this.informesList.length]);
+        // this.shareReportService.setInformeID(this.informesList[this.informesList.length - 1]);
 
-        this.mapSeguidoresService.selectedInformeId = this.informesList[this.informesList.length];
+        this.mapSeguidoresService.selectedInformeId = this.informesList[this.informesList.length - 1];
 
         this.initMap();
       });
@@ -238,7 +238,7 @@ export class MapSeguidoresComponent implements OnInit {
   }
 
   // ESTILOS MAE
-  private getStyleSeguidoresMae(selected) {
+  private getStyleSeguidoresMae(selected: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
@@ -246,9 +246,9 @@ export class MapSeguidoresComponent implements OnInit {
             color: this.getColorSeguidorMae(feature),
             width: selected ? 6 : 4,
           }),
-          /* fill: new Fill({
-            color: this.hexToRgb(this.getColorSeguidor(feature), 0.5),
-          }), */
+          fill: new Fill({
+            color: this.hexToRgb(this.getColorSeguidorMae(feature), 0.5),
+          }),
           /* text: new Text({
             font: '16px "Open Sans", "Arial Unicode MS", "sans-serif"',
             placement: 'line',
@@ -283,6 +283,9 @@ export class MapSeguidoresComponent implements OnInit {
             color: this.getColorSeguidorCelsCalientes(feature),
             width: selected ? 6 : 4,
           }),
+          fill: new Fill({
+            color: this.hexToRgb(this.getColorSeguidorCelsCalientes(feature), 0.5),
+          }),
         });
       }
     };
@@ -312,6 +315,9 @@ export class MapSeguidoresComponent implements OnInit {
           stroke: new Stroke({
             color: this.getColorSeguidorGradienteNormMax(feature),
             width: selected ? 6 : 4,
+          }),
+          fill: new Fill({
+            color: this.hexToRgb(this.getColorSeguidorGradienteNormMax(feature), 0.5),
           }),
         });
       }
@@ -362,7 +368,8 @@ export class MapSeguidoresComponent implements OnInit {
       source.clear();
       filtered.forEach((seguidor) => {
         const feature = new Feature({
-          geometry: new LineString(this.latLonLiteralToLonLat(seguidor.path)),
+          geometry: new Polygon(this.latLonLiteralToLonLat(seguidor.path)),
+          // geometry: new LineString(this.latLonLiteralToLonLat(seguidor.path)),
           properties: {
             seguidorId: seguidor.id,
             informeId: seguidor.informeId,
@@ -378,27 +385,24 @@ export class MapSeguidoresComponent implements OnInit {
       });
     });
 
-    // this._addSelectInteraction();
+    this._addSelectInteraction();
   }
 
   private latLonLiteralToLonLat(path: LatLngLiteral[]) {
-    const coordsList = [];
+    const coordsList: Coordinate[] = [];
     path.forEach((coords) => {
       coordsList.push(fromLonLat([coords.lng, coords.lat]));
     });
 
-    // Al ser un poligono, la 1era y ultima coord deben ser iguales:
-    coordsList.push(coordsList[0]);
-
-    return coordsList;
+    return [coordsList];
   }
 
-  /*  private _addSelectInteraction() {
+  private _addSelectInteraction() {
     const select = new Select({
       // style: this.getStyleSeguidoresMae(true),
       // style: this.getStyleSeguidoresCelsCalientes(true),
-      style: this.getStyleSeguidoresGradienteNormMax(true),
-      condition: click,
+      // style: this.getStyleSeguidoresGradienteNormMax(true),
+      // condition: click,
       layers: (l) => {
         if (l.getProperties().informeId === this.selectedInformeId) {
           return true;
@@ -408,6 +412,8 @@ export class MapSeguidoresComponent implements OnInit {
     });
     this.map.addInteraction(select);
     select.on('select', (e) => {
+      console.log(e.selected);
+
       this.seguidorSeleccionado = undefined;
 
       if (e.selected.length > 0) {
@@ -415,13 +421,21 @@ export class MapSeguidoresComponent implements OnInit {
           const seguidorId = e.selected[0].getProperties().properties.seguidorId;
 
           const seguidor = this.listaSeguidores.filter((seg) => {
-            return seg.id == seguidorId;
+            return seg.id === seguidorId;
           })[0];
-          if (this.selectedInformeId == seguidor.informeId) {
+
+          if (this.selectedInformeId === seguidor.informeId) {
             this.seguidorSeleccionado = seguidor;
+            e.selected[0].setStyle(
+              new Style({
+                stroke: new Stroke({
+                  width: 10,
+                }),
+              })
+            );
           }
         }
       }
     });
-  } */
+  }
 }

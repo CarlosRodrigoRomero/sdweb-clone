@@ -21,7 +21,7 @@ export class Seguidor implements FiltrableInterface {
   columnas: number;
   path: LatLngLiteral[];
 
-  constructor(anomalias: Anomalia[], filas: number, columnas: number, path: LatLngLiteral[], plantaId: string) {
+  constructor(anomalias: Anomalia[], filas: number, columnas: number, path: LatLngLiteral[], plantaId: string, id?: string) {
     this.anomalias = anomalias;
     this.plantaId = plantaId;
     this.filas = filas;
@@ -34,6 +34,7 @@ export class Seguidor implements FiltrableInterface {
     this.modulo = this.getModulo();
     this.globalCoords = this.getGlobalCoords();
     this.path = path;
+    this.id = id;
   }
 
   private getPerdidas(anomalias: Anomalia[]): number {

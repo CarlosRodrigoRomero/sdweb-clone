@@ -72,6 +72,7 @@ export class SeguidorService {
           const locAreaSeguidores = locAreaList.filter((locArea) => locArea.globalCoords[indiceSeleccionado] !== null);
 
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
+          let count = 0;
           locAreaSeguidores.forEach((locArea) => {
             const anomaliasSeguidor = anomaliaList.filter(
               (anomalia) => anomalia.globalCoords[indiceSeleccionado] === locArea.globalCoords[indiceSeleccionado]
@@ -81,7 +82,8 @@ export class SeguidorService {
               this.planta.filas,
               this.planta.columnas,
               locArea.path,
-              plantaId
+              plantaId,
+              'seguidor_' + count++
             );
             seguidores.push(seguidor);
           });
@@ -90,6 +92,7 @@ export class SeguidorService {
           const locAreaSeguidores = locAreaList.filter((locArea) => locArea.globalX !== null);
 
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
+          let count = 0;
           locAreaSeguidores.forEach((locArea) => {
             const anomaliasSeguidor = anomaliaList.filter(
               (anomalia) => (anomalia as PcInterface).global_x === locArea.globalX
@@ -101,7 +104,8 @@ export class SeguidorService {
                 this.planta.filas,
                 this.planta.columnas,
                 locArea.path,
-                plantaId
+                plantaId,
+                'seguidor_' + count++
               );
               seguidores.push(seguidor);
             }

@@ -94,12 +94,6 @@ export class SliderTemporalComponent implements OnInit {
         )
       )
     );
-
-    /* informesId.forEach((informeId) =>
-      this.informeService.getInforme(informeId).subscribe((informe) => {
-        this.dates.push(this.unixToDateLabel(informe.fecha));
-      })
-    ); */
   }
 
   unixToDateLabel(unix: number): string {

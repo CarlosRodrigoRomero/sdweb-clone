@@ -40,6 +40,10 @@ export class MapSeguidoresService {
         });
       this.informesList$.next(this.informesList);
 
+      // indicamos el informe seleccionado
+      this._selectedInformeId = this.informesList[this.informesList.length];
+      this.selectedInformeIdSource.next(this._selectedInformeId);
+
       this.initialized$.next(true);
     });
 
