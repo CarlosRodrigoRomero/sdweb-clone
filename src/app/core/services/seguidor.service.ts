@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 
 import { combineLatest, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
@@ -12,9 +11,7 @@ import { PlantaService } from '@core/services/planta.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
-import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
-import { LocationAreaInterface } from '@core/models/location';
 
 @Injectable({
   providedIn: 'root',
@@ -27,7 +24,6 @@ export class SeguidorService {
     public afs: AngularFirestore,
     private anomaliaService: AnomaliaService,
     private plantaService: PlantaService,
-    private activatedRoute: ActivatedRoute
   ) {}
 
   getSeguidoresPlanta$(plantaId: string): Observable<Seguidor[]> {
@@ -57,6 +53,8 @@ export class SeguidorService {
       map(([locAreaList, anomaliaList]) => {
         const seguidores: Seguidor[] = [];
 
+        console.log(locAreaList);
+
         // comprobamos si tiene globalCoords o globaX, globalY
         if (locAreaList.filter((locArea) => locArea.globalCoords !== undefined).length > 0) {
           // si tiene globalCoords detectamos la mas pequeña que es la utilizaremos para el seguidor
@@ -83,13 +81,17 @@ export class SeguidorService {
               this.planta.columnas,
               locArea.path,
               plantaId,
+              informeId,
+              locArea.modulo,
+              locArea.globalCoords,
               'seguidor_' + count++
             );
             seguidores.push(seguidor);
           });
         } else {
+          // aqui estan las que no tienen globalCoords
           // filtramos las areas seleccionadas para los seguidores
-          const locAreaSeguidores = locAreaList.filter((locArea) => locArea.globalX !== null);
+          const locAreaSeguidores = locAreaList.filter((locArea) => locArea.globalX !== '');
 
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
           let count = 0;
@@ -97,18 +99,20 @@ export class SeguidorService {
             const anomaliasSeguidor = anomaliaList.filter(
               (anomalia) => (anomalia as PcInterface).global_x === locArea.globalX
             );
-            // comprobamos que haya anomalías dentro del seguidor
-            if (anomaliasSeguidor.length > 0) {
-              const seguidor = new Seguidor(
-                anomaliasSeguidor,
-                this.planta.filas,
-                this.planta.columnas,
-                locArea.path,
-                plantaId,
-                'seguidor_' + count++
-              );
-              seguidores.push(seguidor);
-            }
+            console.log(anomaliasSeguidor);
+
+            const seguidor = new Seguidor(
+              anomaliasSeguidor,
+              this.planta.filas,
+              this.planta.columnas,
+              locArea.path,
+              plantaId,
+              informeId,
+              locArea.modulo,
+              [locArea.globalX, null, null],
+              'seguidor_' + count++
+            );
+            seguidores.push(seguidor);
           });
         }
 

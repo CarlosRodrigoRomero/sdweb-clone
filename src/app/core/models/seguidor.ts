@@ -21,7 +21,17 @@ export class Seguidor implements FiltrableInterface {
   columnas: number;
   path: LatLngLiteral[];
 
-  constructor(anomalias: Anomalia[], filas: number, columnas: number, path: LatLngLiteral[], plantaId: string, id?: string) {
+  constructor(
+    anomalias: Anomalia[],
+    filas: number,
+    columnas: number,
+    path: LatLngLiteral[],
+    plantaId: string,
+    informeId: string,
+    modulo: ModuloInterface,
+    globalCoords: string[],
+    id?: string
+  ) {
     this.anomalias = anomalias;
     this.plantaId = plantaId;
     this.filas = filas;
@@ -30,9 +40,9 @@ export class Seguidor implements FiltrableInterface {
     this.temperaturaMax = this.getTempMax();
     this.mae = this.getMae();
     this.gradienteNormalizado = this.getGradienteNormMax();
-    this.informeId = this.getInformeId();
-    this.modulo = this.getModulo();
-    this.globalCoords = this.getGlobalCoords();
+    this.informeId = informeId;
+    this.modulo = modulo;
+    this.globalCoords = globalCoords;
     this.path = path;
     this.id = id;
   }
@@ -52,31 +62,24 @@ export class Seguidor implements FiltrableInterface {
   }
 
   private getTempMax(): number {
-    return Math.max(
-      ...this.anomalias
-        .filter((anomalia) => anomalia.temperaturaMax !== undefined)
-        .map((anomalia) => anomalia.temperaturaMax)
-    );
+    if (this.anomalias.length > 0) {
+      return Math.max(
+        ...this.anomalias
+          .filter((anomalia) => anomalia.temperaturaMax !== undefined)
+          .map((anomalia) => anomalia.temperaturaMax)
+      );
+    }
+    return 0;
   }
 
   private getGradienteNormMax(): number {
-    return Math.max(
-      ...this.anomalias
-        .filter((anomalia) => anomalia.gradienteNormalizado !== undefined)
-        .map((anomalia) => anomalia.gradienteNormalizado)
-    );
-  }
-
-  private getInformeId(): string {
-    return this.anomalias.find((anomalia) => anomalia.informeId !== undefined).informeId;
-  }
-
-  private getModulo(): ModuloInterface {
-    return this.anomalias.find((anomalia) => anomalia.modulo !== undefined).modulo;
-  }
-
-  private getGlobalCoords(): string[] {
-    return this.anomalias[0].globalCoords;
-    // return this.anomalias.find((anomalia) => anomalia.globalCoords !== undefined).globalCoords;
+    if (this.anomalias.length > 0) {
+      return Math.max(
+        ...this.anomalias
+          .filter((anomalia) => anomalia.gradienteNormalizado !== undefined)
+          .map((anomalia) => anomalia.gradienteNormalizado)
+      );
+    }
+    return 0;
   }
 }

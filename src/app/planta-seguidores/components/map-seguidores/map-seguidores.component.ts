@@ -34,6 +34,7 @@ import { Seguidor } from '@core/models/seguidor';
 import { LatLngLiteral } from '@agm/core';
 import LineString from 'ol/geom/LineString';
 import { Coordinate } from 'ol/coordinate';
+import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
 
 @Component({
   selector: 'app-map-seguidores',
@@ -48,11 +49,8 @@ export class MapSeguidoresComponent implements OnInit {
   public rangeMax: number;
   public palleteJSON: string;
   public selectedInformeId: string;
-  public anomaliasVectorSource: VectorSource;
   public locAreasVectorSource: VectorSource;
-  public anomaliaSeleccionada: Anomalia;
   public seguidorSeleccionado: Seguidor;
-  public listaAnomalias: Anomalia[];
   public listaSeguidores: Seguidor[];
   public sliderYear: number;
   public aerialLayer: TileLayer;
@@ -65,6 +63,7 @@ export class MapSeguidoresComponent implements OnInit {
   public mousePosition;
   public informesList: string[] = [];
   public sharedReport = false;
+  private vistaSeleccionada = 0;
 
   constructor(
     public mapSeguidoresService: MapSeguidoresService,
@@ -79,6 +78,7 @@ export class MapSeguidoresComponent implements OnInit {
     if (this.router.url.includes('shared')) {
       this.sharedReport = true;
     }
+    this.mapSeguidoresService.toggleView$.subscribe((sel) => (this.vistaSeleccionada = Number(sel)));
   }
 
   ngOnInit(): void {
@@ -176,6 +176,7 @@ export class MapSeguidoresComponent implements OnInit {
     });
     maeLayer.setProperties({
       informeId,
+      id: '0',
     });
     const celsCalientesLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
@@ -183,6 +184,7 @@ export class MapSeguidoresComponent implements OnInit {
     });
     celsCalientesLayer.setProperties({
       informeId,
+      id: '1',
     });
     const gradNormMaxLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
@@ -190,6 +192,7 @@ export class MapSeguidoresComponent implements OnInit {
     });
     gradNormMaxLayer.setProperties({
       informeId,
+      id: '2',
     });
 
     return [maeLayer, celsCalientesLayer, gradNormMaxLayer];
@@ -244,19 +247,11 @@ export class MapSeguidoresComponent implements OnInit {
         return new Style({
           stroke: new Stroke({
             color: this.getColorSeguidorMae(feature),
-            width: selected ? 6 : 4,
+            width: selected ? 8 : 4,
           }),
           fill: new Fill({
             color: this.hexToRgb(this.getColorSeguidorMae(feature), 0.5),
           }),
-          /* text: new Text({
-            font: '16px "Open Sans", "Arial Unicode MS", "sans-serif"',
-            placement: 'line',
-            fill: new Fill({
-              color: 'white',
-            }),
-            text: '',
-          }), */
         });
       }
     };
@@ -281,7 +276,7 @@ export class MapSeguidoresComponent implements OnInit {
         return new Style({
           stroke: new Stroke({
             color: this.getColorSeguidorCelsCalientes(feature),
-            width: selected ? 6 : 4,
+            width: selected ? 8 : 4,
           }),
           fill: new Fill({
             color: this.hexToRgb(this.getColorSeguidorCelsCalientes(feature), 0.5),
@@ -314,7 +309,7 @@ export class MapSeguidoresComponent implements OnInit {
         return new Style({
           stroke: new Stroke({
             color: this.getColorSeguidorGradienteNormMax(feature),
-            width: selected ? 6 : 4,
+            width: selected ? 8 : 4,
           }),
           fill: new Fill({
             color: this.hexToRgb(this.getColorSeguidorGradienteNormMax(feature), 0.5),
@@ -369,7 +364,6 @@ export class MapSeguidoresComponent implements OnInit {
       filtered.forEach((seguidor) => {
         const feature = new Feature({
           geometry: new Polygon(this.latLonLiteralToLonLat(seguidor.path)),
-          // geometry: new LineString(this.latLonLiteralToLonLat(seguidor.path)),
           properties: {
             seguidorId: seguidor.id,
             informeId: seguidor.informeId,
@@ -398,41 +392,43 @@ export class MapSeguidoresComponent implements OnInit {
   }
 
   private _addSelectInteraction() {
+    // array con los estilos de las 3 vistas
+    const estilosView = [
+      this.getStyleSeguidoresMae(true),
+      this.getStyleSeguidoresCelsCalientes(true),
+      this.getStyleSeguidoresGradienteNormMax(true),
+    ];
+
     const select = new Select({
-      // style: this.getStyleSeguidoresMae(true),
-      // style: this.getStyleSeguidoresCelsCalientes(true),
-      // style: this.getStyleSeguidoresGradienteNormMax(true),
       // condition: click,
       layers: (l) => {
-        if (l.getProperties().informeId === this.selectedInformeId) {
+        if (l.getProperties().informeId === this.selectedInformeId && l.getProperties().id == this.vistaSeleccionada) {
           return true;
         }
         return false;
       },
     });
+
     this.map.addInteraction(select);
     select.on('select', (e) => {
-      console.log(e.selected);
-
       this.seguidorSeleccionado = undefined;
 
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().hasOwnProperty('properties')) {
           const seguidorId = e.selected[0].getProperties().properties.seguidorId;
+          console.log(seguidorId);
 
           const seguidor = this.listaSeguidores.filter((seg) => {
             return seg.id === seguidorId;
           })[0];
 
+          console.log(this.selectedInformeId + '  ' + seguidor.informeId);
           if (this.selectedInformeId === seguidor.informeId) {
             this.seguidorSeleccionado = seguidor;
-            e.selected[0].setStyle(
-              new Style({
-                stroke: new Stroke({
-                  width: 10,
-                }),
-              })
-            );
+
+            // resaltamos el seguidor seleccionado
+            console.log(this.vistaSeleccionada);
+            e.selected[0].setStyle(estilosView[this.vistaSeleccionada]);
           }
         }
       }
