@@ -422,12 +422,14 @@ export class MapSeguidoresComponent implements OnInit {
             return seg.id === seguidorId;
           })[0];
 
-          console.log(this.selectedInformeId + '  ' + seguidor.informeId);
+          console.log('Informe seleccionado: ' + this.selectedInformeId);
+          console.log('Informe seguidor: ' + seguidor.informeId);
+          console.log('Vista seleccionada: ' + this.vistaSeleccionada);
+          
           if (this.selectedInformeId === seguidor.informeId) {
             this.seguidorSeleccionado = seguidor;
 
             // resaltamos el seguidor seleccionado
-            console.log(this.vistaSeleccionada);
             e.selected[0].setStyle(estilosView[this.vistaSeleccionada]);
           }
         }

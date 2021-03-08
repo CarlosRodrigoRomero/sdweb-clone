@@ -23,7 +23,7 @@ export class SeguidorService {
     private informeService: InformeService,
     public afs: AngularFirestore,
     private anomaliaService: AnomaliaService,
-    private plantaService: PlantaService,
+    private plantaService: PlantaService
   ) {}
 
   getSeguidoresPlanta$(plantaId: string): Observable<Seguidor[]> {
@@ -52,8 +52,6 @@ export class SeguidorService {
     return combineLatest([locAreaList$, anomaliaList$]).pipe(
       map(([locAreaList, anomaliaList]) => {
         const seguidores: Seguidor[] = [];
-
-        console.log(locAreaList);
 
         // comprobamos si tiene globalCoords o globaX, globalY
         if (locAreaList.filter((locArea) => locArea.globalCoords !== undefined).length > 0) {
@@ -84,7 +82,7 @@ export class SeguidorService {
               informeId,
               locArea.modulo,
               locArea.globalCoords,
-              'seguidor_' + count++
+              'seguidor_' + informeId + '_' + count++
             );
             seguidores.push(seguidor);
           });
@@ -99,8 +97,6 @@ export class SeguidorService {
             const anomaliasSeguidor = anomaliaList.filter(
               (anomalia) => (anomalia as PcInterface).global_x === locArea.globalX
             );
-            console.log(anomaliasSeguidor);
-
             const seguidor = new Seguidor(
               anomaliasSeguidor,
               this.planta.filas,
@@ -110,7 +106,7 @@ export class SeguidorService {
               informeId,
               locArea.modulo,
               [locArea.globalX, null, null],
-              'seguidor_' + count++
+              'seguidor_' + informeId + '_' + count++
             );
             seguidores.push(seguidor);
           });
