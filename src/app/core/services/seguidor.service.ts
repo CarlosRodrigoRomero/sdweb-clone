@@ -82,7 +82,7 @@ export class SeguidorService {
               informeId,
               locArea.modulo,
               locArea.globalCoords,
-              'seguidor_' + informeId + '_' + count++
+              'seguidor_' + count++ + '_' + informeId
             );
             seguidores.push(seguidor);
           });
@@ -106,7 +106,7 @@ export class SeguidorService {
               informeId,
               locArea.modulo,
               [locArea.globalX, null, null],
-              'seguidor_' + informeId + '_' + count++
+              'seguidor_' + count++ + '_' + informeId
             );
             seguidores.push(seguidor);
           });

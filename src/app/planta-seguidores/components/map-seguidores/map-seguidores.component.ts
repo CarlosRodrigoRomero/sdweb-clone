@@ -8,9 +8,9 @@ import Map from 'ol/Map';
 import { fromLonLat, transformExtent } from 'ol/proj.js';
 import View from 'ol/View';
 import GeoJSON from 'ol/format/GeoJSON';
-import { Fill, Stroke, Style, Text } from 'ol/style';
+import { Fill, Icon, Stroke, Style, Text } from 'ol/style';
 import Select from 'ol/interaction/Select';
-import { Vector as VectorSource } from 'ol/source';
+import { Source, Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { Feature, Overlay } from 'ol';
 import Polygon from 'ol/geom/Polygon';
@@ -35,6 +35,10 @@ import { LatLngLiteral } from '@agm/core';
 import LineString from 'ol/geom/LineString';
 import { Coordinate } from 'ol/coordinate';
 import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
+import Circle from 'ol/geom/Circle';
+import Point from 'ol/geom/Point';
+import { SeguidorInterface } from '@core/services/pc.service';
+import { MAT_SLIDE_TOGGLE_REQUIRED_VALIDATOR } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-map-seguidores',
@@ -56,12 +60,13 @@ export class MapSeguidoresComponent implements OnInit {
   public aerialLayer: TileLayer;
   public thermalSource;
   private seguidorLayers: VectorLayer[];
+  private incrementoLayers: VectorLayer[];
   public leftOpened: boolean;
   public rightOpened: boolean;
   public statsOpened: boolean;
   public anomaliasLoaded = false;
   public mousePosition;
-  public informesList: string[] = [];
+  public informeIdList: string[] = [];
   public sharedReport = false;
   private vistaSeleccionada = 0;
 
@@ -90,14 +95,18 @@ export class MapSeguidoresComponent implements OnInit {
       .pipe(take(1))
       .subscribe(([informes, planta]) => {
         this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers));
+        this.olMapService.getIncrementoLayers().subscribe((layers) => (this.incrementoLayers = layers));
 
         informes
           .sort((a, b) => a.fecha - b.fecha)
           .forEach((informe) => {
-            this.informesList.push(informe.id);
+            this.informeIdList.push(informe.id);
 
-            // creamos las capas de los seguidores para las 2 diferentes vistas
+            // creamos las capas de los seguidores para los diferentes informes
             this._createSeguidorLayers(informe.id).forEach((layer) => this.olMapService.addSeguidorLayer(layer));
+
+            // creamos las capas de los incrementos para los diferentes informes
+            this._createIncrementoLayers(informe.id).forEach((layer) => this.olMapService.addIncrementoLayer(layer));
           });
 
         this.mapSeguidoresService.toggleView$.subscribe((v) => {
@@ -110,12 +119,12 @@ export class MapSeguidoresComponent implements OnInit {
         this.planta = planta;
 
         // seleccionamos el informe mas reciente de la planta
-        this.selectedInformeId = this.informesList[this.informesList.length - 1];
+        this.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
         // asignamos el informe para compartir
         // this.shareReportService.setInformeID(this.informesList[this.informesList.length - 1]);
 
-        this.mapSeguidoresService.selectedInformeId = this.informesList[this.informesList.length - 1];
+        this.mapSeguidoresService.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
         this.initMap();
       });
@@ -163,9 +172,12 @@ export class MapSeguidoresComponent implements OnInit {
       this.addLocationAreas();
     } */
 
+    this.incrementoLayers.forEach((l) => this.map.addLayer(l));
+
     this.mapSeguidoresService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInformeId = informeId;
       this.mostrarSeguidores();
+      this.mostrarIncrementos();
     });
   }
 
@@ -196,6 +208,35 @@ export class MapSeguidoresComponent implements OnInit {
     });
 
     return [maeLayer, celsCalientesLayer, gradNormMaxLayer];
+  }
+
+  private _createIncrementoLayers(informeId: string): VectorLayer[] {
+    const incMaeLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleIncrementos(),
+    });
+    incMaeLayer.setProperties({
+      informeId,
+      id: '0',
+    });
+    const incCCLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleIncrementos(),
+    });
+    incCCLayer.setProperties({
+      informeId,
+      id: '1',
+    });
+    const incGradNormMaxLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleIncrementos(),
+    });
+    incGradNormMaxLayer.setProperties({
+      informeId,
+      id: '2',
+    });
+
+    return [incMaeLayer, incCCLayer, incGradNormMaxLayer];
   }
 
   private addCursorOnHover() {
@@ -362,6 +403,7 @@ export class MapSeguidoresComponent implements OnInit {
       const source = l.getSource();
       source.clear();
       filtered.forEach((seguidor) => {
+        // crea poligono seguidor
         const feature = new Feature({
           geometry: new Polygon(this.latLonLiteralToLonLat(seguidor.path)),
           properties: {
@@ -380,6 +422,86 @@ export class MapSeguidoresComponent implements OnInit {
     });
 
     this._addSelectInteraction();
+  }
+
+  // INCREMENTOS
+  mostrarIncrementos() {
+    this.filterService.filteredElements$.subscribe((seguidores) => {
+      // Dibujar labels incremento
+      this.dibujarIncrementos(seguidores as Seguidor[]);
+    });
+  }
+
+  private dibujarIncrementos(seguidores: Seguidor[]) {
+    // Para cada vector layer (que corresponde a un informe)
+    this.incrementoLayers.forEach((l) => {
+      // filtra los seguidores correspondientes al informe
+      const filtered = seguidores.filter((seguidor) => seguidor.informeId === l.getProperties().informeId);
+      const labelsSource = l.getSource();
+      labelsSource.clear();
+      filtered.forEach((seguidor) => {
+        // crea label incremento
+        const feature = new Feature({
+          geometry: new Point(fromLonLat([seguidor.path[3].lng, seguidor.path[3].lat])),
+          properties: {
+            seguidorId: seguidor.id,
+            informeId: seguidor.informeId,
+            pathSeguidor: seguidor.path,
+          },
+        });
+        labelsSource.addFeature(feature);
+      });
+    });
+  }
+
+  // ESTILOS INCREMENTOS
+  private getStyleIncrementos(/* value: number */) {
+    return (feature) => {
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        if (this.getIncrementoMae(feature) > 0) {
+          return new Style({
+            image: new Icon({
+              crossOrigin: 'anonymous',
+              src: 'assets/icons/caret-up-2.png',
+              // scale: Math.random() * (1 - 0.4) + 0.4,
+            }),
+          });
+        }
+        return new Style({
+          image: new Icon({
+            crossOrigin: 'anonymous',
+            src: 'assets/icons/caret-down-2.png',
+            // scale: Math.random() * (1 - 0.4) + 0.4,
+          }),
+        });
+      }
+    };
+  }
+
+  private getIncrementoMae(feature: any): number {
+    let informeIdActual: string;
+    let informeIdPrevio: string;
+
+    this.informeIdList.forEach((informeId, index) => {
+      if (informeId === feature.getProperties().properties.informeId) {
+        informeIdActual = informeId;
+        informeIdPrevio = this.informeIdList[index - 1];
+      }
+    });
+
+    const seguidorVariosInformes = this.listaSeguidores.filter(
+      (seguidor) => seguidor.path === feature.getProperties().properties.pathSeguidor
+    );
+
+    const maeActual = seguidorVariosInformes.find((seguidor) => seguidor.informeId === informeIdActual).mae;
+
+    // comprovamos que existen mas de un informe realizados
+    if (seguidorVariosInformes.length > 1) {
+      const maePrevio = seguidorVariosInformes.find((seguidor) => seguidor.informeId === informeIdPrevio).mae;
+
+      return maeActual - maePrevio;
+    }
+    return maeActual;
   }
 
   private latLonLiteralToLonLat(path: LatLngLiteral[]) {
@@ -422,10 +544,6 @@ export class MapSeguidoresComponent implements OnInit {
             return seg.id === seguidorId;
           })[0];
 
-          console.log('Informe seleccionado: ' + this.selectedInformeId);
-          console.log('Informe seguidor: ' + seguidor.informeId);
-          console.log('Vista seleccionada: ' + this.vistaSeleccionada);
-          
           if (this.selectedInformeId === seguidor.informeId) {
             this.seguidorSeleccionado = seguidor;
 

@@ -23,6 +23,8 @@ export class OlMapService {
   private anomaliaLayers$ = new BehaviorSubject<VectorLayer[]>(this.anomaliaLayers);
   private seguidorLayers: VectorLayer[] = [];
   private seguidorLayers$ = new BehaviorSubject<VectorLayer[]>(this.seguidorLayers);
+  private incrementoLayers: VectorLayer[] = [];
+  private incrementoLayers$ = new BehaviorSubject<VectorLayer[]>(this.incrementoLayers);
 
   constructor() {}
 
@@ -82,5 +84,14 @@ export class OlMapService {
 
   getSeguidorLayers() {
     return this.seguidorLayers$.asObservable();
+  }
+
+  addIncrementoLayer(layer: VectorLayer) {
+    this.incrementoLayers.push(layer);
+    this.incrementoLayers$.next(this.incrementoLayers);
+  }
+
+  getIncrementoLayers() {
+    return this.incrementoLayers$.asObservable();
   }
 }

@@ -15,6 +15,7 @@ export class Seguidor implements FiltrableInterface {
   //
   id?: string;
   mae: number; // modulos apagados equivalentes en el seguidor
+  incrementoMae: number;
   plantaId?: string;
   informeId?: string;
   filas: number;
