@@ -5,22 +5,21 @@ import { take } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 
 import Map from 'ol/Map';
-import { fromLonLat, transformExtent } from 'ol/proj.js';
+import { fromLonLat } from 'ol/proj.js';
 import View from 'ol/View';
-import GeoJSON from 'ol/format/GeoJSON';
-import { Fill, Icon, Stroke, Style, Text } from 'ol/style';
+import { Fill, Icon, Stroke, Style } from 'ol/style';
 import Select from 'ol/interaction/Select';
-import { Source, Vector as VectorSource } from 'ol/source';
+import { Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { Feature, Overlay } from 'ol';
 import Polygon from 'ol/geom/Polygon';
 import { defaults as defaultControls } from 'ol/control.js';
 import OverlayPositioning from 'ol/OverlayPositioning';
-import { click } from 'ol/events/condition';
 import XYZ from 'ol/source/XYZ';
 
 import { PlantaService } from '@core/services/planta.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
+import { IncrementosService } from '../../services/incrementos.service';
 import { GLOBAL } from '@core/services/global';
 import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '@core/services/filter.service';
@@ -28,17 +27,10 @@ import { OlMapService } from '@core/services/ol-map.service';
 import { ShareReportService } from '@core/services/share-report.service';
 
 import { PlantaInterface } from '@core/models/planta';
-import { LocationAreaInterface } from '@core/models/location';
-import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { LatLngLiteral } from '@agm/core';
-import LineString from 'ol/geom/LineString';
 import { Coordinate } from 'ol/coordinate';
-import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
-import Circle from 'ol/geom/Circle';
 import Point from 'ol/geom/Point';
-import { SeguidorInterface } from '@core/services/pc.service';
-import { MAT_SLIDE_TOGGLE_REQUIRED_VALIDATOR } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-map-seguidores',
@@ -78,7 +70,8 @@ export class MapSeguidoresComponent implements OnInit {
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private incrementosService: IncrementosService
   ) {
     if (this.router.url.includes('shared')) {
       this.sharedReport = true;
@@ -97,23 +90,31 @@ export class MapSeguidoresComponent implements OnInit {
         this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers));
         this.olMapService.getIncrementoLayers().subscribe((layers) => (this.incrementoLayers = layers));
 
+        this.incrementosService.initService();
+
+        this.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
+        this.incrementosService.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
+
         informes
           .sort((a, b) => a.fecha - b.fecha)
           .forEach((informe) => {
-            this.informeIdList.push(informe.id);
-
             // creamos las capas de los seguidores para los diferentes informes
             this._createSeguidorLayers(informe.id).forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
             // creamos las capas de los incrementos para los diferentes informes
-            this._createIncrementoLayers(informe.id).forEach((layer) => this.olMapService.addIncrementoLayer(layer));
+            this.incrementosService
+              .createIncrementoLayers(informe.id)
+              .forEach((layer) => this.olMapService.addIncrementoLayer(layer));
           });
 
+        // los subscribimos al toggle de vitas
         this.mapSeguidoresService.toggleView$.subscribe((v) => {
           // ocultamos las 3 capas de las vistas
           this.seguidorLayers.forEach((layer) => layer.setOpacity(0));
+          this.incrementoLayers.forEach((layer) => layer.setOpacity(0));
           // mostramos la capa seleccionada
           this.seguidorLayers[v].setOpacity(1);
+          this.incrementoLayers[v].setOpacity(1);
         });
 
         this.planta = planta;
@@ -158,6 +159,7 @@ export class MapSeguidoresComponent implements OnInit {
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
       zoom: this.planta.zoom,
       maxZoom: 20,
+      minZoom: 14,
     });
 
     // creamos el mapa a traves del servicio y nos subscribimos a el
@@ -174,10 +176,11 @@ export class MapSeguidoresComponent implements OnInit {
 
     this.incrementoLayers.forEach((l) => this.map.addLayer(l));
 
+    // los subscribimos al slider temporal
     this.mapSeguidoresService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInformeId = informeId;
       this.mostrarSeguidores();
-      this.mostrarIncrementos();
+      this.incrementosService.mostrarIncrementos();
     });
   }
 
@@ -208,35 +211,6 @@ export class MapSeguidoresComponent implements OnInit {
     });
 
     return [maeLayer, celsCalientesLayer, gradNormMaxLayer];
-  }
-
-  private _createIncrementoLayers(informeId: string): VectorLayer[] {
-    const incMaeLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleIncrementos(),
-    });
-    incMaeLayer.setProperties({
-      informeId,
-      id: '0',
-    });
-    const incCCLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleIncrementos(),
-    });
-    incCCLayer.setProperties({
-      informeId,
-      id: '1',
-    });
-    const incGradNormMaxLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleIncrementos(),
-    });
-    incGradNormMaxLayer.setProperties({
-      informeId,
-      id: '2',
-    });
-
-    return [incMaeLayer, incCCLayer, incGradNormMaxLayer];
   }
 
   private addCursorOnHover() {
@@ -422,86 +396,6 @@ export class MapSeguidoresComponent implements OnInit {
     });
 
     this._addSelectInteraction();
-  }
-
-  // INCREMENTOS
-  mostrarIncrementos() {
-    this.filterService.filteredElements$.subscribe((seguidores) => {
-      // Dibujar labels incremento
-      this.dibujarIncrementos(seguidores as Seguidor[]);
-    });
-  }
-
-  private dibujarIncrementos(seguidores: Seguidor[]) {
-    // Para cada vector layer (que corresponde a un informe)
-    this.incrementoLayers.forEach((l) => {
-      // filtra los seguidores correspondientes al informe
-      const filtered = seguidores.filter((seguidor) => seguidor.informeId === l.getProperties().informeId);
-      const labelsSource = l.getSource();
-      labelsSource.clear();
-      filtered.forEach((seguidor) => {
-        // crea label incremento
-        const feature = new Feature({
-          geometry: new Point(fromLonLat([seguidor.path[3].lng, seguidor.path[3].lat])),
-          properties: {
-            seguidorId: seguidor.id,
-            informeId: seguidor.informeId,
-            pathSeguidor: seguidor.path,
-          },
-        });
-        labelsSource.addFeature(feature);
-      });
-    });
-  }
-
-  // ESTILOS INCREMENTOS
-  private getStyleIncrementos(/* value: number */) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        if (this.getIncrementoMae(feature) > 0) {
-          return new Style({
-            image: new Icon({
-              crossOrigin: 'anonymous',
-              src: 'assets/icons/caret-up-2.png',
-              // scale: Math.random() * (1 - 0.4) + 0.4,
-            }),
-          });
-        }
-        return new Style({
-          image: new Icon({
-            crossOrigin: 'anonymous',
-            src: 'assets/icons/caret-down-2.png',
-            // scale: Math.random() * (1 - 0.4) + 0.4,
-          }),
-        });
-      }
-    };
-  }
-
-  private getIncrementoMae(feature: any): number {
-    let informeIdActual: string;
-    let informeIdPrevio: string;
-
-    this.informeIdList.forEach((informeId, index) => {
-      if (informeId === feature.getProperties().properties.informeId) {
-        informeIdActual = informeId;
-        informeIdPrevio = this.informeIdList[index - 1];
-      }
-    });
-
-    const seguidorVariosInformes = this.listaSeguidores.filter(
-      (seguidor) => seguidor.path === feature.getProperties().properties.pathSeguidor
-    );
-
-    const maeActual = seguidorVariosInformes.find((seguidor) => seguidor.informeId === informeIdActual).mae;
-
-    // comprovamos que existen mas de un informe realizados
-    if (seguidorVariosInformes.length > 1) {
-      const maePrevio = seguidorVariosInformes.find((seguidor) => seguidor.informeId === informeIdPrevio).mae;
-
-      return maeActual - maePrevio;
-    }
-    return maeActual;
   }
 
   private latLonLiteralToLonLat(path: LatLngLiteral[]) {

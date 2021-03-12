@@ -7,6 +7,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 
 import { FilterService } from '@core/services/filter.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
+import { IncrementosService } from '../../services/incrementos.service';
 
 @Component({
   selector: 'app-map-view',
@@ -32,7 +33,8 @@ export class MapViewComponent implements OnInit {
     private filterService: FilterService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private mapSeguidoresService: MapSeguidoresService
+    private mapSeguidoresService: MapSeguidoresService,
+    private incrementosService: IncrementosService
   ) {
     if (this.router.url.includes('shared')) {
       this.sharedReport = true;

@@ -12,7 +12,13 @@ import { SliderTemporalComponent } from './components/slider-temporal/slider-tem
 import { ViewToggleComponent } from './components/view-toggle/view-toggle.component';
 
 @NgModule({
-  declarations: [MapViewComponent, SeguidoresListComponent, MapSeguidoresComponent, SliderTemporalComponent, ViewToggleComponent],
+  declarations: [
+    MapViewComponent,
+    SeguidoresListComponent,
+    MapSeguidoresComponent,
+    SliderTemporalComponent,
+    ViewToggleComponent,
+  ],
   imports: [CommonModule, PlantaSeguidoresRoutingModule, SharedModule, FiltersModule],
 })
 export class PlantaSeguidoresModule {}

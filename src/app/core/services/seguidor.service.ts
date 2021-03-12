@@ -12,6 +12,7 @@ import { PlantaService } from '@core/services/planta.service';
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
 import { PcInterface } from '@core/models/pc';
+import { LocationAreaInterface } from '@core/models/location';
 
 @Injectable({
   providedIn: 'root',
