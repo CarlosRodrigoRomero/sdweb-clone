@@ -61,7 +61,7 @@ export class SliderTermicoComponent implements OnInit {
     // Slider opacidad
     this.mapControlService.sliderThermalOpacitySource.subscribe((v) => {
       this.thermalLayers.forEach((layer) => {
-        if (layer.getProperties().informeId == this.selectedInformeId) {
+        if (layer.getProperties().informeId === this.selectedInformeId) {
           layer.setOpacity(v / 100);
         } else {
           layer.setOpacity(0);
@@ -70,6 +70,13 @@ export class SliderTermicoComponent implements OnInit {
         // const val = v/100;
 
         // const dif = layer.getOpacity()-v/100
+      });
+      this.anomaliaLayers.forEach((layer) => {
+        if (layer.getProperties().informeId === this.selectedInformeId) {
+          layer.setOpacity(v / 100);
+        } else {
+          layer.setOpacity(0);
+        }
       });
     });
   }
