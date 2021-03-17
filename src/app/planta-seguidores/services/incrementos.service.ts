@@ -160,13 +160,14 @@ export class IncrementosService {
     const globalCoordsFeature = feature.getProperties().properties.globalCoords;
 
     const seguidorVariosInformes = this.listaSeguidores.filter(
-      (seguidor) => seguidor.globalCoords[0] === globalCoordsFeature[0]
+      (seguidor) => seguidor.globalCoords/* [0] */ === globalCoordsFeature/* [0] */
     );
 
     const maeActual = seguidorVariosInformes.find((seguidor) => seguidor.informeId === informeIdActual).mae;
 
     // comprobamos que existen mas de un informe realizados
-    if (informeIdPrevio !== undefined) {
+    // if (informeIdPrevio !== undefined) {
+    if (seguidorVariosInformes.length > 1) {
       const seguidorInformePrevio = seguidorVariosInformes.find((seguidor) => seguidor.informeId === informeIdPrevio);
 
       const maePrevio = seguidorInformePrevio.mae;
@@ -174,7 +175,8 @@ export class IncrementosService {
       return maeActual - maePrevio;
     }
 
-    return 0;
+    // return 0;
+    return maeActual;
   }
 
   private getIncrementoCC(feature: Feature): number {

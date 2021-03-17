@@ -1,4 +1,6 @@
 import { LatLngLiteral } from '@agm/core';
+import { Coordinate } from 'ol/coordinate';
+import { fromLonLat } from 'ol/proj';
 
 import { Anomalia } from './anomalia';
 import { FiltrableInterface } from './filtrableInterface';
@@ -21,6 +23,7 @@ export class Seguidor implements FiltrableInterface {
   filas: number;
   columnas: number;
   path: LatLngLiteral[];
+  featureCoords?: Coordinate[];
 
   constructor(
     anomalias: Anomalia[],
@@ -46,6 +49,7 @@ export class Seguidor implements FiltrableInterface {
     this.globalCoords = globalCoords;
     this.path = path;
     this.id = id;
+    this.featureCoords = this.pathToCoordinate(path);
   }
 
   private getPerdidas(anomalias: Anomalia[]): number {
@@ -82,5 +86,14 @@ export class Seguidor implements FiltrableInterface {
       );
     }
     return 0;
+  }
+
+  private pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {
+    const coordenadas: Coordinate[] = [];
+    path.forEach((coord) => {
+      const coordenada: Coordinate = fromLonLat([coord.lng, coord.lat]);
+      coordenadas.push(coordenada);
+    });
+    return coordenadas;
   }
 }

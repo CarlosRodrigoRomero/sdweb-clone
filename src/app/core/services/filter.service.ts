@@ -61,26 +61,6 @@ export class FilterService {
     return this.initialized$;
   }
 
-  /* initFilterService(id: string, initType: 'informe' | 'planta' = 'informe') {
-    if (initType === 'planta') {
-      this.anomaliaService.getAnomaliasPlanta$(id).subscribe((array) => {
-        this._allFiltrableElements = array;
-        this.filteredElements$.next(array);
-        this.getLabelFilterTipoPcs();
-        this.initialized$.next(true);
-      });
-    } else {
-      this.anomaliaService.getAnomalias$(id).subscribe((array) => {
-        this._allFiltrableElements = array;
-        this.filteredElements$.next(array);
-        this.getLabelFilterTipoPcs();
-        this.initialized$.next(true);
-      });
-    }
-
-    return this.initialized$;
-  } */
-
   addFilter(filter: FilterInterface) {
     // comprobamos que no es de tipo 'Add'
     if (!this.typeAddFilters.includes(filter.type)) {
@@ -119,7 +99,7 @@ export class FilterService {
           this.filters
             .filter((filter) => filter.type === type)
             .forEach((filter) => {
-              filter.applyFilter(this._allFiltrableElements).forEach((pc) => newFiltrableElements.push(pc));
+              filter.applyFilter(this._allFiltrableElements).forEach((elem) => newFiltrableElements.push(elem));
             });
           // añadimos un array de cada tipo
           everyFilterFiltrableElements.push(newFiltrableElements);
@@ -127,7 +107,7 @@ export class FilterService {
       });
     }
 
-    // añadimos al array los pcs filtrados de los filtros no 'Add'
+    // añadimos al array los elementos filtrados de los filtros no 'Add'
     this.filters
       .filter((filter) => !this.typeAddFilters.includes(filter.type))
       .forEach((filter) => {
@@ -138,7 +118,7 @@ export class FilterService {
     // calculamos la interseccion de los array de los diferentes tipos
     if (everyFilterFiltrableElements.length > 0) {
       this.filteredElements = everyFilterFiltrableElements.reduce((anterior, actual) =>
-        anterior.filter((pc) => actual.includes(pc))
+        anterior.filter((elem) => actual.includes(elem))
       );
     }
 

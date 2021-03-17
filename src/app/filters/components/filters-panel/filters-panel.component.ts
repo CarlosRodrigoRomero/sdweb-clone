@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { FilterService } from '@core/services/filter.service';
 import { OlMapService } from '@core/services/ol-map.service';
@@ -9,9 +10,16 @@ import { OlMapService } from '@core/services/ol-map.service';
   styleUrls: ['./filters-panel.component.css'],
 })
 export class FiltersPanelComponent implements OnInit {
-  constructor(private filterService: FilterService, private olMapService: OlMapService) {}
+  private tipoSeguidores = 'planta-seguidores';
+  public esTipoSeguidores = false;
 
-  ngOnInit(): void {}
+  constructor(private filterService: FilterService, private olMapService: OlMapService, private router: Router) {}
+
+  ngOnInit(): void {
+    if (this.router.url.includes(this.tipoSeguidores)) {
+      this.esTipoSeguidores = true;
+    }
+  }
 
   cleanFilters() {
     // borra todos los filtros

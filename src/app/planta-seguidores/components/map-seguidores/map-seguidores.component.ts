@@ -432,7 +432,6 @@ export class MapSeguidoresComponent implements OnInit {
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().hasOwnProperty('properties')) {
           const seguidorId = e.selected[0].getProperties().properties.seguidorId;
-          console.log(seguidorId);
 
           const seguidor = this.listaSeguidores.filter((seg) => {
             return seg.id === seguidorId;

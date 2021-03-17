@@ -1,8 +1,10 @@
-import { FilterInterface } from './filter';
-import { FiltrableInterface } from './filtrableInterface';
 import { Coordinate } from 'ol/coordinate';
 import Polygon from 'ol/geom/Polygon';
+
 import { Anomalia } from './anomalia';
+import { Seguidor } from './seguidor';
+import { FilterInterface } from './filter';
+import { FiltrableInterface } from './filtrableInterface';
 
 export class AreaFilter implements FilterInterface {
   type: string;
@@ -15,10 +17,12 @@ export class AreaFilter implements FilterInterface {
     this.polygon = new Polygon(coords);
   }
 
-  applyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
-    return pcs.filter((pc) => this.polygon.intersectsCoordinate((pc as Anomalia).featureCoords[0]));
+  applyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
+    return elems.filter((elem) => {
+      return this.polygon.intersectsCoordinate((elem as Anomalia | Seguidor).featureCoords[0]);
+    });
   }
-  unapplyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
+  unapplyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
     return null;
   }
 }

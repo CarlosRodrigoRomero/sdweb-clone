@@ -1,11 +1,13 @@
-<div>
+<div class="panel">
   <app-perdidas-filter></app-perdidas-filter>
   <app-temp-max-filter></app-temp-max-filter>
-  <app-gradient-filter></app-gradient-filter>  
-  <app-tipo-filter></app-tipo-filter>
-  <app-clase-filter></app-clase-filter>
-  <!-- <app-modulo-filter></app-modulo-filter> -->
+  <app-gradient-filter></app-gradient-filter>
   <!-- <app-zona-filter></app-zona-filter> -->
   <app-area-filter></app-area-filter>
+  <!-- <app-modulo-filter></app-modulo-filter> -->
+  <div *ngIf="!esTipoSeguidores">
+    <app-tipo-filter></app-tipo-filter>
+    <app-clase-filter></app-clase-filter>
+  </div>
   <button class="clean-filters" mat-button (click)="cleanFilters()">Limpiar filtros</button>
 </div>

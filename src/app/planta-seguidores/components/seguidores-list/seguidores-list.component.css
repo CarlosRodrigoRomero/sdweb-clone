@@ -1,0 +1,13 @@
+.lista {
+  margin: 10px;
+}
+
+table {
+  width: 100%;
+}
+
+.tabla-container {
+  position: relative;
+  height: 71vh;
+  overflow: auto;
+}

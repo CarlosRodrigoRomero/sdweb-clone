@@ -10,7 +10,7 @@ import { MapControlService } from '../../services/map-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
-interface PcData {
+interface ElemData {
   tipo: string;
   perdidas: number;
   temp: number;
@@ -25,7 +25,7 @@ interface PcData {
 })
 export class FilterPcsListComponent implements OnInit {
   displayedColumns: string[] = ['tipo', 'perdidas', 'temp', 'gradiente'];
-  dataSource: MatTableDataSource<PcData>;
+  dataSource: MatTableDataSource<ElemData>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;

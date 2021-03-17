@@ -39,7 +39,6 @@ export class AnomaliaService {
       switchMap((informes) => {
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
         informes.forEach((informe) => {
-          // this.getAnomalias$(informe.id).subscribe((anomalias) => console.log(anomalias));
           anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs'));
         });
         return combineLatest(anomaliaObsList);
