@@ -31,16 +31,16 @@ export class MapViewComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private plantaService: PlantaService
-  ) {
+  ) {}
+
+  ngOnInit(): void {
+    // this.plantaId = 'egF0cbpXnnBnjcrusoeR';
+    
     if (this.router.url.includes('shared')) {
       this.sharedReport = true;
       this.activatedRoute.params.subscribe((params: Params) => (this.sharedId = params.id));
     }
     this.activatedRoute.params.subscribe((params: Params) => (this.plantaId = params.id));
-  }
-
-  ngOnInit(): void {
-    /* this.plantaId = 'egF0cbpXnnBnjcrusoeR'; */
 
     if (this.sharedReport) {
       this.filterService

@@ -39,7 +39,7 @@ export class AnomaliaService {
       switchMap((informes) => {
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
         informes.forEach((informe) => {
-          anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs'));
+          anomaliaObsList.push(this.getAnomalias$(informe.id/* , 'pcs' */ /* para la demo */));
         });
         return combineLatest(anomaliaObsList);
       }),

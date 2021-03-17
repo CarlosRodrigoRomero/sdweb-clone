@@ -88,7 +88,7 @@ export class MapComponent implements OnInit {
     this.mousePosition = null;
 
     // Para la demo, agregamos un extent a todas las capas:
-    /* this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]); */
+    this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
     /* this.plantaId = 'egF0cbpXnnBnjcrusoeR'; */
     /* this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L']; */
@@ -126,12 +126,12 @@ export class MapComponent implements OnInit {
         this.planta = planta;
 
         // seleccionamos el informe mas reciente de la planta
-        this.selectedInformeId = this.informesList[this.informesList.length];
+        this.selectedInformeId = this.informesList[this.informesList.length - 1];
 
         // asignamos el informe para compartir
-        this.shareReportService.setInformeID(this.informesList[this.informesList.length]);
+        this.shareReportService.setInformeID(this.informesList[this.informesList.length - 1]);
 
-        this.mapControlService.selectedInformeId = this.informesList[this.informesList.length];
+        this.mapControlService.selectedInformeId = this.informesList[this.informesList.length - 1];
 
         this.initMap();
       });
@@ -153,7 +153,7 @@ export class MapComponent implements OnInit {
         },
       }),
 
-      /* extent: this.extent1, */
+      extent: this.extent1,
     });
     tl.setProperties({
       informeId,
@@ -190,19 +190,21 @@ export class MapComponent implements OnInit {
       extent: this.extent1,
     });
     const osmLayer = new TileLayer({
-      source: satellite,
-      // source: new OSM(),
+      // source: satellite,
+      source: new OSM(),
       // extent: this.extent1,
     });
 
-    const layers = [osmLayer, /* this.aerialLayer, */ ...this.thermalLayers];
+    const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers];
 
     // MAPA
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
-      zoom: this.planta.zoom,
-      maxZoom: 20,
-      // extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
+      zoom: 18,
+      // zoom: this.planta.zoom,
+      maxZoom: 24,
+      // para la demo
+      extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
     });
 
     this.olMapService
@@ -244,9 +246,6 @@ export class MapComponent implements OnInit {
       if (feature.length > 0) {
         popup.setPosition(undefined);
         popup.setPosition(clickedCoord);
-        // element.innerHTML = 'hola probando';
-
-        // $(element).popover('show');
       } else {
         popup.setPosition(undefined);
       }
@@ -279,9 +278,8 @@ export class MapComponent implements OnInit {
     const styles = {
       LineString: new Style({
         stroke: new Stroke({
-          // color: '#dbdbdb',
-          color: 'green',
-          // lineDash: [4],
+          color: '#dbdbdb',
+          lineDash: [4],
           width: 2,
         }),
         fill: new Fill({
@@ -301,8 +299,9 @@ export class MapComponent implements OnInit {
     const styleFunction = (feature) => {
       if (feature !== undefined) {
         const style = styles[feature.getGeometry().getType()];
-        style.getText().setText(feature.get('globalCoords'));
-        // style.getText().setText(feature.get('globalCoords')[1]);
+        // style.getText().setText(feature.get('globalCoords'));
+        // para la demo
+        style.getText().setText(feature.get('globalCoords')[1]);
         return style;
       }
     };
@@ -340,9 +339,10 @@ export class MapComponent implements OnInit {
       listOfFeatures.push({
         type: 'Feature',
         properties: {
-          // globalCoords: locArea.globalCoords,
+          // para la demo
+          globalCoords: locArea.globalCoords,
           // globalCoords: locArea.globalX,
-          globalCoords: this.getGlobalCoords(locArea),
+          // globalCoords: this.getGlobalCoords(locArea),
         },
         geometry: {
           type: 'LineString',
