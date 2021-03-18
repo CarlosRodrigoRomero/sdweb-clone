@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { SelectionModel } from '@angular/cdk/collections';
 
 import { MatCheckboxChange } from '@angular/material/checkbox';
 
@@ -9,11 +10,12 @@ import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { MapControlService } from 'src/app/planta-report/services/map-control.service';
+import { FilterControlService } from '@core/services/filter-control.service';
 
 import { TipoPcFilter } from '@core/models/tipoPcFilter';
 import { Anomalia } from '@core/models/anomalia';
 
-interface LabelTipo {
+export interface LabelTipo {
   label?: string;
   count?: number;
   completed?: boolean;
@@ -27,13 +29,15 @@ interface LabelTipo {
 })
 export class TipoFilterComponent implements OnInit {
   tiposPcs: LabelTipo[] = [];
-  allComplete: boolean;
   filtroTipo: TipoPcFilter;
   filterTipoCounts: number[] = [];
 
-  defaultStatus = true;
-  defaultSelect = 'Tipo de anomalía';
-  selected: string[] = [this.defaultSelect];
+  defaultLabelStatus = true;
+  defaultSelectLabel = 'Tipo de anomalía';
+  selectedLabels: string[] = [this.defaultSelectLabel];
+
+  tiposCompleted: boolean[];
+  selection = new SelectionModel<LabelTipo>(true, []);
 
   public plantaId: string;
   public informesList: string[];
@@ -47,7 +51,8 @@ export class TipoFilterComponent implements OnInit {
     private filterService: FilterService,
     private route: ActivatedRoute,
     private anomaliaService: AnomaliaService,
-    private mapControlService: MapControlService
+    private mapControlService: MapControlService,
+    private filterControlService: FilterControlService
   ) {}
 
   ngOnInit(): void {
@@ -69,6 +74,18 @@ export class TipoFilterComponent implements OnInit {
       });
     });
 
+    // inicializamos los tipos seleccionados en el fiter control
+    this.tiposPcs.forEach((tipoPc) => this.tiposCompleted.push(false));
+    this.filterControlService.tiposSelected = this.tiposCompleted;
+
+    // nos suscribimos para poder checkear desde otros lugares
+    this.filterControlService.tiposSelected$.subscribe((sel) =>
+      this.tiposPcs.forEach((tipoPc, index) => (tipoPc.completed = sel[index]))
+    );
+
+    // nos suscribimos a los labels del filter control
+    this.filterControlService.selectedTipoLabels$.subscribe((labels) => (this.selectedLabels = labels));
+
     this.mapControlService.selectedInformeId$.subscribe((informeID) => {
       this.filterService.filteredElementsWithoutFilterTipo$.subscribe((elems) => {
         // estas anomalias son las anomalias filtradas
@@ -86,6 +103,9 @@ export class TipoFilterComponent implements OnInit {
           });
       });
     });
+
+    // nos suscribimos al estado en el control de filtros
+    this.filterControlService.labelTipoDefaultStatus$.subscribe((value) => (this.defaultLabelStatus = value));
   }
 
   onChangeFiltroTipo(event: MatCheckboxChange) {
@@ -94,11 +114,11 @@ export class TipoFilterComponent implements OnInit {
       this.filterService.addFilter(this.filtroTipo);
 
       // añadimos el tipo seleccionado a la variable
-      if (this.selected[0] !== this.defaultSelect) {
-        this.selected.push(event.source.name);
+      if (this.selectedLabels[0] !== this.defaultSelectLabel) {
+        this.filterControlService.selectedTipoLabels.push(event.source.name);
       } else {
-        this.defaultStatus = false;
-        this.selected = [event.source.name];
+        this.filterControlService.labelTipoDefaultStatus = false;
+        this.filterControlService.selectedTipoLabels = [event.source.name];
       }
     } else {
       this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
@@ -112,11 +132,11 @@ export class TipoFilterComponent implements OnInit {
       );
 
       // eliminamos el 'tipo' de seleccionados
-      this.selected = this.selected.filter((sel) => sel !== event.source.name);
+      this.selectedLabels = this.selectedLabels.filter((sel) => sel !== event.source.name);
       // si era el último ponemos el label por defecto
-      if (this.selected.length === 0) {
-        this.defaultStatus = true;
-        this.selected.push(this.defaultSelect);
+      if (this.selectedLabels.length === 0) {
+        this.filterControlService.labelTipoDefaultStatus = true;
+        this.selectedLabels.push(this.defaultSelectLabel);
       }
     }
   }

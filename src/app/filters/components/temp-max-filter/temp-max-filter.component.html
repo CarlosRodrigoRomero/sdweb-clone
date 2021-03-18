@@ -4,8 +4,7 @@
     <ngx-slider
       [(value)]="rangoMinTemp"
       [(highValue)]="rangoMaxTemp"
-      (valueChange)="onChangeFiltroTempMax()"
-      (highValueChange)="onChangeFiltroTempMax()"
+      (valueChange)="onChangeFiltroTempMax(rangoMinTemp, rangoMaxTemp)"
       [options]="options"
     ></ngx-slider>
   </div>

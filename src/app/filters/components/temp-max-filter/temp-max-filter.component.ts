@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
+import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
+
 import { FilterService } from '@core/services/filter.service';
+import { FilterControlService } from '@core/services/filter-control.service';
 
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
-
-import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
-import { AnomaliaService } from '../../../core/services/anomalia.service';
 
 @Component({
   selector: 'app-temp-max-filter',
@@ -13,19 +13,19 @@ import { AnomaliaService } from '../../../core/services/anomalia.service';
   styleUrls: ['./temp-max-filter.component.css'],
 })
 export class TempMaxFilterComponent implements OnInit {
-  minTemp: number;
-  maxTemp: number;
+  minTemp: number = 50;
+  maxTemp: number = 100;
   rangoMinTemp: number;
   rangoMaxTemp: number;
   filtroTempMax: TempMaxFilter;
   options: Options;
 
-  constructor(private anomaliaService: AnomaliaService, private filterService: FilterService) {
-    this.minTemp = 50;
-    // this.maxTemp = this.anomaliaService.getTempMaxAll();
-    this.maxTemp = 100;
-    this.rangoMinTemp = this.minTemp;
-    this.rangoMaxTemp = this.maxTemp;
+  constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
+
+  ngOnInit(): void {
+    this.filterControlService.minTempMaxSource.subscribe((value) => (this.rangoMinTemp = value));
+    this.filterControlService.maxTempMaxSource.subscribe((value) => (this.rangoMaxTemp = value));
+
     this.options = {
       floor: this.minTemp,
       ceil: this.maxTemp,
@@ -55,10 +55,14 @@ export class TempMaxFilterComponent implements OnInit {
     };
   }
 
-  ngOnInit(): void {}
+  onChangeFiltroTempMax(lowValue: number, highValue: number) {
+    // crea el fitro
+    this.filtroTempMax = new TempMaxFilter('tempMax', lowValue, highValue);
 
-  onChangeFiltroTempMax() {
-    this.filtroTempMax = new TempMaxFilter('tempMax', this.rangoMinTemp, this.rangoMaxTemp);
+    // se asocian los valores al control para acceder a ellos desde otras partes
+    this.filterControlService.minTempMax = lowValue;
+    this.filterControlService.maxTempMax = highValue;
+
     if (this.rangoMinTemp === this.minTemp && this.rangoMaxTemp === this.maxTemp) {
       // si se selecciona el mínimo desactivamos el filtro ...
       this.filterService.deleteFilter(this.filtroTempMax);

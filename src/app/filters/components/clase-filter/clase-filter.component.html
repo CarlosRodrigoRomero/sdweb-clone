@@ -1,16 +1,17 @@
 <div class="filtro">
-  <h5>Clase</h5>
-  <mat-button-toggle-group #group="matButtonToggleGroup" multiple="true">
+  <h5>Severidad</h5>
+  <mat-button-toggle-group #group="matButtonToggleGroup" multiple="true" [(ngModel)]="severidadSelected">
     <mat-button-toggle
-      *ngFor="let clase of clasesPcs; index as i"
+      *ngFor="let elem of severidadElems; index as i"
+      value="elem.label"
       [id]="'CoA_' + (i + 1)"
-      [name]="clase.label"
+      [name]="elem.label"
       (change)="onChangeClaseFilter($event)"
     >
       <div class="label">
         <mat-icon [ngStyle]="{ color: coloresSeveridad[i] }">stop_circle</mat-icon>
         <span class="text-label" style="font-size: 15px">
-          {{ clase.label }}
+          {{ elem.label }}
         </span>
       </div>
     </mat-button-toggle>

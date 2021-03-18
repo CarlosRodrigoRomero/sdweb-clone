@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { PerdidasFilter } from '@core/models/perdidasFilter';
 
 import { FilterService } from '@core/services/filter.service';
+import { FilterControlService } from '@core/services/filter-control.service';
 
 import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
 
@@ -45,15 +46,20 @@ export class PerdidasFilterComponent implements OnInit {
     },
   };
 
-  constructor(private filterService: FilterService) {
-    this.rangoMinPerdidas = this.minPerdidas;
-    this.rangoMaxPerdidas = this.maxPerdidas;
+  constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
+
+  ngOnInit(): void {
+    this.filterControlService.minPerdidasSource.subscribe((value) => (this.rangoMinPerdidas = value));
+    this.filterControlService.maxPerdidasSource.subscribe((value) => (this.rangoMaxPerdidas = value));
   }
 
-  ngOnInit(): void {}
+  onChangeFiltroPerdidas(lowValue: number, highValue: number) {
+    // crea el fitro
+    this.filtroPerdidas = new PerdidasFilter('perdidas', lowValue, highValue);
 
-  onChangeFiltroPerdidas() {
-    this.filtroPerdidas = new PerdidasFilter('perdidas', this.rangoMinPerdidas, this.rangoMaxPerdidas);
+    // se asocian los valores al control para acceder a ellos desde otras partes
+    this.filterControlService.minPerdidas = lowValue;
+    this.filterControlService.maxPerdidas = highValue;
 
     if (this.rangoMinPerdidas === 0 && this.rangoMaxPerdidas === 100) {
       // si se selecciona el mínimo desactivamos el filtro ...

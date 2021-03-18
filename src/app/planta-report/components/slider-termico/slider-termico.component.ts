@@ -81,10 +81,11 @@ export class SliderTermicoComponent implements OnInit {
     });
   }
 
-  onChangeTemperatureSlider(highValue: number, lowValue: number) {
+  onChangeTemperatureSlider(lowValue: number, highValue: number) {
     this.mapControlService.sliderMax = highValue;
     this.mapControlService.sliderMin = lowValue;
   }
+
   onChangeThermalOpacitySlider(e: MatSliderChange) {
     this.mapControlService.sliderThermalOpacity = e.value;
   }

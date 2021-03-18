@@ -4,8 +4,7 @@
     <ngx-slider
       [(value)]="rangoMinPerdidas"
       [(highValue)]="rangoMaxPerdidas"
-      (valueChange)="onChangeFiltroPerdidas()"
-      (highValueChange)="onChangeFiltroPerdidas()"
+      (valueChange)="onChangeFiltroPerdidas(rangoMinPerdidas, rangoMaxPerdidas)"
       [options]="options"
     ></ngx-slider>
   </div>

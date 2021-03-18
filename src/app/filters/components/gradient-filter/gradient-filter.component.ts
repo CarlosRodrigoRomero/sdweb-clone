@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 
+import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
+
 import { FilterService } from '@core/services/filter.service';
 import { PcService } from '@core/services/pc.service';
+import { FilterControlService } from '@core/services/filter-control.service';
 
 import { GradientFilter } from '@core/models/gradientFilter';
-
-import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
 
 @Component({
   selector: 'app-gradient-filter',
@@ -20,16 +21,23 @@ export class GradientFilterComponent implements OnInit {
   filtroGradiente: GradientFilter;
   options: Options;
 
-  constructor(private filterService: FilterService, private pcService: PcService) {
+  constructor(
+    private filterService: FilterService,
+    private pcService: PcService,
+    private filterControlService: FilterControlService
+  ) {}
+
+  ngOnInit(): void {
     // this.minGradiente = this.pcService.getMinGradienteNormalizado();
     this.minGradiente = 0;
     // this.maxGradiente = this.pcService.getMaxGradienteNormalizado();
     this.maxGradiente = 50;
-    this.rangoMinGradiente = this.minGradiente;
-    this.rangoMaxGradiente = this.maxGradiente;
-  }
 
-  ngOnInit(): void {
+    this.filterControlService.minGradienteSource.subscribe((value) => (this.rangoMinGradiente = value));
+    this.filterControlService.maxGradienteSource.subscribe((value) => (this.rangoMaxGradiente = value));
+    // this.rangoMinGradiente = this.minGradiente;
+    // this.rangoMaxGradiente = this.maxGradiente;
+
     this.options = {
       floor: this.minGradiente,
       ceil: this.maxGradiente,
@@ -59,8 +67,14 @@ export class GradientFilterComponent implements OnInit {
     };
   }
 
-  onChangeFiltroGradiente() {
+  onChangeFiltroGradiente(lowValue: number, highValue: number) {
+    // crea el fitro
     this.filtroGradiente = new GradientFilter('gradient', this.rangoMinGradiente, this.rangoMaxGradiente);
+
+    // se asocian los valores al control para acceder a ellos desde otras partes
+    this.filterControlService.minGradiente = lowValue;
+    this.filterControlService.maxGradiente = highValue;
+
     if (this.rangoMinGradiente === this.minGradiente && this.rangoMaxGradiente === this.maxGradiente) {
       // si se selecciona el mínimo desactivamos el filtro ...
       this.filterService.deleteFilter(this.filtroGradiente);

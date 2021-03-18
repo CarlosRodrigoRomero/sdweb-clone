@@ -4,13 +4,13 @@ import { MatButtonToggleChange } from '@angular/material/button-toggle';
 
 import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
+import { FilterControlService } from '@core/services/filter-control.service';
 
 import { ClasePcFilter } from '@core/models/clasePcFilter';
 
-interface ClasePc {
+interface Severidad {
   label?: string;
   completed?: boolean;
-  clasesPcs?: ClasePc[];
 }
 
 @Component({
@@ -19,25 +19,25 @@ interface ClasePc {
   styleUrls: ['./clase-filter.component.css'],
 })
 export class ClaseFilterComponent implements OnInit {
-  clasesTask: ClasePc;
-  clasesPcs: ClasePc[] = [];
+  severidadElems: Severidad[] = [];
   allComplete: boolean;
   filtroClase: ClasePcFilter;
   coloresSeveridad: string[];
 
-  constructor(private filterService: FilterService) {}
+  severidadSelected: string[] = undefined;
+
+  constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
 
   ngOnInit(): void {
     GLOBAL.labels_severidad.forEach((label) =>
-      this.clasesPcs.push({
+      this.severidadElems.push({
         label,
         completed: false,
       })
     );
-    this.clasesTask = {
-      clasesPcs: this.clasesPcs,
-    };
     this.coloresSeveridad = GLOBAL.colores_severidad;
+
+    this.filterControlService.severidadSelected$.subscribe((sel) => (this.severidadSelected = sel));
   }
 
   onChangeClaseFilter(event: MatButtonToggleChange) {
@@ -48,6 +48,7 @@ export class ClaseFilterComponent implements OnInit {
         GLOBAL.labels_severidad.indexOf(event.source.name) + 1
       );
       this.filterService.addFilter(this.filtroClase);
+      this.filterControlService.severidadSelected.push(event.source.name);
     } else {
       this.filterService.filters$.subscribe((filters) =>
         filters
@@ -57,6 +58,9 @@ export class ClaseFilterComponent implements OnInit {
               this.filterService.deleteFilter(filter);
             }
           })
+      );
+      this.filterControlService.severidadSelected = this.filterControlService.severidadSelected.filter(
+        (sel) => sel !== event.source.name
       );
     }
   }
