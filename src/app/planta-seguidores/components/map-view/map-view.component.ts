@@ -47,7 +47,7 @@ export class MapViewComponent implements OnInit {
     const initMapSegService = this.mapSeguidoresService.initService(this.plantaId);
 
     if (this.sharedReport) {
-      const initFilterService = this.filterService.initFilterService(
+      const initFilterService = this.filterService.initService(
         this.sharedReport,
         this.plantaId,
         this.plantaFija,
@@ -59,7 +59,7 @@ export class MapViewComponent implements OnInit {
         this.seguidoresLoaded$.next(this.seguidoresLoaded);
       });
     } else {
-      const initFilterService = this.filterService.initFilterService(this.sharedReport, this.plantaId, this.plantaFija);
+      const initFilterService = this.filterService.initService(this.sharedReport, this.plantaId, this.plantaFija);
 
       combineLatest([initMapSegService, initFilterService]).subscribe(([mapSerInit, filtSerInit]) => {
         this.seguidoresLoaded = mapSerInit && filtSerInit;

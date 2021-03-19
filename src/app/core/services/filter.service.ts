@@ -34,7 +34,7 @@ export class FilterService {
     private seguidorService: SeguidorService
   ) {}
 
-  initFilterService(shared: boolean, plantaId: string, plantaFija: boolean, sharedId?: string) {
+  initService(shared: boolean, plantaId: string, plantaFija: boolean, sharedId?: string): Observable<boolean> {
     if (plantaFija) {
       this.anomaliaService.getAnomaliasPlanta$(plantaId).subscribe((array) => {
         this._allFiltrableElements = array;

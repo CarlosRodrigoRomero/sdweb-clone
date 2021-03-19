@@ -1,27 +1,26 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { Anomalia } from '@core/models/anomalia';
 import { GLOBAL } from '@core/services/global';
-import { AnomaliaService } from '@core/services/anomalia.service';
-import { FindValueSubscriber } from 'rxjs/internal/operators/find';
 
 @Component({
   selector: 'app-anomalia-info',
   templateUrl: './anomalia-info.component.html',
   styleUrls: ['./anomalia-info.component.css'],
 })
-export class AnomaliaInfoComponent implements OnInit {
-  @Input() anomalia: Anomalia;
+export class AnomaliaInfoComponent implements OnInit, OnChanges {
+  @Input() anomaliaSelect: Anomalia;
+  @Input() anomaliaHover: Anomalia;
   public displayedColumns: string[] = ['clase', 'tipo', 'tempMax', 'gradienteNormalizado', 'perdidas'];
   public dataSource: Anomalia[];
-  public editable = false;
   public dataType: any;
   public pcDescripcion: string[];
+  public anomaliaHoverPrev: Anomalia;
 
-  constructor(private anomaliaService: AnomaliaService) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.pcDescripcion = GLOBAL.pcDescripcion;
-    this.dataSource = [this.anomalia];
+    this.dataSource = [this.anomaliaHover];
     this.dataType = {
       clase: 'number',
       tipo: 'number',
@@ -29,11 +28,13 @@ export class AnomaliaInfoComponent implements OnInit {
       perdidas: 'number',
     };
   }
-  onEdit(event, anomalia: Anomalia, field: string) {
-    anomalia[field] = event.target.value;
-    this.anomaliaService.updateAnomalia(anomalia);
-  }
-  deleteAnomalia(anomalia: Anomalia) {
-    console.log('anom', anomalia);
+
+  ngOnChanges() {
+    // si hay una anomalia seleccionada deja de aparecer en el hover
+    if (this.anomaliaSelect === undefined) {
+      this.anomaliaHoverPrev = this.anomaliaHover;
+      this.dataSource = [this.anomaliaHover];
+    }
+    this.dataSource = [this.anomaliaSelect];
   }
 }

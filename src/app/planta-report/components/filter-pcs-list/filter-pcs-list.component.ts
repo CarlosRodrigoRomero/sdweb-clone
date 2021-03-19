@@ -7,16 +7,9 @@ import { MatTableDataSource } from '@angular/material/table';
 import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
 import { MapControlService } from '../../services/map-control.service';
+import { AnomaliasControlService } from '../../services/anomalias-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
-
-interface ElemData {
-  tipo: string;
-  perdidas: number;
-  temp: number;
-  gradiente: number;
-  color?: string;
-}
 
 @Component({
   selector: 'app-filter-pcs-list',
@@ -25,12 +18,16 @@ interface ElemData {
 })
 export class FilterPcsListComponent implements OnInit {
   displayedColumns: string[] = ['tipo', 'perdidas', 'temp', 'gradiente'];
-  dataSource: MatTableDataSource<ElemData>;
+  dataSource: MatTableDataSource<any>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(public filterService: FilterService, private mapControlService: MapControlService) {}
+  constructor(
+    public filterService: FilterService,
+    private mapControlService: MapControlService,
+    private anomaliasControlService: AnomaliasControlService
+  ) {}
 
   ngOnInit() {
     this.mapControlService.selectedInformeId$.subscribe((informeId) => {
@@ -39,13 +36,15 @@ export class FilterPcsListComponent implements OnInit {
 
         elems
           .filter((elem) => (elem as Anomalia).informeId === informeId)
-          .forEach((pc) => 
+          .forEach((anom) =>
             filteredElements.push({
-              tipo: GLOBAL.labels_tipos[pc.tipo],
-              perdidas: pc.perdidas * 100,
-              temp: pc.temperaturaMax,
-              gradiente: pc.gradienteNormalizado,
-              color: GLOBAL.colores_tipos_hex[pc.tipo],
+              id: anom.id,
+              tipoLabel: GLOBAL.labels_tipos[anom.tipo],
+              tipo: anom.tipo,
+              perdidas: anom.perdidas,
+              temperaturaMax: anom.temperaturaMax,
+              gradienteNormalizado: anom.gradienteNormalizado,
+              color: GLOBAL.colores_tipos_hex[anom.tipo],
             })
           );
 
@@ -63,5 +62,24 @@ export class FilterPcsListComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+
+  hoverAnomalia(row: any) {
+    if (this.anomaliasControlService.anomaliaSelect === undefined) {
+      this.anomaliasControlService.anomaliaHover = row;
+      this.anomaliasControlService.setExternalStyle(row.id, true);
+    }
+  }
+
+  unhoverAnomalia(row: any) {
+    if (this.anomaliasControlService.anomaliaSelect === undefined) {
+      this.anomaliasControlService.anomaliaHover = undefined;
+      this.anomaliasControlService.setExternalStyle(row.id, false);
+    }
+  }
+
+  selectAnomalia(row: any) {
+    this.anomaliasControlService.anomaliaSelect = row;
+    this.anomaliasControlService.setExternalStyle(row.id, true);
   }
 }

@@ -1,5 +1,5 @@
 <div id="map" class="map"></div>
 
-<div *ngIf="anomaliaSeleccionada" id="popup">
-  <app-anomalia-info [anomalia]="anomaliaSeleccionada"></app-anomalia-info>
+<div *ngIf="anomaliaSelect || anomaliaHover" id="popup">
+  <app-anomalia-info [anomaliaSelect]="anomaliaSelect" [anomaliaHover]="anomaliaHover"></app-anomalia-info>
 </div>

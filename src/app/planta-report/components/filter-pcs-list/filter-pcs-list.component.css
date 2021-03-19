@@ -88,3 +88,7 @@ table {
   -webkit-hyphens: auto;
   hyphens: auto;
 }
+
+.mat-row:hover {
+  background-color: whitesmoke;
+}

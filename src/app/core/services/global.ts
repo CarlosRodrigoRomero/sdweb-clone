@@ -25,6 +25,8 @@ export let GLOBAL = {
   nombreGlobalXFija: 'C1',
   nombreGlobalYFija: 'Pasillo',
   nombreGlobalZFija: 'C3',
+  nombreGlobalCoordsFija: ['C1', 'Pasillo', 'C3'],
+  nombreGlobalCoordsSeguidores: ['C1', 'C2', 'Seguidor'],
   nombreLocalXFija: 'Columna',
   nombreLocalYFija: 'Altura',
   mae: [0.1, 0.2],

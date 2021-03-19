@@ -5,9 +5,10 @@
 
 #popup {
   position: absolute;
-  top: 10px;
+  top: 64px;
   left: 50%;
-  width: 500px;
+  transform: translate(-50%, 0%);
+  margin: 10px;
   background-color: white;
 }
 
@@ -19,7 +20,7 @@
 }
 
 ::ng-deep .ol-control {
-    background-color: rgba(0,0,0,0.2);
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 ::ng-deep .ol-control button {
