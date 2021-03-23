@@ -45,8 +45,6 @@ export class MapViewComponent implements OnInit {
     }
     this.activatedRoute.params.subscribe((params: Params) => (this.plantaId = params.id));
 
-    const initAnomControlService = this.anomaliasControlService.initService();
-
     if (this.sharedReport) {
       this.filterService
         .initService(this.sharedReport, this.plantaId, this.plantaFija, this.sharedId)

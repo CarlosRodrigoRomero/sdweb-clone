@@ -1,3 +1,7 @@
+.popup {
+  display: flex;
+}
+
 table {
   width: 100%;
 }
@@ -84,4 +88,19 @@ table {
   -moz-hyphens: auto;
   -webkit-hyphens: auto;
   hyphens: auto;
+}
+
+.menu-content .subtitulo {
+  font-weight: 300;
+  font-size: 1.1rem;
+}
+
+.menu-content mat-icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+}
+
+.menu-content .elemento {
+  display: flex;
+  margin-left: 1rem;
 }

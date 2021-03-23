@@ -45,6 +45,8 @@ export class FilterPcsListComponent implements OnInit {
               temperaturaMax: anom.temperaturaMax,
               gradienteNormalizado: anom.gradienteNormalizado,
               color: GLOBAL.colores_tipos_hex[anom.tipo],
+              clase: anom.clase,
+              anomalia: anom,
             })
           );
 
@@ -66,7 +68,7 @@ export class FilterPcsListComponent implements OnInit {
 
   hoverAnomalia(row: any) {
     if (this.anomaliasControlService.anomaliaSelect === undefined) {
-      this.anomaliasControlService.anomaliaHover = row;
+      this.anomaliasControlService.anomaliaHover = row.anomalia;
       this.anomaliasControlService.setExternalStyle(row.id, true);
     }
   }
@@ -79,7 +81,13 @@ export class FilterPcsListComponent implements OnInit {
   }
 
   selectAnomalia(row: any) {
-    this.anomaliasControlService.anomaliaSelect = row;
+    // this.anomaliasControlService.anomaliaSelect = undefined;
+    if (this.anomaliasControlService.prevAnomaliaSelect !== undefined) {
+      this.anomaliasControlService.setExternalStyle(this.anomaliasControlService.prevAnomaliaSelect.id, false);
+    }
+    this.anomaliasControlService.prevAnomaliaSelect = row.anomalia;
+
+    this.anomaliasControlService.anomaliaSelect = row.anomalia;
     this.anomaliasControlService.setExternalStyle(row.id, true);
   }
 }

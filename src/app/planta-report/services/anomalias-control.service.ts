@@ -31,6 +31,7 @@ export class AnomaliasControlService {
   private _anomaliaHover: Anomalia = undefined;
   public anomaliaHover$ = new BehaviorSubject<Anomalia>(this._anomaliaHover);
   private prevFeatureHover: any;
+  public prevAnomaliaSelect: Anomalia;
   public listaAnomalias: Anomalia[];
   private anomaliaLayers: VectorLayer[];
 
@@ -92,6 +93,7 @@ export class AnomaliasControlService {
     this.addPointerOnHover();
     this.addOnHoverAction();
     this.addSelectInteraction();
+    this.addClickOutFeatures();
   }
 
   public addPointerOnHover() {
@@ -139,14 +141,12 @@ export class AnomaliasControlService {
             (feature[0] as Feature).setStyle(this.getStyleAnomaliasMapa(true));
 
             if (this.selectedInformeId === anomalia.informeId) {
-              this._anomaliaHover = anomalia;
-              this.anomaliaHover$.next(anomalia);
+              this.anomaliaHover = anomalia;
             }
             this.prevFeatureHover = feature;
           }
         } else {
-          this._anomaliaHover = undefined;
-          this.anomaliaHover$.next(undefined);
+          this.anomaliaHover = undefined;
 
           if (currentFeatureHover !== undefined) {
             (currentFeatureHover[0] as Feature).setStyle(this.getStyleAnomaliasMapa(false));
@@ -163,25 +163,51 @@ export class AnomaliasControlService {
       layers: (l) => {
         if (l.getProperties().informeId === this.selectedInformeId) {
           return true;
+        } else {
+          return false;
         }
-        return false;
       },
     });
 
     this.map.addInteraction(select);
     select.on('select', (e) => {
-      this._anomaliaSelect = undefined;
+      if (this.anomaliaSelect !== undefined) {
+        this.setExternalStyle(this.anomaliaSelect.id, false);
+        this.anomaliaSelect = undefined;
+      }
 
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().hasOwnProperty('properties')) {
           const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
-
           const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
 
-          if (this.selectedInformeId === anomalia.informeId) {
-            this._anomaliaSelect = anomalia;
+          console.log(this.prevAnomaliaSelect);
+          console.log(anomalia);
+
+          if (this.prevAnomaliaSelect !== undefined) {
+            console.log('ok');
+            this.setExternalStyle(this.prevAnomaliaSelect.id, false);
           }
+          this.prevAnomaliaSelect = anomalia;
+          this.anomaliaSelect = anomalia;
+          this.setExternalStyle(anomalia.id, true);
+          this.anomaliaHover = undefined;
         }
+      }
+    });
+  }
+
+  private addClickOutFeatures() {
+    this.map.on('click', (event) => {
+      const feature = this.map
+        .getFeaturesAtPixel(event.pixel)
+        .filter((item) => item.getProperties().properties !== undefined)
+        .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
+      if (feature.length === 0) {
+        if (this.anomaliaSelect !== undefined) {
+          this.setExternalStyle(this.anomaliaSelect.id, false);
+        }
+        this.anomaliaSelect = undefined;
       }
     });
   }
