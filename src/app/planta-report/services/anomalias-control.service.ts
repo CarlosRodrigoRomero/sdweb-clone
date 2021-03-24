@@ -181,11 +181,7 @@ export class AnomaliasControlService {
           const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
           const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
 
-          console.log(this.prevAnomaliaSelect);
-          console.log(anomalia);
-
           if (this.prevAnomaliaSelect !== undefined) {
-            console.log('ok');
             this.setExternalStyle(this.prevAnomaliaSelect.id, false);
           }
           this.prevAnomaliaSelect = anomalia;

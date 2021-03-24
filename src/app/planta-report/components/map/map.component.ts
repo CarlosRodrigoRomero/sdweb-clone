@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
 
 import { take } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
@@ -28,6 +27,7 @@ import { FilterService } from '@core/services/filter.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { ShareReportService } from '@core/services/share-report.service';
 import { AnomaliasControlService } from '../../services/anomalias-control.service';
+import { ReportFijaControlService } from '../../services/report-fija-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { LocationAreaInterface } from '@core/models/location';
@@ -63,7 +63,7 @@ export class MapComponent implements OnInit {
   public statsOpened: boolean;
   public anomaliasLoaded = false;
   public mousePosition;
-  public informesList: string[] = [];
+  public informeIdList: string[] = [];
   public sharedReport = false;
 
   constructor(
@@ -73,14 +73,9 @@ export class MapComponent implements OnInit {
     public filterService: FilterService,
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private anomaliasControlService: AnomaliasControlService
-  ) {
-    if (this.router.url.includes('shared')) {
-      this.sharedReport = true;
-    }
-  }
+    private anomaliasControlService: AnomaliasControlService,
+    private reportFijaControlService: ReportFijaControlService
+  ) {}
 
   ngOnInit(): void {
     this.mousePosition = null;
@@ -88,53 +83,53 @@ export class MapComponent implements OnInit {
     // Para la demo, agregamos un extent a todas las capas:
     this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
-    /* this.plantaId = 'egF0cbpXnnBnjcrusoeR'; */
-    /* this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L']; */
-    this.plantaId = this.activatedRoute.snapshot.paramMap.get('id');
+    // this.plantaId = 'egF0cbpXnnBnjcrusoeR';
+    this.reportFijaControlService.plantaId$.subscribe((plantaId) => {
+      this.plantaId = plantaId;
 
-    // Obtenemos todas las capas para esta planta, incluidas las termicas si es tipo "fija" y las almacenamos en this.thermalLayers
-    combineLatest([
-      this.plantaService.getThermalLayers$(this.plantaId),
-      this.informeService.getInformesDePlanta(this.plantaId),
-      this.plantaService.getPlanta(this.plantaId),
-    ])
-      .pipe(take(1))
-      .subscribe(([thermalLayers, informes, planta]) => {
-        // nos suscribimos a las capas termica y de anomalias
-        this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers));
-        this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers));
+      // Obtenemos todas las capas para esta planta
+      combineLatest([
+        this.plantaService.getThermalLayers$(this.plantaId),
+        this.informeService.getInformesDePlanta(this.plantaId),
+        this.plantaService.getPlanta(this.plantaId),
+      ])
+        .pipe(take(1))
+        .subscribe(([thermalLayers, informes, planta]) => {
+          // nos suscribimos a las capas termica y de anomalias
+          this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers));
+          this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers));
 
-        // Para cada informe, hay que crear 2 capas: térmica y vectorial
-        informes
-          .sort((a, b) => a.fecha - b.fecha)
-          .forEach((informe) => {
-            // Crear capa térmica si es planta tipo "fija"
-            if (planta.tipo !== 'seguidores') {
-              const tl = thermalLayers.filter((item) => item.informeId === informe.id);
+          this.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
+
+          // Para cada informe, hay que crear 2 capas: térmica y vectorial
+          informes
+            .sort((a, b) => a.fecha - b.fecha)
+            .forEach((informe) => {
+              const tl = thermalLayers.find((item) => item.informeId === informe.id);
 
               // TODO: Comprobar que existe...
-              if (tl.length > 0) {
-                this.olMapService.addThermalLayer(this._createThermalLayer(tl[0], informe.id));
+              if (tl !== undefined) {
+                this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id));
               }
-            }
-            this.informesList.push(informe.id);
+              // this.informeIdList.push(informe.id);
 
-            // crear capa de las anomalias
-            this.olMapService.addAnomaliaLayer(this._createAnomaliaLayer(informe.id));
-          });
+              // creamos las capas de anomalías para los diferentes informes
+              this.olMapService.addAnomaliaLayer(this._createAnomaliaLayer(informe.id));
+            });
 
-        this.planta = planta;
+          this.planta = planta;
 
-        // seleccionamos el informe mas reciente de la planta
-        this.selectedInformeId = this.informesList[this.informesList.length - 1];
+          // seleccionamos el informe mas reciente de la planta
+          this.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
-        // asignamos el informe para compartir
-        this.shareReportService.setInformeID(this.informesList[this.informesList.length - 1]);
+          // asignamos los IDs necesarios para compartir
+          this.shareReportService.setIDs(this.informeIdList[this.informeIdList.length - 1], this.plantaId);
 
-        this.mapControlService.selectedInformeId = this.informesList[this.informesList.length - 1];
+          this.mapControlService.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
-        this.initMap();
-      });
+          this.initMap();
+        });
+    });
   }
 
   private _createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {

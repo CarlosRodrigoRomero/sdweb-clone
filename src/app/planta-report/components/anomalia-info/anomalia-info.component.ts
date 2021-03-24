@@ -1,12 +1,12 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Anomalia } from '@core/models/anomalia';
-import { ModuloInterface } from '@core/models/modulo';
 import { PcInterface } from '@core/models/pc';
 
 import { GLOBAL } from '@core/services/global';
 import { PlantaService } from '@core/services/planta.service';
+import { ShareReportService } from '@core/services/share-report.service';
 
 interface InfoAdicional {
   id?: string;
@@ -54,7 +54,12 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   private plantaId: string;
   private nombrePlanta: string;
 
-  constructor(private plantaService: PlantaService, private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private plantaService: PlantaService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    private shareReportService: ShareReportService
+  ) {}
 
   ngOnInit(): void {
     this.pcDescripcion = GLOBAL.pcDescripcion;
@@ -65,7 +70,13 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
       gradienteNormalizado: 'number',
       perdidas: 'number',
     };
-    this.activatedRoute.params.subscribe((params: Params) => (this.plantaId = params.id));
+
+    if (this.router.url.includes('shared')) {
+      this.shareReportService.getParams().subscribe((params) => (this.plantaId = params.plantaId));
+    } else {
+      this.plantaId = this.activatedRoute.snapshot.paramMap.get('id');
+    }
+
     this.plantaService.getPlanta(this.plantaId).subscribe((planta) => (this.nombrePlanta = planta.nombre));
   }
 

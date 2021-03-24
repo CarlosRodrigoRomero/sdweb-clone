@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -19,7 +20,8 @@ export class ShareMapComponent implements OnInit {
   constructor(
     private shareReportService: ShareReportService,
     private clipboardService: ClipboardService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {}
 
   ngOnInit(): void {}
@@ -31,9 +33,16 @@ export class ShareMapComponent implements OnInit {
     // luego recibimos el ID donde se han guardado
     const id = this.shareReportService.getParamsDbId();
 
-    const link = 'localhost:4200/shared/' + id;
+    const currentUrl = this.router.url.split('/');
 
-    return link;
+    let url;
+    if (currentUrl[0] !== '') {
+      url = currentUrl[0] + '/shared/' + id;
+    } else {
+      url = 'localhost:4200/shared/' + id;
+    }
+
+    return url;
   }
 
   copyLink() {

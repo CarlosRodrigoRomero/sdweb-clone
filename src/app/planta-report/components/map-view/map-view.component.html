@@ -53,11 +53,11 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <div class="rel">
+    <div *ngIf="anomaliasLoaded" class="rel">
       <!-- MAPA -->
       <app-map></app-map>
 
-      <div *ngIf="anomaliasLoaded">
+      <div>
         <div class="btns-export">
           <!-- BOTON COMPARTIR -->
           <app-share-map *ngIf="!sharedReport"></app-share-map>

@@ -1,10 +1,19 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+
+import { BehaviorSubject, Observable } from 'rxjs';
+
+import { InformeService } from '@core/services/informe.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MapControlService {
+  private informesList: string[] = [];
+  public informesList$ = new BehaviorSubject<string[]>(this.informesList);
+
+  private initialized = false;
+  private initialized$ = new BehaviorSubject<boolean>(this.initialized);
+
   private _sliderMin: number = 25;
   public sliderMinSource = new BehaviorSubject<number>(this._sliderMin);
 
@@ -17,11 +26,32 @@ export class MapControlService {
   private _sliderThermalOpacity: number = 100;
   public sliderThermalOpacitySource = new BehaviorSubject<number>(this._sliderThermalOpacity);
 
-  private _selectedInformeId: string = '';
+  private _selectedInformeId: string = undefined;
   private selectedInformeIdSource = new BehaviorSubject<string>(this._selectedInformeId);
   public selectedInformeId$ = this.selectedInformeIdSource.asObservable();
 
-  constructor() {}
+  constructor(private informeService: InformeService) {}
+
+  initService(plantaId: string) {
+    this.informeService.getInformesDePlanta(plantaId).subscribe((informes) => {
+      // los ordenamos de menos a mas reciente y los añadimos a la lista
+      informes
+        .sort((a, b) => a.fecha - b.fecha)
+        .forEach((informe) => {
+          this.informesList.push(informe.id);
+        });
+      this.informesList$.next(this.informesList);
+
+      // indicamos el informe seleccionado
+      this._selectedInformeId = this.informesList[this.informesList.length];
+      this.selectedInformeIdSource.next(this._selectedInformeId);
+
+      this.initialized$.next(true);
+    });
+
+    return this.initialized$;
+  }
+
   /////////////////
   get sliderMin() {
     return this._sliderMin;

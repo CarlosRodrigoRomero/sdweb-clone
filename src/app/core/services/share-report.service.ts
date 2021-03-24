@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
@@ -14,7 +14,6 @@ import { ModuloPcFilter } from '@core/models/moduloFilter';
 import { TipoPcFilter } from '@core/models/tipoPcFilter';
 import { ZonaFilter } from '@core/models/zonaFilter';
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
-import { Observable } from 'ol';
 
 @Injectable({
   providedIn: 'root',
@@ -22,12 +21,24 @@ import { Observable } from 'ol';
 export class ShareReportService {
   private params: ParamsFilterShare = {};
   private params$ = new BehaviorSubject<ParamsFilterShare>(this.params);
-  private id: string;
+  private idDB: string;
 
   constructor(private afs: AngularFirestore) {}
 
-  setInformeID(id: string) {
-    this.params.informeID = id;
+  initService(id: string) {
+    this.afs
+      .collection('share')
+      .doc(id)
+      .get()
+      .subscribe((params) => {
+        this.params = params.data();
+        this.params$.next(this.params);
+      });
+  }
+
+  setIDs(informeId: string, plantaId: string) {
+    this.params.informeId = informeId;
+    this.params.plantaId = plantaId;
     this.params$.next(this.params);
   }
 
@@ -98,7 +109,7 @@ export class ShareReportService {
   resetAllParams() {
     // resetea todos los parametros excepto el informeID
     Object.keys(this.params).forEach((i) => {
-      if (this.params[i] !== this.params.informeID) {
+      if (this.params[i] !== this.params.informeId) {
         this.params[i] = null;
       }
     });
@@ -106,13 +117,13 @@ export class ShareReportService {
 
   saveParams() {
     // guarda los params en la DB
-    this.id = this.afs.createId();
+    this.idDB = this.afs.createId();
     this.afs
       .collection('share')
-      .doc(this.id)
+      .doc(this.idDB)
       .set(this.params)
       .then(() => {
-        console.log('Params guardados correctamente ' + this.id);
+        console.log('Params guardados correctamente ' + this.idDB);
       })
       .catch((error) => {
         console.error('Error writing document: ', error);
@@ -120,18 +131,11 @@ export class ShareReportService {
   }
 
   getParamsDbId(): string {
-    return this.id;
+    return this.idDB;
   }
 
   getParamsById(id: string) {
-    this.afs
-      .collection('share')
-      .doc(id)
-      .get()
-      .subscribe((params) => {
-        this.params = params.data();
-        this.params$.next(this.params);
-      });
+    return this.afs.collection('share').doc(id);
   }
 
   getParams() {
@@ -179,7 +183,7 @@ export class ShareReportService {
             const moduloFilter = new ModuloPcFilter('', 'modulo', this.params.modulo);
             filters.push(moduloFilter);
           }
-        } else if (Object.keys(this.params).includes('')) {
+        } else if (Object.keys(this.params).includes('tipo')) {
           if (this.params.tipo !== null) {
             const tipoFilter = new TipoPcFilter('', 'tipo', this.params.tipo);
             filters.push(tipoFilter);

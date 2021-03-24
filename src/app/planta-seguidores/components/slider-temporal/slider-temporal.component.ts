@@ -23,7 +23,7 @@ export class SliderTemporalComponent implements OnInit {
   private sliderLoaded = false;
   public sliderLoaded$ = new BehaviorSubject<boolean>(this.sliderLoaded);
 
-  /* Slider Año */
+  /* Slider Values */
   currentYear = 100;
   dates: string[] = [];
   optionsTemporalSlider: Options = {

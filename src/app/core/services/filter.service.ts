@@ -41,9 +41,13 @@ export class FilterService {
         this.filteredElements$.next(array);
         if (shared) {
           // obtenemos lo filtros guardados en al DB y los añadimos
-          this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => this.addFilters(filters));
+          this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
+            this.addFilters(filters);
+            this.initialized$.next(true);
+          });
+        } else {
+          this.initialized$.next(true);
         }
-        this.initialized$.next(true);
 
         // para contabilizar los diferentes filtros 'tipo'
         this.filteredElementsWithoutFilterTipo = array;

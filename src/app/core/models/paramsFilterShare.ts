@@ -1,7 +1,8 @@
 import { Coordinate } from 'ol/coordinate';
 
 export interface ParamsFilterShare {
-  informeID?: string;
+  informeId?: string;
+  plantaId?: string;
   minGradient?: number;
   maxGradient?: number;
   minPerdidas?: number;
