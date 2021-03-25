@@ -7,8 +7,6 @@ import { FilterService } from '@core/services/filter.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
 import { SeveridadFilter } from '@core/models/clasePcFilter';
-import { take } from 'rxjs/operators';
-import { BehaviorSubject } from 'rxjs';
 
 interface Severidad {
   label?: string;
@@ -34,7 +32,7 @@ export class ClaseFilterComponent implements OnInit {
     GLOBAL.labels_severidad.forEach((label, index) =>
       this.severidadElems.push({
         label,
-        completed: true,
+        completed: false,
       })
     );
 
@@ -55,7 +53,7 @@ export class ClaseFilterComponent implements OnInit {
         GLOBAL.labels_severidad.indexOf(event.source.name) + 1
       );
       this.filterService.addFilter(this.filtroClase);
-      this.filterControlService.severidadSelected[event.source.id.replace('CoA_', '')] = true;
+      this.filterControlService.severidadSelected[parseInt(event.source.id.replace('CoA_', '')) - 1] = true;
     } else {
       this.filterService.filters$.subscribe((filters) =>
         filters
@@ -66,7 +64,7 @@ export class ClaseFilterComponent implements OnInit {
             }
           })
       );
-      this.filterControlService.severidadSelected[event.source.id.replace('CoA_', '')] = false;
+      this.filterControlService.severidadSelected[parseInt(event.source.id.replace('CoA_', '')) - 1] = false;
     }
   }
 }

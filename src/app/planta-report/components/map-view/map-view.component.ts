@@ -28,7 +28,6 @@ export class MapViewComponent implements OnInit {
   ngOnInit(): void {
     this.reportFijaControlService.initService().subscribe((v) => (this.anomaliasLoaded = v));
     this.reportFijaControlService.sharedReportWithFilters$.subscribe((v) => {
-      console.log(v);
       this.showFilters = v;
     });
   }
