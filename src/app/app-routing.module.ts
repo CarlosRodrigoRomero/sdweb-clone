@@ -27,7 +27,7 @@ export const routes: Routes = [
     loadChildren: () => import('./shared-report/shared-report.module').then((m) => m.SharedReportModule),
   },
   {
-    path: 'editable-shared',
+    path: 'filterable-shared',
     loadChildren: () => import('./shared-report/shared-report.module').then((m) => m.SharedReportModule),
   },
 

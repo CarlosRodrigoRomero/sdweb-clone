@@ -12,7 +12,9 @@ import { MapControlService } from '../services/map-control.service';
 })
 export class ReportFijaControlService {
   private _sharedReport = false;
-  private sharedReport$ = new BehaviorSubject<boolean>(this._sharedReport);
+  public sharedReport$ = new BehaviorSubject<boolean>(this._sharedReport);
+  private _sharedReportWithFilters = true;
+  public sharedReportWithFilters$ = new BehaviorSubject<boolean>(this._sharedReportWithFilters);
   private sharedId: string;
   private _plantaId: string = undefined;
   public plantaId$ = new BehaviorSubject<string>(this._plantaId);
@@ -32,6 +34,11 @@ export class ReportFijaControlService {
     // comprobamos si es un informe compartido
     if (this.router.url.includes('shared')) {
       this.sharedReport = true;
+
+      // comprobamos si es filtrable
+      if (!this.router.url.includes('filterable')) {
+        this.sharedReportWithFilters = false;
+      }
       // obtenemos el ID de la URL
       this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 1];
       // iniciamos el servicio share-report
@@ -85,6 +92,15 @@ export class ReportFijaControlService {
   set sharedReport(value: boolean) {
     this._sharedReport = value;
     this.sharedReport$.next(value);
+  }
+
+  get sharedReportWithFilters() {
+    return this._sharedReportWithFilters;
+  }
+
+  set sharedReportWithFilters(value: boolean) {
+    this._sharedReportWithFilters = value;
+    this.sharedReportWithFilters$.next(value);
   }
 
   get plantaId() {

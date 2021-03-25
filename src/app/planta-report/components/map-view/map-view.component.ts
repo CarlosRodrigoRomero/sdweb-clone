@@ -16,7 +16,7 @@ export class MapViewComponent implements OnInit {
   public rightOpened: boolean;
   public statsOpened: boolean;
   public anomaliasLoaded = false;
-  public sharedReport = false;
+  public showFilters = true;
   public mapLoaded = false;
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
@@ -27,5 +27,9 @@ export class MapViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.reportFijaControlService.initService().subscribe((v) => (this.anomaliasLoaded = v));
+    this.reportFijaControlService.sharedReportWithFilters$.subscribe((v) => {
+      console.log(v);
+      this.showFilters = v;
+    });
   }
 }

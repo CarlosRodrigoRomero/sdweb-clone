@@ -1,7 +1,7 @@
 <mat-sidenav-container class="main-container" [hasBackdrop]="false">
   <!-- SIDENAV FILTROS -->
   <mat-sidenav
-    *ngIf="!sharedReport"
+    *ngIf="showFilters"
     #sidenavLeft
     [(opened)]="leftOpened"
     class="left-sidenav"
@@ -38,7 +38,6 @@
 
   <!-- SIDENAV STATS -->
   <mat-sidenav
-    *ngIf="!sharedReport"
     #sidenavStats
     [(opened)]="statsOpened"
     class="stats-sidenav"
@@ -60,7 +59,7 @@
       <div>
         <div class="btns-export">
           <!-- BOTON COMPARTIR -->
-          <app-share-map *ngIf="!sharedReport"></app-share-map>
+          <app-share-map *ngIf="showFilters"></app-share-map>
 
           <!-- BOTON DESCARGAS -->
           <app-download-report></app-download-report>
@@ -72,7 +71,7 @@
         <div class="map-sliders">
           <div class="grid-sliders">
             <app-slider-termico></app-slider-termico>
-            <app-slider-temporal *ngIf="!sharedReport"></app-slider-temporal>
+            <app-slider-temporal *ngIf="showFilters"></app-slider-temporal>
           </div>
         </div>
       </div>
@@ -81,7 +80,7 @@
     <!-- BOTON SIDENAV FILTROS -->
     <div *ngIf="anomaliasLoaded">
       <button
-        *ngIf="!sharedReport"
+        *ngIf="showFilters"
         mat-raised-button
         class="btn-left"
         (click)="sidenavLeft.toggle()"
@@ -100,13 +99,7 @@
       </button>
 
       <!-- BOTON SIDENAV STATS -->
-      <button
-        *ngIf="!sharedReport"
-        mat-raised-button
-        class="btn-right-stats"
-        (click)="sidenavStats.toggle()"
-        [class.mat-elevation-z2]="true"
-      >
+      <button mat-raised-button class="btn-right-stats" (click)="sidenavStats.toggle()" [class.mat-elevation-z2]="true">
         <mat-icon>query_stats</mat-icon>
         <mat-icon *ngIf="!statsOpened">keyboard_arrow_left</mat-icon>
         <mat-icon *ngIf="statsOpened">keyboard_arrow_right</mat-icon>

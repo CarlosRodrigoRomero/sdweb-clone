@@ -48,7 +48,6 @@ export class ClaseFilterComponent implements OnInit {
   }
 
   onChangeClaseFilter(event: MatButtonToggleChange) {
-    console.log(this.severidadElems);
     if (event.source.checked) {
       this.filtroClase = new SeveridadFilter(
         event.source.id,

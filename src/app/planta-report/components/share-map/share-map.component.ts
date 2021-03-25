@@ -16,7 +16,7 @@ import { ShareReportService } from '@core/services/share-report.service';
 })
 export class ShareMapComponent implements OnInit {
   items: Observable<any[]>;
-  public editableCheck = false;
+  public filterableCheck = false;
 
   constructor(
     private shareReportService: ShareReportService,
@@ -35,8 +35,8 @@ export class ShareMapComponent implements OnInit {
     const id = this.shareReportService.getParamsDbId();
 
     let sharedType = '/shared/';
-    if (this.editableCheck) {
-      sharedType = '/editable-shared/';
+    if (this.filterableCheck) {
+      sharedType = '/filterable-shared/';
     }
 
     const currentUrl = this.router.url.split('/');
