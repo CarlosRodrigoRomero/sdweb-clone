@@ -8,9 +8,9 @@
   <mat-menu class="menu-tipo" #menu="matMenu">
     <div class="grid">
       <div class="labels-tipo">
-        <li *ngFor="let tipo of tiposPcs; index as i" (click)="stopPropagation($event)">
+        <li *ngFor="let tipo of tiposElem; index as i" (click)="stopPropagation($event)">
           <mat-checkbox
-            [(ngModel)]="tipo.completed"
+            [(ngModel)]="tiposCompleted[i]"
             [id]="'tipo_' + (i + 1)"
             [name]="tipo.label"
             (change)="onChangeFiltroTipo($event)"

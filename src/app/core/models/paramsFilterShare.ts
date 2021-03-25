@@ -9,9 +9,9 @@ export interface ParamsFilterShare {
   maxPerdidas?: number;
   minTempMax?: number;
   maxTempMax?: number;
-  coordsArea?: Coordinate[][];
-  clase?: number;
+  area?: number[];
+  clase?: boolean[];
   modulo?: string;
-  tipo?: number;
+  tipo?: number[];
   zona?: string;
 }

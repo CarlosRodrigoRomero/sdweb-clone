@@ -1,21 +1,26 @@
 import { FilterInterface } from './filter';
 import { FiltrableInterface } from './filtrableInterface';
 
-export class TipoPcFilter implements FilterInterface {
+export class TipoElemFilter implements FilterInterface {
   id: string;
   type: string;
   tipo: number;
+  numOfTipos: number;
+  position: number;
 
-  constructor(id: string, type: string, tipo: number) {
+  constructor(id: string, type: string, tipo: number, numOfTipos: number, position: number) {
     this.id = id;
     this.type = type;
     this.tipo = tipo;
+    this.numOfTipos = numOfTipos;
+    this.position = position;
   }
 
-  applyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
-    return pcs.filter((pc) => pc.tipo === this.tipo);
+  applyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
+    // tslint:disable-next-line: triple-equals
+    return elems.filter((elem) => elem.tipo == this.tipo);
   }
-  unapplyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
+  unapplyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
     return null;
   }
 }

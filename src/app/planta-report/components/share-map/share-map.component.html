@@ -7,8 +7,13 @@
       <mat-icon color="primary">link</mat-icon>
       <h5>Obtener enlace</h5>
     </li>
-    <button mat-menu-item class="btn-enviar" (click)="copyLink()">
-      <span>Copiar enlace</span>
-    </button>
+    <li>
+      <mat-checkbox class="editable-check" [(ngModel)]="editableCheck" (click)="stopPropagation($event)"
+        >¿Editable?</mat-checkbox
+      >
+      <button mat-menu-item class="btn-enviar" (click)="copyLink()">
+        <span>Copiar enlace</span>
+      </button>
+    </li>
   </div>
 </mat-menu>

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 
 import { BehaviorSubject } from 'rxjs';
 
+import { ParamsFilterShare } from '@core/models/paramsFilterShare';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -36,10 +38,45 @@ export class FilterControlService {
   private _tiposSelected: boolean[] = [];
   public tiposSelected$ = new BehaviorSubject<boolean[]>(this._tiposSelected);
 
-  private _severidadSelected: string[] = [];
-  public severidadSelected$ = new BehaviorSubject<string[]>(this._severidadSelected);
+  private _severidadSelected: boolean[] = [false, false, false];
+  public severidadSelected$ = new BehaviorSubject<boolean[]>(this._severidadSelected);
 
   constructor() {}
+
+  setInitParams(params: ParamsFilterShare) {
+    // console.log(params);
+    if (params.minPerdidas !== undefined && params.minPerdidas !== null) {
+      this.minPerdidas = params.minPerdidas;
+    }
+    if (params.maxPerdidas !== undefined && params.maxPerdidas !== null) {
+      this.maxPerdidas = params.maxPerdidas;
+    }
+    if (params.minTempMax !== undefined && params.minTempMax !== null) {
+      this.minTempMax = params.minTempMax;
+    }
+    if (params.maxTempMax !== undefined && params.maxTempMax !== null) {
+      this.maxTempMax = params.maxTempMax;
+    }
+    if (params.minGradient !== undefined && params.minGradient !== null) {
+      this.minGradiente = params.minGradient;
+    }
+    if (params.maxGradient !== undefined && params.maxGradient !== null) {
+      this.maxGradiente = params.maxGradient;
+    }
+    if (params.clase !== undefined && params.clase !== null) {
+      this.severidadSelected = params.clase;
+    }
+    if (params.tipo !== undefined && params.tipo !== null) {
+      this.tiposSelected = [];
+      params.tipo.forEach((tipo, index) => {
+        if (tipo !== null) {
+          this.tiposSelected.push(true);
+        } else {
+          this.tiposSelected.push(false);
+        }
+      });
+    }
+  }
 
   /* PERDIDAS */
   get minPerdidas() {
@@ -132,7 +169,7 @@ export class FilterControlService {
     return this._severidadSelected;
   }
 
-  set severidadSelected(value: string[]) {
+  set severidadSelected(value: boolean[]) {
     this._severidadSelected = value;
     this.severidadSelected$.next(value);
   }

@@ -42,8 +42,20 @@ export class AreaFilterComponent implements OnInit {
     this.areaFilters$ = this.filterService.getAllFilters();
   }
 
-  deleteFilter(filter: FilterInterface) {
-    this.filterService.deleteFilter(filter);
+  addAreaFilter(coords: Coordinate[][]) {
+    this.activeFilter = true;
+    this.areaFilter = new AreaFilter('area', coords);
+    this.filterService.addFilter(this.areaFilter);
+  }
+
+  deleteAreaFilter() {
+    this.activeFilter = false;
+
+    // eliminamos el filtro
+    this.filterService.deleteFilter(this.areaFilter);
+
+    // eliminamos el poligono del mapa
+    this.olMapService.deleteAllDrawLayers();
   }
 
   deleteAllTypeFilters(type: string) {
@@ -136,22 +148,6 @@ export class AreaFilterComponent implements OnInit {
           ? 'pointer'
           : '')
     );
-  }
-
-  addAreaFilter(coords: Coordinate[][]) {
-    this.activeFilter = true;
-    this.areaFilter = new AreaFilter('area', coords);
-    this.filterService.addFilter(this.areaFilter);
-  }
-
-  deleteAreaFilter() {
-    this.activeFilter = false;
-
-    // eliminamos el filtro
-    this.filterService.deleteFilter(this.areaFilter);
-
-    // eliminamos el poligono del mapa
-    this.olMapService.deleteAllDrawLayers();
   }
 
   getCoords(event: DrawEvent): Coordinate[][] {

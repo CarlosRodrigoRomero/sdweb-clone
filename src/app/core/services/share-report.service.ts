@@ -9,9 +9,9 @@ import { GradientFilter } from '@core/models/gradientFilter';
 import { PerdidasFilter } from '@core/models/perdidasFilter';
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
 import { AreaFilter } from '@core/models/areaFilter';
-import { ClasePcFilter } from '@core/models/clasePcFilter';
+import { SeveridadFilter } from '@core/models/clasePcFilter';
 import { ModuloPcFilter } from '@core/models/moduloFilter';
-import { TipoPcFilter } from '@core/models/tipoPcFilter';
+import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { ZonaFilter } from '@core/models/zonaFilter';
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 
@@ -57,16 +57,36 @@ export class ShareReportService {
         this.params.maxTempMax = (filter as TempMaxFilter).rangoMax;
         break;
       case 'area':
-        this.params.coordsArea = (filter as AreaFilter).coords;
+        this.params.area = [];
+        (filter as AreaFilter).coords[0].forEach((v) => this.params.area.push(...v));
+        // this.params.coordsArea = [...(filter as AreaFilter).coords[0]];
         break;
       case 'clase':
-        this.params.clase = (filter as ClasePcFilter).clase;
+        if (this.params.clase === undefined || this.params.clase === null) {
+          this.params.clase = [false, false, false];
+          this.params.clase[(filter as SeveridadFilter).clase - 1] = !this.params.clase[
+            (filter as SeveridadFilter).clase - 1
+          ];
+        } else {
+          this.params.clase[(filter as SeveridadFilter).clase - 1] = !this.params.clase[
+            (filter as SeveridadFilter).clase - 1
+          ];
+        }
         break;
       case 'modulo':
         this.params.modulo = (filter as ModuloPcFilter).modulo;
         break;
       case 'tipo':
-        this.params.tipo = (filter as TipoPcFilter).tipo;
+        if (this.params.tipo === undefined || this.params.tipo === null) {
+          // inicializamos el array tipo con valores null
+          this.params.tipo = [];
+          for (let i = 0; i < (filter as TipoElemFilter).numOfTipos; i++) {
+            this.params.tipo.push(null);
+          }
+          this.params.tipo[(filter as TipoElemFilter).position] = (filter as TipoElemFilter).tipo;
+        } else {
+          this.params.tipo[(filter as TipoElemFilter).position] = (filter as TipoElemFilter).tipo;
+        }
         break;
       case 'zona':
         this.params.zona = (filter as ZonaFilter).zona;
@@ -89,16 +109,18 @@ export class ShareReportService {
         this.params.maxTempMax = null;
         break;
       case 'area':
-        this.params.coordsArea = null;
+        this.params.area = null;
         break;
       case 'clase':
-        this.params.clase = null;
+        this.params.clase[(filter as SeveridadFilter).clase - 1] = !this.params.clase[
+          (filter as SeveridadFilter).clase - 1
+        ];
         break;
       case 'modulo':
         this.params.modulo = null;
         break;
       case 'tipo':
-        this.params.tipo = null;
+        this.params.tipo[(filter as TipoElemFilter).position] = null;
         break;
       case 'zona':
         this.params.zona = null;
@@ -169,25 +191,36 @@ export class ShareReportService {
             filters.push(tempMaxFilter);
           }
         } else if (Object.keys(this.params).includes('area')) {
-          if (this.params.coordsArea !== null) {
-            const areaFilter = new AreaFilter('area', this.params.coordsArea);
+          if (this.params.area !== null) {
+            const coordinates = [];
+            this.params.area.forEach((num, index) => {
+              if (!(index % 2)) {
+                const c = [num, this.params.area[index + 1]];
+                coordinates.push(c);
+              }
+            });
+            const areaFilter = new AreaFilter('area', [coordinates]);
             filters.push(areaFilter);
           }
         } else if (Object.keys(this.params).includes('clase')) {
-          if (this.params.clase !== null) {
-            const claseFilter = new ClasePcFilter('', 'clase', this.params.clase);
-            filters.push(claseFilter);
-          }
+          this.params.clase.forEach((sev, index) => {
+            if (sev) {
+              const severityFilter = new SeveridadFilter('', 'clase', index + 1);
+              filters.push(severityFilter);
+            }
+          });
         } else if (Object.keys(this.params).includes('modulo')) {
           if (this.params.modulo !== null) {
             const moduloFilter = new ModuloPcFilter('', 'modulo', this.params.modulo);
             filters.push(moduloFilter);
           }
         } else if (Object.keys(this.params).includes('tipo')) {
-          if (this.params.tipo !== null) {
-            const tipoFilter = new TipoPcFilter('', 'tipo', this.params.tipo);
-            filters.push(tipoFilter);
-          }
+          this.params.tipo.forEach((tipo, index, tipos) => {
+            if (tipo !== undefined) {
+              const tipoFilter = new TipoElemFilter('', 'tipo', tipo, tipos.length, index);
+              filters.push(tipoFilter);
+            }
+          });
         } else if (Object.keys(this.params).includes('zona')) {
           if (this.params.zona !== null) {
             const zonaFilter = new ZonaFilter('', 'zona', this.params.zona);

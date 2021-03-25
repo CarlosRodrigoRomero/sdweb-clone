@@ -1,11 +1,12 @@
 <div class="filtro">
   <h5>Severidad</h5>
-  <mat-button-toggle-group #group="matButtonToggleGroup" multiple="true" [(ngModel)]="severidadSelected">
+  <mat-button-toggle-group #group="matButtonToggleGroup" multiple="true" [(ngModel)]="filterLoaded">
     <mat-button-toggle
       *ngFor="let elem of severidadElems; index as i"
-      value="elem.label"
+      [value]="elem.label"
       [id]="'CoA_' + (i + 1)"
       [name]="elem.label"
+      [checked]="severidadSelected[i]"
       (change)="onChangeClaseFilter($event)"
     >
       <div class="label">

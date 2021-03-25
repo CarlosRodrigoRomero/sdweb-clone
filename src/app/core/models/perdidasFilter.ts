@@ -12,12 +12,11 @@ export class PerdidasFilter implements FilterInterface {
     this.rangoMax = rangoMax;
   }
 
-  applyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
-    return pcs.filter((pc) => pc.perdidas >= this.rangoMin / 100 && pc.perdidas <= this.rangoMax / 100);
-
-    
+  applyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
+    return elems.filter((elem) => elem.perdidas >= this.rangoMin / 100 && elem.perdidas <= this.rangoMax / 100);
   }
-  unapplyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
+
+  unapplyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
     return null;
   }
 }

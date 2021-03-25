@@ -12,7 +12,7 @@ import { AnomaliaService } from '@core/services/anomalia.service';
 import { MapControlService } from 'src/app/planta-report/services/map-control.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
-import { TipoPcFilter } from '@core/models/tipoPcFilter';
+import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { Anomalia } from '@core/models/anomalia';
 
 export interface LabelTipo {
@@ -28,8 +28,8 @@ export interface LabelTipo {
   styleUrls: ['./tipo-filter.component.css'],
 })
 export class TipoFilterComponent implements OnInit {
-  tiposPcs: LabelTipo[] = [];
-  filtroTipo: TipoPcFilter;
+  tiposElem: LabelTipo[] = [];
+  filtroTipo: TipoElemFilter;
   filterTipoCounts: number[] = [];
 
   defaultLabelStatus = true;
@@ -56,16 +56,17 @@ export class TipoFilterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.plantaId = this.route.snapshot.paramMap.get('id');
+    // this.plantaId = this.route.snapshot.paramMap.get('id');
+    this.plantaId = 'egF0cbpXnnBnjcrusoeR';
     this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
     const informeId = this.informesList[1];
 
     this.anomaliaService.getAnomaliasPlanta$(this.plantaId).subscribe((anomalias) => {
-      this.tiposPcs = [];
+      this.tiposElem = [];
       // obtenermos los labels de todas las anomalias
       this._getAllCategorias(anomalias);
       this.labelsCategoria.forEach((label, i) => {
-        this.tiposPcs.push({ label, color: this.coloresCategoria[i] });
+        this.tiposElem.push({ label, color: this.coloresCategoria[i] });
       });
       this.numsCategoria.forEach((num) => {
         this.filterTipoCounts.push(
@@ -74,13 +75,14 @@ export class TipoFilterComponent implements OnInit {
       });
     });
 
-    // inicializamos los tipos seleccionados en el fiter control
-    this.tiposPcs.forEach((tipoPc) => this.tiposCompleted.push(false));
-    this.filterControlService.tiposSelected = this.tiposCompleted;
+    // inicializamos los tipos seleccionados en el filter control
+    // this.tiposElem.forEach(() => this.tiposCompleted.push(false));
+    // this.filterControlService.tiposSelected = this.tiposCompleted;
+    this.filterControlService.tiposSelected$.subscribe((tiposSel) => (this.tiposCompleted = tiposSel));
 
     // nos suscribimos para poder checkear desde otros lugares
     this.filterControlService.tiposSelected$.subscribe((sel) =>
-      this.tiposPcs.forEach((tipoPc, index) => (tipoPc.completed = sel[index]))
+      this.tiposElem.forEach((tipoPc, index) => (tipoPc.completed = sel[index]))
     );
 
     // nos suscribimos a los labels del filter control
@@ -110,7 +112,13 @@ export class TipoFilterComponent implements OnInit {
 
   onChangeFiltroTipo(event: MatCheckboxChange) {
     if (event.checked) {
-      this.filtroTipo = new TipoPcFilter(event.source.id, 'tipo', GLOBAL.labels_tipos.indexOf(event.source.name));
+      this.filtroTipo = new TipoElemFilter(
+        event.source.id,
+        'tipo',
+        GLOBAL.labels_tipos.indexOf(event.source.name),
+        this.tiposElem.length,
+        parseInt(event.source.id.replace('tipo_', '')) - 1
+      );
       this.filterService.addFilter(this.filtroTipo);
 
       // añadimos el tipo seleccionado a la variable

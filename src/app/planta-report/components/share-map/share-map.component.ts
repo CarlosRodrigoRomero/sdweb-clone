@@ -16,6 +16,7 @@ import { ShareReportService } from '@core/services/share-report.service';
 })
 export class ShareMapComponent implements OnInit {
   items: Observable<any[]>;
+  public editableCheck = false;
 
   constructor(
     private shareReportService: ShareReportService,
@@ -33,13 +34,18 @@ export class ShareMapComponent implements OnInit {
     // luego recibimos el ID donde se han guardado
     const id = this.shareReportService.getParamsDbId();
 
+    let sharedType = '/shared/';
+    if (this.editableCheck) {
+      sharedType = '/editable-shared/';
+    }
+
     const currentUrl = this.router.url.split('/');
 
     let url;
     if (currentUrl[0] !== '') {
-      url = currentUrl[0] + '/shared/' + id;
+      url = currentUrl[0] + sharedType + id;
     } else {
-      url = 'localhost:4200/shared/' + id;
+      url = 'localhost:4200' + sharedType + id;
     }
 
     return url;

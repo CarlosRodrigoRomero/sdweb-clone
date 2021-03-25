@@ -6,7 +6,9 @@ import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
-import { ClasePcFilter } from '@core/models/clasePcFilter';
+import { SeveridadFilter } from '@core/models/clasePcFilter';
+import { take } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
 
 interface Severidad {
   label?: string;
@@ -21,34 +23,40 @@ interface Severidad {
 export class ClaseFilterComponent implements OnInit {
   severidadElems: Severidad[] = [];
   allComplete: boolean;
-  filtroClase: ClasePcFilter;
+  filtroClase: SeveridadFilter;
   coloresSeveridad: string[];
-
-  severidadSelected: string[] = undefined;
+  public severidadSelected: boolean[] = [false, false, false];
+  public filterLoaded = false;
 
   constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
 
   ngOnInit(): void {
-    GLOBAL.labels_severidad.forEach((label) =>
+    GLOBAL.labels_severidad.forEach((label, index) =>
       this.severidadElems.push({
         label,
-        completed: false,
+        completed: true,
       })
     );
+
     this.coloresSeveridad = GLOBAL.colores_severidad;
 
-    this.filterControlService.severidadSelected$.subscribe((sel) => (this.severidadSelected = sel));
+    this.filterControlService.severidadSelected$.subscribe((sel) => {
+      this.severidadSelected = sel;
+
+      this.filterLoaded = true;
+    });
   }
 
   onChangeClaseFilter(event: MatButtonToggleChange) {
+    console.log(this.severidadElems);
     if (event.source.checked) {
-      this.filtroClase = new ClasePcFilter(
+      this.filtroClase = new SeveridadFilter(
         event.source.id,
         'clase',
         GLOBAL.labels_severidad.indexOf(event.source.name) + 1
       );
       this.filterService.addFilter(this.filtroClase);
-      this.filterControlService.severidadSelected.push(event.source.name);
+      this.filterControlService.severidadSelected[event.source.id.replace('CoA_', '')] = true;
     } else {
       this.filterService.filters$.subscribe((filters) =>
         filters
@@ -59,9 +67,7 @@ export class ClaseFilterComponent implements OnInit {
             }
           })
       );
-      this.filterControlService.severidadSelected = this.filterControlService.severidadSelected.filter(
-        (sel) => sel !== event.source.name
-      );
+      this.filterControlService.severidadSelected[event.source.id.replace('CoA_', '')] = false;
     }
   }
 }

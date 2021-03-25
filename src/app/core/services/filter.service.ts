@@ -5,9 +5,11 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { AnomaliaService } from './anomalia.service';
 import { ShareReportService } from '@core/services/share-report.service';
 import { SeguidorService } from '@core/services/seguidor.service';
+import { FilterControlService } from '@core/services/filter-control.service';
 
 import { FiltrableInterface } from '@core/models/filtrableInterface';
 import { FilterInterface } from '@core/models/filter';
+import { filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +33,8 @@ export class FilterService {
   constructor(
     private anomaliaService: AnomaliaService,
     private shareReportService: ShareReportService,
-    private seguidorService: SeguidorService
+    private seguidorService: SeguidorService,
+    private filterControlService: FilterControlService
   ) {}
 
   initService(shared: boolean, plantaId: string, plantaFija: boolean, sharedId?: string): Observable<boolean> {
@@ -40,6 +43,8 @@ export class FilterService {
         this._allFiltrableElements = array;
         this.filteredElements$.next(array);
         if (shared) {
+          this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params));
+
           // obtenemos lo filtros guardados en al DB y los añadimos
           this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
             this.addFilters(filters);
