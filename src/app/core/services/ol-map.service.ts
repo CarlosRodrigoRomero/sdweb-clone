@@ -9,13 +9,16 @@ import LayerGroup from 'ol/layer/Group';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import TileLayer from 'ol/layer/Tile';
+import { Draw } from 'ol/interaction';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OlMapService {
   private map = {};
-  private map$ = new BehaviorSubject<any>(this.map);
+  public map$ = new BehaviorSubject<any>(this.map);
+  private _draw: Draw = undefined;
+  public draw$ = new BehaviorSubject<Draw>(this._draw);
   private drawLayers: VectorLayer[] = [];
   private thermalLayers: TileLayer[] = [];
   private thermalLayers$ = new BehaviorSubject<TileLayer[]>(this.thermalLayers);
@@ -93,5 +96,14 @@ export class OlMapService {
 
   getIncrementoLayers() {
     return this.incrementoLayers$.asObservable();
+  }
+
+  get draw() {
+    return this._draw;
+  }
+
+  set draw(value: Draw) {
+    this._draw = value;
+    this.draw$.next(value);
   }
 }

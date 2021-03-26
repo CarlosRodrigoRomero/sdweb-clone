@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+
+import { OlMapService } from '@core/services/ol-map.service';
 
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 
@@ -41,7 +43,13 @@ export class FilterControlService {
   private _severidadSelected: boolean[] = [false, false, false];
   public severidadSelected$ = new BehaviorSubject<boolean[]>(this._severidadSelected);
 
-  constructor() {}
+  private _activeDrawArea: boolean = false;
+  public activeDrawArea$ = new BehaviorSubject<boolean>(this._activeDrawArea);
+
+  private _activeDeleteArea: boolean = false;
+  public activeDeleteArea$ = new BehaviorSubject<boolean>(this._activeDeleteArea);
+
+  constructor(private olMapService: OlMapService) {}
 
   setInitParams(params: ParamsFilterShare) {
     // console.log(params);
@@ -68,7 +76,7 @@ export class FilterControlService {
     }
     if (params.tipo !== undefined && params.tipo !== null) {
       this.tiposSelected = [];
-      params.tipo.forEach((tipo, index) => {
+      params.tipo.forEach((tipo) => {
         if (tipo !== null) {
           this.tiposSelected.push(true);
         } else {
@@ -76,6 +84,43 @@ export class FilterControlService {
         }
       });
     }
+  }
+
+  resetFilters() {
+    // PERDIDAS
+    this.minPerdidas = this.minPerdidasDefault;
+    this.maxPerdidas = this.maxPerdidasDefault;
+
+    // TEMPERATURA MAXIMA
+    this.minTempMax = this.minTempMaxDefault;
+    this.maxTempMax = this.maxTempMaxDefault;
+
+    // GRADIENTE NORMALIZADO
+    this.minGradiente = this.minGradienteDefault;
+    this.maxGradiente = this.maxGradienteDefault;
+
+    // TIPOS DE ANOMALIAS
+    const tipSel: boolean[] = [];
+    this.tiposSelected.forEach((sel) => {
+      tipSel.push(false);
+    });
+    this.tiposSelected = tipSel;
+    // Labels tipos de anomalias
+    this.selectedTipoLabels = [this.selectedTipoDefaultLabel];
+    this.labelTipoDefaultStatus = true;
+
+    // SEVERIDAD
+    this.severidadSelected = [false, false, false];
+
+    // AREA
+    this.activeDrawArea = false;
+    this.activeDeleteArea = false;
+    // elimina el poligono del mapa
+    this.olMapService.deleteAllDrawLayers();
+    // cancelamos interacción draw
+    combineLatest([this.olMapService.map$, this.olMapService.draw$]).subscribe(([map, draw]) => {
+      map.removeInteraction(draw);
+    });
   }
 
   /* PERDIDAS */
@@ -172,5 +217,24 @@ export class FilterControlService {
   set severidadSelected(value: boolean[]) {
     this._severidadSelected = value;
     this.severidadSelected$.next(value);
+  }
+
+  /* AREA */
+  get activeDrawArea() {
+    return this._activeDrawArea;
+  }
+
+  set activeDrawArea(value: boolean) {
+    this._activeDrawArea = value;
+    this.activeDrawArea$.next(value);
+  }
+
+  get activeDeleteArea() {
+    return this._activeDeleteArea;
+  }
+
+  set activeDeleteArea(value: boolean) {
+    this._activeDeleteArea = value;
+    this.activeDeleteArea$.next(value);
   }
 }

@@ -7,6 +7,7 @@ import { FilterService } from '@core/services/filter.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
 import { SeveridadFilter } from '@core/models/clasePcFilter';
+import { take } from 'rxjs/operators';
 
 interface Severidad {
   label?: string;
@@ -24,7 +25,6 @@ export class ClaseFilterComponent implements OnInit {
   filtroClase: SeveridadFilter;
   coloresSeveridad: string[];
   public severidadSelected: boolean[] = [false, false, false];
-  public filterLoaded = false;
 
   constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
 
@@ -40,8 +40,6 @@ export class ClaseFilterComponent implements OnInit {
 
     this.filterControlService.severidadSelected$.subscribe((sel) => {
       this.severidadSelected = sel;
-
-      this.filterLoaded = true;
     });
   }
 
@@ -55,7 +53,7 @@ export class ClaseFilterComponent implements OnInit {
       this.filterService.addFilter(this.filtroClase);
       this.filterControlService.severidadSelected[parseInt(event.source.id.replace('CoA_', '')) - 1] = true;
     } else {
-      this.filterService.filters$.subscribe((filters) =>
+      this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
         filters
           .filter((filter) => filter.type === 'clase')
           .forEach((filter) => {

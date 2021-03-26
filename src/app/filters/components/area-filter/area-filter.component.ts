@@ -17,6 +17,7 @@ import { click } from 'ol/events/condition';
 
 import { FilterService } from '@core/services/filter.service';
 import { OlMapService } from '@core/services/ol-map.service';
+import { FilterControlService } from '@core/services/filter-control.service';
 
 import { AreaFilter } from '@core/models/areaFilter';
 import { FilterInterface } from '@core/models/filter';
@@ -29,37 +30,67 @@ import { FilterInterface } from '@core/models/filter';
 export class AreaFilterComponent implements OnInit {
   public areaFilters$: Observable<FilterInterface[]>;
   public map: Map;
-  activeFilter = false;
+  public activeDraw = false;
+  public activeDeleteButton = false;
+  private draw: Draw;
 
   areaFilter: AreaFilter;
   vectorArea: VectorLayer;
   deleteButton: VectorLayer;
 
-  constructor(private filterService: FilterService, private olMapService: OlMapService) {}
+  constructor(
+    private filterService: FilterService,
+    private olMapService: OlMapService,
+    private filterControlService: FilterControlService
+  ) {}
 
   ngOnInit(): void {
-    this.olMapService.getMap().subscribe((map) => (this.map = map));
+    this.olMapService.map$.subscribe((map) => (this.map = map));
     this.areaFilters$ = this.filterService.getAllFilters();
+    this.filterControlService.activeDrawArea$.subscribe((value) => (this.activeDraw = value));
+    this.filterControlService.activeDeleteArea$.subscribe((value) => (this.activeDeleteButton = value));
+    this.olMapService.draw$.subscribe((draw) => (this.draw = draw));
   }
 
   addAreaFilter(coords: Coordinate[][]) {
-    this.activeFilter = true;
+    this.activeDraw = true;
     this.areaFilter = new AreaFilter('area', coords);
     this.filterService.addFilter(this.areaFilter);
   }
 
   deleteAreaFilter() {
-    this.activeFilter = false;
+    this.activeDraw = false;
 
     // eliminamos el filtro
     this.filterService.deleteFilter(this.areaFilter);
 
     // eliminamos el poligono del mapa
     this.olMapService.deleteAllDrawLayers();
+
+    // cambiamos el boton a dibujar area
+    this.activeDeleteButton = false;
   }
 
   deleteAllTypeFilters(type: string) {
     this.filterService.deleteAllTypeFilters(type);
+  }
+
+  clickButtonDraw() {
+    this.activeDraw = !this.activeDraw;
+
+    // si hay un area dibujada la eliminamos...
+    if (this.activeDeleteButton) {
+      this.deleteAreaFilter();
+    } else {
+      // ... si no...
+      if (this.activeDraw) {
+        // comenzamos el modo draw
+        this.drawArea();
+      } else {
+        // terminamos el modo draw
+        this.map.removeInteraction(this.draw);
+      }
+    }
   }
 
   drawArea() {
@@ -79,13 +110,15 @@ export class AreaFilterComponent implements OnInit {
 
     this.map.addLayer(this.vectorArea);
 
-    const draw = new Draw({
+    this.draw = new Draw({
       source: sourceArea,
       type: GeometryType.POLYGON,
     });
-    this.map.addInteraction(draw);
+    this.olMapService.draw = this.draw;
 
-    draw.on('drawend', (evt) => {
+    this.map.addInteraction(this.draw);
+
+    this.draw.on('drawend', (evt) => {
       // desactivamos el dobleclick para que no interfiera al cerrar poligono
       this.map.getInteractions().forEach((interaction) => {
         if (interaction instanceof DoubleClickZoom) {
@@ -102,7 +135,10 @@ export class AreaFilterComponent implements OnInit {
       this.addAreaFilter(coords);
 
       // terminamos el modo draw
-      this.map.removeInteraction(draw);
+      this.map.removeInteraction(this.draw);
+
+      // activamos el boton borrar area
+      this.activeDeleteButton = true;
     });
   }
 

@@ -31,24 +31,11 @@ export class FiltersPanelComponent implements OnInit {
     // borra todos los filtros
     this.filterService.deleteAllFilters();
 
-    // elimina el poligono del mapa
+   /*  // elimina el poligono del mapa
     this.olMapService.deleteAllDrawLayers();
 
-    // PERDIDAS
-    this.filterControlService.minPerdidas = this.filterControlService.minPerdidasDefault;
-    this.filterControlService.maxPerdidas = this.filterControlService.maxPerdidasDefault;
-    // TEMPERATURA MAXIMA
-    this.filterControlService.minTempMax = this.filterControlService.minTempMaxDefault;
-    this.filterControlService.maxTempMax = this.filterControlService.maxTempMaxDefault;
-    // GRADIENTE NORMALIZADO
-    this.filterControlService.minGradiente = this.filterControlService.minGradienteDefault;
-    this.filterControlService.maxGradiente = this.filterControlService.maxGradienteDefault;
-    /* TIPOS DE ANOMALIAS */
-    this.filterControlService.tiposSelected = this.filterControlService.tiposSelectedDefault;
-    /* Labels tipos de anomalias */
-    this.filterControlService.selectedTipoLabels = [this.filterControlService.selectedTipoDefaultLabel];
-    this.filterControlService.labelTipoDefaultStatus = true;
-    /* SEVERIDAD */
-    this.filterControlService.severidadSelected = undefined;
+    this.olMapService.getMap().subscribe(map => map.removeInteraction()) */
+
+    this.filterControlService.resetFilters();
   }
 }

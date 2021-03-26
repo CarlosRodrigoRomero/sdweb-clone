@@ -153,7 +153,6 @@ export class FilterService {
   }
 
   deleteFilter(filter: FilterInterface) {
-    console.log(this.filters);
     // comprobamos que no es de tipo 'Add'
     if (!this.typeAddFilters.includes(filter.type)) {
       // eliminamos el filtro anterior del mismo tipo que el recibido
@@ -162,8 +161,6 @@ export class FilterService {
       this.filters.splice(this.filters.indexOf(filter), 1);
     }
     this.filters$.next(this.filters);
-
-    console.log(this.filters);
 
     // reseteamos parametros para compartir
     this.shareReportService.resetParams(filter);

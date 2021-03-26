@@ -5,7 +5,7 @@
       *ngFor="let elem of severidadElems; index as i"
       [id]="'CoA_' + (i + 1)"
       [name]="elem.label"
-      [(checked)]="severidadSelected[i]"
+      [checked]="severidadSelected[i]"
       (change)="onChangeClaseFilter($event)"
     >
       <div class="label">

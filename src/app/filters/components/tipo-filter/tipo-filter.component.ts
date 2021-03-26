@@ -36,7 +36,7 @@ export class TipoFilterComponent implements OnInit {
   defaultSelectLabel = 'Tipo de anomalía';
   selectedLabels: string[] = [this.defaultSelectLabel];
 
-  tiposCompleted: boolean[];
+  tiposSelected: boolean[];
   selection = new SelectionModel<LabelTipo>(true, []);
 
   public plantaId: string;
@@ -67,6 +67,8 @@ export class TipoFilterComponent implements OnInit {
       this._getAllCategorias(anomalias);
       this.labelsCategoria.forEach((label, i) => {
         this.tiposElem.push({ label, color: this.coloresCategoria[i] });
+
+        this.tiposSelected.push(false);
       });
       this.numsCategoria.forEach((num) => {
         this.filterTipoCounts.push(
@@ -75,15 +77,13 @@ export class TipoFilterComponent implements OnInit {
       });
     });
 
-    // inicializamos los tipos seleccionados en el filter control
-    // this.tiposElem.forEach(() => this.tiposCompleted.push(false));
-    // this.filterControlService.tiposSelected = this.tiposCompleted;
-    this.filterControlService.tiposSelected$.subscribe((tiposSel) => (this.tiposCompleted = tiposSel));
+    // nos suscribimos a los tipos seleccionados de filter control
+    this.filterControlService.tiposSelected$.subscribe((tiposSel) => (this.tiposSelected = tiposSel));
 
     // nos suscribimos para poder checkear desde otros lugares
-    this.filterControlService.tiposSelected$.subscribe((sel) =>
+    /*  this.filterControlService.tiposSelected$.subscribe((sel) =>
       this.tiposElem.forEach((tipoPc, index) => (tipoPc.completed = sel[index]))
-    );
+    ); */
 
     // nos suscribimos a los labels del filter control
     this.filterControlService.selectedTipoLabels$.subscribe((labels) => (this.selectedLabels = labels));
@@ -121,6 +121,8 @@ export class TipoFilterComponent implements OnInit {
       );
       this.filterService.addFilter(this.filtroTipo);
 
+      this.filterControlService.tiposSelected[parseInt(event.source.id.replace('tipo_', '')) - 1] = true;
+
       // añadimos el tipo seleccionado a la variable
       if (this.selectedLabels[0] !== this.defaultSelectLabel) {
         this.filterControlService.selectedTipoLabels.push(event.source.name);
@@ -138,6 +140,8 @@ export class TipoFilterComponent implements OnInit {
             }
           })
       );
+
+      this.filterControlService.tiposSelected[parseInt(event.source.id.replace('tipo_', '')) - 1] = false;
 
       // eliminamos el 'tipo' de seleccionados
       this.selectedLabels = this.selectedLabels.filter((sel) => sel !== event.source.name);

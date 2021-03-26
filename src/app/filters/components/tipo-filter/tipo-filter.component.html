@@ -10,7 +10,7 @@
       <div class="labels-tipo">
         <li *ngFor="let tipo of tiposElem; index as i" (click)="stopPropagation($event)">
           <mat-checkbox
-            [(ngModel)]="tiposCompleted[i]"
+            [checked]="tiposSelected[i]"
             [id]="'tipo_' + (i + 1)"
             [name]="tipo.label"
             (change)="onChangeFiltroTipo($event)"
