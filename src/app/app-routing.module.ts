@@ -9,30 +9,30 @@ import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
 
 export const routes: Routes = [
   { path: '', loadChildren: () => import('./auth/auth.module').then((m) => m.AuthenticationModule) },
-  { path: 'aviso-legal', component: AvisoLegalComponent },
+  // { path: 'aviso-legal', component: AvisoLegalComponent },
   // { path: 'login', component: LoginComponent },
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then((m) => m.AuthenticationModule) },
-  {
-    path: 'admin',
-    loadChildren: () => import('./admin/admin.module').then((m) => m.AdminModule),
-    canActivate: [AuthGuard],
-  },
+  // {
+  //   path: 'admin',
+  //   loadChildren: () => import('./admin/admin.module').then((m) => m.AdminModule),
+  //   canActivate: [AuthGuard],
+  // },
   {
     path: 'clientes',
     loadChildren: () => import('./clientes/clientes.module').then((m) => m.ClientesModule),
     canActivate: [AuthGuard],
   },
-  {
-    path: 'v',
-    component: PubliclayoutComponent,
-    children: [
-      {
-        path: 'davidignis',
-        component: VideoComponent,
-        data: { nombre: 'David Parra', codigo: 'd0ekj87q0d' },
-      },
-    ],
-  },
+  // {
+  //   path: 'v',
+  //   component: PubliclayoutComponent,
+  //   children: [
+  //     {
+  //       path: 'davidignis',
+  //       component: VideoComponent,
+  //       data: { nombre: 'David Parra', codigo: 'd0ekj87q0d' },
+  //     },
+  //   ],
+  // },
 
   // // { path: "**", redirectTo: "" }
 ];
