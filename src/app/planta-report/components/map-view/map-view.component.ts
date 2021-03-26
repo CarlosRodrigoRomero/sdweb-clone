@@ -16,6 +16,7 @@ export class MapViewComponent implements OnInit {
   public rightOpened: boolean;
   public statsOpened: boolean;
   public anomaliasLoaded = false;
+  public notSharedReport = true;
   public showFilters = true;
   public mapLoaded = false;
 
@@ -26,9 +27,10 @@ export class MapViewComponent implements OnInit {
   constructor(private reportFijaControlService: ReportFijaControlService) {}
 
   ngOnInit(): void {
-    this.reportFijaControlService.initService().subscribe((v) => (this.anomaliasLoaded = v));
-    this.reportFijaControlService.sharedReportWithFilters$.subscribe((v) => {
-      this.showFilters = v;
+    this.reportFijaControlService.initService().subscribe((value) => (this.anomaliasLoaded = value));
+    this.reportFijaControlService.sharedReportWithFilters$.subscribe((value) => {
+      this.showFilters = value;
     });
+    this.reportFijaControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value));
   }
 }
