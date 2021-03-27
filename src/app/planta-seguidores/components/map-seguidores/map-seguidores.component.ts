@@ -25,12 +25,12 @@ import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '@core/services/filter.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { ShareReportService } from '@core/services/share-report.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { Seguidor } from '@core/models/seguidor';
 import { LatLngLiteral } from '@agm/core';
 import { Coordinate } from 'ol/coordinate';
-import Point from 'ol/geom/Point';
 
 @Component({
   selector: 'app-map-seguidores',
@@ -71,7 +71,8 @@ export class MapSeguidoresComponent implements OnInit {
     private shareReportService: ShareReportService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private incrementosService: IncrementosService
+    private incrementosService: IncrementosService,
+    private reportControlService: ReportControlService
   ) {
     if (this.router.url.includes('shared')) {
       this.sharedReport = true;
@@ -177,7 +178,7 @@ export class MapSeguidoresComponent implements OnInit {
     this.incrementoLayers.forEach((l) => this.map.addLayer(l));
 
     // los subscribimos al slider temporal
-    this.mapSeguidoresService.selectedInformeId$.subscribe((informeId) => {
+    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInformeId = informeId;
       this.mostrarSeguidores();
       this.incrementosService.mostrarIncrementos();

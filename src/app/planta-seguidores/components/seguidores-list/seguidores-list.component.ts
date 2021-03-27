@@ -7,6 +7,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { GLOBAL } from '@core/services/global';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { FilterService } from '@core/services/filter.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 import { Seguidor } from '@core/models/seguidor';
 
@@ -32,7 +33,11 @@ export class SeguidoresListComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private mapSeguidoresService: MapSeguidoresService, public filterService: FilterService) {}
+  constructor(
+    private mapSeguidoresService: MapSeguidoresService,
+    public filterService: FilterService,
+    private reportControlService: ReportControlService
+  ) {}
 
   ngOnInit(): void {
     this.mapSeguidoresService.toggleView$.subscribe((sel) => {
@@ -52,7 +57,7 @@ export class SeguidoresListComponent implements OnInit {
       }
     });
 
-    this.mapSeguidoresService.selectedInformeId$.subscribe((informeId) => {
+    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.filterService.filteredElements$.subscribe((elems) => {
         console.log(elems);
 

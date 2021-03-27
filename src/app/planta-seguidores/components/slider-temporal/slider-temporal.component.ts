@@ -10,6 +10,7 @@ import VectorLayer from 'ol/layer/Vector';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { InformeService } from '@core/services/informe.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 @Component({
   selector: 'app-slider-temporal',
@@ -39,7 +40,8 @@ export class SliderTemporalComponent implements OnInit {
   constructor(
     private mapSeguidoresService: MapSeguidoresService,
     private olMapService: OlMapService,
-    private informeService: InformeService
+    private informeService: InformeService,
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
@@ -54,7 +56,7 @@ export class SliderTemporalComponent implements OnInit {
       });
     });
 
-    this.mapSeguidoresService.selectedInformeId$.subscribe((informeID) => (this.selectedInformeId = informeID));
+    this.reportControlService.selectedInformeId$.subscribe((informeID) => (this.selectedInformeId = informeID));
 
     this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers));
 

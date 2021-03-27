@@ -6,8 +6,8 @@ import { MatTableDataSource } from '@angular/material/table';
 
 import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
-import { MapControlService } from '../../services/map-control.service';
 import { AnomaliasControlService } from '../../services/anomalias-control.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
@@ -25,12 +25,12 @@ export class FilterPcsListComponent implements OnInit {
 
   constructor(
     public filterService: FilterService,
-    private mapControlService: MapControlService,
-    private anomaliasControlService: AnomaliasControlService
+    private anomaliasControlService: AnomaliasControlService,
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit() {
-    this.mapControlService.selectedInformeId$.subscribe((informeId) => {
+    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.filterService.filteredElements$.subscribe((elems) => {
         const filteredElements = [];
 

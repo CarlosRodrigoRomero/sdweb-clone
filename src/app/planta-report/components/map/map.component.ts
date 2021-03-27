@@ -27,7 +27,7 @@ import { FilterService } from '@core/services/filter.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { ShareReportService } from '@core/services/share-report.service';
 import { AnomaliasControlService } from '../../services/anomalias-control.service';
-import { ReportFijaControlService } from '../../services/report-fija-control.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { LocationAreaInterface } from '@core/models/location';
@@ -74,7 +74,7 @@ export class MapComponent implements OnInit {
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
     private anomaliasControlService: AnomaliasControlService,
-    private reportFijaControlService: ReportFijaControlService
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
@@ -84,7 +84,7 @@ export class MapComponent implements OnInit {
     this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
     // this.plantaId = 'egF0cbpXnnBnjcrusoeR';
-    this.reportFijaControlService.plantaId$.subscribe((plantaId) => {
+    this.reportControlService.plantaId$.subscribe((plantaId) => {
       this.plantaId = plantaId;
 
       // Obtenemos todas las capas para esta planta
@@ -100,6 +100,8 @@ export class MapComponent implements OnInit {
           this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers));
 
           this.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
+
+          console.log(this.informeIdList[1]);
 
           // Para cada informe, hay que crear 2 capas: térmica y vectorial
           informes
@@ -120,12 +122,15 @@ export class MapComponent implements OnInit {
           this.planta = planta;
 
           // seleccionamos el informe mas reciente de la planta
-          this.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
+          this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+            this.selectedInformeId = informeId;
+          });
+          // this.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
           // asignamos los IDs necesarios para compartir
-          this.shareReportService.setIDs(this.informeIdList[this.informeIdList.length - 1], this.plantaId);
+          this.shareReportService.setPlantaId(this.plantaId);
 
-          this.mapControlService.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
+          // this.mapControlService.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
           this.initMap();
         });
@@ -222,9 +227,9 @@ export class MapComponent implements OnInit {
       this.addLocationAreas();
     }
 
-    this.mapControlService.selectedInformeId$.subscribe((informeId) => {
-      this.selectedInformeId = informeId;
-    });
+    // this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+    //   this.selectedInformeId = informeId;
+    // });
   }
 
   private addOverlayInfoAnomalia() {

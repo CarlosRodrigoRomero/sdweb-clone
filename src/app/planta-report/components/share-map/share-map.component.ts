@@ -8,6 +8,7 @@ import { ClipboardService } from 'ngx-clipboard';
 import { Observable } from 'rxjs';
 
 import { ShareReportService } from '@core/services/share-report.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 @Component({
   selector: 'app-share-map',
@@ -17,18 +18,26 @@ import { ShareReportService } from '@core/services/share-report.service';
 export class ShareMapComponent implements OnInit {
   items: Observable<any[]>;
   public filterableCheck = false;
+  private selectedInformeId: string;
 
   constructor(
     private shareReportService: ShareReportService,
     private clipboardService: ClipboardService,
     private snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private reportControlService: ReportControlService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
+  }
 
   getShareLink(): string {
+    this.selectedInformeId = this.reportControlService.selectedInformeId;
+    console.log(this.selectedInformeId);
+
     // primero guarda los params en la DB
+    this.shareReportService.setSelectedInformeId(this.reportControlService.selectedInformeId);
     this.shareReportService.saveParams();
 
     // luego recibimos el ID donde se han guardado

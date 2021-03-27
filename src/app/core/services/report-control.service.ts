@@ -1,16 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { FilterService } from '@core/services/filter.service';
 import { ShareReportService } from '@core/services/share-report.service';
-import { MapControlService } from '../services/map-control.service';
+import { InformeService } from '@core/services/informe.service';
+
+import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ReportFijaControlService {
+export class ReportControlService {
   private _sharedReport = false;
   public sharedReport$ = new BehaviorSubject<boolean>(this._sharedReport);
   private _sharedReportWithFilters = true;
@@ -18,6 +21,10 @@ export class ReportFijaControlService {
   private sharedId: string;
   private _plantaId: string = undefined;
   public plantaId$ = new BehaviorSubject<string>(this._plantaId);
+  private _selectedInformeId: string = undefined;
+  public selectedInformeId$ = new BehaviorSubject<string>(this._selectedInformeId);
+  private informesList: string[] = [];
+  public informesList$ = new BehaviorSubject<string[]>(this.informesList);
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _mapLoaded = false;
@@ -27,7 +34,7 @@ export class ReportFijaControlService {
     private router: Router,
     private shareReportService: ShareReportService,
     private filterService: FilterService,
-    private mapControlService: MapControlService
+    private informeService: InformeService
   ) {}
 
   initService(): Observable<boolean> {
@@ -39,6 +46,7 @@ export class ReportFijaControlService {
       if (!this.router.url.includes('filterable')) {
         this.sharedReportWithFilters = false;
       }
+
       // obtenemos el ID de la URL
       this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 1];
       // iniciamos el servicio share-report
@@ -50,20 +58,27 @@ export class ReportFijaControlService {
         .toPromise()
         .then((doc) => {
           if (doc.exists) {
-            this.plantaId = doc.data().plantaId;
+            const params = doc.data() as ParamsFilterShare;
+            this.plantaId = params.plantaId;
+            this.selectedInformeId = params.informeId;
 
-            const initFilterService = this.filterService.initService(
-              this.sharedReport,
-              this.plantaId,
-              true,
-              this.sharedId
-            );
-            const initMapControlService = this.mapControlService.initService(this.plantaId);
+            // obtenemos los informes de la planta e iniciamos filter service
+            this.informeService
+              .getInformesDePlanta(this.plantaId)
+              .pipe(
+                switchMap((informesId) => {
+                  // ordenamos los informes de menos a mas reciente y los añadimos a la lista
+                  informesId
+                    .sort((a, b) => a.fecha - b.fecha)
+                    .forEach((informe) => {
+                      this.informesList.push(informe.id);
+                    });
+                  this.informesList$.next(this.informesList);
 
-            // iniciamos filter service y map control service
-            combineLatest([initFilterService, initMapControlService]).subscribe(([filtSerInit, mapContrInit]) => {
-              this.initialized = filtSerInit && mapContrInit;
-            });
+                  return this.filterService.initService(this.sharedReport, this.plantaId, true, this.sharedId);
+                })
+              )
+              .subscribe((init) => (this.initialized = init));
           } else {
             console.log('No existe el documento');
           }
@@ -73,13 +88,25 @@ export class ReportFijaControlService {
       // obtenemos plantaId de la url
       this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
-      const initFilterService = this.filterService.initService(this.sharedReport, this.plantaId, true);
-      const initMapControlService = this.mapControlService.initService(this.plantaId);
+      // obtenemos los informes de la planta e iniciamos filter service
+      this.informeService
+        .getInformesDePlanta(this.plantaId)
+        .pipe(
+          switchMap((informesId) => {
+            // ordenamos los informes de menos a mas reciente y los añadimos a la lista
+            informesId
+              .sort((a, b) => a.fecha - b.fecha)
+              .forEach((informe) => {
+                this.informesList.push(informe.id);
+              });
+            this.informesList$.next(this.informesList);
 
-      // iniciamos filter service
-      combineLatest([initFilterService, initMapControlService]).subscribe(([filtSerInit, mapContrInit]) => {
-        this.initialized = filtSerInit && mapContrInit;
-      });
+            this.selectedInformeId = this.informesList[this.informesList.length - 1];
+
+            return this.filterService.initService(this.sharedReport, this.plantaId, true);
+          })
+        )
+        .subscribe((init) => (this.initialized = init));
     }
 
     return this.initialized$;
@@ -110,6 +137,15 @@ export class ReportFijaControlService {
   set plantaId(value: string) {
     this._plantaId = value;
     this.plantaId$.next(value);
+  }
+
+  get selectedInformeId() {
+    return this._selectedInformeId;
+  }
+
+  set selectedInformeId(value: string) {
+    this._selectedInformeId = value;
+    this.selectedInformeId$.next(value);
   }
 
   get initialized() {

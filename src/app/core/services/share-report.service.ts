@@ -36,9 +36,13 @@ export class ShareReportService {
       });
   }
 
-  setIDs(informeId: string, plantaId: string) {
-    this.params.informeId = informeId;
+  setPlantaId(plantaId: string) {
     this.params.plantaId = plantaId;
+    this.params$.next(this.params);
+  }
+
+  setSelectedInformeId(informeId: string) {
+    this.params.informeId = informeId;
     this.params$.next(this.params);
   }
 

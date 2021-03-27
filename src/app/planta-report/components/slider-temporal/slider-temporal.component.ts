@@ -11,6 +11,7 @@ import VectorLayer from 'ol/layer/Vector';
 import { MapControlService } from '../../services/map-control.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { InformeService } from '@core/services/informe.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 @Component({
   selector: 'app-slider-temporal',
@@ -27,7 +28,6 @@ export class SliderTemporalComponent implements OnInit {
 
   /* Slider Values*/
   currentYear = 100;
-  // dates = ['Jul 2019', 'Jun 2020'];
   dates: string[] = [];
   optionsTemporalSlider: Options = {
     floor: 0,
@@ -42,12 +42,12 @@ export class SliderTemporalComponent implements OnInit {
   constructor(
     private mapControlService: MapControlService,
     private olMapService: OlMapService,
-    private informeService: InformeService
+    private informeService: InformeService,
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
-    // this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
-    this.mapControlService.informesList$.subscribe((informesId) => {
+    this.reportControlService.informesList$.pipe(take(1)).subscribe((informesId) => {
       this.informesList = informesId;
       this.getDatesInformes(informesId).subscribe((dates) => {
         this.dates = dates;
@@ -58,45 +58,52 @@ export class SliderTemporalComponent implements OnInit {
       });
     });
 
-    this.mapControlService.selectedInformeId$.subscribe((informeID) => (this.selectedInformeId = informeID));
+    this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
+
+    this.currentYear = this.informesList.indexOf(this.selectedInformeId) * 100;
+
+    this.mapControlService.sliderTemporal = this.currentYear;
 
     combineLatest([this.olMapService.getThermalLayers(), this.olMapService.getAnomaliaLayers()]).subscribe(
       ([tLayers, aLayers]) => {
         this.thermalLayers = tLayers;
         this.anomaliaLayers = aLayers;
 
-        // Slider temporal cambio de año
-        this.mapControlService.sliderTemporalSource.subscribe((sliderValue) => {
-          this.thermalLayers.forEach((layer, index, layers) => {
-            if (index === layers.length - 1) {
-              layer.setOpacity(sliderValue / 100);
-            } else {
-              layer.setOpacity(1 - sliderValue / 100);
-            }
-          });
-          this.anomaliaLayers.forEach((layer, index, layers) => {
-            if (index === layers.length - 1) {
-              layer.setOpacity(sliderValue / 100);
-            } else {
-              layer.setOpacity(1 - sliderValue / 100);
-            }
-          });
-
-          // TODO no funciona para más de 2 informes
-          if (sliderValue >= 50) {
-            this.selectedInformeId = this.informesList[1];
-          } else {
-            this.selectedInformeId = this.informesList[0];
-          }
-        });
+        this.setThermalLayersOpacity(this.selectedInformeId);
+        this.setAnomaliaLayersOpacity(this.selectedInformeId);
       }
     );
   }
 
   onChangeTemporalSlider(value: number) {
     this.mapControlService.sliderTemporal = value;
+
     const roundedValue = Math.round(value / (100 / (this.informesList.length - 1)));
-    this.mapControlService.selectedInformeId = this.informesList[roundedValue];
+
+    this.reportControlService.selectedInformeId = this.informesList[roundedValue];
+
+    this.setThermalLayersOpacity(this.informesList[roundedValue]);
+    this.setAnomaliaLayersOpacity(this.informesList[roundedValue]);
+  }
+
+  setThermalLayersOpacity(informeId: string) {
+    this.thermalLayers.forEach((layer, index) => {
+      if (index === this.informesList.indexOf(informeId)) {
+        layer.setOpacity(1);
+      } else {
+        layer.setOpacity(0);
+      }
+    });
+  }
+
+  setAnomaliaLayersOpacity(informeId: string) {
+    this.anomaliaLayers.forEach((layer, index) => {
+      if (index === this.informesList.indexOf(informeId)) {
+        layer.setOpacity(1);
+      } else {
+        layer.setOpacity(0);
+      }
+    });
   }
 
   getDatesInformes(informesId: string[]) {

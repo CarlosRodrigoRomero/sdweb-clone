@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { MatSidenav } from '@angular/material/sidenav';
 
-import { ReportFijaControlService } from '../../services/report-fija-control.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -24,13 +24,15 @@ export class MapViewComponent implements OnInit {
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
 
-  constructor(private reportFijaControlService: ReportFijaControlService) {}
+  constructor(
+    private reportControlService: ReportControlService
+  ) {}
 
   ngOnInit(): void {
-    this.reportFijaControlService.initService().subscribe((value) => (this.anomaliasLoaded = value));
-    this.reportFijaControlService.sharedReportWithFilters$.subscribe((value) => {
+    this.reportControlService.initService().subscribe((value) => (this.anomaliasLoaded = value));
+    this.reportControlService.sharedReportWithFilters$.subscribe((value) => {
       this.showFilters = value;
     });
-    this.reportFijaControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value));
+    this.reportControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value));
   }
 }

@@ -9,6 +9,7 @@ import VectorLayer from 'ol/layer/Vector';
 
 import { OlMapService } from '@core/services/ol-map.service';
 import { MapControlService } from '../../services/map-control.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 @Component({
   selector: 'app-slider-termico',
@@ -38,10 +39,14 @@ export class SliderTermicoComponent implements OnInit {
     },
   };
 
-  constructor(private mapControlService: MapControlService, private olMapService: OlMapService) {}
+  constructor(
+    private mapControlService: MapControlService,
+    private olMapService: OlMapService,
+    private reportControlService: ReportControlService
+  ) {}
 
   ngOnInit(): void {
-    this.mapControlService.selectedInformeId$.subscribe((informeID) => (this.selectedInformeId = informeID));
+    this.reportControlService.selectedInformeId$.subscribe((informeID) => (this.selectedInformeId = informeID));
 
     this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers));
     this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers));

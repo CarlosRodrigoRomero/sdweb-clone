@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { MapControlService } from '../../services/map-control.service';
+
 import { switchMap } from 'rxjs/operators';
+
 import { InformeService } from '@core/services/informe.service';
+import { MapControlService } from '../../services/map-control.service';
+import { ReportControlService } from '@core/services/report-control.service';
+
 import { InformeInterface } from '@core/models/informe';
 
 @Component({
@@ -15,10 +19,14 @@ export class BarraResumenPlantaComponent implements OnInit {
   tipoPlanta = 'fija';
   public informe: InformeInterface = null;
 
-  constructor(private mapControl: MapControlService, private informeService: InformeService) {}
+  constructor(
+    private mapControl: MapControlService,
+    private informeService: InformeService,
+    private reportControlService: ReportControlService
+  ) {}
 
   ngOnInit(): void {
-    this.mapControl.selectedInformeId$
+    this.reportControlService.selectedInformeId$
       .pipe(
         switchMap((informeId) => {
           return this.informeService.getInforme(informeId);

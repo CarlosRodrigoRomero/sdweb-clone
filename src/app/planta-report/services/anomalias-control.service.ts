@@ -11,8 +11,8 @@ import Polygon from 'ol/geom/Polygon';
 
 import { GLOBAL } from '@core/services/global';
 import { OlMapService } from '@core/services/ol-map.service';
-import { MapControlService } from './map-control.service';
 import { FilterService } from '@core/services/filter.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Select } from 'ol/interaction';
@@ -37,13 +37,13 @@ export class AnomaliasControlService {
 
   constructor(
     private olMapService: OlMapService,
-    private mapControlService: MapControlService,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private reportControlService: ReportControlService
   ) {}
 
   initService(): Observable<boolean> {
     const getMap = this.olMapService.getMap();
-    const getInformeId = this.mapControlService.selectedInformeId$;
+    const getInformeId = this.reportControlService.selectedInformeId$;
     const getAnomLayers = this.olMapService.getAnomaliaLayers();
 
     combineLatest([getMap, getInformeId, getAnomLayers])

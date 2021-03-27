@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 
 import { MatCheckboxChange } from '@angular/material/checkbox';
@@ -9,8 +8,8 @@ import { take } from 'rxjs/operators';
 import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
-import { MapControlService } from 'src/app/planta-report/services/map-control.service';
 import { FilterControlService } from '@core/services/filter-control.service';
+import {ReportControlService} from '@core/services/report-control.service';
 
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { Anomalia } from '@core/models/anomalia';
@@ -49,10 +48,9 @@ export class TipoFilterComponent implements OnInit {
 
   constructor(
     private filterService: FilterService,
-    private route: ActivatedRoute,
     private anomaliaService: AnomaliaService,
-    private mapControlService: MapControlService,
-    private filterControlService: FilterControlService
+    private filterControlService: FilterControlService,
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
@@ -88,7 +86,7 @@ export class TipoFilterComponent implements OnInit {
     // nos suscribimos a los labels del filter control
     this.filterControlService.selectedTipoLabels$.subscribe((labels) => (this.selectedLabels = labels));
 
-    this.mapControlService.selectedInformeId$.subscribe((informeID) => {
+    this.reportControlService.selectedInformeId$.subscribe((informeID) => {
       this.filterService.filteredElementsWithoutFilterTipo$.subscribe((elems) => {
         // estas anomalias son las anomalias filtradas
         this.allAnomalias = elems as Anomalia[];
