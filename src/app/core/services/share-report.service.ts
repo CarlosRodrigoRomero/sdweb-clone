@@ -184,17 +184,20 @@ export class ShareReportService {
             const gradientFilter = new GradientFilter('gradient', this.params.minGradient, this.params.maxGradient);
             filters.push(gradientFilter);
           }
-        } else if (Object.keys(this.params).includes('minPerdidas')) {
+        }
+        if (Object.keys(this.params).includes('minPerdidas')) {
           if (this.params.minPerdidas !== null) {
             const perdidasFilter = new PerdidasFilter('perdidas', this.params.minPerdidas, this.params.maxPerdidas);
             filters.push(perdidasFilter);
           }
-        } else if (Object.keys(this.params).includes('minTempMax')) {
+        }
+        if (Object.keys(this.params).includes('minTempMax')) {
           if (this.params.minTempMax !== null) {
             const tempMaxFilter = new TempMaxFilter('tempMax', this.params.minTempMax, this.params.maxTempMax);
             filters.push(tempMaxFilter);
           }
-        } else if (Object.keys(this.params).includes('area')) {
+        }
+        if (Object.keys(this.params).includes('area')) {
           if (this.params.area !== null) {
             const coordinates = [];
             this.params.area.forEach((num, index) => {
@@ -206,7 +209,8 @@ export class ShareReportService {
             const areaFilter = new AreaFilter('area', [coordinates]);
             filters.push(areaFilter);
           }
-        } else if (Object.keys(this.params).includes('clase')) {
+        }
+        if (Object.keys(this.params).includes('clase')) {
           this.params.clase.forEach((sev, index) => {
             if (sev) {
               const severityFilter = new SeveridadFilter('', 'clase', index + 1);
@@ -218,14 +222,16 @@ export class ShareReportService {
             const moduloFilter = new ModuloPcFilter('', 'modulo', this.params.modulo);
             filters.push(moduloFilter);
           }
-        } else if (Object.keys(this.params).includes('tipo')) {
+        }
+        if (Object.keys(this.params).includes('tipo')) {
           this.params.tipo.forEach((tipo, index, tipos) => {
-            if (tipo !== undefined) {
+            if (tipo !== undefined && tipo !== null) {
               const tipoFilter = new TipoElemFilter('', 'tipo', tipo, tipos.length, index);
               filters.push(tipoFilter);
             }
           });
-        } else if (Object.keys(this.params).includes('zona')) {
+        }
+        if (Object.keys(this.params).includes('zona')) {
           if (this.params.zona !== null) {
             const zonaFilter = new ZonaFilter('', 'zona', this.params.zona);
             filters.push(zonaFilter);

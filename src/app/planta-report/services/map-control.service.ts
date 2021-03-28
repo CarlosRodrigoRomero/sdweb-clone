@@ -9,7 +9,7 @@ export class MapControlService {
   private _sliderMin: number = 25;
   public sliderMinSource = new BehaviorSubject<number>(this._sliderMin);
 
-  private _sliderMax: number = 70;
+  private _sliderMax: number = 75;
   public sliderMaxSource = new BehaviorSubject<number>(this._sliderMax);
 
   private _sliderTemporal: number = 100;

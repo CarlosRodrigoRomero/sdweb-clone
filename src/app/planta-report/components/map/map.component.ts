@@ -101,8 +101,6 @@ export class MapComponent implements OnInit {
 
           this.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
 
-          console.log(this.informeIdList[1]);
-
           // Para cada informe, hay que crear 2 capas: térmica y vectorial
           informes
             .sort((a, b) => a.fecha - b.fecha)

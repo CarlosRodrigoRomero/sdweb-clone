@@ -52,7 +52,7 @@ export class FilterControlService {
   constructor(private olMapService: OlMapService) {}
 
   setInitParams(params: ParamsFilterShare) {
-    console.log(params);
+    // console.log(params);
     if (params.minPerdidas !== undefined && params.minPerdidas !== null) {
       this.minPerdidas = params.minPerdidas;
     }
