@@ -32,7 +32,6 @@ export class BarraResumenPlantaComponent implements OnInit {
           return this.informeService.getInforme(informeId);
         })
       )
-
       .subscribe((informe) => {
         this.informe = informe;
       });
