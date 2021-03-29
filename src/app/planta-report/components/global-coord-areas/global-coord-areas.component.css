@@ -1,0 +1,16 @@
+.global-areas-card {
+  background-color: rgba(255, 255, 255, 0.8);
+  padding-top: 8px;
+  padding-bottom: 0px;
+  min-width: 250px;
+  box-shadow: none !important;
+}
+
+.mat-menu {
+    
+}
+
+li {
+  list-style-type: none;
+  margin-left: 15px;
+}

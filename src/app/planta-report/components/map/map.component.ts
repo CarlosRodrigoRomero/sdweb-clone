@@ -219,15 +219,6 @@ export class MapComponent implements OnInit {
     });
 
     // this.addOverlayInfoAnomalia();
-
-    // añadimos areas globals
-    if (!this.sharedReport) {
-      this.addLocationAreas();
-    }
-
-    // this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-    //   this.selectedInformeId = informeId;
-    // });
   }
 
   private addOverlayInfoAnomalia() {

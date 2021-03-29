@@ -4,7 +4,7 @@
 
 .map-sliders {
   position: absolute;
-  bottom: 3rem;
+  bottom: 5rem;
   left: 50%;
   transform: translate(-50%, 0%);
   /* width: 60%; */
@@ -23,8 +23,15 @@
   }
 
   .map-sliders {
-    bottom: 1rem;
+    bottom: 4.5rem;
   }
+}
+
+app-global-coord-areas {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translate(-50%, 0%);
 }
 
 .main-container {
