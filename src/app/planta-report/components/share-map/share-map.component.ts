@@ -34,7 +34,6 @@ export class ShareMapComponent implements OnInit {
 
   getShareLink(): string {
     this.selectedInformeId = this.reportControlService.selectedInformeId;
-    console.log(this.selectedInformeId);
 
     // primero guarda los params en la DB
     this.shareReportService.setSelectedInformeId(this.reportControlService.selectedInformeId);

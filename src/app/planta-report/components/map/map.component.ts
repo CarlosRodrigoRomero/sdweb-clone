@@ -123,12 +123,9 @@ export class MapComponent implements OnInit {
           this.reportControlService.selectedInformeId$.subscribe((informeId) => {
             this.selectedInformeId = informeId;
           });
-          // this.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
           // asignamos los IDs necesarios para compartir
           this.shareReportService.setPlantaId(this.plantaId);
-
-          // this.mapControlService.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
           this.initMap();
         });
@@ -247,103 +244,5 @@ export class MapComponent implements OnInit {
 
   private transform(extent) {
     return transformExtent(extent, 'EPSG:4326', 'EPSG:3857');
-  }
-
-  private addLocationAreas() {
-    const styles = {
-      LineString: new Style({
-        stroke: new Stroke({
-          color: '#dbdbdb',
-          lineDash: [4],
-          width: 2,
-        }),
-        fill: new Fill({
-          color: 'rgba(0, 0, 255, 0)',
-        }),
-        text: new Text({
-          font: '16px "Open Sans", "Arial Unicode MS", "sans-serif"',
-          placement: 'line',
-          fill: new Fill({
-            color: 'white',
-          }),
-          text: '',
-        }),
-      }),
-    };
-
-    const styleFunction = (feature) => {
-      if (feature !== undefined) {
-        const style = styles[feature.getGeometry().getType()];
-        // style.getText().setText(feature.get('globalCoords'));
-        // para la demo
-        style.getText().setText(feature.get('globalCoords')[1]);
-        return style;
-      }
-    };
-
-    this.plantaService.getLocationsArea(this.plantaId).subscribe((locAreas) => {
-      this.locAreasVectorSource = new VectorSource({
-        features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(locAreas)),
-      });
-
-      this.map.addLayer(
-        new VectorLayer({
-          source: this.locAreasVectorSource,
-          visible: true,
-          style: styleFunction,
-          /* style: new Style({
-            stroke: new Stroke({
-              color: 'red',
-            }),
-          }), */
-        })
-      );
-    });
-  }
-
-  private locAreasToGeoJSON(locAreas: LocationAreaInterface[]) {
-    let listOfFeatures = [];
-    locAreas.forEach((locArea) => {
-      let coordsList = [];
-      locArea.path.forEach((coords) => {
-        coordsList.push(fromLonLat([coords.lng, coords.lat]));
-      });
-      // Al ser un poligono, la 1era y utlima coord deben ser iguales:
-      coordsList.push(coordsList[0]);
-
-      listOfFeatures.push({
-        type: 'Feature',
-        properties: {
-          // para la demo
-          globalCoords: locArea.globalCoords,
-          // globalCoords: locArea.globalX,
-          // globalCoords: this.getGlobalCoords(locArea),
-        },
-        geometry: {
-          type: 'LineString',
-          coordinates: coordsList,
-        },
-      });
-    });
-    const geojsonObject = {
-      type: 'FeatureCollection',
-      // crs: {
-      //   type: 'name',
-      //   properties: {
-      //     name: 'EPSG:3857',
-      //   },
-      // },
-      features: listOfFeatures,
-    };
-
-    return geojsonObject;
-  }
-
-  private getGlobalCoords(locArea: LocationAreaInterface): string {
-    const locs = [...locArea.globalCoords, locArea.globalX, locArea.globalY];
-
-    const globalCoord = locs.find((loc) => loc !== '');
-
-    return globalCoord;
   }
 }

@@ -9,7 +9,6 @@ import { FilterControlService } from '@core/services/filter-control.service';
 
 import { FiltrableInterface } from '@core/models/filtrableInterface';
 import { FilterInterface } from '@core/models/filter';
-import { filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -47,7 +46,9 @@ export class FilterService {
 
           // obtenemos lo filtros guardados en al DB y los añadimos
           this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
-            this.addFilters(filters);
+            if (filters.length > 0) {
+              this.addFilters(filters);
+            }
             this.initialized$.next(true);
           });
         } else {
@@ -100,15 +101,15 @@ export class FilterService {
     const everyFilterFiltrableElements: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
 
     // comprobamos si hay filtros de tipo 'Add'
-    if (this.filters.filter((filter) => this.typeAddFilters.includes(filter.type)).length > 0) {
+    if (this.filters.filter((fil) => this.typeAddFilters.includes(fil.type)).length > 0) {
       // separamos los pcs por tipo de filtro
       this.typeAddFilters.forEach((type) => {
         const newFiltrableElements: FiltrableInterface[] = [];
-        if (this.filters.filter((filter) => filter.type === type).length > 0) {
+        if (this.filters.filter((fil) => fil.type === type).length > 0) {
           this.filters
-            .filter((filter) => filter.type === type)
-            .forEach((filter) => {
-              filter.applyFilter(this._allFiltrableElements).forEach((elem) => newFiltrableElements.push(elem));
+            .filter((fil) => fil.type === type)
+            .forEach((fil) => {
+              fil.applyFilter(this._allFiltrableElements).forEach((elem) => newFiltrableElements.push(elem));
             });
           // añadimos un array de cada tipo
           everyFilterFiltrableElements.push(newFiltrableElements);
@@ -118,9 +119,9 @@ export class FilterService {
 
     // añadimos al array los elementos filtrados de los filtros no 'Add'
     this.filters
-      .filter((filter) => !this.typeAddFilters.includes(filter.type))
-      .forEach((filter) => {
-        const newFiltrableElements = filter.applyFilter(this._allFiltrableElements);
+      .filter((fil) => !this.typeAddFilters.includes(fil.type))
+      .forEach((fil) => {
+        const newFiltrableElements = fil.applyFilter(this._allFiltrableElements);
         everyFilterFiltrableElements.push(newFiltrableElements);
       });
 

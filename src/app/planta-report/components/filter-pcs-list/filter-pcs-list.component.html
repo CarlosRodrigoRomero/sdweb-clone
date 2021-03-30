@@ -45,7 +45,7 @@
       ></tr>
 
       <!-- Se muestra cuando no hay resultados en la búsqueda -->
-      <tr class="mat-row" *matNoDataRow>
+      <tr [ngClass]="{ selected: row.id == selectedRow }" class="mat-row" *matNoDataRow>
         <td class="mat-cell" colspan="4">No hay resultados que conincidan con la búsqueda "{{ input.value }}"</td>
       </tr>
     </table>

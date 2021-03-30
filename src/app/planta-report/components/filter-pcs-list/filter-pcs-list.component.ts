@@ -19,6 +19,7 @@ import { Anomalia } from '@core/models/anomalia';
 export class FilterPcsListComponent implements OnInit {
   displayedColumns: string[] = ['tipo', 'perdidas', 'temp', 'gradiente'];
   dataSource: MatTableDataSource<any>;
+  public selectedRow: string;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -83,6 +84,7 @@ export class FilterPcsListComponent implements OnInit {
   }
 
   selectAnomalia(row: any) {
+    this.selectedRow = row.id;
     // this.anomaliasControlService.anomaliaSelect = undefined;
     if (this.anomaliasControlService.prevAnomaliaSelect !== undefined) {
       this.anomaliasControlService.setExternalStyle(this.anomaliasControlService.prevAnomaliaSelect.id, false);

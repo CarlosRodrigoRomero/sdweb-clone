@@ -25,6 +25,10 @@ table {
   margin-right: 0.5rem;
 }
 
+.mat-row {
+  cursor: pointer;
+}
+
 .mat-column-tipo {
   word-wrap: break-word !important;
   white-space: unset !important;
@@ -90,5 +94,9 @@ table {
 }
 
 .mat-row:hover {
+  background-color: whitesmoke;
+}
+
+.selected {
   background-color: whitesmoke;
 }

@@ -34,6 +34,7 @@ export class AnomaliasControlService {
   public prevAnomaliaSelect: Anomalia;
   public listaAnomalias: Anomalia[];
   private anomaliaLayers: VectorLayer[];
+  private sharedReportNoFilters = false;
 
   constructor(
     private olMapService: OlMapService,
@@ -45,13 +46,15 @@ export class AnomaliasControlService {
     const getMap = this.olMapService.getMap();
     const getInformeId = this.reportControlService.selectedInformeId$;
     const getAnomLayers = this.olMapService.getAnomaliaLayers();
+    const getIfSharedWithFilters = this.reportControlService.sharedReportWithFilters$;
 
-    combineLatest([getMap, getInformeId, getAnomLayers])
+    combineLatest([getMap, getInformeId, getAnomLayers, getIfSharedWithFilters])
       .pipe(take(1))
-      .subscribe(([map, informeId, anomL]) => {
+      .subscribe(([map, informeId, anomL, isSharedWithFil]) => {
         this.map = map;
         this.selectedInformeId = informeId;
         this.anomaliaLayers = anomL;
+        this.sharedReportNoFilters = !isSharedWithFil;
 
         this.initialized$.next(true);
       });
@@ -60,9 +63,14 @@ export class AnomaliasControlService {
 
   public mostrarAnomalias() {
     this.filterService.filteredElements$.subscribe((anomalias) => {
-      // Dibujar anomalias
-      this.dibujarAnomalias(anomalias as Anomalia[]);
-      this.listaAnomalias = anomalias as Anomalia[];
+      if (this.sharedReportNoFilters) {
+        const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
+        this.dibujarAnomalias(anomFil as Anomalia[]);
+        this.listaAnomalias = anomalias as Anomalia[];
+      } else {
+        this.dibujarAnomalias(anomalias as Anomalia[]);
+        this.listaAnomalias = anomalias as Anomalia[];
+      }
     });
   }
 

@@ -62,23 +62,30 @@ export class ReportControlService {
             this.plantaId = params.plantaId;
             this.selectedInformeId = params.informeId;
 
-            // obtenemos los informes de la planta e iniciamos filter service
-            this.informeService
-              .getInformesDePlanta(this.plantaId)
-              .pipe(
-                switchMap((informesId) => {
-                  // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                  informesId
-                    .sort((a, b) => a.fecha - b.fecha)
-                    .forEach((informe) => {
-                      this.informesList.push(informe.id);
-                    });
-                  this.informesList$.next(this.informesList);
+            if (this.router.url.includes('filterable')) {
+              // obtenemos los informes de la planta e iniciamos filter service
+              this.informeService
+                .getInformesDePlanta(this.plantaId)
+                .pipe(
+                  switchMap((informesId) => {
+                    // ordenamos los informes de menos a mas reciente y los añadimos a la lista
+                    informesId
+                      .sort((a, b) => a.fecha - b.fecha)
+                      .forEach((informe) => {
+                        this.informesList.push(informe.id);
+                      });
+                    this.informesList$.next(this.informesList);
 
-                  return this.filterService.initService(this.sharedReport, this.plantaId, true, this.sharedId);
-                })
-              )
-              .subscribe((init) => (this.initialized = init));
+                    return this.filterService.initService(this.sharedReport, this.plantaId, true, this.sharedId);
+                  })
+                )
+                .subscribe((init) => (this.initialized = init));
+            } else {
+              // iniciamos filter service
+              this.filterService
+                .initService(this.sharedReport, this.plantaId, true, this.sharedId)
+                .subscribe((init) => (this.initialized = init));
+            }
           } else {
             console.log('No existe el documento');
           }

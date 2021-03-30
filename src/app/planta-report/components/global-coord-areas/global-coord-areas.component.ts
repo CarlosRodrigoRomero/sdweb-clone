@@ -37,9 +37,9 @@ export class GlobalCoordAreasComponent implements OnInit {
     name: 'Mostrar todas las áreas',
     completed: true,
     subtasks: [
-      { name: 'Global X', completed: true },
-      { name: 'Global Y', completed: true },
-      { name: 'Global Z', completed: true },
+      { name: 'Instalación', completed: true },
+      { name: 'Calle', completed: true },
+      { name: 'Mesa', completed: true },
     ],
   };
   public allComplete = true;
@@ -157,6 +157,14 @@ export class GlobalCoordAreasComponent implements OnInit {
     };
 
     return geojsonObject;
+  }
+
+  private getGlobalCoords(locArea: LocationAreaInterface): string {
+    const locs = [...locArea.globalCoords, locArea.globalX, locArea.globalY];
+
+    const globalCoord = locs.find((loc) => loc !== '');
+
+    return globalCoord;
   }
 
   setVisibilityLayer(index: number) {
