@@ -19,16 +19,14 @@ nav {
 }
 
 .resumen {
-  display: grid;
-  grid-template-columns: 50% 5% 45%;
-  height: 23px;
-  width: max-content;
+  display: flex;
 }
 
 .grupo1 {
   display: inline-flex;
   width: max-content;
   align-items: center;
+  margin-left: 10px;
 }
 
 .grupo1 mat-icon {
@@ -50,17 +48,26 @@ nav {
   font-weight: 400;
 }
 
-.grupo2 .subtitulo {
+.grupo2 {
+  display: flex;
+  align-self: center;
+  cursor: pointer;
+  color: grey;
+  vertical-align: middle;
+  margin-right: 15px;
+}
+
+.menu-grupo2 .subtitulo {
   font-weight: 300;
   font-size: 1.1rem;
 }
 
-.grupo2 mat-icon {
+.menu-grupo2 mat-icon {
   font-size: 1.5rem;
   margin-right: 1rem;
 }
 
-.grupo2 .elemento {
+.menu-grupo2 .elemento {
   display: flex;
   margin-left: 1rem;
 }
@@ -82,14 +89,6 @@ nav {
 
 .success {
   color: green;
-}
-
-.btn-info {
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  color: grey;
-  vertical-align: middle;
 }
 
 @media (max-width: 730px) {

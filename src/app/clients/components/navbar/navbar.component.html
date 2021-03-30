@@ -1,9 +1,9 @@
 <mat-toolbar [class.mat-elevation-z2]="true" class="nb">
   <a class="navbar-brand" routerLink="/clients">
-    <img src="../../../assets/images/logo_sd.png" height="60" class="d-inline-block align-top" alt="" />
+    <img src="../../../assets/images/logo_sd.png" height="50" class="d-inline-block align-top" alt="" />
   </a>
   <a class="navbar-brand-logo" routerLink="/clients" display="none">
-    <img src="../../../assets/images/favicon.png" height="40" class="d-inline-block align-top" alt="" />
+    <img src="../../../assets/images/favicon.png" height="30" class="d-inline-block align-top" alt="" />
   </a>
 
   <div *ngIf="informe" class="resumen">
@@ -14,12 +14,10 @@
         <span class="subtitulo">({{ potenciaPlanta | number: '1.0-0' }} MW / {{ tipoPlanta }})</span>
       </h5>
     </div>
-    <div>
-      <a class="btn-info" [matMenuTriggerFor]="menu">
-        <mat-icon>info</mat-icon>
-      </a>
+    <div class="grupo2" [matMenuTriggerFor]="menu">
+      <mat-icon>info</mat-icon>
       <mat-menu #menu="matMenu" class="menu">
-        <div class="grupo2">
+        <div class="menu-grupo2">
           <div class="elemento">
             <h5>Datos del vuelo</h5>
           </div>
