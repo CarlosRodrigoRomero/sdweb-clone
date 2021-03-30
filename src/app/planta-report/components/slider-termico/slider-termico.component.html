@@ -1,14 +1,5 @@
 <mat-card>
   <mat-card-content>
-    <div class="opacity-slider-group">
-      <span>Opacidad</span>
-      <mat-slider
-        class="opacity-slider"
-        [value]="100"
-        id="slider-opacidad-termico"
-        (input)="onChangeThermalOpacitySlider($event)"
-      ></mat-slider>
-    </div>
     <div class="temperature-slider">
       <ngx-slider
         (valueChange)="onChangeTemperatureSlider(lowTemp, highTemp)"

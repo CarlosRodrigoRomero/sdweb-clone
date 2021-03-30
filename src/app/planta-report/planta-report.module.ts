@@ -26,6 +26,7 @@ import { SliderTermicoComponent } from './components/slider-termico/slider-termi
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
 import { ChartSankeyPotenciaComponent } from './planta-stats/chart-sankey-potencia/chart-sankey-potencia.component';
 import { GlobalCoordAreasComponent } from './components/global-coord-areas/global-coord-areas.component';
+import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { GlobalCoordAreasComponent } from './components/global-coord-areas/globa
     SliderTemporalComponent,
     ChartSankeyPotenciaComponent,
     GlobalCoordAreasComponent,
+    SliderOpacityComponent,
   ],
   imports: [SharedModule, NgxSliderModule, PlantaReportRoutingModule, NgApexchartsModule, FiltersModule],
   exports: [MapViewComponent],

@@ -66,16 +66,19 @@
         </div>
 
         <!-- <app-barra-resumen-planta></app-barra-resumen-planta> -->
-
-        <!-- SLIDERS -->
-        <div class="map-sliders">
-          <div class="grid-sliders">
-            <app-slider-termico></app-slider-termico>
+        <div class="map-control">
+          <!-- CONTROL TEMPORAL -->
+          <div class="temporal-control">
             <app-slider-temporal *ngIf="showFilters"></app-slider-temporal>
           </div>
+
+          <!-- CONTROLES VISUALES -->
+          <div class="visual-control">
+            <app-slider-termico></app-slider-termico>
+            <app-global-coord-areas></app-global-coord-areas>
+            <app-slider-opacity></app-slider-opacity>
+          </div>
         </div>
-        <!-- GLOBAL COORDS AREAS -->
-        <app-global-coord-areas></app-global-coord-areas>
       </div>
     </div>
 

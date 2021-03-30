@@ -2,7 +2,9 @@ mat-card {
   background-color: rgba($color: white, $alpha: 0.8);
   border-color: transparent;
   box-shadow: none !important;
-  padding: 2px 16px;
+  padding-top: 10px;
+  padding-bottom: 0;
+  min-width: 250px;
 }
 
 ::ng-deep {
@@ -28,46 +30,4 @@ mat-card {
     border-top-left-radius: 3px !important;
     border-top-right-radius: 3px !important;
   }
-
-  .opacity-slider {
-    .mat-slider-thumb {
-      background-color: grey !important;
-    }
-    .mat-slider-track-fill {
-      background-color: grey !important;
-    }
-  }
-}
-
-.opacity-slider-group {
-  display: inline-flex;
-}
-
-.opacity-slider-group span {
-  align-self: center;
-  margin-right: 0.5em;
-}
-
-.opacity-slider {
-  width: 150px;
-}
-
-.map-control {
-  width: 250px;
-  height: 100px;
-  display: flex;
-  flex-direction: column;
-  border-radius: 4px;
-  padding: 10px;
-  background-color: rgba($color: white, $alpha: 0.8);
-}
-
-.texto-label {
-  position: absolute;
-  top: -15px;
-  font-size: 1.2rem;
-  border: 1px solid #8080806b;
-  padding: 3px;
-  border-radius: 3px;
-  background-color: rgba($color: white, $alpha: 0.8);
 }

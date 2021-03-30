@@ -2,36 +2,31 @@
   position: relative;
 }
 
-.map-sliders {
+.map-control {
   position: absolute;
-  bottom: 5rem;
+  bottom: 1rem;
+  display: grid;
+  grid-template-columns: 100%;
+  gap: 1rem;
   left: 50%;
   transform: translate(-50%, 0%);
-  /* width: 60%; */
 }
 
-.grid-sliders {
+.visual-control {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 1rem;
 }
 
-@media (max-width: 600px) {
-  .grid-sliders {
-    grid-template-columns: 100%;
+@media (max-width: 900px) {
+  .map-control {
     gap: 0.5rem;
   }
 
-  .map-sliders {
-    bottom: 4.5rem;
+  .visual-control {
+    grid-template-columns: 100%;
+    gap: 0.5rem;
   }
-}
-
-app-global-coord-areas {
-  position: absolute;
-  bottom: 1rem;
-  left: 50%;
-  transform: translate(-50%, 0%);
 }
 
 .main-container {
