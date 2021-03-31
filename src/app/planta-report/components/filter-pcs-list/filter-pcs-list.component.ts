@@ -20,6 +20,7 @@ export class FilterPcsListComponent implements OnInit {
   displayedColumns: string[] = ['tipo', 'perdidas', 'temp', 'gradiente'];
   dataSource: MatTableDataSource<any>;
   public selectedRow: string;
+  public prevSelectedRow: any;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -50,6 +51,7 @@ export class FilterPcsListComponent implements OnInit {
               color: GLOBAL.colores_tipos_hex[anom.tipo],
               clase: anom.clase,
               anomalia: anom,
+              selected: false,
             })
           );
 
@@ -84,6 +86,14 @@ export class FilterPcsListComponent implements OnInit {
   }
 
   selectAnomalia(row: any) {
+    // Seleccionamos en la lista
+    if (this.prevSelectedRow !== undefined) {
+      // deseleccionamos la anterior
+      this.setRowSelected(this.prevSelectedRow);
+    }
+    // seleccionamos la actual
+    this.setRowSelected(row);
+
     this.selectedRow = row.id;
     // this.anomaliasControlService.anomaliaSelect = undefined;
     if (this.anomaliasControlService.prevAnomaliaSelect !== undefined) {
@@ -91,7 +101,14 @@ export class FilterPcsListComponent implements OnInit {
     }
     this.anomaliasControlService.prevAnomaliaSelect = row.anomalia;
 
+    // marcamos la actual como anterior para la proxima seleccion
+    this.prevSelectedRow = row;
+
     this.anomaliasControlService.anomaliaSelect = row.anomalia;
     this.anomaliasControlService.setExternalStyle(row.id, true);
+  }
+
+  setRowSelected(row: any) {
+    row.selected = !row.selected;
   }
 }

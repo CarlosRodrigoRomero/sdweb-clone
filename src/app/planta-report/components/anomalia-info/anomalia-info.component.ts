@@ -11,7 +11,7 @@ import { ShareReportService } from '@core/services/share-report.service';
 interface InfoAdicional {
   id?: string;
   fecha?: string;
-  hora?: number;
+  hora?: string;
   planta?: string; // nombre planta
   marcaModulo?: string;
   modeloModulo?: string;
@@ -33,7 +33,8 @@ interface InfoAdicional {
   nubosidad?: string;
   emisividad?: number;
   tempReflejada?: number;
-  viento?: string;
+  vientoVelocidad?: number;
+  vientoDireccion?: number;
   camaraSN?: number;
   camaraNombre?: string;
   camaraLente?: string;
@@ -53,6 +54,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   public infoAdicional: InfoAdicional;
   private plantaId: string;
   private nombrePlanta: string;
+  public coloresSeveridad: string[];
 
   constructor(
     private plantaService: PlantaService,
@@ -70,6 +72,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
       gradienteNormalizado: 'number',
       perdidas: 'number',
     };
+    this.coloresSeveridad = GLOBAL.colores_severidad;
 
     if (this.router.url.includes('shared')) {
       this.shareReportService.getParams().subscribe((params) => (this.plantaId = params.plantaId));
@@ -98,9 +101,45 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   }
 
   getInfoAdcional() {
-    let marcaModulo;
+    console.log(this.anomaliaSelect);
+
+    /* PARA LA DEMO */
+
+    this.infoAdicional = {
+      id: this.anomaliaSelect.localId,
+      fecha: this.unixToDate((this.anomaliaSelect as PcInterface).datetime),
+      hora: this.unixToTime((this.anomaliaSelect as PcInterface).datetime),
+      planta: this.nombrePlanta,
+      marcaModulo: this.anomaliaSelect.modulo.marca,
+      modeloModulo: this.anomaliaSelect.modulo.modelo,
+      // tipoPanelModulo: 'tipo panel',
+      potencia: this.anomaliaSelect.modulo.potencia,
+      instalacion: this.anomaliaSelect.globalCoords[0],
+      calle: this.anomaliaSelect.globalCoords[1],
+      mesa: this.anomaliaSelect.globalCoords[2],
+      fila: this.anomaliaSelect.localY,
+      columna: this.anomaliaSelect.localX,
+      // tempMedia: (this.anomaliaSelect as PcInterface).temperaturaMedia,
+      // tempMax: (this.anomaliaSelect as PcInterface).temperaturaMax, // temperatura defecto en Demo
+      // gradiente: (this.anomaliaSelect as PcInterface).gradiente,
+      irradiancia: (this.anomaliaSelect as PcInterface).irradiancia, // radiación en Demo
+      // severidad: (this.anomaliaSelect as PcInterface).severidad, // criticidad o relevancia en Demo
+      tipoAnomalia: GLOBAL.labels_tipos[this.anomaliaSelect.tipo],
+      // urlImagenIR: 'url imagen IR',
+      // urlImagenRGB: 'url imagen RGB',
+      nubosidad: (this.anomaliaSelect as PcInterface).nubosidad,
+      emisividad: (this.anomaliaSelect as PcInterface).emisividad,
+      tempReflejada: (this.anomaliaSelect as PcInterface).temperaturaReflejada,
+      vientoVelocidad: this.anomaliaSelect.vientoVelocidad,
+      vientoDireccion: this.anomaliaSelect.vientoDireccion,
+      camaraSN: this.anomaliaSelect.camaraSN,
+      camaraNombre: this.anomaliaSelect.camaraModelo,
+    };
+
+    /* let marcaModulo;
     let modeloModulo;
     let potencia;
+
     if ((this.anomaliaSelect as PcInterface).modulo !== null) {
       marcaModulo = (this.anomaliaSelect as PcInterface).modulo.marca;
       modeloModulo = (this.anomaliaSelect as PcInterface).modulo.modelo;
@@ -135,6 +174,26 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
       camaraSN: (this.anomaliaSelect as PcInterface).camaraSN,
       camaraNombre: (this.anomaliaSelect as PcInterface).camaraNombre,
       camaraLente: (this.anomaliaSelect as PcInterface).camaraLente,
-    };
+    };*/
+  }
+
+  unixToDate(unix: number): string {
+    const date = new Date(unix * 1000);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDay();
+    return day + '/' + month + '/' + year;
+  }
+
+  unixToTime(unix: number): string {
+    const date = new Date(unix * 1000);
+    const hour = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    return hour + ':' + minutes + ':' + seconds;
+  }
+
+  stopPropagation(event) {
+    event.stopPropagation();
   }
 }

@@ -45,15 +45,6 @@ app-share-map {
   margin-right: 15px;
 }
 
-app-barra-resumen-planta {
-  position: absolute;
-  top: 0px;
-  left: 40%;
-  transform: translate(-50%, 0%);
-  margin: 10px;
-  z-index: 999;
-}
-
 .left-sidenav {
   position: absolute;
   display: flex;
@@ -124,46 +115,6 @@ app-barra-resumen-planta {
 #sidenavStats {
   top: 140px;
 }
-
-/* @media (max-width: 900px) {
-  .btn-right {
-    top: 74px;
-  }
-
-  .right-sidenav {
-    margin: 124px 10px 10px;
-  }
-
-  .btn-left {
-    top: 74px;
-  }
-
-  .left-sidenav {
-    margin: 124px 10px 10px;
-  }
-
-  .btn-right-stats {
-    top: 74px;
-  }
-
-  .stats-sidenav {
-    margin: 124px 10px 10px;
-  }
-
-  .btns-export {
-    top: 74px;
-    left: 50%;
-    transform: translate(-50%, 0%);
-    right: unset;
-  }
-
-  app-barra-resumen-planta {
-    left: 0;
-    transform: none;
-    width: -webkit-fill-available;
-    width: stretch;
-  }
-} */
 
 app-filter-pcs-list {
   height: 100%;

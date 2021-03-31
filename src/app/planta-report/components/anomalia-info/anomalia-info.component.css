@@ -1,5 +1,6 @@
 .popup {
   display: flex;
+  align-items: flex-end;
 }
 
 table {
@@ -9,6 +10,21 @@ table {
 .header {
   height: 25px !important;
 }
+
+.info {
+  color: grey;
+  cursor: pointer;
+}
+
+.info-btn {
+  background: white;
+  border-radius: 20px;
+  margin-left: 10px;
+}
+
+/* .menu {
+  width: 500px;
+} */
 
 .mat-column-clase {
   word-wrap: break-word !important;
@@ -90,6 +106,24 @@ table {
   hyphens: auto;
 }
 
+/* :host ::ng-deep .menu-content .mat-menu-content:not(:empty) {
+  min-width: 280px;
+} */
+
+.elemento-principal {
+  display: flex;
+  justify-content: space-between;
+}
+
+.titulo-principal {
+  font-size: 1rem;
+}
+
+.subtitulo-principal {
+  font-weight: 300;
+  font-size: 1.1rem;
+}
+
 .menu-content .subtitulo {
   font-weight: 300;
   font-size: 1.1rem;
@@ -103,4 +137,14 @@ table {
 .menu-content .elemento {
   display: flex;
   margin-left: 1rem;
+  margin-right: 1rem;
+  justify-content: space-between;
+}
+
+.elemento h5 {
+  margin-top: 10px;
+}
+
+[_nghost-uym-c275] .carousel-arrow[_ngcontent-uym-c275] {
+  top: 80%;
 }

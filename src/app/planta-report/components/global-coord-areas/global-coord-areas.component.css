@@ -9,6 +9,7 @@
   padding-bottom: 0px;
   min-width: 250px;
   box-shadow: none !important;
+  min-height: 64px;
   height: 100%;
 }
 

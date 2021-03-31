@@ -20,6 +20,15 @@ export class Anomalia implements FiltrableInterface {
   informeId: string;
   modulosAfectados?: number;
 
+  // demo
+  localId?: string;
+  localX?: number;
+  localY?: number;
+  camaraModelo?: string;
+  camaraSN?: number;
+  vientoVelocidad?: number;
+  vientoDireccion?: number;
+
   constructor(
     tipo: number,
     globalCoords: string[],

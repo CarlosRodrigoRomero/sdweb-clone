@@ -36,16 +36,17 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-      <tr
+      <tr class="table-row"
         (mouseover)="hoverAnomalia(row)"
         (mouseleave)="unhoverAnomalia(row)"
         (click)="selectAnomalia(row)"
         mat-row
+        [ngClass]="{ selected: row.selected }"
         *matRowDef="let row; columns: displayedColumns"
       ></tr>
 
       <!-- Se muestra cuando no hay resultados en la búsqueda -->
-      <tr [ngClass]="{ selected: row.id == selectedRow }" class="mat-row" *matNoDataRow>
+      <tr *matNoDataRow>
         <td class="mat-cell" colspan="4">No hay resultados que conincidan con la búsqueda "{{ input.value }}"</td>
       </tr>
     </table>
