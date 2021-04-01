@@ -1,6 +1,8 @@
 .btn-share {
-  background: white;
-  border-radius: 4px;
+  height: 40px;
+  padding: 0;
+  width: 40px;
+  min-width: unset !important;
 }
 
 h5 {
@@ -16,8 +18,13 @@ li {
   display: inline-flex;
 }
 
+.contenido {
+  display: flex;
+  align-items: baseline;
+}
+
 .btn-enviar {
   text-align: center;
-  color: darkblue;
+  /* color: mediumblue; */
   font-size: medium;
 }

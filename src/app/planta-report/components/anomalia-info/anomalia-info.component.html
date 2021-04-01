@@ -1,6 +1,6 @@
 <div class="popup">
-  <mat-card class="popup" *ngIf="anomaliaHover">
-    <mat-card-content>
+  <mat-card class="popup-card" *ngIf="anomaliaHover">
+    <mat-card-content class="popup-card-content">
       <!-- <div class="elemento-principal">
         <span class="titulo-principal">Clase</span>
         <span class="subtitulo-principal">{{ anomaliaHover.clase }}</span>
@@ -24,8 +24,8 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="popup" *ngIf="anomaliaSelect">
-    <mat-card-content>
+  <mat-card class="popup-card" *ngIf="anomaliaSelect">
+    <mat-card-content class="popup-card-content">
       <!-- <div class="elemento-principal">
         <span class="titulo-principal">Clase</span>
         <span class="subtitulo-principal">{{ anomaliaSelect.clase }}</span>
@@ -50,7 +50,7 @@
   </mat-card>
 
   <div class="info" *ngIf="infoAdicional" [matMenuTriggerFor]="menu">
-    <button mat-icon-button class="info-btn" [class.mat-elevation-z2]="true">
+    <button mat-raised-button class="info-btn" [class.mat-elevation-z2]="true">
       <mat-icon>info</mat-icon>
     </button>
     <mat-menu #menu="matMenu" class="menu">

@@ -6,6 +6,7 @@ import { switchMap } from 'rxjs/operators';
 import { AuthService } from '@core/services/auth.service';
 import { InformeService } from '@core/services/informe.service';
 import { ReportControlService } from '@core/services/report-control.service';
+import { ThemeService } from '@core/services/theme.service';
 
 import { InformeInterface } from '@core/models/informe';
 
@@ -24,11 +25,14 @@ export class NavbarComponent implements OnInit {
   public tipoPlanta = 'fija';
   public informe: InformeInterface = null;
 
+  public themeSelected: string;
+
   constructor(
     public authService: AuthService,
     private router: Router,
     private reportControlService: ReportControlService,
-    private informeService: InformeService
+    private informeService: InformeService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit() {
@@ -51,6 +55,8 @@ export class NavbarComponent implements OnInit {
       .subscribe((informe) => {
         this.informe = informe;
       });
+
+    this.themeService.themeSelected$.subscribe((theme) => (this.themeSelected = theme));
   }
 
   signOut() {

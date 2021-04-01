@@ -33,8 +33,10 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 
+import { SwitchThemeComponent } from './components/switch-theme/switch-theme.component';
+
 @NgModule({
-  declarations: [],
+  declarations: [SwitchThemeComponent],
   imports: [
     CommonModule,
     MatCheckboxModule,
@@ -101,6 +103,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
+    SwitchThemeComponent,
   ],
 })
 export class MaterialModule {}

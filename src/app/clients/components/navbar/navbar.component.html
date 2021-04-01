@@ -1,6 +1,9 @@
 <mat-toolbar [class.mat-elevation-z2]="true" class="nb">
-  <a class="navbar-brand" routerLink="/clients">
+  <a *ngIf="themeSelected === 'light-theme'" class="navbar-brand" routerLink="/clients">
     <img src="../../../assets/images/logo_sd.png" height="50" class="d-inline-block align-top" alt="" />
+  </a>
+  <a *ngIf="themeSelected === 'dark-theme'" class="navbar-brand" routerLink="/clients">
+    <img src="../../../assets/images/logo_white.png" height="50" class="d-inline-block align-top" alt="" />
   </a>
   <a class="navbar-brand-logo" routerLink="/clients" display="none">
     <img src="../../../assets/images/favicon.png" height="30" class="d-inline-block align-top" alt="" />
@@ -61,6 +64,8 @@
   </div>
 
   <span class="example-spacer"></span>
+
+  <app-switch-theme></app-switch-theme>
 
   <!-- botón menu derecha -->
   <button *ngIf="!isShared" mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">

@@ -1,6 +1,8 @@
-.btn-share {
-  background: white;
-  border-radius: 4px;
+.btn-download {
+  height: 40px;
+  padding: 0;
+  width: 40px;
+  min-width: unset !important;
 }
 
 h4 {

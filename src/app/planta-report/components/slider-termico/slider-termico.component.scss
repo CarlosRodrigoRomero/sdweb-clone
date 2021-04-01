@@ -1,5 +1,5 @@
 mat-card {
-  background-color: rgba($color: white, $alpha: 0.8);
+  opacity: 0.8;
   border-color: transparent;
   box-shadow: none !important;
   padding-top: 10px;
@@ -20,7 +20,9 @@ mat-card {
 
   .temperature-slider .ngx-slider .ngx-slider-bubble {
     bottom: 14px !important;
+    color: unset;
   }
+
   .temperature-slider .ngx-slider .ngx-slider-pointer {
     width: 8px !important;
     height: 16px !important;

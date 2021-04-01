@@ -3,9 +3,14 @@
   align-items: flex-end;
 }
 
-table {
-  width: 100%;
+.popup-card {
+  width: 300px;
 }
+
+.popup-card-content {
+  justify-content: space-between;
+}
+
 
 .header {
   height: 25px !important;
@@ -17,9 +22,13 @@ table {
 }
 
 .info-btn {
-  background: white;
   border-radius: 20px;
   margin-left: 10px;
+
+  height: 40px;
+  padding: 0;
+  width: 40px;
+  min-width: unset !important;
 }
 
 /* .menu {

@@ -1,19 +1,19 @@
 mat-card {
-  background-color: rgba($color: white, $alpha: 0.8);
+  opacity: 0.8;
   border-color: transparent;
   box-shadow: none !important;
   padding: 8px 16px;
   min-width: 250px;
 }
 
-::ng-deep .opacity-slider {
+/* ::ng-deep .opacity-slider {
   .mat-slider-thumb {
     background-color: grey !important;
   }
   .mat-slider-track-fill {
     background-color: grey !important;
   }
-}
+} */
 
 .opacity-slider-group {
   display: inline-flex;

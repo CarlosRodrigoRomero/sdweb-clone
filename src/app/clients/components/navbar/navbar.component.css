@@ -10,7 +10,6 @@ nav {
 .nb {
   position: relative;
   height: 8vh;
-  background: white;
   z-index: 999;
 }
 
