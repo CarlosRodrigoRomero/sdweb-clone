@@ -10,7 +10,13 @@ import { ThemeService } from '@core/services/theme.service';
 export class SwitchThemeComponent {
   public darkMode = false;
 
-  constructor(private themeService: ThemeService) {}
+  constructor(private themeService: ThemeService) {
+    this.themeService.themeSelected$.subscribe((theme) => {
+      if (theme === 'dark-theme') {
+        this.darkMode = true;
+      }
+    });
+  }
 
   public onSetTheme(theme: string) {
     this.darkMode = !this.darkMode;
