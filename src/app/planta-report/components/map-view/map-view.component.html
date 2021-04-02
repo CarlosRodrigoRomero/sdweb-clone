@@ -88,7 +88,7 @@
         mat-raised-button
         class="btn-left"
         (click)="sidenavLeft.toggle()"
-        [class.mat-elevation-z2]="true"
+        matTooltip="Filtros"
       >
         <mat-icon *ngIf="!leftOpened">keyboard_arrow_right</mat-icon>
         <mat-icon *ngIf="leftOpened">keyboard_arrow_left</mat-icon>
@@ -96,14 +96,14 @@
       </button>
 
       <!-- BOTON SIDENAV LISTA ANOMALIAS -->
-      <button mat-raised-button class="btn-right" (click)="sidenavRight.toggle()" [class.mat-elevation-z2]="true">
+      <button mat-raised-button class="btn-right" (click)="sidenavRight.toggle()" matTooltip="Lista anomalías">
         <mat-icon>list_alt</mat-icon>
         <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
         <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon>
       </button>
 
       <!-- BOTON SIDENAV STATS -->
-      <button mat-raised-button class="btn-right-stats" (click)="sidenavStats.toggle()" [class.mat-elevation-z2]="true">
+      <button mat-raised-button class="btn-right-stats" (click)="sidenavStats.toggle()" matTooltip="Estadísticas">
         <mat-icon>query_stats</mat-icon>
         <mat-icon *ngIf="!statsOpened">keyboard_arrow_left</mat-icon>
         <mat-icon *ngIf="statsOpened">keyboard_arrow_right</mat-icon>
