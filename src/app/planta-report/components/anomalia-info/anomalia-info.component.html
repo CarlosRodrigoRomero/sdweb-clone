@@ -53,7 +53,7 @@
     <button mat-raised-button class="info-btn" [class.mat-elevation-z2]="true">
       <mat-icon>info</mat-icon>
     </button>
-    <mat-menu #menu="matMenu" class="menu">
+    <mat-menu #menu="matMenu" class="menu" xPosition="before">
       <div class="menu-content" (click)="stopPropagation($event)">
         <div class="elemento">
           <h5>Información adicional</h5>

@@ -1,32 +1,32 @@
 .map {
-    height: 92vh;
-    width: 100%;
-  }
-  
-  #popup {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    width: 400px;
-    background-color: white;
-  }
+  height: calc(100vh - 70px);
+  width: 100%;
+}
 
-  #popup span {
-    background-color: white;
-  }
-  
-  ::ng-deep .ol-zoom {
-    left: unset;
-    right: 10px;
-    top: unset;
-    bottom: 10px;
-  }
-  
-  ::ng-deep .ol-control {
-      background-color: rgba(0,0,0,0.2);
-  }
-  
-  ::ng-deep .ol-control button {
-    background-color: white;
-    color: black;
-  }
+#popup {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 400px;
+  background-color: white;
+}
+
+#popup span {
+  background-color: white;
+}
+
+::ng-deep .ol-zoom {
+  left: unset;
+  right: 10px;
+  top: unset;
+  bottom: 10px;
+}
+
+::ng-deep .ol-control {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+::ng-deep .ol-control button {
+  background-color: white;
+  color: black;
+}

@@ -1,5 +1,5 @@
 .map {
-  height: 92vh;
+  height: calc(100vh - 70px);
   width: 100%;
 }
 
@@ -9,6 +9,12 @@
   left: 50%;
   transform: translate(-50%, 0%);
   margin: 10px;
+}
+
+@media (max-width: 600px) {
+  #popup {
+    top: 50px;
+  }
 }
 
 ::ng-deep .ol-zoom {

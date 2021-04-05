@@ -12,7 +12,7 @@ table {
 
 .tabla-container {
   position: relative;
-  height: 65vh;
+  height: calc(100vh - 318px);
   overflow: auto;
 }
 
@@ -100,4 +100,3 @@ table {
 .mat-row.selected {
   background-color: lightgrey;
 }
-
