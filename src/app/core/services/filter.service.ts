@@ -14,7 +14,7 @@ import { FilterInterface } from '@core/models/filter';
   providedIn: 'root',
 })
 export class FilterService {
-  private typeAddFilters = ['area', 'tipo', 'clase', 'modulo', 'zona'];
+  private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona'];
   private filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
   private filtersByType: FilterInterface[] = [];
@@ -72,14 +72,14 @@ export class FilterService {
   }
 
   addFilter(filter: FilterInterface) {
-    // comprobamos que no es de tipo 'Add'
-    if (!this.typeAddFilters.includes(filter.type)) {
+    // comprobamos que no es de tipo 'multiple'
+    if (!this.multipleFilters.includes(filter.type)) {
       // eliminamos, si lo hubiera, el filtro anterior del mismo tipo que el recibido
       this.filters = this.filters.filter((f) => f.type !== filter.type);
       // añadimos el nuevo filtro
       this.filters.push(filter);
     } else {
-      // si es del tipo 'Add' se añade al array
+      // si es del tipo 'multiple' se añade al array
       this.filters.push(filter);
     }
     this.filters$.next(this.filters);
@@ -100,10 +100,10 @@ export class FilterService {
   private applyFilters() {
     const everyFilterFiltrableElements: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
 
-    // comprobamos si hay filtros de tipo 'Add'
-    if (this.filters.filter((fil) => this.typeAddFilters.includes(fil.type)).length > 0) {
+    // comprobamos si hay filtros de tipo 'multiple'
+    if (this.filters.filter((fil) => this.multipleFilters.includes(fil.type)).length > 0) {
       // separamos los elems por tipo de filtro
-      this.typeAddFilters.forEach((type) => {
+      this.multipleFilters.forEach((type) => {
         const newFiltrableElements: FiltrableInterface[] = [];
         if (this.filters.filter((fil) => fil.type === type).length > 0) {
           // obtenemos un array de las elems filtrados por cada filtro de  diferente tipo
@@ -118,9 +118,9 @@ export class FilterService {
       });
     }
 
-    // añadimos al array los elementos filtrados de los filtros no 'Add'
+    // añadimos al array los elementos filtrados de los filtros no 'multiple'
     this.filters
-      .filter((fil) => !this.typeAddFilters.includes(fil.type))
+      .filter((fil) => !this.multipleFilters.includes(fil.type))
       .forEach((fil) => {
         const newFiltrableElements = fil.applyFilter(this._allFiltrableElements);
         everyFilterFiltrableElements.push(newFiltrableElements);
@@ -155,8 +155,8 @@ export class FilterService {
   }
 
   deleteFilter(filter: FilterInterface) {
-    // comprobamos que no es de tipo 'Add'
-    if (!this.typeAddFilters.includes(filter.type)) {
+    // comprobamos que no es de tipo 'multiple'
+    if (!this.multipleFilters.includes(filter.type)) {
       // eliminamos el filtro anterior del mismo tipo que el recibido
       this.filters = this.filters.filter((f) => f.type !== filter.type);
     } else {
@@ -184,10 +184,10 @@ export class FilterService {
   excludeTipoFilters() {
     const everyFilterFiltrableElements: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
 
-    // comprobamos si hay filtros de tipo 'Add'
-    if (this.filters.filter((filter) => this.typeAddFilters.includes(filter.type)).length > 0) {
+    // comprobamos si hay filtros de tipo 'multiple'
+    if (this.filters.filter((filter) => this.multipleFilters.includes(filter.type)).length > 0) {
       // separamos los pcs por tipo de filtro
-      this.typeAddFilters
+      this.multipleFilters
         .filter((type) => type !== 'tipo')
         .forEach((type) => {
           const newFiltrableElements: FiltrableInterface[] = [];
@@ -203,9 +203,9 @@ export class FilterService {
         });
     }
 
-    // añadimos al array los pcs filtrados de los filtros no 'Add'
+    // añadimos al array los pcs filtrados de los filtros no 'multiple'
     this.filters
-      .filter((filter) => !this.typeAddFilters.includes(filter.type))
+      .filter((filter) => !this.multipleFilters.includes(filter.type))
       .forEach((filter) => {
         const newFiltrableElements = filter.applyFilter(this._allFiltrableElements);
         everyFilterFiltrableElements.push(newFiltrableElements);
