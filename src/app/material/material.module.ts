@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 //Angular Material Components
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -34,11 +35,13 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 
 import { SwitchThemeComponent } from './components/switch-theme/switch-theme.component';
+import { MatRangeSliderComponent } from './components/mat-range-slider/mat-range-slider.component';
 
 @NgModule({
-  declarations: [SwitchThemeComponent],
+  declarations: [SwitchThemeComponent, MatRangeSliderComponent],
   imports: [
     CommonModule,
+    FormsModule,
     MatCheckboxModule,
     MatCheckboxModule,
     MatButtonModule,
@@ -104,6 +107,7 @@ import { SwitchThemeComponent } from './components/switch-theme/switch-theme.com
     MatSortModule,
     MatPaginatorModule,
     SwitchThemeComponent,
+    MatRangeSliderComponent,
   ],
 })
 export class MaterialModule {}

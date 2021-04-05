@@ -4,8 +4,11 @@ import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
 
 import { FilterService } from '@core/services/filter.service';
 import { FilterControlService } from '@core/services/filter-control.service';
+import { ShareReportService } from '@core/services/share-report.service';
 
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
+import { take } from 'rxjs/operators';
+import { RangeType } from '@material/components/mat-range-slider/mat-range-slider.component';
 
 @Component({
   selector: 'app-temp-max-filter',
@@ -20,7 +23,11 @@ export class TempMaxFilterComponent implements OnInit {
   filtroTempMax: TempMaxFilter;
   options: Options;
 
-  constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
+  constructor(
+    private filterService: FilterService,
+    private filterControlService: FilterControlService,
+    private shareReportService: ShareReportService
+  ) {}
 
   ngOnInit(): void {
     this.filterControlService.minTempMaxSource.subscribe((value) => (this.rangoMinTemp = value));
@@ -29,6 +36,7 @@ export class TempMaxFilterComponent implements OnInit {
     this.options = {
       floor: this.minTemp,
       ceil: this.maxTemp,
+      step: 2,
       translate: (value: number, label: LabelType): string => {
         switch (label) {
           case LabelType.Low:

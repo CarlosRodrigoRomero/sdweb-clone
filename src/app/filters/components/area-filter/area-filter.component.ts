@@ -71,10 +71,6 @@ export class AreaFilterComponent implements OnInit {
     this.activeDeleteButton = false;
   }
 
-  deleteAllTypeFilters(type: string) {
-    this.filterService.deleteAllTypeFilters(type);
-  }
-
   clickButtonDraw() {
     this.activeDraw = !this.activeDraw;
 

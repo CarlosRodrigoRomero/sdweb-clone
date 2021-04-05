@@ -4,8 +4,17 @@
     <ngx-slider
       [(value)]="rangoMinTemp"
       [(highValue)]="rangoMaxTemp"
-      (valueChange)="onChangeFiltroTempMax(rangoMinTemp, rangoMaxTemp)"
       [options]="options"
+      (userChangeEnd)="onChangeFiltroTempMax(rangoMinTemp, rangoMaxTemp)"      
     ></ngx-slider>
   </div>
+  <!-- <div class="new-slider">
+    <app-mat-range-slider
+      [min]="50"
+      [max]="100"
+      [(minValue)]="rangoMinTemp"
+      [(maxValue)]="rangoMaxTemp"
+      (output)="onChangeFiltroTempMax($event)"
+    ></app-mat-range-slider>
+  </div> -->
 </div>

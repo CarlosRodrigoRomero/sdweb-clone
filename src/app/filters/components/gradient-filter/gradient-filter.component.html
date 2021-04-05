@@ -4,8 +4,8 @@
     <ngx-slider
       [(value)]="rangoMinGradiente"
       [(highValue)]="rangoMaxGradiente"
-      (valueChange)="onChangeFiltroGradiente(rangoMinGradiente, rangoMaxGradiente)"
       [options]="options"
+      (userChangeEnd)="onChangeFiltroGradiente(rangoMinGradiente, rangoMaxGradiente)"
     ></ngx-slider>
   </div>
 </div>

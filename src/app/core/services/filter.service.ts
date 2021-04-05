@@ -102,10 +102,11 @@ export class FilterService {
 
     // comprobamos si hay filtros de tipo 'Add'
     if (this.filters.filter((fil) => this.typeAddFilters.includes(fil.type)).length > 0) {
-      // separamos los pcs por tipo de filtro
+      // separamos los elems por tipo de filtro
       this.typeAddFilters.forEach((type) => {
         const newFiltrableElements: FiltrableInterface[] = [];
         if (this.filters.filter((fil) => fil.type === type).length > 0) {
+          // obtenemos un array de las elems filtrados por cada filtro de  diferente tipo
           this.filters
             .filter((fil) => fil.type === type)
             .forEach((fil) => {
@@ -176,15 +177,6 @@ export class FilterService {
 
     // reseteamos todos los parametros para compartir
     this.shareReportService.resetAllParams();
-
-    this.applyFilters();
-  }
-
-  deleteAllTypeFilters(type: string) {
-    // Elimina los filtros del tipo recibido
-    this.filters = this.filters.filter((filter) => filter.type !== type);
-
-    this.filters$.next(this.filters);
 
     this.applyFilters();
   }
