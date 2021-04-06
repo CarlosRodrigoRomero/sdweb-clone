@@ -25,6 +25,7 @@ import { PcInterface } from '@core/models/pc';
 import { GLOBAL } from '@core/services/global';
 import { PlantaService } from '@core/services/planta.service';
 import { ShareReportService } from '@core/services/share-report.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 interface InfoAdicional {
   id?: string;
@@ -73,6 +74,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   private plantaId: string;
   private nombrePlanta: string;
   public coloresSeveridad: string[];
+  public tiposAnomalias: string[] = GLOBAL.labels_tipos;
 
   @ViewChild('swiperRef', { static: false }) swiperRef?: SwiperComponent;
 
@@ -80,7 +82,8 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     private plantaService: PlantaService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private shareReportService: ShareReportService
+    private shareReportService: ShareReportService,
+    private anomaliaService: AnomaliaService
   ) {}
 
   ngOnInit(): void {
@@ -155,46 +158,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
       camaraSN: this.anomaliaSelect.camaraSN,
       camaraNombre: this.anomaliaSelect.camaraModelo,
     };
-
-    /* let marcaModulo;
-    let modeloModulo;
-    let potencia;
-
-    if ((this.anomaliaSelect as PcInterface).modulo !== null) {
-      marcaModulo = (this.anomaliaSelect as PcInterface).modulo.marca;
-      modeloModulo = (this.anomaliaSelect as PcInterface).modulo.modelo;
-      potencia = (this.anomaliaSelect as PcInterface).modulo.potencia;
-    }
-    this.infoAdicional = {
-      id: this.anomaliaSelect.id,
-      fecha: (this.anomaliaSelect as PcInterface).datetimeString,
-      hora: (this.anomaliaSelect as PcInterface).datetime,
-      planta: this.nombrePlanta,
-      marcaModulo,
-      modeloModulo,
-      tipoPanelModulo: 'tipo panel',
-      potencia,
-      instalacion: this.anomaliaSelect.globalCoords[0],
-      calle: this.anomaliaSelect.globalCoords[1],
-      mesa: this.anomaliaSelect.globalCoords[2],
-      fila: (this.anomaliaSelect as PcInterface).local_y,
-      columna: (this.anomaliaSelect as PcInterface).local_x,
-      tempMedia: (this.anomaliaSelect as PcInterface).temperaturaMedia,
-      tempMax: (this.anomaliaSelect as PcInterface).temperaturaMax, // temperatura defecto en Demo
-      gradiente: (this.anomaliaSelect as PcInterface).gradiente,
-      irradiancia: (this.anomaliaSelect as PcInterface).irradiancia, // radiación en Demo
-      severidad: (this.anomaliaSelect as PcInterface).severidad, // criticidad o relevancia en Demo
-      tipoAnomalia: GLOBAL.labels_tipos[this.anomaliaSelect.tipo],
-      urlImagenIR: 'url imagen IR',
-      urlImagenRGB: 'url imagen RGB',
-      nubosidad: (this.anomaliaSelect as PcInterface).nubosidad,
-      emisividad: (this.anomaliaSelect as PcInterface).emisividad,
-      tempReflejada: (this.anomaliaSelect as PcInterface).temperaturaReflejada,
-      viento: (this.anomaliaSelect as PcInterface).viento,
-      camaraSN: (this.anomaliaSelect as PcInterface).camaraSN,
-      camaraNombre: (this.anomaliaSelect as PcInterface).camaraNombre,
-      camaraLente: (this.anomaliaSelect as PcInterface).camaraLente,
-    };*/
   }
 
   unixToDate(unix: number): string {
@@ -215,5 +178,18 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
 
   stopPropagation(event) {
     event.stopPropagation();
+  }
+
+  onEdit(event, field: string) {
+    if (event.value !== undefined) {
+      this.anomaliaSelect[field] = event.value;
+    } else {
+      this.anomaliaSelect[field] = event.target.value;
+    }
+    this.anomaliaService.updateAnomalia(this.anomaliaSelect);
+  }
+
+  deleteAnomalia(anomalia: Anomalia) {
+    console.log('anom', anomalia);
   }
 }

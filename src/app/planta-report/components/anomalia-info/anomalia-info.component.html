@@ -7,7 +7,7 @@
       </div> -->
       <div class="elemento">
         <span class="titulo">ID Anomalía</span>
-        <span class="subtitulo">{{ anomaliaHover.id }}</span>
+        <span class="subtitulo">{{ anomaliaHover.localId }}</span>
       </div>
       <div class="elemento">
         <span class="titulo">Tipo</span>
@@ -45,19 +45,46 @@
           </div>
           <div class="elemento">
             <span class="titulo">Tipo</span>
-            <span class="subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] }}</span>
+            <!-- <span class="subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] }}</span> -->
+            <!-- <input
+              (change)="onEdit($event, element, 'tipo')"
+              type="{{ pcDescripcion[anomaliaSelect.tipo] }}"
+              matImput
+              value="anomaliaSelect.tipo"
+            /> -->
+            <mat-form-field appearance="fill">
+              <mat-label>{{ pcDescripcion[anomaliaSelect.tipo] }}</mat-label>
+              <mat-select (selectionChange)="onEdit($event, 'tipo')">
+                <mat-option *ngFor="let tipo of tiposAnomalias; index as i" [value]="i">
+                  {{ tipo }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
           <div class="elemento">
             <span class="titulo">Tª Max</span>
-            <span class="subtitulo">{{ anomaliaSelect.temperaturaMax }} ºC</span>
+            <!-- <span class="subtitulo">{{ anomaliaSelect.temperaturaMax }} ºC</span> -->
+            <input
+              (change)="onEdit($event, 'temperaturaMax')"
+              type="text"
+              matImput
+              [(ngModel)]="anomaliaSelect.temperaturaMax"
+            />
           </div>
           <div class="elemento">
             <span class="titulo">&Delta; Tª</span>
-            <span class="subtitulo">{{ anomaliaSelect.gradienteNormalizado }} ºC</span>
+            <!-- <span class="subtitulo">{{ anomaliaSelect.gradienteNormalizado }} ºC</span> -->
+            <input
+              (change)="onEdit($event, 'gradienteNormalizado')"
+              type="text"
+              matImput
+              [(ngModel)]="anomaliaSelect.gradienteNormalizado"
+            />
           </div>
           <div class="elemento">
             <span class="titulo">Pérdidas</span>
-            <span class="subtitulo">{{ anomaliaSelect.perdidas * 100 }}%</span>
+            <!-- <span class="subtitulo">{{ anomaliaSelect.perdidas * 100 }}%</span> -->
+            <input (change)="onEdit($event, 'perdidas')" type="text" matImput [(ngModel)]="anomaliaSelect.perdidas" />
           </div>
         </ng-template>
 
