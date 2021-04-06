@@ -1,189 +1,184 @@
 <div class="popup">
   <mat-card class="popup-card" *ngIf="anomaliaHover">
     <mat-card-content class="popup-card-content">
-      <!-- <div class="elemento-principal">
-        <span class="titulo-principal">Clase</span>
-        <span class="subtitulo-principal">{{ anomaliaHover.clase }}</span>
+      <!-- <div class="elemento">
+        <span class="titulo">Clase</span>
+        <span class="subtitulo">{{ anomaliaHover.clase }}</span>
       </div> -->
-      <div class="elemento-principal">
-        <span class="titulo-principal">Tipo</span>
-        <span class="subtitulo-principal">{{ pcDescripcion[anomaliaHover.tipo] }}</span>
+      <div class="elemento">
+        <span class="titulo">ID Anomalía</span>
+        <span class="subtitulo">{{ anomaliaHover.id }}</span>
       </div>
-      <div class="elemento-principal">
-        <span class="titulo-principal">Tª Max</span>
-        <span class="subtitulo-principal">{{ anomaliaHover.temperaturaMax }} ºC</span>
+      <div class="elemento">
+        <span class="titulo">Tipo</span>
+        <span class="subtitulo">{{ pcDescripcion[anomaliaHover.tipo] }}</span>
       </div>
-      <div class="elemento-principal">
-        <span class="titulo-principal">&Delta; Tª</span>
-        <span class="subtitulo-principal">{{ anomaliaHover.gradienteNormalizado }} ºC</span>
+      <div class="elemento">
+        <span class="titulo">Tª Max</span>
+        <span class="subtitulo">{{ anomaliaHover.temperaturaMax }} ºC</span>
       </div>
-      <div class="elemento-principal">
-        <span class="titulo-principal">Pérdidas</span>
-        <span class="subtitulo-principal">{{ anomaliaHover.perdidas * 100 }}%</span>
+      <div class="elemento">
+        <span class="titulo">&Delta; Tª</span>
+        <span class="subtitulo">{{ anomaliaHover.gradienteNormalizado }} ºC</span>
+      </div>
+      <div class="elemento">
+        <span class="titulo">Pérdidas</span>
+        <span class="subtitulo">{{ anomaliaHover.perdidas * 100 }}%</span>
       </div>
     </mat-card-content>
   </mat-card>
 
   <mat-card class="popup-card" *ngIf="anomaliaSelect">
     <mat-card-content class="popup-card-content">
-      <!-- <div class="elemento-principal">
-        <span class="titulo-principal">Clase</span>
-        <span class="subtitulo-principal">{{ anomaliaSelect.clase }}</span>
-      </div> -->
-      <div class="elemento-principal">
-        <span class="titulo-principal">Tipo</span>
-        <span class="subtitulo-principal">{{ pcDescripcion[anomaliaSelect.tipo] }}</span>
-      </div>
-      <div class="elemento-principal">
-        <span class="titulo-principal">Tª Max</span>
-        <span class="subtitulo-principal">{{ anomaliaSelect.temperaturaMax }} ºC</span>
-      </div>
-      <div class="elemento-principal">
-        <span class="titulo-principal">&Delta; Tª</span>
-        <span class="subtitulo-principal">{{ anomaliaSelect.gradienteNormalizado }} ºC</span>
-      </div>
-      <div class="elemento-principal">
-        <span class="titulo-principal">Pérdidas</span>
-        <span class="subtitulo-principal">{{ anomaliaSelect.perdidas * 100 }}%</span>
-      </div>
+      <swiper [slidesPerView]="1" [spaceBetween]="50" [navigation]="true" [pagination]="{ clickable: true }">
+        <ng-template swiperSlide>
+          <div class="elemento">
+            <h5>General</h5>
+          </div>
+          <!-- <div class="elemento">
+            <span class="titulo">Clase</span>
+            <span class="subtitulo">{{ anomaliaSelect.clase }}</span>
+          </div> -->
+          <div class="elemento">
+            <span class="titulo">ID Anomalía</span>
+            <span class="subtitulo">{{ infoAdicional.id }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Tipo</span>
+            <span class="subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Tª Max</span>
+            <span class="subtitulo">{{ anomaliaSelect.temperaturaMax }} ºC</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">&Delta; Tª</span>
+            <span class="subtitulo">{{ anomaliaSelect.gradienteNormalizado }} ºC</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Pérdidas</span>
+            <span class="subtitulo">{{ anomaliaSelect.perdidas * 100 }}%</span>
+          </div>
+        </ng-template>
+
+        <ng-template swiperSlide>
+          <div class="elemento">
+            <h5>Vuelo</h5>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Fecha</span>
+            <span class="subtitulo">{{ infoAdicional.fecha }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Hora</span>
+            <span class="subtitulo">{{ infoAdicional.hora }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Relevancia</span>
+            <span class="subtitulo">{{ infoAdicional.irradiancia }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Nubosidad</span>
+            <span class="subtitulo">{{ infoAdicional.nubosidad }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Emisividad</span>
+            <span class="subtitulo">{{ infoAdicional.emisividad }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Temperatura reflejada</span>
+            <span class="subtitulo">{{ infoAdicional.tempReflejada }} ºC</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Velocidad viento</span>
+            <span class="subtitulo">{{ infoAdicional.vientoVelocidad }} (Beaufort)</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Dirección viento</span>
+            <span class="subtitulo">{{ infoAdicional.vientoDireccion }}º</span>
+          </div>
+        </ng-template>
+        <ng-template swiperSlide>
+          <div class="elemento">
+            <h5>Localización</h5>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Instalación</span>
+            <span class="subtitulo">{{ infoAdicional.instalacion }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Calle</span>
+            <span class="subtitulo">{{ infoAdicional.calle }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Mesa</span>
+            <span class="subtitulo">{{ infoAdicional.mesa }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Fila</span>
+            <span class="subtitulo">{{ infoAdicional.fila }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Columna</span>
+            <span class="subtitulo">{{ infoAdicional.columna }}</span>
+          </div>
+        </ng-template>
+        <ng-template swiperSlide>
+          <div class="elemento">
+            <h5>Térmico</h5>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Temperatura media</span>
+            <span class="subtitulo">{{ infoAdicional.tempMedia }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Gradiente</span>
+            <span class="subtitulo">{{ infoAdicional.gradiente }}</span>
+          </div>
+        </ng-template>
+        <ng-template swiperSlide>
+          <div class="elemento">
+            <h5>Módulo</h5>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Marca módulo</span>
+            <span class="subtitulo">{{ infoAdicional.marcaModulo }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Modelo módulo</span>
+            <span class="subtitulo">{{ infoAdicional.modeloModulo }}</span>
+          </div>
+          <!-- <div class="elemento">
+          <span class="titulo">Tipo de panel</span>
+          <span class="subtitulo">{{ infoAdicional.tipoPanelModulo }}</span>
+        </div> -->
+          <div class="elemento">
+            <span class="titulo">Potencia</span>
+            <span class="subtitulo">{{ infoAdicional.potencia }} W</span>
+          </div>
+        </ng-template>
+        <ng-template swiperSlide>
+          <div class="elemento">
+            <h5>Imagen</h5>
+          </div>
+          <!-- <div class="elemento">
+          <span class="titulo">Imagen Térmica</span>
+          <span class="subtitulo">{{ infoAdicional.urlImagenIR }}</span>
+        </div>
+        <div class="elemento">
+          <span class="titulo">Imagen RGB</span>
+          <span class="subtitulo">{{ infoAdicional.urlImagenRGB }}</span>
+        </div> -->
+          <div class="elemento">
+            <span class="titulo">Camara</span>
+            <span class="subtitulo">{{ infoAdicional.camaraNombre }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">S/N Cámara</span>
+            <span class="subtitulo">{{ infoAdicional.camaraSN }}</span>
+          </div>
+        </ng-template>
+      </swiper>
     </mat-card-content>
   </mat-card>
-
-  <div class="info" *ngIf="infoAdicional" [matMenuTriggerFor]="menu" matTooltip="Info adicional">
-    <button mat-raised-button class="info-btn" [class.mat-elevation-z2]="true">
-      <mat-icon>info</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu" class="menu" xPosition="before">
-      <div class="menu-content" (click)="stopPropagation($event)">
-        <div class="elemento">
-          <h5>Información adicional</h5>
-        </div>
-        <div class="elemento">
-          <!-- <mat-icon color="secondary">wb_sunny</mat-icon> -->
-          <span class="titulo">ID Anomalía</span>
-          <span class="subtitulo">{{ infoAdicional.id }}</span>
-        </div>
-
-        <carousel [cellWidth]="280" [height]="260" [arrows]="false">
-          <div class="carousel-cell">
-            <div class="elemento">
-              <h5>1. Vuelo</h5>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Fecha</span>
-              <span class="subtitulo">{{ infoAdicional.fecha }}</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Hora</span>
-              <span class="subtitulo">{{ infoAdicional.hora }}</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Relevancia</span>
-              <span class="subtitulo">{{ infoAdicional.irradiancia }}</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Nubosidad</span>
-              <span class="subtitulo">{{ infoAdicional.nubosidad }}</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Emisividad</span>
-              <span class="subtitulo">{{ infoAdicional.emisividad }}</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Temperatura reflejada</span>
-              <span class="subtitulo">{{ infoAdicional.tempReflejada }} ºC</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Velocidad viento</span>
-              <span class="subtitulo">{{ infoAdicional.vientoVelocidad }} (Beaufort)</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Dirección viento</span>
-              <span class="subtitulo">{{ infoAdicional.vientoDireccion }}º</span>
-            </div>
-          </div>
-          <div class="carousel-cell">
-            <div class="elemento">
-              <h5>2. Localización</h5>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Instalación</span>
-              <span class="subtitulo">{{ infoAdicional.instalacion }}</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Calle</span>
-              <span class="subtitulo">{{ infoAdicional.calle }}</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Mesa</span>
-              <span class="subtitulo">{{ infoAdicional.mesa }}</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Fila</span>
-              <span class="subtitulo">{{ infoAdicional.fila }}</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Columna</span>
-              <span class="subtitulo">{{ infoAdicional.columna }}</span>
-            </div>
-          </div>
-          <!-- <div class="carousel-cell">
-            <div class="elemento">
-              <h5>Térmico</h5>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Temperatura media</span>
-              <span class="subtitulo">{{ infoAdicional.tempMedia }}</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Gradiente</span>
-              <span class="subtitulo">{{ infoAdicional.gradiente }}</span>
-            </div>
-          </div> -->
-          <div class="carousel-cell">
-            <div class="elemento">
-              <h5>3. Módulo</h5>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Marca módulo</span>
-              <span class="subtitulo">{{ infoAdicional.marcaModulo }}</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Modelo módulo</span>
-              <span class="subtitulo">{{ infoAdicional.modeloModulo }}</span>
-            </div>
-            <!-- <div class="elemento">
-              <span class="titulo">Tipo de panel</span>
-              <span class="subtitulo">{{ infoAdicional.tipoPanelModulo }}</span>
-            </div> -->
-            <div class="elemento">
-              <span class="titulo">Potencia</span>
-              <span class="subtitulo">{{ infoAdicional.potencia }} W</span>
-            </div>
-          </div>
-          <div class="carousel-cell">
-            <div class="elemento">
-              <h5>4. Imagen</h5>
-            </div>
-            <!-- <div class="elemento">
-              <span class="titulo">Imagen Térmica</span>
-              <span class="subtitulo">{{ infoAdicional.urlImagenIR }}</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">Imagen RGB</span>
-              <span class="subtitulo">{{ infoAdicional.urlImagenRGB }}</span>
-            </div> -->
-            <div class="elemento">
-              <span class="titulo">Camara</span>
-              <span class="subtitulo">{{ infoAdicional.camaraNombre }}</span>
-            </div>
-            <div class="elemento">
-              <span class="titulo">S/N Cámara</span>
-              <span class="subtitulo">{{ infoAdicional.camaraSN }}</span>
-            </div>
-          </div>
-        </carousel>
-      </div>
-    </mat-menu>
-  </div>
 </div>

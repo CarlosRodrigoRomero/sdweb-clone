@@ -1,5 +1,23 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+
+import { SwiperComponent } from 'swiper/angular';
+
+// import Swiper core and required components
+import SwiperCore, {
+  Navigation,
+  Pagination,
+  Scrollbar,
+  A11y,
+  Virtual,
+  Zoom,
+  Autoplay,
+  Thumbs,
+  Controller,
+} from 'swiper/core';
+
+// install Swiper components
+SwiperCore.use([Navigation, Pagination, Scrollbar, A11y, Virtual, Zoom, Autoplay, Thumbs, Controller]);
 
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
@@ -55,6 +73,8 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   private plantaId: string;
   private nombrePlanta: string;
   public coloresSeveridad: string[];
+
+  @ViewChild('swiperRef', { static: false }) swiperRef?: SwiperComponent;
 
   constructor(
     private plantaService: PlantaService,

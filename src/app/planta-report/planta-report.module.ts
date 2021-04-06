@@ -5,6 +5,8 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 
 import { IvyCarouselModule } from 'angular-responsive-carousel';
 
+import { SwiperModule } from 'swiper/angular';
+
 import { PlantaReportRoutingModule } from './planta-report-routing.module';
 import { SharedModule } from '@shared/shared.module';
 import { FiltersModule } from '../filters/filters.module';
@@ -60,6 +62,7 @@ import { SliderOpacityComponent } from './components/slider-opacity/slider-opaci
     NgApexchartsModule,
     FiltersModule,
     IvyCarouselModule,
+    SwiperModule,
   ],
   exports: [MapViewComponent],
 })

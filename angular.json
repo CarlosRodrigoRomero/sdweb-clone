@@ -43,7 +43,8 @@
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/themes/nova-light/theme.css",
               "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/flexboxgrid/dist/flexboxgrid.min.css"
+              "node_modules/flexboxgrid/dist/flexboxgrid.min.css",
+              "node_modules/swiper/swiper-bundle.min.css"
             ],
             "scripts": [
               "./node_modules/popper.js/dist/umd/popper.min.js",
