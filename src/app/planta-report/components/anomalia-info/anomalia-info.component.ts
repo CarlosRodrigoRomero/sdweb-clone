@@ -223,7 +223,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   downloadRjpg(selectedAnomalia: Anomalia) {
     const archivoPublico = selectedAnomalia.archivoPublico.concat('.jpg');
     this.storage
-      .ref(`informes/${selectedAnomalia.informeId}/jpg/${archivoPublico}`)
+      .ref(`informes/${selectedAnomalia.informeId}/rjpg/${archivoPublico}`)
       .getDownloadURL()
       .pipe(take(1))
       .subscribe((downloadUrl) => {
