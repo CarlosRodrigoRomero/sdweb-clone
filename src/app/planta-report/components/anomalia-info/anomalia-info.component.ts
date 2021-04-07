@@ -26,6 +26,8 @@ import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
+import { take } from 'rxjs/operators';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 interface InfoAdicional {
   id?: string;
@@ -83,7 +85,8 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private shareReportService: ShareReportService,
-    private anomaliaService: AnomaliaService
+    private anomaliaService: AnomaliaService,
+    private storage: AngularFireStorage
   ) {}
 
   ngOnInit(): void {
@@ -189,5 +192,32 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
 
   deleteAnomalia(anomalia: Anomalia) {
     console.log('anom', anomalia);
+  }
+  downloadRjpg(selectedAnomalia: Anomalia) {
+    const archivoPublico = selectedAnomalia.archivoPublico.concat('.jpg');
+    this.storage
+      .ref(`informes/${selectedAnomalia.informeId}/rjpg/${archivoPublico}`)
+      .getDownloadURL()
+      .pipe(take(1))
+      .subscribe((downloadUrl) => {
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
+          /* Create a new Blob object using the response
+           *  data of the onload object.
+           */
+          const blob = new Blob([xhr.response], { type: 'image/jpg' });
+          const a: any = document.createElement('a');
+          a.style = 'display: none';
+          document.body.appendChild(a);
+          const url = window.URL.createObjectURL(blob);
+          a.href = url;
+          a.download = `radiometrico_${archivoPublico}`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+        };
+        xhr.open('GET', downloadUrl);
+        xhr.send();
+      });
   }
 }

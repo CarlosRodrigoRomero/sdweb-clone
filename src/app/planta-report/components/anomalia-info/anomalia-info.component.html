@@ -43,6 +43,7 @@
             <span class="titulo">ID Anomalía</span>
             <span class="subtitulo">{{ infoAdicional.id }}</span>
           </div>
+
           <div class="elemento">
             <span class="titulo">Tipo</span>
             <!-- <span class="subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] }}</span> -->
@@ -193,6 +194,12 @@
         <ng-template swiperSlide>
           <div class="elemento">
             <h5>Imagen</h5>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Descargar RJPG</span>
+            <span class="subtitulo">
+              <a class="link-descarga" (click)="downloadRjpg(anomaliaSelect)"> descarga </a>
+            </span>
           </div>
           <!-- <div class="elemento">
           <span class="titulo">Imagen Térmica</span>
