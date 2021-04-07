@@ -11,6 +11,7 @@ import { InformeService } from './informe.service';
 export class AnomaliaService {
   private _selectedInformeId: string;
   public allAnomaliasInforme: Anomalia[];
+
   constructor(public afs: AngularFirestore, private informeService: InformeService) {}
 
   set selectedInformeId(informeId: string) {
@@ -21,6 +22,7 @@ export class AnomaliaService {
         this.allAnomaliasInforme = anoms;
       });
   }
+
   get selectedInformeId(): string {
     return this._selectedInformeId;
   }
@@ -39,7 +41,7 @@ export class AnomaliaService {
       switchMap((informes) => {
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
         informes.forEach((informe) => {
-          anomaliaObsList.push(this.getAnomalias$(informe.id/* , 'pcs' */ /* para la demo */));
+          anomaliaObsList.push(this.getAnomalias$(informe.id /* , 'pcs' */ /* para la demo */));
         });
         return combineLatest(anomaliaObsList);
       }),
@@ -97,4 +99,8 @@ export class AnomaliaService {
   // );
   // return Math.ceil(tMax);
   // }
+
+  async deleteAnomalia(anomalia: Anomalia) {
+    return this.afs.doc('anomalias/' + anomalia.id).delete();
+  }
 }
