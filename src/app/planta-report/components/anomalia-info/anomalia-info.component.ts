@@ -187,7 +187,9 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     this.anomaliaService.updateAnomalia(this.anomaliaSelect);
   }
 
-  deleteAnomalia(anomalia: Anomalia) {
-    console.log('anom', anomalia);
+  deleteAnomalia() {
+    // console.log('anom', anomalia);
+    this.anomaliaService.deleteAnomalia(this.anomaliaSelect);
+    this.anomaliaSelect = undefined;
   }
 }
