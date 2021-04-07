@@ -16,8 +16,11 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { Anomalia } from '@core/models/anomalia';
-import { Modify, Select } from 'ol/interaction';
+import { Draw, Modify, Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
+import SimpleGeometry from 'ol/geom/SimpleGeometry';
+import GeometryType from 'ol/geom/GeometryType';
+import { createBox } from 'ol/interaction/Draw';
 
 @Injectable({
   providedIn: 'root',
@@ -233,6 +236,40 @@ export class AnomaliasControlService {
       // actualizamos el poligono en la DB con las nuevas coordenadas
       this.anomaliaService.updateAnomalia(this.anomaliaSelect);
     });
+  }
+
+  permitirCrearAnomalias() {
+    const draw = new Draw({
+      source: this.anomaliasVectorSource,
+      type: GeometryType.CIRCLE,
+      geometryFunction: createBox(),
+    });
+
+    this.map.addInteraction(draw);
+    draw.on('drawend', (event) => {
+      this.addAnomaliaToDb(event.feature);
+    });
+  }
+
+  private addAnomaliaToDb(feature: Feature) {
+    const geometry = feature.getGeometry() as SimpleGeometry;
+
+    const anomalia = new Anomalia(
+      0,
+      ['', '', ''],
+      0,
+      0,
+      0,
+      0,
+      null,
+      0,
+      geometry.getCoordinates()[0],
+      geometry.getType(),
+      this.plantaId,
+      this.activeInformeId
+    );
+    // Guardar en la base de datos
+    this.anomaliaService.addAnomalia(anomalia);
   }
 
   get anomaliaSelect() {
