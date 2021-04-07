@@ -8,13 +8,12 @@ export interface FiltrableInterface {
 
   id?: string;
   tipo?: number;
-  clase?: number;
+  severidad?: number;
   gradienteNormalizado?: number;
   temperaturaRef?: number;
   gps_lng?: number;
   gps_lat?: number;
   local_id?: number;
-  severidad?: number;
   reparable?: boolean;
   gradiente?: number;
   global_x?: string;

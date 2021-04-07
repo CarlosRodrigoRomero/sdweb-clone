@@ -2,7 +2,7 @@
   <mat-card-content>
     <div class="temperature-slider">
       <ngx-slider
-        (valueChange)="onChangeTemperatureSlider(lowTemp, highTemp)"
+        (userChangeEnd)="onChangeTemperatureSlider(lowTemp, highTemp)"
         [(value)]="lowTemp"
         [(highValue)]="highTemp"
         [options]="optionsTemp"

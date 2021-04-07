@@ -6,7 +6,7 @@ export class Anomalia implements FiltrableInterface {
   // FiltrableInterface
   tipo: number;
   globalCoords: string[];
-  clase: number;
+  severidad: number;
   perdidas: number;
   gradienteNormalizado: number;
   temperaturaMax: number;
@@ -45,7 +45,7 @@ export class Anomalia implements FiltrableInterface {
   ) {
     this.tipo = tipo;
     this.globalCoords = globalCoords;
-    this.clase = clase;
+    this.severidad = clase;
     this.perdidas = perdidas;
     this.gradienteNormalizado = gradienteNormalizado;
     this.temperaturaMax = temperaturaMax;

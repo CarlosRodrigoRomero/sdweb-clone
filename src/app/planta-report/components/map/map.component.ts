@@ -30,7 +30,6 @@ import { AnomaliasControlService } from '../../services/anomalias-control.servic
 import { ReportControlService } from '@core/services/report-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
-import { LocationAreaInterface } from '@core/models/location';
 import { Anomalia } from '@core/models/anomalia';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 
@@ -47,8 +46,6 @@ export class MapComponent implements OnInit {
   public rangeMax: number;
   public palleteJSON: string;
   public selectedInformeId: string;
-  public anomaliasVectorSource: VectorSource;
-  public locAreasVectorSource: VectorSource;
   public anomaliaSelect: Anomalia;
   public anomaliaHover: Anomalia;
   public listaAnomalias: Anomalia[];

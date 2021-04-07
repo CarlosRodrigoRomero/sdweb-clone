@@ -13,9 +13,10 @@ import { GLOBAL } from '@core/services/global';
 import { OlMapService } from '@core/services/ol-map.service';
 import { FilterService } from '@core/services/filter.service';
 import { ReportControlService } from '@core/services/report-control.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { Anomalia } from '@core/models/anomalia';
-import { Select } from 'ol/interaction';
+import { Modify, Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
 
 @Injectable({
@@ -39,7 +40,8 @@ export class AnomaliasControlService {
   constructor(
     private olMapService: OlMapService,
     private filterService: FilterService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private anomaliaService: AnomaliaService
   ) {}
 
   initService(): Observable<boolean> {
@@ -87,7 +89,7 @@ export class AnomaliasControlService {
           properties: {
             anomaliaId: anom.id,
             tipo: anom.tipo,
-            clase: anom.clase,
+            clase: anom.severidad,
             temperaturaMax: anom.temperaturaMax,
             temperaturaRef: anom.temperaturaRef,
             informeId: anom.informeId,
@@ -199,6 +201,9 @@ export class AnomaliasControlService {
         }
       }
     });
+
+    // hacemos el poligono editable
+    this.canModifyPolygon(select);
   }
 
   private addClickOutFeatures() {
@@ -213,6 +218,20 @@ export class AnomaliasControlService {
         }
         this.anomaliaSelect = undefined;
       }
+    });
+  }
+
+  private canModifyPolygon(select: Select) {
+    const modify = new Modify({
+      features: select.getFeatures(),
+    });
+    this.map.addInteraction(modify);
+
+    modify.on('modifyend', (e) => {
+      const newCoords = (e.features.getArray()[0].getGeometry() as Polygon).getCoordinates()[0];
+      this.anomaliaSelect.featureCoords = newCoords;
+      // actualizamos el poligono en la DB con las nuevas coordenadas
+      this.anomaliaService.updateAnomalia(this.anomaliaSelect);
     });
   }
 

@@ -101,8 +101,14 @@
             <span class="subtitulo">{{ infoAdicional.hora }}</span>
           </div>
           <div class="elemento">
-            <span class="titulo">Relevancia</span>
+            <!-- <span class="titulo">Radiación</span> -->
+            <span class="titulo">Irradiancia</span>
             <span class="subtitulo">{{ infoAdicional.irradiancia }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Relevancia</span>
+            <!-- <span class="subtitulo">{{ infoAdicional.severidad }}</span> -->
+            <input (change)="onEdit($event, 'severidad')" type="text" matImput [(ngModel)]="anomaliaSelect.severidad" />
           </div>
           <div class="elemento">
             <span class="titulo">Nubosidad</span>

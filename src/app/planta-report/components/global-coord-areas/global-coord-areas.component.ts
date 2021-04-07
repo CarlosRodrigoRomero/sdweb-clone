@@ -92,7 +92,13 @@ export class GlobalCoordAreasComponent implements OnInit {
         const style = styles[feature.getGeometry().getType()];
         // style.getText().setText(feature.get('globalCoords'));
         // para la demo
-        style.getText().setText(feature.get('globalCoords')[1]);
+        const areaNames = ['Instalación', 'Calle', 'Mesa'];
+        for (let i = 0; i < 3; i++) {
+          if (feature.get('globalCoords')[i] !== null) {
+            style.getText().setText(areaNames[i] + feature.get('globalCoords')[i]);
+          }
+        }
+
         return style;
       }
     };

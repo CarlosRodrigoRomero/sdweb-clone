@@ -19,13 +19,13 @@ import SwiperCore, {
 // install Swiper components
 SwiperCore.use([Navigation, Pagination, Scrollbar, A11y, Virtual, Zoom, Autoplay, Thumbs, Controller]);
 
-import { Anomalia } from '@core/models/anomalia';
-import { PcInterface } from '@core/models/pc';
-
 import { GLOBAL } from '@core/services/global';
 import { PlantaService } from '@core/services/planta.service';
 import { ShareReportService } from '@core/services/share-report.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
+
+import { Anomalia } from '@core/models/anomalia';
+import { PcInterface } from '@core/models/pc';
 
 interface InfoAdicional {
   id?: string;
@@ -124,8 +124,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   }
 
   getInfoAdcional() {
-    console.log(this.anomaliaSelect);
-
     /* PARA LA DEMO */
 
     this.infoAdicional = {
@@ -146,7 +144,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
       // tempMax: (this.anomaliaSelect as PcInterface).temperaturaMax, // temperatura defecto en Demo
       // gradiente: (this.anomaliaSelect as PcInterface).gradiente,
       irradiancia: (this.anomaliaSelect as PcInterface).irradiancia, // radiación en Demo
-      // severidad: (this.anomaliaSelect as PcInterface).severidad, // criticidad o relevancia en Demo
+      severidad: this.anomaliaSelect.severidad, // criticidad o relevancia en Demo
       tipoAnomalia: GLOBAL.labels_tipos[this.anomaliaSelect.tipo],
       // urlImagenIR: 'url imagen IR',
       // urlImagenRGB: 'url imagen RGB',
