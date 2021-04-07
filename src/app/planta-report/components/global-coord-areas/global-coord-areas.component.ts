@@ -14,6 +14,8 @@ import { OlMapService } from '@core/services/ol-map.service';
 import { ReportControlService } from '@core/services/report-control.service';
 
 import { LocationAreaInterface } from '@core/models/location';
+import Overlay from 'ol/Overlay';
+import OverlayPositioning from 'ol/OverlayPositioning';
 
 export interface Task {
   name: string;
@@ -62,6 +64,7 @@ export class GlobalCoordAreasComponent implements OnInit {
       .subscribe((map) => {
         this.map = map;
         this.addLocationAreas();
+        // this.addOnHoverLabel();
       });
   }
 
@@ -115,13 +118,34 @@ export class GlobalCoordAreasComponent implements OnInit {
               source: this.globalCoordAreasVectorSources[i],
               visible: true,
               style: styleFunction,
-              /* style: new Style({
-                stroke: new Stroke({
-                  color: 'red',
-                }),
-              }), */
             }))
           );
+        }
+      }
+    });
+  }
+
+  private addOnHoverLabel() {
+    // Overlay para los detalles de cada anomalia
+    const element = document.getElementById('popup');
+
+    const popup = new Overlay({
+      element,
+      positioning: OverlayPositioning.BOTTOM_CENTER,
+      stopEvent: false,
+      offset: [0, -50],
+    });
+    this.map.addOverlay(popup);
+
+    this.map.on('pointermove', (event) => {
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        const coords = event.coordinate;
+        const feature = this.map.getFeaturesAtPixel(event.pixel);
+        if (feature.length > 0) {
+          popup.setPosition(undefined);
+          popup.setPosition(coords);
+        } else {
+          popup.setPosition(undefined);
         }
       }
     });
