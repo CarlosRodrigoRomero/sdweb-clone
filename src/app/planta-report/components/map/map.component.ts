@@ -125,6 +125,8 @@ export class MapComponent implements OnInit {
           this.shareReportService.setPlantaId(this.plantaId);
 
           this.initMap();
+
+          this.anomaliasControlService.permitirCrearAnomalias(this.plantaId);
         });
     });
   }

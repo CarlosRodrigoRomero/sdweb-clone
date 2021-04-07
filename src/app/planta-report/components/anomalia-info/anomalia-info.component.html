@@ -87,6 +87,9 @@
             <!-- <span class="subtitulo">{{ anomaliaSelect.perdidas * 100 }}%</span> -->
             <input (change)="onEdit($event, 'perdidas')" type="text" matImput [(ngModel)]="anomaliaSelect.perdidas" />
           </div>
+          <button mat-icon-button (click)="deleteAnomalia()">
+            <mat-icon>delete</mat-icon>
+          </button>
         </ng-template>
 
         <ng-template swiperSlide>
