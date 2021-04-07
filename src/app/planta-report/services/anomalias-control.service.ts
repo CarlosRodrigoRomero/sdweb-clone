@@ -238,20 +238,20 @@ export class AnomaliasControlService {
     });
   }
 
-  permitirCrearAnomalias() {
+  permitirCrearAnomalias(plantaId: string) {
     const draw = new Draw({
-      source: this.anomaliasVectorSource,
+      source: this.anomaliaLayers[0].getSource(),
       type: GeometryType.CIRCLE,
       geometryFunction: createBox(),
     });
 
     this.map.addInteraction(draw);
     draw.on('drawend', (event) => {
-      this.addAnomaliaToDb(event.feature);
+      this.addAnomaliaToDb(event.feature, plantaId);
     });
   }
 
-  private addAnomaliaToDb(feature: Feature) {
+  private addAnomaliaToDb(feature: Feature, plantaId: string) {
     const geometry = feature.getGeometry() as SimpleGeometry;
 
     const anomalia = new Anomalia(
@@ -265,8 +265,8 @@ export class AnomaliasControlService {
       0,
       geometry.getCoordinates()[0],
       geometry.getType(),
-      this.plantaId,
-      this.activeInformeId
+      plantaId,
+      this.selectedInformeId
     );
     // Guardar en la base de datos
     this.anomaliaService.addAnomalia(anomalia);
