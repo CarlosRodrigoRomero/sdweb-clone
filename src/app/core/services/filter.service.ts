@@ -9,6 +9,7 @@ import { FilterControlService } from '@core/services/filter-control.service';
 
 import { FiltrableInterface } from '@core/models/filtrableInterface';
 import { FilterInterface } from '@core/models/filter';
+import { take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -38,27 +39,30 @@ export class FilterService {
 
   initService(shared: boolean, plantaId: string, plantaFija: boolean, sharedId?: string): Observable<boolean> {
     if (plantaFija) {
-      this.anomaliaService.getAnomaliasPlanta$(plantaId).subscribe((array) => {
-        this._allFiltrableElements = array;
-        this.filteredElements$.next(array);
-        if (shared) {
-          this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params));
+      this.anomaliaService
+        .getAnomaliasPlanta$(plantaId)
+        .pipe(take(1))
+        .subscribe((array) => {
+          this._allFiltrableElements = array;
+          this.filteredElements$.next(array);
+          if (shared) {
+            this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params));
 
-          // obtenemos lo filtros guardados en al DB y los añadimos
-          this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
-            if (filters.length > 0) {
-              this.addFilters(filters);
-            }
+            // obtenemos lo filtros guardados en al DB y los añadimos
+            this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
+              if (filters.length > 0) {
+                this.addFilters(filters);
+              }
+              this.initialized$.next(true);
+            });
+          } else {
             this.initialized$.next(true);
-          });
-        } else {
-          this.initialized$.next(true);
-        }
+          }
 
-        // para contabilizar los diferentes filtros 'tipo'
-        this.filteredElementsWithoutFilterTipo = array;
-        this.filteredElementsWithoutFilterTipo$.next(this.filteredElementsWithoutFilterTipo);
-      });
+          // para contabilizar los diferentes filtros 'tipo'
+          this.filteredElementsWithoutFilterTipo = array;
+          this.filteredElementsWithoutFilterTipo$.next(this.filteredElementsWithoutFilterTipo);
+        });
     } else {
       this.seguidorService.getSeguidoresPlanta$(plantaId).subscribe((seguidores) => {
         this._allFiltrableElements = seguidores;
