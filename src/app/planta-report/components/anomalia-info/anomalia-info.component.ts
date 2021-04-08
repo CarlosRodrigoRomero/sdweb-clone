@@ -29,34 +29,43 @@ import { PcInterface } from '@core/models/pc';
 
 interface InfoAdicional {
   id?: string;
-  fecha?: string;
-  hora?: string;
-  planta?: string; // nombre planta
-  marcaModulo?: string;
-  modeloModulo?: string;
-  tipoPanelModulo?: string;
-  potencia?: number;
-  instalacion?: string;
-  calle?: string;
-  mesa?: string;
-  fila?: number;
-  columna?: number;
-  tempMedia?: number;
-  tempMax?: number; // temperatura defecto en Demo
-  gradiente?: number;
-  irradiancia?: number; // radiación en Demo
-  severidad?: number; // criticidad o relevancia en Demo
-  tipoAnomalia?: string;
-  urlImagenIR?: string;
-  urlImagenRGB?: string;
-  nubosidad?: string;
-  emisividad?: number;
-  tempReflejada?: number;
-  vientoVelocidad?: number;
-  vientoDireccion?: number;
-  camaraSN?: number;
-  camaraNombre?: string;
-  camaraLente?: string;
+  vuelo?: {
+    fecha?: string;
+    hora?: string;
+    irradiancia?: number; // radiación en Demo
+    severidad?: number; // criticidad o relevancia en Demo
+    tipoAnomalia?: string;
+    nubosidad?: string;
+    emisividad?: number;
+    tempReflejada?: number;
+    vientoVelocidad?: number;
+    vientoDireccion?: number;
+  };
+  modulo?: {
+    marcaModulo?: string;
+    modeloModulo?: string;
+    tipoPanelModulo?: string;
+    potencia?: number;
+  };
+  localizacion?: {
+    instalacion?: string;
+    calle?: string;
+    mesa?: string;
+    fila?: number;
+    columna?: number;
+  };
+  termico?: {
+    gradiente?: number;
+    tempMedia?: number;
+    tempMax?: number; // temperatura defecto en Demo
+  };
+  imagen?: {
+    urlImagenIR?: string;
+    urlImagenRGB?: string;
+    camaraSN?: number;
+    camaraNombre?: string;
+    camaraLente?: string;
+  };
 }
 @Component({
   selector: 'app-anomalia-info',
@@ -75,6 +84,10 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   private nombrePlanta: string;
   public coloresSeveridad: string[];
   public tiposAnomalias: string[] = GLOBAL.labels_tipos;
+  public seccionModulo = false;
+  public seccionImagen = false;
+  public seccionLocalizacion = false;
+  public seccionVuelo = false;
 
   @ViewChild('swiperRef', { static: false }) swiperRef?: SwiperComponent;
 
@@ -126,52 +139,202 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   getInfoAdcional() {
     /* PARA LA DEMO */
 
+    console.log(this.anomaliaSelect);
+
+    /* MODULO */
+
+    let marcaModulo;
+    let modeloModulo;
+    let potencia;
+
+    if (this.anomaliaSelect.modulo !== undefined && this.anomaliaSelect.modulo !== null) {
+      this.seccionModulo = true;
+      marcaModulo = this.anomaliaSelect.modulo.marca;
+      modeloModulo = this.anomaliaSelect.modulo.modelo;
+      potencia = this.anomaliaSelect.modulo.potencia;
+    }
+
+    /* LOCALIZACION */
+
+    let instalacion;
+    let calle;
+    let mesa;
+    let fila;
+    let columna;
+
+    const coords = this.anomaliaSelect.globalCoords;
+    if (coords !== undefined) {
+      if (coords[0] !== undefined && coords[0] !== null && coords[0] !== '') {
+        instalacion = coords[0];
+      }
+      if (coords[1] !== undefined && coords[1] !== null && coords[1] !== '') {
+        calle = coords[1];
+      }
+      if (coords[2] !== undefined && coords[2] !== null && coords[2] !== '') {
+        mesa = coords[2];
+      }
+    }
+
+    const localY = this.anomaliaSelect.localY;
+    if (localY !== undefined && localY !== null) {
+      fila = localY;
+    }
+
+    const localX = this.anomaliaSelect.localX;
+    if (localX !== undefined && localX !== null) {
+      columna = localX;
+    }
+
+    if (
+      instalacion !== undefined ||
+      calle !== undefined ||
+      mesa !== undefined ||
+      fila !== undefined ||
+      columna !== undefined
+    ) {
+      this.seccionLocalizacion = true;
+    }
+
+    /* VUELO */
+
+    let fecha;
+    let hora;
+    let irradiancia;
+    let severidad;
+    let nubosidad;
+    let emisividad;
+    let tempReflejada;
+    let vientoVelocidad;
+    let vientoDireccion;
+
+    const datetime = (this.anomaliaSelect as PcInterface).datetime;
+    if (datetime !== undefined && datetime !== null) {
+      fecha = this.unixToDate((this.anomaliaSelect as PcInterface).datetime)[0];
+      hora = this.unixToDate((this.anomaliaSelect as PcInterface).datetime)[1];
+    }
+    const irrad = (this.anomaliaSelect as PcInterface).irradiancia;
+    if (irrad !== undefined && irrad !== null) {
+      irradiancia = irrad;
+    }
+    const sev = this.anomaliaSelect.severidad;
+    if (sev !== undefined && sev !== null) {
+      severidad = sev;
+    }
+    const nubo = (this.anomaliaSelect as PcInterface).nubosidad;
+    if (nubo !== undefined && nubo !== null) {
+      nubosidad = nubo;
+    }
+    const emis = (this.anomaliaSelect as PcInterface).emisividad;
+    if (emis !== undefined && emis !== null) {
+      emisividad = emis;
+    }
+    const tempR = (this.anomaliaSelect as PcInterface).temperaturaReflejada;
+    if (tempR !== undefined && tempR !== null) {
+      tempReflejada = tempR;
+    }
+    const vientoV = this.anomaliaSelect.vientoVelocidad;
+    if (vientoV !== undefined && vientoV !== null) {
+      vientoVelocidad = vientoV;
+    }
+    const vientoD = this.anomaliaSelect.vientoDireccion;
+    if (vientoD !== undefined && vientoD !== null) {
+      vientoDireccion = vientoD;
+    }
+
+    if (
+      fecha !== undefined ||
+      hora !== undefined ||
+      irradiancia !== undefined ||
+      severidad !== undefined ||
+      nubosidad !== undefined ||
+      emisividad != undefined ||
+      tempReflejada !== undefined ||
+      vientoVelocidad !== undefined ||
+      vientoDireccion !== undefined
+    ) {
+      this.seccionVuelo = true;
+    }
+
+    /* IMAGEN */
+
+    let urlImagenIR;
+    let urlImagenRGB;
+    let camaraSN;
+    let camaraNombre;
+
+    /* const urlIR = this.anomaliaSelect.urlImagenIR;
+    if (urlIR !== undefined && urlIR !== null) {
+      urlImagenIR = urlIR;
+    }
+    const urlRGB = this.anomaliaSelect.urlImagenRGB;
+    if (urlRGB !== undefined && urlRGB !== null) {
+      urlImagenRGB = urlRGB;
+    } */
+    const camSN = this.anomaliaSelect.camaraSN;
+    if (camSN !== undefined && camSN !== null) {
+      camaraSN = camSN;
+    }
+    const camNombre = this.anomaliaSelect.camaraModelo;
+    if (camNombre !== undefined && camNombre !== null) {
+      camaraNombre = camNombre;
+    }
+
+    if (
+      urlImagenIR !== undefined ||
+      urlImagenRGB !== undefined ||
+      camaraSN !== undefined ||
+      camaraNombre !== undefined
+    ) {
+      this.seccionImagen = true;
+    }
+
     this.infoAdicional = {
+      // GENERAL
       id: this.anomaliaSelect.localId,
-      fecha: this.unixToDate((this.anomaliaSelect as PcInterface).datetime),
-      hora: this.unixToTime((this.anomaliaSelect as PcInterface).datetime),
-      planta: this.nombrePlanta,
-      marcaModulo: this.anomaliaSelect.modulo.marca,
-      modeloModulo: this.anomaliaSelect.modulo.modelo,
-      // tipoPanelModulo: 'tipo panel',
-      potencia: this.anomaliaSelect.modulo.potencia,
-      instalacion: this.anomaliaSelect.globalCoords[0],
-      calle: this.anomaliaSelect.globalCoords[1],
-      mesa: this.anomaliaSelect.globalCoords[2],
-      fila: this.anomaliaSelect.localY,
-      columna: this.anomaliaSelect.localX,
-      // tempMedia: (this.anomaliaSelect as PcInterface).temperaturaMedia,
-      // tempMax: (this.anomaliaSelect as PcInterface).temperaturaMax, // temperatura defecto en Demo
-      // gradiente: (this.anomaliaSelect as PcInterface).gradiente,
-      irradiancia: (this.anomaliaSelect as PcInterface).irradiancia, // radiación en Demo
-      severidad: this.anomaliaSelect.severidad, // criticidad o relevancia en Demo
-      tipoAnomalia: GLOBAL.labels_tipos[this.anomaliaSelect.tipo],
-      // urlImagenIR: 'url imagen IR',
-      // urlImagenRGB: 'url imagen RGB',
-      nubosidad: (this.anomaliaSelect as PcInterface).nubosidad,
-      emisividad: (this.anomaliaSelect as PcInterface).emisividad,
-      tempReflejada: (this.anomaliaSelect as PcInterface).temperaturaReflejada,
-      vientoVelocidad: this.anomaliaSelect.vientoVelocidad,
-      vientoDireccion: this.anomaliaSelect.vientoDireccion,
-      camaraSN: this.anomaliaSelect.camaraSN,
-      camaraNombre: this.anomaliaSelect.camaraModelo,
+      vuelo: {
+        fecha,
+        hora,
+        irradiancia, // radiación en Demo
+        severidad, // criticidad o relevancia en Demo
+        nubosidad,
+        emisividad,
+        tempReflejada,
+        vientoVelocidad,
+        vientoDireccion,
+      },
+      modulo: {
+        marcaModulo,
+        modeloModulo,
+        // tipoPanelModulo: 'tipo panel',
+        potencia,
+      },
+      localizacion: {
+        instalacion,
+        calle,
+        mesa,
+        fila,
+        columna,
+      },
+
+      // TERMICO
+      termico: {
+        tempMedia: (this.anomaliaSelect as PcInterface).temperaturaMedia,
+        gradiente: (this.anomaliaSelect as PcInterface).gradiente,
+      },
+
+      imagen: {
+        // urlImagenIR: 'url imagen IR',
+        // urlImagenRGB: 'url imagen RGB',
+        camaraSN,
+        camaraNombre,
+      },
     };
   }
 
-  unixToDate(unix: number): string {
+  unixToDate(unix: number): string[] {
     const date = new Date(unix * 1000);
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const day = date.getDay();
-    return day + '/' + month + '/' + year;
-  }
 
-  unixToTime(unix: number): string {
-    const date = new Date(unix * 1000);
-    const hour = date.getHours();
-    const minutes = date.getMinutes();
-    const seconds = date.getSeconds();
-    return hour + ':' + minutes + ':' + seconds;
+    return date.toLocaleString().split(' ');
   }
 
   stopPropagation(event) {
@@ -188,7 +351,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   }
 
   deleteAnomalia() {
-    // console.log('anom', anomalia);
     this.anomaliaService.deleteAnomalia(this.anomaliaSelect);
     this.anomaliaSelect = undefined;
   }

@@ -100,3 +100,7 @@ table {
 .mat-row.selected {
   background-color: lightgrey;
 }
+
+.mat-row.hovered {
+  background-color: whitesmoke;
+}

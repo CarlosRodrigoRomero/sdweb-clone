@@ -126,7 +126,7 @@ export class MapComponent implements OnInit {
 
           this.initMap();
 
-          this.anomaliasControlService.permitirCrearAnomalias(this.plantaId);
+          // this.anomaliasControlService.permitirCrearAnomalias(this.plantaId);
         });
     });
   }

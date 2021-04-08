@@ -28,7 +28,169 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="popup-card" *ngIf="anomaliaSelect">
+  <mat-card class="popup-desktop" *ngIf="anomaliaSelect">
+    <mat-tab-group mat-align-tabs="center">
+      <mat-tab label="General">
+        <div class="tab-content">
+          <!-- <div class="elemento">
+            <span class="titulo">Clase</span>
+            <span class="subtitulo">{{ anomaliaSelect.clase }}</span>
+          </div> -->
+          <div class="elemento">
+            <span class="titulo">ID Anomalía</span>
+            <span class="subtitulo">{{ infoAdicional.id }}</span>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Tipo</span>
+            <span class="subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] }}</span>
+            <!-- <mat-form-field appearance="fill">
+                <mat-label>{{ pcDescripcion[anomaliaSelect.tipo] }}</mat-label>
+                <mat-select (selectionChange)="onEdit($event, 'tipo')">
+                  <mat-option *ngFor="let tipo of tiposAnomalias; index as i" [value]="i">
+                    {{ tipo }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field> -->
+          </div>
+          <div class="elemento">
+            <span class="titulo">Tª Max</span>
+            <span class="subtitulo">{{ anomaliaSelect.temperaturaMax }} ºC</span>
+            <!-- <input
+                (change)="onEdit($event, 'temperaturaMax')"
+                type="text"
+                matImput
+                [(ngModel)]="anomaliaSelect.temperaturaMax"
+              /> -->
+          </div>
+          <div class="elemento">
+            <span class="titulo">&Delta; Tª</span>
+            <span class="subtitulo">{{ anomaliaSelect.gradienteNormalizado }} ºC</span>
+            <!-- <input
+                (change)="onEdit($event, 'gradienteNormalizado')"
+                type="text"
+                matImput
+                [(ngModel)]="anomaliaSelect.gradienteNormalizado"
+              /> -->
+          </div>
+          <div class="elemento">
+            <span class="titulo">Pérdidas</span>
+            <span class="subtitulo">{{ anomaliaSelect.perdidas * 100 }}%</span>
+            <!-- <input (change)="onEdit($event, 'perdidas')" type="text" matImput [(ngModel)]="anomaliaSelect.perdidas" /> -->
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Vuelo" *ngIf="seccionVuelo">
+        <div class="tab-content">
+          <div class="elemento" *ngIf="infoAdicional.vuelo.fecha">
+            <span class="titulo">Fecha</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.fecha }}</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.vuelo.hora">
+            <span class="titulo">Hora</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.hora }}</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.vuelo.irradiancia">
+            <!-- <span class="titulo">Radiación</span> -->
+            <span class="titulo">Irradiancia</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.irradiancia }}</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.vuelo.relevancia">
+            <span class="titulo">Relevancia</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.severidad }}</span>
+            <!-- <input (change)="onEdit($event, 'severidad')" type="text" matImput [(ngModel)]="anomaliaSelect.severidad" /> -->
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.vuelo.nubosidad">
+            <span class="titulo">Nubosidad</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.nubosidad }}</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.vuelo.emisividad">
+            <span class="titulo">Emisividad</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.emisividad }}</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.vuelo.tempReflejada">
+            <span class="titulo">Temperatura reflejada</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.tempReflejada }} ºC</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.vuelo.vientoVelocidad">
+            <span class="titulo">Velocidad viento</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.vientoVelocidad }} (Beaufort)</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.vuelo.vientoDireccion">
+            <span class="titulo">Dirección viento</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.vientoDireccion }}º</span>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Localización" *ngIf="seccionLocalizacion">
+        <div class="tab-content">
+          <div class="elemento" *ngIf="infoAdicional.localizacion.instalacion">
+            <span class="titulo">Instalación</span>
+            <span class="subtitulo">{{ infoAdicional.localizacion.instalacion }}</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.localizacion.calle">
+            <span class="titulo">Calle</span>
+            <span class="subtitulo">{{ infoAdicional.localizacion.calle }}</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.localizacion.mesa">
+            <span class="titulo">Mesa</span>
+            <span class="subtitulo">{{ infoAdicional.localizacion.mesa }}</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.localizacion.fila">
+            <span class="titulo">Fila</span>
+            <span class="subtitulo">{{ infoAdicional.localizacion.fila }}</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.localizacion.columna">
+            <span class="titulo">Columna</span>
+            <span class="subtitulo">{{ infoAdicional.localizacion.columna }}</span>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Módulo" *ngIf="seccionModulo">
+        <div class="tab-content">
+          <div class="elemento" *ngIf="infoAdicional.modulo.marcaModulo">
+            <span class="titulo">Marca módulo</span>
+            <span class="subtitulo">{{ infoAdicional.modulo.marcaModulo }}</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.modulo.modeloModulo">
+            <span class="titulo">Modelo módulo</span>
+            <span class="subtitulo">{{ infoAdicional.modulo.modeloModulo }}</span>
+          </div>
+          <!-- <div class="elemento" *ngIf="infoAdicional.modulo.tipoPanelModulo !== undefined">
+          <span class="titulo">Tipo de panel</span>
+          <span class="subtitulo">{{ infoAdicional.modulo.tipoPanelModulo }}</span>
+        </div> -->
+          <div class="elemento" *ngIf="infoAdicional.modulo.potencia">
+            <span class="titulo">Potencia</span>
+            <span class="subtitulo">{{ infoAdicional.modulo.potencia }} W</span>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Imagen" *ngIf="seccionImagen">
+        <div class="tab-content">
+          <div class="elemento">
+            <span class="titulo">Imagen Térmica</span>
+            <!-- <span class="subtitulo">{{ infoAdicional.imagen.urlImagenIR }}</span> -->
+            <a mat-button href="https://www.google.com/">Url imagen térmica</a>
+          </div>
+          <div class="elemento">
+            <span class="titulo">Imagen RGB</span>
+            <!-- <span class="subtitulo">{{ infoAdicional.imagen.urlImagenRGB }}</span> -->
+            <a mat-button href="https://www.google.com/">Url imagen RGB</a>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.imagen.camaraNombre">
+            <span class="titulo">Camara</span>
+            <span class="subtitulo">{{ infoAdicional.imagen.camaraNombre }}</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.imagen.camaraSN">
+            <span class="titulo">S/N Cámara</span>
+            <span class="subtitulo">{{ infoAdicional.imagen.camaraSN }}</span>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
+
+  <mat-card class="popup-card" *ngIf="false">
     <mat-card-content class="popup-card-content">
       <swiper [slidesPerView]="1" [spaceBetween]="50" [navigation]="true" [pagination]="{ clickable: true }">
         <ng-template swiperSlide>
@@ -45,173 +207,172 @@
           </div>
           <div class="elemento">
             <span class="titulo">Tipo</span>
-            <!-- <span class="subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] }}</span> -->
-            <!-- <input
-              (change)="onEdit($event, element, 'tipo')"
-              type="{{ pcDescripcion[anomaliaSelect.tipo] }}"
-              matImput
-              value="anomaliaSelect.tipo"
-            /> -->
-            <mat-form-field appearance="fill">
+            <span class="subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] }}</span>
+            <!-- <mat-form-field appearance="fill">
               <mat-label>{{ pcDescripcion[anomaliaSelect.tipo] }}</mat-label>
               <mat-select (selectionChange)="onEdit($event, 'tipo')">
                 <mat-option *ngFor="let tipo of tiposAnomalias; index as i" [value]="i">
                   {{ tipo }}
                 </mat-option>
               </mat-select>
-            </mat-form-field>
+            </mat-form-field> -->
           </div>
           <div class="elemento">
             <span class="titulo">Tª Max</span>
-            <!-- <span class="subtitulo">{{ anomaliaSelect.temperaturaMax }} ºC</span> -->
-            <input
+            <span class="subtitulo">{{ anomaliaSelect.temperaturaMax }} ºC</span>
+            <!-- <input
               (change)="onEdit($event, 'temperaturaMax')"
               type="text"
               matImput
               [(ngModel)]="anomaliaSelect.temperaturaMax"
-            />
+            /> -->
           </div>
           <div class="elemento">
             <span class="titulo">&Delta; Tª</span>
-            <!-- <span class="subtitulo">{{ anomaliaSelect.gradienteNormalizado }} ºC</span> -->
-            <input
+            <span class="subtitulo">{{ anomaliaSelect.gradienteNormalizado }} ºC</span>
+            <!-- <input
               (change)="onEdit($event, 'gradienteNormalizado')"
               type="text"
               matImput
               [(ngModel)]="anomaliaSelect.gradienteNormalizado"
-            />
+            /> -->
           </div>
           <div class="elemento">
             <span class="titulo">Pérdidas</span>
-            <!-- <span class="subtitulo">{{ anomaliaSelect.perdidas * 100 }}%</span> -->
-            <input (change)="onEdit($event, 'perdidas')" type="text" matImput [(ngModel)]="anomaliaSelect.perdidas" />
+            <span class="subtitulo">{{ anomaliaSelect.perdidas * 100 }}%</span>
+            <!-- <input (change)="onEdit($event, 'perdidas')" type="text" matImput [(ngModel)]="anomaliaSelect.perdidas" /> -->
           </div>
-          <button mat-icon-button (click)="deleteAnomalia()">
+          <!-- <button mat-icon-button (click)="deleteAnomalia()">
             <mat-icon>delete</mat-icon>
-          </button>
+          </button> -->
         </ng-template>
 
-        <ng-template swiperSlide>
+        <ng-template swiperSlide *ngIf="seccionVuelo">
           <div class="elemento">
             <h5>Vuelo</h5>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.vuelo.fecha">
             <span class="titulo">Fecha</span>
-            <span class="subtitulo">{{ infoAdicional.fecha }}</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.fecha }}</span>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.vuelo.hora">
             <span class="titulo">Hora</span>
-            <span class="subtitulo">{{ infoAdicional.hora }}</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.hora }}</span>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.vuelo.irradiancia">
             <!-- <span class="titulo">Radiación</span> -->
             <span class="titulo">Irradiancia</span>
-            <span class="subtitulo">{{ infoAdicional.irradiancia }}</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.irradiancia }}</span>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.vuelo.relevancia">
             <span class="titulo">Relevancia</span>
-            <!-- <span class="subtitulo">{{ infoAdicional.severidad }}</span> -->
-            <input (change)="onEdit($event, 'severidad')" type="text" matImput [(ngModel)]="anomaliaSelect.severidad" />
+            <span class="subtitulo">{{ infoAdicional.vuelo.severidad }}</span>
+            <!-- <input (change)="onEdit($event, 'severidad')" type="text" matImput [(ngModel)]="anomaliaSelect.severidad" /> -->
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.vuelo.nubosidad">
             <span class="titulo">Nubosidad</span>
-            <span class="subtitulo">{{ infoAdicional.nubosidad }}</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.nubosidad }}</span>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.vuelo.emisividad">
             <span class="titulo">Emisividad</span>
-            <span class="subtitulo">{{ infoAdicional.emisividad }}</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.emisividad }}</span>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.vuelo.tempReflejada">
             <span class="titulo">Temperatura reflejada</span>
-            <span class="subtitulo">{{ infoAdicional.tempReflejada }} ºC</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.tempReflejada }} ºC</span>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.vuelo.vientoVelocidad">
             <span class="titulo">Velocidad viento</span>
-            <span class="subtitulo">{{ infoAdicional.vientoVelocidad }} (Beaufort)</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.vientoVelocidad }} (Beaufort)</span>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.vuelo.vientoDireccion">
             <span class="titulo">Dirección viento</span>
-            <span class="subtitulo">{{ infoAdicional.vientoDireccion }}º</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.vientoDireccion }}º</span>
           </div>
         </ng-template>
-        <ng-template swiperSlide>
+
+        <ng-template swiperSlide *ngIf="seccionLocalizacion">
           <div class="elemento">
             <h5>Localización</h5>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.localizacion.instalacion">
             <span class="titulo">Instalación</span>
-            <span class="subtitulo">{{ infoAdicional.instalacion }}</span>
+            <span class="subtitulo">{{ infoAdicional.localizacion.instalacion }}</span>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.localizacion.calle">
             <span class="titulo">Calle</span>
-            <span class="subtitulo">{{ infoAdicional.calle }}</span>
+            <span class="subtitulo">{{ infoAdicional.localizacion.calle }}</span>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.localizacion.mesa">
             <span class="titulo">Mesa</span>
-            <span class="subtitulo">{{ infoAdicional.mesa }}</span>
+            <span class="subtitulo">{{ infoAdicional.localizacion.mesa }}</span>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.localizacion.fila">
             <span class="titulo">Fila</span>
-            <span class="subtitulo">{{ infoAdicional.fila }}</span>
+            <span class="subtitulo">{{ infoAdicional.localizacion.fila }}</span>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.localizacion.columna">
             <span class="titulo">Columna</span>
-            <span class="subtitulo">{{ infoAdicional.columna }}</span>
+            <span class="subtitulo">{{ infoAdicional.localizacion.columna }}</span>
           </div>
         </ng-template>
-        <ng-template swiperSlide>
+
+        <!-- <ng-template swiperSlide>
           <div class="elemento">
             <h5>Térmico</h5>
           </div>
           <div class="elemento">
             <span class="titulo">Temperatura media</span>
-            <span class="subtitulo">{{ infoAdicional.tempMedia }}</span>
+            <span class="subtitulo">{{ infoAdicional.termico.tempMedia }}</span>
           </div>
           <div class="elemento">
             <span class="titulo">Gradiente</span>
-            <span class="subtitulo">{{ infoAdicional.gradiente }}</span>
+            <span class="subtitulo">{{ infoAdicional.termico.gradiente }}</span>
           </div>
-        </ng-template>
-        <ng-template swiperSlide>
+        </ng-template> -->
+
+        <ng-template swiperSlide *ngIf="seccionModulo">
           <div class="elemento">
             <h5>Módulo</h5>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.modulo.marcaModulo">
             <span class="titulo">Marca módulo</span>
-            <span class="subtitulo">{{ infoAdicional.marcaModulo }}</span>
+            <span class="subtitulo">{{ infoAdicional.modulo.marcaModulo }}</span>
           </div>
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.modulo.modeloModulo">
             <span class="titulo">Modelo módulo</span>
-            <span class="subtitulo">{{ infoAdicional.modeloModulo }}</span>
+            <span class="subtitulo">{{ infoAdicional.modulo.modeloModulo }}</span>
           </div>
-          <!-- <div class="elemento">
+          <!-- <div class="elemento" *ngIf="infoAdicional.modulo.tipoPanelModulo !== undefined">
           <span class="titulo">Tipo de panel</span>
-          <span class="subtitulo">{{ infoAdicional.tipoPanelModulo }}</span>
+          <span class="subtitulo">{{ infoAdicional.modulo.tipoPanelModulo }}</span>
         </div> -->
-          <div class="elemento">
+          <div class="elemento" *ngIf="infoAdicional.modulo.potencia">
             <span class="titulo">Potencia</span>
-            <span class="subtitulo">{{ infoAdicional.potencia }} W</span>
+            <span class="subtitulo">{{ infoAdicional.modulo.potencia }} W</span>
           </div>
         </ng-template>
-        <ng-template swiperSlide>
+        <ng-template swiperSlide *ngIf="seccionImagen">
           <div class="elemento">
             <h5>Imagen</h5>
           </div>
-          <!-- <div class="elemento">
-          <span class="titulo">Imagen Térmica</span>
-          <span class="subtitulo">{{ infoAdicional.urlImagenIR }}</span>
-        </div>
-        <div class="elemento">
-          <span class="titulo">Imagen RGB</span>
-          <span class="subtitulo">{{ infoAdicional.urlImagenRGB }}</span>
-        </div> -->
           <div class="elemento">
-            <span class="titulo">Camara</span>
-            <span class="subtitulo">{{ infoAdicional.camaraNombre }}</span>
+            <span class="titulo">Imagen Térmica</span>
+            <!-- <span class="subtitulo">{{ infoAdicional.imagen.urlImagenIR }}</span> -->
+            <a mat-button href="https://www.google.com/">Url imagen térmica</a>
           </div>
           <div class="elemento">
+            <span class="titulo">Imagen RGB</span>
+            <!-- <span class="subtitulo">{{ infoAdicional.imagen.urlImagenRGB }}</span> -->
+            <a mat-button href="https://www.google.com/">Url imagen RGB</a>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.imagen.camaraNombre">
+            <span class="titulo">Camara</span>
+            <span class="subtitulo">{{ infoAdicional.imagen.camaraNombre }}</span>
+          </div>
+          <div class="elemento" *ngIf="infoAdicional.imagen.camaraSN">
             <span class="titulo">S/N Cámara</span>
-            <span class="subtitulo">{{ infoAdicional.camaraSN }}</span>
+            <span class="subtitulo">{{ infoAdicional.imagen.camaraSN }}</span>
           </div>
         </ng-template>
       </swiper>

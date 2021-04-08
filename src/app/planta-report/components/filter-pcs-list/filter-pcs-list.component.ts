@@ -52,6 +52,7 @@ export class FilterPcsListComponent implements OnInit {
               clase: anom.severidad,
               anomalia: anom,
               selected: false,
+              hovered: false,
             })
           );
 
@@ -86,6 +87,9 @@ export class FilterPcsListComponent implements OnInit {
   }
 
   selectAnomalia(row: any) {
+    // quitamos el hover de la anomalia
+    this.anomaliasControlService.anomaliaHover = undefined;
+
     // Seleccionamos en la lista
     if (this.prevSelectedRow !== undefined) {
       // deseleccionamos la anterior

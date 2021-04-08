@@ -49,20 +49,28 @@ export class AnomaliasControlService {
 
   initService(): Observable<boolean> {
     const getMap = this.olMapService.getMap();
-    const getInformeId = this.reportControlService.selectedInformeId$;
+    // const getInformeId = this.reportControlService.selectedInformeId$;
     const getAnomLayers = this.olMapService.getAnomaliaLayers();
     const getIfSharedWithFilters = this.reportControlService.sharedReportWithFilters$;
 
-    combineLatest([getMap, getInformeId, getAnomLayers, getIfSharedWithFilters])
+    combineLatest([getMap, /* getInformeId,  */ getAnomLayers, getIfSharedWithFilters])
       .pipe(take(1))
-      .subscribe(([map, informeId, anomL, isSharedWithFil]) => {
+      .subscribe(([map, /* informeId,  */ anomL, isSharedWithFil]) => {
         this.map = map;
-        this.selectedInformeId = informeId;
+        /* this.selectedInformeId = informeId; */
         this.anomaliaLayers = anomL;
         this.sharedReportNoFilters = !isSharedWithFil;
 
         this.initialized$.next(true);
       });
+
+    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+      this.selectedInformeId = informeId;
+      this.prevAnomaliaSelect = undefined;
+      this.prevFeatureHover = undefined;
+      this.anomaliaSelect = undefined;
+    });
+
     return this.initialized$;
   }
 
@@ -134,7 +142,7 @@ export class AnomaliasControlService {
   public addOnHoverAction() {
     let currentFeatureHover;
     this.map.on('pointermove', (event) => {
-      if (this._anomaliaSelect === undefined) {
+      if (this.anomaliaSelect === undefined) {
         if (this.map.hasFeatureAtPixel(event.pixel)) {
           const feature = this.map
             .getFeaturesAtPixel(event.pixel)
@@ -206,7 +214,7 @@ export class AnomaliasControlService {
     });
 
     // hacemos el poligono editable
-    this.canModifyPolygon(select);
+    // this.canModifyPolygon(select);
   }
 
   private addClickOutFeatures() {
@@ -318,9 +326,11 @@ export class AnomaliasControlService {
   }
 
   private getColorAnomalia(feature: Feature) {
-    const tipo = parseInt(feature.getProperties().properties.tipo);
+    if (feature !== undefined) {
+      const tipo = parseInt(feature.getProperties().properties.tipo);
 
-    return GLOBAL.colores_tipos[tipo];
+      return GLOBAL.colores_tipos[tipo];
+    }
   }
 
   setExternalStyle(anomaliaId: string, focus: boolean) {
