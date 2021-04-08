@@ -64,7 +64,6 @@ export class GlobalCoordAreasComponent implements OnInit {
       .subscribe((map) => {
         this.map = map;
         this.addLocationAreas();
-        // this.addOnHoverLabel();
       });
   }
 
@@ -94,6 +93,7 @@ export class GlobalCoordAreasComponent implements OnInit {
       if (feature !== undefined) {
         const style = styles[feature.getGeometry().getType()];
         // style.getText().setText(feature.get('globalCoords'));
+
         // para la demo
         /* const areaNames = ['Instalación', 'Calle', 'Mesa'];
         for (let i = 0; i < 3; i++) {
@@ -113,6 +113,9 @@ export class GlobalCoordAreasComponent implements OnInit {
           this.globalCoordAreasVectorSources[i] = new VectorSource({
             features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(this.globalCoordAreas[i])),
           });
+          this.globalCoordAreasVectorSources[i]
+            .getFeatures()
+            .forEach((feature) => feature.setProperties({ tipo: 'areaGlobalCoord' }));
           this.map.addLayer(
             (this.globalCoordAreasVectorLayers[i] = new VectorLayer({
               source: this.globalCoordAreasVectorSources[i],
@@ -121,6 +124,31 @@ export class GlobalCoordAreasComponent implements OnInit {
             }))
           );
         }
+      }
+
+      this.addPointerOnHover();
+      this.addOnHoverLabel();
+    });
+  }
+
+  private addPointerOnHover() {
+    this.map.on('pointermove', (event) => {
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        const feature = this.map
+          .getFeaturesAtPixel(event.pixel)
+          .filter((item) => item.getProperties() !== undefined)
+          .filter((item) => item.getProperties().tipo === 'areaGlobalCoord');
+
+        if (feature.length > 0) {
+          // cambia el puntero por el de seleccionar
+          this.map.getViewport().style.cursor = 'pointer';
+        } else {
+          // vuelve a poner el puntero normal
+          this.map.getViewport().style.cursor = 'inherit';
+        }
+      } else {
+        // vuelve a poner el puntero normal
+        this.map.getViewport().style.cursor = 'inherit';
       }
     });
   }
@@ -133,20 +161,35 @@ export class GlobalCoordAreasComponent implements OnInit {
       element,
       positioning: OverlayPositioning.BOTTOM_CENTER,
       stopEvent: false,
-      offset: [0, -50],
+      offset: [0, -10],
     });
+
     this.map.addOverlay(popup);
+
+    const areaNames = ['Instalación', 'Calle', 'Mesa'];
 
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
         const coords = event.coordinate;
-        const feature = this.map.getFeaturesAtPixel(event.pixel);
+        const feature = this.map
+          .getFeaturesAtPixel(event.pixel)
+          .filter((item) => item.getProperties() !== undefined)
+          .filter((item) => item.getProperties().tipo === 'areaGlobalCoord');
+
         if (feature.length > 0) {
           popup.setPosition(undefined);
           popup.setPosition(coords);
+
+          for (let i = 0; i < 3; i++) {
+            if (feature[0].get('globalCoords')[i] !== null) {
+              element.innerHTML = areaNames[i] + ' ' + feature[0].get('globalCoords')[i];
+            }
+          }
         } else {
           popup.setPosition(undefined);
         }
+      } else {
+        popup.setPosition(undefined);
       }
     });
   }

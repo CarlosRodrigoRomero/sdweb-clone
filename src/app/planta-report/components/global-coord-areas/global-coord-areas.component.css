@@ -24,3 +24,11 @@
 li {
   list-style-type: none;
 }
+
+.label-popup {
+  border-radius: 4px;
+  background-color: rgb(78, 78, 78);
+  color: white;
+  padding: 0px 6px;
+  font-size: 12px;
+}
