@@ -93,10 +93,6 @@ table {
   hyphens: auto;
 }
 
-.mat-row:hover {
-  background-color: whitesmoke;
-}
-
 .mat-row.selected {
   background-color: lightgrey;
 }

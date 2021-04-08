@@ -10,6 +10,7 @@ import { AnomaliasControlService } from '../../services/anomalias-control.servic
 import { ReportControlService } from '@core/services/report-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-filter-pcs-list',
@@ -21,6 +22,8 @@ export class FilterPcsListComponent implements OnInit {
   dataSource: MatTableDataSource<any>;
   public selectedRow: string;
   public prevSelectedRow: any;
+  public anomaliaHover;
+  public anomaliaSelect;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -32,6 +35,11 @@ export class FilterPcsListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    const informeSelected = this.reportControlService.selectedInformeId$;
+    const filteredElems = this.filterService.filteredElements$;
+    const anomaliaSelected = this.anomaliasControlService.anomaliaSelect$;
+    const anomaliaHovered = this.anomaliasControlService.anomaliaHover$;
+
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.filterService.filteredElements$.subscribe((elems) => {
         const filteredElements = [];
@@ -61,6 +69,9 @@ export class FilterPcsListComponent implements OnInit {
         this.dataSource.sort = this.sort;
       });
     });
+
+    this.anomaliasControlService.anomaliaHover$.subscribe((anomHov) => (this.anomaliaHover = anomHov));
+    this.anomaliasControlService.anomaliaSelect$.subscribe((anomSel) => (this.anomaliaSelect = anomSel));
   }
 
   applyFilter(event: Event) {
@@ -90,29 +101,13 @@ export class FilterPcsListComponent implements OnInit {
     // quitamos el hover de la anomalia
     this.anomaliasControlService.anomaliaHover = undefined;
 
-    // Seleccionamos en la lista
-    if (this.prevSelectedRow !== undefined) {
-      // deseleccionamos la anterior
-      this.setRowSelected(this.prevSelectedRow);
-    }
-    // seleccionamos la actual
-    this.setRowSelected(row);
-
-    this.selectedRow = row.id;
-    // this.anomaliasControlService.anomaliaSelect = undefined;
+    // reiniciamos el estilo a la anterior anomalia
     if (this.anomaliasControlService.prevAnomaliaSelect !== undefined) {
       this.anomaliasControlService.setExternalStyle(this.anomaliasControlService.prevAnomaliaSelect.id, false);
     }
     this.anomaliasControlService.prevAnomaliaSelect = row.anomalia;
 
-    // marcamos la actual como anterior para la proxima seleccion
-    this.prevSelectedRow = row;
-
     this.anomaliasControlService.anomaliaSelect = row.anomalia;
     this.anomaliasControlService.setExternalStyle(row.id, true);
-  }
-
-  setRowSelected(row: any) {
-    row.selected = !row.selected;
   }
 }
