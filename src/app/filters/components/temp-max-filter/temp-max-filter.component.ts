@@ -4,11 +4,9 @@ import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
 
 import { FilterService } from '@core/services/filter.service';
 import { FilterControlService } from '@core/services/filter-control.service';
-import { ShareReportService } from '@core/services/share-report.service';
+import { AnomaliasControlService } from '../../../planta-report/services/anomalias-control.service';
 
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
-import { take } from 'rxjs/operators';
-import { RangeType } from '@material/components/mat-range-slider/mat-range-slider.component';
 
 @Component({
   selector: 'app-temp-max-filter',
@@ -26,7 +24,7 @@ export class TempMaxFilterComponent implements OnInit {
   constructor(
     private filterService: FilterService,
     private filterControlService: FilterControlService,
-    private shareReportService: ShareReportService
+    private anomaliasControlService: AnomaliasControlService
   ) {}
 
   ngOnInit(): void {

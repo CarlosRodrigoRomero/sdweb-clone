@@ -126,7 +126,7 @@ export class GlobalCoordAreasComponent implements OnInit {
         }
       }
 
-      this.addPointerOnHover();
+      // this.addPointerOnHover();
       this.addOnHoverLabel();
     });
   }

@@ -83,6 +83,10 @@ export class AnomaliasControlService {
       } else {
         this.dibujarAnomalias(anomalias as Anomalia[]);
         this.listaAnomalias = anomalias as Anomalia[];
+
+        // reiniciamos las anomalias seleccionadas cada vez que se aplica un filtro
+        this.prevAnomaliaSelect = undefined;
+        this.anomaliaSelect = undefined;
       }
     });
   }
@@ -110,6 +114,9 @@ export class AnomaliasControlService {
       });
     });
 
+    // eliminamos la interacciones anteriores si las huviese
+    this.removeInteractions();
+
     // añadimos acciones sobre las anomalias
     this.addPointerOnHover();
     this.addOnHoverAction();
@@ -117,7 +124,13 @@ export class AnomaliasControlService {
     this.addClickOutFeatures();
   }
 
-  public addPointerOnHover() {
+  private removeInteractions() {
+    if (this.map.getInteractions().getLength() > 0) {
+      this.map.getInteractions().forEach((interaction) => this.map.removeInteraction(interaction));
+    }
+  }
+
+  private addPointerOnHover() {
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
         let feature = this.map
@@ -139,7 +152,7 @@ export class AnomaliasControlService {
     });
   }
 
-  public addOnHoverAction() {
+  private addOnHoverAction() {
     let currentFeatureHover;
     this.map.on('pointermove', (event) => {
       if (this.anomaliaSelect === undefined) {
@@ -246,7 +259,7 @@ export class AnomaliasControlService {
     });
   }
 
-  permitirCrearAnomalias(plantaId: string) {
+  public permitirCrearAnomalias(plantaId: string) {
     const draw = new Draw({
       source: this.anomaliaLayers[0].getSource(),
       type: GeometryType.CIRCLE,
