@@ -36,12 +36,13 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-      <tr class="table-row"
+      <tr
+        class="table-row"
         (mouseover)="hoverAnomalia(row)"
         (mouseleave)="unhoverAnomalia(row)"
         (click)="selectAnomalia(row)"
         mat-row
-        [ngClass]="{ selected: row.selected }"
+        [ngClass]="{ selected: row.anomalia === anomaliaSelect, hovered: row.anomalia === anomaliaHover }"
         *matRowDef="let row; columns: displayedColumns"
       ></tr>
 

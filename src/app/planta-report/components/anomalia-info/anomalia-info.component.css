@@ -3,8 +3,22 @@
   align-items: flex-end;
 }
 
+.popup-desktop {
+  width: 425px;
+  padding: 0px;
+}
+
+:host ::ng-deep .mat-tab-label {
+  padding: 0px !important;
+  min-width: 80px !important;
+}
+
+.tab-content {
+  margin: 16px 24px;
+}
+
 .popup-card {
-  width: 500px;
+  width: 300px;
 }
 
 .popup-card-content {
@@ -24,5 +38,3 @@
   font-weight: 300;
   font-size: 1.1rem;
 }
-
-
