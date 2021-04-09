@@ -1,9 +1,14 @@
 import { Injectable } from '@angular/core';
+
 import { AngularFirestore } from '@angular/fire/firestore';
+
 import { Observable, combineLatest } from 'rxjs';
 import { map, take, switchMap } from 'rxjs/operators';
-import { Anomalia } from '../models/anomalia';
+
 import { InformeService } from './informe.service';
+import { GLOBAL } from './global';
+
+import { Anomalia } from '@core/models/anomalia';
 
 @Injectable({
   providedIn: 'root',
@@ -65,6 +70,7 @@ export class AnomaliaService {
           actions.map((doc) => {
             const data = doc.payload.doc.data() as Anomalia;
             data.id = doc.payload.doc.id;
+            data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
             // Convertimos el objeto en un array
             if (data.hasOwnProperty('featureCoords')) {
               data.featureCoords = Object.values(data.featureCoords);
@@ -102,5 +108,9 @@ export class AnomaliaService {
 
   async deleteAnomalia(anomalia: Anomalia) {
     return this.afs.doc('anomalias/' + anomalia.id).delete();
+  }
+
+  public getPerdidas(anomalia: Anomalia): number {
+    return GLOBAL.pcPerdidas[anomalia.tipo];
   }
 }
