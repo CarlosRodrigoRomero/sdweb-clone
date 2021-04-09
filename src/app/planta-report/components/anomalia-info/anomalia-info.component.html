@@ -1,10 +1,6 @@
 <div class="popup">
   <mat-card class="popup-card" *ngIf="anomaliaHover">
     <mat-card-content class="popup-card-content">
-      <!-- <div class="elemento">
-        <span class="titulo">Clase</span>
-        <span class="subtitulo">{{ anomaliaHover.clase }}</span>
-      </div> -->
       <div class="elemento">
         <span class="titulo">ID Anomalía</span>
         <span class="subtitulo">{{ anomaliaHover.localId }}</span>
@@ -25,6 +21,10 @@
         <span class="titulo">Pérdidas</span>
         <span class="subtitulo">{{ anomaliaHover.perdidas * 100 }}%</span>
       </div>
+      <div class="elemento">
+        <span class="titulo">Clase</span>
+        <span class="subtitulo">CoA {{ anomaliaHover.severidad }}</span>
+      </div>
     </mat-card-content>
   </mat-card>
 
@@ -32,10 +32,6 @@
     <mat-tab-group mat-align-tabs="center">
       <mat-tab label="General">
         <div class="tab-content">
-          <!-- <div class="elemento">
-            <span class="titulo">Clase</span>
-            <span class="subtitulo">{{ anomaliaSelect.clase }}</span>
-          </div> -->
           <div class="elemento">
             <span class="titulo">ID Anomalía</span>
             <span class="subtitulo">{{ infoAdicional.id }}</span>
@@ -76,6 +72,10 @@
             <span class="titulo">Pérdidas</span>
             <span class="subtitulo">{{ anomaliaSelect.perdidas * 100 }}%</span>
             <!-- <input (change)="onEdit($event, 'perdidas')" type="text" matImput [(ngModel)]="anomaliaSelect.perdidas" /> -->
+          </div>
+          <div class="elemento">
+            <span class="titulo">Clase</span>
+            <span class="subtitulo">CoA {{ anomaliaSelect.severidad }}</span>
           </div>
         </div>
       </mat-tab>
