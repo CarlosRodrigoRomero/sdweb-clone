@@ -22,7 +22,8 @@ export class FilterService {
   private filtersByType$ = new BehaviorSubject<FilterInterface[]>(this.filtersByType);
   private filteredElements: FiltrableInterface[] = [];
   public filteredElements$ = new BehaviorSubject<FiltrableInterface[]>(this.filteredElements);
-  private _allFiltrableElements: FiltrableInterface[];
+  private _allFiltrableElements: FiltrableInterface[] = [];
+  public allFiltrableElements$ = new BehaviorSubject<FiltrableInterface[]>(this._allFiltrableElements);
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private filteredElementsWithoutFilterTipo: FiltrableInterface[] = [];
@@ -43,7 +44,7 @@ export class FilterService {
         .getAnomaliasPlanta$(plantaId)
         .pipe(take(1))
         .subscribe((array) => {
-          this._allFiltrableElements = array;
+          this.allFiltrableElements = array;
           this.filteredElements$.next(array);
           if (shared) {
             this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params));
@@ -65,7 +66,7 @@ export class FilterService {
         });
     } else {
       this.seguidorService.getSeguidoresPlanta$(plantaId).subscribe((seguidores) => {
-        this._allFiltrableElements = seguidores;
+        this.allFiltrableElements = seguidores;
         this.filteredElements$.next(seguidores);
 
         this.initialized$.next(true);
@@ -228,5 +229,14 @@ export class FilterService {
     }
 
     this.filteredElementsWithoutFilterTipo$.next(this.filteredElementsWithoutFilterTipo);
+  }
+
+  get allFiltrableElements() {
+    return this._allFiltrableElements;
+  }
+
+  set allFiltrableElements(value: FiltrableInterface[]) {
+    this._allFiltrableElements = value;
+    this.allFiltrableElements$.next(value);
   }
 }

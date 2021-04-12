@@ -1,8 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Anomalia } from '@core/models/anomalia';
-import { AnomaliaService } from '@core/services/anomalia.service';
+
+import { combineLatest } from 'rxjs';
+
 import { GLOBAL } from '@core/services/global';
+import { FilterService } from '@core/services/filter.service';
+import { ReportControlService } from '@core/services/report-control.service';
+
+import { Anomalia } from '@core/models/anomalia';
 
 import {
   ApexAxisChartSeries,
@@ -18,7 +22,6 @@ import {
   ApexTooltip,
   ApexTitleSubtitle,
 } from 'ng-apexcharts';
-import { take } from 'rxjs/operators';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -43,7 +46,6 @@ export type ChartOptions = {
 export class ChartAnomaliasZonasComponent implements OnInit {
   @ViewChild('chart-anomalias-zonas') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
-  plantaId: string;
   informesList: string[];
   allAnomalias: Anomalia[];
   dataPlot: any[];
@@ -51,26 +53,24 @@ export class ChartAnomaliasZonasComponent implements OnInit {
   chartData: number[][];
   chartLoaded = false;
 
-  constructor(private route: ActivatedRoute, private anomaliaService: AnomaliaService) {}
+  constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    this.plantaId = this.route.snapshot.paramMap.get('id');
-    this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
-    this.zonas = ['1', '2', '3', '4', '5', '6', '7', '8'];
+    this.zonas = ['1', '2', '3', '4', '5', '6', '7', '8']; // DEMO
 
-    this.anomaliaService
-      .getAnomaliasPlanta$(this.plantaId)
-      .pipe(take(1))
-      .subscribe((anomalias) => {
-        this.allAnomalias = anomalias;
-        // this._getAllCategorias(anomalias);
+    combineLatest([this.filterService.allFiltrableElements$, this.reportControlService.informesList$]).subscribe(
+      ([elems, informes]) => {
+        this.allAnomalias = elems as Anomalia[];
+        this.informesList = informes;
+
         this.chartData = [];
         this.informesList.forEach((informeId) => {
-          const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId == informeId);
+          const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
           this.chartData.push(this._calculateChartData(anomaliasInforme));
         });
         this._initChart();
-      });
+      }
+    );
   }
 
   private _calculateChartData(anomalias: Anomalia[]): number[] {
@@ -108,86 +108,89 @@ export class ChartAnomaliasZonasComponent implements OnInit {
   }
 
   private _initChart(): void {
-    this.chartOptions = {
-      series: [
-        {
-          name: 'MAE por Zonas 2019',
-          data: this.chartData[0],
+    // espera a que el dataPlot tenga datos
+    if (this.chartData[0] !== undefined) {
+      this.chartOptions = {
+        series: [
+          {
+            name: 'MAE por Zonas 2019',
+            data: this.chartData[0],
+          },
+          {
+            name: 'MAE por Zonas 2020',
+            data: this.chartData[1],
+          },
+        ],
+        chart: {
+          type: 'bar',
+          height: 240,
+          width: '100%',
         },
-        {
-          name: 'MAE por Zonas 2020',
-          data: this.chartData[1],
-        },
-      ],
-      chart: {
-        type: 'bar',
-        height: 240,
-        width: '100%',
-      },
-      legend: {
-        show: false,
-      },
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: '75%',
-          endingShape: 'rounded',
-        },
-      },
-      dataLabels: {
-        enabled: false,
-      },
-      stroke: {
-        show: true,
-        width: 2,
-        colors: ['transparent'],
-      },
-      title: {
-        // text: 'MAE por zonas',
-        // align: 'left',
-      },
-      xaxis: {
-        categories: this.zonas,
-        title: {
-          text: 'Pasillos',
-        },
-      },
-      colors: [GLOBAL.gris],
-      yaxis: {
-        decimalsInFloat: 0,
-        max: (v) => {
-          return Math.round(1.1 * v);
-        },
-        forceNiceScale: true,
-        tickAmount: 3,
-        labels: {
-          minWidth: 100,
-        },
-        title: {
-          text: 'MAE',
-        },
-      },
-      fill: {
-        opacity: 1,
-      },
-      tooltip: {
-        followCursor: false,
-        theme: 'dark',
-        x: {
+        legend: {
           show: false,
         },
-        marker: {
-          show: false,
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '75%',
+            endingShape: 'rounded',
+          },
         },
-        y: {
+        dataLabels: {
+          enabled: false,
+        },
+        stroke: {
+          show: true,
+          width: 2,
+          colors: ['transparent'],
+        },
+        title: {
+          // text: 'MAE por zonas',
+          // align: 'left',
+        },
+        xaxis: {
+          categories: this.zonas,
           title: {
-            formatter: (s) => {
-              return s;
+            text: 'Pasillos',
+          },
+        },
+        colors: [GLOBAL.gris],
+        yaxis: {
+          decimalsInFloat: 0,
+          max: (v) => {
+            return Math.round(1.1 * v);
+          },
+          forceNiceScale: true,
+          tickAmount: 3,
+          labels: {
+            minWidth: 100,
+          },
+          title: {
+            text: 'MAE',
+          },
+        },
+        fill: {
+          opacity: 1,
+        },
+        tooltip: {
+          followCursor: false,
+          theme: 'dark',
+          x: {
+            show: false,
+          },
+          marker: {
+            show: false,
+          },
+          y: {
+            title: {
+              formatter: (s) => {
+                return s;
+              },
             },
           },
         },
-      },
-    };
-    this.chartLoaded = true;
+      };
+      this.chartLoaded = true;
+    }
   }
 }

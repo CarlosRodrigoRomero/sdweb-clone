@@ -1,6 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { take } from 'rxjs/operators';
-import { AnomaliaService } from '../../../core/services/anomalia.service';
+
+import { combineLatest } from 'rxjs';
+
+import { GLOBAL } from '@core/services/global';
+import { FilterService } from '@core/services/filter.service';
+import { ReportControlService } from '@core/services/report-control.service';
+
+import { Anomalia } from '@core/models/anomalia';
+
 import {
   ChartComponent,
   ApexAxisChartSeries,
@@ -17,9 +24,6 @@ import {
   ApexTooltip,
   ApexPlotOptions,
 } from 'ng-apexcharts';
-import { GLOBAL } from '@core/services/global';
-import { Anomalia } from '../../../core/models/anomalia';
-import { ActivatedRoute } from '@angular/router';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -65,47 +69,32 @@ export class ChartNumsyperdComponent implements OnInit {
   public numsCategoria: number[];
 
   public chartLoaded = false;
-  public plantaId: string;
   public selectedInformeId: string;
   public informesList: string[];
   public dataPlot: DataPlot[];
   public allAnomalias: Anomalia[];
   public chartHeight = 295;
 
-  constructor(private route: ActivatedRoute, private anomaliaService: AnomaliaService) {}
+  constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    this.plantaId = this.route.snapshot.paramMap.get('id');
-    this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
+    combineLatest([this.filterService.allFiltrableElements$, this.reportControlService.informesList$]).subscribe(
+      ([elems, informes]) => {
+        this.allAnomalias = elems as Anomalia[];
+        this.informesList = informes;
 
-    this.anomaliaService
-      .getAnomaliasPlanta$(this.plantaId)
-      .pipe(take(1))
-      .subscribe((anomalias) => {
-        this.allAnomalias = anomalias;
         this.dataPlot = [];
-        this._getAllCategorias(anomalias);
+        this._getAllCategorias(this.allAnomalias);
 
         this.informesList.forEach((informeId) => {
-          const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId == informeId);
+          const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
           this.dataPlot.push(this._calculateDataPlot(anomaliasInforme, informeId));
         });
         this.initChart();
-      });
-
-    // Obtener informeId de map control. Con SwitchMap obtener anomalias
-    //   this.mapControlService.selectedInformeId$
-    //     .pipe(
-    //       switchMap((informeId) => {
-    //         this.selectedInformeId = informeId;
-    //         return this.anomaliaService.getAnomalias$(informeId);
-    //       })
-    //     )
-    //     .subscribe((anomalias) => {
-    //       this.selectedAnomalias = anomalias;
-    //     });
-    // }
+      }
+    );
   }
+
   private _getAllCategorias(anomalias): void {
     const allNumCategorias = Array(GLOBAL.labels_tipos.length)
       .fill(0)
@@ -243,78 +232,81 @@ export class ChartNumsyperdComponent implements OnInit {
       // },
     };
 
-    this.chartOptions1 = {
-      series: [
-        {
-          name: '# Anomalias 2019',
-          data: this.dataPlot[0].numPorCategoria,
+    // espera a que el dataPlot tenga datos
+    if (this.dataPlot[0] !== undefined) {
+      this.chartOptions1 = {
+        series: [
+          {
+            name: '# Anomalias 2019',
+            data: this.dataPlot[0].numPorCategoria,
+          },
+          {
+            name: '# Anomalias 2020',
+            data: this.dataPlot[1].numPorCategoria,
+          },
+        ],
+        colors: this.coloresCategoria,
+        title: {
+          text: '# Anomalías',
+          align: 'left',
         },
-        {
-          name: '# Anomalias 2020',
-          data: this.dataPlot[1].numPorCategoria,
-        },
-      ],
-      colors: this.coloresCategoria,
-      title: {
-        text: '# Anomalías',
-        align: 'left',
-      },
 
-      chart: {
-        id: 'fb',
-        group: 'social',
-        type: 'bar',
-        width: '100%',
-        height: this.chartHeight,
-      },
+        chart: {
+          id: 'fb',
+          group: 'social',
+          type: 'bar',
+          width: '100%',
+          height: this.chartHeight,
+        },
 
-      yaxis: {
-        max: (v) => {
-          return Math.round(1.1 * v);
+        yaxis: {
+          max: (v) => {
+            return Math.round(1.1 * v);
+          },
+          tickAmount: 3,
+          labels: {
+            minWidth: 100,
+          },
         },
-        tickAmount: 3,
-        labels: {
-          minWidth: 100,
-        },
-      },
-    };
+      };
 
-    this.chartOptions2 = {
-      series: [
-        {
-          name: 'MAE 2019',
-          data: this.dataPlot[0].perdidasPorCategoria,
+      this.chartOptions2 = {
+        series: [
+          {
+            name: 'MAE 2019',
+            data: this.dataPlot[0].perdidasPorCategoria,
+          },
+          {
+            name: 'MAE 2020',
+            data: this.dataPlot[1]['perdidasPorCategoria'],
+          },
+        ],
+        title: {
+          text: 'MAE',
+          align: 'left',
         },
-        {
-          name: 'MAE 2020',
-          data: this.dataPlot[1]['perdidasPorCategoria'],
-        },
-      ],
-      title: {
-        text: 'MAE',
-        align: 'left',
-      },
-      chart: {
-        id: 'tw',
-        group: 'social',
-        type: 'bar',
-        width: '100%',
+        chart: {
+          id: 'tw',
+          group: 'social',
+          type: 'bar',
+          width: '100%',
 
-        height: this.chartHeight,
-      },
+          height: this.chartHeight,
+        },
 
-      colors: [GLOBAL.gris],
-      yaxis: {
-        max: (v) => {
-          return Math.round(1.1 * v);
+        colors: [GLOBAL.gris],
+        yaxis: {
+          max: (v) => {
+            return Math.round(1.1 * v);
+          },
+          forceNiceScale: true,
+          tickAmount: 3,
+          labels: {
+            minWidth: 100,
+          },
         },
-        forceNiceScale: true,
-        tickAmount: 3,
-        labels: {
-          minWidth: 100,
-        },
-      },
-    };
-    this.chartLoaded = true;
+      };
+      this.chartLoaded = true;
+    }
   }
 }
