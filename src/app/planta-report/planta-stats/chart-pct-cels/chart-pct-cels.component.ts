@@ -87,6 +87,7 @@ export class ChartPctCelsComponent implements OnInit {
   informesList: string[];
   allAnomalias: Anomalia[];
   dataLoaded = false;
+  chartHeight = 150;
 
   constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
 
@@ -122,7 +123,7 @@ export class ChartPctCelsComponent implements OnInit {
         group: 'social',
         type: 'area',
         width: '100%',
-        height: 160,
+        height: this.chartHeight,
         toolbar: {
           show: true,
           offsetX: 0,
@@ -205,7 +206,7 @@ export class ChartPctCelsComponent implements OnInit {
         group: 'social',
         type: 'area',
         width: '100%',
-        height: 160,
+        height: this.chartHeight,
         toolbar: {
           show: true,
           offsetX: 0,

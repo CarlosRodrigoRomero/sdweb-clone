@@ -66,8 +66,8 @@ export class ChartAlturaComponent {
         },
       ],
       chart: {
-        height: 250,
-        width: 250,
+        height: 200,
+        width: '100%',
         type: 'heatmap',
       },
       dataLabels: {

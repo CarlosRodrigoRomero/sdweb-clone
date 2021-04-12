@@ -73,7 +73,7 @@ export class ChartNumsyperdComponent implements OnInit {
   public informesList: string[];
   public dataPlot: DataPlot[];
   public allAnomalias: Anomalia[];
-  public chartHeight = 295;
+  public chartHeight = 300;
 
   constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
 

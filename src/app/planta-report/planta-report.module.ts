@@ -31,6 +31,7 @@ import { SliderTemporalComponent } from './components/slider-temporal/slider-tem
 import { ChartSankeyPotenciaComponent } from './planta-stats/chart-sankey-potencia/chart-sankey-potencia.component';
 import { GlobalCoordAreasComponent } from './components/global-coord-areas/global-coord-areas.component';
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
+import { ChartMaeGlobalComponent } from './planta-stats/chart-mae-global/chart-mae-global.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +55,7 @@ import { SliderOpacityComponent } from './components/slider-opacity/slider-opaci
     ChartSankeyPotenciaComponent,
     GlobalCoordAreasComponent,
     SliderOpacityComponent,
+    ChartMaeGlobalComponent,
   ],
   imports: [
     SharedModule,

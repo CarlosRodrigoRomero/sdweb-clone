@@ -74,7 +74,8 @@ export class ChartSankeyPotenciaComponent implements AfterViewInit {
     ];
 
     const options = {
-      width: 600,
+      width: '100%',
+      height: 400,
       interactivity: true,
       sankey: {
         node: {

@@ -144,10 +144,10 @@ export class ChartAnomaliasZonasComponent implements OnInit {
           width: 2,
           colors: ['transparent'],
         },
-        title: {
-          // text: 'MAE por zonas',
-          // align: 'left',
-        },
+        /* title: {
+          text: 'MAE por zonas',
+          align: 'left',
+        }, */
         xaxis: {
           categories: this.zonas,
           title: {
