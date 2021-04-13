@@ -36,15 +36,15 @@ export class GlobalCoordAreasComponent implements OnInit {
   public map: Map;
 
   task: Task = {
-    name: 'Mostrar todas las áreas',
-    completed: true,
+    name: 'Ver zonas de la planta',
+    completed: false,
     subtasks: [
-      { name: 'Instalación', completed: true },
-      { name: 'Calle', completed: true },
-      { name: 'Mesa', completed: true },
+      { name: 'Instalación', completed: false },
+      { name: 'Calle', completed: false },
+      { name: 'Mesa', completed: false },
     ],
   };
-  public allComplete = true;
+  public allComplete = false;
 
   constructor(
     private plantaService: PlantaService,
@@ -109,7 +109,14 @@ export class GlobalCoordAreasComponent implements OnInit {
     this.plantaService.getLocationsArea(this.plantaId).subscribe((locAreas) => {
       for (let i = 0; i < 3; i++) {
         if (this.globalCoordAreas.length < 3) {
-          this.globalCoordAreas.push(locAreas.filter((locArea) => locArea.globalCoords[i] !== null));
+          this.globalCoordAreas.push(
+            locAreas.filter(
+              (locArea) =>
+                locArea.globalCoords[i] !== null &&
+                locArea.globalCoords[i] !== undefined &&
+                locArea.globalCoords[i] !== ''
+            )
+          );
           this.globalCoordAreasVectorSources[i] = new VectorSource({
             features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(this.globalCoordAreas[i])),
           });
@@ -119,7 +126,7 @@ export class GlobalCoordAreasComponent implements OnInit {
           this.map.addLayer(
             (this.globalCoordAreasVectorLayers[i] = new VectorLayer({
               source: this.globalCoordAreasVectorSources[i],
-              visible: true,
+              visible: false,
               style: styleFunction,
             }))
           );
@@ -140,6 +147,8 @@ export class GlobalCoordAreasComponent implements OnInit {
           .filter((item) => item.getProperties().tipo === 'areaGlobalCoord');
 
         if (feature.length > 0) {
+          console.log(feature);
+
           // cambia el puntero por el de seleccionar
           this.map.getViewport().style.cursor = 'pointer';
         } else {
@@ -201,7 +210,7 @@ export class GlobalCoordAreasComponent implements OnInit {
       locArea.path.forEach((coords) => {
         coordsList.push(fromLonLat([coords.lng, coords.lat]));
       });
-      // Al ser un poligono, la 1era y utlima coord deben ser iguales:
+      // Al ser un poligono, la 1era y ultima coord deben ser iguales:
       coordsList.push(coordsList[0]);
 
       listOfFeatures.push({
