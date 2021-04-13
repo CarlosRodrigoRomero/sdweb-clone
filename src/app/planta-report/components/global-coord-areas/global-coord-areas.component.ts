@@ -16,6 +16,10 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { LocationAreaInterface } from '@core/models/location';
 import Overlay from 'ol/Overlay';
 import OverlayPositioning from 'ol/OverlayPositioning';
+import Feature from 'ol/Feature';
+import { LatLngLiteral } from '@agm/core';
+import { Coordinate } from 'ol/coordinate';
+import Polygon from 'ol/geom/Polygon';
 
 export interface Task {
   name: string;
@@ -95,12 +99,25 @@ export class GlobalCoordAreasComponent implements OnInit {
         // style.getText().setText(feature.get('globalCoords'));
 
         // para la demo
-        /* const areaNames = ['Instalación', 'Calle', 'Mesa'];
-        for (let i = 0; i < 3; i++) {
-          if (feature.get('globalCoords')[i] !== null) {
-            style.getText().setText(areaNames[i] + feature.get('globalCoords')[i]);
+        if (this.map.getView().getZoom() > 21) {
+          const areaNames = ['Instalación', 'Calle', 'Mesa'];
+
+          for (let i = 0; i < 3; i++) {
+            if (
+              feature.get('globalCoords')[i] !== null &&
+              feature.get('globalCoords')[i] !== undefined &&
+              feature.get('globalCoords')[i] !== ''
+            ) {
+              style.getText().setText(areaNames[i] + feature.get('globalCoords')[i]);
+            }
           }
-        } */
+        } else {
+          for (let i = 0; i < 3; i++) {
+            if (feature.get('globalCoords')[i] !== null) {
+              style.getText().setText('');
+            }
+          }
+        }
 
         return style;
       }
@@ -117,6 +134,7 @@ export class GlobalCoordAreasComponent implements OnInit {
                 locArea.globalCoords[i] !== ''
             )
           );
+
           this.globalCoordAreasVectorSources[i] = new VectorSource({
             features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(this.globalCoordAreas[i])),
           });
@@ -136,6 +154,45 @@ export class GlobalCoordAreasComponent implements OnInit {
       // this.addPointerOnHover();
       // this.addOnHoverLabel();
     });
+  }
+
+  private getLabelArea(feature: Feature): string {
+    if (
+      feature.get('globalCoords')[0] !== null &&
+      feature.get('globalCoords')[0] !== undefined &&
+      feature.get('globalCoords')[0] !== ''
+    ) {
+      const label = 'Instalación ' + feature.get('globalCoords')[0];
+      return label;
+    } else if (
+      feature.get('globalCoords')[1] !== null &&
+      feature.get('globalCoords')[1] !== undefined &&
+      feature.get('globalCoords')[1] !== ''
+    ) {
+      this.globalCoordAreas[0].forEach((instalacion) => {
+        console.log(instalacion);
+        // obtenemos el poligono para calcular si esta dentro feature
+        const polygon = new Polygon([this.pathToCoordinate(instalacion.path)]);
+
+        console.log((feature.getGeometry() as Polygon).getCoordinates()[0]);
+        if (polygon.intersectsCoordinate((feature.getGeometry() as Polygon).getCoordinates()[0][0])) {
+          const label = 'Instalación ' + instalacion.globalCoords[0] + ' - Calle ' + feature.get('globalCoords')[1];
+          console.log(label);
+          return label;
+        }
+      });
+    } else {
+      return 'blablabla';
+    }
+  }
+
+  private pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {
+    const coordenadas: Coordinate[] = [];
+    path.forEach((coord) => {
+      const coordenada: Coordinate = fromLonLat([coord.lng, coord.lat]);
+      coordenadas.push(coordenada);
+    });
+    return coordenadas;
   }
 
   private addPointerOnHover() {
