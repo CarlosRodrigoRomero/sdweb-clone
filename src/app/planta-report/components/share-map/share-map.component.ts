@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 
 import { Observable } from 'rxjs';
 
@@ -24,13 +23,10 @@ export class ShareMapComponent implements OnInit {
     private shareReportService: ShareReportService,
     private clipboardService: ClipboardService,
     private snackBar: MatSnackBar,
-    private router: Router,
     private reportControlService: ReportControlService
   ) {}
 
-  ngOnInit(): void {
-    // this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
-  }
+  ngOnInit(): void {}
 
   getShareLink(): string {
     this.selectedInformeId = this.reportControlService.selectedInformeId;
@@ -49,7 +45,13 @@ export class ShareMapComponent implements OnInit {
 
     const currentUrl = this.reportControlService.getHostname();
 
-    const url = currentUrl + sharedType + id;
+    let url;
+    if (currentUrl !== 'localhost') {
+      url = currentUrl + sharedType + id;
+    } else {
+      // añadimos el puerto
+      url = currentUrl + ':4200' + sharedType + id;
+    }
 
     return url;
   }
