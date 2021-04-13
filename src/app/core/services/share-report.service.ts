@@ -133,9 +133,9 @@ export class ShareReportService {
   }
 
   resetAllParams() {
-    // resetea todos los parametros excepto el informeID
+    // resetea todos los parametros excepto informeID y plantaId
     Object.keys(this.params).forEach((i) => {
-      if (this.params[i] !== this.params.informeId) {
+      if (this.params[i] !== this.params.informeId && this.params[i] !== this.params.plantaId) {
         this.params[i] = null;
       }
     });
@@ -211,12 +211,14 @@ export class ShareReportService {
           }
         }
         if (Object.keys(this.params).includes('clase')) {
-          this.params.clase.forEach((sev, index) => {
-            if (sev) {
-              const severityFilter = new SeveridadFilter('', 'clase', index + 1);
-              filters.push(severityFilter);
-            }
-          });
+          if (this.params.clase !== null) {
+            this.params.clase.forEach((sev, index) => {
+              if (sev) {
+                const severityFilter = new SeveridadFilter('', 'clase', index + 1);
+                filters.push(severityFilter);
+              }
+            });
+          }
         } else if (Object.keys(this.params).includes('modulo')) {
           if (this.params.modulo !== null) {
             const moduloFilter = new ModuloPcFilter('', 'modulo', this.params.modulo);
@@ -224,12 +226,14 @@ export class ShareReportService {
           }
         }
         if (Object.keys(this.params).includes('tipo')) {
-          this.params.tipo.forEach((tipo, index, tipos) => {
-            if (tipo !== undefined && tipo !== null) {
-              const tipoFilter = new TipoElemFilter('', 'tipo', tipo, tipos.length, index);
-              filters.push(tipoFilter);
-            }
-          });
+          if (this.params.tipo !== null) {
+            this.params.tipo.forEach((tipo, index, tipos) => {
+              if (tipo !== undefined && tipo !== null) {
+                const tipoFilter = new TipoElemFilter('', 'tipo', tipo, tipos.length, index);
+                filters.push(tipoFilter);
+              }
+            });
+          }
         }
         if (Object.keys(this.params).includes('zona')) {
           if (this.params.zona !== null) {
