@@ -47,6 +47,8 @@ export class ShareMapComponent implements OnInit {
       sharedType = '/filterable-shared/';
     }
 
+    console.log(this.router.url);
+
     const currentUrl = this.router.url.split('/');
 
     let url;
