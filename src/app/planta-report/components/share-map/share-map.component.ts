@@ -49,14 +49,7 @@ export class ShareMapComponent implements OnInit {
 
     const currentUrl = this.reportControlService.getHostname();
 
-    console.log(currentUrl);
-
-    let url;
-    if (currentUrl !== '') {
-      url = currentUrl + sharedType + id;
-    } else {
-      url = 'localhost:4200' + sharedType + id;
-    }
+    const url = currentUrl + sharedType + id;
 
     return url;
   }
