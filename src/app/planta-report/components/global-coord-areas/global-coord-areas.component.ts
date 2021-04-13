@@ -36,7 +36,7 @@ export class GlobalCoordAreasComponent implements OnInit {
   public map: Map;
 
   task: Task = {
-    name: 'Mostrar todas las áreas',
+    name: 'Mostrar zonas de planta',
     completed: true,
     subtasks: [
       { name: 'Instalación', completed: true },
