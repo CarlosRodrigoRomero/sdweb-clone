@@ -10,7 +10,6 @@ import { AnomaliasControlService } from '../../services/anomalias-control.servic
 import { ReportControlService } from '@core/services/report-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
-import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-filter-pcs-list',
@@ -35,11 +34,6 @@ export class FilterPcsListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const informeSelected = this.reportControlService.selectedInformeId$;
-    const filteredElems = this.filterService.filteredElements$;
-    const anomaliaSelected = this.anomaliasControlService.anomaliaSelect$;
-    const anomaliaHovered = this.anomaliasControlService.anomaliaHover$;
-
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.filterService.filteredElements$.subscribe((elems) => {
         const filteredElements = [];

@@ -142,8 +142,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   getInfoAdcional() {
     /* PARA LA DEMO */
 
-    console.log(this.anomaliaSelect);
-
     /* MODULO */
 
     let marcaModulo;

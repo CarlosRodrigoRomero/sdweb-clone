@@ -1,28 +1,16 @@
 <mat-tab-group>
-  <mat-tab class="mat-tab-stats" label="MAE">
-    <div class="fila">
-      <div class="columna columna-izq">
+  <mat-tab label="MAE">
+    <div class="mae-grid">
+      <div class="mae-content-izq">
         <mat-card class="chart-mae">
           <mat-card-header>
             <mat-card-title>MAE global</mat-card-title>
             <mat-card-subtitle>Módulos Apagados Equivalentes por año</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
-            <apx-chart
-              id="mae-chart"
-              [series]="chartOptionsMAE.series"
-              [chart]="chartOptionsMAE.chart"
-              [xaxis]="chartOptionsMAE.xaxis"
-              [stroke]="chartOptionsMAE.stroke"
-              [colors]="chartOptionsMAE.colors"
-              [dataLabels]="chartOptionsMAE.dataLabels"
-              [legend]="chartOptionsMAE.legend"
-              [markers]="chartOptionsMAE.markers"
-              [grid]="chartOptionsMAE.grid"
-              [yaxis]="chartOptionsMAE.yaxis"
-              [title]="chartOptionsMAE.title"
-              [annotations]="chartOptionsMAE.annotations"
-            ></apx-chart>
+            <div class="mae-global">
+              <app-chart-mae-global></app-chart-mae-global>
+            </div>
           </mat-card-content>
         </mat-card>
 
@@ -32,11 +20,13 @@
             <mat-card-subtitle>Para visualizar dónde están los problemas de rendimiento</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
-            <app-chart-anomalias-zonas></app-chart-anomalias-zonas>
+            <div class="mae-zonas">
+              <app-chart-anomalias-zonas></app-chart-anomalias-zonas>
+            </div>
           </mat-card-content>
         </mat-card>
       </div>
-      <div class="columna">
+      <div>
         <mat-card class="chart-mae">
           <mat-card-header>
             <mat-card-title>MAE por tipo de anomalía</mat-card-title>
@@ -45,7 +35,9 @@
             >
           </mat-card-header>
           <mat-card-content>
-            <app-chart-numsyperd></app-chart-numsyperd>
+            <div class="mae-tipo">
+              <app-chart-numsyperd></app-chart-numsyperd>
+            </div>
           </mat-card-content>
         </mat-card>
       </div>
@@ -53,8 +45,8 @@
   </mat-tab>
 
   <mat-tab class="mat-tab-stats" label="Células calientes (CC)">
-    <div class="fila">
-      <div class="columna columna-izq">
+    <div class="cc-grid">
+      <div class="cc-content-izq">
         <mat-card class="chart-mae">
           <mat-card-header>
             <mat-card-title>Módulos con células calientes</mat-card-title>
@@ -64,8 +56,21 @@
             <app-chart-pct-cels></app-chart-pct-cels>
           </mat-card-content>
         </mat-card>
+
+        <mat-card class="chart-altura">
+          <mat-card-header>
+            <mat-card-title>Céls. calientes por altura</mat-card-title>
+            <mat-card-subtitle
+              >Para detectar posibles problemas relacionados con vegetación y desposiciones de
+              pájaros</mat-card-subtitle
+            >
+          </mat-card-header>
+          <mat-card-content>
+            <app-chart-altura></app-chart-altura>
+          </mat-card-content>
+        </mat-card>
       </div>
-      <div class="columna columna-drcha">
+      <div class="cc-content-drcha">
         <mat-card class="chart-mae">
           <mat-card-header>
             <mat-card-title>Módulos con cel. calientes por gradiente</mat-card-title>
@@ -90,7 +95,7 @@
   </mat-tab>
   <mat-tab class="mat-tab-stats" label="TED">
     <ng-template matTabContent>
-      <div class="fila-avanzado">
+      <div class="ted-grid">
         <mat-card class="chart-sankey">
           <mat-card-header>
             <mat-card-title>TED Potencia (Diagrama de Evolución Temporal)</mat-card-title>
@@ -100,24 +105,12 @@
             >
           </mat-card-header>
           <mat-card-content>
-            <app-chart-sankey-potencia></app-chart-sankey-potencia>
+            <div class="ted-sankey-potencia">
+              <app-chart-sankey-potencia></app-chart-sankey-potencia>
+            </div>
           </mat-card-content>
         </mat-card>
 
-        <mat-card class="chart-altura">
-          <mat-card-header>
-            <mat-card-title>Céls. calientes por altura</mat-card-title>
-            <mat-card-subtitle
-              >Para detectar posibles problemas relacionados con vegetación y desposiciones de
-              pájaros</mat-card-subtitle
-            >
-          </mat-card-header>
-          <mat-card-content>
-            <app-chart-altura></app-chart-altura>
-          </mat-card-content>
-        </mat-card>
-      </div>
-      <div class="fila-avanzado">
         <mat-card class="chart-sankey">
           <mat-card-header>
             <mat-card-title>TED (Diagrama de Evolución Temporal)</mat-card-title>
@@ -127,7 +120,9 @@
             >
           </mat-card-header>
           <mat-card-content>
-            <app-chart-sankey></app-chart-sankey>
+            <div class="ted-sankey">
+              <app-chart-sankey></app-chart-sankey>
+            </div>
           </mat-card-content>
         </mat-card>
       </div>

@@ -1,6 +1,11 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { AnomaliaService } from '@core/services/anomalia.service';
+import { Component, OnInit } from '@angular/core';
+
+import { combineLatest } from 'rxjs';
+
+import { FilterService } from '@core/services/filter.service';
+import { ReportControlService } from '@core/services/report-control.service';
+
+import { Anomalia } from '@core/models/anomalia';
 
 import {
   ApexAxisChartSeries,
@@ -30,8 +35,6 @@ export type ChartOptions = {
   toolbar: any;
   annotations: any;
 };
-import { take } from 'rxjs/operators';
-import { Anomalia } from '../../../core/models/anomalia';
 
 @Component({
   selector: 'app-chart-pct-cels',
@@ -81,32 +84,30 @@ export class ChartPctCelsComponent implements OnInit {
       categories: ['Jul 2019', 'Jun 2020'],
     },
   };
-  public plantaId: string;
   informesList: string[];
   allAnomalias: Anomalia[];
   dataLoaded = false;
+  chartHeight = 150;
 
-  constructor(private route: ActivatedRoute, private anomaliaService: AnomaliaService) {}
+  constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    this.plantaId = this.route.snapshot.paramMap.get('id');
-    this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
+    combineLatest([this.filterService.allFiltrableElements$, this.reportControlService.informesList$]).subscribe(
+      ([elems, informes]) => {
+        this.allAnomalias = elems as Anomalia[];
+        this.informesList = informes;
 
-    this.anomaliaService
-      .getAnomaliasPlanta$(this.plantaId)
-      .pipe(take(1))
-      .subscribe((anomalias) => {
-        this.allAnomalias = anomalias;
         const data = [];
         this.informesList.forEach((informeId) => {
-          const filtered = anomalias.filter((anom) => {
+          const filtered = this.allAnomalias.filter((anom) => {
             return anom.informeId == informeId && (anom.tipo == 8 || anom.tipo == 9);
           });
           data.push(Math.round((10000 * filtered.length) / 5508) / 100);
         });
 
         this._iniitChartData(data);
-      });
+      }
+    );
   }
 
   private _iniitChartData(data): void {
@@ -122,7 +123,7 @@ export class ChartPctCelsComponent implements OnInit {
         group: 'social',
         type: 'area',
         width: '100%',
-        height: 160,
+        height: this.chartHeight,
         toolbar: {
           show: true,
           offsetX: 0,
@@ -205,7 +206,7 @@ export class ChartPctCelsComponent implements OnInit {
         group: 'social',
         type: 'area',
         width: '100%',
-        height: 160,
+        height: this.chartHeight,
         toolbar: {
           show: true,
           offsetX: 0,

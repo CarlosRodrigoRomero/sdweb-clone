@@ -1,9 +1,16 @@
 import { Injectable } from '@angular/core';
+
 import { AngularFirestore } from '@angular/fire/firestore';
-import { Observable, combineLatest } from 'rxjs';
+
+import { Observable, combineLatest, BehaviorSubject, EMPTY } from 'rxjs';
 import { map, take, switchMap } from 'rxjs/operators';
-import { Anomalia } from '../models/anomalia';
+
 import { InformeService } from './informe.service';
+import { GLOBAL } from './global';
+import { PlantaService } from '@core/services/planta.service';
+
+import { Anomalia } from '@core/models/anomalia';
+import { CritCoA } from '@core/models/critCoA';
 
 @Injectable({
   providedIn: 'root',
@@ -11,8 +18,39 @@ import { InformeService } from './informe.service';
 export class AnomaliaService {
   private _selectedInformeId: string;
   public allAnomaliasInforme: Anomalia[];
+  public criterioCoA: CritCoA;
+  private _initialized = false;
+  private initialized$ = new BehaviorSubject<boolean>(this._initialized);
 
-  constructor(public afs: AngularFirestore, private informeService: InformeService) {}
+  constructor(
+    public afs: AngularFirestore,
+    private informeService: InformeService,
+    private plantaService: PlantaService
+  ) {}
+
+  initService(plantaId: string) {
+    // obtenemos el criterio de CoA de la planta
+    this.plantaService
+      .getPlanta(plantaId)
+      .pipe(
+        take(1),
+        switchMap((planta) => {
+          if (planta.hasOwnProperty('criterioId')) {
+            return this.plantaService.getCriterio(planta.criterioId);
+          } else {
+            // DEMO
+            return this.plantaService.getCriterio('aU2iM5nM0S3vMZxMZGff');
+            // return this.plantaService.getCriterio(GLOBAL.criterioSolardroneId);
+          }
+        })
+      )
+      .subscribe((criterio) => {
+        this.criterioCoA = criterio.critCoA;
+        this.inicialized = true;
+      });
+
+    return this.initialized$;
+  }
 
   set selectedInformeId(informeId: string) {
     this._selectedInformeId = informeId;
@@ -57,6 +95,7 @@ export class AnomaliaService {
     if (tipo !== 'pcs') {
       tipo = 'anomalias';
     }
+
     const query$ = this.afs
       .collection<Anomalia>(tipo, (ref) => ref.where('informeId', '==', informeId))
       .snapshotChanges()
@@ -65,6 +104,8 @@ export class AnomaliaService {
           actions.map((doc) => {
             const data = doc.payload.doc.data() as Anomalia;
             data.id = doc.payload.doc.id;
+            data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
+            data.severidad = this.getCoA(data);
             // Convertimos el objeto en un array
             if (data.hasOwnProperty('featureCoords')) {
               data.featureCoords = Object.values(data.featureCoords);
@@ -102,5 +143,62 @@ export class AnomaliaService {
 
   async deleteAnomalia(anomalia: Anomalia) {
     return this.afs.doc('anomalias/' + anomalia.id).delete();
+  }
+
+  private getPerdidas(anomalia: Anomalia): number {
+    return GLOBAL.pcPerdidas[anomalia.tipo];
+  }
+
+  private getCoA(anomalia: Anomalia): number {
+    // comprobamos que se está aplicando un criterio
+    if (this.criterioCoA !== undefined) {
+      // Los que siempre son CoA 3, tengan la temperatura que tengan
+      if (this.criterioCoA.hasOwnProperty('siempreCoA3')) {
+        if (this.criterioCoA.siempreCoA3.includes(anomalia.tipo)) {
+          return 3;
+        }
+      }
+
+      // El resto
+      // Si superan tempCoA3
+      if (this.criterioCoA.hasOwnProperty('tempCoA3')) {
+        if (anomalia.temperaturaMax >= this.criterioCoA.tempCoA3) {
+          return 3;
+        }
+      }
+
+      // Si no la supera, la clasificamos según su gradiente
+      if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[2]) {
+        return 3;
+      } else {
+        if (this.criterioCoA.hasOwnProperty('siempreCoA2')) {
+          if (this.criterioCoA.siempreCoA2.includes(anomalia.tipo)) {
+            return 2;
+          }
+        }
+        if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[1]) {
+          return 2;
+        } else if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[0]) {
+          return 1;
+        }
+      }
+
+      if (this.criterioCoA.hasOwnProperty('siempreVisible')) {
+        if (this.criterioCoA.siempreVisible.includes(anomalia.tipo)) {
+          return 1;
+        }
+      }
+    } else {
+      return 0;
+    }
+  }
+
+  get inicialized() {
+    return this._initialized;
+  }
+
+  set inicialized(value: boolean) {
+    this._initialized = value;
+    this.initialized$.next(value);
   }
 }

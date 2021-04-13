@@ -2,13 +2,16 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { BehaviorSubject, Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import { FilterService } from '@core/services/filter.service';
 import { ShareReportService } from '@core/services/share-report.service';
 import { InformeService } from '@core/services/informe.service';
+import { PlantaService } from '@core/services/planta.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
+import { GLOBAL } from './global';
 
 @Injectable({
   providedIn: 'root',
@@ -29,12 +32,15 @@ export class ReportControlService {
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _mapLoaded = false;
   public mapLoaded$ = new BehaviorSubject<boolean>(this._mapLoaded);
+  public criterioCoA;
 
   constructor(
     private router: Router,
     private shareReportService: ShareReportService,
     private filterService: FilterService,
-    private informeService: InformeService
+    private informeService: InformeService,
+    private plantaService: PlantaService,
+    private anomaliaService: AnomaliaService
   ) {}
 
   initService(): Observable<boolean> {
@@ -62,11 +68,16 @@ export class ReportControlService {
             this.plantaId = params.plantaId;
             this.selectedInformeId = params.informeId;
 
+            // iniciamos anomalias service
+            this.anomaliaService.initService(this.plantaId);
+
             if (this.router.url.includes('filterable')) {
-              // obtenemos los informes de la planta e iniciamos filter service
-              this.informeService
-                .getInformesDePlanta(this.plantaId)
+              // iniciamos anomalia service antes de obtener las anomalias
+              this.anomaliaService
+                .initService(this.plantaId)
                 .pipe(
+                  switchMap(() => this.informeService.getInformesDePlanta(this.plantaId)),
+                  // obtenemos los informes de la planta e iniciamos filter service
                   switchMap((informesId) => {
                     // ordenamos los informes de menos a mas reciente y los añadimos a la lista
                     informesId
@@ -81,9 +92,13 @@ export class ReportControlService {
                 )
                 .subscribe((init) => (this.initialized = init));
             } else {
-              // iniciamos filter service
-              this.filterService
-                .initService(this.sharedReport, this.plantaId, true, this.sharedId)
+              // iniciamos anomalia service antes de obtener las anomalias
+              this.anomaliaService
+                .initService(this.plantaId)
+                .pipe(
+                  switchMap(() => this.filterService.initService(this.sharedReport, this.plantaId, true, this.sharedId))
+                )
+                // iniciamos filter service
                 .subscribe((init) => (this.initialized = init));
             }
           } else {
@@ -95,10 +110,27 @@ export class ReportControlService {
       // obtenemos plantaId de la url
       this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
-      // obtenemos los informes de la planta e iniciamos filter service
-      this.informeService
-        .getInformesDePlanta(this.plantaId)
+      // obtenemos el criterio de CoA de la planta
+      this.plantaService
+        .getPlanta(this.plantaId)
         .pipe(
+          take(1),
+          switchMap((planta) => {
+            if (planta.hasOwnProperty('criterioId')) {
+              return this.plantaService.getCriterio(planta.criterioId);
+            } else {
+              return this.plantaService.getCriterio(GLOBAL.criterioSolardroneId);
+            }
+          })
+        )
+        .subscribe((criterio) => (this.anomaliaService.criterioCoA = criterio.critCoA));
+
+      // iniciamos anomalia service antes de obtener las anomalias
+      this.anomaliaService
+        .initService(this.plantaId)
+        .pipe(
+          switchMap(() => this.informeService.getInformesDePlanta(this.plantaId)),
+          // obtenemos los informes de la planta e iniciamos filter service
           switchMap((informesId) => {
             // ordenamos los informes de menos a mas reciente y los añadimos a la lista
             informesId
