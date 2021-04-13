@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { Observable } from 'rxjs';
+
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ClipboardService } from 'ngx-clipboard';
-
-import { Observable } from 'rxjs';
 
 import { ShareReportService } from '@core/services/share-report.service';
 import { ReportControlService } from '@core/services/report-control.service';
@@ -47,13 +47,13 @@ export class ShareMapComponent implements OnInit {
       sharedType = '/filterable-shared/';
     }
 
-    console.log(this.router.url);
+    const currentUrl = this.reportControlService.getHostname();
 
-    const currentUrl = this.router.url.split('/');
+    console.log(currentUrl);
 
     let url;
-    if (currentUrl[0] !== '') {
-      url = currentUrl[0] + sharedType + id;
+    if (currentUrl !== '') {
+      url = currentUrl + sharedType + id;
     } else {
       url = 'localhost:4200' + sharedType + id;
     }
