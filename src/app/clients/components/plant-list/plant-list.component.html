@@ -60,10 +60,9 @@
           <tr
             mat-row
             class="table-row"
+            (mouseover)="hoverPlanta(row)"
             *matRowDef="let row; columns: displayedColumns"
-            [routerLink]="
-              row.tipo === 'fija' ? ['../planta-report/', row.plantaId] : ['../planta-seguidores/', row.plantaId]
-            "
+            (click)="onClick(row)"
           ></tr>
 
           <!-- Se muestra cuando no hay resultados en la búsqueda -->

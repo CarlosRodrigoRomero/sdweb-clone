@@ -1,23 +1,20 @@
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+
 import 'ol/ol.css';
 import Circle from 'ol/geom/Circle';
-
 import { defaults as defaultControls } from 'ol/control.js';
-
 import Feature from 'ol/Feature';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import { Fill, Stroke, Style } from 'ol/style';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-import { switchMap } from 'rxjs/operators';
 import { fromLonLat } from 'ol/proj';
-import { PlantaInterface } from '@core/models/planta';
-import { AuthService } from '@core/services/auth.service';
-import { PlantaService } from '@core/services/planta.service';
-import { GLOBAL } from '@core/services/global';
+
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
-import { combineLatest } from 'rxjs';
+
+import { PlantaInterface } from '@core/models/planta';
 
 @Component({
   selector: 'app-map-all-plants',
@@ -34,55 +31,45 @@ export class MapAllPlantsComponent implements OnInit {
   public plantaHover: PlantaInterface;
   private prevFeatureHover: any;
 
-  constructor(
-    private plantaService: PlantaService,
-    public auth: AuthService,
-    private elementRef: ElementRef,
-    private portfolioControlService: PortfolioControlService
-  ) {}
+  constructor(private portfolioControlService: PortfolioControlService, private router: Router) {}
 
   ngOnInit(): void {
-    this.auth.user$
-      .pipe(
-        switchMap((user) => {
-          return this.plantaService.getPlantasDeEmpresa(user);
-        })
-      )
-      .subscribe((plantas) => {
-        this.plantas = plantas;
-        this.initMap();
-        const vectorSource = new VectorSource({});
-        const style = new Style({
-          stroke: new Stroke({
-            width: 2,
-          }),
-          fill: new Fill({}),
-        });
+    this.plantas = this.portfolioControlService.listaPlantas;
+    this.initMap();
 
-        plantas.forEach((planta) => {
-          const feature = new Feature(new Circle(fromLonLat([planta.longitud, planta.latitud]), 1e4));
+    const vectorSource = new VectorSource({});
+    const style = new Style({
+      stroke: new Stroke({
+        width: 2,
+      }),
+      fill: new Fill({}),
+    });
 
-          if (planta.informes !== undefined && planta.informes.length > 0) {
-            const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+    this.plantas.forEach((planta) => {
+      const feature = new Feature(new Circle(fromLonLat([planta.longitud, planta.latitud]), 1e4));
 
-            if (mae !== undefined) {
-              feature.setProperties({
-                mae,
-              });
+      if (planta.informes !== undefined && planta.informes.length > 0) {
+        const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
 
-              style.getStroke().setColor(this.portfolioControlService.getColorMae(mae));
-              style.getFill().setColor(this.portfolioControlService.getColorMae(mae, 0.3));
-            }
-          }
+        if (mae !== undefined) {
+          feature.setProperties({
+            mae,
+            plantaId: planta.id,
+            tipo: planta.tipo,
+          });
 
-          vectorSource.addFeature(feature);
-        });
-        const vectorLayer = new VectorLayer({
-          source: vectorSource,
-          style,
-        });
-        this.map.addLayer(vectorLayer);
-      });
+          style.getStroke().setColor(this.portfolioControlService.getColorMae(mae));
+          style.getFill().setColor(this.portfolioControlService.getColorMae(mae, 0.3));
+        }
+      }
+
+      vectorSource.addFeature(feature);
+    });
+    const vectorLayer = new VectorLayer({
+      source: vectorSource,
+      style,
+    });
+    this.map.addLayer(vectorLayer);
   }
 
   initMap() {
@@ -102,6 +89,7 @@ export class MapAllPlantsComponent implements OnInit {
 
     this.addPointerOnHover();
     this.addOnHoverAction();
+    this.addOnClickAction();
 
     // this.portfolioControlService.plantaHover$.subscribe((planta) => (this.plantaHover = planta));
   }
@@ -147,6 +135,25 @@ export class MapAllPlantsComponent implements OnInit {
 
         if (currentFeatureHover !== undefined) {
           (currentFeatureHover[0] as Feature).setStyle(this.getStyleOnHover(false));
+        }
+      }
+    });
+  }
+
+  private addOnClickAction() {
+    this.map.on('click', (event) => {
+      const feature = this.map.getFeaturesAtPixel(event.pixel);
+
+      if (feature.length > 0) {
+        const plantaId = feature[0].getProperties().plantaId;
+
+        // acotado para la DEMO
+        if (plantaId === 'egF0cbpXnnBnjcrusoeR') {
+          if (feature[0].getProperties().tipo === 'seguidores') {
+            this.router.navigate(['clients/planta-seguidores/' + plantaId]);
+          } else {
+            this.router.navigate(['clients/planta-report/' + plantaId]);
+          }
         }
       }
     });

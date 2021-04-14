@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -6,6 +7,7 @@ import { MatTableDataSource } from '@angular/material/table';
 
 import { AuthService } from '@core/services/auth.service';
 import { PlantaService } from '@core/services/planta.service';
+import { PortfolioControlService } from '@core/services/portfolio-control.service';
 
 interface PlantsData {
   nombre: string;
@@ -27,7 +29,12 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(public auth: AuthService, private plantaService: PlantaService) {}
+  constructor(
+    public auth: AuthService,
+    private plantaService: PlantaService,
+    private portfolioControlService: PortfolioControlService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     const plantsData = [];
@@ -89,7 +96,22 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     event.stopPropagation();
   }
 
-  clickEvent() {
-    console.log('clickado');
+  onClick(row) {
+    const plantaId = row.plantaId;
+    const tipoPlanta = row.tipo;
+
+    // acotado para la DEMO
+    if (plantaId === 'egF0cbpXnnBnjcrusoeR') {
+      if (tipoPlanta === 'seguidores') {
+        this.router.navigate(['clients/planta-seguidores/' + plantaId]);
+      } else {
+        this.router.navigate(['clients/planta-report/' + plantaId]);
+      }
+    }
+  }
+
+  hoverPlanta(row: any) {
+    // this.portfolioControlService.plantaHover = row.anomalia;
+    // this.anomaliasControlService.setExternalStyle(row.id, true);
   }
 }
