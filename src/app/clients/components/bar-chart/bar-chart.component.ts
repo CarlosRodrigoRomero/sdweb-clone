@@ -5,6 +5,7 @@ import { GLOBAL } from '@core/services/global';
 
 import { AuthService } from '@core/services/auth.service';
 import { PlantaService } from '@core/services/planta.service';
+import { PortfolioControlService } from '@core/services/portfolio-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import {
@@ -51,23 +52,35 @@ export class BarChartComponent implements OnInit {
   private maeSigma: number;
   public dataLoaded = false;
 
-  constructor(private plantaService: PlantaService, public auth: AuthService) {}
+  constructor(
+    private plantaService: PlantaService,
+    public auth: AuthService,
+    private portfolioControlService: PortfolioControlService
+  ) {}
 
   ngOnInit(): void {
     this.auth.user$.subscribe((user) => {
       this.plantaService.getPlantasDeEmpresa(user).subscribe((plantas) => {
-        plantas.forEach((planta) => {
+        plantas.forEach((planta, index) => {
           if (planta.informes !== undefined && planta.informes.length > 0) {
             const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
             if (mae !== undefined) {
               this.data.push(Math.round(10 * mae) / 10);
-              this.barChartLabels.push(planta.nombre);
+
+              // DEMO
+              if (planta.nombre === 'Demo 1') {
+                this.barChartLabels.push(planta.nombre);
+              } else {
+                this.barChartLabels.push('Planta ' + (index + 1)); // DEMO
+              }
             }
           }
         });
         this.maeMedio = this.average(this.data);
+        this.portfolioControlService.maeMedio = this.maeMedio;
 
         this.maeSigma = this.standardDeviation(this.data);
+        this.portfolioControlService.maeSigma = this.maeSigma;
 
         this.data.forEach((m) => {
           this.coloresChart.push(this.getColorMae(m));

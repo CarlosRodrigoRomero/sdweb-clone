@@ -33,20 +33,36 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     const plantsData = [];
     this.auth.user$.subscribe((user) =>
       this.plantaService.getPlantasDeEmpresa(user).subscribe((plantas) => {
-        plantas.forEach((planta) => {
+        plantas.forEach((planta, index) => {
           if (planta.informes !== undefined && planta.informes.length > 0) {
+            // seleccionamos el dato de mae mas reciente
             const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+
             if (mae !== undefined) {
-              plantsData.push({
-                nombre: planta.nombre,
-                potencia: planta.potencia,
-                mae,
-                ultimaInspeccion: planta.informes.reduce((prev, current) =>
-                  prev.fecha > current.fecha ? prev : current
-                ).fecha,
-                plantaId: planta.id,
-                tipo: planta.tipo,
-              });
+              if (planta.nombre === 'Demo 1') {
+                // DEMO
+                plantsData.push({
+                  nombre: planta.nombre,
+                  potencia: planta.potencia,
+                  mae,
+                  ultimaInspeccion: planta.informes.reduce((prev, current) =>
+                    prev.fecha > current.fecha ? prev : current
+                  ).fecha,
+                  plantaId: planta.id,
+                  tipo: planta.tipo,
+                });
+              } else {
+                plantsData.push({
+                  nombre: 'Planta ' + (index + 1), // DEMO
+                  potencia: planta.potencia,
+                  mae,
+                  ultimaInspeccion: planta.informes.reduce((prev, current) =>
+                    prev.fecha > current.fecha ? prev : current
+                  ).fecha,
+                  plantaId: planta.id,
+                  tipo: planta.tipo,
+                });
+              }
             }
           }
         });

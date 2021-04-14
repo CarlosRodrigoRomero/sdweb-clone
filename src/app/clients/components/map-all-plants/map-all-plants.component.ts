@@ -15,6 +15,9 @@ import { fromLonLat } from 'ol/proj';
 import { PlantaInterface } from '@core/models/planta';
 import { AuthService } from '@core/services/auth.service';
 import { PlantaService } from '@core/services/planta.service';
+import { GLOBAL } from '@core/services/global';
+import { PortfolioControlService } from '@core/services/portfolio-control.service';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-map-all-plants',
@@ -31,7 +34,12 @@ export class MapAllPlantsComponent implements OnInit {
 
   map: any;
 
-  constructor(private plantaService: PlantaService, public auth: AuthService, private elementRef: ElementRef) {}
+  constructor(
+    private plantaService: PlantaService,
+    public auth: AuthService,
+    private elementRef: ElementRef,
+    private portfolioControlService: PortfolioControlService
+  ) {}
 
   ngOnInit(): void {
     this.auth.user$
@@ -44,21 +52,27 @@ export class MapAllPlantsComponent implements OnInit {
         this.plantas = plantas;
         this.initMap();
         const vectorSource = new VectorSource({});
+        const style = new Style({
+          stroke: new Stroke({
+            width: 2,
+          }),
+          fill: new Fill({}),
+        });
 
         plantas.forEach((planta) => {
           vectorSource.addFeature(new Feature(new Circle(fromLonLat([planta.longitud, planta.latitud]), 1e4)));
+          if (
+            planta.informes !== undefined &&
+            planta.informes[0] !== undefined &&
+            planta.informes[0].mae !== undefined
+          ) {
+            style.getStroke().setColor(this.portfolioControlService.getColorMae(planta.informes[0].mae));
+            style.getFill().setColor(this.portfolioControlService.getColorMae(planta.informes[0].mae, 0.3));
+          }
         });
         const vectorLayer = new VectorLayer({
           source: vectorSource,
-          style: new Style({
-            stroke: new Stroke({
-              color: 'red',
-              width: 2,
-            }),
-            fill: new Fill({
-              color: 'rgba(255,0,0,0.3)',
-            }),
-          }),
+          style,
         });
         this.map.addLayer(vectorLayer);
       });
