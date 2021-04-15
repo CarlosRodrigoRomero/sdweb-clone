@@ -61,6 +61,7 @@
             mat-row
             class="table-row"
             (mouseover)="hoverPlanta(row)"
+            (mouseleave)="unhoverPlanta(row)"
             *matRowDef="let row; columns: displayedColumns"
             (click)="onClick(row)"
           ></tr>

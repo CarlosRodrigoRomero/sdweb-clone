@@ -38,12 +38,6 @@ export class MapAllPlantsComponent implements OnInit {
     this.initMap();
 
     const vectorSource = new VectorSource({});
-    const style = new Style({
-      stroke: new Stroke({
-        width: 2,
-      }),
-      fill: new Fill({}),
-    });
 
     this.plantas.forEach((planta) => {
       const feature = new Feature(new Circle(fromLonLat([planta.longitud, planta.latitud]), 1e4));
@@ -57,17 +51,16 @@ export class MapAllPlantsComponent implements OnInit {
             plantaId: planta.id,
             tipo: planta.tipo,
           });
-
-          style.getStroke().setColor(this.portfolioControlService.getColorMae(mae));
-          style.getFill().setColor(this.portfolioControlService.getColorMae(mae, 0.3));
         }
       }
+      this.portfolioControlService.allFeatures.push(feature);
 
       vectorSource.addFeature(feature);
     });
+
     const vectorLayer = new VectorLayer({
       source: vectorSource,
-      style,
+      style: this.getStyleOnHover(false),
     });
     this.map.addLayer(vectorLayer);
   }

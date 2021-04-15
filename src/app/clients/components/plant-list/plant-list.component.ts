@@ -8,6 +8,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { AuthService } from '@core/services/auth.service';
 import { PlantaService } from '@core/services/planta.service';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
+import { PlantaInterface } from '@core/models/planta';
 
 interface PlantsData {
   nombre: string;
@@ -25,6 +26,7 @@ interface PlantsData {
 export class PlantListComponent implements OnInit, AfterViewInit {
   public displayedColumns: string[] = ['nombre', 'potencia', 'mae', 'ultima-inspeccion', 'compartir'];
   public dataSource = new MatTableDataSource<PlantsData>();
+  private plantas: PlantaInterface[];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -37,45 +39,41 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
+    this.plantas = this.portfolioControlService.listaPlantas;
     const plantsData = [];
-    this.auth.user$.subscribe((user) =>
-      this.plantaService.getPlantasDeEmpresa(user).subscribe((plantas) => {
-        plantas.forEach((planta, index) => {
-          if (planta.informes !== undefined && planta.informes.length > 0) {
-            // seleccionamos el dato de mae mas reciente
-            const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
 
-            if (mae !== undefined) {
-              if (planta.nombre === 'Demo 1') {
-                // DEMO
-                plantsData.push({
-                  nombre: planta.nombre,
-                  potencia: planta.potencia,
-                  mae,
-                  ultimaInspeccion: planta.informes.reduce((prev, current) =>
-                    prev.fecha > current.fecha ? prev : current
-                  ).fecha,
-                  plantaId: planta.id,
-                  tipo: planta.tipo,
-                });
-              } else {
-                plantsData.push({
-                  nombre: 'Planta ' + (index + 1), // DEMO
-                  potencia: planta.potencia,
-                  mae,
-                  ultimaInspeccion: planta.informes.reduce((prev, current) =>
-                    prev.fecha > current.fecha ? prev : current
-                  ).fecha,
-                  plantaId: planta.id,
-                  tipo: planta.tipo,
-                });
-              }
-            }
+    this.plantas.forEach((planta, index) => {
+      if (planta.informes !== undefined && planta.informes.length > 0) {
+        // seleccionamos el dato de mae mas reciente
+        const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+
+        if (mae !== undefined) {
+          if (planta.nombre === 'Demo 1') {
+            // DEMO
+            plantsData.push({
+              nombre: planta.nombre,
+              potencia: planta.potencia,
+              mae,
+              ultimaInspeccion: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current))
+                .fecha,
+              plantaId: planta.id,
+              tipo: planta.tipo,
+            });
+          } else {
+            plantsData.push({
+              nombre: 'Planta ' + (index + 1), // DEMO
+              potencia: planta.potencia,
+              mae,
+              ultimaInspeccion: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current))
+                .fecha,
+              plantaId: planta.id,
+              tipo: planta.tipo,
+            });
           }
-        });
-        this.dataSource.data = plantsData;
-      })
-    );
+        }
+      }
+    });
+    this.dataSource.data = plantsData;
   }
 
   ngAfterViewInit() {
@@ -110,8 +108,13 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  hoverPlanta(row: any) {
-    // this.portfolioControlService.plantaHover = row.anomalia;
-    // this.anomaliasControlService.setExternalStyle(row.id, true);
+  hoverPlanta(row) {
+    this.portfolioControlService.plantaHover = this.plantas.find((planta) => planta.id === row.plantaId);
+    this.portfolioControlService.setExternalStyle(row.plantaId, true);
+  }
+
+  unhoverPlanta(row) {
+    this.portfolioControlService.plantaHover = this.plantas.find((planta) => planta.id === row.plantaId);
+    this.portfolioControlService.setExternalStyle(row.plantaId, false);
   }
 }

@@ -8,6 +8,9 @@ import { PlantaService } from '@core/services/planta.service';
 import { PlantaInterface } from '@core/models/planta';
 import { GLOBAL } from './global';
 import { UserInterface } from '@core/models/user';
+import { switchMap } from 'rxjs/operators';
+import { Feature } from 'ol';
+import { Fill, Stroke, Style } from 'ol/style';
 
 @Injectable({
   providedIn: 'root',
@@ -24,11 +27,12 @@ export class PortfolioControlService {
   private _numPlantas;
   private _potenciaTotal;
   public listaPlantas: PlantaInterface[] = [];
+  public allFeatures: Feature[] = [];
 
   constructor(public auth: AuthService, private plantaService: PlantaService) {}
 
-  public initService(user: UserInterface): Observable<boolean> {
-    this.plantaService.getPlantasDeEmpresa(user).subscribe((plantas) => {
+  public initService(): Observable<boolean> {
+    this.auth.user$.pipe(switchMap((user) => this.plantaService.getPlantasDeEmpresa(user))).subscribe((plantas) => {
       plantas.forEach((planta) => {
         if (planta.informes !== undefined && planta.informes.length > 0) {
           const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
@@ -55,7 +59,7 @@ export class PortfolioControlService {
 
   public getColorMae(mae: number, opacity?: number): string {
     if (opacity !== undefined) {
-      if (mae >= this.maeMedio + this.maeSigma) {
+      if (mae > this.maeMedio + this.maeSigma) {
         return GLOBAL.colores_mae_rgb[2].replace(',1)', ',' + opacity + ')');
       } else if (mae <= this.maeMedio - this.maeSigma) {
         return GLOBAL.colores_mae_rgb[0].replace(',1)', ',' + opacity + ')');
@@ -63,13 +67,45 @@ export class PortfolioControlService {
         return GLOBAL.colores_mae_rgb[1].replace(',1)', ',' + opacity + ')');
       }
     } else {
-      if (mae >= this.maeMedio + this.maeSigma) {
+      if (mae > this.maeMedio + this.maeSigma) {
         return GLOBAL.colores_mae_rgb[2];
       } else if (mae <= this.maeMedio - this.maeSigma) {
         return GLOBAL.colores_mae_rgb[0];
       } else {
         return GLOBAL.colores_mae_rgb[1];
       }
+    }
+  }
+
+  public setExternalStyle(plantaId: string, focus: boolean) {
+    this.listaPlantas.find((planta) => planta.id === plantaId);
+
+    const feature = this.allFeatures.find((f) => f.getProperties().plantaId === plantaId);
+
+    const focusedStyle = new Style({
+      stroke: new Stroke({
+        color: 'white',
+        width: 6,
+      }),
+      fill: new Fill({
+        color: this.getColorMae(feature.getProperties().mae, 0.3),
+      }),
+    });
+
+    const unfocusedStyle = new Style({
+      stroke: new Stroke({
+        color: this.getColorMae(feature.getProperties().mae),
+        width: 2,
+      }),
+      fill: new Fill({
+        color: this.getColorMae(feature.getProperties().mae, 0.3),
+      }),
+    });
+
+    if (focus) {
+      feature.setStyle(focusedStyle);
+    } else {
+      feature.setStyle(unfocusedStyle);
     }
   }
 

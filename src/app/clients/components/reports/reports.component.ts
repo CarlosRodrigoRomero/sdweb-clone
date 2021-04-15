@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 
-import { AuthService } from '@core/services/auth.service';
-import { PlantaService } from '@core/services/planta.service';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 
 @Component({
@@ -14,16 +12,10 @@ export class ReportsComponent implements OnInit {
   potenciaTotal = 0;
   public mapLoaded = false;
 
-  constructor(
-    public auth: AuthService,
-    private plantaService: PlantaService,
-    private portfolioControlService: PortfolioControlService
-  ) {}
+  constructor(private portfolioControlService: PortfolioControlService) {}
 
   ngOnInit() {
-    this.auth.user$.subscribe((user) =>
-      this.portfolioControlService.initService(user).subscribe((init) => (this.mapLoaded = init))
-    );
+    this.portfolioControlService.initService().subscribe((init) => (this.mapLoaded = init));
 
     /* this.auth.user$.subscribe((user) =>
       this.plantaService.getPlantasDeEmpresa(user).subscribe((plantas) => {
