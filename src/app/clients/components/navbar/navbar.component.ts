@@ -29,7 +29,7 @@ export class NavbarComponent implements OnInit {
   public tipoPlanta = 'fija';
   public informe: InformeInterface = null;
 
-  public themeSelected: string;
+  public themeSelected = 'light-theme';
 
   constructor(
     public authService: AuthService,
@@ -60,7 +60,7 @@ export class NavbarComponent implements OnInit {
         this.informe = informe;
       });
 
-    this.themeService.themeSelected$.subscribe((theme) => (this.themeSelected = theme));
+    // this.themeService.themeSelected$.subscribe((theme) => (this.themeSelected = theme));
   }
 
   signOut() {
