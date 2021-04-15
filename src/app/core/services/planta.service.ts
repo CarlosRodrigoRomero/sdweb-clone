@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
 
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 
 import { LatLngLiteral } from '@agm/core/map-types';
 
@@ -451,6 +451,35 @@ export class PlantaService {
       return GLOBAL.nombreGlobalYFija;
     }
     return '';
+  }
+  setLocAreaListFromPlantaId(plantaId: string): void {
+    const locAreaList = [];
+    this.getLocationsArea(plantaId)
+      .pipe(take(1))
+      .subscribe((locAreaArray) => {
+        locAreaArray.forEach((locationArea) => {
+          const polygon = new google.maps.Polygon({
+            paths: locationArea.path,
+            strokeColor: '#FF0000',
+            visible: false,
+            strokeOpacity: 0,
+            strokeWeight: 0,
+            fillColor: 'grey',
+            fillOpacity: 0,
+            editable: false,
+            draggable: false,
+            id: locationArea.id,
+            globalX: locationArea.globalX,
+            globalY: locationArea.globalY,
+            globalCoords: locationArea.globalCoords,
+            modulo: locationArea.modulo,
+          });
+          locAreaList.push(polygon);
+          if (locAreaList.length === locAreaArray.length) {
+            this.setLocAreaList(locAreaList);
+          }
+        });
+      });
   }
 
   getNombreGlobalZ(planta: PlantaInterface): string {
