@@ -115,7 +115,7 @@ export class AnomaliasControlService {
     });
 
     // eliminamos la interacciones anteriores si las huviese
-    this.removeInteractions();
+    this.removeSelectAnomaliaInteractions();
 
     // añadimos acciones sobre las anomalias
     this.addPointerOnHover();
@@ -124,14 +124,16 @@ export class AnomaliasControlService {
     this.addClickOutFeatures();
   }
 
-  private removeInteractions() {
+  private removeSelectAnomaliaInteractions() {
     // eliminamos solo las interacciones 'select'
     this.map
       .getInteractions()
       .getArray()
       .forEach((interaction) => {
         if (interaction.getListeners('select') !== undefined) {
-          this.map.removeInteraction(interaction);
+          if (interaction.getProperties().id === 'selectAnomalia') {
+            this.map.removeInteraction(interaction);
+          }
         }
       });
   }
@@ -208,6 +210,8 @@ export class AnomaliasControlService {
         }
       },
     });
+
+    select.setProperties({ id: 'selectAnomalia' });
 
     this.map.addInteraction(select);
     select.on('select', (e) => {

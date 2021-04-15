@@ -161,6 +161,8 @@ export class AreaFilterComponent implements OnInit {
       condition: click,
     });
 
+    select.setProperties({ id: 'deleteButton' });
+
     this.map.addInteraction(select);
     select.on('select', (elem) => {
       if (elem.selected.length > 0) {
