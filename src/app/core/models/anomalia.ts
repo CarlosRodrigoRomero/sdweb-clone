@@ -19,6 +19,7 @@ export class Anomalia implements FiltrableInterface {
   plantaId: string;
   informeId: string;
   modulosAfectados?: number;
+  archivoPublico?: string;
 
   // demo
   localId?: string;

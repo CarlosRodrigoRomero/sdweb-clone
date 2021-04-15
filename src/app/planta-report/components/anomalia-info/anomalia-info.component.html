@@ -209,6 +209,7 @@
             <span class="titulo">ID Anomalía</span>
             <span class="subtitulo">{{ infoAdicional.id }}</span>
           </div>
+
           <div class="elemento">
             <span class="titulo">Tipo</span>
             <span class="subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] }}</span>
@@ -360,6 +361,20 @@
           <div class="elemento">
             <h5>Imagen</h5>
           </div>
+          <div class="elemento">
+            <span class="titulo">Descargar RJPG</span>
+            <span class="subtitulo">
+              <a class="link-descarga" (click)="downloadRjpg(anomaliaSelect)"> descarga </a>
+            </span>
+          </div>
+          <!-- <div class="elemento">
+          <span class="titulo">Imagen Térmica</span>
+          <span class="subtitulo">{{ infoAdicional.urlImagenIR }}</span>
+        </div>
+        <div class="elemento">
+          <span class="titulo">Imagen RGB</span>
+          <span class="subtitulo">{{ infoAdicional.urlImagenRGB }}</span>
+        </div> -->
           <div class="elemento">
             <span class="titulo">Imagen Térmica</span>
             <!-- <span class="subtitulo">{{ infoAdicional.imagen.urlImagenIR }}</span> -->
