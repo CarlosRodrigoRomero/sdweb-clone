@@ -31,8 +31,6 @@ import { AnomaliaService } from '@core/services/anomalia.service';
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
 
-
-
 interface InfoAdicional {
   id?: string;
   vuelo?: {
@@ -369,6 +367,8 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
 
   downloadRjpg(selectedAnomalia: Anomalia) {
     const archivoPublico = selectedAnomalia.archivoPublico.concat('.jpg');
+    console.log(archivoPublico);
+
     this.storage
       .ref(`informes/${selectedAnomalia.informeId}/rjpg/${archivoPublico}`)
       .getDownloadURL()
@@ -393,4 +393,5 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
         xhr.open('GET', downloadUrl);
         xhr.send();
       });
+  }
 }
