@@ -1,18 +1,5 @@
 <div class="barra-titulo" *ngIf="mapLoaded">
-  <div class="titulo">
-    <mat-icon color="primary">home</mat-icon>
-    <h4>Resumen</h4>
-  </div>
-  <div class="plantas">
-    <mat-icon color="primary">tag</mat-icon>
-    <h5 class="subtitulo">Nº plantas</h5>
-    <h5>{{ numPlantas }}</h5>
-  </div>
-  <div class="potencia">
-    <mat-icon color="primary">bolt</mat-icon>
-    <h5 class="subtitulo">Potencia total</h5>
-    <h5>{{ potenciaTotal | number: '1.0-0' }} MW</h5>
-  </div>
+  <app-portfolio-summary></app-portfolio-summary>
   <span class="spacer"></span>
   <app-download-excel-portfolio></app-download-excel-portfolio>
 </div>

@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 
 import { GLOBAL } from '@core/services/global';
 import { AuthService } from '@core/services/auth.service';
-import { PlantaService } from '@core/services/planta.service';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 
 import {
@@ -20,6 +19,7 @@ import {
   ApexAnnotations,
   ApexTooltip,
 } from 'ng-apexcharts';
+import { PlantaInterface } from '@core/models/planta';
 
 export interface ChartOptions {
   series: ApexAxisChartSeries;
@@ -51,49 +51,42 @@ export class BarChartComponent implements OnInit {
   public dataLoaded = false;
   public plantasId: string[] = [];
   public tiposPlantas: string[] = [];
+  private plantas: PlantaInterface[];
 
   constructor(
-    private plantaService: PlantaService,
     public auth: AuthService,
     private portfolioControlService: PortfolioControlService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.auth.user$.subscribe((user) => {
-      this.plantaService.getPlantasDeEmpresa(user).subscribe((plantas) => {
-        plantas.forEach((planta, index) => {
-          if (planta.informes !== undefined && planta.informes.length > 0) {
-            const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
-            if (mae !== undefined) {
-              this.data.push(Math.round(10 * mae) / 10);
-              // añadimos al array de ids
-              this.plantasId.push(planta.id);
-              // añadimos al array de tipos
-              this.tiposPlantas.push(planta.tipo);
+    this.plantas = this.portfolioControlService.listaPlantas;
+    this.maeMedio = this.portfolioControlService.maeMedio;
+    this.maeSigma = this.portfolioControlService.maeSigma;
 
-              // DEMO
-              if (planta.nombre === 'Demo 1') {
-                this.barChartLabels.push(planta.nombre);
-              } else {
-                this.barChartLabels.push('Planta ' + (index + 1)); // DEMO
-              }
-            }
-          }
-        });
-        this.maeMedio = this.average(this.data);
-        // this.portfolioControlService.maeMedio = this.maeMedio;
+    this.plantas.forEach((planta, index) => {
+      const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+      if (mae !== undefined) {
+        this.data.push(Math.round(10 * mae) / 10);
+        // añadimos al array de ids
+        this.plantasId.push(planta.id);
+        // añadimos al array de tipos
+        this.tiposPlantas.push(planta.tipo);
 
-        this.maeSigma = this.standardDeviation(this.data);
-        // this.portfolioControlService.maeSigma = this.maeSigma;
-
-        this.data.forEach((m) => {
-          this.coloresChart.push(this.getColorMae(m));
-        });
-
-        this.initChart();
-      });
+        // DEMO
+        if (planta.nombre === 'Demo 1') {
+          this.barChartLabels.push(planta.nombre);
+        } else {
+          this.barChartLabels.push('Planta ' + (index + 1)); // DEMO
+        }
+      }
     });
+
+    this.data.forEach((m) => {
+      this.coloresChart.push(this.getColorMae(m));
+    });
+
+    this.initChart();
   }
 
   private getColorMae(mae: number): string {
@@ -150,11 +143,12 @@ export class BarChartComponent implements OnInit {
         categories: this.barChartLabels,
         /* tickPlacement: 'on', */
       },
-      /* yaxis: {
-        title: {
+      yaxis: {
+        max: 5,
+        /* title: {
           text: 'MAE',
-        },
-      }, */
+        }, */
+      },
       fill: {
         opacity: 1,
       },

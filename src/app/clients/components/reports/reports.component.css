@@ -3,39 +3,6 @@
   padding: 1.5rem 2rem 1.5rem 2rem;
 }
 
-.barra-titulo mat-icon {
-  font-size: 26px;
-  margin-right: 8px;
-}
-
-.barra-titulo div {
-  display: flex;
-  width: fit-content;
-}
-
-.barra-titulo div span {
-  font-size: medium;
-}
-
-.titulo {
-  display: flex-end;
-  margin-right: 1rem;
-}
-
-.plantas {
-  margin-right: 1rem;
-}
-
-.titulo h4 {
-  margin-right: 1em;
-  margin-bottom: 0;
-}
-
-.subtitulo {
-  margin-right: 1em;
-  font-weight: 400;
-}
-
 .spacer {
   flex: 1 1 auto;
 }

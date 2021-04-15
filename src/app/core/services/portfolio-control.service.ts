@@ -24,8 +24,8 @@ export class PortfolioControlService {
   public maeMedio$ = new BehaviorSubject<number>(this._maeMedio);
   private _maeSigma: number = undefined;
   public maeSigma$ = new BehaviorSubject<number>(this._maeSigma);
-  private _numPlantas;
-  private _potenciaTotal;
+  public numPlantas = 0;
+  public potenciaTotal = 0;
   public listaPlantas: PlantaInterface[] = [];
   public allFeatures: Feature[] = [];
 
@@ -49,7 +49,8 @@ export class PortfolioControlService {
         (planta) => planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae
       );
       this.maeMedio = this.average(maePlantas);
-      this.maeSigma = this.standardDeviation(maePlantas);
+      // this.maeSigma = this.standardDeviation(maePlantas);
+      this.maeSigma = this.standardDeviation(maePlantas) / 3; // DEMO
 
       this.initialized$.next(true);
     });
@@ -158,21 +159,5 @@ export class PortfolioControlService {
   set maeSigma(value: number) {
     this._maeSigma = value;
     this.maeSigma$.next(value);
-  }
-
-  get numPlantas() {
-    return this._numPlantas;
-  }
-
-  set numPlantas(value: number) {
-    this._numPlantas = value;
-  }
-
-  get potenciaTotal() {
-    return this._potenciaTotal;
-  }
-
-  set potenciaTotal(value: number) {
-    this._potenciaTotal = value;
   }
 }
