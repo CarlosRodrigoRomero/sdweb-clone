@@ -111,12 +111,16 @@ nav {
 }
 
 @media (max-width: 450px) {
-  .navbar-brand-logo {
+  /* .navbar-brand-logo {
     display: none;
-  }
+  } */
 
   .grupo1 h5 {
     font-size: 16px;
+  }
+
+  .grupo1 mat-icon {
+    font-size: 22px;
   }
 
   .titulo {

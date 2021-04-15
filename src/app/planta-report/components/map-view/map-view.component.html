@@ -96,14 +96,26 @@
       </button>
 
       <!-- BOTON SIDENAV LISTA ANOMALIAS -->
-      <button mat-raised-button class="btn-right" (click)="sidenavRight.toggle()" matTooltip="Lista anomalías">
+      <button
+        mat-raised-button
+        class="btn-right"
+        (click)="sidenavRight.toggle()"
+        matTooltip="Lista anomalías"
+        [disabled]="statsOpened"
+      >
         <mat-icon>list_alt</mat-icon>
         <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
         <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon>
       </button>
 
       <!-- BOTON SIDENAV STATS -->
-      <button mat-raised-button class="btn-right-stats" (click)="sidenavStats.toggle()" matTooltip="Estadísticas">
+      <button
+        mat-raised-button
+        class="btn-right-stats"
+        (click)="sidenavStats.toggle()"
+        matTooltip="Estadísticas"
+        [disabled]="rightOpened"
+      >
         <mat-icon>query_stats</mat-icon>
         <mat-icon *ngIf="!statsOpened">keyboard_arrow_left</mat-icon>
         <mat-icon *ngIf="statsOpened">keyboard_arrow_right</mat-icon>

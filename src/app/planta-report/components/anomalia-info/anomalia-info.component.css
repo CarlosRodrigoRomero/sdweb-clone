@@ -17,11 +17,11 @@
   margin: 16px 24px;
 }
 
-.popup-card {
+.popup-hover {
   width: 300px;
 }
 
-.popup-card-content {
+.popup-hover-content {
   justify-content: space-between;
 }
 
@@ -37,4 +37,15 @@
 .subtitulo {
   font-weight: 300;
   font-size: 1.1rem;
+}
+
+.link-descarga {
+  padding: 0 4px;
+}
+
+@media (max-width: 500px) {
+  .popup-desktop {
+    width: 94vw;
+    left: -10px;
+  }
 }

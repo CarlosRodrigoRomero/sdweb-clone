@@ -24,9 +24,7 @@ export class MapViewComponent implements OnInit {
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
 
-  constructor(
-    private reportControlService: ReportControlService
-  ) {}
+  constructor(private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
     this.reportControlService.initService().subscribe((value) => (this.anomaliasLoaded = value));
