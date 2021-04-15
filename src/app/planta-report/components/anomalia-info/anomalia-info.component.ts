@@ -393,8 +393,5 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
         xhr.open('GET', downloadUrl);
         xhr.send();
       });
-<<<<<<< HEAD
-=======
   }
->>>>>>> demo-fija-optimizacion
 }
