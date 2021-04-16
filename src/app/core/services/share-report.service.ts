@@ -10,6 +10,7 @@ import { PerdidasFilter } from '@core/models/perdidasFilter';
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
 import { AreaFilter } from '@core/models/areaFilter';
 import { SeveridadFilter } from '@core/models/clasePcFilter';
+import { CriticidadFilter } from '@core/models/criticidad';
 import { ModuloPcFilter } from '@core/models/moduloFilter';
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { ZonaFilter } from '@core/models/zonaFilter';
@@ -77,6 +78,18 @@ export class ShareReportService {
           ];
         }
         break;
+      case 'criticidad':
+        if (this.params.criticidad === undefined || this.params.criticidad === null) {
+          this.params.criticidad = [false, false, false, false, false];
+          this.params.criticidad[(filter as CriticidadFilter).criticidad - 1] = !this.params.criticidad[
+            (filter as CriticidadFilter).criticidad - 1
+          ];
+        } else {
+          this.params.criticidad[(filter as CriticidadFilter).criticidad - 1] = !this.params.criticidad[
+            (filter as CriticidadFilter).criticidad - 1
+          ];
+        }
+        break;
       case 'modulo':
         this.params.modulo = (filter as ModuloPcFilter).modulo;
         break;
@@ -118,6 +131,11 @@ export class ShareReportService {
       case 'clase':
         this.params.clase[(filter as SeveridadFilter).clase - 1] = !this.params.clase[
           (filter as SeveridadFilter).clase - 1
+        ];
+        break;
+      case 'criticidad':
+        this.params.criticidad[(filter as CriticidadFilter).criticidad - 1] = !this.params.criticidad[
+          (filter as CriticidadFilter).criticidad - 1
         ];
         break;
       case 'modulo':
@@ -219,7 +237,18 @@ export class ShareReportService {
               }
             });
           }
-        } else if (Object.keys(this.params).includes('modulo')) {
+        }
+        if (Object.keys(this.params).includes('criticidad')) {
+          if (this.params.criticidad !== null) {
+            this.params.criticidad.forEach((crit, index) => {
+              if (crit) {
+                const criticidadFilter = new CriticidadFilter('', 'criticidad', index + 1);
+                filters.push(criticidadFilter);
+              }
+            });
+          }
+        }
+        if (Object.keys(this.params).includes('modulo')) {
           if (this.params.modulo !== null) {
             const moduloFilter = new ModuloPcFilter('', 'modulo', this.params.modulo);
             filters.push(moduloFilter);

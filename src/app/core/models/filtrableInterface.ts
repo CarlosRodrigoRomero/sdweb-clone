@@ -9,6 +9,7 @@ export interface FiltrableInterface {
   id?: string;
   tipo?: number;
   severidad?: number;
+  criticidad?: number;
   gradienteNormalizado?: number;
   temperaturaRef?: number;
   gps_lng?: number;

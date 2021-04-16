@@ -43,6 +43,9 @@ export class FilterControlService {
   private _severidadSelected: boolean[] = [false, false, false];
   public severidadSelected$ = new BehaviorSubject<boolean[]>(this._severidadSelected);
 
+  private _criticidadSelected: boolean[] = [false, false, false];
+  public criticidadSelected$ = new BehaviorSubject<boolean[]>(this._criticidadSelected);
+
   private _activeDrawArea: boolean = false;
   public activeDrawArea$ = new BehaviorSubject<boolean>(this._activeDrawArea);
 
@@ -73,6 +76,9 @@ export class FilterControlService {
     }
     if (params.clase !== undefined && params.clase !== null) {
       this.severidadSelected = params.clase;
+    }
+    if (params.criticidad !== undefined && params.criticidad !== null) {
+      this.criticidadSelected = params.criticidad;
     }
     if (params.tipo !== undefined && params.tipo !== null) {
       this.tiposSelected = [];
@@ -111,6 +117,9 @@ export class FilterControlService {
 
     // SEVERIDAD
     this.severidadSelected = [false, false, false];
+
+    // CRITICIDAD
+    this.criticidadSelected = [false, false, false, false, false];
 
     // AREA
     this.activeDrawArea = false;
@@ -217,6 +226,16 @@ export class FilterControlService {
   set severidadSelected(value: boolean[]) {
     this._severidadSelected = value;
     this.severidadSelected$.next(value);
+  }
+
+  /* CRITICIDAD */
+  get criticidadSelected() {
+    return this._criticidadSelected;
+  }
+
+  set criticidadSelected(value: boolean[]) {
+    this._criticidadSelected = value;
+    this.criticidadSelected$.next(value);
   }
 
   /* AREA */

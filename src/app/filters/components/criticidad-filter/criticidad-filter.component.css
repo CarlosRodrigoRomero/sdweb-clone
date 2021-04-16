@@ -1,0 +1,8 @@
+h5 {
+  margin-bottom: 15px;
+  font-weight: 400;
+}
+
+:host ::ng-deep .criticidad-group .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+  line-height: unset;
+}

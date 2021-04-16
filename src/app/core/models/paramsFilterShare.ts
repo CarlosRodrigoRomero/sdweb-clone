@@ -11,6 +11,7 @@ export interface ParamsFilterShare {
   maxTempMax?: number;
   area?: number[];
   clase?: boolean[];
+  criticidad?: boolean[];
   modulo?: string;
   tipo?: number[];
   zona?: string;
