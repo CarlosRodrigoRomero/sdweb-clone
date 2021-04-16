@@ -10,11 +10,11 @@
         <span class="subtitulo">{{ pcDescripcion[anomaliaHover.tipo] }}</span>
       </div>
       <div class="elemento">
-        <span class="titulo">Tª Max</span>
+        <span class="titulo">Temperatura Max</span>
         <span class="subtitulo">{{ anomaliaHover.temperaturaMax }} ºC</span>
       </div>
       <div class="elemento">
-        <span class="titulo">&Delta; Tª</span>
+        <span class="titulo">&Delta;T Normalizado</span>
         <span class="subtitulo">{{ anomaliaHover.gradienteNormalizado }} ºC</span>
       </div>
       <div class="elemento">
@@ -50,7 +50,7 @@
                 </mat-form-field> -->
             </div>
             <div class="elemento">
-              <span class="titulo">Tª Max</span>
+              <span class="titulo">Temperatura Max</span>
               <span class="subtitulo">{{ anomaliaSelect.temperaturaMax }} ºC</span>
               <!-- <input
                   (change)="onEdit($event, 'temperaturaMax')"
@@ -60,7 +60,7 @@
                 /> -->
             </div>
             <div class="elemento">
-              <span class="titulo">&Delta; Tª</span>
+              <span class="titulo">Gradiente Temp. Normalizado</span>
               <span class="subtitulo">{{ anomaliaSelect.gradienteNormalizado }} ºC</span>
               <!-- <input
                   (change)="onEdit($event, 'gradienteNormalizado')"

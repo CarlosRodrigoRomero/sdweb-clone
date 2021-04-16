@@ -1,3 +1,7 @@
+.filtro {
+  margin-bottom: 15px;
+}
+
 h5 {
   margin-bottom: 15px;
   font-weight: 400;
@@ -5,4 +9,10 @@ h5 {
 
 :host ::ng-deep .criticidad-group .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
   line-height: unset;
+}
+
+.criticidad-group {
+  width: 80%;
+  left: 50%;
+  transform: translate(-50%, 0%);
 }

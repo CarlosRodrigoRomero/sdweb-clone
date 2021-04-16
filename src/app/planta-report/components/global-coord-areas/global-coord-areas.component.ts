@@ -170,14 +170,11 @@ export class GlobalCoordAreasComponent implements OnInit {
       feature.get('globalCoords')[1] !== ''
     ) {
       this.globalCoordAreas[0].forEach((instalacion) => {
-        console.log(instalacion);
         // obtenemos el poligono para calcular si esta dentro feature
         const polygon = new Polygon([this.pathToCoordinate(instalacion.path)]);
 
-        console.log((feature.getGeometry() as Polygon).getCoordinates()[0]);
         if (polygon.intersectsCoordinate((feature.getGeometry() as Polygon).getCoordinates()[0][0])) {
           const label = 'Instalación ' + instalacion.globalCoords[0] + ' - Calle ' + feature.get('globalCoords')[1];
-          console.log(label);
           return label;
         }
       });
@@ -204,8 +201,6 @@ export class GlobalCoordAreasComponent implements OnInit {
           .filter((item) => item.getProperties().tipo === 'areaGlobalCoord');
 
         if (feature.length > 0) {
-          console.log(feature);
-
           // cambia el puntero por el de seleccionar
           this.map.getViewport().style.cursor = 'pointer';
         } else {

@@ -5,5 +5,5 @@ export interface CriteriosClasificacion {
   id?: string;
   nombre?: string;
   critCoA?: CritCoA;
-  critCategoria?: CritCriticidad;
+  critCriticidad?: CritCriticidad;
 }

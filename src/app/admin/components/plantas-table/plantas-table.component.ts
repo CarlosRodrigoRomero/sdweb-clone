@@ -98,7 +98,6 @@ export class PlantasTableComponent implements OnInit, AfterViewInit {
         this.plantasUserName.push(row.name);
       }
     });
-    console.log(this.plantasUserId);
     this.newPlantasUser.emit(this.plantasUserId);
   }
 }

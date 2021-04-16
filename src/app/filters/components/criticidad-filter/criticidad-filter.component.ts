@@ -24,7 +24,6 @@ export class CriticidadFilterComponent implements OnInit {
   criticidadElems: Criticidad[] = [];
   allComplete: boolean;
   filtroCriticidad: CriticidadFilter;
-  // coloresSeveridad: string[];
   public criticidadSelected: boolean[] = [false, false, false, false, false];
 
   constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
@@ -37,22 +36,17 @@ export class CriticidadFilterComponent implements OnInit {
       })
     );
 
-    // this.coloresSeveridad = GLOBAL.colores_severidad;
-
     this.filterControlService.criticidadSelected$.subscribe((sel) => {
       this.criticidadSelected = sel;
     });
   }
 
   onChangeCriticidadFilter(event: MatButtonToggleChange) {
+    const criticidad = this.criticidadElems.length - parseInt(event.source.id);
     if (event.source.checked) {
-      this.filtroCriticidad = new CriticidadFilter(
-        event.source.id,
-        'criticidad',
-        GLOBAL.labels_criticidad.indexOf(event.source.name) + 1
-      );
+      this.filtroCriticidad = new CriticidadFilter(event.source.id, 'criticidad', criticidad);
       this.filterService.addFilter(this.filtroCriticidad);
-      this.filterControlService.severidadSelected[/* parseInt( */event.source.id/* ) */] = true;
+      this.filterControlService.criticidadSelected[event.source.id] = true;
     } else {
       this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
         filters
@@ -63,7 +57,7 @@ export class CriticidadFilterComponent implements OnInit {
             }
           })
       );
-      this.filterControlService.severidadSelected[/* parseInt( */event.source.id/* ) */] = false;
+      this.filterControlService.criticidadSelected[event.source.id] = false;
     }
   }
 }

@@ -47,9 +47,9 @@ export class AnomaliaService {
           }
         })
       )
-      .subscribe((criterios) => {
+      .subscribe((criterios: CriteriosClasificacion) => {
         this.criterioCoA = criterios.critCoA;
-        this.criterioCriticidad = criterios.critCategoria;
+        this.criterioCriticidad = criterios.critCriticidad;
         this.inicialized = true;
       });
 
@@ -183,9 +183,13 @@ export class AnomaliaService {
         }
         if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[1]) {
           return 2;
-        } else if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[0]) {
+        } else {
+          // DEMO
           return 1;
         }
+        /*  else if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[0]) {
+          return 1;
+        } */
       }
 
       if (this.criterioCoA.hasOwnProperty('siempreVisible')) {
@@ -199,25 +203,28 @@ export class AnomaliaService {
   }
 
   private getCriticidad(anomalia: Anomalia): number {
+    let criticidad: number;
     if (this.criterioCriticidad !== undefined) {
-      if (this.criterioCriticidad.hasOwnProperty('siempreVisible')) {
+      /* if (this.criterioCriticidad.hasOwnProperty('siempreVisible')) {
         this.criterioCriticidad.siempreVisible.forEach((v, i) => {
           if (v.includes(anomalia.tipo)) {
             return i;
           }
         });
-      }
+      } */
       if (this.criterioCriticidad.hasOwnProperty('rangosDT')) {
-        const rangosDTReversed = this.criterioCriticidad.rangosDT.reverse();
-        const len = rangosDTReversed.length;
-        rangosDTReversed.forEach((v, i) => {
+        const rangosDT = this.criterioCriticidad.rangosDT;
+
+        rangosDT.forEach((v, i) => {
           if (anomalia.gradienteNormalizado >= v) {
-            return len - i;
+            criticidad = i + 1;
           }
         });
+        return criticidad;
       }
+    } else {
+      return criticidad;
     }
-    return null;
   }
 
   get inicialized() {

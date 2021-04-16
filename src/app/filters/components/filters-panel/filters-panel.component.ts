@@ -13,6 +13,7 @@ import { FilterControlService } from '@core/services/filter-control.service';
 export class FiltersPanelComponent implements OnInit {
   private tipoSeguidores = 'planta-seguidores';
   public esTipoSeguidores = false;
+  public filtrosActivos = false;
 
   constructor(
     private filterService: FilterService,
@@ -25,16 +26,18 @@ export class FiltersPanelComponent implements OnInit {
     if (this.router.url.includes(this.tipoSeguidores)) {
       this.esTipoSeguidores = true;
     }
+    this.filterService.filters$.subscribe((filters) => {
+      if (filters.length > 0) {
+        this.filtrosActivos = true;
+      } else {
+        this.filtrosActivos = false;
+      }
+    });
   }
 
   cleanFilters() {
     // borra todos los filtros
     this.filterService.deleteAllFilters();
-
-   /*  // elimina el poligono del mapa
-    this.olMapService.deleteAllDrawLayers();
-
-    this.olMapService.getMap().subscribe(map => map.removeInteraction()) */
 
     this.filterControlService.resetFilters();
   }
