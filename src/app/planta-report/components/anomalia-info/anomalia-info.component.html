@@ -252,7 +252,7 @@
           </div>
           <div class="elemento">
             <span class="titulo">Pérdidas</span>
-            <span class="subtitulo">{{ anomaliaSelect.perdidas * 100 }}%</span>
+            <span class="subtitulo">{{ getPerdidas(anomaliaSelect) }}%</span>
             <!-- <input (change)="onEdit($event, 'perdidas')" type="text" matImput [(ngModel)]="anomaliaSelect.perdidas" /> -->
           </div>
           <!-- <button mat-icon-button (click)="deleteAnomalia()">
@@ -375,6 +375,7 @@
               <a class="link-descarga" (click)="downloadRjpg(anomaliaSelect)"> descarga </a>
             </span>
           </div>
+<<<<<<< HEAD
           <!-- <div class="elemento">
           <span class="titulo">Imagen Térmica</span>
           <span class="subtitulo">{{ infoAdicional.urlImagenIR }}</span>
@@ -383,15 +384,18 @@
           <span class="titulo">Imagen RGB</span>
           <span class="subtitulo">{{ infoAdicional.urlImagenRGB }}</span>
         </div> -->
+=======
+
+>>>>>>> fcc02199855b10fa1e4017ed4597fb3836c10f38
           <div class="elemento">
             <span class="titulo">Imagen Térmica</span>
             <!-- <span class="subtitulo">{{ infoAdicional.imagen.urlImagenIR }}</span> -->
-            <a mat-button href="https://www.google.com/">Url imagen térmica</a>
+            <a mat-button (click)="downloadRjpg(anomaliaSelect)">descarga</a>
           </div>
           <div class="elemento">
             <span class="titulo">Imagen RGB</span>
             <!-- <span class="subtitulo">{{ infoAdicional.imagen.urlImagenRGB }}</span> -->
-            <a mat-button href="https://www.google.com/">Url imagen RGB</a>
+            <a mat-button (click)="downloadRjpg(anomaliaSelect)">descarga</a>
           </div>
           <div class="elemento" *ngIf="infoAdicional.imagen.camaraNombre">
             <span class="titulo">Camara</span>

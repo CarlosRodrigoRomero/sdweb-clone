@@ -31,8 +31,6 @@ import { AnomaliaService } from '@core/services/anomalia.service';
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
 
-
-
 interface InfoAdicional {
   id?: string;
   vuelo?: {

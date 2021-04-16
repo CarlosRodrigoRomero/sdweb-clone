@@ -12,6 +12,7 @@ export class Anomalia implements FiltrableInterface {
   temperaturaMax: number;
   modulo: ModuloInterface;
   temperaturaRef: number;
+  criticidad?: number;
   //
   featureCoords: Coordinate[];
   featureType: string;
