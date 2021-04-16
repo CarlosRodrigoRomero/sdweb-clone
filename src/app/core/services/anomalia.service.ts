@@ -183,13 +183,9 @@ export class AnomaliaService {
         }
         if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[1]) {
           return 2;
-        } else {
-          // DEMO
+        } else if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[0]) {
           return 1;
         }
-        /*  else if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[0]) {
-          return 1;
-        } */
       }
 
       if (this.criterioCoA.hasOwnProperty('siempreVisible')) {

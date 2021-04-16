@@ -43,7 +43,7 @@ export class FilterControlService {
   private _severidadSelected: boolean[] = [false, false, false];
   public severidadSelected$ = new BehaviorSubject<boolean[]>(this._severidadSelected);
 
-  private _criticidadSelected: boolean[] = [false, false, false];
+  private _criticidadSelected: boolean[] = [false, false, false, false, false];
   public criticidadSelected$ = new BehaviorSubject<boolean[]>(this._criticidadSelected);
 
   private _activeDrawArea: boolean = false;

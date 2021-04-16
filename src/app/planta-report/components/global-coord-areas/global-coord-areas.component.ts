@@ -99,7 +99,7 @@ export class GlobalCoordAreasComponent implements OnInit {
         // style.getText().setText(feature.get('globalCoords'));
 
         // para la demo
-        if (this.map.getView().getZoom() > 21) {
+        if (this.map.getView().getZoom() > 20) {
           const areaNames = ['Instalación', 'Calle', 'Mesa'];
 
           for (let i = 0; i < 3; i++) {
