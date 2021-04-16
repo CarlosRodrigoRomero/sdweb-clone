@@ -203,7 +203,7 @@ export class AnomaliaService {
       if (this.criterioCriticidad.hasOwnProperty('siempreVisible')) {
         this.criterioCriticidad.siempreVisible.forEach((v, i) => {
           if (v.includes(anomalia.tipo)) {
-            return this.criterioCriticidad.labels[i];
+            return i;
           }
         });
       }
@@ -212,12 +212,12 @@ export class AnomaliaService {
         const len = rangosDTReversed.length;
         rangosDTReversed.forEach((v, i) => {
           if (anomalia.gradienteNormalizado >= v) {
-            return this.criterioCriticidad.labels[len - i - 1];
+            return len - i;
           }
         });
       }
     }
-    return 0;
+    return null;
   }
 
   get inicialized() {
