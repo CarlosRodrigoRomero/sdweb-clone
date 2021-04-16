@@ -59,8 +59,6 @@ export class SeguidoresListComponent implements OnInit {
 
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.filterService.filteredElements$.subscribe((elems) => {
-        console.log(elems);
-
         const filteredElements = [];
 
         elems

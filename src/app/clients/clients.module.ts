@@ -14,6 +14,7 @@ import { PlantListComponent } from './components/plant-list/plant-list.component
 import { MapAllPlantsComponent } from './components/map-all-plants/map-all-plants.component';
 import { BarChartComponent } from './components/bar-chart/bar-chart.component';
 import { DownloadExcelPortfolioComponent } from './components/download-excel-portfolio/download-excel-portfolio.component';
+import { PortfolioSummaryComponent } from './components/portfolio-summary/portfolio-summary.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { DownloadExcelPortfolioComponent } from './components/download-excel-por
     MapAllPlantsComponent,
     BarChartComponent,
     DownloadExcelPortfolioComponent,
+    PortfolioSummaryComponent,
   ],
   imports: [
     CommonModule,

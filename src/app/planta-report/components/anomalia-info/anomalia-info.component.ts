@@ -40,6 +40,7 @@ interface InfoAdicional {
     nubosidad?: string;
     emisividad?: number;
     tempReflejada?: number;
+    tempAire?: number;
     vientoVelocidad?: number;
     vientoDireccion?: number;
   };
@@ -205,6 +206,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     let nubosidad;
     let emisividad;
     let tempReflejada;
+    let tempAire;
     let vientoVelocidad;
     let vientoDireccion;
 
@@ -232,6 +234,10 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     const tempR = (this.anomaliaSelect as PcInterface).temperaturaReflejada;
     if (tempR !== undefined && tempR !== null) {
       tempReflejada = tempR;
+    }
+    const tempA = (this.anomaliaSelect as PcInterface).temperaturaAire;
+    if (tempA !== undefined && tempA !== null) {
+      tempAire = tempA;
     }
     const vientoV = this.anomaliaSelect.vientoVelocidad;
     if (vientoV !== undefined && vientoV !== null) {
@@ -300,6 +306,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
         nubosidad,
         emisividad,
         tempReflejada,
+        tempAire,
         vientoVelocidad,
         vientoDireccion,
       },

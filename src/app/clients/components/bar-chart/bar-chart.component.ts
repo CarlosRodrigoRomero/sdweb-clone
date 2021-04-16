@@ -1,12 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ChartDataSets, ChartType } from 'chart.js';
-import { Label } from 'ng2-charts';
+import { Router } from '@angular/router';
+
 import { GLOBAL } from '@core/services/global';
-
 import { AuthService } from '@core/services/auth.service';
-import { PlantaService } from '@core/services/planta.service';
+import { PortfolioControlService } from '@core/services/portfolio-control.service';
 
-import { PlantaInterface } from '@core/models/planta';
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -21,6 +19,7 @@ import {
   ApexAnnotations,
   ApexTooltip,
 } from 'ng-apexcharts';
+import { PlantaInterface } from '@core/models/planta';
 
 export interface ChartOptions {
   series: ApexAxisChartSeries;
@@ -50,32 +49,44 @@ export class BarChartComponent implements OnInit {
   private maeMedio: number;
   private maeSigma: number;
   public dataLoaded = false;
+  public plantasId: string[] = [];
+  public tiposPlantas: string[] = [];
+  private plantas: PlantaInterface[];
 
-  constructor(private plantaService: PlantaService, public auth: AuthService) {}
+  constructor(
+    public auth: AuthService,
+    private portfolioControlService: PortfolioControlService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    this.auth.user$.subscribe((user) => {
-      this.plantaService.getPlantasDeEmpresa(user).subscribe((plantas) => {
-        plantas.forEach((planta) => {
-          if (planta.informes !== undefined && planta.informes.length > 0) {
-            const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
-            if (mae !== undefined) {
-              this.data.push(Math.round(10 * mae) / 10);
-              this.barChartLabels.push(planta.nombre);
-            }
-          }
-        });
-        this.maeMedio = this.average(this.data);
+    this.plantas = this.portfolioControlService.listaPlantas;
+    this.maeMedio = this.portfolioControlService.maeMedio;
+    this.maeSigma = this.portfolioControlService.maeSigma;
 
-        this.maeSigma = this.standardDeviation(this.data);
+    this.plantas.forEach((planta, index) => {
+      const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+      if (mae !== undefined) {
+        this.data.push(Math.round(10 * mae) / 10);
+        // añadimos al array de ids
+        this.plantasId.push(planta.id);
+        // añadimos al array de tipos
+        this.tiposPlantas.push(planta.tipo);
 
-        this.data.forEach((m) => {
-          this.coloresChart.push(this.getColorMae(m));
-        });
-
-        this.initChart();
-      });
+        // DEMO
+        if (planta.nombre === 'Demo 1') {
+          this.barChartLabels.push(planta.nombre);
+        } else {
+          this.barChartLabels.push('Planta ' + (index + 1)); // DEMO
+        }
+      }
     });
+
+    this.data.forEach((m) => {
+      this.coloresChart.push(this.getColorMae(m));
+    });
+
+    this.initChart();
   }
 
   private getColorMae(mae: number): string {
@@ -99,6 +110,12 @@ export class BarChartComponent implements OnInit {
       chart: {
         type: 'bar',
         height: 280,
+        events: {
+          click: (event, chartContext, config) => {
+            const index = config.dataPointIndex;
+            this.onClick(index);
+          },
+        },
       },
       plotOptions: {
         bar: {
@@ -126,11 +143,12 @@ export class BarChartComponent implements OnInit {
         categories: this.barChartLabels,
         /* tickPlacement: 'on', */
       },
-      /* yaxis: {
-        title: {
+      yaxis: {
+        max: 5,
+        /* title: {
           text: 'MAE',
-        },
-      }, */
+        }, */
+      },
       fill: {
         opacity: 1,
       },
@@ -199,5 +217,19 @@ export class BarChartComponent implements OnInit {
 
     const avg = sum / data.length;
     return avg;
+  }
+
+  private onClick(index: number) {
+    const plantaId = this.plantasId[index];
+    const tipoPlanta = this.tiposPlantas[index];
+
+    // acotado para la DEMO
+    if (plantaId === 'egF0cbpXnnBnjcrusoeR') {
+      if (tipoPlanta === 'seguidores') {
+        this.router.navigate(['clients/planta-seguidores/' + plantaId]);
+      } else {
+        this.router.navigate(['clients/planta-report/' + plantaId]);
+      }
+    }
   }
 }

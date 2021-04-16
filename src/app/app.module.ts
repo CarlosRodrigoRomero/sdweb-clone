@@ -11,6 +11,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 
 import { AuthService } from '@core/services/auth.service';
+import { WINDOW_PROVIDERS } from './window.providers';
+
 import { IndexComponent } from './cts/index/index.component';
 import { VideoComponent } from './cts/video/video.component';
 
@@ -47,7 +49,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     HotkeyModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
-  providers: [{ provide: SETTINGS, useValue: {} }, AuthService],
+  providers: [{ provide: SETTINGS, useValue: {} }, AuthService, WINDOW_PROVIDERS],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

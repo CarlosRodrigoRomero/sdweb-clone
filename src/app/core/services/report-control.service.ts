@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -9,6 +9,7 @@ import { ShareReportService } from '@core/services/share-report.service';
 import { InformeService } from '@core/services/informe.service';
 import { PlantaService } from '@core/services/planta.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
+import { WINDOW } from '../../window.providers';
 
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 import { GLOBAL } from './global';
@@ -40,7 +41,8 @@ export class ReportControlService {
     private filterService: FilterService,
     private informeService: InformeService,
     private plantaService: PlantaService,
-    private anomaliaService: AnomaliaService
+    private anomaliaService: AnomaliaService,
+    @Inject(WINDOW) private window: Window
   ) {}
 
   initService(): Observable<boolean> {
@@ -149,6 +151,10 @@ export class ReportControlService {
     }
 
     return this.initialized$;
+  }
+
+  getHostname(): string {
+    return this.window.location.hostname;
   }
 
   get sharedReport() {

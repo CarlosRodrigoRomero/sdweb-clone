@@ -1,3 +1,7 @@
+mat-card {
+  height: 100%;
+}
+
 .buscar-input {
   width: 100%;
 }
@@ -20,6 +24,10 @@ h4 {
 
 .email {
   margin: 8px;
+}
+
+.mat-row {
+  cursor: pointer;
 }
 
 .mat-column-nombre {

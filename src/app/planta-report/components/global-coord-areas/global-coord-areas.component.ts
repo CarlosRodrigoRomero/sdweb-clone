@@ -16,6 +16,10 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { LocationAreaInterface } from '@core/models/location';
 import Overlay from 'ol/Overlay';
 import OverlayPositioning from 'ol/OverlayPositioning';
+import Feature from 'ol/Feature';
+import { LatLngLiteral } from '@agm/core';
+import { Coordinate } from 'ol/coordinate';
+import Polygon from 'ol/geom/Polygon';
 
 export interface Task {
   name: string;
@@ -36,15 +40,15 @@ export class GlobalCoordAreasComponent implements OnInit {
   public map: Map;
 
   task: Task = {
-    name: 'Mostrar zonas de planta',
-    completed: true,
+    name: 'Ver zonas de la planta',
+    completed: false,
     subtasks: [
-      { name: 'Instalación', completed: true },
-      { name: 'Calle', completed: true },
-      { name: 'Mesa', completed: true },
+      { name: 'Instalación', completed: false },
+      { name: 'Calle', completed: false },
+      { name: 'Mesa', completed: false },
     ],
   };
-  public allComplete = true;
+  public allComplete = false;
 
   constructor(
     private plantaService: PlantaService,
@@ -95,12 +99,25 @@ export class GlobalCoordAreasComponent implements OnInit {
         // style.getText().setText(feature.get('globalCoords'));
 
         // para la demo
-        /* const areaNames = ['Instalación', 'Calle', 'Mesa'];
-        for (let i = 0; i < 3; i++) {
-          if (feature.get('globalCoords')[i] !== null) {
-            style.getText().setText(areaNames[i] + feature.get('globalCoords')[i]);
+        if (this.map.getView().getZoom() > 21) {
+          const areaNames = ['Instalación', 'Calle', 'Mesa'];
+
+          for (let i = 0; i < 3; i++) {
+            if (
+              feature.get('globalCoords')[i] !== null &&
+              feature.get('globalCoords')[i] !== undefined &&
+              feature.get('globalCoords')[i] !== ''
+            ) {
+              style.getText().setText(areaNames[i] + feature.get('globalCoords')[i]);
+            }
           }
-        } */
+        } else {
+          for (let i = 0; i < 3; i++) {
+            if (feature.get('globalCoords')[i] !== null) {
+              style.getText().setText('');
+            }
+          }
+        }
 
         return style;
       }
@@ -109,7 +126,15 @@ export class GlobalCoordAreasComponent implements OnInit {
     this.plantaService.getLocationsArea(this.plantaId).subscribe((locAreas) => {
       for (let i = 0; i < 3; i++) {
         if (this.globalCoordAreas.length < 3) {
-          this.globalCoordAreas.push(locAreas.filter((locArea) => locArea.globalCoords[i] !== null));
+          this.globalCoordAreas.push(
+            locAreas.filter(
+              (locArea) =>
+                locArea.globalCoords[i] !== null &&
+                locArea.globalCoords[i] !== undefined &&
+                locArea.globalCoords[i] !== ''
+            )
+          );
+
           this.globalCoordAreasVectorSources[i] = new VectorSource({
             features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(this.globalCoordAreas[i])),
           });
@@ -119,7 +144,7 @@ export class GlobalCoordAreasComponent implements OnInit {
           this.map.addLayer(
             (this.globalCoordAreasVectorLayers[i] = new VectorLayer({
               source: this.globalCoordAreasVectorSources[i],
-              visible: true,
+              visible: false,
               style: styleFunction,
             }))
           );
@@ -131,6 +156,45 @@ export class GlobalCoordAreasComponent implements OnInit {
     });
   }
 
+  private getLabelArea(feature: Feature): string {
+    if (
+      feature.get('globalCoords')[0] !== null &&
+      feature.get('globalCoords')[0] !== undefined &&
+      feature.get('globalCoords')[0] !== ''
+    ) {
+      const label = 'Instalación ' + feature.get('globalCoords')[0];
+      return label;
+    } else if (
+      feature.get('globalCoords')[1] !== null &&
+      feature.get('globalCoords')[1] !== undefined &&
+      feature.get('globalCoords')[1] !== ''
+    ) {
+      this.globalCoordAreas[0].forEach((instalacion) => {
+        console.log(instalacion);
+        // obtenemos el poligono para calcular si esta dentro feature
+        const polygon = new Polygon([this.pathToCoordinate(instalacion.path)]);
+
+        console.log((feature.getGeometry() as Polygon).getCoordinates()[0]);
+        if (polygon.intersectsCoordinate((feature.getGeometry() as Polygon).getCoordinates()[0][0])) {
+          const label = 'Instalación ' + instalacion.globalCoords[0] + ' - Calle ' + feature.get('globalCoords')[1];
+          console.log(label);
+          return label;
+        }
+      });
+    } else {
+      return 'blablabla';
+    }
+  }
+
+  private pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {
+    const coordenadas: Coordinate[] = [];
+    path.forEach((coord) => {
+      const coordenada: Coordinate = fromLonLat([coord.lng, coord.lat]);
+      coordenadas.push(coordenada);
+    });
+    return coordenadas;
+  }
+
   private addPointerOnHover() {
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
@@ -140,6 +204,8 @@ export class GlobalCoordAreasComponent implements OnInit {
           .filter((item) => item.getProperties().tipo === 'areaGlobalCoord');
 
         if (feature.length > 0) {
+          console.log(feature);
+
           // cambia el puntero por el de seleccionar
           this.map.getViewport().style.cursor = 'pointer';
         } else {
@@ -201,7 +267,7 @@ export class GlobalCoordAreasComponent implements OnInit {
       locArea.path.forEach((coords) => {
         coordsList.push(fromLonLat([coords.lng, coords.lat]));
       });
-      // Al ser un poligono, la 1era y utlima coord deben ser iguales:
+      // Al ser un poligono, la 1era y ultima coord deben ser iguales:
       coordsList.push(coordsList[0]);
 
       listOfFeatures.push({

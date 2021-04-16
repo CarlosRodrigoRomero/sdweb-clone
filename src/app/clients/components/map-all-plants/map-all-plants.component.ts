@@ -1,20 +1,20 @@
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+
 import 'ol/ol.css';
 import Circle from 'ol/geom/Circle';
-
 import { defaults as defaultControls } from 'ol/control.js';
-
 import Feature from 'ol/Feature';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import { Fill, Stroke, Style } from 'ol/style';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-import { switchMap } from 'rxjs/operators';
 import { fromLonLat } from 'ol/proj';
+
+import { PortfolioControlService } from '@core/services/portfolio-control.service';
+
 import { PlantaInterface } from '@core/models/planta';
-import { AuthService } from '@core/services/auth.service';
-import { PlantaService } from '@core/services/planta.service';
 
 @Component({
   selector: 'app-map-all-plants',
@@ -26,42 +26,43 @@ export class MapAllPlantsComponent implements OnInit {
   defaultLng = -4;
   defaultLat = 40;
   defalutZoom = 6;
-
   geojsonObject: any;
+  map: Map;
+  public plantaHover: PlantaInterface;
+  private prevFeatureHover: any;
 
-  map: any;
-
-  constructor(private plantaService: PlantaService, public auth: AuthService, private elementRef: ElementRef) {}
+  constructor(private portfolioControlService: PortfolioControlService, private router: Router) {}
 
   ngOnInit(): void {
-    this.auth.user$
-      .pipe(
-        switchMap((user) => {
-          return this.plantaService.getPlantasDeEmpresa(user);
-        })
-      )
-      .subscribe((plantas) => {
-        this.plantas = plantas;
-        this.initMap();
-        const vectorSource = new VectorSource({});
+    this.plantas = this.portfolioControlService.listaPlantas;
+    this.initMap();
 
-        plantas.forEach((planta) => {
-          vectorSource.addFeature(new Feature(new Circle(fromLonLat([planta.longitud, planta.latitud]), 1e4)));
-        });
-        const vectorLayer = new VectorLayer({
-          source: vectorSource,
-          style: new Style({
-            stroke: new Stroke({
-              color: 'red',
-              width: 2,
-            }),
-            fill: new Fill({
-              color: 'rgba(255,0,0,0.3)',
-            }),
-          }),
-        });
-        this.map.addLayer(vectorLayer);
-      });
+    const vectorSource = new VectorSource({});
+
+    this.plantas.forEach((planta) => {
+      const feature = new Feature(new Circle(fromLonLat([planta.longitud, planta.latitud]), 1e4));
+
+      if (planta.informes !== undefined && planta.informes.length > 0) {
+        const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+
+        if (mae !== undefined) {
+          feature.setProperties({
+            mae,
+            plantaId: planta.id,
+            tipo: planta.tipo,
+          });
+        }
+      }
+      this.portfolioControlService.allFeatures.push(feature);
+
+      vectorSource.addFeature(feature);
+    });
+
+    const vectorLayer = new VectorLayer({
+      source: vectorSource,
+      style: this.getStyleOnHover(false),
+    });
+    this.map.addLayer(vectorLayer);
   }
 
   initMap() {
@@ -78,5 +79,108 @@ export class MapAllPlantsComponent implements OnInit {
       }),
       controls: defaultControls({ attribution: false, zoom: false }).extend([]),
     });
+
+    this.addPointerOnHover();
+    this.addOnHoverAction();
+    this.addOnClickAction();
+
+    // this.portfolioControlService.plantaHover$.subscribe((planta) => (this.plantaHover = planta));
+  }
+
+  private addPointerOnHover() {
+    this.map.on('pointermove', (event) => {
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        const feature = this.map.getFeaturesAtPixel(event.pixel);
+
+        if (feature.length > 0) {
+          // cambia el puntero por el de seleccionar
+          this.map.getViewport().style.cursor = 'pointer';
+        } else {
+          // vuelve a poner el puntero normal
+          this.map.getViewport().style.cursor = 'inherit';
+        }
+      } else {
+        // vuelve a poner el puntero normal
+        this.map.getViewport().style.cursor = 'inherit';
+      }
+    });
+  }
+
+  private addOnHoverAction() {
+    let currentFeatureHover;
+    this.map.on('pointermove', (event) => {
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        const feature = this.map.getFeaturesAtPixel(event.pixel);
+
+        if (feature.length > 0) {
+          // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
+          if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
+            (this.prevFeatureHover[0] as Feature).setStyle(this.getStyleOnHover(false));
+          }
+          currentFeatureHover = feature;
+
+          (feature[0] as Feature).setStyle(this.getStyleOnHover(true));
+
+          this.prevFeatureHover = feature;
+        }
+      } else {
+        this.plantaHover = undefined;
+
+        if (currentFeatureHover !== undefined) {
+          (currentFeatureHover[0] as Feature).setStyle(this.getStyleOnHover(false));
+        }
+      }
+    });
+  }
+
+  private addOnClickAction() {
+    this.map.on('click', (event) => {
+      const feature = this.map.getFeaturesAtPixel(event.pixel);
+
+      if (feature.length > 0) {
+        const plantaId = feature[0].getProperties().plantaId;
+
+        // acotado para la DEMO
+        if (plantaId === 'egF0cbpXnnBnjcrusoeR') {
+          if (feature[0].getProperties().tipo === 'seguidores') {
+            this.router.navigate(['clients/planta-seguidores/' + plantaId]);
+          } else {
+            this.router.navigate(['clients/planta-report/' + plantaId]);
+          }
+        }
+      }
+    });
+  }
+
+  private getStyleOnHover(hovered: boolean) {
+    if (hovered) {
+      return (feature: Feature) => {
+        if (feature !== undefined) {
+          return new Style({
+            stroke: new Stroke({
+              color: 'white',
+              width: 6,
+            }),
+            fill: new Fill({
+              color: this.portfolioControlService.getColorMae(feature.getProperties().mae, 0.3),
+            }),
+          });
+        }
+      };
+    } else {
+      return (feature: Feature) => {
+        if (feature !== undefined) {
+          return new Style({
+            stroke: new Stroke({
+              color: this.portfolioControlService.getColorMae(feature.getProperties().mae),
+              width: 2,
+            }),
+            fill: new Fill({
+              color: this.portfolioControlService.getColorMae(feature.getProperties().mae, 0.3),
+            }),
+          });
+        }
+      };
+    }
   }
 }

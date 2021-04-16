@@ -111,6 +111,10 @@
             <span class="titulo">Temperatura reflejada</span>
             <span class="subtitulo">{{ infoAdicional.vuelo.tempReflejada }} ºC</span>
           </div>
+          <div class="elemento" *ngIf="infoAdicional.vuelo.tempAire">
+            <span class="titulo">Temperatura aire</span>
+            <span class="subtitulo">{{ infoAdicional.vuelo.tempAire }} ºC</span>
+          </div>
           <div class="elemento" *ngIf="infoAdicional.vuelo.vientoVelocidad">
             <span class="titulo">Velocidad viento</span>
             <span class="subtitulo">{{ infoAdicional.vuelo.vientoVelocidad }} Beaufort</span>

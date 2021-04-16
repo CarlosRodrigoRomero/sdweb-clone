@@ -16,6 +16,10 @@ import { InformeInterface } from '@core/models/informe';
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit {
+  public numPlantas: number;
+  public potenciaTotal: number;
+  public load = false;
+
   public isShared = false;
   public userLogged: boolean;
   public isAdmin: boolean;

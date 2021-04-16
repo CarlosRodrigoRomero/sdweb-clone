@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+
+import { Observable } from 'rxjs';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ClipboardService } from 'ngx-clipboard';
-
-import { Observable } from 'rxjs';
 
 import { ShareReportService } from '@core/services/share-report.service';
 import { ReportControlService } from '@core/services/report-control.service';
@@ -24,13 +23,10 @@ export class ShareMapComponent implements OnInit {
     private shareReportService: ShareReportService,
     private clipboardService: ClipboardService,
     private snackBar: MatSnackBar,
-    private router: Router,
     private reportControlService: ReportControlService
   ) {}
 
-  ngOnInit(): void {
-    // this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
-  }
+  ngOnInit(): void {}
 
   getShareLink(): string {
     this.selectedInformeId = this.reportControlService.selectedInformeId;
@@ -47,13 +43,14 @@ export class ShareMapComponent implements OnInit {
       sharedType = '/filterable-shared/';
     }
 
-    const currentUrl = this.router.url.split('/');
+    const currentUrl = this.reportControlService.getHostname();
 
     let url;
-    if (currentUrl[0] !== '') {
-      url = currentUrl[0] + sharedType + id;
+    if (currentUrl !== 'localhost') {
+      url = currentUrl + sharedType + id;
     } else {
-      url = 'localhost:4200' + sharedType + id;
+      // añadimos el puerto
+      url = currentUrl + ':4200' + sharedType + id;
     }
 
     return url;

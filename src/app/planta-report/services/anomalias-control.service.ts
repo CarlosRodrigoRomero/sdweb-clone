@@ -125,9 +125,15 @@ export class AnomaliasControlService {
   }
 
   private removeInteractions() {
-    if (this.map.getInteractions().getLength() > 0) {
-      this.map.getInteractions().forEach((interaction) => this.map.removeInteraction(interaction));
-    }
+    // eliminamos solo las interacciones 'select'
+    this.map
+      .getInteractions()
+      .getArray()
+      .forEach((interaction) => {
+        if (interaction.getListeners('select') !== undefined) {
+          this.map.removeInteraction(interaction);
+        }
+      });
   }
 
   private addPointerOnHover() {
