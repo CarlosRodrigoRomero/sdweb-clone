@@ -1,5 +1,5 @@
 .filtro {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 h5 {
@@ -9,14 +9,15 @@ h5 {
 
 :host ::ng-deep .criticidad-group .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
   line-height: unset;
+  padding: 0 10px;
 }
 
 .criticidad-group {
-  display: flex;
+  /*  display: flex;
   width: 100%;
   flex-direction: row;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: wrap; */
   left: 50%;
   transform: translate(-50%, 0%);
 }

@@ -45,8 +45,8 @@ export let GLOBAL = {
   tipos_severidad: [1, 2, 3],
   // colores_severidad: ['#20B2AA', '#FFD700', '#FF4500', '#800000'],
   colores_severidad: ['#20B2AA', '#FF4500', '#b70000'],
-  labels_criticidad: ['Muy alta', 'Alta', 'Media', 'Baja', 'Muy baja'],
-  tipos_criticidad: [5, 4, 3, 2, 1],
+  labels_criticidad: ['Muy baja', 'Baja', 'Media', 'Alta', 'Muy Alta'],
+  tipos_criticidad: [1, 2, 3, 4, 5],
   labels_tipos: [
     '0',
     'PC',

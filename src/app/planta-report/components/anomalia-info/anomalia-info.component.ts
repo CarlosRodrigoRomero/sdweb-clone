@@ -84,6 +84,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   public dataSource: Anomalia[];
   public dataType: any;
   public pcDescripcion: string[];
+  public criticidadLabels: string[];
   public infoAdicional: InfoAdicional;
   private plantaId: string;
   private nombrePlanta: string;
@@ -107,6 +108,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.pcDescripcion = GLOBAL.pcDescripcion;
+    this.criticidadLabels = GLOBAL.labels_criticidad;
     this.dataSource = [this.anomaliaHover];
     this.dataType = {
       clase: 'number',

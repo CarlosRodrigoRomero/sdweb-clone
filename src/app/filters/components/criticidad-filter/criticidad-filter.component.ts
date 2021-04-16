@@ -29,9 +29,9 @@ export class CriticidadFilterComponent implements OnInit {
   constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
 
   ngOnInit(): void {
-    GLOBAL.labels_criticidad.forEach((label, index) =>
+    GLOBAL.labels_criticidad.forEach((label, index, labels) =>
       this.criticidadElems.push({
-        label,
+        label: labels[labels.length - (index + 1)],
         completed: false,
       })
     );

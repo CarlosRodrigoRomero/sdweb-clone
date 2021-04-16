@@ -1,7 +1,8 @@
 <div class="filtro">
   <h5>Criticidad</h5>
-  <mat-button-toggle-group class="criticidad-group" #group="matButtonToggleGroup" multiple="true" vertical="true">
+  <mat-button-toggle-group class="criticidad-group" #group="matButtonToggleGroup" multiple="true">
     <mat-button-toggle
+    class="criticidad-toggle"
       *ngFor="let elem of criticidadElems; index as i"
       [id]="i"
       [name]="elem.label"
