@@ -1,0 +1,19 @@
+<div class="filtro">
+  <h5>Criticidad</h5>
+  <mat-button-toggle-group class="criticidad-group" #group="matButtonToggleGroup" multiple="true" vertical="true">
+    <mat-button-toggle
+      *ngFor="let elem of criticidadElems; index as i"
+      [id]="i"
+      [name]="elem.label"
+      [checked]="criticidadSelected[i]"
+      (change)="onChangeCriticidadFilter($event)"
+    >
+      <div class="label">
+        <!-- <mat-icon [ngStyle]="{ color: coloresSeveridad[i] }">stop_circle</mat-icon> -->
+        <span class="text-label" style="font-size: 15px">
+          {{ elem.label }}
+        </span>
+      </div>
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+</div>

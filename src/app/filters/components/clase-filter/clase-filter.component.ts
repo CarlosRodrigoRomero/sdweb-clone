@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { take } from 'rxjs/operators';
+
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 
 import { GLOBAL } from '@core/services/global';
@@ -7,7 +9,6 @@ import { FilterService } from '@core/services/filter.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
 import { SeveridadFilter } from '@core/models/clasePcFilter';
-import { take } from 'rxjs/operators';
 
 interface Severidad {
   label?: string;
@@ -45,7 +46,6 @@ export class ClaseFilterComponent implements OnInit {
 
   onChangeClaseFilter(event: MatButtonToggleChange) {
     if (event.source.checked) {
-      console.log('checked');
       this.filtroClase = new SeveridadFilter(
         event.source.id,
         'clase',
@@ -54,7 +54,6 @@ export class ClaseFilterComponent implements OnInit {
       this.filterService.addFilter(this.filtroClase);
       this.filterControlService.severidadSelected[parseInt(event.source.id.replace('CoA_', '')) - 1] = true;
     } else {
-      console.log('unchecked');
       this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
         filters
           .filter((filter) => filter.type === 'clase')

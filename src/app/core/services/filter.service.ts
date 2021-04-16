@@ -15,7 +15,7 @@ import { take } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class FilterService {
-  private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona'];
+  private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad'];
   private filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
   private filtersByType: FilterInterface[] = [];
