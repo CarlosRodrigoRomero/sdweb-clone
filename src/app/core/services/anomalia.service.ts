@@ -11,6 +11,8 @@ import { PlantaService } from '@core/services/planta.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { CritCoA } from '@core/models/critCoA';
+import { CritCriticidad } from '@core/models/critCriticidad';
+import { CriteriosClasificacion } from '../models/criteriosClasificacion';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +21,7 @@ export class AnomaliaService {
   private _selectedInformeId: string;
   public allAnomaliasInforme: Anomalia[];
   public criterioCoA: CritCoA;
+  public criterioCriticidad: CritCriticidad;
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
 
@@ -30,7 +33,7 @@ export class AnomaliaService {
 
   initService(plantaId: string) {
     // obtenemos el criterio de CoA de la planta
-    this.plantaService
+    const critCoA$ = this.plantaService
       .getPlanta(plantaId)
       .pipe(
         take(1),
@@ -44,8 +47,9 @@ export class AnomaliaService {
           }
         })
       )
-      .subscribe((criterio) => {
-        this.criterioCoA = criterio.critCoA;
+      .subscribe((criterios) => {
+        this.criterioCoA = criterios.critCoA;
+        this.criterioCriticidad = criterios.critCategoria;
         this.inicialized = true;
       });
 
@@ -106,6 +110,7 @@ export class AnomaliaService {
             data.id = doc.payload.doc.id;
             data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
             data.severidad = this.getCoA(data);
+            data.criticidad = this.getCriticidad(data);
             // Convertimos el objeto en un array
             if (data.hasOwnProperty('featureCoords')) {
               data.featureCoords = Object.values(data.featureCoords);
@@ -191,6 +196,28 @@ export class AnomaliaService {
     } else {
       return 0;
     }
+  }
+
+  private getCriticidad(anomalia: Anomalia): number {
+    if (this.criterioCriticidad !== undefined) {
+      if (this.criterioCriticidad.hasOwnProperty('siempreVisible')) {
+        this.criterioCriticidad.siempreVisible.forEach((v, i) => {
+          if (v.includes(anomalia.tipo)) {
+            return this.criterioCriticidad.labels[i];
+          }
+        });
+      }
+      if (this.criterioCriticidad.hasOwnProperty('rangosDT')) {
+        const rangosDTReversed = this.criterioCriticidad.rangosDT.reverse();
+        const len = rangosDTReversed.length;
+        rangosDTReversed.forEach((v, i) => {
+          if (anomalia.gradienteNormalizado >= v) {
+            return this.criterioCriticidad.labels[len - i - 1];
+          }
+        });
+      }
+    }
+    return 0;
   }
 
   get inicialized() {
