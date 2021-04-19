@@ -30,6 +30,10 @@ export const routes: Routes = [
     path: 'filterable-shared',
     loadChildren: () => import('./shared-report/shared-report.module').then((m) => m.SharedReportModule),
   },
+  {
+    path: 'clusters',
+    loadChildren: () => import('./clusters/clusters.module').then((m) => m.ClustersModule),
+  },
 
   // // { path: "**", redirectTo: "" }
 ];
