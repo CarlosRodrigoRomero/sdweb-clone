@@ -1,1 +1,7 @@
-<app-map-clusters></app-map-clusters>
+<div *ngIf="trayectoriaLoaded">
+  <app-navbar> </app-navbar>
+  <div class="cluster-grid">
+    <app-map-clusters></app-map-clusters>
+    <app-image-point-cluster></app-image-point-cluster>
+  </div>
+</div>
