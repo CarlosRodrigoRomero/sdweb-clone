@@ -5,4 +5,5 @@ export interface Cluster {
   extremoA: number[];
   extremoB: Coordinate;
   color?: string;
+  clusterJoinId?: string;
 }

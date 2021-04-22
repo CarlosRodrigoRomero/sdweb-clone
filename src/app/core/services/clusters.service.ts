@@ -4,6 +4,7 @@ import { BehaviorSubject, combineLatest, EMPTY, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
+import * as firebase from 'firebase/app';
 
 import { Map } from 'ol';
 import { fromLonLat } from 'ol/proj';
@@ -194,13 +195,13 @@ export class ClustersService {
     }
   }
 
-  joinClusters(clusterId: string, clusterJoinID: string) {
+  joinClusters(clusterId: string, clusterJoinId: string) {
     // creamos la referencia al cluster
     const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(clusterId);
 
     return clusterRef
       .update({
-        clusterJoinID,
+        clusterJoinId,
       })
       .then(() => {
         console.log('Cluster successfully updated!');
@@ -219,6 +220,20 @@ export class ClustersService {
       .delete()
       .then(() => console.log('Cluster borrado correctamente'))
       .catch((error) => console.log('Error al borrar el cluster'));
+
+    // eliminamos tambien los JOIN que pudiese haber a este cluster
+    this.deleteJoinClusterId(clusterId);
+  }
+
+  deleteJoinClusterId(clusterId: string) {
+    this.clusters.forEach((cluster) => {
+      if (cluster.clusterJoinId === clusterId) {
+        const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(cluster.id);
+        clusterRef.update({
+          clusterJoinId: firebase.firestore.FieldValue.delete(),
+        });
+      }
+    });
   }
 
   get planta() {
