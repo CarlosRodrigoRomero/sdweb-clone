@@ -42,13 +42,14 @@ export class MapClustersComponent implements OnInit {
   private coordsPuntosTrayectoria: Coordinate[] = [];
   private prevFeatureHover: any;
   private puntosTrayectoria: PuntoTrayectoria[] = [];
+  private puntoTrayectoriaSelected: PuntoTrayectoria;
   private puntoClusterHovered: PuntoTrayectoria;
-  private puntoClusterSelected: PuntoTrayectoria;
   private clusters: Cluster[];
   private clusterSelected: Cluster;
   private isClusterA: boolean;
   private deleteMode = false;
   private joinActive = false;
+  private createClusterActive = false;
 
   constructor(
     private plantaService: PlantaService,
@@ -63,6 +64,7 @@ export class MapClustersComponent implements OnInit {
     this.clustersService.deleteMode$.subscribe((del) => (this.deleteMode = del));
     this.clustersService.joinActive$.subscribe((joi) => (this.joinActive = joi));
     this.clustersService.clusterSelected$.subscribe((cluster) => (this.clusterSelected = cluster));
+    this.clustersService.createClusterActive$.subscribe((create) => (this.createClusterActive = create));
 
     this.initMap();
 
@@ -76,6 +78,7 @@ export class MapClustersComponent implements OnInit {
     this.addOnHoverClusterAction();
     this.addSelectClusterInteraction();
     this.addSelectPuntosTrayectoriaInteraction();
+    this.addClickOutFeatures();
   }
 
   initMap() {
@@ -320,7 +323,7 @@ export class MapClustersComponent implements OnInit {
 
   private addSelectClusterInteraction() {
     const select = new Select({
-      style: this.getStyleCluster(true),
+      // style: this.getStyleCluster(true),
       condition: click,
       layers: (l) => {
         if (l.getProperties().id === 'clustersLayer') {
@@ -335,9 +338,6 @@ export class MapClustersComponent implements OnInit {
 
     this.map.addInteraction(select);
     select.on('select', (e) => {
-      if (this.puntoClusterSelected !== undefined) {
-        // this.puntoClusterSelected = undefined;
-      }
       if (this.clusterSelected !== undefined) {
         this.setClusterStyle(this.clusterSelected.id, false);
         // this.clustersService.clusterSelected = undefined;
@@ -361,7 +361,7 @@ export class MapClustersComponent implements OnInit {
             // si el modo ELIMINAR esta activo eliminamos los clusters al hacer click
             this.clustersService.deleteCluster(clusterId);
 
-            this.puntoClusterSelected = undefined;
+            this.clustersService.clusterSelected = undefined;
           } else if (this.joinActive) {
             // si JOIN se encuentra active se asocida este clusterId al cluster anterior seleccionado
             this.clustersService.joinClusters(this.clusterSelected.id, clusterId);
@@ -369,15 +369,11 @@ export class MapClustersComponent implements OnInit {
             this.clustersService.joinActive = false;
 
             this.clustersService.clusterSelected = undefined;
-            this.puntoClusterSelected = undefined;
           } else {
             this.setClusterStyle(clusterId, true);
+            console.log('ok');
 
             this.clustersService.clusterSelected = this.clusters.find((cluster) => cluster.id === clusterId);
-
-            const puntoEquivalente = this.getPuntoEquivalente(clusterId);
-
-            this.puntoClusterSelected = puntoEquivalente;
           }
 
           this.puntoClusterHovered = undefined;
@@ -388,7 +384,6 @@ export class MapClustersComponent implements OnInit {
 
   private addSelectPuntosTrayectoriaInteraction() {
     const select = new Select({
-      // style: this.getStylePuntos(true),
       condition: click,
       layers: (l) => {
         if (l.getProperties().id === 'puntosTrayectoriaLayer') {
@@ -403,27 +398,47 @@ export class MapClustersComponent implements OnInit {
 
     this.map.addInteraction(select);
     select.on('select', (e) => {
-      if (this.puntoClusterSelected !== undefined) {
-        if (e.selected.length > 0) {
-          if (
-            e.selected[0].getProperties().properties !== undefined &&
-            e.selected[0].getProperties().properties.name === 'puntoTrayectoria'
-          ) {
-            if (!this.deleteMode) {
-              const puntoId = e.selected[0].getProperties().properties.id;
-              const puntoSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
+      if (e.selected.length > 0) {
+        if (this.createClusterActive) {
+          if (this.puntoTrayectoriaSelected !== undefined) {
+            const puntoId = e.selected[0].getProperties().properties.id;
+            const puntoSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
 
-              if (!this.esPuntoCluster(puntoSelected)) {
-                // Actualizamos el punto cluster seleccionado solo si no pulsamos sobre otro cluster
-                this.clustersService.updateCluster(this.clusterSelected.id, this.isClusterA, [
-                  puntoSelected.long,
-                  puntoSelected.lat,
-                ]);
+            const cluster: Cluster = {
+              extremoA: [this.puntoTrayectoriaSelected.long, this.puntoTrayectoriaSelected.lat],
+              extremoB: [puntoSelected.long, puntoSelected.lat],
+            };
+
+            this.clustersService.addCluster(cluster);
+
+            this.puntoTrayectoriaSelected = undefined;
+            this.clustersService.createClusterActive = false;
+          } else {
+            const puntoId = e.selected[0].getProperties().properties.id;
+            this.puntoTrayectoriaSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
+          }
+        } else {
+          if (this.clusterSelected !== undefined && !this.joinActive) {
+            if (
+              e.selected[0].getProperties().properties !== undefined &&
+              e.selected[0].getProperties().properties.name === 'puntoTrayectoria'
+            ) {
+              if (!this.deleteMode) {
+                const puntoId = e.selected[0].getProperties().properties.id;
+                const puntoSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
+
+                if (!this.esPuntoCluster(puntoSelected)) {
+                  // Actualizamos el punto cluster seleccionado solo si no pulsamos sobre otro cluster
+                  this.clustersService.updateCluster(this.clusterSelected.id, this.isClusterA, [
+                    puntoSelected.long,
+                    puntoSelected.lat,
+                  ]);
+                }
               }
-            }
 
-            this.puntoClusterSelected = undefined;
-            this.puntoClusterHovered = undefined;
+              this.clustersService.clusterSelected = undefined;
+              this.puntoClusterHovered = undefined;
+            }
           }
         }
       }
@@ -440,7 +455,6 @@ export class MapClustersComponent implements OnInit {
         if (this.clusterSelected !== undefined) {
           this.setClusterStyle(this.clusterSelected.id, false);
         }
-        this.puntoClusterSelected = undefined;
         this.clustersService.clusterSelected = undefined;
       }
     });

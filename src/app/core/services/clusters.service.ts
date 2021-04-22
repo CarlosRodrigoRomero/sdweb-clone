@@ -45,6 +45,8 @@ export class ClustersService {
   joinActive$ = new BehaviorSubject<boolean>(this._joinActive);
   private _clusterSelected: Cluster = undefined;
   clusterSelected$ = new BehaviorSubject<Cluster>(this._clusterSelected);
+  private _createClusterActive = false;
+  createClusterActive$ = new BehaviorSubject<boolean>(this._createClusterActive);
 
   constructor(
     private afs: AngularFirestore,
@@ -162,6 +164,26 @@ export class ClustersService {
     const n = moment(date, 'DD/MM/YYYY hh:mm:ss').unix();
 
     return n;
+  }
+
+  addCluster(cluster: Cluster) {
+    // creamos la referencia a la colección de clusters
+    const clustersRef = this.afs.collection('vuelos/Alconera02/clusters');
+
+    // obtenemos un ID aleatorio
+    const id = this.afs.createId();
+
+    cluster.id = id;
+
+    clustersRef
+      .doc(id)
+      .set(cluster)
+      .then((docRef) => {
+        console.log('Cluster creado correctemente');
+      })
+      .catch((error) => {
+        console.error('Error creando cluster: ', error);
+      });
   }
 
   updateCluster(clusterId: string, extremoA: boolean, coords: Coordinate) {
@@ -297,5 +319,14 @@ export class ClustersService {
   set clusterSelected(value: Cluster) {
     this._clusterSelected = value;
     this.clusterSelected$.next(value);
+  }
+
+  get createClusterActive() {
+    return this._createClusterActive;
+  }
+
+  set createClusterActive(value: boolean) {
+    this._createClusterActive = value;
+    this.createClusterActive$.next(value);
   }
 }

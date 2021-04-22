@@ -11,6 +11,7 @@ export class ClustersControlComponent implements OnInit {
   deleteMode = false;
   joinActive = false;
   isClusterSelected = false;
+  createClusterActive = false;
 
   constructor(private clustersService: ClustersService) {}
 
@@ -23,6 +24,7 @@ export class ClustersControlComponent implements OnInit {
       }
     });
     this.clustersService.joinActive$.subscribe((join) => (this.joinActive = join));
+    this.clustersService.createClusterActive$.subscribe((create) => (this.createClusterActive = create));
   }
 
   activeDeleteMode() {
@@ -32,5 +34,10 @@ export class ClustersControlComponent implements OnInit {
 
   activeJoinMode() {
     this.clustersService.joinActive = !this.clustersService.joinActive;
+  }
+
+  createCluster() {
+    this.clustersService.clusterSelected = undefined;
+    this.clustersService.createClusterActive = !this.clustersService.createClusterActive;
   }
 }

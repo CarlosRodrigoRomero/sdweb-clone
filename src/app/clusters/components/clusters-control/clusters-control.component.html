@@ -1,8 +1,15 @@
-<button mat-raised-button (click)="activeDeleteMode()" [disabled]="joinActive">
-  <span *ngIf="!deleteMode">Activar eliminar clusters</span>
-  <span class="warn-active" *ngIf="deleteMode">Desactivar eliminar clusters</span>
+<button mat-raised-button (click)="createCluster()">
+  <span *ngIf="!createClusterActive">Crear nuevo cluster</span>
+  <span *ngIf="createClusterActive">Cancelar crear cluster</span>
 </button>
 <button mat-raised-button (click)="activeJoinMode()" [disabled]="!isClusterSelected">
   <span *ngIf="!joinActive">Unir a otro cluster</span>
   <span *ngIf="joinActive">Cancelar unión</span>
+</button>
+<button mat-raised-button (click)="activeJoinMode()" [disabled]="!isClusterSelected">
+  <span>Eliminar unión cluster</span>
+</button>
+<button mat-raised-button (click)="activeDeleteMode()" [disabled]="joinActive">
+  <span *ngIf="!deleteMode">Activar eliminar clusters</span>
+  <span class="warn-active" *ngIf="deleteMode">Desactivar eliminar clusters</span>
 </button>
