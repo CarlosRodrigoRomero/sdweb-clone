@@ -26,6 +26,7 @@ import { Cluster } from '@core/models/cluster';
 import { GLOBAL } from '@core/services/global';
 import { Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
+import VectorLayer from 'ol/layer/Vector';
 
 @Component({
   selector: 'app-map-clusters',
@@ -46,6 +47,8 @@ export class MapClustersComponent implements OnInit {
   private clusters: Cluster[];
   private clusterSelected: Cluster;
   private isClusterA: boolean;
+  private deleteMode = false;
+  private joinActive = false;
 
   constructor(
     private plantaService: PlantaService,
@@ -57,12 +60,15 @@ export class MapClustersComponent implements OnInit {
     this.planta = this.clustersService.planta;
     this.coordsPuntosTrayectoria = this.clustersService.coordsPuntosTrayectoria;
     this.puntosTrayectoria = this.clustersService.puntosTrayectoria;
-    this.clustersService.clusters$.subscribe((clusters) => (this.clusters = clusters));
+    this.clustersService.deleteMode$.subscribe((del) => (this.deleteMode = del));
+    this.clustersService.joinActive$.subscribe((joi) => (this.joinActive = joi));
+    this.clustersService.clusterSelected$.subscribe((cluster) => (this.clusterSelected = cluster));
 
     this.initMap();
 
     this.addTrayectoria();
     this.addPuntosTrayectoria();
+    this.createClustersLayer();
     this.addClusters();
 
     this.addPointerOnHover();
@@ -166,41 +172,50 @@ export class MapClustersComponent implements OnInit {
     this.map.addLayer(puntos);
   }
 
-  private addClusters() {
-    const features: Feature[] = [];
-
-    this.clusters.forEach((cluster) => {
-      const featureA = new Feature({
-        geometry: new Circle(fromLonLat(cluster.extremoA)),
-        properties: {
-          id: cluster.id,
-          name: 'puntoClusterA',
-        },
-      });
-      features.push(featureA);
-
-      const featureB = new Feature({
-        geometry: new Circle(fromLonLat(cluster.extremoB)),
-        properties: {
-          id: cluster.id,
-          name: 'puntoClusterB',
-        },
-      });
-      features.push(featureB);
-    });
-
-    const clusters = new Vector({
-      source: new VectorSource({
-        features,
-      }),
+  private createClustersLayer() {
+    const layer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
       style: this.getStyleCluster(false),
     });
 
-    clusters.setProperties({
+    layer.setProperties({
       id: 'clustersLayer',
     });
 
-    this.map.addLayer(clusters);
+    this.map.addLayer(layer);
+  }
+
+  private addClusters() {
+    this.clustersService.clusters$.subscribe((clusters) => {
+      this.clusters = clusters;
+      const clustersLayer = this.map
+        .getLayers()
+        .getArray()
+        .find((layer) => layer.getProperties().id === 'clustersLayer') as VectorLayer;
+
+      const clustersSource = clustersLayer.getSource();
+      clustersSource.clear();
+
+      clusters.forEach((cluster) => {
+        const featureA = new Feature({
+          geometry: new Circle(fromLonLat(cluster.extremoA)),
+          properties: {
+            id: cluster.id,
+            name: 'puntoClusterA',
+          },
+        });
+        clustersSource.addFeature(featureA);
+
+        const featureB = new Feature({
+          geometry: new Circle(fromLonLat(cluster.extremoB)),
+          properties: {
+            id: cluster.id,
+            name: 'puntoClusterB',
+          },
+        });
+        clustersSource.addFeature(featureB);
+      });
+    });
   }
 
   private addPointerOnHover() {
@@ -266,31 +281,38 @@ export class MapClustersComponent implements OnInit {
   private addOnHoverClusterAction() {
     let currentFeatureHover;
     this.map.on('pointermove', (event) => {
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        const feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties().properties !== undefined)
-          .filter(
-            (item) =>
-              item.getProperties().properties.name === 'puntoClusterA' ||
-              item.getProperties().properties.name === 'puntoClusterB'
-          );
+      if (this.clusterSelected === undefined) {
+        if (this.map.hasFeatureAtPixel(event.pixel)) {
+          const feature = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined)
+            .filter(
+              (item) =>
+                item.getProperties().properties.name === 'puntoClusterA' ||
+                item.getProperties().properties.name === 'puntoClusterB'
+            );
 
-        if (feature.length > 0) {
-          currentFeatureHover = feature;
+          if (feature.length > 0) {
+            currentFeatureHover = feature;
+            if (feature[0].getProperties().properties.name === 'puntoClusterA') {
+              this.isClusterA = true;
+            } else {
+              this.isClusterA = false;
+            }
 
-          const clusterId = feature[0].getProperties().properties.id;
-          const puntoEquivalente = this.getPuntoEquivalente(clusterId);
-          this.puntoClusterHovered = puntoEquivalente;
+            const clusterId = feature[0].getProperties().properties.id;
+            const puntoEquivalente = this.getPuntoEquivalente(clusterId);
+            this.puntoClusterHovered = puntoEquivalente;
 
-          this.clustersService.getImageThumbnail(puntoEquivalente.thumbnail);
+            this.clustersService.getImageThumbnail(puntoEquivalente.thumbnail);
 
-          (feature[0] as Feature).setStyle(this.getStyleCluster(true));
-        }
-      } else {
-        this.puntoClusterHovered = undefined;
-        if (currentFeatureHover !== undefined) {
-          (currentFeatureHover[0] as Feature).setStyle(this.getStyleCluster(false));
+            (feature[0] as Feature).setStyle(this.getStyleCluster(true));
+          }
+        } else {
+          this.puntoClusterHovered = undefined;
+          if (currentFeatureHover !== undefined) {
+            (currentFeatureHover[0] as Feature).setStyle(this.getStyleCluster(false));
+          }
         }
       }
     });
@@ -314,12 +336,20 @@ export class MapClustersComponent implements OnInit {
     this.map.addInteraction(select);
     select.on('select', (e) => {
       if (this.puntoClusterSelected !== undefined) {
-        this.puntoClusterSelected = undefined;
+        // this.puntoClusterSelected = undefined;
+      }
+      if (this.clusterSelected !== undefined) {
+        this.setClusterStyle(this.clusterSelected.id, false);
+        // this.clustersService.clusterSelected = undefined;
       }
 
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().properties !== undefined) {
-          let puntoEquivalente: PuntoTrayectoria;
+          if (
+            e.selected[0].getProperties().properties.name === 'puntoClusterA' ||
+            e.selected[0].getProperties().properties.name === 'puntoClusterB'
+          ) {
+          }
           if (e.selected[0].getProperties().properties.name === 'puntoClusterA') {
             this.isClusterA = true;
           } else if (e.selected[0].getProperties().properties.name === 'puntoClusterB') {
@@ -327,11 +357,29 @@ export class MapClustersComponent implements OnInit {
           }
           const clusterId = e.selected[0].getProperties().properties.id;
 
-          this.clusterSelected = this.clusters.find((cluster) => cluster.id === clusterId);
+          if (this.deleteMode) {
+            // si el modo ELIMINAR esta activo eliminamos los clusters al hacer click
+            this.clustersService.deleteCluster(clusterId);
 
-          puntoEquivalente = this.getPuntoEquivalente(clusterId);
+            this.puntoClusterSelected = undefined;
+          } else if (this.joinActive) {
+            // si JOIN se encuentra active se asocida este clusterId al cluster anterior seleccionado
+            this.clustersService.joinClusters(this.clusterSelected.id, clusterId);
 
-          this.puntoClusterSelected = puntoEquivalente;
+            this.clustersService.joinActive = false;
+
+            this.clustersService.clusterSelected = undefined;
+            this.puntoClusterSelected = undefined;
+          } else {
+            this.setClusterStyle(clusterId, true);
+
+            this.clustersService.clusterSelected = this.clusters.find((cluster) => cluster.id === clusterId);
+
+            const puntoEquivalente = this.getPuntoEquivalente(clusterId);
+
+            this.puntoClusterSelected = puntoEquivalente;
+          }
+
           this.puntoClusterHovered = undefined;
         }
       }
@@ -340,7 +388,7 @@ export class MapClustersComponent implements OnInit {
 
   private addSelectPuntosTrayectoriaInteraction() {
     const select = new Select({
-      style: this.getStylePuntos(true),
+      // style: this.getStylePuntos(true),
       condition: click,
       layers: (l) => {
         if (l.getProperties().id === 'puntosTrayectoriaLayer') {
@@ -361,18 +409,39 @@ export class MapClustersComponent implements OnInit {
             e.selected[0].getProperties().properties !== undefined &&
             e.selected[0].getProperties().properties.name === 'puntoTrayectoria'
           ) {
-            const puntoId = e.selected[0].getProperties().properties.id;
-            const puntoSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
+            if (!this.deleteMode) {
+              const puntoId = e.selected[0].getProperties().properties.id;
+              const puntoSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
 
-            // Actualizamos el punto cluster seleccionado
-            this.clustersService.updateCluster(this.clusterSelected.id, this.isClusterA, [
-              puntoSelected.long,
-              puntoSelected.lat,
-            ]);
-            this.puntoClusterSelected = puntoSelected;
+              if (!this.esPuntoCluster(puntoSelected)) {
+                // Actualizamos el punto cluster seleccionado solo si no pulsamos sobre otro cluster
+                this.clustersService.updateCluster(this.clusterSelected.id, this.isClusterA, [
+                  puntoSelected.long,
+                  puntoSelected.lat,
+                ]);
+              }
+            }
+
+            this.puntoClusterSelected = undefined;
             this.puntoClusterHovered = undefined;
           }
         }
+      }
+    });
+  }
+
+  private addClickOutFeatures() {
+    this.map.on('click', (event) => {
+      const feature = this.map
+        .getFeaturesAtPixel(event.pixel)
+        .filter((item) => item.getProperties().properties !== undefined);
+
+      if (feature.length === 0) {
+        if (this.clusterSelected !== undefined) {
+          this.setClusterStyle(this.clusterSelected.id, false);
+        }
+        this.puntoClusterSelected = undefined;
+        this.clustersService.clusterSelected = undefined;
       }
     });
   }
@@ -432,6 +501,48 @@ export class MapClustersComponent implements OnInit {
     }
   }
 
+  private setClusterStyle(clusterId: string, focus: boolean) {
+    this.clusters.find((cluster) => cluster.id === clusterId);
+
+    const clustersLayer = this.map
+      .getLayers()
+      .getArray()
+      .find((layer) => layer.getProperties().id === 'clustersLayer') as VectorLayer;
+
+    const features = clustersLayer.getSource().getFeatures();
+
+    let feature: Feature;
+    if (this.isClusterA) {
+      feature = features.find(
+        (f) => f.getProperties().properties.id === clusterId && f.getProperties().properties.name === 'puntoClusterA'
+      );
+    } else {
+      feature = features.find(
+        (f) => f.getProperties().properties.id === clusterId && f.getProperties().properties.name === 'puntoClusterB'
+      );
+    }
+
+    const focusedStyle = new Style({
+      stroke: new Stroke({
+        color: 'white',
+        width: 20,
+      }),
+    });
+
+    const unfocusedStyle = new Style({
+      stroke: new Stroke({
+        color: this.getClusterColor(feature.getProperties().properties.id),
+        width: 20,
+      }),
+    });
+
+    if (focus) {
+      feature.setStyle(focusedStyle);
+    } else {
+      feature.setStyle(unfocusedStyle);
+    }
+  }
+
   private getClusterColor(clusterId: string) {
     const cluster = this.clusters.find((cluster) => cluster.id === clusterId);
     const colorAleatorio = GLOBAL.clusterColors[Math.round(Math.random() * (GLOBAL.clusterColors.length - 1))];
@@ -445,14 +556,43 @@ export class MapClustersComponent implements OnInit {
   }
 
   private getPuntoEquivalente(clusterId: string): PuntoTrayectoria {
-    const clusterHover = this.clusters.find((cluster) => cluster.id === clusterId);
-    const puntoEquivalente = this.puntosTrayectoria.find(
-      (punto) =>
-        // tslint:disable-next-line: triple-equals
-        (punto.long == clusterHover.extremoA[0] && punto.lat == clusterHover.extremoA[1]) ||
-        // tslint:disable-next-line: triple-equals
-        (punto.long == clusterHover.extremoA[0] && punto.lat == clusterHover.extremoA[1])
-    );
+    const cluster = this.clusters.find((cluster) => cluster.id === clusterId);
+    let puntoEquivalente;
+    if (this.isClusterA) {
+      puntoEquivalente = this.puntosTrayectoria.find(
+        (punto) =>
+          // tslint:disable-next-line: triple-equals
+          punto.long == cluster.extremoA[0] && punto.lat == cluster.extremoA[1]
+      );
+    } else {
+      puntoEquivalente = this.puntosTrayectoria.find(
+        (punto) =>
+          // tslint:disable-next-line: triple-equals
+          punto.long == cluster.extremoB[0] && punto.lat == cluster.extremoB[1]
+      );
+    }
     return puntoEquivalente;
+  }
+
+  private esPuntoCluster(punto: PuntoTrayectoria): boolean {
+    let clusterEquivalente = this.clusters.find(
+      (cluster) =>
+        // tslint:disable-next-line: triple-equals
+        punto.long == cluster.extremoA[0] && punto.lat == cluster.extremoA[1]
+    );
+    if (clusterEquivalente) {
+      return true;
+    } else {
+      clusterEquivalente = this.clusters.find(
+        (cluster) =>
+          // tslint:disable-next-line: triple-equals
+          punto.long == cluster.extremoB[0] && punto.lat == cluster.extremoB[1]
+      );
+      if (clusterEquivalente) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 }

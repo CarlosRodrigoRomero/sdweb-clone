@@ -36,8 +36,14 @@ export class ClustersService {
   puntoHover$ = new BehaviorSubject<PuntoTrayectoria>(this._puntoHover);
   private _urlImageThumbnail: string = undefined;
   urlImageThumbnail$ = new BehaviorSubject<string>(this._urlImageThumbnail);
-  clusters: Cluster[] = [];
-  clusters$ = new BehaviorSubject<Cluster[]>(this.clusters);
+  private _clusters: Cluster[] = [];
+  clusters$ = new BehaviorSubject<Cluster[]>(this._clusters);
+  private _deleteMode = false;
+  deleteMode$ = new BehaviorSubject<boolean>(this._deleteMode);
+  private _joinActive = false;
+  joinActive$ = new BehaviorSubject<boolean>(this._joinActive);
+  private _clusterSelected: Cluster = undefined;
+  clusterSelected$ = new BehaviorSubject<Cluster>(this._clusterSelected);
 
   constructor(
     private afs: AngularFirestore,
@@ -103,7 +109,6 @@ export class ClustersService {
     clustersRef
       .snapshotChanges()
       .pipe(
-        take(1),
         map((actions) => {
           return actions.map((a) => {
             const data = a.payload.doc.data() as Cluster;
@@ -112,10 +117,7 @@ export class ClustersService {
           });
         })
       )
-      .subscribe((clusters) => {
-        this.clusters = clusters;
-        this.clusters$.next(this.clusters);
-      });
+      .subscribe((clusters) => (this.clusters = clusters));
 
     return this.clusters$;
   }
@@ -162,6 +164,7 @@ export class ClustersService {
   }
 
   updateCluster(clusterId: string, extremoA: boolean, coords: Coordinate) {
+    // creamos la referencia al cluster
     const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(clusterId);
 
     if (extremoA) {
@@ -191,10 +194,26 @@ export class ClustersService {
     }
   }
 
+  joinClusters(clusterId: string, clusterJoinID: string) {
+    // creamos la referencia al cluster
+    const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(clusterId);
+
+    return clusterRef
+      .update({
+        clusterJoinID,
+      })
+      .then(() => {
+        console.log('Cluster successfully updated!');
+      })
+      .catch((error) => {
+        // The document probably doesn't exist.
+        console.error('Error updating cluster: ', error);
+      });
+  }
+
   deleteCluster(clusterId: string) {
-    // Creamos una referencia al cluster
-    const storageRef = this.storage.ref('');
-    const clusterRef = storageRef.child('vuelos/Alconera02/clusters/' + clusterId);
+    // creamos la referencia al cluster
+    const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(clusterId);
 
     clusterRef
       .delete()
@@ -227,5 +246,41 @@ export class ClustersService {
   set urlImageThumbnail(value: string) {
     this._urlImageThumbnail = value;
     this.urlImageThumbnail$.next(value);
+  }
+
+  get clusters() {
+    return this._clusters;
+  }
+
+  set clusters(value: Cluster[]) {
+    this._clusters = value;
+    this.clusters$.next(value);
+  }
+
+  get deleteMode() {
+    return this._deleteMode;
+  }
+
+  set deleteMode(value: boolean) {
+    this._deleteMode = value;
+    this.deleteMode$.next(value);
+  }
+
+  get joinActive() {
+    return this._joinActive;
+  }
+
+  set joinActive(value: boolean) {
+    this._joinActive = value;
+    this.joinActive$.next(value);
+  }
+
+  get clusterSelected() {
+    return this._clusterSelected;
+  }
+
+  set clusterSelected(value: Cluster) {
+    this._clusterSelected = value;
+    this.clusterSelected$.next(value);
   }
 }

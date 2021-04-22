@@ -2,3 +2,8 @@
     display:grid;
     grid-template-columns: 4fr 1fr;
 }
+
+.right-bar {
+    display: flex;
+    flex-direction: column;
+}
