@@ -200,20 +200,26 @@ export class MapClustersComponent implements OnInit {
       clustersSource.clear();
 
       clusters.forEach((cluster) => {
+        let isJoined = false;
+        if (cluster.clusterJoinId !== undefined) {
+          isJoined = true;
+        }
         const featureA = new Feature({
-          geometry: new Circle(fromLonLat(cluster.extremoA)),
+          geometry: new Circle(fromLonLat(cluster.extremoA), 5),
           properties: {
             id: cluster.id,
             name: 'puntoClusterA',
+            isJoined,
           },
         });
         clustersSource.addFeature(featureA);
 
         const featureB = new Feature({
-          geometry: new Circle(fromLonLat(cluster.extremoB)),
+          geometry: new Circle(fromLonLat(cluster.extremoB), 5),
           properties: {
             id: cluster.id,
             name: 'puntoClusterB',
+            isJoined,
           },
         });
         clustersSource.addFeature(featureB);
@@ -492,11 +498,7 @@ export class MapClustersComponent implements OnInit {
         if (feature !== undefined) {
           return new Style({
             fill: new Fill({
-              color: this.getClusterColor(feature.getProperties().properties.id),
-            }),
-            stroke: new Stroke({
               color: 'white',
-              width: 20,
             }),
           });
         }
@@ -504,12 +506,23 @@ export class MapClustersComponent implements OnInit {
     } else {
       return (feature: Feature) => {
         if (feature !== undefined) {
-          return new Style({
-            stroke: new Stroke({
-              color: this.getClusterColor(feature.getProperties().properties.id),
-              width: 20,
-            }),
-          });
+          if (feature.getProperties().properties.isJoined) {
+            return new Style({
+              fill: new Fill({
+                color: this.getClusterColor(feature.getProperties().properties.id),
+              }),
+              stroke: new Stroke({
+                color: 'white',
+                width: 2,
+              }),
+            });
+          } else {
+            return new Style({
+              fill: new Fill({
+                color: this.getClusterColor(feature.getProperties().properties.id),
+              }),
+            });
+          }
         }
       };
     }
