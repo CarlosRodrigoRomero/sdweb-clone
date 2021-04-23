@@ -40,4 +40,9 @@ export class ClustersControlComponent implements OnInit {
     this.clustersService.clusterSelected = undefined;
     this.clustersService.createClusterActive = !this.clustersService.createClusterActive;
   }
+
+  deleteClusterUnion() {
+    this.clustersService.deleteClustersUnion();
+    this.clustersService.clusterSelected = undefined;
+  }
 }

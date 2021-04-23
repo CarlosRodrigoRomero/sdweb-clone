@@ -6,7 +6,7 @@
   <span *ngIf="!joinActive">Unir a otro cluster</span>
   <span *ngIf="joinActive">Cancelar unión</span>
 </button>
-<button mat-raised-button (click)="activeJoinMode()" [disabled]="!isClusterSelected">
+<button mat-raised-button (click)="deleteClusterUnion()" [disabled]="!isClusterSelected">
   <span>Eliminar unión cluster</span>
 </button>
 <button mat-raised-button (click)="activeDeleteMode()" [disabled]="joinActive">

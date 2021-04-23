@@ -258,6 +258,25 @@ export class ClustersService {
     });
   }
 
+  deleteClustersUnion() {
+    const clusterId = this.clusterSelected.id;
+    const clusterSelected = this.clusters.find((c) => c.id === clusterId);
+    let clusterJoined;
+    if (clusterSelected.clusterJoinId !== undefined) {
+      clusterJoined = clusterSelected.clusterJoinId;
+
+      // creamos la referencia al cluster
+      const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(clusterId);
+
+      clusterRef.update({
+        clusterJoinId: firebase.firestore.FieldValue.delete(),
+      });
+    } else {
+      // clusterJoined = this.clusters.find((c) => c.clusterJoinId === clusterId);
+      this.deleteJoinClusterId(clusterId);
+    }
+  }
+
   get planta() {
     return this._planta;
   }
