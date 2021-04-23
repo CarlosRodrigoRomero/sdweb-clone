@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { ClustersService } from '@core/services/clusters.service';
 
@@ -11,6 +12,8 @@ export class ClustersControlComponent implements OnInit {
   joinActive = false;
   isClusterSelected = false;
   createClusterActive = false;
+  form: FormGroup;
+  formControl = new FormControl(16, Validators.min(10));
 
   constructor(private clustersService: ClustersService) {}
 

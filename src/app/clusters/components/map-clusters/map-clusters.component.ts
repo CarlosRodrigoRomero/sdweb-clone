@@ -283,6 +283,7 @@ export class MapClustersComponent implements OnInit {
       } else {
         if (currentFeatureHover !== undefined) {
           (currentFeatureHover[0] as Feature).setStyle(this.getStylePuntos(false));
+          currentFeatureHover = undefined;
         }
       }
     });
@@ -322,6 +323,7 @@ export class MapClustersComponent implements OnInit {
           this.puntoClusterHovered = undefined;
           if (currentFeatureHover !== undefined) {
             (currentFeatureHover[0] as Feature).setStyle(this.getStyleCluster(false));
+            currentFeatureHover = undefined;
           }
         }
       }
@@ -330,6 +332,7 @@ export class MapClustersComponent implements OnInit {
 
   private addSelectPuntosTrayectoriaInteraction() {
     const select = new Select({
+      style: this.getStylePuntos(false),
       condition: click,
       layers: (l) => {
         if (l.getProperties().id === 'puntosTrayectoriaLayer') {

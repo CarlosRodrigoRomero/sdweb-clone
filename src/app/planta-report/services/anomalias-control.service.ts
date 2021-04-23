@@ -192,6 +192,7 @@ export class AnomaliasControlService {
 
           if (currentFeatureHover !== undefined) {
             (currentFeatureHover[0] as Feature).setStyle(this.getStyleAnomaliasMapa(false));
+            currentFeatureHover = undefined;
           }
         }
       }
