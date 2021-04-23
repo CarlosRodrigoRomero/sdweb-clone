@@ -200,10 +200,7 @@ export class MapClustersComponent implements OnInit {
       clustersSource.clear();
 
       clusters.forEach((cluster) => {
-        let isJoined = false;
-        if (cluster.clusterJoinId !== undefined) {
-          isJoined = true;
-        }
+        const isJoined = this.isJoinedCluster(cluster);
         const featureA = new Feature({
           geometry: new Circle(fromLonLat(cluster.extremoA), 5),
           properties: {
@@ -616,6 +613,19 @@ export class MapClustersComponent implements OnInit {
           punto.long == cluster.extremoB[0] && punto.lat == cluster.extremoB[1]
       );
       if (clusterEquivalente) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  private isJoinedCluster(cluster: Cluster) {
+    if (cluster.clusterJoinId !== undefined) {
+      return true;
+    } else {
+      const clusterJoin = this.clusters.find((c) => c.clusterJoinId === cluster.id);
+      if (clusterJoin !== undefined) {
         return true;
       } else {
         return false;
