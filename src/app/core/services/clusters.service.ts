@@ -39,8 +39,6 @@ export class ClustersService {
   urlImageThumbnail$ = new BehaviorSubject<string>(this._urlImageThumbnail);
   private _clusters: Cluster[] = [];
   clusters$ = new BehaviorSubject<Cluster[]>(this._clusters);
-  private _deleteMode = false;
-  deleteMode$ = new BehaviorSubject<boolean>(this._deleteMode);
   private _joinActive = false;
   joinActive$ = new BehaviorSubject<boolean>(this._joinActive);
   private _clusterSelected: Cluster = undefined;
@@ -234,7 +232,8 @@ export class ClustersService {
       });
   }
 
-  deleteCluster(clusterId: string) {
+  deleteCluster() {
+    const clusterId = this.clusterSelected.id;
     // creamos la referencia al cluster
     const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(clusterId);
 
@@ -261,9 +260,9 @@ export class ClustersService {
   deleteClustersUnion() {
     const clusterId = this.clusterSelected.id;
     const clusterSelected = this.clusters.find((c) => c.id === clusterId);
-    let clusterJoined;
+
     if (clusterSelected.clusterJoinId !== undefined) {
-      clusterJoined = clusterSelected.clusterJoinId;
+      const clusterJoined = clusterSelected.clusterJoinId;
 
       // creamos la referencia al cluster
       const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(clusterId);
@@ -272,7 +271,7 @@ export class ClustersService {
         clusterJoinId: firebase.firestore.FieldValue.delete(),
       });
     } else {
-      // clusterJoined = this.clusters.find((c) => c.clusterJoinId === clusterId);
+      // eliminamos tambien los JOIN que pudiese haber a este cluster
       this.deleteJoinClusterId(clusterId);
     }
   }
@@ -311,15 +310,6 @@ export class ClustersService {
   set clusters(value: Cluster[]) {
     this._clusters = value;
     this.clusters$.next(value);
-  }
-
-  get deleteMode() {
-    return this._deleteMode;
-  }
-
-  set deleteMode(value: boolean) {
-    this._deleteMode = value;
-    this.deleteMode$.next(value);
   }
 
   get joinActive() {

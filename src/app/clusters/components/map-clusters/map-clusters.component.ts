@@ -61,7 +61,6 @@ export class MapClustersComponent implements OnInit {
     this.planta = this.clustersService.planta;
     this.coordsPuntosTrayectoria = this.clustersService.coordsPuntosTrayectoria;
     this.puntosTrayectoria = this.clustersService.puntosTrayectoria;
-    this.clustersService.deleteMode$.subscribe((del) => (this.deleteMode = del));
     this.clustersService.joinActive$.subscribe((joi) => (this.joinActive = joi));
     this.clustersService.clusterSelected$.subscribe((cluster) => (this.clusterSelected = cluster));
     this.clustersService.createClusterActive$.subscribe((create) => (this.createClusterActive = create));
@@ -326,7 +325,6 @@ export class MapClustersComponent implements OnInit {
 
   private addSelectClusterInteraction() {
     const select = new Select({
-      // style: this.getStyleCluster(true),
       condition: click,
       layers: (l) => {
         if (l.getProperties().id === 'clustersLayer') {
@@ -343,7 +341,6 @@ export class MapClustersComponent implements OnInit {
     select.on('select', (e) => {
       if (this.clusterSelected !== undefined) {
         this.setClusterStyle(this.clusterSelected.id, false);
-        // this.clustersService.clusterSelected = undefined;
       }
 
       if (e.selected.length > 0) {
@@ -360,12 +357,7 @@ export class MapClustersComponent implements OnInit {
           }
           const clusterId = e.selected[0].getProperties().properties.id;
 
-          if (this.deleteMode) {
-            // si el modo ELIMINAR esta activo eliminamos los clusters al hacer click
-            this.clustersService.deleteCluster(clusterId);
-
-            this.clustersService.clusterSelected = undefined;
-          } else if (this.joinActive) {
+          if (this.joinActive) {
             // si JOIN se encuentra active se asocida este clusterId al cluster anterior seleccionado
             this.clustersService.joinClusters(this.clusterSelected.id, clusterId);
 
@@ -547,16 +539,18 @@ export class MapClustersComponent implements OnInit {
     }
 
     const focusedStyle = new Style({
-      stroke: new Stroke({
+      fill: new Fill({
         color: 'white',
-        width: 20,
       }),
     });
 
     const unfocusedStyle = new Style({
-      stroke: new Stroke({
+      fill: new Fill({
         color: this.getClusterColor(feature.getProperties().properties.id),
-        width: 20,
+      }),
+      stroke: new Stroke({
+        color: 'white',
+        width: 2,
       }),
     });
 

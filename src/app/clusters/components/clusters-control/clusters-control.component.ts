@@ -8,7 +8,6 @@ import { ClustersService } from '@core/services/clusters.service';
   styleUrls: ['./clusters-control.component.css'],
 })
 export class ClustersControlComponent implements OnInit {
-  deleteMode = false;
   joinActive = false;
   isClusterSelected = false;
   createClusterActive = false;
@@ -27,9 +26,9 @@ export class ClustersControlComponent implements OnInit {
     this.clustersService.createClusterActive$.subscribe((create) => (this.createClusterActive = create));
   }
 
-  activeDeleteMode() {
-    this.deleteMode = !this.deleteMode;
-    this.clustersService.deleteMode = this.deleteMode;
+  deleteCluster() {
+    this.clustersService.deleteCluster();
+    this.clustersService.clusterSelected = undefined;
   }
 
   activeJoinMode() {

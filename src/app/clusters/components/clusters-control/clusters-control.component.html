@@ -9,7 +9,6 @@
 <button mat-raised-button (click)="deleteClusterUnion()" [disabled]="!isClusterSelected">
   <span>Eliminar unión cluster</span>
 </button>
-<button mat-raised-button (click)="activeDeleteMode()" [disabled]="joinActive">
-  <span *ngIf="!deleteMode">Activar eliminar clusters</span>
-  <span class="warn-active" *ngIf="deleteMode">Desactivar eliminar clusters</span>
+<button mat-raised-button (click)="deleteCluster()" [disabled]="!isClusterSelected">
+  <span>Eliminar clusters</span>
 </button>
