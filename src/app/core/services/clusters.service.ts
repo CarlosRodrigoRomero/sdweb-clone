@@ -113,8 +113,7 @@ export class ClustersService {
         map((actions) => {
           return actions.map((a) => {
             const data = a.payload.doc.data() as Cluster;
-            const id = a.payload.doc.id;
-            return { id, ...data };
+            return { ...data };
           });
         })
       )

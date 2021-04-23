@@ -200,8 +200,10 @@ export class MapClustersComponent implements OnInit {
 
       clusters.forEach((cluster) => {
         const isJoined = this.isJoinedCluster(cluster);
+
+        const puntoA = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoAId);
         const featureA = new Feature({
-          geometry: new Circle(fromLonLat(cluster.extremoA), 4),
+          geometry: new Circle(fromLonLat([puntoA.long, puntoA.lat]), 4),
           properties: {
             id: cluster.id,
             name: 'puntoClusterA',
@@ -210,8 +212,9 @@ export class MapClustersComponent implements OnInit {
         });
         clustersSource.addFeature(featureA);
 
+        const puntoB = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoBId);
         const featureB = new Feature({
-          geometry: new Circle(fromLonLat(cluster.extremoB), 4),
+          geometry: new Circle(fromLonLat([puntoB.long, puntoB.lat]), 4),
           properties: {
             id: cluster.id,
             name: 'puntoClusterB',
@@ -346,8 +349,10 @@ export class MapClustersComponent implements OnInit {
             const puntoSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
 
             const cluster: Cluster = {
-              extremoA: [this.puntoTrayectoriaSelected.long, this.puntoTrayectoriaSelected.lat],
-              extremoB: [puntoSelected.long, puntoSelected.lat],
+              // extremoA: [this.puntoTrayectoriaSelected.long, this.puntoTrayectoriaSelected.lat],
+              // extremoB: [puntoSelected.long, puntoSelected.lat],
+              puntoAId: this.puntoTrayectoriaSelected.id,
+              puntoBId: puntoSelected.id,
             };
 
             this.clustersService.addCluster(cluster);
@@ -565,35 +570,37 @@ export class MapClustersComponent implements OnInit {
     const cluster = this.clusters.find((cluster) => cluster.id === clusterId);
     let puntoEquivalente;
     if (this.isClusterA) {
+      const puntoA = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoAId);
       puntoEquivalente = this.puntosTrayectoria.find(
         (punto) =>
           // tslint:disable-next-line: triple-equals
-          punto.long == cluster.extremoA[0] && punto.lat == cluster.extremoA[1]
+          punto.long == puntoA.long && punto.lat == puntoA.lat
       );
     } else {
+      const puntoB = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoBId);
       puntoEquivalente = this.puntosTrayectoria.find(
         (punto) =>
           // tslint:disable-next-line: triple-equals
-          punto.long == cluster.extremoB[0] && punto.lat == cluster.extremoB[1]
+          punto.long == puntoB.long && punto.lat == puntoB.lat
       );
     }
     return puntoEquivalente;
   }
 
   private esPuntoCluster(punto: PuntoTrayectoria): boolean {
-    let clusterEquivalente = this.clusters.find(
-      (cluster) =>
-        // tslint:disable-next-line: triple-equals
-        punto.long == cluster.extremoA[0] && punto.lat == cluster.extremoA[1]
-    );
+    let clusterEquivalente = this.clusters.find((cluster) => {
+      const puntoA = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoAId);
+      // tslint:disable-next-line: triple-equals
+      return punto.long == puntoA.long && punto.lat == puntoA.lat;
+    });
     if (clusterEquivalente) {
       return true;
     } else {
-      clusterEquivalente = this.clusters.find(
-        (cluster) =>
-          // tslint:disable-next-line: triple-equals
-          punto.long == cluster.extremoB[0] && punto.lat == cluster.extremoB[1]
-      );
+      clusterEquivalente = this.clusters.find((cluster) => {
+        const puntoB = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoBId);
+        // tslint:disable-next-line: triple-equals
+        return punto.long == puntoB.long && punto.lat == puntoB.lat;
+      });
       if (clusterEquivalente) {
         return true;
       } else {
