@@ -151,7 +151,7 @@ export class MapClustersComponent implements OnInit {
 
     this.puntosTrayectoria.forEach((punto) => {
       const feature = new Feature({
-        geometry: new Circle(fromLonLat([punto.long, punto.lat])),
+        geometry: new Circle(fromLonLat([punto.long, punto.lat]), 1),
         properties: {
           id: punto.id,
           name: 'puntoTrayectoria',
@@ -201,7 +201,7 @@ export class MapClustersComponent implements OnInit {
       clusters.forEach((cluster) => {
         const isJoined = this.isJoinedCluster(cluster);
         const featureA = new Feature({
-          geometry: new Circle(fromLonLat(cluster.extremoA), 5),
+          geometry: new Circle(fromLonLat(cluster.extremoA), 4),
           properties: {
             id: cluster.id,
             name: 'puntoClusterA',
@@ -211,7 +211,7 @@ export class MapClustersComponent implements OnInit {
         clustersSource.addFeature(featureA);
 
         const featureB = new Feature({
-          geometry: new Circle(fromLonLat(cluster.extremoB), 5),
+          geometry: new Circle(fromLonLat(cluster.extremoB), 4),
           properties: {
             id: cluster.id,
             name: 'puntoClusterB',
@@ -263,12 +263,14 @@ export class MapClustersComponent implements OnInit {
           // cuando pasamos de un punto a otro directamente sin pasar por vacio
           if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
             (this.prevFeatureHover[0] as Feature).setStyle(this.getStylePuntos(false));
+            this.prevFeatureHover = undefined;
           }
           currentFeatureHover = feature;
 
           const puntoId = feature[0].getProperties().properties.id;
           const puntoHover = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
 
+          // mostramos la miniatura asociada a este punto
           this.clustersService.getImageThumbnail(puntoHover.thumbnail);
 
           (feature[0] as Feature).setStyle(this.getStylePuntos(true));
@@ -323,60 +325,6 @@ export class MapClustersComponent implements OnInit {
     });
   }
 
-  private addSelectClusterInteraction() {
-    const select = new Select({
-      condition: click,
-      layers: (l) => {
-        if (l.getProperties().id === 'clustersLayer') {
-          return true;
-        } else {
-          return false;
-        }
-      },
-    });
-
-    select.setProperties({ id: 'clusterSelected' });
-
-    this.map.addInteraction(select);
-    select.on('select', (e) => {
-      if (this.clusterSelected !== undefined) {
-        this.setClusterStyle(this.clusterSelected.id, false);
-      }
-
-      if (e.selected.length > 0) {
-        if (e.selected[0].getProperties().properties !== undefined) {
-          if (
-            e.selected[0].getProperties().properties.name === 'puntoClusterA' ||
-            e.selected[0].getProperties().properties.name === 'puntoClusterB'
-          ) {
-          }
-          if (e.selected[0].getProperties().properties.name === 'puntoClusterA') {
-            this.isClusterA = true;
-          } else if (e.selected[0].getProperties().properties.name === 'puntoClusterB') {
-            this.isClusterA = false;
-          }
-          const clusterId = e.selected[0].getProperties().properties.id;
-
-          if (this.joinActive) {
-            // si JOIN se encuentra active se asocida este clusterId al cluster anterior seleccionado
-            this.clustersService.joinClusters(this.clusterSelected.id, clusterId);
-
-            this.clustersService.joinActive = false;
-
-            this.clustersService.clusterSelected = undefined;
-          } else {
-            this.setClusterStyle(clusterId, true);
-            console.log('ok');
-
-            this.clustersService.clusterSelected = this.clusters.find((cluster) => cluster.id === clusterId);
-          }
-
-          this.puntoClusterHovered = undefined;
-        }
-      }
-    });
-  }
-
   private addSelectPuntosTrayectoriaInteraction() {
     const select = new Select({
       condition: click,
@@ -388,8 +336,6 @@ export class MapClustersComponent implements OnInit {
         }
       },
     });
-
-    select.setProperties({ id: 'clusterSelected' });
 
     this.map.addInteraction(select);
     select.on('select', (e) => {
@@ -414,28 +360,68 @@ export class MapClustersComponent implements OnInit {
           }
         } else {
           if (this.clusterSelected !== undefined && !this.joinActive) {
-            if (
-              e.selected[0].getProperties().properties !== undefined &&
-              e.selected[0].getProperties().properties.name === 'puntoTrayectoria'
-            ) {
-              if (!this.deleteMode) {
-                const puntoId = e.selected[0].getProperties().properties.id;
-                const puntoSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
+            if (!this.deleteMode) {
+              const puntoId = e.selected[0].getProperties().properties.id;
+              const puntoSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
 
-                if (!this.esPuntoCluster(puntoSelected)) {
-                  // Actualizamos el punto cluster seleccionado solo si no pulsamos sobre otro cluster
-                  this.clustersService.updateCluster(this.clusterSelected.id, this.isClusterA, [
-                    puntoSelected.long,
-                    puntoSelected.lat,
-                  ]);
-                }
+              if (!this.esPuntoCluster(puntoSelected)) {
+                // Actualizamos el punto cluster seleccionado solo si no pulsamos sobre otro cluster
+                this.clustersService.updateCluster(this.clusterSelected.id, this.isClusterA, [
+                  puntoSelected.long,
+                  puntoSelected.lat,
+                ]);
               }
-
-              this.clustersService.clusterSelected = undefined;
-              this.puntoClusterHovered = undefined;
             }
+
+            this.clustersService.clusterSelected = undefined;
+            this.puntoClusterHovered = undefined;
           }
         }
+      }
+    });
+  }
+
+  private addSelectClusterInteraction() {
+    const select = new Select({
+      condition: click,
+      layers: (l) => {
+        if (l.getProperties().id === 'clustersLayer') {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    });
+
+    select.setProperties({ id: 'clusterSelected' });
+
+    this.map.addInteraction(select);
+    select.on('select', (e) => {
+      if (this.clusterSelected !== undefined) {
+        this.setClusterStyle(this.clusterSelected.id, false);
+      }
+      if (e.selected.length > 0) {
+        if (e.selected[0].getProperties().properties.name === 'puntoClusterA') {
+          this.isClusterA = true;
+        } else if (e.selected[0].getProperties().properties.name === 'puntoClusterB') {
+          this.isClusterA = false;
+        }
+        const clusterId = e.selected[0].getProperties().properties.id;
+
+        if (this.joinActive) {
+          // si JOIN se encuentra active se asocida este clusterId al cluster anterior seleccionado
+          this.clustersService.joinClusters(this.clusterSelected.id, clusterId);
+
+          this.clustersService.joinActive = false;
+
+          this.clustersService.clusterSelected = undefined;
+        } else {
+          this.setClusterStyle(clusterId, true);
+
+          this.clustersService.clusterSelected = this.clusters.find((cluster) => cluster.id === clusterId);
+        }
+
+        this.puntoClusterHovered = undefined;
       }
     });
   }
@@ -460,9 +446,12 @@ export class MapClustersComponent implements OnInit {
       return (feature: Feature) => {
         if (feature !== undefined) {
           return new Style({
+            fill: new Fill({
+              color: 'red',
+            }),
             stroke: new Stroke({
               color: 'red',
-              width: 10,
+              width: 4,
             }),
           });
         }
@@ -471,9 +460,8 @@ export class MapClustersComponent implements OnInit {
       return (feature: Feature) => {
         if (feature !== undefined) {
           return new Style({
-            stroke: new Stroke({
+            fill: new Fill({
               color: 'black',
-              width: 6,
             }),
           });
         }
