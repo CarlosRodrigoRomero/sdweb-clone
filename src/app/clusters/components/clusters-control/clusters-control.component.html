@@ -1,14 +1,20 @@
-<button mat-raised-button (click)="createCluster()">
-  <span *ngIf="!createClusterActive">Crear nuevo cluster</span>
-  <span *ngIf="createClusterActive">Cancelar crear cluster</span>
-</button>
-<button mat-raised-button (click)="activeJoinMode()" [disabled]="!isClusterSelected">
-  <span *ngIf="!joinActive">Unir a otro cluster</span>
-  <span *ngIf="joinActive">Cancelar unión</span>
-</button>
-<button mat-raised-button (click)="deleteClusterUnion()" [disabled]="!isClusterSelected">
-  <span>Eliminar unión cluster</span>
-</button>
-<button mat-raised-button (click)="deleteCluster()" [disabled]="!isClusterSelected">
-  <span>Eliminar cluster</span>
-</button>
+<div class="clusters-control">
+  <button mat-raised-button (click)="createCluster()" [disabled]="joinActive">
+    <mat-icon>add_circle_outline</mat-icon>
+    <span *ngIf="!createClusterActive">Crear nuevo cluster</span>
+    <span *ngIf="createClusterActive">Cancelar crear cluster</span>
+  </button>
+  <button mat-raised-button (click)="deleteCluster()" [disabled]="!isClusterSelected || joinActive">
+    <mat-icon>delete</mat-icon>
+    <span>Eliminar cluster</span>
+  </button>
+  <button mat-raised-button (click)="activeJoinMode()" [disabled]="!isClusterSelected">
+    <mat-icon>link</mat-icon>
+    <span *ngIf="!joinActive">Unir a otro cluster</span>
+    <span *ngIf="joinActive">Cancelar unión</span>
+  </button>
+  <button mat-raised-button (click)="deleteClusterUnion()" [disabled]="!isClusterSelected || joinActive">
+    <mat-icon>delete</mat-icon>
+    <span>Eliminar unión cluster</span>
+  </button>
+</div>

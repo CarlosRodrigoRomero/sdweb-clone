@@ -1,3 +1,16 @@
+.clusters-control {
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  width: 100%;
+}
+
 .warn-active {
   color: #d32f2f;
+}
+
+mat-icon {
+  margin-right: 8px;
 }
