@@ -38,7 +38,7 @@
             ],
             "styles": [
               "src/styles.css",
-              "src/app/material/custom-theme.scss",
+              "src/app/shared/material/custom-theme.scss",
               "./node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/themes/nova-light/theme.css",

@@ -143,9 +143,9 @@ export class MapAllPlantsComponent implements OnInit {
         // acotado para la DEMO
         if (plantaId === 'egF0cbpXnnBnjcrusoeR') {
           if (feature[0].getProperties().tipo === 'seguidores') {
-            this.router.navigate(['clients/planta-seguidores/' + plantaId]);
+            this.router.navigate(['clients/tracker/' + plantaId]);
           } else {
-            this.router.navigate(['clients/planta-report/' + plantaId]);
+            this.router.navigate(['clients/fixed/' + plantaId]);
           }
         }
       }

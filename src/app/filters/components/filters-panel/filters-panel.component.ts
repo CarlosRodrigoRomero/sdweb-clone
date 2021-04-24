@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { FilterService } from '@core/services/filter.service';
-import { OlMapService } from '@core/services/ol-map.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
 @Component({
@@ -11,13 +10,12 @@ import { FilterControlService } from '@core/services/filter-control.service';
   styleUrls: ['./filters-panel.component.css'],
 })
 export class FiltersPanelComponent implements OnInit {
-  private tipoSeguidores = 'planta-seguidores';
+  private tipoSeguidores = 'tracker';
   public esTipoSeguidores = false;
   public filtrosActivos = false;
 
   constructor(
     private filterService: FilterService,
-    private olMapService: OlMapService,
     private router: Router,
     private filterControlService: FilterControlService
   ) {}

@@ -4,7 +4,6 @@ import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
 
 import { FilterService } from '@core/services/filter.service';
 import { FilterControlService } from '@core/services/filter-control.service';
-import { AnomaliasControlService } from '../../../planta-report/services/anomalias-control.service';
 
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
 
@@ -21,11 +20,7 @@ export class TempMaxFilterComponent implements OnInit {
   filtroTempMax: TempMaxFilter;
   options: Options;
 
-  constructor(
-    private filterService: FilterService,
-    private filterControlService: FilterControlService,
-    private anomaliasControlService: AnomaliasControlService
-  ) {}
+  constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
 
   ngOnInit(): void {
     this.filterControlService.minTempMaxSource.subscribe((value) => (this.rangoMinTemp = value));

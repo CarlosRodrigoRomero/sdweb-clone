@@ -3,7 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard } from '@core/services/auth.guard';
 
 import { ClientsComponent } from './components/clients/clients.component';
-import { MapReportComponent } from './components/map-report/map-report.component';
 import { ReportsComponent } from './components/reports/reports.component';
 
 const routes: Routes = [
@@ -13,23 +12,17 @@ const routes: Routes = [
     children: [
       { path: 'plants', component: ReportsComponent },
       {
-        path: 'planta-report',
-        loadChildren: () => import('../planta-report/planta-report.module').then((m) => m.PlantaReportModule),
+        path: 'fixed',
+        loadChildren: () => import('../planta-fija/planta-fija.module').then((m) => m.PlantaFijaModule),
         canActivate: [AuthGuard],
       },
       {
-        path: 'planta-seguidores',
+        path: 'tracker',
         loadChildren: () =>
           import('../planta-seguidores/planta-seguidores.module').then((m) => m.PlantaSeguidoresModule),
         canActivate: [AuthGuard],
       },
       { path: '', redirectTo: 'plants', pathMatch: 'full' },
-
-      {
-        path: 'plants/:id',
-        loadChildren: () => import('../planta-report/planta-report.module').then((m) => m.PlantaReportModule),
-        canActivate: [AuthGuard],
-      },
     ],
   },
 ];

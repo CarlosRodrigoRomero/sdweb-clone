@@ -61,6 +61,8 @@ export class AuthService {
   }
 
   userIsAdmin(user: UserInterface) {
-    return user.role === 1 || user.role === 3 || user.role === 4 || user.role === 5;
+    if (user !== undefined && user !== null) {
+      return user.role === 1 || user.role === 3 || user.role === 4 || user.role === 5;
+    }
   }
 }

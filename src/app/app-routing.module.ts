@@ -4,17 +4,12 @@ import { AvisoLegalComponent } from './cts/aviso-legal/aviso-legal.component';
 import { AuthGuard } from './core/services/auth.guard';
 
 export const routes: Routes = [
-  { path: '', loadChildren: () => import('./auth/auth.module').then((m) => m.AuthenticationModule) },
+  { path: '', redirectTo: 'clients', pathMatch: 'full' },
   { path: 'aviso-legal', component: AvisoLegalComponent },
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then((m) => m.AuthenticationModule) },
   {
     path: 'admin',
     loadChildren: () => import('./admin/admin.module').then((m) => m.AdminModule),
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'clientes',
-    loadChildren: () => import('./clientes/clientes.module').then((m) => m.ClientesModule),
     canActivate: [AuthGuard],
   },
   {
@@ -34,8 +29,7 @@ export const routes: Routes = [
     path: 'clusters',
     loadChildren: () => import('./clusters/clusters.module').then((m) => m.ClustersModule),
   },
-
-  // // { path: "**", redirectTo: "" }
+  { path: '**', redirectTo: '' },
 ];
 
 @NgModule({

@@ -24,11 +24,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { HotkeyModule } from 'angular2-hotkeys';
-import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
-  declarations: [AppComponent, IndexComponent, VideoComponent, AvisoLegalComponent, PubliclayoutComponent],
+  declarations: [AppComponent, IndexComponent, VideoComponent, AvisoLegalComponent],
 
   imports: [
     BrowserModule,

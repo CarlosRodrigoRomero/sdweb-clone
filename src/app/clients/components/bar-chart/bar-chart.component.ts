@@ -226,9 +226,9 @@ export class BarChartComponent implements OnInit {
     // acotado para la DEMO
     if (plantaId === 'egF0cbpXnnBnjcrusoeR') {
       if (tipoPlanta === 'seguidores') {
-        this.router.navigate(['clients/planta-seguidores/' + plantaId]);
+        this.router.navigate(['clients/tracker/' + plantaId]);
       } else {
-        this.router.navigate(['clients/planta-report/' + plantaId]);
+        this.router.navigate(['clients/fixed/' + plantaId]);
       }
     }
   }

@@ -7,7 +7,7 @@ import { IvyCarouselModule } from 'angular-responsive-carousel';
 
 import { SwiperModule } from 'swiper/angular';
 
-import { PlantaReportRoutingModule } from './planta-report-routing.module';
+import { PlantaFijaRoutingModule } from './planta-fija-routing.module';
 import { SharedModule } from '@shared/shared.module';
 import { FiltersModule } from '../filters/filters.module';
 
@@ -60,7 +60,7 @@ import { ChartMaeGlobalComponent } from './planta-stats/chart-mae-global/chart-m
   imports: [
     SharedModule,
     NgxSliderModule,
-    PlantaReportRoutingModule,
+    PlantaFijaRoutingModule,
     NgApexchartsModule,
     FiltersModule,
     IvyCarouselModule,
@@ -68,4 +68,4 @@ import { ChartMaeGlobalComponent } from './planta-stats/chart-mae-global/chart-m
   ],
   exports: [MapViewComponent],
 })
-export class PlantaReportModule {}
+export class PlantaFijaModule {}
