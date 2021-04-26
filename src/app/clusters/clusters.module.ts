@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 
 import { SharedModule } from '@shared/shared.module';
 import { ClustersRoutingModule } from './clusters-routing.module';
@@ -12,6 +13,6 @@ import { ClustersControlComponent } from './components/clusters-control/clusters
 
 @NgModule({
   declarations: [ClustersComponent, MapClustersComponent, ImagePointClusterComponent, ClustersControlComponent],
-  imports: [CommonModule, ClustersRoutingModule, SharedModule, ClientsModule],
+  imports: [CommonModule, ClustersRoutingModule, SharedModule, ClientsModule, HttpClientModule],
 })
 export class ClustersModule {}
