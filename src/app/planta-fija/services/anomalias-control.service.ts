@@ -49,15 +49,13 @@ export class AnomaliasControlService {
 
   initService(): Observable<boolean> {
     const getMap = this.olMapService.getMap();
-    // const getInformeId = this.reportControlService.selectedInformeId$;
     const getAnomLayers = this.olMapService.getAnomaliaLayers();
     const getIfSharedWithFilters = this.reportControlService.sharedReportWithFilters$;
 
-    combineLatest([getMap, /* getInformeId,  */ getAnomLayers, getIfSharedWithFilters])
+    combineLatest([getMap, getAnomLayers, getIfSharedWithFilters])
       .pipe(take(1))
-      .subscribe(([map, /* informeId,  */ anomL, isSharedWithFil]) => {
+      .subscribe(([map, anomL, isSharedWithFil]) => {
         this.map = map;
-        /* this.selectedInformeId = informeId; */
         this.anomaliaLayers = anomL;
         this.sharedReportNoFilters = !isSharedWithFil;
 

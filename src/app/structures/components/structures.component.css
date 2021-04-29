@@ -10,3 +10,10 @@
 .mat-form-field {
   margin-top: 16px;
 }
+
+app-thermal-slider {
+  position: absolute;
+  left: 60%;
+  transform: translate(-50%, 0%);
+  bottom: 1rem;
+}
