@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 
 import { ApexAxisChartSeries, ApexTitleSubtitle, ApexDataLabels, ApexChart, ChartComponent } from 'ng-apexcharts';
-import { GLOBAL } from '../../../core/services/global';
+import { GLOBAL } from '@core/services/global';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;

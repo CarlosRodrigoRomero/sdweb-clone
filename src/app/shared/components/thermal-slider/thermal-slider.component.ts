@@ -5,14 +5,14 @@ import { LabelType, Options } from '@angular-slider/ngx-slider';
 import TileLayer from 'ol/layer/Tile';
 
 import { OlMapService } from '@core/services/ol-map.service';
-import { MapControlService } from '../../services/map-control.service';
+import { ThermalService } from '@core/services/thermal.service';
 
 @Component({
-  selector: 'app-slider-termico',
-  templateUrl: './slider-termico.component.html',
-  styleUrls: ['./slider-termico.component.scss'],
+  selector: 'app-thermal-slider',
+  templateUrl: './thermal-slider.component.html',
+  styleUrls: ['./thermal-slider.component.scss'],
 })
-export class SliderTermicoComponent implements OnInit {
+export class ThermalSliderComponent implements OnInit {
   private thermalLayers: TileLayer[];
 
   /* Valores de inicio */
@@ -33,17 +33,17 @@ export class SliderTermicoComponent implements OnInit {
     },
   };
 
-  constructor(private mapControlService: MapControlService, private olMapService: OlMapService) {}
+  constructor(private thermalService: ThermalService, private olMapService: OlMapService) {}
 
   ngOnInit(): void {
     this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers));
 
-    this.mapControlService.sliderMaxSource.subscribe(() => {
+    this.thermalService.sliderMaxSource.subscribe(() => {
       this.thermalLayers.forEach((tl) => {
         tl.getSource().changed();
       });
     });
-    this.mapControlService.sliderMinSource.subscribe(() => {
+    this.thermalService.sliderMinSource.subscribe(() => {
       this.thermalLayers.forEach((tl) => {
         tl.getSource().changed();
       });
@@ -51,7 +51,7 @@ export class SliderTermicoComponent implements OnInit {
   }
 
   onChangeTemperatureSlider(lowValue: number, highValue: number) {
-    this.mapControlService.sliderMax = highValue;
-    this.mapControlService.sliderMin = lowValue;
+    this.thermalService.sliderMax = highValue;
+    this.thermalService.sliderMin = lowValue;
   }
 }

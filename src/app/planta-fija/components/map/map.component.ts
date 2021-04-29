@@ -16,8 +16,8 @@ import { defaults as defaultControls } from 'ol/control.js';
 import OverlayPositioning from 'ol/OverlayPositioning';
 import XYZ from 'ol/source/XYZ';
 
-import ImageTileMod from '../../ImageTileMod.js';
-import XYZ_mod from '../../xyz_mod.js';
+import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
+import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 
 import { PlantaService } from '@core/services/planta.service';
 import { MapControlService } from '../../services/map-control.service';
@@ -28,6 +28,7 @@ import { OlMapService } from '@core/services/ol-map.service';
 import { ShareReportService } from '@core/services/share-report.service';
 import { AnomaliasControlService } from '../../services/anomalias-control.service';
 import { ReportControlService } from '@core/services/report-control.service';
+import { ThermalService } from '@core/services/thermal.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { Anomalia } from '@core/models/anomalia';
@@ -71,7 +72,8 @@ export class MapComponent implements OnInit {
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
     private anomaliasControlService: AnomaliasControlService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private thermalService: ThermalService
   ) {}
 
   ngOnInit(): void {
@@ -142,7 +144,7 @@ export class MapComponent implements OnInit {
         tileLoadFunction: (imageTile, src) => {
           imageTile.rangeTempMax = thermalLayer.rangeTempMax;
           imageTile.rangeTempMin = thermalLayer.rangeTempMin;
-          imageTile.mapControlService = this.mapControlService;
+          imageTile.thermalService = this.thermalService;
           imageTile.getImage().src = src;
         },
       }),

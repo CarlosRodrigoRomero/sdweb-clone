@@ -29,6 +29,10 @@ export const routes: Routes = [
     path: 'clusters',
     loadChildren: () => import('./clusters/clusters.module').then((m) => m.ClustersModule),
   },
+  {
+    path: 'structures',
+    loadChildren: () => import('./structures/structures.module').then((m) => m.StructuresModule),
+  },
   { path: '**', redirectTo: '' },
 ];
 

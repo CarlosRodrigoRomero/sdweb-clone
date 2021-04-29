@@ -5,10 +5,8 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 
 import { ClientsRoutingModule } from './clients-routing.module';
 import { SharedModule } from '@shared/shared.module';
-import { OlMapsModule } from '../ol-maps/ol-maps.module';
 
 import { ClientsComponent } from './components/clients/clients.component';
-import { NavbarComponent } from './components/navbar/navbar.component';
 import { ReportsComponent } from './components/reports/reports.component';
 import { PlantListComponent } from './components/plant-list/plant-list.component';
 import { MapAllPlantsComponent } from './components/map-all-plants/map-all-plants.component';
@@ -20,7 +18,6 @@ import { AutoLocComponent } from './components/auto-loc/auto-loc.component';
 @NgModule({
   declarations: [
     ClientsComponent,
-    NavbarComponent,
     ReportsComponent,
     PlantListComponent,
     MapAllPlantsComponent,
@@ -29,15 +26,6 @@ import { AutoLocComponent } from './components/auto-loc/auto-loc.component';
     PortfolioSummaryComponent,
     AutoLocComponent,
   ],
-  imports: [
-    CommonModule,
-    ClientsRoutingModule,
-    SharedModule,
-    FormsModule,
-    ReactiveFormsModule,
-    NgApexchartsModule,
-    OlMapsModule,
-  ],
-  exports: [NavbarComponent],
+  imports: [CommonModule, ClientsRoutingModule, SharedModule, FormsModule, ReactiveFormsModule, NgApexchartsModule],
 })
 export class ClientsModule {}

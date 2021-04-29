@@ -1,6 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AnomaliaService } from '@core/services/anomalia.service';
+
+import { take } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
+
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -14,10 +17,10 @@ import {
   ApexFill,
   ApexTooltip,
 } from 'ng-apexcharts';
-import { take } from 'rxjs/operators';
-import { PcService } from '../../../core/services/pc.service';
-import { combineLatest } from 'rxjs';
-import { GLOBAL } from '../../../core/services/global';
+
+import { PcService } from '@core/services/pc.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
+import { GLOBAL } from '@core/services/global';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;

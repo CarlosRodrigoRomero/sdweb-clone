@@ -26,7 +26,6 @@ import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.
 import { PlantaStatsComponent } from './planta-stats/planta-stats.component';
 import { ChartAlturaComponent } from './planta-stats/chart-altura/chart-altura.component';
 import { ChartNumsyperdComponent } from './planta-stats/chart-numsyperd/chart-numsyperd.component';
-import { SliderTermicoComponent } from './components/slider-termico/slider-termico.component';
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
 import { ChartSankeyPotenciaComponent } from './planta-stats/chart-sankey-potencia/chart-sankey-potencia.component';
 import { GlobalCoordAreasComponent } from './components/global-coord-areas/global-coord-areas.component';
@@ -50,7 +49,6 @@ import { ChartMaeGlobalComponent } from './planta-stats/chart-mae-global/chart-m
     ChartCelsPorZonasComponent,
     DownloadReportComponent,
     MapComponent,
-    SliderTermicoComponent,
     SliderTemporalComponent,
     ChartSankeyPotenciaComponent,
     GlobalCoordAreasComponent,

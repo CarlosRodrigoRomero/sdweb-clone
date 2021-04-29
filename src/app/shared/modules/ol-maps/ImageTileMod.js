@@ -1,9 +1,9 @@
 import Tile from 'ol/Tile.js';
 import TileState from 'ol/TileState.js';
-import {createCanvasContext2D} from 'ol/dom.js';
-import {listenImage} from 'ol/Image.js';
-import { GLOBAL } from '../core/services/global';
+import { createCanvasContext2D } from 'ol/dom.js';
+import { listenImage } from 'ol/Image.js';
 
+import { GLOBAL } from '@core/services/global';
 
 class ImageTileMod extends Tile {
   /**
@@ -15,15 +15,7 @@ class ImageTileMod extends Tile {
    * @param {import("./Tile.js").Options=} opt_options Tile options.
    */
 
-
-  constructor(
-    tileCoord,
-    state,
-    src,
-    crossOrigin,
-    tileLoadFunction,
-    opt_options
-  ) {
+  constructor(tileCoord, state, src, crossOrigin, tileLoadFunction, opt_options) {
     super(tileCoord, state, opt_options);
 
     /**
@@ -35,7 +27,6 @@ class ImageTileMod extends Tile {
     this.rangeTempMin = 10;
     this.rangeTempMax = 100;
     this.prueba = false;
-
 
     /**
      * Image URI
@@ -80,30 +71,27 @@ class ImageTileMod extends Tile {
   getImage() {
     // this.image_.src = this.imageSource;
     if (this.imageLoaded == undefined) {
-      this.sliderMin = this.mapControlService.sliderMin;
-      this.sliderMax = this.mapControlService.sliderMax;
+      this.sliderMin = this.thermalService.sliderMin;
+      this.sliderMax = this.thermalService.sliderMax;
       this.imageLoaded = true;
       // this.imageRaw_.src = this.src_;
       return this.image_;
     } else {
       if (this.lastCanvas_ == undefined) {
         this.lastCanvas_ = this.transformPixels_(this.image_);
-        return this.lastCanvas_
+        return this.lastCanvas_;
       }
 
       // Si el slider no ha cambiado
-      if (this.sliderMax == this.mapControlService.sliderMax && this.sliderMin == this.mapControlService.sliderMin) {
+      if (this.sliderMax == this.thermalService.sliderMax && this.sliderMin == this.thermalService.sliderMin) {
         return this.lastCanvas_;
       } else {
-        this.sliderMin = this.mapControlService.sliderMin;
-        this.sliderMax = this.mapControlService.sliderMax;
+        this.sliderMin = this.thermalService.sliderMin;
+        this.sliderMax = this.thermalService.sliderMax;
         this.lastCanvas_ = this.transformPixels_(this.image_);
-        return this.lastCanvas_
+        return this.lastCanvas_;
       }
-
     }
-
-
   }
 
   /**
@@ -140,7 +128,7 @@ class ImageTileMod extends Tile {
       return this.palette[this.palette.length - 1];
     }
     if (temperatura < this.sliderMin) {
-      return this.palette[0]
+      return this.palette[0];
     }
 
     return this.palette[index];
@@ -153,10 +141,15 @@ class ImageTileMod extends Tile {
     let min;
     let val;
     let maxVal = 0;
-    if (pixel[0]> maxVal ) { maxVal = pixel[0]}
-    if (pixel[1]> maxVal ) { maxVal = pixel[1]}
-    if (pixel[2]> maxVal ) { maxVal = pixel[2]}
-
+    if (pixel[0] > maxVal) {
+      maxVal = pixel[0];
+    }
+    if (pixel[1] > maxVal) {
+      maxVal = pixel[1];
+    }
+    if (pixel[2] > maxVal) {
+      maxVal = pixel[2];
+    }
 
     const subrango = Math.round(10 * gradosMantenerPrecision) / 10;
 
@@ -249,11 +242,7 @@ class ImageTileMod extends Tile {
       this.state = TileState.LOADING;
       this.changed();
       this.tileLoadFunction_(this, this.src_);
-      this.unlisten_ = listenImage(
-        this.image_,
-        this.handleImageLoad_.bind(this),
-        this.handleImageError_.bind(this)
-      );
+      this.unlisten_ = listenImage(this.image_, this.handleImageLoad_.bind(this), this.handleImageError_.bind(this));
     }
   }
 

@@ -11,6 +11,7 @@ import { ArchivoVueloInterface } from '../models/archivoVuelo';
 import { ElementoPlantaInterface } from '../models/elementoPlanta';
 import { PcInterface } from '../models/pc';
 import { LatLngLiteral } from '@agm/core';
+import { ThermalLayerInterface } from '@core/models/thermalLayer';
 
 @Injectable({
   providedIn: 'root',
@@ -204,5 +205,22 @@ export class InformeService {
   }
   get() {
     return this.informe;
+  }
+
+  getThermalLayer$(informeId: string): Observable<ThermalLayerInterface[]> {
+    const query$ = this.afs
+      .collection<ThermalLayerInterface>('thermalLayers', (ref) => ref.where('informeId', '==', informeId))
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((doc) => {
+            let data = doc.payload.doc.data() as ThermalLayerInterface;
+            data.id = doc.payload.doc.id;
+
+            return data;
+          })
+        )
+      );
+    return query$;
   }
 }

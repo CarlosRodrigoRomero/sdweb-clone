@@ -1,0 +1,50 @@
+<div *ngIf="serviceInit">
+  <app-navbar></app-navbar>
+  <div class="structures-grid">
+    <div class="left-bar">
+      <mat-vertical-stepper [linear]="true" #stepper>
+        <mat-step>
+          <ng-template matStepLabel>Filtrar módulos</ng-template>
+
+          <div>
+            <button mat-button matStepperNext>Siguiente</button>
+          </div>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Crear agrupaciones auto</ng-template>
+
+          <div>
+            <button mat-button matStepperPrevious>Atrás</button>
+            <button mat-button matStepperNext>Siguiente</button>
+          </div>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Editar agrupaciones manual</ng-template>
+
+          <div>
+            <button mat-button matStepperPrevious>Atrás</button>
+            <button mat-button matStepperNext>Siguiente</button>
+          </div>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Crear estructuras</ng-template>
+
+          <div>
+            <button mat-button matStepperPrevious>Atrás</button>
+            <button mat-button matStepperNext>Siguiente</button>
+          </div>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Unir/desunir estructuras</ng-template>
+
+          <div>
+            <button mat-button matStepperPrevious>Atrás</button>
+            <button mat-button matStepperNext>Siguiente</button>
+          </div>
+        </mat-step>
+      </mat-vertical-stepper>
+    </div>
+    <app-map-structures></app-map-structures>
+    <app-thermal-slider></app-thermal-slider>
+  </div>
+</div>

@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 
-import { switchMap, take } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 
 import TileLayer from 'ol/layer/Tile';
 import { fromLonLat, transformExtent } from 'ol/proj';
-import { OSM } from 'ol/source';
 import XYZ from 'ol/source/XYZ';
 import View from 'ol/View';
 import { defaults as defaultControls } from 'ol/control.js';
@@ -16,7 +15,6 @@ import LineString from 'ol/geom/LineString';
 import { Fill, Stroke, Style } from 'ol/style';
 import Circle from 'ol/geom/Circle';
 
-import { PlantaService } from '@core/services/planta.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { ClustersService } from '@core/services/clusters.service';
 
@@ -34,7 +32,6 @@ import VectorLayer from 'ol/layer/Vector';
   styleUrls: ['./map-clusters.component.css'],
 })
 export class MapClustersComponent implements OnInit {
-  private plantaId: string;
   private planta: PlantaInterface;
   private aerialLayer: TileLayer;
   private satelliteLayer: TileLayer;
@@ -51,11 +48,7 @@ export class MapClustersComponent implements OnInit {
   private joinActive = false;
   private createClusterActive = false;
 
-  constructor(
-    private plantaService: PlantaService,
-    private olMapService: OlMapService,
-    private clustersService: ClustersService
-  ) {}
+  constructor(private olMapService: OlMapService, private clustersService: ClustersService) {}
 
   ngOnInit(): void {
     this.planta = this.clustersService.planta;
