@@ -58,7 +58,7 @@ export class ChartAnomaliasZonasComponent implements OnInit {
   ngOnInit(): void {
     this.zonas = ['1', '2', '3', '4', '5', '6', '7', '8']; // DEMO
 
-    combineLatest([this.filterService.allFiltrableElements$, this.reportControlService.informesList$]).subscribe(
+    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesList$]).subscribe(
       ([elems, informes]) => {
         this.allAnomalias = elems as Anomalia[];
         this.informesList = informes;

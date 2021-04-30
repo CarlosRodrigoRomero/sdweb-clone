@@ -20,15 +20,15 @@ export class FilterService {
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
   private filtersByType: FilterInterface[] = [];
   private filtersByType$ = new BehaviorSubject<FilterInterface[]>(this.filtersByType);
-  private filteredElements: FilterableElement[] = [];
+  private _filteredElements: FilterableElement[] = [];
   public filteredElements$ = new BehaviorSubject<FilterableElement[]>(this.filteredElements);
   private _allFiltrableElements: FilterableElement[] = [];
   public allFiltrableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFiltrableElements);
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
-  private filteredElementsWithoutFilterTipo: FilterableElement[] = [];
+  private _filteredElementsWithoutFilterTipo: FilterableElement[] = [];
   public filteredElementsWithoutFilterTipo$ = new BehaviorSubject<FilterableElement[]>(
-    this.filteredElementsWithoutFilterTipo
+    this._filteredElementsWithoutFilterTipo
   );
 
   constructor(
@@ -38,32 +38,15 @@ export class FilterService {
     private filterControlService: FilterControlService
   ) {}
 
-  initService(shared: boolean, plantaId: string, plantaFija: boolean, sharedId?: string): Observable<boolean> {
+  initService(plantaId: string, plantaFija: boolean, elems: FilterableElement[]): Observable<boolean> {
     if (plantaFija) {
-      this.anomaliaService
-        .getAnomaliasPlanta$(plantaId)
-        .pipe(take(1))
-        .subscribe((array) => {
-          this.allFiltrableElements = array;
-          this.filteredElements$.next(array);
-          if (shared) {
-            this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params));
+      this.allFiltrableElements = elems;
+      this.filteredElements = elems;
 
-            // obtenemos lo filtros guardados en al DB y los añadimos
-            this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
-              if (filters.length > 0) {
-                this.addFilters(filters);
-              }
-              this.initialized$.next(true);
-            });
-          } else {
-            this.initialized$.next(true);
-          }
+      // para contabilizar los diferentes filtros 'tipo'
+      this.filteredElementsWithoutFilterTipo = elems;
 
-          // para contabilizar los diferentes filtros 'tipo'
-          this.filteredElementsWithoutFilterTipo = array;
-          this.filteredElementsWithoutFilterTipo$.next(this.filteredElementsWithoutFilterTipo);
-        });
+      this.initialized$.next(true);
     } else {
       this.seguidorService.getSeguidoresPlanta$(plantaId).subscribe((seguidores) => {
         this.allFiltrableElements = seguidores;
@@ -238,5 +221,23 @@ export class FilterService {
   set allFiltrableElements(value: FilterableElement[]) {
     this._allFiltrableElements = value;
     this.allFiltrableElements$.next(value);
+  }
+
+  get filteredElements() {
+    return this._filteredElements;
+  }
+
+  set filteredElements(value: FilterableElement[]) {
+    this._filteredElements = value;
+    this.filteredElements$.next(value);
+  }
+
+  get filteredElementsWithoutFilterTipo() {
+    return this._filteredElementsWithoutFilterTipo;
+  }
+
+  set filteredElementsWithoutFilterTipo(value: FilterableElement[]) {
+    this._filteredElementsWithoutFilterTipo = value;
+    this.filteredElementsWithoutFilterTipo$.next(value);
   }
 }

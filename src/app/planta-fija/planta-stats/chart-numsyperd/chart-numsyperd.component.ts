@@ -78,7 +78,7 @@ export class ChartNumsyperdComponent implements OnInit {
   constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    combineLatest([this.filterService.allFiltrableElements$, this.reportControlService.informesList$]).subscribe(
+    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesList$]).subscribe(
       ([elems, informes]) => {
         this.allAnomalias = elems as Anomalia[];
         this.informesList = informes;

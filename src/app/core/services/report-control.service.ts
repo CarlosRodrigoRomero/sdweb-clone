@@ -13,6 +13,7 @@ import { WINDOW } from '../../window.providers';
 
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 import { GLOBAL } from './global';
+import { FilterableElement } from '@core/models/filtrableInterface';
 
 @Injectable({
   providedIn: 'root',
@@ -34,6 +35,10 @@ export class ReportControlService {
   private _mapLoaded = false;
   public mapLoaded$ = new BehaviorSubject<boolean>(this._mapLoaded);
   public criterioCoA;
+  private _allFilterableElements: FilterableElement[] = [];
+  public allFilterableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFilterableElements);
+  private _filteredElements: FilterableElement[] = [];
+  public filteredElements$ = new BehaviorSubject<FilterableElement[]>(this._filteredElements);
 
   constructor(
     private router: Router,
@@ -76,7 +81,7 @@ export class ReportControlService {
                 .initService(this.plantaId)
                 .pipe(
                   switchMap(() => this.informeService.getInformesDePlanta(this.plantaId)),
-                  // obtenemos los informes de la planta e iniciamos filter service
+                  // obtenemos los informes de la planta
                   switchMap((informesId) => {
                     // ordenamos los informes de menos a mas reciente y los añadimos a la lista
                     informesId
@@ -86,7 +91,15 @@ export class ReportControlService {
                       });
                     this.informesList$.next(this.informesList);
 
-                    return this.filterService.initService(this.sharedReport, this.plantaId, true, this.sharedId);
+                    // obtenemos todas las anomalías
+                    return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
+                  }),
+                  take(1),
+                  switchMap((anoms) => {
+                    this.allFilterableElements = anoms;
+
+                    // iniciamos filter service
+                    return this.filterService.initService(this.plantaId, true, anoms);
                   })
                 )
                 .subscribe((init) => (this.initialized = init));
@@ -95,7 +108,14 @@ export class ReportControlService {
               this.anomaliaService
                 .initService(this.plantaId)
                 .pipe(
-                  switchMap(() => this.filterService.initService(this.sharedReport, this.plantaId, true, this.sharedId))
+                  switchMap(() => this.anomaliaService.getAnomaliasPlanta$(this.plantaId)),
+                  take(1),
+                  switchMap((anoms) => {
+                    this.allFilterableElements = anoms;
+
+                    // iniciamos filter service
+                    return this.filterService.initService(this.plantaId, true, anoms);
+                  })
                 )
                 // iniciamos filter service
                 .subscribe((init) => (this.initialized = init));
@@ -129,7 +149,7 @@ export class ReportControlService {
         .initService(this.plantaId)
         .pipe(
           switchMap(() => this.informeService.getInformesDePlanta(this.plantaId)),
-          // obtenemos los informes de la planta e iniciamos filter service
+          // obtenemos los informes de la planta
           switchMap((informesId) => {
             // ordenamos los informes de menos a mas reciente y los añadimos a la lista
             informesId
@@ -141,7 +161,15 @@ export class ReportControlService {
 
             this.selectedInformeId = this.informesList[this.informesList.length - 1];
 
-            return this.filterService.initService(this.sharedReport, this.plantaId, true);
+            // obtenemos todas las anomalías
+            return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
+          }),
+          take(1),
+          switchMap((anoms) => {
+            this.allFilterableElements = anoms;
+
+            // iniciamos filter service
+            return this.filterService.initService(this.plantaId, true, anoms);
           })
         )
         .subscribe((init) => (this.initialized = init));
@@ -206,5 +234,14 @@ export class ReportControlService {
   set mapLoaded(value: boolean) {
     this._mapLoaded = value;
     this.mapLoaded$.next(value);
+  }
+
+  get allFilterableElements() {
+    return this._allFilterableElements;
+  }
+
+  set allFilterableElements(value: FilterableElement[]) {
+    this._allFilterableElements = value;
+    this.allFilterableElements$.next(value);
   }
 }

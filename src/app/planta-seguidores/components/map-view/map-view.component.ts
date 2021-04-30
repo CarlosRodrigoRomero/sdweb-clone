@@ -46,7 +46,7 @@ export class MapViewComponent implements OnInit {
   ngOnInit(): void {
     const initMapSegService = this.mapSeguidoresService.initService(this.plantaId);
 
-    if (this.sharedReport) {
+    /* if (this.sharedReport) {
       const initFilterService = this.filterService.initService(
         this.sharedReport,
         this.plantaId,
@@ -65,6 +65,6 @@ export class MapViewComponent implements OnInit {
         this.seguidoresLoaded = mapSerInit && filtSerInit;
         this.seguidoresLoaded$.next(this.seguidoresLoaded);
       });
-    }
+    } */
   }
 }
