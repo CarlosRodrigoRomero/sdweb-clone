@@ -7,7 +7,7 @@ import { PcService } from '@core/services/pc.service';
 import { FilterService } from '@core/services/filter.service';
 
 import { ModuloPcFilter } from '@core/models/moduloFilter';
-import { FiltrableInterface } from '@core/models/filtrableInterface';
+import { FilterableElement } from '@core/models/filtrableInterface';
 import { AnomaliaService } from '@core/services/anomalia.service';
 
 interface ModuloPc {
@@ -95,7 +95,7 @@ export class ModuloFilterComponent implements OnInit {
     return modulos;
   }
 
-  getModuloLabel(elem: FiltrableInterface): string {
+  getModuloLabel(elem: FilterableElement): string {
     let moduloLabel: string;
     if (elem.modulo.marca === undefined) {
       if (elem.modulo.modelo === undefined) {

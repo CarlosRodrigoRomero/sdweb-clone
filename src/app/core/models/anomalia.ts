@@ -1,8 +1,8 @@
 import { Coordinate } from 'ol/coordinate.js';
-import { FiltrableInterface } from './filtrableInterface';
+import { FilterableElement } from './filtrableInterface';
 import { ModuloInterface } from './modulo';
 
-export class Anomalia implements FiltrableInterface {
+export class Anomalia implements FilterableElement {
   // FiltrableInterface
   tipo: number;
   globalCoords: string[];

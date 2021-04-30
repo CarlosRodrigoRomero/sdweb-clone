@@ -1,6 +1,7 @@
 import { Coordinate } from 'ol/coordinate';
+import { FilterableElement } from './filtrableInterface';
 
-export interface ModuloBruto {
+export class ModuloBruto implements FilterableElement {
   id?: string;
   confianza: number;
   aspectRatio: number;

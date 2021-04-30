@@ -3,10 +3,10 @@ import { Coordinate } from 'ol/coordinate';
 import { fromLonLat } from 'ol/proj';
 
 import { Anomalia } from './anomalia';
-import { FiltrableInterface } from './filtrableInterface';
+import { FilterableElement } from './filtrableInterface';
 import { ModuloInterface } from './modulo';
 
-export class Seguidor implements FiltrableInterface {
+export class Seguidor implements FilterableElement {
   // Filtrable Interface
   anomalias: Anomalia[];
   globalCoords: string[];

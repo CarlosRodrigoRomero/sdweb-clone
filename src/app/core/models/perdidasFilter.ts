@@ -1,5 +1,5 @@
 import { FilterInterface } from './filter';
-import { FiltrableInterface } from './filtrableInterface';
+import { FilterableElement } from './filtrableInterface';
 
 export class PerdidasFilter implements FilterInterface {
   type: string;
@@ -12,11 +12,11 @@ export class PerdidasFilter implements FilterInterface {
     this.rangoMax = rangoMax;
   }
 
-  applyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
+  applyFilter(elems: FilterableElement[]): FilterableElement[] {
     return elems.filter((elem) => elem.perdidas >= this.rangoMin / 100 && elem.perdidas <= this.rangoMax / 100);
   }
 
-  unapplyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
+  unapplyFilter(elems: FilterableElement[]): FilterableElement[] {
     return null;
   }
 }

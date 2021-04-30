@@ -1,5 +1,5 @@
 import { FilterInterface } from './filter';
-import { FiltrableInterface } from './filtrableInterface';
+import { FilterableElement } from './filtrableInterface';
 
 export class SeveridadFilter implements FilterInterface {
   id: string;
@@ -12,11 +12,11 @@ export class SeveridadFilter implements FilterInterface {
     this.clase = severidad;
   }
 
-  applyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
+  applyFilter(elems: FilterableElement[]): FilterableElement[] {
     // tslint:disable-next-line: triple-equals
     return elems.filter((elem) => elem.severidad == this.clase); 
   }
-  unapplyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
+  unapplyFilter(elems: FilterableElement[]): FilterableElement[] {
     return null;
   }
 }

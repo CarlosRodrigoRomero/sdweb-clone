@@ -13,6 +13,7 @@ import { ModuloFilterComponent } from './components/modulo-filter/modulo-filter.
 import { ZonaFilterComponent } from './components/zona-filter/zona-filter.component';
 import { AreaFilterComponent } from './components/area-filter/area-filter.component';
 import { CriticidadFilterComponent } from './components/criticidad-filter/criticidad-filter.component';
+import { ConfianzaFilterComponent } from './components/confianza-filter/confianza-filter.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { CriticidadFilterComponent } from './components/criticidad-filter/critic
     ZonaFilterComponent,
     AreaFilterComponent,
     CriticidadFilterComponent,
+    ConfianzaFilterComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [FiltersPanelComponent],

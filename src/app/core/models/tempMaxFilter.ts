@@ -1,5 +1,5 @@
 import { FilterInterface } from './filter';
-import { FiltrableInterface } from './filtrableInterface';
+import { FilterableElement } from './filtrableInterface';
 
 export class TempMaxFilter implements FilterInterface {
   type: string;
@@ -12,10 +12,10 @@ export class TempMaxFilter implements FilterInterface {
     this.rangoMax = rangoMax;
   }
 
-  applyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
+  applyFilter(pcs: FilterableElement[]): FilterableElement[] {
     return pcs.filter((pc) => pc.temperaturaMax >= this.rangoMin && pc.temperaturaMax <= this.rangoMax);
   }
-  unapplyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
+  unapplyFilter(pcs: FilterableElement[]): FilterableElement[] {
     return null;
   }
 }

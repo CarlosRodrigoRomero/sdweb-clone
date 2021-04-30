@@ -1,5 +1,5 @@
 import { FilterInterface } from './filter';
-import { FiltrableInterface } from './filtrableInterface';
+import { FilterableElement } from './filtrableInterface';
 
 export class GradientFilter implements FilterInterface {
   type: string;
@@ -12,10 +12,10 @@ export class GradientFilter implements FilterInterface {
     this.rangoMax = rangoMax;
   }
 
-  applyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
+  applyFilter(pcs: FilterableElement[]): FilterableElement[] {
     return pcs.filter((pc) => pc.gradienteNormalizado >= this.rangoMin && pc.gradienteNormalizado <= this.rangoMax);
   }
-  unapplyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
+  unapplyFilter(pcs: FilterableElement[]): FilterableElement[] {
     return null;
   }
 }

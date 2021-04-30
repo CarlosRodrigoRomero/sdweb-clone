@@ -1,5 +1,5 @@
 import { FilterInterface } from './filter';
-import { FiltrableInterface } from './filtrableInterface';
+import { FilterableElement } from './filtrableInterface';
 
 export class CriticidadFilter implements FilterInterface {
   id: string;
@@ -12,11 +12,11 @@ export class CriticidadFilter implements FilterInterface {
     this.criticidad = criticidad;
   }
 
-  applyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
+  applyFilter(elems: FilterableElement[]): FilterableElement[] {
     // tslint:disable-next-line: triple-equals
     return elems.filter((elem) => elem.criticidad == this.criticidad); // antes pc.severidad
   }
-  unapplyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
+  unapplyFilter(elems: FilterableElement[]): FilterableElement[] {
     return null;
   }
 }

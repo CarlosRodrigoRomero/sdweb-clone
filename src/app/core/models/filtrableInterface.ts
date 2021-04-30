@@ -1,12 +1,11 @@
 import { ModuloInterface } from './modulo';
 
-export interface FiltrableInterface {
-  globalCoords: string[];
-  perdidas: number;
-  temperaturaMax: number;
-  modulo: ModuloInterface;
-
+export interface FilterableElement {
   id?: string;
+  globalCoords?: string[];
+  perdidas?: number;
+  temperaturaMax?: number;
+  modulo?: ModuloInterface;
   tipo?: number;
   severidad?: number;
   criticidad?: number;

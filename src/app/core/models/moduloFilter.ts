@@ -1,5 +1,5 @@
 import { FilterInterface } from './filter';
-import { FiltrableInterface } from './filtrableInterface';
+import { FilterableElement } from './filtrableInterface';
 
 export class ModuloPcFilter implements FilterInterface {
   id: string;
@@ -12,14 +12,14 @@ export class ModuloPcFilter implements FilterInterface {
     this.modulo = modulo;
   }
 
-  applyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
-    return pcs.filter((pc) => this.getModuloLabelPc(pc) === this.modulo);
+  applyFilter(elems: FilterableElement[]): FilterableElement[] {
+    return elems.filter((elem) => this.getModuloLabelPc(elem) === this.modulo);
   }
-  unapplyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
+  unapplyFilter(elems: FilterableElement[]): FilterableElement[] {
     return null;
   }
 
-  private getModuloLabelPc(pc: FiltrableInterface): string {
+  private getModuloLabelPc(pc: FilterableElement): string {
     let moduloLabel: string;
     if (pc.modulo.marca === undefined) {
       if (pc.modulo.modelo === undefined) {

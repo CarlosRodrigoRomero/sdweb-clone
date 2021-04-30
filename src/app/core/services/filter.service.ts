@@ -7,7 +7,7 @@ import { ShareReportService } from '@core/services/share-report.service';
 import { SeguidorService } from '@core/services/seguidor.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
-import { FiltrableInterface } from '@core/models/filtrableInterface';
+import { FilterableElement } from '@core/models/filtrableInterface';
 import { FilterInterface } from '@core/models/filter';
 import { take } from 'rxjs/operators';
 
@@ -20,14 +20,14 @@ export class FilterService {
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
   private filtersByType: FilterInterface[] = [];
   private filtersByType$ = new BehaviorSubject<FilterInterface[]>(this.filtersByType);
-  private filteredElements: FiltrableInterface[] = [];
-  public filteredElements$ = new BehaviorSubject<FiltrableInterface[]>(this.filteredElements);
-  private _allFiltrableElements: FiltrableInterface[] = [];
-  public allFiltrableElements$ = new BehaviorSubject<FiltrableInterface[]>(this._allFiltrableElements);
+  private filteredElements: FilterableElement[] = [];
+  public filteredElements$ = new BehaviorSubject<FilterableElement[]>(this.filteredElements);
+  private _allFiltrableElements: FilterableElement[] = [];
+  public allFiltrableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFiltrableElements);
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
-  private filteredElementsWithoutFilterTipo: FiltrableInterface[] = [];
-  public filteredElementsWithoutFilterTipo$ = new BehaviorSubject<FiltrableInterface[]>(
+  private filteredElementsWithoutFilterTipo: FilterableElement[] = [];
+  public filteredElementsWithoutFilterTipo$ = new BehaviorSubject<FilterableElement[]>(
     this.filteredElementsWithoutFilterTipo
   );
 
@@ -103,13 +103,13 @@ export class FilterService {
   }
 
   private applyFilters() {
-    const everyFilterFiltrableElements: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
+    const everyFilterFiltrableElements: Array<FilterableElement[]> = new Array<FilterableElement[]>();
 
     // comprobamos si hay filtros de tipo 'multiple'
     if (this.filters.filter((fil) => this.multipleFilters.includes(fil.type)).length > 0) {
       // separamos los elems por tipo de filtro
       this.multipleFilters.forEach((type) => {
-        const newFiltrableElements: FiltrableInterface[] = [];
+        const newFiltrableElements: FilterableElement[] = [];
         if (this.filters.filter((fil) => fil.type === type).length > 0) {
           // obtenemos un array de las elems filtrados por cada filtro de  diferente tipo
           this.filters
@@ -187,15 +187,15 @@ export class FilterService {
   }
 
   private excludeTipoFilters() {
-    const everyFilterFiltrableElements: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
+    const everyFilterFiltrableElements: Array<FilterableElement[]> = new Array<FilterableElement[]>();
 
     // comprobamos si hay filtros de tipo 'multiple'
     if (this.filters.filter((filter) => this.multipleFilters.includes(filter.type)).length > 0) {
-      // separamos los pcs por tipo de filtro
+      // separamos los elems por tipo de filtro excluyendo los filtros "tipo"
       this.multipleFilters
         .filter((type) => type !== 'tipo')
         .forEach((type) => {
-          const newFiltrableElements: FiltrableInterface[] = [];
+          const newFiltrableElements: FilterableElement[] = [];
           if (this.filters.filter((filter) => filter.type === type).length > 0) {
             this.filters
               .filter((filter) => filter.type === type)
@@ -208,7 +208,7 @@ export class FilterService {
         });
     }
 
-    // añadimos al array los pcs filtrados de los filtros no 'multiple'
+    // añadimos al array los elems filtrados de los filtros no 'multiple'
     this.filters
       .filter((filter) => !this.multipleFilters.includes(filter.type))
       .forEach((filter) => {
@@ -235,7 +235,7 @@ export class FilterService {
     return this._allFiltrableElements;
   }
 
-  set allFiltrableElements(value: FiltrableInterface[]) {
+  set allFiltrableElements(value: FilterableElement[]) {
     this._allFiltrableElements = value;
     this.allFiltrableElements$.next(value);
   }

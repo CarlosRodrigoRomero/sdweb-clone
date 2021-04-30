@@ -1,5 +1,5 @@
 import { FilterInterface } from './filter';
-import { FiltrableInterface } from './filtrableInterface';
+import { FilterableElement } from './filtrableInterface';
 
 export class ZonaFilter implements FilterInterface {
   id: string;
@@ -12,10 +12,10 @@ export class ZonaFilter implements FilterInterface {
     this.zona = zona;
   }
 
-  applyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
+  applyFilter(pcs: FilterableElement[]): FilterableElement[] {
     return pcs.filter((pc) => pc.global_x === this.zona);
   }
-  unapplyFilter(pcs: FiltrableInterface[]): FiltrableInterface[] {
+  unapplyFilter(pcs: FilterableElement[]): FilterableElement[] {
     return null;
   }
 }

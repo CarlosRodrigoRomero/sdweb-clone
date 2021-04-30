@@ -1,10 +1,9 @@
-import { FiltrableInterface } from './filtrableInterface';
-
+import { FilterableElement } from './filtrableInterface';
 
 export interface FilterInterface {
   id?: string;
   type?: string;
 
-  applyFilter(pcs: FiltrableInterface[]): FiltrableInterface[];
-  unapplyFilter(pcs: FiltrableInterface[]): FiltrableInterface[];
+  applyFilter(elems: FilterableElement[]): FilterableElement[];
+  unapplyFilter(elems: FilterableElement[]): FilterableElement[];
 }

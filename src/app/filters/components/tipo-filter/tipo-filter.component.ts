@@ -78,11 +78,6 @@ export class TipoFilterComponent implements OnInit {
     // nos suscribimos a los tipos seleccionados de filter control
     this.filterControlService.tiposSelected$.subscribe((tiposSel) => (this.tiposSelected = tiposSel));
 
-    // nos suscribimos para poder checkear desde otros lugares
-    /*  this.filterControlService.tiposSelected$.subscribe((sel) =>
-      this.tiposElem.forEach((tipoPc, index) => (tipoPc.completed = sel[index]))
-    ); */
-
     // nos suscribimos a los labels del filter control
     this.filterControlService.selectedTipoLabels$.subscribe((labels) => (this.selectedLabels = labels));
 

@@ -70,9 +70,6 @@ export class ReportControlService {
             this.plantaId = params.plantaId;
             this.selectedInformeId = params.informeId;
 
-            // iniciamos anomalias service
-            this.anomaliaService.initService(this.plantaId);
-
             if (this.router.url.includes('filterable')) {
               // iniciamos anomalia service antes de obtener las anomalias
               this.anomaliaService

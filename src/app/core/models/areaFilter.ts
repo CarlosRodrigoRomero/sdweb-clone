@@ -4,7 +4,7 @@ import Polygon from 'ol/geom/Polygon';
 import { Anomalia } from './anomalia';
 import { Seguidor } from './seguidor';
 import { FilterInterface } from './filter';
-import { FiltrableInterface } from './filtrableInterface';
+import { FilterableElement } from './filtrableInterface';
 
 export class AreaFilter implements FilterInterface {
   type: string;
@@ -17,12 +17,12 @@ export class AreaFilter implements FilterInterface {
     this.polygon = new Polygon(coords);
   }
 
-  applyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
+  applyFilter(elems: FilterableElement[]): FilterableElement[] {
     return elems.filter((elem) => {
       return this.polygon.intersectsCoordinate((elem as Anomalia | Seguidor).featureCoords[0]);
     });
   }
-  unapplyFilter(elems: FiltrableInterface[]): FiltrableInterface[] {
+  unapplyFilter(elems: FilterableElement[]): FilterableElement[] {
     return null;
   }
 }
