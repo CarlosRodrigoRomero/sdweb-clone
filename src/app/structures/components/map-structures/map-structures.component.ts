@@ -164,8 +164,6 @@ export class MapStructuresComponent implements OnInit {
         .find((layer) => layer.getProperties().id === 'mBLayer') as VectorLayer;
       const mBSource = mBLayer.getSource();
 
-      console.log(this.modulosBrutos);
-
       this.modulosBrutos.forEach((mB) => {
         const feature = new Feature({
           geometry: new Polygon([mB.coords]),

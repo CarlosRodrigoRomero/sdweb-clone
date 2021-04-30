@@ -186,7 +186,7 @@ export class FilterService {
     this.applyFilters();
   }
 
-  excludeTipoFilters() {
+  private excludeTipoFilters() {
     const everyFilterFiltrableElements: Array<FiltrableInterface[]> = new Array<FiltrableInterface[]>();
 
     // comprobamos si hay filtros de tipo 'multiple'
