@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { take } from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
 
 import TileLayer from 'ol/layer/Tile';
 import { fromLonLat, transformExtent } from 'ol/proj';
@@ -195,26 +195,30 @@ export class MapClustersComponent implements OnInit {
         const isJoined = this.isJoinedCluster(cluster);
 
         const puntoA = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoAId);
-        const featureA = new Feature({
-          geometry: new Circle(fromLonLat([puntoA.long, puntoA.lat]), 4),
-          properties: {
-            id: cluster.id,
-            name: 'puntoClusterA',
-            isJoined,
-          },
-        });
-        clustersSource.addFeature(featureA);
+        if (puntoA !== undefined) {
+          const featureA = new Feature({
+            geometry: new Circle(fromLonLat([puntoA.long, puntoA.lat]), 4),
+            properties: {
+              id: cluster.id,
+              name: 'puntoClusterA',
+              isJoined,
+            },
+          });
+          clustersSource.addFeature(featureA);
+        }
 
         const puntoB = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoBId);
-        const featureB = new Feature({
-          geometry: new Circle(fromLonLat([puntoB.long, puntoB.lat]), 4),
-          properties: {
-            id: cluster.id,
-            name: 'puntoClusterB',
-            isJoined,
-          },
-        });
-        clustersSource.addFeature(featureB);
+        if (puntoB !== undefined) {
+          const featureB = new Feature({
+            geometry: new Circle(fromLonLat([puntoB.long, puntoB.lat]), 4),
+            properties: {
+              id: cluster.id,
+              name: 'puntoClusterB',
+              isJoined,
+            },
+          });
+          clustersSource.addFeature(featureB);
+        }
       });
     });
   }

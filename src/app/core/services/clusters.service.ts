@@ -67,7 +67,9 @@ export class ClustersService {
       )
       .subscribe(([puntos, clusters]) => {
         // obtenemos las coordenas de los puntos de la trayectoria
-        puntos.forEach((punto: any) => this.coordsPuntosTrayectoria.push(fromLonLat([punto.long, punto.lat])));
+        if (this.coordsPuntosTrayectoria.length === 0) {
+          puntos.forEach((punto: any) => this.coordsPuntosTrayectoria.push(fromLonLat([punto.long, punto.lat])));
+        }
 
         // TODO: evitar que cuando no haya clusters no cargue
         if (puntos.length > 0 && clusters.length > 0) {
@@ -95,8 +97,22 @@ export class ClustersService {
         })
       )
       .subscribe((puntos) => {
+        // descartamos elementos duplicados
+        const fechasUnixPuntos = puntos.map((punto) => this.dateStringToUnix(punto.date));
+        const tabla = {};
+        const fechasUnixPuntosUnicos = fechasUnixPuntos.filter((index) =>
+          tabla.hasOwnProperty(index) ? false : (tabla[index] = true)
+        );
+
+        const puntosUnicos = [];
+        fechasUnixPuntosUnicos.forEach((fecha) => {
+          puntosUnicos.push(puntos.find((punto) => this.dateStringToUnix(punto.date) === fecha));
+        });
+
         // ordenamos los puntos por fecha
-        this.puntosTrayectoria = puntos.sort((a, b) => this.dateStringToUnix(a.date) - this.dateStringToUnix(b.date));
+        this.puntosTrayectoria = puntosUnicos.sort(
+          (a, b) => this.dateStringToUnix(a.date) - this.dateStringToUnix(b.date)
+        );
         this.puntosTrayectoria$.next(this.puntosTrayectoria);
       });
 
