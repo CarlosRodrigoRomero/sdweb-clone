@@ -371,10 +371,7 @@ export class MapClustersComponent implements OnInit {
 
               if (!this.esPuntoCluster(puntoSelected)) {
                 // Actualizamos el punto cluster seleccionado solo si no pulsamos sobre otro cluster
-                this.clustersService.updateCluster(this.clusterSelected.id, this.isClusterA, [
-                  puntoSelected.long,
-                  puntoSelected.lat,
-                ]);
+                this.clustersService.updateCluster(this.clusterSelected.id, this.isClusterA, puntoSelected.id);
               }
             }
 

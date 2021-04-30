@@ -129,6 +129,7 @@ export class ClustersService {
         map((actions) => {
           return actions.map((a) => {
             const data = a.payload.doc.data() as Cluster;
+            data.id = a.payload.doc.id;
             return { ...data };
           });
         })
@@ -199,14 +200,14 @@ export class ClustersService {
       });
   }
 
-  updateCluster(clusterId: string, extremoA: boolean, coords: Coordinate) {
+  updateCluster(clusterId: string, puntoA: boolean, nuevoPuntoId: string) {
     // creamos la referencia al cluster
     const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(clusterId);
 
-    if (extremoA) {
+    if (puntoA) {
       return clusterRef
         .update({
-          extremoA: coords as Coordinate,
+          puntoAId: nuevoPuntoId,
         })
         .then(() => {
           console.log('Cluster successfully updated!');
@@ -218,7 +219,7 @@ export class ClustersService {
     } else {
       return clusterRef
         .update({
-          extremoB: coords,
+          puntoBId: nuevoPuntoId,
         })
         .then(() => {
           console.log('Cluster successfully updated!');
