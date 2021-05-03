@@ -1,9 +1,17 @@
 .cluster-grid {
-    display:grid;
-    grid-template-columns: 4fr 1fr;
+  display: grid;
+  grid-template-columns: 1fr 4fr;
 }
 
 .right-bar {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+}
+
+.mat-stepper-vertical {
+  margin-top: 8px;
+}
+
+.mat-form-field {
+  margin-top: 16px;
 }

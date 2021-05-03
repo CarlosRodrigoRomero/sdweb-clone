@@ -26,4 +26,5 @@ export interface InformeInterface {
   jpgVisual?: boolean;
   carpetaJpgGray?: string;
   pc_pct?: number;
+  vueloId?: string;
 }

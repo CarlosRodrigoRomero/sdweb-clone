@@ -182,44 +182,46 @@ export class MapClustersComponent implements OnInit {
 
   private addClusters() {
     this.clustersService.clusters$.subscribe((clusters) => {
-      this.clusters = clusters;
-      const clustersLayer = this.map
-        .getLayers()
-        .getArray()
-        .find((layer) => layer.getProperties().id === 'clustersLayer') as VectorLayer;
+      if (clusters !== undefined) {
+        this.clusters = clusters;
+        const clustersLayer = this.map
+          .getLayers()
+          .getArray()
+          .find((layer) => layer.getProperties().id === 'clustersLayer') as VectorLayer;
 
-      const clustersSource = clustersLayer.getSource();
-      clustersSource.clear();
+        const clustersSource = clustersLayer.getSource();
+        clustersSource.clear();
 
-      clusters.forEach((cluster) => {
-        const isJoined = this.isJoinedCluster(cluster);
+        clusters.forEach((cluster) => {
+          const isJoined = this.isJoinedCluster(cluster);
 
-        const puntoA = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoAId);
-        if (puntoA !== undefined) {
-          const featureA = new Feature({
-            geometry: new Circle(fromLonLat([puntoA.long, puntoA.lat]), 4),
-            properties: {
-              id: cluster.id,
-              name: 'puntoClusterA',
-              isJoined,
-            },
-          });
-          clustersSource.addFeature(featureA);
-        }
+          const puntoA = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoAId);
+          if (puntoA !== undefined) {
+            const featureA = new Feature({
+              geometry: new Circle(fromLonLat([puntoA.long, puntoA.lat]), 4),
+              properties: {
+                id: cluster.id,
+                name: 'puntoClusterA',
+                isJoined,
+              },
+            });
+            clustersSource.addFeature(featureA);
+          }
 
-        const puntoB = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoBId);
-        if (puntoB !== undefined) {
-          const featureB = new Feature({
-            geometry: new Circle(fromLonLat([puntoB.long, puntoB.lat]), 4),
-            properties: {
-              id: cluster.id,
-              name: 'puntoClusterB',
-              isJoined,
-            },
-          });
-          clustersSource.addFeature(featureB);
-        }
-      });
+          const puntoB = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoBId);
+          if (puntoB !== undefined) {
+            const featureB = new Feature({
+              geometry: new Circle(fromLonLat([puntoB.long, puntoB.lat]), 4),
+              properties: {
+                id: cluster.id,
+                name: 'puntoClusterB',
+                isJoined,
+              },
+            });
+            clustersSource.addFeature(featureB);
+          }
+        });
+      }
     });
   }
 

@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { BehaviorSubject, combineLatest, EMPTY, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import * as firebase from 'firebase/app';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 import { Map } from 'ol';
 import { fromLonLat } from 'ol/proj';
@@ -14,11 +16,12 @@ import moment from 'moment';
 
 import { PlantaService } from './planta.service';
 import { OlMapService } from './ol-map.service';
-import { AngularFireStorage } from '@angular/fire/storage';
+import { InformeService } from './informe.service';
 
 import { PuntoTrayectoria } from '@core/models/puntoTrayectoria';
 import { PlantaInterface } from '@core/models/planta';
 import { Cluster } from '@core/models/cluster';
+import { query } from '@angular/animations';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +29,9 @@ import { Cluster } from '@core/models/cluster';
 export class ClustersService {
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
+  private informeId: string;
+  private vueloId: string = undefined;
+  public vueloId$ = new BehaviorSubject<string>(this.vueloId);
   private plantaId: string;
   private _planta: PlantaInterface = {};
   private planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
@@ -37,6 +43,7 @@ export class ClustersService {
   puntoHover$ = new BehaviorSubject<PuntoTrayectoria>(this._puntoHover);
   private _urlImageThumbnail: string = undefined;
   urlImageThumbnail$ = new BehaviorSubject<string>(this._urlImageThumbnail);
+  private clustersRef: AngularFirestoreCollection<Cluster>;
   private _clusters: Cluster[] = [];
   clusters$ = new BehaviorSubject<Cluster[]>(this._clusters);
   private _joinActive = false;
@@ -50,19 +57,35 @@ export class ClustersService {
     private afs: AngularFirestore,
     private plantaService: PlantaService,
     private olMapService: OlMapService,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private router: Router,
+    private informeService: InformeService
   ) {}
 
   initService(): Observable<boolean> {
-    this.plantaId = '1J6YwrECCGrXcEzrkjau';
+    // obtenemos el ID de la URL
+    this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+    // this.plantaId = '1J6YwrECCGrXcEzrkjau';
 
-    this.plantaService
-      .getPlanta(this.plantaId)
+    this.informeService
+      .getInforme(this.informeId)
+      .pipe(
+        take(1),
+        switchMap((informe) => {
+          this.vueloId = informe.vueloId;
+          this.vueloId$.next(this.vueloId);
+
+          this.clustersRef = this.afs.collection('vuelos/' + this.vueloId + '/clusters');
+
+          return this.plantaService.getPlanta(informe.plantaId);
+        })
+      )
       .pipe(
         take(1),
         switchMap((planta) => {
           this.planta = planta;
-          return combineLatest([this.getPuntosTrayectoria(this.plantaId), this.getClusters(this.plantaId)]);
+
+          return combineLatest([this.getPuntosTrayectoria(), this.getClusters()]);
         })
       )
       .subscribe(([puntos, clusters]) => {
@@ -72,17 +95,23 @@ export class ClustersService {
         }
 
         // TODO: evitar que cuando no haya clusters no cargue
-        if (puntos.length > 0 && clusters.length > 0) {
-          this.initialized$.next(true);
+        if (clusters === undefined) {
+          if (puntos.length > 0) {
+            this.initialized$.next(true);
+          }
+        } else if (clusters.length > 0) {
+          if (puntos.length > 0) {
+            this.initialized$.next(true);
+          }
         }
       });
 
     return this.initialized$;
   }
 
-  private getPuntosTrayectoria(plantaId: string): Observable<PuntoTrayectoria[]> {
-    // const puntosTrayectoriaRef = this.afs.collection('vuelos/' + plantaId + '/puntosTrayectoria');
-    const puntosTrayectoriaRef = this.afs.collection('vuelos/' + 'Alconera02' + '/puntosTrayectoria');
+  private getPuntosTrayectoria(): Observable<PuntoTrayectoria[]> {
+    const puntosTrayectoriaRef = this.afs.collection('vuelos/' + this.vueloId + '/puntosTrayectoria');
+    // const puntosTrayectoriaRef = this.afs.collection('vuelos/' + 'Alconera02' + '/puntosTrayectoria');
 
     puntosTrayectoriaRef
       .snapshotChanges()
@@ -119,11 +148,13 @@ export class ClustersService {
     return this.puntosTrayectoria$;
   }
 
-  private getClusters(plantaId: string): Observable<Cluster[]> {
-    // const clustersRef = this.afs.collection('vuelos/' + plantaId + '/clusters');
-    const clustersRef = this.afs.collection('vuelos/' + 'Alconera02' + '/clusters'); // DEMO
+  private getClusters(): Observable<Cluster[]> {
+    /* this.clustersRef
+      .get()
+      .toPromise()
+      .then((query) => query.size); */
 
-    clustersRef
+    this.clustersRef
       .snapshotChanges()
       .pipe(
         map((actions) => {
@@ -134,7 +165,13 @@ export class ClustersService {
           });
         })
       )
-      .subscribe((clusters) => (this.clusters = clusters));
+      .subscribe((clusters) => {
+        if (clusters.length > 0) {
+          this.clusters = clusters;
+        } else {
+          this.clusters = undefined;
+        }
+      });
 
     return this.clusters$;
   }
@@ -143,7 +180,7 @@ export class ClustersService {
     if (thumbnailId !== undefined) {
       // Creamos una referencia a la imagen
       const storageRef = this.storage.ref('');
-      const imageRef = storageRef.child('vuelos/Alconera02/thumbnails/' + thumbnailId + '.png');
+      const imageRef = storageRef.child('vuelos/' + this.vueloId + '/thumbnails/' + thumbnailId + '.png');
 
       // Obtenemos la URL y descargamos el archivo capturando los posibles errores
       imageRef
@@ -181,15 +218,12 @@ export class ClustersService {
   }
 
   addCluster(cluster: Cluster) {
-    // creamos la referencia a la colección de clusters
-    const clustersRef = this.afs.collection('vuelos/Alconera02/clusters');
-
     // obtenemos un ID aleatorio
     const id = this.afs.createId();
 
     cluster.id = id;
 
-    clustersRef
+    this.clustersRef
       .doc(id)
       .set(cluster)
       .then((docRef) => {
@@ -202,7 +236,7 @@ export class ClustersService {
 
   updateCluster(clusterId: string, puntoA: boolean, nuevoPuntoId: string) {
     // creamos la referencia al cluster
-    const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(clusterId);
+    const clusterRef = this.clustersRef.doc(clusterId);
 
     if (puntoA) {
       return clusterRef
@@ -233,7 +267,7 @@ export class ClustersService {
 
   joinClusters(clusterId: string, clusterJoinId: string) {
     // creamos la referencia al cluster
-    const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(clusterId);
+    const clusterRef = this.clustersRef.doc(clusterId);
 
     return clusterRef
       .update({
@@ -251,7 +285,7 @@ export class ClustersService {
   deleteCluster() {
     const clusterId = this.clusterSelected.id;
     // creamos la referencia al cluster
-    const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(clusterId);
+    const clusterRef = this.clustersRef.doc(clusterId);
 
     clusterRef
       .delete()
@@ -265,7 +299,7 @@ export class ClustersService {
   deleteJoinClusterId(clusterId: string) {
     this.clusters.forEach((cluster) => {
       if (cluster.clusterJoinId === clusterId) {
-        const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(cluster.id);
+        const clusterRef = this.clustersRef.doc(cluster.id);
         clusterRef.update({
           clusterJoinId: firebase.firestore.FieldValue.delete(),
         });
@@ -281,7 +315,7 @@ export class ClustersService {
       const clusterJoined = clusterSelected.clusterJoinId;
 
       // creamos la referencia al cluster
-      const clusterRef = this.afs.collection('vuelos/Alconera02/clusters').doc(clusterId);
+      const clusterRef = this.clustersRef.doc(clusterId);
 
       clusterRef.update({
         clusterJoinId: firebase.firestore.FieldValue.delete(),

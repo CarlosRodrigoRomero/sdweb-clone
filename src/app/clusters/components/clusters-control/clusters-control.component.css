@@ -3,8 +3,17 @@
   flex-direction: column;
 }
 
-button {
+.control-fine button {
   width: 100%;
+  margin-top: 0.5rem;
+}
+
+.control-fine {
+  margin-bottom: 1.5rem;
+}
+
+.atras-siguiente button {
+  margin-right: 0.5rem;
 }
 
 .warn-active {
@@ -16,7 +25,8 @@ mat-icon {
 }
 
 .auto-cluster-button {
-  margin: 30px 0;
+  width: 100%;
+  margin-bottom: 1.5rem;
 }
 
 mat-form-field {

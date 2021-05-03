@@ -10,6 +10,7 @@ import { ClustersService } from '@core/services/clusters.service';
   styleUrls: ['./clusters-control.component.css'],
 })
 export class ClustersControlComponent implements OnInit {
+  private vueloId: string;
   joinActive = false;
   isClusterSelected = false;
   createClusterActive = false;
@@ -20,6 +21,7 @@ export class ClustersControlComponent implements OnInit {
   constructor(private clustersService: ClustersService, private http: HttpClient) {}
 
   ngOnInit(): void {
+    this.clustersService.vueloId$.subscribe((vueloId) => (this.vueloId = vueloId));
     this.clustersService.clusterSelected$.subscribe((cluster) => {
       if (cluster) {
         this.isClusterSelected = true;
@@ -57,7 +59,7 @@ export class ClustersControlComponent implements OnInit {
     const velValue = this.formControlVel.value;
 
     const params = new HttpParams()
-      .set('id', 'Alconera02')
+      .set('id', this.vueloId)
       .set('threshold_variation', umbValue.toString())
       .set('threshold_speed', velValue.toString());
 
