@@ -15,8 +15,8 @@ import { Draw } from 'ol/interaction';
   providedIn: 'root',
 })
 export class OlMapService {
-  private map = {};
-  public map$ = new BehaviorSubject<any>(this.map);
+  private _map = undefined;
+  public map$ = new BehaviorSubject<any>(this._map);
   private _draw: Draw = undefined;
   public draw$ = new BehaviorSubject<Draw>(this._draw);
   private drawLayers: VectorLayer[] = [];
@@ -37,13 +37,13 @@ export class OlMapService {
     view: View,
     controls?: Collection<Control> | Control[]
   ): Observable<any> {
-    this.map = new Map({
+    this._map = new Map({
       target: id,
       layers,
       view,
       controls,
     });
-    this.map$.next(this.map);
+    this.map$.next(this._map);
     return this.map$.asObservable();
   }
 
@@ -77,7 +77,7 @@ export class OlMapService {
   }
 
   deleteAllDrawLayers() {
-    this.drawLayers.forEach((layer) => (this.map as Map).removeLayer(layer));
+    this.drawLayers.forEach((layer) => (this._map as Map).removeLayer(layer));
   }
 
   addSeguidorLayer(layer: VectorLayer) {
@@ -105,5 +105,14 @@ export class OlMapService {
   set draw(value: Draw) {
     this._draw = value;
     this.draw$.next(value);
+  }
+
+  get map() {
+    return this._map;
+  }
+
+  set map(value: Map) {
+    this._map = value;
+    this.map$.next(value);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { take } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
@@ -39,7 +39,7 @@ import { ThermalLayerInterface } from '@core/models/thermalLayer';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, OnDestroy {
   public plantaId: string;
   public planta: PlantaInterface;
   public map: Map;
@@ -126,6 +126,7 @@ export class MapComponent implements OnInit {
           // asignamos los IDs necesarios para compartir
           this.shareReportService.setPlantaId(this.plantaId);
 
+          console.log('ok');
           this.initMap();
 
           // this.anomaliasControlService.permitirCrearAnomalias(this.plantaId);
@@ -245,5 +246,9 @@ export class MapComponent implements OnInit {
 
   private transform(extent) {
     return transformExtent(extent, 'EPSG:4326', 'EPSG:3857');
+  }
+
+  ngOnDestroy() {
+    console.log('OnDestroy');
   }
 }

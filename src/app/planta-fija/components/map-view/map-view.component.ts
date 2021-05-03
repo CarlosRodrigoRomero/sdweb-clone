@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { ReportControlService } from '@core/services/report-control.service';
+import { Subscription } from 'rxjs';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -10,7 +11,7 @@ import { ReportControlService } from '@core/services/report-control.service';
   templateUrl: './map-view.component.html',
   styleUrls: ['./map-view.component.css'],
 })
-export class MapViewComponent implements OnInit {
+export class MapViewComponent implements OnInit, OnDestroy {
   public plantaFija = true;
   public leftOpened: boolean;
   public rightOpened: boolean;
@@ -20,6 +21,10 @@ export class MapViewComponent implements OnInit {
   public showFilters = true;
   public mapLoaded = false;
 
+  private susInitService: Subscription;
+  private susSharedWithFilters: Subscription;
+  private susSharedReport: Subscription;
+
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
@@ -27,10 +32,19 @@ export class MapViewComponent implements OnInit {
   constructor(private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    this.reportControlService.initService().subscribe((value) => (this.anomaliasLoaded = value));
-    this.reportControlService.sharedReportWithFilters$.subscribe((value) => {
+    this.susInitService = this.reportControlService.initService().subscribe((value) => (this.anomaliasLoaded = value));
+    this.susSharedWithFilters = this.reportControlService.sharedReportWithFilters$.subscribe((value) => {
       this.showFilters = value;
     });
-    this.reportControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value));
+    this.susSharedReport = this.reportControlService.sharedReport$.subscribe(
+      (value) => (this.notSharedReport = !value)
+    );
+  }
+
+  ngOnDestroy(): void {
+    // nos desuscribimos de los observables
+    this.susInitService.unsubscribe();
+    this.susSharedWithFilters.unsubscribe();
+    this.susSharedReport.unsubscribe();
   }
 }
