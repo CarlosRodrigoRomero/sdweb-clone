@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { NavigationStart, Router, Event } from '@angular/router';
 
 import { switchMap } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { InformeService } from '@core/services/informe.service';
 import { MapControlService } from '../../services/map-control.service';
@@ -18,22 +20,44 @@ export class BarraResumenPlantaComponent implements OnInit {
   potenciaPlanta = 1;
   tipoPlanta = 'fija';
   public informe: InformeInterface = null;
+  private subscription: Subscription = new Subscription();
 
   constructor(
     private mapControl: MapControlService,
+    private router: Router,
     private informeService: InformeService,
     private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
-    this.reportControlService.selectedInformeId$
-      .pipe(
-        switchMap((informeId) => {
-          return this.informeService.getInforme(informeId);
-        })
-      )
-      .subscribe((informe) => {
-        this.informe = informe;
-      });
+    // si cargamos vista informe directamente, nos subscribimos al informe seleccionado
+    if (this.router.url.includes('fixed') || this.router.url.includes('tracker')) {
+      this.subscription.add(
+        this.reportControlService.selectedInformeId$
+          .pipe(switchMap((informeId) => this.informeService.getInforme(informeId)))
+          .subscribe((informe) => {
+            this.informe = informe;
+          })
+      );
+    }
+
+    this.router.events.subscribe((event: Event) => {
+      if (event instanceof NavigationStart) {
+        if (event.url.includes('fixed') || event.url.includes('tracker')) {
+          // si navegamos a vista informe nos suscribimos al informe seleccionado
+          this.subscription.add(
+            this.reportControlService.selectedInformeId$
+              .pipe(switchMap((informeId) => this.informeService.getInforme(informeId)))
+              .subscribe((informe) => {
+                this.informe = informe;
+              })
+          );
+        } else {
+          // sino cancelamos la suscripcion
+          this.subscription.unsubscribe();
+          this.informe = undefined;
+        }
+      }
+    });
   }
 }
