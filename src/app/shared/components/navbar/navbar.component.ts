@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationStart, Router, Event } from '@angular/router';
 
 import { switchMap } from 'rxjs/operators';
 
@@ -9,6 +9,7 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { ThemeService } from '@core/services/theme.service';
 
 import { InformeInterface } from '@core/models/informe';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -19,6 +20,7 @@ export class NavbarComponent implements OnInit {
   public numPlantas: number;
   public potenciaTotal: number;
   public load = false;
+  private subscription: Subscription = new Subscription();
 
   public isShared = false;
   public userLogged: boolean;
@@ -50,15 +52,35 @@ export class NavbarComponent implements OnInit {
       });
     }
 
-    this.reportControlService.selectedInformeId$
-      .pipe(
-        switchMap((informeId) => {
-          return this.informeService.getInforme(informeId);
-        })
-      )
-      .subscribe((informe) => {
-        this.informe = informe;
-      });
+    // si cargamos vista informe directamente, nos subscribimos al informe seleccionado
+    if (this.router.url.includes('fixed') || this.router.url.includes('tracker')) {
+      this.subscription.add(
+        this.reportControlService.selectedInformeId$
+          .pipe(switchMap((informeId) => this.informeService.getInforme(informeId)))
+          .subscribe((informe) => {
+            this.informe = informe;
+          })
+      );
+    }
+
+    this.router.events.subscribe((event: Event) => {
+      if (event instanceof NavigationStart) {
+        if (event.url.includes('fixed') || event.url.includes('tracker')) {
+          // si navegamos a vista informe nos suscribimos al informe seleccionado
+          this.subscription.add(
+            this.reportControlService.selectedInformeId$
+              .pipe(switchMap((informeId) => this.informeService.getInforme(informeId)))
+              .subscribe((informe) => {
+                this.informe = informe;
+              })
+          );
+        } else {
+          // sino cancelamos la suscripcion
+          this.subscription.unsubscribe();
+          this.informe = undefined;
+        }
+      }
+    });
 
     // this.themeService.themeSelected$.subscribe((theme) => (this.themeSelected = theme));
   }

@@ -1,16 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-reports',
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.css'],
 })
-export class ReportsComponent implements OnInit {
+export class ReportsComponent implements OnInit, OnDestroy {
   numPlantas = 0;
   potenciaTotal = 0;
   public mapLoaded = false;
+  private subscription: Subscription = new Subscription();
 
   constructor(private portfolioControlService: PortfolioControlService) {}
 
@@ -31,5 +33,9 @@ export class ReportsComponent implements OnInit {
         });
       })
     ); */
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 }
