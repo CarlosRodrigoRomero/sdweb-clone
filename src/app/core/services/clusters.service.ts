@@ -33,7 +33,7 @@ export class ClustersService {
   public vueloId$ = new BehaviorSubject<string>(this.vueloId);
   private plantaId: string;
   private _planta: PlantaInterface = {};
-  private planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
+  public planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
   map: Map;
   puntosTrayectoria: PuntoTrayectoria[] = [];
   puntosTrayectoria$ = new BehaviorSubject<PuntoTrayectoria[]>(this.puntosTrayectoria);

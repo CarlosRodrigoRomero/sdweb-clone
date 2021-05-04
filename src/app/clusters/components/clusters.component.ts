@@ -8,10 +8,12 @@ import { ClustersService } from '@core/services/clusters.service';
 })
 export class ClustersComponent implements OnInit {
   public trayectoriaLoaded = false;
+  public nombrePlanta: string;
 
   constructor(private clustersService: ClustersService) {}
 
   ngOnInit(): void {
     this.clustersService.initService().subscribe((v) => (this.trayectoriaLoaded = v));
+    this.clustersService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre));
   }
 }

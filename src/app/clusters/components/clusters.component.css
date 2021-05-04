@@ -13,6 +13,11 @@ mat-spinner {
 .right-bar {
   display: flex;
   flex-direction: column;
+  background: white;
+}
+
+.right-bar h4 {
+  margin: 1rem;
 }
 
 .mat-stepper-vertical {
