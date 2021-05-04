@@ -21,7 +21,6 @@ import { InformeService } from './informe.service';
 import { PuntoTrayectoria } from '@core/models/puntoTrayectoria';
 import { PlantaInterface } from '@core/models/planta';
 import { Cluster } from '@core/models/cluster';
-import { query } from '@angular/animations';
 
 @Injectable({
   providedIn: 'root',
@@ -149,11 +148,6 @@ export class ClustersService {
   }
 
   private getClusters(): Observable<Cluster[]> {
-    /* this.clustersRef
-      .get()
-      .toPromise()
-      .then((query) => query.size); */
-
     this.clustersRef
       .snapshotChanges()
       .pipe(

@@ -351,8 +351,6 @@ export class MapClustersComponent implements OnInit {
             const puntoSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
 
             const cluster: Cluster = {
-              // extremoA: [this.puntoTrayectoriaSelected.long, this.puntoTrayectoriaSelected.lat],
-              // extremoB: [puntoSelected.long, puntoSelected.lat],
               puntoAId: this.puntoTrayectoriaSelected.id,
               puntoBId: puntoSelected.id,
             };
@@ -588,17 +586,23 @@ export class MapClustersComponent implements OnInit {
 
   private esPuntoCluster(punto: PuntoTrayectoria): boolean {
     let clusterEquivalente = this.clusters.find((cluster) => {
-      const puntoA = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoAId);
-      // tslint:disable-next-line: triple-equals
-      return punto.long == puntoA.long && punto.lat == puntoA.lat;
+      const puntoA = this.puntosTrayectoria.find((p) => p.id === cluster.puntoAId);
+
+      if (puntoA !== undefined) {
+        // tslint:disable-next-line: triple-equals
+        return punto.long == puntoA.long && punto.lat == puntoA.lat;
+      }
     });
     if (clusterEquivalente) {
       return true;
     } else {
       clusterEquivalente = this.clusters.find((cluster) => {
-        const puntoB = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoBId);
-        // tslint:disable-next-line: triple-equals
-        return punto.long == puntoB.long && punto.lat == puntoB.lat;
+        const puntoB = this.puntosTrayectoria.find((p) => p.id === cluster.puntoBId);
+
+        if (puntoB !== undefined) {
+          // tslint:disable-next-line: triple-equals
+          return punto.long == puntoB.long && punto.lat == puntoB.lat;
+        }
       });
       if (clusterEquivalente) {
         return true;
