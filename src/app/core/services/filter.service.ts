@@ -2,14 +2,12 @@ import { Injectable } from '@angular/core';
 
 import { Observable, BehaviorSubject } from 'rxjs';
 
-import { AnomaliaService } from './anomalia.service';
 import { ShareReportService } from '@core/services/share-report.service';
 import { SeguidorService } from '@core/services/seguidor.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
 import { FilterableElement } from '@core/models/filtrableInterface';
 import { FilterInterface } from '@core/models/filter';
-import { take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -32,21 +30,39 @@ export class FilterService {
   );
 
   constructor(
-    private anomaliaService: AnomaliaService,
     private shareReportService: ShareReportService,
     private seguidorService: SeguidorService,
     private filterControlService: FilterControlService
   ) {}
 
-  initService(plantaId: string, plantaFija: boolean, elems: FilterableElement[]): Observable<boolean> {
+  initService(
+    plantaId: string,
+    plantaFija: boolean,
+    elems: FilterableElement[],
+    shared?: boolean,
+    sharedId?: string
+  ): Observable<boolean> {
     if (plantaFija) {
       this.allFiltrableElements = elems;
       this.filteredElements = elems;
 
+      if (shared) {
+        this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params));
+
+        // obtenemos lo filtros guardados en al DB y los añadimos
+        this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
+          if (filters.length > 0) {
+            this.addFilters(filters);
+
+            this.initialized$.next(true);
+          }
+        });
+      } else {
+        this.initialized$.next(true);
+      }
+
       // para contabilizar los diferentes filtros 'tipo'
       this.filteredElementsWithoutFilterTipo = elems;
-
-      this.initialized$.next(true);
     } else {
       this.seguidorService.getSeguidoresPlanta$(plantaId).subscribe((seguidores) => {
         this.allFiltrableElements = seguidores;
@@ -97,9 +113,9 @@ export class FilterService {
           // obtenemos un array de las elems filtrados por cada filtro de  diferente tipo
           this.filters
             .filter((fil) => fil.type === type)
-            .forEach((fil) => {
-              fil.applyFilter(this._allFiltrableElements).forEach((elem) => newFiltrableElements.push(elem));
-            });
+            .forEach((fil) =>
+              fil.applyFilter(this.allFiltrableElements).forEach((elem) => newFiltrableElements.push(elem))
+            );
           // añadimos un array de cada tipo
           everyFilterFiltrableElements.push(newFiltrableElements);
         }
@@ -110,7 +126,7 @@ export class FilterService {
     this.filters
       .filter((fil) => !this.multipleFilters.includes(fil.type))
       .forEach((fil) => {
-        const newFiltrableElements = fil.applyFilter(this._allFiltrableElements);
+        const newFiltrableElements = fil.applyFilter(this.allFiltrableElements);
         everyFilterFiltrableElements.push(newFiltrableElements);
       });
 
@@ -123,19 +139,13 @@ export class FilterService {
 
     // comprobamos que hay algun filtro activo
     if (everyFilterFiltrableElements.length === 0) {
-      this.filteredElements = this._allFiltrableElements;
+      this.filteredElements = this.allFiltrableElements;
     }
 
     this.filteredElements$.next(this.filteredElements);
 
     // para calcular el numero de anomalias por filtro tipo
     this.excludeTipoFilters();
-  }
-
-  getAllTypeFilters(type: string) {
-    this.filtersByType = this.filters.filter((filter) => filter.type === type);
-    this.filtersByType$.next(this.filtersByType);
-    return this.filtersByType$.asObservable();
   }
 
   getAllFilters(): Observable<FilterInterface[]> {
@@ -183,7 +193,7 @@ export class FilterService {
             this.filters
               .filter((filter) => filter.type === type)
               .forEach((filter) => {
-                filter.applyFilter(this._allFiltrableElements).forEach((pc) => newFiltrableElements.push(pc));
+                filter.applyFilter(this.allFiltrableElements).forEach((pc) => newFiltrableElements.push(pc));
               });
             // añadimos un array de cada tipo
             everyFilterFiltrableElements.push(newFiltrableElements);
@@ -195,7 +205,7 @@ export class FilterService {
     this.filters
       .filter((filter) => !this.multipleFilters.includes(filter.type))
       .forEach((filter) => {
-        const newFiltrableElements = filter.applyFilter(this._allFiltrableElements);
+        const newFiltrableElements = filter.applyFilter(this.allFiltrableElements);
         everyFilterFiltrableElements.push(newFiltrableElements);
       });
 
@@ -208,7 +218,7 @@ export class FilterService {
 
     // comprobamos que hay algun filtro activo
     if (everyFilterFiltrableElements.length === 0) {
-      this.filteredElementsWithoutFilterTipo = this._allFiltrableElements;
+      this.filteredElementsWithoutFilterTipo = this.allFiltrableElements;
     }
 
     this.filteredElementsWithoutFilterTipo$.next(this.filteredElementsWithoutFilterTipo);
