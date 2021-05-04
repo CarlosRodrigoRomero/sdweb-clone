@@ -30,6 +30,6 @@ import { ConfianzaFilterComponent } from './components/confianza-filter/confianz
     ConfianzaFilterComponent,
   ],
   imports: [CommonModule, SharedModule],
-  exports: [FiltersPanelComponent],
+  exports: [FiltersPanelComponent, ConfianzaFilterComponent],
 })
 export class FiltersModule {}

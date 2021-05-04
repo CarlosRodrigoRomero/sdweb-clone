@@ -1,15 +1,10 @@
-<mat-card>
-  <mat-card-content>
-    <div class="opacity-slider-group">
-      <span>Opacidad</span>
-      <mat-slider
-        class="opacity-slider"
-        [value]="100"
-        [max]="max"
-        [min]="min"
-        id="slider-opacidad-termico"
-        (input)="onChangeSlider($event)"
-      ></mat-slider>
-    </div>
-  </mat-card-content>
-</mat-card>
+<div>
+  <span>Confianza</span>
+  <mat-slider
+    class="confianza-slider"
+    [value]="0"
+    [max]="max"
+    [min]="min"
+    (input)="onChangeSlider($event)"
+  ></mat-slider>
+</div>

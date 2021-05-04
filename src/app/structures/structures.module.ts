@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 
 import { StructuresRoutingModule } from './structures-routing.module';
 import { SharedModule } from '@shared/shared.module';
+import { FiltersModule } from '@filters/filters.module';
 
 import { StructuresComponent } from './components/structures.component';
 import { MapStructuresComponent } from './components/map-structures/map-structures.component';
 
 @NgModule({
   declarations: [StructuresComponent, MapStructuresComponent],
-  imports: [CommonModule, StructuresRoutingModule, SharedModule],
+  imports: [CommonModule, StructuresRoutingModule, SharedModule, FiltersModule],
 })
 export class StructuresModule {}
