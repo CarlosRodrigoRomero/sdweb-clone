@@ -1,7 +1,7 @@
 mat-spinner {
   position: absolute;
   top: 200px;
-  left: 60%;
+  left: 50%;
   transform: translate(50%, 0%);
 }
 

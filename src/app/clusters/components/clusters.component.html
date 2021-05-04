@@ -1,11 +1,11 @@
 <div>
   <app-navbar> </app-navbar>
-  <div class="cluster-grid">
+  <mat-spinner *ngIf="!trayectoriaLoaded"></mat-spinner>
+  <div class="cluster-grid" *ngIf="trayectoriaLoaded">
     <div class="right-bar">
       <app-image-point-cluster></app-image-point-cluster>
       <app-clusters-control></app-clusters-control>
     </div>
-    <mat-spinner *ngIf="!trayectoriaLoaded"></mat-spinner>
-    <app-map-clusters *ngIf="trayectoriaLoaded"></app-map-clusters>
+    <app-map-clusters></app-map-clusters>
   </div>
 </div>
