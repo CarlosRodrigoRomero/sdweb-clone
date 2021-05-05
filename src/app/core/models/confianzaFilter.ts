@@ -13,7 +13,7 @@ export class ConfianzaFilter implements FilterInterface {
   }
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
-    return elems.filter((elem) => (elem as ModuloBruto).confianza < this.confianza);
+    return elems.filter((elem) => (elem as ModuloBruto).confianza <= this.confianza);
   }
   unapplyFilter(elems: FilterableElement[]): FilterableElement[] {
     return null;
