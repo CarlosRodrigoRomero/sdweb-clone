@@ -11,6 +11,19 @@
   margin-top: 16px;
 }
 
+.delete-mode-warn {
+  position: absolute;
+  left: 60%;
+  transform: translate(-50%, 0%);
+  top: 6rem;
+  padding: 0.5rem;
+}
+
+.delete-mode-warn mat-card-subtitle {
+  color: red;
+  font-weight: 500;
+}
+
 app-thermal-slider {
   position: absolute;
   left: 60%;
