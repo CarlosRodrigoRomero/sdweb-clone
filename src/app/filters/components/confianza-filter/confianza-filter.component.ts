@@ -12,8 +12,8 @@ import { ConfianzaFilter } from '@core/models/confianzaFilter';
   styleUrls: ['./confianza-filter.component.css'],
 })
 export class ConfianzaFilterComponent implements OnInit {
-  min: number = 0;
-  max: number = 1;
+  min = 0;
+  max = 1;
   step = 0.1;
 
   constructor(private filterService: FilterService) {}
