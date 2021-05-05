@@ -12,13 +12,15 @@
           </div>
           <div>
             <button mat-raised-button *ngIf="!deleteMode" (click)="switchDeleteMode()">
-              Activar modo eliminar módulos
+              <mat-icon>delete</mat-icon>
+              <span>Activar modo eliminar</span>
             </button>
             <button mat-raised-button *ngIf="deleteMode" (click)="switchDeleteMode()">
-              Desactivar modo eliminar módulos
+              <mat-icon>cancel</mat-icon>
+              <span>Desactivar modo eliminar</span>
             </button>
           </div>
-          <div>
+          <div class="next-button">
             <button mat-stroked-button matStepperNext>Siguiente</button>
           </div>
         </mat-step>

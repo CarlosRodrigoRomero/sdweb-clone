@@ -11,6 +11,14 @@
   margin-top: 16px;
 }
 
+mat-icon {
+  margin-right: 0.5rem;
+}
+
+.next-button {
+  margin-top: 1rem;
+}
+
 .delete-mode-warn {
   position: absolute;
   left: 60%;
