@@ -16,8 +16,9 @@ import { ClipboardModule } from 'ngx-clipboard';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { SpinnerComponent } from './components/spinner/spinner.component';
 import { ThermalSliderComponent } from './components/thermal-slider/thermal-slider.component';
+import { PlantSummaryComponent } from './components/plant-summary/plant-summary.component';
 
-const components = [NavbarComponent, SpinnerComponent, ThermalSliderComponent];
+const components = [NavbarComponent, SpinnerComponent, ThermalSliderComponent, PlantSummaryComponent];
 const modules = [CommonModule, RouterModule, MaterialModule, NgxSliderModule, FormsModule, ReactiveFormsModule];
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];
 

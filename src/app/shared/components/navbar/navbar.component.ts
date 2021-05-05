@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AuthService } from '@core/services/auth.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 import { ThemeService } from '@core/services/theme.service';
 
@@ -14,10 +15,16 @@ export class NavbarComponent implements OnInit {
   public isShared = false;
   public userLogged: boolean;
   public isAdmin: boolean;
+  public showPlantSummary = false;
 
   public themeSelected = 'light-theme';
 
-  constructor(public authService: AuthService, private router: Router, private themeService: ThemeService) {}
+  constructor(
+    public authService: AuthService,
+    private router: Router,
+    private themeService: ThemeService,
+    private reportControlService: ReportControlService
+  ) {}
 
   ngOnInit() {
     // si el enlace es compartido no requerimos estar loggeado
@@ -29,6 +36,8 @@ export class NavbarComponent implements OnInit {
         this.isAdmin = this.authService.userIsAdmin(user);
       });
     }
+
+    this.reportControlService.initialized$.subscribe((init) => (this.showPlantSummary = init));
 
     // this.themeService.themeSelected$.subscribe((theme) => (this.themeSelected = theme));
   }

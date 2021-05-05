@@ -5,17 +5,16 @@ import { switchMap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import { InformeService } from '@core/services/informe.service';
-import { MapControlService } from '../../services/map-control.service';
 import { ReportControlService } from '@core/services/report-control.service';
 
 import { InformeInterface } from '@core/models/informe';
 
 @Component({
-  selector: 'app-barra-resumen-planta',
-  templateUrl: './barra-resumen-planta.component.html',
-  styleUrls: ['./barra-resumen-planta.component.css'],
+  selector: 'app-plant-summary',
+  templateUrl: './plant-summary.component.html',
+  styleUrls: ['./plant-summary.component.css'],
 })
-export class BarraResumenPlantaComponent implements OnInit {
+export class PlantSummaryComponent implements OnInit {
   nombrePlanta = 'Planta demo';
   potenciaPlanta = 1;
   tipoPlanta = 'fija';
@@ -23,7 +22,6 @@ export class BarraResumenPlantaComponent implements OnInit {
   private subscription: Subscription = new Subscription();
 
   constructor(
-    private mapControl: MapControlService,
     private router: Router,
     private informeService: InformeService,
     private reportControlService: ReportControlService

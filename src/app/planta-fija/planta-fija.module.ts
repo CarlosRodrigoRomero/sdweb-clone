@@ -14,7 +14,6 @@ import { FiltersModule } from '../filters/filters.module';
 import { FilterPcsListComponent } from './components/filter-pcs-list/filter-pcs-list.component';
 import { ChartSankeyComponent } from './planta-stats/chart-sankey/chart-sankey.component';
 import { ShareMapComponent } from './components/share-map/share-map.component';
-import { BarraResumenPlantaComponent } from './components/barra-resumen-planta/barra-resumen-planta.component';
 import { ChartAnomaliasZonasComponent } from './planta-stats/chart-anomalias-zonas/chart-anomalias-zonas.component';
 import { ChartPctCelsComponent } from './planta-stats/chart-pct-cels/chart-pct-cels.component';
 import { ChartCelsTempsComponent } from './planta-stats/chart-cels-temps/chart-cels-temps.component';
@@ -42,7 +41,6 @@ import { ChartMaeGlobalComponent } from './planta-stats/chart-mae-global/chart-m
     FilterPcsListComponent,
     ChartSankeyComponent,
     ShareMapComponent,
-    BarraResumenPlantaComponent,
     ChartAnomaliasZonasComponent,
     ChartPctCelsComponent,
     ChartCelsTempsComponent,

@@ -31,7 +31,7 @@ export class ReportControlService {
   private informesList: string[] = [];
   public informesList$ = new BehaviorSubject<string[]>(this.informesList);
   private _initialized = false;
-  private initialized$ = new BehaviorSubject<boolean>(this._initialized);
+  public initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _mapLoaded = false;
   public mapLoaded$ = new BehaviorSubject<boolean>(this._mapLoaded);
   public criterioCoA;
