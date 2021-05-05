@@ -21,6 +21,8 @@ export class StructuresService {
   private planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
+  private _deleteMode = false;
+  public deleteMode$ = new BehaviorSubject<boolean>(this._deleteMode);
 
   constructor(
     private router: Router,
@@ -66,6 +68,44 @@ export class StructuresService {
     return query$;
   }
 
+  getModulosBrutosDeleted(thermalLayerId: string): Observable<any[]> {
+    const query$ = this.afs
+      .collection('thermalLayers/' + thermalLayerId + '/filters')
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((doc) => {
+            const data = doc.payload.doc.data();
+
+            return data;
+          })
+        )
+      );
+    return query$;
+  }
+
+  saveFilters(
+    thermalLayerId: string,
+    deletedIds?: string[],
+    confianzaMult?: number,
+    aspectRatioMult?: number,
+    areaMult?: number
+  ) {
+    const colRef = this.afs.collection('thermalLayers/' + thermalLayerId + '/filters');
+
+    colRef
+      .doc('filter')
+      .set({
+        eliminados: deletedIds,
+      })
+      .then(() => {
+        console.log('Filtros guardados correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al guardar filtros: ', error);
+      });
+  }
+
   get planta() {
     return this._planta;
   }
@@ -81,5 +121,14 @@ export class StructuresService {
 
   set informeId(value: string) {
     this._informeId = value;
+  }
+
+  get deleteMode() {
+    return this._deleteMode;
+  }
+
+  set deleteMode(value: boolean) {
+    this._deleteMode = value;
+    this.deleteMode$.next(value);
   }
 }

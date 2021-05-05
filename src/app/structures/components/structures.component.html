@@ -11,7 +11,15 @@
             <app-area-modulo-bruto-filter></app-area-modulo-bruto-filter>
           </div>
           <div>
-            <button mat-button matStepperNext>Siguiente</button>
+            <button mat-raised-button *ngIf="!deleteMode" (click)="switchDeleteMode()">
+              Activar modo eliminar módulos
+            </button>
+            <button mat-raised-button *ngIf="deleteMode" (click)="switchDeleteMode()">
+              Desactivar modo eliminar módulos
+            </button>
+          </div>
+          <div>
+            <button mat-stroked-button matStepperNext>Siguiente</button>
           </div>
         </mat-step>
         <mat-step>

@@ -221,7 +221,7 @@ export class ClustersService {
       .doc(id)
       .set(cluster)
       .then((docRef) => {
-        console.log('Cluster creado correctemente');
+        console.log('Cluster creado correctamente');
       })
       .catch((error) => {
         console.error('Error creando cluster: ', error);

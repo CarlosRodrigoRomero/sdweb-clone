@@ -10,7 +10,7 @@ import { fromLonLat, transformExtent } from 'ol/proj';
 import { defaults as defaultControls } from 'ol/control.js';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import { Stroke, Style } from 'ol/style';
+import { Fill, Stroke, Style } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
 
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
@@ -26,6 +26,9 @@ import { FilterService } from '@core/services/filter.service';
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { ModuloBruto } from '@core/models/moduloBruto';
+import { Select } from 'ol/interaction';
+import { click } from 'ol/events/condition';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-map-structures',
@@ -42,6 +45,8 @@ export class MapStructuresComponent implements OnInit {
   private thermalLayers: TileLayer[];
   private extent1: any;
   private modulosBrutos: ModuloBruto[];
+  private deleteMode = false;
+  private mBDeletedIds: string[] = [];
 
   constructor(
     private olMapService: OlMapService,
@@ -56,6 +61,8 @@ export class MapStructuresComponent implements OnInit {
     this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
     this.planta = this.structuresService.planta;
+
+    this.structuresService.deleteMode$.subscribe((mode) => (this.deleteMode = mode));
 
     const informeId = this.structuresService.informeId;
 
@@ -73,6 +80,9 @@ export class MapStructuresComponent implements OnInit {
 
         this.createModulosBrutosLayer();
         this.addModulosBrutos();
+
+        this.addPointerOnHover();
+        this.addSelectModuloBrutoInteraction();
       });
   }
 
@@ -169,14 +179,27 @@ export class MapStructuresComponent implements OnInit {
             .find((layer) => layer.getProperties().id === 'mBLayer') as VectorLayer;
           const mBSource = mBLayer.getSource();
 
-          this.filterService.filteredElements$.subscribe((elems) => {
+          combineLatest([
+            this.filterService.filteredElements$,
+            this.structuresService.getModulosBrutosDeleted(this.thermalLayer.id),
+          ]).subscribe(([elems, filters]) => {
             mBSource.clear();
 
-            this.modulosBrutos = elems as ModuloBruto[];
+            this.mBDeletedIds = filters[0].eliminados;
+
+            if (this.mBDeletedIds) {
+              this.modulosBrutos = (elems as ModuloBruto[]).filter((mB) => !this.mBDeletedIds.includes(mB.id));
+            } else {
+              this.modulosBrutos = elems as ModuloBruto[];
+            }
 
             this.modulosBrutos.forEach((mB) => {
               const feature = new Feature({
                 geometry: new Polygon([mB.coords]),
+                properties: {
+                  id: mB.id,
+                  name: 'moduloBruto',
+                },
               });
 
               mBSource.addFeature(feature);
@@ -184,6 +207,67 @@ export class MapStructuresComponent implements OnInit {
           });
         }
       });
+  }
+
+  private addPointerOnHover() {
+    this.map.on('pointermove', (event) => {
+      if (this.deleteMode) {
+        if (this.map.hasFeatureAtPixel(event.pixel)) {
+          let feature = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined);
+          feature = feature.filter((item) => item.getProperties().properties.name === 'moduloBruto');
+
+          if (feature.length > 0) {
+            // cambia el puntero por el de seleccionar
+            this.map.getViewport().style.cursor = 'pointer';
+          } else {
+            // vuelve a poner el puntero normal
+            this.map.getViewport().style.cursor = 'inherit';
+          }
+        } else {
+          // vuelve a poner el puntero normal
+          this.map.getViewport().style.cursor = 'inherit';
+        }
+      }
+    });
+  }
+
+  private addSelectModuloBrutoInteraction() {
+    const select = new Select({
+      style: new Style({
+        fill: new Fill({
+          color: 'rgba(0,0,0,0)',
+        }),
+      }),
+      condition: click,
+      layers: (l) => {
+        if (l.getProperties().id === 'mBLayer') {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    });
+
+    this.map.addInteraction(select);
+
+    select.on('select', (e) => {
+      if (this.deleteMode) {
+        if (e.selected.length > 0) {
+          if (e.selected[0].getProperties().properties.name === 'moduloBruto') {
+            let deletedIds: string[];
+            if (this.mBDeletedIds !== undefined) {
+              deletedIds = this.mBDeletedIds.concat(e.selected[0].getProperties().properties.id);
+            } else {
+              deletedIds = [e.selected[0].getProperties().properties.id];
+            }
+
+            this.structuresService.saveFilters(this.thermalLayer.id, deletedIds);
+          }
+        }
+      }
+    });
   }
 
   private transform(extent) {
