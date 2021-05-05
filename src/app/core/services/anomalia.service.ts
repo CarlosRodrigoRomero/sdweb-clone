@@ -33,7 +33,7 @@ export class AnomaliaService {
 
   initService(plantaId: string) {
     // obtenemos el criterio de CoA de la planta
-    const critCoA$ = this.plantaService
+    this.plantaService
       .getPlanta(plantaId)
       .pipe(
         take(1),

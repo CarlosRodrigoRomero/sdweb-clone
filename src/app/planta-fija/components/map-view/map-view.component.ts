@@ -20,10 +20,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   public notSharedReport = true;
   public showFilters = true;
   public mapLoaded = false;
-
-  private susInitService: Subscription;
-  private susSharedWithFilters: Subscription;
-  private susSharedReport: Subscription;
+  private subscriptions: Subscription = new Subscription();
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
@@ -32,19 +29,15 @@ export class MapViewComponent implements OnInit, OnDestroy {
   constructor(private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    this.susInitService = this.reportControlService.initService().subscribe((value) => (this.anomaliasLoaded = value));
-    this.susSharedWithFilters = this.reportControlService.sharedReportWithFilters$.subscribe((value) => {
-      this.showFilters = value;
-    });
-    this.susSharedReport = this.reportControlService.sharedReport$.subscribe(
-      (value) => (this.notSharedReport = !value)
+    this.subscriptions.add(this.reportControlService.initService().subscribe((value) => (this.anomaliasLoaded = value)));
+    this.subscriptions.add(
+      this.reportControlService.sharedReportWithFilters$.subscribe((value) => (this.showFilters = value))
     );
+    this.subscriptions.add(this.reportControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value)));
   }
 
   ngOnDestroy(): void {
     // nos desuscribimos de los observables
-    this.susInitService.unsubscribe();
-    this.susSharedWithFilters.unsubscribe();
-    this.susSharedReport.unsubscribe();
+    this.subscriptions.unsubscribe();
   }
 }

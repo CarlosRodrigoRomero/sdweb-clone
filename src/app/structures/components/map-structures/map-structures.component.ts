@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
@@ -11,6 +11,7 @@ import { defaults as defaultControls } from 'ol/control.js';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Stroke, Style } from 'ol/style';
+import Polygon from 'ol/geom/Polygon';
 
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
@@ -20,11 +21,11 @@ import { StructuresService } from '@core/services/structures.service';
 import { InformeService } from '@core/services/informe.service';
 import { GLOBAL } from '@core/services/global';
 import { ThermalService } from '@core/services/thermal.service';
+import { FilterService } from '@core/services/filter.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { ModuloBruto } from '@core/models/moduloBruto';
-import Polygon from 'ol/geom/Polygon';
 
 @Component({
   selector: 'app-map-structures',
@@ -46,7 +47,8 @@ export class MapStructuresComponent implements OnInit {
     private olMapService: OlMapService,
     private structuresService: StructuresService,
     private informeService: InformeService,
-    private thermalService: ThermalService
+    private thermalService: ThermalService,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
@@ -156,22 +158,32 @@ export class MapStructuresComponent implements OnInit {
   }
 
   private addModulosBrutos() {
-    this.thermalService.getModulosBrutos(this.thermalLayer.id).subscribe((modulos) => {
-      this.modulosBrutos = modulos;
-      const mBLayer = this.map
-        .getLayers()
-        .getArray()
-        .find((layer) => layer.getProperties().id === 'mBLayer') as VectorLayer;
-      const mBSource = mBLayer.getSource();
+    this.structuresService
+      .getModulosBrutos(this.thermalLayer.id)
+      .pipe(switchMap((modulos) => this.filterService.initService(this.planta.id, true, modulos)))
+      .subscribe((init) => {
+        if (init) {
+          const mBLayer = this.map
+            .getLayers()
+            .getArray()
+            .find((layer) => layer.getProperties().id === 'mBLayer') as VectorLayer;
+          const mBSource = mBLayer.getSource();
 
-      this.modulosBrutos.forEach((mB) => {
-        const feature = new Feature({
-          geometry: new Polygon([mB.coords]),
-        });
+          this.filterService.filteredElements$.subscribe((elems) => {
+            mBSource.clear();
 
-        mBSource.addFeature(feature);
+            this.modulosBrutos = elems as ModuloBruto[];
+
+            this.modulosBrutos.forEach((mB) => {
+              const feature = new Feature({
+                geometry: new Polygon([mB.coords]),
+              });
+
+              mBSource.addFeature(feature);
+            });
+          });
+        }
       });
-    });
   }
 
   private transform(extent) {

@@ -7,11 +7,11 @@ import { FilterService } from '@core/services/filter.service';
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 
 @Component({
-  selector: 'app-confianza-filter',
-  templateUrl: './confianza-filter.component.html',
-  styleUrls: ['./confianza-filter.component.css'],
+  selector: 'app-area-modulo-bruto-filter',
+  templateUrl: './area-modulo-bruto-filter.component.html',
+  styleUrls: ['./area-modulo-bruto-filter.component.css'],
 })
-export class ConfianzaFilterComponent implements OnInit {
+export class AreaModuloBrutoFilterComponent implements OnInit {
   min = 0;
   max = 1;
   step = 0.1;

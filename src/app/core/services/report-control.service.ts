@@ -72,34 +72,43 @@ export class ReportControlService {
         .then((doc) => {
           if (doc.exists) {
             const params = doc.data() as ParamsFilterShare;
+
             this.plantaId = params.plantaId;
             this.selectedInformeId = params.informeId;
 
             if (this.router.url.includes('filterable')) {
+              let initAnomService = false;
               // iniciamos anomalia service antes de obtener las anomalias
               this.anomaliaService
                 .initService(this.plantaId)
                 .pipe(
-                  switchMap(() => this.informeService.getInformesDePlanta(this.plantaId)),
+                  switchMap((init) => {
+                    initAnomService = init;
+
+                    return this.informeService.getInformesDePlanta(this.plantaId);
+                  }),
                   // obtenemos los informes de la planta
-                  switchMap((informesId) => {
+                  switchMap((informes) => {
                     // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                    informesId
+                    informes
                       .sort((a, b) => a.fecha - b.fecha)
                       .forEach((informe) => {
                         this.informesList.push(informe.id);
                       });
                     this.informesList$.next(this.informesList);
 
-                    // obtenemos todas las anomalías
-                    return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
+                    // comprobamos que anomalia service hay terminado de iniciarse
+                    if (initAnomService) {
+                      // obtenemos todas las anomalías
+                      return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
+                    }
                   }),
                   take(1),
                   switchMap((anoms) => {
                     this.allFilterableElements = anoms;
 
                     // iniciamos filter service
-                    return this.filterService.initService(this.plantaId, true, anoms);
+                    return this.filterService.initService(this.plantaId, true, anoms, true, this.sharedId);
                   })
                 )
                 .subscribe((init) => (this.initialized = init));
@@ -114,7 +123,7 @@ export class ReportControlService {
                     this.allFilterableElements = anoms;
 
                     // iniciamos filter service
-                    return this.filterService.initService(this.plantaId, true, anoms);
+                    return this.filterService.initService(this.plantaId, true, anoms, true, this.sharedId);
                   })
                 )
                 // iniciamos filter service
@@ -128,21 +137,6 @@ export class ReportControlService {
     } else {
       // obtenemos plantaId de la url
       this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 1];
-
-      // obtenemos el criterio de CoA de la planta
-      this.plantaService
-        .getPlanta(this.plantaId)
-        .pipe(
-          take(1),
-          switchMap((planta) => {
-            if (planta.hasOwnProperty('criterioId')) {
-              return this.plantaService.getCriterio(planta.criterioId);
-            } else {
-              return this.plantaService.getCriterio(GLOBAL.criterioSolardroneId);
-            }
-          })
-        )
-        .subscribe((criterio) => (this.anomaliaService.criterioCoA = criterio.critCoA));
 
       // iniciamos anomalia service antes de obtener las anomalias
       this.anomaliaService

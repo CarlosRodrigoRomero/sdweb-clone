@@ -7,11 +7,11 @@ import { FilterService } from '@core/services/filter.service';
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 
 @Component({
-  selector: 'app-confianza-filter',
-  templateUrl: './confianza-filter.component.html',
-  styleUrls: ['./confianza-filter.component.css'],
+  selector: 'app-aspect-ratio-filter',
+  templateUrl: './aspect-ratio-filter.component.html',
+  styleUrls: ['./aspect-ratio-filter.component.css'],
 })
-export class ConfianzaFilterComponent implements OnInit {
+export class AspectRatioFilterComponent implements OnInit {
   min = 0;
   max = 1;
   step = 0.1;
@@ -22,7 +22,7 @@ export class ConfianzaFilterComponent implements OnInit {
 
   onChangeSlider(e: MatSliderChange) {
     // crea el filtro
-    const filtroConfianza = new ModuloBrutoFilter('confianza', e.value);
+    const filtroConfianza = new ModuloBrutoFilter('aspect-ratio', e.value);
 
     if (e.value === this.min) {
       // si se selecciona el mínimo desactivamos el filtro ...

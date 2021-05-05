@@ -14,7 +14,7 @@ export class SeveridadFilter implements FilterInterface {
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
     // tslint:disable-next-line: triple-equals
-    return elems.filter((elem) => elem.severidad == this.clase); 
+    return elems.filter((elem) => elem.severidad == this.clase);
   }
   unapplyFilter(elems: FilterableElement[]): FilterableElement[] {
     return null;
