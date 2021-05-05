@@ -2,25 +2,25 @@ import { FilterInterface } from './filter';
 import { FilterableElement } from './filtrableInterface';
 import { ModuloBruto } from './moduloBruto';
 
-export class ConfianzaFilter implements FilterInterface {
+export class ModuloBrutoFilter implements FilterInterface {
   id?: string;
   type: string;
-  multConfianza: number;
+  multiplier: number;
 
-  constructor(type: string, confianza: number) {
+  constructor(type: string, multiplier: number) {
     this.type = type;
-    this.multConfianza = confianza;
+    this.multiplier = multiplier;
   }
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
-    const confianzas = elems.map((elem) => (elem as ModuloBruto).confianza);
-    const confianzaMedia = this.average(confianzas);
-    const standardDesv = this.standardDeviation(confianzas);
+    const params = elems.map((elem) => (elem as ModuloBruto)[this.type]);
+    const paramsMedio = this.average(params);
+    const standardDesv = this.standardDeviation(params);
 
     return elems.filter(
       (elem) =>
-        (elem as ModuloBruto).confianza >= confianzaMedia - (1 - this.multConfianza) * standardDesv &&
-        (elem as ModuloBruto).confianza <= confianzaMedia + (1 - this.multConfianza) * standardDesv
+        (elem as ModuloBruto)[this.type] >= paramsMedio - (1 - this.multiplier) * standardDesv &&
+        (elem as ModuloBruto)[this.type] <= paramsMedio + (1 - this.multiplier) * standardDesv
     );
   }
 

@@ -5,7 +5,11 @@
       <mat-vertical-stepper [linear]="true" #stepper>
         <mat-step>
           <ng-template matStepLabel>Filtrar módulos</ng-template>
-          <app-confianza-filter></app-confianza-filter>
+          <div>
+            <app-confianza-filter></app-confianza-filter>
+            <app-aspect-ratio-filter></app-aspect-ratio-filter>
+            <app-area-modulo-bruto-filter></app-area-modulo-bruto-filter>
+          </div>
           <div>
             <button mat-button matStepperNext>Siguiente</button>
           </div>

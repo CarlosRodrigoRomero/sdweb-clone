@@ -1,0 +1,11 @@
+<div>
+  <span>Aspect Ratio</span>
+  <mat-slider
+    class="aspect-ratio-slider"
+    [value]="0"
+    [max]="max"
+    [min]="min"
+    [step]="step"
+    (input)="onChangeSlider($event)"
+  ></mat-slider>
+</div>
