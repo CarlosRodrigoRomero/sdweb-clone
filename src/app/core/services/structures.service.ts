@@ -93,17 +93,58 @@ export class StructuresService {
   ) {
     const colRef = this.afs.collection('thermalLayers/' + thermalLayerId + '/filters');
 
-    colRef
-      .doc('filter')
-      .set({
-        eliminados: deletedIds,
-      })
-      .then(() => {
-        console.log('Filtros guardados correctamente');
-      })
-      .catch((error) => {
-        console.error('Error al guardar filtros: ', error);
-      });
+    if (deletedIds) {
+      colRef
+        .doc('filter')
+        .update({
+          eliminados: deletedIds,
+        })
+        .then(() => {
+          console.log('Filtros guardados correctamente');
+        })
+        .catch((error) => {
+          console.error('Error al guardar filtros: ', error);
+        });
+    }
+    if (confianzaMult) {
+      colRef
+        .doc('filter')
+        .update({
+          confianza: confianzaMult,
+        })
+        .then(() => {
+          console.log('Filtros guardados correctamente');
+        })
+        .catch((error) => {
+          console.error('Error al guardar filtros: ', error);
+        });
+    }
+    if (aspectRatioMult !== undefined) {
+      colRef
+        .doc('filter')
+        .update({
+          aspectRatio: aspectRatioMult,
+        })
+        .then(() => {
+          console.log('Filtros guardados correctamente');
+        })
+        .catch((error) => {
+          console.error('Error al guardar filtros: ', error);
+        });
+    }
+    if (areaMult !== undefined) {
+      colRef
+        .doc('filter')
+        .update({
+          area: areaMult,
+        })
+        .then(() => {
+          console.log('Filtros guardados correctamente');
+        })
+        .catch((error) => {
+          console.error('Error al guardar filtros: ', error);
+        });
+    }
   }
 
   get planta() {
