@@ -16,6 +16,7 @@ import { ModuloBruto } from '@core/models/moduloBruto';
 import { FilterModuloBruto } from '@core/models/filterModuloBruto';
 import { FilterableElement } from '@core/models/filtrableInterface';
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
+import { ThermalLayerInterface } from '@core/models/thermalLayer';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +29,7 @@ export class StructuresService {
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _deleteMode = false;
   public deleteMode$ = new BehaviorSubject<boolean>(this._deleteMode);
+  private _thermalLayer: ThermalLayerInterface;
 
   constructor(
     private router: Router,
@@ -41,14 +43,22 @@ export class StructuresService {
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
     this.informeService
-      .getInforme(this._informeId)
+      .getInforme(this.informeId)
       .pipe(
         take(1),
         switchMap((informe) => this.plantaService.getPlanta(informe.plantaId))
       )
-      .pipe(take(1))
-      .subscribe((planta) => {
-        this.planta = planta;
+      .pipe(
+        take(1),
+        switchMap((planta) => {
+          this.planta = planta;
+
+          return this.informeService.getThermalLayer$(this.informeId);
+        })
+      )
+      .subscribe((layers) => {
+        this.thermalLayer = layers[0];
+
         this.initialized$.next(true);
       });
     return this.initialized$;
@@ -56,7 +66,7 @@ export class StructuresService {
 
   getModulosBrutos(thermalLayerId: string): Observable<ModuloBruto[]> {
     const query$ = this.afs
-      .collection<ModuloBruto>('thermalLayers/' + thermalLayerId + '/modulosEnBruto')
+      .collection<ModuloBruto>('thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto')
       .snapshotChanges()
       .pipe(
         map((actions) =>
@@ -76,7 +86,7 @@ export class StructuresService {
 
   getFiltersParams(thermalLayerId: string): Observable<FilterModuloBruto[]> {
     const query$ = this.afs
-      .collection('thermalLayers/' + thermalLayerId + '/filters')
+      .collection('thermalLayers/' + this.thermalLayer.id + '/filters')
       .snapshotChanges()
       .pipe(
         map((actions) =>
@@ -91,7 +101,7 @@ export class StructuresService {
   }
 
   saveFilter(thermalLayerId: string, filterType: string, value: any) {
-    const colRef = this.afs.collection('thermalLayers/' + thermalLayerId + '/filters');
+    const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/filters');
 
     colRef
       .doc('filter')
@@ -106,8 +116,8 @@ export class StructuresService {
       });
   }
 
-  deleteFilter(thermalLayerId: string, filterType: string) {
-    const colRef = this.afs.collection('thermalLayers/' + thermalLayerId + '/filters');
+  deleteFilter(filterType: string) {
+    const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/filters');
     colRef.doc('filter').update({
       [filterType]: firebase.firestore.FieldValue.delete(),
     });
@@ -145,6 +155,14 @@ export class StructuresService {
 
   set informeId(value: string) {
     this._informeId = value;
+  }
+
+  get thermalLayer() {
+    return this._thermalLayer;
+  }
+
+  set thermalLayer(value: ThermalLayerInterface) {
+    this._thermalLayer = value;
   }
 
   get deleteMode() {

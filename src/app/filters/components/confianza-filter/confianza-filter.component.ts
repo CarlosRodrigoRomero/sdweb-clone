@@ -58,7 +58,7 @@ export class ConfianzaFilterComponent implements OnInit {
       this.filterService.deleteFilter(filtroConfianza);
 
       // eliminamos el filtro de la DB
-      this.structuresService.deleteFilter(this.thermalLayer.id, 'confianzaM');
+      this.structuresService.deleteFilter('confianzaM');
     } else {
       // ... si no, lo añadimos
       this.filterService.addFilter(filtroConfianza);

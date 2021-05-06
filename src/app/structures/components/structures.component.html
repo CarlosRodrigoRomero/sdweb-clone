@@ -10,7 +10,7 @@
             <app-aspect-ratio-filter></app-aspect-ratio-filter>
             <app-area-modulo-bruto-filter></app-area-modulo-bruto-filter>
           </div>
-          <div>
+          <div class="delete-buttons">
             <button mat-raised-button *ngIf="!deleteMode" (click)="switchDeleteMode()">
               <mat-icon>delete</mat-icon>
               <span>Activar modo eliminar</span>
@@ -18,6 +18,12 @@
             <button mat-raised-button *ngIf="deleteMode" (click)="switchDeleteMode()">
               <mat-icon>cancel</mat-icon>
               <span>Desactivar modo eliminar</span>
+            </button>
+          </div>
+          <div class="restore-button">
+            <button mat-raised-button (click)="restoreDeletedModules()">
+              <mat-icon>restore_from_trash</mat-icon>
+              <span>Recuperar eliminados</span>
             </button>
           </div>
           <div class="next-button">

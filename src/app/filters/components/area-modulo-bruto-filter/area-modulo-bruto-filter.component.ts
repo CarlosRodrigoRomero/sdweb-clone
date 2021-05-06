@@ -57,7 +57,7 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
       this.filterService.deleteFilter(filtroArea);
 
       // eliminamos el filtro de la DB
-      this.structuresService.deleteFilter(this.thermalLayer.id, 'areaM');
+      this.structuresService.deleteFilter('areaM');
     } else {
       // ... si no, lo añadimos
       this.filterService.addFilter(filtroArea);

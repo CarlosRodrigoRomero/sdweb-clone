@@ -21,4 +21,8 @@ export class StructuresComponent implements OnInit {
   switchDeleteMode() {
     this.structuresService.deleteMode = !this.structuresService.deleteMode;
   }
+
+  restoreDeletedModules() {
+    this.structuresService.deleteFilter('eliminados');
+  }
 }

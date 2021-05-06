@@ -58,7 +58,7 @@ export class AspectRatioFilterComponent implements OnInit {
       this.filterService.deleteFilter(filtroAspectRatio);
 
       // eliminamos el filtro de la DB
-      this.structuresService.deleteFilter(this.thermalLayer.id, 'aspectRatioM');
+      this.structuresService.deleteFilter('aspectRatioM');
     } else {
       // ... si no, lo añadimos
       this.filterService.addFilter(filtroAspectRatio);

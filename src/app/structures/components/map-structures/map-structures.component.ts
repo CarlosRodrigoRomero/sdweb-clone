@@ -70,8 +70,10 @@ export class MapStructuresComponent implements OnInit {
       .getThermalLayer$(informeId)
       .pipe(take(1))
       .subscribe((layers) => {
+        // nos suscribimos a las capas termicas del mapa
         this.olMapService.getThermalLayers().subscribe((tLayers) => (this.thermalLayers = tLayers));
 
+        // esta es la thermalLayer de la DB
         this.thermalLayer = layers[0];
 
         this.olMapService.addThermalLayer(this.createThermalLayer(this.thermalLayer, informeId));
@@ -182,7 +184,6 @@ export class MapStructuresComponent implements OnInit {
           this.structuresService
             .getFiltersParams(this.thermalLayer.id)
             .pipe(
-              take(1),
               switchMap((filtParams) => {
                 this.structuresService.applyFilters(filtParams);
 
