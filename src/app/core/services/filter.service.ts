@@ -14,10 +14,9 @@ import { FilterInterface } from '@core/models/filter';
 })
 export class FilterService {
   private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad'];
+  private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   private filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
-  private filtersByType: FilterInterface[] = [];
-  private filtersByType$ = new BehaviorSubject<FilterInterface[]>(this.filtersByType);
   private _filteredElements: FilterableElement[] = [];
   public filteredElements$ = new BehaviorSubject<FilterableElement[]>(this.filteredElements);
   private _allFiltrableElements: FilterableElement[] = [];
@@ -88,8 +87,10 @@ export class FilterService {
     }
     this.filters$.next(this.filters);
 
-    // añadimos parametros para compartir
-    this.shareReportService.setParams(filter);
+    if (!this.otherFilters.includes(filter.type)) {
+      // añadimos parametros para compartir
+      this.shareReportService.setParams(filter);
+    }
 
     this.applyFilters();
   }
@@ -162,8 +163,10 @@ export class FilterService {
     }
     this.filters$.next(this.filters);
 
-    // reseteamos parametros para compartir
-    this.shareReportService.resetParams(filter);
+    if (!this.otherFilters.includes(filter.type)) {
+      // reseteamos parametros para compartir
+      this.shareReportService.resetParams(filter);
+    }
 
     this.applyFilters();
   }

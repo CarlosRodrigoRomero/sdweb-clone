@@ -2,15 +2,20 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AngularFirestore } from '@angular/fire/firestore';
+import * as firebase from 'firebase/app';
 
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import { PlantaService } from './planta.service';
 import { InformeService } from './informe.service';
+import { FilterService } from '@core/services/filter.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { ModuloBruto } from '@core/models/moduloBruto';
+import { FilterModuloBruto } from '@core/models/filterModuloBruto';
+import { FilterableElement } from '@core/models/filtrableInterface';
+import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +33,8 @@ export class StructuresService {
     private router: Router,
     private informeService: InformeService,
     private plantaService: PlantaService,
-    public afs: AngularFirestore
+    public afs: AngularFirestore,
+    private filterService: FilterService
   ) {}
 
   initService(): Observable<boolean> {
@@ -68,7 +74,7 @@ export class StructuresService {
     return query$;
   }
 
-  getModulosBrutosDeleted(thermalLayerId: string): Observable<any[]> {
+  getFiltersParams(thermalLayerId: string): Observable<FilterModuloBruto[]> {
     const query$ = this.afs
       .collection('thermalLayers/' + thermalLayerId + '/filters')
       .snapshotChanges()
@@ -84,66 +90,43 @@ export class StructuresService {
     return query$;
   }
 
-  saveFilters(
-    thermalLayerId: string,
-    deletedIds?: string[],
-    confianzaMult?: number,
-    aspectRatioMult?: number,
-    areaMult?: number
-  ) {
+  saveFilter(thermalLayerId: string, filterType: string, value: any) {
     const colRef = this.afs.collection('thermalLayers/' + thermalLayerId + '/filters');
 
-    if (deletedIds) {
-      colRef
-        .doc('filter')
-        .update({
-          eliminados: deletedIds,
-        })
-        .then(() => {
-          console.log('Filtros guardados correctamente');
-        })
-        .catch((error) => {
-          console.error('Error al guardar filtros: ', error);
-        });
+    colRef
+      .doc('filter')
+      .update({
+        [filterType]: value,
+      })
+      .then(() => {
+        console.log('Filtro guardado correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al guardar filtro: ', error);
+      });
+  }
+
+  deleteFilter(thermalLayerId: string, filterType: string) {
+    const colRef = this.afs.collection('thermalLayers/' + thermalLayerId + '/filters');
+    colRef.doc('filter').update({
+      [filterType]: firebase.firestore.FieldValue.delete(),
+    });
+  }
+
+  applyFilters(filters: FilterModuloBruto[]) {
+    const filter = filters[0];
+    if (filter.confianzaM !== undefined) {
+      const confianzaFilter = new ModuloBrutoFilter('confianzaM', filter.confianzaM);
+      this.filterService.addFilter(confianzaFilter);
     }
-    if (confianzaMult) {
-      colRef
-        .doc('filter')
-        .update({
-          confianza: confianzaMult,
-        })
-        .then(() => {
-          console.log('Filtros guardados correctamente');
-        })
-        .catch((error) => {
-          console.error('Error al guardar filtros: ', error);
-        });
+    if (filter.aspectRatioM !== undefined) {
+      const aspectRatioFilter = new ModuloBrutoFilter('aspectRatioM', filter.aspectRatioM);
+      this.filterService.addFilter(aspectRatioFilter);
     }
-    if (aspectRatioMult !== undefined) {
-      colRef
-        .doc('filter')
-        .update({
-          aspectRatio: aspectRatioMult,
-        })
-        .then(() => {
-          console.log('Filtros guardados correctamente');
-        })
-        .catch((error) => {
-          console.error('Error al guardar filtros: ', error);
-        });
-    }
-    if (areaMult !== undefined) {
-      colRef
-        .doc('filter')
-        .update({
-          area: areaMult,
-        })
-        .then(() => {
-          console.log('Filtros guardados correctamente');
-        })
-        .catch((error) => {
-          console.error('Error al guardar filtros: ', error);
-        });
+    if (filter.areaM !== undefined) {
+      // usamos 'areaM' para diferenciarlo del filtro 'area'
+      const areaFilter = new ModuloBrutoFilter('areaM', filter.areaM);
+      this.filterService.addFilter(areaFilter);
     }
   }
 

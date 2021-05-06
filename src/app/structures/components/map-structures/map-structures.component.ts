@@ -179,32 +179,39 @@ export class MapStructuresComponent implements OnInit {
             .find((layer) => layer.getProperties().id === 'mBLayer') as VectorLayer;
           const mBSource = mBLayer.getSource();
 
-          combineLatest([
-            this.filterService.filteredElements$,
-            this.structuresService.getModulosBrutosDeleted(this.thermalLayer.id),
-          ]).subscribe(([elems, filters]) => {
-            mBSource.clear();
+          this.structuresService
+            .getFiltersParams(this.thermalLayer.id)
+            .pipe(
+              take(1),
+              switchMap((filtParams) => {
+                this.structuresService.applyFilters(filtParams);
 
-            this.mBDeletedIds = filters[0].eliminados;
+                this.mBDeletedIds = filtParams[0].eliminados;
 
-            if (this.mBDeletedIds) {
-              this.modulosBrutos = (elems as ModuloBruto[]).filter((mB) => !this.mBDeletedIds.includes(mB.id));
-            } else {
-              this.modulosBrutos = elems as ModuloBruto[];
-            }
+                return this.filterService.filteredElements$;
+              })
+            )
+            .subscribe((elems) => {
+              mBSource.clear();
 
-            this.modulosBrutos.forEach((mB) => {
-              const feature = new Feature({
-                geometry: new Polygon([mB.coords]),
-                properties: {
-                  id: mB.id,
-                  name: 'moduloBruto',
-                },
+              if (this.mBDeletedIds) {
+                this.modulosBrutos = (elems as ModuloBruto[]).filter((mB) => !this.mBDeletedIds.includes(mB.id));
+              } else {
+                this.modulosBrutos = elems as ModuloBruto[];
+              }
+
+              this.modulosBrutos.forEach((mB) => {
+                const feature = new Feature({
+                  geometry: new Polygon([mB.coords]),
+                  properties: {
+                    id: mB.id,
+                    name: 'moduloBruto',
+                  },
+                });
+
+                mBSource.addFeature(feature);
               });
-
-              mBSource.addFeature(feature);
             });
-          });
         }
       });
   }
@@ -263,7 +270,7 @@ export class MapStructuresComponent implements OnInit {
               deletedIds = [e.selected[0].getProperties().properties.id];
             }
 
-            this.structuresService.saveFilters(this.thermalLayer.id, deletedIds);
+            this.structuresService.saveFilter(this.thermalLayer.id, 'eliminados', deletedIds);
           }
         }
       }

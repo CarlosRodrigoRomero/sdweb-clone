@@ -13,15 +13,18 @@ export class ModuloBrutoFilter implements FilterInterface {
   }
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
-    const params = elems.map((elem) => (elem as ModuloBruto)[this.type]);
+    const correctType = this.type.replace('M', '');
+
+    const params = elems.map((elem) => (elem as ModuloBruto)[correctType]);
     const paramsMedio = this.average(params);
     const standardDesv = this.standardDeviation(params);
 
-    return elems.filter(
-      (elem) =>
-        (elem as ModuloBruto)[this.type] >= paramsMedio - (1 - this.multiplier) * standardDesv &&
-        (elem as ModuloBruto)[this.type] <= paramsMedio + (1 - this.multiplier) * standardDesv
-    );
+    return elems.filter((elem) => {
+      return (
+        (elem as ModuloBruto)[correctType] >= paramsMedio - (1 - this.multiplier) * standardDesv &&
+        (elem as ModuloBruto)[correctType] <= paramsMedio + (1 - this.multiplier) * standardDesv
+      );
+    });
   }
 
   unapplyFilter(elems: FilterableElement[]): FilterableElement[] {

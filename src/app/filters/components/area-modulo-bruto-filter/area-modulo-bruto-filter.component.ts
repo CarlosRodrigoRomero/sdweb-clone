@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import { MatSliderChange } from '@angular/material/slider';
 
@@ -21,6 +21,7 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
   min = 0;
   max = 1;
   step = 0.1;
+  value = 0;
 
   constructor(
     private filterService: FilterService,
@@ -32,23 +33,37 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
     const informeId = this.structuresService.informeId;
     this.informeService
       .getThermalLayer$(informeId)
-      .pipe(take(1))
-      .subscribe((layers) => (this.thermalLayer = layers[0]));
+      .pipe(
+        take(1),
+        switchMap((layers) => {
+          this.thermalLayer = layers[0];
+
+          return this.structuresService.getFiltersParams(this.thermalLayer.id);
+        })
+      )
+      .subscribe((filters) => {
+        // comprobamos si hay filtros en la DB y seteamos los parámetros
+        if (filters[0].areaM !== undefined) {
+          this.value = filters[0].areaM;
+        }
+      });
   }
 
   onChangeSlider(e: MatSliderChange) {
-    // crea el filtro
-    const filtroArea = new ModuloBrutoFilter('confianza', e.value);
+    const filtroArea = new ModuloBrutoFilter('areaM', e.value);
 
     if (e.value === this.min) {
       // si se selecciona el mínimo desactivamos el filtro ...
       this.filterService.deleteFilter(filtroArea);
+
+      // eliminamos el filtro de la DB
+      this.structuresService.deleteFilter(this.thermalLayer.id, 'areaM');
     } else {
       // ... si no, lo añadimos
       this.filterService.addFilter(filtroArea);
-    }
 
-    // guardamos el filtro en la DB
-    this.structuresService.saveFilters(this.thermalLayer.id, undefined, undefined, undefined, e.value);
+      // guardamos el filtro en la DB
+      this.structuresService.saveFilter(this.thermalLayer.id, 'areaM', e.value);
+    }
   }
 }
