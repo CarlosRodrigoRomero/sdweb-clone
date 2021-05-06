@@ -7,9 +7,10 @@ import { FiltersModule } from '@filters/filters.module';
 
 import { StructuresComponent } from './components/structures.component';
 import { MapStructuresComponent } from './components/map-structures/map-structures.component';
+import { ModuleGroupsComponent } from './components/module-groups/module-groups.component';
 
 @NgModule({
-  declarations: [StructuresComponent, MapStructuresComponent],
+  declarations: [StructuresComponent, MapStructuresComponent, ModuleGroupsComponent],
   imports: [CommonModule, StructuresRoutingModule, SharedModule, FiltersModule],
 })
 export class StructuresModule {}

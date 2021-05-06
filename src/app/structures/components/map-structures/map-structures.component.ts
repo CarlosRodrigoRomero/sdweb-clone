@@ -171,7 +171,7 @@ export class MapStructuresComponent implements OnInit {
 
   private addModulosBrutos() {
     this.structuresService
-      .getModulosBrutos(this.thermalLayer.id)
+      .getModulosBrutos()
       .pipe(switchMap((modulos) => this.filterService.initService(this.planta.id, true, modulos)))
       .subscribe((init) => {
         if (init) {
@@ -182,7 +182,7 @@ export class MapStructuresComponent implements OnInit {
           const mBSource = mBLayer.getSource();
 
           this.structuresService
-            .getFiltersParams(this.thermalLayer.id)
+            .getFiltersParams()
             .pipe(
               switchMap((filtParams) => {
                 this.structuresService.applyFilters(filtParams);
@@ -271,7 +271,7 @@ export class MapStructuresComponent implements OnInit {
               deletedIds = [e.selected[0].getProperties().properties.id];
             }
 
-            this.structuresService.saveFilter(this.thermalLayer.id, 'eliminados', deletedIds);
+            this.structuresService.addFilter('eliminados', deletedIds);
           }
         }
       }

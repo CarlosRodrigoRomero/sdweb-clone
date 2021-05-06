@@ -152,9 +152,7 @@ export class AreaFilterComponent implements OnInit {
       features: feature,
     });
     this.deleteButton = this.olMapService.createVectorLayer(sourceDelete);
-    /* this.deleteButton = new VectorLayer({
-      source: sourceDelete,
-    }); */
+
     this.map.addLayer(this.deleteButton);
 
     const select = new Select({

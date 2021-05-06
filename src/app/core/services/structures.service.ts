@@ -64,7 +64,7 @@ export class StructuresService {
     return this.initialized$;
   }
 
-  getModulosBrutos(thermalLayerId: string): Observable<ModuloBruto[]> {
+  getModulosBrutos(): Observable<ModuloBruto[]> {
     const query$ = this.afs
       .collection<ModuloBruto>('thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto')
       .snapshotChanges()
@@ -84,7 +84,7 @@ export class StructuresService {
     return query$;
   }
 
-  getFiltersParams(thermalLayerId: string): Observable<FilterModuloBruto[]> {
+  getFiltersParams(): Observable<FilterModuloBruto[]> {
     const query$ = this.afs
       .collection('thermalLayers/' + this.thermalLayer.id + '/filters')
       .snapshotChanges()
@@ -100,7 +100,7 @@ export class StructuresService {
     return query$;
   }
 
-  saveFilter(thermalLayerId: string, filterType: string, value: any) {
+  addFilter(filterType: string, value: any) {
     const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/filters');
 
     colRef
@@ -113,6 +113,28 @@ export class StructuresService {
       })
       .catch((error) => {
         console.error('Error al guardar filtro: ', error);
+      });
+  }
+
+  addModuleGroup(coords: any) {
+    // obtenemos un ID aleatorio
+    const id = this.afs.createId();
+
+    const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/agrupaciones');
+
+    // lo preparamos para la DB
+    coords = Object.assign({}, coords);
+
+    colRef
+      .doc(id)
+      .set({
+        coords,
+      })
+      .then(() => {
+        console.log('Agrupación creada correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al crear agrupacion: ', error);
       });
   }
 
