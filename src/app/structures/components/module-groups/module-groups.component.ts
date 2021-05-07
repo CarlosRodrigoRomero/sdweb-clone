@@ -12,7 +12,7 @@ import Feature from 'ol/Feature';
 
 import { OlMapService } from '@core/services/ol-map.service';
 import { StructuresService } from '@core/services/structures.service';
-import { Modify, Select } from 'ol/interaction';
+import { Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
 
 @Component({
@@ -64,7 +64,6 @@ export class ModuleGroupsComponent implements OnInit {
       type: GeometryType.CIRCLE,
       geometryFunction: createBox(),
     });
-    this.olMapService.draw = this.draw;
 
     this.map.addInteraction(this.draw);
 

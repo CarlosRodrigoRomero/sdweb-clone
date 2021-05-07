@@ -1,6 +1,6 @@
 import { FilterInterface } from './filter';
 import { FilterableElement } from './filtrableInterface';
-import { ModuloBruto } from './moduloBruto';
+import { RawModule } from './moduloBruto';
 
 export class ModuloBrutoFilter implements FilterInterface {
   id?: string;
@@ -15,14 +15,17 @@ export class ModuloBrutoFilter implements FilterInterface {
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
     const correctType = this.type.replace('M', '');
 
-    const params = elems.map((elem) => (elem as ModuloBruto)[correctType]);
+    const params = elems
+      .filter((elem) => (elem as RawModule)[correctType] !== undefined)
+      .map((elem) => (elem as RawModule)[correctType]);
     const paramsMedio = this.average(params);
     const standardDesv = this.standardDeviation(params);
 
     return elems.filter((elem) => {
       return (
-        (elem as ModuloBruto)[correctType] >= paramsMedio - (1 - this.multiplier) * standardDesv &&
-        (elem as ModuloBruto)[correctType] <= paramsMedio + (1 - this.multiplier) * standardDesv
+        (elem as RawModule)[correctType] === undefined ||
+        ((elem as RawModule)[correctType] >= paramsMedio - (1 - this.multiplier) * standardDesv &&
+          (elem as RawModule)[correctType] <= paramsMedio + (1 - this.multiplier) * standardDesv)
       );
     });
   }

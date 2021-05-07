@@ -5,27 +5,7 @@
       <mat-vertical-stepper [linear]="true" #stepper>
         <mat-step>
           <ng-template matStepLabel>Filtrar módulos</ng-template>
-          <div>
-            <app-confianza-filter></app-confianza-filter>
-            <app-aspect-ratio-filter></app-aspect-ratio-filter>
-            <app-area-modulo-bruto-filter></app-area-modulo-bruto-filter>
-          </div>
-          <div class="delete-buttons">
-            <button mat-raised-button *ngIf="!deleteMode" (click)="switchDeleteMode()">
-              <mat-icon>delete</mat-icon>
-              <span>Activar modo eliminar</span>
-            </button>
-            <button mat-raised-button *ngIf="deleteMode" (click)="switchDeleteMode()">
-              <mat-icon>cancel</mat-icon>
-              <span>Desactivar modo eliminar</span>
-            </button>
-          </div>
-          <div class="restore-button">
-            <button mat-raised-button (click)="restoreDeletedModules()">
-              <mat-icon>restore_from_trash</mat-icon>
-              <span>Recuperar eliminados</span>
-            </button>
-          </div>
+          <app-raw-modules></app-raw-modules>
           <div class="next-button">
             <button mat-stroked-button matStepperNext (click)="loadModuleGroups()">Siguiente</button>
           </div>

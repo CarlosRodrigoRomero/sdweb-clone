@@ -25,7 +25,7 @@ import { FilterService } from '@core/services/filter.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
-import { ModuloBruto } from '@core/models/moduloBruto';
+import { RawModule } from '@core/models/moduloBruto';
 import { Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
 import { combineLatest } from 'rxjs';
@@ -45,7 +45,7 @@ export class MapStructuresComponent implements OnInit {
   private thermalLayer: ThermalLayerInterface;
   private thermalLayers: TileLayer[];
   private extent1: any;
-  private modulosBrutos: ModuloBruto[];
+  private modulosBrutos: RawModule[];
   private deleteMode = false;
   private mBDeletedIds: string[] = [];
 
@@ -64,6 +64,8 @@ export class MapStructuresComponent implements OnInit {
     this.planta = this.structuresService.planta;
 
     this.structuresService.deleteMode$.subscribe((mode) => (this.deleteMode = mode));
+
+    this.structuresService.deletedRawModIds$.subscribe((ids) => (this.mBDeletedIds = ids));
 
     const informeId = this.structuresService.informeId;
 
@@ -188,7 +190,8 @@ export class MapStructuresComponent implements OnInit {
               switchMap((filtParams) => {
                 this.structuresService.applyFilters(filtParams);
 
-                this.mBDeletedIds = filtParams[0].eliminados;
+                this.structuresService.deletedRawModIds = filtParams[0].eliminados;
+                // this.mBDeletedIds = filtParams[0].eliminados;
 
                 return this.filterService.filteredElements$;
               })
@@ -197,9 +200,9 @@ export class MapStructuresComponent implements OnInit {
               mBSource.clear();
 
               if (this.mBDeletedIds) {
-                this.modulosBrutos = (elems as ModuloBruto[]).filter((mB) => !this.mBDeletedIds.includes(mB.id));
+                this.modulosBrutos = (elems as RawModule[]).filter((mB) => !this.mBDeletedIds.includes(mB.id));
               } else {
-                this.modulosBrutos = elems as ModuloBruto[];
+                this.modulosBrutos = elems as RawModule[];
               }
 
               this.modulosBrutos.forEach((mB) => {

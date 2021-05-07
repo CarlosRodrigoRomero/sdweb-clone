@@ -8,9 +8,10 @@ import { FiltersModule } from '@filters/filters.module';
 import { StructuresComponent } from './components/structures.component';
 import { MapStructuresComponent } from './components/map-structures/map-structures.component';
 import { ModuleGroupsComponent } from './components/module-groups/module-groups.component';
+import { RawModulesComponent } from './components/raw-modules/raw-modules.component';
 
 @NgModule({
-  declarations: [StructuresComponent, MapStructuresComponent, ModuleGroupsComponent],
+  declarations: [StructuresComponent, MapStructuresComponent, ModuleGroupsComponent, RawModulesComponent],
   imports: [CommonModule, StructuresRoutingModule, SharedModule, FiltersModule],
 })
 export class StructuresModule {}

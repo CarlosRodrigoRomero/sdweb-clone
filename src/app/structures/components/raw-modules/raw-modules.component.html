@@ -1,0 +1,30 @@
+<div>
+  <app-confianza-filter></app-confianza-filter>
+  <app-aspect-ratio-filter></app-aspect-ratio-filter>
+  <app-area-modulo-bruto-filter></app-area-modulo-bruto-filter>
+</div>
+<div class="delete-buttons">
+  <button mat-raised-button *ngIf="!deleteMode" (click)="switchDeleteMode()">
+    <mat-icon class="icon">delete</mat-icon>
+    <span>Activar modo eliminar</span>
+  </button>
+  <button mat-raised-button *ngIf="deleteMode" (click)="switchDeleteMode()">
+    <mat-icon class="icon">cancel</mat-icon>
+    <span>Desactivar modo eliminar</span>
+  </button>
+</div>
+<div class="restore-buttons">
+  <button mat-raised-button (click)="restoreDeletedModules()" [disabled]="deleteMode">
+    <mat-icon class="icon">restore_from_trash</mat-icon>
+    <span>Rest. eliminados</span>
+  </button>
+  <button mat-raised-button class="btn-undo" (click)="restoreLastDeletedModule()" [disabled]="deleteMode">
+    <mat-icon>restore</mat-icon>
+  </button>
+</div>
+<div class="add-button">
+  <button mat-raised-button (click)="drawRawModule()" [disabled]="deleteMode">
+    <mat-icon class="icon">add_circle</mat-icon>
+    <span>Crear módulo</span>
+  </button>
+</div>

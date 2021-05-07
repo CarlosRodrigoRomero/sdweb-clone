@@ -12,7 +12,7 @@ import { InformeService } from './informe.service';
 import { FilterService } from '@core/services/filter.service';
 
 import { PlantaInterface } from '@core/models/planta';
-import { ModuloBruto } from '@core/models/moduloBruto';
+import { RawModule } from '@core/models/moduloBruto';
 import { FilterModuloBruto } from '@core/models/filterModuloBruto';
 import { FilterableElement } from '@core/models/filtrableInterface';
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
@@ -33,6 +33,8 @@ export class StructuresService {
   private _thermalLayer: ThermalLayerInterface;
   private _loadModuleGroups = false;
   public loadModuleGroups$ = new BehaviorSubject<boolean>(this._loadModuleGroups);
+  private _deletedRawModIds: string[] = [];
+  public deletedRawModIds$ = new BehaviorSubject<string[]>(this._deletedRawModIds);
 
   constructor(
     private router: Router,
@@ -67,9 +69,9 @@ export class StructuresService {
     return this.initialized$;
   }
 
-  getModulosBrutos(): Observable<ModuloBruto[]> {
+  getModulosBrutos(): Observable<RawModule[]> {
     const query$ = this.afs
-      .collection<ModuloBruto>('thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto')
+      .collection<RawModule>('thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto')
       .snapshotChanges()
       .pipe(
         map((actions) =>
@@ -136,6 +138,27 @@ export class StructuresService {
       })
       .catch((error) => {
         console.error('Error al guardar filtro: ', error);
+      });
+  }
+
+  addRawModule(module: RawModule) {
+    // obtenemos un ID aleatorio
+    const id = this.afs.createId();
+
+    const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto');
+
+    // lo preparamos para la DB
+    module.coords = { ...module.coords };
+    module = Object.assign({}, module);
+
+    colRef
+      .doc(id)
+      .set(module)
+      .then(() => {
+        console.log('Módulo creado correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al crear módulo: ', error);
       });
   }
 
@@ -240,5 +263,14 @@ export class StructuresService {
   set loadModuleGroups(value: boolean) {
     this._loadModuleGroups = value;
     this.loadModuleGroups$.next(value);
+  }
+
+  get deletedRawModIds() {
+    return this._deletedRawModIds;
+  }
+
+  set deletedRawModIds(value: string[]) {
+    this._deletedRawModIds = value;
+    this.deletedRawModIds$.next(value);
   }
 }

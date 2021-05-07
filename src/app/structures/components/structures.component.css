@@ -11,30 +11,13 @@
   margin-top: 16px;
 }
 
-mat-icon {
-  margin-right: 0.5rem;
-}
-
 .next-button {
   margin-top: 1rem;
 }
 
-.delete-buttons {
-  min-width: 225px;
-}
 
-.delete-buttons button {
-  width: 100%;
-}
 
-.restore-button {
-  margin-top: 0.5rem;
-  min-width: 225px;
-}
 
-.restore-button button {
-  width: 100%;
-}
 
 .delete-mode-warn {
   position: absolute;
