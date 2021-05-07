@@ -63,10 +63,6 @@ export class PortfolioBenchmarkComponent implements OnInit {
       })
     );
     this.plantasList$.subscribe((plantas) => {
-      console.log(
-        '🚀 ~ file: portfolio-benchmark.component.ts ~ line 64 ~ PortfolioBenchmarkComponent ~ this.plantasList$.subscribe ~ plantas',
-        plantas
-      );
       this.initChart(plantas);
     });
   }
@@ -91,7 +87,6 @@ export class PortfolioBenchmarkComponent implements OnInit {
           data.push(0);
         }
       });
-      console.log(y, data);
       datasets.push({
         label: y.toString(),
         backgroundColor: 'grey',
