@@ -1,1 +1,5 @@
 <button mat-raised-button (click)="drawGroup()">Crear agrupación</button>
+<button mat-raised-button (click)="deleteModuleGroup()" [disabled]="mGSelectedId === undefined">
+  <mat-icon>delete</mat-icon>
+  <span>Eliminar agrupación</span>
+</button>

@@ -29,6 +29,7 @@ import { ModuloBruto } from '@core/models/moduloBruto';
 import { Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
 import { combineLatest } from 'rxjs';
+import { Coordinate } from 'ol/coordinate';
 
 @Component({
   selector: 'app-map-structures',

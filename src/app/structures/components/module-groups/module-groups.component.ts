@@ -8,9 +8,12 @@ import Draw, { createBox, DrawEvent } from 'ol/interaction/Draw';
 import GeometryType from 'ol/geom/GeometryType';
 import { Coordinate } from 'ol/coordinate';
 import Polygon from 'ol/geom/Polygon';
+import Feature from 'ol/Feature';
 
 import { OlMapService } from '@core/services/ol-map.service';
 import { StructuresService } from '@core/services/structures.service';
+import { Modify, Select } from 'ol/interaction';
+import { click } from 'ol/events/condition';
 
 @Component({
   selector: 'app-module-groups',
@@ -21,11 +24,24 @@ export class ModuleGroupsComponent implements OnInit {
   private vectorGroup: VectorLayer;
   private map: Map;
   private draw: Draw;
+  private moduleGroups: any[];
+  private mGLayer = new VectorLayer();
+  mGSelectedId: string;
 
   constructor(private olMapService: OlMapService, private structuresService: StructuresService) {}
 
   ngOnInit(): void {
     this.olMapService.map$.subscribe((map) => (this.map = map));
+
+    this.structuresService.loadModuleGroups$.subscribe((load) => {
+      if (load) {
+        this.createModulesGroupsLayer();
+        this.addModuleGroups();
+
+        this.addPointerOnHover();
+        this.addSelectMGInteraction();
+      }
+    });
   }
 
   drawGroup() {
@@ -55,8 +71,6 @@ export class ModuleGroupsComponent implements OnInit {
     this.draw.on('drawend', (evt) => {
       const coords = this.getCoordsRectangle(evt);
 
-      console.log(coords);
-
       this.structuresService.addModuleGroup(coords);
 
       // terminamos el modo draw
@@ -68,6 +82,115 @@ export class ModuleGroupsComponent implements OnInit {
     const polygon = event.feature.getGeometry() as Polygon;
     const coords = polygon.getCoordinates();
 
-    return [coords[0][0], coords[0][2]];
+    return [coords[0][1], coords[0][3]];
+  }
+
+  getAllCoordsRectangle(coords: Coordinate[]) {
+    const allCoords: Coordinate[] = [];
+    allCoords.push(coords[0]);
+    allCoords.push([coords[0][0], coords[1][1]]);
+    allCoords.push(coords[1]);
+    allCoords.push([coords[1][0], coords[0][1]]);
+
+    return allCoords;
+  }
+
+  private createModulesGroupsLayer() {
+    this.mGLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: new Style({
+        stroke: new Stroke({
+          color: 'darkblue',
+          width: 2,
+        }),
+      }),
+    });
+
+    this.mGLayer.setProperties({
+      id: 'mGLayer',
+    });
+
+    this.map.addLayer(this.mGLayer);
+  }
+
+  private addModuleGroups() {
+    const mGSource = this.mGLayer.getSource();
+
+    this.structuresService.getModuleGroups().subscribe((groups) => {
+      this.moduleGroups = groups;
+
+      mGSource.clear();
+
+      this.moduleGroups.forEach((mG) => {
+        const feature = new Feature({
+          geometry: new Polygon([this.getAllCoordsRectangle(mG.coords)]),
+          properties: {
+            id: mG.id,
+            name: 'moduleGroup',
+          },
+        });
+
+        this.getAllCoordsRectangle(mG.coords);
+
+        mGSource.addFeature(feature);
+      });
+    });
+  }
+
+  private addPointerOnHover() {
+    this.map.on('pointermove', (event) => {
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        let feature = this.map
+          .getFeaturesAtPixel(event.pixel)
+          .filter((item) => item.getProperties().properties !== undefined);
+        feature = feature.filter((item) => item.getProperties().properties.name === 'moduleGroup');
+
+        if (feature.length > 0) {
+          // cambia el puntero por el de seleccionar
+          this.map.getViewport().style.cursor = 'pointer';
+        } else {
+          // vuelve a poner el puntero normal
+          this.map.getViewport().style.cursor = 'inherit';
+        }
+      } else {
+        // vuelve a poner el puntero normal
+        this.map.getViewport().style.cursor = 'inherit';
+      }
+    });
+  }
+
+  private addSelectMGInteraction() {
+    const select = new Select({
+      style: new Style({
+        stroke: new Stroke({
+          color: 'white',
+          width: 4,
+        }),
+      }),
+      condition: click,
+      layers: (l) => {
+        if (l.getProperties().id === 'mGLayer') {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    });
+
+    // select.setProperties({ id: 'selectAnomalia' });
+
+    this.map.addInteraction(select);
+    select.on('select', (e) => {
+      if (e.selected.length > 0) {
+        // guardamos el id para eliminarlo si lo queremos
+        this.mGSelectedId = e.selected[0].getProperties().properties.id;
+      } else {
+        this.mGSelectedId = undefined;
+      }
+    });
+  }
+
+  deleteModuleGroup() {
+    this.structuresService.deleteModuleGroup(this.mGSelectedId);
   }
 }

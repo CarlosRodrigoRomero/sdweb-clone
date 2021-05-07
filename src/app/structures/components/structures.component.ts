@@ -25,4 +25,8 @@ export class StructuresComponent implements OnInit {
   restoreDeletedModules() {
     this.structuresService.deleteFilter('eliminados');
   }
+
+  loadModuleGroups() {
+    this.structuresService.loadModuleGroups = true;
+  }
 }

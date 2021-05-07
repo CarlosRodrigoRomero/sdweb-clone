@@ -17,6 +17,7 @@ import { FilterModuloBruto } from '@core/models/filterModuloBruto';
 import { FilterableElement } from '@core/models/filtrableInterface';
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
+import { Coordinate } from 'ol/coordinate';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +31,8 @@ export class StructuresService {
   private _deleteMode = false;
   public deleteMode$ = new BehaviorSubject<boolean>(this._deleteMode);
   private _thermalLayer: ThermalLayerInterface;
+  private _loadModuleGroups = false;
+  public loadModuleGroups$ = new BehaviorSubject<boolean>(this._loadModuleGroups);
 
   constructor(
     private router: Router,
@@ -100,6 +103,26 @@ export class StructuresService {
     return query$;
   }
 
+  getModuleGroups() {
+    const query$ = this.afs
+      .collection<any>('thermalLayers/' + this.thermalLayer.id + '/agrupaciones')
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((doc) => {
+            const data = doc.payload.doc.data();
+            const id = doc.payload.doc.id;
+
+            // Convertimos el objeto en un array
+            data.coords = Object.values(data.coords);
+
+            return { id, ...data };
+          })
+        )
+      );
+    return query$;
+  }
+
   addFilter(filterType: string, value: any) {
     const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/filters');
 
@@ -135,6 +158,20 @@ export class StructuresService {
       })
       .catch((error) => {
         console.error('Error al crear agrupacion: ', error);
+      });
+  }
+
+  deleteModuleGroup(id: string) {
+    const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/agrupaciones');
+
+    colRef
+      .doc(id)
+      .delete()
+      .then(() => {
+        console.log('Agrupación eliminada correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al eliminar agrupacion: ', error);
       });
   }
 
@@ -194,5 +231,14 @@ export class StructuresService {
   set deleteMode(value: boolean) {
     this._deleteMode = value;
     this.deleteMode$.next(value);
+  }
+
+  get loadModuleGroups() {
+    return this._loadModuleGroups;
+  }
+
+  set loadModuleGroups(value: boolean) {
+    this._loadModuleGroups = value;
+    this.loadModuleGroups$.next(value);
   }
 }
