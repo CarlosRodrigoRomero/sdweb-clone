@@ -24,7 +24,8 @@
         mat-row
         (mouseover)="hoverSeguidor(row)"
         (mouseleave)="unhoverSeguidor(row)"
-        [ngClass]="{ hovered: row.seguidor === seguidorHovered }"
+        (click)="selectSeguidor(row)"
+        [ngClass]="{ selected: row.seguidor === seguidorSelected, hovered: row.seguidor === seguidorHovered }"
         *matRowDef="let row; columns: displayedColumns"
       ></tr>
 

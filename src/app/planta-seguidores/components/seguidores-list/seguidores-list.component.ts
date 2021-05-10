@@ -30,7 +30,8 @@ export class SeguidoresListComponent implements OnInit {
   viewSeleccionada = 0;
   displayedColumns: string[] = ['id', 'modulo', 'mae'];
   dataSource: MatTableDataSource<SeguidorData>;
-  public seguidorHovered;
+  public seguidorHovered: Seguidor = undefined;
+  public seguidorSelected: Seguidor = undefined;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -85,6 +86,7 @@ export class SeguidoresListComponent implements OnInit {
     });
 
     this.seguidoresControlService.seguidorHovered$.subscribe((segHov) => (this.seguidorHovered = segHov));
+    this.seguidoresControlService.seguidorSelected$.subscribe((segSel) => (this.seguidorSelected = segSel));
   }
 
   applyFilter(event: Event) {
@@ -97,17 +99,31 @@ export class SeguidoresListComponent implements OnInit {
   }
 
   hoverSeguidor(row: any) {
-    // if (this.seguidoresControlService.seguidorSelected === undefined) {
+    if (this.seguidorSelected === undefined) {
       this.seguidoresControlService.seguidorHovered = row.seguidor;
       // this.anomaliasControlService.setExternalStyle(row.id, true);
-    // }
+    }
   }
 
   unhoverSeguidor(row: any) {
-    // if (this.seguidoresControlService.seguidorSelected === undefined) {
+    if (this.seguidorSelected === undefined) {
       this.seguidoresControlService.seguidorHovered = undefined;
       // this.anomaliasControlService.setExternalStyle(row.id, false);
-    // }
+    }
+  }
+
+  selectSeguidor(row: any) {
+    // quitamos el hover del seguidor
+    this.seguidoresControlService.seguidorHovered = undefined;
+
+    // reiniciamos el estilo al anterior seguidor
+    /*  if (this.anomaliasControlService.prevAnomaliaSelect !== undefined) {
+      this.anomaliasControlService.setExternalStyle(this.anomaliasControlService.prevAnomaliaSelect.id, false);
+    }
+    this.anomaliasControlService.prevAnomaliaSelect = row.anomalia; */
+
+    this.seguidoresControlService.seguidorSelected = row.seguidor;
+    // this.anomaliasControlService.setExternalStyle(row.id, true);
   }
 
   getModuloLabel(elem: Seguidor): string {
