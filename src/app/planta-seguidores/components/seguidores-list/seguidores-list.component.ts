@@ -8,6 +8,7 @@ import { GLOBAL } from '@core/services/global';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { FilterService } from '@core/services/filter.service';
 import { ReportControlService } from '@core/services/report-control.service';
+import { SeguidoresControlService } from '../../services/seguidores-control.service';
 
 import { Seguidor } from '@core/models/seguidor';
 
@@ -29,6 +30,7 @@ export class SeguidoresListComponent implements OnInit {
   viewSeleccionada = 0;
   displayedColumns: string[] = ['id', 'modulo', 'mae'];
   dataSource: MatTableDataSource<SeguidorData>;
+  public seguidorHovered;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -36,7 +38,8 @@ export class SeguidoresListComponent implements OnInit {
   constructor(
     private mapSeguidoresService: MapSeguidoresService,
     public filterService: FilterService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private seguidoresControlService: SeguidoresControlService
   ) {}
 
   ngOnInit(): void {
@@ -71,6 +74,7 @@ export class SeguidoresListComponent implements OnInit {
               perdidas: elem.perdidas,
               gradiente: elem.gradienteNormalizado,
               color: 'red',
+              seguidor: elem as Seguidor,
             })
           );
 
@@ -79,6 +83,8 @@ export class SeguidoresListComponent implements OnInit {
         this.dataSource.sort = this.sort;
       });
     });
+
+    this.seguidoresControlService.seguidorHovered$.subscribe((segHov) => (this.seguidorHovered = segHov));
   }
 
   applyFilter(event: Event) {
@@ -88,6 +94,20 @@ export class SeguidoresListComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+
+  hoverSeguidor(row: any) {
+    // if (this.seguidoresControlService.seguidorSelected === undefined) {
+      this.seguidoresControlService.seguidorHovered = row.seguidor;
+      // this.anomaliasControlService.setExternalStyle(row.id, true);
+    // }
+  }
+
+  unhoverSeguidor(row: any) {
+    // if (this.seguidoresControlService.seguidorSelected === undefined) {
+      this.seguidoresControlService.seguidorHovered = undefined;
+      // this.anomaliasControlService.setExternalStyle(row.id, false);
+    // }
   }
 
   getModuloLabel(elem: Seguidor): string {

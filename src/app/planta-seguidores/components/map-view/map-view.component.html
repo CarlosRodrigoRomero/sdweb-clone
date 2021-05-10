@@ -1,6 +1,7 @@
 <mat-sidenav-container class="main-container" [hasBackdrop]="false">
+  <!-- SIDENAV FILTROS -->
   <mat-sidenav
-    *ngIf="!sharedReport"
+    *ngIf="showFilters"
     #sidenavLeft
     [(opened)]="leftOpened"
     class="left-sidenav"
@@ -8,15 +9,13 @@
     position="start"
     disableClose
   >
-    <button mat-icon-button class="btn-close" (click)="sidenavLeft.toggle()">
-      <mat-icon>close</mat-icon>
-    </button>
     <div class="titulo">
       <h4>Filtros</h4>
     </div>
     <app-filters-panel></app-filters-panel>
   </mat-sidenav>
 
+  <!-- SIDENAV LISTA ANOMALIAS -->
   <mat-sidenav
     #sidenavRight
     [(opened)]="rightOpened"
@@ -25,17 +24,14 @@
     position="end"
     disableClose
   >
-    <button mat-icon-button class="btn-close" (click)="sidenavRight.toggle()">
-      <mat-icon>close</mat-icon>
-    </button>
     <div class="titulo">
       <h4>Listado de anomalías</h4>
     </div>
     <app-seguidores-list></app-seguidores-list>
   </mat-sidenav>
 
-  <mat-sidenav
-    *ngIf="!sharedReport"
+  <!-- SIDENAV STATS -->
+  <!-- <mat-sidenav
     #sidenavStats
     [(opened)]="statsOpened"
     class="stats-sidenav"
@@ -43,17 +39,15 @@
     position="end"
     disableClose
   >
-    <button mat-icon-button class="btn-close" (click)="sidenavStats.toggle()">
-      <mat-icon>close</mat-icon>
-    </button>
     <app-planta-stats></app-planta-stats>
-  </mat-sidenav>
+  </mat-sidenav> -->
 
   <mat-sidenav-content>
-    <div class="rel">
+    <div *ngIf="seguidoresLoaded" class="rel">
+      <!-- MAPA -->
       <app-map-seguidores></app-map-seguidores>
 
-      <div *ngIf="seguidoresLoaded$ | async">
+      <div *ngIf="seguidoresLoaded">
         <app-view-toggle></app-view-toggle>
         <app-share-map *ngIf="!sharedReport"></app-share-map>
         <app-download-report></app-download-report>
@@ -64,22 +58,19 @@
       </div>
     </div>
 
+    <!-- BOTON SIDENAV FILTROS -->
     <div *ngIf="seguidoresLoaded">
-      <button
-        *ngIf="!sharedReport"
-        mat-icon-button
-        class="btn-left"
-        (click)="sidenavLeft.toggle()"
-        [class.mat-elevation-z2]="true"
-      >
-        <!-- <mat-icon *ngIf="!leftOpened">keyboard_arrow_right</mat-icon> -->
-        <!-- <mat-icon *ngIf="leftOpened">keyboard_arrow_left</mat-icon> -->
+      <button *ngIf="showFilters" mat-raised-button class="btn-left" (click)="sidenavLeft.toggle()">
+        <mat-icon *ngIf="!leftOpened">keyboard_arrow_right</mat-icon>
+        <mat-icon *ngIf="leftOpened">keyboard_arrow_left</mat-icon>
         <mat-icon>filter_alt</mat-icon>
       </button>
-      <button mat-icon-button class="btn-right" (click)="sidenavRight.toggle()" [class.mat-elevation-z2]="true">
+
+      <!-- BOTON SIDENAV LISTA SEGUIDORES -->
+      <button mat-raised-button class="btn-right" (click)="sidenavRight.toggle()">
         <mat-icon>list_alt</mat-icon>
-        <!-- <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
-          <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon> -->
+        <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
+        <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon>
       </button>
       <button
         *ngIf="!sharedReport"

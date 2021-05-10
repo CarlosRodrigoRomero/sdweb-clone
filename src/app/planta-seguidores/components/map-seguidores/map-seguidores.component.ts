@@ -181,7 +181,7 @@ export class MapSeguidoresComponent implements OnInit {
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInformeId = informeId;
       this.mostrarSeguidores();
-      this.incrementosService.mostrarIncrementos();
+      // this.incrementosService.mostrarIncrementos();
     });
   }
 

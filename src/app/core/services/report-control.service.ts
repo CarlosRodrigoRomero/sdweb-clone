@@ -39,6 +39,7 @@ export class ReportControlService {
   public allFilterableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFilterableElements);
   private _filteredElements: FilterableElement[] = [];
   public filteredElements$ = new BehaviorSubject<FilterableElement[]>(this._filteredElements);
+  private plantaFija = false;
 
   constructor(
     private router: Router,
@@ -51,6 +52,11 @@ export class ReportControlService {
   ) {}
 
   initService(): Observable<boolean> {
+    // comprobamos si es un planta fija o de seguidores
+    if (this.router.url.includes('fixed')) {
+      this.plantaFija = true;
+    }
+
     // comprobamos si es un informe compartido
     if (this.router.url.includes('shared')) {
       this.sharedReport = true;
@@ -108,7 +114,7 @@ export class ReportControlService {
                     this.allFilterableElements = anoms;
 
                     // iniciamos filter service
-                    return this.filterService.initService(this.plantaId, true, anoms, true, this.sharedId);
+                    return this.filterService.initService(this.plantaId, true, anoms, this.plantaFija, this.sharedId);
                   })
                 )
                 .subscribe((init) => (this.initialized = init));
@@ -123,7 +129,7 @@ export class ReportControlService {
                     this.allFilterableElements = anoms;
 
                     // iniciamos filter service
-                    return this.filterService.initService(this.plantaId, true, anoms, true, this.sharedId);
+                    return this.filterService.initService(this.plantaId, true, anoms, this.plantaFija, this.sharedId);
                   })
                 )
                 // iniciamos filter service
@@ -163,7 +169,7 @@ export class ReportControlService {
             this.allFilterableElements = anoms;
 
             // iniciamos filter service
-            return this.filterService.initService(this.plantaId, true, anoms);
+            return this.filterService.initService(this.plantaId, this.plantaFija, anoms);
           })
         )
         .subscribe((init) => (this.initialized = init));

@@ -77,7 +77,7 @@ export class BarChartComponent implements OnInit {
         if (planta.nombre === 'Demo 1') {
           this.barChartLabels.push(planta.nombre);
         } else {
-          this.barChartLabels.push('Planta ' + (index + 1)); // DEMO
+          this.barChartLabels.push(planta.nombre);
         }
       }
     });
@@ -223,13 +223,10 @@ export class BarChartComponent implements OnInit {
     const plantaId = this.plantasId[index];
     const tipoPlanta = this.tiposPlantas[index];
 
-    // acotado para la DEMO
-    if (plantaId === 'egF0cbpXnnBnjcrusoeR') {
-      if (tipoPlanta === 'seguidores') {
-        this.router.navigate(['clients/tracker/' + plantaId]);
-      } else {
-        this.router.navigate(['clients/fixed/' + plantaId]);
-      }
+    if (tipoPlanta === 'seguidores') {
+      this.router.navigate(['clients/tracker/' + plantaId]);
+    } else {
+      this.router.navigate(['clients/fixed/' + plantaId]);
     }
   }
 }

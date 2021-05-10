@@ -81,7 +81,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.mousePosition = null;
 
     // Para la demo, agregamos un extent a todas las capas:
-    this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
+    // this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
     // this.plantaId = 'egF0cbpXnnBnjcrusoeR';
     this.subscriptions.add(
@@ -194,6 +194,11 @@ export class MapComponent implements OnInit, OnDestroy {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       crossOrigin: '',
     });
+    const satelliteLayer = new TileLayer({
+      source: satellite,
+      // extent: this.extent1,
+    });
+
     const aerial = new XYZ({
       url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
       crossOrigin: '',
@@ -204,21 +209,21 @@ export class MapComponent implements OnInit, OnDestroy {
       extent: this.extent1,
     });
     const osmLayer = new TileLayer({
-      // source: satellite,
       source: new OSM(),
       // extent: this.extent1,
     });
 
-    const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers];
+    const layers = [satelliteLayer];
+    // const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers];
 
     // MAPA
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
-      zoom: 18,
-      // zoom: this.planta.zoom,
+      // zoom: 18,
+      zoom: this.planta.zoom,
       maxZoom: 24,
       // para la demo
-      extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
+      // extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
     });
 
     this.subscriptions.add(

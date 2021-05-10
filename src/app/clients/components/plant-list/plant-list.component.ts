@@ -61,7 +61,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
             });
           } else {
             plantsData.push({
-              nombre: 'Planta ' + (index + 1), // DEMO
+              nombre: planta.nombre,
               potencia: planta.potencia,
               mae,
               ultimaInspeccion: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current))

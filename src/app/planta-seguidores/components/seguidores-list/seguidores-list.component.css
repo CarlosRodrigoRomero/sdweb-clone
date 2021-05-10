@@ -2,12 +2,37 @@
   margin: 10px;
 }
 
+.buscar-input {
+  width: 100%;
+}
+
 table {
   width: 100%;
 }
 
 .tabla-container {
   position: relative;
-  height: 71vh;
+  height: calc(100vh - 318px);
   overflow: auto;
+}
+
+.label-tipo {
+  display: inline-flex;
+  margin-top: 0.5rem;
+}
+
+.label-tipo mat-icon {
+  margin-right: 0.5rem;
+}
+
+.mat-row {
+  cursor: pointer;
+}
+
+.mat-row.selected {
+  background-color: lightgrey;
+}
+
+.mat-row.hovered {
+  background-color: whitesmoke;
 }

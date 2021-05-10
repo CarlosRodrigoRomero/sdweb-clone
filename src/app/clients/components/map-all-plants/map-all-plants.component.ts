@@ -140,13 +140,10 @@ export class MapAllPlantsComponent implements OnInit {
       if (feature.length > 0) {
         const plantaId = feature[0].getProperties().plantaId;
 
-        // acotado para la DEMO
-        if (plantaId === 'egF0cbpXnnBnjcrusoeR') {
-          if (feature[0].getProperties().tipo === 'seguidores') {
-            this.router.navigate(['clients/tracker/' + plantaId]);
-          } else {
-            this.router.navigate(['clients/fixed/' + plantaId]);
-          }
+        if (feature[0].getProperties().tipo === 'seguidores') {
+          this.router.navigate(['clients/tracker/' + plantaId]);
+        } else {
+          this.router.navigate(['clients/fixed/' + plantaId]);
         }
       }
     });
