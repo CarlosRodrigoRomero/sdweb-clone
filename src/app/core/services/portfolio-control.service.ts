@@ -33,26 +33,29 @@ export class PortfolioControlService {
 
   public initService(): Observable<boolean> {
     this.auth.user$.pipe(switchMap((user) => this.plantaService.getPlantasDeEmpresa(user))).subscribe((plantas) => {
-      plantas.forEach((planta) => {
-        if (planta.informes !== undefined && planta.informes.length > 0) {
-          const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
-          // comprobamos que el informe tiene "mae"
-          if (mae !== undefined) {
-            this.listaPlantas.push(planta);
+      // evitamos que cargue solo una planta al vovler atrás desde el informe
+      if (plantas.length > 1) {
+        plantas.forEach((planta) => {
+          if (planta.informes !== undefined && planta.informes.length > 0) {
+            const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+            // comprobamos que el informe tiene "mae"
+            if (mae !== undefined) {
+              this.listaPlantas.push(planta);
 
-            this.numPlantas++;
-            this.potenciaTotal += planta.potencia;
+              this.numPlantas++;
+              this.potenciaTotal += planta.potencia;
+            }
           }
-        }
-      });
-      const maePlantas = this.listaPlantas.map(
-        (planta) => planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae
-      );
-      this.maeMedio = this.average(maePlantas);
-      // this.maeSigma = this.standardDeviation(maePlantas);
-      this.maeSigma = this.standardDeviation(maePlantas) / 3; // DEMO
+        });
+        const maePlantas = this.listaPlantas.map(
+          (planta) => planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae
+        );
+        this.maeMedio = this.average(maePlantas);
+        // this.maeSigma = this.standardDeviation(maePlantas);
+        this.maeSigma = this.standardDeviation(maePlantas) / 3; // DEMO
 
-      this.initialized$.next(true);
+        this.initialized$.next(true);
+      }
     });
 
     return this.initialized$;

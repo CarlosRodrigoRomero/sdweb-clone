@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { PortfolioControlService } from '@core/services/portfolio-control.service';
 import { Subscription } from 'rxjs';
+
+import { PortfolioControlService } from '@core/services/portfolio-control.service';
 
 @Component({
   selector: 'app-reports',
