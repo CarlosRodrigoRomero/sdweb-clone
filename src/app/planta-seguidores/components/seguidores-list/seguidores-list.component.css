@@ -14,11 +14,11 @@ table {
   position: relative;
   height: calc(100vh - 318px);
   overflow: auto;
+  min-width: 350px;
 }
 
 .label-tipo {
   display: inline-flex;
-  margin-top: 0.5rem;
 }
 
 .label-tipo mat-icon {

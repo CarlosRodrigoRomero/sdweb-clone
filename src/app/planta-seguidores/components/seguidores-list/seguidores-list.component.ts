@@ -28,7 +28,7 @@ interface SeguidorData {
 })
 export class SeguidoresListComponent implements OnInit {
   viewSeleccionada = 0;
-  displayedColumns: string[] = ['id', 'modulo', 'mae'];
+  displayedColumns: string[] = [];
   dataSource: MatTableDataSource<SeguidorData>;
   public seguidorHovered: Seguidor = undefined;
   public seguidorSelected: Seguidor = undefined;
@@ -69,10 +69,10 @@ export class SeguidoresListComponent implements OnInit {
           .filter((elem) => (elem as Seguidor).informeId === informeId)
           .forEach((elem) =>
             filteredElements.push({
-              id: elem.id.replace((elem as Seguidor).informeId, ''),
+              id: elem.id.replace((elem as Seguidor).informeId, '').replace(/_/g, ' '),
               modulo: this.getModuloLabel(elem as Seguidor),
               mae: (elem as Seguidor).mae.toFixed(2),
-              perdidas: elem.perdidas,
+              perdidas: elem.perdidas.toFixed(2),
               gradiente: elem.gradienteNormalizado,
               color: 'red',
               seguidor: elem as Seguidor,
