@@ -73,12 +73,7 @@ export class BarChartComponent implements OnInit {
         // añadimos al array de tipos
         this.tiposPlantas.push(planta.tipo);
 
-        // DEMO
-        if (planta.nombre === 'Demo 1') {
-          this.barChartLabels.push(planta.nombre);
-        } else {
-          this.barChartLabels.push(planta.nombre);
-        }
+        this.barChartLabels.push(planta.nombre);
       }
     });
 

@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
   selector: 'app-reports',
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.css'],
+  providers: [PortfolioControlService],
 })
 export class ReportsComponent implements OnInit, OnDestroy {
   numPlantas = 0;
@@ -17,22 +18,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
   constructor(private portfolioControlService: PortfolioControlService) {}
 
   ngOnInit() {
-    this.portfolioControlService.initService().subscribe((init) => (this.mapLoaded = init));
-
-    /* this.auth.user$.subscribe((user) =>
-      this.plantaService.getPlantasDeEmpresa(user).subscribe((plantas) => {
-        plantas.forEach((planta) => {
-          if (planta.informes !== undefined && planta.informes.length > 0) {
-            const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
-            // comprobamos que el informe tiene "mae"
-            if (mae !== undefined) {
-              this.numPlantas++;
-              this.potenciaTotal += planta.potencia;
-            }
-          }
-        });
-      })
-    ); */
+    this.subscription.add(this.portfolioControlService.initService().subscribe((init) => (this.mapLoaded = init)));
   }
 
   ngOnDestroy() {

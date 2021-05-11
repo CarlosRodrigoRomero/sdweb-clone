@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
+import { Feature } from 'ol';
+import { Fill, Stroke, Style } from 'ol/style';
+
+import { GLOBAL } from './global';
 import { AuthService } from '@core/services/auth.service';
 import { PlantaService } from '@core/services/planta.service';
 
 import { PlantaInterface } from '@core/models/planta';
-import { GLOBAL } from './global';
-import { UserInterface } from '@core/models/user';
-import { switchMap } from 'rxjs/operators';
-import { Feature } from 'ol';
-import { Fill, Stroke, Style } from 'ol/style';
 
 @Injectable({
   providedIn: 'root',

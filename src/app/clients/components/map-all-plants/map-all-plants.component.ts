@@ -83,8 +83,6 @@ export class MapAllPlantsComponent implements OnInit {
     this.addPointerOnHover();
     this.addOnHoverAction();
     this.addOnClickAction();
-
-    // this.portfolioControlService.plantaHover$.subscribe((planta) => (this.plantaHover = planta));
   }
 
   private addPointerOnHover() {
