@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 
 import Map from 'ol/Map';
@@ -77,56 +77,75 @@ export class MapSeguidoresComponent implements OnInit {
     if (this.router.url.includes('shared')) {
       this.sharedReport = true;
     }
-    this.mapSeguidoresService.toggleView$.subscribe((sel) => (this.vistaSeleccionada = Number(sel)));
+    this.mapSeguidoresService.toggleViewSelected$.subscribe((sel) => (this.vistaSeleccionada = Number(sel)));
   }
 
   ngOnInit(): void {
     this.mousePosition = null;
-    this.plantaId = this.activatedRoute.snapshot.paramMap.get('id');
 
-    // Obtenemos todas las capas para esta planta
-    combineLatest([this.informeService.getInformesDePlanta(this.plantaId), this.plantaService.getPlanta(this.plantaId)])
+    this.reportControlService.plantaId$
+      .pipe(
+        take(1),
+        switchMap((plantaId) => {
+          this.plantaId = plantaId;
+
+          // Obtenemos todas las capas para esta planta
+          return combineLatest([
+            this.informeService.getInformesDePlanta(this.plantaId),
+            this.plantaService.getPlanta(this.plantaId),
+          ]);
+        })
+      )
       .pipe(take(1))
       .subscribe(([informes, planta]) => {
         this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers));
-        this.olMapService.getIncrementoLayers().subscribe((layers) => (this.incrementoLayers = layers));
+        // this.olMapService.getIncrementoLayers().subscribe((layers) => (this.incrementoLayers = layers));
 
-        this.incrementosService.initService();
+        // this.incrementosService.initService();
 
+        // ordenamos los informes por fecha
         this.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
-        this.incrementosService.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
+        // this.incrementosService.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
 
         informes
           .sort((a, b) => a.fecha - b.fecha)
           .forEach((informe) => {
+            console.log(informe);
+
             // creamos las capas de los seguidores para los diferentes informes
             this._createSeguidorLayers(informe.id).forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
             // creamos las capas de los incrementos para los diferentes informes
-            this.incrementosService
-              .createIncrementoLayers(informe.id)
-              .forEach((layer) => this.olMapService.addIncrementoLayer(layer));
+            // this.incrementosService
+            //   .createIncrementoLayers(informe.id)
+            //   .forEach((layer) => this.olMapService.addIncrementoLayer(layer));
           });
 
-        // los subscribimos al toggle de vitas
-        this.mapSeguidoresService.toggleView$.subscribe((v) => {
+        // los subscribimos al toggle de vitas y al slider temporal
+        combineLatest([
+          this.mapSeguidoresService.toggleViewSelected$,
+          this.mapSeguidoresService.sliderTemporalSelected$,
+        ]).subscribe(([toggleValue, sliderValue]) => {
+          const layerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (informes.length - 1))));
+
           // ocultamos las 3 capas de las vistas
           this.seguidorLayers.forEach((layer) => layer.setOpacity(0));
-          this.incrementoLayers.forEach((layer) => layer.setOpacity(0));
+          // this.incrementoLayers.forEach((layer) => layer.setOpacity(0));
           // mostramos la capa seleccionada
-          this.seguidorLayers[v].setOpacity(1);
-          this.incrementoLayers[v].setOpacity(1);
+          this.seguidorLayers[layerSelected].setOpacity(1);
+          // this.incrementoLayers[v].setOpacity(1);
         });
 
         this.planta = planta;
 
         // seleccionamos el informe mas reciente de la planta
-        this.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
+        this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
+        // this.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
         // asignamos el informe para compartir
         // this.shareReportService.setInformeID(this.informesList[this.informesList.length - 1]);
 
-        this.mapSeguidoresService.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
+        // this.mapSeguidoresService.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
         this.initMap();
       });
@@ -136,6 +155,10 @@ export class MapSeguidoresComponent implements OnInit {
     const satellite = new XYZ({
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       crossOrigin: '',
+    });
+    const satelliteLayer = new TileLayer({
+      source: satellite,
+      // extent: this.extent1,
     });
 
     /* const aerial = new XYZ({
@@ -153,7 +176,7 @@ export class MapSeguidoresComponent implements OnInit {
       // source: new OSM(),
     });
 
-    const layers = [osmLayer /* this.aerialLayer */];
+    const layers = [satelliteLayer];
 
     // MAPA
     const view = new View({
@@ -175,7 +198,7 @@ export class MapSeguidoresComponent implements OnInit {
       this.addLocationAreas();
     } */
 
-    this.incrementoLayers.forEach((l) => this.map.addLayer(l));
+    // this.incrementoLayers.forEach((l) => this.map.addLayer(l));
 
     // los subscribimos al slider temporal
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {

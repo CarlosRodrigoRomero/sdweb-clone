@@ -47,13 +47,29 @@
       <!-- MAPA -->
       <app-map-seguidores></app-map-seguidores>
 
-      <div *ngIf="seguidoresLoaded">
-        <app-view-toggle></app-view-toggle>
-        <app-share-map *ngIf="!sharedReport"></app-share-map>
-        <app-download-report></app-download-report>
-        <app-barra-resumen-planta></app-barra-resumen-planta>
-        <div class="map-sliders">
-          <app-slider-temporal *ngIf="!sharedReport"></app-slider-temporal>
+      <div>
+        <div class="btns-export">
+          <!-- TOGGLE MAPAS -->
+          <app-view-toggle></app-view-toggle>
+
+          <!-- BOTON COMPARTIR -->
+          <app-share-map *ngIf="notSharedReport"></app-share-map>
+
+          <!-- BOTON DESCARGAS -->
+          <app-download-report></app-download-report>
+        </div>
+
+        <div class="map-control">
+          <!-- CONTROL TEMPORAL -->
+          <div class="temporal-control">
+            <app-slider-temporal *ngIf="showFilters"></app-slider-temporal>
+          </div>
+
+          <!-- CONTROLES VISUALES -->
+          <div class="visual-control">
+            <app-global-coord-areas></app-global-coord-areas>
+            <app-slider-opacity></app-slider-opacity>
+          </div>
         </div>
       </div>
     </div>
@@ -67,21 +83,17 @@
       </button>
 
       <!-- BOTON SIDENAV LISTA SEGUIDORES -->
-      <button mat-raised-button class="btn-right" (click)="sidenavRight.toggle()">
+      <button mat-raised-button class="btn-right" (click)="sidenavRight.toggle()" [disabled]="statsOpened">
         <mat-icon>list_alt</mat-icon>
         <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
         <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon>
       </button>
-      <button
-        *ngIf="!sharedReport"
-        mat-icon-button
-        class="btn-right-stats"
-        (click)="sidenavStats.toggle()"
-        [class.mat-elevation-z2]="true"
-      >
+
+      <!-- BOTON SIDENAV STATS -->
+      <button mat-raised-button class="btn-right-stats" (click)="sidenavStats.toggle()" [disabled]="rightOpened">
         <mat-icon>query_stats</mat-icon>
-        <!-- <mat-icon *ngIf="!statsOpened">keyboard_arrow_left</mat-icon>
-          <mat-icon *ngIf="statsOpened">keyboard_arrow_right</mat-icon> -->
+        <mat-icon *ngIf="!statsOpened">keyboard_arrow_left</mat-icon>
+        <mat-icon *ngIf="statsOpened">keyboard_arrow_right</mat-icon>
       </button>
     </div>
   </mat-sidenav-content>

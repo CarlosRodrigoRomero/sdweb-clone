@@ -91,6 +91,7 @@ export class MapComponent implements OnInit, OnDestroy {
           switchMap((plantaId) => {
             this.plantaId = plantaId;
 
+            // Obtenemos todas las capas para esta planta
             return combineLatest([
               this.plantaService.getThermalLayers$(this.plantaId),
               this.informeService.getInformesDePlanta(this.plantaId),

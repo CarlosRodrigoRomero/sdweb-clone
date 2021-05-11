@@ -44,7 +44,7 @@ export class SeguidoresListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.mapSeguidoresService.toggleView$.subscribe((sel) => {
+    this.mapSeguidoresService.toggleViewSelected$.subscribe((sel) => {
       this.viewSeleccionada = Number(sel);
 
       // cambiammos la ultima columna con la vista seleccionada

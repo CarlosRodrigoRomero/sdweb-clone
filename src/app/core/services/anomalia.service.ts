@@ -41,9 +41,8 @@ export class AnomaliaService {
           if (planta.hasOwnProperty('criterioId')) {
             return this.plantaService.getCriterio(planta.criterioId);
           } else {
-            // DEMO
-            return this.plantaService.getCriterio('aU2iM5nM0S3vMZxMZGff');
-            // return this.plantaService.getCriterio(GLOBAL.criterioSolardroneId);
+            // return this.plantaService.getCriterio('aU2iM5nM0S3vMZxMZGff');  // DEMO
+            return this.plantaService.getCriterio(GLOBAL.criterioSolardroneId);
           }
         })
       )
@@ -109,8 +108,8 @@ export class AnomaliaService {
             const data = doc.payload.doc.data() as Anomalia;
             data.id = doc.payload.doc.id;
             data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
-            data.severidad = this.getCoA(data);
-            data.criticidad = this.getCriticidad(data);
+            data.severidad = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
+            data.criticidad = this.getCriticidad(data); // DEMO licitacion
             // Convertimos el objeto en un array
             if (data.hasOwnProperty('featureCoords')) {
               data.featureCoords = Object.values(data.featureCoords);

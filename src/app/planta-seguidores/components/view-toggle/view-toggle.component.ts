@@ -13,6 +13,6 @@ export class ViewToggleComponent implements OnInit {
   ngOnInit(): void {}
 
   onToggleChange(value) {
-    this.mapSeguidoresService.toggleView = value;
+    this.mapSeguidoresService.toggleViewSelected = value;
   }
 }

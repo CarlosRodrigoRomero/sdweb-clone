@@ -16,15 +16,18 @@ export class MapSeguidoresService {
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
 
-  private _sliderTemporal: number = 100;
-  public sliderTemporalSource$ = new BehaviorSubject<number>(this._sliderTemporal);
+  private _sliderTemporalSelected: number = 100;
+  public sliderTemporalSelected$ = new BehaviorSubject<number>(this._sliderTemporalSelected);
 
-  private _toggleView = 0;
-  public toggleView$ = new BehaviorSubject<number>(this.toggleView);
+  private _toggleViewSelected = 0;
+  public toggleViewSelected$ = new BehaviorSubject<number>(this._toggleViewSelected);
 
   private _selectedInformeId: string = '';
   private selectedInformeIdSource = new BehaviorSubject<string>(this._selectedInformeId);
   public selectedInformeId$ = this.selectedInformeIdSource.asObservable();
+
+  private _layerSelected = undefined;
+  public layerSelected$ = new BehaviorSubject<number>(this._layerSelected);
 
   constructor(private informeService: InformeService) {}
 
@@ -58,22 +61,14 @@ export class MapSeguidoresService {
     return this.informesList$.asObservable();
   }
 
-  getSliderTemporalSource(): Observable<number> {
-    return this.sliderTemporalSource$.asObservable();
-  }
-
-  getToggleView(): Observable<number> {
-    return this.toggleView$.asObservable();
-  }
-
   get sliderTemporal() {
-    return this._sliderTemporal;
+    return this._sliderTemporalSelected;
   }
 
   set sliderTemporal(value: number) {
-    this._sliderTemporal = value;
+    this._sliderTemporalSelected = value;
 
-    this.sliderTemporalSource$.next(value);
+    this.sliderTemporalSelected$.next(value);
   }
   /////////////////
   get selectedInformeId() {
@@ -85,12 +80,21 @@ export class MapSeguidoresService {
     this.selectedInformeIdSource.next(informeId);
   }
   /////////////////
-  get toggleView() {
-    return this._toggleView;
+  get toggleViewSelected() {
+    return this._toggleViewSelected;
   }
-  set toggleView(selected: number) {
-    this._toggleView = selected;
+  set toggleViewSelected(selected: number) {
+    this._toggleViewSelected = selected;
 
-    this.toggleView$.next(selected);
+    this.toggleViewSelected$.next(selected);
+  }
+
+  get layerSelected() {
+    return this._layerSelected;
+  }
+
+  set layerSelected(value: number) {
+    this._layerSelected = value;
+    this.layerSelected$.next(value);
   }
 }

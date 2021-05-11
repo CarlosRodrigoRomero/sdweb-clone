@@ -46,11 +46,12 @@ export class SeguidorService {
 
   getSeguidores$(informeId: string, plantaId: string, tipo?: 'anomalias' | 'pcs'): Observable<Seguidor[]> {
     // Obtener todas las locArea de la planta
-    const locAreaList$ = this.plantaService.getLocationsArea(plantaId).pipe(take(1));
-    const anomaliaList$ = this.anomaliaService.getAnomalias$(informeId, tipo).pipe(take(1));
+    const locAreaList$ = this.plantaService.getLocationsArea(plantaId);
+    const anomaliaList$ = this.anomaliaService.getAnomalias$(informeId, tipo);
 
     // obtenemos todas las anomalias y las locAreas
     return combineLatest([locAreaList$, anomaliaList$]).pipe(
+      take(1),
       map(([locAreaList, anomaliaList]) => {
         const seguidores: Seguidor[] = [];
 

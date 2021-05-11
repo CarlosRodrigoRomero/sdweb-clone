@@ -4,15 +4,18 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
+import { GLOBAL } from './global';
 import { FilterService } from '@core/services/filter.service';
 import { ShareReportService } from '@core/services/share-report.service';
 import { InformeService } from '@core/services/informe.service';
 import { PlantaService } from '@core/services/planta.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
+import { SeguidorService } from '@core/services/seguidor.service';
+
 import { WINDOW } from '../../window.providers';
 
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
-import { GLOBAL } from './global';
+
 import { FilterableElement } from '@core/models/filtrableInterface';
 
 @Injectable({
@@ -48,131 +51,253 @@ export class ReportControlService {
     private informeService: InformeService,
     private plantaService: PlantaService,
     private anomaliaService: AnomaliaService,
+    private seguidorService: SeguidorService,
     @Inject(WINDOW) private window: Window
   ) {}
 
   initService(): Observable<boolean> {
-    // comprobamos si es un planta fija o de seguidores
+    ////////////////////// PLANTA FIJA ////////////////////////
     if (this.router.url.includes('fixed')) {
       this.plantaFija = true;
-    }
 
-    // comprobamos si es un informe compartido
-    if (this.router.url.includes('shared')) {
-      this.sharedReport = true;
+      if (!this.router.url.includes('shared')) {
+        // obtenemos plantaId de la url
+        this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
-      // comprobamos si es filtrable
-      if (!this.router.url.includes('filterable')) {
-        this.sharedReportWithFilters = false;
-      }
+        // iniciamos anomalia service antes de obtener las anomalias
+        this.anomaliaService
+          .initService(this.plantaId)
+          .pipe(
+            switchMap(() => this.informeService.getInformesDePlanta(this.plantaId)),
+            // obtenemos los informes de la planta
+            switchMap((informesId) => {
+              // ordenamos los informes de menos a mas reciente y los añadimos a la lista
+              informesId
+                .sort((a, b) => a.fecha - b.fecha)
+                .forEach((informe) => {
+                  this.informesList.push(informe.id);
+                });
+              this.informesList$.next(this.informesList);
 
-      // obtenemos el ID de la URL
-      this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 1];
-      // iniciamos el servicio share-report
-      this.shareReportService.initService(this.sharedId);
-      // obtenemos los parámetros necesarios
-      this.shareReportService
-        .getParamsById(this.sharedId)
-        .get()
-        .toPromise()
-        .then((doc) => {
-          if (doc.exists) {
-            const params = doc.data() as ParamsFilterShare;
+              this.selectedInformeId = this.informesList[this.informesList.length - 1];
 
-            this.plantaId = params.plantaId;
-            this.selectedInformeId = params.informeId;
+              // obtenemos todas las anomalías
+              return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
+            }),
+            take(1),
+            switchMap((anoms) => {
+              this.allFilterableElements = anoms;
 
-            if (this.router.url.includes('filterable')) {
-              let initAnomService = false;
-              // iniciamos anomalia service antes de obtener las anomalias
-              this.anomaliaService
-                .initService(this.plantaId)
-                .pipe(
-                  switchMap((init) => {
-                    initAnomService = init;
+              // iniciamos filter service
+              return this.filterService.initService(this.plantaId, this.plantaFija, anoms);
+            })
+          )
+          .subscribe((init) => (this.initialized = init));
+      } else {
+        ///////////////////// SHARED REPORT ///////////////////////
+        this.sharedReport = true;
 
-                    return this.informeService.getInformesDePlanta(this.plantaId);
-                  }),
-                  // obtenemos los informes de la planta
-                  switchMap((informes) => {
-                    // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                    informes
-                      .sort((a, b) => a.fecha - b.fecha)
-                      .forEach((informe) => {
-                        this.informesList.push(informe.id);
-                      });
-                    this.informesList$.next(this.informesList);
+        // comprobamos si es filtrable
+        if (!this.router.url.includes('filterable')) {
+          this.sharedReportWithFilters = false;
+        }
 
-                    // comprobamos que anomalia service hay terminado de iniciarse
-                    if (initAnomService) {
-                      // obtenemos todas las anomalías
-                      return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
-                    }
-                  }),
-                  take(1),
-                  switchMap((anoms) => {
-                    this.allFilterableElements = anoms;
+        // obtenemos el ID de la URL
+        this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+        // iniciamos el servicio share-report
+        this.shareReportService.initService(this.sharedId);
+        // obtenemos los parámetros necesarios
+        this.shareReportService
+          .getParamsById(this.sharedId)
+          .get()
+          .toPromise()
+          .then((doc) => {
+            if (doc.exists) {
+              const params = doc.data() as ParamsFilterShare;
 
-                    // iniciamos filter service
-                    return this.filterService.initService(this.plantaId, true, anoms, this.plantaFija, this.sharedId);
-                  })
-                )
-                .subscribe((init) => (this.initialized = init));
+              this.plantaId = params.plantaId;
+              this.selectedInformeId = params.informeId;
+
+              if (!this.router.url.includes('filterable')) {
+                // iniciamos anomalia service antes de obtener las anomalias
+                this.anomaliaService
+                  .initService(this.plantaId)
+                  .pipe(
+                    switchMap(() => this.anomaliaService.getAnomaliasPlanta$(this.plantaId)),
+                    take(1),
+                    switchMap((anoms) => {
+                      this.allFilterableElements = anoms;
+
+                      // iniciamos filter service
+                      return this.filterService.initService(this.plantaId, true, anoms, this.plantaFija, this.sharedId);
+                    })
+                  )
+                  // iniciamos filter service
+                  .subscribe((init) => (this.initialized = init));
+              } else {
+                //////////////////// FILTERABLE SHARED REPORT /////////////////////////
+                let initAnomService = false;
+                // iniciamos anomalia service antes de obtener las anomalias
+                this.anomaliaService
+                  .initService(this.plantaId)
+                  .pipe(
+                    switchMap((init) => {
+                      initAnomService = init;
+
+                      return this.informeService.getInformesDePlanta(this.plantaId);
+                    }),
+                    // obtenemos los informes de la planta
+                    switchMap((informes) => {
+                      // ordenamos los informes de menos a mas reciente y los añadimos a la lista
+                      informes
+                        .sort((a, b) => a.fecha - b.fecha)
+                        .forEach((informe) => {
+                          this.informesList.push(informe.id);
+                        });
+                      this.informesList$.next(this.informesList);
+
+                      // comprobamos que anomalia service hay terminado de iniciarse
+                      if (initAnomService) {
+                        // obtenemos todas las anomalías
+                        return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
+                      }
+                    }),
+                    take(1),
+                    switchMap((anoms) => {
+                      this.allFilterableElements = anoms;
+
+                      // iniciamos filter service
+                      return this.filterService.initService(this.plantaId, true, anoms, this.plantaFija, this.sharedId);
+                    })
+                  )
+                  .subscribe((init) => (this.initialized = init));
+              }
             } else {
-              // iniciamos anomalia service antes de obtener las anomalias
-              this.anomaliaService
-                .initService(this.plantaId)
-                .pipe(
-                  switchMap(() => this.anomaliaService.getAnomaliasPlanta$(this.plantaId)),
-                  take(1),
-                  switchMap((anoms) => {
-                    this.allFilterableElements = anoms;
-
-                    // iniciamos filter service
-                    return this.filterService.initService(this.plantaId, true, anoms, this.plantaFija, this.sharedId);
-                  })
-                )
-                // iniciamos filter service
-                .subscribe((init) => (this.initialized = init));
+              console.log('No existe el documento');
             }
-          } else {
-            console.log('No existe el documento');
-          }
-        })
-        .catch((error) => console.log('Error accediendo al documento: ', error));
-    } else {
-      // obtenemos plantaId de la url
-      this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 1];
-
-      // iniciamos anomalia service antes de obtener las anomalias
-      this.anomaliaService
-        .initService(this.plantaId)
-        .pipe(
-          switchMap(() => this.informeService.getInformesDePlanta(this.plantaId)),
-          // obtenemos los informes de la planta
-          switchMap((informesId) => {
-            // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-            informesId
-              .sort((a, b) => a.fecha - b.fecha)
-              .forEach((informe) => {
-                this.informesList.push(informe.id);
-              });
-            this.informesList$.next(this.informesList);
-
-            this.selectedInformeId = this.informesList[this.informesList.length - 1];
-
-            // obtenemos todas las anomalías
-            return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
-          }),
-          take(1),
-          switchMap((anoms) => {
-            this.allFilterableElements = anoms;
-
-            // iniciamos filter service
-            return this.filterService.initService(this.plantaId, this.plantaFija, anoms);
           })
-        )
-        .subscribe((init) => (this.initialized = init));
+          .catch((error) => console.log('Error accediendo al documento: ', error));
+      }
+    } else {
+      /////////////////// PLANTA SEGUIDORES //////////////////////
+      if (!this.router.url.includes('shared')) {
+        // obtenemos plantaId de la url
+        this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+
+        // iniciamos anomalia service para cargar los criterios la planta
+        this.anomaliaService
+          .initService(this.plantaId)
+          .pipe(
+            switchMap(() => this.informeService.getInformesDePlanta(this.plantaId)),
+            // obtenemos los informes de la planta
+            switchMap((informesId) => {
+              // ordenamos los informes de menos a mas reciente y los añadimos a la lista
+              informesId
+                .sort((a, b) => a.fecha - b.fecha)
+                .forEach((informe) => {
+                  this.informesList.push(informe.id);
+                });
+              this.informesList$.next(this.informesList);
+
+              this.selectedInformeId = this.informesList[this.informesList.length - 1];
+
+              // obtenemos todos los seguidores
+              return this.seguidorService.getSeguidoresPlanta$(this.plantaId);
+            }),
+            take(1),
+            switchMap((segs) => {
+              this.allFilterableElements = segs;
+
+              // iniciamos filter service
+              return this.filterService.initService(this.plantaId, this.plantaFija, segs);
+            })
+          )
+          .subscribe((init) => (this.initialized = init));
+      } else {
+        ///////////////////// SHARED REPORT ///////////////////////
+        this.sharedReport = true;
+
+        // comprobamos si es filtrable
+        if (!this.router.url.includes('filterable')) {
+          this.sharedReportWithFilters = false;
+        }
+
+        // obtenemos el ID de la URL
+        this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+        // iniciamos el servicio share-report
+        this.shareReportService.initService(this.sharedId);
+        // obtenemos los parámetros necesarios
+        this.shareReportService
+          .getParamsById(this.sharedId)
+          .get()
+          .toPromise()
+          .then((doc) => {
+            if (doc.exists) {
+              const params = doc.data() as ParamsFilterShare;
+
+              this.plantaId = params.plantaId;
+              this.selectedInformeId = params.informeId;
+
+              if (!this.router.url.includes('filterable')) {
+                // iniciamos anomalia service antes de obtener las anomalias
+                this.anomaliaService
+                  .initService(this.plantaId)
+                  .pipe(
+                    switchMap(() => this.seguidorService.getSeguidoresPlanta$(this.plantaId)),
+                    take(1),
+                    switchMap((segs) => {
+                      this.allFilterableElements = segs;
+
+                      // iniciamos filter service
+                      return this.filterService.initService(this.plantaId, true, segs, this.plantaFija, this.sharedId);
+                    })
+                  )
+                  // iniciamos filter service
+                  .subscribe((init) => (this.initialized = init));
+              } else {
+                //////////////////// FILTERABLE SHARED REPORT /////////////////////////
+                let initAnomService = false;
+                // iniciamos anomalia service para cargar los criterios la planta
+                this.anomaliaService
+                  .initService(this.plantaId)
+                  .pipe(
+                    switchMap((init) => {
+                      initAnomService = init;
+
+                      return this.informeService.getInformesDePlanta(this.plantaId);
+                    }),
+                    // obtenemos los informes de la planta
+                    switchMap((informes) => {
+                      // ordenamos los informes de menos a mas reciente y los añadimos a la lista
+                      informes
+                        .sort((a, b) => a.fecha - b.fecha)
+                        .forEach((informe) => {
+                          this.informesList.push(informe.id);
+                        });
+                      this.informesList$.next(this.informesList);
+
+                      // comprobamos que anomalia service hay terminado de iniciarse
+                      if (initAnomService) {
+                        // obtenemos todos los seguidores
+                        return this.seguidorService.getSeguidoresPlanta$(this.plantaId);
+                      }
+                    }),
+                    take(1),
+                    switchMap((segs) => {
+                      this.allFilterableElements = segs;
+
+                      // iniciamos filter service
+                      return this.filterService.initService(this.plantaId, true, segs, this.plantaFija, this.sharedId);
+                    })
+                  )
+                  .subscribe((init) => (this.initialized = init));
+              }
+            } else {
+              console.log('No existe el documento');
+            }
+          })
+          .catch((error) => console.log('Error accediendo al documento: ', error));
+      }
     }
 
     return this.initialized$;

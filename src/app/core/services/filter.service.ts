@@ -41,35 +41,28 @@ export class FilterService {
     shared?: boolean,
     sharedId?: string
   ): Observable<boolean> {
-    if (plantaFija) {
-      this.allFiltrableElements = elems;
-      this.filteredElements = elems;
+    this.allFiltrableElements = elems;
+    this.filteredElements = elems;
 
-      if (shared) {
-        this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params));
+    console.log(elems);
 
-        // obtenemos lo filtros guardados en al DB y los añadimos
-        this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
-          if (filters.length > 0) {
-            this.addFilters(filters);
+    if (shared) {
+      this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params));
 
-            this.initialized$.next(true);
-          }
-        });
-      } else {
-        this.initialized$.next(true);
-      }
+      // obtenemos lo filtros guardados en al DB y los añadimos
+      this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
+        if (filters.length > 0) {
+          this.addFilters(filters);
 
-      // para contabilizar los diferentes filtros 'tipo'
-      this.filteredElementsWithoutFilterTipo = elems;
-    } else {
-      this.seguidorService.getSeguidoresPlanta$(plantaId).subscribe((seguidores) => {
-        this.allFiltrableElements = seguidores;
-        this.filteredElements$.next(seguidores);
-
-        this.initialized$.next(true);
+          this.initialized$.next(true);
+        }
       });
+    } else {
+      this.initialized$.next(true);
     }
+
+    // para contabilizar los diferentes filtros 'tipo'
+    this.filteredElementsWithoutFilterTipo = elems;
 
     return this.initialized$;
   }
