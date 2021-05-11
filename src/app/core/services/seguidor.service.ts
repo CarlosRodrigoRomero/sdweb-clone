@@ -96,9 +96,17 @@ export class SeguidorService {
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
           let count = 0;
           locAreaSeguidores.forEach((locArea) => {
-            const anomaliasSeguidor = anomaliaList.filter(
-              (anomalia) => (anomalia as PcInterface).global_x === locArea.globalX
-            );
+            let anomaliasSeguidor = anomaliaList
+              .filter((anomalia) => anomalia.globalCoords !== undefined)
+              .filter((anomalia) => anomalia.globalCoords[0] == locArea.globalX);
+
+            // comprovamos si las anomalias son de tipo 'anomalia' o 'pc'
+            if (anomaliasSeguidor.length === 0) {
+              anomaliasSeguidor = anomaliaList.filter(
+                (anomalia) => (anomalia as PcInterface).global_x === locArea.globalX
+              );
+            }
+
             const seguidor = new Seguidor(
               anomaliasSeguidor,
               this.planta.filas,

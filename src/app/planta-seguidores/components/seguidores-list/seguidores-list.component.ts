@@ -128,19 +128,24 @@ export class SeguidoresListComponent implements OnInit {
 
   getModuloLabel(elem: Seguidor): string {
     let moduloLabel: string;
-    if (elem.modulo.marca === undefined) {
-      if (elem.modulo.modelo === undefined) {
-        moduloLabel = elem.modulo.potencia + 'W';
+    if (elem.modulo !== undefined) {
+      if (elem.modulo.marca === undefined) {
+        if (elem.modulo.modelo === undefined) {
+          moduloLabel = elem.modulo.potencia + 'W';
+        } else {
+          moduloLabel = elem.modulo.modelo + ' ' + elem.modulo.potencia + 'W';
+        }
       } else {
-        moduloLabel = elem.modulo.modelo + ' ' + elem.modulo.potencia + 'W';
+        if (elem.modulo.modelo === undefined) {
+          moduloLabel = elem.modulo.marca + ' ' + elem.modulo.potencia + 'W';
+        } else {
+          moduloLabel = elem.modulo.marca + ' ' + elem.modulo.modelo + ' ' + elem.modulo.potencia + 'W';
+        }
       }
     } else {
-      if (elem.modulo.modelo === undefined) {
-        moduloLabel = elem.modulo.marca + ' ' + elem.modulo.potencia + 'W';
-      } else {
-        moduloLabel = elem.modulo.marca + ' ' + elem.modulo.modelo + ' ' + elem.modulo.potencia + 'W';
-      }
+      moduloLabel = 'Desconocido';
     }
+
     return moduloLabel;
   }
 }

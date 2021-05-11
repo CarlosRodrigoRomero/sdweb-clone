@@ -110,8 +110,6 @@ export class MapSeguidoresComponent implements OnInit {
         informes
           .sort((a, b) => a.fecha - b.fecha)
           .forEach((informe) => {
-            console.log(informe);
-
             // creamos las capas de los seguidores para los diferentes informes
             this._createSeguidorLayers(informe.id).forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 

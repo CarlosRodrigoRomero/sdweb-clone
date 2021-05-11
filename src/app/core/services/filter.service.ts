@@ -44,8 +44,6 @@ export class FilterService {
     this.allFiltrableElements = elems;
     this.filteredElements = elems;
 
-    console.log(elems);
-
     if (shared) {
       this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params));
 
