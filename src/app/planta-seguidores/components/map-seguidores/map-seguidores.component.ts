@@ -126,6 +126,8 @@ export class MapSeguidoresComponent implements OnInit {
         ]).subscribe(([toggleValue, sliderValue]) => {
           const layerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (informes.length - 1))));
 
+          this.mapSeguidoresService.layerSelected = layerSelected;
+
           // ocultamos las 3 capas de las vistas
           this.seguidorLayers.forEach((layer) => layer.setOpacity(0));
           // this.incrementoLayers.forEach((layer) => layer.setOpacity(0));

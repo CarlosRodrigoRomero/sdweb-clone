@@ -48,28 +48,15 @@ export class PlantListComponent implements OnInit, AfterViewInit {
         const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
 
         if (mae !== undefined) {
-          if (planta.nombre === 'Demo 1') {
-            // DEMO
-            plantsData.push({
-              nombre: planta.nombre,
-              potencia: planta.potencia,
-              mae,
-              ultimaInspeccion: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current))
-                .fecha,
-              plantaId: planta.id,
-              tipo: planta.tipo,
-            });
-          } else {
-            plantsData.push({
-              nombre: planta.nombre,
-              potencia: planta.potencia,
-              mae,
-              ultimaInspeccion: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current))
-                .fecha,
-              plantaId: planta.id,
-              tipo: planta.tipo,
-            });
-          }
+          plantsData.push({
+            nombre: planta.nombre,
+            potencia: planta.potencia,
+            mae,
+            ultimaInspeccion: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current))
+              .fecha,
+            plantaId: planta.id,
+            tipo: planta.tipo,
+          });
         }
       }
     });
@@ -98,13 +85,10 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     const plantaId = row.plantaId;
     const tipoPlanta = row.tipo;
 
-    // acotado para la DEMO
-    if (plantaId === 'egF0cbpXnnBnjcrusoeR') {
-      if (tipoPlanta === 'seguidores') {
-        this.router.navigate(['clients/tracker/' + plantaId]);
-      } else {
-        this.router.navigate(['clients/fixed/' + plantaId]);
-      }
+    if (tipoPlanta === 'seguidores') {
+      this.router.navigate(['clients/tracker/' + plantaId]);
+    } else {
+      this.router.navigate(['clients/fixed/' + plantaId]);
     }
   }
 

@@ -10,6 +10,8 @@ import { SeguidoresListComponent } from './components/seguidores-list/seguidores
 import { MapSeguidoresComponent } from './components/map-seguidores/map-seguidores.component';
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
 import { ViewToggleComponent } from './components/view-toggle/view-toggle.component';
+import { GlobalCoordAreasComponent } from './components/global-coord-areas/global-coord-areas.component';
+import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +20,8 @@ import { ViewToggleComponent } from './components/view-toggle/view-toggle.compon
     MapSeguidoresComponent,
     SliderTemporalComponent,
     ViewToggleComponent,
+    GlobalCoordAreasComponent,
+    SliderOpacityComponent,
   ],
   imports: [CommonModule, PlantaSeguidoresRoutingModule, SharedModule, FiltersModule],
 })

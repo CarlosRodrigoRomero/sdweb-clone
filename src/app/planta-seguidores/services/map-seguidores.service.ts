@@ -19,6 +19,9 @@ export class MapSeguidoresService {
   private _sliderTemporalSelected: number = 100;
   public sliderTemporalSelected$ = new BehaviorSubject<number>(this._sliderTemporalSelected);
 
+  private _sliderOpacity: number = 100;
+  public sliderOpacity$ = new BehaviorSubject<number>(this._sliderOpacity);
+
   private _toggleViewSelected = 0;
   public toggleViewSelected$ = new BehaviorSubject<number>(this._toggleViewSelected);
 
@@ -96,5 +99,14 @@ export class MapSeguidoresService {
   set layerSelected(value: number) {
     this._layerSelected = value;
     this.layerSelected$.next(value);
+  }
+
+  get sliderOpacity() {
+    return this._sliderOpacity;
+  }
+  set sliderOpacity(value: number) {
+    this._sliderOpacity = value;
+
+    this.sliderOpacity$.next(value);
   }
 }
