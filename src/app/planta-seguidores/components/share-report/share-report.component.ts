@@ -10,11 +10,11 @@ import { ShareReportService } from '@core/services/share-report.service';
 import { ReportControlService } from '@core/services/report-control.service';
 
 @Component({
-  selector: 'app-share-map',
-  templateUrl: './share-map.component.html',
-  styleUrls: ['./share-map.component.css'],
+  selector: 'app-share-report',
+  templateUrl: './share-report.component.html',
+  styleUrls: ['./share-report.component.css'],
 })
-export class ShareMapComponent implements OnInit {
+export class ShareReportComponent implements OnInit {
   items: Observable<any[]>;
   public filterableCheck = false;
   private selectedInformeId: string;

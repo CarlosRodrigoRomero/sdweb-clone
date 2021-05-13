@@ -62,6 +62,13 @@ app-view-toggle {
   transform: translate(-50%, 0%);
 }
 
+.btns-export {
+  position: absolute;
+  top: 10px;
+  right: 180px;
+  z-index: 999;
+}
+
 .left-sidenav {
   position: absolute;
   display: flex;

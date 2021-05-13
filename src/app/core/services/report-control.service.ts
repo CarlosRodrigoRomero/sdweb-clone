@@ -40,7 +40,7 @@ export class ReportControlService {
   public allFilterableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFilterableElements);
   private _filteredElements: FilterableElement[] = [];
   public filteredElements$ = new BehaviorSubject<FilterableElement[]>(this._filteredElements);
-  private plantaFija = false;
+  public plantaFija = false;
 
   constructor(
     private router: Router,
@@ -126,7 +126,7 @@ export class ReportControlService {
                       this.allFilterableElements = anoms;
 
                       // iniciamos filter service
-                      return this.filterService.initService(this.plantaId, true, anoms, this.plantaFija, this.sharedId);
+                      return this.filterService.initService(this.plantaId, true, anoms, true, this.sharedId);
                     })
                   )
                   // iniciamos filter service
@@ -144,9 +144,9 @@ export class ReportControlService {
                       return this.informeService.getInformesDePlanta(this.plantaId);
                     }),
                     // obtenemos los informes de la planta
-                    switchMap((informes) => {
+                    switchMap((informesId) => {
                       // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                      informes
+                      informesId
                         .sort((a, b) => a.fecha - b.fecha)
                         .forEach((informe) => {
                           this.informesList.push(informe.id);
@@ -156,7 +156,7 @@ export class ReportControlService {
                       // comprobamos que anomalia service hay terminado de iniciarse
                       if (initAnomService) {
                         // obtenemos todas las anomalías
-                        return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
+                      return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
                       }
                     }),
                     take(1),
@@ -164,7 +164,7 @@ export class ReportControlService {
                       this.allFilterableElements = anoms;
 
                       // iniciamos filter service
-                      return this.filterService.initService(this.plantaId, true, anoms, this.plantaFija, this.sharedId);
+                      return this.filterService.initService(this.plantaId, true, anoms, true, this.sharedId);
                     })
                   )
                   .subscribe((init) => (this.initialized = init));

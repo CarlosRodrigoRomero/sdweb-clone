@@ -18,12 +18,20 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    path: 'shared',
-    loadChildren: () => import('./shared-report/shared-report.module').then((m) => m.SharedReportModule),
+    path: 'fixed-shared',
+    loadChildren: () => import('./planta-fija/planta-fija.module').then((m) => m.PlantaFijaModule),
   },
   {
-    path: 'filterable-shared',
-    loadChildren: () => import('./shared-report/shared-report.module').then((m) => m.SharedReportModule),
+    path: 'fixed-filterable-shared',
+    loadChildren: () => import('./planta-fija/planta-fija.module').then((m) => m.PlantaFijaModule),
+  },
+  {
+    path: 'tracker-shared',
+    loadChildren: () => import('./planta-seguidores/planta-seguidores.module').then((m) => m.PlantaSeguidoresModule),
+  },
+  {
+    path: 'tracker-filterable-shared',
+    loadChildren: () => import('./planta-seguidores/planta-seguidores.module').then((m) => m.PlantaSeguidoresModule),
   },
   {
     path: 'clusters',

@@ -73,7 +73,8 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     private olMapService: OlMapService,
     private incrementosService: IncrementosService,
     private reportControlService: ReportControlService,
-    private seguidoresControlService: SeguidoresControlService
+    private seguidoresControlService: SeguidoresControlService,
+    private shareReportService: ShareReportService
   ) {}
 
   ngOnInit(): void {
@@ -137,6 +138,9 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
           });
 
           this.planta = planta;
+
+          // asignamos los IDs necesarios para compartir
+          this.shareReportService.setPlantaId(this.plantaId);
 
           // seleccionamos el informe mas reciente de la planta
           this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));

@@ -13,6 +13,7 @@ import { ViewToggleComponent } from './components/view-toggle/view-toggle.compon
 import { GlobalCoordAreasComponent } from './components/global-coord-areas/global-coord-areas.component';
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
 import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.component';
+import { ShareReportComponent } from './components/share-report/share-report.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.
     GlobalCoordAreasComponent,
     SliderOpacityComponent,
     SeguidorInfoComponent,
+    ShareReportComponent,
   ],
   imports: [CommonModule, PlantaSeguidoresRoutingModule, SharedModule, FiltersModule],
 })
