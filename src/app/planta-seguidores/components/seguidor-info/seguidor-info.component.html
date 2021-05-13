@@ -1,0 +1,26 @@
+<div class="popup">
+  <mat-card class="popup-hover" *ngIf="seguidorHovered">
+    <mat-card-content class="popup-hover-content">
+      <div class="elemento">
+        <span class="titulo">Seguidor</span>
+        <span class="subtitulo">{{ seguidorHovered.id }}</span>
+      </div>
+      <div class="elemento">
+        <span class="titulo">Temperatura Max</span>
+        <span class="subtitulo">{{ seguidorHovered.temperaturaMax }} ºC</span>
+      </div>
+      <div class="elemento">
+        <span class="titulo">&Delta;T Normalizado</span>
+        <span class="subtitulo">{{ seguidorHovered.gradienteNormalizado }} ºC</span>
+      </div>
+      <div class="elemento">
+        <span class="titulo">Pérdidas</span>
+        <span class="subtitulo">{{ seguidorHovered.perdidas * 100 | number: '1.0-2' }}%</span>
+      </div>
+      <div class="elemento">
+        <span class="titulo">Nº anomalías</span>
+        <span class="subtitulo">{{ seguidorHovered.anomalias.length }}</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

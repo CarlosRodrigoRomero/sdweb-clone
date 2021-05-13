@@ -8,6 +8,8 @@ import { MapSeguidoresService } from '../../services/map-seguidores.service';
   styleUrls: ['./view-toggle.component.css'],
 })
 export class ViewToggleComponent implements OnInit {
+  viewSelected: boolean[] = [true, false, false];
+
   constructor(private mapSeguidoresService: MapSeguidoresService) {}
 
   ngOnInit(): void {}

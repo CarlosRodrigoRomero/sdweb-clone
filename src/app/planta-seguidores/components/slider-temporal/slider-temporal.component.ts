@@ -61,7 +61,7 @@ export class SliderTemporalComponent implements OnInit {
 
     const roundedValue = Math.round(value / (100 / (this.informesList.length - 1)));
 
-    this.mapSeguidoresService.selectedInformeId = this.informesList[roundedValue];
+    this.reportControlService.selectedInformeId = this.informesList[roundedValue];
   }
 
   getDatesInformes(informesId: string[]) {

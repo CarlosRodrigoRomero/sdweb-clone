@@ -1,4 +1,4 @@
-<div *ngIf="informe" class="resumen">
+<div *ngIf="informe$ | async" class="resumen">
   <div class="grupo1">
     <mat-icon color="primary">home</mat-icon>
     <h5 class="titulo">

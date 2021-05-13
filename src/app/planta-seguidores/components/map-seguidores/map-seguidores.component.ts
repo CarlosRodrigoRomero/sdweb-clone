@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { switchMap, take } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
 import { fromLonLat } from 'ol/proj.js';
@@ -26,6 +26,7 @@ import { FilterService } from '@core/services/filter.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { ShareReportService } from '@core/services/share-report.service';
 import { ReportControlService } from '@core/services/report-control.service';
+import { SeguidoresControlService } from '../../services/seguidores-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { Seguidor } from '@core/models/seguidor';
@@ -37,7 +38,7 @@ import { Coordinate } from 'ol/coordinate';
   templateUrl: './map-seguidores.component.html',
   styleUrls: ['./map-seguidores.component.scss'],
 })
-export class MapSeguidoresComponent implements OnInit {
+export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public plantaId: string;
   public planta: PlantaInterface;
   public map: Map;
@@ -45,6 +46,8 @@ export class MapSeguidoresComponent implements OnInit {
   public rangeMax: number;
   public palleteJSON: string;
   public selectedInformeId: string;
+  public seguidorSelected: Seguidor;
+  public seguidorHovered: Seguidor;
   public locAreasVectorSource: VectorSource;
   public seguidorSeleccionado: Seguidor;
   public listaSeguidores: Seguidor[];
@@ -60,7 +63,7 @@ export class MapSeguidoresComponent implements OnInit {
   public mousePosition;
   public informeIdList: string[] = [];
   public sharedReport = false;
-  private vistaSeleccionada = 0;
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     public mapSeguidoresService: MapSeguidoresService,
@@ -68,87 +71,85 @@ export class MapSeguidoresComponent implements OnInit {
     private informeService: InformeService,
     public filterService: FilterService,
     private olMapService: OlMapService,
-    private shareReportService: ShareReportService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
     private incrementosService: IncrementosService,
-    private reportControlService: ReportControlService
-  ) {
-    if (this.router.url.includes('shared')) {
-      this.sharedReport = true;
-    }
-    this.mapSeguidoresService.toggleViewSelected$.subscribe((sel) => (this.vistaSeleccionada = Number(sel)));
-  }
+    private reportControlService: ReportControlService,
+    private seguidoresControlService: SeguidoresControlService
+  ) {}
 
   ngOnInit(): void {
     this.mousePosition = null;
 
-    this.reportControlService.plantaId$
-      .pipe(
-        take(1),
-        switchMap((plantaId) => {
-          this.plantaId = plantaId;
+    this.subscriptions.add(
+      this.reportControlService.plantaId$
+        .pipe(
+          take(1),
+          switchMap((plantaId) => {
+            this.plantaId = plantaId;
 
-          // Obtenemos todas las capas para esta planta
-          return combineLatest([
-            this.informeService.getInformesDePlanta(this.plantaId),
-            this.plantaService.getPlanta(this.plantaId),
-          ]);
-        })
-      )
-      .pipe(take(1))
-      .subscribe(([informes, planta]) => {
-        this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers));
-        // this.olMapService.getIncrementoLayers().subscribe((layers) => (this.incrementoLayers = layers));
+            // Obtenemos todas las capas para esta planta
+            return combineLatest([
+              this.informeService.getInformesDePlanta(this.plantaId),
+              this.plantaService.getPlanta(this.plantaId),
+            ]);
+          })
+        )
+        .pipe(take(1))
+        .subscribe(([informes, planta]) => {
+          this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers));
+          // this.olMapService.getIncrementoLayers().subscribe((layers) => (this.incrementoLayers = layers));
 
-        // this.incrementosService.initService();
+          // this.incrementosService.initService();
 
-        // ordenamos los informes por fecha
-        this.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
-        // this.incrementosService.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
+          // ordenamos los informes por fecha
+          this.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
+          // this.incrementosService.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
 
-        informes
-          .sort((a, b) => a.fecha - b.fecha)
-          .forEach((informe) => {
-            // creamos las capas de los seguidores para los diferentes informes
-            this._createSeguidorLayers(informe.id).forEach((layer) => this.olMapService.addSeguidorLayer(layer));
+          informes
+            .sort((a, b) => a.fecha - b.fecha)
+            .forEach((informe) => {
+              // creamos las capas de los seguidores para los diferentes informes
+              this.seguidoresControlService
+                .createSeguidorLayers(informe.id)
+                .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
-            // creamos las capas de los incrementos para los diferentes informes
-            // this.incrementosService
-            //   .createIncrementoLayers(informe.id)
-            //   .forEach((layer) => this.olMapService.addIncrementoLayer(layer));
+              // creamos las capas de los incrementos para los diferentes informes
+              // this.incrementosService
+              //   .createIncrementoLayers(informe.id)
+              //   .forEach((layer) => this.olMapService.addIncrementoLayer(layer));
+            });
+
+          // los subscribimos al toggle de vitas y al slider temporal
+          combineLatest([
+            this.mapSeguidoresService.toggleViewSelected$,
+            this.mapSeguidoresService.sliderTemporalSelected$,
+          ]).subscribe(([toggleValue, sliderValue]) => {
+            const layerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (informes.length - 1))));
+
+            this.mapSeguidoresService.layerSelected = layerSelected;
+
+            // ocultamos las 3 capas de las vistas
+            this.seguidorLayers.forEach((layer) => layer.setOpacity(0));
+            // this.incrementoLayers.forEach((layer) => layer.setOpacity(0));
+
+            // mostramos la capa seleccionada
+            this.seguidorLayers[layerSelected].setOpacity(1);
+            // this.incrementoLayers[v].setOpacity(1);
           });
 
-        // los subscribimos al toggle de vitas y al slider temporal
-        combineLatest([
-          this.mapSeguidoresService.toggleViewSelected$,
-          this.mapSeguidoresService.sliderTemporalSelected$,
-        ]).subscribe(([toggleValue, sliderValue]) => {
-          const layerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (informes.length - 1))));
+          this.planta = planta;
 
-          this.mapSeguidoresService.layerSelected = layerSelected;
+          // seleccionamos el informe mas reciente de la planta
+          this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
+          // this.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
-          // ocultamos las 3 capas de las vistas
-          this.seguidorLayers.forEach((layer) => layer.setOpacity(0));
-          // this.incrementoLayers.forEach((layer) => layer.setOpacity(0));
-          // mostramos la capa seleccionada
-          this.seguidorLayers[layerSelected].setOpacity(1);
-          // this.incrementoLayers[v].setOpacity(1);
-        });
+          // asignamos el informe para compartir
+          // this.shareReportService.setInformeID(this.informesList[this.informesList.length - 1]);
 
-        this.planta = planta;
+          // this.mapSeguidoresService.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
-        // seleccionamos el informe mas reciente de la planta
-        this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
-        // this.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
-
-        // asignamos el informe para compartir
-        // this.shareReportService.setInformeID(this.informesList[this.informesList.length - 1]);
-
-        // this.mapSeguidoresService.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
-
-        this.initMap();
-      });
+          this.initMap();
+        })
+    );
   }
 
   initMap() {
@@ -187,72 +188,36 @@ export class MapSeguidoresComponent implements OnInit {
     });
 
     // creamos el mapa a traves del servicio y nos subscribimos a el
-    this.olMapService
-      .createMap('map', layers, view, defaultControls({ attribution: false }))
-      .subscribe((map) => (this.map = map));
+    this.subscriptions.add(
+      this.olMapService
+        .createMap('map', layers, view, defaultControls({ attribution: false }))
+        .subscribe((map) => (this.map = map))
+    );
 
     this.seguidorLayers.forEach((l) => this.map.addLayer(l));
-    this.addCursorOnHover();
-    this.addOverlayInfoAnomalia();
-    /* if (!this.sharedReport) {
-      this.addLocationAreas();
-    } */
+
+    // inicializamos el servicio que controla el comportamiento de los seguidores
+    this.subscriptions.add(
+      this.seguidoresControlService
+        .initService()
+        .pipe(
+          switchMap((value) => {
+            if (value) {
+              this.seguidoresControlService.mostrarSeguidores();
+              return combineLatest([
+                this.seguidoresControlService.seguidorHovered$,
+                this.seguidoresControlService.seguidorSelected$,
+              ]);
+            }
+          })
+        )
+        .subscribe(([segHover, segSelect]) => {
+          this.seguidorHovered = segHover;
+          this.seguidorSelected = segSelect;
+        })
+    );
 
     // this.incrementoLayers.forEach((l) => this.map.addLayer(l));
-
-    // los subscribimos al slider temporal
-    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-      this.selectedInformeId = informeId;
-      this.mostrarSeguidores();
-      // this.incrementosService.mostrarIncrementos();
-    });
-  }
-
-  private _createSeguidorLayers(informeId: string): VectorLayer[] {
-    const maeLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleSeguidoresMae(false),
-    });
-    maeLayer.setProperties({
-      informeId,
-      id: '0',
-    });
-    const celsCalientesLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleSeguidoresCelsCalientes(false),
-    });
-    celsCalientesLayer.setProperties({
-      informeId,
-      id: '1',
-    });
-    const gradNormMaxLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleSeguidoresGradienteNormMax(false),
-    });
-    gradNormMaxLayer.setProperties({
-      informeId,
-      id: '2',
-    });
-
-    return [maeLayer, celsCalientesLayer, gradNormMaxLayer];
-  }
-
-  private addCursorOnHover() {
-    this.map.on('pointermove', (event) => {
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        let feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties().properties !== undefined);
-        feature = feature.filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
-        if (feature.length > 0) {
-          this.map.getViewport().style.cursor = 'pointer';
-        } else {
-          this.map.getViewport().style.cursor = 'inherit';
-        }
-      } else {
-        this.map.getViewport().style.cursor = 'inherit';
-      }
-    });
   }
 
   private addOverlayInfoAnomalia() {
@@ -279,196 +244,8 @@ export class MapSeguidoresComponent implements OnInit {
     });
   }
 
-  // ESTILOS MAE
-  private getStyleSeguidoresMae(selected: boolean) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: this.getColorSeguidorMae(feature),
-            width: selected ? 8 : 4,
-          }),
-          fill: new Fill({
-            color: this.hexToRgb(this.getColorSeguidorMae(feature), 0.5),
-          }),
-        });
-      }
-    };
-  }
-
-  private getColorSeguidorMae(feature: Feature) {
-    const mae = feature.getProperties().properties.mae as number;
-
-    if (mae <= 0.01) {
-      return GLOBAL.colores_mae[0];
-    } else if (mae <= 0.02) {
-      return GLOBAL.colores_mae[1];
-    } else {
-      return GLOBAL.colores_mae[2];
-    }
-  }
-
-  // ESTILOS CELS CALIENTES
-  private getStyleSeguidoresCelsCalientes(selected) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: this.getColorSeguidorCelsCalientes(feature),
-            width: selected ? 8 : 4,
-          }),
-          fill: new Fill({
-            color: this.hexToRgb(this.getColorSeguidorCelsCalientes(feature), 0.5),
-          }),
-        });
-      }
-    };
-  }
-
-  private getColorSeguidorCelsCalientes(feature: Feature) {
-    const numModulos = feature.getProperties().properties.filas * feature.getProperties().properties.columnas;
-    const celsCalientes = feature
-      .getProperties()
-      .properties.anomalias.filter((anomalia) => anomalia.tipo == 8 || anomalia.tipo == 9).length;
-    const porcentCelsCalientes = celsCalientes / numModulos;
-
-    if (porcentCelsCalientes <= 0.1) {
-      return GLOBAL.colores_mae[0];
-    } else if (porcentCelsCalientes <= 0.2) {
-      return GLOBAL.colores_mae[1];
-    } else {
-      return GLOBAL.colores_mae[2];
-    }
-  }
-
-  // ESTILOS GRADIENTE NORMALIZADO MAX
-  private getStyleSeguidoresGradienteNormMax(selected) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: this.getColorSeguidorGradienteNormMax(feature),
-            width: selected ? 8 : 4,
-          }),
-          fill: new Fill({
-            color: this.hexToRgb(this.getColorSeguidorGradienteNormMax(feature), 0.5),
-          }),
-        });
-      }
-    };
-  }
-
-  private getColorSeguidorGradienteNormMax(feature: Feature) {
-    const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
-
-    if (gradNormMax <= 10) {
-      return GLOBAL.colores_mae[0];
-    } else if (gradNormMax <= 20) {
-      return GLOBAL.colores_mae[1];
-    } else {
-      return GLOBAL.colores_mae[2];
-    }
-  }
-
-  private hexToRgb(hex: string, opacity: number): string {
-    return (
-      'rgba(' +
-      hex
-        .replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, (m, r, g, b) => '#' + r + r + g + g + b + b)
-        .substring(1)
-        .match(/.{2}/g)
-        .map((x) => parseInt(x, 16))
-        .toString() +
-      ',' +
-      opacity.toString() +
-      ')'
-    );
-  }
-
-  mostrarSeguidores() {
-    this.filterService.filteredElements$.subscribe((seguidores) => {
-      // Dibujar seguidores
-      this.dibujarSeguidores(seguidores as Seguidor[]);
-      this.listaSeguidores = seguidores as Seguidor[];
-    });
-  }
-
-  dibujarSeguidores(seguidores: Seguidor[]) {
-    // Para cada vector layer (que corresponde a un informe)
-    this.seguidorLayers.forEach((l) => {
-      // filtra los seguidores correspondientes al informe
-      const filtered = seguidores.filter((seguidor) => seguidor.informeId === l.getProperties().informeId);
-      const source = l.getSource();
-      source.clear();
-      filtered.forEach((seguidor) => {
-        // crea poligono seguidor
-        const feature = new Feature({
-          geometry: new Polygon(this.latLonLiteralToLonLat(seguidor.path)),
-          properties: {
-            seguidorId: seguidor.id,
-            informeId: seguidor.informeId,
-            mae: seguidor.mae,
-            /* temperaturaMax: seguidor.temperaturaMax, */
-            gradienteNormalizado: seguidor.gradienteNormalizado,
-            anomalias: seguidor.anomalias,
-            filas: seguidor.filas,
-            columnas: seguidor.columnas,
-          },
-        });
-        source.addFeature(feature);
-      });
-    });
-
-    this._addSelectInteraction();
-  }
-
-  private latLonLiteralToLonLat(path: LatLngLiteral[]) {
-    const coordsList: Coordinate[] = [];
-    path.forEach((coords) => {
-      coordsList.push(fromLonLat([coords.lng, coords.lat]));
-    });
-
-    return [coordsList];
-  }
-
-  private _addSelectInteraction() {
-    // array con los estilos de las 3 vistas
-    const estilosView = [
-      this.getStyleSeguidoresMae(true),
-      this.getStyleSeguidoresCelsCalientes(true),
-      this.getStyleSeguidoresGradienteNormMax(true),
-    ];
-
-    const select = new Select({
-      // condition: click,
-      layers: (l) => {
-        if (l.getProperties().informeId === this.selectedInformeId && l.getProperties().id == this.vistaSeleccionada) {
-          return true;
-        }
-        return false;
-      },
-    });
-
-    this.map.addInteraction(select);
-    select.on('select', (e) => {
-      this.seguidorSeleccionado = undefined;
-
-      if (e.selected.length > 0) {
-        if (e.selected[0].getProperties().hasOwnProperty('properties')) {
-          const seguidorId = e.selected[0].getProperties().properties.seguidorId;
-
-          const seguidor = this.listaSeguidores.filter((seg) => {
-            return seg.id === seguidorId;
-          })[0];
-
-          if (this.selectedInformeId === seguidor.informeId) {
-            this.seguidorSeleccionado = seguidor;
-
-            // resaltamos el seguidor seleccionado
-            e.selected[0].setStyle(estilosView[this.vistaSeleccionada]);
-          }
-        }
-      }
-    });
+  ngOnDestroy(): void {
+    console.log('OnDestroy map-seguidores');
+    this.subscriptions.unsubscribe();
   }
 }

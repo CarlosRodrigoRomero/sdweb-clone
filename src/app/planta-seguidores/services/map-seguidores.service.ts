@@ -25,10 +25,6 @@ export class MapSeguidoresService {
   private _toggleViewSelected = 0;
   public toggleViewSelected$ = new BehaviorSubject<number>(this._toggleViewSelected);
 
-  private _selectedInformeId: string = '';
-  private selectedInformeIdSource = new BehaviorSubject<string>(this._selectedInformeId);
-  public selectedInformeId$ = this.selectedInformeIdSource.asObservable();
-
   private _layerSelected = undefined;
   public layerSelected$ = new BehaviorSubject<number>(this._layerSelected);
 
@@ -45,10 +41,6 @@ export class MapSeguidoresService {
           this.informesList.push(informe.id);
         });
       this.informesList$.next(this.informesList);
-
-      // indicamos el informe seleccionado
-      this._selectedInformeId = this.informesList[this.informesList.length];
-      this.selectedInformeIdSource.next(this._selectedInformeId);
 
       this.initialized$.next(true);
     });
@@ -72,15 +64,6 @@ export class MapSeguidoresService {
     this._sliderTemporalSelected = value;
 
     this.sliderTemporalSelected$.next(value);
-  }
-  /////////////////
-  get selectedInformeId() {
-    return this._selectedInformeId;
-  }
-  set selectedInformeId(informeId: string) {
-    this._selectedInformeId = informeId;
-
-    this.selectedInformeIdSource.next(informeId);
   }
   /////////////////
   get toggleViewSelected() {

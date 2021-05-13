@@ -1,19 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { switchMap, take, takeWhile } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
 import OSM from 'ol/source/OSM';
 import { fromLonLat, transformExtent } from 'ol/proj.js';
 import View from 'ol/View';
-import GeoJSON from 'ol/format/GeoJSON';
-import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-import { Overlay } from 'ol';
 import { defaults as defaultControls } from 'ol/control.js';
-import OverlayPositioning from 'ol/OverlayPositioning';
 import XYZ from 'ol/source/XYZ';
 
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
@@ -115,7 +111,6 @@ export class MapComponent implements OnInit, OnDestroy {
                 if (tl !== undefined) {
                   this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id));
                 }
-                // this.informeIdList.push(informe.id);
 
                 // creamos las capas de anomalías para los diferentes informes
                 this.olMapService.addAnomaliaLayer(this._createAnomaliaLayer(informe.id));
@@ -146,8 +141,6 @@ export class MapComponent implements OnInit, OnDestroy {
           if (this.map === undefined) {
             this.initMap();
           }
-
-          // this.anomaliasControlService.permitirCrearAnomalias(this.plantaId);
         })
     );
   }
@@ -255,32 +248,6 @@ export class MapComponent implements OnInit, OnDestroy {
           this.anomaliaSelect = anomSelect;
         })
     );
-
-    // this.addOverlayInfoAnomalia();
-  }
-
-  private addOverlayInfoAnomalia() {
-    // Overlay para los detalles de cada anomalia
-    const element = document.getElementById('popup');
-
-    const popup = new Overlay({
-      element,
-      positioning: OverlayPositioning.BOTTOM_CENTER,
-      stopEvent: false,
-      offset: [0, -50],
-    });
-    this.map.addOverlay(popup);
-
-    this.map.on('click', (event) => {
-      const clickedCoord = event.coordinate;
-      const feature = this.map.getFeaturesAtPixel(event.pixel);
-      if (feature.length > 0) {
-        popup.setPosition(undefined);
-        popup.setPosition(clickedCoord);
-      } else {
-        popup.setPosition(undefined);
-      }
-    });
   }
 
   private transform(extent) {

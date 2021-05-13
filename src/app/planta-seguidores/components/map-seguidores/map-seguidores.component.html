@@ -1,6 +1,5 @@
 <div id="map" class="map"></div>
 
-<div *ngIf="seguidorSeleccionado" id="popup">
-  <!-- <app-anomalia-info [anomalia]="anomaliaSeleccionada"></app-anomalia-info> -->
-  <span>{{seguidorSeleccionado.id}}</span>
+<div *ngIf="seguidorHovered" id="popup">
+  <app-seguidor-info [seguidorHovered]="seguidorHovered"></app-seguidor-info>
 </div>

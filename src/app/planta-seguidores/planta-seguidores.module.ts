@@ -12,6 +12,7 @@ import { SliderTemporalComponent } from './components/slider-temporal/slider-tem
 import { ViewToggleComponent } from './components/view-toggle/view-toggle.component';
 import { GlobalCoordAreasComponent } from './components/global-coord-areas/global-coord-areas.component';
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
+import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { SliderOpacityComponent } from './components/slider-opacity/slider-opaci
     ViewToggleComponent,
     GlobalCoordAreasComponent,
     SliderOpacityComponent,
+    SeguidorInfoComponent,
   ],
   imports: [CommonModule, PlantaSeguidoresRoutingModule, SharedModule, FiltersModule],
 })

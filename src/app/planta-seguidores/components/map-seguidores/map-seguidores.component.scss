@@ -5,14 +5,10 @@
 
 #popup {
   position: absolute;
-  top: 10px;
+  top: 50px;
   left: 50%;
-  width: 400px;
-  background-color: white;
-}
-
-#popup span {
-  background-color: white;
+  transform: translate(-50%, 0%);
+  margin: 10px;
 }
 
 ::ng-deep .ol-zoom {

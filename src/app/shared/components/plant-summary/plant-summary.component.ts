@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationStart, Router, Event } from '@angular/router';
 
 import { switchMap } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 
 import { InformeService } from '@core/services/informe.service';
 import { ReportControlService } from '@core/services/report-control.service';
@@ -16,12 +16,13 @@ import { PlantaInterface } from '@core/models/planta';
   templateUrl: './plant-summary.component.html',
   styleUrls: ['./plant-summary.component.css'],
 })
-export class PlantSummaryComponent implements OnInit {
+export class PlantSummaryComponent implements OnInit, OnDestroy {
   nombrePlanta = 'Planta demo';
   potenciaPlanta = 1;
   tipoPlanta = 'fija';
   public planta: PlantaInterface = undefined;
-  public informe: InformeInterface = null;
+  public _informe: InformeInterface = undefined;
+  public informe$ = new BehaviorSubject<InformeInterface>(this._informe);
   private subscription: Subscription = new Subscription();
 
   constructor(
@@ -60,17 +61,48 @@ export class PlantSummaryComponent implements OnInit {
           // si navegamos a vista informe nos suscribimos al informe seleccionado
           this.subscription.add(
             this.reportControlService.selectedInformeId$
-              .pipe(switchMap((informeId) => this.informeService.getInforme(informeId)))
-              .subscribe((informe) => {
-                this.informe = informe;
+              .pipe(
+                switchMap((informeId) => {
+                  console.log(informeId);
+
+                  return this.informeService.getInforme(informeId);
+                }),
+                switchMap((informe) => {
+                  console.log(informe);
+
+                  this.informe = informe;
+
+                  return this.plantaService.getPlanta(this.informe.plantaId);
+                })
+              )
+              .subscribe((planta) => {
+                this.planta = planta;
+
+                this.nombrePlanta = this.planta.nombre;
+                this.potenciaPlanta = this.planta.potencia;
+                this.tipoPlanta = this.planta.tipo;
               })
           );
         } else {
           // sino cancelamos la suscripcion
           this.subscription.unsubscribe();
           this.informe = undefined;
+          this.planta = undefined;
         }
       }
     });
+  }
+
+  get informe() {
+    return this._informe;
+  }
+
+  set informe(value: InformeInterface) {
+    this._informe = value;
+    this.informe$.next(value);
+  }
+
+  ngOnDestroy(): void {
+    console.log('OnDestroy plant-summary');
   }
 }

@@ -58,7 +58,8 @@ app-barra-resumen-planta {
 app-view-toggle {
   position: absolute;
   top: 9px;
-  margin-left: 90px;
+  left: 50%;
+  transform: translate(-50%, 0%);
 }
 
 .left-sidenav {

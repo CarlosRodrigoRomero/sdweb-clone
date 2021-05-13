@@ -4,11 +4,9 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
-import { GLOBAL } from './global';
 import { FilterService } from '@core/services/filter.service';
 import { ShareReportService } from '@core/services/share-report.service';
 import { InformeService } from '@core/services/informe.service';
-import { PlantaService } from '@core/services/planta.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { SeguidorService } from '@core/services/seguidor.service';
 
@@ -49,7 +47,6 @@ export class ReportControlService {
     private shareReportService: ShareReportService,
     private filterService: FilterService,
     private informeService: InformeService,
-    private plantaService: PlantaService,
     private anomaliaService: AnomaliaService,
     private seguidorService: SeguidorService,
     @Inject(WINDOW) private window: Window
