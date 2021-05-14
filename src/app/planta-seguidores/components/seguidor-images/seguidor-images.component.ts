@@ -14,8 +14,6 @@ export class SeguidorImagesComponent implements OnInit {
 
   ngOnInit(): void {
     this.seguidoresControlService.urlImageVisualSeguidor$.subscribe((url) => {
-      console.log(url);
-
       this.urlImageSeguidor = url;
     });
   }

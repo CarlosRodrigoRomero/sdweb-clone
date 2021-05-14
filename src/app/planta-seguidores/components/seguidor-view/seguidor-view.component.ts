@@ -10,41 +10,14 @@ import { SeguidoresControlService } from '../../services/seguidores-control.serv
 })
 export class SeguidorViewComponent implements OnInit {
   public seguidorSelected: Seguidor = undefined;
-  public moduloLabel: string;
 
   constructor(private seguidoresControlService: SeguidoresControlService) {}
 
   ngOnInit(): void {
     this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
       this.seguidorSelected = seguidor;
-      if (seguidor !== undefined) {
-        this.moduloLabel = this.getModuloLabel(seguidor);
-      }
 
       this.seguidoresControlService.getImageSeguidor('jpg');
     });
-  }
-
-  getModuloLabel(elem: Seguidor): string {
-    let moduloLabel: string;
-    if (elem.modulo !== undefined) {
-      if (elem.modulo.marca === undefined) {
-        if (elem.modulo.modelo === undefined) {
-          moduloLabel = elem.modulo.potencia + 'W';
-        } else {
-          moduloLabel = elem.modulo.modelo + ' ' + elem.modulo.potencia + 'W';
-        }
-      } else {
-        if (elem.modulo.modelo === undefined) {
-          moduloLabel = elem.modulo.marca + ' ' + elem.modulo.potencia + 'W';
-        } else {
-          moduloLabel = elem.modulo.marca + ' ' + elem.modulo.modelo + ' ' + elem.modulo.potencia + 'W';
-        }
-      }
-    } else {
-      moduloLabel = 'Desconocido';
-    }
-
-    return moduloLabel;
   }
 }

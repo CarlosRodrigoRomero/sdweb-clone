@@ -25,6 +25,8 @@ export class Seguidor implements FilterableElement {
   path: LatLngLiteral[];
   featureCoords?: Coordinate[];
   nombre?: string;
+  celsCalientes?: number;
+  moduloLabel?: string;
 
   constructor(
     anomalias: Anomalia[],
@@ -53,6 +55,8 @@ export class Seguidor implements FilterableElement {
     this.id = id;
     this.featureCoords = this.pathToCoordinate(path);
     this.nombre = nombre;
+    this.celsCalientes = this.getCelsCalientes(anomalias);
+    this.moduloLabel = this.getModuloLabel();
   }
 
   private getPerdidas(anomalias: Anomalia[]): number {
@@ -98,5 +102,34 @@ export class Seguidor implements FilterableElement {
       coordenadas.push(coordenada);
     });
     return coordenadas;
+  }
+
+  private getCelsCalientes(anomalias: Anomalia[]): number {
+    const celsCalientes = anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9).length;
+
+    return celsCalientes / (this.filas * this.columnas);
+  }
+
+  private getModuloLabel(): string {
+    let moduloLabel: string;
+    if (this.modulo !== undefined) {
+      if (this.modulo.marca === undefined) {
+        if (this.modulo.modelo === undefined) {
+          moduloLabel = this.modulo.potencia + 'W';
+        } else {
+          moduloLabel = this.modulo.modelo + ' ' + this.modulo.potencia + 'W';
+        }
+      } else {
+        if (this.modulo.modelo === undefined) {
+          moduloLabel = this.modulo.marca + ' ' + this.modulo.potencia + 'W';
+        } else {
+          moduloLabel = this.modulo.marca + ' ' + this.modulo.modelo + ' ' + this.modulo.potencia + 'W';
+        }
+      }
+    } else {
+      moduloLabel = 'Desconocido';
+    }
+
+    return moduloLabel;
   }
 }
