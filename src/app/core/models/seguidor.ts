@@ -24,6 +24,7 @@ export class Seguidor implements FilterableElement {
   columnas: number;
   path: LatLngLiteral[];
   featureCoords?: Coordinate[];
+  nombre?: string;
 
   constructor(
     anomalias: Anomalia[],
@@ -34,7 +35,8 @@ export class Seguidor implements FilterableElement {
     informeId: string,
     modulo: ModuloInterface,
     globalCoords: string[],
-    id?: string
+    id?: string,
+    nombre?: string
   ) {
     this.anomalias = anomalias;
     this.plantaId = plantaId;
@@ -50,6 +52,7 @@ export class Seguidor implements FilterableElement {
     this.path = path;
     this.id = id;
     this.featureCoords = this.pathToCoordinate(path);
+    this.nombre = nombre;
   }
 
   private getPerdidas(anomalias: Anomalia[]): number {

@@ -21,6 +21,7 @@ export class Anomalia implements FilterableElement {
   informeId: string;
   modulosAfectados?: number;
   archivoPublico?: string;
+  archivo?: string;
 
   // demo
   localId?: string;

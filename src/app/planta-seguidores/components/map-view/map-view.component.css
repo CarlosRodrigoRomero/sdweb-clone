@@ -1,3 +1,9 @@
+.seguidor-sidenav {
+  border-radius: 4px 0 0 4px;
+  width: 70vw;
+  /* max-width: 400px; */
+}
+
 .rel {
   position: relative;
 }
@@ -177,4 +183,10 @@ app-view-toggle {
   .stats-sidenav {
     width: calc(100vw - 20px);
   }
+}
+
+.btn-close-seguidor-view {
+  position: absolute;
+  top: 12px;
+  right: 15px;
 }

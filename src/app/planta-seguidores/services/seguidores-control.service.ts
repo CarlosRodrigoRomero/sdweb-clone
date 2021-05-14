@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 
+import { AngularFireStorage } from '@angular/fire/storage';
+
 import { LatLngLiteral } from '@agm/core';
 
 import Map from 'ol/Map';
@@ -41,12 +43,17 @@ export class SeguidoresControlService {
   private seguidorLayers: VectorLayer[];
   private prevFeatureHover: Feature;
   private toggleViewSelected: number = undefined;
+  private _seguidorViewOpened = false;
+  public seguidorViewOpened$ = new BehaviorSubject<boolean>(this._seguidorViewOpened);
+  private _urlImageVisualSeguidor: string = undefined;
+  urlImageVisualSeguidor$ = new BehaviorSubject<string>(this._urlImageVisualSeguidor);
 
   constructor(
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
     private filterService: FilterService,
-    private mapSeguidoresService: MapSeguidoresService
+    private mapSeguidoresService: MapSeguidoresService,
+    private storage: AngularFireStorage
   ) {}
 
   initService(): Observable<boolean> {
@@ -149,7 +156,7 @@ export class SeguidoresControlService {
     this.addCursorOnHover();
     this.addOnHoverAction();
 
-    // this.addSelectInteraction();
+    this.addSelectInteraction();
   }
 
   private addCursorOnHover() {
@@ -220,18 +227,15 @@ export class SeguidoresControlService {
     });
   }
 
-  /* private addSelectInteraction() {
-    // array con los estilos de las 3 vistas
-    const estilosView = [
-      this.getStyleSeguidoresMae(true),
-      this.getStyleSeguidoresCelsCalientes(true),
-      this.getStyleSeguidoresGradienteNormMax(true),
-    ];
-
+  private addSelectInteraction() {
     const select = new Select({
       // condition: click,
       layers: (l) => {
-        if (l.getProperties().informeId === this.selectedInformeId && l.getProperties().id == this.vistaSeleccionada) {
+        if (
+          l.getProperties().informeId === this.selectedInformeId &&
+          // tslint:disable-next-line: triple-equals
+          l.getProperties().layer == this.toggleViewSelected[0]
+        ) {
           return true;
         }
         return false;
@@ -253,13 +257,12 @@ export class SeguidoresControlService {
           if (this.selectedInformeId === seguidor.informeId) {
             this.seguidorSelected = seguidor;
 
-            // resaltamos el seguidor seleccionado
-            // e.selected[0].setStyle(estilosView[this.vistaSeleccionada]);
+            this.seguidorViewOpened = true;
           }
         }
       }
     });
-  } */
+  }
 
   private getStyleSeguidor(focused: boolean) {
     return (feature) => {
@@ -434,6 +437,45 @@ export class SeguidoresControlService {
     return [coordsList];
   }
 
+  getImageSeguidor(folder: string) {
+    if (this.seguidorSelected !== undefined) {
+      // const imageName = this.seguidorSelected.anomalias[0].archivo;
+      const imageName = 'informes_qfqeerbHSTROqL8O2TVk_jpg_200803_Arguedas_1.1.jpg'; // DEMO
+
+      // Creamos una referencia a la imagen
+      const storageRef = this.storage.ref('');
+      const imageRef = storageRef.child('informes/' + this.selectedInformeId + '/' + folder + '/' + imageName);
+
+      // Obtenemos la URL y descargamos el archivo capturando los posibles errores
+      imageRef
+        .getDownloadURL()
+        .toPromise()
+        .then((url) => {
+          console.log(url);
+          this.urlImageVisualSeguidor = url;
+        })
+        .catch((error) => {
+          switch (error.code) {
+            case 'storage/object-not-found':
+              console.log("File doesn't exist");
+              break;
+
+            case 'storage/unauthorized':
+              console.log("User doesn't have permission to access the object");
+              break;
+
+            case 'storage/canceled':
+              console.log('User canceled the upload');
+              break;
+
+            case 'storage/unknown':
+              console.log('Unknown error occurred, inspect the server response');
+              break;
+          }
+        });
+    }
+  }
+
   get seguidorHovered() {
     return this._seguidorHovered;
   }
@@ -450,5 +492,23 @@ export class SeguidoresControlService {
   set seguidorSelected(value: Seguidor) {
     this._seguidorSelected = value;
     this.seguidorSelected$.next(value);
+  }
+
+  get seguidorViewOpened() {
+    return this._seguidorViewOpened;
+  }
+
+  set seguidorViewOpened(value: boolean) {
+    this._seguidorViewOpened = value;
+    this.seguidorViewOpened$.next(value);
+  }
+
+  get urlImageVisualSeguidor() {
+    return this._urlImageVisualSeguidor;
+  }
+
+  set urlImageVisualSeguidor(value: string) {
+    this._urlImageVisualSeguidor = value;
+    this.urlImageVisualSeguidor$.next(value);
   }
 }

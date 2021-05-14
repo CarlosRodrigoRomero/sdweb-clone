@@ -14,6 +14,8 @@ import { GlobalCoordAreasComponent } from './components/global-coord-areas/globa
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
 import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.component';
 import { ShareReportComponent } from './components/share-report/share-report.component';
+import { SeguidorViewComponent } from './components/seguidor-view/seguidor-view.component';
+import { SeguidorImagesComponent } from './components/seguidor-images/seguidor-images.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +28,8 @@ import { ShareReportComponent } from './components/share-report/share-report.com
     SliderOpacityComponent,
     SeguidorInfoComponent,
     ShareReportComponent,
+    SeguidorViewComponent,
+    SeguidorImagesComponent,
   ],
   imports: [CommonModule, PlantaSeguidoresRoutingModule, SharedModule, FiltersModule],
 })

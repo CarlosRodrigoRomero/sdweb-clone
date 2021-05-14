@@ -166,21 +166,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
       // extent: this.extent1,
     });
 
-    /* const aerial = new XYZ({
-      // url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
-      url: this.planta.ortofoto.url,
-      crossOrigin: '',
-    });
-
-    this.aerialLayer = new TileLayer({
-      source: aerial,
-    }); */
-
-    const osmLayer = new TileLayer({
-      source: satellite,
-      // source: new OSM(),
-    });
-
     const layers = [satelliteLayer];
 
     // MAPA
@@ -222,30 +207,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     );
 
     // this.incrementoLayers.forEach((l) => this.map.addLayer(l));
-  }
-
-  private addOverlayInfoAnomalia() {
-    // Overlay para los detalles de cada seguidor
-    const element = document.getElementById('popup');
-
-    const popup = new Overlay({
-      element,
-      positioning: OverlayPositioning.BOTTOM_CENTER,
-      stopEvent: false,
-      offset: [0, -50],
-    });
-    this.map.addOverlay(popup);
-
-    this.map.on('click', (event) => {
-      const clickedCoord = event.coordinate;
-      const feature = this.map.getFeaturesAtPixel(event.pixel);
-      if (feature.length > 0) {
-        popup.setPosition(undefined);
-        popup.setPosition(clickedCoord);
-      } else {
-        popup.setPosition(undefined);
-      }
-    });
   }
 
   ngOnDestroy(): void {

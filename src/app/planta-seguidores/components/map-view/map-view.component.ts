@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { ReportControlService } from '@core/services/report-control.service';
+import { SeguidoresControlService } from '../../services/seguidores-control.service';
 
 @Component({
   selector: 'app-map-view',
@@ -14,6 +15,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   public leftOpened: boolean;
   public rightOpened: boolean;
   public statsOpened: boolean;
+  public seguidorViewOpened: boolean;
   public seguidoresLoaded = false;
   public notSharedReport = true;
   public showFilters = true;
@@ -22,8 +24,12 @@ export class MapViewComponent implements OnInit, OnDestroy {
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
+  @ViewChild('sidenavSeguidorView') sidenavSeguidorView: MatSidenav;
 
-  constructor(private reportControlService: ReportControlService) {}
+  constructor(
+    private reportControlService: ReportControlService,
+    private seguidoresControlService: SeguidoresControlService
+  ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -35,6 +41,13 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.reportControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value))
     );
+    this.subscriptions.add(
+      this.seguidoresControlService.seguidorViewOpened$.subscribe((opened) => (this.seguidorViewOpened = opened))
+    );
+  }
+
+  unSelectSeguidor() {
+    this.seguidoresControlService.seguidorSelected = undefined;
   }
 
   ngOnDestroy(): void {

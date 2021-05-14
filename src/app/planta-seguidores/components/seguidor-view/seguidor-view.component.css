@@ -1,0 +1,12 @@
+.modulo-label {
+  font-size: large;
+  font-weight: 400;
+  margin-left: 1rem;
+  color: grey;
+}
+
+app-seguidor-images {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
