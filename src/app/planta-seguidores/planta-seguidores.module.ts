@@ -16,6 +16,7 @@ import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.
 import { ShareReportComponent } from './components/share-report/share-report.component';
 import { SeguidorViewComponent } from './components/seguidor-view/seguidor-view.component';
 import { SeguidorImagesComponent } from './components/seguidor-images/seguidor-images.component';
+import { OldPcDetailsDialogComponent } from './components/old-pc-details-dialog/old-pc-details-dialog.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { SeguidorImagesComponent } from './components/seguidor-images/seguidor-i
     ShareReportComponent,
     SeguidorViewComponent,
     SeguidorImagesComponent,
+    OldPcDetailsDialogComponent,
   ],
   imports: [CommonModule, PlantaSeguidoresRoutingModule, SharedModule, FiltersModule],
 })

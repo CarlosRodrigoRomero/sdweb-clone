@@ -450,10 +450,7 @@ export class SeguidoresControlService {
       imageRef
         .getDownloadURL()
         .toPromise()
-        .then((url) => {
-          console.log(url);
-          this.urlImageVisualSeguidor = url;
-        })
+        .then((url) => (this.urlImageVisualSeguidor = url))
         .catch((error) => {
           switch (error.code) {
             case 'storage/object-not-found':
