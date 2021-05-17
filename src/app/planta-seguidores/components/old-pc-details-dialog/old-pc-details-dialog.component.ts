@@ -1,20 +1,23 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { PcInterface } from '@core/models/pc';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { GLOBAL } from '@core/services/global';
+import { Component, OnInit } from '@angular/core';
+
 import { AngularFireStorage } from '@angular/fire/storage';
+
+import { take, map } from 'rxjs/operators';
+
 import 'fabric';
 declare let fabric;
 
 import Pica from 'pica';
-import { take, map } from 'rxjs/operators';
-import { PlantaInterface } from '@core/models/planta';
-import { InformeInterface } from '@core/models/informe';
-import { AuthService } from '@core/services/auth.service';
-import { UserInterface } from '@core/models/user';
+
+import { GLOBAL } from '@core/services/global';
 import { PcService } from '@core/services/pc.service';
 import { PlantaService } from '@core/services/planta.service';
-// import { DialogData } from '../../../informe-map/components/informe-map/informe-map.component';
+import { SeguidoresControlService } from '../../services/seguidores-control.service';
+
+import { PcInterface } from '@core/models/pc';
+import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
+import { Seguidor } from '@core/models/seguidor';
 
 const pica = Pica();
 
@@ -28,7 +31,6 @@ export class OldPcDetailsDialogComponent implements OnInit {
   private maxTemp: number;
   private minTemp: number;
   private canvas: any;
-  public user: UserInterface;
 
   // private hiddenCanvas: any;
   // private tooltipElement: any;
@@ -54,14 +56,14 @@ export class OldPcDetailsDialogComponent implements OnInit {
   public sinPcs: boolean;
   public imagenVisualCargada: boolean;
   public imagenTermicaCargada: boolean;
+  private selectedSeguidor: Seguidor;
+  private urlImageSeguidor: string;
 
   constructor(
     public pcService: PcService,
-    public auth: AuthService,
     private storage: AngularFireStorage,
-    // public dialogRef: MatDialogRef<PcDetailsDialogComponent>,
     public plantaService: PlantaService,
-    // @Inject(MAT_DIALOG_DATA) public data: DialogData
+    private seguidoresControlService: SeguidoresControlService
   ) {
     this.minTemp = 41;
     this.maxTemp = 70;
@@ -76,14 +78,7 @@ export class OldPcDetailsDialogComponent implements OnInit {
     // this.sinPcs = data.sinPcs;
   }
 
-  onNoClick(): void {
-    // this.dialogRef.close();
-  }
-
   ngOnInit() {
-    this.auth.user$.subscribe((user) => {
-      this.user = user;
-    });
     this.imagenVisualCargada = false;
     this.imagenTermicaCargada = false;
     this.canvas = new fabric.Canvas('dialog-canvas');
@@ -96,7 +91,22 @@ export class OldPcDetailsDialogComponent implements OnInit {
     this.imagenTermica.crossOrigin = 'anonymous';
     this.imagenVisual.crossOrigin = 'anonymous';
 
-    this.pc.downloadUrl$.pipe(take(1)).subscribe((url) => {
+    // nos suscribimos al seguidor seleccionado
+    this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
+      this.selectedSeguidor = seguidor;
+
+      this.pc = seguidor.anomalias[0] as PcInterface;
+      // this.planta = data.planta;
+      // this.informe = data.informe;
+      // this.sinPcs = data.sinPcs;
+    });
+
+    this.seguidoresControlService.urlImageVisualSeguidor$.subscribe((url) => {
+      this.urlImageSeguidor = url;
+      this.imagenTermica.src = url;
+    });
+
+    /* this.pc.downloadUrl$.pipe(take(1)).subscribe((url) => {
       this.pc.downloadUrlString = url;
       this.imagenTermica.src = url;
     });
@@ -105,9 +115,9 @@ export class OldPcDetailsDialogComponent implements OnInit {
         this.pc.downloadUrlStringVisual = url;
         this.imagenVisual.src = url;
       });
-    }
+    } */
 
-    this.imagenVisual.onload = () => {
+    /* this.imagenVisual.onload = () => {
       pica
         .resize(this.imagenVisual, this.visualCanvas, {
           unsharpAmount: 80,
@@ -118,7 +128,7 @@ export class OldPcDetailsDialogComponent implements OnInit {
           this.imagenVisualCargada = true;
         });
       // this.visualCanvas.getContext('2d').drawImage(this.imagenVisual, 0, 0 );
-    };
+    }; */
 
     this.imagenTermica.onload = () => {
       this.imagenTermicaCargada = true;

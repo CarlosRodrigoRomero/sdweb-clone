@@ -1,2 +1,21 @@
-<img src="{{ urlImageSeguidor }}" id="image" alt="" />
+<!-- <img src="{{ urlImageSeguidor }}" id="image" alt="" /> -->
+
+<canvas
+  id="visual-zoom"
+  width="{{ zoomSquare }}"
+  height="{{ zoomSquare }}"
+  style="position: absolute; top: 0; left: 0; display: none"
+></canvas>
+
+<div id="imagen-div" class="imagen-termica-div">
+  <div *ngIf="!thermalImageLoaded" class="cargando text-center">
+    <app-spinner></app-spinner>
+  </div>
+  <canvas id="dialog-canvas" width="640" height="512"> </canvas>
+</div>
+
+<div id="imagen-visual-div" class="imagen-termica-div">
+  <canvas id="visual-canvas" width="640" height="512"></canvas>
+</div>
+
 <div id="canvas-anomalias"></div>
