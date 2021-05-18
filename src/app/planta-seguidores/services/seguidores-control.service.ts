@@ -234,7 +234,7 @@ export class SeguidoresControlService {
         if (
           l.getProperties().informeId === this.selectedInformeId &&
           // tslint:disable-next-line: triple-equals
-          l.getProperties().layer == this.toggleViewSelected[0]
+          l.getProperties().id == this.toggleViewSelected
         ) {
           return true;
         }
@@ -250,9 +250,7 @@ export class SeguidoresControlService {
         if (e.selected[0].getProperties().hasOwnProperty('properties')) {
           const seguidorId = e.selected[0].getProperties().properties.seguidorId;
 
-          const seguidor = this.listaSeguidores.filter((seg) => {
-            return seg.id === seguidorId;
-          })[0];
+          const seguidor = this.listaSeguidores.filter((seg) => seg.id === seguidorId)[0];
 
           if (this.selectedInformeId === seguidor.informeId) {
             this.seguidorSelected = seguidor;
