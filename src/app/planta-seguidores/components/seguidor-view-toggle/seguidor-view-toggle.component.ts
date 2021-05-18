@@ -8,9 +8,13 @@ import { MapSeguidoresService } from '../../services/map-seguidores.service';
   styleUrls: ['./seguidor-view-toggle.component.css'],
 })
 export class SeguidorViewToggleComponent implements OnInit {
+  viewSelected: number;
+
   constructor(private mapSeguidoresService: MapSeguidoresService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.mapSeguidoresService.toggleViewSelected$.subscribe((view) => (this.viewSelected = view));
+  }
 
   onToggleChange(value) {
     this.mapSeguidoresService.toggleViewSelected = value;
