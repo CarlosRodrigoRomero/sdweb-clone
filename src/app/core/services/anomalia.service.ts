@@ -222,6 +222,20 @@ export class AnomaliaService {
     }
   }
 
+  getPerdidasColor(anomalias: Anomalia[], anomaliaSelected: Anomalia) {
+    const perdidas = anomalias.map((anom) => anom.perdidas);
+    const perdidasMax = Math.max(...perdidas);
+    const perdidasMin = Math.min(...perdidas);
+
+    if (anomaliaSelected.perdidas <= (perdidasMax - perdidasMin) / 3) {
+      return GLOBAL.colores_mae[0];
+    } else if (anomaliaSelected.perdidas <= (2 * (perdidasMax - perdidasMin)) / 3) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
+  }
+
   get inicialized() {
     return this._initialized;
   }

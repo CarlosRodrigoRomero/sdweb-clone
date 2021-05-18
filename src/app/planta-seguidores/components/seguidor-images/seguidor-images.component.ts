@@ -8,11 +8,14 @@ import 'fabric';
 declare let fabric;
 
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { MapSeguidoresService } from '../../services/map-seguidores.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { PcInterface } from '@core/models/pc';
 import { Seguidor } from '@core/models/seguidor';
 import { GLOBAL } from '@core/services/global';
 import { Anomalia } from '@core/models/anomalia';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-seguidor-images',
@@ -27,6 +30,7 @@ export class SeguidorImagesComponent implements OnInit {
   visualImageLoaded: boolean;
   zoomSquare = 200;
   visualCanvas: any;
+  viewSelected = 0;
 
   imageSeguidor;
   imageCanvas;
@@ -37,84 +41,32 @@ export class SeguidorImagesComponent implements OnInit {
   strokeColor = 0;
   drawAnomalias;
 
-  constructor(private seguidoresControlService: SeguidoresControlService) {}
+  constructor(
+    private seguidoresControlService: SeguidoresControlService,
+    private mapSeguidoresService: MapSeguidoresService,
+    private anomaliaService: AnomaliaService
+  ) {}
 
   ngOnInit(): void {
-    /* combineLatest([
-      this.seguidoresControlService.seguidorSelected$,
-      this.seguidoresControlService.urlImageVisualSeguidor$,
-    ]).subscribe(([seguidor, url]) => {
-      this.seguidorSelected = seguidor;
-      this.urlImageSeguidor = url;
-
-      if (this.seguidorSelected !== undefined) {
-        const drawSeguidor = (d: p5) => {
-          d.setup = () => {
-            this.imageSeguidor = d.loadImage(this.urlImageSeguidor);
-
-            this.imageCanvas = d.createCanvas(640, 512);
-            this.imageCanvas.parent('canvas-anomalias');
-          };
-
-          d.draw = () => {
-            d.background(this.imageSeguidor);
-          };
-        };
-
-        this.canvas = new p5(drawSeguidor);
-      }
-    }); */
-
-    this.canvas = new fabric.Canvas('dialog-canvas');
-    this.visualCanvas = new fabric.Canvas('visual-canvas');
+    this.imageCanvas = new fabric.Canvas('image-canvas');
+    this.anomsCanvas = new fabric.Canvas('anomalias-canvas');
     this.setEventListenersCanvas();
 
-    this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
-      this.seguidorSelected = seguidor;
+    this.seguidoresControlService.seguidorSelected$
+      .pipe(
+        switchMap((seguidor) => {
+          this.seguidorSelected = seguidor;
 
-      /*  if (this.drawAnomalias === undefined) {
-        this.drawAnomalias = (p: p5) => {
-          p.setup = () => {
-            this.anomsCanvas = p.createCanvas(640, 512);
-            this.anomsCanvas.parent('canvas-anomalias');
-          };
+          return this.mapSeguidoresService.toggleViewSelected$;
+        })
+      )
+      .subscribe((view) => {
+        this.viewSelected = view;
 
-          p.draw = () => {
-            if (this.seguidorSelected !== undefined) {
-              // limpiamos las anomalias anteriores
-              p.clear();
-              // dibujamos las anomalias del seguidor
-              this.seguidorSelected.anomalias.forEach((anomalia) => {
-                p.noFill();
-                p.strokeWeight(this.sw);
-
-                if (anomalia.perdidas <= 0.01) {
-                  p.stroke(GLOBAL.colores_mae[0]);
-                } else if (anomalia.perdidas <= 0.02) {
-                  p.stroke(GLOBAL.colores_mae[1]);
-                } else {
-                  p.stroke(GLOBAL.colores_mae[2]);
-                }
-
-                const pc = anomalia as PcInterface;
-
-                p.rect(pc.img_left, pc.img_top, pc.img_width, pc.img_height, 4);
-
-                p.point(pc.img_x, pc.img_y);
-                // p.beginShape();
-                // p.vertex(30, 20);
-                // p.vertex(85, 20);
-                // p.vertex(85, 75);
-                // p.vertex(30, 75);
-                // p.endShape(p.CLOSE);
-              });
-            }
-          };
-        };
-
-        this.canvas = new p5(this.drawAnomalias);
-      } */
-    });
+        if (this.seguidorSelected !== undefined) {
+          this.drawAllAnomalias();
+        }
+      });
 
     this.seguidoresControlService.urlImageVisualSeguidor$.subscribe((url) => {
       this.urlImageSeguidor = url;
@@ -124,9 +76,7 @@ export class SeguidorImagesComponent implements OnInit {
       this.thermalImage.onload = () => {
         this.thermalImageLoaded = true;
 
-        this.drawAllAnomalias();
-
-        this.canvas.setBackgroundImage(
+        this.imageCanvas.setBackgroundImage(
           new fabric.Image(this.thermalImage, {
             left: 0,
             top: 0,
@@ -136,7 +86,7 @@ export class SeguidorImagesComponent implements OnInit {
             lockMovementX: true,
             lockMovementY: true,
           }),
-          this.canvas.renderAll.bind(this.canvas),
+          this.imageCanvas.renderAll.bind(this.imageCanvas),
           {
             // scaleX: this.canvas.width / image.width,
             // scaleY: this.canvas.height / image.height,
@@ -152,7 +102,7 @@ export class SeguidorImagesComponent implements OnInit {
   }
 
   drawAllAnomalias() {
-    this.canvas.clear();
+    this.anomsCanvas.clear();
     this.seguidorSelected.anomalias.forEach((anom) => this.drawAnomalia(anom));
   }
 
@@ -163,7 +113,7 @@ export class SeguidorImagesComponent implements OnInit {
       left: pc.img_left,
       top: pc.img_top,
       fill: 'rgba(0,0,0,0)',
-      stroke: this.getPerdidasColor(anomalia),
+      stroke: this.getAnomaliaColor(anomalia),
       strokeWidth: 2,
       width: pc.img_width,
       height: pc.img_height,
@@ -189,39 +139,45 @@ export class SeguidorImagesComponent implements OnInit {
       fill: 'white',
     });
 
-    this.canvas.add(polygon);
-    this.canvas.add(textId);
-    this.canvas.renderAll();
+    this.anomsCanvas.add(polygon);
+    this.anomsCanvas.add(textId);
+    this.anomsCanvas.renderAll();
   }
 
-  private getPerdidasColor(anomalia: Anomalia) {
-    if (anomalia.perdidas <= 0.01) {
-      return GLOBAL.colores_mae[0];
-    } else if (anomalia.perdidas <= 0.02) {
-      return GLOBAL.colores_mae[1];
+  private getAnomaliaColor(anomalia: Anomalia): string {
+    // tslint:disable-next-line: triple-equals
+    if (this.viewSelected == 0) {
+      return this.anomaliaService.getPerdidasColor(this.seguidorSelected.anomalias, anomalia);
+      // tslint:disable-next-line: triple-equals
+    } else if (this.viewSelected == 1) {
+      return 'white';
     } else {
-      return GLOBAL.colores_mae[2];
+      return 'black';
     }
   }
 
+  private getPerdidasColor(anomalia: Anomalia) {
+    return 'white';
+  }
+
   setEventListenersCanvas() {
-    this.canvas.on('mouse:over', (e) => {
+    this.anomsCanvas.on('mouse:over', (e) => {
       if (e.target !== null) {
         if (e.target.ref !== 'triangle' && e.target.ref !== 'text' && e.target.ref !== true) {
-          e.target.set('fill', 'rgba(255,255,255,0.3)'), this.canvas.renderAll();
+          e.target.set('fill', 'rgba(255,255,255,0.3)'), this.anomsCanvas.renderAll();
         }
       }
     });
 
-    this.canvas.on('mouse:out', (e) => {
+    this.anomsCanvas.on('mouse:out', (e) => {
       if (e.target !== null) {
         if (e.target.ref !== 'triangle' && e.target.ref !== 'text' && e.target.ref !== true) {
-          e.target.set('fill', 'rgba(255,255,255,0)'), this.canvas.renderAll();
+          e.target.set('fill', 'rgba(255,255,255,0)'), this.anomsCanvas.renderAll();
         }
       }
     });
 
-  /*   this.canvas.on('selection:updated', (e) => {
+    /*   this.canvas.on('selection:updated', (e) => {
       const actObj = e.selected[0];
       const selectedPc = this.allPcs.filter((pc, i, a) => {
         return pc.local_id === actObj.localId;
@@ -240,7 +196,7 @@ export class SeguidorImagesComponent implements OnInit {
     const zoom = document.getElementById('visual-zoom') as HTMLCanvasElement;
     const zoomCtx = zoom.getContext('2d');
 
-    this.canvas.on('mouse:move', (e) => {
+    this.anomsCanvas.on('mouse:move', (e) => {
       zoomCtx.fillStyle = 'white';
       // zoomCtx.clearRect(0,0, zoom.width, zoom.height);
       // zoomCtx.fillStyle = "transparent";
@@ -248,8 +204,8 @@ export class SeguidorImagesComponent implements OnInit {
       // const visualCanvas = document.getElementById(
       //   "visual-canvas"
       // ) as HTMLCanvasElement;
-      const scaleX = this.thermalImage.width / this.canvas.width;
-      const scaleY = this.thermalImage.height / this.canvas.height;
+      const scaleX = this.thermalImage.width / this.anomsCanvas.width;
+      const scaleY = this.thermalImage.height / this.anomsCanvas.height;
 
       const zoomFactor = 2;
 
@@ -270,11 +226,11 @@ export class SeguidorImagesComponent implements OnInit {
       zoom.style.display = 'block';
     });
 
-    this.canvas.on('mouse:out', (e) => {
+    this.anomsCanvas.on('mouse:out', (e) => {
       zoom.style.display = 'none';
     });
 
-    this.visualCanvas.on('mouse:move', (e) => {
+    this.anomsCanvas.on('mouse:move', (e) => {
       zoomCtx.fillStyle = 'white';
       // zoomCtx.clearRect(0,0, zoom.width, zoom.height);
       // zoomCtx.fillStyle = "transparent";
@@ -282,8 +238,8 @@ export class SeguidorImagesComponent implements OnInit {
       // const visualCanvas = document.getElementById(
       //   "visual-canvas"
       // ) as HTMLCanvasElement;
-      const scaleX = this.thermalImage.width / this.visualCanvas.width;
-      const scaleY = this.thermalImage.height / this.visualCanvas.height;
+      const scaleX = this.thermalImage.width / this.anomsCanvas.width;
+      const scaleY = this.thermalImage.height / this.anomsCanvas.height;
       zoomCtx.drawImage(
         this.thermalImage,
         e.pointer.x * scaleX - this.zoomSquare / 2,
@@ -301,7 +257,7 @@ export class SeguidorImagesComponent implements OnInit {
       zoom.style.display = 'block';
     });
 
-    this.visualCanvas.on('mouse:out', (e) => {
+    this.anomsCanvas.on('mouse:out', (e) => {
       zoom.style.display = 'none';
     });
   }

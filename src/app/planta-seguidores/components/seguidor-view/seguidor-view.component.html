@@ -1,7 +1,8 @@
-<mat-toolbar *ngIf="seguidorSelected">
+<mat-toolbar class="title" *ngIf="seguidorSelected">
   <div>
     <span>{{ seguidorSelected.nombre }}</span>
     <span class="modulo-label">({{ seguidorSelected.moduloLabel }})</span>
   </div>
 </mat-toolbar>
+<app-seguidor-view-toggle></app-seguidor-view-toggle>
 <app-seguidor-images></app-seguidor-images>
