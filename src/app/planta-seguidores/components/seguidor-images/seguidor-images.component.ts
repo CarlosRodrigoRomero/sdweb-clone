@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { combineLatest } from 'rxjs';
-
-import p5 from 'p5';
+import { switchMap } from 'rxjs/operators';
 
 import 'fabric';
 declare let fabric;
@@ -10,12 +9,12 @@ declare let fabric;
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
+import { SeguidorViewService } from '../../services/seguidor-view.service';
 
 import { PcInterface } from '@core/models/pc';
 import { Seguidor } from '@core/models/seguidor';
 import { GLOBAL } from '@core/services/global';
 import { Anomalia } from '@core/models/anomalia';
-import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-seguidor-images',
@@ -23,10 +22,13 @@ import { switchMap } from 'rxjs/operators';
   styleUrls: ['./seguidor-images.component.css'],
 })
 export class SeguidorImagesComponent implements OnInit {
-  public urlImageSeguidor: string;
+  private urlVisualImageSeguidor: string;
+  private urlThermalImageSeguidor: string;
   private seguidorSelected: Seguidor;
+  private imageSelected = new Image();
   thermalImage = new Image();
-  thermalImageLoaded: boolean;
+  imageLoaded: boolean;
+  visualImage = new Image();
   visualImageLoaded: boolean;
   zoomSquare = 200;
   visualCanvas: any;
@@ -44,7 +46,8 @@ export class SeguidorImagesComponent implements OnInit {
   constructor(
     private seguidoresControlService: SeguidoresControlService,
     private mapSeguidoresService: MapSeguidoresService,
-    private anomaliaService: AnomaliaService
+    private anomaliaService: AnomaliaService,
+    private SeguidorViewService: SeguidorViewService
   ) {}
 
   ngOnInit(): void {
@@ -57,6 +60,11 @@ export class SeguidorImagesComponent implements OnInit {
         switchMap((seguidor) => {
           this.seguidorSelected = seguidor;
 
+          // obtenemos imagen térmica
+          this.seguidoresControlService.getImageSeguidor('jpg');
+          // obtenemos imagen visual
+          this.seguidoresControlService.getImageSeguidor('jpgVisual');
+
           return this.mapSeguidoresService.toggleViewSelected$;
         })
       )
@@ -68,16 +76,26 @@ export class SeguidorImagesComponent implements OnInit {
         }
       });
 
-    this.seguidoresControlService.urlImageVisualSeguidor$.subscribe((url) => {
-      this.urlImageSeguidor = url;
+    combineLatest([
+      this.seguidoresControlService.urlVisualImageSeguidor$,
+      this.seguidoresControlService.urlThermalImageSeguidor$,
+      this.SeguidorViewService.imageSelected$,
+    ]).subscribe(([urlVis, urlTherm, image]) => {
+      this.urlVisualImageSeguidor = urlVis;
+      this.urlThermalImageSeguidor = urlTherm;
 
-      this.thermalImage.src = url;
+      // tslint:disable-next-line: triple-equals
+      if (image == 0) {
+        this.imageSelected.src = urlTherm;
+      } else {
+        this.imageSelected.src = urlVis;
+      }
 
-      this.thermalImage.onload = () => {
-        this.thermalImageLoaded = true;
+      this.imageSelected.onload = () => {
+        this.imageLoaded = true;
 
         this.imageCanvas.setBackgroundImage(
-          new fabric.Image(this.thermalImage, {
+          new fabric.Image(this.imageSelected, {
             left: 0,
             top: 0,
             angle: 0,
@@ -85,17 +103,10 @@ export class SeguidorImagesComponent implements OnInit {
             draggable: false,
             lockMovementX: true,
             lockMovementY: true,
+            scaleX: this.imageCanvas.width / this.imageSelected.width,
+            scaleY: this.imageCanvas.height / this.imageSelected.height,
           }),
-          this.imageCanvas.renderAll.bind(this.imageCanvas),
-          {
-            // scaleX: this.canvas.width / image.width,
-            // scaleY: this.canvas.height / image.height,
-            crossOrigin: 'anonymous',
-            left: 0,
-            top: 0,
-            // originX: 'top',
-            // originY: 'left'
-          }
+          this.imageCanvas.renderAll.bind(this.imageCanvas)
         );
       };
     });

@@ -101,7 +101,7 @@ export class OldPcDetailsDialogComponent implements OnInit {
       // this.sinPcs = data.sinPcs;
     });
 
-    this.seguidoresControlService.urlImageVisualSeguidor$.subscribe((url) => {
+    this.seguidoresControlService.urlVisualImageSeguidor$.subscribe((url) => {
       this.urlImageSeguidor = url;
       this.imagenTermica.src = url;
     });

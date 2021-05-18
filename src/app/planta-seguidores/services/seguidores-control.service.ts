@@ -45,8 +45,10 @@ export class SeguidoresControlService {
   private toggleViewSelected: number = undefined;
   private _seguidorViewOpened = false;
   public seguidorViewOpened$ = new BehaviorSubject<boolean>(this._seguidorViewOpened);
-  private _urlImageVisualSeguidor: string = undefined;
-  urlImageVisualSeguidor$ = new BehaviorSubject<string>(this._urlImageVisualSeguidor);
+  private _urlVisualImageSeguidor: string = undefined;
+  public urlVisualImageSeguidor$ = new BehaviorSubject<string>(this._urlVisualImageSeguidor);
+  private _urlThermalImageSeguidor: string = undefined;
+  public urlThermalImageSeguidor$ = new BehaviorSubject<string>(this._urlThermalImageSeguidor);
 
   constructor(
     private olMapService: OlMapService,
@@ -435,10 +437,16 @@ export class SeguidoresControlService {
     return [coordsList];
   }
 
-  getImageSeguidor(folder: string) {
+  public getImageSeguidor(folder: string) {
     if (this.seguidorSelected !== undefined) {
       // const imageName = this.seguidorSelected.anomalias[0].archivo;
-      const imageName = 'informes_qfqeerbHSTROqL8O2TVk_jpg_200803_Arguedas_1.1.jpg'; // DEMO
+
+      /////////// DEMO ///////////
+      let imageName = 'informes_qfqeerbHSTROqL8O2TVk_jpg_200803_Arguedas_1.1.jpg';
+      if (folder !== 'jpg') {
+        imageName = 'informes_qfqeerbHSTROqL8O2TVk_jpgVisual_200803_Arguedas_1.1.jpg';
+      }
+      ///////////////////////////
 
       // Creamos una referencia a la imagen
       const storageRef = this.storage.ref('');
@@ -448,7 +456,13 @@ export class SeguidoresControlService {
       imageRef
         .getDownloadURL()
         .toPromise()
-        .then((url) => (this.urlImageVisualSeguidor = url))
+        .then((url) => {
+          if (folder === 'jpg') {
+            this.urlThermalImageSeguidor = url;
+          } else {
+            this.urlVisualImageSeguidor = url;
+          }
+        })
         .catch((error) => {
           switch (error.code) {
             case 'storage/object-not-found':
@@ -498,12 +512,21 @@ export class SeguidoresControlService {
     this.seguidorViewOpened$.next(value);
   }
 
-  get urlImageVisualSeguidor() {
-    return this._urlImageVisualSeguidor;
+  get urlVisualImageSeguidor() {
+    return this._urlVisualImageSeguidor;
   }
 
-  set urlImageVisualSeguidor(value: string) {
-    this._urlImageVisualSeguidor = value;
-    this.urlImageVisualSeguidor$.next(value);
+  set urlVisualImageSeguidor(value: string) {
+    this._urlVisualImageSeguidor = value;
+    this.urlVisualImageSeguidor$.next(value);
+  }
+
+  get urlThermalImageSeguidor() {
+    return this._urlThermalImageSeguidor;
+  }
+
+  set urlThermalImageSeguidor(value: string) {
+    this._urlThermalImageSeguidor = value;
+    this.urlThermalImageSeguidor$.next(value);
   }
 }

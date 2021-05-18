@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Seguidor } from '@core/models/seguidor';
 
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidorViewService } from '../../services/seguidor-view.service';
 
+import { Seguidor } from '@core/models/seguidor';
 @Component({
   selector: 'app-seguidor-view',
   templateUrl: './seguidor-view.component.html',
@@ -11,13 +12,16 @@ import { SeguidoresControlService } from '../../services/seguidores-control.serv
 export class SeguidorViewComponent implements OnInit {
   public seguidorSelected: Seguidor = undefined;
 
-  constructor(private seguidoresControlService: SeguidoresControlService) {}
+  constructor(
+    private seguidoresControlService: SeguidoresControlService,
+    private seguidorViewService: SeguidorViewService
+  ) {}
 
   ngOnInit(): void {
-    this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
-      this.seguidorSelected = seguidor;
+    this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => (this.seguidorSelected = seguidor));
+  }
 
-      this.seguidoresControlService.getImageSeguidor('jpg');
-    });
+  public closeSidenav() {
+    this.seguidorViewService.closeSidenav();
   }
 }

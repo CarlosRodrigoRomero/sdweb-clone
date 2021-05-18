@@ -10,6 +10,7 @@ import { InformeService } from '@core/services/informe.service';
 export class MapSeguidoresService {
   private plantaId = '';
   private plantaId$ = new BehaviorSubject<string>(this.plantaId);
+
   private informesList: string[] = [];
   private informesList$ = new BehaviorSubject<string[]>(this.informesList);
 
@@ -62,16 +63,15 @@ export class MapSeguidoresService {
 
   set sliderTemporal(value: number) {
     this._sliderTemporalSelected = value;
-
     this.sliderTemporalSelected$.next(value);
   }
-  /////////////////
+
   get toggleViewSelected() {
     return this._toggleViewSelected;
   }
+
   set toggleViewSelected(selected: number) {
     this._toggleViewSelected = selected;
-
     this.toggleViewSelected$.next(selected);
   }
 
@@ -87,9 +87,9 @@ export class MapSeguidoresService {
   get sliderOpacity() {
     return this._sliderOpacity;
   }
+
   set sliderOpacity(value: number) {
     this._sliderOpacity = value;
-
     this.sliderOpacity$.next(value);
   }
 }

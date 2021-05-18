@@ -2,7 +2,11 @@
   <div>
     <span>{{ seguidorSelected.nombre }}</span>
     <span class="modulo-label">({{ seguidorSelected.moduloLabel }})</span>
+    <button mat-icon-button class="btn-close-seguidor-view" (click)="closeSidenav()">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
 </mat-toolbar>
 <app-seguidor-view-toggle></app-seguidor-view-toggle>
 <app-seguidor-images></app-seguidor-images>
+<app-seguidor-image-toggle></app-seguidor-image-toggle>

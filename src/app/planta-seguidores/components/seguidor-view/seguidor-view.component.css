@@ -2,6 +2,12 @@
   height: 70px;
 }
 
+.btn-close-seguidor-view {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+}
+
 .modulo-label {
   font-size: large;
   font-weight: 400;
@@ -21,4 +27,11 @@ app-seguidor-view-toggle {
   transform: translate(-50%, 0%);
   z-index: 999;
   top: 85px;
+}
+
+app-seguidor-image-toggle {
+  position: absolute;
+  top: 526px;
+  right: 170px;
+  z-index: 999;
 }

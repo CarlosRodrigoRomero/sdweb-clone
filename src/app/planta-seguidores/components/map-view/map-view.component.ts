@@ -1,17 +1,18 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { ReportControlService } from '@core/services/report-control.service';
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidorViewService } from '../../services/seguidor-view.service';
 
 @Component({
   selector: 'app-map-view',
   templateUrl: './map-view.component.html',
   styleUrls: ['./map-view.component.css'],
 })
-export class MapViewComponent implements OnInit, OnDestroy {
+export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public leftOpened: boolean;
   public rightOpened: boolean;
   public statsOpened: boolean;
@@ -28,7 +29,8 @@ export class MapViewComponent implements OnInit, OnDestroy {
 
   constructor(
     private reportControlService: ReportControlService,
-    private seguidoresControlService: SeguidoresControlService
+    private seguidoresControlService: SeguidoresControlService,
+    private seguidorViewService: SeguidorViewService
   ) {}
 
   ngOnInit(): void {
@@ -46,8 +48,8 @@ export class MapViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  unSelectSeguidor() {
-    this.seguidoresControlService.seguidorSelected = undefined;
+  ngAfterViewInit(): void {
+    this.seguidorViewService.setSidenav(this.sidenavSeguidorView);
   }
 
   ngOnDestroy(): void {
