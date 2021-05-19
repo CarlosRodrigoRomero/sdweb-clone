@@ -28,6 +28,7 @@ export class SeguidorImagesComponent implements OnInit {
   private selectedInformeId: string;
   private seguidorSelected: Seguidor;
   private imageSelected = new Image();
+  anomaliaSelected: Anomalia = undefined;
   thermalImage = new Image();
   imageLoaded: boolean;
   visualImage = new Image();
@@ -139,8 +140,8 @@ export class SeguidorImagesComponent implements OnInit {
       hasControls: false,
       lockMovementY: true,
       lockMovementX: true,
-      localId: pc.local_id,
-      ref: false,
+      anomId: anomalia.id,
+      ref: 'anom',
       selectable: false,
       hoverCursor: 'default',
       rx: 4,
@@ -175,14 +176,10 @@ export class SeguidorImagesComponent implements OnInit {
     }
   }
 
-  private getPerdidasColor(anomalia: Anomalia) {
-    return 'white';
-  }
-
   setEventListenersCanvas() {
     this.anomsCanvas.on('mouse:over', (e) => {
       if (e.target !== null) {
-        if (e.target.ref !== 'triangle' && e.target.ref !== 'text' && e.target.ref !== true) {
+        if (e.target.ref === 'anom') {
           e.target.set('fill', 'rgba(255,255,255,0.3)'), this.anomsCanvas.renderAll();
         }
       }
@@ -190,27 +187,21 @@ export class SeguidorImagesComponent implements OnInit {
 
     this.anomsCanvas.on('mouse:out', (e) => {
       if (e.target !== null) {
-        if (e.target.ref !== 'triangle' && e.target.ref !== 'text' && e.target.ref !== true) {
+        if (e.target.ref === 'anom') {
           e.target.set('fill', 'rgba(255,255,255,0)'), this.anomsCanvas.renderAll();
         }
       }
     });
 
-    /*   this.canvas.on('selection:updated', (e) => {
-      const actObj = e.selected[0];
-      const selectedPc = this.allPcs.filter((pc, i, a) => {
-        return pc.local_id === actObj.localId;
-      });
-      this.selectPc(selectedPc[0]);
-    });
+    this.anomsCanvas.on('mouse:down', (e) => {
+      if (e.target !== null) {
+        if (e.target.ref === 'anom') {
+          const anomaliaSelected = this.seguidorSelected.anomalias.find((anom) => anom.id === e.target.anomId);
 
-    this.canvas.on('selection:created', (e) => {
-      const actObj = e.selected[0];
-      const selectedPc = this.allPcs.filter((pc, i, a) => {
-        return pc.local_id === actObj.localId;
-      });
-      this.selectPc(selectedPc[0]);
-    }); */
+          this.selectAnomalia(anomaliaSelected);
+        }
+      }
+    });
 
     const zoom = document.getElementById('visual-zoom') as HTMLCanvasElement;
     const zoomCtx = zoom.getContext('2d');
@@ -249,7 +240,7 @@ export class SeguidorImagesComponent implements OnInit {
       zoom.style.display = 'none';
     });
 
-    this.anomsCanvas.on('mouse:move', (e) => {
+    /* this.anomsCanvas.on('mouse:move', (e) => {
       zoomCtx.fillStyle = 'white';
       // zoomCtx.clearRect(0,0, zoom.width, zoom.height);
       // zoomCtx.fillStyle = "transparent";
@@ -278,6 +269,12 @@ export class SeguidorImagesComponent implements OnInit {
 
     this.anomsCanvas.on('mouse:out', (e) => {
       zoom.style.display = 'none';
-    });
+    });*/
+  }
+
+  private selectAnomalia(anomalia: Anomalia) {
+    // this.drawObjRef(anomalia);
+    // this.drawTriangle(anomalia);
+    this.seguidorViewService.anomaliaSelected = anomalia;
   }
 }

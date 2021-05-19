@@ -21,6 +21,7 @@ import { SeguidorViewToggleComponent } from './components/seguidor-view-toggle/s
 import { SeguidorImageToggleComponent } from './components/seguidor-image-toggle/seguidor-image-toggle.component';
 import { SeguidorSliderTemporalComponent } from './components/seguidor-slider-temporal/seguidor-slider-temporal.component';
 import { SeguidorNextPrevComponent } from './components/seguidor-next-prev/seguidor-next-prev.component';
+import { SeguidorAnomaliaInfoComponent } from './components/seguidor-anomalia-info/seguidor-anomalia-info.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { SeguidorNextPrevComponent } from './components/seguidor-next-prev/segui
     SeguidorImageToggleComponent,
     SeguidorSliderTemporalComponent,
     SeguidorNextPrevComponent,
+    SeguidorAnomaliaInfoComponent,
   ],
   imports: [CommonModule, PlantaSeguidoresRoutingModule, SharedModule, FiltersModule],
 })

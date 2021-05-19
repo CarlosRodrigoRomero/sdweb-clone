@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { SeguidoresControlService } from './seguidores-control.service';
+import { Anomalia } from '@core/models/anomalia';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +14,8 @@ export class SeguidorViewService {
   private sidenav: MatSidenav;
   private _imageSelected = 0;
   public imageSelected$ = new BehaviorSubject<number>(this._imageSelected);
+  private _anomaliaSelected: Anomalia = undefined;
+  public anomaliaSelected$ = new BehaviorSubject<Anomalia>(this._anomaliaSelected);
 
   constructor(private seguidoresControlService: SeguidoresControlService) {}
 
@@ -38,5 +41,14 @@ export class SeguidorViewService {
   set imageSelected(value: number) {
     this._imageSelected = value;
     this.imageSelected$.next(value);
+  }
+
+  get anomaliaSelected() {
+    return this._anomaliaSelected;
+  }
+
+  set anomaliaSelected(value: Anomalia) {
+    this._anomaliaSelected = value;
+    this.anomaliaSelected$.next(value);
   }
 }
