@@ -429,13 +429,27 @@ export class SeguidoresControlService {
     }
   }
 
-  newSeguidorSelected() {
+  changeInformeSeguidorSelected() {
     this.seguidorSelected = this.listaSeguidores.find((seguidor) => {
       const idNumber = seguidor.id.split('_')[1];
 
       // cambiamos al seguidor correspondiente al informe actual
       return seguidor.informeId === this.selectedInformeId && seguidor.id.split('_')[1] === idNumber;
     });
+  }
+
+  selectNextSeguidor() {
+    const index = this.listaSeguidores.indexOf(this.seguidorSelected);
+    if (index !== this.listaSeguidores.length - 1) {
+      this.seguidorSelected = this.listaSeguidores[index + 1];
+    }
+  }
+
+  selectPrevSeguidor() {
+    const index = this.listaSeguidores.indexOf(this.seguidorSelected);
+    if (index !== 0) {
+      this.seguidorSelected = this.listaSeguidores[index - 1];
+    }
   }
 
   get seguidorHovered() {

@@ -66,7 +66,7 @@ export class SeguidorSliderTemporalComponent implements OnInit {
     this.reportControlService.selectedInformeId = this.informeIdList[roundedValue];
 
     // cambiamos al mismo seguidor pero del informe actual
-    this.seguidoresControlService.newSeguidorSelected();
+    this.seguidoresControlService.changeInformeSeguidorSelected();
   }
 
   getDatesInformes(informesId: string[]) {

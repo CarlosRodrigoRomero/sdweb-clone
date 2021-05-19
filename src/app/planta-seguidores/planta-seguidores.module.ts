@@ -20,6 +20,7 @@ import { OldPcDetailsDialogComponent } from './components/old-pc-details-dialog/
 import { SeguidorViewToggleComponent } from './components/seguidor-view-toggle/seguidor-view-toggle.component';
 import { SeguidorImageToggleComponent } from './components/seguidor-image-toggle/seguidor-image-toggle.component';
 import { SeguidorSliderTemporalComponent } from './components/seguidor-slider-temporal/seguidor-slider-temporal.component';
+import { SeguidorNextPrevComponent } from './components/seguidor-next-prev/seguidor-next-prev.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { SeguidorSliderTemporalComponent } from './components/seguidor-slider-te
     SeguidorViewToggleComponent,
     SeguidorImageToggleComponent,
     SeguidorSliderTemporalComponent,
+    SeguidorNextPrevComponent,
   ],
   imports: [CommonModule, PlantaSeguidoresRoutingModule, SharedModule, FiltersModule],
 })

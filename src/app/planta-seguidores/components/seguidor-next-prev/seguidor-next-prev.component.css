@@ -1,0 +1,10 @@
+.arrows {
+  display: flex;
+  width: 634px;
+  justify-content: space-between;
+}
+
+mat-icon {
+    color: white;
+    font-size: 40px;
+}

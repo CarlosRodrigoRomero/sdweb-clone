@@ -39,3 +39,8 @@ app-seguidor-slider-temporal {
   top: 550px;
   left: 65px;
 }
+
+app-seguidor-next-prev {
+  position: absolute;
+  top: 220px;
+}
