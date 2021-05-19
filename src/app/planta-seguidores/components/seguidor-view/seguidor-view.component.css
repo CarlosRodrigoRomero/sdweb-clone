@@ -15,23 +15,27 @@
   color: grey;
 }
 
-app-seguidor-images {
-  position: relative;
+.seguidor-content {
   display: flex;
-  justify-content: center;
+  position: relative;
 }
 
 app-seguidor-view-toggle {
   position: absolute;
-  left: 50%;
-  transform: translate(-50%, 0%);
+  left: 15px;
+  top: 15px;
   z-index: 999;
-  top: 85px;
 }
 
 app-seguidor-image-toggle {
   position: absolute;
-  top: 526px;
-  right: 170px;
+  top: 457px;
+  left: 460px;
   z-index: 999;
+}
+
+app-seguidor-slider-temporal {
+  position: absolute;
+  top: 550px;
+  left: 65px;
 }

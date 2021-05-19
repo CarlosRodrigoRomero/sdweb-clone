@@ -57,11 +57,11 @@ export class MapSeguidoresService {
     return this.informesList$.asObservable();
   }
 
-  get sliderTemporal() {
+  get sliderTemporalSelected() {
     return this._sliderTemporalSelected;
   }
 
-  set sliderTemporal(value: number) {
+  set sliderTemporalSelected(value: number) {
     this._sliderTemporalSelected = value;
     this.sliderTemporalSelected$.next(value);
   }

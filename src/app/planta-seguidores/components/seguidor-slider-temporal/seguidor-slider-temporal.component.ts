@@ -10,13 +10,13 @@ import { InformeService } from '@core/services/informe.service';
 import { ReportControlService } from '@core/services/report-control.service';
 
 @Component({
-  selector: 'app-slider-temporal',
-  templateUrl: './slider-temporal.component.html',
-  styleUrls: ['./slider-temporal.component.scss'],
+  selector: 'app-seguidor-slider-temporal',
+  templateUrl: './seguidor-slider-temporal.component.html',
+  styleUrls: ['./seguidor-slider-temporal.component.scss'],
 })
-export class SliderTemporalComponent implements OnInit {
+export class SeguidorSliderTemporalComponent implements OnInit {
   public selectedInformeId: string;
-  public informesList: string[];
+  public informeIdList: string[];
   public sliderLoaded = false;
 
   /* Slider Values */
@@ -40,7 +40,7 @@ export class SliderTemporalComponent implements OnInit {
 
   ngOnInit(): void {
     this.reportControlService.informesList$.pipe(take(1)).subscribe((informesId) => {
-      this.informesList = informesId;
+      this.informeIdList = informesId;
       this.getDatesInformes(informesId).subscribe((dates) => {
         this.dates = dates;
 
@@ -49,9 +49,9 @@ export class SliderTemporalComponent implements OnInit {
       });
     });
 
-    this.reportControlService.selectedInformeId$.subscribe((informeID) => (this.selectedInformeId = informeID));
+    this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
 
-    this.currentYear = this.informesList.indexOf(this.selectedInformeId) * 100;
+    this.currentYear = this.informeIdList.indexOf(this.selectedInformeId) * 100;
 
     this.mapSeguidoresService.sliderTemporalSelected$.subscribe((value) => (this.currentYear = value));
   }
@@ -59,9 +59,9 @@ export class SliderTemporalComponent implements OnInit {
   onChangeTemporalSlider(value: number) {
     this.mapSeguidoresService.sliderTemporalSelected = value;
 
-    const roundedValue = Math.round(value / (100 / (this.informesList.length - 1)));
+    const roundedValue = Math.round(value / (100 / (this.informeIdList.length - 1)));
 
-    this.reportControlService.selectedInformeId = this.informesList[roundedValue];
+    this.reportControlService.selectedInformeId = this.informeIdList[roundedValue];
   }
 
   getDatesInformes(informesId: string[]) {

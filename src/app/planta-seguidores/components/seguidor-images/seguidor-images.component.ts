@@ -10,6 +10,7 @@ import { SeguidoresControlService } from '../../services/seguidores-control.serv
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 import { PcInterface } from '@core/models/pc';
 import { Seguidor } from '@core/models/seguidor';
@@ -24,6 +25,7 @@ import { Anomalia } from '@core/models/anomalia';
 export class SeguidorImagesComponent implements OnInit {
   private urlVisualImageSeguidor: string;
   private urlThermalImageSeguidor: string;
+  private selectedInformeId: string;
   private seguidorSelected: Seguidor;
   private imageSelected = new Image();
   thermalImage = new Image();
@@ -47,7 +49,8 @@ export class SeguidorImagesComponent implements OnInit {
     private seguidoresControlService: SeguidoresControlService,
     private mapSeguidoresService: MapSeguidoresService,
     private anomaliaService: AnomaliaService,
-    private SeguidorViewService: SeguidorViewService
+    private seguidorViewService: SeguidorViewService,
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
@@ -55,8 +58,13 @@ export class SeguidorImagesComponent implements OnInit {
     this.anomsCanvas = new fabric.Canvas('anomalias-canvas');
     this.setEventListenersCanvas();
 
-    this.seguidoresControlService.seguidorSelected$
+    this.reportControlService.selectedInformeId$
       .pipe(
+        switchMap((informeId) => {
+          this.selectedInformeId = informeId;
+
+          return this.seguidoresControlService.seguidorSelected$;
+        }),
         switchMap((seguidor) => {
           this.seguidorSelected = seguidor;
 
@@ -79,7 +87,7 @@ export class SeguidorImagesComponent implements OnInit {
     combineLatest([
       this.seguidoresControlService.urlVisualImageSeguidor$,
       this.seguidoresControlService.urlThermalImageSeguidor$,
-      this.SeguidorViewService.imageSelected$,
+      this.seguidorViewService.imageSelected$,
     ]).subscribe(([urlVis, urlTherm, image]) => {
       this.urlVisualImageSeguidor = urlVis;
       this.urlThermalImageSeguidor = urlTherm;

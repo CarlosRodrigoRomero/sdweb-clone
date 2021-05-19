@@ -264,62 +264,6 @@ export class SeguidoresControlService {
     });
   }
 
-  private getStyleSeguidor(focused: boolean) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        // array de colores para las 3 diferentes vistas
-        const toggleViewColors = [
-          this.getColorSeguidorMae(feature),
-          this.getColorSeguidorCelsCalientes(feature),
-          this.getColorSeguidorGradienteNormMax(feature),
-        ];
-
-        switch (this.toggleViewSelected) {
-          case 0:
-            return new Style({
-              stroke: new Stroke({
-                color: focused ? 'white' : toggleViewColors[0],
-                width: 4,
-              }),
-              fill: new Fill({
-                color: focused ? 'rgba(255,255,255,0.5)' : this.hexToRgb(toggleViewColors[0], 0.5),
-              }),
-            });
-          case 1:
-            return new Style({
-              stroke: new Stroke({
-                color: focused ? 'white' : toggleViewColors[1],
-                width: 4,
-              }),
-              fill: new Fill({
-                color: focused ? 'rgba(255,255,255,0.5)' : this.hexToRgb(toggleViewColors[1], 0.5),
-              }),
-            });
-          case 2:
-            return new Style({
-              stroke: new Stroke({
-                color: focused ? 'white' : toggleViewColors[2],
-                width: 4,
-              }),
-              fill: new Fill({
-                color: focused ? 'rgba(255,255,255,0.5)' : this.hexToRgb(toggleViewColors[2], 0.5),
-              }),
-            });
-        }
-
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : toggleViewColors[this.toggleViewSelected],
-            width: 4,
-          }),
-          fill: new Fill({
-            color: focused ? 'rgba(255,255,255,0.5)' : this.hexToRgb(toggleViewColors[this.toggleViewSelected], 0.5),
-          }),
-        });
-      }
-    };
-  }
-
   // ESTILOS MAE
   private getStyleSeguidoresMae(focused: boolean) {
     return (feature) => {
