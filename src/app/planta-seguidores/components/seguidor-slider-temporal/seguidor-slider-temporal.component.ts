@@ -8,6 +8,7 @@ import { LabelType, Options } from '@angular-slider/ngx-slider';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { InformeService } from '@core/services/informe.service';
 import { ReportControlService } from '@core/services/report-control.service';
+import { SeguidoresControlService } from '../../services/seguidores-control.service';
 
 @Component({
   selector: 'app-seguidor-slider-temporal',
@@ -35,7 +36,8 @@ export class SeguidorSliderTemporalComponent implements OnInit {
   constructor(
     private mapSeguidoresService: MapSeguidoresService,
     private informeService: InformeService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private seguidoresControlService: SeguidoresControlService
   ) {}
 
   ngOnInit(): void {
@@ -62,6 +64,9 @@ export class SeguidorSliderTemporalComponent implements OnInit {
     const roundedValue = Math.round(value / (100 / (this.informeIdList.length - 1)));
 
     this.reportControlService.selectedInformeId = this.informeIdList[roundedValue];
+
+    // cambiamos al mismo seguidor pero del informe actual
+    this.seguidoresControlService.newSeguidorSelected();
   }
 
   getDatesInformes(informesId: string[]) {

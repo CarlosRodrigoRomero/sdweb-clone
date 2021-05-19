@@ -429,6 +429,15 @@ export class SeguidoresControlService {
     }
   }
 
+  newSeguidorSelected() {
+    this.seguidorSelected = this.listaSeguidores.find((seguidor) => {
+      const idNumber = seguidor.id.split('_')[1];
+
+      // cambiamos al seguidor correspondiente al informe actual
+      return seguidor.informeId === this.selectedInformeId && seguidor.id.split('_')[1] === idNumber;
+    });
+  }
+
   get seguidorHovered() {
     return this._seguidorHovered;
   }
