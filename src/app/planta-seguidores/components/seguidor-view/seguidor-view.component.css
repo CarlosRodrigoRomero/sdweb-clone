@@ -1,3 +1,7 @@
+.sidenav-content {
+  height: 100vh;
+}
+
 .title {
   height: 70px;
 }
@@ -16,9 +20,16 @@
 }
 
 .seguidor-content {
+  height: calc(100vh - 70px);
+  padding: 0.5rem;
   display: grid;
   position: relative;
-  grid-template-columns: 6fr 4fr;
+  grid-template-columns: 6.5fr 3.5fr;
+  gap: 1rem;
+}
+
+.image-content {
+  height: 56vh;
 }
 
 app-seguidor-view-toggle {
@@ -33,12 +44,6 @@ app-seguidor-image-toggle {
   top: 457px;
   left: 460px;
   z-index: 999;
-}
-
-app-seguidor-slider-temporal {
-  position: absolute;
-  top: 550px;
-  left: 65px;
 }
 
 app-seguidor-next-prev {

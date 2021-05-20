@@ -1,21 +1,23 @@
-<!-- <img src="{{ urlImageSeguidor }}" id="image" alt="" /> -->
+<div>
+  <canvas
+    id="visual-zoom"
+    width="{{ zoomSquare }}"
+    height="{{ zoomSquare }}"
+    style="position: absolute; top: 0; left: 0; display: none"
+  ></canvas>
 
-<canvas
-  id="visual-zoom"
-  width="{{ zoomSquare }}"
-  height="{{ zoomSquare }}"
-  style="position: absolute; top: 0; left: 0; display: none"
-></canvas>
+  <div>
+    <div id="imagen-div" class="imagen-termica-div">
+      <div *ngIf="!imageLoaded" class="cargando text-center">
+        <app-spinner></app-spinner>
+      </div>
+      <canvas id="image-canvas" width="640" height="512"> </canvas>
+    </div>
 
-<div id="imagen-div" class="imagen-termica-div">
-  <div *ngIf="!imageLoaded" class="cargando text-center">
-    <app-spinner></app-spinner>
+    <div id="imagen-visual-div" class="imagen-termica-div">
+      <canvas id="anomalias-canvas" width="640" height="512"></canvas>
+    </div>
+
+    <div id="canvas-anomalias"></div>
   </div>
-  <canvas id="image-canvas" width="640" height="512"> </canvas>
 </div>
-
-<div id="imagen-visual-div" class="imagen-termica-div">
-  <canvas id="anomalias-canvas" width="640" height="512"></canvas>
-</div>
-
-<div id="canvas-anomalias"></div>

@@ -119,6 +119,8 @@ export class SeguidorImagesComponent implements OnInit {
         );
       };
     });
+
+    this.seguidorViewService.anomaliaSelected$.subscribe((anomSel) => (this.anomaliaSelected = anomSel));
   }
 
   drawAllAnomalias() {
@@ -143,9 +145,10 @@ export class SeguidorImagesComponent implements OnInit {
       anomId: anomalia.id,
       ref: 'anom',
       selectable: false,
-      hoverCursor: 'default',
+      hoverCursor: 'pointer',
       rx: 4,
       ry: 4,
+      anomalia,
     });
 
     const textId = new fabric.Text('#'.concat(pc.local_id.toString().concat(' ')), {
@@ -180,7 +183,9 @@ export class SeguidorImagesComponent implements OnInit {
     this.anomsCanvas.on('mouse:over', (e) => {
       if (e.target !== null) {
         if (e.target.ref === 'anom') {
-          e.target.set('fill', 'rgba(255,255,255,0.3)'), this.anomsCanvas.renderAll();
+          if (this.anomaliaSelected !== e.target.anomalia) {
+            e.target.set('stroke', 'white'), this.anomsCanvas.renderAll();
+          }
         }
       }
     });
@@ -188,7 +193,9 @@ export class SeguidorImagesComponent implements OnInit {
     this.anomsCanvas.on('mouse:out', (e) => {
       if (e.target !== null) {
         if (e.target.ref === 'anom') {
-          e.target.set('fill', 'rgba(255,255,255,0)'), this.anomsCanvas.renderAll();
+          if (this.anomaliaSelected !== e.target.anomalia) {
+            e.target.set('stroke', this.getAnomaliaColor(e.target.anomalia)), this.anomsCanvas.renderAll();
+          }
         }
       }
     });
@@ -198,7 +205,11 @@ export class SeguidorImagesComponent implements OnInit {
         if (e.target.ref === 'anom') {
           const anomaliaSelected = this.seguidorSelected.anomalias.find((anom) => anom.id === e.target.anomId);
 
-          this.selectAnomalia(anomaliaSelected);
+          this.seguidorViewService.anomaliaSelected = anomaliaSelected;
+
+          e.target.set({ stroke: 'white', strokeWidth: 4 });
+        } else {
+          this.seguidorViewService.anomaliaSelected = undefined;
         }
       }
     });

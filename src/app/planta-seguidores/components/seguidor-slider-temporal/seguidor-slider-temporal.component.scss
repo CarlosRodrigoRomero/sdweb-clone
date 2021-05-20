@@ -20,6 +20,11 @@
   }
 }
 
+.content {
+  display: flex;
+  justify-content: center;
+}
+
 .temporal-slider {
   width: 500px;
 }

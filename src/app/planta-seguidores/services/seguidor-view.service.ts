@@ -16,6 +16,8 @@ export class SeguidorViewService {
   public imageSelected$ = new BehaviorSubject<number>(this._imageSelected);
   private _anomaliaSelected: Anomalia = undefined;
   public anomaliaSelected$ = new BehaviorSubject<Anomalia>(this._anomaliaSelected);
+  private _anomaliaHovered: Anomalia = undefined;
+  public anomaliaHovered$ = new BehaviorSubject<Anomalia>(this._anomaliaHovered);
 
   constructor(private seguidoresControlService: SeguidoresControlService) {}
 
@@ -25,13 +27,6 @@ export class SeguidorViewService {
 
   public closeSidenav() {
     return this.sidenav.close();
-  }
-
-  public clearSeguidor() {
-    // deseleecionamos seguidor
-    this.seguidoresControlService.seguidorSelected = undefined;
-    // reiniciamos imagen seleccionada
-    this.imageSelected = 0;
   }
 
   get imageSelected() {
@@ -50,5 +45,14 @@ export class SeguidorViewService {
   set anomaliaSelected(value: Anomalia) {
     this._anomaliaSelected = value;
     this.anomaliaSelected$.next(value);
+  }
+
+  get anomaliaHovered() {
+    return this._anomaliaHovered;
+  }
+
+  set anomaliaHovered(value: Anomalia) {
+    this._anomaliaHovered = value;
+    this.anomaliaHovered$.next(value);
   }
 }

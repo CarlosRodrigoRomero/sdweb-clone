@@ -20,3 +20,7 @@
 .line-content {
   margin-left: 2rem;
 }
+
+.download-btns {
+  display: flex;
+}

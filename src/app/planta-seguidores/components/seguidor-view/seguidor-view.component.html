@@ -1,4 +1,4 @@
-<div *ngIf="seguidorSelected">
+<div class="sidenav-content" *ngIf="seguidorSelected">
   <mat-toolbar class="title">
     <div>
       <span>{{ seguidorSelected.nombre }}</span>
@@ -9,12 +9,15 @@
     </div>
   </mat-toolbar>
   <div class="seguidor-content">
-    <div>
-      <app-seguidor-view-toggle></app-seguidor-view-toggle>
-      <app-seguidor-images></app-seguidor-images>
-      <app-seguidor-image-toggle></app-seguidor-image-toggle>
-      <app-seguidor-next-prev></app-seguidor-next-prev>
+    <div class="left-content">
+      <div class="image-content">
+        <app-seguidor-view-toggle></app-seguidor-view-toggle>
+        <app-seguidor-images></app-seguidor-images>
+        <app-seguidor-image-toggle></app-seguidor-image-toggle>
+        <app-seguidor-next-prev></app-seguidor-next-prev>
+      </div>
       <app-seguidor-slider-temporal></app-seguidor-slider-temporal>
+      <app-seguidor-anomalias-list></app-seguidor-anomalias-list>
     </div>
     <app-seguidor-anomalia-info></app-seguidor-anomalia-info>
   </div>
