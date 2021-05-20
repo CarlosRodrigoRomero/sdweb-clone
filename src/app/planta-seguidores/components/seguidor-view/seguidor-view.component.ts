@@ -18,7 +18,15 @@ export class SeguidorViewComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => (this.seguidorSelected = seguidor));
+    this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
+      this.seguidorSelected = seguidor;
+
+      if (this.seguidorSelected !== undefined) {
+        if (this.seguidorSelected.anomalias.length > 0) {
+          this.seguidorViewService.anomaliaSelected = this.seguidorSelected.anomalias[0];
+        }
+      }
+    });
   }
 
   public closeSidenav() {

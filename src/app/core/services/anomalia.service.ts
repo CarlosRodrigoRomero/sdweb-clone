@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 import { Observable, combineLatest, BehaviorSubject, EMPTY } from 'rxjs';
 import { map, take, switchMap } from 'rxjs/operators';
@@ -13,6 +14,7 @@ import { Anomalia } from '@core/models/anomalia';
 import { CritCoA } from '@core/models/critCoA';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { CriteriosClasificacion } from '../models/criteriosClasificacion';
+import { PcInterface } from '@core/models/pc';
 
 @Injectable({
   providedIn: 'root',
@@ -27,6 +29,7 @@ export class AnomaliaService {
 
   constructor(
     public afs: AngularFirestore,
+    private storage: AngularFireStorage,
     private informeService: InformeService,
     private plantaService: PlantaService
   ) {}
@@ -234,6 +237,62 @@ export class AnomaliaService {
     } else {
       return GLOBAL.colores_mae[2];
     }
+  }
+
+  downloadRjpg(anomalia: Anomalia) {
+    this.storage
+      // .ref(`informes/${anomalia.informeId}/rjpg/${anomalia.archivoPublico}`)
+      .ref(`informes/${anomalia.informeId}/rjpg/informes_qfqeerbHSTROqL8O2TVk_jpg_200803_Arguedas_1.1.jpg`) // DEMO
+      .getDownloadURL()
+      .subscribe((downloadUrl) => {
+        (anomalia as PcInterface).downloadUrlStringRjpg = downloadUrl;
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
+          /* Create a new Blob object using the response
+           *  data of the onload object.
+           */
+          const blob = new Blob([xhr.response], { type: 'image/jpg' });
+          const a: any = document.createElement('a');
+          a.style = 'display: none';
+          document.body.appendChild(a);
+          const url = window.URL.createObjectURL(blob);
+          a.href = url;
+          a.download = `radiometrico_${anomalia.archivoPublico}`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+        };
+        xhr.open('GET', downloadUrl);
+        xhr.send();
+      });
+  }
+
+  downloadJpgVisual(anomalia: Anomalia) {
+    this.storage
+      // .ref(`informes/${anomalia.informeId}/jpgVisual/${anomalia.archivoPublico}`)
+      .ref(`informes/${anomalia.informeId}/jpgVisual/informes_qfqeerbHSTROqL8O2TVk_jpgVisual_200803_Arguedas_1.1.jpg`) // DEMO
+      .getDownloadURL()
+      .subscribe((downloadUrl) => {
+        (anomalia as PcInterface).downloadUrlStringVisual = downloadUrl;
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
+          /* Create a new Blob object using the response
+           *  data of the onload object.
+           */
+          const blob = new Blob([xhr.response], { type: 'image/jpg' });
+          const a: any = document.createElement('a');
+          a.style = 'display: none';
+          document.body.appendChild(a);
+          const url = window.URL.createObjectURL(blob);
+          a.href = url;
+          a.download = `visual_${anomalia.archivoPublico}`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+        };
+        xhr.open('GET', downloadUrl);
+        xhr.send();
+      });
   }
 
   get inicialized() {

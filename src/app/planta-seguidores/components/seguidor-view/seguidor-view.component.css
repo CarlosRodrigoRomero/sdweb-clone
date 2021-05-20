@@ -16,8 +16,9 @@
 }
 
 .seguidor-content {
-  display: flex;
+  display: grid;
   position: relative;
+  grid-template-columns: 6fr 4fr;
 }
 
 app-seguidor-view-toggle {
