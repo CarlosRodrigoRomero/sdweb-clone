@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
 import Map from 'ol/Map';
-
-import { StructuresService } from '@core/services/structures.service';
-import { OlMapService } from '@core/services/ol-map.service';
 import VectorSource from 'ol/source/Vector';
 import { Stroke, Style } from 'ol/style';
 import VectorLayer from 'ol/layer/Vector';
@@ -11,6 +8,11 @@ import Draw, { createBox, DrawEvent } from 'ol/interaction/Draw';
 import GeometryType from 'ol/geom/GeometryType';
 import { Coordinate } from 'ol/coordinate';
 import Polygon from 'ol/geom/Polygon';
+import { getArea } from 'ol/sphere';
+
+import { StructuresService } from '@core/services/structures.service';
+import { OlMapService } from '@core/services/ol-map.service';
+
 import { RawModule } from '@core/models/moduloBruto';
 
 @Component({
@@ -66,6 +68,9 @@ export class RawModulesComponent implements OnInit {
 
       const polygon = evt.feature.getGeometry() as Polygon;
       const coords = polygon.getCoordinates();
+      const area = Math.round(getArea(polygon) * 100) / 100;
+      console.log(area);
+
       const rawModule = new RawModule();
       rawModule.coords = coords[0];
 

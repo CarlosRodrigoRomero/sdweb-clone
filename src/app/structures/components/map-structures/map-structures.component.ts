@@ -117,7 +117,8 @@ export class MapStructuresComponent implements OnInit {
       // zoom: 18,
       zoom: this.planta.zoom,
       minZoom: this.planta.zoom,
-      maxZoom: this.planta.zoom + 3,
+      // maxZoom: this.planta.zoom + 3,
+      maxZoom: 24,
       // extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
     });
 
