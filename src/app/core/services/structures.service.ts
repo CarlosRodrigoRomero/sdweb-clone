@@ -98,8 +98,6 @@ export class StructuresService {
           actions.map((doc) => {
             const data = doc.payload.doc.data();
 
-            console.log(data);
-
             return data;
           })
         )
@@ -132,6 +130,39 @@ export class StructuresService {
 
     colRef
       .doc('filter')
+      .get()
+      .toPromise()
+      .then((data) => {
+        // comprovamos primero que exista la entrada en DB
+        if (data.exists) {
+          colRef
+            .doc('filter')
+            .update({
+              [filterType]: value,
+            })
+            .then(() => {
+              console.log('Filtro actualizado correctamente');
+            })
+            .catch((error) => {
+              console.error('Error al actualizar filtro: ', error);
+            });
+        } else {
+          colRef
+            .doc('filter')
+            .set({
+              [filterType]: value,
+            })
+            .then(() => {
+              console.log('Filtro creado correctamente');
+            })
+            .catch((error) => {
+              console.error('Error al crear filtro: ', error);
+            });
+        }
+      });
+
+    /* colRef
+      .doc('filter')
       .update({
         [filterType]: value,
       })
@@ -140,7 +171,7 @@ export class StructuresService {
       })
       .catch((error) => {
         console.error('Error al guardar filtro: ', error);
-      });
+      }); */
   }
 
   addRawModule(module: RawModule) {
