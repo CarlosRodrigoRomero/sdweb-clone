@@ -22,9 +22,11 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
 
   ngOnInit(): void {
     this.structuresService.getFiltersParams().subscribe((filters) => {
-      // comprobamos si hay filtros en la DB y seteamos los parámetros
-      if (filters[0].areaM !== undefined) {
-        this.value = filters[0].areaM;
+      if (filters.length > 0) {
+        // comprobamos si hay filtros en la DB y seteamos los parámetros
+        if (filters[0].areaM !== undefined) {
+          this.value = filters[0].areaM;
+        }
       }
     });
   }

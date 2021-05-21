@@ -188,10 +188,12 @@ export class MapStructuresComponent implements OnInit {
             .getFiltersParams()
             .pipe(
               switchMap((filtParams) => {
-                this.structuresService.applyFilters(filtParams);
+                if (filtParams.length > 0) {
+                  this.structuresService.applyFilters(filtParams);
 
-                this.structuresService.deletedRawModIds = filtParams[0].eliminados;
-                // this.mBDeletedIds = filtParams[0].eliminados;
+                  this.structuresService.deletedRawModIds = filtParams[0].eliminados;
+                  // this.mBDeletedIds = filtParams[0].eliminados;
+                }
 
                 return this.filterService.filteredElements$;
               })

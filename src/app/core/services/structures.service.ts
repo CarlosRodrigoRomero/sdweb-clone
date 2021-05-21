@@ -98,6 +98,8 @@ export class StructuresService {
           actions.map((doc) => {
             const data = doc.payload.doc.data();
 
+            console.log(data);
+
             return data;
           })
         )
