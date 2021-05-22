@@ -68,11 +68,16 @@ export class RawModulesComponent implements OnInit {
 
       const polygon = evt.feature.getGeometry() as Polygon;
       const coords = polygon.getCoordinates();
-      const area = Math.round(getArea(polygon) * 100) / 100;
-      console.log(area);
+      coords[0].pop(); // quitamos el ultimo punto que es igual al primero
+      const area = Math.round(this.structuresService.getArea(coords) * 1000);
+      const aspectRatio = parseFloat(this.structuresService.getAspectRatio(coords).toFixed(4));
 
-      const rawModule = new RawModule();
-      rawModule.coords = coords[0];
+      const rawModule: RawModule = {
+        coords: coords[0],
+        area,
+        aspectRatio,
+        confianza: 1,
+      };
 
       this.structuresService.addRawModule(rawModule);
 

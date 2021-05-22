@@ -18,6 +18,8 @@ import { FilterableElement } from '@core/models/filtrableInterface';
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { Coordinate } from 'ol/coordinate';
+import Point from 'ol/geom/Point';
+import LineString from 'ol/geom/LineString';
 
 @Injectable({
   providedIn: 'root',
@@ -188,7 +190,7 @@ export class StructuresService {
       .doc(id)
       .set(module)
       .then(() => {
-        console.log('Módulo creado correctamente');
+        console.log('Módulo creado correctamente con ID: ', id);
       })
       .catch((error) => {
         console.error('Error al crear módulo: ', error);
@@ -253,6 +255,28 @@ export class StructuresService {
       const areaFilter = new ModuloBrutoFilter('areaM', filter.areaM);
       this.filterService.addFilter(areaFilter);
     }
+  }
+
+  getAspectRatio(coords: Coordinate[][]) {
+    const topLeft = coords[0][3];
+    const topRight = coords[0][2];
+    const lineH = new LineString([topLeft, topRight]);
+
+    const bottomLeft = coords[0][0];
+    const lineV = new LineString([topLeft, bottomLeft]);
+
+    return lineH.getLength() / lineV.getLength();
+  }
+
+  getArea(coords: Coordinate[][]) {
+    const topLeft = coords[0][3];
+    const topRight = coords[0][2];
+    const lineH = new LineString([topLeft, topRight]);
+
+    const bottomLeft = coords[0][0];
+    const lineV = new LineString([topLeft, bottomLeft]);
+
+    return lineH.getLength() * lineV.getLength();
   }
 
   get planta() {
