@@ -10,13 +10,13 @@ mat-spinner {
   grid-template-columns: 1fr 4fr;
 }
 
-.right-bar {
+.left-bar {
   display: flex;
   flex-direction: column;
   background: white;
 }
 
-.right-bar h4 {
+.left-bar h4 {
   margin: 1rem;
 }
 

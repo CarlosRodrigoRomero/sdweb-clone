@@ -2,7 +2,7 @@
   <app-navbar> </app-navbar>
   <mat-spinner *ngIf="!trayectoriaLoaded"></mat-spinner>
   <div class="cluster-grid" *ngIf="trayectoriaLoaded">
-    <div class="right-bar">
+    <div class="left-bar">
       <h4>{{ nombrePlanta }}</h4>
       <app-image-point-cluster></app-image-point-cluster>
       <app-clusters-control></app-clusters-control>

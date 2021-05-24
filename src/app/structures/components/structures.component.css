@@ -3,6 +3,16 @@
   grid-template-columns: 1fr 4fr;
 }
 
+.left-bar {
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.left-bar h4 {
+  margin: 1rem 1rem 0;
+}
+
 .mat-stepper-vertical {
   margin-top: 8px;
 }
@@ -14,10 +24,6 @@
 .next-button {
   margin-top: 1rem;
 }
-
-
-
-
 
 .delete-mode-warn {
   position: absolute;

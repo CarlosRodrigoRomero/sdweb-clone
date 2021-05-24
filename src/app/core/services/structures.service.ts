@@ -27,7 +27,7 @@ import LineString from 'ol/geom/LineString';
 export class StructuresService {
   private _informeId: string;
   private _planta: PlantaInterface = {};
-  private planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
+  planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _deleteMode = false;

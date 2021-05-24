@@ -10,12 +10,14 @@ import { StructuresService } from '@core/services/structures.service';
 export class StructuresComponent implements OnInit {
   serviceInit = false;
   deleteMode = false;
+  nombrePlanta: string;
 
   constructor(private structuresService: StructuresService) {}
 
   ngOnInit(): void {
     this.structuresService.initService().subscribe((value) => (this.serviceInit = value));
     this.structuresService.deleteMode$.subscribe((mode) => (this.deleteMode = mode));
+    this.structuresService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre));
   }
 
   loadModuleGroups() {
