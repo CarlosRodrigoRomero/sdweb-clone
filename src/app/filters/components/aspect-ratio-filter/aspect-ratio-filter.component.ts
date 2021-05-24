@@ -49,4 +49,8 @@ export class AspectRatioFilterComponent implements OnInit {
       this.structuresService.addFilter('aspectRatioM', e.value);
     }
   }
+
+  formatLabel(value: number) {
+    return value * 10;
+  }
 }

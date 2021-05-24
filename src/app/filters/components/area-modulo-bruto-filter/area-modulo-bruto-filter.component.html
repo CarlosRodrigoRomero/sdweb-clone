@@ -1,7 +1,13 @@
 <div>
-  <span>Area</span>
+  <div class="title">
+    <span>Area</span>
+    <span class="fuerza">Fuerza: {{ value * 10 }}</span>
+  </div>
+
   <mat-slider
     class="area-slider"
+    thumbLabel
+    [displayWith]="formatLabel"
     [value]="value"
     [max]="max"
     [min]="min"

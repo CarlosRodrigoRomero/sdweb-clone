@@ -49,4 +49,8 @@ export class ConfianzaFilterComponent implements OnInit {
       this.structuresService.addFilter('confianzaM', e.value);
     }
   }
+
+  formatLabel(value: number) {
+    return value * 10;
+  }
 }

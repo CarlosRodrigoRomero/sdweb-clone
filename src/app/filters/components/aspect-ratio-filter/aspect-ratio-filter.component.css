@@ -2,3 +2,14 @@
   min-width: 200px;
   width: 100%;
 }
+
+.title {
+  display: inline-flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.fuerza {
+  font-size: 14px;
+  font-weight: 300;
+}

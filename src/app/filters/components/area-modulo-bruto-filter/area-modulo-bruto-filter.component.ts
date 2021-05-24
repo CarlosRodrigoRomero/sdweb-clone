@@ -48,4 +48,8 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
       this.structuresService.addFilter('areaM', e.value);
     }
   }
+
+  formatLabel(value: number) {
+    return value * 10;
+  }
 }
