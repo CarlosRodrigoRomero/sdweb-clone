@@ -31,6 +31,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit {
           temperaturaRef: this.anomaliaSelected.temperaturaRef,
           gradienteNormalizado: this.anomaliaSelected.gradienteNormalizado,
           tipo: GLOBAL.pcDescripcion[this.anomaliaSelected.tipo],
+          perdidas: this.anomaliaSelected.perdidas,
           causa: GLOBAL.pcCausa[this.anomaliaSelected.tipo],
           recomendacion: GLOBAL.pcRecomendacion[this.anomaliaSelected.tipo],
           fila: (this.anomaliaSelected as PcInterface).local_y,
