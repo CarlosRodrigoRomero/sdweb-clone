@@ -173,7 +173,7 @@ export class SeguidorImagesComponent implements OnInit {
       return this.anomaliaService.getPerdidasColor(this.seguidorSelected.anomalias, anomalia);
       // tslint:disable-next-line: triple-equals
     } else if (this.viewSelected == 1) {
-      return 'white';
+      return this.anomaliaService.getCelsCalientesColor(anomalia);
     } else {
       return 'black';
     }
