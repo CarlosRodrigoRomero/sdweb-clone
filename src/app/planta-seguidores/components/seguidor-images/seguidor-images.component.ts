@@ -44,7 +44,6 @@ export class SeguidorImagesComponent implements OnInit {
   sw = 2;
   c = [];
   strokeColor = 0;
-  drawAnomalias;
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
@@ -81,7 +80,7 @@ export class SeguidorImagesComponent implements OnInit {
         this.viewSelected = view;
 
         if (this.seguidorSelected !== undefined) {
-          this.drawAllAnomalias();
+          this.drawAnomalias();
         }
       });
 
@@ -123,9 +122,18 @@ export class SeguidorImagesComponent implements OnInit {
     this.seguidorViewService.anomaliaSelected$.subscribe((anomSel) => (this.anomaliaSelected = anomSel));
   }
 
-  drawAllAnomalias() {
+  drawAnomalias() {
     this.anomsCanvas.clear();
-    this.seguidorSelected.anomalias.forEach((anom) => this.drawAnomalia(anom));
+
+    // tslint:disable-next-line: triple-equals
+    if (this.viewSelected == 1) {
+      // en el view Cels. Calientes solo mostramos estas
+      this.seguidorSelected.anomalias
+        .filter((anom) => anom.tipo === 8 || anom.tipo === 9)
+        .forEach((anom) => this.drawAnomalia(anom));
+    } else {
+      this.seguidorSelected.anomalias.forEach((anom) => this.drawAnomalia(anom));
+    }
   }
 
   drawAnomalia(anomalia: Anomalia) {

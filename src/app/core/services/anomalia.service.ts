@@ -240,11 +240,12 @@ export class AnomaliaService {
   }
 
   getCelsCalientesColor(anomaliaSelected: Anomalia) {
-    if (anomaliaSelected.tipo === 8 || anomaliaSelected.tipo === 9) {
+    /* if (anomaliaSelected.tipo === 8 || anomaliaSelected.tipo === 9) {
       return GLOBAL.colores_mae[0];
     } else {
       return 'rgba(0,0,0,0)';
-    }
+    } */
+    return 'white';
   }
 
   downloadRjpg(anomalia: Anomalia) {
