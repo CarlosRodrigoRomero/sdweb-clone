@@ -32,4 +32,12 @@ export class SeguidorViewComponent implements OnInit {
   public closeSidenav() {
     this.seguidorViewService.closeSidenav();
   }
+
+  nextSeguidor() {
+    this.seguidoresControlService.selectNextSeguidor();
+  }
+
+  prevSeguidor() {
+    this.seguidoresControlService.selectPrevSeguidor();
+  }
 }

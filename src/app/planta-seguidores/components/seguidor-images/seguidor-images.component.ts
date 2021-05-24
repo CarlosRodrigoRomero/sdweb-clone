@@ -27,7 +27,6 @@ export class SeguidorImagesComponent implements OnInit {
   anomaliaSelected: Anomalia = undefined;
   thermalImage = new Image();
   imageLoaded: boolean;
-  visualImage = new Image();
   visualImageLoaded: boolean;
   zoomSquare = 200;
   visualCanvas: any;
@@ -221,13 +220,13 @@ export class SeguidorImagesComponent implements OnInit {
       // const visualCanvas = document.getElementById(
       //   "visual-canvas"
       // ) as HTMLCanvasElement;
-      const scaleX = this.thermalImage.width / this.anomsCanvas.width;
-      const scaleY = this.thermalImage.height / this.anomsCanvas.height;
+      const scaleX = this.imageSelected.width / this.anomsCanvas.width;
+      const scaleY = this.imageSelected.height / this.anomsCanvas.height;
 
       const zoomFactor = 2;
 
       zoomCtx.drawImage(
-        this.thermalImage,
+        this.imageSelected,
         e.pointer.x * scaleX - this.zoomSquare / 2 / zoomFactor,
         e.pointer.y * scaleY - this.zoomSquare / 2 / zoomFactor,
         this.zoomSquare,

@@ -50,3 +50,25 @@ app-seguidor-next-prev {
   position: absolute;
   top: 220px;
 }
+
+.prev-btn {
+  position: absolute;
+  left: 10px;
+  top: 250px;
+}
+
+.prev-btn mat-icon {
+  color: white;
+  font-size: 40px;
+}
+
+.next-btn {
+  position: absolute;
+  left: 600px;
+  top: 250px;
+}
+
+.next-btn mat-icon {
+  color: white;
+  font-size: 40px;
+}
