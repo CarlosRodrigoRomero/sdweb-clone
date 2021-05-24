@@ -434,7 +434,7 @@ export class SeguidoresControlService {
       const idNumber = seguidor.id.split('_')[1];
 
       // cambiamos al seguidor correspondiente al informe actual
-      return seguidor.informeId === this.selectedInformeId && seguidor.id.split('_')[1] === idNumber;
+      return seguidor.informeId === this.selectedInformeId && this.seguidorSelected.id.split('_')[1] === idNumber;
     });
   }
 

@@ -14,7 +14,6 @@ import { ReportControlService } from '@core/services/report-control.service';
 
 import { PcInterface } from '@core/models/pc';
 import { Seguidor } from '@core/models/seguidor';
-import { GLOBAL } from '@core/services/global';
 import { Anomalia } from '@core/models/anomalia';
 
 @Component({
@@ -23,9 +22,6 @@ import { Anomalia } from '@core/models/anomalia';
   styleUrls: ['./seguidor-images.component.css'],
 })
 export class SeguidorImagesComponent implements OnInit {
-  private urlVisualImageSeguidor: string;
-  private urlThermalImageSeguidor: string;
-  private selectedInformeId: string;
   private seguidorSelected: Seguidor;
   private imageSelected = new Image();
   anomaliaSelected: Anomalia = undefined;
@@ -58,13 +54,8 @@ export class SeguidorImagesComponent implements OnInit {
     this.anomsCanvas = new fabric.Canvas('anomalias-canvas');
     this.setEventListenersCanvas();
 
-    this.reportControlService.selectedInformeId$
+    this.seguidoresControlService.seguidorSelected$
       .pipe(
-        switchMap((informeId) => {
-          this.selectedInformeId = informeId;
-
-          return this.seguidoresControlService.seguidorSelected$;
-        }),
         switchMap((seguidor) => {
           this.seguidorSelected = seguidor;
 
@@ -89,9 +80,6 @@ export class SeguidorImagesComponent implements OnInit {
       this.seguidoresControlService.urlThermalImageSeguidor$,
       this.seguidorViewService.imageSelected$,
     ]).subscribe(([urlVis, urlTherm, image]) => {
-      this.urlVisualImageSeguidor = urlVis;
-      this.urlThermalImageSeguidor = urlTherm;
-
       // tslint:disable-next-line: triple-equals
       if (image == 0) {
         this.imageSelected.src = urlTherm;
