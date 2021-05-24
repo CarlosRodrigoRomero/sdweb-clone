@@ -150,7 +150,7 @@ export class SeguidorImagesComponent implements OnInit {
     const textId = new fabric.Text('#'.concat(pc.local_id.toString().concat(' ')), {
       left: pc.img_left,
       top: pc.img_top - 26,
-      fontSize: 20,
+      fontSize: 18,
       // textBackgroundColor: 'red',
       ref: 'text',
       selectable: false,
@@ -171,7 +171,7 @@ export class SeguidorImagesComponent implements OnInit {
     } else if (this.viewSelected == 1) {
       return this.anomaliaService.getCelsCalientesColor(anomalia);
     } else {
-      return 'black';
+      return this.anomaliaService.getGradienteColor(this.seguidorSelected.anomalias, anomalia);
     }
   }
 
