@@ -24,6 +24,7 @@ import {
   ApexTooltip,
   ApexPlotOptions,
 } from 'ng-apexcharts';
+import { Seguidor } from '@core/models/seguidor';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -72,30 +73,37 @@ export class ChartNumsyperdComponent implements OnInit {
   public selectedInformeId: string;
   public informesList: string[];
   public dataPlot: DataPlot[];
-  public allAnomalias: Anomalia[];
+  public allAnomalias: Anomalia[] = [];
   public chartHeight = 300;
 
   constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$]).subscribe(
-      ([elems, informes]) => {
+    combineLatest([
+      this.reportControlService.allFilterableElements$,
+      this.reportControlService.informesIdList$,
+    ]).subscribe(([elems, informes]) => {
+      if (this.reportControlService.plantaFija) {
         this.allAnomalias = elems as Anomalia[];
-        this.informesList = informes;
-
-        this.dataPlot = [];
-        this._getAllCategorias(this.allAnomalias);
-
-        this.informesList.forEach((informeId) => {
-          const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
-          this.dataPlot.push(this._calculateDataPlot(anomaliasInforme, informeId));
-        });
-        this.initChart();
+      } else {
+        (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomalias));
       }
-    );
+
+      this.informesList = informes;
+
+      this.dataPlot = [];
+      this.getAllCategorias(this.allAnomalias);
+
+      this.informesList.forEach((informeId) => {
+        const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
+        this.dataPlot.push(this.calculateDataPlot(anomaliasInforme, informeId));
+      });
+
+      this.initChart();
+    });
   }
 
-  private _getAllCategorias(anomalias): void {
+  private getAllCategorias(anomalias): void {
     const allNumCategorias = Array(GLOBAL.labels_tipos.length)
       .fill(0)
       .map((_, i) => i + 1);
@@ -116,7 +124,7 @@ export class ChartNumsyperdComponent implements OnInit {
     this.numsCategoria = numsCategoria;
   }
 
-  private _calculateDataPlot(anomalias, informeId: string): DataPlot {
+  private calculateDataPlot(anomalias, informeId: string): DataPlot {
     let filtroCategoria: Anomalia[];
     let perdidasCategoria: number;
 
@@ -234,17 +242,11 @@ export class ChartNumsyperdComponent implements OnInit {
 
     // espera a que el dataPlot tenga datos
     if (this.dataPlot[0] !== undefined) {
+      const seriesNumCat: ApexAxisChartSeries = [];
+      this.dataPlot.forEach((data) => seriesNumCat.push({ name: '# Anomalías', data: data.numPorCategoria }));
+
       this.chartOptions1 = {
-        series: [
-          {
-            name: '# Anomalias 2019',
-            data: this.dataPlot[0].numPorCategoria,
-          },
-          {
-            name: '# Anomalias 2020',
-            data: this.dataPlot[1].numPorCategoria,
-          },
-        ],
+        series: seriesNumCat,
         colors: this.coloresCategoria,
         title: {
           text: '# Anomalías',
@@ -270,17 +272,11 @@ export class ChartNumsyperdComponent implements OnInit {
         },
       };
 
+      const seriesMaeCat: ApexAxisChartSeries = [];
+      this.dataPlot.forEach((data) => seriesMaeCat.push({ name: '# Anomalías', data: data.perdidasPorCategoria }));
+
       this.chartOptions2 = {
-        series: [
-          {
-            name: 'MAE 2019',
-            data: this.dataPlot[0].perdidasPorCategoria,
-          },
-          {
-            name: 'MAE 2020',
-            data: this.dataPlot[1]['perdidasPorCategoria'],
-          },
-        ],
+        series: seriesMaeCat,
         title: {
           text: 'MAE',
           align: 'left',

@@ -29,8 +29,8 @@ export class ReportControlService {
   public plantaId$ = new BehaviorSubject<string>(this._plantaId);
   private _selectedInformeId: string = undefined;
   public selectedInformeId$ = new BehaviorSubject<string>(this._selectedInformeId);
-  private informesList: string[] = [];
-  public informesList$ = new BehaviorSubject<string[]>(this.informesList);
+  private informesIdList: string[] = [];
+  public informesIdList$ = new BehaviorSubject<string[]>(this.informesIdList);
   private _initialized = false;
   public initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _mapLoaded = false;
@@ -72,11 +72,11 @@ export class ReportControlService {
               informesId
                 .sort((a, b) => a.fecha - b.fecha)
                 .forEach((informe) => {
-                  this.informesList.push(informe.id);
+                  this.informesIdList.push(informe.id);
                 });
-              this.informesList$.next(this.informesList);
+              this.informesIdList$.next(this.informesIdList);
 
-              this.selectedInformeId = this.informesList[this.informesList.length - 1];
+              this.selectedInformeId = this.informesIdList[this.informesIdList.length - 1];
 
               // obtenemos todas las anomalías
               return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
@@ -149,9 +149,9 @@ export class ReportControlService {
                       informesId
                         .sort((a, b) => a.fecha - b.fecha)
                         .forEach((informe) => {
-                          this.informesList.push(informe.id);
+                          this.informesIdList.push(informe.id);
                         });
-                      this.informesList$.next(this.informesList);
+                      this.informesIdList$.next(this.informesIdList);
 
                       // comprobamos que anomalia service hay terminado de iniciarse
                       if (initAnomService) {
@@ -192,11 +192,11 @@ export class ReportControlService {
               informesId
                 .sort((a, b) => a.fecha - b.fecha)
                 .forEach((informe) => {
-                  this.informesList.push(informe.id);
+                  this.informesIdList.push(informe.id);
                 });
-              this.informesList$.next(this.informesList);
+              this.informesIdList$.next(this.informesIdList);
 
-              this.selectedInformeId = this.informesList[this.informesList.length - 1];
+              this.selectedInformeId = this.informesIdList[this.informesIdList.length - 1];
 
               // obtenemos todos los seguidores
               return this.seguidorService.getSeguidoresPlanta$(this.plantaId);
@@ -269,9 +269,9 @@ export class ReportControlService {
                       informes
                         .sort((a, b) => a.fecha - b.fecha)
                         .forEach((informe) => {
-                          this.informesList.push(informe.id);
+                          this.informesIdList.push(informe.id);
                         });
-                      this.informesList$.next(this.informesList);
+                      this.informesIdList$.next(this.informesIdList);
 
                       // comprobamos que anomalia service hay terminado de iniciarse
                       if (initAnomService) {

@@ -62,14 +62,8 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
           this.subscription.add(
             this.reportControlService.selectedInformeId$
               .pipe(
-                switchMap((informeId) => {
-                  console.log(informeId);
-
-                  return this.informeService.getInforme(informeId);
-                }),
+                switchMap((informeId) => this.informeService.getInforme(informeId)),
                 switchMap((informe) => {
-                  console.log(informe);
-
                   this.informe = informe;
 
                   return this.plantaService.getPlanta(this.informe.plantaId);
@@ -102,7 +96,5 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
     this.informe$.next(value);
   }
 
-  ngOnDestroy(): void {
-    console.log('OnDestroy plant-summary');
-  }
+  ngOnDestroy(): void {}
 }

@@ -39,7 +39,7 @@
       </mat-sidenav>
 
       <!-- SIDENAV STATS -->
-      <!-- <mat-sidenav
+      <mat-sidenav
         #sidenavStats
         [(opened)]="statsOpened"
         class="stats-sidenav"
@@ -48,7 +48,7 @@
         disableClose
       >
         <app-planta-stats></app-planta-stats>
-      </mat-sidenav> -->
+      </mat-sidenav>
 
       <mat-sidenav-content>
         <div *ngIf="seguidoresLoaded" class="rel">
@@ -98,7 +98,12 @@
           </button>
 
           <!-- BOTON SIDENAV STATS -->
-          <button mat-raised-button class="btn-right-stats" (click)="sidenavStats.toggle()" [disabled]="rightOpened">
+          <button
+            mat-raised-button
+            class="btn-right-stats"
+            (click)="sidenavStats.toggle(); loadStats()"
+            [disabled]="rightOpened"
+          >
             <mat-icon>query_stats</mat-icon>
             <mat-icon *ngIf="!statsOpened">keyboard_arrow_left</mat-icon>
             <mat-icon *ngIf="statsOpened">keyboard_arrow_right</mat-icon>

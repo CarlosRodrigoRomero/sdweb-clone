@@ -47,7 +47,7 @@ export class SliderTemporalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.reportControlService.informesList$.pipe(take(1)).subscribe((informesId) => {
+    this.reportControlService.informesIdList$.pipe(take(1)).subscribe((informesId) => {
       this.informesList = informesId;
       this.getDatesInformes(informesId).subscribe((dates) => {
         this.dates = dates;

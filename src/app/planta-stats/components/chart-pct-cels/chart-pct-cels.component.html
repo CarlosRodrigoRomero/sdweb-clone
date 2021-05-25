@@ -1,0 +1,28 @@
+<apx-chart
+  *ngIf="dataLoaded"
+  [series]="chart1options.series"
+  [chart]="chart1options.chart"
+  [colors]="chart1options.colors"
+  [yaxis]="chart1options.yaxis"
+  [dataLabels]="commonOptions.dataLabels"
+  [markers]="commonOptions.markers"
+  [stroke]="commonOptions.stroke"
+  [grid]="commonOptions.grid"
+  [xaxis]="commonOptions.xaxis"
+  [tooltip]="chart1options.tooltip"
+  [annotations]="chart1options.annotations"
+></apx-chart>
+<apx-chart
+  *ngIf="dataLoaded"
+  [series]="chart2options.series"
+  [chart]="chart2options.chart"
+  [colors]="chart2options.colors"
+  [yaxis]="chart2options.yaxis"
+  [dataLabels]="commonOptions.dataLabels"
+  [markers]="commonOptions.markers"
+  [stroke]="commonOptions.stroke"
+  [grid]="commonOptions.grid"
+  [xaxis]="commonOptions.xaxis"
+  [tooltip]="chart2options.tooltip"
+  [annotations]="chart2options.annotations"
+></apx-chart>
