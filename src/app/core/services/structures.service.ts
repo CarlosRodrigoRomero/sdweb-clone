@@ -14,7 +14,7 @@ import { FilterService } from '@core/services/filter.service';
 import { PlantaInterface } from '@core/models/planta';
 import { RawModule } from '@core/models/moduloBruto';
 import { FilterModuloBruto } from '@core/models/filterModuloBruto';
-import { FilterableElement } from '@core/models/filtrableInterface';
+import { FilterableElement } from '@core/models/filterableInterface';
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { Coordinate } from 'ol/coordinate';
@@ -277,6 +277,29 @@ export class StructuresService {
     const lineV = new LineString([topLeft, bottomLeft]);
 
     return lineH.getLength() * lineV.getLength();
+  }
+
+  getStructures(thermalLayer?: ThermalLayerInterface) {
+    if (thermalLayer !== undefined) {
+      this.thermalLayer = thermalLayer;
+    }
+    const query$ = this.afs
+      .collection<any>('thermalLayers/' + this.thermalLayer.id + '/estructuras')
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((doc) => {
+            const data = doc.payload.doc.data();
+            const id = doc.payload.doc.id;
+
+            // Convertimos el objeto en un array
+            // data.coords = Object.values(data.coords);
+
+            return { id, ...data };
+          })
+        )
+      );
+    return query$;
   }
 
   get planta() {

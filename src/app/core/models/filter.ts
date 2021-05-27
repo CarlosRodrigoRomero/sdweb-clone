@@ -1,4 +1,4 @@
-import { FilterableElement } from './filtrableInterface';
+import { FilterableElement } from './filterableInterface';
 
 export interface FilterInterface {
   id?: string;

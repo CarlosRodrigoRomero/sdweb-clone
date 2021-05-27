@@ -1,37 +1,35 @@
 import { Coordinate } from 'ol/coordinate.js';
-import { FilterableElement } from './filtrableInterface';
+import { FilterableElement } from './filterableInterface';
 import { ModuloInterface } from './modulo';
 
 export class Anomalia implements FilterableElement {
-  // FiltrableInterface
+  id?: string;
+  plantaId: string;
+  informeId: string;
   tipo: number;
   globalCoords: string[];
   severidad: number;
   perdidas: number;
+  gradiente?: number;
   gradienteNormalizado: number;
   temperaturaMax: number;
   modulo: ModuloInterface;
   temperaturaRef: number;
+  datetime?: number;
   criticidad?: number;
-  //
   featureCoords: Coordinate[];
   featureType: string;
-  id?: string;
-  plantaId: string;
-  informeId: string;
   modulosAfectados?: number;
   archivoPublico?: string;
   archivo?: string;
-
-  // demo
   localId?: string;
   localX?: number;
   localY?: number;
+
   camaraModelo?: string;
   camaraSN?: number;
   vientoVelocidad?: number;
   vientoDireccion?: number;
-  datetime?: number;
 
   constructor(
     tipo: number,

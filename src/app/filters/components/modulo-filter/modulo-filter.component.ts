@@ -7,7 +7,7 @@ import { PcService } from '@core/services/pc.service';
 import { FilterService } from '@core/services/filter.service';
 
 import { ModuloPcFilter } from '@core/models/moduloFilter';
-import { FilterableElement } from '@core/models/filtrableInterface';
+import { FilterableElement } from '@core/models/filterableInterface';
 import { AnomaliaService } from '@core/services/anomalia.service';
 
 interface ModuloPc {

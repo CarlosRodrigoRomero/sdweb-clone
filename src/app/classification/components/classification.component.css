@@ -1,0 +1,21 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+}
+
+.left-bar {
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.left-bar h4 {
+  margin: 1rem 1rem 0;
+}
+
+app-thermal-slider {
+  position: absolute;
+  left: 60%;
+  transform: translate(-50%, 0%);
+  bottom: 1rem;
+}
