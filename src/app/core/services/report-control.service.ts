@@ -14,7 +14,7 @@ import { WINDOW } from '../../window.providers';
 
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 
-import { FilterableElement } from '@core/models/filtrableInterface';
+import { FilterableElement } from '@core/models/filterableInterface';
 
 @Injectable({
   providedIn: 'root',

@@ -1,5 +1,5 @@
 import { FilterInterface } from './filter';
-import { FilterableElement } from './filtrableInterface';
+import { FilterableElement } from './filterableInterface';
 
 export class TempMaxFilter implements FilterInterface {
   type: string;

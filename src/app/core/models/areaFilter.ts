@@ -4,7 +4,7 @@ import Polygon from 'ol/geom/Polygon';
 import { Anomalia } from './anomalia';
 import { Seguidor } from './seguidor';
 import { FilterInterface } from './filter';
-import { FilterableElement } from './filtrableInterface';
+import { FilterableElement } from './filterableInterface';
 
 export class AreaFilter implements FilterInterface {
   type: string;

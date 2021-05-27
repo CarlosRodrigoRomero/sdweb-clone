@@ -6,7 +6,7 @@ import { ShareReportService } from '@core/services/share-report.service';
 import { SeguidorService } from '@core/services/seguidor.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
-import { FilterableElement } from '@core/models/filtrableInterface';
+import { FilterableElement } from '@core/models/filterableInterface';
 import { FilterInterface } from '@core/models/filter';
 
 @Injectable({

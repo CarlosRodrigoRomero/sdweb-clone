@@ -1,5 +1,5 @@
 import { FilterInterface } from './filter';
-import { FilterableElement } from './filtrableInterface';
+import { FilterableElement } from './filterableInterface';
 import { RawModule } from './moduloBruto';
 
 export class ModuloBrutoFilter implements FilterInterface {

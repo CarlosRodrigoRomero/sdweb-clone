@@ -1,5 +1,5 @@
 import { Coordinate } from 'ol/coordinate';
-import { FilterableElement } from './filtrableInterface';
+import { FilterableElement } from './filterableInterface';
 
 export class RawModule implements FilterableElement {
   id?: string;

@@ -41,6 +41,10 @@ export const routes: Routes = [
     path: 'structures',
     loadChildren: () => import('./structures/structures.module').then((m) => m.StructuresModule),
   },
+  {
+    path: 'classification',
+    loadChildren: () => import('./classification/classification.module').then((m) => m.ClassificationModule),
+  },
   { path: '**', redirectTo: '' },
 ];
 

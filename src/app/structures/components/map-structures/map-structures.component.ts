@@ -12,6 +12,8 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
+import { Select } from 'ol/interaction';
+import { click } from 'ol/events/condition';
 
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
@@ -26,10 +28,6 @@ import { FilterService } from '@core/services/filter.service';
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { RawModule } from '@core/models/moduloBruto';
-import { Select } from 'ol/interaction';
-import { click } from 'ol/events/condition';
-import { combineLatest } from 'rxjs';
-import { Coordinate } from 'ol/coordinate';
 
 @Component({
   selector: 'app-map-structures',

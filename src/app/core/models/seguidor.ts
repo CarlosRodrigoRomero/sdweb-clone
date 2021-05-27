@@ -3,7 +3,7 @@ import { Coordinate } from 'ol/coordinate';
 import { fromLonLat } from 'ol/proj';
 
 import { Anomalia } from './anomalia';
-import { FilterableElement } from './filtrableInterface';
+import { FilterableElement } from './filterableInterface';
 import { ModuloInterface } from './modulo';
 
 export class Seguidor implements FilterableElement {

@@ -1,0 +1,12 @@
+<div *ngIf="serviceInit">
+  <app-navbar></app-navbar>
+  <div class="grid">
+    <div class="left-bar">
+      <h4>{{ nombrePlanta }}</h4>
+    </div>
+    <div>
+      <app-map-classification></app-map-classification>
+      <app-thermal-slider></app-thermal-slider>
+    </div>
+  </div>
+</div>

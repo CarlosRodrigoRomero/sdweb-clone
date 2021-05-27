@@ -60,11 +60,11 @@ export class AnomaliaService {
 
   set selectedInformeId(informeId: string) {
     this._selectedInformeId = informeId;
-    this.getAnomalias$(informeId)
+    /* this.getAnomalias$(informeId)
       .pipe(take(1))
       .subscribe((anoms) => {
         this.allAnomaliasInforme = anoms;
-      });
+      }); */
   }
 
   get selectedInformeId(): string {
@@ -85,7 +85,8 @@ export class AnomaliaService {
       switchMap((informes) => {
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
         informes.forEach((informe) => {
-          anomaliaObsList.push(this.getAnomalias$(informe.id /* , 'pcs' */ /* para la demo */));
+          anomaliaObsList.push(this.getAnomalias$(informe.id));
+          anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs'));
         });
         return combineLatest(anomaliaObsList);
       }),
@@ -101,6 +102,35 @@ export class AnomaliaService {
     if (tipo !== 'pcs') {
       tipo = 'anomalias';
     }
+
+    // let isPc = false;
+
+    // comprobamos primero si son PCS
+    /* const queryPcs = this.afs
+      .collection<Anomalia>('pcs', (ref) => ref.where('informeId', '==', informeId))
+      .snapshotChanges()
+      .pipe(
+        map((actions) => {
+          if (actions.length > 0) {
+            isPc = true;
+            return actions.map((doc) => {
+              const data = doc.payload.doc.data() as Anomalia;
+              data.id = doc.payload.doc.id;
+              data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
+              data.severidad = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
+              data.criticidad = this.getCriticidad(data); // DEMO licitacion
+              // Convertimos el objeto en un array
+              if (data.hasOwnProperty('featureCoords')) {
+                data.featureCoords = Object.values(data.featureCoords);
+              }
+
+              return data;
+            });
+          } else {
+            isPc = false;
+          }
+        })
+      ); */
 
     const query$ = this.afs
       .collection<Anomalia>(tipo, (ref) => ref.where('informeId', '==', informeId))
@@ -122,7 +152,14 @@ export class AnomaliaService {
           })
         )
       );
+
     return query$;
+
+    /*  if (isPc) {
+      return queryPcs;
+    } else {
+      return queryAnomalias;
+    } */
   }
 
   async updateAnomalia(anomalia: Anomalia) {
