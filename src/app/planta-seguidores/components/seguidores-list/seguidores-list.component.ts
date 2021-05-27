@@ -16,7 +16,7 @@ interface SeguidorData {
   id: string;
   modulo: string;
   mae?: number;
-  perdidas?: number;
+  celsCalientes?: number;
   gradiente?: number;
   color?: string;
 }
@@ -53,7 +53,7 @@ export class SeguidoresListComponent implements OnInit {
           this.displayedColumns = ['id', 'modulo', 'mae'];
           break;
         case 1:
-          this.displayedColumns = ['id', 'modulo', 'perdidas'];
+          this.displayedColumns = ['id', 'modulo', 'celsCalientes'];
           break;
         case 2:
           this.displayedColumns = ['id', 'modulo', 'gradiente'];
@@ -71,9 +71,9 @@ export class SeguidoresListComponent implements OnInit {
             filteredElements.push({
               id: elem.id.replace((elem as Seguidor).informeId, '').replace(/_/g, ' '),
               modulo: this.getModuloLabel(elem as Seguidor),
-              mae: (elem as Seguidor).mae.toFixed(2),
-              perdidas: elem.perdidas.toFixed(2),
-              gradiente: elem.gradienteNormalizado,
+              mae: (elem as Seguidor).mae.toFixed(3),
+              celsCalientes: (this.getCelsCalientes(elem as Seguidor) * 100).toFixed(0) + '%',
+              gradiente: elem.gradienteNormalizado + 'ºC',
               color: 'red',
               seguidor: elem as Seguidor,
             })
@@ -101,14 +101,14 @@ export class SeguidoresListComponent implements OnInit {
   hoverSeguidor(row: any) {
     if (this.seguidorSelected === undefined) {
       this.seguidoresControlService.seguidorHovered = row.seguidor;
-      // this.anomaliasControlService.setExternalStyle(row.id, true);
+      this.seguidoresControlService.setExternalStyle(row.seguidor.id, true);
     }
   }
 
   unhoverSeguidor(row: any) {
     if (this.seguidorSelected === undefined) {
       this.seguidoresControlService.seguidorHovered = undefined;
-      // this.anomaliasControlService.setExternalStyle(row.id, false);
+      this.seguidoresControlService.setExternalStyle(row.seguidor.id, false);
     }
   }
 
@@ -117,13 +117,14 @@ export class SeguidoresListComponent implements OnInit {
     this.seguidoresControlService.seguidorHovered = undefined;
 
     // reiniciamos el estilo al anterior seguidor
-    /*  if (this.anomaliasControlService.prevAnomaliaSelect !== undefined) {
-      this.anomaliasControlService.setExternalStyle(this.anomaliasControlService.prevAnomaliaSelect.id, false);
+    if (this.seguidoresControlService.prevSeguidorSelected !== undefined) {
+      this.seguidoresControlService.setExternalStyle(this.seguidoresControlService.prevSeguidorSelected.id, false);
     }
-    this.anomaliasControlService.prevAnomaliaSelect = row.anomalia; */
+    this.seguidoresControlService.prevSeguidorSelected = row.seguidor;
 
     this.seguidoresControlService.seguidorSelected = row.seguidor;
-    // this.anomaliasControlService.setExternalStyle(row.id, true);
+    this.seguidoresControlService.setExternalStyle(row.seguidor.id, true);
+    this.seguidoresControlService.seguidorViewOpened = true;
   }
 
   getModuloLabel(elem: Seguidor): string {
@@ -147,5 +148,12 @@ export class SeguidoresListComponent implements OnInit {
     }
 
     return moduloLabel;
+  }
+
+  getCelsCalientes(seguidor: Seguidor): number {
+    // tslint:disable-next-line: triple-equals
+    const celsCalientes = seguidor.anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+
+    return celsCalientes.length / seguidor.anomalias.length;
   }
 }

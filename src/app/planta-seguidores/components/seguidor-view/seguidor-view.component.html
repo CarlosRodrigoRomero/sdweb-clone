@@ -14,7 +14,13 @@
         <app-seguidor-view-toggle></app-seguidor-view-toggle>
         <app-seguidor-images></app-seguidor-images>
         <app-seguidor-image-toggle></app-seguidor-image-toggle>
-        <app-seguidor-next-prev></app-seguidor-next-prev>
+        <!-- <app-seguidor-next-prev></app-seguidor-next-prev> -->
+        <button class="prev-btn" mat-icon-button (click)="prevSeguidor()">
+          <mat-icon>arrow_back_ios</mat-icon>
+        </button>
+        <button class="next-btn" mat-icon-button (click)="nextSeguidor()">
+          <mat-icon>arrow_forward_ios</mat-icon>
+        </button>
       </div>
       <app-seguidor-slider-temporal></app-seguidor-slider-temporal>
       <app-seguidor-anomalias-list></app-seguidor-anomalias-list>

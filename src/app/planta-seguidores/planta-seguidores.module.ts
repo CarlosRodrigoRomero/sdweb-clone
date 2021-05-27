@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { PlantaSeguidoresRoutingModule } from './planta-seguidores-routing.module';
 import { SharedModule } from '@shared/shared.module';
 import { FiltersModule } from '../filters/filters.module';
+import { PlantaStatsModule } from '../planta-stats/planta-stats.module';
 
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { SeguidoresListComponent } from './components/seguidores-list/seguidores-list.component';
@@ -45,6 +46,6 @@ import { SeguidorAnomaliasListComponent } from './components/seguidor-anomalias-
     SeguidorAnomaliaInfoComponent,
     SeguidorAnomaliasListComponent,
   ],
-  imports: [CommonModule, PlantaSeguidoresRoutingModule, SharedModule, FiltersModule],
+  imports: [CommonModule, PlantaSeguidoresRoutingModule, SharedModule, FiltersModule, PlantaStatsModule],
 })
 export class PlantaSeguidoresModule {}

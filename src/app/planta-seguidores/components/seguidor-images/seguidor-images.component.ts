@@ -14,7 +14,6 @@ import { ReportControlService } from '@core/services/report-control.service';
 
 import { PcInterface } from '@core/models/pc';
 import { Seguidor } from '@core/models/seguidor';
-import { GLOBAL } from '@core/services/global';
 import { Anomalia } from '@core/models/anomalia';
 
 @Component({
@@ -23,15 +22,11 @@ import { Anomalia } from '@core/models/anomalia';
   styleUrls: ['./seguidor-images.component.css'],
 })
 export class SeguidorImagesComponent implements OnInit {
-  private urlVisualImageSeguidor: string;
-  private urlThermalImageSeguidor: string;
-  private selectedInformeId: string;
   private seguidorSelected: Seguidor;
   private imageSelected = new Image();
   anomaliaSelected: Anomalia = undefined;
   thermalImage = new Image();
   imageLoaded: boolean;
-  visualImage = new Image();
   visualImageLoaded: boolean;
   zoomSquare = 200;
   visualCanvas: any;
@@ -44,7 +39,6 @@ export class SeguidorImagesComponent implements OnInit {
   sw = 2;
   c = [];
   strokeColor = 0;
-  drawAnomalias;
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
@@ -59,13 +53,8 @@ export class SeguidorImagesComponent implements OnInit {
     this.anomsCanvas = new fabric.Canvas('anomalias-canvas');
     this.setEventListenersCanvas();
 
-    this.reportControlService.selectedInformeId$
+    this.seguidoresControlService.seguidorSelected$
       .pipe(
-        switchMap((informeId) => {
-          this.selectedInformeId = informeId;
-
-          return this.seguidoresControlService.seguidorSelected$;
-        }),
         switchMap((seguidor) => {
           this.seguidorSelected = seguidor;
 
@@ -81,7 +70,7 @@ export class SeguidorImagesComponent implements OnInit {
         this.viewSelected = view;
 
         if (this.seguidorSelected !== undefined) {
-          this.drawAllAnomalias();
+          this.drawAnomalias();
         }
       });
 
@@ -90,9 +79,6 @@ export class SeguidorImagesComponent implements OnInit {
       this.seguidoresControlService.urlThermalImageSeguidor$,
       this.seguidorViewService.imageSelected$,
     ]).subscribe(([urlVis, urlTherm, image]) => {
-      this.urlVisualImageSeguidor = urlVis;
-      this.urlThermalImageSeguidor = urlTherm;
-
       // tslint:disable-next-line: triple-equals
       if (image == 0) {
         this.imageSelected.src = urlTherm;
@@ -123,9 +109,18 @@ export class SeguidorImagesComponent implements OnInit {
     this.seguidorViewService.anomaliaSelected$.subscribe((anomSel) => (this.anomaliaSelected = anomSel));
   }
 
-  drawAllAnomalias() {
+  drawAnomalias() {
     this.anomsCanvas.clear();
-    this.seguidorSelected.anomalias.forEach((anom) => this.drawAnomalia(anom));
+
+    // tslint:disable-next-line: triple-equals
+    if (this.viewSelected == 1) {
+      // en el view Cels. Calientes solo mostramos estas
+      this.seguidorSelected.anomalias
+        .filter((anom) => anom.tipo === 8 || anom.tipo === 9)
+        .forEach((anom) => this.drawAnomalia(anom));
+    } else {
+      this.seguidorSelected.anomalias.forEach((anom) => this.drawAnomalia(anom));
+    }
   }
 
   drawAnomalia(anomalia: Anomalia) {
@@ -154,7 +149,7 @@ export class SeguidorImagesComponent implements OnInit {
     const textId = new fabric.Text('#'.concat(pc.local_id.toString().concat(' ')), {
       left: pc.img_left,
       top: pc.img_top - 26,
-      fontSize: 20,
+      fontSize: 18,
       // textBackgroundColor: 'red',
       ref: 'text',
       selectable: false,
@@ -173,9 +168,9 @@ export class SeguidorImagesComponent implements OnInit {
       return this.anomaliaService.getPerdidasColor(this.seguidorSelected.anomalias, anomalia);
       // tslint:disable-next-line: triple-equals
     } else if (this.viewSelected == 1) {
-      return 'white';
+      return this.anomaliaService.getCelsCalientesColor(anomalia);
     } else {
-      return 'black';
+      return this.anomaliaService.getGradienteColor(this.seguidorSelected.anomalias, anomalia);
     }
   }
 
@@ -225,13 +220,13 @@ export class SeguidorImagesComponent implements OnInit {
       // const visualCanvas = document.getElementById(
       //   "visual-canvas"
       // ) as HTMLCanvasElement;
-      const scaleX = this.thermalImage.width / this.anomsCanvas.width;
-      const scaleY = this.thermalImage.height / this.anomsCanvas.height;
+      const scaleX = this.imageSelected.width / this.anomsCanvas.width;
+      const scaleY = this.imageSelected.height / this.anomsCanvas.height;
 
       const zoomFactor = 2;
 
       zoomCtx.drawImage(
-        this.thermalImage,
+        this.imageSelected,
         e.pointer.x * scaleX - this.zoomSquare / 2 / zoomFactor,
         e.pointer.y * scaleY - this.zoomSquare / 2 / zoomFactor,
         this.zoomSquare,

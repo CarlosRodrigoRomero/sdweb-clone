@@ -41,9 +41,9 @@ export class SeguidorSliderTemporalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.reportControlService.informesList$.pipe(take(1)).subscribe((informesId) => {
+    this.reportControlService.informesIdList$.pipe(take(1)).subscribe((informesId) => {
       this.informeIdList = informesId;
-      this.getDatesInformes(informesId).subscribe((dates) => {
+      this.informeService.getDateLabelsInformes(informesId).subscribe((dates) => {
         this.dates = dates;
 
         // ya tenemos los labels y ahora mostramos el slider
@@ -67,37 +67,5 @@ export class SeguidorSliderTemporalComponent implements OnInit {
 
     // cambiamos al mismo seguidor pero del informe actual
     this.seguidoresControlService.changeInformeSeguidorSelected();
-  }
-
-  getDatesInformes(informesId: string[]) {
-    return combineLatest(
-      informesId.map((informeId) =>
-        this.informeService.getInforme(informeId).pipe(
-          take(1),
-          map((informe) => this.unixToDateLabel(informe.fecha))
-        )
-      )
-    );
-  }
-
-  unixToDateLabel(unix: number): string {
-    const date = new Date(unix * 1000);
-    const year = date.getFullYear();
-    const monthNames = [
-      'Enero',
-      'Febrero',
-      'Marzo',
-      'Abril',
-      'Mayo',
-      'Junio',
-      'Julio',
-      'Agosto',
-      'Septiembre',
-      'Octubre',
-      'Noviembre',
-      'Diciembre',
-    ];
-    const month = monthNames[date.getMonth()];
-    return month + ' ' + year;
   }
 }

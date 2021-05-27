@@ -9,8 +9,7 @@
 }
 
 #visual-zoom {
-  border: 1px black solid;
-  box-shadow: 5px 5px 10px #1e1e1e;
+  border: 2px white solid;
   z-index: 99999;
 }
 

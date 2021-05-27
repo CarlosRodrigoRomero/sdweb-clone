@@ -6,6 +6,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { ReportControlService } from '@core/services/report-control.service';
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
+import { StatsService } from '@core/services/stats.service';
 
 @Component({
   selector: 'app-map-view',
@@ -30,7 +31,8 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private seguidoresControlService: SeguidoresControlService,
-    private seguidorViewService: SeguidorViewService
+    private seguidorViewService: SeguidorViewService,
+    private statsService: StatsService
   ) {}
 
   ngOnInit(): void {
@@ -50,6 +52,10 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.seguidorViewService.setSidenav(this.sidenavSeguidorView);
+  }
+
+  loadStats() {
+    this.statsService.loadStats = true;
   }
 
   ngOnDestroy(): void {

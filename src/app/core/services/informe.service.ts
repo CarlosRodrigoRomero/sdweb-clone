@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { Observable, Subject } from 'rxjs';
+import { combineLatest, Observable, Subject } from 'rxjs';
 import { InformeInterface } from '../models/informe';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { GLOBAL } from './global';
@@ -222,5 +222,37 @@ export class InformeService {
         )
       );
     return query$;
+  }
+
+  getDateLabelsInformes(informesId: string[]) {
+    return combineLatest(
+      informesId.map((informeId) =>
+        this.getInforme(informeId).pipe(
+          take(1),
+          map((informe) => this.unixToDateLabel(informe.fecha))
+        )
+      )
+    );
+  }
+
+  private unixToDateLabel(unix: number): string {
+    const date = new Date(unix * 1000);
+    const year = date.getFullYear();
+    const monthNames = [
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre',
+    ];
+    const month = monthNames[date.getMonth()];
+    return month + ' ' + year;
   }
 }

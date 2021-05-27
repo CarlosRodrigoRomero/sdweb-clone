@@ -159,6 +159,7 @@ export class SeguidoresControlService {
     this.addOnHoverAction();
 
     this.addSelectInteraction();
+    this.addClickOutFeatures();
   }
 
   private addCursorOnHover() {
@@ -264,6 +265,21 @@ export class SeguidoresControlService {
     });
   }
 
+  private addClickOutFeatures() {
+    this.map.on('click', (event) => {
+      const feature = this.map
+        .getFeaturesAtPixel(event.pixel)
+        .filter((item) => item.getProperties().properties !== undefined)
+        .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
+      if (feature.length === 0) {
+        if (this.seguidorSelected !== undefined) {
+          this.setExternalStyle(this.seguidorSelected.id, false);
+        }
+        this.seguidorSelected = undefined;
+      }
+    });
+  }
+
   // ESTILOS MAE
   private getStyleSeguidoresMae(focused: boolean) {
     return (feature) => {
@@ -284,9 +300,13 @@ export class SeguidoresControlService {
   private getColorSeguidorMae(feature: Feature) {
     const mae = feature.getProperties().properties.mae as number;
 
-    if (mae <= 0.01) {
+    const maes = this.listaSeguidores.map((seg) => seg.mae);
+    const maeMax = Math.max(...maes);
+    const maeMin = Math.min(...maes);
+
+    if (mae <= (maeMax - maeMin) / 3) {
       return GLOBAL.colores_mae[0];
-    } else if (mae <= 0.02) {
+    } else if (mae <= (2 * (maeMax - maeMin)) / 3) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -317,9 +337,13 @@ export class SeguidoresControlService {
       .properties.anomalias.filter((anomalia) => anomalia.tipo == 8 || anomalia.tipo == 9).length;
     const porcentCelsCalientes = celsCalientes / numModulos;
 
-    if (porcentCelsCalientes <= 0.1) {
+    const allCelsCalientes = this.listaSeguidores.map((seg) => seg.celsCalientes);
+    const ccMax = Math.max(...allCelsCalientes);
+    const ccMin = Math.min(...allCelsCalientes);
+
+    if (porcentCelsCalientes <= (ccMax - ccMin) / 3) {
       return GLOBAL.colores_mae[0];
-    } else if (porcentCelsCalientes <= 0.2) {
+    } else if (porcentCelsCalientes <= (2 * (ccMax - ccMin)) / 3) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -348,9 +372,13 @@ export class SeguidoresControlService {
   private getColorSeguidorGradienteNormMax(feature: Feature) {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
-    if (gradNormMax <= 10) {
+    const gradientes = this.listaSeguidores.map((seg) => seg.gradienteNormalizado);
+    const gradMax = Math.max(...gradientes);
+    const gradMin = Math.min(...gradientes);
+
+    if (gradNormMax <= (gradMax - gradMin) / 3) {
       return GLOBAL.colores_mae[0];
-    } else if (gradNormMax <= 20) {
+    } else if (gradNormMax <= (2 * (gradMax - gradMin)) / 3) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -434,7 +462,7 @@ export class SeguidoresControlService {
       const idNumber = seguidor.id.split('_')[1];
 
       // cambiamos al seguidor correspondiente al informe actual
-      return seguidor.informeId === this.selectedInformeId && seguidor.id.split('_')[1] === idNumber;
+      return seguidor.informeId === this.selectedInformeId && this.seguidorSelected.id.split('_')[1] === idNumber;
     });
   }
 
@@ -449,6 +477,66 @@ export class SeguidoresControlService {
     const index = this.listaSeguidores.indexOf(this.seguidorSelected);
     if (index !== 0) {
       this.seguidorSelected = this.listaSeguidores[index - 1];
+    }
+  }
+
+  setExternalStyle(seguidorId: string, focus: boolean) {
+    this.listaSeguidores.find((seg) => seg.id === seguidorId);
+
+    const features = this.seguidorLayers
+      .find((layer) => layer.getProperties().informeId === this.selectedInformeId)
+      .getSource()
+      .getFeatures();
+
+    const feature = features.find((f) => f.getProperties().properties.seguidorId === seguidorId);
+
+    const focusedStyle = new Style({
+      stroke: new Stroke({
+        color: 'white',
+        width: 6,
+      }),
+      fill: new Fill({
+        color: 'rgba(0, 0, 255, 0)',
+      }),
+    });
+
+    let unfocusedStyle;
+    if (this.toggleViewSelected === 0) {
+      unfocusedStyle = new Style({
+        stroke: new Stroke({
+          color: this.getColorSeguidorMae(feature),
+          width: 4,
+        }),
+        fill: new Fill({
+          color: 'rgba(0, 0, 255, 0)',
+        }),
+      });
+    } else if (this.toggleViewSelected === 1) {
+      unfocusedStyle = new Style({
+        stroke: new Stroke({
+          color: this.getColorSeguidorCelsCalientes(feature),
+          width: 4,
+        }),
+        fill: new Fill({
+          color: 'rgba(0, 0, 255, 0)',
+        }),
+      });
+    } else {
+      unfocusedStyle = new Style({
+        stroke: new Stroke({
+          color: this.getColorSeguidorGradienteNormMax(feature),
+          width: 4,
+        }),
+        fill: new Fill({
+          color: 'rgba(0, 0, 255, 0)',
+        }),
+      });
+    }
+
+    if (focus) {
+      feature.setStyle(focusedStyle);
+    } else {
+      feature.setStyle(unfocusedStyle);
     }
   }
 

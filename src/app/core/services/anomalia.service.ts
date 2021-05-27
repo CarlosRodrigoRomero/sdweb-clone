@@ -239,6 +239,26 @@ export class AnomaliaService {
     }
   }
 
+  getCelsCalientesColor(anomaliaSelected: Anomalia) {
+    return 'red';
+  }
+
+  getGradienteColor(anomalias: Anomalia[], anomaliaSelected: Anomalia) {
+    const gradientes = anomalias
+      .filter((anom) => anom.gradienteNormalizado !== undefined)
+      .map((anom) => anom.gradienteNormalizado);
+    const gradienteMax = Math.max(...gradientes);
+    const gradienteMin = Math.min(...gradientes);
+
+    if (anomaliaSelected.gradienteNormalizado <= (gradienteMax - gradienteMin) / 3) {
+      return GLOBAL.colores_mae[0];
+    } else if (anomaliaSelected.gradienteNormalizado <= (2 * (gradienteMax - gradienteMin)) / 3) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
+  }
+
   downloadRjpg(anomalia: Anomalia) {
     this.storage
       // .ref(`informes/${anomalia.informeId}/rjpg/${anomalia.archivoPublico}`)
