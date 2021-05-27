@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { combineLatest, Observable } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
+import { filter, map, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
@@ -35,13 +35,15 @@ export class SeguidorService {
         this.plantaService.getPlanta(plantaId).subscribe((planta) => (this.planta = planta));
         const anomaliaObsList = Array<Observable<Seguidor[]>>();
         informes.forEach((informe) => {
+          // traemos ambos tipos de anomalias por si hay pcs antiguos
           anomaliaObsList.push(this.getSeguidores$(informe.id, plantaId, 'pcs'));
+          anomaliaObsList.push(this.getSeguidores$(informe.id, plantaId, 'anomalias'));
         });
         return combineLatest(anomaliaObsList);
       }),
-      map((arr) => {
-        return arr.flat();
-      })
+      map((arr) => arr.flat()),
+      // eliminamos los seguidores vacios por haber llamado a 'pcs' y 'anomalias'
+      map((segs) => (segs = segs.filter((seg) => seg.temperaturaMax !== 0 || seg.gradienteNormalizado !== 0)))
     );
   }
 

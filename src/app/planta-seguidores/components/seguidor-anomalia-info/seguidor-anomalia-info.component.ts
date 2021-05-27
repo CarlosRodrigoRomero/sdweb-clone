@@ -24,7 +24,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit {
 
       if (this.anomaliaSelected !== undefined) {
         this.anomaliaInfo = {
-          localId: (this.anomaliaSelected as PcInterface).local_id,
+          localId: this.anomaliaSelected.localId,
           clase: GLOBAL.labels_severidad[this.anomaliaSelected.severidad],
           claseColor: GLOBAL.colores_severidad[this.anomaliaSelected.severidad],
           temperaturaMax: this.anomaliaSelected.temperaturaMax,
@@ -34,8 +34,8 @@ export class SeguidorAnomaliaInfoComponent implements OnInit {
           perdidas: this.anomaliaSelected.perdidas,
           causa: GLOBAL.pcCausa[this.anomaliaSelected.tipo],
           recomendacion: GLOBAL.pcRecomendacion[this.anomaliaSelected.tipo],
-          fila: (this.anomaliaSelected as PcInterface).local_y,
-          columna: (this.anomaliaSelected as PcInterface).local_x,
+          fila: this.anomaliaSelected.localY,
+          columna: this.anomaliaSelected.localX,
           fecha: this.anomaliaSelected.datetime,
           irradiancia: (this.anomaliaSelected as PcInterface).irradiancia,
           vientoDireccion: this.anomaliaSelected.vientoDireccion,

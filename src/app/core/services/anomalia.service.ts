@@ -85,53 +85,21 @@ export class AnomaliaService {
       switchMap((informes) => {
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
         informes.forEach((informe) => {
-          anomaliaObsList.push(this.getAnomalias$(informe.id));
+          // traemos ambos tipos de anomalias por si hay pcs antiguos
           anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs'));
+          anomaliaObsList.push(this.getAnomalias$(informe.id, 'anomalias'));
         });
         return combineLatest(anomaliaObsList);
       }),
-      map((arr) => {
-        return arr.flat();
-      })
+      map((arr) => arr.flat()),
+      // eliminamos las anomalias "vacias" por haber llamado a 'pcs' y 'anomalias'
+      map((anoms) => (anoms = anoms.filter((anom) => anom.perdidas !== 0)))
     );
 
     return query$;
   }
 
   getAnomalias$(informeId: string, tipo?: 'anomalias' | 'pcs'): Observable<Anomalia[]> {
-    if (tipo !== 'pcs') {
-      tipo = 'anomalias';
-    }
-
-    // let isPc = false;
-
-    // comprobamos primero si son PCS
-    /* const queryPcs = this.afs
-      .collection<Anomalia>('pcs', (ref) => ref.where('informeId', '==', informeId))
-      .snapshotChanges()
-      .pipe(
-        map((actions) => {
-          if (actions.length > 0) {
-            isPc = true;
-            return actions.map((doc) => {
-              const data = doc.payload.doc.data() as Anomalia;
-              data.id = doc.payload.doc.id;
-              data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
-              data.severidad = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
-              data.criticidad = this.getCriticidad(data); // DEMO licitacion
-              // Convertimos el objeto en un array
-              if (data.hasOwnProperty('featureCoords')) {
-                data.featureCoords = Object.values(data.featureCoords);
-              }
-
-              return data;
-            });
-          } else {
-            isPc = false;
-          }
-        })
-      ); */
-
     const query$ = this.afs
       .collection<Anomalia>(tipo, (ref) => ref.where('informeId', '==', informeId))
       .snapshotChanges()
@@ -143,6 +111,19 @@ export class AnomaliaService {
             data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
             data.severidad = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
             data.criticidad = this.getCriticidad(data); // DEMO licitacion
+
+            if (tipo === 'pcs') {
+              data.localId = (data as PcInterface).local_id.toString();
+              data.localX = (data as PcInterface).local_x;
+              data.localY = (data as PcInterface).local_y;
+              if (data.globalCoords === undefined) {
+                data.globalCoords = [
+                  (data as PcInterface).global_x,
+                  (data as PcInterface).global_y,
+                  (data as PcInterface).global_z,
+                ];
+              }
+            }
             // Convertimos el objeto en un array
             if (data.hasOwnProperty('featureCoords')) {
               data.featureCoords = Object.values(data.featureCoords);
@@ -154,12 +135,6 @@ export class AnomaliaService {
       );
 
     return query$;
-
-    /*  if (isPc) {
-      return queryPcs;
-    } else {
-      return queryAnomalias;
-    } */
   }
 
   async updateAnomalia(anomalia: Anomalia) {

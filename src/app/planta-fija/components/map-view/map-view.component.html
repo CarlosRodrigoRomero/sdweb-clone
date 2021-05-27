@@ -104,7 +104,7 @@
       <button
         mat-raised-button
         class="btn-right-stats"
-        (click)="sidenavStats.toggle()"
+        (click)="sidenavStats.toggle(); loadStats()"
         matTooltip="Estadísticas"
         [disabled]="rightOpened"
       >

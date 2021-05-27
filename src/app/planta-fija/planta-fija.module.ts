@@ -10,6 +10,7 @@ import { SwiperModule } from 'swiper/angular';
 import { PlantaFijaRoutingModule } from './planta-fija-routing.module';
 import { SharedModule } from '@shared/shared.module';
 import { FiltersModule } from '../filters/filters.module';
+import { PlantaStatsModule } from '../planta-stats/planta-stats.module';
 
 import { FilterPcsListComponent } from './components/filter-pcs-list/filter-pcs-list.component';
 import { ChartSankeyComponent } from './planta-stats/chart-sankey/chart-sankey.component';
@@ -22,7 +23,7 @@ import { DownloadReportComponent } from './components/download-report/download-r
 import { MapComponent } from './components/map/map.component';
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.component';
-import { PlantaStatsComponent } from './planta-stats/planta-stats.component';
+
 import { ChartAlturaComponent } from './planta-stats/chart-altura/chart-altura.component';
 import { ChartNumsyperdComponent } from './planta-stats/chart-numsyperd/chart-numsyperd.component';
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
@@ -35,7 +36,7 @@ import { ChartMaeGlobalComponent } from './planta-stats/chart-mae-global/chart-m
   declarations: [
     MapViewComponent,
     AnomaliaInfoComponent,
-    PlantaStatsComponent,
+
     ChartAlturaComponent,
     ChartNumsyperdComponent,
     FilterPcsListComponent,
@@ -61,6 +62,7 @@ import { ChartMaeGlobalComponent } from './planta-stats/chart-mae-global/chart-m
     FiltersModule,
     IvyCarouselModule,
     SwiperModule,
+    PlantaStatsModule,
   ],
   exports: [MapViewComponent],
 })

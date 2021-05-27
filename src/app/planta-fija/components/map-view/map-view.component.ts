@@ -1,9 +1,11 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
+import { Subscription } from 'rxjs';
+
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { ReportControlService } from '@core/services/report-control.service';
-import { Subscription } from 'rxjs';
+import { StatsService } from '@core/services/stats.service';
 
 // planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
@@ -26,18 +28,26 @@ export class MapViewComponent implements OnInit, OnDestroy {
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
 
-  constructor(private reportControlService: ReportControlService) {}
+  constructor(private reportControlService: ReportControlService, private statsService: StatsService) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(this.reportControlService.initService().subscribe((value) => (this.anomaliasLoaded = value)));
+    this.subscriptions.add(
+      this.reportControlService.initService().subscribe((value) => (this.anomaliasLoaded = value))
+    );
     this.subscriptions.add(
       this.reportControlService.sharedReportWithFilters$.subscribe((value) => (this.showFilters = value))
     );
-    this.subscriptions.add(this.reportControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value)));
+    this.subscriptions.add(
+      this.reportControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value))
+    );
   }
 
   ngOnDestroy(): void {
     // nos desuscribimos de los observables
     this.subscriptions.unsubscribe();
+  }
+
+  loadStats() {
+    this.statsService.loadStats = true;
   }
 }

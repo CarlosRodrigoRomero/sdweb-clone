@@ -60,7 +60,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit {
             gradiente = anom.gradienteNormalizado + 'ºC';
           }
           anomalias.push({
-            id: (anom as PcInterface).local_id,
+            id: anom.localId,
             tipo: GLOBAL.pcDescripcion[anom.tipo],
             perdidas,
             tempMax,

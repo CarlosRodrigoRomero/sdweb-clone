@@ -214,7 +214,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     let vientoVelocidad;
     let vientoDireccion;
 
-    const datetime = (this.anomaliaSelect as PcInterface).datetime;
+    const datetime = this.anomaliaSelect.datetime;
     if (datetime !== undefined && datetime !== null) {
       fecha = this.unixToDate((this.anomaliaSelect as PcInterface).datetime)[0];
       hora = this.unixToDate((this.anomaliaSelect as PcInterface).datetime)[1];
@@ -331,7 +331,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
       // TERMICO
       termico: {
         tempMedia: (this.anomaliaSelect as PcInterface).temperaturaMedia,
-        gradiente: (this.anomaliaSelect as PcInterface).gradiente,
+        gradiente: this.anomaliaSelect.gradiente,
       },
 
       imagen: {
