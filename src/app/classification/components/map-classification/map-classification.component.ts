@@ -8,11 +8,14 @@ import View from 'ol/View';
 import { fromLonLat } from 'ol/proj';
 import { defaults as defaultControls } from 'ol/control.js';
 import { Feature, Map } from 'ol';
+import Overlay from 'ol/Overlay';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
 import { Coordinate } from 'ol/coordinate';
+import { DoubleClickZoom, Select } from 'ol/interaction';
+import { click } from 'ol/events/condition';
 
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
@@ -27,8 +30,7 @@ import { StructuresService } from '@core/services/structures.service';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { PlantaInterface } from '@core/models/planta';
 import { Structure } from '@core/models/structure';
-import { Select } from 'ol/interaction';
-import { click } from 'ol/events/condition';
+import { NormalizedModule } from '@core/models/normalizedModule';
 
 @Component({
   selector: 'app-map-classification',
@@ -41,6 +43,7 @@ export class MapClassificationComponent implements OnInit {
   private thermalLayer: ThermalLayerInterface;
   private thermalLayers: TileLayer[];
   private structures: Structure[];
+  private popup: Overlay;
 
   constructor(
     private classificationService: ClassificationService,
@@ -72,8 +75,12 @@ export class MapClassificationComponent implements OnInit {
         this.createNormModLayer();
         this.addStructures();
 
+        this.addPopupOverlay();
+
         this.addPointerOnHover();
-        this.addSelectNormModInteraction();
+        // this.addSelectNormModInteraction();
+        this.addOnDoubleClickInteraction();
+        this.addClickOutFeatures();
       });
   }
 
@@ -136,15 +143,19 @@ export class MapClassificationComponent implements OnInit {
 
       this.structures = structures;
 
+      // AQUÍ LLAMAMOS CLOUD FUNCTION PARA DIVIDIR LA ESTRUCTURA EN MODULOS NORMALIZADOS
+
       this.structures.forEach((struct) => {
         const coords = this.objectToCoordinate(struct.coords);
+
+        const normMod: NormalizedModule = { id: struct.id, fila: 4, columna: 10, coords: struct.coords };
 
         const feature = new Feature({
           geometry: new Polygon([coords]),
           properties: {
             id: struct.id,
             name: 'normMod',
-            normMod: struct,
+            normMod,
           },
         });
 
@@ -201,6 +212,20 @@ export class MapClassificationComponent implements OnInit {
       });
   }
 
+  private addPopupOverlay() {
+    const container = document.getElementById('popup');
+    this.popup = new Overlay({
+      element: container,
+      autoPan: true,
+      autoPanAnimation: {
+        duration: 250,
+      },
+      position: undefined,
+    });
+
+    this.map.addOverlay(this.popup);
+  }
+
   private addPointerOnHover() {
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
@@ -219,6 +244,27 @@ export class MapClassificationComponent implements OnInit {
       } else {
         // vuelve a poner el puntero normal
         this.map.getViewport().style.cursor = 'inherit';
+      }
+    });
+  }
+
+  private addOnDoubleClickInteraction() {
+    this.map.on('dblclick', (event) => {
+      // desactivamos el zoom al hacer dobleclick para que no interfiera
+      this.map.getInteractions().forEach((interaction) => {
+        if (interaction instanceof DoubleClickZoom) {
+          this.map.removeInteraction(interaction);
+        }
+      });
+
+      const feature = this.map.getFeaturesAtPixel(event.pixel)[0];
+      if (feature) {
+        const normMod: NormalizedModule = feature.getProperties().properties.normMod;
+        this.classificationService.normModSelected = normMod;
+
+        const coords = this.objectToCoordinate(feature.getProperties().properties.normMod.coords);
+
+        this.popup.setPosition(coords[2]);
       }
     });
   }
@@ -246,9 +292,28 @@ export class MapClassificationComponent implements OnInit {
     select.on('select', (e) => {
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().properties.name === 'normMod') {
-          // this.classificationService.modNormSelected = 
-        
+          const normMod: NormalizedModule = e.selected[0].getProperties().properties.normMod;
+          this.classificationService.normModSelected = normMod;
+
+          const coords = this.objectToCoordinate(
+            e.selected[0].getProperties().properties.normMod.coords
+          )[2] as Coordinate;
+
+          this.popup.setPosition(coords);
         }
+      }
+    });
+  }
+
+  private addClickOutFeatures() {
+    this.map.on('click', (event) => {
+      const feature = this.map
+        .getFeaturesAtPixel(event.pixel)
+        .filter((item) => item.getProperties().properties !== undefined);
+
+      if (feature.length === 0) {
+        this.classificationService.normModSelected = undefined;
+        this.popup.setPosition(undefined);
       }
     });
   }

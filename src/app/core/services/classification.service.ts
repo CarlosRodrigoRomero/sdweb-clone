@@ -22,8 +22,8 @@ export class ClassificationService {
   private _thermalLayer: ThermalLayerInterface;
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
-  private _modNormSelected: NormalizedModule = undefined;
-  modNormSelected$ = new BehaviorSubject<NormalizedModule>(this._modNormSelected);
+  private _normModSelected: NormalizedModule = undefined;
+  normModSelected$ = new BehaviorSubject<NormalizedModule>(this._normModSelected);
 
   constructor(private router: Router, private informeService: InformeService, private plantaService: PlantaService) {}
 
@@ -77,12 +77,12 @@ export class ClassificationService {
     this._thermalLayer = value;
   }
 
-  get modNormSelected() {
-    return this._modNormSelected;
+  get normModSelected() {
+    return this._normModSelected;
   }
 
-  set modNormSelected(value: NormalizedModule) {
-    this._modNormSelected = value;
-    this.modNormSelected$.next(value);
+  set normModSelected(value: NormalizedModule) {
+    this._normModSelected = value;
+    this.normModSelected$.next(value);
   }
 }

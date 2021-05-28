@@ -1,0 +1,15 @@
+.tipo {
+    width: 150px;
+}
+
+.row-column {
+  display: flex;
+}
+
+.row-column .title {
+    margin-right: 0.5rem;
+}
+
+.row-column .element {
+    margin-right: 1rem;
+}

@@ -72,11 +72,14 @@ export class AnomaliaService {
   }
 
   async addAnomalia(anomalia: Anomalia) {
-    const id = this.afs.createId();
-    anomalia.id = id;
+    if (anomalia.id === undefined) {
+      const id = this.afs.createId();
+      anomalia.id = id;
+    }
+
     // Para que Firestore admita "featureCoords", lo transformamos en un objeto
     const anomaliaObj = this._prepararParaDb(anomalia);
-    return this.afs.collection('anomalias').doc(id).set(anomaliaObj);
+    return this.afs.collection('anomalias').doc(anomalia.id).set(anomaliaObj);
   }
 
   getAnomaliasPlanta$(plantaId: string): Observable<Anomalia[]> {

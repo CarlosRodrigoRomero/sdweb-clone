@@ -1,0 +1,27 @@
+<div *ngIf="normModSelected">
+  <div>
+    <mat-form-field class="tipo" appearance="outline">
+      <mat-label>Tipo anomalía</mat-label>
+      <input matInput type="number" [formControl]="formControl" min="1" max="19" />
+      <mat-error *ngIf="formControl.invalid">Introducir valor entre 1 y 19</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="row-column">
+    <span class="title">Fila:</span>
+    <span class="element">{{ normModSelected.fila }}</span>
+    <span class="title">Columna:</span>
+    <span>{{ normModSelected.columna }}</span>
+  </div>
+  <div>
+    <span>Global Coords</span>
+    <div>
+      <span>X:</span>
+      <span>Y:</span>
+      <span>Z:</span>
+    </div>
+  </div>
+  <button mat-icon-button>
+    <mat-icon>delete</mat-icon>
+  </button>
+</div>

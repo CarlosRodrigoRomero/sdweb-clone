@@ -2,3 +2,15 @@
   height: calc(100vh - 70px);
   width: 100%;
 }
+
+.ol-popup {
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cccccc;
+  bottom: 12px;
+  /* min-width: 280px; */
+  transform: translate(-40%, 0);
+}
