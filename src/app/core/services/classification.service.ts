@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 import { InformeService } from './informe.service';
 import { PlantaService } from './planta.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
@@ -25,7 +26,12 @@ export class ClassificationService {
   private _normModSelected: NormalizedModule = undefined;
   normModSelected$ = new BehaviorSubject<NormalizedModule>(this._normModSelected);
 
-  constructor(private router: Router, private informeService: InformeService, private plantaService: PlantaService) {}
+  constructor(
+    private router: Router,
+    private informeService: InformeService,
+    private plantaService: PlantaService,
+    private anomaliaService: AnomaliaService
+  ) {}
 
   initService(): Observable<boolean> {
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
@@ -50,6 +56,30 @@ export class ClassificationService {
         this.initialized$.next(true);
       });
     return this.initialized$;
+  }
+
+  calculateGlobalCoords() {
+    this.plantaService.setLocAreaListFromPlantaIdOl(this.planta.id);
+    /* this.anomaliaService
+      .getAnomalias$(this.informeId)
+      .pipe(take(1))
+      .subscribe((anomalias) => {
+        console.log('anomalias_', anomalias);
+        // recalcular locs
+        anomalias.forEach((anomalia) => {
+          const coords = [anomalia.featureCoords[0][0], anomalia.featureCoords[0][1]];
+          const latLngArray = toLonLat(coords);
+          const latLng = { lat: latLngArray[1], lng: latLngArray[0] };
+
+          let globalCoords;
+
+          globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(latLng);
+
+          anomalia.globalCoords = globalCoords;
+
+          this.anomaliaService.updateAnomalia(anomalia);
+        });
+      }); */
   }
 
   get informeId() {

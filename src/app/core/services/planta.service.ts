@@ -6,10 +6,14 @@ import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection 
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
+import Polygon from 'ol/geom/Polygon';
+import { Coordinate } from 'ol/coordinate';
+
 import { LatLngLiteral } from '@agm/core/map-types';
 
 import { AuthService } from './auth.service';
 import { GLOBAL } from './global';
+import { OlMapService } from '@core/services/ol-map.service';
 
 import { ThermalLayerInterface } from '../models/thermalLayer';
 import { PlantaInterface } from '@core/models/planta';
@@ -37,7 +41,12 @@ export class PlantaService {
   public currentFilteredLocAreas$ = this.filteredLocAreasSource.asObservable();
   public locAreaList: LocationAreaInterface[];
 
-  constructor(private afs: AngularFirestore, public auth: AuthService, private activatedRoute: ActivatedRoute) {
+  constructor(
+    private afs: AngularFirestore,
+    public auth: AuthService,
+    private activatedRoute: ActivatedRoute,
+    private olMapService: OlMapService
+  ) {
     this.currentPlantId = this.activatedRoute.snapshot.paramMap.get('id');
     this.currentPlantId$.next(this.currentPlantId);
 
@@ -452,6 +461,7 @@ export class PlantaService {
     }
     return '';
   }
+
   setLocAreaListFromPlantaId(plantaId: string): void {
     const locAreaList = [];
     this.getLocationsArea(plantaId)
@@ -474,6 +484,37 @@ export class PlantaService {
             globalCoords: locationArea.globalCoords,
             modulo: locationArea.modulo,
           });
+          locAreaList.push(polygon);
+          if (locAreaList.length === locAreaArray.length) {
+            this.setLocAreaList(locAreaList);
+          }
+        });
+      });
+  }
+
+  setLocAreaListFromPlantaIdOl(plantaId: string): void {
+    const locAreaList = [];
+    this.getLocationsArea(plantaId)
+      .pipe(take(1))
+      .subscribe((locAreaArray) => {
+        locAreaArray.forEach((locationArea) => {
+          // const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat(locationArea.path));
+          const polygon = {
+            paths: locationArea.path,
+            strokeColor: '#FF0000',
+            visible: false,
+            strokeOpacity: 0,
+            strokeWeight: 0,
+            fillColor: 'grey',
+            fillOpacity: 0,
+            editable: false,
+            draggable: false,
+            id: locationArea.id,
+            globalX: locationArea.globalX,
+            globalY: locationArea.globalY,
+            globalCoords: locationArea.globalCoords,
+            modulo: locationArea.modulo,
+          };
           locAreaList.push(polygon);
           if (locAreaList.length === locAreaArray.length) {
             this.setLocAreaList(locAreaList);
@@ -541,6 +582,34 @@ export class PlantaService {
     }
 
     return [globalCoords, modulo];
+  }
+
+  getGlobalCoordsFromLocationAreaOl(coords: Coordinate) {
+    const globalCoords = [null, null, null];
+
+    if (this.locAreaList !== undefined) {
+      this.locAreaList.forEach((locArea) => {
+        const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat(locArea.path));
+
+        if (polygon.intersectsCoordinate(coords)) {
+          if (locArea.globalX.length > 0) {
+            globalCoords[0] = locArea.globalX;
+          }
+          if (locArea.globalY.length > 0) {
+            globalCoords[1] = locArea.globalY;
+          }
+          if (locArea.hasOwnProperty('globalCoords') && locArea.globalCoords !== undefined) {
+            locArea.globalCoords.forEach((item, index) => {
+              if (item !== null && item.length > 0) {
+                globalCoords[index] = item;
+              }
+            });
+          }
+        }
+      });
+    }
+
+    return globalCoords;
   }
 
   initMap(planta: PlantaInterface, map: any) {

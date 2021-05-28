@@ -279,12 +279,13 @@ export class StructuresService {
     return lineH.getLength() * lineV.getLength();
   }
 
-  getStructures(thermalLayer?: ThermalLayerInterface) {
+  getNormModules(thermalLayer?: ThermalLayerInterface) {
     if (thermalLayer !== undefined) {
       this.thermalLayer = thermalLayer;
     }
     const query$ = this.afs
-      .collection<any>('thermalLayers/' + this.thermalLayer.id + '/estructuras')
+      // .collection<any>('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados')
+      .collection<any>('thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto')
       .snapshotChanges()
       .pipe(
         map((actions) =>

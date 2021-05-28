@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, Observable } from 'rxjs';
 
+import { LatLngLiteral } from '@agm/core';
+
 import { Collection, Map, View } from 'ol';
 import { Control } from 'ol/control';
 import BaseLayer from 'ol/layer/Base';
@@ -10,6 +12,8 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import TileLayer from 'ol/layer/Tile';
 import { Draw } from 'ol/interaction';
+import { Coordinate } from 'ol/coordinate';
+import { fromLonLat } from 'ol/proj';
 
 @Injectable({
   providedIn: 'root',
@@ -96,6 +100,15 @@ export class OlMapService {
 
   getIncrementoLayers() {
     return this.incrementoLayers$.asObservable();
+  }
+
+  latLonLiteralToLonLat(path: LatLngLiteral[]) {
+    const coordsList: Coordinate[] = [];
+    path.forEach((coords) => {
+      coordsList.push(fromLonLat([coords.lng, coords.lat]));
+    });
+
+    return [coordsList];
   }
 
   get draw() {
