@@ -10,7 +10,7 @@ import { defaults as defaultControls } from 'ol/control.js';
 import { Feature, Map } from 'ol';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import { Stroke, Style } from 'ol/style';
+import { Fill, Stroke, Style } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
 import { Coordinate } from 'ol/coordinate';
 
@@ -27,6 +27,8 @@ import { StructuresService } from '@core/services/structures.service';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { PlantaInterface } from '@core/models/planta';
 import { Structure } from '@core/models/structure';
+import { Select } from 'ol/interaction';
+import { click } from 'ol/events/condition';
 
 @Component({
   selector: 'app-map-classification',
@@ -67,8 +69,11 @@ export class MapClassificationComponent implements OnInit {
 
         this.initMap();
 
-        this.createStructuresLayer();
+        this.createNormModLayer();
         this.addStructures();
+
+        this.addPointerOnHover();
+        this.addSelectNormModInteraction();
       });
   }
 
@@ -97,32 +102,35 @@ export class MapClassificationComponent implements OnInit {
     return tl;
   }
 
-  private createStructuresLayer() {
-    const structLayer = new VectorLayer({
+  private createNormModLayer() {
+    const normModLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: new Style({
         stroke: new Stroke({
           width: 2,
           color: 'white',
         }),
+        fill: new Fill({
+          color: 'rgba(0,0,0,0)',
+        }),
       }),
     });
 
-    structLayer.setProperties({
-      id: 'structLayer',
+    normModLayer.setProperties({
+      id: 'normModLayer',
     });
 
-    this.map.addLayer(structLayer);
+    this.map.addLayer(normModLayer);
   }
 
   private addStructures() {
     this.structuresService.getStructures(this.thermalLayer).subscribe((structures) => {
-      const structLayer = this.map
+      const normModLayer = this.map
         .getLayers()
         .getArray()
-        .find((layer) => layer.getProperties().id === 'structLayer') as VectorLayer;
+        .find((layer) => layer.getProperties().id === 'normModLayer') as VectorLayer;
 
-      const structSource = structLayer.getSource();
+      const structSource = normModLayer.getSource();
 
       structSource.clear();
 
@@ -135,7 +143,8 @@ export class MapClassificationComponent implements OnInit {
           geometry: new Polygon([coords]),
           properties: {
             id: struct.id,
-            name: 'structure',
+            name: 'normMod',
+            normMod: struct,
           },
         });
 
@@ -190,5 +199,57 @@ export class MapClassificationComponent implements OnInit {
       .subscribe((map) => {
         this.map = map;
       });
+  }
+
+  private addPointerOnHover() {
+    this.map.on('pointermove', (event) => {
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        let feature = this.map
+          .getFeaturesAtPixel(event.pixel)
+          .filter((item) => item.getProperties().properties !== undefined);
+        feature = feature.filter((item) => item.getProperties().properties.name === 'normMod');
+
+        if (feature.length > 0) {
+          // cambia el puntero por el de seleccionar
+          this.map.getViewport().style.cursor = 'pointer';
+        } else {
+          // vuelve a poner el puntero normal
+          this.map.getViewport().style.cursor = 'inherit';
+        }
+      } else {
+        // vuelve a poner el puntero normal
+        this.map.getViewport().style.cursor = 'inherit';
+      }
+    });
+  }
+
+  private addSelectNormModInteraction() {
+    const select = new Select({
+      style: new Style({
+        stroke: new Stroke({
+          width: 4,
+          color: 'white',
+        }),
+      }),
+      condition: click,
+      layers: (l) => {
+        if (l.getProperties().id === 'normModLayer') {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    });
+
+    this.map.addInteraction(select);
+
+    select.on('select', (e) => {
+      if (e.selected.length > 0) {
+        if (e.selected[0].getProperties().properties.name === 'normMod') {
+          // this.classificationService.modNormSelected = 
+        
+        }
+      }
+    });
   }
 }

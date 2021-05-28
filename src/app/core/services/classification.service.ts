@@ -9,6 +9,8 @@ import { PlantaService } from './planta.service';
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { switchMap, take } from 'rxjs/operators';
+import { Structure } from '@core/models/structure';
+import { NormalizedModule } from '@core/models/normalizedModule';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +22,8 @@ export class ClassificationService {
   private _thermalLayer: ThermalLayerInterface;
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
+  private _modNormSelected: NormalizedModule = undefined;
+  modNormSelected$ = new BehaviorSubject<NormalizedModule>(this._modNormSelected);
 
   constructor(private router: Router, private informeService: InformeService, private plantaService: PlantaService) {}
 
@@ -71,5 +75,14 @@ export class ClassificationService {
 
   set thermalLayer(value: ThermalLayerInterface) {
     this._thermalLayer = value;
+  }
+
+  get modNormSelected() {
+    return this._modNormSelected;
+  }
+
+  set modNormSelected(value: NormalizedModule) {
+    this._modNormSelected = value;
+    this.modNormSelected$.next(value);
   }
 }

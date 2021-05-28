@@ -77,7 +77,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.mousePosition = null;
 
     // Para la demo, agregamos un extent a todas las capas:
-    // this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
+    this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
     // this.plantaId = 'egF0cbpXnnBnjcrusoeR';
     this.subscriptions.add(
@@ -207,8 +207,8 @@ export class MapComponent implements OnInit, OnDestroy {
       // extent: this.extent1,
     });
 
-    const layers = [satelliteLayer];
-    // const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers];
+    // const layers = [satelliteLayer];
+    const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers];
 
     // MAPA
     const view = new View({
@@ -217,7 +217,7 @@ export class MapComponent implements OnInit, OnDestroy {
       zoom: this.planta.zoom,
       maxZoom: 24,
       // para la demo
-      // extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
+      extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
     });
 
     this.subscriptions.add(
