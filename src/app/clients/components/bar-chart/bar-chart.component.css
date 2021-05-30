@@ -1,3 +1,7 @@
+mat-card {
+  height: calc(50vh - 86px);
+}
+
 .subtitulo {
   font-size: medium;
   font-weight: 400;

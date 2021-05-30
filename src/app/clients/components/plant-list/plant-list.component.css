@@ -1,9 +1,13 @@
 mat-card {
-  height: 100%;
+  height: calc(50vh - 86px);
 }
 
 .buscar-input {
   width: 100%;
+}
+
+:host ::ng-deep .buscar-input .mat-form-field-wrapper {
+  padding-bottom: 6px;
 }
 
 .tabla-container {

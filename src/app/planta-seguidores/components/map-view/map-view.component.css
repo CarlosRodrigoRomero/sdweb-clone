@@ -137,9 +137,7 @@ app-view-toggle {
 }
 
 .titulo {
-  margin-top: 15px;
-  margin-left: 15px;
-  margin-bottom: 15px;
+  margin: 4px 10px 0;
 }
 
 #sidenavStats {

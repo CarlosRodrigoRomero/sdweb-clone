@@ -1,9 +1,13 @@
 .lista {
-  margin: 10px;
+  margin: 5px;
 }
 
 .buscar-input {
   width: 100%;
+}
+
+:host ::ng-deep .buscar-input .mat-form-field-wrapper {
+  padding-bottom: 6px;
 }
 
 table {
@@ -12,7 +16,7 @@ table {
 
 .tabla-container {
   position: relative;
-  height: calc(100vh - 318px);
+  height: calc(100vh - 280px);
   overflow: auto;
   min-width: 350px;
 }
