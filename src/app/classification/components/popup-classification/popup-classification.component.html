@@ -1,4 +1,4 @@
-<div *ngIf="normModSelected">
+<div *ngIf="showPopup">
   <div>
     <mat-form-field class="tipo" appearance="outline">
       <mat-label>Tipo anomalía</mat-label>
@@ -29,8 +29,9 @@
     </div>
   </div>
   <div class="btn-delete">
-    <button (click)="deleteAnomalia()" mat-icon-button>
+    <button (click)="deleteAnomalia()" mat-icon-button matTooltip="Eliminar anomalía">
       <mat-icon>delete</mat-icon>
     </button>
   </div>
 </div>
+<span *ngIf="showDeleteLabel">Anomalia eliminada</span>

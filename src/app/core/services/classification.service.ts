@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { AngularFirestore } from '@angular/fire/firestore';
+
 import { BehaviorSubject, Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
@@ -35,7 +37,8 @@ export class ClassificationService {
     private router: Router,
     private informeService: InformeService,
     private plantaService: PlantaService,
-    private anomaliaService: AnomaliaService
+    private anomaliaService: AnomaliaService,
+    public afs: AngularFirestore
   ) {}
 
   initService(): Observable<boolean> {
@@ -68,29 +71,44 @@ export class ClassificationService {
   }
 
   createAnomaliaFromNormModule(feature: Feature) {
-    const geometry = feature.getGeometry() as SimpleGeometry;
-    const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(geometry.getCoordinates()[0][0]);
+    const id = feature.getProperties().properties.id;
+    const refAnom = this.afs.collection('anomalias').doc(id);
 
-    const anomalia: Anomalia = {
-      id: feature.getProperties().properties.id,
-      plantaId: this.planta.id,
-      informeId: this.informeId,
-      tipo: 50, // CONECTAR AL FORMULARIO
-      globalCoords,
-      severidad: 50,
-      perdidas: 0,
-      gradienteNormalizado: 0,
-      temperaturaMax: 0,
-      modulo: null,
-      temperaturaRef: 0,
-      featureCoords: geometry.getCoordinates()[0],
-      featureType: geometry.getType(),
-    };
-    // asignamos la nueva anomalia para acceder a ella y poder modificarla
-    this.anomalia = anomalia;
+    refAnom
+      .get()
+      .toPromise()
+      .then((anom) => {
+        // comprobamos si la anomalia existe
+        if (anom.exists) {
+          // si existe la traemos para leer sus datos
+          this.anomaliaService.getAnomalia(id).subscribe((anom) => (this.anomalia = anom));
+        } else {
+          // si no existe previmente la creamos
+          const geometry = feature.getGeometry() as SimpleGeometry;
+          const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(geometry.getCoordinates()[0][0]);
 
-    // Guardar en la base de datos
-    this.anomaliaService.addAnomalia(anomalia);
+          const anomalia: Anomalia = {
+            id,
+            plantaId: this.planta.id,
+            informeId: this.informeId,
+            tipo: 50, // CONECTAR AL FORMULARIO
+            globalCoords,
+            severidad: 50,
+            perdidas: 0,
+            gradienteNormalizado: 0,
+            temperaturaMax: 0,
+            modulo: null,
+            temperaturaRef: 0,
+            featureCoords: geometry.getCoordinates()[0],
+            featureType: geometry.getType(),
+          };
+          // asignamos la nueva anomalia para acceder a ella y poder modificarla
+          this.anomalia = anomalia;
+
+          // Guardar en la base de datos
+          this.anomaliaService.addAnomalia(anomalia);
+        }
+      });
   }
 
   get informeId() {

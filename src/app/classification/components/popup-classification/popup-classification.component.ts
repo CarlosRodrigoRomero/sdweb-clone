@@ -17,6 +17,8 @@ export class PopupClassificationComponent implements OnInit {
   anomalia: Anomalia;
   form = new FormGroup({});
   formControl = new FormControl(8, [Validators.min(1), Validators.max(19)]);
+  showPopup = false;
+  showDeleteLabel = false;
 
   constructor(private classificationService: ClassificationService, private anomaliaService: AnomaliaService) {}
 
@@ -28,6 +30,11 @@ export class PopupClassificationComponent implements OnInit {
       if (this.anomalia !== undefined) {
         // conectamos el input con el tipo
         this.formControl.setValue(this.anomalia.tipo);
+
+        // mostramos el popup
+        this.showPopup = true;
+        // ocultamos el aviso de aliminacion
+        this.showDeleteLabel = false;
       }
     });
   }
@@ -40,6 +47,11 @@ export class PopupClassificationComponent implements OnInit {
   }
 
   deleteAnomalia() {
+    // ocultamos el popup
+    this.showPopup = false;
+    // mostramos el aviso de eliminacion
+    this.showDeleteLabel = true;
+
     // eliminamos la anomalia de la DB
     this.anomaliaService.deleteAnomalia(this.anomalia);
 

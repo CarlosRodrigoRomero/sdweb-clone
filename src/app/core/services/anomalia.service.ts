@@ -82,6 +82,22 @@ export class AnomaliaService {
     return this.afs.collection('anomalias').doc(anomalia.id).set(anomaliaObj);
   }
 
+  getAnomalia(anomaliaId: string): Observable<Anomalia> {
+    const anomRef = this.afs.collection('anomalias').doc(anomaliaId);
+
+    return anomRef.snapshotChanges().pipe(
+      map((action) => {
+        if (action.payload.exists) {
+          const anomalia = action.payload.data() as Anomalia;
+          anomalia.id = action.payload.id;
+          return anomalia;
+        } else {
+          return null;
+        }
+      })
+    );
+  }
+
   getAnomaliasPlanta$(plantaId: string): Observable<Anomalia[]> {
     const query$ = this.informeService.getInformesDePlanta(plantaId).pipe(
       take(1),
