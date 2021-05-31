@@ -14,25 +14,22 @@ import { Anomalia } from '@core/models/anomalia';
 })
 export class PopupClassificationComponent implements OnInit {
   normModSelected: NormalizedModule;
-  anomalia: Anomalia;
+  anomaliaSelected: Anomalia;
   form = new FormGroup({});
   formControl = new FormControl(8, [Validators.min(1), Validators.max(19)]);
-  showPopup = false;
   showDeleteLabel = false;
 
   constructor(private classificationService: ClassificationService, private anomaliaService: AnomaliaService) {}
 
   ngOnInit(): void {
     this.classificationService.normModSelected$.subscribe((normMod) => (this.normModSelected = normMod));
-    this.classificationService.anomalia$.subscribe((anomalia) => {
-      this.anomalia = anomalia;
+    this.classificationService.anomaliaSelected$.subscribe((anomalia) => {
+      this.anomaliaSelected = anomalia;
 
-      if (this.anomalia !== undefined) {
+      if (this.anomaliaSelected !== undefined) {
         // conectamos el input con el tipo
-        this.formControl.setValue(this.anomalia.tipo);
+        this.formControl.setValue(this.anomaliaSelected.tipo);
 
-        // mostramos el popup
-        this.showPopup = true;
         // ocultamos el aviso de aliminacion
         this.showDeleteLabel = false;
       }
@@ -40,21 +37,19 @@ export class PopupClassificationComponent implements OnInit {
   }
 
   updateAnomalia() {
-    this.classificationService.anomalia.tipo = this.formControl.value;
+    this.classificationService.anomaliaSelected.tipo = this.formControl.value;
 
     // actualizamos el tipo en la DB
-    this.anomaliaService.updateAnomalia(this.anomalia);
+    this.anomaliaService.updateAnomalia(this.anomaliaSelected);
   }
 
   deleteAnomalia() {
-    // ocultamos el popup
-    this.showPopup = false;
     // mostramos el aviso de eliminacion
     this.showDeleteLabel = true;
 
     // eliminamos la anomalia de la DB
-    this.anomaliaService.deleteAnomalia(this.anomalia);
+    this.anomaliaService.deleteAnomalia(this.anomaliaSelected);
 
-    this.classificationService.anomalia = undefined;
+    this.classificationService.anomaliaSelected = undefined;
   }
 }

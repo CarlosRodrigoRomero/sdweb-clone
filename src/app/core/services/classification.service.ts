@@ -30,8 +30,10 @@ export class ClassificationService {
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _normModSelected: NormalizedModule = undefined;
   normModSelected$ = new BehaviorSubject<NormalizedModule>(this._normModSelected);
-  private _anomalia = undefined;
-  anomalia$ = new BehaviorSubject<Anomalia>(this._anomalia);
+  private _anomaliaSelected = undefined;
+  anomaliaSelected$ = new BehaviorSubject<Anomalia>(this._anomaliaSelected);
+  private _listaAnomalias: Anomalia[] = undefined;
+  listaAnomalias$ = new BehaviorSubject<Anomalia[]>(this._listaAnomalias);
 
   constructor(
     private router: Router,
@@ -64,6 +66,9 @@ export class ClassificationService {
         // preparamos las locAreas para luego calcular las globalCoords de las nuevas anomalias
         this.plantaService.setLocAreaListFromPlantaIdOl(this.planta.id);
 
+        // nos suscribimos a la lista de anomalias
+        this.anomaliaService.getAnomaliasInforme$(this.informeId).subscribe((anoms) => (this.listaAnomalias = anoms));
+
         this.initialized$.next(true);
       });
 
@@ -81,7 +86,7 @@ export class ClassificationService {
         // comprobamos si la anomalia existe
         if (anom.exists) {
           // si existe la traemos para leer sus datos
-          this.anomaliaService.getAnomalia(id).subscribe((anom) => (this.anomalia = anom));
+          this.anomaliaService.getAnomalia(id).subscribe((anom) => (this.anomaliaSelected = anom));
         } else {
           // si no existe previmente la creamos
           const geometry = feature.getGeometry() as SimpleGeometry;
@@ -91,7 +96,7 @@ export class ClassificationService {
             id,
             plantaId: this.planta.id,
             informeId: this.informeId,
-            tipo: 50, // CONECTAR AL FORMULARIO
+            tipo: 8,
             globalCoords,
             severidad: 50,
             perdidas: 0,
@@ -103,7 +108,7 @@ export class ClassificationService {
             featureType: geometry.getType(),
           };
           // asignamos la nueva anomalia para acceder a ella y poder modificarla
-          this.anomalia = anomalia;
+          this.anomaliaSelected = anomalia;
 
           // Guardar en la base de datos
           this.anomaliaService.addAnomalia(anomalia);
@@ -145,12 +150,21 @@ export class ClassificationService {
     this.normModSelected$.next(value);
   }
 
-  get anomalia() {
-    return this._anomalia;
+  get anomaliaSelected() {
+    return this._anomaliaSelected;
   }
 
-  set anomalia(value: Anomalia) {
-    this._anomalia = value;
-    this.anomalia$.next(value);
+  set anomaliaSelected(value: Anomalia) {
+    this._anomaliaSelected = value;
+    this.anomaliaSelected$.next(value);
+  }
+
+  get listaAnomalias() {
+    return this._listaAnomalias;
+  }
+
+  set listaAnomalias(value: Anomalia[]) {
+    this._listaAnomalias = value;
+    this.listaAnomalias$.next(value);
   }
 }

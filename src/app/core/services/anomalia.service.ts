@@ -118,6 +118,20 @@ export class AnomaliaService {
     return query$;
   }
 
+  getAnomaliasInforme$(informeId: string): Observable<Anomalia[]> {
+    const anomaliaObsList = Array<Observable<Anomalia[]>>();
+
+    // traemos ambos tipos de anomalias por si hay pcs antiguos
+    anomaliaObsList.push(this.getAnomalias$(informeId, 'pcs'));
+    anomaliaObsList.push(this.getAnomalias$(informeId, 'anomalias'));
+
+    return combineLatest(anomaliaObsList).pipe(
+      map((arr) => arr.flat()),
+      // eliminamos las anomalias "vacias" por haber llamado a 'pcs' y 'anomalias'
+      map((anoms) => (anoms = anoms.filter((anom) => anom.perdidas !== 0)))
+    );
+  }
+
   getAnomalias$(informeId: string, tipo?: 'anomalias' | 'pcs'): Observable<Anomalia[]> {
     const query$ = this.afs
       .collection<Anomalia>(tipo, (ref) => ref.where('informeId', '==', informeId))

@@ -1,4 +1,4 @@
-<div *ngIf="showPopup">
+<div *ngIf="anomaliaSelected && normModSelected">
   <div>
     <mat-form-field class="tipo" appearance="outline">
       <mat-label>Tipo anomalía</mat-label>
@@ -17,15 +17,15 @@
     <span class="global-coords__title">Global Coords</span>
     <div>
       <span class="global-coords__row-title">X:</span>
-      <span>{{ anomalia.globalCoords[0] }}</span>
+      <span>{{ anomaliaSelected.globalCoords[0] }}</span>
     </div>
     <div>
       <span class="global-coords__row-title">Y:</span>
-      <span>{{ anomalia.globalCoords[1] }}</span>
+      <span>{{ anomaliaSelected.globalCoords[1] }}</span>
     </div>
     <div>
       <span class="global-coords__row-title">Z:</span>
-      <span>{{ anomalia.globalCoords[2] }}</span>
+      <span>{{ anomaliaSelected.globalCoords[2] }}</span>
     </div>
   </div>
   <div class="btn-delete">

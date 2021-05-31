@@ -45,6 +45,8 @@ export class MapClassificationComponent implements OnInit {
   private thermalLayers: TileLayer[];
   private normModules: Structure[];
   private popup: Overlay;
+  private listaAnomalias: Anomalia[] = [];
+  private normModLayer: VectorLayer = undefined;
 
   constructor(
     private classificationService: ClassificationService,
@@ -58,6 +60,15 @@ export class MapClassificationComponent implements OnInit {
     this.planta = this.classificationService.planta;
 
     const informeId = this.classificationService.informeId;
+
+    // nos conectamos a la lista de anomalias
+    this.classificationService.listaAnomalias$.subscribe((lista) => {
+      this.listaAnomalias = lista;
+
+      if (this.normModLayer !== undefined) {
+        this.normModLayer.setStyle(this.getStyleNormMod());
+      }
+    });
 
     this.informeService
       .getThermalLayer$(informeId)
@@ -111,24 +122,16 @@ export class MapClassificationComponent implements OnInit {
   }
 
   private createNormModLayer() {
-    const normModLayer = new VectorLayer({
+    this.normModLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: new Style({
-        stroke: new Stroke({
-          width: 2,
-          color: 'white',
-        }),
-        fill: new Fill({
-          color: 'rgba(0,0,0,0)',
-        }),
-      }),
+      style: this.getStyleNormMod(),
     });
 
-    normModLayer.setProperties({
+    this.normModLayer.setProperties({
       id: 'normModLayer',
     });
 
-    this.map.addLayer(normModLayer);
+    this.map.addLayer(this.normModLayer);
   }
 
   private addNormModules() {
@@ -279,8 +282,40 @@ export class MapClassificationComponent implements OnInit {
       if (feature.length === 0) {
         this.classificationService.normModSelected = undefined;
         this.popup.setPosition(undefined);
-        this.classificationService.anomalia = undefined;
+        this.classificationService.anomaliaSelected = undefined;
       }
     });
+  }
+
+  private getStyleNormMod() {
+    return (feature) => {
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        if (
+          this.listaAnomalias !== undefined &&
+          this.listaAnomalias.map((anom) => anom.id).includes(feature.getProperties().properties.id)
+        ) {
+          const anomalia = this.listaAnomalias.find((anom) => anom.id === feature.getProperties().properties.id);
+          return new Style({
+            stroke: new Stroke({
+              color: GLOBAL.colores_tipos[anomalia.tipo],
+              width: 2,
+            }),
+            fill: new Fill({
+              color: 'rgba(0,0,0,0)',
+            }),
+          });
+        } else {
+          return new Style({
+            stroke: new Stroke({
+              color: 'white',
+              width: 2,
+            }),
+            fill: new Fill({
+              color: 'rgba(0,0,0,0)',
+            }),
+          });
+        }
+      }
+    };
   }
 }
