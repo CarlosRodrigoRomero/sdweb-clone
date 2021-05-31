@@ -31,6 +31,7 @@ import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { PlantaInterface } from '@core/models/planta';
 import { Structure } from '@core/models/structure';
 import { NormalizedModule } from '@core/models/normalizedModule';
+import { Anomalia } from '@core/models/anomalia';
 
 @Component({
   selector: 'app-map-classification',
@@ -42,7 +43,7 @@ export class MapClassificationComponent implements OnInit {
   private map: Map;
   private thermalLayer: ThermalLayerInterface;
   private thermalLayers: TileLayer[];
-  private structures: Structure[];
+  private normModules: Structure[];
   private popup: Overlay;
 
   constructor(
@@ -73,7 +74,7 @@ export class MapClassificationComponent implements OnInit {
         this.initMap();
 
         this.createNormModLayer();
-        this.addStructures();
+        this.addNormModules();
 
         this.addPopupOverlay();
 
@@ -130,36 +131,34 @@ export class MapClassificationComponent implements OnInit {
     this.map.addLayer(normModLayer);
   }
 
-  private addStructures() {
-    this.structuresService.getNormModules(this.thermalLayer).subscribe((structures) => {
+  private addNormModules() {
+    this.structuresService.getNormModules(this.thermalLayer).subscribe((normModules) => {
       const normModLayer = this.map
         .getLayers()
         .getArray()
         .find((layer) => layer.getProperties().id === 'normModLayer') as VectorLayer;
 
-      const structSource = normModLayer.getSource();
+      const normModsSource = normModLayer.getSource();
 
-      structSource.clear();
+      normModsSource.clear();
 
-      this.structures = structures;
+      this.normModules = normModules;
 
-      // AQUÍ LLAMAMOS CLOUD FUNCTION PARA DIVIDIR LA ESTRUCTURA EN MODULOS NORMALIZADOS
+      this.normModules.forEach((normM) => {
+        const coords = this.objectToCoordinate(normM.coords);
 
-      this.structures.forEach((struct) => {
-        const coords = this.objectToCoordinate(struct.coords);
-
-        const normMod: NormalizedModule = { id: struct.id, fila: 4, columna: 10, coords: struct.coords };
+        const normMod: NormalizedModule = { id: normM.id, fila: 4, columna: 10, coords: normM.coords };
 
         const feature = new Feature({
           geometry: new Polygon([coords]),
           properties: {
-            id: struct.id,
+            id: normM.id,
             name: 'normMod',
             normMod,
           },
         });
 
-        structSource.addFeature(feature);
+        normModsSource.addFeature(feature);
       });
     });
   }
@@ -257,7 +256,7 @@ export class MapClassificationComponent implements OnInit {
         }
       });
 
-      const feature = this.map.getFeaturesAtPixel(event.pixel)[0];
+      const feature = this.map.getFeaturesAtPixel(event.pixel)[0] as Feature;
       if (feature) {
         const normMod: NormalizedModule = feature.getProperties().properties.normMod;
         this.classificationService.normModSelected = normMod;
@@ -265,42 +264,8 @@ export class MapClassificationComponent implements OnInit {
         const coords = this.objectToCoordinate(feature.getProperties().properties.normMod.coords);
 
         this.popup.setPosition(coords[2]);
-      }
-    });
-  }
 
-  private addSelectNormModInteraction() {
-    const select = new Select({
-      style: new Style({
-        stroke: new Stroke({
-          width: 4,
-          color: 'white',
-        }),
-      }),
-      condition: click,
-      layers: (l) => {
-        if (l.getProperties().id === 'normModLayer') {
-          return true;
-        } else {
-          return false;
-        }
-      },
-    });
-
-    this.map.addInteraction(select);
-
-    select.on('select', (e) => {
-      if (e.selected.length > 0) {
-        if (e.selected[0].getProperties().properties.name === 'normMod') {
-          const normMod: NormalizedModule = e.selected[0].getProperties().properties.normMod;
-          this.classificationService.normModSelected = normMod;
-
-          const coords = this.objectToCoordinate(
-            e.selected[0].getProperties().properties.normMod.coords
-          )[2] as Coordinate;
-
-          this.popup.setPosition(coords);
-        }
+        this.classificationService.createAnomaliaFromNormModule(feature);
       }
     });
   }
@@ -314,6 +279,7 @@ export class MapClassificationComponent implements OnInit {
       if (feature.length === 0) {
         this.classificationService.normModSelected = undefined;
         this.popup.setPosition(undefined);
+        this.classificationService.anomalia = undefined;
       }
     });
   }

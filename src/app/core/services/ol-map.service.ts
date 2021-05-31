@@ -104,9 +104,12 @@ export class OlMapService {
 
   latLonLiteralToLonLat(path: LatLngLiteral[]) {
     const coordsList: Coordinate[] = [];
-    path.forEach((coords) => {
-      coordsList.push(fromLonLat([coords.lng, coords.lat]));
-    });
+
+    if (path !== undefined) {
+      path.forEach((coords) => {
+        coordsList.push(fromLonLat([coords.lng, coords.lat]));
+      });
+    }
 
     return [coordsList];
   }

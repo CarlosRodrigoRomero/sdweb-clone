@@ -589,7 +589,7 @@ export class PlantaService {
 
     if (this.locAreaList !== undefined) {
       this.locAreaList.forEach((locArea) => {
-        const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat(locArea.path));
+        const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat((locArea as any).paths));
 
         if (polygon.intersectsCoordinate(coords)) {
           if (locArea.globalX.length > 0) {

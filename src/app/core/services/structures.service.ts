@@ -162,18 +162,6 @@ export class StructuresService {
             });
         }
       });
-
-    /* colRef
-      .doc('filter')
-      .update({
-        [filterType]: value,
-      })
-      .then(() => {
-        console.log('Filtro guardado correctamente');
-      })
-      .catch((error) => {
-        console.error('Error al guardar filtro: ', error);
-      }); */
   }
 
   addRawModule(module: RawModule) {
@@ -285,7 +273,7 @@ export class StructuresService {
     }
     const query$ = this.afs
       // .collection<any>('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados')
-      .collection<any>('thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto')
+      .collection<any>('thermalLayers/' + this.thermalLayer.id + '/estructuras')
       .snapshotChanges()
       .pipe(
         map((actions) =>
