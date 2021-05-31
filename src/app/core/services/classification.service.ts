@@ -86,7 +86,7 @@ export class ClassificationService {
         // comprobamos si la anomalia existe
         if (anom.exists) {
           // si existe la traemos para leer sus datos
-          this.anomaliaService.getAnomalia(id).subscribe((anom) => (this.anomaliaSelected = anom));
+          this.anomaliaService.getAnomalia(id).subscribe((anomalia) => (this.anomaliaSelected = anomalia));
         } else {
           // si no existe previmente la creamos
           const geometry = feature.getGeometry() as SimpleGeometry;

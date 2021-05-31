@@ -26,7 +26,7 @@ export class PopupClassificationComponent implements OnInit {
     this.classificationService.anomaliaSelected$.subscribe((anomalia) => {
       this.anomaliaSelected = anomalia;
 
-      if (this.anomaliaSelected !== undefined) {
+      if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
         // conectamos el input con el tipo
         this.formControl.setValue(this.anomaliaSelected.tipo);
 

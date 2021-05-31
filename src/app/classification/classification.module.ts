@@ -7,9 +7,10 @@ import { SharedModule } from '@shared/shared.module';
 import { ClassificationComponent } from './components/classification.component';
 import { MapClassificationComponent } from './components/map-classification/map-classification.component';
 import { PopupClassificationComponent } from './components/popup-classification/popup-classification.component';
+import { AnomTipoLegendComponent } from './components/anom-tipo-legend/anom-tipo-legend.component';
 
 @NgModule({
-  declarations: [ClassificationComponent, MapClassificationComponent, PopupClassificationComponent],
+  declarations: [ClassificationComponent, MapClassificationComponent, PopupClassificationComponent, AnomTipoLegendComponent],
   imports: [CommonModule, ClassificationRoutingModule, SharedModule],
 })
 export class ClassificationModule {}
