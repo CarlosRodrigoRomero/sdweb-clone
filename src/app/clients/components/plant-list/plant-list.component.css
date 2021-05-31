@@ -2,6 +2,10 @@ mat-card {
   height: calc(50vh - 86px);
 }
 
+:host ::ng-deep .mat-card-header .mat-card-title {
+  margin-bottom: 6px;
+}
+
 .buscar-input {
   width: 100%;
 }
@@ -12,7 +16,7 @@ mat-card {
 
 .tabla-container {
   position: relative;
-  max-height: 25vh;
+  max-height: calc(50vh - 218px);
   overflow: auto;
 }
 
