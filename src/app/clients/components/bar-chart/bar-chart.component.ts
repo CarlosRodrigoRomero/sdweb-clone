@@ -104,7 +104,7 @@ export class BarChartComponent implements OnInit {
       ],
       chart: {
         type: 'bar',
-        height: 280,
+        height: '100%',
         events: {
           click: (event, chartContext, config) => {
             const index = config.dataPointIndex;

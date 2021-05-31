@@ -7,3 +7,8 @@ mat-card {
   font-weight: 400;
   margin-left: 1em;
 }
+
+.chart {
+  height: calc(50vh - 130px);
+  display: grid;
+}
