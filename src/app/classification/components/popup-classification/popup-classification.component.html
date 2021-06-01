@@ -1,4 +1,5 @@
 <div *ngIf="anomaliaSelected && normModSelected">
+  <app-hotkeys-classification></app-hotkeys-classification>
   <div>
     <mat-form-field class="tipo" appearance="outline">
       <mat-label>Tipo anomalía</mat-label>
@@ -34,4 +35,3 @@
     </button>
   </div>
 </div>
-<span *ngIf="showDeleteLabel">Anomalia eliminada</span>

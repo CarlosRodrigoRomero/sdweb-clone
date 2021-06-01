@@ -6,12 +6,13 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
-import { Feature } from 'ol';
+import { Feature, Map } from 'ol';
 import SimpleGeometry from 'ol/geom/SimpleGeometry';
 
 import { InformeService } from './informe.service';
 import { PlantaService } from './planta.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
+import { OlMapService } from '@core/services/ol-map.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
@@ -28,6 +29,7 @@ export class ClassificationService {
   private _thermalLayer: ThermalLayerInterface;
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
+  private map: Map;
   private _normModSelected: NormalizedModule = undefined;
   normModSelected$ = new BehaviorSubject<NormalizedModule>(this._normModSelected);
   private _anomaliaSelected = undefined;
@@ -40,7 +42,8 @@ export class ClassificationService {
     private informeService: InformeService,
     private plantaService: PlantaService,
     private anomaliaService: AnomaliaService,
-    public afs: AngularFirestore
+    private afs: AngularFirestore,
+    private olMapService: OlMapService
   ) {}
 
   initService(): Observable<boolean> {
@@ -71,6 +74,8 @@ export class ClassificationService {
 
         this.initialized$.next(true);
       });
+
+    this.olMapService.map$.subscribe((map) => (this.map = map));
 
     return this.initialized$;
   }
@@ -114,6 +119,10 @@ export class ClassificationService {
           this.anomaliaService.addAnomalia(anomalia);
         }
       });
+  }
+
+  hidePopup() {
+    this.map.getOverlayById('popup').setPosition(undefined);
   }
 
   get informeId() {

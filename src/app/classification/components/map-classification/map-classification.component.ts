@@ -14,8 +14,7 @@ import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
 import { Coordinate } from 'ol/coordinate';
-import { DoubleClickZoom, Select } from 'ol/interaction';
-import { click } from 'ol/events/condition';
+import { DoubleClickZoom } from 'ol/interaction';
 
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
@@ -217,6 +216,7 @@ export class MapClassificationComponent implements OnInit {
   private addPopupOverlay() {
     const container = document.getElementById('popup');
     this.popup = new Overlay({
+      id: 'popup',
       element: container,
       autoPan: true,
       autoPanAnimation: {
