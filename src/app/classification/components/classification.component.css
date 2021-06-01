@@ -5,8 +5,20 @@
   height: 200px;
 }
 
-.bottom-bar h4 {
+.bottom-bar__row-top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bottom-bar__row-top h4 {
   margin: 0.5rem 1rem 0;
+}
+
+.bottom-bar__row-top span {
+  font-weight: 500;
+  font-size: small;
+  align-self: flex-end;
+  margin-right: 1rem;
 }
 
 app-thermal-slider {
