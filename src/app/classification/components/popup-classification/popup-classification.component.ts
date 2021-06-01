@@ -16,7 +16,7 @@ export class PopupClassificationComponent implements OnInit {
   normModSelected: NormalizedModule;
   anomaliaSelected: Anomalia;
   form = new FormGroup({});
-  formControl = new FormControl(8, [Validators.min(1), Validators.max(19)]);
+  formControl = new FormControl(8, [Validators.min(0), Validators.max(19)]);
 
   constructor(private classificationService: ClassificationService, private anomaliaService: AnomaliaService) {}
 

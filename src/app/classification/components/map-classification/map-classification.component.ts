@@ -298,7 +298,7 @@ export class MapClassificationComponent implements OnInit {
           return new Style({
             stroke: new Stroke({
               color: GLOBAL.colores_tipos[anomalia.tipo],
-              width: 2,
+              width: 4,
             }),
             fill: new Fill({
               color: 'rgba(0,0,0,0)',

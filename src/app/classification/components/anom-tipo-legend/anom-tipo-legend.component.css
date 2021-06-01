@@ -1,13 +1,42 @@
 .legend {
   margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
 }
 
-.legend__row {
-  margin-left: 0.5rem;
-  margin: 0 0 0.5rem 0.5rem;
+.legend__element {
+  display: grid;
+  gap: 0.5rem;
+  justify-content: center;
+  align-content: baseline;
+}
+
+.element__title {
+  display: flex;
+  justify-content: center;
 }
 
 .icon {
-  height: 35px;
-  margin: 0 0.5rem;
+  height: 75px;
+}
+
+.icon:hover {
+  cursor: pointer;
+}
+
+.no-icon {
+  text-align: center;
+  font-weight: 500;
+  font-size: small;
+  height: 75px;
+}
+
+.no-icon:hover {
+  cursor: pointer;
+}
+
+.hotkeys {
+  text-align: center;
+  font-weight: 500;
+  font-size: small;
 }

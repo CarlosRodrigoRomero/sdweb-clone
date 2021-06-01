@@ -1,13 +1,11 @@
 <div *ngIf="serviceInit">
   <app-navbar></app-navbar>
-  <div class="grid">
-    <div class="left-bar">
-      <h4>{{ nombrePlanta }}</h4>
-      <app-anom-tipo-legend></app-anom-tipo-legend>
-    </div>
-    <div>
-      <app-map-classification></app-map-classification>
-      <app-thermal-slider></app-thermal-slider>
-    </div>
+  <div>
+    <app-map-classification></app-map-classification>
+    <app-thermal-slider></app-thermal-slider>
+  </div>
+  <div class="bottom-bar">
+    <h4>{{ nombrePlanta }}</h4>
+    <app-anom-tipo-legend></app-anom-tipo-legend>
   </div>
 </div>

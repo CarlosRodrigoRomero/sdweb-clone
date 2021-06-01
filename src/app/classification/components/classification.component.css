@@ -1,21 +1,17 @@
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 4fr;
-}
-
-.left-bar {
+.bottom-bar {
   display: flex;
   flex-direction: column;
-  background: white;
+  background: aliceblue;
+  height: 200px;
 }
 
-.left-bar h4 {
-  margin: 1rem 1rem 0;
+.bottom-bar h4 {
+  margin: 0.5rem 1rem 0;
 }
 
 app-thermal-slider {
   position: absolute;
-  left: 60%;
+  left: 50%;
   transform: translate(-50%, 0%);
-  bottom: 1rem;
+  bottom: 220px;
 }
