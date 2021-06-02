@@ -296,7 +296,7 @@ export class MapClassificationComponent implements OnInit {
 
         const coords = this.objectToCoordinate(feature.getProperties().properties.normMod.coords);
 
-        this.popup.setPosition(coords[2]);
+        this.popup.setPosition(coords[0]);
 
         this.classificationService.createAnomaliaFromNormModule(feature);
       }

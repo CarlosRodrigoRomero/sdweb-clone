@@ -3,7 +3,7 @@
   <div>
     <mat-form-field class="tipo" appearance="outline">
       <mat-label>Tipo anomalía</mat-label>
-      <input matInput type="number" [formControl]="formControl" (change)="updateAnomalia()" min="0" max="19" />
+      <input #inputTipo matInput type="number" [formControl]="formControl" (change)="updateAnomalia()" min="0" max="19" />
       <mat-error *ngIf="formControl.invalid">Introducir valor entre 0 y 19</mat-error>
     </mat-form-field>
   </div>
