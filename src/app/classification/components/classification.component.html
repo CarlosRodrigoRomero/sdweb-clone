@@ -7,8 +7,14 @@
   <div class="bottom-bar">
     <div class="bottom-bar__row-top">
       <h4>{{ nombrePlanta }}</h4>
+      <div class="bottom-bar__fila-columna" *ngIf="normModHovered">
+        <span class="title">Fila:</span>
+        <span class="value">{{ normModHovered.fila }}</span>
+        <span class="title">Columna:</span>
+        <span>{{ normModHovered.columna }}</span>
+      </div>
       <span>Eliminar anomalía ( Q )</span>
     </div>
-    <app-anom-tipo-legend></app-anom-tipo-legend>
+    <app-anom-tipo-control></app-anom-tipo-control>
   </div>
 </div>

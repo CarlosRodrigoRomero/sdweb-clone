@@ -7,9 +7,9 @@ import { ClassificationService } from '@core/services/classification.service';
 import { Anomalia } from '@core/models/anomalia';
 
 @Component({
-  selector: 'app-anom-tipo-legend',
-  templateUrl: './anom-tipo-legend.component.html',
-  styleUrls: ['./anom-tipo-legend.component.css'],
+  selector: 'app-anom-tipo-control',
+  templateUrl: './anom-tipo-control.component.html',
+  styleUrls: ['./anom-tipo-control.component.css'],
 })
 export class AnomTipoLegendComponent implements OnInit {
   tiposAnomalia: string[] = GLOBAL.labels_tipos;

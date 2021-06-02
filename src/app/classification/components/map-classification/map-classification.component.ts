@@ -45,6 +45,7 @@ export class MapClassificationComponent implements OnInit {
   private popup: Overlay;
   private listaAnomalias: Anomalia[] = [];
   private normModLayer: VectorLayer = undefined;
+  private prevFeatureHover: Feature;
 
   constructor(
     private classificationService: ClassificationService,
@@ -88,7 +89,7 @@ export class MapClassificationComponent implements OnInit {
         this.addPopupOverlay();
 
         this.addPointerOnHover();
-        // this.addSelectNormModInteraction();
+        this.addOnHoverAction();
         this.addOnDoubleClickInteraction();
         this.addClickOutFeatures();
       });
@@ -117,62 +118,6 @@ export class MapClassificationComponent implements OnInit {
     });
 
     return tl;
-  }
-
-  private createNormModLayer() {
-    this.normModLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleNormMod(),
-    });
-
-    this.normModLayer.setProperties({
-      id: 'normModLayer',
-    });
-
-    this.map.addLayer(this.normModLayer);
-  }
-
-  private addNormModules() {
-    this.structuresService.getNormModules(this.thermalLayer).subscribe((normModules) => {
-      const normModLayer = this.map
-        .getLayers()
-        .getArray()
-        .find((layer) => layer.getProperties().id === 'normModLayer') as VectorLayer;
-
-      const normModsSource = normModLayer.getSource();
-
-      normModsSource.clear();
-
-      this.normModules = normModules;
-
-      this.normModules.forEach((normMod) => {
-        const coords = this.objectToCoordinate(normMod.coords);
-
-        // const normMod: NormalizedModule = { id: normM.id, fila: 4, columna: 10, coords: normM.coords };
-
-        const feature = new Feature({
-          geometry: new Polygon([coords]),
-          properties: {
-            id: normMod.id,
-            name: 'normMod',
-            normMod,
-          },
-        });
-
-        normModsSource.addFeature(feature);
-      });
-    });
-  }
-
-  private objectToCoordinate(coords: any) {
-    const coordsOK: Coordinate[] = [
-      [coords.topLeft.long, coords.topLeft.lat],
-      [coords.topRight.long, coords.topRight.lat],
-      [coords.bottomRight.long, coords.bottomRight.lat],
-      [coords.bottomLeft.long, coords.bottomLeft.lat],
-    ];
-
-    return coordsOK;
   }
 
   initMap() {
@@ -212,6 +157,60 @@ export class MapClassificationComponent implements OnInit {
       });
   }
 
+  private createNormModLayer() {
+    this.normModLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleNormMod(),
+    });
+
+    this.normModLayer.setProperties({
+      id: 'normModLayer',
+    });
+
+    this.map.addLayer(this.normModLayer);
+  }
+
+  private addNormModules() {
+    this.structuresService.getNormModules(this.thermalLayer).subscribe((normModules) => {
+      const normModLayer = this.map
+        .getLayers()
+        .getArray()
+        .find((layer) => layer.getProperties().id === 'normModLayer') as VectorLayer;
+
+      const normModsSource = normModLayer.getSource();
+
+      normModsSource.clear();
+
+      this.normModules = normModules;
+
+      this.normModules.forEach((normMod) => {
+        const coords = this.objectToCoordinate(normMod.coords);
+
+        const feature = new Feature({
+          geometry: new Polygon([coords]),
+          properties: {
+            id: normMod.id,
+            name: 'normMod',
+            normMod,
+          },
+        });
+
+        normModsSource.addFeature(feature);
+      });
+    });
+  }
+
+  private objectToCoordinate(coords: any) {
+    const coordsOK: Coordinate[] = [
+      [coords.topLeft.long, coords.topLeft.lat],
+      [coords.topRight.long, coords.topRight.lat],
+      [coords.bottomRight.long, coords.bottomRight.lat],
+      [coords.bottomLeft.long, coords.bottomLeft.lat],
+    ];
+
+    return coordsOK;
+  }
+
   private addPopupOverlay() {
     const container = document.getElementById('popup');
     this.popup = new Overlay({
@@ -245,6 +244,38 @@ export class MapClassificationComponent implements OnInit {
       } else {
         // vuelve a poner el puntero normal
         this.map.getViewport().style.cursor = 'inherit';
+      }
+    });
+  }
+
+  private addOnHoverAction() {
+    let currentFeatureHover: Feature;
+    this.map.on('pointermove', (event) => {
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        const feature: Feature = this.map
+          .getFeaturesAtPixel(event.pixel)
+          .filter((item) => item.getProperties().properties !== undefined)
+          .filter((item) => item.getProperties().properties.name === 'normMod')[0] as Feature;
+
+        if (feature !== undefined) {
+          // cuando pasamos de un modulo a otro directamente sin pasar por vacio
+          if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
+            this.prevFeatureHover = undefined;
+          }
+          currentFeatureHover = feature;
+
+          this.classificationService.normModHovered = feature.getProperties().properties.normMod;
+
+          this.prevFeatureHover = feature;
+        } else {
+          this.classificationService.normModHovered = undefined;
+        }
+      } else {
+        if (currentFeatureHover !== undefined) {
+          currentFeatureHover = undefined;
+
+          this.classificationService.normModHovered = undefined;
+        }
       }
     });
   }

@@ -21,6 +21,18 @@
   margin-right: 1rem;
 }
 
+.bottom-bar__fila-columna {
+  display: flex;
+}
+
+.bottom-bar__fila-columna .title {
+  margin-right: 0.5rem;
+}
+
+.bottom-bar__fila-columna .value {
+  margin-right: 1rem;
+}
+
 app-thermal-slider {
   position: absolute;
   left: 50%;
