@@ -272,8 +272,8 @@ export class StructuresService {
       this.thermalLayer = thermalLayer;
     }
     const query$ = this.afs
-      // .collection<any>('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados')
-      .collection<any>('thermalLayers/' + this.thermalLayer.id + '/estructuras')
+      .collection<any>('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados')
+      // .collection<any>('thermalLayers/' + this.thermalLayer.id + '/estructuras')
       .snapshotChanges()
       .pipe(
         map((actions) =>
