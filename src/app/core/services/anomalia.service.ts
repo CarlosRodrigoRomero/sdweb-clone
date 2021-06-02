@@ -125,11 +125,7 @@ export class AnomaliaService {
     anomaliaObsList.push(this.getAnomalias$(informeId, 'pcs'));
     anomaliaObsList.push(this.getAnomalias$(informeId, 'anomalias'));
 
-    return combineLatest(anomaliaObsList).pipe(
-      map((arr) => arr.flat()),
-      // eliminamos las anomalias "vacias" por haber llamado a 'pcs' y 'anomalias'
-      map((anoms) => (anoms = anoms.filter((anom) => anom.perdidas !== 0)))
-    );
+    return combineLatest(anomaliaObsList).pipe(map((arr) => arr.flat()));
   }
 
   getAnomalias$(informeId: string, tipo?: 'anomalias' | 'pcs'): Observable<Anomalia[]> {

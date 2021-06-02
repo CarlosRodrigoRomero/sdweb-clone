@@ -11,6 +11,8 @@ import { AnomaliaService } from '@core/services/anomalia.service';
   styleUrls: ['./hotkeys-classification.component.css'],
 })
 export class HotkeysClassificationComponent implements OnInit {
+  // private hotkeyTipos = [0, 3, 5, 6, 8, 9, 10, 13, 15, 17, 18];
+
   constructor(
     private hotkeysService: HotkeysService,
     private classificationService: ClassificationService,

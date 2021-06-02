@@ -325,6 +325,7 @@ export class MapClassificationComponent implements OnInit {
           this.listaAnomalias.map((anom) => anom.id).includes(feature.getProperties().properties.id)
         ) {
           const anomalia = this.listaAnomalias.find((anom) => anom.id === feature.getProperties().properties.id);
+
           return new Style({
             stroke: new Stroke({
               color: GLOBAL.colores_tipos[anomalia.tipo],

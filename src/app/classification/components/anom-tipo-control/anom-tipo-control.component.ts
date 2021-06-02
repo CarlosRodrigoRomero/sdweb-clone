@@ -14,7 +14,7 @@ import { Anomalia } from '@core/models/anomalia';
 export class AnomTipoLegendComponent implements OnInit {
   tiposAnomalia: string[] = GLOBAL.labels_tipos;
   anomaliaColors: string[] = GLOBAL.colores_tipos;
-  anomaliaSelected: Anomalia;
+  anomaliaSelected: Anomalia = undefined;
 
   constructor(private classificationService: ClassificationService, private anomaliaService: AnomaliaService) {}
 
@@ -25,10 +25,13 @@ export class AnomTipoLegendComponent implements OnInit {
   updateAnomalia(tipo: number) {
     if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
       // asignamos el nuevo tipo a la anomalia seleccionada
-      this.anomaliaSelected.tipo = tipo;
-      this.classificationService.anomaliaSelected = this.anomaliaSelected;
+      const anomalia = this.anomaliaSelected;
+      anomalia.tipo = tipo;
       // actualizamos el tipo en la DB
-      this.anomaliaService.updateAnomalia(this.classificationService.anomaliaSelected);
+      this.anomaliaService.updateAnomalia(anomalia);
+
+      // ocultamos el popup
+      this.classificationService.hidePopup();
     }
   }
 }
