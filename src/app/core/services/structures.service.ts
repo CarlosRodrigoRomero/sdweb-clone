@@ -20,6 +20,7 @@ import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { Coordinate } from 'ol/coordinate';
 import Point from 'ol/geom/Point';
 import LineString from 'ol/geom/LineString';
+import { NormalizedModule } from '@core/models/normalizedModule';
 
 @Injectable({
   providedIn: 'root',
@@ -267,22 +268,18 @@ export class StructuresService {
     return lineH.getLength() * lineV.getLength();
   }
 
-  getNormModules(thermalLayer?: ThermalLayerInterface) {
+  getNormModules(thermalLayer?: ThermalLayerInterface): Observable<NormalizedModule[]> {
     if (thermalLayer !== undefined) {
       this.thermalLayer = thermalLayer;
     }
     const query$ = this.afs
-      .collection<any>('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados')
-      // .collection<any>('thermalLayers/' + this.thermalLayer.id + '/estructuras')
+      .collection<NormalizedModule>('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados')
       .snapshotChanges()
       .pipe(
         map((actions) =>
           actions.map((doc) => {
             const data = doc.payload.doc.data();
             const id = doc.payload.doc.id;
-
-            // Convertimos el objeto en un array
-            // data.coords = Object.values(data.coords);
 
             return { id, ...data };
           })

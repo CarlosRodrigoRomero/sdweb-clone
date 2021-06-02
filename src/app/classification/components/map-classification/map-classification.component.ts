@@ -28,7 +28,6 @@ import { StructuresService } from '@core/services/structures.service';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { PlantaInterface } from '@core/models/planta';
-import { Structure } from '@core/models/structure';
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { Anomalia } from '@core/models/anomalia';
 
@@ -42,7 +41,7 @@ export class MapClassificationComponent implements OnInit {
   private map: Map;
   private thermalLayer: ThermalLayerInterface;
   private thermalLayers: TileLayer[];
-  private normModules: Structure[];
+  private normModules: NormalizedModule[];
   private popup: Overlay;
   private listaAnomalias: Anomalia[] = [];
   private normModLayer: VectorLayer = undefined;
@@ -146,15 +145,15 @@ export class MapClassificationComponent implements OnInit {
 
       this.normModules = normModules;
 
-      this.normModules.forEach((normM) => {
-        const coords = this.objectToCoordinate(normM.coords);
+      this.normModules.forEach((normMod) => {
+        const coords = this.objectToCoordinate(normMod.coords);
 
-        const normMod: NormalizedModule = { id: normM.id, fila: 4, columna: 10, coords: normM.coords };
+        // const normMod: NormalizedModule = { id: normM.id, fila: 4, columna: 10, coords: normM.coords };
 
         const feature = new Feature({
           geometry: new Polygon([coords]),
           properties: {
-            id: normM.id,
+            id: normMod.id,
             name: 'normMod',
             normMod,
           },
