@@ -24,7 +24,9 @@ export class AnomTipoLegendComponent implements OnInit {
 
   updateAnomalia(tipo: number) {
     if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-      this.classificationService.anomaliaSelected.tipo = tipo;
+      // asignamos el nuevo tipo a la anomalia seleccionada
+      this.anomaliaSelected.tipo = tipo;
+      this.classificationService.anomaliaSelected = this.anomaliaSelected;
       // actualizamos el tipo en la DB
       this.anomaliaService.updateAnomalia(this.classificationService.anomaliaSelected);
     }
