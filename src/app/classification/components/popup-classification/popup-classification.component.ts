@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { ClassificationService } from '@core/services/classification.service';
@@ -12,13 +12,11 @@ import { Anomalia } from '@core/models/anomalia';
   templateUrl: './popup-classification.component.html',
   styleUrls: ['./popup-classification.component.css'],
 })
-export class PopupClassificationComponent implements OnInit, AfterViewInit {
+export class PopupClassificationComponent implements OnInit {
   normModSelected: NormalizedModule;
   anomaliaSelected: Anomalia;
   form = new FormGroup({});
   formControl = new FormControl(8, [Validators.min(0), Validators.max(19)]);
-
-  @ViewChild('inputTipo') inputTipo: ElementRef;
 
   constructor(private classificationService: ClassificationService, private anomaliaService: AnomaliaService) {}
 
@@ -32,12 +30,6 @@ export class PopupClassificationComponent implements OnInit, AfterViewInit {
         this.formControl.setValue(this.anomaliaSelected.tipo);
       }
     });
-  }
-
-  ngAfterViewInit() {
-    if (this.anomaliaSelected && this.normModSelected) {
-      this.inputTipo.nativeElement.focus();
-    }
   }
 
   updateAnomalia() {
