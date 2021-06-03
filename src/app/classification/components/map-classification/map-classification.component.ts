@@ -65,7 +65,7 @@ export class MapClassificationComponent implements OnInit {
       this.listaAnomalias = lista;
 
       if (this.normModLayer !== undefined) {
-        this.normModLayer.setStyle(this.getStyleNormMod());
+        this.normModLayer.setStyle(this.getStyleNormMod(false));
       }
     });
 
@@ -160,7 +160,7 @@ export class MapClassificationComponent implements OnInit {
   private createNormModLayer() {
     this.normModLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleNormMod(),
+      style: this.getStyleNormMod(false),
     });
 
     this.normModLayer.setProperties({
@@ -260,9 +260,14 @@ export class MapClassificationComponent implements OnInit {
         if (feature !== undefined) {
           // cuando pasamos de un modulo a otro directamente sin pasar por vacio
           if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
+            // quitamos el efecto resaltado
+            this.prevFeatureHover.setStyle(this.getStyleNormMod(false));
             this.prevFeatureHover = undefined;
           }
           currentFeatureHover = feature;
+
+          // aplicamos el efecto resaltado
+          feature.setStyle(this.getStyleNormMod(true));
 
           this.classificationService.normModHovered = feature.getProperties().properties.normMod;
 
@@ -272,6 +277,8 @@ export class MapClassificationComponent implements OnInit {
         }
       } else {
         if (currentFeatureHover !== undefined) {
+          // quitamos el efecto resaltado
+          currentFeatureHover.setStyle(this.getStyleNormMod(false));
           currentFeatureHover = undefined;
 
           this.classificationService.normModHovered = undefined;
@@ -317,7 +324,7 @@ export class MapClassificationComponent implements OnInit {
     });
   }
 
-  private getStyleNormMod() {
+  private getStyleNormMod(hovered: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         if (
@@ -329,7 +336,7 @@ export class MapClassificationComponent implements OnInit {
           return new Style({
             stroke: new Stroke({
               color: GLOBAL.colores_tipos[anomalia.tipo],
-              width: 4,
+              width: hovered ? 4 : 2,
             }),
             fill: new Fill({
               color: 'rgba(0,0,0,0)',
@@ -339,7 +346,7 @@ export class MapClassificationComponent implements OnInit {
           return new Style({
             stroke: new Stroke({
               color: 'white',
-              width: 2,
+              width: hovered ? 4 : 2,
             }),
             fill: new Fill({
               color: 'rgba(0,0,0,0)',
