@@ -9,10 +9,10 @@
         type="number"
         [formControl]="formControl"
         (change)="updateAnomalia()"
-        min="0"
+        min="3"
         max="19"
       />
-      <mat-error *ngIf="formControl.invalid">Introducir valor entre 0 y 19</mat-error>
+      <mat-error *ngIf="formControl.invalid">Introducir valor entre 3 y 19</mat-error>
     </mat-form-field>
   </div>
 

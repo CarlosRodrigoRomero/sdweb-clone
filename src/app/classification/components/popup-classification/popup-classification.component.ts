@@ -16,7 +16,7 @@ export class PopupClassificationComponent implements OnInit {
   normModSelected: NormalizedModule;
   anomaliaSelected: Anomalia;
   form = new FormGroup({});
-  formControl = new FormControl(8, [Validators.min(0), Validators.max(19)]);
+  formControl = new FormControl(8, [Validators.min(3), Validators.max(19)]);
 
   constructor(private classificationService: ClassificationService, private anomaliaService: AnomaliaService) {}
 
@@ -33,10 +33,17 @@ export class PopupClassificationComponent implements OnInit {
   }
 
   updateAnomalia() {
-    this.classificationService.anomaliaSelected.tipo = this.formControl.value;
+    if (this.formControl.value >= 3 && this.formControl.value <= 19) {
+      if (this.formControl.value === 4) {
+        // almacenamos el tipo 4 en desuso como 17
+        this.classificationService.anomaliaSelected.tipo = 17;
+      } else {
+        this.classificationService.anomaliaSelected.tipo = this.formControl.value;
+      }
 
-    // actualizamos el tipo en la DB
-    this.anomaliaService.updateAnomalia(this.anomaliaSelected);
+      // actualizamos el tipo en la DB
+      this.anomaliaService.updateAnomalia(this.anomaliaSelected);
+    }
   }
 
   deleteAnomalia() {

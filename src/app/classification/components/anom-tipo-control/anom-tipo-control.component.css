@@ -1,7 +1,7 @@
 .legend {
   margin-top: 1rem;
   display: grid;
-  grid-template-columns: repeat(20, 1fr);
+  grid-template-columns: repeat(16, 1fr);
 }
 
 .legend__element {

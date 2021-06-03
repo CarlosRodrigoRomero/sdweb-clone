@@ -1,43 +1,6 @@
 <div class="legend">
   <div class="legend__element">
     <div class="element__title">
-      <span>0</span>
-      <mat-icon [ngStyle]="{ color: anomaliaColors[0] }">crop_16_9</mat-icon>
-    </div>
-    <img
-      class="icon"
-      matTooltip="{{ tiposAnomalia[0] }}"
-      (click)="updateAnomalia(0)"
-      src="../../../assets/images/tipo_0.png"
-    />
-    <span class="hotkeys">(Shift+1)</span>
-  </div>
-  <div class="legend__element">
-    <div class="element__title">
-      <span>1</span>
-      <mat-icon [ngStyle]="{ color: anomaliaColors[1] }">crop_16_9</mat-icon>
-    </div>
-    <img
-      class="icon"
-      matTooltip="{{ tiposAnomalia[1] }}"
-      (click)="updateAnomalia(1)"
-      src="../../../assets/images/tipo_1.png"
-    />
-  </div>
-  <div class="legend__element">
-    <div class="element__title">
-      <span>2</span>
-      <mat-icon [ngStyle]="{ color: anomaliaColors[2] }">crop_16_9</mat-icon>
-    </div>
-    <img
-      class="icon"
-      matTooltip="{{ tiposAnomalia[2] }}"
-      (click)="updateAnomalia(2)"
-      src="../../../assets/images/tipo_2.png"
-    />
-  </div>
-  <div class="legend__element">
-    <div class="element__title">
       <span>3</span>
       <mat-icon [ngStyle]="{ color: anomaliaColors[3] }">crop_16_9</mat-icon>
     </div>
@@ -48,18 +11,6 @@
       src="../../../assets/images/tipo_3.png"
     />
     <span class="hotkeys">( 3 )</span>
-  </div>
-  <div class="legend__element">
-    <div class="element__title">
-      <span>4</span>
-      <mat-icon [ngStyle]="{ color: anomaliaColors[4] }">crop_16_9</mat-icon>
-    </div>
-    <img
-      class="icon"
-      matTooltip="{{ tiposAnomalia[4] }}"
-      (click)="updateAnomalia(4)"
-      src="../../../assets/images/tipo_4.png"
-    />
   </div>
   <div class="legend__element">
     <div class="element__title">
@@ -217,7 +168,12 @@
       <span>17</span>
       <mat-icon [ngStyle]="{ color: anomaliaColors[17] }">crop_16_9</mat-icon>
     </div>
-    <span class="no-icon">{{ tiposAnomalia[17] }}</span>
+    <img
+      class="icon"
+      matTooltip="{{ tiposAnomalia[17] }}"
+      (click)="updateAnomalia(17)"
+      src="../../../assets/images/tipo_4.png"
+    />
     <span class="hotkeys">( 4 )</span>
   </div>
   <div class="legend__element">
