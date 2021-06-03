@@ -1,15 +1,18 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
+import { AdminComponent } from './components/admin.component';
+
 import { UsersComponent } from './components/users/users.component';
 import { EditUserComponent } from './components/edit-user/edit-user.component';
-import { SideBarComponent } from './components/side-bar/side-bar.component';
 import { CreateUserComponent } from './components/create-user/create-user.component';
+
+import { ReportsComponent } from './components/reports/reports.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: SideBarComponent,
+    component: AdminComponent,
     children: [
       {
         path: 'users',
@@ -21,6 +24,18 @@ const routes: Routes = [
       },
       {
         path: 'users/create',
+        component: CreateUserComponent,
+      },
+      {
+        path: 'reports',
+        component: ReportsComponent,
+      },
+      {
+        path: 'reports/edit/:id',
+        component: EditUserComponent,
+      },
+      {
+        path: 'reports/create',
         component: CreateUserComponent,
       },
     ],

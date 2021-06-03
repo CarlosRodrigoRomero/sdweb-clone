@@ -1,7 +1,8 @@
 <div class="users">
-  <h2>Listado de usuarios</h2>
-
-  <button mat-raised-button color="warn" routerLink="create">Crear usuario</button>
+  <div class="users__title">
+    <h2>Listado de usuarios</h2>
+    <button mat-raised-button color="warn" routerLink="create">Crear usuario</button>
+  </div>
 
   <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

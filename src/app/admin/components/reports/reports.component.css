@@ -1,11 +1,15 @@
-.users {
+.reports {
   margin: 1rem;
 }
 
-.users__title {
+.reports__title {
   display: flex;
   justify-content: space-between;
   margin-bottom: 1rem;
+}
+
+mat-form-field {
+  width: 100%;
 }
 
 table {

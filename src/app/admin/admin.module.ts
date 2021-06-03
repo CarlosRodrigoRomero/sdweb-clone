@@ -7,13 +7,14 @@ import { SharedModule } from '@shared/shared.module';
 
 import { AdminRoutingModule } from './admin-routing.module';
 import { EditUserComponent } from './components/edit-user/edit-user.component';
-import { SideBarComponent } from './components/side-bar/side-bar.component';
+import { AdminComponent } from './components/admin.component';
 import { UsersComponent } from './components/users/users.component';
 import { PlantasTableComponent } from './components/plantas-table/plantas-table.component';
 import { CreateUserComponent } from './components/create-user/create-user.component';
+import { ReportsComponent } from './components/reports/reports.component';
 
 @NgModule({
-  declarations: [EditUserComponent, SideBarComponent, UsersComponent, PlantasTableComponent, CreateUserComponent],
+  declarations: [EditUserComponent, AdminComponent, UsersComponent, PlantasTableComponent, CreateUserComponent, ReportsComponent],
   imports: [CommonModule, RouterModule, AdminRoutingModule, SharedModule, LayoutModule],
 })
 export class AdminModule {}

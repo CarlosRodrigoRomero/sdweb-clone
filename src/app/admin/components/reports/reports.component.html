@@ -1,0 +1,47 @@
+<div class="reports">
+  <div class="reports__title">
+    <h3>Listado de informes</h3>
+    <button mat-raised-button color="warn" routerLink="create">Crear informe</button>
+  </div>
+
+  <mat-form-field>
+    <mat-label>Buscar</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Informe" #input />
+  </mat-form-field>
+
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+    <!-- Planta -->
+    <ng-container matColumnDef="planta">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Planta</th>
+      <td mat-cell *matCellDef="let element">{{ element.planta }}</td>
+    </ng-container>
+
+    <!-- Fecha -->
+    <ng-container matColumnDef="fecha">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
+      <td mat-cell *matCellDef="let element">{{ element.fecha * 1000 | date: 'dd/MM/yyyy' }}</td>
+    </ng-container>
+
+    <!-- Informe ID -->
+    <ng-container matColumnDef="informeId">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Informe ID</th>
+      <td mat-cell *matCellDef="let element">{{ element.informeId }}</td>
+    </ng-container>
+
+    <!-- Potencia -->
+    <ng-container matColumnDef="potencia">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencia</th>
+      <td mat-cell *matCellDef="let element">{{ element.potencia }} MW</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-button [routerLink]="['../reports/edit', element.informeId]">Editar</button>
+      </td>
+    </ng-container>
+  </table>
+</div>
