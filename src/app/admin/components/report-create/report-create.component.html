@@ -1,0 +1,75 @@
+<div class="create-user">
+  <h3>Crear informe</h3>
+
+  <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
+    <mat-card>
+      <mat-card-content>
+        <mat-form-field class="example-full-width">
+          <mat-label>Emisividad</mat-label>
+          <input matInput formControlName="emisividad" type="number" min="0" max="1" step="0.01" />
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Temperatura Reflejada</mat-label>
+          <input matInput formControlName="tempReflejada" type="number" />
+          <span matSuffix>ºC</span>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Humedad relativa</mat-label>
+          <input matInput formControlName="humedadRelativa" type="number" min="0" max="1" step="0.01" />
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Nubosidad</mat-label>
+          <input matInput formControlName="nubosidad" type="number" min="0" max="1" step="0.01" />
+          <span matSuffix>octas</span>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>GSD</mat-label>
+          <input matInput formControlName="gsd" type="number" />
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Corrección Hora SRT</mat-label>
+          <input matInput formControlName="correccHoraSrt" type="number" />
+        </mat-form-field>
+
+        <mat-checkbox formControlName="disponible">Disponible</mat-checkbox>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Velocidad viento</mat-label>
+          <input matInput formControlName="vientoVelocidad" type="number" />
+          <span matSuffix>km/h</span>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Dirección viento</mat-label>
+          <input matInput formControlName="vientoVelocidad" type="number" min="0" max="360" />
+          <span matSuffix>º</span>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Temperatura Ambiente</mat-label>
+          <input matInput formControlName="temperatura" type="number" step="1" />
+          <span matSuffix>ºC</span>
+        </mat-form-field>
+
+        <!-- <mat-form-field appearance="fill">
+          <mat-label>Tipo de usuario</mat-label>
+          <mat-select formControlName="role">
+            <mat-option value="0">Usuario</mat-option>
+            <mat-option value="1">Administrador</mat-option>
+            <mat-option value="2">Externo</mat-option>
+            <mat-option value="3">Procesamiento</mat-option>
+          </mat-select>
+        </mat-form-field> -->
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button routerLink="../../">Cancelar</button>
+        <button mat-raised-button type="submit">Crear</button>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+</div>

@@ -198,11 +198,24 @@ export class InformeService {
     informeDoc.update(informe);
   }
 
-  addInforme() {}
+  addInforme(informe: InformeInterface) {
+    this.afs
+      .collection('informes')
+      .add(informe)
+      .then((docRef) => {
+        console.log('Informe creado con ID: ', docRef.id);
+      })
+      .catch((error) => {
+        console.error('Error al crear el informe: ', error);
+      });
+  }
+
   editInforme() {}
+
   set(informe: InformeInterface) {
     this.informe = informe;
   }
+
   get() {
     return this.informe;
   }
