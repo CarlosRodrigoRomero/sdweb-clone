@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
-import { filter, take } from 'rxjs/operators';
+import { HotkeysService, Hotkey } from 'angular2-hotkeys';
+
+import { take } from 'rxjs/operators';
 
 import TileLayer from 'ol/layer/Tile';
 import { fromLonLat, transformExtent } from 'ol/proj';
@@ -14,6 +16,9 @@ import VectorSource from 'ol/source/Vector';
 import LineString from 'ol/geom/LineString';
 import { Fill, Stroke, Style } from 'ol/style';
 import Circle from 'ol/geom/Circle';
+import { Select } from 'ol/interaction';
+import { click } from 'ol/events/condition';
+import VectorLayer from 'ol/layer/Vector';
 
 import { OlMapService } from '@core/services/ol-map.service';
 import { ClustersService } from '@core/services/clusters.service';
@@ -22,9 +27,6 @@ import { PlantaInterface } from '@core/models/planta';
 import { PuntoTrayectoria } from '@core/models/puntoTrayectoria';
 import { Cluster } from '@core/models/cluster';
 import { GLOBAL } from '@core/services/global';
-import { Select } from 'ol/interaction';
-import { click } from 'ol/events/condition';
-import VectorLayer from 'ol/layer/Vector';
 
 @Component({
   selector: 'app-map-clusters',
@@ -37,7 +39,7 @@ export class MapClustersComponent implements OnInit {
   private satelliteLayer: TileLayer;
   private map: Map;
   private coordsPuntosTrayectoria: Coordinate[] = [];
-  private prevFeatureHover: any;
+  private prevFeatureHover: Feature;
   private puntosTrayectoria: PuntoTrayectoria[] = [];
   private puntoTrayectoriaSelected: PuntoTrayectoria;
   private puntoClusterHovered: PuntoTrayectoria;
@@ -48,7 +50,11 @@ export class MapClustersComponent implements OnInit {
   private joinActive = false;
   private createClusterActive = false;
 
-  constructor(private olMapService: OlMapService, private clustersService: ClustersService) {}
+  constructor(
+    private olMapService: OlMapService,
+    private clustersService: ClustersService,
+    private hotkeysService: HotkeysService
+  ) {}
 
   ngOnInit(): void {
     this.planta = this.clustersService.planta;
@@ -71,6 +77,56 @@ export class MapClustersComponent implements OnInit {
     this.addSelectClusterInteraction();
     this.addSelectPuntosTrayectoriaInteraction();
     this.addClickOutFeatures();
+
+    // ATAJOS DE TECLADO DESPLAZAMIENTO FLECHAS
+    this.hotkeysService.add(
+      new Hotkey(
+        'left',
+        (event: KeyboardEvent): boolean => {
+          if (this.puntoTrayectoriaSelected !== undefined) {
+            const index = this.puntosTrayectoria.indexOf(this.puntoTrayectoriaSelected);
+            if (index > 0) {
+              // reseteamos el estilo al anterior
+              this.setPuntosStyle(this.puntoTrayectoriaSelected.id, false);
+
+              // seleccionamos el nuevo punto y le aplicamos el estilo de seleccionado
+              this.puntoTrayectoriaSelected = this.puntosTrayectoria[index - 1];
+              this.setPuntosStyle(this.puntoTrayectoriaSelected.id, true);
+
+              // mostramos la miniatura asociada a este punto
+              this.clustersService.getImageThumbnail(this.puntoTrayectoriaSelected.thumbnail);
+            }
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'left arrow'
+      )
+    );
+    this.hotkeysService.add(
+      new Hotkey(
+        'right',
+        (event: KeyboardEvent): boolean => {
+          if (this.puntoTrayectoriaSelected !== undefined) {
+            const index = this.puntosTrayectoria.indexOf(this.puntoTrayectoriaSelected);
+            if (index < this.puntosTrayectoria.length) {
+              // reseteamos el estilo al anterior
+              this.setPuntosStyle(this.puntoTrayectoriaSelected.id, false);
+
+              // seleccionamos el nuevo punto y le aplicamos el estilo de seleccionado
+              this.puntoTrayectoriaSelected = this.puntosTrayectoria[index + 1];
+              this.setPuntosStyle(this.puntoTrayectoriaSelected.id, true);
+
+              // mostramos la miniatura asociada a este punto
+              this.clustersService.getImageThumbnail(this.puntoTrayectoriaSelected.thumbnail);
+            }
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'right arrow'
+      )
+    );
   }
 
   initMap() {
@@ -253,36 +309,38 @@ export class MapClustersComponent implements OnInit {
   }
 
   private addOnHoverPointAction() {
-    let currentFeatureHover;
+    let currentFeatureHover: Feature;
     this.map.on('pointermove', (event) => {
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        const feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties().properties !== undefined)
-          .filter((item) => item.getProperties().properties.name === 'puntoTrayectoria');
+      if (this.puntoTrayectoriaSelected === undefined) {
+        if (this.map.hasFeatureAtPixel(event.pixel)) {
+          const feature = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined)
+            .filter((item) => item.getProperties().properties.name === 'puntoTrayectoria')[0] as Feature;
 
-        if (feature.length > 0 && this.puntoClusterHovered === undefined) {
-          // cuando pasamos de un punto a otro directamente sin pasar por vacio
-          if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
-            (this.prevFeatureHover[0] as Feature).setStyle(this.getStylePuntos(false));
-            this.prevFeatureHover = undefined;
+          if (feature !== undefined && this.puntoClusterHovered === undefined) {
+            // cuando pasamos de un punto a otro directamente sin pasar por vacio
+            if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
+              this.prevFeatureHover.setStyle(this.getStylePuntos(false));
+              this.prevFeatureHover = undefined;
+            }
+            currentFeatureHover = feature;
+
+            const puntoId = feature.getProperties().properties.id;
+            const puntoHover = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
+
+            // mostramos la miniatura asociada a este punto
+            this.clustersService.getImageThumbnail(puntoHover.thumbnail);
+
+            feature.setStyle(this.getStylePuntos(true));
+
+            this.prevFeatureHover = feature;
           }
-          currentFeatureHover = feature;
-
-          const puntoId = feature[0].getProperties().properties.id;
-          const puntoHover = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
-
-          // mostramos la miniatura asociada a este punto
-          this.clustersService.getImageThumbnail(puntoHover.thumbnail);
-
-          (feature[0] as Feature).setStyle(this.getStylePuntos(true));
-
-          this.prevFeatureHover = feature;
-        }
-      } else {
-        if (currentFeatureHover !== undefined) {
-          (currentFeatureHover[0] as Feature).setStyle(this.getStylePuntos(false));
-          currentFeatureHover = undefined;
+        } else {
+          if (currentFeatureHover !== undefined) {
+            currentFeatureHover.setStyle(this.getStylePuntos(false));
+            currentFeatureHover = undefined;
+          }
         }
       }
     });
@@ -291,7 +349,7 @@ export class MapClustersComponent implements OnInit {
   private addOnHoverClusterAction() {
     let currentFeatureHover;
     this.map.on('pointermove', (event) => {
-      if (this.clusterSelected === undefined) {
+      if (this.clusterSelected === undefined && this.puntoTrayectoriaSelected === undefined) {
         if (this.map.hasFeatureAtPixel(event.pixel)) {
           const feature = this.map
             .getFeaturesAtPixel(event.pixel)
@@ -377,6 +435,12 @@ export class MapClustersComponent implements OnInit {
 
             this.clustersService.clusterSelected = undefined;
             this.puntoClusterHovered = undefined;
+          } else {
+            const puntoId = e.selected[0].getProperties().properties.id;
+            this.puntoTrayectoriaSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
+
+            const feature = e.selected[0];
+            feature.setStyle(this.getStylePuntos(true));
           }
         }
       }
@@ -439,12 +503,17 @@ export class MapClustersComponent implements OnInit {
           this.setClusterStyle(this.clusterSelected.id, false);
         }
         this.clustersService.clusterSelected = undefined;
+
+        if (this.puntoTrayectoriaSelected !== undefined) {
+          this.setPuntosStyle(this.puntoTrayectoriaSelected.id, false);
+          this.puntoTrayectoriaSelected = undefined;
+        }
       }
     });
   }
 
-  private getStylePuntos(hovered: boolean) {
-    if (hovered) {
+  private getStylePuntos(focused: boolean) {
+    if (focused) {
       return (feature: Feature) => {
         if (feature !== undefined) {
           return new Style({
@@ -468,6 +537,39 @@ export class MapClustersComponent implements OnInit {
           });
         }
       };
+    }
+  }
+
+  private setPuntosStyle(puntoId: string, focus: boolean) {
+    const trayectoriaLayer = this.map
+      .getLayers()
+      .getArray()
+      .find((layer) => layer.getProperties().id === 'puntosTrayectoriaLayer') as VectorLayer;
+
+    const features = trayectoriaLayer.getSource().getFeatures();
+
+    const feature: Feature = features.find((f) => f.getProperties().properties.id === puntoId);
+
+    const focusedStyle = new Style({
+      fill: new Fill({
+        color: 'red',
+      }),
+      stroke: new Stroke({
+        color: 'red',
+        width: 4,
+      }),
+    });
+
+    const unfocusedStyle = new Style({
+      fill: new Fill({
+        color: 'black',
+      }),
+    });
+
+    if (focus) {
+      feature.setStyle(focusedStyle);
+    } else {
+      feature.setStyle(unfocusedStyle);
     }
   }
 
@@ -508,8 +610,6 @@ export class MapClustersComponent implements OnInit {
   }
 
   private setClusterStyle(clusterId: string, focus: boolean) {
-    this.clusters.find((cluster) => cluster.id === clusterId);
-
     const clustersLayer = this.map
       .getLayers()
       .getArray()

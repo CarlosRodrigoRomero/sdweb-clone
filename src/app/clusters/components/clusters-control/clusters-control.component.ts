@@ -33,6 +33,11 @@ export class ClustersControlComponent implements OnInit {
     this.clustersService.createClusterActive$.subscribe((create) => (this.createClusterActive = create));
   }
 
+  createCluster() {
+    this.clustersService.clusterSelected = undefined;
+    this.clustersService.createClusterActive = !this.clustersService.createClusterActive;
+  }
+
   deleteCluster() {
     this.clustersService.deleteCluster();
     this.clustersService.clusterSelected = undefined;
@@ -40,11 +45,6 @@ export class ClustersControlComponent implements OnInit {
 
   activeJoinMode() {
     this.clustersService.joinActive = !this.clustersService.joinActive;
-  }
-
-  createCluster() {
-    this.clustersService.clusterSelected = undefined;
-    this.clustersService.createClusterActive = !this.clustersService.createClusterActive;
   }
 
   deleteClusterUnion() {

@@ -4,8 +4,6 @@ import { AngularFireStorage } from '@angular/fire/storage';
 
 import { ClustersService } from '@core/services/clusters.service';
 
-import { PuntoTrayectoria } from '@core/models/puntoTrayectoria';
-
 @Component({
   selector: 'app-image-point-cluster',
   templateUrl: './image-point-cluster.component.html',
