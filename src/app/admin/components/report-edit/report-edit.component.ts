@@ -14,12 +14,13 @@ import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 
 @Component({
-  selector: 'app-report-create',
-  templateUrl: './report-create.component.html',
-  styleUrls: ['./report-create.component.css'],
+  selector: 'app-report-edit',
+  templateUrl: './report-edit.component.html',
+  styleUrls: ['./report-edit.component.css'],
 })
-export class ReportCreateComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ReportEditComponent implements OnInit, AfterViewInit, OnDestroy {
   form: FormGroup;
+  private informeId: string = undefined;
   informe: InformeInterface = {};
   plantaList: PlantaInterface[] = [];
   public filteredPlantas: ReplaySubject<PlantaInterface[]> = new ReplaySubject<PlantaInterface[]>(1);
@@ -40,9 +41,21 @@ export class ReportCreateComponent implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private informeService: InformeService,
     private plantaService: PlantaService
-  ) {}
+  ) {
+    this.buildForm();
+  }
 
   ngOnInit(): void {
+    // obtenemos el ID de la URL
+    this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+
+    // traemos el informe seleccionado
+    this.informeService.getInforme(this.informeId).subscribe((informe) => {
+      this.informe = informe;
+
+      this.form.patchValue(this.informe);
+    });
+
     this.plantaService
       .getAllPlantas()
       .pipe(take(1))
@@ -60,14 +73,15 @@ export class ReportCreateComponent implements OnInit, AfterViewInit, OnDestroy {
 
         // cargamos la lista inicial de plantas
         this.filteredPlantas.next(this.plantaList.slice());
+
+        // indicamos la planta seleccionada
+        this.form.patchValue({ planta: this.plantaList.find((planta) => planta.id === this.informe.plantaId) });
       });
 
     // escuchamos cuando se active el input de busqueda
     this.plantaFilterCtrl.valueChanges.pipe(takeUntil(this._onDestroy)).subscribe(() => {
       this.filterPlantas();
     });
-
-    this.buildForm();
   }
 
   ngAfterViewInit() {
@@ -76,14 +90,14 @@ export class ReportCreateComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private buildForm() {
     this.form = this.formBuilder.group({
-      emisividad: [0.85, [Validators.required, Validators.min(0), Validators.max(1)]],
+      emisividad: [, [Validators.required, Validators.min(0), Validators.max(1)]],
       temperatura: [, [Validators.required]],
-      tempReflejada: [-30, [Validators.required]],
+      tempReflejada: [, [Validators.required]],
       humedadRelativa: [, [Validators.required, Validators.min(0), Validators.max(1)]],
       nubosidad: [, [Validators.required, Validators.min(0), Validators.max(8)]],
-      gsd: [3, [Validators.required]],
-      correccHoraSrt: [8, [Validators.required]],
-      disponible: [false, [Validators.required]],
+      gsd: [, [Validators.required]],
+      correccHoraSrt: [, [Validators.required]],
+      disponible: [, [Validators.required]],
       vientoVelocidad: [, [Validators.required]],
       vientoDireccion: [, [Validators.required, Validators.min(0), Validators.max(360)]],
     });
@@ -106,7 +120,7 @@ export class ReportCreateComponent implements OnInit, AfterViewInit, OnDestroy {
       this.informe.plantaId = this.form.get('planta').value.id;
 
       // Crea el informe en la DB
-      this.informeService.addInforme(this.informe);
+      this.informeService.updateInforme(this.informe);
     }
   }
 

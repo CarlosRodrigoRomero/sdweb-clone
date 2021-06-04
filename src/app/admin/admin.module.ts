@@ -13,9 +13,10 @@ import { PlantasTableComponent } from './components/plantas-table/plantas-table.
 import { CreateUserComponent } from './components/create-user/create-user.component';
 import { ReportsComponent } from './components/reports/reports.component';
 import { ReportCreateComponent } from './components/report-create/report-create.component';
+import { ReportEditComponent } from './components/report-edit/report-edit.component';
 
 @NgModule({
-  declarations: [EditUserComponent, AdminComponent, UsersComponent, PlantasTableComponent, CreateUserComponent, ReportsComponent, ReportCreateComponent],
+  declarations: [EditUserComponent, AdminComponent, UsersComponent, PlantasTableComponent, CreateUserComponent, ReportsComponent, ReportCreateComponent, ReportEditComponent],
   imports: [CommonModule, RouterModule, AdminRoutingModule, SharedModule, LayoutModule],
 })
 export class AdminModule {}

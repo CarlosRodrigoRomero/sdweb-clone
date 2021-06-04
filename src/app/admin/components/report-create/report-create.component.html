@@ -1,4 +1,4 @@
-<div class="create-user">
+<div class="create-report">
   <h4>Crear informe</h4>
 
   <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
@@ -38,7 +38,7 @@
 
         <mat-form-field class="example-full-width">
           <mat-label>Nubosidad</mat-label>
-          <input matInput formControlName="nubosidad" type="number" min="1" max="8" step="1" />
+          <input matInput formControlName="nubosidad" type="number" min="0" max="8" step="1" />
           <span matSuffix>octas</span>
         </mat-form-field>
 

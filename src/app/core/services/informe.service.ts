@@ -194,8 +194,16 @@ export class InformeService {
   }
 
   updateInforme(informe: InformeInterface) {
-    const informeDoc = this.afs.doc('informes/' + informe.id);
-    informeDoc.update(informe);
+    this.afs
+      .collection('informes')
+      .doc(informe.id)
+      .update(informe)
+      .then(() => {
+        console.log('Informe actualizado correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al actualizar el informe: ', error);
+      });
   }
 
   addInforme(informe: InformeInterface) {

@@ -9,6 +9,7 @@ import { CreateUserComponent } from './components/create-user/create-user.compon
 
 import { ReportsComponent } from './components/reports/reports.component';
 import { ReportCreateComponent } from './components/report-create/report-create.component';
+import { ReportEditComponent } from './components/report-edit/report-edit.component';
 
 const routes: Routes = [
   {
@@ -33,7 +34,7 @@ const routes: Routes = [
       },
       {
         path: 'reports/edit/:id',
-        component: EditUserComponent,
+        component: ReportEditComponent,
       },
       {
         path: 'reports/create',
