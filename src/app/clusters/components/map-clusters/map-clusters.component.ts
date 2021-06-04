@@ -485,8 +485,11 @@ export class MapClustersComponent implements OnInit {
           this.puntoTrayectoriaSelected = undefined;
         } else {
           this.setClusterStyle(clusterId, true);
-
           this.clustersService.clusterSelected = this.clusters.find((cluster) => cluster.id === clusterId);
+
+          // quitamos el punto seleccionado y le reseteamos el estilo
+          this.setPuntosStyle(this.puntoTrayectoriaSelected.id, false);
+          this.puntoTrayectoriaSelected = undefined;
         }
 
         this.puntoClusterHovered = undefined;
