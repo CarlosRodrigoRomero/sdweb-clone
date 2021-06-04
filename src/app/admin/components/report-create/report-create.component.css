@@ -3,10 +3,19 @@
 }
 
 .example-form {
-  min-width: 150px;
   width: 100%;
 }
 
 mat-card {
-  width: 100%;
+  width: min-content;
+}
+
+mat-card-content {
+  display: grid;
+}
+
+.btns-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
 }
