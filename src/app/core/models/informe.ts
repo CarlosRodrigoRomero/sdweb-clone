@@ -27,4 +27,6 @@ export interface InformeInterface {
   carpetaJpgGray?: string;
   pc_pct?: number;
   vueloId?: string;
+  vientoVelocidad?: number;
+  vientoDireccion?: number;
 }

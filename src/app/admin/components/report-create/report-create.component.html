@@ -1,5 +1,5 @@
 <div class="create-user">
-  <h3>Crear informe</h3>
+  <h4>Crear informe</h4>
 
   <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
     <mat-card>
@@ -22,7 +22,7 @@
 
         <mat-form-field class="example-full-width">
           <mat-label>Nubosidad</mat-label>
-          <input matInput formControlName="nubosidad" type="number" min="0" max="1" step="0.01" />
+          <input matInput formControlName="nubosidad" type="number" min="1" max="8" step="1" />
           <span matSuffix>octas</span>
         </mat-form-field>
 
@@ -46,7 +46,7 @@
 
         <mat-form-field class="example-full-width">
           <mat-label>Dirección viento</mat-label>
-          <input matInput formControlName="vientoVelocidad" type="number" min="0" max="360" />
+          <input matInput formControlName="vientoDireccion" type="number" min="0" max="360" />
           <span matSuffix>º</span>
         </mat-form-field>
 
@@ -56,15 +56,15 @@
           <span matSuffix>ºC</span>
         </mat-form-field>
 
-        <!-- <mat-form-field appearance="fill">
-          <mat-label>Tipo de usuario</mat-label>
-          <mat-select formControlName="role">
-            <mat-option value="0">Usuario</mat-option>
-            <mat-option value="1">Administrador</mat-option>
-            <mat-option value="2">Externo</mat-option>
-            <mat-option value="3">Procesamiento</mat-option>
+        <mat-form-field appearance="fill">
+          <mat-label>Planta</mat-label>
+          <mat-select #singleSelect [formControl]="plantaCtrl" placeholder="Planta">
+            <mat-option>
+              <ngx-mat-select-search [formControl]="plantaFilterCtrl"></ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let planta of filteredPlantas | async" [value]="planta">{{ planta.nombre }}</mat-option>
           </mat-select>
-        </mat-form-field> -->
+        </mat-form-field>
       </mat-card-content>
       <mat-card-actions>
         <button mat-raised-button routerLink="../../">Cancelar</button>
