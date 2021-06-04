@@ -27,3 +27,9 @@ mat-spinner {
 .mat-form-field {
   margin-top: 16px;
 }
+
+.cluster-id {
+  margin: 1rem 1rem 0;
+  font-weight: 500;
+  font-size: small;
+}

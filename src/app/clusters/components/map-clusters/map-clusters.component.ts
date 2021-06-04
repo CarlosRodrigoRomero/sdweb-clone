@@ -481,6 +481,8 @@ export class MapClustersComponent implements OnInit {
           this.clustersService.joinActive = false;
 
           this.clustersService.clusterSelected = undefined;
+
+          this.puntoTrayectoriaSelected = undefined;
         } else {
           this.setClusterStyle(clusterId, true);
 

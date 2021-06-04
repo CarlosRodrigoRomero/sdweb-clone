@@ -5,6 +5,7 @@
     <div class="left-bar">
       <h4>{{ nombrePlanta }}</h4>
       <app-image-point-cluster></app-image-point-cluster>
+      <span class="cluster-id" *ngIf="clusterSelected">Cluster seleccionado: {{ clusterSelected.id }}</span>
       <app-clusters-control></app-clusters-control>
     </div>
     <app-map-clusters></app-map-clusters>
