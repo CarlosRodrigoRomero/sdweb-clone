@@ -18,6 +18,7 @@ const routes: Routes = [
     path: '',
     component: AdminComponent,
     children: [
+      { path: '', redirectTo: 'reports', pathMatch: 'full' },
       {
         path: 'users',
         component: UsersComponent,

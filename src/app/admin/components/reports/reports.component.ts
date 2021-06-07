@@ -3,12 +3,15 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
-import { InformeService } from '@core/services/informe.service';
+import { switchMap } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
 
+import { InformeService } from '@core/services/informe.service';
+import { ThermalService } from '@core/services/thermal.service';
 import { PlantaService } from '@core/services/planta.service';
+
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
-import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-reports',
@@ -23,7 +26,11 @@ export class ReportsComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private informeService: InformeService, private plantaService: PlantaService) {}
+  constructor(
+    private informeService: InformeService,
+    private plantaService: PlantaService,
+    private thermalService: ThermalService
+  ) {}
 
   ngOnInit(): void {
     this.plantaService
@@ -31,18 +38,27 @@ export class ReportsComponent implements OnInit, AfterViewInit {
       .pipe(
         switchMap((plantas) => {
           this.plantas = plantas;
-          return this.informeService.getInformes();
+
+          return combineLatest([this.informeService.getInformes(), this.thermalService.getThermalLayers()]);
         })
       )
-      .subscribe((informes) => {
+      .subscribe(([informes, thermalLayers]) => {
         const dataInformes: any[] = [];
         informes.forEach((informe) => {
           const planta: PlantaInterface = this.plantas.find((pl) => pl.id === informe.plantaId);
+
+          // comprobamos si existe la capa termica del informe
+          let thermalLayerPending = true;
+          if (thermalLayers.map((tL) => tL.informeId).includes(informe.id)) {
+            thermalLayerPending = false;
+          }
+
           dataInformes.push({
             planta: planta.nombre,
             fecha: informe.fecha,
             informeId: informe.id,
             potencia: planta.potencia,
+            thermalLayerPending,
           });
         });
         this.dataSource.data = dataInformes;
