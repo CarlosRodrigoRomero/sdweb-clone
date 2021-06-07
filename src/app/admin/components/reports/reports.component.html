@@ -40,9 +40,15 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef>Acciones</th>
       <td mat-cell *matCellDef="let element">
-        <button mat-button [routerLink]="['../reports/edit', element.informeId]">Editar</button>
+        <button mat-icon-button [routerLink]="['./edit', element.informeId]">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-button [routerLink]="['../../clusters', element.informeId]">Clusters</button>
+        <button mat-button [routerLink]="['../../structures', element.informeId]">Estructuras</button>
+        <button mat-button [routerLink]="['../../classification', element.informeId]">Clasificación</button>
         <button mat-button *ngIf="element.thermalLayerPending" [routerLink]="['../thermalLayer', element.informeId]">
-          Crear ThermalLayer
+          <mat-icon>add</mat-icon>
+          <span>Thermal</span>
         </button>
       </td>
     </ng-container>

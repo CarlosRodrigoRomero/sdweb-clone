@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import { Feature } from 'ol';
@@ -9,6 +9,7 @@ import { Fill, Stroke, Style } from 'ol/style';
 import { GLOBAL } from './global';
 import { AuthService } from '@core/services/auth.service';
 import { PlantaService } from '@core/services/planta.service';
+import { InformeService } from '@core/services/informe.service';
 
 import { PlantaInterface } from '@core/models/planta';
 
@@ -20,6 +21,7 @@ export class PortfolioControlService {
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _plantaHover: PlantaInterface = undefined;
   public plantaHover$ = new BehaviorSubject<PlantaInterface>(this._plantaHover);
+  public maePlantas: number[] = [];
   private _maeMedio: number = undefined;
   public maeMedio$ = new BehaviorSubject<number>(this._maeMedio);
   private _maeSigma: number = undefined;
@@ -29,34 +31,52 @@ export class PortfolioControlService {
   public listaPlantas: PlantaInterface[] = [];
   public allFeatures: Feature[] = [];
 
-  constructor(public auth: AuthService, private plantaService: PlantaService) {}
+  constructor(public auth: AuthService, private plantaService: PlantaService, private informeService: InformeService) {}
 
   public initService(): Observable<boolean> {
-    this.auth.user$.pipe(switchMap((user) => this.plantaService.getPlantasDeEmpresa(user))).subscribe((plantas) => {
-      // evitamos que cargue solo una planta al vovler atrás desde el informe
-      if (plantas.length > 1) {
-        plantas.forEach((planta) => {
-          if (planta.informes !== undefined && planta.informes.length > 0) {
-            const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
-            // comprobamos que el informe tiene "mae"
-            if (mae !== undefined) {
-              this.listaPlantas.push(planta);
+    this.auth.user$
+      .pipe(
+        switchMap((user) =>
+          combineLatest([this.plantaService.getPlantasDeEmpresa(user), this.informeService.getInformes()])
+        )
+      )
+      .subscribe(([plantas, informes]) => {
+        // evitamos que cargue solo una planta al vovler atrás desde el informe
+        if (plantas.length > 1) {
+          plantas.forEach((planta) => {
+            // obtenemos la plantas que tiene informes dentro de su interface
+            if (planta.informes !== undefined && planta.informes.length > 0) {
+              const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+              // comprobamos que el informe tiene "mae"
+              if (mae !== undefined) {
+                this.listaPlantas.push(planta);
+                this.maePlantas.push(mae);
 
-              this.numPlantas++;
-              this.potenciaTotal += planta.potencia;
+                this.numPlantas++;
+                this.potenciaTotal += planta.potencia;
+              }
+              // añadimos tb aquellas plantas que tienen informes pero no estan incluidos dentro de su interface
+            } else if (informes.map((inf) => inf.plantaId).includes(planta.id)) {
+              const informe = informes.find((inf) => inf.plantaId === planta.id);
+
+              // comprobamos que el informe tiene "mae"
+              if (informe.mae !== undefined) {
+                this.listaPlantas.push(planta);
+                this.maePlantas.push(informe.mae);
+
+                this.numPlantas++;
+                this.potenciaTotal += planta.potencia;
+              }
             }
-          }
-        });
-        const maePlantas = this.listaPlantas.map(
-          (planta) => planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae
-        );
-        this.maeMedio = this.average(maePlantas);
-        // this.maeSigma = this.standardDeviation(maePlantas);
-        this.maeSigma = this.standardDeviation(maePlantas) / 3; // DEMO
+          });
 
-        this.initialized$.next(true);
-      }
-    });
+          this.maeMedio = this.average(this.maePlantas);
+          // this.maeSigma = this.standardDeviation(this.maePlantas);
+          this.maeSigma = this.standardDeviation(this.maePlantas) / 3; // DEMO
+
+          this.initialized$.next(true);
+        }
+      });
 
     return this.initialized$;
   }

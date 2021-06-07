@@ -61,7 +61,17 @@ export class ReportsComponent implements OnInit, AfterViewInit {
             thermalLayerPending,
           });
         });
-        this.dataSource.data = dataInformes;
+
+        // ordenamos la planta de inicio por el nombre de la planta
+        this.dataSource.data = dataInformes.sort((a, b) => {
+          if (a.planta < b.planta) {
+            return -1;
+          }
+          if (a.planta > b.planta) {
+            return 1;
+          }
+          return 0;
+        });
       });
   }
 

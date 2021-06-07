@@ -25,7 +25,7 @@
     <mat-icon>keyboard_arrow_down</mat-icon>
   </button>
   <mat-menu #menu="matMenu">
-    <button *ngIf="isAdmin" mat-menu-item routerLink="/admin/users">Admin</button>
+    <button *ngIf="isAdmin" mat-menu-item routerLink="/admin">Admin</button>
     <button mat-menu-item (click)="signOut()" routerLink="../auth">
       <strong> Cerrar sesión </strong>
     </button>

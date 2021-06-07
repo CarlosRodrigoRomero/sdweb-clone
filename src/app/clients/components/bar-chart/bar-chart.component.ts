@@ -46,6 +46,7 @@ export class BarChartComponent implements OnInit {
   public coloresChart = Array<string>();
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
+  private maePlantas: number[] = [];
   private maeMedio: number;
   private maeSigma: number;
   public dataLoaded = false;
@@ -61,11 +62,12 @@ export class BarChartComponent implements OnInit {
 
   ngOnInit(): void {
     this.plantas = this.portfolioControlService.listaPlantas;
+    this.maePlantas = this.portfolioControlService.maePlantas;
     this.maeMedio = this.portfolioControlService.maeMedio;
     this.maeSigma = this.portfolioControlService.maeSigma;
 
     this.plantas.forEach((planta, index) => {
-      const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+      const mae = this.maePlantas[index];
       if (mae !== undefined) {
         this.data.push(Math.round(10 * mae) / 10);
         // añadimos al array de ids

@@ -15,6 +15,7 @@ import { Fill, Stroke, Style } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
 import { Coordinate } from 'ol/coordinate';
 import { DoubleClickZoom } from 'ol/interaction';
+import { OSM } from 'ol/source';
 
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
@@ -73,25 +74,32 @@ export class MapClassificationComponent implements OnInit {
       .getThermalLayer$(informeId)
       .pipe(take(1))
       .subscribe((layers) => {
-        // nos suscribimos a las capas termicas del mapa
-        this.olMapService.getThermalLayers().subscribe((tLayers) => (this.thermalLayers = tLayers));
+        // comprobamos si existe la thermalLayer
+        /* if (layers.length > 0) {
+          // nos suscribimos a las capas termicas del mapa
+          this.olMapService.getThermalLayers().subscribe((tLayers) => (this.thermalLayers = tLayers));
 
-        // esta es la thermalLayer de la DB
-        this.thermalLayer = layers[0];
+          // esta es la thermalLayer de la DB
+          this.thermalLayer = layers[0];
 
-        this.olMapService.addThermalLayer(this.createThermalLayer(this.thermalLayer, informeId));
+          this.olMapService.addThermalLayer(this.createThermalLayer(this.thermalLayer, informeId));
+
+          this.initMap();
+
+          this.createNormModLayer();
+          this.addNormModules();
+
+          this.addPopupOverlay();
+
+          this.addPointerOnHover();
+          this.addOnHoverAction();
+          this.addOnDoubleClickInteraction();
+          this.addClickOutFeatures();
+        } else {
+          this.initMap();
+        } */
 
         this.initMap();
-
-        this.createNormModLayer();
-        this.addNormModules();
-
-        this.addPopupOverlay();
-
-        this.addPointerOnHover();
-        this.addOnHoverAction();
-        this.addOnDoubleClickInteraction();
-        this.addClickOutFeatures();
       });
   }
 
@@ -121,16 +129,20 @@ export class MapClassificationComponent implements OnInit {
   }
 
   initMap() {
-    const satellite = new XYZ({
+    /* const satellite = new XYZ({
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       crossOrigin: '',
     });
     const satelliteLayer = new TileLayer({
       source: satellite,
+    }); */
+
+    const osmLayer = new TileLayer({
+      source: new OSM(),
     });
 
     const aerial = new XYZ({
-      url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
+      urls: ['http://solardrontech.es/tileserver.php?/index.json?/N2D57LNHwMwTXOXKZaGb_visual/{z}/{x}/{y}.png'],
       crossOrigin: '',
     });
 
@@ -138,15 +150,18 @@ export class MapClassificationComponent implements OnInit {
       source: aerial,
     });
 
-    const layers = [satelliteLayer, ...this.thermalLayers];
+    let layers = [osmLayer, aerialLayer];
+    // añadimos la capa termica si existe
+    if (this.thermalLayers !== undefined) {
+      layers = [...layers, ...this.thermalLayers];
+    }
 
     // MAPA
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
-      // zoom: 18,
       zoom: this.planta.zoom,
-      minZoom: this.planta.zoom,
-      maxZoom: this.planta.zoom + 5,
+      minZoom: this.planta.zoom - 2,
+      maxZoom: this.planta.zoom + 8,
     });
 
     this.olMapService
