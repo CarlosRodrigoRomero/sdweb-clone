@@ -7,11 +7,11 @@ import { AdminService } from '@core/services/admin.service';
 import { UserInterface } from '@core/models/user';
 
 @Component({
-  selector: 'app-edit-user',
-  templateUrl: './edit-user.component.html',
-  styleUrls: ['./edit-user.component.css'],
+  selector: 'app-user-edit',
+  templateUrl: './user-edit.component.html',
+  styleUrls: ['./user-edit.component.css'],
 })
-export class EditUserComponent implements OnInit {
+export class UserEditComponent implements OnInit {
   form: FormGroup;
   emailVerified: boolean;
   id: string;

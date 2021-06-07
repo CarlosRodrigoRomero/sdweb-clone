@@ -4,8 +4,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { AdminComponent } from './components/admin.component';
 
 import { UsersComponent } from './components/users/users.component';
-import { EditUserComponent } from './components/edit-user/edit-user.component';
-import { CreateUserComponent } from './components/create-user/create-user.component';
+import { UserEditComponent } from './components/user-edit/user-edit.component';
+import { UserCreateComponent } from './components/user-create/user-create.component';
 
 import { ReportsComponent } from './components/reports/reports.component';
 import { ReportCreateComponent } from './components/report-create/report-create.component';
@@ -25,11 +25,11 @@ const routes: Routes = [
       },
       {
         path: 'users/edit/:id',
-        component: EditUserComponent,
+        component: UserEditComponent,
       },
       {
         path: 'users/create',
-        component: CreateUserComponent,
+        component: UserCreateComponent,
       },
       {
         path: 'reports',

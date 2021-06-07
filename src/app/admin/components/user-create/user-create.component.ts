@@ -8,11 +8,11 @@ import { AuthService } from '@core/services/auth.service';
 import { UserInterface } from '@core/models/user';
 
 @Component({
-  selector: 'app-create-user',
-  templateUrl: './create-user.component.html',
-  styleUrls: ['./create-user.component.css'],
+  selector: 'app-user-create',
+  templateUrl: './user-create.component.html',
+  styleUrls: ['./user-create.component.css'],
 })
-export class CreateUserComponent implements OnInit {
+export class UserCreateComponent implements OnInit {
   form: FormGroup;
   user: UserInterface = {};
 
