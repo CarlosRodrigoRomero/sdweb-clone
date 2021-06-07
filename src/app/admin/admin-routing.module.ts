@@ -11,6 +11,8 @@ import { ReportsComponent } from './components/reports/reports.component';
 import { ReportCreateComponent } from './components/report-create/report-create.component';
 import { ReportEditComponent } from './components/report-edit/report-edit.component';
 
+import { ThermalLayerCreateComponent } from './components/thermal-layer-create/thermal-layer-create.component';
+
 const routes: Routes = [
   {
     path: '',
@@ -39,6 +41,10 @@ const routes: Routes = [
       {
         path: 'reports/create',
         component: ReportCreateComponent,
+      },
+      {
+        path: 'thermalLayer/:id',
+        component: ThermalLayerCreateComponent,
       },
     ],
   },

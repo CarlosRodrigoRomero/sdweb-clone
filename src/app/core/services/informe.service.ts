@@ -228,6 +228,19 @@ export class InformeService {
     return this.informe;
   }
 
+  addThermalLayer(thermalLayer: ThermalLayerInterface) {
+    this.afs
+      .collection('thermalLayers')
+      .doc(thermalLayer.id)
+      .set(thermalLayer)
+      .then((docRef) => {
+        console.log('ThermalLayer creada correctamente');
+      })
+      .catch((error) => {
+        console.error('Error creando thermalLayer: ', error);
+      });
+  }
+
   getThermalLayer$(informeId: string): Observable<ThermalLayerInterface[]> {
     const query$ = this.afs
       .collection<ThermalLayerInterface>('thermalLayers', (ref) => ref.where('informeId', '==', informeId))

@@ -1,0 +1,44 @@
+<div class="create-thermal">
+  <h4>Crear Thermal Layer</h4>
+
+  <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
+    <mat-card>
+      <div class="row-info">
+        <span>ID: </span>
+        <span>{{ informe.id }}</span>
+      </div>
+      <div class="row-info">
+        <span>Informe ID: </span>
+        <span>{{ informe.id }}</span>
+      </div>
+      <div class="row-info">
+        <span>Planta ID: </span>
+        <span>{{ informe.plantaId }}</span>
+      </div>
+
+      <mat-card-content>
+        <mat-form-field class="example-full-width">
+          <mat-label>GisName</mat-label>
+          <input matInput formControlName="gisName" />
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Rango Temperatura Mínima</mat-label>
+          <input matInput formControlName="rangeTempMin" type="number" />
+          <span matSuffix>ºC</span>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Rango Temperatura Mínima</mat-label>
+          <input matInput formControlName="rangeTempMax" type="number" />
+          <span matSuffix>ºC</span>
+        </mat-form-field>
+
+        <div class="btns-actions">
+          <button mat-raised-button routerLink="../../">Cancelar</button>
+          <button mat-raised-button color="warn" type="submit">Crear</button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </form>
+</div>

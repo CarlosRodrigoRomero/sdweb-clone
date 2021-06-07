@@ -41,6 +41,7 @@
       <th mat-header-cell *matHeaderCellDef>Acciones</th>
       <td mat-cell *matCellDef="let element">
         <button mat-button [routerLink]="['../reports/edit', element.informeId]">Editar</button>
+        <button mat-button [routerLink]="['../thermalLayer', element.informeId]">Thermal</button>
       </td>
     </ng-container>
   </table>
