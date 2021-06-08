@@ -151,11 +151,7 @@ export class MapClassificationComponent implements OnInit {
       source: aerial,
     });
 
-    let layers = [osmLayer, aerialLayer];
-    // añadimos la capa termica si existe
-    if (this.thermalLayers !== undefined) {
-      layers = [...layers, ...this.thermalLayers];
-    }
+    const layers = [osmLayer, aerialLayer, ...this.thermalLayers];
 
     // MAPA
     const view = new View({

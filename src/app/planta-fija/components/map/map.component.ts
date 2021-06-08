@@ -160,9 +160,12 @@ export class MapComponent implements OnInit, OnDestroy {
           imageTile.getImage().src = src;
         },
       }),
-
-      extent: this.extent1,
     });
+    // solo lo aplicamos a la planta DEMO
+    if (this.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+      tl.setExtent(this.extent1);
+    }
+
     tl.setProperties({
       informeId,
     });
@@ -190,35 +193,48 @@ export class MapComponent implements OnInit, OnDestroy {
     });
     const satelliteLayer = new TileLayer({
       source: satellite,
-      // extent: this.extent1,
     });
 
     const aerial = new XYZ({
-      url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
+      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInformeId + '_visual/{z}/{x}/{y}.png',
       crossOrigin: '',
     });
 
     this.aerialLayer = new TileLayer({
       source: aerial,
-      extent: this.extent1,
     });
+    // solo lo aplicamos a la planta DEMO
+    if (this.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+      this.aerialLayer.setExtent(this.extent1);
+    }
+
     const osmLayer = new TileLayer({
       source: new OSM(),
-      // extent: this.extent1,
     });
 
     // const layers = [satelliteLayer];
     const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers];
 
     // MAPA
-    const view = new View({
-      center: fromLonLat([this.planta.longitud, this.planta.latitud]),
-      // zoom: 18,
-      zoom: this.planta.zoom,
-      maxZoom: 24,
-      // para la demo
-      extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
-    });
+    let view: View;
+
+    if (this.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+      // solo lo aplicamos a la planta DEMO
+      view = new View({
+        center: fromLonLat([this.planta.longitud, this.planta.latitud]),
+        zoom: 18,
+        minZoom: 16,
+        maxZoom: 24,
+        extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
+      });
+    } else {
+      view = new View({
+        center: fromLonLat([this.planta.longitud, this.planta.latitud]),
+        zoom: this.planta.zoom,
+        minZoom: this.planta.zoom - 2,
+        maxZoom: this.planta.zoom + 8,
+      });
+    }
 
     this.subscriptions.add(
       this.olMapService
