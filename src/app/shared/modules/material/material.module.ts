@@ -2,12 +2,13 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-//Angular Material Components
+// Angular Material Components
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
@@ -48,6 +49,7 @@ import { MatRangeSliderComponent } from './components/mat-range-slider/mat-range
     MatInputModule,
     MatAutocompleteModule,
     MatDatepickerModule,
+    MatMomentDateModule,
     MatFormFieldModule,
     MatRadioModule,
     MatSelectModule,
@@ -81,6 +83,7 @@ import { MatRangeSliderComponent } from './components/mat-range-slider/mat-range
     MatInputModule,
     MatAutocompleteModule,
     MatDatepickerModule,
+    MatMomentDateModule,
     MatFormFieldModule,
     MatRadioModule,
     MatSelectModule,

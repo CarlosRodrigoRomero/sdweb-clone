@@ -14,40 +14,47 @@
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field class="example-full-width">
+        <mat-form-field>
+          <mat-label>Fecha</mat-label>
+          <input matInput formControlName="fecha" [matDatepicker]="myDatepicker" />
+          <mat-datepicker-toggle [for]="myDatepicker" matSuffix></mat-datepicker-toggle>
+          <mat-datepicker #myDatepicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field>
           <mat-label>Temperatura Ambiente</mat-label>
           <input matInput formControlName="temperatura" type="number" step="1" />
           <span matSuffix>ºC</span>
         </mat-form-field>
 
-        <mat-form-field class="example-full-width">
+        <mat-form-field>
           <mat-label>Temperatura Reflejada</mat-label>
           <input matInput formControlName="tempReflejada" type="number" />
           <span matSuffix>ºC</span>
         </mat-form-field>
 
-        <mat-form-field class="example-full-width">
+        <mat-form-field>
           <mat-label>Emisividad</mat-label>
           <input matInput formControlName="emisividad" type="number" min="0" max="1" step="0.01" />
         </mat-form-field>
 
-        <mat-form-field class="example-full-width">
+        <mat-form-field>
           <mat-label>Humedad relativa</mat-label>
           <input matInput formControlName="humedadRelativa" type="number" min="0" max="1" step="0.01" />
         </mat-form-field>
 
-        <mat-form-field class="example-full-width">
+        <mat-form-field>
           <mat-label>Nubosidad</mat-label>
           <input matInput formControlName="nubosidad" type="number" min="0" max="8" step="1" />
           <span matSuffix>octas</span>
         </mat-form-field>
 
-        <mat-form-field class="example-full-width">
+        <mat-form-field>
           <mat-label>GSD</mat-label>
           <input matInput formControlName="gsd" type="number" />
         </mat-form-field>
 
-        <mat-form-field class="example-full-width">
+        <mat-form-field>
           <mat-label>Corrección Hora SRT</mat-label>
           <input matInput formControlName="correccHoraSrt" type="number" />
         </mat-form-field>
@@ -58,7 +65,7 @@
           <span matSuffix>km/h</span>
         </mat-form-field>
 
-        <mat-form-field class="example-full-width">
+        <mat-form-field>
           <mat-label>Dirección viento</mat-label>
           <input matInput formControlName="vientoDireccion" type="number" min="0" max="360" />
           <span matSuffix>º</span>
@@ -71,7 +78,6 @@
           <button mat-raised-button color="warn" type="submit">Crear</button>
         </div>
       </mat-card-content>
-
     </mat-card>
   </form>
 </div>
