@@ -32,7 +32,12 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
   }
 
   onChangeSlider(e: MatSliderChange) {
-    const filtroArea = new ModuloBrutoFilter('areaM', e.value);
+    const filtroArea = new ModuloBrutoFilter(
+      'areaM',
+      e.value,
+      this.structuresService.areaAverage,
+      this.structuresService.areaStdDev
+    );
 
     if (e.value === this.min) {
       // si se selecciona el mínimo desactivamos el filtro ...

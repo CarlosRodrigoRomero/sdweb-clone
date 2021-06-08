@@ -200,7 +200,17 @@ export class MapStructuresComponent implements OnInit {
   private addModulosBrutos() {
     this.structuresService
       .getModulosBrutos()
-      .pipe(switchMap((modulos) => this.filterService.initService(this.planta.id, true, modulos)))
+      .pipe(
+        switchMap((modulos) => {
+          // asignamos todos los modulos
+          this.structuresService.allRawModules = modulos;
+
+          // calculamos las medias y desviaciones
+          this.structuresService.setAveragesAndStandardDeviations();
+
+          return this.filterService.initService(this.planta.id, true, modulos);
+        })
+      )
       .subscribe((init) => {
         if (init) {
           const mBLayer = this.map

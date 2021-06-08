@@ -33,7 +33,12 @@ export class ConfianzaFilterComponent implements OnInit {
 
   onChangeSlider(e: MatSliderChange) {
     // crea el filtro
-    const filtroConfianza = new ModuloBrutoFilter('confianzaM', e.value);
+    const filtroConfianza = new ModuloBrutoFilter(
+      'confianzaM',
+      e.value,
+      this.structuresService.confianzaAverage,
+      this.structuresService.confianzaStdDev
+    );
 
     if (e.value === this.min) {
       // si se selecciona el mínimo desactivamos el filtro ...

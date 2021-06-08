@@ -33,7 +33,12 @@ export class AspectRatioFilterComponent implements OnInit {
 
   onChangeSlider(e: MatSliderChange) {
     // crea el filtro
-    const filtroAspectRatio = new ModuloBrutoFilter('aspectRatioM', e.value);
+    const filtroAspectRatio = new ModuloBrutoFilter(
+      'aspectRatioM',
+      e.value,
+      this.structuresService.aspectRatioAverage,
+      this.structuresService.aspectRatioStdDev
+    );
 
     if (e.value === this.min) {
       // si se selecciona el mínimo desactivamos el filtro ...
