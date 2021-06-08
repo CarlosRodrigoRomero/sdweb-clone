@@ -62,16 +62,8 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
             });
           });
 
-          // ordenamos la planta de inicio por el nombre de la planta
-          this.dataSource.data = dataInformes.sort((a, b) => {
-            if (a.planta < b.planta) {
-              return -1;
-            }
-            if (a.planta > b.planta) {
-              return 1;
-            }
-            return 0;
-          });
+          // ordenamos los informes mostrandos los mas recientes
+          this.dataSource.data = dataInformes.sort((a, b) => b.fecha - a.fecha);
         })
     );
   }
@@ -83,12 +75,6 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
-
-  private unixToDate(unix: number): string {
-    const date = new Date(unix * 1000);
-
-    return date.toLocaleString().split(' ')[0];
   }
 
   ngOnDestroy(): void {
