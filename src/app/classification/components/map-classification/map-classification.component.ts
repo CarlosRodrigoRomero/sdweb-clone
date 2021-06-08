@@ -39,6 +39,7 @@ import { Anomalia } from '@core/models/anomalia';
 })
 export class MapClassificationComponent implements OnInit {
   private planta: PlantaInterface;
+  private informeId: string = undefined;
   private map: Map;
   private thermalLayer: ThermalLayerInterface;
   private thermalLayers: TileLayer[];
@@ -59,7 +60,7 @@ export class MapClassificationComponent implements OnInit {
   ngOnInit(): void {
     this.planta = this.classificationService.planta;
 
-    const informeId = this.classificationService.informeId;
+    this.informeId = this.classificationService.informeId;
 
     // nos conectamos a la lista de anomalias
     this.classificationService.listaAnomalias$.subscribe((lista) => {
@@ -71,18 +72,18 @@ export class MapClassificationComponent implements OnInit {
     });
 
     this.informeService
-      .getThermalLayer$(informeId)
+      .getThermalLayerDB$(this.informeId)
       .pipe(take(1))
       .subscribe((layers) => {
         // comprobamos si existe la thermalLayer
-        /* if (layers.length > 0) {
+        if (layers.length > 0) {
           // nos suscribimos a las capas termicas del mapa
           this.olMapService.getThermalLayers().subscribe((tLayers) => (this.thermalLayers = tLayers));
 
           // esta es la thermalLayer de la DB
           this.thermalLayer = layers[0];
 
-          this.olMapService.addThermalLayer(this.createThermalLayer(this.thermalLayer, informeId));
+          this.olMapService.addThermalLayer(this.createThermalLayer(this.thermalLayer, this.informeId));
 
           this.initMap();
 
@@ -97,9 +98,9 @@ export class MapClassificationComponent implements OnInit {
           this.addClickOutFeatures();
         } else {
           this.initMap();
-        } */
+        }
 
-        this.initMap();
+        // this.initMap();
       });
   }
 
@@ -142,7 +143,7 @@ export class MapClassificationComponent implements OnInit {
     });
 
     const aerial = new XYZ({
-      urls: ['http://solardrontech.es/tileserver.php?/index.json?/N2D57LNHwMwTXOXKZaGb_visual/{z}/{x}/{y}.png'],
+      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + this.informeId + '_visual/{z}/{x}/{y}.png',
       crossOrigin: '',
     });
 

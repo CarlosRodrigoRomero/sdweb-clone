@@ -241,7 +241,7 @@ export class InformeService {
       });
   }
 
-  getThermalLayer$(informeId: string): Observable<ThermalLayerInterface[]> {
+  getThermalLayerDB$(informeId: string): Observable<ThermalLayerInterface[]> {
     const query$ = this.afs
       .collection<ThermalLayerInterface>('thermalLayers', (ref) => ref.where('informeId', '==', informeId))
       .snapshotChanges()

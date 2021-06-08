@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 import { switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
@@ -14,6 +16,7 @@ import { Fill, Stroke, Style } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
 import { Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
+import { OSM, Source } from 'ol/source';
 
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
@@ -36,23 +39,26 @@ import { RawModule } from '@core/models/moduloBruto';
 })
 export class MapStructuresComponent implements OnInit {
   private planta: PlantaInterface;
+  private informeId: string = undefined;
   private map: Map;
   private satelliteLayer: TileLayer;
-  private aerialLayer: TileLayer;
   public thermalSource;
-  private thermalLayer: ThermalLayerInterface;
+  private thermalLayer: TileLayer = undefined;
+  private thermalLayerDB: ThermalLayerInterface;
   private thermalLayers: TileLayer[];
   private extent1: any;
   private modulosBrutos: RawModule[];
   private deleteMode = false;
   private mBDeletedIds: string[] = [];
+  private thermalNotExist$ = new BehaviorSubject<boolean>(true);
 
   constructor(
     private olMapService: OlMapService,
     private structuresService: StructuresService,
     private informeService: InformeService,
     private thermalService: ThermalService,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -65,19 +71,21 @@ export class MapStructuresComponent implements OnInit {
 
     this.structuresService.deletedRawModIds$.subscribe((ids) => (this.mBDeletedIds = ids));
 
-    const informeId = this.structuresService.informeId;
+    this.informeId = this.structuresService.informeId;
 
     this.informeService
-      .getThermalLayer$(informeId)
+      .getThermalLayerDB$(this.informeId)
       .pipe(take(1))
-      .subscribe((layers) => {
+      .subscribe((layersDB) => {
         // nos suscribimos a las capas termicas del mapa
         this.olMapService.getThermalLayers().subscribe((tLayers) => (this.thermalLayers = tLayers));
 
         // esta es la thermalLayer de la DB
-        this.thermalLayer = layers[0];
+        this.thermalLayerDB = layersDB[0];
 
-        this.olMapService.addThermalLayer(this.createThermalLayer(this.thermalLayer, informeId));
+        this.thermalLayer = this.createThermalLayer(this.thermalLayerDB, this.informeId);
+
+        this.olMapService.addThermalLayer(this.thermalLayer);
 
         this.initMap();
 
@@ -90,34 +98,40 @@ export class MapStructuresComponent implements OnInit {
   }
 
   initMap() {
-    const satellite = new XYZ({
+    /* const satellite = new XYZ({
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       crossOrigin: '',
     });
     this.satelliteLayer = new TileLayer({
       source: satellite,
+    }); */
+
+    const osmLayer = new TileLayer({
+      source: new OSM(),
     });
 
     const aerial = new XYZ({
-      url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
+      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + this.informeId + '_visual/{z}/{x}/{y}.png',
       crossOrigin: '',
     });
 
-    this.aerialLayer = new TileLayer({
+    const aerialLayer = new TileLayer({
       source: aerial,
     });
 
-    const layers = [this.satelliteLayer, ...this.thermalLayers];
+    const layers = [osmLayer, aerialLayer, ...this.thermalLayers];
+
+    // añadimos la capa termica si existe
+    /* if (this.thermalLayers !== undefined) {
+      layers = [...layers, ...this.thermalLayers];
+    } */
 
     // MAPA
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
-      // zoom: 18,
       zoom: this.planta.zoom,
-      minZoom: this.planta.zoom,
-      // maxZoom: this.planta.zoom + 3,
-      maxZoom: 24,
-      // extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
+      minZoom: this.planta.zoom - 2,
+      maxZoom: this.planta.zoom + 8,
     });
 
     this.olMapService
@@ -129,28 +143,42 @@ export class MapStructuresComponent implements OnInit {
   }
 
   private createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {
-    // Iniciar mapa térmico
-    const tl = new TileLayer({
-      source: new XYZ_mod({
-        url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',
-        crossOrigin: '',
-        tileClass: ImageTileMod,
-        transition: 255,
-        tileLoadFunction: (imageTile, src) => {
-          imageTile.rangeTempMax = thermalLayer.rangeTempMax;
-          imageTile.rangeTempMin = thermalLayer.rangeTempMin;
-          imageTile.thermalService = this.thermalService;
-          imageTile.getImage().src = src;
-        },
-      }),
+    console.log(this.thermalImageExists(GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png'));
 
-      // extent: this.extent1,
+    // Iniciar mapa térmico
+    const source = new XYZ_mod({
+      url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',
+      crossOrigin: '',
+      tileClass: ImageTileMod,
+      transition: 255,
+      tileLoadFunction: (imageTile, src) => {
+        imageTile.rangeTempMax = thermalLayer.rangeTempMax;
+        imageTile.rangeTempMin = thermalLayer.rangeTempMin;
+        imageTile.thermalService = this.thermalService;
+        imageTile.getImage().src = src;
+      },
     });
+
+    // source.on('tileloadend', () => this.thermalNotExist$.next(false));
+
+    const tl = new TileLayer({
+      source,
+    });
+
     tl.setProperties({
       informeId,
     });
 
     return tl;
+  }
+
+  private thermalImageExists(url: string): boolean {
+    const http = new XMLHttpRequest();
+
+    http.open('HEAD', url, false);
+    http.send();
+
+    return http.status !== 404;
   }
 
   private createModulosBrutosLayer() {

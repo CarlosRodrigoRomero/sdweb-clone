@@ -61,7 +61,7 @@ export class StructuresService {
         switchMap((planta) => {
           this.planta = planta;
 
-          return this.informeService.getThermalLayer$(this.informeId);
+          return this.informeService.getThermalLayerDB$(this.informeId);
         })
       )
       .subscribe((layers) => {
