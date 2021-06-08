@@ -15,7 +15,7 @@ import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 export class AspectRatioFilterComponent implements OnInit {
   min = 0;
   max = 1;
-  step = 0.1;
+  step = 0.01;
   value = 0;
 
   constructor(private filterService: FilterService, private structuresService: StructuresService) {}
@@ -41,6 +41,9 @@ export class AspectRatioFilterComponent implements OnInit {
 
       // eliminamos el filtro de la DB
       this.structuresService.deleteFilter('aspectRatioM');
+
+      // ponemos el label fuerza a 0
+      this.value = 0;
     } else {
       // ... si no, lo añadimos
       this.filterService.addFilter(filtroAspectRatio);
@@ -51,6 +54,6 @@ export class AspectRatioFilterComponent implements OnInit {
   }
 
   formatLabel(value: number) {
-    return value * 10;
+    return value * 100;
   }
 }

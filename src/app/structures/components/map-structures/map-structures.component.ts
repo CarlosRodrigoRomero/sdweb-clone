@@ -143,8 +143,6 @@ export class MapStructuresComponent implements OnInit {
   }
 
   private createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {
-    console.log(this.thermalImageExists(GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png'));
-
     // Iniciar mapa térmico
     const source = new XYZ_mod({
       url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',

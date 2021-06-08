@@ -15,7 +15,7 @@ import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 export class AreaModuloBrutoFilterComponent implements OnInit {
   min = 0;
   max = 1;
-  step = 0.1;
+  step = 0.01;
   value = 0;
 
   constructor(private filterService: FilterService, private structuresService: StructuresService) {}
@@ -40,6 +40,9 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
 
       // eliminamos el filtro de la DB
       this.structuresService.deleteFilter('areaM');
+
+      // ponemos el label fuerza a 0
+      this.value = 0;
     } else {
       // ... si no, lo añadimos
       this.filterService.addFilter(filtroArea);
@@ -50,6 +53,6 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
   }
 
   formatLabel(value: number) {
-    return value * 10;
+    return value * 100;
   }
 }

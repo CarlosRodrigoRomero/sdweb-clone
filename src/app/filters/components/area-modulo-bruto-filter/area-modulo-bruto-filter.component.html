@@ -1,7 +1,7 @@
 <div>
   <div class="title">
     <span>Area</span>
-    <span class="fuerza">Fuerza: {{ value * 10 }}</span>
+    <span class="fuerza">Fuerza: {{ value * 100 }}</span>
   </div>
 
   <mat-slider
@@ -12,6 +12,6 @@
     [max]="max"
     [min]="min"
     [step]="step"
-    (input)="onChangeSlider($event)"
+    (change)="onChangeSlider($event)"
   ></mat-slider>
 </div>
