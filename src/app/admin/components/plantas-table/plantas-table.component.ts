@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
@@ -9,14 +9,14 @@ import { PlantaService } from '@core/services/planta.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { UserInterface } from '@core/models/user';
-import { StringifyOptions } from 'querystring';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-plantas-table',
   templateUrl: './plantas-table.component.html',
   styleUrls: ['./plantas-table.component.css'],
 })
-export class PlantasTableComponent implements OnInit, AfterViewInit {
+export class PlantasTableComponent implements OnInit, AfterViewInit, OnDestroy {
   plantas: PlantaInterface[];
   displayedColumns: string[] = ['select', 'name', 'power', 'type', 'id'];
   dataSource = new MatTableDataSource<any>();
@@ -31,40 +31,44 @@ export class PlantasTableComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(private plantaService: PlantaService) {}
 
   ngOnInit(): void {
     // Guarda todas las plantas en un array local
-    this.plantaService.getAllPlantas().subscribe((plantas) => (this.plantas = plantas));
+    this.subscriptions.add(this.plantaService.getAllPlantas().subscribe((plantas) => (this.plantas = plantas)));
 
     // Filtra en un array los datos a mostrar en la tabla
     const plantasTable: any[] = [];
-    this.plantaService.getAllPlantas().subscribe((plantas) => {
-      plantas.filter((planta) => {
-        plantasTable.push({
-          name: planta.nombre,
-          power: planta.potencia,
-          type: planta.tipo,
-          id: planta.id,
-        });
-      });
-      this.dataSource.data = plantasTable;
-
-      if (this.user !== undefined) {
-        // Marca como seleccionadas las plantas del usuario
-        this.dataSource.data.forEach((row) => {
-          this.user.plantas.forEach((planta) => {
-            if (row.id === planta) {
-              this.selection.select(row);
-              this.plantasUserId.push(row.id);
-            }
+    this.subscriptions.add(
+      this.plantaService.getAllPlantas().subscribe((plantas) => {
+        plantas.filter((planta) => {
+          plantasTable.push({
+            name: planta.nombre,
+            power: planta.potencia,
+            type: planta.tipo,
+            id: planta.id,
           });
         });
+        this.dataSource.data = plantasTable;
 
-        // Inicializada los chips con las plantas del usuario
-        this.plantasUsuario();
-      }
-    });
+        if (this.user !== undefined) {
+          // Marca como seleccionadas las plantas del usuario
+          this.dataSource.data.forEach((row) => {
+            this.user.plantas.forEach((planta) => {
+              if (row.id === planta) {
+                this.selection.select(row);
+                this.plantasUserId.push(row.id);
+              }
+            });
+          });
+
+          // Inicializada los chips con las plantas del usuario
+          this.plantasUsuario();
+        }
+      })
+    );
   }
 
   ngAfterViewInit(): void {
@@ -99,5 +103,9 @@ export class PlantasTableComponent implements OnInit, AfterViewInit {
       }
     });
     this.newPlantasUser.emit(this.plantasUserId);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

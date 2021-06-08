@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { ReplaySubject, Subject } from 'rxjs';
+import { ReplaySubject, Subject, Subscription } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
 import { MatSelect } from '@angular/material/select';
@@ -24,6 +24,7 @@ export class ReportEditComponent implements OnInit, AfterViewInit, OnDestroy {
   informe: InformeInterface = {};
   plantaList: PlantaInterface[] = [];
   public filteredPlantas: ReplaySubject<PlantaInterface[]> = new ReplaySubject<PlantaInterface[]>(1);
+  private subscriptions: Subscription = new Subscription();
 
   /** control for the selected bank */
   public plantaCtrl: FormControl = new FormControl('', Validators.required);
@@ -50,11 +51,13 @@ export class ReportEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
     // traemos el informe seleccionado
-    this.informeService.getInforme(this.informeId).subscribe((informe) => {
-      this.informe = informe;
+    this.subscriptions.add(
+      this.informeService.getInforme(this.informeId).subscribe((informe) => {
+        this.informe = informe;
 
-      this.form.patchValue(this.informe);
-    });
+        this.form.patchValue(this.informe);
+      })
+    );
 
     this.plantaService
       .getAllPlantas()
@@ -157,5 +160,6 @@ export class ReportEditComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy() {
     this._onDestroy.next();
     this._onDestroy.complete();
+    this.subscriptions.unsubscribe();
   }
 }

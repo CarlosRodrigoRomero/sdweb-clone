@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+
+import { Subscription } from 'rxjs';
 
 import { InformeService } from '@core/services/informe.service';
 
@@ -12,10 +14,11 @@ import { ThermalLayerInterface } from '@core/models/thermalLayer';
   templateUrl: './thermal-layer-create.component.html',
   styleUrls: ['./thermal-layer-create.component.css'],
 })
-export class ThermalLayerCreateComponent implements OnInit {
+export class ThermalLayerCreateComponent implements OnInit, OnDestroy {
   form: FormGroup;
   private informeId: string = undefined;
   informe: InformeInterface = {};
+  private subscriptions: Subscription = new Subscription();
 
   constructor(private router: Router, private informeService: InformeService, private formBuilder: FormBuilder) {}
 
@@ -24,7 +27,9 @@ export class ThermalLayerCreateComponent implements OnInit {
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
     // traemos el informe seleccionado
-    this.informeService.getInforme(this.informeId).subscribe((informe) => (this.informe = informe));
+    this.subscriptions.add(
+      this.informeService.getInforme(this.informeId).subscribe((informe) => (this.informe = informe))
+    );
 
     this.buildForm();
   }
@@ -52,5 +57,9 @@ export class ThermalLayerCreateComponent implements OnInit {
       // Crea thermalLayer en la DB
       this.informeService.addThermalLayer(thermalLayer);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
