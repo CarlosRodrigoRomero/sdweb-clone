@@ -192,9 +192,6 @@ export class MapStructuresComponent implements OnInit {
           width: 2,
           color: 'white',
         }),
-        fill: new Fill({
-          color: 'rgba(0,0,0,0)',
-        }),
       }),
     });
 
