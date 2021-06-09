@@ -34,10 +34,18 @@ export class StructuresService {
   private _deleteMode = false;
   public deleteMode$ = new BehaviorSubject<boolean>(this._deleteMode);
   private _thermalLayer: ThermalLayerInterface;
-  private _loadModuleGroups = false;
-  public loadModuleGroups$ = new BehaviorSubject<boolean>(this._loadModuleGroups);
   private _deletedRawModIds: string[] = [];
   public deletedRawModIds$ = new BehaviorSubject<string[]>(this._deletedRawModIds);
+  private _loadModuleGroups = false;
+  public loadModuleGroups$ = new BehaviorSubject<boolean>(this._loadModuleGroups);
+  private _allRawModules: RawModule[] = [];
+  public allRawModules$ = new BehaviorSubject<RawModule[]>(this._allRawModules);
+  public areaAverage: number = undefined;
+  public areaStdDev: number = undefined;
+  public aspectRatioAverage: number = undefined;
+  public aspectRatioStdDev: number = undefined;
+  public confianzaAverage: number = undefined;
+  public confianzaStdDev: number = undefined;
 
   constructor(
     private router: Router,
@@ -70,6 +78,45 @@ export class StructuresService {
         this.initialized$.next(true);
       });
     return this.initialized$;
+  }
+
+  public setAveragesAndStandardDeviations() {
+    const areas = this.allRawModules.map((module) => module.area);
+    this.areaAverage = this.average(areas);
+    this.areaStdDev = this.standardDeviation(areas);
+
+    const aspectRatios = this.allRawModules.map((module) => module.aspectRatio);
+    this.aspectRatioAverage = this.average(aspectRatios);
+    this.aspectRatioStdDev = this.standardDeviation(aspectRatios);
+
+    const confianzas = this.allRawModules.map((module) => module.confianza);
+    this.confianzaAverage = this.average(confianzas);
+    this.confianzaStdDev = this.standardDeviation(confianzas);
+  }
+
+  private average(values) {
+    const sum = values.reduce((s, value) => s + value, 0);
+
+    const avg = sum / values.length;
+
+    return avg;
+  }
+
+  private standardDeviation(values) {
+    const avg = this.average(values);
+
+    const squareDiffs = values.map((value) => {
+      const diff = value - avg;
+      const sqrDiff = diff * diff;
+
+      return sqrDiff;
+    });
+
+    const avgSquareDiff = this.average(squareDiffs);
+
+    const stdDev = Math.sqrt(avgSquareDiff);
+
+    return stdDev;
   }
 
   getModulosBrutos(): Observable<RawModule[]> {
@@ -232,16 +279,26 @@ export class StructuresService {
   applyFilters(filters: FilterModuloBruto[]) {
     const filter = filters[0];
     if (filter.confianzaM !== undefined) {
-      const confianzaFilter = new ModuloBrutoFilter('confianzaM', filter.confianzaM);
+      const confianzaFilter = new ModuloBrutoFilter(
+        'confianzaM',
+        filter.confianzaM,
+        this.confianzaAverage,
+        this.confianzaStdDev
+      );
       this.filterService.addFilter(confianzaFilter);
     }
     if (filter.aspectRatioM !== undefined) {
-      const aspectRatioFilter = new ModuloBrutoFilter('aspectRatioM', filter.aspectRatioM);
+      const aspectRatioFilter = new ModuloBrutoFilter(
+        'aspectRatioM',
+        filter.aspectRatioM,
+        this.aspectRatioAverage,
+        this.aspectRatioStdDev
+      );
       this.filterService.addFilter(aspectRatioFilter);
     }
     if (filter.areaM !== undefined) {
       // usamos 'areaM' para diferenciarlo del filtro 'area'
-      const areaFilter = new ModuloBrutoFilter('areaM', filter.areaM);
+      const areaFilter = new ModuloBrutoFilter('areaM', filter.areaM, this.areaAverage, this.areaStdDev);
       this.filterService.addFilter(areaFilter);
     }
   }
@@ -320,6 +377,15 @@ export class StructuresService {
   set deleteMode(value: boolean) {
     this._deleteMode = value;
     this.deleteMode$.next(value);
+  }
+
+  get allRawModules() {
+    return this._allRawModules;
+  }
+
+  set allRawModules(value: RawModule[]) {
+    this._allRawModules = value;
+    this.allRawModules$.next(value);
   }
 
   get loadModuleGroups() {

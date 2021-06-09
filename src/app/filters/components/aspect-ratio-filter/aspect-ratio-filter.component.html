@@ -1,7 +1,7 @@
 <div>
   <div class="title">
     <span>Aspect Ratio</span>
-    <span class="fuerza">Fuerza: {{ value * 10 }}</span>
+    <span class="fuerza">Fuerza: {{ value }}</span>
   </div>
   <mat-slider
     class="aspect-ratio-slider"
@@ -11,6 +11,6 @@
     [max]="max"
     [min]="min"
     [step]="step"
-    (input)="onChangeSlider($event)"
+    (change)="onChangeSlider($event)"
   ></mat-slider>
 </div>

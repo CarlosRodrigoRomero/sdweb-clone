@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 
 import { ReplaySubject, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
@@ -37,7 +36,6 @@ export class ReportCreateComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private formBuilder: FormBuilder,
-    private router: Router,
     private informeService: InformeService,
     private plantaService: PlantaService
   ) {}
@@ -76,6 +74,7 @@ export class ReportCreateComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private buildForm() {
     this.form = this.formBuilder.group({
+      fecha: [, [Validators.required]],
       emisividad: [0.85, [Validators.required, Validators.min(0), Validators.max(1)]],
       temperatura: [, [Validators.required]],
       tempReflejada: [-30, [Validators.required]],
@@ -93,6 +92,7 @@ export class ReportCreateComponent implements OnInit, AfterViewInit, OnDestroy {
   onSubmit(event: Event) {
     event.preventDefault();
     if (this.form.valid) {
+      this.informe.fecha = this.form.get('fecha').value.unix();
       this.informe.emisividad = this.form.get('emisividad').value;
       this.informe.temperatura = this.form.get('temperatura').value;
       this.informe.tempReflejada = this.form.get('tempReflejada').value;
