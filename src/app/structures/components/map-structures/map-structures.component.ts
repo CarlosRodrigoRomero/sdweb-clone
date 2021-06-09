@@ -51,6 +51,7 @@ export class MapStructuresComponent implements OnInit {
   private deleteMode = false;
   private mBDeletedIds: string[] = [];
   private thermalNotExist$ = new BehaviorSubject<boolean>(true);
+  public layerVisibility = true;
 
   constructor(
     private olMapService: OlMapService,
@@ -110,6 +111,8 @@ export class MapStructuresComponent implements OnInit {
       source: new OSM(),
     });
 
+    osmLayer.setProperties({ name: 'osm' });
+
     const aerial = new XYZ({
       url: 'http://solardrontech.es/tileserver.php?/index.json?/' + this.informeId + '_visual/{z}/{x}/{y}.png',
       crossOrigin: '',
@@ -118,6 +121,8 @@ export class MapStructuresComponent implements OnInit {
     const aerialLayer = new TileLayer({
       source: aerial,
     });
+
+    aerialLayer.setProperties({ name: 'aerial' });
 
     const layers = [osmLayer, aerialLayer, ...this.thermalLayers];
 
@@ -317,6 +322,17 @@ export class MapStructuresComponent implements OnInit {
         }
       }
     });
+  }
+
+  setLayerVisibility() {
+    this.layerVisibility = !this.layerVisibility;
+    this.map
+      .getLayers()
+      .getArray()
+      .filter(
+        (layer) => layer.getProperties().id === undefined || layer.getProperties().id !== 'mBLayer'
+      )
+      .forEach((layer) => layer.setVisible(this.layerVisibility));
   }
 
   private transform(extent) {
