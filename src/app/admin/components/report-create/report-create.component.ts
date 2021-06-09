@@ -1,10 +1,9 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { ReplaySubject, Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 
-import { MatSelect } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { InformeService } from '@core/services/informe.service';
 import { PlantaService } from '@core/services/planta.service';
@@ -21,23 +20,14 @@ export class ReportCreateComponent implements OnInit /* , AfterViewInit, OnDestr
   form: FormGroup;
   informe: InformeInterface = {};
   plantaList: PlantaInterface[] = [];
-  public filteredPlantas: ReplaySubject<PlantaInterface[]> = new ReplaySubject<PlantaInterface[]>(1);
-
-  /** control for the selected bank */
-  public plantaCtrl: FormControl = new FormControl('', Validators.required);
-
-  /** control for the MatSelect filter keyword */
-  public plantaFilterCtrl: FormControl = new FormControl();
-
-  @ViewChild('singleSelect', { static: true }) singleSelect: MatSelect;
-
-  /** Subject that emits when the component has been destroyed. */
-  protected _onDestroy = new Subject<void>();
+  private plantaSelected: PlantaInterface;
+  reportCreated = false;
 
   constructor(
     private formBuilder: FormBuilder,
     private informeService: InformeService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private _snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -54,27 +44,13 @@ export class ReportCreateComponent implements OnInit /* , AfterViewInit, OnDestr
           }
           return 0;
         });
-        // this.plantaCtrl.setValue(this.plantaList);
-
-        // cargamos la lista inicial de plantas
-        // this.filteredPlantas.next(this.plantaList.slice());
       });
-
-    // escuchamos cuando se active el input de busqueda
-    /* this.plantaFilterCtrl.valueChanges.pipe(takeUntil(this._onDestroy)).subscribe(() => {
-      this.filterPlantas();
-    }); */
 
     this.buildForm();
   }
 
-  /* ngAfterViewInit() {
-    this.setInitialValue();
-  } */
-
   private buildForm() {
     this.form = this.formBuilder.group({
-      planta: [, [Validators.required]],
       fecha: [, [Validators.required]],
       emisividad: [0.85, [Validators.required, Validators.min(0), Validators.max(1)]],
       temperatura: [, [Validators.required]],
@@ -87,62 +63,41 @@ export class ReportCreateComponent implements OnInit /* , AfterViewInit, OnDestr
       vientoVelocidad: [, [Validators.required]],
       vientoDireccion: [, [Validators.required, Validators.min(0), Validators.max(360)]],
     });
-    // this.form.addControl('planta', this.plantaCtrl);
   }
 
   onSubmit(event: Event) {
-    event.preventDefault();
-    if (this.form.valid) {
-      this.informe.fecha = this.form.get('fecha').value.unix();
-      this.informe.emisividad = this.form.get('emisividad').value;
-      this.informe.temperatura = this.form.get('temperatura').value;
-      this.informe.tempReflejada = this.form.get('tempReflejada').value;
-      this.informe.humedadRelativa = this.form.get('humedadRelativa').value;
-      this.informe.nubosidad = this.form.get('nubosidad').value;
-      this.informe.gsd = this.form.get('gsd').value;
-      this.informe.correccHoraSrt = this.form.get('correccHoraSrt').value;
-      this.informe.disponible = this.form.get('disponible').value;
-      this.informe.vientoVelocidad = this.form.get('vientoVelocidad').value;
-      this.informe.vientoDireccion = this.form.get('vientoDireccion').value;
-      this.informe.plantaId = this.form.get('planta').value.id;
+    if (this.plantaSelected) {
+      event.preventDefault();
+      if (this.form.valid) {
+        this.informe.fecha = this.form.get('fecha').value.unix();
+        this.informe.emisividad = this.form.get('emisividad').value;
+        this.informe.temperatura = this.form.get('temperatura').value;
+        this.informe.tempReflejada = this.form.get('tempReflejada').value;
+        this.informe.humedadRelativa = this.form.get('humedadRelativa').value;
+        this.informe.nubosidad = this.form.get('nubosidad').value;
+        this.informe.gsd = this.form.get('gsd').value;
+        this.informe.correccHoraSrt = this.form.get('correccHoraSrt').value;
+        this.informe.disponible = this.form.get('disponible').value;
+        this.informe.vientoVelocidad = this.form.get('vientoVelocidad').value;
+        this.informe.vientoDireccion = this.form.get('vientoDireccion').value;
+        this.informe.plantaId = this.plantaSelected.id;
 
-      // Crea el informe en la DB
-      this.informeService.addInforme(this.informe);
+        // Crea el informe en la DB
+        this.informeService.addInforme(this.informe);
+
+        // aviso de informe creado correctamente
+        this.openSnackBar();
+
+        this.reportCreated = true;
+      }
     }
   }
 
-  /* protected setInitialValue() {
-    this.plantaService
-      .getAllPlantas()
-      .pipe(take(1), takeUntil(this._onDestroy))
-      .subscribe(() => {
-        // setting the compareWith property to a comparison function
-        // triggers initializing the selection according to the initial value of
-        // the form control (i.e. _initializeSelection())
-        // this needs to be done after the filteredBanks are loaded initially
-        // and after the mat-option elements are available
-        this.singleSelect.compareWith = (a: PlantaInterface, b: PlantaInterface) => a && b && a.id === b.id;
-      });
+  getElemSelected(element: any) {
+    this.plantaSelected = element;
   }
 
-  protected filterPlantas() {
-    if (!this.plantaList) {
-      return;
-    }
-    // get the search keyword
-    let search = this.plantaFilterCtrl.value;
-    if (!search) {
-      this.filteredPlantas.next(this.plantaList.slice());
-      return;
-    } else {
-      search = search.toLowerCase();
-    }
-    // filtramos las plantas
-    this.filteredPlantas.next(this.plantaList.filter((planta) => planta.nombre.toLowerCase().indexOf(search) > -1));
+  private openSnackBar() {
+    this._snackBar.open('Informe creado correctamente', 'OK', { duration: 2000 });
   }
-
-  ngOnDestroy() {
-    this._onDestroy.next();
-    this._onDestroy.complete();
-  } */
 }

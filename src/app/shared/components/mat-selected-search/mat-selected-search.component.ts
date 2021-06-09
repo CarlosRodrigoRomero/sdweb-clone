@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 
 import { MatSelect } from '@angular/material/select';
@@ -12,8 +12,9 @@ import { take, takeUntil } from 'rxjs/operators';
   styleUrls: ['./mat-selected-search.component.css'],
 })
 export class MatSelectedSearchComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() elems: any[];
-  @Input() data: string;
+  @Input() elements: any[];
+  @Input() elemSel: any;
+  @Input() property: string;
   @Input() title: string;
   // public elems: any[] = [];
   public elemsFiltered$: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
@@ -26,13 +27,15 @@ export class MatSelectedSearchComponent implements OnInit, AfterViewInit, OnDest
 
   @ViewChild('elemSelect', { static: true }) elemSelect: MatSelect;
 
+  @Output() elemSelected = new EventEmitter();
+
   constructor() {}
 
   ngOnInit(): void {
-    this.elementCtrl.setValue(this.elems);
+    this.elementCtrl.setValue(this.elements);
 
     // cargamos la lista inicial de plantas
-    this.elemsFiltered$.next(this.elems.slice());
+    this.elemsFiltered$.next(this.elements.slice());
 
     // escuchamos cuando se active el input de busqueda
     this.elementFilterCtrl.valueChanges.pipe(takeUntil(this._onDestroy)).subscribe(() => {
@@ -56,19 +59,23 @@ export class MatSelectedSearchComponent implements OnInit, AfterViewInit, OnDest
   }
 
   protected filterElems() {
-    if (!this.elems) {
+    if (!this.elements) {
       return;
     }
     // get the search keyword
     let search = this.elementFilterCtrl.value;
     if (!search) {
-      this.elemsFiltered$.next(this.elems.slice());
+      this.elemsFiltered$.next(this.elements.slice());
       return;
     } else {
       search = search.toLowerCase();
     }
     // filter the elems
-    this.elemsFiltered$.next(this.elems.filter((elem) => elem[this.data].toLowerCase().indexOf(search) > -1));
+    this.elemsFiltered$.next(this.elements.filter((elem) => elem[this.property].toLowerCase().indexOf(search) > -1));
+  }
+
+  sendOutput() {
+    this.elemSelected.emit(this.elemSel);
   }
 
   ngOnDestroy() {
