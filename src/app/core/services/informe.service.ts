@@ -207,11 +207,14 @@ export class InformeService {
   }
 
   addInforme(informe: InformeInterface) {
+    informe.id = this.afs.createId();
+
     this.afs
       .collection('informes')
-      .add(informe)
+      .doc(informe.id)
+      .set(informe)
       .then((docRef) => {
-        console.log('Informe creado con ID: ', docRef.id);
+        console.log('Informe creado con ID: ', informe.id);
       })
       .catch((error) => {
         console.error('Error al crear el informe: ', error);
