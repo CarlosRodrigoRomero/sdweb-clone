@@ -1,0 +1,6 @@
+<mat-select #elemSelect [formControl]="elementCtrl" placeholder="{{ title }}">
+  <mat-option>
+    <ngx-mat-select-search [formControl]="elementFilterCtrl"></ngx-mat-select-search>
+  </mat-option>
+  <mat-option *ngFor="let elem of elemsFiltered$ | async" [value]="elem">{{ elem[data] }}</mat-option>
+</mat-select>

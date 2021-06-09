@@ -4,7 +4,13 @@
   <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
     <mat-card>
       <mat-card-content>
-        <mat-form-field appearance="fill">
+        <app-mat-selected-search
+          *ngIf="plantaList.length > 0"
+          [elems]="plantaList"
+          [data]="'nombre'"
+          [title]="'Planta'"
+        ></app-mat-selected-search>
+        <!-- <mat-form-field appearance="fill">
           <mat-label>Planta</mat-label>
           <mat-select #singleSelect [formControl]="plantaCtrl" placeholder="Planta">
             <mat-option>
@@ -12,7 +18,7 @@
             </mat-option>
             <mat-option *ngFor="let planta of filteredPlantas | async" [value]="planta">{{ planta.nombre }}</mat-option>
           </mat-select>
-        </mat-form-field>
+        </mat-form-field> -->
 
         <mat-form-field>
           <mat-label>Fecha</mat-label>

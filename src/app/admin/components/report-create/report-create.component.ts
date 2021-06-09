@@ -17,7 +17,7 @@ import { PlantaInterface } from '@core/models/planta';
   templateUrl: './report-create.component.html',
   styleUrls: ['./report-create.component.css'],
 })
-export class ReportCreateComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ReportCreateComponent implements OnInit /* , AfterViewInit, OnDestroy */ {
   form: FormGroup;
   informe: InformeInterface = {};
   plantaList: PlantaInterface[] = [];
@@ -54,26 +54,27 @@ export class ReportCreateComponent implements OnInit, AfterViewInit, OnDestroy {
           }
           return 0;
         });
-        this.plantaCtrl.setValue(this.plantaList);
+        // this.plantaCtrl.setValue(this.plantaList);
 
         // cargamos la lista inicial de plantas
-        this.filteredPlantas.next(this.plantaList.slice());
+        // this.filteredPlantas.next(this.plantaList.slice());
       });
 
     // escuchamos cuando se active el input de busqueda
-    this.plantaFilterCtrl.valueChanges.pipe(takeUntil(this._onDestroy)).subscribe(() => {
+    /* this.plantaFilterCtrl.valueChanges.pipe(takeUntil(this._onDestroy)).subscribe(() => {
       this.filterPlantas();
-    });
+    }); */
 
     this.buildForm();
   }
 
-  ngAfterViewInit() {
+  /* ngAfterViewInit() {
     this.setInitialValue();
-  }
+  } */
 
   private buildForm() {
     this.form = this.formBuilder.group({
+      planta: [, [Validators.required]],
       fecha: [, [Validators.required]],
       emisividad: [0.85, [Validators.required, Validators.min(0), Validators.max(1)]],
       temperatura: [, [Validators.required]],
@@ -86,7 +87,7 @@ export class ReportCreateComponent implements OnInit, AfterViewInit, OnDestroy {
       vientoVelocidad: [, [Validators.required]],
       vientoDireccion: [, [Validators.required, Validators.min(0), Validators.max(360)]],
     });
-    this.form.addControl('planta', this.plantaCtrl);
+    // this.form.addControl('planta', this.plantaCtrl);
   }
 
   onSubmit(event: Event) {
@@ -110,7 +111,7 @@ export class ReportCreateComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  protected setInitialValue() {
+  /* protected setInitialValue() {
     this.plantaService
       .getAllPlantas()
       .pipe(take(1), takeUntil(this._onDestroy))
@@ -143,5 +144,5 @@ export class ReportCreateComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy() {
     this._onDestroy.next();
     this._onDestroy.complete();
-  }
+  } */
 }
