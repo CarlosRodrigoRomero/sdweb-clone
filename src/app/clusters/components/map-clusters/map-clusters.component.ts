@@ -437,8 +437,8 @@ export class MapClustersComponent implements OnInit {
             this.puntoTrayectoriaSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
           }
         } else {
-          if (this.clusterSelected !== undefined && !this.joinActive) {
-            if (!this.deleteMode) {
+          if (this.clusterSelected !== undefined) {
+            if (!this.deleteMode && !this.joinActive) {
               const puntoId = e.selected[0].getProperties().properties.id;
               const puntoSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
 
