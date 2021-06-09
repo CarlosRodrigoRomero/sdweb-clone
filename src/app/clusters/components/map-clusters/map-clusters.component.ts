@@ -35,12 +35,12 @@ import { GLOBAL } from '@core/services/global';
 })
 export class MapClustersComponent implements OnInit {
   private planta: PlantaInterface;
-  private aerialLayer: TileLayer;
   private satelliteLayer: TileLayer;
   private map: Map;
   private coordsPuntosTrayectoria: Coordinate[] = [];
   private prevFeatureHover: Feature;
   private puntosTrayectoria: PuntoTrayectoria[] = [];
+  private prevPuntoTrayectoriaSelected: PuntoTrayectoria;
   private puntoTrayectoriaSelected: PuntoTrayectoria;
   private puntoClusterHovered: PuntoTrayectoria;
   private clusters: Cluster[];
@@ -84,6 +84,10 @@ export class MapClustersComponent implements OnInit {
         'left',
         (event: KeyboardEvent): boolean => {
           if (this.puntoTrayectoriaSelected !== undefined) {
+            // si esta activo el modo crea cluster seleccionamos un nuevo punto de la trayectoria
+            if (this.createClusterActive && this.prevPuntoTrayectoriaSelected === undefined) {
+              this.prevPuntoTrayectoriaSelected = this.puntoTrayectoriaSelected;
+            }
             const index = this.puntosTrayectoria.indexOf(this.puntoTrayectoriaSelected);
             if (index > 0) {
               // reseteamos el estilo al anterior
@@ -108,6 +112,10 @@ export class MapClustersComponent implements OnInit {
         'right',
         (event: KeyboardEvent): boolean => {
           if (this.puntoTrayectoriaSelected !== undefined) {
+            // si esta activo el modo crea cluster seleccionamos un nuevo punto de la trayectoria
+            if (this.createClusterActive && this.prevPuntoTrayectoriaSelected === undefined) {
+              this.prevPuntoTrayectoriaSelected = this.puntoTrayectoriaSelected;
+            }
             const index = this.puntosTrayectoria.indexOf(this.puntoTrayectoriaSelected);
             if (index < this.puntosTrayectoria.length) {
               // reseteamos el estilo al anterior
@@ -127,6 +135,28 @@ export class MapClustersComponent implements OnInit {
         'right arrow'
       )
     );
+    this.hotkeysService.add(
+      new Hotkey(
+        'enter',
+        (event: KeyboardEvent): boolean => {
+          if (this.puntoTrayectoriaSelected !== undefined && this.prevPuntoTrayectoriaSelected !== undefined) {
+            const cluster: Cluster = {
+              puntoAId: this.prevPuntoTrayectoriaSelected.id,
+              puntoBId: this.puntoTrayectoriaSelected.id,
+            };
+
+            this.clustersService.addCluster(cluster);
+
+            this.prevPuntoTrayectoriaSelected = undefined;
+            this.puntoTrayectoriaSelected = undefined;
+            this.clustersService.createClusterActive = false;
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'right arrow'
+      )
+    );
   }
 
   initMap() {
@@ -138,25 +168,14 @@ export class MapClustersComponent implements OnInit {
       source: satellite,
     });
 
-    const aerial = new XYZ({
-      url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
-      crossOrigin: '',
-    });
-
-    this.aerialLayer = new TileLayer({
-      source: aerial,
-    });
-
     const layers = [this.satelliteLayer];
 
     // MAPA
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
-      // zoom: 18,
       zoom: this.planta.zoom,
       minZoom: this.planta.zoom,
       maxZoom: 20,
-      // extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
     });
 
     this.olMapService
@@ -165,10 +184,6 @@ export class MapClustersComponent implements OnInit {
       .subscribe((map) => {
         this.map = map;
       });
-  }
-
-  private transform(extent) {
-    return transformExtent(extent, 'EPSG:4326', 'EPSG:3857');
   }
 
   private addTrayectoria() {
