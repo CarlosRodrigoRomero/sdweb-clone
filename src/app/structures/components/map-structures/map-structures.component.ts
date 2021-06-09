@@ -192,6 +192,9 @@ export class MapStructuresComponent implements OnInit {
           width: 2,
           color: 'white',
         }),
+        fill: new Fill({
+          color: 'rgba(0,0,0,0)',
+        }),
       }),
     });
 
@@ -329,9 +332,7 @@ export class MapStructuresComponent implements OnInit {
     this.map
       .getLayers()
       .getArray()
-      .filter(
-        (layer) => layer.getProperties().id === undefined || layer.getProperties().id !== 'mBLayer'
-      )
+      .filter((layer) => layer.getProperties().id === undefined || layer.getProperties().id !== 'mBLayer')
       .forEach((layer) => layer.setVisible(this.layerVisibility));
   }
 
