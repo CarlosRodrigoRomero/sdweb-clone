@@ -36,16 +36,19 @@ export const routes: Routes = [
   {
     path: 'clusters',
     loadChildren: () => import('./clusters/clusters.module').then((m) => m.ClustersModule),
+    canActivate: [AuthGuard],
   },
   {
     path: 'structures',
     loadChildren: () => import('./structures/structures.module').then((m) => m.StructuresModule),
+    canActivate: [AuthGuard],
   },
   {
     path: 'classification',
     loadChildren: () => import('./classification/classification.module').then((m) => m.ClassificationModule),
+    canActivate: [AuthGuard],
   },
-  { path: '**', redirectTo: '' },
+  { path: '**', redirectTo: 'clients', pathMatch: 'full' },
 ];
 
 @NgModule({
