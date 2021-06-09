@@ -14,8 +14,8 @@ import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 })
 export class AspectRatioFilterComponent implements OnInit {
   min = 0;
-  max = 1;
-  step = 0.01;
+  max = 10;
+  step = 1;
   value = 0;
 
   constructor(private filterService: FilterService, private structuresService: StructuresService) {}
@@ -25,7 +25,7 @@ export class AspectRatioFilterComponent implements OnInit {
       if (filters.length > 0) {
         // comprobamos si hay filtros en la DB y seteamos los parámetros
         if (filters[0].aspectRatioM !== undefined) {
-          this.value = filters[0].aspectRatioM;
+          this.value = this.max - filters[0].aspectRatioM;
         }
       }
     });
@@ -35,7 +35,7 @@ export class AspectRatioFilterComponent implements OnInit {
     // crea el filtro
     const filtroAspectRatio = new ModuloBrutoFilter(
       'aspectRatioM',
-      e.value,
+      this.max - e.value,
       this.structuresService.aspectRatioAverage,
       this.structuresService.aspectRatioStdDev
     );
@@ -54,11 +54,11 @@ export class AspectRatioFilterComponent implements OnInit {
       this.filterService.addFilter(filtroAspectRatio);
 
       // guardamos el filtro en la DB
-      this.structuresService.addFilter('aspectRatioM', e.value);
+      this.structuresService.addFilter('aspectRatioM', this.max - e.value);
     }
   }
 
   formatLabel(value: number) {
-    return value * 100;
+    return value;
   }
 }

@@ -22,8 +22,8 @@ export class ModuloBrutoFilter implements FilterInterface {
     return elems.filter((elem) => {
       return (
         (elem as RawModule)[correctType] === undefined ||
-        ((elem as RawModule)[correctType] >= this.average - (1 - this.multiplier) * this.standardDesv &&
-          (elem as RawModule)[correctType] <= this.average + (1 - this.multiplier) * this.standardDesv)
+        ((elem as RawModule)[correctType] >= this.average - this.multiplier * this.standardDesv &&
+          (elem as RawModule)[correctType] <= this.average + this.multiplier * this.standardDesv)
       );
     });
   }

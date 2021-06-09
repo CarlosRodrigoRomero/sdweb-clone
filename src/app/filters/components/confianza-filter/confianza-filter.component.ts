@@ -14,8 +14,8 @@ import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 })
 export class ConfianzaFilterComponent implements OnInit {
   min = 0;
-  max = 1;
-  step = 0.01;
+  max = 10;
+  step = 1;
   value = 0;
 
   constructor(private filterService: FilterService, private structuresService: StructuresService) {}
@@ -25,7 +25,7 @@ export class ConfianzaFilterComponent implements OnInit {
       if (filters.length > 0) {
         // comprobamos si hay filtros en la DB y seteamos los parámetros
         if (filters[0].confianzaM !== undefined) {
-          this.value = filters[0].confianzaM;
+          this.value = this.max - filters[0].confianzaM;
         }
       }
     });
@@ -35,7 +35,7 @@ export class ConfianzaFilterComponent implements OnInit {
     // crea el filtro
     const filtroConfianza = new ModuloBrutoFilter(
       'confianzaM',
-      e.value,
+      this.max - e.value,
       this.structuresService.confianzaAverage,
       this.structuresService.confianzaStdDev
     );
@@ -54,11 +54,11 @@ export class ConfianzaFilterComponent implements OnInit {
       this.filterService.addFilter(filtroConfianza);
 
       // guardamos el filtro en la DB
-      this.structuresService.addFilter('confianzaM', e.value);
+      this.structuresService.addFilter('confianzaM', this.max - e.value);
     }
   }
 
   formatLabel(value: number) {
-    return value * 100;
+    return value;
   }
 }

@@ -14,8 +14,8 @@ import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 })
 export class AreaModuloBrutoFilterComponent implements OnInit {
   min = 0;
-  max = 1;
-  step = 0.01;
+  max = 10;
+  step = 1;
   value = 0;
 
   constructor(private filterService: FilterService, private structuresService: StructuresService) {}
@@ -25,7 +25,7 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
       if (filters.length > 0) {
         // comprobamos si hay filtros en la DB y seteamos los parámetros
         if (filters[0].areaM !== undefined) {
-          this.value = filters[0].areaM;
+          this.value = this.max - filters[0].areaM;
         }
       }
     });
@@ -34,7 +34,7 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
   onChangeSlider(e: MatSliderChange) {
     const filtroArea = new ModuloBrutoFilter(
       'areaM',
-      e.value,
+      this.max - e.value,
       this.structuresService.areaAverage,
       this.structuresService.areaStdDev
     );
@@ -53,11 +53,11 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
       this.filterService.addFilter(filtroArea);
 
       // guardamos el filtro en la DB
-      this.structuresService.addFilter('areaM', e.value);
+      this.structuresService.addFilter('areaM', this.max - e.value);
     }
   }
 
   formatLabel(value: number) {
-    return value * 100;
+    return value;
   }
 }
