@@ -4,15 +4,25 @@
   <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
     <mat-card>
       <mat-card-content>
-        <mat-form-field appearance="fill">
-          <mat-label>Planta</mat-label>
-          <mat-select #singleSelect [formControl]="plantaCtrl" placeholder="Planta">
-            <mat-option>
-              <ngx-mat-select-search [formControl]="plantaFilterCtrl"></ngx-mat-select-search>
-            </mat-option>
-            <mat-option *ngFor="let planta of filteredPlantas | async" [value]="planta">{{ planta.nombre }}</mat-option>
-          </mat-select>
-        </mat-form-field>
+        <!-- Planta -->
+        <app-mat-selected-search
+          *ngIf="plantaList.length > 0"
+          [elements]="plantaList"
+          [property]="'nombre'"
+          [title]="'Planta'"
+          [elementSelected]="plantaSelected"
+          (elemSelected)="getElemSelected($event)"
+        ></app-mat-selected-search>
+
+        <!-- Vuelo -->
+        <app-mat-selected-search
+          *ngIf="vueloList.length > 0"
+          [elements]="vueloList"
+          [property]="'id'"
+          [title]="'Vuelo'"
+          [elementSelected]="vueloSelected"
+          (elemSelected)="getElemSelected($event)"
+        ></app-mat-selected-search>
 
         <mat-form-field>
           <mat-label>Fecha</mat-label>

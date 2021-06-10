@@ -18,8 +18,15 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { SpinnerComponent } from './components/spinner/spinner.component';
 import { ThermalSliderComponent } from './components/thermal-slider/thermal-slider.component';
 import { PlantSummaryComponent } from './components/plant-summary/plant-summary.component';
+import { MatSelectedSearchComponent } from './components/mat-selected-search/mat-selected-search.component';
 
-const components = [NavbarComponent, SpinnerComponent, ThermalSliderComponent, PlantSummaryComponent];
+const components = [
+  NavbarComponent,
+  SpinnerComponent,
+  ThermalSliderComponent,
+  PlantSummaryComponent,
+  MatSelectedSearchComponent,
+];
 const modules = [
   CommonModule,
   RouterModule,
@@ -28,12 +35,13 @@ const modules = [
   FormsModule,
   ReactiveFormsModule,
   NgxMatSelectSearchModule,
+  ClipboardModule,
 ];
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];
 
 @NgModule({
   declarations: [...components, ...pipes],
-  imports: [...modules, ClipboardModule],
+  imports: [...modules],
   exports: [...components, ...modules, ...pipes],
 })
 export class SharedModule {}

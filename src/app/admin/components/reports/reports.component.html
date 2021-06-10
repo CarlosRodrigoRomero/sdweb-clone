@@ -43,13 +43,13 @@
         <button mat-icon-button [routerLink]="['./edit', element.informeId]">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-button [routerLink]="['../../clusters', element.informeId]">Clusters</button>
-        <button mat-button [routerLink]="['../../structures', element.informeId]">Estructuras</button>
-        <button mat-button [routerLink]="['../../classification', element.informeId]">Clasificación</button>
-        <button mat-button *ngIf="element.thermalLayerPending" [routerLink]="['../thermalLayer', element.informeId]">
+        <a mat-button [routerLink]="['../../clusters', element.informeId]">Clusters</a>
+        <a mat-button [routerLink]="['../../structures', element.informeId]">Estructuras</a>
+        <a mat-button [routerLink]="['../../classification', element.informeId]">Clasificación</a>
+        <a mat-button *ngIf="element.thermalLayerPending" [routerLink]="['../thermalLayer', element.informeId]">
           <mat-icon>add</mat-icon>
           <span>Thermal</span>
-        </button>
+        </a>
       </td>
     </ng-container>
   </table>
