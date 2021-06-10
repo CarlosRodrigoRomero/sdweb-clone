@@ -13,10 +13,10 @@ import { take, takeUntil } from 'rxjs/operators';
 })
 export class MatSelectedSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() elements: any[];
-  @Input() elemSel: any;
+  @Input() elementSelected: any;
   @Input() property: string;
   @Input() title: string;
-  // public elems: any[] = [];
+
   public elemsFiltered$: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
   // control for the selected element
   public elementCtrl: FormControl = new FormControl('', Validators.required);
@@ -54,7 +54,7 @@ export class MatSelectedSearchComponent implements OnInit, AfterViewInit, OnDest
       // the form control (i.e. _initializeSelection())
       // this needs to be done after the filteredBanks are loaded initially
       // and after the mat-option elements are available
-      this.elemSelect.compareWith = (a: any, b: any) => a && b && a.id === b.id;
+      this.elemSelect.compareWith = (a: any, b: any) => a && b && a[this.property] === b[this.property];
     });
   }
 
@@ -75,7 +75,7 @@ export class MatSelectedSearchComponent implements OnInit, AfterViewInit, OnDest
   }
 
   sendOutput() {
-    this.elemSelected.emit(this.elemSel);
+    this.elemSelected.emit(this.elementSelected);
   }
 
   ngOnDestroy() {

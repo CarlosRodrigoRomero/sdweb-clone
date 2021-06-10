@@ -17,11 +17,11 @@ import { PlantaInterface } from '@core/models/planta';
   templateUrl: './report-create.component.html',
   styleUrls: ['./report-create.component.css'],
 })
-export class ReportCreateComponent implements OnInit /* , AfterViewInit, OnDestroy */ {
+export class ReportCreateComponent implements OnInit {
   form: FormGroup;
   informe: InformeInterface = {};
   plantaList: PlantaInterface[] = [];
-  vueloList: string[] = [];
+  vueloList: any[] = [];
   private plantaSelected: PlantaInterface;
   private vueloSelected: any;
   reportCreated = false;
@@ -112,6 +112,6 @@ export class ReportCreateComponent implements OnInit /* , AfterViewInit, OnDestr
   }
 
   private openSnackBar() {
-    this._snackBar.open('Informe creado correctamente', 'OK', { duration: 2000 });
+    this._snackBar.open('Informe creado correctamente', 'OK', { duration: 5000 });
   }
 }
