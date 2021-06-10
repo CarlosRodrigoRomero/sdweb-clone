@@ -108,6 +108,21 @@ export class ClustersService {
     return this.initialized$;
   }
 
+  public getVuelos(): Observable<any[]> {
+    return this.afs
+      .collection('vuelos')
+      .snapshotChanges()
+      .pipe(
+        take(1),
+        map((actions) =>
+          actions.map((a) => {
+            const id = a.payload.doc.id;
+            return { id };
+          })
+        )
+      );
+  }
+
   private getPuntosTrayectoria(): Observable<PuntoTrayectoria[]> {
     const puntosTrayectoriaRef = this.afs.collection('vuelos/' + this.vueloId + '/puntosTrayectoria');
     // const puntosTrayectoriaRef = this.afs.collection('vuelos/' + 'Alconera02' + '/puntosTrayectoria');

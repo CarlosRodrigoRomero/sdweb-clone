@@ -13,6 +13,15 @@
           (elemSelected)="getElemSelected($event)"
         ></app-mat-selected-search>
 
+        <!-- Vuelo -->
+        <app-mat-selected-search
+          *ngIf="vueloList.length > 0"
+          [elements]="vueloList"
+          [property]="'id'"
+          [title]="'Vuelo'"
+          (elemSelected)="getElemSelected($event)"
+        ></app-mat-selected-search>
+
         <mat-form-field>
           <mat-label>Fecha</mat-label>
           <input matInput formControlName="fecha" [matDatepicker]="myDatepicker" />

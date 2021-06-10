@@ -7,6 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { InformeService } from '@core/services/informe.service';
 import { PlantaService } from '@core/services/planta.service';
+import { ClustersService } from '@core/services/clusters.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
@@ -20,13 +21,16 @@ export class ReportCreateComponent implements OnInit /* , AfterViewInit, OnDestr
   form: FormGroup;
   informe: InformeInterface = {};
   plantaList: PlantaInterface[] = [];
+  vueloList: string[] = [];
   private plantaSelected: PlantaInterface;
+  private vueloSelected: any;
   reportCreated = false;
 
   constructor(
     private formBuilder: FormBuilder,
     private informeService: InformeService,
     private plantaService: PlantaService,
+    private clustersService: ClustersService,
     private _snackBar: MatSnackBar
   ) {}
 
@@ -45,6 +49,11 @@ export class ReportCreateComponent implements OnInit /* , AfterViewInit, OnDestr
           return 0;
         });
       });
+
+    this.clustersService
+      .getVuelos()
+      .pipe(take(1))
+      .subscribe((vuelos) => (this.vueloList = vuelos));
 
     this.buildForm();
   }
@@ -66,7 +75,7 @@ export class ReportCreateComponent implements OnInit /* , AfterViewInit, OnDestr
   }
 
   onSubmit(event: Event) {
-    if (this.plantaSelected) {
+    if (this.plantaSelected && this.vueloSelected) {
       event.preventDefault();
       if (this.form.valid) {
         this.informe.fecha = this.form.get('fecha').value.unix();
@@ -81,6 +90,7 @@ export class ReportCreateComponent implements OnInit /* , AfterViewInit, OnDestr
         this.informe.vientoVelocidad = this.form.get('vientoVelocidad').value;
         this.informe.vientoDireccion = this.form.get('vientoDireccion').value;
         this.informe.plantaId = this.plantaSelected.id;
+        this.informe.vueloId = this.vueloSelected.id;
 
         // Crea el informe en la DB
         this.informeService.addInforme(this.informe);
@@ -94,7 +104,11 @@ export class ReportCreateComponent implements OnInit /* , AfterViewInit, OnDestr
   }
 
   getElemSelected(element: any) {
-    this.plantaSelected = element;
+    if (element.nombre !== undefined) {
+      this.plantaSelected = element;
+    } else {
+      this.vueloSelected = element;
+    }
   }
 
   private openSnackBar() {
