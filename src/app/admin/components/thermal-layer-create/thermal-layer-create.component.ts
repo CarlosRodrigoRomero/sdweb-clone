@@ -36,7 +36,6 @@ export class ThermalLayerCreateComponent implements OnInit, OnDestroy {
 
   private buildForm() {
     this.form = this.formBuilder.group({
-      gisName: [, [Validators.required]],
       rangeTempMin: [, [Validators.required]],
       rangeTempMax: [, [Validators.required]],
     });
@@ -49,7 +48,7 @@ export class ThermalLayerCreateComponent implements OnInit, OnDestroy {
         id: this.informeId,
         informeId: this.informeId,
         plantaId: this.informe.plantaId,
-        gisName: this.form.get('gisName').value,
+        gisName: this.informeId + '_thermal',
         rangeTempMin: this.form.get('rangeTempMin').value,
         rangeTempMax: this.form.get('rangeTempMax').value,
       };

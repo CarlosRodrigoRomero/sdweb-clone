@@ -18,6 +18,7 @@ mat-card-content {
   display: inline-flex;
   justify-content: space-between;
   width: 300px;
+  margin-bottom: 1rem;
 }
 
 .btns-actions {

@@ -3,24 +3,26 @@
 
   <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
     <mat-card>
-      <div class="row-info">
-        <span>ID: </span>
-        <span>{{ informe.id }}</span>
-      </div>
-      <div class="row-info">
-        <span>Informe ID: </span>
-        <span>{{ informe.id }}</span>
-      </div>
-      <div class="row-info">
-        <span>Planta ID: </span>
-        <span>{{ informe.plantaId }}</span>
-      </div>
-
       <mat-card-content>
-        <mat-form-field class="example-full-width">
-          <mat-label>GisName</mat-label>
-          <input matInput formControlName="gisName" />
-        </mat-form-field>
+        <div class="row-info">
+          <span>GisName: </span>
+          <span>{{ informe.id }}_thermal</span>
+        </div>
+
+        <div class="row-info">
+          <span>ID: </span>
+          <span>{{ informe.id }}</span>
+        </div>
+
+        <div class="row-info">
+          <span>Informe ID: </span>
+          <span>{{ informe.id }}</span>
+        </div>
+
+        <div class="row-info">
+          <span>Planta ID: </span>
+          <span>{{ informe.plantaId }}</span>
+        </div>
 
         <mat-form-field class="example-full-width">
           <mat-label>Rango Temperatura Mínima</mat-label>
