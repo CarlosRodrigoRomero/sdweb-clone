@@ -42,10 +42,16 @@ export class StructuresService {
   public allRawModules$ = new BehaviorSubject<RawModule[]>(this._allRawModules);
   public areaAverage: number = undefined;
   public areaStdDev: number = undefined;
+  public areaMin: number = undefined;
+  public areaMax: number = undefined;
   public aspectRatioAverage: number = undefined;
   public aspectRatioStdDev: number = undefined;
+  public aspectRatioMin: number = undefined;
+  public aspectRatioMax: number = undefined;
   public confianzaAverage: number = undefined;
   public confianzaStdDev: number = undefined;
+  public confianzaMin: number = undefined;
+  public confianzaMax: number = undefined;
 
   constructor(
     private router: Router,
@@ -94,6 +100,8 @@ export class StructuresService {
     this.confianzaStdDev = this.standardDeviation(confianzas);
   }
 
+  public setMinMax() {}
+
   private average(values) {
     const sum = values.reduce((s, value) => s + value, 0);
 
@@ -103,20 +111,9 @@ export class StructuresService {
   }
 
   private standardDeviation(values) {
-    const avg = this.average(values);
-
-    const squareDiffs = values.map((value) => {
-      const diff = value - avg;
-      const sqrDiff = diff * diff;
-
-      return sqrDiff;
-    });
-
-    const avgSquareDiff = this.average(squareDiffs);
-
-    const stdDev = Math.sqrt(avgSquareDiff);
-
-    return stdDev;
+    const n = values.length;
+    const mean = values.reduce((a, b) => a + b) / n;
+    return Math.sqrt(values.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
   }
 
   getModulosBrutos(): Observable<RawModule[]> {

@@ -124,7 +124,7 @@ export class MapStructuresComponent implements OnInit {
 
     aerialLayer.setProperties({ name: 'aerial' });
 
-    const layers = [osmLayer, aerialLayer, ...this.thermalLayers];
+    const layers = [osmLayer, aerialLayer /* , ...this.thermalLayers */];
 
     // añadimos la capa termica si existe
     /* if (this.thermalLayers !== undefined) {
