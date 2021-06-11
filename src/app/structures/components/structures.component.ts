@@ -30,6 +30,7 @@ export class StructuresComponent implements OnInit {
 
   loadNormModules() {
     // ocultamos los modulos en bruto y las agrupaciones
+    this.structuresService.loadRawModules = false;
     this.structuresService.loadModuleGroups = false;
 
     // mostramos los modulos normalizados
@@ -38,6 +39,7 @@ export class StructuresComponent implements OnInit {
 
   unloadNormModules() {
     // mostramos los modulos en bruto y las agrupaciones
+    this.structuresService.loadRawModules = true;
     this.structuresService.loadModuleGroups = true;
 
     // ocultamos los modulos normalizados

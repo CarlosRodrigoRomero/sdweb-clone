@@ -29,8 +29,11 @@ export class RawModulesComponent implements OnInit {
   constructor(private structuresService: StructuresService, private olMapService: OlMapService) {}
 
   ngOnInit(): void {
-    this.structuresService.deleteMode$.subscribe((mode) => (this.deleteMode = mode));
     this.olMapService.map$.subscribe((map) => (this.map = map));
+
+    this.structuresService.deleteMode$.subscribe((mode) => (this.deleteMode = mode));
+
+    this.structuresService.loadRawModules$.subscribe((load) => this.setRawModulesVisibility(load));
   }
 
   switchDeleteMode() {
@@ -97,6 +100,16 @@ export class RawModulesComponent implements OnInit {
       } else {
         this.structuresService.deleteFilter('eliminados');
       }
+    }
+  }
+
+  private setRawModulesVisibility(visible: boolean) {
+    if (this.map !== undefined) {
+      this.map
+        .getLayers()
+        .getArray()
+        .filter((layer) => layer.getProperties().id !== undefined && layer.getProperties().id === 'mBLayer')
+        .forEach((layer) => layer.setVisible(visible));
     }
   }
 }

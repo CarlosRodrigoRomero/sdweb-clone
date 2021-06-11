@@ -36,6 +36,8 @@ export class StructuresService {
   private _thermalLayer: ThermalLayerInterface;
   private _deletedRawModIds: string[] = [];
   public deletedRawModIds$ = new BehaviorSubject<string[]>(this._deletedRawModIds);
+  private _loadRawModules = true;
+  public loadRawModules$ = new BehaviorSubject<boolean>(this._loadRawModules);
   private _loadModuleGroups = false;
   public loadModuleGroups$ = new BehaviorSubject<boolean>(this._loadModuleGroups);
   private _loadNormModules = false;
@@ -377,6 +379,15 @@ export class StructuresService {
   set allRawModules(value: RawModule[]) {
     this._allRawModules = value;
     this.allRawModules$.next(value);
+  }
+
+  get loadRawModules() {
+    return this._loadRawModules;
+  }
+
+  set loadRawModules(value: boolean) {
+    this._loadRawModules = value;
+    this.loadRawModules$.next(value);
   }
 
   get loadModuleGroups() {
