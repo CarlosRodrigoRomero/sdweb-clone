@@ -6,6 +6,7 @@ import { FilterService } from '@core/services/filter.service';
 import { StructuresService } from '@core/services/structures.service';
 
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-area-modulo-bruto-filter',
@@ -17,6 +18,7 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
   max = 10;
   step = 1;
   value = 0;
+  divisor = 3;
 
   constructor(private filterService: FilterService, private structuresService: StructuresService) {}
 
@@ -25,19 +27,19 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
       if (filters.length > 0) {
         // comprobamos si hay filtros en la DB y seteamos los parámetros
         if (filters[0].areaM !== undefined) {
-          this.value = this.max - filters[0].areaM;
+          this.value = filters[0].areaM.fuerza;
         }
       }
     });
   }
 
   onChangeSlider(e: MatSliderChange) {
-    const filtroArea = new ModuloBrutoFilter(
-      'areaM',
-      this.max - e.value,
-      this.structuresService.areaAverage,
-      this.structuresService.areaStdDev
-    );
+    const rangeMinArea =
+      this.structuresService.areaAverage - ((this.max - e.value) / this.divisor) * this.structuresService.areaStdDev;
+    const rangeMaxArea =
+      this.structuresService.areaAverage + ((this.max - e.value) / this.divisor) * this.structuresService.areaStdDev;
+
+    const filtroArea = new ModuloBrutoFilter('areaM', rangeMinArea, rangeMaxArea);
 
     if (e.value === this.min) {
       // si se selecciona el mínimo desactivamos el filtro ...
@@ -53,7 +55,7 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
       this.filterService.addFilter(filtroArea);
 
       // guardamos el filtro en la DB
-      this.structuresService.addFilter('areaM', this.max - e.value);
+      this.structuresService.addFilter('areaM', { fuerza: e.value, min: rangeMinArea, max: rangeMaxArea });
     }
   }
 

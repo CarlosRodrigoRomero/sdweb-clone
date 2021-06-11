@@ -1,6 +1,6 @@
 export interface FilterModuloBruto {
-  confianzaM?: number;
-  aspectRatioM?: number;
-  areaM?: number;
+  confianzaM?: any;
+  aspectRatioM?: any;
+  areaM?: any;
   eliminados?: string[];
 }

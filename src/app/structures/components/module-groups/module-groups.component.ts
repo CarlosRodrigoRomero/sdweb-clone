@@ -25,10 +25,8 @@ export class ModuleGroupsComponent implements OnInit {
   private vectorGroup: VectorLayer;
   private map: Map;
   private draw: Draw;
-  private moduleGroups: any[];
   private mGLayer = new VectorLayer();
   mGSelectedId: string;
-  private layerVisible = true;
 
   constructor(private olMapService: OlMapService, private structuresService: StructuresService) {}
 
@@ -46,6 +44,46 @@ export class ModuleGroupsComponent implements OnInit {
 
       // aplicamos la visibilidad dependiende de la fase en la que estemos
       this.setModuleGroupsVisibility(load);
+    });
+  }
+
+  private createModulesGroupsLayer() {
+    this.mGLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: new Style({
+        stroke: new Stroke({
+          color: 'darkblue',
+          width: 2,
+        }),
+      }),
+    });
+
+    this.mGLayer.setProperties({
+      id: 'mGLayer',
+    });
+
+    this.map.addLayer(this.mGLayer);
+  }
+
+  private addModuleGroups() {
+    const mGSource = this.mGLayer.getSource();
+
+    this.structuresService.getModuleGroups().subscribe((groups) => {
+      mGSource.clear();
+
+      groups.forEach((mG) => {
+        const feature = new Feature({
+          geometry: new Polygon([this.getAllCoordsRectangle(mG.coords)]),
+          properties: {
+            id: mG.id,
+            name: 'moduleGroup',
+          },
+        });
+
+        this.getAllCoordsRectangle(mG.coords);
+
+        mGSource.addFeature(feature);
+      });
     });
   }
 
@@ -97,48 +135,6 @@ export class ModuleGroupsComponent implements OnInit {
     allCoords.push([coords[1][0], coords[0][1]]);
 
     return allCoords;
-  }
-
-  private createModulesGroupsLayer() {
-    this.mGLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: new Style({
-        stroke: new Stroke({
-          color: 'darkblue',
-          width: 2,
-        }),
-      }),
-    });
-
-    this.mGLayer.setProperties({
-      id: 'mGLayer',
-    });
-
-    this.map.addLayer(this.mGLayer);
-  }
-
-  private addModuleGroups() {
-    const mGSource = this.mGLayer.getSource();
-
-    this.structuresService.getModuleGroups().subscribe((groups) => {
-      this.moduleGroups = groups;
-
-      mGSource.clear();
-
-      this.moduleGroups.forEach((mG) => {
-        const feature = new Feature({
-          geometry: new Polygon([this.getAllCoordsRectangle(mG.coords)]),
-          properties: {
-            id: mG.id,
-            name: 'moduleGroup',
-          },
-        });
-
-        this.getAllCoordsRectangle(mG.coords);
-
-        mGSource.addFeature(feature);
-      });
-    });
   }
 
   private addPointerOnHover() {
@@ -198,7 +194,7 @@ export class ModuleGroupsComponent implements OnInit {
     this.structuresService.deleteModuleGroup(this.mGSelectedId);
   }
 
-  setModuleGroupsVisibility(visible: boolean) {
+  private setModuleGroupsVisibility(visible: boolean) {
     if (this.map !== undefined) {
       this.map
         .getLayers()

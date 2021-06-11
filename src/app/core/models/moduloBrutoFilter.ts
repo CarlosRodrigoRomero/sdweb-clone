@@ -5,15 +5,13 @@ import { RawModule } from './moduloBruto';
 export class ModuloBrutoFilter implements FilterInterface {
   id?: string;
   type: string;
-  multiplier: number;
-  average: number;
-  standardDesv: number;
+  min: number;
+  max: number;
 
-  constructor(type: string, multiplier: number, average: number, standardDesv: number) {
+  constructor(type: string, min: number, max: number) {
     this.type = type;
-    this.multiplier = multiplier;
-    this.average = average;
-    this.standardDesv = standardDesv;
+    this.min = min;
+    this.max = max;
   }
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
@@ -22,8 +20,7 @@ export class ModuloBrutoFilter implements FilterInterface {
     return elems.filter((elem) => {
       return (
         (elem as RawModule)[correctType] === undefined ||
-        ((elem as RawModule)[correctType] >= this.average - (this.multiplier / 3) * this.standardDesv &&
-          (elem as RawModule)[correctType] <= this.average + (this.multiplier / 3) * this.standardDesv)
+        ((elem as RawModule)[correctType] >= this.min && (elem as RawModule)[correctType] <= this.max)
       );
     });
   }

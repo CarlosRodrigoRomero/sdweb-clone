@@ -36,7 +36,7 @@ export class StructuresService {
   private _thermalLayer: ThermalLayerInterface;
   private _deletedRawModIds: string[] = [];
   public deletedRawModIds$ = new BehaviorSubject<string[]>(this._deletedRawModIds);
-  private _loadRawModules = true;
+  private _loadRawModules = false;
   public loadRawModules$ = new BehaviorSubject<boolean>(this._loadRawModules);
   private _loadModuleGroups = false;
   public loadModuleGroups$ = new BehaviorSubject<boolean>(this._loadModuleGroups);
@@ -96,6 +96,9 @@ export class StructuresService {
     const confianzas = this.allRawModules.map((module) => module.confianza);
     this.confianzaAverage = this.average(confianzas);
     this.confianzaStdDev = this.standardDeviation(confianzas);
+
+    // cargamos los modulos en bruto
+    this.loadRawModules = true;
   }
 
   private average(values) {
@@ -272,26 +275,16 @@ export class StructuresService {
   applyFilters(filters: FilterModuloBruto[]) {
     const filter = filters[0];
     if (filter.confianzaM !== undefined) {
-      const confianzaFilter = new ModuloBrutoFilter(
-        'confianzaM',
-        filter.confianzaM,
-        this.confianzaAverage,
-        this.confianzaStdDev
-      );
+      const confianzaFilter = new ModuloBrutoFilter('confianzaM', filter.confianzaM.min, filter.confianzaM.max);
       this.filterService.addFilter(confianzaFilter);
     }
     if (filter.aspectRatioM !== undefined) {
-      const aspectRatioFilter = new ModuloBrutoFilter(
-        'aspectRatioM',
-        filter.aspectRatioM,
-        this.aspectRatioAverage,
-        this.aspectRatioStdDev
-      );
+      const aspectRatioFilter = new ModuloBrutoFilter('aspectRatioM', filter.aspectRatioM.min, filter.aspectRatioM.max);
       this.filterService.addFilter(aspectRatioFilter);
     }
     if (filter.areaM !== undefined) {
-      // usamos 'areaM' para diferenciarlo del filtro 'area'
-      const areaFilter = new ModuloBrutoFilter('areaM', filter.areaM, this.areaAverage, this.areaStdDev);
+      // usamos 'areaM' para diferenciarlo del filtro 'area' de anomalias y seguidores
+      const areaFilter = new ModuloBrutoFilter('areaM', filter.areaM.min, filter.areaM.max);
       this.filterService.addFilter(areaFilter);
     }
   }

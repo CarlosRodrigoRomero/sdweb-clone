@@ -17,6 +17,7 @@ export class AspectRatioFilterComponent implements OnInit {
   max = 10;
   step = 1;
   value = 0;
+  divisor = 3;
 
   constructor(private filterService: FilterService, private structuresService: StructuresService) {}
 
@@ -25,20 +26,22 @@ export class AspectRatioFilterComponent implements OnInit {
       if (filters.length > 0) {
         // comprobamos si hay filtros en la DB y seteamos los parámetros
         if (filters[0].aspectRatioM !== undefined) {
-          this.value = this.max - filters[0].aspectRatioM;
+          this.value = filters[0].aspectRatioM.fuerza;
         }
       }
     });
   }
 
   onChangeSlider(e: MatSliderChange) {
+    const rangeMinAspectRatio =
+      this.structuresService.aspectRatioAverage -
+      ((this.max - e.value) / this.divisor) * this.structuresService.aspectRatioStdDev;
+    const rangeMaxAspectRatio =
+      this.structuresService.aspectRatioAverage +
+      ((this.max - e.value) / this.divisor) * this.structuresService.aspectRatioStdDev;
+
     // crea el filtro
-    const filtroAspectRatio = new ModuloBrutoFilter(
-      'aspectRatioM',
-      this.max - e.value,
-      this.structuresService.aspectRatioAverage,
-      this.structuresService.aspectRatioStdDev
-    );
+    const filtroAspectRatio = new ModuloBrutoFilter('aspectRatioM', rangeMinAspectRatio, rangeMaxAspectRatio);
 
     if (e.value === this.min) {
       // si se selecciona el mínimo desactivamos el filtro ...
@@ -54,7 +57,11 @@ export class AspectRatioFilterComponent implements OnInit {
       this.filterService.addFilter(filtroAspectRatio);
 
       // guardamos el filtro en la DB
-      this.structuresService.addFilter('aspectRatioM', this.max - e.value);
+      this.structuresService.addFilter('aspectRatioM', {
+        fuerza: e.value,
+        min: rangeMinAspectRatio,
+        max: rangeMaxAspectRatio,
+      });
     }
   }
 
