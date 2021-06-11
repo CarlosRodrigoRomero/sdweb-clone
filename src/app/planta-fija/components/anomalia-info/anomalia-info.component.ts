@@ -258,7 +258,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
       irradiancia !== undefined ||
       severidad !== undefined ||
       nubosidad !== undefined ||
-      emisividad != undefined ||
+      emisividad !== undefined ||
       tempReflejada !== undefined ||
       vientoVelocidad !== undefined ||
       vientoDireccion !== undefined
