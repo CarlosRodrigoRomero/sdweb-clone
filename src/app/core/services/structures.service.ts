@@ -42,16 +42,10 @@ export class StructuresService {
   public allRawModules$ = new BehaviorSubject<RawModule[]>(this._allRawModules);
   public areaAverage: number = undefined;
   public areaStdDev: number = undefined;
-  public areaMin: number = undefined;
-  public areaMax: number = undefined;
   public aspectRatioAverage: number = undefined;
   public aspectRatioStdDev: number = undefined;
-  public aspectRatioMin: number = undefined;
-  public aspectRatioMax: number = undefined;
   public confianzaAverage: number = undefined;
   public confianzaStdDev: number = undefined;
-  public confianzaMin: number = undefined;
-  public confianzaMax: number = undefined;
 
   constructor(
     private router: Router,
@@ -99,8 +93,6 @@ export class StructuresService {
     this.confianzaAverage = this.average(confianzas);
     this.confianzaStdDev = this.standardDeviation(confianzas);
   }
-
-  public setMinMax() {}
 
   private average(values) {
     const sum = values.reduce((s, value) => s + value, 0);

@@ -195,17 +195,29 @@ export class MapComponent implements OnInit, OnDestroy {
       source: satellite,
     });
 
-    const aerial = new XYZ({
-      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInformeId + '_visual/{z}/{x}/{y}.png',
-      crossOrigin: '',
-    });
-
-    this.aerialLayer = new TileLayer({
-      source: aerial,
-    });
+    let aerial;
     // solo lo aplicamos a la planta DEMO
     if (this.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+      aerial = new XYZ({
+        url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
+        crossOrigin: '',
+      });
+
+      this.aerialLayer = new TileLayer({
+        source: aerial,
+      });
+
       this.aerialLayer.setExtent(this.extent1);
+    } else {
+      aerial = new XYZ({
+        url:
+          'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInformeId + '_visual/{z}/{x}/{y}.png',
+        crossOrigin: '',
+      });
+
+      this.aerialLayer = new TileLayer({
+        source: aerial,
+      });
     }
 
     const osmLayer = new TileLayer({
