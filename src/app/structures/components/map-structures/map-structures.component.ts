@@ -1,14 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 
 import { switchMap, take } from 'rxjs/operators';
-import { BehaviorSubject } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
 import View from 'ol/View';
 import { Feature, Map } from 'ol';
-import { fromLonLat, transformExtent } from 'ol/proj';
+import { fromLonLat } from 'ol/proj';
 import { defaults as defaultControls } from 'ol/control.js';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
@@ -46,11 +44,9 @@ export class MapStructuresComponent implements OnInit {
   private thermalLayer: TileLayer = undefined;
   private thermalLayerDB: ThermalLayerInterface;
   private thermalLayers: TileLayer[];
-  private extent1: any;
   private modulosBrutos: RawModule[];
   private deleteMode = false;
   private mBDeletedIds: string[] = [];
-  private thermalNotExist$ = new BehaviorSubject<boolean>(true);
   public layerVisibility = true;
 
   constructor(
@@ -58,14 +54,10 @@ export class MapStructuresComponent implements OnInit {
     private structuresService: StructuresService,
     private informeService: InformeService,
     private thermalService: ThermalService,
-    private filterService: FilterService,
-    private http: HttpClient
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
-    // Para la demo, agregamos un extent a todas las capas:
-    this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
-
     this.planta = this.structuresService.planta;
 
     this.structuresService.deleteMode$.subscribe((mode) => (this.deleteMode = mode));
@@ -99,14 +91,6 @@ export class MapStructuresComponent implements OnInit {
   }
 
   initMap() {
-    /* const satellite = new XYZ({
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      crossOrigin: '',
-    });
-    this.satelliteLayer = new TileLayer({
-      source: satellite,
-    }); */
-
     const osmLayer = new TileLayer({
       source: new OSM(),
     });
@@ -124,12 +108,7 @@ export class MapStructuresComponent implements OnInit {
 
     aerialLayer.setProperties({ name: 'aerial' });
 
-    const layers = [osmLayer, aerialLayer , ...this.thermalLayers];
-
-    // añadimos la capa termica si existe
-    /* if (this.thermalLayers !== undefined) {
-      layers = [...layers, ...this.thermalLayers];
-    } */
+    const layers = [osmLayer, aerialLayer, ...this.thermalLayers];
 
     // MAPA
     const view = new View({
@@ -173,15 +152,6 @@ export class MapStructuresComponent implements OnInit {
     });
 
     return tl;
-  }
-
-  private thermalImageExists(url: string): boolean {
-    const http = new XMLHttpRequest();
-
-    http.open('HEAD', url, false);
-    http.send();
-
-    return http.status !== 404;
   }
 
   private createModulosBrutosLayer() {
@@ -331,9 +301,5 @@ export class MapStructuresComponent implements OnInit {
       .getArray()
       .filter((layer) => layer.getProperties().id === undefined || layer.getProperties().id !== 'mBLayer')
       .forEach((layer) => layer.setVisible(this.layerVisibility));
-  }
-
-  private transform(extent) {
-    return transformExtent(extent, 'EPSG:4326', 'EPSG:3857');
   }
 }

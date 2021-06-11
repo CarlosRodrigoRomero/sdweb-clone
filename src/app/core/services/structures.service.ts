@@ -38,6 +38,8 @@ export class StructuresService {
   public deletedRawModIds$ = new BehaviorSubject<string[]>(this._deletedRawModIds);
   private _loadModuleGroups = false;
   public loadModuleGroups$ = new BehaviorSubject<boolean>(this._loadModuleGroups);
+  private _loadNormModules = false;
+  public loadNormModules$ = new BehaviorSubject<boolean>(this._loadNormModules);
   private _allRawModules: RawModule[] = [];
   public allRawModules$ = new BehaviorSubject<RawModule[]>(this._allRawModules);
   public areaAverage: number = undefined;
@@ -384,6 +386,15 @@ export class StructuresService {
   set loadModuleGroups(value: boolean) {
     this._loadModuleGroups = value;
     this.loadModuleGroups$.next(value);
+  }
+
+  get loadNormModules() {
+    return this._loadNormModules;
+  }
+
+  set loadNormModules(value: boolean) {
+    this._loadNormModules = value;
+    this.loadNormModules$.next(value);
   }
 
   get deletedRawModIds() {

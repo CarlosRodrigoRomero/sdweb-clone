@@ -15,7 +15,7 @@
           <ng-template matStepLabel>Crear agrupaciones auto</ng-template>
           <app-auto-module-groups></app-auto-module-groups>
           <div>
-            <button mat-stroked-button matStepperPrevious>Atrás</button>
+            <button mat-stroked-button matStepperPrevious (click)="unloadModuleGroups()">Atrás</button>
             <button mat-stroked-button matStepperNext>Siguiente</button>
           </div>
         </mat-step>
@@ -26,12 +26,14 @@
           </div>
           <div>
             <button mat-stroked-button matStepperPrevious>Atrás</button>
-            <button mat-stroked-button matStepperNext>Siguiente</button>
+            <button mat-stroked-button matStepperNext (click)="loadNormModules()">Siguiente</button>
           </div>
         </mat-step>
         <mat-step>
           <ng-template matStepLabel>Crear estructuras</ng-template>
-
+          <div>
+            <app-norm-modules></app-norm-modules>
+          </div>
           <div>
             <button mat-stroked-button matStepperPrevious>Atrás</button>
             <button mat-stroked-button matStepperNext>Siguiente</button>

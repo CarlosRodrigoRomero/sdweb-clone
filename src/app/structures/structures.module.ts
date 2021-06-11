@@ -10,9 +10,10 @@ import { MapStructuresComponent } from './components/map-structures/map-structur
 import { ModuleGroupsComponent } from './components/module-groups/module-groups.component';
 import { RawModulesComponent } from './components/raw-modules/raw-modules.component';
 import { AutoModuleGroupsComponent } from './components/auto-module-groups/auto-module-groups.component';
+import { NormModulesComponent } from './components/norm-modules/norm-modules.component';
 
 @NgModule({
-  declarations: [StructuresComponent, MapStructuresComponent, ModuleGroupsComponent, RawModulesComponent, AutoModuleGroupsComponent],
+  declarations: [StructuresComponent, MapStructuresComponent, ModuleGroupsComponent, RawModulesComponent, AutoModuleGroupsComponent, NormModulesComponent],
   imports: [CommonModule, StructuresRoutingModule, SharedModule, FiltersModule],
 })
 export class StructuresModule {}

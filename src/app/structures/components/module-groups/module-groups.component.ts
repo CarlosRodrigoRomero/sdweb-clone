@@ -9,11 +9,12 @@ import GeometryType from 'ol/geom/GeometryType';
 import { Coordinate } from 'ol/coordinate';
 import Polygon from 'ol/geom/Polygon';
 import Feature from 'ol/Feature';
+import { Select } from 'ol/interaction';
+import { click } from 'ol/events/condition';
 
 import { OlMapService } from '@core/services/ol-map.service';
 import { StructuresService } from '@core/services/structures.service';
-import { Select } from 'ol/interaction';
-import { click } from 'ol/events/condition';
+import { Layer } from 'ol/layer';
 
 @Component({
   selector: 'app-module-groups',
@@ -27,6 +28,7 @@ export class ModuleGroupsComponent implements OnInit {
   private moduleGroups: any[];
   private mGLayer = new VectorLayer();
   mGSelectedId: string;
+  private layerVisible = true;
 
   constructor(private olMapService: OlMapService, private structuresService: StructuresService) {}
 
@@ -41,6 +43,9 @@ export class ModuleGroupsComponent implements OnInit {
         this.addPointerOnHover();
         this.addSelectMGInteraction();
       }
+
+      // aplicamos la visibilidad dependiende de la fase en la que estemos
+      this.setModuleGroupsVisibility(load);
     });
   }
 
@@ -191,5 +196,15 @@ export class ModuleGroupsComponent implements OnInit {
 
   deleteModuleGroup() {
     this.structuresService.deleteModuleGroup(this.mGSelectedId);
+  }
+
+  setModuleGroupsVisibility(visible: boolean) {
+    if (this.map !== undefined) {
+      this.map
+        .getLayers()
+        .getArray()
+        .filter((layer) => layer.getProperties().id !== undefined && layer.getProperties().id === 'mGLayer')
+        .forEach((layer) => layer.setVisible(visible));
+    }
   }
 }

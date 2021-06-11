@@ -23,4 +23,24 @@ export class StructuresComponent implements OnInit {
   loadModuleGroups() {
     this.structuresService.loadModuleGroups = true;
   }
+
+  unloadModuleGroups() {
+    this.structuresService.loadModuleGroups = false;
+  }
+
+  loadNormModules() {
+    // ocultamos los modulos en bruto y las agrupaciones
+    this.structuresService.loadModuleGroups = false;
+
+    // mostramos los modulos normalizados
+    this.structuresService.loadNormModules = true;
+  }
+
+  unloadNormModules() {
+    // mostramos los modulos en bruto y las agrupaciones
+    this.structuresService.loadModuleGroups = true;
+
+    // ocultamos los modulos normalizados
+    this.structuresService.loadNormModules = false;
+  }
 }
