@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 import { InformeService } from '@core/services/informe.service';
 
 import { InformeInterface } from '@core/models/informe';
@@ -19,8 +21,14 @@ export class ThermalLayerCreateComponent implements OnInit, OnDestroy {
   private informeId: string = undefined;
   informe: InformeInterface = {};
   private subscriptions: Subscription = new Subscription();
+  thermalCreated = false;
 
-  constructor(private router: Router, private informeService: InformeService, private formBuilder: FormBuilder) {}
+  constructor(
+    private router: Router,
+    private informeService: InformeService,
+    private formBuilder: FormBuilder,
+    private _snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     // obtenemos el ID de la URL
@@ -55,10 +63,19 @@ export class ThermalLayerCreateComponent implements OnInit, OnDestroy {
 
       // Crea thermalLayer en la DB
       this.informeService.addThermalLayer(thermalLayer);
+
+      // aviso de capa termica creada correctamente
+      this.openSnackBar();
+
+      this.thermalCreated = true;
     }
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+  }
+
+  private openSnackBar() {
+    this._snackBar.open('Capa térmica creada correctamente', 'OK', { duration: 5000 });
   }
 }

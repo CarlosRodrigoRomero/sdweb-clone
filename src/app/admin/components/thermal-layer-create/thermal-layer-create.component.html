@@ -31,14 +31,17 @@
         </mat-form-field>
 
         <mat-form-field class="example-full-width">
-          <mat-label>Rango Temperatura Mínima</mat-label>
+          <mat-label>Rango Temperatura Máxima</mat-label>
           <input matInput formControlName="rangeTempMax" type="number" />
           <span matSuffix>ºC</span>
         </mat-form-field>
 
         <div class="btns-actions">
-          <button mat-raised-button routerLink="../../">Cancelar</button>
-          <button mat-raised-button color="warn" type="submit">Crear</button>
+          <button mat-raised-button routerLink="../../">
+            <span *ngIf="!thermalCreated">Cancelar</span>
+            <span *ngIf="thermalCreated">Volver atrás</span>
+          </button>
+          <button *ngIf="!thermalCreated" mat-raised-button color="warn" type="submit">Crear</button>
         </div>
       </mat-card-content>
     </mat-card>
