@@ -266,10 +266,12 @@ export class MapStructuresComponent implements OnInit {
       }),
       condition: click,
       layers: (l) => {
-        if (l.getProperties().id === 'mBLayer') {
-          return true;
-        } else {
-          return false;
+        if (this.deleteMode) {
+          if (l.getProperties().id === 'mBLayer') {
+            return true;
+          } else {
+            return false;
+          }
         }
       },
     });
