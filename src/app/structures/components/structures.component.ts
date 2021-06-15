@@ -20,29 +20,23 @@ export class StructuresComponent implements OnInit {
     this.structuresService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre));
   }
 
-  loadModuleGroups() {
-    this.structuresService.loadModuleGroups = true;
+  toggleLoadRawModules(load: boolean) {
+    // ocultamos los modulos en bruto
+    this.structuresService.loadRawModules = load;
   }
 
-  unloadModuleGroups() {
-    this.structuresService.loadModuleGroups = false;
+  toggleLoadModuleGroups(load: boolean) {
+    // mostramos las agrupaciones
+    this.structuresService.loadModuleGroups = load;
   }
 
-  loadNormModules() {
-    // ocultamos los modulos en bruto y las agrupaciones
-    this.structuresService.loadRawModules = false;
-    this.structuresService.loadModuleGroups = false;
-
+  toggleLoadNormModules(load: boolean) {
     // mostramos los modulos normalizados
-    this.structuresService.loadNormModules = true;
+    this.structuresService.loadNormModules = load;
   }
 
-  unloadNormModules() {
-    // mostramos los modulos en bruto y las agrupaciones
-    this.structuresService.loadRawModules = true;
-    this.structuresService.loadModuleGroups = true;
-
-    // ocultamos los modulos normalizados
-    this.structuresService.loadNormModules = false;
+  toggleEditNormModules(edit: boolean) {
+    // habilitamos edicion de los módulos normalizados
+    this.structuresService.editNormModules = edit;
   }
 }

@@ -42,6 +42,8 @@ export class StructuresService {
   public loadModuleGroups$ = new BehaviorSubject<boolean>(this._loadModuleGroups);
   private _loadNormModules = false;
   public loadNormModules$ = new BehaviorSubject<boolean>(this._loadNormModules);
+  private _editNormModules = false;
+  public editNormModules$ = new BehaviorSubject<boolean>(this._editNormModules);
   private _allRawModules: RawModule[] = [];
   public allRawModules$ = new BehaviorSubject<RawModule[]>(this._allRawModules);
   public areaAverage: number = undefined;
@@ -50,6 +52,8 @@ export class StructuresService {
   public aspectRatioStdDev: number = undefined;
   public confianzaAverage: number = undefined;
   public confianzaStdDev: number = undefined;
+  private _normModSelected: NormalizedModule = undefined;
+  normModSelected$ = new BehaviorSubject<NormalizedModule>(this._normModSelected);
 
   constructor(
     private router: Router,
@@ -401,6 +405,15 @@ export class StructuresService {
     this.loadNormModules$.next(value);
   }
 
+  get editNormModules() {
+    return this._editNormModules;
+  }
+
+  set editNormModules(value: boolean) {
+    this._editNormModules = value;
+    this.editNormModules$.next(value);
+  }
+
   get deletedRawModIds() {
     return this._deletedRawModIds;
   }
@@ -408,5 +421,14 @@ export class StructuresService {
   set deletedRawModIds(value: string[]) {
     this._deletedRawModIds = value;
     this.deletedRawModIds$.next(value);
+  }
+
+  get normModSelected() {
+    return this._normModSelected;
+  }
+
+  set normModSelected(value: NormalizedModule) {
+    this._normModSelected = value;
+    this.normModSelected$.next(value);
   }
 }

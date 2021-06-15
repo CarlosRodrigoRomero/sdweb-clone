@@ -29,6 +29,7 @@ import { FilterService } from '@core/services/filter.service';
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { RawModule } from '@core/models/moduloBruto';
+import { FeatureLike } from 'ol/Feature';
 
 @Component({
   selector: 'app-map-structures',
@@ -235,24 +236,47 @@ export class MapStructuresComponent implements OnInit {
 
   private addPointerOnHover() {
     this.map.on('pointermove', (event) => {
-      if (this.deleteMode) {
-        if (this.map.hasFeatureAtPixel(event.pixel)) {
-          let feature = this.map
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        // con trolamos todos los pointerOnHover desde aquí para que no tengan interferencias entre ellos
+        const features: FeatureLike[] = [];
+
+        if (this.deleteMode) {
+          let featuresMB = this.map
             .getFeaturesAtPixel(event.pixel)
             .filter((item) => item.getProperties().properties !== undefined);
-          feature = feature.filter((item) => item.getProperties().properties.name === 'moduloBruto');
+          featuresMB = featuresMB.filter((item) => item.getProperties().properties.name === 'moduloBruto');
 
-          if (feature.length > 0) {
-            // cambia el puntero por el de seleccionar
-            this.map.getViewport().style.cursor = 'pointer';
-          } else {
-            // vuelve a poner el puntero normal
-            this.map.getViewport().style.cursor = 'inherit';
-          }
+          features.push(...featuresMB);
+        }
+
+        if (this.structuresService.loadModuleGroups) {
+          let featuresMG = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined);
+          featuresMG = featuresMG.filter((item) => item.getProperties().properties.name === 'moduleGroup');
+
+          features.push(...featuresMG);
+        }
+
+        if (this.structuresService.editNormModules) {
+          let featuresNM = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined);
+          featuresNM = featuresNM.filter((item) => item.getProperties().properties.name === 'normModule');
+
+          features.push(...featuresNM);
+        }
+
+        if (features.length > 0) {
+          // cambia el puntero por el de seleccionar
+          this.map.getViewport().style.cursor = 'pointer';
         } else {
           // vuelve a poner el puntero normal
           this.map.getViewport().style.cursor = 'inherit';
         }
+      } else {
+        // vuelve a poner el puntero normal
+        this.map.getViewport().style.cursor = 'inherit';
       }
     });
   }

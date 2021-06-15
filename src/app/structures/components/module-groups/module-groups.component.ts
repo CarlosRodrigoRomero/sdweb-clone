@@ -38,7 +38,7 @@ export class ModuleGroupsComponent implements OnInit {
         this.createModulesGroupsLayer();
         this.addModuleGroups();
 
-        this.addPointerOnHover();
+        // this.addPointerOnHover();
         this.addSelectMGInteraction();
       }
 
