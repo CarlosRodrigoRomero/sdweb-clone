@@ -23,6 +23,7 @@ export class RawModulesComponent implements OnInit {
   private vectorRawModule: VectorLayer;
   private draw: Draw;
   deleteMode = false;
+  drawActive = false;
 
   constructor(private structuresService: StructuresService, private olMapService: OlMapService) {}
 
@@ -43,6 +44,8 @@ export class RawModulesComponent implements OnInit {
   }
 
   drawRawModule() {
+    this.drawActive = true;
+
     const sourceRawModule = new VectorSource();
     const style = new Style({
       stroke: new Stroke({
@@ -84,6 +87,12 @@ export class RawModulesComponent implements OnInit {
       // terminamos el modo draw
       this.map.removeInteraction(this.draw);
     });
+  }
+
+  cancelDraw() {
+    this.drawActive = false;
+
+    this.map.removeInteraction(this.draw);
   }
 
   restoreLastDeletedModule() {
