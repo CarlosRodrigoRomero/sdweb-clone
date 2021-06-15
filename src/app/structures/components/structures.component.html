@@ -8,7 +8,9 @@
           <ng-template matStepLabel>Filtrar módulos</ng-template>
           <app-raw-modules></app-raw-modules>
           <div class="next-button">
-            <button mat-stroked-button matStepperNext (click)="toggleLoadModuleGroups(true)">Siguiente</button>
+            <button mat-stroked-button matStepperNext (click)="toggleLoadModuleGroups(true); resetFase1()">
+              Siguiente
+            </button>
           </div>
         </mat-step>
         <mat-step>

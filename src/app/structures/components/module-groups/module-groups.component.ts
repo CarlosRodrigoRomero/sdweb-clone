@@ -38,7 +38,6 @@ export class ModuleGroupsComponent implements OnInit {
         this.createModulesGroupsLayer();
         this.addModuleGroups();
 
-        // this.addPointerOnHover();
         this.addSelectMGInteraction();
       }
 
@@ -135,28 +134,6 @@ export class ModuleGroupsComponent implements OnInit {
     allCoords.push([coords[1][0], coords[0][1]]);
 
     return allCoords;
-  }
-
-  private addPointerOnHover() {
-    this.map.on('pointermove', (event) => {
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        let feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties().properties !== undefined);
-        feature = feature.filter((item) => item.getProperties().properties.name === 'moduleGroup');
-
-        if (feature.length > 0) {
-          // cambia el puntero por el de seleccionar
-          this.map.getViewport().style.cursor = 'pointer';
-        } else {
-          // vuelve a poner el puntero normal
-          this.map.getViewport().style.cursor = 'inherit';
-        }
-      } else {
-        // vuelve a poner el puntero normal
-        this.map.getViewport().style.cursor = 'inherit';
-      }
-    });
   }
 
   private addSelectMGInteraction() {

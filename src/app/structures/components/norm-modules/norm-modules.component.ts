@@ -39,7 +39,6 @@ export class NormModulesComponent implements OnInit {
         this.createNormModulesLayer();
         this.addNormModules();
 
-        // this.addPointerOnHover();
         this.addSelectInteraction();
 
         this.addClickOutFeatures();
@@ -99,30 +98,6 @@ export class NormModulesComponent implements OnInit {
     ];
 
     return coordsOK;
-  }
-
-  private addPointerOnHover() {
-    this.map.on('pointermove', (event) => {
-      if (this.editNormModules) {
-        if (this.map.hasFeatureAtPixel(event.pixel)) {
-          let feature = this.map
-            .getFeaturesAtPixel(event.pixel)
-            .filter((item) => item.getProperties().properties !== undefined);
-          feature = feature.filter((item) => item.getProperties().properties.name === 'normModule');
-
-          if (feature.length > 0) {
-            // cambia el puntero por el de seleccionar
-            this.map.getViewport().style.cursor = 'pointer';
-          } else {
-            // vuelve a poner el puntero normal
-            this.map.getViewport().style.cursor = 'inherit';
-          }
-        } else {
-          // vuelve a poner el puntero normal
-          this.map.getViewport().style.cursor = 'inherit';
-        }
-      }
-    });
   }
 
   private setNormModulesVisibility(visible: boolean) {

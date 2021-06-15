@@ -4,11 +4,9 @@ import Map from 'ol/Map';
 import VectorSource from 'ol/source/Vector';
 import { Stroke, Style } from 'ol/style';
 import VectorLayer from 'ol/layer/Vector';
-import Draw, { createBox, DrawEvent } from 'ol/interaction/Draw';
+import Draw, { createBox } from 'ol/interaction/Draw';
 import GeometryType from 'ol/geom/GeometryType';
-import { Coordinate } from 'ol/coordinate';
 import Polygon from 'ol/geom/Polygon';
-import { getArea } from 'ol/sphere';
 
 import { StructuresService } from '@core/services/structures.service';
 import { OlMapService } from '@core/services/ol-map.service';
@@ -63,6 +61,7 @@ export class RawModulesComponent implements OnInit {
       type: GeometryType.CIRCLE,
       geometryFunction: createBox(),
     });
+    this.olMapService.draw = this.draw;
 
     this.map.addInteraction(this.draw);
 
