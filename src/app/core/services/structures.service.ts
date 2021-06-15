@@ -269,6 +269,26 @@ export class StructuresService {
       });
   }
 
+  getNormModules(thermalLayer?: ThermalLayerInterface): Observable<NormalizedModule[]> {
+    if (thermalLayer !== undefined) {
+      this.thermalLayer = thermalLayer;
+    }
+    const query$ = this.afs
+      .collection<NormalizedModule>('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados')
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((doc) => {
+            const data = doc.payload.doc.data();
+            const id = doc.payload.doc.id;
+
+            return { id, ...data };
+          })
+        )
+      );
+    return query$;
+  }
+
   addNormModule(module: NormalizedModule) {
     // obtenemos un ID aleatorio
     const id = this.afs.createId();
@@ -283,6 +303,20 @@ export class StructuresService {
       })
       .catch((error) => {
         console.error('Error al crear módulo: ', error);
+      });
+  }
+
+  deleteNormModule(id: string) {
+    const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados');
+
+    colRef
+      .doc(id)
+      .delete()
+      .then(() => {
+        console.log('Módulo eliminado correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al eliminar módulo: ', error);
       });
   }
 
@@ -330,26 +364,6 @@ export class StructuresService {
     const lineV = new LineString([topLeft, bottomLeft]);
 
     return lineH.getLength() * lineV.getLength();
-  }
-
-  getNormModules(thermalLayer?: ThermalLayerInterface): Observable<NormalizedModule[]> {
-    if (thermalLayer !== undefined) {
-      this.thermalLayer = thermalLayer;
-    }
-    const query$ = this.afs
-      .collection<NormalizedModule>('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados')
-      .snapshotChanges()
-      .pipe(
-        map((actions) =>
-          actions.map((doc) => {
-            const data = doc.payload.doc.data();
-            const id = doc.payload.doc.id;
-
-            return { id, ...data };
-          })
-        )
-      );
-    return query$;
   }
 
   public objectToCoordinate(coords: any) {

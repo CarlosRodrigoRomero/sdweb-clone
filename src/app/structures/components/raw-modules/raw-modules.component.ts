@@ -47,6 +47,18 @@ export class RawModulesComponent implements OnInit {
     this.structuresService.deleteMode = !this.structuresService.deleteMode;
   }
 
+  confirmRestoreDeletedDialog() {
+    const dialogRef = this.dialog.open(MatDialogConfirmComponent, {
+      data: 'Se restaurarán todos los módulos eliminados manualmente. ¿Desea continuar?',
+    });
+
+    dialogRef.afterClosed().subscribe((response: boolean) => {
+      if (response) {
+        this.restoreDeletedModules();
+      }
+    });
+  }
+
   restoreDeletedModules() {
     this.structuresService.deleteFilter('eliminados');
   }
@@ -129,17 +141,5 @@ export class RawModulesComponent implements OnInit {
         .filter((layer) => layer.getProperties().id !== undefined && layer.getProperties().id === 'mBLayer')
         .forEach((layer) => layer.setVisible(visible));
     }
-  }
-
-  confirmRestoreDeletedDialog() {
-    const dialogRef = this.dialog.open(MatDialogConfirmComponent, {
-      data: 'Se restaurarán todos los módulos eliminados manualmente. ¿Desea continuar?',
-    });
-
-    dialogRef.afterClosed().subscribe((response: boolean) => {
-      if (response) {
-        this.restoreDeletedModules();
-      }
-    });
   }
 }

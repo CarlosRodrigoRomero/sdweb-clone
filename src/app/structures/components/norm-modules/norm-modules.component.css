@@ -12,6 +12,7 @@
 }
 
 .add-button {
+  margin-top: 1rem;
   min-width: 225px;
 }
 
@@ -20,6 +21,15 @@
 }
 
 .add-button .icon {
+  margin-right: 0.5rem;
+}
+
+.delete-button {
+  margin: 1rem 0;
+  width: 100%;
+}
+
+.delete-button .icon {
   margin-right: 0.5rem;
 }
 

@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { MatDialog } from '@angular/material/dialog';
+
 import Map from 'ol/Map';
 import VectorLayer from 'ol/layer/Vector';
 
@@ -15,6 +17,8 @@ import Overlay from 'ol/Overlay';
 
 import { OlMapService } from '@core/services/ol-map.service';
 import { StructuresService } from '@core/services/structures.service';
+
+import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
 
 import { NormalizedModule } from '@core/models/normalizedModule';
 import GeometryType from 'ol/geom/GeometryType';
@@ -34,7 +38,11 @@ export class NormModulesComponent implements OnInit {
   private popup: Overlay;
   public coordsNewNormMod: any;
 
-  constructor(private olMapService: OlMapService, private structuresService: StructuresService) {}
+  constructor(
+    private olMapService: OlMapService,
+    private structuresService: StructuresService,
+    public dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.olMapService.map$.subscribe((map) => (this.map = map));
@@ -175,6 +183,9 @@ export class NormModulesComponent implements OnInit {
   drawNormModule() {
     this.drawActive = true;
 
+    // quitamos el modulo seleccionado si lo hubiera
+    this.structuresService.normModSelected = undefined;
+
     const sourceNormModule = new VectorSource();
     const style = new Style({
       stroke: new Stroke({
@@ -218,6 +229,24 @@ export class NormModulesComponent implements OnInit {
     this.drawActive = false;
 
     this.map.removeInteraction(this.draw);
+  }
+
+  confirmDeleteNormModule() {
+    const dialogRef = this.dialog.open(MatDialogConfirmComponent, {
+      data: 'Se eliminará el módulo de forma permanente. ¿Desea continuar?',
+    });
+
+    dialogRef.afterClosed().subscribe((response: boolean) => {
+      if (response) {
+        this.deleteNormModule();
+      }
+    });
+  }
+
+  deleteNormModule() {
+    this.structuresService.deleteNormModule(this.normModSelected.id);
+
+    this.structuresService.normModSelected = undefined;
   }
 
   private addPopupOverlay() {

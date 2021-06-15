@@ -14,7 +14,6 @@ import { click } from 'ol/events/condition';
 
 import { OlMapService } from '@core/services/ol-map.service';
 import { StructuresService } from '@core/services/structures.service';
-import { Layer } from 'ol/layer';
 
 @Component({
   selector: 'app-module-groups',

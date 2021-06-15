@@ -10,15 +10,26 @@
 </div>
 
 <div class="add-button">
-  <button *ngIf="!drawActive" mat-raised-button (click)="drawNormModule()" [disabled]="deleteMode">
+  <button *ngIf="!drawActive" mat-raised-button (click)="drawNormModule()">
     <mat-icon class="icon">add_circle</mat-icon>
     <span>Crear módulo</span>
   </button>
-  <button *ngIf="drawActive" mat-raised-button (click)="cancelDraw()" [disabled]="deleteMode">
+  <button *ngIf="drawActive" mat-raised-button (click)="cancelDraw()">
     <mat-icon class="icon">disabled_by_default</mat-icon>
     <span>Cancelar</span>
   </button>
 </div>
+
+<button
+  class="delete-button"
+  *ngIf="!drawActive"
+  mat-raised-button
+  (click)="confirmDeleteNormModule()"
+  [disabled]="normModSelected === undefined"
+>
+  <mat-icon class="icon">delete</mat-icon>
+  <span>Eliminar módulo</span>
+</button>
 
 <div id="popup" class="ol-popup">
   <app-norm-mod-create-popup [coords]="coordsNewNormMod"></app-norm-mod-create-popup>
