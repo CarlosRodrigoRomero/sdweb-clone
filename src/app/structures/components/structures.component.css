@@ -29,6 +29,10 @@
   margin-top: 1rem;
 }
 
+.back-btn {
+  margin-right: 0.5rem;
+}
+
 .delete-mode-warn {
   position: absolute;
   left: 60%;

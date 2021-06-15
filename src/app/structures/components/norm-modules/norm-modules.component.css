@@ -1,6 +1,7 @@
 .normMod-info {
   font-weight: 500;
   font-size: small;
+  margin-bottom: 1rem;
 }
 
 .normMod-info__column {
@@ -12,7 +13,6 @@
 }
 
 .add-button {
-  margin-top: 1rem;
   min-width: 225px;
 }
 

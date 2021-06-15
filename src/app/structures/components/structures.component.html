@@ -17,7 +17,9 @@
           <ng-template matStepLabel>Crear agrupaciones auto</ng-template>
           <app-auto-module-groups></app-auto-module-groups>
           <div>
-            <button mat-stroked-button matStepperPrevious (click)="toggleLoadModuleGroups(false)">Atrás</button>
+            <button class="back-btn" mat-stroked-button matStepperPrevious (click)="toggleLoadModuleGroups(false)">
+              Atrás
+            </button>
             <button mat-stroked-button matStepperNext>Siguiente</button>
           </div>
         </mat-step>
@@ -27,7 +29,7 @@
             <app-module-groups></app-module-groups>
           </div>
           <div>
-            <button mat-stroked-button matStepperPrevious>Atrás</button>
+            <button class="back-btn" mat-stroked-button matStepperPrevious>Atrás</button>
             <button
               mat-stroked-button
               matStepperNext
@@ -42,6 +44,7 @@
           <div></div>
           <div>
             <button
+              class="back-btn"
               mat-stroked-button
               matStepperPrevious
               (click)="toggleLoadRawModules(true); toggleLoadModuleGroups(true); toggleLoadNormModules(false)"
@@ -64,6 +67,7 @@
           </div>
           <div>
             <button
+              class="back-btn"
               mat-stroked-button
               matStepperPrevious
               (click)="toggleEditNormModules(false); toggleLoadModuleGroups(false)"
