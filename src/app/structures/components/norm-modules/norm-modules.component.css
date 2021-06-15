@@ -10,3 +10,27 @@
 .normMod-info__data {
   margin-left: 0.5rem;
 }
+
+.add-button {
+  min-width: 225px;
+}
+
+.add-button button {
+  width: 100%;
+}
+
+.add-button .icon {
+  margin-right: 0.5rem;
+}
+
+.ol-popup {
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cccccc;
+  bottom: 12px;
+  /* min-width: 280px; */
+  transform: translate(-50%, 0);
+}

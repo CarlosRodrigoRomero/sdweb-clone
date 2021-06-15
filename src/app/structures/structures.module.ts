@@ -11,9 +11,10 @@ import { ModuleGroupsComponent } from './components/module-groups/module-groups.
 import { RawModulesComponent } from './components/raw-modules/raw-modules.component';
 import { AutoModuleGroupsComponent } from './components/auto-module-groups/auto-module-groups.component';
 import { NormModulesComponent } from './components/norm-modules/norm-modules.component';
+import { NormModCreatePopupComponent } from './components/norm-mod-create-popup/norm-mod-create-popup.component';
 
 @NgModule({
-  declarations: [StructuresComponent, MapStructuresComponent, ModuleGroupsComponent, RawModulesComponent, AutoModuleGroupsComponent, NormModulesComponent],
+  declarations: [StructuresComponent, MapStructuresComponent, ModuleGroupsComponent, RawModulesComponent, AutoModuleGroupsComponent, NormModulesComponent, NormModCreatePopupComponent],
   imports: [CommonModule, StructuresRoutingModule, SharedModule, FiltersModule],
 })
 export class StructuresModule {}

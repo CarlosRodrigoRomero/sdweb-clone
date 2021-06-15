@@ -269,6 +269,23 @@ export class StructuresService {
       });
   }
 
+  addNormModule(module: NormalizedModule) {
+    // obtenemos un ID aleatorio
+    const id = this.afs.createId();
+
+    const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados');
+
+    colRef
+      .doc(id)
+      .set(module)
+      .then(() => {
+        console.log('Módulo creado correctamente con ID: ', id);
+      })
+      .catch((error) => {
+        console.error('Error al crear módulo: ', error);
+      });
+  }
+
   deleteFilter(filterType: string) {
     const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/filters');
     colRef.doc('filter').update({
@@ -333,6 +350,40 @@ export class StructuresService {
         )
       );
     return query$;
+  }
+
+  public objectToCoordinate(coords: any) {
+    const coordinates: Coordinate[] = [
+      [coords.topLeft.long, coords.topLeft.lat],
+      [coords.topRight.long, coords.topRight.lat],
+      [coords.bottomRight.long, coords.bottomRight.lat],
+      [coords.bottomLeft.long, coords.bottomLeft.lat],
+    ];
+
+    return coordinates;
+  }
+
+  public coordinateToObject(coordinates: Coordinate[][]) {
+    const coords = {
+      topLeft: {
+        lat: coordinates[0][3][1],
+        long: coordinates[0][3][0],
+      },
+      topRight: {
+        lat: coordinates[0][2][1],
+        long: coordinates[0][2][0],
+      },
+      bottomRight: {
+        lat: coordinates[0][1][1],
+        long: coordinates[0][1][0],
+      },
+      bottomLeft: {
+        lat: coordinates[0][0][1],
+        long: coordinates[0][0][0],
+      },
+    };
+
+    return coords;
   }
 
   get planta() {

@@ -1,0 +1,8 @@
+.create-norm-mod {
+  width: min-content;
+}
+
+.btns-actions {
+  display: flex;
+  justify-content: space-between;
+}

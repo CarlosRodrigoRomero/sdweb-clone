@@ -196,7 +196,7 @@ export class MapClassificationComponent implements OnInit {
       this.normModules = normModules;
 
       this.normModules.forEach((normMod) => {
-        const coords = this.objectToCoordinate(normMod.coords);
+        const coords = this.structuresService.objectToCoordinate(normMod.coords);
 
         const feature = new Feature({
           geometry: new Polygon([coords]),
@@ -210,17 +210,6 @@ export class MapClassificationComponent implements OnInit {
         normModsSource.addFeature(feature);
       });
     });
-  }
-
-  private objectToCoordinate(coords: any) {
-    const coordsOK: Coordinate[] = [
-      [coords.topLeft.long, coords.topLeft.lat],
-      [coords.topRight.long, coords.topRight.lat],
-      [coords.bottomRight.long, coords.bottomRight.lat],
-      [coords.bottomLeft.long, coords.bottomLeft.lat],
-    ];
-
-    return coordsOK;
   }
 
   private addPopupOverlay() {
@@ -313,7 +302,7 @@ export class MapClassificationComponent implements OnInit {
         const normMod: NormalizedModule = feature.getProperties().properties.normMod;
         this.classificationService.normModSelected = normMod;
 
-        const coords = this.objectToCoordinate(feature.getProperties().properties.normMod.coords);
+        const coords = this.structuresService.objectToCoordinate(feature.getProperties().properties.normMod.coords);
 
         this.popup.setPosition(coords[0]);
 

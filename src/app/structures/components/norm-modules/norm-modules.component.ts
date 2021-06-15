@@ -3,8 +3,6 @@ import { Component, OnInit } from '@angular/core';
 import Map from 'ol/Map';
 import VectorLayer from 'ol/layer/Vector';
 
-import { OlMapService } from '@core/services/ol-map.service';
-import { StructuresService } from '@core/services/structures.service';
 import VectorSource from 'ol/source/Vector';
 import { Stroke, Style } from 'ol/style';
 import Feature from 'ol/Feature';
@@ -12,7 +10,14 @@ import Polygon from 'ol/geom/Polygon';
 import { Coordinate } from 'ol/coordinate';
 import Select from 'ol/interaction/Select';
 import { click } from 'ol/events/condition';
+import Draw, { createBox } from 'ol/interaction/Draw';
+import Overlay from 'ol/Overlay';
+
+import { OlMapService } from '@core/services/ol-map.service';
+import { StructuresService } from '@core/services/structures.service';
+
 import { NormalizedModule } from '@core/models/normalizedModule';
+import GeometryType from 'ol/geom/GeometryType';
 
 @Component({
   selector: 'app-norm-modules',
@@ -24,6 +29,10 @@ export class NormModulesComponent implements OnInit {
   private normModLayer = new VectorLayer();
   normModSelected: NormalizedModule = undefined;
   editNormModules = false;
+  private draw: Draw;
+  drawActive = false;
+  private popup: Overlay;
+  public coordsNewNormMod: any;
 
   constructor(private olMapService: OlMapService, private structuresService: StructuresService) {}
 
@@ -40,6 +49,8 @@ export class NormModulesComponent implements OnInit {
         this.addNormModules();
 
         this.addSelectInteraction();
+
+        this.addPopupOverlay();
 
         this.addClickOutFeatures();
       }
@@ -74,7 +85,7 @@ export class NormModulesComponent implements OnInit {
       nMSource.clear();
 
       normMods.forEach((normMod) => {
-        const coords = this.objectToCoordinate(normMod.coords);
+        const coords = this.structuresService.objectToCoordinate(normMod.coords);
         const feature = new Feature({
           geometry: new Polygon([coords]),
           properties: {
@@ -87,17 +98,6 @@ export class NormModulesComponent implements OnInit {
         nMSource.addFeature(feature);
       });
     });
-  }
-
-  private objectToCoordinate(coords: any) {
-    const coordsOK: Coordinate[] = [
-      [coords.topLeft.long, coords.topLeft.lat],
-      [coords.topRight.long, coords.topRight.lat],
-      [coords.bottomRight.long, coords.bottomRight.lat],
-      [coords.bottomLeft.long, coords.bottomLeft.lat],
-    ];
-
-    return coordsOK;
   }
 
   private setNormModulesVisibility(visible: boolean) {
@@ -170,5 +170,68 @@ export class NormModulesComponent implements OnInit {
         this.structuresService.normModSelected = undefined;
       }
     });
+  }
+
+  drawNormModule() {
+    this.drawActive = true;
+
+    const sourceNormModule = new VectorSource();
+    const style = new Style({
+      stroke: new Stroke({
+        color: 'rgba(0,0,0,0)',
+        width: 1,
+      }),
+    });
+
+    const vectorNormModule: VectorLayer = this.olMapService.createVectorLayer(sourceNormModule);
+    vectorNormModule.setStyle(style);
+
+    this.map.addLayer(vectorNormModule);
+
+    this.draw = new Draw({
+      source: sourceNormModule,
+      type: GeometryType.CIRCLE,
+      geometryFunction: createBox(),
+    });
+    this.olMapService.draw = this.draw;
+
+    this.map.addInteraction(this.draw);
+
+    this.draw.on('drawend', (evt) => {
+      sourceNormModule.clear();
+
+      const polygon = evt.feature.getGeometry() as Polygon;
+      const coords = polygon.getCoordinates();
+
+      this.coordsNewNormMod = this.structuresService.coordinateToObject(coords);
+
+      this.popup.setPosition(coords[0][3]);
+
+      // terminamos el modo draw
+      this.map.removeInteraction(this.draw);
+
+      this.drawActive = false;
+    });
+  }
+
+  cancelDraw() {
+    this.drawActive = false;
+
+    this.map.removeInteraction(this.draw);
+  }
+
+  private addPopupOverlay() {
+    const container = document.getElementById('popup');
+    this.popup = new Overlay({
+      id: 'popup',
+      element: container,
+      autoPan: true,
+      autoPanAnimation: {
+        duration: 250,
+      },
+      position: undefined,
+    });
+
+    this.map.addOverlay(this.popup);
   }
 }
