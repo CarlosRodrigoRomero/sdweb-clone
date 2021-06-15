@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { MatDialog } from '@angular/material/dialog';
+
 import Map from 'ol/Map';
 import VectorSource from 'ol/source/Vector';
 import { Stroke, Style } from 'ol/style';
@@ -13,6 +15,8 @@ import { OlMapService } from '@core/services/ol-map.service';
 
 import { RawModule } from '@core/models/moduloBruto';
 
+import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
+
 @Component({
   selector: 'app-raw-modules',
   templateUrl: './raw-modules.component.html',
@@ -25,7 +29,11 @@ export class RawModulesComponent implements OnInit {
   deleteMode = false;
   drawActive = false;
 
-  constructor(private structuresService: StructuresService, private olMapService: OlMapService) {}
+  constructor(
+    private structuresService: StructuresService,
+    private olMapService: OlMapService,
+    public dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.olMapService.map$.subscribe((map) => (this.map = map));
@@ -121,5 +129,17 @@ export class RawModulesComponent implements OnInit {
         .filter((layer) => layer.getProperties().id !== undefined && layer.getProperties().id === 'mBLayer')
         .forEach((layer) => layer.setVisible(visible));
     }
+  }
+
+  confirmRestoreDeletedDialog() {
+    const dialogRef = this.dialog.open(MatDialogConfirmComponent, {
+      data: 'Se restaurarán todos los módulos eliminados manualmente. ¿Desea continuar?',
+    });
+
+    dialogRef.afterClosed().subscribe((response: boolean) => {
+      if (response) {
+        this.restoreDeletedModules();
+      }
+    });
   }
 }

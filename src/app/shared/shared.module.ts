@@ -19,6 +19,7 @@ import { SpinnerComponent } from './components/spinner/spinner.component';
 import { ThermalSliderComponent } from './components/thermal-slider/thermal-slider.component';
 import { PlantSummaryComponent } from './components/plant-summary/plant-summary.component';
 import { MatSelectedSearchComponent } from './components/mat-selected-search/mat-selected-search.component';
+import { MatDialogConfirmComponent } from './components/mat-dialog-confirm/mat-dialog-confirm.component';
 
 const components = [
   NavbarComponent,
@@ -40,7 +41,7 @@ const modules = [
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];
 
 @NgModule({
-  declarations: [...components, ...pipes],
+  declarations: [...components, ...pipes, MatDialogConfirmComponent],
   imports: [...modules],
   exports: [...components, ...modules, ...pipes],
 })
