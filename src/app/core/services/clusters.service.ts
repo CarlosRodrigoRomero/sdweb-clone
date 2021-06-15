@@ -141,7 +141,7 @@ export class ClustersService {
       )
       .subscribe((puntos) => {
         // descartamos elementos duplicados
-        const fechasUnixPuntos = puntos.map((punto) => this.dateStringToUnix(punto.date));
+        /* const fechasUnixPuntos = puntos.map((punto) => this.dateStringToUnix(punto.date));
         const tabla = {};
         const fechasUnixPuntosUnicos = fechasUnixPuntos.filter((index) =>
           tabla.hasOwnProperty(index) ? false : (tabla[index] = true)
@@ -150,12 +150,11 @@ export class ClustersService {
         const puntosUnicos = [];
         fechasUnixPuntosUnicos.forEach((fecha) => {
           puntosUnicos.push(puntos.find((punto) => this.dateStringToUnix(punto.date) === fecha));
-        });
+        }); */
 
         // ordenamos los puntos por fecha
-        this.puntosTrayectoria = puntosUnicos.sort(
-          (a, b) => this.dateStringToUnix(a.date) - this.dateStringToUnix(b.date)
-        );
+        this.puntosTrayectoria = puntos.sort((a, b) => this.dateStringToUnix(a.date) - this.dateStringToUnix(b.date));
+
         this.puntosTrayectoria$.next(this.puntosTrayectoria);
       });
 
