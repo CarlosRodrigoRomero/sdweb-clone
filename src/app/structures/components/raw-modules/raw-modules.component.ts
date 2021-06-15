@@ -79,7 +79,7 @@ export class RawModulesComponent implements OnInit {
         coords: coords[0],
         area: this.structuresService.areaAverage,
         aspectRatio: this.structuresService.aspectRatioAverage,
-        confianza: 1,
+        confianza: this.structuresService.confianzaAverage,
       };
 
       this.structuresService.addRawModule(rawModule);
