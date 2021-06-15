@@ -1,1 +1,10 @@
-<p>norm-modules works!</p>
+<div class="normMod-info" *ngIf="normModSelected">
+  <div>
+    <span>Fila:</span>
+    <span class="normMod-info__data">{{ normModSelected.fila }}</span>
+    <span class="normMod-info__column">Columna:</span>
+    <span class="normMod-info__data">{{ normModSelected.columna }}</span>
+  </div>
+  <span>Imagen:</span>
+  <span class="normMod-info__data">{{ normModSelected.image_name }}</span>
+</div>

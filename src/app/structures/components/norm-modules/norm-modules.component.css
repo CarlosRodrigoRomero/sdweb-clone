@@ -1,0 +1,12 @@
+.normMod-info {
+  font-weight: 500;
+  font-size: small;
+}
+
+.normMod-info__column {
+  margin-left: 1rem;
+}
+
+.normMod-info__data {
+  margin-left: 0.5rem;
+}

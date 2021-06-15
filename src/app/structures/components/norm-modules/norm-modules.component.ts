@@ -22,7 +22,7 @@ import { NormalizedModule } from '@core/models/normalizedModule';
 export class NormModulesComponent implements OnInit {
   private map: Map;
   private normModLayer = new VectorLayer();
-  private normModSelected: NormalizedModule = undefined;
+  normModSelected: NormalizedModule = undefined;
   editNormModules = false;
 
   constructor(private olMapService: OlMapService, private structuresService: StructuresService) {}
