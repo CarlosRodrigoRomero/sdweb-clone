@@ -38,13 +38,13 @@ export class RawModulesComponent implements OnInit {
   ngOnInit(): void {
     this.olMapService.map$.subscribe((map) => (this.map = map));
 
-    this.structuresService.deleteMode$.subscribe((mode) => (this.deleteMode = mode));
+    this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode));
 
     this.structuresService.loadRawModules$.subscribe((load) => this.setRawModulesVisibility(load));
   }
 
   switchDeleteMode() {
-    this.structuresService.deleteMode = !this.structuresService.deleteMode;
+    this.structuresService.deleteRawModMode = !this.structuresService.deleteRawModMode;
   }
 
   confirmRestoreDeletedDialog() {

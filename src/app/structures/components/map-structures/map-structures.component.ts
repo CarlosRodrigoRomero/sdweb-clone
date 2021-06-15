@@ -61,7 +61,7 @@ export class MapStructuresComponent implements OnInit {
   ngOnInit(): void {
     this.planta = this.structuresService.planta;
 
-    this.structuresService.deleteMode$.subscribe((mode) => (this.deleteMode = mode));
+    this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode));
 
     this.structuresService.deletedRawModIds$.subscribe((ids) => (this.mBDeletedIds = ids));
 

@@ -31,29 +31,37 @@ export class StructuresService {
   planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
-  private _deleteMode = false;
-  public deleteMode$ = new BehaviorSubject<boolean>(this._deleteMode);
   private _thermalLayer: ThermalLayerInterface;
-  private _deletedRawModIds: string[] = [];
-  public deletedRawModIds$ = new BehaviorSubject<string[]>(this._deletedRawModIds);
+
   private _loadRawModules = false;
-  public loadRawModules$ = new BehaviorSubject<boolean>(this._loadRawModules);
-  private _loadModuleGroups = false;
-  public loadModuleGroups$ = new BehaviorSubject<boolean>(this._loadModuleGroups);
-  private _loadNormModules = false;
-  public loadNormModules$ = new BehaviorSubject<boolean>(this._loadNormModules);
-  private _editNormModules = false;
-  public editNormModules$ = new BehaviorSubject<boolean>(this._editNormModules);
+  loadRawModules$ = new BehaviorSubject<boolean>(this._loadRawModules);
   private _allRawModules: RawModule[] = [];
-  public allRawModules$ = new BehaviorSubject<RawModule[]>(this._allRawModules);
+  allRawModules$ = new BehaviorSubject<RawModule[]>(this._allRawModules);
+  private _deleteRawModMode = false;
+  deleteRawModMode$ = new BehaviorSubject<boolean>(this._deleteRawModMode);
+  private _deletedRawModIds: string[] = [];
+  deletedRawModIds$ = new BehaviorSubject<string[]>(this._deletedRawModIds);
+
+  private _loadModuleGroups = false;
+  loadModuleGroups$ = new BehaviorSubject<boolean>(this._loadModuleGroups);
+  private _drawModGroups = false;
+  drawModGroups$ = new BehaviorSubject<boolean>(this._drawModGroups);
+  private _modGroupSelectedId: string = undefined;
+  modGroupSelectedId$ = new BehaviorSubject<string>(this._modGroupSelectedId);
+
+  private _loadNormModules = false;
+  loadNormModules$ = new BehaviorSubject<boolean>(this._loadNormModules);
+  private _editNormModules = false;
+  editNormModules$ = new BehaviorSubject<boolean>(this._editNormModules);
+  private _normModSelected: NormalizedModule = undefined;
+  normModSelected$ = new BehaviorSubject<NormalizedModule>(this._normModSelected);
+
   public areaAverage: number = undefined;
   public areaStdDev: number = undefined;
   public aspectRatioAverage: number = undefined;
   public aspectRatioStdDev: number = undefined;
   public confianzaAverage: number = undefined;
   public confianzaStdDev: number = undefined;
-  private _normModSelected: NormalizedModule = undefined;
-  normModSelected$ = new BehaviorSubject<NormalizedModule>(this._normModSelected);
 
   constructor(
     private router: Router,
@@ -425,13 +433,15 @@ export class StructuresService {
     this._thermalLayer = value;
   }
 
-  get deleteMode() {
-    return this._deleteMode;
+  /* RAW MODULES */
+
+  get deleteRawModMode() {
+    return this._deleteRawModMode;
   }
 
-  set deleteMode(value: boolean) {
-    this._deleteMode = value;
-    this.deleteMode$.next(value);
+  set deleteRawModMode(value: boolean) {
+    this._deleteRawModMode = value;
+    this.deleteRawModMode$.next(value);
   }
 
   get allRawModules() {
@@ -452,6 +462,17 @@ export class StructuresService {
     this.loadRawModules$.next(value);
   }
 
+  get deletedRawModIds() {
+    return this._deletedRawModIds;
+  }
+
+  set deletedRawModIds(value: string[]) {
+    this._deletedRawModIds = value;
+    this.deletedRawModIds$.next(value);
+  }
+
+  /* MODULE GROUPS */
+
   get loadModuleGroups() {
     return this._loadModuleGroups;
   }
@@ -460,6 +481,26 @@ export class StructuresService {
     this._loadModuleGroups = value;
     this.loadModuleGroups$.next(value);
   }
+
+  get drawModGroups() {
+    return this._drawModGroups;
+  }
+
+  set drawModGroups(value: boolean) {
+    this._drawModGroups = value;
+    this.drawModGroups$.next(value);
+  }
+
+  get modGroupSelectedId() {
+    return this._modGroupSelectedId;
+  }
+
+  set modGroupSelectedId(value: string) {
+    this._modGroupSelectedId = value;
+    this.modGroupSelectedId$.next(value);
+  }
+
+  /* NORMALIZED MODULES */
 
   get loadNormModules() {
     return this._loadNormModules;
@@ -477,15 +518,6 @@ export class StructuresService {
   set editNormModules(value: boolean) {
     this._editNormModules = value;
     this.editNormModules$.next(value);
-  }
-
-  get deletedRawModIds() {
-    return this._deletedRawModIds;
-  }
-
-  set deletedRawModIds(value: string[]) {
-    this._deletedRawModIds = value;
-    this.deletedRawModIds$.next(value);
   }
 
   get normModSelected() {

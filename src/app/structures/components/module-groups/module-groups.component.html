@@ -1,8 +1,19 @@
-<button mat-raised-button (click)="drawGroup()">
-  <mat-icon class="icon">add_circle</mat-icon>
-  <span>Crear agrupación</span>
-</button>
-<button class="btn-delete" mat-raised-button (click)="deleteModuleGroup()" [disabled]="mGSelectedId === undefined">
+<div class="add-group">
+  <button *ngIf="!drawActive" mat-raised-button (click)="drawGroup()">
+    <mat-icon class="icon">add_circle</mat-icon>
+    <span>Crear agrupación</span>
+  </button>
+  <button *ngIf="drawActive" mat-raised-button (click)="cancelDraw()">
+    <mat-icon class="icon">disabled_by_default</mat-icon>
+    <span>Cancelar</span>
+  </button>
+</div>
+<button
+  class="btn-delete"
+  mat-raised-button
+  (click)="deleteModuleGroup()"
+  [disabled]="modGroupSelectedId === undefined"
+>
   <mat-icon class="icon">delete</mat-icon>
   <span>Eliminar agrupación</span>
 </button>

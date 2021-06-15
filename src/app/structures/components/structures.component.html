@@ -29,11 +29,13 @@
             <app-module-groups></app-module-groups>
           </div>
           <div>
-            <button class="back-btn" mat-stroked-button matStepperPrevious>Atrás</button>
+            <button class="back-btn" mat-stroked-button matStepperPrevious (click)="resetFase3()">Atrás</button>
             <button
               mat-stroked-button
               matStepperNext
-              (click)="toggleLoadRawModules(false); toggleLoadModuleGroups(false); toggleLoadNormModules(true)"
+              (click)="
+                toggleLoadRawModules(false); toggleLoadModuleGroups(false); toggleLoadNormModules(true); resetFase3()
+              "
             >
               Siguiente
             </button>
@@ -70,7 +72,7 @@
               class="back-btn"
               mat-stroked-button
               matStepperPrevious
-              (click)="toggleEditNormModules(false); toggleLoadModuleGroups(false)"
+              (click)="toggleEditNormModules(false); toggleLoadModuleGroups(false); resetFase5()"
             >
               Atrás
             </button>

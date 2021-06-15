@@ -25,12 +25,17 @@ export class ModuleGroupsComponent implements OnInit {
   private map: Map;
   private draw: Draw;
   private mGLayer = new VectorLayer();
-  mGSelectedId: string;
+  modGroupSelectedId: string;
+  drawActive = false;
 
   constructor(private olMapService: OlMapService, private structuresService: StructuresService) {}
 
   ngOnInit(): void {
     this.olMapService.map$.subscribe((map) => (this.map = map));
+
+    this.structuresService.modGroupSelectedId$.subscribe((id) => (this.modGroupSelectedId = id));
+
+    this.structuresService.drawModGroups$.subscribe((value) => (this.drawActive = value));
 
     this.structuresService.loadModuleGroups$.subscribe((load) => {
       if (load) {
@@ -86,6 +91,8 @@ export class ModuleGroupsComponent implements OnInit {
   }
 
   drawGroup() {
+    this.structuresService.drawModGroups = true;
+
     const sourceGroup = new VectorSource();
     const style = new Style({
       stroke: new Stroke({
@@ -105,6 +112,7 @@ export class ModuleGroupsComponent implements OnInit {
       type: GeometryType.CIRCLE,
       geometryFunction: createBox(),
     });
+    this.olMapService.draw = this.draw;
 
     this.map.addInteraction(this.draw);
 
@@ -115,7 +123,16 @@ export class ModuleGroupsComponent implements OnInit {
 
       // terminamos el modo draw
       this.map.removeInteraction(this.draw);
+
+      // cambiamos el boton
+      this.structuresService.drawModGroups = false;
     });
+  }
+
+  cancelDraw() {
+    this.structuresService.drawModGroups = false;
+
+    this.map.removeInteraction(this.draw);
   }
 
   getCoordsRectangle(event: DrawEvent): Coordinate[] {
@@ -153,21 +170,20 @@ export class ModuleGroupsComponent implements OnInit {
       },
     });
 
-    // select.setProperties({ id: 'selectAnomalia' });
-
     this.map.addInteraction(select);
     select.on('select', (e) => {
       if (e.selected.length > 0) {
-        // guardamos el id para eliminarlo si lo queremos
-        this.mGSelectedId = e.selected[0].getProperties().properties.id;
+        this.structuresService.modGroupSelectedId = e.selected[0].getProperties().properties.id;
       } else {
-        this.mGSelectedId = undefined;
+        this.structuresService.modGroupSelectedId = undefined;
       }
     });
   }
 
   deleteModuleGroup() {
-    this.structuresService.deleteModuleGroup(this.mGSelectedId);
+    this.structuresService.deleteModuleGroup(this.modGroupSelectedId);
+
+    this.structuresService.modGroupSelectedId = undefined;
   }
 
   private setModuleGroupsVisibility(visible: boolean) {

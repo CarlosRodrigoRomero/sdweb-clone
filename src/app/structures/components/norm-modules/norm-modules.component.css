@@ -14,6 +14,7 @@
 
 .add-button {
   min-width: 225px;
+  margin-bottom: 1rem;
 }
 
 .add-button button {
@@ -25,7 +26,7 @@
 }
 
 .delete-button {
-  margin: 1rem 0;
+  margin-bottom: 1rem;
   width: 100%;
 }
 

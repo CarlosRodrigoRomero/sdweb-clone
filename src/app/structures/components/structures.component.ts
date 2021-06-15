@@ -12,7 +12,7 @@ import { OlMapService } from '@core/services/ol-map.service';
 })
 export class StructuresComponent implements OnInit {
   serviceInit = false;
-  deleteMode = false;
+  deleteRawModMode = false;
   nombrePlanta: string;
   private map: Map;
 
@@ -20,7 +20,7 @@ export class StructuresComponent implements OnInit {
 
   ngOnInit(): void {
     this.structuresService.initService().subscribe((value) => (this.serviceInit = value));
-    this.structuresService.deleteMode$.subscribe((mode) => (this.deleteMode = mode));
+    this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteRawModMode = mode));
     this.structuresService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre));
     this.olMapService.map$.subscribe((map) => (this.map = map));
   }
@@ -46,7 +46,20 @@ export class StructuresComponent implements OnInit {
   }
 
   resetFase1() {
-    this.structuresService.deleteMode = undefined;
+    this.structuresService.deleteRawModMode = undefined;
+    this.map.removeInteraction(this.olMapService.draw);
+    this.olMapService.draw = undefined;
+  }
+
+  resetFase3() {
+    this.structuresService.drawModGroups = false;
+    this.structuresService.modGroupSelectedId = undefined;
+    this.map.removeInteraction(this.olMapService.draw);
+    this.olMapService.draw = undefined;
+  }
+
+  resetFase5() {
+    this.structuresService.normModSelected = undefined;
     this.map.removeInteraction(this.olMapService.draw);
     this.olMapService.draw = undefined;
   }
