@@ -86,6 +86,8 @@ export class RawModulesComponent implements OnInit {
 
       // terminamos el modo draw
       this.map.removeInteraction(this.draw);
+
+      this.drawActive = false;
     });
   }
 
