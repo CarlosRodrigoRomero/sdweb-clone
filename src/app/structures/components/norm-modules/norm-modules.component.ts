@@ -278,26 +278,26 @@ export class NormModulesComponent implements OnInit {
     this.form = this.formBuilder.group({
       filas: [1, [Validators.required, Validators.min(1)]],
       columnas: [1, [Validators.required, Validators.min(1)]],
-      dilation: [10, [Validators.required, Validators.min(5), Validators.max(20)]],
+      ventana: [7, [Validators.required, Validators.min(3), Validators.max(10)]],
     });
   }
 
   autoNormModules(event: Event) {
     event.preventDefault();
 
-    const url = `https://europe-west1-sdweb-dev.cloudfunctions.net/agrupaciones`;
+    const url = `https://europe-west1-sdweb-dev.cloudfunctions.net/estructura`;
 
     if (this.form.valid) {
       const filas = this.form.get('filas').value;
       const columnas = this.form.get('columnas').value;
-      const dilation = this.form.get('dilation').value;
+      const ventana = this.form.get('ventana').value;
 
       const params = new HttpParams()
         .set('informeId', this.structuresService.informeId)
         .set('agrupacionId', this.modGroupSelectedId)
-        .set('filas', filas)
-        .set('columnas', columnas)
-        .set('dilation', dilation.toString());
+        .set('filas', filas.toString())
+        .set('columnas', columnas.toString())
+        .set('ventana', ventana.toString());
 
       return this.http
         .get(url, { responseType: 'text', params })
