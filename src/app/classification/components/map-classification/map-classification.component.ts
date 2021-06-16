@@ -346,8 +346,8 @@ export class MapClassificationComponent implements OnInit {
         } else {
           return new Style({
             stroke: new Stroke({
-              color: 'white',
-              width: hovered ? 4 : 2,
+              color: hovered ? 'white' : 'rgba(0,0,0,0)',
+              width: 2,
             }),
             fill: new Fill({
               color: 'rgba(0,0,0,0)',
