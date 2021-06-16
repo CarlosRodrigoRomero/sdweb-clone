@@ -10,7 +10,6 @@ import { StructuresService } from '@core/services/structures.service';
   styleUrls: ['./auto-norm-modules.component.css'],
 })
 export class AutoNormModulesComponent implements OnInit {
-  private informeId: string;
   private moduleGroups: any[];
   form: FormGroup;
 
@@ -21,8 +20,6 @@ export class AutoNormModulesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.informeId = this.structuresService.informeId;
-
     this.structuresService.getModuleGroups().subscribe((groups) => (this.moduleGroups = groups));
 
     this.buildForm();
@@ -48,7 +45,7 @@ export class AutoNormModulesComponent implements OnInit {
 
       this.moduleGroups.forEach((group) => {
         const params = new HttpParams()
-          .set('informeId', this.informeId)
+          .set('informeId', this.structuresService.informeId)
           .set('agrupacionId', group.id)
           .set('filas', filas)
           .set('columnas', columnas)

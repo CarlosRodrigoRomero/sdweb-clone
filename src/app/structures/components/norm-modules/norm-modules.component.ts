@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { MatDialog } from '@angular/material/dialog';
 
@@ -37,11 +39,15 @@ export class NormModulesComponent implements OnInit {
   drawActive = false;
   private popup: Overlay;
   public coordsNewNormMod: any;
+  form: FormGroup;
+  modGroupSelectedId: string = undefined;
 
   constructor(
     private olMapService: OlMapService,
     private structuresService: StructuresService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private http: HttpClient,
+    private formBuilder: FormBuilder
   ) {}
 
   ngOnInit(): void {
@@ -50,6 +56,10 @@ export class NormModulesComponent implements OnInit {
     this.structuresService.normModSelected$.subscribe((normMod) => (this.normModSelected = normMod));
 
     this.structuresService.editNormModules$.subscribe((edit) => (this.editNormModules = edit));
+
+    this.structuresService.modGroupSelectedId$.subscribe((id) => (this.modGroupSelectedId = id));
+
+    this.buildForm();
 
     this.structuresService.loadNormModules$.subscribe((load) => {
       if (load) {
@@ -262,5 +272,42 @@ export class NormModulesComponent implements OnInit {
     });
 
     this.map.addOverlay(this.popup);
+  }
+
+  private buildForm() {
+    this.form = this.formBuilder.group({
+      filas: [1, [Validators.required, Validators.min(1)]],
+      columnas: [1, [Validators.required, Validators.min(1)]],
+      dilation: [10, [Validators.required, Validators.min(5), Validators.max(20)]],
+    });
+  }
+
+  autoNormModules(event: Event) {
+    event.preventDefault();
+
+    const url = `https://europe-west1-sdweb-dev.cloudfunctions.net/agrupaciones`;
+
+    if (this.form.valid) {
+      const filas = this.form.get('filas').value;
+      const columnas = this.form.get('columnas').value;
+      const dilation = this.form.get('dilation').value;
+
+      const params = new HttpParams()
+        .set('informeId', this.structuresService.informeId)
+        .set('agrupacionId', this.modGroupSelectedId)
+        .set('filas', filas)
+        .set('columnas', columnas)
+        .set('dilation', dilation.toString());
+
+      return this.http
+        .get(url, { responseType: 'text', params })
+        .toPromise()
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   }
 }
