@@ -5,4 +5,5 @@ export interface ThermalLayerInterface {
   rangeTempMax: number;
   rangeTempMin: number;
   gisName: string;
+  codificationType?: string;
 }

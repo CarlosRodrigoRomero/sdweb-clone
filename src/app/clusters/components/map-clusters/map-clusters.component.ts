@@ -14,7 +14,7 @@ import { Coordinate } from 'ol/coordinate';
 import { Vector } from 'ol/layer';
 import VectorSource from 'ol/source/Vector';
 import LineString from 'ol/geom/LineString';
-import { Fill, Stroke, Style } from 'ol/style';
+import { Fill, Stroke, Style, Text } from 'ol/style';
 import Circle from 'ol/geom/Circle';
 import { Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
@@ -601,6 +601,13 @@ export class MapClustersComponent implements OnInit {
             fill: new Fill({
               color: 'white',
             }),
+            text: new Text({
+              placement: 'point',
+              fill: new Fill({
+                color: 'black',
+              }),
+              text: feature.getProperties().properties.id.slice(0, 3),
+            }),
           });
         }
       };
@@ -616,11 +623,25 @@ export class MapClustersComponent implements OnInit {
                 color: 'white',
                 width: 2,
               }),
+              text: new Text({
+                placement: 'point',
+                fill: new Fill({
+                  color: 'black',
+                }),
+                text: feature.getProperties().properties.id.slice(0, 3),
+              }),
             });
           } else {
             return new Style({
               fill: new Fill({
                 color: this.getClusterColor(feature.getProperties().properties.id),
+              }),
+              text: new Text({
+                placement: 'point',
+                fill: new Fill({
+                  color: 'black',
+                }),
+                text: feature.getProperties().properties.id.slice(0, 3),
               }),
             });
           }

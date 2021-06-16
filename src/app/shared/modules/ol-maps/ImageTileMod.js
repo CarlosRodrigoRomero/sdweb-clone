@@ -24,8 +24,8 @@ class ImageTileMod extends Tile {
      */
     this.crossOrigin_ = 'Anonymous';
     this.palette = GLOBAL.ironPalette;
-    this.rangeTempMin = 10;
-    this.rangeTempMax = 100;
+    // this.rangeTempMin = 10;
+    // this.rangeTempMax = 100;
     this.prueba = false;
 
     /**
