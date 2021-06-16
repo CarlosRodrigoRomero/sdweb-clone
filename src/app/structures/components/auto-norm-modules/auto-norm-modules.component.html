@@ -1,0 +1,23 @@
+<div class="create-norm-mod">
+  <!-- <h4>Crear informe</h4> -->
+
+  <form [formGroup]="form" class="example-form" (ngSubmit)="autoNormModules($event)">
+    <button mat-raised-button class="auto-nM-button" color="warn" type="submit">NORMALIZAR MODULOS AUTO</button>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Filas</mat-label>
+      <input matInput formControlName="filas" type="number" min="1" step="1" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Columnas</mat-label>
+      <input matInput formControlName="columnas" type="number" min="1" step="1" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Dilation</mat-label>
+      <input matInput formControlName="dilation" type="number" min="5" max="20" step="1" />
+      <mat-error *ngIf="form.invalid">Introducir valor entre 5 y 20</mat-error>
+    </mat-form-field>
+  </form>
+</div>
