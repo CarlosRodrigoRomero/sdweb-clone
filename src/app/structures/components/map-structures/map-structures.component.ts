@@ -325,7 +325,11 @@ export class MapStructuresComponent implements OnInit {
     this.map
       .getLayers()
       .getArray()
-      .filter((layer) => layer.getProperties().id === undefined || layer.getProperties().id !== 'mBLayer')
+      .filter(
+        (layer) =>
+          layer.getProperties().id === undefined ||
+          (layer.getProperties().id !== 'mBLayer' && layer.getProperties().id !== 'nMLayer')
+      )
       .forEach((layer) => layer.setVisible(this.layerVisibility));
   }
 }
