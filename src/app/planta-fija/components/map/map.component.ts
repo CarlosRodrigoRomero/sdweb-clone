@@ -107,6 +107,9 @@ export class MapComponent implements OnInit, OnDestroy {
               .forEach((informe) => {
                 const tl = thermalLayers.find((item) => item.informeId === informe.id);
 
+                // this.thermalService.sliderMin = tl.rangeTempMin;
+                // this.thermalService.sliderMax = tl.rangeTempMax;
+
                 // TODO: Comprobar que existe...
                 if (tl !== undefined) {
                   this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id));

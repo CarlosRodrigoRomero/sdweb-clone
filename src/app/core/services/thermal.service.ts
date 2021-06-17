@@ -58,6 +58,7 @@ export class ThermalService {
   get sliderMin() {
     return this._sliderMin;
   }
+
   set sliderMin(value: number) {
     this._sliderMin = value;
     this.sliderMaxSource.next(value);
@@ -66,9 +67,9 @@ export class ThermalService {
   get sliderMax() {
     return this._sliderMax;
   }
+
   set sliderMax(value: number) {
     this._sliderMax = value;
-
     this.sliderMinSource.next(value);
   }
 }

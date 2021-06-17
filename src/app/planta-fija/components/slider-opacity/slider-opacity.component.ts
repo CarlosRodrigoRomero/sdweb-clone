@@ -39,13 +39,13 @@ export class SliderOpacityComponent implements OnInit {
           layer.setOpacity(0);
         }
       });
-      this.anomaliaLayers.forEach((layer) => {
+      /* this.anomaliaLayers.forEach((layer) => {
         if (layer.getProperties().informeId === this.selectedInformeId) {
           layer.setOpacity(v / 100);
         } else {
           layer.setOpacity(0);
         }
-      });
+      }); */
     });
   }
 
