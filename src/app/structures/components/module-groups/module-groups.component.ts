@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { MatDialog } from '@angular/material/dialog';
+
 import Map from 'ol/Map';
 import VectorSource from 'ol/source/Vector';
 import { Stroke, Style } from 'ol/style';
@@ -15,6 +17,8 @@ import { click } from 'ol/events/condition';
 import { OlMapService } from '@core/services/ol-map.service';
 import { StructuresService } from '@core/services/structures.service';
 
+import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
+
 @Component({
   selector: 'app-module-groups',
   templateUrl: './module-groups.component.html',
@@ -28,7 +32,11 @@ export class ModuleGroupsComponent implements OnInit {
   modGroupSelectedId: string;
   drawActive = false;
 
-  constructor(private olMapService: OlMapService, private structuresService: StructuresService) {}
+  constructor(
+    private olMapService: OlMapService,
+    private structuresService: StructuresService,
+    public dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.olMapService.map$.subscribe((map) => (this.map = map));
@@ -180,8 +188,24 @@ export class ModuleGroupsComponent implements OnInit {
     });
   }
 
+  confirmDeleteModGroup() {
+    const dialogRef = this.dialog.open(MatDialogConfirmComponent, {
+      data: 'Esto también eliminará los modulos normalizados asociados a esta agrupación. ¿Desea continuar?',
+    });
+
+    dialogRef.afterClosed().subscribe((response: boolean) => {
+      if (response) {
+        this.deleteModuleGroup();
+      }
+    });
+  }
+
   deleteModuleGroup() {
+    // eliminamos la agrupacion
     this.structuresService.deleteModuleGroup(this.modGroupSelectedId);
+
+    // eliminamos tambien los modulos normalizados pertenecientes a la agrupacion
+    this.structuresService.deleteNormModulesByGroup(this.modGroupSelectedId);
 
     this.structuresService.modGroupSelectedId = undefined;
   }

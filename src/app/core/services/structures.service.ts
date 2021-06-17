@@ -328,6 +328,14 @@ export class StructuresService {
       });
   }
 
+  deleteNormModulesByGroup(modGroupId: string) {
+    const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados', (ref) =>
+      ref.where('agrupacionId', '==', modGroupId)
+    );
+
+    colRef.get().forEach((docs) => docs.forEach((doc) => doc.ref.delete()));
+  }
+
   deleteFilter(filterType: string) {
     const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/filters');
     colRef.doc('filter').update({

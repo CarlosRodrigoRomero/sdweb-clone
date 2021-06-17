@@ -139,6 +139,7 @@ export class MapStructuresComponent implements OnInit {
         imageTile.rangeTempMin = thermalLayer.rangeTempMin;
         imageTile.thermalService = this.thermalService;
         imageTile.getImage().src = src;
+        imageTile.thermalLayer = thermalLayer;
       },
     });
 
