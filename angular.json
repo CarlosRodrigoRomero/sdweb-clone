@@ -34,7 +34,8 @@
                 "input": "node_modules/ngx-auth-firebaseui/assets/",
                 "output": "./assets/"
               },
-              "src/manifest.webmanifest"
+              "src/manifest.webmanifest",
+              "web.config"
             ],
             "styles": [
               "src/styles.css",
