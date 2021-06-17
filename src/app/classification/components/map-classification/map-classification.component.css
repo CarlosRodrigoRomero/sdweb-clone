@@ -14,3 +14,9 @@
   /* min-width: 280px; */
   transform: translate(-40%, 0);
 }
+
+button {
+  position: absolute;
+  top: 80px;
+  right: 10px;
+}

@@ -2,3 +2,7 @@
 <div id="popup" class="ol-popup">
   <app-popup-classification></app-popup-classification>
 </div>
+<button mat-raised-button (click)="setThermalLayerVisibility()">
+  <span *ngIf="thermalLayerVisibility">Ocultar capa térmica</span>
+  <span *ngIf="!thermalLayerVisibility">Mostrar capa térmica</span>
+</button>

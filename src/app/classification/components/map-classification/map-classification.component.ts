@@ -48,6 +48,7 @@ export class MapClassificationComponent implements OnInit {
   private listaAnomalias: Anomalia[] = [];
   private normModLayer: VectorLayer = undefined;
   private prevFeatureHover: Feature;
+  thermalLayerVisibility = true;
 
   constructor(
     private classificationService: ClassificationService,
@@ -125,6 +126,7 @@ export class MapClassificationComponent implements OnInit {
     });
     tl.setProperties({
       informeId,
+      name: 'thermalLayer',
     });
 
     return tl;
@@ -347,8 +349,8 @@ export class MapClassificationComponent implements OnInit {
         } else {
           return new Style({
             stroke: new Stroke({
-              color: 'white',
-              width: hovered ? 4 : 2,
+              color: hovered ? 'white' : 'rgba(0,0,0,0)',
+              width: 2,
             }),
             fill: new Fill({
               color: 'rgba(0,0,0,0)',
@@ -357,5 +359,14 @@ export class MapClassificationComponent implements OnInit {
         }
       }
     };
+  }
+
+  setThermalLayerVisibility() {
+    this.thermalLayerVisibility = !this.thermalLayerVisibility;
+    this.map
+      .getLayers()
+      .getArray()
+      .filter((layer) => layer.getProperties().name !== undefined && layer.getProperties().name === 'thermalLayer')
+      .forEach((layer) => layer.setVisible(this.thermalLayerVisibility));
   }
 }
