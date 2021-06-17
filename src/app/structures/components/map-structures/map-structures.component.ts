@@ -49,6 +49,7 @@ export class MapStructuresComponent implements OnInit {
   private deleteMode = false;
   private mBDeletedIds: string[] = [];
   public layerVisibility = true;
+  private prevFeatureHover: Feature;
 
   constructor(
     private olMapService: OlMapService,
@@ -87,6 +88,7 @@ export class MapStructuresComponent implements OnInit {
         this.addModulosBrutos();
 
         this.addPointerOnHover();
+        this.addOnHoverRawModuleAction();
         this.addSelectModuloBrutoInteraction();
       });
   }
@@ -282,6 +284,41 @@ export class MapStructuresComponent implements OnInit {
     });
   }
 
+  private addOnHoverRawModuleAction() {
+    let currentFeatureHover: Feature;
+    this.map.on('pointermove', (event) => {
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        if (this.deleteMode) {
+          const feature: Feature = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined)
+            .filter((item) => item.getProperties().properties.name === 'moduloBruto')[0] as Feature;
+
+          if (feature !== undefined) {
+            // cuando pasamos de un modulo a otro directamente sin pasar por vacio
+            if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
+              // quitamos el efecto resaltado
+              this.prevFeatureHover.setStyle(this.getStyleRawMod(false));
+              this.prevFeatureHover = undefined;
+            }
+            currentFeatureHover = feature;
+
+            // aplicamos el efecto resaltado
+            feature.setStyle(this.getStyleRawMod(true));
+
+            this.prevFeatureHover = feature;
+          }
+        }
+      } else {
+        if (currentFeatureHover !== undefined) {
+          // quitamos el efecto resaltado
+          currentFeatureHover.setStyle(this.getStyleRawMod(false));
+          currentFeatureHover = undefined;
+        }
+      }
+    });
+  }
+
   private addSelectModuloBrutoInteraction() {
     const select = new Select({
       style: new Style({
@@ -319,6 +356,32 @@ export class MapStructuresComponent implements OnInit {
         }
       }
     });
+  }
+
+  private getStyleRawMod(hovered: boolean) {
+    if (hovered) {
+      return (feature: Feature) => {
+        if (feature !== undefined) {
+          return new Style({
+            stroke: new Stroke({
+              color: 'red',
+              width: 4,
+            }),
+          });
+        }
+      };
+    } else {
+      return (feature: Feature) => {
+        if (feature !== undefined) {
+          return new Style({
+            stroke: new Stroke({
+              color: 'white',
+              width: 2,
+            }),
+          });
+        }
+      };
+    }
   }
 
   setLayerVisibility() {
