@@ -35,7 +35,7 @@
                 "output": "./assets/"
               },
               "src/manifest.webmanifest",
-              "web.config"
+              "src/web.config"
             ],
             "styles": [
               "src/styles.css",
