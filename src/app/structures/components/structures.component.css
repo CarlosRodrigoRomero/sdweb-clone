@@ -41,9 +41,10 @@
   padding: 0.5rem;
 }
 
-.delete-mode-warn mat-card-subtitle {
+.delete-mode-warn mat-card-title {
   color: red;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: larger;
 }
 
 app-thermal-slider {

@@ -158,7 +158,7 @@ export class NormModulesComponent implements OnInit {
         if (feature !== undefined) {
           return new Style({
             stroke: new Stroke({
-              color: 'black',
+              color: 'red',
               width: 4,
             }),
           });
