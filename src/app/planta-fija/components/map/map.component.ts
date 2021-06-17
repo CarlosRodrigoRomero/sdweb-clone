@@ -158,6 +158,7 @@ export class MapComponent implements OnInit, OnDestroy {
           imageTile.rangeTempMin = thermalLayer.rangeTempMin;
           imageTile.thermalService = this.thermalService;
           imageTile.getImage().src = src;
+          imageTile.thermalLayer = thermalLayer;
         },
       }),
     });
