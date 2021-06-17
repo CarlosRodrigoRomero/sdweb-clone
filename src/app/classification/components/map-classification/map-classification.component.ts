@@ -117,6 +117,7 @@ export class MapClassificationComponent implements OnInit {
           imageTile.rangeTempMin = thermalLayer.rangeTempMin;
           imageTile.thermalService = this.thermalService;
           imageTile.getImage().src = src;
+          imageTile.thermalLayer = thermalLayer;
         },
       }),
 
@@ -346,8 +347,8 @@ export class MapClassificationComponent implements OnInit {
         } else {
           return new Style({
             stroke: new Stroke({
-              color: hovered ? 'white' : 'rgba(0,0,0,0)',
-              width: 2,
+              color: 'white',
+              width: hovered ? 4 : 2,
             }),
             fill: new Fill({
               color: 'rgba(0,0,0,0)',

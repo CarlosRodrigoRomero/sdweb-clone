@@ -26,7 +26,6 @@ class ImageTileMod extends Tile {
     this.palette = GLOBAL.ironPalette;
     // this.rangeTempMin = 10;
     // this.rangeTempMax = 100;
-    this.prueba = false;
 
     /**
      * Image URI
@@ -65,9 +64,11 @@ class ImageTileMod extends Tile {
    * @return {HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} Image.
    * @api
    */
+
   setImageSource(src) {
     this.imageSource = src;
   }
+
   getImage() {
     // this.image_.src = this.imageSource;
     if (this.imageLoaded == undefined) {
@@ -105,12 +106,12 @@ class ImageTileMod extends Tile {
     this.image_ = getBlankImage();
     this.changed();
   }
+
   /**
    * Tracks loading or read errors.
    *
    * @private
    */
-
   drawImage_(image, canvas) {
     // Set the canvas the same width and height of the image
     canvas.width = image.width;
@@ -119,6 +120,7 @@ class ImageTileMod extends Tile {
     canvas.getContext('2d').drawImage(image, 0, 0, image.width, image.height);
     return canvas;
   }
+
   temp2palette_(temperatura) {
     const index = Math.round(
       ((this.palette.length - 1) / (this.sliderMax - this.sliderMin)) * (temperatura - this.sliderMin)
@@ -133,47 +135,60 @@ class ImageTileMod extends Tile {
 
     return this.palette[index];
   }
+
   rgb2temp_(pixel) {
-    const precision = 0.1;
-    const gradosMantenerPrecision = 255 * precision;
+    if (this.thermalLayer.codificationType === undefined || this.thermalLayer.codificationType === 'rgb') {
+      const precision = 0.1;
+      const gradosMantenerPrecision = 255 * precision;
 
-    let max;
-    let min;
-    let val;
-    let maxVal = 0;
-    if (pixel[0] > maxVal) {
-      maxVal = pixel[0];
-    }
-    if (pixel[1] > maxVal) {
-      maxVal = pixel[1];
-    }
-    if (pixel[2] > maxVal) {
-      maxVal = pixel[2];
-    }
+      let max;
+      let min;
+      let val;
+      let maxVal = 0;
+      if (pixel[0] > maxVal) {
+        maxVal = pixel[0];
+      }
+      if (pixel[1] > maxVal) {
+        maxVal = pixel[1];
+      }
+      if (pixel[2] > maxVal) {
+        maxVal = pixel[2];
+      }
 
-    const subrango = Math.round(10 * gradosMantenerPrecision) / 10;
+      const subrango = Math.round(10 * gradosMantenerPrecision) / 10;
 
-    if (pixel[0] == 0 && pixel[1] == 0 && pixel[2] == 0) {
-      return this.rangeTempMin;
-    } else if (pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 255) {
-      return this.rangeTempMax;
-    } else if (pixel[0] == maxVal) {
-      max = this.rangeTempMin + subrango;
-      min = this.rangeTempMin;
-      val = pixel[0];
-    } else if (pixel[1] == maxVal) {
-      min = this.rangeTempMin + subrango;
-      max = this.rangeTempMin + 0.1 * Math.round(10 * 2 * subrango);
-      val = pixel[1];
-    } else {
-      max = this.rangeTempMax;
-      min = this.rangeTempMin + 0.1 * Math.round(10 * 2 * subrango);
-      val = pixel[2];
+      if (pixel[0] == 0 && pixel[1] == 0 && pixel[2] == 0) {
+        return this.rangeTempMin;
+      } else if (pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 255) {
+        return this.rangeTempMax;
+      } else if (pixel[0] == maxVal) {
+        max = this.rangeTempMin + subrango;
+        min = this.rangeTempMin;
+        val = pixel[0];
+      } else if (pixel[1] == maxVal) {
+        min = this.rangeTempMin + subrango;
+        max = this.rangeTempMin + 0.1 * Math.round(10 * 2 * subrango);
+        val = pixel[1];
+      } else {
+        max = this.rangeTempMax;
+        min = this.rangeTempMin + 0.1 * Math.round(10 * 2 * subrango);
+        val = pixel[2];
+      }
+      const temp = 0.1 * Math.round(10 * ((val * (max - min)) / 255 + min));
+
+      return temp;
+    } else if (this.thermalLayer.codificationType === 'rainbowHc') {
+      const rainbowHcPalette = GLOBAL.rainbow_hc_palette;
+
+      const pixelIndex = rainbowHcPalette.indexOf(pixel);
+
+      const temp =
+        ((this.rangeTempMax - this.rangeTempMin) * pixelIndex) / (rainbowHcPalette.length + this.rangeTempMin);
+
+      return temp;
     }
-    const temp = 0.1 * Math.round(10 * ((val * (max - min)) / 255 + min));
-
-    return temp;
   }
+
   transformPixels_(image) {
     let canvas = document.createElement('canvas');
     canvas = this.drawImage_(image, canvas);

@@ -3,7 +3,7 @@
  */
 
 import TileImage from 'ol/source/TileImage.js';
-import {createXYZ, extentFromProjection} from 'ol/tilegrid.js';
+import { createXYZ, extentFromProjection } from 'ol/tilegrid.js';
 
 /**
  * @typedef {Object} Options
@@ -73,8 +73,7 @@ class XYZ_mod extends TileImage {
    */
   constructor(opt_options) {
     const options = opt_options || {};
-    const projection =
-      options.projection !== undefined ? options.projection : 'EPSG:3857';
+    const projection = options.projection !== undefined ? options.projection : 'EPSG:3857';
 
     const tileGrid =
       options.tileGrid !== undefined
@@ -108,6 +107,7 @@ class XYZ_mod extends TileImage {
       tileClass: options.tileClass,
     });
   }
+
   setSlider(sliderMax, sliderMin) {
     this.sliderMin = sliderMin;
     this.sliderMax = sliderMax;
