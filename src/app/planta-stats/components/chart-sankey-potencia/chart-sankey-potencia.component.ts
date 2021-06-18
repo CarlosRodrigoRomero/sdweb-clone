@@ -57,8 +57,8 @@ export class ChartSankeyPotenciaComponent implements AfterViewInit {
       GLOBAL.colores_tipos_hex[3], // 'Substring en CA.',
       GLOBAL.colores_tipos_hex[3], // 'Substring en CA',
       GLOBAL.colores_tipos_hex[10], // '2x Substring en CA.',
-      '#fff', // 'Nuevas',
-      '#fff', // 'Unknown',
+      '#474747', // 'Nuevas',
+      '#000', // 'Unknown',
     ];
     const colors_link = [
       '#bfbfbf', // 'Célula caliente',

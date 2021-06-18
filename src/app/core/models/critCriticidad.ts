@@ -3,4 +3,5 @@ export interface CritCriticidad {
   labels: string[];
   rangosDT: number[];
   siempreVisible?: number[][];
+  criterioConstante?: number[][];
 }
