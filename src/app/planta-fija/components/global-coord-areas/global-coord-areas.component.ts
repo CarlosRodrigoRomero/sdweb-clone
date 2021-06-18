@@ -100,7 +100,7 @@ export class GlobalCoordAreasComponent implements OnInit {
 
         // para la demo
         if (this.map.getView().getZoom() > 20) {
-          const areaNames = ['Instalación', 'Calle', 'Mesa'];
+          // const areaNames = ['Instalación', 'Calle', 'Mesa'];
 
           for (let i = 0; i < 3; i++) {
             if (
@@ -108,7 +108,7 @@ export class GlobalCoordAreasComponent implements OnInit {
               feature.get('globalCoords')[i] !== undefined &&
               feature.get('globalCoords')[i] !== ''
             ) {
-              style.getText().setText(areaNames[i] + feature.get('globalCoords')[i]);
+              style.getText().setText(/* areaNames[i] +  */feature.get('globalCoords')[i]);
             }
           }
         } else {
