@@ -25,7 +25,7 @@
         <span class="titulo">Clase</span>
         <span class="subtitulo">CoA {{ anomaliaHover.severidad }}</span>
       </div>
-      <div class="elemento">
+      <div class="elemento" *ngIf="anomaliaHover.criticidad !== undefined">
         <span class="titulo">Criticidad</span>
         <span class="subtitulo">{{ criticidadLabels[anomaliaHover.criticidad - 1] }}</span>
       </div>
@@ -82,7 +82,7 @@
               <span class="titulo">Clase</span>
               <span class="subtitulo">CoA {{ anomaliaSelect.severidad }}</span>
             </div>
-            <div class="elemento">
+            <div class="elemento" *ngIf="anomaliaSelect.criticidad !== undefined">
               <span class="titulo">Criticidad</span>
               <span class="subtitulo">{{ criticidadLabels[anomaliaSelect.criticidad - 1] }}</span>
             </div>
@@ -116,7 +116,7 @@
               <span class="titulo">Emisividad</span>
               <span class="subtitulo">{{ infoAdicional.vuelo.emisividad }}</span>
             </div>
-            <div class="elemento" *ngIf="infoAdicional.vuelo.tempReflejada">
+            <div class="elemento" *ngIf="infoAdicional.vuelo.tempReflejada !== undefined">
               <span class="titulo">Temperatura reflejada</span>
               <span class="subtitulo">{{ infoAdicional.vuelo.tempReflejada }} ºC</span>
             </div>

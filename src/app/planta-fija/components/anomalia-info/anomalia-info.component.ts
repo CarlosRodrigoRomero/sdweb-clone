@@ -37,7 +37,6 @@ interface InfoAdicional {
     fecha?: string;
     hora?: string;
     irradiancia?: number; // radiación en Demo
-    severidad?: number; // criticidad o relevancia en Demo
     tipoAnomalia?: string;
     nubosidad?: string;
     emisividad?: number;
@@ -145,8 +144,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   }
 
   getInfoAdcional() {
-    /* PARA LA DEMO */
-
     /* MODULO */
 
     let marcaModulo;
@@ -206,7 +203,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     let fecha;
     let hora;
     let irradiancia;
-    let severidad;
     let nubosidad;
     let emisividad;
     let tempReflejada;
@@ -223,10 +219,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     if (irrad !== undefined && irrad !== null) {
       irradiancia = irrad;
     }
-    const sev = this.anomaliaSelect.severidad;
-    if (sev !== undefined && sev !== null) {
-      severidad = sev;
-    }
     const nubo = (this.anomaliaSelect as PcInterface).nubosidad;
     if (nubo !== undefined && nubo !== null) {
       nubosidad = nubo;
@@ -235,7 +227,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     if (emis !== undefined && emis !== null) {
       emisividad = emis;
     }
-    const tempR = (this.anomaliaSelect as PcInterface).temperaturaReflejada;
+    const tempR = (this.anomaliaSelect as PcInterface).temperaturaRef;
     if (tempR !== undefined && tempR !== null) {
       tempReflejada = tempR;
     }
@@ -256,7 +248,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
       fecha !== undefined ||
       hora !== undefined ||
       irradiancia !== undefined ||
-      severidad !== undefined ||
       nubosidad !== undefined ||
       emisividad !== undefined ||
       tempReflejada !== undefined ||
@@ -306,7 +297,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
         fecha,
         hora,
         irradiancia, // radiación en Demo
-        severidad, // criticidad o relevancia en Demo
         nubosidad,
         emisividad,
         tempReflejada,
