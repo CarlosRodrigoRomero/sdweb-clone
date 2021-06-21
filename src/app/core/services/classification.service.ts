@@ -85,6 +85,7 @@ export class ClassificationService {
   createAnomaliaFromNormModule(feature: Feature) {
     const id = feature.getProperties().properties.id;
     const refAnom = this.afs.collection('anomalias').doc(id);
+    const normModule = feature.getProperties().properties.normMod;
 
     refAnom
       .get()
@@ -105,7 +106,7 @@ export class ClassificationService {
             informeId: this.informeId,
             tipo: 8,
             globalCoords,
-            severidad: 50,
+            severidad: 0,
             perdidas: 0,
             gradienteNormalizado: 0,
             temperaturaMax: 0,
@@ -113,6 +114,8 @@ export class ClassificationService {
             temperaturaRef: 0,
             featureCoords: geometry.getCoordinates()[0],
             featureType: geometry.getType(),
+            localX: normModule.columna,
+            localY: normModule.fila,
           };
           // asignamos la nueva anomalia para acceder a ella y poder modificarla
           this.anomaliaSelected = anomalia;

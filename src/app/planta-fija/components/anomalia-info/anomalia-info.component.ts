@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import { SwiperComponent } from 'swiper/angular';
 
@@ -27,9 +27,12 @@ import { GLOBAL } from '@core/services/global';
 import { PlantaService } from '@core/services/planta.service';
 import { ShareReportService } from '@core/services/share-report.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
+import { ReportControlService } from '@core/services/report-control.service';
+import { InformeService } from '@core/services/informe.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
+import { InformeInterface } from '@core/models/informe';
 
 interface InfoAdicional {
   id?: string;
@@ -38,7 +41,6 @@ interface InfoAdicional {
     hora?: string;
     irradiancia?: number; // radiación en Demo
     tipoAnomalia?: string;
-    nubosidad?: string;
     emisividad?: number;
     tempReflejada?: number;
     tempAire?: number;
@@ -93,6 +95,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   public seccionImagen = false;
   public seccionLocalizacion = false;
   public seccionVuelo = false;
+  private informeSelected: InformeInterface = undefined;
 
   @ViewChild('swiperRef', { static: false }) swiperRef?: SwiperComponent;
 
@@ -102,7 +105,9 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     private router: Router,
     private shareReportService: ShareReportService,
     private anomaliaService: AnomaliaService,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private reportControlService: ReportControlService,
+    private informeService: InformeService
   ) {}
 
   ngOnInit(): void {
@@ -122,8 +127,11 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     } else {
       this.plantaId = this.activatedRoute.snapshot.paramMap.get('id');
     }
-
     this.plantaService.getPlanta(this.plantaId).subscribe((planta) => (this.nombrePlanta = planta.nombre));
+
+    this.reportControlService.selectedInformeId$
+      .pipe(switchMap((informeID) => this.informeService.getInforme(informeID)))
+      .subscribe((informe) => (this.informeSelected = informe));
   }
 
   ngOnChanges() {
@@ -203,7 +211,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     let fecha;
     let hora;
     let irradiancia;
-    let nubosidad;
     let emisividad;
     let tempReflejada;
     let tempAire;
@@ -219,27 +226,40 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     if (irrad !== undefined && irrad !== null) {
       irradiancia = irrad;
     }
-    const nubo = (this.anomaliaSelect as PcInterface).nubosidad;
-    if (nubo !== undefined && nubo !== null) {
-      nubosidad = nubo;
+    let emis = this.informeSelected.emisividad;
+    if (emis === undefined) {
+      emis = (this.anomaliaSelect as PcInterface).emisividad;
     }
-    const emis = (this.anomaliaSelect as PcInterface).emisividad;
     if (emis !== undefined && emis !== null) {
       emisividad = emis;
     }
-    const tempR = (this.anomaliaSelect as PcInterface).temperaturaRef;
+    let tempR = this.informeSelected.tempReflejada;
+    if (tempR === undefined) {
+      tempR = (this.anomaliaSelect as PcInterface).temperaturaRef;
+    }
     if (tempR !== undefined && tempR !== null) {
       tempReflejada = tempR;
     }
-    const tempA = (this.anomaliaSelect as PcInterface).temperaturaAire;
+    let tempA = this.informeSelected.temperatura;
+    if (tempA === undefined) {
+      tempA = (this.anomaliaSelect as PcInterface).temperaturaAire;
+    }
     if (tempA !== undefined && tempA !== null) {
       tempAire = tempA;
     }
-    const vientoV = this.anomaliaSelect.vientoVelocidad;
+    let vientoV = this.informeSelected.vientoVelocidad;
+    if (vientoV === undefined) {
+      // este paso solo se aplica a la DEMO
+      vientoV = this.anomaliaSelect.vientoVelocidad;
+    }
     if (vientoV !== undefined && vientoV !== null) {
       vientoVelocidad = vientoV;
     }
-    const vientoD = this.anomaliaSelect.vientoDireccion;
+    let vientoD = this.informeSelected.vientoDireccion;
+    if (vientoD === undefined) {
+      // este paso solo se aplica a la DEMO
+      vientoD = this.anomaliaSelect.vientoDireccion;
+    }
     if (vientoD !== undefined && vientoD !== null) {
       vientoDireccion = vientoD;
     }
@@ -248,7 +268,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
       fecha !== undefined ||
       hora !== undefined ||
       irradiancia !== undefined ||
-      nubosidad !== undefined ||
       emisividad !== undefined ||
       tempReflejada !== undefined ||
       vientoVelocidad !== undefined ||
@@ -297,7 +316,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
         fecha,
         hora,
         irradiancia, // radiación en Demo
-        nubosidad,
         emisividad,
         tempReflejada,
         tempAire,

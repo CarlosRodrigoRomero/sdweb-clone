@@ -156,7 +156,7 @@ export class ReportControlService {
                       // comprobamos que anomalia service hay terminado de iniciarse
                       if (initAnomService) {
                         // obtenemos todas las anomalías
-                      return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
+                        return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
                       }
                     }),
                     take(1),
