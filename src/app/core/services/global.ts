@@ -35,16 +35,20 @@ export let GLOBAL = {
   resolucionCamara: [512, 640],
   globalCoordsEstructura: [0, 1, 2],
   numGlobalCoords: 3,
-  // labels_severidad: ['Leve', 'Media', 'Grave'],
-  labels_severidad: ['CoA 1', 'CoA 2', 'CoA 3'],
-  descripcionSeveridad: [
+  criterioCoA: {
+    rangosDT: [10, 10, 40],
+    siempreCoA2: [3, 6, 10, 12],
+    siempreCoA3: [4, 5, 7, 17, 14],
+    siempreVisible: [15, 11, 13, 18],
+  },
+  labels_clase: ['CoA 1', 'CoA 2', 'CoA 3'],
+  descripcionClase: [
     'CoA 1: no es considerada una anomalía térmica. Hacemos seguimiento pero no hay que actuar.',
     'CoA 2: anomalía térmica: ver la causa y, si es necesario, arreglar en un periodo razonable.',
     'CoA 3: anomalía térmica relevante: posible interrupción de la operación normal del módulo, actuar en el corto plazo.',
   ],
-  tipos_severidad: [1, 2, 3],
-  // colores_severidad: ['#20B2AA', '#FFD700', '#FF4500', '#800000'],
-  colores_severidad: ['#20B2AA', '#FF4500', '#b70000'],
+  tipos_clase: [1, 2, 3],
+  colores_clase: ['#20B2AA', '#FF4500', '#b70000'],
   labels_criticidad: ['Muy baja', 'Baja', 'Media', 'Alta', 'Muy Alta'],
   tipos_criticidad: [1, 2, 3, 4, 5],
   labels_tipos: [

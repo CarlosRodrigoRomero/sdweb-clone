@@ -55,7 +55,7 @@ export class PcService {
     );
 
     this.filtroClase.next(
-      Array(GLOBAL.labels_severidad.length)
+      Array(GLOBAL.labels_clase.length)
         .fill(0)
         .map((_, i) => i + 1)
     );

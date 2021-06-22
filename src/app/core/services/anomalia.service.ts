@@ -13,7 +13,6 @@ import { PlantaService } from '@core/services/planta.service';
 import { Anomalia } from '@core/models/anomalia';
 import { CritCoA } from '@core/models/critCoA';
 import { CritCriticidad } from '@core/models/critCriticidad';
-import { CriteriosClasificacion } from '../models/criteriosClasificacion';
 import { PcInterface } from '@core/models/pc';
 
 @Injectable({
@@ -22,7 +21,7 @@ import { PcInterface } from '@core/models/pc';
 export class AnomaliaService {
   private _selectedInformeId: string;
   public allAnomaliasInforme: Anomalia[];
-  public criterioCoA: CritCoA;
+  public criterioCoA: CritCoA = GLOBAL.criterioCoA;
   public criterioCriticidad: CritCriticidad;
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
@@ -42,16 +41,12 @@ export class AnomaliaService {
         take(1),
         switchMap((planta) => {
           if (planta.hasOwnProperty('criterioId')) {
-            return this.plantaService.getCriterio(planta.criterioId);
-          } else {
-            // return this.plantaService.getCriterio('aU2iM5nM0S3vMZxMZGff');  // DEMO
-            return this.plantaService.getCriterio(GLOBAL.criterioSolardroneId);
+            return this.plantaService.getCriterioCriticidad(planta.criterioId);
           }
         })
       )
-      .subscribe((criterios: CriteriosClasificacion) => {
-        this.criterioCoA = criterios.critCoA;
-        this.criterioCriticidad = criterios.critCriticidad;
+      .subscribe((criterio: CritCriticidad) => {
+        this.criterioCriticidad = criterio;
         this.inicialized = true;
       });
 
@@ -138,8 +133,8 @@ export class AnomaliaService {
             const data = doc.payload.doc.data() as Anomalia;
             data.id = doc.payload.doc.id;
             data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
-            data.severidad = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
-            data.criticidad = this.getCriticidad(data); // DEMO licitacion
+            data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
+            data.criticidad = this.getCriticidad(data);
 
             if (tipo === 'pcs') {
               data.localId = (data as PcInterface).local_id.toString();
@@ -160,7 +155,9 @@ export class AnomaliaService {
 
             return data;
           })
-        )
+        ),
+        // filtramos las que tienen criticidad null ya que para el cliente no son anomalias
+        map((anoms) => anoms.filter((anom) => anom.criticidad !== null))
       );
 
     return query$;
@@ -198,72 +195,68 @@ export class AnomaliaService {
   }
 
   private getCoA(anomalia: Anomalia): number {
-    // comprobamos que se está aplicando un criterio
-    if (this.criterioCoA !== undefined) {
-      // Los que siempre son CoA 3, tengan la temperatura que tengan
-      if (this.criterioCoA.hasOwnProperty('siempreCoA3')) {
-        if (this.criterioCoA.siempreCoA3.includes(anomalia.tipo)) {
-          return 3;
-        }
-      }
-
-      // El resto
-      // Si superan tempCoA3
-      if (this.criterioCoA.hasOwnProperty('tempCoA3')) {
-        if (anomalia.temperaturaMax >= this.criterioCoA.tempCoA3) {
-          return 3;
-        }
-      }
-
-      // Si no la supera, la clasificamos según su gradiente
-      if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[2]) {
-        return 3;
-      } else {
-        if (this.criterioCoA.hasOwnProperty('siempreCoA2')) {
-          if (this.criterioCoA.siempreCoA2.includes(anomalia.tipo)) {
-            return 2;
-          }
-        }
-        if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[1]) {
-          return 2;
-        } else if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[0]) {
-          return 1;
-        }
-      }
-
-      if (this.criterioCoA.hasOwnProperty('siempreVisible')) {
-        if (this.criterioCoA.siempreVisible.includes(anomalia.tipo)) {
-          return 1;
-        }
-      }
-    } else {
-      return 0;
+    let clase = 0;
+    // Los que siempre son CoA 3, tengan la temperatura que tengan
+    if (this.criterioCoA.siempreCoA3.includes(anomalia.tipo)) {
+      clase = 3;
     }
+
+    // El resto
+    // Si superan tempCoA3
+    if (anomalia.temperaturaMax >= this.criterioCoA.tempCoA3) {
+      clase = 3;
+    }
+
+    // Si no la supera, la clasificamos según su gradiente
+    if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[2]) {
+      clase = 3;
+    } else {
+      if (this.criterioCoA.siempreCoA2.includes(anomalia.tipo)) {
+        clase = 2;
+      }
+      if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[1]) {
+        clase = 2;
+      } else if (anomalia.gradienteNormalizado >= this.criterioCoA.rangosDT[0]) {
+        clase = 1;
+      }
+    }
+
+    if (this.criterioCoA.siempreVisible.includes(anomalia.tipo)) {
+      clase = 1;
+    }
+
+    if (clase === 0) {
+      clase = 1;
+    }
+
+    return clase;
   }
 
   private getCriticidad(anomalia: Anomalia): number {
-    let criticidad: number;
+    let criticidad = null;
     if (this.criterioCriticidad !== undefined) {
-      /* if (this.criterioCriticidad.hasOwnProperty('siempreVisible')) {
-        this.criterioCriticidad.siempreVisible.forEach((v, i) => {
-          if (v.includes(anomalia.tipo)) {
-            return i;
+      if (this.criterioCriticidad.hasOwnProperty('criterioConstante')) {
+        const criterioConstante = Object.values(this.criterioCriticidad.criterioConstante);
+        criterioConstante.forEach((value, index) => {
+          if (value.includes(anomalia.tipo)) {
+            criticidad = index;
           }
         });
-      } */
-      if (this.criterioCriticidad.hasOwnProperty('rangosDT')) {
-        const rangosDT = this.criterioCriticidad.rangosDT;
-
-        rangosDT.forEach((v, i) => {
-          if (anomalia.gradienteNormalizado >= v) {
-            criticidad = i + 1;
-          }
-        });
-        return criticidad;
       }
-    } else {
-      return criticidad;
+      if (this.criterioCriticidad.hasOwnProperty('siempreVisible')) {
+        if (this.criterioCriticidad.siempreVisible.includes(anomalia.tipo)) {
+          criticidad = 0;
+        }
+      }
+      if (this.criterioCriticidad.hasOwnProperty('rangosDT')) {
+        this.criterioCriticidad.rangosDT.forEach((value, index) => {
+          if (anomalia.gradienteNormalizado >= value) {
+            criticidad = index;
+          }
+        });
+      }
     }
+    return criticidad;
   }
 
   getPerdidasColor(anomalias: Anomalia[], anomaliaSelected: Anomalia) {

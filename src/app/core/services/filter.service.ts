@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 
 import { ShareReportService } from '@core/services/share-report.service';
-import { SeguidorService } from '@core/services/seguidor.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
 import { FilterableElement } from '@core/models/filterableInterface';
@@ -28,19 +27,9 @@ export class FilterService {
     this._filteredElementsWithoutFilterTipo
   );
 
-  constructor(
-    private shareReportService: ShareReportService,
-    private seguidorService: SeguidorService,
-    private filterControlService: FilterControlService
-  ) {}
+  constructor(private shareReportService: ShareReportService, private filterControlService: FilterControlService) {}
 
-  initService(
-    plantaId: string,
-    plantaFija: boolean,
-    elems: FilterableElement[],
-    shared?: boolean,
-    sharedId?: string
-  ): Observable<boolean> {
+  initService(elems: FilterableElement[], shared?: boolean, sharedId?: string): Observable<boolean> {
     this.allFiltrableElements = elems;
     this.filteredElements = elems;
 

@@ -25,8 +25,8 @@ export class SeguidorAnomaliaInfoComponent implements OnInit {
       if (this.anomaliaSelected !== undefined) {
         this.anomaliaInfo = {
           localId: this.anomaliaSelected.localId,
-          clase: GLOBAL.labels_severidad[this.anomaliaSelected.severidad],
-          claseColor: GLOBAL.colores_severidad[this.anomaliaSelected.severidad],
+          clase: GLOBAL.labels_clase[this.anomaliaSelected.clase],
+          claseColor: GLOBAL.colores_clase[this.anomaliaSelected.clase],
           temperaturaMax: this.anomaliaSelected.temperaturaMax,
           temperaturaRef: this.anomaliaSelected.temperaturaRef,
           gradienteNormalizado: this.anomaliaSelected.gradienteNormalizado,

@@ -89,7 +89,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   public infoAdicional: InfoAdicional;
   private plantaId: string;
   private nombrePlanta: string;
-  public coloresSeveridad: string[];
+  public coloresClase: string[];
   public tiposAnomalias: string[] = GLOBAL.labels_tipos;
   public seccionModulo = false;
   public seccionImagen = false;
@@ -120,7 +120,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
       gradienteNormalizado: 'number',
       perdidas: 'number',
     };
-    this.coloresSeveridad = GLOBAL.colores_severidad;
+    this.coloresClase = GLOBAL.colores_clase;
 
     if (this.router.url.includes('shared')) {
       this.shareReportService.getParams().subscribe((params) => (this.plantaId = params.plantaId));

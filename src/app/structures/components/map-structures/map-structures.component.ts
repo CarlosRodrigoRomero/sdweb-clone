@@ -187,7 +187,7 @@ export class MapStructuresComponent implements OnInit {
           // calculamos las medias y desviaciones
           this.structuresService.setAveragesAndStandardDeviations();
 
-          return this.filterService.initService(this.planta.id, true, modulos);
+          return this.filterService.initService(modulos);
         })
       )
       .subscribe((init) => {

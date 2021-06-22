@@ -40,8 +40,8 @@ export class FilterControlService {
   private _tiposSelected: boolean[] = [];
   public tiposSelected$ = new BehaviorSubject<boolean[]>(this._tiposSelected);
 
-  private _severidadSelected: boolean[] = [false, false, false];
-  public severidadSelected$ = new BehaviorSubject<boolean[]>(this._severidadSelected);
+  private _claseSelected: boolean[] = [false, false, false];
+  public claseSelected$ = new BehaviorSubject<boolean[]>(this._claseSelected);
 
   private _criticidadSelected: boolean[] = [false, false, false, false, false];
   public criticidadSelected$ = new BehaviorSubject<boolean[]>(this._criticidadSelected);
@@ -75,7 +75,7 @@ export class FilterControlService {
       this.maxGradiente = params.maxGradient;
     }
     if (params.clase !== undefined && params.clase !== null) {
-      this.severidadSelected = params.clase;
+      this.claseSelected = params.clase;
     }
     if (params.criticidad !== undefined && params.criticidad !== null) {
       this.criticidadSelected = params.criticidad;
@@ -115,8 +115,8 @@ export class FilterControlService {
     this.selectedTipoLabels = [this.selectedTipoDefaultLabel];
     this.labelTipoDefaultStatus = true;
 
-    // SEVERIDAD
-    this.severidadSelected = [false, false, false];
+    // CLASE
+    this.claseSelected = [false, false, false];
 
     // CRITICIDAD
     this.criticidadSelected = [false, false, false, false, false];
@@ -218,14 +218,14 @@ export class FilterControlService {
     this.labelTipoDefaultStatus$.next(value);
   }
 
-  /* SEVERIDAD */
-  get severidadSelected() {
-    return this._severidadSelected;
+  /* CLASE */
+  get claseSelected() {
+    return this._claseSelected;
   }
 
-  set severidadSelected(value: boolean[]) {
-    this._severidadSelected = value;
-    this.severidadSelected$.next(value);
+  set claseSelected(value: boolean[]) {
+    this._claseSelected = value;
+    this.claseSelected$.next(value);
   }
 
   /* CRITICIDAD */

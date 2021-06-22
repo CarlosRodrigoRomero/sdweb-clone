@@ -83,10 +83,13 @@ export class ReportControlService {
             }),
             take(1),
             switchMap((anoms) => {
+              console.log(anoms);
+              console.log(anoms.map((anom) => anom.criticidad));
+
               this.allFilterableElements = anoms;
 
               // iniciamos filter service
-              return this.filterService.initService(this.plantaId, this.plantaFija, anoms);
+              return this.filterService.initService(anoms);
             })
           )
           .subscribe((init) => (this.initialized = init));
@@ -126,7 +129,7 @@ export class ReportControlService {
                       this.allFilterableElements = anoms;
 
                       // iniciamos filter service
-                      return this.filterService.initService(this.plantaId, true, anoms, true, this.sharedId);
+                      return this.filterService.initService(anoms, true, this.sharedId);
                     })
                   )
                   // iniciamos filter service
@@ -164,7 +167,7 @@ export class ReportControlService {
                       this.allFilterableElements = anoms;
 
                       // iniciamos filter service
-                      return this.filterService.initService(this.plantaId, true, anoms, true, this.sharedId);
+                      return this.filterService.initService(anoms, true, this.sharedId);
                     })
                   )
                   .subscribe((init) => (this.initialized = init));
@@ -206,7 +209,7 @@ export class ReportControlService {
               this.allFilterableElements = segs;
 
               // iniciamos filter service
-              return this.filterService.initService(this.plantaId, this.plantaFija, segs);
+              return this.filterService.initService(segs);
             })
           )
           .subscribe((init) => (this.initialized = init));
@@ -246,7 +249,7 @@ export class ReportControlService {
                       this.allFilterableElements = segs;
 
                       // iniciamos filter service
-                      return this.filterService.initService(this.plantaId, true, segs, this.plantaFija, this.sharedId);
+                      return this.filterService.initService(segs, this.plantaFija, this.sharedId);
                     })
                   )
                   // iniciamos filter service
@@ -284,7 +287,7 @@ export class ReportControlService {
                       this.allFilterableElements = segs;
 
                       // iniciamos filter service
-                      return this.filterService.initService(this.plantaId, true, segs, this.plantaFija, this.sharedId);
+                      return this.filterService.initService(segs, this.plantaFija, this.sharedId);
                     })
                   )
                   .subscribe((init) => (this.initialized = init));

@@ -51,7 +51,7 @@ export class FilterPcsListComponent implements OnInit {
               gradiente: anom.gradienteNormalizado,
               gradienteNormalizado: anom.gradienteNormalizado,
               color: GLOBAL.colores_tipos_hex[anom.tipo],
-              clase: anom.severidad,
+              clase: anom.clase,
               anomalia: anom,
               selected: false,
               hovered: false,

@@ -9,7 +9,7 @@ import { GradientFilter } from '@core/models/gradientFilter';
 import { PerdidasFilter } from '@core/models/perdidasFilter';
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
 import { AreaFilter } from '@core/models/areaFilter';
-import { SeveridadFilter } from '@core/models/clasePcFilter';
+import { ClaseFilter } from '@core/models/claseFilter';
 import { CriticidadFilter } from '@core/models/criticidad';
 import { ModuloPcFilter } from '@core/models/moduloFilter';
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
@@ -69,12 +69,12 @@ export class ShareReportService {
       case 'clase':
         if (this.params.clase === undefined || this.params.clase === null) {
           this.params.clase = [false, false, false];
-          this.params.clase[(filter as SeveridadFilter).clase - 1] = !this.params.clase[
-            (filter as SeveridadFilter).clase - 1
+          this.params.clase[(filter as ClaseFilter).clase - 1] = !this.params.clase[
+            (filter as ClaseFilter).clase - 1
           ];
         } else {
-          this.params.clase[(filter as SeveridadFilter).clase - 1] = !this.params.clase[
-            (filter as SeveridadFilter).clase - 1
+          this.params.clase[(filter as ClaseFilter).clase - 1] = !this.params.clase[
+            (filter as ClaseFilter).clase - 1
           ];
         }
         break;
@@ -129,8 +129,8 @@ export class ShareReportService {
         this.params.area = null;
         break;
       case 'clase':
-        this.params.clase[(filter as SeveridadFilter).clase - 1] = !this.params.clase[
-          (filter as SeveridadFilter).clase - 1
+        this.params.clase[(filter as ClaseFilter).clase - 1] = !this.params.clase[
+          (filter as ClaseFilter).clase - 1
         ];
         break;
       case 'criticidad':
@@ -232,7 +232,7 @@ export class ShareReportService {
           if (this.params.clase !== null) {
             this.params.clase.forEach((sev, index) => {
               if (sev) {
-                const severityFilter = new SeveridadFilter('', 'clase', index + 1);
+                const severityFilter = new ClaseFilter('', 'clase', index + 1);
                 filters.push(severityFilter);
               }
             });

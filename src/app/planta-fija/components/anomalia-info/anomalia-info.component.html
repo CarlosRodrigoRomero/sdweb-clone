@@ -23,7 +23,7 @@
       </div>
       <div class="elemento">
         <span class="titulo">Clase</span>
-        <span class="subtitulo">CoA {{ anomaliaHover.severidad }}</span>
+        <span class="subtitulo">CoA {{ anomaliaHover.clase }}</span>
       </div>
       <div class="elemento" *ngIf="anomaliaHover.criticidad !== undefined">
         <span class="titulo">Criticidad</span>
@@ -80,7 +80,7 @@
             </div>
             <div class="elemento">
               <span class="titulo">Clase</span>
-              <span class="subtitulo">CoA {{ anomaliaSelect.severidad }}</span>
+              <span class="subtitulo">CoA {{ anomaliaSelect.clase }}</span>
             </div>
             <div class="elemento" *ngIf="anomaliaSelect.criticidad !== undefined">
               <span class="titulo">Criticidad</span>
@@ -102,11 +102,6 @@
               <!-- <span class="titulo">Radiación</span> -->
               <span class="titulo">Irradiancia</span>
               <span class="subtitulo">{{ infoAdicional.vuelo.irradiancia }}</span>
-            </div>
-            <div class="elemento" *ngIf="infoAdicional.vuelo.severidad">
-              <span class="titulo">Severidad</span>
-              <span class="subtitulo">{{ infoAdicional.vuelo.severidad }}</span>
-              <!-- <input (change)="onEdit($event, 'severidad')" type="text" matImput [(ngModel)]="anomaliaSelect.severidad" /> -->
             </div>
             <div class="elemento" *ngIf="infoAdicional.vuelo.emisividad">
               <span class="titulo">Emisividad</span>
@@ -280,11 +275,6 @@
             <!-- <span class="titulo">Radiación</span> -->
             <span class="titulo">Irradiancia</span>
             <span class="subtitulo">{{ infoAdicional.vuelo.irradiancia }}</span>
-          </div>
-          <div class="elemento" *ngIf="infoAdicional.vuelo.relevancia">
-            <span class="titulo">Relevancia</span>
-            <span class="subtitulo">{{ infoAdicional.vuelo.severidad }}</span>
-            <!-- <input (change)="onEdit($event, 'severidad')" type="text" matImput [(ngModel)]="anomaliaSelect.severidad" /> -->
           </div>
           <div class="elemento" *ngIf="infoAdicional.vuelo.emisividad">
             <span class="titulo">Emisividad</span>

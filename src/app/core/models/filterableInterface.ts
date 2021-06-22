@@ -7,7 +7,7 @@ export interface FilterableElement {
   temperaturaMax?: number;
   modulo?: ModuloInterface;
   tipo?: number;
-  severidad?: number;
+  clase?: number;
   criticidad?: number;
   gradienteNormalizado?: number;
   temperaturaRef?: number;

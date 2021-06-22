@@ -11,18 +11,19 @@ import { Coordinate } from 'ol/coordinate';
 
 import { LatLngLiteral } from '@agm/core/map-types';
 
-import { AuthService } from './auth.service';
-import { GLOBAL } from './global';
+import { AuthService } from '@core/services/auth.service';
+import { GLOBAL } from '@core/services/global';
 import { OlMapService } from '@core/services/ol-map.service';
 
-import { ThermalLayerInterface } from '../models/thermalLayer';
+import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { PlantaInterface } from '@core/models/planta';
-import { CriteriosClasificacion } from '../models/criteriosClasificacion';
-import { LocationAreaInterface } from '../models/location';
-import { UserInterface } from '../models/user';
-import { ModuloInterface } from '../models/modulo';
-import { PcInterface } from '../models/pc';
-import { UserAreaInterface } from '../models/userArea';
+import { CriteriosClasificacion } from '@core/models/criteriosClasificacion';
+import { LocationAreaInterface } from '@core/models/location';
+import { UserInterface } from '@core/models/user';
+import { ModuloInterface } from '@core/models/modulo';
+import { PcInterface } from '@core/models/pc';
+import { UserAreaInterface } from '@core/models/userArea';
+import { CritCriticidad } from '@core/models/critCriticidad';
 
 declare const google: any;
 
@@ -421,19 +422,19 @@ export class PlantaService {
     );
   }
 
-  getCriterios(): Observable<CriteriosClasificacion[]> {
-    let query$: AngularFirestoreCollection<CriteriosClasificacion>;
+  getCriterioCriticidad(criterioId: string): Observable<CritCriticidad> {
+    const criterioDoc = this.afs.doc<CriteriosClasificacion>('criteriosCriticidad/' + criterioId);
 
-    query$ = this.afs.collection<CriteriosClasificacion>('criteriosClasificacion');
-
-    return query$.snapshotChanges().pipe(
-      map((actions) =>
-        actions.map((a) => {
-          const data = a.payload.doc.data() as CriteriosClasificacion;
-          data.id = a.payload.doc.id;
+    return criterioDoc.snapshotChanges().pipe(
+      map((action) => {
+        if (action.payload.exists === false) {
+          return null;
+        } else {
+          const data = action.payload.data() as CritCriticidad;
+          data.id = action.payload.id;
           return data;
-        })
-      )
+        }
+      })
     );
   }
 

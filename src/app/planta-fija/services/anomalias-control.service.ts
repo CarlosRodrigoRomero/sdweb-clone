@@ -102,7 +102,7 @@ export class AnomaliasControlService {
           properties: {
             anomaliaId: anom.id,
             tipo: anom.tipo,
-            clase: anom.severidad,
+            clase: anom.clase,
             temperaturaMax: anom.temperaturaMax,
             temperaturaRef: anom.temperaturaRef,
             informeId: anom.informeId,

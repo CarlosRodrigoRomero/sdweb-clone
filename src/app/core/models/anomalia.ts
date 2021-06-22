@@ -8,7 +8,7 @@ export class Anomalia implements FilterableElement {
   informeId: string;
   tipo: number;
   globalCoords: string[];
-  severidad: number;
+  clase: number;
   perdidas: number;
   gradiente?: number;
   gradienteNormalizado: number;
@@ -47,7 +47,7 @@ export class Anomalia implements FilterableElement {
   ) {
     this.tipo = tipo;
     this.globalCoords = globalCoords;
-    this.severidad = clase;
+    this.clase = clase;
     this.perdidas = perdidas;
     this.gradienteNormalizado = gradienteNormalizado;
     this.temperaturaMax = temperaturaMax;

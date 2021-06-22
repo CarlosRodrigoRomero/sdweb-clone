@@ -2,14 +2,14 @@
   <h5>Clase</h5>
   <mat-button-toggle-group #group="matButtonToggleGroup" multiple="true">
     <mat-button-toggle
-      *ngFor="let elem of severidadElems; index as i"
+      *ngFor="let elem of claseElems; index as i"
       [id]="'CoA_' + (i + 1)"
       [name]="elem.label"
-      [checked]="severidadSelected[i]"
+      [checked]="claseSelected[i]"
       (change)="onChangeClaseFilter($event)"
     >
       <div class="label">
-        <mat-icon [ngStyle]="{ color: coloresSeveridad[i] }">circle</mat-icon>
+        <mat-icon [ngStyle]="{ color: coloresClase[i] }">circle</mat-icon>
         <span class="text-label" style="font-size: 15px">
           {{ elem.label }}
         </span>
