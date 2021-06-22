@@ -35,7 +35,6 @@ export class ReportControlService {
   public initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _mapLoaded = false;
   public mapLoaded$ = new BehaviorSubject<boolean>(this._mapLoaded);
-  public criterioCoA;
   private _allFilterableElements: FilterableElement[] = [];
   public allFilterableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFilterableElements);
   private _filteredElements: FilterableElement[] = [];
@@ -84,8 +83,6 @@ export class ReportControlService {
             take(1),
             switchMap((anoms) => {
               console.log(anoms);
-              console.log(anoms.map((anom) => anom.criticidad));
-
               this.allFilterableElements = anoms;
 
               // iniciamos filter service

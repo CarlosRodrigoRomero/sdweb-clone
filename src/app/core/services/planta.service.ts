@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
 
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, EMPTY, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import Polygon from 'ol/geom/Polygon';

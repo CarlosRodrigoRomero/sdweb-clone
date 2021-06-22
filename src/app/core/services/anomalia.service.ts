@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 
-import { Observable, combineLatest, BehaviorSubject, EMPTY } from 'rxjs';
+import { Observable, combineLatest, BehaviorSubject, EMPTY, iif, of } from 'rxjs';
 import { map, take, switchMap } from 'rxjs/operators';
 
 import { InformeService } from './informe.service';
@@ -34,19 +34,24 @@ export class AnomaliaService {
   ) {}
 
   initService(plantaId: string) {
-    // obtenemos el criterio de CoA de la planta
+    // obtenemos el criterio de criticidad de la planta si tuviese
     this.plantaService
       .getPlanta(plantaId)
       .pipe(
         take(1),
-        switchMap((planta) => {
-          if (planta.hasOwnProperty('criterioId')) {
-            return this.plantaService.getCriterioCriticidad(planta.criterioId);
-          }
-        })
+        switchMap((planta) =>
+          iif(
+            () => planta.hasOwnProperty('criterioId'),
+            this.plantaService.getCriterioCriticidad(planta.criterioId),
+            of()
+          )
+        )
       )
       .subscribe((criterio: CritCriticidad) => {
-        this.criterioCriticidad = criterio;
+        console.log(criterio);
+        if (criterio !== undefined) {
+          this.criterioCriticidad = criterio;
+        }
         this.inicialized = true;
       });
 
@@ -157,7 +162,10 @@ export class AnomaliaService {
           })
         ),
         // filtramos las que tienen criticidad null ya que para el cliente no son anomalias
-        map((anoms) => anoms.filter((anom) => anom.criticidad !== null))
+        map((anoms) => {
+          console.log(anoms.map((anom) => anom.criticidad));
+          return anoms.filter((anom) => anom.criticidad !== null);
+        })
       );
 
     return query$;
@@ -233,6 +241,7 @@ export class AnomaliaService {
   }
 
   private getCriticidad(anomalia: Anomalia): number {
+    // si hay criterio y no cumple ninguno devolvemos null
     let criticidad = null;
     if (this.criterioCriticidad !== undefined) {
       if (this.criterioCriticidad.hasOwnProperty('criterioConstante')) {
@@ -255,6 +264,9 @@ export class AnomaliaService {
           }
         });
       }
+    } else {
+      // si no hay criterio devolvemos undefined
+      criticidad = undefined;
     }
     return criticidad;
   }
