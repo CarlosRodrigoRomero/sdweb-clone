@@ -26,11 +26,15 @@ import { InformeService } from '@core/services/informe.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { ThermalService } from '@core/services/thermal.service';
 import { StructuresService } from '@core/services/structures.service';
+import { ClustersService } from '@core/services/clusters.service';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { PlantaInterface } from '@core/models/planta';
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { Anomalia } from '@core/models/anomalia';
+import Point from 'ol/geom/Point';
+import LineString from 'ol/geom/LineString';
+import moment from 'moment';
 
 @Component({
   selector: 'app-map-classification',
@@ -55,7 +59,8 @@ export class MapClassificationComponent implements OnInit {
     private informeService: InformeService,
     private olMapService: OlMapService,
     private thermalService: ThermalService,
-    private structuresService: StructuresService
+    private structuresService: StructuresService,
+    private clustersService: ClustersService
   ) {}
 
   ngOnInit(): void {
@@ -309,7 +314,9 @@ export class MapClassificationComponent implements OnInit {
 
         this.popup.setPosition(coords[0]);
 
-        this.classificationService.createAnomaliaFromNormModule(feature);
+        const date = this.getDatetime(coords);
+
+        this.classificationService.createAnomaliaFromNormModule(feature, date);
       }
     });
   }
@@ -326,6 +333,34 @@ export class MapClassificationComponent implements OnInit {
         this.classificationService.anomaliaSelected = undefined;
       }
     });
+  }
+
+  private getDatetime(coords: Coordinate[]) {
+    const dateString = this.getClosestPoint(coords);
+
+    return this.dateStringToUnix(dateString);
+  }
+
+  private getClosestPoint(coords: Coordinate[]): string {
+    const distances = this.clustersService.puntosTrayectoria.map((punto, index) => {
+      const line = new LineString([coords[0], [punto.long, punto.lat]]);
+
+      return line.getLength();
+    });
+
+    const minDistance = Math.min(...distances);
+
+    const indexClosestPoint = distances.indexOf(minDistance);
+
+    const closestPoint = this.clustersService.puntosTrayectoria[indexClosestPoint];
+
+    return closestPoint.date;
+  }
+
+  private dateStringToUnix(date: string) {
+    const unix = moment(date, 'DD/MM/YYYY hh:mm:ss').unix();
+
+    return unix;
   }
 
   private getStyleNormMod(hovered: boolean) {

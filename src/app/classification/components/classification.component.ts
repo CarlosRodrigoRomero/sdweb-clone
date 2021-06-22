@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { NormalizedModule } from '@core/models/normalizedModule';
+
+import { take } from 'rxjs/operators';
 
 import { ClassificationService } from '@core/services/classification.service';
+import { ClustersService } from '@core/services/clusters.service';
+
+import { NormalizedModule } from '@core/models/normalizedModule';
+
 
 @Component({
   selector: 'app-classification',
@@ -13,11 +18,13 @@ export class ClassificationComponent implements OnInit {
   nombrePlanta: string;
   normModHovered: NormalizedModule = undefined;
 
-  constructor(private classificationService: ClassificationService) {}
+  constructor(private classificationService: ClassificationService, private clustersService: ClustersService) {}
 
   ngOnInit(): void {
     this.classificationService.initService().subscribe((value) => (this.serviceInit = value));
     this.classificationService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre));
     this.classificationService.normModHovered$.subscribe((normMod) => (this.normModHovered = normMod));
+
+    this.clustersService.initService().pipe(take(1)).subscribe();
   }
 }
