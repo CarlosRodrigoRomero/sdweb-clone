@@ -342,8 +342,8 @@ export class MapClassificationComponent implements OnInit {
   }
 
   private getClosestPoint(coords: Coordinate[]): string {
-    const distances = this.clustersService.puntosTrayectoria.map((punto, index) => {
-      const line = new LineString([coords[0], [punto.long, punto.lat]]);
+    const distances = this.clustersService.coordsPuntosTrayectoria.map((coord) => {
+      const line = new LineString([coords[0], coord]);
 
       return line.getLength();
     });
