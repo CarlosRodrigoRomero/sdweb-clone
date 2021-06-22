@@ -23,6 +23,8 @@ export class AnomaliaService {
   public allAnomaliasInforme: Anomalia[];
   public criterioCoA: CritCoA = GLOBAL.criterioCoA;
   public criterioCriticidad: CritCriticidad;
+  private _hasCriticidad = false;
+  public hasCriticidad$ = new BehaviorSubject<boolean>(this._hasCriticidad);
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
 
@@ -39,13 +41,16 @@ export class AnomaliaService {
       .getPlanta(plantaId)
       .pipe(
         take(1),
-        switchMap((planta) =>
-          iif(
+        switchMap((planta) => {
+          if (planta.hasOwnProperty('criterioId')) {
+            this.hasCriticidad = true;
+          }
+          return iif(
             () => planta.hasOwnProperty('criterioId'),
             this.plantaService.getCriterioCriticidad(planta.criterioId),
             of()
-          )
-        )
+          );
+        })
       )
       .subscribe((criterio: CritCriticidad) => {
         console.log(criterio);
@@ -359,6 +364,15 @@ export class AnomaliaService {
         xhr.open('GET', downloadUrl);
         xhr.send();
       });
+  }
+
+  get hasCriticidad() {
+    return this._hasCriticidad;
+  }
+
+  set hasCriticidad(value: boolean) {
+    this._hasCriticidad = value;
+    this.hasCriticidad$.next(value);
   }
 
   get inicialized() {
