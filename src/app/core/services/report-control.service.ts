@@ -82,7 +82,6 @@ export class ReportControlService {
             }),
             take(1),
             switchMap((anoms) => {
-              console.log(anoms);
               this.allFilterableElements = anoms;
 
               // iniciamos filter service

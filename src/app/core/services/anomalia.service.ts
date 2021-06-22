@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 
-import { Observable, combineLatest, BehaviorSubject, EMPTY, iif, of } from 'rxjs';
+import { Observable, combineLatest, BehaviorSubject, iif, of } from 'rxjs';
 import { map, take, switchMap } from 'rxjs/operators';
 
 import { InformeService } from './informe.service';
@@ -53,7 +53,6 @@ export class AnomaliaService {
         })
       )
       .subscribe((criterio: CritCriticidad) => {
-        console.log(criterio);
         if (criterio !== undefined) {
           this.criterioCriticidad = criterio;
         }
@@ -115,9 +114,14 @@ export class AnomaliaService {
         });
         return combineLatest(anomaliaObsList);
       }),
-      map((arr) => arr.flat()),
+      map((arr) => arr.flat())
+      // TODO: revisar cuando aparezca planta con 'anomalias' y 'pcs'
+      /* ,
       // eliminamos las anomalias "vacias" por haber llamado a 'pcs' y 'anomalias'
-      map((anoms) => (anoms = anoms.filter((anom) => anom.perdidas !== 0)))
+      map((anoms) => {
+        console.log(anoms);
+        return (anoms = anoms.filter((anom) => anom.perdidas !== 0));
+      }) */
     );
 
     return query$;
@@ -167,10 +171,7 @@ export class AnomaliaService {
           })
         ),
         // filtramos las que tienen criticidad null ya que para el cliente no son anomalias
-        map((anoms) => {
-          console.log(anoms.map((anom) => anom.criticidad));
-          return anoms.filter((anom) => anom.criticidad !== null);
-        })
+        map((anoms) => anoms.filter((anom) => anom.criticidad !== null))
       );
 
     return query$;
