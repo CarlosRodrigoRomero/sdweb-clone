@@ -106,8 +106,6 @@ export class ClassificationService {
             informeId: this.informeId,
             tipo: 8,
             globalCoords,
-            clase: 0,
-            perdidas: 0,
             gradienteNormalizado: 0,
             temperaturaMax: 0,
             modulo: null,

@@ -8,8 +8,8 @@ export class Anomalia implements FilterableElement {
   informeId: string;
   tipo: number;
   globalCoords: string[];
-  clase: number;
-  perdidas: number;
+  clase?: number;
+  perdidas?: number;
   gradiente?: number;
   gradienteNormalizado: number;
   temperaturaMax: number;
