@@ -143,20 +143,22 @@ export class ReportControlService {
                       return this.informeService.getInformesDePlanta(this.plantaId);
                     }),
                     // obtenemos los informes de la planta
-                    switchMap((informesId) => {
+                    switchMap((informes) => {
                       // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                      informesId
+                      informes
                         .sort((a, b) => a.fecha - b.fecha)
                         .forEach((informe) => {
                           this.informesIdList.push(informe.id);
                         });
                       this.informesIdList$.next(this.informesIdList);
-
+                      /*TODO: REVISAR
                       // comprobamos que anomalia service hay terminado de iniciarse
                       if (initAnomService) {
                         // obtenemos todas las anomalías
                         return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
-                      }
+                      } */
+                      // obtenemos todas las anomalías
+                      return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
                     }),
                     take(1),
                     switchMap((anoms) => {

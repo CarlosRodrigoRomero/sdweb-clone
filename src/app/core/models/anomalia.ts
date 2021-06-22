@@ -14,7 +14,7 @@ export class Anomalia implements FilterableElement {
   gradienteNormalizado: number;
   temperaturaMax: number;
   modulo: ModuloInterface;
-  temperaturaRef: number;
+  temperaturaRef?: number;
   datetime?: number;
   criticidad?: number;
   featureCoords: Coordinate[];

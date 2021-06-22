@@ -109,7 +109,6 @@ export class ClassificationService {
             gradienteNormalizado: 0,
             temperaturaMax: 0,
             modulo: null,
-            temperaturaRef: 0,
             featureCoords: geometry.getCoordinates()[0],
             featureType: geometry.getType(),
             localX: normModule.columna,

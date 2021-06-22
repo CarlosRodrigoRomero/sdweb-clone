@@ -69,25 +69,19 @@ export class ShareReportService {
       case 'clase':
         if (this.params.clase === undefined || this.params.clase === null) {
           this.params.clase = [false, false, false];
-          this.params.clase[(filter as ClaseFilter).clase - 1] = !this.params.clase[
-            (filter as ClaseFilter).clase - 1
-          ];
+          this.params.clase[(filter as ClaseFilter).clase - 1] = !this.params.clase[(filter as ClaseFilter).clase - 1];
         } else {
-          this.params.clase[(filter as ClaseFilter).clase - 1] = !this.params.clase[
-            (filter as ClaseFilter).clase - 1
-          ];
+          this.params.clase[(filter as ClaseFilter).clase - 1] = !this.params.clase[(filter as ClaseFilter).clase - 1];
         }
         break;
       case 'criticidad':
         if (this.params.criticidad === undefined || this.params.criticidad === null) {
           this.params.criticidad = [false, false, false, false, false];
-          this.params.criticidad[(filter as CriticidadFilter).criticidad - 1] = !this.params.criticidad[
-            (filter as CriticidadFilter).criticidad - 1
-          ];
+          this.params.criticidad[(filter as CriticidadFilter).criticidad - 1] =
+            !this.params.criticidad[(filter as CriticidadFilter).criticidad - 1];
         } else {
-          this.params.criticidad[(filter as CriticidadFilter).criticidad - 1] = !this.params.criticidad[
-            (filter as CriticidadFilter).criticidad - 1
-          ];
+          this.params.criticidad[(filter as CriticidadFilter).criticidad - 1] =
+            !this.params.criticidad[(filter as CriticidadFilter).criticidad - 1];
         }
         break;
       case 'modulo':
@@ -129,14 +123,11 @@ export class ShareReportService {
         this.params.area = null;
         break;
       case 'clase':
-        this.params.clase[(filter as ClaseFilter).clase - 1] = !this.params.clase[
-          (filter as ClaseFilter).clase - 1
-        ];
+        this.params.clase[(filter as ClaseFilter).clase - 1] = !this.params.clase[(filter as ClaseFilter).clase - 1];
         break;
       case 'criticidad':
-        this.params.criticidad[(filter as CriticidadFilter).criticidad - 1] = !this.params.criticidad[
-          (filter as CriticidadFilter).criticidad - 1
-        ];
+        this.params.criticidad[(filter as CriticidadFilter).criticidad - 1] =
+          !this.params.criticidad[(filter as CriticidadFilter).criticidad - 1];
         break;
       case 'modulo':
         this.params.modulo = null;
@@ -230,10 +221,10 @@ export class ShareReportService {
         }
         if (Object.keys(this.params).includes('clase')) {
           if (this.params.clase !== null) {
-            this.params.clase.forEach((sev, index) => {
-              if (sev) {
-                const severityFilter = new ClaseFilter('', 'clase', index + 1);
-                filters.push(severityFilter);
+            this.params.clase.forEach((clase, index) => {
+              if (clase) {
+                const claseFilter = new ClaseFilter('CoA_' + (index + 1), 'clase', index + 1);
+                filters.push(claseFilter);
               }
             });
           }

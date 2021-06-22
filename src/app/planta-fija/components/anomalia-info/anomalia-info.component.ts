@@ -63,11 +63,11 @@ interface InfoAdicional {
   termico?: {
     gradiente?: number;
     tempMedia?: number;
-    tempMax?: number; // temperatura defecto en Demo
+    tempMax?: number; // temperatura defecto en Demo // ya aparecece la tempMax en General
   };
   imagen?: {
-    urlImagenIR?: string;
-    urlImagenRGB?: string;
+    urlImagenIR?: string; // creo q no hay en fijas
+    urlImagenRGB?: string; // creo q no hay en fijas
     camaraSN?: number;
     camaraNombre?: string;
     camaraLente?: string;

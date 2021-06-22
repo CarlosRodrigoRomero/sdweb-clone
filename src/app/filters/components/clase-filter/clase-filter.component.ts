@@ -46,11 +46,7 @@ export class ClaseFilterComponent implements OnInit {
 
   onChangeClaseFilter(event: MatButtonToggleChange) {
     if (event.source.checked) {
-      this.filtroClase = new ClaseFilter(
-        event.source.id,
-        'clase',
-        GLOBAL.labels_clase.indexOf(event.source.name) + 1
-      );
+      this.filtroClase = new ClaseFilter(event.source.id, 'clase', GLOBAL.labels_clase.indexOf(event.source.name) + 1);
       this.filterService.addFilter(this.filtroClase);
       this.filterControlService.claseSelected[parseInt(event.source.id.replace('CoA_', '')) - 1] = true;
     } else {
@@ -58,6 +54,8 @@ export class ClaseFilterComponent implements OnInit {
         filters
           .filter((filter) => filter.type === 'clase')
           .forEach((filter) => {
+            console.log(filter);
+            console.log(event.source.id);
             if (filter.id === event.source.id) {
               this.filterService.deleteFilter(filter);
             }
