@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { BehaviorSubject, combineLatest } from 'rxjs';
+import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
 import { LabelType, Options } from '@angular-slider/ngx-slider';
@@ -18,13 +18,14 @@ import { ReportControlService } from '@core/services/report-control.service';
   templateUrl: './slider-temporal.component.html',
   styleUrls: ['./slider-temporal.component.scss'],
 })
-export class SliderTemporalComponent implements OnInit {
+export class SliderTemporalComponent implements OnInit, OnDestroy {
   private thermalLayers: TileLayer[];
   private anomaliaLayers: VectorLayer[];
   public selectedInformeId: string;
   private informesList: string[];
   private sliderLoaded = false;
   public sliderLoaded$ = new BehaviorSubject<boolean>(this.sliderLoaded);
+  private subscriptions: Subscription = new Subscription();
 
   /* Slider Values*/
   currentYear = 100;
@@ -49,29 +50,35 @@ export class SliderTemporalComponent implements OnInit {
   ngOnInit(): void {
     this.reportControlService.informesIdList$.pipe(take(1)).subscribe((informesId) => {
       this.informesList = informesId;
-      this.getDatesInformes(informesId).subscribe((dates) => {
-        this.dates = dates;
+      this.subscriptions.add(
+        this.getDatesInformes(informesId).subscribe((dates) => {
+          this.dates = dates;
 
-        // ya tenemos los labels y ahora mostramos el slider
-        this.sliderLoaded = true;
-        this.sliderLoaded$.next(this.sliderLoaded);
-      });
+          // ya tenemos los labels y ahora mostramos el slider
+          this.sliderLoaded = true;
+          this.sliderLoaded$.next(this.sliderLoaded);
+        })
+      );
     });
 
-    this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+    );
 
     this.currentYear = this.informesList.indexOf(this.selectedInformeId) * 100;
 
     this.mapControlService.sliderTemporal = this.currentYear;
 
-    combineLatest([this.olMapService.getThermalLayers(), this.olMapService.getAnomaliaLayers()]).subscribe(
-      ([tLayers, aLayers]) => {
-        this.thermalLayers = tLayers;
-        this.anomaliaLayers = aLayers;
+    this.subscriptions.add(
+      combineLatest([this.olMapService.getThermalLayers(), this.olMapService.getAnomaliaLayers()]).subscribe(
+        ([tLayers, aLayers]) => {
+          this.thermalLayers = tLayers;
+          this.anomaliaLayers = aLayers;
 
-        this.setThermalLayersOpacity(this.selectedInformeId);
-        this.setAnomaliaLayersOpacity(this.selectedInformeId);
-      }
+          this.setThermalLayersOpacity(this.selectedInformeId);
+          this.setAnomaliaLayersOpacity(this.selectedInformeId);
+        }
+      )
     );
   }
 
@@ -136,5 +143,9 @@ export class SliderTemporalComponent implements OnInit {
     ];
     const month = monthNames[date.getMonth()];
     return month + ' ' + year;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

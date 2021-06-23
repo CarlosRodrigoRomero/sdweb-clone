@@ -157,6 +157,17 @@ export class PortfolioControlService {
     return stdDev;
   }
 
+  resetService() {
+    this.plantaHover = undefined;
+    this.maePlantas = [];
+    this.maeMedio = undefined;
+    this.maeSigma = undefined;
+    this.numPlantas = 0;
+    this.potenciaTotal = 0;
+    this.listaPlantas = [];
+    this.allFeatures = [];
+  }
+
   get plantaHover() {
     return this._plantaHover;
   }

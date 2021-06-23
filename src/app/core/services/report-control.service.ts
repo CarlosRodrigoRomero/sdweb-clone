@@ -37,8 +37,6 @@ export class ReportControlService {
   public mapLoaded$ = new BehaviorSubject<boolean>(this._mapLoaded);
   private _allFilterableElements: FilterableElement[] = [];
   public allFilterableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFilterableElements);
-  private _filteredElements: FilterableElement[] = [];
-  public filteredElements$ = new BehaviorSubject<FilterableElement[]>(this._filteredElements);
   public plantaFija = false;
 
   constructor(
@@ -299,6 +297,18 @@ export class ReportControlService {
     }
 
     return this.initialized$;
+  }
+
+  resetService() {
+    this.sharedReport = false;
+    this.sharedReportWithFilters = true;
+    this.plantaId = undefined;
+    this.selectedInformeId = undefined;
+    this.informesIdList = [];
+    this.initialized = false;
+    this.mapLoaded = false;
+    this.allFilterableElements = [];
+    this.plantaFija = false;
   }
 
   getHostname(): string {

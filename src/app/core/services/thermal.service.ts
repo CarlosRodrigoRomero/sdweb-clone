@@ -46,6 +46,12 @@ export class ThermalService {
     return this.thermalLayers$;
   }
 
+  resetService() {
+    this.thermalLayers = [];
+    this.sliderMin = 25;
+    this.sliderMax = 75;
+  }
+
   get thermalLayers() {
     return this._thermalLayers;
   }

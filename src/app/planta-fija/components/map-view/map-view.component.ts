@@ -6,8 +6,9 @@ import { MatSidenav } from '@angular/material/sidenav';
 
 import { ReportControlService } from '@core/services/report-control.service';
 import { StatsService } from '@core/services/stats.service';
+import { OlMapService } from '@core/services/ol-map.service';
+import { ThermalService } from '@core/services/thermal.service';
 
-// planta prueba: egF0cbpXnnBnjcrusoeR
 @Component({
   selector: 'app-map-view',
   templateUrl: './map-view.component.html',
@@ -28,7 +29,12 @@ export class MapViewComponent implements OnInit, OnDestroy {
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
 
-  constructor(private reportControlService: ReportControlService, private statsService: StatsService) {}
+  constructor(
+    private reportControlService: ReportControlService,
+    private statsService: StatsService,
+    private olMapService: OlMapService,
+    private thermalService: ThermalService
+  ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -45,6 +51,11 @@ export class MapViewComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // nos desuscribimos de los observables
     this.subscriptions.unsubscribe();
+
+    // reseteamos los servicios a sus valores por defecto
+    this.reportControlService.resetService();
+    this.olMapService.resetService();
+    this.thermalService.resetService();
   }
 
   loadStats() {

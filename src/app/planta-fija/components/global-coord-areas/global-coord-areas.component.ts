@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { switchMap, take } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
 import VectorLayer from 'ol/layer/Vector';
@@ -8,18 +9,19 @@ import { fromLonLat } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import GeoJSON from 'ol/format/GeoJSON';
+import { Coordinate } from 'ol/coordinate';
+import Polygon from 'ol/geom/Polygon';
+import Overlay from 'ol/Overlay';
+import OverlayPositioning from 'ol/OverlayPositioning';
+import Feature from 'ol/Feature';
+
+import { LatLngLiteral } from '@agm/core';
 
 import { PlantaService } from '@core/services/planta.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { ReportControlService } from '@core/services/report-control.service';
 
 import { LocationAreaInterface } from '@core/models/location';
-import Overlay from 'ol/Overlay';
-import OverlayPositioning from 'ol/OverlayPositioning';
-import Feature from 'ol/Feature';
-import { LatLngLiteral } from '@agm/core';
-import { Coordinate } from 'ol/coordinate';
-import Polygon from 'ol/geom/Polygon';
 
 export interface Task {
   name: string;
@@ -32,12 +34,13 @@ export interface Task {
   templateUrl: './global-coord-areas.component.html',
   styleUrls: ['./global-coord-areas.component.css'],
 })
-export class GlobalCoordAreasComponent implements OnInit {
+export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   public plantaId: string;
   private globalCoordAreas: LocationAreaInterface[][] = [];
   public globalCoordAreasVectorSources: VectorSource[] = [];
   public globalCoordAreasVectorLayers: VectorLayer[] = [];
   public map: Map;
+  private subscriptions: Subscription = new Subscription();
 
   task: Task = {
     name: 'Ver zonas de la planta',
@@ -57,18 +60,20 @@ export class GlobalCoordAreasComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.reportControlService.plantaId$
-      .pipe(
-        switchMap((plantaId) => {
-          this.plantaId = plantaId;
+    this.subscriptions.add(
+      this.reportControlService.plantaId$
+        .pipe(
+          switchMap((plantaId) => {
+            this.plantaId = plantaId;
 
-          return this.olMapService.getMap();
+            return this.olMapService.getMap();
+          })
+        )
+        .subscribe((map) => {
+          this.map = map;
+          this.addLocationAreas();
         })
-      )
-      .subscribe((map) => {
-        this.map = map;
-        this.addLocationAreas();
-      });
+    );
   }
 
   private addLocationAreas() {
@@ -108,7 +113,7 @@ export class GlobalCoordAreasComponent implements OnInit {
               feature.get('globalCoords')[i] !== undefined &&
               feature.get('globalCoords')[i] !== ''
             ) {
-              style.getText().setText(/* areaNames[i] +  */feature.get('globalCoords')[i]);
+              style.getText().setText(/* areaNames[i] +  */ feature.get('globalCoords')[i]);
             }
           }
         } else {
@@ -123,37 +128,39 @@ export class GlobalCoordAreasComponent implements OnInit {
       }
     };
 
-    this.plantaService.getLocationsArea(this.plantaId).subscribe((locAreas) => {
-      for (let i = 0; i < 3; i++) {
-        if (this.globalCoordAreas.length < 3) {
-          this.globalCoordAreas.push(
-            locAreas.filter(
-              (locArea) =>
-                locArea.globalCoords[i] !== null &&
-                locArea.globalCoords[i] !== undefined &&
-                locArea.globalCoords[i] !== ''
-            )
-          );
+    this.subscriptions.add(
+      this.plantaService.getLocationsArea(this.plantaId).subscribe((locAreas) => {
+        for (let i = 0; i < 3; i++) {
+          if (this.globalCoordAreas.length < 3) {
+            this.globalCoordAreas.push(
+              locAreas.filter(
+                (locArea) =>
+                  locArea.globalCoords[i] !== null &&
+                  locArea.globalCoords[i] !== undefined &&
+                  locArea.globalCoords[i] !== ''
+              )
+            );
 
-          this.globalCoordAreasVectorSources[i] = new VectorSource({
-            features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(this.globalCoordAreas[i])),
-          });
-          this.globalCoordAreasVectorSources[i]
-            .getFeatures()
-            .forEach((feature) => feature.setProperties({ tipo: 'areaGlobalCoord' }));
-          this.map.addLayer(
-            (this.globalCoordAreasVectorLayers[i] = new VectorLayer({
-              source: this.globalCoordAreasVectorSources[i],
-              visible: false,
-              style: styleFunction,
-            }))
-          );
+            this.globalCoordAreasVectorSources[i] = new VectorSource({
+              features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(this.globalCoordAreas[i])),
+            });
+            this.globalCoordAreasVectorSources[i]
+              .getFeatures()
+              .forEach((feature) => feature.setProperties({ tipo: 'areaGlobalCoord' }));
+            this.map.addLayer(
+              (this.globalCoordAreasVectorLayers[i] = new VectorLayer({
+                source: this.globalCoordAreasVectorSources[i],
+                visible: false,
+                style: styleFunction,
+              }))
+            );
+          }
         }
-      }
 
-      // this.addPointerOnHover();
-      // this.addOnHoverLabel();
-    });
+        // this.addPointerOnHover();
+        // this.addOnHoverLabel();
+      })
+    );
   }
 
   private getLabelArea(feature: Feature): string {
@@ -338,5 +345,9 @@ export class GlobalCoordAreasComponent implements OnInit {
 
   stopPropagation(event) {
     event.stopPropagation();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

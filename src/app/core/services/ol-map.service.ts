@@ -114,6 +114,16 @@ export class OlMapService {
     return [coordsList];
   }
 
+  resetService() {
+    this.map = undefined;
+    this.draw = undefined;
+    this.drawLayers = [];
+    this.thermalLayers = [];
+    this.anomaliaLayers = [];
+    this.seguidorLayers = [];
+    this.incrementoLayers = [];
+  }
+
   get draw() {
     return this._draw;
   }
