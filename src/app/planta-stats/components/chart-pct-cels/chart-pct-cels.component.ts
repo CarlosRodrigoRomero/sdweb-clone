@@ -4,6 +4,7 @@ import { combineLatest } from 'rxjs';
 
 import { FilterService } from '@core/services/filter.service';
 import { ReportControlService } from '@core/services/report-control.service';
+import { InformeService } from '@core/services/informe.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
@@ -18,6 +19,7 @@ import {
   ApexTooltip,
   ApexStroke,
 } from 'ng-apexcharts';
+import { switchMap } from 'rxjs/operators';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -84,33 +86,44 @@ export class ChartPctCelsComponent implements OnInit {
       categories: ['Jul 2019', 'Jun 2020'],
     },
   };
-  informesList: string[];
+  informesIdList: string[];
   allAnomalias: Anomalia[];
   dataLoaded = false;
   chartHeight = 150;
+  private dateLabels: string[] = [];
 
-  constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
+  constructor(
+    private filterService: FilterService,
+    private reportControlService: ReportControlService,
+    private informeService: InformeService
+  ) {}
 
   ngOnInit(): void {
-    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$]).subscribe(
-      ([elems, informes]) => {
-        this.allAnomalias = elems as Anomalia[];
-        this.informesList = informes;
+    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$])
+      .pipe(
+        switchMap(([elems, informesId]) => {
+          this.allAnomalias = elems as Anomalia[];
+          this.informesIdList = informesId;
+
+          return this.informeService.getDateLabelsInformes(this.informesIdList);
+        })
+      )
+      .subscribe((dateLabels) => {
+        this.commonOptions.xaxis.categories = dateLabels;
 
         const data = [];
-        this.informesList.forEach((informeId) => {
+        this.informesIdList.forEach((informeId) => {
           const filtered = this.allAnomalias.filter((anom) => {
             return anom.informeId == informeId && (anom.tipo == 8 || anom.tipo == 9);
           });
           data.push(Math.round((10000 * filtered.length) / 5508) / 100);
         });
 
-        this._iniitChartData(data);
-      }
-    );
+        this._initChartData(data);
+      });
   }
 
-  private _iniitChartData(data): void {
+  private _initChartData(data): void {
     this.chart1options = {
       series: [
         {
