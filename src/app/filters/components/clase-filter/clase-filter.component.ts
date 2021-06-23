@@ -54,8 +54,6 @@ export class ClaseFilterComponent implements OnInit {
         filters
           .filter((filter) => filter.type === 'clase')
           .forEach((filter) => {
-            console.log(filter);
-            console.log(event.source.id);
             if (filter.id === event.source.id) {
               this.filterService.deleteFilter(filter);
             }

@@ -8,7 +8,7 @@ import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
-import { CriticidadFilter } from '@core/models/criticidad';
+import { CriticidadFilter } from '@core/models/criticidadFilter';
 
 interface Criticidad {
   label?: string;
@@ -29,9 +29,9 @@ export class CriticidadFilterComponent implements OnInit {
   constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
 
   ngOnInit(): void {
-    GLOBAL.labels_criticidad.forEach((label, index, labels) =>
+    GLOBAL.labels_criticidad.forEach((label) =>
       this.criticidadElems.push({
-        label: labels[labels.length - (index + 1)],
+        label,
         completed: false,
       })
     );
@@ -42,9 +42,9 @@ export class CriticidadFilterComponent implements OnInit {
   }
 
   onChangeCriticidadFilter(event: MatButtonToggleChange) {
-    const criticidad = this.criticidadElems.length - parseInt(event.source.id);
+    // const criticidad = this.criticidadElems.length - parseInt(event.source.id);
     if (event.source.checked) {
-      this.filtroCriticidad = new CriticidadFilter(event.source.id, 'criticidad', criticidad);
+      this.filtroCriticidad = new CriticidadFilter(event.source.id, 'criticidad', parseInt(event.source.id));
       this.filterService.addFilter(this.filtroCriticidad);
       this.filterControlService.criticidadSelected[event.source.id] = true;
     } else {
@@ -52,7 +52,8 @@ export class CriticidadFilterComponent implements OnInit {
         filters
           .filter((filter) => filter.type === 'criticidad')
           .forEach((filter) => {
-            if (filter.id === event.source.id) {
+            // tslint:disable-next-line: triple-equals
+            if (filter.id == event.source.id) {
               this.filterService.deleteFilter(filter);
             }
           })

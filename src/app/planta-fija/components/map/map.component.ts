@@ -79,7 +79,6 @@ export class MapComponent implements OnInit, OnDestroy {
     // Para la demo, agregamos un extent a todas las capas:
     this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
-    // this.plantaId = 'egF0cbpXnnBnjcrusoeR';
     this.subscriptions.add(
       this.reportControlService.plantaId$
         .pipe(

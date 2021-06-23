@@ -48,12 +48,12 @@ export class AnomaliaService {
           return iif(
             () => planta.hasOwnProperty('criterioId'),
             this.plantaService.getCriterioCriticidad(planta.criterioId),
-            of()
+            of({})
           );
         })
       )
       .subscribe((criterio: CritCriticidad) => {
-        if (criterio !== undefined) {
+        if (criterio.labels !== undefined) {
           this.criterioCriticidad = criterio;
         }
         this.inicialized = true;
@@ -274,6 +274,7 @@ export class AnomaliaService {
       // si no hay criterio devolvemos undefined
       criticidad = undefined;
     }
+
     return criticidad;
   }
 

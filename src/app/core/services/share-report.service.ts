@@ -10,7 +10,7 @@ import { PerdidasFilter } from '@core/models/perdidasFilter';
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
 import { AreaFilter } from '@core/models/areaFilter';
 import { ClaseFilter } from '@core/models/claseFilter';
-import { CriticidadFilter } from '@core/models/criticidad';
+import { CriticidadFilter } from '@core/models/criticidadFilter';
 import { ModuloPcFilter } from '@core/models/moduloFilter';
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { ZonaFilter } from '@core/models/zonaFilter';
@@ -77,11 +77,11 @@ export class ShareReportService {
       case 'criticidad':
         if (this.params.criticidad === undefined || this.params.criticidad === null) {
           this.params.criticidad = [false, false, false, false, false];
-          this.params.criticidad[(filter as CriticidadFilter).criticidad - 1] =
-            !this.params.criticidad[(filter as CriticidadFilter).criticidad - 1];
+          this.params.criticidad[(filter as CriticidadFilter).criticidad] =
+            !this.params.criticidad[(filter as CriticidadFilter).criticidad];
         } else {
-          this.params.criticidad[(filter as CriticidadFilter).criticidad - 1] =
-            !this.params.criticidad[(filter as CriticidadFilter).criticidad - 1];
+          this.params.criticidad[(filter as CriticidadFilter).criticidad] =
+            !this.params.criticidad[(filter as CriticidadFilter).criticidad];
         }
         break;
       case 'modulo':
@@ -233,7 +233,8 @@ export class ShareReportService {
           if (this.params.criticidad !== null) {
             this.params.criticidad.forEach((crit, index) => {
               if (crit) {
-                const criticidadFilter = new CriticidadFilter('', 'criticidad', index + 1);
+                const criticidadFilter = new CriticidadFilter(index.toString(), 'criticidad', index);
+
                 filters.push(criticidadFilter);
               }
             });

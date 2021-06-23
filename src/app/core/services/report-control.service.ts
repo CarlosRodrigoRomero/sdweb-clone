@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { BehaviorSubject, Observable } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, concat, Observable } from 'rxjs';
+import { delay, flatMap, publish, switchMap, take, takeWhile } from 'rxjs/operators';
 
 import { FilterService } from '@core/services/filter.service';
 import { ShareReportService } from '@core/services/share-report.service';
@@ -66,9 +66,9 @@ export class ReportControlService {
           .pipe(
             switchMap(() => this.informeService.getInformesDePlanta(this.plantaId)),
             // obtenemos los informes de la planta
-            switchMap((informesId) => {
+            switchMap((informes) => {
               // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-              informesId
+              informes
                 .sort((a, b) => a.fecha - b.fecha)
                 .forEach((informe) => {
                   this.informesIdList.push(informe.id);
@@ -151,14 +151,14 @@ export class ReportControlService {
                           this.informesIdList.push(informe.id);
                         });
                       this.informesIdList$.next(this.informesIdList);
-                      /*TODO: REVISAR
+                      // TODO: REVISAR
                       // comprobamos que anomalia service hay terminado de iniciarse
                       if (initAnomService) {
                         // obtenemos todas las anomalías
                         return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
-                      } */
+                      }
                       // obtenemos todas las anomalías
-                      return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
+                      // return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
                     }),
                     take(1),
                     switchMap((anoms) => {

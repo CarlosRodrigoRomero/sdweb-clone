@@ -44,7 +44,6 @@ export class FilterService {
           this.initialized$.next(true);
         }
       });
-
       this.initialized$.next(true);
     } else {
       this.initialized$.next(true);

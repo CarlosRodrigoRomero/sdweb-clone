@@ -14,7 +14,7 @@ export class CriticidadFilter implements FilterInterface {
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
     // tslint:disable-next-line: triple-equals
-    return elems.filter((elem) => elem.criticidad == this.criticidad); // antes pc.severidad
+    return elems.filter((elem) => elem.criticidad == this.criticidad);
   }
   unapplyFilter(elems: FilterableElement[]): FilterableElement[] {
     return null;
