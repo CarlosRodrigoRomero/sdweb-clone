@@ -111,14 +111,14 @@ export class ChartAlturaComponent implements OnInit {
             data: [],
           };
 
-          dateLabels.forEach((dateLabel) => {
+          dateLabels.forEach((dateLabel, i) => {
             row.data.push({
               x: dateLabel,
-              y: this.allAnomalias.filter((anom) => anom.localY === index).length,
+              y: this.allAnomalias
+                .filter((anom) => anom.informeId === this.informesIdList[i])
+                .filter((anom) => anom.localY === index).length,
             });
           });
-
-          console.log(row);
 
           this.chartOptions.series.push(row);
         }

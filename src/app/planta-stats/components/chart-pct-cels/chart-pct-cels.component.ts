@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 
 import { combineLatest } from 'rxjs';
 
-import { FilterService } from '@core/services/filter.service';
 import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
 
@@ -90,13 +89,8 @@ export class ChartPctCelsComponent implements OnInit {
   allAnomalias: Anomalia[];
   dataLoaded = false;
   chartHeight = 150;
-  private dateLabels: string[] = [];
 
-  constructor(
-    private filterService: FilterService,
-    private reportControlService: ReportControlService,
-    private informeService: InformeService
-  ) {}
+  constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
 
   ngOnInit(): void {
     combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$])

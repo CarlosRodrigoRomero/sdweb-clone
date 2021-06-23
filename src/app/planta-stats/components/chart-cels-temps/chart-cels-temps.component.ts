@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 
 import {
@@ -21,6 +21,10 @@ import {
 import { PcService } from '@core/services/pc.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { GLOBAL } from '@core/services/global';
+import { ReportControlService } from '@core/services/report-control.service';
+import { InformeService } from '@core/services/informe.service';
+
+import { Anomalia } from '@core/models/anomalia';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -46,64 +50,58 @@ export class ChartCelsTempsComponent implements OnInit {
   public chartOptions: Partial<ChartOptions>;
   dataLoaded = false;
   plantaId: any;
-  informesList: string[];
+  informesIdList: string[];
   allAnomalias: any;
+  dateLabels: string[] = [];
 
-  constructor(private route: ActivatedRoute, private pcService: PcService, private anomaliaService: AnomaliaService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private pcService: PcService,
+    private anomaliaService: AnomaliaService,
+    private reportControlService: ReportControlService,
+    private informeService: InformeService
+  ) {}
 
   ngOnInit(): void {
-    this.plantaId = this.route.snapshot.paramMap.get('id');
-    this.informesList = ['519Z4dQF4gfUPwbbHqxw', '62dvYbGgoMkMNCuNCOEc'];
+    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$])
+      .pipe(
+        switchMap(([elems, informesId]) => {
+          this.allAnomalias = elems as Anomalia[];
+          this.informesIdList = informesId;
 
-    const anom1 = this.pcService.getPcsSinFiltros(this.informesList[0]);
-    const anom2 = this.pcService.getPcsSinFiltros(this.informesList[1]);
+          return this.informeService.getDateLabelsInformes(this.informesIdList);
+        })
+      )
+      .subscribe((dateLabels) => {
+        this.dateLabels = dateLabels;
 
-    combineLatest([anom1, anom2])
-      .pipe(take(1))
-      .subscribe((list) => {
         const data = [];
-        const dataGrads = [];
 
-        list.forEach((pcs) => {
-          pcs = pcs.filter((pc) => pc.tipo == 8 || pc.tipo == 9);
-          const l1 = pcs.filter((pc) => pc.gradienteNormalizado < 10 && pc.gradienteNormalizado >= 0);
-          const l2 = pcs.filter((pc) => pc.gradienteNormalizado < 20 && pc.gradienteNormalizado >= 10);
-          const l3 = pcs.filter((pc) => pc.gradienteNormalizado < 30 && pc.gradienteNormalizado >= 20);
-          const l4 = pcs.filter((pc) => pc.gradienteNormalizado >= 40);
-          data.push([
-            Math.round(l1.length / 10),
-            Math.round(l2.length / 10),
-            Math.round(l3.length / 10),
-            Math.round(l4.length / 10),
-          ]);
-          let sum = 0;
-          let res = 0;
-          // pcs.forEach((pc) => {
-          //   if (!isNaN(pc.gradienteNormalizado)) {
-          //     sum += pc.gradienteNormalizado; //don't forget to add the base
-          //   } else {
-          //     res += 1;
-          //   }
-          // });
-          // dataGrads.push(Math.round((sum / (pcs.length - res)) * 10) / 10);
+        this.informesIdList.forEach((informeId) => {
+          const celsCals = this.allAnomalias
+            .filter((anom) => anom.informeId === informeId)
+            // tslint:disable-next-line: triple-equals
+            .filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+
+          const range1 = celsCals.filter((cc) => cc.gradienteNormalizado < 10 && cc.gradienteNormalizado >= 0);
+          const range2 = celsCals.filter((cc) => cc.gradienteNormalizado < 20 && cc.gradienteNormalizado >= 10);
+          const range3 = celsCals.filter((cc) => cc.gradienteNormalizado < 30 && cc.gradienteNormalizado >= 20);
+          const range4 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
+
+          data.push([range1.length, range2.length, range3.length, range4.length]);
         });
+
         this._initChartData(data);
-        // console.log('dataGrad', dataGrads);
       });
   }
 
-  private _initChartData(data): void {
+  private _initChartData(data: any[]): void {
+    const series = this.dateLabels.map((dateLabel, index) => {
+      return { name: dateLabel, data: data[index] };
+    });
+
     this.chartOptions = {
-      series: [
-        {
-          name: 'Jul 2019',
-          data: data[0],
-        },
-        {
-          name: 'Jun 2020',
-          data: data[1],
-        },
-      ],
+      series,
       chart: {
         type: 'bar',
         height: 250,
@@ -130,7 +128,7 @@ export class ChartCelsTempsComponent implements OnInit {
       },
       yaxis: {
         title: {
-          text: '| Anomalias',
+          text: '# anomalias',
         },
       },
       fill: {
