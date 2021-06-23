@@ -180,12 +180,22 @@ export class PlantaService {
         actions.map((a) => {
           const data = a.payload.doc.data() as LocationAreaInterface;
           data.id = a.payload.doc.id;
+
+          // generamos las globalCoords en caso de que no tenga
+          if (data.globalCoords === undefined) {
+            data.globalCoords = [data.globalX, data.globalY, null];
+          }
+
           return data;
         })
       )
     );
 
     return result;
+  }
+
+  getGlobalCoords(locArea: LocationAreaInterface): any[] {
+    return [locArea.globalX, locArea.globalY, null];
   }
 
   getPlantasDeEmpresa(user: UserInterface): Observable<PlantaInterface[]> {

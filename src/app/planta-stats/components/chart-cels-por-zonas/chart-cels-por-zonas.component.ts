@@ -5,8 +5,10 @@ import { combineLatest } from 'rxjs';
 import { FilterService } from '@core/services/filter.service';
 import { GLOBAL } from '@core/services/global';
 import { ReportControlService } from '@core/services/report-control.service';
+import { PlantaService } from '@core/services/planta.service';
 
 import { Anomalia } from '@core/models/anomalia';
+import { LocationAreaInterface } from '@core/models/location';
 
 import {
   ApexAxisChartSeries,
@@ -48,27 +50,54 @@ export class ChartCelsPorZonasComponent implements OnInit {
   informesList: string[];
   allAnomalias: Anomalia[];
   zonas: string[];
+  zones: LocationAreaInterface[];
   chartData: number[][];
   chartLoaded = false;
+  thereAreZones = true;
 
-  constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
+  constructor(
+    private filterService: FilterService,
+    private reportControlService: ReportControlService,
+    private plantaService: PlantaService
+  ) {}
 
   ngOnInit(): void {
+    this.plantaService.getLocationsArea(this.reportControlService.plantaId).subscribe((locAreas) => {
+      // si en seguidores solo hay un tamaño de area entonces no hay zonas
+      if (
+        !this.reportControlService.plantaFija &&
+        locAreas.filter(
+          (locArea) =>
+            locArea.globalCoords[1] !== undefined && locArea.globalCoords[1] !== null && locArea.globalCoords[1] !== ''
+        ).length === 0
+      ) {
+        this.thereAreZones = false;
+      }
+
+      this.zones = locAreas.filter(
+        (locArea) =>
+          locArea.globalCoords[0] !== undefined && locArea.globalCoords[0] !== null && locArea.globalCoords[0] !== ''
+      );
+
+      console.log(this.zones);
+    });
+
     this.zonas = ['1', '2', '3', '4', '5', '6', '7', '8']; // DEMO
 
-    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$]).subscribe(
-      ([elems, informes]) => {
-        this.allAnomalias = elems as Anomalia[];
-        this.informesList = informes;
+    combineLatest([
+      this.reportControlService.allFilterableElements$,
+      this.reportControlService.informesIdList$,
+    ]).subscribe(([elems, informes]) => {
+      this.allAnomalias = elems as Anomalia[];
+      this.informesList = informes;
 
-        this.chartData = [];
-        this.informesList.forEach((informeId) => {
-          const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
-          this.chartData.push(this._calculateChartData(anomaliasInforme));
-        });
-        this._initChart();
-      }
-    );
+      this.chartData = [];
+      this.informesList.forEach((informeId) => {
+        const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
+        this.chartData.push(this._calculateChartData(anomaliasInforme));
+      });
+      this._initChart();
+    });
   }
 
   private _calculateChartData(anomalias: Anomalia[]): number[] {

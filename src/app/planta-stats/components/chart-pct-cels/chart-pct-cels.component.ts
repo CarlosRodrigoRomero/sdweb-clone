@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { combineLatest } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
@@ -18,7 +19,6 @@ import {
   ApexTooltip,
   ApexStroke,
 } from 'ng-apexcharts';
-import { switchMap } from 'rxjs/operators';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;

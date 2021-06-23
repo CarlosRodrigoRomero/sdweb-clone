@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 
-import { switchMap, take } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 
 import {
@@ -18,8 +17,6 @@ import {
   ApexTooltip,
 } from 'ng-apexcharts';
 
-import { PcService } from '@core/services/pc.service';
-import { AnomaliaService } from '@core/services/anomalia.service';
 import { GLOBAL } from '@core/services/global';
 import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
@@ -51,16 +48,10 @@ export class ChartCelsTempsComponent implements OnInit {
   dataLoaded = false;
   plantaId: any;
   informesIdList: string[];
-  allAnomalias: any;
-  dateLabels: string[] = [];
+  allAnomalias: Anomalia[];
+  dateLabels: string[];
 
-  constructor(
-    private route: ActivatedRoute,
-    private pcService: PcService,
-    private anomaliaService: AnomaliaService,
-    private reportControlService: ReportControlService,
-    private informeService: InformeService
-  ) {}
+  constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
 
   ngOnInit(): void {
     combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$])
