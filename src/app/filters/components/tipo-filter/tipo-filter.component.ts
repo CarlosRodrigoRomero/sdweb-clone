@@ -9,7 +9,7 @@ import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { FilterControlService } from '@core/services/filter-control.service';
-import {ReportControlService} from '@core/services/report-control.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { Anomalia } from '@core/models/anomalia';
@@ -39,7 +39,7 @@ export class TipoFilterComponent implements OnInit {
   selection = new SelectionModel<LabelTipo>(true, []);
 
   public plantaId: string;
-  public informesList: string[];
+  public informesIdList: string[];
   public allAnomalias: Anomalia[];
 
   public labelsCategoria: string[];
@@ -54,10 +54,9 @@ export class TipoFilterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // this.plantaId = this.route.snapshot.paramMap.get('id');
-    this.plantaId = 'egF0cbpXnnBnjcrusoeR';
-    this.informesList = ['4ruzdxY6zYxvUOucACQ0', 'vfMHFBPvNFnOFgfCgM9L'];
-    const informeId = this.informesList[1];
+    this.plantaId = this.reportControlService.plantaId;
+    this.informesIdList = this.reportControlService.informesIdList;
+    const informeId = this.informesIdList[1];
 
     this.anomaliaService.getAnomaliasPlanta$(this.plantaId).subscribe((anomalias) => {
       this.tiposElem = [];
@@ -166,6 +165,7 @@ export class TipoFilterComponent implements OnInit {
         numsCategoria.push(i);
       }
     });
+
     this.labelsCategoria = labelsCategoria;
     this.coloresCategoria = coloresCategoria;
     this.numsCategoria = numsCategoria;
