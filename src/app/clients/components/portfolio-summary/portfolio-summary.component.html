@@ -1,16 +1,14 @@
 <div class="summary">
   <div class="titulo">
     <mat-icon color="primary">home</mat-icon>
-    <h4>Resumen</h4>
+    <span class="title">Resumen</span>
   </div>
-  <div class="plantas">
+  <div class="datos">
     <mat-icon color="primary">tag</mat-icon>
-    <h5 class="subtitulo">Nº plantas</h5>
-    <h5>{{ numPlantas }}</h5>
-  </div>
-  <div class="potencia">
+    <span class="subtitulo">Nº plantas</span>
+    <span class="dato">{{ numPlantas }}</span>
     <mat-icon color="primary">bolt</mat-icon>
-    <h5 class="subtitulo">Potencia total</h5>
-    <h5>{{ potenciaTotal | number: '1.0-0' }} MW</h5>
+    <span class="subtitulo">Potencia total</span>
+    <span class="dato">{{ potenciaTotal | number: '1.0-0' }} MW</span>
   </div>
 </div>

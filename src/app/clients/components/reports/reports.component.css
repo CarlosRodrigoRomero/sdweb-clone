@@ -1,17 +1,14 @@
 .barra-titulo {
   display: flex;
-  padding: 1rem 2rem 1rem 2rem;
-}
-
-.spacer {
-  flex: 1 1 auto;
+  padding: 1rem 2rem;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .grid {
   display: grid;
   grid-template-columns: 100%;
-  padding-left: 2em;
-  padding-right: 2em;
+  padding: 0 2rem;
   gap: 1rem;
 }
 
@@ -36,5 +33,21 @@
   .row_2 {
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
+  }
+}
+
+@media (max-width: 1000px) {
+  .grid {
+    display: grid;
+    padding: 0 1rem 1rem;
+  }
+
+  .barra-titulo {
+    padding: 1rem;
+  }
+
+  app-download-excel-portfolio {
+    display: flex;
+    justify-content: flex-end;
   }
 }
