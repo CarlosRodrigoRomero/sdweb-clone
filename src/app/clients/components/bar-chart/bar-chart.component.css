@@ -9,6 +9,6 @@ mat-card {
 }
 
 .chart {
-  height: calc(50vh - 130px);
+  height: calc(50vh - 160px);
   display: grid;
 }
