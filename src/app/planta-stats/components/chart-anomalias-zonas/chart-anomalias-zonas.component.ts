@@ -5,6 +5,8 @@ import { combineLatest } from 'rxjs';
 import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
 import { ReportControlService } from '@core/services/report-control.service';
+import { PlantaService } from '@core/services/planta.service';
+import { InformeService } from '@core/services/informe.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
@@ -22,6 +24,8 @@ import {
   ApexTooltip,
   ApexTitleSubtitle,
 } from 'ng-apexcharts';
+import { switchMap } from 'rxjs/operators';
+import { LocationAreaInterface } from '@core/models/location';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -46,37 +50,93 @@ export type ChartOptions = {
 export class ChartAnomaliasZonasComponent implements OnInit {
   @ViewChild('chart-anomalias-zonas') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
-  informesList: string[];
+  informesIdList: string[];
   allAnomalias: Anomalia[];
   dataPlot: any[];
-  zonas: string[];
+  zones: LocationAreaInterface[];
   chartData: number[][];
   chartLoaded = false;
+  thereAreZones = true;
+  private dateLabels: string[];
 
-  constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
+  constructor(
+    private filterService: FilterService,
+    private reportControlService: ReportControlService,
+    private plantaService: PlantaService,
+    private informeService: InformeService
+  ) {}
 
   ngOnInit(): void {
-    this.zonas = ['1', '2', '3', '4', '5', '6', '7', '8']; // DEMO
+    this.plantaService
+      .getLocationsArea(this.reportControlService.plantaId)
+      .pipe(
+        switchMap((locAreas) => {
+          // si en seguidores solo hay un tamaño de area entonces no hay zonas
+          if (
+            !this.reportControlService.plantaFija &&
+            locAreas.filter(
+              (locArea) =>
+                locArea.globalCoords[1] !== undefined &&
+                locArea.globalCoords[1] !== null &&
+                locArea.globalCoords[1] !== ''
+            ).length === 0
+          ) {
+            this.thereAreZones = false;
+          }
 
-    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$]).subscribe(
-      ([elems, informes]) => {
-        this.allAnomalias = elems as Anomalia[];
-        this.informesList = informes;
+          this.zones = locAreas.filter(
+            (locArea) =>
+              locArea.globalCoords[0] !== undefined &&
+              locArea.globalCoords[0] !== null &&
+              locArea.globalCoords[0] !== ''
+          );
+
+          return combineLatest([
+            this.reportControlService.allFilterableElements$,
+            this.reportControlService.informesIdList$,
+          ]);
+        }),
+        switchMap(([elems, informesId]) => {
+          this.allAnomalias = elems as Anomalia[];
+          this.informesIdList = informesId;
+
+          return this.informeService.getDateLabelsInformes(this.informesIdList);
+        })
+      )
+      .subscribe((dateLabels) => {
+        this.dateLabels = dateLabels;
 
         this.chartData = [];
-        this.informesList.forEach((informeId) => {
-          const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
+        this.informesIdList.forEach((informeId) => {
+          const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
+
           this.chartData.push(this._calculateChartData(anomaliasInforme));
         });
         this._initChart();
-      }
-    );
+      });
+
+    /*  this.zonas = ['1', '2', '3', '4', '5', '6', '7', '8']; // DEMO
+
+    combineLatest([
+      this.reportControlService.allFilterableElements$,
+      this.reportControlService.informesIdList$,
+    ]).subscribe(([elems, informes]) => {
+      this.allAnomalias = elems as Anomalia[];
+      this.informesIdList = informes;
+
+      this.chartData = [];
+      this.informesIdList.forEach((informeId) => {
+        const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
+        this.chartData.push(this._calculateChartData(anomaliasInforme));
+      });
+      this._initChart();
+    }); */
   }
 
   private _calculateChartData(anomalias: Anomalia[]): number[] {
     const result = Array<number>();
-    this.zonas.forEach((z) => {
-      const filtered = anomalias.filter((item) => item.globalCoords[1] == z);
+    this.zones.forEach((zone) => {
+      const filtered = anomalias.filter((anom) => anom.globalCoords[0] == zone.globalCoords[0]);
       result.push(this._getMAEAnomalias(filtered));
     });
     return result;
@@ -108,19 +168,14 @@ export class ChartAnomaliasZonasComponent implements OnInit {
   }
 
   private _initChart(): void {
+    const series = this.dateLabels.map((dateLabel, index) => {
+      return { name: dateLabel, data: this.chartData[index] };
+    });
+
     // espera a que el dataPlot tenga datos
     if (this.chartData[0] !== undefined) {
       this.chartOptions = {
-        series: [
-          {
-            name: 'MAE por Zonas 2019',
-            data: this.chartData[0],
-          },
-          {
-            name: 'MAE por Zonas 2020',
-            data: this.chartData[1],
-          },
-        ],
+        series,
         chart: {
           type: 'bar',
           height: 240,
@@ -144,14 +199,10 @@ export class ChartAnomaliasZonasComponent implements OnInit {
           width: 2,
           colors: ['transparent'],
         },
-        /* title: {
-          text: 'MAE por zonas',
-          align: 'left',
-        }, */
         xaxis: {
-          categories: this.zonas,
+          categories: this.zones.map((zone) => zone.globalCoords[0]),
           title: {
-            text: 'Pasillos',
+            text: 'Zonas',
           },
         },
         colors: [GLOBAL.gris],
@@ -162,9 +213,6 @@ export class ChartAnomaliasZonasComponent implements OnInit {
           },
           forceNiceScale: true,
           tickAmount: 3,
-          labels: {
-            minWidth: 100,
-          },
           title: {
             text: 'MAE',
           },

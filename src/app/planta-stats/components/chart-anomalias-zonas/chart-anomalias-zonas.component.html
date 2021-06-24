@@ -1,5 +1,5 @@
 <apx-chart
-  *ngIf="chartLoaded"
+  *ngIf="chartLoaded && thereAreZones"
   id="chart-anomalias-zonas"
   [series]="chartOptions.series"
   [chart]="chartOptions.chart"

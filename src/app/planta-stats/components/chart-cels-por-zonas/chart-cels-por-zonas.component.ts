@@ -51,7 +51,6 @@ export class ChartCelsPorZonasComponent implements OnInit {
   public chartOptions: Partial<ChartOptions>;
   informesIdList: string[];
   allAnomalias: Anomalia[];
-  zonas: string[];
   zones: LocationAreaInterface[];
   chartData: number[][];
   chartLoaded = false;
@@ -176,9 +175,9 @@ export class ChartCelsPorZonasComponent implements OnInit {
           // align: 'left',
         },
         xaxis: {
-          categories: this.zonas,
+          categories: this.zones.map((zone) => zone.globalCoords[0]),
           title: {
-            text: 'Pasillos',
+            text: 'Zonas',
           },
         },
         colors: [GLOBAL.gris],

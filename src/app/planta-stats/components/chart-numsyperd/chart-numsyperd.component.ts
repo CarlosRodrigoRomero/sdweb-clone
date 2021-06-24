@@ -266,9 +266,6 @@ export class ChartNumsyperdComponent implements OnInit {
             return Math.round(1.1 * v);
           },
           tickAmount: 3,
-          labels: {
-            minWidth: 100,
-          },
         },
       };
 
@@ -297,9 +294,6 @@ export class ChartNumsyperdComponent implements OnInit {
           },
           forceNiceScale: true,
           tickAmount: 3,
-          labels: {
-            minWidth: 100,
-          },
         },
       };
       this.chartLoaded = true;
