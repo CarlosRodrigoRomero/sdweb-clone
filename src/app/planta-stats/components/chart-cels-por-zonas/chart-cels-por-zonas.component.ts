@@ -6,6 +6,7 @@ import { FilterService } from '@core/services/filter.service';
 import { GLOBAL } from '@core/services/global';
 import { ReportControlService } from '@core/services/report-control.service';
 import { PlantaService } from '@core/services/planta.service';
+import { InformeService } from '@core/services/informe.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
@@ -24,6 +25,7 @@ import {
   ApexTooltip,
   ApexTitleSubtitle,
 } from 'ng-apexcharts';
+import { switchMap } from 'rxjs/operators';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -47,82 +49,90 @@ export type ChartOptions = {
 export class ChartCelsPorZonasComponent implements OnInit {
   @ViewChild('chart-anomalias-zonas') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
-  informesList: string[];
+  informesIdList: string[];
   allAnomalias: Anomalia[];
   zonas: string[];
   zones: LocationAreaInterface[];
   chartData: number[][];
   chartLoaded = false;
   thereAreZones = true;
+  private dateLabels: string[];
 
   constructor(
     private filterService: FilterService,
     private reportControlService: ReportControlService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private informeService: InformeService
   ) {}
 
   ngOnInit(): void {
-    this.plantaService.getLocationsArea(this.reportControlService.plantaId).subscribe((locAreas) => {
-      // si en seguidores solo hay un tamaño de area entonces no hay zonas
-      if (
-        !this.reportControlService.plantaFija &&
-        locAreas.filter(
-          (locArea) =>
-            locArea.globalCoords[1] !== undefined && locArea.globalCoords[1] !== null && locArea.globalCoords[1] !== ''
-        ).length === 0
-      ) {
-        this.thereAreZones = false;
-      }
+    this.plantaService
+      .getLocationsArea(this.reportControlService.plantaId)
+      .pipe(
+        switchMap((locAreas) => {
+          // si en seguidores solo hay un tamaño de area entonces no hay zonas
+          if (
+            !this.reportControlService.plantaFija &&
+            locAreas.filter(
+              (locArea) =>
+                locArea.globalCoords[1] !== undefined &&
+                locArea.globalCoords[1] !== null &&
+                locArea.globalCoords[1] !== ''
+            ).length === 0
+          ) {
+            this.thereAreZones = false;
+          }
 
-      this.zones = locAreas.filter(
-        (locArea) =>
-          locArea.globalCoords[0] !== undefined && locArea.globalCoords[0] !== null && locArea.globalCoords[0] !== ''
-      );
+          this.zones = locAreas.filter(
+            (locArea) =>
+              locArea.globalCoords[0] !== undefined &&
+              locArea.globalCoords[0] !== null &&
+              locArea.globalCoords[0] !== ''
+          );
 
-      console.log(this.zones);
-    });
+          return combineLatest([
+            this.reportControlService.allFilterableElements$,
+            this.reportControlService.informesIdList$,
+          ]);
+        }),
+        switchMap(([elems, informesId]) => {
+          this.allAnomalias = elems as Anomalia[];
+          this.informesIdList = informesId;
 
-    this.zonas = ['1', '2', '3', '4', '5', '6', '7', '8']; // DEMO
+          return this.informeService.getDateLabelsInformes(this.informesIdList);
+        })
+      )
+      .subscribe((dateLabels) => {
+        this.dateLabels = dateLabels;
 
-    combineLatest([
-      this.reportControlService.allFilterableElements$,
-      this.reportControlService.informesIdList$,
-    ]).subscribe(([elems, informes]) => {
-      this.allAnomalias = elems as Anomalia[];
-      this.informesList = informes;
+        this.chartData = [];
+        this.informesIdList.forEach((informeId) => {
+          const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
 
-      this.chartData = [];
-      this.informesList.forEach((informeId) => {
-        const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
-        this.chartData.push(this._calculateChartData(anomaliasInforme));
+          this.chartData.push(this._calculateChartData(anomaliasInforme));
+        });
+        this._initChart();
       });
-      this._initChart();
-    });
   }
 
   private _calculateChartData(anomalias: Anomalia[]): number[] {
     const result = Array<number>();
-    this.zonas.forEach((z) => {
-      const filtered = anomalias.filter((item) => item.globalCoords[1] == z);
+    this.zones.forEach((zone) => {
+      const filtered = anomalias.filter((anom) => anom.globalCoords[0] == zone.globalCoords[0]);
       result.push(Math.round(filtered.length));
     });
     return result;
   }
 
   private _initChart(): void {
+    const series = this.dateLabels.map((dateLabel, index) => {
+      return { name: dateLabel, data: this.chartData[index] };
+    });
+
     // espera a que el charData tenga datos
     if (this.chartData[0] !== undefined) {
       this.chartOptions = {
-        series: [
-          {
-            name: 'CC por Zonas 2019',
-            data: this.chartData[0],
-          },
-          {
-            name: 'CC por Zonas 2020',
-            data: this.chartData[1],
-          },
-        ],
+        series,
         chart: {
           type: 'bar',
           height: 240,
