@@ -41,3 +41,7 @@ table {
   display: flex;
   justify-content: space-between;
 }
+
+.input60 {
+  width: 60px;
+}
