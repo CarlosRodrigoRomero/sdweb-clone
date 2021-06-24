@@ -95,6 +95,7 @@ mat-card {
 
   .cc-grid {
     grid-template-columns: 100%;
+    grid-template-rows: auto;
   }
 
   .ted-grid {

@@ -6,7 +6,7 @@
     </mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <div *ngIf="dataLoaded" id="chart">
+    <div class="chart" *ngIf="dataLoaded" id="chart">
       <apx-chart
         [series]="chartOptions.series"
         [chart]="chartOptions.chart"

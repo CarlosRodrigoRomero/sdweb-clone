@@ -1,14 +1,22 @@
 mat-card {
-  height: 100%;
+  height: calc(50vh - 86px);
+}
+
+:host ::ng-deep .mat-card-header .mat-card-title {
+  margin-bottom: 6px;
 }
 
 .buscar-input {
   width: 100%;
 }
 
+:host ::ng-deep .buscar-input .mat-form-field-wrapper {
+  padding-bottom: 6px;
+}
+
 .tabla-container {
   position: relative;
-  max-height: 25vh;
+  max-height: calc(50vh - 218px);
   overflow: auto;
 }
 

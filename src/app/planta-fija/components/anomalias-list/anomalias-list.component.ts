@@ -12,11 +12,11 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { Anomalia } from '@core/models/anomalia';
 
 @Component({
-  selector: 'app-filter-pcs-list',
-  templateUrl: './filter-pcs-list.component.html',
-  styleUrls: ['./filter-pcs-list.component.css'],
+  selector: 'app-anomalias-list',
+  templateUrl: './anomalias-list.component.html',
+  styleUrls: ['./anomalias-list.component.css'],
 })
-export class FilterPcsListComponent implements OnInit {
+export class AnomaliasListComponent implements OnInit {
   displayedColumns: string[] = ['tipo', 'perdidas', 'temp', 'gradiente'];
   dataSource: MatTableDataSource<any>;
   public selectedRow: string;

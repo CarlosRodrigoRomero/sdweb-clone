@@ -106,7 +106,7 @@ export class BarChartComponent implements OnInit {
       ],
       chart: {
         type: 'bar',
-        height: 280,
+        height: '100%',
         events: {
           click: (event, chartContext, config) => {
             const index = config.dataPointIndex;
@@ -134,11 +134,11 @@ export class BarChartComponent implements OnInit {
         colors: ['transparent'],
       },
       xaxis: {
-        /* labels: {
-          rotate: -30,
-        }, */
         categories: this.barChartLabels,
-        /* tickPlacement: 'on', */
+        labels: {
+          trim: true,
+          maxHeight: 80,
+        },
       },
       yaxis: {
         max: 5,
