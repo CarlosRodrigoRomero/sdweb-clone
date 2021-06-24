@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { combineLatest } from 'rxjs';
 
-import { FilterService } from '@core/services/filter.service';
 import { GLOBAL } from '@core/services/global';
 import { ReportControlService } from '@core/services/report-control.service';
 import { PlantaService } from '@core/services/planta.service';
@@ -58,7 +57,6 @@ export class ChartCelsPorZonasComponent implements OnInit {
   private dateLabels: string[];
 
   constructor(
-    private filterService: FilterService,
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
     private informeService: InformeService

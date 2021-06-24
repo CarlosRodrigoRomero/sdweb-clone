@@ -3,7 +3,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { combineLatest } from 'rxjs';
 
 import { GLOBAL } from '@core/services/global';
-import { FilterService } from '@core/services/filter.service';
 import { ReportControlService } from '@core/services/report-control.service';
 import { PlantaService } from '@core/services/planta.service';
 import { InformeService } from '@core/services/informe.service';
@@ -60,7 +59,6 @@ export class ChartAnomaliasZonasComponent implements OnInit {
   private dateLabels: string[];
 
   constructor(
-    private filterService: FilterService,
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
     private informeService: InformeService
@@ -114,23 +112,6 @@ export class ChartAnomaliasZonasComponent implements OnInit {
         });
         this._initChart();
       });
-
-    /*  this.zonas = ['1', '2', '3', '4', '5', '6', '7', '8']; // DEMO
-
-    combineLatest([
-      this.reportControlService.allFilterableElements$,
-      this.reportControlService.informesIdList$,
-    ]).subscribe(([elems, informes]) => {
-      this.allAnomalias = elems as Anomalia[];
-      this.informesIdList = informes;
-
-      this.chartData = [];
-      this.informesIdList.forEach((informeId) => {
-        const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
-        this.chartData.push(this._calculateChartData(anomaliasInforme));
-      });
-      this._initChart();
-    }); */
   }
 
   private _calculateChartData(anomalias: Anomalia[]): number[] {
