@@ -37,6 +37,9 @@
   opacity: 0.8;
   border-color: transparent;
   box-shadow: none !important;
+  width: fit-content;
+  left: 50%;
+  transform: translate(-50%, 0%);
 }
 
 .one-informe span {
