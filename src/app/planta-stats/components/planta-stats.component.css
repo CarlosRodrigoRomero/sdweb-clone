@@ -24,7 +24,6 @@ mat-tab {
 
 mat-card {
   padding: 8px;
-  height: 100%;
 }
 
 .cc-grid {
@@ -34,20 +33,17 @@ mat-card {
   gap: 0.5rem;
   padding: 0.5rem 2px 2px;
   height: calc(100vh - 209px);
-  /* overflow: hidden; */
 }
 
 .cc-content-izq {
   display: grid;
   grid-template-columns: 100%;
-  grid-template-rows: 56% 43%;
   gap: 0.5rem;
 }
 
 .cc-content-drcha {
   display: grid;
   grid-template-columns: 100%;
-  grid-template-rows: 1fr 1fr;
   gap: 0.5rem;
 }
 
@@ -58,17 +54,6 @@ mat-card {
   gap: 0.5rem;
   padding: 0.5rem 2px 2px;
   height: calc(100vh - 209px);
-  /* overflow: hidden; */
-}
-
-@media (min-width: 800px) {
-  .cc-grid {
-    overflow: hidden;
-  }
-
-  .ted-grid {
-    overflow: hidden;
-  }
 }
 
 @media (max-width: 800px) {

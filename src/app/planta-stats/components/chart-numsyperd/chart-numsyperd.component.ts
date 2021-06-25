@@ -258,7 +258,7 @@ export class ChartNumsyperdComponent implements OnInit {
           group: 'social',
           type: 'bar',
           width: '100%',
-          height: this.chartHeight,
+          // height: this.chartHeight,
         },
 
         yaxis: {
@@ -283,8 +283,7 @@ export class ChartNumsyperdComponent implements OnInit {
           group: 'social',
           type: 'bar',
           width: '100%',
-
-          height: this.chartHeight,
+          // height: this.chartHeight,
         },
 
         colors: [GLOBAL.gris],

@@ -90,7 +90,6 @@ export class ChartMaeGlobalComponent implements OnInit {
             },
           ],
           chart: {
-            height: 240,
             width: '100%',
             type: 'line',
             dropShadow: {
@@ -117,18 +116,10 @@ export class ChartMaeGlobalComponent implements OnInit {
               },
             },
           },
-          // colors: ['#77B6EA', '#999999'],
           colors: maeColors,
           dataLabels: {
             enabled: true,
           },
-          stroke: {
-            // curve: 'smooth',
-          },
-          // title: {
-          //   text: 'Evolución MAE',
-          //   align: 'left',
-          // },
           grid: {
             borderColor: '#e7e7e7',
             row: {
@@ -141,9 +132,6 @@ export class ChartMaeGlobalComponent implements OnInit {
           },
           xaxis: {
             categories: dateLabels,
-            // title: {
-            //   text: 'Año',
-            // },
           },
           yaxis: {
             title: {

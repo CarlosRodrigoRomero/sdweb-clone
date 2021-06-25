@@ -159,7 +159,6 @@ export class ChartAnomaliasZonasComponent implements OnInit {
         series,
         chart: {
           type: 'bar',
-          height: 240,
           width: '100%',
         },
         legend: {

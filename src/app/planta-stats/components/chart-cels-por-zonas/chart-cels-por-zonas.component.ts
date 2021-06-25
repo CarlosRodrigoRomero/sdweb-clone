@@ -168,10 +168,6 @@ export class ChartCelsPorZonasComponent implements OnInit {
           width: 2,
           colors: ['transparent'],
         },
-        title: {
-          // text: 'MAE por zonas',
-          // align: 'left',
-        },
         xaxis: {
           categories: this.zones.map((zone) => zone.globalCoords[0]),
           title: {
@@ -186,9 +182,6 @@ export class ChartCelsPorZonasComponent implements OnInit {
           },
           forceNiceScale: true,
           tickAmount: 3,
-          labels: {
-            minWidth: 100,
-          },
           title: {
             text: '# CC',
           },
