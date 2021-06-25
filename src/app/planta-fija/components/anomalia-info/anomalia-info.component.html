@@ -1,10 +1,10 @@
 <div class="popup">
   <mat-card class="popup-hover" *ngIf="anomaliaHover">
     <mat-card-content class="popup-hover-content">
-      <div class="elemento">
+      <!-- <div class="elemento">
         <span class="titulo">ID Anomalía</span>
         <span class="subtitulo">{{ anomaliaHover.localId }}</span>
-      </div>
+      </div> -->
       <div class="elemento">
         <span class="titulo">Tipo</span>
         <span class="subtitulo">{{ pcDescripcion[anomaliaHover.tipo] }}</span>
@@ -37,10 +37,10 @@
       <mat-tab-group mat-align-tabs="center">
         <mat-tab label="General">
           <div class="tab-content">
-            <div class="elemento">
+            <!-- <div class="elemento">
               <span class="titulo">ID Anomalía</span>
               <span class="subtitulo">{{ infoAdicional.id }}</span>
-            </div>
+            </div> -->
             <div class="elemento">
               <span class="titulo">Tipo</span>
               <span class="subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] }}</span>
@@ -127,17 +127,11 @@
         </mat-tab>
         <mat-tab label="Localización" *ngIf="seccionLocalizacion">
           <div class="tab-content">
-            <div class="elemento" *ngIf="infoAdicional.localizacion.instalacion">
-              <span class="titulo">Instalación</span>
-              <span class="subtitulo">{{ infoAdicional.localizacion.instalacion }}</span>
-            </div>
-            <div class="elemento" *ngIf="infoAdicional.localizacion.calle">
-              <span class="titulo">Calle</span>
-              <span class="subtitulo">{{ infoAdicional.localizacion.calle }}</span>
-            </div>
-            <div class="elemento" *ngIf="infoAdicional.localizacion.mesa">
-              <span class="titulo">Mesa</span>
-              <span class="subtitulo">{{ infoAdicional.localizacion.mesa }}</span>
+            <div *ngIf="infoAdicional.localizacion.zonas">
+              <div class="elemento" *ngFor="let zona of infoAdicional.localizacion.zonas">
+                <span class="titulo">{{ zona.tipo }}</span>
+                <span class="subtitulo">{{ zona.nombre }}</span>
+              </div>
             </div>
             <div class="elemento" *ngIf="infoAdicional.localizacion.fila">
               <span class="titulo">Fila</span>

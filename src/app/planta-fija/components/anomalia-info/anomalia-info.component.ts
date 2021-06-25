@@ -54,9 +54,7 @@ interface InfoAdicional {
     potencia?: number;
   };
   localizacion?: {
-    instalacion?: string;
-    calle?: string;
-    mesa?: string;
+    zonas?: Zona[];
     fila?: number;
     columna?: number;
   };
@@ -73,6 +71,12 @@ interface InfoAdicional {
     camaraLente?: string;
   };
 }
+
+interface Zona {
+  tipo: string;
+  nombre: string;
+}
+
 @Component({
   selector: 'app-anomalia-info',
   templateUrl: './anomalia-info.component.html',
@@ -88,7 +92,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   public criticidadLabels: string[];
   public infoAdicional: InfoAdicional;
   private plantaId: string;
-  private nombrePlanta: string;
+  private nombreGlobalCoords: string[];
   public coloresClase: string[];
   public tiposAnomalias: string[] = GLOBAL.labels_tipos;
   public seccionModulo = false;
@@ -125,9 +129,11 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     if (this.router.url.includes('shared')) {
       this.shareReportService.getParams().subscribe((params) => (this.plantaId = params.plantaId));
     } else {
-      this.plantaId = this.activatedRoute.snapshot.paramMap.get('id');
+      this.plantaId = this.reportControlService.plantaId;
     }
-    this.plantaService.getPlanta(this.plantaId).subscribe((planta) => (this.nombrePlanta = planta.nombre));
+    this.plantaService
+      .getPlanta(this.plantaId)
+      .subscribe((planta) => (this.nombreGlobalCoords = planta.nombreGlobalCoords));
 
     this.reportControlService.selectedInformeId$
       .pipe(switchMap((informeID) => this.informeService.getInforme(informeID)))
@@ -167,23 +173,17 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
 
     /* LOCALIZACION */
 
-    let instalacion;
-    let calle;
-    let mesa;
+    const zonas: Zona[] = [];
     let fila;
     let columna;
 
     const coords = this.anomaliaSelect.globalCoords;
-    if (coords !== undefined) {
-      if (coords[0] !== undefined && coords[0] !== null && coords[0] !== '') {
-        instalacion = coords[0];
-      }
-      if (coords[1] !== undefined && coords[1] !== null && coords[1] !== '') {
-        calle = coords[1];
-      }
-      if (coords[2] !== undefined && coords[2] !== null && coords[2] !== '') {
-        mesa = coords[2];
-      }
+
+    if (this.nombreGlobalCoords !== undefined) {
+      this.nombreGlobalCoords.forEach((nombre, index) => {
+        const zona: Zona = { tipo: nombre, nombre: coords[index] };
+        zonas.push(zona);
+      });
     }
 
     const localY = this.anomaliaSelect.localY;
@@ -196,13 +196,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
       columna = localX;
     }
 
-    if (
-      instalacion !== undefined ||
-      calle !== undefined ||
-      mesa !== undefined ||
-      fila !== undefined ||
-      columna !== undefined
-    ) {
+    if (zonas !== undefined || fila !== undefined || columna !== undefined) {
       this.seccionLocalizacion = true;
     }
 
@@ -329,9 +323,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
         potencia,
       },
       localizacion: {
-        instalacion,
-        calle,
-        mesa,
+        zonas,
         fila,
         columna,
       },
