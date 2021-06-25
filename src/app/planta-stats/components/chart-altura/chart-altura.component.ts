@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { ApexAxisChartSeries, ApexTitleSubtitle, ApexDataLabels, ApexChart, ChartComponent } from 'ng-apexcharts';
+import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent } from 'ng-apexcharts';
 
 import { GLOBAL } from '@core/services/global';
 import { ReportControlService } from '@core/services/report-control.service';
@@ -15,7 +15,6 @@ export type ChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
   dataLabels: ApexDataLabels;
-  title: ApexTitleSubtitle;
   colors: any;
 };
 @Component({
@@ -30,52 +29,9 @@ export class ChartAlturaComponent implements OnInit {
 
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions> = {
-    series: [
-      /* {
-        name: 'A',
-        data: [
-          { x: 'Jul 2019', y: 35 },
-          { x: 'Jun 2020', y: 25 },
-        ],
-      },
-      {
-        name: 'B',
-        data: [
-          { x: 'Jul 2019', y: 20 },
-          { x: 'Jun 2020', y: 17 },
-        ],
-      },
-      {
-        name: 'C',
-        data: [
-          { x: 'Jul 2019', y: 20 },
-          { x: 'Jun 2020', y: 15 },
-        ],
-      },
-      {
-        name: 'D',
-        data: [
-          { x: 'Jul 2019', y: 15 },
-          { x: 'Jun 2020', y: 25 },
-        ],
-      },
-      {
-        name: 'E',
-        data: [
-          { x: 'Jul 2019', y: 18 },
-          { x: 'Jun 2020', y: 20 },
-        ],
-      },
-      {
-        name: 'F',
-        data: [
-          { x: 'Jul 2019', y: 36 },
-          { x: 'Jun 2020', y: 18 },
-        ],
-      }, */
-    ],
+    series: [],
     chart: {
-      height: 200,
+      height: 170,
       width: '100%',
       type: 'heatmap',
     },
@@ -83,9 +39,6 @@ export class ChartAlturaComponent implements OnInit {
       enabled: false,
     },
     colors: [GLOBAL.gris],
-    title: {
-      text: '# anomalías por altura',
-    },
   };
 
   constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}

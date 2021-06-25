@@ -119,7 +119,7 @@ export class ChartCelsTempsComponent implements OnInit {
       },
       yaxis: {
         title: {
-          text: '# anomalias',
+          text: '# CC',
         },
       },
       fill: {
