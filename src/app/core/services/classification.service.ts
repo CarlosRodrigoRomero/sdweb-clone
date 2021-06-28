@@ -146,11 +146,12 @@ export class ClassificationService {
 
   private getAnomModule(coords: Coordinate): ModuloInterface {
     let modulo: ModuloInterface;
+
     if (this.locAreasWithModule.length === 1) {
       modulo = this.locAreasWithModule[0].modulo;
     } else {
       this.locAreasWithModule.forEach((locArea) => {
-        const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat((locArea as any).paths));
+        const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat((locArea as any).path));
 
         if (polygon.intersectsCoordinate(coords)) {
           modulo = locArea.modulo;
@@ -158,6 +159,17 @@ export class ClassificationService {
       });
     }
     return modulo;
+  }
+
+  updateAnomalias() {
+    this.listaAnomalias.forEach((anom) => {
+      if (anom.modulo === null) {
+        const modulo = this.getAnomModule(anom.featureCoords[0]);
+        anom.modulo = modulo;
+
+        this.anomaliaService.updateAnomaliaField(anom);
+      }
+    });
   }
 
   get informeId() {

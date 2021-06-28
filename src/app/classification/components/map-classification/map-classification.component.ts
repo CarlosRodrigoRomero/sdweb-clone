@@ -357,9 +357,7 @@ export class MapClassificationComponent implements OnInit {
     return closestPoint.date;
   }
 
-  private getModule() {
-    
-  }
+  private getModule() {}
 
   private dateStringToUnix(date: string) {
     const unix = moment(date, 'DD/MM/YYYY hh:mm:ss').unix();
@@ -407,5 +405,9 @@ export class MapClassificationComponent implements OnInit {
       .getArray()
       .filter((layer) => layer.getProperties().name !== undefined && layer.getProperties().name === 'thermalLayer')
       .forEach((layer) => layer.setVisible(this.thermalLayerVisibility));
+  }
+
+  updateAnomalias() {
+    this.classificationService.updateAnomalias();
   }
 }

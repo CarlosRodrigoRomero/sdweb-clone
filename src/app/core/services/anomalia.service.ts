@@ -183,6 +183,18 @@ export class AnomaliaService {
     return anomaliaDoc.set(anomaliaObj);
   }
 
+  updateAnomaliaField(anomalia: Anomalia) {
+    this.afs
+      .collection('anomalias')
+      .doc(anomalia.id)
+      .update({
+        modulo: anomalia.modulo,
+      })
+      .then(() => {
+        console.log('Document successfully updated!');
+      });
+  }
+
   private _prepararParaDb(anomalia: Anomalia) {
     anomalia.featureCoords = { ...anomalia.featureCoords };
     anomalia.globalCoords = { ...anomalia.globalCoords };

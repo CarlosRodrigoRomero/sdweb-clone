@@ -15,8 +15,14 @@
   transform: translate(-40%, 0);
 }
 
-button {
+.show-thermal {
   position: absolute;
   top: 80px;
+  right: 10px;
+}
+
+.update-anoms {
+  position: absolute;
+  top: 150px;
   right: 10px;
 }

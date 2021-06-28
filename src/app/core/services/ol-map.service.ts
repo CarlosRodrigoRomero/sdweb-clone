@@ -106,9 +106,7 @@ export class OlMapService {
     const coordsList: Coordinate[] = [];
 
     if (path !== undefined) {
-      path.forEach((coords) => {
-        coordsList.push(fromLonLat([coords.lng, coords.lat]));
-      });
+      path.forEach((coords) => coordsList.push(fromLonLat([coords.lng, coords.lat])));
     }
 
     return [coordsList];
