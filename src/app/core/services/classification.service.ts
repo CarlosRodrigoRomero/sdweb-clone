@@ -165,9 +165,12 @@ export class ClassificationService {
     this.listaAnomalias.forEach((anom) => {
       if (anom.modulo === null) {
         const modulo = this.getAnomModule(anom.featureCoords[0]);
-        anom.modulo = modulo;
 
-        this.anomaliaService.updateAnomaliaField(anom);
+        if (modulo !== undefined) {
+          anom.modulo = modulo;
+
+          this.anomaliaService.updateAnomaliaField(anom);
+        }
       }
     });
   }
