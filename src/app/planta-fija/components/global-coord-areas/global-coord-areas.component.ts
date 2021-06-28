@@ -39,6 +39,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   private globalCoordAreas: LocationAreaInterface[][] = [];
   public globalCoordAreasVectorSources: VectorSource[] = [];
   public globalCoordAreasVectorLayers: VectorLayer[] = [];
+  private nombreGlobalCoords: string[] = [];
   public map: Map;
   private subscriptions: Subscription = new Subscription();
 
@@ -46,9 +47,9 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
     name: 'Ver zonas de la planta',
     completed: false,
     subtasks: [
-      { name: 'Instalación', completed: false },
+      /* { name: 'Instalación', completed: false },
       { name: 'Calle', completed: false },
-      { name: 'Mesa', completed: false },
+      { name: 'Mesa', completed: false }, */
     ],
   };
   public allComplete = false;
@@ -65,6 +66,15 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
         .pipe(
           switchMap((plantaId) => {
             this.plantaId = plantaId;
+
+            return this.plantaService.getPlanta(plantaId);
+          }),
+          switchMap((planta) => {
+            this.nombreGlobalCoords = planta.nombreGlobalCoords;
+
+            this.nombreGlobalCoords.forEach((nombre) => {
+              this.task.subtasks.push({ name: nombre, completed: false });
+            });
 
             return this.olMapService.getMap();
           })
@@ -101,27 +111,22 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
     const styleFunction = (feature) => {
       if (feature !== undefined) {
         const style = styles[feature.getGeometry().getType()];
-        // style.getText().setText(feature.get('globalCoords'));
 
-        // para la demo
         if (this.map.getView().getZoom() > 20) {
-          // const areaNames = ['Instalación', 'Calle', 'Mesa'];
-
-          for (let i = 0; i < 3; i++) {
+          // DEMO
+          this.nombreGlobalCoords.forEach((nombre, index) => {
             if (
-              feature.get('globalCoords')[i] !== null &&
-              feature.get('globalCoords')[i] !== undefined &&
-              feature.get('globalCoords')[i] !== ''
+              feature.get('globalCoords')[index] !== null &&
+              feature.get('globalCoords')[index] !== undefined &&
+              feature.get('globalCoords')[index] !== ''
             ) {
-              style.getText().setText(/* areaNames[i] +  */ feature.get('globalCoords')[i]);
+              style.getText().setText(nombre + ' ' + feature.get('globalCoords')[index]);
             }
-          }
+          });
         } else {
-          for (let i = 0; i < 3; i++) {
-            if (feature.get('globalCoords')[i] !== null) {
-              style.getText().setText('');
-            }
-          }
+          this.nombreGlobalCoords.forEach(() => {
+            style.getText().setText('');
+          });
         }
 
         return style;
