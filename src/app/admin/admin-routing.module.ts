@@ -14,6 +14,8 @@ import { ReportEditComponent } from './components/report-edit/report-edit.compon
 import { ThermalLayerCreateComponent } from './components/thermal-layer-create/thermal-layer-create.component';
 
 import { PlantsComponent } from './components/plants/plants.component';
+import { PlantCreateComponent } from './components/plant-create/plant-create.component';
+import { PlantEditComponent } from './components/plant-edit/plant-edit.component';
 
 const routes: Routes = [
   {
@@ -53,14 +55,14 @@ const routes: Routes = [
         path: 'plants',
         component: PlantsComponent,
       },
-      /* {
+      {
         path: 'plants/edit/:id',
-        component: ReportEditComponent,
+        component: PlantEditComponent,
       },
       {
         path: 'plants/create',
-        component: ReportCreateComponent,
-      }, */
+        component: PlantCreateComponent,
+      },
     ],
   },
 ];
