@@ -25,6 +25,7 @@ export class ClassificationComponent implements OnInit {
     this.classificationService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre));
     this.classificationService.normModHovered$.subscribe((normMod) => (this.normModHovered = normMod));
 
+    // lo iniciamos para poder acceder a la info de la trayectoria del vuelo
     this.clustersService.initService().pipe(take(1)).subscribe();
   }
 }

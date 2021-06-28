@@ -357,6 +357,10 @@ export class MapClassificationComponent implements OnInit {
     return closestPoint.date;
   }
 
+  private getModule() {
+    
+  }
+
   private dateStringToUnix(date: string) {
     const unix = moment(date, 'DD/MM/YYYY hh:mm:ss').unix();
 

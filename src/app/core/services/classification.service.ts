@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/firestore';
 
 import { BehaviorSubject, Observable } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { filter, switchMap, take } from 'rxjs/operators';
 
 import { Feature, Map } from 'ol';
 import SimpleGeometry from 'ol/geom/SimpleGeometry';
@@ -18,6 +18,10 @@ import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { Anomalia } from '@core/models/anomalia';
+import { LocationAreaInterface } from '@core/models/location';
+import { Coordinate } from 'ol/coordinate';
+import Polygon from 'ol/geom/Polygon';
+import { ModuloInterface } from '@core/models/modulo';
 
 @Injectable({
   providedIn: 'root',
@@ -38,6 +42,8 @@ export class ClassificationService {
   anomaliaSelected$ = new BehaviorSubject<Anomalia>(this._anomaliaSelected);
   private _listaAnomalias: Anomalia[] = undefined;
   listaAnomalias$ = new BehaviorSubject<Anomalia[]>(this._listaAnomalias);
+  private _locAreasWithModule: LocationAreaInterface[] = undefined;
+  locAreasWithModule$ = new BehaviorSubject<LocationAreaInterface[]>(this._locAreasWithModule);
 
   constructor(
     private router: Router,
@@ -61,6 +67,8 @@ export class ClassificationService {
         take(1),
         switchMap((planta) => {
           this.planta = planta;
+
+          this.getLocAreasWithModules();
 
           return this.informeService.getThermalLayerDB$(this.informeId);
         })
@@ -99,6 +107,7 @@ export class ClassificationService {
           // si no existe previmente la creamos
           const geometry = feature.getGeometry() as SimpleGeometry;
           const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(geometry.getCoordinates()[0][0]);
+          const modulo = this.getAnomModule(geometry.getCoordinates()[0][0]);
 
           const anomalia: Anomalia = {
             id,
@@ -108,7 +117,7 @@ export class ClassificationService {
             globalCoords,
             gradienteNormalizado: 0,
             temperaturaMax: 0,
-            modulo: null,
+            modulo,
             featureCoords: geometry.getCoordinates()[0],
             featureType: geometry.getType(),
             localX: normModule.columna,
@@ -126,6 +135,29 @@ export class ClassificationService {
 
   hidePopup() {
     this.map.getOverlayById('popup').setPosition(undefined);
+  }
+
+  private getLocAreasWithModules() {
+    this.plantaService
+      .getLocationsArea(this.planta.id)
+      .pipe(take(1))
+      .subscribe((locAreas) => (this.locAreasWithModule = locAreas.filter((locArea) => locArea.modulo !== undefined)));
+  }
+
+  private getAnomModule(coords: Coordinate): ModuloInterface {
+    let modulo: ModuloInterface;
+    if (this.locAreasWithModule.length === 1) {
+      modulo = this.locAreasWithModule[0].modulo;
+    } else {
+      this.locAreasWithModule.forEach((locArea) => {
+        const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat((locArea as any).paths));
+
+        if (polygon.intersectsCoordinate(coords)) {
+          modulo = locArea.modulo;
+        }
+      });
+    }
+    return modulo;
   }
 
   get informeId() {
@@ -187,5 +219,14 @@ export class ClassificationService {
   set listaAnomalias(value: Anomalia[]) {
     this._listaAnomalias = value;
     this.listaAnomalias$.next(value);
+  }
+
+  get locAreasWithModule() {
+    return this._locAreasWithModule;
+  }
+
+  set locAreasWithModule(value: LocationAreaInterface[]) {
+    this._locAreasWithModule = value;
+    this.locAreasWithModule$.next(value);
   }
 }
