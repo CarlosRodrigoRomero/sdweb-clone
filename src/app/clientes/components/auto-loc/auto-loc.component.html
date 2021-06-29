@@ -21,7 +21,8 @@
               </mat-select>
             </mat-form-field>
 
-            <mat-checkbox [(ngModel)]="isUserArea"> isUserArea {{ isUserArea }} </mat-checkbox>
+            <mat-checkbox [(ngModel)]="isUserArea"> isUserArea: ({{ isUserArea }}) </mat-checkbox>
+            <mat-checkbox [(ngModel)]="isDraggable"> isDraggable: ({{ isDraggable }}) </mat-checkbox>
 
             <button (click)="aplicarModulosSeleccion()">Aplicar módulo a selección -></button>
           </div>

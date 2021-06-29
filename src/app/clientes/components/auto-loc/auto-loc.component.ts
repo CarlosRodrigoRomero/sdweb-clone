@@ -57,10 +57,12 @@ export class AutoLocComponent implements OnInit {
   public successMessage: string;
   public lastGlobalChanged: string;
   public map: any;
+  public isDraggable: true;
 
   constructor(private route: ActivatedRoute, private plantaService: PlantaService) {}
 
   ngOnInit() {
+    this.isDraggable = true;
     this.mapType = 'satellite';
     this.defaultZoom = 18;
     this.plantaLocation = { lng: -5.880743, lat: 39.453186 };
@@ -168,7 +170,7 @@ export class AutoLocComponent implements OnInit {
       fillColor: this.getFillColor(area),
       fillOpacity: this._fillOpacity,
       editable: isNew,
-      draggable: isNew,
+      draggable: this.isDraggable,
       id: area.id,
     });
     polygon.setMap(this.map);
@@ -205,7 +207,7 @@ export class AutoLocComponent implements OnInit {
       this.selectedPolygon.setOptions({
         fillColor: this.getFillColor(area),
         editable: false,
-        draggable: false,
+        draggable: this.isDraggable,
       });
     }
 
@@ -219,7 +221,7 @@ export class AutoLocComponent implements OnInit {
       polygon.setOptions({
         fillColor: 'white',
         editable: true,
-        draggable: false,
+        draggable: this.isDraggable,
       });
     }
     this.selectedPolygon = polygon;
