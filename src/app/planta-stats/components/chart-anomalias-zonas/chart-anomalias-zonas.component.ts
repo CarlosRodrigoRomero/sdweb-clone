@@ -196,6 +196,9 @@ export class ChartAnomaliasZonasComponent implements OnInit {
           title: {
             text: 'MAE',
           },
+          labels: {
+            minWidth: 10,
+          }
         },
         fill: {
           opacity: 1,

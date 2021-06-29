@@ -185,6 +185,9 @@ export class ChartCelsPorZonasComponent implements OnInit {
           title: {
             text: '# CC',
           },
+          labels: {
+            minWidth: 10,
+          },
         },
         fill: {
           opacity: 1,

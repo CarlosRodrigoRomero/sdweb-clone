@@ -64,7 +64,7 @@ export class ChartMaeGlobalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const informesPlanta = this.informeService.getInformesDePlanta(this.reportControlService.plantaId);
+    const informesPlanta = this.reportControlService.informes$;
     const getMaeMedio = this.portfolioControlService.maeMedio$;
     const getMaeSigma = this.portfolioControlService.maeSigma$;
 
@@ -119,6 +119,7 @@ export class ChartMaeGlobalComponent implements OnInit {
           colors: maeColors,
           dataLabels: {
             enabled: true,
+            formatter: (value) => Math.round(value * 100) / 100 + '%',
           },
           grid: {
             borderColor: '#e7e7e7',
@@ -142,6 +143,7 @@ export class ChartMaeGlobalComponent implements OnInit {
               formatter: (value) => {
                 return Math.round(value * 10) / 10 + '%';
               },
+              minWidth: 10,
             },
             min: 0,
             max: Math.max(...[...maeData, maeMedio]) + 0.5,

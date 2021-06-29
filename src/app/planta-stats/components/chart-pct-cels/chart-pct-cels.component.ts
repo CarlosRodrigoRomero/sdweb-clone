@@ -19,6 +19,7 @@ import {
   ApexTooltip,
   ApexStroke,
 } from 'ng-apexcharts';
+import { InformeInterface } from '@core/models/informe';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -43,9 +44,14 @@ export type ChartOptions = {
   styleUrls: ['./chart-pct-cels.component.css'],
 })
 export class ChartPctCelsComponent implements OnInit {
+  private informesIdList: string[];
+  private informes: InformeInterface[];
+  private allAnomalias: Anomalia[];
+  private chartHeight = 150;
+  dataLoaded = false;
+
   public chart1options: Partial<ChartOptions>;
   public chart2options: Partial<ChartOptions>;
-  public chart3options: Partial<ChartOptions>;
   public commonOptions: Partial<ChartOptions> = {
     dataLabels: {
       enabled: false,
@@ -53,82 +59,71 @@ export class ChartPctCelsComponent implements OnInit {
     stroke: {
       curve: 'straight',
     },
-
     markers: {
       size: 6,
       hover: {
         size: 10,
       },
     },
-    tooltip: {
-      followCursor: false,
-      theme: 'dark',
-      x: {
-        show: false,
-      },
-      marker: {
-        show: false,
-      },
-      y: {
-        title: {
-          formatter: function () {
-            return '';
-          },
-        },
-      },
-    },
     grid: {
       clipMarkers: false,
     },
     xaxis: {
-      type: 'category',
-      categories: ['Jul 2019', 'Jun 2020'],
+      // type: 'category',
+      categories: [],
     },
   };
-  informesIdList: string[];
-  allAnomalias: Anomalia[];
-  dataLoaded = false;
-  chartHeight = 150;
 
   constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
 
   ngOnInit(): void {
-    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$])
+    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informes$])
       .pipe(
-        switchMap(([elems, informesId]) => {
+        switchMap(([elems, informes]) => {
           this.allAnomalias = elems as Anomalia[];
-          this.informesIdList = informesId;
+          this.informes = informes;
+          this.informesIdList = informes.map((informe) => informe.id);
 
           return this.informeService.getDateLabelsInformes(this.informesIdList);
         })
       )
       .subscribe((dateLabels) => {
+        console.log(dateLabels);
         this.commonOptions.xaxis.categories = dateLabels;
 
-        const data = [];
-        this.informesIdList.forEach((informeId) => {
-          const filtered = this.allAnomalias.filter((anom) => {
-            return anom.informeId == informeId && (anom.tipo == 8 || anom.tipo == 9);
-          });
-          data.push(Math.round((10000 * filtered.length) / 5508) / 100);
+        const data1: number[] = [];
+        const data2: number[] = [];
+        this.informes.forEach((informe) => {
+          data1.push(informe.pc_pct);
+
+          const anomsInforme = this.allAnomalias.filter((anom) => (anom.informeId = informe.id));
+          const gradientes = anomsInforme.map((anom) => anom.gradiente);
+          let gradienteTotal = 0;
+          gradientes.forEach((grad) => (gradienteTotal += grad));
+          data2.push(gradienteTotal / anomsInforme.length);
         });
 
-        this._initChartData(data);
+        this._initChartData(data1, data2);
       });
   }
 
-  private _initChartData(data): void {
+  private _initChartData(data1: number[], data2: number[]): void {
+    // si solo hay un informe cambiamos a grafico tipo lineas
+    let typeChart = 'area';
+    /* if (data1.length === 1) {
+      console.log(data1.length);
+      typeChart = 'line';
+    } */
+
     this.chart1options = {
       series: [
         {
           name: '% celulas calientes',
-          data,
+          data: data1,
         },
       ],
       chart: {
-        id: 'fb',
-        group: 'social',
-        type: 'area',
+        type: typeChart,
         width: '100%',
         height: this.chartHeight,
         toolbar: {
@@ -147,7 +142,6 @@ export class ChartPctCelsComponent implements OnInit {
           },
         },
       },
-      title: {},
       colors: ['#008FFB'],
       yaxis: {
         min: 0,
@@ -160,28 +154,10 @@ export class ChartPctCelsComponent implements OnInit {
           },
         },
       },
-
-      tooltip: {
-        followCursor: false,
-        theme: 'dark',
-        x: {
-          show: false,
-        },
-        marker: {
-          show: false,
-        },
-        y: {
-          title: {
-            formatter: (s) => {
-              return ':' + s;
-            },
-          },
-        },
-      },
       annotations: {
         yaxis: [
           {
-            y: 1.8,
+            y: 1.8, // DEMO - HAY QUE TRAER EL MAE MEDIO DEL PORTFOLIO
             borderColor: '#5b5b5c',
             borderWidth: 2,
             strokeDashArray: 10,
@@ -205,13 +181,11 @@ export class ChartPctCelsComponent implements OnInit {
       series: [
         {
           name: 'gradiente medio',
-          data: [15.4, 15.9],
+          data: data2,
         },
       ],
       chart: {
-        id: 'tw',
-        group: 'social',
-        type: 'area',
+        type: typeChart,
         width: '100%',
         height: this.chartHeight,
         toolbar: {
@@ -239,23 +213,6 @@ export class ChartPctCelsComponent implements OnInit {
           minWidth: 40,
           formatter: (value) => {
             return value + ' ºC';
-          },
-        },
-      },
-      tooltip: {
-        followCursor: false,
-        theme: 'dark',
-        x: {
-          show: false,
-        },
-        marker: {
-          show: false,
-        },
-        y: {
-          title: {
-            formatter: (s) => {
-              return ': ' + s;
-            },
           },
         },
       },
