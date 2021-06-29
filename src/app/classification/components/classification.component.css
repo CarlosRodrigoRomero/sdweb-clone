@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   background: aliceblue;
-  height: 200px;
+  height: 240px;
 }
 
 .bottom-bar__row-top {
@@ -37,5 +37,9 @@ app-thermal-slider {
   position: absolute;
   left: 50%;
   transform: translate(-50%, 0%);
-  bottom: 220px;
+  bottom: 250px;
+}
+
+.end-process {
+  margin: 10px;
 }

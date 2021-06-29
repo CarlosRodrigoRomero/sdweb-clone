@@ -4,9 +4,11 @@ import { take } from 'rxjs/operators';
 
 import { ClassificationService } from '@core/services/classification.service';
 import { ClustersService } from '@core/services/clusters.service';
+import { InformeService } from '@core/services/informe.service';
 
 import { NormalizedModule } from '@core/models/normalizedModule';
-
+import { Anomalia } from '@core/models/anomalia';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-classification',
@@ -17,8 +19,14 @@ export class ClassificationComponent implements OnInit {
   serviceInit = false;
   nombrePlanta: string;
   normModHovered: NormalizedModule = undefined;
+  private anomalias: Anomalia[] = [];
+  private informe: InformeInterface;
 
-  constructor(private classificationService: ClassificationService, private clustersService: ClustersService) {}
+  constructor(
+    private classificationService: ClassificationService,
+    private clustersService: ClustersService,
+    private informeService: InformeService
+  ) {}
 
   ngOnInit(): void {
     this.classificationService.initService().subscribe((value) => (this.serviceInit = value));
@@ -27,5 +35,34 @@ export class ClassificationComponent implements OnInit {
 
     // lo iniciamos para poder acceder a la info de la trayectoria del vuelo
     this.clustersService.initService().pipe(take(1)).subscribe();
+
+    // nos suscribimos a las anomalias
+    this.classificationService.listaAnomalias$.subscribe((anomalias) => (this.anomalias = anomalias));
+
+    // traemos el informe
+    this.informeService
+      .getInforme(this.classificationService.informeId)
+      .subscribe((informe) => (this.informe = informe));
+  }
+
+  endClassification() {
+    this.informe.mae = this.getMaeInforme();
+    this.informe.pc_pct = this.getCCInforme();
+
+    console.log(this.informe);
+  }
+
+  private getMaeInforme() {
+    const perdidas = this.anomalias.map((anom) => anom.perdidas);
+    let perdidasTotales = 0;
+    perdidas.forEach((perd) => (perdidasTotales += perd));
+
+    return perdidasTotales / this.informe.numeroModulos;
+  }
+
+  private getCCInforme() {
+    const celCals = this.anomalias.filter((anom) => anom.tipo === 8 || anom.tipo === 9);
+
+    return celCals.length / this.informe.numeroModulos;
   }
 }

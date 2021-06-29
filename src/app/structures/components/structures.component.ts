@@ -4,6 +4,8 @@ import Map from 'ol/Map';
 
 import { StructuresService } from '@core/services/structures.service';
 import { OlMapService } from '@core/services/ol-map.service';
+import { InformeService } from '@core/services/informe.service';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-structures',
@@ -15,14 +17,20 @@ export class StructuresComponent implements OnInit {
   deleteRawModMode = false;
   nombrePlanta: string;
   private map: Map;
+  private informe: InformeInterface;
 
-  constructor(private structuresService: StructuresService, private olMapService: OlMapService) {}
+  constructor(
+    private structuresService: StructuresService,
+    private olMapService: OlMapService,
+    private informeService: InformeService
+  ) {}
 
   ngOnInit(): void {
     this.structuresService.initService().subscribe((value) => (this.serviceInit = value));
     this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteRawModMode = mode));
     this.structuresService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre));
     this.olMapService.map$.subscribe((map) => (this.map = map));
+    this.informeService.getInforme(this.structuresService.informeId).subscribe((informe) => (this.informe = informe));
   }
 
   toggleLoadRawModules(load: boolean) {
@@ -62,5 +70,12 @@ export class StructuresComponent implements OnInit {
     this.structuresService.normModSelected = undefined;
     this.map.removeInteraction(this.olMapService.draw);
     this.olMapService.draw = undefined;
+  }
+
+  setReportNumModules() {
+    this.informe.numeroModulos = this.structuresService.reportNumModules;
+
+    // actualizamos el informe en la DB
+    this.informeService.updateInforme(this.informe);
   }
 }

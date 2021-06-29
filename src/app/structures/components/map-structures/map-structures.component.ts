@@ -206,7 +206,6 @@ export class MapStructuresComponent implements OnInit {
                   this.structuresService.applyFilters(filtParams);
 
                   this.structuresService.deletedRawModIds = filtParams[0].eliminados;
-                  // this.mBDeletedIds = filtParams[0].eliminados;
                 }
 
                 return this.filterService.filteredElements$;
@@ -220,6 +219,9 @@ export class MapStructuresComponent implements OnInit {
               } else {
                 this.modulosBrutos = elems as RawModule[];
               }
+
+              // asignamos el numero de modulos del informe
+              this.structuresService.reportNumModules = this.modulosBrutos.length;
 
               this.modulosBrutos.forEach((mB) => {
                 const feature = new Feature({

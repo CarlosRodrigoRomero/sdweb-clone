@@ -41,6 +41,7 @@ export class StructuresService {
   deleteRawModMode$ = new BehaviorSubject<boolean>(this._deleteRawModMode);
   private _deletedRawModIds: string[] = [];
   deletedRawModIds$ = new BehaviorSubject<string[]>(this._deletedRawModIds);
+  private _reportNumModules: number = 0;
 
   private _loadModuleGroups = false;
   loadModuleGroups$ = new BehaviorSubject<boolean>(this._loadModuleGroups);
@@ -535,5 +536,13 @@ export class StructuresService {
   set normModSelected(value: NormalizedModule) {
     this._normModSelected = value;
     this.normModSelected$.next(value);
+  }
+
+  get reportNumModules() {
+    return this._reportNumModules;
+  }
+
+  set reportNumModules(value: number) {
+    this._reportNumModules = value;
   }
 }
