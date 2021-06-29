@@ -15,6 +15,7 @@ import { WINDOW } from '../../window.providers';
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 
 import { FilterableElement } from '@core/models/filterableInterface';
+import { InformeInterface } from '@core/models/informe';
 
 @Injectable({
   providedIn: 'root',
@@ -31,6 +32,8 @@ export class ReportControlService {
   public selectedInformeId$ = new BehaviorSubject<string>(this._selectedInformeId);
   private _informesIdList: string[] = [];
   public informesIdList$ = new BehaviorSubject<string[]>(this._informesIdList);
+  private _informes: InformeInterface[] = [];
+  public informes$ = new BehaviorSubject<InformeInterface[]>(this._informes);
   private _initialized = false;
   public initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _mapLoaded = false;
@@ -65,6 +68,8 @@ export class ReportControlService {
             switchMap(() => this.informeService.getInformesDePlanta(this.plantaId)),
             // obtenemos los informes de la planta
             switchMap((informes) => {
+              this.informes = informes;
+
               // ordenamos los informes de menos a mas reciente y los añadimos a la lista
               informes
                 .sort((a, b) => a.fecha - b.fecha)
@@ -81,6 +86,16 @@ export class ReportControlService {
             take(1),
             switchMap((anoms) => {
               this.allFilterableElements = anoms;
+
+              this.informes.forEach((informe) => {
+                const perdidas = anoms.filter((anom) => anom.informeId === informe.id).map((anom) => anom.perdidas);
+                let totalPerdidas = 0;
+                perdidas.forEach((perd) => (totalPerdidas += perd));
+
+                informe.mae = totalPerdidas / 2000; // DEMO - CAMBIAR CUANDO META JOSE VALORES CORRECTOS
+              });
+
+              console.log(this.informes);
 
               // iniciamos filter service
               return this.filterService.initService(anoms);
@@ -358,6 +373,15 @@ export class ReportControlService {
   set informesIdList(value: string[]) {
     this._informesIdList = value;
     this.informesIdList$.next(value);
+  }
+
+  get informes() {
+    return this._informes;
+  }
+
+  set informes(value: InformeInterface[]) {
+    this._informes = value;
+    this.informes$.next(value);
   }
 
   get initialized() {

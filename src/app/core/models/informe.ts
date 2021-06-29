@@ -9,6 +9,7 @@ export interface InformeInterface {
   velocidad?: number;
   carpetaBase?: string;
   mae?: number;
+  cc?: number;
   alturaVuelo?: number;
   nubosidad?: number;
   numeroModulos?: number;
