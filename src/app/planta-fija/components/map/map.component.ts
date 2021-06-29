@@ -89,7 +89,8 @@ export class MapComponent implements OnInit, OnDestroy {
             // Obtenemos todas las capas para esta planta
             return combineLatest([
               this.plantaService.getThermalLayers$(this.plantaId),
-              this.informeService.getInformesDePlanta(this.plantaId),
+              this.reportControlService.informes$,
+              // this.informeService.getInformesDePlanta(this.plantaId),
               this.plantaService.getPlanta(this.plantaId),
             ]);
           })
@@ -101,22 +102,20 @@ export class MapComponent implements OnInit, OnDestroy {
             this.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
 
             // Para cada informe, hay que crear 2 capas: térmica y vectorial
-            informes
-              .sort((a, b) => a.fecha - b.fecha)
-              .forEach((informe) => {
-                const tl = thermalLayers.find((item) => item.informeId === informe.id);
+            informes.forEach((informe) => {
+              const tl = thermalLayers.find((item) => item.informeId === informe.id);
 
-                // this.thermalService.sliderMin = tl.rangeTempMin;
-                // this.thermalService.sliderMax = tl.rangeTempMax;
+              // this.thermalService.sliderMin = tl.rangeTempMin;
+              // this.thermalService.sliderMax = tl.rangeTempMax;
 
-                // TODO: Comprobar que existe...
-                if (tl !== undefined) {
-                  this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id));
-                }
+              // TODO: Comprobar que existe...
+              if (tl !== undefined) {
+                this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id));
+              }
 
-                // creamos las capas de anomalías para los diferentes informes
-                this.olMapService.addAnomaliaLayer(this._createAnomaliaLayer(informe.id));
-              });
+              // creamos las capas de anomalías para los diferentes informes
+              this.olMapService.addAnomaliaLayer(this._createAnomaliaLayer(informe.id));
+            });
 
             this.planta = planta;
 

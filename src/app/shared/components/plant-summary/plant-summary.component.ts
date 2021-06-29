@@ -23,6 +23,7 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
   public planta: PlantaInterface = undefined;
   public _informe: InformeInterface = undefined;
   public informe$ = new BehaviorSubject<InformeInterface>(this._informe);
+  private selectedInformeId: string;
   private subscription: Subscription = new Subscription();
 
   constructor(
@@ -38,9 +39,14 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this.reportControlService.selectedInformeId$
           .pipe(
-            switchMap((informeId) => this.informeService.getInforme(informeId)),
-            switchMap((informe) => {
-              this.informe = informe;
+            switchMap((informeId) => {
+              this.selectedInformeId = informeId;
+
+              return this.reportControlService.informes$;
+              // return this.informeService.getInforme(informeId);
+            }),
+            switchMap((informes) => {
+              this.informe = informes.find((informe) => informe.id === this.selectedInformeId);
 
               return this.plantaService.getPlanta(this.informe.plantaId);
             })
