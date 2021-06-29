@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 
 import { take } from 'rxjs/operators';
 
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 import { ClassificationService } from '@core/services/classification.service';
 import { ClustersService } from '@core/services/clusters.service';
 import { InformeService } from '@core/services/informe.service';
@@ -25,7 +27,8 @@ export class ClassificationComponent implements OnInit {
   constructor(
     private classificationService: ClassificationService,
     private clustersService: ClustersService,
-    private informeService: InformeService
+    private informeService: InformeService,
+    private _snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -49,7 +52,11 @@ export class ClassificationComponent implements OnInit {
     this.informe.mae = this.getMaeInforme();
     this.informe.pc_pct = this.getCCInforme();
 
-    console.log(this.informe);
+    // actualizamos el informe en la DB
+    this.informeService.updateInforme(this.informe);
+
+    // aviso de proceso terminado
+    this.openSnackBar();
   }
 
   private getMaeInforme() {
@@ -64,5 +71,9 @@ export class ClassificationComponent implements OnInit {
     const celCals = this.anomalias.filter((anom) => anom.tipo === 8 || anom.tipo === 9);
 
     return celCals.length / this.informe.numeroModulos;
+  }
+
+  private openSnackBar() {
+    this._snackBar.open('!CLASIFICACIÓN TERMINADA!', 'OK', { duration: 5000, verticalPosition: 'top' });
   }
 }
