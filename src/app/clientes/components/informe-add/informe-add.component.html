@@ -5,11 +5,11 @@
     <ng-container *ngIf="this.planta">
       <h3>{{ planta.nombre }}</h3>
       <form class="formContainer" [formGroup]="form" (ngSubmit)="submitForm()">
-        <!-- <mat-form-field>
+        <mat-form-field>
           <input matInput formControlName="fecha" [matDatepicker]="picker" placeholder="Choose a date" />
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field> -->
+        </mat-form-field>
 
         <mat-form-field>
           <input matInput formControlName="hora_inicio" placeholder="Hora inicio" />
