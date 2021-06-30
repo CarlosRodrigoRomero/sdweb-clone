@@ -9,6 +9,7 @@ import { AuthService } from '@core/services/auth.service';
 import { PlantaService } from '@core/services/planta.service';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
 
 interface PlantsData {
   nombre: string;
@@ -24,9 +25,10 @@ interface PlantsData {
   styleUrls: ['./plant-list.component.css'],
 })
 export class PlantListComponent implements OnInit, AfterViewInit {
-  public displayedColumns: string[] = ['nombre', 'potencia', 'mae', 'ultima-inspeccion', 'compartir'];
+  public displayedColumns: string[] = ['nombre', 'potencia', 'mae', 'ultimaInspeccion', 'compartir'];
   public dataSource = new MatTableDataSource<PlantsData>();
   private plantas: PlantaInterface[];
+  private informes: InformeInterface[];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -40,6 +42,8 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.plantas = this.portfolioControlService.listaPlantas;
+    this.informes = this.portfolioControlService.listaInformes;
+
     const plantsData = [];
 
     this.plantas.forEach((planta, index) => {
@@ -54,6 +58,19 @@ export class PlantListComponent implements OnInit, AfterViewInit {
             mae,
             ultimaInspeccion: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current))
               .fecha,
+            plantaId: planta.id,
+            tipo: planta.tipo,
+          });
+        }
+      } else if (this.informes.map((inf) => inf.plantaId).includes(planta.id)) {
+        const informe = this.informes.find((inf) => inf.plantaId === planta.id);
+
+        if (informe.mae !== undefined) {
+          plantsData.push({
+            nombre: planta.nombre,
+            potencia: planta.potencia,
+            mae: informe.mae,
+            ultimaInspeccion: informe.fecha,
             plantaId: planta.id,
             tipo: planta.tipo,
           });
