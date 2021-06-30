@@ -182,7 +182,7 @@ class ImageTileMod extends Tile {
 
       let pixelIndex;
       rainbowHcPalette.forEach((array, index) => {
-        if (this.arraysEqual(array, pixel.slice(0, 3))) {
+        if (this.compareArrays(array, pixel.slice(0, 3))) {
           pixelIndex = index;
         }
       });
@@ -207,6 +207,10 @@ class ImageTileMod extends Tile {
       if (a[i] !== b[i]) return false;
     }
     return true;
+  }
+
+  compareArrays(a, b) {
+    return a.every((value, index) => value === b[index]);
   }
 
   transformPixels_(image) {
