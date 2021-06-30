@@ -43,7 +43,6 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
               this.selectedInformeId = informeId;
 
               return this.reportControlService.informes$;
-              // return this.informeService.getInforme(informeId);
             }),
             switchMap((informes) => {
               this.informe = informes.find((informe) => informe.id === this.selectedInformeId);

@@ -183,7 +183,7 @@ export class PlantaService {
 
           // generamos las globalCoords en caso de que no tenga
           if (data.globalCoords === undefined) {
-            data.globalCoords = [data.globalX, data.globalY, null];
+            data.globalCoords = [data.globalX, data.globalY];
           }
 
           return data;

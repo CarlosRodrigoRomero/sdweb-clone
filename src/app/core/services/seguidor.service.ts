@@ -58,42 +58,55 @@ export class SeguidorService {
       map(([locAreaList, anomaliaList]) => {
         const seguidores: Seguidor[] = [];
 
-        // comprobamos si tiene globalCoords o globaX, globalY
-        if (locAreaList.filter((locArea) => locArea.globalCoords !== undefined).length > 0) {
-          // si tiene globalCoords detectamos la mas pequeña que es la utilizaremos para el seguidor
-          const contador = [1, 2];
-          let indiceSeleccionado = 0;
-          contador.forEach((c) => {
-            const numItems = locAreaList.filter((locArea) => locArea.globalCoords[c] !== null).length;
-            if (numItems > 0) {
-              indiceSeleccionado = c;
+        // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
+        const coordsLength = locAreaList[0].globalCoords.length;
+
+        let indiceSeleccionado;
+
+        locAreaList.forEach((locArea) => {
+          for (let index = coordsLength - 1; index >= 0; index--) {
+            if (
+              locArea.globalCoords[index] !== undefined &&
+              locArea.globalCoords[index] !== null &&
+              locArea.globalCoords[index] !== ''
+            ) {
+              indiceSeleccionado = index;
+              break;
             }
-          });
-          // filtramos las areas seleccionadas para los seguidores
-          const locAreaSeguidores = locAreaList.filter((locArea) => locArea.globalCoords[indiceSeleccionado] !== null);
+          }
+        });
 
-          // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
-          let count = 0;
-          locAreaSeguidores.forEach((locArea) => {
-            const anomaliasSeguidor = anomaliaList.filter(
-              (anomalia) => anomalia.globalCoords[indiceSeleccionado] === locArea.globalCoords[indiceSeleccionado]
-            );
-            const seguidor = new Seguidor(
-              anomaliasSeguidor,
-              this.planta.filas,
-              this.planta.columnas,
-              locArea.path,
-              plantaId,
-              informeId,
-              locArea.modulo,
-              locArea.globalCoords,
-              'seguidor_' + count++ + '_' + informeId
-            );
-            seguidor.nombre = this.getSeguidorName(seguidor);
+        // filtramos las areas seleccionadas para los seguidores
+        const locAreaSeguidores = locAreaList.filter(
+          (locArea) =>
+            locArea.globalCoords[indiceSeleccionado] !== null &&
+            locArea.globalCoords[indiceSeleccionado] !== undefined &&
+            locArea.globalCoords[indiceSeleccionado] !== ''
+        );
 
-            seguidores.push(seguidor);
-          });
-        } else {
+        // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
+        let count = 0;
+        locAreaSeguidores.forEach((locArea) => {
+          const anomaliasSeguidor = anomaliaList.filter(
+            (anomalia) => anomalia.globalCoords[indiceSeleccionado] === locArea.globalCoords[indiceSeleccionado]
+          );
+          const seguidor = new Seguidor(
+            anomaliasSeguidor,
+            this.planta.filas,
+            this.planta.columnas,
+            locArea.path,
+            plantaId,
+            informeId,
+            locArea.modulo,
+            locArea.globalCoords,
+            'seguidor_' + count++ + '_' + informeId
+          );
+          seguidor.nombre = this.getSeguidorName(seguidor);
+
+          seguidores.push(seguidor);
+        });
+        // }
+        /* else {
           // aqui estan las que no tienen globalCoords
           // filtramos las areas para los seguidores eligiendo las más pequeños como seguidores
           let locAreaSeguidores: LocationAreaInterface[] = [];
@@ -196,7 +209,7 @@ export class SeguidorService {
               seguidores.push(seguidor);
             });
           }
-        }
+        } */
 
         return seguidores;
       })

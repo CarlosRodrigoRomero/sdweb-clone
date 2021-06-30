@@ -112,8 +112,8 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
       if (feature !== undefined) {
         const style = styles[feature.getGeometry().getType()];
 
+        // ZOOM FIJO DEMO
         if (this.map.getView().getZoom() > 20) {
-          // DEMO
           this.nombreGlobalCoords.forEach((nombre, index) => {
             if (
               feature.get('globalCoords')[index] !== null &&

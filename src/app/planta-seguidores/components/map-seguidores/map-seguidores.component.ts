@@ -193,6 +193,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
           switchMap((value) => {
             if (value) {
               this.seguidoresControlService.mostrarSeguidores();
+
               return combineLatest([
                 this.seguidoresControlService.seguidorHovered$,
                 this.seguidoresControlService.seguidorSelected$,
