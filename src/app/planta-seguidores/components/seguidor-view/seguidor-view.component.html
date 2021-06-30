@@ -1,5 +1,5 @@
 <div class="sidenav-content" *ngIf="seguidorSelected">
-  <mat-toolbar class="title">
+  <mat-toolbar [class.mat-elevation-z2]="true" class="title">
     <div>
       <span>{{ seguidorSelected.nombre }}</span>
       <span class="modulo-label">({{ seguidorSelected.moduloLabel }})</span>

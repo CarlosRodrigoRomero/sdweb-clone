@@ -19,8 +19,6 @@ export class SeguidorViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
-      console.log(seguidor);
-
       this.seguidorSelected = seguidor;
 
       if (this.seguidorSelected !== undefined) {

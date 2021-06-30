@@ -4,6 +4,8 @@
 
 .title {
   height: 70px;
+  position: absolute;
+  z-index: 9999;
 }
 
 .btn-close-seguidor-view {
@@ -24,12 +26,18 @@
   padding: 0.5rem;
   display: grid;
   position: relative;
-  grid-template-columns: 6.5fr 3.5fr;
+  grid-template-columns: 640px auto;
   gap: 1rem;
+  top: 70px;
+}
+
+.left-content {
+  display: grid;
+  row-gap: 1rem;
 }
 
 .image-content {
-  height: 56vh;
+  height: 512px;
 }
 
 app-seguidor-view-toggle {
@@ -41,14 +49,18 @@ app-seguidor-view-toggle {
 
 app-seguidor-image-toggle {
   position: absolute;
-  top: 457px;
-  left: 460px;
+  top: 472px;
+  left: 475px;
   z-index: 999;
 }
 
 app-seguidor-next-prev {
   position: absolute;
   top: 220px;
+}
+
+app-seguidor-anomalia-info {
+  width: calc(calc(100vw * 0.85) - (640px + 32px));
 }
 
 .prev-btn {
