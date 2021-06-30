@@ -21,6 +21,7 @@ import { PlantaService } from '@core/services/planta.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { ReportControlService } from '@core/services/report-control.service';
 import { GLOBAL } from '@core/services/global';
+import { SeguidorService } from '@core/services/seguidor.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 
@@ -54,14 +55,22 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   constructor(
     private plantaService: PlantaService,
     private olMapService: OlMapService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private seguidorService: SeguidorService
   ) {}
 
   ngOnInit(): void {
     if (this.reportControlService.plantaFija) {
+      // TODO - adaptar a cada planta
       this.nombreGlobalCoords = GLOBAL.nombreGlobalCoordsFija;
     } else {
-      this.nombreGlobalCoords = GLOBAL.nombreGlobalCoordsSeguidores;
+      if (this.seguidorService.numGlobalCoords > 0) {
+        for (let index = 0; index < this.seguidorService.numGlobalCoords; index++) {
+          this.nombreGlobalCoords.push('Zona ' + index);
+        }
+      } else {
+        this.reportControlService.thereAreZones = false;
+      }
     }
 
     this.subscriptions.add(
@@ -141,8 +150,6 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.plantaService.getLocationsArea(this.plantaId).subscribe((locAreas) => {
-        console.log(locAreas);
-
         this.nombreGlobalCoords.forEach((nombre, i) => {
           if (this.globalCoordAreas.length < this.nombreGlobalCoords.length) {
             this.globalCoordAreas.push(

@@ -19,9 +19,9 @@
 }
 
 .visual-control {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  display: flex;
+  /* grid-template-columns: 1fr 1fr; */
+  /* gap: 1rem; */
 }
 
 @media (max-width: 900px) {
@@ -30,6 +30,7 @@
   }
 
   .visual-control {
+    display: grid;
     grid-template-columns: 100%;
     gap: 0.5rem;
   }

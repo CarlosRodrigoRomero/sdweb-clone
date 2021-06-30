@@ -42,6 +42,8 @@ export class ReportControlService {
   private _allFilterableElements: FilterableElement[] = [];
   public allFilterableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFilterableElements);
   public plantaFija = false;
+  private _thereAreZones = true;
+  thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
 
   constructor(
     private router: Router,
@@ -390,5 +392,14 @@ export class ReportControlService {
   set allFilterableElements(value: FilterableElement[]) {
     this._allFilterableElements = value;
     this.allFilterableElements$.next(value);
+  }
+
+  get thereAreZones() {
+    return this._thereAreZones;
+  }
+
+  set thereAreZones(value: boolean) {
+    this._thereAreZones = value;
+    this.thereAreZones$.next(value);
   }
 }

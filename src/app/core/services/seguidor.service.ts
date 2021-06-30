@@ -20,6 +20,7 @@ import { LocationAreaInterface } from '@core/models/location';
 })
 export class SeguidorService {
   private planta: PlantaInterface;
+  numGlobalCoords: number;
 
   constructor(
     private informeService: InformeService,
@@ -73,6 +74,9 @@ export class SeguidorService {
 
           if (notNullLocAreas.length > 0) {
             indiceSeleccionado = index;
+
+            this.numGlobalCoords = indiceSeleccionado;
+
             break;
           }
         }

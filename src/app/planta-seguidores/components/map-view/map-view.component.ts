@@ -21,6 +21,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public seguidoresLoaded = false;
   public notSharedReport = true;
   public showFilters = true;
+  thereAreZones = true;
   private subscriptions: Subscription = new Subscription();
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
@@ -48,6 +49,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.add(
       this.seguidoresControlService.seguidorViewOpened$.subscribe((opened) => (this.seguidorViewOpened = opened))
     );
+    this.subscriptions.add(this.reportControlService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
   }
 
   ngAfterViewInit(): void {
