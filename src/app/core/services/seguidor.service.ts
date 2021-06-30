@@ -63,18 +63,19 @@ export class SeguidorService {
 
         let indiceSeleccionado;
 
-        locAreaList.forEach((locArea) => {
-          for (let index = coordsLength - 1; index >= 0; index--) {
-            if (
+        for (let index = coordsLength - 1; index >= 0; index--) {
+          const notNullLocAreas = locAreaList.filter(
+            (locArea) =>
               locArea.globalCoords[index] !== undefined &&
               locArea.globalCoords[index] !== null &&
               locArea.globalCoords[index] !== ''
-            ) {
-              indiceSeleccionado = index;
-              break;
-            }
+          );
+
+          if (notNullLocAreas.length > 0) {
+            indiceSeleccionado = index;
+            break;
           }
-        });
+        }
 
         // filtramos las areas seleccionadas para los seguidores
         const locAreaSeguidores = locAreaList.filter(
@@ -105,111 +106,6 @@ export class SeguidorService {
 
           seguidores.push(seguidor);
         });
-        // }
-        /* else {
-          // aqui estan las que no tienen globalCoords
-          // filtramos las areas para los seguidores eligiendo las más pequeños como seguidores
-          let locAreaSeguidores: LocationAreaInterface[] = [];
-          if (locAreaList.filter((locArea) => locArea.globalZ !== undefined && locArea.globalZ !== '').length > 0) {
-            locAreaSeguidores = locAreaList.filter((locArea) => locArea.globalZ !== '');
-
-            // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
-            let count = 0;
-            locAreaSeguidores.forEach((locArea) => {
-              let anomaliasSeguidor = anomaliaList
-                .filter((anomalia) => anomalia.globalCoords !== undefined)
-                .filter((anomalia) => anomalia.globalCoords[2] == locArea.globalZ);
-
-              // comprovamos si las anomalias son de tipo 'anomalia' o 'pc'
-              if (anomaliasSeguidor.length === 0) {
-                anomaliasSeguidor = anomaliaList.filter(
-                  (anomalia) => (anomalia as PcInterface).global_z === locArea.globalZ
-                );
-              }
-
-              const seguidor = new Seguidor(
-                anomaliasSeguidor,
-                this.planta.filas,
-                this.planta.columnas,
-                locArea.path,
-                plantaId,
-                informeId,
-                locArea.modulo,
-                [locArea.globalX, locArea.globalY, locArea.globalZ],
-                'seguidor_' + count++ + '_' + informeId
-              );
-              seguidor.nombre = this.getSeguidorName(seguidor);
-
-              seguidores.push(seguidor);
-            });
-          } else if (
-            locAreaList.filter((locArea) => locArea.globalY !== undefined && locArea.globalY !== '').length > 0
-          ) {
-            locAreaSeguidores = locAreaList.filter((locArea) => locArea.globalY !== '');
-
-            // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
-            let count = 0;
-            locAreaSeguidores.forEach((locArea) => {
-              let anomaliasSeguidor = anomaliaList
-                .filter((anomalia) => anomalia.globalCoords !== undefined)
-                .filter((anomalia) => anomalia.globalCoords[1] == locArea.globalY);
-
-              // comprovamos si las anomalias son de tipo 'anomalia' o 'pc'
-              if (anomaliasSeguidor.length === 0) {
-                anomaliasSeguidor = anomaliaList.filter(
-                  (anomalia) => (anomalia as PcInterface).global_y === locArea.globalY
-                );
-              }
-
-              const seguidor = new Seguidor(
-                anomaliasSeguidor,
-                this.planta.filas,
-                this.planta.columnas,
-                locArea.path,
-                plantaId,
-                informeId,
-                locArea.modulo,
-                [locArea.globalX, locArea.globalY, null],
-                'seguidor_' + count++ + '_' + informeId
-              );
-              seguidor.nombre = this.getSeguidorName(seguidor);
-
-              seguidores.push(seguidor);
-            });
-          } else {
-            locAreaSeguidores = locAreaList.filter((locArea) => locArea.globalX !== '');
-
-            // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
-            let count = 0;
-            locAreaSeguidores.forEach((locArea) => {
-              let anomaliasSeguidor = anomaliaList
-                .filter((anomalia) => anomalia.globalCoords !== undefined)
-                .filter((anomalia) => anomalia.globalCoords[0] == locArea.globalX);
-
-              // comprovamos si las anomalias son de tipo 'anomalia' o 'pc'
-              if (anomaliasSeguidor.length === 0) {
-                anomaliasSeguidor = anomaliaList.filter(
-                  (anomalia) => (anomalia as PcInterface).global_x === locArea.globalX
-                );
-              }
-
-              const seguidor = new Seguidor(
-                anomaliasSeguidor,
-                this.planta.filas,
-                this.planta.columnas,
-                locArea.path,
-                plantaId,
-                informeId,
-                locArea.modulo,
-                [locArea.globalX, null, null],
-                'seguidor_' + count++ + '_' + informeId
-              );
-              seguidor.nombre = this.getSeguidorName(seguidor);
-
-              seguidores.push(seguidor);
-            });
-          }
-        } */
 
         return seguidores;
       })
