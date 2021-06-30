@@ -22,7 +22,7 @@ export let GLOBAL = {
   minGradiente: 10,
   maxGradiente: 50,
   stringParaDesconocido: '-',
-  stringConectorGlobalsDefault: '/',
+  stringConectorGlobalsDefault: ' / ',
   nombreGlobalXFija: 'C1',
   nombreGlobalYFija: 'Pasillo',
   nombreGlobalZFija: 'C3',

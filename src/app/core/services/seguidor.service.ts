@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { combineLatest, Observable } from 'rxjs';
-import { filter, map, switchMap, take } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
@@ -12,8 +12,6 @@ import { GLOBAL } from '@core/services/global';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
-import { PcInterface } from '@core/models/pc';
-import { LocationAreaInterface } from '@core/models/location';
 
 @Injectable({
   providedIn: 'root',
@@ -122,7 +120,7 @@ export class SeguidorService {
       if (index === 0) {
         nombre = nombre + coord;
       } else {
-        if (coord !== null) {
+        if (coord !== null && coord !== undefined && coord !== '') {
           nombre = nombre + GLOBAL.stringConectorGlobalsDefault + coord;
         }
       }
