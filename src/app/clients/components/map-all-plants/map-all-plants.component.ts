@@ -15,6 +15,7 @@ import { fromLonLat } from 'ol/proj';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-map-all-plants',
@@ -22,7 +23,8 @@ import { PlantaInterface } from '@core/models/planta';
   styleUrls: ['./map-all-plants.component.css'],
 })
 export class MapAllPlantsComponent implements OnInit {
-  plantas: PlantaInterface[];
+  private plantas: PlantaInterface[];
+  private informes: InformeInterface[];
   defaultLng = -4;
   defaultLat = 40;
   defalutZoom = 6;
@@ -35,6 +37,8 @@ export class MapAllPlantsComponent implements OnInit {
 
   ngOnInit(): void {
     this.plantas = this.portfolioControlService.listaPlantas;
+    this.informes = this.portfolioControlService.listaInformes;
+
     this.initMap();
 
     const vectorSource = new VectorSource({});
@@ -48,6 +52,16 @@ export class MapAllPlantsComponent implements OnInit {
         if (mae !== undefined) {
           feature.setProperties({
             mae,
+            plantaId: planta.id,
+            tipo: planta.tipo,
+          });
+        }
+      } else if (this.informes.map((inf) => inf.plantaId).includes(planta.id)) {
+        const informe = this.informes.find((inf) => inf.plantaId === planta.id);
+
+        if (informe.mae !== undefined) {
+          feature.setProperties({
+            mae: informe.mae,
             plantaId: planta.id,
             tipo: planta.tipo,
           });

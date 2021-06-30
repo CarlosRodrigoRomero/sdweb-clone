@@ -12,6 +12,7 @@ import { PlantaService } from '@core/services/planta.service';
 import { InformeService } from '@core/services/informe.service';
 
 import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
 
 @Injectable({
   providedIn: 'root',
@@ -29,6 +30,7 @@ export class PortfolioControlService {
   public numPlantas = 0;
   public potenciaTotal = 0;
   public listaPlantas: PlantaInterface[] = [];
+  public listaInformes: InformeInterface[] = [];
   public allFeatures: Feature[] = [];
 
   constructor(public auth: AuthService, private plantaService: PlantaService, private informeService: InformeService) {}
@@ -49,9 +51,11 @@ export class PortfolioControlService {
               const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
               // comprobamos que el informe tiene "mae"
               if (mae !== undefined) {
+                // añadimos la planta y su mae a las listas
                 this.listaPlantas.push(planta);
                 this.maePlantas.push(mae);
 
+                // incrementamos conteo de plantas y suma de potencia
                 this.numPlantas++;
                 this.potenciaTotal += planta.potencia;
               }
@@ -61,9 +65,14 @@ export class PortfolioControlService {
 
               // comprobamos que el informe tiene "mae"
               if (informe.mae !== undefined) {
+                // añadimos el informe a la lista
+                this.listaInformes.push(informe);
+
+                // añadimos la planta y su mae a las listas
                 this.listaPlantas.push(planta);
                 this.maePlantas.push(informe.mae);
 
+                // incrementamos conteo de plantas y suma de potencia
                 this.numPlantas++;
                 this.potenciaTotal += planta.potencia;
               }

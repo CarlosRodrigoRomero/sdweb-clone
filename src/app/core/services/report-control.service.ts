@@ -84,11 +84,6 @@ export class ReportControlService {
             switchMap((anoms) => {
               this.allFilterableElements = anoms;
 
-              this.informes.forEach((informe) => {
-                informe.mae = this.getMaeInforme(informe, anoms);
-                informe.pc_pct = this.getCCInforme(informe, anoms);
-              });
-
               // iniciamos filter service
               return this.filterService.initService(anoms);
             })
@@ -304,23 +299,6 @@ export class ReportControlService {
     }
 
     return this.initialized$;
-  }
-
-  private getMaeInforme(informe: InformeInterface, anoms: Anomalia[]) {
-    const perdidas = anoms.filter((anom) => anom.informeId === informe.id).map((anom) => anom.perdidas);
-    let totalPerdidas = 0;
-    perdidas.forEach((perd) => (totalPerdidas += perd));
-
-    return totalPerdidas / 2000; // DEMO - CAMBIAR CUANDO META JOSE VALORES CORRECTOS
-  }
-
-  private getCCInforme(informe: InformeInterface, anoms: Anomalia[]) {
-    const CCs = anoms
-      .filter((anom) => anom.informeId === informe.id)
-      // tslint:disable-next-line: triple-equals
-      .filter((anom) => anom.tipo == 8 || anom.tipo == 9);
-
-    return CCs.length / 2000; // DEMO - CAMBIAR CUANDO META JOSE VALORES CORRECTOS
   }
 
   resetService() {
