@@ -88,7 +88,6 @@ export class ChartPctCelsComponent implements OnInit {
         })
       )
       .subscribe((dateLabels) => {
-        console.log(dateLabels);
         this.commonOptions.xaxis.categories = dateLabels;
 
         const data1: number[] = [];
