@@ -18,6 +18,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'clientes',
+    loadChildren: () => import('./clientes/clientes.module').then((m) => m.ClientesModule),
+    canActivate: [AuthGuard],
+  },
+  {
     path: 'fixed-shared',
     loadChildren: () => import('./planta-fija/planta-fija.module').then((m) => m.PlantaFijaModule),
   },
