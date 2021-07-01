@@ -17,7 +17,6 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ModuloAddComponent } from './components/modulo-add/modulo-add.component';
 
-import { MaterialModule } from '@material/material.module';
 import { PortfolioBenchmarkComponent } from './components/portfolio-benchmark/portfolio-benchmark.component';
 import { ChartModule } from 'primeng/chart';
 @NgModule({
@@ -46,7 +45,6 @@ import { ChartModule } from 'primeng/chart';
     ReactiveFormsModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MaterialModule,
   ],
   providers: [AuthService, MatDatepickerModule],
 })
