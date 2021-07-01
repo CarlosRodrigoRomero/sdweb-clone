@@ -178,14 +178,11 @@ class ImageTileMod extends Tile {
 
       return temp;
     } else if (this.thermalLayer.codificationType === 'rainbowHc') {
-      const rainbowHcPalette = GLOBAL.rainbow_hc_palette;
+      const rainbowHcPalette = GLOBAL.rainbow_hc_palette_hex;
 
-      let pixelIndex;
-      rainbowHcPalette.forEach((array, index) => {
-        if (this.compareArrays(array, pixel.slice(0, 3))) {
-          pixelIndex = index;
-        }
-      });
+      const pixelHex = this.pixelToHex(pixel.slice(0, 3));
+
+      const pixelIndex = rainbowHcPalette.indexOf(pixelHex);
 
       const temp = ((this.rangeTempMax - this.rangeTempMin) * pixelIndex) / rainbowHcPalette.length + this.rangeTempMin;
 
@@ -193,24 +190,19 @@ class ImageTileMod extends Tile {
     }
   }
 
-  arraysEqual(a, b) {
-    if (a === b) return true;
-    if (a == null || b == null) return false;
-    if (a.length !== b.length) return false;
-
-    // If you don't care about the order of the elements inside
-    // the array, you should sort both arrays here.
-    // Please note that calling sort on an array will modify that array.
-    // you might want to clone your array first.
-
-    for (var i = 0; i < a.length; ++i) {
-      if (a[i] !== b[i]) return false;
-    }
-    return true;
+  pixelToHex(pixel) {
+    var red = this.rgbToHex(pixel[0]);
+    var green = this.rgbToHex(pixel[1]);
+    var blue = this.rgbToHex(pixel[2]);
+    return red + green + blue;
   }
 
-  compareArrays(a, b) {
-    return a.every((value, index) => value === b[index]);
+  rgbToHex(rgb) {
+    var hex = Number(rgb).toString(16);
+    if (hex.length < 2) {
+      hex = '0' + hex;
+    }
+    return hex;
   }
 
   transformPixels_(image) {
@@ -232,6 +224,7 @@ class ImageTileMod extends Tile {
       if (pixel[3] == 0) {
         continue;
       }
+
       const rgb = this.temp2palette_(this.rgb2temp_(pixel));
       if (rgb != null) {
         pixel[0] = rgb[0];
