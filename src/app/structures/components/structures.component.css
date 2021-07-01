@@ -1,0 +1,55 @@
+.structures-grid {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+}
+
+.left-bar {
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.left-bar h4 {
+  margin: 1rem 1rem 0;
+}
+
+.mat-stepper-vertical {
+  margin-top: 8px;
+}
+
+:host ::ng-deep .mat-vertical-stepper-header {
+  pointer-events: none !important;
+}
+
+.mat-form-field {
+  margin-top: 16px;
+}
+
+.next-button {
+  margin-top: 1rem;
+}
+
+.back-btn {
+  margin-right: 0.5rem;
+}
+
+.delete-mode-warn {
+  position: absolute;
+  left: 60%;
+  transform: translate(-50%, 0%);
+  top: 6rem;
+  padding: 0.5rem;
+}
+
+.delete-mode-warn mat-card-title {
+  color: red;
+  font-weight: 600;
+  font-size: larger;
+}
+
+app-thermal-slider {
+  position: absolute;
+  left: 60%;
+  transform: translate(-50%, 0%);
+  bottom: 1rem;
+}

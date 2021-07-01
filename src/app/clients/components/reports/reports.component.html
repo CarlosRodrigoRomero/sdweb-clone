@@ -1,0 +1,22 @@
+<app-navbar></app-navbar>
+
+<div class="barra-titulo" *ngIf="mapLoaded">
+  <app-portfolio-summary></app-portfolio-summary>
+  <app-download-excel-portfolio></app-download-excel-portfolio>
+</div>
+
+<div class="grid" *ngIf="mapLoaded">
+  <div class="row_1">
+    <div>
+      <app-bar-chart></app-bar-chart>
+    </div>
+  </div>
+  <div class="row_2">
+    <div>
+      <app-plant-list></app-plant-list>
+    </div>
+    <div>
+      <app-map-all-plants></app-map-all-plants>
+    </div>
+  </div>
+</div>

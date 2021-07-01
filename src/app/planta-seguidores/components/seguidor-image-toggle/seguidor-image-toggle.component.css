@@ -1,0 +1,9 @@
+:host ::ng-deep .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+  line-height: 40px;
+  font-size: large;
+}
+
+:host ::ng-deep .mat-button-toggle-checked {
+  color: #d32f2f;
+  font-weight: 500;
+}

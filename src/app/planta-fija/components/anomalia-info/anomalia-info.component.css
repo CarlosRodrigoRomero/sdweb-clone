@@ -1,0 +1,51 @@
+.popup {
+  display: flex;
+  align-items: flex-end;
+}
+
+.popup-desktop {
+  width: 425px;
+  padding: 0px;
+}
+
+:host ::ng-deep .mat-tab-label {
+  padding: 0px !important;
+  min-width: 80px !important;
+}
+
+.tab-content {
+  margin: 16px 24px;
+}
+
+.popup-hover {
+  width: 300px;
+}
+
+.popup-hover-content {
+  justify-content: space-between;
+}
+
+.elemento {
+  display: flex;
+  justify-content: space-between;
+}
+
+.titulo {
+  font-size: 1rem;
+}
+
+.subtitulo {
+  font-weight: 300;
+  font-size: 1.1rem;
+}
+
+.link-descarga {
+  padding: 0 4px;
+}
+
+@media (max-width: 500px) {
+  .popup-desktop {
+    width: 94vw;
+    left: -10px;
+  }
+}

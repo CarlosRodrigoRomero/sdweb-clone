@@ -9,6 +9,7 @@ export interface InformeInterface {
   velocidad?: number;
   carpetaBase?: string;
   mae?: number;
+  cc?: number;
   alturaVuelo?: number;
   nubosidad?: number;
   numeroModulos?: number;
@@ -25,4 +26,8 @@ export interface InformeInterface {
   humedadRelativa?: number;
   jpgVisual?: boolean;
   carpetaJpgGray?: string;
+  pc_pct?: number;
+  vueloId?: string;
+  vientoVelocidad?: number;
+  vientoDireccion?: number;
 }

@@ -1,0 +1,127 @@
+mat-card {
+  height: calc(50vh - 86px);
+}
+
+:host ::ng-deep .mat-card-header .mat-card-title {
+  margin-bottom: 6px;
+}
+
+.buscar-input {
+  width: 100%;
+}
+
+:host ::ng-deep .buscar-input .mat-form-field-wrapper {
+  padding-bottom: 6px;
+}
+
+.tabla-container {
+  position: relative;
+  max-height: calc(50vh - 218px);
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.titulo {
+  padding-left: 1em;
+  padding-bottom: 1em;
+}
+
+h4 {
+  margin-left: 10px;
+  font-weight: 400;
+}
+
+.email {
+  margin: 8px;
+}
+
+.mat-row {
+  cursor: pointer;
+}
+
+/* .mat-column-nombre {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 35% !important;
+  width: 35% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-potencia {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 20% !important;
+  width: 20% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-mae {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 15% !important;
+  width: 20% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-ultima-inspeccion {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 20% !important;
+  width: 25% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-compartir {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 10% !important;
+  width: 10% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+} */
+
+tr.table-row:not(.example-expanded-row):hover {
+  background: whitesmoke;
+}

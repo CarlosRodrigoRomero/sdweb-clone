@@ -1,0 +1,14 @@
+<div class="filtro">
+  <h5>Pérdidas</h5>
+  <div class="custom-slider">
+    <ngx-slider
+      [(value)]="rangoMinPerdidas"
+      [(highValue)]="rangoMaxPerdidas"
+      [options]="options"
+      (userChangeEnd)="onChangeFiltroPerdidas(rangoMinPerdidas, rangoMaxPerdidas)"
+    ></ngx-slider>
+  </div>
+  <!-- <div class="new-slider">
+    <app-mat-range-slider [minValue]="15" [maxValue]="85"></app-mat-range-slider>
+  </div> -->
+</div>

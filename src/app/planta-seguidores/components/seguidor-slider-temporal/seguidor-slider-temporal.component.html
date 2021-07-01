@@ -1,0 +1,11 @@
+<div class="content" *ngIf="sliderLoaded">
+  <div *ngIf="informeIdList.length > 1" class="temporal-slider">
+    <ngx-slider
+      (valueChange)="onChangeTemporalSlider($event)"
+      [(value)]="currentYear"
+      [options]="optionsTemporalSlider"
+    ></ngx-slider>
+  </div>
+
+  <span class="one-informe" *ngIf="informeIdList.length === 1">{{ dates[0] }}</span>
+</div>

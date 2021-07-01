@@ -1,0 +1,33 @@
+<mat-toolbar [class.mat-elevation-z2]="true" class="nb">
+  <a *ngIf="themeSelected === 'light-theme'" class="navbar-brand" routerLink="/clients">
+    <img src="../../../assets/images/logo_sd.png" height="50" class="d-inline-block align-top" alt="" />
+  </a>
+  <a *ngIf="themeSelected === 'dark-theme'" class="navbar-brand" routerLink="/clients">
+    <img src="../../../assets/images/logo_white.png" height="50" class="d-inline-block align-top" alt="" />
+  </a>
+  <a *ngIf="themeSelected === 'light-theme'" class="navbar-brand-logo" routerLink="/clients" display="none">
+    <img src="../../../assets/images/favicon.png" height="30" class="d-inline-block align-top" alt="" />
+  </a>
+  <a *ngIf="themeSelected === 'dark-theme'" class="navbar-brand-logo" routerLink="/clients" display="none">
+    <img src="../../../assets/images/drone_red.png" height="30" class="d-inline-block align-top" alt="" />
+  </a>
+
+  <div class="summary-plant" *ngIf="showPlantSummary">
+    <app-plant-summary></app-plant-summary>
+  </div>
+
+  <span class="example-spacer"></span>
+
+  <!-- <app-switch-theme></app-switch-theme> -->
+
+  <!-- botón menu derecha -->
+  <button *ngIf="!isShared" mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+    <mat-icon>keyboard_arrow_down</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button *ngIf="isAdmin" mat-menu-item routerLink="/admin">Admin</button>
+    <button mat-menu-item (click)="signOut()" routerLink="../auth">
+      <strong> Cerrar sesión </strong>
+    </button>
+  </mat-menu>
+</mat-toolbar>

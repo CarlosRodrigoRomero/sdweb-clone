@@ -1,0 +1,18 @@
+<div *ngIf="sliderLoaded">
+  <mat-card *ngIf="informesList.length > 1" class="slider-card">
+    <mat-card-content>
+      <div class="temporal-slider">
+        <ngx-slider
+          (valueChange)="onChangeTemporalSlider($event)"
+          [(value)]="currentYear"
+          [options]="optionsTemporalSlider"
+        ></ngx-slider>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="one-informe" *ngIf="informesList.length === 1">
+    <mat-card-content>
+      <span>{{ dates[0] }}</span>
+    </mat-card-content>
+  </mat-card>
+</div>

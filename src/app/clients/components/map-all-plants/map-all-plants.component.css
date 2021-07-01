@@ -1,0 +1,8 @@
+mat-card {
+  height: calc(50vh - 86px);
+}
+
+#map {
+  height: calc(50vh - 86px - 32px );
+  width: 100%;
+}

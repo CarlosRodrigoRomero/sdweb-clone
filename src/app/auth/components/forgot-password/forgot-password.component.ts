@@ -25,7 +25,7 @@ export class ForgotPasswordComponent implements OnInit {
     });
   }
 
-  forgotPassword(passwordResetEmail: string) {
+  /* forgotPassword(passwordResetEmail: string) {
     this.authService
       .forgotPassword(passwordResetEmail)
       .then(() => {
@@ -37,5 +37,22 @@ export class ForgotPasswordComponent implements OnInit {
         this.warningHide = false;
         console.log(error);
       });
+  } */
+
+  forgotPassword(event: Event) {
+    if (this.form.valid) {
+      const value = this.form.value;
+      this.authService
+        .forgotPassword(value.email)
+        .then(() => {
+          this.warningHide = true;
+          this.successHide = false;
+        })
+        .catch((error) => {
+          this.successHide = true;
+          this.warningHide = false;
+          console.log(error);
+        });
+    }
   }
 }

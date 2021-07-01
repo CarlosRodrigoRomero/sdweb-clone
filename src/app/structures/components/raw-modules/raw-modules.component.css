@@ -1,0 +1,37 @@
+.delete-buttons {
+  min-width: 225px;
+}
+
+.delete-buttons button {
+  width: 100%;
+}
+
+.restore-buttons {
+  margin-top: 0.5rem;
+  min-width: 225px;
+  display: grid;
+  grid-template-columns: 9fr 1fr;
+  gap: 0.5rem;
+}
+
+.btn-undo {
+  padding: 0 0.4rem;
+  min-width: unset !important;
+}
+
+.restore-button button {
+  width: 100%;
+}
+
+.add-button {
+  margin-top: 1rem;
+  min-width: 225px;
+}
+
+.add-button button {
+  width: 100%;
+}
+
+.icon {
+  margin-right: 0.5rem;
+}

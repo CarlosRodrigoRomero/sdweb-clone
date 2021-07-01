@@ -1,0 +1,17 @@
+.reports {
+  margin: 1rem;
+}
+
+.reports__title {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+table {
+  width: 100%;
+}

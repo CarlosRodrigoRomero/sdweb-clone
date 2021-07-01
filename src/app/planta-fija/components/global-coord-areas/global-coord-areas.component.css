@@ -1,0 +1,34 @@
+.card-content {
+  display: flex;
+  align-items: center;
+}
+
+.global-areas-card {
+  opacity: 0.8;
+  padding-top: 8px 10px 0px;
+  padding-bottom: 0px;
+  min-width: 250px;
+  box-shadow: none !important;
+  min-height: 64px;
+  height: 100%;
+}
+
+.btn-menu {
+  margin-left: 7px;
+}
+
+.example-section {
+  margin: 5px 15px 0 15px;
+}
+
+li {
+  list-style-type: none;
+}
+
+.label-popup {
+  border-radius: 4px;
+  background-color: rgb(78, 78, 78);
+  color: white;
+  padding: 0px 6px;
+  font-size: 12px;
+}

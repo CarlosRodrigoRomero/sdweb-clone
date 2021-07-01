@@ -1,0 +1,12 @@
+<button mat-raised-button (click)="clickButtonDraw()">
+  <div *ngIf="!activeDeleteButton">
+    <mat-icon *ngIf="!activeDraw">format_shapes</mat-icon>
+    <mat-icon *ngIf="activeDraw">disabled_by_default</mat-icon>
+    <span *ngIf="!activeDraw">Dibujar área</span>
+    <span *ngIf="activeDraw">Cancelar dibujo</span>
+  </div>
+  <div *ngIf="activeDeleteButton">
+    <mat-icon>delete</mat-icon>
+    <span>Borrar área</span>
+  </div>
+</button>

@@ -1,0 +1,98 @@
+<div *ngIf="serviceInit">
+  <app-navbar></app-navbar>
+  <div class="structures-grid">
+    <div class="left-bar">
+      <h4>{{ nombrePlanta }}</h4>
+      <mat-vertical-stepper [linear]="true" #stepper>
+        <mat-step>
+          <ng-template matStepLabel>Filtrar módulos</ng-template>
+          <app-raw-modules></app-raw-modules>
+          <div class="next-button">
+            <button
+              mat-stroked-button
+              matStepperNext
+              (click)="toggleLoadModuleGroups(true); resetFase1(); setReportNumModules()"
+            >
+              Siguiente
+            </button>
+          </div>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Crear agrupaciones auto</ng-template>
+          <app-auto-module-groups></app-auto-module-groups>
+          <div>
+            <button class="back-btn" mat-stroked-button matStepperPrevious (click)="toggleLoadModuleGroups(false)">
+              Atrás
+            </button>
+            <button mat-stroked-button matStepperNext>Siguiente</button>
+          </div>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Editar agrupaciones</ng-template>
+          <div>
+            <app-module-groups></app-module-groups>
+          </div>
+          <div>
+            <button class="back-btn" mat-stroked-button matStepperPrevious (click)="resetFase3()">Atrás</button>
+            <button
+              mat-stroked-button
+              matStepperNext
+              (click)="
+                toggleLoadRawModules(false); toggleLoadModuleGroups(false); toggleLoadNormModules(true); resetFase3()
+              "
+            >
+              Siguiente
+            </button>
+          </div>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Normalizar módulos auto</ng-template>
+          <div>
+            <app-auto-norm-modules></app-auto-norm-modules>
+          </div>
+          <div>
+            <button
+              class="back-btn"
+              mat-stroked-button
+              matStepperPrevious
+              (click)="toggleLoadRawModules(true); toggleLoadModuleGroups(true); toggleLoadNormModules(false)"
+            >
+              Atrás
+            </button>
+            <button
+              mat-stroked-button
+              matStepperNext
+              (click)="toggleEditNormModules(true); toggleLoadModuleGroups(true)"
+            >
+              Siguiente
+            </button>
+          </div>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Editar módulos normalizados</ng-template>
+          <div>
+            <app-norm-modules></app-norm-modules>
+          </div>
+          <div>
+            <button
+              class="back-btn"
+              mat-stroked-button
+              matStepperPrevious
+              (click)="toggleEditNormModules(false); toggleLoadModuleGroups(false); resetFase5()"
+            >
+              Atrás
+            </button>
+            <!-- <button mat-stroked-button matStepperNext>Siguiente</button> -->
+          </div>
+        </mat-step>
+      </mat-vertical-stepper>
+    </div>
+    <div>
+      <app-map-structures></app-map-structures>
+      <mat-card *ngIf="deleteRawModMode" class="delete-mode-warn">
+        <mat-card-title>MODO ELIMINAR ACTIVADO</mat-card-title>
+      </mat-card>
+      <app-thermal-slider></app-thermal-slider>
+    </div>
+  </div>
+</div>

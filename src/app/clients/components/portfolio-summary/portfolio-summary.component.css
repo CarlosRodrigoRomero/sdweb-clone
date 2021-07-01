@@ -1,0 +1,75 @@
+.summary {
+  display: flex;
+}
+
+.datos {
+  display: flex;
+  align-items: center;
+}
+
+.datos mat-icon {
+  font-size: 26px;
+  margin: 0 0.5rem 0 1rem;
+}
+
+.plantas {
+  display: flex;
+  width: 100%;
+}
+
+.potencia {
+  display: flex;
+  width: 100%;
+}
+
+.titulo {
+  display: flex;
+  align-items: center;
+}
+
+.titulo span {
+  font-size: larger;
+  font-weight: 600;
+}
+
+.titulo mat-icon {
+  font-size: 26px;
+  margin-right: 0.5rem;
+}
+
+.subtitulo {
+  margin-right: 1em;
+  font-size: large;
+  font-weight: 400;
+}
+
+.dato {
+  font-size: large;
+  font-weight: 500;
+}
+
+@media (max-width: 1000px) {
+  .summary {
+    display: grid;
+  }
+
+  .titulo {
+    display: none;
+  }
+
+  .subtitulo {
+    margin-left: 0.5rem;
+  }
+
+  .datos mat-icon {
+    margin: 0;
+    margin-right: 0.5rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .datos {
+    display: grid;
+    grid-template-columns: 28px auto auto;
+  }
+}

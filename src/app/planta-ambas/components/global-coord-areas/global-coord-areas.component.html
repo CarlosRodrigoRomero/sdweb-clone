@@ -1,0 +1,30 @@
+<mat-card class="global-areas-card">
+  <mat-card-content class="card-content">
+    <span class="example-list-section">
+      <mat-checkbox
+        class="example-margin"
+        [checked]="allComplete"
+        [indeterminate]="someComplete()"
+        (change)="setVisibilityAllLayers($event.checked)"
+      >
+        {{ task.name }}
+      </mat-checkbox>
+    </span>
+    <button class="btn-menu" mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon>keyboard_arrow_down</mat-icon>
+    </button>
+    <mat-menu class="menu-tipo" #menu="matMenu">
+      <section class="example-section">
+        <span class="example-list-section">
+          <li *ngFor="let subtask of task.subtasks; index as i" (click)="stopPropagation($event)">
+            <mat-checkbox [(ngModel)]="subtask.completed" (ngModelChange)="setVisibilityLayer(i)">
+              {{ subtask.name }}
+            </mat-checkbox>
+          </li>
+        </span>
+      </section>
+    </mat-menu>
+  </mat-card-content>
+</mat-card>
+
+<div id="popup" class="label-popup"></div>

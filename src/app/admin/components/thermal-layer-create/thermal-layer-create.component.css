@@ -1,0 +1,28 @@
+.create-thermal {
+  margin: 1rem;
+}
+
+.example-form {
+  width: 100%;
+}
+
+mat-card {
+  width: min-content;
+}
+
+mat-card-content {
+  display: grid;
+}
+
+.row-info {
+  display: inline-flex;
+  justify-content: space-between;
+  width: 300px;
+  margin-bottom: 1rem;
+}
+
+.btns-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}

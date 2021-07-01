@@ -1,0 +1,12 @@
+.filtro {
+  margin-bottom: 15px;
+}
+
+h5 {
+  font-weight: 400;
+}
+
+.new-slider {
+  position: relative;
+  display: flex;
+}

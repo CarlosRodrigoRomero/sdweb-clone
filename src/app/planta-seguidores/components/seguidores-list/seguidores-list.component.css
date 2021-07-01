@@ -1,0 +1,42 @@
+.lista {
+  margin: 5px;
+}
+
+.buscar-input {
+  width: 100%;
+}
+
+:host ::ng-deep .buscar-input .mat-form-field-wrapper {
+  padding-bottom: 6px;
+}
+
+table {
+  width: 100%;
+}
+
+.tabla-container {
+  position: relative;
+  height: calc(100vh - 280px);
+  overflow: auto;
+  min-width: 350px;
+}
+
+.label-tipo {
+  display: inline-flex;
+}
+
+.label-tipo mat-icon {
+  margin-right: 0.5rem;
+}
+
+.mat-row {
+  cursor: pointer;
+}
+
+.mat-row.selected {
+  background-color: lightgrey;
+}
+
+.mat-row.hovered {
+  background-color: whitesmoke;
+}

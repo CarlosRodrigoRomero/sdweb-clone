@@ -1,0 +1,26 @@
+<div class="create-norm-mod">
+  <!-- <h4>Crear informe</h4> -->
+
+  <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
+    <mat-form-field>
+      <mat-label>Fila</mat-label>
+      <input matInput formControlName="fila" type="number" min="1" step="1" />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Columna</mat-label>
+      <input matInput formControlName="columna" type="number" min="1" step="1" />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Imagen térmica</mat-label>
+      <input matInput formControlName="image_name" type="text" />
+      <span matSuffix>.tif</span>
+    </mat-form-field>
+
+    <div class="btns-actions">
+      <button mat-raised-button (click)="hidePopup()">Cancelar</button>
+      <button mat-raised-button color="warn" type="submit">Crear</button>
+    </div>
+  </form>
+</div>

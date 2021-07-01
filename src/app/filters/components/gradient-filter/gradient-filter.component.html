@@ -1,0 +1,11 @@
+<div class="filtro">
+  <h5>&Delta;T (normalizado)</h5>
+  <div class="custom-slider">
+    <ngx-slider
+      [(value)]="rangoMinGradiente"
+      [(highValue)]="rangoMaxGradiente"
+      [options]="options"
+      (userChangeEnd)="onChangeFiltroGradiente(rangoMinGradiente, rangoMaxGradiente)"
+    ></ngx-slider>
+  </div>
+</div>

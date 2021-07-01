@@ -1,0 +1,35 @@
+.filtro {
+  margin-bottom: 15px;
+}
+
+h5 {
+  font-weight: 400;
+}
+
+::ng-deep {
+  .custom-slider .ngx-slider .ngx-slider-selection {
+    height: 2px;
+  }
+
+  .custom-slider .ngx-slider .ngx-slider-bar {
+    height: 2px;
+  }
+
+  .custom-slider .ngx-slider .ngx-slider-pointer {
+    background-color: #c4c4c4;
+    width: 15px;
+    height: 15px;
+    top: -7px;
+  }
+
+  .custom-slider .ngx-slider .ngx-slider-pointer:after {
+    display: none;
+  }
+  .custom-slider .ngx-slider .ngx-slider-bubble {
+    color: unset;
+  }
+}
+
+.new-slider {
+  position: relative;
+}

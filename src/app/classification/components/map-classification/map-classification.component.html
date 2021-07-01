@@ -1,0 +1,9 @@
+<div id="map" class="map"></div>
+<div id="popup" class="ol-popup">
+  <app-popup-classification></app-popup-classification>
+</div>
+<button class="show-thermal" mat-raised-button (click)="setThermalLayerVisibility()">
+  <span *ngIf="thermalLayerVisibility">Ocultar capa térmica</span>
+  <span *ngIf="!thermalLayerVisibility">Mostrar capa térmica</span>
+</button>
+<!-- <button class="update-anoms" mat-raised-button (click)="updateAnomalias()">Actualizar anomalias</button> -->

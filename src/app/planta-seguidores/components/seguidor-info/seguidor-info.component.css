@@ -1,0 +1,26 @@
+.popup {
+  display: flex;
+  align-items: flex-end;
+}
+
+.popup-hover {
+  width: 300px;
+}
+
+.popup-hover-content {
+  justify-content: space-between;
+}
+
+.elemento {
+  display: flex;
+  justify-content: space-between;
+}
+
+.titulo {
+  font-size: 1rem;
+}
+
+.subtitulo {
+  font-weight: 300;
+  font-size: 1.1rem;
+}

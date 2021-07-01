@@ -1,16 +1,11 @@
 import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 import { NgModule } from '@angular/core';
-import { AuthGuard } from '@core/services/auth.guard';
-// import { PubliclayoutComponent } from "./layout/publiclayout/publiclayout.component";
-// import { VideoComponent } from "./cts/video/video.component";
 import { AvisoLegalComponent } from './cts/aviso-legal/aviso-legal.component';
-import { VideoComponent } from './cts/video/video.component';
-import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
+import { AuthGuard } from './core/services/auth.guard';
 
 export const routes: Routes = [
-  { path: '', loadChildren: () => import('./auth/auth.module').then((m) => m.AuthenticationModule) },
-  // { path: 'aviso-legal', component: AvisoLegalComponent },
-  // { path: 'login', component: LoginComponent },
+  { path: '', redirectTo: 'clients', pathMatch: 'full' },
+  { path: 'aviso-legal', component: AvisoLegalComponent },
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then((m) => m.AuthenticationModule) },
   // {
   //   path: 'admin',
@@ -18,23 +13,42 @@ export const routes: Routes = [
   //   canActivate: [AuthGuard],
   // },
   {
-    path: 'clientes',
-    loadChildren: () => import('./clientes/clientes.module').then((m) => m.ClientesModule),
+    path: 'clients',
+    loadChildren: () => import('./clients/clients.module').then((m) => m.ClientsModule),
     canActivate: [AuthGuard],
   },
-  // {
-  //   path: 'v',
-  //   component: PubliclayoutComponent,
-  //   children: [
-  //     {
-  //       path: 'davidignis',
-  //       component: VideoComponent,
-  //       data: { nombre: 'David Parra', codigo: 'd0ekj87q0d' },
-  //     },
-  //   ],
-  // },
-
-  // // { path: "**", redirectTo: "" }
+  {
+    path: 'fixed-shared',
+    loadChildren: () => import('./planta-fija/planta-fija.module').then((m) => m.PlantaFijaModule),
+  },
+  {
+    path: 'fixed-filterable-shared',
+    loadChildren: () => import('./planta-fija/planta-fija.module').then((m) => m.PlantaFijaModule),
+  },
+  {
+    path: 'tracker-shared',
+    loadChildren: () => import('./planta-seguidores/planta-seguidores.module').then((m) => m.PlantaSeguidoresModule),
+  },
+  {
+    path: 'tracker-filterable-shared',
+    loadChildren: () => import('./planta-seguidores/planta-seguidores.module').then((m) => m.PlantaSeguidoresModule),
+  },
+  {
+    path: 'clusters',
+    loadChildren: () => import('./clusters/clusters.module').then((m) => m.ClustersModule),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'structures',
+    loadChildren: () => import('./structures/structures.module').then((m) => m.StructuresModule),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'classification',
+    loadChildren: () => import('./classification/classification.module').then((m) => m.ClassificationModule),
+    canActivate: [AuthGuard],
+  },
+  { path: '**', redirectTo: 'clients', pathMatch: 'full' },
 ];
 
 @NgModule({
