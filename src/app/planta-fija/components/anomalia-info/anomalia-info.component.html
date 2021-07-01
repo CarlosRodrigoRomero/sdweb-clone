@@ -11,14 +11,20 @@
       </div>
       <div class="elemento">
         <span class="titulo">Temperatura Max</span>
-        <span class="subtitulo">{{ anomaliaHover.temperaturaMax }} ºC</span>
+        <span *ngIf="anomaliaHover.temperaturaMax !== 0" class="subtitulo"
+          >{{ anomaliaHover.temperaturaMax }} ºC</span
+        >
+        <span *ngIf="anomaliaHover.temperaturaMax === 0" class="subtitulo">en proceso...</span>
       </div>
       <div class="elemento">
         <span class="titulo">&Delta;T Normalizado</span>
-        <span class="subtitulo">{{ anomaliaHover.gradienteNormalizado }} ºC</span>
+        <span *ngIf="anomaliaHover.gradienteNormalizado !== 0" class="subtitulo"
+          >{{ anomaliaHover.gradienteNormalizado }} ºC</span
+        >
+        <span *ngIf="anomaliaHover.gradienteNormalizado === 0" class="subtitulo">en proceso...</span>
       </div>
       <div class="elemento">
-        <span class="titulo">Pérdidas</span>
+        <span class="titulo">Pérdidas (beta)</span>
         <span class="subtitulo">{{ anomaliaHover.perdidas * 100 }}%</span>
       </div>
       <div class="elemento">
@@ -55,7 +61,10 @@
             </div>
             <div class="elemento">
               <span class="titulo">Temperatura Max</span>
-              <span class="subtitulo">{{ anomaliaSelect.temperaturaMax }} ºC</span>
+              <span *ngIf="anomaliaSelect.temperaturaMax !== 0" class="subtitulo"
+                >{{ anomaliaSelect.temperaturaMax }} ºC</span
+              >
+              <span *ngIf="anomaliaSelect.temperaturaMax === 0" class="subtitulo">en proceso...</span>
               <!-- <input
                   (change)="onEdit($event, 'temperaturaMax')"
                   type="text"
@@ -65,7 +74,10 @@
             </div>
             <div class="elemento">
               <span class="titulo">Gradiente Temp. Normalizado</span>
-              <span class="subtitulo">{{ anomaliaSelect.gradienteNormalizado }} ºC</span>
+              <span *ngIf="anomaliaSelect.gradienteNormalizado !== 0" class="subtitulo"
+                >{{ anomaliaSelect.gradienteNormalizado }} ºC</span
+              >
+              <span *ngIf="anomaliaSelect.gradienteNormalizado === 0" class="subtitulo">en proceso...</span>
               <!-- <input
                   (change)="onEdit($event, 'gradienteNormalizado')"
                   type="text"
@@ -74,7 +86,7 @@
                 /> -->
             </div>
             <div class="elemento">
-              <span class="titulo">Pérdidas</span>
+              <span class="titulo">Pérdidas (beta)</span>
               <span class="subtitulo">{{ anomaliaSelect.perdidas * 100 }}%</span>
               <!-- <input (change)="onEdit($event, 'perdidas')" type="text" matImput [(ngModel)]="anomaliaSelect.perdidas" /> -->
             </div>
