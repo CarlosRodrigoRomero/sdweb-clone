@@ -44,7 +44,7 @@ export class PortfolioControlService {
       )
       .subscribe(([plantas, informes]) => {
         // evitamos que cargue solo una planta al vovler atrás desde el informe
-        if (plantas.length > 1) {
+        if (plantas !== undefined) {
           plantas.forEach((planta) => {
             // obtenemos la plantas que tiene informes dentro de su interface
             if (planta.informes !== undefined && planta.informes.length > 0) {

@@ -20,6 +20,10 @@ mat-card {
   overflow: auto;
 }
 
+table {
+  width: 100%;
+}
+
 .titulo {
   padding-left: 1em;
   padding-bottom: 1em;
@@ -38,7 +42,7 @@ h4 {
   cursor: pointer;
 }
 
-.mat-column-nombre {
+/* .mat-column-nombre {
   word-wrap: break-word !important;
   white-space: unset !important;
   flex: 0 0 35% !important;
@@ -116,7 +120,7 @@ h4 {
   -moz-hyphens: auto;
   -webkit-hyphens: auto;
   hyphens: auto;
-}
+} */
 
 tr.table-row:not(.example-expanded-row):hover {
   background: whitesmoke;

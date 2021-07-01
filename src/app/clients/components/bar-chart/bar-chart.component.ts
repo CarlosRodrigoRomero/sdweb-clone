@@ -141,7 +141,7 @@ export class BarChartComponent implements OnInit {
         },
       },
       yaxis: {
-        min: 0,
+        min: this.maeMedio - this.maeSigma - 0.5 > 0 ? this.maeMedio - this.maeSigma - 0.5 : 0,
         max: this.maeMedio + this.maeSigma + 0.5,
         // max: Math.max(...[...this.data, this.maeMedio]) + 0.5,
       },

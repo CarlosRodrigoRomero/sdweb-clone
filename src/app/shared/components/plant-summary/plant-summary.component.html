@@ -17,7 +17,7 @@
           <mat-icon color="secondary">today</mat-icon>
           <h5 class="subtitulo">{{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}</h5>
         </div>
-        <div class="elemento">
+        <div *ngIf="informe.irradiancia !== undefined" class="elemento">
           <mat-icon color="secondary">wb_sunny</mat-icon>
           <h5 class="subtitulo">{{ informe.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></h5>
         </div>
@@ -29,9 +29,15 @@
           <mat-icon color="secondary">window</mat-icon>
           <h5 class="subtitulo">{{ informe.gsd | number: '1.0-0' }} &plusmn; 0.5 cm/pixel</h5>
         </div>
-        <div class="elemento">
+        <div *ngIf="informe.vuelo !== undefined" class="elemento">
           <mat-icon color="secondary">east</mat-icon>
           <h5 class="subtitulo">{{ informe.viento }}</h5>
+          <h5 class="subtitulo">{{ informe.vientoDireccion }}º</h5>
+        </div>
+        <div *ngIf="informe.vuelo === undefined" class="elemento">
+          <mat-icon color="secondary">air</mat-icon>
+          <h5 class="subtitulo">{{ informe.vientoVelocidad }} (Beaufort)</h5>
+          <h5 class="subtitulo">{{ informe.vientoDireccion }}º</h5>
         </div>
       </div>
     </mat-menu>
@@ -39,12 +45,12 @@
   <div class="grupo3">
     <div class="elemento">
       <h5 class="subtitulo">MAE</h5>
-      <h5>{{ informe.mae * 100 | number: '1.0-2' }} %</h5>
+      <h5>{{ informe.mae | number: '1.0-2' }} %</h5>
       <!-- <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon> -->
     </div>
     <div class="elemento">
       <h5 class="subtitulo">CC</h5>
-      <h5>{{ informe.pc_pct * 100 | number: '1.0-2' }} %</h5>
+      <h5>{{ informe.pc_pct | number: '1.0-2' }} %</h5>
       <!-- <mat-icon *ngIf="informe.pc_pct < 3" class="success">arrow_circle_down</mat-icon> -->
     </div>
   </div>
