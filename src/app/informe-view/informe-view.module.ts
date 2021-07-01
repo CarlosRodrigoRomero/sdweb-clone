@@ -12,7 +12,7 @@ import { PcListComponent } from './components/pc-list/pc-list.component';
 import { PcDetailsComponent } from './components/pc-details/pc-details.component';
 import { ExportComponent } from '../informe-export/components/export/export.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { SpinnerModule } from '../shared/spinner/spinner.module';
+import { SpinnerModule } from '@shared/spinner/spinner.module';
 
 @NgModule({
   declarations: [
