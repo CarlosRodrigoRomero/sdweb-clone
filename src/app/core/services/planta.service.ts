@@ -416,6 +416,22 @@ export class PlantaService {
     return !planta.hasOwnProperty('referenciaSolardrone') || planta.referenciaSolardrone;
   }
 
+  getCriterios(): Observable<CriteriosClasificacion[]> {
+    let query$: AngularFirestoreCollection<CriteriosClasificacion>;
+
+    query$ = this.afs.collection<CriteriosClasificacion>('criteriosClasificacion');
+
+    return query$.snapshotChanges().pipe(
+      map((actions) =>
+        actions.map((a) => {
+          const data = a.payload.doc.data() as CriteriosClasificacion;
+          data.id = a.payload.doc.id;
+          return data;
+        })
+      )
+    );
+  }
+
   getCriterio(criterioId: string): Observable<CriteriosClasificacion> {
     const criterioDoc = this.afs.doc<CriteriosClasificacion>('criteriosClasificacion/' + criterioId);
 
