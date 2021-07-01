@@ -38,7 +38,7 @@ export class InformeViewComponent implements OnInit {
   public allowDownloads: boolean;
   public empresaNombre: string;
 
-  numSeveridad = new Array(GLOBAL.labels_severidad.length).fill(0).map((_, i) => i + 1);
+  numSeveridad = new Array(GLOBAL.labels_clase.length).fill(0).map((_, i) => i + 1);
   public countSeveridad: number[];
 
   constructor(
@@ -95,12 +95,12 @@ export class InformeViewComponent implements OnInit {
       legend: { display: false },
     };
     this.dataSeveridad = {
-      labels: GLOBAL.labels_severidad,
+      labels: GLOBAL.labels_clase,
       datasets: [
         {
           label: 'Clase',
-          backgroundColor: GLOBAL.colores_severidad,
-          hoverBackgroundColor: GLOBAL.colores_severidad,
+          backgroundColor: GLOBAL.colores_clase,
+          hoverBackgroundColor: GLOBAL.colores_clase,
           data: [1, 1, 1, 1],
         },
       ],
@@ -153,12 +153,12 @@ export class InformeViewComponent implements OnInit {
 
   initializeChart() {
     this.dataSeveridad = {
-      labels: GLOBAL.labels_severidad,
+      labels: GLOBAL.labels_clase,
       datasets: [
         {
           label: 'Severidad',
-          backgroundColor: GLOBAL.colores_severidad,
-          hoverBackgroundColor: GLOBAL.colores_severidad,
+          backgroundColor: GLOBAL.colores_clase,
+          hoverBackgroundColor: GLOBAL.colores_clase,
           data: this.countSeveridad,
         },
       ],

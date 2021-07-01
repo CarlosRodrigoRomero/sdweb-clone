@@ -50,7 +50,7 @@ export class InformeOverviewComponent implements OnInit {
     this.numCategorias = Array(GLOBAL.labels_tipos.length)
       .fill(0)
       .map((_, i) => i + 1);
-    this.numClases = Array(GLOBAL.labels_severidad.length)
+    this.numClases = Array(GLOBAL.labels_clase.length)
       .fill(0)
       .map((_, i) => i + 1);
 
