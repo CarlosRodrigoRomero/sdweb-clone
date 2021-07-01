@@ -12,19 +12,10 @@ import { AgmCoreModule } from '@agm/core';
 import { EditPcDetailComponent } from './components/edit-pc-detail/edit-pc-detail.component';
 import { HotkeyModule } from 'angular2-hotkeys';
 
-import { MaterialModule } from '@material/material.module';
-
 @NgModule({
-  declarations: [
-    InformeEditComponent,
-    EditMapComponent,
-    EditListComponent,
-    CanvasComponent,
-    EditPcDetailComponent,
-  ],
+  declarations: [InformeEditComponent, EditMapComponent, EditListComponent, CanvasComponent, EditPcDetailComponent],
   imports: [
     SharedModule,
-    MaterialModule,
     InformeEditRoutingModule,
     FormsModule,
     ReactiveFormsModule,
