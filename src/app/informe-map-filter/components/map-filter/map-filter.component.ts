@@ -80,7 +80,7 @@ export class MapFilterComponent implements OnInit {
   }
 
   getStrokeColor(severidad: number) {
-    return GLOBAL.colores_severidad[severidad - 1];
+    return GLOBAL.colores_clase[severidad - 1];
   }
 
   initDrawingManager() {

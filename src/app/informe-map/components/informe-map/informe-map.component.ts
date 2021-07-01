@@ -65,7 +65,7 @@ export class InformeMapComponent implements OnInit {
   }
 
   getStrokeColor(severidad: number) {
-    return GLOBAL.colores_severidad[severidad - 1];
+    return GLOBAL.colores_clase[severidad - 1];
   }
 
   onMapCircleClick(selectedPc: PcInterface, sinPcs: boolean = false): void {
