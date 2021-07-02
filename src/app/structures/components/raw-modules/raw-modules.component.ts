@@ -130,6 +130,8 @@ export class RawModulesComponent implements OnInit {
         this.structuresService.deleteFilter('eliminados');
       }
     }
+
+    this.filterService.applyFilters();
   }
 
   restoreDeletedModules() {
