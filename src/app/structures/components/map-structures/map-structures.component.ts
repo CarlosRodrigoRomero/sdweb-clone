@@ -47,7 +47,7 @@ export class MapStructuresComponent implements OnInit {
   private thermalLayers: TileLayer[];
   private rawMods: RawModule[];
   private deleteMode = false;
-  private mBDeletedIds: string[] = [];
+  private rawModDeletedIds: string[] = [];
   public layerVisibility = true;
   private prevFeatureHover: Feature;
   private rawModLayer: VectorLayer;
@@ -65,7 +65,7 @@ export class MapStructuresComponent implements OnInit {
 
     this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode));
 
-    this.structuresService.deletedRawModIds$.subscribe((ids) => (this.mBDeletedIds = ids));
+    this.structuresService.deletedRawModIds$.subscribe((ids) => (this.rawModDeletedIds = ids));
 
     this.informeId = this.structuresService.informeId;
 
@@ -214,8 +214,8 @@ export class MapStructuresComponent implements OnInit {
             .subscribe((elems) => {
               mBSource.clear();
 
-              if (this.mBDeletedIds) {
-                this.rawMods = (elems as RawModule[]).filter((mB) => !this.mBDeletedIds.includes(mB.id));
+              if (this.rawModDeletedIds) {
+                this.rawMods = (elems as RawModule[]).filter((mB) => !this.rawModDeletedIds.includes(mB.id));
               } else {
                 this.rawMods = elems as RawModule[];
               }
@@ -351,13 +351,21 @@ export class MapStructuresComponent implements OnInit {
       if (this.deleteMode) {
         if (e.selected.length > 0) {
           if (e.selected[0].getProperties().properties.name === 'rawMod') {
-            let deletedIds: string[];
-            if (this.mBDeletedIds !== undefined) {
-              deletedIds = this.mBDeletedIds.concat(e.selected[0].getProperties().properties.id);
+            if (this.rawModDeletedIds !== undefined) {
+              this.structuresService.deletedRawModIds = this.rawModDeletedIds.concat(
+                e.selected[0].getProperties().properties.id
+              );
             } else {
-              deletedIds = [e.selected[0].getProperties().properties.id];
+              this.structuresService.deletedRawModIds = [e.selected[0].getProperties().properties.id];
             }
-            this.structuresService.addFilter('eliminados', deletedIds);
+
+            // añadimos el id del modulo eliminado a la DB
+            this.structuresService.addFilter('eliminados', this.rawModDeletedIds);
+
+            // quitamos el modulo de la lista de modulos filtrados
+            this.filterService.filteredElements = this.filterService.filteredElements.filter(
+              (elem) => elem.id !== e.selected[0].getProperties().properties.id
+            );
           }
         }
       }

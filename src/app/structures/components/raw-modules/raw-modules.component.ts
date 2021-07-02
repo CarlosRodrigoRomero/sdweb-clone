@@ -12,6 +12,7 @@ import Polygon from 'ol/geom/Polygon';
 
 import { StructuresService } from '@core/services/structures.service';
 import { OlMapService } from '@core/services/ol-map.service';
+import { FilterService } from '@core/services/filter.service';
 
 import { RawModule } from '@core/models/moduloBruto';
 
@@ -32,7 +33,8 @@ export class RawModulesComponent implements OnInit {
   constructor(
     private structuresService: StructuresService,
     private olMapService: OlMapService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
@@ -57,10 +59,6 @@ export class RawModulesComponent implements OnInit {
         this.restoreDeletedModules();
       }
     });
-  }
-
-  restoreDeletedModules() {
-    this.structuresService.deleteFilter('eliminados');
   }
 
   drawRawModule() {
@@ -105,12 +103,6 @@ export class RawModulesComponent implements OnInit {
       // añadimos el nuevo modulo a la DB
       this.structuresService.addRawModule(rawModule);
 
-      // dibujamos el modulo
-      // this.addRawModule(rawModule);
-
-      // añadimos el modulos al array de modulos local
-      // this.filterService.addElement(rawModule);
-
       // terminamos el modo draw
       this.map.removeInteraction(this.draw);
 
@@ -138,6 +130,16 @@ export class RawModulesComponent implements OnInit {
         this.structuresService.deleteFilter('eliminados');
       }
     }
+  }
+
+  restoreDeletedModules() {
+    // eliminamos el array aliminados de la DB
+    this.structuresService.deleteFilter('eliminados');
+
+    // vaciamos el array local con los eliminados
+    this.structuresService.deletedRawModIds = [];
+
+    this.filterService.applyFilters();
   }
 
   private setRawModulesVisibility(visible: boolean) {
