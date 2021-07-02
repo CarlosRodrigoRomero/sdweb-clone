@@ -1,6 +1,8 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -37,7 +39,8 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     public auth: AuthService,
     private plantaService: PlantaService,
     private portfolioControlService: PortfolioControlService,
-    private router: Router
+    private router: Router,
+    private _snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -101,12 +104,24 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   onClick(row) {
     const plantaId = row.plantaId;
     const tipoPlanta = row.tipo;
+    const fecha = row.fecha;
 
-    if (tipoPlanta === 'seguidores') {
-      this.router.navigate(['clients/tracker/' + plantaId]);
+    if (fecha > 1619820000) {
+      if (tipoPlanta === 'seguidores') {
+        this.router.navigate(['clients/tracker/' + plantaId]);
+      } else {
+        this.router.navigate(['clients/fixed/' + plantaId]);
+      }
     } else {
-      this.router.navigate(['clients/fixed/' + plantaId]);
+      this.openSnackBar();
     }
+  }
+
+  private openSnackBar() {
+    this._snackBar.open('Planta en mantenimiento temporalmente', 'OK', {
+      duration: 5000,
+      verticalPosition: 'top',
+    });
   }
 
   hoverPlanta(row) {
