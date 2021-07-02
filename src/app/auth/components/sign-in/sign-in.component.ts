@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 
 import { AuthService } from '@core/services/auth.service';
 
+import { UserInterface } from '@core/models/user';
+
 @Component({
   selector: 'app-sign-in',
   templateUrl: './sign-in.component.html',
@@ -13,12 +15,15 @@ export class SignInComponent implements OnInit {
   form: FormGroup;
   hide = true;
   warningHide = true;
+  private user: UserInterface;
 
   constructor(public authService: AuthService, private formBuilder: FormBuilder, private router: Router) {
     this.buildForm();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.authService.user$.subscribe((user) => (this.user = user));
+  }
 
   private buildForm() {
     this.form = this.formBuilder.group({
@@ -33,7 +38,11 @@ export class SignInComponent implements OnInit {
       this.authService
         .signIn(value.email, value.password)
         .then(() => {
-          this.router.navigate(['clients']);
+          if (this.user.role === 0 || this.user.role === 1 || this.user.role === 2) {
+            this.router.navigate(['clients']);
+          } else {
+            this.router.navigate(['clientes']);
+          }
         })
         .catch((error) => {
           console.log(error);
