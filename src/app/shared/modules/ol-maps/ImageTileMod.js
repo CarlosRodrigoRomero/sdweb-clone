@@ -178,11 +178,11 @@ class ImageTileMod extends Tile {
 
       return temp;
     } else if (this.thermalLayer.codificationType === 'rainbowHc') {
-      const rainbowHcPalette = GLOBAL.rainbow_hc_palette_hex;
+      const rainbowHcPalette = GLOBAL.rainbow_hc_palette_string;
 
-      const pixelHex = this.pixelToHex(pixel.slice(0, 3));
+      // const pixelHex = this.pixelToHex(pixel.slice(0, 3));
 
-      const pixelIndex = rainbowHcPalette.indexOf(pixelHex);
+      const pixelIndex = rainbowHcPalette.indexOf(pixel.toString());
 
       const temp = ((this.rangeTempMax - this.rangeTempMin) * pixelIndex) / rainbowHcPalette.length + this.rangeTempMin;
 
