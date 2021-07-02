@@ -208,6 +208,12 @@ export class FilterService {
     this.filteredElementsWithoutFilterTipo$.next(this.filteredElementsWithoutFilterTipo);
   }
 
+  addElement(element: FilterableElement) {
+    this.allFiltrableElements.push(element);
+
+    this.applyFilters();
+  }
+
   get allFiltrableElements() {
     return this._allFiltrableElements;
   }

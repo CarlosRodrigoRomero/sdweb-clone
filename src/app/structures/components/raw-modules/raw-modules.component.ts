@@ -12,10 +12,12 @@ import Polygon from 'ol/geom/Polygon';
 
 import { StructuresService } from '@core/services/structures.service';
 import { OlMapService } from '@core/services/ol-map.service';
+import { FilterService } from '@core/services/filter.service';
 
 import { RawModule } from '@core/models/moduloBruto';
 
 import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
+import Feature from 'ol/Feature';
 
 @Component({
   selector: 'app-raw-modules',
@@ -28,11 +30,13 @@ export class RawModulesComponent implements OnInit {
   private draw: Draw;
   deleteMode = false;
   drawActive = false;
+  private rawModLayer: VectorLayer;
 
   constructor(
     private structuresService: StructuresService,
     private olMapService: OlMapService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
@@ -63,14 +67,27 @@ export class RawModulesComponent implements OnInit {
     this.structuresService.deleteFilter('eliminados');
   }
 
+  private addRawModule(rawMod: RawModule) {
+    const mBSource = this.rawModLayer.getSource();
+    const feature = new Feature({
+      geometry: new Polygon([rawMod.coords]),
+      properties: {
+        id: rawMod.id,
+        name: 'rawMod',
+      },
+    });
+
+    mBSource.addFeature(feature);
+  }
+
   drawRawModule() {
     this.drawActive = true;
 
     const sourceRawModule = new VectorSource();
     const style = new Style({
       stroke: new Stroke({
-        color: 'rgba(0,0,0,0)',
-        width: 1,
+        color: 'white',
+        width: 2,
       }),
     });
 
@@ -102,7 +119,14 @@ export class RawModulesComponent implements OnInit {
         confianza: this.structuresService.confianzaAverage,
       };
 
+      // añadimos el nuevo modulo a la DB
       this.structuresService.addRawModule(rawModule);
+
+      // dibujamos el modulo
+      // this.addRawModule(rawModule);
+
+      // añadimos el modulos al array de modulos local
+      // this.filterService.addElement(rawModule);
 
       // terminamos el modo draw
       this.map.removeInteraction(this.draw);

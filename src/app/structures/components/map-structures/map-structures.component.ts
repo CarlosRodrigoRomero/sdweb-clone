@@ -45,11 +45,12 @@ export class MapStructuresComponent implements OnInit {
   private thermalLayer: TileLayer = undefined;
   private thermalLayerDB: ThermalLayerInterface;
   private thermalLayers: TileLayer[];
-  private modulosBrutos: RawModule[];
+  private rawMods: RawModule[];
   private deleteMode = false;
   private mBDeletedIds: string[] = [];
   public layerVisibility = true;
   private prevFeatureHover: Feature;
+  private rawModLayer: VectorLayer;
 
   constructor(
     private olMapService: OlMapService,
@@ -84,8 +85,8 @@ export class MapStructuresComponent implements OnInit {
 
         this.initMap();
 
-        this.createModulosBrutosLayer();
-        this.addModulosBrutos();
+        this.createRawModulesLayer();
+        this.addInitialRawModules();
 
         this.addPointerOnHover();
         this.addOnHoverRawModuleAction();
@@ -158,8 +159,8 @@ export class MapStructuresComponent implements OnInit {
     return tl;
   }
 
-  private createModulosBrutosLayer() {
-    const mBLayer = new VectorLayer({
+  private createRawModulesLayer() {
+    this.rawModLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: new Style({
         stroke: new Stroke({
@@ -169,17 +170,18 @@ export class MapStructuresComponent implements OnInit {
       }),
     });
 
-    mBLayer.setProperties({
-      id: 'mBLayer',
+    this.rawModLayer.setProperties({
+      id: 'rawModLayer',
     });
 
-    this.map.addLayer(mBLayer);
+    this.map.addLayer(this.rawModLayer);
   }
 
-  private addModulosBrutos() {
+  private addInitialRawModules() {
     this.structuresService
       .getModulosBrutos()
       .pipe(
+        take(1),
         switchMap((modulos) => {
           // asignamos todos los modulos
           this.structuresService.allRawModules = modulos;
@@ -192,15 +194,12 @@ export class MapStructuresComponent implements OnInit {
       )
       .subscribe((init) => {
         if (init) {
-          const mBLayer = this.map
-            .getLayers()
-            .getArray()
-            .find((layer) => layer.getProperties().id === 'mBLayer') as VectorLayer;
-          const mBSource = mBLayer.getSource();
+          const mBSource = this.rawModLayer.getSource();
 
           this.structuresService
             .getFiltersParams()
             .pipe(
+              take(1),
               switchMap((filtParams) => {
                 if (filtParams.length > 0) {
                   this.structuresService.applyFilters(filtParams);
@@ -211,32 +210,40 @@ export class MapStructuresComponent implements OnInit {
                 return this.filterService.filteredElements$;
               })
             )
+            .pipe(take(1))
             .subscribe((elems) => {
               mBSource.clear();
 
+              console.log('ok');
+
               if (this.mBDeletedIds) {
-                this.modulosBrutos = (elems as RawModule[]).filter((mB) => !this.mBDeletedIds.includes(mB.id));
+                this.rawMods = (elems as RawModule[]).filter((mB) => !this.mBDeletedIds.includes(mB.id));
               } else {
-                this.modulosBrutos = elems as RawModule[];
+                this.rawMods = elems as RawModule[];
               }
 
               // asignamos el numero de modulos del informe
-              this.structuresService.reportNumModules = this.modulosBrutos.length;
+              this.structuresService.reportNumModules = this.rawMods.length;
 
-              this.modulosBrutos.forEach((mB) => {
-                const feature = new Feature({
-                  geometry: new Polygon([mB.coords]),
-                  properties: {
-                    id: mB.id,
-                    name: 'moduloBruto',
-                  },
-                });
-
-                mBSource.addFeature(feature);
+              this.rawMods.forEach((rawMod) => {
+                this.addRawModule(rawMod);
               });
             });
         }
       });
+  }
+
+  private addRawModule(rawMod: RawModule) {
+    const mBSource = this.rawModLayer.getSource();
+    const feature = new Feature({
+      geometry: new Polygon([rawMod.coords]),
+      properties: {
+        id: rawMod.id,
+        name: 'rawMod',
+      },
+    });
+
+    mBSource.addFeature(feature);
   }
 
   private addPointerOnHover() {
@@ -249,7 +256,7 @@ export class MapStructuresComponent implements OnInit {
           let featuresMB = this.map
             .getFeaturesAtPixel(event.pixel)
             .filter((item) => item.getProperties().properties !== undefined);
-          featuresMB = featuresMB.filter((item) => item.getProperties().properties.name === 'moduloBruto');
+          featuresMB = featuresMB.filter((item) => item.getProperties().properties.name === 'rawMod');
 
           features.push(...featuresMB);
         }
@@ -294,7 +301,7 @@ export class MapStructuresComponent implements OnInit {
           const feature: Feature = this.map
             .getFeaturesAtPixel(event.pixel)
             .filter((item) => item.getProperties().properties !== undefined)
-            .filter((item) => item.getProperties().properties.name === 'moduloBruto')[0] as Feature;
+            .filter((item) => item.getProperties().properties.name === 'rawMod')[0] as Feature;
 
           if (feature !== undefined) {
             // cuando pasamos de un modulo a otro directamente sin pasar por vacio
@@ -331,7 +338,7 @@ export class MapStructuresComponent implements OnInit {
       condition: click,
       layers: (l) => {
         if (this.deleteMode) {
-          if (l.getProperties().id === 'mBLayer') {
+          if (l.getProperties().id === 'rawModLayer') {
             return true;
           } else {
             return false;
@@ -345,7 +352,7 @@ export class MapStructuresComponent implements OnInit {
     select.on('select', (e) => {
       if (this.deleteMode) {
         if (e.selected.length > 0) {
-          if (e.selected[0].getProperties().properties.name === 'moduloBruto') {
+          if (e.selected[0].getProperties().properties.name === 'rawMod') {
             let deletedIds: string[];
             if (this.mBDeletedIds !== undefined) {
               deletedIds = this.mBDeletedIds.concat(e.selected[0].getProperties().properties.id);
@@ -394,7 +401,7 @@ export class MapStructuresComponent implements OnInit {
       .filter(
         (layer) =>
           layer.getProperties().id === undefined ||
-          (layer.getProperties().id !== 'mBLayer' && layer.getProperties().id !== 'nMLayer')
+          (layer.getProperties().id !== 'rawModLayer' && layer.getProperties().id !== 'nMLayer')
       )
       .forEach((layer) => layer.setVisible(this.layerVisibility));
   }
