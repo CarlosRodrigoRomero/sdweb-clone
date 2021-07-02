@@ -90,7 +90,7 @@ export class MapStructuresComponent implements OnInit {
 
         this.addPointerOnHover();
         this.addOnHoverRawModuleAction();
-        this.addSelectModuloBrutoInteraction();
+        this.addSelectRawModuleInteraction();
       });
   }
 
@@ -210,11 +210,9 @@ export class MapStructuresComponent implements OnInit {
                 return this.filterService.filteredElements$;
               })
             )
-            .pipe(take(1))
+            // .pipe(take(1))
             .subscribe((elems) => {
               mBSource.clear();
-
-              console.log('ok');
 
               if (this.mBDeletedIds) {
                 this.rawMods = (elems as RawModule[]).filter((mB) => !this.mBDeletedIds.includes(mB.id));
@@ -328,7 +326,7 @@ export class MapStructuresComponent implements OnInit {
     });
   }
 
-  private addSelectModuloBrutoInteraction() {
+  private addSelectRawModuleInteraction() {
     const select = new Select({
       style: new Style({
         fill: new Fill({
@@ -359,7 +357,6 @@ export class MapStructuresComponent implements OnInit {
             } else {
               deletedIds = [e.selected[0].getProperties().properties.id];
             }
-
             this.structuresService.addFilter('eliminados', deletedIds);
           }
         }
@@ -375,6 +372,32 @@ export class MapStructuresComponent implements OnInit {
             stroke: new Stroke({
               color: 'red',
               width: 4,
+            }),
+          });
+        }
+      };
+    } else {
+      return (feature: Feature) => {
+        if (feature !== undefined) {
+          return new Style({
+            stroke: new Stroke({
+              color: 'white',
+              width: 2,
+            }),
+          });
+        }
+      };
+    }
+  }
+
+  private setInvisible(invisible: boolean) {
+    if (invisible) {
+      return (feature: Feature) => {
+        if (feature !== undefined) {
+          return new Style({
+            stroke: new Stroke({
+              color: 'rgba(0,0,0,0)',
+              width: 1,
             }),
           });
         }

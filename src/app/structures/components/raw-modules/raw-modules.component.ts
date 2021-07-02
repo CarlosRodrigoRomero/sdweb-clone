@@ -12,12 +12,10 @@ import Polygon from 'ol/geom/Polygon';
 
 import { StructuresService } from '@core/services/structures.service';
 import { OlMapService } from '@core/services/ol-map.service';
-import { FilterService } from '@core/services/filter.service';
 
 import { RawModule } from '@core/models/moduloBruto';
 
 import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
-import Feature from 'ol/Feature';
 
 @Component({
   selector: 'app-raw-modules',
@@ -30,13 +28,11 @@ export class RawModulesComponent implements OnInit {
   private draw: Draw;
   deleteMode = false;
   drawActive = false;
-  private rawModLayer: VectorLayer;
 
   constructor(
     private structuresService: StructuresService,
     private olMapService: OlMapService,
-    public dialog: MatDialog,
-    private filterService: FilterService
+    public dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -65,19 +61,6 @@ export class RawModulesComponent implements OnInit {
 
   restoreDeletedModules() {
     this.structuresService.deleteFilter('eliminados');
-  }
-
-  private addRawModule(rawMod: RawModule) {
-    const mBSource = this.rawModLayer.getSource();
-    const feature = new Feature({
-      geometry: new Polygon([rawMod.coords]),
-      properties: {
-        id: rawMod.id,
-        name: 'rawMod',
-      },
-    });
-
-    mBSource.addFeature(feature);
   }
 
   drawRawModule() {
