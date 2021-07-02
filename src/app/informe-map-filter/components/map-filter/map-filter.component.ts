@@ -38,8 +38,7 @@ export class MapFilterComponent implements OnInit {
     public pcService: PcService
   ) {
     // mostramos todos los pcs al inicio
-    this.filterService.filteredPcs = this.pcService.allPcs;
-    this.filterService.filteredPcs$.next(this.filterService.filteredPcs);
+    this.filterService.filteredElements = this.pcService.allPcs;
   }
 
   ngOnInit(): void {

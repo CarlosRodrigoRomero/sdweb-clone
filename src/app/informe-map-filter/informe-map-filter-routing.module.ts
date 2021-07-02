@@ -4,10 +4,10 @@ import { Routes, RouterModule } from '@angular/router';
 import { MapFilterComponent } from './components/map-filter/map-filter.component';
 
 const routes: Routes = [
-  {
+  /* {
     path: '',
     component: MapFilterComponent,
-  },
+  }, */
 ];
 
 @NgModule({
