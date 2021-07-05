@@ -47,7 +47,7 @@
   <mat-tab class="mat-tab-stats" label="Células calientes (CC)">
     <div class="cc-grid">
       <div class="cc-content-izq">
-        <mat-card>
+        <mat-card *ngIf="loadCCyGradChart">
           <mat-card-header>
             <mat-card-title>Módulos con células calientes</mat-card-title>
             <mat-card-subtitle>% de módulos con CC y gradiente medio (ºC) </mat-card-subtitle>

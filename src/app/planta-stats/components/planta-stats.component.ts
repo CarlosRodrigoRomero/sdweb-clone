@@ -14,6 +14,7 @@ import { ReportControlService } from '@core/services/report-control.service';
 export class PlantaStatsComponent implements OnInit {
   loadStats = false;
   thereAreZones: boolean;
+  loadCCyGradChart = true;
 
   constructor(
     private statsService: StatsService,
@@ -27,5 +28,7 @@ export class PlantaStatsComponent implements OnInit {
     );
 
     this.reportControlService.thereAreZones$.subscribe((value) => (this.thereAreZones = value));
+
+    this.statsService.loadCCyGradChart$.subscribe((load) => (this.loadCCyGradChart = load));
   }
 }

@@ -24,6 +24,9 @@ import {
   ApexLegend,
   ChartComponent,
 } from 'ng-apexcharts';
+
+import { StatsService } from '@core/services/stats.service';
+
 import { InformeInterface } from '@core/models/informe';
 
 export type ChartOptions = {
@@ -82,7 +85,11 @@ export class ChartPctCelsComponent implements OnInit {
     },
   };
 
-  constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
+  constructor(
+    private reportControlService: ReportControlService,
+    private informeService: InformeService,
+    private statsService: StatsService
+  ) {}
 
   ngOnInit(): void {
     combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informes$])
@@ -100,9 +107,9 @@ export class ChartPctCelsComponent implements OnInit {
 
         // this.commonOptions.xaxis.categories = dateLabels;
 
-        const data1: number[] = [1];
-        const data2: number[] = [10];
-        /* this.informes.forEach((informe) => {
+        const data1: number[] = [];
+        const data2: number[] = [];
+        this.informes.forEach((informe) => {
           data1.push(informe.pc_pct);
 
           const anomsInforme = this.allAnomalias.filter((anom) => (anom.informeId = informe.id));
@@ -110,28 +117,27 @@ export class ChartPctCelsComponent implements OnInit {
           let gradienteTotal = 0;
           gradientes.forEach((grad) => (gradienteTotal += grad));
           data2.push(gradienteTotal / anomsInforme.length);
-        }); */
+        });
 
-        this._initChartData(data1, data2);
+        // si solo hay un informe no mostramos el gráfico
+        if (data1.length <= 1) {
+          this.statsService.loadCCyGradChart = false;
+        } else {
+          this._initChartData(data1, data2);
+        }
       });
   }
 
   private _initChartData(data1: number[], data2: number[]): void {
-    // si solo hay un informe cambiamos a grafico tipo lineas
-    let typeChart: ChartType = 'area';
-    if (data1.length === 1) {
-      typeChart = 'bar';
-    }
-
     this.chart1options = {
       series: [
         {
-          name: '% celulas calientes',
+          name: '% CC',
           data: data1,
         },
       ],
       chart: {
-        type: typeChart,
+        type: 'area',
         width: '100%',
         height: this.chartHeight,
         toolbar: {
@@ -207,7 +213,7 @@ export class ChartPctCelsComponent implements OnInit {
         },
       ],
       chart: {
-        type: typeChart,
+        type: 'area',
         width: '100%',
         height: this.chartHeight,
         toolbar: {
