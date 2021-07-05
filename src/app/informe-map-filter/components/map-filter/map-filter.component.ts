@@ -60,7 +60,7 @@ export class MapFilterComponent implements OnInit {
     this.filterService.filters$.subscribe((filtros) => {
       // 1. Borramos todos los poligonos del mapa
       this.areaFilterList.forEach((filtroArea) => {
-        filtroArea.polygon.setMap(null);
+        // filtroArea.polygon.setMap(null);
       });
       this.areaFilterList = [];
 
@@ -73,7 +73,7 @@ export class MapFilterComponent implements OnInit {
         })
         .forEach((filtro) => {
           this.areaFilterList.push(filtro);
-          filtro.polygon.setMap(this.map);
+          // filtro.polygon.setMap(this.map);
         });
     });
   }
@@ -111,7 +111,8 @@ export class MapFilterComponent implements OnInit {
       }
 
       // Creamos el filtro
-      const areaFilter = new AreaFilter('Área ' + this.numAreas, path);
+      const areaFilter = null;
+      // const areaFilter = new AreaFilter('Área ' + this.numAreas, path);
       this.filterService.addFilter(areaFilter);
 
       // Desactiva del modo dibujo
