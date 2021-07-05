@@ -42,6 +42,24 @@
       <div class="row">
         <div class="col-8" *ngIf="selectedLocationArea">
           <ul class="propiedadesLocArea">
+            <li class="liPropiedadesLocArea">
+              <label>
+                N_0
+                <input class="input60" type="number" [(ngModel)]="number[0]"> 
+              </label>              
+            </li>
+            <li class="liPropiedadesLocArea">
+              <label>
+                N_1
+                <input class="input60" type="number" [(ngModel)]="number[1]"> 
+              </label>              
+            </li>
+            <li class="liPropiedadesLocArea">
+              <label>
+                N_2
+                <input class="input60" type="number" [(ngModel)]="number[2]">
+              </label>              
+            </li>
             <li *ngFor="let gc of global.globalCoordsEstructura" class="liPropiedadesLocArea">
               <label>
                 G_<b>{{ gc }}: </b>

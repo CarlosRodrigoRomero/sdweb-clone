@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewChildren, QueryList } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, QueryList, HostListener} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PlantaService } from '@core/services/planta.service';
 import { PlantaInterface } from '@core/models/planta';
@@ -58,6 +58,8 @@ export class AutoLocComponent implements OnInit {
   public lastGlobalChanged: string;
   public map: any;
   public isDraggable: true;
+
+  public number: number [] = [,,];
 
   constructor(private route: ActivatedRoute, private plantaService: PlantaService) {}
 
@@ -253,6 +255,45 @@ export class AutoLocComponent implements OnInit {
     this.addEventListeners(drawingManager);
   }
 
+  @HostListener('window:keyup', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+    if(event.key == 'd'){
+      this.deleteArea(this.selectedLocationArea)
+    }
+    if(event.key == 'c'){
+      this.copyArea(this.selectedLocationArea)
+    }
+    if(event.key == 'z'){
+      if(this.number[0] > 0)
+      this.selectedLocationArea.globalCoords[0]=this.number[0];
+      this.number[0]++;
+      this.updateAreaFromGlobals(this.selectedLocationArea, 0)
+
+      if(this.number[1] > 0)
+      this.selectedLocationArea.globalCoords[1]=this.number[1];
+      this.number[1]++;
+      // this.updateAreaFromGlobals(this.selectedLocationArea, 1)
+
+      if(this.number[2] > 0)
+      this.selectedLocationArea.globalCoords[2]=this.number[2];
+      this.number[2]++;
+      // this.updateAreaFromGlobals(this.selectedLocationArea, 2)
+    }
+    if(event.key == 'x'){
+      if(this.number[0] > 0)
+      this.selectedLocationArea.globalCoords[0]=this.number[0];
+      this.updateAreaFromGlobals(this.selectedLocationArea, 0)
+
+      if(this.number[1] > 0)
+      this.selectedLocationArea.globalCoords[1]=this.number[1];
+      // this.updateAreaFromGlobals(this.selectedLocationArea, 1)
+
+      if(this.number[2] > 0)
+      this.selectedLocationArea.globalCoords[2]=this.number[2];
+      // this.updateAreaFromGlobals(this.selectedLocationArea, 2)
+    }
+  }
+
   deleteArea(area: AreaInterface) {
     // Eliminar del mapa
     const polygon = this.polygonList.find((item) => {
@@ -260,7 +301,6 @@ export class AutoLocComponent implements OnInit {
     });
     polygon.setMap(null);
     this.polygonList = this.polygonList.filter((item) => item.id !== polygon.id);
-
     // Eliminar de la BD
     this.deleteAreaFromDb(area);
   }
