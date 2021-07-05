@@ -12,7 +12,6 @@ import { SeguidoresListComponent } from './components/seguidores-list/seguidores
 import { MapSeguidoresComponent } from './components/map-seguidores/map-seguidores.component';
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
 import { ViewToggleComponent } from './components/view-toggle/view-toggle.component';
-// import { GlobalCoordAreasComponent } from './components/global-coord-areas/global-coord-areas.component';
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
 import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.component';
 import { ShareReportComponent } from './components/share-report/share-report.component';
@@ -33,7 +32,6 @@ import { SeguidorAnomaliasListComponent } from './components/seguidor-anomalias-
     MapSeguidoresComponent,
     SliderTemporalComponent,
     ViewToggleComponent,
-    // GlobalCoordAreasComponent,
     SliderOpacityComponent,
     SeguidorInfoComponent,
     ShareReportComponent,

@@ -20,7 +20,6 @@ import { MapComponent } from './components/map/map.component';
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.component';
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
-// import { GlobalCoordAreasComponent } from './components/global-coord-areas/global-coord-areas.component';
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
 
 @NgModule({
@@ -32,7 +31,6 @@ import { SliderOpacityComponent } from './components/slider-opacity/slider-opaci
     DownloadReportComponent,
     MapComponent,
     SliderTemporalComponent,
-    // GlobalCoordAreasComponent,
     SliderOpacityComponent,
   ],
   imports: [
