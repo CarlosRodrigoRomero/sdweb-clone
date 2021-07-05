@@ -7,11 +7,11 @@ export const routes: Routes = [
   { path: '', redirectTo: 'clients', pathMatch: 'full' },
   { path: 'aviso-legal', component: AvisoLegalComponent },
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then((m) => m.AuthenticationModule) },
-  // {
-  //   path: 'admin',
-  //   loadChildren: () => import('./admin/admin.module').then((m) => m.AdminModule),
-  //   canActivate: [AuthGuard],
-  // },
+  {
+    path: 'admin',
+    loadChildren: () => import('./admin/admin.module').then((m) => m.AdminModule),
+    canActivate: [AuthGuard],
+  },
   {
     path: 'clients',
     loadChildren: () => import('./clients/clients.module').then((m) => m.ClientsModule),

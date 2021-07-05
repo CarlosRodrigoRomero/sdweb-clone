@@ -104,7 +104,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   onClick(row) {
     const plantaId = row.plantaId;
     const tipoPlanta = row.tipo;
-    const fecha = row.fecha;
+    const fecha = row.ultimaInspeccion;
 
     // provisional - no abre plantas con informes anteriores al 1/05/2021
     if (fecha > 1619820000) {

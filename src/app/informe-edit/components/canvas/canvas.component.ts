@@ -16,6 +16,9 @@ import { Estructura, RectanguloInterface } from '@core/models/estructura';
 import { PlantaService } from '@core/services/planta.service';
 import { ModuloInterface } from '@core/models/modulo';
 import { PcService } from '@core/services/pc.service';
+
+import inside from 'point-in-polygon';
+
 declare let fabric;
 
 @Component({
@@ -646,7 +649,7 @@ export class CanvasComponent implements OnInit {
   private getEstructuraPunto(punto: Point) {
     let estEncontrada = null;
     if (this.estructuraList !== null) {
-      const inside = require('point-in-polygon');
+      // const inside = require('point-in-polygon');
       this.estructuraList.forEach((est) => {
         const coords = this.PointToCoords(est.coords);
         if (inside([punto.x, punto.y], this.PointToCoords(est.coords))) {

@@ -14,7 +14,7 @@ import { FilterInterface } from '@core/models/filter';
 export class FilterService {
   private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad'];
   private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
-  private filters: FilterInterface[] = [];
+  public filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
   private _filteredElements: FilterableElement[] = [];
   public filteredElements$ = new BehaviorSubject<FilterableElement[]>(this.filteredElements);
