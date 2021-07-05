@@ -178,31 +178,15 @@ class ImageTileMod extends Tile {
 
       return temp;
     } else if (this.thermalLayer.codificationType === 'rainbowHc') {
-      const rainbowHcPalette = GLOBAL.rainbow_hc_palette_string;
+      const centenas = 255 - pixel[0];
+      const decenas = 255 - pixel[1];
+      const unidades = 255 - pixel[2];
+      const decimales = 255 - pixel[3];
 
-      // const pixelHex = this.pixelToHex(pixel.slice(0, 3));
+      const tempString = centenas.toString() + decenas.toString() + unidades.toString() + '.' + decimales.toString();
 
-      const pixelIndex = rainbowHcPalette.indexOf(pixel.toString());
-
-      const temp = ((this.rangeTempMax - this.rangeTempMin) * pixelIndex) / rainbowHcPalette.length + this.rangeTempMin;
-
-      return temp;
+      return parseFloat(tempString);
     }
-  }
-
-  pixelToHex(pixel) {
-    var red = this.rgbToHex(pixel[0]);
-    var green = this.rgbToHex(pixel[1]);
-    var blue = this.rgbToHex(pixel[2]);
-    return red + green + blue;
-  }
-
-  rgbToHex(rgb) {
-    var hex = Number(rgb).toString(16);
-    if (hex.length < 2) {
-      hex = '0' + hex;
-    }
-    return hex;
   }
 
   transformPixels_(image) {
