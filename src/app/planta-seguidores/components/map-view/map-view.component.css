@@ -21,7 +21,7 @@
 .visual-control {
   display: flex;
   /* grid-template-columns: 1fr 1fr; */
-  /* gap: 1rem; */
+  gap: 1rem;
 }
 
 @media (max-width: 900px) {
