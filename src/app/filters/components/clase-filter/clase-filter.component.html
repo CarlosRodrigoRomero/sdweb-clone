@@ -1,6 +1,6 @@
 <div class="filtro">
   <h5>Clase</h5>
-  <mat-button-toggle-group #group="matButtonToggleGroup" multiple="true">
+  <mat-button-toggle-group class="class-group" #group="matButtonToggleGroup" multiple="true">
     <mat-button-toggle
       *ngFor="let elem of claseElems; index as i"
       [id]="'CoA_' + (i + 1)"
