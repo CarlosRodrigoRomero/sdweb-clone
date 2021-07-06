@@ -214,7 +214,13 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     const datetime = this.anomaliaSelect.datetime;
     if (datetime !== undefined && datetime !== null) {
       fecha = this.unixToDate((this.anomaliaSelect as PcInterface).datetime)[0];
-      hora = this.unixToDate((this.anomaliaSelect as PcInterface).datetime)[1];
+      if (this.informeSelected.correccHoraSrt !== undefined) {
+        hora = this.unixToDate(
+          (this.anomaliaSelect as PcInterface).datetime + this.informeSelected.correccHoraSrt * 3600
+        )[1];
+      } else {
+        hora = this.unixToDate((this.anomaliaSelect as PcInterface).datetime)[1];
+      }
     }
     const irrad = (this.anomaliaSelect as PcInterface).irradiancia;
     if (irrad !== undefined && irrad !== null) {
