@@ -106,13 +106,21 @@ export class ChartCelsPorZonasComponent implements OnInit {
         this.informesIdList.forEach((informeId) => {
           const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
 
-          this.chartData.push(this._calculateChartData(anomaliasInforme));
+          // tslint:disable-next-line: triple-equals
+          const celscalInforme = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+
+          this.chartData.push(this._calculateChartData(celscalInforme));
         });
         this._initChart();
       });
   }
 
   private _calculateChartData(anomalias: Anomalia[]): number[] {
+    // comprobamos y el nombre de las zonas es un numero
+    if (!isNaN(parseFloat(this.zones[0].globalCoords[0]))) {
+      this.zones = this.zones.sort((a, b) => parseFloat(a.globalCoords[0]) - parseFloat(b.globalCoords[0]));
+    }
+
     const result = Array<number>();
     this.zones.forEach((zone) => {
       const filtered = anomalias.filter((anom) => anom.globalCoords[0] == zone.globalCoords[0]);
@@ -125,6 +133,11 @@ export class ChartCelsPorZonasComponent implements OnInit {
     const series = this.dateLabels.map((dateLabel, index) => {
       return { name: dateLabel, data: this.chartData[index] };
     });
+
+    let titleXAxis = 'Zonas';
+    if (this.reportControlService.nombreGlobalCoords !== undefined) {
+      titleXAxis = this.reportControlService.nombreGlobalCoords[0];
+    }
 
     // espera a que el charData tenga datos
     if (this.chartData[0] !== undefined) {
@@ -169,9 +182,9 @@ export class ChartCelsPorZonasComponent implements OnInit {
           colors: ['transparent'],
         },
         xaxis: {
-          categories: this.zones.map((zone) => zone.globalCoords[0]),
+          // categories: this.zones.map((zone) => zone.globalCoords[0]),
           title: {
-            text: 'Zonas',
+            text: titleXAxis,
           },
         },
         colors: [GLOBAL.gris],

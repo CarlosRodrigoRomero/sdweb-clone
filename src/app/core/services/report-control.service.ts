@@ -43,7 +43,8 @@ export class ReportControlService {
   public allFilterableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFilterableElements);
   public plantaFija = false;
   private _thereAreZones = true;
-  thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
+  public thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
+  private _nombreGlobalCoords: string[] = [];
 
   constructor(
     private router: Router,
@@ -401,5 +402,13 @@ export class ReportControlService {
   set thereAreZones(value: boolean) {
     this._thereAreZones = value;
     this.thereAreZones$.next(value);
+  }
+
+  get nombreGlobalCoords() {
+    return this._nombreGlobalCoords;
+  }
+
+  set nombreGlobalCoords(value: string[]) {
+    this._nombreGlobalCoords = value;
   }
 }

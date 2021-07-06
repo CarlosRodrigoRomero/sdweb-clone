@@ -14,14 +14,14 @@
         <span *ngIf="anomaliaHover.temperaturaMax !== 0" class="subtitulo"
           >{{ anomaliaHover.temperaturaMax }} ºC</span
         >
-        <span *ngIf="anomaliaHover.temperaturaMax === 0" class="subtitulo">en proceso...</span>
+        <span *ngIf="anomaliaHover.temperaturaMax === 0" class="subtitulo">Pronto disponible</span>
       </div>
       <div class="elemento">
         <span class="titulo">&Delta;T Normalizado</span>
         <span *ngIf="anomaliaHover.gradienteNormalizado !== 0" class="subtitulo"
           >{{ anomaliaHover.gradienteNormalizado }} ºC</span
         >
-        <span *ngIf="anomaliaHover.gradienteNormalizado === 0" class="subtitulo">en proceso...</span>
+        <span *ngIf="anomaliaHover.gradienteNormalizado === 0" class="subtitulo">Pronto disponible</span>
       </div>
       <div class="elemento">
         <span class="titulo">Pérdidas (beta)</span>
@@ -64,7 +64,7 @@
               <span *ngIf="anomaliaSelect.temperaturaMax !== 0" class="subtitulo"
                 >{{ anomaliaSelect.temperaturaMax }} ºC</span
               >
-              <span *ngIf="anomaliaSelect.temperaturaMax === 0" class="subtitulo">en proceso...</span>
+              <span *ngIf="anomaliaSelect.temperaturaMax === 0" class="subtitulo">Pronto disponible</span>
               <!-- <input
                   (change)="onEdit($event, 'temperaturaMax')"
                   type="text"
@@ -77,7 +77,7 @@
               <span *ngIf="anomaliaSelect.gradienteNormalizado !== 0" class="subtitulo"
                 >{{ anomaliaSelect.gradienteNormalizado }} ºC</span
               >
-              <span *ngIf="anomaliaSelect.gradienteNormalizado === 0" class="subtitulo">en proceso...</span>
+              <span *ngIf="anomaliaSelect.gradienteNormalizado === 0" class="subtitulo">Pronto disponible</span>
               <!-- <input
                   (change)="onEdit($event, 'gradienteNormalizado')"
                   type="text"

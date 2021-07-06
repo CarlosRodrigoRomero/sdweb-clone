@@ -115,6 +115,10 @@ export class ChartAnomaliasZonasComponent implements OnInit {
   }
 
   private _calculateChartData(anomalias: Anomalia[]): number[] {
+    // comprobamos y el nombre de las zonas es un numero
+    if (!isNaN(parseFloat(this.zones[0].globalCoords[0]))) {
+      this.zones = this.zones.sort((a, b) => parseFloat(a.globalCoords[0]) - parseFloat(b.globalCoords[0]));
+    }
     const result = Array<number>();
     this.zones.forEach((zone) => {
       const filtered = anomalias.filter((anom) => anom.globalCoords[0] == zone.globalCoords[0]);
@@ -153,6 +157,11 @@ export class ChartAnomaliasZonasComponent implements OnInit {
       return { name: dateLabel, data: this.chartData[index] };
     });
 
+    let titleXAxis = 'Zonas';
+    if (this.reportControlService.nombreGlobalCoords !== undefined) {
+      titleXAxis = this.reportControlService.nombreGlobalCoords[0];
+    }
+
     // espera a que el dataPlot tenga datos
     if (this.chartData[0] !== undefined) {
       this.chartOptions = {
@@ -160,6 +169,21 @@ export class ChartAnomaliasZonasComponent implements OnInit {
         chart: {
           type: 'bar',
           width: '100%',
+          toolbar: {
+            show: true,
+            offsetX: 0,
+            offsetY: 0,
+            tools: {
+              download: true,
+              selection: false,
+              zoom: false,
+              zoomin: false,
+              zoomout: false,
+              pan: false,
+              reset: false,
+              customIcons: [],
+            },
+          },
         },
         legend: {
           show: false,
@@ -180,9 +204,9 @@ export class ChartAnomaliasZonasComponent implements OnInit {
           colors: ['transparent'],
         },
         xaxis: {
-          categories: this.zones.map((zone) => zone.globalCoords[0]),
+          // categories: this.zones.map((zone) => zone.globalCoords[0]),
           title: {
-            text: 'Zonas',
+            text: titleXAxis,
           },
         },
         colors: [GLOBAL.gris],
@@ -198,7 +222,7 @@ export class ChartAnomaliasZonasComponent implements OnInit {
           },
           labels: {
             minWidth: 10,
-          }
+          },
         },
         fill: {
           opacity: 1,

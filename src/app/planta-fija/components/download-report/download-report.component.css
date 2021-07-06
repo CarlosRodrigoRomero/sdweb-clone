@@ -18,3 +18,8 @@ h4 {
 .contenedor-menu {
   padding: 1rem;
 }
+
+.warning {
+  font-size: large;
+  font-weight: 100;
+}
