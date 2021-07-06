@@ -63,18 +63,6 @@ mat-card {
     grid-template-rows: auto;
   }
 
-  .mae-global {
-    width: calc(100% - 20px);
-  }
-
-  .mae-zonas {
-    width: calc(100% - 20px);
-  }
-
-  .mae-tipo {
-    padding-bottom: 2px;
-  }
-
   .cc-grid {
     grid-template-columns: 100%;
     grid-template-rows: auto;

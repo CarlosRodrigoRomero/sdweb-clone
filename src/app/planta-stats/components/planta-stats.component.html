@@ -1,45 +1,16 @@
-<mat-tab-group *ngIf="loadStats">
+<mat-tab-group>
   <mat-tab label="MAE">
     <div class="mae-grid">
       <div class="mae-content-izq">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>MAE global</mat-card-title>
-            <mat-card-subtitle>Módulos Apagados Equivalentes por año</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="mae-global">
-              <app-chart-mae-global></app-chart-mae-global>
-            </div>
-          </mat-card-content>
-        </mat-card>
+        <!-- MAE GLOBAL -->
+        <app-chart-mae-global></app-chart-mae-global>
 
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>MAE por zonas</mat-card-title>
-            <mat-card-subtitle>Para visualizar dónde están los problemas de rendimiento</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="mae-zonas">
-              <app-chart-anomalias-zonas></app-chart-anomalias-zonas>
-            </div>
-          </mat-card-content>
-        </mat-card>
+        <!-- MAE POR ZONAS -->
+        <app-chart-anomalias-zonas></app-chart-anomalias-zonas>
       </div>
       <div>
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>MAE por tipo de anomalía</mat-card-title>
-            <mat-card-subtitle
-              >Encuentra la relación entre el tipo de anomalía y las pérdidas que provoca</mat-card-subtitle
-            >
-          </mat-card-header>
-          <mat-card-content>
-            <div class="mae-tipo">
-              <app-chart-numsyperd></app-chart-numsyperd>
-            </div>
-          </mat-card-content>
-        </mat-card>
+        <!-- MAE TIPO ANOMALIA -->
+        <app-chart-numsyperd></app-chart-numsyperd>
       </div>
     </div>
   </mat-tab>
@@ -61,25 +32,11 @@
         <app-chart-altura></app-chart-altura>
       </div>
       <div class="cc-content-drcha">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>Módulos con cel. calientes por gradiente</mat-card-title>
-            <mat-card-subtitle>Clasificación de los módulos con céls calientes por gradiente</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <app-chart-cels-temps></app-chart-cels-temps>
-          </mat-card-content>
-        </mat-card>
+        <!-- MODULOS CON CC POR GRADIENTE -->
+        <app-chart-cels-temps></app-chart-cels-temps>
 
-        <mat-card *ngIf="thereAreZones" class="chart-mae">
-          <mat-card-header>
-            <mat-card-title>Céls. calientes por zonas</mat-card-title>
-            <mat-card-subtitle>Para visualizar dónde se generan las céls. calientes</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <app-chart-cels-por-zonas></app-chart-cels-por-zonas>
-          </mat-card-content>
-        </mat-card>
+        <!-- CC POR ZONAS -->
+        <app-chart-cels-por-zonas></app-chart-cels-por-zonas>
       </div>
     </div>
   </mat-tab>

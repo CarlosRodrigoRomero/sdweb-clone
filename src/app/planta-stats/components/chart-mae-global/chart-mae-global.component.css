@@ -1,1 +1,10 @@
+mat-card {
+  padding: 8px;
+  height: fit-content;
+}
 
+@media (max-width: 800px) {
+  .mae-global {
+    width: calc(100% - 20px);
+  }
+}

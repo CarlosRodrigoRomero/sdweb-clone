@@ -1,0 +1,10 @@
+mat-card {
+  padding: 8px;
+  height: fit-content;
+}
+
+@media (max-width: 800px) {
+  .mae-tipo {
+    padding-bottom: 2px;
+  }
+}
