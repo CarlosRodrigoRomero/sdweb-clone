@@ -1,0 +1,14 @@
+mat-card {
+  height: calc(50vh - 86px);
+}
+
+.subtitulo {
+  font-size: medium;
+  font-weight: 400;
+  margin-left: 1em;
+}
+
+.chart {
+  height: calc(50vh - 160px);
+  display: grid;
+}

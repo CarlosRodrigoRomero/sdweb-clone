@@ -10,8 +10,9 @@ import { AngularFireStorageModule } from '@angular/fire/storage';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 
-import { LoginComponent } from './cts/login/login.component';
 import { AuthService } from '@core/services/auth.service';
+import { WINDOW_PROVIDERS } from './window.providers';
+
 import { IndexComponent } from './cts/index/index.component';
 import { VideoComponent } from './cts/video/video.component';
 
@@ -23,18 +24,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { HotkeyModule } from 'angular2-hotkeys';
-import { PubliclayoutComponent } from './publiclayout/publiclayout.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    LoginComponent,
-    IndexComponent,
-    VideoComponent,
-    AvisoLegalComponent,
-    PubliclayoutComponent,
-  ],
+  declarations: [AppComponent, IndexComponent, VideoComponent, AvisoLegalComponent],
 
   imports: [
     BrowserModule,
@@ -55,7 +48,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     HotkeyModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
-  providers: [{ provide: SETTINGS, useValue: {} }, AuthService],
+  providers: [{ provide: SETTINGS, useValue: {} }, AuthService, WINDOW_PROVIDERS],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

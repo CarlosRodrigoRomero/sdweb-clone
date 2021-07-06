@@ -1,0 +1,56 @@
+.filtro {
+  margin-bottom: 15px;
+}
+
+h5 {
+  margin-bottom: 15px;
+  font-weight: 400;
+}
+
+.tipo-select {
+  width: 100%;
+}
+
+.filter-default {
+  font-weight: 200;
+  color: grey;
+}
+
+.filter-selected {
+  display: inline-block;
+  width: 170px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 15px;
+}
+
+:host ::ng-deep .menu-tipo .mat-menu-content:not(:empty) {
+  min-width: 280px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 80% 20%;
+}
+
+li {
+  list-style-type: none;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.counts-tipo {
+  line-height: 2.9;
+  margin-top: -6px;
+  text-align: end;
+}
+
+.label-tipo {
+  display: inline-flex;
+  margin-top: 0.4rem;
+}
+
+.label-tipo mat-icon {
+  margin-right: 0.5rem;
+}

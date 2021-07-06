@@ -1,0 +1,23 @@
+.filtro {
+  margin-bottom: 20px;
+}
+
+h5 {
+  margin-bottom: 15px;
+  font-weight: 400;
+}
+
+:host ::ng-deep .criticidad-group .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+  line-height: unset;
+  padding: 0 10px;
+}
+
+.criticidad-group {
+  /*  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap; */
+  left: 50%;
+  transform: translate(-50%, 0%);
+}

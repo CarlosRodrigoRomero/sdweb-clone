@@ -26,8 +26,8 @@ export class PcFilterComponent implements OnInit, OnDestroy {
   public severidad: MatButtonToggleGroup;
   public filtroClase: number[];
   public filtroCategoria: number[];
-  public labelsSeveridad = GLOBAL.labels_severidad;
-  public descripcionSeveridad = GLOBAL.descripcionSeveridad;
+  public labelsSeveridad = GLOBAL.labels_clase;
+  public descripcionSeveridad = GLOBAL.descripcionClase;
   public numCategorias: Array<number>;
   public numClases: Array<number>;
   public nombreClases: Array<string>;
@@ -53,7 +53,7 @@ export class PcFilterComponent implements OnInit, OnDestroy {
     const numCategorias = Array(GLOBAL.labels_tipos.length)
       .fill(0)
       .map((_, i) => i + 1);
-    const numClases = Array(GLOBAL.labels_severidad.length)
+    const numClases = Array(GLOBAL.labels_clase.length)
       .fill(0)
       .map((_, i) => i + 1);
     this.pcService.PushFiltroClase(numClases);
@@ -68,7 +68,7 @@ export class PcFilterComponent implements OnInit, OnDestroy {
     this.numCategorias = Array(GLOBAL.labels_tipos.length)
       .fill(0)
       .map((_, i) => i + 1);
-    this.numClases = Array(GLOBAL.labels_severidad.length)
+    this.numClases = Array(GLOBAL.labels_clase.length)
       .fill(0)
       .map((_, i) => i + 1);
 

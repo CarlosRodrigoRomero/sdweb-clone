@@ -1,0 +1,15 @@
+button {
+  width: 100%;
+}
+
+div {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+span {
+  margin-left: 1rem;
+  font-size: 1.1rem;
+  font-weight: 400;
+}

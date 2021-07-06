@@ -1,0 +1,21 @@
+<div class="filtro">
+  <h5>Tipo de módulo</h5>
+  <button class="tipo-select" mat-stroked-button [matMenuTriggerFor]="menu">
+    <span class="filter-selected">{{ selected.toString() }}</span>
+    <mat-icon>keyboard_arrow_down</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <li *ngFor="let modulo of modulosPcs; index as i">
+      <mat-checkbox
+        [(ngModel)]="modulo.completed"
+        [id]="'modulo_' + (i + 1)"
+        [name]="modulo.label"
+        (change)="onChangeFiltroModulo($event)"
+      >
+        <span style="font-size: 15px">
+          {{ modulo.label }}
+        </span>
+      </mat-checkbox>
+    </li>
+  </mat-menu>
+</div>

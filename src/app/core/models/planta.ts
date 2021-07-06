@@ -30,6 +30,7 @@ export interface PlantaInterface {
   nombreGlobalX?: string;
   nombreGlobalY?: string;
   nombreGlobalZ?: string;
+  nombreGlobalCoords?: string[]; // 0:Instalacion 1:Pasillo o Calle 2:Mesa
   nombreLocalX?: string;
   nombreLocalY?: string;
   stringConectorGlobals?: string;

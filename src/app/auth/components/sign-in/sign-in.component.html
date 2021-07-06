@@ -1,38 +1,35 @@
-<div class="signin">
-  <div class="form-signin">
+<div class="container">
+  <div class="form-material">
     <img class="logo" src="../../../assets/images/logo_sd.png" alt="" />
-    <form [formGroup]="form" align="center">
-      <h1 class="titulo fw-normal">Iniciar sesión</h1>
-      <input
-        type="email"
-        id="inputEmail"
-        formControlName="email"
-        class="form-control"
-        placeholder="Correo electrónico"
-        #email
-        required
-        autofocus
-      />
-      <input
-        type="password"
-        id="inputPassword"
-        formControlName="password"
-        class="form-control"
-        placeholder="Constraseña"
-        #userPassword
-        required
-      />
-      <div *ngIf="!hide" class="alert alert-danger">ID o contraseña incorrectos</div>
-      <button
-        class="btn btn-lg btn-danger"
-        type="submit"
-        [disabled]="form.invalid"
-        (click)="signIn(email.value, userPassword.value)"
-      >
+    <form [formGroup]="form" align="center" (ngSubmit)="signIn($event)">
+      <h1 class="titulo">Iniciar sesión</h1>
+      <div>
+        <mat-form-field class="email-input" appearance="outline">
+          <mat-label>Correo electrónico</mat-label>
+          <input matInput formControlName="email" />
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field class="password-input" appearance="outline">
+          <mat-label>Contraseña</mat-label>
+          <input matInput formControlName="password" [type]="hide ? 'password' : 'text'" />
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="hide = !hide"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hide"
+          >
+            <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+      <div *ngIf="!warningHide" class="alert alert-danger">Datos de acceso incorrectos</div>
+      <button mat-raised-button class="boton-entrar" color="warn" [disabled]="form.invalid" type="submit">
         Entrar
       </button>
       <div class="forgotPassword">
-        <a routerLink="../forgot-password">¿Has olvidado la contraseña?</a>
+        <a mat-button color="primary" routerLink="../forgot-password">¿Has olvidado la contraseña?</a>
       </div>
     </form>
   </div>

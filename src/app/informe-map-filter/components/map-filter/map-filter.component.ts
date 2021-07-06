@@ -38,8 +38,7 @@ export class MapFilterComponent implements OnInit {
     public pcService: PcService
   ) {
     // mostramos todos los pcs al inicio
-    this.filterService.filteredPcs = this.pcService.allPcs;
-    this.filterService.filteredPcs$.next(this.filterService.filteredPcs);
+    this.filterService.filteredElements = this.pcService.allPcs;
   }
 
   ngOnInit(): void {
@@ -61,7 +60,7 @@ export class MapFilterComponent implements OnInit {
     this.filterService.filters$.subscribe((filtros) => {
       // 1. Borramos todos los poligonos del mapa
       this.areaFilterList.forEach((filtroArea) => {
-        filtroArea.polygon.setMap(null);
+        // filtroArea.polygon.setMap(null);
       });
       this.areaFilterList = [];
 
@@ -74,13 +73,13 @@ export class MapFilterComponent implements OnInit {
         })
         .forEach((filtro) => {
           this.areaFilterList.push(filtro);
-          filtro.polygon.setMap(this.map);
+          // filtro.polygon.setMap(this.map);
         });
     });
   }
 
   getStrokeColor(severidad: number) {
-    return GLOBAL.colores_severidad[severidad - 1];
+    return GLOBAL.colores_clase[severidad - 1];
   }
 
   initDrawingManager() {
@@ -112,7 +111,8 @@ export class MapFilterComponent implements OnInit {
       }
 
       // Creamos el filtro
-      const areaFilter = new AreaFilter('Área ' + this.numAreas, path);
+      const areaFilter = null;
+      // const areaFilter = new AreaFilter('Área ' + this.numAreas, path);
       this.filterService.addFilter(areaFilter);
 
       // Desactiva del modo dibujo

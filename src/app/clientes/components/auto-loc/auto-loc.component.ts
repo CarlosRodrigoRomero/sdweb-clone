@@ -14,6 +14,9 @@ import { UserAreaInterface } from '@core/models/userArea';
 import { AreaInterface } from '@core/models/area';
 import { GLOBAL } from '@core/services/global';
 import { MatPaginator } from '@angular/material/paginator';
+import { AnomaliaService } from '../../../core/services/anomalia.service';
+import { toLonLat } from 'ol/proj';
+import { take } from 'rxjs/operators';
 declare const google: any;
 @Component({
   selector: 'app-auto-loc',
@@ -61,7 +64,35 @@ export class AutoLocComponent implements OnInit {
 
   public number: number[] = [, ,];
 
-  constructor(private route: ActivatedRoute, private plantaService: PlantaService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private plantaService: PlantaService,
+    private anomaliaService: AnomaliaService
+  ) {}
+
+  recalcularLocs2() {
+    this.plantaService.setLocAreaListFromPlantaId('egF0cbpXnnBnjcrusoeR');
+    this.anomaliaService
+      .getAnomalias$('vfMHFBPvNFnOFgfCgM9L')
+      .pipe(take(1))
+      .subscribe((anomalias) => {
+        console.log('anomalias_', anomalias);
+        // recalcular locs
+        anomalias.forEach((anomalia) => {
+          const coords = [anomalia.featureCoords[0][0], anomalia.featureCoords[0][1]];
+          const latLngArray = toLonLat(coords);
+          const latLng = { lat: latLngArray[1], lng: latLngArray[0] };
+
+          let globalCoords;
+          let modulo;
+          [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(latLng);
+
+          anomalia.globalCoords = globalCoords;
+          anomalia.modulo = modulo;
+          this.anomaliaService.updateAnomalia(anomalia);
+        });
+      });
+  }
 
   ngOnInit() {
     this.isDraggable = true;

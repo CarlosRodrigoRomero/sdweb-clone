@@ -1,5 +1,7 @@
 {
   "extends": "../tsconfig.json",
+  "types": [ "node" ],
+"typeRoots": [ "../node_modules/@types" ],
   "compilerOptions": {
     "outDir": "../out-tsc/app",
     "types": []

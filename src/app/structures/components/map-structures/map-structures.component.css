@@ -1,0 +1,11 @@
+.map {
+  height: calc(100vh - 70px);
+  width: 100%;
+  background: black;
+}
+
+button {
+  position: absolute;
+  top: 80px;
+  right: 10px;
+}

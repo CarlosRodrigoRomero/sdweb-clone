@@ -1,0 +1,35 @@
+.clusters-control {
+  display: flex;
+  flex-direction: column;
+}
+
+.control-fine button {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.control-fine {
+  margin-bottom: 1.5rem;
+}
+
+.atras-siguiente button {
+  margin-right: 0.5rem;
+}
+
+.warn-active {
+  color: #d32f2f;
+}
+
+mat-icon {
+  margin-right: 8px;
+}
+
+.auto-cluster-button {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+mat-form-field {
+  width: 100%;
+  padding: 0 20px;
+}

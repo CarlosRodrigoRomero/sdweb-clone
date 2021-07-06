@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { Observable, Subject } from 'rxjs';
+import { combineLatest, Observable, Subject } from 'rxjs';
 import { InformeInterface } from '../models/informe';
 import { map, take } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
@@ -9,9 +9,9 @@ import { GLOBAL } from './global';
 import { EstructuraInterface, Estructura } from '../models/estructura';
 import { ArchivoVueloInterface } from '../models/archivoVuelo';
 import { ElementoPlantaInterface } from '../models/elementoPlanta';
-import { element } from 'protractor';
 import { PcInterface } from '../models/pc';
 import { LatLngLiteral } from '@agm/core';
+import { ThermalLayerInterface } from '@core/models/thermalLayer';
 
 @Injectable({
   providedIn: 'root',
@@ -97,7 +97,7 @@ export class InformeService {
     );
   }
 
-  getInforme(id: string) {
+  getInforme(id: string): Observable<InformeInterface> {
     this.informeDoc = this.afs.doc<InformeInterface>('informes/' + id);
 
     return (this.informe$ = this.informeDoc.snapshotChanges().pipe(
@@ -194,16 +194,102 @@ export class InformeService {
   }
 
   updateInforme(informe: InformeInterface) {
-    const informeDoc = this.afs.doc('informes/' + informe.id);
-    informeDoc.update(informe);
+    this.afs
+      .collection('informes')
+      .doc(informe.id)
+      .update(informe)
+      .then(() => {
+        console.log('Informe actualizado correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al actualizar el informe: ', error);
+      });
   }
 
-  addInforme() {}
+  addInforme(informe: InformeInterface) {
+    informe.id = this.afs.createId();
+
+    this.afs
+      .collection('informes')
+      .doc(informe.id)
+      .set(informe)
+      .then((docRef) => {
+        console.log('Informe creado con ID: ', informe.id);
+      })
+      .catch((error) => {
+        console.error('Error al crear el informe: ', error);
+      });
+  }
+
   editInforme() {}
+
   set(informe: InformeInterface) {
     this.informe = informe;
   }
+
   get() {
     return this.informe;
+  }
+
+  addThermalLayer(thermalLayer: ThermalLayerInterface) {
+    this.afs
+      .collection('thermalLayers')
+      .doc(thermalLayer.id)
+      .set(thermalLayer)
+      .then((docRef) => {
+        console.log('ThermalLayer creada correctamente');
+      })
+      .catch((error) => {
+        console.error('Error creando thermalLayer: ', error);
+      });
+  }
+
+  getThermalLayerDB$(informeId: string): Observable<ThermalLayerInterface[]> {
+    const query$ = this.afs
+      .collection<ThermalLayerInterface>('thermalLayers', (ref) => ref.where('informeId', '==', informeId))
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((doc) => {
+            let data = doc.payload.doc.data() as ThermalLayerInterface;
+            data.id = doc.payload.doc.id;
+
+            return data;
+          })
+        )
+      );
+    return query$;
+  }
+
+  getDateLabelsInformes(informesId: string[]) {
+    return combineLatest(
+      informesId.map((informeId) =>
+        this.getInforme(informeId).pipe(
+          take(1),
+          map((informe) => this.unixToDateLabel(informe.fecha))
+        )
+      )
+    );
+  }
+
+  private unixToDateLabel(unix: number): string {
+    const date = new Date(unix * 1000);
+    const year = date.getFullYear();
+    const monthNames = [
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre',
+    ];
+    const month = monthNames[date.getMonth()];
+    return month + ' ' + year;
   }
 }

@@ -1,0 +1,18 @@
+#canvas-anomalias {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0%);
+}
+
+.imagen-termica-div {
+  position: absolute;
+}
+
+#visual-zoom {
+  border: 2px white solid;
+  z-index: 99999;
+}
+
+#visual-zoom:hover {
+  cursor: pointer;
+}

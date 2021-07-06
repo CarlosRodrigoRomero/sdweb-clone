@@ -1,0 +1,103 @@
+<div *ngIf="anomaliaSelected">
+  <h5 class="title">
+    Anomalía <b>#{{ anomaliaInfo.localId }}</b>
+    <span *ngIf="anomaliaInfo.clase !== undefined" [ngStyle]="{ color: anomaliaInfo.claseColor }">
+      ({{ anomaliaInfo.clase }})</span
+    >
+  </h5>
+  <div class="line-info">
+    <div
+      *ngIf="
+        anomaliaInfo.temperaturaMax !== undefined ||
+        anomaliaInfo.temperaturaRef !== undefined ||
+        anomaliaInfo.gradienteNormalizado !== undefined
+      "
+      class="subtitle-icon"
+    >
+      <mat-icon>thermostat</mat-icon>
+      <span class="subtitle">Temperaturas: </span>
+    </div>
+
+    <div class="line-content">
+      <div *ngIf="anomaliaInfo.temperaturaMax !== undefined">
+        <span><u>Temp. máxima</u></span>
+        <span>{{ anomaliaInfo.temperaturaMax }} ºC</span>
+      </div>
+      <div *ngIf="anomaliaInfo.temperaturaRef !== undefined">
+        <span>Temp. referencia</span>
+        <span style="color: blue">{{ anomaliaInfo.temperaturaRef }} ºC</span>
+      </div>
+      <div *ngIf="anomaliaInfo.gradienteNormalizado !== undefined">
+        <span>&Delta;T (normalizado)</span>
+        <span style="color: red">+ {{ anomaliaInfo.gradienteNormalizado | number: '1.0-1' }} ºC</span>
+      </div>
+    </div>
+  </div>
+  <div class="line-info">
+    <div class="subtitle-icon">
+      <mat-icon>trending_down</mat-icon>
+      <span class="subtitle">Pérdidas: </span>
+    </div>
+    <span class="line-content">{{ anomaliaInfo.perdidas * 100 }}%</span>
+  </div>
+  <div class="line-info">
+    <div class="subtitle-icon">
+      <mat-icon>report_problem</mat-icon>
+      <span class="subtitle">Anomalía: </span>
+    </div>
+    <!-- <span *ngIf="checkIsMoreThanOne(pc.modulosAfectados)"> Módulos afectados: {{ pc.modulosAfectados }}. </span> -->
+    <span class="line-content">{{ anomaliaInfo.tipo }}</span>
+  </div>
+  <div class="line-info">
+    <div class="subtitle-icon">
+      <mat-icon>flag</mat-icon>
+      <span class="subtitle">Causa: </span>
+    </div>
+    <span class="line-content">{{ anomaliaInfo.causa }}</span>
+  </div>
+  <div class="line-info">
+    <div class="subtitle-icon">
+      <mat-icon>check_circle</mat-icon>
+      <span class="subtitle">Actuación recomendada: </span>
+    </div>
+    <span class="line-content">{{ anomaliaInfo.recomendacion }}</span>
+  </div>
+  <div class="line-info">
+    <div class="subtitle-icon">
+      <mat-icon>assistant_direction</mat-icon>
+      <span class="subtitle">Localización: </span>
+    </div>
+    <div class="line-content">
+      <span>Fila: {{ anomaliaInfo.fila }}</span>
+      <span>Columna: {{ anomaliaInfo.columna }}</span>
+    </div>
+  </div>
+  <div class="line-info">
+    <div class="subtitle-icon">
+      <mat-icon>schedule</mat-icon>
+      <span class="subtitle">Fecha de captura: </span>
+    </div>
+    <span class="line-content">{{ anomaliaInfo.fecha * 1000 | date: 'dd/MM/yyyy HH:mm' }}</span>
+  </div>
+  <div class="line-info">
+    <div class="subtitle-icon">
+      <mat-icon>brightness_high</mat-icon>
+      <span class="subtitle">Meteo: </span>
+    </div>
+    <span class="line-content"
+      >{{ anomaliaInfo.irradiancia | number: '1.0-0' }} W/m<sup>2</sup> | Dirección viento:
+      {{ anomaliaInfo.vientoDireccion }} | Velocidad viento: {{ anomaliaInfo.vientoVelocidad }} |
+      {{ anomaliaInfo.temperaturaAire }} ºC | Nubes: {{ anomaliaInfo.nubosidad }}/8 octavas</span
+    >
+  </div>
+  <div class="download-btns">
+    <button mat-raised-button (click)="downloadRjpg()">
+      <mat-icon>download</mat-icon>
+      <span>Imagen radiométrica</span>
+    </button>
+    <button mat-raised-button (click)="downloadJpgVisual()">
+      <mat-icon>download</mat-icon>
+      <span>Imagen visual</span>
+    </button>
+  </div>
+</div>

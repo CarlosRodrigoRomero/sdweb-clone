@@ -36,6 +36,10 @@ export class AuthService {
     return this.afAuth.auth.sendPasswordResetEmail(passwordResetEmail);
   }
 
+  signUp(email: string, password: string) {
+    return this.afAuth.auth.createUserWithEmailAndPassword(email, password);
+  }
+
   signOut() {
     return this.afAuth.auth.signOut();
   }
@@ -55,7 +59,10 @@ export class AuthService {
   canAddPlantas(user: UserInterface) {
     return user.role === 1 || user.role === 4;
   }
+
   userIsAdmin(user: UserInterface) {
-    return user.role === 1 || user.role === 3 || user.role === 4 || user.role === 5;
+    if (user !== undefined && user !== null) {
+      return user.role === 1 || user.role === 3 || user.role === 4 || user.role === 5;
+    }
   }
 }

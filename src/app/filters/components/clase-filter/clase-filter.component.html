@@ -1,0 +1,19 @@
+<div class="filtro">
+  <h5>Clase</h5>
+  <mat-button-toggle-group #group="matButtonToggleGroup" multiple="true">
+    <mat-button-toggle
+      *ngFor="let elem of claseElems; index as i"
+      [id]="'CoA_' + (i + 1)"
+      [name]="elem.label"
+      [checked]="claseSelected[i]"
+      (change)="onChangeClaseFilter($event)"
+    >
+      <div class="label">
+        <mat-icon [ngStyle]="{ color: coloresClase[i] }">circle</mat-icon>
+        <span class="text-label" style="font-size: 15px">
+          {{ elem.label }}
+        </span>
+      </div>
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+</div>

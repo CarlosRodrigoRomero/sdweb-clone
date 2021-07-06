@@ -1,0 +1,28 @@
+.title {
+  margin-top: 1rem;
+}
+
+.line-info {
+  display: grid;
+}
+
+.subtitle-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.line-content {
+  margin-left: 2rem;
+}
+
+.download-btns {
+  display: grid;
+  row-gap: 0.5rem;
+  margin-top: 1rem;
+}

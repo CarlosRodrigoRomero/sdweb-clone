@@ -1,0 +1,35 @@
+mat-spinner {
+  position: absolute;
+  top: 200px;
+  left: 50%;
+  transform: translate(50%, 0%);
+}
+
+.cluster-grid {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+}
+
+.left-bar {
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.left-bar h4 {
+  margin: 1rem;
+}
+
+.mat-stepper-vertical {
+  margin-top: 8px;
+}
+
+.mat-form-field {
+  margin-top: 16px;
+}
+
+.cluster-id {
+  margin: 1rem 1rem 0;
+  font-weight: 500;
+  font-size: small;
+}

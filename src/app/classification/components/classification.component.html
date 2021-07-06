@@ -1,0 +1,23 @@
+<div *ngIf="serviceInit">
+  <app-navbar></app-navbar>
+  <div>
+    <app-map-classification></app-map-classification>
+    <app-thermal-slider></app-thermal-slider>
+  </div>
+  <div class="bottom-bar">
+    <div class="bottom-bar__row-top">
+      <h4>{{ nombrePlanta }}</h4>
+      <div class="bottom-bar__fila-columna" *ngIf="normModHovered">
+        <span class="title">Fila:</span>
+        <span class="value">{{ normModHovered.fila }}</span>
+        <span class="title">Columna:</span>
+        <span>{{ normModHovered.columna }}</span>
+      </div>
+      <span>Eliminar anomalía ( Q )</span>
+    </div>
+    <app-anom-tipo-control></app-anom-tipo-control>
+    <button class="end-process" mat-raised-button color="primary" (click)="endClassification()">
+      Terminar clasificación
+    </button>
+  </div>
+</div>

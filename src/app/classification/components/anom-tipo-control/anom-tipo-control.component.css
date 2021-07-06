@@ -1,0 +1,42 @@
+.legend {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+}
+
+.legend__element {
+  display: grid;
+  gap: 0.5rem;
+  justify-content: center;
+  align-content: baseline;
+}
+
+.element__title {
+  display: flex;
+  justify-content: center;
+}
+
+.icon {
+  height: 75px;
+}
+
+.icon:hover {
+  cursor: pointer;
+}
+
+.no-icon {
+  text-align: center;
+  font-weight: 500;
+  font-size: small;
+  height: 75px;
+}
+
+.no-icon:hover {
+  cursor: pointer;
+}
+
+.hotkeys {
+  text-align: center;
+  font-weight: 500;
+  font-size: small;
+}

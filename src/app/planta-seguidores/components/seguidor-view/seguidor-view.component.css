@@ -1,0 +1,86 @@
+.sidenav-content {
+  height: 100vh;
+}
+
+.title {
+  height: 70px;
+  position: absolute;
+  z-index: 9999;
+}
+
+.btn-close-seguidor-view {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+}
+
+.modulo-label {
+  font-size: large;
+  font-weight: 400;
+  margin-left: 1rem;
+  color: grey;
+}
+
+.seguidor-content {
+  height: calc(100vh - 70px);
+  padding: 0.5rem;
+  display: grid;
+  position: relative;
+  grid-template-columns: 640px auto;
+  gap: 1rem;
+  top: 70px;
+}
+
+.left-content {
+  display: grid;
+  row-gap: 1rem;
+}
+
+.image-content {
+  height: 512px;
+}
+
+app-seguidor-view-toggle {
+  position: absolute;
+  left: 15px;
+  top: 15px;
+  z-index: 999;
+}
+
+app-seguidor-image-toggle {
+  position: absolute;
+  top: 472px;
+  left: 475px;
+  z-index: 999;
+}
+
+app-seguidor-next-prev {
+  position: absolute;
+  top: 220px;
+}
+
+app-seguidor-anomalia-info {
+  width: calc(calc(100vw * 0.85) - (640px + 32px));
+}
+
+.prev-btn {
+  position: absolute;
+  left: 10px;
+  top: 250px;
+}
+
+.prev-btn mat-icon {
+  color: white;
+  font-size: 40px;
+}
+
+.next-btn {
+  position: absolute;
+  left: 600px;
+  top: 250px;
+}
+
+.next-btn mat-icon {
+  color: white;
+  font-size: 40px;
+}

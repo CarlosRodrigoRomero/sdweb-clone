@@ -1,0 +1,45 @@
+<div *ngIf="anomaliaSelected && normModSelected">
+  <app-hotkeys-classification></app-hotkeys-classification>
+  <div>
+    <mat-form-field class="tipo" appearance="outline">
+      <mat-label>Tipo anomalía</mat-label>
+      <input
+        autofocus
+        matInput
+        type="number"
+        [formControl]="formControl"
+        (change)="updateAnomalia()"
+        min="3"
+        max="19"
+      />
+      <mat-error *ngIf="formControl.invalid">Introducir valor entre 3 y 19</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="row-column">
+    <span class="title">Fila:</span>
+    <span class="element">{{ normModSelected.fila }}</span>
+    <span class="title">Columna:</span>
+    <span>{{ normModSelected.columna }}</span>
+  </div>
+  <div class="global-coords">
+    <span class="global-coords__title">Global Coords</span>
+    <div>
+      <span class="global-coords__row-title">X:</span>
+      <span>{{ anomaliaSelected.globalCoords[0] }}</span>
+    </div>
+    <div>
+      <span class="global-coords__row-title">Y:</span>
+      <span>{{ anomaliaSelected.globalCoords[1] }}</span>
+    </div>
+    <div>
+      <span class="global-coords__row-title">Z:</span>
+      <span>{{ anomaliaSelected.globalCoords[2] }}</span>
+    </div>
+  </div>
+  <div class="btn-delete">
+    <button (click)="deleteAnomalia()" mat-icon-button matTooltip="Eliminar anomalía">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+</div>

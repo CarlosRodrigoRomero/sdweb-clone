@@ -1,0 +1,56 @@
+.normMod-info {
+  font-weight: 500;
+  font-size: small;
+  margin-bottom: 1rem;
+}
+
+.normMod-info__column {
+  margin-left: 1rem;
+}
+
+.normMod-info__data {
+  margin-left: 0.5rem;
+}
+
+.add-button {
+  min-width: 225px;
+  margin-bottom: 1rem;
+}
+
+.add-button button {
+  width: 100%;
+}
+
+.add-button .icon {
+  margin-right: 0.5rem;
+}
+
+.delete-button {
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.delete-button .icon {
+  margin-right: 0.5rem;
+}
+
+.create-norm-mod {
+  margin-top: 1rem;
+}
+
+.auto-nM-button {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.ol-popup {
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cccccc;
+  bottom: 12px;
+  /* min-width: 280px; */
+  transform: translate(-50%, 0);
+}

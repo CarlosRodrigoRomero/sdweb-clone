@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { PcInterface, Pc } from '../models/pc';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map, take, switchMap, filter } from 'rxjs/operators';
+import { map, take, switchMap } from 'rxjs/operators';
 import { GLOBAL } from './global';
 import { PlantaService } from './planta.service';
 import { AuthService } from './auth.service';
 import { UserAreaInterface } from '../models/userArea';
 import { CritCoA } from '../models/critCoA';
+import { stringify } from '@angular/compiler/src/util';
 
 export interface SeguidorInterface {
   pcs: PcInterface[];
@@ -54,7 +55,7 @@ export class PcService {
     );
 
     this.filtroClase.next(
-      Array(GLOBAL.labels_severidad.length)
+      Array(GLOBAL.labels_clase.length)
         .fill(0)
         .map((_, i) => i + 1)
     );
@@ -429,5 +430,87 @@ export class PcService {
   }
   get() {
     return this.allPcs;
+  }
+
+  getTempMaxAllPcs(): number {
+    const tMax = Math.max(
+      ...this.allPcs.map((pc) => {
+        return pc.temperaturaMax as number;
+      })
+    );
+    return Math.ceil(tMax);
+  }
+
+  getMinGradienteNormalizado(): number {
+    const min = Math.min(
+      ...this.allPcs.map((pc) => {
+        return pc.gradienteNormalizado as number;
+      })
+    );
+    return Math.floor(min);
+  }
+
+  getMaxGradienteNormalizado(): number {
+    const max = Math.max(
+      ...this.allPcs.map((pc) => {
+        return pc.gradienteNormalizado;
+      })
+    );
+    return Math.ceil(max);
+  }
+
+  getLabelsTipoPcs(): string[] {
+    const indices: number[] = [];
+    const labels: string[] = [];
+    this.allPcs.forEach((pc) => {
+      if (!indices.includes(pc.tipo)) {
+        indices.push(pc.tipo);
+      }
+    });
+    indices.forEach((i) => labels.push(GLOBAL.labels_tipos[i]));
+    // los ordena como estan en GLOBAL
+    labels.sort((a, b) => GLOBAL.labels_tipos.indexOf(a) - GLOBAL.labels_tipos.indexOf(b));
+
+    return labels;
+  }
+
+  getModuloLabelPc(pc: PcInterface): string {
+    let moduloLabel: string;
+    if (pc.modulo.marca === undefined) {
+      if (pc.modulo.modelo === undefined) {
+        moduloLabel = pc.modulo.potencia + 'W';
+      } else {
+        moduloLabel = pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W';
+      }
+    } else {
+      if (pc.modulo.modelo === undefined) {
+        moduloLabel = pc.modulo.marca + ' ' + pc.modulo.potencia + 'W';
+      } else {
+        moduloLabel = pc.modulo.marca + ' ' + pc.modulo.modelo + ' ' + pc.modulo.potencia + 'W';
+      }
+    }
+    return moduloLabel;
+  }
+
+  getModulosPcs(): string[] {
+    const modulos: string[] = [];
+
+    this.allPcs.forEach((pc) => {
+      if (!modulos.includes(this.getModuloLabelPc(pc))) {
+        modulos.push(this.getModuloLabelPc(pc));
+      }
+    });
+
+    return modulos;
+  }
+
+  getZonasPcs(): string[] {
+    const zonas: string[] = [];
+    this.allPcs.forEach((pc) => {
+      if (!zonas.includes(pc.global_x)) {
+        zonas.push(pc.global_x);
+      }
+    });
+    return zonas.sort();
   }
 }

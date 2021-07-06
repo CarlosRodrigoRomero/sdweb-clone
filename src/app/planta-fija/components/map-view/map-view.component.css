@@ -1,0 +1,135 @@
+.rel {
+  position: relative;
+}
+
+.map-control {
+  position: absolute;
+  bottom: 1rem;
+  display: grid;
+  grid-template-columns: 100%;
+  gap: 1rem;
+  left: 50%;
+  transform: translate(-50%, 0%);
+}
+
+.visual-control {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .map-control {
+    gap: 0.5rem;
+  }
+
+  .visual-control {
+    grid-template-columns: 100%;
+    gap: 0.5rem;
+  }
+}
+
+.main-container {
+  position: relative;
+  /* height: 100%; */
+}
+
+.btns-export {
+  position: absolute;
+  top: 10px;
+  right: 180px;
+  z-index: 999;
+}
+
+app-share-map {
+  margin-right: 15px;
+}
+
+.left-sidenav {
+  position: absolute;
+  display: flex;
+  margin: 60px 10px 10px;
+  border-radius: 4px;
+  padding: 15px;
+  width: fit-content;
+  max-width: 400px;
+}
+
+@media (max-width: 420px) {
+  .left-sidenav {
+    max-width: -webkit-fill-available;
+  }
+}
+
+.btn-left {
+  position: absolute;
+  top: 10px;
+  height: 40px;
+  margin-left: 10px;
+  padding: 0px 4px 0px 0px;
+}
+
+.right-sidenav {
+  position: absolute;
+  display: flex;
+  margin: 60px 10px 10px;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.btn-close {
+  position: absolute;
+  right: 10px;
+  z-index: 999;
+}
+
+.stats-sidenav {
+  position: absolute;
+  display: flex;
+  margin: 60px 10px 10px;
+  padding: 10px;
+  border-radius: 4px;
+  width: 80%;
+}
+
+@media (max-width: 1000px) {
+  :host ::ng-deep .mat-drawer-inner-container {
+    overflow: hidden;
+  }
+
+  .stats-sidenav {
+    width: calc(100vw - 20px);
+  }
+}
+
+.btn-right {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  left: auto;
+  height: 40px;
+  margin-right: 10px;
+  padding: 0px 0px 0px 4px;
+}
+
+.btn-right-stats {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  left: auto;
+  height: 40px;
+  margin-right: 90px;
+  padding: 0px 0px 0px 4px;
+}
+
+.titulo {
+  margin: 4px 10px 0;
+}
+
+/* #sidenavStats {
+  top: 140px;
+} */
+
+app-filter-pcs-list {
+  height: 100%;
+}

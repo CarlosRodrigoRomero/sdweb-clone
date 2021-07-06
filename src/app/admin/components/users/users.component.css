@@ -1,7 +1,13 @@
-table {
-  width: 100%;
+.users {
+  margin: 1rem;
 }
 
-th.mat-sort-header-sorted {
-  color: black;
+.users__title {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+table {
+  width: 100%;
 }

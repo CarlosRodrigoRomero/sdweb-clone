@@ -116,7 +116,7 @@
   height: 100vh;
   overflow: scroll;
   padding: 0;
-  z-index: 99999;
+  /* z-index: 99999; */
 }
 
 #container-ppal {

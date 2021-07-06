@@ -1,0 +1,191 @@
+.seguidor-sidenav {
+  border-radius: 4px 0 0 4px;
+  width: 85vw;
+  /* max-width: 400px; */
+}
+
+.rel {
+  position: relative;
+}
+
+.map-control {
+  position: absolute;
+  bottom: 1rem;
+  display: grid;
+  grid-template-columns: 100%;
+  gap: 1rem;
+  left: 50%;
+  transform: translate(-50%, 0%);
+}
+
+.visual-control {
+  display: flex;
+  /* grid-template-columns: 1fr 1fr; */
+  /* gap: 1rem; */
+}
+
+@media (max-width: 900px) {
+  .map-control {
+    gap: 0.5rem;
+  }
+
+  .visual-control {
+    display: grid;
+    grid-template-columns: 100%;
+    gap: 0.5rem;
+  }
+}
+
+.main-container {
+  position: relative;
+  height: 100%;
+}
+
+app-share-map {
+  position: absolute;
+  top: 10px;
+  right: 160px;
+  z-index: 999;
+}
+app-download-report {
+  position: absolute;
+  top: 10px;
+  right: 60px;
+  z-index: 999;
+}
+app-barra-resumen-planta {
+  position: absolute;
+  top: 0px;
+  left: 40%;
+  transform: translate(-50%, 0%);
+  margin: 10px;
+  z-index: 999;
+}
+
+app-view-toggle {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translate(-50%, 0%);
+}
+
+.btns-export {
+  position: absolute;
+  top: 10px;
+  right: 180px;
+  z-index: 999;
+}
+
+.left-sidenav {
+  position: absolute;
+  display: flex;
+  margin: 60px 10px 10px;
+  border-radius: 4px;
+  padding: 15px;
+  width: fit-content;
+  max-width: 400px;
+}
+
+.btn-left {
+  position: absolute;
+  top: 10px;
+  height: 40px;
+  margin-left: 10px;
+  padding: 0px 4px 0px 0px;
+}
+
+.right-sidenav {
+  position: absolute;
+  display: flex;
+  padding: 10px;
+  margin: 60px 10px 10px;
+  border-radius: 4px;
+}
+
+.btn-close {
+  position: absolute;
+  right: 10px;
+  z-index: 999;
+}
+
+.stats-sidenav {
+  position: absolute;
+  display: flex;
+  padding: 10px;
+  margin: 60px 10px 10px;
+  border-radius: 4px;
+  width: 80%;
+}
+
+.btn-right {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  left: auto;
+  height: 40px;
+  margin-right: 10px;
+  padding: 0px 0px 0px 4px;
+}
+
+.btn-right-stats {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  left: auto;
+  height: 40px;
+  margin-right: 90px;
+  padding: 0px 0px 0px 4px;
+}
+
+.titulo {
+  margin: 4px 10px 0;
+}
+
+#sidenavStats {
+  top: 140px;
+}
+
+@media (max-width: 900px) {
+  .btn-right {
+    top: 74px;
+  }
+
+  .btn-left {
+    top: 74px;
+  }
+
+  .btn-right-stats {
+    top: 74px;
+  }
+
+  app-share-map {
+    top: 74px;
+  }
+
+  app-download-report {
+    top: 74px;
+  }
+
+  app-barra-resumen-planta {
+    left: 0;
+    transform: none;
+    width: -webkit-fill-available;
+    width: stretch;
+  }
+}
+
+@media (max-width: 1000px) {
+  :host ::ng-deep .mat-drawer-inner-container {
+    overflow: hidden;
+  }
+
+  .stats-sidenav {
+    width: calc(100vw - 20px);
+  }
+}
+
+.btn-close-seguidor-view {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+}

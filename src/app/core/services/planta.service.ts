@@ -1,18 +1,30 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
-import { PlantaInterface } from '@core/models/planta';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
-import { LocationAreaInterface } from '../models/location';
+import { ActivatedRoute } from '@angular/router';
 
-import { UserInterface } from '../models/user';
-import { ModuloInterface } from '../models/modulo';
-import { PcInterface } from '../models/pc';
-import { UserAreaInterface } from '../models/userArea';
-import { AuthService } from './auth.service';
-import { GLOBAL } from './global';
-import { CriteriosClasificacion } from '../models/criteriosClasificacion';
+import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
+
+import { Observable, BehaviorSubject, EMPTY, of } from 'rxjs';
+import { map, switchMap, take } from 'rxjs/operators';
+
+import Polygon from 'ol/geom/Polygon';
+import { Coordinate } from 'ol/coordinate';
+
 import { LatLngLiteral } from '@agm/core/map-types';
+
+import { AuthService } from '@core/services/auth.service';
+import { GLOBAL } from '@core/services/global';
+import { OlMapService } from '@core/services/ol-map.service';
+
+import { ThermalLayerInterface } from '@core/models/thermalLayer';
+import { PlantaInterface } from '@core/models/planta';
+import { CriteriosClasificacion } from '@core/models/criteriosClasificacion';
+import { LocationAreaInterface } from '@core/models/location';
+import { UserInterface } from '@core/models/user';
+import { ModuloInterface } from '@core/models/modulo';
+import { PcInterface } from '@core/models/pc';
+import { UserAreaInterface } from '@core/models/userArea';
+import { CritCriticidad } from '@core/models/critCriticidad';
+
 declare const google: any;
 
 @Injectable({
@@ -21,6 +33,8 @@ declare const google: any;
 export class PlantaService {
   public planta$: Observable<PlantaInterface>;
   public planta: PlantaInterface;
+  private currentPlantId = '';
+  public currentPlantId$ = new BehaviorSubject<string>(this.currentPlantId);
   private plantaDoc: AngularFirestoreDocument<PlantaInterface>;
   public plantasCollection: AngularFirestoreCollection<PlantaInterface>;
   public modulos: ModuloInterface[];
@@ -28,7 +42,15 @@ export class PlantaService {
   public currentFilteredLocAreas$ = this.filteredLocAreasSource.asObservable();
   public locAreaList: LocationAreaInterface[];
 
-  constructor(private afs: AngularFirestore, public auth: AuthService) {
+  constructor(
+    private afs: AngularFirestore,
+    public auth: AuthService,
+    private activatedRoute: ActivatedRoute,
+    private olMapService: OlMapService
+  ) {
+    this.currentPlantId = this.activatedRoute.snapshot.paramMap.get('id');
+    this.currentPlantId$.next(this.currentPlantId);
+
     this.getModulos().subscribe((modulos) => {
       this.modulos = modulos;
     });
@@ -48,6 +70,22 @@ export class PlantaService {
         }
       })
     ));
+  }
+
+  getCurrentPlant(): Observable<PlantaInterface> {
+    this.plantaDoc = this.afs.doc<PlantaInterface>('plantas/' + this.currentPlantId);
+
+    return this.plantaDoc.snapshotChanges().pipe(
+      map((action) => {
+        if (action.payload.exists === false) {
+          return null;
+        } else {
+          const data = action.payload.data() as PlantaInterface;
+          data.id = action.payload.id;
+          return data;
+        }
+      })
+    );
   }
 
   updatePlanta(planta: PlantaInterface): void {
@@ -142,12 +180,22 @@ export class PlantaService {
         actions.map((a) => {
           const data = a.payload.doc.data() as LocationAreaInterface;
           data.id = a.payload.doc.id;
+
+          // generamos las globalCoords en caso de que no tenga
+          if (data.globalCoords === undefined) {
+            data.globalCoords = [data.globalX, data.globalY];
+          }
+
           return data;
         })
       )
     );
 
     return result;
+  }
+
+  getGlobalCoords(locArea: LocationAreaInterface): any[] {
+    return [locArea.globalX, locArea.globalY, null];
   }
 
   getPlantasDeEmpresa(user: UserInterface): Observable<PlantaInterface[]> {
@@ -368,6 +416,22 @@ export class PlantaService {
     return !planta.hasOwnProperty('referenciaSolardrone') || planta.referenciaSolardrone;
   }
 
+  getCriterios(): Observable<CriteriosClasificacion[]> {
+    let query$: AngularFirestoreCollection<CriteriosClasificacion>;
+
+    query$ = this.afs.collection<CriteriosClasificacion>('criteriosClasificacion');
+
+    return query$.snapshotChanges().pipe(
+      map((actions) =>
+        actions.map((a) => {
+          const data = a.payload.doc.data() as CriteriosClasificacion;
+          data.id = a.payload.doc.id;
+          return data;
+        })
+      )
+    );
+  }
+
   getCriterio(criterioId: string): Observable<CriteriosClasificacion> {
     const criterioDoc = this.afs.doc<CriteriosClasificacion>('criteriosClasificacion/' + criterioId);
 
@@ -384,19 +448,19 @@ export class PlantaService {
     );
   }
 
-  getCriterios(): Observable<CriteriosClasificacion[]> {
-    let query$: AngularFirestoreCollection<CriteriosClasificacion>;
+  getCriterioCriticidad(criterioId: string): Observable<CritCriticidad> {
+    const criterioDoc = this.afs.doc<CriteriosClasificacion>('criteriosCriticidad/' + criterioId);
 
-    query$ = this.afs.collection<CriteriosClasificacion>('criteriosClasificacion');
-
-    return query$.snapshotChanges().pipe(
-      map((actions) =>
-        actions.map((a) => {
-          const data = a.payload.doc.data() as CriteriosClasificacion;
-          data.id = a.payload.doc.id;
+    return criterioDoc.snapshotChanges().pipe(
+      map((action) => {
+        if (action.payload.exists === false) {
+          return null;
+        } else {
+          const data = action.payload.data() as CritCriticidad;
+          data.id = action.payload.id;
           return data;
-        })
-      )
+        }
+      })
     );
   }
 
@@ -423,6 +487,67 @@ export class PlantaService {
       return GLOBAL.nombreGlobalYFija;
     }
     return '';
+  }
+
+  setLocAreaListFromPlantaId(plantaId: string): void {
+    const locAreaList = [];
+    this.getLocationsArea(plantaId)
+      .pipe(take(1))
+      .subscribe((locAreaArray) => {
+        locAreaArray.forEach((locationArea) => {
+          const polygon = new google.maps.Polygon({
+            paths: locationArea.path,
+            strokeColor: '#FF0000',
+            visible: false,
+            strokeOpacity: 0,
+            strokeWeight: 0,
+            fillColor: 'grey',
+            fillOpacity: 0,
+            editable: false,
+            draggable: false,
+            id: locationArea.id,
+            globalX: locationArea.globalX,
+            globalY: locationArea.globalY,
+            globalCoords: locationArea.globalCoords,
+            modulo: locationArea.modulo,
+          });
+          locAreaList.push(polygon);
+          if (locAreaList.length === locAreaArray.length) {
+            this.setLocAreaList(locAreaList);
+          }
+        });
+      });
+  }
+
+  setLocAreaListFromPlantaIdOl(plantaId: string): void {
+    const locAreaList = [];
+    this.getLocationsArea(plantaId)
+      .pipe(take(1))
+      .subscribe((locAreaArray) => {
+        locAreaArray.forEach((locationArea) => {
+          // const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat(locationArea.path));
+          const polygon = {
+            paths: locationArea.path,
+            strokeColor: '#FF0000',
+            visible: false,
+            strokeOpacity: 0,
+            strokeWeight: 0,
+            fillColor: 'grey',
+            fillOpacity: 0,
+            editable: false,
+            draggable: false,
+            id: locationArea.id,
+            globalX: locationArea.globalX,
+            globalY: locationArea.globalY,
+            globalCoords: locationArea.globalCoords,
+            modulo: locationArea.modulo,
+          };
+          locAreaList.push(polygon);
+          if (locAreaList.length === locAreaArray.length) {
+            this.setLocAreaList(locAreaList);
+          }
+        });
+      });
   }
 
   getNombreGlobalZ(planta: PlantaInterface): string {
@@ -486,6 +611,34 @@ export class PlantaService {
     return [globalCoords, modulo];
   }
 
+  getGlobalCoordsFromLocationAreaOl(coords: Coordinate) {
+    const globalCoords = [null, null, null];
+
+    if (this.locAreaList !== undefined) {
+      this.locAreaList.forEach((locArea) => {
+        const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat((locArea as any).paths));
+
+        if (polygon.intersectsCoordinate(coords)) {
+          if (locArea.globalX.length > 0) {
+            globalCoords[0] = locArea.globalX;
+          }
+          if (locArea.globalY.length > 0) {
+            globalCoords[1] = locArea.globalY;
+          }
+          if (locArea.hasOwnProperty('globalCoords') && locArea.globalCoords !== undefined) {
+            locArea.globalCoords.forEach((item, index) => {
+              if (item !== null && item.length > 0) {
+                globalCoords[index] = item;
+              }
+            });
+          }
+        }
+      });
+    }
+
+    return globalCoords;
+  }
+
   initMap(planta: PlantaInterface, map: any) {
     if (planta.hasOwnProperty('ortofoto')) {
       const ortofoto = planta.ortofoto;
@@ -519,5 +672,21 @@ export class PlantaService {
       map.overlayMapTypes.push(imageMapType);
       map.fitBounds(mapBounds);
     }
+  }
+
+  getThermalLayers$(plantaId: string): Observable<ThermalLayerInterface[]> {
+    const query$ = this.afs
+      .collection<ThermalLayerInterface>('thermalLayers', (ref) => ref.where('plantaId', '==', plantaId))
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((doc) => {
+            let data = doc.payload.doc.data() as ThermalLayerInterface;
+            data.id = doc.payload.doc.id;
+            return data;
+          })
+        )
+      );
+    return query$;
   }
 }

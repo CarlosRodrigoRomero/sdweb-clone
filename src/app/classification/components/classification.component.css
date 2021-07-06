@@ -1,0 +1,45 @@
+.bottom-bar {
+  display: flex;
+  flex-direction: column;
+  background: aliceblue;
+  height: 240px;
+}
+
+.bottom-bar__row-top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bottom-bar__row-top h4 {
+  margin: 0.5rem 1rem 0;
+}
+
+.bottom-bar__row-top span {
+  font-weight: 500;
+  font-size: small;
+  align-self: flex-end;
+  margin-right: 1rem;
+}
+
+.bottom-bar__fila-columna {
+  display: flex;
+}
+
+.bottom-bar__fila-columna .title {
+  margin-right: 0.5rem;
+}
+
+.bottom-bar__fila-columna .value {
+  margin-right: 1rem;
+}
+
+app-thermal-slider {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0%);
+  bottom: 250px;
+}
+
+.end-process {
+  margin: 10px;
+}

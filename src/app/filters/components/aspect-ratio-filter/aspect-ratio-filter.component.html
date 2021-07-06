@@ -1,0 +1,16 @@
+<div>
+  <div class="title">
+    <span>Aspect Ratio</span>
+    <span class="fuerza">Fuerza: {{ value }}</span>
+  </div>
+  <mat-slider
+    class="aspect-ratio-slider"
+    thumbLabel
+    [displayWith]="formatLabel"
+    [value]="value"
+    [max]="max"
+    [min]="min"
+    [step]="step"
+    (change)="onChangeSlider($event)"
+  ></mat-slider>
+</div>
