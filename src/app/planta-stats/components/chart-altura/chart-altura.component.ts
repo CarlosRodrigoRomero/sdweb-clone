@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent } from 'ng-apexcharts';
+import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent, ApexYAxis } from 'ng-apexcharts';
 
 import { GLOBAL } from '@core/services/global';
 import { ReportControlService } from '@core/services/report-control.service';
@@ -16,6 +16,7 @@ export type ChartOptions = {
   chart: ApexChart;
   dataLabels: ApexDataLabels;
   colors: any;
+  yaxis: ApexYAxis;
 };
 @Component({
   selector: 'app-chart-altura',
@@ -39,6 +40,11 @@ export class ChartAlturaComponent implements OnInit {
       enabled: false,
     },
     colors: [GLOBAL.gris],
+    yaxis: {
+      title: {
+        text: 'Fila',
+      },
+    },
   };
 
   constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
@@ -58,7 +64,7 @@ export class ChartAlturaComponent implements OnInit {
           ...this.allAnomalias.filter((anom) => anom.localY !== undefined).map((anom) => anom.localY)
         );
 
-        for (let index = 1; index <= alturaMax; index++) {
+        for (let index = alturaMax; index > 0; index--) {
           const row = {
             name: index.toString(),
             data: [],
