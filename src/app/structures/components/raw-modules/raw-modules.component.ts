@@ -149,7 +149,7 @@ export class RawModulesComponent implements OnInit {
       this.map
         .getLayers()
         .getArray()
-        .filter((layer) => layer.getProperties().id !== undefined && layer.getProperties().id === 'mBLayer')
+        .filter((layer) => layer.getProperties().id !== undefined && layer.getProperties().id === 'rawModLayer')
         .forEach((layer) => layer.setVisible(visible));
     }
   }
