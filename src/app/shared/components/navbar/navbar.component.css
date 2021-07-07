@@ -13,6 +13,10 @@ nav {
   z-index: 999;
 }
 
+.navbar-brand {
+  cursor: pointer;
+}
+
 .navbar-brand-logo {
   display: none;
 }
