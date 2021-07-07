@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { take } from 'rxjs/operators';
 
@@ -28,7 +29,8 @@ export class ClassificationComponent implements OnInit {
     private classificationService: ClassificationService,
     private clustersService: ClustersService,
     private informeService: InformeService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -49,15 +51,41 @@ export class ClassificationComponent implements OnInit {
   }
 
   endClassification() {
+    // actualizamos el informe con los datos que le faltan
+    this.updateInforme();
+
+    // actualizamos las anomalias con los datos que les faltan
+    // this.updateAnomalias();
+
+    // aviso de proceso terminado
+    this.openSnackBar();
+  }
+
+  private updateInforme() {
     this.informe.mae = this.getMaeInforme();
     this.informe.pc_pct = this.getCCInforme();
     this.informe.disponible = true;
 
     // actualizamos el informe en la DB
     this.informeService.updateInforme(this.informe);
+  }
 
-    // aviso de proceso terminado
-    this.openSnackBar();
+  private updateAnomalias() {
+    const url = `https://europe-west1-sdweb-dev.cloudfunctions.net/estructura`;
+
+    this.anomalias.forEach((anom) => {
+      const params = new HttpParams().set('anomaliaId', anom.id);
+
+      return this.http
+        .get(url, { responseType: 'text', params })
+        .toPromise()
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
   }
 
   private getMaeInforme() {
