@@ -16,6 +16,8 @@ export class StatsService {
   allElems = this.reportControlService.allFilterableElements;
   informesIdList: string[] = this.reportControlService.informesIdList;
   dateLabels: string[] = [];
+  private _loadCCyGradChart = true;
+  loadCCyGradChart$ = new BehaviorSubject<boolean>(this._loadCCyGradChart);
 
   constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
 
@@ -36,5 +38,14 @@ export class StatsService {
   set loadStats(value: boolean) {
     this._loadStats = value;
     this.loadStats$.next(value);
+  }
+
+  get loadCCyGradChart() {
+    return this._loadCCyGradChart;
+  }
+
+  set loadCCyGradChart(value: boolean) {
+    this._loadCCyGradChart = value;
+    this.loadCCyGradChart$.next(value);
   }
 }

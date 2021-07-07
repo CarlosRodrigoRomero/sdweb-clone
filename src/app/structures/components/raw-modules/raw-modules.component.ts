@@ -12,6 +12,7 @@ import Polygon from 'ol/geom/Polygon';
 
 import { StructuresService } from '@core/services/structures.service';
 import { OlMapService } from '@core/services/ol-map.service';
+import { FilterService } from '@core/services/filter.service';
 
 import { RawModule } from '@core/models/moduloBruto';
 
@@ -32,7 +33,8 @@ export class RawModulesComponent implements OnInit {
   constructor(
     private structuresService: StructuresService,
     private olMapService: OlMapService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
@@ -59,18 +61,14 @@ export class RawModulesComponent implements OnInit {
     });
   }
 
-  restoreDeletedModules() {
-    this.structuresService.deleteFilter('eliminados');
-  }
-
   drawRawModule() {
     this.drawActive = true;
 
     const sourceRawModule = new VectorSource();
     const style = new Style({
       stroke: new Stroke({
-        color: 'rgba(0,0,0,0)',
-        width: 1,
+        color: 'white',
+        width: 2,
       }),
     });
 
@@ -102,6 +100,7 @@ export class RawModulesComponent implements OnInit {
         confianza: this.structuresService.confianzaAverage,
       };
 
+      // añadimos el nuevo modulo a la DB
       this.structuresService.addRawModule(rawModule);
 
       // terminamos el modo draw
@@ -131,6 +130,18 @@ export class RawModulesComponent implements OnInit {
         this.structuresService.deleteFilter('eliminados');
       }
     }
+
+    this.filterService.applyFilters();
+  }
+
+  restoreDeletedModules() {
+    // eliminamos el array aliminados de la DB
+    this.structuresService.deleteFilter('eliminados');
+
+    // vaciamos el array local con los eliminados
+    this.structuresService.deletedRawModIds = [];
+
+    this.filterService.applyFilters();
   }
 
   private setRawModulesVisibility(visible: boolean) {
@@ -138,7 +149,7 @@ export class RawModulesComponent implements OnInit {
       this.map
         .getLayers()
         .getArray()
-        .filter((layer) => layer.getProperties().id !== undefined && layer.getProperties().id === 'mBLayer')
+        .filter((layer) => layer.getProperties().id !== undefined && layer.getProperties().id === 'rawModLayer')
         .forEach((layer) => layer.setVisible(visible));
     }
   }

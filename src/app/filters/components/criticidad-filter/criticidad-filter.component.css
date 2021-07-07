@@ -8,7 +8,7 @@ h5 {
 }
 
 :host ::ng-deep .criticidad-group .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
-  line-height: unset;
+  line-height: 36px;
   padding: 0 10px;
 }
 
@@ -20,4 +20,9 @@ h5 {
   flex-wrap: wrap; */
   left: 50%;
   transform: translate(-50%, 0%);
+}
+
+.text-label {
+  font-size: 14px;
+  font-weight: 400;
 }

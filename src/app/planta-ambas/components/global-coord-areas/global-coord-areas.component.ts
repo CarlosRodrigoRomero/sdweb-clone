@@ -87,6 +87,9 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
               this.nombreGlobalCoords = planta.nombreGlobalCoords;
             }
 
+            // guardamos los nombre en el servicio
+            this.reportControlService.nombreGlobalCoords = this.nombreGlobalCoords;
+
             this.nombreGlobalCoords.forEach((nombre) => {
               this.task.subtasks.push({ name: nombre, completed: false });
             });

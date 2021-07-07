@@ -8,7 +8,6 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { AuthService } from '@core/services/auth.service';
-import { PlantaService } from '@core/services/planta.service';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
@@ -37,7 +36,6 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
   constructor(
     public auth: AuthService,
-    private plantaService: PlantaService,
     private portfolioControlService: PortfolioControlService,
     private router: Router,
     private _snackBar: MatSnackBar
@@ -49,37 +47,20 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
     const plantsData = [];
 
-    this.plantas.forEach((planta, index) => {
-      if (planta.informes !== undefined && planta.informes.length > 0) {
-        // seleccionamos el dato de mae mas reciente
-        const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+    this.plantas.forEach((planta) => {
+      const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
+      const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
 
-        if (mae !== undefined) {
-          plantsData.push({
-            nombre: planta.nombre,
-            potencia: planta.potencia,
-            mae,
-            ultimaInspeccion: planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current))
-              .fecha,
-            plantaId: planta.id,
-            tipo: planta.tipo,
-          });
-        }
-      } else if (this.informes.map((inf) => inf.plantaId).includes(planta.id)) {
-        const informe = this.informes.find((inf) => inf.plantaId === planta.id);
-
-        if (informe.mae !== undefined) {
-          plantsData.push({
-            nombre: planta.nombre,
-            potencia: planta.potencia,
-            mae: informe.mae,
-            ultimaInspeccion: informe.fecha,
-            plantaId: planta.id,
-            tipo: planta.tipo,
-          });
-        }
-      }
+      plantsData.push({
+        nombre: planta.nombre,
+        potencia: planta.potencia,
+        mae: informeReciente.mae,
+        ultimaInspeccion: informeReciente.fecha,
+        plantaId: planta.id,
+        tipo: planta.tipo,
+      });
     });
+
     this.dataSource.data = plantsData;
   }
 

@@ -59,6 +59,7 @@ export class ThermalLayerCreateComponent implements OnInit, OnDestroy {
         gisName: this.informeId + '_thermal',
         rangeTempMin: this.form.get('rangeTempMin').value,
         rangeTempMax: this.form.get('rangeTempMax').value,
+        codificationType: 'rainbowHc',
       };
 
       // Crea thermalLayer en la DB

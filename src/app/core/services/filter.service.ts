@@ -83,7 +83,7 @@ export class FilterService {
     this.applyFilters();
   }
 
-  private applyFilters() {
+  applyFilters() {
     const everyFilterFiltrableElements: Array<FilterableElement[]> = new Array<FilterableElement[]>();
 
     // comprobamos si hay filtros de tipo 'multiple'
@@ -206,6 +206,12 @@ export class FilterService {
     }
 
     this.filteredElementsWithoutFilterTipo$.next(this.filteredElementsWithoutFilterTipo);
+  }
+
+  addElement(element: FilterableElement) {
+    this.allFiltrableElements.push(element);
+
+    this.applyFilters();
   }
 
   get allFiltrableElements() {

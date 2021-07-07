@@ -53,6 +53,7 @@ export class MapClassificationComponent implements OnInit {
   private normModLayer: VectorLayer = undefined;
   private prevFeatureHover: Feature;
   thermalLayerVisibility = true;
+  private palette = GLOBAL.ironPalette;
 
   constructor(
     private classificationService: ClassificationService,
@@ -121,6 +122,7 @@ export class MapClassificationComponent implements OnInit {
         tileLoadFunction: (imageTile, src) => {
           imageTile.rangeTempMax = thermalLayer.rangeTempMax;
           imageTile.rangeTempMin = thermalLayer.rangeTempMin;
+          imageTile.palette = this.palette;
           imageTile.thermalService = this.thermalService;
           imageTile.getImage().src = src;
           imageTile.thermalLayer = thermalLayer;
@@ -132,6 +134,7 @@ export class MapClassificationComponent implements OnInit {
     tl.setProperties({
       informeId,
       name: 'thermalLayer',
+      layerDB: thermalLayer,
     });
 
     return tl;
@@ -409,5 +412,30 @@ export class MapClassificationComponent implements OnInit {
 
   updateAnomalias() {
     this.classificationService.updateAnomalias();
+  }
+
+  setThermalPalette() {
+    if (this.palette === GLOBAL.ironPalette) {
+      this.palette = GLOBAL.rainbow_hc_palette;
+    } else {
+      this.palette = GLOBAL.ironPalette;
+    }
+
+    this.map
+      .getLayers()
+      .getArray()
+      .filter((layer) => layer.getProperties().name !== undefined && layer.getProperties().name === 'thermalLayer')
+      .forEach((layer) => {
+        const thermalLayerDB: ThermalLayerInterface = layer.getProperties().layerDB;
+
+        ((layer as TileLayer).getSource() as XYZ_mod).setTileLoadFunction((imageTile, src) => {
+          imageTile.rangeTempMax = thermalLayerDB.rangeTempMax;
+          imageTile.rangeTempMin = thermalLayerDB.rangeTempMin;
+          imageTile.palette = this.palette;
+          imageTile.thermalService = this.thermalService;
+          imageTile.getImage().src = src;
+          imageTile.thermalLayer = thermalLayerDB;
+        });
+      });
   }
 }

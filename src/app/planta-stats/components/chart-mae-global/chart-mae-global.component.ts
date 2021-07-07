@@ -18,6 +18,7 @@ import {
   ApexLegend,
   ApexAnnotations,
   ApexTooltip,
+  ChartType,
 } from 'ng-apexcharts';
 
 import { ReportControlService } from '@core/services/report-control.service';
@@ -82,6 +83,12 @@ export class ChartMaeGlobalComponent implements OnInit {
       });
 
       this.informeService.getDateLabelsInformes(informes.map((inf) => inf.id)).subscribe((dateLabels) => {
+        // si solo hay un informe cambiamos a grafico tipo barra
+        let typeChart: ChartType = 'area';
+        if (maeData.length === 1) {
+          typeChart = 'bar';
+        }
+
         this.chartOptionsMAE = {
           series: [
             {
@@ -91,7 +98,7 @@ export class ChartMaeGlobalComponent implements OnInit {
           ],
           chart: {
             width: '100%',
-            type: 'line',
+            type: typeChart,
             dropShadow: {
               enabled: true,
               color: '#000',

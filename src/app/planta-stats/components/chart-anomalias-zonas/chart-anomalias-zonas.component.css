@@ -1,0 +1,10 @@
+mat-card {
+  padding: 8px;
+  height: fit-content;
+}
+
+@media (max-width: 800px) {
+  .mae-zonas {
+    width: calc(100% - 20px);
+  }
+}

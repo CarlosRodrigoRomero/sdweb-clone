@@ -46,7 +46,6 @@ export class ChartCelsTempsComponent implements OnInit {
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
   dataLoaded = false;
-  plantaId: any;
   informesIdList: string[];
   allAnomalias: Anomalia[];
   dateLabels: string[];

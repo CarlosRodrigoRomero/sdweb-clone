@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { combineLatest } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
@@ -18,12 +18,20 @@ import {
   ApexXAxis,
   ApexTooltip,
   ApexStroke,
+  ApexChart,
+  ApexGrid,
+  ChartType,
+  ApexLegend,
+  ChartComponent,
 } from 'ng-apexcharts';
+
+import { StatsService } from '@core/services/stats.service';
+
 import { InformeInterface } from '@core/models/informe';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
-  chart: any; //ApexChart;
+  chart: ApexChart;
   dataLabels: ApexDataLabels;
   markers: ApexMarkers;
   title: ApexTitleSubtitle;
@@ -32,10 +40,11 @@ export type ChartOptions = {
   xaxis: ApexXAxis;
   tooltip: ApexTooltip;
   stroke: ApexStroke;
-  grid: any; //ApexGrid;
+  grid: ApexGrid;
   colors: any;
   toolbar: any;
   annotations: any;
+  legend: ApexLegend;
 };
 
 @Component({
@@ -44,11 +53,13 @@ export type ChartOptions = {
   styleUrls: ['./chart-pct-cels.component.css'],
 })
 export class ChartPctCelsComponent implements OnInit {
+  @ViewChild('chart1') chart1: ChartComponent;
   private informesIdList: string[];
   private informes: InformeInterface[];
   private allAnomalias: Anomalia[];
   private chartHeight = 150;
   dataLoaded = false;
+  private dateLabels: string[];
 
   public chart1options: Partial<ChartOptions>;
   public chart2options: Partial<ChartOptions>;
@@ -66,15 +77,19 @@ export class ChartPctCelsComponent implements OnInit {
       },
     },
     grid: {
-      clipMarkers: false,
+      // clipMarkers: false,
     },
     xaxis: {
       // type: 'category',
-      categories: [],
+      categories: ['hola'],
     },
   };
 
-  constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
+  constructor(
+    private reportControlService: ReportControlService,
+    private informeService: InformeService,
+    private statsService: StatsService
+  ) {}
 
   ngOnInit(): void {
     combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informes$])
@@ -88,7 +103,9 @@ export class ChartPctCelsComponent implements OnInit {
         })
       )
       .subscribe((dateLabels) => {
-        this.commonOptions.xaxis.categories = dateLabels;
+        this.dateLabels = dateLabels;
+
+        // this.commonOptions.xaxis.categories = dateLabels;
 
         const data1: number[] = [];
         const data2: number[] = [];
@@ -102,27 +119,25 @@ export class ChartPctCelsComponent implements OnInit {
           data2.push(gradienteTotal / anomsInforme.length);
         });
 
-        this._initChartData(data1, data2);
+        // si solo hay un informe no mostramos el gráfico
+        if (data1.length <= 1) {
+          this.statsService.loadCCyGradChart = false;
+        } else {
+          this._initChartData(data1, data2);
+        }
       });
   }
 
   private _initChartData(data1: number[], data2: number[]): void {
-    // si solo hay un informe cambiamos a grafico tipo lineas
-    let typeChart = 'area';
-    /* if (data1.length === 1) {
-      console.log(data1.length);
-      typeChart = 'line';
-    } */
-
     this.chart1options = {
       series: [
         {
-          name: '% celulas calientes',
+          name: '% CC',
           data: data1,
         },
       ],
       chart: {
-        type: typeChart,
+        type: 'area',
         width: '100%',
         height: this.chartHeight,
         toolbar: {
@@ -142,21 +157,35 @@ export class ChartPctCelsComponent implements OnInit {
         },
       },
       colors: ['#008FFB'],
+      dataLabels: {
+        enabled: true,
+        formatter: (value) => Math.round(value * 100) / 100 + '%',
+      },
+      grid: {},
+      markers: {
+        size: 1,
+      },
+      xaxis: {
+        categories: this.dateLabels,
+      },
       yaxis: {
         min: 0,
-        max: 5,
+        max: Math.max(...data1) + 0.5,
         tickAmount: 2,
         labels: {
           minWidth: 40,
           formatter: (value) => {
-            return value + '%';
+            return Math.round(value * 10) / 10 + '%';
           },
         },
+      },
+      stroke: {
+        curve: 'straight',
       },
       annotations: {
         yaxis: [
           {
-            y: 1.8, // DEMO - HAY QUE TRAER EL MAE MEDIO DEL PORTFOLIO
+            y: 0.5, // DEMO - HAY QUE TRAER EL MAE MEDIO DEL PORTFOLIO
             borderColor: '#5b5b5c',
             borderWidth: 2,
             strokeDashArray: 10,
@@ -169,7 +198,7 @@ export class ChartPctCelsComponent implements OnInit {
                 color: '#fff',
                 background: '#5b5b5c',
               },
-              text: '% Céls. medio portfolio',
+              text: '% CC medio portfolio',
             },
           },
         ],
@@ -184,7 +213,7 @@ export class ChartPctCelsComponent implements OnInit {
         },
       ],
       chart: {
-        type: typeChart,
+        type: 'area',
         width: '100%',
         height: this.chartHeight,
         toolbar: {

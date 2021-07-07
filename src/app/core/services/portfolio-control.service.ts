@@ -43,17 +43,32 @@ export class PortfolioControlService {
         )
       )
       .subscribe(([plantas, informes]) => {
-        // evitamos que cargue solo una planta al vovler atrás desde el informe
         if (plantas !== undefined) {
           plantas.forEach((planta) => {
             // obtenemos la plantas que tiene informes dentro de su interface
             if (planta.informes !== undefined && planta.informes.length > 0) {
-              const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+              // comprobamos tb los posibles informes adiccionales fuera del doc planta
+              const informesAdiccionales: InformeInterface[] = informes
+                .filter((informe) => informe.plantaId === planta.id)
+                .filter((informe) => !planta.informes.includes(informe));
+
+              const informesPlanta = [...informesAdiccionales, ...planta.informes];
+
+              // seleccionamos el dato de mae mas reciente
+              const mae = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+
               // comprobamos que el informe tiene "mae"
               if (mae !== undefined) {
                 // añadimos la planta y su mae a las listas
                 this.listaPlantas.push(planta);
                 this.maePlantas.push(mae);
+
+                // añadimos los informes a la lista
+                informesPlanta.forEach((informe) => {
+                  if (informe.mae !== undefined) {
+                    this.listaInformes.push(informe);
+                  }
+                });
 
                 // incrementamos conteo de plantas y suma de potencia
                 this.numPlantas++;

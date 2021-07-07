@@ -1,16 +1,24 @@
-<apx-chart
-  *ngIf="chartLoaded && thereAreZones"
-  id="chart-anomalias-zonas"
-  [series]="chartOptions.series"
-  [chart]="chartOptions.chart"
-  [dataLabels]="chartOptions.dataLabels"
-  [plotOptions]="chartOptions.plotOptions"
-  [yaxis]="chartOptions.yaxis"
-  [legend]="chartOptions.legend"
-  [fill]="chartOptions.fill"
-  [stroke]="chartOptions.stroke"
-  [tooltip]="chartOptions.tooltip"
-  [xaxis]="chartOptions.xaxis"
-  [title]="chartOptions.title"
-  [colors]="chartOptions.colors"
-></apx-chart>
+<mat-card *ngIf="thereAreZones">
+  <mat-card-header>
+    <mat-card-title>Céls. calientes por zonas</mat-card-title>
+    <mat-card-subtitle>Para visualizar dónde se generan las céls. calientes</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <apx-chart
+      *ngIf="chartLoaded && thereAreZones"
+      id="chart-anomalias-zonas"
+      [series]="chartOptions.series"
+      [chart]="chartOptions.chart"
+      [dataLabels]="chartOptions.dataLabels"
+      [plotOptions]="chartOptions.plotOptions"
+      [yaxis]="chartOptions.yaxis"
+      [legend]="chartOptions.legend"
+      [fill]="chartOptions.fill"
+      [stroke]="chartOptions.stroke"
+      [tooltip]="chartOptions.tooltip"
+      [xaxis]="chartOptions.xaxis"
+      [title]="chartOptions.title"
+      [colors]="chartOptions.colors"
+    ></apx-chart>
+  </mat-card-content>
+</mat-card>

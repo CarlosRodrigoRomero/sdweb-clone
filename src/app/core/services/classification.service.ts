@@ -158,6 +158,10 @@ export class ClassificationService {
         }
       });
     }
+    if (modulo === undefined) {
+      modulo = null;
+    }
+
     return modulo;
   }
 

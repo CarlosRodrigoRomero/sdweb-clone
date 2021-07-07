@@ -4,6 +4,7 @@
     <div class="left-bar">
       <h4>{{ nombrePlanta }}</h4>
       <mat-vertical-stepper [linear]="true" #stepper>
+        <!-- FASE 1 -->
         <mat-step>
           <ng-template matStepLabel>Filtrar módulos</ng-template>
           <app-raw-modules></app-raw-modules>
@@ -17,6 +18,8 @@
             </button>
           </div>
         </mat-step>
+
+        <!-- FASE 2 -->
         <mat-step>
           <ng-template matStepLabel>Crear agrupaciones auto</ng-template>
           <app-auto-module-groups></app-auto-module-groups>
@@ -27,6 +30,8 @@
             <button mat-stroked-button matStepperNext>Siguiente</button>
           </div>
         </mat-step>
+
+        <!-- FASE 3 -->
         <mat-step>
           <ng-template matStepLabel>Editar agrupaciones</ng-template>
           <div>
@@ -45,6 +50,8 @@
             </button>
           </div>
         </mat-step>
+
+        <!-- FASE 4 -->
         <mat-step>
           <ng-template matStepLabel>Normalizar módulos auto</ng-template>
           <div>
@@ -68,6 +75,8 @@
             </button>
           </div>
         </mat-step>
+
+        <!-- FASE 5 -->
         <mat-step>
           <ng-template matStepLabel>Editar módulos normalizados</ng-template>
           <div>
