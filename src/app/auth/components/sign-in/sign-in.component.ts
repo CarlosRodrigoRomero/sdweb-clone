@@ -38,10 +38,12 @@ export class SignInComponent implements OnInit {
       this.authService
         .signIn(value.email, value.password)
         .then(() => {
-          if (this.user.role === 0 || this.user.role === 1 || this.user.role === 2) {
-            this.router.navigate(['clients']);
-          } else {
-            this.router.navigate(['clientes']);
+          if (this.user !== undefined && this.user !== null) {
+            if (this.user.role === 0 || this.user.role === 1 || this.user.role === 2) {
+              this.router.navigate(['clients']);
+            } else {
+              this.router.navigate(['clientes']);
+            }
           }
         })
         .catch((error) => {
