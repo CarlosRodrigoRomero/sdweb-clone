@@ -108,10 +108,11 @@ export class BarChartComponent implements OnInit {
         type: 'bar',
         height: '100%',
         events: {
-          click: (event, chartContext, config) => {
+          // desactivado temporalmente
+          /* click: (event, chartContext, config) => {
             const index = config.dataPointIndex;
             this.onClick(index);
-          },
+          }, */
         },
       },
       plotOptions: {

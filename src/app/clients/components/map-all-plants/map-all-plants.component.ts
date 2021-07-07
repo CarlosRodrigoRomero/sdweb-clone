@@ -96,7 +96,8 @@ export class MapAllPlantsComponent implements OnInit {
 
     this.addPointerOnHover();
     this.addOnHoverAction();
-    this.addOnClickAction();
+    // desactivado temporalmente
+    // this.addOnClickAction();
   }
 
   private addPointerOnHover() {

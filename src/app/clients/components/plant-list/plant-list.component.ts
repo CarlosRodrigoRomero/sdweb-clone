@@ -87,10 +87,11 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     const tipoPlanta = row.tipo;
     const fecha = row.ultimaInspeccion;
 
-    // provisional - no abre plantas con informes anteriores al 1/05/2021
+    // provisional - no abre ningun informe de seguidores, o informes de fijas anteriores al 1/05/2021
     if (fecha > 1619820000) {
       if (tipoPlanta === 'seguidores') {
-        this.router.navigate(['clients/tracker/' + plantaId]);
+        this.openSnackBar();
+        // this.router.navigate(['clients/tracker/' + plantaId]);
       } else {
         this.router.navigate(['clients/fixed/' + plantaId]);
       }
