@@ -55,6 +55,9 @@ export class SeguidorService {
     return combineLatest([locAreaList$, anomaliaList$]).pipe(
       take(1),
       map(([locAreaList, anomaliaList]) => {
+        console.log(anomaliaList);
+        console.log(locAreaList);
+
         const seguidores: Seguidor[] = [];
 
         // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
@@ -91,7 +94,8 @@ export class SeguidorService {
         let count = 0;
         locAreaSeguidores.forEach((locArea) => {
           const anomaliasSeguidor = anomaliaList.filter(
-            (anomalia) => anomalia.globalCoords[indiceSeleccionado] === locArea.globalCoords[indiceSeleccionado]
+            // tslint:disable-next-line: triple-equals
+            (anomalia) => anomalia.globalCoords[indiceSeleccionado] == locArea.globalCoords[indiceSeleccionado]
           );
           const seguidor = new Seguidor(
             anomaliasSeguidor,

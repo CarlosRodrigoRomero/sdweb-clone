@@ -88,16 +88,16 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     const fecha = row.ultimaInspeccion;
 
     // provisional - no abre ningun informe de seguidores, o informes de fijas anteriores al 1/05/2021
-    if (fecha > 1619820000) {
-      if (tipoPlanta === 'seguidores') {
-        this.openSnackBar();
-        // this.router.navigate(['clients/tracker/' + plantaId]);
-      } else {
-        this.router.navigate(['clients/fixed/' + plantaId]);
-      }
+    // if (fecha > 1619820000) {
+    if (tipoPlanta === 'seguidores') {
+      // this.openSnackBar();
+      this.router.navigate(['clients/tracker/' + plantaId]);
     } else {
-      this.openSnackBar();
+      this.router.navigate(['clients/fixed/' + plantaId]);
     }
+    // } else {
+    //   this.openSnackBar();
+    // }
   }
 
   private openSnackBar() {
