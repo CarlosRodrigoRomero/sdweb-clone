@@ -100,7 +100,9 @@ export class SeguidorService {
         let count = 0;
         locAreaSeguidores.forEach((locArea) => {
           const anomaliasSeguidor = anomaliaList.filter(
-            (anomalia) => anomalia.globalCoords.toString() === locArea.globalCoords.toString()
+            (anomalia) =>
+              anomalia.globalCoords.slice(0, this.numGlobalCoords + 1).toString() ===
+              locArea.globalCoords.slice(0, this.numGlobalCoords + 1).toString()
           );
           const seguidor = new Seguidor(
             anomaliasSeguidor,
