@@ -21,7 +21,7 @@ export class AutoModuleGroupsComponent implements OnInit {
   }
 
   autoModuleGroups() {
-    const url = `https://europe-west1-sdweb-dev.cloudfunctions.net/agrupaciones`;
+    const url = `https://europe-west1-sdweb-d33ce.cloudfunctions.net/agrupaciones`;
 
     const dilation = this.formControl.value;
 
