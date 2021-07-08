@@ -53,7 +53,7 @@ export class ClustersControlComponent implements OnInit {
   }
 
   autoCluster() {
-    const url = `https://europe-west1-sdweb-dev.cloudfunctions.net/pruebas-2`;
+    const url = `https://europe-west1-sdweb-d33ce.cloudfunctions.net/clusters`;
 
     const umbValue = this.formControlLoc.value / 1000000;
     const velValue = this.formControlVel.value;

@@ -811,4 +811,19 @@ export class AutoLocComponent implements OnInit {
       console.log('point2' + newPointB);
     });
   }
+
+  calculateGlobalCoords() {
+    this.plantaService.setLocAreaListFromPlantaId(this.plantaId);
+
+    this.locationAreaList.forEach((locArea, index) => {
+      if (index < 10) {
+        console.log(locArea.globalCoords);
+        const coords = locArea.path[0];
+        let globalCoords;
+        let modulo;
+        [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(coords);
+        console.log(globalCoords);
+      }
+    });
+  }
 }

@@ -5,6 +5,8 @@ import { map, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
+import PointInPolygon from 'point-in-polygon';
+
 import { InformeService } from './informe.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { PlantaService } from '@core/services/planta.service';
@@ -12,6 +14,7 @@ import { GLOBAL } from '@core/services/global';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
+import { LocationAreaInterface } from '@core/models/location';
 
 @Injectable({
   providedIn: 'root',
@@ -53,11 +56,7 @@ export class SeguidorService {
 
     // obtenemos todas las anomalias y las locAreas
     return combineLatest([locAreaList$, anomaliaList$]).pipe(
-      take(1),
       map(([locAreaList, anomaliaList]) => {
-        console.log(anomaliaList);
-        console.log(locAreaList);
-
         const seguidores: Seguidor[] = [];
 
         // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
@@ -90,12 +89,18 @@ export class SeguidorService {
             locArea.globalCoords[indiceSeleccionado] !== ''
         );
 
+        const locAreaNoSeguidores = locAreaList.filter((locArea) => !locAreaSeguidores.includes(locArea));
+
+        // obtenemos las globalCoords completas de cada seguidor
+        locAreaSeguidores.forEach((locArea) => {
+          locArea.globalCoords = this.getCompleteGlobalCoords(locAreaNoSeguidores, locArea);
+        });
+
         // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
         let count = 0;
         locAreaSeguidores.forEach((locArea) => {
           const anomaliasSeguidor = anomaliaList.filter(
-            // tslint:disable-next-line: triple-equals
-            (anomalia) => anomalia.globalCoords[indiceSeleccionado] == locArea.globalCoords[indiceSeleccionado]
+            (anomalia) => anomalia.globalCoords.toString() === locArea.globalCoords.toString()
           );
           const seguidor = new Seguidor(
             anomaliasSeguidor,
@@ -131,5 +136,30 @@ export class SeguidorService {
     });
 
     return nombre;
+  }
+
+  private getCompleteGlobalCoords(
+    locAreasNoSeguidores: LocationAreaInterface[],
+    locAreaSeguidor: LocationAreaInterface
+  ): string[] {
+    const globalCoords: string[] = locAreaSeguidor.globalCoords;
+
+    locAreasNoSeguidores.forEach((locArea, index) => {
+      // convertimos el punto y el poligono en array
+      const point = [locAreaSeguidor.path[0].lat, locAreaSeguidor.path[0].lng];
+      const polygon = locArea.path.map((coord) => [coord.lat, coord.lng]);
+
+      if (PointInPolygon(point, polygon)) {
+        locArea.globalCoords.forEach((gC, i) => {
+          if (gC !== null) {
+            if (globalCoords[i] !== null || globalCoords[i] !== undefined || globalCoords[i] !== '') {
+              globalCoords[i] = gC;
+            }
+          }
+        });
+      }
+    });
+
+    return globalCoords;
   }
 }
