@@ -43,9 +43,9 @@ export class SeguidorService {
         });
         return combineLatest(anomaliaObsList);
       }),
-      map((arr) => arr.flat()),
+      map((arr) => arr.flat())
       // eliminamos los seguidores vacios por haber llamado a 'pcs' y 'anomalias'
-      map((segs) => (segs = segs.filter((seg) => seg.temperaturaMax !== 0 || seg.gradienteNormalizado !== 0)))
+      // map((segs) => (segs = segs.filter((seg) => seg.temperaturaMax !== 0 || seg.gradienteNormalizado !== 0)))
     );
   }
 
@@ -59,66 +59,68 @@ export class SeguidorService {
       map(([locAreaList, anomaliaList]) => {
         const seguidores: Seguidor[] = [];
 
-        // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
-        const coordsLength = locAreaList[0].globalCoords.length;
+        if (anomaliaList.length > 0) {
+          // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
+          const coordsLength = locAreaList[0].globalCoords.length;
 
-        let indiceSeleccionado;
+          let indiceSeleccionado;
 
-        for (let index = coordsLength - 1; index >= 0; index--) {
-          const notNullLocAreas = locAreaList.filter(
-            (locArea) =>
-              locArea.globalCoords[index] !== undefined &&
-              locArea.globalCoords[index] !== null &&
-              locArea.globalCoords[index] !== ''
-          );
+          for (let index = coordsLength - 1; index >= 0; index--) {
+            const notNullLocAreas = locAreaList.filter(
+              (locArea) =>
+                locArea.globalCoords[index] !== undefined &&
+                locArea.globalCoords[index] !== null &&
+                locArea.globalCoords[index] !== ''
+            );
 
-          if (notNullLocAreas.length > 0) {
-            indiceSeleccionado = index;
+            if (notNullLocAreas.length > 0) {
+              indiceSeleccionado = index;
 
-            this.numGlobalCoords = indiceSeleccionado;
+              this.numGlobalCoords = indiceSeleccionado;
 
-            break;
+              break;
+            }
           }
+
+          // filtramos las areas seleccionadas para los seguidores
+          const locAreaSeguidores = locAreaList.filter(
+            (locArea) =>
+              locArea.globalCoords[indiceSeleccionado] !== null &&
+              locArea.globalCoords[indiceSeleccionado] !== undefined &&
+              locArea.globalCoords[indiceSeleccionado] !== ''
+          );
+
+          const locAreaNoSeguidores = locAreaList.filter((locArea) => !locAreaSeguidores.includes(locArea));
+
+          // obtenemos las globalCoords completas de cada seguidor
+          locAreaSeguidores.forEach((locArea) => {
+            locArea.globalCoords = this.getCompleteGlobalCoords(locAreaNoSeguidores, locArea);
+          });
+
+          // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
+          let count = 0;
+          locAreaSeguidores.forEach((locArea) => {
+            const anomaliasSeguidor = anomaliaList.filter(
+              (anomalia) =>
+                anomalia.globalCoords.slice(0, this.numGlobalCoords + 1).toString() ===
+                locArea.globalCoords.slice(0, this.numGlobalCoords + 1).toString()
+            );
+            const seguidor = new Seguidor(
+              anomaliasSeguidor,
+              this.planta.filas,
+              this.planta.columnas,
+              locArea.path,
+              plantaId,
+              informeId,
+              locArea.modulo,
+              locArea.globalCoords,
+              'seguidor_' + count++ + '_' + informeId
+            );
+            seguidor.nombre = this.getSeguidorName(seguidor);
+
+            seguidores.push(seguidor);
+          });
         }
-
-        // filtramos las areas seleccionadas para los seguidores
-        const locAreaSeguidores = locAreaList.filter(
-          (locArea) =>
-            locArea.globalCoords[indiceSeleccionado] !== null &&
-            locArea.globalCoords[indiceSeleccionado] !== undefined &&
-            locArea.globalCoords[indiceSeleccionado] !== ''
-        );
-
-        const locAreaNoSeguidores = locAreaList.filter((locArea) => !locAreaSeguidores.includes(locArea));
-
-        // obtenemos las globalCoords completas de cada seguidor
-        locAreaSeguidores.forEach((locArea) => {
-          locArea.globalCoords = this.getCompleteGlobalCoords(locAreaNoSeguidores, locArea);
-        });
-
-        // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
-        let count = 0;
-        locAreaSeguidores.forEach((locArea) => {
-          const anomaliasSeguidor = anomaliaList.filter(
-            (anomalia) =>
-              anomalia.globalCoords.slice(0, this.numGlobalCoords + 1).toString() ===
-              locArea.globalCoords.slice(0, this.numGlobalCoords + 1).toString()
-          );
-          const seguidor = new Seguidor(
-            anomaliasSeguidor,
-            this.planta.filas,
-            this.planta.columnas,
-            locArea.path,
-            plantaId,
-            informeId,
-            locArea.modulo,
-            locArea.globalCoords,
-            'seguidor_' + count++ + '_' + informeId
-          );
-          seguidor.nombre = this.getSeguidorName(seguidor);
-
-          seguidores.push(seguidor);
-        });
 
         return seguidores;
       })
