@@ -93,7 +93,7 @@ export class ClustersService {
           puntos.forEach((punto: any) => this.coordsPuntosTrayectoria.push(fromLonLat([punto.long, punto.lat])));
         }
 
-        // TODO: evitar que cuando no haya clusters no cargue
+        // evita que cuando no haya clusters no cargue
         if (clusters === undefined) {
           if (puntos.length > 0) {
             this.initialized$.next(true);
