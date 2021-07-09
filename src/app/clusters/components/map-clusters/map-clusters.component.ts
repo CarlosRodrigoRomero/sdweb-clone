@@ -418,44 +418,39 @@ export class MapClustersComponent implements OnInit {
     this.map.addInteraction(select);
     select.on('select', (e) => {
       if (e.selected.length > 0) {
-        if (this.createClusterActive) {
-          if (this.puntoTrayectoriaSelected !== undefined) {
-            const puntoId = e.selected[0].getProperties().properties.id;
-            const puntoSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
+        // comprobamos que no sea un punto con un cluster
+        const puntoId: string = e.selected[0].getProperties().properties.id;
+        const puntoSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
+        if (!this.esPuntoCluster(puntoSelected)) {
+          if (this.createClusterActive) {
+            if (this.puntoTrayectoriaSelected !== undefined) {
+              const cluster: Cluster = {
+                puntoAId: this.puntoTrayectoriaSelected.id,
+                puntoBId: puntoSelected.id,
+              };
 
-            const cluster: Cluster = {
-              puntoAId: this.puntoTrayectoriaSelected.id,
-              puntoBId: puntoSelected.id,
-            };
+              this.clustersService.addCluster(cluster);
 
-            this.clustersService.addCluster(cluster);
-
-            this.puntoTrayectoriaSelected = undefined;
-            this.clustersService.createClusterActive = false;
+              this.puntoTrayectoriaSelected = undefined;
+              this.clustersService.createClusterActive = false;
+            } else {
+              this.puntoTrayectoriaSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
+            }
           } else {
-            const puntoId = e.selected[0].getProperties().properties.id;
-            this.puntoTrayectoriaSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
-          }
-        } else {
-          if (this.clusterSelected !== undefined) {
-            if (!this.deleteMode && !this.joinActive) {
-              const puntoId = e.selected[0].getProperties().properties.id;
-              const puntoSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
-
-              if (!this.esPuntoCluster(puntoSelected)) {
+            if (this.clusterSelected !== undefined) {
+              if (!this.deleteMode && !this.joinActive) {
                 // Actualizamos el punto cluster seleccionado solo si no pulsamos sobre otro cluster
                 this.clustersService.updateCluster(this.clusterSelected.id, this.isClusterA, puntoSelected.id);
               }
+
+              this.clustersService.clusterSelected = undefined;
+              this.puntoClusterHovered = undefined;
+            } else {
+              this.puntoTrayectoriaSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
+
+              const feature = e.selected[0];
+              feature.setStyle(this.getStylePuntos(true));
             }
-
-            this.clustersService.clusterSelected = undefined;
-            this.puntoClusterHovered = undefined;
-          } else {
-            const puntoId = e.selected[0].getProperties().properties.id;
-            this.puntoTrayectoriaSelected = this.puntosTrayectoria.find((punto) => punto.id === puntoId);
-
-            const feature = e.selected[0];
-            feature.setStyle(this.getStylePuntos(true));
           }
         }
       }
@@ -503,8 +498,10 @@ export class MapClustersComponent implements OnInit {
           this.clustersService.clusterSelected = this.clusters.find((cluster) => cluster.id === clusterId);
 
           // quitamos el punto seleccionado y le reseteamos el estilo
-          this.setPuntosStyle(this.puntoTrayectoriaSelected.id, false);
-          this.puntoTrayectoriaSelected = undefined;
+          if (this.puntoTrayectoriaSelected !== undefined) {
+            this.setPuntosStyle(this.puntoTrayectoriaSelected.id, false);
+            this.puntoTrayectoriaSelected = undefined;
+          }
         }
 
         this.puntoClusterHovered = undefined;
