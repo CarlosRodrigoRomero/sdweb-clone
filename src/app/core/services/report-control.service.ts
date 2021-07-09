@@ -152,9 +152,12 @@ export class ReportControlService {
                     switchMap((informes) => {
                       this.informes = informes.sort((a, b) => a.fecha - b.fecha);
 
-                      // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                      this.informes.forEach((informe) => this._informesIdList.push(informe.id));
-                      this.informesIdList$.next(this._informesIdList);
+                      // evitamos cargar los informes dobles al navegar atras y volver
+                      if (this.informesIdList.length === 0) {
+                        // ordenamos los informes de menos a mas reciente y los añadimos a la lista
+                        this.informes.forEach((informe) => this._informesIdList.push(informe.id));
+                        this.informesIdList$.next(this._informesIdList);
+                      }
                       // TODO: REVISAR
                       // comprobamos que anomalia service hay terminado de iniciarse
                       if (initAnomService) {
@@ -195,9 +198,12 @@ export class ReportControlService {
             switchMap((informes) => {
               this.informes = informes.sort((a, b) => a.fecha - b.fecha);
 
-              // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-              this.informes.forEach((informe) => this._informesIdList.push(informe.id));
-              this.informesIdList$.next(this._informesIdList);
+              // evitamos cargar los informes dobles al navegar atras y volver
+              if (this.informesIdList.length === 0) {
+                // ordenamos los informes de menos a mas reciente y los añadimos a la lista
+                this.informes.forEach((informe) => this._informesIdList.push(informe.id));
+                this.informesIdList$.next(this._informesIdList);
+              }
 
               this.selectedInformeId = this._informesIdList[this._informesIdList.length - 1];
 
@@ -270,9 +276,12 @@ export class ReportControlService {
                     switchMap((informes) => {
                       this.informes = informes.sort((a, b) => a.fecha - b.fecha);
 
-                      // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                      this.informes.forEach((informe) => this._informesIdList.push(informe.id));
-                      this.informesIdList$.next(this._informesIdList);
+                      // evitamos cargar los informes dobles al navegar atras y volver
+                      if (this.informesIdList.length === 0) {
+                        // ordenamos los informes de menos a mas reciente y los añadimos a la lista
+                        this.informes.forEach((informe) => this._informesIdList.push(informe.id));
+                        this.informesIdList$.next(this._informesIdList);
+                      }
 
                       // comprobamos que anomalia service hay terminado de iniciarse
                       if (initAnomService) {
