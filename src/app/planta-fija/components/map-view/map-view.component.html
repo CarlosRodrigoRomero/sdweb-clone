@@ -102,6 +102,7 @@
 
       <!-- BOTON SIDENAV STATS -->
       <button
+        *ngIf="showFilters"
         mat-raised-button
         class="btn-right-stats"
         (click)="sidenavStats.toggle(); loadStats()"
