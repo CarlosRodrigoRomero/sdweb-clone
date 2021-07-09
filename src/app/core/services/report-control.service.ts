@@ -125,7 +125,13 @@ export class ReportControlService {
                 this.anomaliaService
                   .initService(this.plantaId)
                   .pipe(
-                    switchMap(() => this.anomaliaService.getAnomaliasPlanta$(this.plantaId)),
+                    switchMap(() => this.informeService.getInforme(this.selectedInformeId)),
+                    take(1),
+                    switchMap((informe) => {
+                      this.informes = [informe];
+
+                      return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
+                    }),
                     take(1),
                     switchMap((anoms) => {
                       this.allFilterableElements = anoms;
@@ -249,7 +255,13 @@ export class ReportControlService {
                 this.anomaliaService
                   .initService(this.plantaId)
                   .pipe(
-                    switchMap(() => this.seguidorService.getSeguidoresPlanta$(this.plantaId)),
+                    switchMap(() => this.informeService.getInforme(this.selectedInformeId)),
+                    take(1),
+                    switchMap((informe) => {
+                      this.informes = [informe];
+
+                      return this.seguidorService.getSeguidoresPlanta$(this.plantaId);
+                    }),
                     take(1),
                     switchMap((segs) => {
                       this.allFilterableElements = segs;

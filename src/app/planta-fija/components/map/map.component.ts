@@ -89,7 +89,8 @@ export class MapComponent implements OnInit, OnDestroy {
             // Obtenemos todas las capas para esta planta
             return combineLatest([
               this.plantaService.getThermalLayers$(this.plantaId),
-              this.informeService.getInformesDePlanta(this.plantaId),
+              this.reportControlService.informes$,
+              // this.informeService.getInformesDePlanta(this.plantaId),
               this.plantaService.getPlanta(this.plantaId),
             ]);
           })
