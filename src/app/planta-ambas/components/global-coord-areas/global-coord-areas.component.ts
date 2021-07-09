@@ -90,6 +90,10 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
               this.nombreGlobalCoords = planta.nombreGlobalCoords;
             }
 
+            if (this.reportControlService.plantaFija) {
+              this.numAreas = this.nombreGlobalCoords.length;
+            }
+
             // guardamos los nombre en el servicio
             this.reportControlService.nombreGlobalCoords = this.nombreGlobalCoords;
 
