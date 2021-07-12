@@ -59,6 +59,8 @@ export class SeguidorService {
       map(([locAreaList, anomaliaList]) => {
         const seguidores: Seguidor[] = [];
 
+        console.log(anomaliaList.filter((anom) => anom.tipo == 0));
+
         if (anomaliaList.length > 0) {
           // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
           const coordsLength = locAreaList[0].globalCoords.length;

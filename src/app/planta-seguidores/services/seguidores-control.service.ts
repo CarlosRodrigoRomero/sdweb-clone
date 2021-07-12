@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
@@ -22,8 +22,10 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { FilterService } from '@core/services/filter.service';
 import { GLOBAL } from '@core/services/global';
 import { MapSeguidoresService } from './map-seguidores.service';
+import { InformeService } from '@core/services/informe.service';
 
 import { Seguidor } from '@core/models/seguidor';
+import { InformeInterface } from '@core/models/informe';
 
 @Injectable({
   providedIn: 'root',
@@ -31,6 +33,8 @@ import { Seguidor } from '@core/models/seguidor';
 export class SeguidoresControlService {
   public map: Map;
   public selectedInformeId: string;
+  private selectedInforme: InformeInterface;
+  private imgSeguidoresUrls: string[] = [];
   private _seguidorHovered: Seguidor = undefined;
   public seguidorHovered$ = new BehaviorSubject<Seguidor>(this._seguidorHovered);
   private _seguidorSelected: Seguidor = undefined;
@@ -55,7 +59,8 @@ export class SeguidoresControlService {
     private reportControlService: ReportControlService,
     private filterService: FilterService,
     private mapSeguidoresService: MapSeguidoresService,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private informeService: InformeService
   ) {}
 
   initService(): Observable<boolean> {
@@ -73,7 +78,17 @@ export class SeguidoresControlService {
         this.initialized$.next(true);
       });
 
-    this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
+    this.reportControlService.selectedInformeId$
+      .pipe(
+        switchMap((informeId) => {
+          this.selectedInformeId = informeId;
+
+          // this.getImagesSeguidoresInforme();
+
+          return this.informeService.getInforme(informeId);
+        })
+      )
+      .subscribe((informe) => (this.selectedInforme = informe));
     this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
 
     return this.initialized$;
@@ -413,11 +428,21 @@ export class SeguidoresControlService {
     if (this.seguidorSelected !== undefined) {
       // const imageName = this.seguidorSelected.anomalias[0].archivo;
 
+      const seguidorRef = this.seguidorSelected.nombre.replace('Seguidor ', '').replaceAll(' / ', '.');
+
+      const imageName = this.selectedInforme.prefijo + seguidorRef;
+
+      // const imageName = '210616_Puebla_del_Prior_A.0.3.2.1.jpg';
+
+      const completeImageName = this.imgSeguidoresUrls.find((imgUrl) => imgUrl.indexOf(imageName) > -1);
+
+      console.log(completeImageName);
+
       /////////// DEMO ///////////
-      let imageName = 'informes_qfqeerbHSTROqL8O2TVk_jpg_200803_Arguedas_1.1.jpg';
-      if (folder !== 'jpg') {
-        imageName = 'informes_qfqeerbHSTROqL8O2TVk_jpgVisual_200803_Arguedas_1.1.jpg';
-      }
+      // let imageName = 'informes_qfqeerbHSTROqL8O2TVk_jpg_200803_Arguedas_1.1.jpg';
+      // if (folder !== 'jpg') {
+      //   imageName = 'informes_qfqeerbHSTROqL8O2TVk_jpgVisual_200803_Arguedas_1.1.jpg';
+      // }
       ///////////////////////////
 
       // Creamos una referencia a la imagen
@@ -455,6 +480,20 @@ export class SeguidoresControlService {
           }
         });
     }
+  }
+
+  getImagesSeguidoresInforme() {
+    return this.storage
+      .ref('informes')
+      .child(this.selectedInformeId)
+      .listAll()
+      .then((snap) => {
+        snap.items.forEach((itemRef) => {
+          itemRef.getDownloadURL().then((imgUrl) => {
+            this.imgSeguidoresUrls.push(imgUrl);
+          });
+        });
+      });
   }
 
   changeInformeSeguidorSelected() {
