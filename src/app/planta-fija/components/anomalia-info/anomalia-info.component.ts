@@ -291,11 +291,11 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     if (urlRGB !== undefined && urlRGB !== null) {
       urlImagenRGB = urlRGB;
     } */
-    const camSN = this.anomaliaSelect.camaraSN;
+    const camSN = this.informeSelected.camaraSN;
     if (camSN !== undefined && camSN !== null) {
       camaraSN = camSN;
     }
-    const camNombre = this.anomaliaSelect.camaraModelo;
+    const camNombre = this.informeSelected.camara;
     if (camNombre !== undefined && camNombre !== null) {
       camaraNombre = camNombre;
     }

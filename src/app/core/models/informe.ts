@@ -30,4 +30,6 @@ export interface InformeInterface {
   vueloId?: string;
   vientoVelocidad?: number;
   vientoDireccion?: number;
+  camara?: string;
+  camaraSN?: number;
 }

@@ -177,12 +177,12 @@
         </mat-tab>
         <mat-tab label="Imagen" *ngIf="seccionImagen">
           <div class="tab-content">
-            <div class="elemento">
+            <!-- <div class="elemento">
               <span class="titulo">Descargar RJPG</span>
               <span class="subtitulo">
                 <a mat-button class="link-descarga" (click)="downloadRjpg(anomaliaSelect)"> descarga </a>
               </span>
-            </div>
+            </div> -->
             <!-- <div class="elemento">
               <span class="titulo">Imagen Térmica</span> -->
             <!-- <span class="subtitulo">{{ infoAdicional.imagen.urlImagenIR }}</span> -->
@@ -194,7 +194,7 @@
             <!--  <a mat-button href="https://www.google.com/">Url imagen RGB</a>
             </div> -->
             <div class="elemento" *ngIf="infoAdicional.imagen.camaraNombre">
-              <span class="titulo">Camara</span>
+              <span class="titulo">Cámara</span>
               <span class="subtitulo">{{ infoAdicional.imagen.camaraNombre }}</span>
             </div>
             <div class="elemento" *ngIf="infoAdicional.imagen.camaraSN">
