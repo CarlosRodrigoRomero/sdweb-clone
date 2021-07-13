@@ -58,7 +58,7 @@ export class PortfolioControlService {
               const mae = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
 
               // comprobamos que el informe tiene "mae"
-              if (mae !== undefined) {
+              if (mae !== undefined && mae !== Infinity) {
                 // añadimos la planta y su mae a las listas
                 this.listaPlantas.push(planta);
                 this.maePlantas.push(mae);
@@ -79,7 +79,7 @@ export class PortfolioControlService {
               const informe = informes.find((inf) => inf.plantaId === planta.id);
 
               // comprobamos que el informe tiene "mae"
-              if (informe.mae !== undefined) {
+              if (informe.mae !== undefined && informe.mae !== Infinity) {
                 // añadimos el informe a la lista
                 this.listaInformes.push(informe);
 
