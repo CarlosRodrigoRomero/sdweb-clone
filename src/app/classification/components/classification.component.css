@@ -40,6 +40,14 @@ app-thermal-slider {
   bottom: 250px;
 }
 
+.btn-anom-no-data {
+  position: absolute;
+  right: 10px;
+  bottom: 250px;
+  color: red;
+  font-size: large;
+}
+
 .end-process {
   margin: 10px;
 }

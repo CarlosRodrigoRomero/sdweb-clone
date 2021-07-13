@@ -169,6 +169,7 @@ export class ChartAnomaliasZonasComponent implements OnInit {
         chart: {
           type: 'bar',
           width: '100%',
+          height: 250,
           toolbar: {
             show: true,
             offsetX: 0,

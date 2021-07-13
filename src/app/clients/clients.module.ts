@@ -13,7 +13,6 @@ import { MapAllPlantsComponent } from './components/map-all-plants/map-all-plant
 import { BarChartComponent } from './components/bar-chart/bar-chart.component';
 import { DownloadExcelPortfolioComponent } from './components/download-excel-portfolio/download-excel-portfolio.component';
 import { PortfolioSummaryComponent } from './components/portfolio-summary/portfolio-summary.component';
-import { AutoLocComponent } from './components/auto-loc/auto-loc.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +23,6 @@ import { AutoLocComponent } from './components/auto-loc/auto-loc.component';
     BarChartComponent,
     DownloadExcelPortfolioComponent,
     PortfolioSummaryComponent,
-    AutoLocComponent,
   ],
   imports: [CommonModule, ClientsRoutingModule, SharedModule, FormsModule, ReactiveFormsModule, NgApexchartsModule],
 })

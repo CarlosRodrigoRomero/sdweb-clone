@@ -5,12 +5,10 @@
 
 .global-areas-card {
   opacity: 0.8;
-  padding-top: 8px 10px 0px;
-  padding-bottom: 0px;
   min-width: 250px;
   box-shadow: none !important;
   min-height: 64px;
-  height: 100%;
+  height: 64px;
 }
 
 .btn-menu {

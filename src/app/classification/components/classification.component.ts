@@ -24,6 +24,7 @@ export class ClassificationComponent implements OnInit {
   normModHovered: NormalizedModule = undefined;
   private anomalias: Anomalia[] = [];
   private informe: InformeInterface;
+  anomaliasNoData: Anomalia[] = [];
 
   constructor(
     private classificationService: ClassificationService,
@@ -42,7 +43,13 @@ export class ClassificationComponent implements OnInit {
     this.clustersService.initService().pipe(take(1)).subscribe();
 
     // nos suscribimos a las anomalias
-    this.classificationService.listaAnomalias$.subscribe((anomalias) => (this.anomalias = anomalias));
+    this.classificationService.listaAnomalias$.subscribe((anomalias) => {
+      this.anomalias = anomalias;
+
+      if (anomalias !== undefined) {
+        this.anomaliasNoData = anomalias.filter((anom) => anom.gradienteNormalizado === 0 || anom.temperaturaMax === 0);
+      }
+    });
 
     // traemos el informe
     this.informeService
@@ -55,7 +62,7 @@ export class ClassificationComponent implements OnInit {
     this.updateInforme();
 
     // actualizamos las anomalias con los datos que les faltan
-    // this.updateAnomalias();
+    this.updateAnomalias();
 
     // aviso de proceso terminado
     this.openSnackBar();
@@ -71,9 +78,27 @@ export class ClassificationComponent implements OnInit {
   }
 
   private updateAnomalias() {
-    const url = `https://europe-west1-sdweb-dev.cloudfunctions.net/estructura`;
+    const url = `https://europe-west1-sdweb-d33ce.cloudfunctions.net/datos_anomalia`;
 
     this.anomalias.forEach((anom) => {
+      const params = new HttpParams().set('anomaliaId', anom.id);
+
+      return this.http
+        .get(url, { responseType: 'text', params })
+        .toPromise()
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
+  }
+
+  updateAnomaliasNoData() {
+    const url = `https://europe-west1-sdweb-d33ce.cloudfunctions.net/datos_anomalia`;
+
+    this.anomaliasNoData.forEach((anom) => {
       const params = new HttpParams().set('anomaliaId', anom.id);
 
       return this.http

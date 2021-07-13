@@ -44,6 +44,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   private nombreGlobalCoords: string[] = [];
   public map: Map;
   private subscriptions: Subscription = new Subscription();
+  public numAreas: number;
 
   task: Task = {
     name: 'Ver zonas de la planta',
@@ -64,8 +65,10 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
       // TODO - adaptar a cada planta
       this.nombreGlobalCoords = GLOBAL.nombreGlobalCoordsFija;
     } else {
-      if (this.seguidorService.numGlobalCoords > 0) {
-        for (let index = 0; index < this.seguidorService.numGlobalCoords; index++) {
+      if (this.seguidorService.numGlobalCoords > 1) {
+        // restamos 1 al numero de global coords xq las pequeñas son los seguidores
+        this.numAreas = this.seguidorService.numGlobalCoords - 1;
+        for (let index = 0; index < this.numAreas; index++) {
           this.nombreGlobalCoords.push('Zona ' + index);
         }
       } else {
@@ -85,6 +88,10 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
             // si tiene nombres propios se los aplicamos
             if (planta.nombreGlobalCoords !== undefined) {
               this.nombreGlobalCoords = planta.nombreGlobalCoords;
+            }
+
+            if (this.reportControlService.plantaFija) {
+              this.numAreas = this.nombreGlobalCoords.length;
             }
 
             // guardamos los nombre en el servicio

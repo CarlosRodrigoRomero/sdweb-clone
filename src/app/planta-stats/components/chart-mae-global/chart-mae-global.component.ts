@@ -99,6 +99,7 @@ export class ChartMaeGlobalComponent implements OnInit {
           chart: {
             width: '100%',
             type: typeChart,
+            height: 250,
             dropShadow: {
               enabled: true,
               color: '#000',
