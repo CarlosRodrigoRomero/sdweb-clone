@@ -285,7 +285,7 @@ export class NormModulesComponent implements OnInit {
   autoNormModules(event: Event) {
     event.preventDefault();
 
-    const url = `https://europe-west1-sdweb-dev.cloudfunctions.net/estructura`;
+    const url = `https://europe-west1-sdweb-d33ce.cloudfunctions.net/estructura`;
 
     if (this.form.valid) {
       const filas = this.form.get('filas').value;
