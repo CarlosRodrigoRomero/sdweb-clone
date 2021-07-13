@@ -1,6 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 
-import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
@@ -16,7 +15,7 @@ import { Anomalia } from '@core/models/anomalia';
   templateUrl: './anomalias-list.component.html',
   styleUrls: ['./anomalias-list.component.css'],
 })
-export class AnomaliasListComponent implements OnInit {
+export class AnomaliasListComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['tipo', 'perdidas', 'temp', 'gradiente'];
   dataSource: MatTableDataSource<any>;
   public selectedRow: string;
@@ -24,7 +23,6 @@ export class AnomaliasListComponent implements OnInit {
   public anomaliaHover;
   public anomaliaSelect;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(
@@ -59,13 +57,15 @@ export class AnomaliasListComponent implements OnInit {
           );
 
         this.dataSource = new MatTableDataSource(filteredElements);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
       });
     });
 
     this.anomaliasControlService.anomaliaHover$.subscribe((anomHov) => (this.anomaliaHover = anomHov));
     this.anomaliasControlService.anomaliaSelect$.subscribe((anomSel) => (this.anomaliaSelect = anomSel));
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
   }
 
   applyFilter(event: Event) {
