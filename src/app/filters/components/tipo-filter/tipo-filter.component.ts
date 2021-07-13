@@ -46,6 +46,8 @@ export class TipoFilterComponent implements OnInit {
   public coloresCategoria: string[];
   public numsCategoria: number[];
 
+  selectedInformeId: string;
+
   constructor(
     private filterService: FilterService,
     private anomaliaService: AnomaliaService,
@@ -56,9 +58,10 @@ export class TipoFilterComponent implements OnInit {
   ngOnInit(): void {
     this.plantaId = this.reportControlService.plantaId;
     this.informesIdList = this.reportControlService.informesIdList;
-    const informeId = this.informesIdList[1];
+    this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
 
     this.anomaliaService.getAnomaliasPlanta$(this.plantaId).subscribe((anomalias) => {
+      this.allAnomalias = anomalias;
       this.tiposElem = [];
       // obtenermos los labels de todas las anomalias
       this._getAllCategorias(anomalias);
@@ -67,9 +70,13 @@ export class TipoFilterComponent implements OnInit {
 
         this.tiposSelected.push(false);
       });
+
       this.numsCategoria.forEach((num) => {
         this.filterTipoCounts.push(
-          this.allAnomalias.filter((elem) => elem.informeId === informeId).filter((elem) => elem.tipo === num).length
+          this.allAnomalias
+            .filter((elem) => elem.informeId === this.selectedInformeId)
+            // tslint:disable-next-line: triple-equals
+            .filter((elem) => elem.tipo == num).length
         );
       });
     });
@@ -91,7 +98,8 @@ export class TipoFilterComponent implements OnInit {
               this.numsCategoria.forEach((num, i) => {
                 this.filterTipoCounts[i] = this.allAnomalias
                   .filter((elem) => elem.informeId === informeID)
-                  .filter((elem) => elem.tipo === num).length;
+                  // tslint:disable-next-line: triple-equals
+                  .filter((elem) => elem.tipo == num).length;
               });
             }
           });
