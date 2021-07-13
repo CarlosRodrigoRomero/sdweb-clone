@@ -37,6 +37,7 @@ export class NormModCreatePopupComponent implements OnInit {
       fila: [1, [Validators.required, Validators.min(1)]],
       columna: [1, [Validators.required, Validators.min(1)]],
       image_name: [, [Validators.required]],
+      agrupacionId: [, [Validators.required]],
     });
 
     // guardamos los valores iniciales
@@ -51,6 +52,7 @@ export class NormModCreatePopupComponent implements OnInit {
         columna: this.form.get('columna').value,
         image_name: this.form.get('image_name').value + '.tif',
         coords: this.coords,
+        agrupacionId: this.form.get('agrupacionId').value,
       };
 
       // Crea el modulos normalizado en la DB
