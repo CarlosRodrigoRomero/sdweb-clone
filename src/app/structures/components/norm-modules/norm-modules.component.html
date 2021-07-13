@@ -8,6 +8,9 @@
   <span>Imagen:</span>
   <span class="normMod-info__data">{{ normModSelected.image_name }}</span>
 </div>
+<div class="modGroup-info" *ngIf="modGroupSelectedId">
+  <span>ID Agrupacion: {{ modGroupSelectedId }}</span>
+</div>
 
 <div class="add-button">
   <button *ngIf="!drawActive" mat-raised-button (click)="drawNormModule()">

@@ -12,6 +12,12 @@
   margin-left: 0.5rem;
 }
 
+.modGroup-info {
+  font-weight: 500;
+  font-size: small;
+  margin-bottom: 1rem;
+}
+
 .add-button {
   min-width: 225px;
   margin-bottom: 1rem;
