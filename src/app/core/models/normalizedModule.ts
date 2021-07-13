@@ -3,6 +3,7 @@ export interface NormalizedModule {
   fila: number;
   columna: number;
   image_name?: string;
+  agrupacionId?: string;
   coords: {
     topLeft: {
       long: number;
