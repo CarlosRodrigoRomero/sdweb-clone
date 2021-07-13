@@ -3,6 +3,14 @@
   <div>
     <app-map-classification></app-map-classification>
     <app-thermal-slider></app-thermal-slider>
+    <button
+      class="btn-anom-no-data"
+      mat-raised-button
+      [disabled]="anomaliasNoData.length === 0"
+      (click)="updateAnomaliasNoData()"
+    >
+      {{ anomaliasNoData.length }} anomalías sin datos
+    </button>
   </div>
   <div class="bottom-bar">
     <div class="bottom-bar__row-top">

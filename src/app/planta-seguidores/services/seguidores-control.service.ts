@@ -428,7 +428,7 @@ export class SeguidoresControlService {
     if (this.seguidorSelected !== undefined) {
       // const imageName = this.seguidorSelected.anomalias[0].archivo;
 
-      const seguidorRef = this.seguidorSelected.nombre.replace('Seguidor ', '').replaceAll(' / ', '.');
+      const seguidorRef = this.seguidorSelected.nombre.replace('Seguidor ', '')/* .replaceAll(' / ', '.') */;
 
       const imageName = this.selectedInforme.prefijo + seguidorRef;
 
