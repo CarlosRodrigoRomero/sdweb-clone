@@ -57,6 +57,7 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit {
           );
 
         this.dataSource = new MatTableDataSource(filteredElements);
+        this.dataSource.sort = this.sort;
       });
     });
 
