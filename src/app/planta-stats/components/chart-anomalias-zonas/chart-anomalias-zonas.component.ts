@@ -153,14 +153,13 @@ export class ChartAnomaliasZonasComponent implements OnInit {
   }
 
   private _initChart(): void {
-    const series = this.dateLabels.map((dateLabel, index) => {
-      return { name: dateLabel, data: this.chartData[index] };
-    });
-
     let titleXAxis = 'Zonas';
     if (this.reportControlService.nombreGlobalCoords !== undefined) {
       titleXAxis = this.reportControlService.nombreGlobalCoords[0];
     }
+    const series = this.dateLabels.map((dateLabel, index) => {
+      return { name: dateLabel, data: this.chartData[index] };
+    });
 
     // espera a que el dataPlot tenga datos
     if (this.chartData[0] !== undefined) {
@@ -205,7 +204,7 @@ export class ChartAnomaliasZonasComponent implements OnInit {
           colors: ['transparent'],
         },
         xaxis: {
-          // categories: this.zones.map((zone) => zone.globalCoords[0]),
+          categories: this.zones.map((zone) => zone.globalCoords[0]),
           title: {
             text: titleXAxis,
           },

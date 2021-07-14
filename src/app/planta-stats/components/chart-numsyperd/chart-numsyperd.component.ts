@@ -273,7 +273,7 @@ export class ChartNumsyperdComponent implements OnInit {
       };
 
       const seriesMaeCat: ApexAxisChartSeries = [];
-      this.dataPlot.forEach((data) => seriesMaeCat.push({ name: '# Anomalías', data: data.perdidasPorCategoria }));
+      this.dataPlot.forEach((data) => seriesMaeCat.push({ name: 'MAE Anomalías', data: data.perdidasPorCategoria }));
 
       this.chartOptions2 = {
         series: seriesMaeCat,
@@ -298,6 +298,9 @@ export class ChartNumsyperdComponent implements OnInit {
           tickAmount: 3,
           labels: {
             minWidth: 10,
+            formatter: (value) => {
+              return Math.round(value).toString();
+            },
           },
         },
       };

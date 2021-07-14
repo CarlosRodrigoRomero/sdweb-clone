@@ -122,6 +122,9 @@ export class ChartCelsTempsComponent implements OnInit {
         },
         labels: {
           minWidth: 10,
+          formatter: (value) => {
+            return Math.round(value).toString();
+          },
         },
       },
       fill: {
