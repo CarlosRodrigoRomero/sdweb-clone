@@ -24,7 +24,7 @@ export class CriticidadFilterComponent implements OnInit {
   criticidadElems: Criticidad[] = [];
   allComplete: boolean;
   filtroCriticidad: CriticidadFilter;
-  public criticidadSelected: boolean[] = [false, false, false, false, false];
+  public criticidadSelected: boolean[] = undefined;
 
   constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
 
@@ -42,23 +42,23 @@ export class CriticidadFilterComponent implements OnInit {
   }
 
   onChangeCriticidadFilter(event: MatButtonToggleChange) {
-    // const criticidad = this.criticidadElems.length - parseInt(event.source.id);
+    const indexSelected = Number(event.source.id) - 1;
     if (event.source.checked) {
-      this.filtroCriticidad = new CriticidadFilter(event.source.id, 'criticidad', parseInt(event.source.id));
+      this.filtroCriticidad = new CriticidadFilter(indexSelected.toString(), 'criticidad', indexSelected);
       this.filterService.addFilter(this.filtroCriticidad);
-      this.filterControlService.criticidadSelected[event.source.id] = true;
+      this.filterControlService.criticidadSelected[indexSelected] = true;
     } else {
       this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
         filters
           .filter((filter) => filter.type === 'criticidad')
           .forEach((filter) => {
             // tslint:disable-next-line: triple-equals
-            if (filter.id == event.source.id) {
+            if (filter.id == indexSelected.toString()) {
               this.filterService.deleteFilter(filter);
             }
           })
       );
-      this.filterControlService.criticidadSelected[event.source.id] = false;
+      this.filterControlService.criticidadSelected[indexSelected] = false;
     }
   }
 }

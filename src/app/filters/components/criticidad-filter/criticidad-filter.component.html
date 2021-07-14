@@ -2,9 +2,9 @@
   <h5>Criticidad</h5>
   <mat-button-toggle-group class="criticidad-group" #group="matButtonToggleGroup" multiple="true">
     <mat-button-toggle
-    class="criticidad-toggle"
+      class="criticidad-toggle"
       *ngFor="let elem of criticidadElems; index as i"
-      [id]="i"
+      [id]="i + 1"
       [name]="elem.label"
       [checked]="criticidadSelected[i]"
       (change)="onChangeCriticidadFilter($event)"

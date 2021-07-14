@@ -126,8 +126,8 @@ export class ShareReportService {
         this.params.clase[(filter as ClaseFilter).clase - 1] = !this.params.clase[(filter as ClaseFilter).clase - 1];
         break;
       case 'criticidad':
-        this.params.criticidad[(filter as CriticidadFilter).criticidad - 1] =
-          !this.params.criticidad[(filter as CriticidadFilter).criticidad - 1];
+        this.params.criticidad[(filter as CriticidadFilter).criticidad] =
+          !this.params.criticidad[(filter as CriticidadFilter).criticidad];
         break;
       case 'modulo':
         this.params.modulo = null;
