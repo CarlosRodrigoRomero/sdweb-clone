@@ -12,14 +12,14 @@
       <div class="elemento">
         <span class="titulo">Temperatura Max</span>
         <span *ngIf="anomaliaHover.temperaturaMax !== 0" class="subtitulo"
-          >{{ anomaliaHover.temperaturaMax }} ºC</span
+          >{{ anomaliaHover.temperaturaMax | number: '1.0-1' }} ºC</span
         >
         <span *ngIf="anomaliaHover.temperaturaMax === 0" class="subtitulo">Pronto disponible</span>
       </div>
       <div class="elemento">
         <span class="titulo">&Delta;T Normalizado</span>
         <span *ngIf="anomaliaHover.gradienteNormalizado !== 0" class="subtitulo"
-          >{{ anomaliaHover.gradienteNormalizado }} ºC</span
+          >{{ anomaliaHover.gradienteNormalizado | number: '1.0-1' }} ºC</span
         >
         <span *ngIf="anomaliaHover.gradienteNormalizado === 0" class="subtitulo">Pronto disponible</span>
       </div>
@@ -62,7 +62,7 @@
             <div class="elemento">
               <span class="titulo">Temperatura Max</span>
               <span *ngIf="anomaliaSelect.temperaturaMax !== 0" class="subtitulo"
-                >{{ anomaliaSelect.temperaturaMax }} ºC</span
+                >{{ anomaliaSelect.temperaturaMax | number: '1.0-1' }} ºC</span
               >
               <span *ngIf="anomaliaSelect.temperaturaMax === 0" class="subtitulo">Pronto disponible</span>
               <!-- <input
@@ -75,7 +75,7 @@
             <div class="elemento">
               <span class="titulo">Gradiente Temp. Normalizado</span>
               <span *ngIf="anomaliaSelect.gradienteNormalizado !== 0" class="subtitulo"
-                >{{ anomaliaSelect.gradienteNormalizado }} ºC</span
+                >{{ anomaliaSelect.gradienteNormalizado | number: '1.0-1' }} ºC</span
               >
               <span *ngIf="anomaliaSelect.gradienteNormalizado === 0" class="subtitulo">Pronto disponible</span>
               <!-- <input
@@ -125,7 +125,7 @@
             </div>
             <div class="elemento" *ngIf="infoAdicional.vuelo.tempAire">
               <span class="titulo">Temperatura aire</span>
-              <span class="subtitulo">{{ infoAdicional.vuelo.tempAire }} ºC</span>
+              <span class="subtitulo">{{ infoAdicional.vuelo.tempAire | number: '1.0-1' }} ºC</span>
             </div>
             <div class="elemento" *ngIf="infoAdicional.vuelo.vientoVelocidad">
               <span class="titulo">Velocidad viento</span>
