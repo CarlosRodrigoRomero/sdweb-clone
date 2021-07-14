@@ -108,11 +108,13 @@ export class BarChartComponent implements OnInit {
         type: 'bar',
         height: '100%',
         events: {
-          // desactivado temporalmente
-          /* click: (event, chartContext, config) => {
+          click: (event, chartContext, config) => {
             const index = config.dataPointIndex;
-            this.onClick(index);
-          }, */
+            // evitamos que se pueda acceder a plantas se seguidores temporalmente
+            if (this.plantas[index].tipo !== 'seguidores') {
+              this.onClick(index);
+            }
+          },
         },
       },
       plotOptions: {

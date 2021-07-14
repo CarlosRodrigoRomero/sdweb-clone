@@ -96,8 +96,7 @@ export class MapAllPlantsComponent implements OnInit {
 
     this.addPointerOnHover();
     this.addOnHoverAction();
-    // desactivado temporalmente
-    // this.addOnClickAction();
+    this.addOnClickAction();
   }
 
   private addPointerOnHover() {
@@ -154,7 +153,8 @@ export class MapAllPlantsComponent implements OnInit {
         const plantaId = feature[0].getProperties().plantaId;
 
         if (feature[0].getProperties().tipo === 'seguidores') {
-          this.router.navigate(['clients/tracker/' + plantaId]);
+          // impedimos navegar a seguidores temporalmente
+          // this.router.navigate(['clients/tracker/' + plantaId]);
         } else {
           this.router.navigate(['clients/fixed/' + plantaId]);
         }
