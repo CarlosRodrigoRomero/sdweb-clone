@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import { Feature } from 'ol';
 import { Fill, Stroke, Style } from 'ol/style';
@@ -38,6 +38,7 @@ export class PortfolioControlService {
   public initService(): Observable<boolean> {
     this.auth.user$
       .pipe(
+        take(1),
         switchMap((user) =>
           combineLatest([this.plantaService.getPlantasDeEmpresa(user), this.informeService.getInformes()])
         )
@@ -54,32 +55,37 @@ export class PortfolioControlService {
 
               const informesPlanta = [...informesAdiccionales, ...planta.informes];
 
-              // seleccionamos el dato de mae mas reciente
-              const mae = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+              // mostramos solo los informes disponibles
+              const informesDisponibles = informesPlanta.filter((informe) => informe.disponible === true);
 
-              // comprobamos que el informe tiene "mae"
-              if (mae !== undefined && mae !== Infinity) {
-                // añadimos la planta y su mae a las listas
-                this.listaPlantas.push(planta);
-                this.maePlantas.push(mae);
+              if (informesDisponibles.length > 0) {
+                // seleccionamos el dato de mae mas reciente
+                const mae = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
 
-                // añadimos los informes a la lista
-                informesPlanta.forEach((informe) => {
-                  if (informe.mae !== undefined) {
-                    this.listaInformes.push(informe);
-                  }
-                });
+                // comprobamos que el informe tiene "mae"
+                if (mae !== undefined && mae !== Infinity) {
+                  // añadimos la planta y su mae a las listas
+                  this.listaPlantas.push(planta);
+                  this.maePlantas.push(mae);
 
-                // incrementamos conteo de plantas y suma de potencia
-                this.numPlantas++;
-                this.potenciaTotal += planta.potencia;
+                  // añadimos los informes a la lista
+                  informesPlanta.forEach((informe) => {
+                    if (informe.mae !== undefined) {
+                      this.listaInformes.push(informe);
+                    }
+                  });
+
+                  // incrementamos conteo de plantas y suma de potencia
+                  this.numPlantas++;
+                  this.potenciaTotal += planta.potencia;
+                }
               }
               // añadimos tb aquellas plantas que tienen informes pero no estan incluidos dentro de su interface
             } else if (informes.map((inf) => inf.plantaId).includes(planta.id)) {
               const informe = informes.find((inf) => inf.plantaId === planta.id);
 
-              // comprobamos que el informe tiene "mae"
-              if (informe.mae !== undefined && informe.mae !== Infinity) {
+              // comprobamos que el informe tiene "mae" y que esta "disponible"
+              if (informe.mae !== undefined && informe.mae !== Infinity && informe.disponible === true) {
                 // añadimos el informe a la lista
                 this.listaInformes.push(informe);
 
