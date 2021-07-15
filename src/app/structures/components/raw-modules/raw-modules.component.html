@@ -18,9 +18,9 @@
     <mat-icon class="icon">restore_from_trash</mat-icon>
     <span>Rest. eliminados</span>
   </button>
-  <button mat-raised-button class="btn-undo" (click)="restoreLastDeletedModule()" [disabled]="deleteMode">
+  <!-- <button mat-raised-button class="btn-undo" (click)="restoreLastDeletedModule()" [disabled]="deleteMode">
     <mat-icon>restore</mat-icon>
-  </button>
+  </button> -->
 </div>
 <div class="add-button">
   <button *ngIf="!drawActive" mat-raised-button (click)="drawRawModule()" [disabled]="deleteMode">

@@ -9,9 +9,13 @@
 .restore-buttons {
   margin-top: 0.5rem;
   min-width: 225px;
-  display: grid;
-  grid-template-columns: 9fr 1fr;
-  gap: 0.5rem;
+  /* display: grid; */
+  /* grid-template-columns: 9fr 1fr; */
+  /* gap: 0.5rem; */
+}
+
+.restore-buttons button {
+  width: 100%;
 }
 
 .btn-undo {
