@@ -25,10 +25,10 @@
       <td mat-cell *matCellDef="let element">{{ element.fecha * 1000 | date: 'dd/MM/yyyy' }}</td>
     </ng-container>
 
-    <!-- Informe ID -->
-    <ng-container matColumnDef="informeId">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Informe ID</th>
-      <td mat-cell *matCellDef="let element">{{ element.informeId }}</td>
+    <!-- Tipo -->
+    <ng-container matColumnDef="tipo">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
+      <td mat-cell *matCellDef="let element">{{ element.tipo }}</td>
     </ng-container>
 
     <!-- Potencia -->
@@ -37,19 +37,27 @@
       <td mat-cell *matCellDef="let element">{{ element.potencia }} MW</td>
     </ng-container>
 
+    <!-- Informe ID -->
+    <ng-container matColumnDef="informeId">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Informe ID</th>
+      <td mat-cell *matCellDef="let element">{{ element.informeId }}</td>
+    </ng-container>
+
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef>Acciones</th>
-      <td mat-cell *matCellDef="let element">
+      <td class="actions" mat-cell *matCellDef="let element">
         <button mat-icon-button [routerLink]="['./edit', element.informeId]">
           <mat-icon>edit</mat-icon>
         </button>
-        <a mat-button [routerLink]="['../../clusters', element.informeId]">Clusters</a>
-        <a mat-button [routerLink]="['../../structures', element.informeId]">Estructuras</a>
-        <a mat-button [routerLink]="['../../classification', element.informeId]">Clasificación</a>
-        <a mat-button *ngIf="element.thermalLayerPending" [routerLink]="['../thermalLayer', element.informeId]">
-          <mat-icon>add</mat-icon>
-          <span>Thermal</span>
-        </a>
+        <div *ngIf="element.tipo !== 'seguidores'">
+          <a mat-button [routerLink]="['../../clusters', element.informeId]">Clusters</a>
+          <a mat-button [routerLink]="['../../structures', element.informeId]">Estructuras</a>
+          <a mat-button [routerLink]="['../../classification', element.informeId]">Clasificación</a>
+          <a mat-button *ngIf="element.thermalLayerPending" [routerLink]="['../thermalLayer', element.informeId]">
+            <mat-icon>add</mat-icon>
+            <span>Thermal</span>
+          </a>
+        </div>
       </td>
     </ng-container>
   </table>
