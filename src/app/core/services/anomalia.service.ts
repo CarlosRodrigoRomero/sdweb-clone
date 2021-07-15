@@ -39,20 +39,31 @@ export class AnomaliaService {
 
   initService(plantaId: string) {
     // obtenemos el criterio de criticidad de la planta si tuviese
+    let criterioId: string;
     this.plantaService
       .getPlanta(plantaId)
       .pipe(
         take(1),
-        switchMap((planta) => this.adminService.getUser(planta.empresa)),
-        switchMap((user) => {
-          if (user.hasOwnProperty('criterioId')) {
+        switchMap((planta) => {
+          // primero comprovamos si la planta tiene criterio
+          if (planta.hasOwnProperty('criterioId')) {
             this.hasCriticidad = true;
+            criterioId = planta.criterioId;
           }
-          return iif(
-            () => user.hasOwnProperty('criterioId'),
-            this.plantaService.getCriterioCriticidad(user.criterioId),
-            of({})
-          );
+
+          return this.adminService.getUser(planta.empresa);
+        }),
+        take(1),
+        switchMap((user) => {
+          // si la planta no tiene criterio, comprobamos si lo tiene el user
+          if (criterioId === undefined || criterioId === null) {
+            if (user.hasOwnProperty('criterioId')) {
+              this.hasCriticidad = true;
+              criterioId = user.criterioId;
+            }
+          }
+
+          return iif(() => criterioId !== undefined, this.plantaService.getCriterioCriticidad(criterioId), of({}));
         })
       )
       .subscribe((criterio: CritCriticidad) => {
