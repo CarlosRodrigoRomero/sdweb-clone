@@ -210,7 +210,7 @@ export class MapStructuresComponent implements OnInit {
                 return this.filterService.filteredElements$;
               })
             )
-            // .pipe(take(1))
+            .pipe(take(1))
             .subscribe((elems) => {
               mBSource.clear();
 
@@ -238,6 +238,7 @@ export class MapStructuresComponent implements OnInit {
       properties: {
         id: rawMod.id,
         name: 'rawMod',
+        visible: true,
       },
     });
 
@@ -358,6 +359,11 @@ export class MapStructuresComponent implements OnInit {
             } else {
               this.structuresService.deletedRawModIds = [e.selected[0].getProperties().properties.id];
             }
+            // dejamos de mostrar el modulo
+            e.selected[0].getProperties().properties.visible = false;
+
+            // restamos el numero de modulos
+            this.structuresService.reportNumModules--;
 
             // añadimos el id del modulo eliminado a la DB
             this.structuresService.addFilter('eliminados', this.rawModDeletedIds);
@@ -375,7 +381,7 @@ export class MapStructuresComponent implements OnInit {
   private getStyleRawMod(hovered: boolean) {
     if (hovered) {
       return (feature: Feature) => {
-        if (feature !== undefined) {
+        if (feature !== undefined && feature.getProperties().properties.visible === true) {
           return new Style({
             stroke: new Stroke({
               color: 'red',
@@ -386,7 +392,7 @@ export class MapStructuresComponent implements OnInit {
       };
     } else {
       return (feature: Feature) => {
-        if (feature !== undefined) {
+        if (feature !== undefined && feature.getProperties().properties.visible === true) {
           return new Style({
             stroke: new Stroke({
               color: 'white',
