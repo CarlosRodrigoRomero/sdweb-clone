@@ -9,6 +9,7 @@ import { map, take, switchMap } from 'rxjs/operators';
 import { InformeService } from './informe.service';
 import { GLOBAL } from './global';
 import { PlantaService } from '@core/services/planta.service';
+import { AdminService } from '@core/services/admin.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { CritCoA } from '@core/models/critCoA';
@@ -32,7 +33,8 @@ export class AnomaliaService {
     public afs: AngularFirestore,
     private storage: AngularFireStorage,
     private informeService: InformeService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private adminService: AdminService
   ) {}
 
   initService(plantaId: string) {
@@ -41,13 +43,14 @@ export class AnomaliaService {
       .getPlanta(plantaId)
       .pipe(
         take(1),
-        switchMap((planta) => {
-          if (planta.hasOwnProperty('criterioId')) {
+        switchMap((planta) => this.adminService.getUser(planta.empresa)),
+        switchMap((user) => {
+          if (user.hasOwnProperty('criterioId')) {
             this.hasCriticidad = true;
           }
           return iif(
-            () => planta.hasOwnProperty('criterioId'),
-            this.plantaService.getCriterioCriticidad(planta.criterioId),
+            () => user.hasOwnProperty('criterioId'),
+            this.plantaService.getCriterioCriticidad(user.criterioId),
             of({})
           );
         })

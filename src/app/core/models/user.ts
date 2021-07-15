@@ -7,4 +7,5 @@ export interface UserInterface {
   color?: string;
   photoURL?: string;
   emailVerified?: boolean;
+  criterioId?: string;
 }
