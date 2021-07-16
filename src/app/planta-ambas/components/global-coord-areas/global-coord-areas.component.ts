@@ -62,14 +62,18 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.reportControlService.plantaFija) {
-      // TODO - adaptar a cada planta
       this.nombreGlobalCoords = GLOBAL.nombreGlobalCoordsFija;
+      if (this.nombreGlobalCoords === undefined) {
+        for (let index = 0; index < this.reportControlService.numFixedGlobalCoords; index++) {
+          this.nombreGlobalCoords.push('Zonas tipo ' + index);
+        }
+      }
     } else {
       if (this.seguidorService.numGlobalCoords > 1) {
         // restamos 1 al numero de global coords xq las pequeñas son los seguidores
         this.numAreas = this.seguidorService.numGlobalCoords - 1;
         for (let index = 0; index < this.numAreas; index++) {
-          this.nombreGlobalCoords.push('Zona ' + index);
+          this.nombreGlobalCoords.push('Zonas tipo ' + index);
         }
       } else {
         this.reportControlService.thereAreZones = false;

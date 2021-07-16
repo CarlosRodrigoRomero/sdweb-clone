@@ -45,6 +45,7 @@ export class ReportControlService {
   private _thereAreZones = true;
   public thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
   private _nombreGlobalCoords: string[] = [];
+  private _numFixedGlobalCoords: number = undefined;
 
   constructor(
     private router: Router,
@@ -88,6 +89,8 @@ export class ReportControlService {
             }),
             switchMap((anoms) => {
               this.allFilterableElements = anoms;
+
+              this.numFixedGlobalCoords = this.getNumGlobalCoords(anoms);
 
               // iniciamos filter service
               return this.filterService.initService(anoms);
@@ -321,6 +324,16 @@ export class ReportControlService {
     return this.initialized$;
   }
 
+  private getNumGlobalCoords(anoms: Anomalia[]): number {
+    let numGlobalCoords = anoms[0].globalCoords.length - 1;
+    for (let index = anoms[0].globalCoords.length - 1; index >= 0; index--) {
+      if (anoms.filter((anom) => anom.globalCoords[index] !== null).length > 0) {
+        numGlobalCoords = numGlobalCoords--;
+      }
+    }
+    return numGlobalCoords;
+  }
+
   resetService() {
     this.sharedReport = false;
     this.sharedReportWithFilters = true;
@@ -434,5 +447,13 @@ export class ReportControlService {
 
   set nombreGlobalCoords(value: string[]) {
     this._nombreGlobalCoords = value;
+  }
+
+  get numFixedGlobalCoords() {
+    return this._numFixedGlobalCoords;
+  }
+
+  set numFixedGlobalCoords(value: number) {
+    this._numFixedGlobalCoords = value;
   }
 }
