@@ -89,8 +89,6 @@ export class ReportControlService {
             switchMap((anoms) => {
               this.allFilterableElements = anoms;
 
-              console.log(anoms.filter((anom) => anom.globalCoords[1] === null).length);
-
               // iniciamos filter service
               return this.filterService.initService(anoms);
             })
