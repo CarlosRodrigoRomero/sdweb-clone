@@ -86,7 +86,6 @@ export class ReportControlService {
               // obtenemos todas las anomalías
               return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
             }),
-            take(1),
             switchMap((anoms) => {
               this.allFilterableElements = anoms;
 

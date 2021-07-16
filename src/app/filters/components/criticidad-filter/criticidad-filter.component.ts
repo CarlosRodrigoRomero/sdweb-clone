@@ -45,6 +45,7 @@ export class CriticidadFilterComponent implements OnInit {
     const indexSelected = Number(event.source.id) - 1;
     if (event.source.checked) {
       this.filtroCriticidad = new CriticidadFilter(indexSelected.toString(), 'criticidad', indexSelected);
+
       this.filterService.addFilter(this.filtroCriticidad);
       this.filterControlService.criticidadSelected[indexSelected] = true;
     } else {
