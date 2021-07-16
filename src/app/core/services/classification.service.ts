@@ -93,7 +93,8 @@ export class ClassificationService {
   createAnomaliaFromNormModule(feature: Feature, date: number) {
     const id = feature.getProperties().properties.id;
     const refAnom = this.afs.collection('anomalias').doc(id);
-    const normModule = feature.getProperties().properties.normMod;
+    const normModule: NormalizedModule = feature.getProperties().properties.normMod;
+    const coordCentroid = [normModule.centroid_gps.long, normModule.centroid_gps.lat] as Coordinate;
 
     refAnom
       .get()
@@ -106,7 +107,8 @@ export class ClassificationService {
         } else {
           // si no existe previmente la creamos
           const geometry = feature.getGeometry() as SimpleGeometry;
-          const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(geometry.getCoordinates()[0][0]);
+          // const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(geometry.getCoordinates()[0][0]);
+          const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
           const modulo = this.getAnomModule(geometry.getCoordinates()[0][0]);
 
           const anomalia: Anomalia = {
@@ -165,16 +167,27 @@ export class ClassificationService {
     return modulo;
   }
 
-  updateAnomalias() {
+  // PARA CAMBIAR DATOS QUE SE QUEDARON ATRÁS
+  updateAnomalias(normModules?: NormalizedModule[]) {
     this.listaAnomalias.forEach((anom) => {
-      if (anom.modulo === null) {
-        const modulo = this.getAnomModule(anom.featureCoords[0]);
+      // if (anom.modulo === null) {
+      //   const modulo = this.getAnomModule(anom.featureCoords[0]);
 
-        if (modulo !== undefined) {
-          anom.modulo = modulo;
+      //   if (modulo !== undefined) {
+      //     anom.modulo = modulo;
 
-          this.anomaliaService.updateAnomaliaField(anom);
-        }
+      //     this.anomaliaService.updateAnomaliaField(anom);
+      //   }
+      // }
+
+      const coordObj = normModules.find((nM) => nM.id === anom.id).centroid_gps;
+      if (coordObj !== undefined) {
+        const coordCentroid = [coordObj.long, coordObj.lat] as Coordinate;
+        const newGloblaCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
+
+        anom.globalCoords = newGloblaCoords;
+
+        this.anomaliaService.updateAnomaliaField(anom);
       }
     });
   }

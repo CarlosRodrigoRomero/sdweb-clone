@@ -411,7 +411,7 @@ export class MapClassificationComponent implements OnInit {
   }
 
   updateAnomalias() {
-    this.classificationService.updateAnomalias();
+    this.classificationService.updateAnomalias(this.normModules);
   }
 
   setThermalPalette() {

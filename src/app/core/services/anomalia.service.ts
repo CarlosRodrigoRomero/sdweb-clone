@@ -197,12 +197,13 @@ export class AnomaliaService {
     return anomaliaDoc.set(anomaliaObj);
   }
 
+  // // PARA CAMBIAR DATOS QUE SE QUEDARON ATRÁS
   updateAnomaliaField(anomalia: Anomalia) {
     this.afs
       .collection('anomalias')
       .doc(anomalia.id)
       .update({
-        modulo: anomalia.modulo,
+        globalCoords: anomalia.globalCoords,
       })
       .then(() => {
         console.log('Document successfully updated!');

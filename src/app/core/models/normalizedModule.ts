@@ -4,6 +4,10 @@ export interface NormalizedModule {
   columna: number;
   image_name?: string;
   agrupacionId?: string;
+  centroid_gps?: {
+    lat: number;
+    long: number;
+  };
   coords: {
     topLeft: {
       long: number;
