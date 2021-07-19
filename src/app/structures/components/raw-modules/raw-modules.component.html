@@ -23,12 +23,12 @@
   </button> -->
 </div>
 <div class="add-button">
-  <button *ngIf="!drawActive" mat-raised-button (click)="drawRawModule()" [disabled]="deleteMode">
+  <button *ngIf="!createMode" mat-raised-button (click)="switchCreateMode()" [disabled]="deleteMode">
     <mat-icon class="icon">add_circle</mat-icon>
-    <span>Crear módulo</span>
+    <span>Activar modo crear módulos</span>
   </button>
-  <button *ngIf="drawActive" mat-raised-button (click)="cancelDraw()" [disabled]="deleteMode">
-    <mat-icon class="icon">disabled_by_default</mat-icon>
-    <span>Cancelar</span>
+  <button *ngIf="createMode" mat-raised-button (click)="switchCreateMode()" [disabled]="deleteMode">
+    <mat-icon class="icon">cancel</mat-icon>
+    <span>Desactivar modo crear módulos</span>
   </button>
 </div>

@@ -37,6 +37,8 @@ export class StructuresService {
   loadRawModules$ = new BehaviorSubject<boolean>(this._loadRawModules);
   private _allRawModules: RawModule[] = [];
   allRawModules$ = new BehaviorSubject<RawModule[]>(this._allRawModules);
+  private _createRawModMode = false;
+  createRawModMode$ = new BehaviorSubject<boolean>(this._createRawModMode);
   private _deleteRawModMode = false;
   deleteRawModMode$ = new BehaviorSubject<boolean>(this._deleteRawModMode);
   private _deletedRawModIds: string[] = [];
@@ -443,6 +445,15 @@ export class StructuresService {
   }
 
   /* RAW MODULES */
+
+  get createRawModMode() {
+    return this._createRawModMode;
+  }
+
+  set createRawModMode(value: boolean) {
+    this._createRawModMode = value;
+    this.createRawModMode$.next(value);
+  }
 
   get deleteRawModMode() {
     return this._deleteRawModMode;

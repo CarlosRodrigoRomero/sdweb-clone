@@ -10,6 +10,7 @@
           <app-raw-modules></app-raw-modules>
           <div class="next-button">
             <button
+              [disabled]="deleteRawModMode"
               mat-stroked-button
               matStepperNext
               (click)="toggleLoadModuleGroups(true); resetFase1(); setReportNumModules()"

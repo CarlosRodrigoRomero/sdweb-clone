@@ -28,7 +28,7 @@ export class RawModulesComponent implements OnInit {
   private vectorRawModule: VectorLayer;
   private draw: Draw;
   deleteMode = false;
-  drawActive = false;
+  createMode = false;
 
   constructor(
     private structuresService: StructuresService,
@@ -40,9 +40,24 @@ export class RawModulesComponent implements OnInit {
   ngOnInit(): void {
     this.olMapService.map$.subscribe((map) => (this.map = map));
 
+    this.structuresService.createRawModMode$.subscribe((mode) => {
+      this.createMode = mode;
+
+      if (this.createMode) {
+        this.drawRawModules();
+      } else if (this.draw !== undefined) {
+        // terminamos el modo draw
+        this.map.removeInteraction(this.draw);
+      }
+    });
+
     this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode));
 
     this.structuresService.loadRawModules$.subscribe((load) => this.setRawModulesVisibility(load));
+  }
+
+  switchCreateMode() {
+    this.structuresService.createRawModMode = !this.structuresService.createRawModMode;
   }
 
   switchDeleteMode() {
@@ -61,9 +76,7 @@ export class RawModulesComponent implements OnInit {
     });
   }
 
-  drawRawModule() {
-    this.drawActive = true;
-
+  drawRawModules() {
     const sourceRawModule = new VectorSource();
     const style = new Style({
       stroke: new Stroke({
@@ -102,16 +115,11 @@ export class RawModulesComponent implements OnInit {
 
       // añadimos el nuevo modulo a la DB
       this.structuresService.addRawModule(rawModule);
-
-      // terminamos el modo draw
-      this.map.removeInteraction(this.draw);
-
-      this.drawActive = false;
     });
   }
 
   cancelDraw() {
-    this.drawActive = false;
+    this.createMode = false;
 
     this.map.removeInteraction(this.draw);
   }

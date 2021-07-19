@@ -15,6 +15,7 @@ import { InformeInterface } from '@core/models/informe';
 export class StructuresComponent implements OnInit {
   serviceInit = false;
   deleteRawModMode = false;
+  createRawModMode = false;
   nombrePlanta: string;
   private map: Map;
   private informe: InformeInterface;
@@ -28,6 +29,7 @@ export class StructuresComponent implements OnInit {
   ngOnInit(): void {
     this.structuresService.initService().subscribe((value) => (this.serviceInit = value));
     this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteRawModMode = mode));
+    this.structuresService.createRawModMode$.subscribe((mode) => (this.createRawModMode = mode));
     this.structuresService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre));
     this.olMapService.map$.subscribe((map) => (this.map = map));
     this.informeService.getInforme(this.structuresService.informeId).subscribe((informe) => (this.informe = informe));
