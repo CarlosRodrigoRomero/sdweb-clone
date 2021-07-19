@@ -210,7 +210,7 @@ export class MapStructuresComponent implements OnInit {
                 return this.filterService.filteredElements$;
               })
             )
-            .pipe(take(1))
+            // .pipe(take(1))
             .subscribe((elems) => {
               mBSource.clear();
 
@@ -222,6 +222,8 @@ export class MapStructuresComponent implements OnInit {
 
               // asignamos el numero de modulos del informe
               this.structuresService.reportNumModules = this.rawMods.length;
+
+              console.log(this.structuresService.reportNumModules);
 
               this.rawMods.forEach((rawMod) => {
                 this.addRawModule(rawMod);
@@ -363,7 +365,7 @@ export class MapStructuresComponent implements OnInit {
             e.selected[0].getProperties().properties.visible = false;
 
             // restamos el numero de modulos
-            this.structuresService.reportNumModules--;
+            // this.structuresService.reportNumModules--;
 
             // añadimos el id del modulo eliminado a la DB
             this.structuresService.addFilter('eliminados', this.rawModDeletedIds);
