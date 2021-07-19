@@ -6,7 +6,6 @@ import { FilterService } from '@core/services/filter.service';
 import { StructuresService } from '@core/services/structures.service';
 
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
-import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-area-modulo-bruto-filter',
@@ -19,6 +18,8 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
   step = 1;
   value = 0;
   divisor = 3;
+  createMode = false;
+  deleteMode = false;
 
   constructor(private filterService: FilterService, private structuresService: StructuresService) {}
 
@@ -31,6 +32,9 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
         }
       }
     });
+
+    this.structuresService.createRawModMode$.subscribe((mode) => (this.createMode = mode));
+    this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode));
   }
 
   onChangeSlider(e: MatSliderChange) {

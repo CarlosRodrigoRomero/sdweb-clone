@@ -5,6 +5,7 @@
   </div>
 
   <mat-slider
+    [disabled]="createMode || deleteMode"
     class="area-slider"
     thumbLabel
     [displayWith]="formatLabel"

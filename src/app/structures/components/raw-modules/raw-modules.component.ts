@@ -100,7 +100,7 @@ export class RawModulesComponent implements OnInit {
     this.map.addInteraction(this.draw);
 
     this.draw.on('drawend', (evt) => {
-      sourceRawModule.clear();
+      // sourceRawModule.clear();
 
       const polygon = evt.feature.getGeometry() as Polygon;
       const coords = polygon.getCoordinates();

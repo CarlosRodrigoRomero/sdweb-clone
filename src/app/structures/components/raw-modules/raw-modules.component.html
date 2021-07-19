@@ -4,7 +4,7 @@
   <app-area-modulo-bruto-filter></app-area-modulo-bruto-filter>
 </div>
 <div class="delete-buttons">
-  <button mat-raised-button *ngIf="!deleteMode" (click)="switchDeleteMode()">
+  <button mat-raised-button [disabled]="createMode" *ngIf="!deleteMode" (click)="switchDeleteMode()">
     <mat-icon class="icon">delete</mat-icon>
     <span>Activar modo eliminar</span>
   </button>
@@ -14,7 +14,7 @@
   </button>
 </div>
 <div class="restore-buttons">
-  <button mat-raised-button (click)="confirmRestoreDeletedDialog()" [disabled]="deleteMode">
+  <button mat-raised-button (click)="confirmRestoreDeletedDialog()" [disabled]="deleteMode || createMode">
     <mat-icon class="icon">restore_from_trash</mat-icon>
     <span>Rest. eliminados</span>
   </button>

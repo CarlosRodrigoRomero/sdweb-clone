@@ -4,6 +4,7 @@
     <span class="fuerza">Fuerza: {{ value }}</span>
   </div>
   <mat-slider
+    [disabled]="createMode || deleteMode"
     class="aspect-ratio-slider"
     thumbLabel
     [displayWith]="formatLabel"

@@ -18,6 +18,8 @@ export class AspectRatioFilterComponent implements OnInit {
   step = 1;
   value = 0;
   divisor = 3;
+  createMode = false;
+  deleteMode = false;
 
   constructor(private filterService: FilterService, private structuresService: StructuresService) {}
 
@@ -30,6 +32,9 @@ export class AspectRatioFilterComponent implements OnInit {
         }
       }
     });
+
+    this.structuresService.createRawModMode$.subscribe((mode) => (this.createMode = mode));
+    this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode));
   }
 
   onChangeSlider(e: MatSliderChange) {
