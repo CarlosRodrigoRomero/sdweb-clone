@@ -99,7 +99,7 @@ export class StructuresService {
     return this.initialized$;
   }
 
-  public setAveragesAndStandardDeviations() {
+  setInitialAveragesAndStandardDeviations() {
     const areas = this.allRawModules.map((module) => module.area);
     this.areaAverage = this.average(areas);
     this.areaStdDev = this.standardDeviation(areas);
@@ -114,6 +114,20 @@ export class StructuresService {
 
     // cargamos los modulos en bruto
     this.loadRawModules = true;
+  }
+
+  updateAveragesAndStandardDeviations(modules: RawModule[]) {
+    const areas = modules.map((module) => module.area);
+    this.areaAverage = this.average(areas);
+    this.areaStdDev = this.standardDeviation(areas);
+
+    const aspectRatios = modules.map((module) => module.aspectRatio);
+    this.aspectRatioAverage = this.average(aspectRatios);
+    this.aspectRatioStdDev = this.standardDeviation(aspectRatios);
+
+    const confianzas = modules.map((module) => module.confianza);
+    this.confianzaAverage = this.average(confianzas);
+    this.confianzaStdDev = this.standardDeviation(confianzas);
   }
 
   private average(values) {

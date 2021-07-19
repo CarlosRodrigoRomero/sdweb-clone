@@ -187,7 +187,7 @@ export class MapStructuresComponent implements OnInit {
           this.structuresService.allRawModules = modulos;
 
           // calculamos las medias y desviaciones
-          this.structuresService.setAveragesAndStandardDeviations();
+          this.structuresService.setInitialAveragesAndStandardDeviations();
 
           return this.filterService.initService(modulos);
         })
@@ -219,6 +219,9 @@ export class MapStructuresComponent implements OnInit {
               } else {
                 this.rawMods = elems as RawModule[];
               }
+
+              // actualizamos las medias y desviaciones estandar con los modulos filtrados
+              this.structuresService.updateAveragesAndStandardDeviations(this.rawMods);
 
               // asignamos el numero de modulos del informe
               this.structuresService.reportNumModules = this.rawMods.length;
