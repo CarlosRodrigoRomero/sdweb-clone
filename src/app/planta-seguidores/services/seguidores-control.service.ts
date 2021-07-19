@@ -426,24 +426,9 @@ export class SeguidoresControlService {
 
   public getImageSeguidor(folder: string) {
     if (this.seguidorSelected !== undefined) {
-      // const imageName = this.seguidorSelected.anomalias[0].archivo;
+      console.log(this.seguidorSelected);
 
-      const seguidorRef = this.seguidorSelected.nombre.replace('Seguidor ', '')/* .replaceAll(' / ', '.') */;
-
-      const imageName = this.selectedInforme.prefijo + seguidorRef;
-
-      // const imageName = '210616_Puebla_del_Prior_A.0.3.2.1.jpg';
-
-      const completeImageName = this.imgSeguidoresUrls.find((imgUrl) => imgUrl.indexOf(imageName) > -1);
-
-      console.log(completeImageName);
-
-      /////////// DEMO ///////////
-      // let imageName = 'informes_qfqeerbHSTROqL8O2TVk_jpg_200803_Arguedas_1.1.jpg';
-      // if (folder !== 'jpg') {
-      //   imageName = 'informes_qfqeerbHSTROqL8O2TVk_jpgVisual_200803_Arguedas_1.1.jpg';
-      // }
-      ///////////////////////////
+      const imageName = this.seguidorSelected.anomalias[0].archivoPublico;
 
       // Creamos una referencia a la imagen
       const storageRef = this.storage.ref('');
