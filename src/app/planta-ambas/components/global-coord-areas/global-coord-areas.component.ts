@@ -61,19 +61,18 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    const letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
     if (this.reportControlService.plantaFija) {
-      this.nombreGlobalCoords = GLOBAL.nombreGlobalCoordsFija;
-      if (this.nombreGlobalCoords === undefined) {
-        for (let index = 0; index < this.reportControlService.numFixedGlobalCoords; index++) {
-          this.nombreGlobalCoords.push('Zonas tipo ' + index);
-        }
+      // ponemos un nombre estandar a las zonas por si no tubiese un nombre definido por la empresa
+      for (let index = 0; index < this.reportControlService.numFixedGlobalCoords; index++) {
+        this.nombreGlobalCoords.push('Zonas ' + letras[index]);
       }
     } else {
       if (this.seguidorService.numGlobalCoords > 1) {
         // restamos 1 al numero de global coords xq las pequeñas son los seguidores
         this.numAreas = this.seguidorService.numGlobalCoords - 1;
         for (let index = 0; index < this.numAreas; index++) {
-          this.nombreGlobalCoords.push('Zonas tipo ' + index);
+          this.nombreGlobalCoords.push('Zonas ' + letras[index]);
         }
       } else {
         this.reportControlService.thereAreZones = false;
