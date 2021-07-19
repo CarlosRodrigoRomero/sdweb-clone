@@ -264,9 +264,14 @@ export class EditListComponent implements OnInit {
         let globalCoords;
         let modulo;
         [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(estructura.getLatLng());
-        if (modulo !== null) {
+
+        if (modulo !== null && modulo !== undefined) {
           estructura.setModulo(modulo);
         }
+
+        /* if (globalCoords !== null && globalCoords !== undefined) {
+          estructura.setGlobals(globalCoords);
+        } */
       }
 
       estConPcs.pcs.forEach(async (pc) => {

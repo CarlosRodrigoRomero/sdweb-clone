@@ -187,6 +187,7 @@ export class ClassificationService {
 
         anom.globalCoords = newGloblaCoords;
 
+        // CAMBIAR TB ESTE CAMPO EN EL SERVICIO
         this.anomaliaService.updateAnomaliaField(anom);
       }
     });

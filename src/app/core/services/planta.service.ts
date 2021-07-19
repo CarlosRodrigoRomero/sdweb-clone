@@ -585,15 +585,15 @@ export class PlantaService {
     if (this.locAreaList !== undefined) {
       this.locAreaList.forEach((polygon, i, array) => {
         if (google.maps.geometry.poly.containsLocation(latLng, polygon)) {
-          if (polygon.globalX.length > 0) {
+          if (polygon.globalX !== undefined && polygon.globalX !== null && polygon.globalX !== '') {
             globalCoords[0] = polygon.globalX;
           }
-          if (polygon.globalY.length > 0) {
+          if (polygon.globalY !== undefined && polygon.globalY !== null && polygon.globalY !== '') {
             globalCoords[1] = polygon.globalY;
           }
           if (polygon.hasOwnProperty('globalCoords') && polygon.globalCoords !== undefined) {
             polygon.globalCoords.forEach((item, index) => {
-              if (item !== null && item.length > 0) {
+              if (item !== null && item !== undefined && item !== '') {
                 globalCoords[index] = item;
               }
             });
