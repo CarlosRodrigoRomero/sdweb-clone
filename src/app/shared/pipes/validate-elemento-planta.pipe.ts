@@ -19,7 +19,9 @@ export class ValidateElementoPlantaPipe implements PipeTransform {
     }
     if (planta !== undefined) {
       if (planta.hasOwnProperty('numeroGlobalCoords')) {
-        numeroGlobalCoords = planta.numeroGlobalCoords;
+        if (planta.numeroGlobalCoords !== null) {
+          numeroGlobalCoords = planta.numeroGlobalCoords;
+        }
       }
     }
     if (elem.constructor.name === Estructura.name) {

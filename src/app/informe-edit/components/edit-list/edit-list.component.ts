@@ -268,10 +268,6 @@ export class EditListComponent implements OnInit {
         if (modulo !== null && modulo !== undefined) {
           estructura.setModulo(modulo);
         }
-
-        /* if (globalCoords !== null && globalCoords !== undefined) {
-          estructura.setGlobals(globalCoords);
-        } */
       }
 
       estConPcs.pcs.forEach(async (pc) => {
