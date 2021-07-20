@@ -99,7 +99,7 @@ export class SeguidorService {
 
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
           let count = 0;
-          locAreaSeguidores.forEach((locArea) => {
+          locAreaSeguidores.forEach((locArea, index) => {
             const anomaliasSeguidor = anomaliaList
               // tslint:disable-next-line: triple-equals
               .filter((anomalia) => anomalia.tipo != 0)
@@ -108,6 +108,17 @@ export class SeguidorService {
                   anomalia.globalCoords.slice(0, this.numGlobalCoords + 1).toString() ===
                   locArea.globalCoords.slice(0, this.numGlobalCoords + 1).toString()
               );
+
+            const zona = locAreaList
+              .filter((locA) => locA.modulo !== undefined)
+              // tslint:disable-next-line: triple-equals
+              .find((locA) => locA.globalCoords[0] == locArea.globalCoords[0]);
+
+            let modulo;
+            if (zona !== undefined) {
+              modulo = zona.modulo;
+            }
+
             const seguidor = new Seguidor(
               anomaliasSeguidor,
               this.planta.filas,
@@ -115,7 +126,7 @@ export class SeguidorService {
               locArea.path,
               plantaId,
               informeId,
-              locArea.modulo,
+              modulo,
               locArea.globalCoords,
               'seguidor_' + count++ + '_' + informeId
             );

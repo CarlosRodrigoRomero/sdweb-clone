@@ -222,8 +222,6 @@ export class ReportControlService {
             switchMap((segs) => {
               this.allFilterableElements = segs;
 
-              console.log(segs.filter(seg => seg.celsCalientes > 1));
-
               // iniciamos filter service
               return this.filterService.initService(segs);
             })
