@@ -9,8 +9,10 @@ import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { FilterService } from '@core/services/filter.service';
 import { ReportControlService } from '@core/services/report-control.service';
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { PlantaService } from '@core/services/planta.service';
 
 import { Seguidor } from '@core/models/seguidor';
+import { PlantaInterface } from '@core/models/planta';
 
 interface SeguidorData {
   id: string;
@@ -32,6 +34,7 @@ export class SeguidoresListComponent implements OnInit {
   dataSource: MatTableDataSource<SeguidorData>;
   public seguidorHovered: Seguidor = undefined;
   public seguidorSelected: Seguidor = undefined;
+  private planta: PlantaInterface;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -40,7 +43,8 @@ export class SeguidoresListComponent implements OnInit {
     private mapSeguidoresService: MapSeguidoresService,
     public filterService: FilterService,
     private reportControlService: ReportControlService,
-    private seguidoresControlService: SeguidoresControlService
+    private seguidoresControlService: SeguidoresControlService,
+    private plantaService: PlantaService
   ) {}
 
   ngOnInit(): void {
@@ -71,9 +75,10 @@ export class SeguidoresListComponent implements OnInit {
             filteredElements.push({
               id: elem.id.replace((elem as Seguidor).informeId, '').replace(/_/g, ' '),
               modulo: this.getModuloLabel(elem as Seguidor),
-              mae: (elem as Seguidor).mae.toFixed(3),
-              celsCalientes: (this.getCelsCalientes(elem as Seguidor) * 100).toFixed(0) + '%',
-              gradiente: elem.gradienteNormalizado + 'ºC',
+              mae: (elem as Seguidor).mae,
+              // celsCalientes: (this.getCelsCalientes(elem as Seguidor) * 100).toFixed(0) + '%',
+              celsCalientes: this.getCelsCalientes(elem as Seguidor),
+              gradiente: elem.gradienteNormalizado,
               color: 'red',
               seguidor: elem as Seguidor,
             })
@@ -87,6 +92,8 @@ export class SeguidoresListComponent implements OnInit {
 
     this.seguidoresControlService.seguidorHovered$.subscribe((segHov) => (this.seguidorHovered = segHov));
     this.seguidoresControlService.seguidorSelected$.subscribe((segSel) => (this.seguidorSelected = segSel));
+
+    this.plantaService.getPlanta(this.reportControlService.plantaId).subscribe((planta) => (this.planta = planta));
   }
 
   applyFilter(event: Event) {
@@ -154,6 +161,6 @@ export class SeguidoresListComponent implements OnInit {
     // tslint:disable-next-line: triple-equals
     const celsCalientes = seguidor.anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
-    return celsCalientes.length / seguidor.anomalias.length;
+    return celsCalientes.length / (this.planta.filas * this.planta.columnas);
   }
 }

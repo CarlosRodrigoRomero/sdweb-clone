@@ -61,38 +61,48 @@ export class Seguidor implements FilterableElement {
 
   private getPerdidas(anomalias: Anomalia[]): number {
     let suma = 0;
-    anomalias.forEach((anomalia) => {
-      if (anomalia.perdidas !== undefined) {
-        suma += anomalia.perdidas;
-      }
-    });
+    if (anomalias.length > 0) {
+      anomalias.forEach((anomalia) => {
+        if (anomalia.perdidas !== undefined) {
+          suma += anomalia.perdidas;
+        }
+      });
+    }
     return suma;
   }
 
   private getMae(): number {
-    return this.perdidas / (this.filas * this.columnas);
+    let mae = 0;
+    if (this.perdidas !== 0) {
+      mae = this.perdidas / (this.filas * this.columnas);
+    }
+    return mae;
   }
 
   private getTempMax(): number {
+    let tempMax = 0;
     if (this.anomalias.length > 0) {
-      return Math.max(
-        ...this.anomalias
-          .filter((anomalia) => anomalia.temperaturaMax !== undefined)
-          .map((anomalia) => anomalia.temperaturaMax)
-      );
+      const temps = this.anomalias
+        .filter((anomalia) => anomalia.temperaturaMax !== undefined)
+        .map((anomalia) => anomalia.temperaturaMax);
+      if (temps.length > 0) {
+        tempMax = Math.max(...temps);
+      }
     }
-    return 0;
+    return tempMax;
   }
 
   private getGradienteNormMax(): number {
+    let gradNormMax = 0;
     if (this.anomalias.length > 0) {
-      return Math.max(
-        ...this.anomalias
-          .filter((anomalia) => anomalia.gradienteNormalizado !== undefined)
-          .map((anomalia) => anomalia.gradienteNormalizado)
-      );
+      const gradientes = this.anomalias
+        .filter((anomalia) => anomalia.gradienteNormalizado !== undefined)
+        .map((anomalia) => anomalia.gradienteNormalizado);
+      if (gradientes.length > 0) {
+        gradNormMax = Math.max(...gradientes);
+      }
     }
-    return 0;
+    return gradNormMax;
   }
 
   private pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {
@@ -105,9 +115,14 @@ export class Seguidor implements FilterableElement {
   }
 
   private getCelsCalientes(anomalias: Anomalia[]): number {
-    const celsCalientes = anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9).length;
+    let celsCalientes = 0;
+    if (anomalias.length > 0) {
+      celsCalientes =
+        // tslint:disable-next-line: triple-equals
+        anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9).length / (this.filas * this.columnas);
+    }
 
-    return celsCalientes / (this.filas * this.columnas);
+    return celsCalientes;
   }
 
   private getModuloLabel(): string {

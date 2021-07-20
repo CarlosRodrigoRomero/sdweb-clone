@@ -54,6 +54,13 @@ export class SeguidoresControlService {
   private _urlThermalImageSeguidor: string = undefined;
   public urlThermalImageSeguidor$ = new BehaviorSubject<string>(this._urlThermalImageSeguidor);
 
+  private maeMin: number;
+  private maeMax: number;
+  private ccMin: number;
+  private ccMax: number;
+  private gradMin: number;
+  private gradMax: number;
+
   constructor(
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
@@ -82,6 +89,9 @@ export class SeguidoresControlService {
       .pipe(
         switchMap((informeId) => {
           this.selectedInformeId = informeId;
+
+          // recalculamos los MIN y MAX de cada vista
+          this.getMinMaxViews();
 
           // this.getImagesSeguidoresInforme();
 
@@ -295,6 +305,41 @@ export class SeguidoresControlService {
     });
   }
 
+  private getMinMaxViews() {
+    this.getMinMaxMae();
+    this.getMinMaxCC();
+    this.getMinMaxGradNormMax();
+  }
+
+  private getMinMaxMae() {
+    const maes = this.reportControlService.allFilterableElements
+      .filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId)
+      .map((seg) => (seg as Seguidor).mae);
+
+    this.maeMin = Math.min(...maes);
+    this.maeMax = Math.max(...maes);
+  }
+
+  private getMinMaxCC() {
+    const allCelsCalientes = this.reportControlService.allFilterableElements
+      .filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId)
+      .map((seg) => (seg as Seguidor).celsCalientes)
+      .filter((cc) => !isNaN(cc) && cc !== Infinity && cc !== -Infinity);
+
+    this.ccMin = Math.min(...allCelsCalientes);
+    this.ccMax = Math.max(...allCelsCalientes);
+  }
+
+  private getMinMaxGradNormMax() {
+    const gradientes = this.reportControlService.allFilterableElements
+      .filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId)
+      .map((seg) => (seg as Seguidor).gradienteNormalizado)
+      .filter((grad) => !isNaN(grad) && grad !== Infinity && grad !== -Infinity);
+
+    this.gradMin = Math.min(...gradientes);
+    this.gradMax = Math.max(...gradientes);
+  }
+
   // ESTILOS MAE
   private getStyleSeguidoresMae(focused: boolean) {
     return (feature) => {
@@ -315,13 +360,9 @@ export class SeguidoresControlService {
   private getColorSeguidorMae(feature: Feature) {
     const mae = feature.getProperties().properties.mae as number;
 
-    const maes = this.listaSeguidores.map((seg) => seg.mae);
-    const maeMax = Math.max(...maes);
-    const maeMin = Math.min(...maes);
-
-    if (mae <= (maeMax - maeMin) / 3) {
+    if (mae <= (this.maeMax - this.maeMin) / 3) {
       return GLOBAL.colores_mae[0];
-    } else if (mae <= (2 * (maeMax - maeMin)) / 3) {
+    } else if (mae <= (2 * (this.maeMax - this.maeMin)) / 3) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -349,16 +390,13 @@ export class SeguidoresControlService {
     const numModulos = feature.getProperties().properties.filas * feature.getProperties().properties.columnas;
     const celsCalientes = feature
       .getProperties()
+      // tslint:disable-next-line: triple-equals
       .properties.anomalias.filter((anomalia) => anomalia.tipo == 8 || anomalia.tipo == 9).length;
     const porcentCelsCalientes = celsCalientes / numModulos;
 
-    const allCelsCalientes = this.listaSeguidores.map((seg) => seg.celsCalientes);
-    const ccMax = Math.max(...allCelsCalientes);
-    const ccMin = Math.min(...allCelsCalientes);
-
-    if (porcentCelsCalientes <= (ccMax - ccMin) / 3) {
+    if (porcentCelsCalientes <= (this.ccMax - this.ccMin) / 3) {
       return GLOBAL.colores_mae[0];
-    } else if (porcentCelsCalientes <= (2 * (ccMax - ccMin)) / 3) {
+    } else if (porcentCelsCalientes <= (2 * (this.ccMax - this.ccMin)) / 3) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -387,13 +425,9 @@ export class SeguidoresControlService {
   private getColorSeguidorGradienteNormMax(feature: Feature) {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
-    const gradientes = this.listaSeguidores.map((seg) => seg.gradienteNormalizado);
-    const gradMax = Math.max(...gradientes);
-    const gradMin = Math.min(...gradientes);
-
-    if (gradNormMax <= (gradMax - gradMin) / 3) {
+    if (gradNormMax <= (this.gradMax - this.gradMin) / 3) {
       return GLOBAL.colores_mae[0];
-    } else if (gradNormMax <= (2 * (gradMax - gradMin)) / 3) {
+    } else if (gradNormMax <= (2 * (this.gradMax - this.gradMin)) / 3) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
