@@ -269,7 +269,7 @@ export class ReportControlService {
                       this.allFilterableElements = segs;
 
                       // iniciamos filter service
-                      return this.filterService.initService(segs, this.plantaFija, this.sharedId);
+                      return this.filterService.initService(segs, true, this.sharedId);
                     })
                   )
                   // iniciamos filter service
@@ -308,7 +308,7 @@ export class ReportControlService {
                       this.allFilterableElements = segs;
 
                       // iniciamos filter service
-                      return this.filterService.initService(segs, this.plantaFija, this.sharedId);
+                      return this.filterService.initService(segs, true, this.sharedId);
                     })
                   )
                   .subscribe((init) => (this.initialized = init));

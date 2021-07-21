@@ -22,7 +22,8 @@ table {
 }
 
 .label-tipo {
-  display: inline-flex;
+  display: flex;
+  align-items: center;
 }
 
 .label-tipo mat-icon {

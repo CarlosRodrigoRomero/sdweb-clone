@@ -1,10 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 
-import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
-import { GLOBAL } from '@core/services/global';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { FilterService } from '@core/services/filter.service';
 import { ReportControlService } from '@core/services/report-control.service';
@@ -13,6 +11,8 @@ import { PlantaService } from '@core/services/planta.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
+import { combineLatest } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 
 interface SeguidorData {
   id: string;
@@ -28,15 +28,15 @@ interface SeguidorData {
   templateUrl: './seguidores-list.component.html',
   styleUrls: ['./seguidores-list.component.css'],
 })
-export class SeguidoresListComponent implements OnInit {
+export class SeguidoresListComponent implements OnInit, AfterViewInit {
   viewSeleccionada = 0;
   displayedColumns: string[] = [];
   dataSource: MatTableDataSource<SeguidorData>;
   public seguidorHovered: Seguidor = undefined;
   public seguidorSelected: Seguidor = undefined;
   private planta: PlantaInterface;
+  private informeId: string;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(
@@ -54,43 +54,56 @@ export class SeguidoresListComponent implements OnInit {
       // cambiammos la ultima columna con la vista seleccionada
       switch (this.viewSeleccionada) {
         case 0:
-          this.displayedColumns = ['id', 'modulo', 'mae'];
+          this.displayedColumns = ['id', 'anomalias', 'modulo', 'mae'];
           break;
         case 1:
-          this.displayedColumns = ['id', 'modulo', 'celsCalientes'];
+          this.displayedColumns = ['id', 'anomalias', 'modulo', 'celsCalientes'];
           break;
         case 2:
-          this.displayedColumns = ['id', 'modulo', 'gradiente'];
+          this.displayedColumns = ['id', 'anomalias', 'modulo', 'gradiente'];
           break;
       }
     });
 
-    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-      this.filterService.filteredElements$.subscribe((elems) => {
+    const getPlanta$ = this.plantaService.getPlanta(this.reportControlService.plantaId);
+    const getInformeId$ = this.reportControlService.selectedInformeId$;
+
+    combineLatest([getPlanta$, getInformeId$])
+      .pipe(
+        take(1),
+        switchMap(([planta, informeId]) => {
+          this.planta = planta;
+          this.informeId = informeId;
+
+          return this.filterService.filteredElements$;
+        })
+      )
+      .subscribe((elems) => {
         const filteredElements = [];
 
         elems
-          .filter((elem) => (elem as Seguidor).informeId === informeId)
+          .filter((elem) => (elem as Seguidor).informeId === this.informeId)
           .forEach((elem) =>
             filteredElements.push({
               id: elem.id.replace((elem as Seguidor).informeId, '').replace(/_/g, ' '),
               modulo: this.getModuloLabel(elem as Seguidor),
               celsCalientes: this.getCelsCalientes(elem as Seguidor),
               color: 'red',
+              // numAnomalias: (elem as Seguidor).anomalias.filter((anom) => anom.tipo != 0).length,
               seguidor: elem as Seguidor,
             })
           );
 
         this.dataSource = new MatTableDataSource(filteredElements);
-        this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
       });
-    });
 
     this.seguidoresControlService.seguidorHovered$.subscribe((segHov) => (this.seguidorHovered = segHov));
     this.seguidoresControlService.seguidorSelected$.subscribe((segSel) => (this.seguidorSelected = segSel));
+  }
 
-    this.plantaService.getPlanta(this.reportControlService.plantaId).subscribe((planta) => (this.planta = planta));
+  ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
   }
 
   applyFilter(event: Event) {
