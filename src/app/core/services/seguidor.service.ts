@@ -99,10 +99,10 @@ export class SeguidorService {
 
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
           let count = 0;
-          locAreaSeguidores.forEach((locArea, index) => {
+          locAreaSeguidores.forEach((locArea) => {
             const anomaliasSeguidor = anomaliaList
               // tslint:disable-next-line: triple-equals
-              .filter((anomalia) => anomalia.tipo != 0)
+              // .filter((anomalia) => anomalia.tipo != 0)
               .filter(
                 (anomalia) =>
                   anomalia.globalCoords.slice(0, this.numGlobalCoords + 1).toString() ===

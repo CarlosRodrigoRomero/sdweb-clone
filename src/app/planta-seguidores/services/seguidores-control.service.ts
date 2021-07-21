@@ -460,8 +460,6 @@ export class SeguidoresControlService {
 
   public getImageSeguidor(folder: string) {
     if (this.seguidorSelected !== undefined) {
-      console.log(this.seguidorSelected);
-
       const imageName = this.seguidorSelected.anomalias[0].archivoPublico;
 
       // Creamos una referencia a la imagen

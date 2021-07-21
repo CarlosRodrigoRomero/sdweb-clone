@@ -1,6 +1,12 @@
 <mat-sidenav-container class="seguidor-container">
   <!-- SIDENAV SEGUIDOR VIEW -->
-  <mat-sidenav #sidenavSeguidorView [(opened)]="seguidorViewOpened" class="seguidor-sidenav" position="end">
+  <mat-sidenav
+    #sidenavSeguidorView
+    [(opened)]="seguidorViewOpened"
+    class="seguidor-sidenav"
+    position="end"
+    disableClose
+  >
     <!-- VISTA SEGUIDOR -->
     <app-seguidor-view></app-seguidor-view>
   </mat-sidenav>

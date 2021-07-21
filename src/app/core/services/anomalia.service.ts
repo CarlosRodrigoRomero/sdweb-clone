@@ -163,7 +163,9 @@ export class AnomaliaService {
             data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
             data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
             data.criticidad = this.getCriticidad(data);
-            data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
+            if (data.globalCoords !== undefined && data.globalCoords !== null) {
+              data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
+            }
 
             if (tipo === 'pcs') {
               data.localId = (data as PcInterface).local_id.toString();

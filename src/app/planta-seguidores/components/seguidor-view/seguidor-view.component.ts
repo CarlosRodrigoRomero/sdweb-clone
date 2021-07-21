@@ -31,6 +31,8 @@ export class SeguidorViewComponent implements OnInit {
 
   public closeSidenav() {
     this.seguidorViewService.closeSidenav();
+
+    this.seguidoresControlService.seguidorSelected = undefined;
   }
 
   nextSeguidor() {
