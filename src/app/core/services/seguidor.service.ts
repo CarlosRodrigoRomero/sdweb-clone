@@ -15,6 +15,7 @@ import { GLOBAL } from '@core/services/global';
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
 import { LocationAreaInterface } from '@core/models/location';
+import { InformeInterface } from '@core/models/informe';
 
 @Injectable({
   providedIn: 'root',
@@ -53,10 +54,11 @@ export class SeguidorService {
     // Obtener todas las locArea de la planta
     const locAreaList$ = this.plantaService.getLocationsArea(plantaId);
     const anomaliaList$ = this.anomaliaService.getAnomalias$(informeId, tipo);
+    const getInforme$ = this.informeService.getInforme(informeId);
 
     // obtenemos todas las anomalias y las locAreas
-    return combineLatest([locAreaList$, anomaliaList$]).pipe(
-      map(([locAreaList, anomaliaList]) => {
+    return combineLatest([locAreaList$, anomaliaList$, getInforme$]).pipe(
+      map(([locAreaList, anomaliaList, informe]) => {
         const seguidores: Seguidor[] = [];
 
         if (anomaliaList.length > 0) {
@@ -131,6 +133,7 @@ export class SeguidorService {
               'seguidor_' + count++ + '_' + informeId
             );
             seguidor.nombre = this.getSeguidorName(seguidor);
+            seguidor.imageName = this.getImageName(seguidor, informe);
 
             seguidores.push(seguidor);
           });
@@ -179,5 +182,24 @@ export class SeguidorService {
     });
 
     return globalCoords;
+  }
+
+  private getImageName(seguidor: Seguidor, informe: InformeInterface): string {
+    const anomalia = seguidor.anomalias[0];
+    if (anomalia !== undefined) {
+      let imageName: string;
+
+      imageName = informe.prefijo;
+
+      anomalia.globalCoords.forEach((coord) => {
+        if (coord !== null) {
+          imageName = imageName + coord + '.';
+        }
+      });
+
+      imageName = imageName + anomalia.localX + '.' + anomalia.localY + '.jpg';
+
+      return imageName;
+    }
   }
 }

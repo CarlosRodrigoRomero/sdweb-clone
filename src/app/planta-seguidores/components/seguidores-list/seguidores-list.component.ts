@@ -75,10 +75,7 @@ export class SeguidoresListComponent implements OnInit {
             filteredElements.push({
               id: elem.id.replace((elem as Seguidor).informeId, '').replace(/_/g, ' '),
               modulo: this.getModuloLabel(elem as Seguidor),
-              mae: (elem as Seguidor).mae,
-              // celsCalientes: (this.getCelsCalientes(elem as Seguidor) * 100).toFixed(0) + '%',
               celsCalientes: this.getCelsCalientes(elem as Seguidor),
-              gradiente: elem.gradienteNormalizado,
               color: 'red',
               seguidor: elem as Seguidor,
             })

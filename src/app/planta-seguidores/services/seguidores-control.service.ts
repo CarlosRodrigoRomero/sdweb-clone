@@ -272,7 +272,9 @@ export class SeguidoresControlService {
 
     this.map.addInteraction(select);
     select.on('select', (e) => {
-      this.seguidorSelected = undefined;
+      // this.seguidorSelected = undefined;
+
+      console.log(this.seguidorSelected);
 
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().hasOwnProperty('properties')) {
@@ -287,6 +289,7 @@ export class SeguidoresControlService {
           }
         }
       }
+      console.log(this.seguidorSelected);
     });
   }
 

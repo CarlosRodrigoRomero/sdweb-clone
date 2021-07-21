@@ -27,6 +27,7 @@ export class Seguidor implements FilterableElement {
   nombre?: string;
   celsCalientes?: number;
   moduloLabel?: string;
+  imageName?: string;
 
   constructor(
     anomalias: Anomalia[],
@@ -38,7 +39,7 @@ export class Seguidor implements FilterableElement {
     modulo: ModuloInterface,
     globalCoords: string[],
     id?: string,
-    nombre?: string
+    nombre?: string,
   ) {
     this.anomalias = anomalias;
     this.plantaId = plantaId;
