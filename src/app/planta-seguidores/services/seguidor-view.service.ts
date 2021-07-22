@@ -15,6 +15,8 @@ export class SeguidorViewService {
   public imageSelected$ = new BehaviorSubject<number>(this._imageSelected);
   private _anomaliaSelected: Anomalia = undefined;
   public anomaliaSelected$ = new BehaviorSubject<Anomalia>(this._anomaliaSelected);
+  private _prevAnomaliaSelected: Anomalia = undefined;
+  public prevAnomaliaSelected$ = new BehaviorSubject<Anomalia>(this._prevAnomaliaSelected);
   private _anomaliaHovered: Anomalia = undefined;
   public anomaliaHovered$ = new BehaviorSubject<Anomalia>(this._anomaliaHovered);
 
@@ -44,6 +46,15 @@ export class SeguidorViewService {
   set anomaliaSelected(value: Anomalia) {
     this._anomaliaSelected = value;
     this.anomaliaSelected$.next(value);
+  }
+
+  get prevAnomaliaSelected() {
+    return this._prevAnomaliaSelected;
+  }
+
+  set prevAnomaliaSelected(value: Anomalia) {
+    this._prevAnomaliaSelected = value;
+    this.prevAnomaliaSelected$.next(value);
   }
 
   get anomaliaHovered() {

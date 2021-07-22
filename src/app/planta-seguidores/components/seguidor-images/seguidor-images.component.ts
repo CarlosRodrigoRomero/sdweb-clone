@@ -24,6 +24,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
   private seguidorSelected: Seguidor;
   private imageSelected = new Image();
   anomaliaSelected: Anomalia = undefined;
+  prevAnomaliaSelected: Anomalia = undefined;
   thermalImage = new Image();
   imageLoaded: boolean;
   visualImageLoaded: boolean;
@@ -65,14 +66,33 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
             this.seguidoresControlService.getImageSeguidor('jpgVisual');
 
             return this.mapSeguidoresService.toggleViewSelected$;
+          }),
+          switchMap((view) => {
+            this.viewSelected = view;
+
+            if (this.seguidorSelected !== undefined) {
+              this.drawAnomalias();
+            }
+
+            return combineLatest([
+              this.seguidorViewService.anomaliaSelected$,
+              this.seguidorViewService.prevAnomaliaSelected$,
+            ]);
           })
         )
-        .subscribe((view) => {
-          this.viewSelected = view;
+        .subscribe(([anomSel, prevAnomSel]) => {
+          this.anomaliaSelected = anomSel;
+          this.prevAnomaliaSelected = prevAnomSel;
 
-          if (this.seguidorSelected !== undefined) {
-            this.drawAnomalias();
+          if (this.anomaliaSelected !== undefined) {
+            this.setAnomaliaStyle(this.anomaliaSelected, true);
           }
+
+          if (this.prevAnomaliaSelected !== undefined) {
+            this.setAnomaliaStyle(this.prevAnomaliaSelected, false);
+          }
+
+          this.anomsCanvas.renderAll();
         })
     );
 
@@ -110,9 +130,13 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.subscriptions.add(
-      this.seguidorViewService.anomaliaSelected$.subscribe((anomSel) => (this.anomaliaSelected = anomSel))
-    );
+    /* this.subscriptions.add(
+      this.seguidorViewService.anomaliaSelected$.subscribe((anomSel) => {
+        this.anomaliaSelected = anomSel;
+
+        this.setAnomaliaStyle(this.anomaliaSelected, true);
+      })
+    ); */
   }
 
   drawAnomalias() {
@@ -205,18 +229,15 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     this.anomsCanvas.on('mouse:down', (e) => {
       if (e.target !== null) {
         if (e.target.ref === 'anom') {
-          // reseteamos el estilo de la anterior anomalia seleccionada
-          this.resetAnomStyle(this.seguidorViewService.anomaliaSelected);
-
-          // deseleccionamos la anterior
-          this.seguidorViewService.anomaliaSelected = undefined;
+          // seleccionamos la anterior como previa
+          this.seguidorViewService.prevAnomaliaSelected = this.anomaliaSelected;
 
           // seleccionamos la nueva
           const anomaliaSelected = this.seguidorSelected.anomalias.find((anom) => anom.id === e.target.anomId);
 
           this.seguidorViewService.anomaliaSelected = anomaliaSelected;
 
-          e.target.set({ stroke: 'white', strokeWidth: 4 });
+          // e.target.set({ stroke: 'white', strokeWidth: 4 });
         } else {
           this.seguidorViewService.anomaliaSelected = undefined;
         }
@@ -292,11 +313,14 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     });*/
   }
 
-  private resetAnomStyle(anomalia: Anomalia) {
-    this.anomsCanvas
-      .getObjects()
-      .find((anom) => anom.anomId === anomalia.id)
-      .set({ stroke: this.getAnomaliaColor(anomalia), strokeWidth: 2 });
+  private setAnomaliaStyle(anomalia: Anomalia, selected: boolean) {
+    const polygon = this.anomsCanvas.getObjects().find((anom) => anom.anomId === anomalia.id);
+
+    if (selected) {
+      polygon.set({ stroke: 'white', strokeWidth: 4 });
+    } else {
+      polygon.set({ stroke: this.getAnomaliaColor(anomalia), strokeWidth: 2 });
+    }
   }
 
   private selectAnomalia(anomalia: Anomalia) {

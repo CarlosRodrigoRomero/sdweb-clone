@@ -106,11 +106,8 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
     // quitamos el hover del seguidor
     this.seguidorViewService.anomaliaHovered = undefined;
 
-    // reiniciamos el estilo al anterior seguidor
-    /*  if (this.anomaliasControlService.prevAnomaliaSelect !== undefined) {
-      this.anomaliasControlService.setExternalStyle(this.anomaliasControlService.prevAnomaliaSelect.id, false);
-    }
-    this.anomaliasControlService.prevAnomaliaSelect = row.anomalia; */
+    // seleccionamos la anterior seleccionada como previa
+    this.seguidorViewService.prevAnomaliaSelected = this.anomaliaSelected;
 
     this.seguidorViewService.anomaliaSelected = row.anomalia;
     // this.anomaliasControlService.setExternalStyle(row.id, true);
