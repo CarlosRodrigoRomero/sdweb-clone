@@ -4,6 +4,7 @@ import { combineLatest, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 import PointInPolygon from 'point-in-polygon';
 
@@ -27,6 +28,7 @@ export class SeguidorService {
   constructor(
     private informeService: InformeService,
     public afs: AngularFirestore,
+    private storage: AngularFireStorage,
     private anomaliaService: AnomaliaService,
     private plantaService: PlantaService
   ) {}
@@ -201,5 +203,32 @@ export class SeguidorService {
 
       return imageName;
     }
+  }
+
+  downloadImage(folder: string, seguidor: Seguidor) {
+    this.storage
+      .ref(`informes/${seguidor.informeId}/${folder}/${seguidor.imageName}`)
+      .getDownloadURL()
+      .subscribe((downloadUrl) => {
+        // (anomalia as PcInterface).downloadUrlStringRjpg = downloadUrl;
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
+          /* Create a new Blob object using the response
+           *  data of the onload object.
+           */
+          const blob = new Blob([xhr.response], { type: 'image/jpg' });
+          const a: any = document.createElement('a');
+          a.style = 'display: none';
+          document.body.appendChild(a);
+          const url = window.URL.createObjectURL(blob);
+          a.href = url;
+          a.download = `radiometrico_${seguidor.imageName}`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+        };
+        xhr.open('GET', downloadUrl);
+        xhr.send();
+      });
   }
 }
