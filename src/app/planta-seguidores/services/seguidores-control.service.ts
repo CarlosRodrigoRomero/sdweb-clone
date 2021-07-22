@@ -184,7 +184,7 @@ export class SeguidoresControlService {
     this.addOnHoverAction();
 
     this.addSelectInteraction();
-    this.addClickOutFeatures();
+    // this.addClickOutFeatures();
   }
 
   private addCursorOnHover() {
@@ -272,10 +272,6 @@ export class SeguidoresControlService {
 
     this.map.addInteraction(select);
     select.on('select', (e) => {
-      // this.seguidorSelected = undefined;
-
-      console.log(this.seguidorSelected);
-
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().hasOwnProperty('properties')) {
           const seguidorId = e.selected[0].getProperties().properties.seguidorId;
@@ -289,7 +285,6 @@ export class SeguidoresControlService {
           }
         }
       }
-      console.log(this.seguidorSelected);
     });
   }
 
@@ -301,6 +296,7 @@ export class SeguidoresControlService {
         .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
       if (feature.length === 0) {
         if (this.seguidorSelected !== undefined) {
+          console.log('ok');
           this.setExternalStyle(this.seguidorSelected.id, false);
         }
         this.seguidorSelected = undefined;

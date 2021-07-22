@@ -194,17 +194,11 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
             if (value) {
               this.seguidoresControlService.mostrarSeguidores();
 
-              return combineLatest([
-                this.seguidoresControlService.seguidorHovered$,
-                this.seguidoresControlService.seguidorSelected$,
-              ]);
+              return this.seguidoresControlService.seguidorHovered$;
             }
           })
         )
-        .subscribe(([segHover, segSelect]) => {
-          this.seguidorHovered = segHover;
-          this.seguidorSelected = segSelect;
-        })
+        .subscribe((segHover) => (this.seguidorHovered = segHover))
     );
 
     // this.incrementoLayers.forEach((l) => this.map.addLayer(l));

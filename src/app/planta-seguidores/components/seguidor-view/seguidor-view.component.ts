@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+
+import { Subscription } from 'rxjs';
 
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
@@ -9,8 +11,10 @@ import { Seguidor } from '@core/models/seguidor';
   templateUrl: './seguidor-view.component.html',
   styleUrls: ['./seguidor-view.component.css'],
 })
-export class SeguidorViewComponent implements OnInit {
+export class SeguidorViewComponent implements OnInit, OnDestroy {
   public seguidorSelected: Seguidor = undefined;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
@@ -18,21 +22,21 @@ export class SeguidorViewComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
-      this.seguidorSelected = seguidor;
+    this.subscriptions.add(
+      this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
+        this.seguidorSelected = seguidor;
 
-      if (this.seguidorSelected !== undefined) {
-        if (this.seguidorSelected.anomalias.length > 0) {
-          this.seguidorViewService.anomaliaSelected = this.seguidorSelected.anomalias[0];
+        if (this.seguidorSelected !== undefined) {
+          if (this.seguidorSelected.anomalias.length > 0) {
+            this.seguidorViewService.anomaliaSelected = this.seguidorSelected.anomalias[0];
+          }
         }
-      }
-    });
+      })
+    );
   }
 
   public closeSidenav() {
     this.seguidorViewService.closeSidenav();
-
-    this.seguidoresControlService.seguidorSelected = undefined;
   }
 
   nextSeguidor() {
@@ -41,5 +45,20 @@ export class SeguidorViewComponent implements OnInit {
 
   prevSeguidor() {
     this.seguidoresControlService.selectPrevSeguidor();
+  }
+
+  private resetViewValues() {
+    this.seguidoresControlService.seguidorSelected = undefined;
+    this.seguidorViewService.anomaliaSelected = undefined;
+    this.seguidoresControlService.urlVisualImageSeguidor = undefined;
+    this.seguidoresControlService.urlThermalImageSeguidor = undefined;
+    this.seguidorViewService.imageSelected = undefined;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+
+    // reseteamos los valores
+    this.resetViewValues();
   }
 }

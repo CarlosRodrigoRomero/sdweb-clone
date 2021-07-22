@@ -4,7 +4,6 @@ import { BehaviorSubject } from 'rxjs';
 
 import { MatSidenav } from '@angular/material/sidenav';
 
-import { SeguidoresControlService } from './seguidores-control.service';
 import { Anomalia } from '@core/models/anomalia';
 
 @Injectable({
@@ -19,7 +18,7 @@ export class SeguidorViewService {
   private _anomaliaHovered: Anomalia = undefined;
   public anomaliaHovered$ = new BehaviorSubject<Anomalia>(this._anomaliaHovered);
 
-  constructor(private seguidoresControlService: SeguidoresControlService) {}
+  constructor() {}
 
   public setSidenav(sidenav: MatSidenav) {
     this.sidenav = sidenav;
