@@ -54,25 +54,27 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit {
       // cambiammos la ultima columna con la vista seleccionada
       switch (this.viewSeleccionada) {
         case 0:
-          this.displayedColumns = ['id', 'anomalias', 'modulo', 'mae'];
+          this.displayedColumns = ['id', 'numAnomalias', 'modulo', 'mae'];
           break;
         case 1:
-          this.displayedColumns = ['id', 'anomalias', 'modulo', 'celsCalientes'];
+          this.displayedColumns = ['id', 'numAnomalias', 'modulo', 'celsCalientes'];
           break;
         case 2:
-          this.displayedColumns = ['id', 'anomalias', 'modulo', 'gradiente'];
+          this.displayedColumns = ['id', 'numAnomalias', 'modulo', 'gradiente'];
           break;
       }
     });
 
-    const getPlanta$ = this.plantaService.getPlanta(this.reportControlService.plantaId);
-    const getInformeId$ = this.reportControlService.selectedInformeId$;
-
-    combineLatest([getPlanta$, getInformeId$])
+    this.plantaService
+      .getPlanta(this.reportControlService.plantaId)
       .pipe(
         take(1),
-        switchMap(([planta, informeId]) => {
+        switchMap((planta) => {
           this.planta = planta;
+
+          return this.reportControlService.selectedInformeId$;
+        }),
+        switchMap((informeId) => {
           this.informeId = informeId;
 
           return this.filterService.filteredElements$;
@@ -83,16 +85,20 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit {
 
         elems
           .filter((elem) => (elem as Seguidor).informeId === this.informeId)
-          .forEach((elem) =>
+          .forEach((elem) => {
+            const seguidor = elem as Seguidor;
+
             filteredElements.push({
-              id: elem.id.replace((elem as Seguidor).informeId, '').replace(/_/g, ' '),
-              modulo: this.getModuloLabel(elem as Seguidor),
-              celsCalientes: this.getCelsCalientes(elem as Seguidor),
               color: 'red',
-              // numAnomalias: (elem as Seguidor).anomalias.filter((anom) => anom.tipo != 0).length,
-              seguidor: elem as Seguidor,
-            })
-          );
+              id: elem.id.replace((elem as Seguidor).informeId, '').replace(/_/g, ' '),
+              numAnomalias: seguidor.anomalias.length,
+              modulo: this.getModuloLabel(elem as Seguidor),
+              mae: seguidor.mae,
+              celsCalientes: this.getCelsCalientes(seguidor),
+              gradiente: seguidor.gradienteNormalizado,
+              seguidor,
+            });
+          });
 
         this.dataSource = new MatTableDataSource(filteredElements);
         this.dataSource.sort = this.sort;
@@ -103,7 +109,9 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
+    if (this.dataSource !== undefined) {
+      this.dataSource.sort = this.sort;
+    }
   }
 
   applyFilter(event: Event) {
