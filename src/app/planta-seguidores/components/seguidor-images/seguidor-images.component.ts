@@ -105,8 +105,20 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
         // tslint:disable-next-line: triple-equals
         if (image == 0) {
           this.imageSelected.src = urlTherm;
+
+          // creamos las anomalias de nueva al volver a la vista termica
+          if (this.anomsCanvas !== undefined && this.anomsCanvas.isEmpty()) {
+            this.drawAnomalias();
+          }
+
+          // this.anomsCanvas.renderAll();
         } else {
           this.imageSelected.src = urlVis;
+
+          // quitamos las anomalias al seleccionar la vista visual
+          if (this.anomsCanvas !== undefined) {
+            this.anomsCanvas.clear();
+          }
         }
 
         this.imageSelected.onload = () => {
@@ -129,14 +141,6 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
         };
       })
     );
-
-    /* this.subscriptions.add(
-      this.seguidorViewService.anomaliaSelected$.subscribe((anomSel) => {
-        this.anomaliaSelected = anomSel;
-
-        this.setAnomaliaStyle(this.anomaliaSelected, true);
-      })
-    ); */
   }
 
   drawAnomalias() {
