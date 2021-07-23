@@ -1,0 +1,25 @@
+.btn-download {
+  height: 40px;
+  padding: 0;
+  width: 40px;
+  min-width: unset !important;
+}
+
+h4 {
+  margin-left: 10px;
+}
+
+.email {
+  margin: 8px;
+}
+.menu {
+  margin: 1.5rem;
+}
+.contenedor-menu {
+  padding: 1rem;
+}
+
+.warning {
+  font-size: large;
+  font-weight: 100;
+}

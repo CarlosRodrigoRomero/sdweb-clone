@@ -40,7 +40,7 @@
   position: relative;
   height: 100%;
 }
-
+/* 
 app-share-map {
   position: absolute;
   top: 10px;
@@ -52,7 +52,7 @@ app-download-report {
   top: 10px;
   right: 60px;
   z-index: 999;
-}
+} */
 app-barra-resumen-planta {
   position: absolute;
   top: 0px;
@@ -74,6 +74,10 @@ app-view-toggle {
   top: 10px;
   right: 180px;
   z-index: 999;
+}
+
+app-share-report {
+  margin-right: 15px;
 }
 
 .left-sidenav {

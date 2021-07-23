@@ -1,0 +1,36 @@
+<button mat-raised-button class="btn-download" [matMenuTriggerFor]="menu" matTooltip="Descargas">
+  <mat-icon>download</mat-icon>
+</button>
+<mat-menu #menu="matMenu" class="menu">
+  <div class="contenedor-menu">
+    <h5>Descargas</h5>
+    <span class="warning">(Pronto disponible)</span>
+    <button mat-menu-item class="btn-excel" [disabled]="true">
+      <mat-icon>calculate</mat-icon>
+      <span>EXCEL</span>
+    </button>
+    <button mat-menu-item class="btn-pdf" download="" [disabled]="true">
+      <mat-icon>picture_as_pdf</mat-icon>
+      <span>PDF</span>
+    </button>
+
+    <!-- <a
+      href="https://firebasestorage.googleapis.com/v0/b/sdweb-d33ce.appspot.com/o/informes%2F62dvYbGgoMkMNCuNCOEc%2Finforme.xlsx?alt=media&token=c5c38c2c-16d9-4fdc-b3fb-d22d4d847bf2"
+      download=""
+    >
+      <button mat-menu-item class="btn-excel" [disabled]="true">
+        <mat-icon>calculate</mat-icon>
+        <span>EXCEL</span>
+      </button>
+    </a>
+    <a
+      href="https://firebasestorage.googleapis.com/v0/b/sdweb-dev.appspot.com/o/informe.pdf?alt=media&token=24837c23-9780-4418-b10d-810cf4c8691f"
+      download=""
+    >
+      <button mat-menu-item class="btn-pdf" download="" [disabled]="true">
+        <mat-icon>picture_as_pdf</mat-icon>
+        <span>PDF</span>
+      </button>
+    </a> -->
+  </div>
+</mat-menu>

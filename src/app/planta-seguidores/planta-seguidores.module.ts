@@ -24,6 +24,7 @@ import { SeguidorSliderTemporalComponent } from './components/seguidor-slider-te
 import { SeguidorAnomaliaInfoComponent } from './components/seguidor-anomalia-info/seguidor-anomalia-info.component';
 import { SeguidorAnomaliasListComponent } from './components/seguidor-anomalias-list/seguidor-anomalias-list.component';
 import { SeguidorImageDownloadComponent } from './components/seguidor-image-download/seguidor-image-download.component';
+import { DownloadReportComponent } from './components/download-report/download-report.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { SeguidorImageDownloadComponent } from './components/seguidor-image-down
     SeguidorAnomaliaInfoComponent,
     SeguidorAnomaliasListComponent,
     SeguidorImageDownloadComponent,
+    DownloadReportComponent,
   ],
   imports: [
     CommonModule,
