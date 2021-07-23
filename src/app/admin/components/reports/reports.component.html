@@ -49,15 +49,23 @@
         <button mat-icon-button [routerLink]="['./edit', element.informeId]">
           <mat-icon>edit</mat-icon>
         </button>
-        <div *ngIf="element.tipo !== 'seguidores'">
-          <a mat-button [routerLink]="['../../clusters', element.informeId]">Clusters</a>
-          <a mat-button [routerLink]="['../../structures', element.informeId]">Estructuras</a>
-          <a mat-button [routerLink]="['../../classification', element.informeId]">Clasificación</a>
-          <a mat-button *ngIf="element.thermalLayerPending" [routerLink]="['../thermalLayer', element.informeId]">
-            <mat-icon>add</mat-icon>
-            <span>Thermal</span>
-          </a>
-        </div>
+        <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../clusters', element.informeId]"
+          >Clusters</a
+        >
+        <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../structures', element.informeId]"
+          >Estructuras</a
+        >
+        <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../classification', element.informeId]"
+          >Clasificación</a
+        >
+        <a
+          mat-button
+          *ngIf="element.tipo !== 'seguidores' && element.thermalLayerPending"
+          [routerLink]="['../thermalLayer', element.informeId]"
+        >
+          <mat-icon>add</mat-icon>
+          <span>Thermal</span>
+        </a>
       </td>
     </ng-container>
   </table>
