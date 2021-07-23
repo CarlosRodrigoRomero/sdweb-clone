@@ -17,6 +17,7 @@ import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 import { FilterableElement } from '@core/models/filterableInterface';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
+import { Seguidor } from '@core/models/seguidor';
 
 @Injectable({
   providedIn: 'root',
@@ -222,6 +223,10 @@ export class ReportControlService {
             switchMap((segs) => {
               this.allFilterableElements = segs;
 
+              // calculamos el MAE y las CC de los informes si no tuviesen
+              this.setMaeInformesPlanta(segs);
+              this.setCCInformesPlanta(segs);
+
               // iniciamos filter service
               return this.filterService.initService(segs);
             })
@@ -332,6 +337,34 @@ export class ReportControlService {
       }
     }
     return numGlobalCoords;
+  }
+
+  private setMaeInformesPlanta(seguidores: Seguidor[]) {
+    this.informes.forEach((informe) => {
+      // tslint:disable-next-line: triple-equals
+      if (informe.mae == 0 || informe.mae === undefined || informe.mae === null) {
+        const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
+        let mae = 0;
+        seguidoresInforme.forEach((seg) => (mae = mae + seg.mae));
+        informe.mae = mae;
+
+        this.informeService.updateInforme(informe);
+      }
+    });
+  }
+
+  private setCCInformesPlanta(seguidores: Seguidor[]) {
+    this.informes.forEach((informe) => {
+      // tslint:disable-next-line: triple-equals
+      if (informe.cc == 0 || informe.cc === undefined || informe.cc === null) {
+        const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
+        let cc = 0;
+        seguidoresInforme.forEach((seg) => (cc = cc + seg.celsCalientes));
+        informe.cc = cc;
+
+        this.informeService.updateInforme(informe);
+      }
+    });
   }
 
   resetService() {
