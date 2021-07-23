@@ -284,37 +284,6 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     this.anomsCanvas.on('mouse:out', (e) => {
       zoom.style.display = 'none';
     });
-
-    /* this.anomsCanvas.on('mouse:move', (e) => {
-      zoomCtx.fillStyle = 'white';
-      // zoomCtx.clearRect(0,0, zoom.width, zoom.height);
-      // zoomCtx.fillStyle = "transparent";
-      zoomCtx.fillRect(0, 0, zoom.width, zoom.height);
-      // const visualCanvas = document.getElementById(
-      //   "visual-canvas"
-      // ) as HTMLCanvasElement;
-      const scaleX = this.thermalImage.width / this.anomsCanvas.width;
-      const scaleY = this.thermalImage.height / this.anomsCanvas.height;
-      zoomCtx.drawImage(
-        this.thermalImage,
-        e.pointer.x * scaleX - this.zoomSquare / 2,
-        e.pointer.y * scaleY - this.zoomSquare / 2,
-        this.zoomSquare,
-        this.zoomSquare,
-        0,
-        0,
-        this.zoomSquare,
-        this.zoomSquare
-      );
-      // console.log(zoom.style);
-      zoom.style.top = e.pointer.y + 10 + 'px';
-      zoom.style.left = e.pointer.x + 20 + 'px';
-      zoom.style.display = 'block';
-    });
-
-    this.anomsCanvas.on('mouse:out', (e) => {
-      zoom.style.display = 'none';
-    });*/
   }
 
   private setAnomaliaStyle(anomalia: Anomalia, selected: boolean) {
@@ -325,12 +294,6 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     } else {
       polygon.set({ stroke: this.getAnomaliaColor(anomalia), strokeWidth: 2 });
     }
-  }
-
-  private selectAnomalia(anomalia: Anomalia) {
-    // this.drawObjRef(anomalia);
-    // this.drawTriangle(anomalia);
-    this.seguidorViewService.anomaliaSelected = anomalia;
   }
 
   ngOnDestroy(): void {

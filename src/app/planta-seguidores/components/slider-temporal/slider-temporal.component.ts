@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { combineLatest } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { combineLatest, Subscription } from 'rxjs';
+import { map, switchMap, take } from 'rxjs/operators';
 
 import { LabelType, Options } from '@angular-slider/ngx-slider';
 
@@ -14,7 +14,7 @@ import { ReportControlService } from '@core/services/report-control.service';
   templateUrl: './slider-temporal.component.html',
   styleUrls: ['./slider-temporal.component.scss'],
 })
-export class SliderTemporalComponent implements OnInit {
+export class SliderTemporalComponent implements OnInit, OnDestroy {
   public selectedInformeId: string;
   public informesList: string[];
   public sliderLoaded = false;
@@ -32,6 +32,8 @@ export class SliderTemporalComponent implements OnInit {
     },
   };
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private mapSeguidoresService: MapSeguidoresService,
     private informeService: InformeService,
@@ -39,21 +41,33 @@ export class SliderTemporalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.reportControlService.informesIdList$.pipe(take(1)).subscribe((informesId) => {
-      this.informesList = informesId;
-      this.getDatesInformes(informesId).subscribe((dates) => {
-        this.dates = dates;
+    this.subscriptions.add(
+      this.reportControlService.informesIdList$
+        .pipe(
+          take(1),
+          switchMap((informesId) => {
+            this.informesList = informesId;
 
-        // ya tenemos los labels y ahora mostramos el slider
-        this.sliderLoaded = true;
-      });
-    });
+            return this.getDatesInformes(informesId);
+          })
+        )
+        .subscribe((dates) => {
+          this.dates = dates;
 
-    this.reportControlService.selectedInformeId$.subscribe((informeID) => (this.selectedInformeId = informeID));
+          // ya tenemos los labels y ahora mostramos el slider
+          this.sliderLoaded = true;
+        })
+    );
+
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((informeID) => (this.selectedInformeId = informeID))
+    );
 
     this.currentYear = this.informesList.indexOf(this.selectedInformeId) * 100;
 
-    this.mapSeguidoresService.sliderTemporalSelected$.subscribe((value) => (this.currentYear = value));
+    this.subscriptions.add(
+      this.mapSeguidoresService.sliderTemporalSelected$.subscribe((value) => (this.currentYear = value))
+    );
   }
 
   onChangeTemporalSlider(value: number) {
@@ -94,5 +108,9 @@ export class SliderTemporalComponent implements OnInit {
     ];
     const month = monthNames[date.getMonth()];
     return month + ' ' + year;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

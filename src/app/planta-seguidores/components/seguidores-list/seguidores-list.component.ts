@@ -1,7 +1,10 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+
+import { Subscription } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { FilterService } from '@core/services/filter.service';
@@ -11,8 +14,6 @@ import { PlantaService } from '@core/services/planta.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
-import { combineLatest } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
 
 interface SeguidorData {
   id: string;
@@ -28,7 +29,7 @@ interface SeguidorData {
   templateUrl: './seguidores-list.component.html',
   styleUrls: ['./seguidores-list.component.css'],
 })
-export class SeguidoresListComponent implements OnInit, AfterViewInit {
+export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy {
   viewSeleccionada = 0;
   displayedColumns: string[] = [];
   dataSource: MatTableDataSource<SeguidorData>;
@@ -36,6 +37,8 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit {
   public seguidorSelected: Seguidor = undefined;
   private planta: PlantaInterface;
   private informeId: string;
+
+  private subscriptions: Subscription = new Subscription();
 
   @ViewChild(MatSort) sort: MatSort;
 
@@ -48,65 +51,73 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.mapSeguidoresService.toggleViewSelected$.subscribe((sel) => {
-      this.viewSeleccionada = Number(sel);
+    this.subscriptions.add(
+      this.mapSeguidoresService.toggleViewSelected$.subscribe((sel) => {
+        this.viewSeleccionada = Number(sel);
 
-      // cambiammos la ultima columna con la vista seleccionada
-      switch (this.viewSeleccionada) {
-        case 0:
-          this.displayedColumns = ['id', 'numAnomalias', 'modulo', 'mae'];
-          break;
-        case 1:
-          this.displayedColumns = ['id', 'numAnomalias', 'modulo', 'celsCalientes'];
-          break;
-        case 2:
-          this.displayedColumns = ['id', 'numAnomalias', 'modulo', 'gradiente'];
-          break;
-      }
-    });
+        // cambiammos la ultima columna con la vista seleccionada
+        switch (this.viewSeleccionada) {
+          case 0:
+            this.displayedColumns = ['id', 'numAnomalias', 'modulo', 'mae'];
+            break;
+          case 1:
+            this.displayedColumns = ['id', 'numAnomalias', 'modulo', 'celsCalientes'];
+            break;
+          case 2:
+            this.displayedColumns = ['id', 'numAnomalias', 'modulo', 'gradiente'];
+            break;
+        }
+      })
+    );
 
-    this.plantaService
-      .getPlanta(this.reportControlService.plantaId)
-      .pipe(
-        take(1),
-        switchMap((planta) => {
-          this.planta = planta;
+    this.subscriptions.add(
+      this.plantaService
+        .getPlanta(this.reportControlService.plantaId)
+        .pipe(
+          take(1),
+          switchMap((planta) => {
+            this.planta = planta;
 
-          return this.reportControlService.selectedInformeId$;
-        }),
-        switchMap((informeId) => {
-          this.informeId = informeId;
+            return this.reportControlService.selectedInformeId$;
+          }),
+          switchMap((informeId) => {
+            this.informeId = informeId;
 
-          return this.filterService.filteredElements$;
-        })
-      )
-      .subscribe((elems) => {
-        const filteredElements = [];
+            return this.filterService.filteredElements$;
+          })
+        )
+        .subscribe((elems) => {
+          const filteredElements = [];
 
-        elems
-          .filter((elem) => (elem as Seguidor).informeId === this.informeId)
-          .forEach((elem) => {
-            const seguidor = elem as Seguidor;
+          elems
+            .filter((elem) => (elem as Seguidor).informeId === this.informeId)
+            .forEach((elem) => {
+              const seguidor = elem as Seguidor;
 
-            filteredElements.push({
-              color: 'red',
-              id: elem.id.replace((elem as Seguidor).informeId, '').replace(/_/g, ' '),
-              // tslint:disable-next-line: triple-equals
-              numAnomalias: seguidor.anomalias.filter(anom => anom.tipo != 0).length,
-              modulo: this.getModuloLabel(elem as Seguidor),
-              mae: seguidor.mae,
-              celsCalientes: this.getCelsCalientes(seguidor),
-              gradiente: seguidor.gradienteNormalizado,
-              seguidor,
+              filteredElements.push({
+                color: 'red',
+                id: elem.id.replace((elem as Seguidor).informeId, '').replace(/_/g, ' '),
+                // tslint:disable-next-line: triple-equals
+                numAnomalias: seguidor.anomalias.filter((anom) => anom.tipo != 0).length,
+                modulo: this.getModuloLabel(elem as Seguidor),
+                mae: seguidor.mae,
+                celsCalientes: this.getCelsCalientes(seguidor),
+                gradiente: seguidor.gradienteNormalizado,
+                seguidor,
+              });
             });
-          });
 
-        this.dataSource = new MatTableDataSource(filteredElements);
-        this.dataSource.sort = this.sort;
-      });
+          this.dataSource = new MatTableDataSource(filteredElements);
+          this.dataSource.sort = this.sort;
+        })
+    );
 
-    this.seguidoresControlService.seguidorHovered$.subscribe((segHov) => (this.seguidorHovered = segHov));
-    this.seguidoresControlService.seguidorSelected$.subscribe((segSel) => (this.seguidorSelected = segSel));
+    this.subscriptions.add(
+      this.seguidoresControlService.seguidorHovered$.subscribe((segHov) => (this.seguidorHovered = segHov))
+    );
+    this.subscriptions.add(
+      this.seguidoresControlService.seguidorSelected$.subscribe((segSel) => (this.seguidorSelected = segSel))
+    );
   }
 
   ngAfterViewInit(): void {
@@ -181,5 +192,9 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit {
     const celsCalientes = seguidor.anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
     return celsCalientes.length / (this.planta.filas * this.planta.columnas);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

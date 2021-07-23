@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { combineLatest } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 
 import { LabelType, Options } from '@angular-slider/ngx-slider';
 
@@ -15,7 +15,7 @@ import { SeguidoresControlService } from '../../services/seguidores-control.serv
   templateUrl: './seguidor-slider-temporal.component.html',
   styleUrls: ['./seguidor-slider-temporal.component.scss'],
 })
-export class SeguidorSliderTemporalComponent implements OnInit {
+export class SeguidorSliderTemporalComponent implements OnInit, OnDestroy {
   public selectedInformeId: string;
   public informeIdList: string[];
   public sliderLoaded = false;
@@ -33,6 +33,8 @@ export class SeguidorSliderTemporalComponent implements OnInit {
     },
   };
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private mapSeguidoresService: MapSeguidoresService,
     private informeService: InformeService,
@@ -41,21 +43,33 @@ export class SeguidorSliderTemporalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.reportControlService.informesIdList$.pipe(take(1)).subscribe((informesId) => {
-      this.informeIdList = informesId;
-      this.informeService.getDateLabelsInformes(informesId).subscribe((dates) => {
-        this.dates = dates;
+    this.subscriptions.add(
+      this.reportControlService.informesIdList$
+        .pipe(
+          take(1),
+          switchMap((informesId) => {
+            this.informeIdList = informesId;
 
-        // ya tenemos los labels y ahora mostramos el slider
-        this.sliderLoaded = true;
-      });
-    });
+            return this.informeService.getDateLabelsInformes(informesId);
+          })
+        )
+        .subscribe((dates) => {
+          this.dates = dates;
 
-    this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
+          // ya tenemos los labels y ahora mostramos el slider
+          this.sliderLoaded = true;
+        })
+    );
+
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+    );
 
     this.currentYear = this.informeIdList.indexOf(this.selectedInformeId) * 100;
 
-    this.mapSeguidoresService.sliderTemporalSelected$.subscribe((value) => (this.currentYear = value));
+    this.subscriptions.add(
+      this.mapSeguidoresService.sliderTemporalSelected$.subscribe((value) => (this.currentYear = value))
+    );
   }
 
   onChangeTemporalSlider(value: number) {
@@ -67,5 +81,9 @@ export class SeguidorSliderTemporalComponent implements OnInit {
 
     // cambiamos al mismo seguidor pero del informe actual
     this.seguidoresControlService.changeInformeSeguidorSelected();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

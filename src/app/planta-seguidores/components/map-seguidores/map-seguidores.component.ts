@@ -205,7 +205,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log('OnDestroy map-seguidores');
     this.subscriptions.unsubscribe();
   }
 }
