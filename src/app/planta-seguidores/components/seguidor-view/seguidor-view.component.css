@@ -54,11 +54,6 @@ app-seguidor-image-toggle {
   z-index: 999;
 }
 
-app-seguidor-next-prev {
-  position: absolute;
-  top: 220px;
-}
-
 app-seguidor-anomalia-info {
   width: calc(calc(100vw * 0.85) - (640px + 32px));
 }

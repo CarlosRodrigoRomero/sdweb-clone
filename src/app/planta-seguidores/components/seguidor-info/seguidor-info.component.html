@@ -3,27 +3,28 @@
     <mat-card-content class="popup-hover-content">
       <div class="elemento">
         <h5>{{ seguidorHovered.nombre }}</h5>
+        <span *ngIf="numAnomalias == 0" class="no-anom">(Sin anomalías)</span>
       </div>
-      <div class="elemento">
+      <div *ngIf="numAnomalias > 0" class="elemento">
         <span class="titulo">MAE</span>
         <span class="subtitulo">{{ seguidorHovered.mae | number: '1.0-2' }}</span>
         <!-- <span class="subtitulo">{{ seguidorHovered.perdidas * 100 | number: '1.0-2' }}%</span> -->
       </div>
-      <div class="elemento">
+      <div *ngIf="numAnomalias > 0" class="elemento">
         <span class="titulo">&Delta;T Max (normalizado)</span>
         <span class="subtitulo">{{ seguidorHovered.gradienteNormalizado }}ºC</span>
       </div>
-      <div class="elemento">
+      <div *ngIf="numAnomalias > 0" class="elemento">
         <span class="titulo">Cels. Calientes</span>
         <span class="subtitulo">{{ seguidorHovered.celsCalientes * 100 | number: '1.0-0' }}%</span>
       </div>
-      <div class="elemento">
+      <div *ngIf="numAnomalias > 0" class="elemento">
         <span class="titulo">Temperatura Max</span>
         <span class="subtitulo">{{ seguidorHovered.temperaturaMax }}ºC</span>
       </div>
-      <div class="elemento">
+      <div *ngIf="numAnomalias > 0" class="elemento">
         <span class="titulo">Nº anomalías</span>
-        <span class="subtitulo">{{ seguidorHovered.anomalias.length }}</span>
+        <span class="subtitulo">{{ numAnomalias }}</span>
       </div>
       <div class="elemento">
         <span class="titulo">Módulo</span>

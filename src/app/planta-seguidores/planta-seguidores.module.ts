@@ -21,7 +21,6 @@ import { OldPcDetailsDialogComponent } from './components/old-pc-details-dialog/
 import { SeguidorViewToggleComponent } from './components/seguidor-view-toggle/seguidor-view-toggle.component';
 import { SeguidorImageToggleComponent } from './components/seguidor-image-toggle/seguidor-image-toggle.component';
 import { SeguidorSliderTemporalComponent } from './components/seguidor-slider-temporal/seguidor-slider-temporal.component';
-import { SeguidorNextPrevComponent } from './components/seguidor-next-prev/seguidor-next-prev.component';
 import { SeguidorAnomaliaInfoComponent } from './components/seguidor-anomalia-info/seguidor-anomalia-info.component';
 import { SeguidorAnomaliasListComponent } from './components/seguidor-anomalias-list/seguidor-anomalias-list.component';
 
@@ -41,7 +40,6 @@ import { SeguidorAnomaliasListComponent } from './components/seguidor-anomalias-
     SeguidorViewToggleComponent,
     SeguidorImageToggleComponent,
     SeguidorSliderTemporalComponent,
-    SeguidorNextPrevComponent,
     SeguidorAnomaliaInfoComponent,
     SeguidorAnomaliasListComponent,
   ],

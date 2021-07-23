@@ -91,7 +91,8 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit {
             filteredElements.push({
               color: 'red',
               id: elem.id.replace((elem as Seguidor).informeId, '').replace(/_/g, ' '),
-              numAnomalias: seguidor.anomalias.length,
+              // tslint:disable-next-line: triple-equals
+              numAnomalias: seguidor.anomalias.filter(anom => anom.tipo != 0).length,
               modulo: this.getModuloLabel(elem as Seguidor),
               mae: seguidor.mae,
               celsCalientes: this.getCelsCalientes(seguidor),

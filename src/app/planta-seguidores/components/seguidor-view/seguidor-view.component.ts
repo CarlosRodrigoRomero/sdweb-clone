@@ -13,6 +13,7 @@ import { Seguidor } from '@core/models/seguidor';
 })
 export class SeguidorViewComponent implements OnInit, OnDestroy {
   public seguidorSelected: Seguidor = undefined;
+  numAnomalias: number;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -27,7 +28,10 @@ export class SeguidorViewComponent implements OnInit, OnDestroy {
         this.seguidorSelected = seguidor;
 
         if (this.seguidorSelected !== undefined) {
-          if (this.seguidorSelected.anomalias.length > 0) {
+          // tslint:disable-next-line: triple-equals
+          this.numAnomalias = this.seguidorSelected.anomalias.filter((anom) => anom.tipo != 0).length;
+
+          if (this.numAnomalias > 0) {
             this.seguidorViewService.anomaliaSelected = this.seguidorSelected.anomalias[0];
           }
         }

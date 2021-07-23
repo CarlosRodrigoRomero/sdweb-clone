@@ -10,11 +10,13 @@
   </mat-toolbar>
   <div class="seguidor-content">
     <div class="left-content">
+      <!-- IMAGEN -->
       <div class="image-content">
         <app-seguidor-view-toggle></app-seguidor-view-toggle>
         <app-seguidor-images></app-seguidor-images>
         <app-seguidor-image-toggle></app-seguidor-image-toggle>
-        <!-- <app-seguidor-next-prev></app-seguidor-next-prev> -->
+
+        <!-- BOTONES ANTERIOR Y SIGUIENTE -->
         <button class="prev-btn" mat-icon-button (click)="prevSeguidor()">
           <mat-icon>arrow_back_ios</mat-icon>
         </button>
@@ -23,8 +25,11 @@
         </button>
       </div>
       <app-seguidor-slider-temporal></app-seguidor-slider-temporal>
-      <app-seguidor-anomalias-list></app-seguidor-anomalias-list>
+
+      <!-- LISTA ANOMALIAS -->
+      <app-seguidor-anomalias-list *ngIf="numAnomalias > 0"></app-seguidor-anomalias-list>
     </div>
+    <!-- INFO ANOMALIAS SELECCIONADA -->
     <app-seguidor-anomalia-info></app-seguidor-anomalia-info>
   </div>
 </div>

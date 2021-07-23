@@ -16,6 +16,11 @@
   justify-content: space-between;
 }
 
+.no-anom {
+  font-size: large;
+  font-weight: 300;
+}
+
 .titulo {
   font-size: 1rem;
 }
