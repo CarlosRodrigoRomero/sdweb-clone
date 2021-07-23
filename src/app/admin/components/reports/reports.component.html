@@ -34,7 +34,7 @@
     <!-- Potencia -->
     <ng-container matColumnDef="potencia">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencia</th>
-      <td mat-cell *matCellDef="let element">{{ element.potencia }} MW</td>
+      <td mat-cell *matCellDef="let element">{{ element.potencia | number: '1.0-2' }} MW</td>
     </ng-container>
 
     <!-- Informe ID -->
