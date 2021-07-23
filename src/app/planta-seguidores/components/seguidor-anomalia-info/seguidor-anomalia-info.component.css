@@ -1,7 +1,3 @@
-.title {
-  margin-top: 1rem;
-}
-
 .line-info {
   display: grid;
 }
@@ -19,10 +15,4 @@
 
 .line-content {
   margin-left: 2rem;
-}
-
-.download-btns {
-  display: grid;
-  row-gap: 0.5rem;
-  margin-top: 1rem;
 }

@@ -24,12 +24,18 @@
           <mat-icon>arrow_forward_ios</mat-icon>
         </button>
       </div>
-      <app-seguidor-slider-temporal></app-seguidor-slider-temporal>
+      <app-seguidor-slider-temporal *ngIf="numAnomalias > 0"></app-seguidor-slider-temporal>
+      <app-seguidor-image-download *ngIf="numAnomalias == 0"></app-seguidor-image-download>
 
       <!-- LISTA ANOMALIAS -->
       <app-seguidor-anomalias-list *ngIf="numAnomalias > 0"></app-seguidor-anomalias-list>
     </div>
-    <!-- INFO ANOMALIAS SELECCIONADA -->
-    <app-seguidor-anomalia-info></app-seguidor-anomalia-info>
+    <div class="right-content" *ngIf="numAnomalias > 0">
+      <!-- INFO ANOMALIA SELECCIONADA -->
+      <app-seguidor-anomalia-info></app-seguidor-anomalia-info>
+
+      <!-- DESCARGAR IMAGENES -->
+      <app-seguidor-image-download></app-seguidor-image-download>
+    </div>
   </div>
 </div>

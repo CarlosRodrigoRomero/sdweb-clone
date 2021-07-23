@@ -4,9 +4,6 @@ import { Subscription } from 'rxjs';
 
 import { GLOBAL } from '@core/services/global';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
-import { AnomaliaService } from '@core/services/anomalia.service';
-import { SeguidorService } from '@core/services/seguidor.service';
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
@@ -22,12 +19,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(
-    private seguidorViewService: SeguidorViewService,
-    private anomaliaService: AnomaliaService,
-    private seguidorService: SeguidorService,
-    private seguidoresControlService: SeguidoresControlService
-  ) {}
+  constructor(private seguidorViewService: SeguidorViewService) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -58,14 +50,6 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
         }
       })
     );
-  }
-
-  downloadRjpg() {
-    this.seguidorService.downloadImage('jpg', this.seguidoresControlService.seguidorSelected);
-  }
-
-  downloadJpgVisual() {
-    this.seguidorService.downloadImage('jpgVisual', this.seguidoresControlService.seguidorSelected);
   }
 
   ngOnDestroy(): void {
