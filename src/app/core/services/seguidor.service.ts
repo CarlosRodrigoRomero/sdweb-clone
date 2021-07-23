@@ -104,40 +104,40 @@ export class SeguidorService {
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
           let count = 0;
           locAreaSeguidores.forEach((locArea) => {
-            const anomaliasSeguidor = anomaliaList
-              // tslint:disable-next-line: triple-equals
-              // .filter((anomalia) => anomalia.tipo != 0)
-              .filter(
-                (anomalia) =>
-                  anomalia.globalCoords.slice(0, this.numGlobalCoords + 1).toString() ===
-                  locArea.globalCoords.slice(0, this.numGlobalCoords + 1).toString()
-              );
-
-            const zona = locAreaList
-              .filter((locA) => locA.modulo !== undefined)
-              // tslint:disable-next-line: triple-equals
-              .find((locA) => locA.globalCoords[0] == locArea.globalCoords[0]);
-
-            let modulo;
-            if (zona !== undefined) {
-              modulo = zona.modulo;
-            }
-
-            const seguidor = new Seguidor(
-              anomaliasSeguidor,
-              this.planta.filas,
-              this.planta.columnas,
-              locArea.path,
-              plantaId,
-              informeId,
-              modulo,
-              locArea.globalCoords,
-              'seguidor_' + count++ + '_' + informeId
+            const anomaliasSeguidor = anomaliaList.filter(
+              (anomalia) =>
+                anomalia.globalCoords.slice(0, this.numGlobalCoords + 1).toString() ===
+                locArea.globalCoords.slice(0, this.numGlobalCoords + 1).toString()
             );
-            seguidor.nombre = this.getSeguidorName(seguidor);
-            seguidor.imageName = this.getImageName(seguidor, informe);
 
-            seguidores.push(seguidor);
+            // si no tiene anomalias no creamos el seguidor
+            if (anomaliasSeguidor.length > 0) {
+              const zona = locAreaList
+                .filter((locA) => locA.modulo !== undefined)
+                // tslint:disable-next-line: triple-equals
+                .find((locA) => locA.globalCoords[0] == locArea.globalCoords[0]);
+
+              let modulo;
+              if (zona !== undefined) {
+                modulo = zona.modulo;
+              }
+
+              const seguidor = new Seguidor(
+                anomaliasSeguidor,
+                this.planta.filas,
+                this.planta.columnas,
+                locArea.path,
+                plantaId,
+                informeId,
+                modulo,
+                locArea.globalCoords,
+                'seguidor_' + count++ + '_' + informeId
+              );
+              seguidor.nombre = this.getSeguidorName(seguidor);
+              seguidor.imageName = this.getImageName(seguidor, informe);
+
+              seguidores.push(seguidor);
+            }
           });
         }
 
