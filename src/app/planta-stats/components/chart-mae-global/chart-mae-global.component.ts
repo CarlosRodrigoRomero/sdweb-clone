@@ -75,7 +75,7 @@ export class ChartMaeGlobalComponent implements OnInit {
       const maeColors = maeData.map((mae) => {
         if (mae < maeMedio - maeSigma) {
           return GLOBAL.colores_mae[0];
-        } else if (mae <= maeMedio + maeSigma || mae >= maeMedio - maeSigma) {
+        } else if (mae <= maeMedio + maeSigma && mae >= maeMedio - maeSigma) {
           return GLOBAL.colores_mae[1];
         } else {
           return GLOBAL.colores_mae[2];
