@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 import { Seguidor } from '@core/models/seguidor';
 @Component({
@@ -14,12 +15,14 @@ import { Seguidor } from '@core/models/seguidor';
 export class SeguidorViewComponent implements OnInit, OnDestroy {
   public seguidorSelected: Seguidor = undefined;
   numAnomalias: number;
+  oneReport = true;
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
-    private seguidorViewService: SeguidorViewService
+    private seguidorViewService: SeguidorViewService,
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
@@ -37,6 +40,10 @@ export class SeguidorViewComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    if (this.reportControlService.informesIdList.length > 1) {
+      this.oneReport = false;
+    }
   }
 
   public closeSidenav() {

@@ -24,7 +24,7 @@
           <mat-icon>arrow_forward_ios</mat-icon>
         </button>
       </div>
-      <app-seguidor-slider-temporal *ngIf="numAnomalias > 0"></app-seguidor-slider-temporal>
+      <app-seguidor-slider-temporal *ngIf="!oneReport && numAnomalias > 0"></app-seguidor-slider-temporal>
       <app-seguidor-image-download *ngIf="numAnomalias == 0"></app-seguidor-image-download>
 
       <!-- LISTA ANOMALIAS -->

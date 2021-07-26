@@ -79,7 +79,16 @@
     </div>
     <span class="line-content">{{ anomaliaInfo.fecha * 1000 | date: 'dd/MM/yyyy HH:mm' }}</span>
   </div>
-  <div class="line-info">
+  <div
+    *ngIf="
+      anomaliaInfo.irradiancia !== undefined &&
+      anomaliaInfo.vientoDireccion !== undefined &&
+      anomaliaInfo.vientoVelocidad !== undefined &&
+      anomaliaInfo.temperaturaAire !== undefined &&
+      anomaliaInfo.nubosidad !== undefined
+    "
+    class="line-info"
+  >
     <div class="subtitle-icon">
       <mat-icon>brightness_high</mat-icon>
       <span class="subtitle">Meteo:</span>
