@@ -6,7 +6,7 @@
         <app-chart-mae-global></app-chart-mae-global>
 
         <!-- MAE POR ZONAS -->
-        <app-chart-anomalias-zonas></app-chart-anomalias-zonas>
+        <app-chart-anomalias-zonas *ngIf="thereAreZones"></app-chart-anomalias-zonas>
       </div>
       <div>
         <!-- MAE TIPO ANOMALIA -->
@@ -36,7 +36,7 @@
         <app-chart-cels-temps></app-chart-cels-temps>
 
         <!-- CC POR ZONAS -->
-        <app-chart-cels-por-zonas></app-chart-cels-por-zonas>
+        <app-chart-cels-por-zonas *ngIf="thereAreZones"></app-chart-cels-por-zonas>
       </div>
     </div>
   </mat-tab>
