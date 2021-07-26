@@ -94,7 +94,14 @@ export class ClassificationService {
     const id = feature.getProperties().properties.id;
     const refAnom = this.afs.collection('anomalias').doc(id);
     const normModule: NormalizedModule = feature.getProperties().properties.normMod;
-    const coordCentroid = [normModule.centroid_gps.long, normModule.centroid_gps.lat] as Coordinate;
+    const geometry = feature.getGeometry() as SimpleGeometry;
+    let coords: Coordinate;
+    // si existe centroId lo usamos, sino usamos un vertice del rectangulo
+    if (normModule.hasOwnProperty('centroid_gps')) {
+      coords = [normModule.centroid_gps.long, normModule.centroid_gps.lat] as Coordinate;
+    } else {
+      coords = this.plantaService.getGlobalCoordsFromLocationAreaOl(geometry.getCoordinates()[0][0]);
+    }
 
     refAnom
       .get()
@@ -106,9 +113,7 @@ export class ClassificationService {
           this.anomaliaService.getAnomalia(id).subscribe((anomalia) => (this.anomaliaSelected = anomalia));
         } else {
           // si no existe previmente la creamos
-          const geometry = feature.getGeometry() as SimpleGeometry;
-          // const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(geometry.getCoordinates()[0][0]);
-          const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
+          const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coords);
           const modulo = this.getAnomModule(geometry.getCoordinates()[0][0]);
 
           const anomalia: Anomalia = {
