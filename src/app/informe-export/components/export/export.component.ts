@@ -2401,14 +2401,16 @@ export class ExportComponent implements OnInit {
     }
     const modulo = pc.modulo;
     let new_row = '';
-    if (modulo.hasOwnProperty('marca')) {
-      new_row = new_row.concat(modulo['marca'].toString()).concat(' ');
-    }
-    if (modulo.hasOwnProperty('modelo')) {
-      new_row = new_row.concat(modulo['modelo'].toString()).concat(' ');
-    }
-    if (modulo.hasOwnProperty('potencia')) {
-      new_row = new_row.concat('(').concat(modulo['potencia'].toString()).concat(' W)');
+    if (modulo !== null) {
+      if (modulo.hasOwnProperty('marca')) {
+        new_row = new_row.concat(modulo['marca'].toString()).concat(' ');
+      }
+      if (modulo.hasOwnProperty('modelo')) {
+        new_row = new_row.concat(modulo['modelo'].toString()).concat(' ');
+      }
+      if (modulo.hasOwnProperty('potencia')) {
+        new_row = new_row.concat('(').concat(modulo['potencia'].toString()).concat(' W)');
+      }
     }
 
     return new_row;
