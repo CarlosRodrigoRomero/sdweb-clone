@@ -80,7 +80,7 @@ export class InformeOverviewComponent implements OnInit {
           }
 
           if (pc.hasOwnProperty('modulo')) {
-            if (pc.modulo.hasOwnProperty('potencia')) {
+            if (pc.modulo !== null && pc.modulo.hasOwnProperty('potencia')) {
               return GLOBAL.pcPerdidas[i] * numeroModulos * pc.modulo.potencia;
             }
           }
