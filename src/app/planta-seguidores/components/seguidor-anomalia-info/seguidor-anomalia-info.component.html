@@ -20,15 +20,15 @@
 
     <div class="line-content">
       <div *ngIf="anomaliaInfo.temperaturaMax !== undefined">
-        <span><u>Temp. máxima</u></span>
+        <span><u>Temp. máxima:</u></span>
         <span>{{ anomaliaInfo.temperaturaMax }} ºC</span>
       </div>
       <div *ngIf="anomaliaInfo.temperaturaRef !== undefined">
-        <span>Temp. referencia</span>
+        <span>Temp. referencia:</span>
         <span style="color: blue">{{ anomaliaInfo.temperaturaRef }} ºC</span>
       </div>
       <div *ngIf="anomaliaInfo.gradienteNormalizado !== undefined">
-        <span>&Delta;T (normalizado)</span>
+        <span>&Delta;T (normalizado):</span>
         <span style="color: red">+ {{ anomaliaInfo.gradienteNormalizado | number: '1.0-1' }} ºC</span>
       </div>
     </div>
@@ -82,12 +82,26 @@
   <div class="line-info">
     <div class="subtitle-icon">
       <mat-icon>brightness_high</mat-icon>
-      <span class="subtitle">Meteo: </span>
+      <span class="subtitle">Meteo:</span>
     </div>
-    <span class="line-content"
-      >{{ anomaliaInfo.irradiancia | number: '1.0-0' }} W/m<sup>2</sup> | Dirección viento:
-      {{ anomaliaInfo.vientoDireccion }} | Velocidad viento: {{ anomaliaInfo.vientoVelocidad }} |
-      {{ anomaliaInfo.temperaturaAire }} ºC | Nubes: {{ anomaliaInfo.nubosidad }}/8 octavas</span
-    >
+    <div *ngIf="anomaliaInfo.irradiancia !== undefined" class="line-content">
+      <span>Irradiancia:</span>
+      <span>{{ anomaliaInfo.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></span>
+    </div>
+    <div *ngIf="anomaliaInfo.vientoDireccion !== undefined" class="line-content">
+      <span>Dirección viento:</span>
+      <span>{{ anomaliaInfo.vientoDireccion }}</span>
+    </div>
+    <div *ngIf="anomaliaInfo.vientoVelocidad !== undefined" class="line-content">
+      <span>Velocidad viento:</span>
+      <span>{{ anomaliaInfo.vientoVelocidad }}</span>
+    </div>
+    <div *ngIf="anomaliaInfo.temperaturaAire !== undefined" class="line-content">
+      <span>Temperatura ambiente:</span>
+      <span>{{ anomaliaInfo.temperaturaAire }}ºC</span>
+    </div>
+    <div *ngIf="anomaliaInfo.nubosidad !== undefined" class="line-content">
+      <span>Nubosidad:</span> <span>{{ anomaliaInfo.nubosidad }}/8 octavas</span>
+    </div>
   </div>
 </div>
