@@ -19,7 +19,7 @@ import { PlantaInterface } from '@core/models/planta';
 })
 export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   private plantas: PlantaInterface[];
-  displayedColumns: string[] = ['planta', 'fecha', 'tipo', 'potencia', 'informeId', 'actions'];
+  displayedColumns: string[] = ['planta', 'fecha', 'tipo', 'potencia', 'informeId', 'disponible', 'actions'];
   dataSource = new MatTableDataSource<any>();
   private subscriptions: Subscription = new Subscription();
 
@@ -59,6 +59,7 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
               tipo: planta.tipo,
               potencia: planta.potencia,
               informeId: informe.id,
+              disponible: informe.disponible,
               thermalLayerPending,
             });
           });
