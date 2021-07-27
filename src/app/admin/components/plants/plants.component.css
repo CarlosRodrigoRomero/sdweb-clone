@@ -1,0 +1,17 @@
+.plants {
+  margin: 1rem;
+}
+
+.plants__title {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+table {
+  width: 100%;
+}

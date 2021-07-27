@@ -15,6 +15,9 @@ import { ReportsComponent } from './components/reports/reports.component';
 import { ReportCreateComponent } from './components/report-create/report-create.component';
 import { ReportEditComponent } from './components/report-edit/report-edit.component';
 import { ThermalLayerCreateComponent } from './components/thermal-layer-create/thermal-layer-create.component';
+import { PlantsComponent } from './components/plants/plants.component';
+import { PlantCreateComponent } from './components/plant-create/plant-create.component';
+import { PlantEditComponent } from './components/plant-edit/plant-edit.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +30,9 @@ import { ThermalLayerCreateComponent } from './components/thermal-layer-create/t
     ReportCreateComponent,
     ReportEditComponent,
     ThermalLayerCreateComponent,
+    PlantsComponent,
+    PlantCreateComponent,
+    PlantEditComponent,
   ],
   imports: [CommonModule, RouterModule, AdminRoutingModule, SharedModule, LayoutModule],
 })
