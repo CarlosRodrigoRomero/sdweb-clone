@@ -91,44 +91,76 @@ export class ReportEditComponent implements OnInit {
 
   private buildForm() {
     this.form = this.formBuilder.group({
-      fecha: [, [Validators.required]],
-      emisividad: [0.85, [Validators.required, Validators.min(0), Validators.max(1)]],
-      temperatura: [, [Validators.required]],
-      tempReflejada: [-30, [Validators.required]],
-      humedadRelativa: [, [Validators.required, Validators.min(0), Validators.max(1)]],
-      nubosidad: [, [Validators.required, Validators.min(0), Validators.max(8)]],
-      gsd: [3, [Validators.required]],
-      correccHoraSrt: [8, [Validators.required]],
-      disponible: [false, [Validators.required]],
-      vientoVelocidad: [, [Validators.required]],
-      vientoDireccion: [, [Validators.required, Validators.min(0), Validators.max(360)]],
+      fecha: [],
+      emisividad: [0.85, [Validators.min(0), Validators.max(1)]],
+      temperatura: [],
+      tempReflejada: [-30],
+      humedadRelativa: [, [Validators.min(0), Validators.max(1)]],
+      nubosidad: [, [Validators.min(0), Validators.max(8)]],
+      gsd: [3],
+      correccHoraSrt: [8],
+      disponible: [false],
+      vientoVelocidad: [],
+      vientoDireccion: [, [Validators.min(0), Validators.max(360)]],
+      camara: [],
+      camaraSN: [],
     });
   }
 
   onSubmit(event: Event) {
-    if (this.plantaSelected !== undefined && this.vueloSelected !== undefined) {
-      event.preventDefault();
-      if (this.form.valid) {
+    event.preventDefault();
+    if (this.form.valid) {
+      if (this.form.get('fecha').value !== null) {
         this.informe.fecha = this.form.get('fecha').value.unix();
-        this.informe.emisividad = this.form.get('emisividad').value;
-        this.informe.temperatura = this.form.get('temperatura').value;
-        this.informe.tempReflejada = this.form.get('tempReflejada').value;
-        this.informe.humedadRelativa = this.form.get('humedadRelativa').value;
-        this.informe.nubosidad = this.form.get('nubosidad').value;
-        this.informe.gsd = this.form.get('gsd').value;
-        this.informe.correccHoraSrt = this.form.get('correccHoraSrt').value;
-        this.informe.disponible = this.form.get('disponible').value;
-        this.informe.vientoVelocidad = this.form.get('vientoVelocidad').value;
-        this.informe.vientoDireccion = this.form.get('vientoDireccion').value;
-        this.informe.plantaId = this.plantaSelected.id;
-        this.informe.vueloId = this.vueloSelected.id;
-
-        // Crea el informe en la DB
-        this.informeService.updateInforme(this.informe);
-
-        // aviso de informe creado correctamente
-        this.openSnackBar();
       }
+      if (this.form.get('emisividad').value !== null) {
+        this.informe.emisividad = this.form.get('emisividad').value;
+      }
+      if (this.form.get('temperatura').value !== null) {
+        this.informe.temperatura = this.form.get('temperatura').value;
+      }
+      if (this.form.get('tempReflejada').value !== null) {
+        this.informe.tempReflejada = this.form.get('tempReflejada').value;
+      }
+      if (this.form.get('humedadRelativa').value !== null) {
+        this.informe.humedadRelativa = this.form.get('humedadRelativa').value;
+      }
+      if (this.form.get('nubosidad').value !== null) {
+        this.informe.nubosidad = this.form.get('nubosidad').value;
+      }
+      if (this.form.get('gsd').value !== null) {
+        this.informe.gsd = this.form.get('gsd').value;
+      }
+      if (this.form.get('correccHoraSrt').value !== null) {
+        this.informe.correccHoraSrt = this.form.get('correccHoraSrt').value;
+      }
+      if (this.form.get('disponible').value !== null) {
+        this.informe.disponible = this.form.get('disponible').value;
+      }
+      if (this.form.get('vientoVelocidad').value !== null) {
+        this.informe.vientoVelocidad = this.form.get('vientoVelocidad').value;
+      }
+      if (this.form.get('vientoDireccion').value !== null) {
+        this.informe.vientoDireccion = this.form.get('vientoDireccion').value;
+      }
+      if (this.form.get('camara').value !== null) {
+        this.informe.camara = this.form.get('camara').value;
+      }
+      if (this.form.get('camaraSN').value !== null) {
+        this.informe.camaraSN = this.form.get('camaraSN').value;
+      }
+      if (this.plantaSelected !== undefined) {
+        this.informe.plantaId = this.plantaSelected.id;
+      }
+      if (this.vueloSelected !== undefined) {
+        this.informe.vueloId = this.vueloSelected.id;
+      }
+
+      // Crea el informe en la DB
+      this.informeService.updateInforme(this.informe);
+
+      // aviso de informe creado correctamente
+      this.openSnackBar();
     }
   }
 
