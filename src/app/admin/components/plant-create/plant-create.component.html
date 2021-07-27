@@ -11,11 +11,39 @@
             <input matInput formControlName="nombre" type="text" />
           </mat-form-field>
 
-          <!-- Altura Baja Primero -->
-          <mat-checkbox formControlName="alturaBajaPrimero">Altura Baja Primero</mat-checkbox>
+          <!-- Empresa -->
+          <app-mat-selected-search
+            *ngIf="empresas !== undefined"
+            [elements]="empresas"
+            [property]="'empresaNombre'"
+            [title]="'Empresa'"
+            (elemSelected)="getElemSelected($event)"
+          ></app-mat-selected-search>
 
-          <!-- AutoLoc Ready -->
-          <mat-checkbox formControlName="autoLocReady">AutoLoc Ready</mat-checkbox>
+          <!-- Potencia -->
+          <mat-form-field>
+            <mat-label>Potencia</mat-label>
+            <input matInput formControlName="potencia" type="number" />
+            <span matSuffix>MW</span>
+          </mat-form-field>
+
+          <!-- Tipo -->
+          <mat-form-field appearance="fill">
+            <mat-label>Tipo</mat-label>
+            <mat-select formControlName="tipo" [(ngModel)]="tipo" name="tipo">
+              <mat-option [value]="'fija'">Fija</mat-option>
+              <mat-option [value]="'seguidores'">Seguidores</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Orientación módulos -->
+          <mat-form-field appearance="fill">
+            <mat-label>Orientación módulos</mat-label>
+            <mat-select formControlName="vertical" [(ngModel)]="vertical" name="orientacion">
+              <mat-option [value]="true">Vertical</mat-option>
+              <mat-option [value]="false">Horizontal</mat-option>
+            </mat-select>
+          </mat-form-field>
 
           <!-- Filas -->
           <mat-form-field>
@@ -28,15 +56,6 @@
             <mat-label>Columnas</mat-label>
             <input matInput formControlName="columnas" type="number" min="1" step="1" />
           </mat-form-field>
-
-          <!-- Empresa -->
-          <app-mat-selected-search
-            *ngIf="empresas !== undefined"
-            [elements]="empresas"
-            [property]="'empresaNombre'"
-            [title]="'Empresa'"
-            (elemSelected)="getElemSelected($event)"
-          ></app-mat-selected-search>
 
           <!-- Latitud -->
           <mat-form-field>
@@ -67,6 +86,29 @@
             <mat-label>Zoom</mat-label>
             <input matInput formControlName="zoom" type="number" [(ngModel)]="zoom" (ngModelChange)="setZoom()" />
           </mat-form-field>
+
+          <!-- Nombre Global Coords -->
+          <mat-form-field class="example-chip-list" appearance="fill">
+            <mat-label>Nombres GlobalCoords (Zonas)</mat-label>
+            <mat-chip-list #chipList>
+              <mat-chip *ngFor="let nombre of nombreGlobalCoords" [removable]="removable" (removed)="remove(nombre)">
+                {{ nombre }}
+                <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+              </mat-chip>
+              <input
+                placeholder="De mayor a menor..."
+                [matChipInputFor]="chipList"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                (matChipInputTokenEnd)="add($event)"
+              />
+            </mat-chip-list>
+          </mat-form-field>
+
+          <!-- Altura Baja Primero -->
+          <mat-checkbox formControlName="alturaBajaPrimero">Altura Baja Primero</mat-checkbox>
+
+          <!-- AutoLoc Ready -->
+          <mat-checkbox formControlName="autoLocReady">AutoLoc Ready</mat-checkbox>
 
           <div class="btns-actions">
             <button mat-raised-button routerLink="../">

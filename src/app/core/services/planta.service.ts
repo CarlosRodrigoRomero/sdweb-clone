@@ -88,6 +88,21 @@ export class PlantaService {
     );
   }
 
+  addPlanta(planta: PlantaInterface): void {
+    planta.id = this.afs.createId();
+
+    this.afs
+      .collection('plantas')
+      .doc(planta.id)
+      .set(planta)
+      .then((docRef) => {
+        console.log('Planta creada con ID: ', planta.id);
+      })
+      .catch((error) => {
+        console.error('Error al crear planta: ', error);
+      });
+  }
+
   updatePlanta(planta: PlantaInterface): void {
     const plantaDoc = this.afs.doc(`plantas/${planta.id}`);
     plantaDoc.update(planta);

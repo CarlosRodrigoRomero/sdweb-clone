@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 import { take } from 'rxjs/operators';
 
@@ -9,7 +12,6 @@ import Map from 'ol/Map';
 import XYZ from 'ol/source/XYZ';
 import { Tile as TileLayer } from 'ol/layer';
 import { View } from 'ol';
-import { fromLonLat } from 'ol/proj';
 
 import { PlantaService } from '@core/services/planta.service';
 import { AdminService } from '@core/services/admin.service';
@@ -24,7 +26,7 @@ import { UserInterface } from '@core/models/user';
 })
 export class PlantCreateComponent implements OnInit {
   form: FormGroup;
-  planta: PlantaInterface;
+  planta: PlantaInterface = {};
   plantCreated = false;
   empresas: UserInterface[];
   empresaSelected: UserInterface;
@@ -32,6 +34,11 @@ export class PlantCreateComponent implements OnInit {
   zoom = 5.65;
   latitud = 40;
   longitud = -4.4;
+  nombreGlobalCoords: string[] = [];
+  tipo: string;
+  vertical = false;
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
+  removable = true;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -61,17 +68,18 @@ export class PlantCreateComponent implements OnInit {
       nombre: [, [Validators.required]],
       alturaBajaPrimero: [false, [Validators.required]],
       autoLocReady: [false, [Validators.required]],
-      filas: [, [Validators.required]],
-      columnas: [, [Validators.required]],
+      filas: [1, [Validators.required]],
+      columnas: [1, [Validators.required]],
       latitud: [, [Validators.required]],
       longitud: [, [Validators.required]],
       zoom: [, [Validators.required]],
+      nombreGlobalCoords: [],
+      potencia: [, [Validators.required]],
+      tipo: [, [Validators.required]],
+      vertical: [false, [Validators.required]],
+
       // moduloPotencia: [, [Validators.required]],
-      // nombreGlobalCoords: [],
       // num_modulos: [],
-      // potencia: [, [Validators.required]],
-      // tipo: [, [Validators.required]],
-      // vertical: [false, [Validators.required]],
     });
   }
 
@@ -80,23 +88,20 @@ export class PlantCreateComponent implements OnInit {
       event.preventDefault();
       if (this.form.valid) {
         this.planta.nombre = this.form.get('nombre').value;
-
-        // this.informe.fecha = this.form.get('fecha').value.unix();
-        // this.informe.emisividad = this.form.get('emisividad').value;
-        // this.informe.temperatura = this.form.get('temperatura').value;
-        // this.informe.tempReflejada = this.form.get('tempReflejada').value;
-        // this.informe.humedadRelativa = this.form.get('humedadRelativa').value;
-        // this.informe.nubosidad = this.form.get('nubosidad').value;
-        // this.informe.gsd = this.form.get('gsd').value;
-        // this.informe.correccHoraSrt = this.form.get('correccHoraSrt').value;
-        // this.informe.disponible = this.form.get('disponible').value;
-        // this.informe.vientoVelocidad = this.form.get('vientoVelocidad').value;
-        // this.informe.vientoDireccion = this.form.get('vientoDireccion').value;
-        // this.informe.plantaId = this.plantaSelected.id;
-        // this.informe.vueloId = this.vueloSelected.id;
+        this.planta.filas = this.form.get('filas').value;
+        this.planta.columnas = this.form.get('columnas').value;
+        this.planta.longitud = this.longitud;
+        this.planta.latitud = this.latitud;
+        this.planta.zoom = this.zoom;
+        this.planta.nombreGlobalCoords = this.nombreGlobalCoords;
+        this.planta.potencia = this.form.get('potencia').value;
+        this.planta.tipo = this.tipo;
+        this.planta.vertical = this.vertical;
+        this.planta.alturaBajaPrimero = this.form.get('alturaBajaPrimero').value;
+        this.planta.autoLocReady = this.form.get('autoLocReady').value;
 
         // Crea la planta en la DB
-        // this.informeService.addInforme(this.informe);
+        this.plantaService.addPlanta(this.planta);
 
         // aviso de informe creado correctamente
         this.openSnackBar();
@@ -146,5 +151,29 @@ export class PlantCreateComponent implements OnInit {
 
   setZoom() {
     this.map.getView().setZoom(this.zoom);
+  }
+
+  add(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+
+    // Add our element
+    if (value) {
+      this.nombreGlobalCoords.push(value);
+    }
+
+    // Clear the input value
+    event.input.value = '';
+  }
+
+  remove(nombre: string): void {
+    const index = this.nombreGlobalCoords.indexOf(nombre);
+
+    if (index >= 0) {
+      this.nombreGlobalCoords.splice(index, 1);
+    }
+  }
+
+  drop(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.nombreGlobalCoords, event.previousIndex, event.currentIndex);
   }
 }
