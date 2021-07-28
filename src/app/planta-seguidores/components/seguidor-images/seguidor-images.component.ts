@@ -151,13 +151,14 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     this.anomsCanvas.clear();
 
     // tslint:disable-next-line: triple-equals
+    const anomaliasNoTipo0 = this.seguidorSelected.anomalias.filter((anom) => anom.tipo != 0);
+
+    // tslint:disable-next-line: triple-equals
     if (this.viewSelected == 1) {
       // en el view Cels. Calientes solo mostramos estas
-      this.seguidorSelected.anomalias
-        .filter((anom) => anom.tipo === 8 || anom.tipo === 9)
-        .forEach((anom) => this.drawAnomalia(anom));
+      anomaliasNoTipo0.filter((anom) => anom.tipo === 8 || anom.tipo === 9).forEach((anom) => this.drawAnomalia(anom));
     } else {
-      this.seguidorSelected.anomalias.forEach((anom) => this.drawAnomalia(anom));
+      anomaliasNoTipo0.forEach((anom) => this.drawAnomalia(anom));
     }
   }
 
