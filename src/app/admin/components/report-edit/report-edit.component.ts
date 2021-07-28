@@ -14,7 +14,6 @@ import { ClustersService } from '@core/services/clusters.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
-import { BehaviorSubject, pipe } from 'rxjs';
 
 @Component({
   selector: 'app-report-edit',
@@ -156,7 +155,7 @@ export class ReportEditComponent implements OnInit {
         this.informe.vueloId = this.vueloSelected.id;
       }
 
-      // Crea el informe en la DB
+      // Actualizamos el informe en la DB
       this.informeService.updateInforme(this.informe);
 
       // aviso de informe creado correctamente

@@ -64,7 +64,7 @@
               matInput
               formControlName="latitud"
               type="number"
-              [(ngModel)]="latitud"
+              [value]="latitud"
               (ngModelChange)="setCenter()"
             />
           </mat-form-field>
@@ -76,7 +76,7 @@
               matInput
               formControlName="longitud"
               type="number"
-              [(ngModel)]="longitud"
+              [value]="longitud"
               (ngModelChange)="setCenter()"
             />
           </mat-form-field>

@@ -1,0 +1,57 @@
+.edit-plant {
+  margin: 1rem;
+}
+
+.edit-plant-content {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2rem;
+}
+
+.example-form {
+  width: 100%;
+}
+
+mat-card {
+  width: min-content;
+}
+
+mat-card-content {
+  display: grid;
+}
+
+app-mat-selected-search {
+  margin: 1rem 0;
+  border-bottom: 1px solid grey;
+}
+
+.btns-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
+.map {
+  height: 360px;
+  width: 640px;
+}
+
+.map:-webkit-full-screen {
+  height: 100%;
+  margin: 0;
+}
+.map:-ms-fullscreen {
+  height: 100%;
+}
+.map:fullscreen {
+  height: 100%;
+}
+.map .ol-rotate {
+  top: 3em;
+}
+
+.map-title {
+  font-size: large;
+  font-weight: 500;
+}

@@ -18,6 +18,7 @@ import { AdminService } from '@core/services/admin.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { UserInterface } from '@core/models/user';
+import { fromLonLat } from 'ol/proj';
 
 @Component({
   selector: 'app-plant-create',
@@ -77,9 +78,6 @@ export class PlantCreateComponent implements OnInit {
       potencia: [, [Validators.required]],
       tipo: [, [Validators.required]],
       vertical: [false, [Validators.required]],
-
-      // moduloPotencia: [, [Validators.required]],
-      // num_modulos: [],
     });
   }
 
@@ -99,6 +97,7 @@ export class PlantCreateComponent implements OnInit {
         this.planta.vertical = this.vertical;
         this.planta.alturaBajaPrimero = this.form.get('alturaBajaPrimero').value;
         this.planta.autoLocReady = this.form.get('autoLocReady').value;
+        this.planta.empresa = this.empresaSelected.uid;
 
         // Crea la planta en la DB
         this.plantaService.addPlanta(this.planta);
@@ -128,25 +127,26 @@ export class PlantCreateComponent implements OnInit {
       source: satellite,
     });
 
+    const view = new View({
+      center: fromLonLat([this.longitud, this.latitud]),
+      zoom: this.zoom,
+    });
+
     this.map = new Map({
       target: 'map',
       layers: [satelliteLayer],
-      view: new View({
-        projection: 'EPSG:4326',
-        center: [this.longitud, this.latitud],
-        zoom: this.zoom,
-      }),
+      view,
     });
 
     this.map.on('moveend', (e) => {
       this.zoom = Number(this.map.getView().getZoom().toFixed(2));
-      this.latitud = this.map.getView().getCenter()[1];
-      this.longitud = this.map.getView().getCenter()[0];
+      this.latitud = this.map.getView().getCenter()[1] / 100000;
+      this.longitud = this.map.getView().getCenter()[0] / 100000;
     });
   }
 
   setCenter() {
-    this.map.getView().setCenter([this.longitud, this.latitud]);
+    this.map.getView().setCenter(fromLonLat([this.longitud, this.latitud]));
   }
 
   setZoom() {
