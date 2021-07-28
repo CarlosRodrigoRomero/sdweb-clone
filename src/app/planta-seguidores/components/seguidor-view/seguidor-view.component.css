@@ -18,11 +18,9 @@
 }
 
 .seguidor-content {
-  /* height: calc(100vh - 70px); */
   padding: 0.5rem;
-  display: grid;
+  display: flex;
   position: relative;
-  grid-template-columns: 640px 360px;
   gap: 1rem;
   top: 70px;
 }
