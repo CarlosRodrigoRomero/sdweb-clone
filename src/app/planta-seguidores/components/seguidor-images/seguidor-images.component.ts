@@ -50,7 +50,11 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // nos suscribimos a la carga de la imagen
+    this.subscriptions.add(this.seguidorViewService.imageLoaded$.subscribe((loaded) => (this.imageLoaded = loaded)));
+
     this.imageCanvas = new fabric.Canvas('image-canvas');
+    this.seguidorViewService.imageCanvas = this.imageCanvas;
     this.anomsCanvas = new fabric.Canvas('anomalias-canvas');
     this.setEventListenersCanvas();
 
@@ -122,7 +126,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
         }
 
         this.imageSelected.onload = () => {
-          this.imageLoaded = true;
+          this.seguidorViewService.imageLoaded = true;
 
           this.imageCanvas.setBackgroundImage(
             new fabric.Image(this.imageSelected, {

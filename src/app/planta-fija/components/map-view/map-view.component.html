@@ -32,14 +32,7 @@
   </mat-sidenav>
 
   <!-- SIDENAV STATS -->
-  <mat-sidenav
-    #sidenavStats
-    [(opened)]="statsOpened"
-    class="stats-sidenav"
-    [fixedInViewport]="true"
-    position="end"
-    disableClose
-  >
+  <mat-sidenav #sidenavStats [(opened)]="statsOpened" class="stats-sidenav" [fixedInViewport]="true" position="end">
     <app-planta-stats></app-planta-stats>
   </mat-sidenav>
 

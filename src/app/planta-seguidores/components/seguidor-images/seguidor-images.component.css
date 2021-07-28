@@ -1,11 +1,10 @@
-#canvas-anomalias {
+.imagenes {
   position: absolute;
-  left: 50%;
-  transform: translate(-50%, 0%);
+  background-color: lightgray;
 }
 
-.imagen-termica-div {
-  position: absolute;
+#image-canvas {
+  z-index: 1;
 }
 
 #visual-zoom {
@@ -21,4 +20,8 @@ mat-spinner {
   position: absolute;
   top: 215px;
   left: 275px;
+}
+
+#anomalias-canvas {
+  z-index: 2;
 }
