@@ -57,10 +57,13 @@ export class SeguidoresControlService {
 
   private maeMin: number;
   private maeMax: number;
+  public maeLevels: number[] = [];
   private ccMin: number;
   private ccMax: number;
+  public ccLevels: number[] = [];
   private gradMin: number;
   private gradMax: number;
+  public gradLevels: number[] = [];
 
   constructor(
     private olMapService: OlMapService,
@@ -94,12 +97,16 @@ export class SeguidoresControlService {
           // recalculamos los MIN y MAX de cada vista
           this.getMinMaxViews();
 
+          // obtenemos los niveles para la escala de colores
+          this.getViewsLevels();
+
           // this.getImagesSeguidoresInforme();
 
           return this.informeService.getInforme(informeId);
         })
       )
       .subscribe((informe) => (this.selectedInforme = informe));
+
     this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
 
     return this.initialized$;
@@ -300,7 +307,6 @@ export class SeguidoresControlService {
         .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
       if (feature.length === 0) {
         if (this.seguidorSelected !== undefined) {
-          console.log('ok');
           this.setExternalStyle(this.seguidorSelected.id, false);
         }
         this.seguidorSelected = undefined;
@@ -314,6 +320,15 @@ export class SeguidoresControlService {
     this.getMinMaxGradNormMax();
   }
 
+  private getViewsLevels() {
+    if (this.maeMax !== undefined) {
+      this.getMaeLevels();
+    }
+
+    this.getCCLevels();
+    this.getGradNormLevels();
+  }
+
   private getMinMaxMae() {
     const maes = this.reportControlService.allFilterableElements
       .filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId)
@@ -321,6 +336,14 @@ export class SeguidoresControlService {
 
     this.maeMin = Math.min(...maes);
     this.maeMax = Math.max(...maes);
+  }
+
+  private getMaeLevels() {
+    const numLevels = 3;
+
+    for (let index = 0; index < numLevels - 1; index++) {
+      this.maeLevels[index] = Number((((index + 1) * this.maeMax) / numLevels).toFixed(2));
+    }
   }
 
   private getMinMaxCC() {
@@ -333,6 +356,14 @@ export class SeguidoresControlService {
     this.ccMax = Math.max(...allCelsCalientes);
   }
 
+  private getCCLevels() {
+    const numLevels = 3;
+
+    for (let index = 0; index < numLevels - 1; index++) {
+      this.ccLevels[index] = Number((((index + 1) * this.ccMax) / numLevels).toFixed(2));
+    }
+  }
+
   private getMinMaxGradNormMax() {
     const gradientes = this.reportControlService.allFilterableElements
       .filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId)
@@ -341,6 +372,14 @@ export class SeguidoresControlService {
 
     this.gradMin = Math.min(...gradientes);
     this.gradMax = Math.max(...gradientes);
+  }
+
+  private getGradNormLevels() {
+    const numLevels = 3;
+
+    for (let index = 0; index < numLevels - 1; index++) {
+      this.gradLevels[index] = Number((((index + 1) * this.gradMax) / numLevels).toFixed(2));
+    }
   }
 
   // ESTILOS MAE
@@ -514,7 +553,6 @@ export class SeguidoresControlService {
             this.imgSeguidoresUrls.push(imgUrl);
           });
         });
-        console.log(this.imgSeguidoresUrls);
       });
   }
 

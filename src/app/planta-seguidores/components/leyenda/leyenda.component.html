@@ -2,15 +2,15 @@
   <mat-card-content>
     <div class="line">
       <mat-icon [ngStyle]="{ color: colors[0] }">crop_5_4</mat-icon>
-      <span>Leve</span>
+      <span>< {{ viewsLevels[viewSelected][0] }}</span>
     </div>
     <div class="line">
       <mat-icon [ngStyle]="{ color: colors[1] }">crop_5_4</mat-icon>
-      <span>Medio</span>
+      <span>{{ viewsLevels[viewSelected][0] }} - {{ viewsLevels[viewSelected][1] }}</span>
     </div>
     <div class="line">
       <mat-icon [ngStyle]="{ color: colors[2] }">crop_5_4</mat-icon>
-      <span>Grave</span>
+      <span>> {{ viewsLevels[viewSelected][1] }}</span>
     </div>
   </mat-card-content>
 </mat-card>
