@@ -478,6 +478,7 @@ export class SeguidoresControlService {
           }
         })
         .catch((error) => {
+          
           switch (error.code) {
             case 'storage/object-not-found':
               console.log("File doesn't exist");
@@ -510,6 +511,7 @@ export class SeguidoresControlService {
             this.imgSeguidoresUrls.push(imgUrl);
           });
         });
+        console.log(this.imgSeguidoresUrls);
       });
   }
 

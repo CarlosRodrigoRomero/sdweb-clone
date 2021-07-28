@@ -22,7 +22,7 @@
   padding: 0.5rem;
   display: grid;
   position: relative;
-  grid-template-columns: 640px auto;
+  grid-template-columns: 640px 360px;
   gap: 1rem;
   top: 70px;
 }
@@ -55,6 +55,7 @@ app-seguidor-image-toggle {
   display: grid;
   grid-template-rows: auto 1fr;
   gap: 1rem;
+  max-width: min-content;
 }
 
 .prev-btn {

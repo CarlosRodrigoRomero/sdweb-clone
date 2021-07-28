@@ -101,10 +101,10 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
         this.seguidoresControlService.urlVisualImageSeguidor$,
         this.seguidoresControlService.urlThermalImageSeguidor$,
         this.seguidorViewService.imageSelected$,
-      ]).subscribe(([urlVis, urlTherm, image]) => {
+      ]).subscribe(([urlVisual, urlThermal, image]) => {
         // tslint:disable-next-line: triple-equals
         if (image == 0) {
-          this.imageSelected.src = urlTherm;
+          this.imageSelected.src = urlThermal;
 
           // creamos las anomalias de nueva al volver a la vista termica
           if (this.anomsCanvas !== undefined && this.anomsCanvas.isEmpty()) {
@@ -113,7 +113,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
 
           // this.anomsCanvas.renderAll();
         } else {
-          this.imageSelected.src = urlVis;
+          this.imageSelected.src = urlVisual;
 
           // quitamos las anomalias al seleccionar la vista visual
           if (this.anomsCanvas !== undefined) {
@@ -289,10 +289,12 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
   private setAnomaliaStyle(anomalia: Anomalia, selected: boolean) {
     const polygon = this.anomsCanvas.getObjects().find((anom) => anom.anomId === anomalia.id);
 
-    if (selected) {
-      polygon.set({ stroke: 'white', strokeWidth: 4 });
-    } else {
-      polygon.set({ stroke: this.getAnomaliaColor(anomalia), strokeWidth: 2 });
+    if (polygon !== undefined) {
+      if (selected) {
+        polygon.set({ stroke: 'white', strokeWidth: 4 });
+      } else {
+        polygon.set({ stroke: this.getAnomaliaColor(anomalia), strokeWidth: 2 });
+      }
     }
   }
 

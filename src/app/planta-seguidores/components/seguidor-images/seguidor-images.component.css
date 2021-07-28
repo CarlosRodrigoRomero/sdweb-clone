@@ -16,3 +16,9 @@
 #visual-zoom:hover {
   cursor: pointer;
 }
+
+mat-spinner {
+  position: absolute;
+  top: 215px;
+  left: 275px;
+}

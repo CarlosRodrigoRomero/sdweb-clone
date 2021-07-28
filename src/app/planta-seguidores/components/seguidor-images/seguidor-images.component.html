@@ -3,21 +3,17 @@
     id="visual-zoom"
     width="{{ zoomSquare }}"
     height="{{ zoomSquare }}"
-    style="position: absolute; top: 0; left: 0; display: none; border-radius: 8px;"
+    style="position: absolute; top: 0; left: 0; display: none; border-radius: 8px"
   ></canvas>
 
   <div>
     <div id="imagen-div" class="imagen-termica-div">
-      <div *ngIf="!imageLoaded" class="cargando text-center">
-        <app-spinner></app-spinner>
-      </div>
+      <mat-spinner *ngIf="!imageLoaded"></mat-spinner>
       <canvas id="image-canvas" width="640" height="512"> </canvas>
     </div>
 
     <div id="imagen-visual-div" class="imagen-termica-div">
       <canvas id="anomalias-canvas" width="640" height="512"></canvas>
     </div>
-
-    <div id="canvas-anomalias"></div>
   </div>
 </div>

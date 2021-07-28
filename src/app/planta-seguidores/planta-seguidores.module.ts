@@ -25,6 +25,7 @@ import { SeguidorAnomaliaInfoComponent } from './components/seguidor-anomalia-in
 import { SeguidorAnomaliasListComponent } from './components/seguidor-anomalias-list/seguidor-anomalias-list.component';
 import { SeguidorImageDownloadComponent } from './components/seguidor-image-download/seguidor-image-download.component';
 import { DownloadReportComponent } from './components/download-report/download-report.component';
+import { LeyendaComponent } from './components/leyenda/leyenda.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { DownloadReportComponent } from './components/download-report/download-r
     SeguidorAnomaliasListComponent,
     SeguidorImageDownloadComponent,
     DownloadReportComponent,
+    LeyendaComponent,
   ],
   imports: [
     CommonModule,

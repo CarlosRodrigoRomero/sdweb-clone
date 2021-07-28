@@ -50,8 +50,10 @@ app-barra-resumen-planta {
   z-index: 999;
 }
 
-app-view-toggle {
+.info-sup-centro {
   position: absolute;
+  display: flex;
+  gap: 1rem;
   top: 9px;
   left: 50%;
   transform: translate(-50%, 0%);
