@@ -35,3 +35,22 @@ app-mat-selected-search {
   height: 315px;
   width: 640px;
 }
+
+.map:-webkit-full-screen {
+  height: 100%;
+  margin: 0;
+}
+.map:-ms-fullscreen {
+  height: 100%;
+}
+.map:fullscreen {
+  height: 100%;
+}
+.map .ol-rotate {
+  top: 3em;
+}
+
+.map-title {
+  font-size: large;
+  font-weight: 500;
+}

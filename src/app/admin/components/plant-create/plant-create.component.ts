@@ -12,6 +12,7 @@ import Map from 'ol/Map';
 import XYZ from 'ol/source/XYZ';
 import { Tile as TileLayer } from 'ol/layer';
 import { View } from 'ol';
+import { FullScreen, defaults as defaultControls } from 'ol/control';
 
 import { PlantaService } from '@core/services/planta.service';
 import { AdminService } from '@core/services/admin.service';
@@ -136,6 +137,7 @@ export class PlantCreateComponent implements OnInit {
       target: 'map',
       layers: [satelliteLayer],
       view,
+      controls: defaultControls().extend([new FullScreen()]),
     });
 
     this.map.on('moveend', (e) => {

@@ -60,25 +60,13 @@
           <!-- Latitud -->
           <mat-form-field>
             <mat-label>Latitud</mat-label>
-            <input
-              matInput
-              formControlName="latitud"
-              type="number"
-              [value]="latitud"
-              (ngModelChange)="setCenter()"
-            />
+            <input matInput formControlName="latitud" type="number" [value]="latitud" (ngModelChange)="setCenter()" />
           </mat-form-field>
 
           <!-- Longitud -->
           <mat-form-field>
             <mat-label>Longitud</mat-label>
-            <input
-              matInput
-              formControlName="longitud"
-              type="number"
-              [value]="longitud"
-              (ngModelChange)="setCenter()"
-            />
+            <input matInput formControlName="longitud" type="number" [value]="longitud" (ngModelChange)="setCenter()" />
           </mat-form-field>
 
           <!-- Zoom -->
@@ -120,6 +108,9 @@
         </mat-card-content>
       </mat-card>
     </form>
-    <div id="map" class="map"></div>
+    <div>
+      <span class="map-title">Ajustar mapa en pantalla completa. Así verá el informe el cliente.</span>
+      <div id="map" class="map"></div>
+    </div>
   </div>
 </div>
