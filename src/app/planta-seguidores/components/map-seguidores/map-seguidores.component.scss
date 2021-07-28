@@ -3,12 +3,10 @@
   width: 100%;
 }
 
-#popup {
+.ol-popup {
   position: absolute;
-  top: 50px;
-  left: 50%;
-  transform: translate(-50%, 0%);
-  margin: 10px;
+  margin-left: 20px;
+  transform: translate(0, -50%);
 }
 
 ::ng-deep .ol-zoom {

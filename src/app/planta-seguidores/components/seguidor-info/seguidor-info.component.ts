@@ -1,4 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+
+import { Subscription } from 'rxjs';
+
+import { SeguidoresControlService } from '../../services/seguidores-control.service';
 
 import { Seguidor } from '@core/models/seguidor';
 
@@ -7,15 +11,28 @@ import { Seguidor } from '@core/models/seguidor';
   templateUrl: './seguidor-info.component.html',
   styleUrls: ['./seguidor-info.component.css'],
 })
-export class SeguidorInfoComponent implements OnInit {
+export class SeguidorInfoComponent implements OnInit, OnDestroy {
   numAnomalias: number;
+  seguidorHovered: Seguidor;
 
-  @Input() seguidorHovered: Seguidor;
+  private subscriptions: Subscription = new Subscription();
 
-  constructor() {}
+  constructor(private seguidoresControlService: SeguidoresControlService) {}
 
   ngOnInit(): void {
-    // tslint:disable-next-line: triple-equals
-    this.numAnomalias = this.seguidorHovered.anomalias.filter((anom) => anom.tipo != 0).length;
+    this.subscriptions.add(
+      this.seguidoresControlService.seguidorHovered$.subscribe((seguidor) => {
+        this.seguidorHovered = seguidor;
+
+        if (this.seguidorHovered !== undefined) {
+          // tslint:disable-next-line: triple-equals
+          this.numAnomalias = this.seguidorHovered.anomalias.filter((anom) => anom.tipo != 0).length;
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

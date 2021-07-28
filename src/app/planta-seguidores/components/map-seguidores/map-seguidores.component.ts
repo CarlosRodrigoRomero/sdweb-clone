@@ -63,6 +63,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public mousePosition;
   public informeIdList: string[] = [];
   public sharedReport = false;
+  private popup: Overlay;
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -152,6 +153,8 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
           // this.mapSeguidoresService.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
           this.initMap();
+
+          this.addPopupOverlay();
         })
     );
   }
@@ -202,6 +205,22 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     );
 
     // this.incrementoLayers.forEach((l) => this.map.addLayer(l));
+  }
+
+  private addPopupOverlay() {
+    const container = document.getElementById('popup');
+
+    this.popup = new Overlay({
+      id: 'popup',
+      element: container,
+      autoPan: true,
+      autoPanAnimation: {
+        duration: 250,
+      },
+      position: undefined,
+    });
+
+    this.map.addOverlay(this.popup);
   }
 
   ngOnDestroy(): void {

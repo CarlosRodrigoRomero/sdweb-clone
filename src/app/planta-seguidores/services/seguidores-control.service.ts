@@ -26,6 +26,7 @@ import { InformeService } from '@core/services/informe.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { InformeInterface } from '@core/models/informe';
+import { Overlay } from 'ol';
 
 @Injectable({
   providedIn: 'root',
@@ -178,7 +179,6 @@ export class SeguidoresControlService {
         source.addFeature(feature);
       });
     });
-
     // añadimos acciones sobre los seguidores
     this.addCursorOnHover();
     this.addOnHoverAction();
@@ -236,6 +236,10 @@ export class SeguidoresControlService {
 
           const seguidorId = feature.getProperties().properties.seguidorId;
           const seguidor = this.listaSeguidores.filter((seg) => seg.id === seguidorId)[0];
+
+          const coords = seguidor.featureCoords[0];
+
+          this.map.getOverlayById('popup').setPosition(coords);
 
           feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
 
@@ -478,7 +482,6 @@ export class SeguidoresControlService {
           }
         })
         .catch((error) => {
-          
           switch (error.code) {
             case 'storage/object-not-found':
               console.log("File doesn't exist");
