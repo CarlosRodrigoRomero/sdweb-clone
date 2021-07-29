@@ -33,7 +33,7 @@ export class PortfolioControlService {
   public listaPlantas: PlantaInterface[] = [];
   public listaInformes: InformeInterface[] = [];
   public allFeatures: Feature[] = [];
-  private user: UserInterface;
+  user: UserInterface;
 
   constructor(public auth: AuthService, private plantaService: PlantaService, private informeService: InformeService) {}
 
@@ -110,7 +110,6 @@ export class PortfolioControlService {
               }
             }
           });
-          console.log(this.listaPlantas);
 
           this.maeMedio = this.average(this.maePlantas);
           // this.maeSigma = this.standardDeviation(this.maePlantas);

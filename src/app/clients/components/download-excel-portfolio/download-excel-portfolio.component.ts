@@ -2,15 +2,23 @@ import { Component, OnInit } from '@angular/core';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
+import { PortfolioControlService } from '@core/services/portfolio-control.service';
+
 @Component({
   selector: 'app-download-excel-portfolio',
   templateUrl: './download-excel-portfolio.component.html',
   styleUrls: ['./download-excel-portfolio.component.css'],
 })
 export class DownloadExcelPortfolioComponent implements OnInit {
-  constructor(private storage: AngularFireStorage) {}
+  userDemo = false;
 
-  ngOnInit(): void {}
+  constructor(private storage: AngularFireStorage, private portfolioControlService: PortfolioControlService) {}
+
+  ngOnInit(): void {
+    if (this.portfolioControlService.user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
+      this.userDemo = true;
+    }
+  }
 
   downloadExcel() {
     // Creamos una referencia al archivo que queremos descargar
