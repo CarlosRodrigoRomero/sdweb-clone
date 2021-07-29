@@ -33,7 +33,7 @@ mat-card {
   grid-template-rows: 100%;
   gap: 0.5rem;
   padding: 0.5rem 2px 2px;
-  height: calc(100vh - 209px);
+  /* height: calc(100vh - 209px); */
 }
 
 .cc-content-izq {
@@ -45,6 +45,7 @@ mat-card {
 .cc-content-drcha {
   display: grid;
   grid-template-columns: 100%;
+  grid-template-rows: auto 1fr;
   gap: 0.5rem;
 }
 
@@ -54,7 +55,7 @@ mat-card {
   grid-template-rows: 100%;
   gap: 0.5rem;
   padding: 0.5rem 2px 2px;
-  height: calc(100vh - 209px);
+  /* height: calc(100vh - 209px); */
 }
 
 @media (max-width: 800px) {

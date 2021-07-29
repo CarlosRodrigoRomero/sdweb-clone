@@ -18,7 +18,8 @@
   <mat-tab class="mat-tab-stats" label="Células calientes (CC)">
     <div class="cc-grid">
       <div class="cc-content-izq">
-        <mat-card *ngIf="loadCCyGradChart">
+        <!-- MODULOS CON CC -->
+        <mat-card *ngIf="loadCCyGradChart && plantaDemo">
           <mat-card-header>
             <mat-card-title>Módulos con células calientes</mat-card-title>
             <mat-card-subtitle>% de módulos con CC y gradiente medio (ºC) </mat-card-subtitle>
@@ -40,7 +41,7 @@
       </div>
     </div>
   </mat-tab>
-  <mat-tab class="mat-tab-stats" label="TED">
+  <mat-tab *ngIf="plantaDemo" class="mat-tab-stats" label="TED">
     <ng-template matTabContent>
       <div class="ted-grid">
         <mat-card class="chart-sankey">

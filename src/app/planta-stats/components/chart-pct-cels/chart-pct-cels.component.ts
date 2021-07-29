@@ -40,7 +40,7 @@ export type ChartOptions = {
   xaxis: ApexXAxis;
   tooltip: ApexTooltip;
   stroke: ApexStroke;
-  grid: ApexGrid;
+  grid: any; // ApexGrid;
   colors: any;
   toolbar: any;
   annotations: any;
@@ -76,12 +76,29 @@ export class ChartPctCelsComponent implements OnInit {
         size: 10,
       },
     },
+    tooltip: {
+      followCursor: false,
+      theme: 'dark',
+      x: {
+        show: false,
+      },
+      marker: {
+        show: false,
+      },
+      y: {
+        title: {
+          formatter: function () {
+            return '';
+          },
+        },
+      },
+    },
     grid: {
-      // clipMarkers: false,
+      clipMarkers: false,
     },
     xaxis: {
-      // type: 'category',
-      categories: ['hola'],
+      type: 'category',
+      categories: ['Jul 2019', 'Jun 2020'],
     },
   };
 
@@ -209,7 +226,8 @@ export class ChartPctCelsComponent implements OnInit {
       series: [
         {
           name: 'gradiente medio',
-          data: data2,
+          data: [15.4, 15.9],
+          // data: data2,
         },
       ],
       chart: {
