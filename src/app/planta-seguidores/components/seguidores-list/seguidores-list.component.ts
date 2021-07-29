@@ -139,6 +139,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
     if (this.seguidorSelected === undefined) {
       this.seguidoresControlService.seguidorHovered = row.seguidor;
       this.seguidoresControlService.setExternalStyle(row.seguidor.id, true);
+      this.seguidoresControlService.setPopupPosition(row.seguidor.featureCoords[0]);
     }
   }
 

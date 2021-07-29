@@ -246,7 +246,7 @@ export class SeguidoresControlService {
 
           const coords = seguidor.featureCoords[0];
 
-          this.map.getOverlayById('popup').setPosition(coords);
+          this.setPopupPosition(coords);
 
           feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
 
@@ -312,6 +312,10 @@ export class SeguidoresControlService {
         this.seguidorSelected = undefined;
       }
     });
+  }
+
+  setPopupPosition(coords: Coordinate) {
+    this.map.getOverlayById('popup').setPosition(coords);
   }
 
   private getMinMaxViews() {
