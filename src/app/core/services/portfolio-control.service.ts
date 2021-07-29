@@ -13,6 +13,7 @@ import { InformeService } from '@core/services/informe.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+import { UserInterface } from '@core/models/user';
 
 @Injectable({
   providedIn: 'root',
@@ -32,6 +33,7 @@ export class PortfolioControlService {
   public listaPlantas: PlantaInterface[] = [];
   public listaInformes: InformeInterface[] = [];
   public allFeatures: Feature[] = [];
+  private user: UserInterface;
 
   constructor(public auth: AuthService, private plantaService: PlantaService, private informeService: InformeService) {}
 
@@ -39,12 +41,19 @@ export class PortfolioControlService {
     this.auth.user$
       .pipe(
         take(1),
-        switchMap((user) =>
-          combineLatest([this.plantaService.getPlantasDeEmpresa(user), this.informeService.getInformes()])
-        )
+        switchMap((user) => {
+          this.user = user;
+
+          return combineLatest([this.plantaService.getPlantasDeEmpresa(user), this.informeService.getInformes()]);
+        })
       )
       .subscribe(([plantas, informes]) => {
         if (plantas !== undefined) {
+          // AÑADIMOS PLANTAS FALSAS SOLO EN EL USUARIO DEMO
+          if (this.user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
+            plantas = this.addPlantasFake(plantas);
+          }
+
           plantas.forEach((planta) => {
             // obtenemos la plantas que tiene informes dentro de su interface
             if (planta.informes !== undefined && planta.informes.length > 0) {
@@ -60,7 +69,9 @@ export class PortfolioControlService {
 
               if (informesDisponibles.length > 0) {
                 // seleccionamos el dato de mae mas reciente
-                const mae = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+                const mae = informesDisponibles.reduce((prev, current) =>
+                  prev.fecha > current.fecha ? prev : current
+                ).mae;
 
                 // comprobamos que el informe tiene "mae"
                 if (mae !== undefined && mae !== Infinity) {
@@ -69,7 +80,7 @@ export class PortfolioControlService {
                   this.maePlantas.push(mae);
 
                   // añadimos los informes a la lista
-                  informesPlanta.forEach((informe) => {
+                  informesDisponibles.forEach((informe) => {
                     if (informe.mae !== undefined) {
                       this.listaInformes.push(informe);
                     }
@@ -99,6 +110,7 @@ export class PortfolioControlService {
               }
             }
           });
+          console.log(this.listaPlantas);
 
           this.maeMedio = this.average(this.maePlantas);
           // this.maeSigma = this.standardDeviation(this.maePlantas);
@@ -223,5 +235,97 @@ export class PortfolioControlService {
   set maeSigma(value: number) {
     this._maeSigma = value;
     this.maeSigma$.next(value);
+  }
+
+  // SOLO PARA DEMO
+  private addPlantasFake(plantas: PlantaInterface[]) {
+    const plantasFake: PlantaInterface[] = [
+      {
+        id: '01',
+        nombre: 'Arriba',
+        potencia: 25,
+        latitud: 38.36439,
+        longitud: -1.27652,
+        informes: [{ plantaId: '01', mae: 5.2, fecha: 1624270070, disponible: true }],
+      },
+      {
+        id: '02',
+        nombre: 'Villanueva',
+        potencia: 10,
+        latitud: 42,
+        longitud: -1.5,
+        informes: [{ plantaId: '02', mae: 3.1, fecha: 1623492000, disponible: true }],
+      },
+      {
+        id: '03',
+        nombre: 'Trujillo',
+        potencia: 12,
+        latitud: 41.5,
+        longitud: -6,
+        informes: [{ plantaId: '03', mae: 1.03, fecha: 1624097270, disponible: true }],
+      },
+      {
+        id: '04',
+        nombre: 'Villa',
+        potencia: 2,
+        latitud: 37.5,
+        longitud: -4,
+        informes: [{ plantaId: '04', mae: 0.6, fecha: 1624010870, disponible: true }],
+      },
+      {
+        id: '05',
+        nombre: 'Abajo',
+        potencia: 6,
+        latitud: 40,
+        longitud: -4,
+        informes: [{ plantaId: '05', mae: 5.9, fecha: 1623924470, disponible: true }],
+      },
+      {
+        id: '06',
+        nombre: 'Los Infiernos',
+        potencia: 50,
+        latitud: 42.5,
+        longitud: -6,
+        informes: [{ plantaId: '06', mae: 4.1, fecha: 1623838070, disponible: true }],
+      },
+      {
+        id: '07',
+        nombre: 'Santa Clara',
+        potencia: 21,
+        latitud: 40,
+        longitud: -5,
+        informes: [{ plantaId: '07', mae: 1.5, fecha: 1623751670, disponible: true }],
+      },
+      {
+        id: '08',
+        nombre: 'Fresno',
+        potencia: 5,
+        latitud: 42,
+        longitud: -3,
+        informes: [{ plantaId: '08', mae: 2.3, fecha: 1623665270, disponible: true }],
+      },
+      {
+        id: '09',
+        nombre: 'Parderrubias',
+        potencia: 8,
+        latitud: 41,
+        longitud: -2,
+        informes: [{ plantaId: '09', mae: 3.2, fecha: 1623578870, disponible: true }],
+      },
+      {
+        id: '10',
+        nombre: 'Vicente',
+        potencia: 23,
+        latitud: 39,
+        longitud: -1.5,
+        informes: [{ plantaId: '10', mae: 0.9, fecha: 1623492470, disponible: true }],
+      },
+    ];
+
+    plantasFake.forEach((fake) => {
+      plantas.push(fake);
+    });
+
+    return plantas;
   }
 }
