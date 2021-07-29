@@ -29,8 +29,52 @@ export class ChartAlturaComponent implements OnInit {
   dataLoaded = false;
 
   @ViewChild('chart') chart: ChartComponent;
+
   public chartOptions: Partial<ChartOptions> = {
-    series: [],
+    series: [
+      {
+        name: 'A',
+        data: [
+          { x: 'Jul 2019', y: 35 },
+          { x: 'Jun 2020', y: 25 },
+        ],
+      },
+      {
+        name: 'B',
+        data: [
+          { x: 'Jul 2019', y: 20 },
+          { x: 'Jun 2020', y: 17 },
+        ],
+      },
+      {
+        name: 'C',
+        data: [
+          { x: 'Jul 2019', y: 20 },
+          { x: 'Jun 2020', y: 15 },
+        ],
+      },
+      {
+        name: 'D',
+        data: [
+          { x: 'Jul 2019', y: 15 },
+          { x: 'Jun 2020', y: 25 },
+        ],
+      },
+      {
+        name: 'E',
+        data: [
+          { x: 'Jul 2019', y: 18 },
+          { x: 'Jun 2020', y: 20 },
+        ],
+      },
+      {
+        name: 'F',
+        data: [
+          { x: 'Jul 2019', y: 36 },
+          { x: 'Jun 2020', y: 18 },
+        ],
+      },
+    ],
     chart: {
       height: 170,
       width: '100%',
@@ -83,8 +127,12 @@ export class ChartAlturaComponent implements OnInit {
             });
           });
 
-          if (this.chartOptions.series.length < alturaMax) {
-            this.chartOptions.series.push(row);
+          // en la planta DEMO no aplicamos estos datos
+          if (this.reportControlService.plantaId !== 'egF0cbpXnnBnjcrusoeR') {
+            this.chartOptions.series = [];
+            if (this.chartOptions.series.length < alturaMax) {
+              this.chartOptions.series.push(row);
+            }
           }
         }
 
