@@ -1,3 +1,7 @@
+mat-card {
+  max-width: 162px;
+}
+
 mat-card-content {
   display: grid;
   gap: 0.3rem;
@@ -11,4 +15,9 @@ mat-card-content {
 .line span {
   font-size: medium;
   margin-left: 0.5rem;
+}
+
+.title {
+  font-size: medium;
+  font-weight: 500;
 }

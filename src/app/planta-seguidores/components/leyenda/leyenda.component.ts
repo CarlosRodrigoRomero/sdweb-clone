@@ -13,6 +13,7 @@ export class LeyendaComponent implements OnInit {
   colors = GLOBAL.colores_mae;
   viewSelected: number;
   viewsLevels: number[][];
+  viewsTitle: string[] = ['MAE por seguidor', 'Cels. Calientes por seguidor', 'ΔT Max (norm) por seguidor'];
 
   constructor(
     private mapSeguidoresService: MapSeguidoresService,
