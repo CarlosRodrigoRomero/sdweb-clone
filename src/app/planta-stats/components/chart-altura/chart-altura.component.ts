@@ -71,6 +71,10 @@ export class ChartAlturaComponent implements OnInit {
           };
 
           dateLabels.forEach((dateLabel, i) => {
+            // const anomsInforme = this.allAnomalias.filter((anom) => anom.informeId === this.informesIdList[i]);
+
+            // const posicionAnoms = anomsInforme.map((anom) => anom.localY);
+
             row.data.push({
               x: dateLabel,
               y: this.allAnomalias
@@ -79,26 +83,12 @@ export class ChartAlturaComponent implements OnInit {
             });
           });
 
-          this.chartOptions.series.push(row);
+          if (this.chartOptions.series.length < alturaMax) {
+            this.chartOptions.series.push(row);
+          }
         }
 
         this.dataLoaded = true;
       });
-  }
-
-  public generateData(count, yrange) {
-    var i = 0;
-    var series = [];
-    while (i < count) {
-      var x = 'C' + (i + 1).toString();
-      var y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
-
-      series.push({
-        x: x,
-        y: y,
-      });
-      i++;
-    }
-    return series;
   }
 }
