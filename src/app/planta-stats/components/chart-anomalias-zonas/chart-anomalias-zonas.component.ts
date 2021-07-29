@@ -159,6 +159,7 @@ export class ChartAnomaliasZonasComponent implements OnInit {
     }
 
     let series;
+    // excluimos DEMO
     if (this.reportControlService.plantaId === 'egF0cbpXnnBnjcrusoeR') {
       series = [
         {

@@ -130,9 +130,24 @@ export class ChartCelsPorZonasComponent implements OnInit {
   }
 
   private _initChart(): void {
-    const series = this.dateLabels.map((dateLabel, index) => {
-      return { name: dateLabel, data: this.chartData[index] };
-    });
+    let series;
+    // excluimos DEMO
+    if (this.reportControlService.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+      series = [
+        {
+          name: 'CC por Zonas 2019',
+          data: [32, 45, 58],
+        },
+        {
+          name: 'CC por Zonas 2020',
+          data: [40, 38, 50],
+        },
+      ];
+    } else {
+      series = this.dateLabels.map((dateLabel, index) => {
+        return { name: dateLabel, data: this.chartData[index] };
+      });
+    }
 
     let titleXAxis = 'Zonas';
     if (this.reportControlService.nombreGlobalCoords !== undefined) {
