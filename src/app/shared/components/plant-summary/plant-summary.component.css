@@ -64,6 +64,10 @@
   color: green;
 }
 
+.help {
+  cursor: pointer;
+}
+
 @media (max-width: 730px) {
   .grupo3 {
     display: none;
@@ -78,10 +82,6 @@
   /* .navbar-brand-logo {
     display: none;
   } */
-
-  .grupo1 h5 {
-    font-size: 16px;
-  }
 
   .grupo1 mat-icon {
     font-size: 22px;
