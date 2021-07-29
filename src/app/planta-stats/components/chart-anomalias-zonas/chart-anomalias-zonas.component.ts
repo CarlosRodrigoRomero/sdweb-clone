@@ -157,9 +157,24 @@ export class ChartAnomaliasZonasComponent implements OnInit {
     if (this.reportControlService.nombreGlobalCoords !== undefined) {
       titleXAxis = this.reportControlService.nombreGlobalCoords[0];
     }
-    const series = this.dateLabels.map((dateLabel, index) => {
-      return { name: dateLabel, data: this.chartData[index] };
-    });
+
+    let series;
+    if (this.reportControlService.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+      series = [
+        {
+          name: 'MAE por Zonas 2019',
+          data: [1, 3, 3],
+        },
+        {
+          name: 'MAE por Zonas 2020',
+          data: [2, 1, 1],
+        },
+      ];
+    } else {
+      series = this.dateLabels.map((dateLabel, index) => {
+        return { name: dateLabel, data: this.chartData[index] };
+      });
+    }
 
     // espera a que el dataPlot tenga datos
     if (this.chartData[0] !== undefined) {
