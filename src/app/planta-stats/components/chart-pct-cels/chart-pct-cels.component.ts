@@ -129,7 +129,7 @@ export class ChartPctCelsComponent implements OnInit {
         this.informes.forEach((informe) => {
           data1.push(informe.cc);
 
-          const anomsInforme = this.allAnomalias.filter((anom) => (anom.informeId = informe.id));
+          const anomsInforme = this.allAnomalias.filter((anom) => (anom.informeId === informe.id));
           const gradientes = anomsInforme.map((anom) => anom.gradiente);
           let gradienteTotal = 0;
           gradientes.forEach((grad) => (gradienteTotal += grad));
