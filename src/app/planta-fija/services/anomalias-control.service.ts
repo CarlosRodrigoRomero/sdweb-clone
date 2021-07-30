@@ -135,11 +135,16 @@ export class AnomaliasControlService {
 
       features.forEach((feature) => {
         if (anomalias.map((anom) => anom.id).includes(feature.getProperties().properties.anomaliaId)) {
+          // if (feature.getStyle() === null) {
+          //   feature.setStyle(this.getStyleAnomaliasMapa(false));
+          // }
           if (feature.getProperties().properties.visible === false) {
             feature.getProperties().properties.visible = true;
             feature.setStyle(this.getStyleAnomaliasMapa(false));
           }
         } else {
+          // feature.setStyle(new Style(null));
+
           if (feature.getProperties().properties.visible === true) {
             feature.getProperties().properties.visible = false;
             feature.setStyle(this.getStyleAnomaliasMapa(false));
