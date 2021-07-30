@@ -88,11 +88,18 @@ export class InformeService {
     const query$ = this.afs.collection<InformeInterface>('informes', (ref) => ref.where('plantaId', '==', plantaId));
     return query$.snapshotChanges().pipe(
       map((actions) =>
-        actions.map((a) => {
-          const data = a.payload.doc.data() as InformeInterface;
-          data.id = a.payload.doc.id;
-          return data;
-        })
+        actions
+          .filter((a) => {
+            // solo mostramos los informes a partir de 05/2021
+            const informe = a.payload.doc.data() as InformeInterface;
+
+            return informe.fecha > 1619827200;
+          })
+          .map((a) => {
+            const data = a.payload.doc.data() as InformeInterface;
+            data.id = a.payload.doc.id;
+            return data;
+          })
       )
     );
   }
