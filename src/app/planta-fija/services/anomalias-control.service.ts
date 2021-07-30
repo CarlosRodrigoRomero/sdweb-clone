@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
 
 import Map from 'ol/Map';
 import { Fill, Stroke, Style } from 'ol/style';
@@ -74,17 +74,21 @@ export class AnomaliasControlService {
 
   public mostrarAnomalias() {
     this.filterService.filteredElements$.subscribe((anomalias) => {
-      if (this.sharedReportNoFilters) {
-        const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
-        this.dibujarAnomalias(anomFil as Anomalia[]);
-        this.listaAnomalias = anomalias as Anomalia[];
+      if (this.listaAnomalias !== undefined) {
+        this.setVisibleAnoms(anomalias as Anomalia[]);
       } else {
-        this.dibujarAnomalias(anomalias as Anomalia[]);
-        this.listaAnomalias = anomalias as Anomalia[];
+        if (this.sharedReportNoFilters) {
+          const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
+          this.dibujarAnomalias(anomFil as Anomalia[]);
+          this.listaAnomalias = anomalias as Anomalia[];
+        } else {
+          this.dibujarAnomalias(anomalias as Anomalia[]);
+          this.listaAnomalias = anomalias as Anomalia[];
 
-        // reiniciamos las anomalias seleccionadas cada vez que se aplica un filtro
-        this.prevAnomaliaSelect = undefined;
-        this.anomaliaSelect = undefined;
+          // reiniciamos las anomalias seleccionadas cada vez que se aplica un filtro
+          this.prevAnomaliaSelect = undefined;
+          this.anomaliaSelect = undefined;
+        }
       }
     });
   }
@@ -93,7 +97,7 @@ export class AnomaliasControlService {
     // Para cada vector layer (que corresponde a un informe)
     this.anomaliaLayers.forEach((l) => {
       // filtra las anomalías correspondientes al informe
-      const filtered = anomalias.filter((item) => item.informeId == l.getProperties().informeId);
+      const filtered = anomalias.filter((item) => item.informeId === l.getProperties().informeId);
       const source = l.getSource();
       source.clear();
       filtered.forEach((anom) => {
@@ -106,6 +110,7 @@ export class AnomaliasControlService {
             temperaturaMax: anom.temperaturaMax,
             temperaturaRef: anom.temperaturaRef,
             informeId: anom.informeId,
+            visible: true,
           },
         });
         source.addFeature(feature);
@@ -120,6 +125,28 @@ export class AnomaliasControlService {
     this.addOnHoverAction();
     this.addSelectInteraction();
     this.addClickOutFeatures();
+  }
+
+  private setVisibleAnoms(anomalias: Anomalia[]) {
+    this.anomaliaLayers.forEach((layer) => {
+      const source = layer.getSource();
+
+      const features = source.getFeatures();
+
+      features.forEach((feature) => {
+        if (anomalias.map((anom) => anom.id).includes(feature.getProperties().properties.anomaliaId)) {
+          if (feature.getProperties().properties.visible === false) {
+            feature.getProperties().properties.visible = true;
+            feature.setStyle(this.getStyleAnomaliasMapa(false));
+          }
+        } else {
+          if (feature.getProperties().properties.visible === true) {
+            feature.getProperties().properties.visible = false;
+            feature.setStyle(this.getStyleAnomaliasMapa(false));
+          }
+        }
+      });
+    });
   }
 
   private removeSelectAnomaliaInteractions() {
@@ -322,7 +349,11 @@ export class AnomaliasControlService {
 
   public getStyleAnomaliasMapa(selected = false) {
     return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+      if (
+        feature !== undefined &&
+        feature.getProperties().hasOwnProperty('properties') &&
+        feature.getProperties().properties.visible === true
+      ) {
         if (selected) {
           return new Style({
             stroke: new Stroke({

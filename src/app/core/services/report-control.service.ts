@@ -71,7 +71,9 @@ export class ReportControlService {
         this.anomaliaService
           .initService(this.plantaId)
           .pipe(
+            take(1),
             switchMap(() => this.informeService.getInformesDePlanta(this.plantaId)),
+            take(1),
             // obtenemos los informes de la planta
             switchMap((informes) => {
               this.informes = informes.sort((a, b) => a.fecha - b.fecha);
@@ -88,6 +90,7 @@ export class ReportControlService {
               // obtenemos todas las anomalías
               return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
             }),
+            take(1),
             switchMap((anoms) => {
               this.allFilterableElements = anoms;
 
