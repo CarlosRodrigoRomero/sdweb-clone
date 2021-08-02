@@ -7,7 +7,13 @@ import Map from 'ol/Map';
 import { Fill, Stroke, Style } from 'ol/style';
 import { Feature } from 'ol';
 import VectorLayer from 'ol/layer/Vector';
+import VectorImageLayer from 'ol/layer/VectorImage';
 import Polygon from 'ol/geom/Polygon';
+import { Draw, Modify, Select } from 'ol/interaction';
+import { click } from 'ol/events/condition';
+import SimpleGeometry from 'ol/geom/SimpleGeometry';
+import GeometryType from 'ol/geom/GeometryType';
+import { createBox } from 'ol/interaction/Draw';
 
 import { GLOBAL } from '@core/services/global';
 import { OlMapService } from '@core/services/ol-map.service';
@@ -16,11 +22,6 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { Anomalia } from '@core/models/anomalia';
-import { Draw, Modify, Select } from 'ol/interaction';
-import { click } from 'ol/events/condition';
-import SimpleGeometry from 'ol/geom/SimpleGeometry';
-import GeometryType from 'ol/geom/GeometryType';
-import { createBox } from 'ol/interaction/Draw';
 
 @Injectable({
   providedIn: 'root',
@@ -110,7 +111,7 @@ export class AnomaliasControlService {
             temperaturaMax: anom.temperaturaMax,
             temperaturaRef: anom.temperaturaRef,
             informeId: anom.informeId,
-            visible: true,
+            // visible: true,
           },
         });
         source.addFeature(feature);
@@ -135,36 +136,24 @@ export class AnomaliasControlService {
 
       features.forEach((feature) => {
         if (anomalias.map((anom) => anom.id).includes(feature.getProperties().properties.anomaliaId)) {
-          // if (feature.getStyle() === null) {
+          if (feature.getStyle() === new Style(null)) {
+            feature.setStyle(this.getStyleAnomaliasMapa(false));
+          }
+          // if (feature.getProperties().properties.visible === false) {
+          //   feature.getProperties().properties.visible = true;
           //   feature.setStyle(this.getStyleAnomaliasMapa(false));
           // }
-          if (feature.getProperties().properties.visible === false) {
-            feature.getProperties().properties.visible = true;
-            feature.setStyle(this.getStyleAnomaliasMapa(false));
-          }
         } else {
-          // feature.setStyle(new Style(null));
+          feature.setStyle(new Style(null));
 
-          if (feature.getProperties().properties.visible === true) {
-            feature.getProperties().properties.visible = false;
-            feature.setStyle(this.getStyleAnomaliasMapa(false));
-          }
+          // if (feature.getProperties().properties.visible === true) {
+          //   feature.getProperties().properties.visible = false;
+          //   feature.setStyle(this.getStyleAnomaliasMapa(false));
+          // }
         }
       });
     });
   }
-
-  // private setRedAnoms() {
-  //   this.anomaliaLayers.forEach((layer) => {
-  //     const source = layer.getSource();
-
-  //     const features = source.getFeatures();
-
-  //     features.forEach(feature => {
-  //       feature
-  //     })
-  //   });
-  // }
 
   private removeSelectAnomaliaInteractions() {
     // eliminamos solo las interacciones 'select'
@@ -368,8 +357,8 @@ export class AnomaliasControlService {
     return (feature) => {
       if (
         feature !== undefined &&
-        feature.getProperties().hasOwnProperty('properties') &&
-        feature.getProperties().properties.visible === true
+        feature.getProperties().hasOwnProperty('properties') /* &&
+        feature.getProperties().properties.visible === true */
       ) {
         if (selected) {
           return new Style({
