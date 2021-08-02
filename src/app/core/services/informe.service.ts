@@ -93,7 +93,12 @@ export class InformeService {
             // solo mostramos los informes a partir de 05/2021
             const informe = a.payload.doc.data() as InformeInterface;
 
-            return informe.fecha > 1619827200;
+            // excepción para DEMO
+            if (informe.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+              return informe;
+            } else {
+              return informe.fecha > 1619827200;
+            }
           })
           .map((a) => {
             const data = a.payload.doc.data() as InformeInterface;
