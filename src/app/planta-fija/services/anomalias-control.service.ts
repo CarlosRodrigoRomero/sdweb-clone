@@ -154,6 +154,18 @@ export class AnomaliasControlService {
     });
   }
 
+  // private setRedAnoms() {
+  //   this.anomaliaLayers.forEach((layer) => {
+  //     const source = layer.getSource();
+
+  //     const features = source.getFeatures();
+
+  //     features.forEach(feature => {
+  //       feature
+  //     })
+  //   });
+  // }
+
   private removeSelectAnomaliaInteractions() {
     // eliminamos solo las interacciones 'select'
     this.map
