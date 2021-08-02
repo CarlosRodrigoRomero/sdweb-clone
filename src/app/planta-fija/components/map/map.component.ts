@@ -18,7 +18,6 @@ import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 import { PlantaService } from '@core/services/planta.service';
 import { MapControlService } from '../../services/map-control.service';
 import { GLOBAL } from '@core/services/global';
-import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '@core/services/filter.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { ShareReportService } from '@core/services/share-report.service';
@@ -45,7 +44,6 @@ export class MapComponent implements OnInit, OnDestroy {
   public selectedInformeId: string;
   public anomaliaSelect: Anomalia;
   public anomaliaHover: Anomalia;
-  public listaAnomalias: Anomalia[];
   public sliderYear: number;
   public aerialLayer: TileLayer;
   private extent1: any;
@@ -64,7 +62,6 @@ export class MapComponent implements OnInit, OnDestroy {
   constructor(
     public mapControlService: MapControlService,
     private plantaService: PlantaService,
-    private informeService: InformeService,
     public filterService: FilterService,
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
@@ -90,7 +87,6 @@ export class MapComponent implements OnInit, OnDestroy {
             return combineLatest([
               this.plantaService.getThermalLayers$(this.plantaId),
               this.reportControlService.informes$,
-              // this.informeService.getInformesDePlanta(this.plantaId),
               this.plantaService.getPlanta(this.plantaId),
             ]);
           })

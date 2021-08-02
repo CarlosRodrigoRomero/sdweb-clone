@@ -111,7 +111,7 @@ export class AnomaliasControlService {
             temperaturaMax: anom.temperaturaMax,
             temperaturaRef: anom.temperaturaRef,
             informeId: anom.informeId,
-            // visible: true,
+            visible: true,
           },
         });
         source.addFeature(feature);
@@ -357,8 +357,8 @@ export class AnomaliasControlService {
     return (feature) => {
       if (
         feature !== undefined &&
-        feature.getProperties().hasOwnProperty('properties') /* &&
-        feature.getProperties().properties.visible === true */
+        feature.getProperties().hasOwnProperty('properties') &&
+        feature.getProperties().properties.visible === true
       ) {
         if (selected) {
           return new Style({
