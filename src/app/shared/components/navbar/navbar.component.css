@@ -21,6 +21,10 @@ nav {
   display: none;
 }
 
+#plant-summary {
+  visibility: hidden;
+}
+
 @media (max-width: 950px) {
   .navbar-brand {
     display: none;

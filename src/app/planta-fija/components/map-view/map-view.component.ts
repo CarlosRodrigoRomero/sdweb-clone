@@ -22,6 +22,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   public anomaliasLoaded = false;
   public notSharedReport = true;
   public showFilters = true;
+  public mapLoaded = false;
   private subscriptions: Subscription = new Subscription();
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
@@ -44,6 +45,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.reportControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value))
     );
+    this.subscriptions.add(this.reportControlService.mapLoaded$.subscribe((value) => (this.mapLoaded = value)));
   }
 
   ngOnDestroy(): void {

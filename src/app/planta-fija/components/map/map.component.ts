@@ -201,6 +201,9 @@ export class MapComponent implements OnInit, OnDestroy {
         crossOrigin: '',
       });
 
+      // damos el mapa por cargado al terminar de cargar la capa visual
+      // aerial.on('tileloadend', () => (this.mapControlService.mapLoaded = true));
+
       this.aerialLayer = new TileLayer({
         source: aerial,
       });
@@ -212,6 +215,9 @@ export class MapComponent implements OnInit, OnDestroy {
           'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInformeId + '_visual/{z}/{x}/{y}.png',
         crossOrigin: '',
       });
+
+      // damos el mapa por cargado al terminar de cargar la capa visual
+      // aerial.on('tileloadend', () => (this.mapControlService.mapLoaded = true));
 
       this.aerialLayer = new TileLayer({
         source: aerial,
@@ -247,9 +253,15 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     this.subscriptions.add(
-      this.olMapService
-        .createMap('map', layers, view, defaultControls({ attribution: false }))
-        .subscribe((map) => (this.map = map))
+      this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {
+        this.map = map;
+
+        this.map.once('postrender', () => {
+          this.reportControlService.mapLoaded = true;
+
+          // document.getElementById('map').style.visibility = 'unset';
+        });
+      })
     );
 
     this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
