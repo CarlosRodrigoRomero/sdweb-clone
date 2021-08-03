@@ -35,7 +35,7 @@ export class AnomaliaService {
     private adminService: AdminService
   ) {}
 
-  initService(plantaId: string): Promise<boolean> {
+  initService(plantaId: string): Promise<void> {
     // obtenemos el criterio de criticidad de la planta si tuviese
     let criterioId: string;
     return new Promise((resolve, reject) => {
@@ -71,7 +71,7 @@ export class AnomaliaService {
           }
 
           // servicio iniciado
-          resolve(true);
+          resolve();
         });
     });
   }

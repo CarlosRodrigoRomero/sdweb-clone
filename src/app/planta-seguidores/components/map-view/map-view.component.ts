@@ -39,9 +39,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(
-      this.reportControlService.initService().subscribe((value) => (this.seguidoresLoaded = value))
-    );
+    this.reportControlService.initService().then((res) => (this.seguidoresLoaded = res));
     this.subscriptions.add(
       this.reportControlService.sharedReportWithFilters$.subscribe((value) => (this.showFilters = value))
     );

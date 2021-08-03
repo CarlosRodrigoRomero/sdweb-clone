@@ -29,30 +29,30 @@ export class FilterService {
 
   constructor(private shareReportService: ShareReportService, private filterControlService: FilterControlService) {}
 
-  initService(elems: FilterableElement[], shared?: boolean, sharedId?: string): Observable<boolean> {
+  initService(elems: FilterableElement[], shared?: boolean, sharedId?: string): Promise<boolean> {
     this.allFiltrableElements = elems;
     this.filteredElements = elems;
 
-    if (shared) {
-      this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params));
+    return new Promise((response, reject) => {
+      if (shared) {
+        this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params));
 
-      // obtenemos lo filtros guardados en al DB y los añadimos
-      this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
-        if (filters.length > 0) {
-          this.addFilters(filters);
+        // obtenemos lo filtros guardados en al DB y los añadimos
+        this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
+          if (filters.length > 0) {
+            this.addFilters(filters);
 
-          this.initialized$.next(true);
-        }
-      });
-      this.initialized$.next(true);
-    } else {
-      this.initialized$.next(true);
-    }
+            response(true);
+          }
+        });
+        response(true);
+      } else {
+        response(true);
+      }
 
-    // para contabilizar los diferentes filtros 'tipo'
-    this.filteredElementsWithoutFilterTipo = elems;
-
-    return this.initialized$;
+      // para contabilizar los diferentes filtros 'tipo'
+      this.filteredElementsWithoutFilterTipo = elems;
+    });
   }
 
   addFilter(filter: FilterInterface) {
