@@ -75,21 +75,17 @@ export class AnomaliasControlService {
 
   public mostrarAnomalias() {
     this.filterService.filteredElements$.subscribe((anomalias) => {
-      if (this.listaAnomalias !== undefined) {
-        this.setVisibleAnoms(anomalias as Anomalia[]);
+      if (this.sharedReportNoFilters) {
+        const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
+        this.dibujarAnomalias(anomFil as Anomalia[]);
+        this.listaAnomalias = anomalias as Anomalia[];
       } else {
-        if (this.sharedReportNoFilters) {
-          const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
-          this.dibujarAnomalias(anomFil as Anomalia[]);
-          this.listaAnomalias = anomalias as Anomalia[];
-        } else {
-          this.dibujarAnomalias(anomalias as Anomalia[]);
-          this.listaAnomalias = anomalias as Anomalia[];
+        this.dibujarAnomalias(anomalias as Anomalia[]);
+        this.listaAnomalias = anomalias as Anomalia[];
 
-          // reiniciamos las anomalias seleccionadas cada vez que se aplica un filtro
-          this.prevAnomaliaSelect = undefined;
-          this.anomaliaSelect = undefined;
-        }
+        // reiniciamos las anomalias seleccionadas cada vez que se aplica un filtro
+        this.prevAnomaliaSelect = undefined;
+        this.anomaliaSelect = undefined;
       }
     });
   }
@@ -107,11 +103,7 @@ export class AnomaliasControlService {
           properties: {
             anomaliaId: anom.id,
             tipo: anom.tipo,
-            clase: anom.clase,
-            temperaturaMax: anom.temperaturaMax,
-            temperaturaRef: anom.temperaturaRef,
             informeId: anom.informeId,
-            visible: true,
           },
         });
         source.addFeature(feature);
@@ -126,33 +118,6 @@ export class AnomaliasControlService {
     this.addOnHoverAction();
     this.addSelectInteraction();
     this.addClickOutFeatures();
-  }
-
-  private setVisibleAnoms(anomalias: Anomalia[]) {
-    this.anomaliaLayers.forEach((layer) => {
-      const source = layer.getSource();
-
-      const features = source.getFeatures();
-
-      features.forEach((feature) => {
-        if (anomalias.map((anom) => anom.id).includes(feature.getProperties().properties.anomaliaId)) {
-          if (feature.getStyle() === new Style(null)) {
-            feature.setStyle(this.getStyleAnomaliasMapa(false));
-          }
-          // if (feature.getProperties().properties.visible === false) {
-          //   feature.getProperties().properties.visible = true;
-          //   feature.setStyle(this.getStyleAnomaliasMapa(false));
-          // }
-        } else {
-          feature.setStyle(new Style(null));
-
-          // if (feature.getProperties().properties.visible === true) {
-          //   feature.getProperties().properties.visible = false;
-          //   feature.setStyle(this.getStyleAnomaliasMapa(false));
-          // }
-        }
-      });
-    });
   }
 
   private removeSelectAnomaliaInteractions() {
@@ -355,11 +320,7 @@ export class AnomaliasControlService {
 
   public getStyleAnomaliasMapa(selected = false) {
     return (feature) => {
-      if (
-        feature !== undefined &&
-        feature.getProperties().hasOwnProperty('properties') &&
-        feature.getProperties().properties.visible === true
-      ) {
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         if (selected) {
           return new Style({
             stroke: new Stroke({
