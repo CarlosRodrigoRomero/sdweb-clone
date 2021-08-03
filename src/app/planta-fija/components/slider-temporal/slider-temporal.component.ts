@@ -146,7 +146,6 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log('ok');
     this.subscriptions.unsubscribe();
   }
 }

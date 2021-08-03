@@ -43,6 +43,7 @@ export class FiltersPanelComponent implements OnInit {
     // borra todos los filtros
     this.filterService.deleteAllFilters();
 
+    // reseteamos los parametros
     this.filterControlService.resetFilters();
   }
 }

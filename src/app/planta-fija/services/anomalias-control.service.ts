@@ -1,13 +1,19 @@
 import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
 
 import Map from 'ol/Map';
 import { Fill, Stroke, Style } from 'ol/style';
 import { Feature } from 'ol';
 import VectorLayer from 'ol/layer/Vector';
+import VectorImageLayer from 'ol/layer/VectorImage';
 import Polygon from 'ol/geom/Polygon';
+import { Draw, Modify, Select } from 'ol/interaction';
+import { click } from 'ol/events/condition';
+import SimpleGeometry from 'ol/geom/SimpleGeometry';
+import GeometryType from 'ol/geom/GeometryType';
+import { createBox } from 'ol/interaction/Draw';
 
 import { GLOBAL } from '@core/services/global';
 import { OlMapService } from '@core/services/ol-map.service';
@@ -16,11 +22,6 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { Anomalia } from '@core/models/anomalia';
-import { Draw, Modify, Select } from 'ol/interaction';
-import { click } from 'ol/events/condition';
-import SimpleGeometry from 'ol/geom/SimpleGeometry';
-import GeometryType from 'ol/geom/GeometryType';
-import { createBox } from 'ol/interaction/Draw';
 
 @Injectable({
   providedIn: 'root',
@@ -93,7 +94,7 @@ export class AnomaliasControlService {
     // Para cada vector layer (que corresponde a un informe)
     this.anomaliaLayers.forEach((l) => {
       // filtra las anomalías correspondientes al informe
-      const filtered = anomalias.filter((item) => item.informeId == l.getProperties().informeId);
+      const filtered = anomalias.filter((item) => item.informeId === l.getProperties().informeId);
       const source = l.getSource();
       source.clear();
       filtered.forEach((anom) => {
@@ -102,9 +103,6 @@ export class AnomaliasControlService {
           properties: {
             anomaliaId: anom.id,
             tipo: anom.tipo,
-            clase: anom.clase,
-            temperaturaMax: anom.temperaturaMax,
-            temperaturaRef: anom.temperaturaRef,
             informeId: anom.informeId,
           },
         });
