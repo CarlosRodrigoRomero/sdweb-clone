@@ -26,8 +26,6 @@ export class AnomaliaService {
   public criterioCriticidad: CritCriticidad;
   private _hasCriticidad = false;
   public hasCriticidad$ = new BehaviorSubject<boolean>(this._hasCriticidad);
-  private _initialized = false;
-  private initialized$ = new BehaviorSubject<boolean>(this._initialized);
 
   constructor(
     public afs: AngularFirestore,
@@ -37,43 +35,45 @@ export class AnomaliaService {
     private adminService: AdminService
   ) {}
 
-  initService(plantaId: string) {
+  initService(plantaId: string): Promise<boolean> {
     // obtenemos el criterio de criticidad de la planta si tuviese
     let criterioId: string;
-    this.plantaService
-      .getPlanta(plantaId)
-      .pipe(
-        take(1),
-        switchMap((planta) => {
-          // primero comprovamos si la planta tiene criterio
-          if (planta.hasOwnProperty('criterioId')) {
-            this.hasCriticidad = true;
-            criterioId = planta.criterioId;
-          }
-
-          return this.adminService.getUser(planta.empresa);
-        }),
-        take(1),
-        switchMap((user) => {
-          // si la planta no tiene criterio, comprobamos si lo tiene el user
-          if (criterioId === undefined || criterioId === null) {
-            if (user.hasOwnProperty('criterioId')) {
+    return new Promise((resolve, reject) => {
+      this.plantaService
+        .getPlanta(plantaId)
+        .pipe(
+          take(1),
+          switchMap((planta) => {
+            // primero comprovamos si la planta tiene criterio
+            if (planta.hasOwnProperty('criterioId')) {
               this.hasCriticidad = true;
-              criterioId = user.criterioId;
+              criterioId = planta.criterioId;
             }
+
+            return this.adminService.getUser(planta.empresa);
+          }),
+          take(1),
+          switchMap((user) => {
+            // si la planta no tiene criterio, comprobamos si lo tiene el user
+            if (criterioId === undefined || criterioId === null) {
+              if (user.hasOwnProperty('criterioId')) {
+                this.hasCriticidad = true;
+                criterioId = user.criterioId;
+              }
+            }
+
+            return iif(() => criterioId !== undefined, this.plantaService.getCriterioCriticidad(criterioId), of({}));
+          })
+        )
+        .subscribe((criterio: CritCriticidad) => {
+          if (criterio.labels !== undefined) {
+            this.criterioCriticidad = criterio;
           }
 
-          return iif(() => criterioId !== undefined, this.plantaService.getCriterioCriticidad(criterioId), of({}));
-        })
-      )
-      .subscribe((criterio: CritCriticidad) => {
-        if (criterio.labels !== undefined) {
-          this.criterioCriticidad = criterio;
-        }
-        this.inicialized = true;
-      });
-
-    return this.initialized$;
+          // servicio iniciado
+          resolve(true);
+        });
+    });
   }
 
   set selectedInformeId(informeId: string) {
@@ -405,14 +405,5 @@ export class AnomaliaService {
   set hasCriticidad(value: boolean) {
     this._hasCriticidad = value;
     this.hasCriticidad$.next(value);
-  }
-
-  get inicialized() {
-    return this._initialized;
-  }
-
-  set inicialized(value: boolean) {
-    this._initialized = value;
-    this.initialized$.next(value);
   }
 }

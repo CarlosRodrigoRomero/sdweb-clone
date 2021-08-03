@@ -123,11 +123,6 @@ export class FilterService {
         );
       }
 
-      // comprobamos que hay algun filtro activo
-      // if (everyFilterFiltrableElements.length === 0) {
-      //   this.filteredElements = this.allFiltrableElements;
-      // }
-
       this.filteredElements$.next(this.filteredElements);
 
       // para calcular el numero de anomalias por filtro tipo
