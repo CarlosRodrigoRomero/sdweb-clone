@@ -17,7 +17,7 @@ import { PlantaInterface } from '@core/models/planta';
   styleUrls: ['./plant-summary.component.css'],
 })
 export class PlantSummaryComponent implements OnInit, OnDestroy {
-  nombrePlanta = 'Planta demo';
+  nombrePlanta = 'Planta';
   potenciaPlanta = 1;
   tipoPlanta = 'fija';
   public planta: PlantaInterface = undefined;

@@ -68,7 +68,7 @@ export class ReportControlService {
         this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
         // iniciamos anomalia service antes de obtener las anomalias
-        this.anomaliaService.initService(this.plantaId).then(() => {
+        this.anomaliaService.initService(this.plantaId).then(() =>
           this.informeService
             .getInformesDePlanta(this.plantaId)
             .pipe(
@@ -99,8 +99,8 @@ export class ReportControlService {
                 return this.filterService.initService(anoms);
               })
             )
-            .subscribe((init) => (this.initialized = init));
-        });
+            .subscribe((init) => (this.initialized = init))
+        );
       } else {
         ///////////////////// SHARED REPORT ///////////////////////
         this.sharedReport = true;
@@ -150,6 +150,7 @@ export class ReportControlService {
                   this.informeService
                     .getInformesDePlanta(this.plantaId)
                     .pipe(
+                      take(1),
                       // obtenemos los informes de la planta
                       switchMap((informes) => {
                         this.informes = informes.sort((a, b) => a.fecha - b.fecha);
@@ -189,6 +190,7 @@ export class ReportControlService {
           this.informeService
             .getInformesDePlanta(this.plantaId)
             .pipe(
+              take(1),
               // obtenemos los informes de la planta
               switchMap((informes) => {
                 this.informes = informes.sort((a, b) => a.fecha - b.fecha);
@@ -257,12 +259,12 @@ export class ReportControlService {
                 );
               } else {
                 //////////////////// FILTERABLE SHARED REPORT /////////////////////////
-
                 // iniciamos anomalia service para cargar los criterios la planta
                 this.anomaliaService.initService(this.plantaId).then(() =>
                   this.informeService
                     .getInformesDePlanta(this.plantaId)
                     .pipe(
+                      take(1),
                       // obtenemos los informes de la planta
                       switchMap((informes) => {
                         this.informes = informes.sort((a, b) => a.fecha - b.fecha);
@@ -272,7 +274,6 @@ export class ReportControlService {
                           this.informes.forEach((informe) => this._informesIdList.push(informe.id));
                           this.informesIdList$.next(this._informesIdList);
                         }
-
                         // obtenemos todos los seguidores
                         return this.seguidorService.getSeguidoresPlanta$(this.plantaId);
                       }),
