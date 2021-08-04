@@ -97,8 +97,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
               filteredElements.push({
                 color: 'red',
                 id: elem.id.replace((elem as Seguidor).informeId, '').replace(/_/g, ' '),
-                // tslint:disable-next-line: triple-equals
-                numAnomalias: seguidor.anomalias.filter((anom) => anom.tipo != 0).length,
+                numAnomalias: seguidor.anomaliasCliente.length,
                 modulo: this.getModuloLabel(elem as Seguidor),
                 mae: seguidor.mae,
                 celsCalientes: this.getCelsCalientes(seguidor),

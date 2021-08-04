@@ -129,13 +129,6 @@ export class AnomaliaService {
         return combineLatest(anomaliaObsList);
       }),
       map((arr) => arr.flat())
-      // TODO: revisar cuando aparezca planta con 'anomalias' y 'pcs'
-      /* ,
-      // eliminamos las anomalias "vacias" por haber llamado a 'pcs' y 'anomalias'
-      map((anoms) => {
-        console.log(anoms);
-        return (anoms = anoms.filter((anom) => anom.perdidas !== 0));
-      }) */
     );
 
     return query$;
@@ -186,9 +179,7 @@ export class AnomaliaService {
 
             return data;
           })
-        ),
-        // filtramos las que tienen criticidad null ya que para el cliente no son anomalias
-        map((anoms) => anoms.filter((anom) => anom.criticidad !== null))
+        )
       );
 
     return query$;

@@ -221,6 +221,7 @@ export class ReportControlService {
               )
               .subscribe((segs) => {
                 this.allFilterableElements = segs;
+
                 // calculamos el MAE y las CC de los informes si no tuviesen
                 this.setMaeInformesPlanta(segs);
                 this.setCCInformesPlanta(segs);

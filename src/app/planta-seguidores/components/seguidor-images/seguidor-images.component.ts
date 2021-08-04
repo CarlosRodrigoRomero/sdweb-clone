@@ -151,14 +151,13 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     this.anomsCanvas.clear();
 
     // tslint:disable-next-line: triple-equals
-    const anomaliasNoTipo0 = this.seguidorSelected.anomalias.filter((anom) => anom.tipo != 0);
-
-    // tslint:disable-next-line: triple-equals
     if (this.viewSelected == 1) {
       // en el view Cels. Calientes solo mostramos estas
-      anomaliasNoTipo0.filter((anom) => anom.tipo === 8 || anom.tipo === 9).forEach((anom) => this.drawAnomalia(anom));
+      this.seguidorSelected.anomaliasCliente
+        .filter((anom) => anom.tipo === 8 || anom.tipo === 9)
+        .forEach((anom) => this.drawAnomalia(anom));
     } else {
-      anomaliasNoTipo0.forEach((anom) => this.drawAnomalia(anom));
+      this.seguidorSelected.anomaliasCliente.forEach((anom) => this.drawAnomalia(anom));
     }
   }
 
@@ -204,12 +203,12 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
   private getAnomaliaColor(anomalia: Anomalia): string {
     // tslint:disable-next-line: triple-equals
     if (this.viewSelected == 0) {
-      return this.anomaliaService.getPerdidasColor(this.seguidorSelected.anomalias, anomalia);
+      return this.anomaliaService.getPerdidasColor(this.seguidorSelected.anomaliasCliente, anomalia);
       // tslint:disable-next-line: triple-equals
     } else if (this.viewSelected == 1) {
       return this.anomaliaService.getCelsCalientesColor(anomalia);
     } else {
-      return this.anomaliaService.getGradienteColor(this.seguidorSelected.anomalias, anomalia);
+      return this.anomaliaService.getGradienteColor(this.seguidorSelected.anomaliasCliente, anomalia);
     }
   }
 
@@ -242,7 +241,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
           this.seguidorViewService.prevAnomaliaSelected = this.anomaliaSelected;
 
           // seleccionamos la nueva
-          const anomaliaSelected = this.seguidorSelected.anomalias.find((anom) => anom.id === e.target.anomId);
+          const anomaliaSelected = this.seguidorSelected.anomaliasCliente.find((anom) => anom.id === e.target.anomId);
 
           this.seguidorViewService.anomaliaSelected = anomaliaSelected;
 

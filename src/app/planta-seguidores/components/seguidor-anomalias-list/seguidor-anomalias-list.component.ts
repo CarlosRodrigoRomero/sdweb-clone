@@ -46,34 +46,30 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
       this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
         this.seguidorSelected = seguidor;
 
-        // tslint:disable-next-line: triple-equals
-        if (this.seguidorSelected.anomalias.filter((anom) => anom.tipo != 0).length > 0) {
+        if (seguidor.anomaliasCliente.length > 0) {
           const anomalias = [];
-          this.seguidorSelected.anomalias
-            // tslint:disable-next-line: triple-equals
-            .filter((anom) => anom.tipo != 0)
-            .forEach((anom) => {
-              let perdidas;
-              if (anom.perdidas !== undefined) {
-                perdidas = anom.perdidas + '%';
-              }
-              let tempMax;
-              if (anom.temperaturaMax !== undefined) {
-                tempMax = anom.temperaturaMax + 'ºC';
-              }
-              let gradiente;
-              if (anom.gradienteNormalizado !== undefined) {
-                gradiente = anom.gradienteNormalizado + 'ºC';
-              }
-              anomalias.push({
-                id: anom.localId,
-                tipo: GLOBAL.pcDescripcion[anom.tipo],
-                perdidas,
-                tempMax,
-                gradiente,
-                anomalia: anom,
-              });
+          seguidor.anomaliasCliente.forEach((anom) => {
+            let perdidas;
+            if (anom.perdidas !== undefined) {
+              perdidas = anom.perdidas + '%';
+            }
+            let tempMax;
+            if (anom.temperaturaMax !== undefined) {
+              tempMax = anom.temperaturaMax + 'ºC';
+            }
+            let gradiente;
+            if (anom.gradienteNormalizado !== undefined) {
+              gradiente = anom.gradienteNormalizado + 'ºC';
+            }
+            anomalias.push({
+              id: anom.localId,
+              tipo: GLOBAL.pcDescripcion[anom.tipo],
+              perdidas,
+              tempMax,
+              gradiente,
+              anomalia: anom,
             });
+          });
           this.dataSource = new MatTableDataSource(anomalias);
           this.dataSource.sort = this.sort;
         }

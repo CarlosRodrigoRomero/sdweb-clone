@@ -31,11 +31,10 @@ export class SeguidorViewComponent implements OnInit, OnDestroy {
         this.seguidorSelected = seguidor;
 
         if (this.seguidorSelected !== undefined) {
-          // tslint:disable-next-line: triple-equals
-          this.numAnomalias = this.seguidorSelected.anomalias.filter((anom) => anom.tipo != 0).length;
+          this.numAnomalias = this.seguidorSelected.anomaliasCliente.length;
 
           if (this.numAnomalias > 0) {
-            this.seguidorViewService.anomaliaSelected = this.seguidorSelected.anomalias[0];
+            this.seguidorViewService.anomaliaSelected = this.seguidorSelected.anomaliasCliente[0];
           }
         }
       })

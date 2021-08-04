@@ -9,6 +9,7 @@ import { ModuloInterface } from './modulo';
 export class Seguidor implements FilterableElement {
   // Filtrable Interface
   anomalias: Anomalia[];
+  anomaliasCliente?: Anomalia[]; // anomalias sin tipo 0 y sin criticidad null
   globalCoords: string[];
   perdidas: number; // sumatorio de perdidas de los modulos del seguidor
   temperaturaMax: number; // temperatura máxima en el seguidor
@@ -39,9 +40,11 @@ export class Seguidor implements FilterableElement {
     modulo: ModuloInterface,
     globalCoords: string[],
     id?: string,
-    nombre?: string,
+    nombre?: string
   ) {
     this.anomalias = anomalias;
+    // tslint:disable-next-line: triple-equals
+    this.anomaliasCliente = anomalias.filter((anom) => anom.tipo != 0 && anom.criticidad !== null);
     this.plantaId = plantaId;
     this.filas = filas;
     this.columnas = columnas;
