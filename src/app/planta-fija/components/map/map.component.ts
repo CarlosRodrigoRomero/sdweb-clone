@@ -202,7 +202,7 @@ export class MapComponent implements OnInit, OnDestroy {
       });
 
       // damos el mapa por cargado al terminar de cargar la capa visual
-      // aerial.on('tileloadend', () => (this.mapControlService.mapLoaded = true));
+      // aerial.on('tileloadend', () => (this.reportControlService.mapLoaded = true));
 
       this.aerialLayer = new TileLayer({
         source: aerial,
@@ -217,7 +217,7 @@ export class MapComponent implements OnInit, OnDestroy {
       });
 
       // damos el mapa por cargado al terminar de cargar la capa visual
-      // aerial.on('tileloadend', () => (this.mapControlService.mapLoaded = true));
+      // aerial.on('tileloadend', () => (this.reportControlService.mapLoaded = true));
 
       this.aerialLayer = new TileLayer({
         source: aerial,
@@ -257,9 +257,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this.map = map;
 
         this.map.once('postrender', () => {
-          this.reportControlService.mapLoaded = true;
-
-          // document.getElementById('map').style.visibility = 'unset';
+          setTimeout(() => (this.reportControlService.mapLoaded = true), 2000);
         });
       })
     );
