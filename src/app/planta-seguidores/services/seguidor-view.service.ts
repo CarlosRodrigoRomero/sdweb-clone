@@ -4,6 +4,8 @@ import { BehaviorSubject } from 'rxjs';
 
 import { MatSidenav } from '@angular/material/sidenav';
 
+import { SeguidoresControlService } from '../services/seguidores-control.service';
+
 import { Anomalia } from '@core/models/anomalia';
 
 @Injectable({
@@ -23,7 +25,7 @@ export class SeguidorViewService {
   private _imageLoaded = false;
   public imageLoaded$ = new BehaviorSubject<boolean>(this._imageLoaded);
 
-  constructor() {}
+  constructor(private seguidoresControlService: SeguidoresControlService) {}
 
   public setSidenav(sidenav: MatSidenav) {
     this.sidenav = sidenav;
@@ -31,6 +33,15 @@ export class SeguidorViewService {
 
   public closeSidenav() {
     return this.sidenav.close();
+  }
+
+  resetViewValues() {
+    this.seguidoresControlService.seguidorSelected = undefined;
+    this.anomaliaSelected = undefined;
+    this.seguidoresControlService.urlVisualImageSeguidor = undefined;
+    this.seguidoresControlService.urlThermalImageSeguidor = undefined;
+    this.imageSelected = undefined;
+    this.imageCanvas.clear();
   }
 
   get imageSelected() {

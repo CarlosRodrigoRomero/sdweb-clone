@@ -69,6 +69,10 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.statsService.loadStats = true;
   }
 
+  resetSeguidorView() {
+    this.seguidorViewService.resetViewValues();
+  }
+
   ngOnDestroy(): void {
     // cancelamos las suscripciones
     this.subscriptions.unsubscribe();

@@ -48,7 +48,8 @@ export class SeguidorViewComponent implements OnInit, OnDestroy {
   public closeSidenav() {
     this.seguidorViewService.closeSidenav();
 
-    this.seguidorViewService.imageCanvas.clear();
+    // reseteamos los valores de la vista seguidor
+    this.seguidorViewService.resetViewValues();
   }
 
   nextSeguidor() {
@@ -69,18 +70,10 @@ export class SeguidorViewComponent implements OnInit, OnDestroy {
     this.seguidoresControlService.selectPrevSeguidor();
   }
 
-  private resetViewValues() {
-    this.seguidoresControlService.seguidorSelected = undefined;
-    this.seguidorViewService.anomaliaSelected = undefined;
-    this.seguidoresControlService.urlVisualImageSeguidor = undefined;
-    this.seguidoresControlService.urlThermalImageSeguidor = undefined;
-    this.seguidorViewService.imageSelected = undefined;
-  }
-
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
 
     // reseteamos los valores
-    this.resetViewValues();
+    this.seguidorViewService.resetViewValues();
   }
 }

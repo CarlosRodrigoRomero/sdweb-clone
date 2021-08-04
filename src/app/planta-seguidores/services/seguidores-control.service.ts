@@ -267,7 +267,14 @@ export class SeguidoresControlService {
   }
 
   private addSelectInteraction() {
+    const estilosView = [
+      this.getStyleSeguidoresMae(false),
+      this.getStyleSeguidoresCelsCalientes(false),
+      this.getStyleSeguidoresGradienteNormMax(false),
+    ];
+
     const select = new Select({
+      style: estilosView[this.toggleViewSelected],
       // condition: click,
       layers: (l) => {
         if (

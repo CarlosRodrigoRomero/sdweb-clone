@@ -46,32 +46,34 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
       this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
         this.seguidorSelected = seguidor;
 
-        if (seguidor.anomaliasCliente.length > 0) {
-          const anomalias = [];
-          seguidor.anomaliasCliente.forEach((anom) => {
-            let perdidas;
-            if (anom.perdidas !== undefined) {
-              perdidas = anom.perdidas * 100 + '%';
-            }
-            let tempMax;
-            if (anom.temperaturaMax !== undefined) {
-              tempMax = anom.temperaturaMax + 'ºC';
-            }
-            let gradiente;
-            if (anom.gradienteNormalizado !== undefined) {
-              gradiente = anom.gradienteNormalizado + 'ºC';
-            }
-            anomalias.push({
-              id: anom.localId,
-              tipo: GLOBAL.pcDescripcion[anom.tipo],
-              perdidas,
-              tempMax,
-              gradiente,
-              anomalia: anom,
+        if (this.seguidorSelected !== undefined) {
+          if (seguidor.anomaliasCliente.length > 0) {
+            const anomalias = [];
+            seguidor.anomaliasCliente.forEach((anom) => {
+              let perdidas;
+              if (anom.perdidas !== undefined) {
+                perdidas = anom.perdidas * 100 + '%';
+              }
+              let tempMax;
+              if (anom.temperaturaMax !== undefined) {
+                tempMax = anom.temperaturaMax + 'ºC';
+              }
+              let gradiente;
+              if (anom.gradienteNormalizado !== undefined) {
+                gradiente = anom.gradienteNormalizado + 'ºC';
+              }
+              anomalias.push({
+                id: anom.localId,
+                tipo: GLOBAL.pcDescripcion[anom.tipo],
+                perdidas,
+                tempMax,
+                gradiente,
+                anomalia: anom,
+              });
             });
-          });
-          this.dataSource = new MatTableDataSource(anomalias);
-          this.dataSource.sort = this.sort;
+            this.dataSource = new MatTableDataSource(anomalias);
+            this.dataSource.sort = this.sort;
+          }
         }
       })
     );

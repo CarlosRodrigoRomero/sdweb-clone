@@ -1,5 +1,5 @@
 <app-loading *ngIf="!mapLoaded"></app-loading>
-<mat-sidenav-container class="seguidor-container">
+<mat-sidenav-container class="seguidor-container" (backdropClick)="resetSeguidorView()">
   <!-- SIDENAV SEGUIDOR VIEW -->
   <mat-sidenav #sidenavSeguidorView [(opened)]="seguidorViewOpened" class="seguidor-sidenav" position="end">
     <!-- VISTA SEGUIDOR -->

@@ -110,9 +110,11 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
         if (image == 0) {
           this.imageSelected.src = urlThermal;
 
-          // creamos las anomalias de nueva al volver a la vista termica
-          if (this.anomsCanvas !== undefined && this.anomsCanvas.isEmpty()) {
-            this.drawAnomalias();
+          if (this.seguidorSelected !== undefined) {
+            // creamos las anomalias de nuevo al volver a la vista termica
+            if (this.anomsCanvas !== undefined && this.anomsCanvas.isEmpty()) {
+              this.drawAnomalias();
+            }
           }
 
           // this.anomsCanvas.renderAll();

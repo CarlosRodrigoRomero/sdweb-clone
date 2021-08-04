@@ -201,9 +201,6 @@ export class MapComponent implements OnInit, OnDestroy {
         crossOrigin: '',
       });
 
-      // damos el mapa por cargado al terminar de cargar la capa visual
-      // aerial.on('tileloadend', () => (this.reportControlService.mapLoaded = true));
-
       this.aerialLayer = new TileLayer({
         source: aerial,
       });
@@ -215,9 +212,6 @@ export class MapComponent implements OnInit, OnDestroy {
           'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInformeId + '_visual/{z}/{x}/{y}.png',
         crossOrigin: '',
       });
-
-      // damos el mapa por cargado al terminar de cargar la capa visual
-      // aerial.on('tileloadend', () => (this.reportControlService.mapLoaded = true));
 
       this.aerialLayer = new TileLayer({
         source: aerial,
