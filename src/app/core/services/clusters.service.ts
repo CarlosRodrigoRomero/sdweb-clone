@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { BehaviorSubject, combineLatest, EMPTY, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import * as firebase from 'firebase/app';
 import { AngularFireStorage } from '@angular/fire/storage';
 
@@ -28,10 +28,8 @@ import { Cluster } from '@core/models/cluster';
 export class ClustersService {
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
-  private informeId: string;
+  informeId: string;
   private vueloId: string = undefined;
-  public vueloId$ = new BehaviorSubject<string>(this.vueloId);
-  private plantaId: string;
   private _planta: PlantaInterface = {};
   public planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
   map: Map;
@@ -64,7 +62,6 @@ export class ClustersService {
   initService(): Observable<boolean> {
     // obtenemos el ID de la URL
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
-    // this.plantaId = '1J6YwrECCGrXcEzrkjau';
 
     this.informeService
       .getInforme(this.informeId)
@@ -72,7 +69,6 @@ export class ClustersService {
         take(1),
         switchMap((informe) => {
           this.vueloId = informe.vueloId;
-          this.vueloId$.next(this.vueloId);
 
           this.clustersRef = this.afs.collection('vuelos/' + this.vueloId + '/clusters');
 
@@ -140,18 +136,6 @@ export class ClustersService {
         })
       )
       .subscribe((puntos) => {
-        // descartamos elementos duplicados
-        /* const fechasUnixPuntos = puntos.map((punto) => this.dateStringToUnix(punto.date));
-        const tabla = {};
-        const fechasUnixPuntosUnicos = fechasUnixPuntos.filter((index) =>
-          tabla.hasOwnProperty(index) ? false : (tabla[index] = true)
-        );
-
-        const puntosUnicos = [];
-        fechasUnixPuntosUnicos.forEach((fecha) => {
-          puntosUnicos.push(puntos.find((punto) => this.dateStringToUnix(punto.date) === fecha));
-        }); */
-
         // ordenamos los puntos por fecha
         this.puntosTrayectoria = puntos.sort((a, b) => this.dateStringToUnix(a.date) - this.dateStringToUnix(b.date));
 

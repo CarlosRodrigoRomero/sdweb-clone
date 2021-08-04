@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { ClustersService } from '@core/services/clusters.service';
 
@@ -10,7 +10,6 @@ import { ClustersService } from '@core/services/clusters.service';
   styleUrls: ['./clusters-control.component.css'],
 })
 export class ClustersControlComponent implements OnInit {
-  private vueloId: string;
   joinActive = false;
   isClusterSelected = false;
   createClusterActive = false;
@@ -21,7 +20,6 @@ export class ClustersControlComponent implements OnInit {
   constructor(private clustersService: ClustersService, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.clustersService.vueloId$.subscribe((vueloId) => (this.vueloId = vueloId));
     this.clustersService.clusterSelected$.subscribe((cluster) => {
       if (cluster) {
         this.isClusterSelected = true;
@@ -59,7 +57,7 @@ export class ClustersControlComponent implements OnInit {
     const velValue = this.formControlVel.value;
 
     const params = new HttpParams()
-      .set('id', this.vueloId)
+      .set('id', this.clustersService.informeId)
       .set('threshold_variation', umbValue.toString())
       .set('threshold_speed', velValue.toString());
 
