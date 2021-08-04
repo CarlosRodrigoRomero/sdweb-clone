@@ -181,9 +181,14 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
 
     // creamos el mapa a traves del servicio y nos subscribimos a el
     this.subscriptions.add(
-      this.olMapService
-        .createMap('map', layers, view, defaultControls({ attribution: false }))
-        .subscribe((map) => (this.map = map))
+      this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {
+        this.map = map;
+
+        this.map.once('postrender', () => {
+          // setTimeout(() => (this.reportControlService.mapLoaded = true), 2000);
+          this.reportControlService.mapLoaded = true;
+        });
+      })
     );
 
     this.seguidorLayers.forEach((l) => this.map.addLayer(l));

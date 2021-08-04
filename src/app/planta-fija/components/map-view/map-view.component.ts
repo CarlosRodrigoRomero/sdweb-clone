@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -14,7 +14,7 @@ import { ThermalService } from '@core/services/thermal.service';
   templateUrl: './map-view.component.html',
   styleUrls: ['./map-view.component.css'],
 })
-export class MapViewComponent implements OnInit, OnDestroy {
+export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public plantaFija = true;
   public leftOpened: boolean;
   public rightOpened: boolean;
@@ -46,6 +46,10 @@ export class MapViewComponent implements OnInit, OnDestroy {
       this.reportControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value))
     );
     this.subscriptions.add(this.reportControlService.mapLoaded$.subscribe((value) => (this.mapLoaded = value)));
+  }
+
+  ngAfterViewInit(): void {
+    this.statsService.setSidenav(this.sidenavStats);
   }
 
   ngOnDestroy(): void {
