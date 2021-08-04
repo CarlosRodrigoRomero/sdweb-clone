@@ -51,7 +51,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
           seguidor.anomaliasCliente.forEach((anom) => {
             let perdidas;
             if (anom.perdidas !== undefined) {
-              perdidas = anom.perdidas + '%';
+              perdidas = anom.perdidas * 100 + '%';
             }
             let tempMax;
             if (anom.temperaturaMax !== undefined) {
