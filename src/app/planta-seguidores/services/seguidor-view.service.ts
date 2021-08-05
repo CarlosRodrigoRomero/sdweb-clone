@@ -41,7 +41,7 @@ export class SeguidorViewService {
     this.anomaliaSelected = undefined;
     this.seguidoresControlService.urlVisualImageSeguidor = undefined;
     this.seguidoresControlService.urlThermalImageSeguidor = undefined;
-    this.imageSelected = undefined;
+    this.imageSelected = 0;
     this.visualCanvas.clear();
   }
 
