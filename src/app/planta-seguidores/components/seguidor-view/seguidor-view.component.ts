@@ -45,13 +45,6 @@ export class SeguidorViewComponent implements OnInit, OnDestroy {
     }
   }
 
-  public closeSidenav() {
-    this.seguidorViewService.closeSidenav();
-
-    // reseteamos los valores de la vista seguidor
-    this.seguidorViewService.resetViewValues();
-  }
-
   nextSeguidor() {
     // limpiamos la imagen del seguidor anterior
     this.seguidorViewService.visualCanvas.clear();

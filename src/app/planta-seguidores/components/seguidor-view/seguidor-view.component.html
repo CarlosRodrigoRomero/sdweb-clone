@@ -1,13 +1,6 @@
 <div class="sidenav-content" *ngIf="seguidorSelected">
-  <mat-toolbar [class.mat-elevation-z2]="true" class="title">
-    <div>
-      <span>{{ seguidorSelected.nombre }}</span>
-      <span class="modulo-label">({{ seguidorSelected.moduloLabel }})</span>
-      <button mat-icon-button class="btn-close-seguidor-view" (click)="closeSidenav()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </mat-toolbar>
+  <!-- NAVBAR SEGUIDOR VIEW -->
+  <app-seguidor-view-navbar></app-seguidor-view-navbar>
   <div class="seguidor-content">
     <div class="left-content">
       <!-- IMAGEN -->
@@ -27,15 +20,15 @@
       <app-seguidor-slider-temporal *ngIf="!oneReport && numAnomalias > 0"></app-seguidor-slider-temporal>
       <app-seguidor-image-download *ngIf="numAnomalias == 0"></app-seguidor-image-download>
 
-      <!-- LISTA ANOMALIAS -->
-      <app-seguidor-anomalias-list *ngIf="numAnomalias > 0"></app-seguidor-anomalias-list>
-    </div>
-    <div class="right-content" *ngIf="numAnomalias > 0">
       <!-- INFO ANOMALIA SELECCIONADA -->
       <app-seguidor-anomalia-info></app-seguidor-anomalia-info>
 
       <!-- DESCARGAR IMAGENES -->
       <app-seguidor-image-download></app-seguidor-image-download>
+    </div>
+    <div class="right-content" *ngIf="numAnomalias > 0">
+      <!-- LISTA ANOMALIAS -->
+      <app-seguidor-anomalias-list *ngIf="numAnomalias > 0"></app-seguidor-anomalias-list>
     </div>
   </div>
 </div>

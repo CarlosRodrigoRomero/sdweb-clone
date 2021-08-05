@@ -1,0 +1,43 @@
+<mat-toolbar [class.mat-elevation-z2]="true" class="title">
+  <div>
+    <span>{{ seguidorSelected.nombre }}</span>
+    <span class="modulo-label">({{ seguidorSelected.moduloLabel }})</span>
+    <button mat-icon-button class="btn-close-seguidor-view" (click)="closeSidenav()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div
+    *ngIf=" meteoInfo !== undefined &&
+      meteoInfo.irradiancia !== undefined &&
+      meteoInfo.vientoDireccion !== undefined &&
+      meteoInfo.vientoVelocidad !== undefined &&
+      meteoInfo.temperaturaAire !== undefined &&
+      meteoInfo.nubosidad !== undefined
+    "
+    class="line-info"
+  >
+    <div class="subtitle-icon">
+      <mat-icon>brightness_high</mat-icon>
+      <span class="subtitle">Meteo:</span>
+    </div>
+    <div *ngIf="meteoInfo.irradiancia !== undefined" class="line-content">
+      <span>Irradiancia:</span>
+      <span>{{ meteoInfo.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></span>
+    </div>
+    <div *ngIf="meteoInfo.vientoDireccion !== undefined" class="line-content">
+      <span>Dirección viento:</span>
+      <span>{{ meteoInfo.vientoDireccion }}</span>
+    </div>
+    <div *ngIf="meteoInfo.vientoVelocidad !== undefined" class="line-content">
+      <span>Velocidad viento:</span>
+      <span>{{ meteoInfo.vientoVelocidad }}</span>
+    </div>
+    <div *ngIf="meteoInfo.temperaturaAire !== undefined" class="line-content">
+      <span>Temperatura ambiente:</span>
+      <span>{{ meteoInfo.temperaturaAire }}ºC</span>
+    </div>
+    <div *ngIf="meteoInfo.nubosidad !== undefined" class="line-content">
+      <span>Nubosidad:</span> <span>{{ meteoInfo.nubosidad }}/8 octavas</span>
+    </div>
+  </div>
+</mat-toolbar>

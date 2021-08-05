@@ -91,12 +91,14 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
           this.anomaliaSelected = anomSel;
           this.prevAnomaliaSelected = prevAnomSel;
 
-          if (this.anomaliaSelected !== undefined) {
-            this.setAnomaliaStyle(this.anomaliaSelected, true);
-          }
+          if (this.seguidorSelected !== undefined) {
+            if (this.anomaliaSelected !== undefined) {
+              this.setAnomaliaStyle(this.anomaliaSelected, true);
+            }
 
-          if (this.prevAnomaliaSelected !== undefined) {
-            this.setAnomaliaStyle(this.prevAnomaliaSelected, false);
+            if (this.prevAnomaliaSelected !== undefined) {
+              this.setAnomaliaStyle(this.prevAnomaliaSelected, false);
+            }
           }
 
           this.anomsCanvas.renderAll();

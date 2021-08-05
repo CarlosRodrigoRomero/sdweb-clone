@@ -1,6 +1,7 @@
 .download-btns {
   display: flex;
   gap: 1rem;
+  margin-left: 0.5rem;
 }
 
 mat-icon {
