@@ -22,18 +22,19 @@ import { Anomalia } from '@core/models/anomalia';
 })
 export class SeguidorImagesComponent implements OnInit, OnDestroy {
   private seguidorSelected: Seguidor;
-  private imageSelected = new Image();
+  private imageVisual = new Image();
+  private imageThermal = new Image();
+
   anomaliaSelected: Anomalia = undefined;
   prevAnomaliaSelected: Anomalia = undefined;
   thermalImage = new Image();
-  imageLoaded: boolean;
-  visualImageLoaded: boolean;
+  imagesLoaded: boolean;
   zoomSquare = 200;
-  visualCanvas: any;
   viewSelected = 0;
 
   imageSeguidor;
-  imageCanvas;
+  visualCanvas;
+  thermalCanvas;
   anomsCanvas;
   canvas: any;
   sw = 2;
@@ -51,10 +52,12 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // nos suscribimos a la carga de la imagen
-    this.subscriptions.add(this.seguidorViewService.imageLoaded$.subscribe((loaded) => (this.imageLoaded = loaded)));
+    this.subscriptions.add(this.seguidorViewService.imageLoaded$.subscribe((loaded) => (this.imagesLoaded = loaded)));
 
-    this.imageCanvas = new fabric.Canvas('image-canvas');
-    this.seguidorViewService.imageCanvas = this.imageCanvas;
+    this.visualCanvas = new fabric.Canvas('visual-canvas');
+    this.seguidorViewService.visualCanvas = this.visualCanvas;
+    this.thermalCanvas = new fabric.Canvas('thermal-canvas');
+    this.seguidorViewService.thermalCanvas = this.thermalCanvas;
     this.anomsCanvas = new fabric.Canvas('anomalias-canvas');
     this.setEventListenersCanvas();
 
@@ -108,7 +111,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
       ]).subscribe(([urlVisual, urlThermal, image]) => {
         // tslint:disable-next-line: triple-equals
         if (image == 0) {
-          this.imageSelected.src = urlThermal;
+          // this.imageVisual.src = urlThermal;
 
           if (this.seguidorSelected !== undefined) {
             // creamos las anomalias de nuevo al volver a la vista termica
@@ -116,10 +119,8 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
               this.drawAnomalias();
             }
           }
-
-          // this.anomsCanvas.renderAll();
         } else {
-          this.imageSelected.src = urlVisual;
+          // this.imageVisual.src = urlVisual;
 
           // quitamos las anomalias al seleccionar la vista visual
           if (this.anomsCanvas !== undefined) {
@@ -127,11 +128,13 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
           }
         }
 
-        this.imageSelected.onload = () => {
-          this.seguidorViewService.imageLoaded = true;
+        this.imageThermal.src = urlThermal;
 
-          this.imageCanvas.setBackgroundImage(
-            new fabric.Image(this.imageSelected, {
+        this.imageThermal.onload = () => {
+          this.seguidorViewService.imagesLoaded = true;
+
+          this.thermalCanvas.setBackgroundImage(
+            new fabric.Image(this.imageThermal, {
               left: 0,
               top: 0,
               angle: 0,
@@ -139,10 +142,29 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
               draggable: false,
               lockMovementX: true,
               lockMovementY: true,
-              scaleX: this.imageCanvas.width / this.imageSelected.width,
-              scaleY: this.imageCanvas.height / this.imageSelected.height,
+              scaleX: this.thermalCanvas.width / this.imageThermal.width,
+              scaleY: this.thermalCanvas.height / this.imageThermal.height,
             }),
-            this.imageCanvas.renderAll.bind(this.imageCanvas)
+            this.thermalCanvas.renderAll.bind(this.thermalCanvas)
+          );
+        };
+
+        this.imageVisual.src = urlVisual;
+
+        this.imageVisual.onload = () => {
+          this.visualCanvas.setBackgroundImage(
+            new fabric.Image(this.imageVisual, {
+              left: 0,
+              top: 0,
+              angle: 0,
+              opacity: 1,
+              draggable: false,
+              lockMovementX: true,
+              lockMovementY: true,
+              scaleX: this.visualCanvas.width / this.imageVisual.width,
+              scaleY: this.visualCanvas.height / this.imageVisual.height,
+            }),
+            this.visualCanvas.renderAll.bind(this.visualCanvas)
           );
         };
       })
@@ -265,13 +287,13 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
       // const visualCanvas = document.getElementById(
       //   "visual-canvas"
       // ) as HTMLCanvasElement;
-      const scaleX = this.imageSelected.width / this.anomsCanvas.width;
-      const scaleY = this.imageSelected.height / this.anomsCanvas.height;
+      const scaleX = this.imageVisual.width / this.anomsCanvas.width;
+      const scaleY = this.imageVisual.height / this.anomsCanvas.height;
 
       const zoomFactor = 2;
 
       zoomCtx.drawImage(
-        this.imageSelected,
+        this.imageVisual,
         e.pointer.x * scaleX - this.zoomSquare / 2 / zoomFactor,
         e.pointer.y * scaleY - this.zoomSquare / 2 / zoomFactor,
         this.zoomSquare,

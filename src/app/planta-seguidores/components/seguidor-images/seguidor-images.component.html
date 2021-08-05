@@ -8,8 +8,13 @@
 
   <div>
     <div id="imagenes" class="imagenes">
-      <mat-spinner *ngIf="!imageLoaded"></mat-spinner>
-      <canvas id="image-canvas" width="640" height="512"> </canvas>
+      <mat-spinner *ngIf="!imagesLoaded"></mat-spinner>
+      <div class="thermal-canvas">
+        <canvas id="thermal-canvas" width="640" height="512"> </canvas>
+      </div>
+      <div class="visual-canvas">
+        <canvas id="visual-canvas" width="640" height="512"> </canvas>
+      </div>
     </div>
 
     <div id="anomalias">

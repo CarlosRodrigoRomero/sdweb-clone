@@ -1,10 +1,18 @@
 .imagenes {
   position: absolute;
+  display: flex;
   background-color: lightgray;
 }
 
-#image-canvas {
+.thermal-canvas {
+  z-index: 2;
+}
+
+.visual-canvas {
   z-index: 1;
+  position: absolute;
+  top: 0px;
+  left: 0px;
 }
 
 #visual-zoom {
@@ -23,5 +31,5 @@ mat-spinner {
 }
 
 #anomalias-canvas {
-  z-index: 2;
+  z-index: 3;
 }
