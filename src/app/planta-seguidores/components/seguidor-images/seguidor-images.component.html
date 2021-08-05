@@ -1,4 +1,4 @@
-<div>
+<div class="content">
   <canvas
     id="visual-zoom"
     width="{{ zoomSquare }}"
@@ -6,19 +6,19 @@
     style="position: absolute; top: 0; left: 0; display: none; border-radius: 8px"
   ></canvas>
 
-  <div>
-    <div id="imagenes" class="imagenes">
-      <mat-spinner *ngIf="!imagesLoaded"></mat-spinner>
-      <div class="thermal-canvas">
-        <canvas id="thermal-canvas" width="640" height="512"> </canvas>
-      </div>
-      <div class="visual-canvas">
-        <canvas id="visual-canvas" width="640" height="512"> </canvas>
-      </div>
-    </div>
+  <div *ngIf="!imagesLoaded" class="loading">
+    <app-spinner></app-spinner>
+  </div>
 
-    <div id="anomalias">
-      <canvas id="anomalias-canvas" width="640" height="512"></canvas>
-    </div>
+  <div class="thermal-canvas">
+    <canvas id="thermal-canvas" width="640" height="512"> </canvas>
+  </div>
+
+  <div class="visual-canvas">
+    <canvas id="visual-canvas" width="640" height="512"> </canvas>
+  </div>
+
+  <div class="anomalias-canvas">
+    <canvas id="anomalias-canvas" width="640" height="512"></canvas>
   </div>
 </div>

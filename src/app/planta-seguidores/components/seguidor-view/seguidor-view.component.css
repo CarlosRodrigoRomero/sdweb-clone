@@ -32,6 +32,7 @@
 
 .image-content {
   height: 512px;
+  width: 640px;
 }
 
 app-seguidor-view-toggle {
@@ -60,7 +61,7 @@ app-seguidor-image-toggle {
   position: absolute;
   left: 10px;
   top: 250px;
-  z-index: 2;
+  z-index: 10;
 }
 
 .prev-btn mat-icon {
@@ -72,7 +73,7 @@ app-seguidor-image-toggle {
   position: absolute;
   left: 600px;
   top: 250px;
-  z-index: 2;
+  z-index: 10;
 }
 
 .next-btn mat-icon {

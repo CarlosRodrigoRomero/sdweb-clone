@@ -1,11 +1,12 @@
-.imagenes {
+.content {
   position: absolute;
-  display: flex;
-  background-color: lightgray;
 }
 
 .thermal-canvas {
   z-index: 2;
+  position: absolute;
+  top: 0px;
+  left: 0px;
 }
 
 .visual-canvas {
@@ -15,21 +16,34 @@
   left: 0px;
 }
 
+.anomalias-canvas {
+  z-index: 3;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
 #visual-zoom {
   border: 2px white solid;
-  z-index: 99999;
+  z-index: 999;
 }
 
 #visual-zoom:hover {
   cursor: pointer;
 }
 
-mat-spinner {
+.loading {
+  z-index: 10;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 640px;
+  height: 512px;
+  background: white;
+}
+
+app-spinner {
   position: absolute;
   top: 215px;
   left: 275px;
-}
-
-#anomalias-canvas {
-  z-index: 3;
 }

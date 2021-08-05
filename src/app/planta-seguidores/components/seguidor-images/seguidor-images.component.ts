@@ -27,7 +27,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
 
   anomaliaSelected: Anomalia = undefined;
   prevAnomaliaSelected: Anomalia = undefined;
-  thermalImage = new Image();
+  imageSelected = 0;
   imagesLoaded: boolean;
   zoomSquare = 200;
   viewSelected = 0;
@@ -109,9 +109,11 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
         this.seguidoresControlService.urlThermalImageSeguidor$,
         this.seguidorViewService.imageSelected$,
       ]).subscribe(([urlVisual, urlThermal, image]) => {
-        // tslint:disable-next-line: triple-equals
-        if (image == 0) {
-          // this.imageVisual.src = urlThermal;
+        this.imageSelected = Number(image);
+
+        if (this.imageSelected === 0) {
+          // mostramos imagen termica
+          document.getElementById('thermal-canvas').style.visibility = 'visible';
 
           if (this.seguidorSelected !== undefined) {
             // creamos las anomalias de nuevo al volver a la vista termica
@@ -120,7 +122,8 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
             }
           }
         } else {
-          // this.imageVisual.src = urlVisual;
+          // ocultamos imagen termica
+          document.getElementById('thermal-canvas').style.visibility = 'hidden';
 
           // quitamos las anomalias al seleccionar la vista visual
           if (this.anomsCanvas !== undefined) {
@@ -208,7 +211,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
       anomalia,
     });
 
-    const textId = new fabric.Text('#'.concat(pc.local_id.toString().concat(' ')), {
+    /* const textId = new fabric.Text('#'.concat(pc.local_id.toString().concat(' ')), {
       left: pc.img_left,
       top: pc.img_top - 26,
       fontSize: 18,
@@ -217,10 +220,10 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
       selectable: false,
       hoverCursor: 'default',
       fill: 'white',
-    });
+    }); */
 
     this.anomsCanvas.add(polygon);
-    this.anomsCanvas.add(textId);
+    // this.anomsCanvas.add(textId);
     this.anomsCanvas.renderAll();
   }
 
@@ -281,19 +284,21 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
 
     this.anomsCanvas.on('mouse:move', (e) => {
       zoomCtx.fillStyle = 'white';
-      // zoomCtx.clearRect(0,0, zoom.width, zoom.height);
-      // zoomCtx.fillStyle = "transparent";
       zoomCtx.fillRect(0, 0, zoom.width, zoom.height);
-      // const visualCanvas = document.getElementById(
-      //   "visual-canvas"
-      // ) as HTMLCanvasElement;
-      const scaleX = this.imageVisual.width / this.anomsCanvas.width;
-      const scaleY = this.imageVisual.height / this.anomsCanvas.height;
+
+      let image;
+      if (this.imageSelected === 0) {
+        image = this.imageThermal;
+      } else {
+        image = this.imageVisual;
+      }
+      const scaleX = image.width / this.anomsCanvas.width;
+      const scaleY = image.height / this.anomsCanvas.height;
 
       const zoomFactor = 2;
 
       zoomCtx.drawImage(
-        this.imageVisual,
+        image,
         e.pointer.x * scaleX - this.zoomSquare / 2 / zoomFactor,
         e.pointer.y * scaleY - this.zoomSquare / 2 / zoomFactor,
         this.zoomSquare,
@@ -303,7 +308,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
         this.zoomSquare * zoomFactor,
         this.zoomSquare * zoomFactor
       );
-      // console.log(zoom.style);
+
       zoom.style.top = e.pointer.y - this.zoomSquare / 2 + 'px';
       zoom.style.left = e.pointer.x + 20 + 'px';
       zoom.style.display = 'block';
