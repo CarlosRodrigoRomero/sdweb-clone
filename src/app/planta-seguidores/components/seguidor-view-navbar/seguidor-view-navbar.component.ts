@@ -37,11 +37,16 @@ export class SeguidorViewNavbarComponent implements OnInit {
 
         if (this.anomaliaSelected !== undefined) {
           this.meteoInfo = {
-            irradiancia: this.anomaliaSelected.irradiancia,
-            vientoDireccion: this.anomaliaSelected.vientoDireccion,
-            vientoVelocidad: this.anomaliaSelected.vientoVelocidad,
-            temperaturaAire: (this.anomaliaSelected as PcInterface).temperaturaAire,
-            nubosidad: (this.anomaliaSelected as PcInterface).nubosidad,
+            // irradiancia: this.anomaliaSelected.irradiancia,
+            // vientoDireccion: this.anomaliaSelected.vientoDireccion,
+            // vientoVelocidad: this.anomaliaSelected.vientoVelocidad,
+            // temperaturaAire: (this.anomaliaSelected as PcInterface).temperaturaAire,
+            // nubosidad: (this.anomaliaSelected as PcInterface).nubosidad,
+            irradiancia: 200,
+            vientoDireccion: 45,
+            vientoVelocidad: 60,
+            temperaturaAire: 25,
+            nubosidad: 2,
           };
         }
       })

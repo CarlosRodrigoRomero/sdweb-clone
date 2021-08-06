@@ -16,3 +16,19 @@
   right: 16px;
   top: 16px;
 }
+
+.two-lines-info {
+  display: grid;
+  margin-left: 1rem;
+}
+
+.line-info {
+  display: flex;
+  font-size: medium;
+}
+
+.line-content {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
