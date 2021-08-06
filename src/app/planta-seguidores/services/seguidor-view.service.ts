@@ -12,7 +12,7 @@ import { Anomalia } from '@core/models/anomalia';
   providedIn: 'root',
 })
 export class SeguidorViewService {
-  private sidenav: MatSidenav;
+  private _sidenav: MatSidenav;
   private _imageSelected = 0;
   public imageSelected$ = new BehaviorSubject<number>(this._imageSelected);
   private _anomaliaSelected: Anomalia = undefined;
@@ -28,22 +28,24 @@ export class SeguidorViewService {
 
   constructor(private seguidoresControlService: SeguidoresControlService) {}
 
-  public setSidenav(sidenav: MatSidenav) {
-    this.sidenav = sidenav;
-  }
-
-  public closeSidenav() {
-    return this.sidenav.close();
-  }
-
   resetViewValues() {
     this.seguidoresControlService.seguidorSelected = undefined;
     this.anomaliaSelected = undefined;
     this.seguidoresControlService.urlVisualImageSeguidor = undefined;
     this.seguidoresControlService.urlThermalImageSeguidor = undefined;
     this.imageSelected = 0;
-    this.visualCanvas.clear();
+    if (this.visualCanvas !== undefined) {
+      this.visualCanvas.clear();
+    }
     this.seguidoresControlService.imageExist = true;
+  }
+
+  get sidenav() {
+    return this._sidenav;
+  }
+
+  set sidenav(value: MatSidenav) {
+    this._sidenav = value;
   }
 
   get imageSelected() {

@@ -60,7 +60,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.seguidorViewService.setSidenav(this.sidenavSeguidorView);
+    this.seguidorViewService.sidenav = this.sidenavSeguidorView;
 
     this.statsService.setSidenav(this.sidenavStats);
   }
@@ -80,5 +80,6 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     // reseteamos los servicios a sus valores por defecto
     this.reportControlService.resetService();
     this.olMapService.resetService();
+    this.seguidorViewService.sidenav = undefined;
   }
 }

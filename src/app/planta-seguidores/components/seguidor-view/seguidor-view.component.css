@@ -10,6 +10,7 @@
   display: grid;
   row-gap: 1rem;
   width: 640px;
+  grid-template-rows: min-content;
 }
 
 .image-content {
@@ -22,6 +23,7 @@
   justify-content: center;
   align-items: flex-start;
   margin-top: 1rem;
+  margin-bottom: 2rem;
 }
 
 .image-not mat-icon {
@@ -80,7 +82,7 @@ app-seguidor-image-toggle {
 .prev-btn-no-image {
   position: absolute;
   left: 10px;
-  top: 36px;
+  top: 35px;
   z-index: 10;
 }
 
@@ -91,7 +93,7 @@ app-seguidor-image-toggle {
 .next-btn-no-image {
   position: absolute;
   left: 600px;
-  top: 36px;
+  top: 35px;
   z-index: 10;
 }
 

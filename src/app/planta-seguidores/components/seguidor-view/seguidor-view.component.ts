@@ -52,6 +52,7 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   nextSeguidor() {
     // limpiamos la imagen del seguidor anterior
+    this.seguidorViewService.thermalCanvas.clear();
     this.seguidorViewService.visualCanvas.clear();
     // reiniciamos la carga de la nueva imagen
     this.seguidorViewService.imagesLoaded = false;

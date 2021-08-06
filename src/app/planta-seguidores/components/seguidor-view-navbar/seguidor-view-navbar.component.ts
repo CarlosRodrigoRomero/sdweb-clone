@@ -49,7 +49,7 @@ export class SeguidorViewNavbarComponent implements OnInit {
   }
 
   public closeSidenav() {
-    this.seguidorViewService.closeSidenav();
+    this.seguidorViewService.sidenav.close();
 
     // reseteamos los valores de la vista seguidor
     this.seguidorViewService.resetViewValues();
