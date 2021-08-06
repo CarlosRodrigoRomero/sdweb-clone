@@ -54,15 +54,26 @@ export class AnomaliaService {
           }),
           take(1),
           switchMap((user) => {
-            // si la planta no tiene criterio, comprobamos si lo tiene el user
-            if (criterioId === undefined || criterioId === null) {
-              if (user.hasOwnProperty('criterioId')) {
-                this.hasCriticidad = true;
-                criterioId = user.criterioId;
+            // comprobamos primero que exista el usuario
+            if (user !== undefined && user !== null) {
+              // si la planta no tiene criterio, comprobamos si lo tiene el user
+              if (criterioId === undefined || criterioId === null) {
+                if (user.hasOwnProperty('criterioId')) {
+                  this.hasCriticidad = true;
+                  criterioId = user.criterioId;
+                }
               }
+            } else {
+              // aviso para que se cree el usuario que falta
+              console.log('Falta usuario en la DB');
             }
 
-            return iif(() => criterioId !== undefined, this.plantaService.getCriterioCriticidad(criterioId), of({}));
+            if (criterioId === undefined || criterioId === null) {
+              // si el cliente no tiene criterio propio asignamos el criterio por defecto Solardrone5
+              criterioId = 'aU2iM5nM0S3vMZxMZGff';
+            }
+
+            return this.plantaService.getCriterioCriticidad(criterioId);
           })
         )
         .subscribe((criterio: CritCriticidad) => {
