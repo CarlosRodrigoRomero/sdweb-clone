@@ -54,6 +54,8 @@ export class SeguidoresControlService {
   public urlVisualImageSeguidor$ = new BehaviorSubject<string>(this._urlVisualImageSeguidor);
   private _urlThermalImageSeguidor: string = undefined;
   public urlThermalImageSeguidor$ = new BehaviorSubject<string>(this._urlThermalImageSeguidor);
+  private _imageExist = true;
+  imageExist$ = new BehaviorSubject<boolean>(this._imageExist);
 
   private maeMin: number;
   private maeMax: number;
@@ -525,6 +527,9 @@ export class SeguidoresControlService {
         .getDownloadURL()
         .toPromise()
         .then((url) => {
+          // indicamos  que la imagen existe
+          this.imageExist = true;
+
           if (folder === 'jpg') {
             this.urlThermalImageSeguidor = url;
           } else {
@@ -534,6 +539,8 @@ export class SeguidoresControlService {
         .catch((error) => {
           switch (error.code) {
             case 'storage/object-not-found':
+              // indicamos  que la imagen no existe
+              this.imageExist = false;
               console.log("File doesn't exist");
               break;
 
@@ -580,6 +587,9 @@ export class SeguidoresControlService {
     const index = this.listaSeguidores.indexOf(this.seguidorSelected);
     if (index !== this.listaSeguidores.length - 1) {
       this.seguidorSelected = this.listaSeguidores[index + 1];
+
+      // indicamos que la imagen existe por defecto
+      this.imageExist = true;
     }
   }
 
@@ -587,6 +597,9 @@ export class SeguidoresControlService {
     const index = this.listaSeguidores.indexOf(this.seguidorSelected);
     if (index !== 0) {
       this.seguidorSelected = this.listaSeguidores[index - 1];
+
+      // indicamos que la imagen existe por defecto
+      this.imageExist = true;
     }
   }
 
@@ -693,5 +706,14 @@ export class SeguidoresControlService {
   set urlThermalImageSeguidor(value: string) {
     this._urlThermalImageSeguidor = value;
     this.urlThermalImageSeguidor$.next(value);
+  }
+
+  get imageExist() {
+    return this._imageExist;
+  }
+
+  set imageExist(value: boolean) {
+    this._imageExist = value;
+    this.imageExist$.next(value);
   }
 }

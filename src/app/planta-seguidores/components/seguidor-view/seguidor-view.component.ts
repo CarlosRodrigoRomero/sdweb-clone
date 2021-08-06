@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -12,10 +12,11 @@ import { Seguidor } from '@core/models/seguidor';
   templateUrl: './seguidor-view.component.html',
   styleUrls: ['./seguidor-view.component.css'],
 })
-export class SeguidorViewComponent implements OnInit, OnDestroy {
+export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public seguidorSelected: Seguidor = undefined;
   numAnomalias: number;
   oneReport = true;
+  imagesExist = true;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -43,6 +44,10 @@ export class SeguidorViewComponent implements OnInit, OnDestroy {
     if (this.reportControlService.informesIdList.length > 1) {
       this.oneReport = false;
     }
+  }
+
+  ngAfterViewInit(): void {
+    this.subscriptions.add(this.seguidoresControlService.imageExist$.subscribe((exist) => (this.imagesExist = exist)));
   }
 
   nextSeguidor() {

@@ -17,6 +17,24 @@
   width: 640px;
 }
 
+.image-not {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 1rem;
+}
+
+.image-not mat-icon {
+  color: blue;
+  font-size: 32px;
+}
+
+.image-not span {
+  font-size: larger;
+  font-weight: 500;
+  margin-left: 1rem;
+}
+
 app-seguidor-view-toggle {
   position: absolute;
   left: 15px;

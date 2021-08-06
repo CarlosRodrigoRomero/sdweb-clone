@@ -4,7 +4,7 @@
   <div class="seguidor-content">
     <div class="left-content">
       <!-- IMAGEN -->
-      <div class="image-content">
+      <div *ngIf="imagesExist" id="image-content" class="image-content">
         <app-seguidor-view-toggle></app-seguidor-view-toggle>
         <app-seguidor-images></app-seguidor-images>
         <app-seguidor-image-toggle></app-seguidor-image-toggle>
@@ -17,14 +17,18 @@
           <mat-icon>arrow_forward_ios</mat-icon>
         </button>
       </div>
+      <div class="image-not" *ngIf="!imagesExist">
+        <mat-icon>image_not_supported</mat-icon>
+        <span>Imagen no disponible</span>
+      </div>
+      <!-- SLIDER TEMPORAL -->
       <app-seguidor-slider-temporal *ngIf="!oneReport && numAnomalias > 0"></app-seguidor-slider-temporal>
-      <app-seguidor-image-download *ngIf="numAnomalias == 0"></app-seguidor-image-download>
 
       <!-- INFO ANOMALIA SELECCIONADA -->
       <app-seguidor-anomalia-info></app-seguidor-anomalia-info>
 
       <!-- DESCARGAR IMAGENES -->
-      <app-seguidor-image-download></app-seguidor-image-download>
+      <app-seguidor-image-download *ngIf="imagesExist"></app-seguidor-image-download>
     </div>
     <div class="right-content" *ngIf="numAnomalias > 0">
       <!-- LISTA ANOMALIAS -->

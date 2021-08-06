@@ -43,6 +43,7 @@ export class SeguidorViewService {
     this.seguidoresControlService.urlThermalImageSeguidor = undefined;
     this.imageSelected = 0;
     this.visualCanvas.clear();
+    this.seguidoresControlService.imageExist = true;
   }
 
   get imageSelected() {
