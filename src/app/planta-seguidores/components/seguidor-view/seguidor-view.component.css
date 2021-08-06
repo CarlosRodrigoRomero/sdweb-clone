@@ -76,3 +76,25 @@ app-seguidor-image-toggle {
   color: white;
   font-size: 40px;
 }
+
+.prev-btn-no-image {
+  position: absolute;
+  left: 10px;
+  top: 36px;
+  z-index: 10;
+}
+
+.prev-btn-no-image mat-icon {
+  font-size: 40px;
+}
+
+.next-btn-no-image {
+  position: absolute;
+  left: 600px;
+  top: 36px;
+  z-index: 10;
+}
+
+.next-btn-no-image mat-icon {
+  font-size: 40px;
+}

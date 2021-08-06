@@ -17,6 +17,15 @@
           <mat-icon>arrow_forward_ios</mat-icon>
         </button>
       </div>
+      <div *ngIf="!imagesExist">
+        <!-- BOTONES ANTERIOR Y SIGUIENTE NO IMAGEN -->
+        <button class="prev-btn-no-image" mat-icon-button (click)="prevSeguidor()">
+          <mat-icon>arrow_back_ios</mat-icon>
+        </button>
+        <button class="next-btn-no-image" mat-icon-button (click)="nextSeguidor()">
+          <mat-icon>arrow_forward_ios</mat-icon>
+        </button>
+      </div>
       <div class="image-not" *ngIf="!imagesExist">
         <mat-icon>image_not_supported</mat-icon>
         <span>Imagen no disponible</span>
