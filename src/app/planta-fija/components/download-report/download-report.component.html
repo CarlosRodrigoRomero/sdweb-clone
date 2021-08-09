@@ -1,4 +1,4 @@
-<button mat-raised-button class="btn-download" [matMenuTriggerFor]="menu" matTooltip="Descargas">
+<button mat-raised-button class="btn-downloads" [matMenuTriggerFor]="menu" matTooltip="Descargas">
   <mat-icon>download</mat-icon>
 </button>
 <mat-menu #menu="matMenu" class="menu">
@@ -6,22 +6,24 @@
     <h5>Descargas</h5>
     <span *ngIf="!plantaDemo" class="warning">(Pronto disponible)</span>
     <a
+      class="btn-download"
+      mat-button
       href="https://firebasestorage.googleapis.com/v0/b/sdweb-d33ce.appspot.com/o/informes%2F62dvYbGgoMkMNCuNCOEc%2Finforme.xlsx?alt=media&token=c5c38c2c-16d9-4fdc-b3fb-d22d4d847bf2"
       download=""
+      [disabled]="!plantaDemo"
     >
-      <button mat-menu-item class="btn-excel" [disabled]="!plantaDemo">
-        <mat-icon>calculate</mat-icon>
-        <span>EXCEL</span>
-      </button>
+      <mat-icon>calculate</mat-icon>
+      <span class="label">EXCEL</span>
     </a>
     <a
+      class="btn-download"
+      mat-button
       href="https://firebasestorage.googleapis.com/v0/b/sdweb-d33ce.appspot.com/o/informes%2F62dvYbGgoMkMNCuNCOEc%2Finforme.pdf?alt=media&token=e7360912-80a4-43eb-bbca-b41868c8a9d6"
       download=""
+      [disabled]="!plantaDemo"
     >
-      <button mat-menu-item class="btn-pdf" download="" [disabled]="!plantaDemo">
-        <mat-icon>picture_as_pdf</mat-icon>
-        <span>PDF</span>
-      </button>
+      <mat-icon>picture_as_pdf</mat-icon>
+      <span class="label">PDF</span>
     </a>
   </div>
 </mat-menu>

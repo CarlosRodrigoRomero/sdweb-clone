@@ -1,4 +1,4 @@
-.btn-download {
+.btn-downloads {
   height: 40px;
   padding: 0;
   width: 40px;
@@ -17,9 +17,18 @@ h4 {
 }
 .contenedor-menu {
   padding: 1rem;
+  display: grid;
 }
 
 .warning {
   font-size: large;
   font-weight: 100;
+}
+
+.btn-download {
+  margin-top: 0.5rem;
+}
+
+.label {
+  margin-left: 0.5rem;
 }
