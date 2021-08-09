@@ -37,7 +37,6 @@ export class SeguidorService {
     return this.informeService.getInformesDePlanta(plantaId).pipe(
       take(1),
       switchMap((informes) => {
-        console.log(informes);
         this.plantaService.getPlanta(plantaId).subscribe((planta) => (this.planta = planta));
         const anomaliaObsList = Array<Observable<Seguidor[]>>();
         informes.forEach((informe) => {
@@ -62,9 +61,6 @@ export class SeguidorService {
       map(([locAreaList, anomaliaList, informe]) => {
         const seguidores: Seguidor[] = [];
 
-        console.log(locAreaList);
-        console.log(anomaliaList);
-
         if (anomaliaList.length > 0) {
           // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
           const coordsLength = locAreaList[0].globalCoords.length;
@@ -82,7 +78,7 @@ export class SeguidorService {
             if (notNullLocAreas.length > 0) {
               indiceSeleccionado = index;
 
-              this.numGlobalCoords = indiceSeleccionado;
+              this.numGlobalCoords = indiceSeleccionado + 1;
 
               break;
             }
@@ -96,20 +92,25 @@ export class SeguidorService {
               locArea.globalCoords[indiceSeleccionado] !== ''
           );
 
-          const locAreaNoSeguidores = locAreaList.filter((locArea) => !locAreaSeguidores.includes(locArea));
+          // obtenemos las areas descartando las que no tienen globals, que son las de los modulos
+          const locAreaNoSeguidores = locAreaList
+            .filter((locArea) => !locAreaSeguidores.includes(locArea))
+            .filter((locArea) => locArea.globalCoords.toString() !== ',' && locArea.globalCoords.toString() !== '');
 
-          // obtenemos las globalCoords completas de cada seguidor
-          locAreaSeguidores.forEach((locArea) => {
-            locArea.globalCoords = this.getCompleteGlobalCoords(locAreaNoSeguidores, locArea);
-          });
+          // obtenemos las globalCoords completas de cada seguidor si hay areas mayores
+          if (locAreaNoSeguidores.length > 0) {
+            locAreaSeguidores.forEach((locArea) => {
+              locArea.globalCoords = this.getCompleteGlobalCoords(locAreaNoSeguidores, locArea);
+            });
+          }
 
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
           let count = 0;
           locAreaSeguidores.forEach((locArea) => {
             const anomaliasSeguidor = anomaliaList.filter(
               (anomalia) =>
-                anomalia.globalCoords.slice(0, this.numGlobalCoords + 1).toString() ===
-                locArea.globalCoords.slice(0, this.numGlobalCoords + 1).toString()
+                anomalia.globalCoords.slice(0, this.numGlobalCoords).toString() ===
+                locArea.globalCoords.slice(0, this.numGlobalCoords).toString()
             );
 
             // si no tiene anomalias no creamos el seguidor
