@@ -76,7 +76,7 @@ export class ReportControlService {
                 take(1),
                 // obtenemos los informes de la planta
                 switchMap((informes) => {
-                  this.informes = informes.sort((a, b) => a.fecha - b.fecha);
+                  this.informes = informes;
 
                   // evitamos cargar los informes dobles al navegar atras y volver
                   if (this.informesIdList.length === 0) {
@@ -161,7 +161,8 @@ export class ReportControlService {
                         take(1),
                         // obtenemos los informes de la planta
                         switchMap((informes) => {
-                          this.informes = informes.sort((a, b) => a.fecha - b.fecha);
+                          this.informes = informes;
+
                           // evitamos cargar los informes dobles al navegar atras y volver
                           if (this.informesIdList.length === 0) {
                             // ordenamos los informes de menos a mas reciente y los añadimos a la lista
@@ -206,7 +207,8 @@ export class ReportControlService {
                 take(1),
                 // obtenemos los informes de la planta
                 switchMap((informes) => {
-                  this.informes = informes.sort((a, b) => a.fecha - b.fecha);
+                  this.informes = informes;
+
                   // evitamos cargar los informes dobles al navegar atras y volver
                   if (this.informesIdList.length === 0) {
                     // ordenamos los informes de menos a mas reciente y los añadimos a la lista
@@ -290,7 +292,8 @@ export class ReportControlService {
                         take(1),
                         // obtenemos los informes de la planta
                         switchMap((informes) => {
-                          this.informes = informes.sort((a, b) => a.fecha - b.fecha);
+                          this.informes = informes;
+
                           // evitamos cargar los informes dobles al navegar atras y volver
                           if (this.informesIdList.length === 0) {
                             // ordenamos los informes de menos a mas reciente y los añadimos a la lista

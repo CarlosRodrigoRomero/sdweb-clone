@@ -37,6 +37,7 @@ export class SeguidorService {
     return this.informeService.getInformesDePlanta(plantaId).pipe(
       take(1),
       switchMap((informes) => {
+        console.log(informes);
         this.plantaService.getPlanta(plantaId).subscribe((planta) => (this.planta = planta));
         const anomaliaObsList = Array<Observable<Seguidor[]>>();
         informes.forEach((informe) => {
@@ -47,8 +48,6 @@ export class SeguidorService {
         return combineLatest(anomaliaObsList);
       }),
       map((arr) => arr.flat())
-      // eliminamos los seguidores vacios por haber llamado a 'pcs' y 'anomalias'
-      // map((segs) => (segs = segs.filter((seg) => seg.temperaturaMax !== 0 || seg.gradienteNormalizado !== 0)))
     );
   }
 
@@ -62,6 +61,9 @@ export class SeguidorService {
     return combineLatest([locAreaList$, anomaliaList$, getInforme$]).pipe(
       map(([locAreaList, anomaliaList, informe]) => {
         const seguidores: Seguidor[] = [];
+
+        console.log(locAreaList);
+        console.log(anomaliaList);
 
         if (anomaliaList.length > 0) {
           // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
