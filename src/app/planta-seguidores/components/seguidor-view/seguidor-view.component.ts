@@ -54,8 +54,14 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
     // limpiamos la imagen del seguidor anterior
     this.seguidorViewService.thermalCanvas.clear();
     this.seguidorViewService.visualCanvas.clear();
+
+    // limpiamos las url para que no se muestre la imagen anterior al pasar
+    this.seguidoresControlService.urlThermalImageSeguidor = undefined;
+    this.seguidoresControlService.urlVisualImageSeguidor = undefined;
+
     // reiniciamos la carga de la nueva imagen
     this.seguidorViewService.imagesLoaded = false;
+
     // seleccionamos el proximo seguidor
     this.seguidoresControlService.selectNextSeguidor();
   }
@@ -63,8 +69,15 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
   prevSeguidor() {
     // limpiamos la imagen del seguidor anterior
     this.seguidorViewService.visualCanvas.clear();
+    this.seguidorViewService.visualCanvas.clear();
+
+    // limpiamos las url para que no se muestre la imagen anterior al pasar
+    this.seguidoresControlService.urlThermalImageSeguidor = undefined;
+    this.seguidoresControlService.urlVisualImageSeguidor = undefined;
+
     // reiniciamos la carga de la nueva imagen
     this.seguidorViewService.imagesLoaded = false;
+
     // seleccionamos el seguidor previo
     this.seguidoresControlService.selectPrevSeguidor();
   }
