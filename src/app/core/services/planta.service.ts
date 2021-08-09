@@ -678,7 +678,11 @@ export class PlantaService {
           if (!mapBounds.intersects(tileBounds) || zoom < ortofoto.mapMinZoom || zoom > ortofoto.mapMaxZoom) {
             return null;
           }
-          return `${ortofoto.url}/${zoom}/${coord.x}/${coord.y}.png`;
+          // return `${ortofoto.url}/${zoom}/${coord.x}/${coord.y}.png`;
+          return 'https://solardrontech.es/tileserver.php?/index.json?/I35ozSFLSlGJ62z3eWPt_visual/{z}/{x}/{y}.png'
+            .replace('{z}', zoom)
+            .replace('{x}', coord.x)
+            .replace('{y}', coord.y);
         },
         tileSize: new google.maps.Size(256, 256),
         name: 'Tiles',
@@ -687,6 +691,53 @@ export class PlantaService {
       map.overlayMapTypes.push(imageMapType);
       map.fitBounds(mapBounds);
     }
+  }
+
+  loadOrtoImage(planta: PlantaInterface, map: any) {
+    var mapBounds = new google.maps.LatLngBounds(
+      new google.maps.LatLng(42.7013613084589, -2.9016351700695853),
+      new google.maps.LatLng(42.70798405011936, -2.8863144028989227)
+    );
+    var mapMinZoom = 12;
+    var mapMaxZoom = 24;
+    // var opts = {
+    //   streetViewControl: false,
+    //   tilt: 0,
+    //   mapTypeId: google.maps.MapTypeId.HYBRID,
+    //   center: new google.maps.LatLng(0, 0),
+    //   zoom: mapMinZoom,
+    // };
+    // var map = new google.maps.Map(document.getElementById('map'), opts);
+
+    map.mapTypeId = 'roadmap';
+    map.setOptions({ maxZoom: mapMaxZoom });
+    map.setOptions({ minZoom: mapMinZoom });
+
+    // https://developers.google.com/maps/documentation/javascript/examples/maptype-image-overlay
+    const imageMapType = new google.maps.ImageMapType({
+      getTileUrl(coord, zoom) {
+        const proj = map.getProjection();
+        var z2 = Math.pow(2, zoom);
+        var tileXSize = 256 / z2;
+        var tileYSize = 256 / z2;
+        var tileBounds = new google.maps.LatLngBounds(
+          proj.fromPointToLatLng(new google.maps.Point(coord.x * tileXSize, (coord.y + 1) * tileYSize)),
+          proj.fromPointToLatLng(new google.maps.Point((coord.x + 1) * tileXSize, coord.y * tileYSize))
+        );
+        if (!mapBounds.intersects(tileBounds) || zoom < mapMinZoom || zoom > mapMaxZoom) return null;
+        return 'https://solardrontech.es/tileserver.php?/index.json?/I35ozSFLSlGJ62z3eWPt_visual/{z}/{x}/{y}.png'
+          .replace('{z}', zoom)
+          .replace('{x}', coord.x)
+          .replace('{y}', coord.y);
+      },
+      tileSize: new google.maps.Size(256, 256),
+      minZoom: mapMinZoom,
+      maxZoom: mapMaxZoom,
+      name: 'Tiles',
+    });
+
+    map.overlayMapTypes.push(imageMapType);
+    map.fitBounds(mapBounds);
   }
 
   getThermalLayers$(plantaId: string): Observable<ThermalLayerInterface[]> {

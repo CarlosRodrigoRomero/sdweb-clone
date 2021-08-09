@@ -188,8 +188,13 @@ export class AutoLocComponent implements OnInit {
     this.map = map;
     this.initDrawingManager(map);
     // Agregar ortofoto
-    this.plantaService.initMap(this.planta, map);
-    //Overlay con imagen
+    if (this.planta.id === 'fdAyNQ0pGqVz1Yo7E1zF') {
+      // TODO: PROVISIONAL
+      this.plantaService.loadOrtoImage(this.planta, map);
+    } else {
+      this.plantaService.initMap(this.planta, map);
+    }
+    // Overlay con imagen
     // this.initOverlay();
   }
 
