@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { combineLatest, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore } from '@angular/fire/firestore';
@@ -24,6 +24,8 @@ import { InformeInterface } from '@core/models/informe';
 export class SeguidorService {
   private planta: PlantaInterface;
   numGlobalCoords: number;
+  private _locAreas: LocationAreaInterface[] = [];
+  locAreas$ = new BehaviorSubject<LocationAreaInterface[]>(this._locAreas);
 
   constructor(
     private informeService: InformeService,
@@ -96,6 +98,9 @@ export class SeguidorService {
           const locAreaNoSeguidores = locAreaList
             .filter((locArea) => !locAreaSeguidores.includes(locArea))
             .filter((locArea) => locArea.globalCoords.toString() !== ',' && locArea.globalCoords.toString() !== '');
+
+          // asignamos las areas de la planta
+          this.locAreas = locAreaNoSeguidores;
 
           // obtenemos las globalCoords completas de cada seguidor si hay areas mayores
           if (locAreaNoSeguidores.length > 0) {
@@ -233,5 +238,14 @@ export class SeguidorService {
         xhr.open('GET', downloadUrl);
         xhr.send();
       });
+  }
+
+  get locAreas() {
+    return this._locAreas;
+  }
+
+  set locAreas(value: LocationAreaInterface[]) {
+    this._locAreas = value;
+    this.locAreas$.next(value);
   }
 }

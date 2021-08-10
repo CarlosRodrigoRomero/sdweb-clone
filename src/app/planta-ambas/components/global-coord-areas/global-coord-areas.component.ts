@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
@@ -68,6 +68,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
         this.nombreGlobalCoords.push('Zonas ' + letras[index]);
       }
     } else {
+      console.log(this.seguidorService.numGlobalCoords);
       if (this.seguidorService.numGlobalCoords > 1) {
         // restamos 1 al numero de global coords xq las pequeñas son los seguidores
         this.numAreas = this.seguidorService.numGlobalCoords - 1;
@@ -161,7 +162,38 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.subscriptions.add(
+    this.seguidorService.locAreas$ /* .pipe(take(1)) */
+      .subscribe((locAreas) => {
+        console.log(locAreas);
+        this.nombreGlobalCoords.forEach((nombre, i) => {
+          if (this.globalCoordAreas.length < this.nombreGlobalCoords.length) {
+            this.globalCoordAreas.push(
+              locAreas.filter(
+                (locArea) =>
+                  locArea.globalCoords[i] !== null &&
+                  locArea.globalCoords[i] !== undefined &&
+                  locArea.globalCoords[i] !== ''
+              )
+            );
+
+            this.globalCoordAreasVectorSources[i] = new VectorSource({
+              features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(this.globalCoordAreas[i])),
+            });
+            this.globalCoordAreasVectorSources[i]
+              .getFeatures()
+              .forEach((feature) => feature.setProperties({ tipo: 'areaGlobalCoord' }));
+            this.map.addLayer(
+              (this.globalCoordAreasVectorLayers[i] = new VectorLayer({
+                source: this.globalCoordAreasVectorSources[i],
+                visible: false,
+                style: styleFunction,
+              }))
+            );
+          }
+        });
+      });
+
+    /* this.subscriptions.add(
       this.plantaService.getLocationsArea(this.plantaId).subscribe((locAreas) => {
         this.nombreGlobalCoords.forEach((nombre, i) => {
           if (this.globalCoordAreas.length < this.nombreGlobalCoords.length) {
@@ -193,7 +225,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
         // this.addPointerOnHover();
         // this.addOnHoverLabel();
       })
-    );
+    ); */
   }
 
   private getLabelArea(feature: Feature): string {
