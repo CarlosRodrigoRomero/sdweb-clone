@@ -65,17 +65,7 @@ export class PlantEditComponent implements OnInit {
       .subscribe((planta) => {
         this.planta = planta;
 
-        if (this.planta.tipo === '1 eje') {
-          this.planta.tipo = 'fija';
-        }
-
-        // colocamos el mapa en la posición de la planta
-        this.latitud = planta.latitud;
-        this.longitud = planta.longitud;
-        this.zoom = planta.zoom;
-
-        this.setCenter();
-        this.setZoom();
+        this.nombreGlobalCoords = planta.nombreGlobalCoords;
 
         this.form.patchValue(this.planta);
       });
@@ -95,7 +85,7 @@ export class PlantEditComponent implements OnInit {
         }, 1000);
       });
 
-    this.initMap();
+    // this.initMap();
   }
 
   private buildForm() {
@@ -127,14 +117,14 @@ export class PlantEditComponent implements OnInit {
     if (this.form.get('columnas').value !== null) {
       this.planta.columnas = this.form.get('columnas').value;
     }
-    if (this.longitud !== undefined) {
-      this.planta.longitud = this.longitud;
+    if (this.form.get('longitud').value !== undefined) {
+      this.planta.longitud = this.form.get('longitud').value;
     }
-    if (this.latitud !== undefined) {
-      this.planta.latitud = this.latitud;
+    if (this.form.get('latitud').value !== undefined) {
+      this.planta.latitud = this.form.get('latitud').value;
     }
-    if (this.zoom !== undefined) {
-      this.planta.zoom = this.zoom;
+    if (this.form.get('zoom').value !== undefined) {
+      this.planta.zoom = this.form.get('zoom').value;
     }
     if (this.nombreGlobalCoords !== undefined) {
       this.planta.nombreGlobalCoords = this.nombreGlobalCoords;
@@ -170,7 +160,7 @@ export class PlantEditComponent implements OnInit {
   }
 
   private openSnackBar() {
-    this._snackBar.open('Planta creada correctamente', 'OK', { duration: 5000 });
+    this._snackBar.open('Planta actualizada correctamente', 'OK', { duration: 5000 });
   }
 
   initMap() {

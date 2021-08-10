@@ -33,6 +33,7 @@
             <mat-label>Tipo</mat-label>
             <mat-select formControlName="tipo" [(ngModel)]="tipo" name="tipo">
               <mat-option [value]="'fija'">Fija</mat-option>
+              <mat-option [value]="'1 eje'">1 eje</mat-option>
               <mat-option [value]="'seguidores'">Seguidores</mat-option>
             </mat-select>
           </mat-form-field>
@@ -59,22 +60,22 @@
           </mat-form-field>
 
           <!-- Latitud -->
-          <!-- <mat-form-field>
+          <mat-form-field>
             <mat-label>Latitud</mat-label>
-            <input matInput formControlName="latitud" type="number" [value]="latitud" />
-          </mat-form-field> -->
+            <input matInput formControlName="latitud" type="number" [value]="planta.latitud" />
+          </mat-form-field>
 
           <!-- Longitud -->
-          <!-- <mat-form-field>
+          <mat-form-field>
             <mat-label>Longitud</mat-label>
-            <input matInput formControlName="longitud" type="number" [value]="longitud" (ngModelChange)="setCenter()" />
-          </mat-form-field> -->
+            <input matInput formControlName="longitud" type="number" [value]="planta.longitud" />
+          </mat-form-field>
 
           <!-- Zoom -->
-          <!-- <mat-form-field>
+          <mat-form-field>
             <mat-label>Zoom</mat-label>
-            <input matInput formControlName="zoom" type="number" [(ngModel)]="zoom" (ngModelChange)="setZoom()" />
-          </mat-form-field> -->
+            <input matInput formControlName="zoom" type="number" />
+          </mat-form-field>
 
           <!-- Nombre Global Coords -->
           <mat-form-field class="example-chip-list" appearance="fill">
