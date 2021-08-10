@@ -5,7 +5,7 @@
 .line-info {
   display: flex;
   margin-top: 0.3rem;
-  align-items: flex-end;
+  align-items: flex-start;
 }
 
 .subtitle {

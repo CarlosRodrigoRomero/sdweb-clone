@@ -102,8 +102,6 @@ export class SeguidoresControlService {
           // obtenemos los niveles para la escala de colores
           this.getViewsLevels();
 
-          // this.getImagesSeguidoresInforme();
-
           return this.informeService.getInforme(informeId);
         })
       )
@@ -558,20 +556,6 @@ export class SeguidoresControlService {
           }
         });
     }
-  }
-
-  getImagesSeguidoresInforme() {
-    return this.storage
-      .ref('informes')
-      .child(this.selectedInformeId)
-      .listAll()
-      .then((snap) => {
-        snap.items.forEach((itemRef) => {
-          itemRef.getDownloadURL().then((imgUrl) => {
-            this.imgSeguidoresUrls.push(imgUrl);
-          });
-        });
-      });
   }
 
   changeInformeSeguidorSelected() {

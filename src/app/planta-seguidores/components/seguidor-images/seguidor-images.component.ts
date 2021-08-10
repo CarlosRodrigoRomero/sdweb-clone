@@ -8,8 +8,8 @@ declare let fabric;
 
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
-import { AnomaliaService } from '@core/services/anomalia.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
+import { SeguidorService } from '@core/services/seguidor.service';
 
 import { PcInterface } from '@core/models/pc';
 import { Seguidor } from '@core/models/seguidor';
@@ -46,8 +46,8 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
   constructor(
     private seguidoresControlService: SeguidoresControlService,
     private mapSeguidoresService: MapSeguidoresService,
-    private anomaliaService: AnomaliaService,
-    private seguidorViewService: SeguidorViewService
+    private seguidorViewService: SeguidorViewService,
+    private seguidorService: SeguidorService
   ) {}
 
   ngOnInit(): void {
@@ -231,12 +231,12 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
   private getAnomaliaColor(anomalia: Anomalia): string {
     // tslint:disable-next-line: triple-equals
     if (this.viewSelected == 0) {
-      return this.anomaliaService.getPerdidasColor(this.seguidorSelected.anomaliasCliente, anomalia);
+      return this.seguidorService.getPerdidasColor(anomalia);
       // tslint:disable-next-line: triple-equals
     } else if (this.viewSelected == 1) {
-      return this.anomaliaService.getCelsCalientesColor(anomalia);
+      return this.seguidorService.getCelsCalientesColor(anomalia);
     } else {
-      return this.anomaliaService.getGradienteColor(this.seguidorSelected.anomaliasCliente, anomalia);
+      return this.seguidorService.getGradienteColor(anomalia);
     }
   }
 

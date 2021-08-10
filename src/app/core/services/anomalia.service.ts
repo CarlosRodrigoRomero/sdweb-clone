@@ -310,40 +310,6 @@ export class AnomaliaService {
     return criticidad;
   }
 
-  getPerdidasColor(anomalias: Anomalia[], anomaliaSelected: Anomalia) {
-    const perdidas = anomalias.map((anom) => anom.perdidas);
-    const perdidasMax = Math.max(...perdidas);
-    const perdidasMin = Math.min(...perdidas);
-
-    if (anomaliaSelected.perdidas <= (perdidasMax - perdidasMin) / 3) {
-      return GLOBAL.colores_mae[0];
-    } else if (anomaliaSelected.perdidas <= (2 * (perdidasMax - perdidasMin)) / 3) {
-      return GLOBAL.colores_mae[1];
-    } else {
-      return GLOBAL.colores_mae[2];
-    }
-  }
-
-  getCelsCalientesColor(anomaliaSelected: Anomalia) {
-    return 'red';
-  }
-
-  getGradienteColor(anomalias: Anomalia[], anomaliaSelected: Anomalia) {
-    const gradientes = anomalias
-      .filter((anom) => anom.gradienteNormalizado !== undefined)
-      .map((anom) => anom.gradienteNormalizado);
-    const gradienteMax = Math.max(...gradientes);
-    const gradienteMin = Math.min(...gradientes);
-
-    if (anomaliaSelected.gradienteNormalizado <= (gradienteMax - gradienteMin) / 3) {
-      return GLOBAL.colores_mae[0];
-    } else if (anomaliaSelected.gradienteNormalizado <= (2 * (gradienteMax - gradienteMin)) / 3) {
-      return GLOBAL.colores_mae[1];
-    } else {
-      return GLOBAL.colores_mae[2];
-    }
-  }
-
   downloadRjpg(anomalia: Anomalia) {
     this.storage
       // .ref(`informes/${anomalia.informeId}/rjpg/${anomalia.archivoPublico}`)

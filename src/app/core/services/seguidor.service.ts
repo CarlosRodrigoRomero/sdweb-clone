@@ -17,6 +17,7 @@ import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
 import { LocationAreaInterface } from '@core/models/location';
 import { InformeInterface } from '@core/models/informe';
+import { Anomalia } from '@core/models/anomalia';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +27,9 @@ export class SeguidorService {
   numGlobalCoords: number;
   private _locAreas: LocationAreaInterface[] = [];
   locAreas$ = new BehaviorSubject<LocationAreaInterface[]>(this._locAreas);
+
+  minGradNorm: number;
+  maxGradNorm: number;
 
   constructor(
     private informeService: InformeService,
@@ -62,6 +66,8 @@ export class SeguidorService {
     return combineLatest([locAreaList$, anomaliaList$, getInforme$]).pipe(
       map(([locAreaList, anomaliaList, informe]) => {
         const seguidores: Seguidor[] = [];
+
+        this.getMinMaxGradNorm(anomaliaList);
 
         if (anomaliaList.length > 0) {
           // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
@@ -238,6 +244,52 @@ export class SeguidorService {
         xhr.open('GET', downloadUrl);
         xhr.send();
       });
+  }
+
+  private getMinMaxGradNorm(anomalias: Anomalia[]) {
+    // filtramos solo las que tengan gradiente normalizado
+    const anomsOk = anomalias.filter((anom) => anom.gradienteNormalizado !== undefined);
+
+    if (anomsOk.length > 0) {
+      const minGrad = Math.min(...anomsOk.map((anom) => anom.gradienteNormalizado));
+      const maxGrad = Math.max(...anomsOk.map((anom) => anom.gradienteNormalizado));
+
+      if (this.minGradNorm === undefined) {
+        this.minGradNorm = minGrad;
+      } else if (this.minGradNorm > minGrad) {
+        this.minGradNorm = minGrad;
+      }
+
+      if (this.maxGradNorm === undefined) {
+        this.maxGradNorm = maxGrad;
+      } else if (this.maxGradNorm < maxGrad) {
+        this.maxGradNorm = maxGrad;
+      }
+    }
+  }
+
+  getPerdidasColor(anomaliaSelected: Anomalia) {
+    if (anomaliaSelected.perdidas <= 0.33) {
+      return GLOBAL.colores_mae[0];
+    } else if (anomaliaSelected.perdidas > 0.66) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
+  }
+
+  getCelsCalientesColor(anomaliaSelected: Anomalia) {
+    return 'red';
+  }
+
+  getGradienteColor(anomaliaSelected: Anomalia) {
+    if (anomaliaSelected.gradienteNormalizado <= (this.maxGradNorm - this.minGradNorm) / 3) {
+      return GLOBAL.colores_mae[0];
+    } else if (anomaliaSelected.gradienteNormalizado <= (2 * (this.maxGradNorm - this.minGradNorm)) / 3) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
   }
 
   get locAreas() {
