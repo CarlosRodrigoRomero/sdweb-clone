@@ -116,7 +116,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.pcDescripcion = GLOBAL.pcDescripcion;
-    this.criticidadLabels = GLOBAL.labels_criticidad;
+    this.criticidadLabels = this.anomaliaService.criterioCriticidad.labels;
     this.dataSource = [this.anomaliaHover];
     this.dataType = {
       clase: 'number',

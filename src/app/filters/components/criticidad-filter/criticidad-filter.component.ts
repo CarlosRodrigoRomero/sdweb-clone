@@ -4,9 +4,9 @@ import { take } from 'rxjs/operators';
 
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 
-import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
 import { FilterControlService } from '@core/services/filter-control.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { CriticidadFilter } from '@core/models/criticidadFilter';
 
@@ -26,15 +26,19 @@ export class CriticidadFilterComponent implements OnInit {
   filtroCriticidad: CriticidadFilter;
   public criticidadSelected: boolean[] = undefined;
 
-  constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
+  constructor(
+    private filterService: FilterService,
+    private filterControlService: FilterControlService,
+    private anomaliaService: AnomaliaService
+  ) {}
 
   ngOnInit(): void {
-    GLOBAL.labels_criticidad.forEach((label) =>
+    this.anomaliaService.criterioCriticidad.labels.forEach((label) => {
       this.criticidadElems.push({
         label,
         completed: false,
-      })
-    );
+      });
+    });
 
     this.filterControlService.criticidadSelected$.subscribe((sel) => {
       this.criticidadSelected = sel;
