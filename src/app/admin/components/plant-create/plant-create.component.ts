@@ -32,10 +32,6 @@ export class PlantCreateComponent implements OnInit {
   plantCreated = false;
   empresas: UserInterface[];
   empresaSelected: UserInterface;
-  private map: Map;
-  zoom = 5.65;
-  latitud = 40;
-  longitud = -4.4;
   nombreGlobalCoords: string[] = [];
   tipo: string;
   vertical = false;
@@ -59,8 +55,6 @@ export class PlantCreateComponent implements OnInit {
             empresa.empresaNombre !== undefined && empresa.empresaNombre !== null && empresa.empresaNombre !== ''
         );
       });
-
-    this.initMap();
 
     this.buildForm();
   }
@@ -89,9 +83,9 @@ export class PlantCreateComponent implements OnInit {
         this.planta.nombre = this.form.get('nombre').value;
         this.planta.filas = this.form.get('filas').value;
         this.planta.columnas = this.form.get('columnas').value;
-        this.planta.longitud = this.longitud;
-        this.planta.latitud = this.latitud;
-        this.planta.zoom = this.zoom;
+        this.planta.longitud = this.form.get('longitud').value;
+        this.planta.latitud = this.form.get('latitud').value;
+        this.planta.zoom = this.form.get('zoom').value;
         this.planta.nombreGlobalCoords = this.nombreGlobalCoords;
         this.planta.potencia = this.form.get('potencia').value;
         this.planta.tipo = this.tipo;
@@ -117,42 +111,6 @@ export class PlantCreateComponent implements OnInit {
 
   private openSnackBar() {
     this._snackBar.open('Planta creada correctamente', 'OK', { duration: 5000 });
-  }
-
-  initMap() {
-    const satellite = new XYZ({
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      crossOrigin: '',
-    });
-    const satelliteLayer = new TileLayer({
-      source: satellite,
-    });
-
-    const view = new View({
-      center: fromLonLat([this.longitud, this.latitud]),
-      zoom: this.zoom,
-    });
-
-    this.map = new Map({
-      target: 'map',
-      layers: [satelliteLayer],
-      view,
-      controls: defaultControls().extend([new FullScreen()]),
-    });
-
-    this.map.on('moveend', (e) => {
-      this.zoom = Number(this.map.getView().getZoom().toFixed(2));
-      this.latitud = this.map.getView().getCenter()[1] / 100000;
-      this.longitud = this.map.getView().getCenter()[0] / 100000;
-    });
-  }
-
-  setCenter() {
-    this.map.getView().setCenter(fromLonLat([this.longitud, this.latitud]));
-  }
-
-  setZoom() {
-    this.map.getView().setZoom(this.zoom);
   }
 
   add(event: MatChipInputEvent): void {
