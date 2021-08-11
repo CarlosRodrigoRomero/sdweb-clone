@@ -30,7 +30,7 @@ export class MapAllPlantsComponent implements OnInit {
   private plantasAñadidasId: string[] = [];
   defaultLng = -4;
   defaultLat = 40;
-  defalutZoom = 6;
+  defalutZoom = 5.5;
   geojsonObject: any;
   map: Map;
   public plantaHover: PlantaInterface;
