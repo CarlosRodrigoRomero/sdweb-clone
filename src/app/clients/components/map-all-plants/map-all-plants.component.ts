@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 import 'ol/ol.css';
 import Circle from 'ol/geom/Circle';
 import { defaults as defaultControls } from 'ol/control.js';
@@ -25,6 +27,7 @@ import { InformeInterface } from '@core/models/informe';
 export class MapAllPlantsComponent implements OnInit {
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
+  private plantasAñadidasId: string[] = [];
   defaultLng = -4;
   defaultLat = 40;
   defalutZoom = 6;
@@ -33,7 +36,11 @@ export class MapAllPlantsComponent implements OnInit {
   public plantaHover: PlantaInterface;
   private prevFeatureHover: any;
 
-  constructor(private portfolioControlService: PortfolioControlService, private router: Router) {}
+  constructor(
+    private portfolioControlService: PortfolioControlService,
+    private router: Router,
+    private _snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.plantas = this.portfolioControlService.listaPlantas;
@@ -47,23 +54,35 @@ export class MapAllPlantsComponent implements OnInit {
       const feature = new Feature(new Circle(fromLonLat([planta.longitud, planta.latitud]), 1e4));
 
       if (planta.informes !== undefined && planta.informes.length > 0) {
-        const mae = planta.informes.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current)).mae;
+        // añadimos los ya añadidos
 
-        if (mae !== undefined) {
+        const informeReciente = planta.informes.reduce((prev, current) =>
+          prev.fecha > current.fecha ? prev : current
+        );
+
+        if (informeReciente.mae !== undefined) {
+          // añadimos la planta a añadidas
+
           feature.setProperties({
-            mae,
+            mae: informeReciente.mae,
             plantaId: planta.id,
             tipo: planta.tipo,
+            fechaInfReciente: informeReciente.fecha,
           });
         }
+        // buscamos tambien informes que no esten dentro de la interfaz planta
       } else if (this.informes.map((inf) => inf.plantaId).includes(planta.id)) {
-        const informe = this.informes.find((inf) => inf.plantaId === planta.id);
+        const informesAdiccionales = this.informes.filter((inf) => inf.plantaId === planta.id);
+        const informeReciente = informesAdiccionales.reduce((prev, current) =>
+          prev.fecha > current.fecha ? prev : current
+        );
 
-        if (informe.mae !== undefined) {
+        if (informeReciente.mae !== undefined) {
           feature.setProperties({
-            mae: informe.mae,
+            mae: informeReciente.mae,
             plantaId: planta.id,
             tipo: planta.tipo,
+            fechaInfReciente: informeReciente.fecha,
           });
         }
       }
@@ -96,7 +115,7 @@ export class MapAllPlantsComponent implements OnInit {
 
     this.addPointerOnHover();
     this.addOnHoverAction();
-    // this.addOnClickAction();  // impedimos por el momento hacer click
+    this.addOnClickAction();
   }
 
   private addPointerOnHover() {
@@ -152,14 +171,23 @@ export class MapAllPlantsComponent implements OnInit {
       if (feature.length > 0) {
         const plantaId = feature[0].getProperties().plantaId;
         const tipoPlanta = feature[0].getProperties().tipo;
+        const fechaInformeReciente = feature[0].getProperties().fechaInfReciente;
 
-        if (feature[0].getProperties().tipo === 'seguidores') {
-          // impedimos navegar a seguidores temporalmente
-          // this.router.navigate(['clients/tracker/' + plantaId]);
-        } else {
+        if (tipoPlanta === 'seguidores') {
+          this.router.navigate(['clients/tracker/' + plantaId]);
+        } else if (fechaInformeReciente > 1619820000 || plantaId === 'egF0cbpXnnBnjcrusoeR') {
           this.router.navigate(['clients/fixed/' + plantaId]);
+        } else {
+          this.openSnackBar();
         }
       }
+    });
+  }
+
+  private openSnackBar() {
+    this._snackBar.open('Planta en mantenimiento temporalmente', 'OK', {
+      duration: 5000,
+      verticalPosition: 'top',
     });
   }
 
