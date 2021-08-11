@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { combineLatest } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent, ApexYAxis } from 'ng-apexcharts';
@@ -25,11 +25,13 @@ export type ChartOptions = {
   templateUrl: './chart-altura.component.html',
   styleUrls: ['./chart-altura.component.css'],
 })
-export class ChartAlturaComponent implements OnInit {
+export class ChartAlturaComponent implements OnInit, OnDestroy {
   informesIdList: string[];
   allAnomalias: Anomalia[];
   dataLoaded = false;
   private planta: PlantaInterface;
+
+  private subscriptions: Subscription = new Subscription();
 
   @ViewChild('chart') chart: ChartComponent;
 
@@ -101,48 +103,56 @@ export class ChartAlturaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    combineLatest([
-      this.reportControlService.allFilterableElements$,
-      this.reportControlService.informesIdList$,
-      this.plantaService.getPlanta(this.reportControlService.plantaId),
-    ])
-      .pipe(
-        switchMap(([elems, informesId, planta]) => {
-          this.allAnomalias = elems as Anomalia[];
-          this.informesIdList = informesId;
-          this.planta = planta;
+    this.subscriptions.add(
+      combineLatest([
+        this.reportControlService.allFilterableElements$,
+        this.reportControlService.informesIdList$,
+        this.plantaService.getPlanta(this.reportControlService.plantaId),
+      ])
+        .pipe(
+          switchMap(([elems, informesId, planta]) => {
+            this.allAnomalias = elems as Anomalia[];
+            this.informesIdList = informesId;
+            this.planta = planta;
 
-          return this.informeService.getDateLabelsInformes(this.informesIdList);
-        })
-      )
-      .subscribe((dateLabels) => {
-        const alturaMax = this.planta.filas;
+            console.log(Math.max(...elems.map((elem) => (elem as Anomalia).localY)));
 
-        const series = [];
-        for (let index = alturaMax; index > 0; index--) {
-          const row = {
-            name: index.toString(),
-            data: [],
-          };
+            return this.informeService.getDateLabelsInformes(this.informesIdList);
+          })
+        )
+        .subscribe((dateLabels) => {
+          const alturaMax = this.planta.filas;
 
-          dateLabels.forEach((dateLabel, i) => {
-            row.data.push({
-              x: dateLabel,
-              y: this.allAnomalias
-                .filter((anom) => anom.informeId === this.informesIdList[i])
-                .filter((anom) => anom.localY == index).length,
+          const series = [];
+          for (let index = alturaMax; index > 0; index--) {
+            const row = {
+              name: index.toString(),
+              data: [],
+            };
+
+            dateLabels.forEach((dateLabel, i) => {
+              row.data.push({
+                x: dateLabel,
+                y: this.allAnomalias
+                  .filter((anom) => anom.informeId === this.informesIdList[i])
+                  .filter((anom) => anom.localY == index).length,
+              });
             });
-          });
 
-          series.push(row);
-        }
+            series.push(row);
+          }
 
-        // aplicamos a todas salvo a DEMO
-        if (this.reportControlService.plantaId !== 'egF0cbpXnnBnjcrusoeR') {
-          this.chartOptions.series = series;
-        }
+          // aplicamos a todas salvo a DEMO
+          if (this.reportControlService.plantaId !== 'egF0cbpXnnBnjcrusoeR') {
+            this.chartOptions.series = series;
+          }
 
-        this.dataLoaded = true;
-      });
+          this.dataLoaded = true;
+        })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

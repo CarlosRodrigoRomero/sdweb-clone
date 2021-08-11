@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { combineLatest } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 
 import { GLOBAL } from '@core/services/global';
 import { ReportControlService } from '@core/services/report-control.service';
@@ -46,7 +46,7 @@ export type ChartOptions = {
   templateUrl: './chart-anomalias-zonas.component.html',
   styleUrls: ['./chart-anomalias-zonas.component.css'],
 })
-export class ChartAnomaliasZonasComponent implements OnInit {
+export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
   @ViewChild('chart-anomalias-zonas') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
   informesIdList: string[];
@@ -58,6 +58,8 @@ export class ChartAnomaliasZonasComponent implements OnInit {
   thereAreZones = true;
   private dateLabels: string[];
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
@@ -65,53 +67,55 @@ export class ChartAnomaliasZonasComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.plantaService
-      .getLocationsArea(this.reportControlService.plantaId)
-      .pipe(
-        switchMap((locAreas) => {
-          // si en seguidores solo hay un tamaño de area entonces no hay zonas
-          if (
-            !this.reportControlService.plantaFija &&
-            locAreas.filter(
+    this.subscriptions.add(
+      this.plantaService
+        .getLocationsArea(this.reportControlService.plantaId)
+        .pipe(
+          switchMap((locAreas) => {
+            // si en seguidores solo hay un tamaño de area entonces no hay zonas
+            if (
+              !this.reportControlService.plantaFija &&
+              locAreas.filter(
+                (locArea) =>
+                  locArea.globalCoords[1] !== undefined &&
+                  locArea.globalCoords[1] !== null &&
+                  locArea.globalCoords[1] !== ''
+              ).length === 0
+            ) {
+              this.thereAreZones = false;
+            }
+
+            this.zones = locAreas.filter(
               (locArea) =>
-                locArea.globalCoords[1] !== undefined &&
-                locArea.globalCoords[1] !== null &&
-                locArea.globalCoords[1] !== ''
-            ).length === 0
-          ) {
-            this.thereAreZones = false;
-          }
+                locArea.globalCoords[0] !== undefined &&
+                locArea.globalCoords[0] !== null &&
+                locArea.globalCoords[0] !== ''
+            );
 
-          this.zones = locAreas.filter(
-            (locArea) =>
-              locArea.globalCoords[0] !== undefined &&
-              locArea.globalCoords[0] !== null &&
-              locArea.globalCoords[0] !== ''
-          );
+            return combineLatest([
+              this.reportControlService.allFilterableElements$,
+              this.reportControlService.informesIdList$,
+            ]);
+          }),
+          switchMap(([elems, informesId]) => {
+            this.allAnomalias = elems as Anomalia[];
+            this.informesIdList = informesId;
 
-          return combineLatest([
-            this.reportControlService.allFilterableElements$,
-            this.reportControlService.informesIdList$,
-          ]);
-        }),
-        switchMap(([elems, informesId]) => {
-          this.allAnomalias = elems as Anomalia[];
-          this.informesIdList = informesId;
+            return this.informeService.getDateLabelsInformes(this.informesIdList);
+          })
+        )
+        .subscribe((dateLabels) => {
+          this.dateLabels = dateLabels;
 
-          return this.informeService.getDateLabelsInformes(this.informesIdList);
+          this.chartData = [];
+          this.informesIdList.forEach((informeId) => {
+            const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
+
+            this.chartData.push(this._calculateChartData(anomaliasInforme));
+          });
+          this._initChart();
         })
-      )
-      .subscribe((dateLabels) => {
-        this.dateLabels = dateLabels;
-
-        this.chartData = [];
-        this.informesIdList.forEach((informeId) => {
-          const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
-
-          this.chartData.push(this._calculateChartData(anomaliasInforme));
-        });
-        this._initChart();
-      });
+    );
   }
 
   private _calculateChartData(anomalias: Anomalia[]): number[] {
@@ -263,5 +267,9 @@ export class ChartAnomaliasZonasComponent implements OnInit {
       };
       this.chartLoaded = true;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

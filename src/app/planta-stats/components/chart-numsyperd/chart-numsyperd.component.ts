@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { combineLatest } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 
 import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
@@ -58,7 +58,7 @@ export interface DataPlot {
   templateUrl: './chart-numsyperd.component.html',
   styleUrls: ['./chart-numsyperd.component.css'],
 })
-export class ChartNumsyperdComponent implements OnInit {
+export class ChartNumsyperdComponent implements OnInit, OnDestroy {
   @ViewChild('charNumYPer') chartNumYPer: ChartComponent;
   public chartOptionsComun: Partial<ChartOptions>;
   public chartOptions1: Partial<ChartOptions>;
@@ -76,31 +76,35 @@ export class ChartNumsyperdComponent implements OnInit {
   public allAnomalias: Anomalia[] = [];
   public chartHeight = 300;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    combineLatest([
-      this.reportControlService.allFilterableElements$,
-      this.reportControlService.informesIdList$,
-    ]).subscribe(([elems, informes]) => {
-      if (this.reportControlService.plantaFija) {
-        this.allAnomalias = elems as Anomalia[];
-      } else {
-        (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomalias));
-      }
+    this.subscriptions.add(
+      combineLatest([
+        this.reportControlService.allFilterableElements$,
+        this.reportControlService.informesIdList$,
+      ]).subscribe(([elems, informes]) => {
+        if (this.reportControlService.plantaFija) {
+          this.allAnomalias = elems as Anomalia[];
+        } else {
+          (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomalias));
+        }
 
-      this.informesList = informes;
+        this.informesList = informes;
 
-      this.dataPlot = [];
-      this.getAllCategorias(this.allAnomalias);
+        this.dataPlot = [];
+        this.getAllCategorias(this.allAnomalias);
 
-      this.informesList.forEach((informeId) => {
-        const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
-        this.dataPlot.push(this.calculateDataPlot(anomaliasInforme, informeId));
-      });
+        this.informesList.forEach((informeId) => {
+          const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
+          this.dataPlot.push(this.calculateDataPlot(anomaliasInforme, informeId));
+        });
 
-      this.initChart();
-    });
+        this.initChart();
+      })
+    );
   }
 
   private getAllCategorias(anomalias): void {
@@ -306,5 +310,9 @@ export class ChartNumsyperdComponent implements OnInit {
       };
       this.chartLoaded = true;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

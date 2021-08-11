@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { switchMap } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 
 import {
   ApexAxisChartSeries,
@@ -42,7 +42,7 @@ export type ChartOptions = {
   templateUrl: './chart-cels-temps.component.html',
   styleUrls: ['./chart-cels-temps.component.css'],
 })
-export class ChartCelsTempsComponent implements OnInit {
+export class ChartCelsTempsComponent implements OnInit, OnDestroy {
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
   dataLoaded = false;
@@ -50,39 +50,43 @@ export class ChartCelsTempsComponent implements OnInit {
   allAnomalias: Anomalia[];
   dateLabels: string[];
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
 
   ngOnInit(): void {
-    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$])
-      .pipe(
-        switchMap(([elems, informesId]) => {
-          this.allAnomalias = elems as Anomalia[];
-          this.informesIdList = informesId;
+    this.subscriptions.add(
+      combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$])
+        .pipe(
+          switchMap(([elems, informesId]) => {
+            this.allAnomalias = elems as Anomalia[];
+            this.informesIdList = informesId;
 
-          return this.informeService.getDateLabelsInformes(this.informesIdList);
+            return this.informeService.getDateLabelsInformes(this.informesIdList);
+          })
+        )
+        .subscribe((dateLabels) => {
+          this.dateLabels = dateLabels;
+
+          const data = [];
+
+          this.informesIdList.forEach((informeId) => {
+            const celsCals = this.allAnomalias
+              .filter((anom) => anom.informeId === informeId)
+              // tslint:disable-next-line: triple-equals
+              .filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+
+            const range1 = celsCals.filter((cc) => cc.gradienteNormalizado < 10 && cc.gradienteNormalizado >= 0);
+            const range2 = celsCals.filter((cc) => cc.gradienteNormalizado < 20 && cc.gradienteNormalizado >= 10);
+            const range3 = celsCals.filter((cc) => cc.gradienteNormalizado < 30 && cc.gradienteNormalizado >= 20);
+            const range4 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
+
+            data.push([range1.length, range2.length, range3.length, range4.length]);
+          });
+
+          this._initChartData(data);
         })
-      )
-      .subscribe((dateLabels) => {
-        this.dateLabels = dateLabels;
-
-        const data = [];
-
-        this.informesIdList.forEach((informeId) => {
-          const celsCals = this.allAnomalias
-            .filter((anom) => anom.informeId === informeId)
-            // tslint:disable-next-line: triple-equals
-            .filter((anom) => anom.tipo == 8 || anom.tipo == 9);
-
-          const range1 = celsCals.filter((cc) => cc.gradienteNormalizado < 10 && cc.gradienteNormalizado >= 0);
-          const range2 = celsCals.filter((cc) => cc.gradienteNormalizado < 20 && cc.gradienteNormalizado >= 10);
-          const range3 = celsCals.filter((cc) => cc.gradienteNormalizado < 30 && cc.gradienteNormalizado >= 20);
-          const range4 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
-
-          data.push([range1.length, range2.length, range3.length, range4.length]);
-        });
-
-        this._initChartData(data);
-      });
+    );
   }
 
   private _initChartData(data: any[]): void {
@@ -139,5 +143,9 @@ export class ChartCelsTempsComponent implements OnInit {
       },
     };
     this.dataLoaded = true;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { GLOBAL } from '@core/services/global';
 
@@ -27,7 +27,7 @@ import { StatsService } from '@core/services/stats.service';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 
 import { InformeInterface } from '@core/models/informe';
-import { combineLatest } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -51,11 +51,17 @@ export type ChartOptions = {
   templateUrl: './chart-mae-global.component.html',
   styleUrls: ['./chart-mae-global.component.css'],
 })
-export class ChartMaeGlobalComponent implements OnInit {
+export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
   @ViewChild('chartMAE') chartMAE: ChartComponent;
   public chartOptionsMAE: Partial<ChartOptions>;
   private informeList: InformeInterface[];
   loadChart = false;
+  private maeData: number[] = [];
+  private maeColors: string[] = [];
+  private maeMedio: number;
+  private maeSigma: number;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private reportControlService: ReportControlService,
@@ -69,129 +75,141 @@ export class ChartMaeGlobalComponent implements OnInit {
     const getMaeMedio = this.portfolioControlService.maeMedio$;
     const getMaeSigma = this.portfolioControlService.maeSigma$;
 
-    combineLatest([informesPlanta, getMaeMedio, getMaeSigma]).subscribe(([informes, maeMedio, maeSigma]) => {
-      const maeData = informes.map((inf) => inf.mae);
+    this.subscriptions.add(
+      combineLatest([informesPlanta, getMaeMedio, getMaeSigma])
+        .pipe(
+          switchMap(([informes, maeMedio, maeSigma]) => {
+            this.maeData = informes.map((inf) => inf.mae);
+            this.maeMedio = maeMedio;
+            this.maeSigma = maeSigma;
 
-      const maeColors = maeData.map((mae) => {
-        if (mae < maeMedio - maeSigma) {
-          return GLOBAL.colores_mae[0];
-        } else if (mae <= maeMedio + maeSigma && mae >= maeMedio - maeSigma) {
-          return GLOBAL.colores_mae[1];
-        } else {
-          return GLOBAL.colores_mae[2];
-        }
-      });
+            this.maeColors = this.maeData.map((mae) => {
+              if (mae < maeMedio - maeSigma) {
+                return GLOBAL.colores_mae[0];
+              } else if (mae <= maeMedio + maeSigma && mae >= maeMedio - maeSigma) {
+                return GLOBAL.colores_mae[1];
+              } else {
+                return GLOBAL.colores_mae[2];
+              }
+            });
 
-      this.informeService.getDateLabelsInformes(informes.map((inf) => inf.id)).subscribe((dateLabels) => {
-        // si solo hay un informe cambiamos a grafico tipo barra
-        let typeChart: ChartType = 'area';
-        if (maeData.length === 1) {
-          typeChart = 'bar';
-        }
+            return this.informeService.getDateLabelsInformes(informes.map((inf) => inf.id));
+          })
+        )
+        .subscribe((dateLabels) => {
+          // si solo hay un informe cambiamos a grafico tipo barra
+          let typeChart: ChartType = 'area';
+          if (this.maeData.length === 1) {
+            typeChart = 'bar';
+          }
 
-        this.chartOptionsMAE = {
-          series: [
-            {
-              name: 'MAE %',
-              data: maeData,
-            },
-          ],
-          chart: {
-            width: '100%',
-            type: typeChart,
-            height: 250,
-            dropShadow: {
-              enabled: true,
-              color: '#000',
-              top: 18,
-              left: 7,
-              blur: 10,
-              opacity: 0.2,
-            },
-            toolbar: {
-              show: true,
-              offsetX: 0,
-              offsetY: 0,
-              tools: {
-                download: true,
-                selection: false,
-                zoom: false,
-                zoomin: false,
-                zoomout: false,
-                pan: false,
-                reset: false,
-                customIcons: [],
-              },
-            },
-          },
-          colors: maeColors,
-          dataLabels: {
-            enabled: true,
-            formatter: (value) => Math.round(value * 100) / 100 + '%',
-          },
-          grid: {
-            borderColor: '#e7e7e7',
-            row: {
-              colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-              opacity: 0.5,
-            },
-          },
-          markers: {
-            size: 1,
-          },
-          xaxis: {
-            categories: dateLabels,
-          },
-          yaxis: {
-            title: {
-              text: 'MAE %',
-              offsetY: 30,
-            },
-            labels: {
-              formatter: (value) => {
-                return Math.round(value * 10) / 10 + '%';
-              },
-              minWidth: 10,
-            },
-            min: 0,
-            max: Math.max(...[...maeData, maeMedio]) + 0.5,
-          },
-          legend: {
-            show: false,
-          },
-          annotations: {
-            yaxis: [
+          this.chartOptionsMAE = {
+            series: [
               {
-                y: maeMedio,
-                borderColor: '#5b5b5c',
-                borderWidth: 2,
-                strokeDashArray: 10,
-
-                label: {
-                  offsetX: -100,
-                  borderColor: '#5b5b5c',
-                  style: {
-                    fontSize: '12px',
-                    color: '#fff',
-                    background: '#5b5b5c',
-                  },
-                  text: 'Media MAE Portfolio',
-                },
-              },
-              {
-                y: maeMedio + maeSigma,
-                y2: maeMedio - maeSigma,
-                borderColor: '#000',
-                fillColor: '#FEB019',
-                label: {
-                  text: 'desviación std.',
-                },
+                name: 'MAE %',
+                data: this.maeData,
               },
             ],
-          },
-        };
-        this.loadChart = true;
-      });
-    });
+            chart: {
+              width: '100%',
+              type: typeChart,
+              height: 250,
+              dropShadow: {
+                enabled: true,
+                color: '#000',
+                top: 18,
+                left: 7,
+                blur: 10,
+                opacity: 0.2,
+              },
+              toolbar: {
+                show: true,
+                offsetX: 0,
+                offsetY: 0,
+                tools: {
+                  download: true,
+                  selection: false,
+                  zoom: false,
+                  zoomin: false,
+                  zoomout: false,
+                  pan: false,
+                  reset: false,
+                  customIcons: [],
+                },
+              },
+            },
+            colors: this.maeColors,
+            dataLabels: {
+              enabled: true,
+              formatter: (value) => Math.round(value * 100) / 100 + '%',
+            },
+            grid: {
+              borderColor: '#e7e7e7',
+              row: {
+                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                opacity: 0.5,
+              },
+            },
+            markers: {
+              size: 1,
+            },
+            xaxis: {
+              categories: dateLabels,
+            },
+            yaxis: {
+              title: {
+                text: 'MAE %',
+                offsetY: 30,
+              },
+              labels: {
+                formatter: (value) => {
+                  return Math.round(value * 10) / 10 + '%';
+                },
+                minWidth: 10,
+              },
+              min: 0,
+              max: Math.max(...[...this.maeData, this.maeMedio]) + 0.5,
+            },
+            legend: {
+              show: false,
+            },
+            annotations: {
+              yaxis: [
+                {
+                  y: this.maeMedio,
+                  borderColor: '#5b5b5c',
+                  borderWidth: 2,
+                  strokeDashArray: 10,
+
+                  label: {
+                    offsetX: -100,
+                    borderColor: '#5b5b5c',
+                    style: {
+                      fontSize: '12px',
+                      color: '#fff',
+                      background: '#5b5b5c',
+                    },
+                    text: 'Media MAE Portfolio',
+                  },
+                },
+                {
+                  y: this.maeMedio + this.maeSigma,
+                  y2: this.maeMedio - this.maeSigma,
+                  borderColor: '#000',
+                  fillColor: '#FEB019',
+                  label: {
+                    text: 'desviación std.',
+                  },
+                },
+              ],
+            },
+          };
+          this.loadChart = true;
+        })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
