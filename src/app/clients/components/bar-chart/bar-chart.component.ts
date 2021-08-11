@@ -111,9 +111,9 @@ export class BarChartComponent implements OnInit {
           click: (event, chartContext, config) => {
             const index = config.dataPointIndex;
             // evitamos que se pueda acceder a plantas se seguidores temporalmente
-            if (this.plantas[index].tipo !== 'seguidores') {
-              this.onClick(index);
-            }
+            // if (this.plantas[index].tipo !== 'seguidores') {
+            //   this.onClick(index);
+            // }
           },
         },
       },

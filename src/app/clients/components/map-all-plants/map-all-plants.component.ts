@@ -96,7 +96,7 @@ export class MapAllPlantsComponent implements OnInit {
 
     this.addPointerOnHover();
     this.addOnHoverAction();
-    this.addOnClickAction();
+    // this.addOnClickAction();  // impedimos por el momento hacer click
   }
 
   private addPointerOnHover() {
@@ -151,6 +151,7 @@ export class MapAllPlantsComponent implements OnInit {
 
       if (feature.length > 0) {
         const plantaId = feature[0].getProperties().plantaId;
+        const tipoPlanta = feature[0].getProperties().tipo;
 
         if (feature[0].getProperties().tipo === 'seguidores') {
           // impedimos navegar a seguidores temporalmente
