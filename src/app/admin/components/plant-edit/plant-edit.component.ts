@@ -204,7 +204,11 @@ export class PlantEditComponent implements OnInit {
 
     // Add our element
     if (value) {
-      this.nombreGlobalCoords.push(value);
+      if (this.nombreGlobalCoords !== undefined) {
+        this.nombreGlobalCoords.push(value);
+      } else {
+        this.nombreGlobalCoords = [value];
+      }
     }
 
     // Clear the input value
