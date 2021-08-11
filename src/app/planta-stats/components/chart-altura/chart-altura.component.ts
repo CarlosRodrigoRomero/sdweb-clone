@@ -8,8 +8,10 @@ import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent, ApexYAx
 import { GLOBAL } from '@core/services/global';
 import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
+import { PlantaService } from '@core/services/planta.service';
 
 import { Anomalia } from '@core/models/anomalia';
+import { PlantaInterface } from '@core/models/planta';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -27,6 +29,7 @@ export class ChartAlturaComponent implements OnInit {
   informesIdList: string[];
   allAnomalias: Anomalia[];
   dataLoaded = false;
+  private planta: PlantaInterface;
 
   @ViewChild('chart') chart: ChartComponent;
 
@@ -91,23 +94,31 @@ export class ChartAlturaComponent implements OnInit {
     },
   };
 
-  constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
+  constructor(
+    private reportControlService: ReportControlService,
+    private informeService: InformeService,
+    private plantaService: PlantaService
+  ) {}
 
   ngOnInit(): void {
-    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$])
+    combineLatest([
+      this.reportControlService.allFilterableElements$,
+      this.reportControlService.informesIdList$,
+      this.plantaService.getPlanta(this.reportControlService.plantaId),
+    ])
       .pipe(
-        switchMap(([elems, informesId]) => {
+        switchMap(([elems, informesId, planta]) => {
           this.allAnomalias = elems as Anomalia[];
           this.informesIdList = informesId;
+          this.planta = planta;
 
           return this.informeService.getDateLabelsInformes(this.informesIdList);
         })
       )
       .subscribe((dateLabels) => {
-        const alturaMax = Math.max(
-          ...this.allAnomalias.filter((anom) => anom.localY !== undefined).map((anom) => anom.localY)
-        );
+        const alturaMax = this.planta.filas;
 
+        const series = [];
         for (let index = alturaMax; index > 0; index--) {
           const row = {
             name: index.toString(),
@@ -115,25 +126,20 @@ export class ChartAlturaComponent implements OnInit {
           };
 
           dateLabels.forEach((dateLabel, i) => {
-            // const anomsInforme = this.allAnomalias.filter((anom) => anom.informeId === this.informesIdList[i]);
-
-            // const posicionAnoms = anomsInforme.map((anom) => anom.localY);
-
             row.data.push({
               x: dateLabel,
               y: this.allAnomalias
                 .filter((anom) => anom.informeId === this.informesIdList[i])
-                .filter((anom) => anom.localY === index).length,
+                .filter((anom) => anom.localY == index).length,
             });
           });
 
-          // en la planta DEMO no aplicamos estos datos
-          if (this.reportControlService.plantaId !== 'egF0cbpXnnBnjcrusoeR') {
-            this.chartOptions.series = [];
-            if (this.chartOptions.series.length < alturaMax) {
-              this.chartOptions.series.push(row);
-            }
-          }
+          series.push(row);
+        }
+
+        // aplicamos a todas salvo a DEMO
+        if (this.reportControlService.plantaId !== 'egF0cbpXnnBnjcrusoeR') {
+          this.chartOptions.series = series;
         }
 
         this.dataLoaded = true;
