@@ -1,9 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { GLOBAL } from '@core/services/global';
-import { AuthService } from '@core/services/auth.service';
-import { PortfolioControlService } from '@core/services/portfolio-control.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import {
   ApexAxisChartSeries,
@@ -19,7 +17,13 @@ import {
   ApexAnnotations,
   ApexTooltip,
 } from 'ng-apexcharts';
+
+import { GLOBAL } from '@core/services/global';
+import { AuthService } from '@core/services/auth.service';
+import { PortfolioControlService } from '@core/services/portfolio-control.service';
+
 import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
 
 export interface ChartOptions {
   series: ApexAxisChartSeries;
@@ -53,15 +57,19 @@ export class BarChartComponent implements OnInit {
   public plantasId: string[] = [];
   public tiposPlantas: string[] = [];
   private plantas: PlantaInterface[];
+  private informes: InformeInterface[];
+  private fechaInformesRecientes: number[] = [];
 
   constructor(
     public auth: AuthService,
     private portfolioControlService: PortfolioControlService,
-    private router: Router
+    private router: Router,
+    private _snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
     this.plantas = this.portfolioControlService.listaPlantas;
+    this.informes = this.portfolioControlService.listaInformes;
     this.maePlantas = this.portfolioControlService.maePlantas;
     this.maeMedio = this.portfolioControlService.maeMedio;
     this.maeSigma = this.portfolioControlService.maeSigma;
@@ -69,11 +77,17 @@ export class BarChartComponent implements OnInit {
     this.plantas.forEach((planta, index) => {
       const mae = this.maePlantas[index];
       if (mae !== undefined) {
+        // obtenemos el informe mas reciente de la planta para usar su fecha
+        const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
+        const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
+
         this.data.push(Math.round(10 * mae) / 10);
         // añadimos al array de ids
         this.plantasId.push(planta.id);
         // añadimos al array de tipos
         this.tiposPlantas.push(planta.tipo);
+        // añadimos la fecha al array de fecha informes recientes
+        this.fechaInformesRecientes.push(informeReciente.fecha);
 
         this.barChartLabels.push(planta.nombre);
       }
@@ -110,10 +124,7 @@ export class BarChartComponent implements OnInit {
         events: {
           click: (event, chartContext, config) => {
             const index = config.dataPointIndex;
-            // evitamos que se pueda acceder a plantas se seguidores temporalmente
-            // if (this.plantas[index].tipo !== 'seguidores') {
-            //   this.onClick(index);
-            // }
+            this.onClick(index);
           },
         },
       },
@@ -222,11 +233,21 @@ export class BarChartComponent implements OnInit {
   private onClick(index: number) {
     const plantaId = this.plantasId[index];
     const tipoPlanta = this.tiposPlantas[index];
+    const fechaInformeReciente = this.fechaInformesRecientes[index];
 
     if (tipoPlanta === 'seguidores') {
       this.router.navigate(['clients/tracker/' + plantaId]);
-    } else {
+    } else if (fechaInformeReciente > 1619820000 || plantaId === 'egF0cbpXnnBnjcrusoeR') {
       this.router.navigate(['clients/fixed/' + plantaId]);
+    } else {
+      this.openSnackBar();
     }
+  }
+
+  private openSnackBar() {
+    this._snackBar.open('Planta en mantenimiento temporalmente', 'OK', {
+      duration: 5000,
+      verticalPosition: 'top',
+    });
   }
 }
