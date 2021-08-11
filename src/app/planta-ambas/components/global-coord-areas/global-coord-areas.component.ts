@@ -109,6 +109,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
         )
         .subscribe((map) => {
           this.map = map;
+
           this.addLocationAreas();
         })
     );
@@ -161,7 +162,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.seguidorService.locAreas$.pipe(take(1)).subscribe((locAreas) => {
+    /* this.seguidorService.locAreas$.pipe(take(1)).subscribe((locAreas) => {
       this.nombreGlobalCoords.forEach((nombre, i) => {
         if (this.globalCoordAreas.length < this.nombreGlobalCoords.length) {
           this.globalCoordAreas.push(
@@ -188,41 +189,49 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
           );
         }
       });
-    });
+    }); */
 
-    /* this.subscriptions.add(
-      this.plantaService.getLocationsArea(this.plantaId).subscribe((locAreas) => {
-        this.nombreGlobalCoords.forEach((nombre, i) => {
-          if (this.globalCoordAreas.length < this.nombreGlobalCoords.length) {
-            this.globalCoordAreas.push(
-              locAreas.filter(
-                (locArea) =>
-                  locArea.globalCoords[i] !== null &&
-                  locArea.globalCoords[i] !== undefined &&
-                  locArea.globalCoords[i] !== ''
-              )
-            );
-
-            this.globalCoordAreasVectorSources[i] = new VectorSource({
-              features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(this.globalCoordAreas[i])),
-            });
-            this.globalCoordAreasVectorSources[i]
-              .getFeatures()
-              .forEach((feature) => feature.setProperties({ tipo: 'areaGlobalCoord' }));
-            this.map.addLayer(
-              (this.globalCoordAreasVectorLayers[i] = new VectorLayer({
-                source: this.globalCoordAreasVectorSources[i],
-                visible: false,
-                style: styleFunction,
-              }))
-            );
+    this.subscriptions.add(
+      this.plantaService
+        .getLocationsArea(this.plantaId)
+        .pipe(take(1))
+        .subscribe((locAreas) => {
+          // si la planta es de seguidores obtenemos las areas ya sin seguidores
+          if (!this.reportControlService.plantaFija) {
+            locAreas = this.seguidorService.locAreas;
           }
-        });
 
-        // this.addPointerOnHover();
-        // this.addOnHoverLabel();
-      })
-    ); */
+          this.nombreGlobalCoords.forEach((nombre, i) => {
+            if (this.globalCoordAreas.length < this.nombreGlobalCoords.length) {
+              this.globalCoordAreas.push(
+                locAreas.filter(
+                  (locArea) =>
+                    locArea.globalCoords[i] !== null &&
+                    locArea.globalCoords[i] !== undefined &&
+                    locArea.globalCoords[i] !== ''
+                )
+              );
+
+              this.globalCoordAreasVectorSources[i] = new VectorSource({
+                features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(this.globalCoordAreas[i])),
+              });
+              this.globalCoordAreasVectorSources[i]
+                .getFeatures()
+                .forEach((feature) => feature.setProperties({ tipo: 'areaGlobalCoord' }));
+              this.map.addLayer(
+                (this.globalCoordAreasVectorLayers[i] = new VectorLayer({
+                  source: this.globalCoordAreasVectorSources[i],
+                  visible: false,
+                  style: styleFunction,
+                }))
+              );
+            }
+          });
+
+          // this.addPointerOnHover();
+          // this.addOnHoverLabel();
+        })
+    );
   }
 
   private getLabelArea(feature: Feature): string {

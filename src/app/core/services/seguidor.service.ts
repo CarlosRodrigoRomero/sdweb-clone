@@ -26,7 +26,6 @@ export class SeguidorService {
   private planta: PlantaInterface;
   numGlobalCoords: number;
   private _locAreas: LocationAreaInterface[] = [];
-  locAreas$ = new BehaviorSubject<LocationAreaInterface[]>(this._locAreas);
 
   minGradNorm: number;
   maxGradNorm: number;
@@ -298,6 +297,5 @@ export class SeguidorService {
 
   set locAreas(value: LocationAreaInterface[]) {
     this._locAreas = value;
-    this.locAreas$.next(value);
   }
 }
