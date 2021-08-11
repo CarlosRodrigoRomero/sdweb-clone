@@ -422,6 +422,16 @@ export class SeguidoresControlService {
     }
   }
 
+  getColorSeguidorMaeExternal(mae: number) {
+    if (mae <= (this.maeMax - this.maeMin) / 3) {
+      return GLOBAL.colores_mae[0];
+    } else if (mae <= (2 * (this.maeMax - this.maeMin)) / 3) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
+  }
+
   // ESTILOS CELS CALIENTES
   private getStyleSeguidoresCelsCalientes(focused) {
     return (feature) => {
@@ -478,6 +488,16 @@ export class SeguidoresControlService {
   private getColorSeguidorGradienteNormMax(feature: Feature) {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
+    if (gradNormMax <= (this.gradMax - this.gradMin) / 3) {
+      return GLOBAL.colores_mae[0];
+    } else if (gradNormMax <= (2 * (this.gradMax - this.gradMin)) / 3) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
+  }
+
+  getColorSeguidorGradienteNormMaxExternal(gradNormMax: number) {
     if (gradNormMax <= (this.gradMax - this.gradMin) / 3) {
       return GLOBAL.colores_mae[0];
     } else if (gradNormMax <= (2 * (this.gradMax - this.gradMin)) / 3) {

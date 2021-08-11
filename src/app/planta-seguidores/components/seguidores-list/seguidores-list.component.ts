@@ -95,7 +95,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
               const seguidor = elem as Seguidor;
 
               filteredElements.push({
-                color: 'red',
+                // color: this.seguidoresControlService.getColorSeguidorMaeExternal(seguidor.mae),
                 id: elem.id.replace((elem as Seguidor).informeId, '').replace(/_/g, ' '),
                 numAnomalias: seguidor.anomaliasCliente.length,
                 modulo: this.getModuloLabel(elem as Seguidor),

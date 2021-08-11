@@ -161,7 +161,7 @@ export class SeguidorService {
   }
 
   private getSeguidorName(seguidor: Seguidor): string {
-    let nombre = 'Seguidor ';
+    let nombre = '';
     seguidor.globalCoords.forEach((coord, index) => {
       if (index === 0) {
         nombre = nombre + coord;
@@ -268,7 +268,7 @@ export class SeguidorService {
     }
   }
 
-  getPerdidasColor(anomaliaSelected: Anomalia) {
+  getPerdidasAnomColor(anomaliaSelected: Anomalia) {
     if (anomaliaSelected.perdidas <= 0.33) {
       return GLOBAL.colores_mae[0];
     } else if (anomaliaSelected.perdidas > 0.66) {
@@ -278,11 +278,11 @@ export class SeguidorService {
     }
   }
 
-  getCelsCalientesColor(anomaliaSelected: Anomalia) {
+  getCelsCalientesAnomColor(anomaliaSelected: Anomalia) {
     return 'red';
   }
 
-  getGradienteColor(anomaliaSelected: Anomalia) {
+  getGradienteAnomColor(anomaliaSelected: Anomalia) {
     if (anomaliaSelected.gradienteNormalizado <= (this.maxGradNorm - this.minGradNorm) / 3) {
       return GLOBAL.colores_mae[0];
     } else if (anomaliaSelected.gradienteNormalizado <= (2 * (this.maxGradNorm - this.minGradNorm)) / 3) {

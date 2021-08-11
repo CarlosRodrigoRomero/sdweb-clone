@@ -33,6 +33,7 @@
 
           <!-- SIDENAV LISTA SEGUIDORES -->
           <mat-sidenav
+            *ngIf="seguidoresLoaded"
             #sidenavRight
             [(opened)]="rightOpened"
             class="right-sidenav"

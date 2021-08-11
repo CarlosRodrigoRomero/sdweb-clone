@@ -231,12 +231,12 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
   private getAnomaliaColor(anomalia: Anomalia): string {
     // tslint:disable-next-line: triple-equals
     if (this.viewSelected == 0) {
-      return this.seguidorService.getPerdidasColor(anomalia);
+      return this.seguidorService.getPerdidasAnomColor(anomalia);
       // tslint:disable-next-line: triple-equals
     } else if (this.viewSelected == 1) {
-      return this.seguidorService.getCelsCalientesColor(anomalia);
+      return this.seguidorService.getCelsCalientesAnomColor(anomalia);
     } else {
-      return this.seguidorService.getGradienteColor(anomalia);
+      return this.seguidorService.getGradienteAnomColor(anomalia);
     }
   }
 
