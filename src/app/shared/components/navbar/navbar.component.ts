@@ -17,7 +17,7 @@ export class NavbarComponent implements OnInit {
   public userLogged: boolean;
   private user: UserInterface;
   public isAdmin: boolean;
-  public showPlantSummary = false;
+  loadSummary = false;
 
   public themeSelected = 'light-theme';
 
@@ -40,7 +40,13 @@ export class NavbarComponent implements OnInit {
       });
     }
 
-    this.reportControlService.initialized$.subscribe((init) => (this.showPlantSummary = init));
+    this.reportControlService.mapLoaded$.subscribe((value) => {
+      this.loadSummary = value;
+
+      if (value) {
+        setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
+      }
+    });
 
     // this.themeService.themeSelected$.subscribe((theme) => (this.themeSelected = theme));
   }

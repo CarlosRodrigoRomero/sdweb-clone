@@ -54,6 +54,8 @@ export class SeguidoresControlService {
   public urlVisualImageSeguidor$ = new BehaviorSubject<string>(this._urlVisualImageSeguidor);
   private _urlThermalImageSeguidor: string = undefined;
   public urlThermalImageSeguidor$ = new BehaviorSubject<string>(this._urlThermalImageSeguidor);
+  private _imageExist = true;
+  imageExist$ = new BehaviorSubject<boolean>(this._imageExist);
 
   private maeMin: number;
   private maeMax: number;
@@ -99,8 +101,6 @@ export class SeguidoresControlService {
 
           // obtenemos los niveles para la escala de colores
           this.getViewsLevels();
-
-          // this.getImagesSeguidoresInforme();
 
           return this.informeService.getInforme(informeId);
         })
@@ -267,7 +267,14 @@ export class SeguidoresControlService {
   }
 
   private addSelectInteraction() {
+    const estilosView = [
+      this.getStyleSeguidoresMae(false),
+      this.getStyleSeguidoresCelsCalientes(false),
+      this.getStyleSeguidoresGradienteNormMax(false),
+    ];
+
     const select = new Select({
+      style: estilosView[this.toggleViewSelected],
       // condition: click,
       layers: (l) => {
         if (
@@ -415,6 +422,16 @@ export class SeguidoresControlService {
     }
   }
 
+  getColorSeguidorMaeExternal(mae: number) {
+    if (mae <= (this.maeMax - this.maeMin) / 3) {
+      return GLOBAL.colores_mae[0];
+    } else if (mae <= (2 * (this.maeMax - this.maeMin)) / 3) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
+  }
+
   // ESTILOS CELS CALIENTES
   private getStyleSeguidoresCelsCalientes(focused) {
     return (feature) => {
@@ -480,6 +497,16 @@ export class SeguidoresControlService {
     }
   }
 
+  getColorSeguidorGradienteNormMaxExternal(gradNormMax: number) {
+    if (gradNormMax <= (this.gradMax - this.gradMin) / 3) {
+      return GLOBAL.colores_mae[0];
+    } else if (gradNormMax <= (2 * (this.gradMax - this.gradMin)) / 3) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
+  }
+
   private hexToRgb(hex: string, opacity: number): string {
     return (
       'rgba(' +
@@ -518,6 +545,9 @@ export class SeguidoresControlService {
         .getDownloadURL()
         .toPromise()
         .then((url) => {
+          // indicamos  que la imagen existe
+          this.imageExist = true;
+
           if (folder === 'jpg') {
             this.urlThermalImageSeguidor = url;
           } else {
@@ -527,6 +557,8 @@ export class SeguidoresControlService {
         .catch((error) => {
           switch (error.code) {
             case 'storage/object-not-found':
+              // indicamos  que la imagen no existe
+              this.imageExist = false;
               console.log("File doesn't exist");
               break;
 
@@ -546,20 +578,6 @@ export class SeguidoresControlService {
     }
   }
 
-  getImagesSeguidoresInforme() {
-    return this.storage
-      .ref('informes')
-      .child(this.selectedInformeId)
-      .listAll()
-      .then((snap) => {
-        snap.items.forEach((itemRef) => {
-          itemRef.getDownloadURL().then((imgUrl) => {
-            this.imgSeguidoresUrls.push(imgUrl);
-          });
-        });
-      });
-  }
-
   changeInformeSeguidorSelected() {
     this.seguidorSelected = this.listaSeguidores.find((seguidor) => {
       const idNumber = seguidor.id.split('_')[1];
@@ -573,6 +591,9 @@ export class SeguidoresControlService {
     const index = this.listaSeguidores.indexOf(this.seguidorSelected);
     if (index !== this.listaSeguidores.length - 1) {
       this.seguidorSelected = this.listaSeguidores[index + 1];
+
+      // indicamos que la imagen existe por defecto
+      this.imageExist = true;
     }
   }
 
@@ -580,6 +601,9 @@ export class SeguidoresControlService {
     const index = this.listaSeguidores.indexOf(this.seguidorSelected);
     if (index !== 0) {
       this.seguidorSelected = this.listaSeguidores[index - 1];
+
+      // indicamos que la imagen existe por defecto
+      this.imageExist = true;
     }
   }
 
@@ -686,5 +710,14 @@ export class SeguidoresControlService {
   set urlThermalImageSeguidor(value: string) {
     this._urlThermalImageSeguidor = value;
     this.urlThermalImageSeguidor$.next(value);
+  }
+
+  get imageExist() {
+    return this._imageExist;
+  }
+
+  set imageExist(value: boolean) {
+    this._imageExist = value;
+    this.imageExist$.next(value);
   }
 }

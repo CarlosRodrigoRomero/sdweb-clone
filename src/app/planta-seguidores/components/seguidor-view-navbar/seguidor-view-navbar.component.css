@@ -1,0 +1,35 @@
+.title {
+  height: 70px;
+  position: absolute;
+  z-index: 9999;
+}
+
+.modulo-label {
+  font-size: large;
+  font-weight: 400;
+  margin-left: 1rem;
+  color: grey;
+}
+
+.btn-close-seguidor-view {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+}
+
+.two-lines-info {
+  display: grid;
+  margin-left: 1rem;
+}
+
+.line-info {
+  display: flex;
+  font-size: medium;
+  margin: -0.2rem;
+}
+
+.line-content {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}

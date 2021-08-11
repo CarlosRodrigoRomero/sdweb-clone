@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -12,10 +12,11 @@ import { Seguidor } from '@core/models/seguidor';
   templateUrl: './seguidor-view.component.html',
   styleUrls: ['./seguidor-view.component.css'],
 })
-export class SeguidorViewComponent implements OnInit, OnDestroy {
+export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public seguidorSelected: Seguidor = undefined;
   numAnomalias: number;
   oneReport = true;
+  imagesExist = true;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -31,11 +32,10 @@ export class SeguidorViewComponent implements OnInit, OnDestroy {
         this.seguidorSelected = seguidor;
 
         if (this.seguidorSelected !== undefined) {
-          // tslint:disable-next-line: triple-equals
-          this.numAnomalias = this.seguidorSelected.anomalias.filter((anom) => anom.tipo != 0).length;
+          this.numAnomalias = this.seguidorSelected.anomaliasCliente.length;
 
           if (this.numAnomalias > 0) {
-            this.seguidorViewService.anomaliaSelected = this.seguidorSelected.anomalias[0];
+            this.seguidorViewService.anomaliaSelected = this.seguidorSelected.anomaliasCliente[0];
           }
         }
       })
@@ -46,42 +46,46 @@ export class SeguidorViewComponent implements OnInit, OnDestroy {
     }
   }
 
-  public closeSidenav() {
-    this.seguidorViewService.closeSidenav();
-
-    this.seguidorViewService.imageCanvas.clear();
+  ngAfterViewInit(): void {
+    this.subscriptions.add(this.seguidoresControlService.imageExist$.subscribe((exist) => (this.imagesExist = exist)));
   }
 
   nextSeguidor() {
     // limpiamos la imagen del seguidor anterior
-    this.seguidorViewService.imageCanvas.clear();
+    this.seguidorViewService.thermalCanvas.clear();
+    this.seguidorViewService.visualCanvas.clear();
+
+    // limpiamos las url para que no se muestre la imagen anterior al pasar
+    this.seguidoresControlService.urlThermalImageSeguidor = undefined;
+    this.seguidoresControlService.urlVisualImageSeguidor = undefined;
+
     // reiniciamos la carga de la nueva imagen
-    this.seguidorViewService.imageLoaded = false;
+    this.seguidorViewService.imagesLoaded = false;
+
     // seleccionamos el proximo seguidor
     this.seguidoresControlService.selectNextSeguidor();
   }
 
   prevSeguidor() {
     // limpiamos la imagen del seguidor anterior
-    this.seguidorViewService.imageCanvas.clear();
+    this.seguidorViewService.visualCanvas.clear();
+    this.seguidorViewService.visualCanvas.clear();
+
+    // limpiamos las url para que no se muestre la imagen anterior al pasar
+    this.seguidoresControlService.urlThermalImageSeguidor = undefined;
+    this.seguidoresControlService.urlVisualImageSeguidor = undefined;
+
     // reiniciamos la carga de la nueva imagen
-    this.seguidorViewService.imageLoaded = false;
+    this.seguidorViewService.imagesLoaded = false;
+
     // seleccionamos el seguidor previo
     this.seguidoresControlService.selectPrevSeguidor();
-  }
-
-  private resetViewValues() {
-    this.seguidoresControlService.seguidorSelected = undefined;
-    this.seguidorViewService.anomaliaSelected = undefined;
-    this.seguidoresControlService.urlVisualImageSeguidor = undefined;
-    this.seguidoresControlService.urlThermalImageSeguidor = undefined;
-    this.seguidorViewService.imageSelected = undefined;
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
 
     // reseteamos los valores
-    this.resetViewValues();
+    this.seguidorViewService.resetViewValues();
   }
 }

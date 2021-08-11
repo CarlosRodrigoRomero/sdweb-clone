@@ -20,7 +20,7 @@ export class SeguidorImageToggleComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.seguidorViewService.imageSelected$.subscribe((image) => (this.imageSelected = image)));
   }
 
-  onToggleChange(value) {
+  onToggleChange(value: number) {
     this.seguidorViewService.imageSelected = value;
   }
 

@@ -46,16 +46,13 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
       this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
         this.seguidorSelected = seguidor;
 
-        // tslint:disable-next-line: triple-equals
-        if (this.seguidorSelected.anomalias.filter((anom) => anom.tipo != 0).length > 0) {
-          const anomalias = [];
-          this.seguidorSelected.anomalias
-            // tslint:disable-next-line: triple-equals
-            .filter((anom) => anom.tipo != 0)
-            .forEach((anom) => {
+        if (this.seguidorSelected !== undefined) {
+          if (seguidor.anomaliasCliente.length > 0) {
+            const anomalias = [];
+            seguidor.anomaliasCliente.forEach((anom) => {
               let perdidas;
               if (anom.perdidas !== undefined) {
-                perdidas = anom.perdidas + '%';
+                perdidas = anom.perdidas * 100 + '%';
               }
               let tempMax;
               if (anom.temperaturaMax !== undefined) {
@@ -74,8 +71,9 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
                 anomalia: anom,
               });
             });
-          this.dataSource = new MatTableDataSource(anomalias);
-          this.dataSource.sort = this.sort;
+            this.dataSource = new MatTableDataSource(anomalias);
+            this.dataSource.sort = this.sort;
+          }
         }
       })
     );

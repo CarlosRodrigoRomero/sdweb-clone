@@ -4,13 +4,15 @@ import { BehaviorSubject } from 'rxjs';
 
 import { MatSidenav } from '@angular/material/sidenav';
 
+import { SeguidoresControlService } from '../services/seguidores-control.service';
+
 import { Anomalia } from '@core/models/anomalia';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SeguidorViewService {
-  private sidenav: MatSidenav;
+  private _sidenav: MatSidenav;
   private _imageSelected = 0;
   public imageSelected$ = new BehaviorSubject<number>(this._imageSelected);
   private _anomaliaSelected: Anomalia = undefined;
@@ -19,18 +21,31 @@ export class SeguidorViewService {
   public prevAnomaliaSelected$ = new BehaviorSubject<Anomalia>(this._prevAnomaliaSelected);
   private _anomaliaHovered: Anomalia = undefined;
   public anomaliaHovered$ = new BehaviorSubject<Anomalia>(this._anomaliaHovered);
-  private _imageCanvas: any = undefined;
+  private _visualCanvas: any = undefined;
+  private _thermalCanvas: any = undefined;
   private _imageLoaded = false;
   public imageLoaded$ = new BehaviorSubject<boolean>(this._imageLoaded);
 
-  constructor() {}
+  constructor(private seguidoresControlService: SeguidoresControlService) {}
 
-  public setSidenav(sidenav: MatSidenav) {
-    this.sidenav = sidenav;
+  resetViewValues() {
+    this.seguidoresControlService.seguidorSelected = undefined;
+    this.anomaliaSelected = undefined;
+    this.seguidoresControlService.urlVisualImageSeguidor = undefined;
+    this.seguidoresControlService.urlThermalImageSeguidor = undefined;
+    this.imageSelected = 0;
+    if (this.visualCanvas !== undefined) {
+      this.visualCanvas.clear();
+    }
+    this.seguidoresControlService.imageExist = true;
   }
 
-  public closeSidenav() {
-    return this.sidenav.close();
+  get sidenav() {
+    return this._sidenav;
+  }
+
+  set sidenav(value: MatSidenav) {
+    this._sidenav = value;
   }
 
   get imageSelected() {
@@ -69,19 +84,27 @@ export class SeguidorViewService {
     this.anomaliaHovered$.next(value);
   }
 
-  get imageCanvas() {
-    return this._imageCanvas;
+  get visualCanvas() {
+    return this._visualCanvas;
   }
 
-  set imageCanvas(value: any) {
-    this._imageCanvas = value;
+  set visualCanvas(value: any) {
+    this._visualCanvas = value;
   }
 
-  get imageLoaded() {
+  get thermalCanvas() {
+    return this._thermalCanvas;
+  }
+
+  set thermalCanvas(value: any) {
+    this._thermalCanvas = value;
+  }
+
+  get imagesLoaded() {
     return this._imageLoaded;
   }
 
-  set imageLoaded(value: boolean) {
+  set imagesLoaded(value: boolean) {
     this._imageLoaded = value;
     this.imageLoaded$.next(value);
   }

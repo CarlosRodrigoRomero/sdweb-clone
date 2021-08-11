@@ -1,10 +1,10 @@
 .anomalias-list {
-  /* height: 25vh; */
+  max-height: calc(100vh - 90px);
   overflow: auto;
 }
 
 table {
-  width: 100%;
+  width: 500px;
 }
 
 .mat-row {

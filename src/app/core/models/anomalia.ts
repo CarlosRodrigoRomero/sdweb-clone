@@ -25,6 +25,7 @@ export class Anomalia implements FilterableElement {
   localId?: string;
   localX?: number;
   localY?: number;
+  irradiancia?: number;
 
   camaraModelo?: string;
   camaraSN?: number;

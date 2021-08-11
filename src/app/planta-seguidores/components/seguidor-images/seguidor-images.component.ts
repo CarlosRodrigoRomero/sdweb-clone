@@ -8,8 +8,8 @@ declare let fabric;
 
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
-import { AnomaliaService } from '@core/services/anomalia.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
+import { SeguidorService } from '@core/services/seguidor.service';
 
 import { PcInterface } from '@core/models/pc';
 import { Seguidor } from '@core/models/seguidor';
@@ -22,18 +22,19 @@ import { Anomalia } from '@core/models/anomalia';
 })
 export class SeguidorImagesComponent implements OnInit, OnDestroy {
   private seguidorSelected: Seguidor;
-  private imageSelected = new Image();
+  private imageVisual = new Image();
+  private imageThermal = new Image();
+
   anomaliaSelected: Anomalia = undefined;
   prevAnomaliaSelected: Anomalia = undefined;
-  thermalImage = new Image();
-  imageLoaded: boolean;
-  visualImageLoaded: boolean;
+  imageSelected = 0;
+  imagesLoaded: boolean;
   zoomSquare = 200;
-  visualCanvas: any;
   viewSelected = 0;
 
   imageSeguidor;
-  imageCanvas;
+  visualCanvas;
+  thermalCanvas;
   anomsCanvas;
   canvas: any;
   sw = 2;
@@ -45,16 +46,18 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
   constructor(
     private seguidoresControlService: SeguidoresControlService,
     private mapSeguidoresService: MapSeguidoresService,
-    private anomaliaService: AnomaliaService,
-    private seguidorViewService: SeguidorViewService
+    private seguidorViewService: SeguidorViewService,
+    private seguidorService: SeguidorService
   ) {}
 
   ngOnInit(): void {
     // nos suscribimos a la carga de la imagen
-    this.subscriptions.add(this.seguidorViewService.imageLoaded$.subscribe((loaded) => (this.imageLoaded = loaded)));
+    this.subscriptions.add(this.seguidorViewService.imageLoaded$.subscribe((loaded) => (this.imagesLoaded = loaded)));
 
-    this.imageCanvas = new fabric.Canvas('image-canvas');
-    this.seguidorViewService.imageCanvas = this.imageCanvas;
+    this.visualCanvas = new fabric.Canvas('visual-canvas');
+    this.seguidorViewService.visualCanvas = this.visualCanvas;
+    this.thermalCanvas = new fabric.Canvas('thermal-canvas');
+    this.seguidorViewService.thermalCanvas = this.thermalCanvas;
     this.anomsCanvas = new fabric.Canvas('anomalias-canvas');
     this.setEventListenersCanvas();
 
@@ -82,68 +85,93 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
               this.seguidorViewService.anomaliaSelected$,
               this.seguidorViewService.prevAnomaliaSelected$,
             ]);
+          }),
+          switchMap(([anomSel, prevAnomSel]) => {
+            this.anomaliaSelected = anomSel;
+            this.prevAnomaliaSelected = prevAnomSel;
+
+            if (this.seguidorSelected !== undefined) {
+              if (this.anomaliaSelected !== undefined) {
+                this.setAnomaliaStyle(this.anomaliaSelected, true);
+              }
+
+              if (this.prevAnomaliaSelected !== undefined) {
+                this.setAnomaliaStyle(this.prevAnomaliaSelected, false);
+              }
+            }
+
+            this.anomsCanvas.renderAll();
+
+            return combineLatest([
+              this.seguidoresControlService.urlVisualImageSeguidor$,
+              this.seguidoresControlService.urlThermalImageSeguidor$,
+              this.seguidorViewService.imageSelected$,
+            ]);
           })
         )
-        .subscribe(([anomSel, prevAnomSel]) => {
-          this.anomaliaSelected = anomSel;
-          this.prevAnomaliaSelected = prevAnomSel;
+        .subscribe(([urlVisual, urlThermal, image]) => {
+          this.imageSelected = Number(image);
 
-          if (this.anomaliaSelected !== undefined) {
-            this.setAnomaliaStyle(this.anomaliaSelected, true);
+          if (this.imageSelected === 0) {
+            // mostramos imagen termica
+            document.getElementById('thermal-canvas').style.visibility = 'visible';
+
+            if (this.seguidorSelected !== undefined) {
+              // creamos las anomalias de nuevo al volver a la vista termica
+              if (this.anomsCanvas !== undefined && this.anomsCanvas.isEmpty()) {
+                this.drawAnomalias();
+              }
+            }
+          } else {
+            // ocultamos imagen termica
+            document.getElementById('thermal-canvas').style.visibility = 'hidden';
+
+            // quitamos las anomalias al seleccionar la vista visual
+            if (this.anomsCanvas !== undefined) {
+              this.anomsCanvas.clear();
+            }
           }
 
-          if (this.prevAnomaliaSelected !== undefined) {
-            this.setAnomaliaStyle(this.prevAnomaliaSelected, false);
-          }
+          this.imageThermal.src = urlThermal;
 
-          this.anomsCanvas.renderAll();
+          this.imageThermal.onload = () => {
+            this.seguidorViewService.imagesLoaded = true;
+
+            this.thermalCanvas.setBackgroundImage(
+              new fabric.Image(this.imageThermal, {
+                left: 0,
+                top: 0,
+                angle: 0,
+                opacity: 1,
+                draggable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                scaleX: this.thermalCanvas.width / this.imageThermal.width,
+                scaleY: this.thermalCanvas.height / this.imageThermal.height,
+              }),
+              this.thermalCanvas.renderAll.bind(this.thermalCanvas)
+            );
+          };
+
+          this.imageVisual.src = urlVisual;
+
+          this.imageVisual.onload = () => {
+            this.visualCanvas.setBackgroundImage(
+              new fabric.Image(this.imageVisual, {
+                left: 0,
+                top: 0,
+                angle: 0,
+                opacity: 1,
+                draggable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                scaleX: this.visualCanvas.width / this.imageVisual.width,
+                scaleY: this.visualCanvas.height / this.imageVisual.height,
+              }),
+              this.visualCanvas.renderAll.bind(this.visualCanvas)
+            );
+          };
         })
-    );
-
-    this.subscriptions.add(
-      combineLatest([
-        this.seguidoresControlService.urlVisualImageSeguidor$,
-        this.seguidoresControlService.urlThermalImageSeguidor$,
-        this.seguidorViewService.imageSelected$,
-      ]).subscribe(([urlVisual, urlThermal, image]) => {
-        // tslint:disable-next-line: triple-equals
-        if (image == 0) {
-          this.imageSelected.src = urlThermal;
-
-          // creamos las anomalias de nueva al volver a la vista termica
-          if (this.anomsCanvas !== undefined && this.anomsCanvas.isEmpty()) {
-            this.drawAnomalias();
-          }
-
-          // this.anomsCanvas.renderAll();
-        } else {
-          this.imageSelected.src = urlVisual;
-
-          // quitamos las anomalias al seleccionar la vista visual
-          if (this.anomsCanvas !== undefined) {
-            this.anomsCanvas.clear();
-          }
-        }
-
-        this.imageSelected.onload = () => {
-          this.seguidorViewService.imageLoaded = true;
-
-          this.imageCanvas.setBackgroundImage(
-            new fabric.Image(this.imageSelected, {
-              left: 0,
-              top: 0,
-              angle: 0,
-              opacity: 1,
-              draggable: false,
-              lockMovementX: true,
-              lockMovementY: true,
-              scaleX: this.imageCanvas.width / this.imageSelected.width,
-              scaleY: this.imageCanvas.height / this.imageSelected.height,
-            }),
-            this.imageCanvas.renderAll.bind(this.imageCanvas)
-          );
-        };
-      })
     );
   }
 
@@ -151,14 +179,13 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     this.anomsCanvas.clear();
 
     // tslint:disable-next-line: triple-equals
-    const anomaliasNoTipo0 = this.seguidorSelected.anomalias.filter((anom) => anom.tipo != 0);
-
-    // tslint:disable-next-line: triple-equals
     if (this.viewSelected == 1) {
       // en el view Cels. Calientes solo mostramos estas
-      anomaliasNoTipo0.filter((anom) => anom.tipo === 8 || anom.tipo === 9).forEach((anom) => this.drawAnomalia(anom));
+      this.seguidorSelected.anomaliasCliente
+        .filter((anom) => anom.tipo === 8 || anom.tipo === 9)
+        .forEach((anom) => this.drawAnomalia(anom));
     } else {
-      anomaliasNoTipo0.forEach((anom) => this.drawAnomalia(anom));
+      this.seguidorSelected.anomaliasCliente.forEach((anom) => this.drawAnomalia(anom));
     }
   }
 
@@ -185,7 +212,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
       anomalia,
     });
 
-    const textId = new fabric.Text('#'.concat(pc.local_id.toString().concat(' ')), {
+    /* const textId = new fabric.Text('#'.concat(pc.local_id.toString().concat(' ')), {
       left: pc.img_left,
       top: pc.img_top - 26,
       fontSize: 18,
@@ -194,22 +221,22 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
       selectable: false,
       hoverCursor: 'default',
       fill: 'white',
-    });
+    }); */
 
     this.anomsCanvas.add(polygon);
-    this.anomsCanvas.add(textId);
+    // this.anomsCanvas.add(textId);
     this.anomsCanvas.renderAll();
   }
 
   private getAnomaliaColor(anomalia: Anomalia): string {
     // tslint:disable-next-line: triple-equals
     if (this.viewSelected == 0) {
-      return this.anomaliaService.getPerdidasColor(this.seguidorSelected.anomalias, anomalia);
+      return this.seguidorService.getPerdidasAnomColor(anomalia);
       // tslint:disable-next-line: triple-equals
     } else if (this.viewSelected == 1) {
-      return this.anomaliaService.getCelsCalientesColor(anomalia);
+      return this.seguidorService.getCelsCalientesAnomColor(anomalia);
     } else {
-      return this.anomaliaService.getGradienteColor(this.seguidorSelected.anomalias, anomalia);
+      return this.seguidorService.getGradienteAnomColor(anomalia);
     }
   }
 
@@ -242,7 +269,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
           this.seguidorViewService.prevAnomaliaSelected = this.anomaliaSelected;
 
           // seleccionamos la nueva
-          const anomaliaSelected = this.seguidorSelected.anomalias.find((anom) => anom.id === e.target.anomId);
+          const anomaliaSelected = this.seguidorSelected.anomaliasCliente.find((anom) => anom.id === e.target.anomId);
 
           this.seguidorViewService.anomaliaSelected = anomaliaSelected;
 
@@ -258,19 +285,21 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
 
     this.anomsCanvas.on('mouse:move', (e) => {
       zoomCtx.fillStyle = 'white';
-      // zoomCtx.clearRect(0,0, zoom.width, zoom.height);
-      // zoomCtx.fillStyle = "transparent";
       zoomCtx.fillRect(0, 0, zoom.width, zoom.height);
-      // const visualCanvas = document.getElementById(
-      //   "visual-canvas"
-      // ) as HTMLCanvasElement;
-      const scaleX = this.imageSelected.width / this.anomsCanvas.width;
-      const scaleY = this.imageSelected.height / this.anomsCanvas.height;
+
+      let image;
+      if (this.imageSelected === 0) {
+        image = this.imageThermal;
+      } else {
+        image = this.imageVisual;
+      }
+      const scaleX = image.width / this.anomsCanvas.width;
+      const scaleY = image.height / this.anomsCanvas.height;
 
       const zoomFactor = 2;
 
       zoomCtx.drawImage(
-        this.imageSelected,
+        image,
         e.pointer.x * scaleX - this.zoomSquare / 2 / zoomFactor,
         e.pointer.y * scaleY - this.zoomSquare / 2 / zoomFactor,
         this.zoomSquare,
@@ -280,7 +309,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
         this.zoomSquare * zoomFactor,
         this.zoomSquare * zoomFactor
       );
-      // console.log(zoom.style);
+
       zoom.style.top = e.pointer.y - this.zoomSquare / 2 + 'px';
       zoom.style.left = e.pointer.x + 20 + 'px';
       zoom.style.display = 'block';

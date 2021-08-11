@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { InformeInterface } from '../models/informe';
-import { map, take } from 'rxjs/operators';
+import { filter, map, take } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { GLOBAL } from './global';
@@ -105,6 +105,12 @@ export class InformeService {
             data.id = a.payload.doc.id;
             return data;
           })
+      ),
+      // los ordenamos por fecha
+      map((informes) => informes.sort((a, b) => a.fecha - b.fecha)),
+      // nos quedamos con los 2 más recientes por el momento
+      map((informes) =>
+        informes.filter((informe, index) => index === informes.length - 1 || index === informes.length - 2)
       )
     );
   }

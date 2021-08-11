@@ -1,4 +1,4 @@
-<div *ngIf="anomaliaSelected">
+<div class="anomalia-info" *ngIf="anomaliaSelected">
   <h5 class="title">
     Anomalía <b>#{{ anomaliaInfo.localId }}</b>
     <span *ngIf="anomaliaInfo.clase !== undefined" [ngStyle]="{ color: anomaliaInfo.claseColor }">
@@ -7,110 +7,61 @@
   </h5>
   <div class="line-info">
     <div
+      class="subtitle"
       *ngIf="
         anomaliaInfo.temperaturaMax !== undefined ||
         anomaliaInfo.temperaturaRef !== undefined ||
         anomaliaInfo.gradienteNormalizado !== undefined
       "
-      class="subtitle-icon"
     >
-      <mat-icon>thermostat</mat-icon>
-      <span class="subtitle">Temperaturas: </span>
+      <mat-icon style="color: red">thermostat</mat-icon>
+      <span class="subtitle-label">Temperaturas:</span>
     </div>
-
     <div class="line-content">
-      <div *ngIf="anomaliaInfo.temperaturaMax !== undefined">
-        <span><u>Temp. máxima:</u></span>
-        <span>{{ anomaliaInfo.temperaturaMax }} ºC</span>
-      </div>
-      <div *ngIf="anomaliaInfo.temperaturaRef !== undefined">
-        <span>Temp. referencia:</span>
-        <span style="color: blue">{{ anomaliaInfo.temperaturaRef }} ºC</span>
-      </div>
-      <div *ngIf="anomaliaInfo.gradienteNormalizado !== undefined">
-        <span>&Delta;T (normalizado):</span>
-        <span style="color: red">+ {{ anomaliaInfo.gradienteNormalizado | number: '1.0-1' }} ºC</span>
-      </div>
+      <span *ngIf="anomaliaInfo.temperaturaMax !== undefined"
+        >T. Máx: <b>{{ anomaliaInfo.temperaturaMax }}ºC</b></span
+      >
+      <span *ngIf="anomaliaInfo.temperaturaRef !== undefined" style="color: blue"
+        >T. Ref: <b>{{ anomaliaInfo.temperaturaRef }}ºC</b>
+      </span>
+      <span *ngIf="anomaliaInfo.gradienteNormalizado !== undefined" style="color: red"
+        >&Delta;T (norm): <b>+ {{ anomaliaInfo.gradienteNormalizado | number: '1.0-1' }}ºC</b></span
+      >
     </div>
   </div>
   <div class="line-info">
-    <div class="subtitle-icon">
-      <mat-icon>trending_down</mat-icon>
-      <span class="subtitle">Pérdidas: </span>
-    </div>
-    <span class="line-content">{{ anomaliaInfo.perdidas * 100 }}%</span>
-  </div>
-  <div class="line-info">
-    <div class="subtitle-icon">
-      <mat-icon>report_problem</mat-icon>
-      <span class="subtitle">Anomalía: </span>
-    </div>
-    <!-- <span *ngIf="checkIsMoreThanOne(pc.modulosAfectados)"> Módulos afectados: {{ pc.modulosAfectados }}. </span> -->
-    <span class="line-content">{{ anomaliaInfo.tipo }}</span>
-  </div>
-  <div class="line-info">
-    <div class="subtitle-icon">
-      <mat-icon>flag</mat-icon>
-      <span class="subtitle">Causa: </span>
+    <div class="subtitle">
+      <mat-icon style="color: darkorange">flag</mat-icon>
+      <span class="subtitle-label">Causa: </span>
     </div>
     <span class="line-content">{{ anomaliaInfo.causa }}</span>
   </div>
   <div class="line-info">
-    <div class="subtitle-icon">
-      <mat-icon>check_circle</mat-icon>
-      <span class="subtitle">Actuación recomendada: </span>
+    <div class="subtitle">
+      <mat-icon style="color: green">check_circle</mat-icon>
+      <span class="subtitle-label">Actuación recomendada: </span>
     </div>
     <span class="line-content">{{ anomaliaInfo.recomendacion }}</span>
   </div>
   <div class="line-info">
-    <div class="subtitle-icon">
-      <mat-icon>assistant_direction</mat-icon>
-      <span class="subtitle">Localización: </span>
+    <div class="subtitle">
+      <mat-icon style="color: purple">assistant_direction</mat-icon>
+      <span class="subtitle-label">Localización: </span>
     </div>
     <div class="line-content">
-      <span>Fila: {{ anomaliaInfo.fila }}</span>
-      <span>Columna: {{ anomaliaInfo.columna }}</span>
+      <span
+        >Fila: <b>{{ anomaliaInfo.fila }}</b></span
+      >
+      <span
+        >Columna: <b>{{ anomaliaInfo.columna }}</b>
+      </span>
     </div>
   </div>
   <div class="line-info">
-    <div class="subtitle-icon">
-      <mat-icon>schedule</mat-icon>
-      <span class="subtitle">Fecha de captura: </span>
+    <div class="subtitle">
+      <mat-icon style="color: blue">today</mat-icon>
+      <span class="subtitle-label">Fecha de captura: </span>
     </div>
     <span class="line-content">{{ anomaliaInfo.fecha * 1000 | date: 'dd/MM/yyyy HH:mm' }}</span>
-  </div>
-  <div
-    *ngIf="
-      anomaliaInfo.irradiancia !== undefined &&
-      anomaliaInfo.vientoDireccion !== undefined &&
-      anomaliaInfo.vientoVelocidad !== undefined &&
-      anomaliaInfo.temperaturaAire !== undefined &&
-      anomaliaInfo.nubosidad !== undefined
-    "
-    class="line-info"
-  >
-    <div class="subtitle-icon">
-      <mat-icon>brightness_high</mat-icon>
-      <span class="subtitle">Meteo:</span>
-    </div>
-    <div *ngIf="anomaliaInfo.irradiancia !== undefined" class="line-content">
-      <span>Irradiancia:</span>
-      <span>{{ anomaliaInfo.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></span>
-    </div>
-    <div *ngIf="anomaliaInfo.vientoDireccion !== undefined" class="line-content">
-      <span>Dirección viento:</span>
-      <span>{{ anomaliaInfo.vientoDireccion }}</span>
-    </div>
-    <div *ngIf="anomaliaInfo.vientoVelocidad !== undefined" class="line-content">
-      <span>Velocidad viento:</span>
-      <span>{{ anomaliaInfo.vientoVelocidad }}</span>
-    </div>
-    <div *ngIf="anomaliaInfo.temperaturaAire !== undefined" class="line-content">
-      <span>Temperatura ambiente:</span>
-      <span>{{ anomaliaInfo.temperaturaAire }}ºC</span>
-    </div>
-    <div *ngIf="anomaliaInfo.nubosidad !== undefined" class="line-content">
-      <span>Nubosidad:</span> <span>{{ anomaliaInfo.nubosidad }}/8 octavas</span>
-    </div>
   </div>
 </div>

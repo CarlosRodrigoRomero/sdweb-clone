@@ -23,6 +23,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public notSharedReport = true;
   public showFilters = true;
   thereAreZones = true;
+  public mapLoaded = false;
   private subscriptions: Subscription = new Subscription();
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
@@ -39,27 +40,37 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(
-      this.reportControlService.initService().subscribe((value) => (this.seguidoresLoaded = value))
-    );
+    this.reportControlService.initService().then((res) => (this.seguidoresLoaded = res));
+
     this.subscriptions.add(
       this.reportControlService.sharedReportWithFilters$.subscribe((value) => (this.showFilters = value))
     );
+
     this.subscriptions.add(
       this.reportControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value))
     );
+
     this.subscriptions.add(
       this.seguidoresControlService.seguidorViewOpened$.subscribe((opened) => (this.seguidorViewOpened = opened))
     );
+
     this.subscriptions.add(this.reportControlService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
+
+    this.subscriptions.add(this.reportControlService.mapLoaded$.subscribe((value) => (this.mapLoaded = value)));
   }
 
   ngAfterViewInit(): void {
-    this.seguidorViewService.setSidenav(this.sidenavSeguidorView);
+    this.seguidorViewService.sidenav = this.sidenavSeguidorView;
+
+    this.statsService.setSidenav(this.sidenavStats);
   }
 
   loadStats() {
     this.statsService.loadStats = true;
+  }
+
+  resetSeguidorView() {
+    this.seguidorViewService.resetViewValues();
   }
 
   ngOnDestroy(): void {
@@ -69,5 +80,6 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     // reseteamos los servicios a sus valores por defecto
     this.reportControlService.resetService();
     this.olMapService.resetService();
+    this.seguidorViewService.sidenav = undefined;
   }
 }

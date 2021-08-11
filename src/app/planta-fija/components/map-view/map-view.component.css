@@ -29,9 +29,12 @@
   }
 }
 
+.stas-container {
+  position: relative;
+}
+
 .main-container {
   position: relative;
-  /* height: 100%; */
 }
 
 .btns-export {
@@ -86,7 +89,7 @@ app-share-map {
 .stats-sidenav {
   position: absolute;
   display: flex;
-  margin: 60px 10px 10px;
+  margin: 10px 10px 10px;
   padding: 10px;
   border-radius: 4px;
   width: 80%;
@@ -124,12 +127,4 @@ app-share-map {
 
 .titulo {
   margin: 4px 10px 0;
-}
-
-/* #sidenavStats {
-  top: 140px;
-} */
-
-app-filter-pcs-list {
-  height: 100%;
 }

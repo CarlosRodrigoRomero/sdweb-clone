@@ -66,6 +66,7 @@
 
 .help {
   cursor: pointer;
+  margin-right: 0.5rem;
 }
 
 @media (max-width: 730px) {

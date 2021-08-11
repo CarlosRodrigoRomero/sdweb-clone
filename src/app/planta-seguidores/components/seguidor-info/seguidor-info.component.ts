@@ -25,8 +25,7 @@ export class SeguidorInfoComponent implements OnInit, OnDestroy {
         this.seguidorHovered = seguidor;
 
         if (this.seguidorHovered !== undefined) {
-          // tslint:disable-next-line: triple-equals
-          this.numAnomalias = this.seguidorHovered.anomalias.filter((anom) => anom.tipo != 0).length;
+          this.numAnomalias = this.seguidorHovered.anomaliasCliente.length;
         }
       })
     );

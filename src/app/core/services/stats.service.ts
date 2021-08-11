@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 
+import { MatSidenav } from '@angular/material/sidenav';
+
 import { BehaviorSubject } from 'rxjs';
 
 import { ReportControlService } from '@core/services/report-control.service';
@@ -18,6 +20,7 @@ export class StatsService {
   dateLabels: string[] = [];
   private _loadCCyGradChart = true;
   loadCCyGradChart$ = new BehaviorSubject<boolean>(this._loadCCyGradChart);
+  private sidenav: MatSidenav;
 
   constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
 
@@ -29,6 +32,14 @@ export class StatsService {
     });
 
     return this.initialized$;
+  }
+
+  setSidenav(sidenav: MatSidenav) {
+    this.sidenav = sidenav;
+  }
+
+  closeStatsSidenav() {
+    return this.sidenav.toggle();
   }
 
   get loadStats() {

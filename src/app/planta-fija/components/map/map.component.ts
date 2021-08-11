@@ -247,9 +247,13 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     this.subscriptions.add(
-      this.olMapService
-        .createMap('map', layers, view, defaultControls({ attribution: false }))
-        .subscribe((map) => (this.map = map))
+      this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {
+        this.map = map;
+
+        this.map.once('postrender', () => {
+          setTimeout(() => (this.reportControlService.mapLoaded = true), 2000);
+        });
+      })
     );
 
     this.anomaliaLayers.forEach((l) => this.map.addLayer(l));

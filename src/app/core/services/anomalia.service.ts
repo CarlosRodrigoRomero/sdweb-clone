@@ -35,7 +35,7 @@ export class AnomaliaService {
     private adminService: AdminService
   ) {}
 
-  initService(plantaId: string): Promise<boolean> {
+  initService(plantaId: string): Promise<void> {
     // obtenemos el criterio de criticidad de la planta si tuviese
     let criterioId: string;
     return new Promise((resolve, reject) => {
@@ -82,7 +82,7 @@ export class AnomaliaService {
           }
 
           // servicio iniciado
-          resolve(true);
+          resolve();
         });
     });
   }
@@ -140,13 +140,6 @@ export class AnomaliaService {
         return combineLatest(anomaliaObsList);
       }),
       map((arr) => arr.flat())
-      // TODO: revisar cuando aparezca planta con 'anomalias' y 'pcs'
-      /* ,
-      // eliminamos las anomalias "vacias" por haber llamado a 'pcs' y 'anomalias'
-      map((anoms) => {
-        console.log(anoms);
-        return (anoms = anoms.filter((anom) => anom.perdidas !== 0));
-      }) */
     );
 
     return query$;
@@ -197,9 +190,7 @@ export class AnomaliaService {
 
             return data;
           })
-        ),
-        // filtramos las que tienen criticidad null ya que para el cliente no son anomalias
-        map((anoms) => anoms.filter((anom) => anom.criticidad !== null))
+        )
       );
 
     return query$;
@@ -317,40 +308,6 @@ export class AnomaliaService {
     }
 
     return criticidad;
-  }
-
-  getPerdidasColor(anomalias: Anomalia[], anomaliaSelected: Anomalia) {
-    const perdidas = anomalias.map((anom) => anom.perdidas);
-    const perdidasMax = Math.max(...perdidas);
-    const perdidasMin = Math.min(...perdidas);
-
-    if (anomaliaSelected.perdidas <= (perdidasMax - perdidasMin) / 3) {
-      return GLOBAL.colores_mae[0];
-    } else if (anomaliaSelected.perdidas <= (2 * (perdidasMax - perdidasMin)) / 3) {
-      return GLOBAL.colores_mae[1];
-    } else {
-      return GLOBAL.colores_mae[2];
-    }
-  }
-
-  getCelsCalientesColor(anomaliaSelected: Anomalia) {
-    return 'red';
-  }
-
-  getGradienteColor(anomalias: Anomalia[], anomaliaSelected: Anomalia) {
-    const gradientes = anomalias
-      .filter((anom) => anom.gradienteNormalizado !== undefined)
-      .map((anom) => anom.gradienteNormalizado);
-    const gradienteMax = Math.max(...gradientes);
-    const gradienteMin = Math.min(...gradientes);
-
-    if (anomaliaSelected.gradienteNormalizado <= (gradienteMax - gradienteMin) / 3) {
-      return GLOBAL.colores_mae[0];
-    } else if (anomaliaSelected.gradienteNormalizado <= (2 * (gradienteMax - gradienteMin)) / 3) {
-      return GLOBAL.colores_mae[1];
-    } else {
-      return GLOBAL.colores_mae[2];
-    }
   }
 
   downloadRjpg(anomalia: Anomalia) {

@@ -1,66 +1,72 @@
-.title {
-  height: 70px;
-  position: absolute;
-  z-index: 9999;
-}
-
-.btn-close-seguidor-view {
-  position: absolute;
-  right: 16px;
-  top: 16px;
-}
-
-.modulo-label {
-  font-size: large;
-  font-weight: 400;
-  margin-left: 1rem;
-  color: grey;
-}
-
 .seguidor-content {
   padding: 0.5rem;
   display: flex;
   position: relative;
-  gap: 1rem;
+  gap: 0.5rem;
   top: 70px;
 }
 
 .left-content {
   display: grid;
   row-gap: 1rem;
+  width: 640px;
+  grid-template-rows: min-content;
 }
 
 .image-content {
   height: 512px;
+  width: 640px;
+}
+
+.image-not {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.image-not mat-icon {
+  color: blue;
+  font-size: 32px;
+}
+
+.image-not span {
+  font-size: larger;
+  font-weight: 500;
+  margin-left: 1rem;
 }
 
 app-seguidor-view-toggle {
+  position: absolute;
+  left: 130px;
+  top: 472px;
+  z-index: 999;
+}
+
+app-seguidor-image-toggle {
+  position: absolute;
+  top: 15px;
+  left: 475px;
+  z-index: 999;
+}
+
+app-seguidor-view-leyenda {
   position: absolute;
   left: 15px;
   top: 15px;
   z-index: 999;
 }
 
-app-seguidor-image-toggle {
-  position: absolute;
-  top: 472px;
-  left: 475px;
-  z-index: 999;
-}
-
 .right-content {
-  width: calc(calc(100vw * 0.85) - (640px + 32px));
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 1rem;
-  max-width: min-content;
+  width: auto;
 }
 
 .prev-btn {
   position: absolute;
   left: 10px;
   top: 250px;
-  z-index: 2;
+  z-index: 10;
 }
 
 .prev-btn mat-icon {
@@ -72,10 +78,32 @@ app-seguidor-image-toggle {
   position: absolute;
   left: 600px;
   top: 250px;
-  z-index: 2;
+  z-index: 10;
 }
 
 .next-btn mat-icon {
   color: white;
+  font-size: 40px;
+}
+
+.prev-btn-no-image {
+  position: absolute;
+  left: 10px;
+  top: 35px;
+  z-index: 10;
+}
+
+.prev-btn-no-image mat-icon {
+  font-size: 40px;
+}
+
+.next-btn-no-image {
+  position: absolute;
+  left: 600px;
+  top: 35px;
+  z-index: 10;
+}
+
+.next-btn-no-image mat-icon {
   font-size: 40px;
 }

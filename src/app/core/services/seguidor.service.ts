@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { combineLatest, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore } from '@angular/fire/firestore';
@@ -17,6 +17,7 @@ import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
 import { LocationAreaInterface } from '@core/models/location';
 import { InformeInterface } from '@core/models/informe';
+import { Anomalia } from '@core/models/anomalia';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +25,11 @@ import { InformeInterface } from '@core/models/informe';
 export class SeguidorService {
   private planta: PlantaInterface;
   numGlobalCoords: number;
+  private _locAreas: LocationAreaInterface[] = [];
+  locAreas$ = new BehaviorSubject<LocationAreaInterface[]>(this._locAreas);
+
+  minGradNorm: number;
+  maxGradNorm: number;
 
   constructor(
     private informeService: InformeService,
@@ -47,8 +53,6 @@ export class SeguidorService {
         return combineLatest(anomaliaObsList);
       }),
       map((arr) => arr.flat())
-      // eliminamos los seguidores vacios por haber llamado a 'pcs' y 'anomalias'
-      // map((segs) => (segs = segs.filter((seg) => seg.temperaturaMax !== 0 || seg.gradienteNormalizado !== 0)))
     );
   }
 
@@ -62,6 +66,8 @@ export class SeguidorService {
     return combineLatest([locAreaList$, anomaliaList$, getInforme$]).pipe(
       map(([locAreaList, anomaliaList, informe]) => {
         const seguidores: Seguidor[] = [];
+
+        this.getMinMaxGradNorm(anomaliaList);
 
         if (anomaliaList.length > 0) {
           // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
@@ -80,7 +86,7 @@ export class SeguidorService {
             if (notNullLocAreas.length > 0) {
               indiceSeleccionado = index;
 
-              this.numGlobalCoords = indiceSeleccionado;
+              this.numGlobalCoords = indiceSeleccionado + 1;
 
               break;
             }
@@ -94,20 +100,28 @@ export class SeguidorService {
               locArea.globalCoords[indiceSeleccionado] !== ''
           );
 
-          const locAreaNoSeguidores = locAreaList.filter((locArea) => !locAreaSeguidores.includes(locArea));
+          // obtenemos las areas descartando las que no tienen globals, que son las de los modulos
+          const locAreaNoSeguidores = locAreaList
+            .filter((locArea) => !locAreaSeguidores.includes(locArea))
+            .filter((locArea) => locArea.globalCoords.toString() !== ',' && locArea.globalCoords.toString() !== '');
 
-          // obtenemos las globalCoords completas de cada seguidor
-          locAreaSeguidores.forEach((locArea) => {
-            locArea.globalCoords = this.getCompleteGlobalCoords(locAreaNoSeguidores, locArea);
-          });
+          // asignamos las areas de la planta
+          this.locAreas = locAreaNoSeguidores;
+
+          // obtenemos las globalCoords completas de cada seguidor si hay areas mayores
+          if (locAreaNoSeguidores.length > 0) {
+            locAreaSeguidores.forEach((locArea) => {
+              locArea.globalCoords = this.getCompleteGlobalCoords(locAreaNoSeguidores, locArea);
+            });
+          }
 
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
           let count = 0;
           locAreaSeguidores.forEach((locArea) => {
             const anomaliasSeguidor = anomaliaList.filter(
               (anomalia) =>
-                anomalia.globalCoords.slice(0, this.numGlobalCoords + 1).toString() ===
-                locArea.globalCoords.slice(0, this.numGlobalCoords + 1).toString()
+                anomalia.globalCoords.slice(0, this.numGlobalCoords).toString() ===
+                locArea.globalCoords.slice(0, this.numGlobalCoords).toString()
             );
 
             // si no tiene anomalias no creamos el seguidor
@@ -147,7 +161,7 @@ export class SeguidorService {
   }
 
   private getSeguidorName(seguidor: Seguidor): string {
-    let nombre = 'Seguidor ';
+    let nombre = '';
     seguidor.globalCoords.forEach((coord, index) => {
       if (index === 0) {
         nombre = nombre + coord;
@@ -230,5 +244,60 @@ export class SeguidorService {
         xhr.open('GET', downloadUrl);
         xhr.send();
       });
+  }
+
+  private getMinMaxGradNorm(anomalias: Anomalia[]) {
+    // filtramos solo las que tengan gradiente normalizado
+    const anomsOk = anomalias.filter((anom) => anom.gradienteNormalizado !== undefined);
+
+    if (anomsOk.length > 0) {
+      const minGrad = Math.min(...anomsOk.map((anom) => anom.gradienteNormalizado));
+      const maxGrad = Math.max(...anomsOk.map((anom) => anom.gradienteNormalizado));
+
+      if (this.minGradNorm === undefined) {
+        this.minGradNorm = minGrad;
+      } else if (this.minGradNorm > minGrad) {
+        this.minGradNorm = minGrad;
+      }
+
+      if (this.maxGradNorm === undefined) {
+        this.maxGradNorm = maxGrad;
+      } else if (this.maxGradNorm < maxGrad) {
+        this.maxGradNorm = maxGrad;
+      }
+    }
+  }
+
+  getPerdidasAnomColor(anomaliaSelected: Anomalia) {
+    if (anomaliaSelected.perdidas <= 0.33) {
+      return GLOBAL.colores_mae[0];
+    } else if (anomaliaSelected.perdidas > 0.66) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
+  }
+
+  getCelsCalientesAnomColor(anomaliaSelected: Anomalia) {
+    return 'red';
+  }
+
+  getGradienteAnomColor(anomaliaSelected: Anomalia) {
+    if (anomaliaSelected.gradienteNormalizado <= (this.maxGradNorm - this.minGradNorm) / 3) {
+      return GLOBAL.colores_mae[0];
+    } else if (anomaliaSelected.gradienteNormalizado <= (2 * (this.maxGradNorm - this.minGradNorm)) / 3) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
+  }
+
+  get locAreas() {
+    return this._locAreas;
+  }
+
+  set locAreas(value: LocationAreaInterface[]) {
+    this._locAreas = value;
+    this.locAreas$.next(value);
   }
 }

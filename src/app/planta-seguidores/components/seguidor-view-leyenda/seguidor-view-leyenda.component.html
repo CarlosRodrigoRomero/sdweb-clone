@@ -1,0 +1,28 @@
+<mat-card>
+  <mat-card-content>
+    <div *ngIf="viewSelected != 1">
+      <span class="title">{{ viewsTitle[viewSelected] }}</span>
+      <div class="line">
+        <mat-icon [ngStyle]="{ color: colors[0] }">crop_5_4</mat-icon>
+        <span *ngIf="viewSelected == 0">< 33%</span>
+        <span *ngIf="viewSelected == 2">< {{ gradNormLevels[0] | number: '1.0-1' }} ºC</span>
+      </div>
+      <div class="line">
+        <mat-icon [ngStyle]="{ color: colors[1] }">crop_5_4</mat-icon>
+        <span *ngIf="viewSelected == 0">34% - 66%</span>
+        <span *ngIf="viewSelected == 2"
+          >{{ gradNormLevels[0] | number: '1.0-1' }} - {{ gradNormLevels[1] | number: '1.0-1' }} ºC</span
+        >
+      </div>
+      <div class="line">
+        <mat-icon [ngStyle]="{ color: colors[2] }">crop_5_4</mat-icon>
+        <span *ngIf="viewSelected == 0">> 67%</span>
+        <span *ngIf="viewSelected == 2">> {{ gradNormLevels[1] | number: '1.0-1' }} ºC</span>
+      </div>
+    </div>
+    <div *ngIf="viewSelected == 1">
+      <span class="cc-label" *ngIf="numCelsCalientes === 0">Ningún módulo con celulas calientes</span>
+      <span class="cc-label" *ngIf="numCelsCalientes > 0">Solo módulos con celulas calientes</span>
+    </div>
+  </mat-card-content>
+</mat-card>

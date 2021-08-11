@@ -20,6 +20,7 @@ import { ThermalSliderComponent } from './components/thermal-slider/thermal-slid
 import { PlantSummaryComponent } from './components/plant-summary/plant-summary.component';
 import { MatSelectedSearchComponent } from './components/mat-selected-search/mat-selected-search.component';
 import { MatDialogConfirmComponent } from './components/mat-dialog-confirm/mat-dialog-confirm.component';
+import { LoadingComponent } from './components/loading/loading.component';
 
 const components = [
   NavbarComponent,
@@ -27,6 +28,7 @@ const components = [
   ThermalSliderComponent,
   PlantSummaryComponent,
   MatSelectedSearchComponent,
+  LoadingComponent,
 ];
 const modules = [
   CommonModule,

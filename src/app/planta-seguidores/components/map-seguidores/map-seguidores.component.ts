@@ -169,21 +169,35 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
       // extent: this.extent1,
     });
 
-    const layers = [satelliteLayer];
+    const aerial = new XYZ({
+      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInformeId + '_visual/{z}/{x}/{y}.png',
+      crossOrigin: '',
+    });
+
+    this.aerialLayer = new TileLayer({
+      source: aerial,
+    });
+
+    const layers = [satelliteLayer, this.aerialLayer];
 
     // MAPA
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
       zoom: this.planta.zoom,
-      maxZoom: 20,
-      minZoom: 14,
+      minZoom: this.planta.zoom - 2,
+      maxZoom: this.planta.zoom + 8,
     });
 
     // creamos el mapa a traves del servicio y nos subscribimos a el
     this.subscriptions.add(
-      this.olMapService
-        .createMap('map', layers, view, defaultControls({ attribution: false }))
-        .subscribe((map) => (this.map = map))
+      this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {
+        this.map = map;
+
+        this.map.once('postrender', () => {
+          // setTimeout(() => (this.reportControlService.mapLoaded = true), 2000);
+          this.reportControlService.mapLoaded = true;
+        });
+      })
     );
 
     this.seguidorLayers.forEach((l) => this.map.addLayer(l));

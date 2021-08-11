@@ -36,4 +36,8 @@ export class PlantaStatsComponent implements OnInit {
       this.plantaDemo = true;
     }
   }
+
+  closeSidenav() {
+    this.statsService.closeStatsSidenav();
+  }
 }
