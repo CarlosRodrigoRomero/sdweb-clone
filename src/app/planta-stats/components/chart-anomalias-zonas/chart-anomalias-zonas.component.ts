@@ -249,12 +249,11 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
         },
         tooltip: {
           followCursor: false,
-          theme: 'dark',
           x: {
-            show: false,
-          },
-          marker: {
-            show: false,
+            show: true,
+            formatter: (v) => {
+              return titleXAxis + ' ' + v;
+            },
           },
           y: {
             title: {

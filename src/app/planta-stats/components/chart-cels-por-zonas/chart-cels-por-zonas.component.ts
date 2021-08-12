@@ -201,7 +201,7 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
           colors: ['transparent'],
         },
         xaxis: {
-          // categories: this.zones.map((zone) => zone.globalCoords[0]),
+          categories: this.zones.map((zone) => zone.globalCoords[0]),
           title: {
             text: titleXAxis,
           },
@@ -229,12 +229,11 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
         },
         tooltip: {
           followCursor: false,
-          theme: 'dark',
           x: {
-            show: false,
-          },
-          marker: {
-            show: false,
+            show: true,
+            formatter: (v) => {
+              return titleXAxis + ' ' + v;
+            },
           },
           y: {
             title: {
