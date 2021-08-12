@@ -216,6 +216,7 @@ export class AnomaliaService {
       .doc(anomalia.id)
       .update({
         globalCoords: anomalia.globalCoords,
+        // modulo: anomalia.modulo,
       })
       .then(() => {
         console.log('Document successfully updated!');

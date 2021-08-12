@@ -128,9 +128,15 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
         }),
         text: new Text({
           font: '16px "Open Sans", "Arial Unicode MS", "sans-serif"',
-          placement: 'line',
+          placement: 'point',
+          textAlign: 'end',
+          textBaseline: 'end',
           fill: new Fill({
             color: 'white',
+          }),
+          stroke: new Stroke({
+            color: 'black',
+            width: 1,
           }),
           text: '',
         }),
@@ -153,9 +159,18 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
             }
           });
         } else {
-          this.nombreGlobalCoords.forEach(() => {
+          if (
+            feature.get('globalCoords')[0] !== null &&
+            feature.get('globalCoords')[0] !== undefined &&
+            feature.get('globalCoords')[0] !== ''
+          ) {
+            style.getText().setText(this.nombreGlobalCoords[0] + ' ' + feature.get('globalCoords')[0]);
+          } else {
             style.getText().setText('');
-          });
+          }
+          // this.nombreGlobalCoords.forEach(() => {
+          //   style.getText().setText('');
+          // });
         }
 
         return style;
