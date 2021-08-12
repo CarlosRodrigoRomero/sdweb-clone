@@ -1,5 +1,5 @@
-import { Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
@@ -33,6 +33,7 @@ import { InformeService } from '@core/services/informe.service';
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
 import { InformeInterface } from '@core/models/informe';
+import { Subscription } from 'rxjs';
 
 interface InfoAdicional {
   id?: string;
@@ -82,7 +83,7 @@ interface Zona {
   templateUrl: './anomalia-info.component.html',
   styleUrls: ['./anomalia-info.component.css'],
 })
-export class AnomaliaInfoComponent implements OnInit, OnChanges {
+export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
   @Input() anomaliaSelect: Anomalia;
   @Input() anomaliaHover: Anomalia;
   public displayedColumns: string[] = ['clase', 'tipo', 'tempMax', 'gradienteNormalizado', 'perdidas'];
@@ -101,14 +102,15 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
   public seccionVuelo = false;
   private informeSelected: InformeInterface = undefined;
 
+  private subscriptions: Subscription = new Subscription();
+
   @ViewChild('swiperRef', { static: false }) swiperRef?: SwiperComponent;
 
   constructor(
     private plantaService: PlantaService,
-    private activatedRoute: ActivatedRoute,
     private router: Router,
     private shareReportService: ShareReportService,
-    private anomaliaService: AnomaliaService,
+    public anomaliaService: AnomaliaService,
     private storage: AngularFireStorage,
     private reportControlService: ReportControlService,
     private informeService: InformeService
@@ -127,17 +129,23 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
     this.coloresClase = GLOBAL.colores_clase;
 
     if (this.router.url.includes('shared')) {
-      this.shareReportService.getParams().subscribe((params) => (this.plantaId = params.plantaId));
+      this.subscriptions.add(
+        this.shareReportService.getParams().subscribe((params) => (this.plantaId = params.plantaId))
+      );
     } else {
       this.plantaId = this.reportControlService.plantaId;
     }
+
     this.plantaService
       .getPlanta(this.plantaId)
+      .pipe(take(1))
       .subscribe((planta) => (this.nombreGlobalCoords = planta.nombreGlobalCoords));
 
-    this.reportControlService.selectedInformeId$
-      .pipe(switchMap((informeID) => this.informeService.getInforme(informeID)))
-      .subscribe((informe) => (this.informeSelected = informe));
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$
+        .pipe(switchMap((informeId) => this.informeService.getInforme(informeId)))
+        .subscribe((informe) => (this.informeSelected = informe))
+    );
   }
 
   ngOnChanges() {
@@ -399,5 +407,9 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges {
         xhr.open('GET', downloadUrl);
         xhr.send();
       });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

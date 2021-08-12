@@ -32,7 +32,7 @@
         <span class="subtitulo">CoA {{ anomaliaHover.clase }}</span>
       </div>
       <div class="elemento" *ngIf="anomaliaHover.criticidad !== undefined">
-        <span class="titulo">Criticidad</span>
+        <span class="titulo">Criticidad (Criterio {{ anomaliaService.criterioCriticidad.nombre }})</span>
         <span class="subtitulo">{{ criticidadLabels[anomaliaHover.criticidad] }}</span>
       </div>
     </mat-card-content>
@@ -95,7 +95,7 @@
               <span class="subtitulo">CoA {{ anomaliaSelect.clase }}</span>
             </div>
             <div class="elemento" *ngIf="anomaliaSelect.criticidad !== undefined">
-              <span class="titulo">Criticidad</span>
+              <span class="titulo">Criticidad (Criterio {{ anomaliaService.criterioCriticidad.nombre }})</span>
               <span class="subtitulo">{{ criticidadLabels[anomaliaSelect.criticidad] }}</span>
             </div>
           </div>

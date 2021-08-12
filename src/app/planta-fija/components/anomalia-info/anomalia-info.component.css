@@ -18,7 +18,7 @@
 }
 
 .popup-hover {
-  width: 300px;
+  width: max-content;
 }
 
 .popup-hover-content {
@@ -28,6 +28,7 @@
 .elemento {
   display: flex;
   justify-content: space-between;
+  gap: 1rem;
 }
 
 .titulo {
