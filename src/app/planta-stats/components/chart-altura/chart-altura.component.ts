@@ -115,8 +115,6 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
             this.informesIdList = informesId;
             this.planta = planta;
 
-            console.log(Math.max(...elems.map((elem) => (elem as Anomalia).localY)));
-
             return this.informeService.getDateLabelsInformes(this.informesIdList);
           })
         )

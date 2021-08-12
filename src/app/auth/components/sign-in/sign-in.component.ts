@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+
+import { Subscription } from 'rxjs';
 
 import { AuthService } from '@core/services/auth.service';
 
@@ -11,18 +13,20 @@ import { UserInterface } from '@core/models/user';
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.css'],
 })
-export class SignInComponent implements OnInit {
+export class SignInComponent implements OnInit, OnDestroy {
   form: FormGroup;
   hide = true;
   warningHide = true;
   private user: UserInterface;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(public authService: AuthService, private formBuilder: FormBuilder, private router: Router) {
     this.buildForm();
   }
 
   ngOnInit(): void {
-    this.authService.user$.subscribe((user) => (this.user = user));
+    this.subscriptions.add(this.authService.user$.subscribe((user) => (this.user = user)));
   }
 
   private buildForm() {
@@ -34,9 +38,8 @@ export class SignInComponent implements OnInit {
 
   signIn(event: Event) {
     if (this.form.valid) {
-      const value = this.form.value;
       this.authService
-        .signIn(value.email, value.password)
+        .signIn(this.form.value.email, this.form.value.password)
         .then(() => {
           if (this.user !== undefined && this.user !== null) {
             if (this.user.role === 0 || this.user.role === 1 || this.user.role === 2) {
@@ -51,5 +54,9 @@ export class SignInComponent implements OnInit {
           this.warningHide = false;
         });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

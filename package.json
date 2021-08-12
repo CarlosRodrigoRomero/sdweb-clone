@@ -49,6 +49,7 @@
     "ng-apexcharts": "^1.5.7",
     "ng2-charts": "^2.4.2",
     "ngx-clipboard": "^14.0.1",
+    "ngx-device-detector": "^2.1.1",
     "ngx-mat-select-search": "^3.3.0",
     "node-sass": "^4.14.1",
     "npm-check": "^5.9.2",
