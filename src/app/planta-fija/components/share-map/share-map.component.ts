@@ -55,7 +55,7 @@ export class ShareMapComponent implements OnInit {
 
     let url;
     if (currentUrl !== 'localhost') {
-      url = currentUrl + sharedType + id;
+      url = 'https://' + currentUrl + sharedType + id;
     } else {
       // añadimos el puerto
       url = currentUrl + ':4200' + sharedType + id;
