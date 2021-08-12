@@ -90,6 +90,9 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
                 locArea.globalCoords[0] !== ''
             );
 
+            // filtramos por si hay zonas con el mismo nombre
+            this.zones = this.plantaService.getUniqueLargestLocAreas(this.zones);
+
             return combineLatest([
               this.reportControlService.allFilterableElements$,
               this.reportControlService.informesIdList$,
@@ -120,7 +123,7 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
   }
 
   private _calculateChartData(anomalias: Anomalia[]): number[] {
-    // comprobamos y el nombre de las zonas es un numero
+    // comprobamos si el nombre de las zonas es un numero
     if (!isNaN(parseFloat(this.zones[0].globalCoords[0]))) {
       this.zones = this.zones.sort((a, b) => parseFloat(a.globalCoords[0]) - parseFloat(b.globalCoords[0]));
     }

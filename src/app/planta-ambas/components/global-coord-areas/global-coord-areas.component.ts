@@ -162,35 +162,6 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
       }
     };
 
-    /* this.seguidorService.locAreas$.pipe(take(1)).subscribe((locAreas) => {
-      this.nombreGlobalCoords.forEach((nombre, i) => {
-        if (this.globalCoordAreas.length < this.nombreGlobalCoords.length) {
-          this.globalCoordAreas.push(
-            locAreas.filter(
-              (locArea) =>
-                locArea.globalCoords[i] !== null &&
-                locArea.globalCoords[i] !== undefined &&
-                locArea.globalCoords[i] !== ''
-            )
-          );
-
-          this.globalCoordAreasVectorSources[i] = new VectorSource({
-            features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(this.globalCoordAreas[i])),
-          });
-          this.globalCoordAreasVectorSources[i]
-            .getFeatures()
-            .forEach((feature) => feature.setProperties({ tipo: 'areaGlobalCoord' }));
-          this.map.addLayer(
-            (this.globalCoordAreasVectorLayers[i] = new VectorLayer({
-              source: this.globalCoordAreasVectorSources[i],
-              visible: false,
-              style: styleFunction,
-            }))
-          );
-        }
-      });
-    }); */
-
     this.subscriptions.add(
       this.plantaService
         .getLocationsArea(this.plantaId)

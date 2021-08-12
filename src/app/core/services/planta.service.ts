@@ -209,6 +209,12 @@ export class PlantaService {
     return result;
   }
 
+  getUniqueLargestLocAreas(locAreas: LocationAreaInterface[]): LocationAreaInterface[] {
+    return locAreas.filter(
+      (locA, index, locAs) => locAs.map((loc) => loc.globalCoords[0]).indexOf(locA.globalCoords[0]) === index
+    );
+  }
+
   getGlobalCoords(locArea: LocationAreaInterface): any[] {
     return [locArea.globalX, locArea.globalY, null];
   }

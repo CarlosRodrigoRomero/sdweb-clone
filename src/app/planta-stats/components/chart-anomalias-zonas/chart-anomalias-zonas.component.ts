@@ -92,6 +92,9 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
                 locArea.globalCoords[0] !== ''
             );
 
+            // filtramos por si hay zonas con el mismo nombre
+            this.zones = this.plantaService.getUniqueLargestLocAreas(this.zones);
+
             return combineLatest([
               this.reportControlService.allFilterableElements$,
               this.reportControlService.informesIdList$,
