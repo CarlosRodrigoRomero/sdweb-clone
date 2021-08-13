@@ -185,7 +185,11 @@ export class ClassificationService {
       //   }
       // }
 
-      const coordObj = normModules.find((nM) => nM.id === anom.id).centroid_gps;
+      let coordObj = normModules.find((nM) => nM.id === anom.id).centroid_gps;
+      if (coordObj === undefined) {
+        coordObj = normModules.find((nM) => nM.id === anom.id).coords.bottomLeft;
+      }
+
       if (coordObj !== undefined) {
         const coordCentroid = [coordObj.long, coordObj.lat] as Coordinate;
         const newGloblaCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
