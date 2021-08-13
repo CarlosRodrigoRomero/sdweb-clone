@@ -23,8 +23,8 @@ export class SeguidorViewService {
   public anomaliaHovered$ = new BehaviorSubject<Anomalia>(this._anomaliaHovered);
   private _visualCanvas: any = undefined;
   private _thermalCanvas: any = undefined;
-  private _imageLoaded = false;
-  public imageLoaded$ = new BehaviorSubject<boolean>(this._imageLoaded);
+  private _imagesLoaded = false;
+  public imagesLoaded$ = new BehaviorSubject<boolean>(this._imagesLoaded);
 
   constructor(private seguidoresControlService: SeguidoresControlService) {}
 
@@ -101,11 +101,11 @@ export class SeguidorViewService {
   }
 
   get imagesLoaded() {
-    return this._imageLoaded;
+    return this._imagesLoaded;
   }
 
   set imagesLoaded(value: boolean) {
-    this._imageLoaded = value;
-    this.imageLoaded$.next(value);
+    this._imagesLoaded = value;
+    this.imagesLoaded$.next(value);
   }
 }

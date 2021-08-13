@@ -580,11 +580,12 @@ export class SeguidoresControlService {
 
   changeInformeSeguidorSelected() {
     this.seguidorSelected = this.listaSeguidores.find((seguidor) => {
-      const idNumber = seguidor.id.split('_')[1];
-
       // cambiamos al seguidor correspondiente al informe actual
-      return seguidor.informeId === this.selectedInformeId && this.seguidorSelected.id.split('_')[1] === idNumber;
+      return seguidor.informeId === this.selectedInformeId && seguidor.nombre === this.seguidorSelected.nombre;
     });
+
+    // indicamos que la imagen existe por defecto
+    this.imageExist = true;
   }
 
   selectNextSeguidor() {

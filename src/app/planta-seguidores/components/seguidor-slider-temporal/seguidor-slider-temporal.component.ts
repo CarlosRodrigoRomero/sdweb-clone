@@ -9,6 +9,7 @@ import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { InformeService } from '@core/services/informe.service';
 import { ReportControlService } from '@core/services/report-control.service';
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidorViewService } from '../../services/seguidor-view.service';
 
 @Component({
   selector: 'app-seguidor-slider-temporal',
@@ -39,7 +40,8 @@ export class SeguidorSliderTemporalComponent implements OnInit, OnDestroy {
     private mapSeguidoresService: MapSeguidoresService,
     private informeService: InformeService,
     private reportControlService: ReportControlService,
-    private seguidoresControlService: SeguidoresControlService
+    private seguidoresControlService: SeguidoresControlService,
+    private seguidorViewService: SeguidorViewService
   ) {}
 
   ngOnInit(): void {
@@ -73,7 +75,8 @@ export class SeguidorSliderTemporalComponent implements OnInit, OnDestroy {
   }
 
   onChangeTemporalSlider(value: number) {
-    this.mapSeguidoresService.sliderTemporalSelected = value;
+    // reiniamos las imagenes
+    this.resetImages();
 
     const roundedValue = Math.round(value / (100 / (this.informeIdList.length - 1)));
 
@@ -81,6 +84,19 @@ export class SeguidorSliderTemporalComponent implements OnInit, OnDestroy {
 
     // cambiamos al mismo seguidor pero del informe actual
     this.seguidoresControlService.changeInformeSeguidorSelected();
+  }
+
+  resetImages() {
+    // limpiamos la imagen del seguidor anterior
+    this.seguidorViewService.thermalCanvas.clear();
+    this.seguidorViewService.visualCanvas.clear();
+
+    // limpiamos las url para que no se muestre la imagen anterior al pasar
+    this.seguidoresControlService.urlThermalImageSeguidor = undefined;
+    this.seguidoresControlService.urlVisualImageSeguidor = undefined;
+
+    // reiniciamos la carga de la nueva imagen
+    this.seguidorViewService.imagesLoaded = false;
   }
 
   ngOnDestroy(): void {

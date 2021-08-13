@@ -32,7 +32,9 @@
         <span>Imagen no disponible</span>
       </div>
       <!-- SLIDER TEMPORAL -->
-      <app-seguidor-slider-temporal *ngIf="!oneReport && numAnomalias > 0"></app-seguidor-slider-temporal>
+      <app-seguidor-slider-temporal
+        *ngIf="reportControlService.informesIdList.length > 1"
+      ></app-seguidor-slider-temporal>
 
       <!-- INFO ANOMALIA SELECCIONADA -->
       <app-seguidor-anomalia-info></app-seguidor-anomalia-info>

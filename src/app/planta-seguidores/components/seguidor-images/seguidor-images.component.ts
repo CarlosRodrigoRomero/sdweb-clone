@@ -52,7 +52,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // nos suscribimos a la carga de la imagen
-    this.subscriptions.add(this.seguidorViewService.imageLoaded$.subscribe((loaded) => (this.imagesLoaded = loaded)));
+    this.subscriptions.add(this.seguidorViewService.imagesLoaded$.subscribe((loaded) => (this.imagesLoaded = loaded)));
 
     this.visualCanvas = new fabric.Canvas('visual-canvas');
     this.seguidorViewService.visualCanvas = this.visualCanvas;
