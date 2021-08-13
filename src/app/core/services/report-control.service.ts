@@ -92,12 +92,14 @@ export class ReportControlService {
                 take(1)
               )
               .subscribe((anoms) => {
-                this.allFilterableElements = anoms;
+                // filtramos las anomalias por criterio de criticidad del cliente
+                // tslint:disable-next-line: triple-equals
+                this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
 
-                this.numFixedGlobalCoords = this.getNumGlobalCoords(anoms);
+                this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
 
                 // iniciamos filter service
-                this.filterService.initService(anoms).then((filtersInit) => {
+                this.filterService.initService(this.allFilterableElements).then((filtersInit) => {
                   // enviamos respuesta de servicio iniciado
                   initService(filtersInit);
                 });
@@ -141,13 +143,17 @@ export class ReportControlService {
                         take(1)
                       )
                       .subscribe((anoms) => {
-                        this.allFilterableElements = anoms;
+                        // filtramos las anomalias por criterio de criticidad del cliente
+                        // tslint:disable-next-line: triple-equals
+                        this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
 
                         // iniciamos filter service
-                        this.filterService.initService(anoms, true, this.sharedId).then((filtersInit) => {
-                          // enviamos respuesta de servicio iniciado
-                          initService(filtersInit);
-                        });
+                        this.filterService
+                          .initService(this.allFilterableElements, true, this.sharedId)
+                          .then((filtersInit) => {
+                            // enviamos respuesta de servicio iniciado
+                            initService(filtersInit);
+                          });
                       })
                   );
                 } else {
@@ -175,12 +181,17 @@ export class ReportControlService {
                         take(1)
                       )
                       .subscribe((anoms) => {
-                        this.allFilterableElements = anoms;
+                        // filtramos las anomalias por criterio de criticidad del cliente
+                        // tslint:disable-next-line: triple-equals
+                        this.allFilterableElements = anoms.filter((anom) => anom.tipo != 0 && anom.criticidad !== null);
+
                         // iniciamos filter service
-                        this.filterService.initService(anoms, true, this.sharedId).then((filtersInit) => {
-                          // enviamos respuesta de servicio iniciado
-                          initService(filtersInit);
-                        });
+                        this.filterService
+                          .initService(this.allFilterableElements, true, this.sharedId)
+                          .then((filtersInit) => {
+                            // enviamos respuesta de servicio iniciado
+                            initService(filtersInit);
+                          });
                       })
                   );
                 }
