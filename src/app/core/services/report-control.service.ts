@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { WINDOW } from '../../window.providers';
+
 import { BehaviorSubject, concat, Observable } from 'rxjs';
 import { delay, flatMap, publish, switchMap, take, takeWhile } from 'rxjs/operators';
 
@@ -10,10 +12,7 @@ import { InformeService } from '@core/services/informe.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { SeguidorService } from '@core/services/seguidor.service';
 
-import { WINDOW } from '../../window.providers';
-
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
-
 import { FilterableElement } from '@core/models/filterableInterface';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
@@ -200,7 +199,7 @@ export class ReportControlService {
 
         return new Promise((initService) => {
           // iniciamos anomalia service para cargar los criterios la planta
-          this.anomaliaService.initService(this.plantaId).then(() =>
+          this.anomaliaService.initService(this.plantaId).then(() => {
             this.informeService
               .getInformesDePlanta(this.plantaId)
               .pipe(
@@ -233,8 +232,8 @@ export class ReportControlService {
                   // enviamos respuesta de servicio iniciado
                   initService(filtersInit);
                 });
-              })
-          );
+              });
+          });
         });
       } else {
         ///////////////////// SHARED REPORT ///////////////////////
