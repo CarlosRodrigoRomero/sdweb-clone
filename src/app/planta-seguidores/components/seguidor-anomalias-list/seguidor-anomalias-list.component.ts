@@ -93,14 +93,14 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
   hoverAnomalia(row: any) {
     if (this.anomaliaSelected !== row.anomalia) {
       this.seguidorViewService.anomaliaHovered = row.anomalia;
-      // this.anomaliasControlService.setExternalStyle(row.id, true);
+      this.seguidorViewService.setAnomaliaHoveredStyle(row.anomalia, true);
     }
   }
 
   unhoverAnomalia(row: any) {
     if (this.anomaliaSelected !== row.anomalia) {
       this.seguidorViewService.anomaliaHovered = undefined;
-      // this.anomaliasControlService.setExternalStyle(row.id, false);
+      this.seguidorViewService.setAnomaliaHoveredStyle(row.anomalia, false);
     }
   }
 

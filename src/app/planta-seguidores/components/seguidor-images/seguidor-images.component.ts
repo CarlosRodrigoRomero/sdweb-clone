@@ -9,7 +9,7 @@ declare let fabric;
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
-import { SeguidorService } from '@core/services/seguidor.service';
+
 
 import { PcInterface } from '@core/models/pc';
 import { Seguidor } from '@core/models/seguidor';
@@ -47,7 +47,6 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     private seguidoresControlService: SeguidoresControlService,
     private mapSeguidoresService: MapSeguidoresService,
     private seguidorViewService: SeguidorViewService,
-    private seguidorService: SeguidorService
   ) {}
 
   ngOnInit(): void {
@@ -59,6 +58,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     this.thermalCanvas = new fabric.Canvas('thermal-canvas');
     this.seguidorViewService.thermalCanvas = this.thermalCanvas;
     this.anomsCanvas = new fabric.Canvas('anomalias-canvas');
+    this.seguidorViewService.anomsCanvas = this.anomsCanvas;
     this.setEventListenersCanvas();
 
     this.subscriptions.add(
@@ -92,11 +92,11 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
 
             if (this.seguidorSelected !== undefined) {
               if (this.anomaliaSelected !== undefined) {
-                this.setAnomaliaStyle(this.anomaliaSelected, true);
+                this.setAnomaliaSelectedStyle(this.anomaliaSelected, true);
               }
 
               if (this.prevAnomaliaSelected !== undefined) {
-                this.setAnomaliaStyle(this.prevAnomaliaSelected, false);
+                this.setAnomaliaSelectedStyle(this.prevAnomaliaSelected, false);
               }
             }
 
@@ -196,7 +196,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
       left: pc.img_left,
       top: pc.img_top,
       fill: 'rgba(0,0,0,0)',
-      stroke: this.getAnomaliaColor(anomalia),
+      stroke: this.seguidorViewService.getAnomaliaColor(anomalia),
       strokeWidth: 2,
       width: pc.img_width,
       height: pc.img_height,
@@ -228,18 +228,6 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     this.anomsCanvas.renderAll();
   }
 
-  private getAnomaliaColor(anomalia: Anomalia): string {
-    // tslint:disable-next-line: triple-equals
-    if (this.viewSelected == 0) {
-      return this.seguidorService.getPerdidasAnomColor(anomalia);
-      // tslint:disable-next-line: triple-equals
-    } else if (this.viewSelected == 1) {
-      return this.seguidorService.getCelsCalientesAnomColor(anomalia);
-    } else {
-      return this.seguidorService.getGradienteAnomColor(anomalia);
-    }
-  }
-
   setEventListenersCanvas() {
     this.anomsCanvas.on('mouse:over', (e) => {
       if (e.target !== null) {
@@ -255,7 +243,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
       if (e.target !== null) {
         if (e.target.ref === 'anom') {
           if (this.anomaliaSelected !== e.target.anomalia) {
-            e.target.set({ stroke: this.getAnomaliaColor(e.target.anomalia), strokeWidth: 2 }),
+            e.target.set({ stroke: this.seguidorViewService.getAnomaliaColor(e.target.anomalia), strokeWidth: 2 }),
               this.anomsCanvas.renderAll();
           }
         }
@@ -320,14 +308,14 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     });
   }
 
-  private setAnomaliaStyle(anomalia: Anomalia, selected: boolean) {
+  private setAnomaliaSelectedStyle(anomalia: Anomalia, selected: boolean) {
     const polygon = this.anomsCanvas.getObjects().find((anom) => anom.anomId === anomalia.id);
 
     if (polygon !== undefined) {
       if (selected) {
         polygon.set({ stroke: 'white', strokeWidth: 4 });
       } else {
-        polygon.set({ stroke: this.getAnomaliaColor(anomalia), strokeWidth: 2 });
+        polygon.set({ stroke: this.seguidorViewService.getAnomaliaColor(anomalia), strokeWidth: 2 });
       }
     }
   }
