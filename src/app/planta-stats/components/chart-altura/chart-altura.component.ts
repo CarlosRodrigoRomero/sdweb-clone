@@ -12,6 +12,7 @@ import { PlantaService } from '@core/services/planta.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
+import { Seguidor } from '@core/models/seguidor';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -27,7 +28,8 @@ export type ChartOptions = {
 })
 export class ChartAlturaComponent implements OnInit, OnDestroy {
   informesIdList: string[];
-  allAnomalias: Anomalia[];
+  allAnomalias: Anomalia[] = [];
+  allCC: Anomalia[] = [];
   dataLoaded = false;
   private planta: PlantaInterface;
 
@@ -111,7 +113,15 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
       ])
         .pipe(
           switchMap(([elems, informesId, planta]) => {
-            this.allAnomalias = elems as Anomalia[];
+            if (this.reportControlService.plantaFija) {
+              this.allAnomalias = elems as Anomalia[];
+            } else {
+              (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
+            }
+
+            // tslint:disable-next-line: triple-equals
+            this.allCC = this.allAnomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+
             this.informesIdList = informesId;
             this.planta = planta;
 
@@ -121,31 +131,34 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
         .subscribe((dateLabels) => {
           const alturaMax = this.planta.filas;
 
-          const series = [];
-          for (let index = alturaMax; index > 0; index--) {
-            const row = {
-              name: index.toString(),
-              data: [],
-            };
+          if (this.allCC.length > 0) {
+            const series = [];
+            for (let index = alturaMax; index > 0; index--) {
+              const row = {
+                name: index.toString(),
+                data: [],
+              };
 
-            dateLabels.forEach((dateLabel, i) => {
-              row.data.push({
-                x: dateLabel,
-                y: this.allAnomalias
-                  .filter((anom) => anom.informeId === this.informesIdList[i])
-                  .filter((anom) => anom.localY == index).length,
+              dateLabels.forEach((dateLabel, i) => {
+                row.data.push({
+                  x: dateLabel,
+                  y: this.allCC
+                    .filter((anom) => anom.informeId === this.informesIdList[i])
+                    // tslint:disable-next-line: triple-equals
+                    .filter((anom) => anom.localY == index).length,
+                });
               });
-            });
 
-            series.push(row);
+              series.push(row);
+            }
+
+            // aplicamos a todas salvo a DEMO
+            if (this.reportControlService.plantaId !== 'egF0cbpXnnBnjcrusoeR') {
+              this.chartOptions.series = series;
+            }
+
+            this.dataLoaded = true;
           }
-
-          // aplicamos a todas salvo a DEMO
-          if (this.reportControlService.plantaId !== 'egF0cbpXnnBnjcrusoeR') {
-            this.chartOptions.series = series;
-          }
-
-          this.dataLoaded = true;
         })
     );
   }

@@ -296,6 +296,7 @@ export class InformeService {
       'Diciembre',
     ];
     const month = monthNames[date.getMonth()];
+
     return month + ' ' + year;
   }
 }
