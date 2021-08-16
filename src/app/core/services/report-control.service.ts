@@ -54,7 +54,7 @@ export class ReportControlService {
     private informeService: InformeService,
     private anomaliaService: AnomaliaService,
     private seguidorService: SeguidorService,
-    @Inject(WINDOW) private window: Window
+    @Inject(WINDOW) private window: Window,
   ) {}
 
   initService(): Promise<boolean> {

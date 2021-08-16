@@ -25,6 +25,8 @@ import {
 } from 'ng-apexcharts';
 import { switchMap } from 'rxjs/operators';
 import { LocationAreaInterface } from '@core/models/location';
+import { FilterableElement } from '@core/models/filterableInterface';
+import { Seguidor } from '@core/models/seguidor';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -50,7 +52,7 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
   @ViewChild('chart-anomalias-zonas') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
   informesIdList: string[];
-  allAnomalias: Anomalia[];
+  elements: FilterableElement[];
   dataPlot: any[];
   zones: LocationAreaInterface[];
   chartData: number[][];
@@ -101,7 +103,7 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
             ]);
           }),
           switchMap(([elems, informesId]) => {
-            this.allAnomalias = elems as Anomalia[];
+            this.elements = elems;
             this.informesIdList = informesId;
 
             return this.informeService.getDateLabelsInformes(this.informesIdList);
@@ -112,24 +114,36 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
 
           this.chartData = [];
           this.informesIdList.forEach((informeId) => {
-            const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
+            const elementsInforme = this.elements.filter((elem) => elem.informeId === informeId);
 
-            this.chartData.push(this._calculateChartData(anomaliasInforme));
+            this.chartData.push(this._calculateChartData(elementsInforme));
           });
           this._initChart();
         })
     );
   }
 
-  private _calculateChartData(anomalias: Anomalia[]): number[] {
+  private _calculateChartData(elements: FilterableElement[]): number[] {
     // comprobamos y el nombre de las zonas es un numero
     if (!isNaN(parseFloat(this.zones[0].globalCoords[0]))) {
       this.zones = this.zones.sort((a, b) => parseFloat(a.globalCoords[0]) - parseFloat(b.globalCoords[0]));
     }
     const result = Array<number>();
     this.zones.forEach((zone) => {
-      const filtered = anomalias.filter((anom) => anom.globalCoords[0] == zone.globalCoords[0]);
-      result.push(this._getMAEAnomalias(filtered));
+      if (this.reportControlService.plantaFija) {
+        // tslint:disable-next-line: triple-equals
+        const filtered = (elements as Anomalia[]).filter((elem) => elem.globalCoords[0] == zone.globalCoords[0]);
+        result.push(this._getMAEAnomalias(filtered));
+      } else {
+        const anomalias = [];
+        (elements as Seguidor[])
+          .map((seg) => seg.anomaliasCliente)
+          .forEach((anoms) => anoms.forEach((anom) => anomalias.push(anom)));
+        // tslint:disable-next-line: triple-equals
+        const filtered = anomalias.filter((anom) => anom.globalCoords[0] == zone.globalCoords[0]);
+
+        result.push(this._getMAEAnomalias(filtered));
+      }
     });
     return result;
   }
@@ -160,8 +174,9 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
   }
 
   private _initChart(): void {
-    let titleXAxis = 'Zonas';
-    if (this.reportControlService.nombreGlobalCoords !== undefined) {
+    let titleXAxis = 'Zona';
+
+    if (this.reportControlService.nombreGlobalCoords.length > 0) {
       titleXAxis = this.reportControlService.nombreGlobalCoords[0];
     }
 

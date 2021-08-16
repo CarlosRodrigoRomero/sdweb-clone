@@ -9,7 +9,9 @@
         <app-chart-mae-global></app-chart-mae-global>
 
         <!-- MAE POR ZONAS -->
-        <app-chart-anomalias-zonas *ngIf="thereAreZones"></app-chart-anomalias-zonas>
+        <app-chart-anomalias-zonas
+          *ngIf="thereAreZones && reportControlService.nombreGlobalCoords.length > 0"
+        ></app-chart-anomalias-zonas>
       </div>
       <div>
         <!-- MAE TIPO ANOMALIA -->
