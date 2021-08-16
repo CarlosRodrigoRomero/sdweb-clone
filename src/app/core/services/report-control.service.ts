@@ -54,7 +54,7 @@ export class ReportControlService {
     private informeService: InformeService,
     private anomaliaService: AnomaliaService,
     private seguidorService: SeguidorService,
-    @Inject(WINDOW) private window: Window,
+    @Inject(WINDOW) private window: Window
   ) {}
 
   initService(): Promise<boolean> {
@@ -353,7 +353,7 @@ export class ReportControlService {
         const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
         let mae = 0;
         seguidoresInforme.forEach((seg) => (mae = mae + seg.mae));
-        informe.mae = mae;
+        informe.mae = mae / seguidoresInforme.length;
 
         this.informeService.updateInforme(informe);
       }

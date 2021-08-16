@@ -1,26 +1,35 @@
-<apx-chart
-  *ngIf="dataLoaded"
-  [dataLabels]="chart1options.dataLabels"
-  [markers]="chart1options.markers"
-  [stroke]="chart1options.stroke"
-  [xaxis]="chart1options.xaxis"
-  [series]="chart1options.series"
-  [chart]="chart1options.chart"
-  [colors]="chart1options.colors"
-  [yaxis]="chart1options.yaxis"
-  [annotations]="chart1options.annotations"
-></apx-chart>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Módulos con células calientes</mat-card-title>
+    <mat-card-subtitle>% de módulos con CC y gradiente medio (ºC) </mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <apx-chart
+      *ngIf="dataLoaded"
+      [dataLabels]="chart1options.dataLabels"
+      [markers]="chart1options.markers"
+      [stroke]="chart1options.stroke"
+      [xaxis]="chart1options.xaxis"
+      [series]="chart1options.series"
+      [chart]="chart1options.chart"
+      [colors]="chart1options.colors"
+      [yaxis]="chart1options.yaxis"
+      [annotations]="chart1options.annotations"
+      [tooltip]="commonOptions.tooltip"
+    ></apx-chart>
 
-<apx-chart
-  *ngIf="dataLoaded"
-  [dataLabels]="commonOptions.dataLabels"
-  [markers]="commonOptions.markers"
-  [stroke]="commonOptions.stroke"
-  [grid]="commonOptions.grid"
-  [xaxis]="commonOptions.xaxis"
-  [series]="chart2options.series"
-  [chart]="chart2options.chart"
-  [colors]="chart2options.colors"
-  [yaxis]="chart2options.yaxis"
-  [annotations]="chart2options.annotations"
-></apx-chart>
+    <apx-chart
+      *ngIf="dataLoaded"
+      [dataLabels]="chart2options.dataLabels"
+      [markers]="chart2options.markers"
+      [stroke]="chart2options.stroke"
+      [xaxis]="chart2options.xaxis"
+      [series]="chart2options.series"
+      [chart]="chart2options.chart"
+      [colors]="chart2options.colors"
+      [yaxis]="chart2options.yaxis"
+      [annotations]="chart2options.annotations"
+      [tooltip]="commonOptions.tooltip"
+    ></apx-chart>
+  </mat-card-content>
+</mat-card>

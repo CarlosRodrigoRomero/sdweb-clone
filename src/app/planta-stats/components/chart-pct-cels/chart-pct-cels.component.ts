@@ -89,8 +89,8 @@ export class ChartPctCelsComponent implements OnInit, OnDestroy {
       },
       y: {
         title: {
-          formatter: function () {
-            return '';
+          formatter: (s) => {
+            return s;
           },
         },
       },
@@ -125,25 +125,23 @@ export class ChartPctCelsComponent implements OnInit, OnDestroy {
         .subscribe((dateLabels) => {
           this.dateLabels = dateLabels;
 
-          // this.commonOptions.xaxis.categories = dateLabels;
-
           const data1: number[] = [];
           const data2: number[] = [];
           this.informes.forEach((informe) => {
             data1.push(informe.cc);
 
             const anomsInforme = this.allAnomalias.filter((anom) => anom.informeId === informe.id);
-            const gradientes = anomsInforme.map((anom) => anom.gradiente);
+            const gradientes = anomsInforme.map((anom) => anom.gradienteNormalizado);
             let gradienteTotal = 0;
-            gradientes.forEach((grad) => (gradienteTotal += grad));
-            data2.push(gradienteTotal / anomsInforme.length);
+            gradientes.forEach((grad) => (gradienteTotal = gradienteTotal + grad));
+            data2.push(Number((gradienteTotal / anomsInforme.length).toFixed(2)));
           });
 
           // si solo hay un informe no mostramos el gráfico
-          if (data1.length <= 1) {
-            this.statsService.loadCCyGradChart = false;
-          } else {
+          if (this.informes.length > 1) {
             this._initChartData(data1, data2);
+          } else {
+            this.statsService.loadCCyGradChart = false;
           }
         })
     );
@@ -158,9 +156,11 @@ export class ChartPctCelsComponent implements OnInit, OnDestroy {
         },
       ],
       chart: {
+        id: '%CC',
         type: 'area',
         width: '100%',
         height: this.chartHeight,
+        group: 'groupCC',
         toolbar: {
           show: true,
           offsetX: 0,
@@ -177,12 +177,11 @@ export class ChartPctCelsComponent implements OnInit, OnDestroy {
           },
         },
       },
-      colors: ['#008FFB'],
+      colors: ['#FF6B6B'],
       dataLabels: {
         enabled: true,
         formatter: (value) => Math.round(value * 100) / 100 + '%',
       },
-      grid: {},
       markers: {
         size: 1,
       },
@@ -194,50 +193,51 @@ export class ChartPctCelsComponent implements OnInit, OnDestroy {
         max: Math.max(...data1) + 0.5,
         tickAmount: 2,
         labels: {
-          minWidth: 40,
+          minWidth: 10,
           formatter: (value) => {
-            return Math.round(value * 10) / 10 + '%';
+            return Number(value.toFixed(2)) + '%';
           },
         },
       },
       stroke: {
         curve: 'straight',
       },
-      annotations: {
-        yaxis: [
-          {
-            y: 0.5, // DEMO - HAY QUE TRAER EL MAE MEDIO DEL PORTFOLIO
-            borderColor: '#5b5b5c',
-            borderWidth: 2,
-            strokeDashArray: 10,
+      // annotations: {
+      //   yaxis: [
+      //     {
+      //       y: 0.5, // DEMO - HAY QUE TRAER EL CC MEDIO DEL PORTFOLIO
+      //       borderColor: '#5b5b5c',
+      //       borderWidth: 2,
+      //       strokeDashArray: 10,
 
-            label: {
-              offsetX: -100,
-              borderColor: '#5b5b5c',
-              style: {
-                fontSize: '12px',
-                color: '#fff',
-                background: '#5b5b5c',
-              },
-              text: '% CC medio portfolio',
-            },
-          },
-        ],
-      },
+      //       label: {
+      //         offsetX: -100,
+      //         borderColor: '#5b5b5c',
+      //         style: {
+      //           fontSize: '12px',
+      //           color: '#fff',
+      //           background: '#5b5b5c',
+      //         },
+      //         text: '% CC medio portfolio',
+      //       },
+      //     },
+      //   ],
+      // },
     };
 
     this.chart2options = {
       series: [
         {
           name: 'gradiente medio',
-          data: [15.4, 15.9],
-          // data: data2,
+          data: data2,
         },
       ],
       chart: {
+        id: 'gradiente',
         type: 'area',
         width: '100%',
         height: this.chartHeight,
+        group: 'groupCC',
         toolbar: {
           show: true,
           offsetX: 0,
@@ -255,38 +255,48 @@ export class ChartPctCelsComponent implements OnInit, OnDestroy {
         },
       },
       colors: ['#546E7A'],
+      dataLabels: {
+        enabled: true,
+        formatter: (value) => Math.round(value * 100) / 100 + '%',
+      },
+      markers: {
+        size: 1,
+      },
+      xaxis: {
+        categories: this.dateLabels,
+      },
       yaxis: {
         min: 0,
-        max: 40,
+        max: Math.max(...data2) + 5,
         tickAmount: 2,
         labels: {
-          minWidth: 40,
+          minWidth: 10,
           formatter: (value) => {
-            return value + ' ºC';
+            return value + 'ºC';
           },
         },
       },
-      annotations: {
-        yaxis: [
-          {
-            y: 12.1,
-            borderColor: '#5b5b5c',
-            borderWidth: 2,
-            strokeDashArray: 10,
+      // annotations: {
+      //   yaxis: [
+      //     {
+      //       y: 12.1,
+      //       borderColor: '#5b5b5c',
+      //       borderWidth: 2,
+      //       strokeDashArray: 10,
 
-            label: {
-              offsetX: -100,
-              borderColor: '#5b5b5c',
-              style: {
-                fontSize: '12px',
-                color: '#fff',
-                background: '#5b5b5c',
-              },
-              text: 'DT medio portfolio (ºC)',
-            },
-          },
-        ],
-      },
+      //       label: {
+      //         offsetX: -100,
+      //         borderColor: '#5b5b5c',
+      //         style: {
+      //           fontSize: '12px',
+      //           color: '#fff',
+      //           background: '#5b5b5c',
+      //         },
+      //         text: 'ΔT (norm) medio portfolio (ºC)',
+      //       },
+      //     },
+      //   ],
+      // },
     };
 
     this.dataLoaded = true;
