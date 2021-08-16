@@ -227,11 +227,11 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     this.popup = new Overlay({
       id: 'popup',
       element: container,
-      autoPan: true,
+      position: undefined,
+      /* autoPan: true,
       autoPanAnimation: {
         duration: 250,
-      },
-      position: undefined,
+      }, */
     });
 
     this.map.addOverlay(this.popup);
