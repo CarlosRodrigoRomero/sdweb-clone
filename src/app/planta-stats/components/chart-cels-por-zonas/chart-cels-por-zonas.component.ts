@@ -1,14 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { combineLatest, Subscription } from 'rxjs';
-
-import { GLOBAL } from '@core/services/global';
-import { ReportControlService } from '@core/services/report-control.service';
-import { PlantaService } from '@core/services/planta.service';
-import { InformeService } from '@core/services/informe.service';
-
-import { Anomalia } from '@core/models/anomalia';
-import { LocationAreaInterface } from '@core/models/location';
+import { switchMap } from 'rxjs/operators';
 
 import {
   ApexAxisChartSeries,
@@ -24,7 +17,15 @@ import {
   ApexTooltip,
   ApexTitleSubtitle,
 } from 'ng-apexcharts';
-import { switchMap } from 'rxjs/operators';
+
+import { GLOBAL } from '@core/services/global';
+import { ReportControlService } from '@core/services/report-control.service';
+import { PlantaService } from '@core/services/planta.service';
+import { InformeService } from '@core/services/informe.service';
+
+import { Anomalia } from '@core/models/anomalia';
+import { LocationAreaInterface } from '@core/models/location';
+import { Seguidor } from '@core/models/seguidor';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -49,7 +50,7 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
   @ViewChild('chart-anomalias-zonas') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
   informesIdList: string[];
-  allAnomalias: Anomalia[];
+  allAnomalias: Anomalia[] = [];
   zones: LocationAreaInterface[];
   chartData: number[][];
   chartLoaded = false;
@@ -99,7 +100,12 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
             ]);
           }),
           switchMap(([elems, informesId]) => {
-            this.allAnomalias = elems as Anomalia[];
+            if (this.reportControlService.plantaFija) {
+              this.allAnomalias = elems as Anomalia[];
+            } else {
+              (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
+            }
+
             this.informesIdList = informesId;
 
             return this.informeService.getDateLabelsInformes(this.informesIdList);
@@ -156,8 +162,9 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
       });
     }
 
-    let titleXAxis = 'Zonas';
-    if (this.reportControlService.nombreGlobalCoords !== undefined) {
+    let titleXAxis = 'Zona';
+
+    if (this.reportControlService.nombreGlobalCoords.length > 0) {
       titleXAxis = this.reportControlService.nombreGlobalCoords[0];
     }
 

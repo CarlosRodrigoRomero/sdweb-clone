@@ -1,13 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { combineLatest, Subscription } from 'rxjs';
-
-import { GLOBAL } from '@core/services/global';
-import { ReportControlService } from '@core/services/report-control.service';
-import { PlantaService } from '@core/services/planta.service';
-import { InformeService } from '@core/services/informe.service';
-
-import { Anomalia } from '@core/models/anomalia';
+import { switchMap } from 'rxjs/operators';
 
 import {
   ApexAxisChartSeries,
@@ -23,10 +17,15 @@ import {
   ApexTooltip,
   ApexTitleSubtitle,
 } from 'ng-apexcharts';
-import { switchMap } from 'rxjs/operators';
+
+import { GLOBAL } from '@core/services/global';
+import { ReportControlService } from '@core/services/report-control.service';
+import { PlantaService } from '@core/services/planta.service';
+import { InformeService } from '@core/services/informe.service';
+
 import { LocationAreaInterface } from '@core/models/location';
-import { FilterableElement } from '@core/models/filterableInterface';
 import { Seguidor } from '@core/models/seguidor';
+import { Anomalia } from '@core/models/anomalia';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -52,7 +51,7 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
   @ViewChild('chart-anomalias-zonas') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
   informesIdList: string[];
-  elements: FilterableElement[];
+  allAnomalias: Anomalia[] = [];
   dataPlot: any[];
   zones: LocationAreaInterface[];
   chartData: number[][];
@@ -103,7 +102,12 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
             ]);
           }),
           switchMap(([elems, informesId]) => {
-            this.elements = elems;
+            if (this.reportControlService.plantaFija) {
+              this.allAnomalias = elems as Anomalia[];
+            } else {
+              (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
+            }
+
             this.informesIdList = informesId;
 
             return this.informeService.getDateLabelsInformes(this.informesIdList);
@@ -114,36 +118,25 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
 
           this.chartData = [];
           this.informesIdList.forEach((informeId) => {
-            const elementsInforme = this.elements.filter((elem) => elem.informeId === informeId);
+            const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
 
-            this.chartData.push(this._calculateChartData(elementsInforme));
+            this.chartData.push(this._calculateChartData(anomaliasInforme));
           });
           this._initChart();
         })
     );
   }
 
-  private _calculateChartData(elements: FilterableElement[]): number[] {
+  private _calculateChartData(anomalias: Anomalia[]): number[] {
     // comprobamos y el nombre de las zonas es un numero
     if (!isNaN(parseFloat(this.zones[0].globalCoords[0]))) {
       this.zones = this.zones.sort((a, b) => parseFloat(a.globalCoords[0]) - parseFloat(b.globalCoords[0]));
     }
     const result = Array<number>();
     this.zones.forEach((zone) => {
-      if (this.reportControlService.plantaFija) {
-        // tslint:disable-next-line: triple-equals
-        const filtered = (elements as Anomalia[]).filter((elem) => elem.globalCoords[0] == zone.globalCoords[0]);
-        result.push(this._getMAEAnomalias(filtered));
-      } else {
-        const anomalias = [];
-        (elements as Seguidor[])
-          .map((seg) => seg.anomaliasCliente)
-          .forEach((anoms) => anoms.forEach((anom) => anomalias.push(anom)));
-        // tslint:disable-next-line: triple-equals
-        const filtered = anomalias.filter((anom) => anom.globalCoords[0] == zone.globalCoords[0]);
+      const filtered = anomalias.filter((anom) => anom.globalCoords[0] == zone.globalCoords[0]);
 
-        result.push(this._getMAEAnomalias(filtered));
-      }
+      result.push(this._getMAEAnomalias(filtered));
     });
     return result;
   }
@@ -174,12 +167,6 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
   }
 
   private _initChart(): void {
-    let titleXAxis = 'Zona';
-
-    if (this.reportControlService.nombreGlobalCoords.length > 0) {
-      titleXAxis = this.reportControlService.nombreGlobalCoords[0];
-    }
-
     let series;
     // excluimos DEMO
     if (this.reportControlService.plantaId === 'egF0cbpXnnBnjcrusoeR') {
@@ -197,6 +184,12 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
       series = this.dateLabels.map((dateLabel, index) => {
         return { name: dateLabel, data: this.chartData[index] };
       });
+    }
+
+    let titleXAxis = 'Zona';
+
+    if (this.reportControlService.nombreGlobalCoords.length > 0) {
+      titleXAxis = this.reportControlService.nombreGlobalCoords[0];
     }
 
     // espera a que el dataPlot tenga datos
