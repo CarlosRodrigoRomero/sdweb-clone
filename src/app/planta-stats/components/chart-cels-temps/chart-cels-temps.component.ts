@@ -85,9 +85,10 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
             const range1 = celsCals.filter((cc) => cc.gradienteNormalizado < 10 && cc.gradienteNormalizado >= 0);
             const range2 = celsCals.filter((cc) => cc.gradienteNormalizado < 20 && cc.gradienteNormalizado >= 10);
             const range3 = celsCals.filter((cc) => cc.gradienteNormalizado < 30 && cc.gradienteNormalizado >= 20);
-            const range4 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
+            const range4 = celsCals.filter((cc) => cc.gradienteNormalizado < 40 && cc.gradienteNormalizado >= 30);
+            const range5 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
 
-            data.push([range1.length, range2.length, range3.length, range4.length]);
+            data.push([range1.length, range2.length, range3.length, range4.length, range5.length]);
           });
 
           this._initChartData(data);
@@ -128,7 +129,7 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
         colors: ['transparent'],
       },
       xaxis: {
-        categories: ['0-10 ºC', '20-30 ºC', '30-40 ºC', '>40 ºC'],
+        categories: ['0-10 ºC', '10-20 ºC', '20-30 ºC', '30-40 ºC', '>40 ºC'],
       },
       yaxis: {
         title: {
