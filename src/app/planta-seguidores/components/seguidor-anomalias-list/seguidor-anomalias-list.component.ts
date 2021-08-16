@@ -112,7 +112,6 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
     this.seguidorViewService.prevAnomaliaSelected = this.anomaliaSelected;
 
     this.seguidorViewService.anomaliaSelected = row.anomalia;
-    // this.anomaliasControlService.setExternalStyle(row.id, true);
   }
 
   ngOnDestroy(): void {

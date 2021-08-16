@@ -10,7 +10,6 @@ import { SeguidoresControlService } from '../../services/seguidores-control.serv
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 
-
 import { PcInterface } from '@core/models/pc';
 import { Seguidor } from '@core/models/seguidor';
 import { Anomalia } from '@core/models/anomalia';
@@ -46,7 +45,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
   constructor(
     private seguidoresControlService: SeguidoresControlService,
     private mapSeguidoresService: MapSeguidoresService,
-    private seguidorViewService: SeguidorViewService,
+    private seguidorViewService: SeguidorViewService
   ) {}
 
   ngOnInit(): void {
@@ -234,6 +233,9 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
         if (e.target.ref === 'anom') {
           if (this.anomaliaSelected !== e.target.anomalia) {
             e.target.set({ stroke: 'white', strokeWidth: 2 }), this.anomsCanvas.renderAll();
+
+            // la asignamos como anomalia hovered
+            this.seguidorViewService.anomaliaHovered = e.target.anomalia;
           }
         }
       }
@@ -245,6 +247,9 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
           if (this.anomaliaSelected !== e.target.anomalia) {
             e.target.set({ stroke: this.seguidorViewService.getAnomaliaColor(e.target.anomalia), strokeWidth: 2 }),
               this.anomsCanvas.renderAll();
+
+            // marcamos anomalia hovered como undefined
+            this.seguidorViewService.anomaliaHovered = undefined;
           }
         }
       }
@@ -253,6 +258,9 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     this.anomsCanvas.on('mouse:down', (e) => {
       if (e.target !== null) {
         if (e.target.ref === 'anom') {
+          // marcamos anomalia hovered como undefined
+          this.seguidorViewService.anomaliaHovered = undefined;
+
           // seleccionamos la anterior como previa
           this.seguidorViewService.prevAnomaliaSelected = this.anomaliaSelected;
 
@@ -260,8 +268,6 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
           const anomaliaSelected = this.seguidorSelected.anomaliasCliente.find((anom) => anom.id === e.target.anomId);
 
           this.seguidorViewService.anomaliaSelected = anomaliaSelected;
-
-          // e.target.set({ stroke: 'white', strokeWidth: 4 });
         } else {
           this.seguidorViewService.anomaliaSelected = undefined;
         }

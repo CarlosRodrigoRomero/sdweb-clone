@@ -51,15 +51,17 @@ export class SeguidorViewService {
   }
 
   setAnomaliaHoveredStyle(anomalia: Anomalia, hovered: boolean) {
-    const polygon = this.anomsCanvas.getObjects().find((anom) => anom.anomId === anomalia.id);
+    if (anomalia !== this.anomaliaSelected) {
+      const polygon = this.anomsCanvas.getObjects().find((anom) => anom.anomId === anomalia.id);
 
-    if (polygon !== undefined) {
-      if (hovered) {
-        polygon.set({ stroke: 'white', strokeWidth: 2 });
-        this.anomsCanvas.renderAll();
-      } else {
-        polygon.set({ stroke: this.getAnomaliaColor(anomalia), strokeWidth: 2 });
-        this.anomsCanvas.renderAll();
+      if (polygon !== undefined) {
+        if (hovered) {
+          polygon.set({ stroke: 'white', strokeWidth: 2 });
+          this.anomsCanvas.renderAll();
+        } else {
+          polygon.set({ stroke: this.getAnomaliaColor(anomalia), strokeWidth: 2 });
+          this.anomsCanvas.renderAll();
+        }
       }
     }
   }
