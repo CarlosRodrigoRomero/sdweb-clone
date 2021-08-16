@@ -76,7 +76,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
           switchMap((view) => {
             this.viewSelected = view;
 
-            if (this.seguidorSelected !== undefined) {
+            if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
               this.drawAnomalias();
             }
 

@@ -46,7 +46,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
       this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
         this.seguidorSelected = seguidor;
 
-        if (this.seguidorSelected !== undefined) {
+        if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
           if (seguidor.anomaliasCliente.length > 0) {
             const anomalias = [];
             seguidor.anomaliasCliente.forEach((anom) => {

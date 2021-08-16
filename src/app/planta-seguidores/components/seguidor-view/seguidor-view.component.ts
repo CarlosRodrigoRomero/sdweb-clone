@@ -30,7 +30,7 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
       this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
         this.seguidorSelected = seguidor;
 
-        if (this.seguidorSelected !== undefined) {
+        if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
           this.numAnomalias = this.seguidorSelected.anomaliasCliente.length;
 
           if (this.numAnomalias > 0) {

@@ -52,7 +52,7 @@ export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
       this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
         this.seguidorSelected = seguidor;
 
-        if (this.seguidorSelected !== undefined) {
+        if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
           this.numCelsCalientes = this.seguidorSelected.anomaliasCliente.filter(
             // tslint:disable-next-line: triple-equals
             (anom) => anom.tipo == 8 || anom.tipo == 9

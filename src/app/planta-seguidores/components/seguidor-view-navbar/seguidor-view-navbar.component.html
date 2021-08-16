@@ -1,13 +1,15 @@
 <mat-toolbar [class.mat-elevation-z2]="true" class="title">
   <div>
-    <span>{{ seguidorSelected.nombre }}</span>
-    <span class="modulo-label">({{ seguidorSelected.moduloLabel }})</span>
+    <span *ngIf="seguidorSelected === null">NO EXISTE SEGUIDOR EN LA FECHA SELECCIONADA</span>
+    <span *ngIf="seguidorSelected !== null">{{ seguidorSelected.nombre }}</span>
+    <span *ngIf="seguidorSelected !== null" class="modulo-label">({{ seguidorSelected.moduloLabel }})</span>
     <button mat-icon-button class="btn-close-seguidor-view" (click)="closeSidenav()">
       <mat-icon>close</mat-icon>
     </button>
   </div>
   <div
     *ngIf="
+      seguidorSelected !== null &&
       meteoInfo !== undefined &&
       meteoInfo.irradiancia !== undefined &&
       meteoInfo.vientoDireccion !== undefined &&

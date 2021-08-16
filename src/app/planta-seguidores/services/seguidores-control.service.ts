@@ -532,7 +532,7 @@ export class SeguidoresControlService {
   }
 
   public getImageSeguidor(folder: string) {
-    if (this.seguidorSelected !== undefined) {
+    if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
       // const imageName = this.seguidorSelected.anomalias[0].archivoPublico;
       const imageName = this.seguidorSelected.imageName;
 
@@ -579,17 +579,39 @@ export class SeguidoresControlService {
   }
 
   changeInformeSeguidorSelected() {
-    this.seguidorSelected = this.listaSeguidores.find((seguidor) => {
-      // cambiamos al seguidor correspondiente al informe actual
-      return seguidor.informeId === this.selectedInformeId && seguidor.nombre === this.seguidorSelected.nombre;
-    });
+    let seguidor;
+    if (this.seguidorSelected === null) {
+      seguidor = this.listaSeguidores.find((seg) => {
+        // cambiamos al seguidor correspondiente al informe actual
+        return seg.informeId === this.selectedInformeId && seg.nombre === this.prevSeguidorSelected.nombre;
+      });
+    } else {
+      seguidor = this.listaSeguidores.find((seg) => {
+        // cambiamos al seguidor correspondiente al informe actual
+        return seg.informeId === this.selectedInformeId && seg.nombre === this.seguidorSelected.nombre;
+      });
+    }
+
+    // asignamos el actual al previo
+    this.prevSeguidorSelected = this.seguidorSelected;
+
+    // asignamos el nuevo si existe
+    if (seguidor !== undefined) {
+      this.seguidorSelected = seguidor;
+    } else {
+      this.seguidorSelected = null;
+    }
 
     // indicamos que la imagen existe por defecto
     this.imageExist = true;
   }
 
   selectNextSeguidor() {
-    const index = this.listaSeguidores.indexOf(this.seguidorSelected);
+    // nos movemos solo entre los seguidores del informe seleccionado
+    const seguidoresInformeActual = this.listaSeguidores.filter(
+      (seg) => seg.informeId === this.reportControlService.selectedInformeId
+    );
+    const index = seguidoresInformeActual.indexOf(this.seguidorSelected);
     if (index !== this.listaSeguidores.length - 1) {
       this.seguidorSelected = this.listaSeguidores[index + 1];
 
@@ -599,7 +621,11 @@ export class SeguidoresControlService {
   }
 
   selectPrevSeguidor() {
-    const index = this.listaSeguidores.indexOf(this.seguidorSelected);
+    // nos movemos solo entre los seguidores del informe seleccionado
+    const seguidoresInformeActual = this.listaSeguidores.filter(
+      (seg) => seg.informeId === this.reportControlService.selectedInformeId
+    );
+    const index = seguidoresInformeActual.indexOf(this.seguidorSelected);
     if (index !== 0) {
       this.seguidorSelected = this.listaSeguidores[index - 1];
 

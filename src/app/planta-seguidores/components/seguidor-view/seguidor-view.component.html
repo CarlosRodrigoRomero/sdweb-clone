@@ -1,10 +1,10 @@
-<div class="sidenav-content" *ngIf="seguidorSelected">
+<div class="sidenav-content" *ngIf="seguidorSelected !== undefined">
   <!-- NAVBAR SEGUIDOR VIEW -->
   <app-seguidor-view-navbar></app-seguidor-view-navbar>
   <div class="seguidor-content">
     <div class="left-content">
       <!-- IMAGEN -->
-      <div *ngIf="imagesExist" id="image-content" class="image-content">
+      <div *ngIf="imagesExist && seguidorSelected !== null" id="image-content" class="image-content">
         <app-seguidor-view-toggle></app-seguidor-view-toggle>
         <app-seguidor-images></app-seguidor-images>
         <app-seguidor-image-toggle></app-seguidor-image-toggle>
@@ -37,14 +37,14 @@
       ></app-seguidor-slider-temporal>
 
       <!-- INFO ANOMALIA SELECCIONADA -->
-      <app-seguidor-anomalia-info></app-seguidor-anomalia-info>
+      <app-seguidor-anomalia-info *ngIf="seguidorSelected !== null"></app-seguidor-anomalia-info>
 
       <!-- DESCARGAR IMAGENES -->
-      <app-seguidor-image-download *ngIf="imagesExist"></app-seguidor-image-download>
+      <app-seguidor-image-download *ngIf="imagesExist && seguidorSelected !== null"></app-seguidor-image-download>
     </div>
     <div class="right-content" *ngIf="numAnomalias > 0">
       <!-- LISTA ANOMALIAS -->
-      <app-seguidor-anomalias-list *ngIf="numAnomalias > 0"></app-seguidor-anomalias-list>
+      <app-seguidor-anomalias-list *ngIf="numAnomalias > 0 && seguidorSelected !== null"></app-seguidor-anomalias-list>
     </div>
   </div>
 </div>
