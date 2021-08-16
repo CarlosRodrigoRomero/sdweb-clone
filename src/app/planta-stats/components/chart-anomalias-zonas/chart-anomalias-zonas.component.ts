@@ -229,6 +229,10 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
         dataLabels: {
           enabled: false,
         },
+        fill: {
+          opacity: 1,
+          colors: ['#7F7F7F', '#FF6B6B'],
+        },
         stroke: {
           show: true,
           width: 2,
@@ -254,9 +258,6 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
           labels: {
             minWidth: 10,
           },
-        },
-        fill: {
-          opacity: 1,
         },
         tooltip: {
           followCursor: false,

@@ -205,6 +205,10 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
         dataLabels: {
           enabled: false,
         },
+        fill: {
+          opacity: 1,
+          colors: ['#7F7F7F', '#FF6B6B'],
+        },
         stroke: {
           show: true,
           width: 2,
@@ -233,9 +237,6 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
               return Math.round(value).toString();
             },
           },
-        },
-        fill: {
-          opacity: 1,
         },
         tooltip: {
           followCursor: false,

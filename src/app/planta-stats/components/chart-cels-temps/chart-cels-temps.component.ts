@@ -22,6 +22,7 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
 
 import { Anomalia } from '@core/models/anomalia';
+import { Seguidor } from '@core/models/seguidor';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -47,7 +48,7 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
   public chartOptions: Partial<ChartOptions>;
   dataLoaded = false;
   informesIdList: string[];
-  allAnomalias: Anomalia[];
+  allAnomalias: Anomalia[] = [];
   dateLabels: string[];
 
   private subscriptions: Subscription = new Subscription();
@@ -59,7 +60,12 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
       combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$])
         .pipe(
           switchMap(([elems, informesId]) => {
-            this.allAnomalias = elems as Anomalia[];
+            if (this.reportControlService.plantaFija) {
+              this.allAnomalias = elems as Anomalia[];
+            } else {
+              (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
+            }
+
             this.informesIdList = informesId;
 
             return this.informeService.getDateLabelsInformes(this.informesIdList);
@@ -112,6 +118,10 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
       dataLabels: {
         enabled: false,
       },
+      fill: {
+        opacity: 1,
+        colors: ['#7F7F7F', '#FF6B6B'],
+      },
       stroke: {
         show: true,
         width: 2,
@@ -130,9 +140,6 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
             return Math.round(value).toString();
           },
         },
-      },
-      fill: {
-        opacity: 1,
       },
       tooltip: {
         y: {
