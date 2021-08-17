@@ -63,6 +63,9 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
             anomalias = seguidor.anomaliasCliente.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
           }
 
+          // marcamos la nueva seleccionada
+          this.seguidorViewService.anomaliaSelected = anomalias[0];
+
           if (anomalias.length > 0) {
             const anomaliasTabla = [];
             anomalias.forEach((anom) => {

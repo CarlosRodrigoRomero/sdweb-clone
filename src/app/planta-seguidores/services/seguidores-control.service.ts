@@ -612,8 +612,8 @@ export class SeguidoresControlService {
       (seg) => seg.informeId === this.reportControlService.selectedInformeId
     );
     const index = seguidoresInformeActual.indexOf(this.seguidorSelected);
-    if (index !== this.listaSeguidores.length - 1) {
-      this.seguidorSelected = this.listaSeguidores[index + 1];
+    if (index !== seguidoresInformeActual.length - 1) {
+      this.seguidorSelected = seguidoresInformeActual[index + 1];
 
       // indicamos que la imagen existe por defecto
       this.imageExist = true;
@@ -627,7 +627,7 @@ export class SeguidoresControlService {
     );
     const index = seguidoresInformeActual.indexOf(this.seguidorSelected);
     if (index !== 0) {
-      this.seguidorSelected = this.listaSeguidores[index - 1];
+      this.seguidorSelected = seguidoresInformeActual[index - 1];
 
       // indicamos que la imagen existe por defecto
       this.imageExist = true;

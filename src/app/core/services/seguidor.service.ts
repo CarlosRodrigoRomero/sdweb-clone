@@ -267,24 +267,24 @@ export class SeguidorService {
     }
   }
 
-  getPerdidasAnomColor(anomaliaSelected: Anomalia) {
-    if (anomaliaSelected.perdidas <= 0.33) {
+  getPerdidasAnomColor(anomalia: Anomalia) {
+    if (anomalia.perdidas <= 0.33) {
       return GLOBAL.colores_mae[0];
-    } else if (anomaliaSelected.perdidas > 0.66) {
+    } else if (anomalia.perdidas > 0.66) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
     }
   }
 
-  getCelsCalientesAnomColor(anomaliaSelected: Anomalia) {
+  getCelsCalientesAnomColor(anomalia: Anomalia) {
     return 'red';
   }
 
-  getGradienteAnomColor(anomaliaSelected: Anomalia) {
-    if (anomaliaSelected.gradienteNormalizado <= (this.maxGradNorm - this.minGradNorm) / 3) {
+  getGradienteAnomColor(anomalia: Anomalia) {
+    if (anomalia.gradienteNormalizado <= (this.maxGradNorm - this.minGradNorm) / 3) {
       return GLOBAL.colores_mae[0];
-    } else if (anomaliaSelected.gradienteNormalizado <= (2 * (this.maxGradNorm - this.minGradNorm)) / 3) {
+    } else if (anomalia.gradienteNormalizado <= (2 * (this.maxGradNorm - this.minGradNorm)) / 3) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];

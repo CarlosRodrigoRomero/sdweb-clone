@@ -33,9 +33,9 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
           this.numAnomalias = this.seguidorSelected.anomaliasCliente.length;
 
-          if (this.numAnomalias > 0) {
-            this.seguidorViewService.anomaliaSelected = this.seguidorSelected.anomaliasCliente[0];
-          }
+          // if (this.numAnomalias > 0) {
+          //   this.seguidorViewService.anomaliaSelected = this.seguidorSelected.anomaliasCliente[0];
+          // }
         }
       })
     );
