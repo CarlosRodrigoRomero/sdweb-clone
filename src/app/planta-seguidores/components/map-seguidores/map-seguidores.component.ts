@@ -52,7 +52,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public seguidorSeleccionado: Seguidor;
   public listaSeguidores: Seguidor[];
   public sliderYear: number;
-  public aerialLayer: TileLayer;
+  public aerialLayers: TileLayer[];
   public thermalSource;
   private seguidorLayers: VectorLayer[];
   private incrementoLayers: VectorLayer[];
@@ -103,28 +103,39 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
           // this.incrementosService.initService();
 
           // ordenamos los informes por fecha
-          this.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
-          // this.incrementosService.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
+          this.informeIdList = informes.map((informe) => informe.id);
+          // this.incrementosService.informeIdList = informes.map((informe) => informe.id);
 
-          informes
-            .sort((a, b) => a.fecha - b.fecha)
-            .forEach((informe) => {
-              // creamos las capas de los seguidores para los diferentes informes
-              this.seguidoresControlService
-                .createSeguidorLayers(informe.id)
-                .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
+          informes.forEach((informe) => {
+            // creamos las capas de los seguidores para los diferentes informes
+            this.seguidoresControlService
+              .createSeguidorLayers(informe.id)
+              .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
-              // creamos las capas de los incrementos para los diferentes informes
-              // this.incrementosService
-              //   .createIncrementoLayers(informe.id)
-              //   .forEach((layer) => this.olMapService.addIncrementoLayer(layer));
+            // creamos las capas de los incrementos para los diferentes informes
+            // this.incrementosService
+            //   .createIncrementoLayers(informe.id)
+            //   .forEach((layer) => this.olMapService.addIncrementoLayer(layer));
+
+            // añadimos las ortofotos aereas de cada informe
+            const aerial = new XYZ({
+              url: 'http://solardrontech.es/tileserver.php?/index.json?/' + informe.id + '_visual/{z}/{x}/{y}.png',
+              crossOrigin: '',
             });
+
+            const aerialLayer = new TileLayer({
+              source: aerial,
+            });
+
+            this.olMapService.addAerialLayer(aerialLayer);
+          });
 
           // los subscribimos al toggle de vitas y al slider temporal
           combineLatest([
             this.mapSeguidoresService.toggleViewSelected$,
             this.mapSeguidoresService.sliderTemporalSelected$,
-          ]).subscribe(([toggleValue, sliderValue]) => {
+            this.olMapService.getAerialLayers(),
+          ]).subscribe(([toggleValue, sliderValue, aerialLayers]) => {
             const layerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (informes.length - 1))));
 
             this.mapSeguidoresService.layerSelected = layerSelected;
@@ -136,6 +147,8 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
             // mostramos la capa seleccionada
             this.seguidorLayers[layerSelected].setOpacity(1);
             // this.incrementoLayers[v].setOpacity(1);
+
+            this.aerialLayers = aerialLayers;
           });
 
           this.planta = planta;
@@ -169,16 +182,16 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
       // extent: this.extent1,
     });
 
-    const aerial = new XYZ({
-      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInformeId + '_visual/{z}/{x}/{y}.png',
-      crossOrigin: '',
-    });
+    // const aerial = new XYZ({
+    //   url: 'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInformeId + '_visual/{z}/{x}/{y}.png',
+    //   crossOrigin: '',
+    // });
 
-    this.aerialLayer = new TileLayer({
-      source: aerial,
-    });
+    // this.aerialLayer = new TileLayer({
+    //   source: aerial,
+    // });
 
-    const layers = [satelliteLayer, this.aerialLayer];
+    const layers = [satelliteLayer, ...this.aerialLayers];
 
     // MAPA
     const view = new View({

@@ -32,6 +32,8 @@ export class OlMapService {
   private seguidorLayers$ = new BehaviorSubject<VectorLayer[]>(this.seguidorLayers);
   private incrementoLayers: VectorLayer[] = [];
   private incrementoLayers$ = new BehaviorSubject<VectorLayer[]>(this.incrementoLayers);
+  private aerialLayers: TileLayer[] = [];
+  private aerialLayers$ = new BehaviorSubject<TileLayer[]>(this.aerialLayers);
 
   constructor() {}
 
@@ -100,6 +102,15 @@ export class OlMapService {
 
   getIncrementoLayers() {
     return this.incrementoLayers$.asObservable();
+  }
+
+  addAerialLayer(layer: TileLayer) {
+    this.aerialLayers.push(layer);
+    this.aerialLayers$.next(this.aerialLayers);
+  }
+
+  getAerialLayers() {
+    return this.aerialLayers$.asObservable();
   }
 
   latLonLiteralToLonLat(path: LatLngLiteral[]) {
