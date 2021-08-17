@@ -662,7 +662,7 @@ export class SeguidoresControlService {
           width: 4,
         }),
         fill: new Fill({
-          color: 'rgba(0, 0, 255, 0)',
+          color: this.hexToRgb(this.getColorSeguidorMae(feature), 0.5),
         }),
       });
     } else if (this.toggleViewSelected === 1) {
@@ -672,7 +672,7 @@ export class SeguidoresControlService {
           width: 4,
         }),
         fill: new Fill({
-          color: 'rgba(0, 0, 255, 0)',
+          color: this.hexToRgb(this.getColorSeguidorCelsCalientes(feature), 0.5),
         }),
       });
     } else {
@@ -682,7 +682,7 @@ export class SeguidoresControlService {
           width: 4,
         }),
         fill: new Fill({
-          color: 'rgba(0, 0, 255, 0)',
+          color: this.hexToRgb(this.getColorSeguidorGradienteNormMax(feature), 0.5),
         }),
       });
     }
