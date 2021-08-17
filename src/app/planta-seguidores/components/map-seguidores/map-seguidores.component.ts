@@ -118,16 +118,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
             //   .forEach((layer) => this.olMapService.addIncrementoLayer(layer));
 
             // añadimos las ortofotos aereas de cada informe
-            const aerial = new XYZ({
-              url: 'http://solardrontech.es/tileserver.php?/index.json?/' + informe.id + '_visual/{z}/{x}/{y}.png',
-              crossOrigin: '',
-            });
-
-            const aerialLayer = new TileLayer({
-              source: aerial,
-            });
-
-            this.olMapService.addAerialLayer(aerialLayer);
+            this.addAerialLayer(informe.id);
           });
 
           // los subscribimos al toggle de vitas y al slider temporal
@@ -153,12 +144,12 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
 
           this.planta = planta;
 
+          this.subscriptions.add(
+            this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+          );
+
           // asignamos los IDs necesarios para compartir
           this.shareReportService.setPlantaId(this.plantaId);
-
-          // seleccionamos el informe mas reciente de la planta
-          this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
-          // this.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
           // asignamos el informe para compartir
           // this.shareReportService.setInformeID(this.informesList[this.informesList.length - 1]);
@@ -248,6 +239,19 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     });
 
     this.map.addOverlay(this.popup);
+  }
+
+  private addAerialLayer(informeId: string) {
+    const aerial = new XYZ({
+      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_visual/{z}/{x}/{y}.png',
+      crossOrigin: '',
+    });
+
+    const aerialLayer = new TileLayer({
+      source: aerial,
+    });
+
+    this.olMapService.addAerialLayer(aerialLayer);
   }
 
   ngOnDestroy(): void {

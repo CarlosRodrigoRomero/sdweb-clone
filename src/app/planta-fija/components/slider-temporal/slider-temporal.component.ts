@@ -21,8 +21,9 @@ import { ReportControlService } from '@core/services/report-control.service';
 export class SliderTemporalComponent implements OnInit, OnDestroy {
   private thermalLayers: TileLayer[];
   private anomaliaLayers: VectorLayer[];
+  private aerialLayers: TileLayer[];
   public selectedInformeId: string;
-  private informesList: string[];
+  private informesIdList: string[];
   private sliderLoaded = false;
   public sliderLoaded$ = new BehaviorSubject<boolean>(this.sliderLoaded);
   private subscriptions: Subscription = new Subscription();
@@ -49,7 +50,7 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.reportControlService.informesIdList$.pipe(take(1)).subscribe((informesId) => {
-      this.informesList = informesId;
+      this.informesIdList = informesId;
       this.subscriptions.add(
         this.getDatesInformes(informesId).subscribe((dates) => {
           this.dates = dates;
@@ -65,37 +66,41 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
       this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
     );
 
-    this.currentYear = this.informesList.indexOf(this.selectedInformeId) * 100;
+    this.currentYear = this.informesIdList.indexOf(this.selectedInformeId) * 100;
 
     this.mapControlService.sliderTemporal = this.currentYear;
 
-    this.subscriptions.add(
-      combineLatest([this.olMapService.getThermalLayers(), this.olMapService.getAnomaliaLayers()]).subscribe(
-        ([tLayers, aLayers]) => {
-          this.thermalLayers = tLayers;
-          this.anomaliaLayers = aLayers;
+    combineLatest([
+      this.olMapService.getThermalLayers(),
+      this.olMapService.getAnomaliaLayers(),
+      this.olMapService.getAerialLayers(),
+    ])
+      .pipe(take(1))
+      .subscribe(([thermalLayers, anomLayers, aerialLayers]) => {
+        this.thermalLayers = thermalLayers;
+        this.anomaliaLayers = anomLayers;
+        this.aerialLayers = aerialLayers;
 
-          this.setThermalLayersOpacity(this.selectedInformeId);
-          this.setAnomaliaLayersOpacity(this.selectedInformeId);
-        }
-      )
-    );
+        this.setThermalLayersOpacity(this.selectedInformeId);
+        this.setAnomaliaLayersOpacity(this.selectedInformeId);
+        this.setAerialLayersOpacity(this.selectedInformeId);
+      });
   }
 
   onChangeTemporalSlider(value: number) {
     this.mapControlService.sliderTemporal = value;
 
-    const roundedValue = Math.round(value / (100 / (this.informesList.length - 1)));
+    const roundedValue = Math.round(value / (100 / (this.informesIdList.length - 1)));
 
-    this.reportControlService.selectedInformeId = this.informesList[roundedValue];
+    this.reportControlService.selectedInformeId = this.informesIdList[roundedValue];
 
-    this.setThermalLayersOpacity(this.informesList[roundedValue]);
-    this.setAnomaliaLayersOpacity(this.informesList[roundedValue]);
+    this.setThermalLayersOpacity(this.informesIdList[roundedValue]);
+    this.setAnomaliaLayersOpacity(this.informesIdList[roundedValue]);
   }
 
   setThermalLayersOpacity(informeId: string) {
     this.thermalLayers.forEach((layer, index) => {
-      if (index === this.informesList.indexOf(informeId)) {
+      if (index === this.informesIdList.indexOf(informeId)) {
         layer.setOpacity(1);
       } else {
         layer.setOpacity(0);
@@ -105,7 +110,17 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
 
   setAnomaliaLayersOpacity(informeId: string) {
     this.anomaliaLayers.forEach((layer, index) => {
-      if (index === this.informesList.indexOf(informeId)) {
+      if (index === this.informesIdList.indexOf(informeId)) {
+        layer.setOpacity(1);
+      } else {
+        layer.setOpacity(0);
+      }
+    });
+  }
+
+  private setAerialLayersOpacity(informeId: string) {
+    this.aerialLayers.forEach((layer, index) => {
+      if (index === this.informesIdList.indexOf(informeId)) {
         layer.setOpacity(1);
       } else {
         layer.setOpacity(0);
