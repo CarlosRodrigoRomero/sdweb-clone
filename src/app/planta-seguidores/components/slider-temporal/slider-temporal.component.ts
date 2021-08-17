@@ -5,12 +5,9 @@ import { map, switchMap, take } from 'rxjs/operators';
 
 import { LabelType, Options } from '@angular-slider/ngx-slider';
 
-import TileLayer from 'ol/layer/Tile';
-
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { InformeService } from '@core/services/informe.service';
 import { ReportControlService } from '@core/services/report-control.service';
-import { OlMapService } from '@core/services/ol-map.service';
 
 @Component({
   selector: 'app-slider-temporal',
@@ -21,7 +18,6 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
   public selectedInformeId: string;
   public informesIdList: string[];
   public sliderLoaded = false;
-  private aerialLayers: TileLayer[];
 
   /* Slider Values */
   currentYear = 100;
@@ -41,8 +37,7 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
   constructor(
     private mapSeguidoresService: MapSeguidoresService,
     private informeService: InformeService,
-    private reportControlService: ReportControlService,
-    private olMapService: OlMapService
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
@@ -73,15 +68,6 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.mapSeguidoresService.sliderTemporalSelected$.subscribe((value) => (this.currentYear = value))
     );
-
-    this.olMapService
-      .getAerialLayers()
-      .pipe(take(1))
-      .subscribe((aerialLayers) => {
-        this.aerialLayers = aerialLayers;
-
-        this.setAerialLayersOpacity(this.selectedInformeId);
-      });
   }
 
   onChangeTemporalSlider(value: number) {
@@ -90,18 +76,6 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
     const roundedValue = Math.round(value / (100 / (this.informesIdList.length - 1)));
 
     this.reportControlService.selectedInformeId = this.informesIdList[roundedValue];
-
-    this.setAerialLayersOpacity(this.informesIdList[roundedValue]);
-  }
-
-  private setAerialLayersOpacity(informeId: string) {
-    this.aerialLayers.forEach((layer, index) => {
-      if (index === this.informesIdList.indexOf(informeId)) {
-        layer.setOpacity(1);
-      } else {
-        layer.setOpacity(0);
-      }
-    });
   }
 
   getDatesInformes(informesId: string[]) {

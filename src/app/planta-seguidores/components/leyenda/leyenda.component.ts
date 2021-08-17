@@ -3,7 +3,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
 import { GLOBAL } from '@core/services/global';
 
 @Component({
@@ -14,21 +13,18 @@ import { GLOBAL } from '@core/services/global';
 export class LeyendaComponent implements OnInit, OnDestroy {
   colors = GLOBAL.colores_mae;
   viewSelected: number;
-  viewsLevels: number[][];
+  viewsLabels: string[][];
   viewsTitle: string[] = ['MAE por seguidor', 'Cels. Calientes por seguidor', 'ΔT Max (norm) por seguidor'];
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(
-    private mapSeguidoresService: MapSeguidoresService,
-    private seguidoresControlService: SeguidoresControlService
-  ) {}
+  constructor(private mapSeguidoresService: MapSeguidoresService) {}
 
   ngOnInit(): void {
-    this.viewsLevels = [
-      this.seguidoresControlService.maeLevels,
-      this.seguidoresControlService.ccLevels,
-      this.seguidoresControlService.gradLevels,
+    this.viewsLabels = [
+      ['Bueno', 'En la media', 'Mejorable'],
+      ['Bueno', 'En la media', 'Mejorable'],
+      ['Leve', 'Medio', 'Grave'],
     ];
 
     this.subscriptions.add(

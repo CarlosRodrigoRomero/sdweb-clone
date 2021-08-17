@@ -32,6 +32,7 @@ import { PlantaInterface } from '@core/models/planta';
 import { Seguidor } from '@core/models/seguidor';
 import { LatLngLiteral } from '@agm/core';
 import { Coordinate } from 'ol/coordinate';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-map-seguidores',
@@ -41,6 +42,7 @@ import { Coordinate } from 'ol/coordinate';
 export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public plantaId: string;
   public planta: PlantaInterface;
+  private informes: InformeInterface[];
   public map: Map;
   public rangeMin: number;
   public rangeMax: number;
@@ -92,73 +94,75 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
             return combineLatest([
               this.informeService.getInformesDePlanta(this.plantaId),
               this.plantaService.getPlanta(this.plantaId),
+              this.olMapService.getAerialLayers(),
+              this.olMapService.getSeguidorLayers(),
+              // this.olMapService.getIncrementoLayers()
             ]);
           })
         )
-        .pipe(take(1))
-        .subscribe(([informes, planta]) => {
-          this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers));
-          // this.olMapService.getIncrementoLayers().subscribe((layers) => (this.incrementoLayers = layers));
+        .pipe(
+          take(1),
+          switchMap(([informes, planta, aerialLayers, segLayers]) => {
+            // this.incrementosService.initService();
 
-          // this.incrementosService.initService();
+            this.informes = informes;
 
-          // ordenamos los informes por fecha
-          this.informeIdList = informes.map((informe) => informe.id);
-          // this.incrementosService.informeIdList = informes.map((informe) => informe.id);
+            // ordenamos los informes por fecha
+            this.informeIdList = informes.map((informe) => informe.id);
+            // this.incrementosService.informeIdList = informes.map((informe) => informe.id);
 
-          informes.forEach((informe) => {
-            // creamos las capas de los seguidores para los diferentes informes
-            this.seguidoresControlService
-              .createSeguidorLayers(informe.id)
-              .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
+            informes.forEach((informe) => {
+              // creamos las capas de los seguidores para los diferentes informes
+              this.seguidoresControlService
+                .createSeguidorLayers(informe.id)
+                .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
-            // creamos las capas de los incrementos para los diferentes informes
-            // this.incrementosService
-            //   .createIncrementoLayers(informe.id)
-            //   .forEach((layer) => this.olMapService.addIncrementoLayer(layer));
+              // creamos las capas de los incrementos para los diferentes informes
+              // this.incrementosService
+              //   .createIncrementoLayers(informe.id)
+              //   .forEach((layer) => this.olMapService.addIncrementoLayer(layer));
 
-            // añadimos las ortofotos aereas de cada informe
-            this.addAerialLayer(informe.id);
-          });
-
-          // los subscribimos al toggle de vitas y al slider temporal
-          combineLatest([
-            this.mapSeguidoresService.toggleViewSelected$,
-            this.mapSeguidoresService.sliderTemporalSelected$,
-            this.olMapService.getAerialLayers(),
-          ]).subscribe(([toggleValue, sliderValue, aerialLayers]) => {
-            const layerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (informes.length - 1))));
-
-            this.mapSeguidoresService.layerSelected = layerSelected;
-
-            // ocultamos las 3 capas de las vistas
-            this.seguidorLayers.forEach((layer) => layer.setOpacity(0));
-            // this.incrementoLayers.forEach((layer) => layer.setOpacity(0));
-
-            // mostramos la capa seleccionada
-            this.seguidorLayers[layerSelected].setOpacity(1);
-            // this.incrementoLayers[v].setOpacity(1);
+              // añadimos las ortofotos aereas de cada informe
+              this.addAerialLayer(informe.id);
+            });
 
             this.aerialLayers = aerialLayers;
-          });
 
-          this.planta = planta;
+            this.seguidorLayers = segLayers;
 
-          this.subscriptions.add(
-            this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
-          );
+            this.planta = planta;
 
-          // asignamos los IDs necesarios para compartir
-          this.shareReportService.setPlantaId(this.plantaId);
+            // asignamos los IDs necesarios para compartir
+            this.shareReportService.setPlantaId(this.plantaId);
 
-          // asignamos el informe para compartir
-          // this.shareReportService.setInformeID(this.informesList[this.informesList.length - 1]);
+            // asignamos el informe para compartir
+            // this.shareReportService.setInformeID(this.informesList[this.informesList.length - 1]);
 
-          // this.mapSeguidoresService.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
+            this.initMap();
 
-          this.initMap();
+            this.addPopupOverlay();
 
-          this.addPopupOverlay();
+            return combineLatest([
+              this.mapSeguidoresService.toggleViewSelected$,
+              this.mapSeguidoresService.sliderTemporalSelected$,
+              this.reportControlService.selectedInformeId$,
+            ]);
+          })
+        )
+        .subscribe(([toggleValue, sliderValue, informeId]) => {
+          const layerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (this.informes.length - 1))));
+
+          this.mapSeguidoresService.layerSelected = layerSelected;
+
+          // ocultamos las 3 capas de las vistas
+          this.seguidorLayers.forEach((layer) => layer.setOpacity(0));
+          // this.incrementoLayers.forEach((layer) => layer.setOpacity(0));
+
+          // mostramos la capa seleccionada
+          this.seguidorLayers[layerSelected].setOpacity(1);
+          // this.incrementoLayers[v].setOpacity(1);
+
+          this.selectedInformeId = informeId;
         })
     );
   }
@@ -211,6 +215,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
       this.seguidoresControlService
         .initService()
         .pipe(
+          take(1),
           switchMap((value) => {
             if (value) {
               this.seguidoresControlService.mostrarSeguidores();

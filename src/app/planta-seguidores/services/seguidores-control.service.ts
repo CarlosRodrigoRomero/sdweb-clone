@@ -57,15 +57,10 @@ export class SeguidoresControlService {
   private _imageExist = true;
   imageExist$ = new BehaviorSubject<boolean>(this._imageExist);
 
-  private maeMin: number;
-  private maeMax: number;
-  public maeLevels: number[] = [];
-  private ccMin: number;
-  private ccMax: number;
-  public ccLevels: number[] = [];
-  private gradMin: number;
-  private gradMax: number;
-  public gradLevels: number[] = [];
+  private maesMedio: number[] = [];
+  private maesSigma: number[] = [];
+  private ccsMedio: number[] = [];
+  private ccsSigma: number[] = [];
 
   constructor(
     private olMapService: OlMapService,
@@ -96,16 +91,13 @@ export class SeguidoresControlService {
         switchMap((informeId) => {
           this.selectedInformeId = informeId;
 
-          // recalculamos los MIN y MAX de cada vista
-          this.getMinMaxViews();
-
-          // obtenemos los niveles para la escala de colores
-          this.getViewsLevels();
-
           return this.informeService.getInforme(informeId);
         })
       )
       .subscribe((informe) => (this.selectedInforme = informe));
+
+    this.getMaesMedioSigma();
+    this.getCCsMedioSigma();
 
     this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
 
@@ -178,6 +170,7 @@ export class SeguidoresControlService {
             mae: seguidor.mae,
             /* temperaturaMax: seguidor.temperaturaMax, */
             gradienteNormalizado: seguidor.gradienteNormalizado,
+            celsCalientes: seguidor.celsCalientes,
             anomalias: seguidor.anomalias,
             filas: seguidor.filas,
             columnas: seguidor.columnas,
@@ -283,8 +276,9 @@ export class SeguidoresControlService {
           l.getProperties().id == this.toggleViewSelected
         ) {
           return true;
+        } else {
+          return false;
         }
-        return false;
       },
     });
 
@@ -325,72 +319,40 @@ export class SeguidoresControlService {
     this.map.getOverlayById('popup').setPosition(coords);
   }
 
-  private getMinMaxViews() {
-    this.getMinMaxMae();
-    this.getMinMaxCC();
-    this.getMinMaxGradNormMax();
+  private getMaesMedioSigma() {
+    this.reportControlService.informesIdList.forEach((informeId) => {
+      const maes = this.reportControlService.allFilterableElements
+        .filter((seg) => (seg as Seguidor).informeId === informeId)
+        .map((seg) => (seg as Seguidor).mae);
+
+      this.maesMedio.push(this.average(maes));
+      this.maesSigma.push(this.standardDeviation(maes));
+    });
   }
 
-  private getViewsLevels() {
-    if (this.maeMax !== undefined) {
-      this.getMaeLevels();
-    }
+  private average(values: number[]): number {
+    let suma = 0;
+    values.forEach((value) => (suma += value));
 
-    this.getCCLevels();
-    this.getGradNormLevels();
+    return suma / values.length;
   }
 
-  private getMinMaxMae() {
-    const maes = this.reportControlService.allFilterableElements
-      .filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId)
-      .map((seg) => (seg as Seguidor).mae);
+  private getCCsMedioSigma() {
+    this.reportControlService.informesIdList.forEach((informeId) => {
+      const celsCalientes = this.reportControlService.allFilterableElements
+        .filter((seg) => (seg as Seguidor).informeId === informeId)
+        .map((seg) => (seg as Seguidor).celsCalientes)
+        .filter((cc) => !isNaN(cc) && cc !== Infinity && cc !== -Infinity);
 
-    this.maeMin = Math.min(...maes);
-    this.maeMax = Math.max(...maes);
+      this.ccsMedio.push(this.average(celsCalientes));
+      this.ccsSigma.push(this.standardDeviation(celsCalientes));
+    });
   }
 
-  private getMaeLevels() {
-    const numLevels = 3;
-
-    for (let index = 0; index < numLevels - 1; index++) {
-      this.maeLevels[index] = Number((((index + 1) * this.maeMax) / numLevels).toFixed(2));
-    }
-  }
-
-  private getMinMaxCC() {
-    const allCelsCalientes = this.reportControlService.allFilterableElements
-      .filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId)
-      .map((seg) => (seg as Seguidor).celsCalientes)
-      .filter((cc) => !isNaN(cc) && cc !== Infinity && cc !== -Infinity);
-
-    this.ccMin = Math.min(...allCelsCalientes);
-    this.ccMax = Math.max(...allCelsCalientes);
-  }
-
-  private getCCLevels() {
-    const numLevels = 3;
-
-    for (let index = 0; index < numLevels - 1; index++) {
-      this.ccLevels[index] = Number((((index + 1) * this.ccMax) / numLevels).toFixed(2));
-    }
-  }
-
-  private getMinMaxGradNormMax() {
-    const gradientes = this.reportControlService.allFilterableElements
-      .filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId)
-      .map((seg) => (seg as Seguidor).gradienteNormalizado)
-      .filter((grad) => !isNaN(grad) && grad !== Infinity && grad !== -Infinity);
-
-    this.gradMin = Math.min(...gradientes);
-    this.gradMax = Math.max(...gradientes);
-  }
-
-  private getGradNormLevels() {
-    const numLevels = 3;
-
-    for (let index = 0; index < numLevels - 1; index++) {
-      this.gradLevels[index] = Number((((index + 1) * this.gradMax) / numLevels).toFixed(2));
-    }
+  private standardDeviation(values) {
+    const n = values.length;
+    const mean = values.reduce((a, b) => a + b) / n;
+    return Math.sqrt(values.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
   }
 
   // ESTILOS MAE
@@ -403,7 +365,7 @@ export class SeguidoresControlService {
             width: focused ? 6 : 4,
           }),
           fill: new Fill({
-            color: focused ? 'rgba(255,255,255,0.5)' : this.hexToRgb(this.getColorSeguidorMae(feature), 0.5),
+            color: 'rgba(255,255,255, 0)',
           }),
         });
       }
@@ -412,10 +374,12 @@ export class SeguidoresControlService {
 
   private getColorSeguidorMae(feature: Feature) {
     const mae = feature.getProperties().properties.mae as number;
+    const informeId = feature.getProperties().properties.informeId;
+    const index = this.reportControlService.informesIdList.indexOf(informeId);
 
-    if (mae <= (this.maeMax - this.maeMin) / 3) {
+    if (mae <= this.maesMedio[index] - this.maesSigma[index]) {
       return GLOBAL.colores_mae[0];
-    } else if (mae <= (2 * (this.maeMax - this.maeMin)) / 3) {
+    } else if (mae < this.maesMedio[index] + this.maesSigma[index]) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -423,9 +387,11 @@ export class SeguidoresControlService {
   }
 
   getColorSeguidorMaeExternal(mae: number) {
-    if (mae <= (this.maeMax - this.maeMin) / 3) {
+    const index = this.reportControlService.informesIdList.indexOf(this.selectedInformeId);
+
+    if (mae < this.maesMedio[index] - this.maesSigma[index]) {
       return GLOBAL.colores_mae[0];
-    } else if (mae <= (2 * (this.maeMax - this.maeMin)) / 3) {
+    } else if (mae <= this.maesMedio[index] + this.maesSigma[index]) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -442,7 +408,7 @@ export class SeguidoresControlService {
             width: focused ? 6 : 4,
           }),
           fill: new Fill({
-            color: focused ? 'rgba(255,255,255,0.5)' : this.hexToRgb(this.getColorSeguidorCelsCalientes(feature), 0.5),
+            color: 'rgba(255,255,255, 0)',
           }),
         });
       }
@@ -450,16 +416,14 @@ export class SeguidoresControlService {
   }
 
   private getColorSeguidorCelsCalientes(feature: Feature) {
-    const numModulos = feature.getProperties().properties.filas * feature.getProperties().properties.columnas;
-    const celsCalientes = feature
-      .getProperties()
-      // tslint:disable-next-line: triple-equals
-      .properties.anomalias.filter((anomalia) => anomalia.tipo == 8 || anomalia.tipo == 9).length;
-    const porcentCelsCalientes = celsCalientes / numModulos;
+    const celsCalientes = feature.getProperties().properties.celsCalientes;
 
-    if (porcentCelsCalientes <= (this.ccMax - this.ccMin) / 3) {
+    const informeId = feature.getProperties().properties.informedId;
+    const index = this.reportControlService.informesIdList.indexOf(informeId);
+
+    if (celsCalientes <= this.ccsMedio[index] - this.ccsSigma[index]) {
       return GLOBAL.colores_mae[0];
-    } else if (porcentCelsCalientes <= (2 * (this.ccMax - this.ccMin)) / 3) {
+    } else if (celsCalientes < this.ccsMedio[index] + this.ccsSigma[index]) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -476,9 +440,7 @@ export class SeguidoresControlService {
             width: focused ? 6 : 4,
           }),
           fill: new Fill({
-            color: focused
-              ? 'rgba(255,255,255,0.5)'
-              : this.hexToRgb(this.getColorSeguidorGradienteNormMax(feature), 0.5),
+            color: 'rgba(255,255,255, 0)',
           }),
         });
       }
@@ -488,9 +450,9 @@ export class SeguidoresControlService {
   private getColorSeguidorGradienteNormMax(feature: Feature) {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
-    if (gradNormMax <= (this.gradMax - this.gradMin) / 3) {
+    if (gradNormMax <= 5) {
       return GLOBAL.colores_mae[0];
-    } else if (gradNormMax <= (2 * (this.gradMax - this.gradMin)) / 3) {
+    } else if (gradNormMax < 10) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -498,9 +460,9 @@ export class SeguidoresControlService {
   }
 
   getColorSeguidorGradienteNormMaxExternal(gradNormMax: number) {
-    if (gradNormMax <= (this.gradMax - this.gradMin) / 3) {
+    if (gradNormMax <= 5) {
       return GLOBAL.colores_mae[0];
-    } else if (gradNormMax <= (2 * (this.gradMax - this.gradMin)) / 3) {
+    } else if (gradNormMax < 10) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];

@@ -181,7 +181,8 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     if (this.viewSelected == 1) {
       // en el view Cels. Calientes solo mostramos estas
       this.seguidorSelected.anomaliasCliente
-        .filter((anom) => anom.tipo === 8 || anom.tipo === 9)
+        // tslint:disable-next-line: triple-equals
+        .filter((anom) => anom.tipo == 8 || anom.tipo == 9)
         .forEach((anom) => this.drawAnomalia(anom));
     } else {
       this.seguidorSelected.anomaliasCliente.forEach((anom) => this.drawAnomalia(anom));

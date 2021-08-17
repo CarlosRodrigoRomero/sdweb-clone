@@ -63,6 +63,9 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
             anomalias = seguidor.anomaliasCliente.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
           }
 
+          // vaciamos el datasource
+          this.dataSource = undefined;
+
           // marcamos la nueva seleccionada
           this.seguidorViewService.anomaliaSelected = anomalias[0];
 
@@ -106,7 +109,9 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
   }
 
   ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
+    if (this.dataSource !== undefined) {
+      this.dataSource.sort = this.sort;
+    }
   }
 
   hoverAnomalia(row: any) {

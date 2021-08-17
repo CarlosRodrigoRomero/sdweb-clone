@@ -75,6 +75,8 @@ export class SeguidorSliderTemporalComponent implements OnInit, OnDestroy {
   }
 
   onChangeTemporalSlider(value: number) {
+    this.mapSeguidoresService.sliderTemporalSelected = value;
+
     // reiniamos las imagenes
     this.resetImages();
 
