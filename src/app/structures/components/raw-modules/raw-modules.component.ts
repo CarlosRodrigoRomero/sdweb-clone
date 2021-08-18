@@ -17,6 +17,7 @@ import { FilterService } from '@core/services/filter.service';
 import { RawModule } from '@core/models/moduloBruto';
 
 import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
+import Feature from 'ol/Feature';
 
 @Component({
   selector: 'app-raw-modules',
@@ -100,8 +101,6 @@ export class RawModulesComponent implements OnInit {
     this.map.addInteraction(this.draw);
 
     this.draw.on('drawend', (evt) => {
-      // sourceRawModule.clear();
-
       const polygon = evt.feature.getGeometry() as Polygon;
       const coords = polygon.getCoordinates();
       coords[0].pop(); // quitamos el ultimo punto que es igual al primero
@@ -115,6 +114,9 @@ export class RawModulesComponent implements OnInit {
 
       // añadimos el nuevo modulo a la DB
       this.structuresService.addRawModule(rawModule);
+
+      // añadimos el nuevo modulo como feature
+      // this.addRawModFeature(rawModule);
     });
   }
 
@@ -123,6 +125,29 @@ export class RawModulesComponent implements OnInit {
 
     this.map.removeInteraction(this.draw);
   }
+
+  private addRawModFeature(rawModule: RawModule) {
+    let rawModLayer;
+    this.map.getLayers().forEach((layer) => {
+      if (layer.getProperties().id === 'rawModLayer') {
+        rawModLayer = layer;
+      }
+    });
+
+    const mBSource = rawModLayer.getSource();
+    const feature = new Feature({
+      geometry: new Polygon([rawModule.coords]),
+      properties: {
+        id: rawModule.id,
+        name: 'rawMod',
+        visible: true,
+      },
+    });
+
+    mBSource.addFeature(feature);
+  }
+
+  
 
   restoreLastDeletedModule() {
     let deletedIds: string[] = [];
