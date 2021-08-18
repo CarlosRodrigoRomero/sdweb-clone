@@ -7,20 +7,29 @@
         <!-- FASE 1 -->
         <mat-step>
           <ng-template matStepLabel>Filtrar módulos</ng-template>
+          <app-raw-modules-filters></app-raw-modules-filters>
+          <div class="next-button">
+            <button mat-stroked-button matStepperNext (click)="endFilterSubscription()">Siguiente</button>
+          </div>
+        </mat-step>
+
+        <!-- FASE 2 -->
+        <mat-step>
+          <ng-template matStepLabel>Crear y eliminar módulos</ng-template>
           <app-raw-modules></app-raw-modules>
           <div class="next-button">
             <button
               [disabled]="deleteRawModMode || createRawModMode"
               mat-stroked-button
               matStepperNext
-              (click)="toggleLoadModuleGroups(true); resetFase1(); setReportNumModules()"
+              (click)="toggleLoadModuleGroups(true); resetFase2(); setReportNumModules()"
             >
               Siguiente
             </button>
           </div>
         </mat-step>
 
-        <!-- FASE 2 -->
+        <!-- FASE 3 -->
         <mat-step>
           <ng-template matStepLabel>Crear agrupaciones auto</ng-template>
           <app-auto-module-groups></app-auto-module-groups>
@@ -32,7 +41,7 @@
           </div>
         </mat-step>
 
-        <!-- FASE 3 -->
+        <!-- FASE 4 -->
         <mat-step>
           <ng-template matStepLabel>Editar agrupaciones</ng-template>
           <div>
@@ -44,7 +53,7 @@
               mat-stroked-button
               matStepperNext
               (click)="
-                toggleLoadRawModules(false); toggleLoadModuleGroups(false); toggleLoadNormModules(true); resetFase3()
+                toggleLoadRawModules(false); toggleLoadModuleGroups(false); toggleLoadNormModules(true); resetFase4()
               "
             >
               Siguiente
@@ -77,7 +86,7 @@
           </div>
         </mat-step>
 
-        <!-- FASE 5 -->
+        <!-- FASE 6 -->
         <mat-step>
           <ng-template matStepLabel>Editar módulos normalizados</ng-template>
           <div>
@@ -88,7 +97,7 @@
               class="back-btn"
               mat-stroked-button
               matStepperPrevious
-              (click)="toggleEditNormModules(false); toggleLoadModuleGroups(false); resetFase5()"
+              (click)="toggleEditNormModules(false); toggleLoadModuleGroups(false); resetFase6()"
             >
               Atrás
             </button>

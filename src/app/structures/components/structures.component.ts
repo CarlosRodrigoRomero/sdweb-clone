@@ -35,6 +35,10 @@ export class StructuresComponent implements OnInit {
     this.informeService.getInforme(this.structuresService.informeId).subscribe((informe) => (this.informe = informe));
   }
 
+  endFilterSubscription() {
+    this.structuresService.endFilterSubscription = true;
+  }
+
   toggleLoadRawModules(load: boolean) {
     // ocultamos los modulos en bruto
     this.structuresService.loadRawModules = load;
@@ -55,20 +59,20 @@ export class StructuresComponent implements OnInit {
     this.structuresService.editNormModules = edit;
   }
 
-  resetFase1() {
+  resetFase2() {
     this.structuresService.deleteRawModMode = undefined;
     this.map.removeInteraction(this.olMapService.draw);
     this.olMapService.draw = undefined;
   }
 
-  resetFase3() {
+  resetFase4() {
     this.structuresService.drawModGroups = false;
     this.structuresService.modGroupSelectedId = undefined;
     this.map.removeInteraction(this.olMapService.draw);
     this.olMapService.draw = undefined;
   }
 
-  resetFase5() {
+  resetFase6() {
     this.structuresService.normModSelected = undefined;
     this.map.removeInteraction(this.olMapService.draw);
     this.olMapService.draw = undefined;

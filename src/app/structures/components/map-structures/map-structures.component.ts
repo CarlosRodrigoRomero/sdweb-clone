@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { switchMap, take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
@@ -51,6 +52,9 @@ export class MapStructuresComponent implements OnInit {
   public layerVisibility = true;
   private prevFeatureHover: Feature;
   private rawModLayer: VectorLayer;
+  endFilterSubscription = false;
+
+  private subscriptionFilters: Subscription = new Subscription();
 
   constructor(
     private olMapService: OlMapService,
@@ -62,6 +66,12 @@ export class MapStructuresComponent implements OnInit {
 
   ngOnInit(): void {
     this.planta = this.structuresService.planta;
+
+    this.structuresService.endFilterSubscription$.subscribe((end) => {
+      if (end) {
+        this.subscriptionFilters.unsubscribe();
+      }
+    });
 
     this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode));
 
@@ -196,40 +206,42 @@ export class MapStructuresComponent implements OnInit {
         if (init) {
           const mBSource = this.rawModLayer.getSource();
 
-          this.structuresService
-            .getFiltersParams()
-            .pipe(
-              take(1),
-              switchMap((filtParams) => {
-                if (filtParams.length > 0) {
-                  this.structuresService.applyFilters(filtParams);
+          this.subscriptionFilters.add(
+            this.structuresService
+              .getFiltersParams()
+              .pipe(
+                take(1),
+                switchMap((filtParams) => {
+                  if (filtParams.length > 0) {
+                    this.structuresService.applyFilters(filtParams);
 
-                  this.structuresService.deletedRawModIds = filtParams[0].eliminados;
+                    this.structuresService.deletedRawModIds = filtParams[0].eliminados;
+                  }
+
+                  return this.filterService.filteredElements$;
+                })
+              )
+              // .pipe(take(1))
+              .subscribe((elems) => {
+                mBSource.clear();
+
+                if (this.rawModDeletedIds) {
+                  this.rawMods = (elems as RawModule[]).filter((mB) => !this.rawModDeletedIds.includes(mB.id));
+                } else {
+                  this.rawMods = elems as RawModule[];
                 }
 
-                return this.filterService.filteredElements$;
+                // actualizamos las medias y desviaciones estandar con los modulos filtrados
+                this.structuresService.updateAveragesAndStandardDeviations(this.rawMods);
+
+                // asignamos el numero de modulos del informe
+                this.structuresService.reportNumModules = this.rawMods.length;
+
+                this.rawMods.forEach((rawMod) => {
+                  this.addRawModule(rawMod);
+                });
               })
-            )
-            // .pipe(take(1))
-            .subscribe((elems) => {
-              mBSource.clear();
-
-              if (this.rawModDeletedIds) {
-                this.rawMods = (elems as RawModule[]).filter((mB) => !this.rawModDeletedIds.includes(mB.id));
-              } else {
-                this.rawMods = elems as RawModule[];
-              }
-
-              // actualizamos las medias y desviaciones estandar con los modulos filtrados
-              this.structuresService.updateAveragesAndStandardDeviations(this.rawMods);
-
-              // asignamos el numero de modulos del informe
-              this.structuresService.reportNumModules = this.rawMods.length;
-
-              this.rawMods.forEach((rawMod) => {
-                this.addRawModule(rawMod);
-              });
-            });
+          );
         }
       });
   }

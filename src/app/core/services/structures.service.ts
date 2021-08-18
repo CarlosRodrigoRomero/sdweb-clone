@@ -33,6 +33,9 @@ export class StructuresService {
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _thermalLayer: ThermalLayerInterface;
 
+  private _endFilterSubscription = false;
+  endFilterSubscription$ = new BehaviorSubject<boolean>(this._endFilterSubscription);
+
   private _loadRawModules = false;
   loadRawModules$ = new BehaviorSubject<boolean>(this._loadRawModules);
   private _allRawModules: RawModule[] = [];
@@ -459,6 +462,15 @@ export class StructuresService {
   }
 
   /* RAW MODULES */
+
+  get endFilterSubscription() {
+    return this._endFilterSubscription;
+  }
+
+  set endFilterSubscription(value: boolean) {
+    this._endFilterSubscription = value;
+    this.endFilterSubscription$.next(value);
+  }
 
   get createRawModMode() {
     return this._createRawModMode;
