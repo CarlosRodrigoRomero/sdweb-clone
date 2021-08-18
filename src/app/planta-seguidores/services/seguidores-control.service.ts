@@ -99,7 +99,19 @@ export class SeguidoresControlService {
     this.getMaesMedioSigma();
     this.getCCsMedioSigma();
 
-    this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
+    this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => {
+      this.toggleViewSelected = viewSel;
+
+      // eliminamos la anterior interacción para que la actual obtenga el estilo correcto
+      this.map.getInteractions().forEach((interaction) => {
+        if (interaction instanceof Select) {
+          this.map.removeInteraction(interaction);
+        }
+      });
+
+      // la añadimos de nuevo
+      this.addSelectInteraction();
+    });
 
     return this.initialized$;
   }
@@ -168,7 +180,6 @@ export class SeguidoresControlService {
             seguidorId: seguidor.id,
             informeId: seguidor.informeId,
             mae: seguidor.mae,
-            /* temperaturaMax: seguidor.temperaturaMax, */
             gradienteNormalizado: seguidor.gradienteNormalizado,
             celsCalientes: seguidor.celsCalientes,
             anomalias: seguidor.anomalias,
@@ -183,7 +194,7 @@ export class SeguidoresControlService {
     this.addCursorOnHover();
     this.addOnHoverAction();
 
-    this.addSelectInteraction();
+    // this.addSelectInteraction();
     // this.addClickOutFeatures();
   }
 
@@ -260,14 +271,8 @@ export class SeguidoresControlService {
   }
 
   private addSelectInteraction() {
-    const estilosView = [
-      this.getStyleSeguidoresMae(false),
-      this.getStyleSeguidoresCelsCalientes(false),
-      this.getStyleSeguidoresGradienteNormMax(false),
-    ];
-
     const select = new Select({
-      style: estilosView[this.toggleViewSelected],
+      style: this.getStyleSeguidores(),
       // condition: click,
       layers: (l) => {
         if (
@@ -313,6 +318,16 @@ export class SeguidoresControlService {
         this.seguidorSelected = undefined;
       }
     });
+  }
+
+  private getStyleSeguidores() {
+    const estilosView = [
+      this.getStyleSeguidoresMae(false),
+      this.getStyleSeguidoresCelsCalientes(false),
+      this.getStyleSeguidoresGradienteNormMax(false),
+    ];
+
+    return estilosView[this.toggleViewSelected];
   }
 
   setPopupPosition(coords: Coordinate) {
