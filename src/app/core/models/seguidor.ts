@@ -48,9 +48,9 @@ export class Seguidor implements FilterableElement {
     this.plantaId = plantaId;
     this.filas = filas;
     this.columnas = columnas;
-    this.perdidas = this.getPerdidas(anomalias);
+    this.perdidas = this.getPerdidas(this.anomaliasCliente);
     this.temperaturaMax = this.getTempMax();
-    this.mae = this.getMae();
+    this.mae = this.perdidas;
     this.gradienteNormalizado = this.getGradienteNormMax();
     this.informeId = informeId;
     this.modulo = modulo;
@@ -64,24 +64,28 @@ export class Seguidor implements FilterableElement {
   }
 
   private getPerdidas(anomalias: Anomalia[]): number {
-    let suma = 0;
+    let sumaPerdidas = 0;
     if (anomalias.length > 0) {
       anomalias.forEach((anomalia) => {
         if (anomalia.perdidas !== undefined) {
-          suma += anomalia.perdidas;
+          sumaPerdidas += anomalia.perdidas;
         }
       });
     }
-    return suma;
-  }
-
-  private getMae(): number {
     let mae = 0;
-    if (this.perdidas !== 0) {
-      mae = this.perdidas / (this.filas * this.columnas);
+    if (sumaPerdidas > 0) {
+      mae = sumaPerdidas / (this.filas * this.columnas);
     }
     return mae;
   }
+
+  // private getMae(): number {
+  //   let mae = 0;
+  //   if (this.perdidas !== 0) {
+  //     mae = this.perdidas / (this.filas * this.columnas);
+  //   }
+  //   return mae;
+  // }
 
   private getTempMax(): number {
     let tempMax = 0;

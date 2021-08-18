@@ -334,6 +334,10 @@ export class SeguidoresControlService {
   }
 
   private getMaesMedioSigma() {
+    // reseteamos su valor al calcularlos de nuevo
+    this.maesMedio = [];
+    this.maesSigma = [];
+
     this.reportControlService.informesIdList.forEach((informeId) => {
       const maes = this.reportControlService.allFilterableElements
         .filter((seg) => (seg as Seguidor).informeId === informeId)
@@ -342,13 +346,6 @@ export class SeguidoresControlService {
       this.maesMedio.push(this.average(maes));
       this.maesSigma.push(this.standardDeviation(maes));
     });
-  }
-
-  private average(values: number[]): number {
-    let suma = 0;
-    values.forEach((value) => (suma += value));
-
-    return suma / values.length;
   }
 
   private getCCsMedioSigma() {
@@ -363,7 +360,16 @@ export class SeguidoresControlService {
     });
   }
 
-  private standardDeviation(values) {
+  private average(data: number[]): number {
+    const sum = data.reduce(function (sum, value) {
+      return sum + value;
+    }, 0);
+
+    const avg = sum / data.length;
+    return avg;
+  }
+
+  private standardDeviation(values): number {
     const n = values.length;
     const mean = values.reduce((a, b) => a + b) / n;
     return Math.sqrt(values.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
@@ -391,7 +397,7 @@ export class SeguidoresControlService {
     const informeId = feature.getProperties().properties.informeId;
     const index = this.reportControlService.informesIdList.indexOf(informeId);
 
-    if (mae <= this.maesMedio[index] - this.maesSigma[index]) {
+    if (mae === 0 || mae <= this.maesMedio[index] - this.maesSigma[index]) {
       return GLOBAL.colores_mae[0];
     } else if (mae < this.maesMedio[index] + this.maesSigma[index]) {
       return GLOBAL.colores_mae[1];
@@ -432,7 +438,7 @@ export class SeguidoresControlService {
   private getColorSeguidorCelsCalientes(feature: Feature) {
     const celsCalientes = feature.getProperties().properties.celsCalientes;
 
-    const informeId = feature.getProperties().properties.informedId;
+    const informeId = feature.getProperties().properties.informeId;
     const index = this.reportControlService.informesIdList.indexOf(informeId);
 
     if (celsCalientes <= this.ccsMedio[index] - this.ccsSigma[index]) {
@@ -611,12 +617,13 @@ export class SeguidoresControlService {
   }
 
   setExternalStyle(seguidorId: string, focus: boolean) {
-    this.listaSeguidores.find((seg) => seg.id === seguidorId);
+    const layersInforme = this.seguidorLayers.filter(
+      (layer) => layer.getProperties().informeId === this.selectedInformeId
+    );
 
-    const features = this.seguidorLayers
-      .find((layer) => layer.getProperties().informeId === this.selectedInformeId)
-      .getSource()
-      .getFeatures();
+    const layerView = layersInforme[this.toggleViewSelected];
+
+    const features = layerView.getSource().getFeatures();
 
     const feature = features.find((f) => f.getProperties().properties.seguidorId === seguidorId);
 
@@ -626,7 +633,7 @@ export class SeguidoresControlService {
         width: 6,
       }),
       fill: new Fill({
-        color: 'rgba(0, 0, 255, 0)',
+        color: 'rgba(255, 255, 255, 0)',
       }),
     });
 
@@ -638,7 +645,7 @@ export class SeguidoresControlService {
           width: 4,
         }),
         fill: new Fill({
-          color: this.hexToRgb(this.getColorSeguidorMae(feature), 0.5),
+          color: 'rgba(255, 255, 255, 0)',
         }),
       });
     } else if (this.toggleViewSelected === 1) {
@@ -648,7 +655,7 @@ export class SeguidoresControlService {
           width: 4,
         }),
         fill: new Fill({
-          color: this.hexToRgb(this.getColorSeguidorCelsCalientes(feature), 0.5),
+          color: 'rgba(255, 255, 255, 0)',
         }),
       });
     } else {
@@ -658,7 +665,7 @@ export class SeguidoresControlService {
           width: 4,
         }),
         fill: new Fill({
-          color: this.hexToRgb(this.getColorSeguidorGradienteNormMax(feature), 0.5),
+          color: 'rgba(255, 255, 255, 0)',
         }),
       });
     }

@@ -7,8 +7,7 @@
       </div>
       <div *ngIf="numAnomalias > 0" class="elemento">
         <span class="titulo">MAE</span>
-        <span class="subtitulo">{{ seguidorHovered.mae | number: '1.0-2' }}</span>
-        <!-- <span class="subtitulo">{{ seguidorHovered.perdidas * 100 | number: '1.0-2' }}%</span> -->
+        <span class="subtitulo">{{ seguidorHovered.mae * 100 | number: '1.0-2' }}%</span>
       </div>
       <div *ngIf="numAnomalias > 0" class="elemento">
         <span class="titulo">&Delta;T Max (normalizado)</span>

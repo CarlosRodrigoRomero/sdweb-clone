@@ -113,7 +113,7 @@ export class ClassificationComponent implements OnInit {
     });
   }
 
-  private getMaeInforme() {
+  private getMaeInforme(): number {
     const perdidas = this.anomalias.map((anom) => anom.perdidas);
     let perdidasTotales = 0;
     perdidas.forEach((perd) => (perdidasTotales += perd));
@@ -121,8 +121,9 @@ export class ClassificationComponent implements OnInit {
     return (perdidasTotales / this.informe.numeroModulos) * 100;
   }
 
-  private getCCInforme() {
-    const celCals = this.anomalias.filter((anom) => anom.tipo === 8 || anom.tipo === 9);
+  private getCCInforme(): number {
+    // tslint:disable-next-line: triple-equals
+    const celCals = this.anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
     return (celCals.length / this.informe.numeroModulos) * 100;
   }
