@@ -71,49 +71,49 @@ export class SeguidoresControlService {
     private informeService: InformeService
   ) {}
 
-  initService(): Observable<boolean> {
+  initService(): Promise<boolean> {
     const getMap = this.olMapService.getMap();
     const getSegLayers = this.olMapService.getSeguidorLayers();
     const getIfSharedWithFilters = this.reportControlService.sharedReportWithFilters$;
 
-    combineLatest([getMap, getSegLayers, getIfSharedWithFilters])
-      .pipe(take(1))
-      .subscribe(([map, segL, isSharedWithFil]) => {
-        this.map = map;
-        this.seguidorLayers = segL;
-        this.sharedReportNoFilters = !isSharedWithFil;
+    return new Promise((initService) => {
+      combineLatest([getMap, getSegLayers, getIfSharedWithFilters])
+        .pipe(take(1))
+        .subscribe(([map, segL, isSharedWithFil]) => {
+          this.map = map;
+          this.seguidorLayers = segL;
+          this.sharedReportNoFilters = !isSharedWithFil;
+        });
 
-        this.initialized$.next(true);
+      this.reportControlService.selectedInformeId$
+        .pipe(
+          switchMap((informeId) => {
+            this.selectedInformeId = informeId;
+
+            return this.informeService.getInforme(informeId);
+          })
+        )
+        .subscribe((informe) => (this.selectedInforme = informe));
+
+      this.getMaesMedioSigma();
+      this.getCCsMedioSigma();
+
+      this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => {
+        this.toggleViewSelected = viewSel;
+
+        // eliminamos la anterior interacción para que la actual obtenga el estilo correcto
+        this.map.getInteractions().forEach((interaction) => {
+          if (interaction instanceof Select) {
+            this.map.removeInteraction(interaction);
+          }
+        });
+
+        // la añadimos de nuevo
+        this.addSelectInteraction();
       });
 
-    this.reportControlService.selectedInformeId$
-      .pipe(
-        switchMap((informeId) => {
-          this.selectedInformeId = informeId;
-
-          return this.informeService.getInforme(informeId);
-        })
-      )
-      .subscribe((informe) => (this.selectedInforme = informe));
-
-    this.getMaesMedioSigma();
-    this.getCCsMedioSigma();
-
-    this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => {
-      this.toggleViewSelected = viewSel;
-
-      // eliminamos la anterior interacción para que la actual obtenga el estilo correcto
-      this.map.getInteractions().forEach((interaction) => {
-        if (interaction instanceof Select) {
-          this.map.removeInteraction(interaction);
-        }
-      });
-
-      // la añadimos de nuevo
-      this.addSelectInteraction();
+      initService(true);
     });
-
-    return this.initialized$;
   }
 
   public createSeguidorLayers(informeId: string): VectorLayer[] {
@@ -194,7 +194,6 @@ export class SeguidoresControlService {
     this.addCursorOnHover();
     this.addOnHoverAction();
 
-    // this.addSelectInteraction();
     // this.addClickOutFeatures();
   }
 
