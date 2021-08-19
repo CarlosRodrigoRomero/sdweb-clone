@@ -1,5 +1,6 @@
 .resumen {
   display: flex;
+  position: fixed;
 }
 
 .grupo1 {
@@ -75,7 +76,7 @@
   }
 
   .resumen {
-    grid-template-columns: 92% 8%;
+    /* grid-template-columns: 92% 8%; */
   }
 }
 
