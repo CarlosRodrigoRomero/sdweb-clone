@@ -221,25 +221,26 @@ export class MapStructuresComponent implements OnInit {
                   return this.filterService.filteredElements$;
                 })
               )
-              // .pipe(take(1))
               .subscribe((elems) => {
                 mBSource.clear();
 
-                if (this.rawModDeletedIds) {
+                if (this.rawModDeletedIds.length > 0) {
                   this.rawMods = (elems as RawModule[]).filter((mB) => !this.rawModDeletedIds.includes(mB.id));
                 } else {
                   this.rawMods = elems as RawModule[];
                 }
 
-                // actualizamos las medias y desviaciones estandar con los modulos filtrados
-                this.structuresService.updateAveragesAndStandardDeviations(this.rawMods);
+                if (this.rawMods.length > 0) {
+                  // actualizamos las medias y desviaciones estandar con los modulos filtrados
+                  // this.structuresService.updateAveragesAndStandardDeviations(this.rawMods);
 
-                // asignamos el numero de modulos del informe
-                this.structuresService.reportNumModules = this.rawMods.length;
+                  // asignamos el numero de modulos del informe
+                  this.structuresService.reportNumModules = this.rawMods.length;
 
-                this.rawMods.forEach((rawMod) => {
-                  this.addRawModule(rawMod);
-                });
+                  this.rawMods.forEach((rawMod) => {
+                    this.addRawModule(rawMod);
+                  });
+                }
               })
           );
         }
