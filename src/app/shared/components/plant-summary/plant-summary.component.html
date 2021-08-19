@@ -1,10 +1,8 @@
 <div *ngIf="informe$ | async" class="resumen">
   <div class="grupo1">
     <mat-icon color="primary">home</mat-icon>
-    <h5 class="titulo">
-      {{ nombrePlanta }}
-      <span class="subtitulo">({{ potenciaPlanta | number: '1.0-2' }} MW / {{ tipoPlanta }})</span>
-    </h5>
+    <h5 class="titulo">{{ nombrePlanta }}</h5>
+    <span class="subtitulo">({{ potenciaPlanta | number: '1.0-2' }} MW / {{ tipoPlanta }})</span>
   </div>
   <div class="grupo2" [matMenuTriggerFor]="menu" matTooltip="Datos vuelo">
     <mat-icon>info</mat-icon>
