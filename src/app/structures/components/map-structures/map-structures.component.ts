@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { switchMap, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
@@ -16,6 +16,7 @@ import Polygon from 'ol/geom/Polygon';
 import { Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
 import { OSM, Source } from 'ol/source';
+import { FeatureLike } from 'ol/Feature';
 
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
@@ -30,14 +31,13 @@ import { FilterService } from '@core/services/filter.service';
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { RawModule } from '@core/models/moduloBruto';
-import { FeatureLike } from 'ol/Feature';
 
 @Component({
   selector: 'app-map-structures',
   templateUrl: './map-structures.component.html',
   styleUrls: ['./map-structures.component.css'],
 })
-export class MapStructuresComponent implements OnInit {
+export class MapStructuresComponent implements OnInit, OnDestroy {
   private planta: PlantaInterface;
   private informeId: string = undefined;
   private map: Map;
@@ -55,6 +55,7 @@ export class MapStructuresComponent implements OnInit {
   endFilterSubscription = false;
 
   private subscriptionFilters: Subscription = new Subscription();
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private olMapService: OlMapService,
@@ -67,15 +68,17 @@ export class MapStructuresComponent implements OnInit {
   ngOnInit(): void {
     this.planta = this.structuresService.planta;
 
-    this.structuresService.endFilterSubscription$.subscribe((end) => {
-      if (end) {
-        this.subscriptionFilters.unsubscribe();
-      }
-    });
+    this.subscriptions.add(
+      this.structuresService.endFilterSubscription$.subscribe((end) => {
+        if (end) {
+          this.subscriptionFilters.unsubscribe();
+        }
+      })
+    );
 
-    this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode));
+    this.subscriptions.add(this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode)));
 
-    this.structuresService.deletedRawModIds$.subscribe((ids) => (this.rawModDeletedIds = ids));
+    this.subscriptions.add(this.structuresService.deletedRawModIds$.subscribe((ids) => (this.rawModDeletedIds = ids)));
 
     this.informeId = this.structuresService.informeId;
 
@@ -84,7 +87,9 @@ export class MapStructuresComponent implements OnInit {
       .pipe(take(1))
       .subscribe((layersDB) => {
         // nos suscribimos a las capas termicas del mapa
-        this.olMapService.getThermalLayers().subscribe((tLayers) => (this.thermalLayers = tLayers));
+        this.subscriptions.add(
+          this.olMapService.getThermalLayers().subscribe((tLayers) => (this.thermalLayers = tLayers))
+        );
 
         // esta es la thermalLayer de la DB
         this.thermalLayerDB = layersDB[0];
@@ -134,7 +139,7 @@ export class MapStructuresComponent implements OnInit {
 
     this.olMapService
       .createMap('map', layers, view, defaultControls({ attribution: false }))
-      .pipe(take(1))
+      // .pipe(take(1))
       .subscribe((map) => {
         this.map = map;
       });
@@ -188,63 +193,65 @@ export class MapStructuresComponent implements OnInit {
   }
 
   private addInitialRawModules() {
-    this.structuresService
-      .getModulosBrutos()
-      .pipe(
-        take(1),
-        switchMap((modulos) => {
-          // asignamos todos los modulos
-          this.structuresService.allRawModules = modulos;
+    this.subscriptions.add(
+      this.structuresService
+        .getModulosBrutos()
+        .pipe(
+          take(1),
+          switchMap((modulos) => {
+            // asignamos todos los modulos
+            this.structuresService.allRawModules = modulos;
 
-          // calculamos las medias y desviaciones
-          this.structuresService.setInitialAveragesAndStandardDeviations();
+            // calculamos las medias y desviaciones
+            this.structuresService.setInitialAveragesAndStandardDeviations();
 
-          return this.filterService.initService(modulos);
-        })
-      )
-      .subscribe((init) => {
-        if (init) {
-          const mBSource = this.rawModLayer.getSource();
+            return this.filterService.initService(modulos);
+          })
+        )
+        .subscribe((init) => {
+          if (init) {
+            const mBSource = this.rawModLayer.getSource();
 
-          this.subscriptionFilters.add(
-            this.structuresService
-              .getFiltersParams()
-              .pipe(
-                take(1),
-                switchMap((filtParams) => {
-                  if (filtParams.length > 0) {
-                    this.structuresService.applyFilters(filtParams);
+            this.subscriptionFilters.add(
+              this.structuresService
+                .getFiltersParams()
+                .pipe(
+                  take(1),
+                  switchMap((filtParams) => {
+                    if (filtParams.length > 0) {
+                      this.structuresService.applyFilters(filtParams);
 
-                    this.structuresService.deletedRawModIds = filtParams[0].eliminados;
+                      this.structuresService.deletedRawModIds = filtParams[0].eliminados;
+                    }
+
+                    return this.filterService.filteredElements$;
+                  })
+                )
+                .subscribe((elems) => {
+                  mBSource.clear();
+
+                  if (this.rawModDeletedIds.length > 0) {
+                    this.rawMods = (elems as RawModule[]).filter((mB) => !this.rawModDeletedIds.includes(mB.id));
+                  } else {
+                    this.rawMods = elems as RawModule[];
                   }
 
-                  return this.filterService.filteredElements$;
+                  if (this.rawMods.length > 0) {
+                    // actualizamos las medias y desviaciones estandar con los modulos filtrados
+                    this.structuresService.updateAveragesAndStandardDeviations(this.rawMods);
+
+                    // asignamos el numero de modulos del informe
+                    this.structuresService.reportNumModules = this.rawMods.length;
+
+                    this.rawMods.forEach((rawMod) => {
+                      this.addRawModule(rawMod);
+                    });
+                  }
                 })
-              )
-              .subscribe((elems) => {
-                mBSource.clear();
-
-                if (this.rawModDeletedIds.length > 0) {
-                  this.rawMods = (elems as RawModule[]).filter((mB) => !this.rawModDeletedIds.includes(mB.id));
-                } else {
-                  this.rawMods = elems as RawModule[];
-                }
-
-                if (this.rawMods.length > 0) {
-                  // actualizamos las medias y desviaciones estandar con los modulos filtrados
-                  // this.structuresService.updateAveragesAndStandardDeviations(this.rawMods);
-
-                  // asignamos el numero de modulos del informe
-                  this.structuresService.reportNumModules = this.rawMods.length;
-
-                  this.rawMods.forEach((rawMod) => {
-                    this.addRawModule(rawMod);
-                  });
-                }
-              })
-          );
-        }
-      });
+            );
+          }
+        })
+    );
   }
 
   private addRawModule(rawMod: RawModule) {
@@ -454,5 +461,10 @@ export class MapStructuresComponent implements OnInit {
           (layer.getProperties().id !== 'rawModLayer' && layer.getProperties().id !== 'nMLayer')
       )
       .forEach((layer) => layer.setVisible(this.layerVisibility));
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+    this.subscriptionFilters.unsubscribe();
   }
 }

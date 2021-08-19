@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+import { Subscription } from 'rxjs';
 
 import { StructuresService } from '@core/services/structures.service';
 
@@ -9,9 +11,11 @@ import { StructuresService } from '@core/services/structures.service';
   templateUrl: './auto-norm-modules.component.html',
   styleUrls: ['./auto-norm-modules.component.css'],
 })
-export class AutoNormModulesComponent implements OnInit {
+export class AutoNormModulesComponent implements OnInit, OnDestroy {
   private moduleGroups: any[];
   form: FormGroup;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private http: HttpClient,
@@ -20,7 +24,9 @@ export class AutoNormModulesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.structuresService.getModuleGroups().subscribe((groups) => (this.moduleGroups = groups));
+    this.subscriptions.add(
+      this.structuresService.getModuleGroups().subscribe((groups) => (this.moduleGroups = groups))
+    );
 
     this.buildForm();
   }
@@ -62,5 +68,9 @@ export class AutoNormModulesComponent implements OnInit {
           });
       });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

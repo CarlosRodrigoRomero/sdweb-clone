@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { MatDialog } from '@angular/material/dialog';
+
+import { Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
 import VectorLayer from 'ol/layer/Vector';
@@ -30,7 +32,7 @@ import GeometryType from 'ol/geom/GeometryType';
   templateUrl: './norm-modules.component.html',
   styleUrls: ['./norm-modules.component.css'],
 })
-export class NormModulesComponent implements OnInit {
+export class NormModulesComponent implements OnInit, OnDestroy {
   private map: Map;
   private normModLayer = new VectorLayer();
   normModSelected: NormalizedModule = undefined;
@@ -42,6 +44,8 @@ export class NormModulesComponent implements OnInit {
   form: FormGroup;
   modGroupSelectedId: string = undefined;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private olMapService: OlMapService,
     private structuresService: StructuresService,
@@ -51,31 +55,37 @@ export class NormModulesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.olMapService.map$.subscribe((map) => (this.map = map));
+    this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
-    this.structuresService.normModSelected$.subscribe((normMod) => (this.normModSelected = normMod));
+    this.subscriptions.add(
+      this.structuresService.normModSelected$.subscribe((normMod) => (this.normModSelected = normMod))
+    );
 
-    this.structuresService.editNormModules$.subscribe((edit) => (this.editNormModules = edit));
+    this.subscriptions.add(this.structuresService.editNormModules$.subscribe((edit) => (this.editNormModules = edit)));
 
-    this.structuresService.modGroupSelectedId$.subscribe((id) => (this.modGroupSelectedId = id));
+    this.subscriptions.add(
+      this.structuresService.modGroupSelectedId$.subscribe((id) => (this.modGroupSelectedId = id))
+    );
 
     this.buildForm();
 
-    this.structuresService.loadNormModules$.subscribe((load) => {
-      if (load) {
-        this.createNormModulesLayer();
-        this.addNormModules();
+    this.subscriptions.add(
+      this.structuresService.loadNormModules$.subscribe((load) => {
+        if (load) {
+          this.createNormModulesLayer();
+          this.addNormModules();
 
-        this.addSelectInteraction();
+          this.addSelectInteraction();
 
-        this.addPopupOverlay();
+          this.addPopupOverlay();
 
-        this.addClickOutFeatures();
-      }
+          this.addClickOutFeatures();
+        }
 
-      // aplicamos la visibilidad dependiende de la fase en la que estemos
-      this.setNormModulesVisibility(load);
-    });
+        // aplicamos la visibilidad dependiende de la fase en la que estemos
+        this.setNormModulesVisibility(load);
+      })
+    );
   }
 
   private createNormModulesLayer() {
@@ -99,23 +109,25 @@ export class NormModulesComponent implements OnInit {
   private addNormModules() {
     const nMSource = this.normModLayer.getSource();
 
-    this.structuresService.getNormModules().subscribe((normMods) => {
-      nMSource.clear();
+    this.subscriptions.add(
+      this.structuresService.getNormModules().subscribe((normMods) => {
+        nMSource.clear();
 
-      normMods.forEach((normMod) => {
-        const coords = this.structuresService.objectToCoordinate(normMod.coords);
-        const feature = new Feature({
-          geometry: new Polygon([coords]),
-          properties: {
-            id: normMod.id,
-            name: 'normModule',
-            normMod,
-          },
+        normMods.forEach((normMod) => {
+          const coords = this.structuresService.objectToCoordinate(normMod.coords);
+          const feature = new Feature({
+            geometry: new Polygon([coords]),
+            properties: {
+              id: normMod.id,
+              name: 'normModule',
+              normMod,
+            },
+          });
+
+          nMSource.addFeature(feature);
         });
-
-        nMSource.addFeature(feature);
-      });
-    });
+      })
+    );
   }
 
   private setNormModulesVisibility(visible: boolean) {
@@ -309,5 +321,9 @@ export class NormModulesComponent implements OnInit {
           console.log(err);
         });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

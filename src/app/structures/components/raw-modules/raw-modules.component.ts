@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { MatDialog } from '@angular/material/dialog';
+
+import { Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
 import VectorSource from 'ol/source/Vector';
@@ -24,12 +26,15 @@ import Feature from 'ol/Feature';
   templateUrl: './raw-modules.component.html',
   styleUrls: ['./raw-modules.component.css'],
 })
-export class RawModulesComponent implements OnInit {
+export class RawModulesComponent implements OnInit, OnDestroy {
   private map: Map;
   private vectorRawModule: VectorLayer;
   private draw: Draw;
   deleteMode = false;
   createMode = false;
+  private rawModDeletedIds: string[] = [];
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private structuresService: StructuresService,
@@ -39,22 +44,28 @@ export class RawModulesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.olMapService.map$.subscribe((map) => (this.map = map));
+    this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
-    this.structuresService.createRawModMode$.subscribe((mode) => {
-      this.createMode = mode;
+    this.subscriptions.add(
+      this.structuresService.createRawModMode$.subscribe((mode) => {
+        this.createMode = mode;
 
-      if (this.createMode) {
-        this.drawRawModules();
-      } else if (this.draw !== undefined) {
-        // terminamos el modo draw
-        this.map.removeInteraction(this.draw);
-      }
-    });
+        if (this.createMode) {
+          this.drawRawModules();
+        } else if (this.draw !== undefined) {
+          // terminamos el modo draw
+          this.map.removeInteraction(this.draw);
+        }
+      })
+    );
 
-    this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode));
+    this.subscriptions.add(this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode)));
 
-    this.structuresService.loadRawModules$.subscribe((load) => this.setRawModulesVisibility(load));
+    this.subscriptions.add(this.structuresService.deletedRawModIds$.subscribe((ids) => (this.rawModDeletedIds = ids)));
+
+    this.subscriptions.add(
+      this.structuresService.loadRawModules$.subscribe((load) => this.setRawModulesVisibility(load))
+    );
   }
 
   switchCreateMode() {
@@ -115,6 +126,8 @@ export class RawModulesComponent implements OnInit {
       // añadimos el nuevo modulo a la DB
       this.structuresService.addRawModule(rawModule);
 
+      // this.filterService.filteredElements.push(rawModule);
+
       // añadimos el nuevo modulo como feature
       // this.addRawModFeature(rawModule);
     });
@@ -147,7 +160,18 @@ export class RawModulesComponent implements OnInit {
     mBSource.addFeature(feature);
   }
 
-  
+  undoCreatedModule() {
+    const lastModule = this.filterService.filteredElements.pop();
+
+    if (this.rawModDeletedIds !== undefined) {
+      this.structuresService.deletedRawModIds = this.rawModDeletedIds.concat(lastModule.id);
+    } else {
+      this.structuresService.deletedRawModIds = [lastModule.id];
+    }
+
+    // añadimos el id del modulo eliminado a la DB
+    this.structuresService.addFilter('eliminados', this.rawModDeletedIds);
+  }
 
   restoreLastDeletedModule() {
     let deletedIds: string[] = [];
@@ -185,5 +209,9 @@ export class RawModulesComponent implements OnInit {
         .filter((layer) => layer.getProperties().id !== undefined && layer.getProperties().id === 'rawModLayer')
         .forEach((layer) => layer.setVisible(visible));
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

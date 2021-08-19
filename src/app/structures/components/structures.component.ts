@@ -1,10 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+
+import { Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
 
 import { StructuresService } from '@core/services/structures.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { InformeService } from '@core/services/informe.service';
+import { ThermalService } from '@core/services/thermal.service';
+
 import { InformeInterface } from '@core/models/informe';
 
 @Component({
@@ -12,7 +16,7 @@ import { InformeInterface } from '@core/models/informe';
   templateUrl: './structures.component.html',
   styleUrls: ['./structures.component.css'],
 })
-export class StructuresComponent implements OnInit {
+export class StructuresComponent implements OnInit, OnDestroy {
   serviceInit = false;
   deleteRawModMode = false;
   createRawModMode = false;
@@ -20,19 +24,28 @@ export class StructuresComponent implements OnInit {
   private map: Map;
   private informe: InformeInterface;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private structuresService: StructuresService,
     private olMapService: OlMapService,
-    private informeService: InformeService
+    private informeService: InformeService,
+    private thermalService: ThermalService
   ) {}
 
   ngOnInit(): void {
-    this.structuresService.initService().subscribe((value) => (this.serviceInit = value));
-    this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteRawModMode = mode));
-    this.structuresService.createRawModMode$.subscribe((mode) => (this.createRawModMode = mode));
-    this.structuresService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre));
-    this.olMapService.map$.subscribe((map) => (this.map = map));
-    this.informeService.getInforme(this.structuresService.informeId).subscribe((informe) => (this.informe = informe));
+    this.subscriptions.add(this.structuresService.initService().subscribe((value) => (this.serviceInit = value)));
+    this.subscriptions.add(
+      this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteRawModMode = mode))
+    );
+    this.subscriptions.add(
+      this.structuresService.createRawModMode$.subscribe((mode) => (this.createRawModMode = mode))
+    );
+    this.subscriptions.add(this.structuresService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre)));
+    this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
+    this.subscriptions.add(
+      this.informeService.getInforme(this.structuresService.informeId).subscribe((informe) => (this.informe = informe))
+    );
   }
 
   endFilterSubscription() {
@@ -83,5 +96,13 @@ export class StructuresComponent implements OnInit {
 
     // actualizamos el informe en la DB
     this.informeService.updateInforme(this.informe);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+
+    // reseteamos los servicios a sus valores por defecto
+    this.olMapService.resetService();
+    this.thermalService.resetService();
   }
 }

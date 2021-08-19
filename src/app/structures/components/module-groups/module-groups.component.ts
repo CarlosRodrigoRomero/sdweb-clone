@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+
+import { Subscription } from 'rxjs';
 
 import { MatDialog } from '@angular/material/dialog';
 
@@ -24,13 +26,15 @@ import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm
   templateUrl: './module-groups.component.html',
   styleUrls: ['./module-groups.component.css'],
 })
-export class ModuleGroupsComponent implements OnInit {
+export class ModuleGroupsComponent implements OnInit, OnDestroy {
   private vectorGroup: VectorLayer;
   private map: Map;
   private draw: Draw;
   private mGLayer = new VectorLayer();
   modGroupSelectedId: string;
   drawActive = false;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private olMapService: OlMapService,
@@ -39,23 +43,27 @@ export class ModuleGroupsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.olMapService.map$.subscribe((map) => (this.map = map));
+    this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
-    this.structuresService.modGroupSelectedId$.subscribe((id) => (this.modGroupSelectedId = id));
+    this.subscriptions.add(
+      this.structuresService.modGroupSelectedId$.subscribe((id) => (this.modGroupSelectedId = id))
+    );
 
-    this.structuresService.drawModGroups$.subscribe((value) => (this.drawActive = value));
+    this.subscriptions.add(this.structuresService.drawModGroups$.subscribe((value) => (this.drawActive = value)));
 
-    this.structuresService.loadModuleGroups$.subscribe((load) => {
-      if (load) {
-        this.createModulesGroupsLayer();
-        this.addModuleGroups();
+    this.subscriptions.add(
+      this.structuresService.loadModuleGroups$.subscribe((load) => {
+        if (load) {
+          this.createModulesGroupsLayer();
+          this.addModuleGroups();
 
-        this.addSelectMGInteraction();
-      }
+          this.addSelectMGInteraction();
+        }
 
-      // aplicamos la visibilidad dependiende de la fase en la que estemos
-      this.setModuleGroupsVisibility(load);
-    });
+        // aplicamos la visibilidad dependiende de la fase en la que estemos
+        this.setModuleGroupsVisibility(load);
+      })
+    );
   }
 
   private createModulesGroupsLayer() {
@@ -79,23 +87,25 @@ export class ModuleGroupsComponent implements OnInit {
   private addModuleGroups() {
     const mGSource = this.mGLayer.getSource();
 
-    this.structuresService.getModuleGroups().subscribe((groups) => {
-      mGSource.clear();
+    this.subscriptions.add(
+      this.structuresService.getModuleGroups().subscribe((groups) => {
+        mGSource.clear();
 
-      groups.forEach((mG) => {
-        const feature = new Feature({
-          geometry: new Polygon([this.getAllCoordsRectangle(mG.coords)]),
-          properties: {
-            id: mG.id,
-            name: 'moduleGroup',
-          },
+        groups.forEach((mG) => {
+          const feature = new Feature({
+            geometry: new Polygon([this.getAllCoordsRectangle(mG.coords)]),
+            properties: {
+              id: mG.id,
+              name: 'moduleGroup',
+            },
+          });
+
+          this.getAllCoordsRectangle(mG.coords);
+
+          mGSource.addFeature(feature);
         });
-
-        this.getAllCoordsRectangle(mG.coords);
-
-        mGSource.addFeature(feature);
-      });
-    });
+      })
+    );
   }
 
   drawGroup() {
@@ -218,5 +228,9 @@ export class ModuleGroupsComponent implements OnInit {
         .filter((layer) => layer.getProperties().id !== undefined && layer.getProperties().id === 'mGLayer')
         .forEach((layer) => layer.setVisible(visible));
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

@@ -1,5 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+
+import { Subscription } from 'rxjs';
 
 import { Map } from 'ol';
 
@@ -13,10 +15,12 @@ import { NormalizedModule } from '@core/models/normalizedModule';
   templateUrl: './norm-mod-create-popup.component.html',
   styleUrls: ['./norm-mod-create-popup.component.css'],
 })
-export class NormModCreatePopupComponent implements OnInit {
+export class NormModCreatePopupComponent implements OnInit, OnDestroy {
   form: FormGroup;
   private map: Map;
   private initialValues: any;
+
+  private subscriptions: Subscription = new Subscription();
 
   @Input() coords: any;
 
@@ -27,7 +31,7 @@ export class NormModCreatePopupComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.olMapService.map$.subscribe((map) => (this.map = map));
+    this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
     this.buildForm();
   }
@@ -68,5 +72,9 @@ export class NormModCreatePopupComponent implements OnInit {
     this.form.reset(this.initialValues);
 
     this.map.getOverlayById('popup').setPosition(undefined);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
