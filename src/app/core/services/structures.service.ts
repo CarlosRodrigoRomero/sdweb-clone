@@ -247,7 +247,6 @@ export class StructuresService {
     const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto');
 
     // lo preparamos para la DB
-    module.id = id;
     module.coords = { ...module.coords };
     module = Object.assign({}, module);
 
