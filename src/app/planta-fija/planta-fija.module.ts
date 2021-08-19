@@ -21,6 +21,7 @@ import { MapViewComponent } from './components/map-view/map-view.component';
 import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.component';
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
+import { MapControlsComponent } from './components/map-controls/map-controls.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { SliderOpacityComponent } from './components/slider-opacity/slider-opaci
     MapComponent,
     SliderTemporalComponent,
     SliderOpacityComponent,
+    MapControlsComponent,
   ],
   imports: [
     SharedModule,
