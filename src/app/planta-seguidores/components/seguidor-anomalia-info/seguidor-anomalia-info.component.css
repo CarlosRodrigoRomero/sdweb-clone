@@ -26,3 +26,17 @@
 .line-content span {
   margin-right: 1rem;
 }
+
+.meteo-content {
+  margin-left: 1rem;
+  width: max-content;
+}
+
+.meteo-two-lines {
+  display: grid;
+}
+
+.meteo-line {
+  display: flex;
+  width: max-content;
+}

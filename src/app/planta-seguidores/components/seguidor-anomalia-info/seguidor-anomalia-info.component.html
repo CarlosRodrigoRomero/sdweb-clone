@@ -78,24 +78,26 @@
       <mat-icon>brightness_high</mat-icon>
       <span class="subtitle-label">Meteo:</span>
     </div>
-    <div *ngIf="anomaliaInfo.irradiancia !== undefined" class="line-content">
-      <span>Irradiancia:</span>
-      <span>{{ anomaliaInfo.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></span>
-    </div>
-    <div *ngIf="anomaliaInfo.vientoDireccion !== undefined" class="line-content">
-      <span>Dirección viento:</span>
-      <span>{{ anomaliaInfo.vientoDireccion }}</span>
-    </div>
-    <div *ngIf="anomaliaInfo.vientoVelocidad !== undefined" class="line-content">
-      <span>Velocidad viento:</span>
-      <span>{{ anomaliaInfo.vientoVelocidad }}</span>
-    </div>
-    <div *ngIf="anomaliaInfo.temperaturaAire !== undefined" class="line-content">
-      <span>Temperatura ambiente:</span>
-      <span>{{ anomaliaInfo.temperaturaAire }}ºC</span>
-    </div>
-    <div *ngIf="anomaliaInfo.nubosidad !== undefined" class="line-content">
-      <span>Nubosidad:</span> <span>{{ anomaliaInfo.nubosidad }}/8 octavas</span>
+    <div class="meteo-two-lines">
+      <div class="meteo-line">
+        <span *ngIf="anomaliaInfo.irradiancia !== undefined" class="meteo-content"
+          >Irradiancia: <b>{{ anomaliaInfo.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></b></span
+        >
+        <span *ngIf="anomaliaInfo.vientoDireccion !== undefined" class="meteo-content"
+          >Direc. viento: <b>{{ anomaliaInfo.vientoDireccion }}º</b></span
+        >
+        <span *ngIf="anomaliaInfo.vientoVelocidad !== undefined" class="meteo-content"
+          >Veloc. viento: <b>{{ anomaliaInfo.vientoVelocidad }} (Beaufort)</b></span
+        >
+      </div>
+      <div class="meteo-line">
+        <span *ngIf="anomaliaInfo.temperaturaAire !== undefined" class="meteo-content"
+          >T. ambiente: <b>{{ anomaliaInfo.temperaturaAire }}ºC</b></span
+        >
+        <span *ngIf="anomaliaInfo.nubosidad !== undefined" class="meteo-content"
+          >Nubosidad: <b>{{ anomaliaInfo.nubosidad }} octavas</b></span
+        >
+      </div>
     </div>
   </div>
 </div>
