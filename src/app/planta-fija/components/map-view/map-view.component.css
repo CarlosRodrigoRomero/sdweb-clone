@@ -112,10 +112,6 @@ app-share-map {
 }
 
 @media (max-width: 1000px) {
-  :host ::ng-deep .mat-drawer-inner-container {
-    overflow: hidden;
-  }
-
   .stats-sidenav {
     width: calc(100vw - 20px);
   }
