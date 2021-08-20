@@ -1,7 +1,11 @@
-.title {
+.navbar {
   height: 70px;
   position: absolute;
   z-index: 9999;
+}
+
+.title-line {
+  display: flex;
 }
 
 .modulo-label {
@@ -32,4 +36,8 @@
   display: flex;
   gap: 0.5rem;
   margin-left: 1rem;
+}
+
+.line-content-title {
+  font-weight: 300;
 }

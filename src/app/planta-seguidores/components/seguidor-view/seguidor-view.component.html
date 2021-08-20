@@ -38,11 +38,11 @@
 
       <!-- INFO ANOMALIA SELECCIONADA -->
       <app-seguidor-anomalia-info *ngIf="seguidorSelected !== null"></app-seguidor-anomalia-info>
-
-      <!-- DESCARGAR IMAGENES -->
-      <app-seguidor-image-download *ngIf="imagesExist && seguidorSelected !== null"></app-seguidor-image-download>
     </div>
     <div class="right-content" *ngIf="numAnomalias > 0">
+      <!-- DESCARGAR IMAGENES -->
+      <app-seguidor-image-download *ngIf="imagesExist && seguidorSelected !== null"></app-seguidor-image-download>
+
       <!-- LISTA ANOMALIAS -->
       <app-seguidor-anomalias-list *ngIf="numAnomalias > 0 && seguidorSelected !== null"></app-seguidor-anomalias-list>
     </div>
