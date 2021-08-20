@@ -27,9 +27,6 @@ export class SeguidorService {
   numGlobalCoords: number;
   private _locAreas: LocationAreaInterface[] = [];
 
-  minGradNorm: number;
-  maxGradNorm: number;
-
   constructor(
     private informeService: InformeService,
     public afs: AngularFirestore,
@@ -65,8 +62,6 @@ export class SeguidorService {
     return combineLatest([locAreaList$, anomaliaList$, getInforme$]).pipe(
       map(([locAreaList, anomaliaList, informe]) => {
         const seguidores: Seguidor[] = [];
-
-        this.getMinMaxGradNorm(anomaliaList);
 
         if (anomaliaList.length > 0) {
           // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
@@ -245,32 +240,10 @@ export class SeguidorService {
       });
   }
 
-  private getMinMaxGradNorm(anomalias: Anomalia[]) {
-    // filtramos solo las que tengan gradiente normalizado
-    const anomsOk = anomalias.filter((anom) => anom.gradienteNormalizado !== undefined);
-
-    if (anomsOk.length > 0) {
-      const minGrad = Math.min(...anomsOk.map((anom) => anom.gradienteNormalizado));
-      const maxGrad = Math.max(...anomsOk.map((anom) => anom.gradienteNormalizado));
-
-      if (this.minGradNorm === undefined) {
-        this.minGradNorm = minGrad;
-      } else if (this.minGradNorm > minGrad) {
-        this.minGradNorm = minGrad;
-      }
-
-      if (this.maxGradNorm === undefined) {
-        this.maxGradNorm = maxGrad;
-      } else if (this.maxGradNorm < maxGrad) {
-        this.maxGradNorm = maxGrad;
-      }
-    }
-  }
-
   getPerdidasAnomColor(anomalia: Anomalia) {
-    if (anomalia.perdidas <= 0.33) {
+    if (anomalia.perdidas < 0.33) {
       return GLOBAL.colores_mae[0];
-    } else if (anomalia.perdidas > 0.66) {
+    } else if (anomalia.perdidas < 0.66) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -282,9 +255,9 @@ export class SeguidorService {
   }
 
   getGradienteAnomColor(anomalia: Anomalia) {
-    if (anomalia.gradienteNormalizado <= (this.maxGradNorm - this.minGradNorm) / 3) {
+    if (anomalia.gradienteNormalizado < 10) {
       return GLOBAL.colores_mae[0];
-    } else if (anomalia.gradienteNormalizado <= (2 * (this.maxGradNorm - this.minGradNorm)) / 3) {
+    } else if (anomalia.gradienteNormalizado < 40) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];

@@ -470,9 +470,9 @@ export class SeguidoresControlService {
   private getColorSeguidorGradienteNormMax(feature: Feature) {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
-    if (gradNormMax <= 5) {
+    if (gradNormMax < 10) {
       return GLOBAL.colores_mae[0];
-    } else if (gradNormMax < 10) {
+    } else if (gradNormMax < 40) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
