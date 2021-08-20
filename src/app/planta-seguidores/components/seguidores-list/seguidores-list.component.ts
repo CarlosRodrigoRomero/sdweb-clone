@@ -58,13 +58,13 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
         // cambiammos la ultima columna con la vista seleccionada
         switch (this.viewSeleccionada) {
           case 0:
-            this.displayedColumns = ['id', 'numAnomalias', 'modulo', 'mae'];
+            this.displayedColumns = ['nombre', 'numAnomalias', 'modulo', 'mae'];
             break;
           case 1:
-            this.displayedColumns = ['id', 'numAnomalias', 'modulo', 'celsCalientes'];
+            this.displayedColumns = ['nombre', 'numAnomalias', 'modulo', 'celsCalientes'];
             break;
           case 2:
-            this.displayedColumns = ['id', 'numAnomalias', 'modulo', 'gradiente'];
+            this.displayedColumns = ['nombre', 'numAnomalias', 'modulo', 'gradiente'];
             break;
         }
       })
@@ -96,7 +96,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
 
               filteredElements.push({
                 // color: this.seguidoresControlService.getColorSeguidorMaeExternal(seguidor.mae),
-                id: elem.id.replace((elem as Seguidor).informeId, '').replace(/_/g, ' '),
+                nombre: seguidor.nombre,
                 numAnomalias: seguidor.anomaliasCliente.length,
                 modulo: this.getModuloLabel(elem as Seguidor),
                 mae: seguidor.mae,
