@@ -394,12 +394,10 @@ export class SeguidoresControlService {
 
   private getColorSeguidorMae(feature: Feature) {
     const mae = feature.getProperties().properties.mae as number;
-    const informeId = feature.getProperties().properties.informeId;
-    const index = this.reportControlService.informesIdList.indexOf(informeId);
 
-    if (mae === 0 || mae <= this.maesMedio[index] - this.maesSigma[index]) {
+    if (mae < 0.01) {
       return GLOBAL.colores_mae[0];
-    } else if (mae < this.maesMedio[index] + this.maesSigma[index]) {
+    } else if (mae < 0.05) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -407,11 +405,9 @@ export class SeguidoresControlService {
   }
 
   getColorSeguidorMaeExternal(mae: number) {
-    const index = this.reportControlService.informesIdList.indexOf(this.selectedInformeId);
-
-    if (mae < this.maesMedio[index] - this.maesSigma[index]) {
+    if (mae < 0.01) {
       return GLOBAL.colores_mae[0];
-    } else if (mae <= this.maesMedio[index] + this.maesSigma[index]) {
+    } else if (mae < 0.05) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -438,12 +434,9 @@ export class SeguidoresControlService {
   private getColorSeguidorCelsCalientes(feature: Feature) {
     const celsCalientes = feature.getProperties().properties.celsCalientes;
 
-    const informeId = feature.getProperties().properties.informeId;
-    const index = this.reportControlService.informesIdList.indexOf(informeId);
-
-    if (celsCalientes <= this.ccsMedio[index] - this.ccsSigma[index]) {
+    if (celsCalientes < 0.02) {
       return GLOBAL.colores_mae[0];
-    } else if (celsCalientes < this.ccsMedio[index] + this.ccsSigma[index]) {
+    } else if (celsCalientes < 0.1) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -480,9 +473,9 @@ export class SeguidoresControlService {
   }
 
   getColorSeguidorGradienteNormMaxExternal(gradNormMax: number) {
-    if (gradNormMax <= 5) {
+    if (gradNormMax < 10) {
       return GLOBAL.colores_mae[0];
-    } else if (gradNormMax < 10) {
+    } else if (gradNormMax < 40) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
