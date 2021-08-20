@@ -142,9 +142,14 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
       .subscribe((planta) => (this.nombreGlobalCoords = planta.nombreGlobalCoords));
 
     this.subscriptions.add(
-      this.reportControlService.selectedInformeId$
-        .pipe(switchMap((informeId) => this.informeService.getInforme(informeId)))
-        .subscribe((informe) => (this.informeSelected = informe))
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+        this.informeSelected = this.reportControlService.informes.find((informe) => informe.id === informeId);
+
+        if (this.informeSelected !== undefined && this.anomaliaSelect !== undefined) {
+          // obtenemos la info adicional
+          this.getInfoAdcional();
+        }
+      })
     );
   }
 
@@ -160,8 +165,10 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
     } else {
       this.dataSource = [this.anomaliaSelect];
 
-      // obtenemos la info adicional
-      this.getInfoAdcional();
+      setTimeout(() => {
+        // obtenemos la info adicional
+        this.getInfoAdcional();
+      }, 200);
     }
   }
 
