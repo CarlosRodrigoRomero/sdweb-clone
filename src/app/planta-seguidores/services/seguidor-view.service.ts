@@ -76,6 +76,7 @@ export class SeguidorViewService {
       this.visualCanvas.clear();
     }
     this.seguidoresControlService.imageExist = true;
+    this.imagesLoaded = false;
   }
 
   get sidenav() {
