@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 
@@ -20,11 +21,13 @@ interface Criticidad {
   templateUrl: './criticidad-filter.component.html',
   styleUrls: ['./criticidad-filter.component.css'],
 })
-export class CriticidadFilterComponent implements OnInit {
+export class CriticidadFilterComponent implements OnInit, OnDestroy {
   criticidadElems: Criticidad[] = [];
   allComplete: boolean;
   filtroCriticidad: CriticidadFilter;
   public criticidadSelected: boolean[] = undefined;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private filterService: FilterService,
@@ -40,9 +43,9 @@ export class CriticidadFilterComponent implements OnInit {
       });
     });
 
-    this.filterControlService.criticidadSelected$.subscribe((sel) => {
-      this.criticidadSelected = sel;
-    });
+    this.subscriptions.add(
+      this.filterControlService.criticidadSelected$.subscribe((sel) => (this.criticidadSelected = sel))
+    );
   }
 
   onChangeCriticidadFilter(event: MatButtonToggleChange) {
@@ -65,5 +68,9 @@ export class CriticidadFilterComponent implements OnInit {
       );
       this.filterControlService.criticidadSelected[indexSelected] = false;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

@@ -56,6 +56,18 @@ export class MapViewComponent implements OnInit, OnDestroy {
     );
   }
 
+  showControls() {
+    if (document.getElementById('map-control').style.display === 'none') {
+      document.getElementById('map-control').style.display = 'unset';
+    } else {
+      document.getElementById('map-control').style.display = 'none';
+    }
+  }
+
+  loadStats() {
+    this.statsService.loadStats = true;
+  }
+
   ngOnDestroy(): void {
     // nos desuscribimos de los observables
     this.subscriptions.unsubscribe();
@@ -64,9 +76,5 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.reportControlService.resetService();
     this.olMapService.resetService();
     this.thermalService.resetService();
-  }
-
-  loadStats() {
-    this.statsService.loadStats = true;
   }
 }

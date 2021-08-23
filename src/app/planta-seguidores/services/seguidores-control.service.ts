@@ -57,15 +57,10 @@ export class SeguidoresControlService {
   private _imageExist = true;
   imageExist$ = new BehaviorSubject<boolean>(this._imageExist);
 
-  private maeMin: number;
-  private maeMax: number;
-  public maeLevels: number[] = [];
-  private ccMin: number;
-  private ccMax: number;
-  public ccLevels: number[] = [];
-  private gradMin: number;
-  private gradMax: number;
-  public gradLevels: number[] = [];
+  private maesMedio: number[] = [];
+  private maesSigma: number[] = [];
+  private ccsMedio: number[] = [];
+  private ccsSigma: number[] = [];
 
   constructor(
     private olMapService: OlMapService,
@@ -76,40 +71,49 @@ export class SeguidoresControlService {
     private informeService: InformeService
   ) {}
 
-  initService(): Observable<boolean> {
+  initService(): Promise<boolean> {
     const getMap = this.olMapService.getMap();
     const getSegLayers = this.olMapService.getSeguidorLayers();
     const getIfSharedWithFilters = this.reportControlService.sharedReportWithFilters$;
 
-    combineLatest([getMap, getSegLayers, getIfSharedWithFilters])
-      .pipe(take(1))
-      .subscribe(([map, segL, isSharedWithFil]) => {
-        this.map = map;
-        this.seguidorLayers = segL;
-        this.sharedReportNoFilters = !isSharedWithFil;
+    return new Promise((initService) => {
+      combineLatest([getMap, getSegLayers, getIfSharedWithFilters])
+        .pipe(take(1))
+        .subscribe(([map, segL, isSharedWithFil]) => {
+          this.map = map;
+          this.seguidorLayers = segL;
+          this.sharedReportNoFilters = !isSharedWithFil;
+        });
 
-        this.initialized$.next(true);
+      this.reportControlService.selectedInformeId$
+        .pipe(
+          switchMap((informeId) => {
+            this.selectedInformeId = informeId;
+
+            return this.informeService.getInforme(informeId);
+          })
+        )
+        .subscribe((informe) => (this.selectedInforme = informe));
+
+      this.getMaesMedioSigma();
+      this.getCCsMedioSigma();
+
+      this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => {
+        this.toggleViewSelected = viewSel;
+
+        // eliminamos la anterior interacción para que la actual obtenga el estilo correcto
+        this.map.getInteractions().forEach((interaction) => {
+          if (interaction instanceof Select) {
+            this.map.removeInteraction(interaction);
+          }
+        });
+
+        // la añadimos de nuevo
+        this.addSelectInteraction();
       });
 
-    this.reportControlService.selectedInformeId$
-      .pipe(
-        switchMap((informeId) => {
-          this.selectedInformeId = informeId;
-
-          // recalculamos los MIN y MAX de cada vista
-          this.getMinMaxViews();
-
-          // obtenemos los niveles para la escala de colores
-          this.getViewsLevels();
-
-          return this.informeService.getInforme(informeId);
-        })
-      )
-      .subscribe((informe) => (this.selectedInforme = informe));
-
-    this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
-
-    return this.initialized$;
+      initService(true);
+    });
   }
 
   public createSeguidorLayers(informeId: string): VectorLayer[] {
@@ -176,8 +180,8 @@ export class SeguidoresControlService {
             seguidorId: seguidor.id,
             informeId: seguidor.informeId,
             mae: seguidor.mae,
-            /* temperaturaMax: seguidor.temperaturaMax, */
             gradienteNormalizado: seguidor.gradienteNormalizado,
+            celsCalientes: seguidor.celsCalientes,
             anomalias: seguidor.anomalias,
             filas: seguidor.filas,
             columnas: seguidor.columnas,
@@ -190,7 +194,6 @@ export class SeguidoresControlService {
     this.addCursorOnHover();
     this.addOnHoverAction();
 
-    this.addSelectInteraction();
     // this.addClickOutFeatures();
   }
 
@@ -267,14 +270,8 @@ export class SeguidoresControlService {
   }
 
   private addSelectInteraction() {
-    const estilosView = [
-      this.getStyleSeguidoresMae(false),
-      this.getStyleSeguidoresCelsCalientes(false),
-      this.getStyleSeguidoresGradienteNormMax(false),
-    ];
-
     const select = new Select({
-      style: estilosView[this.toggleViewSelected],
+      style: this.getStyleSeguidores(),
       // condition: click,
       layers: (l) => {
         if (
@@ -283,8 +280,9 @@ export class SeguidoresControlService {
           l.getProperties().id == this.toggleViewSelected
         ) {
           return true;
+        } else {
+          return false;
         }
-        return false;
       },
     });
 
@@ -321,76 +319,60 @@ export class SeguidoresControlService {
     });
   }
 
+  private getStyleSeguidores() {
+    const estilosView = [
+      this.getStyleSeguidoresMae(false),
+      this.getStyleSeguidoresCelsCalientes(false),
+      this.getStyleSeguidoresGradienteNormMax(false),
+    ];
+
+    return estilosView[this.toggleViewSelected];
+  }
+
   setPopupPosition(coords: Coordinate) {
     this.map.getOverlayById('popup').setPosition(coords);
   }
 
-  private getMinMaxViews() {
-    this.getMinMaxMae();
-    this.getMinMaxCC();
-    this.getMinMaxGradNormMax();
+  private getMaesMedioSigma() {
+    // reseteamos su valor al calcularlos de nuevo
+    this.maesMedio = [];
+    this.maesSigma = [];
+
+    this.reportControlService.informesIdList.forEach((informeId) => {
+      const maes = this.reportControlService.allFilterableElements
+        .filter((seg) => (seg as Seguidor).informeId === informeId)
+        .map((seg) => (seg as Seguidor).mae);
+
+      this.maesMedio.push(this.average(maes));
+      this.maesSigma.push(this.standardDeviation(maes));
+    });
   }
 
-  private getViewsLevels() {
-    if (this.maeMax !== undefined) {
-      this.getMaeLevels();
-    }
+  private getCCsMedioSigma() {
+    this.reportControlService.informesIdList.forEach((informeId) => {
+      const celsCalientes = this.reportControlService.allFilterableElements
+        .filter((seg) => (seg as Seguidor).informeId === informeId)
+        .map((seg) => (seg as Seguidor).celsCalientes)
+        .filter((cc) => !isNaN(cc) && cc !== Infinity && cc !== -Infinity);
 
-    this.getCCLevels();
-    this.getGradNormLevels();
+      this.ccsMedio.push(this.average(celsCalientes));
+      this.ccsSigma.push(this.standardDeviation(celsCalientes));
+    });
   }
 
-  private getMinMaxMae() {
-    const maes = this.reportControlService.allFilterableElements
-      .filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId)
-      .map((seg) => (seg as Seguidor).mae);
+  private average(data: number[]): number {
+    const sum = data.reduce(function (sum, value) {
+      return sum + value;
+    }, 0);
 
-    this.maeMin = Math.min(...maes);
-    this.maeMax = Math.max(...maes);
+    const avg = sum / data.length;
+    return avg;
   }
 
-  private getMaeLevels() {
-    const numLevels = 3;
-
-    for (let index = 0; index < numLevels - 1; index++) {
-      this.maeLevels[index] = Number((((index + 1) * this.maeMax) / numLevels).toFixed(2));
-    }
-  }
-
-  private getMinMaxCC() {
-    const allCelsCalientes = this.reportControlService.allFilterableElements
-      .filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId)
-      .map((seg) => (seg as Seguidor).celsCalientes)
-      .filter((cc) => !isNaN(cc) && cc !== Infinity && cc !== -Infinity);
-
-    this.ccMin = Math.min(...allCelsCalientes);
-    this.ccMax = Math.max(...allCelsCalientes);
-  }
-
-  private getCCLevels() {
-    const numLevels = 3;
-
-    for (let index = 0; index < numLevels - 1; index++) {
-      this.ccLevels[index] = Number((((index + 1) * this.ccMax) / numLevels).toFixed(2));
-    }
-  }
-
-  private getMinMaxGradNormMax() {
-    const gradientes = this.reportControlService.allFilterableElements
-      .filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId)
-      .map((seg) => (seg as Seguidor).gradienteNormalizado)
-      .filter((grad) => !isNaN(grad) && grad !== Infinity && grad !== -Infinity);
-
-    this.gradMin = Math.min(...gradientes);
-    this.gradMax = Math.max(...gradientes);
-  }
-
-  private getGradNormLevels() {
-    const numLevels = 3;
-
-    for (let index = 0; index < numLevels - 1; index++) {
-      this.gradLevels[index] = Number((((index + 1) * this.gradMax) / numLevels).toFixed(2));
-    }
+  private standardDeviation(values): number {
+    const n = values.length;
+    const mean = values.reduce((a, b) => a + b) / n;
+    return Math.sqrt(values.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
   }
 
   // ESTILOS MAE
@@ -403,7 +385,7 @@ export class SeguidoresControlService {
             width: focused ? 6 : 4,
           }),
           fill: new Fill({
-            color: focused ? 'rgba(255,255,255,0.5)' : this.hexToRgb(this.getColorSeguidorMae(feature), 0.5),
+            color: 'rgba(255,255,255, 0)',
           }),
         });
       }
@@ -413,9 +395,9 @@ export class SeguidoresControlService {
   private getColorSeguidorMae(feature: Feature) {
     const mae = feature.getProperties().properties.mae as number;
 
-    if (mae <= (this.maeMax - this.maeMin) / 3) {
+    if (mae < 0.01) {
       return GLOBAL.colores_mae[0];
-    } else if (mae <= (2 * (this.maeMax - this.maeMin)) / 3) {
+    } else if (mae < 0.05) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -423,9 +405,9 @@ export class SeguidoresControlService {
   }
 
   getColorSeguidorMaeExternal(mae: number) {
-    if (mae <= (this.maeMax - this.maeMin) / 3) {
+    if (mae < 0.01) {
       return GLOBAL.colores_mae[0];
-    } else if (mae <= (2 * (this.maeMax - this.maeMin)) / 3) {
+    } else if (mae < 0.05) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -442,7 +424,7 @@ export class SeguidoresControlService {
             width: focused ? 6 : 4,
           }),
           fill: new Fill({
-            color: focused ? 'rgba(255,255,255,0.5)' : this.hexToRgb(this.getColorSeguidorCelsCalientes(feature), 0.5),
+            color: 'rgba(255,255,255, 0)',
           }),
         });
       }
@@ -450,16 +432,11 @@ export class SeguidoresControlService {
   }
 
   private getColorSeguidorCelsCalientes(feature: Feature) {
-    const numModulos = feature.getProperties().properties.filas * feature.getProperties().properties.columnas;
-    const celsCalientes = feature
-      .getProperties()
-      // tslint:disable-next-line: triple-equals
-      .properties.anomalias.filter((anomalia) => anomalia.tipo == 8 || anomalia.tipo == 9).length;
-    const porcentCelsCalientes = celsCalientes / numModulos;
+    const celsCalientes = feature.getProperties().properties.celsCalientes;
 
-    if (porcentCelsCalientes <= (this.ccMax - this.ccMin) / 3) {
+    if (celsCalientes < 0.02) {
       return GLOBAL.colores_mae[0];
-    } else if (porcentCelsCalientes <= (2 * (this.ccMax - this.ccMin)) / 3) {
+    } else if (celsCalientes < 0.1) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -476,9 +453,7 @@ export class SeguidoresControlService {
             width: focused ? 6 : 4,
           }),
           fill: new Fill({
-            color: focused
-              ? 'rgba(255,255,255,0.5)'
-              : this.hexToRgb(this.getColorSeguidorGradienteNormMax(feature), 0.5),
+            color: 'rgba(255,255,255, 0)',
           }),
         });
       }
@@ -488,9 +463,9 @@ export class SeguidoresControlService {
   private getColorSeguidorGradienteNormMax(feature: Feature) {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
-    if (gradNormMax <= (this.gradMax - this.gradMin) / 3) {
+    if (gradNormMax < 10) {
       return GLOBAL.colores_mae[0];
-    } else if (gradNormMax <= (2 * (this.gradMax - this.gradMin)) / 3) {
+    } else if (gradNormMax < 40) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -498,9 +473,9 @@ export class SeguidoresControlService {
   }
 
   getColorSeguidorGradienteNormMaxExternal(gradNormMax: number) {
-    if (gradNormMax <= (this.gradMax - this.gradMin) / 3) {
+    if (gradNormMax < 10) {
       return GLOBAL.colores_mae[0];
-    } else if (gradNormMax <= (2 * (this.gradMax - this.gradMin)) / 3) {
+    } else if (gradNormMax < 40) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
@@ -532,7 +507,7 @@ export class SeguidoresControlService {
   }
 
   public getImageSeguidor(folder: string) {
-    if (this.seguidorSelected !== undefined) {
+    if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
       // const imageName = this.seguidorSelected.anomalias[0].archivoPublico;
       const imageName = this.seguidorSelected.imageName;
 
@@ -579,18 +554,41 @@ export class SeguidoresControlService {
   }
 
   changeInformeSeguidorSelected() {
-    this.seguidorSelected = this.listaSeguidores.find((seguidor) => {
-      const idNumber = seguidor.id.split('_')[1];
+    let seguidor;
+    if (this.seguidorSelected === null) {
+      seguidor = this.listaSeguidores.find((seg) => {
+        // cambiamos al seguidor correspondiente al informe actual
+        return seg.informeId === this.selectedInformeId && seg.nombre === this.prevSeguidorSelected.nombre;
+      });
+    } else {
+      seguidor = this.listaSeguidores.find((seg) => {
+        // cambiamos al seguidor correspondiente al informe actual
+        return seg.informeId === this.selectedInformeId && seg.nombre === this.seguidorSelected.nombre;
+      });
+    }
 
-      // cambiamos al seguidor correspondiente al informe actual
-      return seguidor.informeId === this.selectedInformeId && this.seguidorSelected.id.split('_')[1] === idNumber;
-    });
+    // asignamos el actual al previo
+    this.prevSeguidorSelected = this.seguidorSelected;
+
+    // asignamos el nuevo si existe
+    if (seguidor !== undefined) {
+      this.seguidorSelected = seguidor;
+    } else {
+      this.seguidorSelected = null;
+    }
+
+    // indicamos que la imagen existe por defecto
+    this.imageExist = true;
   }
 
   selectNextSeguidor() {
-    const index = this.listaSeguidores.indexOf(this.seguidorSelected);
-    if (index !== this.listaSeguidores.length - 1) {
-      this.seguidorSelected = this.listaSeguidores[index + 1];
+    // nos movemos solo entre los seguidores del informe seleccionado
+    const seguidoresInformeActual = this.listaSeguidores.filter(
+      (seg) => seg.informeId === this.reportControlService.selectedInformeId
+    );
+    const index = seguidoresInformeActual.indexOf(this.seguidorSelected);
+    if (index !== seguidoresInformeActual.length - 1) {
+      this.seguidorSelected = seguidoresInformeActual[index + 1];
 
       // indicamos que la imagen existe por defecto
       this.imageExist = true;
@@ -598,9 +596,13 @@ export class SeguidoresControlService {
   }
 
   selectPrevSeguidor() {
-    const index = this.listaSeguidores.indexOf(this.seguidorSelected);
+    // nos movemos solo entre los seguidores del informe seleccionado
+    const seguidoresInformeActual = this.listaSeguidores.filter(
+      (seg) => seg.informeId === this.reportControlService.selectedInformeId
+    );
+    const index = seguidoresInformeActual.indexOf(this.seguidorSelected);
     if (index !== 0) {
-      this.seguidorSelected = this.listaSeguidores[index - 1];
+      this.seguidorSelected = seguidoresInformeActual[index - 1];
 
       // indicamos que la imagen existe por defecto
       this.imageExist = true;
@@ -608,12 +610,13 @@ export class SeguidoresControlService {
   }
 
   setExternalStyle(seguidorId: string, focus: boolean) {
-    this.listaSeguidores.find((seg) => seg.id === seguidorId);
+    const layersInforme = this.seguidorLayers.filter(
+      (layer) => layer.getProperties().informeId === this.selectedInformeId
+    );
 
-    const features = this.seguidorLayers
-      .find((layer) => layer.getProperties().informeId === this.selectedInformeId)
-      .getSource()
-      .getFeatures();
+    const layerView = layersInforme[this.toggleViewSelected];
+
+    const features = layerView.getSource().getFeatures();
 
     const feature = features.find((f) => f.getProperties().properties.seguidorId === seguidorId);
 
@@ -623,7 +626,7 @@ export class SeguidoresControlService {
         width: 6,
       }),
       fill: new Fill({
-        color: 'rgba(0, 0, 255, 0)',
+        color: 'rgba(255, 255, 255, 0)',
       }),
     });
 
@@ -635,7 +638,7 @@ export class SeguidoresControlService {
           width: 4,
         }),
         fill: new Fill({
-          color: 'rgba(0, 0, 255, 0)',
+          color: 'rgba(255, 255, 255, 0)',
         }),
       });
     } else if (this.toggleViewSelected === 1) {
@@ -645,7 +648,7 @@ export class SeguidoresControlService {
           width: 4,
         }),
         fill: new Fill({
-          color: 'rgba(0, 0, 255, 0)',
+          color: 'rgba(255, 255, 255, 0)',
         }),
       });
     } else {
@@ -655,7 +658,7 @@ export class SeguidoresControlService {
           width: 4,
         }),
         fill: new Fill({
-          color: 'rgba(0, 0, 255, 0)',
+          color: 'rgba(255, 255, 255, 0)',
         }),
       });
     }

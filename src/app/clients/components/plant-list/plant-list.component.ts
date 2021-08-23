@@ -17,6 +17,7 @@ interface PlantsData {
   mae: number;
   ultimaInspeccion: number;
   plantaId: string;
+  tipo: string;
 }
 
 @Component({
@@ -25,7 +26,7 @@ interface PlantsData {
   styleUrls: ['./plant-list.component.css'],
 })
 export class PlantListComponent implements OnInit, AfterViewInit {
-  public displayedColumns: string[] = ['nombre', 'potencia', 'mae', 'ultimaInspeccion', 'compartir'];
+  public displayedColumns: string[] = ['nombre', 'potencia', 'mae', 'tipo', 'ultimaInspeccion', 'compartir'];
   public dataSource = new MatTableDataSource<PlantsData>();
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];

@@ -48,9 +48,9 @@ export class Seguidor implements FilterableElement {
     this.plantaId = plantaId;
     this.filas = filas;
     this.columnas = columnas;
-    this.perdidas = this.getPerdidas(anomalias);
+    this.perdidas = this.getPerdidas(this.anomaliasCliente);
     this.temperaturaMax = this.getTempMax();
-    this.mae = this.getMae();
+    this.mae = this.perdidas;
     this.gradienteNormalizado = this.getGradienteNormMax();
     this.informeId = informeId;
     this.modulo = modulo;
@@ -59,29 +59,33 @@ export class Seguidor implements FilterableElement {
     this.id = id;
     this.featureCoords = this.pathToCoordinate(path);
     this.nombre = nombre;
-    this.celsCalientes = this.getCelsCalientes(anomalias);
+    this.celsCalientes = this.getCelsCalientes(this.anomaliasCliente);
     this.moduloLabel = this.getModuloLabel();
   }
 
   private getPerdidas(anomalias: Anomalia[]): number {
-    let suma = 0;
+    let sumaPerdidas = 0;
     if (anomalias.length > 0) {
       anomalias.forEach((anomalia) => {
         if (anomalia.perdidas !== undefined) {
-          suma += anomalia.perdidas;
+          sumaPerdidas += anomalia.perdidas;
         }
       });
     }
-    return suma;
-  }
-
-  private getMae(): number {
     let mae = 0;
-    if (this.perdidas !== 0) {
-      mae = this.perdidas / (this.filas * this.columnas);
+    if (sumaPerdidas > 0) {
+      mae = sumaPerdidas / (this.filas * this.columnas);
     }
     return mae;
   }
+
+  // private getMae(): number {
+  //   let mae = 0;
+  //   if (this.perdidas !== 0) {
+  //     mae = this.perdidas / (this.filas * this.columnas);
+  //   }
+  //   return mae;
+  // }
 
   private getTempMax(): number {
     let tempMax = 0;
@@ -120,10 +124,14 @@ export class Seguidor implements FilterableElement {
 
   private getCelsCalientes(anomalias: Anomalia[]): number {
     let celsCalientes = 0;
+
     if (anomalias.length > 0) {
-      celsCalientes =
+      const numCelsCalientes =
         // tslint:disable-next-line: triple-equals
-        anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9).length / (this.filas * this.columnas);
+        anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9).length;
+      if (numCelsCalientes > 0) {
+        celsCalientes = numCelsCalientes / (this.filas * this.columnas);
+      }
     }
 
     return celsCalientes;

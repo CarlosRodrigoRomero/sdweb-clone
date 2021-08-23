@@ -6,7 +6,6 @@ import { Subscription } from 'rxjs';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
 import { GLOBAL } from '@core/services/global';
-import { SeguidorService } from '@core/services/seguidor.service';
 
 @Component({
   selector: 'app-seguidor-view-leyenda',
@@ -17,7 +16,6 @@ export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
   viewSelected: number;
   private seguidorSelected: Seguidor;
   viewsTitle: string[] = ['Pérdidas', 'Cels. Calientes', 'ΔT Max (norm)'];
-  gradNormLevels: number[];
   numCelsCalientes = 0;
   colors = GLOBAL.colores_mae;
 
@@ -25,16 +23,10 @@ export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
 
   constructor(
     private mapSeguidoresService: MapSeguidoresService,
-    private seguidoresControlService: SeguidoresControlService,
-    private seguidorService: SeguidorService
+    private seguidoresControlService: SeguidoresControlService
   ) {}
 
   ngOnInit(): void {
-    this.gradNormLevels = [
-      (this.seguidorService.maxGradNorm - this.seguidorService.minGradNorm) / 3,
-      (2 * (this.seguidorService.maxGradNorm - this.seguidorService.minGradNorm)) / 3,
-    ];
-
     this.subscriptions.add(
       this.mapSeguidoresService.toggleViewSelected$.subscribe((view) => {
         this.viewSelected = view;
@@ -52,7 +44,7 @@ export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
       this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
         this.seguidorSelected = seguidor;
 
-        if (this.seguidorSelected !== undefined) {
+        if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
           this.numCelsCalientes = this.seguidorSelected.anomaliasCliente.filter(
             // tslint:disable-next-line: triple-equals
             (anom) => anom.tipo == 8 || anom.tipo == 9

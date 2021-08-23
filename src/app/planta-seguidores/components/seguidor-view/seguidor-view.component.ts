@@ -15,7 +15,6 @@ import { Seguidor } from '@core/models/seguidor';
 export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public seguidorSelected: Seguidor = undefined;
   numAnomalias: number;
-  oneReport = true;
   imagesExist = true;
 
   private subscriptions: Subscription = new Subscription();
@@ -23,7 +22,7 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private seguidoresControlService: SeguidoresControlService,
     private seguidorViewService: SeguidorViewService,
-    private reportControlService: ReportControlService
+    public reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
@@ -31,19 +30,15 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
       this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
         this.seguidorSelected = seguidor;
 
-        if (this.seguidorSelected !== undefined) {
+        if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
           this.numAnomalias = this.seguidorSelected.anomaliasCliente.length;
 
-          if (this.numAnomalias > 0) {
-            this.seguidorViewService.anomaliaSelected = this.seguidorSelected.anomaliasCliente[0];
-          }
+          // if (this.numAnomalias > 0) {
+          //   this.seguidorViewService.anomaliaSelected = this.seguidorSelected.anomaliasCliente[0];
+          // }
         }
       })
     );
-
-    if (this.reportControlService.informesIdList.length > 1) {
-      this.oneReport = false;
-    }
   }
 
   ngAfterViewInit(): void {
@@ -51,6 +46,22 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   nextSeguidor() {
+    // reiniamos las imagenes
+    this.resetImages();
+
+    // seleccionamos el proximo seguidor
+    this.seguidoresControlService.selectNextSeguidor();
+  }
+
+  prevSeguidor() {
+    // reiniamos las imagenes
+    this.resetImages();
+
+    // seleccionamos el seguidor previo
+    this.seguidoresControlService.selectPrevSeguidor();
+  }
+
+  resetImages() {
     // limpiamos la imagen del seguidor anterior
     this.seguidorViewService.thermalCanvas.clear();
     this.seguidorViewService.visualCanvas.clear();
@@ -61,25 +72,6 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // reiniciamos la carga de la nueva imagen
     this.seguidorViewService.imagesLoaded = false;
-
-    // seleccionamos el proximo seguidor
-    this.seguidoresControlService.selectNextSeguidor();
-  }
-
-  prevSeguidor() {
-    // limpiamos la imagen del seguidor anterior
-    this.seguidorViewService.visualCanvas.clear();
-    this.seguidorViewService.visualCanvas.clear();
-
-    // limpiamos las url para que no se muestre la imagen anterior al pasar
-    this.seguidoresControlService.urlThermalImageSeguidor = undefined;
-    this.seguidoresControlService.urlVisualImageSeguidor = undefined;
-
-    // reiniciamos la carga de la nueva imagen
-    this.seguidorViewService.imagesLoaded = false;
-
-    // seleccionamos el seguidor previo
-    this.seguidoresControlService.selectPrevSeguidor();
   }
 
   ngOnDestroy(): void {

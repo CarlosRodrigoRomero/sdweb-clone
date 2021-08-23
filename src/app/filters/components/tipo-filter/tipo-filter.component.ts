@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 
 import { MatCheckboxChange } from '@angular/material/checkbox';
@@ -13,6 +13,7 @@ import { ReportControlService } from '@core/services/report-control.service';
 
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { Anomalia } from '@core/models/anomalia';
+import { Subscription } from 'rxjs';
 
 export interface LabelTipo {
   label?: string;
@@ -26,7 +27,7 @@ export interface LabelTipo {
   templateUrl: './tipo-filter.component.html',
   styleUrls: ['./tipo-filter.component.css'],
 })
-export class TipoFilterComponent implements OnInit {
+export class TipoFilterComponent implements OnInit, OnDestroy {
   tiposElem: LabelTipo[] = [];
   filtroTipo: TipoElemFilter;
   filterTipoCounts: number[] = [];
@@ -48,6 +49,8 @@ export class TipoFilterComponent implements OnInit {
 
   selectedInformeId: string;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private filterService: FilterService,
     private anomaliaService: AnomaliaService,
@@ -58,34 +61,42 @@ export class TipoFilterComponent implements OnInit {
   ngOnInit(): void {
     this.plantaId = this.reportControlService.plantaId;
     this.informesIdList = this.reportControlService.informesIdList;
-    this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+    );
 
-    this.anomaliaService.getAnomaliasPlanta$(this.plantaId).subscribe((anomalias) => {
-      this.allAnomalias = anomalias;
-      this.tiposElem = [];
-      // obtenermos los labels de todas las anomalias
-      this._getAllCategorias(anomalias);
-      this.labelsCategoria.forEach((label, i) => {
-        this.tiposElem.push({ label, color: this.coloresCategoria[i] });
+    this.subscriptions.add(
+      this.anomaliaService.getAnomaliasPlanta$(this.plantaId).subscribe((anomalias) => {
+        this.allAnomalias = anomalias;
+        this.tiposElem = [];
+        // obtenermos los labels de todas las anomalias
+        this._getAllCategorias(anomalias);
+        this.labelsCategoria.forEach((label, i) => {
+          this.tiposElem.push({ label, color: this.coloresCategoria[i] });
 
-        this.tiposSelected.push(false);
-      });
+          this.tiposSelected.push(false);
+        });
 
-      this.numsCategoria.forEach((num) => {
-        this.filterTipoCounts.push(
-          this.allAnomalias
-            .filter((elem) => elem.informeId === this.selectedInformeId)
-            // tslint:disable-next-line: triple-equals
-            .filter((elem) => elem.tipo == num).length
-        );
-      });
-    });
+        this.numsCategoria.forEach((num) => {
+          this.filterTipoCounts.push(
+            this.allAnomalias
+              .filter((elem) => elem.informeId === this.selectedInformeId)
+              // tslint:disable-next-line: triple-equals
+              .filter((elem) => elem.tipo == num).length
+          );
+        });
+      })
+    );
 
     // nos suscribimos a los tipos seleccionados de filter control
-    this.filterControlService.tiposSelected$.subscribe((tiposSel) => (this.tiposSelected = tiposSel));
+    this.subscriptions.add(
+      this.filterControlService.tiposSelected$.subscribe((tiposSel) => (this.tiposSelected = tiposSel))
+    );
 
     // nos suscribimos a los labels del filter control
-    this.filterControlService.selectedTipoLabels$.subscribe((labels) => (this.selectedLabels = labels));
+    this.subscriptions.add(
+      this.filterControlService.selectedTipoLabels$.subscribe((labels) => (this.selectedLabels = labels))
+    );
 
     // this.reportControlService.selectedInformeId$.subscribe((informeID) => {
     //   this.filterService.filteredElementsWithoutFilterTipo$.subscribe((elems) => {
@@ -107,7 +118,9 @@ export class TipoFilterComponent implements OnInit {
     // });
 
     // nos suscribimos al estado en el control de filtros
-    this.filterControlService.labelTipoDefaultStatus$.subscribe((value) => (this.defaultLabelStatus = value));
+    this.subscriptions.add(
+      this.filterControlService.labelTipoDefaultStatus$.subscribe((value) => (this.defaultLabelStatus = value))
+    );
   }
 
   onChangeFiltroTipo(event: MatCheckboxChange) {
@@ -131,14 +144,16 @@ export class TipoFilterComponent implements OnInit {
         this.filterControlService.selectedTipoLabels = [event.source.name];
       }
     } else {
-      this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
-        filters
-          .filter((filter) => filter.type === 'tipo')
-          .forEach((filter) => {
-            if (filter.id === event.source.id) {
-              this.filterService.deleteFilter(filter);
-            }
-          })
+      this.subscriptions.add(
+        this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
+          filters
+            .filter((filter) => filter.type === 'tipo')
+            .forEach((filter) => {
+              if (filter.id === event.source.id) {
+                this.filterService.deleteFilter(filter);
+              }
+            })
+        )
       );
 
       this.filterControlService.tiposSelected[parseInt(event.source.id.replace('tipo_', '')) - 1] = false;
@@ -177,5 +192,9 @@ export class TipoFilterComponent implements OnInit {
     this.labelsCategoria = labelsCategoria;
     this.coloresCategoria = coloresCategoria;
     this.numsCategoria = numsCategoria;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

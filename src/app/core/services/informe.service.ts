@@ -94,6 +94,8 @@ export class InformeService {
           return data;
         })
       ),
+      // solo traemos los disponibles
+      map((informes) => informes.filter((informe) => informe.disponible)),
       // los ordenamos por fecha
       map((informes) => informes.sort((a, b) => a.fecha - b.fecha)),
       // nos quedamos con los 2 más recientes por el momento
@@ -296,6 +298,7 @@ export class InformeService {
       'Diciembre',
     ];
     const month = monthNames[date.getMonth()];
+
     return month + ' ' + year;
   }
 }

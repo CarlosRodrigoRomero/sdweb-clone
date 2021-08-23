@@ -10,7 +10,7 @@
 
 .map-control {
   position: absolute;
-  bottom: 1rem;
+  bottom: 10px;
   display: grid;
   grid-template-columns: 100%;
   gap: 1rem;
@@ -20,18 +20,11 @@
 
 .visual-control {
   display: flex;
-  /* grid-template-columns: 1fr 1fr; */
-  gap: 1rem;
+  justify-content: center;
 }
 
 @media (max-width: 900px) {
   .map-control {
-    gap: 0.5rem;
-  }
-
-  .visual-control {
-    display: grid;
-    grid-template-columns: 100%;
     gap: 0.5rem;
   }
 }
@@ -170,10 +163,6 @@ app-share-report {
 }
 
 @media (max-width: 1000px) {
-  :host ::ng-deep .mat-drawer-inner-container {
-    overflow: hidden;
-  }
-
   .stats-sidenav {
     width: calc(100vw - 20px);
   }

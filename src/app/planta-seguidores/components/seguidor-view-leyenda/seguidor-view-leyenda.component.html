@@ -3,21 +3,19 @@
     <div *ngIf="viewSelected != 1">
       <span class="title">{{ viewsTitle[viewSelected] }}</span>
       <div class="line">
-        <mat-icon [ngStyle]="{ color: colors[0] }">crop_5_4</mat-icon>
-        <span *ngIf="viewSelected == 0">< 33%</span>
-        <span *ngIf="viewSelected == 2">< {{ gradNormLevels[0] | number: '1.0-1' }} ºC</span>
+        <mat-icon [ngStyle]="{ color: colors[2] }">crop_5_4</mat-icon>
+        <span *ngIf="viewSelected == 0">Altas</span>
+        <span *ngIf="viewSelected == 2">Grave</span>
       </div>
       <div class="line">
         <mat-icon [ngStyle]="{ color: colors[1] }">crop_5_4</mat-icon>
-        <span *ngIf="viewSelected == 0">34% - 66%</span>
-        <span *ngIf="viewSelected == 2"
-          >{{ gradNormLevels[0] | number: '1.0-1' }} - {{ gradNormLevels[1] | number: '1.0-1' }} ºC</span
-        >
+        <span *ngIf="viewSelected == 0">Medias</span>
+        <span *ngIf="viewSelected == 2">Medio</span>
       </div>
       <div class="line">
-        <mat-icon [ngStyle]="{ color: colors[2] }">crop_5_4</mat-icon>
-        <span *ngIf="viewSelected == 0">> 67%</span>
-        <span *ngIf="viewSelected == 2">> {{ gradNormLevels[1] | number: '1.0-1' }} ºC</span>
+        <mat-icon [ngStyle]="{ color: colors[0] }">crop_5_4</mat-icon>
+        <span *ngIf="viewSelected == 0">Bajas</span>
+        <span *ngIf="viewSelected == 2">Leve</span>
       </div>
     </div>
     <div *ngIf="viewSelected == 1">

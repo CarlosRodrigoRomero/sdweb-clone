@@ -1,22 +1,22 @@
-<div class="sidenav-content" *ngIf="seguidorSelected">
+<div class="sidenav-content" *ngIf="seguidorSelected !== undefined">
   <!-- NAVBAR SEGUIDOR VIEW -->
   <app-seguidor-view-navbar></app-seguidor-view-navbar>
   <div class="seguidor-content">
     <div class="left-content">
       <!-- IMAGEN -->
-      <div *ngIf="imagesExist" id="image-content" class="image-content">
+      <div *ngIf="imagesExist && seguidorSelected !== null" id="image-content" class="image-content">
         <app-seguidor-view-toggle></app-seguidor-view-toggle>
         <app-seguidor-images></app-seguidor-images>
         <app-seguidor-image-toggle></app-seguidor-image-toggle>
         <app-seguidor-view-leyenda></app-seguidor-view-leyenda>
 
         <!-- BOTONES ANTERIOR Y SIGUIENTE -->
-        <button class="prev-btn" mat-icon-button (click)="prevSeguidor()">
+        <!-- <button class="prev-btn" mat-icon-button (click)="prevSeguidor()">
           <mat-icon>arrow_back_ios</mat-icon>
         </button>
         <button class="next-btn" mat-icon-button (click)="nextSeguidor()">
           <mat-icon>arrow_forward_ios</mat-icon>
-        </button>
+        </button> -->
       </div>
       <div *ngIf="!imagesExist">
         <!-- BOTONES ANTERIOR Y SIGUIENTE NO IMAGEN -->
@@ -32,17 +32,19 @@
         <span>Imagen no disponible</span>
       </div>
       <!-- SLIDER TEMPORAL -->
-      <app-seguidor-slider-temporal *ngIf="!oneReport && numAnomalias > 0"></app-seguidor-slider-temporal>
+      <app-seguidor-slider-temporal
+        *ngIf="reportControlService.informesIdList.length > 1"
+      ></app-seguidor-slider-temporal>
 
       <!-- INFO ANOMALIA SELECCIONADA -->
-      <app-seguidor-anomalia-info></app-seguidor-anomalia-info>
-
-      <!-- DESCARGAR IMAGENES -->
-      <app-seguidor-image-download *ngIf="imagesExist"></app-seguidor-image-download>
+      <app-seguidor-anomalia-info *ngIf="seguidorSelected !== null"></app-seguidor-anomalia-info>
     </div>
     <div class="right-content" *ngIf="numAnomalias > 0">
+      <!-- DESCARGAR IMAGENES -->
+      <app-seguidor-image-download *ngIf="imagesExist && seguidorSelected !== null"></app-seguidor-image-download>
+
       <!-- LISTA ANOMALIAS -->
-      <app-seguidor-anomalias-list *ngIf="numAnomalias > 0"></app-seguidor-anomalias-list>
+      <app-seguidor-anomalias-list *ngIf="numAnomalias > 0 && seguidorSelected !== null"></app-seguidor-anomalias-list>
     </div>
   </div>
 </div>

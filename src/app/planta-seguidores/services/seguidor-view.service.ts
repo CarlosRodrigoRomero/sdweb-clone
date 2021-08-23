@@ -4,7 +4,9 @@ import { BehaviorSubject } from 'rxjs';
 
 import { MatSidenav } from '@angular/material/sidenav';
 
+import { SeguidorService } from '@core/services/seguidor.service';
 import { SeguidoresControlService } from '../services/seguidores-control.service';
+import { MapSeguidoresService } from './map-seguidores.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
@@ -23,10 +25,46 @@ export class SeguidorViewService {
   public anomaliaHovered$ = new BehaviorSubject<Anomalia>(this._anomaliaHovered);
   private _visualCanvas: any = undefined;
   private _thermalCanvas: any = undefined;
-  private _imageLoaded = false;
-  public imageLoaded$ = new BehaviorSubject<boolean>(this._imageLoaded);
+  private _anomsCanvas: any = undefined;
+  private _imagesLoaded = false;
+  public imagesLoaded$ = new BehaviorSubject<boolean>(this._imagesLoaded);
+  private viewSelected = 0;
 
-  constructor(private seguidoresControlService: SeguidoresControlService) {}
+  constructor(
+    private seguidoresControlService: SeguidoresControlService,
+    private mapSeguidoresService: MapSeguidoresService,
+    private seguidorService: SeguidorService
+  ) {
+    this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSelected) => (this.viewSelected = viewSelected));
+  }
+
+  getAnomaliaColor(anomalia: Anomalia): string {
+    // tslint:disable-next-line: triple-equals
+    if (this.viewSelected == 0) {
+      return this.seguidorService.getPerdidasAnomColor(anomalia);
+      // tslint:disable-next-line: triple-equals
+    } else if (this.viewSelected == 1) {
+      return this.seguidorService.getCelsCalientesAnomColor(anomalia);
+    } else {
+      return this.seguidorService.getGradienteAnomColor(anomalia);
+    }
+  }
+
+  setAnomaliaHoveredStyle(anomalia: Anomalia, hovered: boolean) {
+    if (anomalia !== this.anomaliaSelected) {
+      const polygon = this.anomsCanvas.getObjects().find((anom) => anom.anomId === anomalia.id);
+
+      if (polygon !== undefined) {
+        if (hovered) {
+          polygon.set({ stroke: 'white', strokeWidth: 2 });
+          this.anomsCanvas.renderAll();
+        } else {
+          polygon.set({ stroke: this.getAnomaliaColor(anomalia), strokeWidth: 2 });
+          this.anomsCanvas.renderAll();
+        }
+      }
+    }
+  }
 
   resetViewValues() {
     this.seguidoresControlService.seguidorSelected = undefined;
@@ -38,6 +76,7 @@ export class SeguidorViewService {
       this.visualCanvas.clear();
     }
     this.seguidoresControlService.imageExist = true;
+    this.imagesLoaded = false;
   }
 
   get sidenav() {
@@ -100,12 +139,20 @@ export class SeguidorViewService {
     this._thermalCanvas = value;
   }
 
+  get anomsCanvas() {
+    return this._anomsCanvas;
+  }
+
+  set anomsCanvas(value: any) {
+    this._anomsCanvas = value;
+  }
+
   get imagesLoaded() {
-    return this._imageLoaded;
+    return this._imagesLoaded;
   }
 
   set imagesLoaded(value: boolean) {
-    this._imageLoaded = value;
-    this.imageLoaded$.next(value);
+    this._imagesLoaded = value;
+    this.imagesLoaded$.next(value);
   }
 }

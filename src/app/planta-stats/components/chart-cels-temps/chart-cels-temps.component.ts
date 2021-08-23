@@ -22,6 +22,7 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
 
 import { Anomalia } from '@core/models/anomalia';
+import { Seguidor } from '@core/models/seguidor';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -47,7 +48,7 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
   public chartOptions: Partial<ChartOptions>;
   dataLoaded = false;
   informesIdList: string[];
-  allAnomalias: Anomalia[];
+  allAnomalias: Anomalia[] = [];
   dateLabels: string[];
 
   private subscriptions: Subscription = new Subscription();
@@ -59,7 +60,12 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
       combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$])
         .pipe(
           switchMap(([elems, informesId]) => {
-            this.allAnomalias = elems as Anomalia[];
+            if (this.reportControlService.plantaFija) {
+              this.allAnomalias = elems as Anomalia[];
+            } else {
+              (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
+            }
+
             this.informesIdList = informesId;
 
             return this.informeService.getDateLabelsInformes(this.informesIdList);
@@ -79,9 +85,10 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
             const range1 = celsCals.filter((cc) => cc.gradienteNormalizado < 10 && cc.gradienteNormalizado >= 0);
             const range2 = celsCals.filter((cc) => cc.gradienteNormalizado < 20 && cc.gradienteNormalizado >= 10);
             const range3 = celsCals.filter((cc) => cc.gradienteNormalizado < 30 && cc.gradienteNormalizado >= 20);
-            const range4 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
+            const range4 = celsCals.filter((cc) => cc.gradienteNormalizado < 40 && cc.gradienteNormalizado >= 30);
+            const range5 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
 
-            data.push([range1.length, range2.length, range3.length, range4.length]);
+            data.push([range1.length, range2.length, range3.length, range4.length, range5.length]);
           });
 
           this._initChartData(data);
@@ -112,13 +119,17 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
       dataLabels: {
         enabled: false,
       },
+      fill: {
+        opacity: 1,
+        colors: ['#7F7F7F', '#FF6B6B'],
+      },
       stroke: {
         show: true,
         width: 2,
         colors: ['transparent'],
       },
       xaxis: {
-        categories: ['0-10 ºC', '20-30 ºC', '30-40 ºC', '>40 ºC'],
+        categories: ['0-10 ºC', '10-20 ºC', '20-30 ºC', '30-40 ºC', '>40 ºC'],
       },
       yaxis: {
         title: {
@@ -130,9 +141,6 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
             return Math.round(value).toString();
           },
         },
-      },
-      fill: {
-        opacity: 1,
       },
       tooltip: {
         y: {

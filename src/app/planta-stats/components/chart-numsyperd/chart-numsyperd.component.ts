@@ -2,12 +2,6 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { combineLatest, Subscription } from 'rxjs';
 
-import { GLOBAL } from '@core/services/global';
-import { FilterService } from '@core/services/filter.service';
-import { ReportControlService } from '@core/services/report-control.service';
-
-import { Anomalia } from '@core/models/anomalia';
-
 import {
   ChartComponent,
   ApexAxisChartSeries,
@@ -24,6 +18,12 @@ import {
   ApexTooltip,
   ApexPlotOptions,
 } from 'ng-apexcharts';
+
+import { GLOBAL } from '@core/services/global';
+import { FilterService } from '@core/services/filter.service';
+import { ReportControlService } from '@core/services/report-control.service';
+
+import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 
 export type ChartOptions = {
@@ -187,7 +187,6 @@ export class ChartNumsyperdComponent implements OnInit, OnDestroy {
         offsetX: 0,
         offsetY: -25,
       },
-
       stroke: {
         show: true,
         width: 2,
@@ -221,7 +220,6 @@ export class ChartNumsyperdComponent implements OnInit, OnDestroy {
           // rotate: 0,
         },
       },
-
       tooltip: {
         followCursor: false,
         theme: 'dark',
@@ -292,7 +290,6 @@ export class ChartNumsyperdComponent implements OnInit, OnDestroy {
           width: '100%',
           height: this.chartHeight,
         },
-
         colors: [GLOBAL.gris],
         yaxis: {
           max: (v) => {

@@ -2,6 +2,7 @@ import { ModuloInterface } from './modulo';
 
 export interface FilterableElement {
   id?: string;
+  informeId?: string;
   globalCoords?: string[];
   perdidas?: number;
   temperaturaMax?: number;

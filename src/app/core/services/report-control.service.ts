@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { WINDOW } from '../../window.providers';
+
 import { BehaviorSubject, concat, Observable } from 'rxjs';
 import { delay, flatMap, publish, switchMap, take, takeWhile } from 'rxjs/operators';
 
@@ -10,10 +12,7 @@ import { InformeService } from '@core/services/informe.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { SeguidorService } from '@core/services/seguidor.service';
 
-import { WINDOW } from '../../window.providers';
-
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
-
 import { FilterableElement } from '@core/models/filterableInterface';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
@@ -93,12 +92,14 @@ export class ReportControlService {
                 take(1)
               )
               .subscribe((anoms) => {
-                this.allFilterableElements = anoms;
+                // filtramos las anomalias por criterio de criticidad del cliente
+                // tslint:disable-next-line: triple-equals
+                this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
 
-                this.numFixedGlobalCoords = this.getNumGlobalCoords(anoms);
+                this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
 
                 // iniciamos filter service
-                this.filterService.initService(anoms).then((filtersInit) => {
+                this.filterService.initService(this.allFilterableElements).then((filtersInit) => {
                   // enviamos respuesta de servicio iniciado
                   initService(filtersInit);
                 });
@@ -142,13 +143,17 @@ export class ReportControlService {
                         take(1)
                       )
                       .subscribe((anoms) => {
-                        this.allFilterableElements = anoms;
+                        // filtramos las anomalias por criterio de criticidad del cliente
+                        // tslint:disable-next-line: triple-equals
+                        this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
 
                         // iniciamos filter service
-                        this.filterService.initService(anoms, true, this.sharedId).then((filtersInit) => {
-                          // enviamos respuesta de servicio iniciado
-                          initService(filtersInit);
-                        });
+                        this.filterService
+                          .initService(this.allFilterableElements, true, this.sharedId)
+                          .then((filtersInit) => {
+                            // enviamos respuesta de servicio iniciado
+                            initService(filtersInit);
+                          });
                       })
                   );
                 } else {
@@ -176,12 +181,17 @@ export class ReportControlService {
                         take(1)
                       )
                       .subscribe((anoms) => {
-                        this.allFilterableElements = anoms;
+                        // filtramos las anomalias por criterio de criticidad del cliente
+                        // tslint:disable-next-line: triple-equals
+                        this.allFilterableElements = anoms.filter((anom) => anom.tipo != 0 && anom.criticidad !== null);
+
                         // iniciamos filter service
-                        this.filterService.initService(anoms, true, this.sharedId).then((filtersInit) => {
-                          // enviamos respuesta de servicio iniciado
-                          initService(filtersInit);
-                        });
+                        this.filterService
+                          .initService(this.allFilterableElements, true, this.sharedId)
+                          .then((filtersInit) => {
+                            // enviamos respuesta de servicio iniciado
+                            initService(filtersInit);
+                          });
                       })
                   );
                 }
@@ -200,7 +210,7 @@ export class ReportControlService {
 
         return new Promise((initService) => {
           // iniciamos anomalia service para cargar los criterios la planta
-          this.anomaliaService.initService(this.plantaId).then(() =>
+          this.anomaliaService.initService(this.plantaId).then(() => {
             this.informeService
               .getInformesDePlanta(this.plantaId)
               .pipe(
@@ -233,8 +243,8 @@ export class ReportControlService {
                   // enviamos respuesta de servicio iniciado
                   initService(filtersInit);
                 });
-              })
-          );
+              });
+          });
         });
       } else {
         ///////////////////// SHARED REPORT ///////////////////////
@@ -343,7 +353,7 @@ export class ReportControlService {
         const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
         let mae = 0;
         seguidoresInforme.forEach((seg) => (mae = mae + seg.mae));
-        informe.mae = mae;
+        informe.mae = mae / seguidoresInforme.length;
 
         this.informeService.updateInforme(informe);
       }

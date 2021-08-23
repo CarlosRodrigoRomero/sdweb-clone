@@ -3,11 +3,12 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 
 import { GLOBAL } from '@core/services/global';
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
+import { MapSeguidoresService } from '../../services/map-seguidores.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { Anomalia } from '@core/models/anomalia';
@@ -29,6 +30,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
   seguidorSelected: Seguidor = undefined;
   anomaliaHovered: Anomalia = undefined;
   anomaliaSelected: Anomalia = undefined;
+  viewSelected = 0;
   dataSource: MatTableDataSource<AnomaliaData>;
   displayedColumns = ['id', 'tipo', 'perdidas', 'tempMax', 'gradiente'];
 
@@ -38,18 +40,38 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
-    private seguidorViewService: SeguidorViewService
+    private seguidorViewService: SeguidorViewService,
+    private mapSeguidoresService: MapSeguidoresService
   ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
+      combineLatest([
+        this.seguidoresControlService.seguidorSelected$,
+        this.mapSeguidoresService.toggleViewSelected$,
+      ]).subscribe(([seguidor, view]) => {
         this.seguidorSelected = seguidor;
+        this.viewSelected = view;
 
-        if (this.seguidorSelected !== undefined) {
-          if (seguidor.anomaliasCliente.length > 0) {
-            const anomalias = [];
-            seguidor.anomaliasCliente.forEach((anom) => {
+        if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
+          let anomalias;
+          // tslint:disable-next-line: triple-equals
+          if (this.viewSelected != 1) {
+            anomalias = seguidor.anomaliasCliente;
+          } else {
+            // tslint:disable-next-line: triple-equals
+            anomalias = seguidor.anomaliasCliente.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+          }
+
+          // vaciamos el datasource
+          this.dataSource = undefined;
+
+          // marcamos la nueva seleccionada
+          this.seguidorViewService.anomaliaSelected = anomalias[0];
+
+          if (anomalias.length > 0) {
+            const anomaliasTabla = [];
+            anomalias.forEach((anom) => {
               let perdidas;
               if (anom.perdidas !== undefined) {
                 perdidas = anom.perdidas * 100 + '%';
@@ -62,7 +84,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
               if (anom.gradienteNormalizado !== undefined) {
                 gradiente = anom.gradienteNormalizado + 'ºC';
               }
-              anomalias.push({
+              anomaliasTabla.push({
                 id: anom.localId,
                 tipo: GLOBAL.pcDescripcion[anom.tipo],
                 perdidas,
@@ -71,7 +93,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
                 anomalia: anom,
               });
             });
-            this.dataSource = new MatTableDataSource(anomalias);
+            this.dataSource = new MatTableDataSource(anomaliasTabla);
             this.dataSource.sort = this.sort;
           }
         }
@@ -87,20 +109,22 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
   }
 
   ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
+    if (this.dataSource !== undefined) {
+      this.dataSource.sort = this.sort;
+    }
   }
 
   hoverAnomalia(row: any) {
     if (this.anomaliaSelected !== row.anomalia) {
       this.seguidorViewService.anomaliaHovered = row.anomalia;
-      // this.anomaliasControlService.setExternalStyle(row.id, true);
+      this.seguidorViewService.setAnomaliaHoveredStyle(row.anomalia, true);
     }
   }
 
   unhoverAnomalia(row: any) {
     if (this.anomaliaSelected !== row.anomalia) {
       this.seguidorViewService.anomaliaHovered = undefined;
-      // this.anomaliasControlService.setExternalStyle(row.id, false);
+      this.seguidorViewService.setAnomaliaHoveredStyle(row.anomalia, false);
     }
   }
 
@@ -112,7 +136,6 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
     this.seguidorViewService.prevAnomaliaSelected = this.anomaliaSelected;
 
     this.seguidorViewService.anomaliaSelected = row.anomalia;
-    // this.anomaliasControlService.setExternalStyle(row.id, true);
   }
 
   ngOnDestroy(): void {

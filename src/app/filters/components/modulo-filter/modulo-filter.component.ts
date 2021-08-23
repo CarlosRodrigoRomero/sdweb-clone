@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { MatCheckboxChange } from '@angular/material/checkbox';
 
@@ -9,6 +9,7 @@ import { FilterService } from '@core/services/filter.service';
 import { ModuloPcFilter } from '@core/models/moduloFilter';
 import { FilterableElement } from '@core/models/filterableInterface';
 import { AnomaliaService } from '@core/services/anomalia.service';
+import { Subscription } from 'rxjs';
 
 interface ModuloPc {
   label?: string;
@@ -21,7 +22,7 @@ interface ModuloPc {
   templateUrl: './modulo-filter.component.html',
   styleUrls: ['./modulo-filter.component.css'],
 })
-export class ModuloFilterComponent implements OnInit {
+export class ModuloFilterComponent implements OnInit, OnDestroy {
   modulosTask: ModuloPc;
   modulosPcs: ModuloPc[] = [];
   allComplete: boolean;
@@ -29,6 +30,8 @@ export class ModuloFilterComponent implements OnInit {
 
   defaultSelect = 'Tipo módulo';
   selected: string[] = [this.defaultSelect];
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private pcService: PcService,
@@ -61,14 +64,16 @@ export class ModuloFilterComponent implements OnInit {
         this.selected = [event.source.name];
       }
     } else {
-      this.filterService.filters$.subscribe((filters) =>
-        filters
-          .filter((filter) => filter.type === 'modulo')
-          .forEach((filter) => {
-            if (filter.id === event.source.id) {
-              this.filterService.deleteFilter(filter);
-            }
-          })
+      this.subscriptions.add(
+        this.filterService.filters$.subscribe((filters) =>
+          filters
+            .filter((filter) => filter.type === 'modulo')
+            .forEach((filter) => {
+              if (filter.id === event.source.id) {
+                this.filterService.deleteFilter(filter);
+              }
+            })
+        )
       );
 
       // eliminamos el 'tipo' de seleccionados
@@ -111,5 +116,9 @@ export class ModuloFilterComponent implements OnInit {
       }
     }
     return moduloLabel;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

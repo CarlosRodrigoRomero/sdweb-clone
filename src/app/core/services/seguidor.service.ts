@@ -27,9 +27,6 @@ export class SeguidorService {
   numGlobalCoords: number;
   private _locAreas: LocationAreaInterface[] = [];
 
-  minGradNorm: number;
-  maxGradNorm: number;
-
   constructor(
     private informeService: InformeService,
     public afs: AngularFirestore,
@@ -65,8 +62,6 @@ export class SeguidorService {
     return combineLatest([locAreaList$, anomaliaList$, getInforme$]).pipe(
       map(([locAreaList, anomaliaList, informe]) => {
         const seguidores: Seguidor[] = [];
-
-        this.getMinMaxGradNorm(anomaliaList);
 
         if (anomaliaList.length > 0) {
           // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
@@ -133,6 +128,9 @@ export class SeguidorService {
               let modulo;
               if (zona !== undefined) {
                 modulo = zona.modulo;
+              } else {
+                modulo = anomaliasSeguidor[0].modulo;
+                // modulo = this.getSeguidorModule(locAreaList);
               }
 
               const seguidor = new Seguidor(
@@ -172,6 +170,10 @@ export class SeguidorService {
     });
 
     return nombre;
+  }
+
+  private getSeguidorModule(locAreas: LocationAreaInterface[]) {
+    const locAreasWithModule = locAreas.filter((locArea) => locArea.modulo !== undefined);
   }
 
   private getCompleteGlobalCoords(
@@ -245,46 +247,24 @@ export class SeguidorService {
       });
   }
 
-  private getMinMaxGradNorm(anomalias: Anomalia[]) {
-    // filtramos solo las que tengan gradiente normalizado
-    const anomsOk = anomalias.filter((anom) => anom.gradienteNormalizado !== undefined);
-
-    if (anomsOk.length > 0) {
-      const minGrad = Math.min(...anomsOk.map((anom) => anom.gradienteNormalizado));
-      const maxGrad = Math.max(...anomsOk.map((anom) => anom.gradienteNormalizado));
-
-      if (this.minGradNorm === undefined) {
-        this.minGradNorm = minGrad;
-      } else if (this.minGradNorm > minGrad) {
-        this.minGradNorm = minGrad;
-      }
-
-      if (this.maxGradNorm === undefined) {
-        this.maxGradNorm = maxGrad;
-      } else if (this.maxGradNorm < maxGrad) {
-        this.maxGradNorm = maxGrad;
-      }
-    }
-  }
-
-  getPerdidasAnomColor(anomaliaSelected: Anomalia) {
-    if (anomaliaSelected.perdidas <= 0.33) {
+  getPerdidasAnomColor(anomalia: Anomalia) {
+    if (anomalia.perdidas < 0.33) {
       return GLOBAL.colores_mae[0];
-    } else if (anomaliaSelected.perdidas > 0.66) {
+    } else if (anomalia.perdidas < 0.66) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];
     }
   }
 
-  getCelsCalientesAnomColor(anomaliaSelected: Anomalia) {
+  getCelsCalientesAnomColor(anomalia: Anomalia) {
     return 'red';
   }
 
-  getGradienteAnomColor(anomaliaSelected: Anomalia) {
-    if (anomaliaSelected.gradienteNormalizado <= (this.maxGradNorm - this.minGradNorm) / 3) {
+  getGradienteAnomColor(anomalia: Anomalia) {
+    if (anomalia.gradienteNormalizado < 10) {
       return GLOBAL.colores_mae[0];
-    } else if (anomaliaSelected.gradienteNormalizado <= (2 * (this.maxGradNorm - this.minGradNorm)) / 3) {
+    } else if (anomalia.gradienteNormalizado < 40) {
       return GLOBAL.colores_mae[1];
     } else {
       return GLOBAL.colores_mae[2];

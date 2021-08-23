@@ -231,16 +231,18 @@ export class BarChartComponent implements OnInit {
   }
 
   private onClick(index: number) {
-    const plantaId = this.plantasId[index];
-    const tipoPlanta = this.tiposPlantas[index];
-    const fechaInformeReciente = this.fechaInformesRecientes[index];
+    if (index !== -1) {
+      const plantaId = this.plantasId[index];
+      const tipoPlanta = this.tiposPlantas[index];
+      const fechaInformeReciente = this.fechaInformesRecientes[index];
 
-    if (tipoPlanta === 'seguidores') {
-      this.router.navigate(['clients/tracker/' + plantaId]);
-    } else if (fechaInformeReciente > 1619820000 || plantaId === 'egF0cbpXnnBnjcrusoeR') {
-      this.router.navigate(['clients/fixed/' + plantaId]);
-    } else {
-      this.openSnackBar();
+      if (tipoPlanta === 'seguidores') {
+        this.router.navigate(['clients/tracker/' + plantaId]);
+      } else if (fechaInformeReciente > 1619820000 || plantaId === 'egF0cbpXnnBnjcrusoeR') {
+        this.router.navigate(['clients/fixed/' + plantaId]);
+      } else {
+        this.openSnackBar();
+      }
     }
   }
 

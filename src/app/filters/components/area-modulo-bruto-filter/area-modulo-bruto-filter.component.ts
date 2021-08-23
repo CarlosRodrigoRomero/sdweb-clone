@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+
+import { Subscription } from 'rxjs';
 
 import { MatSliderChange } from '@angular/material/slider';
 
@@ -12,7 +14,7 @@ import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
   templateUrl: './area-modulo-bruto-filter.component.html',
   styleUrls: ['./area-modulo-bruto-filter.component.css'],
 })
-export class AreaModuloBrutoFilterComponent implements OnInit {
+export class AreaModuloBrutoFilterComponent implements OnInit, OnDestroy {
   min = 0;
   max = 10;
   step = 1;
@@ -21,20 +23,24 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
   createMode = false;
   deleteMode = false;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(private filterService: FilterService, private structuresService: StructuresService) {}
 
   ngOnInit(): void {
-    this.structuresService.getFiltersParams().subscribe((filters) => {
-      if (filters.length > 0) {
-        // comprobamos si hay filtros en la DB y seteamos los parámetros
-        if (filters[0].areaM !== undefined) {
-          this.value = filters[0].areaM.fuerza;
+    this.subscriptions.add(
+      this.structuresService.getFiltersParams().subscribe((filters) => {
+        if (filters.length > 0) {
+          // comprobamos si hay filtros en la DB y seteamos los parámetros
+          if (filters[0].areaM !== undefined) {
+            this.value = filters[0].areaM.fuerza;
+          }
         }
-      }
-    });
+      })
+    );
 
-    this.structuresService.createRawModMode$.subscribe((mode) => (this.createMode = mode));
-    this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode));
+    this.subscriptions.add(this.structuresService.createRawModMode$.subscribe((mode) => (this.createMode = mode)));
+    this.subscriptions.add(this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode)));
   }
 
   onChangeSlider(e: MatSliderChange) {
@@ -65,5 +71,9 @@ export class AreaModuloBrutoFilterComponent implements OnInit {
 
   formatLabel(value: number) {
     return value;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

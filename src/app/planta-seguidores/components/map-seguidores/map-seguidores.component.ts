@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
 
 import { switchMap, take } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
@@ -7,20 +6,15 @@ import { combineLatest, Subscription } from 'rxjs';
 import Map from 'ol/Map';
 import { fromLonLat } from 'ol/proj.js';
 import View from 'ol/View';
-import { Fill, Icon, Stroke, Style } from 'ol/style';
-import Select from 'ol/interaction/Select';
 import { Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-import { Feature, Overlay } from 'ol';
-import Polygon from 'ol/geom/Polygon';
+import { Overlay } from 'ol';
 import { defaults as defaultControls } from 'ol/control.js';
-import OverlayPositioning from 'ol/OverlayPositioning';
 import XYZ from 'ol/source/XYZ';
 
 import { PlantaService } from '@core/services/planta.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { IncrementosService } from '../../services/incrementos.service';
-import { GLOBAL } from '@core/services/global';
 import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '@core/services/filter.service';
 import { OlMapService } from '@core/services/ol-map.service';
@@ -30,8 +24,7 @@ import { SeguidoresControlService } from '../../services/seguidores-control.serv
 
 import { PlantaInterface } from '@core/models/planta';
 import { Seguidor } from '@core/models/seguidor';
-import { LatLngLiteral } from '@agm/core';
-import { Coordinate } from 'ol/coordinate';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-map-seguidores',
@@ -41,6 +34,7 @@ import { Coordinate } from 'ol/coordinate';
 export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public plantaId: string;
   public planta: PlantaInterface;
+  private informes: InformeInterface[];
   public map: Map;
   public rangeMin: number;
   public rangeMax: number;
@@ -52,7 +46,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public seguidorSeleccionado: Seguidor;
   public listaSeguidores: Seguidor[];
   public sliderYear: number;
-  public aerialLayer: TileLayer;
+  public aerialLayers: TileLayer[];
   public thermalSource;
   private seguidorLayers: VectorLayer[];
   private incrementoLayers: VectorLayer[];
@@ -98,59 +92,50 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
         .pipe(take(1))
         .subscribe(([informes, planta]) => {
           this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers));
-          // this.olMapService.getIncrementoLayers().subscribe((layers) => (this.incrementoLayers = layers));
-
-          // this.incrementosService.initService();
 
           // ordenamos los informes por fecha
-          this.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
-          // this.incrementosService.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
+          this.informeIdList = informes.map((informe) => informe.id);
 
-          informes
-            .sort((a, b) => a.fecha - b.fecha)
-            .forEach((informe) => {
-              // creamos las capas de los seguidores para los diferentes informes
-              this.seguidoresControlService
-                .createSeguidorLayers(informe.id)
-                .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
+          informes.forEach((informe) => {
+            // creamos las capas de los seguidores para los diferentes informes
+            this.seguidoresControlService
+              .createSeguidorLayers(informe.id)
+              .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
-              // creamos las capas de los incrementos para los diferentes informes
-              // this.incrementosService
-              //   .createIncrementoLayers(informe.id)
-              //   .forEach((layer) => this.olMapService.addIncrementoLayer(layer));
-            });
+            // añadimos las ortofotos aereas de cada informe
+            this.addAerialLayer(informe.id);
+          });
 
           // los subscribimos al toggle de vitas y al slider temporal
           combineLatest([
             this.mapSeguidoresService.toggleViewSelected$,
             this.mapSeguidoresService.sliderTemporalSelected$,
-          ]).subscribe(([toggleValue, sliderValue]) => {
+            this.olMapService.getAerialLayers(),
+          ]).subscribe(([toggleValue, sliderValue, aerialLayers]) => {
             const layerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (informes.length - 1))));
 
             this.mapSeguidoresService.layerSelected = layerSelected;
 
             // ocultamos las 3 capas de las vistas
             this.seguidorLayers.forEach((layer) => layer.setOpacity(0));
-            // this.incrementoLayers.forEach((layer) => layer.setOpacity(0));
 
             // mostramos la capa seleccionada
             this.seguidorLayers[layerSelected].setOpacity(1);
-            // this.incrementoLayers[v].setOpacity(1);
+
+            this.aerialLayers = aerialLayers;
           });
 
           this.planta = planta;
 
+          this.subscriptions.add(
+            this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+          );
+
           // asignamos los IDs necesarios para compartir
           this.shareReportService.setPlantaId(this.plantaId);
 
-          // seleccionamos el informe mas reciente de la planta
-          this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
-          // this.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
-
           // asignamos el informe para compartir
           // this.shareReportService.setInformeID(this.informesList[this.informesList.length - 1]);
-
-          // this.mapSeguidoresService.selectedInformeId = this.informeIdList[this.informeIdList.length - 1];
 
           this.initMap();
 
@@ -166,19 +151,9 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     });
     const satelliteLayer = new TileLayer({
       source: satellite,
-      // extent: this.extent1,
     });
 
-    const aerial = new XYZ({
-      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInformeId + '_visual/{z}/{x}/{y}.png',
-      crossOrigin: '',
-    });
-
-    this.aerialLayer = new TileLayer({
-      source: aerial,
-    });
-
-    const layers = [satelliteLayer, this.aerialLayer];
+    const layers = [satelliteLayer, ...this.aerialLayers];
 
     // MAPA
     const view = new View({
@@ -203,22 +178,15 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     this.seguidorLayers.forEach((l) => this.map.addLayer(l));
 
     // inicializamos el servicio que controla el comportamiento de los seguidores
-    this.subscriptions.add(
-      this.seguidoresControlService
-        .initService()
-        .pipe(
-          switchMap((value) => {
-            if (value) {
-              this.seguidoresControlService.mostrarSeguidores();
+    this.seguidoresControlService.initService().then((value) => {
+      if (value) {
+        this.seguidoresControlService.mostrarSeguidores();
 
-              return this.seguidoresControlService.seguidorHovered$;
-            }
-          })
-        )
-        .subscribe((segHover) => (this.seguidorHovered = segHover))
-    );
-
-    // this.incrementoLayers.forEach((l) => this.map.addLayer(l));
+        this.subscriptions.add(
+          this.seguidoresControlService.seguidorHovered$.subscribe((segHover) => (this.seguidorHovered = segHover))
+        );
+      }
+    });
   }
 
   private addPopupOverlay() {
@@ -227,14 +195,27 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     this.popup = new Overlay({
       id: 'popup',
       element: container,
-      autoPan: true,
+      position: undefined,
+      /* autoPan: true,
       autoPanAnimation: {
         duration: 250,
-      },
-      position: undefined,
+      }, */
     });
 
     this.map.addOverlay(this.popup);
+  }
+
+  private addAerialLayer(informeId: string) {
+    const aerial = new XYZ({
+      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_visual/{z}/{x}/{y}.png',
+      crossOrigin: '',
+    });
+
+    const aerialLayer = new TileLayer({
+      source: aerial,
+    });
+
+    this.olMapService.addAerialLayer(aerialLayer);
   }
 
   ngOnDestroy(): void {

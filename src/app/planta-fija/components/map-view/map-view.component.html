@@ -50,7 +50,11 @@
               <app-download-report></app-download-report>
             </div>
 
-            <div class="map-control">
+            <button mat-raised-button class="btn-open-controls" (click)="showControls()">
+              <mat-icon>tune</mat-icon>
+            </button>
+
+            <div id="map-control" class="map-control">
               <!-- CONTROL TEMPORAL -->
               <div class="temporal-control">
                 <app-slider-temporal *ngIf="showFilters"></app-slider-temporal>

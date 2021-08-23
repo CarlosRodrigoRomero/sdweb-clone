@@ -1,9 +1,11 @@
 .resumen {
   display: flex;
+  position: fixed;
+  top: 20px;
 }
 
 .grupo1 {
-  display: inline-flex;
+  display: flex;
   width: max-content;
   align-items: center;
 }
@@ -83,9 +85,16 @@
   /* .navbar-brand-logo {
     display: none;
   } */
+  .resumen {
+    top: 2px;
+  }
+
+  .grupo1 {
+    display: grid;
+  }
 
   .grupo1 mat-icon {
-    font-size: 22px;
+    display: none;
   }
 
   .titulo {

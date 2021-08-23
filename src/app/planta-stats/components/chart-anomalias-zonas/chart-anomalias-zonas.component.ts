@@ -1,13 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { combineLatest, Subscription } from 'rxjs';
-
-import { GLOBAL } from '@core/services/global';
-import { ReportControlService } from '@core/services/report-control.service';
-import { PlantaService } from '@core/services/planta.service';
-import { InformeService } from '@core/services/informe.service';
-
-import { Anomalia } from '@core/models/anomalia';
+import { switchMap } from 'rxjs/operators';
 
 import {
   ApexAxisChartSeries,
@@ -23,8 +17,15 @@ import {
   ApexTooltip,
   ApexTitleSubtitle,
 } from 'ng-apexcharts';
-import { switchMap } from 'rxjs/operators';
+
+import { GLOBAL } from '@core/services/global';
+import { ReportControlService } from '@core/services/report-control.service';
+import { PlantaService } from '@core/services/planta.service';
+import { InformeService } from '@core/services/informe.service';
+
 import { LocationAreaInterface } from '@core/models/location';
+import { Seguidor } from '@core/models/seguidor';
+import { Anomalia } from '@core/models/anomalia';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -50,7 +51,7 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
   @ViewChild('chart-anomalias-zonas') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
   informesIdList: string[];
-  allAnomalias: Anomalia[];
+  allAnomalias: Anomalia[] = [];
   dataPlot: any[];
   zones: LocationAreaInterface[];
   chartData: number[][];
@@ -101,7 +102,12 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
             ]);
           }),
           switchMap(([elems, informesId]) => {
-            this.allAnomalias = elems as Anomalia[];
+            if (this.reportControlService.plantaFija) {
+              this.allAnomalias = elems as Anomalia[];
+            } else {
+              (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
+            }
+
             this.informesIdList = informesId;
 
             return this.informeService.getDateLabelsInformes(this.informesIdList);
@@ -129,6 +135,7 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
     const result = Array<number>();
     this.zones.forEach((zone) => {
       const filtered = anomalias.filter((anom) => anom.globalCoords[0] == zone.globalCoords[0]);
+
       result.push(this._getMAEAnomalias(filtered));
     });
     return result;
@@ -160,11 +167,6 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
   }
 
   private _initChart(): void {
-    let titleXAxis = 'Zonas';
-    if (this.reportControlService.nombreGlobalCoords !== undefined) {
-      titleXAxis = this.reportControlService.nombreGlobalCoords[0];
-    }
-
     let series;
     // excluimos DEMO
     if (this.reportControlService.plantaId === 'egF0cbpXnnBnjcrusoeR') {
@@ -182,6 +184,12 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
       series = this.dateLabels.map((dateLabel, index) => {
         return { name: dateLabel, data: this.chartData[index] };
       });
+    }
+
+    let titleXAxis = 'Zona';
+
+    if (this.reportControlService.nombreGlobalCoords.length > 0) {
+      titleXAxis = this.reportControlService.nombreGlobalCoords[0];
     }
 
     // espera a que el dataPlot tenga datos
@@ -221,6 +229,10 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
         dataLabels: {
           enabled: false,
         },
+        fill: {
+          opacity: 1,
+          colors: ['#7F7F7F', '#FF6B6B'],
+        },
         stroke: {
           show: true,
           width: 2,
@@ -246,9 +258,6 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
           labels: {
             minWidth: 10,
           },
-        },
-        fill: {
-          opacity: 1,
         },
         tooltip: {
           followCursor: false,

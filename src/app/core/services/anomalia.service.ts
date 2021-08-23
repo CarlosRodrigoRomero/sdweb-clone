@@ -161,42 +161,35 @@ export class AnomaliaService {
       .snapshotChanges()
       .pipe(
         map((actions) =>
-          actions
-            .filter((doc) => {
-              // filtramos las anomalias que no son porque no cumplen el criterio de criticidad
-              const data = doc.payload.doc.data() as Anomalia;
+          actions.map((doc) => {
+            const data = doc.payload.doc.data() as Anomalia;
+            data.id = doc.payload.doc.id;
+            data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
+            data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
+            data.criticidad = this.getCriticidad(data);
+            if (data.globalCoords !== undefined && data.globalCoords !== null) {
+              data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
+            }
 
-              return this.getCriticidad(data) !== null;
-            })
-            .map((doc) => {
-              const data = doc.payload.doc.data() as Anomalia;
-              data.id = doc.payload.doc.id;
-              data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
-              data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
-              data.criticidad = this.getCriticidad(data);
-              if (data.globalCoords !== undefined && data.globalCoords !== null) {
-                data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
+            if (tipo === 'pcs') {
+              data.localId = (data as PcInterface).local_id.toString();
+              data.localX = (data as PcInterface).local_x;
+              data.localY = (data as PcInterface).local_y;
+              if (data.globalCoords === undefined) {
+                data.globalCoords = [
+                  (data as PcInterface).global_x,
+                  (data as PcInterface).global_y,
+                  (data as PcInterface).global_z,
+                ];
               }
+            }
+            // Convertimos el objeto en un array
+            if (data.hasOwnProperty('featureCoords')) {
+              data.featureCoords = Object.values(data.featureCoords);
+            }
 
-              if (tipo === 'pcs') {
-                data.localId = (data as PcInterface).local_id.toString();
-                data.localX = (data as PcInterface).local_x;
-                data.localY = (data as PcInterface).local_y;
-                if (data.globalCoords === undefined) {
-                  data.globalCoords = [
-                    (data as PcInterface).global_x,
-                    (data as PcInterface).global_y,
-                    (data as PcInterface).global_z,
-                  ];
-                }
-              }
-              // Convertimos el objeto en un array
-              if (data.hasOwnProperty('featureCoords')) {
-                data.featureCoords = Object.values(data.featureCoords);
-              }
-
-              return data;
-            })
+            return data;
+          })
         )
       );
 
@@ -300,13 +293,17 @@ export class AnomaliaService {
       }
       if (this.criterioCriticidad.hasOwnProperty('siempreVisible')) {
         if (this.criterioCriticidad.siempreVisible.includes(anomalia.tipo)) {
-          criticidad = 0;
+          if (criticidad === null) {
+            criticidad = 0;
+          }
         }
       }
       if (this.criterioCriticidad.hasOwnProperty('rangosDT')) {
         this.criterioCriticidad.rangosDT.forEach((value, index) => {
           if (anomalia.gradienteNormalizado >= value) {
-            criticidad = index;
+            if (criticidad === null) {
+              criticidad = index;
+            }
           }
         });
       }

@@ -9,7 +9,9 @@
         <app-chart-mae-global></app-chart-mae-global>
 
         <!-- MAE POR ZONAS -->
-        <app-chart-anomalias-zonas *ngIf="thereAreZones"></app-chart-anomalias-zonas>
+        <app-chart-anomalias-zonas
+          *ngIf="thereAreZones && reportControlService.nombreGlobalCoords.length > 0"
+        ></app-chart-anomalias-zonas>
       </div>
       <div>
         <!-- MAE TIPO ANOMALIA -->
@@ -22,7 +24,9 @@
     <div class="cc-grid">
       <div class="cc-content-izq">
         <!-- MODULOS CON CC -->
-        <mat-card *ngIf="loadCCyGradChart && plantaDemo">
+        <app-chart-pct-cels *ngIf="loadCCyGradChart"></app-chart-pct-cels>
+
+        <!-- <mat-card *ngIf="loadCCyGradChart && plantaDemo">
           <mat-card-header>
             <mat-card-title>Módulos con células calientes</mat-card-title>
             <mat-card-subtitle>% de módulos con CC y gradiente medio (ºC) </mat-card-subtitle>
@@ -30,7 +34,7 @@
           <mat-card-content>
             <app-chart-pct-cels></app-chart-pct-cels>
           </mat-card-content>
-        </mat-card>
+        </mat-card> -->
 
         <!-- CC POR ALTURA -->
         <app-chart-altura></app-chart-altura>

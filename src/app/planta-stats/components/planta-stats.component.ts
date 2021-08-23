@@ -20,7 +20,7 @@ export class PlantaStatsComponent implements OnInit {
   constructor(
     private statsService: StatsService,
     private portfolioControlService: PortfolioControlService,
-    private reportControlService: ReportControlService
+    public reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {

@@ -1,44 +1,30 @@
-<mat-toolbar [class.mat-elevation-z2]="true" class="title">
-  <div>
-    <span>{{ seguidorSelected.nombre }}</span>
-    <span class="modulo-label">({{ seguidorSelected.moduloLabel }})</span>
+<mat-toolbar [class.mat-elevation-z2]="true" class="navbar">
+  <div class="title-line">
+    <span *ngIf="seguidorSelected === null">NO EXISTE SEGUIDOR EN LA FECHA SELECCIONADA</span>
+    <span *ngIf="seguidorSelected !== null">{{ seguidorSelected.nombre }}</span>
+    <span *ngIf="seguidorSelected !== null" class="modulo-label">({{ seguidorSelected.moduloLabel }})</span>
+    <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
+      <span class="line-content-title">MAE</span>
+      <span>{{ seguidorSelected.mae * 100 | number: '1.0-2' }}%</span>
+    </div>
+    <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
+      <span class="line-content-title">CC</span>
+      <span>{{ seguidorSelected.celsCalientes * 100 | number: '1.0-2' }}%</span>
+    </div>
+    <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
+      <span class="line-content-title">&Delta;T Max (norm)</span>
+      <span>{{ seguidorSelected.gradienteNormalizado }}ºC</span>
+    </div>
+    <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
+      <span class="line-content-title">T Max</span>
+      <span>{{ seguidorSelected.temperaturaMax }}ºC</span>
+    </div>
+    <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
+      <span class="line-content-title"># anoms</span>
+      <span>{{ seguidorSelected.anomaliasCliente.length }}</span>
+    </div>
     <button mat-icon-button class="btn-close-seguidor-view" (click)="closeSidenav()">
       <mat-icon>close</mat-icon>
     </button>
-  </div>
-  <div
-    *ngIf="
-      meteoInfo !== undefined &&
-      meteoInfo.irradiancia !== undefined &&
-      meteoInfo.vientoDireccion !== undefined &&
-      meteoInfo.vientoVelocidad !== undefined &&
-      meteoInfo.temperaturaAire !== undefined &&
-      meteoInfo.nubosidad !== undefined
-    "
-    class="two-lines-info"
-  >
-    <div class="line-info">
-      <div *ngIf="meteoInfo.irradiancia !== undefined" class="line-content">
-        <span>Irradiancia:</span>
-        <span>{{ meteoInfo.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></span>
-      </div>
-      <div *ngIf="meteoInfo.temperaturaAire !== undefined" class="line-content">
-        <span>T. ambiente:</span>
-        <span>{{ meteoInfo.temperaturaAire }}ºC</span>
-      </div>
-      <div *ngIf="meteoInfo.nubosidad !== undefined" class="line-content">
-        <span>Nubosidad:</span> <span>{{ meteoInfo.nubosidad }}/8 octavas</span>
-      </div>
-    </div>
-    <div class="line-info">
-      <div *ngIf="meteoInfo.vientoDireccion !== undefined" class="line-content">
-        <span>Dirección viento:</span>
-        <span>{{ meteoInfo.vientoDireccion }}º</span>
-      </div>
-      <div *ngIf="meteoInfo.vientoVelocidad !== undefined" class="line-content">
-        <span>Velocidad viento:</span>
-        <span>{{ meteoInfo.vientoVelocidad }} (Beaufort)</span>
-      </div>
-    </div>
   </div>
 </mat-toolbar>

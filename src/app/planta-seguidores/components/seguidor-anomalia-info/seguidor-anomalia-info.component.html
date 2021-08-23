@@ -14,7 +14,7 @@
         anomaliaInfo.gradienteNormalizado !== undefined
       "
     >
-      <mat-icon style="color: red">thermostat</mat-icon>
+      <mat-icon>thermostat</mat-icon>
       <span class="subtitle-label">Temperaturas:</span>
     </div>
     <div class="line-content">
@@ -31,21 +31,21 @@
   </div>
   <div class="line-info">
     <div class="subtitle">
-      <mat-icon style="color: darkorange">flag</mat-icon>
+      <mat-icon>flag</mat-icon>
       <span class="subtitle-label">Causa: </span>
     </div>
     <span class="line-content">{{ anomaliaInfo.causa }}</span>
   </div>
   <div class="line-info">
     <div class="subtitle">
-      <mat-icon style="color: green">check_circle</mat-icon>
+      <mat-icon>check_circle</mat-icon>
       <span class="subtitle-label">Actuación recomendada: </span>
     </div>
     <span class="line-content">{{ anomaliaInfo.recomendacion }}</span>
   </div>
   <div class="line-info">
     <div class="subtitle">
-      <mat-icon style="color: purple">assistant_direction</mat-icon>
+      <mat-icon>assistant_direction</mat-icon>
       <span class="subtitle-label">Localización: </span>
     </div>
     <div class="line-content">
@@ -59,9 +59,45 @@
   </div>
   <div class="line-info">
     <div class="subtitle">
-      <mat-icon style="color: blue">today</mat-icon>
+      <mat-icon>today</mat-icon>
       <span class="subtitle-label">Fecha de captura: </span>
     </div>
     <span class="line-content">{{ anomaliaInfo.fecha * 1000 | date: 'dd/MM/yyyy HH:mm' }}</span>
+  </div>
+  <div
+    *ngIf="
+      anomaliaInfo.irradiancia !== undefined &&
+      anomaliaInfo.vientoDireccion !== undefined &&
+      anomaliaInfo.vientoVelocidad !== undefined &&
+      anomaliaInfo.temperaturaAire !== undefined &&
+      anomaliaInfo.nubosidad !== undefined
+    "
+    class="line-info"
+  >
+    <div class="subtitle">
+      <mat-icon>brightness_high</mat-icon>
+      <span class="subtitle-label">Meteo:</span>
+    </div>
+    <div class="meteo-two-lines">
+      <div class="meteo-line">
+        <span *ngIf="anomaliaInfo.irradiancia !== undefined" class="meteo-content"
+          >Irradiancia: <b>{{ anomaliaInfo.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></b></span
+        >
+        <span *ngIf="anomaliaInfo.vientoDireccion !== undefined" class="meteo-content"
+          >Direc. viento: <b>{{ anomaliaInfo.vientoDireccion }}º</b></span
+        >
+        <span *ngIf="anomaliaInfo.vientoVelocidad !== undefined" class="meteo-content"
+          >Veloc. viento: <b>{{ anomaliaInfo.vientoVelocidad }} (Beaufort)</b></span
+        >
+      </div>
+      <div class="meteo-line">
+        <span *ngIf="anomaliaInfo.temperaturaAire !== undefined" class="meteo-content"
+          >T. ambiente: <b>{{ anomaliaInfo.temperaturaAire }}ºC</b></span
+        >
+        <span *ngIf="anomaliaInfo.nubosidad !== undefined" class="meteo-content"
+          >Nubosidad: <b>{{ anomaliaInfo.nubosidad }} octavas</b></span
+        >
+      </div>
+    </div>
   </div>
 </div>

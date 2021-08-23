@@ -45,7 +45,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public anomaliaSelect: Anomalia;
   public anomaliaHover: Anomalia;
   public sliderYear: number;
-  public aerialLayer: TileLayer;
+  public aerialLayers: TileLayer[];
   private extent1: any;
   public thermalSource;
   private thermalLayers: TileLayer[];
@@ -111,6 +111,9 @@ export class MapComponent implements OnInit, OnDestroy {
 
               // creamos las capas de anomalías para los diferentes informes
               this.olMapService.addAnomaliaLayer(this._createAnomaliaLayer(informe.id));
+
+              // añadimos las ortofotos aereas de cada informe
+              this.addAerialLayer(informe.id);
             });
 
             this.planta = planta;
@@ -121,15 +124,17 @@ export class MapComponent implements OnInit, OnDestroy {
             return combineLatest([
               this.olMapService.getThermalLayers(),
               this.olMapService.getAnomaliaLayers(),
+              this.olMapService.getAerialLayers(),
               this.reportControlService.selectedInformeId$,
             ]);
           })
         )
-        .subscribe(([therLayers, anomLayers, informeId]) => {
+        .subscribe(([therLayers, anomLayers, aerLayers, informeId]) => {
           if (this.anomaliaLayers === undefined) {
             // nos suscribimos a las capas termica y de anomalias
             this.thermalLayers = therLayers;
             this.anomaliaLayers = anomLayers;
+            this.aerialLayers = aerLayers;
           }
 
           // nos suscribimos al informe seleccionado
@@ -201,29 +206,20 @@ export class MapComponent implements OnInit, OnDestroy {
         crossOrigin: '',
       });
 
-      this.aerialLayer = new TileLayer({
+      const aerialLayer = new TileLayer({
         source: aerial,
       });
 
-      this.aerialLayer.setExtent(this.extent1);
-    } else {
-      aerial = new XYZ({
-        url:
-          'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInformeId + '_visual/{z}/{x}/{y}.png',
-        crossOrigin: '',
-      });
+      aerialLayer.setExtent(this.extent1);
 
-      this.aerialLayer = new TileLayer({
-        source: aerial,
-      });
+      this.aerialLayers = [aerialLayer, aerialLayer];
     }
 
     const osmLayer = new TileLayer({
       source: new OSM(),
     });
 
-    // const layers = [satelliteLayer];
-    const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers];
+    const layers = [osmLayer, ...this.aerialLayers, ...this.thermalLayers];
 
     // MAPA
     let view: View;
@@ -278,6 +274,19 @@ export class MapComponent implements OnInit, OnDestroy {
           this.anomaliaSelect = anomSelect;
         })
     );
+  }
+
+  private addAerialLayer(informeId: string) {
+    const aerial = new XYZ({
+      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_visual/{z}/{x}/{y}.png',
+      crossOrigin: '',
+    });
+
+    const aerialLayer = new TileLayer({
+      source: aerial,
+    });
+
+    this.olMapService.addAerialLayer(aerialLayer);
   }
 
   private transform(extent) {
