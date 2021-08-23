@@ -71,19 +71,7 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
         .getLocationsArea(this.reportControlService.plantaId)
         .pipe(
           switchMap((locAreas) => {
-            // si en seguidores solo hay un tamaño de area entonces no hay zonas
-            if (
-              !this.reportControlService.plantaFija &&
-              locAreas.filter(
-                (locArea) =>
-                  locArea.globalCoords[1] !== undefined &&
-                  locArea.globalCoords[1] !== null &&
-                  locArea.globalCoords[1] !== ''
-              ).length === 0
-            ) {
-              this.thereAreZones = false;
-            }
-
+            // obtenemos las zonas mayores
             this.zones = locAreas.filter(
               (locArea) =>
                 locArea.globalCoords[0] !== undefined &&

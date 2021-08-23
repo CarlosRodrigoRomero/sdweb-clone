@@ -112,15 +112,18 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
             this.mapSeguidoresService.sliderTemporalSelected$,
             this.olMapService.getAerialLayers(),
           ]).subscribe(([toggleValue, sliderValue, aerialLayers]) => {
-            const layerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (informes.length - 1))));
+            const numLayerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (informes.length - 1))));
 
-            this.mapSeguidoresService.layerSelected = layerSelected;
+            this.mapSeguidoresService.layerSelected = numLayerSelected;
 
             // ocultamos las 3 capas de las vistas
             this.seguidorLayers.forEach((layer) => layer.setOpacity(0));
 
             // mostramos la capa seleccionada
-            this.seguidorLayers[layerSelected].setOpacity(1);
+            const layerSelected = this.seguidorLayers[numLayerSelected];
+            if (layerSelected !== undefined) {
+              layerSelected.setOpacity(1);
+            }
 
             this.aerialLayers = aerialLayers;
           });

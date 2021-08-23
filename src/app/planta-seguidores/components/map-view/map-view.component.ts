@@ -8,6 +8,7 @@ import { SeguidoresControlService } from '../../services/seguidores-control.serv
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 import { StatsService } from '@core/services/stats.service';
 import { OlMapService } from '@core/services/ol-map.service';
+import { SeguidorService } from '@core/services/seguidor.service';
 
 @Component({
   selector: 'app-map-view',
@@ -24,6 +25,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public showFilters = true;
   thereAreZones = true;
   public mapLoaded = false;
+
   private subscriptions: Subscription = new Subscription();
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
@@ -36,7 +38,8 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     private seguidoresControlService: SeguidoresControlService,
     private seguidorViewService: SeguidorViewService,
     private statsService: StatsService,
-    private olMapService: OlMapService
+    private olMapService: OlMapService,
+    private seguidorService: SeguidorService
   ) {}
 
   ngOnInit(): void {

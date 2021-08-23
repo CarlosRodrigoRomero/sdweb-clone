@@ -385,6 +385,7 @@ export class ReportControlService {
     this.mapLoaded = false;
     this.allFilterableElements = [];
     this.plantaFija = false;
+    this.thereAreZones = true;
   }
 
   getHostname(): string {

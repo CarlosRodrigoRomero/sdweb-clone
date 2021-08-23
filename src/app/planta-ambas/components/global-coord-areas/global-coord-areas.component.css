@@ -1,6 +1,7 @@
 .card-content {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .global-areas-card {
@@ -12,7 +13,7 @@
 }
 
 .btn-menu {
-  margin-left: 7px;
+  top: -5px;
 }
 
 .example-section {
