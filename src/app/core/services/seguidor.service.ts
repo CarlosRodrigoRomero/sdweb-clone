@@ -128,6 +128,9 @@ export class SeguidorService {
               let modulo;
               if (zona !== undefined) {
                 modulo = zona.modulo;
+              } else {
+                modulo = anomaliasSeguidor[0].modulo;
+                // modulo = this.getSeguidorModule(locAreaList);
               }
 
               const seguidor = new Seguidor(
@@ -167,6 +170,10 @@ export class SeguidorService {
     });
 
     return nombre;
+  }
+
+  private getSeguidorModule(locAreas: LocationAreaInterface[]) {
+    const locAreasWithModule = locAreas.filter((locArea) => locArea.modulo !== undefined);
   }
 
   private getCompleteGlobalCoords(

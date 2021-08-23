@@ -59,7 +59,7 @@ export class Seguidor implements FilterableElement {
     this.id = id;
     this.featureCoords = this.pathToCoordinate(path);
     this.nombre = nombre;
-    this.celsCalientes = this.getCelsCalientes(anomalias);
+    this.celsCalientes = this.getCelsCalientes(this.anomaliasCliente);
     this.moduloLabel = this.getModuloLabel();
   }
 
@@ -124,10 +124,14 @@ export class Seguidor implements FilterableElement {
 
   private getCelsCalientes(anomalias: Anomalia[]): number {
     let celsCalientes = 0;
+
     if (anomalias.length > 0) {
-      celsCalientes =
+      const numCelsCalientes =
         // tslint:disable-next-line: triple-equals
-        anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9).length / (this.filas * this.columnas);
+        anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9).length;
+      if (numCelsCalientes > 0) {
+        celsCalientes = numCelsCalientes / (this.filas * this.columnas);
+      }
     }
 
     return celsCalientes;

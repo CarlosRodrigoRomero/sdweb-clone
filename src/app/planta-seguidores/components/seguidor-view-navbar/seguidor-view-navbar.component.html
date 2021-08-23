@@ -3,23 +3,23 @@
     <span *ngIf="seguidorSelected === null">NO EXISTE SEGUIDOR EN LA FECHA SELECCIONADA</span>
     <span *ngIf="seguidorSelected !== null">{{ seguidorSelected.nombre }}</span>
     <span *ngIf="seguidorSelected !== null" class="modulo-label">({{ seguidorSelected.moduloLabel }})</span>
-    <div class="line-content">
+    <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
       <span class="line-content-title">MAE</span>
       <span>{{ seguidorSelected.mae * 100 | number: '1.0-2' }}%</span>
     </div>
-    <div class="line-content">
+    <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
       <span class="line-content-title">CC</span>
       <span>{{ seguidorSelected.celsCalientes * 100 | number: '1.0-2' }}%</span>
     </div>
-    <div class="line-content">
+    <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
       <span class="line-content-title">&Delta;T Max (norm)</span>
       <span>{{ seguidorSelected.gradienteNormalizado }}ºC</span>
     </div>
-    <div class="line-content">
+    <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
       <span class="line-content-title">T Max</span>
       <span>{{ seguidorSelected.temperaturaMax }}ºC</span>
     </div>
-    <div class="line-content">
+    <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
       <span class="line-content-title"># anoms</span>
       <span>{{ seguidorSelected.anomaliasCliente.length }}</span>
     </div>

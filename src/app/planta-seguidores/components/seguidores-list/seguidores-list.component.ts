@@ -98,9 +98,9 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
                 // color: this.seguidoresControlService.getColorSeguidorMaeExternal(seguidor.mae),
                 nombre: seguidor.nombre,
                 numAnomalias: seguidor.anomaliasCliente.length,
-                modulo: this.getModuloLabel(elem as Seguidor),
+                modulo: seguidor.moduloLabel,
                 mae: seguidor.mae,
-                celsCalientes: this.getCelsCalientes(seguidor),
+                celsCalientes: seguidor.celsCalientes,
                 gradiente: seguidor.gradienteNormalizado,
                 seguidor,
               });
@@ -162,36 +162,6 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
     this.seguidoresControlService.seguidorSelected = row.seguidor;
     this.seguidoresControlService.setExternalStyle(row.seguidor.id, true);
     this.seguidoresControlService.seguidorViewOpened = true;
-  }
-
-  getModuloLabel(elem: Seguidor): string {
-    let moduloLabel: string;
-    if (elem.modulo !== undefined) {
-      if (elem.modulo.marca === undefined) {
-        if (elem.modulo.modelo === undefined) {
-          moduloLabel = elem.modulo.potencia + 'W';
-        } else {
-          moduloLabel = elem.modulo.modelo + ' ' + elem.modulo.potencia + 'W';
-        }
-      } else {
-        if (elem.modulo.modelo === undefined) {
-          moduloLabel = elem.modulo.marca + ' ' + elem.modulo.potencia + 'W';
-        } else {
-          moduloLabel = elem.modulo.marca + ' ' + elem.modulo.modelo + ' ' + elem.modulo.potencia + 'W';
-        }
-      }
-    } else {
-      moduloLabel = 'Desconocido';
-    }
-
-    return moduloLabel;
-  }
-
-  getCelsCalientes(seguidor: Seguidor): number {
-    // tslint:disable-next-line: triple-equals
-    const celsCalientes = seguidor.anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
-
-    return celsCalientes.length / (this.planta.filas * this.planta.columnas);
   }
 
   ngOnDestroy(): void {

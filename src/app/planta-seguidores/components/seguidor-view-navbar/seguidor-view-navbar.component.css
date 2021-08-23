@@ -21,17 +21,6 @@
   top: 16px;
 }
 
-.two-lines-info {
-  display: grid;
-  margin-left: 1rem;
-}
-
-.line-info {
-  display: flex;
-  font-size: medium;
-  margin: -0.2rem;
-}
-
 .line-content {
   display: flex;
   gap: 0.5rem;
