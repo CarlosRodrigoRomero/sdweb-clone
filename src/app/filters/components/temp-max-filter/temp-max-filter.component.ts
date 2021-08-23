@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
 
@@ -6,13 +6,14 @@ import { FilterService } from '@core/services/filter.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-temp-max-filter',
   templateUrl: './temp-max-filter.component.html',
   styleUrls: ['./temp-max-filter.component.css'],
 })
-export class TempMaxFilterComponent implements OnInit {
+export class TempMaxFilterComponent implements OnInit, OnDestroy {
   minTemp: number = 50;
   maxTemp: number = 100;
   rangoMinTemp: number;
@@ -20,11 +21,17 @@ export class TempMaxFilterComponent implements OnInit {
   filtroTempMax: TempMaxFilter;
   options: Options;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
 
   ngOnInit(): void {
-    this.filterControlService.minTempMaxSource.subscribe((value) => (this.rangoMinTemp = value));
-    this.filterControlService.maxTempMaxSource.subscribe((value) => (this.rangoMaxTemp = value));
+    this.subscriptions.add(
+      this.filterControlService.minTempMaxSource.subscribe((value) => (this.rangoMinTemp = value))
+    );
+    this.subscriptions.add(
+      this.filterControlService.maxTempMaxSource.subscribe((value) => (this.rangoMaxTemp = value))
+    );
 
     this.options = {
       floor: this.minTemp,
@@ -71,5 +78,9 @@ export class TempMaxFilterComponent implements OnInit {
       // ... si no, lo añadimos
       this.filterService.addFilter(this.filtroTempMax);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

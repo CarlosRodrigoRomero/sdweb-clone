@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 
@@ -20,12 +21,14 @@ interface Clase {
   templateUrl: './clase-filter.component.html',
   styleUrls: ['./clase-filter.component.css'],
 })
-export class ClaseFilterComponent implements OnInit {
+export class ClaseFilterComponent implements OnInit, OnDestroy {
   claseElems: Clase[] = [];
   allComplete: boolean;
   filtroClase: ClaseFilter;
   coloresClase: string[];
   public claseSelected: boolean[] = [false, false, false];
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
 
@@ -39,9 +42,11 @@ export class ClaseFilterComponent implements OnInit {
 
     this.coloresClase = GLOBAL.colores_clase;
 
-    this.filterControlService.claseSelected$.subscribe((sel) => {
-      this.claseSelected = sel;
-    });
+    this.subscriptions.add(
+      this.filterControlService.claseSelected$.subscribe((sel) => {
+        this.claseSelected = sel;
+      })
+    );
   }
 
   onChangeClaseFilter(event: MatButtonToggleChange) {
@@ -61,5 +66,9 @@ export class ClaseFilterComponent implements OnInit {
       );
       this.filterControlService.claseSelected[parseInt(event.source.id.replace('CoA_', '')) - 1] = false;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

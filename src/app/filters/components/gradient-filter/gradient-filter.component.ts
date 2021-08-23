@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
 
@@ -7,19 +7,22 @@ import { PcService } from '@core/services/pc.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
 import { GradientFilter } from '@core/models/gradientFilter';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-gradient-filter',
   templateUrl: './gradient-filter.component.html',
   styleUrls: ['./gradient-filter.component.css'],
 })
-export class GradientFilterComponent implements OnInit {
+export class GradientFilterComponent implements OnInit, OnDestroy {
   minGradiente: number;
   maxGradiente: number;
   rangoMinGradiente: number;
   rangoMaxGradiente: number;
   filtroGradiente: GradientFilter;
   options: Options;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private filterService: FilterService,
@@ -33,8 +36,12 @@ export class GradientFilterComponent implements OnInit {
     // this.maxGradiente = this.pcService.getMaxGradienteNormalizado();
     this.maxGradiente = 50;
 
-    this.filterControlService.minGradienteSource.subscribe((value) => (this.rangoMinGradiente = value));
-    this.filterControlService.maxGradienteSource.subscribe((value) => (this.rangoMaxGradiente = value));
+    this.subscriptions.add(
+      this.filterControlService.minGradienteSource.subscribe((value) => (this.rangoMinGradiente = value))
+    );
+    this.subscriptions.add(
+      this.filterControlService.maxGradienteSource.subscribe((value) => (this.rangoMaxGradiente = value))
+    );
     // this.rangoMinGradiente = this.minGradiente;
     // this.rangoMaxGradiente = this.maxGradiente;
 
@@ -82,5 +89,9 @@ export class GradientFilterComponent implements OnInit {
       // ... si no, lo añadimos
       this.filterService.addFilter(this.filtroGradiente);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { Observable } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
-import { DoubleClickZoom, Draw, Modify, Select, Snap } from 'ol/interaction';
+import { DoubleClickZoom, Draw, Select } from 'ol/interaction';
 import { Fill, Icon, Stroke, Style } from 'ol/style';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
@@ -20,15 +20,13 @@ import { OlMapService } from '@core/services/ol-map.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
 import { AreaFilter } from '@core/models/areaFilter';
-import { FilterInterface } from '@core/models/filter';
 
 @Component({
   selector: 'app-area-filter',
   templateUrl: './area-filter.component.html',
   styleUrls: ['./area-filter.component.css'],
 })
-export class AreaFilterComponent implements OnInit {
-  public areaFilters$: Observable<FilterInterface[]>;
+export class AreaFilterComponent implements OnInit, OnDestroy {
   public map: Map;
   public activeDraw = false;
   public activeDeleteButton = false;
@@ -38,6 +36,8 @@ export class AreaFilterComponent implements OnInit {
   vectorArea: VectorLayer;
   deleteButton: VectorLayer;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private filterService: FilterService,
     private olMapService: OlMapService,
@@ -45,11 +45,12 @@ export class AreaFilterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.olMapService.map$.subscribe((map) => (this.map = map));
-    this.areaFilters$ = this.filterService.getAllFilters();
-    this.filterControlService.activeDrawArea$.subscribe((value) => (this.activeDraw = value));
-    this.filterControlService.activeDeleteArea$.subscribe((value) => (this.activeDeleteButton = value));
-    this.olMapService.draw$.subscribe((draw) => (this.draw = draw));
+    this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
+    this.subscriptions.add(this.filterControlService.activeDrawArea$.subscribe((value) => (this.activeDraw = value)));
+    this.subscriptions.add(
+      this.filterControlService.activeDeleteArea$.subscribe((value) => (this.activeDeleteButton = value))
+    );
+    this.subscriptions.add(this.olMapService.draw$.subscribe((draw) => (this.draw = draw)));
   }
 
   addAreaFilter(coords: Coordinate[][]) {
@@ -187,5 +188,9 @@ export class AreaFilterComponent implements OnInit {
     const coords = polygon.getCoordinates();
 
     return coords;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

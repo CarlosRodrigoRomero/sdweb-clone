@@ -1,10 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { MatSliderChange } from '@angular/material/slider';
-
 import { Subscription } from 'rxjs';
 
-import VectorLayer from 'ol/layer/Vector';
+import { MatSliderChange } from '@angular/material/slider';
+
+import TileLayer from 'ol/layer/Tile';
 
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { OlMapService } from '@core/services/ol-map.service';
@@ -15,7 +15,7 @@ import { OlMapService } from '@core/services/ol-map.service';
   styleUrls: ['./slider-opacity.component.scss'],
 })
 export class SliderOpacityComponent implements OnInit, OnDestroy {
-  private seguidorLayers: VectorLayer[];
+  private aerialLayers: TileLayer[];
   private layerSelected: number;
 
   private subscriptions: Subscription = new Subscription();
@@ -23,7 +23,7 @@ export class SliderOpacityComponent implements OnInit, OnDestroy {
   constructor(private mapSeguidoresService: MapSeguidoresService, private olMapService: OlMapService) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers)));
+    this.subscriptions.add(this.olMapService.getAerialLayers().subscribe((layers) => (this.aerialLayers = layers)));
 
     this.subscriptions.add(
       this.mapSeguidoresService.layerSelected$.subscribe((layerSel) => (this.layerSelected = layerSel))
@@ -31,7 +31,7 @@ export class SliderOpacityComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.mapSeguidoresService.sliderOpacity$.subscribe((value) => {
-        this.seguidorLayers.find((layer, index) => {
+        this.aerialLayers.find((layer, index) => {
           if (index === this.layerSelected) {
             layer.setOpacity(value / 100);
           }

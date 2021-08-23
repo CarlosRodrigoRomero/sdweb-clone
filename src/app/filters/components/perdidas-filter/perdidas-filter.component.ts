@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -15,7 +15,7 @@ import { PerdidasFilter } from '@core/models/perdidasFilter';
   templateUrl: './perdidas-filter.component.html',
   styleUrls: ['./perdidas-filter.component.scss'],
 })
-export class PerdidasFilterComponent implements OnInit {
+export class PerdidasFilterComponent implements OnInit, OnDestroy {
   minPerdidas = 0;
   maxPerdidas = 100;
   rangoMinPerdidas: number;
@@ -32,11 +32,18 @@ export class PerdidasFilterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.filterControlService.minPerdidasSource.subscribe((value) => (this.rangoMinPerdidas = value));
-    this.filterControlService.maxPerdidasSource.subscribe((value) => (this.rangoMaxPerdidas = value));
+    this.subscriptions.add(
+      this.filterControlService.minPerdidasSource.subscribe((value) => (this.rangoMinPerdidas = value))
+    );
+
+    this.subscriptions.add(
+      this.filterControlService.maxPerdidasSource.subscribe((value) => (this.rangoMaxPerdidas = value))
+    );
+
     if (!this.reportControlService.plantaFija) {
       this.maxPerdidas = 10;
     }
+
     this.options = {
       floor: this.minPerdidas,
       ceil: this.maxPerdidas,
@@ -82,5 +89,9 @@ export class PerdidasFilterComponent implements OnInit {
       // ... si no, lo añadimos
       this.filterService.addFilter(this.filtroPerdidas);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
