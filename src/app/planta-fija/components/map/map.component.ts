@@ -212,7 +212,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
       aerialLayer.setExtent(this.extent1);
 
-      this.aerialLayers = [aerialLayer, aerialLayer];
+      this.aerialLayers = [aerialLayer];
     }
 
     const osmLayer = new TileLayer({

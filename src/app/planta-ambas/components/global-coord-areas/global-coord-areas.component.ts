@@ -61,7 +61,6 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.seguidorService.numGlobalCoords);
     const letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
     if (this.reportControlService.plantaFija) {
       // ponemos un nombre estandar a las zonas por si no tubiese un nombre definido por la empresa
