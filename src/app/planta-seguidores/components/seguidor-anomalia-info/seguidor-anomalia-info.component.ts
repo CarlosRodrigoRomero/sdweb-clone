@@ -42,8 +42,9 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
             columna: this.anomaliaSelected.localX,
             fecha: this.anomaliaSelected.datetime,
             irradiancia: this.anomaliaSelected.irradiancia,
-            vientoDireccion: this.anomaliaSelected.vientoDireccion,
-            vientoVelocidad: this.anomaliaSelected.vientoVelocidad,
+            // vientoDireccion: this.anomaliaSelected.vientoDireccion,
+            // vientoVelocidad: this.anomaliaSelected.vientoVelocidad,
+            viento: (this.anomaliaSelected as PcInterface).viento,
             temperaturaAire: (this.anomaliaSelected as PcInterface).temperaturaAire,
             nubosidad: (this.anomaliaSelected as PcInterface).nubosidad,
           };

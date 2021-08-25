@@ -66,10 +66,10 @@
   </div>
   <div
     *ngIf="
-      anomaliaInfo.irradiancia !== undefined &&
-      anomaliaInfo.vientoDireccion !== undefined &&
-      anomaliaInfo.vientoVelocidad !== undefined &&
-      anomaliaInfo.temperaturaAire !== undefined &&
+      anomaliaInfo.irradiancia !== undefined ||
+      anomaliaInfo.vientoDireccion !== undefined ||
+      anomaliaInfo.vientoVelocidad !== undefined ||
+      anomaliaInfo.temperaturaAire !== undefined ||
       anomaliaInfo.nubosidad !== undefined
     "
     class="line-info"
@@ -83,11 +83,14 @@
         <span *ngIf="anomaliaInfo.irradiancia !== undefined" class="meteo-content"
           >Irradiancia: <b>{{ anomaliaInfo.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></b></span
         >
-        <span *ngIf="anomaliaInfo.vientoDireccion !== undefined" class="meteo-content"
+        <!-- <span *ngIf="anomaliaInfo.vientoDireccion !== undefined" class="meteo-content"
           >Direc. viento: <b>{{ anomaliaInfo.vientoDireccion }}º</b></span
         >
         <span *ngIf="anomaliaInfo.vientoVelocidad !== undefined" class="meteo-content"
           >Veloc. viento: <b>{{ anomaliaInfo.vientoVelocidad }} (Beaufort)</b></span
+        > -->
+        <span *ngIf="anomaliaInfo.viento !== undefined" class="meteo-content"
+          >Viento: <b>{{ anomaliaInfo.viento }}</b></span
         >
       </div>
       <div class="meteo-line">
