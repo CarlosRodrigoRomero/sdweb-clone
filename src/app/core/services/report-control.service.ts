@@ -349,7 +349,7 @@ export class ReportControlService {
   private setMaeInformesPlanta(seguidores: Seguidor[]) {
     this.informes.forEach((informe) => {
       // tslint:disable-next-line: triple-equals
-      if (informe.mae == 0 || informe.mae === undefined || informe.mae === null) {
+      if (informe.mae == 0 || informe.mae === undefined || informe.mae === null || isNaN(informe.mae)) {
         const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
         let mae = 0;
         seguidoresInforme.forEach((seg) => (mae = mae + seg.mae));
@@ -363,7 +363,7 @@ export class ReportControlService {
   private setCCInformesPlanta(seguidores: Seguidor[]) {
     this.informes.forEach((informe) => {
       // tslint:disable-next-line: triple-equals
-      if (informe.cc == 0 || informe.cc === undefined || informe.cc === null) {
+      if (informe.cc == 0 || informe.cc === undefined || informe.cc === null || isNaN(informe.cc)) {
         const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
         let cc = 0;
         seguidoresInforme.forEach((seg) => (cc = cc + seg.celsCalientes));
