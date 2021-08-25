@@ -41,7 +41,7 @@ export class PerdidasFilterComponent implements OnInit, OnDestroy {
     );
 
     if (!this.reportControlService.plantaFija) {
-      this.maxPerdidas = 10;
+      this.maxPerdidas = 50;
     }
 
     this.options = {
