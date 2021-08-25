@@ -576,7 +576,7 @@ export class DownloadPdfComponent implements OnInit {
           alignment: 'justify',
           margin: [30, 0, 30, 0],
         },
-        tableHeaderRed: {
+        tableHeaderBlue: {
           alignment: 'center',
           bold: true,
           fontSize: 10,
@@ -965,7 +965,7 @@ export class DownloadPdfComponent implements OnInit {
                   [
                     {
                       text: this.translation.t('Vehículo aéreo no tripulado'),
-                      style: 'tableHeaderRed',
+                      style: 'tableHeaderBlue',
                       colSpan: 2,
                       alignment: 'center',
                     },
@@ -1002,7 +1002,7 @@ export class DownloadPdfComponent implements OnInit {
                   [
                     {
                       text: this.translation.t('Datos del vuelo'),
-                      style: 'tableHeaderRed',
+                      style: 'tableHeaderBlue',
                       colSpan: 2,
                       alignment: 'center',
                     },
@@ -1062,7 +1062,7 @@ export class DownloadPdfComponent implements OnInit {
                   [
                     {
                       text: this.translation.t('Datos meteorológicos'),
-                      style: 'tableHeaderRed',
+                      style: 'tableHeaderBlue',
                       colSpan: 2,
                       alignment: 'center',
                     },
@@ -1601,17 +1601,17 @@ export class DownloadPdfComponent implements OnInit {
                   [
                     {
                       text: this.translation.t('Categoría'),
-                      style: 'tableHeaderRed',
+                      style: 'tableHeaderBlue',
                     },
 
                     {
                       text: this.translation.t('Cantidad'),
-                      style: 'tableHeaderRed',
+                      style: 'tableHeaderBlue',
                     },
 
                     {
                       text: this.translation.t('Porcentaje %'),
-                      style: 'tableHeaderRed',
+                      style: 'tableHeaderBlue',
                     },
                   ],
                 ]
@@ -1873,7 +1873,7 @@ export class DownloadPdfComponent implements OnInit {
     const cabecera = [];
     cabecera.push({
       text: this.translation.t('Número'),
-      style: 'tableHeaderRed',
+      style: 'tableHeaderBlue',
     });
 
     this.allAnomalias = this.allAnomalias.sort((a, b) => this.downloadReportService.sortByPosition(a, b));
@@ -1891,15 +1891,14 @@ export class DownloadPdfComponent implements OnInit {
 
     cabecera.push({
       text: nombreCol,
-      style: 'tableHeaderRed',
+      style: 'tableHeaderBlue',
       noWrap: true,
     });
 
-    for (const c of this.columnasAnomalia) {
+    for (const col of this.columnasAnomalia) {
       cabecera.push({
-        text: this.translation.t('Hola'),
-        // text: this.translation.t(this.getEncabezadoTablaSeguidor(c)),
-        style: 'tableHeaderRed',
+        text: this.translation.t(this.getEncabezadoTablaAnomalias(col)),
+        style: 'tableHeaderBlue',
       });
     }
 
@@ -2029,6 +2028,15 @@ export class DownloadPdfComponent implements OnInit {
     }
   }
 
+  getEncabezadoTablaAnomalias(columna: any) {
+    if (columna.nombre === 'local_xy') {
+      if (this.planta.hasOwnProperty('etiquetasLocalXY')) {
+        return 'Nº Módulo';
+      }
+    }
+    return columna.descripcion;
+  }
+
   //  ###################  CONTENIDO ##################################
 
   private getTablaCategoria() {
@@ -2065,7 +2073,7 @@ export class DownloadPdfComponent implements OnInit {
     for (const i of this.arrayColumnas) {
       arrayHeader.push({
         text: i.toString(),
-        style: 'tableHeaderRed',
+        style: 'tableHeaderBlue',
       });
     }
 
@@ -2075,7 +2083,7 @@ export class DownloadPdfComponent implements OnInit {
       const arrayFila = [];
       arrayFila.push({
         text: this.plantaService.getAltura(this.planta, j).toString(),
-        style: 'tableHeaderRed',
+        style: 'tableHeaderBlue',
       });
       const countPosicionFila = this.countPosicion[j - 1];
       for (const i of this.arrayColumnas) {
