@@ -369,6 +369,7 @@ export class PlantaService {
     }
     return nombreEtiqueta;
   }
+
   getGlobalCoordsColumns(planta: PlantaInterface, columnsToDisplay: string[]): string[] {
     if (planta.tipo === 'seguidores') {
       let count = 0;

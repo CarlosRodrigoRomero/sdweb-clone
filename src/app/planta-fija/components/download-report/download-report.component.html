@@ -8,14 +8,15 @@
     <a
       class="btn-download"
       mat-button
-      href="https://firebasestorage.googleapis.com/v0/b/sdweb-d33ce.appspot.com/o/informes%2F62dvYbGgoMkMNCuNCOEc%2Finforme.xlsx?alt=media&token=c5c38c2c-16d9-4fdc-b3fb-d22d4d847bf2"
+      href="https://firebasestorage.googleapis.com/v0/b/sdweb-d33ce.appspot.com/o/informes%2F62dvYbGgoMkMNCuNCOEc%2Finforme.xlsx?alt=media&token=05aab4b1-452d-4822-8a50-dc788739a620"
       download=""
       [disabled]="!plantaDemo"
     >
       <mat-icon>calculate</mat-icon>
       <span class="label">EXCEL</span>
     </a>
-    <a
+    <app-download-pdf></app-download-pdf>
+    <!-- <a
       class="btn-download"
       mat-button
       href="https://firebasestorage.googleapis.com/v0/b/sdweb-d33ce.appspot.com/o/informes%2F62dvYbGgoMkMNCuNCOEc%2Finforme.pdf?alt=media&token=e7360912-80a4-43eb-bbca-b41868c8a9d6"
@@ -24,6 +25,6 @@
     >
       <mat-icon>picture_as_pdf</mat-icon>
       <span class="label">PDF</span>
-    </a>
+    </a> -->
   </div>
 </mat-menu>

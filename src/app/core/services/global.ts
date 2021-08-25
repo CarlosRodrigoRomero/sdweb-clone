@@ -230,6 +230,24 @@ export let GLOBAL = {
     // { nombre: "temperaturaAire", descripcion: "Temp. ambiente (ºC)" },
     // { nombre: "datetimeString", descripcion: "Fecha/hora" }
   ],
+  columnasAnomPdf: [
+    { nombre: 'local_id', descripcion: '#ID' },
+    { nombre: 'severidad', descripcion: 'Clase (CoA)' },
+    { nombre: 'tipo', descripcion: 'Categoría' },
+    // { nombre: "local_x", descripcion: "Columna" },
+    // { nombre: "local_y", descripcion: "Fila" },
+    { nombre: 'local_xy', descripcion: 'Fila/Columna' },
+    { nombre: 'temperaturaMax', descripcion: 'Temp. máx' },
+    {
+      nombre: 'gradienteNormalizado',
+      descripcion: 'Gradiente normalizado',
+    },
+    // { nombre: "archivoPublico", descripcion: "Nombre archivo" },
+    { nombre: 'irradiancia', descripcion: 'Irradiancia' },
+    // { nombre: "viento", descripcion: "Viento" },
+    // { nombre: "temperaturaAire", descripcion: "Temp. ambiente (ºC)" },
+    // { nombre: "datetimeString", descripcion: "Fecha/hora" }
+  ],
 
   columnasAnexoSeguidor: [
     'datetimeString',

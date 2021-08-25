@@ -1,45 +1,28 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { GLOBAL } from '@core/services/global';
+import { Component, OnInit } from '@angular/core';
+import { DatePipe, DecimalPipe } from '@angular/common';
 
-import { PcService, SeguidorInterface } from '@core/services/pc.service';
+import { AngularFireStorage } from '@angular/fire/storage';
 
-import { PcInterface } from '@core/models/pc';
-import { PlantaInterface } from '@core/models/planta';
-import { InformeInterface } from '@core/models/informe';
+import { MatTableDataSource } from '@angular/material/table';
+
+import { BehaviorSubject, Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
+
+import pdfMake from 'pdfmake/build/pdfmake.js';
 
 import 'fabric';
 declare let fabric;
-import { AngularFireStorage } from '@angular/fire/storage';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { take } from 'rxjs/operators';
-import { MatCheckboxChange } from '@angular/material/checkbox';
-import { MatTableDataSource } from '@angular/material/table';
 
-import pdfMake from 'pdfmake/build/pdfmake.js';
-import pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import { DatePipe, DecimalPipe } from '@angular/common';
-
-import { PlantaService } from '@core/services/planta.service';
-import { InformeService } from '@core/services/informe.service';
 import { ReportControlService } from '@core/services/report-control.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
+import { PlantaService } from '@core/services/planta.service';
+import { GLOBAL } from '@core/services/global';
 import { DownloadReportService } from '@core/services/download-report.service';
 
-import { Translation } from './translations';
-import { FilterableElement } from '@core/models/filterableInterface';
 import { Anomalia } from '@core/models/anomalia';
-import { Seguidor } from '@core/models/seguidor';
-
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-declare var $: any;
-
-export interface PcsTable {
-  tipo: string;
-  coa1: number;
-  coa2: number;
-  coa3: number;
-  total: number;
-}
+import { InformeInterface } from '@core/models/informe';
+import { PlantaInterface } from '@core/models/planta';
+import { Translation } from 'src/app/informe-export/components/export/translations';
 
 export interface Apartado {
   nombre: string;
@@ -49,102 +32,87 @@ export interface Apartado {
   apt?: number;
 }
 
+export interface AnomsTable {
+  // antes PcsTable
+  tipo: string;
+  coa1: number;
+  coa2: number;
+  coa3: number;
+  total: number;
+}
+
 @Component({
-  selector: 'app-export',
-  // templateUrl: './export.component.html',
-  templateUrl: './export-test.component.html',
-  styleUrls: ['./export.component.css'],
+  selector: 'app-download-pdf',
+  templateUrl: './download-pdf.component.html',
+  styleUrls: ['./download-pdf.component.css'],
   providers: [DecimalPipe, DatePipe],
 })
-export class ExportComponent implements OnInit {
-  @ViewChild('content') content: ElementRef;
+export class DownloadPdfComponent implements OnInit {
+  generandoPDF = false;
+  private _countLoadedImages = 0;
+  countLoadedImages$ = new BehaviorSubject<number>(this._countLoadedImages);
+  private allAnomalias: Anomalia[];
+  private planta: PlantaInterface;
+  private informe: InformeInterface;
+  private _columnasAnomalia: any[] = []; // antes pcColumnas
+  columnasAnomalia$ = new BehaviorSubject<any[]>(this._columnasAnomalia); // equvalente a currentFilteredColumnas$
+  private filtroColumnas: string[];
+  private arrayFilas: Array<number>;
+  private arrayColumnas: Array<number>;
+  // IMAGENES
+  private irradianciaImg$: Observable<string | null>;
+  private suciedadImg$: Observable<string | null>;
+  private portadaImg$: Observable<string | null>;
+  private logoImg$: Observable<string | null>;
+  private widthIrradiancia: number;
+  private imgQuality: number;
+  private jpgQuality: number;
+  private widthPortada: number;
+  private widthLogo: number;
+  private widthLogoOriginal: number;
+  private widthSuciedad: number;
+  private widthCurvaMae: number;
+  private widthFormulaMae: number;
+  private scaleImgLogoHeader: number;
+  private heightLogoHeader: number;
+  private imgLogoBase64: string;
+  private imgIrradianciaBase64: string;
+  private imgPortadaBase64: string;
+  private imgSuciedadBase64: string;
+  private imgFormulaMaeBase64: string;
+  private imgCurvaMaeBase64: string;
 
-  public planta: PlantaInterface;
-  public informe: InformeInterface;
-  public lan: string;
-  public lanSwitch: boolean;
-  public titulo: string;
-  public irradianciaMedia: number;
-  public url: string;
-  public dataTipos: any;
-  public dataSeveridad: any;
-  public numTipos: number[];
-  public numClases: number[];
-  public countCategoria;
-  public countPosicion;
-  public countCategoriaClase;
-  public countClase;
-  public mae;
-  public global;
-  public irradianciaImg$: Observable<string | null>;
-  public suciedadImg$: Observable<string | null>;
-  public portadaImg$: Observable<string | null>;
-  public logoImg$: Observable<string | null>;
-  public arrayFilas: Array<number>;
-  public arrayColumnas: Array<number>;
-  public tempReflejada: number;
-  public emisividad: number;
-  public tipoInforme: string;
-  public filteredSeguidores: SeguidorInterface[];
-  public seguidor: SeguidorInterface;
-  public pcColumnas: any[];
-  public filtroColumnas: string[];
-  public filtroApartados: string[];
-  private filteredColumnasSource = new BehaviorSubject<any[]>(new Array<any>());
-  public currentFilteredColumnas$ = this.filteredColumnasSource.asObservable();
-  public currentFilteredColumnas: Array<any>;
-  public pcDescripcion = GLOBAL.labels_tipos;
-  public filteredSeguidores$: Observable<SeguidorInterface[]>;
-  public filteredSeguidoresVistaPrevia: SeguidorInterface[];
-  public filteredPcsVistaPrevia: PcInterface[];
-  public filteredPcs$: Observable<PcInterface[]>;
-  public filteredPcs: PcInterface[];
-  allElements: FilterableElement[];
-  public currentFiltroGradiente: number;
-  public countLoadedImages: number;
-  public countSeguidores: number;
-  public generandoPDF = false;
-  public isLocalhost: boolean;
-  public imageList = {};
-  public pages;
-  public imgIrradianciaBase64: string;
-  public imgPortadaBase64: string;
-  public imgSuciedadBase64: string;
-  public imgFormulaMaeBase64: string;
-  public imgCurvaMaeBase64: string;
-  public imgLogoBase64: string;
-  public progresoPDF: string;
-  public informeCalculado: boolean;
-  public apartadosInforme: Apartado[];
-  public displayedColumns: string[] = ['categoria', 'coa1', 'coa2', 'coa3', 'total'];
-  public translation: Translation;
-  public dataSource: MatTableDataSource<PcsTable>;
-  private countLoadedImages$ = new BehaviorSubject(null);
-  widthLogo: number;
-  widthLogoOriginal: number;
-  widthSuciedad: number;
-  widthCurvaMae: number;
-  widthFormulaMae: number;
-  widthPortada: number;
-  widthIrradiancia: number;
-  imgQuality: number;
-  scaleImgLogoHeader: number;
-  heightLogoHeader: number;
-  jpgQuality: number;
-  widthSeguidor: number;
-  public hasUserArea: boolean;
+  private apartadosInforme: Apartado[];
+  private filtroApartados: string[];
+  private progresoPDF: string;
+  private hasUserArea: boolean;
+  private translation: Translation;
+  private language: string; // antes lan
+  private countCategoria;
+  private countPosicion;
+  private countCategoriaClase;
+  private countClase;
+  private informeCalculado: boolean;
+  private dataSource: MatTableDataSource<AnomsTable>;
+  private irradianciaMedia: number;
+  private tempReflejada: number;
+  private emisividad: number;
+  private numTipos: number[];
+  private numClases: number[];
+  private anomTipos = GLOBAL.labels_tipos; // antes pcDescripcion
+  private currentFiltroGradiente: number;
 
   constructor(
-    private decimalPipe: DecimalPipe,
-    private datePipe: DatePipe,
-    private storage: AngularFireStorage,
-    private pcService: PcService,
-    private plantaService: PlantaService,
-    private informeService: InformeService,
     private reportControlService: ReportControlService,
     private anomaliaService: AnomaliaService,
+    private plantaService: PlantaService,
+    private storage: AngularFireStorage,
+    private decimalPipe: DecimalPipe,
+    private datePipe: DatePipe,
     private downloadReportService: DownloadReportService
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     this.numTipos = Array(GLOBAL.labels_tipos.length)
       .fill(0)
       .map((_, i) => i + 1);
@@ -152,17 +120,6 @@ export class ExportComponent implements OnInit {
       .fill(0)
       .map((_, i) => i + 1);
 
-    this.global = GLOBAL;
-
-    this.informeCalculado = false;
-    this.lan = 'es';
-    this.url = GLOBAL.url;
-    this.titulo = 'Vista de informe';
-    this.tipoInforme = '2';
-    this.isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-  }
-
-  ngOnInit() {
     this.plantaService
       .getPlanta(this.reportControlService.plantaId)
       .pipe(take(1))
@@ -171,10 +128,9 @@ export class ExportComponent implements OnInit {
 
         this.plantaService.planta = planta;
 
-        this.pcColumnas = this.getPcColumnas(this.planta);
+        this.columnasAnomalia = this.getColumnasAnom(this.planta);
 
-        this.filtroColumnas = this.pcColumnas.map((element) => element.nombre);
-        this.filteredColumnasSource.next(this.pcColumnas);
+        this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
 
         this.arrayFilas = Array(this.planta.filas)
           .fill(0)
@@ -183,7 +139,7 @@ export class ExportComponent implements OnInit {
           .fill(0)
           .map((_, i) => i + 1);
 
-        this.allElements = this.reportControlService.allFilterableElements;
+        this.allAnomalias = this.reportControlService.allFilterableElements as Anomalia[];
 
         this.calcularInforme();
 
@@ -368,57 +324,6 @@ export class ExportComponent implements OnInit {
             elegible: true,
           },
         ];
-        if (this.planta.tipo === 'seguidores') {
-          this.apartadosInforme.push(
-            {
-              nombre: 'anexo2',
-              descripcion: 'Anexo II: Anomalías térmicas por seguidor',
-              orden: 16,
-              elegible: true,
-            },
-            {
-              nombre: 'resultadosPosicion',
-              descripcion: 'Resultados por posición',
-              orden: 12,
-              apt: 2,
-              elegible: true,
-            }
-          );
-          // const fecha_informe = new Date(this.informe.fecha * 1000);
-
-          // if (fecha_informe.getFullYear() >= 2020) {
-          //   this.apartadosInforme.push({
-          //     nombre: 'anexo3',
-          //     descripcion: 'Anexo III: Seguidores sin anomalías',
-          //     orden: 17,
-          //     elegible: true,
-          //   });
-          // }
-        }
-        // if (this.planta.tipo === '1 eje') {
-        //   this.apartadosInforme.push(
-        //     {
-        //       nombre: 'anexo2b',
-        //       descripcion: 'Anexo II: Anomalías térmicas por seguidor',
-        //       orden: 16,
-        //       elegible: true,
-        //     },
-        //     {
-        //       nombre: 'resultadosPosicionB',
-        //       descripcion: 'Resultados por posición',
-        //       orden: 12,
-        //       apt: 2,
-        //       elegible: true,
-        //     },
-        //     {
-        //       nombre: 'resultadosSeguidor',
-        //       descripcion: 'Resultados por seguidor',
-        //       orden: 13,
-        //       apt: 2,
-        //       elegible: true,
-        //     }
-        //   );
-        // }
 
         this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
           return a.orden - b.orden;
@@ -441,7 +346,6 @@ export class ExportComponent implements OnInit {
     this.imgQuality = 3.5;
     this.heightLogoHeader = 40;
     this.jpgQuality = 0.95;
-    this.widthSeguidor = 450;
     this.hasUserArea = false;
 
     this.plantaService.getUserAreas$(this.reportControlService.plantaId).subscribe((userAreas) => {
@@ -449,27 +353,6 @@ export class ExportComponent implements OnInit {
         this.hasUserArea = true;
       }
     });
-
-    // vista previa
-    this.filteredSeguidores$ = this.pcService.filteredSeguidores$;
-    this.filteredPcs$ = this.pcService.currentFilteredPcs$;
-
-    this.currentFilteredColumnas$.subscribe((filteredCols) => {
-      this.currentFilteredColumnas = filteredCols;
-    });
-
-    // Obtener pcs vista previa
-    // this.filteredPcs$.subscribe((pcs) => {
-    //   this.filteredPcsVistaPrevia = pcs.slice(0, 20);
-    //   this.filteredPcs = pcs;
-    //   this.currentFiltroGradiente = this.pcService.currentFiltroGradiente;
-    //   this.calcularInforme();
-    // });
-    // Ordenar Pcs por seguidor:
-    // this.pcService.filteredSeguidores$.subscribe((seguidores) => {
-    //   this.filteredSeguidores = seguidores;
-    //   this.filteredSeguidoresVistaPrevia = seguidores.slice(0, 3);
-    // });
 
     fabric.util.loadImage(
       '../../../assets/images/maeCurva.png',
@@ -506,68 +389,35 @@ export class ExportComponent implements OnInit {
     );
   }
 
-  onSliderChange($event) {
-    // $event = false: español   | True: english
-    if ($event) {
-      this.lan = 'en';
-    } else {
-      this.lan = 'es';
-    }
-  }
+  public downloadPDF() {
+    this.generandoPDF = true;
+    this.countLoadedImages = null;
 
-  getPcColumnas(planta: PlantaInterface): any[] {
-    const pcColumnasTemp = GLOBAL.pcColumnas;
+    this.reportControlService.allFilterableElements$.pipe(take(1)).subscribe((elems) => {
+      this.allAnomalias = elems.sort(this.anomaliaService.sortByLocalId) as Anomalia[];
 
-    const i = pcColumnasTemp.findIndex((e) => e.nombre === 'local_xy');
-    const descripcion = '';
-    planta.nombreGlobalCoords.forEach((nombre, index, nombres) => {
-      descripcion.concat(nombre);
-      // a ultimo no se lo añadimos
-      if (index < nombres.length - 1) {
-        descripcion.concat('/');
-      }
+      this.calcularInforme();
+
+      pdfMake
+        .createPdf(this.getDocDefinition())
+        .download(/* this.informe.prefijo.concat('informe') */ 'Informe', (cb) => {
+          this.generandoPDF = false;
+        });
     });
-
-    pcColumnasTemp[i].descripcion = descripcion;
-
-    return pcColumnasTemp;
-  }
-
-  loadImage(width: number, url: string) {
-    const canvas = document.createElement('canvas'); // Use Angular's Renderer2 method
-
-    fabric.util.loadImage(
-      url,
-      (img) => {
-        const scaleFactor = width / img.width;
-        canvas.width = width;
-        canvas.height = img.height * scaleFactor;
-        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-      },
-      null,
-      { crossOrigin: 'anonymous' }
-    );
   }
 
   private calcularInforme() {
-    this.translation = new Translation(this.lan);
+    this.translation = new Translation(this.language);
     this.countCategoria = Array();
     this.countCategoriaClase = Array();
     this.countClase = Array();
     this.countPosicion = Array();
 
     this.informeCalculado = false;
-    let elements;
-    if (this.reportControlService.plantaFija) {
-      elements = this.allElements as Anomalia[];
-    } else {
-      elements = this.allElements as Seguidor[];
-    }
 
-    if (elements.length > 0) {
+    if (this.allAnomalias.length > 0) {
       this.irradianciaMedia = Math.round(
-        elements.sort(this.compareIrradiancia)[Math.round(elements.length / 2)].irradiancia
+        this.allAnomalias.sort(this.compareIrradiancia)[Math.round(this.allAnomalias.length / 2)].irradiancia
       );
     } else {
       this.irradianciaMedia = 800;
@@ -582,9 +432,9 @@ export class ExportComponent implements OnInit {
       const countColumnas = Array();
       for (const x of this.arrayColumnas) {
         if (this.planta.tipo === 'seguidores') {
-          countColumnas.push(elements.filter((pc) => pc.localX === x && pc.localY === y).length);
+          countColumnas.push(this.allAnomalias.filter((pc) => pc.localX === x && pc.localY === y).length);
         } else {
-          countColumnas.push(elements.filter((pc) => pc.localY === y).length);
+          countColumnas.push(this.allAnomalias.filter((pc) => pc.localY === y).length);
         }
       }
       this.countPosicion.push(countColumnas);
@@ -594,18 +444,18 @@ export class ExportComponent implements OnInit {
     let filtroCategoria;
     let filtroCategoriaClase;
     for (const cat of this.numTipos) {
-      filtroCategoria = elements.filter((pc) => pc.tipo === cat);
+      filtroCategoria = this.allAnomalias.filter((pc) => pc.tipo === cat);
       this.countCategoria.push(filtroCategoria.length);
 
-      let count1 = Array();
+      const count1 = Array();
       for (const clas of this.numClases) {
-        filtroCategoriaClase = elements.filter((pc) => this.pcService.getPcCoA(pc) === clas && pc.tipo === cat);
+        filtroCategoriaClase = this.allAnomalias.filter((anom) => anom.clase === clas && anom.tipo === cat);
         count1.push(filtroCategoriaClase.length);
       }
       const totalPcsInFilter = count1[0] + count1[1] + count1[2];
       if (totalPcsInFilter > 0) {
         this.countCategoriaClase.push({
-          categoria: this.pcDescripcion[cat],
+          categoria: this.anomTipos[cat],
           coa1: count1[0],
           coa2: count1[1],
           coa3: count1[2],
@@ -617,7 +467,7 @@ export class ExportComponent implements OnInit {
     // CLASES //
     let filtroClase;
     for (const j of this.numClases) {
-      filtroClase = elements.filter((pc) => this.pcService.getPcCoA(pc) === j);
+      filtroClase = this.allAnomalias.filter((anom) => anom.clase === j);
 
       this.countClase.push(filtroClase.length);
     }
@@ -626,370 +476,185 @@ export class ExportComponent implements OnInit {
     this.dataSource = new MatTableDataSource(this.countCategoriaClase);
   }
 
-  public calificacionMae(mae: number) {
-    if (mae <= 0.1) {
-      return this.translation.t('muy bueno');
-    } else if (mae <= 0.2) {
-      return this.translation.t('correcto');
-    } else {
-      return this.translation.t('mejorable');
-    }
-  }
+  getColumnasAnom(planta: PlantaInterface): any[] {
+    const columnasTemp = GLOBAL.columnasAnomPdf;
 
-  compareIrradiancia(a: Anomalia, b: Anomalia) {
-    if (a.irradiancia < b.irradiancia) {
-      return -1;
-    }
-    if (a.irradiancia > b.irradiancia) {
-      return 1;
-    }
-    return 0;
-  }
-  public capFirstLetter(text: string): string {
-    return text.charAt(0).toUpperCase() + text.slice(1);
-  }
-
-  public downloadPDF() {
-    this.generandoPDF = true;
-    this.countLoadedImages$ = new BehaviorSubject(null);
-
-    const imageListBase64 = {};
-    this.countLoadedImages = 0;
-    this.countSeguidores = 1;
-
-    if (this.reportControlService.plantaFija) {
-      this.reportControlService.allFilterableElements$.pipe(take(1)).subscribe((elems) => {
-        this.allElements = elems.sort(this.anomaliaService.sortByLocalId);
-
-        this.calcularInforme();
-
-        pdfMake
-          .createPdf(this.getDocDefinition(imageListBase64))
-          .download(this.informe.prefijo.concat('informe'), (cb) => {
-            this.generandoPDF = false;
-          });
-      });
-    } else {
-      // this.countLoadedImages$.subscribe((nombreSeguidor) => {
-      //   if (nombreSeguidor !== null) {
-      //     const canvas = $(`canvas[id="imgSeguidorCanvas${nombreSeguidor}"]`)[0] as HTMLCanvasElement;
-      //     imageListBase64[`imgSeguidorCanvas${nombreSeguidor}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
-      //     this.progresoPDF = this.decimalPipe.transform((100 * this.countLoadedImages) / this.countSeguidores, '1.0-0');
-      //     // Cuando se carguen todas las imágenes
-      //     if (this.countLoadedImages === this.countSeguidores) {
-      //       this.pcService.currentFilteredPcs$.pipe(take(1)).subscribe((filteredPcs) => {
-      //         this.filteredPcs = filteredPcs.sort(this.pcService.sortByGlobals);
-      //         this.calcularInforme();
-      //         pdfMake
-      //           .createPdf(this.getDocDefinition(imageListBase64))
-      //           .download(this.informe.prefijo.concat('informe'));
-      //         this.generandoPDF = false;
-      //       });
-      //     }
-      //   }
-      // });
-      // // Generar imagenes
-      // this.countSeguidores = 0;
-      // for (const seguidor of this.filteredSeguidores) {
-      //   this.setImgSeguidorCanvas(seguidor, false);
-      //   this.countSeguidores++;
-      // }
-    }
-  }
-
-  private onlyUnique(pcs: PcInterface[]): PcInterface[] {
-    const archivosList = pcs.map((v, i, a) => {
-      return v.archivo;
+    const i = columnasTemp.findIndex((e) => e.nombre === 'local_xy');
+    const descripcion = '';
+    planta.nombreGlobalCoords.forEach((nombre, index, nombres) => {
+      descripcion.concat(nombre);
+      // a ultimo no se lo añadimos
+      if (index < nombres.length - 1) {
+        descripcion.concat('/');
+      }
     });
 
-    const archivosListUnique = archivosList.filter((v, i, s) => {
-      return s.indexOf(v) === i;
-    });
+    columnasTemp[i].descripcion = descripcion;
 
-    const archivosListUniqueIndex = archivosList.map((v, i, s) => {
-      return s.indexOf(v);
-    });
-
-    return pcs.filter((v, i, s) => {
-      return archivosListUniqueIndex.includes(i);
-    });
+    return columnasTemp;
   }
 
-  private setImgSeguidorCanvas(seguidor: SeguidorInterface, vistaPrevia: boolean = false) {
-    const uniquePcs = this.onlyUnique(seguidor.pcs);
-    const maxImagesPerPage = 2;
-    const numImagesSeguidor = uniquePcs.length;
-    const separacionImagenes = 2; //en pixeles
+  getDocDefinition() {
+    const pages = this.getPagesPDF();
+    let anexo1 = [];
+    let numAnexo = 'I';
 
-    const scale = Math.max(1 / numImagesSeguidor, 0.5);
+    if (this.filtroApartados.includes('anexo1')) {
+      anexo1 = this.getAnexoLista(numAnexo);
+      numAnexo = 'II';
+    }
 
-    const canvas = new fabric.Canvas(`imgSeguidorCanvas${this.plantaService.getNombreSeguidor(seguidor.pcs[0])}`);
-    canvas.height = canvas.height + separacionImagenes;
-    canvas.backgroundColor = 'white';
+    return {
+      header: (currentPage, pageCount) => {
+        if (currentPage > 1) {
+          return [
+            {
+              margin: 10,
+              columns: [
+                {
+                  // usually you would use a dataUri instead of the name for client-side printing
+                  // sampleImage.jpg however works inside playground so you can play with it
+                  margin: [300 - this.widthLogo * this.scaleImgLogoHeader, 0, 0, 0],
+                  image: this.imgLogoBase64,
+                  width: this.scaleImgLogoHeader * this.widthLogo,
+                },
+              ],
+            },
+          ];
+        }
+      },
 
-    const imagesWidth = GLOBAL.resolucionCamara[1] / Math.min(maxImagesPerPage, numImagesSeguidor);
-    const left0 = GLOBAL.resolucionCamara[1] / 2 - imagesWidth / 2;
-    let loadedImages = 0;
+      content: pages.concat(anexo1),
 
-    uniquePcs.forEach((pc, index, array) => {
-      index++; // index empieza en 0. Le sumamos 1 para que empiece en 1.
-      if (index <= maxImagesPerPage) {
-        const pcs = seguidor.pcs.filter((value) => {
-          return value.archivo === pc.archivo;
-        });
-        this.storage
-          .ref(`informes/${this.informe.id}/jpg/${pc.archivoPublico}`)
-          .getDownloadURL()
-          .pipe(take(1))
-          .subscribe((url) => {
-            fabric.Image.fromURL(
-              url,
-              (img) => {
-                loadedImages++;
-                const top0 = (index - 1) * (GLOBAL.resolucionCamara[0] / numImagesSeguidor + separacionImagenes);
-
-                img.set({
-                  top: top0,
-                  left: left0,
-                  // width :  GLOBAL.resolucionCamara[0] * scale,
-                  // height : GLOBAL.resolucionCamara[1] * scale,
-                  scaleX: scale,
-                  scaleY: scale,
-                });
-                //i create an extra var for to change some image properties
-                canvas.add(img);
-                this.drawAllPcsInCanvas(pcs, canvas, vistaPrevia, scale, top0, left0);
-
-                if (!vistaPrevia && loadedImages === Math.min(numImagesSeguidor, maxImagesPerPage)) {
-                  this.countLoadedImages++;
-                  this.countLoadedImages$.next(seguidor.nombre);
-                }
+      footer: (currentPage, pageCount) => {
+        if (currentPage > 1) {
+          return [
+            {
+              table: {
+                widths: ['*'],
+                body: [
+                  [
+                    {
+                      text: currentPage,
+                      alignment: 'center',
+                      color: 'grey',
+                      margin: [0, 10, 0, 0],
+                    },
+                  ],
+                ],
               },
-              { crossOrigin: 'Anonymous' }
-            );
-          });
-      }
-    });
-  }
-
-  private drawAllPcsInCanvas(pcs: PcInterface[], canvas, vistaPrevia: boolean = false, scale = 1, top0 = 0, left0 = 0) {
-    pcs.forEach((pc, i, a) => {
-      this.drawPc(pc, canvas, scale, top0, left0);
-      this.drawTriangle(pc, canvas, scale, top0, left0);
-    });
-  }
-
-  private drawPc(pc: PcInterface, canvas: any, scale = 1, top0 = 0, left0 = 0) {
-    const actObj1 = new fabric.Rect({
-      left: pc.img_left * scale + left0,
-      top: pc.img_top * scale + top0,
-      fill: 'rgba(0,0,0,0)',
-      stroke: 'black',
-      strokeWidth: 1 * scale,
-      width: pc.img_width * scale,
-      height: pc.img_height * scale,
-      hasControls: false,
-      lockMovementY: true,
-      lockMovementX: true,
-      localId: pc.local_id,
-      ref: false,
-      selectable: false,
-      hoverCursor: 'default',
-    });
-    const actObj2 = new fabric.Rect({
-      left: pc.img_left * scale - 1 + left0,
-      top: pc.img_top * scale - 1 + top0,
-      fill: 'rgba(0,0,0,0)',
-      stroke: 'red',
-      strokeWidth: 1,
-      width: pc.img_width * scale + 2,
-      height: pc.img_height * scale + 2,
-      hasControls: false,
-      lockMovementY: true,
-      lockMovementX: true,
-      localId: pc.local_id,
-      ref: false,
-      hoverCursor: 'pointer',
-      selectable: true,
-    });
-    const textId = new fabric.Text('#'.concat(pc.local_id.toString().concat(' ')), {
-      left: pc.img_left * scale + left0,
-      top: (pc.img_top - 26) * scale + top0,
-      fontSize: 20 * scale,
-      // textBackgroundColor: 'red',
-      ref: 'text',
-      selectable: false,
-      hoverCursor: 'default',
-      fill: 'white',
-    });
-
-    canvas.add(actObj1);
-    canvas.add(actObj2);
-    canvas.add(textId);
-    canvas.renderAll();
-  }
-
-  private drawTriangle(pc: PcInterface, canvas: any, scale = 1, top0 = 0, left0 = 0) {
-    const x = pc.img_x * scale;
-    const y = pc.img_y * scale;
-
-    const squareBase = 12 * scale;
-    const triangle = new fabric.Triangle({
-      width: squareBase,
-      height: squareBase,
-      fill: 'red',
-      stroke: 'black',
-      left: Math.round(x - squareBase / 2) + left0,
-      top: y + top0, // si no ponemos este 2, entonces no lee bien debajo del triangulo
-      selectable: false,
-      ref: 'triangle',
-      hoverCursor: 'default',
-    });
-
-    // const textTriangle = new fabric.Text(
-    //   ' + '.concat(pc.gradienteNormalizado.toString().concat(' ºC ')),
-    //   {
-    //     left: pc.img_left * scale,
-    //     top: (pc.img_top + pc.img_height + 5)  * scale,
-    //     fontSize: 22 * scale,
-    //     textBackgroundColor: 'white',
-    //     ref: 'text',
-    //     selectable: false,
-    //     hoverCursor: 'default',
-    //     fill: 'red'
-    //   }
-    // );
-
-    canvas.add(triangle);
-    // canvas.add(textTriangle);
-    canvas.renderAll();
-  }
-
-  onCheckBoxColumnaChange($event: MatCheckboxChange) {
-    const columnaChecked = $event.source.value;
-    this.filtroColumnas = this.filtroColumnas.filter((nombre) => nombre !== columnaChecked);
-    if ($event.checked === true) {
-      this.filtroColumnas.push(columnaChecked);
-    }
-
-    // Llamar al behaviourObject
-    this.filteredColumnasSource.next(this.pcColumnas.filter((e) => this.filtroColumnas.includes(e.nombre)));
-  }
-  onCheckBoxApartadosChange($event: MatCheckboxChange) {
-    const apartadoChecked = $event.source.value;
-    this.filtroApartados = this.filtroApartados.filter((nombre) => nombre !== apartadoChecked);
-    if ($event.checked === true) {
-      this.filtroApartados.push(apartadoChecked);
-    }
-  }
-
-  onClickTipoInforme() {
-    if (this.tipoInforme === '2') {
-      // let count = 0;
-      for (const seguidor of this.filteredSeguidoresVistaPrevia) {
-        this.setImgSeguidorCanvas(seguidor, true);
-        // count = count + 1;
-        // if ( count === 5 ) {
-        //   break;
-        // }
-      }
-    }
-  }
-
-  //  ###################  CONTENIDO ##################################
-
-  private getTablaCategoria() {
-    const array = [];
-    for (const i of this.numTipos) {
-      if (this.countCategoria[i - 1] > 0) {
-        array.push(
-          new Array(
-            {
-              text: this.translation.t(this.global.pcDescripcion[i]),
+              layout: 'noBorders',
             },
-            {
-              text: this.countCategoria[i - 1],
-            },
-            {
-              text:
-                this.decimalPipe
-                  .transform((this.countCategoria[i - 1] / this.allElements.length) * 100, '1.0-1')
-                  .toString() + ' %',
-            }
-          )
-        );
-      }
-    }
+          ];
+        }
+      },
 
-    return array;
-  }
+      styles: {
+        h1: {
+          fontSize: 22,
+          bold: true,
+        },
+        h2: {
+          fontSize: 18,
+          bold: true,
+        },
+        h3: {
+          fontSize: 15,
+          bold: true,
+        },
+        h4: {
+          fontSize: 13,
+          bold: true,
+        },
+        h5: {
+          fontSize: 13,
+          bold: false,
+          decoration: 'underline',
+          margin: [30, 0, 30, 0],
+        },
+        p: {
+          alignment: 'justify',
+          margin: [30, 0, 30, 0],
+        },
+        tableHeaderRed: {
+          alignment: 'center',
+          bold: true,
+          fontSize: 10,
+          fillColor: '#003b73',
+          color: 'white',
+        },
 
-  private getTablaPosicion = function () {
-    const array = [];
-    const arrayHeader = [];
-    arrayHeader.push({});
+        tableHeaderImageData: {
+          alignment: 'center',
+          bold: true,
+          fontSize: 10,
+          fillColor: '#4cb6c9',
+        },
 
-    for (const i of this.arrayColumnas) {
-      arrayHeader.push({
-        text: i.toString(),
-        style: 'tableHeaderRed',
-      });
-    }
+        tableCellAnexo1: {
+          alignment: 'center',
+          fontSize: 9,
+        },
 
-    array.push(arrayHeader);
+        tableHeader: {
+          alignment: 'center',
+          bold: true,
+          fontSize: 13,
+        },
 
-    for (const j of this.arrayFilas) {
-      const arrayFila = [];
-      arrayFila.push({
-        text: this.plantaService.getAltura(this.planta, j).toString(),
-        style: 'tableHeaderRed',
-      });
-      const countPosicionFila = this.countPosicion[j - 1];
-      for (const i of this.arrayColumnas) {
-        arrayFila.push({
-          text: countPosicionFila[i - 1].toString(),
-          style: 'tableCell',
-        });
-      }
+        pieFoto: {
+          alignment: 'center',
+          fontSize: 11,
+          italics: true,
+          color: 'gray',
+        },
+        subtitulo: {
+          alignment: 'right',
+          fontSize: 15,
+        },
 
-      array.push(arrayFila);
-    }
+        table: {
+          alignment: 'center',
+        },
 
-    return array;
-  };
-
-  private getTextoIrradiancia() {
-    if (this.informe.irradiancia === 0) {
-      return `${this.translation.t(
-        'Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición el equipo ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.'
-      )}`;
-    } else {
-      return `${this.translation.t(
-        'Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de'
-      )} ${this.planta.nombre}, ${this.translation.t(
-        'los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.'
-      )}`;
-    }
-  }
-
-  private getTextoLocalizar() {
-    if (this.planta.tipo === 'seguidores') {
-      return `${this.translation.t('Además todos ellos tienen asociado los parámetros')} '${this.translation.t(
-        this.plantaService.getNombreGlobalX(this.planta)
-      )}', '${this.translation.t(this.plantaService.getNombreLocalX(this.planta))}' ${this.translation.t(
-        'y'
-      )} '${this.translation.t(this.plantaService.getNombreLocalY(this.planta))}' ${this.translation.t(
-        'según el mapa habitual de la planta'
-      )}.`;
-    } else {
-      return `${this.translation.t('Además todos ellos tienen asociado los parámetros')} '${this.translation.t(
-        this.plantaService.getNombreGlobalX(this.planta)
-      )}', '${this.translation.t(this.plantaService.getNombreGlobalY(this.planta))}', '${this.translation.t(
-        this.plantaService.getNombreLocalX(this.planta)
-      )}' ${this.translation.t('y')} '${this.translation.t(
-        this.plantaService.getNombreLocalY(this.planta)
-      )}' ${this.translation.t('según el mapa habitual de la planta')}.`;
-    }
+        param: {
+          alignment: 'center',
+          bold: true,
+          decoration: 'underline',
+        },
+        tableCell: {
+          alignment: 'center',
+        },
+        mae1: {
+          fillColor: '#559c55',
+          alignment: 'center',
+        },
+        bold: {
+          bold: true,
+        },
+        mae2: {
+          fillColor: '#00a0ea',
+          alignment: 'center',
+        },
+        mae3: {
+          fillColor: '#fdc400',
+          alignment: 'center',
+        },
+        coa1: {
+          color: 'black',
+        },
+        coa2: {
+          color: 'orange',
+        },
+        coa3: {
+          color: 'red',
+        },
+        tableLeft: {
+          bold: true,
+          alignment: 'right',
+        },
+      },
+    };
   }
 
   getPagesPDF() {
@@ -1003,11 +668,11 @@ export class ExportComponent implements OnInit {
 
       '\n',
 
-      {
-        image: this.imgPortadaBase64,
-        width: this.widthPortada,
-        alignment: 'center',
-      },
+      // {
+      //   image: this.imgPortadaBase64,
+      //   width: this.widthPortada,
+      //   alignment: 'center',
+      // },
 
       '\n',
 
@@ -1312,7 +977,7 @@ export class ExportComponent implements OnInit {
                       style: 'tableLeft',
                     },
                     {
-                      text: `${this.global.uav}`,
+                      text: `${GLOBAL.uav}`,
                     },
                   ],
                   [
@@ -1321,7 +986,7 @@ export class ExportComponent implements OnInit {
                       style: 'tableLeft',
                     },
                     {
-                      text: `${this.global.camaraTermica}`,
+                      text: `${GLOBAL.camaraTermica}`,
                     },
                   ],
                   [
@@ -1330,7 +995,7 @@ export class ExportComponent implements OnInit {
                       style: 'tableLeft',
                     },
                     {
-                      text: `${this.global.ultimaCalibracion}`,
+                      text: `${GLOBAL.ultimaCalibracion}`,
                     },
                   ],
 
@@ -1464,11 +1129,11 @@ export class ExportComponent implements OnInit {
 
         '\n',
 
-        {
-          image: this.imgIrradianciaBase64,
-          width: this.widthIrradiancia,
-          alignment: 'center',
-        },
+        // {
+        //   image: this.imgIrradianciaBase64,
+        //   width: this.widthIrradiancia,
+        //   alignment: 'center',
+        // },
 
         '\n\n',
       ];
@@ -1532,11 +1197,11 @@ export class ExportComponent implements OnInit {
         '\n',
 
         // Imagen suciedad
-        {
-          image: this.imgSuciedadBase64,
-          width: this.widthSuciedad,
-          alignment: 'center',
-        },
+        // {
+        //   image: this.imgSuciedadBase64,
+        //   width: this.widthSuciedad,
+        //   alignment: 'center',
+        // },
 
         '\n\n',
 
@@ -1724,7 +1389,7 @@ export class ExportComponent implements OnInit {
                   ],
                   [
                     {
-                      text: '% MAE < ' + this.global.mae[0],
+                      text: '% MAE < ' + GLOBAL.mae[0],
                       style: ['mae1', 'bold'],
                     },
                     {
@@ -1734,7 +1399,7 @@ export class ExportComponent implements OnInit {
                   ],
                   [
                     {
-                      text: this.global.mae[0].toString() + ' < % MAE <  ' + this.global.mae[1].toString(),
+                      text: GLOBAL.mae[0].toString() + ' < % MAE <  ' + GLOBAL.mae[1].toString(),
                       style: ['mae2', 'bold'],
                     },
                     {
@@ -1958,7 +1623,7 @@ export class ExportComponent implements OnInit {
                         style: 'bold',
                       },
                       {
-                        text: this.allElements.length.toString(),
+                        text: this.allAnomalias.length.toString(),
                         style: 'bold',
                       },
                       {
@@ -1981,50 +1646,11 @@ export class ExportComponent implements OnInit {
       ];
     };
 
-    const resultadosSeguidor = (index: string) => {
-      const numAnomaliasMedia = new Intl.NumberFormat('en-IN', { maximumSignificantDigits: 2 }).format(
-        this.filteredPcs.length / this.filteredSeguidores.length
-      );
-      let numeroSeguidores = 0;
-      let porcentajeSeguidores = 0;
-      if (this.planta.hasOwnProperty('numeroSeguidores')) {
-        numeroSeguidores = this.planta.numeroSeguidores;
-        porcentajeSeguidores = (this.filteredSeguidores.length / numeroSeguidores) * 100;
-      }
-      return [
-        {
-          text: `${index} - ${this.translation.t('Resultados por seguidores')}`,
-          style: 'h3',
-        },
-
-        '\n',
-        `${this.translation.t('El número de seguidores afectados por anomalías térmicas es')} ${
-          this.filteredSeguidores.length
-        }${
-          numeroSeguidores === 0 ? '. ' : `/${numeroSeguidores} (${porcentajeSeguidores.toFixed(2)}%). `
-        } ${this.translation.t(
-          'El número medio de módulos con anomalías por seguidor es de'
-        )} ${numAnomaliasMedia} ${this.translation.t('módulos/seguidor')}.`,
-        '\n',
-        '\n',
-      ];
-    };
-
     const resultadosPosicion = (index: string) => {
-      let texto1;
-      if (this.planta.tipo === 'seguidores') {
-        texto1 = `${this.translation.t(
-          'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran'
-        )} (${this.plantaService.getNombreLocalX(this.planta)} ${this.translation.t(
-          'y'
-        )} ${this.plantaService.getNombreLocalY(this.planta)}) ${this.translation.t(
-          'dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
-        )}`;
-      } else {
-        texto1 = this.translation.t(
-          'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
-        );
-      }
+      const texto1 = this.translation.t(
+        'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
+      );
+
       return [
         {
           text: `${index} - ${this.translation.t('Resultados por posición de la anomalía dentro del seguidor')}`,
@@ -2091,7 +1717,9 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: `MAE = ∆PR / PR = ${this.informe.mae} % (${this.calificacionMae(this.informe.mae)})`,
+          text: `MAE = ∆PR / PR = ${this.decimalPipe.transform(this.informe.mae, '1.0-2')}% (${this.calificacionMae(
+            this.informe.mae
+          )})`,
           style: 'param',
         },
 
@@ -2104,7 +1732,7 @@ export class ExportComponent implements OnInit {
               'dd/MM/yyyy'
             )}) ${this.translation.t('es')} `,
             {
-              text: `${this.informe.mae} %`,
+              text: `${this.decimalPipe.transform(this.informe.mae, '1.0-2')}%`,
               style: 'bold',
             },
             ' ',
@@ -2212,11 +1840,6 @@ export class ExportComponent implements OnInit {
       result = result.concat(resultadosPosicion(apartado));
       subtitulo = subtitulo + 1;
     }
-    if (this.filtroApartados.includes('resultadosSeguidor')) {
-      apartado = titulo.toString().concat('.').concat(subtitulo.toString());
-      result = result.concat(resultadosSeguidor(apartado));
-      subtitulo = subtitulo + 1;
-    }
 
     if (this.filtroApartados.includes('resultadosMAE') && !this.hasUserArea) {
       apartado = titulo.toString().concat('.').concat(subtitulo.toString());
@@ -2226,30 +1849,6 @@ export class ExportComponent implements OnInit {
 
     return result;
   }
-
-  // getTextoSeguidor(pc: PcInterface, planta: PlantaInterface) {
-  //   let seguidor: string;
-  //   if (planta.tipo === "seguidores") {
-  //     // Columna 'globalX'
-  //     seguidor =
-  //       !pc.hasOwnProperty("global_y") || pc["global_y"] === "NaN"
-  //         ? String(pc["global_x"])
-  //         : String(pc["global_x"])
-  //             .concat(" ")
-  //             .concat(String(pc["global_y"]));
-  //   } else {
-  //     if (Number.isNaN(pc["global_x"])) {
-  //       seguidor = pc["global_y"];
-  //     } else {
-  //       seguidor = pc["global_x"]
-  //         .toString()
-  //         .concat(" ")
-  //         .concat(pc["global_y"]);
-  //     }
-  //   }
-
-  //   return seguidor;
-  // }
 
   getAnexoLista(numAnexo: string) {
     const allPagsAnexoLista = [];
@@ -2277,62 +1876,54 @@ export class ExportComponent implements OnInit {
       style: 'tableHeaderRed',
     });
 
-    if (this.planta.tipo === 'seguidores') {
-      this.allElements = this.allElements.sort(this.downloadReportService.sortByGlobalCoords);
+    this.allAnomalias = this.allAnomalias.sort((a, b) => this.downloadReportService.sortByPosition(a, b));
+
+    let nombreCol = '';
+    this.planta.nombreGlobalCoords.forEach((nombre, index, nombres) => {
+      nombreCol.concat(nombre);
+      // a ultimo no se lo añadimos
+      if (index < nombres.length - 1) {
+        nombreCol.concat(this.plantaService.getGlobalsConector());
+      }
+    });
+
+    nombreCol = this.translation.t(nombreCol);
+
+    cabecera.push({
+      text: nombreCol,
+      style: 'tableHeaderRed',
+      noWrap: true,
+    });
+
+    for (const c of this.columnasAnomalia) {
       cabecera.push({
-        text: this.translation.t('Seguidor'),
-        style: 'tableHeaderRed',
-        noWrap: true,
-      });
-    } else {
-      this.allElements = this.allElements.sort((a, b) => this.downloadReportService.sortByPosition(a, b));
-
-      let nombreCol = '';
-      this.planta.nombreGlobalCoords.forEach((nombre, index, nombres) => {
-        nombreCol.concat(nombre);
-        // a ultimo no se lo añadimos
-        if (index < nombres.length - 1) {
-          nombreCol.concat(this.plantaService.getGlobalsConector());
-        }
-      });
-
-      nombreCol = this.translation.t(nombreCol);
-
-      cabecera.push({
-        text: nombreCol,
-        style: 'tableHeaderRed',
-        noWrap: true,
-      });
-    }
-
-    for (const c of this.currentFilteredColumnas) {
-      cabecera.push({
-        text: this.translation.t(this.getEncabezadoTablaSeguidor(c)),
+        text: this.translation.t('Hola'),
+        // text: this.translation.t(this.getEncabezadoTablaSeguidor(c)),
         style: 'tableHeaderRed',
       });
     }
 
     // Body
     const body = [];
-    let contadorElems = 0;
-    const totalElems = this.allElements.length;
-    for (const elem of this.allElements) {
-      contadorElems += 1;
+    let contadorAnoms = 0;
+    const totalAnoms = this.allAnomalias.length;
+    for (const anom of this.allAnomalias) {
+      contadorAnoms += 1;
 
       const row = [];
       row.push({
-        text: `${contadorElems}/${totalElems}`,
+        text: `${contadorAnoms}/${totalAnoms}`,
         noWrap: true,
         style: 'tableCellAnexo1',
       });
       row.push({
-        text: this.plantaService.getEtiquetaGlobals(elem),
+        text: this.plantaService.getEtiquetaGlobals(anom),
         noWrap: true,
         style: 'tableCellAnexo1',
       });
-      for (let c of this.currentFilteredColumnas) {
+      for (let c of this.columnasAnomalia) {
         row.push({
-          text: this.translation.t(this.getTextoColumnaAnomalia(elem, c.nombre)),
+          text: this.translation.t(this.getTextoColumnaAnomalia(anom, c.nombre)),
           noWrap: true,
           style: 'tableCellAnexo1',
         });
@@ -2369,607 +1960,154 @@ export class ExportComponent implements OnInit {
     return allPagsAnexoLista.concat(tablaAnexo);
   }
 
-  getTextoColumnaAnomalia(elem: FilterableElement, columnaNombre: string): string {
+  compareIrradiancia(a: Anomalia, b: Anomalia) {
+    if (a.irradiancia < b.irradiancia) {
+      return -1;
+    }
+    if (a.irradiancia > b.irradiancia) {
+      return 1;
+    }
+    return 0;
+  }
+
+  private getTextoIrradiancia() {
+    if (this.informe.irradiancia === 0) {
+      return `${this.translation.t(
+        'Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición el equipo ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.'
+      )}`;
+    } else {
+      return `${this.translation.t(
+        'Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de'
+      )} ${this.planta.nombre}, ${this.translation.t(
+        'los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.'
+      )}`;
+    }
+  }
+
+  private capFirstLetter(text: string): string {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  private getTextoLocalizar() {
+    return `${this.translation.t('Además todos ellos tienen asociado los parámetros')} '${this.translation.t(
+      this.plantaService.getNombreGlobalX(this.planta)
+    )}', '${this.translation.t(this.plantaService.getNombreGlobalY(this.planta))}', '${this.translation.t(
+      this.plantaService.getNombreLocalX(this.planta)
+    )}' ${this.translation.t('y')} '${this.translation.t(
+      this.plantaService.getNombreLocalY(this.planta)
+    )}' ${this.translation.t('según el mapa habitual de la planta')}.`;
+  }
+
+  private calificacionMae(mae: number) {
+    if (mae <= 0.1) {
+      return this.translation.t('muy bueno');
+    } else if (mae <= 0.2) {
+      return this.translation.t('correcto');
+    } else {
+      return this.translation.t('mejorable');
+    }
+  }
+
+  private getTextoColumnaAnomalia(anomalia: Anomalia, columnaNombre: string): string {
     if (columnaNombre === 'tipo') {
-      return this.pcDescripcion[elem.tipo];
+      return this.anomTipos[anomalia.tipo];
     } else if (columnaNombre === 'gradienteNormalizado' || columnaNombre === 'temperaturaMax') {
-      return (Math.round(elem[columnaNombre] * 10) / 10).toString().concat(' ºC');
+      return (Math.round(anomalia[columnaNombre] * 10) / 10).toString().concat(' ºC');
     } else if (columnaNombre === 'irradiancia') {
-      return Math.round((elem as Anomalia).irradiancia).toString().concat(' W/m2');
+      return Math.round(anomalia.irradiancia).toString().concat(' W/m2');
     } else if (columnaNombre === 'datetimeString') {
       return this.datePipe
         .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
         .concat(' ')
-        .concat(this.datePipe.transform((elem as Anomalia).datetime * 1000, 'HH:mm:ss'));
+        .concat(this.datePipe.transform(anomalia.datetime * 1000, 'HH:mm:ss'));
     } else if (columnaNombre === 'local_xy') {
-      return this.plantaService.getNumeroModulo(elem as PcInterface).toString();
+      return this.downloadReportService.getPositionModulo(this.planta, anomalia).toString();
     } else if (columnaNombre === 'severidad') {
-      return this.pcService.getPcCoA(elem).toString();
+      return anomalia.clase.toString();
     } else {
-      return elem[columnaNombre];
+      return anomalia[columnaNombre];
     }
   }
 
-  getEncabezadoTablaSeguidor(columna) {
-    if (columna.nombre === 'local_xy') {
-      if (this.planta.hasOwnProperty('etiquetasLocalXY')) {
-        return 'Nº Módulo';
-      }
-    }
-    return columna.descripcion;
-  }
+  //  ###################  CONTENIDO ##################################
 
-  // getPaginaSeguidor(seguidor: SeguidorInterface) {
-  //   // Header
-  //   const cabecera = [];
-  //   let columnasAnexoSeguidor = this.currentFilteredColumnas.filter((col) => {
-  //     return !GLOBAL.columnasAnexoSeguidor.includes(col.nombre);
-  //   });
-  //   if (this.planta.hasOwnProperty('numerosSerie')) {
-  //     if (this.planta.numerosSerie) {
-  //       columnasAnexoSeguidor.push({ nombre: 'numeroSerie', descripcion: 'N/S' });
-  //     }
-  //   }
-
-  //   cabecera.push({
-  //     text: this.translation.t('Número'),
-  //     style: 'tableHeaderRed',
-  //   });
-  //   for (const col of columnasAnexoSeguidor) {
-  //     cabecera.push({
-  //       text: this.translation.t(this.getEncabezadoTablaSeguidor(col)),
-  //       style: 'tableHeaderRed',
-  //     });
-  //   }
-
-  //   // Body
-  //   const body = [];
-  //   let contadorPcs = 0;
-  //   const totalPcsSeguidor = seguidor.pcs.length;
-  //   for (const pc of seguidor.pcs) {
-  //     contadorPcs += 1;
-  //     const row = [];
-  //     row.push({
-  //       text: `${contadorPcs}/${totalPcsSeguidor}`,
-  //       noWrap: true,
-  //       style: 'tableCellAnexo1',
-  //     });
-
-  //     for (const col of columnasAnexoSeguidor) {
-  //       row.push({
-  //         text: this.translation.t(this.getTextoColumnaAnomalia(pc, col.nombre)),
-  //         noWrap: true,
-  //         style: 'tableCellAnexo1',
-  //       });
-  //     }
-  //     body.push(row);
-  //   }
-  //   return [cabecera, body];
-  // }
-
-  writeModulo(pc: Anomalia) {
-    if (!pc.hasOwnProperty('modulo')) {
-      return '-';
-    }
-    const modulo = pc.modulo;
-    let new_row = '';
-    if (modulo !== null) {
-      if (modulo.hasOwnProperty('marca')) {
-        new_row = new_row.concat(modulo['marca'].toString()).concat(' ');
-      }
-      if (modulo.hasOwnProperty('modelo')) {
-        new_row = new_row.concat(modulo['modelo'].toString()).concat(' ');
-      }
-      if (modulo.hasOwnProperty('potencia')) {
-        new_row = new_row.concat('(').concat(modulo['potencia'].toString()).concat(' W)');
-      }
-    }
-
-    return new_row;
-  }
-
-  // getAnexoSeguidores(numAnexo: string) {
-  //   const allPagsAnexo = [];
-  //   // tslint:disable-next-line:max-line-length
-  //   const pag1Anexo = {
-  //     text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
-  //       'Anomalías térmicas por seguidor'
-  //     )}`,
-  //     style: 'h1',
-  //     alignment: 'center',
-  //     pageBreak: 'before',
-  //   };
-
-  //   allPagsAnexo.push(pag1Anexo);
-
-  //   for (const s of this.filteredSeguidores) {
-  //     const table = this.getPaginaSeguidor(s);
-
-  //     const pagAnexo = [
-  //       {
-  //         text: `${this.translation.t('Seguidor')} ${s.nombre}`,
-  //         style: 'h2',
-  //         alignment: 'center',
-  //         pageBreak: 'before',
-  //       },
-
-  //       '\n',
-
-  //       {
-  //         image: `imgSeguidorCanvas${s.nombre}`,
-  //         width: this.widthSeguidor,
-  //         alignment: 'center',
-  //       },
-
-  //       '\n',
-
-  //       {
-  //         columns: [
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-
-  //           {
-  //             width: 'auto',
-  //             table: {
-  //               body: [
-  //                 [
-  //                   {
-  //                     text: this.translation.t('Fecha/Hora'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-
-  //                   {
-  //                     text: this.translation.t('Irradiancia'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-
-  //                   {
-  //                     text: this.translation.t('Temp. aire'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-
-  //                   {
-  //                     text: this.translation.t('Viento'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-
-  //                   {
-  //                     text: this.translation.t('Emisividad'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-
-  //                   {
-  //                     text: this.translation.t('Temp. reflejada'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-  //                   {
-  //                     text: this.translation.t('Módulo'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-  //                 ],
-  //                 [
-  //                   {
-  //                     text: this.datePipe
-  //                       .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
-  //                       .concat(' ')
-  //                       .concat(this.datePipe.transform(s.pcs[0].datetime * 1000, 'HH:mm:ss')),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-
-  //                   {
-  //                     text: Math.round(s.pcs[0].irradiancia).toString().concat(' W/m2'),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-  //                   {
-  //                     text: Math.round(s.pcs[0].temperaturaAire).toString().concat(' ºC'),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-
-  //                   {
-  //                     text: s.pcs[0].viento,
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-
-  //                   {
-  //                     text: s.pcs[0].emisividad,
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-
-  //                   {
-  //                     text: Math.round(s.pcs[0].temperaturaReflejada).toString().concat(' ºC'),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-
-  //                   {
-  //                     text: this.writeModulo(s.pcs[0]),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-  //                 ],
-  //               ],
-  //             },
-  //           },
-
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-  //         ],
-  //       },
-
-  //       '\n',
-
-  //       {
-  //         columns: [
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-  //           {
-  //             width: 'auto',
-  //             table: {
-  //               headerRows: 1,
-  //               body: [table[0]].concat(table[1]),
-  //             },
-  //           },
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-  //         ],
-  //       },
-  //     ];
-
-  //     allPagsAnexo.push(pagAnexo);
-  //   }
-
-  //   return allPagsAnexo;
-  // }
-  
-  // getAnexoSeguidores1eje(numAnexo: string) {
-  //   const allPagsAnexo = [];
-  //   // tslint:disable-next-line:max-line-length
-  //   const pag1Anexo = {
-  //     text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
-  //       'Anomalías térmicas por seguidor'
-  //     )}`,
-  //     style: 'h1',
-  //     alignment: 'center',
-  //     pageBreak: 'before',
-  //   };
-
-  //   allPagsAnexo.push(pag1Anexo);
-
-  //   for (const s of this.filteredSeguidores) {
-  //     const table = this.getPaginaSeguidor(s);
-
-  //     const pagAnexo = [
-  //       {
-  //         text: `${this.translation.t('Seguidor')} ${s.nombre}`,
-  //         style: 'h2',
-  //         alignment: 'center',
-  //         pageBreak: 'before',
-  //       },
-
-  //       '\n',
-
-  //       // Si son segudores de 1 eje, le quitamos la imagen (porque)
-  //       // {
-  //       //   image: `imgSeguidorCanvas${s.nombre}`,
-  //       //   width: this.widthSeguidor,
-  //       //   alignment: 'center'
-  //       // },
-
-  //       // '\n',
-
-  //       {
-  //         columns: [
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-
-  //           {
-  //             width: 'auto',
-  //             table: {
-  //               body: [
-  //                 [
-  //                   {
-  //                     text: this.translation.t('Fecha/Hora'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-
-  //                   {
-  //                     text: this.translation.t('Irradiancia'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-
-  //                   {
-  //                     text: this.translation.t('Temp. aire'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-
-  //                   {
-  //                     text: this.translation.t('Viento'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-
-  //                   {
-  //                     text: this.translation.t('Emisividad'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-
-  //                   {
-  //                     text: this.translation.t('Temp. reflejada'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-  //                   {
-  //                     text: this.translation.t('Módulo'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-  //                 ],
-  //                 [
-  //                   {
-  //                     text: this.datePipe
-  //                       .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
-  //                       .concat(' ')
-  //                       .concat(this.datePipe.transform(s.pcs[0].datetime * 1000, 'HH:mm:ss')),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-
-  //                   {
-  //                     text: Math.round(s.pcs[0].irradiancia).toString().concat(' W/m2'),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-  //                   {
-  //                     text: Math.round(s.pcs[0].temperaturaAire).toString().concat(' ºC'),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-
-  //                   {
-  //                     text: s.pcs[0].viento,
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-
-  //                   {
-  //                     text: s.pcs[0].emisividad,
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-
-  //                   {
-  //                     text: Math.round(s.pcs[0].temperaturaReflejada).toString().concat(' ºC'),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-
-  //                   {
-  //                     text: this.writeModulo(s.pcs[0]),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-  //                 ],
-  //               ],
-  //             },
-  //           },
-
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-  //         ],
-  //       },
-
-  //       '\n',
-
-  //       {
-  //         columns: [
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-  //           {
-  //             width: 'auto',
-  //             table: {
-  //               headerRows: 1,
-  //               body: [table[0]].concat(table[1]),
-  //             },
-  //           },
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-  //         ],
-  //       },
-  //     ];
-
-  //     allPagsAnexo.push(pagAnexo);
-  //   }
-
-  //   return allPagsAnexo;
-  // }
-
-  getDocDefinition(imagesSeguidores) {
-    const pages = this.getPagesPDF();
-    let anexo1 = [];
-    let anexo2 = [];
-    let numAnexo = 'I';
-
-    if (this.filtroApartados.includes('anexo1')) {
-      anexo1 = this.getAnexoLista(numAnexo);
-      numAnexo = 'II';
-    }
-    // if (this.filtroApartados.includes('anexo2')) {
-    //   anexo2 = this.getAnexoSeguidores(numAnexo);
-    // }
-    // if (this.filtroApartados.includes('anexo2b')) {
-    //   anexo2 = this.getAnexoSeguidores1eje(numAnexo);
-    // }
-
-    return {
-      header: (currentPage, pageCount) => {
-        if (currentPage > 1) {
-          return [
+  private getTablaCategoria() {
+    const array = [];
+    for (const i of this.numTipos) {
+      if (this.countCategoria[i - 1] > 0) {
+        array.push(
+          new Array(
             {
-              margin: 10,
-              columns: [
-                {
-                  // usually you would use a dataUri instead of the name for client-side printing
-                  // sampleImage.jpg however works inside playground so you can play with it
-                  margin: [300 - this.widthLogo * this.scaleImgLogoHeader, 0, 0, 0],
-                  image: this.imgLogoBase64,
-                  width: this.scaleImgLogoHeader * this.widthLogo,
-                },
-              ],
+              text: this.translation.t(GLOBAL.pcDescripcion[i]),
             },
-          ];
-        }
-      },
-
-      content: pages.concat(anexo1).concat(anexo2),
-
-      images: imagesSeguidores,
-
-      footer: (currentPage, pageCount) => {
-        if (currentPage > 1) {
-          return [
             {
-              table: {
-                widths: ['*'],
-                body: [
-                  [
-                    {
-                      text: currentPage,
-                      alignment: 'center',
-                      color: 'grey',
-                      margin: [0, 10, 0, 0],
-                    },
-                  ],
-                ],
-              },
-              layout: 'noBorders',
+              text: this.countCategoria[i - 1],
             },
-          ];
-        }
-      },
+            {
+              text:
+                this.decimalPipe
+                  .transform((this.countCategoria[i - 1] / this.allAnomalias.length) * 100, '1.0-1')
+                  .toString() + '%',
+            }
+          )
+        );
+      }
+    }
 
-      styles: {
-        h1: {
-          fontSize: 22,
-          bold: true,
-        },
-        h2: {
-          fontSize: 18,
-          bold: true,
-        },
-        h3: {
-          fontSize: 15,
-          bold: true,
-        },
-        h4: {
-          fontSize: 13,
-          bold: true,
-        },
-        h5: {
-          fontSize: 13,
-          bold: false,
-          decoration: 'underline',
-          margin: [30, 0, 30, 0],
-        },
-        p: {
-          alignment: 'justify',
-          margin: [30, 0, 30, 0],
-        },
-        tableHeaderRed: {
-          alignment: 'center',
-          bold: true,
-          fontSize: 10,
-          fillColor: '#003b73',
-          color: 'white',
-        },
+    return array;
+  }
 
-        tableHeaderImageData: {
-          alignment: 'center',
-          bold: true,
-          fontSize: 10,
-          fillColor: '#4cb6c9',
-        },
+  private getTablaPosicion() {
+    const array = [];
+    const arrayHeader = [];
+    arrayHeader.push({});
 
-        tableCellAnexo1: {
-          alignment: 'center',
-          fontSize: 9,
-        },
+    for (const i of this.arrayColumnas) {
+      arrayHeader.push({
+        text: i.toString(),
+        style: 'tableHeaderRed',
+      });
+    }
 
-        tableHeader: {
-          alignment: 'center',
-          bold: true,
-          fontSize: 13,
-        },
+    array.push(arrayHeader);
 
-        pieFoto: {
-          alignment: 'center',
-          fontSize: 11,
-          italics: true,
-          color: 'gray',
-        },
-        subtitulo: {
-          alignment: 'right',
-          fontSize: 15,
-        },
+    for (const j of this.arrayFilas) {
+      const arrayFila = [];
+      arrayFila.push({
+        text: this.plantaService.getAltura(this.planta, j).toString(),
+        style: 'tableHeaderRed',
+      });
+      const countPosicionFila = this.countPosicion[j - 1];
+      for (const i of this.arrayColumnas) {
+        arrayFila.push({
+          text: countPosicionFila[i - 1].toString(),
+          style: 'tableCell',
+        });
+      }
 
-        table: {
-          alignment: 'center',
-        },
+      array.push(arrayFila);
+    }
 
-        param: {
-          alignment: 'center',
-          bold: true,
-          decoration: 'underline',
-        },
-        tableCell: {
-          alignment: 'center',
-        },
-        mae1: {
-          fillColor: '#559c55',
-          alignment: 'center',
-        },
-        bold: {
-          bold: true,
-        },
-        mae2: {
-          fillColor: '#00a0ea',
-          alignment: 'center',
-        },
-        mae3: {
-          fillColor: '#fdc400',
-          alignment: 'center',
-        },
-        coa1: {
-          color: 'black',
-        },
-        coa2: {
-          color: 'orange',
-        },
-        coa3: {
-          color: 'red',
-        },
-        tableLeft: {
-          bold: true,
-          alignment: 'right',
-        },
-      },
-    };
+    return array;
+  }
+
+  ////////////////////////////////////////////////////
+
+  get countLoadedImages() {
+    return this._countLoadedImages;
+  }
+
+  set countLoadedImages(value: number) {
+    this._countLoadedImages = value;
+    this.countLoadedImages$.next(value);
+  }
+
+  get columnasAnomalia() {
+    return this._columnasAnomalia;
+  }
+
+  set columnasAnomalia(value: any[]) {
+    this._columnasAnomalia = value;
+    this.columnasAnomalia$.next(value);
   }
 }
