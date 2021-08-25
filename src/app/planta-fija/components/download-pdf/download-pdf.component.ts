@@ -1880,10 +1880,10 @@ export class DownloadPdfComponent implements OnInit {
 
     let nombreCol = '';
     this.planta.nombreGlobalCoords.forEach((nombre, index, nombres) => {
-      nombreCol.concat(nombre);
+      nombreCol += nombre;
       // a ultimo no se lo añadimos
       if (index < nombres.length - 1) {
-        nombreCol.concat(this.plantaService.getGlobalsConector());
+        nombreCol += this.plantaService.getGlobalsConector();
       }
     });
 
@@ -1916,7 +1916,7 @@ export class DownloadPdfComponent implements OnInit {
         style: 'tableCellAnexo1',
       });
       row.push({
-        text: this.plantaService.getEtiquetaGlobals(anom),
+        text: this.getGlobalCoordsLabel(anom),
         noWrap: true,
         style: 'tableCellAnexo1',
       });
@@ -2016,6 +2016,51 @@ export class DownloadPdfComponent implements OnInit {
     return columna.descripcion;
   }
 
+  private getLocalId(anomalia: Anomalia): string {
+    const localIdParts: string[] = [];
+    anomalia.globalCoords.forEach((coord) => {
+      if (coord !== undefined && coord !== null && coord !== '') {
+        localIdParts.push(coord);
+      }
+    });
+    if (anomalia.localX !== undefined && anomalia.localX !== null && anomalia.localX > 0) {
+      localIdParts.push(anomalia.localX.toString());
+    }
+    if (anomalia.localY !== undefined && anomalia.localY !== null && anomalia.localY > 0) {
+      localIdParts.push(this.downloadReportService.getAltura(this.planta, anomalia.localY).toString());
+    }
+
+    let localId = '';
+    localIdParts.forEach((part, index, parts) => {
+      localId += part;
+      if (index < parts.length - 1) {
+        localId += '.';
+      }
+    });
+
+    if (localId === '') {
+      localId = '-';
+    }
+
+    return localId;
+  }
+
+  private getGlobalCoordsLabel(anomalia: Anomalia) {
+    let label = '';
+    this.planta.nombreGlobalCoords.forEach((nombre, index, nombres) => {
+      let coord = anomalia.globalCoords[index];
+      if (coord === undefined || coord === null || coord === '') {
+        coord = '-';
+      }
+      label += coord;
+      if (index < nombres.length - 1) {
+        label += '/';
+      }
+    });
+
+    return label;
+  }
+
   //  ###################  CONTENIDO ##################################
 
   private getTextoColumnaAnomalia(anomalia: Anomalia, columnaNombre: string): string {
@@ -2034,6 +2079,8 @@ export class DownloadPdfComponent implements OnInit {
       return this.downloadReportService.getPositionModulo(this.planta, anomalia).toString();
     } else if (columnaNombre === 'severidad') {
       return anomalia.clase.toString();
+    } else if (columnaNombre === 'local_id') {
+      return this.getLocalId(anomalia);
     } else {
       return anomalia[columnaNombre];
     }
