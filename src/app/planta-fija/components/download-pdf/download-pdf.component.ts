@@ -479,17 +479,17 @@ export class DownloadPdfComponent implements OnInit {
   getColumnasAnom(planta: PlantaInterface): any[] {
     const columnasTemp = GLOBAL.columnasAnomPdf;
 
-    const i = columnasTemp.findIndex((e) => e.nombre === 'local_xy');
-    const descripcion = '';
-    planta.nombreGlobalCoords.forEach((nombre, index, nombres) => {
-      descripcion.concat(nombre);
-      // a ultimo no se lo añadimos
-      if (index < nombres.length - 1) {
-        descripcion.concat('/');
-      }
-    });
+    // const i = columnasTemp.findIndex((e) => e.nombre === 'local_xy');
+    // let descripcion = '';
+    // planta.nombreGlobalCoords.forEach((nombre, index, nombres) => {
+    //   descripcion = descripcion.concat(nombre);
+    //   // a ultimo no se lo añadimos
+    //   if (index < nombres.length - 1) {
+    //     descripcion = descripcion.concat('/');
+    //   }
+    // });
 
-    columnasTemp[i].descripcion = descripcion;
+    // columnasTemp[i].descripcion = descripcion;
 
     return columnasTemp;
   }
@@ -2007,6 +2007,17 @@ export class DownloadPdfComponent implements OnInit {
     }
   }
 
+  private getEncabezadoTablaAnomalias(columna: any) {
+    if (columna.nombre === 'local_xy') {
+      if (this.planta.hasOwnProperty('etiquetasLocalXY')) {
+        return 'Nº Módulo';
+      }
+    }
+    return columna.descripcion;
+  }
+
+  //  ###################  CONTENIDO ##################################
+
   private getTextoColumnaAnomalia(anomalia: Anomalia, columnaNombre: string): string {
     if (columnaNombre === 'tipo') {
       return this.anomTipos[anomalia.tipo];
@@ -2027,17 +2038,6 @@ export class DownloadPdfComponent implements OnInit {
       return anomalia[columnaNombre];
     }
   }
-
-  getEncabezadoTablaAnomalias(columna: any) {
-    if (columna.nombre === 'local_xy') {
-      if (this.planta.hasOwnProperty('etiquetasLocalXY')) {
-        return 'Nº Módulo';
-      }
-    }
-    return columna.descripcion;
-  }
-
-  //  ###################  CONTENIDO ##################################
 
   private getTablaCategoria() {
     const array = [];

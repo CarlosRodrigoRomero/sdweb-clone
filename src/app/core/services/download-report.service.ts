@@ -66,7 +66,7 @@ export class DownloadReportService {
       return planta.etiquetasLocalXY[altura][anomalia.localX - 1];
     }
 
-    return (anomalia.localX + '/' + altura).toString();
+    return (altura + '/' + anomalia.localX).toString();
   }
 
   getAltura(planta: PlantaInterface, localY: number) {
