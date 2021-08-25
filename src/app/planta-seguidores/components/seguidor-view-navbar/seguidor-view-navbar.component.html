@@ -23,6 +23,9 @@
       <span class="line-content-title"># anoms</span>
       <span>{{ seguidorSelected.anomaliasCliente.length }}</span>
     </div>
+    <div *ngIf="seguidorSelected.anomaliasCliente.length === 0" class="line-content">
+      <span>Sin anomalías</span>
+    </div>
     <button mat-icon-button class="btn-close-seguidor-view" (click)="closeSidenav()">
       <mat-icon>close</mat-icon>
     </button>
