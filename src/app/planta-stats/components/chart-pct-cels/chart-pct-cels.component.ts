@@ -257,7 +257,7 @@ export class ChartPctCelsComponent implements OnInit, OnDestroy {
       colors: ['#546E7A'],
       dataLabels: {
         enabled: true,
-        formatter: (value) => Math.round(value * 100) / 100 + '%',
+        formatter: (value) => Math.round(value * 100) / 100 + ' ºC',
       },
       markers: {
         size: 1,
@@ -272,7 +272,7 @@ export class ChartPctCelsComponent implements OnInit, OnDestroy {
         labels: {
           minWidth: 10,
           formatter: (value) => {
-            return value + 'ºC';
+            return value + ' ºC';
           },
         },
       },

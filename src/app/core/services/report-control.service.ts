@@ -367,7 +367,7 @@ export class ReportControlService {
         const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
         let cc = 0;
         seguidoresInforme.forEach((seg) => (cc = cc + seg.celsCalientes));
-        informe.cc = cc / seguidores.length;
+        informe.cc = cc / seguidoresInforme.length;
 
         this.informeService.updateInforme(informe);
       }

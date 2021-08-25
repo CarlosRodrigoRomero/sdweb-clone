@@ -22,8 +22,8 @@ export class LeyendaComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.viewsLabels = [
-      ['Bueno', 'En la media', 'Mejorable'],
-      ['Bueno', 'En la media', 'Mejorable'],
+      ['Muy bueno', 'Correcto', 'Mejorable'],
+      ['Muy bueno', 'Correcto', 'Mejorable'],
       ['Leve', 'Medio', 'Grave'],
     ];
 
