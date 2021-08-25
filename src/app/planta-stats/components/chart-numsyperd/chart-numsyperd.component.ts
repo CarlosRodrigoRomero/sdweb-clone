@@ -89,7 +89,7 @@ export class ChartNumsyperdComponent implements OnInit, OnDestroy {
         if (this.reportControlService.plantaFija) {
           this.allAnomalias = elems as Anomalia[];
         } else {
-          (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomalias));
+          (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
         }
 
         this.informesList = informes;
