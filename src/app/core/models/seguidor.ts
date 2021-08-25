@@ -89,8 +89,8 @@ export class Seguidor implements FilterableElement {
 
   private getTempMax(): number {
     let tempMax = 0;
-    if (this.anomalias.length > 0) {
-      const temps = this.anomalias
+    if (this.anomaliasCliente.length > 0) {
+      const temps = this.anomaliasCliente
         .filter((anomalia) => anomalia.temperaturaMax !== undefined)
         .map((anomalia) => anomalia.temperaturaMax);
       if (temps.length > 0) {
@@ -102,8 +102,8 @@ export class Seguidor implements FilterableElement {
 
   private getGradienteNormMax(): number {
     let gradNormMax = 0;
-    if (this.anomalias.length > 0) {
-      const gradientes = this.anomalias
+    if (this.anomaliasCliente.length > 0) {
+      const gradientes = this.anomaliasCliente
         .filter((anomalia) => anomalia.gradienteNormalizado !== undefined)
         .map((anomalia) => anomalia.gradienteNormalizado);
       if (gradientes.length > 0) {
