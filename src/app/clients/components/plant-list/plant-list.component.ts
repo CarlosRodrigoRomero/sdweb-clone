@@ -16,6 +16,7 @@ interface PlantsData {
   potencia: number;
   mae: number;
   ultimaInspeccion: number;
+  informesAntiguos: InformeInterface[];
   plantaId: string;
   tipo: string;
 }
@@ -26,7 +27,15 @@ interface PlantsData {
   styleUrls: ['./plant-list.component.css'],
 })
 export class PlantListComponent implements OnInit, AfterViewInit {
-  public displayedColumns: string[] = ['nombre', 'potencia', 'mae', 'tipo', 'ultimaInspeccion', 'compartir'];
+  public displayedColumns: string[] = [
+    'nombre',
+    'potencia',
+    'mae',
+    'tipo',
+    'ultimaInspeccion',
+    'inspeccionesAntiguas',
+    /* 'compartir', */
+  ];
   public dataSource = new MatTableDataSource<PlantsData>();
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
@@ -50,12 +59,14 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     this.plantas.forEach((planta) => {
       const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
       const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
+      const informesAntiguos = informesPlanta.filter((informe) => informe.id !== informeReciente.id);
 
       plantsData.push({
         nombre: planta.nombre,
         potencia: planta.potencia,
         mae: informeReciente.mae,
         ultimaInspeccion: informeReciente.fecha,
+        informesAntiguos,
         plantaId: planta.id,
         tipo: planta.tipo,
       });
@@ -100,7 +111,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   }
 
   private openSnackBar() {
-    this._snackBar.open('Planta en mantenimiento temporalmente', 'OK', {
+    this._snackBar.open('Acceda a inspecciones antiguasa la derecha en la tabla', '', {
       duration: 5000,
       verticalPosition: 'top',
     });
