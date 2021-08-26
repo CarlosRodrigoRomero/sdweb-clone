@@ -55,60 +55,56 @@ export class PortfolioControlService {
           }
 
           plantas.forEach((planta) => {
+            const informesPlanta = informes.filter((inf) => inf.plantaId === planta.id);
+
+            if (informesPlanta.length > 0) {
+              informesPlanta.forEach((informe) => {
+                // comprobamos que el informe tiene "mae" y que esta "disponible"
+                if (informe.mae !== undefined && informe.mae !== Infinity && informe.disponible === true) {
+                  // añadimos el informe a la lista
+                  this.listaInformes.push(informe);
+
+                  if (!this.listaPlantas.map((pl) => pl.id).includes(planta.id)) {
+                    // añadimos la planta a la lista
+                    this.listaPlantas.push(planta);
+                    // incrementamos conteo de plantas y suma de potencia
+                    this.numPlantas++;
+                    this.potenciaTotal += planta.potencia;
+                  }
+                }
+              });
+            }
+
             // obtenemos la plantas que tiene informes dentro de su interface
             if (planta.informes !== undefined && planta.informes.length > 0) {
-              // comprobamos tb los posibles informes adiccionales fuera del doc planta
-              const informesAdiccionales: InformeInterface[] = informes
-                .filter((informe) => informe.plantaId === planta.id)
-                .filter((informe) => !planta.informes.includes(informe));
+              planta.informes.forEach((informe) => {
+                // comprobamos que no estubiese ya añadido
+                if (!this.listaInformes.map((inf) => inf.id).includes(informe.id)) {
+                  // comprobamos que el informe tiene "mae" y que esta "disponible"
+                  if (informe.mae !== undefined && informe.mae !== Infinity && informe.disponible === true) {
+                    // añadimos el informe a la lista
+                    this.listaInformes.push(informe);
 
-              const informesPlanta = [...informesAdiccionales, ...planta.informes];
-
-              // mostramos solo los informes disponibles
-              const informesDisponibles = informesPlanta.filter((informe) => informe.disponible === true);
-
-              if (informesDisponibles.length > 0) {
-                // seleccionamos el dato de mae mas reciente
-                const mae = informesDisponibles.reduce((prev, current) =>
-                  prev.fecha > current.fecha ? prev : current
-                ).mae;
-
-                // comprobamos que el informe tiene "mae"
-                if (mae !== undefined && mae !== Infinity) {
-                  // añadimos la planta y su mae a las listas
-                  this.listaPlantas.push(planta);
-                  this.maePlantas.push(mae);
-
-                  // añadimos los informes a la lista
-                  informesDisponibles.forEach((informe) => {
-                    if (informe.mae !== undefined) {
-                      this.listaInformes.push(informe);
+                    if (!this.listaPlantas.map((pl) => pl.id).includes(planta.id)) {
+                      // añadimos la planta si no estaba ya añadida
+                      this.listaPlantas.push(planta);
+                      // incrementamos conteo de plantas y suma de potencia
+                      this.numPlantas++;
+                      this.potenciaTotal += planta.potencia;
                     }
-                  });
-
-                  // incrementamos conteo de plantas y suma de potencia
-                  this.numPlantas++;
-                  this.potenciaTotal += planta.potencia;
+                  }
                 }
-              }
-              // añadimos tb aquellas plantas que tienen informes pero no estan incluidos dentro de su interface
-            } else if (informes.map((inf) => inf.plantaId).includes(planta.id)) {
-              const informe = informes.find((inf) => inf.plantaId === planta.id);
-
-              // comprobamos que el informe tiene "mae" y que esta "disponible"
-              if (informe.mae !== undefined && informe.mae !== Infinity && informe.disponible === true) {
-                // añadimos el informe a la lista
-                this.listaInformes.push(informe);
-
-                // añadimos la planta y su mae a las listas
-                this.listaPlantas.push(planta);
-                this.maePlantas.push(informe.mae);
-
-                // incrementamos conteo de plantas y suma de potencia
-                this.numPlantas++;
-                this.potenciaTotal += planta.potencia;
-              }
+              });
             }
+          });
+
+          this.listaPlantas.forEach((planta) => {
+            const informesPlanta = this.listaInformes.filter((inf) => inf.plantaId === planta.id);
+            const informeReciente = informesPlanta.reduce((prev, current) =>
+              prev.fecha > current.fecha ? prev : current
+            );
+            // añadimos el mae del informe mas reciente de cada planta
+            this.maePlantas.push(informeReciente.mae);
           });
 
           this.maeMedio = this.average(this.maePlantas);
