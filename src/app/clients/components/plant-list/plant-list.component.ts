@@ -114,6 +114,10 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     }
   }
 
+  navigateOldReport(informeId: string) {
+    this.router.navigate(['clientes/informe-view/' + informeId + '/informe-overview']);
+  }
+
   private openSnackBar() {
     this._snackBar.open('Acceda a inspecciones antiguas a la derecha en la tabla', '', {
       duration: 5000,

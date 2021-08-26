@@ -57,9 +57,7 @@
               </button>
               <mat-menu #menu="matMenu" class="menu">
                 <button mat-menu-item *ngFor="let item of row.informesAntiguos">
-                  <span [routerLink]="['clientes/informe-view', item.id, 'informe-overview']">{{
-                    item.fecha * 1000 | date: 'dd/MM/yyyy'
-                  }}</span>
+                  <span (click)="navigateOldReport(item.id)">{{ item.fecha * 1000 | date: 'dd/MM/yyyy' }}</span>
                 </button>
               </mat-menu>
             </td>
