@@ -59,7 +59,11 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     this.plantas.forEach((planta) => {
       const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
       const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
-      const informesAntiguos = informesPlanta.filter((informe) => informe.id !== informeReciente.id);
+
+      let informesAntiguos: InformeInterface[] = [];
+      if (planta.tipo !== 'seguidores') {
+        informesAntiguos = informesPlanta.filter((informe) => informe.fecha < 1619820000);
+      }
 
       plantsData.push({
         nombre: planta.nombre,
@@ -111,7 +115,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   }
 
   private openSnackBar() {
-    this._snackBar.open('Acceda a inspecciones antiguasa la derecha en la tabla', '', {
+    this._snackBar.open('Acceda a inspecciones antiguas a la derecha en la tabla', '', {
       duration: 5000,
       verticalPosition: 'top',
     });
