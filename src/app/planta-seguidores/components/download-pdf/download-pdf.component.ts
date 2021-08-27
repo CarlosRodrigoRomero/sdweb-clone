@@ -530,14 +530,10 @@ export class DownloadPdfComponent implements OnInit {
 
     // Calcular las alturas
     for (const y of this.arrayFilas) {
-      const countColumnas = Array();
+      const countColumnas: number[] = [];
       for (const x of this.arrayColumnas) {
-        this.allSeguidores.forEach((seguidor) => {
-          const anomaliasSeguidor = seguidor.anomaliasCliente;
-          if (anomaliasSeguidor.length > 0) {
-            countColumnas.push(anomaliasSeguidor.filter((anom) => anom.localX === x && anom.localY === y).length);
-          }
-        });
+        // tslint:disable-next-line: triple-equals
+        countColumnas.push(this.allAnomalias.filter((anom) => anom.localX == x && anom.localY == y).length);
       }
       this.countPosicion.push(countColumnas);
     }
