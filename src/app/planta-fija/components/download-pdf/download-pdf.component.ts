@@ -444,7 +444,7 @@ export class DownloadPdfComponent implements OnInit {
     let filtroCategoria;
     let filtroCategoriaClase;
     for (const cat of this.numTipos) {
-      filtroCategoria = this.allAnomalias.filter((pc) => pc.tipo === cat);
+      filtroCategoria = this.allAnomalias.filter((anom) => anom.tipo === cat);
       this.countCategoria.push(filtroCategoria.length);
 
       const count1 = Array();
@@ -476,7 +476,7 @@ export class DownloadPdfComponent implements OnInit {
     this.dataSource = new MatTableDataSource(this.countCategoriaClase);
   }
 
-  getColumnasAnom(planta: PlantaInterface): any[] {
+  private getColumnasAnom(planta: PlantaInterface): any[] {
     const columnasTemp = GLOBAL.columnasAnomPdf;
 
     // const i = columnasTemp.findIndex((e) => e.nombre === 'local_xy');
@@ -1214,7 +1214,7 @@ export class DownloadPdfComponent implements OnInit {
 
         {
           text: this.translation.t(
-            'La temperatura reflejada nos depende de la atmosfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura reflejada medida es:'
+            'La temperatura reflejada no depende de la atmosfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura reflejada medida es:'
           ),
           style: 'p',
         },
