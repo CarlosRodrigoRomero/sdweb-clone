@@ -84,6 +84,7 @@ export class InformeService {
       )
     );
   }
+
   getInformesDePlanta(plantaId: string): Observable<InformeInterface[]> {
     const query$ = this.afs.collection<InformeInterface>('informes', (ref) => ref.where('plantaId', '==', plantaId));
     return query$.snapshotChanges().pipe(
@@ -119,6 +120,11 @@ export class InformeService {
         }
       })
     ));
+  }
+
+  getOnlyNewInfomesFijas(informes: InformeInterface[]) {
+    // solo permitimos los informes nuevos en fijas, exluyendo el informe DEMO
+    return informes.filter((informe) => informe.fecha > 1619820000 || informe.plantaId === 'egF0cbpXnnBnjcrusoeR');
   }
 
   getFileList(carpeta: string): Observable<any> {
