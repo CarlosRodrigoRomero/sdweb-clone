@@ -133,7 +133,7 @@ export class StructuresService {
     this.confianzaStdDev = this.standardDeviation(confianzas);
   }
 
-  private average(values) {
+  private average(values: number[]): number {
     const sum = values.reduce((s, value) => s + value, 0);
 
     const avg = sum / values.length;
@@ -141,10 +141,20 @@ export class StructuresService {
     return avg;
   }
 
-  private standardDeviation(values) {
+  private standardDeviation(values: number[]): number {
     const n = values.length;
     const mean = values.reduce((a, b) => a + b) / n;
     return Math.sqrt(values.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+  }
+
+  private DAM(values: number[], average: number): number {
+    // desviacion media absoluta, para que no afectanten los extremos a la desviacion
+    let sumatorioDesviaciones = 0;
+    values.forEach((value) => {
+      sumatorioDesviaciones = sumatorioDesviaciones + Math.abs(value - average);
+    });
+
+    return sumatorioDesviaciones / values.length;
   }
 
   getModulosBrutos(): Observable<RawModule[]> {
