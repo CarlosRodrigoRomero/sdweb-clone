@@ -6,7 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { AngularFireStorage } from '@angular/fire/storage';
 
 import { BehaviorSubject, Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import pdfMake from 'pdfmake/build/pdfmake.js';
 
@@ -56,8 +56,8 @@ export class DownloadPdfComponent implements OnInit {
   countLoadedImages$ = new BehaviorSubject<number>(this._countLoadedImages);
   private countSeguidores: number;
   private progresoPDF: string;
-  private allSeguidores: Seguidor[];
-  private allAnomalias: Anomalia[] = [];
+  private seguidoresInforme: Seguidor[];
+  private anomaliasInforme: Anomalia[] = [];
   private planta: PlantaInterface;
   private informe: InformeInterface;
   private translation: Translation;
@@ -128,33 +128,43 @@ export class DownloadPdfComponent implements OnInit {
 
     this.plantaService
       .getPlanta(this.reportControlService.plantaId)
-      .pipe(take(1))
-      .subscribe((planta) => {
-        this.planta = planta;
+      .pipe(
+        take(1),
+        switchMap((planta) => {
+          this.planta = planta;
 
-        this.plantaService.planta = planta;
+          this.plantaService.planta = planta;
 
-        this.columnasAnomalia = this.getColumnasAnom(this.planta);
+          this.columnasAnomalia = this.getColumnasAnom(this.planta);
 
-        this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
+          this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
 
-        this.arrayFilas = Array(this.planta.filas)
-          .fill(0)
-          .map((_, i) => i + 1);
-        this.arrayColumnas = Array(this.planta.columnas)
-          .fill(0)
-          .map((_, i) => i + 1);
+          this.arrayFilas = Array(this.planta.filas)
+            .fill(0)
+            .map((_, i) => i + 1);
+          this.arrayColumnas = Array(this.planta.columnas)
+            .fill(0)
+            .map((_, i) => i + 1);
 
-        this.allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
+          return this.reportControlService.selectedInformeId$;
+        })
+      )
+      .subscribe((informeId) => {
+        this.informe = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
-        this.allSeguidores.forEach((seguidor) => {
+        const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
+        this.seguidoresInforme = allSeguidores.filter((seg) => seg.informeId === informeId);
+        // los ordenamos por globalCoords
+        this.seguidoresInforme = this.seguidoresInforme.sort(this.downloadReportService.sortByGlobalCoords);
+
+        this.seguidoresInforme.forEach((seguidor) => {
           const anomaliasSeguidor = seguidor.anomaliasCliente;
           if (anomaliasSeguidor.length > 0) {
-            this.allAnomalias.push(...anomaliasSeguidor);
+            this.anomaliasInforme.push(...anomaliasSeguidor);
           }
         });
 
-        this.calcularInforme();
+        // this.calcularInforme();
 
         this.irradianciaImg$ = this.storage.ref(`informes/${this.informe.id}/irradiancia.png`).getDownloadURL();
         this.suciedadImg$ = this.storage.ref(`informes/${this.informe.id}/suciedad.jpg`).getDownloadURL();
@@ -354,9 +364,9 @@ export class DownloadPdfComponent implements OnInit {
               elegible: true,
             }
           );
-          const fecha_informe = new Date(this.informe.fecha * 1000);
+          const fechaInforme = new Date(this.informe.fecha * 1000);
 
-          if (fecha_informe.getFullYear() >= 2020) {
+          if (fechaInforme.getFullYear() >= 2020) {
             this.apartadosInforme.push({
               nombre: 'anexo3',
               descripcion: 'Anexo III: Seguidores sin anomalías',
@@ -398,10 +408,6 @@ export class DownloadPdfComponent implements OnInit {
         this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
       });
 
-    this.informe = this.reportControlService.informes.find(
-      (informe) => this.reportControlService.selectedInformeId === informe.id
-    );
-
     this.progresoPDF = '0';
     this.widthLogo = 200;
     this.widthPortada = 600; // =600 es el ancho de pagina completo
@@ -423,19 +429,6 @@ export class DownloadPdfComponent implements OnInit {
 
     // gradiente minimo del criterio
     this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
-
-    // Obtener pcs vista previa
-    // this.filteredPcs$.subscribe((pcs) => {
-    //   this.filteredPcsVistaPrevia = pcs.slice(0, 20);
-    //   this.filteredPcs = pcs;
-    //   this.currentFiltroGradiente = this.pcService.currentFiltroGradiente;
-    //   this.calcularInforme();
-    // });
-    // Ordenar Pcs por seguidor:
-    // this.pcService.filteredSeguidores$.subscribe((seguidores) => {
-    //   this.filteredSeguidores = seguidores;
-    //   this.filteredSeguidoresVistaPrevia = seguidores.slice(0, 3);
-    // });
 
     fabric.util.loadImage(
       '../../../assets/images/maeCurva.png',
@@ -479,26 +472,22 @@ export class DownloadPdfComponent implements OnInit {
     this.countLoadedImages = 0;
     this.countSeguidores = 1;
 
-    this.reportControlService.allFilterableElements$.pipe(take(1)).subscribe((elems) => {
-      this.allSeguidores = elems.sort(this.downloadReportService.sortByGlobalCoords) as Seguidor[];
-
-      this.allSeguidores.forEach((seguidor) => {
-        // const canvas = $(`canvas[id="imgSeguidorCanvas${seguidor.nombre}"]`)[0] as HTMLCanvasElement;
-        const canvas = document.createElement('canvas');
-        canvas.id = `imgSeguidorCanvas${seguidor.nombre}`;
-        imageListBase64[`imgSeguidorCanvas${seguidor.nombre}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
-        this.progresoPDF = this.decimalPipe.transform((100 * this.countLoadedImages) / this.countSeguidores, '1.0-0');
-      });
-
-      this.calcularInforme();
-
-      pdfMake.createPdf(this.getDocDefinition(imageListBase64)).download(this.informe.prefijo.concat('informe'));
-      this.generandoPDF = false;
+    this.seguidoresInforme.forEach((seguidor) => {
+      // const canvas = $(`canvas[id="imgSeguidorCanvas${seguidor.nombre}"]`)[0] as HTMLCanvasElement;
+      const canvas = document.createElement('canvas');
+      canvas.id = `imgSeguidorCanvas${seguidor.nombre}`;
+      imageListBase64[`imgSeguidorCanvas${seguidor.nombre}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+      this.progresoPDF = this.decimalPipe.transform((100 * this.countLoadedImages) / this.countSeguidores, '1.0-0');
     });
+
+    this.calcularInforme();
+
+    pdfMake.createPdf(this.getDocDefinition(imageListBase64)).download(this.informe.prefijo.concat('informe'));
+    this.generandoPDF = false;
 
     // Generar imagenes
     this.countSeguidores = 0;
-    for (const seguidor of this.allSeguidores) {
+    for (const seguidor of this.seguidoresInforme) {
       this.setImgSeguidorCanvas(seguidor, false, 'jpg');
       this.countSeguidores++;
     }
@@ -514,7 +503,7 @@ export class DownloadPdfComponent implements OnInit {
     this.informeCalculado = false;
 
     const irradiancias: number[] = [];
-    this.allSeguidores.forEach((seguidor) => {
+    this.seguidoresInforme.forEach((seguidor) => {
       if (seguidor.anomaliasCliente.length > 0) {
         seguidor.anomaliasCliente.forEach((anom) => irradiancias.push(anom.irradiancia));
       }
@@ -533,7 +522,7 @@ export class DownloadPdfComponent implements OnInit {
       const countColumnas: number[] = [];
       for (const x of this.arrayColumnas) {
         // tslint:disable-next-line: triple-equals
-        countColumnas.push(this.allAnomalias.filter((anom) => anom.localX == x && anom.localY == y).length);
+        countColumnas.push(this.anomaliasInforme.filter((anom) => anom.localX == x && anom.localY == y).length);
       }
       this.countPosicion.push(countColumnas);
     }
@@ -542,14 +531,14 @@ export class DownloadPdfComponent implements OnInit {
     const filtroCategoriaClase = [];
     for (const tipo of this.numTipos) {
       // tslint:disable-next-line: triple-equals
-      const anomsTipo = this.allAnomalias.filter((anom) => anom.tipo == tipo);
+      const anomsTipo = this.anomaliasInforme.filter((anom) => anom.tipo == tipo);
 
       this.countCategoria.push(anomsTipo.length);
 
       let count1 = Array();
       for (const clas of this.numClases) {
         // tslint:disable-next-line: triple-equals
-        const anomsClase = this.allAnomalias.filter((anom) => anom.clase == clas);
+        const anomsClase = this.anomaliasInforme.filter((anom) => anom.clase == clas);
 
         count1.push(anomsClase.length);
       }
@@ -568,7 +557,7 @@ export class DownloadPdfComponent implements OnInit {
     // CLASES //
     const filtroClase = [];
     for (const j of this.numClases) {
-      this.allSeguidores.forEach((seguidor) => {
+      this.seguidoresInforme.forEach((seguidor) => {
         const anomaliasSeguidor = seguidor.anomaliasCliente;
         if (anomaliasSeguidor.length > 0) {
           filtroClase.push(anomaliasSeguidor.filter((anom) => anom.clase === j));
@@ -757,7 +746,6 @@ export class DownloadPdfComponent implements OnInit {
   private setImgSeguidorCanvas(seguidor: Seguidor, vistaPrevia: boolean = false, folder?: string) {
     const anomaliasSeguidor = seguidor.anomaliasCliente;
 
-    const maxImagesPerPage = 2;
     const separacionImagenes = 2; //en pixeles
 
     const scale = 1;
@@ -767,8 +755,9 @@ export class DownloadPdfComponent implements OnInit {
     canvas.backgroundColor = 'white';
 
     const imagesWidth = GLOBAL.resolucionCamara[1];
-    const left0 = GLOBAL.resolucionCamara[1] / 2 - imagesWidth / 2;
-    let loadedImages = 0;
+    const left0 = 0;
+    // const left0 = GLOBAL.resolucionCamara[1] / 2 - imagesWidth / 2;
+    let imageLoaded = false;
 
     const imageName = seguidor.imageName;
 
@@ -779,12 +768,11 @@ export class DownloadPdfComponent implements OnInit {
     // Obtenemos la URL y descargamos el archivo capturando los posibles errores
     imageRef
       .getDownloadURL()
-      .pipe(take(1))
-      .subscribe((url) => {
+      .toPromise()
+      .then((url) => {
         fabric.Image.fromURL(
           url,
           (img) => {
-            loadedImages++;
             // const top0 = (index - 1) * (GLOBAL.resolucionCamara[0] / numImagesSeguidor + separacionImagenes);
             const top0 = 0;
 
@@ -798,11 +786,9 @@ export class DownloadPdfComponent implements OnInit {
             });
 
             canvas.add(img);
-            this.drawAllPcsInCanvas(anomaliasSeguidor, canvas, vistaPrevia, scale, top0, left0);
+            this.drawAllPcsInCanvas(anomaliasSeguidor as PcInterface[], canvas, vistaPrevia, scale, top0, left0);
 
-            if (!vistaPrevia && loadedImages === 1) {
-              this.countLoadedImages++;
-            }
+            this.countLoadedImages++;
           },
           { crossOrigin: 'Anonymous' }
         );
@@ -810,10 +796,14 @@ export class DownloadPdfComponent implements OnInit {
   }
 
   private drawAllPcsInCanvas(pcs: PcInterface[], canvas, vistaPrevia: boolean = false, scale = 1, top0 = 0, left0 = 0) {
-    pcs.forEach((pc, i, a) => {
-      this.drawPc(pc, canvas, scale, top0, left0);
-      // this.drawTriangle(pc, canvas, scale, top0, left0);
-    });
+    if (pcs.length > 0) {
+      pcs.forEach((pc, i, a) => {
+        this.drawPc(pc, canvas, scale, top0, left0);
+        // this.drawTriangle(pc, canvas, scale, top0, left0);
+      });
+    } else {
+      canvas.renderAll();
+    }
   }
 
   private drawPc(pc: PcInterface, canvas: any, scale = 1, top0 = 0, left0 = 0) {
@@ -1832,7 +1822,7 @@ export class DownloadPdfComponent implements OnInit {
                         style: 'bold',
                       },
                       {
-                        text: this.allAnomalias.length.toString(),
+                        text: this.anomaliasInforme.length.toString(),
                         style: 'bold',
                       },
                       {
@@ -1857,13 +1847,13 @@ export class DownloadPdfComponent implements OnInit {
 
     const resultadosSeguidor = (index: string) => {
       const numAnomaliasMedia = new Intl.NumberFormat('en-IN', { maximumSignificantDigits: 2 }).format(
-        this.allAnomalias.length / this.allSeguidores.length
+        this.anomaliasInforme.length / this.seguidoresInforme.length
       );
       let numeroSeguidores = 0;
       let porcentajeSeguidores = 0;
       if (this.planta.hasOwnProperty('numeroSeguidores')) {
-        numeroSeguidores = this.allSeguidores.length;
-        porcentajeSeguidores = (this.allSeguidores.length / numeroSeguidores) * 100;
+        numeroSeguidores = this.seguidoresInforme.length;
+        porcentajeSeguidores = (this.seguidoresInforme.length / numeroSeguidores) * 100;
       }
       return [
         {
@@ -1873,7 +1863,7 @@ export class DownloadPdfComponent implements OnInit {
 
         '\n',
         `${this.translation.t('El número de seguidores afectados por anomalías térmicas es')} ${
-          this.allSeguidores.length
+          this.seguidoresInforme.length
         }${
           numeroSeguidores === 0 ? '. ' : `/${numeroSeguidores} (${porcentajeSeguidores.toFixed(2)}%). `
         } ${this.translation.t(
@@ -1965,7 +1955,9 @@ export class DownloadPdfComponent implements OnInit {
         '\n',
 
         {
-          text: `MAE = ∆PR / PR = ${this.informe.mae} % (${this.calificacionMae(this.informe.mae)})`,
+          text: `MAE = ∆PR / PR = ${this.decimalPipe.transform(this.informe.mae, '1.0-2')}% (${this.calificacionMae(
+            this.informe.mae
+          )})`,
           style: 'param',
         },
 
@@ -1978,7 +1970,7 @@ export class DownloadPdfComponent implements OnInit {
               'dd/MM/yyyy'
             )}) ${this.translation.t('es')} `,
             {
-              text: `${this.informe.mae} %`,
+              text: `${this.decimalPipe.transform(this.informe.mae, '1.0-2')}%`,
               style: 'bold',
             },
             ' ',
@@ -2137,7 +2129,7 @@ export class DownloadPdfComponent implements OnInit {
       style: 'tableHeaderBlue',
     });
 
-    this.allAnomalias = this.allAnomalias.sort(this.downloadReportService.sortByGlobalCoords);
+    this.anomaliasInforme = this.anomaliasInforme.sort(this.downloadReportService.sortByGlobalCoords);
     cabecera.push({
       text: this.translation.t('Seguidor'),
       style: 'tableHeaderBlue',
@@ -2154,8 +2146,8 @@ export class DownloadPdfComponent implements OnInit {
     // Body
     const body = [];
     let contadorAnoms = 0;
-    const totalAnoms = this.allAnomalias.length;
-    for (const anom of this.allAnomalias) {
+    const totalAnoms = this.anomaliasInforme.length;
+    for (const anom of this.anomaliasInforme) {
       contadorAnoms += 1;
 
       const row = [];
@@ -2222,7 +2214,7 @@ export class DownloadPdfComponent implements OnInit {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (const seg of this.allSeguidores) {
+    for (const seg of this.seguidoresInforme) {
       const table = this.getPaginaSeguidor(seg);
 
       if (seg.anomaliasCliente.length > 0) {
@@ -2394,7 +2386,7 @@ export class DownloadPdfComponent implements OnInit {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (const s of this.allSeguidores) {
+    for (const s of this.seguidoresInforme) {
       const table = this.getPaginaSeguidor(s);
 
       const pagAnexo = [
@@ -2677,7 +2669,7 @@ export class DownloadPdfComponent implements OnInit {
             {
               text:
                 this.decimalPipe
-                  .transform((this.countCategoria[i - 1] / this.allAnomalias.length) * 100, '1.0-1')
+                  .transform((this.countCategoria[i - 1] / this.anomaliasInforme.length) * 100, '1.0-1')
                   .toString() + ' %',
             }
           )
