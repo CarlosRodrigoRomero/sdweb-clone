@@ -202,7 +202,13 @@ export class SeguidorService {
   }
 
   private getImageName(seguidor: Seguidor, informe: InformeInterface): string {
-    const anomalia = seguidor.anomalias[0];
+    let anomalia;
+    if (seguidor.anomaliasCliente.length > 0) {
+      anomalia = seguidor.anomaliasCliente[0];
+    } else {
+      anomalia = seguidor.anomalias[0];
+    }
+
     if (anomalia !== undefined) {
       let imageName: string;
 
