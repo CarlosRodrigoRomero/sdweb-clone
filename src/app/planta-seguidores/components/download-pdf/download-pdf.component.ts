@@ -54,9 +54,12 @@ export class DownloadPdfComponent implements OnInit {
   private generandoPDF = false;
   private _countLoadedImages = 0;
   countLoadedImages$ = new BehaviorSubject<number>(this._countLoadedImages);
+  private _loadedImages = undefined;
+  loadedImages$ = new BehaviorSubject<string>(this._loadedImages);
   private countSeguidores: number;
   private progresoPDF: string;
-  private seguidoresInforme: Seguidor[];
+  seguidoresInforme: Seguidor[] = [];
+  seguidoresInforme$ = new BehaviorSubject<Seguidor[]>(this.seguidoresInforme);
   private anomaliasInforme: Anomalia[] = [];
   private planta: PlantaInterface;
   private informe: InformeInterface;
@@ -107,6 +110,7 @@ export class DownloadPdfComponent implements OnInit {
   private currentFiltroGradiente: number;
   private widthSeguidor: number;
   private hasUserArea: boolean;
+  seguidoresLoaded = false;
 
   constructor(
     private decimalPipe: DecimalPipe,
@@ -156,6 +160,12 @@ export class DownloadPdfComponent implements OnInit {
         this.seguidoresInforme = allSeguidores.filter((seg) => seg.informeId === informeId);
         // los ordenamos por globalCoords
         this.seguidoresInforme = this.seguidoresInforme.sort(this.downloadReportService.sortByGlobalCoords);
+
+        this.seguidoresInforme$.next(this.seguidoresInforme);
+
+        if (this.seguidoresInforme.length > 0) {
+          this.seguidoresLoaded = true;
+        }
 
         this.seguidoresInforme.forEach((seguidor) => {
           const anomaliasSeguidor = seguidor.anomaliasCliente;
@@ -472,18 +482,32 @@ export class DownloadPdfComponent implements OnInit {
     this.countLoadedImages = 0;
     this.countSeguidores = 1;
 
-    this.seguidoresInforme.forEach((seguidor) => {
-      // const canvas = $(`canvas[id="imgSeguidorCanvas${seguidor.nombre}"]`)[0] as HTMLCanvasElement;
-      const canvas = document.createElement('canvas');
-      canvas.id = `imgSeguidorCanvas${seguidor.nombre}`;
-      imageListBase64[`imgSeguidorCanvas${seguidor.nombre}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
-      this.progresoPDF = this.decimalPipe.transform((100 * this.countLoadedImages) / this.countSeguidores, '1.0-0');
+    this.loadedImages$.subscribe((nombreSeguidor) => {
+      if (nombreSeguidor !== null && nombreSeguidor !== undefined) {
+        // const canvas = $(`canvas[id="imgSeguidorCanvas${nombreSeguidor}"]`)[0] as HTMLCanvasElement;
+
+        const canvas = document.createElement('canvas');
+        canvas.id = `imgSeguidorCanvas${nombreSeguidor}`;
+
+        // const canvas = document.getElementById(`imgSeguidorCanvas${nombreSeguidor}`) as HTMLCanvasElement;
+
+        // if (canvas !== undefined) {
+        imageListBase64[`imgSeguidorCanvas${nombreSeguidor}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        // } else {
+        //   imageListBase64[`imgSeguidorCanvas${nombreSeguidor}`] = null;
+        // }
+
+        this.progresoPDF = this.decimalPipe.transform((100 * this.countLoadedImages) / this.countSeguidores, '1.0-0');
+
+        // Cuando se carguen todas las imágenes
+        if (this.countLoadedImages === this.countSeguidores) {
+          this.calcularInforme();
+
+          pdfMake.createPdf(this.getDocDefinition(imageListBase64)).download(this.informe.prefijo.concat('informe'));
+          this.generandoPDF = false;
+        }
+      }
     });
-
-    this.calcularInforme();
-
-    pdfMake.createPdf(this.getDocDefinition(imageListBase64)).download(this.informe.prefijo.concat('informe'));
-    this.generandoPDF = false;
 
     // Generar imagenes
     this.countSeguidores = 0;
@@ -751,7 +775,7 @@ export class DownloadPdfComponent implements OnInit {
     const scale = 1;
 
     const canvas = new fabric.Canvas(`imgSeguidorCanvas${seguidor.nombre}`);
-    canvas.height = canvas.height + separacionImagenes;
+    canvas.height = canvas.height;
     canvas.backgroundColor = 'white';
 
     const imagesWidth = GLOBAL.resolucionCamara[1];
@@ -773,6 +797,7 @@ export class DownloadPdfComponent implements OnInit {
         fabric.Image.fromURL(
           url,
           (img) => {
+            imageLoaded = true;
             // const top0 = (index - 1) * (GLOBAL.resolucionCamara[0] / numImagesSeguidor + separacionImagenes);
             const top0 = 0;
 
@@ -788,10 +813,39 @@ export class DownloadPdfComponent implements OnInit {
             canvas.add(img);
             this.drawAllPcsInCanvas(anomaliasSeguidor as PcInterface[], canvas, vistaPrevia, scale, top0, left0);
 
-            this.countLoadedImages++;
+            if (imageLoaded) {
+              this.countLoadedImages++;
+
+              this.loadedImages = seguidor.nombre;
+            }
           },
           { crossOrigin: 'Anonymous' }
         );
+      })
+      .catch((error) => {
+        imageLoaded = true;
+
+        this.countLoadedImages++;
+
+        this.loadedImages = seguidor.nombre;
+
+        switch (error.code) {
+          case 'storage/object-not-found':
+            console.log("File doesn't exist");
+            break;
+
+          case 'storage/unauthorized':
+            console.log("User doesn't have permission to access the object");
+            break;
+
+          case 'storage/canceled':
+            console.log('User canceled the upload');
+            break;
+
+          case 'storage/unknown':
+            console.log('Unknown error occurred, inspect the server response');
+            break;
+        }
       });
   }
 
@@ -2809,5 +2863,14 @@ export class DownloadPdfComponent implements OnInit {
   set columnasAnomalia(value: any[]) {
     this._columnasAnomalia = value;
     this.columnasAnomalia$.next(value);
+  }
+
+  get loadedImages() {
+    return this._loadedImages;
+  }
+
+  set loadedImages(value: string) {
+    this._loadedImages = value;
+    this.loadedImages$.next(value);
   }
 }

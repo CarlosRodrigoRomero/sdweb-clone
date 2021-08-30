@@ -2,3 +2,11 @@
   <mat-icon>picture_as_pdf</mat-icon>
   <span class="label">PDF</span>
 </button>
+
+<div style="display: none">
+  <ng-container *ngFor="let seguidor of seguidoresInforme$ | async">
+    <div class="hiddenCanvas">
+      <canvas id="imgSeguidorCanvas{{ seguidor.nombre }}" width="640" height="512"> </canvas>
+    </div>
+  </ng-container>
+</div>

@@ -670,30 +670,30 @@ export class ExportComponent implements OnInit {
           });
       });
     } else {
-      // this.countLoadedImages$.subscribe((nombreSeguidor) => {
-      //   if (nombreSeguidor !== null) {
-      //     const canvas = $(`canvas[id="imgSeguidorCanvas${nombreSeguidor}"]`)[0] as HTMLCanvasElement;
-      //     imageListBase64[`imgSeguidorCanvas${nombreSeguidor}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
-      //     this.progresoPDF = this.decimalPipe.transform((100 * this.countLoadedImages) / this.countSeguidores, '1.0-0');
-      //     // Cuando se carguen todas las imágenes
-      //     if (this.countLoadedImages === this.countSeguidores) {
-      //       this.pcService.currentFilteredPcs$.pipe(take(1)).subscribe((filteredPcs) => {
-      //         this.filteredPcs = filteredPcs.sort(this.pcService.sortByGlobals);
-      //         this.calcularInforme();
-      //         pdfMake
-      //           .createPdf(this.getDocDefinition(imageListBase64))
-      //           .download(this.informe.prefijo.concat('informe'));
-      //         this.generandoPDF = false;
-      //       });
-      //     }
-      //   }
-      // });
-      // // Generar imagenes
-      // this.countSeguidores = 0;
-      // for (const seguidor of this.filteredSeguidores) {
-      //   this.setImgSeguidorCanvas(seguidor, false);
-      //   this.countSeguidores++;
-      // }
+      this.countLoadedImages$.subscribe((nombreSeguidor) => {
+        if (nombreSeguidor !== null) {
+          const canvas = $(`canvas[id="imgSeguidorCanvas${nombreSeguidor}"]`)[0] as HTMLCanvasElement;
+          imageListBase64[`imgSeguidorCanvas${nombreSeguidor}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+          this.progresoPDF = this.decimalPipe.transform((100 * this.countLoadedImages) / this.countSeguidores, '1.0-0');
+          // Cuando se carguen todas las imágenes
+          if (this.countLoadedImages === this.countSeguidores) {
+            this.pcService.currentFilteredPcs$.pipe(take(1)).subscribe((filteredPcs) => {
+              this.filteredPcs = filteredPcs.sort(this.pcService.sortByGlobals);
+              this.calcularInforme();
+              pdfMake
+                .createPdf(this.getDocDefinition(imageListBase64))
+                .download(this.informe.prefijo.concat('informe'));
+              this.generandoPDF = false;
+            });
+          }
+        }
+      });
+      // Generar imagenes
+      this.countSeguidores = 0;
+      for (const seguidor of this.filteredSeguidores) {
+        this.setImgSeguidorCanvas(seguidor, false);
+        this.countSeguidores++;
+      }
     }
   }
 
