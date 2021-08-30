@@ -139,7 +139,7 @@ export class Seguidor implements FilterableElement {
 
   private getModuloLabel(): string {
     let moduloLabel: string;
-    if (this.modulo !== undefined) {
+    if (this.modulo !== undefined && this.modulo !== null) {
       if (this.modulo.marca === undefined) {
         if (this.modulo.modelo === undefined) {
           moduloLabel = this.modulo.potencia + 'W';
