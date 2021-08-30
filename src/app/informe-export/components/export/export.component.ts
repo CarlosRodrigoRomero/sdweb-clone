@@ -18,17 +18,9 @@ import { MatTableDataSource } from '@angular/material/table';
 import pdfMake from 'pdfmake/build/pdfmake.js';
 import pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import { DatePipe, DecimalPipe } from '@angular/common';
-
 import { PlantaService } from '@core/services/planta.service';
 import { InformeService } from '@core/services/informe.service';
-import { ReportControlService } from '@core/services/report-control.service';
-import { AnomaliaService } from '@core/services/anomalia.service';
-import { DownloadReportService } from '@core/services/download-report.service';
-
 import { Translation } from './translations';
-import { FilterableElement } from '@core/models/filterableInterface';
-import { Anomalia } from '@core/models/anomalia';
-import { Seguidor } from '@core/models/seguidor';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 declare var $: any;
@@ -51,8 +43,7 @@ export interface Apartado {
 
 @Component({
   selector: 'app-export',
-  // templateUrl: './export.component.html',
-  templateUrl: './export-test.component.html',
+  templateUrl: './export.component.html',
   styleUrls: ['./export.component.css'],
   providers: [DecimalPipe, DatePipe],
 })
@@ -68,7 +59,7 @@ export class ExportComponent implements OnInit {
   public url: string;
   public dataTipos: any;
   public dataSeveridad: any;
-  public numTipos: number[];
+  public numCategorias: number[];
   public numClases: number[];
   public countCategoria;
   public countPosicion;
@@ -99,7 +90,6 @@ export class ExportComponent implements OnInit {
   public filteredPcsVistaPrevia: PcInterface[];
   public filteredPcs$: Observable<PcInterface[]>;
   public filteredPcs: PcInterface[];
-  allElements: FilterableElement[];
   public currentFiltroGradiente: number;
   public countLoadedImages: number;
   public countSeguidores: number;
@@ -117,7 +107,7 @@ export class ExportComponent implements OnInit {
   public informeCalculado: boolean;
   public apartadosInforme: Apartado[];
   public displayedColumns: string[] = ['categoria', 'coa1', 'coa2', 'coa3', 'total'];
-  public translation: Translation;
+  public t: Translation;
   public dataSource: MatTableDataSource<PcsTable>;
   private countLoadedImages$ = new BehaviorSubject(null);
   widthLogo: number;
@@ -140,12 +130,9 @@ export class ExportComponent implements OnInit {
     private storage: AngularFireStorage,
     private pcService: PcService,
     private plantaService: PlantaService,
-    private informeService: InformeService,
-    private reportControlService: ReportControlService,
-    private anomaliaService: AnomaliaService,
-    private downloadReportService: DownloadReportService
+    private informeService: InformeService
   ) {
-    this.numTipos = Array(GLOBAL.labels_tipos.length)
+    this.numCategorias = Array(GLOBAL.labels_tipos.length)
       .fill(0)
       .map((_, i) => i + 1);
     this.numClases = Array(GLOBAL.labels_clase.length)
@@ -162,275 +149,18 @@ export class ExportComponent implements OnInit {
     this.isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   }
 
+  onSliderChange($event) {
+    // $event = false: español   | True: english
+    if ($event) {
+      this.lan = 'en';
+    } else {
+      this.lan = 'es';
+    }
+  }
+
   ngOnInit() {
-    this.plantaService
-      .getPlanta(this.reportControlService.plantaId)
-      .pipe(take(1))
-      .subscribe((planta) => {
-        this.planta = planta;
-
-        this.plantaService.planta = planta;
-
-        this.pcColumnas = this.getPcColumnas(this.planta);
-
-        this.filtroColumnas = this.pcColumnas.map((element) => element.nombre);
-        this.filteredColumnasSource.next(this.pcColumnas);
-
-        this.arrayFilas = Array(this.planta.filas)
-          .fill(0)
-          .map((_, i) => i + 1);
-        this.arrayColumnas = Array(this.planta.columnas)
-          .fill(0)
-          .map((_, i) => i + 1);
-
-        this.allElements = this.reportControlService.allFilterableElements;
-
-        this.calcularInforme();
-
-        this.irradianciaImg$ = this.storage.ref(`informes/${this.informe.id}/irradiancia.png`).getDownloadURL();
-        this.suciedadImg$ = this.storage.ref(`informes/${this.informe.id}/suciedad.jpg`).getDownloadURL();
-        this.portadaImg$ = this.storage.ref(`informes/${this.informe.id}/portada.jpg`).getDownloadURL();
-        this.logoImg$ = this.storage.ref(`empresas/${this.planta.empresa}/logo.jpg`).getDownloadURL();
-
-        this.irradianciaImg$.pipe(take(1)).subscribe((url) => {
-          fabric.util.loadImage(
-            url,
-            (img) => {
-              const canvas = document.createElement('canvas');
-              const width =
-                this.widthIrradiancia * this.imgQuality > img.width
-                  ? img.width
-                  : this.widthIrradiancia * this.imgQuality;
-              const scaleFactor = width / img.width;
-              canvas.width = width;
-              canvas.height = img.height * scaleFactor;
-              const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-              this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            },
-            null,
-            { crossOrigin: 'anonymous' }
-          );
-        });
-
-        this.suciedadImg$.pipe(take(1)).subscribe((url) => {
-          fabric.util.loadImage(
-            url,
-            (img) => {
-              const canvas = document.createElement('canvas');
-              const width =
-                this.widthIrradiancia * this.imgQuality > img.width
-                  ? img.width
-                  : this.widthIrradiancia * this.imgQuality;
-              const scaleFactor = width / img.width;
-              canvas.width = width;
-              canvas.height = img.height * scaleFactor;
-              const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-              this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            },
-            null,
-            { crossOrigin: 'anonymous' }
-          );
-        });
-
-        this.portadaImg$.pipe(take(1)).subscribe((url) => {
-          fabric.util.loadImage(
-            url,
-            (img) => {
-              const canvas = document.createElement('canvas');
-              const width =
-                this.widthPortada * this.imgQuality > img.width ? img.width : this.widthPortada * this.imgQuality;
-              const scaleFactor = width / img.width;
-              canvas.width = width;
-              canvas.height = img.height * scaleFactor;
-              const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-              this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            },
-            null,
-            { crossOrigin: 'anonymous' }
-          );
-        });
-
-        this.logoImg$.pipe(take(1)).subscribe((url) => {
-          fabric.util.loadImage(
-            url,
-            (img) => {
-              const canvas = document.createElement('canvas');
-              const newWidth =
-                this.widthLogo * this.imgQuality > img.width ? img.width : this.widthLogo * this.imgQuality;
-              this.widthLogoOriginal = newWidth;
-              const scaleFactor = newWidth / img.width;
-              const newHeight = img.height * scaleFactor;
-              canvas.width = newWidth;
-              canvas.height = newHeight;
-              this.scaleImgLogoHeader = this.heightLogoHeader / newHeight;
-              const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, newWidth, newHeight);
-              this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            },
-            null,
-            { crossOrigin: 'anonymous' }
-          );
-        });
-
-        this.apartadosInforme = [
-          {
-            nombre: 'introduccion',
-            descripcion: 'Introducción',
-            orden: 1,
-            apt: 1,
-            elegible: false,
-          },
-          {
-            nombre: 'criterios',
-            descripcion: 'Criterios de operación',
-            orden: 2,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'normalizacion',
-            descripcion: 'Normalización de gradientes de temperatura',
-            orden: 3,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'datosVuelo',
-            descripcion: 'Datos del vuelo',
-            orden: 4,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'irradiancia',
-            descripcion: 'Irradiancia durante el vuelo',
-            orden: 5,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'paramsTermicos',
-            descripcion: 'Ajuste de parámetros térmicos',
-            orden: 6,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'perdidaPR',
-            descripcion: 'Pérdida de Performance Ratio',
-            orden: 7,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'clasificacion',
-            descripcion: 'Cómo se clasifican las anomalías',
-            orden: 8,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'localizar',
-            descripcion: 'Cómo localizar las anomalías',
-            orden: 9,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'resultadosClase',
-            descripcion: 'Resultados por clase',
-            orden: 10,
-            apt: 2,
-            elegible: true,
-          },
-          {
-            nombre: 'resultadosCategoria',
-            descripcion: 'Resultados por categoría',
-            orden: 11,
-            apt: 2,
-            elegible: true,
-          },
-
-          {
-            nombre: 'resultadosMAE',
-            descripcion: 'MAE de la planta',
-            orden: 14,
-            apt: 2,
-            elegible: true,
-          },
-          {
-            nombre: 'anexo1',
-            descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
-            orden: 15,
-            elegible: true,
-          },
-        ];
-        if (this.planta.tipo === 'seguidores') {
-          this.apartadosInforme.push(
-            {
-              nombre: 'anexo2',
-              descripcion: 'Anexo II: Anomalías térmicas por seguidor',
-              orden: 16,
-              elegible: true,
-            },
-            {
-              nombre: 'resultadosPosicion',
-              descripcion: 'Resultados por posición',
-              orden: 12,
-              apt: 2,
-              elegible: true,
-            }
-          );
-          // const fecha_informe = new Date(this.informe.fecha * 1000);
-
-          // if (fecha_informe.getFullYear() >= 2020) {
-          //   this.apartadosInforme.push({
-          //     nombre: 'anexo3',
-          //     descripcion: 'Anexo III: Seguidores sin anomalías',
-          //     orden: 17,
-          //     elegible: true,
-          //   });
-          // }
-        }
-        // if (this.planta.tipo === '1 eje') {
-        //   this.apartadosInforme.push(
-        //     {
-        //       nombre: 'anexo2b',
-        //       descripcion: 'Anexo II: Anomalías térmicas por seguidor',
-        //       orden: 16,
-        //       elegible: true,
-        //     },
-        //     {
-        //       nombre: 'resultadosPosicionB',
-        //       descripcion: 'Resultados por posición',
-        //       orden: 12,
-        //       apt: 2,
-        //       elegible: true,
-        //     },
-        //     {
-        //       nombre: 'resultadosSeguidor',
-        //       descripcion: 'Resultados por seguidor',
-        //       orden: 13,
-        //       apt: 2,
-        //       elegible: true,
-        //     }
-        //   );
-        // }
-
-        this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
-          return a.orden - b.orden;
-        });
-
-        this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
-      });
-
-    this.informe = this.reportControlService.informes.find(
-      (informe) => this.reportControlService.selectedInformeId === informe.id
-    );
-
+    this.planta = this.plantaService.get();
+    this.informe = this.informeService.get();
     this.progresoPDF = '0';
     this.widthLogo = 200;
     this.widthPortada = 600; // =600 es el ancho de pagina completo
@@ -444,32 +174,125 @@ export class ExportComponent implements OnInit {
     this.widthSeguidor = 450;
     this.hasUserArea = false;
 
-    this.plantaService.getUserAreas$(this.reportControlService.plantaId).subscribe((userAreas) => {
+    this.plantaService.getUserAreas$(this.planta.id).subscribe((userAreas) => {
       if (userAreas.length > 0) {
         this.hasUserArea = true;
       }
     });
 
-    // vista previa
     this.filteredSeguidores$ = this.pcService.filteredSeguidores$;
     this.filteredPcs$ = this.pcService.currentFilteredPcs$;
+    this.pcColumnas = this.getPcColumnas(this.planta);
+
+    this.filtroColumnas = this.pcColumnas.map((element) => element.nombre);
+    this.filteredColumnasSource.next(this.pcColumnas);
 
     this.currentFilteredColumnas$.subscribe((filteredCols) => {
       this.currentFilteredColumnas = filteredCols;
     });
 
+    this.arrayFilas = Array(this.planta.filas)
+      .fill(0)
+      .map((_, i) => i + 1);
+    this.arrayColumnas = Array(this.planta.columnas)
+      .fill(0)
+      .map((_, i) => i + 1);
+
+    this.irradianciaImg$ = this.storage.ref(`informes/${this.informe.id}/irradiancia.png`).getDownloadURL();
+    this.suciedadImg$ = this.storage.ref(`informes/${this.informe.id}/suciedad.jpg`).getDownloadURL();
+    this.portadaImg$ = this.storage.ref(`informes/${this.informe.id}/portada.jpg`).getDownloadURL();
+    this.logoImg$ = this.storage.ref(`empresas/${this.planta.empresa}/logo.jpg`).getDownloadURL();
+
+    this.irradianciaImg$.pipe(take(1)).subscribe((url) => {
+      fabric.util.loadImage(
+        url,
+        (img) => {
+          const canvas = document.createElement('canvas');
+          const width =
+            this.widthIrradiancia * this.imgQuality > img.width ? img.width : this.widthIrradiancia * this.imgQuality;
+          const scaleFactor = width / img.width;
+          canvas.width = width;
+          canvas.height = img.height * scaleFactor;
+          const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+          this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        },
+        null,
+        { crossOrigin: 'anonymous' }
+      );
+    });
+
+    this.portadaImg$.pipe(take(1)).subscribe((url) => {
+      fabric.util.loadImage(
+        url,
+        (img) => {
+          const canvas = document.createElement('canvas');
+          const width =
+            this.widthPortada * this.imgQuality > img.width ? img.width : this.widthPortada * this.imgQuality;
+          const scaleFactor = width / img.width;
+          canvas.width = width;
+          canvas.height = img.height * scaleFactor;
+          const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+          this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        },
+        null,
+        { crossOrigin: 'anonymous' }
+      );
+    });
+
+    this.logoImg$.pipe(take(1)).subscribe((url) => {
+      fabric.util.loadImage(
+        url,
+        (img) => {
+          const canvas = document.createElement('canvas');
+          const newWidth = this.widthLogo * this.imgQuality > img.width ? img.width : this.widthLogo * this.imgQuality;
+          this.widthLogoOriginal = newWidth;
+          const scaleFactor = newWidth / img.width;
+          const newHeight = img.height * scaleFactor;
+          canvas.width = newWidth;
+          canvas.height = newHeight;
+          this.scaleImgLogoHeader = this.heightLogoHeader / newHeight;
+          const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, newWidth, newHeight);
+          this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        },
+        null,
+        { crossOrigin: 'anonymous' }
+      );
+    });
+
     // Obtener pcs vista previa
-    // this.filteredPcs$.subscribe((pcs) => {
-    //   this.filteredPcsVistaPrevia = pcs.slice(0, 20);
-    //   this.filteredPcs = pcs;
-    //   this.currentFiltroGradiente = this.pcService.currentFiltroGradiente;
-    //   this.calcularInforme();
-    // });
+    this.filteredPcs$.subscribe((pcs) => {
+      this.filteredPcsVistaPrevia = pcs.slice(0, 20);
+      this.filteredPcs = pcs;
+      this.currentFiltroGradiente = this.pcService.currentFiltroGradiente;
+      this.calcularInforme();
+    });
     // Ordenar Pcs por seguidor:
-    // this.pcService.filteredSeguidores$.subscribe((seguidores) => {
-    //   this.filteredSeguidores = seguidores;
-    //   this.filteredSeguidoresVistaPrevia = seguidores.slice(0, 3);
-    // });
+    this.pcService.filteredSeguidores$.subscribe((seguidores) => {
+      this.filteredSeguidores = seguidores;
+      this.filteredSeguidoresVistaPrevia = seguidores.slice(0, 3);
+    });
+
+    this.suciedadImg$.pipe(take(1)).subscribe((url) => {
+      fabric.util.loadImage(
+        url,
+        (img) => {
+          const canvas = document.createElement('canvas');
+          const width =
+            this.widthIrradiancia * this.imgQuality > img.width ? img.width : this.widthIrradiancia * this.imgQuality;
+          const scaleFactor = width / img.width;
+          canvas.width = width;
+          canvas.height = img.height * scaleFactor;
+          const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+          this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        },
+        null,
+        { crossOrigin: 'anonymous' }
+      );
+    });
 
     fabric.util.loadImage(
       '../../../assets/images/maeCurva.png',
@@ -504,31 +327,167 @@ export class ExportComponent implements OnInit {
       null,
       { crossOrigin: 'anonymous' }
     );
-  }
 
-  onSliderChange($event) {
-    // $event = false: español   | True: english
-    if ($event) {
-      this.lan = 'en';
-    } else {
-      this.lan = 'es';
+    this.apartadosInforme = [
+      {
+        nombre: 'introduccion',
+        descripcion: 'Introducción',
+        orden: 1,
+        apt: 1,
+        elegible: false,
+      },
+      {
+        nombre: 'criterios',
+        descripcion: 'Criterios de operación',
+        orden: 2,
+        apt: 1,
+        elegible: true,
+      },
+      {
+        nombre: 'normalizacion',
+        descripcion: 'Normalización de gradientes de temperatura',
+        orden: 3,
+        apt: 1,
+        elegible: true,
+      },
+      {
+        nombre: 'datosVuelo',
+        descripcion: 'Datos del vuelo',
+        orden: 4,
+        apt: 1,
+        elegible: true,
+      },
+      {
+        nombre: 'irradiancia',
+        descripcion: 'Irradiancia durante el vuelo',
+        orden: 5,
+        apt: 1,
+        elegible: true,
+      },
+      {
+        nombre: 'paramsTermicos',
+        descripcion: 'Ajuste de parámetros térmicos',
+        orden: 6,
+        apt: 1,
+        elegible: true,
+      },
+      {
+        nombre: 'perdidaPR',
+        descripcion: 'Pérdida de Performance Ratio',
+        orden: 7,
+        apt: 1,
+        elegible: true,
+      },
+      {
+        nombre: 'clasificacion',
+        descripcion: 'Cómo se clasifican las anomalías',
+        orden: 8,
+        apt: 1,
+        elegible: true,
+      },
+      {
+        nombre: 'localizar',
+        descripcion: 'Cómo localizar las anomalías',
+        orden: 9,
+        apt: 1,
+        elegible: true,
+      },
+      {
+        nombre: 'resultadosClase',
+        descripcion: 'Resultados por clase',
+        orden: 10,
+        apt: 2,
+        elegible: true,
+      },
+      {
+        nombre: 'resultadosCategoria',
+        descripcion: 'Resultados por categoría',
+        orden: 11,
+        apt: 2,
+        elegible: true,
+      },
+
+      {
+        nombre: 'resultadosMAE',
+        descripcion: 'MAE de la planta',
+        orden: 14,
+        apt: 2,
+        elegible: true,
+      },
+      {
+        nombre: 'anexo1',
+        descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
+        orden: 15,
+        elegible: true,
+      },
+    ];
+    if (this.planta.tipo === 'seguidores') {
+      this.apartadosInforme.push(
+        {
+          nombre: 'anexo2',
+          descripcion: 'Anexo II: Anomalías térmicas por seguidor',
+          orden: 16,
+          elegible: true,
+        },
+        {
+          nombre: 'resultadosPosicion',
+          descripcion: 'Resultados por posición',
+          orden: 12,
+          apt: 2,
+          elegible: true,
+        }
+      );
+      // const fecha_informe = new Date(this.informe.fecha * 1000);
+
+      // if (fecha_informe.getFullYear() >= 2020) {
+      //   this.apartadosInforme.push({
+      //     nombre: 'anexo3',
+      //     descripcion: 'Anexo III: Seguidores sin anomalías',
+      //     orden: 17,
+      //     elegible: true,
+      //   });
+      // }
     }
+    if (this.planta.tipo === '1 eje') {
+      this.apartadosInforme.push(
+        {
+          nombre: 'anexo2b',
+          descripcion: 'Anexo II: Anomalías térmicas por seguidor',
+          orden: 16,
+          elegible: true,
+        },
+        {
+          nombre: 'resultadosPosicionB',
+          descripcion: 'Resultados por posición',
+          orden: 12,
+          apt: 2,
+          elegible: true,
+        },
+        {
+          nombre: 'resultadosSeguidor',
+          descripcion: 'Resultados por seguidor',
+          orden: 13,
+          apt: 2,
+          elegible: true,
+        }
+      );
+    }
+
+    this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
+      return a.orden - b.orden;
+    });
+
+    this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
   }
 
   getPcColumnas(planta: PlantaInterface): any[] {
-    const pcColumnasTemp = GLOBAL.pcColumnas;
+    let pcColumnasTemp = GLOBAL.pcColumnas;
 
     const i = pcColumnasTemp.findIndex((e) => e.nombre === 'local_xy');
-    const descripcion = '';
-    planta.nombreGlobalCoords.forEach((nombre, index, nombres) => {
-      descripcion.concat(nombre);
-      // a ultimo no se lo añadimos
-      if (index < nombres.length - 1) {
-        descripcion.concat('/');
-      }
-    });
-
-    pcColumnasTemp[i].descripcion = descripcion;
+    pcColumnasTemp[i].descripcion = this.plantaService
+      .getNombreLocalX(planta)
+      .concat('/')
+      .concat(this.plantaService.getNombreLocalY(planta));
 
     return pcColumnasTemp;
   }
@@ -551,23 +510,18 @@ export class ExportComponent implements OnInit {
   }
 
   private calcularInforme() {
-    this.translation = new Translation(this.lan);
+    this.t = new Translation(this.lan);
     this.countCategoria = Array();
     this.countCategoriaClase = Array();
     this.countClase = Array();
     this.countPosicion = Array();
 
     this.informeCalculado = false;
-    let elements;
-    if (this.reportControlService.plantaFija) {
-      elements = this.allElements as Anomalia[];
-    } else {
-      elements = this.allElements as Seguidor[];
-    }
+    const allPcs = this.filteredPcs;
 
-    if (elements.length > 0) {
+    if (allPcs.length > 0) {
       this.irradianciaMedia = Math.round(
-        elements.sort(this.compareIrradiancia)[Math.round(elements.length / 2)].irradiancia
+        allPcs.sort(this.compareIrradiancia)[Math.round(allPcs.length / 2)].irradiancia
       );
     } else {
       this.irradianciaMedia = 800;
@@ -582,9 +536,9 @@ export class ExportComponent implements OnInit {
       const countColumnas = Array();
       for (const x of this.arrayColumnas) {
         if (this.planta.tipo === 'seguidores') {
-          countColumnas.push(elements.filter((pc) => pc.localX === x && pc.localY === y).length);
+          countColumnas.push(allPcs.filter((pc) => pc.local_x === x && pc.local_y === y).length);
         } else {
-          countColumnas.push(elements.filter((pc) => pc.localY === y).length);
+          countColumnas.push(allPcs.filter((pc) => pc.local_y === y).length);
         }
       }
       this.countPosicion.push(countColumnas);
@@ -593,13 +547,13 @@ export class ExportComponent implements OnInit {
     // CATEGORIAS //
     let filtroCategoria;
     let filtroCategoriaClase;
-    for (const cat of this.numTipos) {
-      filtroCategoria = elements.filter((pc) => pc.tipo === cat);
+    for (const cat of this.numCategorias) {
+      filtroCategoria = allPcs.filter((pc) => pc.tipo === cat);
       this.countCategoria.push(filtroCategoria.length);
 
       let count1 = Array();
       for (const clas of this.numClases) {
-        filtroCategoriaClase = elements.filter((pc) => this.pcService.getPcCoA(pc) === clas && pc.tipo === cat);
+        filtroCategoriaClase = allPcs.filter((pc) => this.pcService.getPcCoA(pc) === clas && pc.tipo === cat);
         count1.push(filtroCategoriaClase.length);
       }
       const totalPcsInFilter = count1[0] + count1[1] + count1[2];
@@ -617,7 +571,7 @@ export class ExportComponent implements OnInit {
     // CLASES //
     let filtroClase;
     for (const j of this.numClases) {
-      filtroClase = elements.filter((pc) => this.pcService.getPcCoA(pc) === j);
+      filtroClase = allPcs.filter((pc) => this.pcService.getPcCoA(pc) === j);
 
       this.countClase.push(filtroClase.length);
     }
@@ -628,15 +582,19 @@ export class ExportComponent implements OnInit {
 
   public calificacionMae(mae: number) {
     if (mae <= 0.1) {
-      return this.translation.t('muy bueno');
+      return this.t.t('muy bueno');
     } else if (mae <= 0.2) {
-      return this.translation.t('correcto');
+      return this.t.t('correcto');
     } else {
-      return this.translation.t('mejorable');
+      return this.t.t('mejorable');
     }
   }
 
-  compareIrradiancia(a: Anomalia, b: Anomalia) {
+  sortByLocalId(a: PcInterface, b: PcInterface) {
+    return a.local_id - b.local_id;
+  }
+
+  compareIrradiancia(a: PcInterface, b: PcInterface) {
     if (a.irradiancia < b.irradiancia) {
       return -1;
     }
@@ -657,9 +615,32 @@ export class ExportComponent implements OnInit {
     this.countLoadedImages = 0;
     this.countSeguidores = 1;
 
-    if (this.reportControlService.plantaFija) {
-      this.reportControlService.allFilterableElements$.pipe(take(1)).subscribe((elems) => {
-        this.allElements = elems.sort(this.anomaliaService.sortByLocalId);
+    if (this.filtroApartados.includes('anexo2')) {
+      this.countLoadedImages$.subscribe((nombreSeguidor) => {
+        if (nombreSeguidor !== null) {
+          const canvas = $(`canvas[id="imgSeguidorCanvas${nombreSeguidor}"]`)[0] as HTMLCanvasElement;
+          imageListBase64[`imgSeguidorCanvas${nombreSeguidor}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+          this.progresoPDF = this.decimalPipe.transform((100 * this.countLoadedImages) / this.countSeguidores, '1.0-0');
+
+          // Cuando se carguen todas las imágenes
+          if (this.countLoadedImages === this.countSeguidores) {
+            this.pcService.currentFilteredPcs$.pipe(take(1)).subscribe((filteredPcs) => {
+              this.filteredPcs = filteredPcs.sort(this.pcService.sortByGlobals);
+
+              this.calcularInforme();
+
+              pdfMake
+                .createPdf(this.getDocDefinition(imageListBase64))
+                .download(this.informe.prefijo.concat('informe'));
+
+              this.generandoPDF = false;
+            });
+          }
+        }
+      });
+    } else {
+      this.pcService.currentFilteredPcs$.pipe(take(1)).subscribe((filteredPcs) => {
+        this.filteredPcs = filteredPcs.sort(this.pcService.sortByLocalId);
 
         this.calcularInforme();
 
@@ -669,26 +650,10 @@ export class ExportComponent implements OnInit {
             this.generandoPDF = false;
           });
       });
-    } else {
-      this.countLoadedImages$.subscribe((nombreSeguidor) => {
-        if (nombreSeguidor !== null) {
-          const canvas = $(`canvas[id="imgSeguidorCanvas${nombreSeguidor}"]`)[0] as HTMLCanvasElement;
-          imageListBase64[`imgSeguidorCanvas${nombreSeguidor}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
-          this.progresoPDF = this.decimalPipe.transform((100 * this.countLoadedImages) / this.countSeguidores, '1.0-0');
-          // Cuando se carguen todas las imágenes
-          if (this.countLoadedImages === this.countSeguidores) {
-            this.pcService.currentFilteredPcs$.pipe(take(1)).subscribe((filteredPcs) => {
-              this.filteredPcs = filteredPcs.sort(this.pcService.sortByGlobals);
-              this.calcularInforme();
-              pdfMake
-                .createPdf(this.getDocDefinition(imageListBase64))
-                .download(this.informe.prefijo.concat('informe'));
-              this.generandoPDF = false;
-            });
-          }
-        }
-      });
-      // Generar imagenes
+    }
+
+    // Generar imagenes
+    if (this.filtroApartados.includes('anexo2')) {
       this.countSeguidores = 0;
       for (const seguidor of this.filteredSeguidores) {
         this.setImgSeguidorCanvas(seguidor, false);
@@ -900,12 +865,12 @@ export class ExportComponent implements OnInit {
 
   private getTablaCategoria() {
     const array = [];
-    for (const i of this.numTipos) {
+    for (const i of this.numCategorias) {
       if (this.countCategoria[i - 1] > 0) {
         array.push(
           new Array(
             {
-              text: this.translation.t(this.global.pcDescripcion[i]),
+              text: this.t.t(this.global.pcDescripcion[i]),
             },
             {
               text: this.countCategoria[i - 1],
@@ -913,7 +878,7 @@ export class ExportComponent implements OnInit {
             {
               text:
                 this.decimalPipe
-                  .transform((this.countCategoria[i - 1] / this.allElements.length) * 100, '1.0-1')
+                  .transform((this.countCategoria[i - 1] / this.filteredPcs.length) * 100, '1.0-1')
                   .toString() + ' %',
             }
           )
@@ -960,13 +925,13 @@ export class ExportComponent implements OnInit {
 
   private getTextoIrradiancia() {
     if (this.informe.irradiancia === 0) {
-      return `${this.translation.t(
+      return `${this.t.t(
         'Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición el equipo ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.'
       )}`;
     } else {
-      return `${this.translation.t(
+      return `${this.t.t(
         'Los datos de irradiancia durante el vuelo han sido obtenidos de la estación meteorológica de la propia planta de'
-      )} ${this.planta.nombre}, ${this.translation.t(
+      )} ${this.planta.nombre}, ${this.t.t(
         'los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.'
       )}`;
     }
@@ -974,21 +939,19 @@ export class ExportComponent implements OnInit {
 
   private getTextoLocalizar() {
     if (this.planta.tipo === 'seguidores') {
-      return `${this.translation.t('Además todos ellos tienen asociado los parámetros')} '${this.translation.t(
+      return `${this.t.t('Además todos ellos tienen asociado los parámetros')} '${this.t.t(
         this.plantaService.getNombreGlobalX(this.planta)
-      )}', '${this.translation.t(this.plantaService.getNombreLocalX(this.planta))}' ${this.translation.t(
-        'y'
-      )} '${this.translation.t(this.plantaService.getNombreLocalY(this.planta))}' ${this.translation.t(
+      )}', '${this.t.t(this.plantaService.getNombreLocalX(this.planta))}' ${this.t.t('y')} '${this.t.t(
+        this.plantaService.getNombreLocalY(this.planta)
+      )}' ${this.t.t('según el mapa habitual de la planta')}.`;
+    } else {
+      return `${this.t.t('Además todos ellos tienen asociado los parámetros')} '${this.t.t(
+        this.plantaService.getNombreGlobalX(this.planta)
+      )}', '${this.t.t(this.plantaService.getNombreGlobalY(this.planta))}', '${this.t.t(
+        this.plantaService.getNombreLocalX(this.planta)
+      )}' ${this.t.t('y')} '${this.t.t(this.plantaService.getNombreLocalY(this.planta))}' ${this.t.t(
         'según el mapa habitual de la planta'
       )}.`;
-    } else {
-      return `${this.translation.t('Además todos ellos tienen asociado los parámetros')} '${this.translation.t(
-        this.plantaService.getNombreGlobalX(this.planta)
-      )}', '${this.translation.t(this.plantaService.getNombreGlobalY(this.planta))}', '${this.translation.t(
-        this.plantaService.getNombreLocalX(this.planta)
-      )}' ${this.translation.t('y')} '${this.translation.t(
-        this.plantaService.getNombreLocalY(this.planta)
-      )}' ${this.translation.t('según el mapa habitual de la planta')}.`;
     }
   }
 
@@ -996,7 +959,7 @@ export class ExportComponent implements OnInit {
     // PORTADA //
     const portada: any[] = [
       {
-        text: this.translation.t('Análisis termográfico aéreo de módulos fotovoltaicos'),
+        text: this.t.t('Análisis termográfico aéreo de módulos fotovoltaicos'),
         style: 'h1',
         alignment: 'center',
       },
@@ -1014,11 +977,11 @@ export class ExportComponent implements OnInit {
       {
         text: [
           {
-            text: this.translation.t(`Planta solar:`),
+            text: this.t.t(`Planta solar:`),
             style: 'bold',
           },
           ' ',
-          `${this.planta.nombre} (${this.planta.potencia} MW - ${this.translation.t(this.planta.tipo)})`,
+          `${this.planta.nombre} (${this.planta.potencia} MW - ${this.t.t(this.planta.tipo)})`,
         ],
         style: 'subtitulo',
       },
@@ -1026,7 +989,7 @@ export class ExportComponent implements OnInit {
       {
         text: [
           {
-            text: this.translation.t(`Fecha del vuelo:`),
+            text: this.t.t(`Fecha del vuelo:`),
             style: 'bold',
           },
           ' ',
@@ -1048,16 +1011,16 @@ export class ExportComponent implements OnInit {
     const introduccion = (index: string) => {
       return [
         {
-          text: `${this.translation.t(
+          text: `${this.t.t(
             'Este documento contiene los resultados de la inspección termográfica realizada en la planta solar fotovoltaica de'
-          )} ${this.planta.nombre} (${this.planta.potencia} MW - ${this.translation.t(this.planta.tipo)}).`,
+          )} ${this.planta.nombre} (${this.planta.potencia} MW - ${this.t.t(this.planta.tipo)}).`,
           style: 'p',
         },
 
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'Las inspecciones termográficas en instalaciones solares fotovoltaicas forman parte del mantenimiento preventivo recomendado para este tipo de instalaciones y tienen como objetivo anticiparse a aquellos problemas en los paneles que no son detectables fácilmente de otra manera.'
           ),
           style: 'p',
@@ -1066,7 +1029,7 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'Es importante que este mantenimiento sea llevado a cabo por profesionales, ya que una termografía mal realizada durante varios años puede afectar al estado general de la planta.'
           ),
           style: 'p',
@@ -1075,7 +1038,7 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'Entre las ventajas de realizar termografía infrarroja de manera regular: permite aumentar la eficiencia de la planta (performance ratio) en el medio plazo, evitar reparaciones más costosas, aumentar la vida útil de los equipos, detectar problemas relacionados con distintos fabricantes de paneles, problemas de conexión entre módulos, problemas relacionados con la vegetación o la suciedad en los módulos... entre una larga lista de ventajas.'
           ),
           style: 'p',
@@ -1084,13 +1047,11 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: `${this.translation.t(
+          text: `${this.t.t(
             'La inspección ha sido realizada mediante vehículos aéreos no tripulados operados y diseñados a tal efecto'
           )} ${
-            this.plantaService.getReferenciaSolardrone(this.planta)
-              ? ` ${this.translation.t('por')} Solardrone. `
-              : '. '
-          } ${this.translation.t(
+            this.plantaService.getReferenciaSolardrone(this.planta) ? ` ${this.t.t('por')} Solardrone. ` : '. '
+          } ${this.t.t(
             'Se ha utilizado la más avanzada tecnología al servicio de la fotovoltaica con el fin de reducir al mínimo el tiempo y el coste de operación sin renunciar a la más alta calidad y fiabilidad. El equipo de que ha realizado el presente documento cuenta con personal formado en Termografía Infrarroja Nivel 1.'
           )}`,
           style: 'p',
@@ -1103,16 +1064,16 @@ export class ExportComponent implements OnInit {
     const criterios = (index: string) => {
       return [
         {
-          text: `${index} - ${this.translation.t('Criterios de operación')}`,
+          text: `${index} - ${this.t.t('Criterios de operación')}`,
           style: 'h3',
         },
 
         '\n',
 
         {
-          text: `${this.translation.t('El criterio base que')} ${
-            this.plantaService.getReferenciaSolardrone(this.planta) ? ' Solardrone' : this.translation.t(' se')
-          } ${this.translation.t(
+          text: `${this.t.t('El criterio base que')} ${
+            this.plantaService.getReferenciaSolardrone(this.planta) ? ' Solardrone' : this.t.t(' se')
+          } ${this.t.t(
             'ha seguido para realizar esta inspección termográfica es la norma internacional para inspecciones termográficas IEC 62446-3. En la misma se define cómo deben realizarse las termografías infrarrojas de módulos fotovoltaicos en plantas durante su operación'
           )}`,
           style: 'p',
@@ -1121,7 +1082,7 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: this.translation.t('Hay dos niveles de inspección termográfica según la norma IEC 62446-3:'),
+          text: this.t.t('Hay dos niveles de inspección termográfica según la norma IEC 62446-3:'),
           style: 'p',
         },
 
@@ -1132,10 +1093,10 @@ export class ExportComponent implements OnInit {
             {
               text: [
                 {
-                  text: this.translation.t('Inspección simplificada'),
+                  text: this.t.t('Inspección simplificada'),
                   bold: true,
                 },
-                `: ${this.translation.t(
+                `: ${this.t.t(
                   'Esta es una inspección limitada para verificar que los módulos están funcionando, con requisitos reducidos para el personal. Este tipo de inspecciones se usan, por ejemplo, durante una puesta en marcha básica de una planta fotovoltaica'
                 )}.\n\n`,
               ],
@@ -1144,10 +1105,10 @@ export class ExportComponent implements OnInit {
             {
               text: [
                 {
-                  text: this.translation.t('Inspección detallada'),
+                  text: this.t.t('Inspección detallada'),
                   bold: true,
                 },
-                `: ${this.translation.t(
+                `: ${this.t.t(
                   'Requiere una comprensión más profunda de las anomalías térmicas. Puede ser utilizado para inspecciones periódicas de acuerdo con a la serie IEC 62446 y para solucionar problemas en sistemas con un bajo rendimiento. Se realizan mediciones de temperatura absoluta. Un experto autorizado en plantas fotovoltaicas, junto con exportos termógrafos, pueden llevar a cabo este tipo de inspecciones'
                 )} .`,
               ],
@@ -1159,7 +1120,7 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'La termografía realizada entra dentro de las inspecciones detalladas indicadas por la norma, cumpliendo con los requisitos que indica la misma, que son:'
           ),
           style: 'p',
@@ -1170,59 +1131,59 @@ export class ExportComponent implements OnInit {
         {
           ul: [
             {
-              text: this.translation.t('Medición absoluta de temperaturas: con un error menor de 2 ºC.'),
+              text: this.t.t('Medición absoluta de temperaturas: con un error menor de 2 ºC.'),
               style: 'p',
             },
             {
-              text: this.translation.t('Medición de temperatura máxima, media y gradiente.'),
+              text: this.t.t('Medición de temperatura máxima, media y gradiente.'),
               style: 'p',
             },
             {
-              text: this.translation.t(
+              text: this.t.t(
                 'Informe realizado por un experto en termografía infrarroja en conjunto con un experto en fotovoltaica.'
               ),
               style: 'p',
             },
             {
-              text: this.translation.t('Recomendación para cada tipo de anomalía registrada.'),
+              text: this.t.t('Recomendación para cada tipo de anomalía registrada.'),
               style: 'p',
             },
             {
-              text: this.translation.t('Resolución geométrica térmica: 5x5 pixels por cada célula fotovoltaica.'),
+              text: this.t.t('Resolución geométrica térmica: 5x5 pixels por cada célula fotovoltaica.'),
               style: 'p',
             },
             {
-              text: this.translation.t('Resolución geométrica visual: 25x25 pixels por cada célula fotovoltaica.'),
+              text: this.t.t('Resolución geométrica visual: 25x25 pixels por cada célula fotovoltaica.'),
               style: 'p',
             },
             {
-              text: this.translation.t(
+              text: this.t.t(
                 'Condiciones ambientales correctas: temperatura ambiente, viento, nubosidad e irradiancia.'
               ),
               style: 'p',
             },
             {
-              text: this.translation.t('Calibración de los equipos: cada 2 años.'),
+              text: this.t.t('Calibración de los equipos: cada 2 años.'),
               style: 'p',
             },
             {
-              text: this.translation.t(
+              text: this.t.t(
                 'Parámetros térmicos: el ajuste de la emisividad y la temperatura reflejada es imprescindible para una correcta medición de las temperaturas. Es necesario hacer las mediciones oportunas en campo para poder obtener estos parámetros, ya que dependen de la atmósfera, la meteorología, la suciedad en los módulos el día del vuelo y de los materiales del propio módulo.'
               ),
               style: 'p',
             },
             {
-              text: this.translation.t(
+              text: this.t.t(
                 'Documentación: el entregable incluye las imágenes radiométricas y visuales originales junto con todos los datos que requiere la norma.'
               ),
               style: 'p',
             },
             {
-              text: this.translation.t('Trayectoria: que asegure el cumplimiento de la norma.'),
+              text: this.t.t('Trayectoria: que asegure el cumplimiento de la norma.'),
               style: 'p',
             },
             {
-              text: this.translation.t('Velocidad: 10 km/h máximo.'),
+              text: this.t.t('Velocidad: 10 km/h máximo.'),
               style: 'p',
             },
           ],
@@ -1236,7 +1197,7 @@ export class ExportComponent implements OnInit {
     const normalizacion = (index: string) => {
       return [
         {
-          text: `${index} - ${this.translation.t('Normalización de gradientes de temperatura')}`,
+          text: `${index} - ${this.t.t('Normalización de gradientes de temperatura')}`,
           style: 'h3',
         },
 
@@ -1244,13 +1205,13 @@ export class ExportComponent implements OnInit {
 
         {
           text: [
-            this.translation.t('Con el fin de poder ver la '),
+            this.t.t('Con el fin de poder ver la '),
             {
-              text: this.translation.t('evolución de las anomalías térmicas con el tiempo'),
+              text: this.t.t('evolución de las anomalías térmicas con el tiempo'),
               style: 'bold',
             },
             ' ',
-            this.translation.t(
+            this.t.t(
               'comparando inspecciones termográficas llevadas a cabo en distintos meses o años (con condiciones ambientales distintas), es necesario contar con un procedimiento que permita normalizar los gradientes de temperatura.'
             ),
           ],
@@ -1260,7 +1221,7 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             "Por este motivo todas las anomalías registradas tienen asociada su 'gradiente normalizado', que es el gradiente de temperatura equivalente a haber realizado la inspección con una irradiancia de 1000 W/m2. Esto permitirá poder comparar los resultados de la presente inspección con otras futuras realizadas en condiciones ambientales diferentes y así poder tener una evolución fidedigna de cada una de las anomalías."
           ),
           style: 'p',
@@ -1273,14 +1234,14 @@ export class ExportComponent implements OnInit {
     const datosVuelo = (index: string) => {
       return [
         {
-          text: `${index} - ${this.translation.t('Datos del vuelo')}`,
+          text: `${index} - ${this.t.t('Datos del vuelo')}`,
           style: 'h3',
         },
 
         '\n',
 
         {
-          text: this.translation.t('Las condiciones durante le vuelo han sido las siguientes:'),
+          text: this.t.t('Las condiciones durante le vuelo han sido las siguientes:'),
           style: 'p',
         },
 
@@ -1299,7 +1260,7 @@ export class ExportComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: this.translation.t('Vehículo aéreo no tripulado'),
+                      text: this.t.t('Vehículo aéreo no tripulado'),
                       style: 'tableHeaderRed',
                       colSpan: 2,
                       alignment: 'center',
@@ -1308,7 +1269,7 @@ export class ExportComponent implements OnInit {
                   ],
                   [
                     {
-                      text: this.translation.t('Aeronave'),
+                      text: this.t.t('Aeronave'),
                       style: 'tableLeft',
                     },
                     {
@@ -1317,7 +1278,7 @@ export class ExportComponent implements OnInit {
                   ],
                   [
                     {
-                      text: this.translation.t('Cámara térmica'),
+                      text: this.t.t('Cámara térmica'),
                       style: 'tableLeft',
                     },
                     {
@@ -1326,7 +1287,7 @@ export class ExportComponent implements OnInit {
                   ],
                   [
                     {
-                      text: this.translation.t('Última calibración'),
+                      text: this.t.t('Última calibración'),
                       style: 'tableLeft',
                     },
                     {
@@ -1336,7 +1297,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: this.translation.t('Datos del vuelo'),
+                      text: this.t.t('Datos del vuelo'),
                       style: 'tableHeaderRed',
                       colSpan: 2,
                       alignment: 'center',
@@ -1346,7 +1307,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: this.translation.t('Fecha'),
+                      text: this.t.t('Fecha'),
                       style: 'tableLeft',
                     },
                     {
@@ -1356,7 +1317,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: this.translation.t('Horario de los vuelos'),
+                      text: this.t.t('Horario de los vuelos'),
                       style: 'tableLeft',
                     },
                     {
@@ -1366,7 +1327,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: this.translation.t('Velocidad'),
+                      text: this.t.t('Velocidad'),
                       style: 'tableLeft',
                     },
                     {
@@ -1376,7 +1337,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: this.translation.t('GSD térmico (medio)'),
+                      text: this.t.t('GSD térmico (medio)'),
                       style: 'tableLeft',
                     },
                     {
@@ -1386,7 +1347,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: this.translation.t('GSD visual'),
+                      text: this.t.t('GSD visual'),
                       style: 'tableLeft',
                     },
                     {
@@ -1396,7 +1357,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: this.translation.t('Datos meteorológicos'),
+                      text: this.t.t('Datos meteorológicos'),
                       style: 'tableHeaderRed',
                       colSpan: 2,
                       alignment: 'center',
@@ -1406,7 +1367,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: this.translation.t('Irradiancia (media)'),
+                      text: this.t.t('Irradiancia (media)'),
                       style: 'tableLeft',
                     },
                     {
@@ -1416,7 +1377,7 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: this.translation.t('Temperatura del aire'),
+                      text: this.t.t('Temperatura del aire'),
                       style: 'tableLeft',
                     },
                     {
@@ -1426,11 +1387,11 @@ export class ExportComponent implements OnInit {
 
                   [
                     {
-                      text: this.translation.t('Nubosidad'),
+                      text: this.t.t('Nubosidad'),
                       style: 'tableLeft',
                     },
                     {
-                      text: `${this.informe.nubosidad}/8 ${this.translation.t('octavas')}`,
+                      text: `${this.informe.nubosidad}/8 ${this.t.t('octavas')}`,
                     },
                   ],
                 ],
@@ -1451,7 +1412,7 @@ export class ExportComponent implements OnInit {
     const irradiancia = (index: string) => {
       return [
         {
-          text: `${index} - ${this.translation.t('Irradiancia durante el vuelo')}`,
+          text: `${index} - ${this.t.t('Irradiancia durante el vuelo')}`,
           style: 'h3',
         },
 
@@ -1477,7 +1438,7 @@ export class ExportComponent implements OnInit {
     const paramsTermicos = (index: string) => {
       return [
         {
-          text: `${index} - ${this.translation.t('Ajuste de parámetros térmicos')}`,
+          text: `${index} - ${this.t.t('Ajuste de parámetros térmicos')}`,
           style: 'h3',
         },
 
@@ -1485,20 +1446,20 @@ export class ExportComponent implements OnInit {
 
         {
           text: [
-            this.translation.t(
+            this.t.t(
               'Con el fin de obtener medidas de temperaturas absolutas fiables, es necesario tener en cuenta distintas variables térmicas que afectan directamente al resultado de las medidas obtenidas por las cámaras. Las más importantes son'
             ),
             ' ',
             {
-              text: this.translation.t('la emisividad'),
+              text: this.t.t('la emisividad'),
               style: 'bold',
             },
             ' ',
-            this.translation.t('y la'),
+            this.t.t('y la'),
             ,
             ' ',
             {
-              text: this.translation.t('temperatura reflejada'),
+              text: this.t.t('temperatura reflejada'),
               style: 'bold',
             },
             '.',
@@ -1509,14 +1470,14 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: `${index}.1 - ${this.translation.t('Emisividad')}`,
+          text: `${index}.1 - ${this.t.t('Emisividad')}`,
           style: 'h4',
         },
 
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'La emisividad del material se mide de manera experimental en campo y depende del tipo de vidrio de los módulos y de la suciedad que presenten el día del vuelo. La emisividad escogida por el termógrafo tras el ensayo experimental es la siguiente:'
           ),
           style: 'p',
@@ -1525,7 +1486,7 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: this.translation.t('Emisividad') + '  = ' + this.informe.emisividad.toString(),
+          text: this.t.t('Emisividad') + '  = ' + this.informe.emisividad.toString(),
           style: 'param',
         },
 
@@ -1541,14 +1502,14 @@ export class ExportComponent implements OnInit {
         '\n\n',
 
         {
-          text: `${index}.2 - ${this.capFirstLetter(this.translation.t('temperatura reflejada'))}`,
+          text: `${index}.2 - ${this.capFirstLetter(this.t.t('temperatura reflejada'))}`,
           style: 'h4',
         },
 
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'La temperatura reflejada nos depende de la atmosfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura reflejada medida es:'
           ),
           style: 'p',
@@ -1558,7 +1519,7 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            this.capFirstLetter(this.translation.t('temperatura reflejada')) +
+            this.capFirstLetter(this.t.t('temperatura reflejada')) +
             ' = ' +
             this.informe.tempReflejada.toString() +
             ' ºC',
@@ -1572,7 +1533,7 @@ export class ExportComponent implements OnInit {
     const perdidaPR = (index: string) => {
       return [
         {
-          text: `${index} - ${this.translation.t('Pérdida de Performance Ratio')} (ΔPR)`,
+          text: `${index} - ${this.t.t('Pérdida de Performance Ratio')} (ΔPR)`,
           style: 'h3',
         },
 
@@ -1580,14 +1541,14 @@ export class ExportComponent implements OnInit {
 
         {
           text:
-            this.translation.t(
+            this.t.t(
               'El coeficiente de rendimiento de sistemas fotovoltaicos o Performance Ratio es un parámetro que tuvo su origen conceptual en la norma IES 61724 (1998) para ser utilizado como indicador de calidad en la evaluación de sistemas fotovoltaicos'
             ) + '.\n\n',
           style: 'p',
         },
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'Este parámetro se utiliza para medir el rendimiento de cualquier sistema fotovoltaico. En otras palabras, si queremos saber si un módulo está generando la energía que debería bastaría con conocer su PR. No podemos conocer el PR de cada módulo con una termografía, pero lo que sí podemos conocer es la pérdida de PR (ΔPR) producida por anomalía térmica respecto a sus condiciones ideales. Es decir, un módulo con un punto caliente que causa una ΔPR = -1% tiene menos importancia que una anomalía que causa una ΔPR = -33%, el cual está haciendo caer la producción eléctrica del módulo en un 33%.'
           ),
           style: 'p',
@@ -1596,7 +1557,7 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'La pérdida de PR nos indica, por tanto, lo perjudicial que es una anomalía térmica, identificando explícitamente los puntos sobre los que se debe actuar para optimizar la producción eléctrica. Es un parámetro indispensable en el diagnóstico termográfico de una instalación fotovoltaica, ya que nos permite tomar decisiones en base a un dato técnico-económico objetivo.'
           ),
           style: 'p',
@@ -1605,21 +1566,21 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: this.translation.t('Para poder evaluar la planta utilizaremos los siguientes dos sencillos conceptos:'),
+          text: this.t.t('Para poder evaluar la planta utilizaremos los siguientes dos sencillos conceptos:'),
           style: 'p',
         },
 
         '\n',
 
         {
-          text: `${index}.1 - ${this.translation.t('Pérdidas de performance ratio')} (ΔPR)`,
+          text: `${index}.1 - ${this.t.t('Pérdidas de performance ratio')} (ΔPR)`,
           style: 'h4',
         },
 
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'Cada incidencia tiene una variación de performance ratio asociado. Por ejemplo, un diodo bypass en circuito abierto produce que el módulo trabaje al 15% de eficiencia en un caso típico (ΔPR=85%), mientras que una célula caliente aislada produce de media < 1% de pérdidas.'
           ),
           style: 'p',
@@ -1628,21 +1589,21 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: `${index}.2 - ${this.translation.t('Módulos apagados equivalentes')}`,
+          text: `${index}.2 - ${this.t.t('Módulos apagados equivalentes')}`,
           style: 'h4',
         },
 
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             "El concepto 'módulos apagados equivalentes' es la cantidad equivalente de módulos que no generan energía debido a las incidencias registradas en la planta. Por ejemplo, si tenemos tres módulos idénticos con un defecto en un diodo bypass cada uno, cada módulo genera un 33% menos de energía. Entonces, el número de módulos apagados equivalentes es 1."
           ),
           style: 'p',
         },
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'Uniendo los dos conceptos anteriores, se puede hacer una estimación “grosso modo” de la variación de PR de la planta de la siguiente manera:'
           ),
           style: 'p',
@@ -1655,7 +1616,7 @@ export class ExportComponent implements OnInit {
         },
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'Siendo N = Número de módulos; PR = Performance ratio; MAE = Módulos apagados equivalente calculados'
           ),
           style: 'pieFoto',
@@ -1664,7 +1625,7 @@ export class ExportComponent implements OnInit {
         '\n\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'Por lo tanto, sabiendo el MAE sabremos cuánto PR estamos perdiendo debido a las incidencias encontradas.'
           ),
           style: 'p',
@@ -1673,7 +1634,7 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'El objetivo será obtener un MAE bajo, lo cual nos indicará un correcto mantenimiento de la planta.'
           ),
           style: 'p',
@@ -1682,9 +1643,9 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: `${this.translation.t('Teniendo en cuenta todas las plantas fotovoltaicas inspeccionadas')}  ${
-            this.plantaService.getReferenciaSolardrone(this.planta) ? ` ${this.translation.t('por')} Solardrone,` : ','
-          } ${this.translation.t(
+          text: `${this.t.t('Teniendo en cuenta todas las plantas fotovoltaicas inspeccionadas')}  ${
+            this.plantaService.getReferenciaSolardrone(this.planta) ? ` ${this.t.t('por')} Solardrone,` : ','
+          } ${this.t.t(
             "se puede hacer una clasificación estadística según el MAE. Según la siguiente tabla, podemos clasificar el mantenimiento de una planta en 3 tipos: muy bueno (por debajo de la media), correcto (en la media) y 'mejorable' (por encima de la media):"
           )}`,
           style: 'p',
@@ -1714,11 +1675,11 @@ export class ExportComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: this.translation.t('MAE de la planta'),
+                      text: this.t.t('MAE de la planta'),
                       style: 'tableHeader',
                     },
                     {
-                      text: this.capFirstLetter(this.translation.t('estado')),
+                      text: this.capFirstLetter(this.t.t('estado')),
                       style: 'tableHeader',
                     },
                   ],
@@ -1728,7 +1689,7 @@ export class ExportComponent implements OnInit {
                       style: ['mae1', 'bold'],
                     },
                     {
-                      text: this.capFirstLetter(this.translation.t('muy bueno')),
+                      text: this.capFirstLetter(this.t.t('muy bueno')),
                       style: 'mae1',
                     },
                   ],
@@ -1738,7 +1699,7 @@ export class ExportComponent implements OnInit {
                       style: ['mae2', 'bold'],
                     },
                     {
-                      text: this.capFirstLetter(this.translation.t('correcto')),
+                      text: this.capFirstLetter(this.t.t('correcto')),
                       style: 'mae2',
                     },
                   ],
@@ -1748,7 +1709,7 @@ export class ExportComponent implements OnInit {
                       style: ['mae3', 'bold'],
                     },
                     {
-                      text: this.capFirstLetter(this.translation.t('mejorable')),
+                      text: this.capFirstLetter(this.t.t('mejorable')),
                       style: 'mae3',
                     },
                   ],
@@ -1770,14 +1731,14 @@ export class ExportComponent implements OnInit {
     const clasificacion = (index: string) => {
       return [
         {
-          text: `${index} - ${this.translation.t('Cómo se clasifican las anomalías térmicas (según IEC 62446-3)')}`,
+          text: `${index} - ${this.t.t('Cómo se clasifican las anomalías térmicas (según IEC 62446-3)')}`,
           style: 'h3',
         },
 
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'Según la norma internacional IEC 62446-3 para inspecciones termográficas de instalaciones fotovoltaicas, las anomalías térmicas se clasifican en tres clases o CoA (Class of Abnormalitys):'
           ),
           style: 'p',
@@ -1790,31 +1751,31 @@ export class ExportComponent implements OnInit {
             {
               text: [
                 {
-                  text: `CoA 1 - ${this.translation.t('sin anomalía')}`,
+                  text: `CoA 1 - ${this.t.t('sin anomalía')}`,
                   style: ['coa1', 'bold'],
                 },
-                `: ${this.translation.t('hacemos seguimiento, pero no hay que actuar.')}`,
+                `: ${this.t.t('hacemos seguimiento, pero no hay que actuar.')}`,
               ],
               style: 'p',
             },
             {
               text: [
                 {
-                  text: `CoA 2 - ${this.translation.t('anomalía térmica')}`,
+                  text: `CoA 2 - ${this.t.t('anomalía térmica')}`,
                   style: ['coa2', 'bold'],
                 },
                 ': ',
-                this.translation.t('ver la causa y, si es necesario, arreglar en un periodo razonable.'),
+                this.t.t('ver la causa y, si es necesario, arreglar en un periodo razonable.'),
               ],
               style: 'p',
             },
             {
               text: [
                 {
-                  text: `CoA 3 - ${this.translation.t('anomalía térmica relevante para la seguridad')}`,
+                  text: `CoA 3 - ${this.t.t('anomalía térmica relevante para la seguridad')}`,
                   style: ['coa3', 'bold'],
                 },
-                `: ${this.translation.t(
+                `: ${this.t.t(
                   'próxima interrupción de la operación normal del módulo, detectar la causa y rectificar en un periodo razonable.'
                 )}`,
               ],
@@ -1830,14 +1791,14 @@ export class ExportComponent implements OnInit {
     const localizar = (index: string) => {
       return [
         {
-          text: `${index} - ${this.translation.t('Cómo localizar las anomalías')}`,
+          text: `${index} - ${this.t.t('Cómo localizar las anomalías')}`,
           style: 'h3',
         },
 
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'Todas las incidencias tienen asociada una localización GPS, cuyo margen de error es de unos pocos metros (0-2 metros).'
           ),
           style: 'p',
@@ -1857,7 +1818,7 @@ export class ExportComponent implements OnInit {
     const resultados = (index: string) => {
       return [
         {
-          text: `${index} - ${this.translation.t('Resultados de la inspección termográfica')}`,
+          text: `${index} - ${this.t.t('Resultados de la inspección termográfica')}`,
           style: 'h2',
           pageBreak: 'before',
           alignment: 'center',
@@ -1875,14 +1836,14 @@ export class ExportComponent implements OnInit {
     const resultadosClase = (index: string) => {
       return [
         {
-          text: `${index} - ${this.translation.t('Resultados por clase de anomalía')} (CoA)`,
+          text: `${index} - ${this.t.t('Resultados por clase de anomalía')} (CoA)`,
           style: 'h3',
         },
 
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'A continuación se detallan la cantidad de incidencias registradas según su clase (1, 2 ó 3).'
           ),
           style: 'p',
@@ -1890,13 +1851,11 @@ export class ExportComponent implements OnInit {
 
         {
           text: [
-            `${this.translation.t('Se han registrado un total de')} `,
+            `${this.t.t('Se han registrado un total de')} `,
             { text: this.countClase[0] + this.countClase[1] + this.countClase[2], style: 'bold' },
-            ` ${this.translation.t('anomalías térmicas, de las cuales')} ${this.countClase[0]} ${this.translation.t(
-              'son de clase'
-            )} 1, ${this.countClase[1]} ${this.translation.t('son de clase')} 2  ${this.translation.t('y')} ${
-              this.countClase[2]
-            } ${this.translation.t('son de clase')} 3.`,
+            ` ${this.t.t('anomalías térmicas, de las cuales')} ${this.countClase[0]} ${this.t.t('son de clase')} 1, ${
+              this.countClase[1]
+            } ${this.t.t('son de clase')} 2  ${this.t.t('y')} ${this.countClase[2]} ${this.t.t('son de clase')} 3.`,
           ],
           style: 'p',
         },
@@ -1908,14 +1867,14 @@ export class ExportComponent implements OnInit {
     const resultadosCategoria = (index: string) => {
       return [
         {
-          text: `${index} - ${this.translation.t('Resultados por categoría de la anomalía')}`,
+          text: `${index} - ${this.t.t('Resultados por categoría de la anomalía')}`,
           style: 'h3',
         },
 
         '\n',
 
         {
-          text: `${this.translation.t(
+          text: `${this.t.t(
             'La siguiente tabla muestra la cantidad de anomalías térmicas por categoría. En el caso de células calientes, sólo se incluyen aquellas con gradientes mayores a'
           )} ${this.currentFiltroGradiente} ºC`,
           style: 'p',
@@ -1935,17 +1894,17 @@ export class ExportComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: this.translation.t('Categoría'),
+                      text: this.t.t('Categoría'),
                       style: 'tableHeaderRed',
                     },
 
                     {
-                      text: this.translation.t('Cantidad'),
+                      text: this.t.t('Cantidad'),
                       style: 'tableHeaderRed',
                     },
 
                     {
-                      text: this.translation.t('Porcentaje %'),
+                      text: this.t.t('Porcentaje %'),
                       style: 'tableHeaderRed',
                     },
                   ],
@@ -1958,7 +1917,7 @@ export class ExportComponent implements OnInit {
                         style: 'bold',
                       },
                       {
-                        text: this.allElements.length.toString(),
+                        text: this.filteredPcs.length.toString(),
                         style: 'bold',
                       },
                       {
@@ -1993,18 +1952,16 @@ export class ExportComponent implements OnInit {
       }
       return [
         {
-          text: `${index} - ${this.translation.t('Resultados por seguidores')}`,
+          text: `${index} - ${this.t.t('Resultados por seguidores')}`,
           style: 'h3',
         },
 
         '\n',
-        `${this.translation.t('El número de seguidores afectados por anomalías térmicas es')} ${
-          this.filteredSeguidores.length
-        }${
+        `${this.t.t('El número de seguidores afectados por anomalías térmicas es')} ${this.filteredSeguidores.length}${
           numeroSeguidores === 0 ? '. ' : `/${numeroSeguidores} (${porcentajeSeguidores.toFixed(2)}%). `
-        } ${this.translation.t(
-          'El número medio de módulos con anomalías por seguidor es de'
-        )} ${numAnomaliasMedia} ${this.translation.t('módulos/seguidor')}.`,
+        } ${this.t.t('El número medio de módulos con anomalías por seguidor es de')} ${numAnomaliasMedia} ${this.t.t(
+          'módulos/seguidor'
+        )}.`,
         '\n',
         '\n',
       ];
@@ -2013,28 +1970,26 @@ export class ExportComponent implements OnInit {
     const resultadosPosicion = (index: string) => {
       let texto1;
       if (this.planta.tipo === 'seguidores') {
-        texto1 = `${this.translation.t(
+        texto1 = `${this.t.t(
           'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran'
-        )} (${this.plantaService.getNombreLocalX(this.planta)} ${this.translation.t(
-          'y'
-        )} ${this.plantaService.getNombreLocalY(this.planta)}) ${this.translation.t(
-          'dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
-        )}`;
+        )} (${this.plantaService.getNombreLocalX(this.planta)} ${this.t.t('y')} ${this.plantaService.getNombreLocalY(
+          this.planta
+        )}) ${this.t.t('dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.')}`;
       } else {
-        texto1 = this.translation.t(
+        texto1 = this.t.t(
           'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
         );
       }
       return [
         {
-          text: `${index} - ${this.translation.t('Resultados por posición de la anomalía dentro del seguidor')}`,
+          text: `${index} - ${this.t.t('Resultados por posición de la anomalía dentro del seguidor')}`,
           style: 'h3',
         },
 
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'Esta clasificación tiene como fin detectar posibles problemas relacionados con la posición de cada módulo. De este análisis se obtienen problemas relacionados con la vegetación de la instalación, deposiciones de pájaros, etc.'
           ),
           style: 'p',
@@ -2075,14 +2030,14 @@ export class ExportComponent implements OnInit {
     const resultadosMAE = (index: string) => {
       return [
         {
-          text: `${index} - ${this.translation.t('MAE de la planta')}`,
+          text: `${index} - ${this.t.t('MAE de la planta')}`,
           style: 'h3',
         },
 
         '\n',
 
         {
-          text: this.translation.t(
+          text: this.t.t(
             'El MAE (módulo apagados equivalentes) nos da medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.'
           ),
           style: 'p',
@@ -2099,10 +2054,10 @@ export class ExportComponent implements OnInit {
 
         {
           text: [
-            `${this.translation.t('El MAE de')} ${this.planta.nombre} (${this.datePipe.transform(
+            `${this.t.t('El MAE de')} ${this.planta.nombre} (${this.datePipe.transform(
               this.informe.fecha * 1000,
               'dd/MM/yyyy'
-            )}) ${this.translation.t('es')} `,
+            )}) ${this.t.t('es')} `,
             {
               text: `${this.informe.mae} %`,
               style: 'bold',
@@ -2128,7 +2083,7 @@ export class ExportComponent implements OnInit {
 
     result = result.concat([
       {
-        text: `1 - ${this.translation.t('Introducción')}`,
+        text: `1 - ${this.t.t('Introducción')}`,
         style: 'h2',
         alignment: 'center',
       },
@@ -2255,7 +2210,7 @@ export class ExportComponent implements OnInit {
     const allPagsAnexoLista = [];
     // tslint:disable-next-line:max-line-length
     const pag1Anexo = {
-      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.t.t('Anexo')} ${numAnexo}: ${this.t.t(
         'Listado de anomalías térmicas'
       )}`,
       style: 'h1',
@@ -2273,31 +2228,24 @@ export class ExportComponent implements OnInit {
     // Header
     const cabecera = [];
     cabecera.push({
-      text: this.translation.t('Número'),
+      text: this.t.t('Número'),
       style: 'tableHeaderRed',
     });
 
     if (this.planta.tipo === 'seguidores') {
-      this.allElements = this.allElements.sort(this.downloadReportService.sortByGlobalCoords);
+      this.filteredPcs = this.filteredPcs.sort(this.pcService.sortByGlobals);
       cabecera.push({
-        text: this.translation.t('Seguidor'),
+        text: this.t.t('Seguidor'),
         style: 'tableHeaderRed',
         noWrap: true,
       });
     } else {
-      this.allElements = this.allElements.sort((a, b) => this.downloadReportService.sortByPosition(a, b));
-
-      let nombreCol = '';
-      this.planta.nombreGlobalCoords.forEach((nombre, index, nombres) => {
-        nombreCol.concat(nombre);
-        // a ultimo no se lo añadimos
-        if (index < nombres.length - 1) {
-          nombreCol.concat(this.plantaService.getGlobalsConector());
-        }
-      });
-
-      nombreCol = this.translation.t(nombreCol);
-
+      this.filteredPcs = this.filteredPcs.sort(this.pcService.sortByGlobals);
+      let nombreCol = this.t.t(this.plantaService.getNombreGlobalX(this.planta));
+      if (nombreCol.length > 0) {
+        nombreCol = nombreCol.concat(this.plantaService.getGlobalsConector());
+      }
+      nombreCol = nombreCol.concat(this.t.t(this.plantaService.getNombreGlobalY(this.planta)));
       cabecera.push({
         text: nombreCol,
         style: 'tableHeaderRed',
@@ -2307,32 +2255,32 @@ export class ExportComponent implements OnInit {
 
     for (const c of this.currentFilteredColumnas) {
       cabecera.push({
-        text: this.translation.t(this.getEncabezadoTablaSeguidor(c)),
+        text: this.t.t(this.getEncabezadoTablaSeguidor(c)),
         style: 'tableHeaderRed',
       });
     }
 
     // Body
     const body = [];
-    let contadorElems = 0;
-    const totalElems = this.allElements.length;
-    for (const elem of this.allElements) {
-      contadorElems += 1;
+    let contadorPcs = 0;
+    const totalPcs = this.filteredPcs.length;
+    for (const pc of this.filteredPcs) {
+      contadorPcs += 1;
 
       const row = [];
       row.push({
-        text: `${contadorElems}/${totalElems}`,
+        text: `${contadorPcs}/${totalPcs}`,
         noWrap: true,
         style: 'tableCellAnexo1',
       });
       row.push({
-        text: this.plantaService.getEtiquetaGlobals(elem),
+        text: this.plantaService.getEtiquetaGlobals(pc),
         noWrap: true,
         style: 'tableCellAnexo1',
       });
       for (let c of this.currentFilteredColumnas) {
         row.push({
-          text: this.translation.t(this.getTextoColumnaAnomalia(elem, c.nombre)),
+          text: this.t.t(this.getTextoColumnaPc(pc, c.nombre)),
           noWrap: true,
           style: 'tableCellAnexo1',
         });
@@ -2369,24 +2317,24 @@ export class ExportComponent implements OnInit {
     return allPagsAnexoLista.concat(tablaAnexo);
   }
 
-  getTextoColumnaAnomalia(elem: FilterableElement, columnaNombre: string): string {
+  getTextoColumnaPc(pc: PcInterface, columnaNombre: string): string {
     if (columnaNombre === 'tipo') {
-      return this.pcDescripcion[elem.tipo];
+      return this.pcDescripcion[pc['tipo']];
     } else if (columnaNombre === 'gradienteNormalizado' || columnaNombre === 'temperaturaMax') {
-      return (Math.round(elem[columnaNombre] * 10) / 10).toString().concat(' ºC');
+      return (Math.round(pc[columnaNombre] * 10) / 10).toString().concat(' ºC');
     } else if (columnaNombre === 'irradiancia') {
-      return Math.round((elem as Anomalia).irradiancia).toString().concat(' W/m2');
+      return Math.round(pc['irradiancia']).toString().concat(' W/m2');
     } else if (columnaNombre === 'datetimeString') {
       return this.datePipe
         .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
         .concat(' ')
-        .concat(this.datePipe.transform((elem as Anomalia).datetime * 1000, 'HH:mm:ss'));
+        .concat(this.datePipe.transform(pc.datetime * 1000, 'HH:mm:ss'));
     } else if (columnaNombre === 'local_xy') {
-      return this.plantaService.getNumeroModulo(elem as PcInterface).toString();
+      return this.plantaService.getNumeroModulo(pc).toString();
     } else if (columnaNombre === 'severidad') {
-      return this.pcService.getPcCoA(elem).toString();
+      return this.pcService.getPcCoA(pc).toString();
     } else {
-      return elem[columnaNombre];
+      return pc[columnaNombre];
     }
   }
 
@@ -2399,55 +2347,55 @@ export class ExportComponent implements OnInit {
     return columna.descripcion;
   }
 
-  // getPaginaSeguidor(seguidor: SeguidorInterface) {
-  //   // Header
-  //   const cabecera = [];
-  //   let columnasAnexoSeguidor = this.currentFilteredColumnas.filter((col) => {
-  //     return !GLOBAL.columnasAnexoSeguidor.includes(col.nombre);
-  //   });
-  //   if (this.planta.hasOwnProperty('numerosSerie')) {
-  //     if (this.planta.numerosSerie) {
-  //       columnasAnexoSeguidor.push({ nombre: 'numeroSerie', descripcion: 'N/S' });
-  //     }
-  //   }
+  getPaginaSeguidor(seguidor: SeguidorInterface) {
+    // Header
+    const cabecera = [];
+    let columnasAnexoSeguidor = this.currentFilteredColumnas.filter((col) => {
+      return !GLOBAL.columnasAnexoSeguidor.includes(col.nombre);
+    });
+    if (this.planta.hasOwnProperty('numerosSerie')) {
+      if (this.planta.numerosSerie) {
+        columnasAnexoSeguidor.push({ nombre: 'numeroSerie', descripcion: 'N/S' });
+      }
+    }
 
-  //   cabecera.push({
-  //     text: this.translation.t('Número'),
-  //     style: 'tableHeaderRed',
-  //   });
-  //   for (const col of columnasAnexoSeguidor) {
-  //     cabecera.push({
-  //       text: this.translation.t(this.getEncabezadoTablaSeguidor(col)),
-  //       style: 'tableHeaderRed',
-  //     });
-  //   }
+    cabecera.push({
+      text: this.t.t('Número'),
+      style: 'tableHeaderRed',
+    });
+    for (const col of columnasAnexoSeguidor) {
+      cabecera.push({
+        text: this.t.t(this.getEncabezadoTablaSeguidor(col)),
+        style: 'tableHeaderRed',
+      });
+    }
 
-  //   // Body
-  //   const body = [];
-  //   let contadorPcs = 0;
-  //   const totalPcsSeguidor = seguidor.pcs.length;
-  //   for (const pc of seguidor.pcs) {
-  //     contadorPcs += 1;
-  //     const row = [];
-  //     row.push({
-  //       text: `${contadorPcs}/${totalPcsSeguidor}`,
-  //       noWrap: true,
-  //       style: 'tableCellAnexo1',
-  //     });
+    // Body
+    const body = [];
+    let contadorPcs = 0;
+    const totalPcsSeguidor = seguidor.pcs.length;
+    for (const pc of seguidor.pcs) {
+      contadorPcs += 1;
+      const row = [];
+      row.push({
+        text: `${contadorPcs}/${totalPcsSeguidor}`,
+        noWrap: true,
+        style: 'tableCellAnexo1',
+      });
 
-  //     for (const col of columnasAnexoSeguidor) {
-  //       row.push({
-  //         text: this.translation.t(this.getTextoColumnaAnomalia(pc, col.nombre)),
-  //         noWrap: true,
-  //         style: 'tableCellAnexo1',
-  //       });
-  //     }
-  //     body.push(row);
-  //   }
-  //   return [cabecera, body];
-  // }
+      for (const col of columnasAnexoSeguidor) {
+        row.push({
+          text: this.t.t(this.getTextoColumnaPc(pc, col.nombre)),
+          noWrap: true,
+          style: 'tableCellAnexo1',
+        });
+      }
+      body.push(row);
+    }
+    return [cabecera, body];
+  }
 
-  writeModulo(pc: Anomalia) {
+  writeModulo(pc: PcInterface) {
     if (!pc.hasOwnProperty('modulo')) {
       return '-';
     }
@@ -2468,338 +2416,337 @@ export class ExportComponent implements OnInit {
     return new_row;
   }
 
-  // getAnexoSeguidores(numAnexo: string) {
-  //   const allPagsAnexo = [];
-  //   // tslint:disable-next-line:max-line-length
-  //   const pag1Anexo = {
-  //     text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
-  //       'Anomalías térmicas por seguidor'
-  //     )}`,
-  //     style: 'h1',
-  //     alignment: 'center',
-  //     pageBreak: 'before',
-  //   };
+  getAnexoSeguidores(numAnexo: string) {
+    const allPagsAnexo = [];
+    // tslint:disable-next-line:max-line-length
+    const pag1Anexo = {
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.t.t('Anexo')} ${numAnexo}: ${this.t.t(
+        'Anomalías térmicas por seguidor'
+      )}`,
+      style: 'h1',
+      alignment: 'center',
+      pageBreak: 'before',
+    };
 
-  //   allPagsAnexo.push(pag1Anexo);
+    allPagsAnexo.push(pag1Anexo);
 
-  //   for (const s of this.filteredSeguidores) {
-  //     const table = this.getPaginaSeguidor(s);
+    for (const s of this.filteredSeguidores) {
+      const table = this.getPaginaSeguidor(s);
 
-  //     const pagAnexo = [
-  //       {
-  //         text: `${this.translation.t('Seguidor')} ${s.nombre}`,
-  //         style: 'h2',
-  //         alignment: 'center',
-  //         pageBreak: 'before',
-  //       },
+      const pagAnexo = [
+        {
+          text: `${this.t.t('Seguidor')} ${s.nombre}`,
+          style: 'h2',
+          alignment: 'center',
+          pageBreak: 'before',
+        },
 
-  //       '\n',
+        '\n',
 
-  //       {
-  //         image: `imgSeguidorCanvas${s.nombre}`,
-  //         width: this.widthSeguidor,
-  //         alignment: 'center',
-  //       },
+        {
+          image: `imgSeguidorCanvas${s.nombre}`,
+          width: this.widthSeguidor,
+          alignment: 'center',
+        },
 
-  //       '\n',
+        '\n',
 
-  //       {
-  //         columns: [
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
+        {
+          columns: [
+            {
+              width: '*',
+              text: '',
+            },
 
-  //           {
-  //             width: 'auto',
-  //             table: {
-  //               body: [
-  //                 [
-  //                   {
-  //                     text: this.translation.t('Fecha/Hora'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
+            {
+              width: 'auto',
+              table: {
+                body: [
+                  [
+                    {
+                      text: this.t.t('Fecha/Hora'),
+                      style: 'tableHeaderImageData',
+                    },
 
-  //                   {
-  //                     text: this.translation.t('Irradiancia'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
+                    {
+                      text: this.t.t('Irradiancia'),
+                      style: 'tableHeaderImageData',
+                    },
 
-  //                   {
-  //                     text: this.translation.t('Temp. aire'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
+                    {
+                      text: this.t.t('Temp. aire'),
+                      style: 'tableHeaderImageData',
+                    },
 
-  //                   {
-  //                     text: this.translation.t('Viento'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
+                    {
+                      text: this.t.t('Viento'),
+                      style: 'tableHeaderImageData',
+                    },
 
-  //                   {
-  //                     text: this.translation.t('Emisividad'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
+                    {
+                      text: this.t.t('Emisividad'),
+                      style: 'tableHeaderImageData',
+                    },
 
-  //                   {
-  //                     text: this.translation.t('Temp. reflejada'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-  //                   {
-  //                     text: this.translation.t('Módulo'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-  //                 ],
-  //                 [
-  //                   {
-  //                     text: this.datePipe
-  //                       .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
-  //                       .concat(' ')
-  //                       .concat(this.datePipe.transform(s.pcs[0].datetime * 1000, 'HH:mm:ss')),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
+                    {
+                      text: this.t.t('Temp. reflejada'),
+                      style: 'tableHeaderImageData',
+                    },
+                    {
+                      text: this.t.t('Módulo'),
+                      style: 'tableHeaderImageData',
+                    },
+                  ],
+                  [
+                    {
+                      text: this.datePipe
+                        .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
+                        .concat(' ')
+                        .concat(this.datePipe.transform(s.pcs[0].datetime * 1000, 'HH:mm:ss')),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
 
-  //                   {
-  //                     text: Math.round(s.pcs[0].irradiancia).toString().concat(' W/m2'),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-  //                   {
-  //                     text: Math.round(s.pcs[0].temperaturaAire).toString().concat(' ºC'),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
+                    {
+                      text: Math.round(s.pcs[0].irradiancia).toString().concat(' W/m2'),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
+                    {
+                      text: Math.round(s.pcs[0].temperaturaAire).toString().concat(' ºC'),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
 
-  //                   {
-  //                     text: s.pcs[0].viento,
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
+                    {
+                      text: s.pcs[0].viento,
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
 
-  //                   {
-  //                     text: s.pcs[0].emisividad,
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
+                    {
+                      text: s.pcs[0].emisividad,
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
 
-  //                   {
-  //                     text: Math.round(s.pcs[0].temperaturaReflejada).toString().concat(' ºC'),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
+                    {
+                      text: Math.round(s.pcs[0].temperaturaReflejada).toString().concat(' ºC'),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
 
-  //                   {
-  //                     text: this.writeModulo(s.pcs[0]),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-  //                 ],
-  //               ],
-  //             },
-  //           },
+                    {
+                      text: this.writeModulo(s.pcs[0]),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
+                  ],
+                ],
+              },
+            },
 
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-  //         ],
-  //       },
+            {
+              width: '*',
+              text: '',
+            },
+          ],
+        },
 
-  //       '\n',
+        '\n',
 
-  //       {
-  //         columns: [
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-  //           {
-  //             width: 'auto',
-  //             table: {
-  //               headerRows: 1,
-  //               body: [table[0]].concat(table[1]),
-  //             },
-  //           },
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-  //         ],
-  //       },
-  //     ];
+        {
+          columns: [
+            {
+              width: '*',
+              text: '',
+            },
+            {
+              width: 'auto',
+              table: {
+                headerRows: 1,
+                body: [table[0]].concat(table[1]),
+              },
+            },
+            {
+              width: '*',
+              text: '',
+            },
+          ],
+        },
+      ];
 
-  //     allPagsAnexo.push(pagAnexo);
-  //   }
+      allPagsAnexo.push(pagAnexo);
+    }
 
-  //   return allPagsAnexo;
-  // }
-  
-  // getAnexoSeguidores1eje(numAnexo: string) {
-  //   const allPagsAnexo = [];
-  //   // tslint:disable-next-line:max-line-length
-  //   const pag1Anexo = {
-  //     text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
-  //       'Anomalías térmicas por seguidor'
-  //     )}`,
-  //     style: 'h1',
-  //     alignment: 'center',
-  //     pageBreak: 'before',
-  //   };
+    return allPagsAnexo;
+  }
+  getAnexoSeguidores1eje(numAnexo: string) {
+    const allPagsAnexo = [];
+    // tslint:disable-next-line:max-line-length
+    const pag1Anexo = {
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.t.t('Anexo')} ${numAnexo}: ${this.t.t(
+        'Anomalías térmicas por seguidor'
+      )}`,
+      style: 'h1',
+      alignment: 'center',
+      pageBreak: 'before',
+    };
 
-  //   allPagsAnexo.push(pag1Anexo);
+    allPagsAnexo.push(pag1Anexo);
 
-  //   for (const s of this.filteredSeguidores) {
-  //     const table = this.getPaginaSeguidor(s);
+    for (const s of this.filteredSeguidores) {
+      const table = this.getPaginaSeguidor(s);
 
-  //     const pagAnexo = [
-  //       {
-  //         text: `${this.translation.t('Seguidor')} ${s.nombre}`,
-  //         style: 'h2',
-  //         alignment: 'center',
-  //         pageBreak: 'before',
-  //       },
+      const pagAnexo = [
+        {
+          text: `${this.t.t('Seguidor')} ${s.nombre}`,
+          style: 'h2',
+          alignment: 'center',
+          pageBreak: 'before',
+        },
 
-  //       '\n',
+        '\n',
 
-  //       // Si son segudores de 1 eje, le quitamos la imagen (porque)
-  //       // {
-  //       //   image: `imgSeguidorCanvas${s.nombre}`,
-  //       //   width: this.widthSeguidor,
-  //       //   alignment: 'center'
-  //       // },
+        // Si son segudores de 1 eje, le quitamos la imagen (porque)
+        // {
+        //   image: `imgSeguidorCanvas${s.nombre}`,
+        //   width: this.widthSeguidor,
+        //   alignment: 'center'
+        // },
 
-  //       // '\n',
+        // '\n',
 
-  //       {
-  //         columns: [
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
+        {
+          columns: [
+            {
+              width: '*',
+              text: '',
+            },
 
-  //           {
-  //             width: 'auto',
-  //             table: {
-  //               body: [
-  //                 [
-  //                   {
-  //                     text: this.translation.t('Fecha/Hora'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
+            {
+              width: 'auto',
+              table: {
+                body: [
+                  [
+                    {
+                      text: this.t.t('Fecha/Hora'),
+                      style: 'tableHeaderImageData',
+                    },
 
-  //                   {
-  //                     text: this.translation.t('Irradiancia'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
+                    {
+                      text: this.t.t('Irradiancia'),
+                      style: 'tableHeaderImageData',
+                    },
 
-  //                   {
-  //                     text: this.translation.t('Temp. aire'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
+                    {
+                      text: this.t.t('Temp. aire'),
+                      style: 'tableHeaderImageData',
+                    },
 
-  //                   {
-  //                     text: this.translation.t('Viento'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
+                    {
+                      text: this.t.t('Viento'),
+                      style: 'tableHeaderImageData',
+                    },
 
-  //                   {
-  //                     text: this.translation.t('Emisividad'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
+                    {
+                      text: this.t.t('Emisividad'),
+                      style: 'tableHeaderImageData',
+                    },
 
-  //                   {
-  //                     text: this.translation.t('Temp. reflejada'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-  //                   {
-  //                     text: this.translation.t('Módulo'),
-  //                     style: 'tableHeaderImageData',
-  //                   },
-  //                 ],
-  //                 [
-  //                   {
-  //                     text: this.datePipe
-  //                       .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
-  //                       .concat(' ')
-  //                       .concat(this.datePipe.transform(s.pcs[0].datetime * 1000, 'HH:mm:ss')),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
+                    {
+                      text: this.t.t('Temp. reflejada'),
+                      style: 'tableHeaderImageData',
+                    },
+                    {
+                      text: this.t.t('Módulo'),
+                      style: 'tableHeaderImageData',
+                    },
+                  ],
+                  [
+                    {
+                      text: this.datePipe
+                        .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
+                        .concat(' ')
+                        .concat(this.datePipe.transform(s.pcs[0].datetime * 1000, 'HH:mm:ss')),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
 
-  //                   {
-  //                     text: Math.round(s.pcs[0].irradiancia).toString().concat(' W/m2'),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-  //                   {
-  //                     text: Math.round(s.pcs[0].temperaturaAire).toString().concat(' ºC'),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
+                    {
+                      text: Math.round(s.pcs[0].irradiancia).toString().concat(' W/m2'),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
+                    {
+                      text: Math.round(s.pcs[0].temperaturaAire).toString().concat(' ºC'),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
 
-  //                   {
-  //                     text: s.pcs[0].viento,
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
+                    {
+                      text: s.pcs[0].viento,
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
 
-  //                   {
-  //                     text: s.pcs[0].emisividad,
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
+                    {
+                      text: s.pcs[0].emisividad,
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
 
-  //                   {
-  //                     text: Math.round(s.pcs[0].temperaturaReflejada).toString().concat(' ºC'),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
+                    {
+                      text: Math.round(s.pcs[0].temperaturaReflejada).toString().concat(' ºC'),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
 
-  //                   {
-  //                     text: this.writeModulo(s.pcs[0]),
-  //                     style: 'tableCellAnexo1',
-  //                     noWrap: true,
-  //                   },
-  //                 ],
-  //               ],
-  //             },
-  //           },
+                    {
+                      text: this.writeModulo(s.pcs[0]),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
+                  ],
+                ],
+              },
+            },
 
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-  //         ],
-  //       },
+            {
+              width: '*',
+              text: '',
+            },
+          ],
+        },
 
-  //       '\n',
+        '\n',
 
-  //       {
-  //         columns: [
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-  //           {
-  //             width: 'auto',
-  //             table: {
-  //               headerRows: 1,
-  //               body: [table[0]].concat(table[1]),
-  //             },
-  //           },
-  //           {
-  //             width: '*',
-  //             text: '',
-  //           },
-  //         ],
-  //       },
-  //     ];
+        {
+          columns: [
+            {
+              width: '*',
+              text: '',
+            },
+            {
+              width: 'auto',
+              table: {
+                headerRows: 1,
+                body: [table[0]].concat(table[1]),
+              },
+            },
+            {
+              width: '*',
+              text: '',
+            },
+          ],
+        },
+      ];
 
-  //     allPagsAnexo.push(pagAnexo);
-  //   }
+      allPagsAnexo.push(pagAnexo);
+    }
 
-  //   return allPagsAnexo;
-  // }
+    return allPagsAnexo;
+  }
 
   getDocDefinition(imagesSeguidores) {
     const pages = this.getPagesPDF();
@@ -2811,12 +2758,12 @@ export class ExportComponent implements OnInit {
       anexo1 = this.getAnexoLista(numAnexo);
       numAnexo = 'II';
     }
-    // if (this.filtroApartados.includes('anexo2')) {
-    //   anexo2 = this.getAnexoSeguidores(numAnexo);
-    // }
-    // if (this.filtroApartados.includes('anexo2b')) {
-    //   anexo2 = this.getAnexoSeguidores1eje(numAnexo);
-    // }
+    if (this.filtroApartados.includes('anexo2')) {
+      anexo2 = this.getAnexoSeguidores(numAnexo);
+    }
+    if (this.filtroApartados.includes('anexo2b')) {
+      anexo2 = this.getAnexoSeguidores1eje(numAnexo);
+    }
 
     return {
       header: (currentPage, pageCount) => {
