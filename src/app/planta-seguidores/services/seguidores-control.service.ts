@@ -39,8 +39,6 @@ export class SeguidoresControlService {
   public seguidorHovered$ = new BehaviorSubject<Seguidor>(this._seguidorHovered);
   private _seguidorSelected: Seguidor = undefined;
   public seguidorSelected$ = new BehaviorSubject<Seguidor>(this._seguidorSelected);
-  private _initialized = false;
-  private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   public listaSeguidores: Seguidor[];
   public prevSeguidorSelected: Seguidor;
   private sharedReportNoFilters = false;
@@ -290,6 +288,14 @@ export class SeguidoresControlService {
             this.seguidorViewOpened = true;
           }
         }
+      }
+    });
+  }
+
+  clearSelectFeature() {
+    this.map.getInteractions().forEach((interaction) => {
+      if (interaction instanceof Select) {
+        interaction.getFeatures().clear();
       }
     });
   }

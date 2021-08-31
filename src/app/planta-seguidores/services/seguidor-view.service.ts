@@ -85,6 +85,8 @@ export class SeguidorViewService {
     this.imagesLoaded = false;
     // volvemos el valor al de la vista del mapa
     this.toggleViewSelected = this.mapSeguidoresService.toggleViewSelected;
+    // limpiamos la feature seleccionada
+    this.seguidoresControlService.clearSelectFeature();
   }
 
   get sidenav() {

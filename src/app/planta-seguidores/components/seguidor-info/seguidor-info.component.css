@@ -17,9 +17,14 @@
   gap: 1rem;
 }
 
+h5 {
+  width: max-content;
+}
+
 .no-anom {
   font-size: large;
   font-weight: 300;
+  width: max-content;
 }
 
 .titulo {
