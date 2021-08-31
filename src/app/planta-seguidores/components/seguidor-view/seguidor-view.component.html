@@ -13,7 +13,10 @@
       <div class="image-not" *ngIf="!imagesExist">
         <img src="assets/images/seguidor-check.png" alt="" />
         <!-- <mat-icon>done</mat-icon> -->
-        <span>Seguidor sin anomalias</span>
+        <div class="image-not-label">
+          <span class="image-not-label-principal">Seguidor sin anomalias</span>
+          <span class="image-not-label-secondary">(imagen no disponible)</span>
+        </div>
       </div>
       <!-- SLIDER TEMPORAL -->
       <app-seguidor-slider-temporal

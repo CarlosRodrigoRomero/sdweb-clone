@@ -40,10 +40,8 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public rangeMax: number;
   public palleteJSON: string;
   public selectedInformeId: string;
-  public seguidorSelected: Seguidor;
   public seguidorHovered: Seguidor;
   public locAreasVectorSource: VectorSource;
-  public seguidorSeleccionado: Seguidor;
   public listaSeguidores: Seguidor[];
   public sliderYear: number;
   public aerialLayers: TileLayer[];

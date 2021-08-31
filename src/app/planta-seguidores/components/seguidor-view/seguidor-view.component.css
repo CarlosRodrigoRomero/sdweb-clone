@@ -29,11 +29,21 @@
   width: 300px;
 }
 
-.image-not span {
+.image-not-label {
+  display: grid;
+  align-self: baseline;
+  justify-self: center;
+}
+
+.image-not-label-principal {
   font-size: 24px;
   font-weight: 500;
+}
+
+.image-not-label-secondary {
+  font-size: 20px;
+  font-weight: 300;
   justify-self: center;
-  align-self: baseline;
 }
 
 app-seguidor-view-toggle {

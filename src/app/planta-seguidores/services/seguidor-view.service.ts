@@ -23,6 +23,8 @@ export class SeguidorViewService {
   public prevAnomaliaSelected$ = new BehaviorSubject<Anomalia>(this._prevAnomaliaSelected);
   private _anomaliaHovered: Anomalia = undefined;
   public anomaliaHovered$ = new BehaviorSubject<Anomalia>(this._anomaliaHovered);
+  private _sliderTemporalSelected: number = 100;
+  public sliderTemporalSelected$ = new BehaviorSubject<number>(this._sliderTemporalSelected);
   private _visualCanvas: any = undefined;
   private _thermalCanvas: any = undefined;
   private _anomsCanvas: any = undefined;
@@ -68,6 +70,7 @@ export class SeguidorViewService {
 
   resetViewValues() {
     this.seguidoresControlService.seguidorSelected = undefined;
+    this.seguidoresControlService.prevSeguidorSelected = undefined;
     this.anomaliaSelected = undefined;
     this.seguidoresControlService.urlVisualImageSeguidor = undefined;
     this.seguidoresControlService.urlThermalImageSeguidor = undefined;
@@ -121,6 +124,15 @@ export class SeguidorViewService {
   set anomaliaHovered(value: Anomalia) {
     this._anomaliaHovered = value;
     this.anomaliaHovered$.next(value);
+  }
+
+  get sliderTemporalSelected() {
+    return this._sliderTemporalSelected;
+  }
+
+  set sliderTemporalSelected(value: number) {
+    this._sliderTemporalSelected = value;
+    this.sliderTemporalSelected$.next(value);
   }
 
   get visualCanvas() {

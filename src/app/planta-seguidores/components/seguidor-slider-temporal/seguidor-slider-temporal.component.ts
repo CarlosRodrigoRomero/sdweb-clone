@@ -75,7 +75,7 @@ export class SeguidorSliderTemporalComponent implements OnInit, OnDestroy {
   }
 
   onChangeTemporalSlider(value: number) {
-    this.mapSeguidoresService.sliderTemporalSelected = value;
+    this.seguidorViewService.sliderTemporalSelected = value;
 
     // reiniamos las imagenes
     this.resetImages();
@@ -84,7 +84,7 @@ export class SeguidorSliderTemporalComponent implements OnInit, OnDestroy {
 
     this.reportControlService.selectedInformeId = this.informeIdList[roundedValue];
 
-    // cambiamos al mismo seguidor pero del informe actual
+    // cambiamos al mismo seguidor pero del nuevo informe seleccionado
     this.seguidoresControlService.changeInformeSeguidorSelected();
   }
 
