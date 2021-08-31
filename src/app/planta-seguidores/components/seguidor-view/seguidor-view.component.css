@@ -19,22 +19,21 @@
 }
 
 .image-not {
-  display: flex;
+  display: grid;
   justify-content: center;
-  align-items: flex-start;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
+  align-items: center;
+  height: 512px;
 }
 
-.image-not mat-icon {
-  color: blue;
-  font-size: 32px;
+.image-not img {
+  width: 300px;
 }
 
 .image-not span {
-  font-size: larger;
+  font-size: 24px;
   font-weight: 500;
-  margin-left: 1rem;
+  justify-self: center;
+  align-self: baseline;
 }
 
 app-seguidor-view-toggle {

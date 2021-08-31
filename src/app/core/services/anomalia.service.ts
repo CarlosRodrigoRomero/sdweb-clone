@@ -315,6 +315,37 @@ export class AnomaliaService {
     return criticidad;
   }
 
+  downloadImage(folder: string, anomalia: Anomalia) {
+    let prefijo = 'visual';
+    if (folder === 'jpg') {
+      prefijo = 'radiometrico';
+    }
+    this.storage
+      .ref(`informes/${anomalia.informeId}/${folder}/${anomalia.archivoPublico}`)
+      .getDownloadURL()
+      .subscribe((downloadUrl) => {
+        // (anomalia as PcInterface).downloadUrlStringRjpg = downloadUrl;
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
+          /* Create a new Blob object using the response
+           *  data of the onload object.
+           */
+          const blob = new Blob([xhr.response], { type: 'image/jpg' });
+          const a: any = document.createElement('a');
+          a.style = 'display: none';
+          document.body.appendChild(a);
+          const url = window.URL.createObjectURL(blob);
+          a.href = url;
+          a.download = `${prefijo}_${anomalia.archivoPublico}`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+        };
+        xhr.open('GET', downloadUrl);
+        xhr.send();
+      });
+  }
+
   downloadRjpg(anomalia: Anomalia) {
     this.storage
       // .ref(`informes/${anomalia.informeId}/rjpg/${anomalia.archivoPublico}`)

@@ -508,8 +508,11 @@ export class SeguidoresControlService {
 
   public getImageSeguidor(folder: string) {
     if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
-      // const imageName = this.seguidorSelected.anomalias[0].archivoPublico;
-      const imageName = this.seguidorSelected.imageName;
+      // const imageName = this.seguidorSelected.imageName;
+      let imageName = this.seguidorSelected.anomalias[0].archivoPublico;
+      if (this.seguidorSelected.anomaliasCliente.length > 0) {
+        imageName = this.seguidorSelected.anomaliasCliente[0].archivoPublico;
+      }
 
       // Creamos una referencia a la imagen
       const storageRef = this.storage.ref('');
