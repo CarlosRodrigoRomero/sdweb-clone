@@ -7,6 +7,10 @@ table {
   width: 500px;
 }
 
+:host ::ng-deep .mat-cell {
+  padding: 0 1rem 0 0;
+}
+
 .mat-row {
   cursor: pointer;
 }

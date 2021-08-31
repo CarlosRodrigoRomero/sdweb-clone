@@ -212,19 +212,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
       anomalia,
     });
 
-    /* const textId = new fabric.Text('#'.concat(pc.local_id.toString().concat(' ')), {
-      left: pc.img_left,
-      top: pc.img_top - 26,
-      fontSize: 18,
-      // textBackgroundColor: 'red',
-      ref: 'text',
-      selectable: false,
-      hoverCursor: 'default',
-      fill: 'white',
-    }); */
-
     this.anomsCanvas.add(polygon);
-    // this.anomsCanvas.add(textId);
     this.anomsCanvas.renderAll();
   }
 
@@ -295,7 +283,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
 
       zoomCtx.drawImage(
         image,
-        e.pointer.x * scaleX - this.zoomSquare / 2 / zoomFactor,
+        e.pointer.x * scaleX + this.zoomSquare / 2 / zoomFactor,
         e.pointer.y * scaleY - this.zoomSquare / 2 / zoomFactor,
         this.zoomSquare,
         this.zoomSquare,
@@ -305,8 +293,8 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
         this.zoomSquare * zoomFactor
       );
 
-      zoom.style.top = e.pointer.y - this.zoomSquare / 2 + 'px';
-      zoom.style.left = e.pointer.x + 20 + 'px';
+      zoom.style.top = e.pointer.y + 20 + 'px';
+      zoom.style.left = e.pointer.x - this.zoomSquare - 20 + 'px';
       zoom.style.display = 'block';
     });
 
