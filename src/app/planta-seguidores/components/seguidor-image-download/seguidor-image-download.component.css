@@ -1,13 +1,16 @@
+.btn-downloads {
+  height: 40px;
+  padding: 0;
+  width: 40px;
+  min-width: unset !important;
+}
+
 .download-btns {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
 }
 
-mat-icon {
-  margin-right: 0.3rem;
-}
-
-span {
-  color: darkred;
+.menu {
+  margin: 0.5rem 1rem 0;
 }

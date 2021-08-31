@@ -6,7 +6,7 @@
   top: 70px;
 }
 
-.left-content {
+.right-content {
   display: grid;
   row-gap: 1rem;
   width: 640px;
@@ -48,7 +48,7 @@
 
 app-seguidor-view-toggle {
   position: absolute;
-  left: 130px;
+  right: 132px;
   top: 472px;
   z-index: 999;
 }
@@ -56,18 +56,25 @@ app-seguidor-view-toggle {
 app-seguidor-image-toggle {
   position: absolute;
   top: 15px;
-  left: 475px;
+  right: 15px;
   z-index: 999;
 }
 
 app-seguidor-view-leyenda {
   position: absolute;
-  left: 15px;
+  right: 537px;
   top: 15px;
   z-index: 999;
 }
 
-.right-content {
+app-seguidor-image-download {
+  position: absolute;
+  z-index: 999;
+  right: 15px;
+  top: 472px;
+}
+
+.left-content {
   width: auto;
 }
 
