@@ -3,8 +3,8 @@ import { Seguidor } from '@core/models/seguidor';
 
 import { Subscription } from 'rxjs';
 
-import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidorViewService } from '../../services/seguidor-view.service';
 import { GLOBAL } from '@core/services/global';
 
 @Component({
@@ -22,13 +22,13 @@ export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
 
   constructor(
-    private mapSeguidoresService: MapSeguidoresService,
-    private seguidoresControlService: SeguidoresControlService
+    private seguidoresControlService: SeguidoresControlService,
+    private seguidorViewService: SeguidorViewService
   ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.mapSeguidoresService.toggleViewSelected$.subscribe((view) => {
+      this.seguidorViewService.toggleViewSelected$.subscribe((view) => {
         this.viewSelected = view;
 
         if (this.seguidorSelected !== undefined) {

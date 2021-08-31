@@ -26,7 +26,6 @@ import { InformeService } from '@core/services/informe.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { InformeInterface } from '@core/models/informe';
-import { Overlay } from 'ol';
 
 @Injectable({
   providedIn: 'root',
@@ -90,6 +89,9 @@ export class SeguidoresControlService {
           switchMap((informeId) => {
             this.selectedInformeId = informeId;
 
+            // reseteamos la interaccion con cada vista para obtener el estilo correcto
+            this.resetSelectInteraction();
+
             return this.informeService.getInforme(informeId);
           })
         )
@@ -98,19 +100,7 @@ export class SeguidoresControlService {
       this.getMaesMedioSigma();
       this.getCCsMedioSigma();
 
-      this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => {
-        this.toggleViewSelected = viewSel;
-
-        // eliminamos la anterior interacción para que la actual obtenga el estilo correcto
-        this.map.getInteractions().forEach((interaction) => {
-          if (interaction instanceof Select) {
-            this.map.removeInteraction(interaction);
-          }
-        });
-
-        // la añadimos de nuevo
-        this.addSelectInteraction();
-      });
+      this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
 
       initService(true);
     });
@@ -302,6 +292,18 @@ export class SeguidoresControlService {
         }
       }
     });
+  }
+
+  private resetSelectInteraction() {
+    // eliminamos la anterior interacción para que la actual obtenga el estilo correcto
+    this.map.getInteractions().forEach((interaction) => {
+      if (interaction instanceof Select) {
+        this.map.removeInteraction(interaction);
+      }
+    });
+
+    // la añadimos de nuevo
+    this.addSelectInteraction();
   }
 
   private addClickOutFeatures() {

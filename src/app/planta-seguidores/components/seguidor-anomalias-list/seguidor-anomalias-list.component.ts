@@ -8,7 +8,6 @@ import { combineLatest, Subscription } from 'rxjs';
 import { GLOBAL } from '@core/services/global';
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
-import { MapSeguidoresService } from '../../services/map-seguidores.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { Anomalia } from '@core/models/anomalia';
@@ -40,15 +39,14 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
-    private seguidorViewService: SeguidorViewService,
-    private mapSeguidoresService: MapSeguidoresService
+    private seguidorViewService: SeguidorViewService
   ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
       combineLatest([
         this.seguidoresControlService.seguidorSelected$,
-        this.mapSeguidoresService.toggleViewSelected$,
+        this.seguidorViewService.toggleViewSelected$,
       ]).subscribe(([seguidor, view]) => {
         this.seguidorSelected = seguidor;
         this.viewSelected = view;

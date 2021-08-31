@@ -3,6 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
+import { SeguidorViewService } from '../../services/seguidor-view.service';
 
 @Component({
   selector: 'app-seguidor-view-toggle',
@@ -14,7 +15,7 @@ export class SeguidorViewToggleComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private mapSeguidoresService: MapSeguidoresService) {}
+  constructor(private mapSeguidoresService: MapSeguidoresService, private seguidorViewService: SeguidorViewService) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -23,7 +24,7 @@ export class SeguidorViewToggleComponent implements OnInit, OnDestroy {
   }
 
   onToggleChange(value) {
-    this.mapSeguidoresService.toggleViewSelected = value;
+    this.seguidorViewService.toggleViewSelected = value;
   }
 
   ngOnDestroy(): void {

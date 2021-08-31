@@ -25,6 +25,8 @@ export class SeguidorViewService {
   public anomaliaHovered$ = new BehaviorSubject<Anomalia>(this._anomaliaHovered);
   private _sliderTemporalSelected: number = 100;
   public sliderTemporalSelected$ = new BehaviorSubject<number>(this._sliderTemporalSelected);
+  private _toggleViewSelected = 0;
+  public toggleViewSelected$ = new BehaviorSubject<number>(this._toggleViewSelected);
   private _visualCanvas: any = undefined;
   private _thermalCanvas: any = undefined;
   private _anomsCanvas: any = undefined;
@@ -37,7 +39,8 @@ export class SeguidorViewService {
     private mapSeguidoresService: MapSeguidoresService,
     private seguidorService: SeguidorService
   ) {
-    this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSelected) => (this.viewSelected = viewSelected));
+    this.toggleViewSelected$.subscribe((view) => (this.viewSelected = view));
+    this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSelected) => (this.toggleViewSelected = viewSelected));
   }
 
   getAnomaliaColor(anomalia: Anomalia): string {
@@ -80,6 +83,8 @@ export class SeguidorViewService {
     }
     this.seguidoresControlService.imageExist = true;
     this.imagesLoaded = false;
+    // volvemos el valor al de la vista del mapa
+    this.toggleViewSelected = this.mapSeguidoresService.toggleViewSelected;
   }
 
   get sidenav() {
@@ -133,6 +138,15 @@ export class SeguidorViewService {
   set sliderTemporalSelected(value: number) {
     this._sliderTemporalSelected = value;
     this.sliderTemporalSelected$.next(value);
+  }
+
+  get toggleViewSelected() {
+    return this._toggleViewSelected;
+  }
+
+  set toggleViewSelected(selected: number) {
+    this._toggleViewSelected = selected;
+    this.toggleViewSelected$.next(selected);
   }
 
   get visualCanvas() {
