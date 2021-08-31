@@ -62,9 +62,10 @@ app-seguidor-image-toggle {
 
 app-seguidor-view-leyenda {
   position: absolute;
-  right: 537px;
-  top: 15px;
+  right: 640px;
+  top: 16px;
   z-index: 999;
+  transform: translate(100%, 0);
 }
 
 app-seguidor-image-download {

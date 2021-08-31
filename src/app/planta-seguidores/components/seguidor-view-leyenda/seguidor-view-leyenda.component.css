@@ -1,6 +1,7 @@
 mat-card {
   max-width: max-content;
   padding: 10px;
+  opacity: 0.8;
 }
 
 mat-card-content {
