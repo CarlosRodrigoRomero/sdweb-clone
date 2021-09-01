@@ -16,7 +16,7 @@
         <!-- DESCARGAR IMAGENES -->
         <app-seguidor-image-download></app-seguidor-image-download>
       </div>
-      <div class="image-not" *ngIf="!imagesExist">
+      <div class="image-not" *ngIf="!imagesExist || seguidorSelected === null">
         <img src="assets/images/seguidor-check.png" alt="" />
         <div class="image-not-label">
           <span class="image-not-label-principal">Seguidor sin anomalias</span>

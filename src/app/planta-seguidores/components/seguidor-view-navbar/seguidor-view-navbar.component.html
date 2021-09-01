@@ -1,6 +1,6 @@
 <mat-toolbar [class.mat-elevation-z2]="true" class="navbar">
   <div class="title-line">
-    <span *ngIf="seguidorSelected === null">NO EXISTE SEGUIDOR EN LA FECHA SELECCIONADA</span>
+    <span *ngIf="seguidorSelected === null">Seguidor</span>
     <span *ngIf="seguidorSelected !== null">{{ seguidorSelected.nombre }}</span>
     <span *ngIf="seguidorSelected !== null" class="modulo-label">({{ seguidorSelected.moduloLabel }})</span>
     <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
