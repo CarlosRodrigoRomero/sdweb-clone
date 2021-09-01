@@ -172,7 +172,6 @@ export class AnomaliaService {
             }
 
             if (tipo === 'pcs') {
-              data.localId = (data as PcInterface).local_id.toString();
               data.localX = (data as PcInterface).local_x;
               data.localY = (data as PcInterface).local_y;
               if (data.globalCoords === undefined) {
@@ -182,6 +181,7 @@ export class AnomaliaService {
                   (data as PcInterface).global_z,
                 ];
               }
+              data.localId = this.getLocalId(data);
             }
             // Convertimos el objeto en un array
             if (data.hasOwnProperty('featureCoords')) {
@@ -214,6 +214,29 @@ export class AnomaliaService {
       .then(() => {
         console.log('Document successfully updated!');
       });
+  }
+
+  private getLocalId(anomalia: Anomalia): string {
+    const parts: string[] = [];
+    anomalia.globalCoords.forEach((coord) => {
+      if (coord !== undefined && coord !== null && coord !== '') {
+        parts.push(coord);
+      }
+    });
+    parts.push(anomalia.localX.toString());
+    parts.push(anomalia.localY.toString());
+
+    let localId = '';
+
+    parts.forEach((part, index) => {
+      if (index < parts.length - 1) {
+        localId += part + '.';
+      } else {
+        localId += part;
+      }
+    });
+
+    return localId;
   }
 
   private _prepararParaDb(anomalia: Anomalia) {

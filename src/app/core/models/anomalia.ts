@@ -1,4 +1,5 @@
 import { Coordinate } from 'ol/coordinate.js';
+
 import { FilterableElement } from './filterableInterface';
 import { ModuloInterface } from './modulo';
 
@@ -54,7 +55,6 @@ export class Anomalia implements FilterableElement {
     this.temperaturaMax = temperaturaMax;
     this.modulo = modulo;
     this.temperaturaRef = temperaturaRef;
-
     this.featureCoords = featureCoords;
     this.featureType = featureType;
     this.plantaId = plantaId;
