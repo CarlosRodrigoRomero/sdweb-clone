@@ -82,10 +82,12 @@ export class SeguidorSliderTemporalComponent implements OnInit, OnDestroy {
 
     const roundedValue = Math.round(value / (100 / (this.informeIdList.length - 1)));
 
-    this.reportControlService.selectedInformeId = this.informeIdList[roundedValue];
+    const newInformeId = this.informeIdList[roundedValue];
+
+    this.seguidorViewService.selectedInformeId = newInformeId;
 
     // cambiamos al mismo seguidor pero del nuevo informe seleccionado
-    this.seguidoresControlService.changeInformeSeguidorSelected();
+    this.seguidoresControlService.changeInformeSeguidorSelected(newInformeId);
   }
 
   resetImages() {

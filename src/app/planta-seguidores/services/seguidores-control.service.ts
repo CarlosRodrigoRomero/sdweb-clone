@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
@@ -22,10 +22,8 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { FilterService } from '@core/services/filter.service';
 import { GLOBAL } from '@core/services/global';
 import { MapSeguidoresService } from './map-seguidores.service';
-import { InformeService } from '@core/services/informe.service';
 
 import { Seguidor } from '@core/models/seguidor';
-import { InformeInterface } from '@core/models/informe';
 
 @Injectable({
   providedIn: 'root',
@@ -33,8 +31,6 @@ import { InformeInterface } from '@core/models/informe';
 export class SeguidoresControlService {
   public map: Map;
   public selectedInformeId: string;
-  private selectedInforme: InformeInterface;
-  private imgSeguidoresUrls: string[] = [];
   private _seguidorHovered: Seguidor = undefined;
   public seguidorHovered$ = new BehaviorSubject<Seguidor>(this._seguidorHovered);
   private _seguidorSelected: Seguidor = undefined;
@@ -64,8 +60,7 @@ export class SeguidoresControlService {
     private reportControlService: ReportControlService,
     private filterService: FilterService,
     private mapSeguidoresService: MapSeguidoresService,
-    private storage: AngularFireStorage,
-    private informeService: InformeService
+    private storage: AngularFireStorage
   ) {}
 
   initService(): Promise<boolean> {
@@ -82,23 +77,17 @@ export class SeguidoresControlService {
           this.sharedReportNoFilters = !isSharedWithFil;
         });
 
-      this.reportControlService.selectedInformeId$
-        .pipe(
-          switchMap((informeId) => {
-            this.selectedInformeId = informeId;
-
-            // reseteamos la interaccion con cada vista para obtener el estilo correcto
-            this.resetSelectInteraction();
-
-            return this.informeService.getInforme(informeId);
-          })
-        )
-        .subscribe((informe) => (this.selectedInforme = informe));
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
 
       this.getMaesMedioSigma();
       this.getCCsMedioSigma();
 
-      this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
+      this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => {
+        this.toggleViewSelected = viewSel;
+
+        // reseteamos la interaccion con cada vista para obtener el estilo correcto
+        this.resetSelectInteraction();
+      });
 
       initService(true);
     });
@@ -524,7 +513,7 @@ export class SeguidoresControlService {
 
       // Creamos una referencia a la imagen
       const storageRef = this.storage.ref('');
-      const imageRef = storageRef.child('informes/' + this.selectedInformeId + '/' + folder + '/' + imageName);
+      const imageRef = storageRef.child('informes/' + this.seguidorSelected.informeId + '/' + folder + '/' + imageName);
 
       // Obtenemos la URL y descargamos el archivo capturando los posibles errores
       imageRef
@@ -564,17 +553,17 @@ export class SeguidoresControlService {
     }
   }
 
-  changeInformeSeguidorSelected() {
+  changeInformeSeguidorSelected(informeId: string) {
     let seguidor;
     if (this.seguidorSelected === null) {
       seguidor = this.listaSeguidores.find((seg) => {
         // cambiamos al seguidor correspondiente al informe actual
-        return seg.informeId === this.selectedInformeId && seg.nombre === this.prevSeguidorSelected.nombre;
+        return seg.informeId === informeId && seg.nombre === this.prevSeguidorSelected.nombre;
       });
     } else {
       seguidor = this.listaSeguidores.find((seg) => {
         // cambiamos al seguidor correspondiente al informe actual
-        return seg.informeId === this.selectedInformeId && seg.nombre === this.seguidorSelected.nombre;
+        return seg.informeId === informeId && seg.nombre === this.seguidorSelected.nombre;
       });
     }
 
@@ -590,34 +579,6 @@ export class SeguidoresControlService {
 
     // indicamos que la imagen existe por defecto
     this.imageExist = true;
-  }
-
-  selectNextSeguidor() {
-    // nos movemos solo entre los seguidores del informe seleccionado
-    const seguidoresInformeActual = this.listaSeguidores.filter(
-      (seg) => seg.informeId === this.reportControlService.selectedInformeId
-    );
-    const index = seguidoresInformeActual.indexOf(this.seguidorSelected);
-    if (index !== seguidoresInformeActual.length - 1) {
-      this.seguidorSelected = seguidoresInformeActual[index + 1];
-
-      // indicamos que la imagen existe por defecto
-      this.imageExist = true;
-    }
-  }
-
-  selectPrevSeguidor() {
-    // nos movemos solo entre los seguidores del informe seleccionado
-    const seguidoresInformeActual = this.listaSeguidores.filter(
-      (seg) => seg.informeId === this.reportControlService.selectedInformeId
-    );
-    const index = seguidoresInformeActual.indexOf(this.seguidorSelected);
-    if (index !== 0) {
-      this.seguidorSelected = seguidoresInformeActual[index - 1];
-
-      // indicamos que la imagen existe por defecto
-      this.imageExist = true;
-    }
   }
 
   setExternalStyle(seguidorId: string, focus: boolean) {

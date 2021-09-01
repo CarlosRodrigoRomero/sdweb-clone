@@ -7,6 +7,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { SeguidorService } from '@core/services/seguidor.service';
 import { SeguidoresControlService } from '../services/seguidores-control.service';
 import { MapSeguidoresService } from './map-seguidores.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
@@ -27,6 +28,8 @@ export class SeguidorViewService {
   public sliderTemporalSelected$ = new BehaviorSubject<number>(this._sliderTemporalSelected);
   private _toggleViewSelected = 0;
   public toggleViewSelected$ = new BehaviorSubject<number>(this._toggleViewSelected);
+  private _selectedInformeId: string = undefined;
+  public selectedInformeId$ = new BehaviorSubject<string>(this._selectedInformeId);
   private _visualCanvas: any = undefined;
   private _thermalCanvas: any = undefined;
   private _anomsCanvas: any = undefined;
@@ -37,10 +40,13 @@ export class SeguidorViewService {
   constructor(
     private seguidoresControlService: SeguidoresControlService,
     private mapSeguidoresService: MapSeguidoresService,
-    private seguidorService: SeguidorService
+    private seguidorService: SeguidorService,
+    private reportControlService: ReportControlService
   ) {
     this.toggleViewSelected$.subscribe((view) => (this.viewSelected = view));
     this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSelected) => (this.toggleViewSelected = viewSelected));
+
+    this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
   }
 
   getAnomaliaColor(anomalia: Anomalia): string {
@@ -87,6 +93,8 @@ export class SeguidorViewService {
     this.toggleViewSelected = this.mapSeguidoresService.toggleViewSelected;
     // limpiamos la feature seleccionada
     this.seguidoresControlService.clearSelectFeature();
+    // seleccionamos el mismo que el mapa al cerrar
+    this.selectedInformeId = this.reportControlService.selectedInformeId;
   }
 
   get sidenav() {
@@ -149,6 +157,15 @@ export class SeguidorViewService {
   set toggleViewSelected(selected: number) {
     this._toggleViewSelected = selected;
     this.toggleViewSelected$.next(selected);
+  }
+
+  get selectedInformeId() {
+    return this._selectedInformeId;
+  }
+
+  set selectedInformeId(value: string) {
+    this._selectedInformeId = value;
+    this.selectedInformeId$.next(value);
   }
 
   get visualCanvas() {

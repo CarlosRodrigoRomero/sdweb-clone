@@ -45,22 +45,6 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.add(this.seguidoresControlService.imageExist$.subscribe((exist) => (this.imagesExist = exist)));
   }
 
-  nextSeguidor() {
-    // reiniamos las imagenes
-    this.resetImages();
-
-    // seleccionamos el proximo seguidor
-    this.seguidoresControlService.selectNextSeguidor();
-  }
-
-  prevSeguidor() {
-    // reiniamos las imagenes
-    this.resetImages();
-
-    // seleccionamos el seguidor previo
-    this.seguidoresControlService.selectPrevSeguidor();
-  }
-
   resetImages() {
     // limpiamos la imagen del seguidor anterior
     this.seguidorViewService.thermalCanvas.clear();

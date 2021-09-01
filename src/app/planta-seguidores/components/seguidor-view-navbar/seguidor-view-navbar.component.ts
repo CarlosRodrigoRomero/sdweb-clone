@@ -40,9 +40,6 @@ export class SeguidorViewNavbarComponent implements OnInit {
   public closeSidenav() {
     this.seguidorViewService.sidenav.close();
 
-    // reseteamos el estilo del seguidor
-    this.seguidoresControlService.setExternalStyle(this.seguidorSelected.id, false);
-
     // reseteamos los valores de la vista seguidor
     this.seguidorViewService.resetViewValues();
   }
