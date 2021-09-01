@@ -271,6 +271,7 @@ export class ReportControlService {
                 const params = doc.data() as ParamsFilterShare;
                 this.plantaId = params.plantaId;
                 this.selectedInformeId = params.informeId;
+
                 if (!this.router.url.includes('filterable')) {
                   // iniciamos anomalia service antes de obtener las anomalias
                   this.anomaliaService.initService(this.plantaId).then(() =>
