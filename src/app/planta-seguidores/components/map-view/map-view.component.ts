@@ -59,13 +59,19 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.subscriptions.add(this.reportControlService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
 
-    this.subscriptions.add(this.reportControlService.mapLoaded$.subscribe((value) => (this.mapLoaded = value)));
+    this.subscriptions.add(
+      this.reportControlService.mapLoaded$.subscribe((value) => {
+        this.mapLoaded = value;
+
+        if (this.mapLoaded) {
+          this.statsService.setSidenav(this.sidenavStats);
+        }
+      })
+    );
   }
 
   ngAfterViewInit(): void {
     this.seguidorViewService.sidenav = this.sidenavSeguidorView;
-
-    this.statsService.setSidenav(this.sidenavStats);
   }
 
   loadStats() {

@@ -7,14 +7,14 @@
   </mat-sidenav>
   <mat-sidenav-content>
     <app-navbar></app-navbar>
-    <mat-sidenav-container *ngIf="seguidoresLoaded" class="stats-container" (backdropClick)="sidenavStats.toggle()">
+    <mat-sidenav-container *ngIf="seguidoresLoaded" class="stats-container">
       <!-- SIDENAV STATS -->
       <mat-sidenav #sidenavStats [(opened)]="statsOpened" class="stats-sidenav" position="end">
         <app-planta-stats></app-planta-stats>
       </mat-sidenav>
 
       <mat-sidenav-content>
-        <mat-sidenav-container class="main-container" [hasBackdrop]="false">
+        <mat-sidenav-container class="main-container" [hasBackdrop]="false" (backdropClick)="sidenavStats.toggle()">
           <!-- SIDENAV FILTROS -->
           <mat-sidenav
             *ngIf="showFilters"
