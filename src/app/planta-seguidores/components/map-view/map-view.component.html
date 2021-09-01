@@ -85,14 +85,20 @@
 
             <!-- BOTON SIDENAV FILTROS -->
             <div *ngIf="seguidoresLoaded">
-              <button *ngIf="showFilters" mat-raised-button class="btn-left" (click)="sidenavLeft.toggle()">
+              <button
+                *ngIf="showFilters"
+                mat-raised-button
+                class="btn-left"
+                (click)="sidenavLeft.toggle()"
+                matTooltip="Filtros"
+              >
                 <mat-icon *ngIf="!leftOpened">keyboard_arrow_right</mat-icon>
                 <mat-icon *ngIf="leftOpened">keyboard_arrow_left</mat-icon>
                 <mat-icon>filter_alt</mat-icon>
               </button>
 
               <!-- BOTON SIDENAV LISTA SEGUIDORES -->
-              <button mat-raised-button class="btn-right" (click)="sidenavRight.toggle()">
+              <button mat-raised-button class="btn-right" (click)="sidenavRight.toggle()" matTooltip="Lista seguidores">
                 <mat-icon>list_alt</mat-icon>
                 <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
                 <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon>
@@ -100,9 +106,11 @@
 
               <!-- BOTON SIDENAV STATS -->
               <button
+                *ngIf="showFilters"
                 mat-raised-button
                 class="btn-right-stats"
                 (click)="sidenavStats.toggle(); loadStats()"
+                matTooltip="Estadísticas"
                 [disabled]="rightOpened"
               >
                 <mat-icon>query_stats</mat-icon>
