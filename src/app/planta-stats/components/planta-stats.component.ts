@@ -16,6 +16,7 @@ export class PlantaStatsComponent implements OnInit {
   thereAreZones: boolean;
   loadCCyGradChart = true;
   plantaDemo = false;
+  sharedReport = false;
 
   constructor(
     private statsService: StatsService,
@@ -29,6 +30,8 @@ export class PlantaStatsComponent implements OnInit {
     );
 
     this.reportControlService.thereAreZones$.subscribe((value) => (this.thereAreZones = value));
+
+    this.reportControlService.sharedReport$.subscribe((shared) => (this.sharedReport = shared));
 
     this.statsService.loadCCyGradChart$.subscribe((load) => (this.loadCCyGradChart = load));
 
