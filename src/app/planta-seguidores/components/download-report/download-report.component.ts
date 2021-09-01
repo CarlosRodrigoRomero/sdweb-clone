@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { AngularFireStorage } from '@angular/fire/storage';
+
+import { Subscription } from 'rxjs';
 
 import { ReportControlService } from '@core/services/report-control.service';
 
@@ -9,22 +11,26 @@ import { ReportControlService } from '@core/services/report-control.service';
   templateUrl: './download-report.component.html',
   styleUrls: ['./download-report.component.css'],
 })
-export class DownloadReportComponent implements OnInit {
+export class DownloadReportComponent implements OnInit, OnDestroy {
   private selectedInformeId: string;
   imagesZipExist = true;
   imagesZipUrl: string;
   excelExist = true;
   excelUrl: string;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(private storage: AngularFireStorage, private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-      this.selectedInformeId = informeId;
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+        this.selectedInformeId = informeId;
 
-      this.downloadExcel();
-      this.downloadImages();
-    });
+        this.downloadExcel();
+        this.downloadImages();
+      })
+    );
   }
 
   private downloadExcel() {
@@ -93,5 +99,9 @@ export class DownloadReportComponent implements OnInit {
             break;
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
