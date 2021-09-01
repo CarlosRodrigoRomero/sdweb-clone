@@ -209,7 +209,7 @@ export let GLOBAL = {
     0, // "Módulo afectado por sombras" // 15
     0, // Yellowing //16
     1, // "String en CA", // 17
-    0,
+    0.85, // "Posible PID" // 18
   ],
 
   pcColumnas: [
