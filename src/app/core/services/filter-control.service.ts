@@ -20,15 +20,15 @@ export class FilterControlService {
   public minTempMaxDefault: number = 50;
   private _minTempMax: number = 50;
   public minTempMaxSource = new BehaviorSubject<number>(this._minTempMax);
-  public maxTempMaxDefault: number = 100;
-  private _maxTempMax: number = 100;
+  public maxTempMaxDefault: number = 120;
+  private _maxTempMax: number = 120;
   public maxTempMaxSource = new BehaviorSubject<number>(this._maxTempMax);
 
   public minGradienteDefault: number = 0;
   private _minGradiente: number = 0;
   public minGradienteSource = new BehaviorSubject<number>(this._minGradiente);
-  public maxGradienteDefault: number = 50;
-  private _maxGradiente: number = 50;
+  public maxGradienteDefault: number = 80;
+  private _maxGradiente: number = 80;
   public maxGradienteSource = new BehaviorSubject<number>(this._maxGradiente);
 
   private _labelTipoDefaultStatus = true;

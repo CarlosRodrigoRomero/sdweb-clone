@@ -1,13 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
+import { Subscription } from 'rxjs';
+
 import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
 
 import { FilterService } from '@core/services/filter.service';
-import { PcService } from '@core/services/pc.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
 import { GradientFilter } from '@core/models/gradientFilter';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-gradient-filter',
@@ -15,8 +15,8 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./gradient-filter.component.css'],
 })
 export class GradientFilterComponent implements OnInit, OnDestroy {
-  minGradiente: number;
-  maxGradiente: number;
+  minGradiente = 0;
+  maxGradiente = 80;
   rangoMinGradiente: number;
   rangoMaxGradiente: number;
   filtroGradiente: GradientFilter;
@@ -24,26 +24,15 @@ export class GradientFilterComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(
-    private filterService: FilterService,
-    private pcService: PcService,
-    private filterControlService: FilterControlService
-  ) {}
+  constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
 
   ngOnInit(): void {
-    // this.minGradiente = this.pcService.getMinGradienteNormalizado();
-    this.minGradiente = 0;
-    // this.maxGradiente = this.pcService.getMaxGradienteNormalizado();
-    this.maxGradiente = 50;
-
     this.subscriptions.add(
       this.filterControlService.minGradienteSource.subscribe((value) => (this.rangoMinGradiente = value))
     );
     this.subscriptions.add(
       this.filterControlService.maxGradienteSource.subscribe((value) => (this.rangoMaxGradiente = value))
     );
-    // this.rangoMinGradiente = this.minGradiente;
-    // this.rangoMaxGradiente = this.maxGradiente;
 
     this.options = {
       floor: this.minGradiente,

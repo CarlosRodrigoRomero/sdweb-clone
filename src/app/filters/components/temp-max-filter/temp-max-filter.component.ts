@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
+import { Subscription } from 'rxjs';
+
 import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
 
 import { FilterService } from '@core/services/filter.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-temp-max-filter',
@@ -14,8 +15,8 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./temp-max-filter.component.css'],
 })
 export class TempMaxFilterComponent implements OnInit, OnDestroy {
-  minTemp: number = 50;
-  maxTemp: number = 100;
+  minTemp = 50;
+  maxTemp = 120;
   rangoMinTemp: number;
   rangoMaxTemp: number;
   filtroTempMax: TempMaxFilter;
