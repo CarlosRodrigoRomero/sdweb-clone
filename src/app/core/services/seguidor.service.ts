@@ -57,11 +57,10 @@ export class SeguidorService {
     // Obtener todas las locArea de la planta
     const locAreaList$ = this.plantaService.getLocationsArea(plantaId);
     const anomaliaList$ = this.anomaliaService.getAnomalias$(informeId, tipo);
-    const getInforme$ = this.informeService.getInforme(informeId);
 
     // obtenemos todas las anomalias y las locAreas
-    return combineLatest([locAreaList$, anomaliaList$, getInforme$]).pipe(
-      map(([locAreaList, anomaliaList, informe]) => {
+    return combineLatest([locAreaList$, anomaliaList$]).pipe(
+      map(([locAreaList, anomaliaList]) => {
         const seguidores: Seguidor[] = [];
 
         if (anomaliaList.length > 0) {
@@ -181,25 +180,30 @@ export class SeguidorService {
     locAreasNoSeguidores: LocationAreaInterface[],
     locAreaSeguidor: LocationAreaInterface
   ): string[] {
-    const globalCoords: string[] = locAreaSeguidor.globalCoords;
+    const globalCoordsSeguidor: string[] = locAreaSeguidor.globalCoords;
 
-    locAreasNoSeguidores.forEach((locArea, index) => {
+    locAreasNoSeguidores.forEach((locAreaNoSeg, index) => {
       // convertimos el punto y el poligono en array
       const point = [locAreaSeguidor.path[0].lat, locAreaSeguidor.path[0].lng];
-      const polygon = locArea.path.map((coord) => [coord.lat, coord.lng]);
+      const polygon = locAreaNoSeg.path.map((coord) => [coord.lat, coord.lng]);
 
       if (PointInPolygon(point, polygon)) {
-        locArea.globalCoords.forEach((gC, i) => {
-          if (gC !== null) {
-            if (globalCoords[i] !== null || globalCoords[i] !== undefined || globalCoords[i] !== '') {
-              globalCoords[i] = gC;
+        locAreaNoSeg.globalCoords.forEach((coord, i) => {
+          if (coord !== null && coord !== undefined && coord !== '') {
+            // si la global del seguidor es incorrecta le aplicamos la del area
+            if (
+              globalCoordsSeguidor[i] === null ||
+              globalCoordsSeguidor[i] === undefined ||
+              globalCoordsSeguidor[i] === ''
+            ) {
+              globalCoordsSeguidor[i] = coord;
             }
           }
         });
       }
     });
 
-    return globalCoords;
+    return globalCoordsSeguidor;
   }
 
   private getImageName(seguidor: Seguidor, informe: InformeInterface): string {
