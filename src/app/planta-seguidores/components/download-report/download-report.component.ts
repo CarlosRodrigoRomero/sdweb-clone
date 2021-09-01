@@ -13,6 +13,8 @@ export class DownloadReportComponent implements OnInit {
   private selectedInformeId: string;
   imagesZipExist = true;
   imagesZipUrl: string;
+  excelExist = true;
+  excelUrl: string;
 
   constructor(private storage: AngularFireStorage, private reportControlService: ReportControlService) {}
 
@@ -20,12 +22,47 @@ export class DownloadReportComponent implements OnInit {
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInformeId = informeId;
 
+      this.downloadExcel();
       this.downloadImages();
     });
   }
 
+  private downloadExcel() {
+    // Creamos la referencia
+    const storageRef = this.storage.ref('');
+    const excelRef = storageRef.child('informes/' + this.selectedInformeId + '/informe.xlsx');
+
+    excelRef
+      .getDownloadURL()
+      .toPromise()
+      .then((url) => {
+        this.excelUrl = url;
+      })
+      .catch((error) => {
+        switch (error.code) {
+          case 'storage/object-not-found':
+            // indicamos  que el excel no existe
+            this.excelExist = false;
+            console.log("File doesn't exist");
+            break;
+
+          case 'storage/unauthorized':
+            console.log("User doesn't have permission to access the object");
+            break;
+
+          case 'storage/canceled':
+            console.log('User canceled the upload');
+            break;
+
+          case 'storage/unknown':
+            console.log('Unknown error occurred, inspect the server response');
+            break;
+        }
+      });
+  }
+
   private downloadImages() {
-    // Creamos una referencia a la imagen
+    // Creamos la referencia
     const storageRef = this.storage.ref('');
     const imagesZipRef = storageRef.child('informes/' + this.selectedInformeId + '/imagenes.zip');
 
