@@ -24,7 +24,7 @@ export class LeyendaComponent implements OnInit, OnDestroy {
     this.viewsLabels = [
       ['Muy bueno', 'Correcto', 'Mejorable'],
       ['Muy bueno', 'Correcto', 'Mejorable'],
-      ['Leve', 'Medio', 'Grave'],
+      ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
     ];
 
     this.subscriptions.add(
