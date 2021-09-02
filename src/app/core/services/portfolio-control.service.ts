@@ -103,8 +103,15 @@ export class PortfolioControlService {
             const informeReciente = informesPlanta.reduce((prev, current) =>
               prev.fecha > current.fecha ? prev : current
             );
+
             // añadimos el mae del informe mas reciente de cada planta
-            this.maePlantas.push(informeReciente.mae);
+            // los antiguos de fijas los devidimos por 100
+            if (planta.tipo !== 'seguidores' && informeReciente.fecha < 1619820000) {
+              this.maePlantas.push(informeReciente.mae / 100);
+            } else {
+              // el resto añadimos normal
+              this.maePlantas.push(informeReciente.mae);
+            }
           });
 
           this.maeMedio = this.average(this.maePlantas);

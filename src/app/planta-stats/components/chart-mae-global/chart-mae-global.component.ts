@@ -74,8 +74,8 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
         .pipe(
           switchMap(([informes, maeMedio, maeSigma]) => {
             this.maeData = informes.map((inf) => inf.mae * 100);
-            this.maeMedio = maeMedio;
-            this.maeSigma = maeSigma;
+            this.maeMedio = maeMedio * 100;
+            this.maeSigma = maeSigma * 100;
 
             this.maeColors = this.maeData.map((mae) => {
               if (mae < maeMedio - maeSigma) {

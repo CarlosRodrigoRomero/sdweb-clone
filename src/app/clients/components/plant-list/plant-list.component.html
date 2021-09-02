@@ -26,7 +26,7 @@
           <!-- MAE -->
           <ng-container matColumnDef="mae">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>MAE</th>
-            <td mat-cell (click)="onClick(row)" *matCellDef="let row">{{ row.mae | number: '1.2-2' }}%</td>
+            <td mat-cell (click)="onClick(row)" *matCellDef="let row">{{ row.mae * 100 | number: '1.2-2' }}%</td>
           </ng-container>
 
           <!-- Tipo -->

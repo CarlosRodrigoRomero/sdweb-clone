@@ -81,7 +81,7 @@ export class BarChartComponent implements OnInit {
         const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
         const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
 
-        this.data.push(Math.round(10 * mae) / 10);
+        this.data.push(mae * 100);
         // añadimos al array de ids
         this.plantasId.push(planta.id);
         // añadimos al array de tipos
@@ -90,13 +90,10 @@ export class BarChartComponent implements OnInit {
         this.fechaInformesRecientes.push(informeReciente.fecha);
 
         this.barChartLabels.push(planta.nombre);
+        // añadimos los colores
+        this.coloresChart.push(this.getColorMae(mae));
       }
     });
-
-    this.data.forEach((m) => {
-      this.coloresChart.push(this.getColorMae(m));
-    });
-
     this.initChart();
   }
 
@@ -141,6 +138,7 @@ export class BarChartComponent implements OnInit {
       },
       dataLabels: {
         enabled: false,
+        formatter: (value) => Math.round(value * 100) / 100 + '%',
       },
       stroke: {
         show: true,
@@ -158,15 +156,20 @@ export class BarChartComponent implements OnInit {
         min: 0,
         // min: this.maeMedio - this.maeSigma - 0.5 > 0 ? this.maeMedio - this.maeSigma - 0.5 : 0,
         // max: this.maeMedio + this.maeSigma + 0.5,
-        max: Math.max(...[...this.data, this.maeMedio]) + 0.5,
+        max: Math.max(...[...this.data, this.maeMedio * 100]) + 0.5,
+        labels: {
+          formatter: (value) => {
+            return Math.round(value * 10) / 10 + '%';
+          },
+        },
       },
       fill: {
         opacity: 1,
       },
       tooltip: {
         y: {
-          formatter: (val) => {
-            return +val + ' %';
+          formatter: (value) => {
+            return Math.round(value * 100) / 100 + ' %';
           },
         },
       },
@@ -174,7 +177,7 @@ export class BarChartComponent implements OnInit {
       annotations: {
         yaxis: [
           {
-            y: this.maeMedio,
+            y: this.maeMedio * 100,
             borderColor: '#053e86',
             borderWidth: 2,
             strokeDashArray: 10,
@@ -191,8 +194,8 @@ export class BarChartComponent implements OnInit {
             },
           },
           {
-            y: this.maeMedio + this.maeSigma,
-            y2: this.maeMedio - this.maeSigma,
+            y: (this.maeMedio + this.maeSigma) * 100,
+            y2: (this.maeMedio - this.maeSigma) * 100,
             borderColor: '#000',
             fillColor: '#2478ff',
             label: {

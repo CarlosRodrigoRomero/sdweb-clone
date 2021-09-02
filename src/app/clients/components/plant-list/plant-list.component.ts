@@ -65,10 +65,19 @@ export class PlantListComponent implements OnInit, AfterViewInit {
         informesAntiguos = informesPlanta.filter((informe) => informe.fecha < 1619820000);
       }
 
+      let mae: number;
+      // los antiguos de fijas los devidimos por 100
+      if (planta.tipo !== 'seguidores' && informeReciente.fecha < 1619820000) {
+        mae = informeReciente.mae / 100;
+      } else {
+        // el resto añadimos normal
+        mae = informeReciente.mae;
+      }
+
       plantsData.push({
         nombre: planta.nombre,
         potencia: planta.potencia,
-        mae: informeReciente.mae,
+        mae,
         ultimaInspeccion: informeReciente.fecha,
         informesAntiguos,
         plantaId: planta.id,
