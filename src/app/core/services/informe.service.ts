@@ -1,17 +1,22 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { combineLatest, Observable, Subject } from 'rxjs';
-import { InformeInterface } from '../models/informe';
-import { filter, map, take } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
+
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
+
+import { combineLatest, Observable, Subject } from 'rxjs';
+import { map, take } from 'rxjs/operators';
+
+import { LatLngLiteral } from '@agm/core';
+
 import { GLOBAL } from './global';
+
+import { ThermalLayerInterface } from '@core/models/thermalLayer';
+import { InformeInterface } from '../models/informe';
 import { EstructuraInterface, Estructura } from '../models/estructura';
 import { ArchivoVueloInterface } from '../models/archivoVuelo';
 import { ElementoPlantaInterface } from '../models/elementoPlanta';
 import { PcInterface } from '../models/pc';
-import { LatLngLiteral } from '@agm/core';
-import { ThermalLayerInterface } from '@core/models/thermalLayer';
 
 @Injectable({
   providedIn: 'root',

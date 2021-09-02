@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 
 import { WINDOW } from '../../window.providers';
 
-import { BehaviorSubject, concat, Observable } from 'rxjs';
-import { delay, flatMap, publish, switchMap, take, takeWhile } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 
 import { FilterService } from '@core/services/filter.service';
 import { ShareReportService } from '@core/services/share-report.service';

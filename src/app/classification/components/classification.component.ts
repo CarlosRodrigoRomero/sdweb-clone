@@ -118,14 +118,14 @@ export class ClassificationComponent implements OnInit {
     let perdidasTotales = 0;
     perdidas.forEach((perd) => (perdidasTotales += perd));
 
-    return (perdidasTotales / this.informe.numeroModulos) * 100;
+    return (perdidasTotales / this.informe.numeroModulos);
   }
 
   private getCCInforme(): number {
     // tslint:disable-next-line: triple-equals
     const celCals = this.anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
-    return (celCals.length / this.informe.numeroModulos) * 100;
+    return (celCals.length / this.informe.numeroModulos);
   }
 
   private openSnackBar() {
