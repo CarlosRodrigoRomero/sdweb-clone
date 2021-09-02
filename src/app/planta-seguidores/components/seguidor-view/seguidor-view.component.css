@@ -50,27 +50,27 @@ app-seguidor-view-toggle {
   position: absolute;
   right: 132px;
   top: 472px;
-  z-index: 999;
+  z-index: 8;
 }
 
 app-seguidor-image-toggle {
   position: absolute;
   top: 15px;
   right: 15px;
-  z-index: 999;
+  z-index: 8;
 }
 
 app-seguidor-view-leyenda {
   position: absolute;
   right: 640px;
   top: 16px;
-  z-index: 999;
+  z-index: 8;
   transform: translate(100%, 0);
 }
 
 app-seguidor-image-download {
   position: absolute;
-  z-index: 999;
+  z-index: 8;
   right: 15px;
   top: 472px;
 }

@@ -25,7 +25,7 @@
 
 #visual-zoom {
   border: 2px white solid;
-  z-index: 999;
+  z-index: 9;
 }
 
 #visual-zoom:hover {
