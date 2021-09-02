@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
 
 import {
@@ -70,22 +70,25 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
     const getMaeSigma = this.portfolioControlService.maeSigma$;
 
     this.subscriptions.add(
-      combineLatest([informesPlanta, getMaeMedio, getMaeSigma])
+      this.reportControlService.informes$
         .pipe(
-          switchMap(([informes, maeMedio, maeSigma]) => {
+          take(1),
+          switchMap((informes) => {
             this.maeData = informes.map((inf) => inf.mae * 100);
-            this.maeMedio = maeMedio * 100;
-            this.maeSigma = maeSigma * 100;
+            this.maeMedio = this.portfolioControlService.maeMedio * 100;
+            this.maeSigma = this.portfolioControlService.maeSigma * 100;
 
-            this.maeColors = this.maeData.map((mae) => {
-              if (mae < maeMedio - maeSigma) {
-                return GLOBAL.colores_mae[0];
-              } else if (mae <= maeMedio + maeSigma && mae >= maeMedio - maeSigma) {
-                return GLOBAL.colores_mae[1];
-              } else {
-                return GLOBAL.colores_mae[2];
-              }
-            });
+            if (this.maeMedio !== undefined && this.maeSigma !== undefined) {
+              this.maeColors = this.maeData.map((mae) => {
+                if (mae < this.maeMedio - this.maeSigma) {
+                  return GLOBAL.colores_mae[0];
+                } else if (mae <= this.maeMedio + this.maeSigma && mae >= this.maeMedio - this.maeSigma) {
+                  return GLOBAL.colores_mae[1];
+                } else {
+                  return GLOBAL.colores_mae[2];
+                }
+              });
+            }
 
             return this.informeService.getDateLabelsInformes(informes.map((inf) => inf.id));
           })

@@ -12,11 +12,11 @@ import { ReportControlService } from '@core/services/report-control.service';
   styleUrls: ['./planta-stats.component.css'],
 })
 export class PlantaStatsComponent implements OnInit {
-  loadStats = false;
   thereAreZones: boolean;
   loadCCyGradChart = true;
   plantaDemo = false;
   sharedReport = false;
+  portfolioLoaded = false;
 
   constructor(
     private statsService: StatsService,
@@ -25,9 +25,7 @@ export class PlantaStatsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    combineLatest([this.portfolioControlService.initService(), this.statsService.loadStats$]).subscribe(
-      ([initPortServ, loadStats]) => (this.loadStats = initPortServ && loadStats)
-    );
+    this.portfolioControlService.initService().then((res) => (this.portfolioLoaded = res));
 
     this.reportControlService.thereAreZones$.subscribe((value) => (this.thereAreZones = value));
 

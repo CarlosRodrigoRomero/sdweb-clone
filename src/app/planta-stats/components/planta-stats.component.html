@@ -6,7 +6,7 @@
     <div class="mae-grid">
       <div class="mae-content-izq">
         <!-- MAE GLOBAL -->
-        <app-chart-mae-global *ngIf="!sharedReport"></app-chart-mae-global>
+        <app-chart-mae-global *ngIf="!sharedReport && portfolioLoaded"></app-chart-mae-global>
 
         <!-- MAE POR ZONAS -->
         <app-chart-anomalias-zonas

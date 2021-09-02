@@ -37,92 +37,93 @@ export class PortfolioControlService {
 
   constructor(public auth: AuthService, private plantaService: PlantaService, private informeService: InformeService) {}
 
-  public initService(): Observable<boolean> {
-    this.auth.user$
-      .pipe(
-        take(1),
-        switchMap((user) => {
-          this.user = user;
+  public initService(): Promise<boolean> {
+    return new Promise((initService) => {
+      this.auth.user$
+        .pipe(
+          take(1),
+          switchMap((user) => {
+            this.user = user;
 
-          return combineLatest([this.plantaService.getPlantasDeEmpresa(user), this.informeService.getInformes()]);
-        })
-      )
-      .subscribe(([plantas, informes]) => {
-        if (plantas !== undefined) {
-          // AÑADIMOS PLANTAS FALSAS SOLO EN EL USUARIO DEMO
-          if (this.user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
-            plantas = this.addPlantasFake(plantas);
-          }
-
-          plantas.forEach((planta) => {
-            const informesPlanta = informes.filter((inf) => inf.plantaId === planta.id);
-
-            if (informesPlanta.length > 0) {
-              informesPlanta.forEach((informe) => {
-                // comprobamos que el informe tiene "mae" y que esta "disponible"
-                if (informe.mae !== undefined && informe.mae !== Infinity && informe.disponible === true) {
-                  // añadimos el informe a la lista
-                  this.listaInformes.push(informe);
-
-                  if (!this.listaPlantas.map((pl) => pl.id).includes(planta.id)) {
-                    // añadimos la planta a la lista
-                    this.listaPlantas.push(planta);
-                    // incrementamos conteo de plantas y suma de potencia
-                    this.numPlantas++;
-                    this.potenciaTotal += planta.potencia;
-                  }
-                }
-              });
+            return combineLatest([this.plantaService.getPlantasDeEmpresa(user), this.informeService.getInformes()]);
+          })
+        )
+        .pipe(take(1))
+        .subscribe(([plantas, informes]) => {
+          if (plantas !== undefined) {
+            // AÑADIMOS PLANTAS FALSAS SOLO EN EL USUARIO DEMO
+            if (this.user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
+              plantas = this.addPlantasFake(plantas);
             }
 
-            // obtenemos la plantas que tiene informes dentro de su interface
-            if (planta.informes !== undefined && planta.informes.length > 0) {
-              planta.informes.forEach((informe) => {
-                // comprobamos que no estubiese ya añadido
-                if (!this.listaInformes.map((inf) => inf.id).includes(informe.id)) {
+            plantas.forEach((planta) => {
+              const informesPlanta = informes.filter((inf) => inf.plantaId === planta.id);
+
+              if (informesPlanta.length > 0) {
+                informesPlanta.forEach((informe) => {
                   // comprobamos que el informe tiene "mae" y que esta "disponible"
                   if (informe.mae !== undefined && informe.mae !== Infinity && informe.disponible === true) {
                     // añadimos el informe a la lista
                     this.listaInformes.push(informe);
 
                     if (!this.listaPlantas.map((pl) => pl.id).includes(planta.id)) {
-                      // añadimos la planta si no estaba ya añadida
+                      // añadimos la planta a la lista
                       this.listaPlantas.push(planta);
                       // incrementamos conteo de plantas y suma de potencia
                       this.numPlantas++;
                       this.potenciaTotal += planta.potencia;
                     }
                   }
-                }
-              });
-            }
-          });
+                });
+              }
 
-          this.listaPlantas.forEach((planta) => {
-            const informesPlanta = this.listaInformes.filter((inf) => inf.plantaId === planta.id);
-            const informeReciente = informesPlanta.reduce((prev, current) =>
-              prev.fecha > current.fecha ? prev : current
-            );
+              // obtenemos la plantas que tiene informes dentro de su interface
+              if (planta.informes !== undefined && planta.informes.length > 0) {
+                planta.informes.forEach((informe) => {
+                  // comprobamos que no estubiese ya añadido
+                  if (!this.listaInformes.map((inf) => inf.id).includes(informe.id)) {
+                    // comprobamos que el informe tiene "mae" y que esta "disponible"
+                    if (informe.mae !== undefined && informe.mae !== Infinity && informe.disponible === true) {
+                      // añadimos el informe a la lista
+                      this.listaInformes.push(informe);
 
-            // añadimos el mae del informe mas reciente de cada planta
-            // los antiguos de fijas los devidimos por 100
-            if (planta.tipo !== 'seguidores' && informeReciente.fecha < 1619820000) {
-              this.maePlantas.push(informeReciente.mae / 100);
-            } else {
-              // el resto añadimos normal
-              this.maePlantas.push(informeReciente.mae);
-            }
-          });
+                      if (!this.listaPlantas.map((pl) => pl.id).includes(planta.id)) {
+                        // añadimos la planta si no estaba ya añadida
+                        this.listaPlantas.push(planta);
+                        // incrementamos conteo de plantas y suma de potencia
+                        this.numPlantas++;
+                        this.potenciaTotal += planta.potencia;
+                      }
+                    }
+                  }
+                });
+              }
+            });
 
-          this.maeMedio = this.average(this.maePlantas);
-          // this.maeSigma = this.standardDeviation(this.maePlantas);
-          this.maeSigma = this.standardDeviation(this.maePlantas) / 3; // DEMO
+            this.listaPlantas.forEach((planta) => {
+              const informesPlanta = this.listaInformes.filter((inf) => inf.plantaId === planta.id);
+              const informeReciente = informesPlanta.reduce((prev, current) =>
+                prev.fecha > current.fecha ? prev : current
+              );
 
-          this.initialized$.next(true);
-        }
-      });
+              // añadimos el mae del informe mas reciente de cada planta
+              // los antiguos de fijas los devidimos por 100
+              if (planta.tipo !== 'seguidores' && informeReciente.fecha < 1619820000) {
+                this.maePlantas.push(informeReciente.mae / 100);
+              } else {
+                // el resto añadimos normal
+                this.maePlantas.push(informeReciente.mae);
+              }
+            });
 
-    return this.initialized$;
+            this.maeMedio = this.average(this.maePlantas);
+            this.maeSigma = this.standardDeviation(this.maePlantas);
+            // this.maeSigma = this.standardDeviation(this.maePlantas) / 3; // DEMO
+
+            initService(true);
+          }
+        });
+    });
   }
 
   public getColorMae(mae: number, opacity?: number): string {
