@@ -87,7 +87,8 @@ export class SeguidorViewService {
     if (this.visualCanvas !== undefined) {
       this.visualCanvas.clear();
     }
-    this.seguidoresControlService.imageExist = true;
+    this.seguidoresControlService.thermalImageExist = true;
+    this.seguidoresControlService.visualImageExist = true;
     this.imagesLoaded = false;
     // volvemos el valor al de la vista del mapa
     this.toggleViewSelected = this.mapSeguidoresService.toggleViewSelected;

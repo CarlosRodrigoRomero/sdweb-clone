@@ -47,8 +47,10 @@ export class SeguidoresControlService {
   public urlVisualImageSeguidor$ = new BehaviorSubject<string>(this._urlVisualImageSeguidor);
   private _urlThermalImageSeguidor: string = undefined;
   public urlThermalImageSeguidor$ = new BehaviorSubject<string>(this._urlThermalImageSeguidor);
-  private _imageExist = true;
-  imageExist$ = new BehaviorSubject<boolean>(this._imageExist);
+  private _thermalImageExist = true;
+  thermalImageExist$ = new BehaviorSubject<boolean>(this._thermalImageExist);
+  private _visualImageExist = true;
+  visualImageExist$ = new BehaviorSubject<boolean>(this._visualImageExist);
 
   private maesMedio: number[] = [];
   private maesSigma: number[] = [];
@@ -520,20 +522,29 @@ export class SeguidoresControlService {
         .getDownloadURL()
         .toPromise()
         .then((url) => {
-          // indicamos  que la imagen existe
-          this.imageExist = true;
-
           if (folder === 'jpg') {
+            // indicamos  que la imagen existe
+            this.thermalImageExist = true;
+
             this.urlThermalImageSeguidor = url;
           } else {
+            // indicamos  que la imagen existe
+            this.visualImageExist = true;
+
             this.urlVisualImageSeguidor = url;
           }
         })
         .catch((error) => {
           switch (error.code) {
             case 'storage/object-not-found':
-              // indicamos  que la imagen no existe
-              this.imageExist = false;
+              if (folder === 'jpg') {
+                // indicamos  que la imagen no existe
+                this.thermalImageExist = false;
+              } else {
+                // indicamos  que la imagen no existe
+                this.visualImageExist = false;
+              }
+
               console.log("File doesn't exist");
               break;
 
@@ -577,8 +588,9 @@ export class SeguidoresControlService {
       this.seguidorSelected = null;
     }
 
-    // indicamos que la imagen existe por defecto
-    this.imageExist = true;
+    // indicamos que las imagenes existen por defecto
+    this.thermalImageExist = true;
+    this.visualImageExist = true;
   }
 
   setExternalStyle(seguidorId: string, focus: boolean) {
@@ -687,12 +699,21 @@ export class SeguidoresControlService {
     this.urlThermalImageSeguidor$.next(value);
   }
 
-  get imageExist() {
-    return this._imageExist;
+  get thermalImageExist() {
+    return this._thermalImageExist;
   }
 
-  set imageExist(value: boolean) {
-    this._imageExist = value;
-    this.imageExist$.next(value);
+  set thermalImageExist(value: boolean) {
+    this._thermalImageExist = value;
+    this.thermalImageExist$.next(value);
+  }
+
+  get visualImageExist() {
+    return this._visualImageExist;
+  }
+
+  set visualImageExist(value: boolean) {
+    this._visualImageExist = value;
+    this.visualImageExist$.next(value);
   }
 }

@@ -15,7 +15,8 @@ import { Seguidor } from '@core/models/seguidor';
 export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public seguidorSelected: Seguidor = undefined;
   numAnomalias: number;
-  imagesExist = true;
+  imagesExist = [true, true];
+  imageSelected = 0;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -32,17 +33,20 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
           this.numAnomalias = this.seguidorSelected.anomaliasCliente.length;
-
-          // if (this.numAnomalias > 0) {
-          //   this.seguidorViewService.anomaliaSelected = this.seguidorSelected.anomaliasCliente[0];
-          // }
         }
       })
     );
+
+    this.subscriptions.add(this.seguidorViewService.imageSelected$.subscribe((image) => (this.imageSelected = image)));
   }
 
   ngAfterViewInit(): void {
-    this.subscriptions.add(this.seguidoresControlService.imageExist$.subscribe((exist) => (this.imagesExist = exist)));
+    this.subscriptions.add(
+      this.seguidoresControlService.thermalImageExist$.subscribe((exist) => (this.imagesExist[0] = exist))
+    );
+    this.subscriptions.add(
+      this.seguidoresControlService.visualImageExist$.subscribe((exist) => (this.imagesExist[1] = exist))
+    );
   }
 
   resetImages() {

@@ -175,11 +175,23 @@ export class AnomaliaService {
               data.localX = (data as PcInterface).local_x;
               data.localY = (data as PcInterface).local_y;
               if (data.globalCoords === undefined) {
-                data.globalCoords = [
-                  (data as PcInterface).global_x,
-                  (data as PcInterface).global_y,
-                  (data as PcInterface).global_z,
-                ];
+                data.globalCoords = [];
+
+                const globalX = (data as PcInterface).global_x;
+                const globalY = (data as PcInterface).global_y;
+                const globalZ = (data as PcInterface).global_z;
+
+                if (globalX !== undefined && globalX !== null && globalX !== '' && !isNaN(globalX)) {
+                  data.globalCoords.push(globalX);
+
+                  if (globalY !== undefined && globalY !== null && globalY !== '' && !isNaN(globalY)) {
+                    data.globalCoords.push(globalY);
+
+                    if (globalZ !== undefined && globalZ !== null && globalZ !== '' && !isNaN(globalZ)) {
+                      data.globalCoords.push(globalZ);
+                    }
+                  }
+                }
               }
               data.localId = this.getLocalId(data);
             }
