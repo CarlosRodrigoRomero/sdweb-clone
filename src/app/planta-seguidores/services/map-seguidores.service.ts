@@ -49,6 +49,15 @@ export class MapSeguidoresService {
     return this.initialized$;
   }
 
+  resetService() {
+    this.plantaId = '';
+    this.informesList = [];
+    this.sliderTemporalSelected = 100;
+    this.sliderOpacity = 100;
+    this.toggleViewSelected = 0;
+    this.layerSelected = undefined;
+  }
+
   getPlantaId(): Observable<string> {
     return this.plantaId$.asObservable();
   }
