@@ -128,7 +128,7 @@ export class ChartPctCelsComponent implements OnInit, OnDestroy {
           const data1: number[] = [];
           const data2: number[] = [];
           this.informes.forEach((informe) => {
-            data1.push(informe.cc);
+            data1.push(informe.cc * 100);
 
             const anomsInforme = this.allAnomalias.filter((anom) => anom.informeId === informe.id);
             const gradientes = anomsInforme.map((anom) => anom.gradienteNormalizado);

@@ -73,7 +73,7 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
       combineLatest([informesPlanta, getMaeMedio, getMaeSigma])
         .pipe(
           switchMap(([informes, maeMedio, maeSigma]) => {
-            this.maeData = informes.map((inf) => inf.mae);
+            this.maeData = informes.map((inf) => inf.mae * 100);
             this.maeMedio = maeMedio;
             this.maeSigma = maeSigma;
 
