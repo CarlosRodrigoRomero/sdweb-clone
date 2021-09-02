@@ -60,6 +60,7 @@ export class SeguidorService {
 
     // obtenemos todas las anomalias y las locAreas
     return combineLatest([locAreaList$, anomaliaList$]).pipe(
+      take(1),
       map(([locAreaList, anomaliaList]) => {
         const seguidores: Seguidor[] = [];
 
