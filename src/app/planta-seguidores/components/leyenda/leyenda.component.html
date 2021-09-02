@@ -2,15 +2,15 @@
   <mat-card-content>
     <span class="title">{{ viewsTitle[viewSelected] }}</span>
     <div class="line">
-      <mat-icon [ngStyle]="{ color: colors[2] }">crop_5_4</mat-icon>
+      <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
       <span> {{ viewsLabels[viewSelected][2] }}</span>
     </div>
     <div class="line">
-      <mat-icon [ngStyle]="{ color: colors[1] }">crop_5_4</mat-icon>
+      <mat-icon [ngStyle]="{ color: colors[viewSelected][1] }">crop_5_4</mat-icon>
       <span>{{ viewsLabels[viewSelected][1] }}</span>
     </div>
     <div class="line">
-      <mat-icon [ngStyle]="{ color: colors[0] }">crop_5_4</mat-icon>
+      <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
       <span> {{ viewsLabels[viewSelected][0] }}</span>
     </div>
   </mat-card-content>

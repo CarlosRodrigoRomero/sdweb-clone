@@ -11,7 +11,7 @@ import { GLOBAL } from '@core/services/global';
   styleUrls: ['./leyenda.component.css'],
 })
 export class LeyendaComponent implements OnInit, OnDestroy {
-  colors = GLOBAL.colores_mae;
+  colors = [GLOBAL.colores_mae, GLOBAL.colores_mae, GLOBAL.colores_grad];
   viewSelected: number;
   viewsLabels: string[][];
   viewsTitle: string[] = ['MAE por seguidor', 'Cels. Calientes por seguidor', 'ΔT Max (norm) por seguidor'];

@@ -3,17 +3,17 @@
     <div *ngIf="viewSelected != 1">
       <span class="title">{{ viewsTitle[viewSelected] }}</span>
       <div class="line">
-        <mat-icon [ngStyle]="{ color: colors[2] }">crop_5_4</mat-icon>
+        <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
         <span *ngIf="viewSelected == 0">Altas</span>
         <span *ngIf="viewSelected == 2">Grave</span>
       </div>
       <div class="line">
-        <mat-icon [ngStyle]="{ color: colors[1] }">crop_5_4</mat-icon>
+        <mat-icon [ngStyle]="{ color: colors[viewSelected][1] }">crop_5_4</mat-icon>
         <span *ngIf="viewSelected == 0">Medias</span>
         <span *ngIf="viewSelected == 2">Medio</span>
       </div>
       <div class="line">
-        <mat-icon [ngStyle]="{ color: colors[0] }">crop_5_4</mat-icon>
+        <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
         <span *ngIf="viewSelected == 0">Bajas</span>
         <span *ngIf="viewSelected == 2">Leve</span>
       </div>

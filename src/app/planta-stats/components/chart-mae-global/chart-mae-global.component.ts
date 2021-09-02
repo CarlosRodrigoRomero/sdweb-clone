@@ -1,8 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { GLOBAL } from '@core/services/global';
-
-import { switchMap, take } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
+import { combineLatest, Subscription } from 'rxjs';
 
 import {
   ChartComponent,
@@ -23,11 +22,8 @@ import {
 
 import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
-import { StatsService } from '@core/services/stats.service';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
-
-import { InformeInterface } from '@core/models/informe';
-import { combineLatest, Subscription } from 'rxjs';
+import { GLOBAL } from '@core/services/global';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -54,7 +50,6 @@ export type ChartOptions = {
 export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
   @ViewChild('chartMAE') chartMAE: ChartComponent;
   public chartOptionsMAE: Partial<ChartOptions>;
-  private informeList: InformeInterface[];
   loadChart = false;
   private maeData: number[] = [];
   private maeColors: string[] = [];
@@ -66,7 +61,6 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private informeService: InformeService,
-    private statsService: StatsService,
     private portfolioControlService: PortfolioControlService
   ) {}
 
@@ -177,17 +171,17 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
               yaxis: [
                 {
                   y: this.maeMedio,
-                  borderColor: '#5b5b5c',
+                  borderColor: '#053e86',
                   borderWidth: 2,
                   strokeDashArray: 10,
 
                   label: {
                     offsetX: -100,
-                    borderColor: '#5b5b5c',
+                    borderColor: '#053e86',
                     style: {
                       fontSize: '12px',
                       color: '#fff',
-                      background: '#5b5b5c',
+                      background: '#053e86',
                     },
                     text: 'Media MAE Portfolio',
                   },
@@ -196,7 +190,7 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
                   y: this.maeMedio + this.maeSigma,
                   y2: this.maeMedio - this.maeSigma,
                   borderColor: '#000',
-                  fillColor: '#FEB019',
+                  fillColor: '#2478ff',
                   label: {
                     text: 'desviación std.',
                   },

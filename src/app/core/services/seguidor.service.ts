@@ -248,11 +248,11 @@ export class SeguidorService {
 
   getGradienteAnomColor(anomalia: Anomalia) {
     if (anomalia.gradienteNormalizado < 10) {
-      return GLOBAL.colores_mae[0];
+      return GLOBAL.colores_grad[0];
     } else if (anomalia.gradienteNormalizado < 40) {
-      return GLOBAL.colores_mae[1];
+      return GLOBAL.colores_grad[1];
     } else {
-      return GLOBAL.colores_mae[2];
+      return GLOBAL.colores_grad[2];
     }
   }
 

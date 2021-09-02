@@ -8,8 +8,10 @@ export let GLOBAL = {
   // 5: Clasificación
   gris: '#546e7a',
   GIS: 'https://solardrontech.es/tileserver.php?/index.json?/',
-  colores_mae: ['#00e396', '#FF8A00', '#ff0400'], // verde, naranja, rojo // antes rojo era '#fd504d'
-  colores_mae_rgb: ['rgba(0,227,150,1)', 'rgba(255,138,0,1)', 'rgba(253,80,77,1)'], // verde, naranja, rojo
+  colores_mae: ['#00e396', '#0892d0', '#ff0400'], // verde, azul, rojo
+  colores_mae_rgb: ['rgba(0,227,150,1)', 'rgba(8,146,208,1)', 'rgba(253,80,77,1)'], // verde, azul, rojo
+  colores_grad: ['#00e396', '#FF8A00', '#fd504d'], // verde, naranja, rojo
+  colores_grad_rgb: ['rgba(0,227,150,1)', 'rgba(255,138,0,1)', 'rgba(253,80,77,1)'], // verde, naranja, rojo
   color_rojo_interfaz: '#d32f2f', // red 700 material
   url: 'http://localhost:3977/api',
   num_tipos: 16,

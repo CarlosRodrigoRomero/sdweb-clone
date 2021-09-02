@@ -17,7 +17,7 @@ export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
   private seguidorSelected: Seguidor;
   viewsTitle: string[] = ['Pérdidas', 'Cels. Calientes', 'ΔT Max (norm)'];
   numCelsCalientes = 0;
-  colors = GLOBAL.colores_mae;
+  colors = [GLOBAL.colores_mae, GLOBAL.colores_mae, GLOBAL.colores_grad];
 
   private subscriptions: Subscription = new Subscription();
 
