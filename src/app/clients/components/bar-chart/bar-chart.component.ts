@@ -175,17 +175,17 @@ export class BarChartComponent implements OnInit {
         yaxis: [
           {
             y: this.maeMedio,
-            borderColor: '#77b6ea',
+            borderColor: '#053e86',
             borderWidth: 2,
             strokeDashArray: 10,
 
             label: {
               offsetX: -100,
-              borderColor: '#77b6ea',
+              borderColor: '#053e86',
               style: {
                 fontSize: '12px',
                 color: '#fff',
-                background: '#77b6ea',
+                background: '#053e86',
               },
               text: 'Media MAE Portfolio',
             },
@@ -194,7 +194,7 @@ export class BarChartComponent implements OnInit {
             y: this.maeMedio + this.maeSigma,
             y2: this.maeMedio - this.maeSigma,
             borderColor: '#000',
-            fillColor: '#FEB019',
+            fillColor: '#2478ff',
             label: {
               text: 'desviación std.',
             },
