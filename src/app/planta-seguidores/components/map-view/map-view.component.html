@@ -65,7 +65,7 @@
                   <app-share-report *ngIf="notSharedReport"></app-share-report>
 
                   <!-- BOTON DESCARGAS -->
-                  <app-download-report></app-download-report>
+                  <app-download-report *ngIf="notSharedReport"></app-download-report>
                 </div>
 
                 <div class="map-control">
@@ -106,7 +106,7 @@
 
               <!-- BOTON SIDENAV STATS -->
               <button
-                *ngIf="showFilters"
+                *ngIf="notSharedReport"
                 mat-raised-button
                 class="btn-right-stats"
                 (click)="sidenavStats.toggle(); loadStats()"
