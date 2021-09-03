@@ -36,6 +36,7 @@ export class SeguidoresControlService {
   private _seguidorSelected: Seguidor = undefined;
   public seguidorSelected$ = new BehaviorSubject<Seguidor>(this._seguidorSelected);
   public listaSeguidores: Seguidor[];
+  private listaAllSeguidores: Seguidor[];
   public prevSeguidorSelected: Seguidor;
   private sharedReportNoFilters = false;
   private seguidorLayers: VectorLayer[];
@@ -66,6 +67,8 @@ export class SeguidoresControlService {
   ) {}
 
   initService(): Promise<boolean> {
+    this.listaAllSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
+
     const getMap = this.olMapService.getMap();
     const getSegLayers = this.olMapService.getSeguidorLayers();
     const getIfSharedWithFilters = this.reportControlService.sharedReportWithFilters$;
@@ -374,6 +377,103 @@ export class SeguidoresControlService {
     return Math.sqrt(values.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
   }
 
+  private latLonLiteralToLonLat(path: LatLngLiteral[]) {
+    const coordsList: Coordinate[] = [];
+    path.forEach((coords) => {
+      coordsList.push(fromLonLat([coords.lng, coords.lat]));
+    });
+
+    return [coordsList];
+  }
+
+  public getImageSeguidor(folder: string) {
+    if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
+      // const imageName = this.seguidorSelected.imageName;
+      let imageName = this.seguidorSelected.anomalias[0].archivoPublico;
+      if (this.seguidorSelected.anomaliasCliente.length > 0) {
+        imageName = this.seguidorSelected.anomaliasCliente[0].archivoPublico;
+      }
+
+      // Creamos una referencia a la imagen
+      const storageRef = this.storage.ref('');
+      const imageRef = storageRef.child('informes/' + this.seguidorSelected.informeId + '/' + folder + '/' + imageName);
+
+      // Obtenemos la URL y descargamos el archivo capturando los posibles errores
+      imageRef
+        .getDownloadURL()
+        .toPromise()
+        .then((url) => {
+          if (folder === 'jpg') {
+            // indicamos  que la imagen existe
+            this.thermalImageExist = true;
+
+            this.urlThermalImageSeguidor = url;
+          } else {
+            // indicamos  que la imagen existe
+            this.visualImageExist = true;
+
+            this.urlVisualImageSeguidor = url;
+          }
+        })
+        .catch((error) => {
+          switch (error.code) {
+            case 'storage/object-not-found':
+              if (folder === 'jpg') {
+                // indicamos  que la imagen no existe
+                this.thermalImageExist = false;
+              } else {
+                // indicamos  que la imagen no existe
+                this.visualImageExist = false;
+              }
+
+              console.log("File doesn't exist");
+              break;
+
+            case 'storage/unauthorized':
+              console.log("User doesn't have permission to access the object");
+              break;
+
+            case 'storage/canceled':
+              console.log('User canceled the upload');
+              break;
+
+            case 'storage/unknown':
+              console.log('Unknown error occurred, inspect the server response');
+              break;
+          }
+        });
+    }
+  }
+
+  changeInformeSeguidorSelected(informeId: string) {
+    let seguidor;
+    if (this.seguidorSelected === null) {
+      seguidor = this.listaAllSeguidores.find((seg) => {
+        // cambiamos al seguidor correspondiente al informe actual
+        return seg.informeId === informeId && seg.nombre === this.prevSeguidorSelected.nombre;
+      });
+    } else {
+      seguidor = this.listaAllSeguidores.find((seg) => {
+        // cambiamos al seguidor correspondiente al informe actual
+        return seg.informeId === informeId && seg.nombre === this.seguidorSelected.nombre;
+      });
+    }
+
+    // asignamos el actual al previo
+    this.prevSeguidorSelected = this.seguidorSelected;
+
+    // asignamos el nuevo si existe
+    if (seguidor !== undefined) {
+      this.seguidorSelected = seguidor;
+    } else {
+      this.seguidorSelected = null;
+    }
+
+    // indicamos que las imagenes existen por defecto
+    this.thermalImageExist = true;
+    this.visualImageExist = true;
+  }
+
   // ESTILOS MAE
   private getStyleSeguidoresMae(focused: boolean) {
     return (feature) => {
@@ -494,103 +594,6 @@ export class SeguidoresControlService {
       opacity.toString() +
       ')'
     );
-  }
-
-  private latLonLiteralToLonLat(path: LatLngLiteral[]) {
-    const coordsList: Coordinate[] = [];
-    path.forEach((coords) => {
-      coordsList.push(fromLonLat([coords.lng, coords.lat]));
-    });
-
-    return [coordsList];
-  }
-
-  public getImageSeguidor(folder: string) {
-    if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
-      // const imageName = this.seguidorSelected.imageName;
-      let imageName = this.seguidorSelected.anomalias[0].archivoPublico;
-      if (this.seguidorSelected.anomaliasCliente.length > 0) {
-        imageName = this.seguidorSelected.anomaliasCliente[0].archivoPublico;
-      }
-
-      // Creamos una referencia a la imagen
-      const storageRef = this.storage.ref('');
-      const imageRef = storageRef.child('informes/' + this.seguidorSelected.informeId + '/' + folder + '/' + imageName);
-
-      // Obtenemos la URL y descargamos el archivo capturando los posibles errores
-      imageRef
-        .getDownloadURL()
-        .toPromise()
-        .then((url) => {
-          if (folder === 'jpg') {
-            // indicamos  que la imagen existe
-            this.thermalImageExist = true;
-
-            this.urlThermalImageSeguidor = url;
-          } else {
-            // indicamos  que la imagen existe
-            this.visualImageExist = true;
-
-            this.urlVisualImageSeguidor = url;
-          }
-        })
-        .catch((error) => {
-          switch (error.code) {
-            case 'storage/object-not-found':
-              if (folder === 'jpg') {
-                // indicamos  que la imagen no existe
-                this.thermalImageExist = false;
-              } else {
-                // indicamos  que la imagen no existe
-                this.visualImageExist = false;
-              }
-
-              console.log("File doesn't exist");
-              break;
-
-            case 'storage/unauthorized':
-              console.log("User doesn't have permission to access the object");
-              break;
-
-            case 'storage/canceled':
-              console.log('User canceled the upload');
-              break;
-
-            case 'storage/unknown':
-              console.log('Unknown error occurred, inspect the server response');
-              break;
-          }
-        });
-    }
-  }
-
-  changeInformeSeguidorSelected(informeId: string) {
-    let seguidor;
-    if (this.seguidorSelected === null) {
-      seguidor = this.listaSeguidores.find((seg) => {
-        // cambiamos al seguidor correspondiente al informe actual
-        return seg.informeId === informeId && seg.nombre === this.prevSeguidorSelected.nombre;
-      });
-    } else {
-      seguidor = this.listaSeguidores.find((seg) => {
-        // cambiamos al seguidor correspondiente al informe actual
-        return seg.informeId === informeId && seg.nombre === this.seguidorSelected.nombre;
-      });
-    }
-
-    // asignamos el actual al previo
-    this.prevSeguidorSelected = this.seguidorSelected;
-
-    // asignamos el nuevo si existe
-    if (seguidor !== undefined) {
-      this.seguidorSelected = seguidor;
-    } else {
-      this.seguidorSelected = null;
-    }
-
-    // indicamos que las imagenes existen por defecto
-    this.thermalImageExist = true;
-    this.visualImageExist = true;
   }
 
   setExternalStyle(seguidorId: string, focus: boolean) {
