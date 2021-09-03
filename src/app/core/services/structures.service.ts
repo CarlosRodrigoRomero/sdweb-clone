@@ -48,8 +48,6 @@ export class StructuresService {
   deletedRawModIds$ = new BehaviorSubject<string[]>(this._deletedRawModIds);
   private _reportNumModules: number = 0;
 
-  private _loadModuleGroups = false;
-  loadModuleGroups$ = new BehaviorSubject<boolean>(this._loadModuleGroups);
   private _drawModGroups = false;
   drawModGroups$ = new BehaviorSubject<boolean>(this._drawModGroups);
   private _modGroupSelectedId: string = undefined;
@@ -539,15 +537,6 @@ export class StructuresService {
   }
 
   /* MODULE GROUPS */
-
-  get loadModuleGroups() {
-    return this._loadModuleGroups;
-  }
-
-  set loadModuleGroups(value: boolean) {
-    this._loadModuleGroups = value;
-    this.loadModuleGroups$.next(value);
-  }
 
   get drawModGroups() {
     return this._drawModGroups;

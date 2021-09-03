@@ -43,27 +43,24 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
+    this.subscriptions.add(
+      this.olMapService.map$.subscribe((map) => {
+        this.map = map;
+
+        if (this.map !== undefined) {
+          this.createModulesGroupsLayer();
+          this.addModuleGroups();
+
+          this.addSelectMGInteraction();
+        }
+      })
+    );
 
     this.subscriptions.add(
       this.structuresService.modGroupSelectedId$.subscribe((id) => (this.modGroupSelectedId = id))
     );
 
     this.subscriptions.add(this.structuresService.drawModGroups$.subscribe((value) => (this.drawActive = value)));
-
-    this.subscriptions.add(
-      this.structuresService.loadModuleGroups$.subscribe((load) => {
-        if (load) {
-          this.createModulesGroupsLayer();
-          this.addModuleGroups();
-
-          this.addSelectMGInteraction();
-        }
-
-        // aplicamos la visibilidad dependiende de la fase en la que estemos
-        this.setModuleGroupsVisibility(load);
-      })
-    );
   }
 
   private createModulesGroupsLayer() {

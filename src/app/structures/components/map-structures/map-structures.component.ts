@@ -283,14 +283,12 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
           features.push(...featuresMB);
         }
 
-        if (this.structuresService.loadModuleGroups) {
-          let featuresMG = this.map
-            .getFeaturesAtPixel(event.pixel)
-            .filter((item) => item.getProperties().properties !== undefined);
-          featuresMG = featuresMG.filter((item) => item.getProperties().properties.name === 'moduleGroup');
+        let featuresMG = this.map
+          .getFeaturesAtPixel(event.pixel)
+          .filter((item) => item.getProperties().properties !== undefined);
+        featuresMG = featuresMG.filter((item) => item.getProperties().properties.name === 'moduleGroup');
 
-          features.push(...featuresMG);
-        }
+        features.push(...featuresMG);
 
         if (this.structuresService.editNormModules) {
           let featuresNM = this.map

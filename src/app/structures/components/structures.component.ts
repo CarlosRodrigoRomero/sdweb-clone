@@ -57,11 +57,6 @@ export class StructuresComponent implements OnInit, OnDestroy {
     this.structuresService.loadRawModules = load;
   }
 
-  toggleLoadModuleGroups(load: boolean) {
-    // mostramos las agrupaciones
-    this.structuresService.loadModuleGroups = load;
-  }
-
   toggleLoadNormModules(load: boolean) {
     // mostramos los modulos normalizados
     this.structuresService.loadNormModules = load;
