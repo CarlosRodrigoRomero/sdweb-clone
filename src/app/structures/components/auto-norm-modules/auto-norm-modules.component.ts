@@ -5,6 +5,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import { StructuresService } from '@core/services/structures.service';
+import { take } from 'rxjs/operators';
+import { NormalizedModule } from '@core/models/normalizedModule';
 
 @Component({
   selector: 'app-auto-norm-modules',
@@ -13,6 +15,7 @@ import { StructuresService } from '@core/services/structures.service';
 })
 export class AutoNormModulesComponent implements OnInit, OnDestroy {
   private moduleGroups: any[];
+  private normModules: NormalizedModule[];
   form: FormGroup;
 
   private subscriptions: Subscription = new Subscription();
@@ -27,6 +30,11 @@ export class AutoNormModulesComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.structuresService.getModuleGroups().subscribe((groups) => (this.moduleGroups = groups))
     );
+
+    this.structuresService
+      .getNormModules()
+      .pipe(take(1))
+      .subscribe((normMods) => (this.normModules = normMods));
 
     this.buildForm();
   }
@@ -50,22 +58,24 @@ export class AutoNormModulesComponent implements OnInit, OnDestroy {
       const ventana = this.form.get('ventana').value;
 
       this.moduleGroups.forEach((group) => {
-        const params = new HttpParams()
-          .set('informeId', this.structuresService.informeId)
-          .set('agrupacionId', group.id)
-          .set('filas', filas.toString())
-          .set('columnas', columnas.toString())
-          .set('ventana', ventana.toString());
+        if (!this.normModules.map((normMod) => normMod.agrupacionId).includes(group.id)) {
+          const params = new HttpParams()
+            .set('informeId', this.structuresService.informeId)
+            .set('agrupacionId', group.id)
+            .set('filas', filas.toString())
+            .set('columnas', columnas.toString())
+            .set('ventana', ventana.toString());
 
-        return this.http
-          .get(url, { responseType: 'text', params })
-          .toPromise()
-          .then((res) => {
-            console.log(res);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+          return this.http
+            .get(url, { responseType: 'text', params })
+            .toPromise()
+            .then((res) => {
+              console.log(res);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
       });
     }
   }
