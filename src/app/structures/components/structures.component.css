@@ -7,6 +7,9 @@
   display: flex;
   flex-direction: column;
   background: white;
+  height: calc(100vh - 70px);
+  overflow: auto;
+  width: 350px;
 }
 
 .left-bar h4 {
