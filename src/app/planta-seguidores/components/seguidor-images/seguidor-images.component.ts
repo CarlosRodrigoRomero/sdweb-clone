@@ -175,56 +175,6 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
         };
       }
     });
-
-    // combineLatest([
-    //   this.seguidoresControlService.urlVisualImageSeguidor$,
-    //   this.seguidoresControlService.urlThermalImageSeguidor$,
-    //   this.seguidorViewService.imageSelected$,
-    // ]).subscribe(([urlVisual, urlThermal, image]) => {
-    //   this.imageSelected = Number(image);
-
-    //   console.log(urlThermal);
-
-    //   this.imageThermal.src = urlThermal;
-
-    //   this.imageThermal.onload = () => {
-    //     this.seguidorViewService.imagesLoaded = true;
-
-    //     this.thermalCanvas.setBackgroundImage(
-    //       new fabric.Image(this.imageThermal, {
-    //         left: 0,
-    //         top: 0,
-    //         angle: 0,
-    //         opacity: 1,
-    //         draggable: false,
-    //         lockMovementX: true,
-    //         lockMovementY: true,
-    //         scaleX: this.thermalCanvas.width / this.imageThermal.width,
-    //         scaleY: this.thermalCanvas.height / this.imageThermal.height,
-    //       }),
-    //       this.thermalCanvas.renderAll.bind(this.thermalCanvas)
-    //     );
-    //   };
-
-    //   this.imageVisual.src = urlVisual;
-
-    //   this.imageVisual.onload = () => {
-    //     this.visualCanvas.setBackgroundImage(
-    //       new fabric.Image(this.imageVisual, {
-    //         left: 0,
-    //         top: 0,
-    //         angle: 0,
-    //         opacity: 1,
-    //         draggable: false,
-    //         lockMovementX: true,
-    //         lockMovementY: true,
-    //         scaleX: this.visualCanvas.width / this.imageVisual.width,
-    //         scaleY: this.visualCanvas.height / this.imageVisual.height,
-    //       }),
-    //       this.visualCanvas.renderAll.bind(this.visualCanvas)
-    //     );
-    //   };
-    // });
   }
 
   drawAnomalias() {
@@ -336,7 +286,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
 
       zoomCtx.drawImage(
         image,
-        e.pointer.x * scaleX + this.zoomSquare / 2 / zoomFactor,
+        e.pointer.x * scaleX - this.zoomSquare / 2 / zoomFactor,
         e.pointer.y * scaleY - this.zoomSquare / 2 / zoomFactor,
         this.zoomSquare,
         this.zoomSquare,
