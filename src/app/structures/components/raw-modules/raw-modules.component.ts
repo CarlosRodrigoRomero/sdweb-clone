@@ -115,12 +115,15 @@ export class RawModulesComponent implements OnInit, OnDestroy {
       const polygon = evt.feature.getGeometry() as Polygon;
       const coords = polygon.getCoordinates();
       coords[0].pop(); // quitamos el ultimo punto que es igual al primero
+      const centroid = this.structuresService.getCentroid(coords[0]);
 
       const rawModule: RawModule = {
         coords: coords[0],
         area: this.structuresService.areaAverage,
         aspectRatio: this.structuresService.aspectRatioAverage,
         confianza: this.structuresService.confianzaAverage,
+        centroid_gps_long: centroid[0],
+        centroid_gps_lat: centroid[1],
       };
 
       // añadimos el nuevo modulo a la DB

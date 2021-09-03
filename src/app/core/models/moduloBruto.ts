@@ -7,4 +7,6 @@ export class RawModule implements FilterableElement {
   aspectRatio?: number;
   area?: number;
   coords: Coordinate[];
+  centroid_gps_long: number;
+  centroid_gps_lat: number;
 }

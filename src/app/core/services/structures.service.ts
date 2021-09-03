@@ -446,6 +446,17 @@ export class StructuresService {
     return coords;
   }
 
+  getCentroid(coords: Coordinate[]): Coordinate {
+    let sumLong = 0;
+    let sumLat = 0;
+    coords.forEach((coord) => {
+      sumLong += coord[0];
+      sumLat += coord[1];
+    });
+
+    return [sumLong / coords.length, sumLat / coords.length];
+  }
+
   get planta() {
     return this._planta;
   }
