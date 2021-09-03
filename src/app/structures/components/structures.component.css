@@ -20,6 +20,15 @@
   margin-top: 8px;
 }
 
+.filter-warning {
+  margin-bottom: 1rem;
+}
+
+.filter-warning span {
+  font-size: 13px;
+  font-weight: 300;
+}
+
 :host ::ng-deep .mat-vertical-stepper-header {
   pointer-events: none !important;
 }

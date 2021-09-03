@@ -5,6 +5,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 
 import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 import Map from 'ol/Map';
 import VectorLayer from 'ol/layer/Vector';
@@ -13,7 +14,6 @@ import VectorSource from 'ol/source/Vector';
 import { Stroke, Style } from 'ol/style';
 import Feature from 'ol/Feature';
 import Polygon from 'ol/geom/Polygon';
-import { Coordinate } from 'ol/coordinate';
 import Select from 'ol/interaction/Select';
 import { click } from 'ol/events/condition';
 import Draw, { createBox } from 'ol/interaction/Draw';
@@ -109,8 +109,10 @@ export class NormModulesComponent implements OnInit, OnDestroy {
   private addNormModules() {
     const nMSource = this.normModLayer.getSource();
 
-    this.subscriptions.add(
-      this.structuresService.getNormModules().subscribe((normMods) => {
+    this.structuresService
+      .getNormModules()
+      .pipe(take(1))
+      .subscribe((normMods) => {
         nMSource.clear();
 
         normMods.forEach((normMod) => {
@@ -126,8 +128,7 @@ export class NormModulesComponent implements OnInit, OnDestroy {
 
           nMSource.addFeature(feature);
         });
-      })
-    );
+      });
   }
 
   private setNormModulesVisibility(visible: boolean) {
