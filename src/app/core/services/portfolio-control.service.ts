@@ -126,6 +126,127 @@ export class PortfolioControlService {
     });
   }
 
+  // private getMaeAverageAndSigmaPortfolio() {
+  //   this.auth.user$
+  //     .pipe(
+  //       take(1),
+  //       switchMap((user) => {
+  //         this.user = user;
+
+  //         return combineLatest([this.plantaService.getPlantasDeEmpresa(user), this.informeService.getInformes()]);
+  //       })
+  //     )
+  //     .pipe(take(1))
+  //     .subscribe(([plantas, informes]) => {
+  //       if (plantas !== undefined) {
+  //         // AÑADIMOS PLANTAS FALSAS SOLO EN EL USUARIO DEMO
+  //         if (this.user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
+  //           plantas = this.addPlantasFake(plantas);
+  //         }
+
+  //         plantas.forEach((planta) => {
+  //           const informesPlanta = informes.filter((inf) => inf.plantaId === planta.id);
+
+  //           if (informesPlanta.length > 0) {
+  //             informesPlanta.forEach((informe) => {
+  //               // comprobamos que el informe tiene "mae" y que esta "disponible"
+  //               if (informe.mae !== undefined && informe.mae !== Infinity && informe.disponible === true) {
+  //                 // añadimos el informe a la lista
+  //                 this.listaInformes.push(informe);
+
+  //                 if (!this.listaPlantas.map((pl) => pl.id).includes(planta.id)) {
+  //                   // añadimos la planta a la lista
+  //                   this.listaPlantas.push(planta);
+  //                   // incrementamos conteo de plantas y suma de potencia
+  //                   this.numPlantas++;
+  //                   this.potenciaTotal += planta.potencia;
+  //                 }
+  //               }
+  //             });
+  //           }
+
+  //           // obtenemos la plantas que tiene informes dentro de su interface
+  //           if (planta.informes !== undefined && planta.informes.length > 0) {
+  //             planta.informes.forEach((informe) => {
+  //               // comprobamos que no estubiese ya añadido
+  //               if (!this.listaInformes.map((inf) => inf.id).includes(informe.id)) {
+  //                 // comprobamos que el informe tiene "mae" y que esta "disponible"
+  //                 if (informe.mae !== undefined && informe.mae !== Infinity && informe.disponible === true) {
+  //                   // añadimos el informe a la lista
+  //                   this.listaInformes.push(informe);
+
+  //                   if (!this.listaPlantas.map((pl) => pl.id).includes(planta.id)) {
+  //                     // añadimos la planta si no estaba ya añadida
+  //                     this.listaPlantas.push(planta);
+  //                     // incrementamos conteo de plantas y suma de potencia
+  //                     this.numPlantas++;
+  //                     this.potenciaTotal += planta.potencia;
+  //                   }
+  //                 }
+  //               }
+  //             });
+  //           }
+  //         });
+
+  //         this.listaPlantas.forEach((planta) => {
+  //           const informesPlanta = this.listaInformes.filter((inf) => inf.plantaId === planta.id);
+  //           const informeReciente = informesPlanta.reduce((prev, current) =>
+  //             prev.fecha > current.fecha ? prev : current
+  //           );
+
+  //           // añadimos el mae del informe mas reciente de cada planta
+  //           // los antiguos de fijas los devidimos por 100
+  //           if (planta.tipo !== 'seguidores' && informeReciente.fecha < 1619820000) {
+  //             this.maePlantas.push(informeReciente.mae / 100);
+  //           } else {
+  //             // el resto añadimos normal
+  //             this.maePlantas.push(informeReciente.mae);
+  //           }
+  //         });
+
+  //         this.maeMedio = this.average(this.maePlantas);
+  //         this.maeSigma = this.standardDeviation(this.maePlantas);
+  //       }
+  //     });
+  // }
+
+  private average(data) {
+    const sum = data.reduce((s, value) => {
+      return s + value;
+    }, 0);
+
+    const avg = sum / data.length;
+    return avg;
+  }
+
+  private standardDeviation(values) {
+    const avg = this.average(values);
+
+    const squareDiffs = values.map((value) => {
+      const diff = value - avg;
+      const sqrDiff = diff * diff;
+      return sqrDiff;
+    });
+
+    const avgSquareDiff = this.average(squareDiffs);
+
+    const stdDev = Math.sqrt(avgSquareDiff);
+    return stdDev;
+  }
+
+  resetService() {
+    this.plantaHover = undefined;
+    this.maePlantas = [];
+    this.maeMedio = undefined;
+    this.maeSigma = undefined;
+    this.numPlantas = 0;
+    this.potenciaTotal = 0;
+    this.listaPlantas = [];
+    this.allFeatures = [];
+  }
+
+  /////////////////     ESTILOS      ////////////////////
+
   public getColorMae(mae: number, opacity?: number): string {
     if (opacity !== undefined) {
       if (mae > this.maeMedio + this.maeSigma) {
@@ -176,41 +297,6 @@ export class PortfolioControlService {
     } else {
       feature.setStyle(unfocusedStyle);
     }
-  }
-
-  private average(data) {
-    const sum = data.reduce((s, value) => {
-      return s + value;
-    }, 0);
-
-    const avg = sum / data.length;
-    return avg;
-  }
-
-  private standardDeviation(values) {
-    const avg = this.average(values);
-
-    const squareDiffs = values.map((value) => {
-      const diff = value - avg;
-      const sqrDiff = diff * diff;
-      return sqrDiff;
-    });
-
-    const avgSquareDiff = this.average(squareDiffs);
-
-    const stdDev = Math.sqrt(avgSquareDiff);
-    return stdDev;
-  }
-
-  resetService() {
-    this.plantaHover = undefined;
-    this.maePlantas = [];
-    this.maeMedio = undefined;
-    this.maeSigma = undefined;
-    this.numPlantas = 0;
-    this.potenciaTotal = 0;
-    this.listaPlantas = [];
-    this.allFeatures = [];
   }
 
   get plantaHover() {

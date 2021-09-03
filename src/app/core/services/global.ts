@@ -94,7 +94,7 @@ export let GLOBAL = {
     'rgba(170, 0, 255,1)', // 'Sombras', // 15
     'rgba(255, 255, 255,1)', // 'Yellowing', // 16
     '#fd504d', // 'Módulo en CA (string)', // 17
-    'rgba(255, 255, 255,1)', // 'Posible PID', // 18
+    '#9B0000', // 'Posible PID', // 18
     'rgba(196, 196, 196,1)', // 'Falta módulo', // 19
   ],
   colores_tipos: [
@@ -116,7 +116,7 @@ export let GLOBAL = {
     'rgba(170, 0, 255, 1)', // 'Sombras', // 15
     'rgba(255, 255, 255, 1)', // 'Yellowing', // 16
     'rgba(255, 0, 0, 1)', // 'Módulo en CA (string)', // 17
-    'rgba(255, 255, 255, 1)', // 'Posible PID', // 18
+    'rgba(155, 0, 0, 1)', // 'Posible PID', // 18
     'rgba(196, 196, 196, 1)', // 'Falta módulo', // 19
   ],
   labels_bloqueadas: [0, 1, 2, 4, 16],

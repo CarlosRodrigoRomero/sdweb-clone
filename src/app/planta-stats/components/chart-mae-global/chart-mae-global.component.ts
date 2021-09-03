@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
+import { AngularFirestore } from '@angular/fire/firestore';
+
 import { switchMap, take } from 'rxjs/operators';
-import { combineLatest, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import {
   ChartComponent,
@@ -24,6 +26,8 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 import { GLOBAL } from '@core/services/global';
+
+import { PlantaInterface } from '@core/models/planta';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -61,14 +65,11 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private informeService: InformeService,
-    private portfolioControlService: PortfolioControlService
+    private portfolioControlService: PortfolioControlService,
+    private afs: AngularFirestore
   ) {}
 
   ngOnInit(): void {
-    const informesPlanta = this.reportControlService.informes$;
-    const getMaeMedio = this.portfolioControlService.maeMedio$;
-    const getMaeSigma = this.portfolioControlService.maeSigma$;
-
     this.subscriptions.add(
       this.reportControlService.informes$
         .pipe(
