@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { combineLatest, Subscription } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
 import { ReportControlService } from '@core/services/report-control.service';
@@ -19,8 +19,6 @@ import {
   ApexTooltip,
   ApexStroke,
   ApexChart,
-  ApexGrid,
-  ChartType,
   ApexLegend,
   ChartComponent,
 } from 'ng-apexcharts';
@@ -52,7 +50,7 @@ export type ChartOptions = {
   templateUrl: './chart-pct-cels.component.html',
   styleUrls: ['./chart-pct-cels.component.css'],
 })
-export class ChartPctCelsComponent implements OnInit, OnDestroy {
+export class ChartPctCelsComponent implements OnInit {
   @ViewChild('chart1') chart1: ChartComponent;
   private informesIdList: string[];
   private informes: InformeInterface[];
@@ -60,8 +58,6 @@ export class ChartPctCelsComponent implements OnInit, OnDestroy {
   private chartHeight = 150;
   dataLoaded = false;
   private dateLabels: string[];
-
-  private subscriptions: Subscription = new Subscription();
 
   public chart1options: Partial<ChartOptions>;
   public chart2options: Partial<ChartOptions>;
@@ -111,40 +107,41 @@ export class ChartPctCelsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(
-      combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informes$])
-        .pipe(
-          switchMap(([elems, informes]) => {
-            this.allAnomalias = elems as Anomalia[];
-            this.informes = informes;
-            this.informesIdList = informes.map((informe) => informe.id);
+    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informes$])
+      .pipe(
+        take(1),
+        switchMap(([elems, informes]) => {
+          this.allAnomalias = elems as Anomalia[];
+          this.informes = informes;
+          this.informesIdList = informes.map((informe) => informe.id);
 
-            return this.informeService.getDateLabelsInformes(this.informesIdList);
-          })
-        )
-        .subscribe((dateLabels) => {
-          this.dateLabels = dateLabels;
-
-          const data1: number[] = [];
-          const data2: number[] = [];
-          this.informes.forEach((informe) => {
-            data1.push(informe.cc * 100);
-
-            const anomsInforme = this.allAnomalias.filter((anom) => anom.informeId === informe.id);
-            const gradientes = anomsInforme.map((anom) => anom.gradienteNormalizado);
-            let gradienteTotal = 0;
-            gradientes.forEach((grad) => (gradienteTotal = gradienteTotal + grad));
-            data2.push(Number((gradienteTotal / anomsInforme.length).toFixed(2)));
-          });
-
-          // si solo hay un informe no mostramos el gráfico
-          if (this.informes.length > 1) {
-            this._initChartData(data1, data2);
-          } else {
-            this.statsService.loadCCyGradChart = false;
-          }
+          return this.informeService.getDateLabelsInformes(this.informesIdList);
         })
-    );
+      )
+      .pipe(take(1))
+      .subscribe((dateLabels) => {
+        this.dateLabels = dateLabels;
+
+        const data1: number[] = [];
+        const data2: number[] = [];
+        this.informes.forEach((informe) => {
+          data1.push(informe.cc * 100);
+
+          const anomsInforme = this.allAnomalias.filter((anom) => anom.informeId === informe.id);
+          const gradientes = anomsInforme.map((anom) => anom.gradienteNormalizado);
+          let gradienteTotal = 0;
+          gradientes.forEach((grad) => (gradienteTotal += Number(grad)));
+
+          data2.push(Number((gradienteTotal / anomsInforme.length).toFixed(2)));
+        });
+
+        // si solo hay un informe no mostramos el gráfico
+        if (this.informes.length > 1) {
+          this._initChartData(data1, data2);
+        } else {
+          this.statsService.loadCCyGradChart = false;
+        }
+      });
   }
 
   private _initChartData(data1: number[], data2: number[]): void {
@@ -300,9 +297,5 @@ export class ChartPctCelsComponent implements OnInit, OnDestroy {
     };
 
     this.dataLoaded = true;
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
   }
 }
