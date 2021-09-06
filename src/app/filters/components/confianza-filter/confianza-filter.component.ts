@@ -15,13 +15,11 @@ import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
   styleUrls: ['./confianza-filter.component.css'],
 })
 export class ConfianzaFilterComponent implements OnInit, OnDestroy {
-  min = 0;
-  max = 10;
-  step = 1;
+  min = 0.5;
+  max = 1;
+  step = 0.01;
   value = 0;
   divisor = 3;
-  createMode = false;
-  deleteMode = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -33,26 +31,16 @@ export class ConfianzaFilterComponent implements OnInit, OnDestroy {
         if (filters.length > 0) {
           // comprobamos si hay filtros en la DB y seteamos los parámetros
           if (filters[0].confianzaM !== undefined) {
-            this.value = filters[0].confianzaM.fuerza;
+            this.value = filters[0].confianzaM.min;
           }
         }
       })
     );
-
-    this.subscriptions.add(this.structuresService.createRawModMode$.subscribe((mode) => (this.createMode = mode)));
-    this.subscriptions.add(this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode)));
   }
 
   onChangeSlider(e: MatSliderChange) {
-    const rangeMinConfianza =
-      this.structuresService.confianzaAverage -
-      ((this.max - e.value) / this.divisor) * this.structuresService.confianzaStdDev;
-    const rangeMaxConfianza =
-      this.structuresService.confianzaAverage +
-      ((this.max - e.value) / this.divisor) * this.structuresService.confianzaStdDev;
-
     // crea el filtro
-    const filtroConfianza = new ModuloBrutoFilter('confianzaM', rangeMinConfianza, rangeMaxConfianza);
+    const filtroConfianza = new ModuloBrutoFilter('confianzaM', e.value, this.max);
 
     if (e.value === this.min) {
       // si se selecciona el mínimo desactivamos el filtro ...
@@ -68,11 +56,7 @@ export class ConfianzaFilterComponent implements OnInit, OnDestroy {
       this.filterService.addFilter(filtroConfianza);
 
       // guardamos el filtro en la DB
-      this.structuresService.addFilter('confianzaM', {
-        fuerza: e.value,
-        min: rangeMinConfianza,
-        max: rangeMaxConfianza,
-      });
+      this.structuresService.addFilter('confianzaM', { min: e.value, max: this.max });
     }
   }
 
