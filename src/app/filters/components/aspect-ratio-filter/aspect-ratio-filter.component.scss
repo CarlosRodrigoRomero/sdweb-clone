@@ -1,0 +1,39 @@
+.aspect-ratio-slider {
+  min-width: 200px;
+  width: 100%;
+}
+
+.title {
+  display: inline-flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.fuerza {
+  font-size: 14px;
+  font-weight: 300;
+}
+
+::ng-deep {
+  .custom-slider .ngx-slider .ngx-slider-selection {
+    height: 2px;
+  }
+
+  .custom-slider .ngx-slider .ngx-slider-bar {
+    height: 2px;
+  }
+
+  .custom-slider .ngx-slider .ngx-slider-pointer {
+    background-color: #c4c4c4;
+    width: 15px;
+    height: 15px;
+    top: -7px;
+  }
+
+  .custom-slider .ngx-slider .ngx-slider-pointer:after {
+    display: none;
+  }
+  .custom-slider .ngx-slider .ngx-slider-bubble {
+    color: unset;
+  }
+}

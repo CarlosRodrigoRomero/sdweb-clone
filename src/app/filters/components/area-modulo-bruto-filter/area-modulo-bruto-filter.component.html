@@ -1,18 +1,13 @@
-<div>
+<div *ngIf="loadFilter">
   <div class="title">
     <span>Area</span>
-    <span class="fuerza">Fuerza: {{ value }}</span>
   </div>
-
-  <mat-slider
-    [disabled]="createMode || deleteMode"
-    class="area-slider"
-    thumbLabel
-    [displayWith]="formatLabel"
-    [value]="value"
-    [max]="max"
-    [min]="min"
-    [step]="step"
-    (change)="onChangeSlider($event)"
-  ></mat-slider>
+  <div class="custom-slider">
+    <ngx-slider
+      [(value)]="minValue"
+      [(highValue)]="maxValue"
+      [options]="options"
+      (userChangeEnd)="onChangeSlider(minValue, maxValue)"
+    ></ngx-slider>
+  </div>
 </div>

@@ -2,26 +2,28 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import { MatSliderChange } from '@angular/material/slider';
+import { Options, PointerType } from '@angular-slider/ngx-slider';
 
 import { FilterService } from '@core/services/filter.service';
 import { StructuresService } from '@core/services/structures.service';
 
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
+import { switchMap, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-area-modulo-bruto-filter',
   templateUrl: './area-modulo-bruto-filter.component.html',
-  styleUrls: ['./area-modulo-bruto-filter.component.css'],
+  styleUrls: ['./area-modulo-bruto-filter.component.scss'],
 })
 export class AreaModuloBrutoFilterComponent implements OnInit, OnDestroy {
   min = 0;
   max = 10;
   step = 1;
-  value = 0;
-  divisor = 3;
-  createMode = false;
-  deleteMode = false;
+  minValue = 0;
+  maxValue = 10;
+  multiplier = 2;
+  options: Options;
+  loadFilter = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -29,48 +31,74 @@ export class AreaModuloBrutoFilterComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.structuresService.getFiltersParams().subscribe((filters) => {
-        if (filters.length > 0) {
-          // comprobamos si hay filtros en la DB y seteamos los parámetros
-          if (filters[0].areaM !== undefined) {
-            this.value = filters[0].areaM.fuerza;
-          }
-        }
-      })
-    );
+      this.structuresService
+        .getFiltersParams()
+        .pipe(
+          take(1),
+          switchMap((filters) => {
+            if (filters.length > 0) {
+              // comprobamos si hay filtros en la DB y seteamos los parámetros
+              if (filters[0].areaM !== undefined) {
+                if (filters[0].areaM.min !== undefined && filters[0].areaM.min !== null) {
+                  this.minValue = filters[0].areaM.min;
+                }
+                if (filters[0].areaM.max !== undefined && filters[0].areaM.max !== null) {
+                  this.maxValue = filters[0].areaM.max;
+                }
+              }
+            }
 
-    this.subscriptions.add(this.structuresService.createRawModMode$.subscribe((mode) => (this.createMode = mode)));
-    this.subscriptions.add(this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode)));
+            return this.structuresService.allRawModules$;
+          })
+        )
+        .subscribe((rawMods) => {
+          const areas = rawMods.map((rawMod) => rawMod.area);
+          const median = this.structuresService.getMedian(areas);
+
+          if (!isNaN(median)) {
+            this.max = Math.round(median * this.multiplier);
+
+            this.options = {
+              floor: this.min,
+              ceil: this.max,
+              step: this.step,
+              getSelectionBarColor: (minValue: number, maxValue: number): string => {
+                if (minValue === this.minValue && maxValue === this.maxValue) {
+                  return '#c4c4c4';
+                }
+                return '#455a64';
+              },
+              getPointerColor: (value: number, pointerType: PointerType.Min | PointerType.Max): string => {
+                if (value !== this.min) {
+                  if (value !== this.max) {
+                    return '#455a64';
+                  }
+                }
+              },
+            };
+
+            this.loadFilter = true;
+          }
+        })
+    );
   }
 
-  onChangeSlider(e: MatSliderChange) {
-    const rangeMinArea =
-      this.structuresService.areaAverage - ((this.max - e.value) / this.divisor) * this.structuresService.areaStdDev;
-    const rangeMaxArea =
-      this.structuresService.areaAverage + ((this.max - e.value) / this.divisor) * this.structuresService.areaStdDev;
+  onChangeSlider(lowValue: number, highValue: number) {
+    const filtroArea = new ModuloBrutoFilter('areaM', lowValue, highValue);
 
-    const filtroArea = new ModuloBrutoFilter('areaM', rangeMinArea, rangeMaxArea);
-
-    if (e.value === this.min) {
+    if (lowValue === this.min && highValue === this.max) {
       // si se selecciona el mínimo desactivamos el filtro ...
       this.filterService.deleteFilter(filtroArea);
 
       // eliminamos el filtro de la DB
       this.structuresService.deleteFilter('areaM');
-
-      // ponemos el label fuerza a 0
-      this.value = 0;
     } else {
       // ... si no, lo añadimos
       this.filterService.addFilter(filtroArea);
 
       // guardamos el filtro en la DB
-      this.structuresService.addFilter('areaM', { fuerza: e.value, min: rangeMinArea, max: rangeMaxArea });
+      this.structuresService.addFilter('areaM', { min: lowValue, max: highValue });
     }
-  }
-
-  formatLabel(value: number) {
-    return value;
   }
 
   ngOnDestroy(): void {

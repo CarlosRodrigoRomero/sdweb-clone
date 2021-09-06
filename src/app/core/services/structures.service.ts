@@ -476,6 +476,14 @@ export class StructuresService {
     return [sumLong / coords.length, sumLat / coords.length];
   }
 
+  getMedian(values: number[]) {
+    values.sort((a, b) => {
+      return a - b;
+    });
+    const mid = values.length / 2;
+    return mid % 1 ? values[mid - 0.5] : (values[mid - 1] + values[mid]) / 2;
+  }
+
   prepareCentroidToDB(centroid: Coordinate) {
     const centroidD = {
       lat: centroid[1],
