@@ -18,6 +18,7 @@ import Select from 'ol/interaction/Select';
 import { click } from 'ol/events/condition';
 import Draw, { createBox } from 'ol/interaction/Draw';
 import Overlay from 'ol/Overlay';
+import GeometryType from 'ol/geom/GeometryType';
 
 import { OlMapService } from '@core/services/ol-map.service';
 import { StructuresService } from '@core/services/structures.service';
@@ -25,7 +26,6 @@ import { StructuresService } from '@core/services/structures.service';
 import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
 
 import { NormalizedModule } from '@core/models/normalizedModule';
-import GeometryType from 'ol/geom/GeometryType';
 
 @Component({
   selector: 'app-norm-modules',
@@ -41,6 +41,7 @@ export class NormModulesComponent implements OnInit, OnDestroy {
   drawActive = false;
   private popup: Overlay;
   public coordsNewNormMod: any;
+  centroidDB: any;
   form: FormGroup;
   modGroupSelectedId: string = undefined;
 
@@ -238,6 +239,10 @@ export class NormModulesComponent implements OnInit, OnDestroy {
       const coords = polygon.getCoordinates();
 
       this.coordsNewNormMod = this.structuresService.coordinateToObject(coords);
+
+      const centroid = this.structuresService.getCentroid(coords[0]);
+
+      this.centroidDB = this.structuresService.prepareCentroidToDB(centroid);
 
       this.popup.setPosition(coords[0][3]);
 

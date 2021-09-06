@@ -23,6 +23,7 @@ export class NormModCreatePopupComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
 
   @Input() coords: any;
+  @Input() centroid: any;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -57,6 +58,7 @@ export class NormModCreatePopupComponent implements OnInit, OnDestroy {
         image_name: this.form.get('image_name').value + '.tif',
         coords: this.coords,
         agrupacionId: this.form.get('agrupacionId').value,
+        centroid_gps: this.centroid,
       };
 
       // Crea el modulos normalizado en la DB

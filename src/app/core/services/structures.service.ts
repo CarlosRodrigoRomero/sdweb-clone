@@ -21,6 +21,7 @@ import { Coordinate } from 'ol/coordinate';
 import Point from 'ol/geom/Point';
 import LineString from 'ol/geom/LineString';
 import { NormalizedModule } from '@core/models/normalizedModule';
+import { ModuleGroup } from '@core/models/moduleGroup';
 
 @Injectable({
   providedIn: 'root',
@@ -193,7 +194,7 @@ export class StructuresService {
 
   getModuleGroups() {
     const query$ = this.afs
-      .collection<any>('thermalLayers/' + this.thermalLayer.id + '/agrupaciones')
+      .collection<ModuleGroup>('thermalLayers/' + this.thermalLayer.id + '/agrupaciones')
       .snapshotChanges()
       .pipe(
         map((actions) =>
@@ -453,6 +454,15 @@ export class StructuresService {
     });
 
     return [sumLong / coords.length, sumLat / coords.length];
+  }
+
+  prepareCentroidToDB(centroid: Coordinate) {
+    const centroidD = {
+      lat: centroid[1],
+      long: centroid[0],
+    };
+
+    return centroidD;
   }
 
   get planta() {

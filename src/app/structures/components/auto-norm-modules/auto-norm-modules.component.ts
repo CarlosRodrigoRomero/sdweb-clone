@@ -2,11 +2,13 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 import { StructuresService } from '@core/services/structures.service';
-import { take } from 'rxjs/operators';
+
 import { NormalizedModule } from '@core/models/normalizedModule';
+import { ModuleGroup } from '@core/models/moduleGroup';
 
 @Component({
   selector: 'app-auto-norm-modules',
@@ -17,6 +19,7 @@ export class AutoNormModulesComponent implements OnInit, OnDestroy {
   private moduleGroups: any[];
   private normModules: NormalizedModule[];
   form: FormGroup;
+  groupsWithoutNormMod: ModuleGroup[] = [];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -27,14 +30,18 @@ export class AutoNormModulesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(
-      this.structuresService.getModuleGroups().subscribe((groups) => (this.moduleGroups = groups))
-    );
-
-    this.structuresService
-      .getNormModules()
+    combineLatest([this.structuresService.getModuleGroups(), this.structuresService.getNormModules()])
       .pipe(take(1))
-      .subscribe((normMods) => (this.normModules = normMods));
+      .subscribe(([groups, normMods]) => {
+        this.moduleGroups = groups;
+        this.normModules = normMods;
+
+        this.moduleGroups.forEach((group) => {
+          if (this.normModules.map((normMod) => normMod.agrupacionId).includes(group.id)) {
+            this.groupsWithoutNormMod.push(group);
+          }
+        });
+      });
 
     this.buildForm();
   }
@@ -47,9 +54,15 @@ export class AutoNormModulesComponent implements OnInit, OnDestroy {
     });
   }
 
-  autoNormModules(event: Event) {
-    event.preventDefault();
+  onSubmit(select: string) {
+    if (select === 'all') {
+      this.autoNormModules(this.moduleGroups);
+    } else {
+      this.autoNormModules(this.groupsWithoutNormMod);
+    }
+  }
 
+  autoNormModules(moduleGroups: ModuleGroup[]) {
     const url = `https://europe-west1-sdweb-d33ce.cloudfunctions.net/estructura`;
 
     if (this.form.valid) {
@@ -57,25 +70,23 @@ export class AutoNormModulesComponent implements OnInit, OnDestroy {
       const columnas = this.form.get('columnas').value;
       const ventana = this.form.get('ventana').value;
 
-      this.moduleGroups.forEach((group) => {
-        if (!this.normModules.map((normMod) => normMod.agrupacionId).includes(group.id)) {
-          const params = new HttpParams()
-            .set('informeId', this.structuresService.informeId)
-            .set('agrupacionId', group.id)
-            .set('filas', filas.toString())
-            .set('columnas', columnas.toString())
-            .set('ventana', ventana.toString());
+      moduleGroups.forEach((group) => {
+        const params = new HttpParams()
+          .set('informeId', this.structuresService.informeId)
+          .set('agrupacionId', group.id)
+          .set('filas', filas.toString())
+          .set('columnas', columnas.toString())
+          .set('ventana', ventana.toString());
 
-          return this.http
-            .get(url, { responseType: 'text', params })
-            .toPromise()
-            .then((res) => {
-              console.log(res);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
+        return this.http
+          .get(url, { responseType: 'text', params })
+          .toPromise()
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       });
     }
   }
