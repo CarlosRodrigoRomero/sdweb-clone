@@ -411,7 +411,7 @@ export class StructuresService {
     return lineH.getLength() * lineV.getLength();
   }
 
-  public objectToCoordinate(coords: any) {
+  public coordsDBToCoordinate(coords: any) {
     const coordinates: Coordinate[] = [
       [coords.topLeft.long, coords.topLeft.lat],
       [coords.topRight.long, coords.topRight.lat],

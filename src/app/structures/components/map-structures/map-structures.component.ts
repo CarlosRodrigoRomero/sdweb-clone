@@ -255,6 +255,7 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
   }
 
   private addRawModule(rawMod: RawModule) {
+    console.log(rawMod);
     const mBSource = this.rawModLayer.getSource();
     const feature = new Feature({
       geometry: new Polygon([rawMod.coords]),

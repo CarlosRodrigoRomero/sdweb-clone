@@ -117,7 +117,7 @@ export class NormModulesComponent implements OnInit, OnDestroy {
         nMSource.clear();
 
         normMods.forEach((normMod) => {
-          const coords = this.structuresService.objectToCoordinate(normMod.coords);
+          const coords = this.structuresService.coordsDBToCoordinate(normMod.coords);
           const feature = new Feature({
             geometry: new Polygon([coords]),
             properties: {
@@ -213,8 +213,8 @@ export class NormModulesComponent implements OnInit, OnDestroy {
     const sourceNormModule = new VectorSource();
     const style = new Style({
       stroke: new Stroke({
-        color: 'rgba(0,0,0,0)',
-        width: 1,
+        color: 'white',
+        width: 2,
       }),
     });
 

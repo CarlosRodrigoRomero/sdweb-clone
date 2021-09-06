@@ -11,6 +11,7 @@ import VectorLayer from 'ol/layer/Vector';
 import Draw, { createBox } from 'ol/interaction/Draw';
 import GeometryType from 'ol/geom/GeometryType';
 import Polygon from 'ol/geom/Polygon';
+import Feature from 'ol/Feature';
 
 import { StructuresService } from '@core/services/structures.service';
 import { OlMapService } from '@core/services/ol-map.service';
@@ -19,7 +20,6 @@ import { FilterService } from '@core/services/filter.service';
 import { RawModule } from '@core/models/moduloBruto';
 
 import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
-import Feature from 'ol/Feature';
 
 @Component({
   selector: 'app-raw-modules',
@@ -132,7 +132,7 @@ export class RawModulesComponent implements OnInit, OnDestroy {
       // this.filterService.filteredElements.push(rawModule);
 
       // añadimos el nuevo modulo como feature
-      // this.addRawModFeature(rawModule);
+      this.addRawModFeature(rawModule);
     });
   }
 
@@ -150,9 +150,11 @@ export class RawModulesComponent implements OnInit, OnDestroy {
       }
     });
 
+    const coords = Object.values(rawModule.coords); // lo convertimos en un array
+
     const mBSource = rawModLayer.getSource();
     const feature = new Feature({
-      geometry: new Polygon([rawModule.coords]),
+      geometry: new Polygon([coords]),
       properties: {
         id: rawModule.id,
         name: 'rawMod',

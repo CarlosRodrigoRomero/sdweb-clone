@@ -207,7 +207,7 @@ export class MapClassificationComponent implements OnInit {
       this.normModules = normModules;
 
       this.normModules.forEach((normMod) => {
-        const coords = this.structuresService.objectToCoordinate(normMod.coords);
+        const coords = this.structuresService.coordsDBToCoordinate(normMod.coords);
 
         const feature = new Feature({
           geometry: new Polygon([coords]),
@@ -313,7 +313,7 @@ export class MapClassificationComponent implements OnInit {
         const normMod: NormalizedModule = feature.getProperties().properties.normMod;
         this.classificationService.normModSelected = normMod;
 
-        const coords = this.structuresService.objectToCoordinate(feature.getProperties().properties.normMod.coords);
+        const coords = this.structuresService.coordsDBToCoordinate(feature.getProperties().properties.normMod.coords);
 
         this.popup.setPosition(coords[0]);
 

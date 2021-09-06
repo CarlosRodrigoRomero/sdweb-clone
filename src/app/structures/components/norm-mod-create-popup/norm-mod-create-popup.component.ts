@@ -4,6 +4,8 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Subscription } from 'rxjs';
 
 import { Map } from 'ol';
+import Feature from 'ol/Feature';
+import Polygon from 'ol/geom/Polygon';
 
 import { StructuresService } from '@core/services/structures.service';
 import { OlMapService } from '@core/services/ol-map.service';
@@ -64,9 +66,35 @@ export class NormModCreatePopupComponent implements OnInit, OnDestroy {
       // Crea el modulos normalizado en la DB
       this.structuresService.addNormModule(normModule);
 
+      // añadimos el nuevo modulo como feature
+      this.addNormModFeature(normModule);
+
       // ocultamos el popup
       this.hidePopup();
     }
+  }
+
+  private addNormModFeature(normModule: NormalizedModule) {
+    let normModLayer;
+    this.map.getLayers().forEach((layer) => {
+      if (layer.getProperties().id === 'nMLayer') {
+        normModLayer = layer;
+      }
+    });
+
+    const mBSource = normModLayer.getSource();
+
+    const coords = this.structuresService.coordsDBToCoordinate(normModule.coords);
+    const feature = new Feature({
+      geometry: new Polygon([coords]),
+      properties: {
+        id: normModule.id,
+        name: 'normModule',
+        visible: true,
+      },
+    });
+
+    mBSource.addFeature(feature);
   }
 
   hidePopup() {
