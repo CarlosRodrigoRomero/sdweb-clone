@@ -30,18 +30,20 @@ export class AutoNormModulesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    combineLatest([this.structuresService.getModuleGroups(), this.structuresService.getNormModules()])
-      .pipe(take(1))
-      .subscribe(([groups, normMods]) => {
-        this.moduleGroups = groups;
-        this.normModules = normMods;
+    this.subscriptions.add(
+      combineLatest([this.structuresService.allModGroups$, this.structuresService.allNormModules$]).subscribe(
+        ([groups, normMods]) => {
+          this.moduleGroups = groups;
+          this.normModules = normMods;
 
-        this.moduleGroups.forEach((group) => {
-          if (this.normModules.map((normMod) => normMod.agrupacionId).includes(group.id)) {
-            this.groupsWithoutNormMod.push(group);
-          }
-        });
-      });
+          this.moduleGroups.forEach((group) => {
+            if (!this.normModules.map((normMod) => normMod.agrupacionId).includes(group.id)) {
+              this.groupsWithoutNormMod.push(group);
+            }
+          });
+        }
+      )
+    );
 
     this.buildForm();
   }

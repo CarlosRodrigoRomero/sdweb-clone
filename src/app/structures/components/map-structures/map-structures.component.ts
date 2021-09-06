@@ -243,9 +243,7 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
                     // asignamos el numero de modulos del informe
                     this.structuresService.reportNumModules = this.rawMods.length;
 
-                    this.rawMods.forEach((rawMod) => {
-                      this.addRawModule(rawMod);
-                    });
+                    this.rawMods.forEach((rawMod) => this.addRawModule(rawMod));
                   }
                 })
             );
@@ -255,7 +253,6 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
   }
 
   private addRawModule(rawMod: RawModule) {
-    console.log(rawMod);
     const mBSource = this.rawModLayer.getSource();
     const feature = new Feature({
       geometry: new Polygon([rawMod.coords]),
@@ -457,7 +454,7 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
       .filter(
         (layer) =>
           layer.getProperties().id === undefined ||
-          (layer.getProperties().id !== 'rawModLayer' && layer.getProperties().id !== 'nMLayer')
+          (layer.getProperties().id !== 'rawModLayer' && layer.getProperties().id !== 'normModLayer')
       )
       .forEach((layer) => layer.setVisible(this.layerVisibility));
   }

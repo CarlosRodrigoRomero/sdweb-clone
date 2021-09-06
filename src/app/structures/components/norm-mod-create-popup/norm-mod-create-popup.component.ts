@@ -3,6 +3,8 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 
 import { Subscription } from 'rxjs';
 
+import { AngularFirestore } from '@angular/fire/firestore';
+
 import { Map } from 'ol';
 import Feature from 'ol/Feature';
 import Polygon from 'ol/geom/Polygon';
@@ -30,7 +32,8 @@ export class NormModCreatePopupComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private structuresService: StructuresService,
-    private olMapService: OlMapService
+    private olMapService: OlMapService,
+    public afs: AngularFirestore
   ) {}
 
   ngOnInit(): void {
@@ -54,7 +57,10 @@ export class NormModCreatePopupComponent implements OnInit, OnDestroy {
   onSubmit(event: Event) {
     event.preventDefault();
     if (this.form.valid) {
+      const id = this.afs.createId();
+
       const normModule: NormalizedModule = {
+        id,
         fila: this.form.get('fila').value,
         columna: this.form.get('columna').value,
         image_name: this.form.get('image_name').value + '.tif',
@@ -77,7 +83,7 @@ export class NormModCreatePopupComponent implements OnInit, OnDestroy {
   private addNormModFeature(normModule: NormalizedModule) {
     let normModLayer;
     this.map.getLayers().forEach((layer) => {
-      if (layer.getProperties().id === 'nMLayer') {
+      if (layer.getProperties().id === 'normModLayer') {
         normModLayer = layer;
       }
     });
@@ -90,6 +96,7 @@ export class NormModCreatePopupComponent implements OnInit, OnDestroy {
       properties: {
         id: normModule.id,
         name: 'normModule',
+        normMod: normModule,
         visible: true,
       },
     });

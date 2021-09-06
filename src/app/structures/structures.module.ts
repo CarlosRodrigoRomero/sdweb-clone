@@ -14,6 +14,7 @@ import { NormModulesComponent } from './components/norm-modules/norm-modules.com
 import { NormModCreatePopupComponent } from './components/norm-mod-create-popup/norm-mod-create-popup.component';
 import { AutoNormModulesComponent } from './components/auto-norm-modules/auto-norm-modules.component';
 import { RawModulesFiltersComponent } from './components/raw-modules-filters/raw-modules-filters.component';
+import { RefreshComponent } from './components/refresh/refresh.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { RawModulesFiltersComponent } from './components/raw-modules-filters/raw
     NormModCreatePopupComponent,
     AutoNormModulesComponent,
     RawModulesFiltersComponent,
+    RefreshComponent,
   ],
   imports: [CommonModule, StructuresRoutingModule, SharedModule, FiltersModule],
 })

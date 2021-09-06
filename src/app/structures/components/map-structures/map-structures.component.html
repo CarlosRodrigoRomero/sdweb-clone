@@ -1,5 +1,6 @@
 <div id="map" class="map"></div>
-<button mat-raised-button (click)="setLayerVisibility()">
+<button class="btn-visibility" mat-raised-button (click)="setLayerVisibility()">
   <span *ngIf="layerVisibility">Ocultar capas</span>
   <span *ngIf="!layerVisibility">Mostrar capas</span>
 </button>
+<app-refresh class="btn-refresh"></app-refresh>

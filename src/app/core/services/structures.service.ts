@@ -53,6 +53,8 @@ export class StructuresService {
   drawModGroups$ = new BehaviorSubject<boolean>(this._drawModGroups);
   private _modGroupSelectedId: string = undefined;
   modGroupSelectedId$ = new BehaviorSubject<string>(this._modGroupSelectedId);
+  private _allModGroups: ModuleGroup[] = [];
+  allModGroups$ = new BehaviorSubject<ModuleGroup[]>(this._allModGroups);
 
   private _loadNormModules = false;
   loadNormModules$ = new BehaviorSubject<boolean>(this._loadNormModules);
@@ -60,6 +62,8 @@ export class StructuresService {
   editNormModules$ = new BehaviorSubject<boolean>(this._editNormModules);
   private _normModSelected: NormalizedModule = undefined;
   normModSelected$ = new BehaviorSubject<NormalizedModule>(this._normModSelected);
+  private _allNormModules: NormalizedModule[] = [];
+  allNormModules$ = new BehaviorSubject<NormalizedModule[]>(this._allNormModules);
 
   public areaAverage: number = undefined;
   public areaStdDev: number = undefined;
@@ -95,6 +99,16 @@ export class StructuresService {
       )
       .subscribe((layers) => {
         this.thermalLayer = layers[0];
+
+        // cargamos las agrupaciones
+        this.getModuleGroups()
+          .pipe(take(1))
+          .subscribe((modGroups) => (this.allModGroups = modGroups));
+
+        // cargamos los modulos normalizados
+        this.getNormModules()
+          .pipe(take(1))
+          .subscribe((normMods) => (this.allNormModules = normMods));
 
         this.initialized$.next(true);
       });
@@ -270,20 +284,22 @@ export class StructuresService {
       });
   }
 
-  addModuleGroup(coords: any) {
-    // obtenemos un ID aleatorio
-    const id = this.afs.createId();
+  addModuleGroup(modGroup: ModuleGroup) {
+    let id = modGroup.id;
+
+    if (id === undefined) {
+      // obtenemos un ID aleatorio
+      id = this.afs.createId();
+    }
 
     const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/agrupaciones');
 
     // lo preparamos para la DB
-    coords = Object.assign({}, coords);
+    modGroup.coords = Object.assign({}, modGroup.coords);
 
     colRef
       .doc(id)
-      .set({
-        coords,
-      })
+      .set(modGroup)
       .then(() => {
         console.log('Agrupación creada correctamente');
       })
@@ -327,8 +343,12 @@ export class StructuresService {
   }
 
   addNormModule(module: NormalizedModule) {
-    // obtenemos un ID aleatorio
-    const id = this.afs.createId();
+    let id = module.id;
+
+    if (id !== undefined) {
+      // obtenemos un ID aleatorio
+      id = this.afs.createId();
+    }
 
     const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados');
 
@@ -566,6 +586,15 @@ export class StructuresService {
     this.modGroupSelectedId$.next(value);
   }
 
+  get allModGroups() {
+    return this._allModGroups;
+  }
+
+  set allModGroups(value: ModuleGroup[]) {
+    this._allModGroups = value;
+    this.allModGroups$.next(value);
+  }
+
   /* NORMALIZED MODULES */
 
   get loadNormModules() {
@@ -594,6 +623,17 @@ export class StructuresService {
     this._normModSelected = value;
     this.normModSelected$.next(value);
   }
+
+  get allNormModules() {
+    return this._allNormModules;
+  }
+
+  set allNormModules(value: NormalizedModule[]) {
+    this._allNormModules = value;
+    this.allNormModules$.next(value);
+  }
+
+  //////////////////////////////
 
   get reportNumModules() {
     return this._reportNumModules;

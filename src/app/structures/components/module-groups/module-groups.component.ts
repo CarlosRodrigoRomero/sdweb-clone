@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 
 import { MatDialog } from '@angular/material/dialog';
 
+import { AngularFirestore } from '@angular/fire/firestore';
+
 import Map from 'ol/Map';
 import VectorSource from 'ol/source/Vector';
 import { Stroke, Style } from 'ol/style';
@@ -20,6 +22,7 @@ import { OlMapService } from '@core/services/ol-map.service';
 import { StructuresService } from '@core/services/structures.service';
 
 import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
+import { ModuleGroup } from '@core/models/moduleGroup';
 
 @Component({
   selector: 'app-module-groups',
@@ -39,7 +42,8 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
   constructor(
     private olMapService: OlMapService,
     private structuresService: StructuresService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    public afs: AngularFirestore
   ) {}
 
   ngOnInit(): void {
@@ -85,7 +89,7 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
     const mGSource = this.mGLayer.getSource();
 
     this.subscriptions.add(
-      this.structuresService.getModuleGroups().subscribe((groups) => {
+      this.structuresService.allModGroups$.subscribe((groups) => {
         mGSource.clear();
 
         groups.forEach((mG) => {
@@ -111,7 +115,7 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
     const sourceGroup = new VectorSource();
     const style = new Style({
       stroke: new Stroke({
-        color: 'darkblue',
+        color: 'rgba(0,0,0,0)',
         width: 2,
       }),
     });
@@ -132,9 +136,23 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
     this.map.addInteraction(this.draw);
 
     this.draw.on('drawend', (evt) => {
+      sourceGroup.clear();
+
+      // obtenemos un ID aleatorio
+      const id = this.afs.createId();
+
       const coords = this.getCoordsRectangle(evt);
 
-      this.structuresService.addModuleGroup(coords);
+      const modGroup: ModuleGroup = {
+        id,
+        coords,
+      };
+
+      // lo añadimos a la DB
+      this.structuresService.addModuleGroup(modGroup);
+
+      // lo añadimos a la lista de agrupaciones
+      this.structuresService.allModGroups = [...this.structuresService.allModGroups, modGroup];
 
       // terminamos el modo draw
       this.map.removeInteraction(this.draw);
@@ -208,11 +226,16 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
   }
 
   deleteModuleGroup() {
-    // eliminamos la agrupacion
+    // eliminamos la agrupacion de la DB
     this.structuresService.deleteModuleGroup(this.modGroupSelectedId);
 
     // eliminamos tambien los modulos normalizados pertenecientes a la agrupacion
     this.structuresService.deleteNormModulesByGroup(this.modGroupSelectedId);
+
+    // eliminarmos la agrupacion de la lista de agrupaciones
+    this.structuresService.allModGroups = this.structuresService.allModGroups.filter(
+      (modGroup) => modGroup.id !== this.modGroupSelectedId
+    );
 
     this.structuresService.modGroupSelectedId = undefined;
   }

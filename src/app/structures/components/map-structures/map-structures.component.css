@@ -4,8 +4,14 @@
   background: black;
 }
 
-button {
+.btn-visibility {
   position: absolute;
   top: 80px;
+  right: 10px;
+}
+
+.btn-refresh {
+  position: absolute;
+  top: 140px;
   right: 10px;
 }

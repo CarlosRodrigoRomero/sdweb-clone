@@ -11,7 +11,7 @@ import Map from 'ol/Map';
 import VectorLayer from 'ol/layer/Vector';
 
 import VectorSource from 'ol/source/Vector';
-import { Stroke, Style } from 'ol/style';
+import { Fill, Stroke, Style } from 'ol/style';
 import Feature from 'ol/Feature';
 import Polygon from 'ol/geom/Polygon';
 import Select from 'ol/interaction/Select';
@@ -101,7 +101,7 @@ export class NormModulesComponent implements OnInit, OnDestroy {
     });
 
     this.normModLayer.setProperties({
-      id: 'nMLayer',
+      id: 'normModLayer',
     });
 
     this.map.addLayer(this.normModLayer);
@@ -110,26 +110,23 @@ export class NormModulesComponent implements OnInit, OnDestroy {
   private addNormModules() {
     const nMSource = this.normModLayer.getSource();
 
-    this.structuresService
-      .getNormModules()
-      .pipe(take(1))
-      .subscribe((normMods) => {
-        nMSource.clear();
+    this.structuresService.allNormModules$.subscribe((normMods) => {
+      nMSource.clear();
 
-        normMods.forEach((normMod) => {
-          const coords = this.structuresService.coordsDBToCoordinate(normMod.coords);
-          const feature = new Feature({
-            geometry: new Polygon([coords]),
-            properties: {
-              id: normMod.id,
-              name: 'normModule',
-              normMod,
-            },
-          });
-
-          nMSource.addFeature(feature);
+      normMods.forEach((normMod) => {
+        const coords = this.structuresService.coordsDBToCoordinate(normMod.coords);
+        const feature = new Feature({
+          geometry: new Polygon([coords]),
+          properties: {
+            id: normMod.id,
+            name: 'normModule',
+            normMod,
+          },
         });
+
+        nMSource.addFeature(feature);
       });
+    });
   }
 
   private setNormModulesVisibility(visible: boolean) {
@@ -137,7 +134,7 @@ export class NormModulesComponent implements OnInit, OnDestroy {
       this.map
         .getLayers()
         .getArray()
-        .filter((layer) => layer.getProperties().id !== undefined && layer.getProperties().id === 'nMLayer')
+        .filter((layer) => layer.getProperties().id !== undefined && layer.getProperties().id === 'normModLayer')
         .forEach((layer) => layer.setVisible(visible));
     }
   }
@@ -148,7 +145,7 @@ export class NormModulesComponent implements OnInit, OnDestroy {
       condition: click,
       layers: (l) => {
         if (this.editNormModules) {
-          if (l.getProperties().id === 'nMLayer') {
+          if (l.getProperties().id === 'normModLayer') {
             return true;
           } else {
             return false;
@@ -161,6 +158,7 @@ export class NormModulesComponent implements OnInit, OnDestroy {
     select.on('select', (e) => {
       if (e.selected.length > 0) {
         this.structuresService.normModSelected = e.selected[0].getProperties().properties.normMod;
+
         e.selected[0].setStyle(this.getNormModStyle(true));
       }
     });
@@ -213,8 +211,8 @@ export class NormModulesComponent implements OnInit, OnDestroy {
     const sourceNormModule = new VectorSource();
     const style = new Style({
       stroke: new Stroke({
-        color: 'white',
-        width: 2,
+        color: 'rgba(0,0,0,0)',
+        width: 1,
       }),
     });
 
@@ -272,7 +270,13 @@ export class NormModulesComponent implements OnInit, OnDestroy {
   }
 
   deleteNormModule() {
+    // lo eliminamos de la DB
     this.structuresService.deleteNormModule(this.normModSelected.id);
+
+    // eliminamos el modulo de la lista de todos los modulos
+    this.structuresService.allNormModules = this.structuresService.allNormModules.filter(
+      (normMod) => normMod.id !== this.normModSelected.id
+    );
 
     this.structuresService.normModSelected = undefined;
   }

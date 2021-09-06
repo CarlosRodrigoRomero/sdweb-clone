@@ -194,7 +194,7 @@ export class MapClassificationComponent implements OnInit {
   }
 
   private addNormModules() {
-    this.structuresService.getNormModules(this.thermalLayer).subscribe((normModules) => {
+    this.structuresService.allNormModules$.subscribe((normModules) => {
       const normModLayer = this.map
         .getLayers()
         .getArray()
