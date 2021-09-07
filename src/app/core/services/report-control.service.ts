@@ -97,6 +97,10 @@ export class ReportControlService {
                 // tslint:disable-next-line: triple-equals
                 this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
 
+                // calculamos el MAE y las CC de los informes si no tuviesen
+                // this.setMaeInformesPlantaFija(anoms);
+                // this.setCCInformesPlantaFija(anoms);
+
                 this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
 
                 // iniciamos filter service
@@ -237,8 +241,8 @@ export class ReportControlService {
                 this.allFilterableElements = segs;
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
-                this.setMaeInformesPlanta(segs);
-                this.setCCInformesPlanta(segs);
+                this.setMaeInformesPlantaSeguidores(segs);
+                this.setCCInformesPlantaSeguidores(segs);
 
                 // iniciamos filter service
                 this.filterService.initService(segs).then((filtersInit) => {
@@ -349,7 +353,7 @@ export class ReportControlService {
     return numGlobalCoords;
   }
 
-  private setMaeInformesPlanta(seguidores: Seguidor[]) {
+  private setMaeInformesPlantaSeguidores(seguidores: Seguidor[]) {
     this.informes.forEach((informe) => {
       // tslint:disable-next-line: triple-equals
       if (informe.mae == 0 || informe.mae === undefined || informe.mae === null || isNaN(informe.mae)) {
@@ -363,7 +367,22 @@ export class ReportControlService {
     });
   }
 
-  private setCCInformesPlanta(seguidores: Seguidor[]) {
+  private setMaeInformesPlantaFija(anomalias: Anomalia[]) {
+    this.informes.forEach((informe) => {
+      // tslint:disable-next-line: triple-equals
+      if (informe.mae == 0 || informe.mae === undefined || informe.mae === null || isNaN(informe.mae)) {
+        const perdidas = anomalias.map((anom) => anom.perdidas);
+        let perdidasTotales = 0;
+        perdidas.forEach((perd) => (perdidasTotales += perd));
+
+        informe.mae = perdidasTotales / informe.numeroModulos;
+
+        this.informeService.updateInforme(informe);
+      }
+    });
+  }
+
+  private setCCInformesPlantaSeguidores(seguidores: Seguidor[]) {
     this.informes.forEach((informe) => {
       // tslint:disable-next-line: triple-equals
       if (informe.cc == 0 || informe.cc === undefined || informe.cc === null || isNaN(informe.cc)) {
@@ -371,6 +390,20 @@ export class ReportControlService {
         let cc = 0;
         seguidoresInforme.forEach((seg) => (cc = cc + seg.celsCalientes));
         informe.cc = cc / seguidoresInforme.length;
+
+        this.informeService.updateInforme(informe);
+      }
+    });
+  }
+
+  private setCCInformesPlantaFija(anomalias: Anomalia[]) {
+    this.informes.forEach((informe) => {
+      // tslint:disable-next-line: triple-equals
+      if (informe.cc == 0 || informe.cc === undefined || informe.cc === null || isNaN(informe.cc)) {
+        // tslint:disable-next-line: triple-equals
+        const celCals = anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+
+        informe.cc = celCals.length / informe.numeroModulos;
 
         this.informeService.updateInforme(informe);
       }

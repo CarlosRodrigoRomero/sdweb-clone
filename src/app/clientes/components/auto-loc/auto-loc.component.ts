@@ -191,6 +191,9 @@ export class AutoLocComponent implements OnInit {
     if (this.planta.id === 'fdAyNQ0pGqVz1Yo7E1zF') {
       // TODO: PROVISIONAL
       this.plantaService.loadOrtoImage(this.planta, map);
+    } else if (this.planta.id === 'KTLBAxcTTe62ENcCgCxs') {
+      // TODO: PROVISIONAL
+      this.plantaService.loadOrtoImage(this.planta, map);
     } else {
       this.plantaService.initMap(this.planta, map);
     }

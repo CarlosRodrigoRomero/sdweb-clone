@@ -685,7 +685,7 @@ export class PlantaService {
             return null;
           }
           // return `${ortofoto.url}/${zoom}/${coord.x}/${coord.y}.png`;
-          return 'https://solardrontech.es/tileserver.php?/index.json?/I35ozSFLSlGJ62z3eWPt_visual/{z}/{x}/{y}.png'
+          return 'https://solardrontech.es/tileserver.php?/index.json?/kyswupn4T2GXardoZorv_visual/{z}/{x}/{y}.png'
             .replace('{z}', zoom)
             .replace('{x}', coord.x)
             .replace('{y}', coord.y);
@@ -701,8 +701,8 @@ export class PlantaService {
 
   loadOrtoImage(planta: PlantaInterface, map: any) {
     var mapBounds = new google.maps.LatLngBounds(
-      new google.maps.LatLng(42.7013613084589, -2.9016351700695853),
-      new google.maps.LatLng(42.70798405011936, -2.8863144028989227)
+      new google.maps.LatLng(planta.latitud - 0.02, planta.longitud - 0.02),
+      new google.maps.LatLng(planta.latitud + 0.02, planta.longitud + 0.02)
     );
     var mapMinZoom = 12;
     var mapMaxZoom = 24;
@@ -731,7 +731,7 @@ export class PlantaService {
           proj.fromPointToLatLng(new google.maps.Point((coord.x + 1) * tileXSize, coord.y * tileYSize))
         );
         if (!mapBounds.intersects(tileBounds) || zoom < mapMinZoom || zoom > mapMaxZoom) return null;
-        return 'https://solardrontech.es/tileserver.php?/index.json?/I35ozSFLSlGJ62z3eWPt_visual/{z}/{x}/{y}.png'
+        return 'https://solardrontech.es/tileserver.php?/index.json?/kyswupn4T2GXardoZorv_visual/{z}/{x}/{y}.png'
           .replace('{z}', zoom)
           .replace('{x}', coord.x)
           .replace('{y}', coord.y);
