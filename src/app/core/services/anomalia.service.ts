@@ -334,13 +334,13 @@ export class AnomaliaService {
         }
       }
       if (this.criterioCriticidad.hasOwnProperty('rangosDT')) {
-        this.criterioCriticidad.rangosDT.forEach((value, index) => {
-          if (anomalia.gradienteNormalizado >= value) {
-            if (criticidad === null) {
+        if (criticidad === null) {
+          this.criterioCriticidad.rangosDT.forEach((value, index) => {
+            if (anomalia.gradienteNormalizado >= value) {
               criticidad = index;
             }
-          }
-        });
+          });
+        }
       }
     } else {
       // si no hay criterio devolvemos undefined
