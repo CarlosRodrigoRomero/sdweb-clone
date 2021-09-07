@@ -345,7 +345,7 @@ export class StructuresService {
   addNormModule(module: NormalizedModule) {
     let id = module.id;
 
-    if (id !== undefined) {
+    if (id === undefined) {
       // obtenemos un ID aleatorio
       id = this.afs.createId();
     }
@@ -407,6 +407,11 @@ export class StructuresService {
       const areaFilter = new ModuloBrutoFilter('areaM', filter.areaM.min, filter.areaM.max);
       this.filterService.addFilter(areaFilter);
     }
+  }
+
+  generateRandomId(): string {
+    // obtenemos un ID aleatorio
+    return this.afs.createId();
   }
 
   getAspectRatio(coords: Coordinate[][]) {

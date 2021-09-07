@@ -1,9 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Subscription } from 'rxjs';
-
-import { AngularFirestore } from '@angular/fire/firestore';
 
 import { Map } from 'ol';
 import Feature from 'ol/Feature';
@@ -32,8 +30,7 @@ export class NormModCreatePopupComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private structuresService: StructuresService,
-    private olMapService: OlMapService,
-    public afs: AngularFirestore
+    private olMapService: OlMapService
   ) {}
 
   ngOnInit(): void {
@@ -57,7 +54,7 @@ export class NormModCreatePopupComponent implements OnInit, OnDestroy {
   onSubmit(event: Event) {
     event.preventDefault();
     if (this.form.valid) {
-      const id = this.afs.createId();
+      const id = this.structuresService.generateRandomId();
 
       const normModule: NormalizedModule = {
         id,

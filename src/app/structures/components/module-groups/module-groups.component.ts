@@ -4,8 +4,6 @@ import { Subscription } from 'rxjs';
 
 import { MatDialog } from '@angular/material/dialog';
 
-import { AngularFirestore } from '@angular/fire/firestore';
-
 import Map from 'ol/Map';
 import VectorSource from 'ol/source/Vector';
 import { Stroke, Style } from 'ol/style';
@@ -42,8 +40,7 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
   constructor(
     private olMapService: OlMapService,
     private structuresService: StructuresService,
-    public dialog: MatDialog,
-    public afs: AngularFirestore
+    public dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -139,7 +136,7 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
       sourceGroup.clear();
 
       // obtenemos un ID aleatorio
-      const id = this.afs.createId();
+      const id = this.structuresService.generateRandomId();
 
       const coords = this.getCoordsRectangle(evt);
 
