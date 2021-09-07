@@ -153,6 +153,10 @@
               <span class="titulo">Columna</span>
               <span class="subtitulo">{{ infoAdicional.localizacion.columna }}</span>
             </div>
+            <div class="elemento" *ngIf="infoAdicional.localizacion.numeroModulo">
+              <span class="titulo">Nº módulo</span>
+              <span class="subtitulo">{{ infoAdicional.localizacion.numeroModulo }}</span>
+            </div>
           </div>
         </mat-tab>
         <mat-tab label="Módulo" *ngIf="seccionModulo">

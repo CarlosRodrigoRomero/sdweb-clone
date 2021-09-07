@@ -98,8 +98,8 @@ export class ReportControlService {
                 this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
-                // this.setMaeInformesPlantaFija(anoms);
-                // this.setCCInformesPlantaFija(anoms);
+                this.setMaeInformesPlantaFija(anoms);
+                this.setCCInformesPlantaFija(anoms);
 
                 this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
 

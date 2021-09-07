@@ -24,6 +24,7 @@ import { ModuloInterface } from '@core/models/modulo';
 import { PcInterface } from '@core/models/pc';
 import { UserAreaInterface } from '@core/models/userArea';
 import { CritCriticidad } from '@core/models/critCriticidad';
+import { Anomalia } from '@core/models/anomalia';
 
 declare const google: any;
 
@@ -281,20 +282,29 @@ export class PlantaService {
     );
   }
 
-  getNumeroModulo(pc: PcInterface): string {
-    const altura = this.getAltura(this.planta, pc.local_y);
-    if (
-      this.planta.hasOwnProperty('etiquetasLocalXY') &&
-      this.planta.etiquetasLocalXY[altura] !== undefined &&
-      this.planta.etiquetasLocalXY[altura][pc.local_x - 1] !== undefined
-    ) {
-      return this.planta.etiquetasLocalXY[altura][pc.local_x - 1];
+  getNumeroModulo(elem: PcInterface | Anomalia, type?: string, planta?: PlantaInterface): string {
+    if (planta === undefined) {
+      planta = this.planta;
     }
 
-    return this.getEtiquetaLocalX(this.planta, pc)
-      .toString()
-      .concat('/')
-      .concat(this.getEtiquetaLocalY(this.planta, pc).toString());
+    let localX = (elem as PcInterface).local_x;
+    let localY = (elem as PcInterface).local_y;
+    if (type === 'anomalia') {
+      localX = (elem as Anomalia).localX;
+      localY = (elem as Anomalia).localY;
+    }
+
+    const altura = this.getAltura(planta, localY);
+
+    if (
+      planta.hasOwnProperty('etiquetasLocalXY') &&
+      planta.etiquetasLocalXY[altura] !== undefined &&
+      planta.etiquetasLocalXY[altura][localX - 1] !== undefined
+    ) {
+      return planta.etiquetasLocalXY[altura][localX - 1];
+    }
+
+    return this.getEtiquetaLocalX(planta, elem, type).concat('/').concat(this.getEtiquetaLocalY(planta, elem, type));
   }
 
   getAltura(planta: PlantaInterface, localY: number) {
@@ -306,28 +316,39 @@ export class PlantaService {
     }
   }
 
-  getEtiquetaLocalX(planta: PlantaInterface, pc: PcInterface) {
-    if (pc.local_x <= 0) {
+  getEtiquetaLocalX(planta: PlantaInterface, elem: PcInterface | Anomalia, type?: string): string {
+    let localX = (elem as PcInterface).local_x;
+    if (type === 'anomalia') {
+      localX = (elem as Anomalia).localX;
+    }
+
+    if (localX <= 0) {
       return GLOBAL.stringParaDesconocido;
     }
     if (planta.hasOwnProperty('etiquetasLocalX')) {
-      const localX = pc.local_x > planta.etiquetasLocalX.length ? planta.etiquetasLocalX.length : pc.local_x;
-      return planta.etiquetasLocalX[localX - 1];
+      const newLocalX = localX > planta.etiquetasLocalX.length ? planta.etiquetasLocalX.length : localX;
+      return planta.etiquetasLocalX[newLocalX - 1];
     }
-    return pc.local_x;
+    return localX.toString();
   }
-  getEtiquetaLocalY(planta: PlantaInterface, pc: PcInterface) {
-    if (pc.local_y <= 0) {
+
+  getEtiquetaLocalY(planta: PlantaInterface, elem: PcInterface | Anomalia, type?: string): string {
+    let localY = (elem as PcInterface).local_y;
+    if (type === 'anomalia') {
+      localY = (elem as Anomalia).localY;
+    }
+
+    if (localY <= 0) {
       return GLOBAL.stringParaDesconocido;
     }
     if (planta.hasOwnProperty('etiquetasLocalY')) {
-      const localY = pc.local_y > planta.etiquetasLocalY.length ? planta.etiquetasLocalY.length : pc.local_y;
+      const newLocalY = localY > planta.etiquetasLocalY.length ? planta.etiquetasLocalY.length : localY;
       if (planta.alturaBajaPrimero) {
-        return planta.etiquetasLocalY[localY - 1];
+        return planta.etiquetasLocalY[newLocalY - 1];
       }
-      return planta.etiquetasLocalY[planta.etiquetasLocalY.length - localY];
+      return planta.etiquetasLocalY[planta.etiquetasLocalY.length - newLocalY];
     }
-    return this.getAltura(planta, pc.local_y);
+    return this.getAltura(planta, localY).toString();
   }
 
   getNombreSeguidor(pc: PcInterface) {

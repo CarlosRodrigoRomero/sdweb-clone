@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AngularFireStorage } from '@angular/fire/storage';
 
 import { switchMap, take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { SwiperComponent } from 'swiper/angular';
 
@@ -33,7 +34,7 @@ import { InformeService } from '@core/services/informe.service';
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
 import { InformeInterface } from '@core/models/informe';
-import { Subscription } from 'rxjs';
+import { PlantaInterface } from '@core/models/planta';
 
 interface InfoAdicional {
   id?: string;
@@ -58,6 +59,7 @@ interface InfoAdicional {
     zonas?: Zona[];
     fila?: number;
     columna?: number;
+    numeroModulo?: string;
   };
   termico?: {
     gradiente?: number;
@@ -101,6 +103,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
   public seccionLocalizacion = false;
   public seccionVuelo = false;
   private informeSelected: InformeInterface = undefined;
+  private planta: PlantaInterface;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -139,7 +142,11 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
     this.plantaService
       .getPlanta(this.plantaId)
       .pipe(take(1))
-      .subscribe((planta) => (this.nombreGlobalCoords = planta.nombreGlobalCoords));
+      .subscribe((planta) => {
+        this.planta = planta;
+
+        this.nombreGlobalCoords = planta.nombreGlobalCoords;
+      });
 
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {
@@ -189,8 +196,9 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
     /* LOCALIZACION */
 
     const zonas: Zona[] = [];
-    let fila;
-    let columna;
+    let fila: number;
+    let columna: number;
+    let numeroModulo: string;
 
     const coords = this.anomaliaSelect.globalCoords;
 
@@ -201,17 +209,22 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
       });
     }
 
-    const localY = this.anomaliaSelect.localY;
-    if (localY !== undefined && localY !== null) {
-      fila = localY;
+    const numModulo = this.plantaService.getNumeroModulo(this.anomaliaSelect, 'anomalia', this.planta);
+    if (numModulo !== undefined && numModulo !== null) {
+      numeroModulo = numModulo;
+    } else {
+      const localY = this.anomaliaSelect.localY;
+      if (localY !== undefined && localY !== null) {
+        fila = localY;
+      }
+
+      const localX = this.anomaliaSelect.localX;
+      if (localX !== undefined && localX !== null) {
+        columna = localX;
+      }
     }
 
-    const localX = this.anomaliaSelect.localX;
-    if (localX !== undefined && localX !== null) {
-      columna = localX;
-    }
-
-    if (zonas !== undefined || fila !== undefined || columna !== undefined) {
+    if (zonas !== undefined || fila !== undefined || columna !== undefined || numeroModulo !== undefined) {
       this.seccionLocalizacion = true;
     }
 
@@ -347,6 +360,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
         zonas,
         fila,
         columna,
+        numeroModulo,
       },
 
       // TERMICO
