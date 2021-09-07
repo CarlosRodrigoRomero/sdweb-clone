@@ -36,6 +36,7 @@ export interface EstructuraInterface {
   longitud: number;
   globalCoords?: any[];
   modulo?: ModuloInterface;
+  estructuraCoords?: any[];
 }
 
 export class Estructura implements EstructuraInterface, ElementoPlantaInterface {
@@ -54,7 +55,9 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   globalCoords: any[];
   modulo?: ModuloInterface;
 
-  private estructuraMatrix: any[];
+  estructuraMatrix: any[];
+
+  estructuraCoords: any[];
 
   constructor(est: EstructuraInterface) {
     this.id = est.id;
@@ -85,7 +88,13 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
       enumerable: false,
       writable: true,
     });
-    this.estructuraMatrix = this.getEstructuraMatrix();
+    if (est.estructuraCoords !== undefined) {
+      this.estructuraCoords = est.estructuraCoords;
+      this.estructuraMatrix = null;
+    } else {
+      this.estructuraCoords = null;
+      this.estructuraMatrix = this.getEstructuraMatrix();
+    }
   }
 
   getLatLng(): LatLngLiteral {
