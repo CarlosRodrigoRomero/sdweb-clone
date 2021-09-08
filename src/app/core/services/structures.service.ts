@@ -30,12 +30,13 @@ export class StructuresService {
   private _informeId: string;
   private _planta: PlantaInterface = {};
   planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
-  private _initialized = false;
-  private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _thermalLayer: ThermalLayerInterface;
 
   private _endFilterSubscription = false;
   endFilterSubscription$ = new BehaviorSubject<boolean>(this._endFilterSubscription);
+
+  private _modulesLoaded = false;
+  modulesLoaded$ = new BehaviorSubject<boolean>(this._modulesLoaded);
 
   private _loadRawModules = false;
   loadRawModules$ = new BehaviorSubject<boolean>(this._loadRawModules);
@@ -80,39 +81,40 @@ export class StructuresService {
     private filterService: FilterService
   ) {}
 
-  initService(): Observable<boolean> {
+  initService(): Promise<boolean> {
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
-    this.informeService
-      .getInforme(this.informeId)
-      .pipe(
-        take(1),
-        switchMap((informe) => this.plantaService.getPlanta(informe.plantaId))
-      )
-      .pipe(
-        take(1),
-        switchMap((planta) => {
-          this.planta = planta;
+    return new Promise((initService) => {
+      this.informeService
+        .getInforme(this.informeId)
+        .pipe(
+          take(1),
+          switchMap((informe) => this.plantaService.getPlanta(informe.plantaId))
+        )
+        .pipe(
+          take(1),
+          switchMap((planta) => {
+            this.planta = planta;
 
-          return this.informeService.getThermalLayerDB$(this.informeId);
-        })
-      )
-      .subscribe((layers) => {
-        this.thermalLayer = layers[0];
+            return this.informeService.getThermalLayerDB$(this.informeId);
+          })
+        )
+        .subscribe((layers) => {
+          this.thermalLayer = layers[0];
 
-        // cargamos las agrupaciones
-        this.getModuleGroups()
-          .pipe(take(1))
-          .subscribe((modGroups) => (this.allModGroups = modGroups));
+          // cargamos las agrupaciones
+          this.getModuleGroups()
+            .pipe(take(1))
+            .subscribe((modGroups) => (this.allModGroups = modGroups));
 
-        // cargamos los modulos normalizados
-        this.getNormModules()
-          .pipe(take(1))
-          .subscribe((normMods) => (this.allNormModules = normMods));
+          // cargamos los modulos normalizados
+          this.getNormModules()
+            .pipe(take(1))
+            .subscribe((normMods) => (this.allNormModules = normMods));
 
-        this.initialized$.next(true);
-      });
-    return this.initialized$;
+          initService(true);
+        });
+    });
   }
 
   setInitialAveragesAndStandardDeviations() {
@@ -496,6 +498,17 @@ export class StructuresService {
     };
 
     return centroidD;
+  }
+
+  ////////////////////////////////////////////////
+
+  get modulesLoaded() {
+    return this._modulesLoaded;
+  }
+
+  set modulesLoaded(value: boolean) {
+    this._modulesLoaded = value;
+    this.modulesLoaded$.next(value);
   }
 
   get planta() {

@@ -23,6 +23,7 @@ export class StructuresComponent implements OnInit, OnDestroy {
   nombrePlanta: string;
   private map: Map;
   private informe: InformeInterface;
+  modulesLoaded = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -34,7 +35,8 @@ export class StructuresComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(this.structuresService.initService().subscribe((value) => (this.serviceInit = value)));
+    this.structuresService.initService().then((init) => (this.serviceInit = init));
+    this.subscriptions.add(this.structuresService.modulesLoaded$.subscribe((load) => (this.modulesLoaded = load)));
     this.subscriptions.add(
       this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteRawModMode = mode))
     );

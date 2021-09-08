@@ -243,7 +243,14 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
                     // asignamos el numero de modulos del informe
                     this.structuresService.reportNumModules = this.rawMods.length;
 
-                    this.rawMods.forEach((rawMod) => this.addRawModule(rawMod));
+                    this.rawMods.forEach((rawMod, index) => {
+                      this.addRawModule(rawMod);
+
+                      if (index === this.rawMods.length - 1) {
+                        console.log('ok');
+                        this.structuresService.modulesLoaded = true;
+                      }
+                    });
                   }
                 })
             );
