@@ -355,8 +355,14 @@ export class ReportControlService {
 
   private setMaeInformesPlantaSeguidores(seguidores: Seguidor[]) {
     this.informes.forEach((informe) => {
-      // tslint:disable-next-line: triple-equals
-      if (informe.mae == 0 || informe.mae === undefined || informe.mae === null || isNaN(informe.mae)) {
+      if (
+        // tslint:disable-next-line: triple-equals
+        informe.mae == 0 ||
+        informe.mae === undefined ||
+        informe.mae === null ||
+        isNaN(informe.mae) ||
+        informe.mae === Infinity
+      ) {
         const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
         let mae = 0;
         seguidoresInforme.forEach((seg) => (mae = mae + seg.mae));
@@ -369,8 +375,14 @@ export class ReportControlService {
 
   private setMaeInformesPlantaFija(anomalias: Anomalia[]) {
     this.informes.forEach((informe) => {
-      // tslint:disable-next-line: triple-equals
-      if (informe.mae == 0 || informe.mae === undefined || informe.mae === null || isNaN(informe.mae)) {
+      if (
+        // tslint:disable-next-line: triple-equals
+        informe.mae == 0 ||
+        informe.mae === undefined ||
+        informe.mae === null ||
+        isNaN(informe.mae) ||
+        informe.mae === Infinity
+      ) {
         const perdidas = anomalias.map((anom) => anom.perdidas);
         let perdidasTotales = 0;
         perdidas.forEach((perd) => (perdidasTotales += perd));
@@ -384,8 +396,14 @@ export class ReportControlService {
 
   private setCCInformesPlantaSeguidores(seguidores: Seguidor[]) {
     this.informes.forEach((informe) => {
-      // tslint:disable-next-line: triple-equals
-      if (informe.cc == 0 || informe.cc === undefined || informe.cc === null || isNaN(informe.cc)) {
+      if (
+        // tslint:disable-next-line: triple-equals
+        informe.cc == 0 ||
+        informe.cc === undefined ||
+        informe.cc === null ||
+        isNaN(informe.cc) ||
+        informe.cc === Infinity
+      ) {
         const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
         let cc = 0;
         seguidoresInforme.forEach((seg) => (cc = cc + seg.celsCalientes));
@@ -398,8 +416,14 @@ export class ReportControlService {
 
   private setCCInformesPlantaFija(anomalias: Anomalia[]) {
     this.informes.forEach((informe) => {
-      // tslint:disable-next-line: triple-equals
-      if (informe.cc == 0 || informe.cc === undefined || informe.cc === null || isNaN(informe.cc)) {
+      if (
+        // tslint:disable-next-line: triple-equals
+        informe.cc == 0 ||
+        informe.cc === undefined ||
+        informe.cc === null ||
+        isNaN(informe.cc) ||
+        informe.cc === Infinity
+      ) {
         // tslint:disable-next-line: triple-equals
         const celCals = anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
