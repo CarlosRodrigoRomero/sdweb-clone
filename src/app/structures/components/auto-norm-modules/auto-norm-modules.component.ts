@@ -36,6 +36,9 @@ export class AutoNormModulesComponent implements OnInit, OnDestroy {
           this.moduleGroups = groups;
           this.normModules = normMods;
 
+          // vaciamos el array para que no se acumule
+          this.groupsWithoutNormMod = [];
+
           this.moduleGroups.forEach((group) => {
             if (!this.normModules.map((normMod) => normMod.agrupacionId).includes(group.id)) {
               this.groupsWithoutNormMod.push(group);
