@@ -57,7 +57,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
 
   estructuraMatrix: any[];
 
-  estructuraCoords: any[];
+  estructuraCoords: any[][][];
 
   constructor(est: EstructuraInterface) {
     this.id = est.id;
@@ -89,7 +89,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
       writable: true,
     });
     if (est.estructuraCoords !== undefined) {
-      this.estructuraCoords = est.estructuraCoords;
+      this.estructuraCoords = this.estructureCoordsToArray(est.estructuraCoords);
       this.estructuraMatrix = null;
     } else {
       this.estructuraCoords = null;
@@ -100,20 +100,24 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   getLatLng(): LatLngLiteral {
     return { lat: this.latitud, lng: this.longitud };
   }
+
   setLatLng(latLng: LatLngLiteral): void {
     this.latitud = latLng.lat;
     this.longitud = latLng.lng;
   }
+
   setGlobals(globals: any[]) {
     globals.forEach((v, i, array) => {
       this.globalCoords[i] = v;
     });
   }
+
   setModulo(modulo: ModuloInterface) {
     if (modulo !== undefined) {
       this.modulo = modulo;
     }
   }
+
   calcularFilaColumna(x: number, y: number) {
     let distanciaMinima = 999999;
     let columnaDistMin;
@@ -146,27 +150,21 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     return [filaDistMin, columnaDistMin];
   }
 
-  // getPointDistanciaMin(x: number, y: number) {
-  //   let distanciaMinima = 99999;
-  //   let puntoDistanciaMin;
+  private estructureCoordsToArray(coords: any[]) {
+    const array: any[][][] = Object.values(coords);
 
-  //   this.estructuraMatrix.forEach((filaEst) => {
-  //     filaEst.forEach((punto) => {
-  //       const distancia = Math.abs(punto.x - x) + Math.abs(punto.y - y);
-  //       if (distancia < distanciaMinima) {
-  //         distanciaMinima = distancia;
-  //         puntoDistanciaMin = punto;
-  //       }
-  //     });
-  //   });
+    array.forEach((fila, index) => {
+      array[index] = Object.values(fila);
+    });
+    array.forEach((fila, indexF) => {
+      fila.forEach((columna, indexC) => {
+        array[indexF][indexC] = Object.values(columna);
+      });
+    });
 
-  //   let fila;
-  //   let columna;
+    return array;
+  }
 
-  //   [fila, columna] = this.calcularFilaColumna(puntoDistanciaMin.x + 10, puntoDistanciaMin.y + 10);
-
-  //   return puntoDistanciaMin;
-  // }
   private kClosest(points: Point[], k) {
     // sorts the array in place
     points.sort((point1, point2) => {
@@ -226,45 +224,6 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     return [columnaRef, filaRef];
   }
 
-  // getCuadrilateroRef(columna: number, fila: number): CuadrilateroInterface {
-  //   const cuadrilateroPrincipal = this.getCuadrilatero(columna, fila);
-
-  //   let topLeftRef: Point;
-  //   let topRightRef: Point;
-  //   let bottomLeftRef: Point;
-  //   let bottomRightRef: Point;
-
-  //   if (this.columnas === 1) {
-  //     if (fila === this.filas) {
-  //       topLeftRef = this.estructuraMatrix[fila - 2][columna - 1];
-  //       topRightRef = this.estructuraMatrix[fila - 2][columna];
-
-  //       bottomRightRef = cuadrilateroPrincipal.tr;
-  //       bottomLeftRef = cuadrilateroPrincipal.bl;
-  //     } else {
-  //       topLeftRef = cuadrilateroPrincipal.bl;
-  //       topRightRef = cuadrilateroPrincipal.br;
-
-  //       bottomRightRef = this.estructuraMatrix[fila + 1][columna];
-  //       bottomLeftRef = this.estructuraMatrix[fila + 1][columna - 1];
-  //     }
-  //   } else {
-  //     if (columna === this.columnas) {
-  //       topLeftRef = this.estructuraMatrix[fila - 1][columna - 2];
-  //       bottomLeftRef = this.estructuraMatrix[fila][columna - 2];
-  //       topRightRef = cuadrilateroPrincipal.tl;
-  //       bottomRightRef = cuadrilateroPrincipal.bl;
-  //     } else {
-  //       topLeftRef = cuadrilateroPrincipal.tr;
-  //       bottomLeftRef = cuadrilateroPrincipal.br;
-  //       topRightRef = this.estructuraMatrix[fila - 1][columna + 1];
-  //       bottomRightRef = this.estructuraMatrix[fila][columna + 1];
-  //     }
-  //   }
-
-  //   return { tl: topLeftRef, tr: topRightRef, br: bottomRightRef, bl: bottomLeftRef } as CuadrilateroInterface;
-  // }
-
   getRectanguloExterior(columna: number, fila: number): RectanguloInterface {
     const cuadrilatero = this.getCuadrilatero(columna, fila);
 
@@ -283,13 +242,6 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     const left = Math.round(Math.max(cuadrilatero.bl.x, cuadrilatero.tl.x));
     const bottom = Math.round(Math.min(cuadrilatero.br.y, cuadrilatero.bl.y));
     const right = Math.round(Math.min(cuadrilatero.tr.x, cuadrilatero.br.x));
-
-    // top = Math.round(0.5 * (topLeftModulo.y + topRightModulo.y));
-    // bottom = Math.round(0.5 * (bottomLeftModulo.y + bottomRightModulo.y));
-    // left = Math.round(0.5 * (topLeftModulo.x + bottomLeftModulo.x));
-    // right = Math.round(0.5 * (topRightModulo.x + bottomRightModulo.x));
-    // height = Math.round(Math.abs(bottom - top) + 2) + 1;
-    // width = Math.round(Math.abs(right - left)) + 1;
 
     return { top, bottom, left, right } as RectanguloInterface;
   }

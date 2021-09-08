@@ -464,11 +464,57 @@ export class CanvasComponent implements OnInit {
     // this.canvas.add(polygon);
     // this.canvas.sendToBack(polygon);
 
-    const points = Object.values(estructura.estructuraCoords);
+    estructura.estructuraCoords.forEach((fila) => {
+      fila.forEach((modulo, index) => {
+        console.log(modulo);
+        // const polygon = new fabric.Polygon(modulo, {
+        //   left: modulo[0][0],
+        //   top: modulo[0][1],
+        //   radius: 2,
+        //   fill: '#72FD03',
+        //   selectable: false,
+        //   estructura,
+        //   hoverCursor: 'default',
+        //   originX: 'center',
+        //   originY: 'center',
+        //   name: 1,
+        // });
+        // this.canvas.add(polygon);
+        if (index === 0) {
+          modulo.forEach((point) => {
+            const circle = new fabric.Circle({
+              left: point[0],
+              top: point[1],
+              radius: 2,
+              fill: '#72FD03',
+              selectable: false,
+              estructura,
+              hoverCursor: 'default',
+              originX: 'center',
+              originY: 'center',
+              name: 1,
+            });
+            this.canvas.add(circle);
+          });
+        }
+      });
+    });
 
-    console.log(estructura.estructuraCoords[0][0][0]);
+    // console.log(pointList);
 
-    console.log(points);
+    // const circle = new fabric.Circle({
+    //   left: point[0],
+    //   top: point[1],
+    //   radius: 2,
+    //   fill: '#72FD03',
+    //   selectable: false,
+    //   estructura,
+    //   hoverCursor: 'default',
+    //   originX: 'center',
+    //   originY: 'center',
+    //   name: 1,
+    // });
+    // this.canvas.add(circle);
 
     // estructura.coords.forEach((point, index) => {
     //   const circle = new fabric.Circle({
@@ -488,7 +534,7 @@ export class CanvasComponent implements OnInit {
     //   });
     //   this.canvas.add(circle);
     // });
-    // this.canvas.renderAll();
+    this.canvas.renderAll();
   }
 
   private drawPcInCanvas(pc: PcInterface) {
