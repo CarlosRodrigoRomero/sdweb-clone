@@ -210,9 +210,15 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     const numModulo = this.plantaService.getNumeroModulo(this.anomaliaSelect, 'anomalia', this.planta);
-    if (numModulo !== undefined && numModulo !== null) {
-      numeroModulo = numModulo;
-    } else {
+    if (numModulo !== undefined) {
+      if (!isNaN(Number(numModulo))) {
+        numeroModulo = numModulo;
+      } else {
+        numeroModulo = undefined;
+      }
+    }
+
+    if (numeroModulo === undefined) {
       const localY = this.anomaliaSelect.localY;
       if (localY !== undefined && localY !== null) {
         fila = localY;

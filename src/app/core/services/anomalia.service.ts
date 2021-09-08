@@ -15,6 +15,7 @@ import { Anomalia } from '@core/models/anomalia';
 import { CritCoA } from '@core/models/critCoA';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { PcInterface } from '@core/models/pc';
+import { PlantaInterface } from '@core/models/planta';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +27,7 @@ export class AnomaliaService {
   public criterioCriticidad: CritCriticidad;
   private _hasCriticidad = false;
   public hasCriticidad$ = new BehaviorSubject<boolean>(this._hasCriticidad);
+  private planta: PlantaInterface;
 
   constructor(
     public afs: AngularFirestore,
@@ -44,6 +46,7 @@ export class AnomaliaService {
         .pipe(
           take(1),
           switchMap((planta) => {
+            this.planta = planta;
             // primero comprovamos si la planta tiene criterio
             if (planta.hasOwnProperty('criterioId')) {
               this.hasCriticidad = true;
@@ -235,8 +238,18 @@ export class AnomaliaService {
         parts.push(coord);
       }
     });
-    parts.push(anomalia.localX.toString());
-    parts.push(anomalia.localY.toString());
+
+    let numeroModulo = this.plantaService.getNumeroModulo(anomalia, 'anomalia', this.planta);
+    if (isNaN(Number(numeroModulo))) {
+      numeroModulo = undefined;
+    }
+
+    if (numeroModulo !== undefined) {
+      parts.push(numeroModulo);
+    } else {
+      parts.push(anomalia.localX.toString());
+      parts.push(anomalia.localY.toString());
+    }
 
     let localId = '';
 
