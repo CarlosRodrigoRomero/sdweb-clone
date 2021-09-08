@@ -52,7 +52,7 @@ export class PortfolioControlService {
         .subscribe(([plantas, informes]) => {
           if (plantas !== undefined) {
             // AÑADIMOS PLANTAS FALSAS SOLO EN EL USUARIO DEMO
-            if (this.user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
+            if (this.user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2' || this.user.uid === 'AM2qmC06OWPb3V1gXJXyEpGS3Uz2') {
               plantas = this.addPlantasFake(plantas);
             }
 
@@ -125,90 +125,6 @@ export class PortfolioControlService {
         });
     });
   }
-
-  // private getMaeAverageAndSigmaPortfolio() {
-  //   this.auth.user$
-  //     .pipe(
-  //       take(1),
-  //       switchMap((user) => {
-  //         this.user = user;
-
-  //         return combineLatest([this.plantaService.getPlantasDeEmpresa(user), this.informeService.getInformes()]);
-  //       })
-  //     )
-  //     .pipe(take(1))
-  //     .subscribe(([plantas, informes]) => {
-  //       if (plantas !== undefined) {
-  //         // AÑADIMOS PLANTAS FALSAS SOLO EN EL USUARIO DEMO
-  //         if (this.user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
-  //           plantas = this.addPlantasFake(plantas);
-  //         }
-
-  //         plantas.forEach((planta) => {
-  //           const informesPlanta = informes.filter((inf) => inf.plantaId === planta.id);
-
-  //           if (informesPlanta.length > 0) {
-  //             informesPlanta.forEach((informe) => {
-  //               // comprobamos que el informe tiene "mae" y que esta "disponible"
-  //               if (informe.mae !== undefined && informe.mae !== Infinity && informe.disponible === true) {
-  //                 // añadimos el informe a la lista
-  //                 this.listaInformes.push(informe);
-
-  //                 if (!this.listaPlantas.map((pl) => pl.id).includes(planta.id)) {
-  //                   // añadimos la planta a la lista
-  //                   this.listaPlantas.push(planta);
-  //                   // incrementamos conteo de plantas y suma de potencia
-  //                   this.numPlantas++;
-  //                   this.potenciaTotal += planta.potencia;
-  //                 }
-  //               }
-  //             });
-  //           }
-
-  //           // obtenemos la plantas que tiene informes dentro de su interface
-  //           if (planta.informes !== undefined && planta.informes.length > 0) {
-  //             planta.informes.forEach((informe) => {
-  //               // comprobamos que no estubiese ya añadido
-  //               if (!this.listaInformes.map((inf) => inf.id).includes(informe.id)) {
-  //                 // comprobamos que el informe tiene "mae" y que esta "disponible"
-  //                 if (informe.mae !== undefined && informe.mae !== Infinity && informe.disponible === true) {
-  //                   // añadimos el informe a la lista
-  //                   this.listaInformes.push(informe);
-
-  //                   if (!this.listaPlantas.map((pl) => pl.id).includes(planta.id)) {
-  //                     // añadimos la planta si no estaba ya añadida
-  //                     this.listaPlantas.push(planta);
-  //                     // incrementamos conteo de plantas y suma de potencia
-  //                     this.numPlantas++;
-  //                     this.potenciaTotal += planta.potencia;
-  //                   }
-  //                 }
-  //               }
-  //             });
-  //           }
-  //         });
-
-  //         this.listaPlantas.forEach((planta) => {
-  //           const informesPlanta = this.listaInformes.filter((inf) => inf.plantaId === planta.id);
-  //           const informeReciente = informesPlanta.reduce((prev, current) =>
-  //             prev.fecha > current.fecha ? prev : current
-  //           );
-
-  //           // añadimos el mae del informe mas reciente de cada planta
-  //           // los antiguos de fijas los devidimos por 100
-  //           if (planta.tipo !== 'seguidores' && informeReciente.fecha < 1619820000) {
-  //             this.maePlantas.push(informeReciente.mae / 100);
-  //           } else {
-  //             // el resto añadimos normal
-  //             this.maePlantas.push(informeReciente.mae);
-  //           }
-  //         });
-
-  //         this.maeMedio = this.average(this.maePlantas);
-  //         this.maeSigma = this.standardDeviation(this.maePlantas);
-  //       }
-  //     });
-  // }
 
   private average(data) {
     const sum = data.reduce((s, value) => {
@@ -335,7 +251,7 @@ export class PortfolioControlService {
         potencia: 25,
         latitud: 38.36439,
         longitud: -1.27652,
-        informes: [{ plantaId: '01', mae: 5.2, fecha: 1624270070, disponible: true }],
+        informes: [{ plantaId: '01', mae: 0.052, fecha: 1624270070, disponible: true }],
       },
       {
         id: '02',
@@ -343,7 +259,7 @@ export class PortfolioControlService {
         potencia: 10,
         latitud: 42,
         longitud: -1.5,
-        informes: [{ plantaId: '02', mae: 3.1, fecha: 1623492000, disponible: true }],
+        informes: [{ plantaId: '02', mae: 0.031, fecha: 1625737808, disponible: true }],
       },
       {
         id: '03',
@@ -351,7 +267,7 @@ export class PortfolioControlService {
         potencia: 12,
         latitud: 41.5,
         longitud: -6,
-        informes: [{ plantaId: '03', mae: 1.03, fecha: 1624097270, disponible: true }],
+        informes: [{ plantaId: '03', mae: 0.0103, fecha: 1625824208, disponible: true }],
       },
       {
         id: '04',
@@ -359,7 +275,7 @@ export class PortfolioControlService {
         potencia: 2,
         latitud: 37.5,
         longitud: -4,
-        informes: [{ plantaId: '04', mae: 0.6, fecha: 1624010870, disponible: true }],
+        informes: [{ plantaId: '04', mae: 0.006, fecha: 1625910608, disponible: true }],
       },
       {
         id: '05',
@@ -367,7 +283,7 @@ export class PortfolioControlService {
         potencia: 6,
         latitud: 40,
         longitud: -4,
-        informes: [{ plantaId: '05', mae: 5.9, fecha: 1623924470, disponible: true }],
+        informes: [{ plantaId: '05', mae: 0.059, fecha: 1626083408, disponible: true }],
       },
       {
         id: '06',
@@ -375,7 +291,7 @@ export class PortfolioControlService {
         potencia: 50,
         latitud: 42.5,
         longitud: -6,
-        informes: [{ plantaId: '06', mae: 4.1, fecha: 1623838070, disponible: true }],
+        informes: [{ plantaId: '06', mae: 0.041, fecha: 1626083408, disponible: true }],
       },
       {
         id: '07',
@@ -383,7 +299,7 @@ export class PortfolioControlService {
         potencia: 21,
         latitud: 40,
         longitud: -5,
-        informes: [{ plantaId: '07', mae: 1.5, fecha: 1623751670, disponible: true }],
+        informes: [{ plantaId: '07', mae: 0.015, fecha: 1626083408, disponible: true }],
       },
       {
         id: '08',
@@ -391,7 +307,7 @@ export class PortfolioControlService {
         potencia: 5,
         latitud: 42,
         longitud: -3,
-        informes: [{ plantaId: '08', mae: 2.3, fecha: 1623665270, disponible: true }],
+        informes: [{ plantaId: '08', mae: 0.023, fecha: 1626083408, disponible: true }],
       },
       {
         id: '09',
@@ -399,7 +315,7 @@ export class PortfolioControlService {
         potencia: 8,
         latitud: 41,
         longitud: -2,
-        informes: [{ plantaId: '09', mae: 3.2, fecha: 1623578870, disponible: true }],
+        informes: [{ plantaId: '09', mae: 0.032, fecha: 1626083408, disponible: true }],
       },
       {
         id: '10',
@@ -407,7 +323,7 @@ export class PortfolioControlService {
         potencia: 23,
         latitud: 39,
         longitud: -1.5,
-        informes: [{ plantaId: '10', mae: 0.9, fecha: 1623492470, disponible: true }],
+        informes: [{ plantaId: '10', mae: 0.009, fecha: 1624226400, disponible: true }],
       },
     ];
 
