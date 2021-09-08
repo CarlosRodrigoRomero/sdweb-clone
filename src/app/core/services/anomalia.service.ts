@@ -134,6 +134,9 @@ export class AnomaliaService {
     const query$ = this.informeService.getInformesDePlanta(plantaId).pipe(
       take(1),
       switchMap((informes) => {
+        // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
+        informes = this.informeService.getOnlyNewInfomesFijas(informes);
+
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
         informes.forEach((informe) => {
           // traemos ambos tipos de anomalias por si hay pcs antiguos
