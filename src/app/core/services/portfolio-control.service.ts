@@ -251,6 +251,7 @@ export class PortfolioControlService {
         potencia: 25,
         latitud: 38.36439,
         longitud: -1.27652,
+        tipo: 'fija',
         informes: [{ id: '01', plantaId: '01', mae: 0.052, fecha: 1624270070, disponible: true }],
       },
       {
@@ -259,6 +260,7 @@ export class PortfolioControlService {
         potencia: 10,
         latitud: 42,
         longitud: -1.5,
+        tipo: 'seguidores',
         informes: [{ id: '02', plantaId: '02', mae: 0.031, fecha: 1625737808, disponible: true }],
       },
       {
@@ -267,6 +269,7 @@ export class PortfolioControlService {
         potencia: 12,
         latitud: 41.5,
         longitud: -6,
+        tipo: 'fija',
         informes: [{ id: '03', plantaId: '03', mae: 0.0103, fecha: 1625824208, disponible: true }],
       },
       {
@@ -275,6 +278,7 @@ export class PortfolioControlService {
         potencia: 2,
         latitud: 37.5,
         longitud: -4,
+        tipo: 'seguidores',
         informes: [{ id: '04', plantaId: '04', mae: 0.006, fecha: 1625910608, disponible: true }],
       },
       {
@@ -283,6 +287,7 @@ export class PortfolioControlService {
         potencia: 6,
         latitud: 40,
         longitud: -4,
+        tipo: 'fija',
         informes: [{ id: '05', plantaId: '05', mae: 0.059, fecha: 1626083408, disponible: true }],
       },
       {
@@ -291,6 +296,7 @@ export class PortfolioControlService {
         potencia: 50,
         latitud: 42.5,
         longitud: -6,
+        tipo: 'fija',
         informes: [{ id: '06', plantaId: '06', mae: 0.041, fecha: 1626083408, disponible: true }],
       },
       {
@@ -299,6 +305,7 @@ export class PortfolioControlService {
         potencia: 21,
         latitud: 40,
         longitud: -5,
+        tipo: 'seguidores',
         informes: [{ id: '07', plantaId: '07', mae: 0.015, fecha: 1626083408, disponible: true }],
       },
       {
@@ -307,6 +314,7 @@ export class PortfolioControlService {
         potencia: 5,
         latitud: 42,
         longitud: -3,
+        tipo: 'seguidores',
         informes: [{ id: '08', plantaId: '08', mae: 0.023, fecha: 1626083408, disponible: true }],
       },
       {
@@ -315,6 +323,7 @@ export class PortfolioControlService {
         potencia: 8,
         latitud: 41,
         longitud: -2,
+        tipo: 'fija',
         informes: [{ id: '09', plantaId: '09', mae: 0.032, fecha: 1626083408, disponible: true }],
       },
       {
@@ -323,6 +332,7 @@ export class PortfolioControlService {
         potencia: 23,
         latitud: 39,
         longitud: -1.5,
+        tipo: 'seguidores',
         informes: [{ id: '10', plantaId: '10', mae: 0.009, fecha: 1624226400, disponible: true }],
       },
     ];
