@@ -939,6 +939,157 @@ export class DownloadPdfComponent implements OnInit {
     };
 
     const datosVuelo = (index: string) => {
+      const apt01 = [
+        [
+          {
+            text: this.translation.t('Vehículo aéreo no tripulado'),
+            style: 'tableHeaderBlue',
+            colSpan: 2,
+            alignment: 'center',
+          },
+          {},
+        ],
+        [
+          {
+            text: this.translation.t('Aeronave'),
+            style: 'tableLeft',
+          },
+          {
+            text: `${GLOBAL.uav}`,
+          },
+        ],
+        [
+          {
+            text: this.translation.t('Cámara térmica'),
+            style: 'tableLeft',
+          },
+          {
+            text: `${GLOBAL.camaraTermica}`,
+          },
+        ],
+        [
+          {
+            text: this.translation.t('Última calibración'),
+            style: 'tableLeft',
+          },
+          {
+            text: `${GLOBAL.ultimaCalibracion}`,
+          },
+        ],
+      ];
+
+      const apt02 = [
+        [
+          {
+            text: this.translation.t('Datos del vuelo'),
+            style: 'tableHeaderBlue',
+            colSpan: 2,
+            alignment: 'center',
+          },
+          {},
+        ],
+        [
+          {
+            text: this.translation.t('Fecha'),
+            style: 'tableLeft',
+          },
+          {
+            text: this.datePipe.transform(this.informe.fecha * 1000, 'dd/MM/yyyy'),
+          },
+        ],
+        [
+          {
+            text: this.translation.t('GSD térmico (medio)'),
+            style: 'tableLeft',
+          },
+          {
+            text: `${this.informe.gsd} cm/pixel (+- 0.5cm/pixel)`,
+          },
+        ],
+
+        [
+          {
+            text: this.translation.t('GSD visual'),
+            style: 'tableLeft',
+          },
+          {
+            text: `${Math.round(this.informe.gsd * 0.16 * 100) / 100} cm/pixel`,
+          },
+        ],
+      ];
+
+      const apt03 = [
+        [
+          {
+            text: this.translation.t('Datos meteorológicos'),
+            style: 'tableHeaderBlue',
+            colSpan: 2,
+            alignment: 'center',
+          },
+          {},
+        ],
+
+        [
+          {
+            text: this.translation.t('Temperatura del aire'),
+            style: 'tableLeft',
+          },
+          {
+            text: `${this.informe.temperatura} ºC`,
+          },
+        ],
+
+        [
+          {
+            text: this.translation.t('Nubosidad'),
+            style: 'tableLeft',
+          },
+          {
+            text: `${this.informe.nubosidad}/8 ${this.translation.t('octavas')}`,
+          },
+        ],
+      ];
+
+      if (this.informe.hasOwnProperty('hora_inicio')) {
+        apt02.push([
+          {
+            text: this.translation.t('Horario de los vuelos'),
+            style: 'tableLeft',
+          },
+          {
+            text: `${this.informe.hora_inicio} - ${this.informe.hora_fin}`,
+          },
+        ]);
+      }
+
+      if (this.informe.hasOwnProperty('velocidad')) {
+        if (this.informe.velocidad !== undefined && this.informe.velocidad !== null && !isNaN(this.informe.velocidad)) {
+          apt02.push([
+            {
+              text: this.translation.t('Velocidad'),
+              style: 'tableLeft',
+            },
+            {
+              text: `${this.informe.velocidad} km/h`,
+            },
+          ]);
+        }
+      }
+
+      if (this.irradianciaMedia !== undefined && this.irradianciaMedia !== null && !isNaN(this.irradianciaMedia)) {
+        apt03.push([
+          {
+            text: this.translation.t('Irradiancia (media)'),
+            style: 'tableLeft',
+          },
+          {
+            text: `${this.irradianciaMedia} W/m2`,
+          },
+        ]);
+      }
+
+      const body = [...apt01, ...apt02, ...apt03];
+
       return [
         {
           text: `${index} - ${this.translation.t('Datos del vuelo')}`,
@@ -964,144 +1115,7 @@ export class DownloadPdfComponent implements OnInit {
             {
               width: 'auto',
               table: {
-                body: [
-                  [
-                    {
-                      text: this.translation.t('Vehículo aéreo no tripulado'),
-                      style: 'tableHeaderBlue',
-                      colSpan: 2,
-                      alignment: 'center',
-                    },
-                    {},
-                  ],
-                  [
-                    {
-                      text: this.translation.t('Aeronave'),
-                      style: 'tableLeft',
-                    },
-                    {
-                      text: `${GLOBAL.uav}`,
-                    },
-                  ],
-                  [
-                    {
-                      text: this.translation.t('Cámara térmica'),
-                      style: 'tableLeft',
-                    },
-                    {
-                      text: `${GLOBAL.camaraTermica}`,
-                    },
-                  ],
-                  [
-                    {
-                      text: this.translation.t('Última calibración'),
-                      style: 'tableLeft',
-                    },
-                    {
-                      text: `${GLOBAL.ultimaCalibracion}`,
-                    },
-                  ],
-
-                  [
-                    {
-                      text: this.translation.t('Datos del vuelo'),
-                      style: 'tableHeaderBlue',
-                      colSpan: 2,
-                      alignment: 'center',
-                    },
-                    {},
-                  ],
-
-                  [
-                    {
-                      text: this.translation.t('Fecha'),
-                      style: 'tableLeft',
-                    },
-                    {
-                      text: this.datePipe.transform(this.informe.fecha * 1000, 'dd/MM/yyyy'),
-                    },
-                  ],
-
-                  [
-                    {
-                      text: this.translation.t('Horario de los vuelos'),
-                      style: 'tableLeft',
-                    },
-                    {
-                      text: `${this.informe.hora_inicio} - ${this.informe.hora_fin}`,
-                    },
-                  ],
-
-                  [
-                    {
-                      text: this.translation.t('Velocidad'),
-                      style: 'tableLeft',
-                    },
-                    {
-                      text: `${this.informe.velocidad} km/h`,
-                    },
-                  ],
-
-                  [
-                    {
-                      text: this.translation.t('GSD térmico (medio)'),
-                      style: 'tableLeft',
-                    },
-                    {
-                      text: `${this.informe.gsd} cm/pixel (+- 0.5cm/pixel)`,
-                    },
-                  ],
-
-                  [
-                    {
-                      text: this.translation.t('GSD visual'),
-                      style: 'tableLeft',
-                    },
-                    {
-                      text: `${Math.round(this.informe.gsd * 0.16 * 100) / 100} cm/pixel`,
-                    },
-                  ],
-
-                  [
-                    {
-                      text: this.translation.t('Datos meteorológicos'),
-                      style: 'tableHeaderBlue',
-                      colSpan: 2,
-                      alignment: 'center',
-                    },
-                    {},
-                  ],
-
-                  [
-                    {
-                      text: this.translation.t('Irradiancia (media)'),
-                      style: 'tableLeft',
-                    },
-                    {
-                      text: `${this.irradianciaMedia} W/m2`,
-                    },
-                  ],
-
-                  [
-                    {
-                      text: this.translation.t('Temperatura del aire'),
-                      style: 'tableLeft',
-                    },
-                    {
-                      text: `${this.informe.temperatura} ºC`,
-                    },
-                  ],
-
-                  [
-                    {
-                      text: this.translation.t('Nubosidad'),
-                      style: 'tableLeft',
-                    },
-                    {
-                      text: `${this.informe.nubosidad}/8 ${this.translation.t('octavas')}`,
-                    },
-                  ],
-                ],
+                body,
               },
             },
 
