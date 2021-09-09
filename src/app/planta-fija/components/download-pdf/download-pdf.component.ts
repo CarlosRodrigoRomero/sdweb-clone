@@ -101,6 +101,7 @@ export class DownloadPdfComponent implements OnInit {
   private numClases: number[];
   private anomTipos = GLOBAL.labels_tipos; // antes pcDescripcion
   private currentFiltroGradiente: number;
+  private labelsCriticidad: string[];
 
   constructor(
     private reportControlService: ReportControlService,
@@ -141,6 +142,9 @@ export class DownloadPdfComponent implements OnInit {
 
         // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
         this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
+
+        // asignamos los labels del criterio especifico del cliente
+        this.labelsCriticidad = this.anomaliaService.criterioCriticidad.labels;
 
         this.allAnomalias = this.reportControlService.allFilterableElements as Anomalia[];
 
@@ -2100,6 +2104,8 @@ export class DownloadPdfComponent implements OnInit {
       return this.downloadReportService.getPositionModulo(this.planta, anomalia).toString();
     } else if (columnaNombre === 'severidad') {
       return anomalia.clase.toString();
+    } else if (columnaNombre === 'criticidad') {
+      return this.labelsCriticidad[anomalia.criticidad];
     } else if (columnaNombre === 'local_id') {
       return this.getLocalId(anomalia);
     } else {
