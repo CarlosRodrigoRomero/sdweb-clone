@@ -260,13 +260,13 @@ export class DownloadPdfComponent implements OnInit {
             apt: 1,
             elegible: true,
           },
-          {
-            nombre: 'irradiancia',
-            descripcion: 'Irradiancia durante el vuelo',
-            orden: 5,
-            apt: 1,
-            elegible: true,
-          },
+          // {
+          //   nombre: 'irradiancia',
+          //   descripcion: 'Irradiancia durante el vuelo',
+          //   orden: 5,
+          //   apt: 1,
+          //   elegible: true,
+          // },
           {
             nombre: 'paramsTermicos',
             descripcion: 'Ajuste de parámetros térmicos',
