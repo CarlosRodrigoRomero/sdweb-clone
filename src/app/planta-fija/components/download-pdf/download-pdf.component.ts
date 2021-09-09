@@ -1734,9 +1734,10 @@ export class DownloadPdfComponent implements OnInit {
         '\n',
 
         {
-          text: `MAE = ∆PR / PR = ${this.decimalPipe.transform(this.informe.mae, '1.0-2')}% (${this.calificacionMae(
-            this.informe.mae
-          )})`,
+          text: `MAE = ∆PR / PR = ${this.decimalPipe.transform(
+            this.informe.mae * 100,
+            '1.0-2'
+          )}% (${this.calificacionMae(this.informe.mae * 100)})`,
           style: 'param',
         },
 
@@ -1749,13 +1750,13 @@ export class DownloadPdfComponent implements OnInit {
               'dd/MM/yyyy'
             )}) ${this.translation.t('es')} `,
             {
-              text: `${this.decimalPipe.transform(this.informe.mae, '1.0-2')}%`,
+              text: `${this.decimalPipe.transform(this.informe.mae * 100, '1.0-2')}%`,
               style: 'bold',
             },
             ' ',
             '(',
             {
-              text: `${this.calificacionMae(this.informe.mae)}`,
+              text: `${this.calificacionMae(this.informe.mae * 100)}`,
               style: 'bold',
             },
             ')',
