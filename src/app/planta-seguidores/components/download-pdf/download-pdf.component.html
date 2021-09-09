@@ -1,4 +1,4 @@
-<button mat-raised-button (click)="downloadPDF()">
+<button mat-menu-item (click)="downloadPDF()" [disabled]="true" matTooltip="Pronto disponible">
   <mat-icon>picture_as_pdf</mat-icon>
   <span class="label">PDF</span>
 </button>

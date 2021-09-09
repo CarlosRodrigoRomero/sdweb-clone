@@ -245,7 +245,7 @@ export let GLOBAL = {
       descripcion: 'Gradiente normalizado',
     },
     // { nombre: "archivoPublico", descripcion: "Nombre archivo" },
-    { nombre: 'irradiancia', descripcion: 'Irradiancia' },
+    // { nombre: 'irradiancia', descripcion: 'Irradiancia' },
     // { nombre: "viento", descripcion: "Viento" },
     // { nombre: "temperaturaAire", descripcion: "Temp. ambiente (ºC)" },
     // { nombre: "datetimeString", descripcion: "Fecha/hora" }
