@@ -398,11 +398,14 @@ export class DownloadPdfComponent implements OnInit {
 
       this.calcularInforme();
 
-      pdfMake
-        .createPdf(this.getDocDefinition())
-        .download(/* this.informe.prefijo.concat('informe') */ 'Informe', (cb) => {
-          this.generandoPDF = false;
-        });
+      let prefijo = 'informe';
+      if (this.informe.hasOwnProperty('prefijo')) {
+        prefijo = this.informe.prefijo.concat('informe');
+      }
+
+      pdfMake.createPdf(this.getDocDefinition()).download(prefijo, (cb) => {
+        this.generandoPDF = false;
+      });
     });
   }
 
@@ -668,11 +671,11 @@ export class DownloadPdfComponent implements OnInit {
 
       '\n',
 
-      // {
-      //   image: this.imgPortadaBase64,
-      //   width: this.widthPortada,
-      //   alignment: 'center',
-      // },
+      {
+        image: this.imgPortadaBase64,
+        width: this.widthPortada,
+        alignment: 'center',
+      },
 
       '\n',
 
@@ -1197,11 +1200,11 @@ export class DownloadPdfComponent implements OnInit {
         '\n',
 
         // Imagen suciedad
-        // {
-        //   image: this.imgSuciedadBase64,
-        //   width: this.widthSuciedad,
-        //   alignment: 'center',
-        // },
+        {
+          image: this.imgSuciedadBase64,
+          width: this.widthSuciedad,
+          alignment: 'center',
+        },
 
         '\n\n',
 
