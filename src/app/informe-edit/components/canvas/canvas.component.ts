@@ -464,39 +464,52 @@ export class CanvasComponent implements OnInit {
     // this.canvas.add(polygon);
     // this.canvas.sendToBack(polygon);
 
+    console.log(estructura.estructuraCoords);
+
     estructura.estructuraCoords.forEach((fila) => {
       fila.forEach((modulo, index) => {
-        console.log(modulo);
-        // const polygon = new fabric.Polygon(modulo, {
-        //   left: modulo[0][0],
-        //   top: modulo[0][1],
-        //   radius: 2,
-        //   fill: '#72FD03',
-        //   selectable: false,
-        //   estructura,
-        //   hoverCursor: 'default',
-        //   originX: 'center',
-        //   originY: 'center',
-        //   name: 1,
+        const puntos = [
+          { x: modulo[0][0], y: modulo[0][1] },
+          { x: modulo[2][0], y: modulo[2][1] },
+          { x: modulo[3][0], y: modulo[3][1] },
+          { x: modulo[1][0], y: modulo[1][1] },
+        ];
+        // modulo.forEach((point) => {
+        //   puntos.push({ x: point[1], y: point[0] });
         // });
-        // this.canvas.add(polygon);
-        if (index === 0) {
-          modulo.forEach((point) => {
-            const circle = new fabric.Circle({
-              left: point[0],
-              top: point[1],
-              radius: 2,
-              fill: '#72FD03',
-              selectable: false,
-              estructura,
-              hoverCursor: 'default',
-              originX: 'center',
-              originY: 'center',
-              name: 1,
-            });
-            this.canvas.add(circle);
-          });
-        }
+        console.log(puntos);
+
+        const polygon = new fabric.Polygon(puntos, {
+          left: modulo[0][0],
+          top: modulo[0][1],
+          radius: 2,
+          fill: 'rgba(0,0,0,0)',
+          stroke: '#72FD03',
+          strokeWidth: 2,
+          selectable: false,
+          estructura,
+          hoverCursor: 'default',
+          originX: 'center',
+          originY: 'center',
+          name: 1,
+        });
+        this.canvas.add(polygon);
+
+        // modulo.forEach((point) => {
+        //   const circle = new fabric.Circle({
+        //     left: point[0],
+        //     top: point[1],
+        //     radius: 2,
+        //     fill: '#ff0000',
+        //     selectable: false,
+        //     estructura,
+        //     hoverCursor: 'default',
+        //     originX: 'center',
+        //     originY: 'center',
+        //     name: 1,
+        //   });
+        //   this.canvas.add(circle);
+        // });
       });
     });
 
