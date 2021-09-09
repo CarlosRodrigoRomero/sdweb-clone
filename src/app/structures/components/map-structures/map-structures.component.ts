@@ -247,7 +247,6 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
                       this.addRawModule(rawMod);
 
                       if (index === this.rawMods.length - 1) {
-                        console.log('ok');
                         this.structuresService.modulesLoaded = true;
                       }
                     });

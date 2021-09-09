@@ -35,6 +35,7 @@ import { Anomalia } from '@core/models/anomalia';
 import Point from 'ol/geom/Point';
 import LineString from 'ol/geom/LineString';
 import moment from 'moment';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-map-classification',
@@ -54,6 +55,8 @@ export class MapClassificationComponent implements OnInit {
   private prevFeatureHover: Feature;
   thermalLayerVisibility = true;
   private palette = GLOBAL.ironPalette;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private classificationService: ClassificationService,
@@ -85,7 +88,9 @@ export class MapClassificationComponent implements OnInit {
         // comprobamos si existe la thermalLayer
         if (layers.length > 0) {
           // nos suscribimos a las capas termicas del mapa
-          this.olMapService.getThermalLayers().subscribe((tLayers) => (this.thermalLayers = tLayers));
+          this.subscriptions.add(
+            this.olMapService.getThermalLayers().subscribe((tLayers) => (this.thermalLayers = tLayers))
+          );
 
           // esta es la thermalLayer de la DB
           this.thermalLayer = layers[0];
@@ -106,8 +111,6 @@ export class MapClassificationComponent implements OnInit {
         } else {
           this.initMap();
         }
-
-        // this.initMap();
       });
   }
 
@@ -194,33 +197,31 @@ export class MapClassificationComponent implements OnInit {
   }
 
   private addNormModules() {
-    this.structuresService.getNormModules(this.thermalLayer).subscribe((normModules) => {
-      const normModLayer = this.map
-        .getLayers()
-        .getArray()
-        .find((layer) => layer.getProperties().id === 'normModLayer') as VectorLayer;
+    const normModsSource = this.normModLayer.getSource();
 
-      const normModsSource = normModLayer.getSource();
+    this.structuresService
+      .getNormModules(this.thermalLayer)
+      .pipe(take(1))
+      .subscribe((normModules) => {
+        normModsSource.clear();
 
-      normModsSource.clear();
+        this.normModules = normModules;
 
-      this.normModules = normModules;
+        this.normModules.forEach((normMod) => {
+          const coords = this.structuresService.coordsDBToCoordinate(normMod.coords);
 
-      this.normModules.forEach((normMod) => {
-        const coords = this.structuresService.coordsDBToCoordinate(normMod.coords);
+          const feature = new Feature({
+            geometry: new Polygon([coords]),
+            properties: {
+              id: normMod.id,
+              name: 'normMod',
+              normMod,
+            },
+          });
 
-        const feature = new Feature({
-          geometry: new Polygon([coords]),
-          properties: {
-            id: normMod.id,
-            name: 'normMod',
-            normMod,
-          },
+          normModsSource.addFeature(feature);
         });
-
-        normModsSource.addFeature(feature);
       });
-    });
   }
 
   private addPopupOverlay() {
@@ -310,6 +311,10 @@ export class MapClassificationComponent implements OnInit {
 
       const feature = this.map.getFeaturesAtPixel(event.pixel)[0] as Feature;
       if (feature) {
+        // primero reseteamos los valores de la anomalia anterior
+        this.classificationService.normModSelected = undefined;
+        this.classificationService.anomaliaSelected = undefined;
+
         const normMod: NormalizedModule = feature.getProperties().properties.normMod;
         this.classificationService.normModSelected = normMod;
 
