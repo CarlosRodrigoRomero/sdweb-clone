@@ -139,6 +139,9 @@ export class DownloadPdfComponent implements OnInit {
           .fill(0)
           .map((_, i) => i + 1);
 
+        // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
+        this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
+
         this.allAnomalias = this.reportControlService.allFilterableElements as Anomalia[];
 
         this.calcularInforme();
