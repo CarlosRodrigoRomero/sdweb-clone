@@ -1392,7 +1392,7 @@ export class DownloadPdfComponent implements OnInit {
                   ],
                   [
                     {
-                      text: '% MAE < ' + GLOBAL.mae[0],
+                      text: '% MAE < ' + GLOBAL.mae[0] + '%',
                       style: ['mae1', 'bold'],
                     },
                     {
@@ -1402,7 +1402,7 @@ export class DownloadPdfComponent implements OnInit {
                   ],
                   [
                     {
-                      text: GLOBAL.mae[0].toString() + ' < % MAE <  ' + GLOBAL.mae[1].toString(),
+                      text: GLOBAL.mae[0].toString() + '%' + ' < % MAE <  ' + GLOBAL.mae[1].toString() + '%',
                       style: ['mae2', 'bold'],
                     },
                     {
@@ -1412,7 +1412,7 @@ export class DownloadPdfComponent implements OnInit {
                   ],
                   [
                     {
-                      text: '% MAE > 0.2',
+                      text: '% MAE > ' + GLOBAL.mae[1].toString() + '%',
                       style: ['mae3', 'bold'],
                     },
                     {

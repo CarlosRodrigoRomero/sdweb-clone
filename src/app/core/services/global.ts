@@ -32,7 +32,7 @@ export let GLOBAL = {
   nombreGlobalCoordsSeguidores: ['C1', 'C2', 'Seguidor'],
   nombreLocalXFija: 'Columna',
   nombreLocalYFija: 'Altura',
-  mae: [0.1, 0.2],
+  mae: [1, 2],
   anomaliaPorDefecto: 9,
   resolucionCamara: [512, 640],
   globalCoordsEstructura: [0, 1, 2],
