@@ -21,7 +21,7 @@ export class AreaModuloBrutoFilterComponent implements OnInit, OnDestroy {
   step = 1;
   minValue = 0;
   maxValue = 10;
-  multiplier = 2;
+  multiplier = 2.5;
   options: Options;
   loadFilter = false;
 
