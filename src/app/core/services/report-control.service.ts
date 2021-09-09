@@ -80,7 +80,7 @@ export class ReportControlService {
 
                   // evitamos cargar los informes dobles al navegar atras y volver
                   if (this.informesIdList.length === 0) {
-                    // ordenamos los informes de menos a mas reciente y los añadimos a la lista
+                    // añadimos los informes  a la lista
                     this.informes.forEach((informe) => this._informesIdList.push(informe.id));
                     this.informesIdList$.next(this._informesIdList);
                   }

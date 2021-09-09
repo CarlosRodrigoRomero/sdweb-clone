@@ -12,6 +12,7 @@ import { SharedModule } from '@shared/shared.module';
 import { FiltersModule } from '../filters/filters.module';
 import { PlantaStatsModule } from '../planta-stats/planta-stats.module';
 import { PlantaAmbasModule } from '../planta-ambas/planta-ambas.module';
+import { InformeExportModule } from '../informe-export/informe-export.module';
 
 import { AnomaliasListComponent } from './components/anomalias-list/anomalias-list.component';
 import { ShareMapComponent } from './components/share-map/share-map.component';
@@ -22,6 +23,7 @@ import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
 import { MapControlsComponent } from './components/map-controls/map-controls.component';
+import { DownloadPdfComponent } from './components/download-pdf/download-pdf.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +36,7 @@ import { MapControlsComponent } from './components/map-controls/map-controls.com
     SliderTemporalComponent,
     SliderOpacityComponent,
     MapControlsComponent,
+    DownloadPdfComponent,
   ],
   imports: [
     SharedModule,
@@ -45,6 +48,7 @@ import { MapControlsComponent } from './components/map-controls/map-controls.com
     SwiperModule,
     PlantaStatsModule,
     PlantaAmbasModule,
+    InformeExportModule,
   ],
   exports: [MapViewComponent],
 })
