@@ -464,8 +464,6 @@ export class CanvasComponent implements OnInit {
     // this.canvas.add(polygon);
     // this.canvas.sendToBack(polygon);
 
-    console.log(estructura.estructuraCoords);
-
     estructura.estructuraCoords.forEach((fila) => {
       fila.forEach((modulo, index) => {
         const puntos = [
@@ -477,7 +475,6 @@ export class CanvasComponent implements OnInit {
         // modulo.forEach((point) => {
         //   puntos.push({ x: point[1], y: point[0] });
         // });
-        console.log(puntos);
 
         const polygon = new fabric.Polygon(puntos, {
           left: modulo[0][0],

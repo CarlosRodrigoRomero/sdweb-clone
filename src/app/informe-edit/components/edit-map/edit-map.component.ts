@@ -6,7 +6,7 @@ import { InformeService } from '@core/services/informe.service';
 import { PlantaService } from '@core/services/planta.service';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
-import { ValidateElementoPlantaPipe } from '../../../shared/pipes/validate-elemento-planta.pipe';
+import { ValidateElementoPlantaPipe } from '@shared/pipes/validate-elemento-planta.pipe';
 import { take, switchMap } from 'rxjs/operators';
 import { LocationAreaInterface } from '@core/models/location';
 import { PlantaInterface } from '@core/models/planta';

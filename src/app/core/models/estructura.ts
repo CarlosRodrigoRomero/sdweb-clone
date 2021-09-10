@@ -151,18 +151,22 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   }
 
   private estructureCoordsToArray(coords: any[]) {
-    const array: any[][][] = Object.values(coords);
+    if (coords !== null) {
+      const array: any[][][] = Object.values(coords);
 
-    array.forEach((fila, index) => {
-      array[index] = Object.values(fila);
-    });
-    array.forEach((fila, indexF) => {
-      fila.forEach((columna, indexC) => {
-        array[indexF][indexC] = Object.values(columna);
+      array.forEach((fila, index) => {
+        array[index] = Object.values(fila);
       });
-    });
+      array.forEach((fila, indexF) => {
+        fila.forEach((columna, indexC) => {
+          array[indexF][indexC] = Object.values(columna);
+        });
+      });
 
-    return array;
+      return array;
+    } else {
+      return null;
+    }
   }
 
   private kClosest(points: Point[], k) {
