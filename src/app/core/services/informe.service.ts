@@ -231,6 +231,20 @@ export class InformeService {
     );
   }
 
+  getAllAutoEstructuras(informeId: string): Observable<Estructura[]> {
+    const query$ = this.afs.collection('informes').doc(informeId).collection('autoEstructura');
+
+    return query$.snapshotChanges().pipe(
+      map((actions) =>
+        actions.map((a) => {
+          const data = a.payload.doc.data() as EstructuraInterface;
+          data.id = a.payload.doc.id;
+          return new Estructura(data);
+        })
+      )
+    );
+  }
+
   updateInforme(informe: InformeInterface) {
     this.afs
       .collection('informes')
