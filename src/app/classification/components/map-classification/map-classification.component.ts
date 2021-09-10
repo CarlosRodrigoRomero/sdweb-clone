@@ -14,7 +14,7 @@ import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
 import { Coordinate } from 'ol/coordinate';
-import { DoubleClickZoom } from 'ol/interaction';
+import { DoubleClickZoom, Select, Translate } from 'ol/interaction';
 import { OSM } from 'ol/source';
 
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
@@ -36,6 +36,7 @@ import Point from 'ol/geom/Point';
 import LineString from 'ol/geom/LineString';
 import moment from 'moment';
 import { Subscription } from 'rxjs';
+import { click } from 'ol/events/condition';
 
 @Component({
   selector: 'app-map-classification',
@@ -107,6 +108,7 @@ export class MapClassificationComponent implements OnInit {
           this.addPointerOnHover();
           this.addOnHoverAction();
           this.addOnDoubleClickInteraction();
+          this.addSelectInteraction();
           this.addClickOutFeatures();
         } else {
           this.initMap();
@@ -327,6 +329,42 @@ export class MapClassificationComponent implements OnInit {
         this.classificationService.createAnomaliaFromNormModule(feature, date);
       }
     });
+  }
+
+  private addSelectInteraction() {
+    const select = new Select({
+      style: this.getStyleNormMod(false),
+      condition: click,
+      layers: (l) => {
+        if (l.getProperties().id === 'normModLayer') {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      filter: (f) => {
+        if (this.listaAnomalias !== undefined && this.listaAnomalias.length > 0) {
+          if (this.listaAnomalias.map((anom) => anom.id).includes(f.getProperties().properties.id)) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      },
+    });
+
+    const translate = new Translate({
+      features: select.getFeatures(),
+    });
+
+    translate.on('translateend', (e) => {
+      console.log('anomalia');
+    });
+
+    this.map.addInteraction(select);
+    this.map.addInteraction(translate);
   }
 
   private addClickOutFeatures() {

@@ -38,6 +38,8 @@ export class ClassificationService {
   normModSelected$ = new BehaviorSubject<NormalizedModule>(this._normModSelected);
   private _normModHovered: NormalizedModule = undefined;
   normModHovered$ = new BehaviorSubject<NormalizedModule>(this._normModHovered);
+  private _normModAnomaliaSelected: NormalizedModule = undefined;
+  normModAnomaliaSelected$ = new BehaviorSubject<NormalizedModule>(this._normModAnomaliaSelected);
   private _anomaliaSelected: Anomalia = undefined;
   anomaliaSelected$ = new BehaviorSubject<Anomalia>(this._anomaliaSelected);
   private _listaAnomalias: Anomalia[] = undefined;
@@ -252,6 +254,15 @@ export class ClassificationService {
   set normModHovered(value: NormalizedModule) {
     this._normModHovered = value;
     this.normModHovered$.next(value);
+  }
+
+  get normModAnomaliaSelected() {
+    return this._normModAnomaliaSelected;
+  }
+
+  set normModAnomaliaSelected(value: NormalizedModule) {
+    this._normModAnomaliaSelected = value;
+    this.normModAnomaliaSelected$.next(value);
   }
 
   get listaAnomalias() {
