@@ -230,7 +230,7 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
                 .subscribe((elems) => {
                   mBSource.clear();
 
-                  if (this.rawModDeletedIds.length > 0) {
+                  if (this.rawModDeletedIds !== undefined && this.rawModDeletedIds.length > 0) {
                     this.rawMods = (elems as RawModule[]).filter((mB) => !this.rawModDeletedIds.includes(mB.id));
                   } else {
                     this.rawMods = elems as RawModule[];
