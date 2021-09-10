@@ -6,10 +6,11 @@ import { InformeService } from '@core/services/informe.service';
 import { PlantaService } from '@core/services/planta.service';
 import { ActivatedRoute } from '@angular/router';
 import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
-import { ValidateElementoPlantaPipe } from '../../../shared/pipes/validate-elemento-planta.pipe';
+import { ValidateElementoPlantaPipe } from '@shared/pipes/validate-elemento-planta.pipe';
 import { take, switchMap } from 'rxjs/operators';
 import { LocationAreaInterface } from '@core/models/location';
 import { PlantaInterface } from '@core/models/planta';
+import { combineLatest } from 'rxjs';
 declare const google: any;
 
 @Component({
@@ -63,12 +64,14 @@ export class EditMapComponent implements OnInit {
     // this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
     // });
 
-    const obsEstructuras$ = this.informeService
-      .getAllEstructuras(this.informeId)
+    combineLatest([
+      this.informeService.getAllEstructuras(this.informeId),
+      this.informeService.getAllAutoEstructuras(this.informeId),
+    ])
       .pipe(take(1))
-      .subscribe((estArray) => {
+      .subscribe(([estArray, autoEstArray]) => {
         if (!this.allElementosPlanta) {
-          this.allElementosPlanta = estArray;
+          this.allElementosPlanta = [...estArray, ...autoEstArray];
         }
       });
 

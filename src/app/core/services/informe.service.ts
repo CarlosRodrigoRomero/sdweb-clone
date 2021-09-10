@@ -198,8 +198,41 @@ export class InformeService {
     return result;
   }
 
+  getAutoEstructuraInforme(informeId: string, currentFileName: string): Observable<Estructura[]> {
+    const query$ = this.afs
+      .collection('informes')
+      .doc(informeId)
+      .collection('autoEstructura', (ref) => ref.where('archivo', '==', currentFileName));
+
+    const result = query$.snapshotChanges().pipe(
+      map((actions) =>
+        actions.map((a) => {
+          const data = a.payload.doc.data() as EstructuraInterface;
+          data.id = a.payload.doc.id;
+          return new Estructura(data);
+        })
+      )
+    );
+
+    return result;
+  }
+
   getAllEstructuras(informeId: string): Observable<Estructura[]> {
     const query$ = this.afs.collection('informes').doc(informeId).collection('estructuras');
+
+    return query$.snapshotChanges().pipe(
+      map((actions) =>
+        actions.map((a) => {
+          const data = a.payload.doc.data() as EstructuraInterface;
+          data.id = a.payload.doc.id;
+          return new Estructura(data);
+        })
+      )
+    );
+  }
+
+  getAllAutoEstructuras(informeId: string): Observable<Estructura[]> {
+    const query$ = this.afs.collection('informes').doc(informeId).collection('autoEstructura');
 
     return query$.snapshotChanges().pipe(
       map((actions) =>
