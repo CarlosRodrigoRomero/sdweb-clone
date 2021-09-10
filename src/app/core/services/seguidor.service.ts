@@ -146,6 +146,7 @@ export class SeguidorService {
                 'seguidor_' + count++ + '_' + informeId
               );
               seguidor.nombre = this.getSeguidorName(seguidor);
+              seguidor.imageName = '1A.1.10.2.jpg';
               // seguidor.imageName = this.getImageName(seguidor, informe);
 
               seguidores.push(seguidor);

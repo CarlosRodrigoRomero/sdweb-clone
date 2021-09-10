@@ -90,6 +90,7 @@ export class DownloadPdfComponent implements OnInit {
   private imgCurvaMaeBase64: string;
   private widthLogoOriginal: number;
   private heightLogoHeader: number;
+  private imageListBase64 = {};
 
   private apartadosInforme: Apartado[];
   private countCategoria;
@@ -109,6 +110,7 @@ export class DownloadPdfComponent implements OnInit {
   private filtroApartados: string[];
   private currentFiltroGradiente: number;
   private widthSeguidor: number;
+  private heightSeguidor: number;
   private hasUserArea: boolean;
   seguidoresLoaded = false;
 
@@ -173,8 +175,6 @@ export class DownloadPdfComponent implements OnInit {
             this.anomaliasInforme.push(...anomaliasSeguidor);
           }
         });
-
-        // this.calcularInforme();
 
         this.irradianciaImg$ = this.storage.ref(`informes/${this.informe.id}/irradiancia.png`).getDownloadURL();
         this.suciedadImg$ = this.storage.ref(`informes/${this.informe.id}/suciedad.jpg`).getDownloadURL();
@@ -429,6 +429,7 @@ export class DownloadPdfComponent implements OnInit {
     this.heightLogoHeader = 40;
     this.jpgQuality = 0.95;
     this.widthSeguidor = 450;
+    this.heightSeguidor = (this.widthSeguidor * 4) / 5;
     this.hasUserArea = false;
 
     this.plantaService.getUserAreas$(this.reportControlService.plantaId).subscribe((userAreas) => {
@@ -478,36 +479,7 @@ export class DownloadPdfComponent implements OnInit {
   public downloadPDF() {
     this.generandoPDF = true;
 
-    const imageListBase64 = {};
     this.countLoadedImages = 0;
-    this.countSeguidores = 1;
-
-    this.loadedImages$.subscribe((nombreSeguidor) => {
-      if (nombreSeguidor !== null && nombreSeguidor !== undefined) {
-        // const canvas = $(`canvas[id="imgSeguidorCanvas${nombreSeguidor}"]`)[0] as HTMLCanvasElement;
-
-        const canvas = document.createElement('canvas');
-        canvas.id = `imgSeguidorCanvas${nombreSeguidor}`;
-
-        // const canvas = document.getElementById(`imgSeguidorCanvas${nombreSeguidor}`) as HTMLCanvasElement;
-
-        // if (canvas !== undefined) {
-        imageListBase64[`imgSeguidorCanvas${nombreSeguidor}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
-        // } else {
-        //   imageListBase64[`imgSeguidorCanvas${nombreSeguidor}`] = null;
-        // }
-
-        this.progresoPDF = this.decimalPipe.transform((100 * this.countLoadedImages) / this.countSeguidores, '1.0-0');
-
-        // Cuando se carguen todas las imágenes
-        if (this.countLoadedImages === this.countSeguidores) {
-          this.calcularInforme();
-
-          pdfMake.createPdf(this.getDocDefinition(imageListBase64)).download(this.informe.prefijo.concat('informe'));
-          this.generandoPDF = false;
-        }
-      }
-    });
 
     // Generar imagenes
     this.countSeguidores = 0;
@@ -515,6 +487,16 @@ export class DownloadPdfComponent implements OnInit {
       this.setImgSeguidorCanvas(seguidor, false, 'jpg');
       this.countSeguidores++;
     }
+
+    this.countLoadedImages$.subscribe((countLoadedImgs) => {
+      // Cuando se carguen todas las imágenes
+      if (countLoadedImgs === this.countSeguidores) {
+        this.calcularInforme();
+
+        pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.informe.prefijo.concat('informe'));
+        this.generandoPDF = false;
+      }
+    });
   }
 
   private calcularInforme() {
@@ -768,74 +750,72 @@ export class DownloadPdfComponent implements OnInit {
   }
 
   private setImgSeguidorCanvas(seguidor: Seguidor, vistaPrevia: boolean = false, folder?: string) {
-    const anomaliasSeguidor = seguidor.anomaliasCliente;
+    const anomaliasSeguidor = seguidor.anomaliasCliente as PcInterface[];
 
-    const separacionImagenes = 2; //en pixeles
-
-    const scale = 1;
-
-    const canvas = new fabric.Canvas(`imgSeguidorCanvas${seguidor.nombre}`);
-    canvas.height = canvas.height;
-    canvas.backgroundColor = 'white';
-
-    const imagesWidth = GLOBAL.resolucionCamara[1];
-    const left0 = 0;
-    // const left0 = GLOBAL.resolucionCamara[1] / 2 - imagesWidth / 2;
-    let imageLoaded = false;
-
-    const imageName = seguidor.imageName;
+    let imageName = seguidor.anomalias[0].archivoPublico;
+    if (seguidor.anomaliasCliente.length > 0) {
+      imageName = seguidor.anomaliasCliente[0].archivoPublico;
+    }
 
     // Creamos una referencia a la imagen
     const storageRef = this.storage.ref('');
     const imageRef = storageRef.child('informes/' + seguidor.informeId + '/' + folder + '/' + imageName);
 
-    // Obtenemos la URL y descargamos el archivo capturando los posibles errores
     imageRef
       .getDownloadURL()
       .toPromise()
       .then((url) => {
-        fabric.Image.fromURL(
+        fabric.util.loadImage(
           url,
           (img) => {
-            imageLoaded = true;
-            // const top0 = (index - 1) * (GLOBAL.resolucionCamara[0] / numImagesSeguidor + separacionImagenes);
-            const top0 = 0;
+            if (img !== null) {
+              const canvas = new fabric.Canvas('canvas');
+              canvas.width = this.widthSeguidor;
+              canvas.height = this.heightSeguidor;
+              const image = new fabric.Image(img);
 
-            img.set({
-              top: top0,
-              left: left0,
-              // width :  GLOBAL.resolucionCamara[0] * scale,
-              // height : GLOBAL.resolucionCamara[1] * scale,
-              scaleX: scale,
-              scaleY: scale,
-            });
+              const width = img.width * this.imgQuality > img.width ? img.width : img.width * this.imgQuality;
+              const scaleFactor = canvas.width / img.width;
 
-            canvas.add(img);
-            this.drawAllPcsInCanvas(anomaliasSeguidor as PcInterface[], canvas, vistaPrevia, scale, top0, left0);
+              image.set({
+                left: 0,
+                top: 0,
+                angle: 0,
+                opacity: 1,
+                draggable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                scaleX: canvas.width / GLOBAL.resolucionCamara[0],
+                scaleY: canvas.height / GLOBAL.resolucionCamara[1],
+              });
 
-            if (imageLoaded) {
-              this.countLoadedImages++;
-
-              this.loadedImages = seguidor.nombre;
+              canvas.add(image);
+              this.drawAllPcsInCanvas(anomaliasSeguidor, canvas, vistaPrevia, 1, 0, 0);
+              this.imageListBase64[`imgSeguidorCanvas${seguidor.nombre}`] = canvas.toDataURL(
+                'image/jpeg',
+                this.jpgQuality
+              );
             }
+
+            this.countLoadedImages++;
           },
-          { crossOrigin: 'Anonymous' }
+          null,
+          { crossOrigin: 'anonymous' }
         );
       })
       .catch((error) => {
-        imageLoaded = true;
+        const canvas = document.createElement('canvas');
+        this.imageListBase64[`imgSeguidorCanvas${seguidor.nombre}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
 
         this.countLoadedImages++;
 
-        this.loadedImages = seguidor.nombre;
-
         switch (error.code) {
           case 'storage/object-not-found':
-            console.log("File doesn't exist");
+            console.log(`File doesn't exist`);
             break;
 
           case 'storage/unauthorized':
-            console.log("User doesn't have permission to access the object");
+            console.log(`User doesn't have permission to access the object`);
             break;
 
           case 'storage/canceled':
@@ -847,12 +827,71 @@ export class DownloadPdfComponent implements OnInit {
             break;
         }
       });
+
+    // Obtenemos la URL y descargamos el archivo capturando los posibles errores
+    // imageRef
+    //   .getDownloadURL()
+    //   .toPromise()
+    //   .then((url) => {
+    //     fabric.Image.fromURL(
+    //       url,
+    //       (img) => {
+    //         imageLoaded = true;
+    //         const top0 = 0;
+
+    //         img.set({
+    //           top: top0,
+    //           left: left0,
+    //           // width :  GLOBAL.resolucionCamara[0] * scale,
+    //           // height : GLOBAL.resolucionCamara[1] * scale,
+    //           scaleX: scale,
+    //           scaleY: scale,
+    //         });
+
+    //         canvas.add(img);
+    //         this.drawAllPcsInCanvas(anomaliasSeguidor as PcInterface[], canvas, vistaPrevia, scale, top0, left0);
+
+    //         if (imageLoaded) {
+    //           this.countLoadedImages++;
+
+    //           this.loadedImages = seguidor.nombre;
+    //         }
+    //       },
+    //       { crossOrigin: 'Anonymous' }
+    //     );
+    //   })
+    //   .catch((error) => {
+    //     imageLoaded = true;
+
+    //     this.countLoadedImages++;
+
+    //     this.loadedImages = seguidor.nombre;
+
+    //     switch (error.code) {
+    //       case 'storage/object-not-found':
+    //         console.log("File doesn't exist");
+    //         break;
+
+    //       case 'storage/unauthorized':
+    //         console.log("User doesn't have permission to access the object");
+    //         break;
+
+    //       case 'storage/canceled':
+    //         console.log('User canceled the upload');
+    //         break;
+
+    //       case 'storage/unknown':
+    //         console.log('Unknown error occurred, inspect the server response');
+    //         break;
+    //     }
+    //   });
   }
 
   private drawAllPcsInCanvas(pcs: PcInterface[], canvas, vistaPrevia: boolean = false, scale = 1, top0 = 0, left0 = 0) {
     if (pcs.length > 0) {
       pcs.forEach((pc, i, a) => {
-        this.drawPc(pc, canvas, scale, top0, left0);
+        this.drawAnomalia(pc, canvas);
+        // this.drawPc(pc, canvas, scale, top0, left0);
         // this.drawTriangle(pc, canvas, scale, top0, left0);
       });
     } else {
@@ -906,7 +945,32 @@ export class DownloadPdfComponent implements OnInit {
 
     canvas.add(actObj1);
     canvas.add(actObj2);
-    canvas.add(textId);
+    // canvas.add(textId);
+    canvas.renderAll();
+  }
+
+  drawAnomalia(pc: PcInterface, canvas: any) {
+    const polygon = new fabric.Rect({
+      left: pc.img_left,
+      top: pc.img_top,
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'white',
+      // stroke: this.seguidorViewService.getAnomaliaColor(anomalia),
+      strokeWidth: 2,
+      width: pc.img_width,
+      height: pc.img_height,
+      hasControls: false,
+      lockMovementY: true,
+      lockMovementX: true,
+      anomId: pc.id,
+      ref: 'anom',
+      selectable: false,
+      hoverCursor: 'pointer',
+      rx: 4,
+      ry: 4,
+    });
+
+    canvas.add(polygon);
     canvas.renderAll();
   }
 
