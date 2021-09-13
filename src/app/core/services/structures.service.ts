@@ -464,22 +464,42 @@ export class StructuresService {
   }
 
   public coordinateToObject(coordinates: Coordinate[][]) {
+    let top = -9000000;
+    let right = -9000000;
+    coordinates[0].forEach((corner) => {
+      if (corner[1] > top) {
+        top = corner[1];
+      }
+      if (corner[0] > right) {
+        right = corner[0];
+      }
+    });
+    let bottom;
+    let left;
+    coordinates[0].forEach((corner) => {
+      if (corner[1] < top) {
+        bottom = corner[1];
+      }
+      if (corner[0] < right) {
+        left = corner[0];
+      }
+    });
     const coords = {
       topLeft: {
-        lat: coordinates[0][3][1],
-        long: coordinates[0][3][0],
+        lat: top,
+        long: left,
       },
       topRight: {
-        lat: coordinates[0][2][1],
-        long: coordinates[0][2][0],
+        lat: top,
+        long: right,
       },
       bottomRight: {
-        lat: coordinates[0][1][1],
-        long: coordinates[0][1][0],
+        lat: bottom,
+        long: right,
       },
       bottomLeft: {
-        lat: coordinates[0][0][1],
-        long: coordinates[0][0][0],
+        lat: bottom,
+        long: left,
       },
     };
 
