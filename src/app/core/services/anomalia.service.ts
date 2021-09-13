@@ -154,8 +154,6 @@ export class AnomaliaService {
   getAnomaliasInforme$(informeId: string): Observable<Anomalia[]> {
     const anomaliaObsList = Array<Observable<Anomalia[]>>();
 
-    // traemos ambos tipos de anomalias por si hay pcs antiguos
-    anomaliaObsList.push(this.getAnomalias$(informeId, 'pcs'));
     anomaliaObsList.push(this.getAnomalias$(informeId, 'anomalias'));
 
     return combineLatest(anomaliaObsList).pipe(map((arr) => arr.flat()));
