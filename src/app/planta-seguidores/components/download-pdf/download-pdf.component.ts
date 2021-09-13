@@ -801,7 +801,7 @@ export class DownloadPdfComponent implements OnInit {
         );
       })
       .catch((error) => {
-        const canvas = document.createElement('canvas');
+        const canvas = new fabric.Canvas('canvas');
         this.imageListBase64[`imgSeguidorCanvas${seguidor.nombre}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
 
         this.countLoadedImages++;

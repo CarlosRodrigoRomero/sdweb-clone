@@ -29,7 +29,6 @@ import { LeyendaComponent } from './components/leyenda/leyenda.component';
 import { SeguidorViewNavbarComponent } from './components/seguidor-view-navbar/seguidor-view-navbar.component';
 import { SeguidorViewLeyendaComponent } from './components/seguidor-view-leyenda/seguidor-view-leyenda.component';
 import { SeguidorImagesAreaComponent } from './components/seguidor-images-area/seguidor-images-area.component';
-import { DownloadPdfComponent } from './components/download-pdf/download-pdf.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +54,6 @@ import { DownloadPdfComponent } from './components/download-pdf/download-pdf.com
     SeguidorViewNavbarComponent,
     SeguidorViewLeyendaComponent,
     SeguidorImagesAreaComponent,
-    DownloadPdfComponent,
   ],
   imports: [
     CommonModule,

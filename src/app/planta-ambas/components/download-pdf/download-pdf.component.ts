@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 
-import { AngularFireStorage } from '@angular/fire/storage';
-
 import { MatTableDataSource } from '@angular/material/table';
 
+import { AngularFireStorage } from '@angular/fire/storage';
+
 import { BehaviorSubject, Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import pdfMake from 'pdfmake/build/pdfmake.js';
 
@@ -14,15 +14,18 @@ import 'fabric';
 declare let fabric;
 
 import { ReportControlService } from '@core/services/report-control.service';
-import { AnomaliaService } from '@core/services/anomalia.service';
-import { PlantaService } from '@core/services/planta.service';
-import { GLOBAL } from '@core/services/global';
 import { DownloadReportService } from '@core/services/download-report.service';
+import { GLOBAL } from '@core/services/global';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
-import { Anomalia } from '@core/models/anomalia';
-import { InformeInterface } from '@core/models/informe';
+import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
+import { Anomalia } from '@core/models/anomalia';
+
 import { Translation } from 'src/app/informe-export/components/export/translations';
+import { PcInterface } from '@core/models/pc';
+import { PlantaService } from '@core/services/planta.service';
 
 export interface Apartado {
   nombre: string;
@@ -48,69 +51,77 @@ export interface AnomsTable {
   providers: [DecimalPipe, DatePipe],
 })
 export class DownloadPdfComponent implements OnInit {
-  generandoPDF = false;
+  private generandoPDF = false;
   private _countLoadedImages = 0;
   countLoadedImages$ = new BehaviorSubject<number>(this._countLoadedImages);
-  private allAnomalias: Anomalia[];
+  private _loadedImages = undefined;
+  loadedImages$ = new BehaviorSubject<string>(this._loadedImages);
+  private countSeguidores: number;
+  private progresoPDF: string;
+  seguidoresInforme: Seguidor[] = [];
+  seguidoresInforme$ = new BehaviorSubject<Seguidor[]>(this.seguidoresInforme);
+  private anomaliasInforme: Anomalia[] = []; // equivalente allAnomalias en fijas
   private planta: PlantaInterface;
   private informe: InformeInterface;
+  private translation: Translation;
+  private language: string; // antes lan
   private _columnasAnomalia: any[] = []; // antes pcColumnas
   columnasAnomalia$ = new BehaviorSubject<any[]>(this._columnasAnomalia); // equvalente a currentFilteredColumnas$
   private filtroColumnas: string[];
-  private arrayFilas: Array<number>;
-  private arrayColumnas: Array<number>;
   // IMAGENES
   private irradianciaImg$: Observable<string | null>;
   private suciedadImg$: Observable<string | null>;
   private portadaImg$: Observable<string | null>;
   private logoImg$: Observable<string | null>;
-  private widthIrradiancia: number;
   private imgQuality: number;
   private jpgQuality: number;
-  private widthPortada: number;
   private widthLogo: number;
-  private widthLogoOriginal: number;
-  private widthSuciedad: number;
-  private widthCurvaMae: number;
-  private widthFormulaMae: number;
   private scaleImgLogoHeader: number;
-  private heightLogoHeader: number;
   private imgLogoBase64: string;
-  private imgIrradianciaBase64: string;
+  private widthPortada: number;
   private imgPortadaBase64: string;
+  private widthIrradiancia: number;
+  private widthSuciedad: number;
+  private imgIrradianciaBase64: string;
   private imgSuciedadBase64: string;
+  private widthFormulaMae: number;
   private imgFormulaMaeBase64: string;
+  private widthCurvaMae: number;
   private imgCurvaMaeBase64: string;
+  private widthLogoOriginal: number;
+  private heightLogoHeader: number;
+  private imageListBase64 = {};
 
   private apartadosInforme: Apartado[];
-  private filtroApartados: string[];
-  private progresoPDF: string;
-  private hasUserArea: boolean;
-  private translation: Translation;
-  private language: string; // antes lan
   private countCategoria;
   private countPosicion;
   private countCategoriaClase;
   private countClase;
   private informeCalculado: boolean;
-  private dataSource: MatTableDataSource<AnomsTable>;
+  private arrayFilas: Array<number>;
+  private arrayColumnas: Array<number>;
   private irradianciaMedia: number;
   private tempReflejada: number;
   private emisividad: number;
   private numTipos: number[];
   private numClases: number[];
   private anomTipos = GLOBAL.labels_tipos; // antes pcDescripcion
+  private dataSource: MatTableDataSource<AnomsTable>;
+  private filtroApartados: string[];
   private currentFiltroGradiente: number;
   private labelsCriticidad: string[];
+  private widthSeguidor: number;
+  private hasUserArea: boolean;
+  seguidoresLoaded = false;
 
   constructor(
-    private reportControlService: ReportControlService,
-    private anomaliaService: AnomaliaService,
-    private plantaService: PlantaService,
-    private storage: AngularFireStorage,
     private decimalPipe: DecimalPipe,
     private datePipe: DatePipe,
-    private downloadReportService: DownloadReportService
+    private reportControlService: ReportControlService,
+    private downloadReportService: DownloadReportService,
+    private storage: AngularFireStorage,
+    private plantaService: PlantaService,
+    private anomaliaService: AnomaliaService
   ) {}
 
   ngOnInit(): void {
@@ -123,32 +134,57 @@ export class DownloadPdfComponent implements OnInit {
 
     this.plantaService
       .getPlanta(this.reportControlService.plantaId)
-      .pipe(take(1))
-      .subscribe((planta) => {
-        this.planta = planta;
+      .pipe(
+        take(1),
+        switchMap((planta) => {
+          this.planta = planta;
 
-        this.plantaService.planta = planta;
+          this.plantaService.planta = planta;
 
-        this.columnasAnomalia = this.getColumnasAnom(this.planta);
+          this.columnasAnomalia = GLOBAL.columnasAnomPdf;
 
-        this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
+          this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
 
-        this.arrayFilas = Array(this.planta.filas)
-          .fill(0)
-          .map((_, i) => i + 1);
-        this.arrayColumnas = Array(this.planta.columnas)
-          .fill(0)
-          .map((_, i) => i + 1);
+          this.arrayFilas = Array(this.planta.filas)
+            .fill(0)
+            .map((_, i) => i + 1);
+          this.arrayColumnas = Array(this.planta.columnas)
+            .fill(0)
+            .map((_, i) => i + 1);
+
+          return this.reportControlService.selectedInformeId$;
+        })
+      )
+      .subscribe((informeId) => {
+        this.informe = this.reportControlService.informes.find((informe) => informeId === informe.id);
+
+        if (this.reportControlService.plantaFija) {
+          this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
+        } else {
+          const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
+          this.seguidoresInforme = allSeguidores.filter((seg) => seg.informeId === informeId);
+          // los ordenamos por globalCoords
+          this.seguidoresInforme = this.seguidoresInforme.sort(this.downloadReportService.sortByGlobalCoords);
+
+          this.seguidoresInforme$.next(this.seguidoresInforme);
+
+          if (this.seguidoresInforme.length > 0) {
+            this.seguidoresLoaded = true;
+          }
+
+          this.seguidoresInforme.forEach((seguidor) => {
+            const anomaliasSeguidor = seguidor.anomaliasCliente;
+            if (anomaliasSeguidor.length > 0) {
+              this.anomaliasInforme.push(...anomaliasSeguidor);
+            }
+          });
+        }
 
         // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
         this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
 
         // asignamos los labels del criterio especifico del cliente
         this.labelsCriticidad = this.anomaliaService.criterioCriticidad.labels;
-
-        this.allAnomalias = this.reportControlService.allFilterableElements as Anomalia[];
-
-        this.calcularInforme();
 
         this.irradianciaImg$ = this.storage.ref(`informes/${this.informe.id}/irradiancia.png`).getDownloadURL();
         this.suciedadImg$ = this.storage.ref(`informes/${this.informe.id}/suciedad.jpg`).getDownloadURL();
@@ -332,16 +368,40 @@ export class DownloadPdfComponent implements OnInit {
           },
         ];
 
+        if (this.planta.tipo === 'seguidores') {
+          this.apartadosInforme.push(
+            {
+              nombre: 'anexo2',
+              descripcion: 'Anexo II: Anomalías térmicas por seguidor',
+              orden: 16,
+              elegible: true,
+            },
+            {
+              nombre: 'resultadosPosicion',
+              descripcion: 'Resultados por posición',
+              orden: 12,
+              apt: 2,
+              elegible: true,
+            }
+          );
+          const fechaInforme = new Date(this.informe.fecha * 1000);
+
+          if (fechaInforme.getFullYear() >= 2020) {
+            this.apartadosInforme.push({
+              nombre: 'anexo3',
+              descripcion: 'Anexo III: Seguidores sin anomalías',
+              orden: 17,
+              elegible: true,
+            });
+          }
+        }
+
         this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
           return a.orden - b.orden;
         });
 
         this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
       });
-
-    this.informe = this.reportControlService.informes.find(
-      (informe) => this.reportControlService.selectedInformeId === informe.id
-    );
 
     this.progresoPDF = '0';
     this.widthLogo = 200;
@@ -353,6 +413,7 @@ export class DownloadPdfComponent implements OnInit {
     this.imgQuality = 3.5;
     this.heightLogoHeader = 40;
     this.jpgQuality = 0.95;
+    this.widthSeguidor = 450;
     this.hasUserArea = false;
 
     this.plantaService.getUserAreas$(this.reportControlService.plantaId).subscribe((userAreas) => {
@@ -398,22 +459,31 @@ export class DownloadPdfComponent implements OnInit {
 
   public downloadPDF() {
     this.generandoPDF = true;
-    this.countLoadedImages = null;
 
-    this.reportControlService.allFilterableElements$.pipe(take(1)).subscribe((elems) => {
-      this.allAnomalias = elems.sort(this.anomaliaService.sortByLocalId) as Anomalia[];
-
+    if (this.reportControlService.plantaFija) {
       this.calcularInforme();
+    } else {
+      this.countLoadedImages = 0;
 
-      let prefijo = 'informe';
-      if (this.informe.hasOwnProperty('prefijo')) {
-        prefijo = this.informe.prefijo.concat('informe');
+      // Generar imagenes
+      this.countSeguidores = 0;
+      for (const seguidor of this.seguidoresInforme) {
+        this.setImgSeguidorCanvas(seguidor, false, 'jpg');
+        this.countSeguidores++;
       }
 
-      pdfMake.createPdf(this.getDocDefinition()).download(prefijo, (cb) => {
-        this.generandoPDF = false;
+      this.countLoadedImages$.subscribe((countLoadedImgs) => {
+        // Cuando se carguen todas las imágenes
+        if (countLoadedImgs === this.countSeguidores) {
+          this.calcularInforme();
+
+          pdfMake
+            .createPdf(this.getDocDefinition(this.imageListBase64))
+            .download(this.informe.prefijo.concat('informe'));
+          this.generandoPDF = false;
+        }
       });
-    });
+    }
   }
 
   private calcularInforme() {
@@ -425,11 +495,11 @@ export class DownloadPdfComponent implements OnInit {
 
     this.informeCalculado = false;
 
-    if (this.allAnomalias.length > 0) {
-      this.irradianciaMedia = Math.round(
-        this.allAnomalias.sort(this.compareIrradiancia)[Math.round(this.allAnomalias.length / 2)].irradiancia
-      );
-    } else {
+    const irradiancias: number[] = this.anomaliasInforme.map((anom) => anom.irradiancia);
+
+    this.irradianciaMedia = irradiancias.sort((a, b) => a - b)[Math.round(irradiancias.length / 2)];
+
+    if (isNaN(this.irradianciaMedia)) {
       this.irradianciaMedia = 800;
     }
 
@@ -437,39 +507,37 @@ export class DownloadPdfComponent implements OnInit {
     this.tempReflejada = this.informe.tempReflejada;
 
     // Calcular las alturas
-
     for (const y of this.arrayFilas) {
-      const countColumnas = Array();
+      const countColumnas: number[] = [];
       for (const x of this.arrayColumnas) {
-        if (this.planta.tipo === 'seguidores') {
-          countColumnas.push(this.allAnomalias.filter((pc) => pc.localX === x && pc.localY === y).length);
-        } else {
-          countColumnas.push(this.allAnomalias.filter((pc) => pc.localY === y).length);
-        }
+        // tslint:disable-next-line: triple-equals
+        countColumnas.push(this.anomaliasInforme.filter((anom) => anom.localX == x && anom.localY == y).length);
       }
       this.countPosicion.push(countColumnas);
     }
 
     // CATEGORIAS //
-    let filtroCategoria;
-    let filtroCategoriaClase;
-    for (const cat of this.numTipos) {
-      filtroCategoria = this.allAnomalias.filter((anom) => anom.tipo === cat);
-      this.countCategoria.push(filtroCategoria.length);
+    for (const tipo of this.numTipos) {
+      // tslint:disable-next-line: triple-equals
+      const anomsTipo = this.anomaliasInforme.filter((anom) => anom.tipo == tipo);
+
+      this.countCategoria.push(anomsTipo.length);
 
       const count1 = Array();
       for (const clas of this.numClases) {
-        filtroCategoriaClase = this.allAnomalias.filter((anom) => anom.clase === clas && anom.tipo === cat);
-        count1.push(filtroCategoriaClase.length);
+        // tslint:disable-next-line: triple-equals
+        const anomsClase = this.anomaliasInforme.filter((anom) => anom.clase == clas);
+
+        count1.push(anomsClase.length);
       }
-      const totalPcsInFilter = count1[0] + count1[1] + count1[2];
-      if (totalPcsInFilter > 0) {
+      const totalAnomsInFilter = count1[0] + count1[1] + count1[2];
+      if (totalAnomsInFilter > 0) {
         this.countCategoriaClase.push({
-          categoria: this.anomTipos[cat],
+          categoria: this.anomTipos[tipo],
           coa1: count1[0],
           coa2: count1[1],
           coa3: count1[2],
-          total: totalPcsInFilter,
+          total: totalAnomsInFilter,
         });
       }
     }
@@ -477,7 +545,7 @@ export class DownloadPdfComponent implements OnInit {
     // CLASES //
     let filtroClase;
     for (const j of this.numClases) {
-      filtroClase = this.allAnomalias.filter((anom) => anom.clase === j);
+      filtroClase = this.anomaliasInforme.filter((anom) => anom.clase === j);
 
       this.countClase.push(filtroClase.length);
     }
@@ -486,32 +554,18 @@ export class DownloadPdfComponent implements OnInit {
     this.dataSource = new MatTableDataSource(this.countCategoriaClase);
   }
 
-  private getColumnasAnom(planta: PlantaInterface): any[] {
-    const columnasTemp = GLOBAL.columnasAnomPdf;
-
-    // const i = columnasTemp.findIndex((e) => e.nombre === 'local_xy');
-    // let descripcion = '';
-    // planta.nombreGlobalCoords.forEach((nombre, index, nombres) => {
-    //   descripcion = descripcion.concat(nombre);
-    //   // a ultimo no se lo añadimos
-    //   if (index < nombres.length - 1) {
-    //     descripcion = descripcion.concat('/');
-    //   }
-    // });
-
-    // columnasTemp[i].descripcion = descripcion;
-
-    return columnasTemp;
-  }
-
-  getDocDefinition() {
+  getDocDefinition(imagesSeguidores) {
     const pages = this.getPagesPDF();
     let anexo1 = [];
+    let anexo2 = [];
     let numAnexo = 'I';
 
     if (this.filtroApartados.includes('anexo1')) {
       anexo1 = this.getAnexoLista(numAnexo);
       numAnexo = 'II';
+    }
+    if (this.filtroApartados.includes('anexo2')) {
+      anexo2 = this.getAnexoSeguidores(numAnexo);
     }
 
     return {
@@ -534,7 +588,9 @@ export class DownloadPdfComponent implements OnInit {
         }
       },
 
-      content: pages.concat(anexo1),
+      content: pages.concat(anexo1).concat(anexo2),
+
+      images: imagesSeguidores,
 
       footer: (currentPage, pageCount) => {
         if (currentPage > 1) {
@@ -665,6 +721,118 @@ export class DownloadPdfComponent implements OnInit {
         },
       },
     };
+  }
+
+  private setImgSeguidorCanvas(seguidor: Seguidor, vistaPrevia: boolean = false, folder?: string) {
+    const anomaliasSeguidor = seguidor.anomaliasCliente as PcInterface[];
+
+    let imageName = seguidor.anomalias[0].archivoPublico;
+    if (seguidor.anomaliasCliente.length > 0) {
+      imageName = seguidor.anomaliasCliente[0].archivoPublico;
+    }
+
+    // Creamos una referencia a la imagen
+    const storageRef = this.storage.ref('');
+    const imageRef = storageRef.child('informes/' + seguidor.informeId + '/' + folder + '/' + imageName);
+
+    imageRef
+      .getDownloadURL()
+      .toPromise()
+      .then((url) => {
+        fabric.util.loadImage(
+          url,
+          (img) => {
+            if (img !== null) {
+              const canvas = new fabric.Canvas('canvas');
+              canvas.width = GLOBAL.resolucionCamara[1];
+              canvas.height = GLOBAL.resolucionCamara[0];
+              const image = new fabric.Image(img);
+
+              image.set({
+                left: 0,
+                top: 0,
+                angle: 0,
+                opacity: 1,
+                draggable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                scaleX: 1,
+                scaleY: 1,
+              });
+
+              canvas.add(image);
+              this.drawAllPcsInCanvas(anomaliasSeguidor, canvas, vistaPrevia, 1, 0, 0);
+              this.imageListBase64[`imgSeguidorCanvas${seguidor.nombre}`] = canvas.toDataURL(
+                'image/jpeg',
+                this.jpgQuality
+              );
+            }
+
+            this.countLoadedImages++;
+          },
+          null,
+          { crossOrigin: 'anonymous' }
+        );
+      })
+      .catch((error) => {
+        const canvas = new fabric.Canvas('canvas');
+        this.imageListBase64[`imgSeguidorCanvas${seguidor.nombre}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+
+        this.countLoadedImages++;
+
+        switch (error.code) {
+          case 'storage/object-not-found':
+            console.log(`File doesn't exist`);
+            break;
+
+          case 'storage/unauthorized':
+            console.log(`User doesn't have permission to access the object`);
+            break;
+
+          case 'storage/canceled':
+            console.log('User canceled the upload');
+            break;
+
+          case 'storage/unknown':
+            console.log('Unknown error occurred, inspect the server response');
+            break;
+        }
+      });
+  }
+
+  private drawAllPcsInCanvas(pcs: PcInterface[], canvas, vistaPrevia: boolean = false, scale = 1, top0 = 0, left0 = 0) {
+    if (pcs.length > 0) {
+      pcs.forEach((pc, i, a) => {
+        this.drawAnomalia(pc, canvas);
+      });
+    } else {
+      canvas.renderAll();
+    }
+  }
+
+  drawAnomalia(pc: PcInterface, canvas: any) {
+    const polygon = new fabric.Rect({
+      left: pc.img_left,
+      top: pc.img_top,
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'white',
+      // stroke: this.seguidorViewService.getAnomaliaColor(anomalia),
+      strokeWidth: 2,
+      width: pc.img_width,
+      height: pc.img_height,
+      hasControls: false,
+      lockMovementY: true,
+      lockMovementX: true,
+      anomId: pc.id,
+      ref: 'anom',
+      selectable: false,
+      hoverCursor: 'pointer',
+      rx: 4,
+      ry: 4,
+    });
+
+    canvas.add(polygon);
+    canvas.renderAll();
   }
 
   getPagesPDF() {
@@ -1153,11 +1321,11 @@ export class DownloadPdfComponent implements OnInit {
 
         '\n',
 
-        // {
-        //   image: this.imgIrradianciaBase64,
-        //   width: this.widthIrradiancia,
-        //   alignment: 'center',
-        // },
+        {
+          image: this.imgIrradianciaBase64,
+          width: this.widthIrradiancia,
+          alignment: 'center',
+        },
 
         '\n\n',
       ];
@@ -1413,7 +1581,7 @@ export class DownloadPdfComponent implements OnInit {
                   ],
                   [
                     {
-                      text: '% MAE < ' + GLOBAL.mae[0] + '%',
+                      text: '% MAE < ' + GLOBAL.mae[0],
                       style: ['mae1', 'bold'],
                     },
                     {
@@ -1423,7 +1591,7 @@ export class DownloadPdfComponent implements OnInit {
                   ],
                   [
                     {
-                      text: GLOBAL.mae[0].toString() + '%' + ' < % MAE <  ' + GLOBAL.mae[1].toString() + '%',
+                      text: GLOBAL.mae[0].toString() + ' < % MAE <  ' + GLOBAL.mae[1].toString(),
                       style: ['mae2', 'bold'],
                     },
                     {
@@ -1433,7 +1601,7 @@ export class DownloadPdfComponent implements OnInit {
                   ],
                   [
                     {
-                      text: '% MAE > ' + GLOBAL.mae[1].toString() + '%',
+                      text: '% MAE > 0.2',
                       style: ['mae3', 'bold'],
                     },
                     {
@@ -1647,7 +1815,7 @@ export class DownloadPdfComponent implements OnInit {
                         style: 'bold',
                       },
                       {
-                        text: this.allAnomalias.length.toString(),
+                        text: this.anomaliasInforme.length.toString(),
                         style: 'bold',
                       },
                       {
@@ -1670,11 +1838,50 @@ export class DownloadPdfComponent implements OnInit {
       ];
     };
 
-    const resultadosPosicion = (index: string) => {
-      const texto1 = this.translation.t(
-        'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
+    const resultadosSeguidor = (index: string) => {
+      const numAnomaliasMedia = new Intl.NumberFormat('en-IN', { maximumSignificantDigits: 2 }).format(
+        this.anomaliasInforme.length / this.seguidoresInforme.length
       );
+      let numeroSeguidores = 0;
+      let porcentajeSeguidores = 0;
+      if (this.planta.hasOwnProperty('numeroSeguidores')) {
+        numeroSeguidores = this.seguidoresInforme.length;
+        porcentajeSeguidores = (this.seguidoresInforme.length / numeroSeguidores) * 100;
+      }
+      return [
+        {
+          text: `${index} - ${this.translation.t('Resultados por seguidores')}`,
+          style: 'h3',
+        },
 
+        '\n',
+        `${this.translation.t('El número de seguidores afectados por anomalías térmicas es')} ${
+          this.seguidoresInforme.length
+        }${
+          numeroSeguidores === 0 ? '. ' : `/${numeroSeguidores} (${porcentajeSeguidores.toFixed(2)}%). `
+        } ${this.translation.t(
+          'El número medio de módulos con anomalías por seguidor es de'
+        )} ${numAnomaliasMedia} ${this.translation.t('módulos/seguidor')}.`,
+        '\n',
+        '\n',
+      ];
+    };
+
+    const resultadosPosicion = (index: string) => {
+      let texto1;
+      if (this.reportControlService.plantaFija) {
+        texto1 = this.translation.t(
+          'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
+        );
+      } else {
+        texto1 = `${this.translation.t(
+          'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran'
+        )} (${this.plantaService.getNombreLocalX(this.planta)} ${this.translation.t(
+          'y'
+        )} ${this.plantaService.getNombreLocalY(this.planta)}) ${this.translation.t(
+          'dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
+        )}`;
+      }
       return [
         {
           text: `${index} - ${this.translation.t('Resultados por posición de la anomalía dentro del seguidor')}`,
@@ -1865,6 +2072,11 @@ export class DownloadPdfComponent implements OnInit {
       result = result.concat(resultadosPosicion(apartado));
       subtitulo = subtitulo + 1;
     }
+    if (this.filtroApartados.includes('resultadosSeguidor')) {
+      apartado = titulo.toString().concat('.').concat(subtitulo.toString());
+      result = result.concat(resultadosSeguidor(apartado));
+      subtitulo = subtitulo + 1;
+    }
 
     if (this.filtroApartados.includes('resultadosMAE') && !this.hasUserArea) {
       apartado = titulo.toString().concat('.').concat(subtitulo.toString());
@@ -1901,28 +2113,17 @@ export class DownloadPdfComponent implements OnInit {
       style: 'tableHeaderBlue',
     });
 
-    this.allAnomalias = this.allAnomalias.sort((a, b) => this.downloadReportService.sortByPosition(a, b));
-
-    let nombreCol = '';
-    this.planta.nombreGlobalCoords.forEach((nombre, index, nombres) => {
-      nombreCol += nombre;
-      // a ultimo no se lo añadimos
-      if (index < nombres.length - 1) {
-        nombreCol += this.plantaService.getGlobalsConector();
-      }
-    });
-
-    nombreCol = this.translation.t(nombreCol);
+    this.anomaliasInforme = this.anomaliasInforme.sort(this.downloadReportService.sortByGlobalCoords);
 
     cabecera.push({
-      text: nombreCol,
+      text: this.translation.t('Seguidor'),
       style: 'tableHeaderBlue',
       noWrap: true,
     });
 
-    for (const col of this.columnasAnomalia) {
+    for (const c of this.columnasAnomalia) {
       cabecera.push({
-        text: this.translation.t(this.getEncabezadoTablaAnomalias(col)),
+        text: this.translation.t(this.getEncabezadoTablaSeguidor(c)),
         style: 'tableHeaderBlue',
       });
     }
@@ -1930,8 +2131,8 @@ export class DownloadPdfComponent implements OnInit {
     // Body
     const body = [];
     let contadorAnoms = 0;
-    const totalAnoms = this.allAnomalias.length;
-    for (const anom of this.allAnomalias) {
+    const totalAnoms = this.anomaliasInforme.length;
+    for (const anom of this.anomaliasInforme) {
       contadorAnoms += 1;
 
       const row = [];
@@ -1941,7 +2142,7 @@ export class DownloadPdfComponent implements OnInit {
         style: 'tableCellAnexo1',
       });
       row.push({
-        text: this.getGlobalCoordsLabel(anom),
+        text: this.plantaService.getEtiquetaGlobals(anom),
         noWrap: true,
         style: 'tableCellAnexo1',
       });
@@ -1984,6 +2185,199 @@ export class DownloadPdfComponent implements OnInit {
     return allPagsAnexoLista.concat(tablaAnexo);
   }
 
+  getAnexoSeguidores(numAnexo: string) {
+    const allPagsAnexo = [];
+    // tslint:disable-next-line:max-line-length
+    const pag1Anexo = {
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
+        'Anomalías térmicas por seguidor'
+      )}`,
+      style: 'h1',
+      alignment: 'center',
+      pageBreak: 'before',
+    };
+
+    allPagsAnexo.push(pag1Anexo);
+
+    for (const seg of this.seguidoresInforme) {
+      const table = this.getPaginaSeguidor(seg);
+
+      if (seg.anomaliasCliente.length > 0) {
+        const pagAnexo = [
+          {
+            text: `${this.translation.t('Seguidor')} ${seg.nombre}`,
+            style: 'h2',
+            alignment: 'center',
+            pageBreak: 'before',
+          },
+
+          '\n',
+
+          {
+            image: `imgSeguidorCanvas${seg.nombre}`,
+            width: this.widthSeguidor,
+            alignment: 'center',
+          },
+
+          '\n',
+
+          {
+            columns: [
+              {
+                width: '*',
+                text: '',
+              },
+
+              {
+                width: 'auto',
+                table: {
+                  body: [
+                    [
+                      {
+                        text: this.translation.t('Fecha/Hora'),
+                        style: 'tableHeaderImageData',
+                      },
+
+                      {
+                        text: this.translation.t('Irradiancia'),
+                        style: 'tableHeaderImageData',
+                      },
+
+                      {
+                        text: this.translation.t('Temp. aire'),
+                        style: 'tableHeaderImageData',
+                      },
+
+                      {
+                        text: this.translation.t('Viento'),
+                        style: 'tableHeaderImageData',
+                      },
+
+                      {
+                        text: this.translation.t('Emisividad'),
+                        style: 'tableHeaderImageData',
+                      },
+
+                      {
+                        text: this.translation.t('Temp. reflejada'),
+                        style: 'tableHeaderImageData',
+                      },
+                      {
+                        text: this.translation.t('Módulo'),
+                        style: 'tableHeaderImageData',
+                      },
+                    ],
+                    [
+                      {
+                        text: this.datePipe
+                          .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
+                          .concat(' ')
+                          .concat(this.datePipe.transform(seg.anomaliasCliente[0].datetime * 1000, 'HH:mm:ss')),
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+
+                      {
+                        text: Math.round(seg.anomaliasCliente[0].irradiancia).toString().concat(' W/m2'),
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+                      {
+                        text: Math.round((seg.anomaliasCliente[0] as PcInterface).temperaturaAire)
+                          .toString()
+                          .concat(' ºC'),
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+
+                      {
+                        text: (seg.anomaliasCliente[0] as PcInterface).viento,
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+
+                      {
+                        text: (seg.anomaliasCliente[0] as PcInterface).emisividad,
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+
+                      {
+                        text: Math.round((seg.anomaliasCliente[0] as PcInterface).temperaturaReflejada)
+                          .toString()
+                          .concat(' ºC'),
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+
+                      {
+                        text: this.writeModulo(seg.anomaliasCliente[0]),
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+                    ],
+                  ],
+                },
+              },
+
+              {
+                width: '*',
+                text: '',
+              },
+            ],
+          },
+
+          '\n',
+
+          {
+            columns: [
+              {
+                width: '*',
+                text: '',
+              },
+              {
+                width: 'auto',
+                table: {
+                  headerRows: 1,
+                  body: [table[0]].concat(table[1]),
+                },
+              },
+              {
+                width: '*',
+                text: '',
+              },
+            ],
+          },
+        ];
+
+        allPagsAnexo.push(pagAnexo);
+      }
+    }
+
+    return allPagsAnexo;
+  }
+
+  writeModulo(anomalia: Anomalia) {
+    if (!anomalia.hasOwnProperty('modulo')) {
+      return '-';
+    }
+    const modulo = anomalia.modulo;
+    let newRow = '';
+    if (modulo !== null) {
+      if (modulo.hasOwnProperty('marca')) {
+        newRow = newRow.concat(modulo.marca.toString()).concat(' ');
+      }
+      if (modulo.hasOwnProperty('modelo')) {
+        newRow = newRow.concat(modulo.modelo.toString()).concat(' ');
+      }
+      if (modulo.hasOwnProperty('potencia')) {
+        newRow = newRow.concat('(').concat(modulo.potencia.toString()).concat(' W)');
+      }
+    }
+
+    return newRow;
+  }
+
   compareIrradiancia(a: Anomalia, b: Anomalia) {
     if (a.irradiancia < b.irradiancia) {
       return -1;
@@ -2023,7 +2417,6 @@ export class DownloadPdfComponent implements OnInit {
   }
 
   private calificacionMae(mae: number) {
-    console.log(mae);
     if (mae <= 0.1) {
       return this.translation.t('muy bueno');
     } else if (mae <= 0.2) {
@@ -2033,58 +2426,13 @@ export class DownloadPdfComponent implements OnInit {
     }
   }
 
-  private getEncabezadoTablaAnomalias(columna: any) {
+  private getEncabezadoTablaSeguidor(columna: any) {
     if (columna.nombre === 'local_xy') {
       if (this.planta.hasOwnProperty('etiquetasLocalXY')) {
         return 'Nº Módulo';
       }
     }
     return columna.descripcion;
-  }
-
-  private getLocalId(anomalia: Anomalia): string {
-    const localIdParts: string[] = [];
-    anomalia.globalCoords.forEach((coord) => {
-      if (coord !== undefined && coord !== null && coord !== '') {
-        localIdParts.push(coord);
-      }
-    });
-    if (anomalia.localX !== undefined && anomalia.localX !== null && anomalia.localX > 0) {
-      localIdParts.push(anomalia.localX.toString());
-    }
-    if (anomalia.localY !== undefined && anomalia.localY !== null && anomalia.localY > 0) {
-      localIdParts.push(this.downloadReportService.getAltura(this.planta, anomalia.localY).toString());
-    }
-
-    let localId = '';
-    localIdParts.forEach((part, index, parts) => {
-      localId += part;
-      if (index < parts.length - 1) {
-        localId += '.';
-      }
-    });
-
-    if (localId === '') {
-      localId = '-';
-    }
-
-    return localId;
-  }
-
-  private getGlobalCoordsLabel(anomalia: Anomalia) {
-    let label = '';
-    this.planta.nombreGlobalCoords.forEach((nombre, index, nombres) => {
-      let coord = anomalia.globalCoords[index];
-      if (coord === undefined || coord === null || coord === '') {
-        coord = '-';
-      }
-      label += coord;
-      if (index < nombres.length - 1) {
-        label += '/';
-      }
-    });
-
-    return label;
   }
 
   //  ###################  CONTENIDO ##################################
@@ -2129,8 +2477,8 @@ export class DownloadPdfComponent implements OnInit {
             {
               text:
                 this.decimalPipe
-                  .transform((this.countCategoria[i - 1] / this.allAnomalias.length) * 100, '1.0-1')
-                  .toString() + '%',
+                  .transform((this.countCategoria[i - 1] / this.anomaliasInforme.length) * 100, '1.0-1')
+                  .toString() + ' %',
             }
           )
         );
@@ -2138,6 +2486,35 @@ export class DownloadPdfComponent implements OnInit {
     }
 
     return array;
+  }
+
+  private getLocalId(anomalia: Anomalia): string {
+    const localIdParts: string[] = [];
+    anomalia.globalCoords.forEach((coord) => {
+      if (coord !== undefined && coord !== null && coord !== '') {
+        localIdParts.push(coord);
+      }
+    });
+    if (anomalia.localX !== undefined && anomalia.localX !== null && anomalia.localX > 0) {
+      localIdParts.push(anomalia.localX.toString());
+    }
+    if (anomalia.localY !== undefined && anomalia.localY !== null && anomalia.localY > 0) {
+      localIdParts.push(this.downloadReportService.getAltura(this.planta, anomalia.localY).toString());
+    }
+
+    let localId = '';
+    localIdParts.forEach((part, index, parts) => {
+      localId += part;
+      if (index < parts.length - 1) {
+        localId += '.';
+      }
+    });
+
+    if (localId === '') {
+      localId = '-';
+    }
+
+    return localId;
   }
 
   private getTablaPosicion() {
@@ -2174,7 +2551,55 @@ export class DownloadPdfComponent implements OnInit {
     return array;
   }
 
-  ////////////////////////////////////////////////////
+  getPaginaSeguidor(seguidor: Seguidor) {
+    // Header
+    const cabecera = [];
+    const columnasAnexoSeguidor = this.columnasAnomalia.filter((col) => {
+      return !GLOBAL.columnasAnexoSeguidor.includes(col.nombre);
+    });
+    if (this.planta.hasOwnProperty('numerosSerie')) {
+      if (this.planta.numerosSerie) {
+        columnasAnexoSeguidor.push({ nombre: 'numeroSerie', descripcion: 'N/S' });
+      }
+    }
+
+    cabecera.push({
+      text: this.translation.t('Número'),
+      style: 'tableHeaderBlue',
+    });
+    for (const col of columnasAnexoSeguidor) {
+      cabecera.push({
+        text: this.translation.t(this.getEncabezadoTablaSeguidor(col)),
+        style: 'tableHeaderBlue',
+      });
+    }
+
+    // Body
+    const body = [];
+    let contadorAnoms = 0;
+    const totalAnomsSeguidor = seguidor.anomaliasCliente.length;
+    for (const anom of seguidor.anomaliasCliente) {
+      contadorAnoms += 1;
+      const row = [];
+      row.push({
+        text: `${contadorAnoms}/${totalAnomsSeguidor}`,
+        noWrap: true,
+        style: 'tableCellAnexo1',
+      });
+
+      for (const col of columnasAnexoSeguidor) {
+        row.push({
+          text: this.translation.t(this.getTextoColumnaAnomalia(anom, col.nombre)),
+          noWrap: true,
+          style: 'tableCellAnexo1',
+        });
+      }
+      body.push(row);
+    }
+    return [cabecera, body];
+  }
+
+  //////////////////////////////////////////////////////
 
   get countLoadedImages() {
     return this._countLoadedImages;
@@ -2192,5 +2617,14 @@ export class DownloadPdfComponent implements OnInit {
   set columnasAnomalia(value: any[]) {
     this._columnasAnomalia = value;
     this.columnasAnomalia$.next(value);
+  }
+
+  get loadedImages() {
+    return this._loadedImages;
+  }
+
+  set loadedImages(value: string) {
+    this._loadedImages = value;
+    this.loadedImages$.next(value);
   }
 }
