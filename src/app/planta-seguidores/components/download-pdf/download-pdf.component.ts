@@ -770,12 +770,9 @@ export class DownloadPdfComponent implements OnInit {
           (img) => {
             if (img !== null) {
               const canvas = new fabric.Canvas('canvas');
-              canvas.width = this.widthSeguidor;
-              canvas.height = this.heightSeguidor;
+              canvas.width = GLOBAL.resolucionCamara[1];
+              canvas.height = GLOBAL.resolucionCamara[0];
               const image = new fabric.Image(img);
-
-              const width = img.width * this.imgQuality > img.width ? img.width : img.width * this.imgQuality;
-              const scaleFactor = canvas.width / img.width;
 
               image.set({
                 left: 0,
@@ -785,8 +782,8 @@ export class DownloadPdfComponent implements OnInit {
                 draggable: false,
                 lockMovementX: true,
                 lockMovementY: true,
-                scaleX: canvas.width / GLOBAL.resolucionCamara[0],
-                scaleY: canvas.height / GLOBAL.resolucionCamara[1],
+                scaleX: 1,
+                scaleY: 1,
               });
 
               canvas.add(image);
