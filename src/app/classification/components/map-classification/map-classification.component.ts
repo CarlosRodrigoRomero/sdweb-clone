@@ -268,37 +268,40 @@ export class MapClassificationComponent implements OnInit {
   private addOnHoverAction() {
     let currentFeatureHover: Feature;
     this.map.on('pointermove', (event) => {
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        const feature: Feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties().properties !== undefined)
-          .filter((item) => item.getProperties().properties.name === 'normMod')[0] as Feature;
+      // impedimos hover cuando estamos moviendo una anomalia
+      if (this.classificationService.normModAnomaliaSelected === undefined) {
+        if (this.map.hasFeatureAtPixel(event.pixel)) {
+          const feature: Feature = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined)
+            .filter((item) => item.getProperties().properties.name === 'normMod')[0] as Feature;
 
-        if (feature !== undefined) {
-          // cuando pasamos de un modulo a otro directamente sin pasar por vacio
-          if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
-            // quitamos el efecto resaltado
-            this.prevFeatureHover.setStyle(this.getStyleNormMod(false));
-            this.prevFeatureHover = undefined;
+          if (feature !== undefined) {
+            // cuando pasamos de un modulo a otro directamente sin pasar por vacio
+            if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
+              // quitamos el efecto resaltado
+              this.prevFeatureHover.setStyle(this.getStyleNormMod(false));
+              this.prevFeatureHover = undefined;
+            }
+            currentFeatureHover = feature;
+
+            // aplicamos el efecto resaltado
+            feature.setStyle(this.getStyleNormMod(true));
+
+            this.classificationService.normModHovered = feature.getProperties().properties.normMod;
+
+            this.prevFeatureHover = feature;
+          } else {
+            this.classificationService.normModHovered = undefined;
           }
-          currentFeatureHover = feature;
-
-          // aplicamos el efecto resaltado
-          feature.setStyle(this.getStyleNormMod(true));
-
-          this.classificationService.normModHovered = feature.getProperties().properties.normMod;
-
-          this.prevFeatureHover = feature;
         } else {
-          this.classificationService.normModHovered = undefined;
-        }
-      } else {
-        if (currentFeatureHover !== undefined) {
-          // quitamos el efecto resaltado
-          currentFeatureHover.setStyle(this.getStyleNormMod(false));
-          currentFeatureHover = undefined;
+          if (currentFeatureHover !== undefined) {
+            // quitamos el efecto resaltado
+            currentFeatureHover.setStyle(this.getStyleNormMod(false));
+            currentFeatureHover = undefined;
 
-          this.classificationService.normModHovered = undefined;
+            this.classificationService.normModHovered = undefined;
+          }
         }
       }
     });
@@ -335,7 +338,7 @@ export class MapClassificationComponent implements OnInit {
 
   private addSelectInteraction() {
     const select = new Select({
-      style: this.getStyleNormMod(false),
+      style: this.getStyleNormMod(true),
       condition: click,
       layers: (l) => {
         if (l.getProperties().id === 'normModLayer') {
@@ -360,10 +363,17 @@ export class MapClassificationComponent implements OnInit {
     const features = select.getFeatures();
 
     select.on('select', (e) => {
-      // asignamos el modulo normalizado seleccionado
-      this.classificationService.normModAnomaliaSelected = this.normModules.find(
-        (normMod) => normMod.id === features.getArray()[0].getProperties().properties.id
-      );
+      if (e.selected.length > 0) {
+        // asignamos el modulo normalizado seleccionado
+        this.classificationService.normModAnomaliaSelected = this.normModules.find(
+          (normMod) => normMod.id === features.getArray()[0].getProperties().properties.id
+        );
+
+        // reseteamos si venimos de crear una anomalia
+        this.classificationService.normModSelected = undefined;
+        this.popup.setPosition(undefined);
+        this.classificationService.anomaliaSelected = undefined;
+      }
     });
 
     const translate = new Translate({
@@ -377,12 +387,10 @@ export class MapClassificationComponent implements OnInit {
       this.classificationService.normModAnomaliaSelected.coords = this.structuresService.coordinateToObject(newCoords);
       this.structuresService.updateNormModule(this.classificationService.normModAnomaliaSelected);
 
-      // localizamos la anomalia seleccionada y la actualizamos en la DB
-      const anomaliaSelected = this.listaAnomalias.find(
-        (anom) => anom.id === this.classificationService.normModAnomaliaSelected.id
-      );
-      // anomaliaSelected.featureCoords = newCoords[0];
-      this.anomaliaService.updateAnomaliaField(anomaliaSelected.id, 'featureCoords', { ...newCoords[0] });
+      // actualizamos tb la anomalia seleccionada en la DB
+      this.anomaliaService.updateAnomaliaField(this.classificationService.normModAnomaliaSelected.id, 'featureCoords', {
+        ...newCoords[0],
+      });
     });
 
     this.map.addInteraction(select);
@@ -399,6 +407,7 @@ export class MapClassificationComponent implements OnInit {
         this.classificationService.normModSelected = undefined;
         this.popup.setPosition(undefined);
         this.classificationService.anomaliaSelected = undefined;
+        this.classificationService.normModAnomaliaSelected = undefined;
       }
     });
   }
