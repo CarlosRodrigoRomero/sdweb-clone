@@ -2142,7 +2142,7 @@ export class DownloadPdfComponent implements OnInit {
         style: 'tableCellAnexo1',
       });
       row.push({
-        text: this.plantaService.getEtiquetaGlobals(anom),
+        text: this.getGlobalCoordsLabel(anom),
         noWrap: true,
         style: 'tableCellAnexo1',
       });
@@ -2417,9 +2417,9 @@ export class DownloadPdfComponent implements OnInit {
   }
 
   private calificacionMae(mae: number) {
-    if (mae <= 0.1) {
+    if (mae <= 1) {
       return this.translation.t('muy bueno');
-    } else if (mae <= 0.2) {
+    } else if (mae <= 2) {
       return this.translation.t('correcto');
     } else {
       return this.translation.t('mejorable');
@@ -2433,6 +2433,22 @@ export class DownloadPdfComponent implements OnInit {
       }
     }
     return columna.descripcion;
+  }
+
+  private getGlobalCoordsLabel(anomalia: Anomalia) {
+    let label = '';
+
+    const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
+
+    globals.forEach((coord, index) => {
+      label += coord;
+
+      if (index < globals.length - 1) {
+        label += this.plantaService.getGlobalsConector(this.planta);
+      }
+    });
+
+    return label;
   }
 
   //  ###################  CONTENIDO ##################################
