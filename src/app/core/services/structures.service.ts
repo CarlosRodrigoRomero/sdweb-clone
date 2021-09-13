@@ -172,6 +172,27 @@ export class StructuresService {
     return sumatorioDesviaciones / values.length;
   }
 
+  addRawModule(module: RawModule) {
+    // obtenemos un ID aleatorio
+    const id = this.afs.createId();
+
+    const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto');
+
+    // lo preparamos para la DB
+    module.coords = { ...module.coords };
+    module = Object.assign({}, module);
+
+    colRef
+      .doc(id)
+      .set(module)
+      .then(() => {
+        console.log('Módulo creado correctamente con ID: ', id);
+      })
+      .catch((error) => {
+        console.error('Error al crear módulo: ', error);
+      });
+  }
+
   getModulosBrutos(): Observable<RawModule[]> {
     const query$ = this.afs
       .collection<RawModule>('thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto')
@@ -265,27 +286,6 @@ export class StructuresService {
       });
   }
 
-  addRawModule(module: RawModule) {
-    // obtenemos un ID aleatorio
-    const id = this.afs.createId();
-
-    const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto');
-
-    // lo preparamos para la DB
-    module.coords = { ...module.coords };
-    module = Object.assign({}, module);
-
-    colRef
-      .doc(id)
-      .set(module)
-      .then(() => {
-        console.log('Módulo creado correctamente con ID: ', id);
-      })
-      .catch((error) => {
-        console.error('Error al crear módulo: ', error);
-      });
-  }
-
   addModuleGroup(modGroup: ModuleGroup) {
     let id = modGroup.id;
 
@@ -362,6 +362,20 @@ export class StructuresService {
       })
       .catch((error) => {
         console.error('Error al crear módulo: ', error);
+      });
+  }
+
+  updateNormModule(module: NormalizedModule) {
+    const colRef = this.afs.collection('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados');
+
+    colRef
+      .doc(module.id)
+      .update(module)
+      .then(() => {
+        console.log('Módulo actualizado correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al actualizad módulo: ', error);
       });
   }
 

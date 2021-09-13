@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
@@ -16,6 +17,8 @@ import Polygon from 'ol/geom/Polygon';
 import { Coordinate } from 'ol/coordinate';
 import { DoubleClickZoom, Select, Translate } from 'ol/interaction';
 import { OSM } from 'ol/source';
+import { click } from 'ol/events/condition';
+import LineString from 'ol/geom/LineString';
 
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
@@ -27,16 +30,14 @@ import { OlMapService } from '@core/services/ol-map.service';
 import { ThermalService } from '@core/services/thermal.service';
 import { StructuresService } from '@core/services/structures.service';
 import { ClustersService } from '@core/services/clusters.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { PlantaInterface } from '@core/models/planta';
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { Anomalia } from '@core/models/anomalia';
-import Point from 'ol/geom/Point';
-import LineString from 'ol/geom/LineString';
+
 import moment from 'moment';
-import { Subscription } from 'rxjs';
-import { click } from 'ol/events/condition';
 
 @Component({
   selector: 'app-map-classification',
@@ -65,7 +66,8 @@ export class MapClassificationComponent implements OnInit {
     private olMapService: OlMapService,
     private thermalService: ThermalService,
     private structuresService: StructuresService,
-    private clustersService: ClustersService
+    private clustersService: ClustersService,
+    private anomaliaService: AnomaliaService
   ) {}
 
   ngOnInit(): void {
@@ -355,12 +357,32 @@ export class MapClassificationComponent implements OnInit {
       },
     });
 
+    const features = select.getFeatures();
+
+    select.on('select', (e) => {
+      // asignamos el modulo normalizado seleccionado
+      this.classificationService.normModAnomaliaSelected = this.normModules.find(
+        (normMod) => normMod.id === features.getArray()[0].getProperties().properties.id
+      );
+    });
+
     const translate = new Translate({
-      features: select.getFeatures(),
+      features,
     });
 
     translate.on('translateend', (e) => {
-      console.log('anomalia');
+      const newCoords = (e.features.getArray()[0].getGeometry() as Polygon).getCoordinates();
+
+      // aplicamos las nuevas coordenadas y guardamos los cambios en la DB
+      this.classificationService.normModAnomaliaSelected.coords = this.structuresService.coordinateToObject(newCoords);
+      this.structuresService.updateNormModule(this.classificationService.normModAnomaliaSelected);
+
+      // localizamos la anomalia seleccionada y la actualizamos en la DB
+      const anomaliaSelected = this.listaAnomalias.find(
+        (anom) => anom.id === this.classificationService.normModAnomaliaSelected.id
+      );
+      // anomaliaSelected.featureCoords = newCoords[0];
+      this.anomaliaService.updateAnomaliaField(anomaliaSelected.id, 'featureCoords', { ...newCoords[0] });
     });
 
     this.map.addInteraction(select);
