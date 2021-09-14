@@ -8,8 +8,13 @@
       <mat-icon>calculate</mat-icon>
       <span>EXCEL</span>
     </a>
-    <app-download-pdf></app-download-pdf>
-    <a mat-menu-item href="{{ imagesZipUrl }}" download="" [disabled]="!imagesZipExist">
+    <app-download-pdf *ngIf="!plantaDemo"></app-download-pdf>
+    <!-- DEMO -->
+    <a *ngIf="plantaDemo" mat-menu-item href="{{ pdfDemo }}" download="" [disabled]="!excelExist">
+      <mat-icon>picture_as_pdf</mat-icon>
+      <span>PDF</span>
+    </a>
+    <a *ngIf="!reportControlService.plantaFija" mat-menu-item href="{{ imagesZipUrl }}" download="" [disabled]="!imagesZipExist">
       <mat-icon>crop_original</mat-icon>
       <span>Imágenes</span>
     </a>

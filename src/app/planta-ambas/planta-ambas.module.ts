@@ -6,10 +6,11 @@ import { SharedModule } from '@shared/shared.module';
 import { GlobalCoordAreasComponent } from './components/global-coord-areas/global-coord-areas.component';
 import { DownloadPdfComponent } from './components/download-pdf/download-pdf.component';
 import { ProgressBarPdfComponent } from './components/progress-bar-pdf/progress-bar-pdf.component';
+import { DownloadReportComponent } from './components/download-report/download-report.component';
 
 @NgModule({
-  declarations: [GlobalCoordAreasComponent, DownloadPdfComponent, ProgressBarPdfComponent],
+  declarations: [GlobalCoordAreasComponent, DownloadPdfComponent, ProgressBarPdfComponent, DownloadReportComponent],
   imports: [CommonModule, SharedModule],
-  exports: [GlobalCoordAreasComponent, DownloadPdfComponent, ProgressBarPdfComponent],
+  exports: [GlobalCoordAreasComponent, DownloadReportComponent, ProgressBarPdfComponent],
 })
 export class PlantaAmbasModule {}

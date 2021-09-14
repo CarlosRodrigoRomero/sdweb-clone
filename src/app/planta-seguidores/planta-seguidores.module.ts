@@ -24,7 +24,6 @@ import { SeguidorSliderTemporalComponent } from './components/seguidor-slider-te
 import { SeguidorAnomaliaInfoComponent } from './components/seguidor-anomalia-info/seguidor-anomalia-info.component';
 import { SeguidorAnomaliasListComponent } from './components/seguidor-anomalias-list/seguidor-anomalias-list.component';
 import { SeguidorImageDownloadComponent } from './components/seguidor-image-download/seguidor-image-download.component';
-import { DownloadReportComponent } from './components/download-report/download-report.component';
 import { LeyendaComponent } from './components/leyenda/leyenda.component';
 import { SeguidorViewNavbarComponent } from './components/seguidor-view-navbar/seguidor-view-navbar.component';
 import { SeguidorViewLeyendaComponent } from './components/seguidor-view-leyenda/seguidor-view-leyenda.component';
@@ -49,7 +48,6 @@ import { SeguidorImagesAreaComponent } from './components/seguidor-images-area/s
     SeguidorAnomaliaInfoComponent,
     SeguidorAnomaliasListComponent,
     SeguidorImageDownloadComponent,
-    DownloadReportComponent,
     LeyendaComponent,
     SeguidorViewNavbarComponent,
     SeguidorViewLeyendaComponent,
