@@ -84,11 +84,8 @@ export class ClassificationService {
         this.initialized$.next(true);
       });
 
-    // cargamos la lista de anomalias
-    this.anomaliaService
-      .getAnomaliasInforme$(this.informeId)
-      .pipe(take(1))
-      .subscribe((anoms) => (this.listaAnomalias = anoms));
+    // nos subscribimos a la lista de anomalias
+    this.anomaliaService.getAnomaliasInforme$(this.informeId).subscribe((anoms) => (this.listaAnomalias = anoms));
 
     this.olMapService.map$.subscribe((map) => (this.map = map));
 

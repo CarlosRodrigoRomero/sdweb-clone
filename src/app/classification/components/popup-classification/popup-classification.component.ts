@@ -41,22 +41,12 @@ export class PopupClassificationComponent implements OnInit {
       }
       this.classificationService.anomaliaSelected.tipo = tipo;
 
-      // actualizamos la anomalia de la lista local
-      this.updateAnomaliaLocal(tipo);
-
       // actualizamos el tipo en la DB
       this.anomaliaService.updateAnomalia(this.anomaliaSelected);
     }
   }
 
-  private updateAnomaliaLocal(tipo: number) {
-    this.classificationService.listaAnomalias.find((anom) => anom.id === this.anomaliaSelected.id).tipo = tipo;
-  }
-
   deleteAnomalia() {
-    // eliminamos la anomalia de la lista local
-    this.deleteAnomaliaLocal(this.anomaliaSelected.id);
-
     // eliminamos la anomalia de la DB
     this.anomaliaService.deleteAnomalia(this.anomaliaSelected);
 
@@ -64,11 +54,5 @@ export class PopupClassificationComponent implements OnInit {
 
     // ocultamos el popup
     this.classificationService.hidePopup();
-  }
-
-  private deleteAnomaliaLocal(id: string) {
-    this.classificationService.listaAnomalias = this.classificationService.listaAnomalias.filter(
-      (anom) => anom.id !== id
-    );
   }
 }
