@@ -75,6 +75,7 @@ export class DownloadPdfComponent implements OnInit {
   private logoImg$: Observable<string | null>;
   private imgQuality: number;
   private jpgQuality: number;
+  private heightLogo: number;
   private widthLogo: number;
   private scaleImgLogoHeader: number;
   private imgLogoBase64: string;
@@ -89,6 +90,7 @@ export class DownloadPdfComponent implements OnInit {
   private widthCurvaMae: number;
   private imgCurvaMaeBase64: string;
   private widthLogoOriginal: number;
+  private heightLogoOriginal: number;
   private heightLogoHeader: number;
   private imageListBase64 = {};
 
@@ -191,88 +193,117 @@ export class DownloadPdfComponent implements OnInit {
         this.portadaImg$ = this.storage.ref(`informes/${this.informe.id}/portada.jpg`).getDownloadURL();
         this.logoImg$ = this.storage.ref(`empresas/${this.planta.empresa}/logo.jpg`).getDownloadURL();
 
-        this.irradianciaImg$.pipe(take(1)).subscribe((url) => {
-          fabric.util.loadImage(
-            url,
-            (img) => {
-              const canvas = document.createElement('canvas');
-              const width =
-                this.widthIrradiancia * this.imgQuality > img.width
-                  ? img.width
-                  : this.widthIrradiancia * this.imgQuality;
-              const scaleFactor = width / img.width;
-              canvas.width = width;
-              canvas.height = img.height * scaleFactor;
-              const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-              this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            },
-            null,
-            { crossOrigin: 'anonymous' }
-          );
-        });
+        this.irradianciaImg$
+          .toPromise()
+          .then((url) => {
+            fabric.util.loadImage(
+              url,
+              (img) => {
+                const canvas = document.createElement('canvas');
+                const width =
+                  this.widthIrradiancia * this.imgQuality > img.width
+                    ? img.width
+                    : this.widthIrradiancia * this.imgQuality;
+                const scaleFactor = width / img.width;
+                canvas.width = width;
+                canvas.height = img.height * scaleFactor;
+                const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+                this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              },
+              null,
+              { crossOrigin: 'anonymous' }
+            );
+          })
+          .catch((error) => {
+            console.log('Error al obtener la imagen de irradiancia ', error);
+            const canvas = document.createElement('canvas');
+            this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+          });
 
-        this.suciedadImg$.pipe(take(1)).subscribe((url) => {
-          fabric.util.loadImage(
-            url,
-            (img) => {
-              const canvas = document.createElement('canvas');
-              const width =
-                this.widthIrradiancia * this.imgQuality > img.width
-                  ? img.width
-                  : this.widthIrradiancia * this.imgQuality;
-              const scaleFactor = width / img.width;
-              canvas.width = width;
-              canvas.height = img.height * scaleFactor;
-              const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-              this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            },
-            null,
-            { crossOrigin: 'anonymous' }
-          );
-        });
+        this.suciedadImg$
+          .toPromise()
+          .then((url) => {
+            fabric.util.loadImage(
+              url,
+              (img) => {
+                const canvas = document.createElement('canvas');
+                const width =
+                  this.widthIrradiancia * this.imgQuality > img.width
+                    ? img.width
+                    : this.widthIrradiancia * this.imgQuality;
+                const scaleFactor = width / img.width;
+                canvas.width = width;
+                canvas.height = img.height * scaleFactor;
+                const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+                this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              },
+              null,
+              { crossOrigin: 'anonymous' }
+            );
+          })
+          .catch((error) => {
+            console.log('Error al obtener la imagen de suciedad ', error);
+            const canvas = document.createElement('canvas');
+            this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+          });
 
-        this.portadaImg$.pipe(take(1)).subscribe((url) => {
-          fabric.util.loadImage(
-            url,
-            (img) => {
-              const canvas = document.createElement('canvas');
-              const width =
-                this.widthPortada * this.imgQuality > img.width ? img.width : this.widthPortada * this.imgQuality;
-              const scaleFactor = width / img.width;
-              canvas.width = width;
-              canvas.height = img.height * scaleFactor;
-              const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-              this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            },
-            null,
-            { crossOrigin: 'anonymous' }
-          );
-        });
+        this.portadaImg$
+          .toPromise()
+          .then((url) => {
+            fabric.util.loadImage(
+              url,
+              (img) => {
+                const canvas = document.createElement('canvas');
+                const width =
+                  this.widthPortada * this.imgQuality > img.width ? img.width : this.widthPortada * this.imgQuality;
+                const scaleFactor = width / img.width;
+                canvas.width = width;
+                canvas.height = img.height * scaleFactor;
+                const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+                this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              },
+              null,
+              { crossOrigin: 'anonymous' }
+            );
+          })
+          .catch((error) => {
+            console.log('Error al obtener la imagen de portada ', error);
+            const canvas = document.createElement('canvas');
+            this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+          });
 
-        this.logoImg$.pipe(take(1)).subscribe((url) => {
-          fabric.util.loadImage(
-            url,
-            (img) => {
-              const canvas = document.createElement('canvas');
-              const newWidth =
-                this.widthLogo * this.imgQuality > img.width ? img.width : this.widthLogo * this.imgQuality;
-              this.widthLogoOriginal = newWidth;
-              const scaleFactor = newWidth / img.width;
-              const newHeight = img.height * scaleFactor;
-              canvas.width = newWidth;
-              canvas.height = newHeight;
-              this.scaleImgLogoHeader = this.heightLogoHeader / newHeight;
-              const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, newWidth, newHeight);
-              this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            },
-            null,
-            { crossOrigin: 'anonymous' }
-          );
-        });
+        this.logoImg$
+          .toPromise()
+          .then((url) => {
+            fabric.util.loadImage(
+              url,
+              (img) => {
+                const canvas = document.createElement('canvas');
+                const newWidth =
+                  this.widthLogo * this.imgQuality > img.width ? img.width : this.widthLogo * this.imgQuality;
+                this.widthLogoOriginal = newWidth;
+                const scaleFactor = newWidth / img.width;
+                const newHeight = img.height * scaleFactor;
+                this.heightLogoOriginal = newHeight;
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                this.scaleImgLogoHeader = this.heightLogoHeader / newHeight;
+                const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, newWidth, newHeight);
+                this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              },
+              null,
+              { crossOrigin: 'anonymous' }
+            );
+          })
+          .catch((error) => {
+            console.log('Error al obtener la imagen del logo ', error);
+            const canvas = document.createElement('canvas');
+            this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+          });
 
         this.apartadosInforme = [
           {
@@ -404,8 +435,9 @@ export class DownloadPdfComponent implements OnInit {
       });
 
     this.progresoPDF = '0';
+    this.heightLogo = 150;
     this.widthLogo = 200;
-    this.widthPortada = 600; // =600 es el ancho de pagina completo
+    this.widthPortada = 600; // es el ancho de pagina completo
     this.widthSuciedad = 501;
     this.widthCurvaMae = 300;
     this.widthFormulaMae = 200;
@@ -460,11 +492,20 @@ export class DownloadPdfComponent implements OnInit {
   public downloadPDF() {
     this.generandoPDF = true;
 
+    this.countLoadedImages = 0;
+
     if (this.reportControlService.plantaFija) {
       this.calcularInforme();
-    } else {
-      this.countLoadedImages = 0;
 
+      let prefijo = 'informe';
+      if (this.informe.hasOwnProperty('prefijo')) {
+        prefijo = this.informe.prefijo.concat('informe');
+      }
+
+      pdfMake.createPdf(this.getDocDefinition()).download(prefijo, (cb) => {
+        this.generandoPDF = false;
+      });
+    } else {
       // Generar imagenes
       this.countSeguidores = 0;
       for (const seguidor of this.seguidoresInforme) {
@@ -554,7 +595,7 @@ export class DownloadPdfComponent implements OnInit {
     this.dataSource = new MatTableDataSource(this.countCategoriaClase);
   }
 
-  getDocDefinition(imagesSeguidores) {
+  getDocDefinition(imagesSeguidores?: any) {
     const pages = this.getPagesPDF();
     let anexo1 = [];
     let anexo2 = [];
@@ -837,6 +878,13 @@ export class DownloadPdfComponent implements OnInit {
 
   getPagesPDF() {
     // PORTADA //
+    let widthLogoPortada = this.widthLogo;
+    // controlamos que la altura del logo no se salga de la portada
+    if (this.heightLogoOriginal > 250) {
+      const factorReduccion = 250 / this.heightLogoOriginal;
+      widthLogoPortada = this.widthLogo * factorReduccion;
+    }
+
     const portada: any[] = [
       {
         text: this.translation.t('Análisis termográfico aéreo de módulos fotovoltaicos'),
@@ -882,7 +930,7 @@ export class DownloadPdfComponent implements OnInit {
 
       {
         image: this.imgLogoBase64,
-        width: this.widthLogo,
+        width: widthLogoPortada,
         alignment: 'center',
         pageBreak: 'after',
       },

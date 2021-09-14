@@ -23,7 +23,6 @@ import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
 import { MapControlsComponent } from './components/map-controls/map-controls.component';
-import { DownloadPdfComponent } from './components/download-pdf/download-pdf.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +35,6 @@ import { DownloadPdfComponent } from './components/download-pdf/download-pdf.com
     SliderTemporalComponent,
     SliderOpacityComponent,
     MapControlsComponent,
-    DownloadPdfComponent,
   ],
   imports: [
     SharedModule,
