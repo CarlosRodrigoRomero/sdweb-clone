@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 
 import { MatTableDataSource } from '@angular/material/table';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
 import pdfMake from 'pdfmake/build/pdfmake.js';
@@ -49,7 +49,7 @@ export interface AnomsTable {
   styleUrls: ['./download-pdf.component.css'],
   providers: [DecimalPipe, DatePipe],
 })
-export class DownloadPdfComponent implements OnInit {
+export class DownloadPdfComponent implements OnInit, OnDestroy {
   private _countLoadedImages = 0;
   countLoadedImages$ = new BehaviorSubject<number>(this._countLoadedImages);
   private _loadedImages = undefined;
@@ -113,6 +113,8 @@ export class DownloadPdfComponent implements OnInit {
   private hasUserArea: boolean;
   seguidoresLoaded = false;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private decimalPipe: DecimalPipe,
     private datePipe: DatePipe,
@@ -131,305 +133,307 @@ export class DownloadPdfComponent implements OnInit {
       .fill(0)
       .map((_, i) => i + 1);
 
-    this.plantaService
-      .getPlanta(this.reportControlService.plantaId)
-      .pipe(
-        take(1),
-        switchMap((planta) => {
-          this.planta = planta;
+    this.subscriptions.add(
+      this.plantaService
+        .getPlanta(this.reportControlService.plantaId)
+        .pipe(
+          take(1),
+          switchMap((planta) => {
+            this.planta = planta;
 
-          this.plantaService.planta = planta;
+            this.plantaService.planta = planta;
 
-          this.columnasAnomalia = GLOBAL.columnasAnomPdf;
+            this.columnasAnomalia = GLOBAL.columnasAnomPdf;
 
-          this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
+            this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
 
-          this.arrayFilas = Array(this.planta.filas)
-            .fill(0)
-            .map((_, i) => i + 1);
-          this.arrayColumnas = Array(this.planta.columnas)
-            .fill(0)
-            .map((_, i) => i + 1);
+            this.arrayFilas = Array(this.planta.filas)
+              .fill(0)
+              .map((_, i) => i + 1);
+            this.arrayColumnas = Array(this.planta.columnas)
+              .fill(0)
+              .map((_, i) => i + 1);
 
-          return this.reportControlService.selectedInformeId$;
-        })
-      )
-      .subscribe((informeId) => {
-        this.informe = this.reportControlService.informes.find((informe) => informeId === informe.id);
+            return this.reportControlService.selectedInformeId$;
+          })
+        )
+        .subscribe((informeId) => {
+          this.informe = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
-        if (this.reportControlService.plantaFija) {
-          this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
-        } else {
-          const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
-          this.seguidoresInforme = allSeguidores.filter((seg) => seg.informeId === informeId);
-          // los ordenamos por globalCoords
-          this.seguidoresInforme = this.seguidoresInforme.sort(this.downloadReportService.sortByGlobalCoords);
+          if (this.reportControlService.plantaFija) {
+            this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
+          } else {
+            const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
+            this.seguidoresInforme = allSeguidores.filter((seg) => seg.informeId === informeId);
+            // los ordenamos por globalCoords
+            this.seguidoresInforme = this.seguidoresInforme.sort(this.downloadReportService.sortByGlobalCoords);
 
-          this.seguidoresInforme$.next(this.seguidoresInforme);
+            this.seguidoresInforme$.next(this.seguidoresInforme);
 
-          if (this.seguidoresInforme.length > 0) {
-            this.seguidoresLoaded = true;
+            if (this.seguidoresInforme.length > 0) {
+              this.seguidoresLoaded = true;
+            }
+
+            this.seguidoresInforme.forEach((seguidor) => {
+              const anomaliasSeguidor = seguidor.anomaliasCliente;
+              if (anomaliasSeguidor.length > 0) {
+                this.anomaliasInforme.push(...anomaliasSeguidor);
+              }
+            });
           }
 
-          this.seguidoresInforme.forEach((seguidor) => {
-            const anomaliasSeguidor = seguidor.anomaliasCliente;
-            if (anomaliasSeguidor.length > 0) {
-              this.anomaliasInforme.push(...anomaliasSeguidor);
-            }
-          });
-        }
+          // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
+          this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
 
-        // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
-        this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
+          // asignamos los labels del criterio especifico del cliente
+          this.labelsCriticidad = this.anomaliaService.criterioCriticidad.labels;
 
-        // asignamos los labels del criterio especifico del cliente
-        this.labelsCriticidad = this.anomaliaService.criterioCriticidad.labels;
+          this.irradianciaImg$ = this.storage.ref(`informes/${this.informe.id}/irradiancia.png`).getDownloadURL();
+          this.suciedadImg$ = this.storage.ref(`informes/${this.informe.id}/suciedad.jpg`).getDownloadURL();
+          this.portadaImg$ = this.storage.ref(`informes/${this.informe.id}/portada.jpg`).getDownloadURL();
+          this.logoImg$ = this.storage.ref(`empresas/${this.planta.empresa}/logo.jpg`).getDownloadURL();
 
-        this.irradianciaImg$ = this.storage.ref(`informes/${this.informe.id}/irradiancia.png`).getDownloadURL();
-        this.suciedadImg$ = this.storage.ref(`informes/${this.informe.id}/suciedad.jpg`).getDownloadURL();
-        this.portadaImg$ = this.storage.ref(`informes/${this.informe.id}/portada.jpg`).getDownloadURL();
-        this.logoImg$ = this.storage.ref(`empresas/${this.planta.empresa}/logo.jpg`).getDownloadURL();
+          this.irradianciaImg$
+            .toPromise()
+            .then((url) => {
+              fabric.util.loadImage(
+                url,
+                (img) => {
+                  const canvas = document.createElement('canvas');
+                  const width =
+                    this.widthIrradiancia * this.imgQuality > img.width
+                      ? img.width
+                      : this.widthIrradiancia * this.imgQuality;
+                  const scaleFactor = width / img.width;
+                  canvas.width = width;
+                  canvas.height = img.height * scaleFactor;
+                  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                  ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+                  this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+                },
+                null,
+                { crossOrigin: 'anonymous' }
+              );
+            })
+            .catch((error) => {
+              console.log('Error al obtener la imagen de irradiancia ', error);
+              const canvas = document.createElement('canvas');
+              this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+            });
 
-        this.irradianciaImg$
-          .toPromise()
-          .then((url) => {
-            fabric.util.loadImage(
-              url,
-              (img) => {
-                const canvas = document.createElement('canvas');
-                const width =
-                  this.widthIrradiancia * this.imgQuality > img.width
-                    ? img.width
-                    : this.widthIrradiancia * this.imgQuality;
-                const scaleFactor = width / img.width;
-                canvas.width = width;
-                canvas.height = img.height * scaleFactor;
-                const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-                this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-              },
-              null,
-              { crossOrigin: 'anonymous' }
-            );
-          })
-          .catch((error) => {
-            console.log('Error al obtener la imagen de irradiancia ', error);
-            const canvas = document.createElement('canvas');
-            this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-          });
+          this.suciedadImg$
+            .toPromise()
+            .then((url) => {
+              fabric.util.loadImage(
+                url,
+                (img) => {
+                  const canvas = document.createElement('canvas');
+                  const width =
+                    this.widthIrradiancia * this.imgQuality > img.width
+                      ? img.width
+                      : this.widthIrradiancia * this.imgQuality;
+                  const scaleFactor = width / img.width;
+                  canvas.width = width;
+                  canvas.height = img.height * scaleFactor;
+                  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                  ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+                  this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+                },
+                null,
+                { crossOrigin: 'anonymous' }
+              );
+            })
+            .catch((error) => {
+              console.log('Error al obtener la imagen de suciedad ', error);
+              const canvas = document.createElement('canvas');
+              this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+            });
 
-        this.suciedadImg$
-          .toPromise()
-          .then((url) => {
-            fabric.util.loadImage(
-              url,
-              (img) => {
-                const canvas = document.createElement('canvas');
-                const width =
-                  this.widthIrradiancia * this.imgQuality > img.width
-                    ? img.width
-                    : this.widthIrradiancia * this.imgQuality;
-                const scaleFactor = width / img.width;
-                canvas.width = width;
-                canvas.height = img.height * scaleFactor;
-                const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-                this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-              },
-              null,
-              { crossOrigin: 'anonymous' }
-            );
-          })
-          .catch((error) => {
-            console.log('Error al obtener la imagen de suciedad ', error);
-            const canvas = document.createElement('canvas');
-            this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-          });
+          this.portadaImg$
+            .toPromise()
+            .then((url) => {
+              fabric.util.loadImage(
+                url,
+                (img) => {
+                  const canvas = document.createElement('canvas');
+                  const width =
+                    this.widthPortada * this.imgQuality > img.width ? img.width : this.widthPortada * this.imgQuality;
+                  const scaleFactor = width / img.width;
+                  canvas.width = width;
+                  canvas.height = img.height * scaleFactor;
+                  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                  ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+                  this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+                },
+                null,
+                { crossOrigin: 'anonymous' }
+              );
+            })
+            .catch((error) => {
+              console.log('Error al obtener la imagen de portada ', error);
+              const canvas = document.createElement('canvas');
+              this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+            });
 
-        this.portadaImg$
-          .toPromise()
-          .then((url) => {
-            fabric.util.loadImage(
-              url,
-              (img) => {
-                const canvas = document.createElement('canvas');
-                const width =
-                  this.widthPortada * this.imgQuality > img.width ? img.width : this.widthPortada * this.imgQuality;
-                const scaleFactor = width / img.width;
-                canvas.width = width;
-                canvas.height = img.height * scaleFactor;
-                const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-                this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-              },
-              null,
-              { crossOrigin: 'anonymous' }
-            );
-          })
-          .catch((error) => {
-            console.log('Error al obtener la imagen de portada ', error);
-            const canvas = document.createElement('canvas');
-            this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-          });
+          this.logoImg$
+            .toPromise()
+            .then((url) => {
+              fabric.util.loadImage(
+                url,
+                (img) => {
+                  const canvas = document.createElement('canvas');
+                  const newWidth =
+                    this.widthLogo * this.imgQuality > img.width ? img.width : this.widthLogo * this.imgQuality;
+                  this.widthLogoOriginal = newWidth;
+                  const scaleFactor = newWidth / img.width;
+                  const newHeight = img.height * scaleFactor;
+                  this.heightLogoOriginal = newHeight;
+                  canvas.width = newWidth;
+                  canvas.height = newHeight;
+                  this.scaleImgLogoHeader = this.heightLogoHeader / newHeight;
+                  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                  ctx.drawImage(img, 0, 0, newWidth, newHeight);
+                  this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+                },
+                null,
+                { crossOrigin: 'anonymous' }
+              );
+            })
+            .catch((error) => {
+              console.log('Error al obtener la imagen del logo ', error);
+              const canvas = document.createElement('canvas');
+              this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+            });
 
-        this.logoImg$
-          .toPromise()
-          .then((url) => {
-            fabric.util.loadImage(
-              url,
-              (img) => {
-                const canvas = document.createElement('canvas');
-                const newWidth =
-                  this.widthLogo * this.imgQuality > img.width ? img.width : this.widthLogo * this.imgQuality;
-                this.widthLogoOriginal = newWidth;
-                const scaleFactor = newWidth / img.width;
-                const newHeight = img.height * scaleFactor;
-                this.heightLogoOriginal = newHeight;
-                canvas.width = newWidth;
-                canvas.height = newHeight;
-                this.scaleImgLogoHeader = this.heightLogoHeader / newHeight;
-                const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, newWidth, newHeight);
-                this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-              },
-              null,
-              { crossOrigin: 'anonymous' }
-            );
-          })
-          .catch((error) => {
-            console.log('Error al obtener la imagen del logo ', error);
-            const canvas = document.createElement('canvas');
-            this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-          });
-
-        this.apartadosInforme = [
-          {
-            nombre: 'introduccion',
-            descripcion: 'Introducción',
-            orden: 1,
-            apt: 1,
-            elegible: false,
-          },
-          {
-            nombre: 'criterios',
-            descripcion: 'Criterios de operación',
-            orden: 2,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'normalizacion',
-            descripcion: 'Normalización de gradientes de temperatura',
-            orden: 3,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'datosVuelo',
-            descripcion: 'Datos del vuelo',
-            orden: 4,
-            apt: 1,
-            elegible: true,
-          },
-          // {
-          //   nombre: 'irradiancia',
-          //   descripcion: 'Irradiancia durante el vuelo',
-          //   orden: 5,
-          //   apt: 1,
-          //   elegible: true,
-          // },
-          {
-            nombre: 'paramsTermicos',
-            descripcion: 'Ajuste de parámetros térmicos',
-            orden: 6,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'perdidaPR',
-            descripcion: 'Pérdida de Performance Ratio',
-            orden: 7,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'clasificacion',
-            descripcion: 'Cómo se clasifican las anomalías',
-            orden: 8,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'localizar',
-            descripcion: 'Cómo localizar las anomalías',
-            orden: 9,
-            apt: 1,
-            elegible: true,
-          },
-          {
-            nombre: 'resultadosClase',
-            descripcion: 'Resultados por clase',
-            orden: 10,
-            apt: 2,
-            elegible: true,
-          },
-          {
-            nombre: 'resultadosCategoria',
-            descripcion: 'Resultados por categoría',
-            orden: 11,
-            apt: 2,
-            elegible: true,
-          },
-
-          {
-            nombre: 'resultadosMAE',
-            descripcion: 'MAE de la planta',
-            orden: 14,
-            apt: 2,
-            elegible: true,
-          },
-          {
-            nombre: 'anexo1',
-            descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
-            orden: 15,
-            elegible: true,
-          },
-        ];
-
-        if (this.planta.tipo === 'seguidores') {
-          this.apartadosInforme.push(
+          this.apartadosInforme = [
             {
-              nombre: 'anexo2',
-              descripcion: 'Anexo II: Anomalías térmicas por seguidor',
-              orden: 16,
+              nombre: 'introduccion',
+              descripcion: 'Introducción',
+              orden: 1,
+              apt: 1,
+              elegible: false,
+            },
+            {
+              nombre: 'criterios',
+              descripcion: 'Criterios de operación',
+              orden: 2,
+              apt: 1,
               elegible: true,
             },
             {
-              nombre: 'resultadosPosicion',
-              descripcion: 'Resultados por posición',
-              orden: 12,
+              nombre: 'normalizacion',
+              descripcion: 'Normalización de gradientes de temperatura',
+              orden: 3,
+              apt: 1,
+              elegible: true,
+            },
+            {
+              nombre: 'datosVuelo',
+              descripcion: 'Datos del vuelo',
+              orden: 4,
+              apt: 1,
+              elegible: true,
+            },
+            // {
+            //   nombre: 'irradiancia',
+            //   descripcion: 'Irradiancia durante el vuelo',
+            //   orden: 5,
+            //   apt: 1,
+            //   elegible: true,
+            // },
+            {
+              nombre: 'paramsTermicos',
+              descripcion: 'Ajuste de parámetros térmicos',
+              orden: 6,
+              apt: 1,
+              elegible: true,
+            },
+            {
+              nombre: 'perdidaPR',
+              descripcion: 'Pérdida de Performance Ratio',
+              orden: 7,
+              apt: 1,
+              elegible: true,
+            },
+            {
+              nombre: 'clasificacion',
+              descripcion: 'Cómo se clasifican las anomalías',
+              orden: 8,
+              apt: 1,
+              elegible: true,
+            },
+            {
+              nombre: 'localizar',
+              descripcion: 'Cómo localizar las anomalías',
+              orden: 9,
+              apt: 1,
+              elegible: true,
+            },
+            {
+              nombre: 'resultadosClase',
+              descripcion: 'Resultados por clase',
+              orden: 10,
               apt: 2,
               elegible: true,
-            }
-          );
-          const fechaInforme = new Date(this.informe.fecha * 1000);
-
-          if (fechaInforme.getFullYear() >= 2020) {
-            this.apartadosInforme.push({
-              nombre: 'anexo3',
-              descripcion: 'Anexo III: Seguidores sin anomalías',
-              orden: 17,
+            },
+            {
+              nombre: 'resultadosCategoria',
+              descripcion: 'Resultados por categoría',
+              orden: 11,
+              apt: 2,
               elegible: true,
-            });
+            },
+
+            {
+              nombre: 'resultadosMAE',
+              descripcion: 'MAE de la planta',
+              orden: 14,
+              apt: 2,
+              elegible: true,
+            },
+            {
+              nombre: 'anexo1',
+              descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
+              orden: 15,
+              elegible: true,
+            },
+          ];
+
+          if (this.planta.tipo === 'seguidores') {
+            this.apartadosInforme.push(
+              {
+                nombre: 'anexo2',
+                descripcion: 'Anexo II: Anomalías térmicas por seguidor',
+                orden: 16,
+                elegible: true,
+              },
+              {
+                nombre: 'resultadosPosicion',
+                descripcion: 'Resultados por posición',
+                orden: 12,
+                apt: 2,
+                elegible: true,
+              }
+            );
+            const fechaInforme = new Date(this.informe.fecha * 1000);
+
+            if (fechaInforme.getFullYear() >= 2020) {
+              this.apartadosInforme.push({
+                nombre: 'anexo3',
+                descripcion: 'Anexo III: Seguidores sin anomalías',
+                orden: 17,
+                elegible: true,
+              });
+            }
           }
-        }
 
-        this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
-          return a.orden - b.orden;
-        });
+          this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
+            return a.orden - b.orden;
+          });
 
-        this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
-      });
+          this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
+        })
+    );
 
     this.heightLogo = 150;
     this.widthLogo = 200;
@@ -444,11 +448,13 @@ export class DownloadPdfComponent implements OnInit {
     this.widthSeguidor = 450;
     this.hasUserArea = false;
 
-    this.plantaService.getUserAreas$(this.reportControlService.plantaId).subscribe((userAreas) => {
-      if (userAreas.length > 0) {
-        this.hasUserArea = true;
-      }
-    });
+    this.subscriptions.add(
+      this.plantaService.getUserAreas$(this.reportControlService.plantaId).subscribe((userAreas) => {
+        if (userAreas.length > 0) {
+          this.hasUserArea = true;
+        }
+      })
+    );
 
     fabric.util.loadImage(
       '../../../assets/images/maeCurva.png',
@@ -509,23 +515,25 @@ export class DownloadPdfComponent implements OnInit {
         this.countSeguidores++;
       }
 
-      this.countLoadedImages$.subscribe((countLoadedImgs) => {
-        this.downloadReportService.progressBarValue = Math.round(
-          (countLoadedImgs / this.seguidoresInforme.length) * 100
-        );
+      this.subscriptions.add(
+        this.countLoadedImages$.subscribe((countLoadedImgs) => {
+          this.downloadReportService.progressBarValue = Math.round(
+            (countLoadedImgs / this.seguidoresInforme.length) * 100
+          );
 
-        // Cuando se carguen todas las imágenes
-        if (countLoadedImgs === this.countSeguidores) {
-          this.calcularInforme();
+          // Cuando se carguen todas las imágenes
+          if (countLoadedImgs === this.countSeguidores) {
+            this.calcularInforme();
 
-          pdfMake
-            .createPdf(this.getDocDefinition(this.imageListBase64))
-            .download(this.informe.prefijo.concat('informe'), () => {
-              this.downloadReportService.generatingPDF = false;
-            });
-          this.downloadReportService.endingPDF = true;
-        }
-      });
+            pdfMake
+              .createPdf(this.getDocDefinition(this.imageListBase64))
+              .download(this.informe.prefijo.concat('informe'), () => {
+                this.downloadReportService.generatingPDF = false;
+              });
+            this.downloadReportService.endingPDF = true;
+          }
+        })
+      );
     }
   }
 
@@ -2663,6 +2671,10 @@ export class DownloadPdfComponent implements OnInit {
       body.push(row);
     }
     return [cabecera, body];
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   //////////////////////////////////////////////////////
