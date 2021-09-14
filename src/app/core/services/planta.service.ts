@@ -390,6 +390,7 @@ export class PlantaService {
     }
     return nombreEtiqueta;
   }
+
   getGlobalCoordsColumns(planta: PlantaInterface, columnsToDisplay: string[]): string[] {
     if (planta.tipo === 'seguidores') {
       let count = 0;
@@ -424,7 +425,11 @@ export class PlantaService {
     return columnsToDisplay;
   }
 
-  getGlobalsConector(): string {
+  getGlobalsConector(planta?: PlantaInterface): string {
+    if (planta !== undefined) {
+      this.planta = planta;
+    }
+
     if (this.planta.hasOwnProperty('stringConectorGlobals')) {
       return this.planta.stringConectorGlobals;
     }

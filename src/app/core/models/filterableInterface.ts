@@ -15,10 +15,13 @@ export interface FilterableElement {
   gps_lng?: number;
   gps_lat?: number;
   local_id?: number;
+  localId?: string;
   reparable?: boolean;
   gradiente?: number;
   global_x?: string;
   global_y?: string;
   local_x?: number;
   local_y?: number;
+  localX?: number;
+  localY?: number;
 }

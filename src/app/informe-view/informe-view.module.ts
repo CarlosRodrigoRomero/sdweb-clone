@@ -14,7 +14,7 @@ import { PcDetailsDialogComponent } from './components/pc-details-dialog/pc-deta
 
 import { PcListComponent } from './components/pc-list/pc-list.component';
 import { PcDetailsComponent } from './components/pc-details/pc-details.component';
-import { ExportComponent } from '../informe-export/components/export/export.component';
+// import { ExportComponent } from '../informe-export/components/export/export.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +25,6 @@ import { ExportComponent } from '../informe-export/components/export/export.comp
     PcDetailsDialogComponent,
     PcListComponent,
     PcDetailsComponent,
-    ExportComponent,
     PcFilterComponent,
   ],
   entryComponents: [ExplicacionCoaComponent, PcDetailsDialogComponent],

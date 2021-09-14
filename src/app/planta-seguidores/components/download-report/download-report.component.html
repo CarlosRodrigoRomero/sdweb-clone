@@ -8,13 +8,10 @@
       <mat-icon>calculate</mat-icon>
       <span>EXCEL</span>
     </a>
-    <button mat-menu-item class="btn-pdf" [disabled]="true" matTooltip="Pronto disponible">
-      <mat-icon>picture_as_pdf</mat-icon>
-      <span>PDF</span>
-    </button>
+    <app-download-pdf></app-download-pdf>
     <a mat-menu-item href="{{ imagesZipUrl }}" download="" [disabled]="!imagesZipExist">
       <mat-icon>crop_original</mat-icon>
       <span>Imágenes</span>
     </a>
-  </div>
-</mat-menu>
+  </div></mat-menu
+>

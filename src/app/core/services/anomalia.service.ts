@@ -451,6 +451,16 @@ export class AnomaliaService {
       });
   }
 
+  sortByLocalId(a: Anomalia, b: Anomalia) {
+    if (a.localId < b.localId) {
+      return -1;
+    }
+    if (a.localId > b.localId) {
+      return 1;
+    }
+    return 0;
+  }
+
   get hasCriticidad() {
     return this._hasCriticidad;
   }

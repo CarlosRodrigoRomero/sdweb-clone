@@ -64,6 +64,13 @@ app-share-map {
   margin-right: 15px;
 }
 
+app-progress-bar-pdf {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translate(-50%, 0%);
+}
+
 .left-sidenav {
   position: absolute;
   display: flex;
