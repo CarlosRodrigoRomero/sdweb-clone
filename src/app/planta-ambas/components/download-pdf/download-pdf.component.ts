@@ -17,15 +17,14 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { DownloadReportService } from '@core/services/download-report.service';
 import { GLOBAL } from '@core/services/global';
 import { AnomaliaService } from '@core/services/anomalia.service';
+import { PlantaService } from '@core/services/planta.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
-
 import { Translation } from 'src/app/informe-export/components/export/translations';
 import { PcInterface } from '@core/models/pc';
-import { PlantaService } from '@core/services/planta.service';
 
 export interface Apartado {
   nombre: string;
@@ -51,13 +50,11 @@ export interface AnomsTable {
   providers: [DecimalPipe, DatePipe],
 })
 export class DownloadPdfComponent implements OnInit {
-  private generandoPDF = false;
   private _countLoadedImages = 0;
   countLoadedImages$ = new BehaviorSubject<number>(this._countLoadedImages);
   private _loadedImages = undefined;
   loadedImages$ = new BehaviorSubject<string>(this._loadedImages);
   private countSeguidores: number;
-  private progresoPDF: string;
   seguidoresInforme: Seguidor[] = [];
   seguidoresInforme$ = new BehaviorSubject<Seguidor[]>(this.seguidoresInforme);
   private anomaliasInforme: Anomalia[] = []; // equivalente allAnomalias en fijas
@@ -434,7 +431,6 @@ export class DownloadPdfComponent implements OnInit {
         this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
       });
 
-    this.progresoPDF = '0';
     this.heightLogo = 150;
     this.widthLogo = 200;
     this.widthPortada = 600; // es el ancho de pagina completo
@@ -490,7 +486,7 @@ export class DownloadPdfComponent implements OnInit {
   }
 
   public downloadPDF() {
-    this.generandoPDF = true;
+    this.downloadReportService.generatingPDF = true;
 
     this.countLoadedImages = 0;
 
@@ -503,7 +499,7 @@ export class DownloadPdfComponent implements OnInit {
       }
 
       pdfMake.createPdf(this.getDocDefinition()).download(prefijo, (cb) => {
-        this.generandoPDF = false;
+        this.downloadReportService.generatingPDF = false;
       });
     } else {
       // Generar imagenes
@@ -514,14 +510,20 @@ export class DownloadPdfComponent implements OnInit {
       }
 
       this.countLoadedImages$.subscribe((countLoadedImgs) => {
+        this.downloadReportService.progressBarValue = Math.round(
+          (countLoadedImgs / this.seguidoresInforme.length) * 100
+        );
+
         // Cuando se carguen todas las imágenes
         if (countLoadedImgs === this.countSeguidores) {
           this.calcularInforme();
 
           pdfMake
             .createPdf(this.getDocDefinition(this.imageListBase64))
-            .download(this.informe.prefijo.concat('informe'));
-          this.generandoPDF = false;
+            .download(this.informe.prefijo.concat('informe'), () => {
+              this.downloadReportService.generatingPDF = false;
+            });
+          this.downloadReportService.endingPDF = true;
         }
       });
     }

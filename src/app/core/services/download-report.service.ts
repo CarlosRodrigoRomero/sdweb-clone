@@ -3,11 +3,19 @@ import { Anomalia } from '@core/models/anomalia';
 
 import { FilterableElement } from '@core/models/filterableInterface';
 import { PlantaInterface } from '@core/models/planta';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DownloadReportService {
+  private _generatingPDF = false;
+  generatingPDF$ = new BehaviorSubject<boolean>(this._generatingPDF);
+  private _endingPDF = false;
+  endingPDF$ = new BehaviorSubject<boolean>(this._endingPDF);
+  private _progressBarValue = 0;
+  progressBarValue$ = new BehaviorSubject<number>(this._progressBarValue);
+
   constructor() {}
 
   sortByPosition(a: FilterableElement, b: FilterableElement): number {
@@ -76,5 +84,34 @@ export class DownloadReportService {
     } else {
       return localY;
     }
+  }
+
+  //////////////////////////////////////////////////////
+
+  get generatingPDF() {
+    return this._generatingPDF;
+  }
+
+  set generatingPDF(value: boolean) {
+    this._generatingPDF = value;
+    this.generatingPDF$.next(value);
+  }
+
+  get endingPDF() {
+    return this._endingPDF;
+  }
+
+  set endingPDF(value: boolean) {
+    this._endingPDF = value;
+    this.endingPDF$.next(value);
+  }
+
+  get progressBarValue() {
+    return this._progressBarValue;
+  }
+
+  set progressBarValue(value: number) {
+    this._progressBarValue = value;
+    this.progressBarValue$.next(value);
   }
 }
