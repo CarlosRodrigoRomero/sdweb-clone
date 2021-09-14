@@ -81,11 +81,14 @@ export class ClassificationService {
         // preparamos las locAreas para luego calcular las globalCoords de las nuevas anomalias
         this.plantaService.setLocAreaListFromPlantaIdOl(this.planta.id);
 
-        // nos suscribimos a la lista de anomalias
-        this.anomaliaService.getAnomaliasInforme$(this.informeId).subscribe((anoms) => (this.listaAnomalias = anoms));
-
         this.initialized$.next(true);
       });
+
+    // cargamos la lista de anomalias
+    this.anomaliaService
+      .getAnomaliasInforme$(this.informeId)
+      .pipe(take(1))
+      .subscribe((anoms) => (this.listaAnomalias = anoms));
 
     this.olMapService.map$.subscribe((map) => (this.map = map));
 
@@ -135,6 +138,8 @@ export class ClassificationService {
           };
           // asignamos la nueva anomalia para acceder a ella y poder modificarla
           this.anomaliaSelected = anomalia;
+
+          this.listaAnomalias.push(anomalia);
 
           // Guardar en la base de datos
           this.anomaliaService.addAnomalia(anomalia);

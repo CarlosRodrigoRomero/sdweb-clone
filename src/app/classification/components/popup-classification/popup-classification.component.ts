@@ -34,19 +34,29 @@ export class PopupClassificationComponent implements OnInit {
 
   updateAnomalia() {
     if (this.formControl.value >= 3 && this.formControl.value <= 19) {
-      if (this.formControl.value === 4) {
+      let tipo = this.formControl.value;
+      if (tipo === 4) {
         // almacenamos el tipo 4 en desuso como 17
-        this.classificationService.anomaliaSelected.tipo = 17;
-      } else {
-        this.classificationService.anomaliaSelected.tipo = this.formControl.value;
+        tipo = 17;
       }
+      this.classificationService.anomaliaSelected.tipo = tipo;
+
+      // actualizamos la anomalia de la lista local
+      this.updateAnomaliaLocal(tipo);
 
       // actualizamos el tipo en la DB
       this.anomaliaService.updateAnomalia(this.anomaliaSelected);
     }
   }
 
+  private updateAnomaliaLocal(tipo: number) {
+    this.classificationService.listaAnomalias.find((anom) => anom.id === this.anomaliaSelected.id).tipo = tipo;
+  }
+
   deleteAnomalia() {
+    // eliminamos la anomalia de la lista local
+    this.deleteAnomaliaLocal(this.anomaliaSelected.id);
+
     // eliminamos la anomalia de la DB
     this.anomaliaService.deleteAnomalia(this.anomaliaSelected);
 
@@ -54,5 +64,11 @@ export class PopupClassificationComponent implements OnInit {
 
     // ocultamos el popup
     this.classificationService.hidePopup();
+  }
+
+  private deleteAnomaliaLocal(id: string) {
+    this.classificationService.listaAnomalias = this.classificationService.listaAnomalias.filter(
+      (anom) => anom.id !== id
+    );
   }
 }

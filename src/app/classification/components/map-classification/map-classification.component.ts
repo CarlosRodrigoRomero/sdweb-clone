@@ -105,6 +105,8 @@ export class MapClassificationComponent implements OnInit {
           this.createNormModLayer();
           this.addNormModules();
 
+          // this.addZoomEvent();
+
           this.addPopupOverlay();
 
           this.addPointerOnHover();
@@ -226,6 +228,18 @@ export class MapClassificationComponent implements OnInit {
           normModsSource.addFeature(feature);
         });
       });
+  }
+
+  private addZoomEvent() {
+    this.map.on('moveend', () => {
+      const zoom = this.map.getView().getZoom();
+
+      if (zoom > this.planta.zoom + 3) {
+        this.normModLayer.setVisible(true);
+      } else {
+        this.normModLayer.setVisible(false);
+      }
+    });
   }
 
   private addPopupOverlay() {
@@ -383,7 +397,7 @@ export class MapClassificationComponent implements OnInit {
     translate.on('translateend', (e) => {
       const newCoords = (e.features.getArray()[0].getGeometry() as Polygon).getCoordinates();
 
-      // aplicamos las nuevas coordenadas y guardamos los cambios en la DB
+      // aplicamos las nuevas coordenadas del modulo y guardamos los cambios en la DB
       this.classificationService.normModAnomaliaSelected.coords = this.structuresService.coordinateToObject(newCoords);
       this.structuresService.updateNormModule(this.classificationService.normModAnomaliaSelected);
 
