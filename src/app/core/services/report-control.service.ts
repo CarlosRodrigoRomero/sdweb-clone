@@ -97,6 +97,8 @@ export class ReportControlService {
                 // tslint:disable-next-line: triple-equals
                 this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
 
+                console.log(this.allFilterableElements);
+
                 // calculamos el MAE y las CC de los informes si no tuviesen
                 this.setMaeInformesPlantaFija(anoms);
                 this.setCCInformesPlantaFija(anoms);

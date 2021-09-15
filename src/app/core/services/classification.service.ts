@@ -155,7 +155,7 @@ export class ClassificationService {
       .subscribe((locAreas) => (this.locAreasWithModule = locAreas.filter((locArea) => locArea.modulo !== undefined)));
   }
 
-  private getAnomModule(coords: Coordinate): ModuloInterface {
+  getAnomModule(coords: Coordinate): ModuloInterface {
     let modulo: ModuloInterface;
 
     if (this.locAreasWithModule.length === 1) {
@@ -176,35 +176,7 @@ export class ClassificationService {
     return modulo;
   }
 
-  // PARA CAMBIAR DATOS QUE SE QUEDARON ATRÁS
-  updateAnomalias(normModules?: NormalizedModule[]) {
-    this.listaAnomalias.forEach((anom) => {
-      // if (anom.modulo === null) {
-      //   const modulo = this.getAnomModule(anom.featureCoords[0]);
-
-      //   if (modulo !== undefined) {
-      //     anom.modulo = modulo;
-
-      //     this.anomaliaService.updateAnomaliaField(anom);
-      //   }
-      // }
-
-      let coordObj = normModules.find((nM) => nM.id === anom.id).centroid_gps;
-      if (coordObj === undefined) {
-        coordObj = normModules.find((nM) => nM.id === anom.id).coords.bottomLeft;
-      }
-
-      if (coordObj !== undefined) {
-        const coordCentroid = [coordObj.long, coordObj.lat] as Coordinate;
-        const newGloblaCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
-
-        anom.globalCoords = newGloblaCoords;
-
-        // CAMBIAR TB ESTE CAMPO EN EL SERVICIO
-        // this.anomaliaService.updateAnomaliaField(anom);
-      }
-    });
-  }
+  ////////////////////////////////////////////////////////////
 
   get informeId() {
     return this._informeId;

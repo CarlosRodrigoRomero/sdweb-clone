@@ -25,6 +25,8 @@ export class ClassificationComponent implements OnInit {
   private anomalias: Anomalia[] = [];
   private informe: InformeInterface;
   anomaliasNoData: Anomalia[] = [];
+  numAnomsNoModule = 0;
+  numAnomsNoGlobals = 0;
 
   constructor(
     private classificationService: ClassificationService,
@@ -48,6 +50,8 @@ export class ClassificationComponent implements OnInit {
 
       if (anomalias !== undefined) {
         this.anomaliasNoData = anomalias.filter((anom) => anom.gradienteNormalizado === 0 || anom.temperaturaMax === 0);
+        this.numAnomsNoModule = anomalias.filter((anom) => anom.modulo === null).length;
+        this.numAnomsNoGlobals = anomalias.filter((anom) => anom.globalCoords[0] === null).length;
       }
     });
 
@@ -118,14 +122,14 @@ export class ClassificationComponent implements OnInit {
     let perdidasTotales = 0;
     perdidas.forEach((perd) => (perdidasTotales += perd));
 
-    return (perdidasTotales / this.informe.numeroModulos);
+    return perdidasTotales / this.informe.numeroModulos;
   }
 
   private getCCInforme(): number {
     // tslint:disable-next-line: triple-equals
     const celCals = this.anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
-    return (celCals.length / this.informe.numeroModulos);
+    return celCals.length / this.informe.numeroModulos;
   }
 
   private openSnackBar() {

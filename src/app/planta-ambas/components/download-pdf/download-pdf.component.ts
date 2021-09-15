@@ -55,8 +55,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private _loadedImages = undefined;
   loadedImages$ = new BehaviorSubject<string>(this._loadedImages);
   private countSeguidores: number;
-  seguidoresInforme: Seguidor[] = [];
-  seguidoresInforme$ = new BehaviorSubject<Seguidor[]>(this.seguidoresInforme);
+  private _seguidoresInforme: Seguidor[] = [];
+  seguidoresInforme$ = new BehaviorSubject<Seguidor[]>(this._seguidoresInforme);
   private anomaliasInforme: Anomalia[] = []; // equivalente allAnomalias en fijas
   private planta: PlantaInterface;
   private informe: InformeInterface;
@@ -164,11 +164,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
           } else {
             const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
-            this.seguidoresInforme = allSeguidores.filter((seg) => seg.informeId === informeId);
-            // los ordenamos por globalCoords
-            this.seguidoresInforme = this.seguidoresInforme.sort(this.downloadReportService.sortByGlobalCoords);
-
-            this.seguidoresInforme$.next(this.seguidoresInforme);
+            // filtramos los del informe actual y los ordenamos por globals
+            this.seguidoresInforme = allSeguidores
+              .filter((seg) => seg.informeId === informeId)
+              .sort(this.downloadReportService.sortByGlobalCoords);
 
             if (this.seguidoresInforme.length > 0) {
               this.seguidoresLoaded = true;
@@ -504,9 +503,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         prefijo = this.informe.prefijo.concat('informe');
       }
 
-      pdfMake.createPdf(this.getDocDefinition()).download(prefijo, (cb) => {
+      pdfMake.createPdf(this.getDocDefinition()).download(prefijo, () => {
         this.downloadReportService.generatingPDF = false;
       });
+      this.downloadReportService.endingPDF = true;
     } else {
       // Generar imagenes
       this.countSeguidores = 0;
@@ -609,6 +609,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const pages = this.getPagesPDF();
     let anexo1 = [];
     let anexo2 = [];
+    let anexo3 = [];
     let numAnexo = 'I';
 
     if (this.filtroApartados.includes('anexo1')) {
@@ -617,6 +618,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     }
     if (this.filtroApartados.includes('anexo2')) {
       anexo2 = this.getAnexoSeguidores(numAnexo);
+      numAnexo = 'III';
+    }
+    if (this.filtroApartados.includes('anexo3')) {
+      anexo3 = this.getAnexoSeguidoresSinAnomalias(numAnexo);
     }
 
     return {
@@ -852,16 +857,18 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   private drawAllPcsInCanvas(pcs: PcInterface[], canvas, vistaPrevia: boolean = false, scale = 1, top0 = 0, left0 = 0) {
+    let contadorPcs = 0;
     if (pcs.length > 0) {
       pcs.forEach((pc, i, a) => {
-        this.drawAnomalia(pc, canvas);
+        contadorPcs++;
+        this.drawAnomalia(pc, canvas, contadorPcs);
       });
     } else {
       canvas.renderAll();
     }
   }
 
-  drawAnomalia(pc: PcInterface, canvas: any) {
+  drawAnomalia(pc: PcInterface, canvas: any, contadorPc: number) {
     const polygon = new fabric.Rect({
       left: pc.img_left,
       top: pc.img_top,
@@ -881,8 +888,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       rx: 4,
       ry: 4,
     });
+    const label = new fabric.Text(contadorPc.toString(), {
+      left: pc.img_left,
+      top: pc.img_top - 26,
+      fontSize: 20,
+      // textBackgroundColor: 'red',
+      ref: 'text',
+      selectable: false,
+      hoverCursor: 'default',
+      fill: 'white',
+    });
 
     canvas.add(polygon);
+    canvas.add(label);
     canvas.renderAll();
   }
 
@@ -2243,7 +2261,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     return allPagsAnexoLista.concat(tablaAnexo);
   }
 
-  getAnexoSeguidores(numAnexo: string) {
+  private getAnexoSeguidores(numAnexo: string) {
     const allPagsAnexo = [];
     // tslint:disable-next-line:max-line-length
     const pag1Anexo = {
@@ -2400,6 +2418,156 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                   body: [table[0]].concat(table[1]),
                 },
               },
+              {
+                width: '*',
+                text: '',
+              },
+            ],
+          },
+        ];
+
+        allPagsAnexo.push(pagAnexo);
+      }
+    }
+
+    return allPagsAnexo;
+  }
+
+  private getAnexoSeguidoresSinAnomalias(numAnexo: string) {
+    const allPagsAnexo = [];
+    // tslint:disable-next-line:max-line-length
+    const pag1Anexo = {
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
+        'Seguidores sin anomalías'
+      )}`,
+      style: 'h1',
+      alignment: 'center',
+      pageBreak: 'before',
+    };
+
+    allPagsAnexo.push(pag1Anexo);
+
+    for (const seg of this.seguidoresInforme) {
+      const table = this.getPaginaSeguidor(seg);
+
+      if (seg.anomaliasCliente.length === 0) {
+        const pagAnexo = [
+          {
+            text: `${this.translation.t('Seguidor')} ${seg.nombre}`,
+            style: 'h2',
+            alignment: 'center',
+            pageBreak: 'before',
+          },
+
+          '\n',
+
+          {
+            image: `imgSeguidorCanvas${seg.nombre}`,
+            width: this.widthSeguidor,
+            alignment: 'center',
+          },
+
+          '\n',
+
+          {
+            columns: [
+              {
+                width: '*',
+                text: '',
+              },
+
+              {
+                width: 'auto',
+                table: {
+                  body: [
+                    [
+                      {
+                        text: this.translation.t('Fecha/Hora'),
+                        style: 'tableHeaderImageData',
+                      },
+
+                      {
+                        text: this.translation.t('Irradiancia'),
+                        style: 'tableHeaderImageData',
+                      },
+
+                      {
+                        text: this.translation.t('Temp. aire'),
+                        style: 'tableHeaderImageData',
+                      },
+
+                      {
+                        text: this.translation.t('Viento'),
+                        style: 'tableHeaderImageData',
+                      },
+
+                      {
+                        text: this.translation.t('Emisividad'),
+                        style: 'tableHeaderImageData',
+                      },
+
+                      {
+                        text: this.translation.t('Temp. reflejada'),
+                        style: 'tableHeaderImageData',
+                      },
+                      {
+                        text: this.translation.t('Módulo'),
+                        style: 'tableHeaderImageData',
+                      },
+                    ],
+                    [
+                      {
+                        text: this.datePipe
+                          .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
+                          .concat(' ')
+                          .concat(this.datePipe.transform(seg.anomaliasCliente[0].datetime * 1000, 'HH:mm:ss')),
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+
+                      {
+                        text: Math.round(seg.anomaliasCliente[0].irradiancia).toString().concat(' W/m2'),
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+                      {
+                        text: Math.round((seg.anomaliasCliente[0] as PcInterface).temperaturaAire)
+                          .toString()
+                          .concat(' ºC'),
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+
+                      {
+                        text: (seg.anomaliasCliente[0] as PcInterface).viento,
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+
+                      {
+                        text: (seg.anomaliasCliente[0] as PcInterface).emisividad,
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+
+                      {
+                        text: Math.round((seg.anomaliasCliente[0] as PcInterface).temperaturaReflejada)
+                          .toString()
+                          .concat(' ºC'),
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+
+                      {
+                        text: this.writeModulo(seg.anomaliasCliente[0]),
+                        style: 'tableCellAnexo1',
+                        noWrap: true,
+                      },
+                    ],
+                  ],
+                },
+              },
+
               {
                 width: '*',
                 text: '',
@@ -2704,5 +2872,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   set loadedImages(value: string) {
     this._loadedImages = value;
     this.loadedImages$.next(value);
+  }
+
+  get seguidoresInforme() {
+    return this._seguidoresInforme;
+  }
+
+  set seguidoresInforme(value: Seguidor[]) {
+    this._seguidoresInforme = value;
+    this.seguidoresInforme$.next(value);
   }
 }

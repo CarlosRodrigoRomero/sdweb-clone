@@ -31,6 +31,7 @@ import { ThermalService } from '@core/services/thermal.service';
 import { StructuresService } from '@core/services/structures.service';
 import { ClustersService } from '@core/services/clusters.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
+import { PlantaService } from '@core/services/planta.service';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { PlantaInterface } from '@core/models/planta';
@@ -67,7 +68,8 @@ export class MapClassificationComponent implements OnInit {
     private thermalService: ThermalService,
     private structuresService: StructuresService,
     private clustersService: ClustersService,
-    private anomaliaService: AnomaliaService
+    private anomaliaService: AnomaliaService,
+    private plantaService: PlantaService
   ) {}
 
   ngOnInit(): void {
@@ -76,8 +78,8 @@ export class MapClassificationComponent implements OnInit {
     this.informeId = this.classificationService.informeId;
 
     // nos conectamos a la lista de anomalias
-    this.classificationService.listaAnomalias$.subscribe((lista) => {
-      this.listaAnomalias = lista;
+    this.classificationService.listaAnomalias$.subscribe((anomalias) => {
+      this.listaAnomalias = anomalias;
 
       if (this.normModLayer !== undefined) {
         this.normModLayer.setStyle(this.getStyleNormMod(false));
@@ -496,8 +498,33 @@ export class MapClassificationComponent implements OnInit {
       .forEach((layer) => layer.setVisible(this.thermalLayerVisibility));
   }
 
-  updateAnomalias() {
-    this.classificationService.updateAnomalias(this.normModules);
+  updateGlobalCoordsAnoms() {
+    this.classificationService.listaAnomalias.forEach((anom) => {
+      if (anom.globalCoords[0] === null) {
+        let coordObj = this.normModules.find((nM) => nM.id === anom.id).centroid_gps;
+        if (coordObj === undefined) {
+          coordObj = this.normModules.find((nM) => nM.id === anom.id).coords.bottomLeft;
+        }
+
+        if (coordObj !== undefined) {
+          const coordCentroid = [coordObj.long, coordObj.lat] as Coordinate;
+          const newGloblaCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
+
+          this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGloblaCoords);
+        }
+      }
+    });
+  }
+
+  updateModuleAnoms() {
+    this.classificationService.listaAnomalias.forEach((anom) => {
+      if (anom.modulo === null) {
+        const modulo = this.classificationService.getAnomModule(anom.featureCoords[0]);
+        if (modulo !== undefined) {
+          this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
+        }
+      }
+    });
   }
 
   setThermalPalette() {
