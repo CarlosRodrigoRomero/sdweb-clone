@@ -18,7 +18,7 @@ import { switchMap, take } from 'rxjs/operators';
 export class AreaModuloBrutoFilterComponent implements OnInit, OnDestroy {
   min = 0;
   max = 10;
-  step = 1;
+  step = 0.01;
   minValue = 0;
   maxValue = 10;
   multiplier = 2.5;
