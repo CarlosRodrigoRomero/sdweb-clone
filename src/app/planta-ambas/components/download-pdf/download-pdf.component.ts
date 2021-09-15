@@ -644,7 +644,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         }
       },
 
-      content: pages.concat(anexo1).concat(anexo2),
+      content: pages.concat(anexo1).concat(anexo2).concat(anexo3),
 
       images: imagesSeguidores,
 
@@ -2520,18 +2520,18 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                         text: this.datePipe
                           .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
                           .concat(' ')
-                          .concat(this.datePipe.transform(seg.anomaliasCliente[0].datetime * 1000, 'HH:mm:ss')),
+                          .concat(this.datePipe.transform(seg.anomalias[0].datetime * 1000, 'HH:mm:ss')),
                         style: 'tableCellAnexo1',
                         noWrap: true,
                       },
 
                       {
-                        text: Math.round(seg.anomaliasCliente[0].irradiancia).toString().concat(' W/m2'),
+                        text: Math.round(seg.anomalias[0].irradiancia).toString().concat(' W/m2'),
                         style: 'tableCellAnexo1',
                         noWrap: true,
                       },
                       {
-                        text: Math.round((seg.anomaliasCliente[0] as PcInterface).temperaturaAire)
+                        text: Math.round((seg.anomalias[0] as PcInterface).temperaturaAire)
                           .toString()
                           .concat(' ºC'),
                         style: 'tableCellAnexo1',
@@ -2539,19 +2539,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                       },
 
                       {
-                        text: (seg.anomaliasCliente[0] as PcInterface).viento,
+                        text: (seg.anomalias[0] as PcInterface).viento,
                         style: 'tableCellAnexo1',
                         noWrap: true,
                       },
 
                       {
-                        text: (seg.anomaliasCliente[0] as PcInterface).emisividad,
+                        text: (seg.anomalias[0] as PcInterface).emisividad,
                         style: 'tableCellAnexo1',
                         noWrap: true,
                       },
 
                       {
-                        text: Math.round((seg.anomaliasCliente[0] as PcInterface).temperaturaReflejada)
+                        text: Math.round((seg.anomalias[0] as PcInterface).temperaturaReflejada)
                           .toString()
                           .concat(' ºC'),
                         style: 'tableCellAnexo1',
@@ -2559,7 +2559,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                       },
 
                       {
-                        text: this.writeModulo(seg.anomaliasCliente[0]),
+                        text: this.writeModulo(seg.anomalias[0]),
                         style: 'tableCellAnexo1',
                         noWrap: true,
                       },
