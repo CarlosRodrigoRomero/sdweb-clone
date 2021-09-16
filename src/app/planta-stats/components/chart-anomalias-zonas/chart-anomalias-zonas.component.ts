@@ -116,12 +116,12 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
   }
 
   private _calculateChartData(anomalias: Anomalia[]): number[] {
-    // comprobamos y el nombre de las zonas es un numero
-    if (!isNaN(parseFloat(this.zones[0].globalCoords[0]))) {
-      this.zones = this.zones.sort((a, b) => parseFloat(a.globalCoords[0]) - parseFloat(b.globalCoords[0]));
-    }
+    // ordenamos las zonas por nombre
+    this.zones = this.reportControlService.sortLocAreas(this.zones);
+
     const result = Array<number>();
     this.zones.forEach((zone) => {
+      // tslint:disable-next-line: triple-equals
       const filtered = anomalias.filter((anom) => anom.globalCoords[0] == zone.globalCoords[0]);
 
       result.push(this._getMAEAnomalias(filtered));

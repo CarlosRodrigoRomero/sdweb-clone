@@ -17,6 +17,7 @@ import { FilterableElement } from '@core/models/filterableInterface';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
+import { LocationAreaInterface } from '@core/models/location';
 
 @Injectable({
   providedIn: 'root',
@@ -432,6 +433,29 @@ export class ReportControlService {
         this.informeService.updateInforme(informe);
       }
     });
+  }
+
+  public sortLocAreas(locAreas: LocationAreaInterface[]) {
+    // comprobamos si el nombre de las zonas es un numero
+    if (!isNaN(parseFloat(locAreas[0].globalCoords[0]))) {
+      locAreas = locAreas.sort((a, b) => parseFloat(a.globalCoords[0]) - parseFloat(b.globalCoords[0]));
+    } else {
+      // si no es un numero buscamos si tiene alguno incluido para ordenarlo
+      locAreas.sort((a, b) => {
+        let numsA = '';
+        a.globalCoords[0].match(/\d+/g).forEach((element) => {
+          numsA += element;
+        });
+        let numsB = '';
+        b.globalCoords[0].match(/\d+/g).forEach((element) => {
+          numsB += element;
+        });
+
+        return Number(numsA) - Number(numsB);
+      });
+    }
+
+    return locAreas;
   }
 
   resetService() {
