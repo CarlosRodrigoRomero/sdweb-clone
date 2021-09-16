@@ -199,7 +199,7 @@ export class BarChartComponent implements OnInit {
             borderColor: '#000',
             fillColor: '#2478ff',
             label: {
-              text: 'desviación std.',
+              text: 'desviación media',
             },
           },
         ],

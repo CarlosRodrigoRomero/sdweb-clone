@@ -117,7 +117,7 @@ export class PortfolioControlService {
             });
 
             this.maeMedio = this.average(this.maePlantas);
-            this.maeSigma = this.standardDeviation(this.maePlantas);
+            this.maeSigma = this.DAM(this.maePlantas);
             // this.maeSigma = this.standardDeviation(this.maePlantas) / 3; // DEMO
 
             initService(true);
@@ -148,6 +148,18 @@ export class PortfolioControlService {
 
     const stdDev = Math.sqrt(avgSquareDiff);
     return stdDev;
+  }
+
+  private DAM(values: number[]): number {
+    const average = this.average(values);
+
+    // desviacion media absoluta, para que no afectanten los extremos a la desviacion
+    let sumatorioDesviaciones = 0;
+    values.forEach((value) => {
+      sumatorioDesviaciones = sumatorioDesviaciones + Math.abs(value - average);
+    });
+
+    return sumatorioDesviaciones / values.length;
   }
 
   resetService() {
