@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
@@ -14,10 +14,9 @@ import { ReportControlService } from '@core/services/report-control.service';
   templateUrl: './share-report.component.html',
   styleUrls: ['./share-report.component.css'],
 })
-export class ShareReportComponent implements OnInit {
+export class ShareReportComponent {
   items: Observable<any[]>;
   public filterableCheck = false;
-  private selectedInformeId: string;
 
   constructor(
     private shareReportService: ShareReportService,
@@ -26,11 +25,12 @@ export class ShareReportComponent implements OnInit {
     private reportControlService: ReportControlService
   ) {}
 
-  ngOnInit(): void {}
+  copyLink() {
+    this.clipboardService.copy(this.getShareLink());
+    this.openSnackBar();
+  }
 
   getShareLink(): string {
-    this.selectedInformeId = this.reportControlService.selectedInformeId;
-
     // primero guarda los params en la DB
     this.shareReportService.setSelectedInformeId(this.reportControlService.selectedInformeId);
     this.shareReportService.saveParams();
@@ -62,11 +62,6 @@ export class ShareReportComponent implements OnInit {
     }
 
     return url;
-  }
-
-  copyLink() {
-    this.clipboardService.copy(this.getShareLink());
-    this.openSnackBar();
   }
 
   stopPropagation(event) {

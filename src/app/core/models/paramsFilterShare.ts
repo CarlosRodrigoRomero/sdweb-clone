@@ -15,4 +15,5 @@ export interface ParamsFilterShare {
   modulo?: string;
   tipo?: number[];
   zona?: string;
+  segsNoAnoms?: boolean;
 }

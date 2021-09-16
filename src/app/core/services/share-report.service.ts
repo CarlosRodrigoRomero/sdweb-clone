@@ -15,6 +15,7 @@ import { ModuloPcFilter } from '@core/models/moduloFilter';
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { ZonaFilter } from '@core/models/zonaFilter';
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
+import { SegsNoAnomsFilter } from '@core/models/segsNoAmosFilter';
 
 @Injectable({
   providedIn: 'root',
@@ -101,6 +102,9 @@ export class ShareReportService {
         break;
       case 'zona':
         this.params.zona = (filter as ZonaFilter).zona;
+        break;
+      case 'segsNoAnoms':
+        this.params.segsNoAnoms = (filter as SegsNoAnomsFilter).value;
         break;
     }
   }
@@ -260,6 +264,12 @@ export class ShareReportService {
           if (this.params.zona !== null) {
             const zonaFilter = new ZonaFilter('', 'zona', this.params.zona);
             filters.push(zonaFilter);
+          }
+        }
+        if (Object.keys(this.params).includes('segsNoAnoms')) {
+          if (this.params.segsNoAnoms !== null) {
+            const segsNoAnomsFilter = new SegsNoAnomsFilter('segsNoAnoms', 'segsNoAnoms', this.params.segsNoAnoms);
+            filters.push(segsNoAnomsFilter);
           }
         }
         filters$.next(filters);

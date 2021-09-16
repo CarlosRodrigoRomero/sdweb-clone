@@ -13,15 +13,13 @@ import { FilterInterface } from '@core/models/filter';
 })
 export class FilterService {
   private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad'];
-  private otherFilters = ['confianza', 'aspectRatio', 'areaM', 'segsNoAnoms'];
+  private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   public filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
   private _filteredElements: FilterableElement[] = [];
   public filteredElements$ = new BehaviorSubject<FilterableElement[]>(this.filteredElements);
   private _allFiltrableElements: FilterableElement[] = [];
   public allFiltrableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFiltrableElements);
-  private _initialized = false;
-  private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _filteredElementsWithoutFilterTipo: FilterableElement[] = [];
   public filteredElementsWithoutFilterTipo$ = new BehaviorSubject<FilterableElement[]>(
     this._filteredElementsWithoutFilterTipo
@@ -213,6 +211,8 @@ export class FilterService {
 
     this.applyFilters();
   }
+
+  /////////////////////////////////////////////////
 
   get allFiltrableElements() {
     return this._allFiltrableElements;

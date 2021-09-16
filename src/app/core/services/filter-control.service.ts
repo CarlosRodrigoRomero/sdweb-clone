@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, combineLatest } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 import { OlMapService } from '@core/services/ol-map.service';
 
@@ -52,10 +53,12 @@ export class FilterControlService {
   private _activeDeleteArea: boolean = false;
   public activeDeleteArea$ = new BehaviorSubject<boolean>(this._activeDeleteArea);
 
+  private _segsNoAnoms: boolean = true;
+  public segsNoAnoms$ = new BehaviorSubject<boolean>(this._segsNoAnoms);
+
   constructor(private olMapService: OlMapService) {}
 
   setInitParams(params: ParamsFilterShare) {
-    // console.log(params);
     if (params.minPerdidas !== undefined && params.minPerdidas !== null) {
       this.minPerdidas = params.minPerdidas;
     }
@@ -89,6 +92,9 @@ export class FilterControlService {
           this.tiposSelected.push(false);
         }
       });
+    }
+    if (params.segsNoAnoms !== undefined && params.segsNoAnoms !== null) {
+      this.segsNoAnoms = params.segsNoAnoms;
     }
   }
 
@@ -127,10 +133,17 @@ export class FilterControlService {
     // elimina el poligono del mapa
     this.olMapService.deleteAllDrawLayers();
     // cancelamos interacción draw
-    combineLatest([this.olMapService.map$, this.olMapService.draw$]).subscribe(([map, draw]) => {
-      map.removeInteraction(draw);
-    });
+    combineLatest([this.olMapService.map$, this.olMapService.draw$])
+      .pipe(take(1))
+      .subscribe(([map, draw]) => {
+        map.removeInteraction(draw);
+      });
+
+    // SEGUIDORES SIN ANOMALIAS
+    this.segsNoAnoms = true;
   }
+
+  //////////////////////////////////////////////////
 
   /* PERDIDAS */
   get minPerdidas() {
@@ -255,5 +268,15 @@ export class FilterControlService {
   set activeDeleteArea(value: boolean) {
     this._activeDeleteArea = value;
     this.activeDeleteArea$.next(value);
+  }
+
+  /* SEGUIDORES SIN ANOMALIAS */
+  get segsNoAnoms() {
+    return this._segsNoAnoms;
+  }
+
+  set segsNoAnoms(value: boolean) {
+    this._segsNoAnoms = value;
+    this.segsNoAnoms$.next(value);
   }
 }
