@@ -1,5 +1,6 @@
 import { FilterInterface } from './filter';
 import { FilterableElement } from './filterableInterface';
+import { Seguidor } from './seguidor';
 
 export class ClaseFilter implements FilterInterface {
   id: string;
@@ -13,8 +14,15 @@ export class ClaseFilter implements FilterInterface {
   }
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
-    // tslint:disable-next-line: triple-equals
-    return elems.filter((elem) => elem.clase == this.clase);
+    return elems.filter((elem) => {
+      if (elem.hasOwnProperty('anomaliasCliente')) {
+        // tslint:disable-next-line: triple-equals
+        return (elem as Seguidor).anomaliasCliente.filter((anom) => anom.clase == this.clase).length > 0;
+      } else {
+        // tslint:disable-next-line: triple-equals
+        return elem.clase == this.clase;
+      }
+    });
   }
   unapplyFilter(elems: FilterableElement[]): FilterableElement[] {
     return null;

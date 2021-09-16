@@ -82,7 +82,7 @@ export class PerdidasFilterComponent implements OnInit, OnDestroy {
     this.filterControlService.minPerdidas = lowValue;
     this.filterControlService.maxPerdidas = highValue;
 
-    if (this.rangoMinPerdidas === 0 && this.rangoMaxPerdidas === 100) {
+    if (this.rangoMinPerdidas === this.minPerdidas && this.rangoMaxPerdidas === this.maxPerdidas) {
       // si se selecciona el mínimo desactivamos el filtro ...
       this.filterService.deleteFilter(this.filtroPerdidas);
     } else {

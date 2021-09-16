@@ -144,16 +144,14 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
         this.filterControlService.selectedTipoLabels = [event.source.name];
       }
     } else {
-      this.subscriptions.add(
-        this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
-          filters
-            .filter((filter) => filter.type === 'tipo')
-            .forEach((filter) => {
-              if (filter.id === event.source.id) {
-                this.filterService.deleteFilter(filter);
-              }
-            })
-        )
+      this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
+        filters
+          .filter((filter) => filter.type === 'tipo')
+          .forEach((filter) => {
+            if (filter.id === event.source.id) {
+              this.filterService.deleteFilter(filter);
+            }
+          })
       );
 
       this.filterControlService.tiposSelected[parseInt(event.source.id.replace('tipo_', '')) - 1] = false;

@@ -1,5 +1,6 @@
 import { FilterInterface } from './filter';
 import { FilterableElement } from './filterableInterface';
+import { Seguidor } from './seguidor';
 
 export class CriticidadFilter implements FilterInterface {
   id: string;
@@ -13,8 +14,15 @@ export class CriticidadFilter implements FilterInterface {
   }
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
-    // tslint:disable-next-line: triple-equals
-    return elems.filter((elem) => elem.criticidad == this.criticidad);
+    return elems.filter((elem) => {
+      if (elem.hasOwnProperty('anomaliasCliente')) {
+        // tslint:disable-next-line: triple-equals
+        return (elem as Seguidor).anomaliasCliente.filter((anom) => anom.criticidad == this.criticidad).length > 0;
+      } else {
+        // tslint:disable-next-line: triple-equals
+        return elem.criticidad == this.criticidad;
+      }
+    });
   }
   unapplyFilter(elems: FilterableElement[]): FilterableElement[] {
     return null;

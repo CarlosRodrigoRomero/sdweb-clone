@@ -13,7 +13,7 @@ import { FilterInterface } from '@core/models/filter';
 })
 export class FilterService {
   private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad'];
-  private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
+  private otherFilters = ['confianza', 'aspectRatio', 'areaM', 'segsNoAnoms'];
   public filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
   private _filteredElements: FilterableElement[] = [];
