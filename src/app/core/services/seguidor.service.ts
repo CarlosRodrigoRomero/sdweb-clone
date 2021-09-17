@@ -67,10 +67,6 @@ export class SeguidorService {
   }
 
   getSeguidores$(informeId: string, plantaId: string, tipo?: 'anomalias' | 'pcs'): Observable<Seguidor[]> {
-    // Obtener todas las locArea de la planta
-    const locAreaList$ = this.plantaService.getLocationsArea(plantaId);
-    const anomaliaList$ = this.anomaliaService.getAnomalias$(informeId, tipo);
-
     // obtenemos todas las anomalias y las locAreas
     return this.anomaliaService.getAnomalias$(informeId, tipo).pipe(
       take(1),
@@ -78,10 +74,17 @@ export class SeguidorService {
         const seguidores: Seguidor[] = [];
 
         if (anomaliaList.length > 0) {
+          // ordenamos las anomalias por zonas
+          const sortedAnoms = this.sortAnomList(anomaliaList);
+
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
           let count = 0;
           this.locAreaSeguidores.forEach((locArea) => {
-            const anomaliasSeguidor = anomaliaList.filter(
+            const anomsLargestLocArea = sortedAnoms[0].find(
+              (array) => (array[0] as Anomalia).globalCoords[0] === locArea.globalCoords[0]
+            );
+
+            const anomaliasSeguidor = anomsLargestLocArea.filter(
               (anomalia) =>
                 anomalia.globalCoords.slice(0, this.numGlobalCoords).toString() ===
                 locArea.globalCoords.slice(0, this.numGlobalCoords).toString()
@@ -180,6 +183,22 @@ export class SeguidorService {
         });
       }
     });
+  }
+
+  private sortAnomList(anoms: Anomalia[]): any[][] {
+    const largestLocAreas = this.locAreas.filter(
+      (locArea) =>
+        locArea.globalCoords[0] !== undefined && locArea.globalCoords[0] !== null && locArea.globalCoords[0] !== ''
+    );
+
+    const sortAnoms = [[]];
+    largestLocAreas.forEach((locArea) => {
+      const anomsLocArea = anoms.filter((anom) => anom.globalCoords[0] === locArea.globalCoords[0]);
+
+      sortAnoms[0].push(anomsLocArea);
+    });
+
+    return sortAnoms;
   }
 
   private getSeguidorName(seguidor: Seguidor): string {

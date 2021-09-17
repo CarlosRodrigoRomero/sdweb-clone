@@ -72,9 +72,9 @@ export class DownloadReportService {
       planta.etiquetasLocalXY[altura][anomalia.localX - 1] !== undefined
     ) {
       return planta.etiquetasLocalXY[altura][anomalia.localX - 1];
+    } else {
+      return (altura + '/' + anomalia.localX).toString();
     }
-
-    return (altura + '/' + anomalia.localX).toString();
   }
 
   getAltura(planta: PlantaInterface, localY: number) {
