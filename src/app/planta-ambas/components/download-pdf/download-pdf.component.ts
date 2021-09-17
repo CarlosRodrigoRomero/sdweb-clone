@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 
 import { MatTableDataSource } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
@@ -18,6 +19,8 @@ import { DownloadReportService } from '@core/services/download-report.service';
 import { GLOBAL } from '@core/services/global';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { PlantaService } from '@core/services/planta.service';
+
+import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
@@ -122,7 +125,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     private downloadReportService: DownloadReportService,
     private storage: AngularFireStorage,
     private plantaService: PlantaService,
-    private anomaliaService: AnomaliaService
+    private anomaliaService: AnomaliaService,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -488,6 +492,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       null,
       { crossOrigin: 'anonymous' }
     );
+  }
+
+  public selectFilteredPDF() {
+    const dialogRef = this.dialog.open(DialogFilteredReportComponent);
+
+    dialogRef.afterClosed().subscribe((response) => {
+      console.log(response);
+    });
   }
 
   public downloadPDF() {
