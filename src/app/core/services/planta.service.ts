@@ -184,6 +184,16 @@ export class PlantaService {
     return LocAreaDoc.set(locArea);
   }
 
+  updateLocationAreaField(locArea: LocationAreaInterface, field: string, value: any) {
+    const tempLocArea = {};
+    tempLocArea[field] = value;
+
+    this.afs
+      .doc(`plantas/${locArea.plantaId}/locationAreas/${locArea.id}`)
+      .update(tempLocArea)
+      .then(() => console.log('LocArea actualizada correctamente!'));
+  }
+
   delLocationArea(locationArea: LocationAreaInterface) {
     this.afs.collection('plantas').doc(locationArea.plantaId).collection('locationAreas').doc(locationArea.id).delete();
   }
@@ -196,6 +206,11 @@ export class PlantaService {
         actions.map((a) => {
           const data = a.payload.doc.data() as LocationAreaInterface;
           data.id = a.payload.doc.id;
+
+          // si ya tienes las globals completas se las asignamos
+          if (data.completeGlobalCoords !== undefined) {
+            data.globalCoords = data.completeGlobalCoords;
+          }
 
           // generamos las globalCoords en caso de que no tenga
           if (data.globalCoords === undefined) {

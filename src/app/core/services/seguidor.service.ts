@@ -26,7 +26,9 @@ import { PcInterface } from '@core/models/pc';
 export class SeguidorService {
   private planta: PlantaInterface;
   numGlobalCoords: number;
-  private _locAreas: LocationAreaInterface[] = [];
+  public locAreas: LocationAreaInterface[] = [];
+  private locAreaSeguidores: LocationAreaInterface[] = [];
+  private locAreaModulos: LocationAreaInterface[] = [];
 
   constructor(
     private informeService: InformeService,
@@ -37,20 +39,31 @@ export class SeguidorService {
   ) {}
 
   getSeguidoresPlanta$(plantaId: string): Observable<Seguidor[]> {
-    return this.informeService.getInformesDePlanta(plantaId).pipe(
-      take(1),
-      switchMap((informes) => {
-        this.plantaService.getPlanta(plantaId).subscribe((planta) => (this.planta = planta));
-        const anomaliaObsList = Array<Observable<Seguidor[]>>();
-        informes.forEach((informe) => {
-          // traemos ambos tipos de anomalias por si hay pcs antiguos
-          anomaliaObsList.push(this.getSeguidores$(informe.id, plantaId, 'pcs'));
-          anomaliaObsList.push(this.getSeguidores$(informe.id, plantaId, 'anomalias'));
-        });
-        return combineLatest(anomaliaObsList);
-      }),
-      map((arr) => arr.flat())
-    );
+    return this.plantaService
+      .getPlanta(plantaId)
+      .pipe(
+        take(1),
+        switchMap((planta) => {
+          this.planta = planta;
+
+          this.getDifferentLocAreas(plantaId);
+
+          return this.informeService.getInformesDePlanta(plantaId);
+        })
+      )
+      .pipe(
+        take(1),
+        switchMap((informes) => {
+          const anomaliaObsList = Array<Observable<Seguidor[]>>();
+          informes.forEach((informe) => {
+            // traemos ambos tipos de anomalias por si hay pcs antiguos
+            anomaliaObsList.push(this.getSeguidores$(informe.id, plantaId, 'pcs'));
+            anomaliaObsList.push(this.getSeguidores$(informe.id, plantaId, 'anomalias'));
+          });
+          return combineLatest(anomaliaObsList);
+        }),
+        map((arr) => arr.flat())
+      );
   }
 
   getSeguidores$(informeId: string, plantaId: string, tipo?: 'anomalias' | 'pcs'): Observable<Seguidor[]> {
@@ -59,60 +72,15 @@ export class SeguidorService {
     const anomaliaList$ = this.anomaliaService.getAnomalias$(informeId, tipo);
 
     // obtenemos todas las anomalias y las locAreas
-    return combineLatest([locAreaList$, anomaliaList$]).pipe(
+    return this.anomaliaService.getAnomalias$(informeId, tipo).pipe(
       take(1),
-      map(([locAreaList, anomaliaList]) => {
+      map((anomaliaList) => {
         const seguidores: Seguidor[] = [];
 
         if (anomaliaList.length > 0) {
-          // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
-          const coordsLength = locAreaList[0].globalCoords.length;
-
-          let indiceSeleccionado;
-
-          for (let index = coordsLength - 1; index >= 0; index--) {
-            const notNullLocAreas = locAreaList.filter(
-              (locArea) =>
-                locArea.globalCoords[index] !== undefined &&
-                locArea.globalCoords[index] !== null &&
-                locArea.globalCoords[index] !== ''
-            );
-
-            if (notNullLocAreas.length > 0) {
-              indiceSeleccionado = index;
-
-              this.numGlobalCoords = indiceSeleccionado + 1;
-
-              break;
-            }
-          }
-
-          // filtramos las areas seleccionadas para los seguidores
-          const locAreaSeguidores = locAreaList.filter(
-            (locArea) =>
-              locArea.globalCoords[indiceSeleccionado] !== null &&
-              locArea.globalCoords[indiceSeleccionado] !== undefined &&
-              locArea.globalCoords[indiceSeleccionado] !== ''
-          );
-
-          // obtenemos las areas descartando las que no tienen globals, que son las de los modulos
-          const locAreaNoSeguidores = locAreaList
-            .filter((locArea) => !locAreaSeguidores.includes(locArea))
-            .filter((locArea) => locArea.globalCoords.toString() !== ',' && locArea.globalCoords.toString() !== '');
-
-          // asignamos las areas de la planta
-          this.locAreas = locAreaNoSeguidores;
-
-          // obtenemos las globalCoords completas de cada seguidor si hay areas mayores
-          if (locAreaNoSeguidores.length > 0) {
-            locAreaSeguidores.forEach((locArea) => {
-              locArea.globalCoords = this.getCompleteGlobalCoords(locAreaNoSeguidores, locArea);
-            });
-          }
-
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
           let count = 0;
-          locAreaSeguidores.forEach((locArea) => {
+          this.locAreaSeguidores.forEach((locArea) => {
             const anomaliasSeguidor = anomaliaList.filter(
               (anomalia) =>
                 anomalia.globalCoords.slice(0, this.numGlobalCoords).toString() ===
@@ -121,8 +89,7 @@ export class SeguidorService {
 
             // si no tiene anomalias no creamos el seguidor
             if (anomaliasSeguidor.length > 0) {
-              const zona = locAreaList
-                .filter((locA) => locA.modulo !== undefined)
+              const zona = this.locAreaModulos
                 // tslint:disable-next-line: triple-equals
                 .find((locA) => locA.globalCoords[0] == locArea.globalCoords[0]);
 
@@ -146,7 +113,6 @@ export class SeguidorService {
                 'seguidor_' + count++ + '_' + informeId
               );
               seguidor.nombre = this.getSeguidorName(seguidor);
-              seguidor.imageName = '1A.1.10.2.jpg';
               // seguidor.imageName = this.getImageName(seguidor, informe);
 
               seguidores.push(seguidor);
@@ -157,6 +123,63 @@ export class SeguidorService {
         return seguidores;
       })
     );
+  }
+
+  private getDifferentLocAreas(plantaId: string) {
+    this.plantaService.getLocationsArea(plantaId).subscribe((locAreaList) => {
+      // guardamos las zonas con módulos
+      this.locAreaModulos = locAreaList.filter((locArea) => locArea.modulo !== undefined);
+
+      // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
+      const coordsLength = locAreaList[0].globalCoords.length;
+
+      let indiceSeleccionado;
+
+      for (let index = coordsLength - 1; index >= 0; index--) {
+        const notNullLocAreas = locAreaList.filter(
+          (locArea) =>
+            locArea.globalCoords[index] !== undefined &&
+            locArea.globalCoords[index] !== null &&
+            locArea.globalCoords[index] !== ''
+        );
+
+        if (notNullLocAreas.length > 0) {
+          indiceSeleccionado = index;
+
+          this.numGlobalCoords = indiceSeleccionado + 1;
+
+          break;
+        }
+      }
+
+      // filtramos las areas seleccionadas para los seguidores
+      this.locAreaSeguidores = locAreaList.filter(
+        (locArea) =>
+          locArea.globalCoords[indiceSeleccionado] !== null &&
+          locArea.globalCoords[indiceSeleccionado] !== undefined &&
+          locArea.globalCoords[indiceSeleccionado] !== ''
+      );
+
+      // obtenemos las areas descartando las que no tienen globals, que son las de los modulos
+      const locAreaNoSeguidores = locAreaList
+        .filter((locArea) => !this.locAreaSeguidores.includes(locArea))
+        .filter((locArea) => locArea.globalCoords.toString() !== ',' && locArea.globalCoords.toString() !== '');
+
+      // asignamos las areas de la planta
+      this.locAreas = locAreaNoSeguidores;
+
+      // obtenemos las globalCoords completas de cada seguidor si hay areas mayores
+      if (locAreaNoSeguidores.length > 0) {
+        this.locAreaSeguidores.forEach((locArea) => {
+          if (locArea.completeGlobalCoords === undefined) {
+            locArea.globalCoords = this.getCompleteGlobalCoords(locAreaNoSeguidores, locArea);
+
+            // almacenamos las globalsCoords completas en la DB
+            this.plantaService.updateLocationAreaField(locArea, 'completeGlobalCoords', locArea.globalCoords);
+          }
+        });
+      }
+    });
   }
 
   private getSeguidorName(seguidor: Seguidor): string {
@@ -184,7 +207,7 @@ export class SeguidorService {
   ): string[] {
     const globalCoordsSeguidor: string[] = locAreaSeguidor.globalCoords;
 
-    locAreasNoSeguidores.forEach((locAreaNoSeg, index) => {
+    locAreasNoSeguidores.forEach((locAreaNoSeg) => {
       // convertimos el punto y el poligono en array
       const point = [locAreaSeguidor.path[0].lat, locAreaSeguidor.path[0].lng];
       const polygon = locAreaNoSeg.path.map((coord) => [coord.lat, coord.lng]);
@@ -205,7 +228,9 @@ export class SeguidorService {
       }
     });
 
-    return globalCoordsSeguidor;
+    // globalCoordsSeguidor.filter((coord) => coord !== null);
+
+    return globalCoordsSeguidor.filter((coord) => coord !== null);
   }
 
   private getImageName(seguidor: Seguidor, informe: InformeInterface): string {
@@ -255,13 +280,5 @@ export class SeguidorService {
     } else {
       return GLOBAL.colores_grad[2];
     }
-  }
-
-  get locAreas() {
-    return this._locAreas;
-  }
-
-  set locAreas(value: LocationAreaInterface[]) {
-    this._locAreas = value;
   }
 }

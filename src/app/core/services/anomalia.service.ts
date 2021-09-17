@@ -218,7 +218,6 @@ export class AnomaliaService {
     return anomaliaDoc.set(anomaliaObj);
   }
 
-  // // PARA CAMBIAR DATOS QUE SE QUEDARON ATRÁS
   updateAnomaliaField(id: string, field: string, value: any) {
     const anomalia = {};
     anomalia[field] = value;
