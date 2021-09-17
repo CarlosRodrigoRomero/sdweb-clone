@@ -1,6 +1,6 @@
 <h3 mat-dialog-title>Descarga PDF</h3>
 <mat-dialog-content> ¿Desea descargar el informe completo o con los filtros activos? </mat-dialog-content>
 <mat-dialog-actions class="btns" align="center">
-  <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Completo</button>
-  <button mat-button mat-dialog-close>Filtrado</button>
+  <button mat-stroked-button [mat-dialog-close]="true" cdkFocusInitial (click)="selectFiltered(false)">Completo</button>
+  <button mat-stroked-button mat-dialog-close (click)="selectFiltered(true)">Filtrado</button>
 </mat-dialog-actions>

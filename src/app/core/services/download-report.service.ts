@@ -15,6 +15,10 @@ export class DownloadReportService {
   endingPDF$ = new BehaviorSubject<boolean>(this._endingPDF);
   private _progressBarValue = 0;
   progressBarValue$ = new BehaviorSubject<number>(this._progressBarValue);
+  private _filteredPDF: boolean = undefined;
+  filteredPDF$ = new BehaviorSubject<boolean>(this._filteredPDF);
+  private _downloadPDF = false;
+  downloadPDF$ = new BehaviorSubject<boolean>(this._downloadPDF);
 
   constructor() {}
 
@@ -113,5 +117,23 @@ export class DownloadReportService {
   set progressBarValue(value: number) {
     this._progressBarValue = value;
     this.progressBarValue$.next(value);
+  }
+
+  get filteredPDF() {
+    return this._filteredPDF;
+  }
+
+  set filteredPDF(value: boolean) {
+    this._filteredPDF = value;
+    this.filteredPDF$.next(value);
+  }
+
+  get downloadPDF() {
+    return this._endingPDF;
+  }
+
+  set downloadPDF(value: boolean) {
+    this._downloadPDF = value;
+    this.downloadPDF$.next(value);
   }
 }

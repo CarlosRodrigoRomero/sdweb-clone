@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
 import pdfMake from 'pdfmake/build/pdfmake.js';
@@ -19,7 +19,7 @@ import { DownloadReportService } from '@core/services/download-report.service';
 import { GLOBAL } from '@core/services/global';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { PlantaService } from '@core/services/planta.service';
-
+import { FilterService } from '@core/services/filter.service';
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
 
 import { Seguidor } from '@core/models/seguidor';
@@ -126,7 +126,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     private storage: AngularFireStorage,
     private plantaService: PlantaService,
     private anomaliaService: AnomaliaService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
@@ -136,6 +137,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.numClases = Array(GLOBAL.labels_clase.length)
       .fill(0)
       .map((_, i) => i + 1);
+
+    // this.downloadReportService.downloadPDF$.subscribe((value) => {
+    //   if (value) {
+    //     this.downloadPDF();
+    //   }
+    // });
 
     this.subscriptions.add(
       this.plantaService
@@ -158,31 +165,64 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               .fill(0)
               .map((_, i) => i + 1);
 
-            return this.reportControlService.selectedInformeId$;
+            return combineLatest([
+              this.reportControlService.selectedInformeId$,
+              this.downloadReportService.filteredPDF$,
+            ]);
           })
         )
-        .subscribe((informeId) => {
+        .subscribe(([informeId, filteredPDF]) => {
           this.informe = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
-          if (this.reportControlService.plantaFija) {
-            this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
-          } else {
-            const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
-            // filtramos los del informe actual y los ordenamos por globals
-            this.seguidoresInforme = allSeguidores
-              .filter((seg) => seg.informeId === informeId)
-              .sort(this.downloadReportService.sortByGlobalCoords);
+          if (filteredPDF !== undefined) {
+            if (filteredPDF) {
+              // utilizamos elementos filtrados para crear el informe
+              if (this.reportControlService.plantaFija) {
+                this.anomaliasInforme = this.filterService.filteredElements as Anomalia[];
+              } else {
+                const allSeguidores = this.filterService.filteredElements as Seguidor[];
+                // filtramos los del informe actual y los ordenamos por globals
+                this.seguidoresInforme = allSeguidores
+                  .filter((seg) => seg.informeId === informeId)
+                  .sort(this.downloadReportService.sortByGlobalCoords);
 
-            if (this.seguidoresInforme.length > 0) {
-              this.seguidoresLoaded = true;
-            }
+                if (this.seguidoresInforme.length > 0) {
+                  this.seguidoresLoaded = true;
+                }
 
-            this.seguidoresInforme.forEach((seguidor) => {
-              const anomaliasSeguidor = seguidor.anomaliasCliente;
-              if (anomaliasSeguidor.length > 0) {
-                this.anomaliasInforme.push(...anomaliasSeguidor);
+                this.seguidoresInforme.forEach((seguidor) => {
+                  const anomaliasSeguidor = seguidor.anomaliasCliente;
+                  if (anomaliasSeguidor.length > 0) {
+                    this.anomaliasInforme.push(...anomaliasSeguidor);
+                  }
+                });
               }
-            });
+
+              this.downloadPDF();
+            } else {
+              if (this.reportControlService.plantaFija) {
+                this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
+              } else {
+                const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
+                // filtramos los del informe actual y los ordenamos por globals
+                this.seguidoresInforme = allSeguidores
+                  .filter((seg) => seg.informeId === informeId)
+                  .sort(this.downloadReportService.sortByGlobalCoords);
+
+                if (this.seguidoresInforme.length > 0) {
+                  this.seguidoresLoaded = true;
+                }
+
+                this.seguidoresInforme.forEach((seguidor) => {
+                  const anomaliasSeguidor = seguidor.anomaliasCliente;
+                  if (anomaliasSeguidor.length > 0) {
+                    this.anomaliasInforme.push(...anomaliasSeguidor);
+                  }
+                });
+              }
+
+              this.downloadPDF();
+            }
           }
 
           // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
@@ -497,9 +537,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   public selectFilteredPDF() {
     const dialogRef = this.dialog.open(DialogFilteredReportComponent);
 
-    dialogRef.afterClosed().subscribe((response) => {
-      console.log(response);
-    });
+    dialogRef.afterClosed().subscribe(() => (this.downloadReportService.filteredPDF = undefined));
   }
 
   public downloadPDF() {
