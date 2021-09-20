@@ -40,6 +40,14 @@ app-thermal-slider {
   bottom: 250px;
 }
 
+.btn-anom-disconnected {
+  position: absolute;
+  left: 10px;
+  bottom: 250px;
+  color: red;
+  font-size: large;
+}
+
 .btns-anom-no-data {
   position: absolute;
   display: grid;

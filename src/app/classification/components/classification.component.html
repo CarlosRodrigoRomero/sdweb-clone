@@ -3,8 +3,17 @@
   <div>
     <app-map-classification></app-map-classification>
     <app-thermal-slider></app-thermal-slider>
+    <button
+      *ngIf="anomsDisconnected.length > 0"
+      class="btn-anom-disconnected"
+      mat-raised-button
+      (click)="deleteDisconnectedAnoms()"
+    >
+      Eliminar {{ anomsDisconnected.length }} anomalías desconectadas
+    </button>
     <div class="btns-anom-no-data">
-      <button *ngIf="anomaliasNoData.length === 0"
+      <button
+        *ngIf="anomaliasNoData.length === 0"
         class="btn-anom-no-data"
         mat-raised-button
         (click)="updateModuleAnoms()"
@@ -12,7 +21,8 @@
       >
         {{ numAnomsNoModule }} anomalías sin módulo
       </button>
-      <button *ngIf="anomaliasNoData.length === 0"
+      <button
+        *ngIf="anomaliasNoData.length === 0"
         class="btn-anom-no-data"
         mat-raised-button
         (click)="updateGlobalCoordsAnoms()"

@@ -1,17 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ClassificationService } from '@core/services/classification.service';
 import { ClustersService } from '@core/services/clusters.service';
 import { InformeService } from '@core/services/informe.service';
+import { StructuresService } from '@core/services/structures.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
+import { ThermalLayerInterface } from '@core/models/thermalLayer';
 
 @Component({
   selector: 'app-classification',
@@ -27,13 +30,18 @@ export class ClassificationComponent implements OnInit {
   anomaliasNoData: Anomalia[] = [];
   numAnomsNoModule = 0;
   numAnomsNoGlobals = 0;
+  anomsDisconnected: Anomalia[] = [];
+  private normModules: NormalizedModule[];
+  private thermalLayer: ThermalLayerInterface;
 
   constructor(
     private classificationService: ClassificationService,
     private clustersService: ClustersService,
     private informeService: InformeService,
     private _snackBar: MatSnackBar,
-    private http: HttpClient
+    private http: HttpClient,
+    private structuresService: StructuresService,
+    private anomaliaService: AnomaliaService
   ) {}
 
   ngOnInit(): void {
@@ -44,16 +52,41 @@ export class ClassificationComponent implements OnInit {
     // lo iniciamos para poder acceder a la info de la trayectoria del vuelo
     this.clustersService.initService().pipe(take(1)).subscribe();
 
-    // nos suscribimos a las anomalias
-    this.classificationService.listaAnomalias$.subscribe((anomalias) => {
-      this.anomalias = anomalias;
+    this.informeService
+      .getThermalLayerDB$(this.classificationService.informeId)
+      .pipe(
+        take(1),
+        switchMap((layers) => {
+          // comprobamos si existe la thermalLayer
+          if (layers.length > 0) {
+            this.thermalLayer = layers[0];
+          }
+          // obtenemos los modulos normalizados
+          return this.structuresService.getNormModules(this.thermalLayer);
+        })
+      )
+      .pipe(
+        take(1),
+        switchMap((normMods) => {
+          this.normModules = normMods;
 
-      if (anomalias !== undefined) {
-        this.anomaliasNoData = anomalias.filter((anom) => anom.gradienteNormalizado === 0 || anom.temperaturaMax === 0);
-        this.numAnomsNoModule = anomalias.filter((anom) => anom.modulo === null).length;
-        this.numAnomsNoGlobals = anomalias.filter((anom) => anom.globalCoords[0] === null).length;
-      }
-    });
+          // nos suscribimos a las anomalias
+          return this.classificationService.listaAnomalias$;
+        })
+      )
+      .subscribe((anomalias) => {
+        this.anomalias = anomalias;
+
+        if (anomalias !== undefined) {
+          this.anomaliasNoData = anomalias.filter(
+            (anom) => anom.gradienteNormalizado === 0 || anom.temperaturaMax === 0
+          );
+          this.numAnomsNoModule = anomalias.filter((anom) => anom.modulo === null).length;
+          this.numAnomsNoGlobals = anomalias.filter((anom) => anom.globalCoords[0] === null).length;
+          const normModsIds = this.normModules.map((normMod) => normMod.id);
+          this.anomsDisconnected = anomalias.filter((anom) => !normModsIds.includes(anom.id));
+        }
+      });
 
     // traemos el informe
     this.informeService
@@ -115,6 +148,10 @@ export class ClassificationComponent implements OnInit {
           console.log(err);
         });
     });
+  }
+
+  deleteDisconnectedAnoms() {
+    this.anomsDisconnected.forEach((anom) => this.anomaliaService.deleteAnomalia(anom));
   }
 
   private getMaeInforme(): number {
