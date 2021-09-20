@@ -14,7 +14,5 @@ export class DialogFilteredReportComponent implements OnInit {
 
   selectFiltered(value: boolean) {
     this.downloadReportService.filteredPDF = value;
-
-    this.downloadReportService.downloadPDF = true;
   }
 }

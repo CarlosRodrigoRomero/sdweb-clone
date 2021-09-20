@@ -17,8 +17,6 @@ export class DownloadReportService {
   progressBarValue$ = new BehaviorSubject<number>(this._progressBarValue);
   private _filteredPDF: boolean = undefined;
   filteredPDF$ = new BehaviorSubject<boolean>(this._filteredPDF);
-  private _downloadPDF = false;
-  downloadPDF$ = new BehaviorSubject<boolean>(this._downloadPDF);
 
   constructor() {}
 
@@ -126,14 +124,5 @@ export class DownloadReportService {
   set filteredPDF(value: boolean) {
     this._filteredPDF = value;
     this.filteredPDF$.next(value);
-  }
-
-  get downloadPDF() {
-    return this._endingPDF;
-  }
-
-  set downloadPDF(value: boolean) {
-    this._downloadPDF = value;
-    this.downloadPDF$.next(value);
   }
 }

@@ -138,12 +138,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       .fill(0)
       .map((_, i) => i + 1);
 
-    // this.downloadReportService.downloadPDF$.subscribe((value) => {
-    //   if (value) {
-    //     this.downloadPDF();
-    //   }
-    // });
-
     this.subscriptions.add(
       this.plantaService
         .getPlanta(this.reportControlService.plantaId)
@@ -565,6 +559,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         this.countSeguidores++;
       }
 
+      // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+      let downloads = 0;
+
       this.subscriptions.add(
         this.countLoadedImages$.subscribe((countLoadedImgs) => {
           this.downloadReportService.progressBarValue = Math.round(
@@ -572,15 +569,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           );
 
           // Cuando se carguen todas las imágenes
-          if (countLoadedImgs === this.countSeguidores) {
+          if (countLoadedImgs === this.countSeguidores && downloads === 0) {
             this.calcularInforme();
 
             pdfMake
               .createPdf(this.getDocDefinition(this.imageListBase64))
               .download(this.informe.prefijo.concat('informe'), () => {
+                this.downloadReportService.progressBarValue = 0;
+
                 this.downloadReportService.generatingPDF = false;
               });
             this.downloadReportService.endingPDF = true;
+
+            downloads++;
           }
         })
       );
