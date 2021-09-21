@@ -80,15 +80,26 @@ export class SeguidorService {
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
           let count = 0;
           this.locAreaSeguidores.forEach((locArea) => {
-            const anomsLargestLocArea = sortedAnoms[0].find(
-              (array) => (array[0] as Anomalia).globalCoords[0] === locArea.globalCoords[0]
-            );
+            let anomaliasSeguidor: Anomalia[] = [];
+            if (sortedAnoms !== null) {
+              const anomsLargestLocArea = sortedAnoms[0].find(
+                (array) => (array[0] as Anomalia).globalCoords[0] === locArea.globalCoords[0]
+              );
 
-            const anomaliasSeguidor = anomsLargestLocArea.filter(
-              (anomalia) =>
-                anomalia.globalCoords.slice(0, this.numGlobalCoords).toString() ===
-                locArea.globalCoords.slice(0, this.numGlobalCoords).toString()
-            );
+              if (anomsLargestLocArea !== undefined) {
+                anomaliasSeguidor = anomsLargestLocArea.filter(
+                  (anomalia) =>
+                    anomalia.globalCoords.slice(0, this.numGlobalCoords).toString() ===
+                    locArea.globalCoords.slice(0, this.numGlobalCoords).toString()
+                );
+              }
+            } else {
+              anomaliasSeguidor = anomaliaList.filter(
+                (anomalia) =>
+                  anomalia.globalCoords.slice(0, this.numGlobalCoords).toString() ===
+                  locArea.globalCoords.slice(0, this.numGlobalCoords).toString()
+              );
+            }
 
             // si no tiene anomalias no creamos el seguidor
             if (anomaliasSeguidor.length > 0) {
@@ -191,14 +202,18 @@ export class SeguidorService {
         locArea.globalCoords[0] !== undefined && locArea.globalCoords[0] !== null && locArea.globalCoords[0] !== ''
     );
 
-    const sortAnoms = [[]];
-    largestLocAreas.forEach((locArea) => {
-      const anomsLocArea = anoms.filter((anom) => anom.globalCoords[0] === locArea.globalCoords[0]);
+    if (largestLocAreas.length > 0) {
+      const sortAnoms = [[]];
+      largestLocAreas.forEach((locArea) => {
+        const anomsLocArea = anoms.filter((anom) => anom.globalCoords[0] === locArea.globalCoords[0]);
 
-      sortAnoms[0].push(anomsLocArea);
-    });
+        sortAnoms[0].push(anomsLocArea);
+      });
 
-    return sortAnoms;
+      return sortAnoms;
+    } else {
+      return null;
+    }
   }
 
   private getSeguidorName(seguidor: Seguidor): string {

@@ -104,77 +104,83 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
         })
     );
 
-    this.seguidorViewService.imageSelected$.subscribe((image) => {
-      this.imageSelected = Number(image);
+    this.subscriptions.add(
+      this.seguidorViewService.imageSelected$.subscribe((image) => {
+        this.imageSelected = Number(image);
 
-      if (this.imageSelected === 0) {
-        // mostramos imagen termica
-        document.getElementById('thermal-canvas').style.visibility = 'visible';
+        if (this.imageSelected === 0) {
+          // mostramos imagen termica
+          document.getElementById('thermal-canvas').style.visibility = 'visible';
 
-        if (this.seguidorSelected !== undefined) {
-          // creamos las anomalias de nuevo al volver a la vista termica
-          if (this.anomsCanvas !== undefined && this.anomsCanvas.isEmpty()) {
-            this.drawAnomalias();
+          if (this.seguidorSelected !== undefined) {
+            // creamos las anomalias de nuevo al volver a la vista termica
+            if (this.anomsCanvas !== undefined && this.anomsCanvas.isEmpty()) {
+              this.drawAnomalias();
+            }
+          }
+        } else {
+          // ocultamos imagen termica
+          document.getElementById('thermal-canvas').style.visibility = 'hidden';
+
+          // quitamos las anomalias al seleccionar la vista visual
+          if (this.anomsCanvas !== undefined) {
+            this.anomsCanvas.clear();
           }
         }
-      } else {
-        // ocultamos imagen termica
-        document.getElementById('thermal-canvas').style.visibility = 'hidden';
+      })
+    );
 
-        // quitamos las anomalias al seleccionar la vista visual
-        if (this.anomsCanvas !== undefined) {
-          this.anomsCanvas.clear();
+    this.subscriptions.add(
+      this.seguidoresControlService.urlThermalImageSeguidor$.subscribe((urlThermal) => {
+        if (urlThermal !== undefined) {
+          this.imageThermal.src = urlThermal;
+
+          this.imageThermal.onload = () => {
+            this.seguidorViewService.imagesLoaded = true;
+
+            this.thermalCanvas.setBackgroundImage(
+              new fabric.Image(this.imageThermal, {
+                left: 0,
+                top: 0,
+                angle: 0,
+                opacity: 1,
+                draggable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                scaleX: this.thermalCanvas.width / this.imageThermal.width,
+                scaleY: this.thermalCanvas.height / this.imageThermal.height,
+              }),
+              this.thermalCanvas.renderAll.bind(this.thermalCanvas)
+            );
+          };
         }
-      }
-    });
+      })
+    );
 
-    this.seguidoresControlService.urlThermalImageSeguidor$.subscribe((urlThermal) => {
-      if (urlThermal !== undefined) {
-        this.imageThermal.src = urlThermal;
+    this.subscriptions.add(
+      this.seguidoresControlService.urlVisualImageSeguidor$.subscribe((urlVisual) => {
+        if (urlVisual !== undefined) {
+          this.imageVisual.src = urlVisual;
 
-        this.imageThermal.onload = () => {
-          this.seguidorViewService.imagesLoaded = true;
-
-          this.thermalCanvas.setBackgroundImage(
-            new fabric.Image(this.imageThermal, {
-              left: 0,
-              top: 0,
-              angle: 0,
-              opacity: 1,
-              draggable: false,
-              lockMovementX: true,
-              lockMovementY: true,
-              scaleX: this.thermalCanvas.width / this.imageThermal.width,
-              scaleY: this.thermalCanvas.height / this.imageThermal.height,
-            }),
-            this.thermalCanvas.renderAll.bind(this.thermalCanvas)
-          );
-        };
-      }
-    });
-
-    this.seguidoresControlService.urlVisualImageSeguidor$.subscribe((urlVisual) => {
-      if (urlVisual !== undefined) {
-        this.imageVisual.src = urlVisual;
-
-        this.imageVisual.onload = () => {
-          this.visualCanvas.setBackgroundImage(
-            new fabric.Image(this.imageVisual, {
-              left: 0,
-              top: 0,
-              angle: 0,
-              opacity: 1,
-              draggable: false,
-              lockMovementX: true,
-              lockMovementY: true,
-              scaleX: this.visualCanvas.width / this.imageVisual.width,
-              scaleY: this.visualCanvas.height / this.imageVisual.height,
-            }),
-            this.visualCanvas.renderAll.bind(this.visualCanvas)
-          );
-        };
-      }
-    });
+          this.imageVisual.onload = () => {
+            this.visualCanvas.setBackgroundImage(
+              new fabric.Image(this.imageVisual, {
+                left: 0,
+                top: 0,
+                angle: 0,
+                opacity: 1,
+                draggable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                scaleX: this.visualCanvas.width / this.imageVisual.width,
+                scaleY: this.visualCanvas.height / this.imageVisual.height,
+              }),
+              this.visualCanvas.renderAll.bind(this.visualCanvas)
+            );
+          };
+        }
+      })
+    );
   }
 
   drawAnomalias() {
