@@ -74,14 +74,13 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
       this.mapSeguidoresService.sliderTemporalSelected$.subscribe((value) => (this.currentYear = value))
     );
 
-    this.olMapService
-      .getAerialLayers()
-      .pipe(take(1))
-      .subscribe((aerialLayers) => {
+    this.subscriptions.add(
+      this.olMapService.getAerialLayers().subscribe((aerialLayers) => {
         this.aerialLayers = aerialLayers;
 
         this.setAerialLayersOpacity(this.selectedInformeId);
-      });
+      })
+    );
   }
 
   onChangeTemporalSlider(value: number) {

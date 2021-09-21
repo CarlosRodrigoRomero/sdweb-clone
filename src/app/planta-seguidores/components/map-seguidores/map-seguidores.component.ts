@@ -89,7 +89,9 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
         )
         .pipe(take(1))
         .subscribe(([informes, planta]) => {
-          this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers));
+          this.subscriptions.add(
+            this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers))
+          );
 
           // ordenamos los informes por fecha
           this.informeIdList = informes.map((informe) => informe.id);
@@ -99,6 +101,8 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
             this.seguidoresControlService
               .createSeguidorLayers(informe.id)
               .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
+
+            console.log('ok');
 
             // añadimos las ortofotos aereas de cada informe
             this.addAerialLayer(informe.id);

@@ -128,6 +128,7 @@ export class OlMapService {
     this.draw = undefined;
     this.drawLayers = [];
     this.thermalLayers = [];
+    this.aerialLayers = [];
     this.anomaliaLayers = [];
     this.seguidorLayers = [];
     this.incrementoLayers = [];
