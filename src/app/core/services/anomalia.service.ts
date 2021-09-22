@@ -222,13 +222,7 @@ export class AnomaliaService {
     const anomalia = {};
     anomalia[field] = value;
 
-    this.afs
-      .collection('anomalias')
-      .doc(id)
-      .update(anomalia)
-      .then(() => {
-        console.log('Document successfully updated!');
-      });
+    this.afs.collection('anomalias').doc(id).update(anomalia);
   }
 
   private getLocalId(anomalia: Anomalia): string {

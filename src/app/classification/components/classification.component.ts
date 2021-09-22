@@ -8,13 +8,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ClassificationService } from '@core/services/classification.service';
 import { ClustersService } from '@core/services/clusters.service';
 import { InformeService } from '@core/services/informe.service';
-import { StructuresService } from '@core/services/structures.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
-import { ThermalLayerInterface } from '@core/models/thermalLayer';
 
 @Component({
   selector: 'app-classification',
@@ -32,7 +30,6 @@ export class ClassificationComponent implements OnInit {
   numAnomsNoGlobals = 0;
   anomsDisconnected: Anomalia[] = [];
   private normModules: NormalizedModule[];
-  private thermalLayer: ThermalLayerInterface;
 
   constructor(
     private classificationService: ClassificationService,
@@ -40,7 +37,6 @@ export class ClassificationComponent implements OnInit {
     private informeService: InformeService,
     private _snackBar: MatSnackBar,
     private http: HttpClient,
-    private structuresService: StructuresService,
     private anomaliaService: AnomaliaService
   ) {}
 
@@ -65,13 +61,13 @@ export class ClassificationComponent implements OnInit {
         this.anomalias = anomalias;
 
         if (anomalias !== undefined) {
-          this.anomaliasNoData = anomalias.filter(
-            (anom) => anom.gradienteNormalizado === 0 || anom.temperaturaMax === 0
-          );
-          this.numAnomsNoModule = anomalias.filter((anom) => anom.modulo === null).length;
-          this.numAnomsNoGlobals = anomalias.filter((anom) => anom.globalCoords[0] === null).length;
-          const normModsIds = this.normModules.map((normMod) => normMod.id);
-          this.anomsDisconnected = anomalias.filter((anom) => !normModsIds.includes(anom.id));
+          // this.anomaliasNoData = anomalias.filter(
+          //   (anom) => anom.gradienteNormalizado === 0 || anom.temperaturaMax === 0
+          // );
+          // this.numAnomsNoModule = anomalias.filter((anom) => anom.modulo === null).length;
+          // this.numAnomsNoGlobals = anomalias.filter((anom) => anom.globalCoords[0] === null).length;
+          // const normModsIds = this.normModules.map((normMod) => normMod.id);
+          // this.anomsDisconnected = anomalias.filter((anom) => !normModsIds.includes(anom.id));
         }
       });
 

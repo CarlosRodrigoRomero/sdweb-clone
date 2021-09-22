@@ -78,13 +78,7 @@ export class MapClassificationComponent implements OnInit {
     this.informeId = this.classificationService.informeId;
 
     // nos conectamos a la lista de anomalias
-    this.classificationService.listaAnomalias$.subscribe((anomalias) => {
-      this.listaAnomalias = anomalias;
-
-      if (this.normModLayer !== undefined) {
-        this.normModLayer.setStyle(this.getStyleNormMod(false));
-      }
-    });
+    this.classificationService.listaAnomalias$.subscribe((anomalias) => (this.listaAnomalias = anomalias));
 
     this.informeService
       .getThermalLayerDB$(this.informeId)

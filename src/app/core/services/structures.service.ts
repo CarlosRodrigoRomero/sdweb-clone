@@ -371,9 +371,6 @@ export class StructuresService {
     colRef
       .doc(module.id)
       .update(module)
-      .then(() => {
-        console.log('Módulo actualizado correctamente');
-      })
       .catch((error) => {
         console.error('Error al actualizad módulo: ', error);
       });
