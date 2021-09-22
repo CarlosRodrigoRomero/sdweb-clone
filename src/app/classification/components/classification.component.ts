@@ -45,28 +45,15 @@ export class ClassificationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.classificationService.initService().subscribe((value) => (this.serviceInit = value));
+    this.classificationService.initService().then((value) => (this.serviceInit = value));
     this.classificationService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre));
     this.classificationService.normModHovered$.subscribe((normMod) => (this.normModHovered = normMod));
 
     // lo iniciamos para poder acceder a la info de la trayectoria del vuelo
     this.clustersService.initService().pipe(take(1)).subscribe();
 
-    this.informeService
-      .getThermalLayerDB$(this.classificationService.informeId)
+    this.classificationService.normModules$
       .pipe(
-        take(1),
-        switchMap((layers) => {
-          // comprobamos si existe la thermalLayer
-          if (layers.length > 0) {
-            this.thermalLayer = layers[0];
-          }
-          // obtenemos los modulos normalizados
-          return this.structuresService.getNormModules(this.thermalLayer);
-        })
-      )
-      .pipe(
-        take(1),
         switchMap((normMods) => {
           this.normModules = normMods;
 

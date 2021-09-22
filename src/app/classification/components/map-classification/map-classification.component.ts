@@ -114,6 +114,7 @@ export class MapClassificationComponent implements OnInit {
           this.addPointerOnHover();
           this.addOnHoverAction();
           this.addOnDoubleClickInteraction();
+          // this.addClickInteraction();
           this.addSelectInteraction();
           this.addClickOutFeatures();
         } else {
@@ -207,29 +208,26 @@ export class MapClassificationComponent implements OnInit {
   private addNormModules() {
     const normModsSource = this.normModLayer.getSource();
 
-    this.structuresService
-      .getNormModules(this.thermalLayer)
-      .pipe(take(1))
-      .subscribe((normModules) => {
-        normModsSource.clear();
+    this.classificationService.normModules$.pipe(take(1)).subscribe((normModules) => {
+      normModsSource.clear();
 
-        this.normModules = normModules;
+      this.normModules = normModules;
 
-        this.normModules.forEach((normMod) => {
-          const coords = this.structuresService.coordsDBToCoordinate(normMod.coords);
+      this.normModules.forEach((normMod) => {
+        const coords = this.structuresService.coordsDBToCoordinate(normMod.coords);
 
-          const feature = new Feature({
-            geometry: new Polygon([coords]),
-            properties: {
-              id: normMod.id,
-              name: 'normMod',
-              normMod,
-            },
-          });
-
-          normModsSource.addFeature(feature);
+        const feature = new Feature({
+          geometry: new Polygon([coords]),
+          properties: {
+            id: normMod.id,
+            name: 'normMod',
+            normMod,
+          },
         });
+
+        normModsSource.addFeature(feature);
       });
+    });
   }
 
   private addZoomEvent() {
@@ -350,6 +348,46 @@ export class MapClassificationComponent implements OnInit {
         this.classificationService.createAnomaliaFromNormModule(feature, date);
       }
     });
+  }
+
+  private addClickInteraction() {
+    let features;
+
+    this.map.on('click', (event) => {
+      console.log('click');
+      features = this.map.getFeaturesAtPixel(event.pixel);
+      const feature = features[0] as Feature;
+      if (feature) {
+        // asignamos el modulo normalizado seleccionado
+        this.classificationService.normModAnomaliaSelected = this.normModules.find(
+          (normMod) => normMod.id === feature.getProperties().properties.id
+        );
+
+        // reseteamos si venimos de crear una anomalia
+        this.classificationService.normModSelected = undefined;
+        this.popup.setPosition(undefined);
+        this.classificationService.anomaliaSelected = undefined;
+      }
+    });
+
+    const translate = new Translate({
+      features,
+    });
+
+    translate.on('translateend', (e) => {
+      const newCoords = (e.features.getArray()[0].getGeometry() as Polygon).getCoordinates();
+
+      // aplicamos las nuevas coordenadas del modulo y guardamos los cambios en la DB
+      this.classificationService.normModAnomaliaSelected.coords = this.structuresService.coordinateToObject(newCoords);
+      this.structuresService.updateNormModule(this.classificationService.normModAnomaliaSelected);
+
+      // actualizamos tb la anomalia seleccionada en la DB
+      this.anomaliaService.updateAnomaliaField(this.classificationService.normModAnomaliaSelected.id, 'featureCoords', {
+        ...newCoords[0],
+      });
+    });
+
+    this.map.addInteraction(translate);
   }
 
   private addSelectInteraction() {

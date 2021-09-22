@@ -8,19 +8,20 @@ import { filter, switchMap, take } from 'rxjs/operators';
 
 import { Feature, Map } from 'ol';
 import SimpleGeometry from 'ol/geom/SimpleGeometry';
+import { Coordinate } from 'ol/coordinate';
+import Polygon from 'ol/geom/Polygon';
 
 import { InformeService } from './informe.service';
 import { PlantaService } from './planta.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { OlMapService } from '@core/services/ol-map.service';
+import { StructuresService } from '@core/services/structures.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
-import { Coordinate } from 'ol/coordinate';
-import Polygon from 'ol/geom/Polygon';
 import { ModuloInterface } from '@core/models/modulo';
 
 @Injectable({
@@ -46,6 +47,8 @@ export class ClassificationService {
   listaAnomalias$ = new BehaviorSubject<Anomalia[]>(this._listaAnomalias);
   private _locAreasWithModule: LocationAreaInterface[] = undefined;
   locAreasWithModule$ = new BehaviorSubject<LocationAreaInterface[]>(this._locAreasWithModule);
+  private _normModules: NormalizedModule[] = [];
+  normModules$ = new BehaviorSubject<NormalizedModule[]>(this._normModules);
 
   constructor(
     private router: Router,
@@ -53,43 +56,55 @@ export class ClassificationService {
     private plantaService: PlantaService,
     private anomaliaService: AnomaliaService,
     private afs: AngularFirestore,
-    private olMapService: OlMapService
+    private olMapService: OlMapService,
+    private structuresService: StructuresService
   ) {}
 
-  initService(): Observable<boolean> {
+  initService(): Promise<boolean> {
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
-    this.informeService
-      .getInforme(this.informeId)
-      .pipe(
-        take(1),
-        switchMap((informe) => this.plantaService.getPlanta(informe.plantaId))
-      )
-      .pipe(
-        take(1),
-        switchMap((planta) => {
-          this.planta = planta;
+    return new Promise((initService) => {
+      this.informeService
+        .getInforme(this.informeId)
+        .pipe(
+          take(1),
+          switchMap((informe) => this.plantaService.getPlanta(informe.plantaId))
+        )
+        .pipe(
+          take(1),
+          switchMap((planta) => {
+            this.planta = planta;
 
-          this.getLocAreasWithModules();
+            this.getLocAreasWithModules();
 
-          return this.informeService.getThermalLayerDB$(this.informeId);
-        })
-      )
-      .subscribe((layers) => {
-        this.thermalLayer = layers[0];
+            return this.informeService.getThermalLayerDB$(this.informeId);
+          }),
+          take(1),
+          switchMap((layers) => {
+            // comprobamos si existe la thermalLayer
+            if (layers.length > 0) {
+              this.thermalLayer = layers[0];
+            }
 
-        // preparamos las locAreas para luego calcular las globalCoords de las nuevas anomalias
-        this.plantaService.setLocAreaListFromPlantaIdOl(this.planta.id);
+            // obtenemos los modulos normalizados
+            return this.structuresService.getNormModules(this.thermalLayer);
+          })
+        )
+        .pipe(take(1))
+        .subscribe((normMods) => {
+          this.normModules = normMods;
 
-        this.initialized$.next(true);
-      });
+          // preparamos las locAreas para luego calcular las globalCoords de las nuevas anomalias
+          this.plantaService.setLocAreaListFromPlantaIdOl(this.planta.id);
 
-    // nos subscribimos a la lista de anomalias
-    this.anomaliaService.getAnomaliasInforme$(this.informeId).subscribe((anoms) => (this.listaAnomalias = anoms));
+          initService(true);
+        });
 
-    this.olMapService.map$.subscribe((map) => (this.map = map));
+      // nos subscribimos a la lista de anomalias
+      this.anomaliaService.getAnomaliasInforme$(this.informeId).subscribe((anoms) => (this.listaAnomalias = anoms));
 
-    return this.initialized$;
+      this.olMapService.map$.subscribe((map) => (this.map = map));
+    });
   }
 
   createAnomaliaFromNormModule(feature: Feature, date: number) {
@@ -97,6 +112,7 @@ export class ClassificationService {
     const refAnom = this.afs.collection('anomalias').doc(id);
     const normModule: NormalizedModule = feature.getProperties().properties.normMod;
     const geometry = feature.getGeometry() as SimpleGeometry;
+
     let coords: Coordinate;
     // si existe centroId lo usamos, sino usamos un vertice del rectangulo
     if (normModule.hasOwnProperty('centroid_gps')) {
@@ -255,5 +271,14 @@ export class ClassificationService {
   set locAreasWithModule(value: LocationAreaInterface[]) {
     this._locAreasWithModule = value;
     this.locAreasWithModule$.next(value);
+  }
+
+  get normModules() {
+    return this._normModules;
+  }
+
+  set normModules(value: NormalizedModule[]) {
+    this._normModules = value;
+    this.normModules$.next(value);
   }
 }
