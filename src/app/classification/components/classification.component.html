@@ -12,28 +12,29 @@
       Eliminar {{ anomsDisconnected.length }} anomalías desconectadas
     </button>
     <div class="btns-anom-no-data">
+      <button class="sync-btn" mat-raised-button (click)="syncAnomsState()" matTooltip="Actualizar estado anomalías">
+        <mat-icon>sync</mat-icon>
+      </button>
       <button
-        *ngIf="anomaliasNoData.length === 0"
+        *ngIf="anomaliasNoData.length === 0 && anomsNoModule.length > 0"
         class="btn-anom-no-data"
         mat-raised-button
         (click)="updateModuleAnoms()"
-        [disabled]="numAnomsNoModule === 0"
       >
-        {{ numAnomsNoModule }} anomalías sin módulo
+        {{ anomsNoModule.length }} anomalías sin módulo
       </button>
       <button
-        *ngIf="anomaliasNoData.length === 0"
+        *ngIf="anomaliasNoData.length === 0 && anomsNoGlobals.length > 0"
         class="btn-anom-no-data"
         mat-raised-button
         (click)="updateGlobalCoordsAnoms()"
-        [disabled]="numAnomsNoGlobals === 0"
       >
-        {{ numAnomsNoGlobals }} anomalías sin globals
+        {{ anomsNoGlobals.length }} anomalías sin globals
       </button>
       <button
+        *ngIf="anomaliasNoData.length > 0"
         class="btn-anom-no-data"
         mat-raised-button
-        [disabled]="anomaliasNoData.length === 0"
         (click)="updateAnomaliasNoData()"
       >
         {{ anomaliasNoData.length }} anomalías sin datos
@@ -57,3 +58,13 @@
     </button>
   </div>
 </div>
+
+<mat-card class="bar-progress" *ngIf="processing">
+  <mat-card-content>
+    <h5>Procesando...</h5>
+
+    <section class="example-section">
+      <mat-progress-bar [color]="progressBarColor" [mode]="determinate" [value]="progressBarValue"> </mat-progress-bar>
+    </section>
+  </mat-card-content>
+</mat-card>

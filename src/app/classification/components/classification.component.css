@@ -64,3 +64,18 @@ app-thermal-slider {
 .end-process {
   margin: 10px;
 }
+
+.bar-progress {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+.sync-btn {
+  height: 40px;
+  padding: 0;
+  width: 40px;
+  min-width: unset !important;
+  justify-self: end;
+}

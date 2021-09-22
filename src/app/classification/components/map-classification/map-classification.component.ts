@@ -530,34 +530,7 @@ export class MapClassificationComponent implements OnInit {
       .forEach((layer) => layer.setVisible(this.thermalLayerVisibility));
   }
 
-  updateGlobalCoordsAnoms() {
-    this.classificationService.listaAnomalias.forEach((anom) => {
-      if (anom.globalCoords[0] === null) {
-        let coordObj = this.normModules.find((nM) => nM.id === anom.id).centroid_gps;
-        if (coordObj === undefined) {
-          coordObj = this.normModules.find((nM) => nM.id === anom.id).coords.bottomLeft;
-        }
-
-        if (coordObj !== undefined) {
-          const coordCentroid = [coordObj.long, coordObj.lat] as Coordinate;
-          const newGloblaCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
-
-          this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGloblaCoords);
-        }
-      }
-    });
-  }
-
-  updateModuleAnoms() {
-    this.classificationService.listaAnomalias.forEach((anom) => {
-      if (anom.modulo === null) {
-        const modulo = this.classificationService.getAnomModule(anom.featureCoords[0]);
-        if (modulo !== undefined) {
-          this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
-        }
-      }
-    });
-  }
+ 
 
   setThermalPalette() {
     if (this.palette === GLOBAL.ironPalette) {
