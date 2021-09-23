@@ -28,7 +28,7 @@ export class AnomTipoLegendComponent implements OnInit {
       const anomalia = this.anomaliaSelected;
       anomalia.tipo = tipo;
       // actualizamos el tipo en la DB
-      this.anomaliaService.updateAnomalia(anomalia);
+      this.anomaliaService.updateAnomaliaField(anomalia.id, 'tipo', tipo);
 
       // ocultamos el popup
       this.classificationService.hidePopup();

@@ -28,7 +28,7 @@ export class HotkeysClassificationComponent implements OnInit {
             if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 8;
               // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomalia(this.classificationService.anomaliaSelected);
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 8);
 
               // ocultamos el popup
               this.classificationService.hidePopup();
@@ -46,7 +46,7 @@ export class HotkeysClassificationComponent implements OnInit {
             if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 0;
               // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomalia(this.classificationService.anomaliaSelected);
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 0);
 
               // ocultamos el popup
               this.classificationService.hidePopup();
@@ -64,7 +64,7 @@ export class HotkeysClassificationComponent implements OnInit {
             if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 13;
               // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomalia(this.classificationService.anomaliaSelected);
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 13);
 
               // ocultamos el popup
               this.classificationService.hidePopup();
@@ -82,7 +82,7 @@ export class HotkeysClassificationComponent implements OnInit {
             if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 9;
               // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomalia(this.classificationService.anomaliaSelected);
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 9);
 
               // ocultamos el popup
               this.classificationService.hidePopup();
@@ -100,7 +100,7 @@ export class HotkeysClassificationComponent implements OnInit {
             if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 15;
               // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomalia(this.classificationService.anomaliaSelected);
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 15);
 
               // ocultamos el popup
               this.classificationService.hidePopup();
@@ -118,7 +118,7 @@ export class HotkeysClassificationComponent implements OnInit {
             if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 3;
               // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomalia(this.classificationService.anomaliaSelected);
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 3);
 
               // ocultamos el popup
               this.classificationService.hidePopup();
@@ -136,7 +136,7 @@ export class HotkeysClassificationComponent implements OnInit {
             if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 10;
               // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomalia(this.classificationService.anomaliaSelected);
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 10);
 
               // ocultamos el popup
               this.classificationService.hidePopup();
@@ -154,7 +154,7 @@ export class HotkeysClassificationComponent implements OnInit {
             if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 6;
               // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomalia(this.classificationService.anomaliaSelected);
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 6);
 
               // ocultamos el popup
               this.classificationService.hidePopup();
@@ -172,7 +172,7 @@ export class HotkeysClassificationComponent implements OnInit {
             if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 17;
               // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomalia(this.classificationService.anomaliaSelected);
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 17);
 
               // ocultamos el popup
               this.classificationService.hidePopup();
@@ -190,7 +190,7 @@ export class HotkeysClassificationComponent implements OnInit {
             if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 5;
               // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomalia(this.classificationService.anomaliaSelected);
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 5);
 
               // ocultamos el popup
               this.classificationService.hidePopup();
@@ -209,7 +209,7 @@ export class HotkeysClassificationComponent implements OnInit {
             if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 18;
               // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomalia(this.classificationService.anomaliaSelected);
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 18);
 
               // ocultamos el popup
               this.classificationService.hidePopup();

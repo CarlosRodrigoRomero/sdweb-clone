@@ -1,4 +1,4 @@
-<div *ngIf="normModSelected">
+<div *ngIf="normModSelected && anomaliaSelected">
   <app-hotkeys-classification></app-hotkeys-classification>
   <div>
     <mat-form-field class="tipo" appearance="outline">
@@ -22,7 +22,7 @@
     <span class="title">Columna:</span>
     <span>{{ normModSelected.columna }}</span>
   </div>
-  <!-- <div class="global-coords">
+  <div class="global-coords">
     <span class="global-coords__title">Global Coords</span>
     <div>
       <span class="global-coords__row-title">X:</span>
@@ -36,7 +36,7 @@
       <span class="global-coords__row-title">Z:</span>
       <span>{{ anomaliaSelected.globalCoords[2] }}</span>
     </div>
-  </div> -->
+  </div>
   <div class="btn-delete">
     <button (click)="deleteAnomalia()" mat-icon-button matTooltip="Eliminar anomalía">
       <mat-icon>delete</mat-icon>

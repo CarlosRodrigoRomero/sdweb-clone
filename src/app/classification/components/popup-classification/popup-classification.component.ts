@@ -42,7 +42,7 @@ export class PopupClassificationComponent implements OnInit {
       this.classificationService.anomaliaSelected.tipo = tipo;
 
       // actualizamos el tipo en la DB
-      this.anomaliaService.updateAnomalia(this.anomaliaSelected);
+      this.anomaliaService.updateAnomaliaField(this.anomaliaSelected.id, 'tipo', tipo);
     }
   }
 

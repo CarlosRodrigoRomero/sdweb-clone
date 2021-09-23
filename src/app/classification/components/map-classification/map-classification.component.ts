@@ -78,7 +78,13 @@ export class MapClassificationComponent implements OnInit {
     this.informeId = this.classificationService.informeId;
 
     // nos conectamos a la lista de anomalias
-    this.classificationService.listaAnomalias$.subscribe((anomalias) => (this.listaAnomalias = anomalias));
+    this.classificationService.listaAnomalias$.subscribe((anomalias) => {
+      this.listaAnomalias = anomalias;
+
+      if (this.normModLayer !== undefined) {
+        this.normModLayer.setStyle(this.getStyleNormMod(false));
+      }
+    });
 
     this.informeService
       .getThermalLayerDB$(this.informeId)
@@ -529,8 +535,6 @@ export class MapClassificationComponent implements OnInit {
       .filter((layer) => layer.getProperties().name !== undefined && layer.getProperties().name === 'thermalLayer')
       .forEach((layer) => layer.setVisible(this.thermalLayerVisibility));
   }
-
- 
 
   setThermalPalette() {
     if (this.palette === GLOBAL.ironPalette) {
