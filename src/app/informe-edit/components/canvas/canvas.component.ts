@@ -241,27 +241,42 @@ export class CanvasComponent implements OnInit {
   }
 
   getEstList(archivo: string) {
-    combineLatest([
-      this.informeService.getEstructuraInforme(this.informeId, archivo),
-      this.informeService.getAutoEstructuraInforme(this.informeId, archivo),
-    ])
+    this.informeService
+      .getEstructuraInforme(this.informeId, archivo)
       .pipe(take(1))
-      .subscribe(([estList, autoEstList]) => {
+      .subscribe((estList) => {
         if (estList.length > 0) {
           this.estructuraList = estList;
-        }
-        if (autoEstList.length > 0) {
-          this.estructuraList = autoEstList;
-        }
-        if (this.estructuraList.length > 0) {
-          this.dibujarEstructuraList(this.estructuraList);
+          this.dibujarEstructuraList(estList);
           if (this.informeService.selectedElementoPlanta == null) {
-            this.informeService.selectElementoPlanta(this.estructuraList[0]);
-          } else if (this.informeService.selectedElementoPlanta.id !== this.estructuraList[0].id) {
-            this.informeService.selectElementoPlanta(this.estructuraList[0]);
+            this.informeService.selectElementoPlanta(estList[0]);
+          } else if (this.informeService.selectedElementoPlanta.id !== estList[0].id) {
+            this.informeService.selectElementoPlanta(estList[0]);
           }
         }
       });
+
+    // combineLatest([
+    //   this.informeService.getEstructuraInforme(this.informeId, archivo),
+    //   this.informeService.getAutoEstructuraInforme(this.informeId, archivo),
+    // ])
+    //   .pipe(take(1))
+    //   .subscribe(([estList, autoEstList]) => {
+    //     if (estList.length > 0) {
+    //       this.estructuraList = estList;
+    //     }
+    //     if (autoEstList.length > 0) {
+    //       this.estructuraList = autoEstList;
+    //     }
+    //     if (this.estructuraList.length > 0) {
+    //       this.dibujarEstructuraList(this.estructuraList);
+    //       if (this.informeService.selectedElementoPlanta == null) {
+    //         this.informeService.selectElementoPlanta(this.estructuraList[0]);
+    //       } else if (this.informeService.selectedElementoPlanta.id !== this.estructuraList[0].id) {
+    //         this.informeService.selectElementoPlanta(this.estructuraList[0]);
+    //       }
+    //     }
+    //   });
   }
 
   dibujarEstructuraList(estList: Estructura[]) {
