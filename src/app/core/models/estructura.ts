@@ -88,13 +88,13 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
       enumerable: false,
       writable: true,
     });
-    if (est.estructuraCoords !== undefined) {
-      this.estructuraCoords = this.estructureCoordsToArray(est.estructuraCoords);
-      this.estructuraMatrix = null;
-    } else {
+    // if (est.estructuraCoords !== undefined) {
+    //   this.estructuraCoords = this.estructureCoordsToArray(est.estructuraCoords);
+    //   this.estructuraMatrix = null;
+    // } else {
       this.estructuraCoords = null;
       this.estructuraMatrix = this.getEstructuraMatrix();
-    }
+    // }
   }
 
   getLatLng(): LatLngLiteral {
