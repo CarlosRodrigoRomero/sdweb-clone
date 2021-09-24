@@ -2,7 +2,9 @@
   <app-navbar></app-navbar>
   <div>
     <app-map-classification></app-map-classification>
+
     <app-thermal-slider></app-thermal-slider>
+
     <button
       *ngIf="anomsDisconnected.length > 0"
       class="btn-anom-disconnected"
@@ -11,6 +13,18 @@
     >
       Eliminar {{ anomsDisconnected.length }} anomalías desconectadas
     </button>
+
+    <button mat-raised-button class="recalc-btn" [matMenuTriggerFor]="menu" matTooltip="Menu recalcular">
+      <mat-icon>settings</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu" class="menu">
+      <div class="contenedor-menu">
+        <h5>Recalular datos anomalías</h5>
+        <button mat-menu-item (click)="updateModuleAnoms(false)">Módulos</button>
+        <button mat-menu-item (click)="updateGlobalCoordsAnoms(false)">GlobalsCoords</button>
+      </div>
+    </mat-menu>
+
     <div class="btns-anom-no-data">
       <button class="sync-btn" mat-raised-button (click)="syncAnomsState()" matTooltip="Actualizar estado anomalías">
         <mat-icon>sync</mat-icon>
@@ -19,7 +33,7 @@
         *ngIf="anomaliasNoData.length === 0 && anomsNoModule.length > 0"
         class="btn-anom-no-data"
         mat-raised-button
-        (click)="updateModuleAnoms()"
+        (click)="updateModuleAnoms(true)"
       >
         {{ anomsNoModule.length }} anomalías sin módulo
       </button>
@@ -27,7 +41,7 @@
         *ngIf="anomaliasNoData.length === 0 && anomsNoGlobals.length > 0"
         class="btn-anom-no-data"
         mat-raised-button
-        (click)="updateGlobalCoordsAnoms()"
+        (click)="updateGlobalCoordsAnoms(true)"
       >
         {{ anomsNoGlobals.length }} anomalías sin globals
       </button>

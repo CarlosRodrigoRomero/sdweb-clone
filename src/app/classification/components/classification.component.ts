@@ -156,56 +156,62 @@ export class ClassificationComponent implements OnInit {
     });
   }
 
-  updateGlobalCoordsAnoms() {
+  updateGlobalCoordsAnoms(check: boolean) {
     this.processing = true;
 
     let count = 0;
     this.progressBarValue = 0;
 
-    this.anomsNoGlobals.forEach((anom) => {
-      if (anom.globalCoords[0] === null) {
-        let coordObj = this.normModules.find((nM) => nM.id === anom.id).centroid_gps;
-        if (coordObj === undefined) {
-          coordObj = this.normModules.find((nM) => nM.id === anom.id).coords.bottomLeft;
-        }
+    let anomalias = this.classificationService.listaAnomalias;
+    if (check) {
+      anomalias = this.anomsNoGlobals;
+    }
 
-        if (coordObj !== undefined) {
-          const coordCentroid = [coordObj.long, coordObj.lat] as Coordinate;
-          const newGloblaCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
+    anomalias.forEach((anom) => {
+      let coordObj = this.normModules.find((nM) => nM.id === anom.id).centroid_gps;
+      if (coordObj === undefined) {
+        coordObj = this.normModules.find((nM) => nM.id === anom.id).coords.bottomLeft;
+      }
 
-          this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGloblaCoords);
+      if (coordObj !== undefined) {
+        const coordCentroid = [coordObj.long, coordObj.lat] as Coordinate;
+        const newGloblaCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
 
-          count++;
-          this.progressBarValue = Math.round((count / this.anomsNoGlobals.length) * 100);
-          if (count === this.anomsNoGlobals.length) {
-            this.processing = false;
+        this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGloblaCoords);
 
-            this.syncAnomsState();
-          }
+        count++;
+        this.progressBarValue = Math.round((count / anomalias.length) * 100);
+        if (count === anomalias.length) {
+          this.processing = false;
+
+          this.syncAnomsState();
         }
       }
     });
   }
 
-  updateModuleAnoms() {
+  updateModuleAnoms(check: boolean) {
     this.processing = true;
 
     let count = 0;
     this.progressBarValue = 0;
 
-    this.anomsNoModule.forEach((anom) => {
-      if (anom.modulo === null) {
-        const modulo = this.classificationService.getAnomModule(anom.featureCoords[0]);
-        if (modulo !== undefined) {
-          this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
+    let anomalias = this.classificationService.listaAnomalias;
+    if (check) {
+      anomalias = this.anomsNoModule;
+    }
 
-          count++;
-          this.progressBarValue = Math.round((count / this.anomsNoModule.length) * 100);
-          if (count === this.anomsNoModule.length) {
-            this.processing = false;
+    anomalias.forEach((anom) => {
+      const modulo = this.classificationService.getAnomModule(anom.featureCoords[0]);
+      if (modulo !== undefined) {
+        this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
 
-            this.syncAnomsState();
-          }
+        count++;
+        this.progressBarValue = Math.round((count / anomalias.length) * 100);
+        if (count === anomalias.length) {
+          this.processing = false;
+
+          this.syncAnomsState();
         }
       }
     });

@@ -72,6 +72,21 @@ app-thermal-slider {
   transform: translate(-50%, 0);
 }
 
+.recalc-btn {
+  position: absolute;
+  top: 172px;
+  right: 10px;
+  height: 40px;
+  padding: 0;
+  width: 40px;
+  min-width: unset !important;
+  justify-self: end;
+}
+
+.contenedor-menu {
+  padding: 0 1rem;
+}
+
 .sync-btn {
   height: 40px;
   padding: 0;
