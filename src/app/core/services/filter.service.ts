@@ -16,6 +16,7 @@ import { Anomalia } from '@core/models/anomalia';
 })
 export class FilterService {
   private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad'];
+  private noAmosSegsFilters = ['area', 'segsNoAnoms'];
   private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   public filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
@@ -99,11 +100,17 @@ export class FilterService {
       this.unapplyFilters();
     } else {
       if (this.plantaSeguidores) {
-        this.filteredElements = this.allFiltrableElements.filter((elem) => {
-          (elem as Seguidor).anomaliasCliente = this.applyFilters((elem as Seguidor).anomalias) as Anomalia[];
+        const elemsFiltered = this.allFiltrableElements.filter((elem) => {
+          const newAnomaliasCliente = this.applyFilters((elem as Seguidor).anomalias) as Anomalia[];
+          if (newAnomaliasCliente !== undefined) {
+            (elem as Seguidor).anomaliasCliente = newAnomaliasCliente;
+          }
 
           return (elem as Seguidor).anomaliasCliente.length > 0;
         });
+
+        // aplicamos los filtros noAnomsSegs
+        this.applyNoAnomsSegsFilters(elemsFiltered);
       } else {
         this.filteredElements = this.applyFilters(this.allFiltrableElements);
       }
@@ -113,10 +120,19 @@ export class FilterService {
   private applyFilters(elements: FilterableElement[]): FilterableElement[] {
     const everyFilterFiltrableElements: Array<FilterableElement[]> = new Array<FilterableElement[]>();
 
+    let multFilters = this.multipleFilters;
+    let noMultFilters = this.filters
+      .map((filter) => filter.type)
+      .filter((filter) => !this.multipleFilters.includes(filter));
+    if (this.plantaSeguidores) {
+      multFilters = multFilters.filter((filter) => !this.noAmosSegsFilters.includes(filter));
+      noMultFilters = noMultFilters.filter((filter) => !this.noAmosSegsFilters.includes(filter));
+    }
+
     // comprobamos si hay filtros de tipo 'multiple'
-    if (this.filters.filter((fil) => this.multipleFilters.includes(fil.type)).length > 0) {
+    if (this.filters.filter((fil) => multFilters.includes(fil.type)).length > 0) {
       // separamos los elems por tipo de filtro
-      this.multipleFilters.forEach((type) => {
+      multFilters.forEach((type) => {
         const newFiltrableElements: FilterableElement[] = [];
         if (this.filters.filter((fil) => fil.type === type).length > 0) {
           // obtenemos un array de las elems filtrados por cada filtro de  diferente tipo
@@ -131,7 +147,7 @@ export class FilterService {
 
     // añadimos al array los elementos filtrados de los filtros no 'multiple'
     this.filters
-      .filter((fil) => !this.multipleFilters.includes(fil.type))
+      .filter((fil) => noMultFilters.includes(fil.type))
       .forEach((fil) => {
         const newFiltrableElements = fil.applyFilter(elements);
         everyFilterFiltrableElements.push(newFiltrableElements);
@@ -149,6 +165,35 @@ export class FilterService {
     // this.excludeTipoFilters();
 
     return finalElements;
+  }
+
+  private applyNoAnomsSegsFilters(elems: FilterableElement[]) {
+    // comprobamos si hay filtros noAnomsSegs
+    if (this.filters.filter((fil) => this.noAmosSegsFilters.includes(fil.type)).length > 0) {
+      const everyFilterFiltrableElements = [elems];
+
+      // separamos los elems por tipo de filtro
+      this.noAmosSegsFilters.forEach((type) => {
+        const newFiltrableElements: FilterableElement[] = [];
+        if (this.filters.filter((fil) => fil.type === type).length > 0) {
+          // obtenemos un array de las elems filtrados por cada filtro de  diferente tipo
+          this.filters
+            .filter((fil) => fil.type === type)
+            .forEach((fil) => fil.applyFilter(elems).forEach((elem) => newFiltrableElements.push(elem)));
+          // añadimos un array de cada tipo
+          everyFilterFiltrableElements.push(newFiltrableElements);
+        }
+      });
+
+      // calculamos la interseccion de los array de los diferentes tipos
+      if (everyFilterFiltrableElements.length > 0) {
+        this.filteredElements = everyFilterFiltrableElements.reduce((anterior, actual) =>
+          anterior.filter((elem) => actual.includes(elem))
+        );
+      }
+    } else {
+      this.filteredElements = elems;
+    }
   }
 
   private unapplyFilters() {
