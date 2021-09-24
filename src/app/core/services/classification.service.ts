@@ -47,6 +47,8 @@ export class ClassificationService {
   locAreasWithModule$ = new BehaviorSubject<LocationAreaInterface[]>(this._locAreasWithModule);
   private _normModules: NormalizedModule[] = [];
   normModules$ = new BehaviorSubject<NormalizedModule[]>(this._normModules);
+  private _showAnomOk = false;
+  showAnomOk$ = new BehaviorSubject<boolean>(this._showAnomOk);
 
   constructor(
     private router: Router,
@@ -98,8 +100,11 @@ export class ClassificationService {
           initService(true);
         });
 
-      // nos subscribimos a la lista de anomalias
-      this.anomaliaService.getAnomaliasInforme$(this.informeId).subscribe((anoms) => (this.listaAnomalias = anoms));
+      // nos traemos la lista de anomalias
+      this.anomaliaService
+        .getAnomaliasInforme$(this.informeId)
+        .pipe(take(1))
+        .subscribe((anoms) => (this.listaAnomalias = anoms));
 
       this.olMapService.map$.subscribe((map) => (this.map = map));
     });
@@ -147,19 +152,20 @@ export class ClassificationService {
             localY: normModule.fila,
             datetime: date,
           };
+
           // asignamos la nueva anomalia para acceder a ella y poder modificarla
           this.anomaliaSelected = anomalia;
 
-          this.listaAnomalias.push(anomalia);
+          // añadimos a la lista de anomalias
+          this.listaAnomalias = this.listaAnomalias.concat(anomalia);
 
           // Guardar en la base de datos
           this.anomaliaService.addAnomalia(anomalia);
         }
-      });
-  }
 
-  hidePopup() {
-    this.map.getOverlayById('popup').setPosition(undefined);
+        // mostramos el aviso de anomalia creada
+        this.showAnomOk = true;
+      });
   }
 
   private getLocAreasWithModules() {
@@ -188,6 +194,12 @@ export class ClassificationService {
     }
 
     return modulo;
+  }
+
+  resetElemsSelected() {
+    this.normModSelected = undefined;
+    this.anomaliaSelected = undefined;
+    this.normModAnomaliaSelected = undefined;
   }
 
   ////////////////////////////////////////////////////////////
@@ -231,8 +243,15 @@ export class ClassificationService {
   }
 
   set anomaliaSelected(value: Anomalia) {
+    // const start1 = performance.now();
     this._anomaliaSelected = value;
+    // const end1 = performance.now();
+    // console.log(end1 - start1);
+
+    // const start2 = performance.now();
     this.anomaliaSelected$.next(value);
+    // const end2 = performance.now();
+    // console.log(end2 - start2);
   }
 
   get normModHovered() {
@@ -278,5 +297,14 @@ export class ClassificationService {
   set normModules(value: NormalizedModule[]) {
     this._normModules = value;
     this.normModules$.next(value);
+  }
+
+  get showAnomOk() {
+    return this._showAnomOk;
+  }
+
+  set showAnomOk(value: boolean) {
+    this._showAnomOk = value;
+    this.showAnomOk$.next(value);
   }
 }

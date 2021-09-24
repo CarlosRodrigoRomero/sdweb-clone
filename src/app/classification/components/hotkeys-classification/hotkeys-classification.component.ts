@@ -5,12 +5,15 @@ import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 import { ClassificationService } from '@core/services/classification.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 
+import { Anomalia } from '@core/models/anomalia';
+
 @Component({
   selector: 'app-hotkeys-classification',
   templateUrl: './hotkeys-classification.component.html',
   styleUrls: ['./hotkeys-classification.component.css'],
 })
 export class HotkeysClassificationComponent implements OnInit {
+  private anomaliaSelected: Anomalia;
   // private hotkeyTipos = [0, 3, 5, 6, 8, 9, 10, 13, 15, 17, 18];
 
   constructor(
@@ -20,18 +23,24 @@ export class HotkeysClassificationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.classificationService.anomaliaSelected$.subscribe((anomaliaSelected) => {
+    this.classificationService.anomaliaSelected$.subscribe((anomalia) => (this.anomaliaSelected = anomalia));
+
+    if (this.anomaliaSelected !== undefined) {
       this.hotkeysService.add(
         new Hotkey(
           '1',
           (event: KeyboardEvent): boolean => {
-            if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 8;
+
+              // ocultamos el aviso de anomalia creada
+              this.classificationService.showAnomOk = false;
+
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 8);
 
-              // ocultamos el popup
-              this.classificationService.hidePopup();
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
             }
             return false; // Prevent bubbling
           },
@@ -43,13 +52,17 @@ export class HotkeysClassificationComponent implements OnInit {
         new Hotkey(
           'shift+1',
           (event: KeyboardEvent): boolean => {
-            if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 0;
+
+              // ocultamos el aviso de anomalia creada
+              this.classificationService.showAnomOk = false;
+
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 0);
 
-              // ocultamos el popup
-              this.classificationService.hidePopup();
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
             }
             return false; // Prevent bubbling
           },
@@ -61,13 +74,17 @@ export class HotkeysClassificationComponent implements OnInit {
         new Hotkey(
           'ctrl+1',
           (event: KeyboardEvent): boolean => {
-            if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 13;
+
+              // ocultamos el aviso de anomalia creada
+              this.classificationService.showAnomOk = false;
+
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 13);
 
-              // ocultamos el popup
-              this.classificationService.hidePopup();
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
             }
             return false; // Prevent bubbling
           },
@@ -79,13 +96,17 @@ export class HotkeysClassificationComponent implements OnInit {
         new Hotkey(
           '2',
           (event: KeyboardEvent): boolean => {
-            if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 9;
+
+              // ocultamos el aviso de anomalia creada
+              this.classificationService.showAnomOk = false;
+
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 9);
 
-              // ocultamos el popup
-              this.classificationService.hidePopup();
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
             }
             return false; // Prevent bubbling
           },
@@ -97,13 +118,17 @@ export class HotkeysClassificationComponent implements OnInit {
         new Hotkey(
           'shift+2',
           (): boolean => {
-            if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 15;
+
+              // ocultamos el aviso de anomalia creada
+              this.classificationService.showAnomOk = false;
+
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 15);
 
-              // ocultamos el popup
-              this.classificationService.hidePopup();
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
             }
             return false; // Prevent bubbling
           },
@@ -115,13 +140,17 @@ export class HotkeysClassificationComponent implements OnInit {
         new Hotkey(
           '3',
           (event: KeyboardEvent): boolean => {
-            if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 3;
+
+              // ocultamos el aviso de anomalia creada
+              this.classificationService.showAnomOk = false;
+
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 3);
 
-              // ocultamos el popup
-              this.classificationService.hidePopup();
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
             }
             return false; // Prevent bubbling
           },
@@ -133,13 +162,17 @@ export class HotkeysClassificationComponent implements OnInit {
         new Hotkey(
           'ctrl+3',
           (event: KeyboardEvent): boolean => {
-            if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 10;
+
+              // ocultamos el aviso de anomalia creada
+              this.classificationService.showAnomOk = false;
+
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 10);
 
-              // ocultamos el popup
-              this.classificationService.hidePopup();
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
             }
             return false; // Prevent bubbling
           },
@@ -151,13 +184,17 @@ export class HotkeysClassificationComponent implements OnInit {
         new Hotkey(
           'shift+3',
           (event: KeyboardEvent): boolean => {
-            if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 6;
+
+              // ocultamos el aviso de anomalia creada
+              this.classificationService.showAnomOk = false;
+
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 6);
 
-              // ocultamos el popup
-              this.classificationService.hidePopup();
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
             }
             return false; // Prevent bubbling
           },
@@ -169,13 +206,17 @@ export class HotkeysClassificationComponent implements OnInit {
         new Hotkey(
           '4',
           (event: KeyboardEvent): boolean => {
-            if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 17;
+
+              // ocultamos el aviso de anomalia creada
+              this.classificationService.showAnomOk = false;
+
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 17);
 
-              // ocultamos el popup
-              this.classificationService.hidePopup();
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
             }
             return false; // Prevent bubbling
           },
@@ -187,13 +228,17 @@ export class HotkeysClassificationComponent implements OnInit {
         new Hotkey(
           '5',
           (event: KeyboardEvent): boolean => {
-            if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 5;
+
+              // ocultamos el aviso de anomalia creada
+              this.classificationService.showAnomOk = false;
+
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 5);
 
-              // ocultamos el popup
-              this.classificationService.hidePopup();
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
             }
             return false; // Prevent bubbling
           },
@@ -206,13 +251,17 @@ export class HotkeysClassificationComponent implements OnInit {
         new Hotkey(
           '8',
           (event: KeyboardEvent): boolean => {
-            if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 18;
+
+              // ocultamos el aviso de anomalia creada
+              this.classificationService.showAnomOk = false;
+
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 18);
 
-              // ocultamos el popup
-              this.classificationService.hidePopup();
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
             }
             return false; // Prevent bubbling
           },
@@ -225,14 +274,19 @@ export class HotkeysClassificationComponent implements OnInit {
         new Hotkey(
           'q',
           (event: KeyboardEvent): boolean => {
-            if (anomaliaSelected !== undefined && anomaliaSelected !== null) {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
+              // ocultamos el aviso de anomalia creada
+              this.classificationService.showAnomOk = false;
+
               // eliminamos la anomalia de la DB
-              this.anomaliaService.deleteAnomalia(anomaliaSelected);
+              this.anomaliaService.deleteAnomalia(this.anomaliaSelected);
+
+              // eliminamos la anomalia de la lista
+              this.classificationService.listaAnomalias = this.classificationService.listaAnomalias.filter(
+                (anom) => anom.id !== this.anomaliaSelected.id
+              );
 
               this.classificationService.anomaliaSelected = undefined;
-
-              // ocultamos el popup
-              this.classificationService.hidePopup();
             }
             return false; // Prevent bubbling
           },
@@ -240,6 +294,6 @@ export class HotkeysClassificationComponent implements OnInit {
           'q: eliminar anomalia'
         )
       );
-    });
+    }
   }
 }

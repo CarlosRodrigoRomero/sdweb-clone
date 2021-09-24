@@ -57,6 +57,7 @@ export class MapClassificationComponent implements OnInit {
   private palette = GLOBAL.ironPalette;
   normModSelected: NormalizedModule;
   anomaliaSelected: Anomalia;
+  public showAnomOk = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -67,7 +68,7 @@ export class MapClassificationComponent implements OnInit {
     private thermalService: ThermalService,
     private structuresService: StructuresService,
     private clustersService: ClustersService,
-    private anomaliaService: AnomaliaService,
+    private anomaliaService: AnomaliaService
   ) {}
 
   ngOnInit(): void {
@@ -76,17 +77,19 @@ export class MapClassificationComponent implements OnInit {
     this.informeId = this.classificationService.informeId;
 
     // nos conectamos a la lista de anomalias
-    this.classificationService.listaAnomalias$.subscribe((anomalias) => {
-      this.listaAnomalias = anomalias;
+    this.classificationService.listaAnomalias$.subscribe((anomalias) => (this.listaAnomalias = anomalias));
 
-      if (this.normModLayer !== undefined) {
-        this.normModLayer.setStyle(this.getStyleNormMod(false));
+    // aplicamos estilos cada vez que se modifica una anomalia
+    this.classificationService.anomaliaSelected$.subscribe((anomalia) => {
+      if (anomalia !== undefined) {
+        if (this.normModLayer !== undefined) {
+          this.normModLayer.setStyle(this.getStyleNormMod(false));
+        }
       }
     });
 
-    // nos suscribimos al modulo y a la anomalia seleccionada
-    this.classificationService.normModSelected$.subscribe((normMod) => (this.normModSelected = normMod));
-    this.classificationService.anomaliaSelected$.subscribe((anomalia) => (this.anomaliaSelected = anomalia));
+    // nos suscribimos al aviso de anomalia creada
+    this.classificationService.showAnomOk$.subscribe((show) => (this.showAnomOk = show));
 
     this.informeService
       .getThermalLayerDB$(this.informeId)
@@ -96,7 +99,10 @@ export class MapClassificationComponent implements OnInit {
         if (layers.length > 0) {
           // nos suscribimos a las capas termicas del mapa
           this.subscriptions.add(
-            this.olMapService.getThermalLayers().subscribe((tLayers) => (this.thermalLayers = tLayers))
+            this.olMapService
+              .getThermalLayers()
+              .pipe(take(1))
+              .subscribe((tLayers) => (this.thermalLayers = tLayers))
           );
 
           // esta es la thermalLayer de la DB
@@ -189,6 +195,13 @@ export class MapClassificationComponent implements OnInit {
       .pipe(take(1))
       .subscribe((map) => {
         this.map = map;
+
+        // desactivamos el zoom al hacer dobleclick para que no interfiera
+        this.map.getInteractions().forEach((interaction) => {
+          if (interaction instanceof DoubleClickZoom) {
+            this.map.removeInteraction(interaction);
+          }
+        });
       });
   }
 
@@ -308,25 +321,15 @@ export class MapClassificationComponent implements OnInit {
 
   private addOnDoubleClickInteraction() {
     this.map.on('dblclick', (event) => {
-      // desactivamos el zoom al hacer dobleclick para que no interfiera
-      this.map.getInteractions().forEach((interaction) => {
-        if (interaction instanceof DoubleClickZoom) {
-          this.map.removeInteraction(interaction);
-        }
-      });
-
       const feature = this.map.getFeaturesAtPixel(event.pixel)[0] as Feature;
       if (feature) {
-        // primero reseteamos los valores de la anomalia anterior
-        this.classificationService.normModSelected = undefined;
-        this.classificationService.anomaliaSelected = undefined;
+        // ocultamos el aviso de anomalia creada
+        this.classificationService.showAnomOk = false;
 
         const normMod: NormalizedModule = feature.getProperties().properties.normMod;
         this.classificationService.normModSelected = normMod;
 
         const coords = this.structuresService.coordsDBToCoordinate(feature.getProperties().properties.normMod.coords);
-
-        
 
         const date = this.getDatetime(coords);
 
@@ -347,10 +350,6 @@ export class MapClassificationComponent implements OnInit {
         this.classificationService.normModAnomaliaSelected = this.normModules.find(
           (normMod) => normMod.id === feature.getProperties().properties.id
         );
-
-        // reseteamos si venimos de crear una anomalia
-        this.classificationService.normModSelected = undefined;
-        this.classificationService.anomaliaSelected = undefined;
       }
     });
 
@@ -406,10 +405,6 @@ export class MapClassificationComponent implements OnInit {
         this.classificationService.normModAnomaliaSelected = this.normModules.find(
           (normMod) => normMod.id === features.getArray()[0].getProperties().properties.id
         );
-
-        // reseteamos si venimos de crear una anomalia
-        this.classificationService.normModSelected = undefined;
-        this.classificationService.anomaliaSelected = undefined;
       }
     });
 
@@ -444,6 +439,8 @@ export class MapClassificationComponent implements OnInit {
         this.classificationService.normModSelected = undefined;
         this.classificationService.anomaliaSelected = undefined;
         this.classificationService.normModAnomaliaSelected = undefined;
+        // ocultamos el aviso de anomalia creada
+        this.classificationService.showAnomOk = false;
       }
     });
   }
