@@ -47,8 +47,6 @@ export class ClassificationService {
   locAreasWithModule$ = new BehaviorSubject<LocationAreaInterface[]>(this._locAreasWithModule);
   private _normModules: NormalizedModule[] = [];
   normModules$ = new BehaviorSubject<NormalizedModule[]>(this._normModules);
-  private _showAnomOk = false;
-  showAnomOk$ = new BehaviorSubject<boolean>(this._showAnomOk);
 
   constructor(
     private router: Router,
@@ -162,9 +160,6 @@ export class ClassificationService {
           // Guardar en la base de datos
           this.anomaliaService.addAnomalia(anomalia);
         }
-
-        // mostramos el aviso de anomalia creada
-        this.showAnomOk = true;
       });
   }
 
@@ -297,14 +292,5 @@ export class ClassificationService {
   set normModules(value: NormalizedModule[]) {
     this._normModules = value;
     this.normModules$.next(value);
-  }
-
-  get showAnomOk() {
-    return this._showAnomOk;
-  }
-
-  set showAnomOk(value: boolean) {
-    this._showAnomOk = value;
-    this.showAnomOk$.next(value);
   }
 }

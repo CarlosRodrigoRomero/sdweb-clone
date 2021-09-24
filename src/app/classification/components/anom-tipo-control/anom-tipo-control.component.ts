@@ -28,11 +28,11 @@ export class AnomTipoLegendComponent implements OnInit {
       const anomalia = this.anomaliaSelected;
       anomalia.tipo = tipo;
 
-      // ocultamos el aviso de anomalia creada
-      this.classificationService.showAnomOk = false;
-
       // actualizamos el tipo en la DB
       this.anomaliaService.updateAnomaliaField(anomalia.id, 'tipo', tipo);
+
+      // reseteamos lo seleccionado
+      this.classificationService.resetElemsSelected();
     }
   }
 }

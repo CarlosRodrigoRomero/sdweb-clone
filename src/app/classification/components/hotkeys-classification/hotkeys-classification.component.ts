@@ -33,9 +33,6 @@ export class HotkeysClassificationComponent implements OnInit {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 8;
 
-              // ocultamos el aviso de anomalia creada
-              this.classificationService.showAnomOk = false;
-
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 8);
 
@@ -54,9 +51,6 @@ export class HotkeysClassificationComponent implements OnInit {
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 0;
-
-              // ocultamos el aviso de anomalia creada
-              this.classificationService.showAnomOk = false;
 
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 0);
@@ -77,9 +71,6 @@ export class HotkeysClassificationComponent implements OnInit {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 13;
 
-              // ocultamos el aviso de anomalia creada
-              this.classificationService.showAnomOk = false;
-
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 13);
 
@@ -98,9 +89,6 @@ export class HotkeysClassificationComponent implements OnInit {
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 9;
-
-              // ocultamos el aviso de anomalia creada
-              this.classificationService.showAnomOk = false;
 
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 9);
@@ -121,9 +109,6 @@ export class HotkeysClassificationComponent implements OnInit {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 15;
 
-              // ocultamos el aviso de anomalia creada
-              this.classificationService.showAnomOk = false;
-
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 15);
 
@@ -142,9 +127,6 @@ export class HotkeysClassificationComponent implements OnInit {
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 3;
-
-              // ocultamos el aviso de anomalia creada
-              this.classificationService.showAnomOk = false;
 
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 3);
@@ -165,9 +147,6 @@ export class HotkeysClassificationComponent implements OnInit {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 10;
 
-              // ocultamos el aviso de anomalia creada
-              this.classificationService.showAnomOk = false;
-
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 10);
 
@@ -186,9 +165,6 @@ export class HotkeysClassificationComponent implements OnInit {
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 6;
-
-              // ocultamos el aviso de anomalia creada
-              this.classificationService.showAnomOk = false;
 
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 6);
@@ -209,9 +185,6 @@ export class HotkeysClassificationComponent implements OnInit {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 17;
 
-              // ocultamos el aviso de anomalia creada
-              this.classificationService.showAnomOk = false;
-
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 17);
 
@@ -230,9 +203,6 @@ export class HotkeysClassificationComponent implements OnInit {
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 5;
-
-              // ocultamos el aviso de anomalia creada
-              this.classificationService.showAnomOk = false;
 
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 5);
@@ -254,9 +224,6 @@ export class HotkeysClassificationComponent implements OnInit {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
               this.classificationService.anomaliaSelected.tipo = 18;
 
-              // ocultamos el aviso de anomalia creada
-              this.classificationService.showAnomOk = false;
-
               // actualizamos el tipo en la DB
               this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 18);
 
@@ -275,9 +242,6 @@ export class HotkeysClassificationComponent implements OnInit {
           'q',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              // ocultamos el aviso de anomalia creada
-              this.classificationService.showAnomOk = false;
-
               // eliminamos la anomalia de la DB
               this.anomaliaService.deleteAnomalia(this.anomaliaSelected);
 

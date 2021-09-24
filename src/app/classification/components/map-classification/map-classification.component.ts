@@ -81,6 +81,8 @@ export class MapClassificationComponent implements OnInit {
 
     // aplicamos estilos cada vez que se modifica una anomalia
     this.classificationService.anomaliaSelected$.subscribe((anomalia) => {
+      this.anomaliaSelected = anomalia;
+
       if (anomalia !== undefined) {
         if (this.normModLayer !== undefined) {
           this.normModLayer.setStyle(this.getStyleNormMod(false));
@@ -88,8 +90,7 @@ export class MapClassificationComponent implements OnInit {
       }
     });
 
-    // nos suscribimos al aviso de anomalia creada
-    this.classificationService.showAnomOk$.subscribe((show) => (this.showAnomOk = show));
+    this.classificationService.normModSelected$.subscribe((normMod) => (this.normModSelected = normMod));
 
     this.informeService
       .getThermalLayerDB$(this.informeId)
@@ -323,8 +324,8 @@ export class MapClassificationComponent implements OnInit {
     this.map.on('dblclick', (event) => {
       const feature = this.map.getFeaturesAtPixel(event.pixel)[0] as Feature;
       if (feature) {
-        // ocultamos el aviso de anomalia creada
-        this.classificationService.showAnomOk = false;
+        // reseteamos lo seleccionado antes
+        this.classificationService.resetElemsSelected();
 
         const normMod: NormalizedModule = feature.getProperties().properties.normMod;
         this.classificationService.normModSelected = normMod;
@@ -436,11 +437,8 @@ export class MapClassificationComponent implements OnInit {
         .filter((item) => item.getProperties().properties !== undefined);
 
       if (feature.length === 0) {
-        this.classificationService.normModSelected = undefined;
-        this.classificationService.anomaliaSelected = undefined;
-        this.classificationService.normModAnomaliaSelected = undefined;
-        // ocultamos el aviso de anomalia creada
-        this.classificationService.showAnomOk = false;
+        // reseteamos lo seleccionado
+        this.classificationService.resetElemsSelected();
       }
     });
   }
