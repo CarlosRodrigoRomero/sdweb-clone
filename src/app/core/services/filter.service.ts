@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Observable, BehaviorSubject } from 'rxjs';
 
@@ -7,6 +8,8 @@ import { FilterControlService } from '@core/services/filter-control.service';
 
 import { FilterableElement } from '@core/models/filterableInterface';
 import { FilterInterface } from '@core/models/filter';
+import { Seguidor } from '@core/models/seguidor';
+import { Anomalia } from '@core/models/anomalia';
 
 @Injectable({
   providedIn: 'root',
@@ -24,8 +27,13 @@ export class FilterService {
   public filteredElementsWithoutFilterTipo$ = new BehaviorSubject<FilterableElement[]>(
     this._filteredElementsWithoutFilterTipo
   );
+  public plantaSeguidores = false;
 
-  constructor(private shareReportService: ShareReportService, private filterControlService: FilterControlService) {}
+  constructor(
+    private router: Router,
+    private shareReportService: ShareReportService,
+    private filterControlService: FilterControlService
+  ) {}
 
   initService(elems: FilterableElement[], shared?: boolean, sharedId?: string): Promise<boolean> {
     this.allFiltrableElements = elems;
@@ -71,60 +79,90 @@ export class FilterService {
       this.shareReportService.setParams(filter);
     }
 
-    this.applyFilters();
+    this.processFilters();
   }
 
   addFilters(filters: FilterInterface[]) {
     this.filters = filters;
     this.filters$.next(this.filters);
 
-    this.applyFilters();
+    this.processFilters();
   }
 
-  applyFilters() {
+  processFilters() {
+    // revisamos tipo de planta
+    this.getTipoPlanta();
+
     // comprobamos primero si hay filtros activos
     if (this.filters.length === 0) {
-      this.filteredElements = this.allFiltrableElements;
+      // desaplicamos filtros si los hubiese
+      this.unapplyFilters();
     } else {
-      const everyFilterFiltrableElements: Array<FilterableElement[]> = new Array<FilterableElement[]>();
+      if (this.plantaSeguidores) {
+        this.filteredElements = this.allFiltrableElements.filter((elem) => {
+          (elem as Seguidor).anomaliasCliente = this.applyFilters((elem as Seguidor).anomalias) as Anomalia[];
 
-      // comprobamos si hay filtros de tipo 'multiple'
-      if (this.filters.filter((fil) => this.multipleFilters.includes(fil.type)).length > 0) {
-        // separamos los elems por tipo de filtro
-        this.multipleFilters.forEach((type) => {
-          const newFiltrableElements: FilterableElement[] = [];
-          if (this.filters.filter((fil) => fil.type === type).length > 0) {
-            // obtenemos un array de las elems filtrados por cada filtro de  diferente tipo
-            this.filters
-              .filter((fil) => fil.type === type)
-              .forEach((fil) =>
-                fil.applyFilter(this.allFiltrableElements).forEach((elem) => newFiltrableElements.push(elem))
-              );
-            // añadimos un array de cada tipo
-            everyFilterFiltrableElements.push(newFiltrableElements);
-          }
+          return (elem as Seguidor).anomaliasCliente.length > 0;
         });
+      } else {
+        this.filteredElements = this.applyFilters(this.allFiltrableElements);
       }
+    }
+  }
 
-      // añadimos al array los elementos filtrados de los filtros no 'multiple'
-      this.filters
-        .filter((fil) => !this.multipleFilters.includes(fil.type))
-        .forEach((fil) => {
-          const newFiltrableElements = fil.applyFilter(this.allFiltrableElements);
+  private applyFilters(elements: FilterableElement[]): FilterableElement[] {
+    const everyFilterFiltrableElements: Array<FilterableElement[]> = new Array<FilterableElement[]>();
+
+    // comprobamos si hay filtros de tipo 'multiple'
+    if (this.filters.filter((fil) => this.multipleFilters.includes(fil.type)).length > 0) {
+      // separamos los elems por tipo de filtro
+      this.multipleFilters.forEach((type) => {
+        const newFiltrableElements: FilterableElement[] = [];
+        if (this.filters.filter((fil) => fil.type === type).length > 0) {
+          // obtenemos un array de las elems filtrados por cada filtro de  diferente tipo
+          this.filters
+            .filter((fil) => fil.type === type)
+            .forEach((fil) => fil.applyFilter(elements).forEach((elem) => newFiltrableElements.push(elem)));
+          // añadimos un array de cada tipo
           everyFilterFiltrableElements.push(newFiltrableElements);
-        });
+        }
+      });
+    }
 
-      // calculamos la interseccion de los array de los diferentes tipos
-      if (everyFilterFiltrableElements.length > 0) {
-        this.filteredElements = everyFilterFiltrableElements.reduce((anterior, actual) =>
-          anterior.filter((elem) => actual.includes(elem))
+    // añadimos al array los elementos filtrados de los filtros no 'multiple'
+    this.filters
+      .filter((fil) => !this.multipleFilters.includes(fil.type))
+      .forEach((fil) => {
+        const newFiltrableElements = fil.applyFilter(elements);
+        everyFilterFiltrableElements.push(newFiltrableElements);
+      });
+
+    // calculamos la interseccion de los array de los diferentes tipos
+    let finalElements: FilterableElement[];
+    if (everyFilterFiltrableElements.length > 0) {
+      finalElements = everyFilterFiltrableElements.reduce((anterior, actual) =>
+        anterior.filter((elem) => actual.includes(elem))
+      );
+    }
+
+    // para calcular el numero de anomalias por filtro tipo
+    // this.excludeTipoFilters();
+
+    return finalElements;
+  }
+
+  private unapplyFilters() {
+    if (this.plantaSeguidores) {
+      this.filteredElements = this.allFiltrableElements.filter((elem) => {
+        (elem as Seguidor).anomaliasCliente = (elem as Seguidor).anomalias.filter(
+          // tslint:disable-next-line: triple-equals
+          (anom) => anom.tipo != 0 && anom.criticidad !== null
         );
-      }
 
-      this.filteredElements$.next(this.filteredElements);
-
-      // para calcular el numero de anomalias por filtro tipo
-      // this.excludeTipoFilters();
+        return (elem as Seguidor).anomaliasCliente.length > 0;
+      });
+    } else {
+      this.filteredElements = this.allFiltrableElements;
     }
   }
 
@@ -147,7 +185,7 @@ export class FilterService {
       this.shareReportService.resetParams(filter);
     }
 
-    this.applyFilters();
+    this.processFilters();
   }
 
   deleteAllFilters() {
@@ -158,7 +196,7 @@ export class FilterService {
     // reseteamos todos los parametros para compartir
     this.shareReportService.resetAllParams();
 
-    this.applyFilters();
+    this.processFilters();
   }
 
   private excludeTipoFilters() {
@@ -209,7 +247,13 @@ export class FilterService {
   addElement(element: FilterableElement) {
     this.allFiltrableElements.push(element);
 
-    this.applyFilters();
+    this.processFilters();
+  }
+
+  private getTipoPlanta() {
+    if (this.router.url.includes('tracker')) {
+      this.plantaSeguidores = true;
+    }
   }
 
   /////////////////////////////////////////////////
