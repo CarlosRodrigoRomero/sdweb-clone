@@ -325,7 +325,7 @@ export class MapClassificationComponent implements OnInit {
       const feature = this.map.getFeaturesAtPixel(event.pixel)[0] as Feature;
       if (feature) {
         // reseteamos lo seleccionado antes
-        this.classificationService.resetElemsSelected();
+        // this.classificationService.resetElemsSelected();
 
         const normMod: NormalizedModule = feature.getProperties().properties.normMod;
         this.classificationService.normModSelected = normMod;

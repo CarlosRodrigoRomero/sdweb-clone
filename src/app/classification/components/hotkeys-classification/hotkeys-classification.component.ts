@@ -250,7 +250,8 @@ export class HotkeysClassificationComponent implements OnInit {
                 (anom) => anom.id !== this.anomaliaSelected.id
               );
 
-              this.classificationService.anomaliaSelected = undefined;
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
             }
             return false; // Prevent bubbling
           },
