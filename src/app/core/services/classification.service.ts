@@ -32,8 +32,6 @@ export class ClassificationService {
   private _planta: PlantaInterface = {};
   planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
   private _thermalLayer: ThermalLayerInterface;
-  private _initialized = false;
-  private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private map: Map;
   private _normModSelected: NormalizedModule = undefined;
   normModSelected$ = new BehaviorSubject<NormalizedModule>(this._normModSelected);

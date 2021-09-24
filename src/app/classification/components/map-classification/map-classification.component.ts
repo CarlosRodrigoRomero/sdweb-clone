@@ -9,7 +9,6 @@ import View from 'ol/View';
 import { fromLonLat } from 'ol/proj';
 import { defaults as defaultControls } from 'ol/control.js';
 import { Feature, Map } from 'ol';
-import Overlay from 'ol/Overlay';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style } from 'ol/style';
@@ -31,7 +30,6 @@ import { ThermalService } from '@core/services/thermal.service';
 import { StructuresService } from '@core/services/structures.service';
 import { ClustersService } from '@core/services/clusters.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
-import { PlantaService } from '@core/services/planta.service';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { PlantaInterface } from '@core/models/planta';
@@ -52,12 +50,13 @@ export class MapClassificationComponent implements OnInit {
   private thermalLayer: ThermalLayerInterface;
   private thermalLayers: TileLayer[];
   private normModules: NormalizedModule[];
-  private popup: Overlay;
   private listaAnomalias: Anomalia[] = [];
   private normModLayer: VectorLayer = undefined;
   private prevFeatureHover: Feature;
   thermalLayerVisibility = true;
   private palette = GLOBAL.ironPalette;
+  normModSelected: NormalizedModule;
+  anomaliaSelected: Anomalia;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -69,7 +68,6 @@ export class MapClassificationComponent implements OnInit {
     private structuresService: StructuresService,
     private clustersService: ClustersService,
     private anomaliaService: AnomaliaService,
-    private plantaService: PlantaService
   ) {}
 
   ngOnInit(): void {
@@ -85,6 +83,10 @@ export class MapClassificationComponent implements OnInit {
         this.normModLayer.setStyle(this.getStyleNormMod(false));
       }
     });
+
+    // nos suscribimos al modulo y a la anomalia seleccionada
+    this.classificationService.normModSelected$.subscribe((normMod) => (this.normModSelected = normMod));
+    this.classificationService.anomaliaSelected$.subscribe((anomalia) => (this.anomaliaSelected = anomalia));
 
     this.informeService
       .getThermalLayerDB$(this.informeId)
@@ -108,8 +110,6 @@ export class MapClassificationComponent implements OnInit {
           this.addNormModules();
 
           // this.addZoomEvent();
-
-          this.addPopupOverlay();
 
           this.addPointerOnHover();
           this.addOnHoverAction();
@@ -242,21 +242,6 @@ export class MapClassificationComponent implements OnInit {
     });
   }
 
-  private addPopupOverlay() {
-    const container = document.getElementById('popup');
-    this.popup = new Overlay({
-      id: 'popup',
-      element: container,
-      autoPan: true,
-      autoPanAnimation: {
-        duration: 250,
-      },
-      position: undefined,
-    });
-
-    this.map.addOverlay(this.popup);
-  }
-
   private addPointerOnHover() {
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
@@ -341,7 +326,7 @@ export class MapClassificationComponent implements OnInit {
 
         const coords = this.structuresService.coordsDBToCoordinate(feature.getProperties().properties.normMod.coords);
 
-        this.popup.setPosition(coords[0]);
+        
 
         const date = this.getDatetime(coords);
 
@@ -365,7 +350,6 @@ export class MapClassificationComponent implements OnInit {
 
         // reseteamos si venimos de crear una anomalia
         this.classificationService.normModSelected = undefined;
-        this.popup.setPosition(undefined);
         this.classificationService.anomaliaSelected = undefined;
       }
     });
@@ -425,7 +409,6 @@ export class MapClassificationComponent implements OnInit {
 
         // reseteamos si venimos de crear una anomalia
         this.classificationService.normModSelected = undefined;
-        this.popup.setPosition(undefined);
         this.classificationService.anomaliaSelected = undefined;
       }
     });
@@ -459,7 +442,6 @@ export class MapClassificationComponent implements OnInit {
 
       if (feature.length === 0) {
         this.classificationService.normModSelected = undefined;
-        this.popup.setPosition(undefined);
         this.classificationService.anomaliaSelected = undefined;
         this.classificationService.normModAnomaliaSelected = undefined;
       }

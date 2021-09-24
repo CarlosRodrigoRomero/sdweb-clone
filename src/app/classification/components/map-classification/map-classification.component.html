@@ -1,9 +1,12 @@
 <div id="map" class="map"></div>
-<div id="popup" class="ol-popup">
-  <app-popup-classification></app-popup-classification>
-</div>
 <button class="show-thermal" mat-raised-button (click)="setThermalLayerVisibility()">
   <span *ngIf="thermalLayerVisibility">Ocultar capa térmica</span>
   <span *ngIf="!thermalLayerVisibility">Mostrar capa térmica</span>
 </button>
 <button class="change-palette" mat-raised-button (click)="setThermalPalette()">Cambiar paleta colores</button>
+<div class="anom-ok" *ngIf="normModSelected && anomaliaSelected">
+  <app-hotkeys-classification></app-hotkeys-classification>
+  <button mat-raised-button>
+    <mat-icon>done</mat-icon>
+  </button>
+</div>

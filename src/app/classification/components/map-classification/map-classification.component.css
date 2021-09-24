@@ -26,3 +26,14 @@
   top: 125px;
   right: 10px;
 }
+
+.anom-ok {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+.anom-ok mat-icon {
+  color: green;
+}
