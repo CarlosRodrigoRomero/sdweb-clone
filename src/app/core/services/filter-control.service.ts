@@ -53,9 +53,6 @@ export class FilterControlService {
   private _activeDeleteArea: boolean = false;
   public activeDeleteArea$ = new BehaviorSubject<boolean>(this._activeDeleteArea);
 
-  private _segsNoAnoms: boolean = false;
-  public segsNoAnoms$ = new BehaviorSubject<boolean>(this._segsNoAnoms);
-
   constructor(private olMapService: OlMapService) {}
 
   setInitParams(params: ParamsFilterShare) {
@@ -92,9 +89,6 @@ export class FilterControlService {
           this.tiposSelected.push(false);
         }
       });
-    }
-    if (params.segsNoAnoms !== undefined && params.segsNoAnoms !== null) {
-      this.segsNoAnoms = params.segsNoAnoms;
     }
   }
 
@@ -138,9 +132,6 @@ export class FilterControlService {
       .subscribe(([map, draw]) => {
         map.removeInteraction(draw);
       });
-
-    // SEGUIDORES SIN ANOMALIAS
-    this.segsNoAnoms = true;
   }
 
   //////////////////////////////////////////////////
@@ -268,15 +259,5 @@ export class FilterControlService {
   set activeDeleteArea(value: boolean) {
     this._activeDeleteArea = value;
     this.activeDeleteArea$.next(value);
-  }
-
-  /* SEGUIDORES SIN ANOMALIAS */
-  get segsNoAnoms() {
-    return this._segsNoAnoms;
-  }
-
-  set segsNoAnoms(value: boolean) {
-    this._segsNoAnoms = value;
-    this.segsNoAnoms$.next(value);
   }
 }

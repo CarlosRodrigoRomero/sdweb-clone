@@ -16,7 +16,7 @@ import { Anomalia } from '@core/models/anomalia';
 })
 export class FilterService {
   private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad'];
-  private noAmosSegsFilters = ['area' , 'segsNoAnoms'];
+  private noAmosSegsFilters = ['area'];
   private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   public filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
@@ -100,8 +100,11 @@ export class FilterService {
       this.unapplyFilters();
     } else {
       if (this.plantaSeguidores) {
-        // si el filtro area es el unico le mandamos todos los elems y sino calculamos su interseccion con otros filtros
-        if (this.filters.length === 1 && this.filters[0].type === 'area') {
+        // si todos los filtros son tipo noAnomsSeg le mandamos todos los elems y sino calculamos su interseccion con otros filtros
+        if (
+          this.filters.map((fil) => fil.type).filter((fil) => this.noAmosSegsFilters.includes(fil)).length ===
+          this.filters.length
+        ) {
           this.applyNoAnomsSegsFilters(this.allFiltrableElements);
         } else {
           const elemsFiltered = this.allFiltrableElements.filter((elem) => {
