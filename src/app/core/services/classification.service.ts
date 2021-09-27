@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { AngularFirestore } from '@angular/fire/firestore';
+import { BehaviorSubject } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 
-import { BehaviorSubject, Observable } from 'rxjs';
-import { filter, switchMap, take } from 'rxjs/operators';
-
-import { Feature, Map } from 'ol';
+import { Feature } from 'ol';
 import SimpleGeometry from 'ol/geom/SimpleGeometry';
 import { Coordinate } from 'ol/coordinate';
 import Polygon from 'ol/geom/Polygon';
@@ -32,7 +30,6 @@ export class ClassificationService {
   private _planta: PlantaInterface = {};
   planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
   private _thermalLayer: ThermalLayerInterface;
-  private map: Map;
   private _normModSelected: NormalizedModule = undefined;
   normModSelected$ = new BehaviorSubject<NormalizedModule>(this._normModSelected);
   private _normModHovered: NormalizedModule = undefined;
@@ -53,7 +50,6 @@ export class ClassificationService {
     private informeService: InformeService,
     private plantaService: PlantaService,
     private anomaliaService: AnomaliaService,
-    private afs: AngularFirestore,
     private olMapService: OlMapService,
     private structuresService: StructuresService
   ) {}
@@ -103,14 +99,11 @@ export class ClassificationService {
         .getAnomaliasInforme$(this.informeId)
         .pipe(take(1))
         .subscribe((anoms) => (this.listaAnomalias = anoms));
-
-      this.olMapService.map$.subscribe((map) => (this.map = map));
     });
   }
 
   createAnomaliaFromNormModule(feature: Feature, date: number) {
     const id = feature.getProperties().properties.id;
-    const refAnom = this.afs.collection('anomalias').doc(id);
     const normModule: NormalizedModule = feature.getProperties().properties.normMod;
     const geometry = feature.getGeometry() as SimpleGeometry;
 
@@ -122,45 +115,33 @@ export class ClassificationService {
       coords = this.plantaService.getGlobalCoordsFromLocationAreaOl(geometry.getCoordinates()[0][0]);
     }
 
-    refAnom
-      .get()
-      .toPromise()
-      .then((anom) => {
-        // comprobamos si la anomalia existe
-        if (anom.exists) {
-          // si existe la traemos para leer sus datos
-          this.anomaliaSelected = this.listaAnomalias.find((an) => an.id === id);
-        } else {
-          // si no existe previmente la creamos
-          const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coords);
-          const modulo = this.getAnomModule(geometry.getCoordinates()[0][0]);
+    const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coords);
+    const modulo = this.getAnomModule(geometry.getCoordinates()[0][0]);
 
-          const anomalia: Anomalia = {
-            id,
-            plantaId: this.planta.id,
-            informeId: this.informeId,
-            tipo: 8,
-            globalCoords,
-            gradienteNormalizado: 0,
-            temperaturaMax: 0,
-            modulo,
-            featureCoords: geometry.getCoordinates()[0],
-            featureType: geometry.getType(),
-            localX: normModule.columna,
-            localY: normModule.fila,
-            datetime: date,
-          };
+    const anomalia: Anomalia = {
+      id,
+      plantaId: this.planta.id,
+      informeId: this.informeId,
+      tipo: 8,
+      globalCoords,
+      gradienteNormalizado: 0,
+      temperaturaMax: 0,
+      modulo,
+      featureCoords: geometry.getCoordinates()[0],
+      featureType: geometry.getType(),
+      localX: normModule.columna,
+      localY: normModule.fila,
+      datetime: date,
+    };
 
-          // asignamos la nueva anomalia para acceder a ella y poder modificarla
-          this.anomaliaSelected = anomalia;
+    // asignamos la nueva anomalia para acceder a ella y poder modificarla
+    this.anomaliaSelected = anomalia;
 
-          // añadimos a la lista de anomalias
-          this.listaAnomalias = this.listaAnomalias.concat(anomalia);
+    // añadimos a la lista de anomalias
+    this.listaAnomalias = this.listaAnomalias.concat(anomalia);
 
-          // Guardar en la base de datos
-          this.anomaliaService.addAnomalia(anomalia);
-        }
-      });
+    // Guardar en la base de datos
+    this.anomaliaService.addAnomalia(anomalia);
   }
 
   private getLocAreasWithModules() {

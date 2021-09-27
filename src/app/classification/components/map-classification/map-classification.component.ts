@@ -324,17 +324,21 @@ export class MapClassificationComponent implements OnInit {
     this.map.on('dblclick', (event) => {
       const feature = this.map.getFeaturesAtPixel(event.pixel)[0] as Feature;
       if (feature) {
-        // reseteamos lo seleccionado antes
-        // this.classificationService.resetElemsSelected();
-
         const normMod: NormalizedModule = feature.getProperties().properties.normMod;
-        this.classificationService.normModSelected = normMod;
 
-        const coords = this.structuresService.coordsDBToCoordinate(feature.getProperties().properties.normMod.coords);
+        // no permitimos doble click sobre anomalias
+        if (!this.listaAnomalias.map((anom) => anom.id).includes(normMod.id)) {
+          console.log(normMod);
+          console.log(this.listaAnomalias.find((anom) => anom.id === normMod.id));
 
-        const date = this.getDatetime(coords);
+          this.classificationService.normModSelected = normMod;
 
-        this.classificationService.createAnomaliaFromNormModule(feature, date);
+          const coords = this.structuresService.coordsDBToCoordinate(feature.getProperties().properties.normMod.coords);
+
+          const date = this.getDatetime(coords);
+
+          this.classificationService.createAnomaliaFromNormModule(feature, date);
+        }
       }
     });
   }
@@ -405,6 +409,11 @@ export class MapClassificationComponent implements OnInit {
         // asignamos el modulo normalizado seleccionado
         this.classificationService.normModAnomaliaSelected = this.normModules.find(
           (normMod) => normMod.id === features.getArray()[0].getProperties().properties.id
+        );
+
+        // marcamos la anomalia como seleccionada
+        this.classificationService.anomaliaSelected = this.listaAnomalias.find(
+          (anom) => anom.id === features.getArray()[0].getProperties().properties.id
         );
       }
     });
