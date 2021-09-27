@@ -193,7 +193,7 @@ export class RawModulesComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.filterService.applyFilters();
+    this.filterService.processFilters();
   }
 
   restoreDeletedModules() {
@@ -203,7 +203,7 @@ export class RawModulesComponent implements OnInit, OnDestroy {
     // vaciamos el array local con los eliminados
     this.structuresService.deletedRawModIds = [];
 
-    this.filterService.applyFilters();
+    this.filterService.processFilters();
   }
 
   private setRawModulesVisibility(visible: boolean) {

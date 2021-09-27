@@ -102,8 +102,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
               .createSeguidorLayers(informe.id)
               .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
-            console.log('ok');
-
             // añadimos las ortofotos aereas de cada informe
             this.addAerialLayer(informe.id);
           });

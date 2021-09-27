@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Observable, BehaviorSubject } from 'rxjs';
 
@@ -7,12 +8,15 @@ import { FilterControlService } from '@core/services/filter-control.service';
 
 import { FilterableElement } from '@core/models/filterableInterface';
 import { FilterInterface } from '@core/models/filter';
+import { Seguidor } from '@core/models/seguidor';
+import { Anomalia } from '@core/models/anomalia';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FilterService {
   private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad'];
+  private noAmosSegsFilters = ['area'];
   private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   public filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
@@ -24,8 +28,13 @@ export class FilterService {
   public filteredElementsWithoutFilterTipo$ = new BehaviorSubject<FilterableElement[]>(
     this._filteredElementsWithoutFilterTipo
   );
+  public plantaSeguidores = false;
 
-  constructor(private shareReportService: ShareReportService, private filterControlService: FilterControlService) {}
+  constructor(
+    private router: Router,
+    private shareReportService: ShareReportService,
+    private filterControlService: FilterControlService
+  ) {}
 
   initService(elems: FilterableElement[], shared?: boolean, sharedId?: string): Promise<boolean> {
     this.allFiltrableElements = elems;
@@ -71,48 +80,118 @@ export class FilterService {
       this.shareReportService.setParams(filter);
     }
 
-    this.applyFilters();
+    this.processFilters();
   }
 
   addFilters(filters: FilterInterface[]) {
     this.filters = filters;
     this.filters$.next(this.filters);
 
-    this.applyFilters();
+    this.processFilters();
   }
 
-  applyFilters() {
+  processFilters() {
+    // revisamos tipo de planta
+    this.getTipoPlanta();
+
     // comprobamos primero si hay filtros activos
     if (this.filters.length === 0) {
-      this.filteredElements = this.allFiltrableElements;
+      // desaplicamos filtros si los hubiese
+      this.unapplyFilters();
     } else {
-      const everyFilterFiltrableElements: Array<FilterableElement[]> = new Array<FilterableElement[]>();
+      if (this.plantaSeguidores) {
+        // si todos los filtros son tipo noAnomsSeg le mandamos todos los elems y sino calculamos su interseccion con otros filtros
+        if (
+          this.filters.map((fil) => fil.type).filter((fil) => this.noAmosSegsFilters.includes(fil)).length ===
+          this.filters.length
+        ) {
+          this.applyNoAnomsSegsFilters(this.allFiltrableElements);
+        } else {
+          const elemsFiltered = this.allFiltrableElements.filter((elem) => {
+            const newAnomaliasCliente = this.applyFilters((elem as Seguidor).anomalias) as Anomalia[];
+            if (newAnomaliasCliente !== undefined) {
+              (elem as Seguidor).anomaliasCliente = newAnomaliasCliente;
+            }
 
-      // comprobamos si hay filtros de tipo 'multiple'
-      if (this.filters.filter((fil) => this.multipleFilters.includes(fil.type)).length > 0) {
-        // separamos los elems por tipo de filtro
-        this.multipleFilters.forEach((type) => {
-          const newFiltrableElements: FilterableElement[] = [];
-          if (this.filters.filter((fil) => fil.type === type).length > 0) {
-            // obtenemos un array de las elems filtrados por cada filtro de  diferente tipo
-            this.filters
-              .filter((fil) => fil.type === type)
-              .forEach((fil) =>
-                fil.applyFilter(this.allFiltrableElements).forEach((elem) => newFiltrableElements.push(elem))
-              );
-            // añadimos un array de cada tipo
-            everyFilterFiltrableElements.push(newFiltrableElements);
-          }
-        });
+            return (elem as Seguidor).anomaliasCliente.length > 0;
+          });
+
+          // aplicamos los filtros noAnomsSegs
+          this.applyNoAnomsSegsFilters(elemsFiltered);
+        }
+      } else {
+        this.filteredElements = this.applyFilters(this.allFiltrableElements);
       }
+    }
+  }
 
-      // añadimos al array los elementos filtrados de los filtros no 'multiple'
-      this.filters
-        .filter((fil) => !this.multipleFilters.includes(fil.type))
-        .forEach((fil) => {
-          const newFiltrableElements = fil.applyFilter(this.allFiltrableElements);
+  private applyFilters(elements: FilterableElement[]): FilterableElement[] {
+    const everyFilterFiltrableElements: Array<FilterableElement[]> = new Array<FilterableElement[]>();
+
+    let multFilters = this.multipleFilters;
+    let noMultFilters = this.filters
+      .map((filter) => filter.type)
+      .filter((filter) => !this.multipleFilters.includes(filter));
+    if (this.plantaSeguidores) {
+      multFilters = multFilters.filter((filter) => !this.noAmosSegsFilters.includes(filter));
+      noMultFilters = noMultFilters.filter((filter) => !this.noAmosSegsFilters.includes(filter));
+    }
+
+    // comprobamos si hay filtros de tipo 'multiple'
+    if (this.filters.filter((fil) => multFilters.includes(fil.type)).length > 0) {
+      // separamos los elems por tipo de filtro
+      multFilters.forEach((type) => {
+        const newFiltrableElements: FilterableElement[] = [];
+        if (this.filters.filter((fil) => fil.type === type).length > 0) {
+          // obtenemos un array de las elems filtrados por cada filtro de  diferente tipo
+          this.filters
+            .filter((fil) => fil.type === type)
+            .forEach((fil) => fil.applyFilter(elements).forEach((elem) => newFiltrableElements.push(elem)));
+          // añadimos un array de cada tipo
           everyFilterFiltrableElements.push(newFiltrableElements);
-        });
+        }
+      });
+    }
+
+    // añadimos al array los elementos filtrados de los filtros no 'multiple'
+    this.filters
+      .filter((fil) => noMultFilters.includes(fil.type))
+      .forEach((fil) => {
+        const newFiltrableElements = fil.applyFilter(elements);
+        everyFilterFiltrableElements.push(newFiltrableElements);
+      });
+
+    // calculamos la interseccion de los array de los diferentes tipos
+    let finalElements: FilterableElement[];
+    if (everyFilterFiltrableElements.length > 0) {
+      finalElements = everyFilterFiltrableElements.reduce((anterior, actual) =>
+        anterior.filter((elem) => actual.includes(elem))
+      );
+    }
+
+    // para calcular el numero de anomalias por filtro tipo
+    // this.excludeTipoFilters();
+
+    return finalElements;
+  }
+
+  private applyNoAnomsSegsFilters(elems: FilterableElement[]) {
+    // comprobamos si hay filtros noAnomsSegs
+    if (this.filters.filter((fil) => this.noAmosSegsFilters.includes(fil.type)).length > 0) {
+      const everyFilterFiltrableElements = [elems];
+
+      // separamos los elems por tipo de filtro
+      this.noAmosSegsFilters.forEach((type) => {
+        const newFiltrableElements: FilterableElement[] = [];
+        if (this.filters.filter((fil) => fil.type === type).length > 0) {
+          // obtenemos un array de las elems filtrados por cada filtro de  diferente tipo
+          this.filters
+            .filter((fil) => fil.type === type)
+            .forEach((fil) => fil.applyFilter(elems).forEach((elem) => newFiltrableElements.push(elem)));
+          // añadimos un array de cada tipo
+          everyFilterFiltrableElements.push(newFiltrableElements);
+        }
+      });
 
       // calculamos la interseccion de los array de los diferentes tipos
       if (everyFilterFiltrableElements.length > 0) {
@@ -120,12 +199,13 @@ export class FilterService {
           anterior.filter((elem) => actual.includes(elem))
         );
       }
-
-      this.filteredElements$.next(this.filteredElements);
-
-      // para calcular el numero de anomalias por filtro tipo
-      // this.excludeTipoFilters();
+    } else {
+      this.filteredElements = elems;
     }
+  }
+
+  private unapplyFilters() {
+    this.filteredElements = this.allFiltrableElements;
   }
 
   getAllFilters(): Observable<FilterInterface[]> {
@@ -147,7 +227,7 @@ export class FilterService {
       this.shareReportService.resetParams(filter);
     }
 
-    this.applyFilters();
+    this.processFilters();
   }
 
   deleteAllFilters() {
@@ -158,7 +238,7 @@ export class FilterService {
     // reseteamos todos los parametros para compartir
     this.shareReportService.resetAllParams();
 
-    this.applyFilters();
+    this.processFilters();
   }
 
   private excludeTipoFilters() {
@@ -209,7 +289,13 @@ export class FilterService {
   addElement(element: FilterableElement) {
     this.allFiltrableElements.push(element);
 
-    this.applyFilters();
+    this.processFilters();
+  }
+
+  private getTipoPlanta() {
+    if (this.router.url.includes('tracker')) {
+      this.plantaSeguidores = true;
+    }
   }
 
   /////////////////////////////////////////////////
