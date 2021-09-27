@@ -107,6 +107,7 @@ export class ClassificationComponent implements OnInit {
         })
         .catch((err) => {
           console.log('Error al actualizar anomalia ' + anom.id);
+          console.log('Error: ' + err);
 
           count++;
           this.progressBarValue = Math.round((count / this.anomalias.length) * 100);
@@ -146,6 +147,7 @@ export class ClassificationComponent implements OnInit {
         })
         .catch((err) => {
           console.log('Error al actualizar anomalia ' + anom.id);
+          console.log('Error: ' + err);
 
           count++;
           this.progressBarValue = Math.round((count / this.anomaliasNoData.length) * 100);
