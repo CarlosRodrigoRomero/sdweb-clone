@@ -146,10 +146,11 @@ export class InformeOverviewComponent implements OnInit {
     // Pérdidas totales en kW
     this.perdidasTotales = Math.round(this.perdidasPorCategoria.reduce((a, b) => a + b, 0) * 10) / 10;
 
-    this.informe.mae = Math.round((this.perdidasTotales / 10 / this.planta.potencia) * 100) / 100;
-    this.informeService.updateInforme(this.informe);
-
-    // this.informeService.updateInforme(this.informe);
+    // si no tiene mae lo calculamos
+    if (this.informe.mae === undefined || this.informe.mae === null || this.informe.mae === 0) {
+      this.informe.mae = Math.round((this.perdidasTotales / 10 / this.planta.potencia) * 100) / 100;
+      this.informeService.updateInforme(this.informe);
+    }
 
     this.dataPerdidasTotales = {
       labels: ['Pérdidas nominales (kW)', 'Potencia nominal no afectada'],

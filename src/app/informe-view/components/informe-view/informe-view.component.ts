@@ -60,6 +60,10 @@ export class InformeViewComponent implements OnInit {
         this.informeService.set(informe);
         this.getPcsList(informe);
         this.informe = informe;
+        // multiplicamos x100 el mae de los informes nuevos
+        if (this.informe.fecha > 1619820000) {
+          this.informe.mae = this.informe.mae * 100;
+        }
         this.storage
           .ref(`informes/${this.informe.id}/informe.xlsx`)
           .getDownloadURL()

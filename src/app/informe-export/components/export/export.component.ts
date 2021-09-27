@@ -1705,7 +1705,7 @@ export class ExportComponent implements OnInit {
                   ],
                   [
                     {
-                      text: '% MAE > 0.2',
+                      text: '% MAE > ' + this.global.mae[1],
                       style: ['mae3', 'bold'],
                     },
                     {
@@ -2046,7 +2046,9 @@ export class ExportComponent implements OnInit {
         '\n',
 
         {
-          text: `MAE = ∆PR / PR = ${this.informe.mae} % (${this.calificacionMae(this.informe.mae)})`,
+          text: `MAE = ∆PR / PR = ${this.decimalPipe.transform(this.informe.mae, '1.0-2')} % (${this.calificacionMae(
+            this.informe.mae
+          )})`,
           style: 'param',
         },
 
@@ -2059,7 +2061,7 @@ export class ExportComponent implements OnInit {
               'dd/MM/yyyy'
             )}) ${this.t.t('es')} `,
             {
-              text: `${this.informe.mae} %`,
+              text: `${this.decimalPipe.transform(this.informe.mae, '1.0-2')} %`,
               style: 'bold',
             },
             ' ',
