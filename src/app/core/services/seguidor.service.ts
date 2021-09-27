@@ -74,11 +74,20 @@ export class SeguidorService {
         const seguidores: Seguidor[] = [];
 
         if (anomaliaList.length > 0) {
-          // ordenamos las anomalias por zonas
-          const sortedAnoms = this.sortAnomList(anomaliaList);
+          // comprobamos que hay zonas
+          const thereAreZones = this.checkZones();
+
+          let sortedAnoms: any[][];
+          if (thereAreZones) {
+            // ordenamos las anomalias por zonas
+            sortedAnoms = this.sortAnomList(anomaliaList);
+          } else {
+            sortedAnoms = null;
+          }
 
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
           let count = 0;
+
           this.locAreaSeguidores.forEach((locArea) => {
             let anomaliasSeguidor: Anomalia[] = [];
             if (sortedAnoms !== null) {
@@ -136,6 +145,15 @@ export class SeguidorService {
 
         return seguidores;
       })
+    );
+  }
+
+  private checkZones(): boolean {
+    return (
+      this.locAreas.filter(
+        (locArea) =>
+          locArea.globalCoords[1] !== undefined && locArea.globalCoords[1] !== null && locArea.globalCoords[1] !== ''
+      ).length > 0
     );
   }
 
