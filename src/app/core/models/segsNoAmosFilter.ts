@@ -15,9 +15,9 @@ export class SegsNoAnomsFilter implements FilterInterface {
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
     if (this.value) {
-      return elems;
-    } else {
       return (elems as Seguidor[]).filter((seg) => seg.anomaliasCliente.length > 0);
+    } else {
+      return elems;
     }
   }
 

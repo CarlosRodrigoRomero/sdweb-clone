@@ -53,7 +53,7 @@ export class FilterControlService {
   private _activeDeleteArea: boolean = false;
   public activeDeleteArea$ = new BehaviorSubject<boolean>(this._activeDeleteArea);
 
-  private _segsNoAnoms: boolean = true;
+  private _segsNoAnoms: boolean = false;
   public segsNoAnoms$ = new BehaviorSubject<boolean>(this._segsNoAnoms);
 
   constructor(private olMapService: OlMapService) {}

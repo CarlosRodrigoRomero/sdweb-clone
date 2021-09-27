@@ -16,7 +16,7 @@ import { SegsNoAnomsFilter } from '@core/models/segsNoAmosFilter';
   styleUrls: ['./segs-no-anoms-filter.component.css'],
 })
 export class SegsNoAnomsFilterComponent implements OnInit, OnDestroy {
-  checked = true;
+  checked = false;
   disabled = false;
 
   private subscriptions: Subscription = new Subscription();
@@ -27,8 +27,10 @@ export class SegsNoAnomsFilterComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.filterService.filters$.subscribe((filters) => {
         if (filters.filter((fil) => fil.type !== 'segsNoAnoms').length > 0) {
+          this.checked = true;
           this.disabled = true;
         } else {
+          this.checked = false;
           this.disabled = false;
         }
       })
@@ -39,19 +41,17 @@ export class SegsNoAnomsFilterComponent implements OnInit, OnDestroy {
 
   onChange(event: MatCheckboxChange) {
     if (event.checked) {
-      this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
-        filters
-          .filter((filter) => filter.type === 'segsNoAnoms')
-          .forEach((filter) => {
-            if (filter.id === event.source.id) {
-              this.filterService.deleteFilter(filter);
-            }
-          })
-      );
-    } else {
       const filtroSegsNoAmos = new SegsNoAnomsFilter(event.source.id, 'segsNoAnoms', event.checked);
 
       this.filterService.addFilter(filtroSegsNoAmos);
+    } else {
+      this.filterService.filters
+        .filter((filter) => filter.type === 'segsNoAnoms')
+        .forEach((filter) => {
+          if (filter.id === event.source.id) {
+            this.filterService.deleteFilter(filter);
+          }
+        });
     }
   }
 

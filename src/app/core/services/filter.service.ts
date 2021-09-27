@@ -16,7 +16,7 @@ import { Anomalia } from '@core/models/anomalia';
 })
 export class FilterService {
   private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad'];
-  private noAmosSegsFilters = ['area', 'segsNoAnoms'];
+  private noAmosSegsFilters = ['area' , 'segsNoAnoms'];
   private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   public filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
@@ -100,17 +100,22 @@ export class FilterService {
       this.unapplyFilters();
     } else {
       if (this.plantaSeguidores) {
-        const elemsFiltered = this.allFiltrableElements.filter((elem) => {
-          const newAnomaliasCliente = this.applyFilters((elem as Seguidor).anomalias) as Anomalia[];
-          if (newAnomaliasCliente !== undefined) {
-            (elem as Seguidor).anomaliasCliente = newAnomaliasCliente;
-          }
+        // si el filtro area es el unico le mandamos todos los elems y sino calculamos su interseccion con otros filtros
+        if (this.filters.length === 1 && this.filters[0].type === 'area') {
+          this.applyNoAnomsSegsFilters(this.allFiltrableElements);
+        } else {
+          const elemsFiltered = this.allFiltrableElements.filter((elem) => {
+            const newAnomaliasCliente = this.applyFilters((elem as Seguidor).anomalias) as Anomalia[];
+            if (newAnomaliasCliente !== undefined) {
+              (elem as Seguidor).anomaliasCliente = newAnomaliasCliente;
+            }
 
-          return (elem as Seguidor).anomaliasCliente.length > 0;
-        });
+            return (elem as Seguidor).anomaliasCliente.length > 0;
+          });
 
-        // aplicamos los filtros noAnomsSegs
-        this.applyNoAnomsSegsFilters(elemsFiltered);
+          // aplicamos los filtros noAnomsSegs
+          this.applyNoAnomsSegsFilters(elemsFiltered);
+        }
       } else {
         this.filteredElements = this.applyFilters(this.allFiltrableElements);
       }
@@ -197,18 +202,7 @@ export class FilterService {
   }
 
   private unapplyFilters() {
-    if (this.plantaSeguidores) {
-      this.filteredElements = this.allFiltrableElements.filter((elem) => {
-        (elem as Seguidor).anomaliasCliente = (elem as Seguidor).anomalias.filter(
-          // tslint:disable-next-line: triple-equals
-          (anom) => anom.tipo != 0 && anom.criticidad !== null
-        );
-
-        return (elem as Seguidor).anomaliasCliente.length > 0;
-      });
-    } else {
-      this.filteredElements = this.allFiltrableElements;
-    }
+    this.filteredElements = this.allFiltrableElements;
   }
 
   getAllFilters(): Observable<FilterInterface[]> {
