@@ -136,6 +136,8 @@ export class ClassificationComponent implements OnInit {
         .then((res) => {
           count++;
           this.progressBarValue = Math.round((count / this.anomaliasNoData.length) * 100);
+
+          // al terminar...
           if (count === this.anomaliasNoData.length) {
             this.processing = false;
 
@@ -147,6 +149,8 @@ export class ClassificationComponent implements OnInit {
 
           count++;
           this.progressBarValue = Math.round((count / this.anomaliasNoData.length) * 100);
+
+          // al terminar...
           if (count === this.anomaliasNoData.length) {
             this.processing = false;
 
@@ -181,6 +185,8 @@ export class ClassificationComponent implements OnInit {
 
         count++;
         this.progressBarValue = Math.round((count / anomalias.length) * 100);
+
+        // al terminar...
         if (count === anomalias.length) {
           this.processing = false;
 
@@ -208,6 +214,8 @@ export class ClassificationComponent implements OnInit {
 
         count++;
         this.progressBarValue = Math.round((count / anomalias.length) * 100);
+
+        // al terminar...
         if (count === anomalias.length) {
           this.processing = false;
 
