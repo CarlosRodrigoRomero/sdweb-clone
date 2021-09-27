@@ -168,56 +168,57 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         .subscribe(([informeId, filteredPDF]) => {
           this.informe = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
-          if (filteredPDF !== undefined) {
-            if (filteredPDF) {
-              // utilizamos elementos filtrados para crear el informe
-              if (this.reportControlService.plantaFija) {
-                this.anomaliasInforme = this.filterService.filteredElements as Anomalia[];
-              } else {
-                const allSeguidores = this.filterService.filteredElements as Seguidor[];
-                // filtramos los del informe actual y los ordenamos por globals
-                this.seguidoresInforme = allSeguidores
-                  .filter((seg) => seg.informeId === informeId)
-                  .sort(this.downloadReportService.sortByGlobalCoords);
+          // if (filteredPDF !== undefined) {
+          //   if (filteredPDF) {
+          //     // utilizamos elementos filtrados para crear el informe
+          //     if (this.reportControlService.plantaFija) {
+          //       this.anomaliasInforme = this.filterService.filteredElements as Anomalia[];
+          //     } else {
+          //       const allSeguidores = this.filterService.filteredElements as Seguidor[];
+          //       // filtramos los del informe actual y los ordenamos por globals
+          //       this.seguidoresInforme = allSeguidores
+          //         .filter((seg) => seg.informeId === informeId)
+          //         .sort(this.downloadReportService.sortByGlobalCoords);
 
-                if (this.seguidoresInforme.length > 0) {
-                  this.seguidoresLoaded = true;
-                }
+          //       if (this.seguidoresInforme.length > 0) {
+          //         this.seguidoresLoaded = true;
+          //       }
 
-                this.seguidoresInforme.forEach((seguidor) => {
-                  const anomaliasSeguidor = seguidor.anomaliasCliente;
-                  if (anomaliasSeguidor.length > 0) {
-                    this.anomaliasInforme.push(...anomaliasSeguidor);
-                  }
-                });
-              }
+          //       this.seguidoresInforme.forEach((seguidor) => {
+          //         const anomaliasSeguidor = seguidor.anomaliasCliente;
+          //         if (anomaliasSeguidor.length > 0) {
+          //           this.anomaliasInforme.push(...anomaliasSeguidor);
+          //         }
+          //       });
+          //     }
 
-              this.downloadPDF();
-            } else {
-              if (this.reportControlService.plantaFija) {
-                this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
-              } else {
-                const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
-                // filtramos los del informe actual y los ordenamos por globals
-                this.seguidoresInforme = allSeguidores
-                  .filter((seg) => seg.informeId === informeId)
-                  .sort(this.downloadReportService.sortByGlobalCoords);
+          //     // quitamos los seguidores sin anomalias
+          //     this.filtroApartados = this.filtroApartados.filter((apt) => apt !== 'anexo3');
 
-                if (this.seguidoresInforme.length > 0) {
-                  this.seguidoresLoaded = true;
-                }
+          //     this.downloadPDF();
+          //   } else {
+          if (this.reportControlService.plantaFija) {
+            this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
+          } else {
+            const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
+            // filtramos los del informe actual y los ordenamos por globals
+            this.seguidoresInforme = allSeguidores
+              .filter((seg) => seg.informeId === informeId)
+              .sort(this.downloadReportService.sortByGlobalCoords);
 
-                this.seguidoresInforme.forEach((seguidor) => {
-                  const anomaliasSeguidor = seguidor.anomaliasCliente;
-                  if (anomaliasSeguidor.length > 0) {
-                    this.anomaliasInforme.push(...anomaliasSeguidor);
-                  }
-                });
-              }
-
-              this.downloadPDF();
+            if (this.seguidoresInforme.length > 0) {
+              this.seguidoresLoaded = true;
             }
+
+            this.seguidoresInforme.forEach((seguidor) => {
+              const anomaliasSeguidor = seguidor.anomaliasCliente;
+              if (anomaliasSeguidor.length > 0) {
+                this.anomaliasInforme.push(...anomaliasSeguidor);
+              }
+            });
           }
+          // }
+          // }
 
           // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
           this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
@@ -468,7 +469,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             return a.orden - b.orden;
           });
 
-          this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
+          if (this.filtroApartados === undefined) {
+            this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
+          }
         })
     );
 
