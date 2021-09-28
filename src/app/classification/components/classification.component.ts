@@ -97,6 +97,8 @@ export class ClassificationComponent implements OnInit {
         .get(url, { responseType: 'text', params })
         .toPromise()
         .then((res) => {
+          console.log(res);
+
           count++;
           this.progressBarValue = Math.round((count / this.anomalias.length) * 100);
           if (count === this.anomalias.length) {
@@ -106,8 +108,7 @@ export class ClassificationComponent implements OnInit {
           }
         })
         .catch((err) => {
-          console.log('Error al actualizar anomalia ' + anom.id);
-          console.log('Error: ' + err);
+          console.log(err);
 
           count++;
           this.progressBarValue = Math.round((count / this.anomalias.length) * 100);
@@ -135,6 +136,8 @@ export class ClassificationComponent implements OnInit {
         .get(url, { responseType: 'text', params })
         .toPromise()
         .then((res) => {
+          console.log(res);
+
           count++;
           this.progressBarValue = Math.round((count / this.anomaliasNoData.length) * 100);
 
@@ -146,8 +149,7 @@ export class ClassificationComponent implements OnInit {
           }
         })
         .catch((err) => {
-          console.log('Error al actualizar anomalia ' + anom.id);
-          console.log('Error: ' + err);
+          console.log(err);
 
           count++;
           this.progressBarValue = Math.round((count / this.anomaliasNoData.length) * 100);
