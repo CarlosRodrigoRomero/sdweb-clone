@@ -53,6 +53,13 @@
       >
         {{ anomaliasNoData.length }} anomalías sin datos
       </button>
+      <button
+        *ngIf="everSynced && anomaliasNoData.length === 0 && anomsNoModule.length === 0 && anomsNoGlobals.length === 0"
+        class="btn-anom-no-data"
+        mat-raised-button
+      >
+        Todas las anomalías ok
+      </button>
     </div>
   </div>
   <div class="bottom-bar">

@@ -347,7 +347,6 @@ export class MapClassificationComponent implements OnInit {
     let features;
 
     this.map.on('click', (event) => {
-      console.log('click');
       features = this.map.getFeaturesAtPixel(event.pixel);
       const feature = features[0] as Feature;
       if (feature) {

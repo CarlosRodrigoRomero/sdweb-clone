@@ -37,6 +37,7 @@ export class ClassificationComponent implements OnInit {
   progressBarColor: ThemePalette = 'primary';
   progressBarMode: ProgressBarMode = 'determinate';
   progressBarValue = 0;
+  everSynced = false;
 
   constructor(
     private classificationService: ClassificationService,
@@ -233,6 +234,7 @@ export class ClassificationComponent implements OnInit {
     const anomalias = this.classificationService.listaAnomalias;
 
     if (anomalias !== undefined) {
+      this.everSynced = true;
       this.anomaliasNoData = anomalias.filter((anom) => anom.gradienteNormalizado === 0 || anom.temperaturaMax === 0);
       this.anomsNoModule = anomalias.filter((anom) => anom.modulo === null);
       this.anomsNoGlobals = anomalias.filter((anom) => anom.globalCoords[0] === null);
