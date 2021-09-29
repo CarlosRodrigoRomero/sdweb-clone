@@ -102,7 +102,7 @@ export class MapClassificationComponent implements OnInit {
           this.subscriptions.add(
             this.olMapService
               .getThermalLayers()
-              .pipe(take(1))
+              // .pipe(take(1))
               .subscribe((tLayers) => (this.thermalLayers = tLayers))
           );
 
