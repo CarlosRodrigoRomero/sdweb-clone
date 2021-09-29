@@ -130,7 +130,7 @@ export class ClassificationComponent implements OnInit {
     let count = 0;
     this.progressBarValue = 0;
 
-    this.anomaliasNoData.forEach((anom) => {
+    this.anomaliasNoData.forEach((anom, index) => {
       const params = new HttpParams().set('anomaliaId', anom.id);
 
       return this.http
@@ -231,6 +231,9 @@ export class ClassificationComponent implements OnInit {
   }
 
   syncAnomsState() {
+    // actualizamos las anomalias por si ha habido cambios
+    this.classificationService.getAnomalias();
+
     const anomalias = this.classificationService.listaAnomalias;
 
     if (anomalias !== undefined) {

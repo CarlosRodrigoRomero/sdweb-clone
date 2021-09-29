@@ -95,11 +95,15 @@ export class ClassificationService {
         });
 
       // nos traemos la lista de anomalias
-      this.anomaliaService
-        .getAnomaliasInforme$(this.informeId)
-        .pipe(take(1))
-        .subscribe((anoms) => (this.listaAnomalias = anoms));
+      this.getAnomalias();
     });
+  }
+
+  getAnomalias() {
+    this.anomaliaService
+      .getAnomaliasInforme$(this.informeId)
+      .pipe(take(1))
+      .subscribe((anoms) => (this.listaAnomalias = anoms));
   }
 
   createAnomaliaFromNormModule(feature: Feature, date: number) {
