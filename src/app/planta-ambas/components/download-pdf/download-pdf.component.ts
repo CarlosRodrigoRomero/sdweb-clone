@@ -2245,11 +2245,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     this.anomaliasInforme = this.anomaliasInforme.sort(this.downloadReportService.sortByGlobalCoords);
 
-    cabecera.push({
-      text: this.translation.t('Seguidor'),
-      style: 'tableHeaderBlue',
-      noWrap: true,
-    });
+    if (this.reportControlService.plantaFija) {
+      cabecera.push({
+        text: this.translation.t('Localización'),
+        style: 'tableHeaderBlue',
+        noWrap: true,
+      });
+    } else {
+      cabecera.push({
+        text: this.translation.t('Seguidor'),
+        style: 'tableHeaderBlue',
+        noWrap: true,
+      });
+    }
 
     for (const c of this.columnasAnomalia) {
       cabecera.push({
