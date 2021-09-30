@@ -26,7 +26,7 @@ import { PcInterface } from '@core/models/pc';
 export class SeguidorService {
   private planta: PlantaInterface;
   numGlobalCoords: number;
-  public locAreas: LocationAreaInterface[] = [];
+  public zones: LocationAreaInterface[] = [];
   private locAreaSeguidores: LocationAreaInterface[] = [];
   private locAreaModulos: LocationAreaInterface[] = [];
 
@@ -74,11 +74,10 @@ export class SeguidorService {
         const seguidores: Seguidor[] = [];
 
         if (anomaliaList.length > 0) {
-          // comprobamos que hay zonas
-          const thereAreZones = this.checkZones();
-
           let sortedAnoms: any[][];
-          if (thereAreZones) {
+
+          // comprobamos si hay zonas
+          if (this.zones.length > 0) {
             // ordenamos las anomalias por zonas
             sortedAnoms = this.sortAnomList(anomaliaList);
           } else {
@@ -148,15 +147,6 @@ export class SeguidorService {
     );
   }
 
-  private checkZones(): boolean {
-    return (
-      this.locAreas.filter(
-        (locArea) =>
-          locArea.globalCoords[1] !== undefined && locArea.globalCoords[1] !== null && locArea.globalCoords[1] !== ''
-      ).length > 0
-    );
-  }
-
   private getDifferentLocAreas(plantaId: string) {
     this.plantaService.getLocationsArea(plantaId).subscribe((locAreaList) => {
       // guardamos las zonas con módulos
@@ -198,7 +188,7 @@ export class SeguidorService {
         .filter((locArea) => locArea.globalCoords.toString() !== ',' && locArea.globalCoords.toString() !== '');
 
       // asignamos las areas de la planta
-      this.locAreas = locAreaNoSeguidores;
+      this.zones = locAreaNoSeguidores;
 
       // obtenemos las globalCoords completas de cada seguidor si hay areas mayores
       if (locAreaNoSeguidores.length > 0) {
@@ -215,7 +205,7 @@ export class SeguidorService {
   }
 
   private sortAnomList(anoms: Anomalia[]): any[][] {
-    const largestLocAreas = this.locAreas.filter(
+    const largestLocAreas = this.zones.filter(
       (locArea) =>
         locArea.globalCoords[0] !== undefined && locArea.globalCoords[0] !== null && locArea.globalCoords[0] !== ''
     );

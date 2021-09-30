@@ -184,7 +184,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
         .subscribe((locAreas) => {
           // si la planta es de seguidores obtenemos las areas ya sin seguidores
           if (!this.reportControlService.plantaFija) {
-            locAreas = this.seguidorService.locAreas;
+            locAreas = this.seguidorService.zones;
           }
 
           this.nombreGlobalCoords.forEach((nombre, i) => {
