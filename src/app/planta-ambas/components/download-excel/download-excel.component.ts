@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import * as XLSX from 'xlsx';
-
-const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8';
-const EXCEL_EXT = '.xlsx';
+import { ExcelService } from '@core/services/excel.service';
 
 @Component({
   selector: 'app-download-excel',
@@ -12,20 +9,42 @@ const EXCEL_EXT = '.xlsx';
 })
 export class DownloadExcelComponent implements OnInit {
   private json = [{ 1: 'hola', 2: 'que', 3: 'tal' }];
-  private excelFileName = 'excel';
+  private excelFileName;
+  private columnas = [
+    'localId',
+    'visualImage',
+    'thermalImage',
+    'temperaturaRef',
+    'temperaturaMax',
+    'gradienteNormalizado',
+    'tipo',
+    'clase',
+    'urlMaps',
+    'localizacion',
+    'localY',
+    'localX',
+    'irradiancia',
+    'datetime',
+    'lugar',
+    'nubosidad',
+    'temperaturaAire',
+    'emisividad',
+    'temperaturaReflejada',
+    'vientoVelocidad',
+    'vientoDirección',
+    'camaraModelo',
+    'camaraSN',
+    'modulo',
+    'numModsAfeactados',
+  ];
+  private headersArray = [];
+  private sheetName = 'Resultados';
 
-  constructor() {}
+  constructor(private excelService: ExcelService) {}
 
   ngOnInit(): void {}
 
   downloadExcel(): void {
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.json);
-    const workbook: XLSX.WorkBook = {
-      Sheets: { data: worksheet },
-      SheetNames: ['data'],
-    };
-
-    // guardamos el archivo
-    XLSX.writeFile(workbook, this.excelFileName);
+    this.excelService.exportAsExcelFile('Título', [1, 2, 3], this.json, this.excelFileName, this.sheetName);
   }
 }
