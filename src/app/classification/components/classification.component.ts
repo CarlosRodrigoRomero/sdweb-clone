@@ -77,7 +77,6 @@ export class ClassificationComponent implements OnInit {
   private updateInforme() {
     this.informe.mae = this.getMaeInforme();
     this.informe.cc = this.getCCInforme();
-    this.informe.disponible = true;
 
     // actualizamos el informe en la DB
     this.informeService.updateInforme(this.informe);
