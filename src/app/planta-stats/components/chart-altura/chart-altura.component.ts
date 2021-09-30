@@ -129,7 +129,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
           })
         )
         .subscribe((dateLabels) => {
-          const alturaMax = this.planta.filas;
+          const alturaMax = this.getAlturaMax();
 
           if (this.allCC.length > 0) {
             const series = [];
@@ -161,6 +161,10 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
           }
         })
     );
+  }
+
+  private getAlturaMax() {
+    return Math.max(...this.allAnomalias.map((anom) => anom.localY));
   }
 
   ngOnDestroy(): void {
