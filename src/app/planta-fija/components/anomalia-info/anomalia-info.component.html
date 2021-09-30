@@ -110,11 +110,10 @@
               <span class="titulo">Hora</span>
               <span class="subtitulo">{{ infoAdicional.vuelo.hora }}</span>
             </div>
-            <div class="elemento" *ngIf="infoAdicional.vuelo.irradiancia">
-              <!-- <span class="titulo">Radiación</span> -->
+            <!-- <div class="elemento" *ngIf="infoAdicional.vuelo.irradiancia">
               <span class="titulo">Irradiancia</span>
               <span class="subtitulo">{{ infoAdicional.vuelo.irradiancia }}</span>
-            </div>
+            </div> -->
             <div class="elemento" *ngIf="infoAdicional.vuelo.emisividad">
               <span class="titulo">Emisividad</span>
               <span class="subtitulo">{{ infoAdicional.vuelo.emisividad }}</span>
@@ -134,6 +133,10 @@
             <div class="elemento" *ngIf="infoAdicional.vuelo.vientoDireccion">
               <span class="titulo">Dirección viento</span>
               <span class="subtitulo">{{ infoAdicional.vuelo.vientoDireccion }}º</span>
+            </div>
+            <div class="elemento">
+              <span class="titulo">Irradiancia</span>
+              <span class="subtitulo">(pronto disponible)</span>
             </div>
           </div>
         </mat-tab>
