@@ -475,8 +475,8 @@ export class CanvasComponent implements OnInit {
             selectable: false,
             estructura,
             hoverCursor: 'default',
-            originX: 'center',
-            originY: 'center',
+            originX: 'left',
+            originY: 'bottom',
             name: 1,
           });
           this.canvas.add(polygon);
