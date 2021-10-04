@@ -298,8 +298,8 @@ export class EditMapComponent implements OnInit {
     return { lat: event.latLng.lat(), lng: event.latLng.lng() };
   }
 
-  onMapElementoPlantaDragEnd(elementoPlanta: ElementoPlantaInterface, event) {
-    const latLng = this.getLatLng(event);
+  onMapElementoPlantaDragEnd(elementoPlanta: ElementoPlantaInterface, coords: LatLng) {
+    const latLng = this.getLatLng(coords);
     if (this.planta.tipo === 'seguidores') {
       this.allElementosPlanta
         .filter((elem) => {

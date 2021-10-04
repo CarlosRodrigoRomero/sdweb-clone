@@ -161,7 +161,11 @@ export class InformeService {
   async updateElementoPlanta(informeId: string, elementoPlanta: ElementoPlantaInterface) {
     this.avisadorChangeElementoSource.next(elementoPlanta);
     if (elementoPlanta.constructor.name === Estructura.name) {
-      return this.updateEstructura(informeId, elementoPlanta as Estructura);
+      if ((elementoPlanta as Estructura).estructuraMatrix === null) {
+        return this.updateAutoEstructura(informeId, elementoPlanta as Estructura);
+      } else {
+        return this.updateEstructura(informeId, elementoPlanta as Estructura);
+      }
     }
   }
 
@@ -169,6 +173,12 @@ export class InformeService {
     const estructuraObj = Object.assign({}, estructura);
     const estructuraDoc = this.afs.doc('informes/' + informeId + '/estructuras/' + estructura.id);
     return estructuraDoc.update(estructuraObj);
+  }
+
+  async updateAutoEstructura(informeId: string, estructura: EstructuraInterface) {
+    const estructuraDoc = this.afs.doc('informes/' + informeId + '/autoEstructura/' + estructura.id);
+
+    return estructuraDoc.update({ latitud: estructura.latitud, longitud: estructura.longitud });
   }
 
   deleteEstructuraInforme(informeId: string, estructura: Estructura): void {
