@@ -158,6 +158,18 @@ export class InformeService {
     return promesa;
   }
 
+  async addAutoEstructuraInforme(informeId: string, estructura: EstructuraInterface) {
+    const id = this.afs.createId();
+
+    const promesa = this.afs.collection('informes').doc(informeId).collection('autoEstructura').doc(id).set(estructura);
+
+    promesa.then((v) => {
+      this.avisadorNuevoElementoSource.next(new Estructura(estructura));
+      // this.selectElementoPlanta(estructura);
+    });
+    return promesa;
+  }
+
   async updateElementoPlanta(informeId: string, elementoPlanta: ElementoPlantaInterface) {
     this.avisadorChangeElementoSource.next(elementoPlanta);
     if (elementoPlanta.constructor.name === Estructura.name) {
