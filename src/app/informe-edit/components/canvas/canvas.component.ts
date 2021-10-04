@@ -471,7 +471,7 @@ export class CanvasComponent implements OnInit {
             radius: 2,
             fill: 'rgba(0,0,0,0)',
             stroke: '#72FD03',
-            strokeWidth: 2,
+            strokeWidth: 1,
             selectable: false,
             estructura,
             hoverCursor: 'default',
@@ -865,9 +865,12 @@ export class CanvasComponent implements OnInit {
     return false;
   }
 
-  deletePc(pc: PcInterface) {}
   deleteEstructura(estructura: Estructura) {
-    this.informeService.deleteEstructuraInforme(this.informeId, estructura);
+    if (estructura.estructuraMatrix === null) {
+      this.informeService.deleteAutoEstructuraInforme(this.informeId, estructura);
+    } else {
+      this.informeService.deleteEstructuraInforme(this.informeId, estructura);
+    }
   }
 
   private getLeftAndTop(imageRotation: number) {

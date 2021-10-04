@@ -201,6 +201,14 @@ export class InformeService {
     });
   }
 
+  deleteAutoEstructuraInforme(informeId: string, estructura: Estructura): void {
+    // const response = new Subject<boolean>();
+    const estructuraDoc = this.afs.doc('informes/' + informeId + '/autoEstructura/' + estructura.id);
+    estructuraDoc.delete().then(() => {
+      this.avisadorNuevoElementoSource.next(estructura);
+    });
+  }
+
   getEstructuraInforme(informeId: string, currentFileName: string): Observable<Estructura[]> {
     const query$ = this.afs
       .collection('informes')
