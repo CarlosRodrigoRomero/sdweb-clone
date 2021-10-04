@@ -198,7 +198,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           //     this.downloadPDF();
           //   } else {
           if (this.reportControlService.plantaFija) {
-            this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
+            this.anomaliasInforme = (this.reportControlService.allFilterableElements as Anomalia[]).filter(
+              (anom) => anom.informeId === informeId
+            );
           } else {
             const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
             // filtramos los del informe actual y los ordenamos por globals
