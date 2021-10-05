@@ -182,6 +182,9 @@ export class InformeService {
   }
 
   async updateEstructura(informeId: string, estructura: EstructuraInterface) {
+    // no guardamos estructuraCoords
+    delete estructura.estructuraCoords;
+
     const estructuraObj = Object.assign({}, estructura);
     const estructuraDoc = this.afs.doc('informes/' + informeId + '/estructuras/' + estructura.id);
     return estructuraDoc.update(estructuraObj);

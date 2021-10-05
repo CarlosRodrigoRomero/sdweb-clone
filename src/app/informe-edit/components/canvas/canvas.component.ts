@@ -474,7 +474,7 @@ export class CanvasComponent implements OnInit {
             strokeWidth: 1,
             selectable: false,
             estructura,
-            hoverCursor: 'default',
+            hoverCursor: 'pointer',
             originX: 'left',
             originY: 'bottom',
             name: 1,
@@ -597,7 +597,21 @@ export class CanvasComponent implements OnInit {
       if (this.pcsOrEstructuras) {
         this.onDblClickCanvas(options.e);
       } else {
-        this.addAutoEstructura();
+        // evitamos que se cree una autoEstructura donde ya hay una o una estructura normal
+        combineLatest([
+          this.informeService.getAllEstructuras(this.informeId),
+          this.informeService.getAllAutoEstructuras(this.informeId),
+        ])
+          .pipe(take(1))
+          .subscribe(([allEst, allAutoEst]) => {
+            const allAmbasEstructuras = [...allEst, ...allAutoEst];
+
+            if (
+              !allAmbasEstructuras.map((est) => est.archivo).includes(this.informeService.selectedArchivoVuelo.archivo)
+            ) {
+              this.addAutoEstructura();
+            }
+          });
       }
     });
     // Seleccionar estructura
