@@ -152,7 +152,7 @@ export class CanvasComponent implements OnInit {
           this.borrarPcsEstructura(this.estructura);
           this.estructura = null;
         } else {
-          if ((elem as Estructura).getEstructuraMatrix === null) {
+          if ((elem as Estructura).estructuraMatrix === null) {
             this.dibujarAutoEstructura(elem as Estructura);
           } else {
             this.dibujarEstructura(elem as Estructura);
@@ -609,7 +609,7 @@ export class CanvasComponent implements OnInit {
       }
     });
 
-    // Creacion de Est con boton derecho
+    // Creacion de Estructura con boton derecho
     this.canvas.on('mouse:down', (options) => {
       if ((options.button === 3 || (options.button === 1 && options.e.ctrlKey)) && !this.polygonMode) {
         this.drawPolygon();
@@ -725,6 +725,7 @@ export class CanvasComponent implements OnInit {
       latitud: this.estructura && this.planta.tipo === 'seguidores' ? this.estructura.latitud : this.currentLatLng.lat,
       longitud:
         this.estructura && this.planta.tipo === 'seguidores' ? this.estructura.longitud : this.currentLatLng.lng,
+      globalCoords,
       estructuraCoords: null,
     } as EstructuraInterface;
 

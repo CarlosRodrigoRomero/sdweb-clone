@@ -190,7 +190,12 @@ export class InformeService {
   async updateAutoEstructura(informeId: string, estructura: EstructuraInterface) {
     const estructuraDoc = this.afs.doc('informes/' + informeId + '/autoEstructura/' + estructura.id);
 
-    return estructuraDoc.update({ latitud: estructura.latitud, longitud: estructura.longitud });
+    return estructuraDoc.update({
+      latitud: estructura.latitud,
+      longitud: estructura.longitud,
+      globalCoords: estructura.globalCoords,
+      modulo: estructura.modulo,
+    });
   }
 
   deleteEstructuraInforme(informeId: string, estructura: Estructura): void {
