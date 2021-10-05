@@ -84,17 +84,30 @@ export class EditListComponent implements OnInit {
         return estArray.sort(this.dynamicSort('archivo'));
       })
     );
+    const allAutoEstructuras$ = this.informeService.getAllAutoEstructuras(this.informeId).pipe(
+      map((autoEstArray) => {
+        return autoEstArray.sort(this.dynamicSort('archivo'));
+      })
+    );
     const allPcs$ = this.pcService.getPcsInformeEdit(this.informeId);
 
-    combineLatest([allEstructuras$, allPcs$])
+    combineLatest([allEstructuras$, allAutoEstructuras$, allPcs$])
       .pipe(take(1))
       .subscribe((elem) => {
         this.estConPcs = elem[0].map((est) => {
-          const pcs = elem[1].filter((pc) => {
+          const pcs = elem[2].filter((pc) => {
             return pc.archivo === est.archivo;
           });
           return { estructura: est, pcs };
         });
+        this.estConPcs.push(
+          ...elem[1].map((est) => {
+            const pcs = elem[2].filter((pc) => {
+              return pc.archivo === est.archivo;
+            });
+            return { estructura: est, pcs };
+          })
+        );
 
         this.dataSourceEst.data = this.estConPcs;
       });
