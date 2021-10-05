@@ -729,7 +729,19 @@ export class CanvasComponent implements OnInit {
       estructuraCoords: null,
     } as EstructuraInterface;
 
-    this.informeService.addAutoEstructuraInforme(this.informeId, autoEstructura);
+    this.informeService
+      .addAutoEstructuraInforme(this.informeId, autoEstructura)
+      .then(() => {
+        this.successMessage = 'AutoEstructura añadida - OK';
+        setTimeout(() => {
+          this.successMessage = undefined;
+        }, 2000);
+        this.alertMessage = undefined;
+      })
+      .catch((res) => {
+        console.log('ERROR', res);
+        this.alertMessage = 'ERROR';
+      });
   }
 
   onDblClickCanvas(event: MouseEvent) {

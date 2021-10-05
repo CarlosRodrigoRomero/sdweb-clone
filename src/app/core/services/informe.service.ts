@@ -160,7 +160,7 @@ export class InformeService {
 
   async addAutoEstructuraInforme(informeId: string, estructura: EstructuraInterface) {
     const id = this.afs.createId();
-
+    estructura.id = id;
     const promesa = this.afs.collection('informes').doc(informeId).collection('autoEstructura').doc(id).set(estructura);
 
     promesa.then((v) => {
