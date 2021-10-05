@@ -91,6 +91,11 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     if (est.estructuraCoords !== undefined) {
       this.estructuraCoords = this.estructureCoordsToArray(est.estructuraCoords);
       this.estructuraMatrix = null;
+      if (est.estructuraCoords !== null) {
+        this.coords = this.getCoordsFromEstCoords();
+        this.filas = this.estructuraCoords.length;
+        this.columnas = this.estructuraCoords[0].length;
+      }
     } else {
       this.estructuraCoords = null;
       this.estructuraMatrix = this.getEstructuraMatrix();
@@ -150,6 +155,20 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     return [filaDistMin, columnaDistMin];
   }
 
+  private getCoordsFromEstCoords(): any[] {
+    const filas = this.estructuraCoords.length;
+    const columnas = this.estructuraCoords[0].length;
+
+    const topLeft = this.estructuraCoords[filas - 1][columnas - 1][2];
+    const topRight = this.estructuraCoords[filas - 1][0][3];
+    const bottomRight = this.estructuraCoords[0][0][1];
+    const bottomLeft = this.estructuraCoords[0][columnas - 1][0];
+
+    const coords = [topLeft, topRight, bottomRight, bottomLeft];
+
+    return coords;
+  }
+
   private estructureCoordsToArray(coords: any[]) {
     if (coords !== null) {
       const array: any[][][] = Object.values(coords);
@@ -207,6 +226,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
 
     return { tl: topLeft, tr: topRight, br: bottomRight, bl: bottomLeft } as CuadrilateroInterface;
   }
+
   getFilaColumnaRef(columna: number, fila: number): number[] {
     let filaRef: number;
     let columnaRef: number;
@@ -248,6 +268,46 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     const right = Math.round(Math.min(cuadrilatero.tr.x, cuadrilatero.br.x));
 
     return { top, bottom, left, right } as RectanguloInterface;
+  }
+
+  getRectanguloAutoEst(fila: number, columna: number) {
+    const filas = this.estructuraCoords.length;
+    const columnas = this.estructuraCoords[0].length;
+
+    const filEstCoords = filas - fila;
+    const colEstCoords = columnas - columna;
+
+    const rect = this.estructuraCoords[filEstCoords][colEstCoords];
+
+    return { top: rect[2][1], bottom: rect[0][1], left: rect[0][0], right: rect[1][0] } as RectanguloInterface;
+  }
+
+  getFilaColumnaAutoEst(x: number, y: number): any[] {
+    const point = [x, y];
+    let filaSeleccionada = 0;
+    let columnaSelecciona = 0;
+    let menorDistancia = 999999;
+
+    this.estructuraCoords.forEach((fila, filIndex, filas) => {
+      fila.forEach((modulo, colIndex, columnas) => {
+        let sumaDistancias = 0;
+        modulo.forEach((p) => {
+          const distancia = this.distanceBetweenTwoPoints(point, p);
+          sumaDistancias = sumaDistancias + distancia;
+        });
+        if (sumaDistancias < menorDistancia) {
+          menorDistancia = sumaDistancias;
+          filaSeleccionada = filas.length - filIndex;
+          columnaSelecciona = columnas.length - colIndex;
+        }
+      });
+    });
+
+    return [filaSeleccionada, columnaSelecciona];
+  }
+
+  private distanceBetweenTwoPoints(a: number[], b: number[]) {
+    return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
   }
 
   getLocalCoordsFromEstructura(columna, fila) {

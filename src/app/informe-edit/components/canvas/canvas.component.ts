@@ -718,9 +718,15 @@ export class CanvasComponent implements OnInit {
     if (this.estructuraList !== null) {
       // const inside = require('point-in-polygon');
       this.estructuraList.forEach((est) => {
-        const coords = this.PointToCoords(est.coords);
-        if (inside([punto.x, punto.y], this.PointToCoords(est.coords))) {
-          estEncontrada = est;
+        if (est.estructuraMatrix === null) {
+          if (inside([punto.x, punto.y], est.coords)) {
+            estEncontrada = est;
+          }
+        } else {
+          const coords = this.PointToCoords(est.coords);
+          if (inside([punto.x, punto.y], coords)) {
+            estEncontrada = est;
+          }
         }
       });
     }
@@ -776,23 +782,34 @@ export class CanvasComponent implements OnInit {
     const point = { x: event.offsetX, y: event.offsetY } as Point;
     const estructura = this.getEstructuraPunto(point);
     if (estructura !== null) {
-      [fila, columna] = estructura.calcularFilaColumna(event.offsetX, event.offsetY);
+      if (estructura.estructuraMatrix === null) {
+        [fila, columna] = estructura.getFilaColumnaAutoEst(event.offsetX, event.offsetY);
 
-      [columnaReal, filaReal] = estructura.getLocalCoordsFromEstructura(columna, fila);
-      [columnaRef, filaRef] = estructura.getFilaColumnaRef(columna, fila);
+        [filaReal, columnaReal] = [fila, columna];
+        [columnaRef, filaRef] = estructura.getFilaColumnaRef(columna, fila);
 
-      if (event.altKey) {
-        rectInteriorPc = estructura.getRectanguloExterior(columna, fila);
-        rectInteriorRef = estructura.getRectanguloExterior(columnaRef, filaRef);
+        rectInteriorPc = estructura.getRectanguloAutoEst(fila, columna);
+        rectInteriorRef = estructura.getRectanguloAutoEst(filaRef, columnaRef);
       } else {
-        rectInteriorPc = estructura.getRectanguloInterior(columna, fila);
-        rectInteriorRef = estructura.getRectanguloInterior(columnaRef, filaRef);
-      }
+        [fila, columna] = estructura.calcularFilaColumna(event.offsetX, event.offsetY);
 
-      this.setSquareBase(
-        this.planta,
-        Math.min(rectInteriorPc.bottom - rectInteriorPc.top, rectInteriorPc.right - rectInteriorPc.left)
-      );
+        [columnaReal, filaReal] = estructura.getLocalCoordsFromEstructura(columna, fila);
+        [columnaRef, filaRef] = estructura.getFilaColumnaRef(columna, fila);
+
+        if (event.altKey) {
+          rectInteriorPc = estructura.getRectanguloExterior(columna, fila);
+          rectInteriorRef = estructura.getRectanguloExterior(columnaRef, filaRef);
+        } else {
+          rectInteriorPc = estructura.getRectanguloInterior(columna, fila);
+          rectInteriorRef = estructura.getRectanguloInterior(columnaRef, filaRef);
+        }
+
+        // tamaño por defecto cuando no hay estructura
+        this.setSquareBase(
+          this.planta,
+          Math.min(rectInteriorPc.bottom - rectInteriorPc.top, rectInteriorPc.right - rectInteriorPc.left)
+        );
+      }
 
       // Localizaciones
       let globalCoords;
