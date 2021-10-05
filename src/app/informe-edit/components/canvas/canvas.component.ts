@@ -794,26 +794,6 @@ export class CanvasComponent implements OnInit {
         Math.min(rectInteriorPc.bottom - rectInteriorPc.top, rectInteriorPc.right - rectInteriorPc.left)
       );
 
-      // else {
-      //   filaReal = 0;
-      //   columnaReal = 1;
-
-      //   const top = event.offsetY - this.squareHeight / 2;
-      //   const left = event.offsetX - this.squareWidth / 2;
-      //   const height = this.squareHeight;
-      //   const width = this.squareWidth;
-      //   rectInteriorPc = { top, left, bottom: top + height, right: left + width };
-
-      //   const leftRef = Math.round(left + width * (1 + this.rectSeparation) + (width * this.rectRefReduction) / 2);
-      //   const topRef = Math.round(top + (height * this.rectRefReduction) / 2);
-      //   const widthRef = Math.round(width * (1 - this.rectRefReduction));
-      //   const heightRef = Math.round(height * (1 - this.rectRefReduction));
-      //   rectInteriorRef = { top: topRef, left: leftRef, bottom: topRef + heightRef, right: leftRef + widthRef };
-
-      //   gpsLat = this.currentLatLng.lat;
-      //   gpsLng = this.currentLatLng.lng;
-      // }
-
       // Localizaciones
       let globalCoords;
       let modulo;
@@ -1107,7 +1087,6 @@ export class CanvasComponent implements OnInit {
         console.log('ERROR', res);
         this.alertMessage = 'ERROR';
       });
-    // this.informeService.selectElementoPlanta(nuevaEstructuraObj);
 
     this.activeLine = null;
     this.activeShape = null;
