@@ -472,6 +472,7 @@ export class CanvasComponent implements OnInit {
             fill: 'rgba(0,0,0,0)',
             stroke: '#72FD03',
             strokeWidth: 1,
+            strokeDashArray: [5, 5],
             selectable: false,
             estructura,
             hoverCursor: 'pointer',
@@ -517,7 +518,7 @@ export class CanvasComponent implements OnInit {
 
     const transformedRect = this.transformActObjToRotated(rect2);
     const transformedRectRef = this.transformActObjToRotated(rectRef2);
-    const strokeWidth = 1;
+    const strokeWidth = 2;
 
     const rect = new fabric.Rect({
       left: transformedRect.left,
@@ -1158,56 +1159,4 @@ export class CanvasComponent implements OnInit {
 
     return actObj;
   }
-
-  // onClickDeletePc(pc: PcInterface) {
-  //   // Eliminamos el PC de la bbdd
-  //   this.delPcFromDb(pc);
-
-  //   // Eliminamos el cuadrado
-  //   this.selected_pc = null;
-  //   // Eliminamos el triangulo
-  //   if (this.oldTriangle !== null && this.oldTriangle !== undefined) {
-  //     this.canvas.remove(this.oldTriangle);
-  //   }
-
-  //   // Eliminamos el pc del canvas
-  //   this.canvas.getObjects().forEach((object) => {
-  //     if (object.local_id === pc.local_id) {
-  //       this.canvas.remove(object);
-  //     }
-  //   });
-
-  //   // Elimminamos el pc de la lista
-  //   const index: number = this.allPcs.indexOf(pc);
-  //   if (index !== -1) {
-  //     this.allPcs.splice(index, 1);
-  //   }
-  // }
-
-  // onObjectModified(event) {
-  //   // const actObj = this.canvas.getActiveObject();
-  //   const actObj = event.target;
-
-  //   // Get HS img coords and draw triangle
-  //   if (actObj !== null && actObj !== undefined) {
-  //     if (actObj.get('type') === 'rect' && actObj.isMoving === true) {
-  //       const actObjRaw = this.transformActObjToRaw(actObj);
-  //       // const max_temp = this.getMaxTempInActObj(actObj);
-  //       // this.selected_pc.temperaturaMax = max_temp.max_temp;
-  //       // this.selected_pc.img_x = max_temp.max_temp_x;
-  //       // this.selected_pc.img_y = max_temp.max_temp_y;
-  //       if (actObjRaw.ref === true) {
-  //         this.selected_pc.refTop = Math.round(actObjRaw.top);
-  //         this.selected_pc.refLeft = Math.round(actObjRaw.left);
-  //         this.selected_pc.refWidth = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
-  //         this.selected_pc.refHeight = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
-  //       } else {
-  //         this.selected_pc.img_top = Math.round(actObjRaw.top);
-  //         this.selected_pc.img_left = Math.round(actObjRaw.left);
-  //         this.selected_pc.img_width = Math.round(Math.abs(actObjRaw.aCoords.tl.x - actObjRaw.aCoords.tr.x));
-  //         this.selected_pc.img_height = Math.round(Math.abs(actObjRaw.aCoords.tl.y - actObjRaw.aCoords.bl.y));
-  //       }
-  //     }
-  //   }
-  // }
 }
