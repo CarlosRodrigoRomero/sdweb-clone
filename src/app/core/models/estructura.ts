@@ -92,7 +92,6 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
       this.estructuraCoords = this.estructureCoordsToArray(est.estructuraCoords);
       this.estructuraMatrix = null;
       if (est.estructuraCoords !== null) {
-        this.coords = this.getCoordsFromEstCoords();
         this.filas = this.estructuraCoords.length;
         this.columnas = this.estructuraCoords[0].length;
       }
@@ -153,20 +152,6 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     }
 
     return [filaDistMin, columnaDistMin];
-  }
-
-  private getCoordsFromEstCoords(): any[] {
-    const filas = this.estructuraCoords.length;
-    const columnas = this.estructuraCoords[0].length;
-
-    const topLeft = this.estructuraCoords[filas - 1][columnas - 1][2];
-    const topRight = this.estructuraCoords[filas - 1][0][3];
-    const bottomRight = this.estructuraCoords[0][0][1];
-    const bottomLeft = this.estructuraCoords[0][columnas - 1][0];
-
-    const coords = [topLeft, topRight, bottomRight, bottomLeft];
-
-    return coords;
   }
 
   private estructureCoordsToArray(coords: any[]) {

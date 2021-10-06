@@ -720,9 +720,13 @@ export class CanvasComponent implements OnInit {
       // const inside = require('point-in-polygon');
       this.estructuraList.forEach((est) => {
         if (est.estructuraMatrix === null) {
-          if (inside([punto.x, punto.y], est.coords)) {
-            estEncontrada = est;
-          }
+          est.estructuraCoords.some((fila) => {
+            fila.some((modulo) => {
+              if (inside([punto.x, punto.y], modulo)) {
+                estEncontrada = est;
+              }
+            });
+          });
         } else {
           const coords = this.PointToCoords(est.coords);
           if (inside([punto.x, punto.y], coords)) {
