@@ -9,6 +9,8 @@ import 'fabric';
 import { Point } from '@agm/core/services/google-maps-types';
 import { LatLngLiteral } from '@agm/core/map-types';
 
+import { HotkeysService, Hotkey } from 'angular2-hotkeys';
+
 import { GLOBAL } from '@core/services/global';
 import { PcInterface, Pc } from '@core/models/pc';
 import { InformeService } from '@core/services/informe.service';
@@ -85,7 +87,8 @@ export class CanvasComponent implements OnInit {
     public informeService: InformeService,
     private route: ActivatedRoute,
     private plantaService: PlantaService,
-    private pcService: PcService
+    private pcService: PcService,
+    private hotkeysService: HotkeysService
   ) {}
 
   ngOnInit(): void {
@@ -165,7 +168,37 @@ export class CanvasComponent implements OnInit {
     this.informeService.droneLatLng$.subscribe((latLng) => {
       this.currentLatLng = latLng;
     });
+
+    // creamos nuevas autoEstructuras pulsando la barra espaciadora
+    this.hotkeysService.add(
+      new Hotkey(
+        'space',
+        (event: KeyboardEvent): boolean => {
+          // evitamos que se cree una autoEstructura donde ya hay una o una estructura normal
+          combineLatest([
+            this.informeService.getAllEstructuras(this.informeId),
+            this.informeService.getAllAutoEstructuras(this.informeId),
+          ])
+            .pipe(take(1))
+            .subscribe(([allEst, allAutoEst]) => {
+              const allAmbasEstructuras = [...allEst, ...allAutoEst];
+
+              if (
+                !allAmbasEstructuras
+                  .map((est) => est.archivo)
+                  .includes(this.informeService.selectedArchivoVuelo.archivo)
+              ) {
+                this.addAutoEstructura();
+              }
+            });
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '<---- retroceder 4 frames'
+      )
+    );
   }
+
   private borrarPcsEstructura(estructura: Estructura) {
     if (this.estructuraList.length === 1) {
       this.allPcs
@@ -598,22 +631,6 @@ export class CanvasComponent implements OnInit {
     this.canvas.on('mouse:dblclick', (options) => {
       if (this.pcsOrEstructuras) {
         this.onDblClickCanvas(options.e);
-      } else {
-        // evitamos que se cree una autoEstructura donde ya hay una o una estructura normal
-        combineLatest([
-          this.informeService.getAllEstructuras(this.informeId),
-          this.informeService.getAllAutoEstructuras(this.informeId),
-        ])
-          .pipe(take(1))
-          .subscribe(([allEst, allAutoEst]) => {
-            const allAmbasEstructuras = [...allEst, ...allAutoEst];
-
-            if (
-              !allAmbasEstructuras.map((est) => est.archivo).includes(this.informeService.selectedArchivoVuelo.archivo)
-            ) {
-              this.addAutoEstructura();
-            }
-          });
       }
     });
     // Seleccionar estructura
