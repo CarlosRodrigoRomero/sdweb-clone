@@ -468,11 +468,10 @@ export class CanvasComponent implements OnInit {
           const polygon = new fabric.Polygon(puntos, {
             left: modulo[0][0],
             top: modulo[0][1],
-            radius: 2,
             fill: 'rgba(0,0,0,0)',
-            stroke: '#72FD03',
-            strokeWidth: 1,
-            strokeDashArray: [5, 5],
+            stroke: '#2874A6',
+            strokeWidth: 0.5,
+            // strokeDashArray: [5, 5],
             selectable: false,
             estructura,
             hoverCursor: 'pointer',
@@ -481,6 +480,8 @@ export class CanvasComponent implements OnInit {
             name: 1,
           });
           this.canvas.add(polygon);
+          // lo movemos en el eje Z para que no quede delante de las anomalias antiguas
+          this.canvas.moveTo(polygon, 0);
         });
       });
     }
@@ -617,9 +618,11 @@ export class CanvasComponent implements OnInit {
     });
     // Seleccionar estructura
     this.canvas.on('mouse:down', (options) => {
-      if (options.button === 1 && options.hasOwnProperty('target') && options.target !== null) {
-        if (options.target.hasOwnProperty('estructura')) {
-          this.selectElementoPlanta(options.target.estructura);
+      if (!this.pcsOrEstructuras) {
+        if (options.button === 1 && options.hasOwnProperty('target') && options.target !== null) {
+          if (options.target.hasOwnProperty('estructura')) {
+            this.selectElementoPlanta(options.target.estructura);
+          }
         }
       }
     });
@@ -717,12 +720,16 @@ export class CanvasComponent implements OnInit {
   private getEstructuraPunto(punto: Point) {
     let estEncontrada = null;
     if (this.estructuraList !== null) {
-      // const inside = require('point-in-polygon');
-      this.estructuraList.forEach((est) => {
+      this.estructuraList.some((est) => {
         if (est.estructuraMatrix === null) {
-          if (inside([punto.x, punto.y], est.coords)) {
-            estEncontrada = est;
-          }
+          est.estructuraCoords.some((fila) => {
+            fila.some((modulo) => {
+              const moduloCorrecto = [modulo[2], modulo[3], modulo[1], modulo[0]];
+              if (inside([punto.x, punto.y], moduloCorrecto)) {
+                estEncontrada = est;
+              }
+            });
+          });
         } else {
           const coords = this.PointToCoords(est.coords);
           if (inside([punto.x, punto.y], coords)) {
