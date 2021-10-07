@@ -480,6 +480,8 @@ export class CanvasComponent implements OnInit {
             name: 1,
           });
           this.canvas.add(polygon);
+          // lo movemos en el eje Z para que no quede delante de las anomalias antiguas
+          this.canvas.moveTo(polygon, 0);
         });
       });
     }
@@ -787,7 +789,6 @@ export class CanvasComponent implements OnInit {
 
     const point = { x: event.offsetX, y: event.offsetY } as Point;
     const estructura = this.getEstructuraPunto(point);
-    console.log(estructura);
     if (estructura !== null) {
       if (estructura.estructuraMatrix === null) {
         [fila, columna] = estructura.getFilaColumnaAutoEst(event.offsetX, event.offsetY);
