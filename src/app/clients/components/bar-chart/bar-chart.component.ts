@@ -25,6 +25,12 @@ import { PortfolioControlService } from '@core/services/portfolio-control.servic
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 
+interface PlantaChart {
+  planta: PlantaInterface;
+  informeReciente: InformeInterface;
+  mae: number;
+}
+
 export interface ChartOptions {
   series: ApexAxisChartSeries;
   chart: ApexChart;
@@ -59,6 +65,7 @@ export class BarChartComponent implements OnInit {
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
   private fechaInformesRecientes: number[] = [];
+  private plantasChart: PlantaChart[] = [];
 
   constructor(
     public auth: AuthService,
@@ -81,19 +88,20 @@ export class BarChartComponent implements OnInit {
         const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
         const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
 
-        this.data.push(mae * 100);
-        // añadimos al array de ids
-        this.plantasId.push(planta.id);
-        // añadimos al array de tipos
-        this.tiposPlantas.push(planta.tipo);
-        // añadimos la fecha al array de fecha informes recientes
-        this.fechaInformesRecientes.push(informeReciente.fecha);
-
-        this.barChartLabels.push(planta.nombre);
-        // añadimos los colores
-        this.coloresChart.push(this.getColorMae(mae));
+        this.plantasChart.push({ planta, informeReciente, mae });
       }
     });
+
+    this.plantasChart.sort((a, b) => b.mae - a.mae);
+
+    this.plantasChart.forEach((plant) => {
+      this.data.push(plant.mae * 100);
+      this.plantasId.push(plant.planta.id);
+      this.tiposPlantas.push(plant.planta.tipo);
+      this.fechaInformesRecientes.push(plant.informeReciente.fecha);
+      this.coloresChart.push(this.getColorMae(plant.mae));
+    });
+
     this.initChart();
   }
 
