@@ -772,7 +772,7 @@ export class PlantaService {
           proj.fromPointToLatLng(new google.maps.Point((coord.x + 1) * tileXSize, coord.y * tileYSize))
         );
         if (!mapBounds.intersects(tileBounds) || zoom < mapMinZoom || zoom > mapMaxZoom) return null;
-        return 'https://solardrontech.es/tileserver.php?/index.json?/kyswupn4T2GXardoZorv_visual/{z}/{x}/{y}.png'
+        return 'https://solardrontech.es/tileserver.php?/index.json?/3ZTCav9adZ7trWBveUQO_visual/{z}/{x}/{y}.png'
           .replace('{z}', zoom)
           .replace('{x}', coord.x)
           .replace('{y}', coord.y);
