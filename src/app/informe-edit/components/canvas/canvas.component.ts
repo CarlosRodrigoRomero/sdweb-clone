@@ -468,7 +468,6 @@ export class CanvasComponent implements OnInit {
           const polygon = new fabric.Polygon(puntos, {
             left: modulo[0][0],
             top: modulo[0][1],
-            radius: 2,
             fill: 'rgba(0,0,0,0)',
             stroke: '#2874A6',
             strokeWidth: 0.5,
@@ -617,9 +616,11 @@ export class CanvasComponent implements OnInit {
     });
     // Seleccionar estructura
     this.canvas.on('mouse:down', (options) => {
-      if (options.button === 1 && options.hasOwnProperty('target') && options.target !== null) {
-        if (options.target.hasOwnProperty('estructura')) {
-          this.selectElementoPlanta(options.target.estructura);
+      if (!this.pcsOrEstructuras) {
+        if (options.button === 1 && options.hasOwnProperty('target') && options.target !== null) {
+          if (options.target.hasOwnProperty('estructura')) {
+            this.selectElementoPlanta(options.target.estructura);
+          }
         }
       }
     });
@@ -721,7 +722,8 @@ export class CanvasComponent implements OnInit {
         if (est.estructuraMatrix === null) {
           est.estructuraCoords.some((fila) => {
             fila.some((modulo) => {
-              if (inside([punto.x, punto.y], modulo)) {
+              const moduloCorrecto = [modulo[2], modulo[3], modulo[1], modulo[0]];
+              if (inside([punto.x, punto.y], moduloCorrecto)) {
                 estEncontrada = est;
               }
             });
