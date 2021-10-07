@@ -146,13 +146,7 @@ export class AnomaliaService {
         return combineLatest(anomaliaObsList);
       }),
       map((arr) => arr.flat()),
-      map((arr) => {
-        if (this.planta.alturaBajaPrimero) {
-          return this.getAlturaCorrecta(arr);
-        } else {
-          return arr;
-        }
-      })
+      map((arr) => this.getAlturaCorrecta(arr))
     );
 
     return query$;
@@ -366,17 +360,18 @@ export class AnomaliaService {
     return criticidad;
   }
 
-  private getAlturaCorrecta(anomalias: Anomalia[]) {
-    anomalias.forEach((anom) => {
-      const alturaMax = Math.max(
-        ...[
-          ...anomalias.filter((a) => a.globalCoords.toString() === anom.globalCoords.toString()).map((a) => a.localY),
-          this.planta.filas,
-        ]
-      );
-      console.log(alturaMax);
-      anom.localY = alturaMax - anom.localY + 1;
-    });
+  public getAlturaCorrecta(anomalias: Anomalia[]) {
+    if (this.planta.alturaBajaPrimero) {
+      anomalias.forEach((anom) => {
+        const alturaMax = Math.max(
+          ...[
+            ...anomalias.filter((a) => a.globalCoords.toString() === anom.globalCoords.toString()).map((a) => a.localY),
+            this.planta.filas,
+          ]
+        );
+        anom.localY = alturaMax - anom.localY + 1;
+      });
+    }
 
     return anomalias;
   }

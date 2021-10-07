@@ -71,6 +71,10 @@ export class SeguidorService {
     return this.anomaliaService.getAnomalias$(informeId, tipo).pipe(
       take(1),
       map((anomaliaList) => {
+        if (this.planta.alturaBajaPrimero) {
+          anomaliaList = this.anomaliaService.getAlturaCorrecta(anomaliaList);
+        }
+
         const seguidores: Seguidor[] = [];
 
         if (anomaliaList.length > 0) {
