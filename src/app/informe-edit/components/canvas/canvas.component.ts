@@ -717,8 +717,7 @@ export class CanvasComponent implements OnInit {
   private getEstructuraPunto(punto: Point) {
     let estEncontrada = null;
     if (this.estructuraList !== null) {
-      // const inside = require('point-in-polygon');
-      this.estructuraList.forEach((est) => {
+      this.estructuraList.some((est) => {
         if (est.estructuraMatrix === null) {
           est.estructuraCoords.some((fila) => {
             fila.some((modulo) => {
@@ -786,6 +785,7 @@ export class CanvasComponent implements OnInit {
 
     const point = { x: event.offsetX, y: event.offsetY } as Point;
     const estructura = this.getEstructuraPunto(point);
+    console.log(estructura);
     if (estructura !== null) {
       if (estructura.estructuraMatrix === null) {
         [fila, columna] = estructura.getFilaColumnaAutoEst(event.offsetX, event.offsetY);
