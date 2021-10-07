@@ -174,7 +174,9 @@ export class AnomaliaService {
             if (data.globalCoords !== undefined && data.globalCoords !== null) {
               data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
             }
-
+            if (this.planta.alturaBajaPrimero) {
+              data.localY = this.planta.filas - data.localY + 1;
+            }
             if (tipo === 'pcs') {
               data.localX = (data as PcInterface).local_x;
               data.localY = (data as PcInterface).local_y;

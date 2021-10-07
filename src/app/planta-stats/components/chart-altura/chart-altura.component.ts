@@ -133,23 +133,44 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
 
           if (this.allCC.length > 0) {
             const series = [];
-            for (let index = alturaMax; index > 0; index--) {
-              const row = {
-                name: index.toString(),
-                data: [],
-              };
+            if (this.planta.alturaBajaPrimero) {
+              for (let index = 1; index <= alturaMax; index++) {
+                const row = {
+                  name: index.toString(),
+                  data: [],
+                };
 
-              dateLabels.forEach((dateLabel, i) => {
-                row.data.push({
-                  x: dateLabel,
-                  y: this.allCC
-                    .filter((anom) => anom.informeId === this.informesIdList[i])
-                    // tslint:disable-next-line: triple-equals
-                    .filter((anom) => anom.localY == index).length,
+                dateLabels.forEach((dateLabel, i) => {
+                  row.data.push({
+                    x: dateLabel,
+                    y: this.allCC
+                      .filter((anom) => anom.informeId === this.informesIdList[i])
+                      // tslint:disable-next-line: triple-equals
+                      .filter((anom) => anom.localY == index).length,
+                  });
                 });
-              });
 
-              series.push(row);
+                series.push(row);
+              }
+            } else {
+              for (let index = alturaMax; index > 0; index--) {
+                const row = {
+                  name: index.toString(),
+                  data: [],
+                };
+
+                dateLabels.forEach((dateLabel, i) => {
+                  row.data.push({
+                    x: dateLabel,
+                    y: this.allCC
+                      .filter((anom) => anom.informeId === this.informesIdList[i])
+                      // tslint:disable-next-line: triple-equals
+                      .filter((anom) => anom.localY == index).length,
+                  });
+                });
+
+                series.push(row);
+              }
             }
 
             // aplicamos a todas salvo a DEMO
@@ -164,7 +185,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
   }
 
   private getAlturaMax() {
-    return Math.max(...this.allAnomalias.map((anom) => anom.localY));
+    return Math.max(...[...this.allAnomalias.map((anom) => anom.localY), this.planta.filas]);
   }
 
   ngOnDestroy(): void {
