@@ -256,7 +256,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   }
 
   getRectanguloAutoEst(fila: number, columna: number) {
-    const rect = this.estructuraCoords[fila][columna];
+    const rect = this.estructuraCoords[fila - 1][columna - 1];
 
     return { top: rect[2][1], bottom: rect[0][1], left: rect[0][0], right: rect[1][0] } as RectanguloInterface;
   }
