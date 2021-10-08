@@ -361,7 +361,7 @@ export class AnomaliaService {
   }
 
   public getAlturaCorrecta(anomalias: Anomalia[]) {
-    if (this.planta.alturaBajaPrimero) {
+    if (this.planta.tipo !== 'seguidores' && this.planta.alturaBajaPrimero) {
       anomalias.forEach((anom) => {
         const alturaMax = Math.max(
           ...[
