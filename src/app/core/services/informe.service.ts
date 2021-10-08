@@ -45,8 +45,10 @@ export class InformeService {
   avisadorChangeElementoSource = new Subject<ElementoPlantaInterface>();
   avisadorChangeElemento$ = this.avisadorChangeElementoSource.asObservable();
 
-  private _avisadorMoveElement: ElementoPlantaInterface = null;
-  public avisadorMoveElement$ = new BehaviorSubject<ElementoPlantaInterface>(this._avisadorMoveElement);
+  private _avisadorMoveElements = false;
+  public avisadorMoveElements$ = new BehaviorSubject<boolean>(this._avisadorMoveElements);
+
+  public allElementosPlanta: ElementoPlantaInterface[] = [];
 
   constructor(public afs: AngularFirestore, private http: HttpClient) {
     this.url = GLOBAL.url;
@@ -197,7 +199,7 @@ export class InformeService {
     const estructura = {};
     estructura[field] = value;
 
-    return this.afs.doc('informes/' + informeId + '/estructuras/' + id).update(estructura);
+    this.afs.doc('informes/' + informeId + '/estructuras/' + id).update(estructura);
   }
 
   async updateAutoEstructura(informeId: string, estructura: EstructuraInterface) {
@@ -403,12 +405,12 @@ export class InformeService {
 
   ///////////////////////////////////////////////////////
 
-  get avisadorMoveElement() {
-    return this._avisadorMoveElement;
+  get avisadorMoveElements() {
+    return this._avisadorMoveElements;
   }
 
-  set avisadorMoveElement(value: ElementoPlantaInterface) {
-    this._avisadorMoveElement = value;
-    this.avisadorMoveElement$.next(value);
+  set avisadorMoveElements(value: boolean) {
+    this._avisadorMoveElements = value;
+    this.avisadorMoveElements$.next(value);
   }
 }

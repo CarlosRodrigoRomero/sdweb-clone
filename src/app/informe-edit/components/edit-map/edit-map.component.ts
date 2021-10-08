@@ -72,24 +72,23 @@ export class EditMapComponent implements OnInit {
       .subscribe(([estArray, autoEstArray]) => {
         if (!this.allElementosPlanta) {
           this.allElementosPlanta = [...estArray, ...autoEstArray];
+          this.informeService.allElementosPlanta = this.allElementosPlanta;
         }
       });
 
-    this.informeService.avisadorMoveElement$.subscribe((elem) => {
-      if (elem !== null) {
-        if (elem.constructor.name === Estructura.name) {
-          const elemPos = this.allElementosPlanta.findIndex((est) => {
-            return est.id === elem.id;
-          });
-          if (elemPos >= 0) {
-            // Le borramos y le volvemos a añadir
-            this.allElementosPlanta.splice(elemPos, 1);
-            this.deleteEstructuraCircle(elem as Estructura);
+    this.informeService.avisadorMoveElements$.subscribe((value) => {
+      if (value) {
+        // borramos todos los circulos del mapa
+        this.allElementosPlanta.forEach((elem) => this.deleteEstructuraCircle(elem as Estructura));
 
-            this.allElementosPlanta.push(elem);
-            this.drawEstructuraCircle(elem as Estructura);
+        // dibujamos los nuevos circulos
+        this.informeService.allElementosPlanta.forEach((elem, index, elems) => {
+          this.drawEstructuraCircle(elem as Estructura);
+
+          if (index === elems.length - 1) {
+            this.informeService.avisadorMoveElements = false;
           }
-        }
+        });
       }
     });
 

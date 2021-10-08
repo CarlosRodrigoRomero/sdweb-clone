@@ -10,12 +10,13 @@ import { take } from 'rxjs/operators';
 
 import { AuthService } from '@core/services/auth.service';
 import { UserInterface } from '@core/models/user';
-import { combineLatest, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 
 import { ArchivoVueloInterface } from '@core/models/archivoVuelo';
 import { LatLngLiteral } from '@agm/core';
 import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
 import { HotkeysService, Hotkey } from 'angular2-hotkeys';
+import { Estructura, EstructuraInterface } from '@core/models/estructura';
 
 export interface EventInterface {
   offsetX: number;
@@ -73,6 +74,9 @@ export class InformeEditComponent implements OnInit {
   public gpsCoordsList: LatLngLiteral[];
 
   informeId: string;
+
+  private moveDate: number;
+  private move$ = new BehaviorSubject<boolean>(null);
 
   constructor(
     private route: ActivatedRoute,
@@ -170,6 +174,19 @@ export class InformeEditComponent implements OnInit {
 
     window.addEventListener('online', (e) => (this.alertMessage = undefined));
     window.addEventListener('offline', (e) => (this.alertMessage = 'ERROR Internet conection'));
+
+    this.move$.subscribe((value) => {
+      if (value) {
+        // esperamos 2 segundos desde el ultimo move para guardar
+        setTimeout(() => {
+          if (this.moveDate + 2000 < performance.now()) {
+            // si hace 2 segundos que se movio por ultima vez guarda cambios
+            console.log('guardando');
+            this.saveMovesChanges();
+          }
+        }, 2000);
+      }
+    });
   }
 
   setArchivoVuelo(archivoVuelo: ArchivoVueloInterface): void {
@@ -197,32 +214,32 @@ export class InformeEditComponent implements OnInit {
   }
 
   moveUpEstructuras() {
-    combineLatest([
-      this.informeService.getAllEstructuras(this.informeId),
-      this.informeService.getAllAutoEstructuras(this.informeId),
-    ])
-      .pipe(take(1))
-      .subscribe(([allEst, allAutoEst]) => {
-        if (allEst.length > 0) {
-          allEst.forEach((est) => {
-            const latitud = est.latitud - 0.0001;
+    let count = 0;
+    this.moveDate = performance.now();
+    this.move$.next(true);
+    this.informeService.allElementosPlanta.forEach((elem, index, elems) => {
+      count++;
+      const estructura = elem as Estructura;
+      const latitud = estructura.latitud + 0.00001;
+      (this.informeService.allElementosPlanta[index] as Estructura).latitud = latitud;
 
-            this.informeService.updateEstructuraField(est.id, this.informeId, 'latitud', latitud);
-          });
-        }
-        if (allAutoEst.length > 0) {
-          allAutoEst.forEach((autoEst) => {
-            const latitud = autoEst.latitud - 0.0001;
+      if (count === elems.length - 1) {
+        this.informeService.avisadorMoveElements = true;
+      }
+    });
+    this.move$.next(false);
+  }
 
-            this.informeService
-              .updateAutoEstructuraField(autoEst.id, this.informeId, 'latitud', latitud)
-              .then((res) => {
-                // Avisar de que se ha añadido un nuevo elemento
-                this.informeService.avisadorMoveElement = autoEst;
-              });
-          });
-        }
-      });
+  private saveMovesChanges() {
+    this.informeService.allElementosPlanta.forEach((elem) => {
+      const estructura = elem as Estructura;
+
+      if (estructura.estructuraMatrix === null) {
+        this.informeService.updateAutoEstructuraField(estructura.id, this.informeId, 'latitud', estructura.latitud);
+      } else {
+        this.informeService.updateEstructuraField(estructura.id, this.informeId, 'latitud', estructura.latitud);
+      }
+    });
   }
 
   getCurrentImageRotation(trackHeading: number) {
