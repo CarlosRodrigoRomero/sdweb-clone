@@ -99,6 +99,7 @@ export class BarChartComponent implements OnInit {
       this.plantasId.push(plant.planta.id);
       this.tiposPlantas.push(plant.planta.tipo);
       this.fechaInformesRecientes.push(plant.informeReciente.fecha);
+      this.barChartLabels.push(plant.planta.nombre);
       this.coloresChart.push(this.getColorMae(plant.mae));
     });
 
