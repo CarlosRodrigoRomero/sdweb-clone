@@ -25,6 +25,12 @@
         {{ alertMessage }}
       </div>
 
+      <div class="move-arrows">
+        <button mat-icon-button (click)="moveUpEstructuras()">
+          <mat-icon>arrow_upward</mat-icon>
+        </button>
+      </div>
+
       <div class="btn-group btn-group-toggle btn-group-vuelos">
         <label
           [ngClass]="{ selected_flight: currentFlight === flight }"

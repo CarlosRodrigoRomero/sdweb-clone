@@ -123,3 +123,9 @@
   height: 100vh;
   overflow: hidden;
 }
+
+.move-arrows {
+  position: absolute;
+  right: 200px;
+  top: 0px;
+}

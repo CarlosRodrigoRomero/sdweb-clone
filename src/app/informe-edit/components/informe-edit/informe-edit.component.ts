@@ -10,7 +10,7 @@ import { take } from 'rxjs/operators';
 
 import { AuthService } from '@core/services/auth.service';
 import { UserInterface } from '@core/models/user';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 
 import { ArchivoVueloInterface } from '@core/models/archivoVuelo';
 import { LatLngLiteral } from '@agm/core';
@@ -194,6 +194,35 @@ export class InformeEditComponent implements OnInit {
 
   setElementoPlanta(elementoPlanta: ElementoPlantaInterface) {
     this.setArchivoVuelo({ archivo: elementoPlanta.archivo, vuelo: elementoPlanta.vuelo } as ArchivoVueloInterface);
+  }
+
+  moveUpEstructuras() {
+    combineLatest([
+      this.informeService.getAllEstructuras(this.informeId),
+      this.informeService.getAllAutoEstructuras(this.informeId),
+    ])
+      .pipe(take(1))
+      .subscribe(([allEst, allAutoEst]) => {
+        if (allEst.length > 0) {
+          allEst.forEach((est) => {
+            const latitud = est.latitud - 0.0001;
+
+            this.informeService.updateEstructuraField(est.id, this.informeId, 'latitud', latitud);
+          });
+        }
+        if (allAutoEst.length > 0) {
+          allAutoEst.forEach((autoEst) => {
+            const latitud = autoEst.latitud - 0.0001;
+
+            this.informeService
+              .updateAutoEstructuraField(autoEst.id, this.informeId, 'latitud', latitud)
+              .then((res) => {
+                // Avisar de que se ha añadido un nuevo elemento
+                this.informeService.avisadorMoveElement = autoEst;
+              });
+          });
+        }
+      });
   }
 
   getCurrentImageRotation(trackHeading: number) {

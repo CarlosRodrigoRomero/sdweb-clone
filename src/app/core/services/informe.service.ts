@@ -4,7 +4,7 @@ import { HttpHeaders } from '@angular/common/http';
 
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 
-import { combineLatest, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
 import { LatLngLiteral } from '@agm/core';
@@ -44,6 +44,9 @@ export class InformeService {
 
   avisadorChangeElementoSource = new Subject<ElementoPlantaInterface>();
   avisadorChangeElemento$ = this.avisadorChangeElementoSource.asObservable();
+
+  private _avisadorMoveElement: ElementoPlantaInterface = null;
+  public avisadorMoveElement$ = new BehaviorSubject<ElementoPlantaInterface>(this._avisadorMoveElement);
 
   constructor(public afs: AngularFirestore, private http: HttpClient) {
     this.url = GLOBAL.url;
@@ -190,6 +193,13 @@ export class InformeService {
     return estructuraDoc.update(estructuraObj);
   }
 
+  public updateEstructuraField(id: string, informeId: string, field: string, value: any) {
+    const estructura = {};
+    estructura[field] = value;
+
+    return this.afs.doc('informes/' + informeId + '/estructuras/' + id).update(estructura);
+  }
+
   async updateAutoEstructura(informeId: string, estructura: EstructuraInterface) {
     const estructuraDoc = this.afs.doc('informes/' + informeId + '/autoEstructura/' + estructura.id);
 
@@ -199,6 +209,13 @@ export class InformeService {
       globalCoords: estructura.globalCoords,
       modulo: estructura.modulo,
     });
+  }
+
+  public updateAutoEstructuraField(id: string, informeId: string, field: string, value: any) {
+    const estructura = {};
+    estructura[field] = value;
+
+    return this.afs.doc('informes/' + informeId + '/autoEstructura/' + id).update(estructura);
   }
 
   deleteEstructuraInforme(informeId: string, estructura: Estructura): void {
@@ -382,5 +399,16 @@ export class InformeService {
     const month = monthNames[date.getMonth()];
 
     return month + ' ' + year;
+  }
+
+  ///////////////////////////////////////////////////////
+
+  get avisadorMoveElement() {
+    return this._avisadorMoveElement;
+  }
+
+  set avisadorMoveElement(value: ElementoPlantaInterface) {
+    this._avisadorMoveElement = value;
+    this.avisadorMoveElement$.next(value);
   }
 }

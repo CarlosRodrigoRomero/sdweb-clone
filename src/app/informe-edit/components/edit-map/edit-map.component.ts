@@ -75,6 +75,24 @@ export class EditMapComponent implements OnInit {
         }
       });
 
+    this.informeService.avisadorMoveElement$.subscribe((elem) => {
+      if (elem !== null) {
+        if (elem.constructor.name === Estructura.name) {
+          const elemPos = this.allElementosPlanta.findIndex((est) => {
+            return est.id === elem.id;
+          });
+          if (elemPos >= 0) {
+            // Le borramos y le volvemos a añadir
+            this.allElementosPlanta.splice(elemPos, 1);
+            this.deleteEstructuraCircle(elem as Estructura);
+
+            this.allElementosPlanta.push(elem);
+            this.drawEstructuraCircle(elem as Estructura);
+          }
+        }
+      }
+    });
+
     this.informeService.avisadorChangeElemento$.subscribe((elem) => {
       if (elem.constructor.name === Estructura.name) {
         const elemPos = this.allElementosPlanta.findIndex((est) => {
