@@ -133,7 +133,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
 
           if (this.allCC.length > 0) {
             const series = [];
-            if (this.planta.alturaBajaPrimero) {
+            if (this.planta.tipo !== 'seguidores' && this.planta.alturaBajaPrimero) {
               for (let index = 1; index <= alturaMax; index++) {
                 const row = {
                   name: index.toString(),

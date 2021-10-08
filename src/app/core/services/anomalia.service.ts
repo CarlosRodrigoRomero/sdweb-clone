@@ -145,7 +145,8 @@ export class AnomaliaService {
         });
         return combineLatest(anomaliaObsList);
       }),
-      map((arr) => arr.flat())
+      map((arr) => arr.flat()),
+      map((arr) => this.getAlturaCorrecta(arr))
     );
 
     return query$;
@@ -174,9 +175,9 @@ export class AnomaliaService {
             if (data.globalCoords !== undefined && data.globalCoords !== null) {
               data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
             }
-            if (this.planta.alturaBajaPrimero) {
-              data.localY = this.planta.filas - data.localY + 1;
-            }
+            // if (this.planta.alturaBajaPrimero) {
+            //   data.localY = this.planta.filas - data.localY + 1;
+            // }
             if (tipo === 'pcs') {
               data.localX = (data as PcInterface).local_x;
               data.localY = (data as PcInterface).local_y;
@@ -357,6 +358,22 @@ export class AnomaliaService {
     }
 
     return criticidad;
+  }
+
+  public getAlturaCorrecta(anomalias: Anomalia[]) {
+    if (this.planta.tipo !== 'seguidores' && this.planta.alturaBajaPrimero) {
+      anomalias.forEach((anom) => {
+        const alturaMax = Math.max(
+          ...[
+            ...anomalias.filter((a) => a.globalCoords.toString() === anom.globalCoords.toString()).map((a) => a.localY),
+            this.planta.filas,
+          ]
+        );
+        anom.localY = alturaMax - anom.localY + 1;
+      });
+    }
+
+    return anomalias;
   }
 
   downloadImage(folder: string, anomalia: Anomalia) {
