@@ -256,13 +256,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   }
 
   getRectanguloAutoEst(fila: number, columna: number) {
-    const filas = this.estructuraCoords.length;
-    const columnas = this.estructuraCoords[0].length;
-
-    const filEstCoords = filas - fila;
-    const colEstCoords = columnas - columna;
-
-    const rect = this.estructuraCoords[filEstCoords][colEstCoords];
+    const rect = this.estructuraCoords[fila][columna];
 
     return { top: rect[2][1], bottom: rect[0][1], left: rect[0][0], right: rect[1][0] } as RectanguloInterface;
   }
@@ -273,8 +267,8 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     let columnaSelecciona = 0;
     let menorDistancia = 999999;
 
-    this.estructuraCoords.forEach((fila, filIndex, filas) => {
-      fila.forEach((modulo, colIndex, columnas) => {
+    this.estructuraCoords.forEach((fila, filIndex) => {
+      fila.forEach((modulo, colIndex) => {
         let sumaDistancias = 0;
         modulo.forEach((p) => {
           const distancia = this.distanceBetweenTwoPoints(point, p);
@@ -282,8 +276,8 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
         });
         if (sumaDistancias < menorDistancia) {
           menorDistancia = sumaDistancias;
-          filaSeleccionada = filas.length - filIndex;
-          columnaSelecciona = columnas.length - colIndex;
+          filaSeleccionada = filIndex + 1;
+          columnaSelecciona = colIndex + 1;
         }
       });
     });
