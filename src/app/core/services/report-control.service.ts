@@ -439,7 +439,7 @@ export class ReportControlService {
     // comprobamos si el nombre de las zonas es un numero
     if (!isNaN(parseFloat(locAreas[0].globalCoords[0]))) {
       locAreas = locAreas.sort((a, b) => parseFloat(a.globalCoords[0]) - parseFloat(b.globalCoords[0]));
-    } else {
+    } else if (locAreas[0].globalCoords[0].match(/\d+/g) !== null) {
       // si no es un numero buscamos si tiene alguno incluido para ordenarlo
       locAreas.sort((a, b) => {
         let numsA = '';
