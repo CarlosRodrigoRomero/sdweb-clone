@@ -128,8 +128,13 @@
   position: absolute;
   display: flex;
   align-items: center;
-  right: 200px;
-  top: 0px;
+  right: 16px;
+  top: -8px;
+}
+
+.move-arrows button {
+  width: 18px;
+  height: 30px;
 }
 
 .up-down-arrows {
