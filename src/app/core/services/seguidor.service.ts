@@ -231,7 +231,7 @@ export class SeguidorService {
         nombre = nombre + coord;
       } else {
         if (coord !== null && coord !== undefined && coord !== '') {
-          nombre = nombre + this.plantaService.getGlobalsConector() + coord;
+          nombre = nombre + this.plantaService.getGlobalsConector(this.planta) + coord;
         }
       }
     });

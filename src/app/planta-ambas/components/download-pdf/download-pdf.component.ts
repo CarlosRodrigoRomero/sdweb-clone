@@ -401,13 +401,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               elegible: true,
             },
             {
-              nombre: 'localizar',
-              descripcion: 'Cómo localizar las anomalías',
-              orden: 9,
-              apt: 1,
-              elegible: true,
-            },
-            {
               nombre: 'resultadosClase',
               descripcion: 'Resultados por clase',
               orden: 10,
@@ -1814,33 +1807,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       ];
     };
 
-    const localizar = (index: string) => {
-      return [
-        {
-          text: `${index} - ${this.translation.t('Cómo localizar las anomalías')}`,
-          style: 'h3',
-        },
-
-        '\n',
-
-        {
-          text: this.translation.t(
-            'Todas las incidencias tienen asociada una localización GPS, cuyo margen de error es de unos pocos metros (0-2 metros).'
-          ),
-          style: 'p',
-        },
-
-        '\n',
-
-        {
-          text: this.getTextoLocalizar(),
-          style: 'p',
-        },
-
-        '\n\n',
-      ];
-    };
-
     const resultados = (index: string) => {
       return [
         {
@@ -2170,12 +2136,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     if (this.filtroApartados.includes('clasificacion')) {
       apartado = titulo.toString().concat('.').concat(subtitulo.toString());
       result = result.concat(clasificacion(apartado));
-      subtitulo = subtitulo + 1;
-    }
-
-    if (this.filtroApartados.includes('localizar')) {
-      apartado = titulo.toString().concat('.').concat(subtitulo.toString());
-      result = result.concat(localizar(apartado));
       subtitulo = subtitulo + 1;
     }
 
@@ -2692,16 +2652,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   private capFirstLetter(text: string): string {
     return text.charAt(0).toUpperCase() + text.slice(1);
-  }
-
-  private getTextoLocalizar() {
-    return `${this.translation.t('Además todos ellos tienen asociado los parámetros')} '${this.translation.t(
-      this.plantaService.getNombreGlobalX(this.planta)
-    )}', '${this.translation.t(this.plantaService.getNombreGlobalY(this.planta))}', '${this.translation.t(
-      this.plantaService.getNombreLocalX(this.planta)
-    )}' ${this.translation.t('y')} '${this.translation.t(
-      this.plantaService.getNombreLocalY(this.planta)
-    )}' ${this.translation.t('según el mapa habitual de la planta')}.`;
   }
 
   private calificacionMae(mae: number) {
