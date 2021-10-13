@@ -148,60 +148,63 @@ export class SeguidorService {
   }
 
   private getDifferentLocAreas(plantaId: string) {
-    this.plantaService.getLocationsArea(plantaId).subscribe((locAreaList) => {
-      // guardamos las zonas con módulos
-      this.locAreaModulos = locAreaList.filter((locArea) => locArea.modulo !== undefined);
+    this.plantaService
+      .getLocationsArea(plantaId)
+      .pipe(take(1))
+      .subscribe((locAreaList) => {
+        // guardamos las zonas con módulos
+        this.locAreaModulos = locAreaList.filter((locArea) => locArea.modulo !== undefined);
 
-      // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
-      const coordsLength = locAreaList[0].globalCoords.length;
+        // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
+        const coordsLength = locAreaList[0].globalCoords.length;
 
-      let indiceSeleccionado;
+        let indiceSeleccionado;
 
-      for (let index = coordsLength - 1; index >= 0; index--) {
-        const notNullLocAreas = locAreaList.filter(
+        for (let index = coordsLength - 1; index >= 0; index--) {
+          const notNullLocAreas = locAreaList.filter(
+            (locArea) =>
+              locArea.globalCoords[index] !== undefined &&
+              locArea.globalCoords[index] !== null &&
+              locArea.globalCoords[index] !== ''
+          );
+
+          if (notNullLocAreas.length > 0) {
+            indiceSeleccionado = index;
+
+            this.numGlobalCoords = indiceSeleccionado + 1;
+
+            break;
+          }
+        }
+
+        // filtramos las areas seleccionadas para los seguidores
+        this.locAreaSeguidores = locAreaList.filter(
           (locArea) =>
-            locArea.globalCoords[index] !== undefined &&
-            locArea.globalCoords[index] !== null &&
-            locArea.globalCoords[index] !== ''
+            locArea.globalCoords[indiceSeleccionado] !== null &&
+            locArea.globalCoords[indiceSeleccionado] !== undefined &&
+            locArea.globalCoords[indiceSeleccionado] !== ''
         );
 
-        if (notNullLocAreas.length > 0) {
-          indiceSeleccionado = index;
+        // obtenemos las areas descartando las que no tienen globals, que son las de los modulos
+        const locAreaNoSeguidores = locAreaList
+          .filter((locArea) => !this.locAreaSeguidores.includes(locArea))
+          .filter((locArea) => locArea.globalCoords.toString() !== ',' && locArea.globalCoords.toString() !== '');
 
-          this.numGlobalCoords = indiceSeleccionado + 1;
+        // asignamos las areas de la planta
+        this.zones = locAreaNoSeguidores;
 
-          break;
+        // obtenemos las globalCoords completas de cada seguidor si hay areas mayores
+        if (locAreaNoSeguidores.length > 0) {
+          this.locAreaSeguidores.forEach((locArea) => {
+            if (locArea.completeGlobalCoords === undefined) {
+              locArea.globalCoords = this.getCompleteGlobalCoords(locAreaNoSeguidores, locArea);
+
+              // almacenamos las globalsCoords completas en la DB
+              this.plantaService.updateLocationAreaField(locArea, 'completeGlobalCoords', locArea.globalCoords);
+            }
+          });
         }
-      }
-
-      // filtramos las areas seleccionadas para los seguidores
-      this.locAreaSeguidores = locAreaList.filter(
-        (locArea) =>
-          locArea.globalCoords[indiceSeleccionado] !== null &&
-          locArea.globalCoords[indiceSeleccionado] !== undefined &&
-          locArea.globalCoords[indiceSeleccionado] !== ''
-      );
-
-      // obtenemos las areas descartando las que no tienen globals, que son las de los modulos
-      const locAreaNoSeguidores = locAreaList
-        .filter((locArea) => !this.locAreaSeguidores.includes(locArea))
-        .filter((locArea) => locArea.globalCoords.toString() !== ',' && locArea.globalCoords.toString() !== '');
-
-      // asignamos las areas de la planta
-      this.zones = locAreaNoSeguidores;
-
-      // obtenemos las globalCoords completas de cada seguidor si hay areas mayores
-      if (locAreaNoSeguidores.length > 0) {
-        this.locAreaSeguidores.forEach((locArea) => {
-          if (locArea.completeGlobalCoords === undefined) {
-            locArea.globalCoords = this.getCompleteGlobalCoords(locAreaNoSeguidores, locArea);
-
-            // almacenamos las globalsCoords completas en la DB
-            this.plantaService.updateLocationAreaField(locArea, 'completeGlobalCoords', locArea.globalCoords);
-          }
-        });
-      }
-    });
+      });
   }
 
   private sortAnomList(anoms: Anomalia[]): any[][] {
