@@ -1,5 +1,6 @@
 <div *ngIf="informeService.selectedArchivoVuelo && planta">
   <agm-map
+    *ngIf="elemsLoaded"
     mapTypeControl="true"
     [latitude]="droneLatLng.lat"
     [longitude]="droneLatLng.lng"

@@ -38,6 +38,7 @@ export class EditMapComponent implements OnInit {
   droneCircle: any;
   estDrawedInMap: any[];
   selectedEstructura: ElementoPlantaInterface;
+  elemsLoaded = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -61,9 +62,6 @@ export class EditMapComponent implements OnInit {
     this.informeId = this.route.snapshot.paramMap.get('id');
     this.soloEstructurasVuelo = false;
 
-    // this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
-    // });
-
     combineLatest([
       this.informeService.getAllEstructuras(this.informeId),
       this.informeService.getAllAutoEstructuras(this.informeId),
@@ -72,8 +70,27 @@ export class EditMapComponent implements OnInit {
       .subscribe(([estArray, autoEstArray]) => {
         if (!this.allElementosPlanta) {
           this.allElementosPlanta = [...estArray, ...autoEstArray];
+          this.informeService.allElementosPlanta = this.allElementosPlanta;
+
+          this.elemsLoaded = true;
         }
       });
+
+    this.informeService.avisadorMoveElements$.subscribe((value) => {
+      if (value) {
+        // borramos todos los circulos del mapa
+        this.allElementosPlanta.forEach((elem) => this.deleteEstructuraCircle(elem as Estructura));
+
+        // dibujamos los nuevos circulos
+        this.informeService.allElementosPlanta.forEach((elem, index, elems) => {
+          this.drawEstructuraCircle(elem as Estructura);
+
+          if (index === elems.length - 1) {
+            this.informeService.avisadorMoveElements = false;
+          }
+        });
+      }
+    });
 
     this.informeService.avisadorChangeElemento$.subscribe((elem) => {
       if (elem.constructor.name === Estructura.name) {
@@ -165,7 +182,7 @@ export class EditMapComponent implements OnInit {
         this.onMapElementoPlantaDragEnd(est, coords);
       });
       google.maps.event.addListener(estCircle, 'click', (coords: LatLng) => {
-        this.onMapElementoPlantaClick(est);
+        this.informeService.onMapElementoPlantaClick(est);
       });
       this.estDrawedInMap.push(estCircle);
     }
@@ -198,6 +215,7 @@ export class EditMapComponent implements OnInit {
         return elemn.vuelo === this.informeService.selectedArchivoVuelo.vuelo;
       });
     }
+
     return this.allElementosPlanta;
   }
 
@@ -288,6 +306,7 @@ export class EditMapComponent implements OnInit {
     elementoPlanta.setGlobals(globalCoords);
     elementoPlanta.setModulo(modulo);
 
+    this.informeService.avisadorChangeElementoSource.next(elementoPlanta);
     this.informeService.updateElementoPlanta(this.informeId, elementoPlanta);
   }
 
@@ -311,7 +330,7 @@ export class EditMapComponent implements OnInit {
     } else {
       this.changeLocationElementoPlanta(elementoPlanta, latLng);
     }
-    this.onMapElementoPlantaClick(elementoPlanta);
+    this.informeService.onMapElementoPlantaClick(elementoPlanta);
   }
 
   private setLocAreaList(plantaId: string): LocationAreaInterface[] {

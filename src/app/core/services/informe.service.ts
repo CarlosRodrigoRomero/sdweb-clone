@@ -4,12 +4,13 @@ import { HttpHeaders } from '@angular/common/http';
 
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 
-import { combineLatest, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
-import { LatLngLiteral } from '@agm/core';
+import { LatLng as number, LatLngLiteral } from '@agm/core';
 
 import { GLOBAL } from './global';
+import { PlantaService } from '@core/services/planta.service';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { InformeInterface } from '../models/informe';
@@ -17,6 +18,7 @@ import { EstructuraInterface, Estructura } from '../models/estructura';
 import { ArchivoVueloInterface } from '../models/archivoVuelo';
 import { ElementoPlantaInterface } from '../models/elementoPlanta';
 import { PcInterface } from '../models/pc';
+import { PlantaInterface } from '@core/models/planta';
 
 @Injectable({
   providedIn: 'root',
@@ -45,7 +47,12 @@ export class InformeService {
   avisadorChangeElementoSource = new Subject<ElementoPlantaInterface>();
   avisadorChangeElemento$ = this.avisadorChangeElementoSource.asObservable();
 
-  constructor(public afs: AngularFirestore, private http: HttpClient) {
+  private _avisadorMoveElements = false;
+  public avisadorMoveElements$ = new BehaviorSubject<boolean>(this._avisadorMoveElements);
+
+  public allElementosPlanta: ElementoPlantaInterface[] = [];
+
+  constructor(public afs: AngularFirestore, private http: HttpClient, private plantaService: PlantaService) {
     this.url = GLOBAL.url;
     // this.informes = afs.collection('informes').valueChanges();
     this.informesCollection = afs.collection<InformeInterface>('informes');
@@ -171,7 +178,6 @@ export class InformeService {
   }
 
   async updateElementoPlanta(informeId: string, elementoPlanta: ElementoPlantaInterface) {
-    this.avisadorChangeElementoSource.next(elementoPlanta);
     if (elementoPlanta.constructor.name === Estructura.name) {
       if ((elementoPlanta as Estructura).estructuraMatrix === null) {
         return this.updateAutoEstructura(informeId, elementoPlanta as Estructura);
@@ -190,6 +196,13 @@ export class InformeService {
     return estructuraDoc.update(estructuraObj);
   }
 
+  public updateEstructuraField(id: string, informeId: string, field: string, value: any) {
+    const estructura = {};
+    estructura[field] = value;
+
+    this.afs.doc('informes/' + informeId + '/estructuras/' + id).update(estructura);
+  }
+
   async updateAutoEstructura(informeId: string, estructura: EstructuraInterface) {
     const estructuraDoc = this.afs.doc('informes/' + informeId + '/autoEstructura/' + estructura.id);
 
@@ -199,6 +212,54 @@ export class InformeService {
       globalCoords: estructura.globalCoords,
       modulo: estructura.modulo,
     });
+  }
+
+  public updateAutoEstructuraField(id: string, informeId: string, field: string, value: any) {
+    const estructura = {};
+    estructura[field] = value;
+
+    return this.afs.doc('informes/' + informeId + '/autoEstructura/' + id).update(estructura);
+  }
+
+  public onMapElementoPlantaDragEnd(
+    informeId: string,
+    planta: PlantaInterface,
+    elementoPlanta: ElementoPlantaInterface
+  ) {
+    const latLng = elementoPlanta.getLatLng();
+    if (planta.tipo === 'seguidores') {
+      this.allElementosPlanta
+        .filter((elem) => {
+          return elem.archivo === elementoPlanta.archivo;
+        })
+        .forEach((elem) => {
+          this.changeLocationElementoPlanta(informeId, elem, latLng);
+        });
+    } else {
+      this.changeLocationElementoPlanta(informeId, elementoPlanta, latLng);
+    }
+  }
+
+  public changeLocationElementoPlanta(
+    informeId: string,
+    elementoPlanta: ElementoPlantaInterface,
+    coords: LatLngLiteral
+  ) {
+    elementoPlanta.setLatLng({ lat: coords.lat, lng: coords.lng });
+
+    let globalCoords;
+    let modulo;
+    [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(elementoPlanta.getLatLng());
+
+    elementoPlanta.setGlobals(globalCoords);
+    elementoPlanta.setModulo(modulo);
+
+
+    this.updateElementoPlanta(informeId, elementoPlanta);
+  }
+
+  public onMapElementoPlantaClick(elementoPlanta: ElementoPlantaInterface): void {
+    this.selectElementoPlanta(elementoPlanta);
   }
 
   deleteEstructuraInforme(informeId: string, estructura: Estructura): void {
@@ -382,5 +443,16 @@ export class InformeService {
     const month = monthNames[date.getMonth()];
 
     return month + ' ' + year;
+  }
+
+  ///////////////////////////////////////////////////////
+
+  get avisadorMoveElements() {
+    return this._avisadorMoveElements;
+  }
+
+  set avisadorMoveElements(value: boolean) {
+    this._avisadorMoveElements = value;
+    this.avisadorMoveElements$.next(value);
   }
 }

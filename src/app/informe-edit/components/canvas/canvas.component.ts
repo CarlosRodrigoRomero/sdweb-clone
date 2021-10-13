@@ -418,6 +418,7 @@ export class CanvasComponent implements OnInit {
     this.limpiarEstructuraCanvas(this.estructura);
 
     this.dibujarEstructura(this.estructura);
+    this.informeService.avisadorChangeElementoSource.next(this.estructura);
     this.informeService
       .updateElementoPlanta(this.informeId, this.estructura)
       .then((res) => {
@@ -479,6 +480,7 @@ export class CanvasComponent implements OnInit {
         if (p.estructura.id === estructura.id) {
           polygon.points[p.name] = { x: p.getCenterPoint().x, y: p.getCenterPoint().y };
           estructura.coords = polygon.points;
+          this.informeService.avisadorChangeElementoSource.next(estructura);
           this.informeService.updateElementoPlanta(this.informeId, estructura);
 
           this.dibujarPuntosInterioresEst(estructura);
