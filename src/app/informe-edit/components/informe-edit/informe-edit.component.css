@@ -126,6 +126,12 @@
 
 .move-arrows {
   position: absolute;
+  display: flex;
+  align-items: center;
   right: 200px;
   top: 0px;
+}
+
+.up-down-arrows {
+  display: grid;
 }

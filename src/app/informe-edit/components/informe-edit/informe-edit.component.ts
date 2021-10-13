@@ -77,6 +77,7 @@ export class InformeEditComponent implements OnInit {
 
   private moveDate: number;
   private move$ = new BehaviorSubject<boolean>(null);
+  private saveDelay = 1000; // tiempo que tarda en guardar tras mover todas las estructuras
 
   constructor(
     private route: ActivatedRoute,
@@ -179,12 +180,12 @@ export class InformeEditComponent implements OnInit {
       if (value) {
         // esperamos 2 segundos desde el ultimo move para guardar
         setTimeout(() => {
-          if (this.moveDate + 2000 < performance.now()) {
+          if (this.moveDate + this.saveDelay < performance.now()) {
             // si hace 2 segundos que se movio por ultima vez guarda cambios
             console.log('guardando');
             this.saveMovesChanges();
           }
-        }, 2000);
+        }, this.saveDelay);
       }
     });
   }
@@ -213,15 +214,24 @@ export class InformeEditComponent implements OnInit {
     this.setArchivoVuelo({ archivo: elementoPlanta.archivo, vuelo: elementoPlanta.vuelo } as ArchivoVueloInterface);
   }
 
-  moveUpEstructuras() {
+  moveEstructuras(vertical: boolean, positive: boolean) {
     let count = 0;
+    let coordType = 'longitud';
+    if (vertical) {
+      coordType = 'latitud';
+    }
     this.moveDate = performance.now();
     this.move$.next(true);
     this.informeService.allElementosPlanta.forEach((elem, index, elems) => {
       count++;
       const estructura = elem as Estructura;
-      const latitud = estructura.latitud + 0.00001;
-      (this.informeService.allElementosPlanta[index] as Estructura).latitud = latitud;
+      let location;
+      if (positive) {
+        location = estructura[coordType] + 0.00001;
+      } else {
+        location = estructura[coordType] - 0.00001;
+      }
+      (this.informeService.allElementosPlanta[index] as Estructura)[coordType] = location;
 
       if (count === elems.length - 1) {
         this.informeService.avisadorMoveElements = true;

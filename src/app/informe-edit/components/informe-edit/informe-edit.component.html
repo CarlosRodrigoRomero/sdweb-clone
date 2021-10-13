@@ -26,8 +26,19 @@
       </div>
 
       <div class="move-arrows">
-        <button mat-icon-button (click)="moveUpEstructuras()">
-          <mat-icon>arrow_upward</mat-icon>
+        <button mat-icon-button (click)="moveEstructuras(false, false)">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="up-down-arrows">
+          <button mat-icon-button (click)="moveEstructuras(true, true)">
+            <mat-icon>arrow_upward</mat-icon>
+          </button>
+          <button mat-icon-button (click)="moveEstructuras(true, false)">
+            <mat-icon>arrow_downward</mat-icon>
+          </button>
+        </div>
+        <button mat-icon-button (click)="moveEstructuras(false, true)">
+          <mat-icon>arrow_forward</mat-icon>
         </button>
       </div>
 
