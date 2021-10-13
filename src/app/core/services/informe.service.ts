@@ -7,9 +7,10 @@ import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument 
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
-import { LatLngLiteral } from '@agm/core';
+import { LatLng as number, LatLngLiteral } from '@agm/core';
 
 import { GLOBAL } from './global';
+import { PlantaService } from '@core/services/planta.service';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { InformeInterface } from '../models/informe';
@@ -17,6 +18,7 @@ import { EstructuraInterface, Estructura } from '../models/estructura';
 import { ArchivoVueloInterface } from '../models/archivoVuelo';
 import { ElementoPlantaInterface } from '../models/elementoPlanta';
 import { PcInterface } from '../models/pc';
+import { PlantaInterface } from '@core/models/planta';
 
 @Injectable({
   providedIn: 'root',
@@ -50,7 +52,7 @@ export class InformeService {
 
   public allElementosPlanta: ElementoPlantaInterface[] = [];
 
-  constructor(public afs: AngularFirestore, private http: HttpClient) {
+  constructor(public afs: AngularFirestore, private http: HttpClient, private plantaService: PlantaService) {
     this.url = GLOBAL.url;
     // this.informes = afs.collection('informes').valueChanges();
     this.informesCollection = afs.collection<InformeInterface>('informes');
@@ -176,7 +178,6 @@ export class InformeService {
   }
 
   async updateElementoPlanta(informeId: string, elementoPlanta: ElementoPlantaInterface) {
-    this.avisadorChangeElementoSource.next(elementoPlanta);
     if (elementoPlanta.constructor.name === Estructura.name) {
       if ((elementoPlanta as Estructura).estructuraMatrix === null) {
         return this.updateAutoEstructura(informeId, elementoPlanta as Estructura);
@@ -218,6 +219,47 @@ export class InformeService {
     estructura[field] = value;
 
     return this.afs.doc('informes/' + informeId + '/autoEstructura/' + id).update(estructura);
+  }
+
+  public onMapElementoPlantaDragEnd(
+    informeId: string,
+    planta: PlantaInterface,
+    elementoPlanta: ElementoPlantaInterface
+  ) {
+    const latLng = elementoPlanta.getLatLng();
+    if (planta.tipo === 'seguidores') {
+      this.allElementosPlanta
+        .filter((elem) => {
+          return elem.archivo === elementoPlanta.archivo;
+        })
+        .forEach((elem) => {
+          this.changeLocationElementoPlanta(informeId, elem, latLng);
+        });
+    } else {
+      this.changeLocationElementoPlanta(informeId, elementoPlanta, latLng);
+    }
+  }
+
+  public changeLocationElementoPlanta(
+    informeId: string,
+    elementoPlanta: ElementoPlantaInterface,
+    coords: LatLngLiteral
+  ) {
+    elementoPlanta.setLatLng({ lat: coords.lat, lng: coords.lng });
+
+    let globalCoords;
+    let modulo;
+    [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(elementoPlanta.getLatLng());
+
+    elementoPlanta.setGlobals(globalCoords);
+    elementoPlanta.setModulo(modulo);
+
+
+    this.updateElementoPlanta(informeId, elementoPlanta);
+  }
+
+  public onMapElementoPlantaClick(elementoPlanta: ElementoPlantaInterface): void {
+    this.selectElementoPlanta(elementoPlanta);
   }
 
   deleteEstructuraInforme(informeId: string, estructura: Estructura): void {

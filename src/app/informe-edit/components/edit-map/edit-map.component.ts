@@ -182,7 +182,7 @@ export class EditMapComponent implements OnInit {
         this.onMapElementoPlantaDragEnd(est, coords);
       });
       google.maps.event.addListener(estCircle, 'click', (coords: LatLng) => {
-        this.onMapElementoPlantaClick(est);
+        this.informeService.onMapElementoPlantaClick(est);
       });
       this.estDrawedInMap.push(estCircle);
     }
@@ -305,6 +305,7 @@ export class EditMapComponent implements OnInit {
     elementoPlanta.setGlobals(globalCoords);
     elementoPlanta.setModulo(modulo);
 
+    this.informeService.avisadorChangeElementoSource.next(elementoPlanta);
     this.informeService.updateElementoPlanta(this.informeId, elementoPlanta);
   }
 
@@ -328,7 +329,7 @@ export class EditMapComponent implements OnInit {
     } else {
       this.changeLocationElementoPlanta(elementoPlanta, latLng);
     }
-    this.onMapElementoPlantaClick(elementoPlanta);
+    this.informeService.onMapElementoPlantaClick(elementoPlanta);
   }
 
   private setLocAreaList(plantaId: string): LocationAreaInterface[] {

@@ -260,6 +260,7 @@ export class InformeEditComponent implements OnInit {
           estructura[this.coordType]
         );
       }
+      this.informeService.onMapElementoPlantaDragEnd(this.informeId, this.planta, elem);
     });
   }
 
