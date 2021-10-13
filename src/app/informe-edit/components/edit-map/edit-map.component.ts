@@ -38,6 +38,7 @@ export class EditMapComponent implements OnInit {
   droneCircle: any;
   estDrawedInMap: any[];
   selectedEstructura: ElementoPlantaInterface;
+  elemsLoaded = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -61,9 +62,6 @@ export class EditMapComponent implements OnInit {
     this.informeId = this.route.snapshot.paramMap.get('id');
     this.soloEstructurasVuelo = false;
 
-    // this.informeService.selectedArchivoVuelo$.subscribe((archivoVuelo) => {
-    // });
-
     combineLatest([
       this.informeService.getAllEstructuras(this.informeId),
       this.informeService.getAllAutoEstructuras(this.informeId),
@@ -73,6 +71,8 @@ export class EditMapComponent implements OnInit {
         if (!this.allElementosPlanta) {
           this.allElementosPlanta = [...estArray, ...autoEstArray];
           this.informeService.allElementosPlanta = this.allElementosPlanta;
+
+          this.elemsLoaded = true;
         }
       });
 
@@ -215,6 +215,7 @@ export class EditMapComponent implements OnInit {
         return elemn.vuelo === this.informeService.selectedArchivoVuelo.vuelo;
       });
     }
+
     return this.allElementosPlanta;
   }
 
