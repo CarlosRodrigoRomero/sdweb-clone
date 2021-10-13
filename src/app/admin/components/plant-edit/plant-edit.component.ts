@@ -102,6 +102,7 @@ export class PlantEditComponent implements OnInit {
       potencia: [, [Validators.required]],
       tipo: [, [Validators.required]],
       vertical: [false, [Validators.required]],
+      stringConectorGlobals: [],
     });
   }
 
@@ -146,6 +147,9 @@ export class PlantEditComponent implements OnInit {
     }
     if (this.empresaSelected !== undefined) {
       this.planta.empresa = this.empresaSelected.uid;
+    }
+    if (this.form.get('stringConectorGlobals').value !== null && this.form.get('stringConectorGlobals').value !== '') {
+      this.planta.stringConectorGlobals = this.form.get('stringConectorGlobals').value;
     }
 
     // Actualizamos la planta en la DB
