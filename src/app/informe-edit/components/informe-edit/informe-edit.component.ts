@@ -78,6 +78,7 @@ export class InformeEditComponent implements OnInit {
   private moveDate: number;
   private move$ = new BehaviorSubject<boolean>(null);
   private saveDelay = 1000; // tiempo que tarda en guardar tras mover todas las estructuras
+  private coordType: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -182,7 +183,6 @@ export class InformeEditComponent implements OnInit {
         setTimeout(() => {
           if (this.moveDate + this.saveDelay < performance.now()) {
             // si hace 2 segundos que se movio por ultima vez guarda cambios
-            console.log('guardando');
             this.saveMovesChanges();
           }
         }, this.saveDelay);
@@ -216,9 +216,10 @@ export class InformeEditComponent implements OnInit {
 
   moveEstructuras(vertical: boolean, positive: boolean) {
     let count = 0;
-    let coordType = 'longitud';
     if (vertical) {
-      coordType = 'latitud';
+      this.coordType = 'latitud';
+    } else {
+      this.coordType = 'longitud';
     }
     this.moveDate = performance.now();
     this.move$.next(true);
@@ -227,11 +228,11 @@ export class InformeEditComponent implements OnInit {
       const estructura = elem as Estructura;
       let location;
       if (positive) {
-        location = estructura[coordType] + 0.00001;
+        location = estructura[this.coordType] + 0.00001;
       } else {
-        location = estructura[coordType] - 0.00001;
+        location = estructura[this.coordType] - 0.00001;
       }
-      (this.informeService.allElementosPlanta[index] as Estructura)[coordType] = location;
+      (this.informeService.allElementosPlanta[index] as Estructura)[this.coordType] = location;
 
       if (count === elems.length - 1) {
         this.informeService.avisadorMoveElements = true;
@@ -245,9 +246,19 @@ export class InformeEditComponent implements OnInit {
       const estructura = elem as Estructura;
 
       if (estructura.estructuraMatrix === null) {
-        this.informeService.updateAutoEstructuraField(estructura.id, this.informeId, 'latitud', estructura.latitud);
+        this.informeService.updateAutoEstructuraField(
+          estructura.id,
+          this.informeId,
+          this.coordType,
+          estructura[this.coordType]
+        );
       } else {
-        this.informeService.updateEstructuraField(estructura.id, this.informeId, 'latitud', estructura.latitud);
+        this.informeService.updateEstructuraField(
+          estructura.id,
+          this.informeId,
+          this.coordType,
+          estructura[this.coordType]
+        );
       }
     });
   }
