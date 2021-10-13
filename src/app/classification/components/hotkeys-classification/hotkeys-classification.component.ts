@@ -123,6 +123,25 @@ export class HotkeysClassificationComponent implements OnInit {
       );
       this.hotkeysService.add(
         new Hotkey(
+          'ctrl+2',
+          (): boolean => {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
+              this.classificationService.anomaliaSelected.tipo = 11;
+
+              // actualizamos el tipo en la DB
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 11);
+
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
+            }
+            return false; // Prevent bubbling
+          },
+          undefined,
+          'ctrl+2: Suciedad'
+        )
+      );
+      this.hotkeysService.add(
+        new Hotkey(
           '3',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
