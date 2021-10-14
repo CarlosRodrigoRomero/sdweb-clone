@@ -8,10 +8,18 @@ import { DownloadPdfComponent } from './components/download-pdf/download-pdf.com
 import { ProgressBarPdfComponent } from './components/progress-bar-pdf/progress-bar-pdf.component';
 import { DownloadReportComponent } from './components/download-report/download-report.component';
 import { DialogFilteredReportComponent } from './components/dialog-filtered-report/dialog-filtered-report.component';
+import { ShareReportComponent } from './components/share-report/share-report.component';
 
 @NgModule({
-  declarations: [GlobalCoordAreasComponent, DownloadPdfComponent, ProgressBarPdfComponent, DownloadReportComponent, DialogFilteredReportComponent],
+  declarations: [
+    GlobalCoordAreasComponent,
+    DownloadPdfComponent,
+    ProgressBarPdfComponent,
+    DownloadReportComponent,
+    DialogFilteredReportComponent,
+    ShareReportComponent,
+  ],
   imports: [CommonModule, SharedModule],
-  exports: [GlobalCoordAreasComponent, DownloadReportComponent, ProgressBarPdfComponent],
+  exports: [GlobalCoordAreasComponent, DownloadReportComponent, ProgressBarPdfComponent, ShareReportComponent],
 })
 export class PlantaAmbasModule {}

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
@@ -10,14 +10,13 @@ import { ShareReportService } from '@core/services/share-report.service';
 import { ReportControlService } from '@core/services/report-control.service';
 
 @Component({
-  selector: 'app-share-map',
-  templateUrl: './share-map.component.html',
-  styleUrls: ['./share-map.component.css'],
+  selector: 'app-share-report',
+  templateUrl: './share-report.component.html',
+  styleUrls: ['./share-report.component.css'],
 })
-export class ShareMapComponent implements OnInit {
+export class ShareReportComponent {
   items: Observable<any[]>;
-  public filterableCheck = false;
-  private selectedInformeId: string;
+  public onlyFiltered = false;
 
   constructor(
     private shareReportService: ShareReportService,
@@ -26,11 +25,12 @@ export class ShareMapComponent implements OnInit {
     private reportControlService: ReportControlService
   ) {}
 
-  ngOnInit(): void {}
+  copyLink() {
+    this.clipboardService.copy(this.getShareLink());
+    this.openSnackBar();
+  }
 
   getShareLink(): string {
-    this.selectedInformeId = this.reportControlService.selectedInformeId;
-
     // primero guarda los params en la DB
     this.shareReportService.setSelectedInformeId(this.reportControlService.selectedInformeId);
     this.shareReportService.saveParams();
@@ -40,14 +40,14 @@ export class ShareMapComponent implements OnInit {
 
     let sharedType: string;
     if (this.reportControlService.plantaFija) {
-      sharedType = '/fixed-shared/';
-      if (this.filterableCheck) {
-        sharedType = '/fixed-filterable-shared/';
+      sharedType = '/fixed-filterable-shared/';
+      if (this.onlyFiltered) {
+        sharedType = '/fixed-shared/';
       }
     } else {
-      sharedType = '/tracker-shared/';
-      if (this.filterableCheck) {
-        sharedType = '/tracker-filterable-shared/';
+      sharedType = '/tracker-filterable-shared/';
+      if (this.onlyFiltered) {
+        sharedType = '/tracker-shared/';
       }
     }
 
@@ -62,11 +62,6 @@ export class ShareMapComponent implements OnInit {
     }
 
     return url;
-  }
-
-  copyLink() {
-    this.clipboardService.copy(this.getShareLink());
-    this.openSnackBar();
   }
 
   stopPropagation(event) {

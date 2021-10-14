@@ -15,16 +15,12 @@ h5 {
 
 li {
   list-style-type: none;
-  display: inline-flex;
-}
-
-.contenido {
   display: flex;
-  align-items: baseline;
+  justify-content: center;
+  margin-bottom: 0.5rem;
 }
 
 .btn-enviar {
   text-align: center;
-  /* color: mediumblue; */
   font-size: medium;
 }
