@@ -20,6 +20,7 @@ import {
 import { GLOBAL } from '@core/services/global';
 import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -50,10 +51,16 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
   informesIdList: string[];
   allAnomalias: Anomalia[] = [];
   dateLabels: string[];
+  private gradienteMinimoCriterio = 0;
+  private categories: string[];
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
+  constructor(
+    private reportControlService: ReportControlService,
+    private informeService: InformeService,
+    private anomaliaService: AnomaliaService
+  ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -82,13 +89,34 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
               // tslint:disable-next-line: triple-equals
               .filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
-            const range1 = celsCals.filter((cc) => cc.gradienteNormalizado < 10 && cc.gradienteNormalizado >= 0);
-            const range2 = celsCals.filter((cc) => cc.gradienteNormalizado < 20 && cc.gradienteNormalizado >= 10);
-            const range3 = celsCals.filter((cc) => cc.gradienteNormalizado < 30 && cc.gradienteNormalizado >= 20);
-            const range4 = celsCals.filter((cc) => cc.gradienteNormalizado < 40 && cc.gradienteNormalizado >= 30);
-            const range5 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
+            this.gradienteMinimoCriterio = this.anomaliaService.criterioCriticidad.rangosDT[0];
 
-            data.push([range1.length, range2.length, range3.length, range4.length, range5.length]);
+            if (this.gradienteMinimoCriterio < 10) {
+              const range1 = celsCals.filter((cc) => cc.gradienteNormalizado < 10 && cc.gradienteNormalizado >= 0);
+              const range2 = celsCals.filter((cc) => cc.gradienteNormalizado < 20 && cc.gradienteNormalizado >= 10);
+              const range3 = celsCals.filter((cc) => cc.gradienteNormalizado < 30 && cc.gradienteNormalizado >= 20);
+              const range4 = celsCals.filter((cc) => cc.gradienteNormalizado < 40 && cc.gradienteNormalizado >= 30);
+              const range5 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
+
+              this.categories = [
+                this.gradienteMinimoCriterio.toString() + '-10 ºC',
+                '10-20 ºC',
+                '20-30 ºC',
+                '30-40 ºC',
+                '>40 ºC',
+              ];
+
+              data.push([range1.length, range2.length, range3.length, range4.length, range5.length]);
+            } else {
+              const range1 = celsCals.filter((cc) => cc.gradienteNormalizado < 20 && cc.gradienteNormalizado >= 10);
+              const range2 = celsCals.filter((cc) => cc.gradienteNormalizado < 30 && cc.gradienteNormalizado >= 20);
+              const range3 = celsCals.filter((cc) => cc.gradienteNormalizado < 40 && cc.gradienteNormalizado >= 30);
+              const range4 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
+
+              this.categories = ['10-20 ºC', '20-30 ºC', '30-40 ºC', '>40 ºC'];
+
+              data.push([range1.length, range2.length, range3.length, range4.length]);
+            }
           });
 
           this._initChartData(data);
@@ -129,7 +157,7 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
         colors: ['transparent'],
       },
       xaxis: {
-        categories: ['0-10 ºC', '10-20 ºC', '20-30 ºC', '30-40 ºC', '>40 ºC'],
+        categories: this.categories,
       },
       yaxis: {
         title: {
