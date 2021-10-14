@@ -225,7 +225,17 @@ export class AnomaliaService {
     const anomalia = {};
     anomalia[field] = value;
 
-    this.afs.collection('anomalias').doc(id).update(anomalia);
+    this.afs
+      .collection('anomalias')
+      .doc(id)
+      .update(anomalia)
+      .then((res) => {
+        console.log('Campo ' + field + ' de anomalia con id ' + id + ' actualizado correctamente');
+      })
+      .catch((err) => {
+        console.log('Error al actualizar campo ' + field + ' de anomalia con id ' + id);
+        console.log(err);
+      });
   }
 
   private getLocalId(anomalia: Anomalia): string {

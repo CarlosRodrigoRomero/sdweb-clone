@@ -238,8 +238,20 @@ export class ClassificationComponent implements OnInit {
     if (anomalias !== undefined) {
       this.everSynced = true;
       this.anomaliasNoData = anomalias.filter((anom) => anom.gradienteNormalizado === 0 || anom.temperaturaMax === 0);
+      if (this.anomaliasNoData.length > 0) {
+        console.log('Anomalías sin datos');
+        console.log(this.anomaliasNoData);
+      }
       this.anomsNoModule = anomalias.filter((anom) => anom.modulo === null);
+      if (this.anomaliasNoData.length === 0 && this.anomsNoModule.length > 0) {
+        console.log('Anomalías sin modulo');
+        console.log(this.anomsNoModule);
+      }
       this.anomsNoGlobals = anomalias.filter((anom) => anom.globalCoords[0] === null);
+      if (this.anomaliasNoData.length === 0 && this.anomsNoGlobals.length > 0) {
+        console.log('Anomalías sin globalCoords');
+        console.log(this.anomsNoGlobals);
+      }
       const normModsIds = this.normModules.map((normMod) => normMod.id);
       this.anomsDisconnected = anomalias.filter((anom) => !normModsIds.includes(anom.id));
     }
