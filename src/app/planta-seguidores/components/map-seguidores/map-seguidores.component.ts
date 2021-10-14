@@ -15,7 +15,6 @@ import XYZ from 'ol/source/XYZ';
 import { PlantaService } from '@core/services/planta.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { IncrementosService } from '../../services/incrementos.service';
-import { InformeService } from '@core/services/informe.service';
 import { FilterService } from '@core/services/filter.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { ShareReportService } from '@core/services/share-report.service';
@@ -34,7 +33,6 @@ import { InformeInterface } from '@core/models/informe';
 export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public plantaId: string;
   public planta: PlantaInterface;
-  private informes: InformeInterface[];
   public map: Map;
   public rangeMin: number;
   public rangeMax: number;
@@ -61,7 +59,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   constructor(
     public mapSeguidoresService: MapSeguidoresService,
     private plantaService: PlantaService,
-    private informeService: InformeService,
     public filterService: FilterService,
     private olMapService: OlMapService,
     private incrementosService: IncrementosService,
@@ -81,10 +78,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
             this.plantaId = plantaId;
 
             // Obtenemos todas las capas para esta planta
-            return combineLatest([
-              this.informeService.getInformesDePlanta(this.plantaId),
-              this.plantaService.getPlanta(this.plantaId),
-            ]);
+            return combineLatest([this.reportControlService.informes$, this.plantaService.getPlanta(this.plantaId)]);
           })
         )
         .pipe(take(1))
