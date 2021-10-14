@@ -218,7 +218,9 @@ export class SeguidorService {
       largestLocAreas.forEach((locArea) => {
         const anomsLocArea = anoms.filter((anom) => anom.globalCoords[0] === locArea.globalCoords[0]);
 
-        sortAnoms[0].push(anomsLocArea);
+        if (anomsLocArea.length > 0) {
+          sortAnoms[0].push(anomsLocArea);
+        }
       });
 
       return sortAnoms;
