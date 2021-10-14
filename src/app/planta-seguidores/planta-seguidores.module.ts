@@ -14,7 +14,6 @@ import { SliderTemporalComponent } from './components/slider-temporal/slider-tem
 import { ViewToggleComponent } from './components/view-toggle/view-toggle.component';
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
 import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.component';
-import { ShareReportComponent } from './components/share-report/share-report.component';
 import { SeguidorViewComponent } from './components/seguidor-view/seguidor-view.component';
 import { SeguidorImagesComponent } from './components/seguidor-images/seguidor-images.component';
 import { OldPcDetailsDialogComponent } from './components/old-pc-details-dialog/old-pc-details-dialog.component';
@@ -38,7 +37,6 @@ import { SeguidorImagesAreaComponent } from './components/seguidor-images-area/s
     ViewToggleComponent,
     SliderOpacityComponent,
     SeguidorInfoComponent,
-    ShareReportComponent,
     SeguidorViewComponent,
     SeguidorImagesComponent,
     OldPcDetailsDialogComponent,

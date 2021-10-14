@@ -15,7 +15,6 @@ import { PlantaAmbasModule } from '../planta-ambas/planta-ambas.module';
 import { InformeExportModule } from '../informe-export/informe-export.module';
 
 import { AnomaliasListComponent } from './components/anomalias-list/anomalias-list.component';
-import { ShareMapComponent } from './components/share-map/share-map.component';
 import { MapComponent } from './components/map/map.component';
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.component';
@@ -28,7 +27,6 @@ import { MapControlsComponent } from './components/map-controls/map-controls.com
     MapViewComponent,
     AnomaliaInfoComponent,
     AnomaliasListComponent,
-    ShareMapComponent,
     MapComponent,
     SliderTemporalComponent,
     SliderOpacityComponent,

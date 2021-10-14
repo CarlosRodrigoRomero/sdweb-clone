@@ -73,6 +73,7 @@ export class PlantCreateComponent implements OnInit {
       potencia: [, [Validators.required]],
       tipo: [, [Validators.required]],
       vertical: [false, [Validators.required]],
+      stringConectorGlobals: [],
     });
   }
 
@@ -93,6 +94,10 @@ export class PlantCreateComponent implements OnInit {
         this.planta.alturaBajaPrimero = this.form.get('alturaBajaPrimero').value;
         this.planta.autoLocReady = this.form.get('autoLocReady').value;
         this.planta.empresa = this.empresaSelected.uid;
+
+        if (this.form.get('stringConectorGlobals').value !== null) {
+          this.planta.stringConectorGlobals = this.form.get('stringConectorGlobals').value;
+        }
 
         // Crea la planta en la DB
         this.plantaService.addPlanta(this.planta);

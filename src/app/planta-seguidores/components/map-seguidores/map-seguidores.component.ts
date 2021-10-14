@@ -211,7 +211,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   private addAerialLayer(informeId: string) {
     const aerial = new XYZ({
       url: 'http://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_visual/{z}/{x}/{y}.png',
-      crossOrigin: '',
+      crossOrigin: null,
     });
 
     const aerialLayer = new TileLayer({
