@@ -101,5 +101,6 @@ export class StructuresComponent implements OnInit, OnDestroy {
     // reseteamos los servicios a sus valores por defecto
     this.olMapService.resetService();
     this.thermalService.resetService();
+    this.structuresService.resetService();
   }
 }

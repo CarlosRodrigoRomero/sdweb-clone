@@ -531,6 +531,37 @@ export class StructuresService {
     return centroidD;
   }
 
+  resetService() {
+    this.endFilterSubscription = false;
+
+    this.modulesLoaded = false;
+    this.loadRawModules = false;
+    this.allRawModules = [];
+    this.createRawModMode = false;
+    this.deleteRawModMode = false;
+    this.deletedRawModIds = [];
+
+    this.reportNumModules = 0;
+
+    this.drawModGroups = false;
+    this.modGroupSelectedId = undefined;
+    this.allModGroups = [];
+
+    this.loadNormModules = false;
+    this.editNormModules = false;
+    this.normModSelected = undefined;
+    this.allNormModules = [];
+
+    // this.thermalLayer = undefined;
+
+    this.areaAverage = undefined;
+    this.areaStdDev = undefined;
+    this.aspectRatioAverage = undefined;
+    this.aspectRatioStdDev = undefined;
+    this.confianzaAverage = undefined;
+    this.confianzaStdDev = undefined;
+  }
+
   ////////////////////////////////////////////////
 
   get modulesLoaded() {

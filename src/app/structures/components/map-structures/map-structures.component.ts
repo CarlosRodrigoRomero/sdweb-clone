@@ -202,8 +202,10 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
             // asignamos todos los modulos
             this.structuresService.allRawModules = modulos;
 
-            // calculamos las medias y desviaciones
-            this.structuresService.setInitialAveragesAndStandardDeviations();
+            if (modulos.length > 0) {
+              // calculamos las medias y desviaciones
+              this.structuresService.setInitialAveragesAndStandardDeviations();
+            }
 
             return this.filterService.initService(modulos);
           })
@@ -250,6 +252,9 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
                         this.structuresService.modulesLoaded = true;
                       }
                     });
+                  } else {
+                    // si no hay modulos permitimos tambien avanzar a la siguiente fase
+                    this.structuresService.modulesLoaded = true;
                   }
                 })
             );
