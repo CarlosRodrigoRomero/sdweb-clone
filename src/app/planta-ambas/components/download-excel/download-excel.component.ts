@@ -171,7 +171,7 @@ export class DownloadExcelComponent implements OnInit {
       .catch((err) => console.log(err));
 
     this.storage
-      .ref(`informes/${this.informe.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
+      .ref(`informes/${this.informe.id}/jpgVisual/${(anomalia as PcInterface).archivoPublico}`)
       .getDownloadURL()
       .toPromise()
       .then((urlVisual) => {

@@ -101,7 +101,11 @@ export class ExcelService {
     data.forEach((element: any) => {
       const eachRow = [];
       columnsArray.forEach((column) => {
-        eachRow.push(element[column]);
+        if (column === 'thermalImage' || column === 'visualImage') {
+          eachRow.push({ text: 'link', hyperlink: element[column] });
+        } else {
+          eachRow.push(element[column]);
+        }
       });
 
       if (element.isDeleted === 'Y') {
@@ -114,13 +118,27 @@ export class ExcelService {
       }
     });
 
-    // centrado filas datos
-    worksheet.getRows(3, worksheet.rowCount).forEach((cell) => {
-      cell.alignment = { horizontal: 'center' };
+    // centramos texto filas datos
+    worksheet.getRows(3, worksheet.rowCount).forEach((row) => {
+      row.alignment = { horizontal: 'center' };
+    });
+
+    // aplicamos estilos a los links
+    worksheet.getColumn(2).eachCell((cell, index) => {
+      // no aplicamos a las cabeceras
+      if (index > 2) {
+        this.applyLinkStyle(cell);
+      }
+    });
+    worksheet.getColumn(3).eachCell((cell, index) => {
+      // no aplicamos a las cabeceras
+      if (index > 2) {
+        this.applyLinkStyle(cell);
+      }
     });
 
     // filtros
-    worksheet.autoFilter = 'G2:H' + worksheet.rowCount.toString();
+    worksheet.getColumn(2).worksheet.autoFilter = 'G2:H' + worksheet.rowCount.toString();
     worksheet.autoFilter = 'K2:L' + worksheet.rowCount.toString();
     worksheet.autoFilter = 'X2:X' + worksheet.rowCount.toString();
 
@@ -129,6 +147,17 @@ export class ExcelService {
       const blob = new Blob([data], { type: EXCEL_TYPE });
       FileSaver.saveAs(blob, excelFileName + EXCEL_EXT);
     });
+  }
+
+  private applyLinkStyle(cell) {
+    const linkStyle = {
+      underline: true,
+      color: { argb: 'FF0000FF' },
+    };
+
+    if (cell) {
+      cell.font = linkStyle;
+    }
   }
 
   private numToAlpha(num: number) {
