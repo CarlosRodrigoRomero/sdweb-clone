@@ -160,6 +160,30 @@ export class DownloadExcelComponent implements OnInit {
     const row: Fila = {};
 
     row.localId = anomalia.localId;
+    row.thermalImage = null;
+    row.visualImage = null;
+    row.temperaturaRef = Number(this.decimalPipe.transform(anomalia.temperaturaRef, '1.2-2'));
+    row.temperaturaMax = Number(this.decimalPipe.transform(anomalia.temperaturaMax, '1.2-2'));
+    row.gradienteNormalizado = Number(this.decimalPipe.transform(anomalia.gradienteNormalizado, '1.2-2'));
+    row.tipo = GLOBAL.labels_tipos[anomalia.tipo];
+    row.clase = anomalia.clase;
+    row.urlMaps = 'Google maps';
+    row.localizacion = 'Seguidor';
+    row.localY = anomalia.localY;
+    row.localX = anomalia.localX;
+    row.irradiancia = 0;
+    row.datetime = this.datePipe.transform(anomalia.datetime * 1000, 'dd/MM/yyyy HH:mm:ss');
+    row.lugar = this.planta.nombre;
+    row.nubosidad = this.informe.nubosidad;
+    row.temperaturaAire = this.informe.temperatura;
+    row.emisividad = this.informe.emisividad;
+    row.temperaturaReflejada = this.informe.tempReflejada;
+    row.vientoVelocidad = this.informe.vientoVelocidad;
+    row.vientoDirección = this.informe.vientoDireccion;
+    row.camaraModelo = this.informe.camara;
+    row.camaraSN = this.informe.camaraSN;
+    row.modulo = this.getModuloLabel(anomalia.modulo);
+    row.numModsAfeactados = 1;
 
     this.storage
       .ref(`informes/${this.informe.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
@@ -176,29 +200,6 @@ export class DownloadExcelComponent implements OnInit {
       .toPromise()
       .then((urlVisual) => {
         row.visualImage = urlVisual;
-
-        row.temperaturaRef = Number(this.decimalPipe.transform(anomalia.temperaturaRef, '1.2-2'));
-        row.temperaturaMax = Number(this.decimalPipe.transform(anomalia.temperaturaMax, '1.2-2'));
-        row.gradienteNormalizado = Number(this.decimalPipe.transform(anomalia.gradienteNormalizado, '1.2-2'));
-        row.tipo = GLOBAL.labels_tipos[anomalia.tipo];
-        row.clase = anomalia.clase;
-        row.urlMaps = 'Google maps';
-        row.localizacion = 'Seguidor';
-        row.localY = anomalia.localY;
-        row.localX = anomalia.localX;
-        row.irradiancia = 0;
-        row.datetime = this.datePipe.transform(anomalia.datetime * 1000, 'dd/MM/yyyy HH:mm:ss');
-        row.lugar = this.planta.nombre;
-        row.nubosidad = this.informe.nubosidad;
-        row.temperaturaAire = this.informe.temperatura;
-        row.emisividad = this.informe.emisividad;
-        row.temperaturaReflejada = this.informe.tempReflejada;
-        row.vientoVelocidad = this.informe.vientoVelocidad;
-        row.vientoDirección = this.informe.vientoDireccion;
-        row.camaraModelo = this.informe.camara;
-        row.camaraSN = this.informe.camaraSN;
-        row.modulo = this.getModuloLabel(anomalia.modulo);
-        row.numModsAfeactados = 1;
 
         this.json.push(row);
       })
