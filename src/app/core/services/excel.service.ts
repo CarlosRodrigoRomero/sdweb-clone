@@ -88,6 +88,7 @@ export class ExcelService {
 
     // obtenemos todas las columnas
     let columnsArray: any[];
+    console.log(json);
     for (const key in json) {
       if (json.hasOwnProperty(key)) {
         columnsArray = Object.keys(json[key]);

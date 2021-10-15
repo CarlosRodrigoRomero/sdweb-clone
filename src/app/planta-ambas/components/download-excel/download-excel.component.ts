@@ -114,7 +114,7 @@ export class DownloadExcelComponent implements OnInit {
           });
         }
 
-        this.anomaliasInforme.forEach((anom) => this.json.push(this.getRowData(anom)));
+        this.anomaliasInforme.forEach((anom) => this.getRowData(anom));
       });
   }
 
@@ -128,11 +128,11 @@ export class DownloadExcelComponent implements OnInit {
     );
   }
 
-  private getRowData(anomalia: Anomalia): any[] {
+  private getRowData(anomalia: Anomalia) {
     const row: any[] = [];
 
     this.storage
-      .ref(`informes/${this.informe.id}/${(anomalia as PcInterface).archivoPublico}`)
+      .ref(`informes/${this.informe.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
       .getDownloadURL()
       .toPromise()
       .then((url) => {
@@ -161,11 +161,10 @@ export class DownloadExcelComponent implements OnInit {
         row.push(this.informe.camaraSN);
         row.push(this.getModuloLabel(anomalia.modulo));
         row.push(1);
-      });
 
-    if (row.length > 0) {
-      return row;
-    }
+        this.json.push(row);
+      })
+      .catch((err) => console.log(err));
   }
 
   private getModuloLabel(modulo: ModuloInterface): string {
