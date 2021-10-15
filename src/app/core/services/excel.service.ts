@@ -86,9 +86,11 @@ export class ExcelService {
       headeRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
     });
 
+    // congelamos las 2 primeras filas
+    worksheet.views = [{ state: 'frozen', ySplit: 2, activeCell: 'A3' }];
+
     // obtenemos todas las columnas
     let columnsArray: any[];
-    console.log(json);
     for (const key in json) {
       if (json.hasOwnProperty(key)) {
         columnsArray = Object.keys(json[key]);

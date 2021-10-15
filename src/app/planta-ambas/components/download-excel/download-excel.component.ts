@@ -22,6 +22,34 @@ interface Columna {
   nombre: string;
 }
 
+interface Fila {
+  localId?: string;
+  visualImage?: string;
+  thermalImage?: string;
+  temperaturaRef?: number;
+  temperaturaMax?: number;
+  gradienteNormalizado?: number;
+  tipo?: string;
+  clase?: number;
+  urlMaps?: string;
+  localizacion?: string;
+  localY?: number;
+  localX?: number;
+  irradiancia?: number;
+  datetime?: string;
+  lugar?: string;
+  nubosidad?: number;
+  temperaturaAire?: number;
+  emisividad?: number;
+  temperaturaReflejada?: number;
+  vientoVelocidad?: number;
+  vientoDirección?: number;
+  camaraModelo?: string;
+  camaraSN?: number;
+  modulo?: string;
+  numModsAfeactados?: number;
+}
+
 @Component({
   selector: 'app-download-excel',
   templateUrl: './download-excel.component.html',
@@ -33,8 +61,8 @@ export class DownloadExcelComponent implements OnInit {
   private excelFileName = 'Informe';
   private columnas: Columna[] = [
     { id: 'localId', nombre: 'ID' },
-    { id: 'visualImage', nombre: 'Imagen visual' },
     { id: 'thermalImage', nombre: 'Imagen térmica' },
+    { id: 'visualImage', nombre: 'Imagen visual' },
     { id: 'temperaturaRef', nombre: 'Temperatura de referencia (ºC)' },
     { id: 'temperaturaMax', nombre: 'Temperatura máxima módulo (ºC)' },
     { id: 'gradienteNormalizado', nombre: 'Gradiente de temperatura (ºC)' },
@@ -129,38 +157,48 @@ export class DownloadExcelComponent implements OnInit {
   }
 
   private getRowData(anomalia: Anomalia) {
-    const row: any[] = [];
+    const row: Fila = {};
+
+    row.localId = anomalia.localId;
 
     this.storage
       .ref(`informes/${this.informe.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
       .getDownloadURL()
       .toPromise()
-      .then((url) => {
-        row.push(anomalia.localId);
-        row.push('Imagen visual');
-        row.push(url);
-        row.push(this.decimalPipe.transform(anomalia.temperaturaRef, '1.2-2'));
-        row.push(this.decimalPipe.transform(anomalia.temperaturaMax, '1.2-2'));
-        row.push(this.decimalPipe.transform(anomalia.gradienteNormalizado, '1.2-2'));
-        row.push(GLOBAL.labels_tipos[anomalia.tipo]);
-        row.push(anomalia.clase);
-        row.push('Google maps');
-        row.push('Seguidor');
-        row.push(anomalia.localY);
-        row.push(anomalia.localX);
-        row.push('Irradiancia');
-        row.push(this.datePipe.transform(anomalia.datetime * 1000, 'dd/MM/yyyy HH:mm:ss'));
-        row.push(this.planta.nombre);
-        row.push(this.informe.nubosidad);
-        row.push(this.informe.temperatura);
-        row.push(this.informe.emisividad);
-        row.push(this.informe.tempReflejada);
-        row.push(this.informe.vientoVelocidad);
-        row.push(this.informe.vientoDireccion);
-        row.push(this.informe.camara);
-        row.push(this.informe.camaraSN);
-        row.push(this.getModuloLabel(anomalia.modulo));
-        row.push(1);
+      .then((urlThermal) => {
+        row.thermalImage = urlThermal;
+      })
+      .catch((err) => console.log(err));
+
+    this.storage
+      .ref(`informes/${this.informe.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
+      .getDownloadURL()
+      .toPromise()
+      .then((urlVisual) => {
+        row.visualImage = urlVisual;
+
+        row.temperaturaRef = Number(this.decimalPipe.transform(anomalia.temperaturaRef, '1.2-2'));
+        row.temperaturaMax = Number(this.decimalPipe.transform(anomalia.temperaturaMax, '1.2-2'));
+        row.gradienteNormalizado = Number(this.decimalPipe.transform(anomalia.gradienteNormalizado, '1.2-2'));
+        row.tipo = GLOBAL.labels_tipos[anomalia.tipo];
+        row.clase = anomalia.clase;
+        row.urlMaps = 'Google maps';
+        row.localizacion = 'Seguidor';
+        row.localY = anomalia.localY;
+        row.localX = anomalia.localX;
+        row.irradiancia = 0;
+        row.datetime = this.datePipe.transform(anomalia.datetime * 1000, 'dd/MM/yyyy HH:mm:ss');
+        row.lugar = this.planta.nombre;
+        row.nubosidad = this.informe.nubosidad;
+        row.temperaturaAire = this.informe.temperatura;
+        row.emisividad = this.informe.emisividad;
+        row.temperaturaReflejada = this.informe.tempReflejada;
+        row.vientoVelocidad = this.informe.vientoVelocidad;
+        row.vientoDirección = this.informe.vientoDireccion;
+        row.camaraModelo = this.informe.camara;
+        row.camaraSN = this.informe.camaraSN;
+        row.modulo = this.getModuloLabel(anomalia.modulo);
+        row.numModsAfeactados = 1;
 
         this.json.push(row);
       })
@@ -189,4 +227,6 @@ export class DownloadExcelComponent implements OnInit {
 
     return moduloLabel;
   }
+
+  private sortRow(row: Fila) {}
 }
