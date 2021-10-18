@@ -27,11 +27,11 @@ export class Anomalia implements FilterableElement {
   localX?: number;
   localY?: number;
   irradiancia?: number;
-
   camaraModelo?: string;
   camaraSN?: number;
   vientoVelocidad?: number;
   vientoDireccion?: number;
+  nombreSeguidor?: string;
 
   constructor(
     tipo: number,

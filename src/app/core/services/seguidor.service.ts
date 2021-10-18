@@ -138,6 +138,9 @@ export class SeguidorService {
               seguidor.nombre = this.getSeguidorName(seguidor);
               // seguidor.imageName = this.getImageName(seguidor, informe);
 
+              // guardamos el nombre del seguidor en cada anomalia
+              anomaliasSeguidor.forEach((anom) => (anom.nombreSeguidor = seguidor.nombre));
+
               seguidores.push(seguidor);
             }
           });

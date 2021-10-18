@@ -32,7 +32,7 @@ interface Fila {
   gradienteNormalizado?: number;
   tipo?: string;
   clase?: number;
-  urlMaps?: string;
+  // urlMaps?: string;
   localizacion?: string;
   localY?: number;
   localX?: number;
@@ -69,7 +69,7 @@ export class DownloadExcelComponent implements OnInit {
     { id: 'gradienteNormalizado', nombre: 'Gradiente de temperatura (ºC)' },
     { id: 'tipo', nombre: 'Categoría' },
     { id: 'clase', nombre: 'Clase de Anomalía' },
-    { id: 'urlMaps', nombre: 'Google maps' },
+    // { id: 'urlMaps', nombre: 'Google maps' },
     { id: 'localizacion', nombre: 'Seguidor' },
     { id: 'localY', nombre: 'Fila' },
     { id: 'localX', nombre: 'Columna' },
@@ -170,8 +170,8 @@ export class DownloadExcelComponent implements OnInit {
     row.gradienteNormalizado = Number(this.decimalPipe.transform(anomalia.gradienteNormalizado, '1.2-2'));
     row.tipo = GLOBAL.labels_tipos[anomalia.tipo];
     row.clase = anomalia.clase;
-    row.urlMaps = 'Google maps';
-    row.localizacion = 'Seguidor';
+    // row.urlMaps = 'Google maps';
+    row.localizacion = anomalia.nombreSeguidor;
     row.localY = anomalia.localY;
     row.localX = anomalia.localX;
     row.irradiancia = 0;
