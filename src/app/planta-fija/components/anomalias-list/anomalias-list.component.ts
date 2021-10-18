@@ -14,6 +14,7 @@ import { Anomalia } from '@core/models/anomalia';
 import { Map } from 'ol';
 import { PlantaInterface } from '@core/models/planta';
 import { take } from 'rxjs/operators';
+import { Layer } from 'ol/layer';
 
 @Component({
   selector: 'app-anomalias-list',
@@ -117,6 +118,9 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit {
       this.anomaliasControlService.setExternalStyle(this.anomaliasControlService.prevAnomaliaSelect.id, false);
     }
     this.anomaliasControlService.prevAnomaliaSelect = row.anomalia;
+
+    this.anomaliasControlService.anomaliaSelect = row.anomalia;
+    this.anomaliasControlService.setExternalStyle(row.id, true);
 
     // centramos la vista al hacer click
     this.centerView(row.anomalia);
