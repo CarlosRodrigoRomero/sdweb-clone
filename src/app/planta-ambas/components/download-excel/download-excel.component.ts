@@ -36,7 +36,7 @@ interface Fila {
   localizacion?: string;
   localY?: number;
   localX?: number;
-  irradiancia?: number;
+  // irradiancia?: number;
   datetime?: string;
   lugar?: string;
   nubosidad?: number;
@@ -48,7 +48,7 @@ interface Fila {
   camaraModelo?: string;
   camaraSN?: number;
   modulo?: string;
-  numModsAfeactados?: number;
+  // numModsAfeactados?: number;
 }
 
 @Component({
@@ -73,7 +73,7 @@ export class DownloadExcelComponent implements OnInit {
     { id: 'localizacion', nombre: 'Seguidor' },
     { id: 'localY', nombre: 'Fila' },
     { id: 'localX', nombre: 'Columna' },
-    { id: 'irradiancia', nombre: 'Irradiancia (W/m2)' },
+    // { id: 'irradiancia', nombre: 'Irradiancia (W/m2)' },
     { id: 'datetime', nombre: 'Fecha y hora' },
     { id: 'lugar', nombre: 'Lugar' },
     { id: 'nubosidad', nombre: 'Nubosidad (octavas)' },
@@ -85,7 +85,7 @@ export class DownloadExcelComponent implements OnInit {
     { id: 'camaraModelo', nombre: 'Cámara térmica y visual' },
     { id: 'camaraSN', nombre: 'Número de serie cámara térmica' },
     { id: 'modulo', nombre: 'Módulo' },
-    { id: 'numModsAfeactados', nombre: 'Número de módulos afectados' },
+    // { id: 'numModsAfeactados', nombre: 'Número de módulos afectados' },
   ];
   private sheetName = 'Resultados';
   private anomaliasInforme: Anomalia[] = [];
@@ -174,7 +174,7 @@ export class DownloadExcelComponent implements OnInit {
     row.localizacion = anomalia.nombreSeguidor;
     row.localY = anomalia.localY;
     row.localX = anomalia.localX;
-    row.irradiancia = 0;
+    // row.irradiancia = 0;
     row.datetime = this.datePipe.transform(anomalia.datetime * 1000, 'dd/MM/yyyy HH:mm:ss');
     row.lugar = this.planta.nombre;
     row.nubosidad = this.informe.nubosidad;
@@ -186,7 +186,7 @@ export class DownloadExcelComponent implements OnInit {
     row.camaraModelo = this.informe.camara;
     row.camaraSN = this.informe.camaraSN;
     row.modulo = this.getModuloLabel(anomalia.modulo);
-    row.numModsAfeactados = 1;
+    // row.numModsAfeactados = 1;
 
     this.storage
       .ref(`informes/${this.informe.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
@@ -231,6 +231,4 @@ export class DownloadExcelComponent implements OnInit {
 
     return moduloLabel;
   }
-
-  private sortRow(row: Fila) {}
 }
