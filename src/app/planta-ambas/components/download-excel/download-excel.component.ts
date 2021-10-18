@@ -16,6 +16,7 @@ import { PlantaInterface } from '@core/models/planta';
 import { GLOBAL } from '@core/services/global';
 import { ModuloInterface } from '@core/models/modulo';
 import { PcInterface } from '@core/models/pc';
+import { FilterableElement } from '@core/models/filterableInterface';
 
 interface Columna {
   id: string;
@@ -91,6 +92,7 @@ export class DownloadExcelComponent implements OnInit {
   private informe: InformeInterface;
   private sheetTitle = 'Inspección termográfica ';
   private planta: PlantaInterface;
+  private allElems: FilterableElement[];
 
   constructor(
     private excelService: ExcelService,
@@ -109,6 +111,8 @@ export class DownloadExcelComponent implements OnInit {
         switchMap((planta) => {
           this.planta = planta;
 
+          this.allElems = this.reportControlService.allFilterableElements;
+
           this.sheetTitle = this.sheetTitle + planta.nombre;
 
           return this.reportControlService.selectedInformeId$;
@@ -125,14 +129,13 @@ export class DownloadExcelComponent implements OnInit {
           this.excelFileName = this.informe.prefijo.concat('informe');
         }
 
+        // reseteamos con cada cambio de informe
+        this.anomaliasInforme = [];
+
         if (this.reportControlService.plantaFija) {
-          this.anomaliasInforme = (this.reportControlService.allFilterableElements as Anomalia[]).filter(
-            (anom) => anom.informeId === informeId
-          );
+          this.anomaliasInforme = (this.allElems as Anomalia[]).filter((anom) => anom.informeId === informeId);
         } else {
-          const seguidoresInforme = (this.reportControlService.allFilterableElements as Seguidor[]).filter(
-            (seg) => seg.informeId === informeId
-          );
+          const seguidoresInforme = (this.allElems as Seguidor[]).filter((seg) => seg.informeId === informeId);
 
           seguidoresInforme.forEach((seguidor) => {
             const anomaliasSeguidor = seguidor.anomaliasCliente;

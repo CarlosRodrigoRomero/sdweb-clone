@@ -31,11 +31,11 @@ export class ExcelService {
     const worksheet = workbook.addWorksheet(sheetName);
 
     // añadimos la cabecera de la hora
-    worksheet.addRow([]);
-    worksheet.mergeCells('A1:' + this.numToAlpha(header.length - 1) + '1');
-    worksheet.getCell('A1').value = reportHeading;
-    worksheet.getCell('A1').alignment = { horizontal: 'center' };
-    worksheet.getCell('A1').font = { size: 15, bold: true };
+    // worksheet.addRow([]);
+    // worksheet.mergeCells('A1:' + this.numToAlpha(header.length - 1) + '1');
+    // worksheet.getCell('A1').value = reportHeading;
+    // worksheet.getCell('A1').alignment = { horizontal: 'center' };
+    // worksheet.getCell('A1').font = { size: 15, bold: true };
 
     // añadimos las cabeceras de las columnas
     const headeRow = worksheet.addRow(header);
@@ -87,7 +87,7 @@ export class ExcelService {
     });
 
     // congelamos las 2 primeras filas
-    worksheet.views = [{ state: 'frozen', ySplit: 2, activeCell: 'A3' }];
+    worksheet.views = [{ state: 'frozen', ySplit: 1, activeCell: 'A2' }];
 
     // obtenemos todas las columnas
     let columnsArray: any[];
@@ -123,20 +123,20 @@ export class ExcelService {
     });
 
     // centramos texto filas datos
-    worksheet.getRows(3, worksheet.rowCount).forEach((row) => {
+    worksheet.getRows(2, worksheet.rowCount).forEach((row) => {
       row.alignment = { horizontal: 'center' };
     });
 
     // aplicamos estilos a los links
     worksheet.getColumn(2).eachCell((cell, index) => {
       // no aplicamos a las cabeceras
-      if (index > 2) {
+      if (index > 1) {
         this.applyLinkStyle(cell);
       }
     });
     worksheet.getColumn(3).eachCell((cell, index) => {
       // no aplicamos a las cabeceras
-      if (index > 2) {
+      if (index > 1) {
         this.applyLinkStyle(cell);
       }
     });
