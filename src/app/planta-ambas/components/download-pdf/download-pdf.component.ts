@@ -57,6 +57,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   countLoadedImages$ = new BehaviorSubject<number>(this._countLoadedImages);
   private _loadedImages = undefined;
   loadedImages$ = new BehaviorSubject<string>(this._loadedImages);
+  private countAnomalias: number;
   private countSeguidores: number;
   private _seguidoresInforme: Seguidor[] = [];
   seguidoresInforme$ = new BehaviorSubject<Seguidor[]>(this._seguidoresInforme);
@@ -112,7 +113,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private filtroApartados: string[];
   private currentFiltroGradiente: number;
   private labelsCriticidad: string[];
-  private widthSeguidor: number;
+  private widthImageSeguidor: number;
+  private widthImageAnomalia: number;
   private hasUserArea: boolean;
   seguidoresLoaded = false;
 
@@ -193,7 +195,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           //     }
 
           //     // quitamos los seguidores sin anomalias
-          //     this.filtroApartados = this.filtroApartados.filter((apt) => apt !== 'anexo3');
+          //     this.filtroApartados = this.filtroApartados.filter((apt) => apt !== 'anexoSegsNoAnoms');
 
           //     this.downloadPDF();
           //   } else {
@@ -433,7 +435,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           if (this.planta.tipo === 'seguidores') {
             this.apartadosInforme.push(
               {
-                nombre: 'anexo2',
+                nombre: 'anexoSeguidores',
                 descripcion: 'Anexo II: Anomalías térmicas por seguidor',
                 orden: 16,
                 elegible: true,
@@ -450,12 +452,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
             if (fechaInforme.getFullYear() >= 2020) {
               this.apartadosInforme.push({
-                nombre: 'anexo3',
+                nombre: 'anexoSegsNoAnoms',
                 descripcion: 'Anexo III: Seguidores sin anomalías',
                 orden: 17,
                 elegible: true,
               });
             }
+          } else {
+            this.apartadosInforme.push({
+              nombre: 'anexoAnomalias',
+              descripcion: 'Anexo II: Anomalías térmicas',
+              orden: 16,
+              elegible: true,
+            });
           }
 
           this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
@@ -478,7 +487,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.imgQuality = 3.5;
     this.heightLogoHeader = 40;
     this.jpgQuality = 0.95;
-    this.widthSeguidor = 450;
+    this.widthImageSeguidor = 450;
+    this.widthImageAnomalia = 250;
     this.hasUserArea = false;
 
     this.subscriptions.add(
@@ -536,17 +546,51 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.countLoadedImages = 0;
 
     if (this.reportControlService.plantaFija) {
-      this.calcularInforme();
-
-      let prefijo = 'informe';
-      if (this.informe.hasOwnProperty('prefijo')) {
-        prefijo = this.informe.prefijo.concat('informe');
+      // Generar imagenes
+      this.countAnomalias = 0;
+      for (const anomalia of this.anomaliasInforme) {
+        this.setImgAnomaliaCanvas(anomalia);
+        this.countAnomalias++;
       }
 
-      pdfMake.createPdf(this.getDocDefinition()).download(prefijo, () => {
-        this.downloadReportService.generatingPDF = false;
-      });
-      this.downloadReportService.endingPDF = true;
+      // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+      let downloads = 0;
+
+      this.subscriptions.add(
+        this.countLoadedImages$.subscribe((countLoadedImgs) => {
+          this.downloadReportService.progressBarValue = Math.round(
+            (countLoadedImgs / this.anomaliasInforme.length) * 100
+          );
+
+          // Cuando se carguen todas las imágenes
+          if (countLoadedImgs === this.countAnomalias && downloads === 0) {
+            this.calcularInforme();
+
+            pdfMake
+              .createPdf(this.getDocDefinition(this.imageListBase64))
+              .download(this.informe.prefijo.concat('informe'), () => {
+                this.downloadReportService.progressBarValue = 0;
+
+                this.downloadReportService.generatingPDF = false;
+              });
+            this.downloadReportService.endingPDF = true;
+
+            downloads++;
+          }
+        })
+      );
+
+      // this.calcularInforme();
+
+      // let prefijo = 'informe';
+      // if (this.informe.hasOwnProperty('prefijo')) {
+      //   prefijo = this.informe.prefijo.concat('informe');
+      // }
+
+      // pdfMake.createPdf(this.getDocDefinition()).download(prefijo, () => {
+      //   this.downloadReportService.generatingPDF = false;
+      // });
+      // this.downloadReportService.endingPDF = true;
     } else {
       // Generar imagenes
       this.countSeguidores = 0;
@@ -652,23 +696,28 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.dataSource = new MatTableDataSource(this.countCategoriaClase);
   }
 
-  getDocDefinition(imagesSeguidores?: any) {
+  getDocDefinition(images?: any) {
     const pages = this.getPagesPDF();
     let anexo1 = [];
-    let anexo2 = [];
-    let anexo3 = [];
+    let anexoAnomalias = [];
+    let anexoSeguidores = [];
+    let anexoSegsNoAnoms = [];
     let numAnexo = 'I';
 
     if (this.filtroApartados.includes('anexo1')) {
       anexo1 = this.getAnexoLista(numAnexo);
       numAnexo = 'II';
     }
-    if (this.filtroApartados.includes('anexo2')) {
-      anexo2 = this.getAnexoSeguidores(numAnexo);
+    if (this.filtroApartados.includes('anexoAnomalias')) {
+      anexoAnomalias = this.getAnexoAnomalias(numAnexo);
       numAnexo = 'III';
     }
-    if (this.filtroApartados.includes('anexo3')) {
-      anexo3 = this.getAnexoSeguidoresSinAnomalias(numAnexo);
+    if (this.filtroApartados.includes('anexoSeguidores')) {
+      anexoSeguidores = this.getAnexoSeguidores(numAnexo);
+      numAnexo = 'III';
+    }
+    if (this.filtroApartados.includes('anexoSegsNoAnoms')) {
+      anexoSegsNoAnoms = this.getAnexoSeguidoresSinAnomalias(numAnexo);
     }
 
     return {
@@ -691,9 +740,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         }
       },
 
-      content: pages.concat(anexo1).concat(anexo2).concat(anexo3),
+      content: pages.concat(anexo1).concat(anexoAnomalias).concat(anexoSeguidores).concat(anexoSegsNoAnoms),
 
-      images: imagesSeguidores,
+      images,
 
       footer: (currentPage, pageCount) => {
         if (currentPage > 1) {
@@ -826,6 +875,33 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     };
   }
 
+  private setImgAnomaliaCanvas(anomalia: Anomalia) {
+    const mapCanvas = document.createElement('canvas');
+    // const size = map.getSize();
+    mapCanvas.width = 256;
+    mapCanvas.height = 256;
+    const mapContext = mapCanvas.getContext('2d');
+    Array.prototype.forEach.call(document.querySelectorAll('.ol-layer canvas'), (canvas) => {
+      if (canvas.width > 0) {
+        const opacity = canvas.parentNode.style.opacity;
+        mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
+        const transform = canvas.style.transform;
+        // Get the transform parameters from the style's transform matrix
+        const matrix = transform
+          .match(/^matrix\(([^\(]*)\)$/)[1]
+          .split(',')
+          .map(Number);
+        // Apply the transform to the export map context
+        CanvasRenderingContext2D.prototype.setTransform.apply(mapContext, matrix);
+        mapContext.drawImage(canvas, 0, 0);
+      }
+    });
+
+    this.countLoadedImages++;
+
+    this.imageListBase64[`imgCanvas${anomalia.localId}`] = mapCanvas.toDataURL('image/jpeg', this.jpgQuality);
+  }
+
   private setImgSeguidorCanvas(seguidor: Seguidor, vistaPrevia: boolean = false, folder?: string) {
     const anomaliasSeguidor = seguidor.anomaliasCliente as PcInterface[];
 
@@ -865,10 +941,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
               canvas.add(image);
               this.drawAllPcsInCanvas(anomaliasSeguidor, canvas, vistaPrevia, 1, 0, 0);
-              this.imageListBase64[`imgSeguidorCanvas${seguidor.nombre}`] = canvas.toDataURL(
-                'image/jpeg',
-                this.jpgQuality
-              );
+              this.imageListBase64[`imgCanvas${seguidor.nombre}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
             }
 
             this.countLoadedImages++;
@@ -879,7 +952,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       })
       .catch((error) => {
         const canvas = new fabric.Canvas('canvas');
-        this.imageListBase64[`imgSeguidorCanvas${seguidor.nombre}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        this.imageListBase64[`imgCanvas${seguidor.nombre}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
 
         this.countLoadedImages++;
 
@@ -2283,6 +2356,156 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     return allPagsAnexoLista.concat(tablaAnexo);
   }
 
+  private getAnexoAnomalias(numAnexo: string) {
+    const allPagsAnexo = [];
+    // tslint:disable-next-line:max-line-length
+    const pag1Anexo = {
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
+        'Anomalías térmicas'
+      )}`,
+      style: 'h1',
+      alignment: 'center',
+      pageBreak: 'before',
+    };
+
+    allPagsAnexo.push(pag1Anexo);
+
+    for (const anom of this.anomaliasInforme) {
+      // const table = this.getPaginaSeguidor(anom);
+      const pagAnexo = [
+        {
+          text: `${this.translation.t('Anomalía')} ${anom.localId}`,
+          style: 'h2',
+          alignment: 'center',
+          pageBreak: 'before',
+        },
+        '\n',
+        {
+          image: `imgCanvas${anom.localId}`,
+          width: this.widthImageAnomalia,
+          alignment: 'center',
+        },
+        '\n',
+        // {
+        //   columns: [
+        //     {
+        //       width: '*',
+        //       text: '',
+        //     },
+        //     {
+        //       width: 'auto',
+        //       table: {
+        //         body: [
+        //           [
+        //             {
+        //               text: this.translation.t('Fecha/Hora'),
+        //               style: 'tableHeaderImageData',
+        //             },
+        //             {
+        //               text: this.translation.t('Irradiancia'),
+        //               style: 'tableHeaderImageData',
+        //             },
+        //             {
+        //               text: this.translation.t('Temp. aire'),
+        //               style: 'tableHeaderImageData',
+        //             },
+        //             {
+        //               text: this.translation.t('Viento'),
+        //               style: 'tableHeaderImageData',
+        //             },
+        //             {
+        //               text: this.translation.t('Emisividad'),
+        //               style: 'tableHeaderImageData',
+        //             },
+        //             {
+        //               text: this.translation.t('Temp. reflejada'),
+        //               style: 'tableHeaderImageData',
+        //             },
+        //             {
+        //               text: this.translation.t('Módulo'),
+        //               style: 'tableHeaderImageData',
+        //             },
+        //           ],
+        //           [
+        //             {
+        //               text: this.datePipe
+        //                 .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
+        //                 .concat(' ')
+        //                 .concat(this.datePipe.transform(anom.anomaliasCliente[0].datetime * 1000, 'HH:mm:ss')),
+        //               style: 'tableCellAnexo1',
+        //               noWrap: true,
+        //             },
+        //             {
+        //               text: Math.round(anom.anomaliasCliente[0].irradiancia).toString().concat(' W/m2'),
+        //               style: 'tableCellAnexo1',
+        //               noWrap: true,
+        //             },
+        //             {
+        //               text: Math.round((anom.anomaliasCliente[0] as PcInterface).temperaturaAire)
+        //                 .toString()
+        //                 .concat(' ºC'),
+        //               style: 'tableCellAnexo1',
+        //               noWrap: true,
+        //             },
+        //             {
+        //               text: (anom.anomaliasCliente[0] as PcInterface).viento,
+        //               style: 'tableCellAnexo1',
+        //               noWrap: true,
+        //             },
+        //             {
+        //               text: (anom.anomaliasCliente[0] as PcInterface).emisividad,
+        //               style: 'tableCellAnexo1',
+        //               noWrap: true,
+        //             },
+        //             {
+        //               text: Math.round((anom.anomaliasCliente[0] as PcInterface).temperaturaReflejada)
+        //                 .toString()
+        //                 .concat(' ºC'),
+        //               style: 'tableCellAnexo1',
+        //               noWrap: true,
+        //             },
+        //             {
+        //               text: this.writeModulo(anom.anomaliasCliente[0]),
+        //               style: 'tableCellAnexo1',
+        //               noWrap: true,
+        //             },
+        //           ],
+        //         ],
+        //       },
+        //     },
+        //     {
+        //       width: '*',
+        //       text: '',
+        //     },
+        //   ],
+        // },
+        '\n',
+        // {
+        //   columns: [
+        //     {
+        //       width: '*',
+        //       text: '',
+        //     },
+        //     {
+        //       width: 'auto',
+        //       table: {
+        //         headerRows: 1,
+        //         body: [table[0]].concat(table[1]),
+        //       },
+        //     },
+        //     {
+        //       width: '*',
+        //       text: '',
+        //     },
+        //   ],
+        // },
+      ];
+      allPagsAnexo.push(pagAnexo);
+    }
+
+    return allPagsAnexo;
+  }
+
   private getAnexoSeguidores(numAnexo: string) {
     const allPagsAnexo = [];
     // tslint:disable-next-line:max-line-length
@@ -2312,8 +2535,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           '\n',
 
           {
-            image: `imgSeguidorCanvas${seg.nombre}`,
-            width: this.widthSeguidor,
+            image: `imgCanvas${seg.nombre}`,
+            width: this.widthImageSeguidor,
             alignment: 'center',
           },
 
@@ -2484,8 +2707,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           '\n',
 
           {
-            image: `imgSeguidorCanvas${seg.nombre}`,
-            width: this.widthSeguidor,
+            image: `imgCanvas${seg.nombre}`,
+            width: this.widthImageSeguidor,
             alignment: 'center',
           },
 
