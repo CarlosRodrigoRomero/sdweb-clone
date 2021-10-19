@@ -23,6 +23,7 @@ import { AnomaliaService } from '@core/services/anomalia.service';
 import { PlantaService } from '@core/services/planta.service';
 import { FilterService } from '@core/services/filter.service';
 import { OlMapService } from '@core/services/ol-map.service';
+import { ImageProcessService } from '../../services/image-process.service';
 
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
 
@@ -137,7 +138,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     private anomaliaService: AnomaliaService,
     public dialog: MatDialog,
     private filterService: FilterService,
-    private olMapService: OlMapService
+    private olMapService: OlMapService,
+    private imageProcessService: ImageProcessService
   ) {}
 
   ngOnInit(): void {
@@ -915,10 +917,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       url,
       (img) => {
         if (img !== null) {
+          img = this.imageProcessService.transformPixels(img);
+
           const canvas = new fabric.Canvas('canvas');
           canvas.width = GLOBAL.resolucionCamara[1];
           canvas.height = GLOBAL.resolucionCamara[0];
-          const image = new fabric.Image(img);
+          let image = new fabric.Image(img);
+
+          // image = this.imageProcessService.transformPixels(image);
 
           image.set({
             left: 0,
