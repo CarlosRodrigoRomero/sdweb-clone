@@ -7,7 +7,7 @@ import Map from 'ol/Map';
 import OSM from 'ol/source/OSM';
 import { fromLonLat, transformExtent } from 'ol/proj.js';
 import View from 'ol/View';
-import { Vector as VectorSource } from 'ol/source';
+import { TileDebug, Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { defaults as defaultControls } from 'ol/control.js';
 import XYZ from 'ol/source/XYZ';
@@ -152,7 +152,7 @@ export class MapComponent implements OnInit, OnDestroy {
     const tl = new TileLayer({
       source: new XYZ_mod({
         url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',
-        crossOrigin: '',
+        crossOrigin: 'anonymous',
         tileClass: ImageTileMod,
         transition: 255,
         tileLoadFunction: (imageTile, src) => {
@@ -234,7 +234,14 @@ export class MapComponent implements OnInit, OnDestroy {
       source: new OSM(),
     });
 
-    const layers = [satelliteLayer, ...this.aerialLayers, ...this.thermalLayers];
+    const layers = [
+      satelliteLayer,
+      ...this.aerialLayers,
+      ...this.thermalLayers,
+      new TileLayer({
+        source: new TileDebug(),
+      }),
+    ];
 
     // MAPA
     let view: View;

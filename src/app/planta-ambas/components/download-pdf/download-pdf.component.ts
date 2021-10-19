@@ -9,6 +9,8 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
+import Map from 'ol/Map';
+
 import pdfMake from 'pdfmake/build/pdfmake.js';
 
 import 'fabric';
@@ -20,6 +22,8 @@ import { GLOBAL } from '@core/services/global';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { PlantaService } from '@core/services/planta.service';
 import { FilterService } from '@core/services/filter.service';
+import { OlMapService } from '@core/services/ol-map.service';
+
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
 
 import { Seguidor } from '@core/models/seguidor';
@@ -28,6 +32,8 @@ import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { Translation } from 'src/app/informe-export/components/export/translations';
 import { PcInterface } from '@core/models/pc';
+import { TileCoord } from 'ol/tilecoord';
+import TileGrid from 'ol/tilegrid/TileGrid';
 
 export interface Apartado {
   nombre: string;
@@ -117,6 +123,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private widthImageAnomalia: number;
   private hasUserArea: boolean;
   seguidoresLoaded = false;
+  private map: Map;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -129,7 +136,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     private plantaService: PlantaService,
     private anomaliaService: AnomaliaService,
     public dialog: MatDialog,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private olMapService: OlMapService
   ) {}
 
   ngOnInit(): void {
@@ -139,6 +147,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.numClases = Array(GLOBAL.labels_clase.length)
       .fill(0)
       .map((_, i) => i + 1);
+
+    this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
     this.subscriptions.add(
       this.plantaService
@@ -546,6 +556,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.countLoadedImages = 0;
 
     if (this.reportControlService.plantaFija) {
+      // this.getLongLatFromTiles(23);
       // Generar imagenes
       this.countAnomalias = 0;
       for (const anomalia of this.anomaliasInforme) {
@@ -875,31 +886,109 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     };
   }
 
+  private getLongLatFromTiles(zoomLevel: number) {
+    this.olMapService
+      .getThermalLayers()
+      .pipe(take(1))
+      .subscribe((layers) => {
+        layers.forEach((layer) => {
+          const source = layer.getSource();
+          const tileGrid = source.getTileGrid();
+          tileGrid.forEachTileCoord(this.map.getView().calculateExtent(), zoomLevel, (tileCoord) => {
+            console.log(this.getLongLatFromZXY(tileCoord, tileGrid));
+            const tile = source.getTile(
+              tileCoord[0],
+              tileCoord[1],
+              tileCoord[2],
+              1,
+              this.map.getView().getProjection()
+            );
+          });
+        });
+      });
+  }
+
   private setImgAnomaliaCanvas(anomalia: Anomalia) {
-    const mapCanvas = document.createElement('canvas');
-    // const size = map.getSize();
-    mapCanvas.width = 256;
-    mapCanvas.height = 256;
-    const mapContext = mapCanvas.getContext('2d');
-    Array.prototype.forEach.call(document.querySelectorAll('.ol-layer canvas'), (canvas) => {
-      if (canvas.width > 0) {
-        const opacity = canvas.parentNode.style.opacity;
-        mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
-        const transform = canvas.style.transform;
-        // Get the transform parameters from the style's transform matrix
-        const matrix = transform
-          .match(/^matrix\(([^\(]*)\)$/)[1]
-          .split(',')
-          .map(Number);
-        // Apply the transform to the export map context
-        CanvasRenderingContext2D.prototype.setTransform.apply(mapContext, matrix);
-        mapContext.drawImage(canvas, 0, 0);
-      }
-    });
+    const url = GLOBAL.GIS + 'kyswupn4T2GXardoZorv_thermal/17/63396/50894.png';
 
-    this.countLoadedImages++;
+    fabric.util.loadImage(
+      url,
+      (img) => {
+        if (img !== null) {
+          const canvas = new fabric.Canvas('canvas');
+          canvas.width = GLOBAL.resolucionCamara[1];
+          canvas.height = GLOBAL.resolucionCamara[0];
+          const image = new fabric.Image(img);
 
-    this.imageListBase64[`imgCanvas${anomalia.localId}`] = mapCanvas.toDataURL('image/jpeg', this.jpgQuality);
+          image.set({
+            left: 0,
+            top: 0,
+            angle: 0,
+            opacity: 1,
+            draggable: false,
+            lockMovementX: true,
+            lockMovementY: true,
+            scaleX: 1,
+            scaleY: 1,
+          });
+
+          canvas.add(image);
+          this.imageListBase64[`imgCanvas${anomalia.localId}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        }
+
+        this.countLoadedImages++;
+      },
+      null,
+      { crossOrigin: 'anonymous' }
+    );
+
+    // const mapCanvas = document.createElement('canvas');
+    // const ctx = mapCanvas.getContext('2d');
+    // const img = new Image();
+    // img.crossOrigin = 'anonymous';
+    // img.onload = () => {
+    //   ctx.drawImage(img, 0, 0); // Or at whatever offset you like
+    // };
+    // img.src = url;
+
+    // const mapCanvas = document.createElement('canvas');
+    // // const size = map.getSize();
+    // mapCanvas.width = 256;
+    // mapCanvas.height = 256;
+    // const mapContext = mapCanvas.getContext('2d');
+    // Array.prototype.forEach.call(document.querySelectorAll('.ol-layer canvas'), (canvas) => {
+    //   if (canvas.width > 0) {
+    //     const opacity = canvas.parentNode.style.opacity;
+    //     mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
+    //     const transform = canvas.style.transform;
+    //     // Get the transform parameters from the style's transform matrix
+    //     const matrix = transform
+    //       .match(/^matrix\(([^\(]*)\)$/)[1]
+    //       .split(',')
+    //       .map(Number);
+    //     // Apply the transform to the export map context
+    //     CanvasRenderingContext2D.prototype.setTransform.apply(mapContext, matrix);
+    //     mapContext.drawImage(canvas, 0, 0);
+    //   }
+    // });
+
+    // this.countLoadedImages++;
+
+    // this.imageListBase64[`imgCanvas${anomalia.localId}`] = mapCanvas.toDataURL('image/jpeg', this.jpgQuality);
+  }
+
+  private getLongLatFromZXY(tileCoord: TileCoord, tileGrid: TileGrid) {
+    const z = tileCoord[0];
+    const x = tileCoord[1];
+    const y = tileCoord[2];
+    const tileGridOrigin = tileGrid.getOrigin(z);
+    const tileSizeAtResolution = (tileGrid.getTileSize(z) as number) * tileGrid.getResolution(z);
+    return [
+      tileGridOrigin[0] + tileSizeAtResolution * x,
+      tileGridOrigin[1] + tileSizeAtResolution * y,
+      tileGridOrigin[0] + tileSizeAtResolution * (x + 1),
+      tileGridOrigin[1] + tileSizeAtResolution * (y + 1),
+    ];
   }
 
   private setImgSeguidorCanvas(seguidor: Seguidor, vistaPrevia: boolean = false, folder?: string) {
