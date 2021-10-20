@@ -11,16 +11,18 @@ import { ThermalLayerInterface } from '@core/models/thermalLayer';
 })
 export class ImageProcessService {
   palette = GLOBAL.ironPalette;
-  sliderMin = 0;
+  sliderMin = 25;
   sliderMax = 100;
-  rangeTempMin = 0;
-  rangeTempMax = 100;
+  rangeTempMin = 25;
+  rangeTempMax = 75;
   thermalLayer: ThermalLayerInterface;
 
   constructor(private thermalService: ThermalService, private reportControlService: ReportControlService) {
     this.thermalService.getThermalLayers().subscribe((layers) => {
       this.thermalLayer = layers.find((tL) => tL.informeId === this.reportControlService.selectedInformeId);
     });
+    // this.thermalService.sliderMinSource.subscribe((value) => (this.rangeTempMin = value));
+    // this.thermalService.sliderMaxSource.subscribe((value) => (this.rangeTempMax = value));
   }
 
   transformPixels(image) {

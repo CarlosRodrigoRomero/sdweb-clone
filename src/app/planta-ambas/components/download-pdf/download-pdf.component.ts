@@ -35,6 +35,7 @@ import { Translation } from 'src/app/informe-export/components/export/translatio
 import { PcInterface } from '@core/models/pc';
 import { TileCoord } from 'ol/tilecoord';
 import TileGrid from 'ol/tilegrid/TileGrid';
+import { Extent } from 'ol/extent';
 
 export interface Apartado {
   nombre: string;
@@ -500,7 +501,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.heightLogoHeader = 40;
     this.jpgQuality = 0.95;
     this.widthImageSeguidor = 450;
-    this.widthImageAnomalia = 250;
+    this.widthImageAnomalia = 450;
     this.hasUserArea = false;
 
     this.subscriptions.add(
@@ -910,8 +911,55 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       });
   }
 
+  private getAnomaliaExtent(anomalia: Anomalia): Extent {
+    const range = 0.001;
+    const coord = anomalia.featureCoords[0];
+    const extent: Extent = [coord[0] - range, coord[1] - range, coord[0] + range, coord[1] + range];
+
+    return extent;
+  }
+
+  private getAnomaliaTiles(anomalia: Anomalia, extent: Extent, zoomLevel: number): TileCoord[] {
+    const tilesCoord: TileCoord[] = [];
+    this.olMapService
+      .getThermalLayers()
+      .pipe(take(1))
+      .subscribe((layers) => {
+        layers.forEach((layer) => {
+          const source = layer.getSource();
+          const tileGrid = source.getTileGrid();
+          tileGrid.forEachTileCoord(extent, zoomLevel, (tileCoord) => {
+            tilesCoord.push(tileCoord);
+          });
+        });
+      });
+
+    return tilesCoord;
+  }
+
+  private getArroundTiles(tileCoord: TileCoord) {
+    const tilesCoord: TileCoord[] = [];
+    tilesCoord.push([tileCoord[0], tileCoord[1] - 1, tileCoord[2] - 1]);
+    tilesCoord.push([tileCoord[0], tileCoord[1], tileCoord[2] - 1]);
+    tilesCoord.push([tileCoord[0], tileCoord[1] + 1, tileCoord[2] - 1]);
+    tilesCoord.push([tileCoord[0], tileCoord[1] - 1, tileCoord[2]]);
+    tilesCoord.push([tileCoord[0], tileCoord[1] - 1, tileCoord[2] - 1]);
+    tilesCoord.push([tileCoord[0], tileCoord[1] - 1, tileCoord[2] - 1]);
+    tilesCoord.push([tileCoord[0], tileCoord[1] - 1, tileCoord[2] - 1]);
+    tilesCoord.push([tileCoord[0], tileCoord[1] - 1, tileCoord[2] - 1]);
+  }
+
+  private checkAnomInsideTiles(anomalia: Anomalia, tilesCoord: TileCoord[], tileGrid: TileGrid) {
+    const coords = anomalia.featureCoords;
+    tilesCoord.forEach((tC) => {
+      const longLatCoords = this.getLongLatFromZXY(tC, tileGrid);
+    });
+  }
+
   private setImgAnomaliaCanvas(anomalia: Anomalia) {
-    const url = GLOBAL.GIS + 'kyswupn4T2GXardoZorv_thermal/17/63396/50894.png';
+    const coords = this.getAnomaliaTiles(anomalia, this.getAnomaliaExtent(anomalia), 22);
+
+    const url = GLOBAL.GIS + `kyswupn4T2GXardoZorv_thermal/${coords[0][0]}/${coords[0][1]}/${coords[0][2]}.png`;
 
     fabric.util.loadImage(
       url,
@@ -922,9 +970,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           const canvas = new fabric.Canvas('canvas');
           canvas.width = GLOBAL.resolucionCamara[1];
           canvas.height = GLOBAL.resolucionCamara[0];
-          let image = new fabric.Image(img);
-
-          // image = this.imageProcessService.transformPixels(image);
+          const image = new fabric.Image(img);
 
           image.set({
             left: 0,
@@ -939,7 +985,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           });
 
           canvas.add(image);
-          this.imageListBase64[`imgCanvas${anomalia.localId}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+          this.imageListBase64[`imgCanvas${this.getLocalId(anomalia)}`] = canvas.toDataURL(
+            'image/jpeg',
+            this.jpgQuality
+          );
         }
 
         this.countLoadedImages++;
@@ -947,40 +996,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       null,
       { crossOrigin: 'anonymous' }
     );
-
-    // const mapCanvas = document.createElement('canvas');
-    // const ctx = mapCanvas.getContext('2d');
-    // const img = new Image();
-    // img.crossOrigin = 'anonymous';
-    // img.onload = () => {
-    //   ctx.drawImage(img, 0, 0); // Or at whatever offset you like
-    // };
-    // img.src = url;
-
-    // const mapCanvas = document.createElement('canvas');
-    // // const size = map.getSize();
-    // mapCanvas.width = 256;
-    // mapCanvas.height = 256;
-    // const mapContext = mapCanvas.getContext('2d');
-    // Array.prototype.forEach.call(document.querySelectorAll('.ol-layer canvas'), (canvas) => {
-    //   if (canvas.width > 0) {
-    //     const opacity = canvas.parentNode.style.opacity;
-    //     mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
-    //     const transform = canvas.style.transform;
-    //     // Get the transform parameters from the style's transform matrix
-    //     const matrix = transform
-    //       .match(/^matrix\(([^\(]*)\)$/)[1]
-    //       .split(',')
-    //       .map(Number);
-    //     // Apply the transform to the export map context
-    //     CanvasRenderingContext2D.prototype.setTransform.apply(mapContext, matrix);
-    //     mapContext.drawImage(canvas, 0, 0);
-    //   }
-    // });
-
-    // this.countLoadedImages++;
-
-    // this.imageListBase64[`imgCanvas${anomalia.localId}`] = mapCanvas.toDataURL('image/jpeg', this.jpgQuality);
   }
 
   private getLongLatFromZXY(tileCoord: TileCoord, tileGrid: TileGrid) {
@@ -3085,6 +3100,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     if (localId === '') {
       localId = '-';
     }
+
+    anomalia.localId = localId;
 
     return localId;
   }
