@@ -24,6 +24,7 @@ import { PlantaService } from '@core/services/planta.service';
 import { FilterService } from '@core/services/filter.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { ImageProcessService } from '../../services/image-process.service';
+import { AnomaliaInfoService } from '@core/services/anomalia-info.service';
 
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
 
@@ -140,7 +141,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private filterService: FilterService,
     private olMapService: OlMapService,
-    private imageProcessService: ImageProcessService
+    private imageProcessService: ImageProcessService,
+    private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
   ngOnInit(): void {
@@ -559,7 +561,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.countLoadedImages = 0;
 
     if (this.reportControlService.plantaFija) {
-      // this.getLongLatFromTiles(23);
       // Generar imagenes
       this.countAnomalias = 0;
       for (const anomalia of this.anomaliasInforme) {
@@ -885,30 +886,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           bold: true,
           alignment: 'right',
         },
+        anomInfoTitle: {
+          bold: true,
+          aligment: 'left',
+          fontSize: 14,
+          lineHeight: 1.5,
+        },
+        anomInfoValue: {
+          aligment: 'left',
+          fontSize: 14,
+          lineHeight: 1.15,
+        },
       },
     };
-  }
-
-  private getLongLatFromTiles(zoomLevel: number) {
-    this.olMapService
-      .getThermalLayers()
-      .pipe(take(1))
-      .subscribe((layers) => {
-        layers.forEach((layer) => {
-          const source = layer.getSource();
-          const tileGrid = source.getTileGrid();
-          tileGrid.forEachTileCoord(this.map.getView().calculateExtent(), zoomLevel, (tileCoord) => {
-            console.log(this.getLongLatFromZXY(tileCoord, tileGrid));
-            const tile = source.getTile(
-              tileCoord[0],
-              tileCoord[1],
-              tileCoord[2],
-              1,
-              this.map.getView().getProjection()
-            );
-          });
-        });
-      });
   }
 
   private getAnomaliaExtent(anomalia: Anomalia): Extent {
@@ -2491,124 +2481,97 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         },
         '\n',
         {
-          image: `imgCanvas${anom.localId}`,
-          width: this.widthImageAnomalia,
-          alignment: 'center',
+          columns: [
+            { text: 'Tipo de anomalía', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getTipoLabel(anom), style: 'anomInfoValue' },
+          ],
+          margin: [0, 300, 0, 0],
         },
-        '\n',
-        // {
-        //   columns: [
-        //     {
-        //       width: '*',
-        //       text: '',
-        //     },
-        //     {
-        //       width: 'auto',
-        //       table: {
-        //         body: [
-        //           [
-        //             {
-        //               text: this.translation.t('Fecha/Hora'),
-        //               style: 'tableHeaderImageData',
-        //             },
-        //             {
-        //               text: this.translation.t('Irradiancia'),
-        //               style: 'tableHeaderImageData',
-        //             },
-        //             {
-        //               text: this.translation.t('Temp. aire'),
-        //               style: 'tableHeaderImageData',
-        //             },
-        //             {
-        //               text: this.translation.t('Viento'),
-        //               style: 'tableHeaderImageData',
-        //             },
-        //             {
-        //               text: this.translation.t('Emisividad'),
-        //               style: 'tableHeaderImageData',
-        //             },
-        //             {
-        //               text: this.translation.t('Temp. reflejada'),
-        //               style: 'tableHeaderImageData',
-        //             },
-        //             {
-        //               text: this.translation.t('Módulo'),
-        //               style: 'tableHeaderImageData',
-        //             },
-        //           ],
-        //           [
-        //             {
-        //               text: this.datePipe
-        //                 .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
-        //                 .concat(' ')
-        //                 .concat(this.datePipe.transform(anom.anomaliasCliente[0].datetime * 1000, 'HH:mm:ss')),
-        //               style: 'tableCellAnexo1',
-        //               noWrap: true,
-        //             },
-        //             {
-        //               text: Math.round(anom.anomaliasCliente[0].irradiancia).toString().concat(' W/m2'),
-        //               style: 'tableCellAnexo1',
-        //               noWrap: true,
-        //             },
-        //             {
-        //               text: Math.round((anom.anomaliasCliente[0] as PcInterface).temperaturaAire)
-        //                 .toString()
-        //                 .concat(' ºC'),
-        //               style: 'tableCellAnexo1',
-        //               noWrap: true,
-        //             },
-        //             {
-        //               text: (anom.anomaliasCliente[0] as PcInterface).viento,
-        //               style: 'tableCellAnexo1',
-        //               noWrap: true,
-        //             },
-        //             {
-        //               text: (anom.anomaliasCliente[0] as PcInterface).emisividad,
-        //               style: 'tableCellAnexo1',
-        //               noWrap: true,
-        //             },
-        //             {
-        //               text: Math.round((anom.anomaliasCliente[0] as PcInterface).temperaturaReflejada)
-        //                 .toString()
-        //                 .concat(' ºC'),
-        //               style: 'tableCellAnexo1',
-        //               noWrap: true,
-        //             },
-        //             {
-        //               text: this.writeModulo(anom.anomaliasCliente[0]),
-        //               style: 'tableCellAnexo1',
-        //               noWrap: true,
-        //             },
-        //           ],
-        //         ],
-        //       },
-        //     },
-        //     {
-        //       width: '*',
-        //       text: '',
-        //     },
-        //   ],
-        // },
-        '\n',
-        // {
-        //   columns: [
-        //     {
-        //       width: '*',
-        //       text: '',
-        //     },
-        //     {
-        //       width: 'auto',
-        //       table: {
-        //         headerRows: 1,
-        //         body: [table[0]].concat(table[1]),
-        //       },
-        //     },
-        //     {
-        //       width: '*',
-        //       text: '',
-        //     },
-        //   ],
-        // },
+        {
+          columns: [
+            { text: 'Causa', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getCausa(anom), style: 'anomInfoValue', margin: [0, 0, 0, 5] },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Recomendación', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getRecomendacion(anom), style: 'anomInfoValue', margin: [0, 0, 0, 5] },
+          ],
+        },
+        {
+          columns: [
+            {
+              text: `Criticidad (Criterio ${this.anomaliaService.criterioCriticidad.nombre})`,
+              width: 200,
+              style: 'anomInfoTitle',
+            },
+            { text: this.anomaliaInfoService.getCriticidadLabel(anom), style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Clase', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getClaseLabel(anom), style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Pérdidas (beta)', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getPerdidasLabel(anom), style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Temperatura Máxima', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getTempMaxLabel(anom), style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Gradiente Temp. Normalizado', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getGradNormLabel(anom), style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Fecha y hora captura', width: 200, style: 'anomInfoTitle' },
+            {
+              text: this.anomaliaInfoService.getFechaHoraLabel(anom),
+              style: 'anomInfoValue',
+            },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Emisividad', width: 200, style: 'anomInfoTitle' },
+            { text: `${this.informe.emisividad}`, style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Temperatura Reflejada', width: 200, style: 'anomInfoTitle' },
+            { text: `${this.informe.tempReflejada} ºC`, style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Temperatura aire', width: 200, style: 'anomInfoTitle' },
+            { text: `${this.informe.temperatura} ºC`, style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Dirección viento', width: 200, style: 'anomInfoTitle' },
+            { text: `${this.informe.vientoDireccion}º`, style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Localización', width: 200, style: 'anomInfoTitle' },
+            { text: `${this.informe.tempReflejada} ºC`, style: 'anomInfoValue' },
+          ],
+        },
       ];
       allPagsAnexo.push(pagAnexo);
     }
