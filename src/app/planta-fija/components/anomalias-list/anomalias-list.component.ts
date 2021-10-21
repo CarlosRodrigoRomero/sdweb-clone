@@ -7,8 +7,14 @@ import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
 import { AnomaliasControlService } from '../../services/anomalias-control.service';
 import { ReportControlService } from '@core/services/report-control.service';
+import { OlMapService } from '@core/services/ol-map.service';
+import { PlantaService } from '@core/services/planta.service';
 
 import { Anomalia } from '@core/models/anomalia';
+import { Map } from 'ol';
+import { PlantaInterface } from '@core/models/planta';
+import { take } from 'rxjs/operators';
+import { Layer } from 'ol/layer';
 
 @Component({
   selector: 'app-anomalias-list',
@@ -22,16 +28,27 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit {
   public prevSelectedRow: any;
   public anomaliaHover;
   public anomaliaSelect;
+  private map: Map;
+  private planta: PlantaInterface;
 
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(
     public filterService: FilterService,
     private anomaliasControlService: AnomaliasControlService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private olMapService: OlMapService,
+    private plantaService: PlantaService
   ) {}
 
   ngOnInit() {
+    this.olMapService.map$.subscribe((map) => (this.map = map));
+
+    this.plantaService
+      .getPlanta(this.reportControlService.plantaId)
+      .pipe(take(1))
+      .subscribe((planta) => (this.planta = planta));
+
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.filterService.filteredElements$.subscribe((elems) => {
         const filteredElements = [];
@@ -104,5 +121,13 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit {
 
     this.anomaliasControlService.anomaliaSelect = row.anomalia;
     this.anomaliasControlService.setExternalStyle(row.id, true);
+
+    // centramos la vista al hacer click
+    this.centerView(row.anomalia);
+  }
+
+  private centerView(anomalia: Anomalia) {
+    this.map.getView().setCenter(anomalia.featureCoords[0]);
+    this.map.getView().setZoom(this.planta.zoom + 6);
   }
 }

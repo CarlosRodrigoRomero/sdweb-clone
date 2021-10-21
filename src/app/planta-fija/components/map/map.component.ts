@@ -163,6 +163,7 @@ export class MapComponent implements OnInit, OnDestroy {
           imageTile.thermalLayer = thermalLayer;
         },
       }),
+      preload: Infinity,
     });
     // solo lo aplicamos a la planta DEMO
     if (this.plantaId === 'egF0cbpXnnBnjcrusoeR') {
@@ -174,6 +175,20 @@ export class MapComponent implements OnInit, OnDestroy {
     });
 
     return tl;
+  }
+
+  private addAerialLayer(informeId: string) {
+    const aerial = new XYZ({
+      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_visual/{z}/{x}/{y}.png',
+      crossOrigin: '',
+    });
+
+    const aerialLayer = new TileLayer({
+      source: aerial,
+      preload: Infinity,
+    });
+
+    this.olMapService.addAerialLayer(aerialLayer);
   }
 
   private _createAnomaliaLayer(informeId: string): VectorLayer {
@@ -219,7 +234,7 @@ export class MapComponent implements OnInit, OnDestroy {
       source: new OSM(),
     });
 
-    const layers = [osmLayer, ...this.aerialLayers, ...this.thermalLayers];
+    const layers = [satelliteLayer, ...this.aerialLayers, ...this.thermalLayers];
 
     // MAPA
     let view: View;
@@ -274,19 +289,6 @@ export class MapComponent implements OnInit, OnDestroy {
           this.anomaliaSelect = anomSelect;
         })
     );
-  }
-
-  private addAerialLayer(informeId: string) {
-    const aerial = new XYZ({
-      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_visual/{z}/{x}/{y}.png',
-      crossOrigin: '',
-    });
-
-    const aerialLayer = new TileLayer({
-      source: aerial,
-    });
-
-    this.olMapService.addAerialLayer(aerialLayer);
   }
 
   private transform(extent) {
