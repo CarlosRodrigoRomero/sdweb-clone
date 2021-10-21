@@ -120,7 +120,11 @@ export class PortfolioControlService {
 
               // añadimos el mae del informe mas reciente de cada planta
               // los antiguos de fijas los devidimos por 100
-              if (planta.tipo !== 'seguidores' && informeReciente.fecha < 1619820000) {
+              if (
+                planta.tipo !== 'seguidores' &&
+                informeReciente.fecha < 1619820000 &&
+                planta.id !== 'egF0cbpXnnBnjcrusoeR'
+              ) {
                 this.maePlantas.push(informeReciente.mae / 100);
               } else {
                 // el resto añadimos normal
