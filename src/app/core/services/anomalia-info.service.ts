@@ -3,10 +3,12 @@ import { formatNumber, formatDate } from '@angular/common';
 
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { ReportControlService } from '@core/services/report-control.service';
+import { PlantaService } from '@core/services/planta.service';
 import { GLOBAL } from './global';
 
 import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
+import { PlantaInterface } from '@core/models/planta';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +19,8 @@ export class AnomaliaInfoService {
   constructor(
     @Inject(LOCALE_ID) public locale: string,
     private anomaliaService: AnomaliaService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private plantaService: PlantaService
   ) {
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInforme = this.reportControlService.informes.find((informe) => informe.id === informeId);
@@ -70,5 +73,65 @@ export class AnomaliaInfoService {
     const hora = formatDate((anomalia.datetime + correctHoraSrtUnix) * 1000, 'HH:mm:ss', this.locale);
 
     return `${fecha} ${hora}`;
+  }
+
+  getModuloLabel(anomalia: Anomalia): string {
+    if (!anomalia.hasOwnProperty('modulo')) {
+      return 'Desconocido';
+    }
+    const modulo = anomalia.modulo;
+    let labelModulo = '';
+    if (modulo !== null) {
+      if (modulo.hasOwnProperty('marca')) {
+        labelModulo = labelModulo.concat(modulo.marca.toString()).concat(' ');
+      }
+      if (modulo.hasOwnProperty('modelo')) {
+        labelModulo = labelModulo.concat(modulo.modelo.toString()).concat(' ');
+      }
+      if (modulo.hasOwnProperty('potencia')) {
+        labelModulo = labelModulo.concat('(').concat(modulo.potencia.toString()).concat(' W)');
+      }
+    }
+
+    return labelModulo;
+  }
+
+  getLocalizacionReducLabel(anomalia: Anomalia, planta: PlantaInterface) {
+    let label = '';
+
+    const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
+
+    globals.forEach((coord, index) => {
+      label += coord;
+
+      if (index < globals.length - 1) {
+        label += this.plantaService.getGlobalsConector(planta);
+      }
+    });
+
+    return label;
+  }
+
+  getLocalizacionCompleteLabel(anomalia: Anomalia, planta: PlantaInterface) {
+    let label = '';
+
+    const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
+
+    globals.forEach((coord, index) => {
+      if (coord !== undefined && coord !== null && coord !== '') {
+        label += `${planta.nombreGlobalCoords[index]}: ${coord} / `;
+      }
+    });
+
+    const numModulo = this.plantaService.getNumeroModulo(anomalia, 'anomalia', planta);
+    if (numModulo !== undefined) {
+      if (!isNaN(Number(numModulo))) {
+        label += `Nº módulo: ${numModulo}`;
+      } else {
+        label += `Fila: ${anomalia.localY} / Columna: ${anomalia.localX}`;
+      }
+    }
+
+    return label;
   }
 }

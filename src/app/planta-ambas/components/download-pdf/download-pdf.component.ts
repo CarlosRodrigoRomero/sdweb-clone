@@ -889,12 +889,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         anomInfoTitle: {
           bold: true,
           aligment: 'left',
-          fontSize: 14,
+          fontSize: 13,
           lineHeight: 1.5,
         },
         anomInfoValue: {
-          aligment: 'left',
-          fontSize: 14,
+          alignment: 'justify',
+          fontSize: 13,
           lineHeight: 1.15,
         },
       },
@@ -1555,6 +1555,18 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           },
           {
             text: `${this.irradianciaMedia} W/m2`,
+          },
+        ]);
+      }
+
+      if (this.informe.hasOwnProperty('vientoVelocidad')) {
+        apt03.push([
+          {
+            text: 'Viento',
+            style: 'tableLeft',
+          },
+          {
+            text: `${this.informe.vientoVelocidad} (Beaufort) ${this.informe.vientoDireccion}º`,
           },
         ]);
       }
@@ -2470,11 +2482,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (const anom of this.anomaliasInforme) {
+    for (let i = 0; i < this.anomaliasInforme.length; i++) {
+      const anom = this.anomaliasInforme[i];
       // const table = this.getPaginaSeguidor(anom);
       const pagAnexo = [
         {
-          text: `${this.translation.t('Anomalía')} ${anom.localId}`,
+          text: `${this.translation.t('Anomalía')} ${i + 1}/${this.anomaliasInforme.length}`,
           style: 'h2',
           alignment: 'center',
           pageBreak: 'before',
@@ -2485,7 +2498,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             { text: 'Tipo de anomalía', width: 200, style: 'anomInfoTitle' },
             { text: this.anomaliaInfoService.getTipoLabel(anom), style: 'anomInfoValue' },
           ],
-          margin: [0, 300, 0, 0],
+          margin: [0, 350, 0, 0],
         },
         {
           columns: [
@@ -2497,6 +2510,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           columns: [
             { text: 'Recomendación', width: 200, style: 'anomInfoTitle' },
             { text: this.anomaliaInfoService.getRecomendacion(anom), style: 'anomInfoValue', margin: [0, 0, 0, 5] },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Módulo', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getModuloLabel(anom), style: 'anomInfoValue' },
           ],
         },
         {
@@ -2542,34 +2561,37 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             },
           ],
         },
-        {
-          columns: [
-            { text: 'Emisividad', width: 200, style: 'anomInfoTitle' },
-            { text: `${this.informe.emisividad}`, style: 'anomInfoValue' },
-          ],
-        },
-        {
-          columns: [
-            { text: 'Temperatura Reflejada', width: 200, style: 'anomInfoTitle' },
-            { text: `${this.informe.tempReflejada} ºC`, style: 'anomInfoValue' },
-          ],
-        },
-        {
-          columns: [
-            { text: 'Temperatura aire', width: 200, style: 'anomInfoTitle' },
-            { text: `${this.informe.temperatura} ºC`, style: 'anomInfoValue' },
-          ],
-        },
-        {
-          columns: [
-            { text: 'Dirección viento', width: 200, style: 'anomInfoTitle' },
-            { text: `${this.informe.vientoDireccion}º`, style: 'anomInfoValue' },
-          ],
-        },
+        // {
+        //   columns: [
+        //     { text: 'Emisividad', width: 200, style: 'anomInfoTitle' },
+        //     { text: `${this.informe.emisividad}`, style: 'anomInfoValue' },
+        //   ],
+        // },
+        // {
+        //   columns: [
+        //     { text: 'Temperatura Reflejada', width: 200, style: 'anomInfoTitle' },
+        //     { text: `${this.informe.tempReflejada} ºC`, style: 'anomInfoValue' },
+        //   ],
+        // },
+        // {
+        //   columns: [
+        //     { text: 'Temperatura aire', width: 200, style: 'anomInfoTitle' },
+        //     { text: `${this.informe.temperatura} ºC`, style: 'anomInfoValue' },
+        //   ],
+        // },
+        // {
+        //   columns: [
+        //     { text: 'Viento', width: 200, style: 'anomInfoTitle' },
+        //     {
+        //       text: `${this.informe.vientoVelocidad} (Beaufort) ${this.informe.vientoDireccion}º`,
+        //       style: 'anomInfoValue',
+        //     },
+        //   ],
+        // },
         {
           columns: [
             { text: 'Localización', width: 200, style: 'anomInfoTitle' },
-            { text: `${this.informe.tempReflejada} ºC`, style: 'anomInfoValue' },
+            { text: this.anomaliaInfoService.getLocalizacionCompleteLabel(anom, this.planta), style: 'anomInfoValue' },
           ],
         },
       ];
