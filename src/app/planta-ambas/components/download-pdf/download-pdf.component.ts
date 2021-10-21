@@ -1714,7 +1714,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         {
           text: this.translation.t(
-            'La temperatura reflejada no depende de la atmosfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura reflejada medida es:'
+            'La temperatura reflejada no depende de la atmósfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura reflejada medida es:'
           ),
           style: 'p',
         },
@@ -2021,7 +2021,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         {
           text: this.translation.t(
-            'A continuación se detallan la cantidad de incidencias registradas según su clase (1, 2 ó 3).'
+            'A continuación se detalla la cantidad de incidencias registradas según su clase (1, 2 ó 3).'
           ),
           style: 'p',
         },
@@ -2221,7 +2221,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         {
           text: this.translation.t(
-            'El MAE (módulo apagados equivalentes) nos da medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.'
+            'El MAE (módulo apagados equivalentes) nos da una medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.'
           ),
           style: 'p',
         },
