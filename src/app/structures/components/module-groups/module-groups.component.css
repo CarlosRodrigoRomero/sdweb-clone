@@ -9,3 +9,8 @@ button {
 .icon {
   margin-right: 0.5rem;
 }
+
+.btns-add-groups {
+  display: grid;
+  gap: 0.5rem;
+}

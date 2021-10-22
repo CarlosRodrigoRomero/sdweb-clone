@@ -90,8 +90,14 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
         mGSource.clear();
 
         groups.forEach((mG) => {
+          let coords = mG.coords;
+
+          if (coords.length <= 2 || coords[2] === undefined) {
+            coords = this.getAllCoordsRectangle(mG.coords);
+          }
+
           const feature = new Feature({
-            geometry: new Polygon([this.getAllCoordsRectangle(mG.coords)]),
+            geometry: new Polygon([coords]),
             properties: {
               id: mG.id,
               name: 'moduleGroup',
@@ -211,11 +217,11 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
         coords,
       };
 
-      // lo añadimos a la DB
-      // this.structuresService.addModuleGroup(modGroup);
-
       // lo añadimos a la lista de agrupaciones
       this.structuresService.allModGroups = [...this.structuresService.allModGroups, modGroup];
+
+      // lo añadimos a la DB
+      this.structuresService.addModuleGroup(modGroup);
 
       // terminamos el modo draw
       this.map.removeInteraction(this.draw);
