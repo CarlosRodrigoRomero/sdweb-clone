@@ -13,7 +13,7 @@ import GeometryType from 'ol/geom/GeometryType';
 import { Coordinate } from 'ol/coordinate';
 import Polygon from 'ol/geom/Polygon';
 import Feature from 'ol/Feature';
-import { Select } from 'ol/interaction';
+import { DoubleClickZoom, Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
 
 import { OlMapService } from '@core/services/ol-map.service';
@@ -124,15 +124,22 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
 
     this.draw = new Draw({
       source: sourceGroup,
-      // type: GeometryType.POLYGON,
       type: GeometryType.CIRCLE,
       geometryFunction: createBox(),
     });
+
     this.olMapService.draw = this.draw;
 
     this.map.addInteraction(this.draw);
 
     this.draw.on('drawend', (evt) => {
+      // desactivamos el dobleclick para que no interfiera al cerrar poligono
+      this.map.getInteractions().forEach((interaction) => {
+        if (interaction instanceof DoubleClickZoom) {
+          this.map.removeInteraction(interaction);
+        }
+      });
+
       sourceGroup.clear();
 
       // obtenemos un ID aleatorio
@@ -159,6 +166,65 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
     });
   }
 
+  drawIrregularGroup() {
+    this.structuresService.drawModGroups = true;
+
+    const sourceGroup = new VectorSource();
+    const style = new Style({
+      stroke: new Stroke({
+        color: 'rgba(0,0,0,0)',
+        width: 2,
+      }),
+    });
+
+    this.vectorGroup = this.olMapService.createVectorLayer(sourceGroup);
+    this.vectorGroup.setStyle(style);
+
+    this.map.addLayer(this.vectorGroup);
+
+    this.draw = new Draw({
+      source: sourceGroup,
+      type: GeometryType.POLYGON,
+    });
+
+    this.olMapService.draw = this.draw;
+
+    this.map.addInteraction(this.draw);
+
+    this.draw.on('drawend', (evt) => {
+      // desactivamos el dobleclick para que no interfiera al cerrar poligono
+      this.map.getInteractions().forEach((interaction) => {
+        if (interaction instanceof DoubleClickZoom) {
+          this.map.removeInteraction(interaction);
+        }
+      });
+
+      sourceGroup.clear();
+
+      // obtenemos un ID aleatorio
+      const id = this.structuresService.generateRandomId();
+
+      const coords = this.getCoordsPolygon(evt);
+
+      const modGroup: ModuleGroup = {
+        id,
+        coords,
+      };
+
+      // lo añadimos a la DB
+      // this.structuresService.addModuleGroup(modGroup);
+
+      // lo añadimos a la lista de agrupaciones
+      this.structuresService.allModGroups = [...this.structuresService.allModGroups, modGroup];
+
+      // terminamos el modo draw
+      this.map.removeInteraction(this.draw);
+
+      // cambiamos el boton
+      this.structuresService.drawModGroups = false;
+    });
+  }
+
   cancelDraw() {
     this.structuresService.drawModGroups = false;
 
@@ -170,6 +236,15 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
     const coords = polygon.getCoordinates();
 
     return [coords[0][1], coords[0][3]];
+  }
+
+  getCoordsPolygon(event: DrawEvent): Coordinate[] {
+    const polygon = event.feature.getGeometry() as Polygon;
+    const coords = polygon.getCoordinates();
+
+    console.log(coords);
+
+    return coords[0];
   }
 
   getAllCoordsRectangle(coords: Coordinate[]) {
