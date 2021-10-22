@@ -220,6 +220,8 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
       // lo añadimos a la lista de agrupaciones
       this.structuresService.allModGroups = [...this.structuresService.allModGroups, modGroup];
 
+      // this.prepareIrregularCoordsToDB(modGroup);
+
       // lo añadimos a la DB
       this.structuresService.addModuleGroup(modGroup);
 
@@ -229,6 +231,35 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
       // cambiamos el boton
       this.structuresService.drawModGroups = false;
     });
+  }
+
+  private prepareIrregularCoordsToDB(modGroup: ModuleGroup) {
+    const coords: Coordinate[] = [];
+    modGroup.coords.forEach((coord, index) => {
+      if (index < 4) {
+        coords.push(coord);
+      }
+    });
+
+    coords.sort((a, b) => a[0] - b[0]);
+
+    const lefts = [coords[0], coords[1]];
+    const rights = [coords[2], coords[3]];
+
+    let topLeft = lefts[0];
+    let bottomLeft = lefts[1];
+    if (topLeft[1] < bottomLeft[1]) {
+      topLeft = lefts[1];
+      bottomLeft = lefts[0];
+    }
+    let topRight = rights[0];
+    let bottomRight = rights[1];
+    if (topRight[1] < bottomRight[1]) {
+      topRight = rights[1];
+      bottomRight = rights[0];
+    }
+
+    return { topLeft, topRight, bottomRight, bottomLeft };
   }
 
   cancelDraw() {
@@ -247,8 +278,6 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
   getCoordsPolygon(event: DrawEvent): Coordinate[] {
     const polygon = event.feature.getGeometry() as Polygon;
     const coords = polygon.getCoordinates();
-
-    console.log(coords);
 
     return coords[0];
   }
