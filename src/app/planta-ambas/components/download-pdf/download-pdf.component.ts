@@ -13,6 +13,8 @@ import Map from 'ol/Map';
 
 import pdfMake from 'pdfmake/build/pdfmake.js';
 
+import inside from 'point-in-polygon';
+
 import 'fabric';
 declare let fabric;
 
@@ -37,6 +39,8 @@ import { PcInterface } from '@core/models/pc';
 import { TileCoord } from 'ol/tilecoord';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import { Extent } from 'ol/extent';
+import { Coordinate } from 'ol/coordinate';
+import { fromLonLat } from 'ol/proj';
 
 export interface Apartado {
   nombre: string;
@@ -503,7 +507,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.heightLogoHeader = 40;
     this.jpgQuality = 0.95;
     this.widthImageSeguidor = 450;
-    this.widthImageAnomalia = 450;
+    this.widthImageAnomalia = 350;
     this.hasUserArea = false;
 
     this.subscriptions.add(
@@ -901,91 +905,126 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     };
   }
 
-  private getAnomaliaExtent(anomalia: Anomalia): Extent {
+  private getElemExtent(coords: Coordinate[]): Extent[] {
     const range = 0.001;
-    const coord = anomalia.featureCoords[0];
-    const extent: Extent = [coord[0] - range, coord[1] - range, coord[0] + range, coord[1] + range];
+    const extents: Extent[] = [];
+    coords.forEach((coord) => {
+      const extent: Extent = [coord[0] - range, coord[1] - range, coord[0] + range, coord[1] + range];
+      extents.push(extent);
+    });
 
-    return extent;
+    return extents;
   }
 
-  private getAnomaliaTiles(anomalia: Anomalia, extent: Extent, zoomLevel: number): TileCoord[] {
-    const tilesCoord: TileCoord[] = [];
+  private getElemTiles(coords: Coordinate[], extents: Extent[], zoomLevel: number): TileCoord[] {
+    let tilesCoord: TileCoord[] = [];
     this.olMapService
       .getThermalLayers()
       .pipe(take(1))
       .subscribe((layers) => {
-        layers.forEach((layer) => {
-          const source = layer.getSource();
-          const tileGrid = source.getTileGrid();
+        const layerInformeSelected = layers.find((layer) => layer.getProperties().informeId === this.informe.id);
+        const source = layerInformeSelected.getSource();
+        const tileGrid = source.getTileGrid();
+        extents.forEach((extent, index) => {
           tileGrid.forEachTileCoord(extent, zoomLevel, (tileCoord) => {
-            tilesCoord.push(tileCoord);
+            const longLatCoords = this.getLongLatFromZXY(tileCoord, tileGrid);
+            if (inside(coords[index], longLatCoords)) {
+              tilesCoord.push(tileCoord);
+            }
           });
         });
       });
 
+    tilesCoord = this.getCompleteTiles(tilesCoord);
+
     return tilesCoord;
   }
 
-  private getArroundTiles(tileCoord: TileCoord) {
-    const tilesCoord: TileCoord[] = [];
-    tilesCoord.push([tileCoord[0], tileCoord[1] - 1, tileCoord[2] - 1]);
-    tilesCoord.push([tileCoord[0], tileCoord[1], tileCoord[2] - 1]);
-    tilesCoord.push([tileCoord[0], tileCoord[1] + 1, tileCoord[2] - 1]);
-    tilesCoord.push([tileCoord[0], tileCoord[1] - 1, tileCoord[2]]);
-    tilesCoord.push([tileCoord[0], tileCoord[1] - 1, tileCoord[2] - 1]);
-    tilesCoord.push([tileCoord[0], tileCoord[1] - 1, tileCoord[2] - 1]);
-    tilesCoord.push([tileCoord[0], tileCoord[1] - 1, tileCoord[2] - 1]);
-    tilesCoord.push([tileCoord[0], tileCoord[1] - 1, tileCoord[2] - 1]);
-  }
+  private getCompleteTiles(tilesCoord: TileCoord[]): TileCoord[] {
+    const tilesCoordCompletes: TileCoord[] = [];
 
-  private checkAnomInsideTiles(anomalia: Anomalia, tilesCoord: TileCoord[], tileGrid: TileGrid) {
-    const coords = anomalia.featureCoords;
-    tilesCoord.forEach((tC) => {
-      const longLatCoords = this.getLongLatFromZXY(tC, tileGrid);
-    });
+    const coordsX = tilesCoord.map((coord) => coord[1]);
+    const coordsY = tilesCoord.map((coord) => coord[2]);
+    // obtenemos los maximos y le sumamos una para traernos los de alrededor
+    const minX = Math.min(...coordsX) - 1;
+    let maxX = Math.max(...coordsX) + 1;
+    const minY = Math.min(...coordsY) - 1;
+    let maxY = Math.max(...coordsY) + 1;
+
+    // hacemos el grupo cuadrado con lado el que sea mayor de X o Y
+    const rangoX = maxX - minX;
+    const rangoY = maxY - minY;
+    const diferencia = rangoY - rangoX;
+    if (diferencia > 0) {
+      maxX += diferencia;
+    } else if (diferencia < 0) {
+      maxY += Math.abs(diferencia);
+    }
+
+    for (let j = minY; j <= maxY; j++) {
+      for (let i = minX; i <= maxX; i++) {
+        const coord = [tilesCoord[0][0], i, j];
+        tilesCoordCompletes.push(coord);
+      }
+    }
+
+    return tilesCoordCompletes;
   }
 
   private setImgAnomaliaCanvas(anomalia: Anomalia) {
-    const coords = this.getAnomaliaTiles(anomalia, this.getAnomaliaExtent(anomalia), 22);
+    const coords = this.getElemTiles(anomalia.featureCoords, this.getElemExtent(anomalia.featureCoords), 22);
 
-    const url = GLOBAL.GIS + `kyswupn4T2GXardoZorv_thermal/${coords[0][0]}/${coords[0][1]}/${coords[0][2]}.png`;
+    const canvas = new fabric.Canvas('canvas');
+    canvas.width = 500;
+    canvas.height = 500;
+    coords.forEach((coord, index) => {
+      const url = GLOBAL.GIS + `kyswupn4T2GXardoZorv_thermal/${coord[0]}/${coord[1]}/${coord[2]}.png`;
 
-    fabric.util.loadImage(
-      url,
-      (img) => {
-        if (img !== null) {
-          img = this.imageProcessService.transformPixels(img);
+      fabric.util.loadImage(
+        url,
+        (img, error) => {
+          if (img !== null) {
+            img = this.imageProcessService.transformPixels(img);
 
-          const canvas = new fabric.Canvas('canvas');
-          canvas.width = GLOBAL.resolucionCamara[1];
-          canvas.height = GLOBAL.resolucionCamara[0];
-          const image = new fabric.Image(img);
+            const image = new fabric.Image(img);
 
-          image.set({
-            left: 0,
-            top: 0,
-            angle: 0,
-            opacity: 1,
-            draggable: false,
-            lockMovementX: true,
-            lockMovementY: true,
-            scaleX: 1,
-            scaleY: 1,
-          });
+            image.set({
+              left: 2 * index,
+              top: 2 * index,
+              angle: 0,
+              opacity: 1,
+              draggable: false,
+              lockMovementX: true,
+              lockMovementY: true,
+              scaleX: 1,
+              scaleY: 1,
+            });
+            canvas.add(image);
 
-          canvas.add(image);
-          this.imageListBase64[`imgCanvas${this.getLocalId(anomalia)}`] = canvas.toDataURL(
-            'image/jpeg',
-            this.jpgQuality
-          );
-        }
+            if (index === coords.length - 1) {
+              this.imageListBase64[`imgCanvas${this.getLocalId(anomalia)}`] = canvas.toDataURL(
+                'image/jpeg',
+                this.jpgQuality
+              );
 
-        this.countLoadedImages++;
-      },
-      null,
-      { crossOrigin: 'anonymous' }
-    );
+              this.countLoadedImages++;
+            }
+          }
+          if (error) {
+            if (index === coords.length - 1) {
+              this.imageListBase64[`imgCanvas${this.getLocalId(anomalia)}`] = canvas.toDataURL(
+                'image/jpeg',
+                this.jpgQuality
+              );
+
+              this.countLoadedImages++;
+            }
+          }
+        },
+        null,
+        { crossOrigin: 'anonymous' }
+      );
+    });
   }
 
   private getLongLatFromZXY(tileCoord: TileCoord, tileGrid: TileGrid) {
@@ -993,13 +1032,20 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const x = tileCoord[1];
     const y = tileCoord[2];
     const tileGridOrigin = tileGrid.getOrigin(z);
-    const tileSizeAtResolution = (tileGrid.getTileSize(z) as number) * tileGrid.getResolution(z);
-    return [
-      tileGridOrigin[0] + tileSizeAtResolution * x,
-      tileGridOrigin[1] + tileSizeAtResolution * y,
+    const tileSizeAtResolution = Number(tileGrid.getTileSize(z)) * tileGrid.getResolution(z);
+
+    const bottomLeft = [tileGridOrigin[0] + tileSizeAtResolution * x, tileGridOrigin[1] - tileSizeAtResolution * y];
+    const topLeft = [tileGridOrigin[0] + tileSizeAtResolution * x, tileGridOrigin[1] - tileSizeAtResolution * (y + 1)];
+    const topRight = [
       tileGridOrigin[0] + tileSizeAtResolution * (x + 1),
-      tileGridOrigin[1] + tileSizeAtResolution * (y + 1),
+      tileGridOrigin[1] - tileSizeAtResolution * (y + 1),
     ];
+    const bottomRight = [
+      tileGridOrigin[0] + tileSizeAtResolution * (x + 1),
+      tileGridOrigin[1] - tileSizeAtResolution * y,
+    ];
+
+    return [bottomLeft, topLeft, topRight, bottomRight];
   }
 
   private setImgSeguidorCanvas(seguidor: Seguidor, vistaPrevia: boolean = false, folder?: string) {
@@ -2494,11 +2540,15 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         },
         '\n',
         {
+          image: `imgCanvas${anom.localId}`,
+          width: this.widthImageAnomalia,
+          alignment: 'center',
+        },
+        {
           columns: [
             { text: 'Tipo de anomalía', width: 200, style: 'anomInfoTitle' },
             { text: this.anomaliaInfoService.getTipoLabel(anom), style: 'anomInfoValue' },
           ],
-          margin: [0, 350, 0, 0],
         },
         {
           columns: [
@@ -2561,33 +2611,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             },
           ],
         },
-        // {
-        //   columns: [
-        //     { text: 'Emisividad', width: 200, style: 'anomInfoTitle' },
-        //     { text: `${this.informe.emisividad}`, style: 'anomInfoValue' },
-        //   ],
-        // },
-        // {
-        //   columns: [
-        //     { text: 'Temperatura Reflejada', width: 200, style: 'anomInfoTitle' },
-        //     { text: `${this.informe.tempReflejada} ºC`, style: 'anomInfoValue' },
-        //   ],
-        // },
-        // {
-        //   columns: [
-        //     { text: 'Temperatura aire', width: 200, style: 'anomInfoTitle' },
-        //     { text: `${this.informe.temperatura} ºC`, style: 'anomInfoValue' },
-        //   ],
-        // },
-        // {
-        //   columns: [
-        //     { text: 'Viento', width: 200, style: 'anomInfoTitle' },
-        //     {
-        //       text: `${this.informe.vientoVelocidad} (Beaufort) ${this.informe.vientoDireccion}º`,
-        //       style: 'anomInfoValue',
-        //     },
-        //   ],
-        // },
         {
           columns: [
             { text: 'Localización', width: 200, style: 'anomInfoTitle' },

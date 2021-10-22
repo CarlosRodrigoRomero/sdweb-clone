@@ -57,6 +57,9 @@ export class MapComponent implements OnInit, OnDestroy {
   public mousePosition;
   public informeIdList: string[] = [];
   public sharedReport = false;
+
+  public coordsPointer;
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -72,6 +75,8 @@ export class MapComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.mousePosition = null;
+
+    this.anomaliasControlService.coordsPointer$.subscribe((coords) => (this.coordsPointer = coords));
 
     // Para la demo, agregamos un extent a todas las capas:
     this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
