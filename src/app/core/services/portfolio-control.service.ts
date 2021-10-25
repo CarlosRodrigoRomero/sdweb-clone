@@ -61,7 +61,11 @@ export class PortfolioControlService {
 
               if (informesPlanta.length > 0) {
                 informesPlanta.forEach((informe) => {
-                  // comprobamos que el informe tiene "mae" y que esta "disponible"
+                  // comprobamos si el informe tiene "mae" y es reciente
+                  if (!informe.hasOwnProperty('mae') && informe.fecha > 1619820000) {
+                    informe.mae = 0;
+                  }
+                  // comprobamos si el "mae" es correcto y si está "disponible"
                   if (
                     informe.mae !== undefined &&
                     informe.mae !== Infinity &&
