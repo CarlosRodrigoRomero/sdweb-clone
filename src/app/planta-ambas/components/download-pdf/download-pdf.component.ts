@@ -107,6 +107,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private heightLogoOriginal: number;
   private heightLogoHeader: number;
   private imageListBase64 = {};
+  private tileResolution = 256;
 
   private apartadosInforme: Apartado[];
   private countCategoria;
@@ -507,7 +508,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.heightLogoHeader = 40;
     this.jpgQuality = 0.95;
     this.widthImageSeguidor = 450;
-    this.widthImageAnomalia = 350;
+    this.widthImageAnomalia = 300;
     this.hasUserArea = false;
 
     this.subscriptions.add(
@@ -975,10 +976,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const coords = this.getElemTiles(anomalia.featureCoords, this.getElemExtent(anomalia.featureCoords), 22);
 
     const canvas = new fabric.Canvas('canvas');
-    canvas.width = 500;
-    canvas.height = 500;
+    const lado = Math.sqrt(coords.length);
+    canvas.width = lado * this.tileResolution;
+    canvas.height = lado * this.tileResolution;
+    const width = canvas.width / lado;
+    const height = canvas.height / lado;
     coords.forEach((coord, index) => {
       const url = GLOBAL.GIS + `kyswupn4T2GXardoZorv_thermal/${coord[0]}/${coord[1]}/${coord[2]}.png`;
+
+      const left = (index % lado) * width;
+      const top = Math.trunc(index / lado) * height;
 
       fabric.util.loadImage(
         url,
@@ -989,8 +996,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             const image = new fabric.Image(img);
 
             image.set({
-              left: 2 * index,
-              top: 2 * index,
+              width,
+              height,
+              left,
+              top,
               angle: 0,
               opacity: 1,
               draggable: false,
@@ -2530,7 +2539,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     for (let i = 0; i < this.anomaliasInforme.length; i++) {
       const anom = this.anomaliasInforme[i];
-      // const table = this.getPaginaSeguidor(anom);
+
       const pagAnexo = [
         {
           text: `${this.translation.t('Anomalía')} ${i + 1}/${this.anomaliasInforme.length}`,
@@ -2549,6 +2558,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             { text: 'Tipo de anomalía', width: 200, style: 'anomInfoTitle' },
             { text: this.anomaliaInfoService.getTipoLabel(anom), style: 'anomInfoValue' },
           ],
+          margin: [0, 40, 0, 0],
         },
         {
           columns: [
