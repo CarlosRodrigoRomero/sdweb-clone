@@ -1,22 +1,30 @@
 import { Component, OnInit, ViewChild, ViewChildren, QueryList, HostListener } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PlantaService } from '@core/services/planta.service';
-import { PlantaInterface } from '@core/models/planta';
-import { LocationAreaInterface } from '@core/models/location';
-import { LatLngLiteral } from '@agm/core/map-types';
-import { Observable } from 'rxjs';
-import { AgmPolygon, AgmMap } from '@agm/core';
-import { ModuloInterface } from '@core/models/modulo';
+import { SelectionModel } from '@angular/cdk/collections';
+
+import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { SelectionModel } from '@angular/cdk/collections';
+
+import { take } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+
+import { LatLngLiteral } from '@agm/core/map-types';
+import { AgmPolygon, AgmMap } from '@agm/core';
+
+import { toLonLat } from 'ol/proj';
+
+import { GLOBAL } from '@core/services/global';
+import { AnomaliaService } from '../../../core/services/anomalia.service';
+import { PlantaService } from '@core/services/planta.service';
+import { InformeService } from '@core/services/informe.service';
+
 import { UserAreaInterface } from '@core/models/userArea';
 import { AreaInterface } from '@core/models/area';
-import { GLOBAL } from '@core/services/global';
-import { MatPaginator } from '@angular/material/paginator';
-import { AnomaliaService } from '../../../core/services/anomalia.service';
-import { toLonLat } from 'ol/proj';
-import { take } from 'rxjs/operators';
+import { PlantaInterface } from '@core/models/planta';
+import { LocationAreaInterface } from '@core/models/location';
+import { ModuloInterface } from '@core/models/modulo';
+
 declare const google: any;
 @Component({
   selector: 'app-auto-loc',
@@ -67,7 +75,8 @@ export class AutoLocComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private plantaService: PlantaService,
-    private anomaliaService: AnomaliaService
+    private anomaliaService: AnomaliaService,
+    private informeService: InformeService
   ) {}
 
   recalcularLocs2() {
@@ -187,19 +196,36 @@ export class AutoLocComponent implements OnInit {
   onMapReady(map) {
     this.map = map;
     this.initDrawingManager(map);
-    // Agregar ortofoto
-    if (this.planta.id === 'fdAyNQ0pGqVz1Yo7E1zF') {
-      // TODO: PROVISIONAL
-      this.plantaService.loadOrtoImage(this.planta, map);
-    } else if (this.planta.id === 'KTLBAxcTTe62ENcCgCxs') {
-      // TODO: PROVISIONAL
-      this.plantaService.loadOrtoImage(this.planta, map);
-    } else if (this.planta.id === 'omlzkFAmzLfqMiyKKNlS') {
-      // TODO: PROVISIONAL
-      this.plantaService.loadOrtoImage(this.planta, map);
-    } else {
-      this.plantaService.initMap(this.planta, map);
-    }
+
+    this.informeService
+      .getInformesDePlanta(this.plantaId)
+      .pipe(take(1))
+      .subscribe((informes) => {
+        const informeReciente = informes.pop();
+
+        if (informeReciente !== undefined) {
+          if (informeReciente.fecha > 1619820000) {
+            this.plantaService.loadOrtoImage(this.planta, informeReciente.id, map);
+          } else {
+            this.plantaService.initMap(this.planta, map);
+          }
+        } else {
+          this.plantaService.initMap(this.planta, map);
+        }
+      });
+    // // Agregar ortofoto
+    // if (this.planta.id === 'fdAyNQ0pGqVz1Yo7E1zF') {
+    //   // TODO: PROVISIONAL
+    //   this.plantaService.loadOrtoImage(this.planta, map);
+    // } else if (this.planta.id === 'KTLBAxcTTe62ENcCgCxs') {
+    //   // TODO: PROVISIONAL
+    //   this.plantaService.loadOrtoImage(this.planta, map);
+    // } else if (this.planta.id === 'omlzkFAmzLfqMiyKKNlS') {
+    //   // TODO: PROVISIONAL
+    //   this.plantaService.loadOrtoImage(this.planta, map);
+    // } else {
+    //   this.plantaService.initMap(this.planta, map);
+    // }
     // Overlay con imagen
     // this.initOverlay();
   }

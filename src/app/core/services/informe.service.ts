@@ -254,7 +254,6 @@ export class InformeService {
     elementoPlanta.setGlobals(globalCoords);
     elementoPlanta.setModulo(modulo);
 
-
     this.updateElementoPlanta(informeId, elementoPlanta);
   }
 
