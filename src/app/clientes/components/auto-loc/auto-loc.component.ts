@@ -213,21 +213,6 @@ export class AutoLocComponent implements OnInit {
           this.plantaService.initMap(this.planta, map);
         }
       });
-    // // Agregar ortofoto
-    // if (this.planta.id === 'fdAyNQ0pGqVz1Yo7E1zF') {
-    //   // TODO: PROVISIONAL
-    //   this.plantaService.loadOrtoImage(this.planta, map);
-    // } else if (this.planta.id === 'KTLBAxcTTe62ENcCgCxs') {
-    //   // TODO: PROVISIONAL
-    //   this.plantaService.loadOrtoImage(this.planta, map);
-    // } else if (this.planta.id === 'omlzkFAmzLfqMiyKKNlS') {
-    //   // TODO: PROVISIONAL
-    //   this.plantaService.loadOrtoImage(this.planta, map);
-    // } else {
-    //   this.plantaService.initMap(this.planta, map);
-    // }
-    // Overlay con imagen
-    // this.initOverlay();
   }
 
   private addPolygonToMap(area: AreaInterface, isNew = false) {
