@@ -212,6 +212,8 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
 
       const coords = this.getCoordsPolygon(evt);
 
+      coords.pop();
+
       const modGroup: ModuleGroup = {
         id,
         coords,
