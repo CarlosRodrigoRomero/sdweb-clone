@@ -121,7 +121,7 @@ export class DownloadReportService {
         }
 
         // filtramos las areas seleccionadas para los seguidores
-        const areasPequeñas = locAreaList.filter(
+        this.seguidores1Eje = locAreaList.filter(
           (locArea) =>
             locArea.globalCoords[indiceSeleccionado] !== null &&
             locArea.globalCoords[indiceSeleccionado] !== undefined &&

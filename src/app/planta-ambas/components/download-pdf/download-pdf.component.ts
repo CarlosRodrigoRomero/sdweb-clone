@@ -504,7 +504,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             if (this.planta.tipo === '1 eje') {
               this.apartadosInforme.push({
                 nombre: 'anexoSeguidores1Eje',
-                descripcion: 'Anexo III: Listado de seguidores',
+                descripcion: 'Anexo III: Anomalías térmicas por seguidor',
                 orden: 17,
                 elegible: true,
               });
@@ -584,6 +584,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(() => (this.downloadReportService.filteredPDF = undefined));
   }
 
+  private getPrefijoInforme() {
+    let prefijo = this.informe.prefijo;
+    if (prefijo !== undefined) {
+      prefijo = prefijo.concat('informe');
+    } else {
+      prefijo = 'informe';
+    }
+    return prefijo;
+  }
+
   public downloadPDF() {
     this.downloadReportService.generatingPDF = true;
 
@@ -600,8 +610,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
       this.countSegs1Eje = 0;
       if (this.planta.tipo === '1 eje') {
-        this.seguidores1eje.forEach((seg) => {
-          this.setImgSeguidor1EjeCanvas(seg);
+        this.seguidores1eje.forEach((seg, index) => {
+          this.setImgSeguidor1EjeCanvas(seg, index);
           this.countSegs1Eje++;
         });
 
@@ -612,30 +622,25 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           combineLatest([this.countLoadedImages$, this.countLoadedImagesSegs1Eje$]).subscribe(
             ([countLoadedImgs, countLoadedImgSegs1Eje]) => {
               this.downloadReportService.progressBarValue = Math.round(
-                ((countLoadedImgs + countLoadedImgSegs1Eje) / this.anomaliasInforme.length) * 100
+                ((countLoadedImgs + countLoadedImgSegs1Eje) /
+                  (this.anomaliasInforme.length + this.seguidores1eje.length)) *
+                  100
               );
 
               // Cuando se carguen todas las imágenes
               if (
-                countLoadedImgs + countLoadedImgSegs1Eje === this.countAnomalias + this.countLoadedImagesSegs1Eje &&
+                countLoadedImgs + countLoadedImgSegs1Eje === this.countAnomalias + this.seguidores1eje.length &&
                 downloads === 0
               ) {
                 this.calcularInforme();
 
-                let prefijo = this.informe.prefijo;
-                if (prefijo !== undefined) {
-                  prefijo = prefijo.concat('informe');
-                } else {
-                  prefijo = 'informe';
-                }
+                pdfMake
+                  .createPdf(this.getDocDefinition(this.imageListBase64))
+                  .download(this.getPrefijoInforme(), () => {
+                    this.downloadReportService.progressBarValue = 0;
 
-                // CONTINUAR AQUI
-
-                pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(prefijo, () => {
-                  this.downloadReportService.progressBarValue = 0;
-
-                  this.downloadReportService.generatingPDF = false;
-                });
+                    this.downloadReportService.generatingPDF = false;
+                  });
                 this.downloadReportService.endingPDF = true;
 
                 downloads++;
@@ -657,13 +662,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             if (countLoadedImgs === this.countAnomalias && downloads === 0) {
               this.calcularInforme();
 
-              pdfMake
-                .createPdf(this.getDocDefinition(this.imageListBase64))
-                .download(this.informe.prefijo.concat('informe'), () => {
-                  this.downloadReportService.progressBarValue = 0;
+              pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
+                this.downloadReportService.progressBarValue = 0;
 
-                  this.downloadReportService.generatingPDF = false;
-                });
+                this.downloadReportService.generatingPDF = false;
+              });
               this.downloadReportService.endingPDF = true;
 
               downloads++;
@@ -692,13 +695,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           if (countLoadedImgs === this.countSeguidores && downloads === 0) {
             this.calcularInforme();
 
-            pdfMake
-              .createPdf(this.getDocDefinition(this.imageListBase64))
-              .download(this.informe.prefijo.concat('informe'), () => {
-                this.downloadReportService.progressBarValue = 0;
+            pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
+              this.downloadReportService.progressBarValue = 0;
 
-                this.downloadReportService.generatingPDF = false;
-              });
+              this.downloadReportService.generatingPDF = false;
+            });
             this.downloadReportService.endingPDF = true;
 
             downloads++;
@@ -795,7 +796,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     }
     if (this.filtroApartados.includes('anexoSeguidores1Eje')) {
       anexoSeguidores1Eje = this.getAnexoSegs1Eje(numAnexo);
-      numAnexo = 'IV';
     }
     if (this.filtroApartados.includes('anexoSeguidores')) {
       anexoSeguidores = this.getAnexoSeguidores(numAnexo);
@@ -804,6 +804,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     if (this.filtroApartados.includes('anexoSegsNoAnoms')) {
       anexoSegsNoAnoms = this.getAnexoSeguidoresSinAnomalias(numAnexo);
     }
+
+    console.log(images);
 
     return {
       header: (currentPage, pageCount) => {
@@ -825,7 +827,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         }
       },
 
-      content: pages.concat(anexo1).concat(anexoAnomalias).concat(anexoSeguidores).concat(anexoSegsNoAnoms),
+      content: pages
+        .concat(anexo1)
+        .concat(anexoAnomalias)
+        .concat(anexoSeguidores1Eje)
+        .concat(anexoSeguidores)
+        .concat(anexoSegsNoAnoms),
 
       images,
 
@@ -1101,7 +1108,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     });
   }
 
-  private setImgSeguidor1EjeCanvas(seg: LocationAreaInterface) {
+  private setImgSeguidor1EjeCanvas(seg: LocationAreaInterface, count: number) {
     const coords = this.pathToCoordinate(seg.path);
     const tileCoords = this.getElemTiles(coords, this.getElemExtent(coords), 22);
 
@@ -1141,14 +1148,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             canvas.add(image);
 
             if (index === tileCoords.length - 1) {
-              this.imageListBase64[`imgCanvas${index}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              this.imageListBase64[`imgCanvas${count}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
 
               this.countLoadedImagesSegs1Eje++;
             }
           }
           if (error) {
             if (index === tileCoords.length - 1) {
-              this.imageListBase64[`imgCanvas${index}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              this.imageListBase64[`imgCanvas${count}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
 
               this.countLoadedImagesSegs1Eje++;
             }
