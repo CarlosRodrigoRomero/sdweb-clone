@@ -1083,20 +1083,20 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             canvas.add(image);
 
             if (index === coords.length - 1) {
-              this.imageListBase64[`imgCanvas${this.getLocalId(anomalia)}`] = canvas.toDataURL(
-                'image/jpeg',
-                this.jpgQuality
-              );
+              this.imageListBase64[`imgCanvas${this.getLocalId(anomalia)}`] = canvas.toDataURL({
+                format: 'png',
+                // quality: this.jpgQuality,
+              });
 
               this.countLoadedImages++;
             }
           }
           if (error) {
             if (index === coords.length - 1) {
-              this.imageListBase64[`imgCanvas${this.getLocalId(anomalia)}`] = canvas.toDataURL(
-                'image/jpeg',
-                this.jpgQuality
-              );
+              this.imageListBase64[`imgCanvas${this.getLocalId(anomalia)}`] = canvas.toDataURL({
+                format: 'png',
+                // quality: this.jpgQuality,
+              });
 
               this.countLoadedImages++;
             }
@@ -1148,14 +1148,20 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             canvas.add(image);
 
             if (index === tileCoords.length - 1) {
-              this.imageListBase64[`imgCanvas${count}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              this.imageListBase64[`imgCanvas${count}`] = canvas.toDataURL({
+                format: 'png',
+                // quality: this.jpgQuality,
+              });
 
               this.countLoadedImagesSegs1Eje++;
             }
           }
           if (error) {
             if (index === tileCoords.length - 1) {
-              this.imageListBase64[`imgCanvas${count}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              this.imageListBase64[`imgCanvas${count}`] = canvas.toDataURL({
+                format: 'png',
+                // quality: this.jpgQuality,
+              });
 
               this.countLoadedImagesSegs1Eje++;
             }
@@ -2779,7 +2785,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     // tslint:disable-next-line:max-line-length
     const pag1Anexo = {
       text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
-        'Listado de seguidores'
+        'Anomalías por seguidor'
       )}`,
       style: 'h1',
       alignment: 'center',
@@ -2793,7 +2799,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
       const pagAnexo = [
         {
-          text: `${this.translation.t('Anomalía')} ${i + 1}/${this.anomaliasInforme.length}`,
+          text: `${this.translation.t('Seguidor')} ${seg.globalCoords.toString()}`,
           style: 'h2',
           alignment: 'center',
           pageBreak: 'before',
