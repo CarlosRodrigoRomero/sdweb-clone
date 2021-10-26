@@ -1,9 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Anomalia } from '@core/models/anomalia';
+
+import { BehaviorSubject } from 'rxjs';
+import { take } from 'rxjs/operators';
+
+import { PlantaService } from '@core/services/planta.service';
 
 import { FilterableElement } from '@core/models/filterableInterface';
 import { PlantaInterface } from '@core/models/planta';
-import { BehaviorSubject } from 'rxjs';
+import { Anomalia } from '@core/models/anomalia';
+import { LocationAreaInterface } from '@core/models/location';
 
 @Injectable({
   providedIn: 'root',
@@ -17,8 +22,10 @@ export class DownloadReportService {
   progressBarValue$ = new BehaviorSubject<number>(this._progressBarValue);
   private _filteredPDF: boolean = undefined;
   filteredPDF$ = new BehaviorSubject<boolean>(this._filteredPDF);
+  private _seguidores1Eje: LocationAreaInterface[] = [];
+  seguidores1Eje$ = new BehaviorSubject<LocationAreaInterface[]>(this._seguidores1Eje);
 
-  constructor() {}
+  constructor(private plantaService: PlantaService) {}
 
   sortByPosition(a: FilterableElement, b: FilterableElement): number {
     if (this.sortByGlobalCoords(a, b) !== 0) {
@@ -88,6 +95,41 @@ export class DownloadReportService {
     }
   }
 
+  getSeguidores1Eje(plantaId: string) {
+    this.plantaService
+      .getLocationsArea(plantaId)
+      .pipe(take(1))
+      .subscribe((locAreaList) => {
+        // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
+        const coordsLength = locAreaList[0].globalCoords.length;
+
+        let indiceSeleccionado;
+
+        for (let index = coordsLength - 1; index >= 0; index--) {
+          const notNullLocAreas = locAreaList.filter(
+            (locArea) =>
+              locArea.globalCoords[index] !== undefined &&
+              locArea.globalCoords[index] !== null &&
+              locArea.globalCoords[index] !== ''
+          );
+
+          if (notNullLocAreas.length > 0) {
+            indiceSeleccionado = index;
+
+            break;
+          }
+        }
+
+        // filtramos las areas seleccionadas para los seguidores
+        const areasPequeñas = locAreaList.filter(
+          (locArea) =>
+            locArea.globalCoords[indiceSeleccionado] !== null &&
+            locArea.globalCoords[indiceSeleccionado] !== undefined &&
+            locArea.globalCoords[indiceSeleccionado] !== ''
+        );
+      });
+  }
+
   //////////////////////////////////////////////////////
 
   get generatingPDF() {
@@ -124,5 +166,14 @@ export class DownloadReportService {
   set filteredPDF(value: boolean) {
     this._filteredPDF = value;
     this.filteredPDF$.next(value);
+  }
+
+  get seguidores1Eje() {
+    return this._seguidores1Eje;
+  }
+
+  set seguidores1Eje(value: LocationAreaInterface[]) {
+    this._seguidores1Eje = value;
+    this.seguidores1Eje$.next(value);
   }
 }

@@ -41,6 +41,9 @@ import TileGrid from 'ol/tilegrid/TileGrid';
 import { Extent } from 'ol/extent';
 import { Coordinate } from 'ol/coordinate';
 import { fromLonLat } from 'ol/proj';
+import { AreaInterface } from '@core/models/area';
+import { LocationAreaInterface } from '@core/models/location';
+import { LatLngLiteral } from '@agm/core';
 
 export interface Apartado {
   nombre: string;
@@ -68,9 +71,12 @@ export interface AnomsTable {
 export class DownloadPdfComponent implements OnInit, OnDestroy {
   private _countLoadedImages = 0;
   countLoadedImages$ = new BehaviorSubject<number>(this._countLoadedImages);
+  private _countLoadedImagesSegs1Eje = 0;
+  countLoadedImagesSegs1Eje$ = new BehaviorSubject<number>(this._countLoadedImagesSegs1Eje);
   private _loadedImages = undefined;
   loadedImages$ = new BehaviorSubject<string>(this._loadedImages);
   private countAnomalias: number;
+  private countSegs1Eje: number;
   private countSeguidores: number;
   private _seguidoresInforme: Seguidor[] = [];
   seguidoresInforme$ = new BehaviorSubject<Seguidor[]>(this._seguidoresInforme);
@@ -132,6 +138,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private hasUserArea: boolean;
   seguidoresLoaded = false;
   private map: Map;
+  private seguidores1eje: LocationAreaInterface[] = [];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -161,12 +168,20 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
     this.subscriptions.add(
+      this.downloadReportService.seguidores1Eje$.subscribe((segs) => (this.seguidores1eje = segs))
+    );
+
+    this.subscriptions.add(
       this.plantaService
         .getPlanta(this.reportControlService.plantaId)
         .pipe(
           take(1),
           switchMap((planta) => {
             this.planta = planta;
+
+            if (this.planta.tipo === '1 eje') {
+              this.downloadReportService.getSeguidores1Eje(this.planta.id);
+            }
 
             this.plantaService.planta = planta;
 
@@ -485,6 +500,15 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               orden: 16,
               elegible: true,
             });
+
+            if (this.planta.tipo === '1 eje') {
+              this.apartadosInforme.push({
+                nombre: 'anexoSeguidores1Eje',
+                descripcion: 'Anexo III: Listado de seguidores',
+                orden: 17,
+                elegible: true,
+              });
+            }
           }
 
           this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
@@ -564,6 +588,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.downloadReportService.generatingPDF = true;
 
     this.countLoadedImages = 0;
+    this.countLoadedImagesSegs1Eje = 0;
 
     if (this.reportControlService.plantaFija) {
       // Generar imagenes
@@ -573,44 +598,79 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         this.countAnomalias++;
       }
 
-      // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-      let downloads = 0;
+      this.countSegs1Eje = 0;
+      if (this.planta.tipo === '1 eje') {
+        this.seguidores1eje.forEach((seg) => {
+          this.setImgSeguidor1EjeCanvas(seg);
+          this.countSegs1Eje++;
+        });
 
-      this.subscriptions.add(
-        this.countLoadedImages$.subscribe((countLoadedImgs) => {
-          this.downloadReportService.progressBarValue = Math.round(
-            (countLoadedImgs / this.anomaliasInforme.length) * 100
-          );
+        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+        let downloads = 0;
 
-          // Cuando se carguen todas las imágenes
-          if (countLoadedImgs === this.countAnomalias && downloads === 0) {
-            this.calcularInforme();
+        this.subscriptions.add(
+          combineLatest([this.countLoadedImages$, this.countLoadedImagesSegs1Eje$]).subscribe(
+            ([countLoadedImgs, countLoadedImgSegs1Eje]) => {
+              this.downloadReportService.progressBarValue = Math.round(
+                ((countLoadedImgs + countLoadedImgSegs1Eje) / this.anomaliasInforme.length) * 100
+              );
 
-            pdfMake
-              .createPdf(this.getDocDefinition(this.imageListBase64))
-              .download(this.informe.prefijo.concat('informe'), () => {
-                this.downloadReportService.progressBarValue = 0;
+              // Cuando se carguen todas las imágenes
+              if (
+                countLoadedImgs + countLoadedImgSegs1Eje === this.countAnomalias + this.countLoadedImagesSegs1Eje &&
+                downloads === 0
+              ) {
+                this.calcularInforme();
 
-                this.downloadReportService.generatingPDF = false;
-              });
-            this.downloadReportService.endingPDF = true;
+                let prefijo = this.informe.prefijo;
+                if (prefijo !== undefined) {
+                  prefijo = prefijo.concat('informe');
+                } else {
+                  prefijo = 'informe';
+                }
 
-            downloads++;
-          }
-        })
-      );
+                // CONTINUAR AQUI
 
-      // this.calcularInforme();
+                pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(prefijo, () => {
+                  this.downloadReportService.progressBarValue = 0;
 
-      // let prefijo = 'informe';
-      // if (this.informe.hasOwnProperty('prefijo')) {
-      //   prefijo = this.informe.prefijo.concat('informe');
-      // }
+                  this.downloadReportService.generatingPDF = false;
+                });
+                this.downloadReportService.endingPDF = true;
 
-      // pdfMake.createPdf(this.getDocDefinition()).download(prefijo, () => {
-      //   this.downloadReportService.generatingPDF = false;
-      // });
-      // this.downloadReportService.endingPDF = true;
+                downloads++;
+              }
+            }
+          )
+        );
+      } else {
+        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+        let downloads = 0;
+
+        this.subscriptions.add(
+          this.countLoadedImages$.subscribe((countLoadedImgs) => {
+            this.downloadReportService.progressBarValue = Math.round(
+              (countLoadedImgs / this.anomaliasInforme.length) * 100
+            );
+
+            // Cuando se carguen todas las imágenes
+            if (countLoadedImgs === this.countAnomalias && downloads === 0) {
+              this.calcularInforme();
+
+              pdfMake
+                .createPdf(this.getDocDefinition(this.imageListBase64))
+                .download(this.informe.prefijo.concat('informe'), () => {
+                  this.downloadReportService.progressBarValue = 0;
+
+                  this.downloadReportService.generatingPDF = false;
+                });
+              this.downloadReportService.endingPDF = true;
+
+              downloads++;
+            }
+          })
+        );
+      }
     } else {
       // Generar imagenes
       this.countSeguidores = 0;
@@ -722,6 +782,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     let anexoAnomalias = [];
     let anexoSeguidores = [];
     let anexoSegsNoAnoms = [];
+    let anexoSeguidores1Eje = [];
     let numAnexo = 'I';
 
     if (this.filtroApartados.includes('anexo1')) {
@@ -731,6 +792,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     if (this.filtroApartados.includes('anexoAnomalias')) {
       anexoAnomalias = this.getAnexoAnomalias(numAnexo);
       numAnexo = 'III';
+    }
+    if (this.filtroApartados.includes('anexoSeguidores1Eje')) {
+      anexoSeguidores1Eje = this.getAnexoSegs1Eje(numAnexo);
+      numAnexo = 'IV';
     }
     if (this.filtroApartados.includes('anexoSeguidores')) {
       anexoSeguidores = this.getAnexoSeguidores(numAnexo);
@@ -1034,6 +1099,74 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         { crossOrigin: 'anonymous' }
       );
     });
+  }
+
+  private setImgSeguidor1EjeCanvas(seg: LocationAreaInterface) {
+    const coords = this.pathToCoordinate(seg.path);
+    const tileCoords = this.getElemTiles(coords, this.getElemExtent(coords), 22);
+
+    const canvas = new fabric.Canvas('canvas');
+    const lado = Math.sqrt(tileCoords.length);
+    canvas.width = lado * this.tileResolution;
+    canvas.height = lado * this.tileResolution;
+    const width = canvas.width / lado;
+    const height = canvas.height / lado;
+    tileCoords.forEach((coord, index) => {
+      const url = GLOBAL.GIS + `kyswupn4T2GXardoZorv_thermal/${coord[0]}/${coord[1]}/${coord[2]}.png`;
+
+      const left = (index % lado) * width;
+      const top = Math.trunc(index / lado) * height;
+
+      fabric.util.loadImage(
+        url,
+        (img, error) => {
+          if (img !== null) {
+            img = this.imageProcessService.transformPixels(img);
+
+            const image = new fabric.Image(img);
+
+            image.set({
+              width,
+              height,
+              left,
+              top,
+              angle: 0,
+              opacity: 1,
+              draggable: false,
+              lockMovementX: true,
+              lockMovementY: true,
+              scaleX: 1,
+              scaleY: 1,
+            });
+            canvas.add(image);
+
+            if (index === tileCoords.length - 1) {
+              this.imageListBase64[`imgCanvas${index}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+
+              this.countLoadedImagesSegs1Eje++;
+            }
+          }
+          if (error) {
+            if (index === tileCoords.length - 1) {
+              this.imageListBase64[`imgCanvas${index}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+
+              this.countLoadedImagesSegs1Eje++;
+            }
+          }
+        },
+        null,
+        { crossOrigin: 'anonymous' }
+      );
+    });
+  }
+
+  private pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {
+    const coordenadas: Coordinate[] = [];
+    path.forEach((coord) => {
+      const coordenada: Coordinate = fromLonLat([coord.lng, coord.lat]);
+      coordenadas.push(coordenada);
+    });
+    return coordenadas;
   }
 
   private getLongLatFromZXY(tileCoord: TileCoord, tileGrid: TileGrid) {
@@ -2634,6 +2767,117 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     return allPagsAnexo;
   }
 
+  private getAnexoSegs1Eje(numAnexo: string) {
+    const allPagsAnexo = [];
+    // tslint:disable-next-line:max-line-length
+    const pag1Anexo = {
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
+        'Listado de seguidores'
+      )}`,
+      style: 'h1',
+      alignment: 'center',
+      pageBreak: 'before',
+    };
+
+    allPagsAnexo.push(pag1Anexo);
+
+    for (let i = 0; i < this.seguidores1eje.length; i++) {
+      const seg = this.seguidores1eje[i];
+
+      const pagAnexo = [
+        {
+          text: `${this.translation.t('Anomalía')} ${i + 1}/${this.anomaliasInforme.length}`,
+          style: 'h2',
+          alignment: 'center',
+          pageBreak: 'before',
+        },
+        '\n',
+        {
+          image: `imgCanvas${i}`,
+          width: this.widthImageAnomalia,
+          alignment: 'center',
+        },
+        // {
+        //   columns: [
+        //     { text: 'Tipo de anomalía', width: 200, style: 'anomInfoTitle' },
+        //     { text: this.anomaliaInfoService.getTipoLabel(seg), style: 'anomInfoValue' },
+        //   ],
+        //   margin: [0, 40, 0, 0],
+        // },
+        // {
+        //   columns: [
+        //     { text: 'Causa', width: 200, style: 'anomInfoTitle' },
+        //     { text: this.anomaliaInfoService.getCausa(seg), style: 'anomInfoValue', margin: [0, 0, 0, 5] },
+        //   ],
+        // },
+        // {
+        //   columns: [
+        //     { text: 'Recomendación', width: 200, style: 'anomInfoTitle' },
+        //     { text: this.anomaliaInfoService.getRecomendacion(seg), style: 'anomInfoValue', margin: [0, 0, 0, 5] },
+        //   ],
+        // },
+        // {
+        //   columns: [
+        //     { text: 'Módulo', width: 200, style: 'anomInfoTitle' },
+        //     { text: this.anomaliaInfoService.getModuloLabel(seg), style: 'anomInfoValue' },
+        //   ],
+        // },
+        // {
+        //   columns: [
+        //     {
+        //       text: `Criticidad (Criterio ${this.anomaliaService.criterioCriticidad.nombre})`,
+        //       width: 200,
+        //       style: 'anomInfoTitle',
+        //     },
+        //     { text: this.anomaliaInfoService.getCriticidadLabel(seg), style: 'anomInfoValue' },
+        //   ],
+        // },
+        // {
+        //   columns: [
+        //     { text: 'Clase', width: 200, style: 'anomInfoTitle' },
+        //     { text: this.anomaliaInfoService.getClaseLabel(seg), style: 'anomInfoValue' },
+        //   ],
+        // },
+        // {
+        //   columns: [
+        //     { text: 'Pérdidas (beta)', width: 200, style: 'anomInfoTitle' },
+        //     { text: this.anomaliaInfoService.getPerdidasLabel(seg), style: 'anomInfoValue' },
+        //   ],
+        // },
+        // {
+        //   columns: [
+        //     { text: 'Temperatura Máxima', width: 200, style: 'anomInfoTitle' },
+        //     { text: this.anomaliaInfoService.getTempMaxLabel(seg), style: 'anomInfoValue' },
+        //   ],
+        // },
+        // {
+        //   columns: [
+        //     { text: 'Gradiente Temp. Normalizado', width: 200, style: 'anomInfoTitle' },
+        //     { text: this.anomaliaInfoService.getGradNormLabel(seg), style: 'anomInfoValue' },
+        //   ],
+        // },
+        // {
+        //   columns: [
+        //     { text: 'Fecha y hora captura', width: 200, style: 'anomInfoTitle' },
+        //     {
+        //       text: this.anomaliaInfoService.getFechaHoraLabel(seg),
+        //       style: 'anomInfoValue',
+        //     },
+        //   ],
+        // },
+        // {
+        //   columns: [
+        //     { text: 'Localización', width: 200, style: 'anomInfoTitle' },
+        //     { text: this.anomaliaInfoService.getLocalizacionCompleteLabel(seg, this.planta), style: 'anomInfoValue' },
+        //   ],
+        // },
+      ];
+      allPagsAnexo.push(pagAnexo);
+    }
+
+    return allPagsAnexo;
+  }
+
   private getAnexoSeguidores(numAnexo: string) {
     const allPagsAnexo = [];
     // tslint:disable-next-line:max-line-length
@@ -3219,6 +3463,15 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   set countLoadedImages(value: number) {
     this._countLoadedImages = value;
     this.countLoadedImages$.next(value);
+  }
+
+  get countLoadedImagesSegs1Eje() {
+    return this._countLoadedImagesSegs1Eje;
+  }
+
+  set countLoadedImagesSegs1Eje(value: number) {
+    this._countLoadedImagesSegs1Eje = value;
+    this.countLoadedImagesSegs1Eje$.next(value);
   }
 
   get columnasAnomalia() {
