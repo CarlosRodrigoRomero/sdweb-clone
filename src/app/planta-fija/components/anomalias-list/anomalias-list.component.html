@@ -40,7 +40,8 @@
         class="table-row"
         (mouseover)="hoverAnomalia(row)"
         (mouseleave)="unhoverAnomalia(row)"
-        (click)="selectAnomalia(row)"
+        (click)="selectAnomalia(row, false)"
+        (dblclick)="selectAnomalia(row, true)"
         mat-row
         [ngClass]="{ selected: row.anomalia === anomaliaSelect, hovered: row.anomalia === anomaliaHover }"
         *matRowDef="let row; columns: displayedColumns"
