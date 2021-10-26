@@ -97,7 +97,11 @@ export class FilterService {
     // comprobamos primero si hay filtros activos
     if (this.filters.length === 0) {
       // desaplicamos filtros si los hubiese
-      this.unapplyFilters();
+      if (this.plantaSeguidores) {
+        this.unaplySegsFilters();
+      } else {
+        this.unapplyFilters();
+      }
     } else {
       if (this.plantaSeguidores) {
         // si todos los filtros son tipo noAnomsSeg le mandamos todos los elems y sino calculamos su interseccion con otros filtros
@@ -205,6 +209,15 @@ export class FilterService {
   }
 
   private unapplyFilters() {
+    this.filteredElements = this.allFiltrableElements;
+  }
+
+  private unaplySegsFilters() {
+    this.allFiltrableElements.forEach((seg) => {
+      const seguidor = seg as Seguidor;
+      seguidor.anomaliasCliente = seguidor.anomalias.filter((anom) => anom.tipo != 0 && anom.criticidad !== null);
+    });
+
     this.filteredElements = this.allFiltrableElements;
   }
 
