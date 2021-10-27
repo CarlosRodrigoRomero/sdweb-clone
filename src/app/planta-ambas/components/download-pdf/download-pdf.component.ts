@@ -1045,7 +1045,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   private setImgAnomaliaCanvas(anomalia: Anomalia) {
-    const coords = this.getElemTiles(anomalia.featureCoords, this.getElemExtent(anomalia.featureCoords), 22);
+    const coords = this.getElemTiles(anomalia.featureCoords, this.getElemExtent(anomalia.featureCoords), 20);
 
     const canvas = new fabric.Canvas('canvas');
     const lado = Math.sqrt(coords.length);
@@ -1054,7 +1054,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const width = canvas.width / lado;
     const height = canvas.height / lado;
     coords.forEach((coord, index) => {
-      const url = GLOBAL.GIS + `kyswupn4T2GXardoZorv_thermal/${coord[0]}/${coord[1]}/${coord[2]}.png`;
+      const url = GLOBAL.GIS + `${this.informe.id}_thermal/${coord[0]}/${coord[1]}/${coord[2]}.png`;
 
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;
@@ -1110,7 +1110,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   private setImgSeguidor1EjeCanvas(seg: LocationAreaInterface, count: number) {
     const coords = this.pathToCoordinate(seg.path);
-    const tileCoords = this.getElemTiles(coords, this.getElemExtent(coords), 22);
+    const tileCoords = this.getElemTiles(coords, this.getElemExtent(coords), 20);
 
     const canvas = new fabric.Canvas('canvas');
     const lado = Math.sqrt(tileCoords.length);
@@ -1119,7 +1119,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const width = canvas.width / lado;
     const height = canvas.height / lado;
     tileCoords.forEach((coord, index) => {
-      const url = GLOBAL.GIS + `kyswupn4T2GXardoZorv_thermal/${coord[0]}/${coord[1]}/${coord[2]}.png`;
+      const url = GLOBAL.GIS + `${this.informe.id}_thermal/${coord[0]}/${coord[1]}/${coord[2]}.png`;
 
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;
