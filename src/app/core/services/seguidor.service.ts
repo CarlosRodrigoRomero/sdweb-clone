@@ -196,12 +196,7 @@ export class SeguidorService {
         // obtenemos las globalCoords completas de cada seguidor si hay areas mayores
         if (locAreaNoSeguidores.length > 0) {
           this.locAreaSeguidores.forEach((locArea) => {
-            if (locArea.completeGlobalCoords === undefined) {
-              locArea.globalCoords = this.getCompleteGlobalCoords(locAreaNoSeguidores, locArea);
-
-              // almacenamos las globalsCoords completas en la DB
-              this.plantaService.updateLocationAreaField(locArea, 'completeGlobalCoords', locArea.globalCoords);
-            }
+            locArea.globalCoords = this.getCompleteGlobalCoords(locAreaNoSeguidores, locArea);
           });
         }
       });

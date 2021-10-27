@@ -207,11 +207,6 @@ export class PlantaService {
           const data = a.payload.doc.data() as LocationAreaInterface;
           data.id = a.payload.doc.id;
 
-          // si ya tienes las globals completas se las asignamos
-          if (data.completeGlobalCoords !== undefined) {
-            data.globalCoords = data.completeGlobalCoords;
-          }
-
           // generamos las globalCoords en caso de que no tenga
           if (data.globalCoords === undefined) {
             data.globalCoords = [data.globalX, data.globalY];
