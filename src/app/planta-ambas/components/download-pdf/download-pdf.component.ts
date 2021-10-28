@@ -10,6 +10,14 @@ import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
 import Map from 'ol/Map';
+import { TileCoord } from 'ol/tilecoord';
+import TileGrid from 'ol/tilegrid/TileGrid';
+import { Extent } from 'ol/extent';
+import { Coordinate } from 'ol/coordinate';
+import { fromLonLat } from 'ol/proj';
+import TileLayer from 'ol/layer/Tile';
+import { LocationAreaInterface } from '@core/models/location';
+import { LatLngLiteral } from '@agm/core';
 
 import pdfMake from 'pdfmake/build/pdfmake.js';
 
@@ -29,22 +37,13 @@ import { ImageProcessService } from '../../services/image-process.service';
 import { AnomaliaInfoService } from '@core/services/anomalia-info.service';
 
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
+import { Translation } from 'src/app/informe-export/components/export/translations';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
-import { Translation } from 'src/app/informe-export/components/export/translations';
 import { PcInterface } from '@core/models/pc';
-import { TileCoord } from 'ol/tilecoord';
-import TileGrid from 'ol/tilegrid/TileGrid';
-import { Extent } from 'ol/extent';
-import { Coordinate } from 'ol/coordinate';
-import { fromLonLat } from 'ol/proj';
-import { AreaInterface } from '@core/models/area';
-import { LocationAreaInterface } from '@core/models/location';
-import { LatLngLiteral } from '@agm/core';
-import TileLayer from 'ol/layer/Tile';
 
 export interface Apartado {
   nombre: string;
@@ -807,8 +806,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       anexoSegsNoAnoms = this.getAnexoSeguidoresSinAnomalias(numAnexo);
     }
 
-    console.log(images);
-
     return {
       header: (currentPage, pageCount) => {
         if (currentPage > 1) {
@@ -1117,9 +1114,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   private getCoordsPolygonCanvas(coordsOrigen: number[][], coordsFin: number[][], anomalia: Anomalia, lado: number) {
     const topLeft = coordsOrigen[1];
-    console.log(topLeft);
     const bottomRight = coordsFin[3];
-    console.log(bottomRight);
     const anomTopLeft = anomalia.featureCoords[0];
     const anomBottomRight = anomalia.featureCoords[2];
     const polygonLeft = ((anomTopLeft[0] - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
@@ -1215,15 +1210,15 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const tileGridOrigin = tileGrid.getOrigin(z);
     const tileSizeAtResolution = Number(tileGrid.getTileSize(z)) * tileGrid.getResolution(z);
 
-    const bottomLeft = [tileGridOrigin[0] + tileSizeAtResolution * x, tileGridOrigin[1] - tileSizeAtResolution * y];
-    const topLeft = [tileGridOrigin[0] + tileSizeAtResolution * x, tileGridOrigin[1] - tileSizeAtResolution * (y + 1)];
-    const topRight = [
-      tileGridOrigin[0] + tileSizeAtResolution * (x + 1),
+    const bottomLeft = [
+      tileGridOrigin[0] + tileSizeAtResolution * x,
       tileGridOrigin[1] - tileSizeAtResolution * (y + 1),
     ];
+    const topLeft = [tileGridOrigin[0] + tileSizeAtResolution * x, tileGridOrigin[1] - tileSizeAtResolution * y];
+    const topRight = [tileGridOrigin[0] + tileSizeAtResolution * (x + 1), tileGridOrigin[1] - tileSizeAtResolution * y];
     const bottomRight = [
       tileGridOrigin[0] + tileSizeAtResolution * (x + 1),
-      tileGridOrigin[1] - tileSizeAtResolution * y,
+      tileGridOrigin[1] - tileSizeAtResolution * (y + 1),
     ];
 
     return [bottomLeft, topLeft, topRight, bottomRight];
