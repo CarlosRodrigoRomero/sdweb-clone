@@ -1060,13 +1060,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
       fabric.util.loadImage(
         url,
-        (img, error) => {
+        (img) => {
           if (img !== null) {
-            img = this.imageProcessService.transformPixels(img);
+            const processImg = this.imageProcessService.transformPixels(img);
 
-            const image = new fabric.Image(img);
-
-            image.set({
+            const image = new fabric.Image(processImg, {
               width,
               height,
               left,
@@ -1079,6 +1077,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               scaleX: 1,
               scaleY: 1,
             });
+
             canvas.add(image);
 
             if (index === coords.length - 1) {
@@ -1087,19 +1086,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               const longLatFin = this.getLongLatFromXYZ(coords[coords.length - 1], tileGrid);
               const coordsPolygonCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, anomalia, lado);
               this.drawImgAnomalia(anomalia, canvas, coordsPolygonCanvas);
-              this.imageListBase64[`imgCanvas${this.getLocalId(anomalia)}`] = canvas.toDataURL({
+              this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
                 format: 'png',
-                // quality: this.jpgQuality,
               });
 
               this.countLoadedImages++;
             }
-          }
-          if (error) {
+          } else {
             if (index === coords.length - 1) {
-              this.imageListBase64[`imgCanvas${this.getLocalId(anomalia)}`] = canvas.toDataURL({
+              this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
                 format: 'png',
-                // quality: this.jpgQuality,
               });
 
               this.countLoadedImages++;
@@ -2753,7 +2749,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         },
         '\n',
         {
-          image: `imgCanvas${anom.localId}`,
+          image: `imgCanvas${anom.id}`,
           width: this.widthImageAnomalia,
           alignment: 'center',
         },
