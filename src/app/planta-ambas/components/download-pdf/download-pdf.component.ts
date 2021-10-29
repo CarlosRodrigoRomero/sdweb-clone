@@ -1044,16 +1044,17 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   private setImgAnomaliaCanvas(anomalia: Anomalia) {
-    const coords = this.getElemTiles(anomalia.featureCoords, this.getElemExtent(anomalia.featureCoords), 22);
+    const tileCoords = this.getElemTiles(anomalia.featureCoords, this.getElemExtent(anomalia.featureCoords), 22);
 
     const canvas = new fabric.Canvas('canvas');
-    const lado = Math.sqrt(coords.length);
+    const lado = Math.sqrt(tileCoords.length);
     canvas.width = lado * this.tileResolution;
     canvas.height = lado * this.tileResolution;
     const width = canvas.width / lado;
     const height = canvas.height / lado;
-    coords.forEach((coord, index) => {
-      const url = GLOBAL.GIS + `${this.informe.id}_thermal/${coord[0]}/${coord[1]}/${coord[2]}.png`;
+    let contador = 0;
+    tileCoords.forEach((tileCoord, index) => {
+      const url = GLOBAL.GIS + `${this.informe.id}_thermal/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
 
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;
@@ -1080,10 +1081,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
             canvas.add(image);
 
-            if (index === coords.length - 1) {
+            contador++;
+
+            if (contador === tileCoords.length) {
               const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
-              const longLatOrigen = this.getLongLatFromXYZ(coords[0], tileGrid);
-              const longLatFin = this.getLongLatFromXYZ(coords[coords.length - 1], tileGrid);
+              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
               const coordsPolygonCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, anomalia, lado);
               this.drawImgAnomalia(anomalia, canvas, coordsPolygonCanvas);
               this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
@@ -1093,7 +1096,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               this.countLoadedImages++;
             }
           } else {
-            if (index === coords.length - 1) {
+            contador++;
+            if (contador === tileCoords.length) {
               this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
                 format: 'png',
               });
