@@ -502,14 +502,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               elegible: true,
             });
 
-            // if (this.planta.tipo === '1 eje') {
-            //   this.apartadosInforme.push({
-            //     nombre: 'anexoSeguidores1Eje',
-            //     descripcion: 'Anexo III: Anomalías térmicas por seguidor',
-            //     orden: 17,
-            //     elegible: true,
-            //   });
-            // }
+            if (this.planta.tipo === '1 eje') {
+              this.apartadosInforme.push({
+                nombre: 'anexoSeguidores1Eje',
+                descripcion: 'Anexo III: Anomalías térmicas por seguidor',
+                orden: 17,
+                elegible: true,
+              });
+            }
           }
 
           this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
@@ -605,76 +605,80 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       // Generar imagenes
       this.countAnomalias = 0;
       this.anomaliasInforme.forEach((anomalia, index) => {
-        this.setImgAnomaliaCanvas(anomalia);
-        this.countAnomalias++;
+        if (index < 5) {
+          this.setImgAnomaliaCanvas(anomalia);
+          this.countAnomalias++;
+        }
       });
 
-      // this.countSegs1Eje = 0;
-      // if (this.planta.tipo === '1 eje') {
-      //   this.seguidores1eje.forEach((seg, index) => {
-      //     this.setImgSeguidor1EjeCanvas(seg, index);
-      //     this.countSegs1Eje++;
-      //   });
-
-      //   // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-      //   let downloads = 0;
-
-      //   this.subscriptions.add(
-      //     combineLatest([this.countLoadedImages$, this.countLoadedImagesSegs1Eje$]).subscribe(
-      //       ([countLoadedImgs, countLoadedImgSegs1Eje]) => {
-      //         this.downloadReportService.progressBarValue = Math.round(
-      //           ((countLoadedImgs + countLoadedImgSegs1Eje) /
-      //             (this.anomaliasInforme.length + this.seguidores1eje.length)) *
-      //             100
-      //         );
-
-      //         // Cuando se carguen todas las imágenes
-      //         if (
-      //           countLoadedImgs + countLoadedImgSegs1Eje === this.countAnomalias + this.seguidores1eje.length &&
-      //           downloads === 0
-      //         ) {
-      //           this.calcularInforme();
-
-      //           pdfMake
-      //             .createPdf(this.getDocDefinition(this.imageListBase64))
-      //             .download(this.getPrefijoInforme(), () => {
-      //               this.downloadReportService.progressBarValue = 0;
-
-      //               this.downloadReportService.generatingPDF = false;
-      //             });
-      //           this.downloadReportService.endingPDF = true;
-
-      //           downloads++;
-      //         }
-      //       }
-      //     )
-      //   );
-      // } else {
-      // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-      let downloads = 0;
-
-      this.subscriptions.add(
-        this.countLoadedImages$.subscribe((countLoadedImgs) => {
-          this.downloadReportService.progressBarValue = Math.round(
-            (countLoadedImgs / this.anomaliasInforme.length) * 100
-          );
-
-          // Cuando se carguen todas las imágenes
-          if (countLoadedImgs === this.countAnomalias && downloads === 0) {
-            this.calcularInforme();
-
-            pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
-              this.downloadReportService.progressBarValue = 0;
-
-              this.downloadReportService.generatingPDF = false;
-            });
-            this.downloadReportService.endingPDF = true;
-
-            downloads++;
+      this.countSegs1Eje = 0;
+      if (this.planta.tipo === '1 eje') {
+        this.seguidores1eje.forEach((seg, index) => {
+          if (index < 5) {
+            this.setImgSeguidor1EjeCanvas(seg, index);
+            this.countSegs1Eje++;
           }
-        })
-      );
-      // }
+        });
+
+        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+        let downloads = 0;
+
+        this.subscriptions.add(
+          combineLatest([this.countLoadedImages$, this.countLoadedImagesSegs1Eje$]).subscribe(
+            ([countLoadedImgs, countLoadedImgSegs1Eje]) => {
+              this.downloadReportService.progressBarValue = Math.round(
+                ((countLoadedImgs + countLoadedImgSegs1Eje) /
+                  (this.anomaliasInforme.length + this.seguidores1eje.length)) *
+                  100
+              );
+
+              // Cuando se carguen todas las imágenes
+              if (
+                countLoadedImgs + countLoadedImgSegs1Eje === 10 /* this.countAnomalias + this.seguidores1eje.length */ &&
+                downloads === 0
+              ) {
+                this.calcularInforme();
+
+                pdfMake
+                  .createPdf(this.getDocDefinition(this.imageListBase64))
+                  .download(this.getPrefijoInforme(), () => {
+                    this.downloadReportService.progressBarValue = 0;
+
+                    this.downloadReportService.generatingPDF = false;
+                  });
+                this.downloadReportService.endingPDF = true;
+
+                downloads++;
+              }
+            }
+          )
+        );
+      } else {
+        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+        let downloads = 0;
+
+        this.subscriptions.add(
+          this.countLoadedImages$.subscribe((countLoadedImgs) => {
+            this.downloadReportService.progressBarValue = Math.round(
+              (countLoadedImgs / this.anomaliasInforme.length) * 100
+            );
+
+            // Cuando se carguen todas las imágenes
+            if (countLoadedImgs === 5 /* this.countAnomalias */ && downloads === 0) {
+              this.calcularInforme();
+
+              pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
+                this.downloadReportService.progressBarValue = 0;
+
+                this.downloadReportService.generatingPDF = false;
+              });
+              this.downloadReportService.endingPDF = true;
+
+              downloads++;
+            }
+          })
+        );
+      }
     } else {
       // Generar imagenes
       this.countSeguidores = 0;
@@ -1086,8 +1090,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
               const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
               const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
-              const coordsPolygonCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, anomalia, lado);
-              this.drawImgAnomalia(anomalia, canvas, coordsPolygonCanvas);
+              const coordsPolygonCanvas = this.getCoordsPolygonCanvas(
+                longLatOrigen,
+                longLatFin,
+                anomalia.featureCoords,
+                lado
+              );
+              this.drawPolygonInCanvas(anomalia.id, canvas, coordsPolygonCanvas);
               this.canvasCenterAndZoomInAnom(coordsPolygonCanvas, canvas);
               this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
                 format: 'png',
@@ -1101,8 +1110,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
               const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
               const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
-              const coordsPolygonCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, anomalia, lado);
-              this.drawImgAnomalia(anomalia, canvas, coordsPolygonCanvas);
+              const coordsPolygonCanvas = this.getCoordsPolygonCanvas(
+                longLatOrigen,
+                longLatFin,
+                anomalia.featureCoords,
+                lado
+              );
+              this.drawPolygonInCanvas(anomalia.id, canvas, coordsPolygonCanvas);
               this.canvasCenterAndZoomInAnom(coordsPolygonCanvas, canvas);
               this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
                 format: 'png',
@@ -1131,11 +1145,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     canvas.renderAll();
   }
 
-  private getCoordsPolygonCanvas(coordsOrigen: number[][], coordsFin: number[][], anomalia: Anomalia, lado: number) {
+  private getCoordsPolygonCanvas(
+    coordsOrigen: number[][],
+    coordsFin: number[][],
+    polygonCoords: Coordinate[],
+    lado: number
+  ) {
     const topLeft = coordsOrigen[1];
     const bottomRight = coordsFin[3];
-    const anomTopLeft = anomalia.featureCoords[0];
-    const anomBottomRight = anomalia.featureCoords[2];
+    const anomTopLeft = polygonCoords[0];
+    const anomBottomRight = polygonCoords[2];
     const polygonLeft = ((anomTopLeft[0] - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
     const polygonRight =
       ((anomBottomRight[0] - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
@@ -1158,21 +1177,20 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     canvas.height = lado * this.tileResolution;
     const width = canvas.width / lado;
     const height = canvas.height / lado;
-    tileCoords.forEach((coord, index) => {
-      const url = GLOBAL.GIS + `${this.informe.id}_thermal/${coord[0]}/${coord[1]}/${coord[2]}.png`;
+    let contador = 0;
+    tileCoords.forEach((tileCoord, index) => {
+      const url = GLOBAL.GIS + `${this.informe.id}_thermal/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
 
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;
 
       fabric.util.loadImage(
         url,
-        (img, error) => {
+        (img) => {
           if (img !== null) {
             img = this.imageProcessService.transformPixels(img);
 
-            const image = new fabric.Image(img);
-
-            image.set({
+            const image = new fabric.Image(img, {
               width,
               height,
               left,
@@ -1185,22 +1203,34 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               scaleX: 1,
               scaleY: 1,
             });
+
             canvas.add(image);
 
-            if (index === tileCoords.length - 1) {
+            contador++;
+            if (contador === tileCoords.length) {
+              const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
+              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+              const coordsPolygonCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, coords, lado);
+              this.drawPolygonInCanvas(count.toString(), canvas, coordsPolygonCanvas);
+              this.canvasCenterAndZoomInAnom(coordsPolygonCanvas, canvas);
               this.imageListBase64[`imgCanvas${count}`] = canvas.toDataURL({
                 format: 'png',
-                // quality: this.jpgQuality,
               });
 
               this.countLoadedImagesSegs1Eje++;
             }
-          }
-          if (error) {
-            if (index === tileCoords.length - 1) {
+          } else {
+            contador++;
+            if (contador === tileCoords.length) {
+              const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
+              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+              const coordsPolygonCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, coords, lado);
+              this.drawPolygonInCanvas(count.toString(), canvas, coordsPolygonCanvas);
+              this.canvasCenterAndZoomInAnom(coordsPolygonCanvas, canvas);
               this.imageListBase64[`imgCanvas${count}`] = canvas.toDataURL({
                 format: 'png',
-                // quality: this.jpgQuality,
               });
 
               this.countLoadedImagesSegs1Eje++;
@@ -1330,7 +1360,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       });
   }
 
-  private drawImgAnomalia(anomalia: Anomalia, canvas: any, coordsPolygonCanvas: number[]) {
+  private drawPolygonInCanvas(id: string, canvas: any, coordsPolygonCanvas: number[]) {
     const polygon = new fabric.Rect({
       left: coordsPolygonCanvas[0],
       top: coordsPolygonCanvas[1],
@@ -1342,7 +1372,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       hasControls: false,
       lockMovementY: true,
       lockMovementX: true,
-      anomId: anomalia.id,
+      anomId: id,
       ref: 'anom',
       selectable: false,
       hoverCursor: 'pointer',
@@ -2760,7 +2790,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (let i = 0; i < this.anomaliasInforme.length; i++) {
+    for (let i = 0; i < 2 /* this.anomaliasInforme.length */; i++) {
       const anom = this.anomaliasInforme[i];
 
       const pagAnexo = [
@@ -2851,6 +2881,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           ],
         },
       ];
+
       allPagsAnexo.push(pagAnexo);
     }
 
@@ -2871,7 +2902,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (let i = 0; i < this.seguidores1eje.length; i++) {
+    for (let i = 0; i < 2 /* this.seguidores1eje.length */; i++) {
       const seg = this.seguidores1eje[i];
 
       const pagAnexo = [
