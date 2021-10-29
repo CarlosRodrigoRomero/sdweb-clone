@@ -1082,7 +1082,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             canvas.add(image);
 
             contador++;
-
             if (contador === tileCoords.length) {
               const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
               const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
@@ -1098,6 +1097,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           } else {
             contador++;
             if (contador === tileCoords.length) {
+              const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
+              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+              const coordsPolygonCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, anomalia, lado);
+              this.drawImgAnomalia(anomalia, canvas, coordsPolygonCanvas);
               this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
                 format: 'png',
               });
