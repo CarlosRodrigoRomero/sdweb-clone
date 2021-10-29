@@ -1088,7 +1088,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
               const coordsPolygonCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, anomalia, lado);
               this.drawImgAnomalia(anomalia, canvas, coordsPolygonCanvas);
-              this.canvasCenterInAnom(coordsPolygonCanvas, canvas);
+              this.canvasCenterAndZoomInAnom(coordsPolygonCanvas, canvas);
               this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
                 format: 'png',
               });
@@ -1103,7 +1103,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
               const coordsPolygonCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, anomalia, lado);
               this.drawImgAnomalia(anomalia, canvas, coordsPolygonCanvas);
-              this.canvasCenterInAnom(coordsPolygonCanvas, canvas);
+              this.canvasCenterAndZoomInAnom(coordsPolygonCanvas, canvas);
               this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
                 format: 'png',
               });
@@ -1118,15 +1118,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     });
   }
 
-  private canvasCenterInAnom(coordsPolygon: number[], canvas: any) {
-    const center = canvas.getCenter();
-    const polygonCentroid = [coordsPolygon[0] + coordsPolygon[2] / 2, coordsPolygon[1] + coordsPolygon[3] / 2];
-    const moveLeft = center.left - polygonCentroid[0];
-    const moveTop = center.top - polygonCentroid[1];
-    canvas.getObjects().forEach((obj) => {
-      obj.left += moveLeft;
-      obj.top += moveTop;
-    });
+  private canvasCenterAndZoomInAnom(coordsPolygon: number[], canvas: any) {
+    const longestSide = Math.max(coordsPolygon[2], coordsPolygon[3]);
+    const polygonCentroid = new fabric.Point(
+      coordsPolygon[0] + coordsPolygon[2] / 2,
+      coordsPolygon[1] + coordsPolygon[3] / 2
+    );
+    const zoom = canvas.getWidth() / (longestSide + 120);
+
+    canvas.zoomToPoint(polygonCentroid, zoom);
+
     canvas.renderAll();
   }
 
