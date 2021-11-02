@@ -634,7 +634,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
               // Cuando se carguen todas las imágenes
               if (
-                countLoadedImgs + countLoadedImgSegs1Eje === 10 /* this.countAnomalias + this.seguidores1eje.length */ &&
+                countLoadedImgs + countLoadedImgSegs1Eje ===
+                  10 /* this.countAnomalias + this.seguidores1eje.length */ &&
                 downloads === 0
               ) {
                 this.calcularInforme();
@@ -1134,13 +1135,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   private canvasCenterAndZoomInAnom(coordsPolygon: number[], canvas: any) {
     const longestSide = Math.max(coordsPolygon[2], coordsPolygon[3]);
-    const polygonCentroid = new fabric.Point(
-      coordsPolygon[0] + coordsPolygon[2] / 2,
-      coordsPolygon[1] + coordsPolygon[3] / 2
-    );
+    const polygonCentroid = [coordsPolygon[0] + coordsPolygon[2] / 2, coordsPolygon[1] + coordsPolygon[3] / 2];
     const zoom = canvas.getWidth() / (longestSide + 120);
 
-    canvas.zoomToPoint(polygonCentroid, zoom);
+    canvas.setZoom(1); // reset zoom so pan actions work as expected
+    const vpw = canvas.width / zoom;
+    const vph = canvas.height / zoom;
+    const x = polygonCentroid[0] - vpw / 2; // x is the location where the top left of the viewport should be
+    const y = polygonCentroid[1] - vph / 2; // y idem
+    canvas.absolutePan({ x, y });
+    canvas.setZoom(zoom);
 
     canvas.renderAll();
   }
