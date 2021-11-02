@@ -71,12 +71,15 @@ export interface AnomsTable {
 export class DownloadPdfComponent implements OnInit, OnDestroy {
   private _countLoadedImages = 0;
   countLoadedImages$ = new BehaviorSubject<number>(this._countLoadedImages);
-  private _countLoadedImagesSegs1Eje = 0;
-  countLoadedImagesSegs1Eje$ = new BehaviorSubject<number>(this._countLoadedImagesSegs1Eje);
+  private _countLoadedImagesSegs1EjeAnoms = 0;
+  countLoadedImagesSegs1EjeAnoms$ = new BehaviorSubject<number>(this._countLoadedImagesSegs1EjeAnoms);
+  private _countLoadedImagesSegs1EjeNoAnoms = 0;
+  countLoadedImagesSegs1EjeNoAnoms$ = new BehaviorSubject<number>(this._countLoadedImagesSegs1EjeNoAnoms);
   private _loadedImages = undefined;
   loadedImages$ = new BehaviorSubject<string>(this._loadedImages);
   private countAnomalias: number;
-  private countSegs1Eje: number;
+  private countSegs1EjeAnoms: number;
+  private countSegs1EjeNoAnoms: number;
   private countSeguidores: number;
   private _seguidoresInforme: Seguidor[] = [];
   seguidoresInforme$ = new BehaviorSubject<Seguidor[]>(this._seguidoresInforme);
@@ -139,8 +142,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private hasUserArea: boolean;
   seguidoresLoaded = false;
   private map: Map;
-  private seguidores1eje: LocationAreaInterface[] = [];
+  private seguidores1ejeAnoms: LocationAreaInterface[] = [];
   private anomSeguidores1Eje: Anomalia[][] = [];
+  private seguidores1ejeNoAnoms: LocationAreaInterface[] = [];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -170,17 +174,18 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
     this.subscriptions.add(
-      this.downloadReportService.seguidores1Eje$.subscribe(
-        (segs) =>
-          (this.seguidores1eje = segs.filter((seg) => {
-            const anomsSeguidor = this.anomaliasInforme.filter(
-              (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
-            );
-            if (anomsSeguidor.length > 0) {
-              this.anomSeguidores1Eje.push(anomsSeguidor);
-              return seg;
-            }
-          }))
+      this.downloadReportService.seguidores1Eje$.subscribe((segs) =>
+        segs.forEach((seg) => {
+          const anomsSeguidor = this.anomaliasInforme.filter(
+            (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
+          );
+          if (anomsSeguidor.length > 0) {
+            this.anomSeguidores1Eje.push(anomsSeguidor);
+            this.seguidores1ejeAnoms.push(seg);
+          } else {
+            this.seguidores1ejeNoAnoms.push(seg);
+          }
+        })
       )
     );
 
@@ -516,8 +521,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
             if (this.planta.tipo === '1 eje') {
               this.apartadosInforme.push({
-                nombre: 'anexoSeguidores1Eje',
+                nombre: 'anexoSeguidores1EjeAnoms',
                 descripcion: 'Anexo III: Anomalías térmicas por seguidor',
+                orden: 17,
+                elegible: true,
+              });
+              this.apartadosInforme.push({
+                nombre: 'anexoSeguidores1EjeNoAnoms',
+                descripcion: 'Anexo III: Seguidores sin anomalías',
                 orden: 17,
                 elegible: true,
               });
@@ -611,7 +622,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.downloadReportService.generatingPDF = true;
 
     this.countLoadedImages = 0;
-    this.countLoadedImagesSegs1Eje = 0;
+    this.countLoadedImagesSegs1EjeAnoms = 0;
 
     if (this.reportControlService.plantaFija) {
       // Generar imagenes
@@ -623,48 +634,52 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         }
       });
 
-      this.countSegs1Eje = 0;
       if (this.planta.tipo === '1 eje') {
-        this.seguidores1eje.forEach((seg, index) => {
-          const anomaliasSeguidor = this.anomaliasInforme.filter(
-            (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
-          );
-          this.setImgSeguidor1EjeCanvas(seg, index, anomaliasSeguidor);
-          this.countSegs1Eje++;
+        this.seguidores1ejeAnoms.forEach((seg, index) => {
+          if (index < 2) {
+            this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
+          }
+        });
+
+        this.seguidores1ejeNoAnoms.forEach((seg, index) => {
+          if (index < 2) {
+            this.setImgSeguidor1EjeCanvas(seg, index);
+          }
         });
 
         // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
         let downloads = 0;
 
         this.subscriptions.add(
-          combineLatest([this.countLoadedImages$, this.countLoadedImagesSegs1Eje$]).subscribe(
-            ([countLoadedImgs, countLoadedImgSegs1Eje]) => {
-              this.downloadReportService.progressBarValue = Math.round(
-                ((countLoadedImgs + countLoadedImgSegs1Eje) /
-                  (this.anomaliasInforme.length + this.seguidores1eje.length)) *
-                  100
-              );
+          combineLatest([
+            this.countLoadedImages$,
+            this.countLoadedImagesSegs1EjeAnoms$,
+            this.countLoadedImagesSegs1EjeNoAnoms$,
+          ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
+            this.downloadReportService.progressBarValue = Math.round(
+              ((countLoadedImgs + countLoadedImgSegs1EjeAnoms) /
+                (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length)) *
+                100
+            );
 
-              // Cuando se carguen todas las imágenes
-              if (
-                countLoadedImgs + countLoadedImgSegs1Eje === 2 /* this.countAnomalias */ + this.seguidores1eje.length &&
-                downloads === 0
-              ) {
-                this.calcularInforme();
+            // Cuando se carguen todas las imágenes
+            if (
+              countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
+                6 /* this.countAnomalias  + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length*/ &&
+              downloads === 0
+            ) {
+              this.calcularInforme();
 
-                pdfMake
-                  .createPdf(this.getDocDefinition(this.imageListBase64))
-                  .download(this.getPrefijoInforme(), () => {
-                    this.downloadReportService.progressBarValue = 0;
+              pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
+                this.downloadReportService.progressBarValue = 0;
 
-                    this.downloadReportService.generatingPDF = false;
-                  });
-                this.downloadReportService.endingPDF = true;
+                this.downloadReportService.generatingPDF = false;
+              });
+              this.downloadReportService.endingPDF = true;
 
-                downloads++;
-              }
+              downloads++;
             }
-          )
+          })
         );
       } else {
         // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
@@ -801,7 +816,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     let anexoAnomalias = [];
     let anexoSeguidores = [];
     let anexoSegsNoAnoms = [];
-    let anexoSeguidores1Eje = [];
+    let anexoSeguidores1EjeAnoms = [];
+    let anexoSeguidores1EjeNoAnoms = [];
     let numAnexo = 'I';
 
     if (this.filtroApartados.includes('anexo1')) {
@@ -812,8 +828,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       anexoAnomalias = this.getAnexoAnomalias(numAnexo);
       numAnexo = 'III';
     }
-    if (this.filtroApartados.includes('anexoSeguidores1Eje')) {
-      anexoSeguidores1Eje = this.getAnexoSegs1Eje(numAnexo);
+    if (this.filtroApartados.includes('anexoSeguidores1EjeAnoms')) {
+      anexoSeguidores1EjeAnoms = this.getAnexoSegs1EjeAnoms(numAnexo);
+      numAnexo = 'IV';
+    }
+    if (this.filtroApartados.includes('anexoSeguidores1EjeNoAnoms')) {
+      anexoSeguidores1EjeNoAnoms = this.getAnexoSegs1EjeNoAnoms(numAnexo);
     }
     if (this.filtroApartados.includes('anexoSeguidores')) {
       anexoSeguidores = this.getAnexoSeguidores(numAnexo);
@@ -846,7 +866,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       content: pages
         .concat(anexo1)
         .concat(anexoAnomalias)
-        .concat(anexoSeguidores1Eje)
+        .concat(anexoSeguidores1EjeAnoms)
+        .concat(anexoSeguidores1EjeNoAnoms)
         .concat(anexoSeguidores)
         .concat(anexoSegsNoAnoms),
 
@@ -1244,16 +1265,27 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
               const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, coords, lado);
 
-              this.drawAnomaliasSeguidor(anomalias, canvas);
+              if (anomalias !== undefined) {
+                this.drawAnomaliasSeguidor(anomalias, canvas);
+              }
 
               // this.drawPolygonInCanvas(count.toString(), canvas, coordsSegCanvas);
 
               this.canvasCenterAndZoomInAnom(coordsSegCanvas, canvas, true);
-              this.imageListBase64[`imgCanvas${count}`] = canvas.toDataURL({
-                format: 'png',
-              });
 
-              this.countLoadedImagesSegs1Eje++;
+              if (anomalias !== undefined) {
+                this.imageListBase64[`imgCanvasSegAnoms${count}`] = canvas.toDataURL({
+                  format: 'png',
+                });
+
+                this.countLoadedImagesSegs1EjeAnoms++;
+              } else {
+                this.imageListBase64[`imgCanvasSegNoAnoms${count}`] = canvas.toDataURL({
+                  format: 'png',
+                });
+
+                this.countLoadedImagesSegs1EjeNoAnoms++;
+              }
             }
           } else {
             contador++;
@@ -1262,13 +1294,27 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
               const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
               const coordsPolygonCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, coords, lado);
+
+              if (anomalias !== undefined) {
+                this.drawAnomaliasSeguidor(anomalias, canvas);
+              }
+
               // this.drawPolygonInCanvas(count.toString(), canvas, coordsPolygonCanvas);
               this.canvasCenterAndZoomInAnom(coordsPolygonCanvas, canvas, true);
-              this.imageListBase64[`imgCanvas${count}`] = canvas.toDataURL({
-                format: 'png',
-              });
 
-              this.countLoadedImagesSegs1Eje++;
+              if (anomalias !== undefined) {
+                this.imageListBase64[`imgCanvasSegAnoms${count}`] = canvas.toDataURL({
+                  format: 'png',
+                });
+
+                this.countLoadedImagesSegs1EjeAnoms++;
+              } else {
+                this.imageListBase64[`imgCanvasSegNoAnoms${count}`] = canvas.toDataURL({
+                  format: 'png',
+                });
+
+                this.countLoadedImagesSegs1EjeNoAnoms++;
+              }
             }
           }
         },
@@ -2929,7 +2975,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     return allPagsAnexo;
   }
 
-  private getAnexoSegs1Eje(numAnexo: string) {
+  private getAnexoSegs1EjeAnoms(numAnexo: string) {
     const allPagsAnexo = [];
     // tslint:disable-next-line:max-line-length
     const pag1Anexo = {
@@ -2943,22 +2989,22 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (let i = 0; i < this.seguidores1eje.length; i++) {
-      const seg = this.seguidores1eje[i];
+    for (let i = 0; i < 2 /* this.seguidores1ejeAnoms.length */; i++) {
+      const seg = this.seguidores1ejeAnoms[i];
       const anoms = this.anomSeguidores1Eje[i];
 
-      const table = this.getPaginaSeguidor1Eje(anoms);
+      const table = this.getPaginaSeguidor1EjeAnoms(anoms);
 
       const pagAnexo = [
         {
-          text: `${this.translation.t('Seguidor')} ${seg.globalCoords.toString()}`,
+          text: `${this.translation.t('Seguidor')} ${this.globalCoordsLabel(seg.globalCoords)}`,
           style: 'h2',
           alignment: 'center',
           pageBreak: 'before',
         },
         '\n',
         {
-          image: `imgCanvas${i}`,
+          image: `imgCanvasSegAnoms${i}`,
           width: this.widthImageAnomalia,
           alignment: 'center',
         },
@@ -3098,7 +3144,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     return allPagsAnexo;
   }
 
-  private getPaginaSeguidor1Eje(anomalias: Anomalia[]) {
+  private globalCoordsLabel(globalCoords: string[]): string {
+    const label = '';
+    globalCoords.forEach((coord, index) => {
+      label.concat(coord);
+      if (index < globalCoords.length - 1) {
+        label.concat(GLOBAL.stringConectorGlobalsDefault);
+      }
+    });
+
+    return label;
+  }
+
+  private getPaginaSeguidor1EjeAnoms(anomalias: Anomalia[]) {
     // Header
     const cabecera = [];
     const columnasAnexoSeguidor = this.columnasAnomalia.filter((col) => {
@@ -3144,6 +3202,150 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       body.push(row);
     }
     return [cabecera, body];
+  }
+
+  private getAnexoSegs1EjeNoAnoms(numAnexo: string) {
+    const allPagsAnexo = [];
+    // tslint:disable-next-line:max-line-length
+    const pag1Anexo = {
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
+        'Seguidores sin anomalías'
+      )}`,
+      style: 'h1',
+      alignment: 'center',
+      pageBreak: 'before',
+    };
+
+    allPagsAnexo.push(pag1Anexo);
+
+    for (let i = 0; i < 2 /* this.seguidores1ejeNoAnoms.length */; i++) {
+      const seg = this.seguidores1ejeNoAnoms[i];
+
+      const pagAnexo = [
+        {
+          text: `${this.translation.t('Seguidor')} ${this.globalCoordsLabel(seg.globalCoords)}`,
+          style: 'h2',
+          alignment: 'center',
+          pageBreak: 'before',
+        },
+        '\n',
+        {
+          image: `imgCanvasSegNoAnoms${i}`,
+          width: this.widthImageAnomalia,
+          alignment: 'center',
+        },
+        '\n',
+        {
+          columns: [
+            {
+              width: '*',
+              text: '',
+            },
+
+            {
+              width: 'auto',
+              table: {
+                body: [
+                  [
+                    {
+                      text: this.translation.t('Fecha/Hora'),
+                      style: 'tableHeaderImageData',
+                    },
+
+                    {
+                      text: this.translation.t('Irradiancia'),
+                      style: 'tableHeaderImageData',
+                    },
+
+                    {
+                      text: this.translation.t('Temp. aire'),
+                      style: 'tableHeaderImageData',
+                    },
+
+                    {
+                      text: this.translation.t('Viento'),
+                      style: 'tableHeaderImageData',
+                    },
+
+                    {
+                      text: this.translation.t('Emisividad'),
+                      style: 'tableHeaderImageData',
+                    },
+
+                    {
+                      text: this.translation.t('Temp. reflejada'),
+                      style: 'tableHeaderImageData',
+                    },
+                    {
+                      text: this.translation.t('Módulo'),
+                      style: 'tableHeaderImageData',
+                    },
+                  ],
+                  // [
+                  //   {
+                  //     text: this.datePipe
+                  //       .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
+                  //       .concat(' ')
+                  //       .concat(this.datePipe.transform(anoms[0].datetime * 1000, 'HH:mm:ss')),
+                  //     style: 'tableCellAnexo1',
+                  //     noWrap: true,
+                  //   },
+
+                  //   {
+                  //     text: Math.round(anoms[0].irradiancia).toString().concat(' W/m2'),
+                  //     style: 'tableCellAnexo1',
+                  //     noWrap: true,
+                  //   },
+                  //   {
+                  //     text: Math.round((anoms[0] as PcInterface).temperaturaAire)
+                  //       .toString()
+                  //       .concat(' ºC'),
+                  //     style: 'tableCellAnexo1',
+                  //     noWrap: true,
+                  //   },
+
+                  //   {
+                  //     text: (anoms[0] as PcInterface).viento,
+                  //     style: 'tableCellAnexo1',
+                  //     noWrap: true,
+                  //   },
+
+                  //   {
+                  //     text: (anoms[0] as PcInterface).emisividad,
+                  //     style: 'tableCellAnexo1',
+                  //     noWrap: true,
+                  //   },
+
+                  //   {
+                  //     text: Math.round((anoms[0] as PcInterface).temperaturaReflejada)
+                  //       .toString()
+                  //       .concat(' ºC'),
+                  //     style: 'tableCellAnexo1',
+                  //     noWrap: true,
+                  //   },
+
+                  //   {
+                  //     text: this.writeModulo(anoms[0]),
+                  //     style: 'tableCellAnexo1',
+                  //     noWrap: true,
+                  //   },
+                  // ],
+                ],
+              },
+            },
+
+            {
+              width: '*',
+              text: '',
+            },
+          ],
+        },
+      ];
+
+      allPagsAnexo.push(pagAnexo);
+    }
+
+    return allPagsAnexo;
   }
 
   private getAnexoSeguidores(numAnexo: string) {
@@ -3731,13 +3933,22 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.countLoadedImages$.next(value);
   }
 
-  get countLoadedImagesSegs1Eje() {
-    return this._countLoadedImagesSegs1Eje;
+  get countLoadedImagesSegs1EjeAnoms() {
+    return this._countLoadedImagesSegs1EjeAnoms;
   }
 
-  set countLoadedImagesSegs1Eje(value: number) {
-    this._countLoadedImagesSegs1Eje = value;
-    this.countLoadedImagesSegs1Eje$.next(value);
+  set countLoadedImagesSegs1EjeAnoms(value: number) {
+    this._countLoadedImagesSegs1EjeAnoms = value;
+    this.countLoadedImagesSegs1EjeAnoms$.next(value);
+  }
+
+  get countLoadedImagesSegs1EjeNoAnoms() {
+    return this._countLoadedImagesSegs1EjeNoAnoms;
+  }
+
+  set countLoadedImagesSegs1EjeNoAnoms(value: number) {
+    this._countLoadedImagesSegs1EjeNoAnoms = value;
+    this.countLoadedImagesSegs1EjeNoAnoms$.next(value);
   }
 
   get columnasAnomalia() {
