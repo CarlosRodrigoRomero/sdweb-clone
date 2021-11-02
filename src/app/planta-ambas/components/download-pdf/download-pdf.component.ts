@@ -169,7 +169,17 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
     this.subscriptions.add(
-      this.downloadReportService.seguidores1Eje$.subscribe((segs) => (this.seguidores1eje = segs))
+      this.downloadReportService.seguidores1Eje$.subscribe(
+        (segs) =>
+          (this.seguidores1eje = segs.filter((seg) => {
+            const anomsSeguidor = this.anomaliasInforme.filter(
+              (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
+            );
+            if (anomsSeguidor.length > 0) {
+              return seg;
+            }
+          }))
+      )
     );
 
     this.subscriptions.add(
@@ -605,7 +615,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       // Generar imagenes
       this.countAnomalias = 0;
       this.anomaliasInforme.forEach((anomalia, index) => {
-        if (index < 5) {
+        if (index < 2) {
           this.setImgAnomaliaCanvas(anomalia);
           this.countAnomalias++;
         }
@@ -614,10 +624,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       this.countSegs1Eje = 0;
       if (this.planta.tipo === '1 eje') {
         this.seguidores1eje.forEach((seg, index) => {
-          if (index < 5) {
-            this.setImgSeguidor1EjeCanvas(seg, index);
-            this.countSegs1Eje++;
-          }
+          const anomaliasSeguidor = this.anomaliasInforme.filter(
+            (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
+          );
+          this.setImgSeguidor1EjeCanvas(seg, index, anomaliasSeguidor);
+          this.countSegs1Eje++;
         });
 
         // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
@@ -634,8 +645,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
               // Cuando se carguen todas las imágenes
               if (
-                countLoadedImgs + countLoadedImgSegs1Eje ===
-                  10 /* this.countAnomalias + this.seguidores1eje.length */ &&
+                countLoadedImgs + countLoadedImgSegs1Eje === 2 /* this.countAnomalias */ + this.seguidores1eje.length &&
                 downloads === 0
               ) {
                 this.calcularInforme();
@@ -1133,18 +1143,31 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     });
   }
 
-  private canvasCenterAndZoomInAnom(coordsPolygon: number[], canvas: any) {
+  private canvasCenterAndZoomInAnom(coordsPolygon: number[], canvas: any, trim?: boolean) {
     const longestSide = Math.max(coordsPolygon[2], coordsPolygon[3]);
     const polygonCentroid = [coordsPolygon[0] + coordsPolygon[2] / 2, coordsPolygon[1] + coordsPolygon[3] / 2];
     const zoom = canvas.getWidth() / (longestSide + 120);
 
+    // VERDINALES
+    let desviacion = 0;
+    if (trim) {
+      desviacion = -235;
+    }
+
     canvas.setZoom(1); // reset zoom so pan actions work as expected
     const vpw = canvas.width / zoom;
     const vph = canvas.height / zoom;
-    const x = polygonCentroid[0] - vpw / 2; // x is the location where the top left of the viewport should be
+    const x = polygonCentroid[0] - vpw / 2 + desviacion; // x is the location where the top left of the viewport should be
     const y = polygonCentroid[1] - vph / 2; // y idem
     canvas.absolutePan({ x, y });
     canvas.setZoom(zoom);
+
+    // VERDINALES
+    if (trim) {
+      canvas.clipTo = (ctx) => {
+        ctx.rect(polygonCentroid[0] + 250, 0, 500, canvas.getWidth());
+      };
+    }
 
     canvas.renderAll();
   }
@@ -1171,7 +1194,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     return [polygonLeft, polygonTop, width, height];
   }
 
-  private setImgSeguidor1EjeCanvas(seg: LocationAreaInterface, count: number) {
+  private setImgSeguidor1EjeCanvas(seg: LocationAreaInterface, count: number, anomalias?: Anomalia[]) {
     const coords = this.pathToCoordinate(seg.path);
     const tileCoords = this.getElemTiles(coords, this.getElemExtent(coords), 22);
 
@@ -1215,9 +1238,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
               const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
               const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
-              const coordsPolygonCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, coords, lado);
-              this.drawPolygonInCanvas(count.toString(), canvas, coordsPolygonCanvas);
-              this.canvasCenterAndZoomInAnom(coordsPolygonCanvas, canvas);
+              const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, coords, lado);
+
+              this.drawAnomaliasSeguidor(anomalias, canvas);
+
+              // this.drawPolygonInCanvas(count.toString(), canvas, coordsSegCanvas);
+
+              this.canvasCenterAndZoomInAnom(coordsSegCanvas, canvas, true);
               this.imageListBase64[`imgCanvas${count}`] = canvas.toDataURL({
                 format: 'png',
               });
@@ -1231,8 +1258,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
               const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
               const coordsPolygonCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, coords, lado);
-              this.drawPolygonInCanvas(count.toString(), canvas, coordsPolygonCanvas);
-              this.canvasCenterAndZoomInAnom(coordsPolygonCanvas, canvas);
+              // this.drawPolygonInCanvas(count.toString(), canvas, coordsPolygonCanvas);
+              this.canvasCenterAndZoomInAnom(coordsPolygonCanvas, canvas, true);
               this.imageListBase64[`imgCanvas${count}`] = canvas.toDataURL({
                 format: 'png',
               });
@@ -1244,6 +1271,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         null,
         { crossOrigin: 'anonymous' }
       );
+    });
+  }
+
+  private drawAnomaliasSeguidor(anomalias: Anomalia[], canvas: any): void {
+    anomalias.forEach((anom) => {
+      this.drawPolygonInCanvas(anom.localId, canvas, anom.featureCoords[0]);
     });
   }
 
@@ -2906,7 +2939,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (let i = 0; i < 2 /* this.seguidores1eje.length */; i++) {
+    for (let i = 0; i < this.seguidores1eje.length; i++) {
       const seg = this.seguidores1eje[i];
 
       const pagAnexo = [
