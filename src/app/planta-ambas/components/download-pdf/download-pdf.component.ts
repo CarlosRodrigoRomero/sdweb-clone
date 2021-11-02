@@ -140,6 +140,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   seguidoresLoaded = false;
   private map: Map;
   private seguidores1eje: LocationAreaInterface[] = [];
+  private anomSeguidores1Eje: Anomalia[][] = [];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -176,6 +177,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
             );
             if (anomsSeguidor.length > 0) {
+              this.anomSeguidores1Eje.push(anomsSeguidor);
               return seg;
             }
           }))
@@ -1149,23 +1151,25 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const zoom = canvas.getWidth() / (longestSide + 120);
 
     // VERDINALES
-    let desviacion = 0;
+    let desviacion = 1;
     if (trim) {
-      desviacion = -235;
+      desviacion = 0.85;
     }
 
     canvas.setZoom(1); // reset zoom so pan actions work as expected
     const vpw = canvas.width / zoom;
     const vph = canvas.height / zoom;
-    const x = polygonCentroid[0] - vpw / 2 + desviacion; // x is the location where the top left of the viewport should be
+    const x = (polygonCentroid[0] - vpw / 2) * desviacion; // x is the location where the top left of the viewport should be
     const y = polygonCentroid[1] - vph / 2; // y idem
     canvas.absolutePan({ x, y });
     canvas.setZoom(zoom);
 
     // VERDINALES
     if (trim) {
+      const left = (canvas.getWidth() / 2) * 0.5;
+      const width = (canvas.getWidth() / 2 - left) * 2;
       canvas.clipTo = (ctx) => {
-        ctx.rect(polygonCentroid[0] + 250, 0, 500, canvas.getWidth());
+        ctx.rect(left, 0, width, canvas.getWidth());
       };
     }
 
@@ -2941,6 +2945,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     for (let i = 0; i < this.seguidores1eje.length; i++) {
       const seg = this.seguidores1eje[i];
+      const anoms = this.anomSeguidores1Eje[i];
+
+      const table = this.getPaginaSeguidor1Eje(anoms);
 
       const pagAnexo = [
         {
@@ -2955,85 +2962,188 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           width: this.widthImageAnomalia,
           alignment: 'center',
         },
-        // {
-        //   columns: [
-        //     { text: 'Tipo de anomalía', width: 200, style: 'anomInfoTitle' },
-        //     { text: this.anomaliaInfoService.getTipoLabel(seg), style: 'anomInfoValue' },
-        //   ],
-        //   margin: [0, 40, 0, 0],
-        // },
-        // {
-        //   columns: [
-        //     { text: 'Causa', width: 200, style: 'anomInfoTitle' },
-        //     { text: this.anomaliaInfoService.getCausa(seg), style: 'anomInfoValue', margin: [0, 0, 0, 5] },
-        //   ],
-        // },
-        // {
-        //   columns: [
-        //     { text: 'Recomendación', width: 200, style: 'anomInfoTitle' },
-        //     { text: this.anomaliaInfoService.getRecomendacion(seg), style: 'anomInfoValue', margin: [0, 0, 0, 5] },
-        //   ],
-        // },
-        // {
-        //   columns: [
-        //     { text: 'Módulo', width: 200, style: 'anomInfoTitle' },
-        //     { text: this.anomaliaInfoService.getModuloLabel(seg), style: 'anomInfoValue' },
-        //   ],
-        // },
-        // {
-        //   columns: [
-        //     {
-        //       text: `Criticidad (Criterio ${this.anomaliaService.criterioCriticidad.nombre})`,
-        //       width: 200,
-        //       style: 'anomInfoTitle',
-        //     },
-        //     { text: this.anomaliaInfoService.getCriticidadLabel(seg), style: 'anomInfoValue' },
-        //   ],
-        // },
-        // {
-        //   columns: [
-        //     { text: 'Clase', width: 200, style: 'anomInfoTitle' },
-        //     { text: this.anomaliaInfoService.getClaseLabel(seg), style: 'anomInfoValue' },
-        //   ],
-        // },
-        // {
-        //   columns: [
-        //     { text: 'Pérdidas (beta)', width: 200, style: 'anomInfoTitle' },
-        //     { text: this.anomaliaInfoService.getPerdidasLabel(seg), style: 'anomInfoValue' },
-        //   ],
-        // },
-        // {
-        //   columns: [
-        //     { text: 'Temperatura Máxima', width: 200, style: 'anomInfoTitle' },
-        //     { text: this.anomaliaInfoService.getTempMaxLabel(seg), style: 'anomInfoValue' },
-        //   ],
-        // },
-        // {
-        //   columns: [
-        //     { text: 'Gradiente Temp. Normalizado', width: 200, style: 'anomInfoTitle' },
-        //     { text: this.anomaliaInfoService.getGradNormLabel(seg), style: 'anomInfoValue' },
-        //   ],
-        // },
-        // {
-        //   columns: [
-        //     { text: 'Fecha y hora captura', width: 200, style: 'anomInfoTitle' },
-        //     {
-        //       text: this.anomaliaInfoService.getFechaHoraLabel(seg),
-        //       style: 'anomInfoValue',
-        //     },
-        //   ],
-        // },
-        // {
-        //   columns: [
-        //     { text: 'Localización', width: 200, style: 'anomInfoTitle' },
-        //     { text: this.anomaliaInfoService.getLocalizacionCompleteLabel(seg, this.planta), style: 'anomInfoValue' },
-        //   ],
-        // },
+        '\n',
+        {
+          columns: [
+            {
+              width: '*',
+              text: '',
+            },
+
+            {
+              width: 'auto',
+              table: {
+                body: [
+                  [
+                    {
+                      text: this.translation.t('Fecha/Hora'),
+                      style: 'tableHeaderImageData',
+                    },
+
+                    {
+                      text: this.translation.t('Irradiancia'),
+                      style: 'tableHeaderImageData',
+                    },
+
+                    {
+                      text: this.translation.t('Temp. aire'),
+                      style: 'tableHeaderImageData',
+                    },
+
+                    {
+                      text: this.translation.t('Viento'),
+                      style: 'tableHeaderImageData',
+                    },
+
+                    {
+                      text: this.translation.t('Emisividad'),
+                      style: 'tableHeaderImageData',
+                    },
+
+                    {
+                      text: this.translation.t('Temp. reflejada'),
+                      style: 'tableHeaderImageData',
+                    },
+                    {
+                      text: this.translation.t('Módulo'),
+                      style: 'tableHeaderImageData',
+                    },
+                  ],
+                  [
+                    {
+                      text: this.datePipe
+                        .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
+                        .concat(' ')
+                        .concat(this.datePipe.transform(anoms[0].datetime * 1000, 'HH:mm:ss')),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
+
+                    {
+                      text: Math.round(anoms[0].irradiancia).toString().concat(' W/m2'),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
+                    {
+                      text: Math.round((anoms[0] as PcInterface).temperaturaAire)
+                        .toString()
+                        .concat(' ºC'),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
+
+                    {
+                      text: (anoms[0] as PcInterface).viento,
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
+
+                    {
+                      text: (anoms[0] as PcInterface).emisividad,
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
+
+                    {
+                      text: Math.round((anoms[0] as PcInterface).temperaturaReflejada)
+                        .toString()
+                        .concat(' ºC'),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
+
+                    {
+                      text: this.writeModulo(anoms[0]),
+                      style: 'tableCellAnexo1',
+                      noWrap: true,
+                    },
+                  ],
+                ],
+              },
+            },
+
+            {
+              width: '*',
+              text: '',
+            },
+          ],
+        },
+
+        '\n',
+
+        {
+          columns: [
+            {
+              width: '*',
+              text: '',
+            },
+            {
+              width: 'auto',
+              table: {
+                headerRows: 1,
+                body: [table[0]].concat(table[1]),
+              },
+            },
+            {
+              width: '*',
+              text: '',
+            },
+          ],
+        },
       ];
+
       allPagsAnexo.push(pagAnexo);
     }
 
     return allPagsAnexo;
+  }
+
+  private getPaginaSeguidor1Eje(anomalias: Anomalia[]) {
+    // Header
+    const cabecera = [];
+    const columnasAnexoSeguidor = this.columnasAnomalia.filter((col) => {
+      return !GLOBAL.columnasAnexoSeguidor.includes(col.nombre);
+    });
+    if (this.planta.hasOwnProperty('numerosSerie')) {
+      if (this.planta.numerosSerie) {
+        columnasAnexoSeguidor.push({ nombre: 'numeroSerie', descripcion: 'N/S' });
+      }
+    }
+
+    cabecera.push({
+      text: this.translation.t('Número'),
+      style: 'tableHeaderBlue',
+    });
+    for (const col of columnasAnexoSeguidor) {
+      cabecera.push({
+        text: this.translation.t(this.getEncabezadoTablaSeguidor(col)),
+        style: 'tableHeaderBlue',
+      });
+    }
+
+    // Body
+    const body = [];
+    let contadorAnoms = 0;
+    const totalAnomsSeguidor = anomalias.length;
+    for (const anom of anomalias) {
+      contadorAnoms += 1;
+      const row = [];
+      row.push({
+        text: `${contadorAnoms}/${totalAnomsSeguidor}`,
+        noWrap: true,
+        style: 'tableCellAnexo1',
+      });
+
+      for (const col of columnasAnexoSeguidor) {
+        row.push({
+          text: this.translation.t(this.getTextoColumnaAnomalia(anom, col.nombre)),
+          noWrap: true,
+          style: 'tableCellAnexo1',
+        });
+      }
+      body.push(row);
+    }
+    return [cabecera, body];
   }
 
   private getAnexoSeguidores(numAnexo: string) {
@@ -3223,8 +3333,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     allPagsAnexo.push(pag1Anexo);
 
     for (const seg of this.seguidoresInforme) {
-      const table = this.getPaginaSeguidor(seg);
-
       if (seg.anomaliasCliente.length === 0) {
         const pagAnexo = [
           {
