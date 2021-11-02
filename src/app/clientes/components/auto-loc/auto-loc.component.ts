@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewChildren, QueryList, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, QueryList, HostListener, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 
@@ -31,7 +31,7 @@ declare const google: any;
   templateUrl: './auto-loc.component.html',
   styleUrls: ['./auto-loc.component.css'],
 })
-export class AutoLocComponent implements OnInit {
+export class AutoLocComponent implements OnInit, AfterViewInit {
   @ViewChildren(AgmPolygon) polygonData: QueryList<AgmPolygon>;
   @ViewChild(AgmMap, { static: true }) agmMap: any;
   @ViewChild(MatSort) sort: MatSort;
@@ -128,12 +128,12 @@ export class AutoLocComponent implements OnInit {
     this.locAreaDataSource = new MatTableDataSource([]);
     this.locAreaDataSource.paginator = this.paginator;
     this.userAreaDataSource = new MatTableDataSource([]);
-    this.locAreaDataSource.sortData = (data, sort: MatSort) => {
-      if (sort.active === 'globalX') {
-        data.sort(this.sortByGlobalX);
-      }
-      return data;
-    };
+    // this.locAreaDataSource.sortData = (data, sort: MatSort) => {
+    //   if (sort.active === 'globalCoords') {
+    //     data.sort(this.sortByGlobalCoords);
+    //   }
+    //   return data;
+    // };
     this.userAreaDataSource.sortData = (data, sort: MatSort) => {
       if (sort.active === 'userId') {
         data.sort(this.sortByGlobalX);
@@ -172,6 +172,10 @@ export class AutoLocComponent implements OnInit {
 
     window.addEventListener('online', (e) => (this.alertMessage = undefined));
     window.addEventListener('offline', (e) => (this.alertMessage = 'ERROR Internet conection'));
+  }
+
+  ngAfterViewInit(): void {
+    this.locAreaDataSource.sort = this.sort;
   }
 
   getPlanta(plantaId: string) {
@@ -699,8 +703,11 @@ export class AutoLocComponent implements OnInit {
       return element === null ? '' : element;
     });
     if (
+      globalCoords[0] !== undefined &&
       globalCoords[0].toString().length === 0 &&
+      globalCoords[1] !== undefined &&
       globalCoords[1].toString().length === 0 &&
+      globalCoords[2] !== undefined &&
       globalCoords[2].toString().length === 0
     ) {
       return false;
