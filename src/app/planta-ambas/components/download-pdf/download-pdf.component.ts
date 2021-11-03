@@ -2991,9 +2991,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     for (let i = 0; i < 2 /* this.seguidores1ejeAnoms.length */; i++) {
       const seg = this.seguidores1ejeAnoms[i];
+
+      const segTable = this.getSeg1ejeTable();
+
       const anoms = this.anomSeguidores1Eje[i];
 
-      const table = this.getPaginaSeguidor1EjeAnoms(anoms);
+      const anomsTable = this.getPaginaSeguidor1EjeAnoms(anoms);
 
       const pagAnexo = [
         {
@@ -3009,6 +3012,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           alignment: 'center',
         },
         '\n',
+        '\n',
         {
           columns: [
             {
@@ -3018,94 +3022,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
             {
               width: 'auto',
-              table: {
-                body: [
-                  [
-                    {
-                      text: this.translation.t('Fecha/Hora'),
-                      style: 'tableHeaderImageData',
-                    },
-
-                    {
-                      text: this.translation.t('Irradiancia'),
-                      style: 'tableHeaderImageData',
-                    },
-
-                    {
-                      text: this.translation.t('Temp. aire'),
-                      style: 'tableHeaderImageData',
-                    },
-
-                    {
-                      text: this.translation.t('Viento'),
-                      style: 'tableHeaderImageData',
-                    },
-
-                    {
-                      text: this.translation.t('Emisividad'),
-                      style: 'tableHeaderImageData',
-                    },
-
-                    {
-                      text: this.translation.t('Temp. reflejada'),
-                      style: 'tableHeaderImageData',
-                    },
-                    {
-                      text: this.translation.t('Módulo'),
-                      style: 'tableHeaderImageData',
-                    },
-                  ],
-                  [
-                    {
-                      text: this.datePipe
-                        .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
-                        .concat(' ')
-                        .concat(this.datePipe.transform(anoms[0].datetime * 1000, 'HH:mm:ss')),
-                      style: 'tableCellAnexo1',
-                      noWrap: true,
-                    },
-
-                    {
-                      text: Math.round(anoms[0].irradiancia).toString().concat(' W/m2'),
-                      style: 'tableCellAnexo1',
-                      noWrap: true,
-                    },
-                    {
-                      text: Math.round((anoms[0] as PcInterface).temperaturaAire)
-                        .toString()
-                        .concat(' ºC'),
-                      style: 'tableCellAnexo1',
-                      noWrap: true,
-                    },
-
-                    {
-                      text: (anoms[0] as PcInterface).viento,
-                      style: 'tableCellAnexo1',
-                      noWrap: true,
-                    },
-
-                    {
-                      text: (anoms[0] as PcInterface).emisividad,
-                      style: 'tableCellAnexo1',
-                      noWrap: true,
-                    },
-
-                    {
-                      text: Math.round((anoms[0] as PcInterface).temperaturaReflejada)
-                        .toString()
-                        .concat(' ºC'),
-                      style: 'tableCellAnexo1',
-                      noWrap: true,
-                    },
-
-                    {
-                      text: this.writeModulo(anoms[0]),
-                      style: 'tableCellAnexo1',
-                      noWrap: true,
-                    },
-                  ],
-                ],
-              },
+              table: segTable,
             },
 
             {
@@ -3127,7 +3044,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               width: 'auto',
               table: {
                 headerRows: 1,
-                body: [table[0]].concat(table[1]),
+                body: [anomsTable[0]].concat(anomsTable[1]),
               },
             },
             {
@@ -3144,12 +3061,119 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     return allPagsAnexo;
   }
 
+  private getSeg1ejeTable() {
+    const segBodyTableHeader = [
+      {
+        text: this.translation.t('Fecha/Hora'),
+        style: 'tableHeaderImageData',
+      },
+      {
+        text: this.translation.t('Temp. aire'),
+        style: 'tableHeaderImageData',
+      },
+      {
+        text: this.translation.t('Emisividad'),
+        style: 'tableHeaderImageData',
+      },
+      {
+        text: this.translation.t('Temp. reflejada'),
+        style: 'tableHeaderImageData',
+      },
+      // {
+      //   text: this.translation.t('Módulo'),
+      //   style: 'tableHeaderImageData',
+      // },
+    ];
+
+    const segBodyTableContent = [
+      {
+        text: this.datePipe.transform(this.informe.fecha * 1000, 'dd/MM/yyyy HH:mm:ss'),
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      },
+      {
+        text: this.informe.temperatura.toString().concat(' ºC'),
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      },
+      {
+        text: this.informe.emisividad,
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      },
+      {
+        text: this.informe.tempReflejada.toString().concat(' ºC'),
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      },
+      // {
+      //   text: this.writeModulo(anoms[0]),
+      //   style: 'tableCellAnexo1',
+      //   noWrap: true,
+      // },
+    ];
+
+    const segTableBody = [segBodyTableHeader, segBodyTableContent];
+
+    const segTable = {
+      body: segTableBody,
+    };
+
+    if (this.informe.hasOwnProperty('irradiancia')) {
+      segBodyTableHeader.push({
+        text: this.translation.t('Irradiancia'),
+        style: 'tableHeaderImageData',
+      });
+      segBodyTableContent.push({
+        text: this.informe.irradiancia.toString().concat(' W/m2'),
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      });
+    }
+    if (this.informe.hasOwnProperty('viento')) {
+      segBodyTableHeader.push({
+        text: this.translation.t('Viento'),
+        style: 'tableHeaderImageData',
+      });
+      segBodyTableContent.push({
+        text: this.informe.viento,
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      });
+    }
+    if (this.informe.hasOwnProperty('vientoVelocidad')) {
+      segBodyTableHeader.push({
+        text: this.translation.t('Velocidad viento'),
+        style: 'tableHeaderImageData',
+      });
+      segBodyTableContent.push({
+        text: this.informe.vientoVelocidad.toString() + ' (Beaufort)',
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      });
+    }
+    if (this.informe.hasOwnProperty('vientoDireccion')) {
+      segBodyTableHeader.push({
+        text: this.translation.t('Dirección viento'),
+        style: 'tableHeaderImageData',
+      });
+      segBodyTableContent.push({
+        text: this.informe.vientoDireccion.toString() + 'º',
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      });
+    }
+
+    return segTable;
+  }
+
   private globalCoordsLabel(globalCoords: string[]): string {
-    const label = '';
+    console.log(globalCoords);
+    let label = '';
     globalCoords.forEach((coord, index) => {
-      label.concat(coord);
+      label = label.concat(coord);
       if (index < globalCoords.length - 1) {
-        label.concat(GLOBAL.stringConectorGlobalsDefault);
+        label = label.concat(GLOBAL.stringConectorGlobalsDefault);
       }
     });
 
@@ -3221,6 +3245,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     for (let i = 0; i < 2 /* this.seguidores1ejeNoAnoms.length */; i++) {
       const seg = this.seguidores1ejeNoAnoms[i];
 
+      const segTable = this.getSeg1ejeTable();
+
       const pagAnexo = [
         {
           text: `${this.translation.t('Seguidor')} ${this.globalCoordsLabel(seg.globalCoords)}`,
@@ -3235,6 +3261,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           alignment: 'center',
         },
         '\n',
+        '\n',
         {
           columns: [
             {
@@ -3244,94 +3271,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
             {
               width: 'auto',
-              table: {
-                body: [
-                  [
-                    {
-                      text: this.translation.t('Fecha/Hora'),
-                      style: 'tableHeaderImageData',
-                    },
-
-                    {
-                      text: this.translation.t('Irradiancia'),
-                      style: 'tableHeaderImageData',
-                    },
-
-                    {
-                      text: this.translation.t('Temp. aire'),
-                      style: 'tableHeaderImageData',
-                    },
-
-                    {
-                      text: this.translation.t('Viento'),
-                      style: 'tableHeaderImageData',
-                    },
-
-                    {
-                      text: this.translation.t('Emisividad'),
-                      style: 'tableHeaderImageData',
-                    },
-
-                    {
-                      text: this.translation.t('Temp. reflejada'),
-                      style: 'tableHeaderImageData',
-                    },
-                    {
-                      text: this.translation.t('Módulo'),
-                      style: 'tableHeaderImageData',
-                    },
-                  ],
-                  // [
-                  //   {
-                  //     text: this.datePipe
-                  //       .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
-                  //       .concat(' ')
-                  //       .concat(this.datePipe.transform(anoms[0].datetime * 1000, 'HH:mm:ss')),
-                  //     style: 'tableCellAnexo1',
-                  //     noWrap: true,
-                  //   },
-
-                  //   {
-                  //     text: Math.round(anoms[0].irradiancia).toString().concat(' W/m2'),
-                  //     style: 'tableCellAnexo1',
-                  //     noWrap: true,
-                  //   },
-                  //   {
-                  //     text: Math.round((anoms[0] as PcInterface).temperaturaAire)
-                  //       .toString()
-                  //       .concat(' ºC'),
-                  //     style: 'tableCellAnexo1',
-                  //     noWrap: true,
-                  //   },
-
-                  //   {
-                  //     text: (anoms[0] as PcInterface).viento,
-                  //     style: 'tableCellAnexo1',
-                  //     noWrap: true,
-                  //   },
-
-                  //   {
-                  //     text: (anoms[0] as PcInterface).emisividad,
-                  //     style: 'tableCellAnexo1',
-                  //     noWrap: true,
-                  //   },
-
-                  //   {
-                  //     text: Math.round((anoms[0] as PcInterface).temperaturaReflejada)
-                  //       .toString()
-                  //       .concat(' ºC'),
-                  //     style: 'tableCellAnexo1',
-                  //     noWrap: true,
-                  //   },
-
-                  //   {
-                  //     text: this.writeModulo(anoms[0]),
-                  //     style: 'tableCellAnexo1',
-                  //     noWrap: true,
-                  //   },
-                  // ],
-                ],
-              },
+              table: segTable,
             },
 
             {
