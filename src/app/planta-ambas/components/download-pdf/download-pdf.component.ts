@@ -546,22 +546,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             });
 
             if (this.planta.tipo === '1 eje') {
-              if (this.seguidores1ejeAnoms.length > 0) {
-                this.apartadosInforme.push({
-                  nombre: 'anexoSeguidores1EjeAnoms',
-                  descripcion: 'Anexo III: Anomalías térmicas por seguidor',
-                  orden: 17,
-                  elegible: true,
-                });
-              }
-              if (this.seguidores1ejeNoAnoms.length > 0) {
-                this.apartadosInforme.push({
-                  nombre: 'anexoSeguidores1EjeNoAnoms',
-                  descripcion: 'Anexo III: Seguidores sin anomalías',
-                  orden: 17,
-                  elegible: true,
-                });
-              }
+              this.apartadosInforme.push({
+                nombre: 'anexoSeguidores1EjeAnoms',
+                descripcion: 'Anexo III: Anomalías térmicas por seguidor',
+                orden: 17,
+                elegible: true,
+              });
+
+              this.apartadosInforme.push({
+                nombre: 'anexoSeguidores1EjeNoAnoms',
+                descripcion: 'Anexo III: Seguidores sin anomalías',
+                orden: 18,
+                elegible: true,
+              });
             }
           }
 
@@ -688,10 +685,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             this.countLoadedImagesSegs1EjeNoAnoms$,
           ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
             this.downloadReportService.progressBarValue = Math.round(
-              ((countLoadedImgs + countLoadedImgSegs1EjeAnoms) /
-                (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length)) *
+              ((countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
+                (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
                 100
             );
+            console.log(this.downloadReportService.progressBarValue);
 
             // Cuando se carguen todas las imágenes
             if (
@@ -754,6 +752,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           this.downloadReportService.progressBarValue = Math.round(
             (countLoadedImgs / this.seguidoresInforme.length) * 100
           );
+          console.log(this.downloadReportService.progressBarValue);
 
           // Cuando se carguen todas las imágenes
           if (countLoadedImgs === this.countSeguidores && downloads === 0) {
@@ -845,10 +844,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const pages = this.getPagesPDF();
     let anexo1 = [];
     let anexoAnomalias = [];
-    let anexoSeguidores = [];
-    let anexoSegsNoAnoms = [];
     let anexoSeguidores1EjeAnoms = [];
     let anexoSeguidores1EjeNoAnoms = [];
+    let anexoSeguidores = [];
+    let anexoSegsNoAnoms = [];
+
     let numAnexo = 'I';
 
     if (this.filtroApartados.includes('anexo1')) {
