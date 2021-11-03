@@ -589,7 +589,7 @@ export class PlantaService {
         locAreaArray.forEach((locationArea) => {
           // const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat(locationArea.path));
           const polygon = {
-            paths: locationArea.path,
+            path: locationArea.path,
             strokeColor: '#FF0000',
             visible: false,
             strokeOpacity: 0,
@@ -673,12 +673,16 @@ export class PlantaService {
     return [globalCoords, modulo];
   }
 
-  getGlobalCoordsFromLocationAreaOl(coords: Coordinate) {
+  getGlobalCoordsFromLocationAreaOl(coords: Coordinate, locAreaList?: LocationAreaInterface[]) {
     const globalCoords = [null, null, null];
+
+    if (locAreaList !== undefined) {
+      this.locAreaList = locAreaList;
+    }
 
     if (this.locAreaList !== undefined) {
       this.locAreaList.forEach((locArea) => {
-        const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat((locArea as any).paths));
+        const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat(locArea.path));
 
         if (polygon.intersectsCoordinate(coords)) {
           if (locArea.globalX.length > 0) {

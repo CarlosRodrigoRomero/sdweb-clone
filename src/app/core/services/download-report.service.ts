@@ -9,6 +9,9 @@ import { FilterableElement } from '@core/models/filterableInterface';
 import { PlantaInterface } from '@core/models/planta';
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
+import { LatLngLiteral } from '@agm/core';
+import { Coordinate } from 'ol/coordinate';
+import { fromLonLat } from 'ol/proj';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +27,7 @@ export class DownloadReportService {
   filteredPDF$ = new BehaviorSubject<boolean>(this._filteredPDF);
   private _seguidores1Eje: LocationAreaInterface[] = [];
   seguidores1Eje$ = new BehaviorSubject<LocationAreaInterface[]>(this._seguidores1Eje);
+  private allLocAreas: LocationAreaInterface[] = [];
 
   constructor(private plantaService: PlantaService) {}
 
@@ -100,6 +104,9 @@ export class DownloadReportService {
       .getLocationsArea(plantaId)
       .pipe(take(1))
       .subscribe((locAreaList) => {
+        // guardamos todas las areas
+        this.allLocAreas = locAreaList;
+
         // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
         const coordsLength = locAreaList[0].globalCoords.length;
 
@@ -128,6 +135,19 @@ export class DownloadReportService {
             locArea.globalCoords[indiceSeleccionado] !== ''
         );
       });
+  }
+
+  getCompleteGlobalCoords(seg: LocationAreaInterface): any[] {
+    return this.plantaService.getGlobalCoordsFromLocationAreaOl(this.pathToCoordinate(seg.path)[0], this.allLocAreas);
+  }
+
+  pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {
+    const coordenadas: Coordinate[] = [];
+    path.forEach((coord) => {
+      const coordenada: Coordinate = fromLonLat([coord.lng, coord.lat]);
+      coordenadas.push(coordenada);
+    });
+    return coordenadas;
   }
 
   //////////////////////////////////////////////////////

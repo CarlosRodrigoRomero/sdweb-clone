@@ -118,6 +118,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private heightLogoHeader: number;
   private imageListBase64 = {};
   private tileResolution = 256;
+  private imgSolardroneBase64: string;
+  private widthImgSolardroneTech: number;
 
   private apartadosInforme: Apartado[];
   private countCategoria;
@@ -176,8 +178,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.downloadReportService.seguidores1Eje$.subscribe((segs) =>
         segs.forEach((seg) => {
+          const globalCoordsSeg = this.downloadReportService.getCompleteGlobalCoords(seg);
+
           const anomsSeguidor = this.anomaliasInforme.filter(
-            (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
+            (anom) => anom.globalCoords.toString() === globalCoordsSeg.toString()
           );
           if (anomsSeguidor.length > 0) {
             this.anomSeguidores1Eje.push(anomsSeguidor);
@@ -398,6 +402,28 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
             });
 
+          // Cargamos Logo Solardrone
+          fabric.util.loadImage('../../../assets/images/logo_tecno.png', (img) => {
+            const canvas = new fabric.Canvas('canvas');
+            const image = new fabric.Image(img);
+
+            image.set({
+              left: 0,
+              top: 0,
+              angle: 0,
+              opacity: 1,
+              draggable: false,
+              lockMovementX: true,
+              lockMovementY: true,
+              scaleX: 0.1,
+              scaleY: 0.1,
+            });
+
+            canvas.add(image);
+
+            this.imgSolardroneBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+          });
+
           this.apartadosInforme = [
             {
               nombre: 'introduccion',
@@ -520,18 +546,22 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             });
 
             if (this.planta.tipo === '1 eje') {
-              this.apartadosInforme.push({
-                nombre: 'anexoSeguidores1EjeAnoms',
-                descripcion: 'Anexo III: Anomalías térmicas por seguidor',
-                orden: 17,
-                elegible: true,
-              });
-              this.apartadosInforme.push({
-                nombre: 'anexoSeguidores1EjeNoAnoms',
-                descripcion: 'Anexo III: Seguidores sin anomalías',
-                orden: 17,
-                elegible: true,
-              });
+              if (this.seguidores1ejeAnoms.length > 0) {
+                this.apartadosInforme.push({
+                  nombre: 'anexoSeguidores1EjeAnoms',
+                  descripcion: 'Anexo III: Anomalías térmicas por seguidor',
+                  orden: 17,
+                  elegible: true,
+                });
+              }
+              if (this.seguidores1ejeNoAnoms.length > 0) {
+                this.apartadosInforme.push({
+                  nombre: 'anexoSeguidores1EjeNoAnoms',
+                  descripcion: 'Anexo III: Seguidores sin anomalías',
+                  orden: 17,
+                  elegible: true,
+                });
+              }
             }
           }
 
@@ -548,6 +578,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.heightLogo = 150;
     this.widthLogo = 200;
     this.widthPortada = 600; // es el ancho de pagina completo
+    this.widthImgSolardroneTech = 250;
     this.widthSuciedad = 501;
     this.widthCurvaMae = 300;
     this.widthFormulaMae = 200;
@@ -1530,8 +1561,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     // PORTADA //
     let widthLogoPortada = this.widthLogo;
     // controlamos que la altura del logo no se salga de la portada
-    if (this.heightLogoOriginal > 250) {
-      const factorReduccion = 250 / this.heightLogoOriginal;
+    const alturaMaxLogo = 250;
+    if (this.heightLogoOriginal > alturaMaxLogo) {
+      const factorReduccion = alturaMaxLogo / this.heightLogoOriginal;
       widthLogoPortada = this.widthLogo * factorReduccion;
     }
 
@@ -1582,6 +1614,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         image: this.imgLogoBase64,
         width: widthLogoPortada,
         alignment: 'center',
+      },
+      {
+        image: this.imgSolardroneBase64,
+        width: this.widthImgSolardroneTech,
+        absolutePosition: {
+          x: this.widthPortada - this.widthImgSolardroneTech,
+          y: this.widthPortada * Math.sqrt(2) - this.widthImgSolardroneTech / 4 - 20, // aspect ratio logo 4:1
+        },
         pageBreak: 'after',
       },
     ];
