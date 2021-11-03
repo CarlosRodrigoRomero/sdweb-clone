@@ -1266,7 +1266,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, coords, lado);
 
               if (anomalias !== undefined) {
-                this.drawAnomaliasSeguidor(anomalias, canvas);
+                this.drawAnomaliasSeguidor(anomalias, canvas, longLatOrigen, longLatFin, lado);
               }
 
               // this.drawPolygonInCanvas(count.toString(), canvas, coordsSegCanvas);
@@ -1296,7 +1296,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               const coordsPolygonCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, coords, lado);
 
               if (anomalias !== undefined) {
-                this.drawAnomaliasSeguidor(anomalias, canvas);
+                this.drawAnomaliasSeguidor(anomalias, canvas, longLatOrigen, longLatFin, lado);
               }
 
               // this.drawPolygonInCanvas(count.toString(), canvas, coordsPolygonCanvas);
@@ -1324,9 +1324,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     });
   }
 
-  private drawAnomaliasSeguidor(anomalias: Anomalia[], canvas: any): void {
+  private drawAnomaliasSeguidor(
+    anomalias: Anomalia[],
+    canvas: any,
+    coordsOrigen: number[][],
+    coordsFin: number[][],
+    lado: number
+  ): void {
     anomalias.forEach((anom) => {
-      this.drawPolygonInCanvas(anom.localId, canvas, anom.featureCoords[0]);
+      const coordsAnomCanvas = this.getCoordsPolygonCanvas(coordsOrigen, coordsFin, anom.featureCoords, lado);
+      this.drawPolygonInCanvas(anom.localId, canvas, coordsAnomCanvas);
     });
   }
 
@@ -3168,7 +3175,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   private globalCoordsLabel(globalCoords: string[]): string {
-    console.log(globalCoords);
     let label = '';
     globalCoords.forEach((coord, index) => {
       label = label.concat(coord);
