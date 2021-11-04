@@ -649,6 +649,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     this.countLoadedImages = 0;
     this.countLoadedImagesSegs1EjeAnoms = 0;
+    this.countLoadedImagesSegs1EjeNoAnoms = 0;
 
     if (this.reportControlService.plantaFija) {
       // Generar imagenes
