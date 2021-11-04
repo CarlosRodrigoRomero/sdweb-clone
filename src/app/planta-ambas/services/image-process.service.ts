@@ -12,17 +12,18 @@ import { ThermalLayerInterface } from '@core/models/thermalLayer';
 export class ImageProcessService {
   palette = GLOBAL.ironPalette;
   sliderMin = 25;
-  sliderMax = 100;
-  rangeTempMin = 25;
-  rangeTempMax = 75;
+  sliderMax = 75;
+  sliderFloor = 25;
+  sliderCeil = 100;
   thermalLayer: ThermalLayerInterface;
 
   constructor(private thermalService: ThermalService, private reportControlService: ReportControlService) {
     this.thermalService.getThermalLayers().subscribe((layers) => {
       this.thermalLayer = layers.find((tL) => tL.informeId === this.reportControlService.selectedInformeId);
     });
-    // this.thermalService.sliderMinSource.subscribe((value) => (this.rangeTempMin = value));
-    // this.thermalService.sliderMaxSource.subscribe((value) => (this.rangeTempMax = value));
+
+    this.thermalService.sliderMinSource.subscribe((value) => (this.sliderMin = value));
+    this.thermalService.sliderMaxSource.subscribe((value) => (this.sliderMax = value));
   }
 
   transformPixels(image) {
@@ -108,20 +109,20 @@ export class ImageProcessService {
       const subrango = Math.round(10 * gradosMantenerPrecision) / 10;
 
       if (pixel[0] == 0 && pixel[1] == 0 && pixel[2] == 0) {
-        return this.rangeTempMin;
+        return this.sliderFloor;
       } else if (pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 255) {
-        return this.rangeTempMax;
+        return this.sliderCeil;
       } else if (pixel[0] == maxVal) {
-        max = this.rangeTempMin + subrango;
-        min = this.rangeTempMin;
+        max = this.sliderFloor + subrango;
+        min = this.sliderFloor;
         val = pixel[0];
       } else if (pixel[1] == maxVal) {
-        min = this.rangeTempMin + subrango;
-        max = this.rangeTempMin + 0.1 * Math.round(10 * 2 * subrango);
+        min = this.sliderFloor + subrango;
+        max = this.sliderFloor + 0.1 * Math.round(10 * 2 * subrango);
         val = pixel[1];
       } else {
-        max = this.rangeTempMax;
-        min = this.rangeTempMin + 0.1 * Math.round(10 * 2 * subrango);
+        max = this.sliderCeil;
+        min = this.sliderFloor + 0.1 * Math.round(10 * 2 * subrango);
         val = pixel[2];
       }
       const temp = 0.1 * Math.round(10 * ((val * (max - min)) / 255 + min));
