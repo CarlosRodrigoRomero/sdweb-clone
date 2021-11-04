@@ -750,7 +750,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           this.downloadReportService.progressBarValue = Math.round(
             (countLoadedImgs / this.seguidoresInforme.length) * 100
           );
-          console.log(this.downloadReportService.progressBarValue);
 
           // Cuando se carguen todas las imágenes
           if (countLoadedImgs === this.countSeguidores && downloads === 0) {
@@ -1309,7 +1308,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               }
 
               // this.drawPolygonInCanvas(count.toString(), canvas, coordsSegCanvas);
-              this.canvasCenterAndZoomInAnom(coordsSegCanvas, canvas , true);
+              this.canvasCenterAndZoomInAnom(coordsSegCanvas, canvas, true);
 
               if (anomalias !== undefined) {
                 this.imageListBase64[`imgCanvasSegAnoms${count}`] = canvas.toDataURL({
@@ -1338,7 +1337,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               }
 
               // this.drawPolygonInCanvas(count.toString(), canvas, coordsSegCanvas);
-              this.canvasCenterAndZoomInAnom(coordsSegCanvas, canvas , true);
+              this.canvasCenterAndZoomInAnom(coordsSegCanvas, canvas, true);
 
               if (anomalias !== undefined) {
                 this.imageListBase64[`imgCanvasSegAnoms${count}`] = canvas.toDataURL({
@@ -1369,9 +1368,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     coordsFin: number[][],
     lado: number
   ): void {
-    anomalias.forEach((anom) => {
+    anomalias.forEach((anom, index) => {
       const coordsAnomCanvas = this.getCoordsPolygonCanvas(coordsOrigen, coordsFin, anom.featureCoords, lado);
-      this.drawPolygonInCanvas(anom.localId, canvas, coordsAnomCanvas);
+      this.drawPolygonInCanvas(anom.localId, canvas, coordsAnomCanvas, index + 1);
     });
   }
 
@@ -1492,7 +1491,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       });
   }
 
-  private drawPolygonInCanvas(id: string, canvas: any, coordsPolygonCanvas: number[]) {
+  private drawPolygonInCanvas(id: string, canvas: any, coordsPolygonCanvas: number[], index?: number) {
     const polygon = new fabric.Rect({
       left: coordsPolygonCanvas[0],
       top: coordsPolygonCanvas[1],
@@ -1513,6 +1512,22 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     });
 
     canvas.add(polygon);
+
+    if (index !== undefined) {
+      const label = new fabric.Text(index.toString(), {
+        left: coordsPolygonCanvas[0],
+        top: coordsPolygonCanvas[1] - 26,
+        fontSize: 20,
+        // textBackgroundColor: 'red',
+        ref: 'text',
+        selectable: false,
+        hoverCursor: 'default',
+        fill: 'white',
+      });
+
+      canvas.add(label);
+    }
+
     canvas.renderAll();
   }
 
