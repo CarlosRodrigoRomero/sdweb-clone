@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { take } from 'rxjs/operators';
 
+import inside from 'point-in-polygon';
+
 import { PlantaService } from '@core/services/planta.service';
 
 import { FilterableElement } from '@core/models/filterableInterface';
@@ -28,6 +30,7 @@ export class DownloadReportService {
   private _seguidores1Eje: LocationAreaInterface[] = [];
   seguidores1Eje$ = new BehaviorSubject<LocationAreaInterface[]>(this._seguidores1Eje);
   private allLocAreas: LocationAreaInterface[] = [];
+  private largestLocAreas: LocationAreaInterface[] = [];
 
   constructor(private plantaService: PlantaService) {}
 
@@ -128,17 +131,51 @@ export class DownloadReportService {
         }
 
         // filtramos las areas seleccionadas para los seguidores
-        this.seguidores1Eje = locAreaList.filter(
+        const segs1Eje = locAreaList.filter(
           (locArea) =>
             locArea.globalCoords[indiceSeleccionado] !== null &&
             locArea.globalCoords[indiceSeleccionado] !== undefined &&
             locArea.globalCoords[indiceSeleccionado] !== ''
         );
+
+        this.largestLocAreas = locAreaList
+          .filter((locArea) => !segs1Eje.includes(locArea))
+          .filter((locArea) => locArea.globalCoords.toString() !== ',' && locArea.globalCoords.toString() !== '');
+
+        segs1Eje.forEach((seg) => (seg.globalCoords = this.getCompleteGlobalCoords(seg, indiceSeleccionado)));
+
+        this.seguidores1Eje = segs1Eje;
       });
   }
 
-  getCompleteGlobalCoords(seg: LocationAreaInterface): any[] {
-    return this.plantaService.getGlobalCoordsFromLocationAreaOl(this.pathToCoordinate(seg.path)[0], this.allLocAreas);
+  getCompleteGlobalCoords(seg: LocationAreaInterface, indexSelected: number): any[] {
+    const globalCoords = seg.globalCoords;
+
+    this.largestLocAreas.forEach((locArea) => {
+      const centroid = this.getCentroid(this.pathToCoordinate(seg.path));
+      const polygon = this.pathToCoordinate(locArea.path);
+
+      if (inside(centroid, polygon)) {
+        locArea.globalCoords.forEach((coord, index) => {
+          if (index < indexSelected && coord !== undefined && coord !== null && coord !== '') {
+            globalCoords[index] = coord;
+          }
+        });
+      }
+    });
+
+    return globalCoords;
+  }
+
+  getCentroid(coords: Coordinate[]): Coordinate {
+    let sumLong = 0;
+    let sumLat = 0;
+    coords.forEach((coord) => {
+      sumLong += coord[0];
+      sumLat += coord[1];
+    });
+
+    return [sumLong / coords.length, sumLat / coords.length];
   }
 
   pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {
