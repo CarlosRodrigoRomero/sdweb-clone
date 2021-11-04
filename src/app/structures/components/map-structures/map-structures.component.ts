@@ -53,6 +53,7 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
   private prevFeatureHover: Feature;
   private rawModLayer: VectorLayer;
   endFilterSubscription = false;
+  public rawModHovered: RawModule;
 
   private subscriptionFilters: Subscription = new Subscription();
   private subscriptions: Subscription = new Subscription();
@@ -341,13 +342,25 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
             }
             currentFeatureHover = feature;
 
+            this.rawModHovered = this.rawMods.find((rawMod) => rawMod.id === feature.getProperties().properties.id);
+
             // aplicamos el efecto resaltado
             feature.setStyle(this.getStyleRawMod(true));
 
             this.prevFeatureHover = feature;
           }
+        } else {
+          const feature: Feature = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined)
+            .filter((item) => item.getProperties().properties.name === 'rawMod')[0] as Feature;
+
+          if (feature !== undefined) {
+            this.rawModHovered = this.rawMods.find((rawMod) => rawMod.id === feature.getProperties().properties.id);
+          } 
         }
       } else {
+        this.rawModHovered = undefined;
         if (currentFeatureHover !== undefined) {
           // quitamos el efecto resaltado
           currentFeatureHover.setStyle(this.getStyleRawMod(false));

@@ -61,8 +61,23 @@ export class PortfolioControlService {
 
               if (informesPlanta.length > 0) {
                 informesPlanta.forEach((informe) => {
-                  // comprobamos que el informe tiene "mae" y que esta "disponible"
-                  if (informe.mae !== undefined && informe.mae !== Infinity && informe.disponible === true) {
+                  // si el informe es reciente ponemos el mae a 0 en las siguientes situaciones
+                  if (informe.fecha > 1619820000) {
+                    if (!informe.hasOwnProperty('mae')) {
+                      informe.mae = 0;
+                    } else if (isNaN(informe.mae) || informe.mae === Infinity || informe.mae === null) {
+                      informe.mae = 0;
+                    }
+                  }
+
+                  // comprobamos si el "mae" es correcto y si está "disponible"
+                  if (
+                    informe.mae !== undefined &&
+                    informe.mae !== Infinity &&
+                    !isNaN(informe.mae) &&
+                    informe.mae !== null &&
+                    informe.disponible === true
+                  ) {
                     // añadimos el informe a la lista
                     this.listaInformes.push(informe);
 
@@ -83,7 +98,13 @@ export class PortfolioControlService {
                   // comprobamos que no estubiese ya añadido
                   if (!this.listaInformes.map((inf) => inf.id).includes(informe.id)) {
                     // comprobamos que el informe tiene "mae" y que esta "disponible"
-                    if (informe.mae !== undefined && informe.mae !== Infinity && informe.disponible === true) {
+                    if (
+                      informe.mae !== undefined &&
+                      informe.mae !== Infinity &&
+                      !isNaN(informe.mae) &&
+                      informe.mae !== null &&
+                      informe.disponible === true
+                    ) {
                       // añadimos el informe a la lista
                       this.listaInformes.push(informe);
 
@@ -108,7 +129,11 @@ export class PortfolioControlService {
 
               // añadimos el mae del informe mas reciente de cada planta
               // los antiguos de fijas los devidimos por 100
-              if (planta.tipo !== 'seguidores' && informeReciente.fecha < 1619820000) {
+              if (
+                planta.tipo !== 'seguidores' &&
+                informeReciente.fecha < 1619820000 &&
+                planta.id !== 'egF0cbpXnnBnjcrusoeR'
+              ) {
                 this.maePlantas.push(informeReciente.mae / 100);
               } else {
                 // el resto añadimos normal

@@ -93,7 +93,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
       this.estructuraMatrix = null;
       if (est.estructuraCoords !== null) {
         this.filas = this.estructuraCoords.length;
-        this.columnas = this.estructuraCoords[0].length;
+        this.columnas = Math.max(...this.estructuraCoords.map((filas) => filas.length));
       }
     } else {
       this.estructuraCoords = null;
@@ -215,7 +215,11 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   getFilaColumnaRef(columna: number, fila: number): number[] {
     let filaRef: number;
     let columnaRef: number;
-    if (this.columnas === 1) {
+    let columnas = this.columnas;
+    if (this.estructuraCoords !== null) {
+      columnas = this.getColumnasFila(fila);
+    }
+    if (columnas === 1) {
       columnaRef = 1;
       if (fila === this.filas) {
         filaRef = fila - 1;
@@ -224,13 +228,17 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
       }
     } else {
       filaRef = fila;
-      if (columna === this.columnas) {
+      if (columna === columnas) {
         columnaRef = columna - 1;
       } else {
         columnaRef = columna + 1;
       }
     }
     return [columnaRef, filaRef];
+  }
+
+  private getColumnasFila(fila: number): number {
+    return this.estructuraCoords[fila - 1].length;
   }
 
   getRectanguloExterior(columna: number, fila: number): RectanguloInterface {

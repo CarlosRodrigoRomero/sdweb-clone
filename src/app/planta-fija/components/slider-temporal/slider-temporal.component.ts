@@ -70,13 +70,12 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
 
     this.mapControlService.sliderTemporal = this.currentYear;
 
-    combineLatest([
-      this.olMapService.getThermalLayers(),
-      this.olMapService.getAnomaliaLayers(),
-      this.olMapService.getAerialLayers(),
-    ])
-      .pipe(take(1))
-      .subscribe(([thermalLayers, anomLayers, aerialLayers]) => {
+    this.subscriptions.add(
+      combineLatest([
+        this.olMapService.getThermalLayers(),
+        this.olMapService.getAnomaliaLayers(),
+        this.olMapService.getAerialLayers(),
+      ]).subscribe(([thermalLayers, anomLayers, aerialLayers]) => {
         this.thermalLayers = thermalLayers;
         this.anomaliaLayers = anomLayers;
         this.aerialLayers = aerialLayers;
@@ -84,7 +83,8 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
         this.setThermalLayersOpacity(this.selectedInformeId);
         this.setAnomaliaLayersOpacity(this.selectedInformeId);
         this.setAerialLayersOpacity(this.selectedInformeId);
-      });
+      })
+    );
   }
 
   onChangeTemporalSlider(value: number) {

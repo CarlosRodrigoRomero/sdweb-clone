@@ -40,10 +40,6 @@ export class PerdidasFilterComponent implements OnInit, OnDestroy {
       this.filterControlService.maxPerdidasSource.subscribe((value) => (this.rangoMaxPerdidas = value))
     );
 
-    if (!this.reportControlService.plantaFija) {
-      this.maxPerdidas = 50;
-    }
-
     this.options = {
       floor: this.minPerdidas,
       ceil: this.maxPerdidas,

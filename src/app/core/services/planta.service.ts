@@ -207,11 +207,6 @@ export class PlantaService {
           const data = a.payload.doc.data() as LocationAreaInterface;
           data.id = a.payload.doc.id;
 
-          // si ya tienes las globals completas se las asignamos
-          if (data.completeGlobalCoords !== undefined) {
-            data.globalCoords = data.completeGlobalCoords;
-          }
-
           // generamos las globalCoords en caso de que no tenga
           if (data.globalCoords === undefined) {
             data.globalCoords = [data.globalX, data.globalY];
@@ -744,21 +739,13 @@ export class PlantaService {
     }
   }
 
-  loadOrtoImage(planta: PlantaInterface, map: any) {
-    var mapBounds = new google.maps.LatLngBounds(
+  loadOrtoImage(planta: PlantaInterface, informeId: string, map: any) {
+    const mapBounds = new google.maps.LatLngBounds(
       new google.maps.LatLng(planta.latitud - 0.02, planta.longitud - 0.02),
       new google.maps.LatLng(planta.latitud + 0.02, planta.longitud + 0.02)
     );
-    var mapMinZoom = 12;
-    var mapMaxZoom = 24;
-    // var opts = {
-    //   streetViewControl: false,
-    //   tilt: 0,
-    //   mapTypeId: google.maps.MapTypeId.HYBRID,
-    //   center: new google.maps.LatLng(0, 0),
-    //   zoom: mapMinZoom,
-    // };
-    // var map = new google.maps.Map(document.getElementById('map'), opts);
+    const mapMinZoom = planta.zoom - 2;
+    const mapMaxZoom = planta.zoom + 8;
 
     map.mapTypeId = 'roadmap';
     map.setOptions({ maxZoom: mapMaxZoom });
@@ -768,15 +755,15 @@ export class PlantaService {
     const imageMapType = new google.maps.ImageMapType({
       getTileUrl(coord, zoom) {
         const proj = map.getProjection();
-        var z2 = Math.pow(2, zoom);
-        var tileXSize = 256 / z2;
-        var tileYSize = 256 / z2;
-        var tileBounds = new google.maps.LatLngBounds(
+        const z2 = Math.pow(2, zoom);
+        const tileXSize = 256 / z2;
+        const tileYSize = 256 / z2;
+        const tileBounds = new google.maps.LatLngBounds(
           proj.fromPointToLatLng(new google.maps.Point(coord.x * tileXSize, (coord.y + 1) * tileYSize)),
           proj.fromPointToLatLng(new google.maps.Point((coord.x + 1) * tileXSize, coord.y * tileYSize))
         );
         if (!mapBounds.intersects(tileBounds) || zoom < mapMinZoom || zoom > mapMaxZoom) return null;
-        return 'https://solardrontech.es/tileserver.php?/index.json?/3ZTCav9adZ7trWBveUQO_visual/{z}/{x}/{y}.png'
+        return `https://solardrontech.es/tileserver.php?/index.json?/${informeId}_visual/{z}/{x}/{y}.png`
           .replace('{z}', zoom)
           .replace('{x}', coord.x)
           .replace('{y}', coord.y);

@@ -9,4 +9,5 @@ export class RawModule implements FilterableElement {
   coords: Coordinate[];
   centroid_gps_long: number;
   centroid_gps_lat: number;
+  image_name?: string;
 }

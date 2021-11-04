@@ -113,7 +113,7 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  selectAnomalia(row: any) {
+  selectAnomalia(row: any, zoom: boolean) {
     // quitamos el hover de la anomalia
     this.anomaliasControlService.anomaliaHover = undefined;
 
@@ -127,11 +127,13 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit {
     this.anomaliasControlService.setExternalStyle(row.id, true);
 
     // centramos la vista al hacer click
-    this.centerView(row.anomalia);
+    this.centerView(row.anomalia, zoom);
   }
 
-  private centerView(anomalia: Anomalia) {
+  private centerView(anomalia: Anomalia, zoom: boolean) {
     this.map.getView().setCenter(anomalia.featureCoords[0]);
-    this.map.getView().setZoom(this.planta.zoom + 6);
+    if (zoom) {
+      this.map.getView().setZoom(this.planta.zoom + 6);
+    }
   }
 }

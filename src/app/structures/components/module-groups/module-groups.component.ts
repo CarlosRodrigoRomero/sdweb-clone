@@ -13,7 +13,7 @@ import GeometryType from 'ol/geom/GeometryType';
 import { Coordinate } from 'ol/coordinate';
 import Polygon from 'ol/geom/Polygon';
 import Feature from 'ol/Feature';
-import { Select } from 'ol/interaction';
+import { DoubleClickZoom, Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
 
 import { OlMapService } from '@core/services/ol-map.service';
@@ -90,8 +90,14 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
         mGSource.clear();
 
         groups.forEach((mG) => {
+          let coords = mG.coords;
+
+          if (coords.length <= 2 || coords[2] === undefined) {
+            coords = this.getAllCoordsRectangle(mG.coords);
+          }
+
           const feature = new Feature({
-            geometry: new Polygon([this.getAllCoordsRectangle(mG.coords)]),
+            geometry: new Polygon([coords]),
             properties: {
               id: mG.id,
               name: 'moduleGroup',
@@ -124,15 +130,22 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
 
     this.draw = new Draw({
       source: sourceGroup,
-      // type: GeometryType.POLYGON,
       type: GeometryType.CIRCLE,
       geometryFunction: createBox(),
     });
+
     this.olMapService.draw = this.draw;
 
     this.map.addInteraction(this.draw);
 
     this.draw.on('drawend', (evt) => {
+      // desactivamos el dobleclick para que no interfiera al cerrar poligono
+      this.map.getInteractions().forEach((interaction) => {
+        if (interaction instanceof DoubleClickZoom) {
+          this.map.removeInteraction(interaction);
+        }
+      });
+
       sourceGroup.clear();
 
       // obtenemos un ID aleatorio
@@ -159,6 +172,98 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
     });
   }
 
+  drawIrregularGroup() {
+    this.structuresService.drawModGroups = true;
+
+    const sourceGroup = new VectorSource();
+    const style = new Style({
+      stroke: new Stroke({
+        color: 'rgba(0,0,0,0)',
+        width: 2,
+      }),
+    });
+
+    this.vectorGroup = this.olMapService.createVectorLayer(sourceGroup);
+    this.vectorGroup.setStyle(style);
+
+    this.map.addLayer(this.vectorGroup);
+
+    this.draw = new Draw({
+      source: sourceGroup,
+      type: GeometryType.POLYGON,
+    });
+
+    this.olMapService.draw = this.draw;
+
+    this.map.addInteraction(this.draw);
+
+    this.draw.on('drawend', (evt) => {
+      // desactivamos el dobleclick para que no interfiera al cerrar poligono
+      this.map.getInteractions().forEach((interaction) => {
+        if (interaction instanceof DoubleClickZoom) {
+          this.map.removeInteraction(interaction);
+        }
+      });
+
+      sourceGroup.clear();
+
+      // obtenemos un ID aleatorio
+      const id = this.structuresService.generateRandomId();
+
+      const coords = this.getCoordsPolygon(evt);
+
+      coords.pop();
+
+      const modGroup: ModuleGroup = {
+        id,
+        coords,
+      };
+
+      // lo añadimos a la lista de agrupaciones
+      this.structuresService.allModGroups = [...this.structuresService.allModGroups, modGroup];
+
+      // this.prepareIrregularCoordsToDB(modGroup);
+
+      // lo añadimos a la DB
+      this.structuresService.addModuleGroup(modGroup);
+
+      // terminamos el modo draw
+      this.map.removeInteraction(this.draw);
+
+      // cambiamos el boton
+      this.structuresService.drawModGroups = false;
+    });
+  }
+
+  private prepareIrregularCoordsToDB(modGroup: ModuleGroup) {
+    const coords: Coordinate[] = [];
+    modGroup.coords.forEach((coord, index) => {
+      if (index < 4) {
+        coords.push(coord);
+      }
+    });
+
+    coords.sort((a, b) => a[0] - b[0]);
+
+    const lefts = [coords[0], coords[1]];
+    const rights = [coords[2], coords[3]];
+
+    let topLeft = lefts[0];
+    let bottomLeft = lefts[1];
+    if (topLeft[1] < bottomLeft[1]) {
+      topLeft = lefts[1];
+      bottomLeft = lefts[0];
+    }
+    let topRight = rights[0];
+    let bottomRight = rights[1];
+    if (topRight[1] < bottomRight[1]) {
+      topRight = rights[1];
+      bottomRight = rights[0];
+    }
+
+    return { topLeft, topRight, bottomRight, bottomLeft };
+  }
+
   cancelDraw() {
     this.structuresService.drawModGroups = false;
 
@@ -170,6 +275,13 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
     const coords = polygon.getCoordinates();
 
     return [coords[0][1], coords[0][3]];
+  }
+
+  getCoordsPolygon(event: DrawEvent): Coordinate[] {
+    const polygon = event.feature.getGeometry() as Polygon;
+    const coords = polygon.getCoordinates();
+
+    return coords[0];
   }
 
   getAllCoordsRectangle(coords: Coordinate[]) {

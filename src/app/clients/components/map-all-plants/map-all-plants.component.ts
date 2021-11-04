@@ -173,19 +173,39 @@ export class MapAllPlantsComponent implements OnInit {
         const tipoPlanta = feature[0].getProperties().tipo;
         const fechaInformeReciente = feature[0].getProperties().fechaInfReciente;
 
-        if (tipoPlanta === 'seguidores') {
-          this.router.navigate(['clients/tracker/' + plantaId]);
-        } else if (fechaInformeReciente > 1619820000 || plantaId === 'egF0cbpXnnBnjcrusoeR') {
-          this.router.navigate(['clients/fixed/' + plantaId]);
+        if (!this.checkFake(plantaId)) {
+          if (tipoPlanta === 'seguidores') {
+            this.router.navigate(['clients/tracker/' + plantaId]);
+          } else if (fechaInformeReciente > 1619820000 || plantaId === 'egF0cbpXnnBnjcrusoeR') {
+            this.router.navigate(['clients/fixed/' + plantaId]);
+          } else {
+            this.openSnackBar();
+          }
         } else {
-          this.openSnackBar();
+          this.openSnackBarDemo();
         }
       }
     });
   }
 
+  private checkFake(plantaId: string): boolean {
+    const fakeIds = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10'];
+    if (fakeIds.includes(plantaId)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private openSnackBar() {
     this._snackBar.open('Planta en mantenimiento temporalmente', 'OK', {
+      duration: 5000,
+      verticalPosition: 'top',
+    });
+  }
+
+  private openSnackBarDemo() {
+    this._snackBar.open('Planta sin contenido. Acceda a "Demo 1"', '', {
       duration: 5000,
       verticalPosition: 'top',
     });

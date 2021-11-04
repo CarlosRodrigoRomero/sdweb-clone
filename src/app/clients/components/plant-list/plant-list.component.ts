@@ -111,15 +111,19 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     const tipoPlanta = row.tipo;
     const fecha = row.ultimaInspeccion;
 
-    // provisional - no abre ningun informe de fijas anterior al 1/05/2021 salvo DEMO
-    if (tipoPlanta === 'seguidores') {
-      this.router.navigate(['clients/tracker/' + plantaId]);
-    } else {
-      if (fecha > 1619820000 || plantaId === 'egF0cbpXnnBnjcrusoeR') {
-        this.router.navigate(['clients/fixed/' + plantaId]);
+    if (!this.checkFake(plantaId)) {
+      // provisional - no abre ningun informe de fijas anterior al 1/05/2021 salvo DEMO
+      if (tipoPlanta === 'seguidores') {
+        this.router.navigate(['clients/tracker/' + plantaId]);
       } else {
-        this.openSnackBar();
+        if (fecha > 1619820000 || plantaId === 'egF0cbpXnnBnjcrusoeR') {
+          this.router.navigate(['clients/fixed/' + plantaId]);
+        } else {
+          this.openSnackBar();
+        }
       }
+    } else {
+      this.openSnackBarDemo();
     }
   }
 
@@ -127,8 +131,24 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     this.router.navigate(['clientes/informe-view/' + informeId + '/informe-overview']);
   }
 
+  private checkFake(plantaId: string): boolean {
+    const fakeIds = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10'];
+    if (fakeIds.includes(plantaId)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private openSnackBar() {
     this._snackBar.open('Acceda a inspecciones antiguas a la derecha en la tabla', '', {
+      duration: 5000,
+      verticalPosition: 'top',
+    });
+  }
+
+  private openSnackBarDemo() {
+    this._snackBar.open('Planta sin contenido. Acceda a "Demo 1"', '', {
       duration: 5000,
       verticalPosition: 'top',
     });

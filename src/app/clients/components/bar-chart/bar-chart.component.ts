@@ -234,7 +234,7 @@ export class BarChartComponent implements OnInit {
   }
 
   private average(data) {
-    const sum = data.reduce(function (sum, value) {
+    const sum = data.reduce((sum, value) => {
       return sum + value;
     }, 0);
 
@@ -248,12 +248,16 @@ export class BarChartComponent implements OnInit {
       const tipoPlanta = this.tiposPlantas[index];
       const fechaInformeReciente = this.fechaInformesRecientes[index];
 
-      if (tipoPlanta === 'seguidores') {
-        this.router.navigate(['clients/tracker/' + plantaId]);
-      } else if (fechaInformeReciente > 1619820000 || plantaId === 'egF0cbpXnnBnjcrusoeR') {
-        this.router.navigate(['clients/fixed/' + plantaId]);
+      if (!this.checkFake(plantaId)) {
+        if (tipoPlanta === 'seguidores') {
+          this.router.navigate(['clients/tracker/' + plantaId]);
+        } else if (fechaInformeReciente > 1619820000 || plantaId === 'egF0cbpXnnBnjcrusoeR') {
+          this.router.navigate(['clients/fixed/' + plantaId]);
+        } else {
+          this.openSnackBar();
+        }
       } else {
-        this.openSnackBar();
+        this.openSnackBarDemo();
       }
     }
   }
@@ -263,5 +267,21 @@ export class BarChartComponent implements OnInit {
       duration: 5000,
       verticalPosition: 'top',
     });
+  }
+
+  private openSnackBarDemo() {
+    this._snackBar.open('Planta sin contenido. Acceda a "Demo 1"', '', {
+      duration: 5000,
+      verticalPosition: 'top',
+    });
+  }
+
+  private checkFake(plantaId: string): boolean {
+    const fakeIds = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10'];
+    if (fakeIds.includes(plantaId)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

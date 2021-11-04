@@ -10,5 +10,4 @@ export interface LocationAreaInterface extends AreaInterface {
   moduloId?: string;
   modulo?: ModuloInterface;
   globalCoords?: any[];
-  completeGlobalCoords: any[];
 }
