@@ -1227,21 +1227,31 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   private getCoordsPolygonCanvas(
-    coordsOrigen: number[][],
-    coordsFin: number[][],
+    coordsTileOrigen: number[][],
+    coordsTileFin: number[][],
     polygonCoords: Coordinate[],
     lado: number
   ) {
-    const topLeft = coordsOrigen[1];
-    const bottomRight = coordsFin[3];
-    const anomTopLeft = polygonCoords[0];
-    const anomBottomRight = polygonCoords[2];
-    const polygonLeft = ((anomTopLeft[0] - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
+    const topLeft = coordsTileOrigen[1];
+    const bottomRight = coordsTileFin[3];
+    const horizOrdered = polygonCoords.sort((a, b) => a[0] - b[0]);
+
+    let polygonTopLeft = horizOrdered[0];
+    if (polygonTopLeft[1] < horizOrdered[1][1]) {
+      polygonTopLeft = horizOrdered[1];
+    }
+    let polygonBottomRight = horizOrdered[2];
+    if (polygonBottomRight[1] > horizOrdered[3][1]) {
+      polygonBottomRight = horizOrdered[3];
+    }
+    const polygonLeft =
+      ((polygonTopLeft[0] - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
     const polygonRight =
-      ((anomBottomRight[0] - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
-    const polygonTop = ((anomTopLeft[1] - topLeft[1]) * (this.tileResolution * lado)) / (bottomRight[1] - topLeft[1]);
+      ((polygonBottomRight[0] - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
+    const polygonTop =
+      (Math.abs(polygonTopLeft[1] - topLeft[1]) * (this.tileResolution * lado)) / Math.abs(bottomRight[1] - topLeft[1]);
     const polygonBottom =
-      ((anomBottomRight[1] - topLeft[1]) * (this.tileResolution * lado)) / (bottomRight[1] - topLeft[1]);
+      ((polygonBottomRight[1] - topLeft[1]) * (this.tileResolution * lado)) / (bottomRight[1] - topLeft[1]);
     const width = Math.abs(polygonRight - polygonLeft);
     const height = Math.abs(polygonBottom - polygonTop);
 
@@ -1249,8 +1259,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   private setImgSeguidor1EjeCanvas(seg: LocationAreaInterface, count: number, anomalias?: Anomalia[]) {
-    const coords = this.pathToCoordinate(seg.path);
-    const tileCoords = this.getElemTiles(coords, this.getElemExtent(coords), 22);
+    const segCoords = this.pathToCoordinate(seg.path);
+    const tileCoords = this.getElemTiles(segCoords, this.getElemExtent(segCoords), 22);
 
     const canvas = new fabric.Canvas('canvas');
     const lado = Math.sqrt(tileCoords.length);
@@ -1292,13 +1302,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
               const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
               const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
-              const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, coords, lado);
+              const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, segCoords, lado);
 
               if (anomalias !== undefined) {
                 this.drawAnomaliasSeguidor(anomalias, canvas, longLatOrigen, longLatFin, lado);
               }
 
-              this.canvasCenterAndZoomInAnom(coordsSegCanvas, canvas, true);
+              // this.drawPolygonInCanvas(count.toString(), canvas, coordsSegCanvas);
+              this.canvasCenterAndZoomInAnom(coordsSegCanvas, canvas , true);
 
               if (anomalias !== undefined) {
                 this.imageListBase64[`imgCanvasSegAnoms${count}`] = canvas.toDataURL({
@@ -1320,13 +1331,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
               const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
               const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
-              const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, coords, lado);
+              const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, segCoords, lado);
 
               if (anomalias !== undefined) {
                 this.drawAnomaliasSeguidor(anomalias, canvas, longLatOrigen, longLatFin, lado);
               }
 
-              this.canvasCenterAndZoomInAnom(coordsSegCanvas, canvas, true);
+              // this.drawPolygonInCanvas(count.toString(), canvas, coordsSegCanvas);
+              this.canvasCenterAndZoomInAnom(coordsSegCanvas, canvas , true);
 
               if (anomalias !== undefined) {
                 this.imageListBase64[`imgCanvasSegAnoms${count}`] = canvas.toDataURL({
