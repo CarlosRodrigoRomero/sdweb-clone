@@ -1201,9 +1201,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     // VERDINALES
     let desviacion = 1;
-    if (trim) {
-      desviacion = 0.85;
-    }
+    // if (trim) {
+    //   desviacion = 0.85;
+    // }
 
     canvas.setZoom(1); // reset zoom so pan actions work as expected
     const vpw = canvas.width / zoom;
@@ -1215,7 +1215,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     // VERDINALES
     if (trim) {
-      const left = (canvas.getWidth() / 2) * 0.5;
+      const left = (canvas.getWidth() / 2) * 0.75;
       const width = (canvas.getWidth() / 2 - left) * 2;
       canvas.clipTo = (ctx) => {
         ctx.rect(left, 0, width, canvas.getWidth());
@@ -3069,7 +3069,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
       const pagAnexo = [
         {
-          text: `${this.translation.t('Seguidor')} ${this.globalCoordsLabel(seg.globalCoords)}`,
+          // text: `${this.translation.t('Seguidor')} ${this.globalCoordsLabel(seg.globalCoords)}`,
+          text: `${this.translation.t('Seguidor')} ${i + 1}/${this.seguidores1ejeAnoms.length}`,
           style: 'h2',
           alignment: 'center',
           pageBreak: 'before',
@@ -3316,14 +3317,15 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (let i = 0; i < 2 /* this.seguidores1ejeNoAnoms.length */; i++) {
+    for (let i = 400; i < this.seguidores1ejeNoAnoms.length; i++) {
       const seg = this.seguidores1ejeNoAnoms[i];
 
       const segTable = this.getSeg1ejeTable();
 
       const pagAnexo = [
         {
-          text: `${this.translation.t('Seguidor')} ${this.globalCoordsLabel(seg.globalCoords)}`,
+          // text: `${this.translation.t('Seguidor')} ${this.globalCoordsLabel(seg.globalCoords)}`,
+          text: `${this.translation.t('Seguidor')} ${i + 1}/${this.seguidores1ejeNoAnoms.length}`,
           style: 'h2',
           alignment: 'center',
           pageBreak: 'before',
