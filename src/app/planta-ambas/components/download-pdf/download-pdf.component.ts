@@ -44,6 +44,7 @@ import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
 export interface Apartado {
   nombre: string;
@@ -543,21 +544,21 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               elegible: true,
             });
 
-            if (this.planta.tipo === '1 eje') {
-              this.apartadosInforme.push({
-                nombre: 'anexoSeguidores1EjeAnoms',
-                descripcion: 'Anexo III: Anomalías térmicas por seguidor',
-                orden: 17,
-                elegible: true,
-              });
+            // if (this.planta.tipo === '1 eje') {
+            //   this.apartadosInforme.push({
+            //     nombre: 'anexoSeguidores1EjeAnoms',
+            //     descripcion: 'Anexo III: Anomalías térmicas por seguidor',
+            //     orden: 17,
+            //     elegible: true,
+            //   });
 
-              this.apartadosInforme.push({
-                nombre: 'anexoSeguidores1EjeNoAnoms',
-                descripcion: 'Anexo III: Seguidores sin anomalías',
-                orden: 18,
-                elegible: true,
-              });
-            }
+            //   this.apartadosInforme.push({
+            //     nombre: 'anexoSeguidores1EjeNoAnoms',
+            //     descripcion: 'Anexo III: Seguidores sin anomalías',
+            //     orden: 18,
+            //     elegible: true,
+            //   });
+            // }
           }
 
           this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
@@ -661,79 +662,79 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         }
       });
 
-      if (this.planta.tipo === '1 eje') {
-        this.seguidores1ejeAnoms.forEach((seg, index) => {
-          if (index < 2) {
-            this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
+      // if (this.planta.tipo === '1 eje') {
+      //   this.seguidores1ejeAnoms.forEach((seg, index) => {
+      //     if (index < 2) {
+      //       this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
+      //     }
+      //   });
+
+      //   this.seguidores1ejeNoAnoms.forEach((seg, index) => {
+      //     if (index < 2) {
+      //       this.setImgSeguidor1EjeCanvas(seg, index);
+      //     }
+      //   });
+
+      //   // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+      //   let downloads = 0;
+
+      //   this.subscriptions.add(
+      //     combineLatest([
+      //       this.countLoadedImages$,
+      //       this.countLoadedImagesSegs1EjeAnoms$,
+      //       this.countLoadedImagesSegs1EjeNoAnoms$,
+      //     ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
+      //       this.downloadReportService.progressBarValue = Math.round(
+      //         ((countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
+      //           (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
+      //           100
+      //       );
+
+      //       // Cuando se carguen todas las imágenes
+      //       if (
+      //         countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
+      //           6 /* this.countAnomalias  + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length*/ &&
+      //         downloads === 0
+      //       ) {
+      //         this.calcularInforme();
+
+      //         pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
+      //           this.downloadReportService.progressBarValue = 0;
+
+      //           this.downloadReportService.generatingPDF = false;
+      //         });
+      //         this.downloadReportService.endingPDF = true;
+
+      //         downloads++;
+      //       }
+      //     })
+      //   );
+      // } else {
+      // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+      let downloads = 0;
+
+      this.subscriptions.add(
+        this.countLoadedImages$.subscribe((countLoadedImgs) => {
+          this.downloadReportService.progressBarValue = Math.round(
+            (countLoadedImgs / this.anomaliasInforme.length) * 100
+          );
+
+          // Cuando se carguen todas las imágenes
+          if (countLoadedImgs === 2 /* this.countAnomalias */ && downloads === 0) {
+            this.calcularInforme();
+
+            pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
+              this.downloadReportService.progressBarValue = 0;
+
+              this.downloadReportService.generatingPDF = false;
+            });
+            this.downloadReportService.endingPDF = true;
+
+            downloads++;
           }
-        });
-
-        this.seguidores1ejeNoAnoms.forEach((seg, index) => {
-          if (index < 2) {
-            this.setImgSeguidor1EjeCanvas(seg, index);
-          }
-        });
-
-        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-        let downloads = 0;
-
-        this.subscriptions.add(
-          combineLatest([
-            this.countLoadedImages$,
-            this.countLoadedImagesSegs1EjeAnoms$,
-            this.countLoadedImagesSegs1EjeNoAnoms$,
-          ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
-            this.downloadReportService.progressBarValue = Math.round(
-              ((countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
-                (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
-                100
-            );
-
-            // Cuando se carguen todas las imágenes
-            if (
-              countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
-                6 /* this.countAnomalias  + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length*/ &&
-              downloads === 0
-            ) {
-              this.calcularInforme();
-
-              pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
-                this.downloadReportService.progressBarValue = 0;
-
-                this.downloadReportService.generatingPDF = false;
-              });
-              this.downloadReportService.endingPDF = true;
-
-              downloads++;
-            }
-          })
-        );
-      } else {
-        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-        let downloads = 0;
-
-        this.subscriptions.add(
-          this.countLoadedImages$.subscribe((countLoadedImgs) => {
-            this.downloadReportService.progressBarValue = Math.round(
-              (countLoadedImgs / this.anomaliasInforme.length) * 100
-            );
-
-            // Cuando se carguen todas las imágenes
-            if (countLoadedImgs === 5 /* this.countAnomalias */ && downloads === 0) {
-              this.calcularInforme();
-
-              pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
-                this.downloadReportService.progressBarValue = 0;
-
-                this.downloadReportService.generatingPDF = false;
-              });
-              this.downloadReportService.endingPDF = true;
-
-              downloads++;
-            }
-          })
-        );
-      }
+        })
+      );
+      // }
     } else {
       // Generar imagenes
       this.countSeguidores = 0;
@@ -837,7 +838,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.dataSource = new MatTableDataSource(this.countCategoriaClase);
   }
 
-  getDocDefinition(images?: any) {
+  getDocDefinition(images?: any): TDocumentDefinitions {
     const pages = this.getPagesPDF();
     let anexo1 = [];
     let anexoAnomalias = [];
@@ -876,16 +877,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         if (currentPage > 1) {
           return [
             {
-              margin: 10,
-              columns: [
-                {
-                  // usually you would use a dataUri instead of the name for client-side printing
-                  // sampleImage.jpg however works inside playground so you can play with it
-                  margin: [300 - this.widthLogo * this.scaleImgLogoHeader, 0, 0, 0],
-                  image: this.imgLogoBase64,
-                  width: this.scaleImgLogoHeader * this.widthLogo,
-                },
-              ],
+              margin: [300 - this.widthLogo * this.scaleImgLogoHeader, 10, 0, 0],
+              image: this.imgLogoBase64,
+              width: this.scaleImgLogoHeader * this.widthLogo,
             },
           ];
         }
@@ -1030,7 +1024,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         },
         anomInfoTitle: {
           bold: true,
-          aligment: 'left',
+          alignment: 'left',
           fontSize: 13,
           lineHeight: 1.5,
         },
@@ -1708,6 +1702,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Criterios de operación')}`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -1841,6 +1837,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Normalización de gradientes de temperatura')}`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -2041,6 +2039,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Datos del vuelo')}`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -2082,6 +2082,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Irradiancia durante el vuelo')}`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -2108,6 +2110,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Ajuste de parámetros térmicos')}`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -2194,7 +2198,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           style: 'param',
         },
 
-        '\n\n',
+        // '\n\n',
       ];
     };
 
@@ -2203,6 +2207,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Pérdida de Performance Ratio')} (ΔPR)`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -2401,6 +2407,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Cómo se clasifican las anomalías térmicas (según IEC 62446-3)')}`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -2461,8 +2469,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Resultados de la inspección termográfica')}`,
           style: 'h2',
-          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
           alignment: 'center',
+          pageBreak: 'before',
         },
 
         {
@@ -2735,6 +2744,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       {
         text: `1 - ${this.translation.t('Introducción')}`,
         style: 'h2',
+        margin: [0, 10, 0, 0],
         alignment: 'center',
       },
 
