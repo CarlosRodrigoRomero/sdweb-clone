@@ -8,8 +8,11 @@ import { MatTableDataSource } from '@angular/material/table';
 
 import { AuthService } from '@core/services/auth.service';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
+import { GLOBAL } from '@core/services/global';
+
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+
 
 interface PlantsData {
   nombre: string;
@@ -62,12 +65,12 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
       let informesAntiguos: InformeInterface[] = [];
       if (planta.tipo !== 'seguidores' && planta.id !== 'egF0cbpXnnBnjcrusoeR') {
-        informesAntiguos = informesPlanta.filter((informe) => informe.fecha < 1619820000);
+        informesAntiguos = informesPlanta.filter((informe) => informe.fecha < GLOBAL.newReportsDate);
       }
 
       let mae: number;
       // los antiguos de fijas los devidimos por 100
-      if (planta.tipo !== 'seguidores' && informeReciente.fecha < 1619820000 && planta.id !== 'egF0cbpXnnBnjcrusoeR') {
+      if (planta.tipo !== 'seguidores' && informeReciente.fecha < GLOBAL.newReportsDate && planta.id !== 'egF0cbpXnnBnjcrusoeR') {
         mae = informeReciente.mae / 100;
       } else {
         // el resto añadimos normal
@@ -116,7 +119,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
       if (tipoPlanta === 'seguidores') {
         this.router.navigate(['clients/tracker/' + plantaId]);
       } else {
-        if (fecha > 1619820000 || plantaId === 'egF0cbpXnnBnjcrusoeR') {
+        if (fecha > GLOBAL.newReportsDate || plantaId === 'egF0cbpXnnBnjcrusoeR') {
           this.router.navigate(['clients/fixed/' + plantaId]);
         } else {
           this.openSnackBar();

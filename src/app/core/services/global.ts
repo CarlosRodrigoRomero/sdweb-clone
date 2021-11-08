@@ -33,6 +33,7 @@ export let GLOBAL = {
   nombreLocalXFija: 'Columna',
   nombreLocalYFija: 'Altura',
   mae: [1, 2],
+  newReportsDate: 1619820000,
   anomaliaPorDefecto: 9,
   resolucionCamara: [512, 640],
   globalCoordsEstructura: [0, 1, 2],

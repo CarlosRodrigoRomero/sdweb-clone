@@ -15,9 +15,11 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat } from 'ol/proj';
 
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
+import { GLOBAL } from '@core/services/global';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+
 
 @Component({
   selector: 'app-map-all-plants',
@@ -176,7 +178,7 @@ export class MapAllPlantsComponent implements OnInit {
         if (!this.checkFake(plantaId)) {
           if (tipoPlanta === 'seguidores') {
             this.router.navigate(['clients/tracker/' + plantaId]);
-          } else if (fechaInformeReciente > 1619820000 || plantaId === 'egF0cbpXnnBnjcrusoeR') {
+          } else if (fechaInformeReciente > GLOBAL.newReportsDate || plantaId === 'egF0cbpXnnBnjcrusoeR') {
             this.router.navigate(['clients/fixed/' + plantaId]);
           } else {
             this.openSnackBar();

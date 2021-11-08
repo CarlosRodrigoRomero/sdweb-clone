@@ -251,7 +251,7 @@ export class BarChartComponent implements OnInit {
       if (!this.checkFake(plantaId)) {
         if (tipoPlanta === 'seguidores') {
           this.router.navigate(['clients/tracker/' + plantaId]);
-        } else if (fechaInformeReciente > 1619820000 || plantaId === 'egF0cbpXnnBnjcrusoeR') {
+        } else if (fechaInformeReciente > GLOBAL.newReportsDate || plantaId === 'egF0cbpXnnBnjcrusoeR') {
           this.router.navigate(['clients/fixed/' + plantaId]);
         } else {
           this.openSnackBar();

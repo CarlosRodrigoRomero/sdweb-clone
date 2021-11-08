@@ -61,7 +61,7 @@ export class InformeViewComponent implements OnInit {
         this.getPcsList(informe);
         this.informe = informe;
         // multiplicamos x100 el mae de los informes nuevos
-        if (this.informe.fecha > 1619820000) {
+        if (this.informe.fecha > GLOBAL.newReportsDate) {
           this.informe.mae = this.informe.mae * 100;
         }
         this.storage

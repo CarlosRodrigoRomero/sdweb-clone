@@ -29,8 +29,7 @@ export class DownloadReportService {
   filteredPDF$ = new BehaviorSubject<boolean>(this._filteredPDF);
   private _seguidores1Eje: LocationAreaInterface[] = [];
   seguidores1Eje$ = new BehaviorSubject<LocationAreaInterface[]>(this._seguidores1Eje);
-  private allLocAreas: LocationAreaInterface[] = [];
-  private largestLocAreas: LocationAreaInterface[] = [];
+  private noS1EsLocAreas: LocationAreaInterface[] = [];
 
   constructor(private plantaService: PlantaService) {}
 
@@ -107,9 +106,6 @@ export class DownloadReportService {
       .getLocationsArea(plantaId)
       .pipe(take(1))
       .subscribe((locAreaList) => {
-        // guardamos todas las areas
-        this.allLocAreas = locAreaList;
-
         // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
         const coordsLength = locAreaList[0].globalCoords.length;
 
@@ -138,7 +134,7 @@ export class DownloadReportService {
             locArea.globalCoords[indiceSeleccionado] !== ''
         );
 
-        this.largestLocAreas = locAreaList
+        this.noS1EsLocAreas = locAreaList
           .filter((locArea) => !segs1Eje.includes(locArea))
           .filter((locArea) => locArea.globalCoords.toString() !== ',' && locArea.globalCoords.toString() !== '');
 
@@ -151,7 +147,7 @@ export class DownloadReportService {
   getCompleteGlobalCoords(seg: LocationAreaInterface, indexSelected: number): any[] {
     const globalCoords = seg.globalCoords;
 
-    this.largestLocAreas.forEach((locArea) => {
+    this.noS1EsLocAreas.forEach((locArea) => {
       const centroid = this.getCentroid(this.pathToCoordinate(seg.path));
       const polygon = this.pathToCoordinate(locArea.path);
 
