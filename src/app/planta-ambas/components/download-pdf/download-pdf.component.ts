@@ -20,6 +20,7 @@ import { LocationAreaInterface } from '@core/models/location';
 import { LatLngLiteral } from '@agm/core';
 
 import pdfMake from 'pdfmake/build/pdfmake.js';
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
 import inside from 'point-in-polygon';
 
@@ -37,14 +38,13 @@ import { ImageProcessService } from '../../services/image-process.service';
 import { AnomaliaInfoService } from '@core/services/anomalia-info.service';
 
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
-import { Translation } from 'src/app/informe-export/components/export/translations';
+import { Translation } from '@shared/utils/translations/translations';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
-import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
 export interface Apartado {
   nombre: string;
@@ -169,6 +169,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.subscriptions.add(
+      this.downloadReportService.englishLang$.subscribe((lang) => {
+        if (lang) {
+          this.language = 'en';
+        } else {
+          this.language = 'es';
+        }
+      })
+    );
+
     this.numTipos = Array(GLOBAL.labels_tipos.length)
       .fill(0)
       .map((_, i) => i + 1);
@@ -203,7 +213,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             locArea.globalCoords[0] !== undefined && locArea.globalCoords[0] !== null && locArea.globalCoords[0] !== ''
         );
 
-        this.setImgPlantaCompleta(this.largestLocAreas);
+        // this.setImgPlantaCompleta(this.largestLocAreas);
       });
 
     this.subscriptions.add(
@@ -242,7 +252,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
           if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
             // imágenes planta completa
-            this.setImgPlantaCompleta(this.largestLocAreas);
+            // this.setImgPlantaCompleta(this.largestLocAreas);
           }
 
           // if (filteredPDF !== undefined) {
@@ -501,13 +511,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               apt: 1,
               elegible: true,
             },
-            {
-              nombre: 'planoTermico',
-              descripcion: 'Plano térmico',
-              orden: 9,
-              apt: 1,
-              elegible: false,
-            },
+            // {
+            //   nombre: 'planoTermico',
+            //   descripcion: 'Plano térmico',
+            //   orden: 9,
+            //   apt: 1,
+            //   elegible: false,
+            // },
             {
               nombre: 'resultadosClase',
               descripcion: 'Resultados por clase',
@@ -698,14 +708,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       });
 
       // if (this.planta.tipo === '1 eje') {
-      // // Imagenes S1E con anomalías
+      //   // Imagenes S1E con anomalías
       //   this.seguidores1ejeAnoms.forEach((seg, index) => {
       //     if (index < 2) {
       //       this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
       //     }
       //   });
 
-      // // Imagenes S1E sin anomalías
+      //   // Imagenes S1E sin anomalías
       //   this.seguidores1ejeNoAnoms.forEach((seg, index) => {
       //     if (index < 2) {
       //       this.setImgSeguidor1EjeCanvas(seg, index);
@@ -730,7 +740,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       //       // Cuando se carguen todas las imágenes
       //       if (
       //         countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
-      //           6 /* this.countAnomalias  + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length*/ &&
+      //           4 /* + this.countAnomalias + this.seguidores1ejeAnoms.length */ +
+      //             this.seguidores1ejeNoAnoms.length -
+      //             400 &&
       //         downloads === 0
       //       ) {
       //         this.calcularInforme();
@@ -941,7 +953,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                 body: [
                   [
                     {
-                      text: currentPage,
+                      text: currentPage + 60 + 400,
                       alignment: 'center',
                       color: 'grey',
                       margin: [0, 10, 0, 0],
@@ -2007,7 +2019,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             style: 'tableLeft',
           },
           {
-            text: `${GLOBAL.camaraTermica}`,
+            text: `${this.translation.t(GLOBAL.camaraTermica)}`,
           },
         ],
         [
@@ -3106,21 +3118,29 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         },
         {
           columns: [
-            { text: 'Tipo de anomalía', width: 200, style: 'anomInfoTitle' },
-            { text: this.anomaliaInfoService.getTipoLabel(anom), style: 'anomInfoValue' },
+            { text: this.translation.t('Tipo de anomalía'), width: 200, style: 'anomInfoTitle' },
+            { text: this.translation.t(this.anomaliaInfoService.getTipoLabel(anom)), style: 'anomInfoValue' },
           ],
           margin: [0, 40, 0, 0],
         },
         {
           columns: [
-            { text: 'Causa', width: 200, style: 'anomInfoTitle' },
-            { text: this.anomaliaInfoService.getCausa(anom), style: 'anomInfoValue', margin: [0, 0, 0, 5] },
+            { text: this.translation.t('Causa'), width: 200, style: 'anomInfoTitle' },
+            {
+              text: this.translation.t(this.anomaliaInfoService.getCausa(anom)),
+              style: 'anomInfoValue',
+              margin: [0, 0, 0, 5],
+            },
           ],
         },
         {
           columns: [
-            { text: 'Recomendación', width: 200, style: 'anomInfoTitle' },
-            { text: this.anomaliaInfoService.getRecomendacion(anom), style: 'anomInfoValue', margin: [0, 0, 0, 5] },
+            { text: this.translation.t('Recomendación'), width: 200, style: 'anomInfoTitle' },
+            {
+              text: this.translation.t(this.anomaliaInfoService.getRecomendacion(anom)),
+              style: 'anomInfoValue',
+              margin: [0, 0, 0, 5],
+            },
           ],
         },
         {
@@ -3136,7 +3156,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               width: 200,
               style: 'anomInfoTitle',
             },
-            { text: this.anomaliaInfoService.getCriticidadLabel(anom), style: 'anomInfoValue' },
+            { text: this.translation.t(this.anomaliaInfoService.getCriticidadLabel(anom)), style: 'anomInfoValue' },
           ],
         },
         {
@@ -3191,7 +3211,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     // tslint:disable-next-line:max-line-length
     const pag1Anexo = {
       text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
-        'Anomalías por seguidor'
+        'Anomalías térmicas por seguidor'
       )}`,
       style: 'h1',
       alignment: 'center',
@@ -3200,7 +3220,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (let i = 0; i < 2 /* this.seguidores1ejeAnoms.length */; i++) {
+    for (let i = 0; i < this.seguidores1ejeAnoms.length; i++) {
       const seg = this.seguidores1ejeAnoms[i];
 
       const segTable = this.getSeg1ejeTable();
@@ -3459,7 +3479,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (let i = 400; i < this.seguidores1ejeNoAnoms.length; i++) {
+    for (let i = 0; i < this.seguidores1ejeNoAnoms.length; i++) {
       const seg = this.seguidores1ejeNoAnoms[i];
 
       const segTable = this.getSeg1ejeTable();

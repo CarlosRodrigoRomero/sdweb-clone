@@ -647,7 +647,7 @@ export class ExportComponent implements OnInit {
 
         pdfMake
           .createPdf(this.getDocDefinition(imageListBase64))
-          .download(this.informe.prefijo.concat('informe'), (cb) => {
+          .download(this.informe.prefijo.concat('informe'), () => {
             this.generandoPDF = false;
           });
       });

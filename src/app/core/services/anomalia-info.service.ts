@@ -6,6 +6,8 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { PlantaService } from '@core/services/planta.service';
 import { GLOBAL } from './global';
 
+import { Translation } from '@shared/utils/translations/translations';
+
 import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
@@ -15,6 +17,8 @@ import { PlantaInterface } from '@core/models/planta';
 })
 export class AnomaliaInfoService {
   private selectedInforme: InformeInterface;
+  private translation: Translation;
+  private language: string;
 
   constructor(
     @Inject(LOCALE_ID) public locale: string,
@@ -22,6 +26,8 @@ export class AnomaliaInfoService {
     private reportControlService: ReportControlService,
     private plantaService: PlantaService
   ) {
+    this.language = 'en';
+    this.translation = new Translation(this.language);
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInforme = this.reportControlService.informes.find((informe) => informe.id === informeId);
     });
@@ -119,16 +125,18 @@ export class AnomaliaInfoService {
 
     globals.forEach((coord, index) => {
       if (coord !== undefined && coord !== null && coord !== '') {
-        label += `${planta.nombreGlobalCoords[index]}: ${coord} / `;
+        label += `${this.translation.t(planta.nombreGlobalCoords[index])}: ${coord} / `;
       }
     });
 
     const numModulo = this.plantaService.getNumeroModulo(anomalia, 'anomalia', planta);
     if (numModulo !== undefined) {
       if (!isNaN(Number(numModulo))) {
-        label += `Nº módulo: ${numModulo}`;
+        label += `${this.translation.t('Nº módulo')}: ${numModulo}`;
       } else {
-        label += `Fila: ${anomalia.localY} / Columna: ${anomalia.localX}`;
+        label += `${this.translation.t('Fila')}: ${anomalia.localY} / ${this.translation.t('Columna')}: ${
+          anomalia.localX
+        }`;
       }
     }
 

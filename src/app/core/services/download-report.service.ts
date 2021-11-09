@@ -30,6 +30,8 @@ export class DownloadReportService {
   private _seguidores1Eje: LocationAreaInterface[] = [];
   seguidores1Eje$ = new BehaviorSubject<LocationAreaInterface[]>(this._seguidores1Eje);
   private noS1EsLocAreas: LocationAreaInterface[] = [];
+  private _englishLang = false;
+  englishLang$ = new BehaviorSubject<boolean>(this._englishLang);
 
   constructor(private plantaService: PlantaService) {}
 
@@ -228,5 +230,14 @@ export class DownloadReportService {
   set seguidores1Eje(value: LocationAreaInterface[]) {
     this._seguidores1Eje = value;
     this.seguidores1Eje$.next(value);
+  }
+
+  get englishLang() {
+    return this._englishLang;
+  }
+
+  set englishLang(value: boolean) {
+    this._englishLang = value;
+    this.englishLang$.next(value);
   }
 }
