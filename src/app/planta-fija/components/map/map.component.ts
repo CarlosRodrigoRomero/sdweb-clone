@@ -243,9 +243,9 @@ export class MapComponent implements OnInit, OnDestroy {
       satelliteLayer,
       ...this.aerialLayers,
       ...this.thermalLayers,
-      new TileLayer({
-        source: new TileDebug(),
-      }),
+      // new TileLayer({
+      //   source: new TileDebug(),
+      // }),
     ];
 
     // MAPA

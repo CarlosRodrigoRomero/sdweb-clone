@@ -220,5 +220,7 @@
   "Seguidores sin anomalías": "Trackers without abnormalities",
   "Zona": "Zone",
   "Mesa": "Table",
-  "Instalación": "Installation"
+  "Instalación": "Installation",
+  "Ortomosaico térmico": "Thermal orthomosaic",
+  "Ortomosaico RGB": "RGB orthomosaic"
 }

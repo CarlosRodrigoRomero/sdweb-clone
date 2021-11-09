@@ -121,7 +121,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private tileResolution = 256;
   private imgSolardroneBase64: string;
   private widthImgSolardroneTech: number;
-  private imagePlantaCompleta: string;
+  private imagesPlantaCompleta = {};
 
   private apartadosInforme: Apartado[];
   private countCategoria;
@@ -204,18 +204,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       )
     );
 
-    this.plantaService
-      .getLocationsArea(this.reportControlService.plantaId)
-      .pipe(take(1))
-      .subscribe((locAreas) => {
-        this.largestLocAreas = locAreas.filter(
-          (locArea) =>
-            locArea.globalCoords[0] !== undefined && locArea.globalCoords[0] !== null && locArea.globalCoords[0] !== ''
-        );
-
-        // this.setImgPlantaCompleta(this.largestLocAreas);
-      });
-
     this.subscriptions.add(
       this.plantaService
         .getPlanta(this.reportControlService.plantaId)
@@ -241,6 +229,17 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               .fill(0)
               .map((_, i) => i + 1);
 
+            return this.plantaService.getLocationsArea(this.planta.id);
+          }),
+          take(1),
+          switchMap((locAreas) => {
+            this.largestLocAreas = locAreas.filter(
+              (locArea) =>
+                locArea.globalCoords[0] !== undefined &&
+                locArea.globalCoords[0] !== null &&
+                locArea.globalCoords[0] !== ''
+            );
+
             return combineLatest([
               this.reportControlService.selectedInformeId$,
               this.downloadReportService.filteredPDF$,
@@ -249,11 +248,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         )
         .subscribe(([informeId, filteredPDF]) => {
           this.selectedInforme = this.reportControlService.informes.find((informe) => informeId === informe.id);
-
-          if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
-            // imágenes planta completa
-            // this.setImgPlantaCompleta(this.largestLocAreas);
-          }
 
           // if (filteredPDF !== undefined) {
           //   if (filteredPDF) {
@@ -304,6 +298,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               }
             });
           }
+
+          if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
+            // imágenes planta completa
+            this.setImgPlantaCompleta(this.largestLocAreas, 'thermal', this.anomaliasInforme);
+            this.setImgPlantaCompleta(this.largestLocAreas, 'visual');
+          }
+
           // }
           // }
 
@@ -511,13 +512,20 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               apt: 1,
               elegible: true,
             },
-            // {
-            //   nombre: 'planoTermico',
-            //   descripcion: 'Plano térmico',
-            //   orden: 9,
-            //   apt: 1,
-            //   elegible: false,
-            // },
+            {
+              nombre: 'planoTermico',
+              descripcion: 'Plano térmico',
+              orden: 9,
+              apt: 1,
+              elegible: false,
+            },
+            {
+              nombre: 'planoVisual',
+              descripcion: 'Plano visual',
+              orden: 10,
+              apt: 1,
+              elegible: false,
+            },
             {
               nombre: 'resultadosClase',
               descripcion: 'Resultados por clase',
@@ -1239,10 +1247,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     });
   }
 
-  private setImgPlantaCompleta(locAreas: LocationAreaInterface[]) {
+  private setImgPlantaCompleta(locAreas: LocationAreaInterface[], type: string, anomalias?: Anomalia[]) {
     let tileCoords: TileCoord[] = [];
+    const allLocAreaCoords: Coordinate[] = [];
     locAreas.forEach((locArea) => {
       const locAreaCoords = this.pathToCoordinate(locArea.path);
+      allLocAreaCoords.push(...locAreaCoords);
       tileCoords.push(...this.getElemTiles(locAreaCoords, this.getElemExtent(locAreaCoords), 17));
     });
     tileCoords = this.getCompleteTiles(tileCoords);
@@ -1255,7 +1265,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const height = canvas.height / lado;
     let contador = 0;
     tileCoords.forEach((tileCoord, index) => {
-      const url = GLOBAL.GIS + `${this.selectedInforme.id}_thermal/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+      const url = GLOBAL.GIS + `${this.selectedInforme.id}_${type}/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
 
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;
@@ -1264,7 +1274,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         url,
         (img) => {
           if (img !== null) {
-            img = this.imageProcessService.transformPixels(img);
+            if (type === 'thermal') {
+              img = this.imageProcessService.transformPixels(img);
+            }
 
             const image = new fabric.Image(img, {
               width,
@@ -1284,21 +1296,36 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
             contador++;
             if (contador === tileCoords.length) {
-              // const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
-              // const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
-              // const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
-              // const coordsSegCanvas = this.getCoordsRectangleCanvas(longLatOrigen, longLatFin, segCoords, lado);
+              const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
+              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+              const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, allLocAreaCoords, lado);
 
-              // this.canvasCenterAndZoom(coordsSegCanvas, canvas, true);
+              if (anomalias !== undefined) {
+                this.drawAnomaliasPlanta(anomalias, canvas, longLatOrigen, longLatFin, lado);
+              }
 
-              this.imagePlantaCompleta = canvas.toDataURL({
+              this.canvasCenterAndZoom(coordsSegCanvas, canvas);
+
+              this.imagesPlantaCompleta[type] = canvas.toDataURL({
                 format: 'png',
               });
             }
           } else {
             contador++;
             if (contador === tileCoords.length) {
-              this.imagePlantaCompleta = canvas.toDataURL({
+              const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
+              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+              const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, allLocAreaCoords, lado);
+
+              if (anomalias !== undefined) {
+                this.drawAnomaliasPlanta(anomalias, canvas, longLatOrigen, longLatFin, lado);
+              }
+
+              this.canvasCenterAndZoom(coordsSegCanvas, canvas);
+
+              this.imagesPlantaCompleta[type] = canvas.toDataURL({
                 format: 'png',
               });
             }
@@ -1349,6 +1376,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   ) {
     const topLeft = coordsTileOrigen[1];
     const bottomRight = coordsTileFin[3];
+    // TODO: no ordena bien las coordenadas
     const horizOrdered = polygonCoords.sort((a, b) => a[0] - b[0]);
 
     let polygonTopLeft = horizOrdered[0];
@@ -1367,6 +1395,36 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       (Math.abs(polygonTopLeft[1] - topLeft[1]) * (this.tileResolution * lado)) / Math.abs(bottomRight[1] - topLeft[1]);
     const polygonBottom =
       ((polygonBottomRight[1] - topLeft[1]) * (this.tileResolution * lado)) / (bottomRight[1] - topLeft[1]);
+    const width = Math.abs(polygonRight - polygonLeft);
+    const height = Math.abs(polygonBottom - polygonTop);
+
+    return [polygonLeft, polygonTop, width, height];
+  }
+
+  private getCoordsPolygonCanvas(
+    coordsTileOrigen: number[][],
+    coordsTileFin: number[][],
+    polygonCoords: Coordinate[],
+    lado: number
+  ) {
+    const topLeft = coordsTileOrigen[1];
+    const bottomRight = coordsTileFin[3];
+    const longsOrdered = polygonCoords.map((coord) => coord[0]).sort((a, b) => a - b);
+
+    const leftLongitude = longsOrdered[0];
+    const rightLongitude = longsOrdered[longsOrdered.length - 1];
+
+    const latsOrdered = polygonCoords.map((coord) => coord[1]).sort((a, b) => a - b);
+
+    const topLatitude = latsOrdered[latsOrdered.length - 1];
+    const bottomLatitude = latsOrdered[0];
+
+    const polygonLeft = ((leftLongitude - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
+    const polygonRight = ((rightLongitude - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
+    const polygonTop =
+      (Math.abs(topLatitude - topLeft[1]) * (this.tileResolution * lado)) / Math.abs(bottomRight[1] - topLeft[1]);
+    const polygonBottom =
+      ((bottomLatitude - topLeft[1]) * (this.tileResolution * lado)) / (bottomRight[1] - topLeft[1]);
     const width = Math.abs(polygonRight - polygonLeft);
     const height = Math.abs(polygonBottom - polygonTop);
 
@@ -1490,6 +1548,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     });
   }
 
+  private drawAnomaliasPlanta(
+    anomalias: Anomalia[],
+    canvas: any,
+    coordsOrigen: number[][],
+    coordsFin: number[][],
+    lado: number
+  ): void {
+    anomalias.forEach((anom, index) => {
+      const coordsAnomCanvas = this.getCoordsPolygonCanvas(coordsOrigen, coordsFin, anom.featureCoords, lado);
+      this.drawPolygonInCanvas(anom.localId, canvas, coordsAnomCanvas, undefined, 4);
+    });
+  }
+
   private pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {
     const coordenadas: Coordinate[] = [];
     path.forEach((coord) => {
@@ -1607,13 +1678,27 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       });
   }
 
-  private drawPolygonInCanvas(id: string, canvas: any, coordsPolygonCanvas: number[], index?: number) {
+  private drawPolygonInCanvas(
+    id: string,
+    canvas: any,
+    coordsPolygonCanvas: number[],
+    index?: number,
+    strokeAnomalia?: number
+  ) {
+    let strokeWidth = 2;
+    let rx = 4;
+    let ry = 4;
+    if (strokeAnomalia !== undefined) {
+      strokeWidth = strokeAnomalia;
+      rx = 0;
+      ry = 0;
+    }
     const polygon = new fabric.Rect({
       left: coordsPolygonCanvas[0],
       top: coordsPolygonCanvas[1],
       fill: 'rgba(0,0,0,0)',
       stroke: 'white',
-      strokeWidth: 2,
+      strokeWidth,
       width: coordsPolygonCanvas[2],
       height: coordsPolygonCanvas[3],
       hasControls: false,
@@ -1623,8 +1708,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       ref: 'anom',
       selectable: false,
       hoverCursor: 'pointer',
-      rx: 4,
-      ry: 4,
+      rx,
+      ry,
     });
 
     canvas.add(polygon);
@@ -2594,10 +2679,34 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       return [
         // Imagen planta termica
         {
-          image: this.imagePlantaCompleta,
-          width: this.widthSuciedad,
+          text: `${index} - ${this.translation.t('Ortomosaico térmico')}`,
+          style: 'h2',
+          margin: [0, 10, 0, 20],
           alignment: 'center',
           pageBreak: 'before',
+        },
+        {
+          image: this.imagesPlantaCompleta['thermal'],
+          width: this.widthSuciedad,
+          alignment: 'center',
+        },
+      ];
+    };
+
+    const planoVisual = (index: string) => {
+      return [
+        // Imagen planta visual
+        {
+          text: `${index} - ${this.translation.t('Ortomosaico RGB')}`,
+          style: 'h2',
+          margin: [0, 10, 0, 20],
+          alignment: 'center',
+          pageBreak: 'before',
+        },
+        {
+          image: this.imagesPlantaCompleta['visual'],
+          width: this.widthSuciedad,
+          alignment: 'center',
         },
       ];
     };
@@ -2939,6 +3048,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     if (this.filtroApartados.includes('planoTermico')) {
       apartado = titulo.toString().concat('.').concat(subtitulo.toString());
       result = result.concat(planoTermico(apartado));
+      subtitulo = subtitulo + 1;
+    }
+
+    if (this.filtroApartados.includes('planoVisual')) {
+      apartado = titulo.toString().concat('.').concat(subtitulo.toString());
+      result = result.concat(planoVisual(apartado));
       subtitulo = subtitulo + 1;
     }
 
