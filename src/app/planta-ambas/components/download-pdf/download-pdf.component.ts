@@ -516,27 +516,27 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               nombre: 'planoTermico',
               descripcion: 'Plano térmico',
               orden: 9,
-              apt: 1,
+              apt: 2,
               elegible: false,
             },
             {
               nombre: 'planoVisual',
               descripcion: 'Plano visual',
               orden: 10,
-              apt: 1,
+              apt: 2,
               elegible: false,
             },
             {
               nombre: 'resultadosClase',
               descripcion: 'Resultados por clase',
-              orden: 10,
+              orden: 11,
               apt: 2,
               elegible: true,
             },
             {
               nombre: 'resultadosCategoria',
               descripcion: 'Resultados por categoría',
-              orden: 11,
+              orden: 12,
               apt: 2,
               elegible: true,
             },
@@ -547,13 +547,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               orden: 14,
               apt: 2,
               elegible: true,
-            },
-            {
-              nombre: 'plano',
-              descripcion: 'Plano térmico',
-              orden: 1,
-              apt: 3,
-              elegible: false,
             },
             {
               nombre: 'anexo1',
@@ -574,7 +567,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               {
                 nombre: 'resultadosPosicion',
                 descripcion: 'Resultados por posición',
-                orden: 12,
+                orden: 13,
                 apt: 2,
                 elegible: true,
               }
@@ -2749,7 +2742,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Ortomosaico térmico')}`,
           style: 'h2',
-          margin: [0, 10, 0, 20],
+          margin: [0, 10, 0, 40],
           alignment: 'center',
           pageBreak: 'before',
         },
@@ -2767,7 +2760,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Ortomosaico RGB')}`,
           style: 'h2',
-          margin: [0, 10, 0, 20],
+          margin: [0, 10, 0, 40],
           alignment: 'center',
           pageBreak: 'before',
         },
@@ -3113,21 +3106,25 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       subtitulo = subtitulo + 1;
     }
 
+    titulo = titulo + 1;
+    apartado = '2';
+
     if (this.filtroApartados.includes('planoTermico')) {
-      apartado = titulo.toString().concat('.').concat(subtitulo.toString());
+      apartado = titulo.toString();
       result = result.concat(planoTermico(apartado));
-      subtitulo = subtitulo + 1;
     }
 
+    titulo = titulo + 1;
+    apartado = '3';
+
     if (this.filtroApartados.includes('planoVisual')) {
-      apartado = titulo.toString().concat('.').concat(subtitulo.toString());
+      apartado = titulo.toString();
       result = result.concat(planoVisual(apartado));
-      subtitulo = subtitulo + 1;
     }
 
     titulo = titulo + 1;
     subtitulo = 1;
-    apartado = '2';
+    apartado = '4';
 
     result = result.concat(resultados(apartado));
 
