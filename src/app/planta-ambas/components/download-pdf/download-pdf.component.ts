@@ -301,8 +301,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
           if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
             // imágenes planta completa
-            this.setImgPlantaCompleta(this.largestLocAreas, 'thermal', this.anomaliasInforme);
-            this.setImgPlantaCompleta(this.largestLocAreas, 'visual');
+            this.setImgCapaPlanta(this.largestLocAreas, 'thermal', this.anomaliasInforme);
+            this.setImgCapaPlanta(this.largestLocAreas, 'visual');
           }
 
           // }
@@ -1247,7 +1247,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     });
   }
 
-  private setImgPlantaCompleta(locAreas: LocationAreaInterface[], type: string, anomalias?: Anomalia[]) {
+  private setImgCapaPlanta(locAreas: LocationAreaInterface[], type: string, anomalias?: Anomalia[]) {
     let tileCoords: TileCoord[] = [];
     const allLocAreaCoords: Coordinate[] = [];
     locAreas.forEach((locArea) => {
@@ -1270,70 +1270,138 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;
 
-      fabric.util.loadImage(
-        url,
-        (img) => {
-          if (img !== null) {
-            if (type === 'thermal') {
-              img = this.imageProcessService.transformPixels(img);
-            }
+      contador++;
 
-            const image = new fabric.Image(img, {
-              width,
-              height,
-              left,
-              top,
-              angle: 0,
-              opacity: 1,
-              draggable: false,
-              lockMovementX: true,
-              lockMovementY: true,
-              scaleX: 1,
-              scaleY: 1,
-            });
+      if (type === 'thermal') {
+        const visualUrl =
+          GLOBAL.GIS + `${this.selectedInforme.id}_visual/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+        this.createImageCanvas(
+          visualUrl,
+          'visual',
+          tileCoords,
+          anomalias,
+          allLocAreaCoords,
+          canvas,
+          lado,
+          top,
+          left,
+          width,
+          height,
+          contador,
+          false
+        );
+        this.createImageCanvas(
+          url,
+          type,
+          tileCoords,
+          anomalias,
+          allLocAreaCoords,
+          canvas,
+          lado,
+          top,
+          left,
+          width,
+          height,
+          contador,
+          true
+        );
+      } else {
+        this.createImageCanvas(
+          url,
+          type,
+          tileCoords,
+          anomalias,
+          allLocAreaCoords,
+          canvas,
+          lado,
+          top,
+          left,
+          width,
+          height,
+          contador,
+          true
+        );
+      }
+    });
+  }
 
-            canvas.add(image);
-
-            contador++;
-            if (contador === tileCoords.length) {
-              const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
-              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
-              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
-              const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, allLocAreaCoords, lado);
-
-              if (anomalias !== undefined) {
-                this.drawAnomaliasPlanta(anomalias, canvas, longLatOrigen, longLatFin, lado);
-              }
-
-              this.canvasCenterAndZoom(coordsSegCanvas, canvas);
-
-              this.imagesPlantaCompleta[type] = canvas.toDataURL({
-                format: 'png',
-              });
-            }
-          } else {
-            contador++;
-            if (contador === tileCoords.length) {
-              const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
-              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
-              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
-              const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, allLocAreaCoords, lado);
-
-              if (anomalias !== undefined) {
-                this.drawAnomaliasPlanta(anomalias, canvas, longLatOrigen, longLatFin, lado);
-              }
-
-              this.canvasCenterAndZoom(coordsSegCanvas, canvas);
-
-              this.imagesPlantaCompleta[type] = canvas.toDataURL({
-                format: 'png',
-              });
-            }
+  private createImageCanvas(
+    url: string,
+    type: string,
+    tileCoords: TileCoord[],
+    anomalias: Anomalia[],
+    allLocAreaCoords: Coordinate[],
+    canvas: any,
+    lado: number,
+    top: number,
+    left: number,
+    width: number,
+    height: number,
+    contador: number,
+    processImage: boolean
+  ) {
+    fabric.util.loadImage(
+      url,
+      (img) => {
+        if (img !== null) {
+          if (type === 'thermal') {
+            img = this.imageProcessService.transformPixels(img);
           }
-        },
-        null,
-        { crossOrigin: 'anonymous' }
-      );
+
+          const image = new fabric.Image(img, {
+            width,
+            height,
+            left,
+            top,
+            angle: 0,
+            opacity: 1,
+            draggable: false,
+            lockMovementX: true,
+            lockMovementY: true,
+            scaleX: 1,
+            scaleY: 1,
+          });
+
+          canvas.add(image);
+          if (!processImage) {
+            canvas.moveTo(image, 0);
+          }
+
+          if (contador === tileCoords.length && processImage) {
+            this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+          }
+        } else {
+          if (contador === tileCoords.length && processImage) {
+            this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+          }
+        }
+      },
+      null,
+      { crossOrigin: 'anonymous' }
+    );
+  }
+
+  private createFinalImage(
+    tileCoords: TileCoord[],
+    lado: number,
+    allLocAreaCoords: Coordinate[],
+    anomalias: Anomalia[],
+    canvas: any,
+    type: string
+  ) {
+    const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
+    const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
+    const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+    const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, allLocAreaCoords, lado);
+
+    if (anomalias !== undefined) {
+      this.drawAnomaliasPlanta(anomalias, canvas, longLatOrigen, longLatFin, lado);
+    }
+
+    this.canvasCenterAndZoom(coordsSegCanvas, canvas);
+
+    this.imagesPlantaCompleta[type] = canvas.toDataURL({
+      format: 'png',
     });
   }
 
