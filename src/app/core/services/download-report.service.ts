@@ -185,6 +185,17 @@ export class DownloadReportService {
     return coordenadas;
   }
 
+  resetService() {
+    // reiniciamos los valores
+    this.generatingPDF = false;
+    this.endingPDF = false;
+    this.progressBarValue = 0;
+    this.filteredPDF = undefined;
+    this.seguidores1Eje = [];
+    this.noS1EsLocAreas = [];
+    this.englishLang = false;
+  }
+
   //////////////////////////////////////////////////////
 
   get generatingPDF() {

@@ -5,6 +5,7 @@ import { AnomaliaService } from '@core/services/anomalia.service';
 import { ReportControlService } from '@core/services/report-control.service';
 import { PlantaService } from '@core/services/planta.service';
 import { GLOBAL } from './global';
+import { DownloadReportService } from './download-report.service';
 
 import { Translation } from '@shared/utils/translations/translations';
 
@@ -24,9 +25,17 @@ export class AnomaliaInfoService {
     @Inject(LOCALE_ID) public locale: string,
     private anomaliaService: AnomaliaService,
     private reportControlService: ReportControlService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private downloadReportService: DownloadReportService
   ) {
-    this.language = 'en';
+    this.downloadReportService.englishLang$.subscribe((lang) => {
+      if (lang) {
+        this.language = 'en';
+      } else {
+        this.language = 'es';
+      }
+    });
+
     this.translation = new Translation(this.language);
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInforme = this.reportControlService.informes.find((informe) => informe.id === informeId);

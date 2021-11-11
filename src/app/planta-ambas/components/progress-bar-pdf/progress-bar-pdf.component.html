@@ -4,7 +4,8 @@
     <h5 *ngIf="endingPDF">Terminando...</h5>
 
     <section class="example-section">
-      <mat-progress-bar [color]="progressBarColor" [mode]="determinate" [value]="progressBarValue"> </mat-progress-bar>
+      <mat-progress-bar class="progress-bar" [color]="progressBarColor" [mode]="determinate" [value]="progressBarValue">
+      </mat-progress-bar>
     </section>
   </mat-card-content>
 </mat-card>
