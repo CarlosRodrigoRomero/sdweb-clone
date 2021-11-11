@@ -291,6 +291,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               this.seguidoresLoaded = true;
             }
 
+            this.anomaliasInforme = [];
+
             this.seguidoresInforme.forEach((seguidor) => {
               const anomaliasSeguidor = seguidor.anomaliasCliente;
               if (anomaliasSeguidor.length > 0) {
@@ -570,16 +572,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                 elegible: true,
               });
             }
-
-            if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
-              this.apartadosInforme.push({
-                nombre: 'planoVisual',
-                descripcion: 'Plano visual',
-                orden: 10,
-                apt: 2,
-                elegible: false,
-              });
-            }
           } else {
             this.apartadosInforme.push({
               nombre: 'planoTermico',
@@ -612,13 +604,23 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             // }
           }
 
+          if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
+            this.apartadosInforme.push({
+              nombre: 'planoVisual',
+              descripcion: 'Plano visual',
+              orden: 10,
+              apt: 2,
+              elegible: false,
+            });
+          }
+
           this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
             return a.orden - b.orden;
           });
 
-          if (this.filtroApartados === undefined) {
-            this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
-          }
+          // if (this.filtroApartados === undefined) {
+          this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
+          // }
         })
     );
 
@@ -1289,113 +1291,116 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         const visualUrl =
           GLOBAL.GIS + `${this.selectedInforme.id}_visual/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
 
-        this.createImageCanvas(
+        fabric.util.loadImage(
           visualUrl,
-          'visual',
-          tileCoords,
-          anomalias,
-          allLocAreaCoords,
-          canvas,
-          lado,
-          top,
-          left,
-          width,
-          height,
-          contador,
-          false
+          (img) => {
+            if (img !== null) {
+              if (type === 'thermal') {
+                img = this.imageProcessService.transformPixels(img);
+              }
+
+              const image = new fabric.Image(img, {
+                width,
+                height,
+                left,
+                top,
+                angle: 0,
+                opacity: 1,
+                draggable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                scaleX: 1,
+                scaleY: 1,
+              });
+
+              canvas.add(image);
+              // movemos al fondo para que quede debajo de la termica
+              canvas.moveTo(image, 0);
+            }
+          },
+          null,
+          { crossOrigin: 'anonymous' }
         );
 
-        this.createImageCanvas(
+        fabric.util.loadImage(
           url,
-          type,
-          tileCoords,
-          anomalias,
-          allLocAreaCoords,
-          canvas,
-          lado,
-          top,
-          left,
-          width,
-          height,
-          contador,
-          true
+          (img) => {
+            if (img !== null) {
+              if (type === 'thermal') {
+                img = this.imageProcessService.transformPixels(img);
+              }
+
+              const image = new fabric.Image(img, {
+                width,
+                height,
+                left,
+                top,
+                angle: 0,
+                opacity: 1,
+                draggable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                scaleX: 1,
+                scaleY: 1,
+              });
+
+              canvas.add(image);
+
+              contador++;
+              if (contador === tileCoords.length) {
+                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+              }
+            } else {
+              contador++;
+              if (contador === tileCoords.length) {
+                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+              }
+            }
+          },
+          null,
+          { crossOrigin: 'anonymous' }
         );
       } else {
-        this.createImageCanvas(
+        fabric.util.loadImage(
           url,
-          type,
-          tileCoords,
-          anomalias,
-          allLocAreaCoords,
-          canvas,
-          lado,
-          top,
-          left,
-          width,
-          height,
-          contador,
-          true
+          (img) => {
+            if (img !== null) {
+              if (type === 'thermal') {
+                img = this.imageProcessService.transformPixels(img);
+              }
+
+              const image = new fabric.Image(img, {
+                width,
+                height,
+                left,
+                top,
+                angle: 0,
+                opacity: 1,
+                draggable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                scaleX: 1,
+                scaleY: 1,
+              });
+
+              canvas.add(image);
+
+              contador++;
+              if (contador === tileCoords.length) {
+                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+              }
+            } else {
+              contador++;
+              if (contador === tileCoords.length) {
+                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+              }
+            }
+          },
+          null,
+          { crossOrigin: 'anonymous' }
         );
       }
-
-      contador++;
     });
-  }
-
-  private createImageCanvas(
-    url: string,
-    type: string,
-    tileCoords: TileCoord[],
-    anomalias: Anomalia[],
-    allLocAreaCoords: Coordinate[],
-    canvas: any,
-    lado: number,
-    top: number,
-    left: number,
-    width: number,
-    height: number,
-    contador: number,
-    processImage: boolean
-  ) {
-    fabric.util.loadImage(
-      url,
-      (img) => {
-        if (img !== null) {
-          if (type === 'thermal') {
-            img = this.imageProcessService.transformPixels(img);
-          }
-
-          const image = new fabric.Image(img, {
-            width,
-            height,
-            left,
-            top,
-            angle: 0,
-            opacity: 1,
-            draggable: false,
-            lockMovementX: true,
-            lockMovementY: true,
-            scaleX: 1,
-            scaleY: 1,
-          });
-
-          canvas.add(image);
-          if (!processImage) {
-            canvas.moveTo(image, 0);
-          }
-
-          if (contador === tileCoords.length - 1 && processImage) {
-            this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
-          }
-        } else {
-          if (contador === tileCoords.length - 1 && processImage) {
-            this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
-          }
-        }
-      },
-      null,
-      { crossOrigin: 'anonymous' }
-    );
   }
 
   private createFinalImage(
@@ -2917,6 +2922,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             {
               width: '*',
               text: '',
+              pageBreak: 'after',
             },
           ],
         },
