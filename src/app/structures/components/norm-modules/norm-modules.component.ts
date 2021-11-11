@@ -70,6 +70,15 @@ export class NormModulesComponent implements OnInit, OnDestroy {
       this.structuresService.modGroupSelectedId$.subscribe((id) => (this.modGroupSelectedId = id))
     );
 
+    this.subscriptions.add(
+      this.structuresService.normModSelected$.subscribe((normMod) => {
+        if (normMod !== undefined) {
+          this.imageTif = normMod.image_name.replace('.tif', '');
+          this.modGroupId = normMod.agrupacionId;
+        }
+      })
+    );
+
     this.buildForm();
 
     this.subscriptions.add(
@@ -205,6 +214,10 @@ export class NormModulesComponent implements OnInit, OnDestroy {
 
       if (feature.length === 0) {
         this.structuresService.normModSelected = undefined;
+
+        if (!this.draw) {
+          this.popup.setPosition(undefined);
+        }
       }
     });
   }
@@ -286,6 +299,8 @@ export class NormModulesComponent implements OnInit, OnDestroy {
     );
 
     this.structuresService.normModSelected = undefined;
+
+    this.popup.setPosition(undefined);
   }
 
   private addPopupOverlay() {
