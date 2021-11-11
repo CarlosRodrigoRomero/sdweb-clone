@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Subscription } from 'rxjs';
@@ -17,7 +17,7 @@ import { NormalizedModule } from '@core/models/normalizedModule';
   templateUrl: './norm-mod-create-popup.component.html',
   styleUrls: ['./norm-mod-create-popup.component.css'],
 })
-export class NormModCreatePopupComponent implements OnInit, OnDestroy {
+export class NormModCreatePopupComponent implements OnInit, OnChanges, OnDestroy {
   form: FormGroup;
   private map: Map;
   private initialValues: any;
@@ -26,6 +26,8 @@ export class NormModCreatePopupComponent implements OnInit, OnDestroy {
 
   @Input() coords: any;
   @Input() centroid: any;
+  @Input() imageTif: string;
+  @Input() modGroupId: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -37,6 +39,12 @@ export class NormModCreatePopupComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
     this.buildForm();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.form !== undefined) {
+      this.form.patchValue({ image_name: this.imageTif, agrupacionId: this.modGroupId });
+    }
   }
 
   private buildForm() {

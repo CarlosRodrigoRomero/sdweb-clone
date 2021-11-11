@@ -28,6 +28,7 @@ import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { Translation } from 'src/app/informe-export/components/export/translations';
 import { PcInterface } from '@core/models/pc';
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
 export interface Apartado {
   nombre: string;
@@ -652,7 +653,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.dataSource = new MatTableDataSource(this.countCategoriaClase);
   }
 
-  getDocDefinition(imagesSeguidores?: any) {
+  getDocDefinition(imagesSeguidores?: any): TDocumentDefinitions {
     const pages = this.getPagesPDF();
     let anexo1 = [];
     let anexo2 = [];

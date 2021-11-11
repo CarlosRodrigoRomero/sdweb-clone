@@ -21,6 +21,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { PlantaService } from '@core/services/planta.service';
 import { InformeService } from '@core/services/informe.service';
 import { Translation } from './translations';
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 declare var $: any;
@@ -646,7 +647,7 @@ export class ExportComponent implements OnInit {
 
         pdfMake
           .createPdf(this.getDocDefinition(imageListBase64))
-          .download(this.informe.prefijo.concat('informe'), (cb) => {
+          .download(this.informe.prefijo.concat('informe'), () => {
             this.generandoPDF = false;
           });
       });
@@ -2750,7 +2751,7 @@ export class ExportComponent implements OnInit {
     return allPagsAnexo;
   }
 
-  getDocDefinition(imagesSeguidores) {
+  getDocDefinition(imagesSeguidores): TDocumentDefinitions {
     const pages = this.getPagesPDF();
     let anexo1 = [];
     let anexo2 = [];

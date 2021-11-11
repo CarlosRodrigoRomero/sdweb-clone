@@ -44,6 +44,8 @@ export class NormModulesComponent implements OnInit, OnDestroy {
   centroidDB: any;
   form: FormGroup;
   modGroupSelectedId: string = undefined;
+  imageTif: string;
+  modGroupId: string;
 
   private subscriptions: Subscription = new Subscription();
 

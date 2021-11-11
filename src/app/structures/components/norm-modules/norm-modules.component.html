@@ -12,6 +12,18 @@
   <span>ID Agrupacion: {{ modGroupSelectedId }}</span>
 </div>
 
+<div class="normModValues">
+  <mat-form-field appearance="outline">
+    <mat-label>Imagen térmica</mat-label>
+    <input matInput type="text" [(ngModel)]="imageTif" />
+    <span matSuffix>.tif</span>
+  </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>ID Agrupación</mat-label>
+    <input matInput type="text" [(ngModel)]="modGroupId" />
+  </mat-form-field>
+</div>
+
 <div class="add-button">
   <button *ngIf="!drawActive" mat-raised-button (click)="drawNormModule()">
     <mat-icon class="icon">add_circle</mat-icon>
@@ -65,5 +77,10 @@
 </div>
 
 <div id="popup" class="ol-popup">
-  <app-norm-mod-create-popup [coords]="coordsNewNormMod" [centroid]="centroidDB"></app-norm-mod-create-popup>
+  <app-norm-mod-create-popup
+    [coords]="coordsNewNormMod"
+    [centroid]="centroidDB"
+    [imageTif]="imageTif"
+    [modGroupId]="modGroupId"
+  ></app-norm-mod-create-popup>
 </div>
