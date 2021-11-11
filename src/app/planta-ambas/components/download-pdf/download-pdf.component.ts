@@ -513,13 +513,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               elegible: true,
             },
             {
-              nombre: 'planoTermico',
-              descripcion: 'Plano térmico',
-              orden: 9,
-              apt: 2,
-              elegible: false,
-            },
-            {
               nombre: 'planoVisual',
               descripcion: 'Plano visual',
               orden: 10,
@@ -583,6 +576,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               });
             }
           } else {
+            this.apartadosInforme.push({
+              nombre: 'planoTermico',
+              descripcion: 'Plano térmico',
+              orden: 9,
+              apt: 2,
+              elegible: false,
+            });
             this.apartadosInforme.push({
               nombre: 'anexoAnomalias',
               descripcion: 'Anexo II: Anomalías térmicas',
@@ -788,10 +788,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     } else {
       // Generar imagenes
       this.countSeguidores = 0;
-      for (const seguidor of this.seguidoresInforme) {
+      this.seguidoresInforme.forEach((seguidor, index) => {
         this.setImgSeguidorCanvas(seguidor, false, 'jpg');
         this.countSeguidores++;
-      }
+      });
 
       // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
       let downloads = 0;
@@ -1101,22 +1101,38 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private getElemTiles(coords: Coordinate[], extents: Extent[], zoomLevel: number): TileCoord[] {
     // obtenemos los tileCoords de cada coordenada
     let tilesCoord: TileCoord[] = [];
-    this.olMapService
-      .getThermalLayers()
-      .pipe(take(1))
-      .subscribe((layers) => {
-        this.layerInformeSelected = layers.find((layer) => layer.getProperties().informeId === this.selectedInforme.id);
-        const source = this.layerInformeSelected.getSource();
-        const tileGrid = source.getTileGrid();
-        extents.forEach((extent, index) => {
-          tileGrid.forEachTileCoord(extent, zoomLevel, (tileCoord) => {
-            const longLatCoords = this.getLongLatFromXYZ(tileCoord, tileGrid);
-            if (inside(coords[index], longLatCoords)) {
-              tilesCoord.push(tileCoord);
-            }
-          });
-        });
+
+    this.layerInformeSelected = this.map.getLayers().getArray()[0] as TileLayer;
+
+    const source = this.layerInformeSelected.getSource();
+    const tileGrid = source.getTileGrid();
+    extents.forEach((extent, index) => {
+      tileGrid.forEachTileCoord(extent, zoomLevel, (tileCoord) => {
+        const longLatCoords = this.getLongLatFromXYZ(tileCoord, tileGrid);
+        if (inside(coords[index], longLatCoords)) {
+          tilesCoord.push(tileCoord);
+        }
       });
+    });
+
+    // this.olMapService
+    //   .getThermalLayers()
+    //   .pipe(take(1))
+    //   .subscribe((layers) => {
+    //     console.log(layers);
+    //     console.log(this.selectedInforme);
+    //     this.layerInformeSelected = layers.find((layer) => layer.getProperties().informeId === this.selectedInforme.id);
+    //     const source = this.layerInformeSelected.getSource();
+    //     const tileGrid = source.getTileGrid();
+    //     extents.forEach((extent, index) => {
+    //       tileGrid.forEachTileCoord(extent, zoomLevel, (tileCoord) => {
+    //         const longLatCoords = this.getLongLatFromXYZ(tileCoord, tileGrid);
+    //         if (inside(coords[index], longLatCoords)) {
+    //           tilesCoord.push(tileCoord);
+    //         }
+    //       });
+    //     });
+    //   });
 
     // obtenemos todos los tiles descartando duplicados
     tilesCoord = this.getCompleteTiles(tilesCoord);
@@ -1256,6 +1272,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     canvas.height = lado * this.tileResolution;
     const width = canvas.width / lado;
     const height = canvas.height / lado;
+
     let contador = 0;
     tileCoords.forEach((tileCoord, index) => {
       const url = GLOBAL.GIS + `${this.selectedInforme.id}_${type}/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
@@ -1263,11 +1280,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;
 
-      contador++;
-
       if (type === 'thermal') {
         const visualUrl =
           GLOBAL.GIS + `${this.selectedInforme.id}_visual/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+
         this.createImageCanvas(
           visualUrl,
           'visual',
@@ -1283,6 +1299,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           contador,
           false
         );
+
         this.createImageCanvas(
           url,
           type,
@@ -1315,6 +1332,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           true
         );
       }
+
+      contador++;
     });
   }
 
@@ -1360,11 +1379,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             canvas.moveTo(image, 0);
           }
 
-          if (contador === tileCoords.length && processImage) {
+          if (contador === tileCoords.length - 1 && processImage) {
             this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
           }
         } else {
-          if (contador === tileCoords.length && processImage) {
+          if (contador === tileCoords.length - 1 && processImage) {
             this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
           }
         }
@@ -3106,12 +3125,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       subtitulo = subtitulo + 1;
     }
 
-    titulo = titulo + 1;
-    apartado = '2';
+    if (this.reportControlService.plantaFija) {
+      titulo = titulo + 1;
+      apartado = '2';
 
-    if (this.filtroApartados.includes('planoTermico')) {
-      apartado = titulo.toString();
-      result = result.concat(planoTermico(apartado));
+      if (this.filtroApartados.includes('planoTermico')) {
+        apartado = titulo.toString();
+        result = result.concat(planoTermico(apartado));
+      }
     }
 
     titulo = titulo + 1;
