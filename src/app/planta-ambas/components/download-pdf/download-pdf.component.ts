@@ -699,6 +699,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   public downloadPDF() {
+    this.downloadReportService.endingPDF = false;
     this.downloadReportService.generatingPDF = true;
 
     this.countLoadedImages = 0;
@@ -773,7 +774,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       this.subscriptions.add(
         this.countLoadedImages$.subscribe((countLoadedImgs) => {
           this.downloadReportService.progressBarValue = Math.round(
-            (countLoadedImgs / this.anomaliasInforme.length) * 100
+            (countLoadedImgs / 2) /* this.anomaliasInforme.length */ * 100
           );
 
           // Cuando se carguen todas las imágenes
@@ -1295,10 +1296,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           visualUrl,
           (img) => {
             if (img !== null) {
-              if (type === 'thermal') {
-                img = this.imageProcessService.transformPixels(img);
-              }
-
               const image = new fabric.Image(img, {
                 width,
                 height,
@@ -1326,9 +1323,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           url,
           (img) => {
             if (img !== null) {
-              if (type === 'thermal') {
-                img = this.imageProcessService.transformPixels(img);
-              }
+              img = this.imageProcessService.transformPixels(img);
 
               const image = new fabric.Image(img, {
                 width,
@@ -1417,7 +1412,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, allLocAreaCoords, lado);
 
     if (type === 'thermal' && anomalias !== undefined) {
-      console.log(type);
       this.drawAnomaliasPlanta(anomalias, canvas, longLatOrigen, longLatFin, lado);
     }
 

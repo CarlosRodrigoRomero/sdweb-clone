@@ -6,7 +6,7 @@ import { combineLatest, Subscription } from 'rxjs';
 import Map from 'ol/Map';
 import { fromLonLat } from 'ol/proj.js';
 import View from 'ol/View';
-import { Vector as VectorSource } from 'ol/source';
+import { TileDebug, Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { Overlay } from 'ol';
 import { defaults as defaultControls } from 'ol/control.js';
@@ -150,7 +150,13 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
       source: satellite,
     });
 
-    const layers = [satelliteLayer, ...this.aerialLayers];
+    const layers = [
+      satelliteLayer,
+      ...this.aerialLayers,
+      // new TileLayer({
+      //   source: new TileDebug(),
+      // }),
+    ];
 
     // MAPA
     const view = new View({
