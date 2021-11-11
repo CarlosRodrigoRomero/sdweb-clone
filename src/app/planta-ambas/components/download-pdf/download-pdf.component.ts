@@ -301,7 +301,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
           if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
             // imágenes planta completa
-            this.setImgCapaPlanta(this.largestLocAreas, 'thermal', this.anomaliasInforme);
+            if (this.planta.tipo !== 'seguidores') {
+              this.setImgCapaPlanta(this.largestLocAreas, 'thermal', this.anomaliasInforme);
+            }
             this.setImgCapaPlanta(this.largestLocAreas, 'visual');
           }
 
@@ -513,13 +515,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               elegible: true,
             },
             {
-              nombre: 'planoVisual',
-              descripcion: 'Plano visual',
-              orden: 10,
-              apt: 2,
-              elegible: false,
-            },
-            {
               nombre: 'resultadosClase',
               descripcion: 'Resultados por clase',
               orden: 11,
@@ -573,6 +568,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                 descripcion: 'Anexo III: Seguidores sin anomalías',
                 orden: 17,
                 elegible: true,
+              });
+            }
+
+            if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
+              this.apartadosInforme.push({
+                nombre: 'planoVisual',
+                descripcion: 'Plano visual',
+                orden: 10,
+                apt: 2,
+                elegible: false,
               });
             }
           } else {
@@ -1262,7 +1267,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     locAreas.forEach((locArea) => {
       const locAreaCoords = this.pathToCoordinate(locArea.path);
       allLocAreaCoords.push(...locAreaCoords);
-      tileCoords.push(...this.getElemTiles(locAreaCoords, this.getElemExtent(locAreaCoords), 17));
+      tileCoords.push(...this.getElemTiles(locAreaCoords, this.getElemExtent(locAreaCoords), 18));
     });
     tileCoords = this.getCompleteTiles(tileCoords);
 
@@ -1406,7 +1411,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
     const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, allLocAreaCoords, lado);
 
-    if (anomalias !== undefined) {
+    if (type === 'thermal' && anomalias !== undefined) {
+      console.log(type);
       this.drawAnomaliasPlanta(anomalias, canvas, longLatOrigen, longLatFin, lado);
     }
 
@@ -3125,27 +3131,21 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       subtitulo = subtitulo + 1;
     }
 
-    if (this.reportControlService.plantaFija) {
+    if (this.filtroApartados.includes('planoTermico')) {
       titulo = titulo + 1;
-      apartado = '2';
-
-      if (this.filtroApartados.includes('planoTermico')) {
-        apartado = titulo.toString();
-        result = result.concat(planoTermico(apartado));
-      }
+      apartado = titulo.toString();
+      result = result.concat(planoTermico(apartado));
     }
 
-    titulo = titulo + 1;
-    apartado = '3';
-
     if (this.filtroApartados.includes('planoVisual')) {
+      titulo = titulo + 1;
       apartado = titulo.toString();
       result = result.concat(planoVisual(apartado));
     }
 
     titulo = titulo + 1;
     subtitulo = 1;
-    apartado = '4';
+    apartado = titulo.toString();
 
     result = result.concat(resultados(apartado));
 
