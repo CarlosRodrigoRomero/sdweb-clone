@@ -21,6 +21,7 @@ export class NormModCreatePopupComponent implements OnInit, OnChanges, OnDestroy
   form: FormGroup;
   private map: Map;
   private initialValues: any;
+  normModSelected: NormalizedModule;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -37,6 +38,21 @@ export class NormModCreatePopupComponent implements OnInit, OnChanges, OnDestroy
 
   ngOnInit(): void {
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
+
+    this.subscriptions.add(
+      this.structuresService.normModSelected$.subscribe((normMod) => {
+        this.normModSelected = normMod;
+
+        if (normMod !== undefined) {
+          this.form.patchValue({
+            fila: normMod.fila,
+            columna: normMod.columna,
+            image_name: normMod.image_name.replace('.tif', ''),
+            agrupacionId: normMod.agrupacionId,
+          });
+        }
+      })
+    );
 
     this.buildForm();
   }
@@ -62,27 +78,55 @@ export class NormModCreatePopupComponent implements OnInit, OnChanges, OnDestroy
   onSubmit(event: Event) {
     event.preventDefault();
     if (this.form.valid) {
-      const id = this.structuresService.generateRandomId();
-
-      const normModule: NormalizedModule = {
-        id,
-        fila: this.form.get('fila').value,
-        columna: this.form.get('columna').value,
-        image_name: this.form.get('image_name').value + '.tif',
-        coords: this.coords,
-        agrupacionId: this.form.get('agrupacionId').value,
-        centroid_gps: this.centroid,
-      };
-
-      // Crea el modulos normalizado en la DB
-      this.structuresService.addNormModule(normModule);
-
-      // añadimos el nuevo modulo como feature
-      this.addNormModFeature(normModule);
+      if (this.normModSelected === undefined) {
+        this.addNormModule();
+      } else {
+        this.updateNormModule();
+      }
 
       // ocultamos el popup
       this.hidePopup();
     }
+  }
+
+  private addNormModule() {
+    const id = this.structuresService.generateRandomId();
+
+    const normModule: NormalizedModule = {
+      id,
+      fila: this.form.get('fila').value,
+      columna: this.form.get('columna').value,
+      image_name: this.form.get('image_name').value + '.tif',
+      coords: this.coords,
+      agrupacionId: this.form.get('agrupacionId').value,
+      centroid_gps: this.centroid,
+    };
+
+    // Crea el modulos normalizado en la DB
+    this.structuresService.addNormModule(normModule);
+
+    // añadimos el nuevo modulo como feature
+    this.addNormModFeature(normModule);
+  }
+
+  private updateNormModule() {
+    const id = this.normModSelected.id;
+
+    const normModule: NormalizedModule = {
+      id,
+      fila: this.form.get('fila').value,
+      columna: this.form.get('columna').value,
+      image_name: this.form.get('image_name').value + '.tif',
+      coords: this.normModSelected.coords,
+      agrupacionId: this.form.get('agrupacionId').value,
+      centroid_gps: this.normModSelected.centroid_gps,
+    };
+
+    // actualizamos el modulo normalizado en la DB
+    this.structuresService.updateNormModule(normModule);
+
+    // actualizamos la feature del modulo
+    this.updateNormModFeature(normModule);
   }
 
   private addNormModFeature(normModule: NormalizedModule) {
@@ -109,9 +153,41 @@ export class NormModCreatePopupComponent implements OnInit, OnChanges, OnDestroy
     mBSource.addFeature(feature);
   }
 
+  private updateNormModFeature(normModule: NormalizedModule) {
+    let normModLayer;
+    this.map.getLayers().forEach((layer) => {
+      if (layer.getProperties().id === 'normModLayer') {
+        normModLayer = layer;
+      }
+    });
+
+    const mBSource = normModLayer.getSource();
+
+    const features = mBSource.getFeatures().filter((f) => f.getProperties().properties.id !== normModule.id);
+
+    mBSource.clear();
+
+    mBSource.addFeatures(features);
+
+    const coords = this.structuresService.coordsDBToCoordinate(normModule.coords);
+    const feature = new Feature({
+      geometry: new Polygon([coords]),
+      properties: {
+        id: normModule.id,
+        name: 'normModule',
+        normMod: normModule,
+        visible: true,
+      },
+    });
+
+    mBSource.addFeature(feature);
+  }
+
   hidePopup() {
     // reseteamos el formulario
     this.form.reset(this.initialValues);
+
+    this.structuresService.normModSelected = undefined;
 
     this.map.getOverlayById('popup').setPosition(undefined);
   }

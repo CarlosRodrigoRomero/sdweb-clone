@@ -161,6 +161,11 @@ export class NormModulesComponent implements OnInit, OnDestroy {
       if (e.selected.length > 0) {
         this.structuresService.normModSelected = e.selected[0].getProperties().properties.normMod;
 
+        const polygon = e.selected[0].getGeometry() as Polygon;
+        const coords = polygon.getCoordinates();
+
+        this.popup.setPosition(coords[0][3]);
+
         e.selected[0].setStyle(this.getNormModStyle(true));
       }
     });
