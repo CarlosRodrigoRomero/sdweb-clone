@@ -36,11 +36,12 @@ export class ThermalService {
         })
       )
       .subscribe((tL) => {
-        if (tL.length > 0) {
-          this.thermalLayers = tL;
-        } else {
-          this.thermalLayers = undefined;
-        }
+        this.thermalLayers = tL;
+        // if (tL.length > 0) {
+        //   this.thermalLayers = tL;
+        // } else {
+        //   this.thermalLayers = undefined;
+        // }
       });
 
     return this.thermalLayers$;

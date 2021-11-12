@@ -204,430 +204,434 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       )
     );
 
-    this.subscriptions.add(
-      this.plantaService
-        .getPlanta(this.reportControlService.plantaId)
-        .pipe(
-          take(1),
-          switchMap((planta) => {
-            this.planta = planta;
+    this.imageProcessService.initService().then(() => {
+      this.subscriptions.add(
+        this.plantaService
+          .getPlanta(this.reportControlService.plantaId)
+          .pipe(
+            take(1),
+            switchMap((planta) => {
+              this.planta = planta;
 
-            if (this.planta.tipo === '1 eje') {
-              this.downloadReportService.getSeguidores1Eje(this.planta.id);
-            }
-
-            this.plantaService.planta = planta;
-
-            this.columnasAnomalia = GLOBAL.columnasAnomPdf;
-
-            this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
-
-            this.arrayFilas = Array(this.planta.filas)
-              .fill(0)
-              .map((_, i) => i + 1);
-            this.arrayColumnas = Array(this.planta.columnas)
-              .fill(0)
-              .map((_, i) => i + 1);
-
-            return this.plantaService.getLocationsArea(this.planta.id);
-          }),
-          take(1),
-          switchMap((locAreas) => {
-            this.largestLocAreas = locAreas.filter(
-              (locArea) =>
-                locArea.globalCoords[0] !== undefined &&
-                locArea.globalCoords[0] !== null &&
-                locArea.globalCoords[0] !== ''
-            );
-
-            return combineLatest([
-              this.reportControlService.selectedInformeId$,
-              this.downloadReportService.filteredPDF$,
-            ]);
-          })
-        )
-        .subscribe(([informeId, filteredPDF]) => {
-          this.selectedInforme = this.reportControlService.informes.find((informe) => informeId === informe.id);
-
-          // if (filteredPDF !== undefined) {
-          //   if (filteredPDF) {
-          //     // utilizamos elementos filtrados para crear el informe
-          //     if (this.reportControlService.plantaFija) {
-          //       this.anomaliasInforme = this.filterService.filteredElements as Anomalia[];
-          //     } else {
-          //       const allSeguidores = this.filterService.filteredElements as Seguidor[];
-          //       // filtramos los del informe actual y los ordenamos por globals
-          //       this.seguidoresInforme = allSeguidores
-          //         .filter((seg) => seg.informeId === informeId)
-          //         .sort(this.downloadReportService.sortByGlobalCoords);
-
-          //       if (this.seguidoresInforme.length > 0) {
-          //         this.seguidoresLoaded = true;
-          //       }
-
-          //       this.seguidoresInforme.forEach((seguidor) => {
-          //         const anomaliasSeguidor = seguidor.anomaliasCliente;
-          //         if (anomaliasSeguidor.length > 0) {
-          //           this.anomaliasInforme.push(...anomaliasSeguidor);
-          //         }
-          //       });
-          //     }
-
-          //     // quitamos los seguidores sin anomalias
-          //     this.filtroApartados = this.filtroApartados.filter((apt) => apt !== 'anexoSegsNoAnoms');
-
-          //     this.downloadPDF();
-          //   } else {
-          if (this.reportControlService.plantaFija) {
-            this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
-          } else {
-            const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
-            // filtramos los del informe actual y los ordenamos por globals
-            this.seguidoresInforme = allSeguidores
-              .filter((seg) => seg.informeId === informeId)
-              .sort(this.downloadReportService.sortByGlobalCoords);
-
-            if (this.seguidoresInforme.length > 0) {
-              this.seguidoresLoaded = true;
-            }
-
-            this.anomaliasInforme = [];
-
-            this.seguidoresInforme.forEach((seguidor) => {
-              const anomaliasSeguidor = seguidor.anomaliasCliente;
-              if (anomaliasSeguidor.length > 0) {
-                this.anomaliasInforme.push(...anomaliasSeguidor);
+              if (this.planta.tipo === '1 eje') {
+                this.downloadReportService.getSeguidores1Eje(this.planta.id);
               }
-            });
-          }
 
-          if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
-            // imágenes planta completa
-            if (this.planta.tipo !== 'seguidores') {
-              this.setImgCapaPlanta(this.largestLocAreas, 'thermal', this.anomaliasInforme);
+              this.plantaService.planta = planta;
+
+              this.columnasAnomalia = GLOBAL.columnasAnomPdf;
+
+              this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
+
+              this.arrayFilas = Array(this.planta.filas)
+                .fill(0)
+                .map((_, i) => i + 1);
+              this.arrayColumnas = Array(this.planta.columnas)
+                .fill(0)
+                .map((_, i) => i + 1);
+
+              return this.plantaService.getLocationsArea(this.planta.id);
+            }),
+            take(1),
+            switchMap((locAreas) => {
+              this.largestLocAreas = locAreas.filter(
+                (locArea) =>
+                  locArea.globalCoords[0] !== undefined &&
+                  locArea.globalCoords[0] !== null &&
+                  locArea.globalCoords[0] !== ''
+              );
+
+              return combineLatest([
+                this.reportControlService.selectedInformeId$,
+                this.downloadReportService.filteredPDF$,
+              ]);
+            })
+          )
+          .subscribe(([informeId, filteredPDF]) => {
+            this.selectedInforme = this.reportControlService.informes.find((informe) => informeId === informe.id);
+
+            // if (filteredPDF !== undefined) {
+            //   if (filteredPDF) {
+            //     // utilizamos elementos filtrados para crear el informe
+            //     if (this.reportControlService.plantaFija) {
+            //       this.anomaliasInforme = this.filterService.filteredElements as Anomalia[];
+            //     } else {
+            //       const allSeguidores = this.filterService.filteredElements as Seguidor[];
+            //       // filtramos los del informe actual y los ordenamos por globals
+            //       this.seguidoresInforme = allSeguidores
+            //         .filter((seg) => seg.informeId === informeId)
+            //         .sort(this.downloadReportService.sortByGlobalCoords);
+
+            //       if (this.seguidoresInforme.length > 0) {
+            //         this.seguidoresLoaded = true;
+            //       }
+
+            //       this.seguidoresInforme.forEach((seguidor) => {
+            //         const anomaliasSeguidor = seguidor.anomaliasCliente;
+            //         if (anomaliasSeguidor.length > 0) {
+            //           this.anomaliasInforme.push(...anomaliasSeguidor);
+            //         }
+            //       });
+            //     }
+
+            //     // quitamos los seguidores sin anomalias
+            //     this.filtroApartados = this.filtroApartados.filter((apt) => apt !== 'anexoSegsNoAnoms');
+
+            //     this.downloadPDF();
+            //   } else {
+            if (this.reportControlService.plantaFija) {
+              this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
+            } else {
+              const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
+              // filtramos los del informe actual y los ordenamos por globals
+              this.seguidoresInforme = allSeguidores
+                .filter((seg) => seg.informeId === informeId)
+                .sort(this.downloadReportService.sortByGlobalCoords);
+
+              if (this.seguidoresInforme.length > 0) {
+                this.seguidoresLoaded = true;
+              }
+
+              this.anomaliasInforme = [];
+
+              this.seguidoresInforme.forEach((seguidor) => {
+                const anomaliasSeguidor = seguidor.anomaliasCliente;
+                if (anomaliasSeguidor.length > 0) {
+                  this.anomaliasInforme.push(...anomaliasSeguidor);
+                }
+              });
             }
-            this.setImgCapaPlanta(this.largestLocAreas, 'visual');
-          }
 
-          // }
-          // }
+            if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
+              // imágenes planta completa
+              if (this.planta.tipo !== 'seguidores') {
+                this.setImgCapaPlanta(this.largestLocAreas, 'thermal', this.anomaliasInforme);
+              }
+              this.setImgCapaPlanta(this.largestLocAreas, 'visual');
+            }
 
-          // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
-          this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
+            // }
+            // }
 
-          // asignamos los labels del criterio especifico del cliente
-          this.labelsCriticidad = this.anomaliaService.criterioCriticidad.labels;
+            // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
+            this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
 
-          this.irradianciaImg$ = this.storage
-            .ref(`informes/${this.selectedInforme.id}/irradiancia.png`)
-            .getDownloadURL();
-          this.suciedadImg$ = this.storage.ref(`informes/${this.selectedInforme.id}/suciedad.jpg`).getDownloadURL();
-          this.portadaImg$ = this.storage.ref(`informes/${this.selectedInforme.id}/portada.jpg`).getDownloadURL();
-          this.logoImg$ = this.storage.ref(`empresas/${this.planta.empresa}/logo.jpg`).getDownloadURL();
+            // asignamos los labels del criterio especifico del cliente
+            this.labelsCriticidad = this.anomaliaService.criterioCriticidad.labels;
 
-          this.irradianciaImg$
-            .toPromise()
-            .then((url) => {
-              fabric.util.loadImage(
-                url,
-                (img) => {
-                  const canvas = document.createElement('canvas');
-                  const width =
-                    this.widthIrradiancia * this.imgQuality > img.width
-                      ? img.width
-                      : this.widthIrradiancia * this.imgQuality;
-                  const scaleFactor = width / img.width;
-                  canvas.width = width;
-                  canvas.height = img.height * scaleFactor;
-                  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                  ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-                  this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-                },
-                null,
-                { crossOrigin: 'anonymous' }
-              );
-            })
-            .catch((error) => {
-              console.log('Error al obtener la imagen de irradiancia ', error);
-              const canvas = document.createElement('canvas');
-              this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+            this.irradianciaImg$ = this.storage
+              .ref(`informes/${this.selectedInforme.id}/irradiancia.png`)
+              .getDownloadURL();
+            this.suciedadImg$ = this.storage.ref(`informes/${this.selectedInforme.id}/suciedad.jpg`).getDownloadURL();
+            this.portadaImg$ = this.storage.ref(`informes/${this.selectedInforme.id}/portada.jpg`).getDownloadURL();
+            this.logoImg$ = this.storage.ref(`empresas/${this.planta.empresa}/logo.jpg`).getDownloadURL();
+
+            this.irradianciaImg$
+              .toPromise()
+              .then((url) => {
+                fabric.util.loadImage(
+                  url,
+                  (img) => {
+                    const canvas = document.createElement('canvas');
+                    const width =
+                      this.widthIrradiancia * this.imgQuality > img.width
+                        ? img.width
+                        : this.widthIrradiancia * this.imgQuality;
+                    const scaleFactor = width / img.width;
+                    canvas.width = width;
+                    canvas.height = img.height * scaleFactor;
+                    const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+                    this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+                  },
+                  null,
+                  { crossOrigin: 'anonymous' }
+                );
+              })
+              .catch((error) => {
+                console.log('Error al obtener la imagen de irradiancia ', error);
+                const canvas = document.createElement('canvas');
+                this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              });
+
+            this.suciedadImg$
+              .toPromise()
+              .then((url) => {
+                fabric.util.loadImage(
+                  url,
+                  (img) => {
+                    const canvas = document.createElement('canvas');
+                    const width =
+                      this.widthIrradiancia * this.imgQuality > img.width
+                        ? img.width
+                        : this.widthIrradiancia * this.imgQuality;
+                    const scaleFactor = width / img.width;
+                    canvas.width = width;
+                    canvas.height = img.height * scaleFactor;
+                    const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+                    this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+                  },
+                  null,
+                  { crossOrigin: 'anonymous' }
+                );
+              })
+              .catch((error) => {
+                console.log('Error al obtener la imagen de suciedad ', error);
+                const canvas = document.createElement('canvas');
+                this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              });
+
+            this.portadaImg$
+              .toPromise()
+              .then((url) => {
+                fabric.util.loadImage(
+                  url,
+                  (img) => {
+                    const canvas = document.createElement('canvas');
+                    const width =
+                      this.widthPortada * this.imgQuality > img.width ? img.width : this.widthPortada * this.imgQuality;
+                    const scaleFactor = width / img.width;
+                    canvas.width = width;
+                    canvas.height = img.height * scaleFactor;
+                    const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+                    this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+                  },
+                  null,
+                  { crossOrigin: 'anonymous' }
+                );
+              })
+              .catch((error) => {
+                console.log('Error al obtener la imagen de portada ', error);
+                const canvas = document.createElement('canvas');
+                this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              });
+
+            this.logoImg$
+              .toPromise()
+              .then((url) => {
+                fabric.util.loadImage(
+                  url,
+                  (img) => {
+                    const canvas = document.createElement('canvas');
+                    const newWidth =
+                      this.widthLogo * this.imgQuality > img.width ? img.width : this.widthLogo * this.imgQuality;
+                    this.widthLogoOriginal = newWidth;
+                    const scaleFactor = newWidth / img.width;
+                    const newHeight = img.height * scaleFactor;
+                    this.heightLogoOriginal = newHeight;
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
+                    this.scaleImgLogoHeader = this.heightLogoHeader / newHeight;
+                    const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, newWidth, newHeight);
+                    this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+                  },
+                  null,
+                  { crossOrigin: 'anonymous' }
+                );
+              })
+              .catch((error) => {
+                console.log('Error al obtener la imagen del logo ', error);
+                const canvas = document.createElement('canvas');
+                this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              });
+
+            // Cargamos Logo Solardrone
+            fabric.util.loadImage('../../../assets/images/logo_sd_tecno.png', (img) => {
+              const canvas = new fabric.Canvas('canvas');
+              const image = new fabric.Image(img);
+
+              const scale = this.widthImgSolardroneTech / image.width;
+
+              image.set({
+                left: 0,
+                top: 0,
+                angle: 0,
+                opacity: 1,
+                draggable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                scaleX: scale,
+                scaleY: scale,
+              });
+
+              canvas.add(image);
+
+              this.imgSolardroneBase64 = canvas.toDataURL('png');
             });
 
-          this.suciedadImg$
-            .toPromise()
-            .then((url) => {
-              fabric.util.loadImage(
-                url,
-                (img) => {
-                  const canvas = document.createElement('canvas');
-                  const width =
-                    this.widthIrradiancia * this.imgQuality > img.width
-                      ? img.width
-                      : this.widthIrradiancia * this.imgQuality;
-                  const scaleFactor = width / img.width;
-                  canvas.width = width;
-                  canvas.height = img.height * scaleFactor;
-                  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                  ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-                  this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-                },
-                null,
-                { crossOrigin: 'anonymous' }
-              );
-            })
-            .catch((error) => {
-              console.log('Error al obtener la imagen de suciedad ', error);
-              const canvas = document.createElement('canvas');
-              this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            });
-
-          this.portadaImg$
-            .toPromise()
-            .then((url) => {
-              fabric.util.loadImage(
-                url,
-                (img) => {
-                  const canvas = document.createElement('canvas');
-                  const width =
-                    this.widthPortada * this.imgQuality > img.width ? img.width : this.widthPortada * this.imgQuality;
-                  const scaleFactor = width / img.width;
-                  canvas.width = width;
-                  canvas.height = img.height * scaleFactor;
-                  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                  ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-                  this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-                },
-                null,
-                { crossOrigin: 'anonymous' }
-              );
-            })
-            .catch((error) => {
-              console.log('Error al obtener la imagen de portada ', error);
-              const canvas = document.createElement('canvas');
-              this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            });
-
-          this.logoImg$
-            .toPromise()
-            .then((url) => {
-              fabric.util.loadImage(
-                url,
-                (img) => {
-                  const canvas = document.createElement('canvas');
-                  const newWidth =
-                    this.widthLogo * this.imgQuality > img.width ? img.width : this.widthLogo * this.imgQuality;
-                  this.widthLogoOriginal = newWidth;
-                  const scaleFactor = newWidth / img.width;
-                  const newHeight = img.height * scaleFactor;
-                  this.heightLogoOriginal = newHeight;
-                  canvas.width = newWidth;
-                  canvas.height = newHeight;
-                  this.scaleImgLogoHeader = this.heightLogoHeader / newHeight;
-                  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                  ctx.drawImage(img, 0, 0, newWidth, newHeight);
-                  this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-                },
-                null,
-                { crossOrigin: 'anonymous' }
-              );
-            })
-            .catch((error) => {
-              console.log('Error al obtener la imagen del logo ', error);
-              const canvas = document.createElement('canvas');
-              this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            });
-
-          // Cargamos Logo Solardrone
-          fabric.util.loadImage('../../../assets/images/logo_tecno.png', (img) => {
-            const canvas = new fabric.Canvas('canvas');
-            const image = new fabric.Image(img);
-
-            image.set({
-              left: 0,
-              top: 0,
-              angle: 0,
-              opacity: 1,
-              draggable: false,
-              lockMovementX: true,
-              lockMovementY: true,
-              scaleX: 0.1,
-              scaleY: 0.1,
-            });
-
-            canvas.add(image);
-
-            this.imgSolardroneBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-          });
-
-          this.apartadosInforme = [
-            {
-              nombre: 'introduccion',
-              descripcion: 'Introducción',
-              orden: 1,
-              apt: 1,
-              elegible: false,
-            },
-            {
-              nombre: 'criterios',
-              descripcion: 'Criterios de operación',
-              orden: 2,
-              apt: 1,
-              elegible: true,
-            },
-            {
-              nombre: 'normalizacion',
-              descripcion: 'Normalización de gradientes de temperatura',
-              orden: 3,
-              apt: 1,
-              elegible: true,
-            },
-            {
-              nombre: 'datosVuelo',
-              descripcion: 'Datos del vuelo',
-              orden: 4,
-              apt: 1,
-              elegible: true,
-            },
-            // {
-            //   nombre: 'irradiancia',
-            //   descripcion: 'Irradiancia durante el vuelo',
-            //   orden: 5,
-            //   apt: 1,
-            //   elegible: true,
-            // },
-            {
-              nombre: 'paramsTermicos',
-              descripcion: 'Ajuste de parámetros térmicos',
-              orden: 6,
-              apt: 1,
-              elegible: true,
-            },
-            {
-              nombre: 'perdidaPR',
-              descripcion: 'Pérdida de Performance Ratio',
-              orden: 7,
-              apt: 1,
-              elegible: true,
-            },
-            {
-              nombre: 'clasificacion',
-              descripcion: 'Cómo se clasifican las anomalías',
-              orden: 8,
-              apt: 1,
-              elegible: true,
-            },
-            {
-              nombre: 'resultadosClase',
-              descripcion: 'Resultados por clase',
-              orden: 11,
-              apt: 2,
-              elegible: true,
-            },
-            {
-              nombre: 'resultadosCategoria',
-              descripcion: 'Resultados por categoría',
-              orden: 12,
-              apt: 2,
-              elegible: true,
-            },
-
-            {
-              nombre: 'resultadosMAE',
-              descripcion: 'MAE de la planta',
-              orden: 14,
-              apt: 2,
-              elegible: true,
-            },
-            {
-              nombre: 'anexo1',
-              descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
-              orden: 15,
-              elegible: true,
-            },
-          ];
-
-          if (this.planta.tipo === 'seguidores') {
-            this.apartadosInforme.push(
+            this.apartadosInforme = [
               {
-                nombre: 'anexoSeguidores',
-                descripcion: 'Anexo II: Anomalías térmicas por seguidor',
-                orden: 16,
+                nombre: 'introduccion',
+                descripcion: 'Introducción',
+                orden: 1,
+                apt: 1,
+                elegible: false,
+              },
+              {
+                nombre: 'criterios',
+                descripcion: 'Criterios de operación',
+                orden: 2,
+                apt: 1,
                 elegible: true,
               },
               {
-                nombre: 'resultadosPosicion',
-                descripcion: 'Resultados por posición',
-                orden: 13,
+                nombre: 'normalizacion',
+                descripcion: 'Normalización de gradientes de temperatura',
+                orden: 3,
+                apt: 1,
+                elegible: true,
+              },
+              {
+                nombre: 'datosVuelo',
+                descripcion: 'Datos del vuelo',
+                orden: 4,
+                apt: 1,
+                elegible: true,
+              },
+              // {
+              //   nombre: 'irradiancia',
+              //   descripcion: 'Irradiancia durante el vuelo',
+              //   orden: 5,
+              //   apt: 1,
+              //   elegible: true,
+              // },
+              {
+                nombre: 'paramsTermicos',
+                descripcion: 'Ajuste de parámetros térmicos',
+                orden: 6,
+                apt: 1,
+                elegible: true,
+              },
+              {
+                nombre: 'perdidaPR',
+                descripcion: 'Pérdida de Performance Ratio',
+                orden: 7,
+                apt: 1,
+                elegible: true,
+              },
+              {
+                nombre: 'clasificacion',
+                descripcion: 'Cómo se clasifican las anomalías',
+                orden: 8,
+                apt: 1,
+                elegible: true,
+              },
+              {
+                nombre: 'resultadosClase',
+                descripcion: 'Resultados por clase',
+                orden: 11,
                 apt: 2,
                 elegible: true,
-              }
-            );
-            const fechaInforme = new Date(this.selectedInforme.fecha * 1000);
+              },
+              {
+                nombre: 'resultadosCategoria',
+                descripcion: 'Resultados por categoría',
+                orden: 12,
+                apt: 2,
+                elegible: true,
+              },
 
-            if (fechaInforme.getFullYear() >= 2020) {
+              {
+                nombre: 'resultadosMAE',
+                descripcion: 'MAE de la planta',
+                orden: 14,
+                apt: 2,
+                elegible: true,
+              },
+              {
+                nombre: 'anexo1',
+                descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
+                orden: 15,
+                elegible: true,
+              },
+            ];
+
+            if (this.planta.tipo === 'seguidores') {
+              this.apartadosInforme.push(
+                {
+                  nombre: 'anexoSeguidores',
+                  descripcion: 'Anexo II: Anomalías térmicas por seguidor',
+                  orden: 16,
+                  elegible: true,
+                },
+                {
+                  nombre: 'resultadosPosicion',
+                  descripcion: 'Resultados por posición',
+                  orden: 13,
+                  apt: 2,
+                  elegible: true,
+                }
+              );
+              const fechaInforme = new Date(this.selectedInforme.fecha * 1000);
+
+              if (fechaInforme.getFullYear() >= 2020) {
+                this.apartadosInforme.push({
+                  nombre: 'anexoSegsNoAnoms',
+                  descripcion: 'Anexo III: Seguidores sin anomalías',
+                  orden: 17,
+                  elegible: true,
+                });
+              }
+            } else {
               this.apartadosInforme.push({
-                nombre: 'anexoSegsNoAnoms',
-                descripcion: 'Anexo III: Seguidores sin anomalías',
-                orden: 17,
+                nombre: 'planoTermico',
+                descripcion: 'Plano térmico',
+                orden: 9,
+                apt: 2,
+                elegible: false,
+              });
+              this.apartadosInforme.push({
+                nombre: 'anexoAnomalias',
+                descripcion: 'Anexo II: Anomalías térmicas',
+                orden: 16,
                 elegible: true,
               });
+
+              // if (this.planta.tipo === '1 eje') {
+              //   this.apartadosInforme.push({
+              //     nombre: 'anexoSeguidores1EjeAnoms',
+              //     descripcion: 'Anexo III: Anomalías térmicas por seguidor',
+              //     orden: 17,
+              //     elegible: true,
+              //   });
+
+              //   this.apartadosInforme.push({
+              //     nombre: 'anexoSeguidores1EjeNoAnoms',
+              //     descripcion: 'Anexo III: Seguidores sin anomalías',
+              //     orden: 18,
+              //     elegible: true,
+              //   });
+              // }
             }
-          } else {
-            this.apartadosInforme.push({
-              nombre: 'planoTermico',
-              descripcion: 'Plano térmico',
-              orden: 9,
-              apt: 2,
-              elegible: false,
-            });
-            this.apartadosInforme.push({
-              nombre: 'anexoAnomalias',
-              descripcion: 'Anexo II: Anomalías térmicas',
-              orden: 16,
-              elegible: true,
+
+            if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
+              this.apartadosInforme.push({
+                nombre: 'planoVisual',
+                descripcion: 'Plano visual',
+                orden: 10,
+                apt: 2,
+                elegible: false,
+              });
+            }
+
+            this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
+              return a.orden - b.orden;
             });
 
-            // if (this.planta.tipo === '1 eje') {
-            //   this.apartadosInforme.push({
-            //     nombre: 'anexoSeguidores1EjeAnoms',
-            //     descripcion: 'Anexo III: Anomalías térmicas por seguidor',
-            //     orden: 17,
-            //     elegible: true,
-            //   });
-
-            //   this.apartadosInforme.push({
-            //     nombre: 'anexoSeguidores1EjeNoAnoms',
-            //     descripcion: 'Anexo III: Seguidores sin anomalías',
-            //     orden: 18,
-            //     elegible: true,
-            //   });
+            // if (this.filtroApartados === undefined) {
+            this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
             // }
-          }
-
-          if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
-            this.apartadosInforme.push({
-              nombre: 'planoVisual',
-              descripcion: 'Plano visual',
-              orden: 10,
-              apt: 2,
-              elegible: false,
-            });
-          }
-
-          this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
-            return a.orden - b.orden;
-          });
-
-          // if (this.filtroApartados === undefined) {
-          this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
-          // }
-        })
-    );
+          })
+      );
+    });
 
     this.heightLogo = 150;
     this.widthLogo = 200;
     this.widthPortada = 600; // es el ancho de pagina completo
-    this.widthImgSolardroneTech = 250;
+    this.widthImgSolardroneTech = 300;
     this.widthSuciedad = 501;
     this.widthCurvaMae = 300;
     this.widthFormulaMae = 200;
@@ -1313,6 +1317,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               canvas.add(image);
               // movemos al fondo para que quede debajo de la termica
               canvas.moveTo(image, 0);
+
+              contador++;
+              if (contador === tileCoords.length * 2) {
+                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+              }
+            } else {
+              contador++;
+              if (contador === tileCoords.length * 2) {
+                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+              }
             }
           },
           null,
@@ -1342,12 +1356,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               canvas.add(image);
 
               contador++;
-              if (contador === tileCoords.length) {
+              if (contador === tileCoords.length * 2) {
                 this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
               }
             } else {
               contador++;
-              if (contador === tileCoords.length) {
+              if (contador === tileCoords.length * 2) {
                 this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
               }
             }
@@ -1917,18 +1931,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       },
 
       '\n\n',
-
       {
         image: this.imgLogoBase64,
         width: widthLogoPortada,
-        alignment: 'center',
+        margin: [10, 0, 0, 0],
       },
       {
         image: this.imgSolardroneBase64,
         width: this.widthImgSolardroneTech,
         absolutePosition: {
-          x: this.widthPortada - this.widthImgSolardroneTech,
-          y: this.widthPortada * Math.sqrt(2) - this.widthImgSolardroneTech / 4 - 20, // aspect ratio logo 4:1
+          // x: this.widthPortada / 2,
+          // y: this.widthPortada * Math.sqrt(2) - 50,
+          x: this.widthPortada - this.widthImgSolardroneTech - 20,
+          y: this.widthPortada * Math.sqrt(2) - this.widthImgSolardroneTech / 4 - 40, // aspect ratio logo 4:1
         },
         pageBreak: 'after',
       },
@@ -4299,6 +4314,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+
+    this.imageProcessService.resetService();
   }
 
   //////////////////////////////////////////////////////
