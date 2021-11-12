@@ -250,11 +250,13 @@ export class SeguidorService {
     const globalCoordsSeguidor: string[] = locAreaSeguidor.globalCoords;
 
     locAreasNoSeguidores.forEach((locAreaNoSeg) => {
-      // convertimos el punto y el poligono en array
-      const point = [locAreaSeguidor.path[0].lat, locAreaSeguidor.path[0].lng];
+      // calculamos el centroide del seguidor
+      const centroid = this.getLocAreaCentroid(locAreaSeguidor);
+
       const polygon = locAreaNoSeg.path.map((coord) => [coord.lat, coord.lng]);
 
-      if (PointInPolygon(point, polygon)) {
+      // comprobamos si esta dentro de la zona
+      if (PointInPolygon(centroid, polygon)) {
         locAreaNoSeg.globalCoords.forEach((coord, i) => {
           if (coord !== null && coord !== undefined && coord !== '') {
             // si la global del seguidor es incorrecta le aplicamos la del area
@@ -273,6 +275,17 @@ export class SeguidorService {
     // globalCoordsSeguidor.filter((coord) => coord !== null);
 
     return globalCoordsSeguidor.filter((coord) => coord !== null);
+  }
+
+  private getLocAreaCentroid(locArea: LocationAreaInterface): number[] {
+    let sumLong = 0;
+    let sumLat = 0;
+    locArea.path.forEach((coord) => {
+      sumLong += coord.lng;
+      sumLat += coord.lat;
+    });
+
+    return [sumLat / locArea.path.length, sumLong / locArea.path.length];
   }
 
   private getImageName(seguidor: Seguidor, informe: InformeInterface): string {
