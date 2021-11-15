@@ -388,14 +388,27 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                 fabric.util.loadImage(
                   url,
                   (img) => {
-                    const canvas = document.createElement('canvas');
+                    const canvas = new fabric.Canvas('canvas');
                     const width =
                       this.widthPortada * this.imgQuality > img.width ? img.width : this.widthPortada * this.imgQuality;
                     const scaleFactor = width / img.width;
                     canvas.width = width;
-                    canvas.height = img.height * scaleFactor;
-                    const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+
+                    let height = img.height * scaleFactor;
+                    if (height > 1200) {
+                      height = 1200;
+                    }
+                    canvas.height = height;
+
+                    const image = new fabric.Image(img, {
+                      top: height,
+                      originY: 'bottom',
+                      scaleX: scaleFactor,
+                      scaleY: scaleFactor,
+                    });
+
+                    canvas.add(image);
+
                     this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
                   },
                   null,
@@ -565,9 +578,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                   elegible: true,
                 }
               );
-              const fechaInforme = new Date(this.selectedInforme.fecha * 1000);
 
-              if (fechaInforme.getFullYear() >= 2020) {
+              if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
                 this.apartadosInforme.push({
                   nombre: 'anexoSegsNoAnoms',
                   descripcion: 'Anexo III: Seguidores sin anomalías',
@@ -1934,6 +1946,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       {
         image: this.imgLogoBase64,
         width: widthLogoPortada,
+        alignment: 'center',
         margin: [10, 0, 0, 0],
       },
       {
