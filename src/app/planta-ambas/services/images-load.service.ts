@@ -4,7 +4,9 @@ import { AngularFireStorage } from '@angular/fire/storage';
 
 import { fabric } from 'fabric';
 
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+
+import { DownloadReportService } from '@core/services/download-report.service';
 
 @Injectable({
   providedIn: 'root',
@@ -52,7 +54,7 @@ export class ImagesLoadService {
   private _imgCurvaMaeBase64: string = undefined;
   imgCurvaMaeBase64$ = new BehaviorSubject<string>(this._imgCurvaMaeBase64);
 
-  constructor(private storage: AngularFireStorage) {}
+  constructor(private storage: AngularFireStorage, private downloadReportService: DownloadReportService) {}
 
   checkImagesLoaded(): Promise<boolean> {
     return new Promise((loaded) => {
@@ -65,6 +67,8 @@ export class ImagesLoadService {
   }
 
   loadSelectedInformeImages(selectedInformeId: string) {
+    this.loadedChangingImages = 0;
+
     this.storage
       .ref(`informes/${selectedInformeId}/irradiancia.png`)
       .getDownloadURL()
@@ -213,7 +217,14 @@ export class ImagesLoadService {
       });
 
     // Cargamos Logo Solardrone
-    fabric.util.loadImage('../../../assets/images/logo_sd_tecno.png', (img) => {
+    let archivoLogo = 'logo_sd_tecno';
+    this.downloadReportService.englishLang$.subscribe((lang) => {
+      if (lang) {
+        archivoLogo = 'logo_sd_techno';
+      }
+    });
+
+    fabric.util.loadImage(`../../../assets/images/${archivoLogo}.png`, (img) => {
       const canvas = new fabric.Canvas('canvas');
       const newWidth =
         this.widthImgSolardroneTech * this.imgQuality > img.width

@@ -524,10 +524,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   private getPrefijoInforme() {
     let prefijo = this.selectedInforme.prefijo;
+
+    const parteFinal = this.translation.t('informe');
+
     if (prefijo !== undefined) {
-      prefijo = prefijo.concat('informe');
+      prefijo = prefijo + '_' + parteFinal;
     } else {
-      prefijo = 'informe';
+      prefijo = parteFinal;
     }
     return prefijo;
   }
