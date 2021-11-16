@@ -272,7 +272,12 @@ export class EditListComponent implements OnInit {
         estructura.setModulo(modulo);
         estructura.setGlobals(globalCoords);
 
-        await this.informeService.updateEstructura(this.informeId, estructura);
+        // diferenciamos entre estructuras y autoestructuras
+        if (estructura.estructuraMatrix === null) {
+          await this.informeService.updateAutoEstructura(this.informeId, estructura);
+        } else {
+          await this.informeService.updateEstructura(this.informeId, estructura);
+        }
       } else {
         let globalCoords;
         let modulo;
