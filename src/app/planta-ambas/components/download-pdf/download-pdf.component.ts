@@ -242,6 +242,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                 .fill(0)
                 .map((_, i) => i + 1);
 
+              // cargamos las imagenes que no cambiar al cambiar de informe
+              this.imagesLoadService.loadFixedImages(this.planta.empresa);
+
               return this.plantaService.getLocationsArea(this.planta.id);
             }),
             take(1),
@@ -262,7 +265,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           .subscribe(([informeId, filteredPDF]) => {
             this.selectedInforme = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
-            this.imagesLoadService.loadImages(informeId, this.planta.empresa);
+            this.imagesLoadService.loadSelectedInformeImages(informeId);
 
             // if (filteredPDF !== undefined) {
             //   if (filteredPDF) {

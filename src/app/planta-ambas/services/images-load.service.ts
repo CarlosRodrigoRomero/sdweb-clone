@@ -4,7 +4,7 @@ import { AngularFireStorage } from '@angular/fire/storage';
 
 import { fabric } from 'fabric';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -46,7 +46,7 @@ export class ImagesLoadService {
 
   constructor(private storage: AngularFireStorage) {}
 
-  loadImages(selectedInformeId: string, empresaId: string): void {
+  loadSelectedInformeImages(selectedInformeId: string) {
     this.storage
       .ref(`informes/${selectedInformeId}/irradiancia.png`)
       .getDownloadURL()
@@ -143,7 +143,9 @@ export class ImagesLoadService {
         const canvas = document.createElement('canvas');
         this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
       });
+  }
 
+  loadFixedImages(empresaId: string): void {
     this.storage
       .ref(`empresas/${empresaId}/logo.jpg`)
       .getDownloadURL()
