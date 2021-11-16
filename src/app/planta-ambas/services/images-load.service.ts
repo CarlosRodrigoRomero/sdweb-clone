@@ -15,11 +15,11 @@ export class ImagesLoadService {
   imgQuality = 3.5;
   jpgQuality = 0.95;
 
-  private numChangingImages = 3;
+  private numChangingImages = 4;
   private _loadedChangingImages = 0;
   private loadedChangingImages$ = new BehaviorSubject<number>(this._loadedChangingImages);
 
-  private numFixedImages = 4;
+  private numFixedImages = 3;
   private _loadedFixedImages = 0;
   private loadedFixedImages$ = new BehaviorSubject<number>(this._loadedFixedImages);
 
@@ -208,7 +208,7 @@ export class ImagesLoadService {
 
       this.imgSolardroneBase64 = canvas.toDataURL('png');
       // indicamos que la imagen se ha cargado
-      this.loadedFixedImages++;
+      this.loadedChangingImages++;
     });
   }
 
@@ -288,6 +288,20 @@ export class ImagesLoadService {
       null,
       { crossOrigin: 'anonymous' }
     );
+  }
+
+  resetService() {
+    this.loadedChangingImages = 0;
+    this.loadedFixedImages = 0;
+    this.imgIrradianciaBase64 = undefined;
+    this.imgSuciedadBase64 = undefined;
+    this.imgPortadaBase64 = undefined;
+    this.heightLogoEmpresa = undefined;
+    this.scaleImgLogoHeader = undefined;
+    this.imgLogoBase64 = undefined;
+    this.imgSolardroneBase64 = undefined;
+    this.imgFormulaMaeBase64 = undefined;
+    this.imgCurvaMaeBase64 = undefined;
   }
 
   ////////////////////////////////////////////////////////////

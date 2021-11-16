@@ -4165,6 +4165,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
 
     this.imageProcessService.resetService();
+    this.imagesLoadService.resetService();
   }
 
   //////////////////////////////////////////////////////

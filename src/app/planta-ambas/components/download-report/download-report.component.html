@@ -4,7 +4,7 @@
 <mat-menu #menu="matMenu" class="menu">
   <div class="contenedor-menu">
     <h5 (click)="$event.stopPropagation()">Descargas</h5>
-    <app-select-language></app-select-language>
+    <app-select-language *ngIf="!plantaDemo"></app-select-language>
     <a mat-menu-item href="{{ excelUrl }}" download="" [disabled]="!excelExist">
       <mat-icon>calculate</mat-icon>
       <span>EXCEL</span>
