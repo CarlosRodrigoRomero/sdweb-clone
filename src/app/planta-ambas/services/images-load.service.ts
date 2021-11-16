@@ -95,7 +95,11 @@ export class ImagesLoadService {
       })
       .catch((error) => {
         console.log('Error al obtener la imagen de irradiancia ', error);
+        // añadimos un canvas blanco cuando no hay imagen
         const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
         // indicamos que la imagen se ha cargado
         this.loadedChangingImages++;
@@ -127,7 +131,11 @@ export class ImagesLoadService {
       })
       .catch((error) => {
         console.log('Error al obtener la imagen de suciedad ', error);
+        // añadimos un canvas blanco cuando no hay imagen
         const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
         // indicamos que la imagen se ha cargado
         this.loadedChangingImages++;
@@ -172,7 +180,11 @@ export class ImagesLoadService {
       })
       .catch((error) => {
         console.log('Error al obtener la imagen de portada ', error);
+        // añadimos un canvas blanco cuando no hay imagen
         const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
         // indicamos que la imagen se ha cargado
         this.loadedChangingImages++;
@@ -243,7 +255,11 @@ export class ImagesLoadService {
       })
       .catch((error) => {
         console.log('Error al obtener la imagen del logo ', error);
+        // añadimos un canvas blanco cuando no hay imagen
         const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
         // indicamos que la imagen se ha cargado
         this.loadedFixedImages++;

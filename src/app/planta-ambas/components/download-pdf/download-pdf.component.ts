@@ -94,8 +94,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   columnasAnomalia$ = new BehaviorSubject<any[]>(this._columnasAnomalia); // equvalente a currentFilteredColumnas$
   private filtroColumnas: string[];
   private layerInformeSelected: TileLayer;
-  // IMAGENES
+  private alturaMax = 0;
 
+  // IMAGENES
   private imgLogoBase64: string;
   private imgPortadaBase64: string;
   private widthSuciedad: number;
@@ -235,13 +236,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
               this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
 
-              this.arrayFilas = Array(this.planta.filas)
-                .fill(0)
-                .map((_, i) => i + 1);
-              this.arrayColumnas = Array(this.planta.columnas)
-                .fill(0)
-                .map((_, i) => i + 1);
-
               // cargamos las imagenes que no cambian al cambiar de informe
               this.imagesLoadService.loadFixedImages(this.planta.empresa);
 
@@ -316,6 +310,15 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                 }
               });
             }
+            // obtenemos la altura maxima de los modulos
+            this.alturaMax = this.getAlturaMax();
+
+            this.arrayFilas = Array(this.alturaMax)
+              .fill(0)
+              .map((_, i) => i + 1);
+            this.arrayColumnas = Array(this.planta.columnas)
+              .fill(0)
+              .map((_, i) => i + 1);
 
             if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
               // imágenes planta completa
@@ -405,7 +408,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                 apt: 2,
                 elegible: true,
               },
-
+              {
+                nombre: 'resultadosPosicion',
+                descripcion: 'Resultados por posición',
+                orden: 13,
+                apt: 2,
+                elegible: true,
+              },
               {
                 nombre: 'resultadosMAE',
                 descripcion: 'MAE de la planta',
@@ -422,21 +431,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             ];
 
             if (this.planta.tipo === 'seguidores') {
-              this.apartadosInforme.push(
-                {
-                  nombre: 'anexoSeguidores',
-                  descripcion: 'Anexo II: Anomalías térmicas por seguidor',
-                  orden: 16,
-                  elegible: true,
-                },
-                {
-                  nombre: 'resultadosPosicion',
-                  descripcion: 'Resultados por posición',
-                  orden: 13,
-                  apt: 2,
-                  elegible: true,
-                }
-              );
+              this.apartadosInforme.push({
+                nombre: 'anexoSeguidores',
+                descripcion: 'Anexo II: Anomalías térmicas por seguidor',
+                orden: 16,
+                elegible: true,
+              });
 
               if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
                 this.apartadosInforme.push({
@@ -512,6 +512,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  private getAlturaMax() {
+    return Math.max(...[...this.anomaliasInforme.map((anom) => anom.localY), this.planta.filas]);
   }
 
   public selectFilteredPDF() {
@@ -889,6 +893,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         table: {
           alignment: 'center',
+          // margin: [0, 10, 0, 0],
         },
 
         param: {
@@ -2819,12 +2824,17 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     };
 
     const resultadosPosicion = (index: string) => {
+      let titulo;
       let texto1;
+      let body;
       if (this.reportControlService.plantaFija) {
+        titulo = this.translation.t('Resultados por altura');
         texto1 = this.translation.t(
           'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
         );
+        body = this.getTablaAltura();
       } else {
+        titulo = this.translation.t('Resultados por posición de la anomalía dentro del seguidor');
         texto1 = `${this.translation.t(
           'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran'
         )} (${this.plantaService.getNombreLocalX(this.planta)} ${this.translation.t(
@@ -2832,10 +2842,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         )} ${this.plantaService.getNombreLocalY(this.planta)}) ${this.translation.t(
           'dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
         )}`;
+        body = this.getTablaPosicion();
       }
       return [
         {
-          text: `${index} - ${this.translation.t('Resultados por posición de la anomalía dentro del seguidor')}`,
+          text: `${index} - ${titulo}`,
           style: 'h3',
         },
 
@@ -2866,7 +2877,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             {
               width: 'auto',
               table: {
-                body: this.getTablaPosicion(),
+                body,
               },
             },
             {
@@ -4096,7 +4107,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     for (const j of this.arrayFilas) {
       const arrayFila = [];
       arrayFila.push({
-        text: this.plantaService.getAltura(this.planta, j).toString(),
+        text: this.plantaService.getAltura(this.planta, j, this.alturaMax).toString(),
         style: 'tableHeaderBlue',
       });
       const countPosicionFila = this.countPosicion[j - 1];
@@ -4106,6 +4117,31 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           style: 'tableCell',
         });
       }
+
+      array.push(arrayFila);
+    }
+
+    return array;
+  }
+
+  private getTablaAltura() {
+    const array = [];
+
+    for (let i = 1; i <= this.alturaMax; i++) {
+      const arrayFila = [];
+      arrayFila.push({
+        text: this.plantaService.getAltura(this.planta, i, this.alturaMax).toString(),
+        style: 'tableHeaderBlue',
+      });
+
+      const countAnomalias = this.anomaliasInforme
+        .filter((anom) => anom.clase !== 1)
+        .filter((anom) => anom.localY === i).length;
+
+      arrayFila.push({
+        text: countAnomalias.toString(),
+        style: 'tableCell',
+      });
 
       array.push(arrayFila);
     }

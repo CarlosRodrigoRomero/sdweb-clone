@@ -317,7 +317,11 @@ export class PlantaService {
     return this.getEtiquetaLocalX(planta, elem, type).concat('/').concat(this.getEtiquetaLocalY(planta, elem, type));
   }
 
-  getAltura(planta: PlantaInterface, localY: number) {
+  getAltura(planta: PlantaInterface, localY: number, alturaMax?: number) {
+    let altura = planta.filas;
+    if (alturaMax !== undefined) {
+      altura = alturaMax;
+    }
     // Por defecto, la altura alta es la numero 1
     if (planta.alturaBajaPrimero) {
       return planta.filas - (localY - 1);
