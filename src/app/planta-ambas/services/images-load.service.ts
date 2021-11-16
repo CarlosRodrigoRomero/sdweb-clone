@@ -66,7 +66,7 @@ export class ImagesLoadService {
     });
   }
 
-  loadSelectedInformeImages(selectedInformeId: string) {
+  loadChangingImages(selectedInformeId: string) {
     this.loadedChangingImages = 0;
 
     this.storage
@@ -177,6 +177,39 @@ export class ImagesLoadService {
         // indicamos que la imagen se ha cargado
         this.loadedChangingImages++;
       });
+
+    // Logo Solardrone en español o inglés
+    let archivoLogo = 'logo_sd_tecno';
+    this.downloadReportService.englishLang$.subscribe((lang) => {
+      if (lang) {
+        archivoLogo = 'logo_sd_techno';
+      }
+    });
+
+    fabric.util.loadImage(`../../../assets/images/${archivoLogo}.png`, (img) => {
+      const canvas = new fabric.Canvas('canvas');
+      const newWidth =
+        this.widthImgSolardroneTech * this.imgQuality > img.width
+          ? img.width
+          : this.widthImgSolardroneTech * this.imgQuality;
+
+      const scaleFactor = newWidth / img.width;
+      const newHeight = img.height * scaleFactor;
+
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+
+      const image = new fabric.Image(img, {
+        scaleX: scaleFactor,
+        scaleY: scaleFactor,
+      });
+
+      canvas.add(image);
+
+      this.imgSolardroneBase64 = canvas.toDataURL('png');
+      // indicamos que la imagen se ha cargado
+      this.loadedFixedImages++;
+    });
   }
 
   loadFixedImages(empresaId: string): void {
@@ -215,39 +248,6 @@ export class ImagesLoadService {
         // indicamos que la imagen se ha cargado
         this.loadedFixedImages++;
       });
-
-    // Cargamos Logo Solardrone
-    let archivoLogo = 'logo_sd_tecno';
-    this.downloadReportService.englishLang$.subscribe((lang) => {
-      if (lang) {
-        archivoLogo = 'logo_sd_techno';
-      }
-    });
-
-    fabric.util.loadImage(`../../../assets/images/${archivoLogo}.png`, (img) => {
-      const canvas = new fabric.Canvas('canvas');
-      const newWidth =
-        this.widthImgSolardroneTech * this.imgQuality > img.width
-          ? img.width
-          : this.widthImgSolardroneTech * this.imgQuality;
-
-      const scaleFactor = newWidth / img.width;
-      const newHeight = img.height * scaleFactor;
-
-      canvas.width = newWidth;
-      canvas.height = newHeight;
-
-      const image = new fabric.Image(img, {
-        scaleX: scaleFactor,
-        scaleY: scaleFactor,
-      });
-
-      canvas.add(image);
-
-      this.imgSolardroneBase64 = canvas.toDataURL('png');
-      // indicamos que la imagen se ha cargado
-      this.loadedFixedImages++;
-    });
 
     // GRAFICO MAE
     fabric.util.loadImage(

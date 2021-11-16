@@ -242,7 +242,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                 .fill(0)
                 .map((_, i) => i + 1);
 
-              // cargamos las imagenes que no cambiar al cambiar de informe
+              // cargamos las imagenes que no cambian al cambiar de informe
               this.imagesLoadService.loadFixedImages(this.planta.empresa);
 
               return this.plantaService.getLocationsArea(this.planta.id);
@@ -264,8 +264,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           )
           .subscribe(([informeId, filteredPDF]) => {
             this.selectedInforme = this.reportControlService.informes.find((informe) => informeId === informe.id);
-
-            this.imagesLoadService.loadSelectedInformeImages(informeId);
 
             // if (filteredPDF !== undefined) {
             //   if (filteredPDF) {
@@ -539,6 +537,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.downloadReportService.endingPDF = false;
     this.downloadReportService.generatingPDF = true;
 
+    // cargamos imagenes otras imagenes del informe
+    this.imagesLoadService.loadChangingImages(this.selectedInforme.id);
+
     this.countLoadedImages = 0;
     this.countLoadedImagesSegs1EjeAnoms = 0;
     this.countLoadedImagesSegs1EjeNoAnoms = 0;
@@ -605,17 +606,18 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       //     })
       //   );
       // } else {
-      // comprobamos que estan cargadas tb el resto de imagenes del PDF
-      this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-        let downloads = 0;
 
-        this.subscriptions.add(
-          this.countLoadedImages$.subscribe((countLoadedImgs) => {
-            this.downloadReportService.progressBarValue = Math.round(
-              (countLoadedImgs / 2) /* this.anomaliasInforme.length */ * 100
-            );
+      // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+      let downloads = 0;
 
+      this.subscriptions.add(
+        this.countLoadedImages$.subscribe((countLoadedImgs) => {
+          this.downloadReportService.progressBarValue = Math.round(
+            (countLoadedImgs / 2) /* this.anomaliasInforme.length */ * 100
+          );
+
+          // comprobamos que estan cargadas tb el resto de imagenes del PDF
+          this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
             // Cuando se carguen todas las imágenes
             if (imagesLoaded && countLoadedImgs === 2 /* this.countAnomalias */ && downloads === 0) {
               this.calcularInforme();
@@ -629,9 +631,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
               downloads++;
             }
-          })
-        );
-      });
+          });
+        })
+      );
 
       // }
     } else {
@@ -642,17 +644,17 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         this.countSeguidores++;
       });
 
-      // comprobamos que estan cargadas tb el resto de imagenes del PDF
-      this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-        let downloads = 0;
+      // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+      let downloads = 0;
 
-        this.subscriptions.add(
-          this.countLoadedImages$.subscribe((countLoadedImgs) => {
-            this.downloadReportService.progressBarValue = Math.round(
-              (countLoadedImgs / this.seguidoresInforme.length) * 100
-            );
+      this.subscriptions.add(
+        this.countLoadedImages$.subscribe((countLoadedImgs) => {
+          this.downloadReportService.progressBarValue = Math.round(
+            (countLoadedImgs / this.seguidoresInforme.length) * 100
+          );
 
+          // comprobamos que estan cargadas tb el resto de imagenes del PDF
+          this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
             // Cuando se carguen todas las imágenes
             if (imagesLoaded && countLoadedImgs === this.countSeguidores && downloads === 0) {
               this.calcularInforme();
@@ -666,9 +668,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
               downloads++;
             }
-          })
-        );
-      });
+          });
+        })
+      );
     }
   }
 
