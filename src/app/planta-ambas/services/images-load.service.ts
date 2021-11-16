@@ -4,7 +4,7 @@ import { AngularFireStorage } from '@angular/fire/storage';
 
 import { fabric } from 'fabric';
 
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +12,14 @@ import { BehaviorSubject } from 'rxjs';
 export class ImagesLoadService {
   imgQuality = 3.5;
   jpgQuality = 0.95;
+
+  private numChangingImages = 3;
+  private _loadedChangingImages = 0;
+  private loadedChangingImages$ = new BehaviorSubject<number>(this._loadedChangingImages);
+
+  private numFixedImages = 4;
+  private _loadedFixedImages = 0;
+  private loadedFixedImages$ = new BehaviorSubject<number>(this._loadedFixedImages);
 
   widthIrradiancia = 499;
   private _imgIrradianciaBase64: string = undefined;
@@ -46,6 +54,16 @@ export class ImagesLoadService {
 
   constructor(private storage: AngularFireStorage) {}
 
+  checkImagesLoaded(): Promise<boolean> {
+    return new Promise((loaded) => {
+      combineLatest([this.loadedChangingImages$, this.loadedFixedImages$]).subscribe(([imgC, imgF]) => {
+        if (imgC + imgF === this.numChangingImages + this.numFixedImages) {
+          loaded(true);
+        }
+      });
+    });
+  }
+
   loadSelectedInformeImages(selectedInformeId: string) {
     this.storage
       .ref(`informes/${selectedInformeId}/irradiancia.png`)
@@ -64,6 +82,8 @@ export class ImagesLoadService {
             const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
             this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+            // indicamos que la imagen se ha cargado
+            this.loadedChangingImages++;
           },
           null,
           { crossOrigin: 'anonymous' }
@@ -73,6 +93,8 @@ export class ImagesLoadService {
         console.log('Error al obtener la imagen de irradiancia ', error);
         const canvas = document.createElement('canvas');
         this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        // indicamos que la imagen se ha cargado
+        this.loadedChangingImages++;
       });
 
     this.storage
@@ -92,6 +114,8 @@ export class ImagesLoadService {
             const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
             this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+            // indicamos que la imagen se ha cargado
+            this.loadedChangingImages++;
           },
           null,
           { crossOrigin: 'anonymous' }
@@ -101,6 +125,8 @@ export class ImagesLoadService {
         console.log('Error al obtener la imagen de suciedad ', error);
         const canvas = document.createElement('canvas');
         this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        // indicamos que la imagen se ha cargado
+        this.loadedChangingImages++;
       });
 
     this.storage
@@ -133,6 +159,8 @@ export class ImagesLoadService {
             canvas.add(image);
 
             this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+            // indicamos que la imagen se ha cargado
+            this.loadedChangingImages++;
           },
           null,
           { crossOrigin: 'anonymous' }
@@ -142,6 +170,8 @@ export class ImagesLoadService {
         console.log('Error al obtener la imagen de portada ', error);
         const canvas = document.createElement('canvas');
         this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        // indicamos que la imagen se ha cargado
+        this.loadedChangingImages++;
       });
   }
 
@@ -167,6 +197,8 @@ export class ImagesLoadService {
             const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, newWidth, newHeight);
             this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+            // indicamos que la imagen se ha cargado
+            this.loadedFixedImages++;
           },
           null,
           { crossOrigin: 'anonymous' }
@@ -176,6 +208,8 @@ export class ImagesLoadService {
         console.log('Error al obtener la imagen del logo ', error);
         const canvas = document.createElement('canvas');
         this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        // indicamos que la imagen se ha cargado
+        this.loadedFixedImages++;
       });
 
     // Cargamos Logo Solardrone
@@ -200,6 +234,8 @@ export class ImagesLoadService {
       canvas.add(image);
 
       this.imgSolardroneBase64 = canvas.toDataURL('png');
+      // indicamos que la imagen se ha cargado
+      this.loadedFixedImages++;
     });
 
     // GRAFICO MAE
@@ -215,6 +251,8 @@ export class ImagesLoadService {
         const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
         this.imgCurvaMaeBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        // indicamos que la imagen se ha cargado
+        this.loadedFixedImages++;
       },
       null,
       { crossOrigin: 'anonymous' }
@@ -233,6 +271,8 @@ export class ImagesLoadService {
         const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
         this.imgFormulaMaeBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        // indicamos que la imagen se ha cargado
+        this.loadedFixedImages++;
       },
       null,
       { crossOrigin: 'anonymous' }
@@ -245,7 +285,7 @@ export class ImagesLoadService {
     return this._imgIrradianciaBase64;
   }
 
-  set imgIrradianciaBase64(value) {
+  set imgIrradianciaBase64(value: string) {
     this._imgIrradianciaBase64 = value;
     this.imgIrradianciaBase64$.next(value);
   }
@@ -254,7 +294,7 @@ export class ImagesLoadService {
     return this._imgSuciedadBase64;
   }
 
-  set imgSuciedadBase64(value) {
+  set imgSuciedadBase64(value: string) {
     this._imgSuciedadBase64 = value;
     this.imgSuciedadBase64$.next(value);
   }
@@ -263,7 +303,7 @@ export class ImagesLoadService {
     return this._imgPortadaBase64;
   }
 
-  set imgPortadaBase64(value) {
+  set imgPortadaBase64(value: string) {
     this._imgPortadaBase64 = value;
     this.imgPortadaBase64$.next(value);
   }
@@ -272,7 +312,7 @@ export class ImagesLoadService {
     return this._imgLogoBase64;
   }
 
-  set imgLogoBase64(value) {
+  set imgLogoBase64(value: string) {
     this._imgLogoBase64 = value;
     this.imgLogoBase64$.next(value);
   }
@@ -281,7 +321,7 @@ export class ImagesLoadService {
     return this._imgSolardroneBase64;
   }
 
-  set imgSolardroneBase64(value) {
+  set imgSolardroneBase64(value: string) {
     this._imgSolardroneBase64 = value;
     this.imgSolardroneBase64$.next(value);
   }
@@ -290,7 +330,7 @@ export class ImagesLoadService {
     return this._imgFormulaMaeBase64;
   }
 
-  set imgFormulaMaeBase64(value) {
+  set imgFormulaMaeBase64(value: string) {
     this._imgFormulaMaeBase64 = value;
     this.imgFormulaMaeBase64$.next(value);
   }
@@ -299,8 +339,26 @@ export class ImagesLoadService {
     return this._imgCurvaMaeBase64;
   }
 
-  set imgCurvaMaeBase64(value) {
+  set imgCurvaMaeBase64(value: string) {
     this._imgCurvaMaeBase64 = value;
     this.imgCurvaMaeBase64$.next(value);
+  }
+
+  get loadedChangingImages() {
+    return this._loadedChangingImages;
+  }
+
+  set loadedChangingImages(value: number) {
+    this._loadedChangingImages = value;
+    this.loadedChangingImages$.next(value);
+  }
+
+  get loadedFixedImages() {
+    return this._loadedFixedImages;
+  }
+
+  set loadedFixedImages(value: number) {
+    this._loadedFixedImages = value;
+    this.loadedFixedImages$.next(value);
   }
 }
