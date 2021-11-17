@@ -57,6 +57,8 @@ export class MapComponent implements OnInit, OnDestroy {
   public mousePosition;
   public informeIdList: string[] = [];
   public sharedReport = false;
+  noAnomsReport = false;
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -145,6 +147,8 @@ export class MapComponent implements OnInit, OnDestroy {
           }
         })
     );
+
+    this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
   }
 
   private _createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {

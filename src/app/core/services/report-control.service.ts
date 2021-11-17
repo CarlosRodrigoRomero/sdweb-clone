@@ -47,6 +47,8 @@ export class ReportControlService {
   public thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
   private _nombreGlobalCoords: string[] = [];
   private _numFixedGlobalCoords: number = undefined;
+  private _noAnomsReport = false;
+  noAnomsReport$ = new BehaviorSubject<boolean>(this._noAnomsReport);
 
   constructor(
     private router: Router,
@@ -97,6 +99,10 @@ export class ReportControlService {
                 // filtramos las anomalias por criterio de criticidad del cliente
                 // tslint:disable-next-line: triple-equals
                 this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
+
+                if (this.allFilterableElements.length === 0) {
+                  this.noAnomsReport = true;
+                }
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
                 this.setMaeInformesPlantaFija(this.allFilterableElements as Anomalia[]);
@@ -474,6 +480,7 @@ export class ReportControlService {
     this.allFilterableElements = [];
     this.plantaFija = false;
     this.thereAreZones = true;
+    this.noAnomsReport = false;
   }
 
   getHostname(): string {
@@ -584,5 +591,14 @@ export class ReportControlService {
 
   set numFixedGlobalCoords(value: number) {
     this._numFixedGlobalCoords = value;
+  }
+
+  get noAnomsReport() {
+    return this._noAnomsReport;
+  }
+
+  set noAnomsReport(value: boolean) {
+    this._noAnomsReport = value;
+    this.noAnomsReport$.next(value);
   }
 }

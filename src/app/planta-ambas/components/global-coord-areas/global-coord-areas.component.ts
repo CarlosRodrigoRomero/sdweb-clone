@@ -43,7 +43,6 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   public globalCoordAreasVectorLayers: VectorLayer[] = [];
   private nombreGlobalCoords: string[] = [];
   public map: Map;
-  private subscriptions: Subscription = new Subscription();
   public numAreas: number;
 
   task: Task = {
@@ -52,6 +51,8 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
     subtasks: [],
   };
   public allComplete = false;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private plantaService: PlantaService,
