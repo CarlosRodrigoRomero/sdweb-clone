@@ -99,7 +99,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   // IMAGENES
   private imgLogoBase64: string;
   private imgPortadaBase64: string;
-  private widthSuciedad: number;
+  private widthPlano: number;
   private imgIrradianciaBase64: string;
   private imgSuciedadBase64: string;
   private imgFormulaMaeBase64: string;
@@ -323,9 +323,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
               // imágenes planta completa
               if (this.planta.tipo !== 'seguidores') {
-                this.setImgCapaPlanta(this.largestLocAreas, 'thermal', this.anomaliasInforme);
+                this.setImgPlanoPlanta(this.largestLocAreas, 'thermal', this.anomaliasInforme);
               }
-              this.setImgCapaPlanta(this.largestLocAreas, 'visual');
+              this.setImgPlanoPlanta(this.largestLocAreas, 'visual');
             }
 
             // }
@@ -499,7 +499,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       );
     });
 
-    this.widthSuciedad = 501;
+    this.widthPlano = 500;
 
     this.widthImageSeguidor = 450;
     this.widthImageAnomalia = 300;
@@ -1116,7 +1116,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     });
   }
 
-  private setImgCapaPlanta(locAreas: LocationAreaInterface[], type: string, anomalias?: Anomalia[]) {
+  private setImgPlanoPlanta(locAreas: LocationAreaInterface[], type: string, anomalias?: Anomalia[]) {
     let tileCoords: TileCoord[] = [];
     const allLocAreaCoords: Coordinate[] = [];
     locAreas.forEach((locArea) => {
@@ -2332,7 +2332,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         // Imagen suciedad
         {
           image: this.imgSuciedadBase64,
-          width: this.widthSuciedad,
+          width: this.imagesLoadService.widthSuciedad,
           alignment: 'center',
         },
 
@@ -2641,7 +2641,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         },
         {
           image: this.imagesPlantaCompleta['thermal'],
-          width: this.widthSuciedad,
+          width: this.widthPlano,
           alignment: 'center',
         },
       ];
@@ -2659,7 +2659,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         },
         {
           image: this.imagesPlantaCompleta['visual'],
-          width: this.widthSuciedad,
+          width: this.widthPlano,
           alignment: 'center',
         },
       ];
