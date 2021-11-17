@@ -136,7 +136,7 @@ export class InformeService {
 
   getOnlyNewInfomesFijas(informes: InformeInterface[]) {
     // solo permitimos los informes nuevos en fijas, exluyendo el informe DEMO
-    return informes.filter((informe) => informe.fecha > 1619820000 || informe.plantaId === 'egF0cbpXnnBnjcrusoeR');
+    return informes.filter((informe) => informe.fecha > GLOBAL.newReportsDate || informe.plantaId === 'egF0cbpXnnBnjcrusoeR');
   }
 
   getFileList(carpeta: string): Observable<any> {

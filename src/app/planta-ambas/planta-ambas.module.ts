@@ -9,6 +9,7 @@ import { ProgressBarPdfComponent } from './components/progress-bar-pdf/progress-
 import { DownloadReportComponent } from './components/download-report/download-report.component';
 import { DialogFilteredReportComponent } from './components/dialog-filtered-report/dialog-filtered-report.component';
 import { ShareReportComponent } from './components/share-report/share-report.component';
+import { SelectLanguageComponent } from './components/select-language/select-language.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { ShareReportComponent } from './components/share-report/share-report.com
     DownloadReportComponent,
     DialogFilteredReportComponent,
     ShareReportComponent,
+    SelectLanguageComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [GlobalCoordAreasComponent, DownloadReportComponent, ProgressBarPdfComponent, ShareReportComponent],

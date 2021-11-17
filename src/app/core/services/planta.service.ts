@@ -317,7 +317,11 @@ export class PlantaService {
     return this.getEtiquetaLocalX(planta, elem, type).concat('/').concat(this.getEtiquetaLocalY(planta, elem, type));
   }
 
-  getAltura(planta: PlantaInterface, localY: number) {
+  getAltura(planta: PlantaInterface, localY: number, alturaMax?: number) {
+    let altura = planta.filas;
+    if (alturaMax !== undefined) {
+      altura = alturaMax;
+    }
     // Por defecto, la altura alta es la numero 1
     if (planta.alturaBajaPrimero) {
       return planta.filas - (localY - 1);
@@ -584,7 +588,7 @@ export class PlantaService {
         locAreaArray.forEach((locationArea) => {
           // const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat(locationArea.path));
           const polygon = {
-            paths: locationArea.path,
+            path: locationArea.path,
             strokeColor: '#FF0000',
             visible: false,
             strokeOpacity: 0,
@@ -668,12 +672,16 @@ export class PlantaService {
     return [globalCoords, modulo];
   }
 
-  getGlobalCoordsFromLocationAreaOl(coords: Coordinate) {
+  getGlobalCoordsFromLocationAreaOl(coords: Coordinate, locAreaList?: LocationAreaInterface[]) {
     const globalCoords = [null, null, null];
+
+    if (locAreaList !== undefined) {
+      this.locAreaList = locAreaList;
+    }
 
     if (this.locAreaList !== undefined) {
       this.locAreaList.forEach((locArea) => {
-        const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat((locArea as any).paths));
+        const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat(locArea.path));
 
         if (polygon.intersectsCoordinate(coords)) {
           if (locArea.globalX.length > 0) {

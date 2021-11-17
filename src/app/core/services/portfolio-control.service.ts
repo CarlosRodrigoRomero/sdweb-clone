@@ -62,7 +62,7 @@ export class PortfolioControlService {
               if (informesPlanta.length > 0) {
                 informesPlanta.forEach((informe) => {
                   // si el informe es reciente ponemos el mae a 0 en las siguientes situaciones
-                  if (informe.fecha > 1619820000) {
+                  if (informe.fecha > GLOBAL.newReportsDate) {
                     if (!informe.hasOwnProperty('mae')) {
                       informe.mae = 0;
                     } else if (isNaN(informe.mae) || informe.mae === Infinity || informe.mae === null) {
@@ -131,7 +131,7 @@ export class PortfolioControlService {
               // los antiguos de fijas los devidimos por 100
               if (
                 planta.tipo !== 'seguidores' &&
-                informeReciente.fecha < 1619820000 &&
+                informeReciente.fecha < GLOBAL.newReportsDate &&
                 planta.id !== 'egF0cbpXnnBnjcrusoeR'
               ) {
                 this.maePlantas.push(informeReciente.mae / 100);
