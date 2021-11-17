@@ -99,8 +99,8 @@ export class ReportControlService {
                 this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
-                this.setMaeInformesPlantaFija(anoms);
-                this.setCCInformesPlantaFija(anoms);
+                this.setMaeInformesPlantaFija(this.allFilterableElements as Anomalia[]);
+                this.setCCInformesPlantaFija(this.allFilterableElements as Anomalia[]);
 
                 this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
 
@@ -345,12 +345,16 @@ export class ReportControlService {
   }
 
   private getNumGlobalCoords(anoms: Anomalia[]): number {
-    let numGlobalCoords = anoms[0].globalCoords.length - 1;
-    for (let index = anoms[0].globalCoords.length - 1; index >= 0; index--) {
-      if (anoms.filter((anom) => anom.globalCoords[index] !== null).length > 0) {
-        numGlobalCoords = numGlobalCoords--;
+    let numGlobalCoords = 0;
+    if (anoms.length > 0) {
+      numGlobalCoords = anoms[0].globalCoords.length - 1;
+      for (let index = anoms[0].globalCoords.length - 1; index >= 0; index--) {
+        if (anoms.filter((anom) => anom.globalCoords[index] !== null).length > 0) {
+          numGlobalCoords = numGlobalCoords--;
+        }
       }
     }
+
     return numGlobalCoords;
   }
 
