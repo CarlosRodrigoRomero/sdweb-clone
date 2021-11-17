@@ -552,10 +552,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       // Imagenes anomalías
       this.countAnomalias = 0;
       this.anomaliasInforme.forEach((anomalia, index) => {
-        if (index < 2) {
-          this.setImgAnomaliaCanvas(anomalia);
-          this.countAnomalias++;
-        }
+        // if (index < 2) {
+        this.setImgAnomaliaCanvas(anomalia);
+        this.countAnomalias++;
+        // }
       });
 
       // if (this.planta.tipo === '1 eje') {
@@ -617,13 +617,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       this.subscriptions.add(
         this.countLoadedImages$.subscribe((countLoadedImgs) => {
           this.downloadReportService.progressBarValue = Math.round(
-            (countLoadedImgs / 2) /* this.anomaliasInforme.length */ * 100
+            (countLoadedImgs / this.anomaliasInforme.length) * 100
           );
 
           // comprobamos que estan cargadas tb el resto de imagenes del PDF
           this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
             // Cuando se carguen todas las imágenes
-            if (imagesLoaded && countLoadedImgs === 2 /* this.countAnomalias */ && downloads === 0) {
+            if (imagesLoaded && countLoadedImgs === this.countAnomalias && downloads === 0) {
               this.calcularInforme();
 
               pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
@@ -1032,7 +1032,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   private setImgAnomaliaCanvas(anomalia: Anomalia) {
-    const tileCoords = this.getElemTiles(anomalia.featureCoords, this.getElemExtent(anomalia.featureCoords), 22);
+    let zoomLevel = 22;
+    // parche para la planta Logrosan que tiene huecos en la capa termica
+    if (this.planta.id === 'AyKgsY6F3TqGQGYNaOUY') {
+      zoomLevel = 20;
+    }
+    const tileCoords = this.getElemTiles(anomalia.featureCoords, this.getElemExtent(anomalia.featureCoords), zoomLevel);
 
     const canvas = new fabric.Canvas('canvas');
     const lado = Math.sqrt(tileCoords.length);
@@ -3176,7 +3181,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (let i = 0; i < 2 /* this.anomaliasInforme.length */; i++) {
+    for (let i = 0; i < this.anomaliasInforme.length; i++) {
       const anom = this.anomaliasInforme[i];
 
       const pagAnexo = [

@@ -29,9 +29,11 @@ export class ImageProcessService {
         .getThermalLayers()
         .pipe(auditTime(2000))
         .subscribe((layers) => {
-          this.thermalLayer = layers.find((tL) => tL.informeId === this.reportControlService.selectedInformeId);
+          if (this.reportControlService.selectedInformeId !== undefined) {
+            this.thermalLayer = layers.find((tL) => tL.informeId === this.reportControlService.selectedInformeId);
 
-          initService(true);
+            initService(true);
+          }
         });
     });
   }
