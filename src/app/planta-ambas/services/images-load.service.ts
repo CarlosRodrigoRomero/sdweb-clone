@@ -95,12 +95,10 @@ export class ImagesLoadService {
       })
       .catch((error) => {
         console.log('Error al obtener la imagen de irradiancia ', error);
-        // añadimos un canvas blanco cuando no hay imagen
+        // añadimos un canvas transparente cuando no hay imagen
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+
+        this.imgIrradianciaBase64 = canvas.toDataURL('png');
         // indicamos que la imagen se ha cargado
         this.loadedChangingImages++;
       });
@@ -133,10 +131,8 @@ export class ImagesLoadService {
         console.log('Error al obtener la imagen de suciedad ', error);
         // añadimos un canvas blanco cuando no hay imagen
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+
+        this.imgSuciedadBase64 = canvas.toDataURL('png');
         // indicamos que la imagen se ha cargado
         this.loadedChangingImages++;
       });
@@ -182,10 +178,8 @@ export class ImagesLoadService {
         console.log('Error al obtener la imagen de portada ', error);
         // añadimos un canvas blanco cuando no hay imagen
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        
+        this.imgPortadaBase64 = canvas.toDataURL('png');
         // indicamos que la imagen se ha cargado
         this.loadedChangingImages++;
       });
@@ -198,30 +192,35 @@ export class ImagesLoadService {
       }
     });
 
-    fabric.util.loadImage(`../../../assets/images/${archivoLogo}.png`, (img) => {
-      const canvas = new fabric.Canvas('canvas');
-      const newWidth =
-        this.widthImgSolardroneTech * this.imgQuality > img.width
-          ? img.width
-          : this.widthImgSolardroneTech * this.imgQuality;
+    fabric.util.loadImage(
+      `../../../assets/images/${archivoLogo}.png`,
+      (img) => {
+        const canvas = new fabric.Canvas('canvas');
+        const newWidth =
+          this.widthImgSolardroneTech * this.imgQuality > img.width
+            ? img.width
+            : this.widthImgSolardroneTech * this.imgQuality;
 
-      const scaleFactor = newWidth / img.width;
-      const newHeight = img.height * scaleFactor;
+        const scaleFactor = newWidth / img.width;
+        const newHeight = img.height * scaleFactor;
 
-      canvas.width = newWidth;
-      canvas.height = newHeight;
+        canvas.width = newWidth;
+        canvas.height = newHeight;
 
-      const image = new fabric.Image(img, {
-        scaleX: scaleFactor,
-        scaleY: scaleFactor,
-      });
+        const image = new fabric.Image(img, {
+          scaleX: scaleFactor,
+          scaleY: scaleFactor,
+        });
 
-      canvas.add(image);
+        canvas.add(image);
 
-      this.imgSolardroneBase64 = canvas.toDataURL('png');
-      // indicamos que la imagen se ha cargado
-      this.loadedChangingImages++;
-    });
+        this.imgSolardroneBase64 = canvas.toDataURL('png');
+        // indicamos que la imagen se ha cargado
+        this.loadedChangingImages++;
+      },
+      null,
+      { crossOrigin: 'anonymous' }
+    );
   }
 
   loadFixedImages(empresaId: string): void {
@@ -257,10 +256,8 @@ export class ImagesLoadService {
         console.log('Error al obtener la imagen del logo ', error);
         // añadimos un canvas blanco cuando no hay imagen
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+
+        this.imgLogoBase64 = canvas.toDataURL('png');
         // indicamos que la imagen se ha cargado
         this.loadedFixedImages++;
       });
