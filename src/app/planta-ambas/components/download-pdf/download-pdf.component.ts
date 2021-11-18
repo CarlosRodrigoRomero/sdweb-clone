@@ -806,24 +806,26 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
       footer: (currentPage, pageCount) => {
         if (currentPage > 1) {
-          return [
-            {
-              table: {
-                widths: ['*'],
-                body: [
-                  [
-                    {
-                      text: currentPage + 60 + 400,
-                      alignment: 'center',
-                      color: 'grey',
-                      margin: [0, 10, 0, 0],
-                    },
-                  ],
+          return {
+            table: {
+              body: [
+                [
+                  {
+                    text: currentPage,
+                    alignment: 'center',
+                    color: 'grey',
+                    // margin: [0, 10, 0, 0],
+                  },
+                  {
+                    image: this.imgLogoBase64,
+                    width: this.imagesLoadService.scaleImgLogoHeader * this.imagesLoadService.widthLogoEmpresa,
+                    alignment: 'center',
+                  },
                 ],
-              },
-              layout: 'noBorders',
+              ],
             },
-          ];
+            layout: 'noBorders',
+          };
         }
       },
 
