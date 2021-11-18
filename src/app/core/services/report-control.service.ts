@@ -97,8 +97,13 @@ export class ReportControlService {
               )
               .subscribe((anoms) => {
                 // filtramos las anomalias por criterio de criticidad del cliente
-                // tslint:disable-next-line: triple-equals
-                this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
+                if (this.plantaId === 'Cvnr5nXunK69aZ8q4uLu') {
+                  // excepcion para Tudela SKF que no tiene anomalias
+                  this.allFilterableElements = anoms;
+                } else {
+                  // tslint:disable-next-line: triple-equals
+                  this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
+                }
 
                 if (this.allFilterableElements.length === 0) {
                   this.noAnomsReport = true;
@@ -351,16 +356,19 @@ export class ReportControlService {
   }
 
   private getNumGlobalCoords(anoms: Anomalia[]): number {
-    let numGlobalCoords = 0;
-    if (anoms.length > 0) {
-      numGlobalCoords = anoms[0].globalCoords.length - 1;
-      for (let index = anoms[0].globalCoords.length - 1; index >= 0; index--) {
-        if (anoms.filter((anom) => anom.globalCoords[index] !== null).length > 0) {
-          numGlobalCoords = numGlobalCoords--;
-        }
+    let numGlobalCoords = anoms[0].globalCoords.length;
+    for (let index = numGlobalCoords; index >= 0; index--) {
+      if (
+        anoms.filter(
+          (anom) =>
+            anom.globalCoords[index] !== null &&
+            anom.globalCoords[index] !== undefined &&
+            anom.globalCoords[index] !== ''
+        ).length > 0
+      ) {
+        numGlobalCoords = numGlobalCoords--;
       }
     }
-
     return numGlobalCoords;
   }
 
