@@ -9,6 +9,7 @@ import { SeguidorViewService } from '../../services/seguidor-view.service';
 import { StatsService } from '@core/services/stats.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
+import { DownloadReportService } from '@core/services/download-report.service';
 
 @Component({
   selector: 'app-map-view',
@@ -39,7 +40,8 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     private seguidorViewService: SeguidorViewService,
     private statsService: StatsService,
     private olMapService: OlMapService,
-    private mapSeguidoresService: MapSeguidoresService
+    private mapSeguidoresService: MapSeguidoresService,
+    private downloadReportService: DownloadReportService
   ) {}
 
   ngOnInit(): void {
@@ -91,5 +93,6 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.olMapService.resetService();
     this.seguidorViewService.sidenav = undefined;
     this.mapSeguidoresService.resetService();
+    this.downloadReportService.resetService();
   }
 }

@@ -483,6 +483,30 @@ export class AnomaliaService {
     return 0;
   }
 
+  sortByGlobalCoords(a: Anomalia, b: Anomalia): number {
+    let globalCoordsLength;
+    a.globalCoords.forEach((coord, index) => {
+      if (coord !== undefined && coord !== null && coord !== '') {
+        globalCoordsLength = index + 1;
+      }
+    });
+
+    let value = 0;
+
+    for (let index = 0; index < globalCoordsLength; index++) {
+      if (a.globalCoords[index] < b.globalCoords[index]) {
+        value = -1;
+        break;
+      }
+      if (a.globalCoords[index] > b.globalCoords[index]) {
+        value = 1;
+        break;
+      }
+    }
+
+    return value;
+  }
+
   get hasCriticidad() {
     return this._hasCriticidad;
   }

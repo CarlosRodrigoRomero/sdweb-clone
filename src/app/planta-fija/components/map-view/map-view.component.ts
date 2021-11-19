@@ -8,6 +8,7 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { StatsService } from '@core/services/stats.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { ThermalService } from '@core/services/thermal.service';
+import { DownloadReportService } from '@core/services/download-report.service';
 
 @Component({
   selector: 'app-map-view',
@@ -35,7 +36,8 @@ export class MapViewComponent implements OnInit, OnDestroy {
     private reportControlService: ReportControlService,
     private statsService: StatsService,
     private olMapService: OlMapService,
-    private thermalService: ThermalService
+    private thermalService: ThermalService,
+    private downloadReportService: DownloadReportService
   ) {}
 
   ngOnInit(): void {
@@ -80,5 +82,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.reportControlService.resetService();
     this.olMapService.resetService();
     this.thermalService.resetService();
+    this.downloadReportService.resetService();
   }
 }

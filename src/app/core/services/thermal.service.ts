@@ -36,11 +36,12 @@ export class ThermalService {
         })
       )
       .subscribe((tL) => {
-        if (tL.length > 0) {
-          this.thermalLayers = tL;
-        } else {
-          this.thermalLayers = undefined;
-        }
+        this.thermalLayers = tL;
+        // if (tL.length > 0) {
+        //   this.thermalLayers = tL;
+        // } else {
+        //   this.thermalLayers = undefined;
+        // }
       });
 
     return this.thermalLayers$;
@@ -67,7 +68,7 @@ export class ThermalService {
 
   set sliderMin(value: number) {
     this._sliderMin = value;
-    this.sliderMaxSource.next(value);
+    this.sliderMinSource.next(value);
   }
 
   get sliderMax() {
@@ -76,6 +77,6 @@ export class ThermalService {
 
   set sliderMax(value: number) {
     this._sliderMax = value;
-    this.sliderMinSource.next(value);
+    this.sliderMaxSource.next(value);
   }
 }

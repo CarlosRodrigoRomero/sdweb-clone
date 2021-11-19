@@ -9,6 +9,7 @@ import { AnomaliasControlService } from '../../services/anomalias-control.servic
 import { ReportControlService } from '@core/services/report-control.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { PlantaService } from '@core/services/planta.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Map } from 'ol';
@@ -38,7 +39,8 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit {
     private anomaliasControlService: AnomaliasControlService,
     private reportControlService: ReportControlService,
     private olMapService: OlMapService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private anomaliaService: AnomaliaService
   ) {}
 
   ngOnInit() {
@@ -52,6 +54,8 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit {
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.filterService.filteredElements$.subscribe((elems) => {
         const filteredElements = [];
+
+        elems = elems.sort(this.anomaliaService.sortByGlobalCoords);
 
         elems
           .filter((elem) => (elem as Anomalia).informeId === informeId)

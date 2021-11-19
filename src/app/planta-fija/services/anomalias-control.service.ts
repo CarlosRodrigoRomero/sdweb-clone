@@ -14,6 +14,7 @@ import { click } from 'ol/events/condition';
 import SimpleGeometry from 'ol/geom/SimpleGeometry';
 import GeometryType from 'ol/geom/GeometryType';
 import { createBox } from 'ol/interaction/Draw';
+import { Coordinate } from 'ol/coordinate';
 
 import { GLOBAL } from '@core/services/global';
 import { OlMapService } from '@core/services/ol-map.service';
@@ -40,6 +41,9 @@ export class AnomaliasControlService {
   public listaAnomalias: Anomalia[];
   private anomaliaLayers: VectorLayer[];
   private sharedReportNoFilters = false;
+
+  private _coordsPointer: Coordinate = undefined;
+  public coordsPointer$ = new BehaviorSubject<Coordinate>(this._coordsPointer);
 
   constructor(
     private olMapService: OlMapService,
@@ -136,6 +140,8 @@ export class AnomaliasControlService {
 
   private addPointerOnHover() {
     this.map.on('pointermove', (event) => {
+      this.coordsPointer = event.coordinate;
+
       if (this.map.hasFeatureAtPixel(event.pixel)) {
         let feature = this.map
           .getFeaturesAtPixel(event.pixel)
@@ -388,5 +394,16 @@ export class AnomaliasControlService {
     } else {
       feature.setStyle(unfocusedStyle);
     }
+  }
+
+  ///////////////////////////////////////////////////////////
+
+  get coordsPointer() {
+    return this._coordsPointer;
+  }
+
+  set coordsPointer(value: Coordinate) {
+    this._coordsPointer = value;
+    this.coordsPointer$.next(value);
   }
 }

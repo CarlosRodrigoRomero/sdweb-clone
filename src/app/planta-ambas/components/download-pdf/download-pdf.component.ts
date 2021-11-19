@@ -9,7 +9,20 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
+import Map from 'ol/Map';
+import { TileCoord } from 'ol/tilecoord';
+import TileGrid from 'ol/tilegrid/TileGrid';
+import { Extent } from 'ol/extent';
+import { Coordinate } from 'ol/coordinate';
+import { fromLonLat } from 'ol/proj';
+import TileLayer from 'ol/layer/Tile';
+import { LocationAreaInterface } from '@core/models/location';
+import { LatLngLiteral } from '@agm/core';
+
 import pdfMake from 'pdfmake/build/pdfmake.js';
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
+
+import inside from 'point-in-polygon';
 
 import 'fabric';
 declare let fabric;
@@ -20,15 +33,19 @@ import { GLOBAL } from '@core/services/global';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { PlantaService } from '@core/services/planta.service';
 import { FilterService } from '@core/services/filter.service';
+import { OlMapService } from '@core/services/ol-map.service';
+import { ImageProcessService } from '../../services/image-process.service';
+import { AnomaliaInfoService } from '@core/services/anomalia-info.service';
+import { ImagesLoadService } from '../../services/images-load.service';
+
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
+import { Translation } from '@shared/utils/translations/translations';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
-import { Translation } from 'src/app/informe-export/components/export/translations';
 import { PcInterface } from '@core/models/pc';
-import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
 export interface Apartado {
   nombre: string;
@@ -56,44 +73,44 @@ export interface AnomsTable {
 export class DownloadPdfComponent implements OnInit, OnDestroy {
   private _countLoadedImages = 0;
   countLoadedImages$ = new BehaviorSubject<number>(this._countLoadedImages);
+  private _countLoadedImagesSegs1EjeAnoms = 0;
+  countLoadedImagesSegs1EjeAnoms$ = new BehaviorSubject<number>(this._countLoadedImagesSegs1EjeAnoms);
+  private _countLoadedImagesSegs1EjeNoAnoms = 0;
+  countLoadedImagesSegs1EjeNoAnoms$ = new BehaviorSubject<number>(this._countLoadedImagesSegs1EjeNoAnoms);
   private _loadedImages = undefined;
   loadedImages$ = new BehaviorSubject<string>(this._loadedImages);
+  private countAnomalias: number;
+  private countSegs1EjeAnoms: number;
+  private countSegs1EjeNoAnoms: number;
   private countSeguidores: number;
   private _seguidoresInforme: Seguidor[] = [];
   seguidoresInforme$ = new BehaviorSubject<Seguidor[]>(this._seguidoresInforme);
   private anomaliasInforme: Anomalia[] = []; // equivalente allAnomalias en fijas
   private planta: PlantaInterface;
-  private informe: InformeInterface;
+  private selectedInforme: InformeInterface;
   private translation: Translation;
   private language: string; // antes lan
   private _columnasAnomalia: any[] = []; // antes pcColumnas
   columnasAnomalia$ = new BehaviorSubject<any[]>(this._columnasAnomalia); // equvalente a currentFilteredColumnas$
   private filtroColumnas: string[];
+  private layerInformeSelected: TileLayer;
+  private alturaMax = 0;
+
   // IMAGENES
-  private irradianciaImg$: Observable<string | null>;
-  private suciedadImg$: Observable<string | null>;
-  private portadaImg$: Observable<string | null>;
-  private logoImg$: Observable<string | null>;
-  private imgQuality: number;
-  private jpgQuality: number;
-  private heightLogo: number;
-  private widthLogo: number;
-  private scaleImgLogoHeader: number;
   private imgLogoBase64: string;
-  private widthPortada: number;
   private imgPortadaBase64: string;
-  private widthIrradiancia: number;
-  private widthSuciedad: number;
   private imgIrradianciaBase64: string;
   private imgSuciedadBase64: string;
-  private widthFormulaMae: number;
   private imgFormulaMaeBase64: string;
-  private widthCurvaMae: number;
   private imgCurvaMaeBase64: string;
+  private imgLogoFooterBase64: string;
+
+  private widthPlano: number;
   private widthLogoOriginal: number;
-  private heightLogoOriginal: number;
-  private heightLogoHeader: number;
   private imageListBase64 = {};
+  private tileResolution = 256;
+  private imgSolardroneBase64: string;
+  private imagesPlantaCompleta = {};
 
   private apartadosInforme: Apartado[];
   private countCategoria;
@@ -113,9 +130,15 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private filtroApartados: string[];
   private currentFiltroGradiente: number;
   private labelsCriticidad: string[];
-  private widthSeguidor: number;
+  private widthImageSeguidor: number;
+  private widthImageAnomalia: number;
   private hasUserArea: boolean;
   seguidoresLoaded = false;
+  private map: Map;
+  private seguidores1ejeAnoms: LocationAreaInterface[] = [];
+  private anomSeguidores1Eje: Anomalia[][] = [];
+  private seguidores1ejeNoAnoms: LocationAreaInterface[] = [];
+  private largestLocAreas: LocationAreaInterface[] = [];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -128,10 +151,24 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     private plantaService: PlantaService,
     private anomaliaService: AnomaliaService,
     public dialog: MatDialog,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private olMapService: OlMapService,
+    private imageProcessService: ImageProcessService,
+    private anomaliaInfoService: AnomaliaInfoService,
+    private imagesLoadService: ImagesLoadService
   ) {}
 
   ngOnInit(): void {
+    this.subscriptions.add(
+      this.downloadReportService.englishLang$.subscribe((lang) => {
+        if (lang) {
+          this.language = 'en';
+        } else {
+          this.language = 'es';
+        }
+      })
+    );
+
     this.numTipos = Array(GLOBAL.labels_tipos.length)
       .fill(0)
       .map((_, i) => i + 1);
@@ -139,347 +176,313 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       .fill(0)
       .map((_, i) => i + 1);
 
+    this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
+
     this.subscriptions.add(
-      this.plantaService
-        .getPlanta(this.reportControlService.plantaId)
-        .pipe(
-          take(1),
-          switchMap((planta) => {
-            this.planta = planta;
+      this.downloadReportService.seguidores1Eje$.subscribe((segs) =>
+        segs.forEach((seg) => {
+          const anomsSeguidor = this.anomaliasInforme.filter(
+            (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
+          );
+          if (anomsSeguidor.length > 0) {
+            this.anomSeguidores1Eje.push(anomsSeguidor);
+            this.seguidores1ejeAnoms.push(seg);
+          } else {
+            this.seguidores1ejeNoAnoms.push(seg);
+          }
+        })
+      )
+    );
 
-            this.plantaService.planta = planta;
+    // suscripciones a las imagenes
+    this.loadOtherImages();
 
-            this.columnasAnomalia = GLOBAL.columnasAnomPdf;
+    this.imageProcessService.initService().then(() => {
+      this.subscriptions.add(
+        this.plantaService
+          .getPlanta(this.reportControlService.plantaId)
+          .pipe(
+            take(1),
+            switchMap((planta) => {
+              this.planta = planta;
 
-            this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
+              if (this.planta.tipo === '1 eje') {
+                this.downloadReportService.getSeguidores1Eje(this.planta.id);
+              }
 
-            this.arrayFilas = Array(this.planta.filas)
+              this.plantaService.planta = planta;
+
+              this.columnasAnomalia = GLOBAL.columnasAnomPdf;
+
+              this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
+
+              // cargamos las imagenes que no cambian al cambiar de informe
+              this.imagesLoadService.loadFixedImages(this.planta.empresa);
+
+              return this.plantaService.getLocationsArea(this.planta.id);
+            }),
+            take(1),
+            switchMap((locAreas) => {
+              this.largestLocAreas = locAreas.filter(
+                (locArea) =>
+                  locArea.globalCoords[0] !== undefined &&
+                  locArea.globalCoords[0] !== null &&
+                  locArea.globalCoords[0] !== ''
+              );
+
+              return combineLatest([
+                this.reportControlService.selectedInformeId$,
+                this.downloadReportService.filteredPDF$,
+              ]);
+            })
+          )
+          .subscribe(([informeId, filteredPDF]) => {
+            this.selectedInforme = this.reportControlService.informes.find((informe) => informeId === informe.id);
+
+            // if (filteredPDF !== undefined) {
+            //   if (filteredPDF) {
+            //     // utilizamos elementos filtrados para crear el informe
+            //     if (this.reportControlService.plantaFija) {
+            //       this.anomaliasInforme = this.filterService.filteredElements as Anomalia[];
+            //     } else {
+            //       const allSeguidores = this.filterService.filteredElements as Seguidor[];
+            //       // filtramos los del informe actual y los ordenamos por globals
+            //       this.seguidoresInforme = allSeguidores
+            //         .filter((seg) => seg.informeId === informeId)
+            //         .sort(this.downloadReportService.sortByGlobalCoords);
+
+            //       if (this.seguidoresInforme.length > 0) {
+            //         this.seguidoresLoaded = true;
+            //       }
+
+            //       this.seguidoresInforme.forEach((seguidor) => {
+            //         const anomaliasSeguidor = seguidor.anomaliasCliente;
+            //         if (anomaliasSeguidor.length > 0) {
+            //           this.anomaliasInforme.push(...anomaliasSeguidor);
+            //         }
+            //       });
+            //     }
+
+            //     // quitamos los seguidores sin anomalias
+            //     this.filtroApartados = this.filtroApartados.filter((apt) => apt !== 'anexoSegsNoAnoms');
+
+            //     this.downloadPDF();
+            //   } else {
+            if (this.reportControlService.plantaFija) {
+              this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
+            } else {
+              const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
+              // filtramos los del informe actual y los ordenamos por globals
+              this.seguidoresInforme = allSeguidores
+                .filter((seg) => seg.informeId === informeId)
+                .sort(this.downloadReportService.sortByGlobalCoords);
+
+              if (this.seguidoresInforme.length > 0) {
+                this.seguidoresLoaded = true;
+              }
+
+              this.anomaliasInforme = [];
+
+              this.seguidoresInforme.forEach((seguidor) => {
+                const anomaliasSeguidor = seguidor.anomaliasCliente;
+                if (anomaliasSeguidor.length > 0) {
+                  this.anomaliasInforme.push(...anomaliasSeguidor);
+                }
+              });
+            }
+            // obtenemos la altura maxima de los modulos
+            this.alturaMax = this.getAlturaMax();
+
+            this.arrayFilas = Array(this.alturaMax)
               .fill(0)
               .map((_, i) => i + 1);
             this.arrayColumnas = Array(this.planta.columnas)
               .fill(0)
               .map((_, i) => i + 1);
 
-            return combineLatest([
-              this.reportControlService.selectedInformeId$,
-              this.downloadReportService.filteredPDF$,
-            ]);
-          })
-        )
-        .subscribe(([informeId, filteredPDF]) => {
-          this.informe = this.reportControlService.informes.find((informe) => informeId === informe.id);
-
-          // if (filteredPDF !== undefined) {
-          //   if (filteredPDF) {
-          //     // utilizamos elementos filtrados para crear el informe
-          //     if (this.reportControlService.plantaFija) {
-          //       this.anomaliasInforme = this.filterService.filteredElements as Anomalia[];
-          //     } else {
-          //       const allSeguidores = this.filterService.filteredElements as Seguidor[];
-          //       // filtramos los del informe actual y los ordenamos por globals
-          //       this.seguidoresInforme = allSeguidores
-          //         .filter((seg) => seg.informeId === informeId)
-          //         .sort(this.downloadReportService.sortByGlobalCoords);
-
-          //       if (this.seguidoresInforme.length > 0) {
-          //         this.seguidoresLoaded = true;
-          //       }
-
-          //       this.seguidoresInforme.forEach((seguidor) => {
-          //         const anomaliasSeguidor = seguidor.anomaliasCliente;
-          //         if (anomaliasSeguidor.length > 0) {
-          //           this.anomaliasInforme.push(...anomaliasSeguidor);
-          //         }
-          //       });
-          //     }
-
-          //     // quitamos los seguidores sin anomalias
-          //     this.filtroApartados = this.filtroApartados.filter((apt) => apt !== 'anexo3');
-
-          //     this.downloadPDF();
-          //   } else {
-          if (this.reportControlService.plantaFija) {
-            this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
-          } else {
-            const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
-            // filtramos los del informe actual y los ordenamos por globals
-            this.seguidoresInforme = allSeguidores
-              .filter((seg) => seg.informeId === informeId)
-              .sort(this.downloadReportService.sortByGlobalCoords);
-
-            if (this.seguidoresInforme.length > 0) {
-              this.seguidoresLoaded = true;
+            if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
+              // imágenes planta completa
+              if (this.planta.tipo !== 'seguidores') {
+                this.setImgPlanoPlanta(this.largestLocAreas, 'thermal', this.anomaliasInforme);
+              }
+              this.setImgPlanoPlanta(this.largestLocAreas, 'visual');
             }
 
-            this.seguidoresInforme.forEach((seguidor) => {
-              const anomaliasSeguidor = seguidor.anomaliasCliente;
-              if (anomaliasSeguidor.length > 0) {
-                this.anomaliasInforme.push(...anomaliasSeguidor);
-              }
-            });
-          }
-          // }
-          // }
+            // }
+            // }
 
-          // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
-          this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
+            // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
+            this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
 
-          // asignamos los labels del criterio especifico del cliente
-          this.labelsCriticidad = this.anomaliaService.criterioCriticidad.labels;
+            // asignamos los labels del criterio especifico del cliente
+            this.labelsCriticidad = this.anomaliaService.criterioCriticidad.labels;
 
-          this.irradianciaImg$ = this.storage.ref(`informes/${this.informe.id}/irradiancia.png`).getDownloadURL();
-          this.suciedadImg$ = this.storage.ref(`informes/${this.informe.id}/suciedad.jpg`).getDownloadURL();
-          this.portadaImg$ = this.storage.ref(`informes/${this.informe.id}/portada.jpg`).getDownloadURL();
-          this.logoImg$ = this.storage.ref(`empresas/${this.planta.empresa}/logo.jpg`).getDownloadURL();
-
-          this.irradianciaImg$
-            .toPromise()
-            .then((url) => {
-              fabric.util.loadImage(
-                url,
-                (img) => {
-                  const canvas = document.createElement('canvas');
-                  const width =
-                    this.widthIrradiancia * this.imgQuality > img.width
-                      ? img.width
-                      : this.widthIrradiancia * this.imgQuality;
-                  const scaleFactor = width / img.width;
-                  canvas.width = width;
-                  canvas.height = img.height * scaleFactor;
-                  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                  ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-                  this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-                },
-                null,
-                { crossOrigin: 'anonymous' }
-              );
-            })
-            .catch((error) => {
-              console.log('Error al obtener la imagen de irradiancia ', error);
-              const canvas = document.createElement('canvas');
-              this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            });
-
-          this.suciedadImg$
-            .toPromise()
-            .then((url) => {
-              fabric.util.loadImage(
-                url,
-                (img) => {
-                  const canvas = document.createElement('canvas');
-                  const width =
-                    this.widthIrradiancia * this.imgQuality > img.width
-                      ? img.width
-                      : this.widthIrradiancia * this.imgQuality;
-                  const scaleFactor = width / img.width;
-                  canvas.width = width;
-                  canvas.height = img.height * scaleFactor;
-                  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                  ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-                  this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-                },
-                null,
-                { crossOrigin: 'anonymous' }
-              );
-            })
-            .catch((error) => {
-              console.log('Error al obtener la imagen de suciedad ', error);
-              const canvas = document.createElement('canvas');
-              this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            });
-
-          this.portadaImg$
-            .toPromise()
-            .then((url) => {
-              fabric.util.loadImage(
-                url,
-                (img) => {
-                  const canvas = document.createElement('canvas');
-                  const width =
-                    this.widthPortada * this.imgQuality > img.width ? img.width : this.widthPortada * this.imgQuality;
-                  const scaleFactor = width / img.width;
-                  canvas.width = width;
-                  canvas.height = img.height * scaleFactor;
-                  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                  ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-                  this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-                },
-                null,
-                { crossOrigin: 'anonymous' }
-              );
-            })
-            .catch((error) => {
-              console.log('Error al obtener la imagen de portada ', error);
-              const canvas = document.createElement('canvas');
-              this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            });
-
-          this.logoImg$
-            .toPromise()
-            .then((url) => {
-              fabric.util.loadImage(
-                url,
-                (img) => {
-                  const canvas = document.createElement('canvas');
-                  const newWidth =
-                    this.widthLogo * this.imgQuality > img.width ? img.width : this.widthLogo * this.imgQuality;
-                  this.widthLogoOriginal = newWidth;
-                  const scaleFactor = newWidth / img.width;
-                  const newHeight = img.height * scaleFactor;
-                  this.heightLogoOriginal = newHeight;
-                  canvas.width = newWidth;
-                  canvas.height = newHeight;
-                  this.scaleImgLogoHeader = this.heightLogoHeader / newHeight;
-                  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                  ctx.drawImage(img, 0, 0, newWidth, newHeight);
-                  this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-                },
-                null,
-                { crossOrigin: 'anonymous' }
-              );
-            })
-            .catch((error) => {
-              console.log('Error al obtener la imagen del logo ', error);
-              const canvas = document.createElement('canvas');
-              this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            });
-
-          this.apartadosInforme = [
-            {
-              nombre: 'introduccion',
-              descripcion: 'Introducción',
-              orden: 1,
-              apt: 1,
-              elegible: false,
-            },
-            {
-              nombre: 'criterios',
-              descripcion: 'Criterios de operación',
-              orden: 2,
-              apt: 1,
-              elegible: true,
-            },
-            {
-              nombre: 'normalizacion',
-              descripcion: 'Normalización de gradientes de temperatura',
-              orden: 3,
-              apt: 1,
-              elegible: true,
-            },
-            {
-              nombre: 'datosVuelo',
-              descripcion: 'Datos del vuelo',
-              orden: 4,
-              apt: 1,
-              elegible: true,
-            },
-            // {
-            //   nombre: 'irradiancia',
-            //   descripcion: 'Irradiancia durante el vuelo',
-            //   orden: 5,
-            //   apt: 1,
-            //   elegible: true,
-            // },
-            {
-              nombre: 'paramsTermicos',
-              descripcion: 'Ajuste de parámetros térmicos',
-              orden: 6,
-              apt: 1,
-              elegible: true,
-            },
-            {
-              nombre: 'perdidaPR',
-              descripcion: 'Pérdida de Performance Ratio',
-              orden: 7,
-              apt: 1,
-              elegible: true,
-            },
-            {
-              nombre: 'clasificacion',
-              descripcion: 'Cómo se clasifican las anomalías',
-              orden: 8,
-              apt: 1,
-              elegible: true,
-            },
-            {
-              nombre: 'resultadosClase',
-              descripcion: 'Resultados por clase',
-              orden: 10,
-              apt: 2,
-              elegible: true,
-            },
-            {
-              nombre: 'resultadosCategoria',
-              descripcion: 'Resultados por categoría',
-              orden: 11,
-              apt: 2,
-              elegible: true,
-            },
-
-            {
-              nombre: 'resultadosMAE',
-              descripcion: 'MAE de la planta',
-              orden: 14,
-              apt: 2,
-              elegible: true,
-            },
-            {
-              nombre: 'anexo1',
-              descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
-              orden: 15,
-              elegible: true,
-            },
-          ];
-
-          if (this.planta.tipo === 'seguidores') {
-            this.apartadosInforme.push(
+            this.apartadosInforme = [
               {
-                nombre: 'anexo2',
-                descripcion: 'Anexo II: Anomalías térmicas por seguidor',
-                orden: 16,
+                nombre: 'introduccion',
+                descripcion: 'Introducción',
+                orden: 1,
+                apt: 1,
+                elegible: false,
+              },
+              {
+                nombre: 'criterios',
+                descripcion: 'Criterios de operación',
+                orden: 2,
+                apt: 1,
+                elegible: true,
+              },
+              {
+                nombre: 'normalizacion',
+                descripcion: 'Normalización de gradientes de temperatura',
+                orden: 3,
+                apt: 1,
+                elegible: true,
+              },
+              {
+                nombre: 'datosVuelo',
+                descripcion: 'Datos del vuelo',
+                orden: 4,
+                apt: 1,
+                elegible: true,
+              },
+              // {
+              //   nombre: 'irradiancia',
+              //   descripcion: 'Irradiancia durante el vuelo',
+              //   orden: 5,
+              //   apt: 1,
+              //   elegible: true,
+              // },
+              {
+                nombre: 'paramsTermicos',
+                descripcion: 'Ajuste de parámetros térmicos',
+                orden: 6,
+                apt: 1,
+                elegible: true,
+              },
+              {
+                nombre: 'perdidaPR',
+                descripcion: 'Pérdida de Performance Ratio',
+                orden: 7,
+                apt: 1,
+                elegible: true,
+              },
+              {
+                nombre: 'clasificacion',
+                descripcion: 'Cómo se clasifican las anomalías',
+                orden: 8,
+                apt: 1,
+                elegible: true,
+              },
+              {
+                nombre: 'resultadosClase',
+                descripcion: 'Resultados por clase',
+                orden: 11,
+                apt: 2,
+                elegible: true,
+              },
+              {
+                nombre: 'resultadosCategoria',
+                descripcion: 'Resultados por categoría',
+                orden: 12,
+                apt: 2,
                 elegible: true,
               },
               {
                 nombre: 'resultadosPosicion',
                 descripcion: 'Resultados por posición',
-                orden: 12,
+                orden: 13,
                 apt: 2,
                 elegible: true,
-              }
-            );
-            const fechaInforme = new Date(this.informe.fecha * 1000);
+              },
+              {
+                nombre: 'resultadosMAE',
+                descripcion: 'MAE de la planta',
+                orden: 14,
+                apt: 2,
+                elegible: true,
+              },
+              {
+                nombre: 'anexo1',
+                descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
+                orden: 15,
+                elegible: true,
+              },
+            ];
 
-            if (fechaInforme.getFullYear() >= 2020) {
+            if (this.planta.tipo === 'seguidores') {
               this.apartadosInforme.push({
-                nombre: 'anexo3',
-                descripcion: 'Anexo III: Seguidores sin anomalías',
-                orden: 17,
+                nombre: 'anexoSeguidores',
+                descripcion: 'Anexo II: Anomalías térmicas por seguidor',
+                orden: 16,
                 elegible: true,
               });
+
+              if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
+                this.apartadosInforme.push({
+                  nombre: 'anexoSegsNoAnoms',
+                  descripcion: 'Anexo III: Seguidores sin anomalías',
+                  orden: 17,
+                  elegible: true,
+                });
+              }
+            } else {
+              this.apartadosInforme.push({
+                nombre: 'planoTermico',
+                descripcion: 'Plano térmico',
+                orden: 9,
+                apt: 2,
+                elegible: false,
+              });
+              this.apartadosInforme.push({
+                nombre: 'anexoAnomalias',
+                descripcion: 'Anexo II: Anomalías térmicas',
+                orden: 16,
+                elegible: true,
+              });
+
+              // if (this.planta.tipo === '1 eje') {
+              //   this.apartadosInforme.push({
+              //     nombre: 'anexoSeguidores1EjeAnoms',
+              //     descripcion: 'Anexo III: Anomalías térmicas por seguidor',
+              //     orden: 17,
+              //     elegible: true,
+              //   });
+
+              //   this.apartadosInforme.push({
+              //     nombre: 'anexoSeguidores1EjeNoAnoms',
+              //     descripcion: 'Anexo III: Seguidores sin anomalías',
+              //     orden: 18,
+              //     elegible: true,
+              //   });
+              // }
             }
-          }
 
-          this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
-            return a.orden - b.orden;
-          });
+            if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
+              this.apartadosInforme.push({
+                nombre: 'planoVisual',
+                descripcion: 'Plano visual',
+                orden: 10,
+                apt: 2,
+                elegible: false,
+              });
+            }
 
-          if (this.filtroApartados === undefined) {
+            this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
+              return a.orden - b.orden;
+            });
+
+            // if (this.filtroApartados === undefined) {
             this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
-          }
-        })
-    );
+            // }
+          })
+      );
+    });
 
-    this.heightLogo = 150;
-    this.widthLogo = 200;
-    this.widthPortada = 600; // es el ancho de pagina completo
-    this.widthSuciedad = 501;
-    this.widthCurvaMae = 300;
-    this.widthFormulaMae = 200;
-    this.widthIrradiancia = 499;
-    this.imgQuality = 3.5;
-    this.heightLogoHeader = 40;
-    this.jpgQuality = 0.95;
-    this.widthSeguidor = 450;
+    this.widthPlano = 500;
+
+    this.widthImageSeguidor = 450;
+    this.widthImageAnomalia = 300;
     this.hasUserArea = false;
 
     this.subscriptions.add(
@@ -489,40 +492,40 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
 
-    fabric.util.loadImage(
-      '../../../assets/images/maeCurva.png',
-      (img) => {
-        const canvas = document.createElement('canvas');
-        const width =
-          this.widthCurvaMae * this.imgQuality > img.width ? img.width : this.widthCurvaMae * this.imgQuality;
-        const scaleFactor = width / img.width;
-        canvas.width = width;
-        canvas.height = img.height * scaleFactor;
-        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-        this.imgCurvaMaeBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-      },
-      null,
-      { crossOrigin: 'anonymous' }
+  private loadOtherImages() {
+    this.subscriptions.add(
+      this.imagesLoadService.imgIrradianciaBase64$.subscribe((img) => (this.imgIrradianciaBase64 = img))
     );
 
-    fabric.util.loadImage(
-      '../../../assets/images/formula_mae.png',
-      (img) => {
-        const canvas = document.createElement('canvas');
-        const width =
-          this.widthFormulaMae * this.imgQuality > img.width ? img.width : this.widthFormulaMae * this.imgQuality;
-        const scaleFactor = width / img.width;
-        canvas.width = width;
-        canvas.height = img.height * scaleFactor;
-        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-        this.imgFormulaMaeBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-      },
-      null,
-      { crossOrigin: 'anonymous' }
+    this.subscriptions.add(
+      this.imagesLoadService.imgSuciedadBase64$.subscribe((img) => (this.imgSuciedadBase64 = img))
     );
+
+    this.subscriptions.add(this.imagesLoadService.imgPortadaBase64$.subscribe((img) => (this.imgPortadaBase64 = img)));
+
+    this.subscriptions.add(this.imagesLoadService.imgLogoBase64$.subscribe((img) => (this.imgLogoBase64 = img)));
+
+    this.subscriptions.add(
+      this.imagesLoadService.imgSolardroneBase64$.subscribe((img) => (this.imgSolardroneBase64 = img))
+    );
+
+    this.subscriptions.add(
+      this.imagesLoadService.imgFormulaMaeBase64$.subscribe((img) => (this.imgFormulaMaeBase64 = img))
+    );
+
+    this.subscriptions.add(
+      this.imagesLoadService.imgCurvaMaeBase64$.subscribe((img) => (this.imgCurvaMaeBase64 = img))
+    );
+
+    this.subscriptions.add(
+      this.imagesLoadService.imgLogoFooterBase64$.subscribe((img) => (this.imgLogoFooterBase64 = img))
+    );
+  }
+
+  private getAlturaMax() {
+    return Math.max(...[...this.anomaliasInforme.map((anom) => anom.localY), this.planta.filas]);
   }
 
   public selectFilteredPDF() {
@@ -531,30 +534,129 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(() => (this.downloadReportService.filteredPDF = undefined));
   }
 
+  private getPrefijoInforme() {
+    let prefijo = this.selectedInforme.prefijo;
+
+    const parteFinal = this.translation.t('informe');
+
+    if (prefijo !== undefined) {
+      prefijo = prefijo + '_' + parteFinal;
+    } else {
+      prefijo = parteFinal;
+    }
+    return prefijo;
+  }
+
   public downloadPDF() {
+    this.downloadReportService.endingPDF = false;
     this.downloadReportService.generatingPDF = true;
 
+    // cargamos imagenes otras imagenes del informe
+    this.imagesLoadService.loadChangingImages(this.selectedInforme.id);
+
     this.countLoadedImages = 0;
+    this.countLoadedImagesSegs1EjeAnoms = 0;
+    this.countLoadedImagesSegs1EjeNoAnoms = 0;
 
     if (this.reportControlService.plantaFija) {
-      this.calcularInforme();
-
-      let prefijo = 'informe';
-      if (this.informe.hasOwnProperty('prefijo')) {
-        prefijo = this.informe.prefijo.concat('informe');
-      }
-
-      pdfMake.createPdf(this.getDocDefinition()).download(prefijo, () => {
-        this.downloadReportService.generatingPDF = false;
+      // Imagenes anomalías
+      this.countAnomalias = 0;
+      this.anomaliasInforme.forEach((anomalia, index) => {
+        if (index < 2) {
+          this.setImgAnomaliaCanvas(anomalia);
+          this.countAnomalias++;
+        }
       });
-      this.downloadReportService.endingPDF = true;
+
+      // if (this.planta.tipo === '1 eje') {
+      //   // Imagenes S1E con anomalías
+      //   this.seguidores1ejeAnoms.forEach((seg, index) => {
+      //     if (index < 2) {
+      //       this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
+      //     }
+      //   });
+
+      //   // Imagenes S1E sin anomalías
+      //   this.seguidores1ejeNoAnoms.forEach((seg, index) => {
+      //     if (index < 2) {
+      //       this.setImgSeguidor1EjeCanvas(seg, index);
+      //     }
+      //   });
+
+      //   // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+      //   let downloads = 0;
+
+      //   this.subscriptions.add(
+      //     combineLatest([
+      //       this.countLoadedImages$,
+      //       this.countLoadedImagesSegs1EjeAnoms$,
+      //       this.countLoadedImagesSegs1EjeNoAnoms$,
+      //     ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
+      //       this.downloadReportService.progressBarValue = Math.round(
+      //         ((countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
+      //           (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
+      //           100
+      //       );
+
+      //       // Cuando se carguen todas las imágenes
+      //       if (
+      //         countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
+      //           4 /* + this.countAnomalias + this.seguidores1ejeAnoms.length */ +
+      //             this.seguidores1ejeNoAnoms.length -
+      //             400 &&
+      //         downloads === 0
+      //       ) {
+      //         this.calcularInforme();
+
+      //         pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
+      //           this.downloadReportService.progressBarValue = 0;
+
+      //           this.downloadReportService.generatingPDF = false;
+      //         });
+      //         this.downloadReportService.endingPDF = true;
+
+      //         downloads++;
+      //       }
+      //     })
+      //   );
+      // } else {
+
+      // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+      let downloads = 0;
+
+      this.subscriptions.add(
+        this.countLoadedImages$.subscribe((countLoadedImgs) => {
+          this.downloadReportService.progressBarValue = Math.round(
+            (countLoadedImgs / this.anomaliasInforme.length) * 100
+          );
+
+          // comprobamos que estan cargadas tb el resto de imagenes del PDF
+          this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
+            // Cuando se carguen todas las imágenes
+            if (imagesLoaded && 2 /* countLoadedImgs */ === this.countAnomalias && downloads === 0) {
+              this.calcularInforme();
+
+              pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
+                this.downloadReportService.progressBarValue = 0;
+
+                this.downloadReportService.generatingPDF = false;
+              });
+              this.downloadReportService.endingPDF = true;
+
+              downloads++;
+            }
+          });
+        })
+      );
+
+      // }
     } else {
       // Generar imagenes
       this.countSeguidores = 0;
-      for (const seguidor of this.seguidoresInforme) {
+      this.seguidoresInforme.forEach((seguidor, index) => {
         this.setImgSeguidorCanvas(seguidor, false, 'jpg');
         this.countSeguidores++;
-      }
+      });
 
       // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
       let downloads = 0;
@@ -565,21 +667,22 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             (countLoadedImgs / this.seguidoresInforme.length) * 100
           );
 
-          // Cuando se carguen todas las imágenes
-          if (countLoadedImgs === this.countSeguidores && downloads === 0) {
-            this.calcularInforme();
+          // comprobamos que estan cargadas tb el resto de imagenes del PDF
+          this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
+            // Cuando se carguen todas las imágenes
+            if (imagesLoaded && countLoadedImgs === this.countSeguidores && downloads === 0) {
+              this.calcularInforme();
 
-            pdfMake
-              .createPdf(this.getDocDefinition(this.imageListBase64))
-              .download(this.informe.prefijo.concat('informe'), () => {
+              pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
                 this.downloadReportService.progressBarValue = 0;
 
                 this.downloadReportService.generatingPDF = false;
               });
-            this.downloadReportService.endingPDF = true;
+              this.downloadReportService.endingPDF = true;
 
-            downloads++;
-          }
+              downloads++;
+            }
+          });
         })
       );
     }
@@ -602,8 +705,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       this.irradianciaMedia = 800;
     }
 
-    this.emisividad = this.informe.emisividad;
-    this.tempReflejada = this.informe.tempReflejada;
+    this.emisividad = this.selectedInforme.emisividad;
+    this.tempReflejada = this.selectedInforme.tempReflejada;
 
     // Calcular las alturas
     for (const y of this.arrayFilas) {
@@ -653,23 +756,38 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.dataSource = new MatTableDataSource(this.countCategoriaClase);
   }
 
-  getDocDefinition(imagesSeguidores?: any): TDocumentDefinitions {
+  getDocDefinition(images?: any): TDocumentDefinitions {
     const pages = this.getPagesPDF();
     let anexo1 = [];
-    let anexo2 = [];
-    let anexo3 = [];
+    let anexoAnomalias = [];
+    let anexoSeguidores1EjeAnoms = [];
+    let anexoSeguidores1EjeNoAnoms = [];
+    let anexoSeguidores = [];
+    let anexoSegsNoAnoms = [];
+
     let numAnexo = 'I';
 
     if (this.filtroApartados.includes('anexo1')) {
       anexo1 = this.getAnexoLista(numAnexo);
       numAnexo = 'II';
     }
-    if (this.filtroApartados.includes('anexo2')) {
-      anexo2 = this.getAnexoSeguidores(numAnexo);
+    if (this.filtroApartados.includes('anexoAnomalias')) {
+      anexoAnomalias = this.getAnexoAnomalias(numAnexo);
       numAnexo = 'III';
     }
-    if (this.filtroApartados.includes('anexo3')) {
-      anexo3 = this.getAnexoSeguidoresSinAnomalias(numAnexo);
+    if (this.filtroApartados.includes('anexoSeguidores1EjeAnoms')) {
+      anexoSeguidores1EjeAnoms = this.getAnexoSegs1EjeAnoms(numAnexo);
+      numAnexo = 'IV';
+    }
+    if (this.filtroApartados.includes('anexoSeguidores1EjeNoAnoms')) {
+      anexoSeguidores1EjeNoAnoms = this.getAnexoSegs1EjeNoAnoms(numAnexo);
+    }
+    if (this.filtroApartados.includes('anexoSeguidores')) {
+      anexoSeguidores = this.getAnexoSeguidores(numAnexo);
+      numAnexo = 'III';
+    }
+    if (this.filtroApartados.includes('anexoSegsNoAnoms')) {
+      anexoSegsNoAnoms = this.getAnexoSeguidoresSinAnomalias(numAnexo);
     }
 
     return {
@@ -677,45 +795,49 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         if (currentPage > 1) {
           return [
             {
-              margin: 10,
-              columns: [
-                {
-                  // usually you would use a dataUri instead of the name for client-side printing
-                  // sampleImage.jpg however works inside playground so you can play with it
-                  margin: [300 - this.widthLogo * this.scaleImgLogoHeader, 0, 0, 0],
-                  image: this.imgLogoBase64,
-                  width: this.scaleImgLogoHeader * this.widthLogo,
-                },
-              ],
+              margin: [0, 10, 0, 0],
+              image: this.imgLogoBase64,
+              width: this.imagesLoadService.scaleImgLogoHeader * this.imagesLoadService.widthLogoEmpresa,
+              alignment: 'center',
             },
           ];
         }
       },
 
-      content: pages.concat(anexo1).concat(anexo2).concat(anexo3),
+      content: pages
+        .concat(anexo1)
+        .concat(anexoAnomalias)
+        .concat(anexoSeguidores1EjeAnoms)
+        .concat(anexoSeguidores1EjeNoAnoms)
+        .concat(anexoSeguidores)
+        .concat(anexoSegsNoAnoms),
 
-      images: imagesSeguidores,
+      images,
 
       footer: (currentPage, pageCount) => {
         if (currentPage > 1) {
-          return [
-            {
-              table: {
-                widths: ['*'],
-                body: [
-                  [
-                    {
-                      text: currentPage,
-                      alignment: 'center',
-                      color: 'grey',
-                      margin: [0, 10, 0, 0],
-                    },
-                  ],
+          return {
+            table: {
+              widths: [300, '*'],
+              body: [
+                [
+                  {
+                    text: currentPage,
+                    alignment: 'right',
+                    color: 'grey',
+                    margin: [0, 0, 0, 0],
+                  },
+                  {
+                    image: this.imgLogoFooterBase64,
+                    width: this.imagesLoadService.widthImgLogoFooter,
+                    alignment: 'right',
+                    margin: [0, -10, 15, 0],
+                  },
                 ],
-              },
-              layout: 'noBorders',
+              ],
             },
-          ];
+            layout: 'noBorders',
+          };
         }
       },
 
@@ -785,6 +907,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         table: {
           alignment: 'center',
+          // margin: [0, 10, 0, 0],
         },
 
         param: {
@@ -823,8 +946,628 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           bold: true,
           alignment: 'right',
         },
+        anomInfoTitle: {
+          bold: true,
+          alignment: 'left',
+          fontSize: 13,
+          lineHeight: 1.5,
+        },
+        anomInfoValue: {
+          alignment: 'justify',
+          fontSize: 13,
+          lineHeight: 1.15,
+        },
       },
     };
+  }
+
+  private getElemExtent(coords: Coordinate[]): Extent[] {
+    const range = 0.001;
+    const extents: Extent[] = [];
+    coords.forEach((coord) => {
+      const extent: Extent = [coord[0] - range, coord[1] - range, coord[0] + range, coord[1] + range];
+      extents.push(extent);
+    });
+
+    return extents;
+  }
+
+  private getElemTiles(coords: Coordinate[], extents: Extent[], zoomLevel: number): TileCoord[] {
+    // obtenemos los tileCoords de cada coordenada
+    let tilesCoord: TileCoord[] = [];
+
+    this.layerInformeSelected = this.map.getLayers().getArray()[0] as TileLayer;
+
+    const source = this.layerInformeSelected.getSource();
+    const tileGrid = source.getTileGrid();
+    extents.forEach((extent, index) => {
+      tileGrid.forEachTileCoord(extent, zoomLevel, (tileCoord) => {
+        const longLatCoords = this.getLongLatFromXYZ(tileCoord, tileGrid);
+        if (inside(coords[index], longLatCoords)) {
+          tilesCoord.push(tileCoord);
+        }
+      });
+    });
+
+    // this.olMapService
+    //   .getThermalLayers()
+    //   .pipe(take(1))
+    //   .subscribe((layers) => {
+    //     console.log(layers);
+    //     console.log(this.selectedInforme);
+    //     this.layerInformeSelected = layers.find((layer) => layer.getProperties().informeId === this.selectedInforme.id);
+    //     const source = this.layerInformeSelected.getSource();
+    //     const tileGrid = source.getTileGrid();
+    //     extents.forEach((extent, index) => {
+    //       tileGrid.forEachTileCoord(extent, zoomLevel, (tileCoord) => {
+    //         const longLatCoords = this.getLongLatFromXYZ(tileCoord, tileGrid);
+    //         if (inside(coords[index], longLatCoords)) {
+    //           tilesCoord.push(tileCoord);
+    //         }
+    //       });
+    //     });
+    //   });
+
+    // obtenemos todos los tiles descartando duplicados
+    tilesCoord = this.getCompleteTiles(tilesCoord);
+
+    return tilesCoord;
+  }
+
+  private getCompleteTiles(tilesCoord: TileCoord[]): TileCoord[] {
+    const tilesCoordCompletes: TileCoord[] = [];
+
+    const coordsX = tilesCoord.map((coord) => coord[1]);
+    const coordsY = tilesCoord.map((coord) => coord[2]);
+    // obtenemos los maximos y le sumamos una para traernos los de alrededor
+    const minX = Math.min(...coordsX) - 1;
+    let maxX = Math.max(...coordsX) + 1;
+    const minY = Math.min(...coordsY) - 1;
+    let maxY = Math.max(...coordsY) + 1;
+
+    // hacemos el grupo cuadrado con lado el que sea mayor de X o Y
+    const rangoX = maxX - minX;
+    const rangoY = maxY - minY;
+    const diferencia = rangoY - rangoX;
+    if (diferencia > 0) {
+      maxX += diferencia;
+    } else if (diferencia < 0) {
+      maxY += Math.abs(diferencia);
+    }
+
+    for (let j = minY; j <= maxY; j++) {
+      for (let i = minX; i <= maxX; i++) {
+        const coord = [tilesCoord[0][0], i, j];
+        tilesCoordCompletes.push(coord);
+      }
+    }
+
+    return tilesCoordCompletes;
+  }
+
+  private setImgAnomaliaCanvas(anomalia: Anomalia) {
+    let zoomLevel = 22;
+    // parche para la planta Logrosan que tiene huecos en la capa termica
+    if (this.planta.id === 'AyKgsY6F3TqGQGYNaOUY') {
+      zoomLevel = 20;
+    }
+    const tileCoords = this.getElemTiles(anomalia.featureCoords, this.getElemExtent(anomalia.featureCoords), zoomLevel);
+
+    const canvas = new fabric.Canvas('canvas');
+    const lado = Math.sqrt(tileCoords.length);
+    canvas.width = lado * this.tileResolution;
+    canvas.height = lado * this.tileResolution;
+    const width = canvas.width / lado;
+    const height = canvas.height / lado;
+    let contador = 0;
+    tileCoords.forEach((tileCoord, index) => {
+      const url = GLOBAL.GIS + `${this.selectedInforme.id}_thermal/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+
+      const left = (index % lado) * width;
+      const top = Math.trunc(index / lado) * height;
+
+      fabric.util.loadImage(
+        url,
+        (img) => {
+          if (img !== null) {
+            const processImg = this.imageProcessService.transformPixels(img);
+
+            const image = new fabric.Image(processImg, {
+              width,
+              height,
+              left,
+              top,
+              angle: 0,
+              opacity: 1,
+              draggable: false,
+              lockMovementX: true,
+              lockMovementY: true,
+              scaleX: 1,
+              scaleY: 1,
+            });
+
+            canvas.add(image);
+
+            contador++;
+            if (contador === tileCoords.length) {
+              const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
+              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+              const coordsPolygonCanvas = this.getCoordsRectangleCanvas(
+                longLatOrigen,
+                longLatFin,
+                anomalia.featureCoords,
+                lado
+              );
+              this.drawPolygonInCanvas(anomalia.id, canvas, coordsPolygonCanvas);
+              this.canvasCenterAndZoom(coordsPolygonCanvas, canvas);
+              this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
+                format: 'png',
+              });
+
+              this.countLoadedImages++;
+            }
+          } else {
+            contador++;
+            if (contador === tileCoords.length) {
+              const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
+              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+              const coordsPolygonCanvas = this.getCoordsRectangleCanvas(
+                longLatOrigen,
+                longLatFin,
+                anomalia.featureCoords,
+                lado
+              );
+              this.drawPolygonInCanvas(anomalia.id, canvas, coordsPolygonCanvas);
+              this.canvasCenterAndZoom(coordsPolygonCanvas, canvas);
+              this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
+                format: 'png',
+              });
+
+              this.countLoadedImages++;
+            }
+          }
+        },
+        null,
+        { crossOrigin: 'anonymous' }
+      );
+    });
+  }
+
+  private setImgPlanoPlanta(locAreas: LocationAreaInterface[], type: string, anomalias?: Anomalia[]) {
+    let tileCoords: TileCoord[] = [];
+    const allLocAreaCoords: Coordinate[] = [];
+    locAreas.forEach((locArea) => {
+      const locAreaCoords = this.pathToCoordinate(locArea.path);
+      allLocAreaCoords.push(...locAreaCoords);
+      tileCoords.push(...this.getElemTiles(locAreaCoords, this.getElemExtent(locAreaCoords), 18));
+    });
+    tileCoords = this.getCompleteTiles(tileCoords);
+
+    const canvas = new fabric.Canvas('canvas');
+    const lado = Math.sqrt(tileCoords.length);
+    canvas.width = lado * this.tileResolution;
+    canvas.height = lado * this.tileResolution;
+    const width = canvas.width / lado;
+    const height = canvas.height / lado;
+
+    let contador = 0;
+    tileCoords.forEach((tileCoord, index) => {
+      const url = GLOBAL.GIS + `${this.selectedInforme.id}_${type}/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+
+      const left = (index % lado) * width;
+      const top = Math.trunc(index / lado) * height;
+
+      if (type === 'thermal') {
+        const visualUrl =
+          GLOBAL.GIS + `${this.selectedInforme.id}_visual/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+
+        fabric.util.loadImage(
+          visualUrl,
+          (img) => {
+            if (img !== null) {
+              const image = new fabric.Image(img, {
+                width,
+                height,
+                left,
+                top,
+                angle: 0,
+                opacity: 1,
+                draggable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                scaleX: 1,
+                scaleY: 1,
+              });
+
+              canvas.add(image);
+              // movemos al fondo para que quede debajo de la termica
+              canvas.moveTo(image, 0);
+
+              contador++;
+              if (contador === tileCoords.length * 2) {
+                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+              }
+            } else {
+              contador++;
+              if (contador === tileCoords.length * 2) {
+                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+              }
+            }
+          },
+          null,
+          { crossOrigin: 'anonymous' }
+        );
+
+        fabric.util.loadImage(
+          url,
+          (img) => {
+            if (img !== null) {
+              img = this.imageProcessService.transformPixels(img);
+
+              const image = new fabric.Image(img, {
+                width,
+                height,
+                left,
+                top,
+                angle: 0,
+                opacity: 1,
+                draggable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                scaleX: 1,
+                scaleY: 1,
+              });
+
+              canvas.add(image);
+
+              contador++;
+              if (contador === tileCoords.length * 2) {
+                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+              }
+            } else {
+              contador++;
+              if (contador === tileCoords.length * 2) {
+                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+              }
+            }
+          },
+          null,
+          { crossOrigin: 'anonymous' }
+        );
+      } else {
+        fabric.util.loadImage(
+          url,
+          (img) => {
+            if (img !== null) {
+              if (type === 'thermal') {
+                img = this.imageProcessService.transformPixels(img);
+              }
+
+              const image = new fabric.Image(img, {
+                width,
+                height,
+                left,
+                top,
+                angle: 0,
+                opacity: 1,
+                draggable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                scaleX: 1,
+                scaleY: 1,
+              });
+
+              canvas.add(image);
+
+              contador++;
+              if (contador === tileCoords.length) {
+                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+              }
+            } else {
+              contador++;
+              if (contador === tileCoords.length) {
+                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
+              }
+            }
+          },
+          null,
+          { crossOrigin: 'anonymous' }
+        );
+      }
+    });
+  }
+
+  private createFinalImage(
+    tileCoords: TileCoord[],
+    lado: number,
+    allLocAreaCoords: Coordinate[],
+    anomalias: Anomalia[],
+    canvas: any,
+    type: string
+  ) {
+    const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
+    const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
+    const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+    const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, allLocAreaCoords, lado);
+
+    if (type === 'thermal' && anomalias !== undefined) {
+      this.drawAnomaliasPlanta(anomalias, canvas, longLatOrigen, longLatFin, lado);
+    }
+
+    this.canvasCenterAndZoom(coordsSegCanvas, canvas);
+
+    this.imagesPlantaCompleta[type] = canvas.toDataURL({
+      format: 'png',
+    });
+  }
+
+  private canvasCenterAndZoom(coordsPolygon: number[], canvas: any, trim?: boolean) {
+    const longestSide = Math.max(coordsPolygon[2], coordsPolygon[3]);
+    const polygonCentroid = [coordsPolygon[0] + coordsPolygon[2] / 2, coordsPolygon[1] + coordsPolygon[3] / 2];
+    const zoom = canvas.getWidth() / (longestSide + 120);
+
+    // VERDINALES
+    let desviacion = 1;
+    // if (trim) {
+    //   desviacion = 0.85;
+    // }
+
+    canvas.setZoom(1); // reset zoom so pan actions work as expected
+    const vpw = canvas.width / zoom;
+    const vph = canvas.height / zoom;
+    const x = (polygonCentroid[0] - vpw / 2) * desviacion; // x is the location where the top left of the viewport should be
+    const y = polygonCentroid[1] - vph / 2; // y idem
+    canvas.absolutePan({ x, y });
+    canvas.setZoom(zoom);
+
+    // VERDINALES
+    if (trim) {
+      const left = (canvas.getWidth() / 2) * 0.75;
+      const width = (canvas.getWidth() / 2 - left) * 2;
+      canvas.clipTo = (ctx) => {
+        ctx.rect(left, 0, width, canvas.getWidth());
+      };
+    }
+
+    canvas.renderAll();
+  }
+
+  private getCoordsRectangleCanvas(
+    coordsTileOrigen: number[][],
+    coordsTileFin: number[][],
+    polygonCoords: Coordinate[],
+    lado: number
+  ) {
+    const topLeft = coordsTileOrigen[1];
+    const bottomRight = coordsTileFin[3];
+    // TODO: no ordena bien las coordenadas
+    const horizOrdered = polygonCoords.sort((a, b) => a[0] - b[0]);
+
+    let polygonTopLeft = horizOrdered[0];
+    if (polygonTopLeft[1] < horizOrdered[1][1]) {
+      polygonTopLeft = horizOrdered[1];
+    }
+    let polygonBottomRight = horizOrdered[2];
+    if (polygonBottomRight[1] > horizOrdered[3][1]) {
+      polygonBottomRight = horizOrdered[3];
+    }
+    const polygonLeft =
+      ((polygonTopLeft[0] - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
+    const polygonRight =
+      ((polygonBottomRight[0] - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
+    const polygonTop =
+      (Math.abs(polygonTopLeft[1] - topLeft[1]) * (this.tileResolution * lado)) / Math.abs(bottomRight[1] - topLeft[1]);
+    const polygonBottom =
+      ((polygonBottomRight[1] - topLeft[1]) * (this.tileResolution * lado)) / (bottomRight[1] - topLeft[1]);
+    const width = Math.abs(polygonRight - polygonLeft);
+    const height = Math.abs(polygonBottom - polygonTop);
+
+    return [polygonLeft, polygonTop, width, height];
+  }
+
+  private getCoordsPolygonCanvas(
+    coordsTileOrigen: number[][],
+    coordsTileFin: number[][],
+    polygonCoords: Coordinate[],
+    lado: number
+  ) {
+    const topLeft = coordsTileOrigen[1];
+    const bottomRight = coordsTileFin[3];
+    const longsOrdered = polygonCoords.map((coord) => coord[0]).sort((a, b) => a - b);
+
+    const leftLongitude = longsOrdered[0];
+    const rightLongitude = longsOrdered[longsOrdered.length - 1];
+
+    const latsOrdered = polygonCoords.map((coord) => coord[1]).sort((a, b) => a - b);
+
+    const topLatitude = latsOrdered[latsOrdered.length - 1];
+    const bottomLatitude = latsOrdered[0];
+
+    const polygonLeft = ((leftLongitude - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
+    const polygonRight = ((rightLongitude - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
+    const polygonTop =
+      (Math.abs(topLatitude - topLeft[1]) * (this.tileResolution * lado)) / Math.abs(bottomRight[1] - topLeft[1]);
+    const polygonBottom =
+      ((bottomLatitude - topLeft[1]) * (this.tileResolution * lado)) / (bottomRight[1] - topLeft[1]);
+    const width = Math.abs(polygonRight - polygonLeft);
+    const height = Math.abs(polygonBottom - polygonTop);
+
+    return [polygonLeft, polygonTop, width, height];
+  }
+
+  private setImgSeguidor1EjeCanvas(seg: LocationAreaInterface, count: number, anomalias?: Anomalia[]) {
+    const segCoords = this.pathToCoordinate(seg.path);
+    const tileCoords = this.getElemTiles(segCoords, this.getElemExtent(segCoords), 22);
+
+    const canvas = new fabric.Canvas('canvas');
+    const lado = Math.sqrt(tileCoords.length);
+    canvas.width = lado * this.tileResolution;
+    canvas.height = lado * this.tileResolution;
+    const width = canvas.width / lado;
+    const height = canvas.height / lado;
+    let contador = 0;
+    tileCoords.forEach((tileCoord, index) => {
+      const url = GLOBAL.GIS + `${this.selectedInforme.id}_thermal/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+
+      const left = (index % lado) * width;
+      const top = Math.trunc(index / lado) * height;
+
+      fabric.util.loadImage(
+        url,
+        (img) => {
+          if (img !== null) {
+            img = this.imageProcessService.transformPixels(img);
+
+            const image = new fabric.Image(img, {
+              width,
+              height,
+              left,
+              top,
+              angle: 0,
+              opacity: 1,
+              draggable: false,
+              lockMovementX: true,
+              lockMovementY: true,
+              scaleX: 1,
+              scaleY: 1,
+            });
+
+            canvas.add(image);
+
+            contador++;
+            if (contador === tileCoords.length) {
+              const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
+              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+              const coordsSegCanvas = this.getCoordsRectangleCanvas(longLatOrigen, longLatFin, segCoords, lado);
+
+              if (anomalias !== undefined) {
+                this.drawAnomaliasSeguidor(anomalias, canvas, longLatOrigen, longLatFin, lado);
+              }
+
+              // this.drawPolygonInCanvas(count.toString(), canvas, coordsSegCanvas);
+              this.canvasCenterAndZoom(coordsSegCanvas, canvas, true);
+
+              if (anomalias !== undefined) {
+                this.imageListBase64[`imgCanvasSegAnoms${count}`] = canvas.toDataURL({
+                  format: 'png',
+                });
+
+                this.countLoadedImagesSegs1EjeAnoms++;
+              } else {
+                this.imageListBase64[`imgCanvasSegNoAnoms${count}`] = canvas.toDataURL({
+                  format: 'png',
+                });
+
+                this.countLoadedImagesSegs1EjeNoAnoms++;
+              }
+            }
+          } else {
+            contador++;
+            if (contador === tileCoords.length) {
+              const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
+              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+              const coordsSegCanvas = this.getCoordsRectangleCanvas(longLatOrigen, longLatFin, segCoords, lado);
+
+              if (anomalias !== undefined) {
+                this.drawAnomaliasSeguidor(anomalias, canvas, longLatOrigen, longLatFin, lado);
+              }
+
+              // this.drawPolygonInCanvas(count.toString(), canvas, coordsSegCanvas);
+              this.canvasCenterAndZoom(coordsSegCanvas, canvas, true);
+
+              if (anomalias !== undefined) {
+                this.imageListBase64[`imgCanvasSegAnoms${count}`] = canvas.toDataURL({
+                  format: 'png',
+                });
+
+                this.countLoadedImagesSegs1EjeAnoms++;
+              } else {
+                this.imageListBase64[`imgCanvasSegNoAnoms${count}`] = canvas.toDataURL({
+                  format: 'png',
+                });
+
+                this.countLoadedImagesSegs1EjeNoAnoms++;
+              }
+            }
+          }
+        },
+        null,
+        { crossOrigin: 'anonymous' }
+      );
+    });
+  }
+
+  private drawAnomaliasSeguidor(
+    anomalias: Anomalia[],
+    canvas: any,
+    coordsOrigen: number[][],
+    coordsFin: number[][],
+    lado: number
+  ): void {
+    anomalias.forEach((anom, index) => {
+      const coordsAnomCanvas = this.getCoordsRectangleCanvas(coordsOrigen, coordsFin, anom.featureCoords, lado);
+      this.drawPolygonInCanvas(anom.localId, canvas, coordsAnomCanvas, index + 1);
+    });
+  }
+
+  private drawAnomaliasPlanta(
+    anomalias: Anomalia[],
+    canvas: any,
+    coordsOrigen: number[][],
+    coordsFin: number[][],
+    lado: number
+  ): void {
+    anomalias.forEach((anom, index) => {
+      const coordsAnomCanvas = this.getCoordsPolygonCanvas(coordsOrigen, coordsFin, anom.featureCoords, lado);
+      this.drawPolygonInCanvas(anom.localId, canvas, coordsAnomCanvas, undefined, 4);
+    });
+  }
+
+  private pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {
+    const coordenadas: Coordinate[] = [];
+    path.forEach((coord) => {
+      const coordenada: Coordinate = fromLonLat([coord.lng, coord.lat]);
+      coordenadas.push(coordenada);
+    });
+    return coordenadas;
+  }
+
+  private getLongLatFromXYZ(tileCoord: TileCoord, tileGrid: TileGrid) {
+    const z = tileCoord[0];
+    const x = tileCoord[1];
+    const y = tileCoord[2];
+    const tileGridOrigin = tileGrid.getOrigin(z);
+    const tileSizeAtResolution = Number(tileGrid.getTileSize(z)) * tileGrid.getResolution(z);
+
+    const bottomLeft = [
+      tileGridOrigin[0] + tileSizeAtResolution * x,
+      tileGridOrigin[1] - tileSizeAtResolution * (y + 1),
+    ];
+    const topLeft = [tileGridOrigin[0] + tileSizeAtResolution * x, tileGridOrigin[1] - tileSizeAtResolution * y];
+    const topRight = [tileGridOrigin[0] + tileSizeAtResolution * (x + 1), tileGridOrigin[1] - tileSizeAtResolution * y];
+    const bottomRight = [
+      tileGridOrigin[0] + tileSizeAtResolution * (x + 1),
+      tileGridOrigin[1] - tileSizeAtResolution * (y + 1),
+    ];
+
+    return [bottomLeft, topLeft, topRight, bottomRight];
+  }
+
+  private getXYZFromLongLat(long: number, lat: number, zoom): TileCoord {
+    const xtile = Math.floor(((long + 180) / 360) * (1 << zoom));
+    const ytile = Math.floor(
+      ((1 - Math.log(Math.tan(this.toRad(lat)) + 1 / Math.cos(this.toRad(lat))) / Math.PI) / 2) * (1 << zoom)
+    );
+    return [zoom, xtile, ytile];
+  }
+
+  private toRad(value: number): number {
+    // convierte grados a radianes
+    return (value * Math.PI) / 180;
   }
 
   private setImgSeguidorCanvas(seguidor: Seguidor, vistaPrevia: boolean = false, folder?: string) {
@@ -866,9 +1609,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
               canvas.add(image);
               this.drawAllPcsInCanvas(anomaliasSeguidor, canvas, vistaPrevia, 1, 0, 0);
-              this.imageListBase64[`imgSeguidorCanvas${seguidor.nombre}`] = canvas.toDataURL(
+              this.imageListBase64[`imgCanvas${seguidor.nombre}`] = canvas.toDataURL(
                 'image/jpeg',
-                this.jpgQuality
+                this.imagesLoadService.jpgQuality
               );
             }
 
@@ -880,7 +1623,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       })
       .catch((error) => {
         const canvas = new fabric.Canvas('canvas');
-        this.imageListBase64[`imgSeguidorCanvas${seguidor.nombre}`] = canvas.toDataURL('image/jpeg', this.jpgQuality);
+        this.imageListBase64[`imgCanvas${seguidor.nombre}`] = canvas.toDataURL(
+          'image/jpeg',
+          this.imagesLoadService.jpgQuality
+        );
 
         this.countLoadedImages++;
 
@@ -902,6 +1648,60 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             break;
         }
       });
+  }
+
+  private drawPolygonInCanvas(
+    id: string,
+    canvas: any,
+    coordsPolygonCanvas: number[],
+    index?: number,
+    strokeAnomalia?: number
+  ) {
+    let strokeWidth = 2;
+    let rx = 4;
+    let ry = 4;
+    if (strokeAnomalia !== undefined) {
+      strokeWidth = strokeAnomalia;
+      rx = 0;
+      ry = 0;
+    }
+    const polygon = new fabric.Rect({
+      left: coordsPolygonCanvas[0],
+      top: coordsPolygonCanvas[1],
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'white',
+      strokeWidth,
+      width: coordsPolygonCanvas[2],
+      height: coordsPolygonCanvas[3],
+      hasControls: false,
+      lockMovementY: true,
+      lockMovementX: true,
+      anomId: id,
+      ref: 'anom',
+      selectable: false,
+      hoverCursor: 'pointer',
+      rx,
+      ry,
+    });
+
+    canvas.add(polygon);
+
+    if (index !== undefined) {
+      const label = new fabric.Text(index.toString(), {
+        left: coordsPolygonCanvas[0],
+        top: coordsPolygonCanvas[1] - 26,
+        fontSize: 20,
+        // textBackgroundColor: 'red',
+        ref: 'text',
+        selectable: false,
+        hoverCursor: 'default',
+        fill: 'white',
+      });
+
+      canvas.add(label);
+    }
+
+    canvas.renderAll();
   }
 
   private drawAllPcsInCanvas(pcs: PcInterface[], canvas, vistaPrevia: boolean = false, scale = 1, top0 = 0, left0 = 0) {
@@ -954,11 +1754,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   getPagesPDF() {
     // PORTADA //
-    let widthLogoPortada = this.widthLogo;
+    let widthLogoPortada = this.imagesLoadService.widthLogoEmpresa;
     // controlamos que la altura del logo no se salga de la portada
-    if (this.heightLogoOriginal > 250) {
-      const factorReduccion = 250 / this.heightLogoOriginal;
-      widthLogoPortada = this.widthLogo * factorReduccion;
+    const alturaMaxLogo = 250;
+    if (this.imagesLoadService.heightLogoEmpresa > alturaMaxLogo) {
+      const factorReduccion = alturaMaxLogo / this.imagesLoadService.heightLogoEmpresa;
+      widthLogoPortada = this.imagesLoadService.widthLogoEmpresa * factorReduccion;
     }
 
     const portada: any[] = [
@@ -972,7 +1773,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
       {
         image: this.imgPortadaBase64,
-        width: this.widthPortada,
+        width: this.imagesLoadService.widthPortada,
         alignment: 'center',
       },
 
@@ -997,17 +1798,26 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             style: 'bold',
           },
           ' ',
-          this.datePipe.transform(this.informe.fecha * 1000, 'dd/MM/yyyy'),
+          this.datePipe.transform(this.selectedInforme.fecha * 1000, 'dd/MM/yyyy'),
         ],
         style: 'subtitulo',
       },
 
       '\n\n',
-
       {
         image: this.imgLogoBase64,
         width: widthLogoPortada,
         alignment: 'center',
+        margin: [10, 0, 0, 0],
+      },
+      {
+        image: this.imgSolardroneBase64,
+        width: this.imagesLoadService.widthImgSolardroneTech,
+        absolutePosition: {
+          x: this.imagesLoadService.widthPortada - this.imagesLoadService.widthImgSolardroneTech - 20,
+          y:
+            this.imagesLoadService.widthPortada * Math.sqrt(2) - this.imagesLoadService.widthImgSolardroneTech / 4 - 40, // aspect ratio logo 4:1
+        },
         pageBreak: 'after',
       },
     ];
@@ -1072,6 +1882,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Criterios de operación')}`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -1205,6 +2017,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Normalización de gradientes de temperatura')}`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -1263,7 +2077,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             style: 'tableLeft',
           },
           {
-            text: `${GLOBAL.camaraTermica}`,
+            text: `${this.translation.t(GLOBAL.camaraTermica)}`,
           },
         ],
         [
@@ -1293,7 +2107,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             style: 'tableLeft',
           },
           {
-            text: this.datePipe.transform(this.informe.fecha * 1000, 'dd/MM/yyyy'),
+            text: this.datePipe.transform(this.selectedInforme.fecha * 1000, 'dd/MM/yyyy'),
           },
         ],
         [
@@ -1302,7 +2116,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             style: 'tableLeft',
           },
           {
-            text: `${this.informe.gsd} cm/pixel (+- 0.5cm/pixel)`,
+            text: `${this.selectedInforme.gsd} cm/pixel (+- 0.5cm/pixel)`,
           },
         ],
 
@@ -1312,7 +2126,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             style: 'tableLeft',
           },
           {
-            text: `${Math.round(this.informe.gsd * 0.16 * 100) / 100} cm/pixel`,
+            text: `${Math.round(this.selectedInforme.gsd * 0.16 * 100) / 100} cm/pixel`,
           },
         ],
       ];
@@ -1334,7 +2148,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             style: 'tableLeft',
           },
           {
-            text: `${this.informe.temperatura} ºC`,
+            text: `${this.selectedInforme.temperatura} ºC`,
           },
         ],
 
@@ -1344,32 +2158,36 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             style: 'tableLeft',
           },
           {
-            text: `${this.informe.nubosidad}/8 ${this.translation.t('octavas')}`,
+            text: `${this.selectedInforme.nubosidad}/8 ${this.translation.t('octavas')}`,
           },
         ],
       ];
 
-      if (this.informe.hasOwnProperty('hora_inicio')) {
+      if (this.selectedInforme.hasOwnProperty('hora_inicio')) {
         apt02.push([
           {
             text: this.translation.t('Horario de los vuelos'),
             style: 'tableLeft',
           },
           {
-            text: `${this.informe.hora_inicio} - ${this.informe.hora_fin}`,
+            text: `${this.selectedInforme.hora_inicio} - ${this.selectedInforme.hora_fin}`,
           },
         ]);
       }
 
-      if (this.informe.hasOwnProperty('velocidad')) {
-        if (this.informe.velocidad !== undefined && this.informe.velocidad !== null && !isNaN(this.informe.velocidad)) {
+      if (this.selectedInforme.hasOwnProperty('velocidad')) {
+        if (
+          this.selectedInforme.velocidad !== undefined &&
+          this.selectedInforme.velocidad !== null &&
+          !isNaN(this.selectedInforme.velocidad)
+        ) {
           apt02.push([
             {
               text: this.translation.t('Velocidad'),
               style: 'tableLeft',
             },
             {
-              text: `${this.informe.velocidad} km/h`,
+              text: `${this.selectedInforme.velocidad} km/h`,
             },
           ]);
         }
@@ -1387,12 +2205,26 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         ]);
       }
 
+      if (this.selectedInforme.hasOwnProperty('vientoVelocidad')) {
+        apt03.push([
+          {
+            text: 'Viento',
+            style: 'tableLeft',
+          },
+          {
+            text: `${this.selectedInforme.vientoVelocidad} (Beaufort) ${this.selectedInforme.vientoDireccion}º`,
+          },
+        ]);
+      }
+
       const body = [...apt01, ...apt02, ...apt03];
 
       return [
         {
           text: `${index} - ${this.translation.t('Datos del vuelo')}`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -1434,6 +2266,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Irradiancia durante el vuelo')}`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -1447,7 +2281,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         {
           image: this.imgIrradianciaBase64,
-          width: this.widthIrradiancia,
+          width: this.imagesLoadService.widthIrradiancia,
           alignment: 'center',
         },
 
@@ -1460,6 +2294,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Ajuste de parámetros térmicos')}`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -1506,7 +2342,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         '\n',
 
         {
-          text: this.translation.t('Emisividad') + '  = ' + this.informe.emisividad.toString(),
+          text: this.translation.t('Emisividad') + '  = ' + this.selectedInforme.emisividad.toString(),
           style: 'param',
         },
 
@@ -1515,7 +2351,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         // Imagen suciedad
         {
           image: this.imgSuciedadBase64,
-          width: this.widthSuciedad,
+          width: this.imagesLoadService.widthSuciedad,
           alignment: 'center',
         },
 
@@ -1530,7 +2366,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         {
           text: this.translation.t(
-            'La temperatura reflejada no depende de la atmosfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura reflejada medida es:'
+            'La temperatura reflejada no depende de la atmósfera y las condiciones meteorológicas del día del vuelo. Para obtener este parámetro es necesario llevar a cabo un procedimiento de medición adecuado en la misma planta el mismo día del vuelo. La temperatura reflejada medida es:'
           ),
           style: 'p',
         },
@@ -1541,12 +2377,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           text:
             this.capFirstLetter(this.translation.t('temperatura reflejada')) +
             ' = ' +
-            this.informe.tempReflejada.toString() +
+            this.selectedInforme.tempReflejada.toString() +
             ' ºC',
           style: 'param',
         },
 
-        '\n\n',
+        // '\n\n',
       ];
     };
 
@@ -1555,6 +2391,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Pérdida de Performance Ratio')} (ΔPR)`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -1631,7 +2469,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         {
           image: this.imgFormulaMaeBase64,
-          width: this.widthFormulaMae,
+          width: this.imagesLoadService.widthFormulaMae,
           alignment: 'center',
         },
 
@@ -1676,7 +2514,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         // Imagen maeCurva
         {
           image: this.imgCurvaMaeBase64,
-          width: this.widthCurvaMae,
+          width: this.imagesLoadService.widthCurvaMae,
           alignment: 'center',
         },
 
@@ -1753,6 +2591,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${index} - ${this.translation.t('Cómo se clasifican las anomalías térmicas (según IEC 62446-3)')}`,
           style: 'h3',
+          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
         },
 
         '\n',
@@ -1808,13 +2648,50 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       ];
     };
 
+    const planoTermico = (index: string) => {
+      return [
+        // Imagen planta termica
+        {
+          text: `${index} - ${this.translation.t('Ortomosaico térmico')}`,
+          style: 'h2',
+          margin: [0, 10, 0, 40],
+          alignment: 'center',
+          pageBreak: 'before',
+        },
+        {
+          image: this.imagesPlantaCompleta['thermal'],
+          width: this.widthPlano,
+          alignment: 'center',
+        },
+      ];
+    };
+
+    const planoVisual = (index: string) => {
+      return [
+        // Imagen planta visual
+        {
+          text: `${index} - ${this.translation.t('Ortomosaico RGB')}`,
+          style: 'h2',
+          margin: [0, 10, 0, 40],
+          alignment: 'center',
+          pageBreak: 'before',
+        },
+        {
+          image: this.imagesPlantaCompleta['visual'],
+          width: this.widthPlano,
+          alignment: 'center',
+        },
+      ];
+    };
+
     const resultados = (index: string) => {
       return [
         {
           text: `${index} - ${this.translation.t('Resultados de la inspección termográfica')}`,
           style: 'h2',
-          pageBreak: 'before',
+          margin: [0, 10, 0, 0],
           alignment: 'center',
+          pageBreak: 'before',
         },
 
         {
@@ -1837,7 +2714,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         {
           text: this.translation.t(
-            'A continuación se detallan la cantidad de incidencias registradas según su clase (1, 2 ó 3).'
+            'A continuación se detalla la cantidad de incidencias registradas según su clase (1, 2 ó 3).'
           ),
           style: 'p',
         },
@@ -1927,6 +2804,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             {
               width: '*',
               text: '',
+              pageBreak: 'after',
             },
           ],
         },
@@ -1965,12 +2843,17 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     };
 
     const resultadosPosicion = (index: string) => {
+      let titulo;
       let texto1;
+      let body;
       if (this.reportControlService.plantaFija) {
+        titulo = this.translation.t('Resultados por altura');
         texto1 = this.translation.t(
-          'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
+          'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura y su porcentaje sobre el total. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
         );
+        body = this.getTablaAltura();
       } else {
+        titulo = this.translation.t('Resultados por posición de la anomalía dentro del seguidor');
         texto1 = `${this.translation.t(
           'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran'
         )} (${this.plantaService.getNombreLocalX(this.planta)} ${this.translation.t(
@@ -1978,10 +2861,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         )} ${this.plantaService.getNombreLocalY(this.planta)}) ${this.translation.t(
           'dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
         )}`;
+        body = this.getTablaPosicion();
       }
       return [
         {
-          text: `${index} - ${this.translation.t('Resultados por posición de la anomalía dentro del seguidor')}`,
+          text: `${index} - ${titulo}`,
           style: 'h3',
         },
 
@@ -2012,7 +2896,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             {
               width: 'auto',
               table: {
-                body: this.getTablaPosicion(),
+                body,
               },
             },
             {
@@ -2037,7 +2921,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         {
           text: this.translation.t(
-            'El MAE (módulo apagados equivalentes) nos da medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.'
+            'El MAE (módulo apagados equivalentes) nos da una medida cualitativa del impacto que tienen las incidencias registradas en el PR (performance ratio) de la planta.'
           ),
           style: 'p',
         },
@@ -2046,9 +2930,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         {
           text: `MAE = ∆PR / PR = ${this.decimalPipe.transform(
-            this.informe.mae * 100,
+            this.selectedInforme.mae * 100,
             '1.0-2'
-          )}% (${this.calificacionMae(this.informe.mae * 100)})`,
+          )}% (${this.calificacionMae(this.selectedInforme.mae * 100)})`,
           style: 'param',
         },
 
@@ -2057,17 +2941,17 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: [
             `${this.translation.t('El MAE de')} ${this.planta.nombre} (${this.datePipe.transform(
-              this.informe.fecha * 1000,
+              this.selectedInforme.fecha * 1000,
               'dd/MM/yyyy'
             )}) ${this.translation.t('es')} `,
             {
-              text: `${this.decimalPipe.transform(this.informe.mae * 100, '1.0-2')}%`,
+              text: `${this.decimalPipe.transform(this.selectedInforme.mae * 100, '1.0-2')}%`,
               style: 'bold',
             },
             ' ',
             '(',
             {
-              text: `${this.calificacionMae(this.informe.mae * 100)}`,
+              text: `${this.calificacionMae(this.selectedInforme.mae * 100)}`,
               style: 'bold',
             },
             ')',
@@ -2087,6 +2971,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       {
         text: `1 - ${this.translation.t('Introducción')}`,
         style: 'h2',
+        margin: [0, 10, 0, 0],
         alignment: 'center',
       },
 
@@ -2140,9 +3025,21 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       subtitulo = subtitulo + 1;
     }
 
+    if (this.filtroApartados.includes('planoTermico')) {
+      titulo = titulo + 1;
+      apartado = titulo.toString();
+      result = result.concat(planoTermico(apartado));
+    }
+
+    if (this.filtroApartados.includes('planoVisual')) {
+      titulo = titulo + 1;
+      apartado = titulo.toString();
+      result = result.concat(planoVisual(apartado));
+    }
+
     titulo = titulo + 1;
     subtitulo = 1;
-    apartado = '2';
+    apartado = titulo.toString();
 
     result = result.concat(resultados(apartado));
 
@@ -2284,6 +3181,446 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     return allPagsAnexoLista.concat(tablaAnexo);
   }
 
+  private getAnexoAnomalias(numAnexo: string) {
+    const allPagsAnexo = [];
+    // tslint:disable-next-line:max-line-length
+    const pag1Anexo = {
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
+        'Anomalías térmicas'
+      )}`,
+      style: 'h1',
+      alignment: 'center',
+      pageBreak: 'before',
+    };
+
+    allPagsAnexo.push(pag1Anexo);
+
+    for (let i = 0; i < 2 /* this.anomaliasInforme.length */; i++) {
+      const anom = this.anomaliasInforme[i];
+
+      const pagAnexo = [
+        {
+          text: `${this.translation.t('Anomalía')} ${i + 1}/${this.anomaliasInforme.length}`,
+          style: 'h2',
+          alignment: 'center',
+          pageBreak: 'before',
+        },
+        '\n',
+        {
+          image: `imgCanvas${anom.id}`,
+          width: this.widthImageAnomalia,
+          alignment: 'center',
+        },
+        {
+          columns: [
+            { text: this.translation.t('Tipo de anomalía'), width: 200, style: 'anomInfoTitle' },
+            { text: this.translation.t(this.anomaliaInfoService.getTipoLabel(anom)), style: 'anomInfoValue' },
+          ],
+          margin: [0, 40, 0, 0],
+        },
+        {
+          columns: [
+            { text: this.translation.t('Causa'), width: 200, style: 'anomInfoTitle' },
+            {
+              text: this.translation.t(this.anomaliaInfoService.getCausa(anom)),
+              style: 'anomInfoValue',
+              margin: [0, 0, 0, 5],
+            },
+          ],
+        },
+        {
+          columns: [
+            { text: this.translation.t('Recomendación'), width: 200, style: 'anomInfoTitle' },
+            {
+              text: this.translation.t(this.anomaliaInfoService.getRecomendacion(anom)),
+              style: 'anomInfoValue',
+              margin: [0, 0, 0, 5],
+            },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Módulo', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getModuloLabel(anom), style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            {
+              text: `Criticidad (Criterio ${this.anomaliaService.criterioCriticidad.nombre})`,
+              width: 200,
+              style: 'anomInfoTitle',
+            },
+            { text: this.translation.t(this.anomaliaInfoService.getCriticidadLabel(anom)), style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Clase', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getClaseLabel(anom), style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Pérdidas (beta)', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getPerdidasLabel(anom), style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Temperatura Máxima', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getTempMaxLabel(anom), style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Gradiente Temp. Normalizado', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getGradNormLabel(anom), style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Fecha y hora captura', width: 200, style: 'anomInfoTitle' },
+            {
+              text: this.anomaliaInfoService.getFechaHoraLabel(anom),
+              style: 'anomInfoValue',
+            },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Localización', width: 200, style: 'anomInfoTitle' },
+            { text: this.anomaliaInfoService.getLocalizacionCompleteLabel(anom, this.planta), style: 'anomInfoValue' },
+          ],
+        },
+      ];
+
+      allPagsAnexo.push(pagAnexo);
+    }
+
+    return allPagsAnexo;
+  }
+
+  private getAnexoSegs1EjeAnoms(numAnexo: string) {
+    const allPagsAnexo = [];
+    // tslint:disable-next-line:max-line-length
+    const pag1Anexo = {
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
+        'Anomalías térmicas por seguidor'
+      )}`,
+      style: 'h1',
+      alignment: 'center',
+      pageBreak: 'before',
+    };
+
+    allPagsAnexo.push(pag1Anexo);
+
+    for (let i = 0; i < this.seguidores1ejeAnoms.length; i++) {
+      const seg = this.seguidores1ejeAnoms[i];
+
+      const segTable = this.getSeg1ejeTable();
+
+      const anoms = this.anomSeguidores1Eje[i];
+
+      const anomsTable = this.getPaginaSeguidor1EjeAnoms(anoms);
+
+      const pagAnexo = [
+        {
+          // text: `${this.translation.t('Seguidor')} ${this.globalCoordsLabel(seg.globalCoords)}`,
+          text: `${this.translation.t('Seguidor')} ${i + 1}/${this.seguidores1ejeAnoms.length}`,
+          style: 'h2',
+          alignment: 'center',
+          pageBreak: 'before',
+        },
+        '\n',
+        {
+          image: `imgCanvasSegAnoms${i}`,
+          width: this.widthImageAnomalia,
+          alignment: 'center',
+        },
+        '\n',
+        '\n',
+        {
+          columns: [
+            {
+              width: '*',
+              text: '',
+            },
+
+            {
+              width: 'auto',
+              table: segTable,
+            },
+
+            {
+              width: '*',
+              text: '',
+            },
+          ],
+        },
+
+        '\n',
+
+        {
+          columns: [
+            {
+              width: '*',
+              text: '',
+            },
+            {
+              width: 'auto',
+              table: {
+                headerRows: 1,
+                body: [anomsTable[0]].concat(anomsTable[1]),
+              },
+            },
+            {
+              width: '*',
+              text: '',
+            },
+          ],
+        },
+      ];
+
+      allPagsAnexo.push(pagAnexo);
+    }
+
+    return allPagsAnexo;
+  }
+
+  private getSeg1ejeTable() {
+    const segBodyTableHeader = [
+      {
+        text: this.translation.t('Fecha/Hora'),
+        style: 'tableHeaderImageData',
+      },
+      {
+        text: this.translation.t('Temp. aire'),
+        style: 'tableHeaderImageData',
+      },
+      {
+        text: this.translation.t('Emisividad'),
+        style: 'tableHeaderImageData',
+      },
+      {
+        text: this.translation.t('Temp. reflejada'),
+        style: 'tableHeaderImageData',
+      },
+      // {
+      //   text: this.translation.t('Módulo'),
+      //   style: 'tableHeaderImageData',
+      // },
+    ];
+
+    const segBodyTableContent = [
+      {
+        text: this.datePipe.transform(this.selectedInforme.fecha * 1000, 'dd/MM/yyyy HH:mm:ss'),
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      },
+      {
+        text: this.selectedInforme.temperatura.toString().concat(' ºC'),
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      },
+      {
+        text: this.selectedInforme.emisividad,
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      },
+      {
+        text: this.selectedInforme.tempReflejada.toString().concat(' ºC'),
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      },
+      // {
+      //   text: this.writeModulo(anoms[0]),
+      //   style: 'tableCellAnexo1',
+      //   noWrap: true,
+      // },
+    ];
+
+    const segTableBody = [segBodyTableHeader, segBodyTableContent];
+
+    const segTable = {
+      body: segTableBody,
+    };
+
+    if (this.selectedInforme.hasOwnProperty('irradiancia')) {
+      segBodyTableHeader.push({
+        text: this.translation.t('Irradiancia'),
+        style: 'tableHeaderImageData',
+      });
+      segBodyTableContent.push({
+        text: this.selectedInforme.irradiancia.toString().concat(' W/m2'),
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      });
+    }
+    if (this.selectedInforme.hasOwnProperty('viento')) {
+      segBodyTableHeader.push({
+        text: this.translation.t('Viento'),
+        style: 'tableHeaderImageData',
+      });
+      segBodyTableContent.push({
+        text: this.selectedInforme.viento,
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      });
+    }
+    if (this.selectedInforme.hasOwnProperty('vientoVelocidad')) {
+      segBodyTableHeader.push({
+        text: this.translation.t('Velocidad viento'),
+        style: 'tableHeaderImageData',
+      });
+      segBodyTableContent.push({
+        text: this.selectedInforme.vientoVelocidad.toString() + ' (Beaufort)',
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      });
+    }
+    if (this.selectedInforme.hasOwnProperty('vientoDireccion')) {
+      segBodyTableHeader.push({
+        text: this.translation.t('Dirección viento'),
+        style: 'tableHeaderImageData',
+      });
+      segBodyTableContent.push({
+        text: this.selectedInforme.vientoDireccion.toString() + 'º',
+        style: 'tableCellAnexo1',
+        noWrap: true,
+      });
+    }
+
+    return segTable;
+  }
+
+  private globalCoordsLabel(globalCoords: string[]): string {
+    const coords: string[] = [];
+    globalCoords.forEach((coord, index) => {
+      if (coord !== undefined && coord !== null && coord !== '') {
+        coords.push(coord);
+      }
+    });
+    let label = '';
+    coords.forEach((coord, index) => {
+      label = label + coord;
+      if (index < coords.length - 1) {
+        label = label + '.';
+      }
+    });
+
+    return label;
+  }
+
+  private getPaginaSeguidor1EjeAnoms(anomalias: Anomalia[]) {
+    // Header
+    const cabecera = [];
+    const columnasAnexoSeguidor = this.columnasAnomalia.filter((col) => {
+      return !GLOBAL.columnasAnexoSeguidor.includes(col.nombre);
+    });
+    if (this.planta.hasOwnProperty('numerosSerie')) {
+      if (this.planta.numerosSerie) {
+        columnasAnexoSeguidor.push({ nombre: 'numeroSerie', descripcion: 'N/S' });
+      }
+    }
+
+    cabecera.push({
+      text: this.translation.t('Número'),
+      style: 'tableHeaderBlue',
+    });
+    for (const col of columnasAnexoSeguidor) {
+      cabecera.push({
+        text: this.translation.t(this.getEncabezadoTablaSeguidor(col)),
+        style: 'tableHeaderBlue',
+      });
+    }
+
+    // Body
+    const body = [];
+    let contadorAnoms = 0;
+    const totalAnomsSeguidor = anomalias.length;
+    for (const anom of anomalias) {
+      contadorAnoms += 1;
+      const row = [];
+      row.push({
+        text: `${contadorAnoms}/${totalAnomsSeguidor}`,
+        noWrap: true,
+        style: 'tableCellAnexo1',
+      });
+
+      for (const col of columnasAnexoSeguidor) {
+        row.push({
+          text: this.translation.t(this.getTextoColumnaAnomalia(anom, col.nombre)),
+          noWrap: true,
+          style: 'tableCellAnexo1',
+        });
+      }
+      body.push(row);
+    }
+    return [cabecera, body];
+  }
+
+  private getAnexoSegs1EjeNoAnoms(numAnexo: string) {
+    const allPagsAnexo = [];
+    // tslint:disable-next-line:max-line-length
+    const pag1Anexo = {
+      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
+        'Seguidores sin anomalías'
+      )}`,
+      style: 'h1',
+      alignment: 'center',
+      pageBreak: 'before',
+    };
+
+    allPagsAnexo.push(pag1Anexo);
+
+    for (let i = 0; i < this.seguidores1ejeNoAnoms.length; i++) {
+      const seg = this.seguidores1ejeNoAnoms[i];
+
+      const segTable = this.getSeg1ejeTable();
+
+      const pagAnexo = [
+        {
+          // text: `${this.translation.t('Seguidor')} ${this.globalCoordsLabel(seg.globalCoords)}`,
+          text: `${this.translation.t('Seguidor')} ${i + 1}/${this.seguidores1ejeNoAnoms.length}`,
+          style: 'h2',
+          alignment: 'center',
+          pageBreak: 'before',
+        },
+        '\n',
+        {
+          image: `imgCanvasSegNoAnoms${i}`,
+          width: this.widthImageAnomalia,
+          alignment: 'center',
+        },
+        '\n',
+        '\n',
+        {
+          columns: [
+            {
+              width: '*',
+              text: '',
+            },
+
+            {
+              width: 'auto',
+              table: segTable,
+            },
+
+            {
+              width: '*',
+              text: '',
+            },
+          ],
+        },
+      ];
+
+      allPagsAnexo.push(pagAnexo);
+    }
+
+    return allPagsAnexo;
+  }
+
   private getAnexoSeguidores(numAnexo: string) {
     const allPagsAnexo = [];
     // tslint:disable-next-line:max-line-length
@@ -2313,8 +3650,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           '\n',
 
           {
-            image: `imgSeguidorCanvas${seg.nombre}`,
-            width: this.widthSeguidor,
+            image: `imgCanvas${seg.nombre}`,
+            width: this.widthImageSeguidor,
             alignment: 'center',
           },
 
@@ -2369,7 +3706,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                     [
                       {
                         text: this.datePipe
-                          .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
+                          .transform(this.selectedInforme.fecha * 1000, 'dd/MM/yyyy')
                           .concat(' ')
                           .concat(this.datePipe.transform(seg.anomaliasCliente[0].datetime * 1000, 'HH:mm:ss')),
                         style: 'tableCellAnexo1',
@@ -2471,8 +3808,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     allPagsAnexo.push(pag1Anexo);
 
     for (const seg of this.seguidoresInforme) {
-      const table = this.getPaginaSeguidor(seg);
-
       if (seg.anomaliasCliente.length === 0) {
         const pagAnexo = [
           {
@@ -2485,8 +3820,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           '\n',
 
           {
-            image: `imgSeguidorCanvas${seg.nombre}`,
-            width: this.widthSeguidor,
+            image: `imgCanvas${seg.nombre}`,
+            width: this.widthImageSeguidor,
             alignment: 'center',
           },
 
@@ -2541,7 +3876,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                     [
                       {
                         text: this.datePipe
-                          .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
+                          .transform(this.selectedInforme.fecha * 1000, 'dd/MM/yyyy')
                           .concat(' ')
                           .concat(this.datePipe.transform(seg.anomalias[0].datetime * 1000, 'HH:mm:ss')),
                         style: 'tableCellAnexo1',
@@ -2638,7 +3973,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   private getTextoIrradiancia() {
-    if (this.informe.irradiancia === 0) {
+    if (this.selectedInforme.irradiancia === 0) {
       return `${this.translation.t(
         'Los datos de irradiancia durante el vuelo han sido obtenidos de los instrumentos de medición el equipo ha llevado a planta, los cuales han sido suministrados a nuestro software para ser emparejados con las imágenes termográficas tomadas desde el aire, de manera que cada imagen tiene una irradiancia asociada. Dicha irradiancia es la más cercana en el tiempo de las registradas.'
       )}`;
@@ -2701,7 +4036,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       return Math.round(anomalia.irradiancia).toString().concat(' W/m2');
     } else if (columnaNombre === 'datetimeString') {
       return this.datePipe
-        .transform(this.informe.fecha * 1000, 'dd/MM/yyyy')
+        .transform(this.selectedInforme.fecha * 1000, 'dd/MM/yyyy')
         .concat(' ')
         .concat(this.datePipe.transform(anomalia.datetime * 1000, 'HH:mm:ss'));
     } else if (columnaNombre === 'local_xy') {
@@ -2769,6 +4104,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       localId = '-';
     }
 
+    anomalia.localId = localId;
+
     return localId;
   }
 
@@ -2789,7 +4126,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     for (const j of this.arrayFilas) {
       const arrayFila = [];
       arrayFila.push({
-        text: this.plantaService.getAltura(this.planta, j).toString(),
+        text: this.plantaService.getAltura(this.planta, j, this.alturaMax).toString(),
         style: 'tableHeaderBlue',
       });
       const countPosicionFila = this.countPosicion[j - 1];
@@ -2804,6 +4141,36 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     }
 
     return array;
+  }
+
+  private getTablaAltura() {
+    const body = [];
+
+    const anomsTabla = this.anomaliasInforme.filter((anom) => anom.clase !== 1);
+
+    for (let i = 1; i <= this.alturaMax; i++) {
+      const arrayFila = [];
+      arrayFila.push({
+        text: 'Fila ' + this.plantaService.getAltura(this.planta, i, this.alturaMax).toString(),
+        style: 'tableHeaderBlue',
+      });
+
+      const countAnomalias = anomsTabla.filter((anom) => anom.localY === i).length;
+
+      arrayFila.push({
+        text: countAnomalias.toString(),
+        style: 'tableCell',
+      });
+
+      arrayFila.push({
+        text: this.decimalPipe.transform((countAnomalias / anomsTabla.length) * 100, '1.0-2') + '%',
+        style: 'tableCell',
+      });
+
+      body.push(arrayFila);
+    }
+
+    return body;
   }
 
   getPaginaSeguidor(seguidor: Seguidor) {
@@ -2856,6 +4223,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+
+    this.imageProcessService.resetService();
+    this.imagesLoadService.resetService();
   }
 
   //////////////////////////////////////////////////////
@@ -2867,6 +4237,24 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   set countLoadedImages(value: number) {
     this._countLoadedImages = value;
     this.countLoadedImages$.next(value);
+  }
+
+  get countLoadedImagesSegs1EjeAnoms() {
+    return this._countLoadedImagesSegs1EjeAnoms;
+  }
+
+  set countLoadedImagesSegs1EjeAnoms(value: number) {
+    this._countLoadedImagesSegs1EjeAnoms = value;
+    this.countLoadedImagesSegs1EjeAnoms$.next(value);
+  }
+
+  get countLoadedImagesSegs1EjeNoAnoms() {
+    return this._countLoadedImagesSegs1EjeNoAnoms;
+  }
+
+  set countLoadedImagesSegs1EjeNoAnoms(value: number) {
+    this._countLoadedImagesSegs1EjeNoAnoms = value;
+    this.countLoadedImagesSegs1EjeNoAnoms$.next(value);
   }
 
   get columnasAnomalia() {

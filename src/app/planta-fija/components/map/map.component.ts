@@ -7,7 +7,7 @@ import Map from 'ol/Map';
 import OSM from 'ol/source/OSM';
 import { fromLonLat, transformExtent } from 'ol/proj.js';
 import View from 'ol/View';
-import { Vector as VectorSource } from 'ol/source';
+import { TileDebug, Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { defaults as defaultControls } from 'ol/control.js';
 import XYZ from 'ol/source/XYZ';
@@ -58,6 +58,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public informeIdList: string[] = [];
   public sharedReport = false;
   noAnomsReport = false;
+  public coordsPointer;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -74,6 +75,8 @@ export class MapComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.mousePosition = null;
+
+    this.anomaliasControlService.coordsPointer$.subscribe((coords) => (this.coordsPointer = coords));
 
     // Para la demo, agregamos un extent a todas las capas:
     this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
@@ -156,7 +159,7 @@ export class MapComponent implements OnInit, OnDestroy {
     const tl = new TileLayer({
       source: new XYZ_mod({
         url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',
-        crossOrigin: '',
+        crossOrigin: 'anonymous',
         tileClass: ImageTileMod,
         transition: 255,
         tileLoadFunction: (imageTile, src) => {
@@ -238,7 +241,14 @@ export class MapComponent implements OnInit, OnDestroy {
       source: new OSM(),
     });
 
-    const layers = [satelliteLayer, ...this.aerialLayers, ...this.thermalLayers];
+    const layers = [
+      satelliteLayer,
+      ...this.aerialLayers,
+      ...this.thermalLayers,
+      // new TileLayer({
+      //   source: new TileDebug(),
+      // }),
+    ];
 
     // MAPA
     let view: View;
