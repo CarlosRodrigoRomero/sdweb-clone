@@ -113,7 +113,7 @@
   "Porcentaje %": "Percentage %",
   "Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran": "The numbers in the following table indicate the number of thermal abnormalities recorded in the position they are in",
   "dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.": "within each follower. Only class 2 and 3 thermal abnormalities are included.",
-  "Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.": "The numbers in the following table indicate the number of thermal abnormalities recorded by height. Only class 2 and 3 thermal abnormalities are included.",
+  "Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura y su porcentaje sobre el total. Sólo se incluyen anomalías térmicas de clase 2 y 3.": "The numbers in the following table indicate the number of thermal abnormalities recorded by height and its percentage of the total. Only class 2 and 3 thermal abnormalities are included.",
   "Resultados por posición de la anomalía dentro del seguidor": "Results by position of the abnormality within the follower",
   "Resultados por altura": "Results by height",
   "Esta clasificación tiene como fin detectar posibles problemas relacionados con la posición de cada módulo. De este análisis se obtienen problemas relacionados con la vegetación de la instalación, deposiciones de pájaros, etc.": "The purpose of this classification is to detect possible problems related to the position of each module. From this analysis, problems related to the vegetation of the facility, bird depositions, etc. are obtained.",

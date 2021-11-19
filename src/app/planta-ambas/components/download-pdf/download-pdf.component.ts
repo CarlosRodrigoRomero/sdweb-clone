@@ -821,20 +821,18 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               widths: [300, '*'],
               body: [
                 [
-                  
-                    {
-                      text: currentPage,
-                      alignment: 'right',
-                      color: 'grey',
-                      margin: [0, 10, 0, 0],
-                    },
-                    {
-                      image: this.imgLogoFooterBase64,
-                      width: this.imagesLoadService.widthImgLogoFooter,
-                      alignment: 'right',
-                      margin: [0, -10, 15, 0],
-                    },
-                  
+                  {
+                    text: currentPage,
+                    alignment: 'right',
+                    color: 'grey',
+                    margin: [0, 0, 0, 0],
+                  },
+                  {
+                    image: this.imgLogoFooterBase64,
+                    width: this.imagesLoadService.widthImgLogoFooter,
+                    alignment: 'right',
+                    margin: [0, -10, 15, 0],
+                  },
                 ],
               ],
             },
@@ -2851,7 +2849,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       if (this.reportControlService.plantaFija) {
         titulo = this.translation.t('Resultados por altura');
         texto1 = this.translation.t(
-          'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
+          'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura y su porcentaje sobre el total. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
         );
         body = this.getTablaAltura();
       } else {
@@ -4146,28 +4144,33 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   private getTablaAltura() {
-    const array = [];
+    const body = [];
+
+    const anomsTabla = this.anomaliasInforme.filter((anom) => anom.clase !== 1);
 
     for (let i = 1; i <= this.alturaMax; i++) {
       const arrayFila = [];
       arrayFila.push({
-        text: this.plantaService.getAltura(this.planta, i, this.alturaMax).toString(),
+        text: 'Fila ' + this.plantaService.getAltura(this.planta, i, this.alturaMax).toString(),
         style: 'tableHeaderBlue',
       });
 
-      const countAnomalias = this.anomaliasInforme
-        .filter((anom) => anom.clase !== 1)
-        .filter((anom) => anom.localY === i).length;
+      const countAnomalias = anomsTabla.filter((anom) => anom.localY === i).length;
 
       arrayFila.push({
         text: countAnomalias.toString(),
         style: 'tableCell',
       });
 
-      array.push(arrayFila);
+      arrayFila.push({
+        text: this.decimalPipe.transform((countAnomalias / anomsTabla.length) * 100, '1.0-2') + '%',
+        style: 'tableCell',
+      });
+
+      body.push(arrayFila);
     }
 
-    return array;
+    return body;
   }
 
   getPaginaSeguidor(seguidor: Seguidor) {
