@@ -178,21 +178,22 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
-    this.subscriptions.add(
-      this.downloadReportService.seguidores1Eje$.subscribe((segs) =>
-        segs.forEach((seg) => {
-          const anomsSeguidor = this.anomaliasInforme.filter(
-            (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
-          );
-          if (anomsSeguidor.length > 0) {
-            this.anomSeguidores1Eje.push(anomsSeguidor);
-            this.seguidores1ejeAnoms.push(seg);
-          } else {
-            this.seguidores1ejeNoAnoms.push(seg);
-          }
-        })
-      )
-    );
+    // this.subscriptions.add(
+    //   this.downloadReportService.seguidores1Eje$.subscribe((segs) => {
+    //     console.log(segs, this.anomaliasInforme);
+    //     segs.forEach((seg) => {
+    //       const anomsSeguidor = this.anomaliasInforme.filter(
+    //         (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
+    //       );
+    //       if (anomsSeguidor.length > 0) {
+    //         this.anomSeguidores1Eje.push(anomsSeguidor);
+    //         this.seguidores1ejeAnoms.push(seg);
+    //       } else {
+    //         this.seguidores1ejeNoAnoms.push(seg);
+    //       }
+    //     });
+    //   })
+    // );
 
     // suscripciones a las imagenes
     this.loadOtherImages();
@@ -234,62 +235,50 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                 this.reportControlService.selectedInformeId$,
                 this.downloadReportService.filteredPDF$,
               ]);
-            })
-          )
-          .subscribe(([informeId, filteredPDF]) => {
-            this.selectedInforme = this.reportControlService.informes.find((informe) => informeId === informe.id);
+            }),
+            switchMap(([informeId, filteredPDF]) => {
+              this.selectedInforme = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
-            // if (filteredPDF !== undefined) {
-            //   if (filteredPDF) {
-            //     // utilizamos elementos filtrados para crear el informe
-            //     if (this.reportControlService.plantaFija) {
-            //       this.anomaliasInforme = this.filterService.filteredElements as Anomalia[];
-            //     } else {
-            //       const allSeguidores = this.filterService.filteredElements as Seguidor[];
-            //       // filtramos los del informe actual y los ordenamos por globals
-            //       this.seguidoresInforme = allSeguidores
-            //         .filter((seg) => seg.informeId === informeId)
-            //         .sort(this.downloadReportService.sortByGlobalCoords);
+              if (this.reportControlService.plantaFija) {
+                this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
+              } else {
+                const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
+                // filtramos los del informe actual y los ordenamos por globals
+                this.seguidoresInforme = allSeguidores
+                  .filter((seg) => seg.informeId === informeId)
+                  .sort(this.downloadReportService.sortByGlobalCoords);
 
-            //       if (this.seguidoresInforme.length > 0) {
-            //         this.seguidoresLoaded = true;
-            //       }
+                if (this.seguidoresInforme.length > 0) {
+                  this.seguidoresLoaded = true;
+                }
 
-            //       this.seguidoresInforme.forEach((seguidor) => {
-            //         const anomaliasSeguidor = seguidor.anomaliasCliente;
-            //         if (anomaliasSeguidor.length > 0) {
-            //           this.anomaliasInforme.push(...anomaliasSeguidor);
-            //         }
-            //       });
-            //     }
+                this.anomaliasInforme = [];
 
-            //     // quitamos los seguidores sin anomalias
-            //     this.filtroApartados = this.filtroApartados.filter((apt) => apt !== 'anexoSegsNoAnoms');
-
-            //     this.downloadPDF();
-            //   } else {
-            if (this.reportControlService.plantaFija) {
-              this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
-            } else {
-              const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
-              // filtramos los del informe actual y los ordenamos por globals
-              this.seguidoresInforme = allSeguidores
-                .filter((seg) => seg.informeId === informeId)
-                .sort(this.downloadReportService.sortByGlobalCoords);
-
-              if (this.seguidoresInforme.length > 0) {
-                this.seguidoresLoaded = true;
+                this.seguidoresInforme.forEach((seguidor) => {
+                  const anomaliasSeguidor = seguidor.anomaliasCliente;
+                  if (anomaliasSeguidor.length > 0) {
+                    this.anomaliasInforme.push(...anomaliasSeguidor);
+                  }
+                });
               }
 
-              this.anomaliasInforme = [];
+              return this.downloadReportService.seguidores1Eje$;
+            })
+          )
+          .subscribe((segs) => {
+            console.log(segs, this.anomaliasInforme);
+            segs.forEach((seg) => {
+              const anomsSeguidor = this.anomaliasInforme.filter(
+                (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
+              );
+              if (anomsSeguidor.length > 0) {
+                this.anomSeguidores1Eje.push(anomsSeguidor);
+                this.seguidores1ejeAnoms.push(seg);
+              } else {
+                this.seguidores1ejeNoAnoms.push(seg);
+              }
+            });
 
-              this.seguidoresInforme.forEach((seguidor) => {
-                const anomaliasSeguidor = seguidor.anomaliasCliente;
-                if (anomaliasSeguidor.length > 0) {
-                  this.anomaliasInforme.push(...anomaliasSeguidor);
-                }
-              });
-            }
             // obtenemos la altura maxima de los modulos
             this.alturaMax = this.getAlturaMax();
 
@@ -307,9 +296,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               }
               this.setImgPlanoPlanta(this.largestLocAreas, 'visual');
             }
-
-            // }
-            // }
 
             // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
             this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
@@ -441,21 +427,21 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                 elegible: true,
               });
 
-              // if (this.planta.tipo === '1 eje') {
-              //   this.apartadosInforme.push({
-              //     nombre: 'anexoSeguidores1EjeAnoms',
-              //     descripcion: 'Anexo III: Anomalías térmicas por seguidor',
-              //     orden: 17,
-              //     elegible: true,
-              //   });
+              if (this.planta.tipo === '1 eje') {
+                this.apartadosInforme.push({
+                  nombre: 'anexoSeguidores1EjeAnoms',
+                  descripcion: 'Anexo III: Anomalías térmicas por seguidor',
+                  orden: 17,
+                  elegible: true,
+                });
 
-              //   this.apartadosInforme.push({
-              //     nombre: 'anexoSeguidores1EjeNoAnoms',
-              //     descripcion: 'Anexo III: Seguidores sin anomalías',
-              //     orden: 18,
-              //     elegible: true,
-              //   });
-              // }
+                this.apartadosInforme.push({
+                  nombre: 'anexoSeguidores1EjeNoAnoms',
+                  descripcion: 'Anexo III: Seguidores sin anomalías',
+                  orden: 18,
+                  elegible: true,
+                });
+              }
             }
 
             if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
@@ -562,94 +548,98 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       // Imagenes anomalías
       this.countAnomalias = 0;
       this.anomaliasInforme.forEach((anomalia, index) => {
-        if (index < 2) {
-          this.setImgAnomaliaCanvas(anomalia);
-          this.countAnomalias++;
-        }
+        // if (index < 2) {
+        this.setImgAnomaliaCanvas(anomalia);
+        this.countAnomalias++;
+        // }
       });
 
-      // if (this.planta.tipo === '1 eje') {
-      //   // Imagenes S1E con anomalías
-      //   this.seguidores1ejeAnoms.forEach((seg, index) => {
-      //     if (index < 2) {
-      //       this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
-      //     }
-      //   });
+      if (this.planta.tipo === '1 eje') {
+        // Imagenes S1E con anomalías
+        this.seguidores1ejeAnoms.forEach((seg, index) => {
+          // if (index < 2) {
+          this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
+          // }
+        });
 
-      //   // Imagenes S1E sin anomalías
-      //   this.seguidores1ejeNoAnoms.forEach((seg, index) => {
-      //     if (index < 2) {
-      //       this.setImgSeguidor1EjeCanvas(seg, index);
-      //     }
-      //   });
+        // Imagenes S1E sin anomalías
+        this.seguidores1ejeNoAnoms.forEach((seg, index) => {
+          // if (index < 2) {
+          this.setImgSeguidor1EjeCanvas(seg, index);
+          // }
+        });
 
-      //   // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-      //   let downloads = 0;
+        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+        let downloads = 0;
 
-      //   this.subscriptions.add(
-      //     combineLatest([
-      //       this.countLoadedImages$,
-      //       this.countLoadedImagesSegs1EjeAnoms$,
-      //       this.countLoadedImagesSegs1EjeNoAnoms$,
-      //     ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
-      //       this.downloadReportService.progressBarValue = Math.round(
-      //         ((countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
-      //           (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
-      //           100
-      //       );
+        this.subscriptions.add(
+          combineLatest([
+            this.countLoadedImages$,
+            this.countLoadedImagesSegs1EjeAnoms$,
+            this.countLoadedImagesSegs1EjeNoAnoms$,
+          ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
+            this.downloadReportService.progressBarValue = Math.round(
+              ((countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
+                (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
+                100
+            );
 
-      //       // Cuando se carguen todas las imágenes
-      //       if (
-      //         countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
-      //           4 /* + this.countAnomalias + this.seguidores1ejeAnoms.length */ +
-      //             this.seguidores1ejeNoAnoms.length -
-      //             400 &&
-      //         downloads === 0
-      //       ) {
-      //         this.calcularInforme();
+            // comprobamos que estan cargadas tb el resto de imagenes del PDF
+            this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
+              // Cuando se carguen todas las imágenes
+              if (
+                imagesLoaded &&
+                countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
+                  +this.countAnomalias + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length &&
+                downloads === 0
+              ) {
+                this.calcularInforme();
 
-      //         pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
-      //           this.downloadReportService.progressBarValue = 0;
+                pdfMake
+                  .createPdf(this.getDocDefinition(this.imageListBase64))
+                  .download(this.getPrefijoInforme(), () => {
+                    this.downloadReportService.progressBarValue = 0;
 
-      //           this.downloadReportService.generatingPDF = false;
-      //         });
-      //         this.downloadReportService.endingPDF = true;
+                    this.downloadReportService.generatingPDF = false;
+                  });
+                this.downloadReportService.endingPDF = true;
 
-      //         downloads++;
-      //       }
-      //     })
-      //   );
-      // } else {
+                downloads++;
+              }
+            });
+          })
+        );
+      } else {
+        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+        let downloads = 0;
 
-      // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-      let downloads = 0;
+        this.subscriptions.add(
+          this.countLoadedImages$.subscribe((countLoadedImgs) => {
+            this.downloadReportService.progressBarValue = Math.round(
+              (countLoadedImgs / this.anomaliasInforme.length) * 100
+            );
 
-      this.subscriptions.add(
-        this.countLoadedImages$.subscribe((countLoadedImgs) => {
-          this.downloadReportService.progressBarValue = Math.round(
-            (countLoadedImgs / this.anomaliasInforme.length) * 100
-          );
+            // comprobamos que estan cargadas tb el resto de imagenes del PDF
+            this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
+              // Cuando se carguen todas las imágenes
+              if (imagesLoaded && countLoadedImgs === this.countAnomalias && downloads === 0) {
+                this.calcularInforme();
 
-          // comprobamos que estan cargadas tb el resto de imagenes del PDF
-          this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-            // Cuando se carguen todas las imágenes
-            if (imagesLoaded && 2 /* countLoadedImgs */ === this.countAnomalias && downloads === 0) {
-              this.calcularInforme();
+                pdfMake
+                  .createPdf(this.getDocDefinition(this.imageListBase64))
+                  .download(this.getPrefijoInforme(), () => {
+                    this.downloadReportService.progressBarValue = 0;
 
-              pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
-                this.downloadReportService.progressBarValue = 0;
+                    this.downloadReportService.generatingPDF = false;
+                  });
+                this.downloadReportService.endingPDF = true;
 
-                this.downloadReportService.generatingPDF = false;
-              });
-              this.downloadReportService.endingPDF = true;
-
-              downloads++;
-            }
-          });
-        })
-      );
-
-      // }
+                downloads++;
+              }
+            });
+          })
+        );
+      }
     } else {
       // Generar imagenes
       this.countSeguidores = 0;
@@ -3195,7 +3185,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (let i = 0; i < 2 /* this.anomaliasInforme.length */; i++) {
+    for (let i = 0; i < this.anomaliasInforme.length; i++) {
       const anom = this.anomaliasInforme[i];
 
       const pagAnexo = [
@@ -3241,7 +3231,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           columns: [
             { text: 'Módulo', width: 200, style: 'anomInfoTitle' },
-            { text: this.anomaliaInfoService.getModuloLabel(anom), style: 'anomInfoValue' },
+            { text: this.translation.t(this.anomaliaInfoService.getModuloLabel(anom)), style: 'anomInfoValue' },
           ],
         },
         {
@@ -3251,7 +3241,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               width: 200,
               style: 'anomInfoTitle',
             },
-            { text: this.translation.t(this.anomaliaInfoService.getCriticidadLabel(anom)), style: 'anomInfoValue' },
+            {
+              text: this.translation.t('Leve' /* this.anomaliaInfoService.getCriticidadLabel(anom) */),
+              style: 'anomInfoValue',
+            },
           ],
         },
         {
@@ -3316,8 +3309,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     allPagsAnexo.push(pag1Anexo);
 
     for (let i = 0; i < this.seguidores1ejeAnoms.length; i++) {
-      const seg = this.seguidores1ejeAnoms[i];
-
       const segTable = this.getSeg1ejeTable();
 
       const anoms = this.anomSeguidores1Eje[i];
@@ -4044,7 +4035,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     } else if (columnaNombre === 'severidad') {
       return anomalia.clase.toString();
     } else if (columnaNombre === 'criticidad') {
-      return this.labelsCriticidad[anomalia.criticidad];
+      return 'Leve' /* this.labelsCriticidad[anomalia.criticidad] */;
     } else if (columnaNombre === 'local_id') {
       return this.getLocalId(anomalia);
     } else {
@@ -4162,8 +4153,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         style: 'tableCell',
       });
 
+      let percentage = 0;
+      if (countAnomalias > 0) {
+        percentage = (countAnomalias / anomsTabla.length) * 100;
+      }
+
       arrayFila.push({
-        text: this.decimalPipe.transform((countAnomalias / anomsTabla.length) * 100, '1.0-2') + '%',
+        text: this.decimalPipe.transform(percentage, '1.0-2') + '%',
         style: 'tableCell',
       });
 

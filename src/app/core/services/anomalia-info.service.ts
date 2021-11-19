@@ -91,10 +91,16 @@ export class AnomaliaInfoService {
   }
 
   getModuloLabel(anomalia: Anomalia): string {
-    if (!anomalia.hasOwnProperty('modulo')) {
+    if (
+      !anomalia.hasOwnProperty('modulo') ||
+      anomalia.modulo === null ||
+      anomalia.modulo === undefined ||
+      anomalia.modulo === ''
+    ) {
       return 'Desconocido';
     }
     const modulo = anomalia.modulo;
+
     let labelModulo = '';
     if (modulo !== null) {
       if (modulo.hasOwnProperty('marca')) {
