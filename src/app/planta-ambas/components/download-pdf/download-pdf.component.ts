@@ -6,26 +6,19 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
-import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
 import Map from 'ol/Map';
 import { TileCoord } from 'ol/tilecoord';
-import TileGrid from 'ol/tilegrid/TileGrid';
-import { Extent } from 'ol/extent';
 import { Coordinate } from 'ol/coordinate';
-import { fromLonLat } from 'ol/proj';
 import TileLayer from 'ol/layer/Tile';
 import { LocationAreaInterface } from '@core/models/location';
-import { LatLngLiteral } from '@agm/core';
 
 import pdfMake from 'pdfmake/build/pdfmake.js';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
-import inside from 'point-in-polygon';
-
-import 'fabric';
-declare let fabric;
+import { fabric } from 'fabric';
 
 import { ReportControlService } from '@core/services/report-control.service';
 import { DownloadReportService } from '@core/services/download-report.service';
@@ -37,6 +30,7 @@ import { OlMapService } from '@core/services/ol-map.service';
 import { ImageProcessService } from '../../services/image-process.service';
 import { AnomaliaInfoService } from '@core/services/anomalia-info.service';
 import { ImagesLoadService } from '../../services/images-load.service';
+import { ImagesTilesService } from '../../services/images-tiles.service';
 
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
 import { Translation } from '@shared/utils/translations/translations';
@@ -155,7 +149,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     private olMapService: OlMapService,
     private imageProcessService: ImageProcessService,
     private anomaliaInfoService: AnomaliaInfoService,
-    private imagesLoadService: ImagesLoadService
+    private imagesLoadService: ImagesLoadService,
+    private imagesTilesService: ImagesTilesService
   ) {}
 
   ngOnInit(): void {
@@ -167,6 +162,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           this.language = 'es';
         }
       })
+    );
+
+    this.subscriptions.add(
+      this.imagesTilesService.layerInformeSelected$.subscribe((layer) => (this.layerInformeSelected = layer))
     );
 
     this.numTipos = Array(GLOBAL.labels_tipos.length)
@@ -274,9 +273,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
               // imágenes planta completa
               if (this.planta.tipo !== 'seguidores') {
-                this.setImgPlanoPlanta(this.largestLocAreas, 'thermal', this.anomaliasInforme);
+                this.imagesTilesService.setImgPlanoPlanta(
+                  this.largestLocAreas,
+                  'thermal',
+                  this.selectedInforme.id,
+                  this.anomaliasInforme
+                );
               }
-              this.setImgPlanoPlanta(this.largestLocAreas, 'visual');
+              this.imagesTilesService.setImgPlanoPlanta(this.largestLocAreas, 'visual', this.selectedInforme.id);
             }
 
             // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
@@ -490,6 +494,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.imagesLoadService.imgLogoFooterBase64$.subscribe((img) => (this.imgLogoFooterBase64 = img))
     );
+
+    this.subscriptions.add(
+      this.imagesTilesService.imagesPlantaCompleta$.subscribe((imgs) => (this.imagesPlantaCompleta = imgs))
+    );
   }
 
   private getAlturaMax() {
@@ -530,10 +538,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       // Imagenes anomalías
       this.countAnomalias = 0;
       this.anomaliasInforme.forEach((anomalia, index) => {
-        // if (index < 2) {
-        this.setImgAnomaliaCanvas(anomalia);
-        this.countAnomalias++;
-        // }
+        if (index < 2) {
+          this.setImgAnomaliaCanvas(anomalia);
+          this.countAnomalias++;
+        }
       });
 
       // if (this.planta.tipo === '1 eje') {
@@ -601,21 +609,26 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             (countLoadedImgs / this.anomaliasInforme.length) * 100
           );
 
-          // comprobamos que estan cargadas tb el resto de imagenes del PDF
-          this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-            // Cuando se carguen todas las imágenes
-            if (imagesLoaded && countLoadedImgs === this.countAnomalias && downloads === 0) {
-              this.calcularInforme();
+          // comprobamos que estan cargados los planos de la planta
+          this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
+            // comprobamos que estan cargadas tb el resto de imagenes del PDF
+            this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
+              // Cuando se carguen todas las imágenes
+              if (planosLoaded && imagesLoaded && countLoadedImgs === 2 /* this.countAnomalias */ && downloads === 0) {
+                this.calcularInforme();
 
-              pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
-                this.downloadReportService.progressBarValue = 0;
+                pdfMake
+                  .createPdf(this.getDocDefinition(this.imageListBase64))
+                  .download(this.getPrefijoInforme(), () => {
+                    this.downloadReportService.progressBarValue = 0;
 
-                this.downloadReportService.generatingPDF = false;
-              });
-              this.downloadReportService.endingPDF = true;
+                    this.downloadReportService.generatingPDF = false;
+                  });
+                this.downloadReportService.endingPDF = true;
 
-              downloads++;
-            }
+                downloads++;
+              }
+            });
           });
         })
       );
@@ -931,97 +944,17 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     };
   }
 
-  private getElemExtent(coords: Coordinate[]): Extent[] {
-    const range = 0.001;
-    const extents: Extent[] = [];
-    coords.forEach((coord) => {
-      const extent: Extent = [coord[0] - range, coord[1] - range, coord[0] + range, coord[1] + range];
-      extents.push(extent);
-    });
-
-    return extents;
-  }
-
-  private getElemTiles(coords: Coordinate[], extents: Extent[], zoomLevel: number): TileCoord[] {
-    // obtenemos los tileCoords de cada coordenada
-    let tilesCoord: TileCoord[] = [];
-
-    this.layerInformeSelected = this.map.getLayers().getArray()[0] as TileLayer;
-
-    const source = this.layerInformeSelected.getSource();
-    const tileGrid = source.getTileGrid();
-    extents.forEach((extent, index) => {
-      tileGrid.forEachTileCoord(extent, zoomLevel, (tileCoord) => {
-        const longLatCoords = this.getLongLatFromXYZ(tileCoord, tileGrid);
-        if (inside(coords[index], longLatCoords)) {
-          tilesCoord.push(tileCoord);
-        }
-      });
-    });
-
-    // this.olMapService
-    //   .getThermalLayers()
-    //   .pipe(take(1))
-    //   .subscribe((layers) => {
-    //     console.log(layers);
-    //     console.log(this.selectedInforme);
-    //     this.layerInformeSelected = layers.find((layer) => layer.getProperties().informeId === this.selectedInforme.id);
-    //     const source = this.layerInformeSelected.getSource();
-    //     const tileGrid = source.getTileGrid();
-    //     extents.forEach((extent, index) => {
-    //       tileGrid.forEachTileCoord(extent, zoomLevel, (tileCoord) => {
-    //         const longLatCoords = this.getLongLatFromXYZ(tileCoord, tileGrid);
-    //         if (inside(coords[index], longLatCoords)) {
-    //           tilesCoord.push(tileCoord);
-    //         }
-    //       });
-    //     });
-    //   });
-
-    // obtenemos todos los tiles descartando duplicados
-    tilesCoord = this.getCompleteTiles(tilesCoord);
-
-    return tilesCoord;
-  }
-
-  private getCompleteTiles(tilesCoord: TileCoord[]): TileCoord[] {
-    const tilesCoordCompletes: TileCoord[] = [];
-
-    const coordsX = tilesCoord.map((coord) => coord[1]);
-    const coordsY = tilesCoord.map((coord) => coord[2]);
-    // obtenemos los maximos y le sumamos una para traernos los de alrededor
-    const minX = Math.min(...coordsX) - 1;
-    let maxX = Math.max(...coordsX) + 1;
-    const minY = Math.min(...coordsY) - 1;
-    let maxY = Math.max(...coordsY) + 1;
-
-    // hacemos el grupo cuadrado con lado el que sea mayor de X o Y
-    const rangoX = maxX - minX;
-    const rangoY = maxY - minY;
-    const diferencia = rangoY - rangoX;
-    if (diferencia > 0) {
-      maxX += diferencia;
-    } else if (diferencia < 0) {
-      maxY += Math.abs(diferencia);
-    }
-
-    for (let j = minY; j <= maxY; j++) {
-      for (let i = minX; i <= maxX; i++) {
-        const coord = [tilesCoord[0][0], i, j];
-        tilesCoordCompletes.push(coord);
-      }
-    }
-
-    return tilesCoordCompletes;
-  }
-
   private setImgAnomaliaCanvas(anomalia: Anomalia) {
     let zoomLevel = 22;
     // parche para la planta Logrosan que tiene huecos en la capa termica
     if (this.planta.id === 'AyKgsY6F3TqGQGYNaOUY') {
       zoomLevel = 20;
     }
-    const tileCoords = this.getElemTiles(anomalia.featureCoords, this.getElemExtent(anomalia.featureCoords), zoomLevel);
+    const tileCoords = this.imagesTilesService.getElemTiles(
+      anomalia.featureCoords,
+      this.imagesTilesService.getElemExtent(anomalia.featureCoords),
+      zoomLevel
+    );
 
     const canvas = new fabric.Canvas('canvas');
     const lado = Math.sqrt(tileCoords.length);
@@ -1061,16 +994,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             contador++;
             if (contador === tileCoords.length) {
               const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
-              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
-              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+              const longLatOrigen = this.imagesTilesService.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.imagesTilesService.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
               const coordsPolygonCanvas = this.getCoordsRectangleCanvas(
                 longLatOrigen,
                 longLatFin,
                 anomalia.featureCoords,
                 lado
               );
-              this.drawPolygonInCanvas(anomalia.id, canvas, coordsPolygonCanvas);
-              this.canvasCenterAndZoom(coordsPolygonCanvas, canvas);
+              this.imagesTilesService.drawPolygonInCanvas(anomalia.id, canvas, coordsPolygonCanvas);
+              this.imagesTilesService.canvasCenterAndZoom(coordsPolygonCanvas, canvas);
               this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
                 format: 'png',
               });
@@ -1081,16 +1014,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             contador++;
             if (contador === tileCoords.length) {
               const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
-              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
-              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+              const longLatOrigen = this.imagesTilesService.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.imagesTilesService.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
               const coordsPolygonCanvas = this.getCoordsRectangleCanvas(
                 longLatOrigen,
                 longLatFin,
                 anomalia.featureCoords,
                 lado
               );
-              this.drawPolygonInCanvas(anomalia.id, canvas, coordsPolygonCanvas);
-              this.canvasCenterAndZoom(coordsPolygonCanvas, canvas);
+              this.imagesTilesService.drawPolygonInCanvas(anomalia.id, canvas, coordsPolygonCanvas);
+              this.imagesTilesService.canvasCenterAndZoom(coordsPolygonCanvas, canvas);
               this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
                 format: 'png',
               });
@@ -1103,205 +1036,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         { crossOrigin: 'anonymous' }
       );
     });
-  }
-
-  private setImgPlanoPlanta(locAreas: LocationAreaInterface[], type: string, anomalias?: Anomalia[]) {
-    let tileCoords: TileCoord[] = [];
-    const allLocAreaCoords: Coordinate[] = [];
-    locAreas.forEach((locArea) => {
-      const locAreaCoords = this.pathToCoordinate(locArea.path);
-      allLocAreaCoords.push(...locAreaCoords);
-      tileCoords.push(...this.getElemTiles(locAreaCoords, this.getElemExtent(locAreaCoords), 18));
-    });
-    tileCoords = this.getCompleteTiles(tileCoords);
-
-    const canvas = new fabric.Canvas('canvas');
-    const lado = Math.sqrt(tileCoords.length);
-    canvas.width = lado * this.tileResolution;
-    canvas.height = lado * this.tileResolution;
-    const width = canvas.width / lado;
-    const height = canvas.height / lado;
-
-    let contador = 0;
-    tileCoords.forEach((tileCoord, index) => {
-      const url = GLOBAL.GIS + `${this.selectedInforme.id}_${type}/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
-
-      const left = (index % lado) * width;
-      const top = Math.trunc(index / lado) * height;
-
-      if (type === 'thermal') {
-        const visualUrl =
-          GLOBAL.GIS + `${this.selectedInforme.id}_visual/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
-
-        fabric.util.loadImage(
-          visualUrl,
-          (img) => {
-            if (img !== null) {
-              const image = new fabric.Image(img, {
-                width,
-                height,
-                left,
-                top,
-                angle: 0,
-                opacity: 1,
-                draggable: false,
-                lockMovementX: true,
-                lockMovementY: true,
-                scaleX: 1,
-                scaleY: 1,
-              });
-
-              canvas.add(image);
-              // movemos al fondo para que quede debajo de la termica
-              canvas.moveTo(image, 0);
-
-              contador++;
-              if (contador === tileCoords.length * 2) {
-                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
-              }
-            } else {
-              contador++;
-              if (contador === tileCoords.length * 2) {
-                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
-              }
-            }
-          },
-          null,
-          { crossOrigin: 'anonymous' }
-        );
-
-        fabric.util.loadImage(
-          url,
-          (img) => {
-            if (img !== null) {
-              img = this.imageProcessService.transformPixels(img);
-
-              const image = new fabric.Image(img, {
-                width,
-                height,
-                left,
-                top,
-                angle: 0,
-                opacity: 1,
-                draggable: false,
-                lockMovementX: true,
-                lockMovementY: true,
-                scaleX: 1,
-                scaleY: 1,
-              });
-
-              canvas.add(image);
-
-              contador++;
-              if (contador === tileCoords.length * 2) {
-                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
-              }
-            } else {
-              contador++;
-              if (contador === tileCoords.length * 2) {
-                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
-              }
-            }
-          },
-          null,
-          { crossOrigin: 'anonymous' }
-        );
-      } else {
-        fabric.util.loadImage(
-          url,
-          (img) => {
-            if (img !== null) {
-              if (type === 'thermal') {
-                img = this.imageProcessService.transformPixels(img);
-              }
-
-              const image = new fabric.Image(img, {
-                width,
-                height,
-                left,
-                top,
-                angle: 0,
-                opacity: 1,
-                draggable: false,
-                lockMovementX: true,
-                lockMovementY: true,
-                scaleX: 1,
-                scaleY: 1,
-              });
-
-              canvas.add(image);
-
-              contador++;
-              if (contador === tileCoords.length) {
-                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
-              }
-            } else {
-              contador++;
-              if (contador === tileCoords.length) {
-                this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
-              }
-            }
-          },
-          null,
-          { crossOrigin: 'anonymous' }
-        );
-      }
-    });
-  }
-
-  private createFinalImage(
-    tileCoords: TileCoord[],
-    lado: number,
-    allLocAreaCoords: Coordinate[],
-    anomalias: Anomalia[],
-    canvas: any,
-    type: string
-  ) {
-    const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
-    const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
-    const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
-    const coordsSegCanvas = this.getCoordsPolygonCanvas(longLatOrigen, longLatFin, allLocAreaCoords, lado);
-
-    if (type === 'thermal' && anomalias !== undefined) {
-      this.drawAnomaliasPlanta(anomalias, canvas, longLatOrigen, longLatFin, lado);
-    }
-
-    this.canvasCenterAndZoom(coordsSegCanvas, canvas);
-
-    this.imagesPlantaCompleta[type] = canvas.toDataURL({
-      format: 'png',
-    });
-  }
-
-  private canvasCenterAndZoom(coordsPolygon: number[], canvas: any, trim?: boolean) {
-    const longestSide = Math.max(coordsPolygon[2], coordsPolygon[3]);
-    const polygonCentroid = [coordsPolygon[0] + coordsPolygon[2] / 2, coordsPolygon[1] + coordsPolygon[3] / 2];
-    const zoom = canvas.getWidth() / (longestSide + 120);
-
-    // VERDINALES
-    let desviacion = 1;
-    // if (trim) {
-    //   desviacion = 0.85;
-    // }
-
-    canvas.setZoom(1); // reset zoom so pan actions work as expected
-    const vpw = canvas.width / zoom;
-    const vph = canvas.height / zoom;
-    const x = (polygonCentroid[0] - vpw / 2) * desviacion; // x is the location where the top left of the viewport should be
-    const y = polygonCentroid[1] - vph / 2; // y idem
-    canvas.absolutePan({ x, y });
-    canvas.setZoom(zoom);
-
-    // VERDINALES
-    if (trim) {
-      const left = (canvas.getWidth() / 2) * 0.75;
-      const width = (canvas.getWidth() / 2 - left) * 2;
-      canvas.clipTo = (ctx) => {
-        ctx.rect(left, 0, width, canvas.getWidth());
-      };
-    }
-
-    canvas.renderAll();
   }
 
   private getCoordsRectangleCanvas(
@@ -1337,39 +1071,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     return [polygonLeft, polygonTop, width, height];
   }
 
-  private getCoordsPolygonCanvas(
-    coordsTileOrigen: number[][],
-    coordsTileFin: number[][],
-    polygonCoords: Coordinate[],
-    lado: number
-  ) {
-    const topLeft = coordsTileOrigen[1];
-    const bottomRight = coordsTileFin[3];
-    const longsOrdered = polygonCoords.map((coord) => coord[0]).sort((a, b) => a - b);
-
-    const leftLongitude = longsOrdered[0];
-    const rightLongitude = longsOrdered[longsOrdered.length - 1];
-
-    const latsOrdered = polygonCoords.map((coord) => coord[1]).sort((a, b) => a - b);
-
-    const topLatitude = latsOrdered[latsOrdered.length - 1];
-    const bottomLatitude = latsOrdered[0];
-
-    const polygonLeft = ((leftLongitude - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
-    const polygonRight = ((rightLongitude - topLeft[0]) * (this.tileResolution * lado)) / (bottomRight[0] - topLeft[0]);
-    const polygonTop =
-      (Math.abs(topLatitude - topLeft[1]) * (this.tileResolution * lado)) / Math.abs(bottomRight[1] - topLeft[1]);
-    const polygonBottom =
-      ((bottomLatitude - topLeft[1]) * (this.tileResolution * lado)) / (bottomRight[1] - topLeft[1]);
-    const width = Math.abs(polygonRight - polygonLeft);
-    const height = Math.abs(polygonBottom - polygonTop);
-
-    return [polygonLeft, polygonTop, width, height];
-  }
-
   private setImgSeguidor1EjeCanvas(seg: LocationAreaInterface, count: number, anomalias?: Anomalia[]) {
-    const segCoords = this.pathToCoordinate(seg.path);
-    const tileCoords = this.getElemTiles(segCoords, this.getElemExtent(segCoords), 22);
+    const segCoords = this.imagesTilesService.pathToCoordinate(seg.path);
+    const tileCoords = this.imagesTilesService.getElemTiles(
+      segCoords,
+      this.imagesTilesService.getElemExtent(segCoords),
+      22
+    );
 
     const canvas = new fabric.Canvas('canvas');
     const lado = Math.sqrt(tileCoords.length);
@@ -1409,16 +1117,15 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             contador++;
             if (contador === tileCoords.length) {
               const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
-              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
-              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+              const longLatOrigen = this.imagesTilesService.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.imagesTilesService.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
               const coordsSegCanvas = this.getCoordsRectangleCanvas(longLatOrigen, longLatFin, segCoords, lado);
 
               if (anomalias !== undefined) {
                 this.drawAnomaliasSeguidor(anomalias, canvas, longLatOrigen, longLatFin, lado);
               }
 
-              // this.drawPolygonInCanvas(count.toString(), canvas, coordsSegCanvas);
-              this.canvasCenterAndZoom(coordsSegCanvas, canvas, true);
+              this.imagesTilesService.canvasCenterAndZoom(coordsSegCanvas, canvas, true);
 
               if (anomalias !== undefined) {
                 this.imageListBase64[`imgCanvasSegAnoms${count}`] = canvas.toDataURL({
@@ -1438,16 +1145,15 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             contador++;
             if (contador === tileCoords.length) {
               const tileGrid = this.layerInformeSelected.getSource().getTileGrid();
-              const longLatOrigen = this.getLongLatFromXYZ(tileCoords[0], tileGrid);
-              const longLatFin = this.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
+              const longLatOrigen = this.imagesTilesService.getLongLatFromXYZ(tileCoords[0], tileGrid);
+              const longLatFin = this.imagesTilesService.getLongLatFromXYZ(tileCoords[tileCoords.length - 1], tileGrid);
               const coordsSegCanvas = this.getCoordsRectangleCanvas(longLatOrigen, longLatFin, segCoords, lado);
 
               if (anomalias !== undefined) {
                 this.drawAnomaliasSeguidor(anomalias, canvas, longLatOrigen, longLatFin, lado);
               }
 
-              // this.drawPolygonInCanvas(count.toString(), canvas, coordsSegCanvas);
-              this.canvasCenterAndZoom(coordsSegCanvas, canvas, true);
+              this.imagesTilesService.canvasCenterAndZoom(coordsSegCanvas, canvas, true);
 
               if (anomalias !== undefined) {
                 this.imageListBase64[`imgCanvasSegAnoms${count}`] = canvas.toDataURL({
@@ -1480,51 +1186,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   ): void {
     anomalias.forEach((anom, index) => {
       const coordsAnomCanvas = this.getCoordsRectangleCanvas(coordsOrigen, coordsFin, anom.featureCoords, lado);
-      this.drawPolygonInCanvas(anom.localId, canvas, coordsAnomCanvas, index + 1);
+      this.imagesTilesService.drawPolygonInCanvas(anom.localId, canvas, coordsAnomCanvas, index + 1);
     });
-  }
-
-  private drawAnomaliasPlanta(
-    anomalias: Anomalia[],
-    canvas: any,
-    coordsOrigen: number[][],
-    coordsFin: number[][],
-    lado: number
-  ): void {
-    anomalias.forEach((anom, index) => {
-      const coordsAnomCanvas = this.getCoordsPolygonCanvas(coordsOrigen, coordsFin, anom.featureCoords, lado);
-      this.drawPolygonInCanvas(anom.localId, canvas, coordsAnomCanvas, undefined, 4);
-    });
-  }
-
-  private pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {
-    const coordenadas: Coordinate[] = [];
-    path.forEach((coord) => {
-      const coordenada: Coordinate = fromLonLat([coord.lng, coord.lat]);
-      coordenadas.push(coordenada);
-    });
-    return coordenadas;
-  }
-
-  private getLongLatFromXYZ(tileCoord: TileCoord, tileGrid: TileGrid) {
-    const z = tileCoord[0];
-    const x = tileCoord[1];
-    const y = tileCoord[2];
-    const tileGridOrigin = tileGrid.getOrigin(z);
-    const tileSizeAtResolution = Number(tileGrid.getTileSize(z)) * tileGrid.getResolution(z);
-
-    const bottomLeft = [
-      tileGridOrigin[0] + tileSizeAtResolution * x,
-      tileGridOrigin[1] - tileSizeAtResolution * (y + 1),
-    ];
-    const topLeft = [tileGridOrigin[0] + tileSizeAtResolution * x, tileGridOrigin[1] - tileSizeAtResolution * y];
-    const topRight = [tileGridOrigin[0] + tileSizeAtResolution * (x + 1), tileGridOrigin[1] - tileSizeAtResolution * y];
-    const bottomRight = [
-      tileGridOrigin[0] + tileSizeAtResolution * (x + 1),
-      tileGridOrigin[1] - tileSizeAtResolution * (y + 1),
-    ];
-
-    return [bottomLeft, topLeft, topRight, bottomRight];
   }
 
   private getXYZFromLongLat(long: number, lat: number, zoom): TileCoord {
@@ -1618,60 +1281,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             break;
         }
       });
-  }
-
-  private drawPolygonInCanvas(
-    id: string,
-    canvas: any,
-    coordsPolygonCanvas: number[],
-    index?: number,
-    strokeAnomalia?: number
-  ) {
-    let strokeWidth = 2;
-    let rx = 4;
-    let ry = 4;
-    if (strokeAnomalia !== undefined) {
-      strokeWidth = strokeAnomalia;
-      rx = 0;
-      ry = 0;
-    }
-    const polygon = new fabric.Rect({
-      left: coordsPolygonCanvas[0],
-      top: coordsPolygonCanvas[1],
-      fill: 'rgba(0,0,0,0)',
-      stroke: 'white',
-      strokeWidth,
-      width: coordsPolygonCanvas[2],
-      height: coordsPolygonCanvas[3],
-      hasControls: false,
-      lockMovementY: true,
-      lockMovementX: true,
-      anomId: id,
-      ref: 'anom',
-      selectable: false,
-      hoverCursor: 'pointer',
-      rx,
-      ry,
-    });
-
-    canvas.add(polygon);
-
-    if (index !== undefined) {
-      const label = new fabric.Text(index.toString(), {
-        left: coordsPolygonCanvas[0],
-        top: coordsPolygonCanvas[1] - 26,
-        fontSize: 20,
-        // textBackgroundColor: 'red',
-        ref: 'text',
-        selectable: false,
-        hoverCursor: 'default',
-        fill: 'white',
-      });
-
-      canvas.add(label);
-    }
-
-    canvas.renderAll();
   }
 
   private drawAllPcsInCanvas(pcs: PcInterface[], canvas, vistaPrevia: boolean = false, scale = 1, top0 = 0, left0 = 0) {
@@ -3165,7 +2774,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (let i = 0; i < this.anomaliasInforme.length; i++) {
+    for (let i = 0; i < 2 /* this.anomaliasInforme.length */; i++) {
       const anom = this.anomaliasInforme[i];
 
       const pagAnexo = [
@@ -4202,6 +3811,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     this.imageProcessService.resetService();
     this.imagesLoadService.resetService();
+    this.imagesTilesService.resetService();
   }
 
   //////////////////////////////////////////////////////

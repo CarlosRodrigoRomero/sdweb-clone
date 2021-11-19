@@ -348,6 +348,7 @@ export class ImagesLoadService {
     this.imgSolardroneBase64 = undefined;
     this.imgFormulaMaeBase64 = undefined;
     this.imgCurvaMaeBase64 = undefined;
+    this.imgLogoFooterBase64 = undefined;
   }
 
   ////////////////////////////////////////////////////////////
