@@ -19,7 +19,7 @@ export class ImagesLoadService {
   private _loadedChangingImages = 0;
   private loadedChangingImages$ = new BehaviorSubject<number>(this._loadedChangingImages);
 
-  private numFixedImages = 3;
+  private numFixedImages = 4;
   private _loadedFixedImages = 0;
   private loadedFixedImages$ = new BehaviorSubject<number>(this._loadedFixedImages);
 
@@ -53,6 +53,10 @@ export class ImagesLoadService {
   widthCurvaMae = 300;
   private _imgCurvaMaeBase64: string = undefined;
   imgCurvaMaeBase64$ = new BehaviorSubject<string>(this._imgCurvaMaeBase64);
+
+  widthImgLogoFooter = 150;
+  private _imgLogoFooterBase64: string = undefined;
+  imgLogoFooterBase64$ = new BehaviorSubject<string>(this._imgLogoFooterBase64);
 
   constructor(private storage: AngularFireStorage, private downloadReportService: DownloadReportService) {}
 
@@ -178,7 +182,7 @@ export class ImagesLoadService {
         console.log('Error al obtener la imagen de portada ', error);
         // añadimos un canvas blanco cuando no hay imagen
         const canvas = document.createElement('canvas');
-        
+
         this.imgPortadaBase64 = canvas.toDataURL('png');
         // indicamos que la imagen se ha cargado
         this.loadedChangingImages++;
@@ -301,6 +305,35 @@ export class ImagesLoadService {
       null,
       { crossOrigin: 'anonymous' }
     );
+
+    // LOGO SOLARDRONE FOOTER
+    fabric.util.loadImage(
+      `../../../assets/images/logo_sd.png`,
+      (img) => {
+        const canvas = new fabric.Canvas('canvas');
+        const newWidth =
+          this.widthImgLogoFooter * this.imgQuality > img.width ? img.width : this.widthImgLogoFooter * this.imgQuality;
+
+        const scaleFactor = newWidth / img.width;
+        const newHeight = img.height * scaleFactor;
+
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+
+        const image = new fabric.Image(img, {
+          scaleX: scaleFactor,
+          scaleY: scaleFactor,
+        });
+
+        canvas.add(image);
+
+        this.imgLogoFooterBase64 = canvas.toDataURL('png');
+        // indicamos que la imagen se ha cargado
+        this.loadedFixedImages++;
+      },
+      null,
+      { crossOrigin: 'anonymous' }
+    );
   }
 
   resetService() {
@@ -398,5 +431,14 @@ export class ImagesLoadService {
   set loadedFixedImages(value: number) {
     this._loadedFixedImages = value;
     this.loadedFixedImages$.next(value);
+  }
+
+  get imgLogoFooterBase64() {
+    return this._imgLogoFooterBase64;
+  }
+
+  set imgLogoFooterBase64(value: string) {
+    this._imgLogoFooterBase64 = value;
+    this.imgLogoFooterBase64$.next(value);
   }
 }

@@ -99,11 +99,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   // IMAGENES
   private imgLogoBase64: string;
   private imgPortadaBase64: string;
-  private widthPlano: number;
   private imgIrradianciaBase64: string;
   private imgSuciedadBase64: string;
   private imgFormulaMaeBase64: string;
   private imgCurvaMaeBase64: string;
+  private imgLogoFooterBase64: string;
+
+  private widthPlano: number;
   private widthLogoOriginal: number;
   private imageListBase64 = {};
   private tileResolution = 256;
@@ -193,29 +195,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     );
 
     // suscripciones a las imagenes
-    this.subscriptions.add(
-      this.imagesLoadService.imgIrradianciaBase64$.subscribe((img) => (this.imgIrradianciaBase64 = img))
-    );
-
-    this.subscriptions.add(
-      this.imagesLoadService.imgSuciedadBase64$.subscribe((img) => (this.imgSuciedadBase64 = img))
-    );
-
-    this.subscriptions.add(this.imagesLoadService.imgPortadaBase64$.subscribe((img) => (this.imgPortadaBase64 = img)));
-
-    this.subscriptions.add(this.imagesLoadService.imgLogoBase64$.subscribe((img) => (this.imgLogoBase64 = img)));
-
-    this.subscriptions.add(
-      this.imagesLoadService.imgSolardroneBase64$.subscribe((img) => (this.imgSolardroneBase64 = img))
-    );
-
-    this.subscriptions.add(
-      this.imagesLoadService.imgFormulaMaeBase64$.subscribe((img) => (this.imgFormulaMaeBase64 = img))
-    );
-
-    this.subscriptions.add(
-      this.imagesLoadService.imgCurvaMaeBase64$.subscribe((img) => (this.imgCurvaMaeBase64 = img))
-    );
+    this.loadOtherImages();
 
     this.imageProcessService.initService().then(() => {
       this.subscriptions.add(
@@ -514,6 +494,36 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     );
   }
 
+  private loadOtherImages() {
+    this.subscriptions.add(
+      this.imagesLoadService.imgIrradianciaBase64$.subscribe((img) => (this.imgIrradianciaBase64 = img))
+    );
+
+    this.subscriptions.add(
+      this.imagesLoadService.imgSuciedadBase64$.subscribe((img) => (this.imgSuciedadBase64 = img))
+    );
+
+    this.subscriptions.add(this.imagesLoadService.imgPortadaBase64$.subscribe((img) => (this.imgPortadaBase64 = img)));
+
+    this.subscriptions.add(this.imagesLoadService.imgLogoBase64$.subscribe((img) => (this.imgLogoBase64 = img)));
+
+    this.subscriptions.add(
+      this.imagesLoadService.imgSolardroneBase64$.subscribe((img) => (this.imgSolardroneBase64 = img))
+    );
+
+    this.subscriptions.add(
+      this.imagesLoadService.imgFormulaMaeBase64$.subscribe((img) => (this.imgFormulaMaeBase64 = img))
+    );
+
+    this.subscriptions.add(
+      this.imagesLoadService.imgCurvaMaeBase64$.subscribe((img) => (this.imgCurvaMaeBase64 = img))
+    );
+
+    this.subscriptions.add(
+      this.imagesLoadService.imgLogoFooterBase64$.subscribe((img) => (this.imgLogoFooterBase64 = img))
+    );
+  }
+
   private getAlturaMax() {
     return Math.max(...[...this.anomaliasInforme.map((anom) => anom.localY), this.planta.filas]);
   }
@@ -552,10 +562,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       // Imagenes anomalías
       this.countAnomalias = 0;
       this.anomaliasInforme.forEach((anomalia, index) => {
-        // if (index < 2) {
-        this.setImgAnomaliaCanvas(anomalia);
-        this.countAnomalias++;
-        // }
+        if (index < 2) {
+          this.setImgAnomaliaCanvas(anomalia);
+          this.countAnomalias++;
+        }
       });
 
       // if (this.planta.tipo === '1 eje') {
@@ -623,7 +633,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           // comprobamos que estan cargadas tb el resto de imagenes del PDF
           this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
             // Cuando se carguen todas las imágenes
-            if (imagesLoaded && countLoadedImgs === this.countAnomalias && downloads === 0) {
+            if (imagesLoaded && 2 /* countLoadedImgs */ === this.countAnomalias && downloads === 0) {
               this.calcularInforme();
 
               pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
@@ -808,19 +818,23 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         if (currentPage > 1) {
           return {
             table: {
+              widths: [300, '*'],
               body: [
                 [
-                  {
-                    text: currentPage,
-                    alignment: 'center',
-                    color: 'grey',
-                    // margin: [0, 10, 0, 0],
-                  },
-                  {
-                    image: this.imgLogoBase64,
-                    width: this.imagesLoadService.scaleImgLogoHeader * this.imagesLoadService.widthLogoEmpresa,
-                    alignment: 'center',
-                  },
+                  
+                    {
+                      text: currentPage,
+                      alignment: 'right',
+                      color: 'grey',
+                      margin: [0, 10, 0, 0],
+                    },
+                    {
+                      image: this.imgLogoFooterBase64,
+                      width: this.imagesLoadService.widthImgLogoFooter,
+                      alignment: 'right',
+                      margin: [0, -10, 15, 0],
+                    },
+                  
                 ],
               ],
             },
@@ -3183,7 +3197,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (let i = 0; i < this.anomaliasInforme.length; i++) {
+    for (let i = 0; i < 2 /* this.anomaliasInforme.length */; i++) {
       const anom = this.anomaliasInforme[i];
 
       const pagAnexo = [
