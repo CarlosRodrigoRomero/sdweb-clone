@@ -178,23 +178,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
-    // this.subscriptions.add(
-    //   this.downloadReportService.seguidores1Eje$.subscribe((segs) => {
-    //     console.log(segs, this.anomaliasInforme);
-    //     segs.forEach((seg) => {
-    //       const anomsSeguidor = this.anomaliasInforme.filter(
-    //         (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
-    //       );
-    //       if (anomsSeguidor.length > 0) {
-    //         this.anomSeguidores1Eje.push(anomsSeguidor);
-    //         this.seguidores1ejeAnoms.push(seg);
-    //       } else {
-    //         this.seguidores1ejeNoAnoms.push(seg);
-    //       }
-    //     });
-    //   })
-    // );
-
     // suscripciones a las imagenes
     this.loadOtherImages();
 
@@ -207,9 +190,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             switchMap((planta) => {
               this.planta = planta;
 
-              if (this.planta.tipo === '1 eje') {
-                this.downloadReportService.getSeguidores1Eje(this.planta.id);
-              }
+              // if (this.planta.tipo === '1 eje') {
+              //   this.downloadReportService.getSeguidores1Eje(this.planta.id);
+              // }
 
               this.plantaService.planta = planta;
 
@@ -266,7 +249,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             })
           )
           .subscribe((segs) => {
-            console.log(segs, this.anomaliasInforme);
             segs.forEach((seg) => {
               const anomsSeguidor = this.anomaliasInforme.filter(
                 (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
@@ -427,21 +409,21 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                 elegible: true,
               });
 
-              if (this.planta.tipo === '1 eje') {
-                this.apartadosInforme.push({
-                  nombre: 'anexoSeguidores1EjeAnoms',
-                  descripcion: 'Anexo III: Anomalías térmicas por seguidor',
-                  orden: 17,
-                  elegible: true,
-                });
+              // if (this.planta.tipo === '1 eje') {
+              //   this.apartadosInforme.push({
+              //     nombre: 'anexoSeguidores1EjeAnoms',
+              //     descripcion: 'Anexo III: Anomalías térmicas por seguidor',
+              //     orden: 17,
+              //     elegible: true,
+              //   });
 
-                this.apartadosInforme.push({
-                  nombre: 'anexoSeguidores1EjeNoAnoms',
-                  descripcion: 'Anexo III: Seguidores sin anomalías',
-                  orden: 18,
-                  elegible: true,
-                });
-              }
+              //   this.apartadosInforme.push({
+              //     nombre: 'anexoSeguidores1EjeNoAnoms',
+              //     descripcion: 'Anexo III: Seguidores sin anomalías',
+              //     orden: 18,
+              //     elegible: true,
+              //   });
+              // }
             }
 
             if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
@@ -554,92 +536,90 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         // }
       });
 
-      if (this.planta.tipo === '1 eje') {
-        // Imagenes S1E con anomalías
-        this.seguidores1ejeAnoms.forEach((seg, index) => {
-          // if (index < 2) {
-          this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
-          // }
-        });
+      // if (this.planta.tipo === '1 eje') {
+      //   // Imagenes S1E con anomalías
+      //   this.seguidores1ejeAnoms.forEach((seg, index) => {
+      //     // if (index < 2) {
+      //     this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
+      //     // }
+      //   });
 
-        // Imagenes S1E sin anomalías
-        this.seguidores1ejeNoAnoms.forEach((seg, index) => {
-          // if (index < 2) {
-          this.setImgSeguidor1EjeCanvas(seg, index);
-          // }
-        });
+      //   // Imagenes S1E sin anomalías
+      //   this.seguidores1ejeNoAnoms.forEach((seg, index) => {
+      //     // if (index < 2) {
+      //     this.setImgSeguidor1EjeCanvas(seg, index);
+      //     // }
+      //   });
 
-        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-        let downloads = 0;
+      //   // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+      //   let downloads = 0;
 
-        this.subscriptions.add(
-          combineLatest([
-            this.countLoadedImages$,
-            this.countLoadedImagesSegs1EjeAnoms$,
-            this.countLoadedImagesSegs1EjeNoAnoms$,
-          ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
-            this.downloadReportService.progressBarValue = Math.round(
-              ((countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
-                (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
-                100
-            );
+      //   this.subscriptions.add(
+      //     combineLatest([
+      //       this.countLoadedImages$,
+      //       this.countLoadedImagesSegs1EjeAnoms$,
+      //       this.countLoadedImagesSegs1EjeNoAnoms$,
+      //     ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
+      //       this.downloadReportService.progressBarValue = Math.round(
+      //         ((countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
+      //           (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
+      //           100
+      //       );
 
-            // comprobamos que estan cargadas tb el resto de imagenes del PDF
-            this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-              // Cuando se carguen todas las imágenes
-              if (
-                imagesLoaded &&
-                countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
-                  +this.countAnomalias + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length &&
-                downloads === 0
-              ) {
-                this.calcularInforme();
+      //       // comprobamos que estan cargadas tb el resto de imagenes del PDF
+      //       this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
+      //         // Cuando se carguen todas las imágenes
+      //         if (
+      //           imagesLoaded &&
+      //           countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
+      //             +this.countAnomalias + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length &&
+      //           downloads === 0
+      //         ) {
+      //           this.calcularInforme();
 
-                pdfMake
-                  .createPdf(this.getDocDefinition(this.imageListBase64))
-                  .download(this.getPrefijoInforme(), () => {
-                    this.downloadReportService.progressBarValue = 0;
+      //           pdfMake
+      //             .createPdf(this.getDocDefinition(this.imageListBase64))
+      //             .download(this.getPrefijoInforme(), () => {
+      //               this.downloadReportService.progressBarValue = 0;
 
-                    this.downloadReportService.generatingPDF = false;
-                  });
-                this.downloadReportService.endingPDF = true;
+      //               this.downloadReportService.generatingPDF = false;
+      //             });
+      //           this.downloadReportService.endingPDF = true;
 
-                downloads++;
-              }
-            });
-          })
-        );
-      } else {
-        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-        let downloads = 0;
+      //           downloads++;
+      //         }
+      //       });
+      //     })
+      //   );
+      // } else {
+      // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+      let downloads = 0;
 
-        this.subscriptions.add(
-          this.countLoadedImages$.subscribe((countLoadedImgs) => {
-            this.downloadReportService.progressBarValue = Math.round(
-              (countLoadedImgs / this.anomaliasInforme.length) * 100
-            );
+      this.subscriptions.add(
+        this.countLoadedImages$.subscribe((countLoadedImgs) => {
+          this.downloadReportService.progressBarValue = Math.round(
+            (countLoadedImgs / this.anomaliasInforme.length) * 100
+          );
 
-            // comprobamos que estan cargadas tb el resto de imagenes del PDF
-            this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-              // Cuando se carguen todas las imágenes
-              if (imagesLoaded && countLoadedImgs === this.countAnomalias && downloads === 0) {
-                this.calcularInforme();
+          // comprobamos que estan cargadas tb el resto de imagenes del PDF
+          this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
+            // Cuando se carguen todas las imágenes
+            if (imagesLoaded && countLoadedImgs === this.countAnomalias && downloads === 0) {
+              this.calcularInforme();
 
-                pdfMake
-                  .createPdf(this.getDocDefinition(this.imageListBase64))
-                  .download(this.getPrefijoInforme(), () => {
-                    this.downloadReportService.progressBarValue = 0;
+              pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
+                this.downloadReportService.progressBarValue = 0;
 
-                    this.downloadReportService.generatingPDF = false;
-                  });
-                this.downloadReportService.endingPDF = true;
+                this.downloadReportService.generatingPDF = false;
+              });
+              this.downloadReportService.endingPDF = true;
 
-                downloads++;
-              }
-            });
-          })
-        );
-      }
+              downloads++;
+            }
+          });
+        })
+      );
+      // }
     } else {
       // Generar imagenes
       this.countSeguidores = 0;
