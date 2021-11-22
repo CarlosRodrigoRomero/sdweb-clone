@@ -34,6 +34,7 @@ import { ImagesTilesService } from '../../services/images-tiles.service';
 
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
 import { Translation } from '@shared/utils/translations/translations';
+import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
@@ -133,6 +134,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private anomSeguidores1Eje: Anomalia[][] = [];
   private seguidores1ejeNoAnoms: LocationAreaInterface[] = [];
   private largestLocAreas: LocationAreaInterface[] = [];
+  private informeConImagenes = false;
+  private incluirImagenes = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -160,6 +163,17 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           this.language = 'en';
         } else {
           this.language = 'es';
+        }
+      })
+    );
+
+    // comprobamos el numero de anomalias para imprimir o no imagenes
+    this.subscriptions.add(
+      this.reportControlService.allFilterableElements$.subscribe((elems) => {
+        if (elems.length <= 500) {
+          this.informeConImagenes = true;
+        } else {
+          this.informeConImagenes = false;
         }
       })
     );
@@ -289,164 +303,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             // asignamos los labels del criterio especifico del cliente
             this.labelsCriticidad = this.anomaliaService.criterioCriticidad.labels;
 
-            this.apartadosInforme = [
-              {
-                nombre: 'introduccion',
-                descripcion: 'Introducción',
-                orden: 1,
-                apt: 1,
-                elegible: false,
-              },
-              {
-                nombre: 'criterios',
-                descripcion: 'Criterios de operación',
-                orden: 2,
-                apt: 1,
-                elegible: true,
-              },
-              {
-                nombre: 'normalizacion',
-                descripcion: 'Normalización de gradientes de temperatura',
-                orden: 3,
-                apt: 1,
-                elegible: true,
-              },
-              {
-                nombre: 'datosVuelo',
-                descripcion: 'Datos del vuelo',
-                orden: 4,
-                apt: 1,
-                elegible: true,
-              },
-              // {
-              //   nombre: 'irradiancia',
-              //   descripcion: 'Irradiancia durante el vuelo',
-              //   orden: 5,
-              //   apt: 1,
-              //   elegible: true,
-              // },
-              {
-                nombre: 'paramsTermicos',
-                descripcion: 'Ajuste de parámetros térmicos',
-                orden: 6,
-                apt: 1,
-                elegible: true,
-              },
-              {
-                nombre: 'perdidaPR',
-                descripcion: 'Pérdida de Performance Ratio',
-                orden: 7,
-                apt: 1,
-                elegible: true,
-              },
-              {
-                nombre: 'clasificacion',
-                descripcion: 'Cómo se clasifican las anomalías',
-                orden: 8,
-                apt: 1,
-                elegible: true,
-              },
-              {
-                nombre: 'resultadosClase',
-                descripcion: 'Resultados por clase',
-                orden: 11,
-                apt: 2,
-                elegible: true,
-              },
-              {
-                nombre: 'resultadosCategoria',
-                descripcion: 'Resultados por categoría',
-                orden: 12,
-                apt: 2,
-                elegible: true,
-              },
-              {
-                nombre: 'resultadosPosicion',
-                descripcion: 'Resultados por posición',
-                orden: 13,
-                apt: 2,
-                elegible: true,
-              },
-              {
-                nombre: 'resultadosMAE',
-                descripcion: 'MAE de la planta',
-                orden: 14,
-                apt: 2,
-                elegible: true,
-              },
-              {
-                nombre: 'anexo1',
-                descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
-                orden: 15,
-                elegible: true,
-              },
-            ];
-
-            if (this.planta.tipo === 'seguidores') {
-              this.apartadosInforme.push({
-                nombre: 'anexoSeguidores',
-                descripcion: 'Anexo II: Anomalías térmicas por seguidor',
-                orden: 16,
-                elegible: true,
-              });
-
-              if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
-                this.apartadosInforme.push({
-                  nombre: 'anexoSegsNoAnoms',
-                  descripcion: 'Anexo III: Seguidores sin anomalías',
-                  orden: 17,
-                  elegible: true,
-                });
-              }
-            } else {
-              this.apartadosInforme.push({
-                nombre: 'planoTermico',
-                descripcion: 'Plano térmico',
-                orden: 9,
-                apt: 2,
-                elegible: false,
-              });
-              this.apartadosInforme.push({
-                nombre: 'anexoAnomalias',
-                descripcion: 'Anexo II: Anomalías térmicas',
-                orden: 16,
-                elegible: true,
-              });
-
-              // if (this.planta.tipo === '1 eje') {
-              //   this.apartadosInforme.push({
-              //     nombre: 'anexoSeguidores1EjeAnoms',
-              //     descripcion: 'Anexo III: Anomalías térmicas por seguidor',
-              //     orden: 17,
-              //     elegible: true,
-              //   });
-
-              //   this.apartadosInforme.push({
-              //     nombre: 'anexoSeguidores1EjeNoAnoms',
-              //     descripcion: 'Anexo III: Seguidores sin anomalías',
-              //     orden: 18,
-              //     elegible: true,
-              //   });
-              // }
-            }
-
-            if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
-              this.apartadosInforme.push({
-                nombre: 'planoVisual',
-                descripcion: 'Plano visual',
-                orden: 10,
-                apt: 2,
-                elegible: false,
-              });
-            }
-
-            this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
-              return a.orden - b.orden;
-            });
-
-            // if (this.filtroApartados === undefined) {
-            this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
-            // }
+            // establemos los apartados del informe
+            this.loadApartadosInforme();
           })
       );
     });
@@ -464,6 +322,170 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  private loadApartadosInforme() {
+    this.apartadosInforme = [
+      {
+        nombre: 'introduccion',
+        descripcion: 'Introducción',
+        orden: 1,
+        apt: 1,
+        elegible: false,
+      },
+      {
+        nombre: 'criterios',
+        descripcion: 'Criterios de operación',
+        orden: 2,
+        apt: 1,
+        elegible: true,
+      },
+      {
+        nombre: 'normalizacion',
+        descripcion: 'Normalización de gradientes de temperatura',
+        orden: 3,
+        apt: 1,
+        elegible: true,
+      },
+      {
+        nombre: 'datosVuelo',
+        descripcion: 'Datos del vuelo',
+        orden: 4,
+        apt: 1,
+        elegible: true,
+      },
+      // {
+      //   nombre: 'irradiancia',
+      //   descripcion: 'Irradiancia durante el vuelo',
+      //   orden: 5,
+      //   apt: 1,
+      //   elegible: true,
+      // },
+      {
+        nombre: 'paramsTermicos',
+        descripcion: 'Ajuste de parámetros térmicos',
+        orden: 6,
+        apt: 1,
+        elegible: true,
+      },
+      {
+        nombre: 'perdidaPR',
+        descripcion: 'Pérdida de Performance Ratio',
+        orden: 7,
+        apt: 1,
+        elegible: true,
+      },
+      {
+        nombre: 'clasificacion',
+        descripcion: 'Cómo se clasifican las anomalías',
+        orden: 8,
+        apt: 1,
+        elegible: true,
+      },
+      {
+        nombre: 'resultadosClase',
+        descripcion: 'Resultados por clase',
+        orden: 11,
+        apt: 2,
+        elegible: true,
+      },
+      {
+        nombre: 'resultadosCategoria',
+        descripcion: 'Resultados por categoría',
+        orden: 12,
+        apt: 2,
+        elegible: true,
+      },
+      {
+        nombre: 'resultadosPosicion',
+        descripcion: 'Resultados por posición',
+        orden: 13,
+        apt: 2,
+        elegible: true,
+      },
+      {
+        nombre: 'resultadosMAE',
+        descripcion: 'MAE de la planta',
+        orden: 14,
+        apt: 2,
+        elegible: true,
+      },
+      {
+        nombre: 'anexo1',
+        descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
+        orden: 15,
+        elegible: true,
+      },
+    ];
+
+    if (this.planta.tipo === 'seguidores') {
+      this.apartadosInforme.push({
+        nombre: 'anexoSeguidores',
+        descripcion: 'Anexo II: Anomalías térmicas por seguidor',
+        orden: 16,
+        elegible: true,
+      });
+
+      if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
+        this.apartadosInforme.push({
+          nombre: 'anexoSegsNoAnoms',
+          descripcion: 'Anexo III: Seguidores sin anomalías',
+          orden: 17,
+          elegible: true,
+        });
+      }
+    } else {
+      this.apartadosInforme.push({
+        nombre: 'planoTermico',
+        descripcion: 'Plano térmico',
+        orden: 9,
+        apt: 2,
+        elegible: false,
+      });
+      // solo disponible para plantas con menos de 500 anomalias
+      if (this.informeConImagenes && this.incluirImagenes) {
+        this.apartadosInforme.push({
+          nombre: 'anexoAnomalias',
+          descripcion: 'Anexo II: Anomalías térmicas',
+          orden: 16,
+          elegible: true,
+        });
+      }
+
+      // if (this.planta.tipo === '1 eje') {
+      //   this.apartadosInforme.push({
+      //     nombre: 'anexoSeguidores1EjeAnoms',
+      //     descripcion: 'Anexo III: Anomalías térmicas por seguidor',
+      //     orden: 17,
+      //     elegible: true,
+      //   });
+
+      //   this.apartadosInforme.push({
+      //     nombre: 'anexoSeguidores1EjeNoAnoms',
+      //     descripcion: 'Anexo III: Seguidores sin anomalías',
+      //     orden: 18,
+      //     elegible: true,
+      //   });
+      // }
+    }
+
+    if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
+      this.apartadosInforme.push({
+        nombre: 'planoVisual',
+        descripcion: 'Plano visual',
+        orden: 10,
+        apt: 2,
+        elegible: false,
+      });
+    }
+
+    this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
+      return a.orden - b.orden;
+    });
+
+    // if (this.filtroApartados === undefined) {
+    this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
+    // }
   }
 
   private loadOtherImages() {
@@ -510,6 +532,33 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(() => (this.downloadReportService.filteredPDF = undefined));
   }
 
+  selectDownloadType() {
+    if (this.reportControlService.plantaFija) {
+      if (this.informeConImagenes) {
+        this.selectDownloadAnomImages();
+      } else {
+        this.downloadPDF();
+      }
+    } else {
+      this.downloadPDF();
+    }
+  }
+
+  private selectDownloadAnomImages() {
+    const dialogRef = this.dialog.open(MatDialogConfirmComponent, {
+      data: '¿Quiere incluir imágenes de las anomalías?',
+    });
+
+    dialogRef.afterClosed().subscribe((response: boolean) => {
+      this.incluirImagenes = response;
+
+      // cambiamos los apartados dependiendo de las respuesta
+      this.loadApartadosInforme();
+
+      this.downloadPDF();
+    });
+  }
+
   private getPrefijoInforme() {
     let prefijo = this.selectedInforme.prefijo;
 
@@ -535,14 +584,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.countLoadedImagesSegs1EjeNoAnoms = 0;
 
     if (this.reportControlService.plantaFija) {
-      // Imagenes anomalías
-      this.countAnomalias = 0;
-      this.anomaliasInforme.forEach((anomalia, index) => {
-        if (index < 2) {
+      if (this.informeConImagenes && this.incluirImagenes) {
+        // Imagenes anomalías
+        this.countAnomalias = 0;
+        this.anomaliasInforme.forEach((anomalia, index) => {
+          // if (index < 700) {
           this.setImgAnomaliaCanvas(anomalia);
           this.countAnomalias++;
-        }
-      });
+          // }
+        });
+      }
 
       // if (this.planta.tipo === '1 eje') {
       //   // Imagenes S1E con anomalías
@@ -613,20 +664,37 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
             // comprobamos que estan cargadas tb el resto de imagenes del PDF
             this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-              // Cuando se carguen todas las imágenes
-              if (planosLoaded && imagesLoaded && countLoadedImgs === 2 /* this.countAnomalias */ && downloads === 0) {
-                this.calcularInforme();
+              // comprobamos si se van a cargar imagenes de anomalias
+              if (this.informeConImagenes && this.incluirImagenes) {
+                // Cuando se carguen todas las imágenes
+                if (planosLoaded && imagesLoaded && countLoadedImgs === this.countAnomalias && downloads === 0) {
+                  this.calcularInforme();
 
-                pdfMake
-                  .createPdf(this.getDocDefinition(this.imageListBase64))
-                  .download(this.getPrefijoInforme(), () => {
+                  pdfMake
+                    .createPdf(this.getDocDefinition(this.imageListBase64))
+                    .download(this.getPrefijoInforme(), () => {
+                      this.downloadReportService.progressBarValue = 0;
+
+                      this.downloadReportService.generatingPDF = false;
+                    });
+                  this.downloadReportService.endingPDF = true;
+
+                  downloads++;
+                }
+              } else {
+                // Cuando se carguen todas las imágenes
+                if (planosLoaded && imagesLoaded && downloads === 0) {
+                  this.calcularInforme();
+
+                  pdfMake.createPdf(this.getDocDefinition()).download(this.getPrefijoInforme(), () => {
                     this.downloadReportService.progressBarValue = 0;
 
                     this.downloadReportService.generatingPDF = false;
                   });
-                this.downloadReportService.endingPDF = true;
+                  this.downloadReportService.endingPDF = true;
 
-                downloads++;
+                  downloads++;
+                }
               }
             });
           });
@@ -2774,7 +2842,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     allPagsAnexo.push(pag1Anexo);
 
-    for (let i = 0; i < 2 /* this.anomaliasInforme.length */; i++) {
+    for (let i = 0; i < this.anomaliasInforme.length; i++) {
       const anom = this.anomaliasInforme[i];
 
       const pagAnexo = [

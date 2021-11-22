@@ -140,7 +140,11 @@ export class AnomaliaInfoService {
 
     globals.forEach((coord, index) => {
       if (coord !== undefined && coord !== null && coord !== '') {
-        label += `${this.translation.t(planta.nombreGlobalCoords[index])}: ${coord} / `;
+        if (planta.hasOwnProperty('globalConector')) {
+          label += `${this.translation.t(planta.nombreGlobalCoords[index])}: ${coord} / `;
+        } else {
+          label += `${coord} / `;
+        }
       }
     });
 

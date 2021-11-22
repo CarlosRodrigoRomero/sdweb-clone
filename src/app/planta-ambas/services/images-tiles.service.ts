@@ -49,7 +49,6 @@ export class ImagesTilesService {
   checkImgsPlanosLoaded(): Promise<boolean> {
     return new Promise((loaded) => {
       this.imagesPlantaLoaded$.subscribe((value) => {
-        console.log(this.imagesPlantaCompleta);
         if (this.reportControlService.plantaFija) {
           if (value === 2) {
             loaded(true);

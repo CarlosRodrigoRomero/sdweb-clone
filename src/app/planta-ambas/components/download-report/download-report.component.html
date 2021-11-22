@@ -5,17 +5,21 @@
   <div class="contenedor-menu">
     <h5 (click)="$event.stopPropagation()">Descargas</h5>
     <app-select-language *ngIf="!plantaDemo"></app-select-language>
+
+    <app-download-pdf *ngIf="!plantaDemo"></app-download-pdf>
+
     <a mat-menu-item href="{{ excelUrl }}" download="" [disabled]="!excelExist">
       <mat-icon>calculate</mat-icon>
       <span>EXCEL</span>
       <span class="pronto-disponible" *ngIf="!excelExist"> (pronto disponible)</span>
     </a>
-    <app-download-pdf *ngIf="!plantaDemo"></app-download-pdf>
+
     <!-- DEMO -->
     <a *ngIf="plantaDemo" mat-menu-item href="{{ pdfDemo }}" download="" [disabled]="!excelExist">
       <mat-icon>picture_as_pdf</mat-icon>
       <span>PDF</span>
     </a>
+
     <a
       *ngIf="!reportControlService.plantaFija"
       mat-menu-item
