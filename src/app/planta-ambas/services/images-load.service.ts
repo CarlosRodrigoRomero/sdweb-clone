@@ -156,9 +156,10 @@ export class ImagesLoadService {
             canvas.width = width;
 
             let height = img.height * scaleFactor;
-            if (height > 1200) {
-              height = 1200;
+            if (height > (width * 9) / 16) {
+              height = (width * 9) / 16;
             }
+
             canvas.height = height;
 
             const image = new fabric.Image(img, {
