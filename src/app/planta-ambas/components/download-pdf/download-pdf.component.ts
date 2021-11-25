@@ -194,120 +194,105 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     // suscripciones a las imagenes
     this.loadOtherImages();
 
-    this.imageProcessService.initService().then(() => {
-      this.subscriptions.add(
-        this.plantaService
-          .getPlanta(this.reportControlService.plantaId)
-          .pipe(
-            take(1),
-            switchMap((planta) => {
-              this.planta = planta;
+    this.subscriptions.add(
+      this.plantaService
+        .getPlanta(this.reportControlService.plantaId)
+        .pipe(
+          take(1),
+          switchMap((planta) => {
+            this.planta = planta;
 
-              // if (this.planta.tipo === '1 eje') {
-              //   this.downloadReportService.getSeguidores1Eje(this.planta.id);
-              // }
+            // if (this.planta.tipo === '1 eje') {
+            //   this.downloadReportService.getSeguidores1Eje(this.planta.id);
+            // }
 
-              this.plantaService.planta = planta;
+            this.plantaService.planta = planta;
 
-              this.columnasAnomalia = GLOBAL.columnasAnomPdf;
+            this.columnasAnomalia = GLOBAL.columnasAnomPdf;
 
-              this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
+            this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
 
-              // cargamos las imagenes que no cambian al cambiar de informe
-              this.imagesLoadService.loadFixedImages(this.planta.empresa);
+            // cargamos las imagenes que no cambian al cambiar de informe
+            this.imagesLoadService.loadFixedImages(this.planta.empresa);
 
-              return this.plantaService.getLocationsArea(this.planta.id);
-            }),
-            take(1),
-            switchMap((locAreas) => {
-              this.largestLocAreas = locAreas.filter(
-                (locArea) =>
-                  locArea.globalCoords[0] !== undefined &&
-                  locArea.globalCoords[0] !== null &&
-                  locArea.globalCoords[0] !== ''
-              );
+            return this.plantaService.getLocationsArea(this.planta.id);
+          }),
+          take(1),
+          switchMap((locAreas) => {
+            this.largestLocAreas = locAreas.filter(
+              (locArea) =>
+                locArea.globalCoords[0] !== undefined &&
+                locArea.globalCoords[0] !== null &&
+                locArea.globalCoords[0] !== ''
+            );
 
-              return combineLatest([
-                this.reportControlService.selectedInformeId$,
-                this.downloadReportService.filteredPDF$,
-              ]);
-            }),
-            switchMap(([informeId, filteredPDF]) => {
-              this.selectedInforme = this.reportControlService.informes.find((informe) => informeId === informe.id);
+            return combineLatest([
+              this.reportControlService.selectedInformeId$,
+              this.downloadReportService.filteredPDF$,
+            ]);
+          }),
+          switchMap(([informeId, filteredPDF]) => {
+            this.selectedInforme = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
-              if (this.reportControlService.plantaFija) {
-                this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
-              } else {
-                const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
-                // filtramos los del informe actual y los ordenamos por globals
-                this.seguidoresInforme = allSeguidores
-                  .filter((seg) => seg.informeId === informeId)
-                  .sort(this.downloadReportService.sortByGlobalCoords);
+            if (this.reportControlService.plantaFija) {
+              this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
+            } else {
+              const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
+              // filtramos los del informe actual y los ordenamos por globals
+              this.seguidoresInforme = allSeguidores
+                .filter((seg) => seg.informeId === informeId)
+                .sort(this.downloadReportService.sortByGlobalCoords);
 
-                if (this.seguidoresInforme.length > 0) {
-                  this.seguidoresLoaded = true;
+              if (this.seguidoresInforme.length > 0) {
+                this.seguidoresLoaded = true;
+              }
+
+              this.anomaliasInforme = [];
+
+              this.seguidoresInforme.forEach((seguidor) => {
+                const anomaliasSeguidor = seguidor.anomaliasCliente;
+                if (anomaliasSeguidor.length > 0) {
+                  this.anomaliasInforme.push(...anomaliasSeguidor);
                 }
-
-                this.anomaliasInforme = [];
-
-                this.seguidoresInforme.forEach((seguidor) => {
-                  const anomaliasSeguidor = seguidor.anomaliasCliente;
-                  if (anomaliasSeguidor.length > 0) {
-                    this.anomaliasInforme.push(...anomaliasSeguidor);
-                  }
-                });
-              }
-
-              return this.downloadReportService.seguidores1Eje$;
-            })
-          )
-          .subscribe((segs) => {
-            segs.forEach((seg) => {
-              const anomsSeguidor = this.anomaliasInforme.filter(
-                (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
-              );
-              if (anomsSeguidor.length > 0) {
-                this.anomSeguidores1Eje.push(anomsSeguidor);
-                this.seguidores1ejeAnoms.push(seg);
-              } else {
-                this.seguidores1ejeNoAnoms.push(seg);
-              }
-            });
-
-            // obtenemos la altura maxima de los modulos
-            this.alturaMax = this.getAlturaMax();
-
-            this.arrayFilas = Array(this.alturaMax)
-              .fill(0)
-              .map((_, i) => i + 1);
-            this.arrayColumnas = Array(this.planta.columnas)
-              .fill(0)
-              .map((_, i) => i + 1);
-
-            if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
-              // imágenes planta completa
-              if (this.planta.tipo !== 'seguidores') {
-                this.imagesTilesService.setImgPlanoPlanta(
-                  this.largestLocAreas,
-                  'thermal',
-                  this.selectedInforme.id,
-                  this.anomaliasInforme
-                );
-              }
-              this.imagesTilesService.setImgPlanoPlanta(this.largestLocAreas, 'visual', this.selectedInforme.id);
+              });
             }
 
-            // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
-            this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
-
-            // asignamos los labels del criterio especifico del cliente
-            this.labelsCriticidad = this.anomaliaService.criterioCriticidad.labels;
-
-            // establemos los apartados del informe
-            this.loadApartadosInforme();
+            return this.downloadReportService.seguidores1Eje$;
           })
-      );
-    });
+        )
+        .subscribe((segs) => {
+          segs.forEach((seg) => {
+            const anomsSeguidor = this.anomaliasInforme.filter(
+              (anom) => anom.globalCoords.toString() === seg.globalCoords.toString()
+            );
+            if (anomsSeguidor.length > 0) {
+              this.anomSeguidores1Eje.push(anomsSeguidor);
+              this.seguidores1ejeAnoms.push(seg);
+            } else {
+              this.seguidores1ejeNoAnoms.push(seg);
+            }
+          });
+
+          // obtenemos la altura maxima de los modulos
+          this.alturaMax = this.getAlturaMax();
+
+          this.arrayFilas = Array(this.alturaMax)
+            .fill(0)
+            .map((_, i) => i + 1);
+          this.arrayColumnas = Array(this.planta.columnas)
+            .fill(0)
+            .map((_, i) => i + 1);
+
+          // este es el gradiente mínima bajo el que se filtra por criterio de criticidad
+          this.currentFiltroGradiente = this.anomaliaService.criterioCriticidad.rangosDT[0];
+
+          // asignamos los labels del criterio especifico del cliente
+          this.labelsCriticidad = this.anomaliaService.criterioCriticidad.labels;
+
+          // establemos los apartados del informe
+          this.loadApartadosInforme();
+        })
+    );
 
     this.widthPlano = 500;
 
@@ -532,6 +517,21 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(() => (this.downloadReportService.filteredPDF = undefined));
   }
 
+  private getImgsPlanos() {
+    if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
+      // imágenes planta completa
+      if (this.planta.tipo !== 'seguidores') {
+        this.imagesTilesService.setImgPlanoPlanta(
+          this.largestLocAreas,
+          'thermal',
+          this.selectedInforme.id,
+          this.anomaliasInforme
+        );
+      }
+      this.imagesTilesService.setImgPlanoPlanta(this.largestLocAreas, 'visual', this.selectedInforme.id);
+    }
+  }
+
   selectDownloadType() {
     if (this.reportControlService.plantaFija) {
       if (this.informeConImagenes) {
@@ -576,8 +576,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.downloadReportService.endingPDF = false;
     this.downloadReportService.generatingPDF = true;
 
-    // cargamos imagenes otras imagenes del informe
+    // cargamos imagenes que cambian con cada informe
     this.imagesLoadService.loadChangingImages(this.selectedInforme.id);
+
+    // cargamos las orto termica y visual de la planta
+    this.getImgsPlanos();
 
     this.countLoadedImages = 0;
     this.countLoadedImagesSegs1EjeAnoms = 0;

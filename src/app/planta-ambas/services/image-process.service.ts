@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 
+import { switchMap } from 'rxjs/operators';
+
 import { ThermalService } from '@core/services/thermal.service';
 import { ReportControlService } from '@core/services/report-control.service';
 import { GLOBAL } from '@core/services/global';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
-import { auditTime } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -17,25 +18,25 @@ export class ImageProcessService {
   sliderFloor = 25;
   sliderCeil = 100;
   thermalLayer: ThermalLayerInterface;
+  selectedInformeId: string;
 
-  constructor(private thermalService: ThermalService, private reportControlService: ReportControlService) {}
+  constructor(private thermalService: ThermalService, private reportControlService: ReportControlService) {
+    this.thermalService.sliderMinSource.subscribe((value) => (this.sliderMin = value));
+    this.thermalService.sliderMaxSource.subscribe((value) => (this.sliderMax = value));
 
-  initService() {
-    return new Promise((initService) => {
-      this.thermalService.sliderMinSource.subscribe((value) => (this.sliderMin = value));
-      this.thermalService.sliderMaxSource.subscribe((value) => (this.sliderMax = value));
+    this.reportControlService.selectedInformeId$
+      .pipe(
+        switchMap((informeId) => {
+          this.selectedInformeId = informeId;
 
-      this.thermalService
-        .getThermalLayers()
-        .pipe(auditTime(2000))
-        .subscribe((layers) => {
-          if (this.reportControlService.selectedInformeId !== undefined) {
-            this.thermalLayer = layers.find((tL) => tL.informeId === this.reportControlService.selectedInformeId);
-
-            initService(true);
-          }
-        });
-    });
+          return this.thermalService.getThermalLayers();
+        })
+      )
+      .subscribe((layers) => {
+        if (this.reportControlService.selectedInformeId !== undefined) {
+          this.thermalLayer = layers.find((tL) => tL.informeId === this.selectedInformeId);
+        }
+      });
   }
 
   transformPixels(image) {
