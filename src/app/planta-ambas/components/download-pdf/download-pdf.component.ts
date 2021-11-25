@@ -508,7 +508,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   private getAlturaMax() {
-    return Math.max(...[...this.anomaliasInforme.map((anom) => anom.localY), this.planta.filas]);
+    return Math.max(
+      ...[...this.anomaliasInforme.map((anom) => Number(anom.localY)).filter((fila) => !isNaN(fila)), this.planta.filas]
+    );
   }
 
   public selectFilteredPDF() {

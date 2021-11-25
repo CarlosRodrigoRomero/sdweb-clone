@@ -185,7 +185,9 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
   }
 
   private getAlturaMax() {
-    return Math.max(...[...this.allAnomalias.map((anom) => anom.localY), this.planta.filas]);
+    return Math.max(
+      ...[...this.allAnomalias.map((anom) => Number(anom.localY)).filter((fila) => !isNaN(fila)), this.planta.filas]
+    );
   }
 
   ngOnDestroy(): void {
