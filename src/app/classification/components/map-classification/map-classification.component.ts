@@ -328,9 +328,6 @@ export class MapClassificationComponent implements OnInit {
 
         // no permitimos doble click sobre anomalias
         if (!this.listaAnomalias.map((anom) => anom.id).includes(normMod.id)) {
-          console.log(normMod);
-          console.log(this.listaAnomalias.find((anom) => anom.id === normMod.id));
-
           this.classificationService.normModSelected = normMod;
 
           const coords = this.structuresService.coordsDBToCoordinate(feature.getProperties().properties.normMod.coords);
