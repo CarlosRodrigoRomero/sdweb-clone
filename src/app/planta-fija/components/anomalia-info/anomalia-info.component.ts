@@ -245,20 +245,19 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
     let vientoVelocidad;
     let vientoDireccion;
 
-    const datetime = this.anomaliaSelect.datetime;
-    if (datetime !== undefined && datetime !== null) {
-      fecha = this.unixToDate((this.anomaliaSelect as PcInterface).datetime)[0];
-      if (this.informeSelected.correccHoraSrt !== undefined) {
-        hora = this.unixToDate(
-          (this.anomaliaSelect as PcInterface).datetime + this.informeSelected.correccHoraSrt * 3600
-        )[1];
-      } else {
-        hora = this.unixToDate((this.anomaliaSelect as PcInterface).datetime)[1];
-      }
+    let datetime = this.anomaliaSelect.datetime;
+    if (this.informeSelected.correccHoraSrt !== undefined) {
+      datetime += this.informeSelected.correccHoraSrt * 3600;
     }
-    const irrad = (this.anomaliaSelect as PcInterface).irradiancia;
+    if (datetime !== undefined && datetime !== null) {
+      fecha = this.unixToDate(datetime)[0];
+      hora = this.unixToDate(datetime)[1];
+    }
+    const irrad = this.anomaliaSelect.irradiancia;
     if (irrad !== undefined && irrad !== null) {
       irradiancia = irrad;
+    } else if (this.planta.tipo === 'fija') {
+      irradiancia = this.anomaliaService.getIrradiancia(datetime);
     }
     let emis = this.informeSelected.emisividad;
     if (emis === undefined) {

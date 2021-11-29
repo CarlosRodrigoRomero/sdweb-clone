@@ -238,6 +238,10 @@ export class AnomaliaService {
       });
   }
 
+  async deleteAnomalia(anomalia: Anomalia) {
+    return this.afs.doc('anomalias/' + anomalia.id).delete();
+  }
+
   private getLocalId(anomalia: Anomalia): string {
     const parts: string[] = [];
     anomalia.globalCoords.forEach((coord) => {
@@ -287,10 +291,6 @@ export class AnomaliaService {
   // );
   // return Math.ceil(tMax);
   // }
-
-  async deleteAnomalia(anomalia: Anomalia) {
-    return this.afs.doc('anomalias/' + anomalia.id).delete();
-  }
 
   private getPerdidas(anomalia: Anomalia): number {
     return GLOBAL.pcPerdidas[anomalia.tipo];
@@ -368,6 +368,61 @@ export class AnomaliaService {
     }
 
     return criticidad;
+  }
+
+  getIrradiancia(date: number): number {
+    const diasSolst = this.getDiffDiasSolsticio(date);
+    const long = this.planta.longitud;
+
+    const maxIrrad = 1000;
+    const minIrrad = 900;
+    const maxAncho = -0.01;
+    const minAncho = -0.008;
+    const maxDesplazLaterial = 4; // min/grado
+    const minDesplazLaterial = 2; // min/grado
+
+    const minASolArriba = this.getMinutosASolArriba(date);
+
+    const limiteDiasEstable = 60;
+
+    const A = maxAncho;
+    let B = maxIrrad;
+    if (diasSolst > limiteDiasEstable) {
+      B = ((diasSolst - limiteDiasEstable) / (180 - limiteDiasEstable)) * (minIrrad - maxIrrad) + maxIrrad;
+    }
+    const C = Math.abs(long) * (((minDesplazLaterial - maxDesplazLaterial) * 2 * diasSolst) / 365 + maxDesplazLaterial);
+
+    let irradiancia = A * Math.pow(minASolArriba - C, 2) + B;
+    if (irradiancia < 0) {
+      irradiancia = 0;
+    }
+    return irradiancia;
+  }
+
+  private getDiffDiasSolsticio(date: number): number {
+    const fechaAnom = new Date(date * 1000);
+    const solsticioVerano = new Date(fechaAnom.getFullYear(), 5, 21);
+
+    // Calculamos las diferencia entre las dos fechas
+    const diferenciaFechas = solsticioVerano.getTime() - fechaAnom.getTime();
+
+    // Convertimos a días
+    const difenciaEnDias = diferenciaFechas / (1000 * 3600 * 24);
+
+    return Math.abs(difenciaEnDias);
+  }
+
+  private getMinutosASolArriba(date: number): number {
+    const fecha = new Date(date * 1000);
+    const fechaSolArriba = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), 14, 0, 0, 0);
+
+    // Calculamos las diferencia entre las dos fechas
+    const diferenciaFechas = fechaSolArriba.getTime() - fecha.getTime();
+
+    // convertimos a minutos
+    const difenciaEnMinutos = -(diferenciaFechas / (1000 * 60));
+
+    return difenciaEnMinutos;
   }
 
   public getAlturaCorrecta(anomalias: Anomalia[]) {
