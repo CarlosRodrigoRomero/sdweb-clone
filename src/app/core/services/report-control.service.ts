@@ -46,7 +46,7 @@ export class ReportControlService {
   private _thereAreZones = true;
   public thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
   private _nombreGlobalCoords: string[] = [];
-  private _numFixedGlobalCoords: number = undefined;
+  private _numFixedGlobalCoords: number = 3;
   private _noAnomsReport = false;
   noAnomsReport$ = new BehaviorSubject<boolean>(this._noAnomsReport);
 
@@ -487,6 +487,7 @@ export class ReportControlService {
     this.plantaFija = false;
     this.thereAreZones = true;
     this.noAnomsReport = false;
+    this.numFixedGlobalCoords = 3;
   }
 
   getHostname(): string {
