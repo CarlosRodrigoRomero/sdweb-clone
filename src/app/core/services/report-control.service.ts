@@ -97,23 +97,17 @@ export class ReportControlService {
               )
               .subscribe((anoms) => {
                 // filtramos las anomalias por criterio de criticidad del cliente
-                if (this.plantaId === 'Cvnr5nXunK69aZ8q4uLu') {
-                  // excepcion para Tudela SKF que no tiene anomalias
-                  this.allFilterableElements = anoms;
-                } else {
-                  // tslint:disable-next-line: triple-equals
-                  this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
-                }
+                this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
 
                 if (this.allFilterableElements.length === 0) {
                   this.noAnomsReport = true;
+                } else {
+                  this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
                 }
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
                 this.setMaeInformesPlantaFija(this.allFilterableElements as Anomalia[]);
                 this.setCCInformesPlantaFija(this.allFilterableElements as Anomalia[]);
-
-                this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
 
                 // iniciamos filter service
                 this.filterService.initService(this.allFilterableElements).then((filtersInit) => {

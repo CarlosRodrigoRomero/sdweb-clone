@@ -66,7 +66,7 @@
               <!-- CONTROLES VISUALES -->
               <div class="visual-control">
                 <app-thermal-slider></app-thermal-slider>
-                <app-global-coord-areas *ngIf="!noAnomsReport"></app-global-coord-areas>
+                <app-global-coord-areas></app-global-coord-areas>
                 <app-slider-opacity></app-slider-opacity>
               </div>
             </div>
@@ -81,7 +81,6 @@
             class="btn-left"
             (click)="sidenavLeft.toggle()"
             matTooltip="Filtros"
-            [disabled]="noAnomsReport"
           >
             <mat-icon *ngIf="!leftOpened">keyboard_arrow_right</mat-icon>
             <mat-icon *ngIf="leftOpened">keyboard_arrow_left</mat-icon>
@@ -89,13 +88,7 @@
           </button>
 
           <!-- BOTON SIDENAV LISTA ANOMALIAS -->
-          <button
-            mat-raised-button
-            class="btn-right"
-            (click)="sidenavRight.toggle()"
-            matTooltip="Lista anomalías"
-            [disabled]="noAnomsReport"
-          >
+          <button mat-raised-button class="btn-right" (click)="sidenavRight.toggle()" matTooltip="Lista anomalías">
             <mat-icon>list_alt</mat-icon>
             <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
             <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon>
