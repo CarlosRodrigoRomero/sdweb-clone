@@ -90,6 +90,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private filtroColumnas: string[];
   private layerInformeSelected: TileLayer;
   private alturaMax = 0;
+  private noAnomReport = false;
 
   // IMAGENES
   private imgLogoBase64: string;
@@ -167,10 +168,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       })
     );
 
+    // comprobamos si tiene anomalias el informe
+    this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomReport = value)));
+
     // comprobamos el numero de anomalias para imprimir o no imagenes
     this.subscriptions.add(
       this.reportControlService.allFilterableElements$.subscribe((elems) => {
-        if (elems.length <= 500) {
+        if (elems.length <= 500 && elems.length > 0) {
           this.informeConImagenes = true;
         } else {
           this.informeConImagenes = false;
@@ -395,13 +399,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         apt: 2,
         elegible: true,
       },
-      {
+    ];
+
+    if (!this.noAnomReport) {
+      this.apartadosInforme.push({
         nombre: 'anexo1',
         descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
         orden: 15,
         elegible: true,
-      },
-    ];
+      });
+    }
 
     if (this.planta.tipo === 'seguidores') {
       this.apartadosInforme.push({
