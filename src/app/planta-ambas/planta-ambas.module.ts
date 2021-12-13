@@ -10,6 +10,7 @@ import { DownloadReportComponent } from './components/download-report/download-r
 import { DialogFilteredReportComponent } from './components/dialog-filtered-report/dialog-filtered-report.component';
 import { ShareReportComponent } from './components/share-report/share-report.component';
 import { SelectLanguageComponent } from './components/select-language/select-language.component';
+import { DownloadExcelComponent } from './components/download-excel/download-excel.component';
 
 @NgModule({
   declarations: [
@@ -20,8 +21,15 @@ import { SelectLanguageComponent } from './components/select-language/select-lan
     DialogFilteredReportComponent,
     ShareReportComponent,
     SelectLanguageComponent,
+    DownloadExcelComponent,
   ],
   imports: [CommonModule, SharedModule],
-  exports: [GlobalCoordAreasComponent, DownloadReportComponent, ProgressBarPdfComponent, ShareReportComponent],
+  exports: [
+    GlobalCoordAreasComponent,
+    DownloadReportComponent,
+    ProgressBarPdfComponent,
+    ShareReportComponent,
+    DownloadExcelComponent,
+  ],
 })
 export class PlantaAmbasModule {}
