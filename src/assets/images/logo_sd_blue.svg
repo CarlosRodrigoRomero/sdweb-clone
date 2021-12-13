@@ -6,7 +6,7 @@
    viewBox="0 0 2551.000000 625.000000"
    preserveAspectRatio="xMidYMid meet"
    id="svg91"
-   sodipodi:docname="logo_sd.svg"
+   sodipodi:docname="logo_sd_blue.svg"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -31,12 +31,12 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="pt"
      showgrid="false"
-     inkscape:zoom="0.25"
-     inkscape:cx="1134"
-     inkscape:cy="282"
+     inkscape:zoom="1"
+     inkscape:cx="1124.5"
+     inkscape:cy="425.5"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
-     inkscape:window-x="1912"
+     inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg91"
@@ -140,11 +140,11 @@ Created by potrace 1.15, written by Peter Selinger 2001-2017
      fill="#000000"
      stroke="none"
      id="g89-1"
-     style="fill:#d32f2f;fill-opacity:0.87058824">
+     style="fill:#2660de;fill-opacity:0.87058824">
     <path
        d="m 6397,3381 c -445,-967 -811,-1768 -813,-1778 -4,-16 3,-23 38,-36 24,-10 48,-17 54,-17 5,0 33,51 61,113 45,100 277,604 1274,2773 164,358 299,655 299,661 0,10 -74,43 -95,43 -6,0 -374,-792 -818,-1759 z"
        id="path55-5"
-       style="fill:#d32f2f;fill-opacity:0.87058824" />
+       style="fill:#2660de;fill-opacity:0.87058824" />
   </g>
   <path
      style="fill:#ff0000;stroke-width:0.176121"

@@ -71,6 +71,8 @@ export class SeguidorService {
     return this.anomaliaService.getAnomalias$(informeId, tipo).pipe(
       take(1),
       map((anomaliaList) => {
+        // TEST - comprobar si falta anomalia en algun seguidor
+        // console.log(anomaliaList.filter((anom) => anom.globalCoords[0] === '8').map(anom => anom.globalCoords));
         const seguidores: Seguidor[] = [];
 
         if (anomaliaList.length > 0) {
