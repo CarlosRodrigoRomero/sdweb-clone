@@ -8,6 +8,7 @@ import { switchMap, take } from 'rxjs/operators';
 import { ExcelService } from '@core/services/excel.service';
 import { ReportControlService } from '@core/services/report-control.service';
 import { PlantaService } from '@core/services/planta.service';
+import { AnomaliaInfoService } from '@core/services/anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -32,6 +33,7 @@ interface Fila {
   gradienteNormalizado?: number;
   tipo?: string;
   clase?: number;
+  criticidad?: string;
   // urlMaps?: string;
   localizacion?: string;
   localY?: number;
@@ -64,11 +66,12 @@ export class DownloadExcelComponent implements OnInit {
     { id: 'localId', nombre: 'ID' },
     { id: 'thermalImage', nombre: 'Imagen térmica' },
     { id: 'visualImage', nombre: 'Imagen visual' },
-    { id: 'temperaturaRef', nombre: 'Temperatura de referencia (ºC)' },
-    { id: 'temperaturaMax', nombre: 'Temperatura máxima módulo (ºC)' },
+    { id: 'temperaturaRef', nombre: 'Temp. de referencia (ºC)' },
+    { id: 'temperaturaMax', nombre: 'Temp. máxima módulo (ºC)' },
     { id: 'gradienteNormalizado', nombre: 'Gradiente de temperatura (ºC)' },
     { id: 'tipo', nombre: 'Categoría' },
-    { id: 'clase', nombre: 'Clase de Anomalía' },
+    { id: 'clase', nombre: 'CoA' },
+    { id: 'criticidad', nombre: 'Criticidad' },
     // { id: 'urlMaps', nombre: 'Google maps' },
     { id: 'localizacion', nombre: 'Seguidor' },
     { id: 'localY', nombre: 'Fila' },
@@ -100,7 +103,8 @@ export class DownloadExcelComponent implements OnInit {
     private plantaService: PlantaService,
     private datePipe: DatePipe,
     private decimalPipe: DecimalPipe,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
   ngOnInit(): void {
@@ -170,6 +174,7 @@ export class DownloadExcelComponent implements OnInit {
     row.gradienteNormalizado = Number(this.decimalPipe.transform(anomalia.gradienteNormalizado, '1.2-2'));
     row.tipo = GLOBAL.labels_tipos[anomalia.tipo];
     row.clase = anomalia.clase;
+    row.criticidad = this.anomaliaInfoService.getCriticidadLabel(anomalia);
     // row.urlMaps = 'Google maps';
     row.localizacion = anomalia.nombreSeguidor;
     row.localY = anomalia.localY;
