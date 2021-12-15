@@ -132,12 +132,12 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
           }
 
           // vaciamos el contenido con cada cambio de informe
-          this.json = [];
+          this.json = new Array(this.anomaliasInforme.length);
 
           // reseteamos el contador de filas
           this.filasCargadas = 0;
 
-          this.anomaliasInforme.forEach((anom) => this.getRowData(anom));
+          this.anomaliasInforme.forEach((anom, index) => this.getRowData(anom, index));
         })
     );
   }
@@ -235,7 +235,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     // ];
   }
 
-  private getRowData(anomalia: Anomalia) {
+  private getRowData(anomalia: Anomalia, index: number) {
     const row: Fila = {};
 
     row.localId = anomalia.localId;
@@ -285,7 +285,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     // row.numModsAfeactados = 1;
 
     if (this.reportControlService.plantaFija) {
-      this.json.push(row);
+      this.json[index] = row;
     } else {
       this.storage
         .ref(`informes/${this.informeSelected.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
@@ -303,7 +303,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
         .then((urlVisual) => {
           row.visualImage = urlVisual;
 
-          this.json.push(row);
+          this.json[index] = row;
 
           this.filasCargadas++;
         })
