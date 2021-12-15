@@ -98,23 +98,27 @@ export class AnomaliaInfoService {
       anomalia.modulo === ''
     ) {
       return 'Desconocido';
-    }
-    const modulo = anomalia.modulo;
+    } else {
+      const modulo = anomalia.modulo;
 
-    let labelModulo = '';
-    if (modulo !== null) {
-      if (modulo.hasOwnProperty('marca')) {
-        labelModulo = labelModulo.concat(modulo.marca.toString()).concat(' ');
+      let labelModulo = '';
+      if (modulo !== null) {
+        if (modulo.hasOwnProperty('marca')) {
+          labelModulo = labelModulo.concat(modulo.marca.toString()).concat(' ');
+        }
+        if (modulo.hasOwnProperty('modelo')) {
+          labelModulo = labelModulo.concat(modulo.modelo.toString()).concat(' ');
+        }
+        if (modulo.hasOwnProperty('potencia')) {
+          labelModulo = labelModulo.concat('(').concat(modulo.potencia.toString()).concat(' W)');
+        }
       }
-      if (modulo.hasOwnProperty('modelo')) {
-        labelModulo = labelModulo.concat(modulo.modelo.toString()).concat(' ');
+      if (labelModulo === '') {
+        labelModulo = 'Desconocido';
       }
-      if (modulo.hasOwnProperty('potencia')) {
-        labelModulo = labelModulo.concat('(').concat(modulo.potencia.toString()).concat(' W)');
-      }
-    }
 
-    return labelModulo;
+      return labelModulo;
+    }
   }
 
   getLocalizacionReducLabel(anomalia: Anomalia, planta: PlantaInterface) {

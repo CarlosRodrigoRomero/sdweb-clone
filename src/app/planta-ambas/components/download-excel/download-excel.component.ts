@@ -52,7 +52,6 @@ interface Fila {
   camaraModelo?: string;
   camaraSN?: number;
   modulo?: string;
-  // numModsAfeactados?: number;
 }
 
 @Component({
@@ -73,6 +72,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private allElems: FilterableElement[];
   private _filasCargadas = 0;
   private filasCargadas$ = new BehaviorSubject<number>(this._filasCargadas);
+  private limiteImgs = 1000;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -105,8 +105,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
         .subscribe((informeId) => {
           this.informeSelected = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
-          this.getColumnas();
-
           this.sheetTitle =
             this.sheetTitle + ' (' + this.datePipe.transform(this.informeSelected.fecha * 1000, 'dd/MM/yyyy ') + ')';
 
@@ -131,26 +129,29 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
             });
           }
 
+          this.getColumnas();
+
           // vaciamos el contenido con cada cambio de informe
           this.json = new Array(this.anomaliasInforme.length);
 
           // reseteamos el contador de filas
           this.filasCargadas = 0;
-
-          this.anomaliasInforme.forEach((anom, index) => this.getRowData(anom, index));
         })
     );
   }
 
   checkDownloadType() {
-    if (this.reportControlService.plantaFija) {
-      this.downloadExcel();
-    } else {
+    this.anomaliasInforme.forEach((anom, index) => this.getRowData(anom, index));
+
+    // incluimos urls de imagenes solo en seguidores y hasta cierto limite
+    if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
       // con este contador impedimos que se descarge más de una vez debido a la suscripcion
       let downloads = 0;
 
       this.subscriptions.add(
         this.filasCargadas$.subscribe((filasCargadas) => {
+          console.log(filasCargadas);
+
           if (filasCargadas === this.anomaliasInforme.length && downloads === 0) {
             this.downloadExcel();
 
@@ -161,23 +162,28 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
           }
         })
       );
+    } else {
+      this.downloadExcel();
     }
   }
 
-  private downloadExcel(): void {
+  downloadExcel(): void {
     this.excelService.exportAsExcelFile(
       this.sheetTitle,
       this.columnas.map((col) => col.nombre),
       this.json,
       this.excelFileName,
-      this.sheetName
+      this.sheetName,
+      this.limiteImgs
     );
   }
 
   private getColumnas() {
     this.columnas = [{ id: 'localId', nombre: 'ID' }];
 
-    if (!this.reportControlService.plantaFija) {
+    if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
+      console.log(this.anomaliasInforme.length);
+
       this.columnas.push(
         { id: 'thermalImage', nombre: 'Imagen térmica' },
         { id: 'visualImage', nombre: 'Imagen visual' }
@@ -239,7 +245,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     const row: Fila = {};
 
     row.localId = anomalia.localId;
-    if (!this.reportControlService.plantaFija) {
+    if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
       row.thermalImage = null;
       row.visualImage = null;
     }
@@ -281,12 +287,9 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       row.camaraSN = this.informeSelected.camaraSN;
     }
 
-    row.modulo = this.getModuloLabel(anomalia.modulo);
-    // row.numModsAfeactados = 1;
+    row.modulo = this.anomaliaInfoService.getModuloLabel(anomalia);
 
-    if (this.reportControlService.plantaFija) {
-      this.json[index] = row;
-    } else {
+    if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
       this.storage
         .ref(`informes/${this.informeSelected.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
         .getDownloadURL()
@@ -312,30 +315,9 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
           this.filasCargadas++;
         });
-    }
-  }
-
-  private getModuloLabel(modulo: ModuloInterface): string {
-    let moduloLabel: string;
-    if (modulo !== undefined && modulo !== null) {
-      if (modulo.marca === undefined) {
-        if (modulo.modelo === undefined) {
-          moduloLabel = '(' + modulo.potencia + 'W)';
-        } else {
-          moduloLabel = modulo.modelo + ' (' + modulo.potencia + 'W)';
-        }
-      } else {
-        if (modulo.modelo === undefined) {
-          moduloLabel = modulo.marca + ' (' + modulo.potencia + 'W)';
-        } else {
-          moduloLabel = modulo.marca + ' ' + modulo.modelo + ' (' + modulo.potencia + 'W)';
-        }
-      }
     } else {
-      moduloLabel = 'Desconocido';
+      this.json[index] = row;
     }
-
-    return moduloLabel;
   }
 
   ngOnDestroy(): void {

@@ -19,7 +19,8 @@ export class ExcelService {
     headersArray: any[],
     json: any[],
     excelFileName: string,
-    sheetName: string
+    sheetName: string,
+    limiteImgs: number
   ) {
     const header = headersArray;
     const data = json;
@@ -37,16 +38,12 @@ export class ExcelService {
 
     // estilos de la cabeceras de las columnas
     let seccion1 = 3;
-    if (this.reportControlService.plantaFija) {
-      seccion1 = 1;
-    }
     let seccion2 = 9;
-    if (this.reportControlService.plantaFija) {
-      seccion2 = 7;
-    }
     let seccion3 = 14;
-    if (this.reportControlService.plantaFija) {
-      seccion3 = 12;
+    if (this.reportControlService.plantaFija || json.length > limiteImgs) {
+      seccion1 = seccion1 - 2;
+      seccion2 = seccion2 - 2;
+      seccion3 = seccion3 - 2;
     }
 
     headeRow.eachCell((cell, index) => {
