@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
 import { switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, Subscription } from 'rxjs';
 
 import { ExcelService } from '@core/services/excel.service';
 import { ReportControlService } from '@core/services/report-control.service';
@@ -47,6 +48,7 @@ interface Fila {
   temperaturaReflejada?: number;
   vientoVelocidad?: number;
   vientoDirección?: number;
+  viento?: string;
   camaraModelo?: string;
   camaraSN?: number;
   modulo?: string;
@@ -59,43 +61,20 @@ interface Fila {
   styleUrls: ['./download-excel.component.css'],
   providers: [DatePipe, DecimalPipe],
 })
-export class DownloadExcelComponent implements OnInit {
+export class DownloadExcelComponent implements OnInit, OnDestroy {
   private json: any[] = [];
   private excelFileName = 'Informe';
-  private columnas: Columna[] = [
-    { id: 'localId', nombre: 'ID' },
-    { id: 'thermalImage', nombre: 'Imagen térmica' },
-    { id: 'visualImage', nombre: 'Imagen visual' },
-    { id: 'temperaturaRef', nombre: 'Temp. de referencia (ºC)' },
-    { id: 'temperaturaMax', nombre: 'Temp. máxima módulo (ºC)' },
-    { id: 'gradienteNormalizado', nombre: 'Gradiente de temperatura (ºC)' },
-    { id: 'tipo', nombre: 'Categoría' },
-    { id: 'clase', nombre: 'CoA' },
-    { id: 'criticidad', nombre: 'Criticidad' },
-    // { id: 'urlMaps', nombre: 'Google maps' },
-    { id: 'localizacion', nombre: 'Seguidor' },
-    { id: 'localY', nombre: 'Fila' },
-    { id: 'localX', nombre: 'Columna' },
-    // { id: 'irradiancia', nombre: 'Irradiancia (W/m2)' },
-    { id: 'datetime', nombre: 'Fecha y hora' },
-    { id: 'lugar', nombre: 'Lugar' },
-    { id: 'nubosidad', nombre: 'Nubosidad (octavas)' },
-    { id: 'temperaturaAire', nombre: 'Temperatura ambiente (ºC)' },
-    { id: 'emisividad', nombre: 'Emisividad' },
-    { id: 'temperaturaReflejada', nombre: 'Temperatura reflejada (ºC)' },
-    { id: 'vientoVelocidad', nombre: 'Velocidad viento (Beaufort)' },
-    { id: 'vientoDirección', nombre: 'Dirección viento (º)' },
-    { id: 'camaraModelo', nombre: 'Cámara térmica y visual' },
-    { id: 'camaraSN', nombre: 'Número de serie cámara térmica' },
-    { id: 'modulo', nombre: 'Módulo' },
-    // { id: 'numModsAfeactados', nombre: 'Número de módulos afectados' },
-  ];
+  private columnas: Columna[] = [];
   private sheetName = 'Resultados';
   private anomaliasInforme: Anomalia[] = [];
-  private informe: InformeInterface;
+  private informeSelected: InformeInterface;
   private sheetTitle = 'Inspección termográfica ';
   private planta: PlantaInterface;
   private allElems: FilterableElement[];
+  private _filasCargadas = 0;
+  private filasCargadas$ = new BehaviorSubject<number>(this._filasCargadas);
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private excelService: ExcelService,
@@ -123,14 +102,16 @@ export class DownloadExcelComponent implements OnInit {
         })
       )
       .subscribe((informeId) => {
-        this.informe = this.reportControlService.informes.find((informe) => informeId === informe.id);
+        this.informeSelected = this.reportControlService.informes.find((informe) => informeId === informe.id);
+
+        this.getColumnas();
 
         this.sheetTitle =
-          this.sheetTitle + ' (' + this.datePipe.transform(this.informe.fecha * 1000, 'dd/MM/yyyy ') + ')';
+          this.sheetTitle + ' (' + this.datePipe.transform(this.informeSelected.fecha * 1000, 'dd/MM/yyyy ') + ')';
 
         // si tiene prefijo le ponemos ese nombre
-        if (this.informe.hasOwnProperty('prefijo')) {
-          this.excelFileName = this.informe.prefijo.concat('informe');
+        if (this.informeSelected.hasOwnProperty('prefijo')) {
+          this.excelFileName = this.informeSelected.prefijo.concat('informe');
         }
 
         // reseteamos con cada cambio de informe
@@ -149,18 +130,96 @@ export class DownloadExcelComponent implements OnInit {
           });
         }
 
+        // vaciamos el contenido con cada cambio de informe
+        this.json = [];
+
+        // reseteamos el contador de filas
+        this.filasCargadas = 0;
+
         this.anomaliasInforme.forEach((anom) => this.getRowData(anom));
       });
   }
 
   downloadExcel(): void {
-    this.excelService.exportAsExcelFile(
-      this.sheetTitle,
-      this.columnas.map((col) => col.nombre),
-      this.json,
-      this.excelFileName,
-      this.sheetName
+    // con este contador impedimos que se descarge más de una vez debido a la suscripcion
+    let downloads = 0;
+
+    this.subscriptions.add(
+      this.filasCargadas$.subscribe((filasCargadas) => {
+        if (filasCargadas === this.anomaliasInforme.length && downloads === 0) {
+          this.excelService.exportAsExcelFile(
+            this.sheetTitle,
+            this.columnas.map((col) => col.nombre),
+            this.json,
+            this.excelFileName,
+            this.sheetName
+          );
+
+          // reseteamos el contador de filas
+          this.filasCargadas = 0;
+
+          downloads++;
+        }
+      })
     );
+  }
+
+  private getColumnas() {
+    // vaciamos el array en el cambio de informe
+    this.columnas = [];
+
+    this.columnas = [
+      { id: 'localId', nombre: 'ID' },
+      { id: 'thermalImage', nombre: 'Imagen térmica' },
+      { id: 'visualImage', nombre: 'Imagen visual' },
+      { id: 'temperaturaRef', nombre: 'Temp. de referencia (ºC)' },
+      { id: 'temperaturaMax', nombre: 'Temp. máxima módulo (ºC)' },
+      { id: 'gradienteNormalizado', nombre: 'Gradiente de temperatura (ºC)' },
+      { id: 'tipo', nombre: 'Categoría' },
+      { id: 'clase', nombre: 'CoA' },
+      { id: 'criticidad', nombre: 'Criticidad' },
+    ];
+
+    if (this.reportControlService.plantaFija) {
+      this.columnas.push({ id: 'localizacion', nombre: 'Localización' });
+    } else {
+      this.columnas.push({ id: 'localizacion', nombre: 'Seguidor' });
+    }
+
+    this.columnas.push(
+      { id: 'localY', nombre: 'Fila' },
+      { id: 'localX', nombre: 'Columna' },
+      { id: 'datetime', nombre: 'Fecha y hora' },
+      { id: 'lugar', nombre: 'Lugar' },
+      { id: 'nubosidad', nombre: 'Nubosidad (octavas)' },
+      { id: 'temperaturaAire', nombre: 'Temperatura ambiente (ºC)' },
+      { id: 'emisividad', nombre: 'Emisividad' },
+      { id: 'temperaturaReflejada', nombre: 'Temperatura reflejada (ºC)' }
+    );
+
+    if (this.informeSelected.hasOwnProperty('vientoVelocidad')) {
+      this.columnas.push(
+        { id: 'vientoVelocidad', nombre: 'Velocidad viento (Beaufort)' },
+        { id: 'vientoDirección', nombre: 'Dirección viento (º)' }
+      );
+    } else if (this.informeSelected.hasOwnProperty('viento')) {
+      this.columnas.push({ id: 'viento', nombre: 'Viento' });
+    }
+
+    if (this.informeSelected.hasOwnProperty('camara')) {
+      this.columnas.push({ id: 'camaraModelo', nombre: 'Cámara térmica y visual' });
+    }
+    if (this.informeSelected.hasOwnProperty('camaraSN')) {
+      this.columnas.push({ id: 'camaraSN', nombre: 'Número de serie cámara térmica' });
+    }
+
+    this.columnas.push({ id: 'modulo', nombre: 'Módulo' });
+
+    // this.columnas = [
+    //   // { id: 'urlMaps', nombre: 'Google maps' },
+    //   // { id: 'irradiancia', nombre: 'Irradiancia (W/m2)' },
+    //   // { id: 'numModsAfeactados', nombre: 'Número de módulos afectados' },
+    // ];
   }
 
   private getRowData(anomalia: Anomalia) {
@@ -176,25 +235,42 @@ export class DownloadExcelComponent implements OnInit {
     row.clase = anomalia.clase;
     row.criticidad = this.anomaliaInfoService.getCriticidadLabel(anomalia);
     // row.urlMaps = 'Google maps';
-    row.localizacion = anomalia.nombreSeguidor;
+
+    if (this.reportControlService.plantaFija) {
+      row.localizacion = this.anomaliaInfoService.getLocalizacionReducLabel(anomalia, this.planta);
+    } else {
+      row.localizacion = anomalia.nombreSeguidor;
+    }
+
     row.localY = anomalia.localY;
     row.localX = anomalia.localX;
     // row.irradiancia = 0;
     row.datetime = this.datePipe.transform(anomalia.datetime * 1000, 'dd/MM/yyyy HH:mm:ss');
     row.lugar = this.planta.nombre;
-    row.nubosidad = this.informe.nubosidad;
-    row.temperaturaAire = this.informe.temperatura;
-    row.emisividad = this.informe.emisividad;
-    row.temperaturaReflejada = this.informe.tempReflejada;
-    row.vientoVelocidad = this.informe.vientoVelocidad;
-    row.vientoDirección = this.informe.vientoDireccion;
-    row.camaraModelo = this.informe.camara;
-    row.camaraSN = this.informe.camaraSN;
+    row.nubosidad = this.informeSelected.nubosidad;
+    row.temperaturaAire = this.informeSelected.temperatura;
+    row.emisividad = this.informeSelected.emisividad;
+    row.temperaturaReflejada = this.informeSelected.tempReflejada;
+
+    if (this.informeSelected.hasOwnProperty('vientoVelocidad')) {
+      row.vientoVelocidad = this.informeSelected.vientoVelocidad;
+      row.vientoDirección = this.informeSelected.vientoDireccion;
+    } else if (this.informeSelected.hasOwnProperty('viento')) {
+      row.viento = this.informeSelected.viento;
+    }
+
+    if (this.informeSelected.hasOwnProperty('camara')) {
+      row.camaraModelo = this.informeSelected.camara;
+    }
+    if (this.informeSelected.hasOwnProperty('camaraSN')) {
+      row.camaraSN = this.informeSelected.camaraSN;
+    }
+
     row.modulo = this.getModuloLabel(anomalia.modulo);
     // row.numModsAfeactados = 1;
 
     this.storage
-      .ref(`informes/${this.informe.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
+      .ref(`informes/${this.informeSelected.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
       .getDownloadURL()
       .toPromise()
       .then((urlThermal) => {
@@ -203,15 +279,21 @@ export class DownloadExcelComponent implements OnInit {
       .catch((err) => console.log(err));
 
     this.storage
-      .ref(`informes/${this.informe.id}/jpgVisual/${(anomalia as PcInterface).archivoPublico}`)
+      .ref(`informes/${this.informeSelected.id}/jpgVisual/${(anomalia as PcInterface).archivoPublico}`)
       .getDownloadURL()
       .toPromise()
       .then((urlVisual) => {
         row.visualImage = urlVisual;
 
         this.json.push(row);
+
+        this.filasCargadas++;
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+
+        this.filasCargadas++;
+      });
   }
 
   private getModuloLabel(modulo: ModuloInterface): string {
@@ -235,5 +317,20 @@ export class DownloadExcelComponent implements OnInit {
     }
 
     return moduloLabel;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////
+
+  get filasCargadas(): number {
+    return this._filasCargadas;
+  }
+
+  set filasCargadas(value: number) {
+    this._filasCargadas = value;
+    this.filasCargadas$.next(value);
   }
 }
