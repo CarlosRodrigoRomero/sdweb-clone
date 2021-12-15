@@ -201,6 +201,8 @@ export class AnomaliaService {
                 }
               }
               data.localId = this.getLocalId(data);
+            } else {
+              data.localId = this.getLocalId(data);
             }
             // Convertimos el objeto en un array
             if (data.hasOwnProperty('featureCoords')) {

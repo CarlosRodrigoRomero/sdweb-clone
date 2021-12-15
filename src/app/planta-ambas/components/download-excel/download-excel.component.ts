@@ -87,98 +87,111 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.plantaService
-      .getPlanta(this.reportControlService.plantaId)
-      .pipe(
-        take(1),
-        switchMap((planta) => {
-          this.planta = planta;
-
-          this.allElems = this.reportControlService.allFilterableElements;
-
-          this.sheetTitle = this.sheetTitle + planta.nombre;
-
-          return this.reportControlService.selectedInformeId$;
-        })
-      )
-      .subscribe((informeId) => {
-        this.informeSelected = this.reportControlService.informes.find((informe) => informeId === informe.id);
-
-        this.getColumnas();
-
-        this.sheetTitle =
-          this.sheetTitle + ' (' + this.datePipe.transform(this.informeSelected.fecha * 1000, 'dd/MM/yyyy ') + ')';
-
-        // si tiene prefijo le ponemos ese nombre
-        if (this.informeSelected.hasOwnProperty('prefijo')) {
-          this.excelFileName = this.informeSelected.prefijo.concat('informe');
-        }
-
-        // reseteamos con cada cambio de informe
-        this.anomaliasInforme = [];
-
-        if (this.reportControlService.plantaFija) {
-          this.anomaliasInforme = (this.allElems as Anomalia[]).filter((anom) => anom.informeId === informeId);
-        } else {
-          const seguidoresInforme = (this.allElems as Seguidor[]).filter((seg) => seg.informeId === informeId);
-
-          seguidoresInforme.forEach((seguidor) => {
-            const anomaliasSeguidor = seguidor.anomaliasCliente;
-            if (anomaliasSeguidor.length > 0) {
-              this.anomaliasInforme.push(...anomaliasSeguidor);
-            }
-          });
-        }
-
-        // vaciamos el contenido con cada cambio de informe
-        this.json = [];
-
-        // reseteamos el contador de filas
-        this.filasCargadas = 0;
-
-        this.anomaliasInforme.forEach((anom) => this.getRowData(anom));
-      });
-  }
-
-  downloadExcel(): void {
-    // con este contador impedimos que se descarge más de una vez debido a la suscripcion
-    let downloads = 0;
-
     this.subscriptions.add(
-      this.filasCargadas$.subscribe((filasCargadas) => {
-        if (filasCargadas === this.anomaliasInforme.length && downloads === 0) {
-          this.excelService.exportAsExcelFile(
-            this.sheetTitle,
-            this.columnas.map((col) => col.nombre),
-            this.json,
-            this.excelFileName,
-            this.sheetName
-          );
+      this.plantaService
+        .getPlanta(this.reportControlService.plantaId)
+        .pipe(
+          take(1),
+          switchMap((planta) => {
+            this.planta = planta;
+
+            this.allElems = this.reportControlService.allFilterableElements;
+
+            this.sheetTitle = this.sheetTitle + planta.nombre;
+
+            return this.reportControlService.selectedInformeId$;
+          })
+        )
+        .subscribe((informeId) => {
+          this.informeSelected = this.reportControlService.informes.find((informe) => informeId === informe.id);
+
+          this.getColumnas();
+
+          this.sheetTitle =
+            this.sheetTitle + ' (' + this.datePipe.transform(this.informeSelected.fecha * 1000, 'dd/MM/yyyy ') + ')';
+
+          // si tiene prefijo le ponemos ese nombre
+          if (this.informeSelected.hasOwnProperty('prefijo')) {
+            this.excelFileName = this.informeSelected.prefijo.concat('informe');
+          }
+
+          // reseteamos con cada cambio de informe
+          this.anomaliasInforme = [];
+
+          if (this.reportControlService.plantaFija) {
+            this.anomaliasInforme = (this.allElems as Anomalia[]).filter((anom) => anom.informeId === informeId);
+          } else {
+            const seguidoresInforme = (this.allElems as Seguidor[]).filter((seg) => seg.informeId === informeId);
+
+            seguidoresInforme.forEach((seguidor) => {
+              const anomaliasSeguidor = seguidor.anomaliasCliente;
+              if (anomaliasSeguidor.length > 0) {
+                this.anomaliasInforme.push(...anomaliasSeguidor);
+              }
+            });
+          }
+
+          // vaciamos el contenido con cada cambio de informe
+          this.json = [];
 
           // reseteamos el contador de filas
           this.filasCargadas = 0;
 
-          downloads++;
-        }
-      })
+          this.anomaliasInforme.forEach((anom) => this.getRowData(anom));
+        })
+    );
+  }
+
+  checkDownloadType() {
+    if (this.reportControlService.plantaFija) {
+      this.downloadExcel();
+    } else {
+      // con este contador impedimos que se descarge más de una vez debido a la suscripcion
+      let downloads = 0;
+
+      this.subscriptions.add(
+        this.filasCargadas$.subscribe((filasCargadas) => {
+          if (filasCargadas === this.anomaliasInforme.length && downloads === 0) {
+            this.downloadExcel();
+
+            // reseteamos el contador de filas
+            this.filasCargadas = 0;
+
+            downloads++;
+          }
+        })
+      );
+    }
+  }
+
+  private downloadExcel(): void {
+    this.excelService.exportAsExcelFile(
+      this.sheetTitle,
+      this.columnas.map((col) => col.nombre),
+      this.json,
+      this.excelFileName,
+      this.sheetName
     );
   }
 
   private getColumnas() {
-    // vaciamos el array en el cambio de informe
-    this.columnas = [];
+    this.columnas = [{ id: 'localId', nombre: 'ID' }];
 
-    this.columnas = [
-      { id: 'localId', nombre: 'ID' },
-      { id: 'thermalImage', nombre: 'Imagen térmica' },
-      { id: 'visualImage', nombre: 'Imagen visual' },
+    if (!this.reportControlService.plantaFija) {
+      this.columnas.push(
+        { id: 'thermalImage', nombre: 'Imagen térmica' },
+        { id: 'visualImage', nombre: 'Imagen visual' }
+      );
+    }
+
+    this.columnas.push(
       { id: 'temperaturaRef', nombre: 'Temp. de referencia (ºC)' },
       { id: 'temperaturaMax', nombre: 'Temp. máxima módulo (ºC)' },
       { id: 'gradienteNormalizado', nombre: 'Gradiente de temperatura (ºC)' },
       { id: 'tipo', nombre: 'Categoría' },
       { id: 'clase', nombre: 'CoA' },
-      { id: 'criticidad', nombre: 'Criticidad' },
-    ];
+      { id: 'criticidad', nombre: 'Criticidad' }
+    );
 
     if (this.reportControlService.plantaFija) {
       this.columnas.push({ id: 'localizacion', nombre: 'Localización' });
@@ -226,8 +239,10 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     const row: Fila = {};
 
     row.localId = anomalia.localId;
-    row.thermalImage = null;
-    row.visualImage = null;
+    if (!this.reportControlService.plantaFija) {
+      row.thermalImage = null;
+      row.visualImage = null;
+    }
     row.temperaturaRef = Number(this.decimalPipe.transform(anomalia.temperaturaRef, '1.2-2'));
     row.temperaturaMax = Number(this.decimalPipe.transform(anomalia.temperaturaMax, '1.2-2'));
     row.gradienteNormalizado = Number(this.decimalPipe.transform(anomalia.gradienteNormalizado, '1.2-2'));
@@ -269,31 +284,35 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     row.modulo = this.getModuloLabel(anomalia.modulo);
     // row.numModsAfeactados = 1;
 
-    this.storage
-      .ref(`informes/${this.informeSelected.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
-      .getDownloadURL()
-      .toPromise()
-      .then((urlThermal) => {
-        row.thermalImage = urlThermal;
-      })
-      .catch((err) => console.log(err));
+    if (this.reportControlService.plantaFija) {
+      this.json.push(row);
+    } else {
+      this.storage
+        .ref(`informes/${this.informeSelected.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
+        .getDownloadURL()
+        .toPromise()
+        .then((urlThermal) => {
+          row.thermalImage = urlThermal;
+        })
+        .catch((err) => console.log(err));
 
-    this.storage
-      .ref(`informes/${this.informeSelected.id}/jpgVisual/${(anomalia as PcInterface).archivoPublico}`)
-      .getDownloadURL()
-      .toPromise()
-      .then((urlVisual) => {
-        row.visualImage = urlVisual;
+      this.storage
+        .ref(`informes/${this.informeSelected.id}/jpgVisual/${(anomalia as PcInterface).archivoPublico}`)
+        .getDownloadURL()
+        .toPromise()
+        .then((urlVisual) => {
+          row.visualImage = urlVisual;
 
-        this.json.push(row);
+          this.json.push(row);
 
-        this.filasCargadas++;
-      })
-      .catch((err) => {
-        console.log(err);
+          this.filasCargadas++;
+        })
+        .catch((err) => {
+          console.log(err);
 
-        this.filasCargadas++;
-      });
+          this.filasCargadas++;
+        });
+    }
   }
 
   private getModuloLabel(modulo: ModuloInterface): string {
