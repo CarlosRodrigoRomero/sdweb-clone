@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Workbook } from 'exceljs';
 import * as FileSaver from 'file-saver';
 
+import { ReportControlService } from './report-control.service';
+
 const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8';
 const EXCEL_EXT = '.xlsx';
 
@@ -10,7 +12,7 @@ const EXCEL_EXT = '.xlsx';
   providedIn: 'root',
 })
 export class ExcelService {
-  constructor() {}
+  constructor(private reportControlService: ReportControlService) {}
 
   public exportAsExcelFile(
     reportHeading: string,
@@ -30,31 +32,37 @@ export class ExcelService {
     workbook.modified = new Date();
     const worksheet = workbook.addWorksheet(sheetName);
 
-    // añadimos la cabecera de la hora
-    // worksheet.addRow([]);
-    // worksheet.mergeCells('A1:' + this.numToAlpha(header.length - 1) + '1');
-    // worksheet.getCell('A1').value = reportHeading;
-    // worksheet.getCell('A1').alignment = { horizontal: 'center' };
-    // worksheet.getCell('A1').font = { size: 15, bold: true };
-
     // añadimos las cabeceras de las columnas
     const headeRow = worksheet.addRow(header);
 
     // estilos de la cabeceras de las columnas
+    let seccion1 = 3;
+    if (this.reportControlService.plantaFija) {
+      seccion1 = 1;
+    }
+    let seccion2 = 9;
+    if (this.reportControlService.plantaFija) {
+      seccion2 = 7;
+    }
+    let seccion3 = 14;
+    if (this.reportControlService.plantaFija) {
+      seccion3 = 12;
+    }
+
     headeRow.eachCell((cell, index) => {
-      if (index <= 3) {
+      if (index <= seccion1) {
         cell.fill = {
           type: 'pattern',
           pattern: 'solid',
           fgColor: { argb: 'FFE5E7E9' },
         };
-      } else if (index <= 8) {
+      } else if (index <= seccion2) {
         cell.fill = {
           type: 'pattern',
           pattern: 'solid',
           fgColor: { argb: 'FFF5B7B1' },
         };
-      } else if (index <= 12) {
+      } else if (index <= seccion3) {
         cell.fill = {
           type: 'pattern',
           pattern: 'solid',
@@ -86,7 +94,7 @@ export class ExcelService {
       headeRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
     });
 
-    // congelamos las 2 primeras filas
+    // congelamos la primera filas
     worksheet.views = [{ state: 'frozen', ySplit: 1, activeCell: 'A2' }];
 
     // obtenemos todas las columnas
@@ -128,18 +136,20 @@ export class ExcelService {
     });
 
     // aplicamos estilos a los links
-    worksheet.getColumn(2).eachCell((cell, index) => {
-      // no aplicamos a las cabeceras
-      if (index > 1) {
-        this.applyLinkStyle(cell);
-      }
-    });
-    worksheet.getColumn(3).eachCell((cell, index) => {
-      // no aplicamos a las cabeceras
-      if (index > 1) {
-        this.applyLinkStyle(cell);
-      }
-    });
+    if (!this.reportControlService.plantaFija) {
+      worksheet.getColumn(2).eachCell((cell, index) => {
+        // no aplicamos a las cabeceras
+        if (index > 1) {
+          this.applyLinkStyle(cell);
+        }
+      });
+      worksheet.getColumn(3).eachCell((cell, index) => {
+        // no aplicamos a las cabeceras
+        if (index > 1) {
+          this.applyLinkStyle(cell);
+        }
+      });
+    }
 
     // filtros
     worksheet.getColumn(2).worksheet.autoFilter = 'G2:H' + worksheet.rowCount.toString();
