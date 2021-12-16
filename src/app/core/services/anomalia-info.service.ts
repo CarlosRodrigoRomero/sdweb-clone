@@ -34,28 +34,28 @@ export class AnomaliaInfoService {
       } else {
         this.language = 'es';
       }
+      this.translation = new Translation(this.language);
     });
 
-    this.translation = new Translation(this.language);
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {
       this.selectedInforme = this.reportControlService.informes.find((informe) => informe.id === informeId);
     });
   }
 
   getTipoLabel(anomalia: Anomalia): string {
-    return GLOBAL.labels_tipos[anomalia.tipo];
+    return this.translation.t(GLOBAL.labels_tipos[anomalia.tipo]);
   }
 
   getCausa(anomalia: Anomalia): string {
-    return GLOBAL.pcCausa[anomalia.tipo];
+    return this.translation.t(GLOBAL.pcCausa[anomalia.tipo]);
   }
 
   getRecomendacion(anomalia: Anomalia): string {
-    return GLOBAL.pcRecomendacion[anomalia.tipo];
+    return this.translation.t(GLOBAL.pcRecomendacion[anomalia.tipo]);
   }
 
   getCriticidadLabel(anomalia: Anomalia): string {
-    return this.anomaliaService.criterioCriticidad.labels[anomalia.criticidad];
+    return this.translation.t(this.anomaliaService.criterioCriticidad.labels[anomalia.criticidad]);
   }
 
   getClaseLabel(anomalia: Anomalia): string {
@@ -97,7 +97,7 @@ export class AnomaliaInfoService {
       anomalia.modulo === undefined ||
       anomalia.modulo === ''
     ) {
-      return 'Desconocido';
+      return this.translation.t('Desconocido');
     } else {
       const modulo = anomalia.modulo;
 
@@ -114,7 +114,7 @@ export class AnomaliaInfoService {
         }
       }
       if (labelModulo === '') {
-        labelModulo = 'Desconocido';
+        labelModulo = this.translation.t('Desconocido');
       }
 
       return labelModulo;

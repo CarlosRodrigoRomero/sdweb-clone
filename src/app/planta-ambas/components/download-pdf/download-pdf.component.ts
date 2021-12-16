@@ -2873,7 +2873,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           columns: [
             { text: this.translation.t('Tipo de anomalía'), width: 200, style: 'anomInfoTitle' },
-            { text: this.translation.t(this.anomaliaInfoService.getTipoLabel(anom)), style: 'anomInfoValue' },
+            { text: this.anomaliaInfoService.getTipoLabel(anom), style: 'anomInfoValue' },
           ],
           margin: [0, 40, 0, 0],
         },
@@ -2881,7 +2881,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           columns: [
             { text: this.translation.t('Causa'), width: 200, style: 'anomInfoTitle' },
             {
-              text: this.translation.t(this.anomaliaInfoService.getCausa(anom)),
+              text: this.anomaliaInfoService.getCausa(anom),
               style: 'anomInfoValue',
               margin: [0, 0, 0, 5],
             },
@@ -2891,7 +2891,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           columns: [
             { text: this.translation.t('Recomendación'), width: 200, style: 'anomInfoTitle' },
             {
-              text: this.translation.t(this.anomaliaInfoService.getRecomendacion(anom)),
+              text: this.anomaliaInfoService.getRecomendacion(anom),
               style: 'anomInfoValue',
               margin: [0, 0, 0, 5],
             },
@@ -2900,7 +2900,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           columns: [
             { text: 'Módulo', width: 200, style: 'anomInfoTitle' },
-            { text: this.translation.t(this.anomaliaInfoService.getModuloLabel(anom)), style: 'anomInfoValue' },
+            { text: this.anomaliaInfoService.getModuloLabel(anom), style: 'anomInfoValue' },
           ],
         },
         {
@@ -2911,7 +2911,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               style: 'anomInfoTitle',
             },
             {
-              text: this.translation.t('Leve' /* this.anomaliaInfoService.getCriticidadLabel(anom) */),
+              text: this.anomaliaInfoService.getCriticidadLabel(anom),
               style: 'anomInfoValue',
             },
           ],

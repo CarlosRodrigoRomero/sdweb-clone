@@ -226,5 +226,17 @@
   "Ortomosaico térmico": "Thermal orthomosaic",
   "Ortomosaico RGB": "RGB orthomosaic",
   "informe": "report",
-  "Desconocido": "Unknown"
+  "Desconocido": "Unknown",
+  "Imagen térmica": "Thermal image",
+  "Imagen visual": "Visual image",
+  "Temperatura referencia": "Reference temperature",
+  "Temperatura máxima": "Maximum temperature",
+  "Gradiente temp. Normalizado": "Normalized temp. gradient",
+  "Fecha y hora": "Date and time",
+  "Lugar": "Place",
+  "Nubosidad (octavas)": "Cloudiness (octaves)",
+  "Temperatura ambiente": "Ambient temperature",
+  "Temperatura reflejada": "Reflected temperature",
+  "Cámara térmica y visual": "Thermal and visual camera",
+  "Número de serie cámara": "Camera serial number"
 }

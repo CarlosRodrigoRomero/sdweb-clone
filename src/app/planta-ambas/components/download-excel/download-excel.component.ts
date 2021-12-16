@@ -10,6 +10,7 @@ import { ExcelService } from '@core/services/excel.service';
 import { ReportControlService } from '@core/services/report-control.service';
 import { PlantaService } from '@core/services/planta.service';
 import { AnomaliaInfoService } from '@core/services/anomalia-info.service';
+import { DownloadReportService } from '@core/services/download-report.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -19,6 +20,8 @@ import { GLOBAL } from '@core/services/global';
 import { ModuloInterface } from '@core/models/modulo';
 import { PcInterface } from '@core/models/pc';
 import { FilterableElement } from '@core/models/filterableInterface';
+
+import { Translation } from '@shared/utils/translations/translations';
 
 interface Columna {
   id: string;
@@ -73,6 +76,8 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private _filasCargadas = 0;
   private filasCargadas$ = new BehaviorSubject<number>(this._filasCargadas);
   private limiteImgs = 1000;
+  private translation: Translation;
+  private language: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -83,10 +88,21 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     private datePipe: DatePipe,
     private decimalPipe: DecimalPipe,
     private storage: AngularFireStorage,
-    private anomaliaInfoService: AnomaliaInfoService
+    private anomaliaInfoService: AnomaliaInfoService,
+    private downloadReportService: DownloadReportService
   ) {}
 
   ngOnInit(): void {
+    this.subscriptions.add(
+      this.downloadReportService.englishLang$.subscribe((lang) => {
+        if (lang) {
+          this.language = 'en';
+        } else {
+          this.language = 'es';
+        }
+      })
+    );
+
     this.subscriptions.add(
       this.plantaService
         .getPlanta(this.reportControlService.plantaId)
@@ -108,11 +124,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
           this.sheetTitle =
             this.sheetTitle + ' (' + this.datePipe.transform(this.informeSelected.fecha * 1000, 'dd/MM/yyyy ') + ')';
 
-          // si tiene prefijo le ponemos ese nombre
-          if (this.informeSelected.hasOwnProperty('prefijo')) {
-            this.excelFileName = this.informeSelected.prefijo.concat('informe');
-          }
-
           // reseteamos con cada cambio de informe
           this.anomaliasInforme = [];
 
@@ -129,8 +140,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
             });
           }
 
-          this.getColumnas();
-
           // vaciamos el contenido con cada cambio de informe
           this.json = new Array(this.anomaliasInforme.length);
 
@@ -141,6 +150,15 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   }
 
   checkDownloadType() {
+    this.translation = new Translation(this.language);
+
+    // si tiene prefijo le ponemos ese nombre
+    if (this.informeSelected.hasOwnProperty('prefijo')) {
+      this.excelFileName = this.informeSelected.prefijo + this.translation.t('informe');
+    }
+
+    this.getColumnas();
+
     this.anomaliasInforme.forEach((anom, index) => this.getRowData(anom, index));
 
     // incluimos urls de imagenes solo en seguidores y hasta cierto limite
@@ -150,8 +168,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
       this.subscriptions.add(
         this.filasCargadas$.subscribe((filasCargadas) => {
-          console.log(filasCargadas);
-
           if (filasCargadas === this.anomaliasInforme.length && downloads === 0) {
             this.downloadExcel();
 
@@ -185,54 +201,54 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       console.log(this.anomaliasInforme.length);
 
       this.columnas.push(
-        { id: 'thermalImage', nombre: 'Imagen térmica' },
-        { id: 'visualImage', nombre: 'Imagen visual' }
+        { id: 'thermalImage', nombre: this.translation.t('Imagen térmica') },
+        { id: 'visualImage', nombre: this.translation.t('Imagen visual') }
       );
     }
 
     this.columnas.push(
-      { id: 'temperaturaRef', nombre: 'Temp. de referencia (ºC)' },
-      { id: 'temperaturaMax', nombre: 'Temp. máxima módulo (ºC)' },
-      { id: 'gradienteNormalizado', nombre: 'Gradiente de temperatura (ºC)' },
-      { id: 'tipo', nombre: 'Categoría' },
+      { id: 'temperaturaRef', nombre: this.translation.t('Temperatura referencia') + ' (ºC)' },
+      { id: 'temperaturaMax', nombre: this.translation.t('Temperatura máxima') + ' (ºC)' },
+      { id: 'gradienteNormalizado', nombre: this.translation.t('Gradiente temp. Normalizado') + ' (ºC)' },
+      { id: 'tipo', nombre: this.translation.t('Categoría') },
       { id: 'clase', nombre: 'CoA' },
-      { id: 'criticidad', nombre: 'Criticidad' }
+      { id: 'criticidad', nombre: this.translation.t('Criticidad') }
     );
 
     if (this.reportControlService.plantaFija) {
-      this.columnas.push({ id: 'localizacion', nombre: 'Localización' });
+      this.columnas.push({ id: 'localizacion', nombre: this.translation.t('Localización') });
     } else {
-      this.columnas.push({ id: 'localizacion', nombre: 'Seguidor' });
+      this.columnas.push({ id: 'localizacion', nombre: this.translation.t('Seguidor') });
     }
 
     this.columnas.push(
-      { id: 'localY', nombre: 'Fila' },
-      { id: 'localX', nombre: 'Columna' },
-      { id: 'datetime', nombre: 'Fecha y hora' },
-      { id: 'lugar', nombre: 'Lugar' },
-      { id: 'nubosidad', nombre: 'Nubosidad (octavas)' },
-      { id: 'temperaturaAire', nombre: 'Temperatura ambiente (ºC)' },
-      { id: 'emisividad', nombre: 'Emisividad' },
-      { id: 'temperaturaReflejada', nombre: 'Temperatura reflejada (ºC)' }
+      { id: 'localY', nombre: this.translation.t('Fila') },
+      { id: 'localX', nombre: this.translation.t('Columna') },
+      { id: 'datetime', nombre: this.translation.t('Fecha y hora') },
+      { id: 'lugar', nombre: this.translation.t('Lugar') },
+      { id: 'nubosidad', nombre: this.translation.t('Nubosidad (octavas)') },
+      { id: 'temperaturaAire', nombre: this.translation.t('Temperatura ambiente') + ' (ºC)' },
+      { id: 'emisividad', nombre: this.translation.t('Emisividad') },
+      { id: 'temperaturaReflejada', nombre: this.translation.t('Temperatura reflejada') + ' (ºC)' }
     );
 
     if (this.informeSelected.hasOwnProperty('vientoVelocidad')) {
       this.columnas.push(
-        { id: 'vientoVelocidad', nombre: 'Velocidad viento (Beaufort)' },
-        { id: 'vientoDirección', nombre: 'Dirección viento (º)' }
+        { id: 'vientoVelocidad', nombre: this.translation.t('Velocidad viento') + ' (Beaufort)' },
+        { id: 'vientoDirección', nombre: this.translation.t('Dirección viento') + ' (º)' }
       );
     } else if (this.informeSelected.hasOwnProperty('viento')) {
-      this.columnas.push({ id: 'viento', nombre: 'Viento' });
+      this.columnas.push({ id: 'viento', nombre: this.translation.t('Viento') });
     }
 
     if (this.informeSelected.hasOwnProperty('camara')) {
-      this.columnas.push({ id: 'camaraModelo', nombre: 'Cámara térmica y visual' });
+      this.columnas.push({ id: 'camaraModelo', nombre: this.translation.t('Cámara térmica y visual') });
     }
     if (this.informeSelected.hasOwnProperty('camaraSN')) {
-      this.columnas.push({ id: 'camaraSN', nombre: 'Número de serie cámara térmica' });
+      this.columnas.push({ id: 'camaraSN', nombre: this.translation.t('Número de serie cámara') });
     }
 
-    this.columnas.push({ id: 'modulo', nombre: 'Módulo' });
+    this.columnas.push({ id: 'modulo', nombre: this.translation.t('Módulo') });
 
     // this.columnas = [
     //   // { id: 'urlMaps', nombre: 'Google maps' },
@@ -252,7 +268,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     row.temperaturaRef = Number(this.decimalPipe.transform(anomalia.temperaturaRef, '1.2-2'));
     row.temperaturaMax = Number(this.decimalPipe.transform(anomalia.temperaturaMax, '1.2-2'));
     row.gradienteNormalizado = Number(this.decimalPipe.transform(anomalia.gradienteNormalizado, '1.2-2'));
-    row.tipo = GLOBAL.labels_tipos[anomalia.tipo];
+    row.tipo = this.anomaliaInfoService.getTipoLabel(anomalia);
     row.clase = anomalia.clase;
     row.criticidad = this.anomaliaInfoService.getCriticidadLabel(anomalia);
     // row.urlMaps = 'Google maps';
