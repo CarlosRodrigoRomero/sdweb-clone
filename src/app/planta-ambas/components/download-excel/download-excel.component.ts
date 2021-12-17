@@ -11,6 +11,7 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { PlantaService } from '@core/services/planta.service';
 import { AnomaliaInfoService } from '@core/services/anomalia-info.service';
 import { DownloadReportService } from '@core/services/download-report.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -42,7 +43,7 @@ interface Fila {
   localizacion?: string;
   localY?: number;
   localX?: number;
-  // irradiancia?: number;
+  irradiancia?: number;
   datetime?: string;
   lugar?: string;
   nubosidad?: number;
@@ -89,7 +90,8 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     private decimalPipe: DecimalPipe,
     private storage: AngularFireStorage,
     private anomaliaInfoService: AnomaliaInfoService,
-    private downloadReportService: DownloadReportService
+    private downloadReportService: DownloadReportService,
+    private anomaliaService: AnomaliaService
   ) {}
 
   ngOnInit(): void {
@@ -238,6 +240,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       { id: 'localX', nombre: this.translation.t('Columna') },
       { id: 'datetime', nombre: this.translation.t('Fecha y hora') },
       { id: 'lugar', nombre: this.translation.t('Lugar') },
+      { id: 'irradiancia', nombre: this.translation.t('Irradiancia') + ' (beta) (W/m2)' },
       { id: 'nubosidad', nombre: this.translation.t('Nubosidad (octavas)') },
       { id: 'temperaturaAire', nombre: this.translation.t('Temperatura ambiente') + ' (ºC)' },
       { id: 'emisividad', nombre: this.translation.t('Emisividad') },
@@ -264,8 +267,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     // this.columnas = [
     //   // { id: 'urlMaps', nombre: 'Google maps' },
-    //   // { id: 'irradiancia', nombre: 'Irradiancia (W/m2)' },
-    //   // { id: 'numModsAfeactados', nombre: 'Número de módulos afectados' },
     // ];
   }
 
@@ -293,9 +294,18 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     row.localY = anomalia.localY;
     row.localX = anomalia.localX;
-    // row.irradiancia = 0;
-    row.datetime = this.datePipe.transform(anomalia.datetime * 1000, 'dd/MM/yyyy HH:mm:ss');
+
+    let datetime = anomalia.datetime;
+    if (this.informeSelected.correccHoraSrt !== undefined) {
+      datetime += this.informeSelected.correccHoraSrt * 3600;
+    }
+    row.datetime = this.datePipe.transform(datetime * 1000, 'dd/MM/yyyy HH:mm:ss');
     row.lugar = this.planta.nombre;
+    if (anomalia.hasOwnProperty('irradiancia') && anomalia.irradiancia !== null) {
+      row.irradiancia = anomalia.irradiancia;
+    } else {
+      row.irradiancia = this.anomaliaService.getIrradiancia(datetime);
+    }
     row.nubosidad = this.informeSelected.nubosidad;
     row.temperaturaAire = this.informeSelected.temperatura;
     row.emisividad = this.informeSelected.emisividad;

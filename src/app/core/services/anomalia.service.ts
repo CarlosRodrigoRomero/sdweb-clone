@@ -394,10 +394,12 @@ export class AnomaliaService {
     }
     const C = Math.abs(long) * (((minDesplazLaterial - maxDesplazLaterial) * 2 * diasSolst) / 365 + maxDesplazLaterial);
 
-    let irradiancia = A * Math.pow(minASolArriba - C, 2) + B;
+    let irradiancia = Math.round(A * Math.pow(minASolArriba - C, 2) + B);
+
     if (irradiancia < 0) {
       irradiancia = 0;
     }
+
     return irradiancia;
   }
 

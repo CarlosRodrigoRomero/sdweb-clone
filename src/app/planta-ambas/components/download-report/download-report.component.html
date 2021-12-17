@@ -15,9 +15,17 @@
       <mat-icon>picture_as_pdf</mat-icon>
       <span>PDF</span>
     </a>
+    <a *ngIf="!reportControlService.plantaFija"> </a>
+
     <a
       *ngIf="!reportControlService.plantaFija"
+      mat-menu-item
+      href="{{ imagesZipUrl }}"
+      download=""
+      [disabled]="!imagesZipExist"
     >
+      <mat-icon>crop_original</mat-icon>
+      <span>Imágenes</span>
     </a>
   </div></mat-menu
 >
