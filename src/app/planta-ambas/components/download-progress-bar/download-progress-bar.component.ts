@@ -7,15 +7,16 @@ import { Subscription } from 'rxjs';
 import { DownloadReportService } from '@core/services/download-report.service';
 
 @Component({
-  selector: 'app-progress-bar-pdf',
-  templateUrl: './progress-bar-pdf.component.html',
-  styleUrls: ['./progress-bar-pdf.component.css'],
+  selector: 'app-download-progress-bar',
+  templateUrl: './download-progress-bar.component.html',
+  styleUrls: ['./download-progress-bar.component.css'],
 })
 export class ProgressBarPdfComponent implements OnInit, OnDestroy {
-  generatingPDF = false;
-  endingPDF = false;
+  generatingDownload = false;
+  endingDownload = false;
   progressBarColor: ThemePalette = 'primary';
   progressBarValue = 0;
+  typeDownload: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -23,14 +24,18 @@ export class ProgressBarPdfComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.downloadReportService.generatingPDF$.subscribe((value) => (this.generatingPDF = value))
+      this.downloadReportService.generatingDownload$.subscribe((value) => (this.generatingDownload = value))
     );
 
-    this.subscriptions.add(this.downloadReportService.endingPDF$.subscribe((value) => (this.endingPDF = value)));
+    this.subscriptions.add(
+      this.downloadReportService.endingDownload$.subscribe((value) => (this.endingDownload = value))
+    );
 
     this.subscriptions.add(
       this.downloadReportService.progressBarValue$.subscribe((value) => (this.progressBarValue = value))
     );
+
+    this.subscriptions.add(this.downloadReportService.typeDownload$.subscribe((value) => (this.typeDownload = value)));
   }
 
   ngOnDestroy(): void {

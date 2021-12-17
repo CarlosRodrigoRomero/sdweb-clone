@@ -19,10 +19,10 @@ import { fromLonLat } from 'ol/proj';
   providedIn: 'root',
 })
 export class DownloadReportService {
-  private _generatingPDF = false;
-  generatingPDF$ = new BehaviorSubject<boolean>(this._generatingPDF);
-  private _endingPDF = false;
-  endingPDF$ = new BehaviorSubject<boolean>(this._endingPDF);
+  private _generatingDownload = false;
+  generatingDownload$ = new BehaviorSubject<boolean>(this._generatingDownload);
+  private _endingDownload = false;
+  endingDownload$ = new BehaviorSubject<boolean>(this._endingDownload);
   private _progressBarValue = 0;
   progressBarValue$ = new BehaviorSubject<number>(this._progressBarValue);
   private _filteredPDF: boolean = undefined;
@@ -32,6 +32,8 @@ export class DownloadReportService {
   private noS1EsLocAreas: LocationAreaInterface[] = [];
   private _englishLang = false;
   englishLang$ = new BehaviorSubject<boolean>(this._englishLang);
+  private _typeDownload = 'pdf';
+  typeDownload$ = new BehaviorSubject<string>(this._typeDownload);
 
   constructor(private plantaService: PlantaService) {}
 
@@ -187,33 +189,34 @@ export class DownloadReportService {
 
   resetService() {
     // reiniciamos los valores
-    this.generatingPDF = false;
-    this.endingPDF = false;
+    this.generatingDownload = false;
+    this.endingDownload = false;
     this.progressBarValue = 0;
     this.filteredPDF = undefined;
     this.seguidores1Eje = [];
     this.noS1EsLocAreas = [];
     this.englishLang = false;
+    this.typeDownload = 'pdf';
   }
 
   //////////////////////////////////////////////////////
 
-  get generatingPDF() {
-    return this._generatingPDF;
+  get generatingDownload() {
+    return this._generatingDownload;
   }
 
-  set generatingPDF(value: boolean) {
-    this._generatingPDF = value;
-    this.generatingPDF$.next(value);
+  set generatingDownload(value: boolean) {
+    this._generatingDownload = value;
+    this.generatingDownload$.next(value);
   }
 
-  get endingPDF() {
-    return this._endingPDF;
+  get endingDownload() {
+    return this._endingDownload;
   }
 
-  set endingPDF(value: boolean) {
-    this._endingPDF = value;
-    this.endingPDF$.next(value);
+  set endingDownload(value: boolean) {
+    this._endingDownload = value;
+    this.endingDownload$.next(value);
   }
 
   get progressBarValue() {
@@ -250,5 +253,14 @@ export class DownloadReportService {
   set englishLang(value: boolean) {
     this._englishLang = value;
     this.englishLang$.next(value);
+  }
+
+  get typeDownload(): string {
+    return this._typeDownload;
+  }
+
+  set typeDownload(value: string) {
+    this._typeDownload = value;
+    this.typeDownload$.next(value);
   }
 }

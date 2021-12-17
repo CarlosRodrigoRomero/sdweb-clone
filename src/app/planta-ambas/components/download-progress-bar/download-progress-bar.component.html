@@ -1,7 +1,7 @@
-<mat-card *ngIf="generatingPDF">
+<mat-card *ngIf="generatingDownload">
   <mat-card-content>
-    <h5 *ngIf="!endingPDF">Generando PDF...</h5>
-    <h5 *ngIf="endingPDF">Terminando...</h5>
+    <h5 *ngIf="!endingDownload">Generando {{ typeDownload | uppercase }}...</h5>
+    <h5 *ngIf="endingDownload">Terminando...</h5>
 
     <section class="example-section">
       <mat-progress-bar class="progress-bar" [color]="progressBarColor" [mode]="determinate" [value]="progressBarValue">

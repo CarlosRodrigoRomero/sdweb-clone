@@ -75,7 +75,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private allElems: FilterableElement[];
   private _filasCargadas = 0;
   private filasCargadas$ = new BehaviorSubject<number>(this._filasCargadas);
-  private limiteImgs = 1000;
+  private limiteImgs = 2000;
   private translation: Translation;
   private language: string;
 
@@ -152,6 +152,11 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   checkDownloadType() {
     this.translation = new Translation(this.language);
 
+    // mostramos la barra de progreso al iniciar la descarga
+    this.downloadReportService.generatingDownload = true;
+    this.downloadReportService.endingDownload = false;
+    this.downloadReportService.typeDownload = 'excel';
+
     // si tiene prefijo le ponemos ese nombre
     if (this.informeSelected.hasOwnProperty('prefijo')) {
       this.excelFileName = this.informeSelected.prefijo + this.translation.t('informe');
@@ -168,6 +173,12 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
       this.subscriptions.add(
         this.filasCargadas$.subscribe((filasCargadas) => {
+          // indicamos el progreso en la barra de progreso
+          this.downloadReportService.progressBarValue = Math.round(
+            (filasCargadas / this.anomaliasInforme.length) * 100
+          );
+
+          // cuando esten todas las filas cargadas descargamos el excel
           if (filasCargadas === this.anomaliasInforme.length && downloads === 0) {
             this.downloadExcel();
 
@@ -192,14 +203,15 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       this.sheetName,
       this.limiteImgs
     );
+
+    // ocultamos la barra de progreso
+    this.downloadReportService.generatingDownload = false;
   }
 
   private getColumnas() {
     this.columnas = [{ id: 'localId', nombre: 'ID' }];
 
     if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
-      console.log(this.anomaliasInforme.length);
-
       this.columnas.push(
         { id: 'thermalImage', nombre: this.translation.t('Imagen térmica') },
         { id: 'visualImage', nombre: this.translation.t('Imagen visual') }

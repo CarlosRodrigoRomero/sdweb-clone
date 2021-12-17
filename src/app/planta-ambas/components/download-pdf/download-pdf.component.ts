@@ -582,8 +582,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   public downloadPDF() {
-    this.downloadReportService.endingPDF = false;
-    this.downloadReportService.generatingPDF = true;
+    this.downloadReportService.endingDownload = false;
+    this.downloadReportService.generatingDownload = true;
+    this.downloadReportService.typeDownload = 'pdf';
 
     // cargamos imagenes que cambian con cada informe
     this.imagesLoadService.loadChangingImages(this.selectedInforme.id);
@@ -687,9 +688,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                     .download(this.getPrefijoInforme(), () => {
                       this.downloadReportService.progressBarValue = 0;
 
-                      this.downloadReportService.generatingPDF = false;
+                      this.downloadReportService.generatingDownload = false;
                     });
-                  this.downloadReportService.endingPDF = true;
+                  this.downloadReportService.endingDownload = true;
 
                   downloads++;
                 }
@@ -701,9 +702,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                   pdfMake.createPdf(this.getDocDefinition()).download(this.getPrefijoInforme(), () => {
                     this.downloadReportService.progressBarValue = 0;
 
-                    this.downloadReportService.generatingPDF = false;
+                    this.downloadReportService.generatingDownload = false;
                   });
-                  this.downloadReportService.endingPDF = true;
+                  this.downloadReportService.endingDownload = true;
 
                   downloads++;
                 }
@@ -739,9 +740,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
                 this.downloadReportService.progressBarValue = 0;
 
-                this.downloadReportService.generatingPDF = false;
+                this.downloadReportService.generatingDownload = false;
               });
-              this.downloadReportService.endingPDF = true;
+              this.downloadReportService.endingDownload = true;
 
               downloads++;
             }
