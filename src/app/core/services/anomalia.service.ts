@@ -39,7 +39,6 @@ export class AnomaliaService {
 
   initService(plantaId: string): Promise<void> {
     // obtenemos el criterio de criticidad de la planta si tuviese
-    let criterioId: string;
     return new Promise((resolve, reject) => {
       this.plantaService
         .getPlanta(plantaId)
@@ -47,37 +46,10 @@ export class AnomaliaService {
           take(1),
           switchMap((planta) => {
             this.planta = planta;
-            // primero comprovamos si la planta tiene criterio
-            if (planta.hasOwnProperty('criterioId')) {
-              this.hasCriticidad = true;
-              criterioId = planta.criterioId;
-            }
 
-            return this.adminService.getUser(planta.empresa);
+            return this.getCriterioId(planta);
           }),
-          take(1),
-          switchMap((user) => {
-            // comprobamos primero que exista el usuario
-            if (user !== undefined && user !== null) {
-              // si la planta no tiene criterio, comprobamos si lo tiene el user
-              if (criterioId === undefined || criterioId === null) {
-                if (user.hasOwnProperty('criterioId')) {
-                  this.hasCriticidad = true;
-                  criterioId = user.criterioId;
-                }
-              }
-            } else {
-              // aviso para que se cree el usuario que falta
-              console.log('Falta usuario en la DB');
-            }
-
-            if (criterioId === undefined || criterioId === null) {
-              // si el cliente no tiene criterio propio asignamos el criterio por defecto Solardrone5
-              criterioId = 'aU2iM5nM0S3vMZxMZGff';
-            }
-
-            return this.plantaService.getCriterioCriticidad(criterioId);
-          })
+          switchMap((criterioId) => this.plantaService.getCriterioCriticidad(criterioId))
         )
         .subscribe((criterio: CritCriticidad) => {
           if (criterio.labels !== undefined) {
@@ -88,19 +60,6 @@ export class AnomaliaService {
           resolve();
         });
     });
-  }
-
-  set selectedInformeId(informeId: string) {
-    this._selectedInformeId = informeId;
-    /* this.getAnomalias$(informeId)
-      .pipe(take(1))
-      .subscribe((anoms) => {
-        this.allAnomaliasInforme = anoms;
-      }); */
-  }
-
-  get selectedInformeId(): string {
-    return this._selectedInformeId;
   }
 
   async addAnomalia(anomalia: Anomalia) {
@@ -217,6 +176,63 @@ export class AnomaliaService {
     return query$;
   }
 
+  getRawAnomaliasInfome$(informeId: string, tipo: string): Observable<Anomalia[]> {
+    const query$ = this.afs
+      .collection<Anomalia>(tipo, (ref) => ref.where('informeId', '==', informeId))
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((doc) => {
+            const data = doc.payload.doc.data() as Anomalia;
+            data.id = doc.payload.doc.id;
+            // data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
+            // data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
+            // data.criticidad = this.getCriticidad(data);
+            // if (data.globalCoords !== undefined && data.globalCoords !== null) {
+            //   data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
+            // }
+            // // if (this.planta.alturaBajaPrimero) {
+            // //   data.localY = this.planta.filas - data.localY + 1;
+            // // }
+            // if (tipo === 'pcs') {
+            //   data.localX = (data as PcInterface).local_x;
+            //   data.localY = (data as PcInterface).local_y;
+            //   if (data.globalCoords === undefined) {
+            //     data.globalCoords = [];
+
+            //     const globalX = (data as PcInterface).global_x;
+            //     const globalY = (data as PcInterface).global_y;
+            //     const globalZ = (data as PcInterface).global_z;
+
+            //     if (globalX !== undefined && globalX !== null && globalX !== '' && !isNaN(globalX)) {
+            //       data.globalCoords.push(globalX);
+
+            //       if (globalY !== undefined && globalY !== null && globalY !== '' && !isNaN(globalY)) {
+            //         data.globalCoords.push(globalY);
+
+            //         if (globalZ !== undefined && globalZ !== null && globalZ !== '' && !isNaN(globalZ)) {
+            //           data.globalCoords.push(globalZ);
+            //         }
+            //       }
+            //     }
+            //   }
+            //   data.localId = this.getLocalId(data);
+            // } else {
+            //   data.localId = this.getLocalId(data);
+            // }
+            // // Convertimos el objeto en un array
+            // if (data.hasOwnProperty('featureCoords')) {
+            //   data.featureCoords = Object.values(data.featureCoords);
+            // }
+
+            return data;
+          })
+        )
+      );
+
+    return query$;
+  }
+
   async updateAnomalia(anomalia: Anomalia) {
     const anomaliaObj = this._prepararParaDb(anomalia);
     const anomaliaDoc = this.afs.doc('anomalias/' + anomalia.id);
@@ -242,6 +258,41 @@ export class AnomaliaService {
 
   async deleteAnomalia(anomalia: Anomalia) {
     return this.afs.doc('anomalias/' + anomalia.id).delete();
+  }
+
+  getCriterioId(planta: PlantaInterface) {
+    let criterioId: string;
+    // primero comprovamos si la planta tiene criterio
+    if (planta.hasOwnProperty('criterioId')) {
+      this.hasCriticidad = true;
+      criterioId = planta.criterioId;
+    }
+
+    return this.adminService.getUser(planta.empresa).pipe(
+      take(1),
+      map((user) => {
+        // comprobamos primero que exista el usuario
+        if (user !== undefined && user !== null) {
+          // si la planta no tiene criterio, comprobamos si lo tiene el user
+          if (criterioId === undefined || criterioId === null) {
+            if (user.hasOwnProperty('criterioId')) {
+              this.hasCriticidad = true;
+              criterioId = user.criterioId;
+            }
+          }
+        } else {
+          // aviso para que se cree el usuario que falta
+          console.log('Falta usuario en la DB');
+        }
+
+        if (criterioId === undefined || criterioId === null) {
+          // si el cliente no tiene criterio propio asignamos el criterio por defecto Solardrone5
+          criterioId = 'aU2iM5nM0S3vMZxMZGff';
+        }
+
+        return criterioId;
+      })
+    );
   }
 
   private getLocalId(anomalia: Anomalia): string {
@@ -564,6 +615,16 @@ export class AnomaliaService {
     }
 
     return value;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////////////
+
+  get selectedInformeId(): string {
+    return this._selectedInformeId;
+  }
+
+  set selectedInformeId(value: string) {
+    this._selectedInformeId = value;
   }
 
   get hasCriticidad() {

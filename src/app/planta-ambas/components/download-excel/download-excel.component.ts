@@ -71,7 +71,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private sheetName = 'Resultados';
   private anomaliasInforme: Anomalia[] = [];
   private informeSelected: InformeInterface;
-  private sheetTitle = 'Inspección termográfica ';
   private planta: PlantaInterface;
   private allElems: FilterableElement[];
   private _filasCargadas = 0;
@@ -115,16 +114,11 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
             this.allElems = this.reportControlService.allFilterableElements;
 
-            this.sheetTitle = this.sheetTitle + planta.nombre;
-
             return this.reportControlService.selectedInformeId$;
           })
         )
         .subscribe((informeId) => {
           this.informeSelected = this.reportControlService.informes.find((informe) => informeId === informe.id);
-
-          this.sheetTitle =
-            this.sheetTitle + ' (' + this.datePipe.transform(this.informeSelected.fecha * 1000, 'dd/MM/yyyy ') + ')';
 
           // reseteamos con cada cambio de informe
           this.anomaliasInforme = [];
@@ -198,7 +192,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
   downloadExcel(): void {
     this.excelService.exportAsExcelFile(
-      this.sheetTitle,
       this.columnas.map((col) => col.nombre),
       this.json,
       this.excelFileName,
