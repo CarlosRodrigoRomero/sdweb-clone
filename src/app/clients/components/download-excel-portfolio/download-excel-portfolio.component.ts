@@ -6,9 +6,11 @@ import { PortfolioControlService } from '@core/services/portfolio-control.servic
 import { ExcelService } from '@core/services/excel.service';
 import { GLOBAL } from '@core/services/global';
 import { AnomaliaService } from '@core/services/anomalia.service';
-import { AdminService } from '@core/services/admin.service';
+import { PlantaService } from '@core/services/planta.service';
 
 import { CritCriticidad } from '@core/models/critCriticidad';
+import { forkJoin, Observable } from 'rxjs';
+import { Anomalia } from '@core/models/anomalia';
 
 interface Fila {
   nombre: string;
@@ -50,7 +52,7 @@ export class DownloadExcelPortfolioComponent implements OnInit {
     private portfolioControlService: PortfolioControlService,
     private excelService: ExcelService,
     private anomaliaService: AnomaliaService,
-    private adminService: AdminService
+    private plantaService: PlantaService
   ) {}
 
   ngOnInit(): void {
@@ -63,73 +65,71 @@ export class DownloadExcelPortfolioComponent implements OnInit {
     const plantas = this.portfolioControlService.listaPlantas;
     const informes = this.portfolioControlService.listaInformes;
 
+    const criteriosObservables: Observable<CritCriticidad>[] = [];
+
     plantas.forEach((planta) => {
-      let criterioCriticidad: CritCriticidad;
+      /* criteriosObservables.push(
+        this.anomaliaService.getCriterioId(planta).pipe(
+          take(1),
+          switchMap((criterioId) => {
+            console.log(criterioId);
 
-      // primero comprovamos si la planta tiene criterio
-      let criterioId: string;
-      if (planta.hasOwnProperty('criterioId')) {
-        criterioId = planta.criterioId;
-      }
-
-      // this.adminService.getUser(planta.empresa).pipe(
-      //   take(1),
-      //   switchMap((user) => {
-      //     // comprobamos primero que exista el usuario
-      //     if (user !== undefined && user !== null) {
-      //       // si la planta no tiene criterio, comprobamos si lo tiene el user
-      //       if (criterioId === undefined || criterioId === null) {
-      //         if (user.hasOwnProperty('criterioId')) {
-      //           criterioId = user.criterioId;
-      //         }
-      //       }
-      //     } else {
-      //       // aviso para que se cree el usuario que falta
-      //       console.log('Falta usuario en la DB');
-      //     }
-
-      //     if (criterioId === undefined || criterioId === null) {
-      //       // si el cliente no tiene criterio propio asignamos el criterio por defecto Solardrone5
-      //       criterioId = 'aU2iM5nM0S3vMZxMZGff';
-      //     }
-      //   })
-      // );
+            return this.plantaService.getCriterioCriticidad(criterioId);
+          })
+        )
+      ); */
 
       const informesPlanta = informes.filter((informe) => informe.plantaId === planta.id);
+
+      const anomsInfsObservables: Observable<Anomalia[]>[] = [];
 
       informesPlanta.forEach((informe) => {
         let tipo = 'anomalias';
         if (planta.tipo === 'seguidores') {
           tipo = 'pcs';
         }
-        this.anomaliaService
-          .getRawAnomaliasInfome$(informe.id, tipo)
-          .pipe(take(1))
-          .subscribe((anomaliasInforme) => {
-            // tslint:disable-next-line: triple-equals
-            const ccTotales = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
-            const fila: Fila = {
-              nombre: planta.nombre,
-              potencia: planta.potencia,
-              mae: informe.mae,
-              tipo: planta.tipo,
-              fechaInspeccion: informe.fecha.toString(),
-              ccTotales: ccTotales.length,
-              ccMenos20: ccTotales.filter((anom) => anom.temperaturaMax < 20).length,
-              cc20a30: ccTotales.filter((anom) => anom.temperaturaMax >= 20 && anom.temperaturaMax < 30).length,
-              cc30a40: ccTotales.filter((anom) => anom.temperaturaMax >= 30 && anom.temperaturaMax < 40).length,
-              ccMas40: ccTotales.filter((anom) => anom.temperaturaMax >= 40).length,
-            };
+        anomsInfsObservables.push(this.anomaliaService.getRawAnomaliasInfome$(informe.id, tipo).pipe(take(1)));
+      });
 
-            this.filas.push(fila);
+      forkJoin(anomsInfsObservables).subscribe((allAnoms) => {
+        console.log(allAnoms);
 
-            if (this.filas.length === informes.length) {
-              this.downloadExcel();
-            }
-          });
+        allAnoms.forEach((anomsInforme, index) => {
+          const informe = informesPlanta[index];
+          // tslint:disable-next-line: triple-equals
+          const ccTotales = anomsInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+
+          const fila: Fila = {
+            nombre: planta.nombre,
+            potencia: planta.potencia,
+            mae: informe.mae,
+            tipo: planta.tipo,
+            fechaInspeccion: informe.fecha.toString(),
+            ccTotales: ccTotales.length,
+            ccMenos20: ccTotales.filter((anom) => anom.temperaturaMax < 20).length,
+            cc20a30: ccTotales.filter((anom) => anom.temperaturaMax >= 20 && anom.temperaturaMax < 30).length,
+            cc30a40: ccTotales.filter((anom) => anom.temperaturaMax >= 30 && anom.temperaturaMax < 40).length,
+            ccMas40: ccTotales.filter((anom) => anom.temperaturaMax >= 40).length,
+          };
+
+          this.filas.push(fila);
+
+          if (this.filas.length === informes.length) {
+            this.downloadExcel();
+          }
+        });
       });
     });
+
+    // forkJoin(criteriosObservables).subscribe((allCriterios) => {
+    //   allCriterios.forEach((criterio, index) => {
+    //     if (criterio.labels !== undefined) {
+    //       this.anomaliaService.criterioCriticidad = criterio;
+    //     }
+    //     const planta = plantas[index];
+    //   });
+    // });
   }
 
   private downloadExcel() {

@@ -177,58 +177,56 @@ export class AnomaliaService {
   }
 
   getRawAnomaliasInfome$(informeId: string, tipo: string): Observable<Anomalia[]> {
-    const query$ = this.afs
-      .collection<Anomalia>(tipo, (ref) => ref.where('informeId', '==', informeId))
-      .snapshotChanges()
-      .pipe(
-        map((actions) =>
-          actions.map((doc) => {
-            const data = doc.payload.doc.data() as Anomalia;
-            data.id = doc.payload.doc.id;
-            // data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
-            // data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
-            // data.criticidad = this.getCriticidad(data);
-            // if (data.globalCoords !== undefined && data.globalCoords !== null) {
-            //   data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
-            // }
-            // // if (this.planta.alturaBajaPrimero) {
-            // //   data.localY = this.planta.filas - data.localY + 1;
-            // // }
-            // if (tipo === 'pcs') {
-            //   data.localX = (data as PcInterface).local_x;
-            //   data.localY = (data as PcInterface).local_y;
-            //   if (data.globalCoords === undefined) {
-            //     data.globalCoords = [];
+    const query$ = this.afs.collection<Anomalia>(tipo, (ref) => ref.where('informeId', '==', informeId)).valueChanges();
+    // .pipe(
+    //   map((actions) =>
+    //     actions.map((doc) => {
+    //       const data = doc.payload.doc.data() as Anomalia;
+    //       data.id = doc.payload.doc.id;
+    // data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
+    // data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
+    // data.criticidad = this.getCriticidad(data);
+    // if (data.globalCoords !== undefined && data.globalCoords !== null) {
+    //   data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
+    // }
+    // // if (this.planta.alturaBajaPrimero) {
+    // //   data.localY = this.planta.filas - data.localY + 1;
+    // // }
+    // if (tipo === 'pcs') {
+    //   data.localX = (data as PcInterface).local_x;
+    //   data.localY = (data as PcInterface).local_y;
+    //   if (data.globalCoords === undefined) {
+    //     data.globalCoords = [];
 
-            //     const globalX = (data as PcInterface).global_x;
-            //     const globalY = (data as PcInterface).global_y;
-            //     const globalZ = (data as PcInterface).global_z;
+    //     const globalX = (data as PcInterface).global_x;
+    //     const globalY = (data as PcInterface).global_y;
+    //     const globalZ = (data as PcInterface).global_z;
 
-            //     if (globalX !== undefined && globalX !== null && globalX !== '' && !isNaN(globalX)) {
-            //       data.globalCoords.push(globalX);
+    //     if (globalX !== undefined && globalX !== null && globalX !== '' && !isNaN(globalX)) {
+    //       data.globalCoords.push(globalX);
 
-            //       if (globalY !== undefined && globalY !== null && globalY !== '' && !isNaN(globalY)) {
-            //         data.globalCoords.push(globalY);
+    //       if (globalY !== undefined && globalY !== null && globalY !== '' && !isNaN(globalY)) {
+    //         data.globalCoords.push(globalY);
 
-            //         if (globalZ !== undefined && globalZ !== null && globalZ !== '' && !isNaN(globalZ)) {
-            //           data.globalCoords.push(globalZ);
-            //         }
-            //       }
-            //     }
-            //   }
-            //   data.localId = this.getLocalId(data);
-            // } else {
-            //   data.localId = this.getLocalId(data);
-            // }
-            // // Convertimos el objeto en un array
-            // if (data.hasOwnProperty('featureCoords')) {
-            //   data.featureCoords = Object.values(data.featureCoords);
-            // }
+    //         if (globalZ !== undefined && globalZ !== null && globalZ !== '' && !isNaN(globalZ)) {
+    //           data.globalCoords.push(globalZ);
+    //         }
+    //       }
+    //     }
+    //   }
+    //   data.localId = this.getLocalId(data);
+    // } else {
+    //   data.localId = this.getLocalId(data);
+    // }
+    // // Convertimos el objeto en un array
+    // if (data.hasOwnProperty('featureCoords')) {
+    //   data.featureCoords = Object.values(data.featureCoords);
+    // }
 
-            return data;
-          })
-        )
-      );
+    //     return data;
+    //   })
+    // )
+    // );
 
     return query$;
   }
