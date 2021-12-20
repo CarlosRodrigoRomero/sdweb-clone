@@ -32,4 +32,5 @@ export interface InformeInterface {
   vientoDireccion?: number;
   camara?: string;
   camaraSN?: number;
+  tiposAnomalias?: number[];
 }

@@ -202,7 +202,10 @@ export class AnomaliaService {
               }
               data.localId = this.getLocalId(data);
             } else {
-              data.localId = this.getLocalId(data);
+              // excluimos la planta DEMO
+              if (this.planta.id !== 'egF0cbpXnnBnjcrusoeR') {
+                data.localId = this.getLocalId(data);
+              }
             }
             // Convertimos el objeto en un array
             if (data.hasOwnProperty('featureCoords')) {

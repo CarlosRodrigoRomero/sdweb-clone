@@ -18,6 +18,7 @@ import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { LocationAreaInterface } from '@core/models/location';
+import { GLOBAL } from './global';
 
 @Injectable({
   providedIn: 'root',
@@ -104,6 +105,9 @@ export class ReportControlService {
                 } else {
                   this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
                 }
+
+                // guardamos el numero de anomalias de cada tipo por informe en la DB
+                this.setTiposAnomaliaInformes(this.allFilterableElements as Anomalia[]);
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
                 this.setMaeInformesPlantaFija(this.allFilterableElements as Anomalia[]);
@@ -245,6 +249,9 @@ export class ReportControlService {
               )
               .subscribe((segs) => {
                 this.allFilterableElements = segs;
+
+                // guardamos el numero de anomalias de cada tipo por informe en la DB
+                this.setTiposAnomaliaInformes(this.allFilterableElements as Seguidor[]);
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
                 this.setMaeInformesPlantaSeguidores(segs);
@@ -448,6 +455,32 @@ export class ReportControlService {
 
         this.informeService.updateInforme(informe);
       }
+    });
+  }
+
+  private setTiposAnomaliaInformes(elems: Anomalia[] | Seguidor[]) {
+    let anomalias: Anomalia[] = [];
+    if (elems[0].hasOwnProperty('tipo')) {
+      anomalias = elems as Anomalia[];
+    } else {
+      elems.forEach((elem) => {
+        anomalias.push(...(elem as Seguidor).anomaliasCliente);
+      });
+    }
+
+    this.informes.forEach((informe) => {
+      const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
+
+      const tiposAnomalias = new Array(GLOBAL.labels_tipos.length);
+
+      GLOBAL.labels_tipos.forEach((_, index) => {
+        // tslint:disable-next-line: triple-equals
+        tiposAnomalias[index] = anomaliasInforme.filter((anom) => anom.tipo == index).length;
+      });
+
+      informe.tiposAnomalias = tiposAnomalias;
+
+      this.informeService.updateInforme(informe);
     });
   }
 
