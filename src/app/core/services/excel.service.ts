@@ -148,9 +148,9 @@ export class ExcelService {
     }
 
     // filtros
-    worksheet.getColumn(2).worksheet.autoFilter = 'G2:H' + worksheet.rowCount.toString();
-    worksheet.autoFilter = 'K2:L' + worksheet.rowCount.toString();
-    worksheet.autoFilter = 'X2:X' + worksheet.rowCount.toString();
+    // worksheet.getColumn(2).worksheet.autoFilter = 'G2:H' + worksheet.rowCount.toString();
+    // worksheet.autoFilter = 'K2:L' + worksheet.rowCount.toString();
+    // worksheet.autoFilter = 'X2:X' + worksheet.rowCount.toString();
 
     // guardamos el archivo excel
     workbook.xlsx.writeBuffer().then((data: ArrayBuffer) => {
