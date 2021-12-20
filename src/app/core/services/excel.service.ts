@@ -15,7 +15,6 @@ export class ExcelService {
   constructor(private reportControlService: ReportControlService) {}
 
   public exportAsExcelFile(
-    reportHeading: string,
     headersArray: any[],
     json: any[],
     excelFileName: string,
