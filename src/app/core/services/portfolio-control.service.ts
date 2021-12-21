@@ -61,7 +61,10 @@ export class PortfolioControlService {
           switchMap((criterio) => {
             this.criterioCriticidad = criterio;
 
-            return combineLatest([this.plantaService.getPlantasDeEmpresa(this.user), this.informeService.getInformes()]);
+            return combineLatest([
+              this.plantaService.getPlantasDeEmpresa(this.user),
+              this.informeService.getInformes(),
+            ]);
           })
         )
         .pipe(take(1))
@@ -94,6 +97,15 @@ export class PortfolioControlService {
                     informe.mae !== null &&
                     informe.disponible === true
                   ) {
+                    // dividimos por 100 el mae de los informes antiguos de fijas xq se ven en la web antigua
+                    if (
+                      planta.tipo !== 'seguidores' &&
+                      informe.fecha < GLOBAL.newReportsDate &&
+                      planta.id !== 'egF0cbpXnnBnjcrusoeR'
+                    ) {
+                      informe.mae = informe.mae / 100;
+                    }
+
                     // añadimos el informe a la lista
                     this.listaInformes.push(informe);
 

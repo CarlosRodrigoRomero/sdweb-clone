@@ -20,9 +20,13 @@ export class ExcelService {
     json: any[],
     excelFileName: string,
     sheetName: string,
-    limiteImgs: number
+    limiteImgs: number,
+    columnasLink?: number[],
+    columnasFormula?: number[],
+    formulas?: string[]
   ) {
-    const header = [...headersArray];
+    const header: string[] = [];
+    headersArray.forEach((array) => header.push(...array));
     const data = json;
 
     // creamos workbook y worksheet
@@ -37,82 +41,87 @@ export class ExcelService {
     const headeRow = worksheet.addRow(header);
 
     // estilos de la cabeceras de las columnas
+    let initColor = 1;
     headersArray.forEach((section, i) => {
       headeRow.eachCell((cell, index) => {
-        if (index <= section.length) {
+        if (index >= initColor && index <= initColor + section.length) {
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: headersColors[i] },
           };
         }
-        // cell.border = {
-        //   top: { style: 'thin' },
-        //   left: { style: 'thin' },
-        //   bottom: { style: 'thin' },
-        //   right: { style: 'thin' },
-        // };
+
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+
         cell.font = { size: 12 };
 
         worksheet.getColumn(index).width = header[index - 1].length < 20 ? 20 : header[index - 1].length;
 
         headeRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
       });
+
+      initColor += section.length;
     });
 
-    let seccion1 = 3;
-    let seccion2 = 9;
-    let seccion3 = 14;
-    if (this.reportControlService.plantaFija || json.length > limiteImgs) {
-      seccion1 = seccion1 - 2;
-      seccion2 = seccion2 - 2;
-      seccion3 = seccion3 - 2;
-    }
+    // let seccion1 = 3;
+    // let seccion2 = 9;
+    // let seccion3 = 14;
+    // if (this.reportControlService.plantaFija || json.length > limiteImgs) {
+    //   seccion1 = seccion1 - 2;
+    //   seccion2 = seccion2 - 2;
+    //   seccion3 = seccion3 - 2;
+    // }
 
-    headeRow.eachCell((cell, index) => {
-      if (index <= seccion1) {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFE5E7E9' },
-        };
-      } else if (index <= seccion2) {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFF5B7B1' },
-        };
-      } else if (index <= seccion3) {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFD4EFDF' },
-        };
-      } else if (index <= header.length) {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFE5E7E9' },
-        };
-      } else {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFFFFFFF' },
-        };
-      }
-      cell.border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' },
-      };
-      cell.font = { size: 12 };
+    // headeRow.eachCell((cell, index) => {
+    //   if (index <= seccion1) {
+    //     cell.fill = {
+    //       type: 'pattern',
+    //       pattern: 'solid',
+    //       fgColor: { argb: 'FFE5E7E9' },
+    //     };
+    //   } else if (index <= seccion2) {
+    //     cell.fill = {
+    //       type: 'pattern',
+    //       pattern: 'solid',
+    //       fgColor: { argb: 'FFF5B7B1' },
+    //     };
+    //   } else if (index <= seccion3) {
+    //     cell.fill = {
+    //       type: 'pattern',
+    //       pattern: 'solid',
+    //       fgColor: { argb: 'FFD4EFDF' },
+    //     };
+    //   } else if (index <= header.length) {
+    //     cell.fill = {
+    //       type: 'pattern',
+    //       pattern: 'solid',
+    //       fgColor: { argb: 'FFE5E7E9' },
+    //     };
+    //   } else {
+    //     cell.fill = {
+    //       type: 'pattern',
+    //       pattern: 'solid',
+    //       fgColor: { argb: 'FFFFFFFF' },
+    //     };
+    //   }
+    //   cell.border = {
+    //     top: { style: 'thin' },
+    //     left: { style: 'thin' },
+    //     bottom: { style: 'thin' },
+    //     right: { style: 'thin' },
+    //   };
+    //   cell.font = { size: 12 };
 
-      worksheet.getColumn(index).width = header[index - 1].length < 20 ? 20 : header[index - 1].length;
+    //   worksheet.getColumn(index).width = header[index - 1].length < 20 ? 20 : header[index - 1].length;
 
-      headeRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-    });
+    //   headeRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+    // });
 
     // congelamos la primera filas
     worksheet.views = [{ state: 'frozen', ySplit: 1, activeCell: 'A2' }];
@@ -156,32 +165,29 @@ export class ExcelService {
     });
 
     // aplicamos estilos a los links
-    if (!this.reportControlService.plantaFija) {
-      worksheet.getColumn(2).eachCell((cell, index) => {
-        // no aplicamos a las cabeceras
-        if (index > 1) {
-          this.applyLinkStyle(cell);
-        }
-      });
-      worksheet.getColumn(3).eachCell((cell, index) => {
-        // no aplicamos a las cabeceras
-        if (index > 1) {
-          this.applyLinkStyle(cell);
-        }
+    if (columnasLink !== undefined) {
+      columnasLink.forEach((columna) => {
+        worksheet.getColumn(columna).eachCell((cell, index) => {
+          // no aplicamos a las cabeceras
+          if (index > 1) {
+            this.applyLinkStyle(cell);
+          }
+        });
       });
     }
 
-    worksheet.getColumn(6).eachCell((cell, index) => {
-      if (index > 1) {
-        cell.value = { formula: `SUM(I${index}:AD${index})` } as CellValue;
-      }
-    });
+    // añadimos las formulas
+    if (columnasFormula !== undefined) {
+      columnasFormula.forEach((columna, i) => {
+        worksheet.getColumn(columna).eachCell((cell, index) => {
+          if (index > 1) {
+            const formula = formulas[i].split('#').join(`${index}`);
 
-    worksheet.getColumn(8).eachCell((cell, index) => {
-      if (index > 1) {
-        cell.value = { formula: `SUM(I${index}:M${index})` } as CellValue;
-      }
-    });
+            cell.value = { formula } as CellValue;
+          }
+        });
+      });
+    }
 
     // filtros
     // worksheet.getColumn(2).worksheet.autoFilter = 'G2:H' + worksheet.rowCount.toString();
@@ -206,7 +212,7 @@ export class ExcelService {
     }
   }
 
-  private numToAlpha(num: number) {
+  numToAlpha(num: number) {
     let alpha = '';
 
     for (; num >= 0; num = parseInt((num / 26).toString(), 10) - 1) {

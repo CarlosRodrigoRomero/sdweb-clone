@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DatePipe, DecimalPipe } from '@angular/common';
 
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 import { ExcelService } from '@core/services/excel.service';
@@ -10,6 +11,7 @@ import { GLOBAL } from '@core/services/global';
   selector: 'app-download-excel-portfolio',
   templateUrl: './download-excel-portfolio.component.html',
   styleUrls: ['./download-excel-portfolio.component.css'],
+  providers: [DatePipe, DecimalPipe],
 })
 export class DownloadExcelPortfolioComponent implements OnInit {
   userDemo = false;
@@ -22,8 +24,15 @@ export class DownloadExcelPortfolioComponent implements OnInit {
   private filas: any[] = [];
   private sheetName = 'Portfolio';
   private excelFileName = 'Portfolio';
+  private columnasFormula = [6, 8];
+  private formulas: string[] = [];
 
-  constructor(private portfolioControlService: PortfolioControlService, private excelService: ExcelService) {}
+  constructor(
+    private portfolioControlService: PortfolioControlService,
+    private excelService: ExcelService,
+    private datePipe: DatePipe,
+    private decimalPipe: DecimalPipe
+  ) {}
 
   ngOnInit(): void {
     if (this.portfolioControlService.user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
@@ -46,6 +55,17 @@ export class DownloadExcelPortfolioComponent implements OnInit {
         this.columnas[2].push(tipo);
       }
     });
+
+    // formula suma todas las anomalias
+    this.formulas.push(
+      `SUM(I#:${this.excelService.numToAlpha(
+        7 + this.portfolioControlService.criterioCriticidad.rangosDT.length + GLOBAL.labels_tipos.length - 3
+      )}#)`
+    );
+    // formula suma de ccs
+    this.formulas.push(
+      `SUM(I#:${this.excelService.numToAlpha(7 + this.portfolioControlService.criterioCriticidad.rangosDT.length)}#)`
+    );
   }
 
   getPortfolioData() {
@@ -64,15 +84,15 @@ export class DownloadExcelPortfolioComponent implements OnInit {
       informesPlanta.forEach((informe) => {
         const fila = {
           nombre: planta.nombre,
-          fechaInspeccion: informe.fecha.toString(),
+          fechaInspeccion: this.datePipe.transform(informe.fecha * 1000, 'dd/MM/yyyy'),
           potencia: planta.potencia,
           tipo: planta.tipo,
-          mae: informe.mae,
+          mae: Math.round(informe.mae * 10000) / 100,
         };
 
         fila['numAnomalias'] = '';
 
-        fila['cc'] = informe.cc;
+        fila['cc'] = Math.round(informe.cc * 10000) / 100;
 
         fila['ccTotales'] = '';
 
@@ -103,7 +123,10 @@ export class DownloadExcelPortfolioComponent implements OnInit {
       this.filas,
       this.excelFileName,
       this.sheetName,
-      0
+      0,
+      undefined,
+      this.columnasFormula,
+      this.formulas
     );
   }
 }
