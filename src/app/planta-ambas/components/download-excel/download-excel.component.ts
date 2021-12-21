@@ -61,9 +61,9 @@ interface Fila {
 })
 export class DownloadExcelComponent implements OnInit, OnDestroy {
   private json: any[] = [];
-  private excelFileName = 'Informe';
+  private excelFileName: string;
   private columnas: string[][] = [[], [], [], [], []];
-  private sheetName = 'Resultados';
+  private sheetName: string;
   private anomaliasInforme: Anomalia[] = [];
   private informeSelected: InformeInterface;
   private planta: PlantaInterface;
@@ -75,6 +75,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private language: string;
   private headersColors = ['FFE5E7E9', 'FFF5B7B1', 'FFD4EFDF', 'FFABD5FF', 'FFE5E7E9'];
   private columnasLink;
+  private inicioFilters = 5;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -133,6 +134,8 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
             });
 
             this.columnasLink = [2, 3];
+
+            this.inicioFilters = 7;
           }
 
           // vaciamos el contenido con cada cambio de informe
@@ -146,6 +149,9 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
   checkDownloadType() {
     this.translation = new Translation(this.language);
+
+    this.excelFileName = this.translation.t('Informe');
+    this.sheetName = this.translation.t('Resultados');
 
     // mostramos la barra de progreso al iniciar la descarga
     this.downloadReportService.generatingDownload = true;
@@ -196,8 +202,10 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       this.json,
       this.excelFileName,
       this.sheetName,
-      this.limiteImgs,
-      this.columnasLink
+      this.columnasLink,
+      undefined,
+      undefined,
+      this.inicioFilters
     );
 
     // ocultamos la barra de progreso

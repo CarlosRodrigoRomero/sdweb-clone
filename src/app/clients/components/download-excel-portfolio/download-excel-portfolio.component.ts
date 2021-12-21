@@ -123,7 +123,6 @@ export class DownloadExcelPortfolioComponent implements OnInit {
       this.filas,
       this.excelFileName,
       this.sheetName,
-      0,
       undefined,
       this.columnasFormula,
       this.formulas
