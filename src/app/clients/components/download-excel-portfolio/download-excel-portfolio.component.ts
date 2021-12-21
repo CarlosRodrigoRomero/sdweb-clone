@@ -15,7 +15,7 @@ import { GLOBAL } from '@core/services/global';
 })
 export class DownloadExcelPortfolioComponent implements OnInit {
   userDemo = false;
-  private columnas = [
+  private columnas: string[][] = [
     ['Nombre planta', 'Fecha inspección', 'Potencia (MW)', 'Tipo', 'MAE (%)', 'Nº total anomalías'],
     ['Células calientes (%)', 'Nº total céls. calientes'],
     [],

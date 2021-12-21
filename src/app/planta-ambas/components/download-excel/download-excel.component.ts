@@ -24,11 +24,6 @@ import { FilterableElement } from '@core/models/filterableInterface';
 
 import { Translation } from '@shared/utils/translations/translations';
 
-interface Columna {
-  id: string;
-  nombre: string;
-}
-
 interface Fila {
   localId?: string;
   visualImage?: string;
@@ -67,7 +62,7 @@ interface Fila {
 export class DownloadExcelComponent implements OnInit, OnDestroy {
   private json: any[] = [];
   private excelFileName = 'Informe';
-  private columnas: Columna[] = [];
+  private columnas: string[][] = [[], [], [], [], []];
   private sheetName = 'Resultados';
   private anomaliasInforme: Anomalia[] = [];
   private informeSelected: InformeInterface;
@@ -78,6 +73,8 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private limiteImgs = 2000;
   private translation: Translation;
   private language: string;
+  private headersColors = ['FFE5E7E9', 'FFF5B7B1', 'FFD4EFDF', 'FFABD5FF', 'FFE5E7E9'];
+  private columnasLink;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -134,6 +131,8 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
                 this.anomaliasInforme.push(...anomaliasSeguidor);
               }
             });
+
+            this.columnasLink = [2, 3];
           }
 
           // vaciamos el contenido con cada cambio de informe
@@ -192,12 +191,13 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
   downloadExcel(): void {
     this.excelService.exportAsExcelFile(
-      [this.columnas.map((col) => col.nombre)],
-      ['prueba'],
+      this.columnas,
+      this.headersColors,
       this.json,
       this.excelFileName,
       this.sheetName,
-      this.limiteImgs
+      this.limiteImgs,
+      this.columnasLink
     );
 
     // ocultamos la barra de progreso
@@ -205,59 +205,51 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   }
 
   private getColumnas() {
-    this.columnas = [{ id: 'localId', nombre: 'ID' }];
+    this.columnas[0].push('ID');
 
     if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
-      this.columnas.push(
-        { id: 'thermalImage', nombre: this.translation.t('Imagen térmica') },
-        { id: 'visualImage', nombre: this.translation.t('Imagen visual') }
-      );
+      this.columnas[0].push(this.translation.t('Imagen térmica'));
+      this.columnas[0].push(this.translation.t('Imagen visual'));
     }
 
-    this.columnas.push(
-      { id: 'temperaturaRef', nombre: this.translation.t('Temperatura referencia') + ' (ºC)' },
-      { id: 'temperaturaMax', nombre: this.translation.t('Temperatura máxima') + ' (ºC)' },
-      { id: 'gradienteNormalizado', nombre: this.translation.t('Gradiente temp. Normalizado') + ' (ºC)' },
-      { id: 'tipo', nombre: this.translation.t('Categoría') },
-      { id: 'clase', nombre: 'CoA' },
-      { id: 'criticidad', nombre: this.translation.t('Criticidad') }
-    );
+    this.columnas[1].push(this.translation.t('Temperatura referencia') + ' (ºC)');
+    this.columnas[1].push(this.translation.t('Temperatura máxima') + ' (ºC)');
+    this.columnas[1].push(this.translation.t('Gradiente temp. Normalizado') + ' (ºC)');
+    this.columnas[1].push(this.translation.t('Categoría'));
+    this.columnas[1].push('CoA');
+    this.columnas[1].push(this.translation.t('Criticidad'));
 
     if (this.reportControlService.plantaFija) {
-      this.columnas.push({ id: 'localizacion', nombre: this.translation.t('Localización') });
+      this.columnas[2].push(this.translation.t('Localización'));
     } else {
-      this.columnas.push({ id: 'localizacion', nombre: this.translation.t('Seguidor') });
+      this.columnas[2].push(this.translation.t('Seguidor'));
     }
 
-    this.columnas.push(
-      { id: 'localY', nombre: this.translation.t('Fila') },
-      { id: 'localX', nombre: this.translation.t('Columna') },
-      { id: 'datetime', nombre: this.translation.t('Fecha y hora') },
-      { id: 'lugar', nombre: this.translation.t('Lugar') },
-      { id: 'irradiancia', nombre: this.translation.t('Irradiancia') + ' (beta) (W/m2)' },
-      { id: 'nubosidad', nombre: this.translation.t('Nubosidad (octavas)') },
-      { id: 'temperaturaAire', nombre: this.translation.t('Temperatura ambiente') + ' (ºC)' },
-      { id: 'emisividad', nombre: this.translation.t('Emisividad') },
-      { id: 'temperaturaReflejada', nombre: this.translation.t('Temperatura reflejada') + ' (ºC)' }
-    );
+    this.columnas[2].push(this.translation.t('Fila'));
+    this.columnas[2].push(this.translation.t('Columna'));
+    this.columnas[2].push(this.translation.t('Fecha y hora'));
+    this.columnas[2].push(this.translation.t('Lugar'));
+    this.columnas[2].push(this.translation.t('Irradiancia') + ' (beta) (W/m2)');
+    this.columnas[3].push(this.translation.t('Nubosidad (octavas)'));
+    this.columnas[3].push(this.translation.t('Temperatura ambiente') + ' (ºC)');
+    this.columnas[3].push(this.translation.t('Emisividad'));
+    this.columnas[3].push(this.translation.t('Temperatura reflejada') + ' (ºC)');
 
     if (this.informeSelected.hasOwnProperty('vientoVelocidad')) {
-      this.columnas.push(
-        { id: 'vientoVelocidad', nombre: this.translation.t('Velocidad viento') + ' (Beaufort)' },
-        { id: 'vientoDirección', nombre: this.translation.t('Dirección viento') + ' (º)' }
-      );
+      this.columnas[3].push(this.translation.t('Velocidad viento') + ' (Beaufort)');
+      this.columnas[3].push(this.translation.t('Dirección viento') + ' (º)');
     } else if (this.informeSelected.hasOwnProperty('viento')) {
-      this.columnas.push({ id: 'viento', nombre: this.translation.t('Viento') });
+      this.columnas[3].push(this.translation.t('Viento'));
     }
 
     if (this.informeSelected.hasOwnProperty('camara')) {
-      this.columnas.push({ id: 'camaraModelo', nombre: this.translation.t('Cámara térmica y visual') });
+      this.columnas[4].push(this.translation.t('Cámara térmica y visual'));
     }
     if (this.informeSelected.hasOwnProperty('camaraSN')) {
-      this.columnas.push({ id: 'camaraSN', nombre: this.translation.t('Número de serie cámara') });
+      this.columnas[4].push(this.translation.t('Número de serie cámara'));
     }
 
-    this.columnas.push({ id: 'modulo', nombre: this.translation.t('Módulo') });
+    this.columnas[4].push(this.translation.t('Módulo'));
 
     // this.columnas = [
     //   // { id: 'urlMaps', nombre: 'Google maps' },
