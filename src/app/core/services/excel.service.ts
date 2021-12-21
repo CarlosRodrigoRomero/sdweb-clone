@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Workbook } from 'exceljs';
+import { CellValue, Workbook } from 'exceljs';
 import * as FileSaver from 'file-saver';
 
 import { ReportControlService } from './report-control.service';
@@ -15,13 +15,14 @@ export class ExcelService {
   constructor(private reportControlService: ReportControlService) {}
 
   public exportAsExcelFile(
-    headersArray: any[],
+    headersArray: string[][],
+    headersColors: string[],
     json: any[],
     excelFileName: string,
     sheetName: string,
     limiteImgs: number
   ) {
-    const header = headersArray;
+    const header = [...headersArray];
     const data = json;
 
     // creamos workbook y worksheet
@@ -36,6 +37,29 @@ export class ExcelService {
     const headeRow = worksheet.addRow(header);
 
     // estilos de la cabeceras de las columnas
+    headersArray.forEach((section, i) => {
+      headeRow.eachCell((cell, index) => {
+        if (index <= section.length) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: headersColors[i] },
+          };
+        }
+        // cell.border = {
+        //   top: { style: 'thin' },
+        //   left: { style: 'thin' },
+        //   bottom: { style: 'thin' },
+        //   right: { style: 'thin' },
+        // };
+        cell.font = { size: 12 };
+
+        worksheet.getColumn(index).width = header[index - 1].length < 20 ? 20 : header[index - 1].length;
+
+        headeRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+      });
+    });
+
     let seccion1 = 3;
     let seccion2 = 9;
     let seccion3 = 14;
@@ -146,6 +170,18 @@ export class ExcelService {
         }
       });
     }
+
+    worksheet.getColumn(6).eachCell((cell, index) => {
+      if (index > 1) {
+        cell.value = { formula: `SUM(I${index}:AD${index})` } as CellValue;
+      }
+    });
+
+    worksheet.getColumn(8).eachCell((cell, index) => {
+      if (index > 1) {
+        cell.value = { formula: `SUM(I${index}:M${index})` } as CellValue;
+      }
+    });
 
     // filtros
     // worksheet.getColumn(2).worksheet.autoFilter = 'G2:H' + worksheet.rowCount.toString();

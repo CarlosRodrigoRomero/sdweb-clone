@@ -13,10 +13,15 @@ import { GLOBAL } from '@core/services/global';
 })
 export class DownloadExcelPortfolioComponent implements OnInit {
   userDemo = false;
-  private columnas = ['Nombre planta', 'Potencia (MW)', 'MAE (%)', 'Tipo', 'Fecha inspección'];
+  private columnas = [
+    ['Nombre planta', 'Fecha inspección', 'Potencia (MW)', 'Tipo', 'MAE (%)', 'Nº total anomalías'],
+    ['Células calientes (%)', 'Nº total céls. calientes'],
+    [],
+  ];
+  private headersColors = ['FFE5E7E9', 'FFF5B7B1', 'FFD4EFDF'];
   private filas: any[] = [];
   private sheetName = 'Portfolio';
-  private excelFileName = 'Informe';
+  private excelFileName = 'Portfolio';
 
   constructor(private portfolioControlService: PortfolioControlService, private excelService: ExcelService) {}
 
@@ -33,19 +38,20 @@ export class DownloadExcelPortfolioComponent implements OnInit {
         columna = 'Cels. calientes >' + rango + 'ºC';
       }
 
-      this.columnas.push(columna);
+      this.columnas[1].push(columna);
     });
-
-    this.columnas.push('CC totales');
 
     GLOBAL.labels_tipos.forEach((tipo, index) => {
       if (index !== 0 && index !== 8 && index !== 9) {
-        this.columnas.push(tipo);
+        this.columnas[2].push(tipo);
       }
     });
   }
 
   getPortfolioData() {
+    // reseteamos el contenido
+    this.filas = [];
+
     const plantas = this.portfolioControlService.listaPlantas;
     const informes = this.portfolioControlService.listaInformes.filter((informe) =>
       informe.hasOwnProperty('tiposAnomalias')
@@ -55,25 +61,25 @@ export class DownloadExcelPortfolioComponent implements OnInit {
       // nos quedamos solo con los informe de la planta que tengan 'tiposAnomalias'
       const informesPlanta = informes.filter((informe) => informe.plantaId === planta.id);
 
-      // const anomsInfsObservables: Observable<Anomalia[]>[] = [];
-
       informesPlanta.forEach((informe) => {
         const fila = {
           nombre: planta.nombre,
-          potencia: planta.potencia,
-          mae: informe.mae,
-          tipo: planta.tipo,
           fechaInspeccion: informe.fecha.toString(),
+          potencia: planta.potencia,
+          tipo: planta.tipo,
+          mae: informe.mae,
         };
 
-        let ccTotales = 0;
+        fila['numAnomalias'] = '';
+
+        fila['cc'] = informe.cc;
+
+        fila['ccTotales'] = '';
+
         this.portfolioControlService.criterioCriticidad.rangosDT.forEach((_, index) => {
           const ccsRango = informe.tiposAnomalias[8][index] + informe.tiposAnomalias[9][index];
-          ccTotales += ccsRango;
           fila['cc' + (index + 1)] = ccsRango;
         });
-
-        fila['ccTotales'] = ccTotales;
 
         GLOBAL.labels_tipos.forEach((_, index) => {
           if (index !== 0 && index !== 8 && index !== 9) {
@@ -91,6 +97,13 @@ export class DownloadExcelPortfolioComponent implements OnInit {
   }
 
   private downloadExcel() {
-    this.excelService.exportAsExcelFile(this.columnas, this.filas, this.excelFileName, this.sheetName, 0);
+    this.excelService.exportAsExcelFile(
+      this.columnas,
+      this.headersColors,
+      this.filas,
+      this.excelFileName,
+      this.sheetName,
+      0
+    );
   }
 }

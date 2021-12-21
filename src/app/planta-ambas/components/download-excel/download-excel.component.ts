@@ -192,7 +192,8 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
   downloadExcel(): void {
     this.excelService.exportAsExcelFile(
-      this.columnas.map((col) => col.nombre),
+      [this.columnas.map((col) => col.nombre)],
+      ['prueba'],
       this.json,
       this.excelFileName,
       this.sheetName,
