@@ -201,8 +201,6 @@ export class AnomaliaService {
                 }
               }
               data.localId = this.getLocalId(data);
-            } else {
-              data.localId = this.getLocalId(data);
             }
             // Convertimos el objeto en un array
             if (data.hasOwnProperty('featureCoords')) {
@@ -244,7 +242,7 @@ export class AnomaliaService {
     return this.afs.doc('anomalias/' + anomalia.id).delete();
   }
 
-  private getLocalId(anomalia: Anomalia): string {
+  getLocalId(anomalia: Anomalia): string {
     const parts: string[] = [];
     anomalia.globalCoords.forEach((coord) => {
       if (coord !== undefined && coord !== null && coord !== '') {
