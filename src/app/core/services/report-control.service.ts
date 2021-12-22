@@ -460,43 +460,50 @@ export class ReportControlService {
 
   private setTiposAnomaliaInformes(elems: Anomalia[] | Seguidor[]) {
     let anomalias: Anomalia[] = [];
-    if (elems[0].hasOwnProperty('tipo')) {
-      anomalias = elems as Anomalia[];
-    } else {
-      elems.forEach((elem) => {
-        anomalias.push(...(elem as Seguidor).anomaliasCliente);
-      });
+    if (elems.length > 0) {
+      if (elems[0].hasOwnProperty('tipo')) {
+        anomalias = elems as Anomalia[];
+      } else {
+        elems.forEach((elem) => {
+          anomalias.push(...(elem as Seguidor).anomaliasCliente);
+        });
+      }
     }
 
     this.informes.forEach((informe) => {
-      const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
-
       const tiposAnomalias = new Array(GLOBAL.labels_tipos.length);
 
-      GLOBAL.labels_tipos.forEach((_, index) => {
-        // las celulas calientes las dividimos por gradiente normalizado segun el criterio de criticidad de la empresa
-        if (index === 8 || index === 9) {
-          const ccGradNorm: number[] = [];
-          // tslint:disable-next-line: triple-equals
-          const ccs = anomaliasInforme.filter((anom) => anom.tipo == index);
+      if (elems.length > 0) {
+        const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
 
-          this.anomaliaService.criterioCriticidad.rangosDT.forEach((rango, i, rangos) => {
-            if (i < rangos.length - 1) {
-              ccGradNorm.push(
-                ccs.filter((anom) => anom.gradienteNormalizado > rango).length -
-                  ccs.filter((anom) => anom.gradienteNormalizado > rangos[i + 1]).length
-              );
-            } else {
-              ccGradNorm.push(ccs.filter((anom) => anom.gradienteNormalizado > rango).length);
-            }
-          });
+        GLOBAL.labels_tipos.forEach((_, index) => {
+          // las celulas calientes las dividimos por gradiente normalizado segun el criterio de criticidad de la empresa
+          if (index === 8 || index === 9) {
+            const ccGradNorm: number[] = [];
+            // tslint:disable-next-line: triple-equals
+            const ccs = anomaliasInforme.filter((anom) => anom.tipo == index);
 
-          tiposAnomalias[index] = ccGradNorm;
-        } else {
-          // tslint:disable-next-line: triple-equals
-          tiposAnomalias[index] = anomaliasInforme.filter((anom) => anom.tipo == index).length;
-        }
-      });
+            this.anomaliaService.criterioCriticidad.rangosDT.forEach((rango, i, rangos) => {
+              if (i < rangos.length - 1) {
+                ccGradNorm.push(
+                  ccs.filter((anom) => anom.gradienteNormalizado > rango).length -
+                    ccs.filter((anom) => anom.gradienteNormalizado > rangos[i + 1]).length
+                );
+              } else {
+                ccGradNorm.push(ccs.filter((anom) => anom.gradienteNormalizado > rango).length);
+              }
+            });
+
+            tiposAnomalias[index] = ccGradNorm;
+          } else {
+            // tslint:disable-next-line: triple-equals
+            tiposAnomalias[index] = anomaliasInforme.filter((anom) => anom.tipo == index).length;
+          }
+        });
+      } else {
+        GLOBAL.labels_tipos.forEach((_, index) => (tiposAnomalias[index] = 0));
+        console.log(tiposAnomalias);
+      }
 
       informe.tiposAnomalias = tiposAnomalias;
 
