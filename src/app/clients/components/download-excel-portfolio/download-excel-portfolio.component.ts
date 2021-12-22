@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 
+import { switchMap, take } from 'rxjs/operators';
+
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 import { ExcelService } from '@core/services/excel.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { PlantaService } from '@core/services/planta.service';
 import { GLOBAL } from '@core/services/global';
+import { ReportControlService } from '@core/services/report-control.service';
 
 @Component({
   selector: 'app-download-excel-portfolio',
@@ -31,7 +34,10 @@ export class DownloadExcelPortfolioComponent implements OnInit {
     private portfolioControlService: PortfolioControlService,
     private excelService: ExcelService,
     private datePipe: DatePipe,
-    private decimalPipe: DecimalPipe
+    private decimalPipe: DecimalPipe,
+    private anomaliaService: AnomaliaService,
+    private reportControlService: ReportControlService,
+    private plantaService: PlantaService
   ) {}
 
   ngOnInit(): void {
@@ -127,5 +133,32 @@ export class DownloadExcelPortfolioComponent implements OnInit {
       this.columnasFormula,
       this.formulas
     );
+  }
+
+  calculate() {
+    const plantas = this.portfolioControlService.listaPlantas;
+    const informes = this.portfolioControlService.listaInformes;
+
+    plantas.forEach((planta, index) => {
+      if (index < 35) {
+        const informesPlanta = informes.filter((informe) => informe.plantaId === planta.id);
+        let criterio;
+        this.anomaliaService
+          .getCriterioId(planta)
+          .pipe(
+            take(1),
+            switchMap((criterioId) => this.plantaService.getCriterioCriticidad(criterioId)),
+            take(1),
+            switchMap((crit) => {
+              criterio = crit;
+              return this.anomaliaService.getAnomaliasPlanta$(planta.id);
+            })
+          )
+          .pipe(take(1))
+          .subscribe((anoms) => {
+            this.reportControlService.setTiposAnomaliaInformesPlanta(anoms, informesPlanta, criterio);
+          });
+      }
+    });
   }
 }

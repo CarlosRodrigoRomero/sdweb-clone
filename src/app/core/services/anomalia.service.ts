@@ -105,7 +105,7 @@ export class AnomaliaService {
         return combineLatest(anomaliaObsList);
       }),
       map((arr) => arr.flat()),
-      map((arr) => this.getAlturaCorrecta(arr))
+      // map((arr) => this.getAlturaCorrecta(arr))
     );
 
     return query$;
@@ -131,41 +131,41 @@ export class AnomaliaService {
             data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
             data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
             data.criticidad = this.getCriticidad(data);
-            if (data.globalCoords !== undefined && data.globalCoords !== null) {
-              data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
-            }
-            // if (this.planta.alturaBajaPrimero) {
-            //   data.localY = this.planta.filas - data.localY + 1;
+            // if (data.globalCoords !== undefined && data.globalCoords !== null) {
+            //   data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
             // }
-            if (tipo === 'pcs') {
-              data.localX = (data as PcInterface).local_x;
-              data.localY = (data as PcInterface).local_y;
-              if (data.globalCoords === undefined) {
-                data.globalCoords = [];
+            // // if (this.planta.alturaBajaPrimero) {
+            // //   data.localY = this.planta.filas - data.localY + 1;
+            // // }
+            // if (tipo === 'pcs') {
+            //   data.localX = (data as PcInterface).local_x;
+            //   data.localY = (data as PcInterface).local_y;
+            //   if (data.globalCoords === undefined) {
+            //     data.globalCoords = [];
 
-                const globalX = (data as PcInterface).global_x;
-                const globalY = (data as PcInterface).global_y;
-                const globalZ = (data as PcInterface).global_z;
+            //     const globalX = (data as PcInterface).global_x;
+            //     const globalY = (data as PcInterface).global_y;
+            //     const globalZ = (data as PcInterface).global_z;
 
-                if (globalX !== undefined && globalX !== null && globalX !== '' && !isNaN(globalX)) {
-                  data.globalCoords.push(globalX);
+            //     if (globalX !== undefined && globalX !== null && globalX !== '' && !isNaN(globalX)) {
+            //       data.globalCoords.push(globalX);
 
-                  if (globalY !== undefined && globalY !== null && globalY !== '' && !isNaN(globalY)) {
-                    data.globalCoords.push(globalY);
+            //       if (globalY !== undefined && globalY !== null && globalY !== '' && !isNaN(globalY)) {
+            //         data.globalCoords.push(globalY);
 
-                    if (globalZ !== undefined && globalZ !== null && globalZ !== '' && !isNaN(globalZ)) {
-                      data.globalCoords.push(globalZ);
-                    }
-                  }
-                }
-              }
-              data.localId = this.getLocalId(data);
-            } else {
-              // excluimos la planta DEMO
-              if (this.planta.id !== 'egF0cbpXnnBnjcrusoeR') {
-                data.localId = this.getLocalId(data);
-              }
-            }
+            //         if (globalZ !== undefined && globalZ !== null && globalZ !== '' && !isNaN(globalZ)) {
+            //           data.globalCoords.push(globalZ);
+            //         }
+            //       }
+            //     }
+            //   }
+            //   data.localId = this.getLocalId(data);
+            // } else {
+            //   // excluimos la planta DEMO
+            //   if (this.planta.id !== 'egF0cbpXnnBnjcrusoeR') {
+            //     data.localId = this.getLocalId(data);
+            //   }
+            // }
             // Convertimos el objeto en un array
             if (data.hasOwnProperty('featureCoords')) {
               data.featureCoords = Object.values(data.featureCoords);

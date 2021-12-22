@@ -19,6 +19,7 @@ import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { LocationAreaInterface } from '@core/models/location';
 import { GLOBAL } from './global';
+import { CritCriticidad } from '@core/models/critCriticidad';
 
 @Injectable({
   providedIn: 'root',
@@ -107,7 +108,7 @@ export class ReportControlService {
                 }
 
                 // guardamos el numero de anomalias de cada tipo por informe en la DB
-                this.setTiposAnomaliaInformes(this.allFilterableElements as Anomalia[]);
+                this.setTiposAnomaliaInformesPlanta(this.allFilterableElements as Anomalia[]);
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
                 this.setMaeInformesPlantaFija(this.allFilterableElements as Anomalia[]);
@@ -251,7 +252,7 @@ export class ReportControlService {
                 this.allFilterableElements = segs;
 
                 // guardamos el numero de anomalias de cada tipo por informe en la DB
-                this.setTiposAnomaliaInformes(this.allFilterableElements as Seguidor[]);
+                this.setTiposAnomaliaInformesPlanta(this.allFilterableElements as Seguidor[]);
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
                 this.setMaeInformesPlantaSeguidores(segs);
@@ -458,7 +459,11 @@ export class ReportControlService {
     });
   }
 
-  private setTiposAnomaliaInformes(elems: Anomalia[] | Seguidor[]) {
+  setTiposAnomaliaInformesPlanta(
+    elems: Anomalia[] | Seguidor[],
+    informes?: InformeInterface[],
+    criterioCriticidad?: CritCriticidad
+  ) {
     let anomalias: Anomalia[] = [];
     if (elems[0].hasOwnProperty('tipo')) {
       anomalias = elems as Anomalia[];
@@ -468,7 +473,17 @@ export class ReportControlService {
       });
     }
 
+    if (criterioCriticidad !== undefined) {
+      this.anomaliaService.criterioCriticidad = criterioCriticidad;
+    }
+
+    if (informes !== undefined) {
+      this.informes = informes;
+    }
+
     this.informes.forEach((informe) => {
+      console.log(informe.id);
+
       const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
 
       const tiposAnomalias = new Array(GLOBAL.labels_tipos.length);
@@ -500,7 +515,10 @@ export class ReportControlService {
 
       informe.tiposAnomalias = tiposAnomalias;
 
-      this.informeService.updateInforme(informe);
+      console.log(tiposAnomalias);
+      
+
+      // this.informeService.updateInforme(informe);
     });
   }
 
