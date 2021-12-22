@@ -407,11 +407,15 @@ export class ReportControlService {
         isNaN(informe.mae) ||
         informe.mae === Infinity
       ) {
-        const perdidas = anomalias.map((anom) => anom.perdidas);
-        let perdidasTotales = 0;
-        perdidas.forEach((perd) => (perdidasTotales += perd));
+        if (anomalias.length > 0) {
+          const perdidas = anomalias.map((anom) => anom.perdidas);
+          let perdidasTotales = 0;
+          perdidas.forEach((perd) => (perdidasTotales += perd));
 
-        informe.mae = perdidasTotales / informe.numeroModulos;
+          informe.mae = perdidasTotales / informe.numeroModulos;
+        } else {
+          informe.mae = 0;
+        }
 
         this.informeService.updateInforme(informe);
       }
@@ -448,10 +452,14 @@ export class ReportControlService {
         isNaN(informe.cc) ||
         informe.cc === Infinity
       ) {
-        // tslint:disable-next-line: triple-equals
-        const celCals = anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+        if (anomalias.length > 0) {
+          // tslint:disable-next-line: triple-equals
+          const celCals = anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
-        informe.cc = celCals.length / informe.numeroModulos;
+          informe.cc = celCals.length / informe.numeroModulos;
+        } else {
+          informe.cc = 0;
+        }
 
         this.informeService.updateInforme(informe);
       }
@@ -502,7 +510,6 @@ export class ReportControlService {
         });
       } else {
         GLOBAL.labels_tipos.forEach((_, index) => (tiposAnomalias[index] = 0));
-        console.log(tiposAnomalias);
       }
 
       informe.tiposAnomalias = tiposAnomalias;
