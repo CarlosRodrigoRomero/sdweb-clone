@@ -267,7 +267,13 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private getRowData(anomalia: Anomalia, index: number) {
     const row: Fila = {};
 
-    row.localId = anomalia.localId;
+    let localId;
+    if (anomalia.hasOwnProperty('localId')) {
+      localId = anomalia.localId;
+    } else {
+      this.anomaliaService.getLocalId(anomalia);
+    }
+    row.localId = localId;
     if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
       row.thermalImage = null;
       row.visualImage = null;
