@@ -16,6 +16,7 @@ import { CritCoA } from '@core/models/critCoA';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { PcInterface } from '@core/models/pc';
 import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
 
 @Injectable({
   providedIn: 'root',
@@ -89,12 +90,16 @@ export class AnomaliaService {
     );
   }
 
-  getAnomaliasPlanta$(plantaId: string): Observable<Anomalia[]> {
+  getAnomaliasPlanta$(plantaId: string, informs?: InformeInterface[]): Observable<Anomalia[]> {
     const query$ = this.informeService.getInformesDePlanta(plantaId).pipe(
       take(1),
       switchMap((informes) => {
         // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
         informes = this.informeService.getOnlyNewInfomesFijas(informes);
+
+        if (informs !== undefined) {
+          informes = informs;
+        }
 
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
         informes.forEach((informe) => {
@@ -104,7 +109,7 @@ export class AnomaliaService {
         });
         return combineLatest(anomaliaObsList);
       }),
-      map((arr) => arr.flat()),
+      map((arr) => arr.flat())
       // map((arr) => this.getAlturaCorrecta(arr))
     );
 
@@ -128,8 +133,8 @@ export class AnomaliaService {
           actions.map((doc) => {
             const data = doc.payload.doc.data() as Anomalia;
             data.id = doc.payload.doc.id;
-            data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
-            data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
+            // data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
+            // data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
             data.criticidad = this.getCriticidad(data);
             // if (data.globalCoords !== undefined && data.globalCoords !== null) {
             //   data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
@@ -160,16 +165,12 @@ export class AnomaliaService {
             //     }
             //   }
             //   data.localId = this.getLocalId(data);
-            // } else {
-            //   // excluimos la planta DEMO
-            //   if (this.planta.id !== 'egF0cbpXnnBnjcrusoeR') {
-            //     data.localId = this.getLocalId(data);
-            //   }
             // }
-            // Convertimos el objeto en un array
-            if (data.hasOwnProperty('featureCoords')) {
-              data.featureCoords = Object.values(data.featureCoords);
-            }
+
+            // // Convertimos el objeto en un array
+            // if (data.hasOwnProperty('featureCoords')) {
+            //   data.featureCoords = Object.values(data.featureCoords);
+            // }
 
             return data;
           })
@@ -296,7 +297,7 @@ export class AnomaliaService {
     );
   }
 
-  private getLocalId(anomalia: Anomalia): string {
+  getLocalId(anomalia: Anomalia): string {
     const parts: string[] = [];
     anomalia.globalCoords.forEach((coord) => {
       if (coord !== undefined && coord !== null && coord !== '') {

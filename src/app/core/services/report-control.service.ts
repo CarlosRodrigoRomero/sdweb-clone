@@ -459,67 +459,63 @@ export class ReportControlService {
     });
   }
 
-  setTiposAnomaliaInformesPlanta(
-    elems: Anomalia[] | Seguidor[],
-    informes?: InformeInterface[],
-    criterioCriticidad?: CritCriticidad
-  ) {
+  setTiposAnomaliaInformesPlanta(elems: Anomalia[] | Seguidor[], informes?: InformeInterface[], rangos?: number[]) {
     let anomalias: Anomalia[] = [];
-    if (elems[0].hasOwnProperty('tipo')) {
-      anomalias = elems as Anomalia[];
-    } else {
-      elems.forEach((elem) => {
-        anomalias.push(...(elem as Seguidor).anomaliasCliente);
+    if (elems.length > 0) {
+      if (elems[0].hasOwnProperty('tipo')) {
+        anomalias = elems as Anomalia[];
+      } else {
+        elems.forEach((elem) => {
+          anomalias.push(...(elem as Seguidor).anomaliasCliente);
+        });
+      }
+
+      let rangosDT /*  = this.anomaliaService.criterioCriticidad.rangosDT */;
+      if (rangos !== undefined) {
+        rangosDT = rangos;
+      }
+
+      if (informes !== undefined) {
+        this.informes = informes;
+      }
+
+      this.informes.forEach((informe) => {
+        const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
+
+        const tiposAnomalias = new Array(GLOBAL.labels_tipos.length);
+
+        GLOBAL.labels_tipos.forEach((_, index) => {
+          // las celulas calientes las dividimos por gradiente normalizado segun el criterio de criticidad de la empresa
+          if (index === 8 || index === 9) {
+            const ccGradNorm: number[] = [];
+            // tslint:disable-next-line: triple-equals
+            const ccs = anomaliasInforme.filter((anom) => anom.tipo == index);
+
+            rangosDT.forEach((rango, i, rangs) => {
+              if (i < rangs.length - 1) {
+                ccGradNorm.push(
+                  ccs.filter((anom) => anom.gradienteNormalizado >= rango).length -
+                    ccs.filter((anom) => anom.gradienteNormalizado >= rangs[i + 1]).length
+                );
+              } else {
+                ccGradNorm.push(ccs.filter((anom) => anom.gradienteNormalizado > rango).length);
+              }
+            });
+
+            tiposAnomalias[index] = ccGradNorm;
+          } else {
+            // tslint:disable-next-line: triple-equals
+            tiposAnomalias[index] = anomaliasInforme.filter((anom) => anom.tipo == index).length;
+          }
+        });
+
+        informe.tiposAnomalias = tiposAnomalias;
+
+        console.log(tiposAnomalias);
+
+        this.informeService.updateInforme(informe);
       });
     }
-
-    if (criterioCriticidad !== undefined) {
-      this.anomaliaService.criterioCriticidad = criterioCriticidad;
-    }
-
-    if (informes !== undefined) {
-      this.informes = informes;
-    }
-
-    this.informes.forEach((informe) => {
-      console.log(informe.id);
-
-      const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
-
-      const tiposAnomalias = new Array(GLOBAL.labels_tipos.length);
-
-      GLOBAL.labels_tipos.forEach((_, index) => {
-        // las celulas calientes las dividimos por gradiente normalizado segun el criterio de criticidad de la empresa
-        if (index === 8 || index === 9) {
-          const ccGradNorm: number[] = [];
-          // tslint:disable-next-line: triple-equals
-          const ccs = anomaliasInforme.filter((anom) => anom.tipo == index);
-
-          this.anomaliaService.criterioCriticidad.rangosDT.forEach((rango, i, rangos) => {
-            if (i < rangos.length - 1) {
-              ccGradNorm.push(
-                ccs.filter((anom) => anom.gradienteNormalizado > rango).length -
-                  ccs.filter((anom) => anom.gradienteNormalizado > rangos[i + 1]).length
-              );
-            } else {
-              ccGradNorm.push(ccs.filter((anom) => anom.gradienteNormalizado > rango).length);
-            }
-          });
-
-          tiposAnomalias[index] = ccGradNorm;
-        } else {
-          // tslint:disable-next-line: triple-equals
-          tiposAnomalias[index] = anomaliasInforme.filter((anom) => anom.tipo == index).length;
-        }
-      });
-
-      informe.tiposAnomalias = tiposAnomalias;
-
-      console.log(tiposAnomalias);
-      
-
-      // this.informeService.updateInforme(informe);
-    });
   }
 
   public sortLocAreas(locAreas: LocationAreaInterface[]) {

@@ -9,6 +9,7 @@ import { AnomaliaService } from '@core/services/anomalia.service';
 import { PlantaService } from '@core/services/planta.service';
 import { GLOBAL } from '@core/services/global';
 import { ReportControlService } from '@core/services/report-control.service';
+import { CritCriticidad } from '@core/models/critCriticidad';
 
 @Component({
   selector: 'app-download-excel-portfolio',
@@ -139,10 +140,292 @@ export class DownloadExcelPortfolioComponent implements OnInit {
     const plantas = this.portfolioControlService.listaPlantas;
     const informes = this.portfolioControlService.listaInformes;
 
+    console.log(informes.filter((informe) => !informe.hasOwnProperty('tiposAnomalias')).length);
+
+    const criteriosId = [
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'wRubKS2StaZTrc0644lJ',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'aU2iM5nM0S3vMZxMZGff',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'aU2iM5nM0S3vMZxMZGff',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'ZHSp2yNdpORe3XMDAxoA',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'BuAdwZlgE8doyc558oAM',
+      'BuAdwZlgE8doyc558oAM',
+      'BuAdwZlgE8doyc558oAM',
+      'BuAdwZlgE8doyc558oAM',
+      'BuAdwZlgE8doyc558oAM',
+      'BuAdwZlgE8doyc558oAM',
+      'BuAdwZlgE8doyc558oAM',
+      'BuAdwZlgE8doyc558oAM',
+      'BuAdwZlgE8doyc558oAM',
+      'BuAdwZlgE8doyc558oAM',
+      'BuAdwZlgE8doyc558oAM',
+      'BuAdwZlgE8doyc558oAM',
+      'BuAdwZlgE8doyc558oAM',
+      'BuAdwZlgE8doyc558oAM',
+      'aU2iM5nM0S3vMZxMZGff',
+      'cgrOwQnVxWgftFeQICJc',
+      'xuAMPmcDLQAaoVHX1bpi',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'aU2iM5nM0S3vMZxMZGff',
+      'wRubKS2StaZTrc0644lJ',
+      'nByXBdGjlf7ifhVKu6pc',
+      'aU2iM5nM0S3vMZxMZGff',
+    ];
+
+    const criterios: CritCriticidad[] = [
+      {
+        id: 'BuAdwZlgE8doyc558oAM',
+        criterioConstante: [null, null, [3, 4, 5, 6, 7, 10, 12, 14, 17]],
+        labels: ['Leve', 'Media', 'Grave'],
+        nombre: 'Eolia',
+        siempreVisible: [15, 18],
+        rangosDT: [5, 10, 40],
+      },
+      {
+        id: 'ZHSp2yNdpORe3XMDAxoA',
+        criterioConstante: [null, [3, 6, 10, 12], [4, 5, 7, 17, 14]],
+        labels: ['Leve', 'Media', 'Grave'],
+        nombre: 'Solardrone10',
+        siempreVisible: [15, 18],
+        rangosDT: [10, 10, 40],
+      },
+      {
+        id: 'aU2iM5nM0S3vMZxMZGff',
+        criterioConstante: [null, null, [3, 4, 5, 6, 7, 10, 12, 14, 17]],
+        labels: ['Leve', 'Media', 'Grave'],
+        nombre: 'Eolia',
+        siempreVisible: [15, 18],
+        rangosDT: [5, 10, 40],
+      },
+      {
+        id: 'cgrOwQnVxWgftFeQICJc',
+        criterioConstante: [null, null, [3, 4, 5, 6, 7, 10, 12, 14, 17]],
+        labels: ['Leve', 'Media', 'Grave'],
+        nombre: 'Eolia',
+        siempreVisible: [15, 18],
+        rangosDT: [5, 10, 20],
+      },
+      {
+        id: 'nByXBdGjlf7ifhVKu6pc',
+        criterioConstante: [null, null, [3, 4, 5, 6, 7, 10, 12, 14, 17]],
+        labels: ['Leve', 'Media', 'Grave'],
+        nombre: 'Eolia',
+        siempreVisible: [15, 18],
+        rangosDT: [5, 10, 40],
+      },
+      {
+        id: 'wRubKS2StaZTrc0644lJ',
+        criterioConstante: [null, null, [3, 4, 5, 6, 7, 10, 12, 14, 17]],
+        labels: ['Leve', 'Media', 'Grave'],
+        nombre: 'Eolia',
+        siempreVisible: [15, 18],
+        rangosDT: [5, 10, 20, 30, 100],
+      },
+      {
+        id: 'xuAMPmcDLQAaoVHX1bpi',
+        criterioConstante: [null, null, [3, 4, 5, 6, 7, 10, 12, 14, 17]],
+        labels: ['Leve', 'Media', 'Grave'],
+        nombre: 'Eolia',
+        siempreVisible: [15, 18],
+        rangosDT: [5, 10, 40],
+      },
+    ];
+
     plantas.forEach((planta, index) => {
-      if (index < 35) {
-        const informesPlanta = informes.filter((informe) => informe.plantaId === planta.id);
-        let criterio;
+      // if (index < 5) {
+      const informesPlanta = informes.filter((informe) => informe.plantaId === planta.id);
+
+      let calcular = false;
+      informesPlanta.forEach((informe) => {
+        if (!informe.hasOwnProperty('tiposAnomalias')) {
+          calcular = true;
+        }
+      });
+
+      if (calcular) {
+        // let rangos;
+
+        // const criterioId = criteriosId[index];
+
+        // rangos = criterios.find((criterio) => criterio.id === criterioId).rangosDT;
+
+        let criterio: CritCriticidad;
+
         this.anomaliaService
           .getCriterioId(planta)
           .pipe(
@@ -151,14 +434,32 @@ export class DownloadExcelPortfolioComponent implements OnInit {
             take(1),
             switchMap((crit) => {
               criterio = crit;
-              return this.anomaliaService.getAnomaliasPlanta$(planta.id);
+              this.anomaliaService.criterioCriticidad = crit;
+              return this.anomaliaService.getAnomaliasPlanta$(planta.id, informesPlanta);
             })
           )
           .pipe(take(1))
           .subscribe((anoms) => {
-            this.reportControlService.setTiposAnomaliaInformesPlanta(anoms, informesPlanta, criterio);
+            console.log(planta.id);
+            const anomalias = anoms.filter((anom) => anom.criticidad !== null);
+
+            this.reportControlService.setTiposAnomaliaInformesPlanta(anomalias, informesPlanta, criterio.rangosDT);
           });
+
+        // this.anomaliaService
+        //   .getAnomaliasPlanta$(planta.id)
+        //   .pipe(take(1))
+        //   .subscribe((anoms) => {
+        //     console.log(anoms);
+
+        //     const anomalias = anoms.filter((anom) => anom.criticidad !== null);
+
+        //     console.log(anomalias.length);
+
+        //     this.reportControlService.setTiposAnomaliaInformesPlanta(anomalias, informesPlanta, rangos);
+        //   });
       }
+      // }
     });
   }
 }
