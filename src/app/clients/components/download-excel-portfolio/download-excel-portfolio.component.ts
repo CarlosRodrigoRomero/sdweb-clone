@@ -97,8 +97,9 @@ export class DownloadExcelPortfolioComponent implements OnInit {
         fila['ccTotales'] = '';
 
         this.portfolioControlService.criterioCriticidad.rangosDT.forEach((_, index) => {
-          console.log(informe.id);
-          
+          if (informe.tiposAnomalias[8] === 0) {
+            console.log(planta.id);
+          }
           const ccsRango = informe.tiposAnomalias[8][index] + informe.tiposAnomalias[9][index];
           fila['cc' + (index + 1)] = ccsRango;
         });

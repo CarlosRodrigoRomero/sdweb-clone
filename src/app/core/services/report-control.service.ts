@@ -509,7 +509,15 @@ export class ReportControlService {
           }
         });
       } else {
-        GLOBAL.labels_tipos.forEach((_, index) => (tiposAnomalias[index] = 0));
+        GLOBAL.labels_tipos.forEach((_, index) => {
+          if (index === 8 || index === 9) {
+            const ccGradNorm: number[] = [];
+            this.anomaliaService.criterioCriticidad.rangosDT.forEach(() => ccGradNorm.push(0));
+            tiposAnomalias[index] = ccGradNorm;
+          } else {
+            tiposAnomalias[index] = 0;
+          }
+        });
       }
 
       informe.tiposAnomalias = tiposAnomalias;
