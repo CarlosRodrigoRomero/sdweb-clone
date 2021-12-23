@@ -91,7 +91,11 @@ export class DownloadExcelPortfolioComponent implements OnInit {
 
         fila['numAnomalias'] = numAnomalias;
 
-        fila['cc'] = Math.round(informe.cc * 10000) / 100;
+        let cc = null;
+        if (informe.hasOwnProperty('cc') && informe.cc !== null && !isNaN(informe.cc)) {
+          cc = Math.round(informe.cc * 10000) / 100;
+        }
+        fila['cc'] = cc;
 
         fila['ccTotales'] = ccTotales;
 
