@@ -68,19 +68,19 @@ export class PlantListComponent implements OnInit, AfterViewInit {
         informesAntiguos = informesPlanta.filter((informe) => informe.fecha < GLOBAL.newReportsDate);
       }
 
-      let mae: number;
-      // los antiguos de fijas los devidimos por 100
-      if (planta.tipo !== 'seguidores' && informeReciente.fecha < GLOBAL.newReportsDate && planta.id !== 'egF0cbpXnnBnjcrusoeR') {
-        mae = informeReciente.mae / 100;
-      } else {
-        // el resto añadimos normal
-        mae = informeReciente.mae;
-      }
+      // let mae: number;
+      // // los antiguos de fijas los devidimos por 100
+      // if (planta.tipo !== 'seguidores' && informeReciente.fecha < GLOBAL.newReportsDate && planta.id !== 'egF0cbpXnnBnjcrusoeR') {
+      //   mae = informeReciente.mae / 100;
+      // } else {
+      //   // el resto añadimos normal
+      //   mae = informeReciente.mae;
+      // }
 
       plantsData.push({
         nombre: planta.nombre,
         potencia: planta.potencia,
-        mae,
+        mae: informeReciente.mae,
         ultimaInspeccion: informeReciente.fecha,
         informesAntiguos,
         plantaId: planta.id,

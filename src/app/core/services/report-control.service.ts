@@ -18,6 +18,7 @@ import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { LocationAreaInterface } from '@core/models/location';
+import { GLOBAL } from './global';
 
 @Injectable({
   providedIn: 'root',
@@ -104,6 +105,9 @@ export class ReportControlService {
                 } else {
                   this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
                 }
+
+                // guardamos el numero de anomalias de cada tipo por informe en la DB
+                this.setTiposAnomaliaInformes(this.allFilterableElements as Anomalia[]);
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
                 this.setMaeInformesPlantaFija(this.allFilterableElements as Anomalia[]);
@@ -245,6 +249,9 @@ export class ReportControlService {
               )
               .subscribe((segs) => {
                 this.allFilterableElements = segs;
+
+                // guardamos el numero de anomalias de cada tipo por informe en la DB
+                this.setTiposAnomaliaInformes(this.allFilterableElements as Seguidor[]);
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
                 this.setMaeInformesPlantaSeguidores(segs);
@@ -400,11 +407,15 @@ export class ReportControlService {
         isNaN(informe.mae) ||
         informe.mae === Infinity
       ) {
-        const perdidas = anomalias.map((anom) => anom.perdidas);
-        let perdidasTotales = 0;
-        perdidas.forEach((perd) => (perdidasTotales += perd));
+        if (anomalias.length > 0) {
+          const perdidas = anomalias.map((anom) => anom.perdidas);
+          let perdidasTotales = 0;
+          perdidas.forEach((perd) => (perdidasTotales += perd));
 
-        informe.mae = perdidasTotales / informe.numeroModulos;
+          informe.mae = perdidasTotales / informe.numeroModulos;
+        } else {
+          informe.mae = 0;
+        }
 
         this.informeService.updateInforme(informe);
       }
@@ -441,13 +452,77 @@ export class ReportControlService {
         isNaN(informe.cc) ||
         informe.cc === Infinity
       ) {
-        // tslint:disable-next-line: triple-equals
-        const celCals = anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+        if (anomalias.length > 0) {
+          // tslint:disable-next-line: triple-equals
+          const celCals = anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
-        informe.cc = celCals.length / informe.numeroModulos;
+          informe.cc = celCals.length / informe.numeroModulos;
+        } else {
+          informe.cc = 0;
+        }
 
         this.informeService.updateInforme(informe);
       }
+    });
+  }
+
+  private setTiposAnomaliaInformes(elems: Anomalia[] | Seguidor[]) {
+    let anomalias: Anomalia[] = [];
+    if (elems.length > 0) {
+      if (elems[0].hasOwnProperty('tipo')) {
+        anomalias = elems as Anomalia[];
+      } else {
+        elems.forEach((elem) => {
+          anomalias.push(...(elem as Seguidor).anomaliasCliente);
+        });
+      }
+    }
+
+    this.informes.forEach((informe) => {
+      const tiposAnomalias = new Array(GLOBAL.labels_tipos.length);
+
+      if (elems.length > 0) {
+        const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
+
+        GLOBAL.labels_tipos.forEach((_, index) => {
+          // las celulas calientes las dividimos por gradiente normalizado segun el criterio de criticidad de la empresa
+          if (index === 8 || index === 9) {
+            const ccGradNorm: number[] = [];
+            // tslint:disable-next-line: triple-equals
+            const ccs = anomaliasInforme.filter((anom) => anom.tipo == index);
+
+            this.anomaliaService.criterioCriticidad.rangosDT.forEach((rango, i, rangos) => {
+              if (i < rangos.length - 1) {
+                ccGradNorm.push(
+                  ccs.filter((anom) => anom.gradienteNormalizado > rango).length -
+                    ccs.filter((anom) => anom.gradienteNormalizado > rangos[i + 1]).length
+                );
+              } else {
+                ccGradNorm.push(ccs.filter((anom) => anom.gradienteNormalizado > rango).length);
+              }
+            });
+
+            tiposAnomalias[index] = ccGradNorm;
+          } else {
+            // tslint:disable-next-line: triple-equals
+            tiposAnomalias[index] = anomaliasInforme.filter((anom) => anom.tipo == index).length;
+          }
+        });
+      } else {
+        GLOBAL.labels_tipos.forEach((_, index) => {
+          if (index === 8 || index === 9) {
+            const ccGradNorm: number[] = [];
+            this.anomaliaService.criterioCriticidad.rangosDT.forEach(() => ccGradNorm.push(0));
+            tiposAnomalias[index] = ccGradNorm;
+          } else {
+            tiposAnomalias[index] = 0;
+          }
+        });
+      }
+
+      informe.tiposAnomalias = tiposAnomalias;
+
+      this.informeService.updateInforme(informe);
     });
   }
 

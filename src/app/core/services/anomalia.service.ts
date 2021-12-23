@@ -39,7 +39,6 @@ export class AnomaliaService {
 
   initService(plantaId: string): Promise<void> {
     // obtenemos el criterio de criticidad de la planta si tuviese
-    let criterioId: string;
     return new Promise((resolve, reject) => {
       this.plantaService
         .getPlanta(plantaId)
@@ -47,37 +46,10 @@ export class AnomaliaService {
           take(1),
           switchMap((planta) => {
             this.planta = planta;
-            // primero comprovamos si la planta tiene criterio
-            if (planta.hasOwnProperty('criterioId')) {
-              this.hasCriticidad = true;
-              criterioId = planta.criterioId;
-            }
 
-            return this.adminService.getUser(planta.empresa);
+            return this.getCriterioId(planta);
           }),
-          take(1),
-          switchMap((user) => {
-            // comprobamos primero que exista el usuario
-            if (user !== undefined && user !== null) {
-              // si la planta no tiene criterio, comprobamos si lo tiene el user
-              if (criterioId === undefined || criterioId === null) {
-                if (user.hasOwnProperty('criterioId')) {
-                  this.hasCriticidad = true;
-                  criterioId = user.criterioId;
-                }
-              }
-            } else {
-              // aviso para que se cree el usuario que falta
-              console.log('Falta usuario en la DB');
-            }
-
-            if (criterioId === undefined || criterioId === null) {
-              // si el cliente no tiene criterio propio asignamos el criterio por defecto Solardrone5
-              criterioId = 'aU2iM5nM0S3vMZxMZGff';
-            }
-
-            return this.plantaService.getCriterioCriticidad(criterioId);
-          })
+          switchMap((criterioId) => this.plantaService.getCriterioCriticidad(criterioId))
         )
         .subscribe((criterio: CritCriticidad) => {
           if (criterio.labels !== undefined) {
@@ -88,19 +60,6 @@ export class AnomaliaService {
           resolve();
         });
     });
-  }
-
-  set selectedInformeId(informeId: string) {
-    this._selectedInformeId = informeId;
-    /* this.getAnomalias$(informeId)
-      .pipe(take(1))
-      .subscribe((anoms) => {
-        this.allAnomaliasInforme = anoms;
-      }); */
-  }
-
-  get selectedInformeId(): string {
-    return this._selectedInformeId;
   }
 
   async addAnomalia(anomalia: Anomalia) {
@@ -202,6 +161,7 @@ export class AnomaliaService {
               }
               data.localId = this.getLocalId(data);
             }
+
             // Convertimos el objeto en un array
             if (data.hasOwnProperty('featureCoords')) {
               data.featureCoords = Object.values(data.featureCoords);
@@ -240,6 +200,41 @@ export class AnomaliaService {
 
   async deleteAnomalia(anomalia: Anomalia) {
     return this.afs.doc('anomalias/' + anomalia.id).delete();
+  }
+
+  getCriterioId(planta: PlantaInterface) {
+    let criterioId: string;
+    // primero comprovamos si la planta tiene criterio
+    if (planta.hasOwnProperty('criterioId')) {
+      this.hasCriticidad = true;
+      criterioId = planta.criterioId;
+    }
+
+    return this.adminService.getUser(planta.empresa).pipe(
+      take(1),
+      map((user) => {
+        // comprobamos primero que exista el usuario
+        if (user !== undefined && user !== null) {
+          // si la planta no tiene criterio, comprobamos si lo tiene el user
+          if (criterioId === undefined || criterioId === null) {
+            if (user.hasOwnProperty('criterioId')) {
+              this.hasCriticidad = true;
+              criterioId = user.criterioId;
+            }
+          }
+        } else {
+          // aviso para que se cree el usuario que falta
+          console.log('Falta usuario en la DB');
+        }
+
+        if (criterioId === undefined || criterioId === null) {
+          // si el cliente no tiene criterio propio asignamos el criterio por defecto Solardrone5
+          criterioId = 'aU2iM5nM0S3vMZxMZGff';
+        }
+
+        return criterioId;
+      })
+    );
   }
 
   getLocalId(anomalia: Anomalia): string {
@@ -562,6 +557,16 @@ export class AnomaliaService {
     }
 
     return value;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////////////
+
+  get selectedInformeId(): string {
+    return this._selectedInformeId;
+  }
+
+  set selectedInformeId(value: string) {
+    this._selectedInformeId = value;
   }
 
   get hasCriticidad() {

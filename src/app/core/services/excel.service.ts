@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Workbook } from 'exceljs';
+import { AutoFilter, CellValue, Workbook } from 'exceljs';
 import * as FileSaver from 'file-saver';
 
 import { ReportControlService } from './report-control.service';
@@ -15,14 +15,18 @@ export class ExcelService {
   constructor(private reportControlService: ReportControlService) {}
 
   public exportAsExcelFile(
-    reportHeading: string,
-    headersArray: any[],
+    headersArray: string[][],
+    headersColors: string[],
     json: any[],
     excelFileName: string,
     sheetName: string,
-    limiteImgs: number
+    columnasLink?: number[],
+    columnasFormula?: number[],
+    formulas?: string[],
+    inicioFilters?: number
   ) {
-    const header = headersArray;
+    const header: string[] = [];
+    headersArray.forEach((array) => header.push(...array));
     const data = json;
 
     // creamos workbook y worksheet
@@ -37,58 +41,32 @@ export class ExcelService {
     const headeRow = worksheet.addRow(header);
 
     // estilos de la cabeceras de las columnas
-    let seccion1 = 3;
-    let seccion2 = 9;
-    let seccion3 = 14;
-    if (this.reportControlService.plantaFija || json.length > limiteImgs) {
-      seccion1 = seccion1 - 2;
-      seccion2 = seccion2 - 2;
-      seccion3 = seccion3 - 2;
-    }
+    let initColor = 1;
+    headersArray.forEach((section, i) => {
+      headeRow.eachCell((cell, index) => {
+        if (index >= initColor && index <= initColor + section.length) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: headersColors[i] },
+          };
+        }
 
-    headeRow.eachCell((cell, index) => {
-      if (index <= seccion1) {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFE5E7E9' },
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
         };
-      } else if (index <= seccion2) {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFF5B7B1' },
-        };
-      } else if (index <= seccion3) {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFD4EFDF' },
-        };
-      } else if (index <= header.length) {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFE5E7E9' },
-        };
-      } else {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFFFFFFF' },
-        };
-      }
-      cell.border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' },
-      };
-      cell.font = { size: 12 };
 
-      worksheet.getColumn(index).width = header[index - 1].length < 20 ? 20 : header[index - 1].length;
+        cell.font = { size: 12 };
 
-      headeRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+        worksheet.getColumn(index).width = header[index - 1].length < 20 ? 20 : header[index - 1].length;
+
+        headeRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+      });
+
+      initColor += section.length;
     });
 
     // congelamos la primera filas
@@ -133,25 +111,40 @@ export class ExcelService {
     });
 
     // aplicamos estilos a los links
-    if (!this.reportControlService.plantaFija) {
-      worksheet.getColumn(2).eachCell((cell, index) => {
-        // no aplicamos a las cabeceras
-        if (index > 1) {
-          this.applyLinkStyle(cell);
-        }
-      });
-      worksheet.getColumn(3).eachCell((cell, index) => {
-        // no aplicamos a las cabeceras
-        if (index > 1) {
-          this.applyLinkStyle(cell);
-        }
+    if (columnasLink !== undefined) {
+      columnasLink.forEach((columna) => {
+        worksheet.getColumn(columna).eachCell((cell, index) => {
+          // no aplicamos a las cabeceras
+          if (index > 1) {
+            this.applyLinkStyle(cell);
+          }
+        });
       });
     }
 
-    // filtros
-    worksheet.getColumn(2).worksheet.autoFilter = 'G2:H' + worksheet.rowCount.toString();
-    worksheet.autoFilter = 'K2:L' + worksheet.rowCount.toString();
-    worksheet.autoFilter = 'X2:X' + worksheet.rowCount.toString();
+    // añadimos las formulas
+    if (columnasFormula !== undefined) {
+      columnasFormula.forEach((columna, i) => {
+        worksheet.getColumn(columna).eachCell((cell, index) => {
+          if (index > 1) {
+            const formula = formulas[i].split('#').join(`${index}`);
+
+            cell.value = { formula } as CellValue;
+          }
+        });
+      });
+    }
+
+    // añadimos los filtros
+    if (inicioFilters !== undefined) {
+      worksheet.autoFilter = `${this.numToAlpha(inicioFilters - 1)}1:${this.numToAlpha(
+        inicioFilters - 1 + 5
+      )}${worksheet.rowCount.toString()}`;
+      // worksheet.autoFilter = `${this.numToAlpha(header.length)}1:${this.numToAlpha(header.length)}${
+      //   worksheet.rowCount
+      // }`;
+      // worksheet.autoFilter = 'V1:V' + worksheet.rowCount.toString();
+    }
 
     // guardamos el archivo excel
     workbook.xlsx.writeBuffer().then((data: ArrayBuffer) => {
@@ -171,7 +164,7 @@ export class ExcelService {
     }
   }
 
-  private numToAlpha(num: number) {
+  numToAlpha(num: number) {
     let alpha = '';
 
     for (; num >= 0; num = parseInt((num / 26).toString(), 10) - 1) {

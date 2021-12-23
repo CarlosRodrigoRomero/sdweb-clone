@@ -14,6 +14,7 @@ import { InformeService } from '@core/services/informe.service';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 import { UserInterface } from '@core/models/user';
+import { CritCriticidad } from '@core/models/critCriticidad';
 
 @Injectable({
   providedIn: 'root',
@@ -34,6 +35,7 @@ export class PortfolioControlService {
   public listaInformes: InformeInterface[] = [];
   public allFeatures: Feature[] = [];
   user: UserInterface;
+  criterioCriticidad: CritCriticidad;
 
   constructor(public auth: AuthService, private plantaService: PlantaService, private informeService: InformeService) {}
 
@@ -45,7 +47,24 @@ export class PortfolioControlService {
           switchMap((user) => {
             this.user = user;
 
-            return combineLatest([this.plantaService.getPlantasDeEmpresa(user), this.informeService.getInformes()]);
+            let criterioId;
+            if (user.hasOwnProperty('criterioId')) {
+              criterioId = user.criterioId;
+            } else {
+              // si no tiene criterio propio usamos el criterio Solardrone5
+              criterioId = 'aU2iM5nM0S3vMZxMZGff';
+            }
+
+            return this.plantaService.getCriterioCriticidad(criterioId);
+          }),
+          take(1),
+          switchMap((criterio) => {
+            this.criterioCriticidad = criterio;
+
+            return combineLatest([
+              this.plantaService.getPlantasDeEmpresa(this.user),
+              this.informeService.getInformes(),
+            ]);
           })
         )
         .pipe(take(1))
@@ -78,6 +97,15 @@ export class PortfolioControlService {
                     informe.mae !== null &&
                     informe.disponible === true
                   ) {
+                    // dividimos por 100 el mae de los informes antiguos de fijas xq se ven en la web antigua
+                    if (
+                      planta.tipo !== 'seguidores' &&
+                      informe.fecha < GLOBAL.newReportsDate &&
+                      planta.id !== 'egF0cbpXnnBnjcrusoeR'
+                    ) {
+                      informe.mae = informe.mae / 100;
+                    }
+
                     // añadimos el informe a la lista
                     this.listaInformes.push(informe);
 
