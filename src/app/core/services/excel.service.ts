@@ -61,7 +61,8 @@ export class ExcelService {
 
         cell.font = { size: 12 };
 
-        worksheet.getColumn(index).width = header[index - 1].length < 20 ? 20 : header[index - 1].length;
+        worksheet.getColumn(index).width =
+          header[index - 1].length < 20 ? 20 : header[index - 1].length > 25 ? 25 : header[index - 1].length;
 
         headeRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
       });

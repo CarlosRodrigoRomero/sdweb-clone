@@ -38,9 +38,9 @@ export class DownloadExcelPortfolioComponent implements OnInit {
     this.portfolioControlService.criterioCriticidad.rangosDT.forEach((rango, index, rangos) => {
       let columna: string;
       if (index < rangos.length - 1) {
-        columna = 'Cels. calientes ' + rango + ' - ' + rangos[index + 1] + 'ºC';
+        columna = 'Cels. calientes por ΔT Max (norm) ' + rango + ' - ' + rangos[index + 1] + 'ºC';
       } else {
-        columna = 'Cels. calientes >' + rango + 'ºC';
+        columna = 'Cels. calientes por ΔT Max (norm) >' + rango + 'ºC';
       }
 
       this.columnas[1].push(columna);
