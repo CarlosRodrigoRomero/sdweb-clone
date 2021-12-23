@@ -68,8 +68,8 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private informeSelected: InformeInterface;
   private planta: PlantaInterface;
   private allElems: FilterableElement[];
-  private _filasCargadas = 0;
-  private filasCargadas$ = new BehaviorSubject<number>(this._filasCargadas);
+  private _linksCargados = 0;
+  private linksCargados$ = new BehaviorSubject<number>(this._linksCargados);
   private limiteImgs = 2000;
   private translation: Translation;
   private language: string;
@@ -142,7 +142,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
           this.json = new Array(this.anomaliasInforme.length);
 
           // reseteamos el contador de filas
-          this.filasCargadas = 0;
+          this.linksCargados = 0;
         })
     );
   }
@@ -173,18 +173,18 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       let downloads = 0;
 
       this.subscriptions.add(
-        this.filasCargadas$.subscribe((filasCargadas) => {
+        this.linksCargados$.subscribe((linksCargados) => {
           // indicamos el progreso en la barra de progreso
           this.downloadReportService.progressBarValue = Math.round(
-            (filasCargadas / this.anomaliasInforme.length) * 100
+            (linksCargados / this.anomaliasInforme.length) * 100
           );
 
           // cuando esten todas las filas cargadas descargamos el excel
-          if (filasCargadas === this.anomaliasInforme.length && downloads === 0) {
+          if (linksCargados / 2 === this.anomaliasInforme.length && downloads === 0) {
             this.downloadExcel();
 
             // reseteamos el contador de filas
-            this.filasCargadas = 0;
+            this.linksCargados = 0;
 
             downloads++;
           }
@@ -334,8 +334,20 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
         .toPromise()
         .then((urlThermal) => {
           row.thermalImage = urlThermal;
+
+          if (row.visualImage !== undefined) {
+            this.json[index] = row;
+          }
+
+          this.linksCargados++;
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          row.thermalImage = null;
+
+          console.log(err);
+
+          this.linksCargados++;
+        });
 
       this.storage
         .ref(`informes/${this.informeSelected.id}/jpgVisual/${(anomalia as PcInterface).archivoPublico}`)
@@ -344,14 +356,18 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
         .then((urlVisual) => {
           row.visualImage = urlVisual;
 
-          this.json[index] = row;
+          if (row.thermalImage !== undefined) {
+            this.json[index] = row;
+          }
 
-          this.filasCargadas++;
+          this.linksCargados++;
         })
         .catch((err) => {
+          row.visualImage = null;
+
           console.log(err);
 
-          this.filasCargadas++;
+          this.linksCargados++;
         });
     } else {
       this.json[index] = row;
@@ -364,12 +380,12 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
   //////////////////////////////////////////////////////////////////////////////////////////////
 
-  get filasCargadas(): number {
-    return this._filasCargadas;
+  get linksCargados(): number {
+    return this._linksCargados;
   }
 
-  set filasCargadas(value: number) {
-    this._filasCargadas = value;
-    this.filasCargadas$.next(value);
+  set linksCargados(value: number) {
+    this._linksCargados = value;
+    this.linksCargados$.next(value);
   }
 }
