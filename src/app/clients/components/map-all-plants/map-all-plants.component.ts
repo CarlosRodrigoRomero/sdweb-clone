@@ -20,7 +20,6 @@ import { GLOBAL } from '@core/services/global';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 
-
 @Component({
   selector: 'app-map-all-plants',
   templateUrl: './map-all-plants.component.html',
@@ -53,41 +52,18 @@ export class MapAllPlantsComponent implements OnInit {
     const vectorSource = new VectorSource({});
 
     this.plantas.forEach((planta) => {
+      const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
+      const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
+
       const feature = new Feature(new Circle(fromLonLat([planta.longitud, planta.latitud]), 1e4));
 
-      if (planta.informes !== undefined && planta.informes.length > 0) {
-        // añadimos los ya añadidos
+      feature.setProperties({
+        mae: informeReciente.mae,
+        plantaId: planta.id,
+        tipo: planta.tipo,
+        fechaInfReciente: informeReciente.fecha,
+      });
 
-        const informeReciente = planta.informes.reduce((prev, current) =>
-          prev.fecha > current.fecha ? prev : current
-        );
-
-        if (informeReciente.mae !== undefined) {
-          // añadimos la planta a añadidas
-
-          feature.setProperties({
-            mae: informeReciente.mae,
-            plantaId: planta.id,
-            tipo: planta.tipo,
-            fechaInfReciente: informeReciente.fecha,
-          });
-        }
-        // buscamos tambien informes que no esten dentro de la interfaz planta
-      } else if (this.informes.map((inf) => inf.plantaId).includes(planta.id)) {
-        const informesAdiccionales = this.informes.filter((inf) => inf.plantaId === planta.id);
-        const informeReciente = informesAdiccionales.reduce((prev, current) =>
-          prev.fecha > current.fecha ? prev : current
-        );
-
-        if (informeReciente.mae !== undefined) {
-          feature.setProperties({
-            mae: informeReciente.mae,
-            plantaId: planta.id,
-            tipo: planta.tipo,
-            fechaInfReciente: informeReciente.fecha,
-          });
-        }
-      }
       this.portfolioControlService.allFeatures.push(feature);
 
       vectorSource.addFeature(feature);
