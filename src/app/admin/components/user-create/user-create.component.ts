@@ -42,7 +42,7 @@ export class UserCreateComponent implements OnInit {
       this.user.uid = this.form.get('uid').value;
       this.user.email = this.form.get('email').value;
       this.user.empresaNombre = this.form.get('empresa').value;
-      this.user.role = this.form.get('role').value as number;
+      this.user.role = Number(this.form.get('role').value);
 
       // Crea el usuario en la DB
       this.createUser(this.user);

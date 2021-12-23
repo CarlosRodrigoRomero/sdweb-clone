@@ -63,7 +63,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     if (this.form.valid) {
       this.user.email = this.form.get('email').value;
       this.user.empresaNombre = this.form.get('empresa').value;
-      this.user.role = this.form.get('role').value;
+      this.user.role = Number(this.form.get('role').value);
       console.log(this.user);
       // Actualiza el usuario en la DB
       this.updateUser(this.user);

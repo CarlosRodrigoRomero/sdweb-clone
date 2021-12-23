@@ -42,7 +42,8 @@ export class SignInComponent implements OnInit, OnDestroy {
         .signIn(this.form.value.email, this.form.value.password)
         .then(() => {
           if (this.user !== undefined && this.user !== null) {
-            if (this.user.role === 0 || this.user.role === 1 || this.user.role === 2) {
+            // tslint:disable-next-line: triple-equals
+            if (this.user.role == 0 || this.user.role == 1 || this.user.role == 2) {
               this.router.navigate(['clients']);
             } else {
               this.router.navigate(['clientes']);
