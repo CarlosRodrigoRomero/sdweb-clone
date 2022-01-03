@@ -64,7 +64,7 @@ export class BarChartComponent implements OnInit {
   public tiposPlantas: string[] = [];
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
-  private fechaInformesRecientes: number[] = [];
+  private informesRecientes: InformeInterface[] = [];
   private plantasChart: PlantaChart[] = [];
 
   constructor(
@@ -98,7 +98,7 @@ export class BarChartComponent implements OnInit {
       this.data.push(plant.mae * 100);
       this.plantasId.push(plant.planta.id);
       this.tiposPlantas.push(plant.planta.tipo);
-      this.fechaInformesRecientes.push(plant.informeReciente.fecha);
+      this.informesRecientes.push(plant.informeReciente);
       this.barChartLabels.push(plant.planta.nombre);
       this.coloresChart.push(this.getColorMae(plant.mae));
     });
@@ -246,20 +246,29 @@ export class BarChartComponent implements OnInit {
     if (index !== -1) {
       const plantaId = this.plantasId[index];
       const tipoPlanta = this.tiposPlantas[index];
-      const fechaInformeReciente = this.fechaInformesRecientes[index];
+      const informeReciente = this.informesRecientes[index];
 
       if (!this.checkFake(plantaId)) {
-        if (tipoPlanta === 'seguidores') {
-          this.router.navigate(['clients/tracker/' + plantaId]);
-        } else if (fechaInformeReciente > GLOBAL.newReportsDate || plantaId === 'egF0cbpXnnBnjcrusoeR') {
-          this.router.navigate(['clients/fixed/' + plantaId]);
+        // comprobamos si es una planta que solo se ve en el informe antiguo
+        if (this.portfolioControlService.checkPlantaSoloWebAntigua(plantaId)) {
+          this.navigateOldReport(informeReciente.id);
         } else {
-          this.openSnackBar();
+          if (tipoPlanta === 'seguidores') {
+            this.router.navigate(['clients/tracker/' + plantaId]);
+          } else if (informeReciente.fecha > GLOBAL.newReportsDate || plantaId === 'egF0cbpXnnBnjcrusoeR') {
+            this.router.navigate(['clients/fixed/' + plantaId]);
+          } else {
+            this.openSnackBar();
+          }
         }
       } else {
         this.openSnackBarDemo();
       }
     }
+  }
+
+  private navigateOldReport(informeId: string) {
+    this.router.navigate(['clientes/informe-view/' + informeId + '/informe-overview']);
   }
 
   private openSnackBar() {

@@ -99,9 +99,10 @@ export class PortfolioControlService {
                   ) {
                     // dividimos por 100 el mae de los informes antiguos de fijas xq se ven en la web antigua
                     if (
-                      planta.tipo !== 'seguidores' &&
-                      informe.fecha < GLOBAL.newReportsDate &&
-                      planta.id !== 'egF0cbpXnnBnjcrusoeR'
+                      (planta.tipo !== 'seguidores' &&
+                        informe.fecha < GLOBAL.newReportsDate &&
+                        planta.id !== 'egF0cbpXnnBnjcrusoeR') ||
+                      this.checkPlantaSoloWebAntigua(planta.id)
                     ) {
                       informe.mae = informe.mae / 100;
                     }
@@ -213,6 +214,19 @@ export class PortfolioControlService {
     });
 
     return sumatorioDesviaciones / values.length;
+  }
+
+  checkPlantaSoloWebAntigua(plantaId: string): boolean {
+    const plantasVerInformeAntiguo: string[] = [
+      'yoKAhD3TWvbxrJ9eGcTR' /* Adrados de Ordas */,
+      'zkW3KgOofLdSqV2hWvqD' /* Fuente Alamo NS */,
+    ];
+
+    if (plantasVerInformeAntiguo.includes(plantaId)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   resetService() {

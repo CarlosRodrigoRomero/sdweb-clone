@@ -13,7 +13,6 @@ import { GLOBAL } from '@core/services/global';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 
-
 interface PlantsData {
   nombre: string;
   potencia: number;
@@ -68,6 +67,11 @@ export class PlantListComponent implements OnInit, AfterViewInit {
         informesAntiguos = informesPlanta.filter((informe) => informe.fecha < GLOBAL.newReportsDate);
       }
 
+      // comprobamos si es una planta que solo se ve en el informe antiguo
+      if (this.portfolioControlService.checkPlantaSoloWebAntigua(planta.id)) {
+        informesAntiguos = informesPlanta;
+      }
+
       plantsData.push({
         nombre: planta.nombre,
         potencia: planta.potencia,
@@ -106,14 +110,19 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     const fecha = row.ultimaInspeccion;
 
     if (!this.checkFake(plantaId)) {
-      // provisional - no abre ningun informe de fijas anterior al 1/05/2021 salvo DEMO
-      if (tipoPlanta === 'seguidores') {
-        this.router.navigate(['clients/tracker/' + plantaId]);
+      // comprobamos si es una planta que solo se ve en el informe antiguo
+      if (this.portfolioControlService.checkPlantaSoloWebAntigua(plantaId)) {
+        this.openSnackBar();
       } else {
-        if (fecha > GLOBAL.newReportsDate || plantaId === 'egF0cbpXnnBnjcrusoeR') {
-          this.router.navigate(['clients/fixed/' + plantaId]);
+        // provisional - no abre ningun informe de fijas anterior al 1/05/2021 salvo DEMO
+        if (tipoPlanta === 'seguidores') {
+          this.router.navigate(['clients/tracker/' + plantaId]);
         } else {
-          this.openSnackBar();
+          if (fecha > GLOBAL.newReportsDate || plantaId === 'egF0cbpXnnBnjcrusoeR') {
+            this.router.navigate(['clients/fixed/' + plantaId]);
+          } else {
+            this.openSnackBar();
+          }
         }
       }
     } else {

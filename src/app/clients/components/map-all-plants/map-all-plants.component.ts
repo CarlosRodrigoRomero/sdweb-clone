@@ -61,7 +61,7 @@ export class MapAllPlantsComponent implements OnInit {
         mae: informeReciente.mae,
         plantaId: planta.id,
         tipo: planta.tipo,
-        fechaInfReciente: informeReciente.fecha,
+        informeReciente,
       });
 
       this.portfolioControlService.allFeatures.push(feature);
@@ -149,15 +149,20 @@ export class MapAllPlantsComponent implements OnInit {
       if (feature.length > 0) {
         const plantaId = feature[0].getProperties().plantaId;
         const tipoPlanta = feature[0].getProperties().tipo;
-        const fechaInformeReciente = feature[0].getProperties().fechaInfReciente;
+        const informeReciente = feature[0].getProperties().informeReciente;
 
         if (!this.checkFake(plantaId)) {
-          if (tipoPlanta === 'seguidores') {
-            this.router.navigate(['clients/tracker/' + plantaId]);
-          } else if (fechaInformeReciente > GLOBAL.newReportsDate || plantaId === 'egF0cbpXnnBnjcrusoeR') {
-            this.router.navigate(['clients/fixed/' + plantaId]);
+          // comprobamos si es una planta que solo se ve en el informe antiguo
+          if (this.portfolioControlService.checkPlantaSoloWebAntigua(plantaId)) {
+            this.navigateOldReport(informeReciente.id);
           } else {
-            this.openSnackBar();
+            if (tipoPlanta === 'seguidores') {
+              this.router.navigate(['clients/tracker/' + plantaId]);
+            } else if (informeReciente.fecha > GLOBAL.newReportsDate || plantaId === 'egF0cbpXnnBnjcrusoeR') {
+              this.router.navigate(['clients/fixed/' + plantaId]);
+            } else {
+              this.openSnackBar();
+            }
           }
         } else {
           this.openSnackBarDemo();
@@ -173,6 +178,10 @@ export class MapAllPlantsComponent implements OnInit {
     } else {
       return false;
     }
+  }
+
+  private navigateOldReport(informeId: string) {
+    this.router.navigate(['clientes/informe-view/' + informeId + '/informe-overview']);
   }
 
   private openSnackBar() {
