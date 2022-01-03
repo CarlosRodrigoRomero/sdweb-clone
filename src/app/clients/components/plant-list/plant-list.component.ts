@@ -67,16 +67,10 @@ export class PlantListComponent implements OnInit, AfterViewInit {
         informesAntiguos = informesPlanta.filter((informe) => informe.fecha < GLOBAL.newReportsDate);
       }
 
-      // comprobamos si es una planta que solo se ve en el informe antiguo
-      if (this.portfolioControlService.checkPlantaSoloWebAntigua(planta.id)) {
-        informesAntiguos = informesPlanta;
-      }
-
       plantsData.push({
         nombre: planta.nombre,
         potencia: planta.potencia,
-        mae: informeReciente.mae,
-        ultimaInspeccion: informeReciente.fecha,
+        informeReciente,
         informesAntiguos,
         plantaId: planta.id,
         tipo: planta.tipo,
@@ -104,29 +98,29 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     event.stopPropagation();
   }
 
-  onClick(row) {
-    const plantaId = row.plantaId;
-    const tipoPlanta = row.tipo;
-    const fecha = row.ultimaInspeccion;
-
-    if (!this.checkFake(plantaId)) {
+  onClick(row: any) {
+    if (!this.checkFake(row.plantaId)) {
       // comprobamos si es una planta que solo se ve en el informe antiguo
-      if (this.portfolioControlService.checkPlantaSoloWebAntigua(plantaId)) {
-        this.openSnackBar();
+      if (this.portfolioControlService.checkPlantaSoloWebAntigua(row.plantaId)) {
+        this.navigateOldReport(row.informeReciente.id);
       } else {
-        // provisional - no abre ningun informe de fijas anterior al 1/05/2021 salvo DEMO
-        if (tipoPlanta === 'seguidores') {
-          this.router.navigate(['clients/tracker/' + plantaId]);
-        } else {
-          if (fecha > GLOBAL.newReportsDate || plantaId === 'egF0cbpXnnBnjcrusoeR') {
-            this.router.navigate(['clients/fixed/' + plantaId]);
-          } else {
-            this.openSnackBar();
-          }
-        }
+        this.navegateNewReport(row);
       }
     } else {
       this.openSnackBarDemo();
+    }
+  }
+
+  navegateNewReport(row: any) {
+    // provisional - no abre ningun informe de fijas anterior al 1/05/2021 salvo DEMO
+    if (row.tipoPlanta === 'seguidores') {
+      this.router.navigate(['clients/tracker/' + row.plantaId]);
+    } else {
+      if (row.informeReciente.fecha > GLOBAL.newReportsDate || row.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+        this.router.navigate(['clients/fixed/' + row.plantaId]);
+      } else {
+        this.openSnackBar();
+      }
     }
   }
 
