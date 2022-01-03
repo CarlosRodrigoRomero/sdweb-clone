@@ -204,11 +204,6 @@ export class AnomaliaService {
 
   getCriterioId(planta: PlantaInterface) {
     let criterioId: string;
-    // primero comprovamos si la planta tiene criterio
-    if (planta.hasOwnProperty('criterioId')) {
-      this.hasCriticidad = true;
-      criterioId = planta.criterioId;
-    }
 
     return this.adminService.getUser(planta.empresa).pipe(
       take(1),
@@ -225,6 +220,12 @@ export class AnomaliaService {
         } else {
           // aviso para que se cree el usuario que falta
           console.log('Falta usuario en la DB');
+        }
+
+        // si la planta tiene criterio propio le damos prioridad sobre el de la empresa
+        if (planta.hasOwnProperty('criterioId')) {
+          this.hasCriticidad = true;
+          criterioId = planta.criterioId;
         }
 
         if (criterioId === undefined || criterioId === null) {
