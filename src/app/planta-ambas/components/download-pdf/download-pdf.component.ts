@@ -427,13 +427,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         });
       }
     } else {
-      this.apartadosInforme.push({
-        nombre: 'planoTermico',
-        descripcion: 'Plano térmico',
-        orden: 9,
-        apt: 2,
-        elegible: false,
-      });
+      // si no hay zonas no se incluye el plano termico
+      if (this.reportControlService.thereAreZones) {
+        this.apartadosInforme.push({
+          nombre: 'planoTermico',
+          descripcion: 'Plano térmico',
+          orden: 9,
+          apt: 2,
+          elegible: false,
+        });
+      }
       // solo disponible para plantas con menos de 500 anomalias
       if (this.informeConImagenes && this.incluirImagenes) {
         this.apartadosInforme.push({
@@ -461,7 +464,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       // }
     }
 
-    if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
+    // solo se añade el plano visual si hay zonas y es un informe de 2021 en adelante
+    if (this.reportControlService.thereAreZones && this.selectedInforme.fecha > GLOBAL.newReportsDate) {
       this.apartadosInforme.push({
         nombre: 'planoVisual',
         descripcion: 'Plano visual',
@@ -589,8 +593,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     // cargamos imagenes que cambian con cada informe
     this.imagesLoadService.loadChangingImages(this.selectedInforme.id);
 
-    // cargamos las orto termica y visual de la planta
-    this.getImgsPlanos();
+    if (this.reportControlService.thereAreZones) {
+      // cargamos las orto termica y visual de la planta
+      this.getImgsPlanos();
+    }
 
     this.countLoadedImages = 0;
     this.countLoadedImagesSegs1EjeAnoms = 0;

@@ -49,14 +49,18 @@ export class ImagesTilesService {
   checkImgsPlanosLoaded(): Promise<boolean> {
     return new Promise((loaded) => {
       this.imagesPlantaLoaded$.subscribe((value) => {
-        if (this.reportControlService.plantaFija) {
-          if (value === 2) {
-            loaded(true);
+        if (this.reportControlService.thereAreZones) {
+          if (this.reportControlService.plantaFija) {
+            if (value === 2) {
+              loaded(true);
+            }
+          } else {
+            if (value === 1) {
+              loaded(true);
+            }
           }
         } else {
-          if (value === 1) {
-            loaded(true);
-          }
+          loaded(true);
         }
       });
     });
