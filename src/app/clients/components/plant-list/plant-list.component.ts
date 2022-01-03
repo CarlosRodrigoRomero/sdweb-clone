@@ -113,7 +113,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
   navegateNewReport(row: any) {
     // provisional - no abre ningun informe de fijas anterior al 1/05/2021 salvo DEMO
-    if (row.tipoPlanta === 'seguidores') {
+    if (row.tipo === 'seguidores') {
       this.router.navigate(['clients/tracker/' + row.plantaId]);
     } else {
       if (row.informeReciente.fecha > GLOBAL.newReportsDate || row.plantaId === 'egF0cbpXnnBnjcrusoeR') {

@@ -41,7 +41,7 @@
           <ng-container matColumnDef="ultimaInspeccion">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Última inspección</th>
             <td mat-cell (click)="onClick(row)" *matCellDef="let row">
-              {{ row.informeReciente.ultimaInspeccion * 1000 | date: 'dd/MM/yyyy' }}
+              {{ row.informeReciente.fecha * 1000 | date: 'dd/MM/yyyy' }}
             </td>
           </ng-container>
 
