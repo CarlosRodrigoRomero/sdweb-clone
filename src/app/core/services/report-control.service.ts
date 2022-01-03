@@ -371,6 +371,8 @@ export class ReportControlService {
         numGlobalCoords = index + 1;
 
         break;
+      } else {
+        numGlobalCoords = index;
       }
     }
 
