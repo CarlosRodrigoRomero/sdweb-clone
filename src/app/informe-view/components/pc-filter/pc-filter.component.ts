@@ -98,19 +98,19 @@ export class PcFilterComponent implements OnInit, OnDestroy {
       .subscribe((planta) => {
         if (planta.hasOwnProperty('criterioId')) {
           this.plantaService
-            .getCriterio(planta.criterioId)
+            .getCriterioCriticidad(planta.criterioId)
             .pipe(take(1))
             .subscribe((criterio) => {
-              this.minGradiente = criterio.critCoA.rangosDT[0];
+              this.minGradiente = criterio.rangosDT[0];
               this.pcService.PushFiltroGradiente(this.minGradiente);
               this.criterio = criterio;
             });
         } else {
           this.plantaService
-            .getCriterio(GLOBAL.criterioSolardroneId)
+            .getCriterioCriticidad(GLOBAL.criterioSolardroneId)
             .pipe(take(1))
             .subscribe((criterio) => {
-              this.minGradiente = criterio.critCoA.rangosDT[0];
+              this.minGradiente = criterio.rangosDT[0];
               this.pcService.PushFiltroGradiente(this.minGradiente);
               this.criterio = criterio;
             });
