@@ -27,7 +27,7 @@
           <ng-container matColumnDef="mae">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>MAE</th>
             <td mat-cell (click)="onClick(row)" *matCellDef="let row">
-              {{ row.informeReciente.mae * 100 | number: '1.2-2' }}%
+              {{ row.mae * 100 | number: '1.2-2' }}%
             </td>
           </ng-container>
 
@@ -41,7 +41,7 @@
           <ng-container matColumnDef="ultimaInspeccion">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Última inspección</th>
             <td mat-cell (click)="onClick(row)" *matCellDef="let row">
-              {{ row.informeReciente.fecha * 1000 | date: 'dd/MM/yyyy' }}
+              {{ row.ultimaInspeccion * 1000 | date: 'dd/MM/yyyy' }}
             </td>
           </ng-container>
 

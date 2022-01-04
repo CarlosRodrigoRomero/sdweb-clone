@@ -70,10 +70,12 @@ export class PlantListComponent implements OnInit, AfterViewInit {
       plantsData.push({
         nombre: planta.nombre,
         potencia: planta.potencia,
-        informeReciente,
+        mae: informeReciente.mae,
+        ultimaInspeccion: informeReciente.fecha,
         informesAntiguos,
         plantaId: planta.id,
         tipo: planta.tipo,
+        informeReciente,
       });
     });
 
@@ -116,7 +118,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     if (row.tipo === 'seguidores') {
       this.router.navigate(['clients/tracker/' + row.plantaId]);
     } else {
-      if (row.informeReciente.fecha > GLOBAL.newReportsDate || row.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+      if (row.ultimaInspeccion > GLOBAL.newReportsDate || row.plantaId === 'egF0cbpXnnBnjcrusoeR') {
         this.router.navigate(['clients/fixed/' + row.plantaId]);
       } else {
         this.openSnackBar();

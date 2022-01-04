@@ -58,8 +58,8 @@ export class DownloadExcelPortfolioComponent implements OnInit {
     this.filas = [];
 
     const plantas = this.portfolioControlService.listaPlantas;
-    const informes = this.portfolioControlService.listaInformes.filter((informe) =>
-      informe.hasOwnProperty('tiposAnomalias')
+    const informes = this.portfolioControlService.listaInformes.filter(
+      (informe) => informe.hasOwnProperty('tiposAnomalias') && informe.tiposAnomalias[0] !== undefined
     );
 
     plantas.forEach((planta) => {
@@ -72,8 +72,15 @@ export class DownloadExcelPortfolioComponent implements OnInit {
           fechaInspeccion: this.datePipe.transform(informe.fecha * 1000, 'dd/MM/yyyy'),
           potencia: planta.potencia,
           tipo: planta.tipo,
-          mae: Math.round(informe.mae * 10000) / 100,
         };
+
+        let mae = 0;
+        if (informe.fecha < GLOBAL.newReportsDate) {
+          mae = Math.round(informe.mae * 100) / 100;
+        } else {
+          mae = Math.round(informe.mae * 10000) / 100;
+        }
+        fila['mae'] = mae;
 
         let numAnomalias = 0;
         let ccTotales = 0;
@@ -100,7 +107,10 @@ export class DownloadExcelPortfolioComponent implements OnInit {
         fila['ccTotales'] = ccTotales;
 
         this.portfolioControlService.criterioCriticidad.rangosDT.forEach((_, index) => {
-          const ccsRango = informe.tiposAnomalias[8][index] + informe.tiposAnomalias[9][index];
+          let ccsRango = informe.tiposAnomalias[8][index] + informe.tiposAnomalias[9][index];
+          if (isNaN(ccsRango)) {
+            ccsRango = 0;
+          }
           fila['cc' + (index + 1)] = ccsRango;
         });
 
