@@ -220,6 +220,7 @@ export class PortfolioControlService {
     const plantasVerInformeAntiguo: string[] = [
       'yoKAhD3TWvbxrJ9eGcTR' /* Adrados de Ordas */,
       'zkW3KgOofLdSqV2hWvqD' /* Fuente Alamo NS */,
+      'fjub5AUln6LZER8cQhyw' /* Mahora */,
     ];
 
     if (plantasVerInformeAntiguo.includes(plantaId)) {
