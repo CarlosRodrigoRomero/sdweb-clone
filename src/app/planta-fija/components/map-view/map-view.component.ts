@@ -17,8 +17,8 @@ import { DownloadReportService } from '@core/services/download-report.service';
 })
 export class MapViewComponent implements OnInit, OnDestroy {
   public plantaFija = true;
-  public leftOpened: boolean;
-  public rightOpened: boolean;
+  public leftOpened = true;
+  public rightOpened = true;
   public statsOpened: boolean;
   public anomaliasLoaded = false;
   public notSharedReport = true;

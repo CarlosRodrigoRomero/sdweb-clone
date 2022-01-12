@@ -17,8 +17,8 @@ import { DownloadReportService } from '@core/services/download-report.service';
   styleUrls: ['./map-view.component.css'],
 })
 export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
-  public leftOpened: boolean;
-  public rightOpened: boolean;
+  public leftOpened = true;
+  public rightOpened = true;
   public statsOpened: boolean;
   public seguidorViewOpened: boolean;
   public seguidoresLoaded = false;
