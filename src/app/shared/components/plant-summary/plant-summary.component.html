@@ -54,6 +54,7 @@
       <mat-icon
         class="help"
         matTooltip="Módulos Apagados Equivalentes. Cada anomalía térmica detectada tiene una pérdida de energía asociada. El MAE cuantifica la suma de estas pérdidas acumuladas en la planta"
+        matTooltipClass="tooltip-style"
         >help_outline</mat-icon
       >
       <span class="subtitulo">MAE</span>
@@ -61,7 +62,10 @@
       <!-- <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon> -->
     </div>
     <div class="elemento">
-      <mat-icon class="help" matTooltip="Porcentaje de módulos que tienen células calientes en la planta."
+      <mat-icon
+        class="help"
+        matTooltip="Porcentaje de módulos que tienen células calientes en la planta."
+        matTooltipClass="tooltip-style"
         >help_outline</mat-icon
       >
       <span class="subtitulo">CC</span>

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { NavigationStart, Router, Event } from '@angular/router';
 
 import { switchMap } from 'rxjs/operators';
@@ -15,6 +15,7 @@ import { PlantaInterface } from '@core/models/planta';
   selector: 'app-plant-summary',
   templateUrl: './plant-summary.component.html',
   styleUrls: ['./plant-summary.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class PlantSummaryComponent implements OnInit, OnDestroy {
   nombrePlanta = 'Planta';
