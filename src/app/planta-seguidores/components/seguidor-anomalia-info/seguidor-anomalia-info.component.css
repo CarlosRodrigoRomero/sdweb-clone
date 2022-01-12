@@ -4,7 +4,7 @@
 
 .info {
   overflow: auto;
-  max-height: calc(100vh - 646px);
+  max-height: calc(100vh - 730px);
 }
 
 .line-info {
