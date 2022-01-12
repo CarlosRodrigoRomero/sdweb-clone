@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
@@ -10,6 +10,7 @@ import { ReportControlService } from '@core/services/report-control.service';
   selector: 'app-download-report',
   templateUrl: './download-report.component.html',
   styleUrls: ['./download-report.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class DownloadReportComponent implements OnInit, OnDestroy {
   private selectedInformeId: string;

@@ -26,6 +26,10 @@
   justify-content: center;
 }
 
+.tooltip-style {
+  font-size: 14px;
+}
+
 @media (max-width: 900px) {
   .map-control {
     gap: 0.5rem;

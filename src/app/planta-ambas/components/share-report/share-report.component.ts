@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
@@ -13,6 +13,7 @@ import { ReportControlService } from '@core/services/report-control.service';
   selector: 'app-share-report',
   templateUrl: './share-report.component.html',
   styleUrls: ['./share-report.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ShareReportComponent {
   items: Observable<any[]>;

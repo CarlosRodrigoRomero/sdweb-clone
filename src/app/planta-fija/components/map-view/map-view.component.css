@@ -28,6 +28,10 @@
   display: none;
 }
 
+.tooltip-style {
+  font-size: 14px;
+}
+
 @media (max-width: 900px) {
   .map-control {
     display: none;
