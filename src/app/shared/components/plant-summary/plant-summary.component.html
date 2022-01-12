@@ -1,11 +1,12 @@
 <div *ngIf="informe$ | async" class="resumen">
   <div class="grupo1">
-    <mat-icon color="primary">home</mat-icon>
-    <h5 class="titulo">{{ nombrePlanta }}</h5>
+    <!-- <mat-icon color="primary">home</mat-icon> -->
+    <span class="titulo">{{ nombrePlanta }}</span>
     <span class="subtitulo">({{ potenciaPlanta | number: '1.0-2' }} MW / {{ tipoPlanta }})</span>
   </div>
-  <div class="grupo2" [matMenuTriggerFor]="menu" matTooltip="Datos vuelo">
+  <div class="grupo2" [matMenuTriggerFor]="menu" matTooltip="Datos del vuelo" matTooltipClass="tooltip-style">
     <mat-icon>info</mat-icon>
+    <mat-icon>expand_more</mat-icon>
     <mat-menu #menu="matMenu" class="menu">
       <div class="menu-grupo2">
         <div class="elemento">
@@ -55,10 +56,10 @@
         class="help"
         matTooltip="Módulos Apagados Equivalentes. Cada anomalía térmica detectada tiene una pérdida de energía asociada. El MAE cuantifica la suma de estas pérdidas acumuladas en la planta"
         matTooltipClass="tooltip-style"
-        >help_outline</mat-icon
+        >help</mat-icon
       >
-      <span class="subtitulo">MAE</span>
-      <span>{{ informe.mae * 100 | number: '1.0-2' }}%</span>
+      <span class="titulo-mae">MAE</span>
+      <span class="valor-mae">{{ informe.mae * 100 | number: '1.0-2' }}%</span>
       <!-- <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon> -->
     </div>
     <div class="elemento">
@@ -66,10 +67,10 @@
         class="help"
         matTooltip="Porcentaje de módulos que tienen células calientes en la planta."
         matTooltipClass="tooltip-style"
-        >help_outline</mat-icon
+        >help</mat-icon
       >
-      <span class="subtitulo">CC</span>
-      <span>{{ informe.cc * 100 | number: '1.0-2' }}%</span>
+      <span class="titulo-cc">CC</span>
+      <span class="valor-cc">{{ informe.cc * 100 | number: '1.0-2' }}%</span>
       <!-- <mat-icon *ngIf="informe.cc < 3" class="success">arrow_circle_down</mat-icon> -->
     </div>
   </div>
