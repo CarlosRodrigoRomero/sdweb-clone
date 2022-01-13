@@ -13,7 +13,7 @@ h5 {
   padding: 0.5rem 1rem 0 1rem;
 }
 
-li {
+.row {
   list-style-type: none;
   display: flex;
   justify-content: center;
