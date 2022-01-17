@@ -9,8 +9,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "deploy:dev": "firebase use dev && ng build && firebase deploy --only hosting",
-    "deploy:prod": "firebase use prod && ng build --prod && firebase deploy --only hosting",
+    "deploy:dev": "firebase use dev && ng build && gulp cache && firebase deploy --only hosting",
+    "deploy:prod": "firebase use prod && ng build --configuration production && firebase deploy --only hosting",
     "analyzer": "webpack-bundle-analyzer dist/sdweb/stats-es2015.json"
   },
   "private": true,
