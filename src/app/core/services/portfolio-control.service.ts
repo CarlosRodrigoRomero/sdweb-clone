@@ -36,6 +36,7 @@ export class PortfolioControlService {
   public allFeatures: Feature[] = [];
   user: UserInterface;
   criterioCriticidad: CritCriticidad;
+  usersFakePlants = ['xsx8U7BrLRU20pj9Oa35ZbJIggx2', 'AM2qmC06OWPb3V1gXJXyEpGS3Uz2', 'I3VzW9HJ5UdIuJH0pbuX69TndDn2'];
 
   constructor(public auth: AuthService, private plantaService: PlantaService, private informeService: InformeService) {}
 
@@ -70,8 +71,8 @@ export class PortfolioControlService {
         .pipe(take(1))
         .subscribe(([plantas, informes]) => {
           if (plantas !== undefined) {
-            // AÑADIMOS PLANTAS FALSAS SOLO EN EL USUARIO DEMO
-            if (this.user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2' || this.user.uid === 'AM2qmC06OWPb3V1gXJXyEpGS3Uz2') {
+            // AÑADIMOS PLANTAS FALSAS SOLO EN LOS USUARIOS DEMO
+            if (this.usersFakePlants.includes(this.user.uid)) {
               plantas = this.addPlantasFake(plantas);
             }
 
