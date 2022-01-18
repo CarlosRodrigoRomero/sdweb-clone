@@ -5,7 +5,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { ThemeService } from '@core/services/theme.service';
 import { filter } from 'rxjs/operators';
 
-declare var gtag;
+// declare var gtag;
 
 @Component({
   selector: 'app-root',
@@ -18,13 +18,14 @@ export class AppComponent implements OnInit {
   @HostBinding('class') componentCssClass: any;
 
   constructor(public overlayContainer: OverlayContainer, private themeService: ThemeService, private router: Router) {
-    const navEndEvents$ = this.router.events.pipe(filter((event) => event instanceof NavigationEnd));
+ /*    const navEndEvents$ = this.router.events.pipe(filter((event) => event instanceof NavigationEnd));
 
     navEndEvents$.subscribe((event: NavigationEnd) => {
       gtag('config', 'G-76T306HFCN', {
         page_path: event.urlAfterRedirects,
+        page_title: 'Web',
       });
-    });
+    }); */
   }
 
   ngOnInit() {
