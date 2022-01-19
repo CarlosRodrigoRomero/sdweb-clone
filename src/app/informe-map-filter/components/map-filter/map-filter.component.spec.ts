@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { PlantaService } from '@core/services/planta.service';
 import { InformeService } from '@core/services/informe.service';
@@ -25,7 +25,7 @@ xdescribe('InformeMapFilterComponent', () => {
   let component: MapFilterComponent;
   let fixture: ComponentFixture<MapFilterComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [MapFilterComponent],
       providers: [

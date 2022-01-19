@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { PubliclayoutComponent } from './publiclayout.component';
 
@@ -6,7 +6,7 @@ xdescribe('PubliclayoutComponent', () => {
     let component: PubliclayoutComponent;
     let fixture: ComponentFixture<PubliclayoutComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [PubliclayoutComponent]
         })

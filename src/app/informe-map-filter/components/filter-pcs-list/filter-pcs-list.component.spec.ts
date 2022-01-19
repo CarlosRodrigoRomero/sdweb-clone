@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { PcInterface } from '@core/models/pc';
 import { FilterService } from '@core/services/filter.service';
 import { BehaviorSubject } from 'rxjs';
@@ -16,7 +16,7 @@ xdescribe('FilterPcsListComponent', () => {
   let fixture: ComponentFixture<FilterPcsListComponent>;
   let filterService: FilterService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers: [FilterPcsListComponent, { provide: FilterService, useClass: MockFilterService }],
       schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA],

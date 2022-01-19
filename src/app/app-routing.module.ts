@@ -60,8 +60,9 @@ export const routes: Routes = [
   providers: [],
   imports: [
     RouterModule.forRoot(routes, {
-      preloadingStrategy: PreloadAllModules,
-    }),
+    preloadingStrategy: PreloadAllModules,
+    relativeLinkResolution: 'legacy'
+}),
   ],
   exports: [RouterModule],
 })

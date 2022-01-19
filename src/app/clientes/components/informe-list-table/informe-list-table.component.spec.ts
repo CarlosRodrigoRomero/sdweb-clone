@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { InformeListTableComponent } from './informe-list-table.component';
 
@@ -6,7 +6,7 @@ xdescribe('InformeListTableComponent', () => {
   let component: InformeListTableComponent;
   let fixture: ComponentFixture<InformeListTableComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ InformeListTableComponent ]
     })

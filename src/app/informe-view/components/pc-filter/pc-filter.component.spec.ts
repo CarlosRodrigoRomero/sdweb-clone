@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { PcFilterComponent } from './pc-filter.component';
 
@@ -6,7 +6,7 @@ xdescribe('PcFilterComponent', () => {
     let component: PcFilterComponent;
     let fixture: ComponentFixture<PcFilterComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [PcFilterComponent]
         })

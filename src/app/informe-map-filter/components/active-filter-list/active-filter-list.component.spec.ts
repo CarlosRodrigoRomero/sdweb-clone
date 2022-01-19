@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ActiveFilterListComponent } from './active-filter-list.component';
 
@@ -6,7 +6,7 @@ xdescribe('ActiveFilterListComponent', () => {
   let component: ActiveFilterListComponent;
   let fixture: ComponentFixture<ActiveFilterListComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ActiveFilterListComponent ]
     })

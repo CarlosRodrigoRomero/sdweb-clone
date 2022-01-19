@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { EditMapComponent } from './edit-map.component';
 
@@ -6,7 +6,7 @@ xdescribe('EditMapComponent', () => {
     let component: EditMapComponent;
     let fixture: ComponentFixture<EditMapComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [EditMapComponent]
         })

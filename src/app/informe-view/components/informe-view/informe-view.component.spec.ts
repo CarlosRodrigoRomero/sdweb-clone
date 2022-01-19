@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { InformeViewComponent } from './informe-view.component';
 
@@ -6,7 +6,7 @@ xdescribe('InformeViewComponent', () => {
     let component: InformeViewComponent;
     let fixture: ComponentFixture<InformeViewComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [InformeViewComponent]
         })

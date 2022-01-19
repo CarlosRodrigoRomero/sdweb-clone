@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { AutoLocComponent } from './auto-loc.component';
 
@@ -6,7 +6,7 @@ xdescribe('AutoLocComponent', () => {
     let component: AutoLocComponent;
     let fixture: ComponentFixture<AutoLocComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [AutoLocComponent]
         })
