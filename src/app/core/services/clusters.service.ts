@@ -5,7 +5,6 @@ import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
-import * as firebase from 'firebase/app';
 import { AngularFireStorage } from '@angular/fire/storage';
 
 import { Map } from 'ol';
@@ -15,7 +14,6 @@ import { Coordinate } from 'ol/coordinate';
 import moment from 'moment';
 
 import { PlantaService } from './planta.service';
-import { OlMapService } from './ol-map.service';
 import { InformeService } from './informe.service';
 
 import { PuntoTrayectoria } from '@core/models/puntoTrayectoria';
@@ -53,7 +51,6 @@ export class ClustersService {
   constructor(
     private afs: AngularFirestore,
     private plantaService: PlantaService,
-    private olMapService: OlMapService,
     private storage: AngularFireStorage,
     private router: Router,
     private informeService: InformeService
@@ -289,12 +286,17 @@ export class ClustersService {
   }
 
   deleteJoinClusterId(clusterId: string) {
+    const clusterSelected = this.clusters.find((c) => c.id === clusterId);
+
     this.clusters.forEach((cluster) => {
       if (cluster.clusterJoinId === clusterId) {
         const clusterRef = this.clustersRef.doc(cluster.id);
-        clusterRef.update({
-          clusterJoinId: firebase.firestore.FieldValue.delete(),
-        });
+
+        // eliminamos el campo clusterJoinId
+        delete clusterSelected.clusterJoinId;
+
+        // guardamos el cluster sin la propiedad
+        clusterRef.set(clusterSelected);
       }
     });
   }
@@ -304,14 +306,14 @@ export class ClustersService {
     const clusterSelected = this.clusters.find((c) => c.id === clusterId);
 
     if (clusterSelected.clusterJoinId !== undefined) {
-      const clusterJoined = clusterSelected.clusterJoinId;
-
       // creamos la referencia al cluster
       const clusterRef = this.clustersRef.doc(clusterId);
 
-      clusterRef.update({
-        clusterJoinId: firebase.firestore.FieldValue.delete(),
-      });
+      // eliminamos el campo clusterJoinId
+      delete clusterSelected.clusterJoinId;
+
+      // guardamos el cluster sin la propiedad
+      clusterRef.set(clusterSelected);
     } else {
       // eliminamos tambien los JOIN que pudiese haber a este cluster
       this.deleteJoinClusterId(clusterId);

@@ -29,19 +29,19 @@ export class AuthService {
   }
 
   signIn(email: string, password: string) {
-    return this.afAuth.auth.signInWithEmailAndPassword(email, password);
+    return this.afAuth.signInWithEmailAndPassword(email, password);
   }
 
   forgotPassword(passwordResetEmail: string) {
-    return this.afAuth.auth.sendPasswordResetEmail(passwordResetEmail);
+    return this.afAuth.sendPasswordResetEmail(passwordResetEmail);
   }
 
   signUp(email: string, password: string) {
-    return this.afAuth.auth.createUserWithEmailAndPassword(email, password);
+    return this.afAuth.createUserWithEmailAndPassword(email, password);
   }
 
   signOut() {
-    return this.afAuth.auth.signOut();
+    return this.afAuth.signOut();
   }
 
   isAuthenticated(): Observable<boolean> {

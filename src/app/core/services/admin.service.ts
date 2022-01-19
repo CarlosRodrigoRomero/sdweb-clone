@@ -55,8 +55,8 @@ export class AdminService {
       });
   }
 
-  sendVerificationMail() {
-    return this.afAuth.auth.currentUser.sendEmailVerification().then(() => {
+  async sendVerificationMail() {
+    return (await this.afAuth.currentUser).sendEmailVerification().then(() => {
       this.router.navigate(['../auth/verify-email-address']);
     });
   }
