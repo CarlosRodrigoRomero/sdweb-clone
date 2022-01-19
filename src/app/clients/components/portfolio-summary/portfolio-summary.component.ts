@@ -14,7 +14,7 @@ export class PortfolioSummaryComponent implements OnInit {
   constructor(private portfolioControlService: PortfolioControlService) {}
 
   ngOnInit(): void {
-    // this.numPlantas = this.portfolioControlService.numPlantas;
+    this.numPlantas = this.portfolioControlService.numPlantas;
     this.potenciaTotal = this.portfolioControlService.potenciaTotal;
   }
 }
