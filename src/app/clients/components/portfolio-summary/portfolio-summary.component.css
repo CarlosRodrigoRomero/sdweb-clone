@@ -9,7 +9,7 @@
 
 .datos mat-icon {
   font-size: 26px;
-  margin: 0 0.5rem 0 1rem;
+  margin: 0 0.5rem 0 1.5rem;
 }
 
 .plantas {
@@ -28,8 +28,9 @@
 }
 
 .titulo span {
-  font-size: larger;
+  font-size: 24px;
   font-weight: 600;
+  margin-left: 0.5rem;
 }
 
 .titulo mat-icon {
@@ -38,7 +39,7 @@
 }
 
 .subtitulo {
-  margin-right: 1em;
+  margin-right: 0.5em;
   font-size: large;
   font-weight: 400;
 }
