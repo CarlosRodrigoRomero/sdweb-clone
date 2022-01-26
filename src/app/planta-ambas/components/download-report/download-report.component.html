@@ -9,19 +9,19 @@
 </button>
 <mat-menu #menu="matMenu" class="menu">
   <div class="contenedor-menu">
-    <h5 (click)="$event.stopPropagation()">Descargas</h5>
+    <h4 class="title" (click)="$event.stopPropagation()">Descargas</h4>
     <app-select-language *ngIf="!plantaDemo"></app-select-language>
 
     <app-download-pdf *ngIf="!plantaDemo"></app-download-pdf>
 
-    <app-download-excel *ngIf="!plantaDemo"></app-download-excel>
-
-    <!-- DEMO -->
+    <!-- PDF DEMO -->
     <a *ngIf="plantaDemo" mat-menu-item href="{{ pdfDemo }}" download="" [disabled]="!excelExist">
       <mat-icon>picture_as_pdf</mat-icon>
-      <span>PDF</span>
+      <span class="label">PDF</span>
     </a>
     <a *ngIf="!reportControlService.plantaFija"> </a>
+
+    <app-download-excel></app-download-excel>
 
     <a
       *ngIf="!reportControlService.plantaFija"

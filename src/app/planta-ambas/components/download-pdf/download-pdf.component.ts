@@ -137,6 +137,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private largestLocAreas: LocationAreaInterface[] = [];
   private informeConImagenes = false;
   private incluirImagenes = false;
+  private simplePDF = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -194,6 +195,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       .map((_, i) => i + 1);
 
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
+
+    this.subscriptions.add(this.downloadReportService.simplePDF$.subscribe((value) => (this.simplePDF = value)));
 
     // suscripciones a las imagenes
     this.loadOtherImages();
@@ -357,13 +360,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         apt: 1,
         elegible: true,
       },
-      {
+      /* {
         nombre: 'perdidaPR',
         descripcion: 'Pérdida de Performance Ratio',
         orden: 7,
         apt: 1,
         elegible: true,
-      },
+      }, */
       {
         nombre: 'clasificacion',
         descripcion: 'Cómo se clasifican las anomalías',
@@ -392,14 +395,26 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         apt: 2,
         elegible: true,
       },
-      {
-        nombre: 'resultadosMAE',
-        descripcion: 'MAE de la planta',
-        orden: 14,
-        apt: 2,
-        elegible: true,
-      },
     ];
+
+    if (!this.simplePDF) {
+      this.apartadosInforme.push(
+        {
+          nombre: 'perdidaPR',
+          descripcion: 'Pérdida de Performance Ratio',
+          orden: 7,
+          apt: 1,
+          elegible: true,
+        },
+        {
+          nombre: 'resultadosMAE',
+          descripcion: 'MAE de la planta',
+          orden: 14,
+          apt: 2,
+          elegible: true,
+        }
+      );
+    }
 
     if (!this.noAnomReport) {
       this.apartadosInforme.push({
@@ -528,6 +543,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(DialogFilteredReportComponent);
 
     dialogRef.afterClosed().subscribe(() => (this.downloadReportService.filteredPDF = undefined));
+  }
+
+  public setSimplePDF(checked: boolean) {
+    this.downloadReportService.simplePDF = checked;
   }
 
   private getImgsPlanos() {
