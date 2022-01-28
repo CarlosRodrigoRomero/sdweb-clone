@@ -27,6 +27,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   thereAreZones = true;
   public mapLoaded = false;
   noAnomsReport = false;
+  generatingDownload = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -73,6 +74,10 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     );
 
     this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
+
+    this.subscriptions.add(
+      this.downloadReportService.generatingDownload$.subscribe((value) => (this.generatingDownload = value))
+    );
   }
 
   ngAfterViewInit(): void {

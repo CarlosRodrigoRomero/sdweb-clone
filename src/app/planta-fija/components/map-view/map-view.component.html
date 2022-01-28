@@ -50,9 +50,6 @@
               <app-download-report *ngIf="notSharedReport"></app-download-report>
             </div>
 
-            <!-- PROGRESS BAR DESCARGAS -->
-            <app-download-progress-bar></app-download-progress-bar>
-
             <button mat-raised-button class="btn-open-controls" (click)="showControls()">
               <mat-icon>tune</mat-icon>
             </button>
@@ -119,3 +116,8 @@
     </mat-sidenav-container>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<!-- PROGRESS BAR DESCARGAS -->
+<app-download-progress-bar class="progress-bar" *ngIf="generatingDownload"></app-download-progress-bar>
+
+<div class="dark-trasp-background" *ngIf="generatingDownload"></div>
