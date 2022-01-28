@@ -25,6 +25,8 @@ export class DownloadReportService {
   endingDownload$ = new BehaviorSubject<boolean>(this._endingDownload);
   private _progressBarValue = 0;
   progressBarValue$ = new BehaviorSubject<number>(this._progressBarValue);
+  private _progressBarMode = 'determinate';
+  progressBarMode$ = new BehaviorSubject<string>(this._progressBarMode);
   private _filteredPDF: boolean = undefined;
   filteredPDF$ = new BehaviorSubject<boolean>(this._filteredPDF);
   private _seguidores1Eje: LocationAreaInterface[] = [];
@@ -194,6 +196,7 @@ export class DownloadReportService {
     this.generatingDownload = false;
     this.endingDownload = false;
     this.progressBarValue = 0;
+    this.progressBarMode = 'determinate';
     this.filteredPDF = undefined;
     this.seguidores1Eje = [];
     this.noS1EsLocAreas = [];
@@ -228,6 +231,15 @@ export class DownloadReportService {
   set progressBarValue(value: number) {
     this._progressBarValue = value;
     this.progressBarValue$.next(value);
+  }
+
+  get progressBarMode(): string {
+    return this._progressBarMode;
+  }
+
+  set progressBarMode(value: string) {
+    this._progressBarMode = value;
+    this.progressBarMode$.next(value);
   }
 
   get filteredPDF() {

@@ -16,6 +16,7 @@ export class ProgressBarPdfComponent implements OnInit, OnDestroy {
   endingDownload = false;
   progressBarColor: ThemePalette = 'primary';
   progressBarValue = 0;
+  progressBarMode = 'indeterminate';
   typeDownload: string;
 
   private subscriptions: Subscription = new Subscription();
@@ -33,6 +34,10 @@ export class ProgressBarPdfComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.downloadReportService.progressBarValue$.subscribe((value) => (this.progressBarValue = value))
+    );
+
+    this.subscriptions.add(
+      this.downloadReportService.progressBarMode$.subscribe((value) => (this.progressBarMode = value))
     );
 
     this.subscriptions.add(this.downloadReportService.typeDownload$.subscribe((value) => (this.typeDownload = value)));

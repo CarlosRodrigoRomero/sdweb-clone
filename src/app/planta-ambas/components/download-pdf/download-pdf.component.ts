@@ -138,6 +138,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private informeConImagenes = false;
   private incluirImagenes = false;
   private simplePDF = false;
+  private maxAnomsConImgs = 500;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -175,7 +176,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     // comprobamos el numero de anomalias para imprimir o no imagenes
     this.subscriptions.add(
       this.reportControlService.allFilterableElements$.subscribe((elems) => {
-        if (elems.length <= 500 && elems.length > 0) {
+        if (elems.length <= this.maxAnomsConImgs && elems.length > 0) {
           this.informeConImagenes = true;
         } else {
           this.informeConImagenes = false;
@@ -295,9 +296,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
           // asignamos los labels del criterio especifico del cliente
           this.labelsCriticidad = this.anomaliaService.criterioCriticidad.labels;
-
-          // establemos los apartados del informe
-          this.loadApartadosInforme();
         })
     );
 
@@ -452,7 +450,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           elegible: false,
         });
       }
-      // solo disponible para plantas con menos de 500 anomalias
+      // solo disponible para plantas con pocas anomalias
       if (this.informeConImagenes && this.incluirImagenes) {
         this.apartadosInforme.push({
           nombre: 'anexoAnomalias',
@@ -584,11 +582,20 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe((response: boolean) => {
       this.incluirImagenes = response;
 
-      // cambiamos los apartados dependiendo de las respuesta
-      this.loadApartadosInforme();
-
       this.downloadPDF();
     });
+  }
+
+  selectProgressBarMode() {
+    if (this.reportControlService.plantaFija) {
+      if (this.informeConImagenes && this.incluirImagenes) {
+        this.downloadReportService.progressBarMode = 'determinate';
+      } else {
+        this.downloadReportService.progressBarMode = 'indeterminate';
+      }
+    } else {
+      this.downloadReportService.progressBarMode = 'determinate';
+    }
   }
 
   private getPrefijoInforme() {
@@ -605,6 +612,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   public downloadPDF() {
+    // cargamos los apartados del informe
+    this.loadApartadosInforme();
+
+    // seleccionamos el modo de progressBar
+    this.selectProgressBarMode();
+
     this.downloadReportService.endingDownload = false;
     this.downloadReportService.generatingDownload = true;
     this.downloadReportService.typeDownload = 'pdf';
@@ -621,6 +634,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.countLoadedImagesSegs1EjeAnoms = 0;
     this.countLoadedImagesSegs1EjeNoAnoms = 0;
 
+    // PLANTAS FIJAS
     if (this.reportControlService.plantaFija) {
       if (this.informeConImagenes && this.incluirImagenes) {
         // Imagenes anomalías
@@ -740,6 +754,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       );
       // }
     } else {
+      // PLANTAS SEGUIDORES
       // Generar imagenes
       this.countSeguidores = 0;
       this.seguidoresInforme.forEach((seguidor, index) => {

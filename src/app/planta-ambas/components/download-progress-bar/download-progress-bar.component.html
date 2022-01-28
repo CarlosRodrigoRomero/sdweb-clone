@@ -4,7 +4,12 @@
     <h5 *ngIf="endingDownload">Terminando...</h5>
 
     <section class="example-section">
-      <mat-progress-bar class="progress-bar" [color]="progressBarColor" [mode]="determinate" [value]="progressBarValue">
+      <mat-progress-bar
+        class="progress-bar"
+        [color]="progressBarColor"
+        [mode]="progressBarMode"
+        [value]="progressBarValue"
+      >
       </mat-progress-bar>
     </section>
   </mat-card-content>
