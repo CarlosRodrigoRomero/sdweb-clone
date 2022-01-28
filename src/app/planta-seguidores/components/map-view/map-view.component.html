@@ -60,7 +60,7 @@
                     <app-view-toggle></app-view-toggle>
 
                     <!-- PROGRESS BAR DESCARGAS -->
-                    <app-download-progress-bar></app-download-progress-bar>
+                    <!-- <app-download-progress-bar></app-download-progress-bar> -->
                   </div>
                 </div>
 
@@ -135,3 +135,8 @@
     </mat-sidenav-container>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<!-- PROGRESS BAR DESCARGAS -->
+<app-download-progress-bar class="progress-bar" *ngIf="generatingDownload"></app-download-progress-bar>
+
+<div class="dark-trasp-background" *ngIf="generatingDownload"></div>
