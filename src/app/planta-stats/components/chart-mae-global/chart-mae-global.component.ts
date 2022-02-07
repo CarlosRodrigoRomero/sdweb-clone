@@ -1,7 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { AngularFirestore } from '@angular/fire/firestore';
-
 import { switchMap, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
@@ -26,8 +24,6 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 import { GLOBAL } from '@core/services/global';
-
-import { PlantaInterface } from '@core/models/planta';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -65,8 +61,7 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private informeService: InformeService,
-    private portfolioControlService: PortfolioControlService,
-    private afs: AngularFirestore
+    private portfolioControlService: PortfolioControlService
   ) {}
 
   ngOnInit(): void {
@@ -166,7 +161,11 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
                 minWidth: 10,
               },
               min: 0,
-              max: Math.max(...[...this.maeData, this.maeMedio]) + 0.5,
+              max:
+                Math.max(...[...this.maeData, this.maeMedio]) * 1.1 <
+                Math.max(...[...this.maeData, this.maeMedio]) + 0.1
+                  ? Math.max(...[...this.maeData, this.maeMedio]) * 1.1
+                  : Math.max(...[...this.maeData, this.maeMedio]) + 0.1,
             },
             legend: {
               show: false,
