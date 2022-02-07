@@ -4,7 +4,11 @@
     <mat-icon>picture_as_pdf</mat-icon>
     <span class="label">PDF</span>
   </button>
-  <mat-checkbox class="simple-pdf" (change)="setSimplePDF($event.checked)" (click)="$event.stopPropagation()"
+  <mat-checkbox
+    class="simple-pdf"
+    [checked]="simplePDF"
+    (change)="setSimplePDF($event.checked)"
+    (click)="$event.stopPropagation()"
     >Simplificado</mat-checkbox
   >
 </div>

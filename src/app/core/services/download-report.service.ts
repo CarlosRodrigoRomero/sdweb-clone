@@ -36,7 +36,7 @@ export class DownloadReportService {
   englishLang$ = new BehaviorSubject<boolean>(this._englishLang);
   private _typeDownload = 'pdf';
   typeDownload$ = new BehaviorSubject<string>(this._typeDownload);
-  private _simplePDF = false;
+  private _simplePDF = true;
   simplePDF$ = new BehaviorSubject<boolean>(this._simplePDF);
 
   constructor(private plantaService: PlantaService) {}

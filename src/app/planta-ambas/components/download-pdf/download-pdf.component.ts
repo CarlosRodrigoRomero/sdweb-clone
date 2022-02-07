@@ -137,7 +137,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private largestLocAreas: LocationAreaInterface[] = [];
   private informeConImagenes = false;
   private incluirImagenes = false;
-  private simplePDF = false;
+  simplePDF = false;
   private maxAnomsConImgs = 500;
 
   private subscriptions: Subscription = new Subscription();
