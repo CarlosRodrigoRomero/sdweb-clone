@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -49,6 +50,7 @@ export interface ChartOptions {
   selector: 'app-bar-chart',
   templateUrl: './bar-chart.component.html',
   styleUrls: ['./bar-chart.component.css'],
+  providers: [DecimalPipe],
 })
 export class BarChartComponent implements OnInit {
   public barChartLabels = Array<string>();
@@ -71,7 +73,8 @@ export class BarChartComponent implements OnInit {
     public auth: AuthService,
     private portfolioControlService: PortfolioControlService,
     private router: Router,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private decimalPipe: DecimalPipe
   ) {}
 
   ngOnInit(): void {
@@ -107,12 +110,22 @@ export class BarChartComponent implements OnInit {
   }
 
   private getColorMae(mae: number): string {
-    if (mae >= this.maeMedio + this.maeSigma) {
-      return GLOBAL.colores_mae[2];
-    } else if (mae <= this.maeMedio - this.maeSigma) {
-      return GLOBAL.colores_mae[0];
+    if (this.plantas.length < 3) {
+      if (mae >= 2) {
+        return GLOBAL.colores_mae[2];
+      } else if (mae < 1) {
+        return GLOBAL.colores_mae[0];
+      } else {
+        return GLOBAL.colores_mae[1];
+      }
     } else {
-      return GLOBAL.colores_mae[1];
+      if (mae >= this.maeMedio + this.maeSigma) {
+        return GLOBAL.colores_mae[2];
+      } else if (mae <= this.maeMedio - this.maeSigma) {
+        return GLOBAL.colores_mae[0];
+      } else {
+        return GLOBAL.colores_mae[1];
+      }
     }
   }
 
@@ -163,9 +176,11 @@ export class BarChartComponent implements OnInit {
       },
       yaxis: {
         min: 0,
-        // min: this.maeMedio - this.maeSigma - 0.5 > 0 ? this.maeMedio - this.maeSigma - 0.5 : 0,
-        // max: this.maeMedio + this.maeSigma + 0.5,
-        max: Math.max(...[...this.data, this.maeMedio * 100]) + 0.5,
+        max:
+          Math.max(...[...this.data, this.maeMedio * 100]) * 1.1 <
+          Math.max(...[...this.data, this.maeMedio * 100]) + 0.1
+            ? Math.max(...[...this.data, this.maeMedio * 100]) * 1.1
+            : Math.max(...[...this.data, this.maeMedio * 100]) + 0.1,
         labels: {
           formatter: (value) => {
             return Math.round(value * 10) / 10 + '%';
@@ -199,7 +214,7 @@ export class BarChartComponent implements OnInit {
                 color: '#fff',
                 background: '#053e86',
               },
-              text: 'Media MAE Portfolio',
+              text: 'Media MAE Portfolio ' + this.decimalPipe.transform(this.maeMedio * 100, '1.0-2') + '%',
             },
           },
           {
