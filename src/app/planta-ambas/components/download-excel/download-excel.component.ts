@@ -220,7 +220,10 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       this.columnas[0].push(this.translation.t('Imagen visual'));
     }
 
-    this.columnas[1].push(this.translation.t('Temperatura referencia') + ' (ºC)');
+    if (!this.reportControlService.plantaFija) {
+      this.columnas[1].push(this.translation.t('Temperatura referencia') + ' (ºC)');
+    }
+
     this.columnas[1].push(this.translation.t('Temperatura máxima') + ' (ºC)');
     this.columnas[1].push(this.translation.t('Gradiente temp. Normalizado') + ' (ºC)');
     this.columnas[1].push(this.translation.t('Categoría'));
@@ -278,7 +281,9 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       row.thermalImage = null;
       row.visualImage = null;
     }
-    row.temperaturaRef = Number(this.decimalPipe.transform(anomalia.temperaturaRef, '1.2-2'));
+    if (!this.reportControlService.plantaFija) {
+      row.temperaturaRef = Number(this.decimalPipe.transform(anomalia.temperaturaRef, '1.2-2'));
+    }
     row.temperaturaMax = Number(this.decimalPipe.transform(anomalia.temperaturaMax, '1.2-2'));
     row.gradienteNormalizado = Number(this.decimalPipe.transform(anomalia.gradienteNormalizado, '1.2-2'));
     row.tipo = this.anomaliaInfoService.getTipoLabel(anomalia);
