@@ -21,7 +21,13 @@
     </a>
     <a *ngIf="!reportControlService.plantaFija"> </a>
 
-    <app-download-excel></app-download-excel>
+    <app-download-excel *ngIf="!plantaDemo"></app-download-excel>
+
+    <!-- EXCEL DEMO -->
+    <a *ngIf="plantaDemo" mat-menu-item href="{{ excelUrl }}" download="">
+      <mat-icon>calculate</mat-icon>
+      <span>EXCEL</span>
+    </a>
 
     <a
       *ngIf="!reportControlService.plantaFija"
