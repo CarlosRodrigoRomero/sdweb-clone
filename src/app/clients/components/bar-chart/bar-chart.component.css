@@ -2,6 +2,40 @@ mat-card {
   height: calc(50vh - 86px);
 }
 
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.direction-btns {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  display: flex;
+  gap: 20px;
+}
+
+.change-btns {
+  margin-right: 150px;
+}
+
+.change-btn {
+  font-size: 16px;
+}
+
+.btn-label {
+  margin-left: 16px;
+}
+
+.titulo {
+  font-size: 20px;
+  font-weight: 500;
+  margin-left: 20px;
+}
+
 .subtitulo {
   font-size: medium;
   font-weight: 400;
@@ -9,6 +43,6 @@ mat-card {
 }
 
 .chart {
-  height: calc(50vh - 160px);
+  height: calc(100% - 16px);
   display: grid;
 }

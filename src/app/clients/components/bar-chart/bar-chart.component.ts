@@ -379,6 +379,19 @@ export class BarChartComponent implements OnInit {
         maxHeight: 80,
       },
     };
+    this.chartOptions.yaxis = {
+      min: 0,
+      max:
+        Math.max(...[...dataFiltered, this.maeMedio * 100]) * 1.1 <
+        Math.max(...[...dataFiltered, this.maeMedio * 100]) + 0.1
+          ? Math.max(...[...dataFiltered, this.maeMedio * 100]) * 1.1
+          : Math.max(...[...dataFiltered, this.maeMedio * 100]) + 0.1,
+      labels: {
+        formatter: (value) => {
+          return Math.round(value * 10) / 10 + '%';
+        },
+      },
+    };
     this.chartOptions.colors = colorsFiltered;
   }
 
