@@ -10,7 +10,7 @@ import Feature from 'ol/Feature';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import { Fill, Stroke, Style } from 'ol/style';
-import { OSM, Vector as VectorSource } from 'ol/source';
+import { OSM, Vector as VectorSource, XYZ } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat } from 'ol/proj';
 
@@ -81,9 +81,13 @@ export class MapAllPlantsComponent implements OnInit {
       target: 'map',
       layers: [
         new TileLayer({
-          source: new OSM(),
+          source: new XYZ({
+            url: 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}',
+            crossOrigin: '',
+          }),
         }),
       ],
+
       view: new View({
         center: fromLonLat([this.defaultLng, this.defaultLat]),
         zoom: this.defalutZoom,
