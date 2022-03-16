@@ -1,0 +1,22 @@
+.dashboard-content {
+  background-color: gray;
+  height: calc(100% - 70px);
+  padding: 1rem;
+  display: grid;
+  grid-template-rows: 56px auto;
+  gap: 1rem;
+}
+
+.summary {
+  background-color: white;
+}
+
+.views {
+  background-color: white;
+  padding: 1rem;
+}
+
+.view {
+  background-color: grey;
+  height: 100%;
+}

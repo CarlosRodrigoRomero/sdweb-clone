@@ -12,6 +12,11 @@ const routes: Routes = [
     children: [
       { path: 'plants', component: ReportsComponent },
       {
+        path: 'portfolio',
+        loadChildren: () => import('../portfolio/portfolio.module').then((m) => m.PortfolioModule),
+        canActivate: [AuthGuard],
+      },
+      {
         path: 'fixed',
         loadChildren: () => import('../planta-fija/planta-fija.module').then((m) => m.PlantaFijaModule),
         canActivate: [AuthGuard],
@@ -22,7 +27,7 @@ const routes: Routes = [
           import('../planta-seguidores/planta-seguidores.module').then((m) => m.PlantaSeguidoresModule),
         canActivate: [AuthGuard],
       },
-      { path: '', redirectTo: 'plants', pathMatch: 'full' },
+      { path: '', redirectTo: 'portfolio', pathMatch: 'full' },
     ],
   },
 ];
