@@ -6,6 +6,30 @@
     </mat-card-title>
   </mat-card-header>
   <mat-card-content>
+    <div>
+      <button mat-raised-button *ngIf="plantas.length > 50 && chartZoomed == true" (click)="updateOptions('all')">
+        Ver todas
+      </button>
+      <button mat-raised-button *ngIf="plantas.length > 50 && chartZoomed == false" (click)="updateOptions('start')">
+        Ampliar
+      </button>
+      <button
+        mat-icon-button
+        *ngIf="plantas.length > 50 && chartZoomed == true"
+        [disabled]="chartStart"
+        (click)="updateOptions('left')"
+      >
+        <mat-icon>arrow_back_ios</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        *ngIf="plantas.length > 50 && chartZoomed == true"
+        [disabled]="chartEnd"
+        (click)="updateOptions('right')"
+      >
+        <mat-icon>arrow_forward_ios</mat-icon>
+      </button>
+    </div>
     <div class="chart" *ngIf="dataLoaded" id="chart">
       <apx-chart
         [series]="chartOptions.series"

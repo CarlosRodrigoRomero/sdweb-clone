@@ -17,6 +17,7 @@ import {
   ApexFill,
   ApexAnnotations,
   ApexTooltip,
+  ApexGrid,
 } from 'ng-apexcharts';
 
 import { GLOBAL } from '@core/services/global';
@@ -44,6 +45,7 @@ export interface ChartOptions {
   stroke: ApexStroke;
   legend: ApexLegend;
   annotations: ApexAnnotations;
+  grid: ApexGrid;
   colors: string[];
 }
 @Component({
@@ -56,7 +58,7 @@ export class BarChartComponent implements OnInit {
   public barChartLabels = Array<string>();
   public data = Array<number>();
   public coloresChart = Array<string>();
-  @ViewChild('chart') chart: ChartComponent;
+  @ViewChild('chart', { static: false }) chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
   private maePlantas: number[] = [];
   private maeMedio: number;
@@ -64,10 +66,15 @@ export class BarChartComponent implements OnInit {
   public dataLoaded = false;
   public plantasId: string[] = [];
   public tiposPlantas: string[] = [];
-  private plantas: PlantaInterface[];
+  public plantas: PlantaInterface[];
   private informes: InformeInterface[];
   private informesRecientes: InformeInterface[] = [];
   private plantasChart: PlantaChart[] = [];
+  public chartZoomed = true;
+  private chartPosition = 0;
+  public chartStart = true;
+  public chartEnd = false;
+  private endChart = 50;
 
   constructor(
     public auth: AuthService,
@@ -109,34 +116,42 @@ export class BarChartComponent implements OnInit {
     this.initChart();
   }
 
-  private getColorMae(mae: number): string {
-    if (this.plantas.length < 3) {
-      if (mae >= 2) {
-        return GLOBAL.colores_mae[2];
-      } else if (mae < 1) {
-        return GLOBAL.colores_mae[0];
-      } else {
-        return GLOBAL.colores_mae[1];
-      }
-    } else {
-      if (mae >= this.maeMedio + this.maeSigma) {
-        return GLOBAL.colores_mae[2];
-      } else if (mae <= this.maeMedio - this.maeSigma) {
-        return GLOBAL.colores_mae[0];
-      } else {
-        return GLOBAL.colores_mae[1];
-      }
-    }
-  }
-
   initChart() {
-    this.chartOptions = {
-      series: [
+    let series: ApexAxisChartSeries;
+    let xaxis: ApexXAxis;
+    if (this.plantas.length > 50) {
+      // empezamos con el gráfico ampliado
+      series = [
+        {
+          name: 'MAE Planta',
+          data: this.data.filter((_, index) => index < 50),
+        },
+      ];
+      xaxis = {
+        categories: this.barChartLabels.filter((_, index) => index < 50),
+        labels: {
+          trim: true,
+          maxHeight: 80,
+        },
+      };
+    } else {
+      series = [
         {
           name: 'MAE Planta',
           data: this.data,
         },
-      ],
+      ];
+      xaxis = {
+        categories: this.barChartLabels,
+        labels: {
+          trim: true,
+          maxHeight: 80,
+        },
+      };
+    }
+
+    this.chartOptions = {
+      series,
       chart: {
         type: 'bar',
         height: '100%',
@@ -147,6 +162,7 @@ export class BarChartComponent implements OnInit {
           },
         },
       },
+      grid: {},
       plotOptions: {
         bar: {
           horizontal: false,
@@ -167,13 +183,7 @@ export class BarChartComponent implements OnInit {
         width: 2,
         colors: ['transparent'],
       },
-      xaxis: {
-        categories: this.barChartLabels,
-        labels: {
-          trim: true,
-          maxHeight: 80,
-        },
-      },
+      xaxis,
       yaxis: {
         min: 0,
         max:
@@ -217,20 +227,31 @@ export class BarChartComponent implements OnInit {
               text: 'Media MAE Portfolio ' + this.decimalPipe.transform(this.maeMedio * 100, '1.0-2') + '%',
             },
           },
-          {
-            y: (this.maeMedio + this.maeSigma) * 100,
-            y2: (this.maeMedio - this.maeSigma) * 100,
-            borderColor: '#000',
-            fillColor: '#2478ff',
-            label: {
-              text: 'desviación media',
-            },
-          },
         ],
       },
     };
 
     this.dataLoaded = true;
+  }
+
+  private getColorMae(mae: number): string {
+    if (this.plantas.length < 3) {
+      if (mae >= 2) {
+        return GLOBAL.colores_mae[2];
+      } else if (mae < 1) {
+        return GLOBAL.colores_mae[0];
+      } else {
+        return GLOBAL.colores_mae[1];
+      }
+    } else {
+      if (mae >= this.maeMedio + this.maeSigma) {
+        return GLOBAL.colores_mae[2];
+      } else if (mae <= this.maeMedio) {
+        return GLOBAL.colores_mae[0];
+      } else {
+        return GLOBAL.colores_mae[1];
+      }
+    }
   }
 
   private standardDeviation(values) {
@@ -298,6 +319,67 @@ export class BarChartComponent implements OnInit {
       duration: 5000,
       verticalPosition: 'top',
     });
+  }
+
+  public updateOptions(value: string): void {
+    let dataFiltered;
+    let labelsFiltered;
+    let colorsFiltered;
+
+    switch (value) {
+      case 'all':
+        this.chartZoomed = false;
+        dataFiltered = this.data;
+        labelsFiltered = this.barChartLabels;
+        colorsFiltered = this.coloresChart;
+        break;
+      case 'start':
+        this.chartZoomed = true;
+        this.chartPosition = 0;
+        dataFiltered = this.data.filter((_, index) => index < 50);
+        labelsFiltered = this.barChartLabels.filter((_, index) => index < 50);
+        colorsFiltered = this.coloresChart.filter((_, index) => index < 50);
+        break;
+      case 'left':
+        this.chartEnd = false;
+        this.chartPosition -= 50;
+        this.endChart = this.chartPosition + 50;
+        if (this.chartPosition === 0) {
+          this.chartStart = true;
+          this.endChart = 50;
+        }
+        dataFiltered = this.data.filter((_, index) => index >= this.chartPosition && index < this.endChart);
+        labelsFiltered = this.barChartLabels.filter((_, index) => index >= this.chartPosition && index < this.endChart);
+        colorsFiltered = this.coloresChart.filter((_, index) => index >= this.chartPosition && index < this.endChart);
+        break;
+      case 'right':
+        this.chartStart = false;
+        this.chartPosition += 50;
+        this.endChart = this.chartPosition + 50;
+        if (this.plantas.length - this.chartPosition < 50) {
+          this.chartEnd = true;
+          this.endChart = this.plantas.length;
+        }
+        dataFiltered = this.data.filter((_, index) => index >= this.chartPosition && index < this.endChart);
+        labelsFiltered = this.barChartLabels.filter((_, index) => index >= this.chartPosition && index < this.endChart);
+        colorsFiltered = this.coloresChart.filter((_, index) => index >= this.chartPosition && index < this.endChart);
+        break;
+    }
+
+    this.chartOptions.series = [
+      {
+        name: 'MAE Planta',
+        data: dataFiltered,
+      },
+    ];
+    this.chartOptions.xaxis = {
+      categories: labelsFiltered,
+      labels: {
+        trim: true,
+        maxHeight: 80,
+      },
+    };
+    this.chartOptions.colors = colorsFiltered;
   }
 
   private checkFake(plantaId: string): boolean {
