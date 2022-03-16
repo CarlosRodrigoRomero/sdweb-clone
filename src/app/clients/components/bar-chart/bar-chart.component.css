@@ -9,27 +9,6 @@ mat-card {
   align-items: center;
 }
 
-.direction-btns {
-  position: absolute;
-  top: 16px;
-  left: 50%;
-  transform: translate(-50%, 0);
-  display: flex;
-  gap: 20px;
-}
-
-.change-btns {
-  margin-right: 150px;
-}
-
-.change-btn {
-  font-size: 16px;
-}
-
-.btn-label {
-  margin-left: 16px;
-}
-
 .titulo {
   font-size: 20px;
   font-weight: 500;
@@ -40,9 +19,4 @@ mat-card {
   font-size: medium;
   font-weight: 400;
   margin-left: 1em;
-}
-
-.chart {
-  height: calc(100% - 16px);
-  display: grid;
 }

@@ -1,0 +1,55 @@
+<div class="change-btns">
+  <button
+    mat-raised-button
+    class="change-btn"
+    *ngIf="data.length > amplitude && zoomed == true"
+    (click)="updateOptions('all')"
+  >
+    <mat-icon>zoom_in_map</mat-icon>
+    <span class="btn-label">Ver todas</span>
+  </button>
+  <button
+    mat-raised-button
+    class="change-btn"
+    *ngIf="data.length > amplitude && zoomed == false"
+    (click)="updateOptions('start')"
+  >
+    <mat-icon>zoom_out_map</mat-icon>
+    <span class="btn-label">Ampliar</span>
+  </button>
+</div>
+<div class="direction-btns">
+  <button
+    mat-icon-button
+    *ngIf="data.length > amplitude && zoomed == true"
+    [disabled]="chartStart"
+    (click)="updateOptions('left')"
+  >
+    <mat-icon>arrow_back_ios</mat-icon>
+  </button>
+  <button
+    mat-icon-button
+    *ngIf="data.length > amplitude && zoomed == true"
+    [disabled]="chartEnd"
+    (click)="updateOptions('right')"
+  >
+    <mat-icon>arrow_forward_ios</mat-icon>
+  </button>
+</div>
+<div class="chart" id="chart" *ngIf="dataLoaded">
+  <apx-chart
+    *ngIf="dataLoaded"
+    [series]="chartOptions.series"
+    [chart]="chartOptions.chart"
+    [dataLabels]="chartOptions.dataLabels"
+    [plotOptions]="chartOptions.plotOptions"
+    [yaxis]="chartOptions.yaxis"
+    [legend]="chartOptions.legend"
+    [fill]="chartOptions.fill"
+    [stroke]="chartOptions.stroke"
+    [tooltip]="chartOptions.tooltip"
+    [xaxis]="chartOptions.xaxis"
+    [annotations]="chartOptions.annotations"
+    [colors]="chartOptions.colors"
+  ></apx-chart>
+</div>
