@@ -167,10 +167,10 @@ export class AnomaliaInfoService {
     return label;
   }
 
-  getGoogleMapsUrl(anomalia: Anomalia): string {
-    const coord = proj4('EPSG:3857', 'EPSG:4326', anomalia.featureCoords[0]);
+  getGoogleMapsUrl(coord: number[]): string {
+    const coordConverted = proj4('EPSG:3857', 'EPSG:4326', coord);
 
-    const url = `http://www.google.com/maps/place/${coord[1]},${coord[0]}/data=!3m1!1e3`;
+    const url = `http://www.google.com/maps/place/${coordConverted[1]},${coordConverted[0]}/data=!3m1!1e3`;
 
     return url;
   }
