@@ -1061,6 +1061,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           fontSize: 13,
           lineHeight: 1.15,
         },
+        link: {
+          alignment: 'left',
+          fontSize: 13,
+          lineHeight: 1.15,
+          decoration: 'underline',
+          color: '#0645AD',
+        },
       },
     };
   }
@@ -2994,6 +3001,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           columns: [
             { text: 'Localización', width: 200, style: 'anomInfoTitle' },
             { text: this.anomaliaInfoService.getLocalizacionCompleteLabel(anom, this.planta), style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Posición GPS', width: 200, style: 'anomInfoTitle' },
+            {
+              text: 'link',
+              link: this.anomaliaInfoService.getGoogleMapsUrl(anom.featureCoords[0]),
+              style: 'link',
+            },
           ],
         },
       ];
