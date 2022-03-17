@@ -6,6 +6,8 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import { switchMap, take } from 'rxjs/operators';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
+import proj4 from 'proj4';
+
 import { ExcelService } from '@core/services/excel.service';
 import { ReportControlService } from '@core/services/report-control.service';
 import { PlantaService } from '@core/services/planta.service';
@@ -17,8 +19,6 @@ import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
-import { GLOBAL } from '@core/services/global';
-import { ModuloInterface } from '@core/models/modulo';
 import { PcInterface } from '@core/models/pc';
 import { FilterableElement } from '@core/models/filterableInterface';
 
@@ -34,7 +34,7 @@ interface Fila {
   tipo?: string;
   clase?: number;
   criticidad?: string;
-  // urlMaps?: string;
+  urlMaps?: string;
   localizacion?: string;
   localY?: number;
   localX?: number;
@@ -230,6 +230,8 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     this.columnas[1].push('CoA');
     this.columnas[1].push(this.translation.t('Criticidad'));
 
+    this.columnas[2].push('Google maps');
+
     if (this.reportControlService.plantaFija) {
       this.columnas[2].push(this.translation.t('Localización'));
     } else {
@@ -261,10 +263,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     }
 
     this.columnas[4].push(this.translation.t('Módulo'));
-
-    // this.columnas = [
-    //   // { id: 'urlMaps', nombre: 'Google maps' },
-    // ];
   }
 
   private getRowData(anomalia: Anomalia, index: number) {
@@ -289,7 +287,8 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     row.tipo = this.anomaliaInfoService.getTipoLabel(anomalia);
     row.clase = anomalia.clase;
     row.criticidad = this.anomaliaInfoService.getCriticidadLabel(anomalia);
-    // row.urlMaps = 'Google maps';
+
+    row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(anomalia);
 
     if (this.reportControlService.plantaFija) {
       row.localizacion = this.anomaliaInfoService.getLocalizacionReducLabel(anomalia, this.planta);

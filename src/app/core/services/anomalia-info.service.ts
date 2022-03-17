@@ -12,6 +12,7 @@ import { Translation } from '@shared/utils/translations/translations';
 import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
+import proj4 from 'proj4';
 
 @Injectable({
   providedIn: 'root',
@@ -164,5 +165,13 @@ export class AnomaliaInfoService {
     }
 
     return label;
+  }
+
+  getGoogleMapsUrl(anomalia: Anomalia): string {
+    const coord = proj4('EPSG:3857', 'EPSG:4326', anomalia.featureCoords[0]);
+
+    const url = `http://www.google.com/maps/place/${coord[1]},${coord[0]}/data=!3m1!1e3`;
+
+    return url;
   }
 }
