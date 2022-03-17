@@ -241,10 +241,10 @@ export let GLOBAL = {
     // { nombre: "local_x", descripcion: "Columna" },
     // { nombre: "local_y", descripcion: "Fila" },
     { nombre: 'local_xy', descripcion: 'Fila/Columna' },
-    { nombre: 'temperaturaMax', descripcion: 'Temp. máx' },
+    { nombre: 'temperaturaMax', descripcion: 'Tª Máx' },
     {
       nombre: 'gradienteNormalizado',
-      descripcion: 'Gradiente normalizado',
+      descripcion: 'Grad. Tª Norm.',
     },
     // { nombre: "archivoPublico", descripcion: "Nombre archivo" },
     // { nombre: 'irradiancia', descripcion: 'Irradiancia' },
