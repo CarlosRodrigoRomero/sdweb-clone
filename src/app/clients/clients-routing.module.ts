@@ -27,7 +27,7 @@ const routes: Routes = [
           import('../planta-seguidores/planta-seguidores.module').then((m) => m.PlantaSeguidoresModule),
         canActivate: [AuthGuard],
       },
-      { path: '', redirectTo: 'portfolio', pathMatch: 'full' },
+      { path: '', redirectTo: 'plants', pathMatch: 'full' },
     ],
   },
 ];

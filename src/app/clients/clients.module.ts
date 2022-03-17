@@ -14,6 +14,7 @@ import { MapAllPlantsComponent } from './components/map-all-plants/map-all-plant
 import { BarChartComponent } from './components/bar-chart/bar-chart.component';
 import { DownloadExcelPortfolioComponent } from './components/download-excel-portfolio/download-excel-portfolio.component';
 import { PortfolioSummaryComponent } from './components/portfolio-summary/portfolio-summary.component';
+import { NewPlantListComponent } from './components/new-plant-list/new-plant-list.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { PortfolioSummaryComponent } from './components/portfolio-summary/portfo
     BarChartComponent,
     DownloadExcelPortfolioComponent,
     PortfolioSummaryComponent,
+    NewPlantListComponent,
   ],
   imports: [CommonModule, ClientsRoutingModule, SharedModule, FormsModule, ReactiveFormsModule, NgApexchartsModule],
 })

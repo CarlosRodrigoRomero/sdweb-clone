@@ -1,0 +1,108 @@
+mat-card {
+  height: calc(50vh - 86px);
+}
+
+.table-container {
+  position: relative;
+  max-height: calc(50vh - 160px);
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+}
+
+tr.example-detail-row {
+  height: 0;
+}
+
+tr.example-element-row:not(.example-expanded-row):hover {
+  background: whitesmoke;
+}
+
+tr.example-element-row:not(.example-expanded-row):active {
+  background: #efefef;
+}
+
+.example-element-row td {
+  border-bottom-width: 0;
+}
+
+.expanded-panel {
+  overflow: hidden;
+  display: grid;
+}
+
+.example-element-diagram {
+  min-width: 80px;
+  border: 2px solid black;
+  padding: 8px;
+  font-weight: lighter;
+  margin: 8px 0;
+  height: 104px;
+}
+
+.example-element-symbol {
+  font-weight: bold;
+  font-size: 40px;
+  line-height: normal;
+}
+
+.example-element-description {
+  padding: 16px;
+}
+
+.example-element-description-attribution {
+  opacity: 0.5;
+}
+
+.cell-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cell-icon mat-icon {
+  color: orange;
+}
+
+.resumen-inferior {
+  display: flex;
+  width: 100%;
+  height: fit-content;
+}
+
+.problemas {
+  background-color: grey;
+  width: 60%;
+}
+
+.alertas {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.alerta {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.danger {
+  color: #b90009;
+}
+
+.warning {
+  color: #ff9a00;
+}
+
+.descargas {
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+}
+
+.titulo {
+  font-size: 18px;
+  font-weight: 500;
+}

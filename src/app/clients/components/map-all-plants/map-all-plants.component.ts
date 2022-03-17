@@ -82,7 +82,8 @@ export class MapAllPlantsComponent implements OnInit {
       layers: [
         new TileLayer({
           source: new XYZ({
-            url: 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}',
+            url: 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}', // hidrido
+            // url: 'http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', // satelite
             crossOrigin: '',
           }),
         }),
