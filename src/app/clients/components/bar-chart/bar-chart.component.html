@@ -7,12 +7,13 @@
   </div>
   <app-bar-expandable-chart
     [data]="data"
-    [dataName]="'MAE Planta'"
+    [dataName]="'MAE'"
     [dataAverage]="maeMedio"
     [labels]="barChartLabels"
     [amplitude]="50"
     [colors]="coloresChart"
     [zoomed]="true"
     (elemSelected)="onClick($event)"
+    (elemHovered)="onHover($event)"
   ></app-bar-expandable-chart>
 </mat-card>

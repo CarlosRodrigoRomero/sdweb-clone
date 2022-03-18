@@ -5,11 +5,14 @@ import { switchMap, take } from 'rxjs/operators';
 
 import { Feature } from 'ol';
 import { Fill, Stroke, Style } from 'ol/style';
+import Map from 'ol/Map';
+import { Coordinate } from 'ol/coordinate';
 
 import { GLOBAL } from './global';
 import { AuthService } from '@core/services/auth.service';
 import { PlantaService } from '@core/services/planta.service';
 import { InformeService } from '@core/services/informe.service';
+import { OlMapService } from './ol-map.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
@@ -22,8 +25,8 @@ import { CritCriticidad } from '@core/models/critCriticidad';
 export class PortfolioControlService {
   private _initialized = false;
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
-  private _plantaHover: PlantaInterface = undefined;
-  public plantaHover$ = new BehaviorSubject<PlantaInterface>(this._plantaHover);
+  private _plantaHovered: PlantaInterface = undefined;
+  public plantaHovered$ = new BehaviorSubject<PlantaInterface>(this._plantaHovered);
   public maePlantas: number[] = [];
   private _maeMedio: number = undefined;
   public maeMedio$ = new BehaviorSubject<number>(this._maeMedio);
@@ -37,8 +40,14 @@ export class PortfolioControlService {
   user: UserInterface;
   criterioCriticidad: CritCriticidad;
   usersFakePlants = ['xsx8U7BrLRU20pj9Oa35ZbJIggx2', 'AM2qmC06OWPb3V1gXJXyEpGS3Uz2', 'I3VzW9HJ5UdIuJH0pbuX69TndDn2'];
+  public map: Map;
 
-  constructor(public auth: AuthService, private plantaService: PlantaService, private informeService: InformeService) {}
+  constructor(
+    public auth: AuthService,
+    private plantaService: PlantaService,
+    private informeService: InformeService,
+    private olMapService: OlMapService
+  ) {}
 
   public initService(): Promise<boolean> {
     return new Promise((initService) => {
@@ -250,8 +259,15 @@ export class PortfolioControlService {
     }
   }
 
+  setPopupPosition(coords: Coordinate) {
+    if (this.map === undefined) {
+      this.map = this.olMapService.map;
+    }
+    this.map.getOverlayById('popup').setPosition(coords);
+  }
+
   resetService() {
-    this.plantaHover = undefined;
+    this.plantaHovered = undefined;
     this.maePlantas = [];
     this.maeMedio = undefined;
     this.maeSigma = undefined;
@@ -339,13 +355,13 @@ export class PortfolioControlService {
     }
   }
 
-  get plantaHover() {
-    return this._plantaHover;
+  get plantaHovered() {
+    return this._plantaHovered;
   }
 
-  set plantaHover(value: PlantaInterface) {
-    this._plantaHover = value;
-    this.plantaHover$.next(value);
+  set plantaHovered(value: PlantaInterface) {
+    this._plantaHovered = value;
+    this.plantaHovered$.next(value);
   }
 
   get maeMedio() {

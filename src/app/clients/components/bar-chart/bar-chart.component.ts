@@ -9,6 +9,7 @@ import { PortfolioControlService } from '@core/services/portfolio-control.servic
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+import { fromLonLat } from 'ol/proj';
 
 interface PlantaChart {
   planta: PlantaInterface;
@@ -67,31 +68,11 @@ export class BarChartComponent implements OnInit {
       this.tiposPlantas.push(plant.planta.tipo);
       this.informesRecientes.push(plant.informeReciente);
       this.barChartLabels.push(plant.planta.nombre);
-      this.coloresChart.push(this.getColorMae(plant.mae));
+      this.coloresChart.push(this.portfolioControlService.getColorMae(plant.mae));
     });
   }
 
-  private getColorMae(mae: number): string {
-    if (this.plantas.length < 3) {
-      if (mae >= 2) {
-        return GLOBAL.colores_mae[2];
-      } else if (mae < 1) {
-        return GLOBAL.colores_mae[0];
-      } else {
-        return GLOBAL.colores_mae[1];
-      }
-    } else {
-      if (mae >= this.maeMedio + this.maeSigma) {
-        return GLOBAL.colores_mae[2];
-      } else if (mae <= this.maeMedio) {
-        return GLOBAL.colores_mae[0];
-      } else {
-        return GLOBAL.colores_mae[1];
-      }
-    }
-  }
-
-  public onClick(index: number) {
+  onClick(index: number) {
     if (index !== -1) {
       const plantaId = this.plantasId[index];
       const tipoPlanta = this.tiposPlantas[index];
@@ -113,6 +94,16 @@ export class BarChartComponent implements OnInit {
       } else {
         this.openSnackBarDemo();
       }
+    }
+  }
+
+  onHover(index: number) {
+    if (index !== -1) {
+      const planta = this.plantas[index];
+
+      this.portfolioControlService.plantaHovered = planta;
+    } else {
+      this.portfolioControlService.setPopupPosition(undefined);
     }
   }
 

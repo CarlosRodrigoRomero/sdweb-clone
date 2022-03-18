@@ -51,6 +51,7 @@ export class BarExpandableChartComponent implements OnInit {
   @Input() zoomed: boolean;
 
   @Output() elemSelected = new EventEmitter();
+  @Output() elemHovered = new EventEmitter();
 
   public chartOptions: Partial<ChartOptions>;
   public dataLoaded = false;
@@ -109,7 +110,11 @@ export class BarExpandableChartComponent implements OnInit {
         events: {
           click: (event, chartContext, config) => {
             const index = config.dataPointIndex;
-            this.sendData(index);
+            this.sendElemSelected(index);
+          },
+          mouseMove: (event, chartContext, config) => {
+            const index = config.dataPointIndex;
+            this.sendElemHovered(index);
           },
         },
       },
@@ -185,8 +190,12 @@ export class BarExpandableChartComponent implements OnInit {
     this.dataLoaded = true;
   }
 
-  private sendData(index: number) {
+  private sendElemSelected(index: number) {
     this.elemSelected.emit(index);
+  }
+
+  private sendElemHovered(index: number) {
+    this.elemHovered.emit(index);
   }
 
   public updateOptions(value: string): void {
@@ -236,7 +245,7 @@ export class BarExpandableChartComponent implements OnInit {
 
     this.chartOptions.series = [
       {
-        name: 'MAE Planta',
+        name: this.dataName,
         data: dataFiltered,
       },
     ];

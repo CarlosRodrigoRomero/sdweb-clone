@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
+
+import { Subscription } from 'rxjs';
 
 import 'ol/ol.css';
 import Circle from 'ol/geom/Circle';
@@ -18,6 +20,7 @@ import Point from 'ol/geom/Point';
 
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 import { GLOBAL } from '@core/services/global';
+import { OlMapService } from '@core/services/ol-map.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
@@ -27,34 +30,77 @@ import { InformeInterface } from '@core/models/informe';
   templateUrl: './map-all-plants.component.html',
   styleUrls: ['./map-all-plants.component.css'],
 })
-export class MapAllPlantsComponent implements OnInit {
+export class MapAllPlantsComponent implements OnInit, OnDestroy {
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
   private plantasAñadidasId: string[] = [];
   defaultLng = -4;
   defaultLat = 40;
-  defalutZoom = 5.5;
+  defaultZoom = 5.5;
   geojsonObject: any;
   map: Map;
-  plantaHover: PlantaInterface;
+  plantaHovered: PlantaInterface;
   private prevFeatureHover: any;
   private popup: Overlay;
   labelPlanta: string;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private portfolioControlService: PortfolioControlService,
     private router: Router,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private olMapService: OlMapService
   ) {}
 
   ngOnInit(): void {
     this.plantas = this.portfolioControlService.listaPlantas;
     this.informes = this.portfolioControlService.listaInformes;
 
+    this.subscriptions.add(
+      this.portfolioControlService.plantaHovered$.subscribe((planta) => {
+        this.plantaHovered = planta;
+        if (planta !== undefined) {
+          this.labelPlanta = planta.nombre + '  (' + planta.potencia + ' MW)';
+
+          this.map.getOverlayById('popup').setPosition(fromLonLat([planta.longitud, planta.latitud]));
+        }
+      })
+    );
+
     this.initMap();
+
+    this.addFeaturesLayer();
 
     this.addPopupOverlay();
 
+    this.addPointerOnHover();
+    this.addOnHoverAction();
+    this.addOnClickAction();
+  }
+
+  initMap() {
+    const source = new XYZ({
+      url: 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}', // hidrido
+      // url: 'http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', // satelite
+      crossOrigin: '',
+    });
+    const layer = new TileLayer({
+      source,
+    });
+    const view = new View({
+      center: fromLonLat([this.defaultLng, this.defaultLat]),
+      zoom: this.defaultZoom,
+    });
+    const controls = defaultControls({ attribution: false, zoom: false });
+
+    // creamos el mapa a traves del servicio y nos subscribimos a el
+    this.subscriptions.add(
+      this.olMapService.createMap('map', [layer], view, controls).subscribe((map) => (this.map = map))
+    );
+  }
+
+  private addFeaturesLayer() {
     const vectorSource = new VectorSource({});
 
     this.plantas.forEach((planta) => {
@@ -66,19 +112,14 @@ export class MapAllPlantsComponent implements OnInit {
       });
 
       feature.setProperties({
-        mae: informeReciente.mae,
-        plantaId: planta.id,
-        tipo: planta.tipo,
+        planta,
         informeReciente,
-        nombre: planta.nombre,
-        potencia: planta.potencia,
-        coords: fromLonLat([planta.longitud, planta.latitud]),
       });
 
       feature.setStyle(
         new Style({
           image: new Icon({
-            color: this.portfolioControlService.getColorMae(feature.getProperties().mae),
+            color: this.portfolioControlService.getColorMae(feature.getProperties().informeReciente.mae),
             crossOrigin: 'anonymous',
             src: 'assets/icons/place_black_24dp.svg',
             scale: 0.8,
@@ -95,32 +136,8 @@ export class MapAllPlantsComponent implements OnInit {
       source: vectorSource,
       style: this.getStyleOnHover(false),
     });
+
     this.map.addLayer(vectorLayer);
-  }
-
-  initMap() {
-    this.map = new Map({
-      target: 'map',
-      layers: [
-        new TileLayer({
-          source: new XYZ({
-            url: 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}', // hidrido
-            // url: 'http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', // satelite
-            crossOrigin: '',
-          }),
-        }),
-      ],
-
-      view: new View({
-        center: fromLonLat([this.defaultLng, this.defaultLat]),
-        zoom: this.defalutZoom,
-      }),
-      controls: defaultControls({ attribution: false, zoom: false }).extend([]),
-    });
-
-    this.addPointerOnHover();
-    this.addOnHoverAction();
-    this.addOnClickAction();
   }
 
   private addPointerOnHover() {
@@ -146,30 +163,31 @@ export class MapAllPlantsComponent implements OnInit {
     let currentFeatureHover;
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
-        const feature = this.map.getFeaturesAtPixel(event.pixel) as Feature[];
+        const features = this.map.getFeaturesAtPixel(event.pixel) as Feature[];
 
-        if (feature.length > 0) {
+        if (features.length > 0) {
+          const feature = features[0] as Feature;
+          const planta = feature.getProperties().planta;
+
           // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
-          if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
+          if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== features) {
             (this.prevFeatureHover[0] as Feature).setStyle(this.getStyleOnHover(false));
           }
           currentFeatureHover = feature;
 
-          (feature[0] as Feature).setStyle(this.getStyleOnHover(true));
+          feature.setStyle(this.getStyleOnHover(true));
 
-          this.labelPlanta = feature[0].getProperties().nombre + '  (' + feature[0].getProperties().potencia + ' MW)';
-
-          this.map.getOverlayById('popup').setPosition(feature[0].getProperties().coords);
+          this.portfolioControlService.plantaHovered = planta;
 
           this.prevFeatureHover = feature;
         }
       } else {
-        this.plantaHover = undefined;
+        this.portfolioControlService.plantaHovered = undefined;
 
         this.map.getOverlayById('popup').setPosition(undefined);
 
         if (currentFeatureHover !== undefined) {
-          (currentFeatureHover[0] as Feature).setStyle(this.getStyleOnHover(false));
+          currentFeatureHover.setStyle(this.getStyleOnHover(false));
         }
       }
     });
@@ -177,22 +195,22 @@ export class MapAllPlantsComponent implements OnInit {
 
   private addOnClickAction() {
     this.map.on('click', (event) => {
-      const feature = this.map.getFeaturesAtPixel(event.pixel);
+      const features = this.map.getFeaturesAtPixel(event.pixel);
 
-      if (feature.length > 0) {
-        const plantaId = feature[0].getProperties().plantaId;
-        const tipoPlanta = feature[0].getProperties().tipo;
-        const informeReciente = feature[0].getProperties().informeReciente;
+      if (features.length > 0) {
+        const feature = features[0] as Feature;
+        const planta: PlantaInterface = feature.getProperties().planta;
+        const informeReciente = feature.getProperties().informeReciente;
 
-        if (!this.checkFake(plantaId)) {
+        if (!this.checkFake(planta.id)) {
           // comprobamos si es una planta que solo se ve en el informe antiguo
-          if (this.portfolioControlService.checkPlantaSoloWebAntigua(plantaId)) {
+          if (this.portfolioControlService.checkPlantaSoloWebAntigua(planta.id)) {
             this.navigateOldReport(informeReciente.id);
           } else {
-            if (tipoPlanta === 'seguidores') {
-              this.router.navigate(['clients/tracker/' + plantaId]);
-            } else if (informeReciente.fecha > GLOBAL.newReportsDate || plantaId === 'egF0cbpXnnBnjcrusoeR') {
-              this.router.navigate(['clients/fixed/' + plantaId]);
+            if (planta.tipo === 'seguidores') {
+              this.router.navigate(['clients/tracker/' + planta.id]);
+            } else if (informeReciente.fecha > GLOBAL.newReportsDate || planta.id === 'egF0cbpXnnBnjcrusoeR') {
+              this.router.navigate(['clients/fixed/' + planta.id]);
             } else {
               this.openSnackBar();
             }
@@ -211,10 +229,6 @@ export class MapAllPlantsComponent implements OnInit {
       id: 'popup',
       element: container,
       position: undefined,
-      /* autoPan: true,
-      autoPanAnimation: {
-        duration: 250,
-      }, */
     });
 
     this.map.addOverlay(this.popup);
@@ -266,7 +280,7 @@ export class MapAllPlantsComponent implements OnInit {
         if (feature !== undefined) {
           return new Style({
             image: new Icon({
-              color: this.portfolioControlService.getColorMae(feature.getProperties().mae),
+              color: this.portfolioControlService.getColorMae(feature.getProperties().informeReciente.mae),
               crossOrigin: 'anonymous',
               src: 'assets/icons/place_black_24dp.svg',
               scale: 0.8,
@@ -275,5 +289,9 @@ export class MapAllPlantsComponent implements OnInit {
         }
       };
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

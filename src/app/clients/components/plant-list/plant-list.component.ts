@@ -154,12 +154,12 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   }
 
   hoverPlanta(row) {
-    this.portfolioControlService.plantaHover = this.plantas.find((planta) => planta.id === row.plantaId);
+    this.portfolioControlService.plantaHovered = this.plantas.find((planta) => planta.id === row.plantaId);
     this.portfolioControlService.setExternalStyle(row.plantaId, true);
   }
 
   unhoverPlanta(row) {
-    this.portfolioControlService.plantaHover = this.plantas.find((planta) => planta.id === row.plantaId);
+    this.portfolioControlService.plantaHovered = this.plantas.find((planta) => planta.id === row.plantaId);
     this.portfolioControlService.setExternalStyle(row.plantaId, false);
   }
 }
