@@ -9,7 +9,7 @@ import { defaults as defaultControls } from 'ol/control.js';
 import Feature from 'ol/Feature';
 import Map from 'ol/Map';
 import View from 'ol/View';
-import { Fill, Stroke, Style } from 'ol/style';
+import { Fill, Icon, Stroke, Style } from 'ol/style';
 import { OSM, Vector as VectorSource, XYZ } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat } from 'ol/proj';
@@ -19,6 +19,7 @@ import { GLOBAL } from '@core/services/global';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+import Point from 'ol/geom/Point';
 
 @Component({
   selector: 'app-map-all-plants',
@@ -55,7 +56,9 @@ export class MapAllPlantsComponent implements OnInit {
       const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
       const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
 
-      const feature = new Feature(new Circle(fromLonLat([planta.longitud, planta.latitud]), 1e4));
+      const feature = new Feature({
+        geometry: new Point(fromLonLat([planta.longitud, planta.latitud])),
+      });
 
       feature.setProperties({
         mae: informeReciente.mae,
@@ -63,6 +66,17 @@ export class MapAllPlantsComponent implements OnInit {
         tipo: planta.tipo,
         informeReciente,
       });
+
+      feature.setStyle(
+        new Style({
+          image: new Icon({
+            color: this.portfolioControlService.getColorMae(feature.getProperties().mae),
+            crossOrigin: 'anonymous',
+            src: 'assets/icons/place_black_24dp.svg',
+            scale: 0.8,
+          }),
+        })
+      );
 
       this.portfolioControlService.allFeatures.push(feature);
 
@@ -208,12 +222,11 @@ export class MapAllPlantsComponent implements OnInit {
       return (feature: Feature) => {
         if (feature !== undefined) {
           return new Style({
-            stroke: new Stroke({
+            image: new Icon({
               color: 'white',
-              width: 6,
-            }),
-            fill: new Fill({
-              color: this.portfolioControlService.getColorMae(feature.getProperties().mae, 0.3),
+              crossOrigin: 'anonymous',
+              src: 'assets/icons/place_black_24dp.svg',
+              // scale: 1.5,
             }),
           });
         }
@@ -222,12 +235,11 @@ export class MapAllPlantsComponent implements OnInit {
       return (feature: Feature) => {
         if (feature !== undefined) {
           return new Style({
-            stroke: new Stroke({
+            image: new Icon({
               color: this.portfolioControlService.getColorMae(feature.getProperties().mae),
-              width: 2,
-            }),
-            fill: new Fill({
-              color: this.portfolioControlService.getColorMae(feature.getProperties().mae, 0.3),
+              crossOrigin: 'anonymous',
+              src: 'assets/icons/place_black_24dp.svg',
+              scale: 0.8,
             }),
           });
         }

@@ -264,23 +264,47 @@ export class PortfolioControlService {
   /////////////////     ESTILOS      ////////////////////
 
   public getColorMae(mae: number, opacity?: number): string {
-    if (opacity !== undefined) {
-      if (mae > this.maeMedio + this.maeSigma) {
-        return GLOBAL.colores_mae_rgb[2].replace(',1)', ',' + opacity + ')');
-      } else if (mae <= this.maeMedio - this.maeSigma) {
-        return GLOBAL.colores_mae_rgb[0].replace(',1)', ',' + opacity + ')');
-      } else {
-        return GLOBAL.colores_mae_rgb[1].replace(',1)', ',' + opacity + ')');
-      }
+    let colorMae = '';
+    if (this.numPlantas < 3) {
+      GLOBAL.mae_rangos.forEach((rango, index) => {
+        if (mae > rango) {
+          colorMae = GLOBAL.colores_mae_rgb[index + 1];
+        }
+      });
     } else {
-      if (mae > this.maeMedio + this.maeSigma) {
-        return GLOBAL.colores_mae_rgb[2];
-      } else if (mae <= this.maeMedio - this.maeSigma) {
-        return GLOBAL.colores_mae_rgb[0];
+      if (mae >= this.maeMedio + this.maeSigma) {
+        colorMae = GLOBAL.colores_mae_rgb[2];
+      } else if (mae <= this.maeMedio) {
+        colorMae = GLOBAL.colores_mae_rgb[0];
       } else {
-        return GLOBAL.colores_mae_rgb[1];
+        colorMae = GLOBAL.colores_mae_rgb[1];
       }
     }
+
+    // si se envía opacidad
+    if (opacity !== undefined) {
+      colorMae = colorMae.replace(',1)', ',' + opacity + ')');
+    }
+
+    return colorMae;
+
+    // if (opacity !== undefined) {
+    //   if (mae > this.maeMedio + this.maeSigma) {
+    //     return GLOBAL.colores_mae_rgb[2].replace(',1)', ',' + opacity + ')');
+    //   } else if (mae <= this.maeMedio - this.maeSigma) {
+    //     return GLOBAL.colores_mae_rgb[0].replace(',1)', ',' + opacity + ')');
+    //   } else {
+    //     return GLOBAL.colores_mae_rgb[1].replace(',1)', ',' + opacity + ')');
+    //   }
+    // } else {
+    //   if (mae > this.maeMedio + this.maeSigma) {
+    //     return GLOBAL.colores_mae_rgb[2];
+    //   } else if (mae <= this.maeMedio - this.maeSigma) {
+    //     return GLOBAL.colores_mae_rgb[0];
+    //   } else {
+    //     return GLOBAL.colores_mae_rgb[1];
+    //   }
+    // }
   }
 
   public setExternalStyle(plantaId: string, focus: boolean) {
