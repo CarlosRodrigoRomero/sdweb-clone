@@ -13,13 +13,14 @@ import { Fill, Icon, Stroke, Style } from 'ol/style';
 import { OSM, Vector as VectorSource, XYZ } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat } from 'ol/proj';
+import { Overlay } from 'ol';
+import Point from 'ol/geom/Point';
 
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 import { GLOBAL } from '@core/services/global';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
-import Point from 'ol/geom/Point';
 
 @Component({
   selector: 'app-map-all-plants',
@@ -35,8 +36,10 @@ export class MapAllPlantsComponent implements OnInit {
   defalutZoom = 5.5;
   geojsonObject: any;
   map: Map;
-  public plantaHover: PlantaInterface;
+  plantaHover: PlantaInterface;
   private prevFeatureHover: any;
+  private popup: Overlay;
+  labelPlanta: string;
 
   constructor(
     private portfolioControlService: PortfolioControlService,
@@ -49,6 +52,8 @@ export class MapAllPlantsComponent implements OnInit {
     this.informes = this.portfolioControlService.listaInformes;
 
     this.initMap();
+
+    this.addPopupOverlay();
 
     const vectorSource = new VectorSource({});
 
@@ -65,6 +70,9 @@ export class MapAllPlantsComponent implements OnInit {
         plantaId: planta.id,
         tipo: planta.tipo,
         informeReciente,
+        nombre: planta.nombre,
+        potencia: planta.potencia,
+        coords: fromLonLat([planta.longitud, planta.latitud]),
       });
 
       feature.setStyle(
@@ -138,7 +146,7 @@ export class MapAllPlantsComponent implements OnInit {
     let currentFeatureHover;
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
-        const feature = this.map.getFeaturesAtPixel(event.pixel);
+        const feature = this.map.getFeaturesAtPixel(event.pixel) as Feature[];
 
         if (feature.length > 0) {
           // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
@@ -149,10 +157,16 @@ export class MapAllPlantsComponent implements OnInit {
 
           (feature[0] as Feature).setStyle(this.getStyleOnHover(true));
 
+          this.labelPlanta = feature[0].getProperties().nombre + '  (' + feature[0].getProperties().potencia + ' MW)';
+
+          this.map.getOverlayById('popup').setPosition(feature[0].getProperties().coords);
+
           this.prevFeatureHover = feature;
         }
       } else {
         this.plantaHover = undefined;
+
+        this.map.getOverlayById('popup').setPosition(undefined);
 
         if (currentFeatureHover !== undefined) {
           (currentFeatureHover[0] as Feature).setStyle(this.getStyleOnHover(false));
@@ -188,6 +202,22 @@ export class MapAllPlantsComponent implements OnInit {
         }
       }
     });
+  }
+
+  private addPopupOverlay() {
+    const container = document.getElementById('popup');
+
+    this.popup = new Overlay({
+      id: 'popup',
+      element: container,
+      position: undefined,
+      /* autoPan: true,
+      autoPanAnimation: {
+        duration: 250,
+      }, */
+    });
+
+    this.map.addOverlay(this.popup);
   }
 
   private checkFake(plantaId: string): boolean {
