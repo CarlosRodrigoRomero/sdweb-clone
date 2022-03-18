@@ -31,7 +31,7 @@
 
 @media (min-width: 900px) {
   .row_2 {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 60% auto;
     gap: 1rem;
   }
 }

@@ -14,6 +14,7 @@ table {
 
 tr.example-detail-row {
   height: 0;
+  background: whitesmoke;
 }
 
 tr.example-element-row:not(.example-expanded-row):hover {
@@ -28,9 +29,15 @@ tr.example-element-row:not(.example-expanded-row):active {
   border-bottom-width: 0;
 }
 
+.example-expanded-row {
+  background: whitesmoke;
+  font-weight: 500;
+}
+
 .expanded-panel {
   overflow: hidden;
   display: grid;
+  gap: 10px;
 }
 
 .example-element-diagram {
@@ -56,30 +63,59 @@ tr.example-element-row:not(.example-expanded-row):active {
   opacity: 0.5;
 }
 
+.header-not-centered {
+  font-size: 16px;
+}
+
+.header-centered {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.cell-content {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
 .cell-icon {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  justify-content: center;
 }
 
 .cell-icon mat-icon {
   color: orange;
 }
 
-.resumen-inferior {
-  display: flex;
-  width: 100%;
-  height: fit-content;
+.acceder-btn {
+  color: blue;
 }
 
-.problemas {
-  background-color: grey;
-  width: 60%;
+.resumen-superior {
+  display: grid;
+  margin-top: 10px;
+}
+
+.resumen-inferior {
+  display: grid;
+  grid-template-columns: auto fit-content(40%);
+  margin: 0 1rem 1rem 1rem;
+}
+
+.problemas-header {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 10px;
 }
 
 .alertas {
   display: grid;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .alerta {
@@ -96,10 +132,20 @@ tr.example-element-row:not(.example-expanded-row):active {
   color: #ff9a00;
 }
 
-.descargas {
+.descargas-btns {
   display: grid;
-  gap: 1rem;
+  gap: 10px;
   justify-items: center;
+}
+
+.btn-icon-pdf {
+  margin-right: 10px;
+  color: red;
+}
+
+.btn-icon-excel {
+  margin-right: 10px;
+  color: green;
 }
 
 .titulo {

@@ -15,6 +15,7 @@ interface PlantsData {
   potencia: number;
   mae: number;
   variacionMae: number;
+  gravedadMae: string;
   perdidas: number;
   variacionPerdidas: number;
   ultimaInspeccion: number;
@@ -73,6 +74,7 @@ export class NewPlantListComponent implements OnInit {
         potencia: planta.potencia,
         mae: informeReciente.mae,
         variacionMae: 0,
+        gravedadMae: this.getGravedadMae(informeReciente.mae),
         perdidas: informeReciente.mae * planta.potencia * 1000,
         variacionPerdidas: 0,
         ultimaInspeccion: informeReciente.fecha,
@@ -83,6 +85,17 @@ export class NewPlantListComponent implements OnInit {
     });
 
     this.dataSource.data = plantsData;
+  }
+
+  private getGravedadMae(mae: number) {
+    let gravedad = GLOBAL.mae_rangos_labels[0];
+    GLOBAL.mae_rangos.forEach((rango, index) => {
+      if (mae > rango) {
+        gravedad = GLOBAL.mae_rangos_labels[index + 1];
+      }
+    });
+
+    return gravedad;
   }
 
   hoverPlanta(row) {
