@@ -72,6 +72,7 @@ tr.example-element-row:not(.example-expanded-row):active {
   width: 100%;
   justify-content: center;
   font-size: 16px;
+  text-align: center;
 }
 
 .cell-content {

@@ -4,12 +4,10 @@ import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { GLOBAL } from '@core/services/global';
-import { AuthService } from '@core/services/auth.service';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
-import { fromLonLat } from 'ol/proj';
 
 interface PlantaChart {
   planta: PlantaInterface;
@@ -27,7 +25,6 @@ export class BarChartComponent implements OnInit {
   public coloresChart = Array<string>();
   private maePlantas: number[] = [];
   public maeMedio: number;
-  private maeSigma: number;
   public plantasId: string[] = [];
   public tiposPlantas: string[] = [];
   public plantas: PlantaInterface[];
@@ -37,7 +34,6 @@ export class BarChartComponent implements OnInit {
   private chartPosition = 0;
 
   constructor(
-    public auth: AuthService,
     private portfolioControlService: PortfolioControlService,
     private router: Router,
     private _snackBar: MatSnackBar
@@ -48,7 +44,6 @@ export class BarChartComponent implements OnInit {
     this.informes = this.portfolioControlService.listaInformes;
     this.maePlantas = this.portfolioControlService.maePlantas;
     this.maeMedio = this.portfolioControlService.maeMedio;
-    this.maeSigma = this.portfolioControlService.maeSigma;
 
     this.plantas.forEach((planta, index) => {
       const mae = this.maePlantas[index];

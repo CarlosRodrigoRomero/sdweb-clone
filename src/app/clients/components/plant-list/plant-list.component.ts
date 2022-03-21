@@ -155,11 +155,9 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
   hoverPlanta(row) {
     this.portfolioControlService.plantaHovered = this.plantas.find((planta) => planta.id === row.plantaId);
-    this.portfolioControlService.setExternalStyle(row.plantaId, true);
   }
 
   unhoverPlanta(row) {
-    this.portfolioControlService.plantaHovered = this.plantas.find((planta) => planta.id === row.plantaId);
-    this.portfolioControlService.setExternalStyle(row.plantaId, false);
+    this.portfolioControlService.plantaHovered = undefined;
   }
 }

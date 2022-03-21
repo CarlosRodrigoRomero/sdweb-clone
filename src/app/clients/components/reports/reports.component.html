@@ -13,8 +13,8 @@
   </div>
   <div class="row_2">
     <div>
-      <!-- <app-plant-list></app-plant-list> -->
-      <app-new-plant-list></app-new-plant-list>
+      <app-plant-list *ngIf="!portfolioControlService.isDemo"></app-plant-list>
+      <app-new-plant-list *ngIf="portfolioControlService.isDemo"></app-new-plant-list>
     </div>
     <div>
       <app-map-all-plants></app-map-all-plants>

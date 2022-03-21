@@ -41,6 +41,7 @@ export class PortfolioControlService {
   criterioCriticidad: CritCriticidad;
   usersFakePlants = ['xsx8U7BrLRU20pj9Oa35ZbJIggx2', 'AM2qmC06OWPb3V1gXJXyEpGS3Uz2', 'I3VzW9HJ5UdIuJH0pbuX69TndDn2'];
   public map: Map;
+  isDemo = false;
 
   constructor(
     public auth: AuthService,
@@ -55,6 +56,10 @@ export class PortfolioControlService {
         .pipe(
           take(1),
           switchMap((user) => {
+            if (user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2' || user.uid === 'AM2qmC06OWPb3V1gXJXyEpGS3Uz2') {
+              this.isDemo = true;
+            }
+
             this.user = user;
 
             let criterioId;
