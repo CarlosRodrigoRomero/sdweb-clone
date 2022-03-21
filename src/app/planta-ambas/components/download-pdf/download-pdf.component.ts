@@ -992,6 +992,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           fontSize: 9,
         },
 
+        linkCellAnexo1: {
+          alignment: 'center',
+          fontSize: 9,
+          decoration: 'underline',
+          color: '#0645AD',
+        },
+
         tableHeader: {
           alignment: 'center',
           bold: true,
@@ -1060,6 +1067,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           alignment: 'justify',
           fontSize: 13,
           lineHeight: 1.15,
+        },
+        linkAnomInfo: {
+          alignment: 'left',
+          fontSize: 13,
+          lineHeight: 1.15,
+          decoration: 'underline',
+          color: '#0645AD',
         },
       },
     };
@@ -2803,6 +2817,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     this.anomaliasInforme = this.anomaliasInforme.sort(this.downloadReportService.sortByGlobalCoords);
 
+    cabecera.push({
+      text: this.translation.t('Posición GPS'),
+      style: 'tableHeaderBlue',
+    });
+
     if (this.reportControlService.plantaFija) {
       cabecera.push({
         text: this.translation.t('Localización'),
@@ -2831,11 +2850,28 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     for (const anom of this.anomaliasInforme) {
       contadorAnoms += 1;
 
+      let gpsLink = '';
+      if (this.reportControlService.plantaFija) {
+        gpsLink = this.anomaliaInfoService.getGoogleMapsUrl(this.downloadReportService.getCentroid(anom.featureCoords));
+      } else {
+        const seguidor = this.seguidoresInforme.find((seg) => seg.nombre === anom.nombreSeguidor);
+
+        gpsLink = this.anomaliaInfoService.getGoogleMapsUrl(
+          this.downloadReportService.getCentroid(seguidor.featureCoords)
+        );
+      }
+
       const row = [];
       row.push({
         text: `${contadorAnoms}/${totalAnoms}`,
         noWrap: true,
         style: 'tableCellAnexo1',
+      });
+      row.push({
+        text: 'link',
+        link: gpsLink,
+        noWrap: true,
+        style: 'linkCellAnexo1',
       });
       row.push({
         text: this.getGlobalCoordsLabel(anom),
@@ -2994,6 +3030,16 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           columns: [
             { text: 'Localización', width: 200, style: 'anomInfoTitle' },
             { text: this.anomaliaInfoService.getLocalizacionCompleteLabel(anom, this.planta), style: 'anomInfoValue' },
+          ],
+        },
+        {
+          columns: [
+            { text: 'Posición GPS', width: 200, style: 'anomInfoTitle' },
+            {
+              text: 'link',
+              link: this.anomaliaInfoService.getGoogleMapsUrl(anom.featureCoords[0]),
+              style: 'linkAnomInfo',
+            },
           ],
         },
       ];
@@ -3371,6 +3417,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                   body: [
                     [
                       {
+                        text: this.translation.t('Posición GPS'),
+                        style: 'tableHeaderImageData',
+                      },
+                      {
                         text: this.translation.t('Fecha/Hora'),
                         style: 'tableHeaderImageData',
                       },
@@ -3405,6 +3455,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                       },
                     ],
                     [
+                      {
+                        text: 'link',
+                        link: this.anomaliaInfoService.getGoogleMapsUrl(
+                          this.downloadReportService.getCentroid(seg.featureCoords)
+                        ),
+                        style: 'linkCellAnexo1',
+                        noWrap: true,
+                      },
                       {
                         text: this.datePipe
                           .transform(this.selectedInforme.fecha * 1000, 'dd/MM/yyyy')
@@ -3541,6 +3599,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                   body: [
                     [
                       {
+                        text: this.translation.t('Posición GPS'),
+                        style: 'tableHeaderImageData',
+                      },
+                      {
                         text: this.translation.t('Fecha/Hora'),
                         style: 'tableHeaderImageData',
                       },
@@ -3575,6 +3637,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                       },
                     ],
                     [
+                      {
+                        text: 'link',
+                        link: this.anomaliaInfoService.getGoogleMapsUrl(
+                          this.downloadReportService.getCentroid(seg.featureCoords)
+                        ),
+                        style: 'linkCellAnexo1',
+                        noWrap: true,
+                      },
                       {
                         text: this.datePipe
                           .transform(this.selectedInforme.fecha * 1000, 'dd/MM/yyyy')

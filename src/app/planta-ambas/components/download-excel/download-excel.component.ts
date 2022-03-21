@@ -6,6 +6,8 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import { switchMap, take } from 'rxjs/operators';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
+import proj4 from 'proj4';
+
 import { ExcelService } from '@core/services/excel.service';
 import { ReportControlService } from '@core/services/report-control.service';
 import { PlantaService } from '@core/services/planta.service';
@@ -17,8 +19,6 @@ import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
-import { GLOBAL } from '@core/services/global';
-import { ModuloInterface } from '@core/models/modulo';
 import { PcInterface } from '@core/models/pc';
 import { FilterableElement } from '@core/models/filterableInterface';
 
@@ -34,7 +34,7 @@ interface Fila {
   tipo?: string;
   clase?: number;
   criticidad?: string;
-  // urlMaps?: string;
+  urlMaps?: string;
   localizacion?: string;
   localY?: number;
   localX?: number;
@@ -75,7 +75,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private language: string;
   private headersColors = ['FFE5E7E9', 'FFF5B7B1', 'FFD4EFDF', 'FFABD5FF', 'FFE5E7E9'];
   private columnasLink;
-  private inicioFilters = 5;
+  private inicioFilters = 4;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -123,6 +123,8 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
           if (this.reportControlService.plantaFija) {
             this.anomaliasInforme = (this.allElems as Anomalia[]).filter((anom) => anom.informeId === informeId);
+
+            this.columnasLink = [10];
           } else {
             const seguidoresInforme = (this.allElems as Seguidor[]).filter((seg) => seg.informeId === informeId);
 
@@ -133,7 +135,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
               }
             });
 
-            this.columnasLink = [2, 3];
+            this.columnasLink = [2, 3, 13];
 
             this.inicioFilters = 7;
           }
@@ -238,9 +240,11 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     this.columnas[2].push(this.translation.t('Fila'));
     this.columnas[2].push(this.translation.t('Columna'));
+    this.columnas[2].push('Google maps');
     this.columnas[2].push(this.translation.t('Fecha y hora'));
     this.columnas[2].push(this.translation.t('Lugar'));
     this.columnas[2].push(this.translation.t('Irradiancia') + ' (beta) (W/m2)');
+
     this.columnas[3].push(this.translation.t('Nubosidad (octavas)'));
     this.columnas[3].push(this.translation.t('Temperatura ambiente') + ' (ºC)');
     this.columnas[3].push(this.translation.t('Emisividad'));
@@ -261,10 +265,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     }
 
     this.columnas[4].push(this.translation.t('Módulo'));
-
-    // this.columnas = [
-    //   // { id: 'urlMaps', nombre: 'Google maps' },
-    // ];
   }
 
   private getRowData(anomalia: Anomalia, index: number) {
@@ -289,7 +289,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     row.tipo = this.anomaliaInfoService.getTipoLabel(anomalia);
     row.clase = anomalia.clase;
     row.criticidad = this.anomaliaInfoService.getCriticidadLabel(anomalia);
-    // row.urlMaps = 'Google maps';
 
     if (this.reportControlService.plantaFija) {
       row.localizacion = this.anomaliaInfoService.getLocalizacionReducLabel(anomalia, this.planta);
@@ -299,6 +298,18 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     row.localY = anomalia.localY;
     row.localX = anomalia.localX;
+
+    if (this.reportControlService.plantaFija) {
+      row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(
+        this.downloadReportService.getCentroid(anomalia.featureCoords)
+      );
+    } else {
+      const seguidor = (this.allElems as Seguidor[]).find((seguidor) => seguidor.nombre === anomalia.nombreSeguidor);
+
+      row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(
+        this.downloadReportService.getCentroid(seguidor.featureCoords)
+      );
+    }
 
     let datetime = anomalia.datetime;
     if (this.informeSelected.correccHoraSrt !== undefined) {

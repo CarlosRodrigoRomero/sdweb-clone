@@ -85,7 +85,7 @@ export class ExcelService {
     data.forEach((element: any) => {
       const eachRow = [];
       columnsArray.forEach((column) => {
-        if (column === 'thermalImage' || column === 'visualImage') {
+        if (column === 'thermalImage' || column === 'visualImage' || column === 'urlMaps') {
           if (element[column] !== null) {
             eachRow.push({ text: 'link', hyperlink: element[column] });
           } else {
