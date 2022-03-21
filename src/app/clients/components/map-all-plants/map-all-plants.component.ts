@@ -59,11 +59,15 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.portfolioControlService.plantaHovered$.subscribe((planta) => {
-        this.plantaHovered = planta;
-        if (planta !== undefined) {
-          this.labelPlanta = planta.nombre + '  (' + planta.potencia + ' MW)';
+        if (this.map !== undefined) {
+          this.plantaHovered = planta;
+          if (planta !== undefined) {
+            this.labelPlanta = planta.nombre + '  (' + planta.potencia + ' MW)';
 
-          this.map.getOverlayById('popup').setPosition(fromLonLat([planta.longitud, planta.latitud]));
+            this.map.getOverlayById('popup').setPosition(fromLonLat([planta.longitud, planta.latitud]));
+          } else {
+            this.map.getOverlayById('popup').setPosition(undefined);
+          }
         }
       })
     );

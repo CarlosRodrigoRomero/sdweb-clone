@@ -100,12 +100,12 @@ export class NewPlantListComponent implements OnInit {
 
   hoverPlanta(row) {
     this.portfolioControlService.plantaHovered = this.plantas.find((planta) => planta.id === row.plantaId);
-    this.portfolioControlService.setExternalStyle(row.plantaId, true);
+    // this.portfolioControlService.setExternalStyle(row.plantaId, true);
   }
 
   unhoverPlanta(row) {
-    this.portfolioControlService.plantaHovered = this.plantas.find((planta) => planta.id === row.plantaId);
-    this.portfolioControlService.setExternalStyle(row.plantaId, false);
+    this.portfolioControlService.plantaHovered = undefined;
+    // this.portfolioControlService.setExternalStyle(row.plantaId, false);
   }
 
   navegateToReport(row: any) {

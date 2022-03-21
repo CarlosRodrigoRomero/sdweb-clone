@@ -166,6 +166,8 @@
           class="example-element-row"
           [class.example-expanded-row]="expandedRow === row"
           (click)="expandedRow = expandedRow === row ? null : row"
+          (mouseover)="hoverPlanta(row)"
+          (mouseleave)="unhoverPlanta(row)"
         ></tr>
         <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
       </table>
