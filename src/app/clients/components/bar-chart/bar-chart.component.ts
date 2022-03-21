@@ -101,7 +101,7 @@ export class BarChartComponent implements OnInit {
     if (index !== -1) {
       const planta = this.plantas[index];
 
-      this.portfolioControlService.plantaHovered = planta;
+      // this.portfolioControlService.plantaHovered = planta;
     } else {
       this.portfolioControlService.setPopupPosition(undefined);
     }

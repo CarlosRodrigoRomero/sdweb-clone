@@ -43,6 +43,8 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
   private prevFeatureHover: any;
   private popup: Overlay;
   labelPlanta: string;
+  private plantasSource: VectorSource;
+  private prevPlantaHovered: PlantaInterface;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -64,9 +66,26 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
           if (planta !== undefined) {
             this.labelPlanta = planta.nombre + '  (' + planta.potencia + ' MW)';
 
+            // cuando pasamos de una planta a otra directamente sin pasar por vacio
+            if (this.prevPlantaHovered !== undefined && this.prevPlantaHovered.id !== planta.id) {
+              this.setPlantaStyle(this.prevPlantaHovered.id, false);
+            }
+
+            // cambiamos el estilo a hovered
+            this.setPlantaStyle(planta.id, true);
+
+            // mostramos el popup
             this.map.getOverlayById('popup').setPosition(fromLonLat([planta.longitud, planta.latitud]));
+
+            this.prevPlantaHovered = planta;
           } else {
+            // ocultamos el popup
             this.map.getOverlayById('popup').setPosition(undefined);
+
+            if (this.prevPlantaHovered !== undefined) {
+              // cambiamos el estilo a no hovered
+              this.setPlantaStyle(this.prevPlantaHovered.id, false);
+            }
           }
         }
       })
@@ -105,7 +124,7 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
   }
 
   private addFeaturesLayer() {
-    const vectorSource = new VectorSource({});
+    this.plantasSource = new VectorSource({});
 
     this.plantas.forEach((planta) => {
       const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
@@ -114,6 +133,8 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
       const feature = new Feature({
         geometry: new Point(fromLonLat([planta.longitud, planta.latitud])),
       });
+
+      feature.setId(planta.id);
 
       feature.setProperties({
         planta,
@@ -133,15 +154,15 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
 
       this.portfolioControlService.allFeatures.push(feature);
 
-      vectorSource.addFeature(feature);
+      this.plantasSource.addFeature(feature);
     });
 
-    const vectorLayer = new VectorLayer({
-      source: vectorSource,
+    const plantasLayer = new VectorLayer({
+      source: this.plantasSource,
       style: this.getStyleOnHover(false),
     });
 
-    this.map.addLayer(vectorLayer);
+    this.map.addLayer(plantasLayer);
   }
 
   private addPointerOnHover() {
@@ -173,26 +194,10 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
           const feature = features[0] as Feature;
           const planta = feature.getProperties().planta;
 
-          // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
-          if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== features) {
-            (this.prevFeatureHover[0] as Feature).setStyle(this.getStyleOnHover(false));
-          }
-          currentFeatureHover = feature;
-
-          feature.setStyle(this.getStyleOnHover(true));
-
           this.portfolioControlService.plantaHovered = planta;
-
-          this.prevFeatureHover = feature;
         }
       } else {
         this.portfolioControlService.plantaHovered = undefined;
-
-        this.map.getOverlayById('popup').setPosition(undefined);
-
-        if (currentFeatureHover !== undefined) {
-          currentFeatureHover.setStyle(this.getStyleOnHover(false));
-        }
       }
     });
   }
@@ -263,6 +268,12 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
       duration: 5000,
       verticalPosition: 'top',
     });
+  }
+
+  private setPlantaStyle(plantaId: string, hovered: boolean) {
+    const feature = this.plantasSource.getFeatureById(plantaId);
+
+    feature.setStyle(this.getStyleOnHover(hovered));
   }
 
   private getStyleOnHover(hovered: boolean) {
