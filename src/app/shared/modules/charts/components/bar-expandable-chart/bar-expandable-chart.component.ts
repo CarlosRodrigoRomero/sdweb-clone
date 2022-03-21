@@ -206,6 +206,7 @@ export class BarExpandableChartComponent implements OnInit {
     switch (value) {
       case 'all':
         this.zoomed = false;
+        this.chartStart = true;
         dataFiltered = this.data;
         labelsFiltered = this.labels;
         colorsFiltered = this.colors;
