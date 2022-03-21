@@ -34,6 +34,7 @@ export class BarChartComponent implements OnInit {
   private informes: InformeInterface[];
   private informesRecientes: InformeInterface[] = [];
   private plantasChart: PlantaChart[] = [];
+  private chartPosition = 0;
 
   constructor(
     public auth: AuthService,
@@ -99,12 +100,17 @@ export class BarChartComponent implements OnInit {
 
   onHover(index: number) {
     if (index !== -1) {
-      const planta = this.plantas[index];
+      const realIndex = index + this.chartPosition;
+      const planta = this.plantasChart[realIndex].planta;
 
-      // this.portfolioControlService.plantaHovered = planta;
+      this.portfolioControlService.plantaHovered = planta;
     } else {
-      this.portfolioControlService.setPopupPosition(undefined);
+      this.portfolioControlService.plantaHovered = undefined;
     }
+  }
+
+  chartPositionChange(value: number) {
+    this.chartPosition = value;
   }
 
   private navigateOldReport(informeId: string) {

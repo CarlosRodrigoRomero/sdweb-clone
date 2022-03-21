@@ -52,6 +52,7 @@ export class BarExpandableChartComponent implements OnInit {
 
   @Output() elemSelected = new EventEmitter();
   @Output() elemHovered = new EventEmitter();
+  @Output() chartPositionChange = new EventEmitter();
 
   public chartOptions: Partial<ChartOptions>;
   public dataLoaded = false;
@@ -206,13 +207,14 @@ export class BarExpandableChartComponent implements OnInit {
     switch (value) {
       case 'all':
         this.zoomed = false;
-        this.chartStart = true;
+        this.chartPosition = 0;
         dataFiltered = this.data;
         labelsFiltered = this.labels;
         colorsFiltered = this.colors;
         break;
       case 'start':
         this.zoomed = true;
+        this.chartStart = true;
         this.chartPosition = 0;
         dataFiltered = this.data.filter((_, index) => index < 50);
         labelsFiltered = this.labels.filter((_, index) => index < 50);
@@ -271,5 +273,8 @@ export class BarExpandableChartComponent implements OnInit {
       },
     };
     this.chartOptions.colors = colorsFiltered;
+
+    // enviamos el nuevo valor de inicio del gráfico
+    this.chartPositionChange.emit(this.chartPosition);
   }
 }
