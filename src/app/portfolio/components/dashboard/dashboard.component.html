@@ -1,10 +1,10 @@
 <app-navbar></app-navbar>
 
-<div class="dashboard-content">
+<div class="dashboard-content" *ngIf="dataLoaded">
   <div class="estado">
     <app-estado></app-estado>
   </div>
-  <div class="views">
-    <div class="view"></div>
-  </div>
+  <mat-card class="views">
+    <app-views></app-views>
+  </mat-card>
 </div>

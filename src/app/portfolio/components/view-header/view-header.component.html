@@ -1,0 +1,30 @@
+<div class="content">
+  <div class="titulo">Listado de plantas</div>
+  <img src="assets/images/escala-gravedad.svg" />
+  <button mat-stroked-button>
+    <mat-icon>sort</mat-icon>
+    <span>Ordenar por MAE</span>
+  </button>
+  <div class="views-btns">
+    <button mat-stroked-button (click)="sendViewSelected(0)">
+      <mat-icon>format_list_numbered</mat-icon>
+      <span>RESUMEN</span>
+    </button>
+    <button mat-stroked-button (click)="sendViewSelected(1)">
+      <mat-icon>format_list_numbered</mat-icon>
+      <span>PLANTAS</span>
+    </button>
+    <button mat-stroked-button (click)="sendViewSelected(2)">
+      <mat-icon>bar_chart</mat-icon>
+      <span>MAE</span>
+    </button>
+    <button mat-stroked-button (click)="sendViewSelected(3)">
+      <mat-icon>leaderboard</mat-icon>
+      <span>PÉRDIDAS</span>
+    </button>
+    <button mat-stroked-button (click)="sendViewSelected(4)">
+      <mat-icon>batch_prediction</mat-icon>
+      <span>PREDICCIÓN</span>
+    </button>
+  </div>
+</div>

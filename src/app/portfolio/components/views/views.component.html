@@ -1,0 +1,36 @@
+<div class="content">
+  <app-view-header (viewSelected)="changeView($event)"></app-view-header>
+  <div class="views">
+    <mat-horizontal-stepper #stepper>
+      <mat-step>
+        <div class="step-content">
+          <app-plants-list></app-plants-list>
+        </div>
+      </mat-step>
+      <mat-step>
+        <div>
+          <span>Vista 2</span>
+          <button mat-button matStepperNext>Next</button>
+        </div>
+      </mat-step>
+      <mat-step>
+        <div>
+          <span>Vista 3</span>
+          <button mat-button matStepperNext>Next</button>
+        </div>
+      </mat-step>
+      <mat-step>
+        <div>
+          <span>Vista 4</span>
+          <button mat-button matStepperNext>Next</button>
+        </div>
+      </mat-step>
+      <mat-step>
+        <div>
+          <span>Vista 5</span>
+          <button mat-button matStepperNext>Next</button>
+        </div>
+      </mat-step>
+    </mat-horizontal-stepper>
+  </div>
+</div>
