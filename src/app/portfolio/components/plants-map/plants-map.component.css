@@ -3,8 +3,8 @@ mat-card {
 }
 
 #map {
-  height: 200px;
-  /* height: calc(50vh - 86px - 32px); */
+  /* height: calc(100vh - 302px); */
+  height: calc(100vh - 310px); /* +8px para que se vean las sombras */
   width: 100%;
 }
 

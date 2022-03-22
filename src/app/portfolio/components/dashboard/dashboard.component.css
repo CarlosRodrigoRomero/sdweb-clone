@@ -2,7 +2,7 @@
   height: calc(100% - 70px);
   padding: 1rem;
   display: grid;
-  grid-template-rows: 56px auto;
+  grid-template-rows: 56px calc(100vh - 174px);
   gap: 1rem;
 }
 

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -29,7 +29,7 @@ import { InformeInterface } from '@core/models/informe';
   templateUrl: './plants-map.component.html',
   styleUrls: ['./plants-map.component.css'],
 })
-export class PlantsMapComponent implements OnInit, OnDestroy {
+export class PlantsMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
   defaultLng = -4;
@@ -87,7 +87,10 @@ export class PlantsMapComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
 
+  ngAfterViewInit(): void {
+    // cargamos aquí todo lo relacionado con el mapa xq esta dentro de un mat-step
     this.initMap();
 
     this.addFeaturesLayer();

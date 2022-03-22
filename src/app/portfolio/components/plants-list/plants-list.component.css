@@ -4,8 +4,10 @@
 
 .table-container {
   position: relative;
-  max-height: calc(100vh - 270px);
+  /* max-height: calc(100vh - 270px); */
+  max-height: calc(100vh - 278px); /* +8px para que se vean las sombras */
   overflow: auto;
+  border-radius: 4px;
 }
 
 table {
