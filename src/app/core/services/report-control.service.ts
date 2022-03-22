@@ -496,11 +496,11 @@ export class ReportControlService {
             this.anomaliaService.criterioCriticidad.rangosDT.forEach((rango, i, rangos) => {
               if (i < rangos.length - 1) {
                 ccGradNorm.push(
-                  ccs.filter((anom) => anom.gradienteNormalizado > rango).length -
-                    ccs.filter((anom) => anom.gradienteNormalizado > rangos[i + 1]).length
+                  ccs.filter((anom) => anom.gradienteNormalizado >= rango).length -
+                    ccs.filter((anom) => anom.gradienteNormalizado >= rangos[i + 1]).length
                 );
               } else {
-                ccGradNorm.push(ccs.filter((anom) => anom.gradienteNormalizado > rango).length);
+                ccGradNorm.push(ccs.filter((anom) => anom.gradienteNormalizado >= rango).length);
               }
             });
 
