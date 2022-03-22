@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -29,7 +29,7 @@ import { InformeInterface } from '@core/models/informe';
   templateUrl: './plants-map.component.html',
   styleUrls: ['./plants-map.component.css'],
 })
-export class PlantsMapComponent implements OnInit {
+export class PlantsMapComponent implements OnInit, OnDestroy {
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
   defaultLng = -4;
@@ -182,7 +182,6 @@ export class PlantsMapComponent implements OnInit {
   }
 
   private addOnHoverAction() {
-    let currentFeatureHover;
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
         const features = this.map.getFeaturesAtPixel(event.pixel) as Feature[];

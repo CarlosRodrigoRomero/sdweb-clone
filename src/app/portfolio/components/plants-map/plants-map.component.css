@@ -1,9 +1,10 @@
 mat-card {
-  height: calc(50vh - 86px);
+  height: 100%;
 }
 
 #map {
-  height: calc(50vh - 86px - 32px);
+  height: 200px;
+  /* height: calc(50vh - 86px - 32px); */
   width: 100%;
 }
 
