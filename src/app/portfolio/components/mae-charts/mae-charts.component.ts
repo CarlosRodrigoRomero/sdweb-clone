@@ -48,7 +48,7 @@ export class MaeChartsComponent implements OnInit {
     this.plantas.forEach((planta, index) => {
       const mae = this.maePlantas[index];
       if (mae !== undefined) {
-        // obtenemos el informe mas reciente de la planta para usar su fecha
+        // obtenemos los 2 ultimos informes para obtener los datos
         const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
         const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
         const informePrevio = informesPlanta
