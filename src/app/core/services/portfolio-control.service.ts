@@ -42,6 +42,7 @@ export class PortfolioControlService {
   usersFakePlants = ['xsx8U7BrLRU20pj9Oa35ZbJIggx2', 'AM2qmC06OWPb3V1gXJXyEpGS3Uz2', 'I3VzW9HJ5UdIuJH0pbuX69TndDn2'];
   public map: Map;
   isDemo = false;
+  newPortfolio = false;
 
   constructor(
     public auth: AuthService,
@@ -58,6 +59,7 @@ export class PortfolioControlService {
           switchMap((user) => {
             if (user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2' || user.uid === 'AM2qmC06OWPb3V1gXJXyEpGS3Uz2') {
               this.isDemo = true;
+              this.newPortfolio = true;
             }
 
             this.user = user;

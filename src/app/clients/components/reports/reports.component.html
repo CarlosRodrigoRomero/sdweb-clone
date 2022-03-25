@@ -1,23 +1,29 @@
-<app-navbar></app-navbar>
+<div *ngIf="!portfolioControlService.newPortfolio">
+  <app-navbar></app-navbar>
 
-<div class="barra-titulo" *ngIf="mapLoaded">
-  <app-portfolio-summary></app-portfolio-summary>
-  <app-download-excel-portfolio></app-download-excel-portfolio>
+  <div class="barra-titulo" *ngIf="mapLoaded">
+    <app-portfolio-summary></app-portfolio-summary>
+    <app-download-excel-portfolio></app-download-excel-portfolio>
+  </div>
+
+  <div class="grid" *ngIf="mapLoaded">
+    <div class="row_1">
+      <div>
+        <app-bar-chart></app-bar-chart>
+      </div>
+    </div>
+    <div class="row_2">
+      <div>
+        <app-plant-list *ngIf="!portfolioControlService.isDemo"></app-plant-list>
+        <app-new-plant-list *ngIf="portfolioControlService.isDemo"></app-new-plant-list>
+      </div>
+      <div>
+        <app-map-all-plants></app-map-all-plants>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="grid" *ngIf="mapLoaded">
-  <div class="row_1">
-    <div>
-      <app-bar-chart></app-bar-chart>
-    </div>
-  </div>
-  <div class="row_2">
-    <div>
-      <app-plant-list *ngIf="!portfolioControlService.isDemo"></app-plant-list>
-      <app-new-plant-list *ngIf="portfolioControlService.isDemo"></app-new-plant-list>
-    </div>
-    <div>
-      <app-map-all-plants></app-map-all-plants>
-    </div>
-  </div>
+<div *ngIf="portfolioControlService.newPortfolio">
+  <app-dashboard></app-dashboard>
 </div>

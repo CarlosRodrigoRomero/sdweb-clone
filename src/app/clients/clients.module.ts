@@ -6,6 +6,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 
 import { ClientsRoutingModule } from './clients-routing.module';
 import { SharedModule } from '@shared/shared.module';
+import { PortfolioModule } from '../portfolio/portfolio.module';
 
 import { ClientsComponent } from './components/clients/clients.component';
 import { ReportsComponent } from './components/reports/reports.component';
@@ -27,6 +28,14 @@ import { NewPlantListComponent } from './components/new-plant-list/new-plant-lis
     PortfolioSummaryComponent,
     NewPlantListComponent,
   ],
-  imports: [CommonModule, ClientsRoutingModule, SharedModule, FormsModule, ReactiveFormsModule, NgApexchartsModule],
+  imports: [
+    CommonModule,
+    ClientsRoutingModule,
+    SharedModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NgApexchartsModule,
+    PortfolioModule,
+  ],
 })
 export class ClientsModule {}

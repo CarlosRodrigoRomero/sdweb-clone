@@ -12,7 +12,15 @@ import { PlantsListComponent } from './components/plants-list/plants-list.compon
 import { PlantsMapComponent } from './components/plants-map/plants-map.component';
 
 @NgModule({
-  declarations: [DashboardComponent, EstadoComponent, ViewHeaderComponent, ViewsComponent, PlantsListComponent, PlantsMapComponent],
+  declarations: [
+    DashboardComponent,
+    EstadoComponent,
+    ViewHeaderComponent,
+    ViewsComponent,
+    PlantsListComponent,
+    PlantsMapComponent,
+  ],
   imports: [CommonModule, PortfolioRoutingModule, SharedModule],
+  exports: [DashboardComponent],
 })
 export class PortfolioModule {}
