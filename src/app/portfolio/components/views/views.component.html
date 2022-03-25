@@ -4,32 +4,28 @@
     <mat-horizontal-stepper #stepper>
       <mat-step>
         <div class="step-content">
+          <app-portfolio-resumen></app-portfolio-resumen>
+        </div>
+      </mat-step>
+      <mat-step>
+        <div class="step-content">
           <app-plants-list></app-plants-list>
           <app-plants-map></app-plants-map>
         </div>
       </mat-step>
       <mat-step>
-        <div>
-          <span>Vista 2</span>
-          <button mat-button matStepperNext>Next</button>
+        <div class="step-content">
+          <app-mae-charts></app-mae-charts>
         </div>
       </mat-step>
       <mat-step>
-        <div>
-          <span>Vista 3</span>
-          <button mat-button matStepperNext>Next</button>
+        <div class="step-content">
+          <app-perdidas-charts></app-perdidas-charts>
         </div>
       </mat-step>
       <mat-step>
-        <div>
-          <span>Vista 4</span>
-          <button mat-button matStepperNext>Next</button>
-        </div>
-      </mat-step>
-      <mat-step>
-        <div>
-          <span>Vista 5</span>
-          <button mat-button matStepperNext>Next</button>
+        <div class="step-content">
+          <app-prediccion-maes></app-prediccion-maes>
         </div>
       </mat-step>
     </mat-horizontal-stepper>
