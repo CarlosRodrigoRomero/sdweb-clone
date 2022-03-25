@@ -72,6 +72,7 @@ export class BarExpandableChartComponent implements OnInit {
   initChart() {
     let series: ApexAxisChartSeries;
     let xaxis: ApexXAxis;
+    let annotations: ApexAnnotations;
     if (this.data.length > this.amplitude) {
       // empezamos con el gráfico ampliado
       series = [
@@ -102,6 +103,29 @@ export class BarExpandableChartComponent implements OnInit {
         },
       };
     }
+    if (this.dataAverage !== undefined) {
+      annotations = {
+        yaxis: [
+          {
+            y: this.dataAverage * 100,
+            borderColor: '#053e86',
+            borderWidth: 2,
+            strokeDashArray: 10,
+
+            label: {
+              offsetX: -100,
+              borderColor: '#053e86',
+              style: {
+                fontSize: '12px',
+                color: '#fff',
+                background: '#053e86',
+              },
+              text: 'Media MAE Portfolio ' + this.decimalPipe.transform(this.dataAverage * 100, '1.0-2') + '%',
+            },
+          },
+        ],
+      };
+    }
 
     this.chartOptions = {
       series,
@@ -119,7 +143,6 @@ export class BarExpandableChartComponent implements OnInit {
           },
         },
       },
-      grid: {},
       plotOptions: {
         bar: {
           horizontal: false,
@@ -142,15 +165,9 @@ export class BarExpandableChartComponent implements OnInit {
       },
       xaxis,
       yaxis: {
-        min: 0,
-        max:
-          Math.max(...[...this.data, this.dataAverage * 100]) * 1.1 <
-          Math.max(...[...this.data, this.dataAverage * 100]) + 0.1
-            ? Math.max(...[...this.data, this.dataAverage * 100]) * 1.1
-            : Math.max(...[...this.data, this.dataAverage * 100]) + 0.1,
         labels: {
           formatter: (value) => {
-            return Math.round(value * 10) / 10 + '%';
+            return Math.round(value * 100) / 100 + '%';
           },
         },
       },
@@ -165,27 +182,7 @@ export class BarExpandableChartComponent implements OnInit {
         },
       },
       colors: this.colors,
-      annotations: {
-        yaxis: [
-          {
-            y: this.dataAverage * 100,
-            borderColor: '#053e86',
-            borderWidth: 2,
-            strokeDashArray: 10,
-
-            label: {
-              offsetX: -100,
-              borderColor: '#053e86',
-              style: {
-                fontSize: '12px',
-                color: '#fff',
-                background: '#053e86',
-              },
-              text: 'Media MAE Portfolio ' + this.decimalPipe.transform(this.dataAverage * 100, '1.0-2') + '%',
-            },
-          },
-        ],
-      },
+      annotations,
     };
 
     this.dataLoaded = true;
@@ -260,15 +257,9 @@ export class BarExpandableChartComponent implements OnInit {
       },
     };
     this.chartOptions.yaxis = {
-      min: 0,
-      max:
-        Math.max(...[...dataFiltered, this.dataAverage * 100]) * 1.1 <
-        Math.max(...[...dataFiltered, this.dataAverage * 100]) + 0.1
-          ? Math.max(...[...dataFiltered, this.dataAverage * 100]) * 1.1
-          : Math.max(...[...dataFiltered, this.dataAverage * 100]) + 0.1,
       labels: {
         formatter: (value) => {
-          return Math.round(value * 10) / 10 + '%';
+          return Math.round(value * 100) / 100 + '%';
         },
       },
     };

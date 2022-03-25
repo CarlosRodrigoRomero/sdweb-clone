@@ -18,10 +18,14 @@ app-view-header {
   margin: 0 24px;
 }
 
-.step-content {
+.plantas-content {
   display: grid;
   grid-template-columns: 60% auto;
   gap: 1rem;
   align-items: center;
+  height: calc(100vh - 270px);
+}
+
+.step-content {
   height: calc(100vh - 270px);
 }

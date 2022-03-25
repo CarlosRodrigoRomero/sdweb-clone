@@ -167,6 +167,8 @@ export class PortfolioControlService {
               }
             });
 
+            console.log(this.listaPlantas);
+
             this.listaPlantas.forEach((planta) => {
               const informesPlanta = this.listaInformes.filter((inf) => inf.plantaId === planta.id);
               const informeReciente = informesPlanta.reduce((prev, current) =>
@@ -399,7 +401,10 @@ export class PortfolioControlService {
         latitud: 38.36439,
         longitud: -1.27652,
         tipo: 'fija',
-        informes: [{ id: '01', plantaId: '01', mae: 0.052, fecha: 1624270070, disponible: true }],
+        informes: [
+          { id: '01_1', plantaId: '01', mae: 0.052, fecha: 1624270070, disponible: true },
+          { id: '01_2', plantaId: '01', mae: 0.063, fecha: 1594047573, disponible: true },
+        ],
       },
       {
         id: '02',
@@ -408,7 +413,10 @@ export class PortfolioControlService {
         latitud: 42,
         longitud: -1.5,
         tipo: 'seguidores',
-        informes: [{ id: '02', plantaId: '02', mae: 0.031, fecha: 1625737808, disponible: true }],
+        informes: [
+          { id: '02_1', plantaId: '02', mae: 0.031, fecha: 1625737808, disponible: true },
+          { id: '02_2', plantaId: '02', mae: 0.056, fecha: 1594911573, disponible: true },
+        ],
       },
       {
         id: '03',
@@ -417,7 +425,10 @@ export class PortfolioControlService {
         latitud: 41.5,
         longitud: -6,
         tipo: 'fija',
-        informes: [{ id: '03', plantaId: '03', mae: 0.0103, fecha: 1625824208, disponible: true }],
+        informes: [
+          { id: '03_1', plantaId: '03', mae: 0.0103, fecha: 1625824208, disponible: true },
+          { id: '03_2', plantaId: '03', mae: 0.019, fecha: 1587049173, disponible: true },
+        ],
       },
       {
         id: '04',
@@ -426,7 +437,10 @@ export class PortfolioControlService {
         latitud: 37.5,
         longitud: -4,
         tipo: 'seguidores',
-        informes: [{ id: '04', plantaId: '04', mae: 0.006, fecha: 1625910608, disponible: true }],
+        informes: [
+          { id: '04_1', plantaId: '04', mae: 0.006, fecha: 1625910608, disponible: true },
+          { id: '04_2', plantaId: '04', mae: 0.016, fecha: 1597417173, disponible: true },
+        ],
       },
       {
         id: '05',
@@ -435,7 +449,10 @@ export class PortfolioControlService {
         latitud: 40,
         longitud: -4,
         tipo: 'fija',
-        informes: [{ id: '05', plantaId: '05', mae: 0.059, fecha: 1626083408, disponible: true }],
+        informes: [
+          { id: '05_1', plantaId: '05', mae: 0.059, fecha: 1626083408, disponible: true },
+          { id: '05_2', plantaId: '05', mae: 0.032, fecha: 1597071573, disponible: true },
+        ],
       },
       {
         id: '06',
@@ -444,7 +461,10 @@ export class PortfolioControlService {
         latitud: 42.5,
         longitud: -6,
         tipo: 'fija',
-        informes: [{ id: '06', plantaId: '06', mae: 0.041, fecha: 1626083408, disponible: true }],
+        informes: [
+          { id: '06_1', plantaId: '06', mae: 0.041, fecha: 1626083408, disponible: true },
+          { id: '06_2', plantaId: '06', mae: 0.052, fecha: 1599145173, disponible: true },
+        ],
       },
       {
         id: '07',
@@ -453,7 +473,10 @@ export class PortfolioControlService {
         latitud: 40,
         longitud: -5,
         tipo: 'seguidores',
-        informes: [{ id: '07', plantaId: '07', mae: 0.015, fecha: 1626083408, disponible: true }],
+        informes: [
+          { id: '07_1', plantaId: '07', mae: 0.015, fecha: 1626083408, disponible: true },
+          { id: '07_2', plantaId: '07', mae: 0.005, fecha: 1589900373, disponible: true },
+        ],
       },
       {
         id: '08',
@@ -462,7 +485,10 @@ export class PortfolioControlService {
         latitud: 42,
         longitud: -3,
         tipo: 'seguidores',
-        informes: [{ id: '08', plantaId: '08', mae: 0.023, fecha: 1626083408, disponible: true }],
+        informes: [
+          { id: '08_1', plantaId: '08', mae: 0.023, fecha: 1626083408, disponible: true },
+          { id: '08_2', plantaId: '08', mae: 0.029, fecha: 1595257173, disponible: true },
+        ],
       },
       {
         id: '09',
@@ -471,7 +497,10 @@ export class PortfolioControlService {
         latitud: 41,
         longitud: -2,
         tipo: 'fija',
-        informes: [{ id: '09', plantaId: '09', mae: 0.032, fecha: 1626083408, disponible: true }],
+        informes: [
+          { id: '09_1', plantaId: '09', mae: 0.032, fecha: 1626083408, disponible: true },
+          { id: '09_2', plantaId: '09', mae: 0.036, fecha: 1593356373, disponible: true },
+        ],
       },
       {
         id: '10',
@@ -480,7 +509,10 @@ export class PortfolioControlService {
         latitud: 39,
         longitud: -1.5,
         tipo: 'seguidores',
-        informes: [{ id: '10', plantaId: '10', mae: 0.009, fecha: 1624226400, disponible: true }],
+        informes: [
+          { id: '10_1', plantaId: '10', mae: 0.009, fecha: 1624226400, disponible: true },
+          { id: '10_2', plantaId: '10', mae: 0.02, fecha: 1595948373, disponible: true },
+        ],
       },
     ];
 
