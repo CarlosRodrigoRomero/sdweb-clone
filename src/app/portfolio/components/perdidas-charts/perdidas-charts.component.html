@@ -1,7 +1,7 @@
 <mat-card>
   <app-bar-expandable-chart
-    [data]="dataMae"
-    [dataName]="'MAE'"
+    [data]="dataPerdidas"
+    [dataName]="'Pérdidas'"
     [labels]="labels"
     [amplitude]="50"
     [colors]="coloresMae"
@@ -11,8 +11,8 @@
     (chartPositionChange)="chartPositionChange($event)"
   ></app-bar-expandable-chart>
   <app-bar-expandable-chart
-    [data]="dataVarMae"
-    [dataName]="'Variacion MAE'"
+    [data]="dataVarPerdidas"
+    [dataName]="'Variacion Pérdidas'"
     [labels]="labels"
     [amplitude]="50"
     [colors]="coloresVarMae"

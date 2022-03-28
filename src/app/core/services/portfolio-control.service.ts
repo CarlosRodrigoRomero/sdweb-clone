@@ -167,8 +167,6 @@ export class PortfolioControlService {
               }
             });
 
-            console.log(this.listaPlantas);
-
             this.listaPlantas.forEach((planta) => {
               const informesPlanta = this.listaInformes.filter((inf) => inf.plantaId === planta.id);
               const informeReciente = informesPlanta.reduce((prev, current) =>

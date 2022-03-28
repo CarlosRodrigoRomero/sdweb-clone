@@ -25,8 +25,8 @@ export class PerdidasChartsComponent implements OnInit {
   private informes: InformeInterface[];
   private maePlantas: number[] = [];
   private perdidasChart: PlantaChart[] = [];
-  public dataMae = Array<number>();
-  public dataVarMae = Array<number>();
+  public dataPerdidas = Array<number>();
+  public dataVarPerdidas = Array<number>();
   public plantasId: string[] = [];
   public tiposPlantas: string[] = [];
   private informesRecientes: InformeInterface[] = [];
@@ -47,25 +47,27 @@ export class PerdidasChartsComponent implements OnInit {
     this.maePlantas = this.portfolioControlService.maePlantas;
 
     this.plantas.forEach((planta, index) => {
-      const perdidas = this.maePlantas[index] * this.plantas[index].potencia;
-      if (perdidas !== undefined) {
+      const perdidasInfActual = this.maePlantas[index] * planta.potencia;
+      if (perdidasInfActual !== undefined) {
         // obtenemos los 2 ultimos informes para obtener los datos
         const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
         const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
         const informePrevio = informesPlanta
           .filter((informe) => informe.id !== informeReciente.id)
           .reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
-        const variacionPerdidas = perdidas - informePrevio.mae * planta.potencia;
+        const perdidasInfPrevio = informePrevio.mae * planta.potencia;
 
-        this.perdidasChart.push({ planta, perdidas, variacionPerdidas });
+        const variacionPerdidas = (perdidasInfActual - perdidasInfPrevio) / perdidasInfPrevio;
+
+        this.perdidasChart.push({ planta, perdidas: perdidasInfActual, variacionPerdidas });
       }
     });
 
     this.perdidasChart.sort((a, b) => b.variacionPerdidas - a.variacionPerdidas);
 
     this.perdidasChart.forEach((plant) => {
-      this.dataMae.push(plant.perdidas * 100);
-      this.dataVarMae.push(plant.variacionPerdidas * 100);
+      this.dataPerdidas.push(plant.perdidas * 100);
+      this.dataVarPerdidas.push(plant.variacionPerdidas * 100);
       this.plantasId.push(plant.planta.id);
       // this.informesRecientes.push(plant.informeReciente);
       this.labels.push(plant.planta.nombre);

@@ -121,8 +121,7 @@ export class BarExpandableChartComponent implements OnInit {
                 color: '#fff',
                 background: '#053e86',
               },
-              text:
-                'Media MAE Portfolio ' + this.decimalPipe.transform(this.dataAverage * 100, '1.0-2')  + this.units,
+              text: 'Media MAE Portfolio ' + this.decimalPipe.transform(this.dataAverage * 100, '1.0-2') + this.units,
             },
           },
         ],
@@ -158,7 +157,7 @@ export class BarExpandableChartComponent implements OnInit {
       },
       dataLabels: {
         enabled: false,
-        formatter: (value) => Math.round(value * 100) / 100 +  this.units,
+        formatter: (value) => value + this.units,
       },
       stroke: {
         show: true,
@@ -169,7 +168,7 @@ export class BarExpandableChartComponent implements OnInit {
       yaxis: {
         labels: {
           formatter: (value) => {
-            return Math.round(value * 100) / 100 +  this.units;
+            return value + this.units;
           },
         },
       },
@@ -178,9 +177,7 @@ export class BarExpandableChartComponent implements OnInit {
       },
       tooltip: {
         y: {
-          formatter: (value) => {
-            return Math.round(value * 100) / 100 +  this.units;
-          },
+          formatter: (value) => value + this.units,
         },
       },
       colors: this.colors,
@@ -260,9 +257,7 @@ export class BarExpandableChartComponent implements OnInit {
     };
     this.chartOptions.yaxis = {
       labels: {
-        formatter: (value) => {
-          return Math.round(value * 100) / 100 + this.units;
-        },
+        formatter: (value) => value + this.units,
       },
     };
     this.chartOptions.colors = colorsFiltered;
