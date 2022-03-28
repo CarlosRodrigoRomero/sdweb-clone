@@ -24,7 +24,7 @@ import { CritCriticidad } from '@core/models/critCriticidad';
 })
 export class PortfolioControlService {
   private _initialized = false;
-  private initialized$ = new BehaviorSubject<boolean>(this._initialized);
+  initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _plantaHovered: PlantaInterface = undefined;
   public plantaHovered$ = new BehaviorSubject<PlantaInterface>(this._plantaHovered);
   public maePlantas: number[] = [];
@@ -194,6 +194,11 @@ export class PortfolioControlService {
             this.maeSigma = this.DAM(this.maePlantas, this.maeMedio);
             // this.maeSigma = this.standardDeviation(this.maePlantas) / 3; // DEMO
 
+            console.log(this.maeMedio);
+            console.log(this.maeSigma);
+
+            this.initialized = true;
+
             initService(true);
           }
         });
@@ -310,24 +315,32 @@ export class PortfolioControlService {
     }
 
     return colorMae;
+  }
 
-    // if (opacity !== undefined) {
-    //   if (mae > this.maeMedio + this.maeSigma) {
-    //     return GLOBAL.colores_mae_rgb[2].replace(',1)', ',' + opacity + ')');
-    //   } else if (mae <= this.maeMedio - this.maeSigma) {
-    //     return GLOBAL.colores_mae_rgb[0].replace(',1)', ',' + opacity + ')');
-    //   } else {
-    //     return GLOBAL.colores_mae_rgb[1].replace(',1)', ',' + opacity + ')');
-    //   }
-    // } else {
-    //   if (mae > this.maeMedio + this.maeSigma) {
-    //     return GLOBAL.colores_mae_rgb[2];
-    //   } else if (mae <= this.maeMedio - this.maeSigma) {
-    //     return GLOBAL.colores_mae_rgb[0];
-    //   } else {
-    //     return GLOBAL.colores_mae_rgb[1];
-    //   }
-    // }
+  getNewColorMae(mae: number, opacity?: number): string {
+    let colorMae = '';
+    if (this.numPlantas < 3) {
+      GLOBAL.mae_rangos.forEach((rango, index) => {
+        if (mae > rango) {
+          colorMae = GLOBAL.colores_new_mae_rgb[index + 1];
+        }
+      });
+    } else {
+      if (mae >= this.maeMedio + this.maeSigma) {
+        colorMae = GLOBAL.colores_new_mae_rgb[2];
+      } else if (mae <= this.maeMedio) {
+        colorMae = GLOBAL.colores_new_mae_rgb[0];
+      } else {
+        colorMae = GLOBAL.colores_new_mae_rgb[1];
+      }
+    }
+
+    // si se envía opacidad
+    if (opacity !== undefined) {
+      colorMae = colorMae.replace(',1)', ',' + opacity + ')');
+    }
+
+    return colorMae;
   }
 
   public setExternalStyle(plantaId: string, focus: boolean) {
@@ -387,6 +400,15 @@ export class PortfolioControlService {
   set maeSigma(value: number) {
     this._maeSigma = value;
     this.maeSigma$.next(value);
+  }
+
+  get initialized() {
+    return this._initialized;
+  }
+
+  set initialized(value: boolean) {
+    this._initialized = value;
+    this.initialized$.next(value);
   }
 
   // SOLO PARA DEMO

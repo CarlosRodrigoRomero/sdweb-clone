@@ -3,7 +3,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
-import { OlMapService } from '@core/services/ol-map.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,18 +14,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription = new Subscription();
 
-  constructor(private portfolioControlService: PortfolioControlService, private olMapService: OlMapService) {}
+  constructor(private portfolioControlService: PortfolioControlService) {}
 
   ngOnInit(): void {
-    this.portfolioControlService.initService().then((res) => (this.dataLoaded = res));
+    this.portfolioControlService.initialized$.subscribe((value) => (this.dataLoaded = value));
   }
 
   ngOnDestroy() {
     // cancelamos las suscripciones
     this.subscription.unsubscribe();
-
-    // reseteamos los servicios a sus valores por defecto
-    this.portfolioControlService.resetService();
-    this.olMapService.resetService();
   }
 }

@@ -71,7 +71,7 @@ export class PerdidasChartsComponent implements OnInit {
       this.plantasId.push(plant.planta.id);
       // this.informesRecientes.push(plant.informeReciente);
       this.labels.push(plant.planta.nombre);
-      this.coloresMae.push(this.portfolioControlService.getColorMae(plant.perdidas));
+      this.coloresMae.push(this.portfolioControlService.getNewColorMae(plant.perdidas));
       this.coloresVarMae.push(this.getColorVarPerdidas(plant.variacionPerdidas));
     });
   }

@@ -68,7 +68,7 @@ export class MaeChartsComponent implements OnInit {
       this.plantasId.push(plant.planta.id);
       // this.informesRecientes.push(plant.informeReciente);
       this.labels.push(plant.planta.nombre);
-      this.coloresMae.push(this.portfolioControlService.getColorMae(plant.mae));
+      this.coloresMae.push(this.portfolioControlService.getNewColorMae(plant.mae));
       this.coloresVarMae.push(this.getColorVarMae(plant.variacionMae));
     });
   }
