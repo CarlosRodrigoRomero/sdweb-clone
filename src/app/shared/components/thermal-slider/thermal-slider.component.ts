@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { LabelType, Options } from '@angular-slider/ngx-slider';
 
@@ -40,7 +41,8 @@ export class ThermalSliderComponent implements OnInit, OnDestroy {
   constructor(
     private thermalService: ThermalService,
     private olMapService: OlMapService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -63,7 +65,8 @@ export class ThermalSliderComponent implements OnInit, OnDestroy {
     );
 
     // PLANTA NUEVO CLIENTE
-    if (this.reportControlService.plantaId === '3JXI01XmcE3G1d4WNMMd') {
+    const informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+    if (this.reportControlService.plantaId === '3JXI01XmcE3G1d4WNMMd' || informeId === 'EQKwnkexFVUJ5YLZfHsM') {
       this.optionsTemp.floor = 0;
       this.thermalService.sliderMin = 0;
       this.thermalService.sliderMax = 50;
