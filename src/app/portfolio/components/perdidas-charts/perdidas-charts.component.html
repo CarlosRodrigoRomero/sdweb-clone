@@ -6,6 +6,7 @@
     [amplitude]="50"
     [colors]="coloresMae"
     [zoomed]="true"
+    [units]="' kW'"
     (elemSelected)="onClick($event)"
     (chartPositionChange)="chartPositionChange($event)"
   ></app-bar-expandable-chart>
@@ -16,6 +17,7 @@
     [amplitude]="50"
     [colors]="coloresVarMae"
     [zoomed]="true"
+    [units]="'%'"
     (elemSelected)="onClick($event)"
     (chartPositionChange)="chartPositionChange($event)"
   ></app-bar-expandable-chart>

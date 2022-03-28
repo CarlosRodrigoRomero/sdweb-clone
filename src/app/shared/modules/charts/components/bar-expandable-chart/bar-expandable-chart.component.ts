@@ -49,6 +49,7 @@ export class BarExpandableChartComponent implements OnInit {
   @Input() amplitude: number;
   @Input() colors: string[];
   @Input() zoomed: boolean;
+  @Input() units: string;
 
   @Output() elemSelected = new EventEmitter();
   @Output() elemHovered = new EventEmitter();
@@ -120,7 +121,8 @@ export class BarExpandableChartComponent implements OnInit {
                 color: '#fff',
                 background: '#053e86',
               },
-              text: 'Media MAE Portfolio ' + this.decimalPipe.transform(this.dataAverage * 100, '1.0-2') + '%',
+              text:
+                'Media MAE Portfolio ' + this.decimalPipe.transform(this.dataAverage * 100, '1.0-2')  + this.units,
             },
           },
         ],
@@ -156,7 +158,7 @@ export class BarExpandableChartComponent implements OnInit {
       },
       dataLabels: {
         enabled: false,
-        formatter: (value) => Math.round(value * 100) / 100 + '%',
+        formatter: (value) => Math.round(value * 100) / 100 +  this.units,
       },
       stroke: {
         show: true,
@@ -167,7 +169,7 @@ export class BarExpandableChartComponent implements OnInit {
       yaxis: {
         labels: {
           formatter: (value) => {
-            return Math.round(value * 100) / 100 + '%';
+            return Math.round(value * 100) / 100 +  this.units;
           },
         },
       },
@@ -177,7 +179,7 @@ export class BarExpandableChartComponent implements OnInit {
       tooltip: {
         y: {
           formatter: (value) => {
-            return Math.round(value * 100) / 100 + ' %';
+            return Math.round(value * 100) / 100 +  this.units;
           },
         },
       },
@@ -259,7 +261,7 @@ export class BarExpandableChartComponent implements OnInit {
     this.chartOptions.yaxis = {
       labels: {
         formatter: (value) => {
-          return Math.round(value * 100) / 100 + '%';
+          return Math.round(value * 100) / 100 + this.units;
         },
       },
     };
