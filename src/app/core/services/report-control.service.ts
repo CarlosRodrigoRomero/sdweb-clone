@@ -28,6 +28,9 @@ export class ReportControlService {
   public sharedReport$ = new BehaviorSubject<boolean>(this._sharedReport);
   private _sharedReportWithFilters = true;
   public sharedReportWithFilters$ = new BehaviorSubject<boolean>(this._sharedReportWithFilters);
+  completeViewPlants = ['3JXI01XmcE3G1d4WNMMd', 'buzSMRcLEEeLfhnqfbbG'];
+  private _completeView = false;
+  public completeView$ = new BehaviorSubject<boolean>(this._completeView);
   private sharedId: string;
   private _plantaId: string = undefined;
   public plantaId$ = new BehaviorSubject<string>(this._plantaId);
@@ -124,12 +127,14 @@ export class ReportControlService {
       } else {
         ///////////////////// SHARED REPORT ///////////////////////
         this.sharedReport = true;
+
         // comprobamos si es filtrable
         if (!this.router.url.includes('filterable')) {
           this.sharedReportWithFilters = false;
         }
         // obtenemos el ID de la URL
         this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+
         // iniciamos el servicio share-report
         this.shareReportService.initService(this.sharedId);
 
@@ -144,6 +149,12 @@ export class ReportControlService {
                 const params = doc.data() as ParamsFilterShare;
                 this.plantaId = params.plantaId;
                 this.selectedInformeId = params.informeId;
+
+                // comprobamos si ese enlace shared debe mostrar la vista completa
+                if (this.completeViewPlants.includes(this.plantaId)) {
+                  this.completeView = true;
+                }
+
                 if (!this.router.url.includes('filterable')) {
                   // iniciamos anomalia service antes de obtener las anomalias
                   this.anomaliaService.initService(this.plantaId).then(() =>
@@ -268,12 +279,14 @@ export class ReportControlService {
       } else {
         ///////////////////// SHARED REPORT ///////////////////////
         this.sharedReport = true;
+
         // comprobamos si es filtrable
         if (!this.router.url.includes('filterable')) {
           this.sharedReportWithFilters = false;
         }
         // obtenemos el ID de la URL
         this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+
         // iniciamos el servicio share-report
         this.shareReportService.initService(this.sharedId);
 
@@ -288,6 +301,11 @@ export class ReportControlService {
                 const params = doc.data() as ParamsFilterShare;
                 this.plantaId = params.plantaId;
                 this.selectedInformeId = params.informeId;
+
+                // comprobamos si ese enlace shared debe mostrar la vista completa
+                if (this.completeViewPlants.includes(this.plantaId)) {
+                  this.completeView = true;
+                }
 
                 if (!this.router.url.includes('filterable')) {
                   // iniciamos anomalia service antes de obtener las anomalias
@@ -684,5 +702,14 @@ export class ReportControlService {
   set noAnomsReport(value: boolean) {
     this._noAnomsReport = value;
     this.noAnomsReport$.next(value);
+  }
+
+  get completeView() {
+    return this._completeView;
+  }
+
+  set completeView(value: boolean) {
+    this._completeView = value;
+    this.completeView$.next(value);
   }
 }

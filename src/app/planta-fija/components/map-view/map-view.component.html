@@ -44,10 +44,10 @@
           <div>
             <div class="btns-export">
               <!-- BOTON COMPARTIR -->
-              <app-share-report *ngIf="notSharedReport"></app-share-report>
+              <app-share-report *ngIf="notSharedReport && !completeView"></app-share-report>
 
               <!-- BOTON DESCARGAS -->
-              <app-download-report *ngIf="notSharedReport"></app-download-report>
+              <app-download-report *ngIf="notSharedReport && !completeView"></app-download-report>
             </div>
 
             <button mat-raised-button class="btn-open-controls" (click)="showControls()">
@@ -100,7 +100,7 @@
 
           <!-- BOTON SIDENAV STATS -->
           <button
-            *ngIf="notSharedReport"
+            *ngIf="notSharedReport && !completeView"
             mat-raised-button
             class="btn-right-stats stats"
             (click)="sidenavStats.toggle(); loadStats()"
