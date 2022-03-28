@@ -110,24 +110,54 @@
                 <b>{{ row.mae * 100 | number: '1.0-2' }}%</b>. Se considera un valor <b>{{ row.gravedadMae }}</b
                 >. No disponemos de datos de años anteriores para ver su variación.
               </span>
+              <!-- DATOS FALSOS DEMO -->
+              <div *ngIf="row.nombre == 'Planta 1'">
+                <span
+                  >La planta tienen un problema con <b>strings abiertos</b>. El 99% de las pérdidas de Planta 1 se
+                  concentra en:</span
+                >
+                <li>3476 módulos en circuito abierto (string)</li>
+                <li>446 módulos con substring en circuito abierto</li>
+              </div>
+              <div *ngIf="row.nombre == 'Planta 2'">
+                <span
+                  >La planta de tiene un problema con <b>vegetación/sombras</b>, acumulando un total de
+                  <b>587 módulos</b> afectados por sombras.</span
+                >
+              </div>
             </div>
             <div class="resumen-inferior">
               <div class="problemas">
                 <div class="problemas-header">
                   <span class="titulo">Principales problemas</span>
                 </div>
-                <div class="alertas">
+
+                <!-- ALERTAS FALSAS DEMO -->
+                <div
+                  class="alertas"
+                  *ngIf="row.nombre === 'Planta 1' || row.nombre === 'Planta 2' || row.nombre === 'Planta 3'"
+                >
+                  <div class="alerta" *ngFor="let warning of row.warnings">
+                    <mat-icon class="danger">warning</mat-icon>
+                    <span>{{ warning }}</span>
+                  </div>
+                </div>
+
+                <div
+                  *ngIf="row.nombre !== 'Planta 1' && row.nombre !== 'Planta 2' && row.nombre !== 'Planta 3'"
+                  class="alertas"
+                >
                   <div class="alerta">
                     <mat-icon class="danger">warning</mat-icon>
-                    <span>Hay 18 módulos en circuito abierto</span>
+                    <span>156 módulos en circuito abierto (string)</span>
                   </div>
                   <div class="alerta">
                     <mat-icon class="danger">warning</mat-icon>
-                    <span>Hay 18 módulos en circuito abierto</span>
+                    <span>89 módulos con substring en circuito abierto</span>
                   </div>
                   <div class="alerta">
                     <mat-icon class="warning">warning</mat-icon>
-                    <span>Hay 18 módulos en circuito abierto</span>
+                    <span>56 módulos afectados por sombras</span>
                   </div>
                 </div>
               </div>

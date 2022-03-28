@@ -10,7 +10,7 @@ import { PortfolioControlService } from '@core/services/portfolio-control.servic
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 
-interface PlantsData {
+interface PlantData {
   nombre: string;
   potencia: number;
   mae: number;
@@ -23,6 +23,7 @@ interface PlantsData {
   informesAntiguos?: InformeInterface[];
   plantaId?: string;
   tipo?: string;
+  warnings?: string[];
 }
 
 @Component({
@@ -47,8 +48,8 @@ export class PlantsListComponent implements OnInit {
     'ultimaInspeccion',
     'acceso',
   ];
-  dataSource = new MatTableDataSource<PlantsData>();
-  expandedRow: PlantsData | null;
+  dataSource = new MatTableDataSource<PlantData>();
+  expandedRow: PlantData | null;
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
 
@@ -58,7 +59,7 @@ export class PlantsListComponent implements OnInit {
     this.plantas = this.portfolioControlService.listaPlantas;
     this.informes = this.portfolioControlService.listaInformes;
 
-    const plantsData: PlantsData[] = [];
+    const plantsData: PlantData[] = [];
 
     this.plantas.forEach((planta) => {
       const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
@@ -69,7 +70,7 @@ export class PlantsListComponent implements OnInit {
         informesAntiguos = informesPlanta.filter((informe) => informe.fecha < GLOBAL.newReportsDate);
       }
 
-      plantsData.push({
+      let plantData: PlantData = {
         nombre: planta.nombre,
         potencia: planta.potencia,
         mae: informeReciente.mae,
@@ -81,7 +82,11 @@ export class PlantsListComponent implements OnInit {
         plantaId: planta.id,
         tipo: planta.tipo,
         cc: informeReciente.cc,
-      });
+      };
+
+      plantData = this.addFakeWarnings(plantData);
+
+      plantsData.push(plantData);
     });
 
     this.dataSource.data = plantsData;
@@ -96,6 +101,31 @@ export class PlantsListComponent implements OnInit {
     });
 
     return gravedad;
+  }
+
+  private addFakeWarnings(plantsData: PlantData) {
+    const warnings: string[] = [];
+    if (plantsData.nombre === 'Planta 1') {
+      warnings.push('3476 módulos en circuito abierto (string)');
+      warnings.push('446 módulos con substring en circuito abierto');
+      warnings.push('63% de anomalías en la fila 1 (más alejada del suelo)');
+
+      plantsData.warnings = warnings;
+    }
+    if (plantsData.nombre === 'Planta 2') {
+      warnings.push('587 módulos afectados por sombras');
+
+      plantsData.warnings = warnings;
+    }
+    if (plantsData.nombre === 'Planta 3') {
+      warnings.push('573 módulos en circuito abierto (string)');
+      warnings.push('147 módulos con substring en circuito abierto');
+      warnings.push('6 módulos con células calientes con gradiente mayor de 40ºC');
+
+      plantsData.warnings = warnings;
+    }
+
+    return plantsData;
   }
 
   hoverPlanta(row) {
