@@ -8,6 +8,7 @@ import TileLayer from 'ol/layer/Tile';
 
 import { OlMapService } from '@core/services/ol-map.service';
 import { ThermalService } from '@core/services/thermal.service';
+import { ReportControlService } from '@core/services/report-control.service';
 
 @Component({
   selector: 'app-thermal-slider',
@@ -36,13 +37,17 @@ export class ThermalSliderComponent implements OnInit, OnDestroy {
     },
   };
 
-  constructor(private thermalService: ThermalService, private olMapService: OlMapService) {}
+  constructor(
+    private thermalService: ThermalService,
+    private olMapService: OlMapService,
+    private reportControlService: ReportControlService
+  ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers)));
 
     this.subscriptions.add(
-      this.thermalService.sliderMaxSource.subscribe(() => {
+      this.thermalService.sliderMax$.subscribe(() => {
         this.thermalLayers.forEach((tl) => {
           tl.getSource().changed();
         });
@@ -50,12 +55,21 @@ export class ThermalSliderComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.thermalService.sliderMinSource.subscribe(() => {
+      this.thermalService.sliderMin$.subscribe(() => {
         this.thermalLayers.forEach((tl) => {
           tl.getSource().changed();
         });
       })
     );
+
+    // PLANTA NUEVO CLIENTE
+    if (this.reportControlService.plantaId === '3JXI01XmcE3G1d4WNMMd') {
+      this.optionsTemp.floor = 0;
+      this.thermalService.sliderMin = 0;
+      this.thermalService.sliderMax = 50;
+      this.lowTemp = 0;
+      this.highTemp = 50;
+    }
   }
 
   onChangeTemperatureSlider(lowValue: number, highValue: number) {

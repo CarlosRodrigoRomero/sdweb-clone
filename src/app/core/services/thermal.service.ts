@@ -15,10 +15,10 @@ export class ThermalService {
   thermalLayers$ = new BehaviorSubject<ThermalLayerInterface[]>(this._thermalLayers);
 
   private _sliderMin: number = 25;
-  public sliderMinSource = new BehaviorSubject<number>(this._sliderMin);
+  sliderMin$ = new BehaviorSubject<number>(this._sliderMin);
 
-  private _sliderMax: number = 75;
-  public sliderMaxSource = new BehaviorSubject<number>(this._sliderMax);
+  private _sliderMax: number = 50;
+  sliderMax$ = new BehaviorSubject<number>(this._sliderMax);
 
   constructor(private afs: AngularFirestore) {}
 
@@ -68,7 +68,7 @@ export class ThermalService {
 
   set sliderMin(value: number) {
     this._sliderMin = value;
-    this.sliderMinSource.next(value);
+    this.sliderMin$.next(value);
   }
 
   get sliderMax() {
@@ -77,6 +77,6 @@ export class ThermalService {
 
   set sliderMax(value: number) {
     this._sliderMax = value;
-    this.sliderMaxSource.next(value);
+    this.sliderMax$.next(value);
   }
 }
