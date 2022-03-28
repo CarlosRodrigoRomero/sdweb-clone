@@ -66,7 +66,7 @@ export class PerdidasChartsComponent implements OnInit {
     this.perdidasChart.sort((a, b) => b.variacionPerdidas - a.variacionPerdidas);
 
     this.perdidasChart.forEach((plant) => {
-      this.dataPerdidas.push(plant.perdidas * 100);
+      this.dataPerdidas.push(plant.perdidas * 1000);
       this.dataVarPerdidas.push(plant.variacionPerdidas * 100);
       this.plantasId.push(plant.planta.id);
       // this.informesRecientes.push(plant.informeReciente);

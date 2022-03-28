@@ -90,8 +90,16 @@ tr.example-element-row:not(.example-expanded-row):active {
   justify-content: center;
 }
 
-.cell-icon mat-icon {
+.up {
+  color: red;
+}
+
+.equal {
   color: orange;
+}
+
+.down {
+  color: #71974c;
 }
 
 .acceder-btn {

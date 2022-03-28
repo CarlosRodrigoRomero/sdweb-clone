@@ -35,7 +35,9 @@
         <td mat-cell *matCellDef="let row">
           <div class="cell-icon">
             <span>{{ row.variacionMae * 100 | number: '1.0-2' }}%</span>
-            <mat-icon>horizontal_rule</mat-icon>
+            <mat-icon class="up" *ngIf="row.variacionMae > 0">arrow_drop_up</mat-icon>
+            <mat-icon class="equal" *ngIf="row.variacionMae == 0">horizontal_rule</mat-icon>
+            <mat-icon class="down" *ngIf="row.variacionMae < 0">arrow_drop_down</mat-icon>
           </div>
         </td>
       </ng-container>
@@ -64,7 +66,9 @@
         <td mat-cell *matCellDef="let row">
           <div class="cell-icon">
             <span>{{ row.variacionPerdidas * 100 | number: '1.0-2' }}%</span>
-            <mat-icon>horizontal_rule</mat-icon>
+            <mat-icon class="up" *ngIf="row.variacionPerdidas > 0">arrow_drop_up</mat-icon>
+            <mat-icon class="equal" *ngIf="row.variacionPerdidas == 0">horizontal_rule</mat-icon>
+            <mat-icon class="down" *ngIf="row.variacionPerdidas < 0">arrow_drop_down</mat-icon>
           </div>
         </td>
       </ng-container>

@@ -64,6 +64,13 @@ export class PlantsListComponent implements OnInit {
     this.plantas.forEach((planta) => {
       const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
       const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
+      const informePrevio = informesPlanta
+        .filter((informe) => informe.id !== informeReciente.id)
+        .reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
+      const variacionMae = informeReciente.mae - informePrevio.mae;
+      const perdidasInfReciente = informeReciente.mae * planta.potencia * 1000;
+      const perdidasInfPrevio = informePrevio.mae * planta.potencia * 1000;
+      const variacionPerdidas = (perdidasInfReciente - perdidasInfPrevio) / perdidasInfPrevio;
 
       let informesAntiguos: InformeInterface[] = [];
       if (planta.tipo !== 'seguidores' && planta.id !== 'egF0cbpXnnBnjcrusoeR') {
@@ -74,10 +81,10 @@ export class PlantsListComponent implements OnInit {
         nombre: planta.nombre,
         potencia: planta.potencia,
         mae: informeReciente.mae,
-        variacionMae: 0,
+        variacionMae,
         gravedadMae: this.getGravedadMae(informeReciente.mae),
-        perdidas: informeReciente.mae * planta.potencia * 1000,
-        variacionPerdidas: 0,
+        perdidas: perdidasInfReciente,
+        variacionPerdidas,
         ultimaInspeccion: informeReciente.fecha,
         plantaId: planta.id,
         tipo: planta.tipo,
