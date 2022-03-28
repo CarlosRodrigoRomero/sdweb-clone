@@ -53,12 +53,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
       this.reportControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value))
     );
 
-    this.subscriptions.add(
-      this.reportControlService.completeView$.subscribe((value) => {
-        console.log(value);
-        this.completeView = value;
-      })
-    );
+    this.subscriptions.add(this.reportControlService.completeView$.subscribe((value) => (this.completeView = value)));
 
     this.subscriptions.add(
       this.reportControlService.mapLoaded$.subscribe((value) => {
