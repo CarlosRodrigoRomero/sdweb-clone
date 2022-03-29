@@ -18,6 +18,7 @@ export class NavbarComponent implements OnInit {
   private user: UserInterface;
   public isAdmin: boolean;
   loadSummary = false;
+  hasNotifications = false;
 
   public themeSelected = 'light-theme';
 
@@ -47,6 +48,13 @@ export class NavbarComponent implements OnInit {
         setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
       }
     });
+
+    if (
+      this.reportControlService.plantaId === '3JXI01XmcE3G1d4WNMMd' ||
+      this.reportControlService.plantaId === 'buzSMRcLEEeLfhnqfbbG'
+    ) {
+      this.hasNotifications = true;
+    }
 
     // this.themeService.themeSelected$.subscribe((theme) => (this.themeSelected = theme));
   }
