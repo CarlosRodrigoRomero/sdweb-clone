@@ -50,6 +50,7 @@ export class BarExpandableChartComponent implements OnInit {
   @Input() colors: string[];
   @Input() zoomed: boolean;
   @Input() units: string;
+  @Input() titleY: string;
 
   @Output() elemSelected = new EventEmitter();
   @Output() elemHovered = new EventEmitter();
@@ -87,6 +88,9 @@ export class BarExpandableChartComponent implements OnInit {
         labels: {
           trim: true,
           maxHeight: 80,
+          style: {
+            fontFamily: 'Roboto',
+          },
         },
       };
     } else {
@@ -101,6 +105,9 @@ export class BarExpandableChartComponent implements OnInit {
         labels: {
           trim: true,
           maxHeight: 80,
+          style: {
+            fontFamily: 'Roboto',
+          },
         },
       };
     }
@@ -159,16 +166,24 @@ export class BarExpandableChartComponent implements OnInit {
         enabled: false,
         formatter: (value) => value + this.units,
       },
-      stroke: {
-        show: true,
-        width: 2,
-        colors: ['transparent'],
-      },
+      // stroke: {
+      //   show: true,
+      //   width: 2,
+      //   colors: ['transparent'],
+      // },
       xaxis,
       yaxis: {
         labels: {
           formatter: (value) => {
             return value + this.units;
+          },
+        },
+        title: {
+          text: this.titleY,
+          style: {
+            fontSize: '16px',
+            fontFamily: 'Roboto',
+            fontWeight: 500,
           },
         },
       },
@@ -177,7 +192,7 @@ export class BarExpandableChartComponent implements OnInit {
       },
       tooltip: {
         y: {
-          formatter: (value) => value + this.units,
+          formatter: (value) => this.decimalPipe.transform(value, '1.0-2') + this.units,
         },
       },
       colors: this.colors,

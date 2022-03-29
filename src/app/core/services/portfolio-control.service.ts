@@ -192,10 +192,6 @@ export class PortfolioControlService {
               this.listaPlantas.map((planta) => planta.potencia)
             );
             this.maeSigma = this.DAM(this.maePlantas, this.maeMedio);
-            // this.maeSigma = this.standardDeviation(this.maePlantas) / 3; // DEMO
-
-            console.log(this.maeMedio);
-            console.log(this.maeSigma);
 
             this.initialized = true;
 

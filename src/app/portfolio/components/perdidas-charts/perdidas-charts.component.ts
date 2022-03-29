@@ -31,8 +31,8 @@ export class PerdidasChartsComponent implements OnInit {
   public tiposPlantas: string[] = [];
   private informesRecientes: InformeInterface[] = [];
   public labels = Array<string>();
-  public coloresMae = Array<string>();
-  public coloresVarMae = Array<string>();
+  public coloresPerdidas = Array<string>();
+  public coloresVarPerdidas = Array<string>();
   private chartPosition = 0;
 
   constructor(
@@ -71,8 +71,8 @@ export class PerdidasChartsComponent implements OnInit {
       this.plantasId.push(plant.planta.id);
       // this.informesRecientes.push(plant.informeReciente);
       this.labels.push(plant.planta.nombre);
-      this.coloresMae.push(this.portfolioControlService.getNewColorMae(plant.perdidas));
-      this.coloresVarMae.push(this.getColorVarPerdidas(plant.variacionPerdidas));
+      this.coloresPerdidas.push(this.getColorPerdidas(plant.perdidas));
+      this.coloresVarPerdidas.push(this.getColorVarPerdidas(plant.variacionPerdidas));
     });
   }
 
@@ -105,17 +105,30 @@ export class PerdidasChartsComponent implements OnInit {
     this.chartPosition = value;
   }
 
-  private getColorVarPerdidas(varMae: number) {
-    let colorMae = '';
-    if (varMae >= 0.02) {
-      colorMae = GLOBAL.colores_new_mae[2];
-    } else if (varMae <= 0) {
-      colorMae = GLOBAL.colores_new_mae[0];
+  private getColorPerdidas(perdidas: number) {
+    let colorPerdidas = '';
+    if (perdidas >= 0.2) {
+      colorPerdidas = GLOBAL.colores_new_mae[2];
+    } else if (perdidas <= 0.1) {
+      colorPerdidas = GLOBAL.colores_new_mae[0];
     } else {
-      colorMae = GLOBAL.colores_new_mae[1];
+      colorPerdidas = GLOBAL.colores_new_mae[1];
     }
 
-    return colorMae;
+    return colorPerdidas;
+  }
+
+  private getColorVarPerdidas(varPerdidas: number) {
+    let colorPerdidas = '';
+    if (varPerdidas >= 1) {
+      colorPerdidas = GLOBAL.colores_new_mae[2];
+    } else if (varPerdidas <= 0) {
+      colorPerdidas = GLOBAL.colores_new_mae[0];
+    } else {
+      colorPerdidas = GLOBAL.colores_new_mae[1];
+    }
+
+    return colorPerdidas;
   }
 
   private openSnackBar() {

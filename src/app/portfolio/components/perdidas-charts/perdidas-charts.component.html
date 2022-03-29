@@ -1,23 +1,25 @@
 <mat-card>
   <app-bar-expandable-chart
-    [data]="dataPerdidas"
-    [dataName]="'Pérdidas'"
-    [labels]="labels"
-    [amplitude]="50"
-    [colors]="coloresMae"
-    [zoomed]="true"
-    [units]="' kW'"
-    (elemSelected)="onClick($event)"
-    (chartPositionChange)="chartPositionChange($event)"
-  ></app-bar-expandable-chart>
-  <app-bar-expandable-chart
     [data]="dataVarPerdidas"
     [dataName]="'Variacion Pérdidas'"
     [labels]="labels"
     [amplitude]="50"
-    [colors]="coloresVarMae"
+    [colors]="coloresVarPerdidas"
     [zoomed]="true"
     [units]="'%'"
+    [titleY]="'Variación Pérdidas'"
+    (elemSelected)="onClick($event)"
+    (chartPositionChange)="chartPositionChange($event)"
+  ></app-bar-expandable-chart>
+  <app-bar-expandable-chart
+    [data]="dataPerdidas"
+    [dataName]="'Pérdidas'"
+    [labels]="labels"
+    [amplitude]="50"
+    [colors]="coloresPerdidas"
+    [zoomed]="true"
+    [units]="' kW'"
+    [titleY]="'Pérdidas'"
     (elemSelected)="onClick($event)"
     (chartPositionChange)="chartPositionChange($event)"
   ></app-bar-expandable-chart>
