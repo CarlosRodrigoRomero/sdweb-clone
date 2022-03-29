@@ -183,9 +183,9 @@ export class ClassificationComponent implements OnInit {
 
       if (coordObj !== undefined) {
         const coordCentroid = [coordObj.long, coordObj.lat] as Coordinate;
-        const newGloblaCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
+        const newGlobalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
 
-        this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGloblaCoords);
+        this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGlobalCoords);
 
         count++;
         this.progressBarValue = Math.round((count / anomalias.length) * 100);

@@ -620,6 +620,7 @@ export class PlantaService {
     }
     return '';
   }
+
   getNombreLocalX(planta: PlantaInterface): string {
     if (planta.hasOwnProperty('nombreLocalX')) {
       return planta.nombreLocalX;
@@ -633,6 +634,7 @@ export class PlantaService {
     }
     return GLOBAL.nombreLocalYFija;
   }
+
   setLocAreaList(locAreaList: LocationAreaInterface[]) {
     this.locAreaList = locAreaList;
   }
@@ -692,8 +694,13 @@ export class PlantaService {
           }
           if (locArea.hasOwnProperty('globalCoords') && locArea.globalCoords !== undefined) {
             locArea.globalCoords.forEach((item, index) => {
-              if (item !== null && item.length > 0) {
-                globalCoords[index] = item;
+              if (item !== null) {
+                if (typeof item === 'string' && item.length > 0) {
+                  globalCoords[index] = item;
+                }
+                if (typeof item === 'number') {
+                  globalCoords[index] = item;
+                }
               }
             });
           }
