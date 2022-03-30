@@ -41,8 +41,8 @@ export let GLOBAL = {
   criterioCoA: {
     rangosDT: [10, 10, 40],
     siempreCoA2: [3, 6, 10, 12],
-    siempreCoA3: [4, 5, 7, 17, 14],
-    siempreVisible: [15, 11, 13, 18],
+    siempreCoA3: [4, 5, 7, 17, 14, 18, 20, 21],
+    siempreVisible: [15, 11, 13],
   },
   labels_clase: ['CoA 1', 'CoA 2', 'CoA 3'],
   descripcionClase: [
