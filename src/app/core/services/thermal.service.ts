@@ -17,7 +17,7 @@ export class ThermalService {
   private _sliderMin: number = 25;
   sliderMin$ = new BehaviorSubject<number>(this._sliderMin);
 
-  private _sliderMax: number = 50;
+  private _sliderMax: number = 75;
   sliderMax$ = new BehaviorSubject<number>(this._sliderMax);
 
   constructor(private afs: AngularFirestore) {}
