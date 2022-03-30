@@ -113,6 +113,9 @@ export class SeguidorService {
 
             // si no tiene anomalias no creamos el seguidor
             if (anomaliasSeguidor.length > 0) {
+              // ordenamos las anomalias por tipo
+              anomaliasSeguidor = this.anomaliaService.sortAnomsByTipo(anomaliasSeguidor);
+
               const zona = this.locAreaModulos
                 // tslint:disable-next-line: triple-equals
                 .find((locA) => locA.globalCoords[0] == locArea.globalCoords[0]);

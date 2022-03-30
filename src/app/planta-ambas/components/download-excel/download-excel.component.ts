@@ -133,6 +133,9 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
               }
             });
 
+            // ordenamos la lista de anomalias por tipo
+            this.anomaliasInforme = this.anomaliaService.sortAnomsByTipo(this.anomaliasInforme);
+
             this.columnasLink = [2, 3];
 
             this.inicioFilters = 7;
