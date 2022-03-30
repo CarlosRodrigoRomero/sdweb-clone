@@ -24,14 +24,14 @@ export class MaeChartsComponent implements OnInit {
   private informes: InformeInterface[];
   private maePlantas: number[] = [];
   private maesChart: PlantaChart[] = [];
-  public dataMae = Array<number>();
-  public dataVarMae = Array<number>();
-  public plantasId: string[] = [];
-  public tiposPlantas: string[] = [];
+  dataMae: number[] = [];
+  dataVarMae: number[] = [];
+  plantasId: string[] = [];
+  tiposPlantas: string[] = [];
   private informesRecientes: InformeInterface[] = [];
-  public labels = Array<string>();
-  public coloresMae = Array<string>();
-  public coloresVarMae = Array<string>();
+  labels: string[] = [];
+  coloresMae: string[] = [];
+  coloresVarMae: string[] = [];
   private chartPosition = 0;
 
   constructor(
