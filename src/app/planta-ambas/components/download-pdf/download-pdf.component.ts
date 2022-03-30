@@ -2801,8 +2801,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       style: 'tableHeaderBlue',
     });
 
-    this.anomaliasInforme = this.anomaliasInforme.sort(this.downloadReportService.sortByGlobalCoords);
-
     if (this.reportControlService.plantaFija) {
       cabecera.push({
         text: this.translation.t('Localización'),
