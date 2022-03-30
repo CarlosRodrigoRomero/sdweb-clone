@@ -211,14 +211,17 @@ export let GLOBAL = {
     0.02, // "Célula caliente", // 8
     0.03, // "Varias células calientes", // 9
     0.66, // "2X substring en CA", // 10
-    0, // "Células calientes debido a suciedad", // 11
+    0.02, // "Células calientes debido a suciedad", // 11
     0.85, // "Vidrio roto", // 12
     0, // "Transfer resistance", // 13
     0, // "Caja de conexiones caliente", // 14
-    0, // "Módulo afectado por sombras" // 15
+    0.02, // "Módulo afectado por sombras" // 15
     0, // Yellowing //16
     1, // "String en CA", // 17
-    0.85, // "Posible PID" // 18
+    0.05, // "Posible PID" // 18
+    0, // Falta modulo // 19
+    0.55, // PID regular // 20
+    0.2, // PID irregular // 21
   ],
   sortedAnomsTipos: [
     20, // PID regular
