@@ -1,7 +1,8 @@
 .legend {
   margin-top: 1rem;
-  display: grid;
-  grid-template-columns: repeat(16, 1fr);
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 10px 0px 10px;
 }
 
 .legend__element {

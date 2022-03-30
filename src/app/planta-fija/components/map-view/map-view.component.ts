@@ -22,6 +22,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   public statsOpened: boolean;
   public anomaliasLoaded = false;
   public notSharedReport = true;
+  completeView = false;
   public showFilters = true;
   public mapLoaded = false;
   noAnomsReport = false;
@@ -51,6 +52,9 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.reportControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value))
     );
+
+    this.subscriptions.add(this.reportControlService.completeView$.subscribe((value) => (this.completeView = value)));
+
     this.subscriptions.add(
       this.reportControlService.mapLoaded$.subscribe((value) => {
         this.mapLoaded = value;

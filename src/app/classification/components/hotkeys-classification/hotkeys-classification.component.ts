@@ -258,6 +258,46 @@ export class HotkeysClassificationComponent implements OnInit {
 
       this.hotkeysService.add(
         new Hotkey(
+          'ctrl+8',
+          (event: KeyboardEvent): boolean => {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
+              this.classificationService.anomaliaSelected.tipo = 20;
+
+              // actualizamos el tipo en la DB
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 20);
+
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
+            }
+            return false; // Prevent bubbling
+          },
+          undefined,
+          'ctrl+8: PID regular'
+        )
+      );
+
+      this.hotkeysService.add(
+        new Hotkey(
+          'shift+8',
+          (event: KeyboardEvent): boolean => {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
+              this.classificationService.anomaliaSelected.tipo = 21;
+
+              // actualizamos el tipo en la DB
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 21);
+
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
+            }
+            return false; // Prevent bubbling
+          },
+          undefined,
+          'shift+8: PID irregular'
+        )
+      );
+
+      this.hotkeysService.add(
+        new Hotkey(
           'q',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {

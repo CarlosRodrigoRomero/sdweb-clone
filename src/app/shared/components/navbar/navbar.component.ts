@@ -4,8 +4,16 @@ import { Router } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { ReportControlService } from '@core/services/report-control.service';
 import { ThemeService } from '@core/services/theme.service';
+import { FilterService } from '@core/services/filter.service';
 
 import { UserInterface } from '@core/models/user';
+import { TipoElemFilter } from '@core/models/tipoPcFilter';
+import { GradientFilter } from '@core/models/gradientFilter';
+
+interface Notification {
+  content: string;
+  filter: string;
+}
 
 @Component({
   selector: 'app-navbar',
@@ -18,6 +26,8 @@ export class NavbarComponent implements OnInit {
   private user: UserInterface;
   public isAdmin: boolean;
   loadSummary = false;
+  hasNotifications = false;
+  notifications: Notification[] = [];
 
   public themeSelected = 'light-theme';
 
@@ -25,7 +35,8 @@ export class NavbarComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private themeService: ThemeService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private filterService: FilterService
   ) {}
 
   ngOnInit() {
@@ -48,12 +59,55 @@ export class NavbarComponent implements OnInit {
       }
     });
 
+    this.reportControlService.plantaId$.subscribe((plantaId) => {
+      if (plantaId !== undefined) {
+        if (plantaId === '3JXI01XmcE3G1d4WNMMd' || plantaId === 'buzSMRcLEEeLfhnqfbbG') {
+          this.hasNotifications = true;
+          if (plantaId === '3JXI01XmcE3G1d4WNMMd') {
+            this.notifications.push({
+              content: 'Hay 20 módulos en circuito abierto (string)',
+              filter: 'CA (string)',
+            });
+            this.notifications.push({
+              content: 'Hay varias anomalías térmicas como consecuencia de suciedad en los módulos',
+              filter: 'suciedad',
+            });
+          }
+          if (plantaId === 'buzSMRcLEEeLfhnqfbbG') {
+            this.notifications = [
+              { content: 'Hay 2 células calientes con un gradiente mayor de 40 ºC (Grave)', filter: 'cc gradiente 40' },
+            ];
+          }
+        }
+      }
+    });
+
     // this.themeService.themeSelected$.subscribe((theme) => (this.themeSelected = theme));
   }
 
   navigateHome() {
     if (this.user.role === 0 || this.user.role === 1 || this.user.role === 2) {
       this.router.navigate(['/clients']);
+    }
+  }
+
+  applyFilter(filter: string) {
+    if (filter === 'CA (string)') {
+      const tipoFilterCA = new TipoElemFilter('', 'tipo', 17, 0, 0);
+
+      this.filterService.addFilters([tipoFilterCA]);
+    }
+    if (filter === 'suciedad') {
+      const tipoFilterSuciedad = new TipoElemFilter('', 'tipo', 11, 0, 0);
+
+      this.filterService.addFilters([tipoFilterSuciedad]);
+    }
+    if (filter === 'cc gradiente 40') {
+      const tipoFilterCC = new TipoElemFilter('', 'tipo', 8, 0, 0);
+      const tipoFilterVarCC = new TipoElemFilter('', 'tipo', 9, 0, 0);
+      const gradientFilter = new GradientFilter('gradient', 40, 80);
+
+      this.filterService.addFilters([tipoFilterCC, tipoFilterVarCC, gradientFilter]);
     }
   }
 

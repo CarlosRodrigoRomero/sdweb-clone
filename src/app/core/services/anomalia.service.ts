@@ -560,6 +560,19 @@ export class AnomaliaService {
     return value;
   }
 
+  sortAnomsByTipo(anomalias: Anomalia[]): Anomalia[] {
+    const sortedAnoms: Anomalia[] = [];
+
+    GLOBAL.sortedAnomsTipos.forEach((tipo) => {
+      // tslint:disable-next-line: triple-equals
+      const anomsTipo = anomalias.filter((anom) => anom.tipo == tipo);
+
+      sortedAnoms.push(...anomsTipo);
+    });
+
+    return sortedAnoms;
+  }
+
   /////////////////////////////////////////////////////////////////////////////////////////////
 
   get selectedInformeId(): string {

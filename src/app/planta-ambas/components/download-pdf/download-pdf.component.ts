@@ -263,6 +263,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                   this.anomaliasInforme.push(...anomaliasSeguidor);
                 }
               });
+
+              // ordenamos la lista de anomalias por tipo
+              this.anomaliasInforme = this.anomaliaService.sortAnomsByTipo(this.anomaliasInforme);
             }
 
             return this.downloadReportService.seguidores1Eje$;

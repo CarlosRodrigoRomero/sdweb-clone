@@ -108,9 +108,7 @@ export class ChartNumsyperdComponent implements OnInit, OnDestroy {
   }
 
   private getAllCategorias(anomalias): void {
-    const allNumCategorias = Array(GLOBAL.labels_tipos.length)
-      .fill(0)
-      .map((_, i) => i + 1);
+    const allNumCategorias = GLOBAL.sortedAnomsTipos;
 
     const labelsCategoria = Array<string>();
     const coloresCategoria = Array<string>();

@@ -6,13 +6,6 @@ const routes: Routes = [
   {
     path: ':id',
     component: MapViewComponent,
-    // children: [
-    //   {
-    //     path: '',
-    //     pathMatch: 'full',
-    //     redirectTo: 'informe-overview',
-    //   },
-    // ],
   },
 ];
 

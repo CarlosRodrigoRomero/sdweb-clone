@@ -23,6 +23,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public seguidorViewOpened: boolean;
   public seguidoresLoaded = false;
   public notSharedReport = true;
+  completeView = false;
   public showFilters = true;
   thereAreZones = true;
   public mapLoaded = false;
@@ -56,6 +57,8 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.add(
       this.reportControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value))
     );
+
+    this.subscriptions.add(this.reportControlService.completeView$.subscribe((value) => (this.completeView = value)));
 
     this.subscriptions.add(
       this.seguidoresControlService.seguidorViewOpened$.subscribe((opened) => (this.seguidorViewOpened = opened))
