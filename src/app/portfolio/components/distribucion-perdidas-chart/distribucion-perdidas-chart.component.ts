@@ -10,12 +10,14 @@ import {
   ApexDataLabels,
   ApexPlotOptions,
   ApexTooltip,
+  ApexTheme,
 } from 'ng-apexcharts';
 
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+import { GLOBAL } from '@core/services/global';
 
 export type ChartOptions = {
   series: ApexNonAxisChartSeries;
@@ -26,6 +28,7 @@ export type ChartOptions = {
   dataLabels: ApexDataLabels;
   plotOptions: ApexPlotOptions;
   toolTip: ApexTooltip;
+  theme: ApexTheme;
 };
 
 interface PlantaChart {
@@ -80,7 +83,7 @@ export class DistribucionPerdidasChartComponent implements OnInit {
       series: this.dataPerdidas,
       chart: {
         type: 'donut',
-        width: '130%', // es mayor por la relación de aspecto del gráfico
+        width: '122%', // es mayor por la relación de aspecto del gráfico
       },
       labels: this.labels,
       legend: {
@@ -91,7 +94,12 @@ export class DistribucionPerdidasChartComponent implements OnInit {
           fontFamily: 'Roboto',
           fontWeight: 500,
         },
-        formatter: (value) => this.decimalPipe.transform(value, '1.0-2') + ' kW',
+      },
+      theme: {
+        monochrome: {
+          enabled: true,
+          color: GLOBAL.colores_new_mae[2],
+        },
       },
       plotOptions: {
         pie: {
