@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+
+import { Subscription } from 'rxjs';
 
 import { AuthService } from '@core/services/auth.service';
 import { ReportControlService } from '@core/services/report-control.service';
@@ -20,7 +22,7 @@ interface Notification {
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   public isShared = false;
   public userLogged: boolean;
   private user: UserInterface;
@@ -29,7 +31,9 @@ export class NavbarComponent implements OnInit {
   hasNotifications = false;
   notifications: Notification[] = [];
 
-  public themeSelected = 'light-theme';
+  private subscriptions: Subscription = new Subscription();
+
+  themeSelected = 'light-theme';
 
   constructor(
     public authService: AuthService,
@@ -44,43 +48,64 @@ export class NavbarComponent implements OnInit {
     if (this.router.url.includes('shared')) {
       this.isShared = true;
     } else {
-      this.authService.isAuthenticated().subscribe((isAuth) => (this.userLogged = isAuth));
-      this.authService.user$.subscribe((user) => {
-        this.user = user;
-        this.isAdmin = this.authService.userIsAdmin(user);
-      });
+      this.subscriptions.add(this.authService.isAuthenticated().subscribe((isAuth) => (this.userLogged = isAuth)));
+      this.subscriptions.add(
+        this.authService.user$.subscribe((user) => {
+          this.user = user;
+          this.isAdmin = this.authService.userIsAdmin(user);
+        })
+      );
     }
 
-    this.reportControlService.mapLoaded$.subscribe((value) => {
-      this.loadSummary = value;
+    this.subscriptions.add(
+      this.reportControlService.mapLoaded$.subscribe((value) => {
+        this.loadSummary = value;
 
-      if (value) {
-        setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
-      }
-    });
+        if (value) {
+          setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
+        }
+      })
+    );
 
-    this.reportControlService.plantaId$.subscribe((plantaId) => {
-      if (plantaId !== undefined) {
-        if (plantaId === '3JXI01XmcE3G1d4WNMMd' || plantaId === 'buzSMRcLEEeLfhnqfbbG') {
-          this.hasNotifications = true;
-          if (plantaId === '3JXI01XmcE3G1d4WNMMd') {
-            this.notifications.push({
-              content: 'Hay 20 módulos en circuito abierto (string)',
-              filter: 'CA (string)',
-            });
-            this.notifications.push({
-              content: 'Hay varias anomalías térmicas como consecuencia de suciedad en los módulos',
-              filter: 'suciedad',
-            });
-          }
-          if (plantaId === 'buzSMRcLEEeLfhnqfbbG') {
-            this.notifications = [
-              { content: 'Hay 2 células calientes con un gradiente mayor de 40 ºC (Grave)', filter: 'cc gradiente 40' },
-            ];
+    this.subscriptions.add(
+      this.reportControlService.plantaId$.subscribe((plantaId) => {
+        if (plantaId !== undefined) {
+          if (plantaId === '3JXI01XmcE3G1d4WNMMd' || plantaId === 'buzSMRcLEEeLfhnqfbbG') {
+            this.hasNotifications = true;
+            if (plantaId === '3JXI01XmcE3G1d4WNMMd') {
+              this.notifications.push({
+                content: 'Hay 20 módulos en circuito abierto (string)',
+                filter: 'CA (string)',
+              });
+              this.notifications.push({
+                content: 'Hay varias anomalías térmicas como consecuencia de suciedad en los módulos',
+                filter: 'suciedad',
+              });
+            }
+            if (plantaId === 'buzSMRcLEEeLfhnqfbbG') {
+              this.notifications = [
+                {
+                  content: 'Hay 2 células calientes con un gradiente mayor de 40 ºC (Grave)',
+                  filter: 'cc gradiente 40',
+                },
+              ];
+            }
           }
         }
-      }
-    });
+      })
+    );
+
+    this.subscriptions.add(
+      this.authService.user$.subscribe((user) => {
+        if (user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
+          this.hasNotifications = true;
+          this.notifications.push({
+            content: 'Notificación',
+            filter: 'sombras',
+          });
+        }
+      })
+    );
 
     // this.themeService.themeSelected$.subscribe((theme) => (this.themeSelected = theme));
   }
@@ -113,5 +138,9 @@ export class NavbarComponent implements OnInit {
 
   signOut() {
     this.authService.signOut();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
