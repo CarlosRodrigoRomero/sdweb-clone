@@ -75,6 +75,8 @@ export let GLOBAL = {
     'Módulo en CA (string)', // 17
     'Posible PID', // 18
     'Falta módulo', // 19
+    'PID regular', // 20
+    'PID irregular', // 21
   ],
   colores_tipos_hex: [
     'rgba(0, 0, 0, 1)', // '0',
@@ -97,6 +99,8 @@ export let GLOBAL = {
     '#fd504d', // 'Módulo en CA (string)', // 17
     '#9B0000', // 'Posible PID', // 18
     'rgba(196, 196, 196,1)', // 'Falta módulo', // 19
+    '#9B0000', // 'PID regular', // 20
+    '#9B0000', // 'PID irregular', // 21
   ],
   colores_tipos: [
     'rgba(0, 0, 0, 1)', // '0',
@@ -119,6 +123,8 @@ export let GLOBAL = {
     'rgba(255, 0, 0, 1)', // 'Módulo en CA (string)', // 17
     'rgba(155, 0, 0, 1)', // 'Posible PID', // 18
     'rgba(196, 196, 196, 1)', // 'Falta módulo', // 19
+    'rgba(155, 0, 0, 1)', // 'PID regular', // 20
+    'rgba(155, 0, 0, 1)', // 'PID irregular', // 21
   ],
   labels_bloqueadas: [0, 1, 2, 4, 16],
   pcDescripcion: [
@@ -142,56 +148,56 @@ export let GLOBAL = {
     'Módulo en string con baja producción', // 17
     'Posible PID', // 18
     'Falta módulo', // 19
+    'PID regular', // 20
+    'PID irregular', // 21
   ],
-  //   '0',
-  //   'Célula caliente',
-  //   'Varias células calientes',
-  //   'Substring del módulo en circuito abierto',
-  //   'Módulos en circuito abierto',
-  //   '2 Substrings en CA',
-  //   'Substring en CC',
-  //   'Rotura en vidrio'
   pcCausa: [
-    '0',
-    'La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en un daño irreversible en la célula, aislamiento o diodo bypass.',
-    'La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en un daño irreversible en la célula, aislamiento o diodo bypass.',
-    'Diodo bypass actuando en el módulo. Puede ser debido a que una o varias células calientes están produciendo que el diodo se active. También puede ser debido a un problema de conexión entre células o diodo bypass defectuoso.',
-    'Los módulos que componen el string se encuentran a una temperatura varios grados superior a la temperatura normal de operación del módulo. Es posible que el string esté en circuito abierto.',
-    'Problema de conexión entre células o diodo bypass defectuoso. Puede derivar en un arco en serie visible en la superficie posterior del módulo.',
-    'Diodo bypass defectuoso.',
-    'Posible subida repentina de tensión o defecto de fabricación.',
-    'La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en un daño irreversible en la célula, aislamiento o diodo bypass.',
-    'La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en un daño irreversible en la célula, aislamiento o diodo bypass.',
-    'Diodo bypass actuando en el módulo. Puede ser debido a que una o varias células calientes están produciendo que el diodo se active. También puede ser debido a un problema de conexión entre células o diodo bypass defectuoso.',
-    'La suciedad habitual (tierra o deposiciones de pájaros) suelen desaparecer con la lluvia.',
-    'Puede haber sido causado por una célula altas temperaturas.',
-    'Existe un calentamiento anómalo en una o varias de las de las conexiones entre células del módulo.',
-    'La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta.',
-    'Existe algún elemento que está provocando sombras que evitan el correcto funcionamiento del módulo o módulos afectados.',
-    'Suelen aparecer por defectos en la fabricación. No suele afectar al rendimiento del módulo.',
-    'Los módulos que componen el string se encuentran a una temperatura varios grados superior a la temperatura normal de operación del módulo. Es posible que el string esté en circuito abierto.',
-    'Es posible que el módulo sufra de PID.',
+    '0', // 0
+    'La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en un daño irreversible en la célula, aislamiento o diodo bypass.', // 1
+    'La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en un daño irreversible en la célula, aislamiento o diodo bypass.', // 2
+    'Diodo bypass actuando en el módulo. Puede ser debido a que una o varias células calientes están produciendo que el diodo se active. También puede ser debido a un problema de conexión entre células o diodo bypass defectuoso.', // 3
+    'Los módulos que componen el string se encuentran a una temperatura varios grados superior a la temperatura normal de operación del módulo. Es posible que el string esté en circuito abierto.', // 4
+    'Problema de conexión entre células o diodo bypass defectuoso. Puede derivar en un arco en serie visible en la superficie posterior del módulo.', // 5
+    'Diodo bypass defectuoso.', // 6
+    'Posible subida repentina de tensión o defecto de fabricación.', // 7
+    'La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en un daño irreversible en la célula, aislamiento o diodo bypass.', // 8
+    'La diferencia de temperatura aumenta con la corriente. Normalmente causadas por células rotas. Puede derivar en un daño irreversible en la célula, aislamiento o diodo bypass.', // 9
+    'Diodo bypass actuando en el módulo. Puede ser debido a que una o varias células calientes están produciendo que el diodo se active. También puede ser debido a un problema de conexión entre células o diodo bypass defectuoso.', // 10
+    'La suciedad habitual (tierra o deposiciones de pájaros) suelen desaparecer con la lluvia.', // 11
+    'Puede haber sido causado por una célula altas temperaturas.', // 12
+    'Existe un calentamiento anómalo en una o varias de las de las conexiones entre células del módulo.', // 13
+    'La temperatura aumenta con la carga de corriente causada por el aumento de resistencia eléctrica dentro de la caja de conexiones. Puede también ser causada por una cinta rota o un punto de soldadura defectuoso entre el conector transversal y la cinta.', // 14
+    'Existe algún elemento que está provocando sombras que evitan el correcto funcionamiento del módulo o módulos afectados.', // 15
+    'Suelen aparecer por defectos en la fabricación. No suele afectar al rendimiento del módulo.', // 16
+    'Los módulos que componen el string se encuentran a una temperatura varios grados superior a la temperatura normal de operación del módulo. Es posible que el string esté en circuito abierto.', // 17
+    'Es posible que el módulo sufra de PID.', // 18
+    'Falta el módulo en esta posición', // 19
+    'El módulo sufre de PID de tipo regular', // 20
+    'El módulo sufre de PID de tipo irregular', // 21
   ],
   pcRecomendacion: [
-    '0',
-    'Ver si no hay sombras o suciedad.',
-    '',
-    'Sustituir diodo bypass en su caso.',
-    'Revisar módulos, estado de operación del inversor, cableado, conectores y fusibles.',
-    'Revisar módulo en campo para determinar causa.',
-    'Revisar módulo y diodos bypass para un correcto funcionamiento con polaridad inversa.',
-    'Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.',
-    'Reclamar a garantía en su caso.',
-    'Reclamar a garantía en su caso.',
-    'Cambiar el diodo bypass en caso de que sea este el motivo.',
-    'Se recomienda la limpieza del módulo si se estima que no va a llover pronto, con el fin de evitar daños al módulo.',
-    'Tener cuidado con las subidas de voltaje debido a las pérdidas de aislamiento por altas temperaturas.',
-    'Análisis en detalle por experto.',
-    'Análisis en detalle por experto.',
-    'Eliminación de la fuente de sombras.',
-    'Hacer seguimiento de le evolución.',
-    'Revisar módulos, estado de operación del inversor, cableado, conectores y fusibles.',
-    'Revisar módulos.',
+    '0', // 0
+    'Ver si no hay sombras o suciedad.', // 1
+    '', // 2
+    'Sustituir diodo bypass en su caso.', // 3
+    'Revisar módulos, estado de operación del inversor, cableado, conectores y fusibles.', // 4
+    'Revisar módulo en campo para determinar causa.', // 5
+    'Revisar módulo y diodos bypass para un correcto funcionamiento con polaridad inversa.', // 6
+    'Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.', // 7
+    'Reclamar a garantía en su caso.', // 8
+    'Reclamar a garantía en su caso.', // 9
+    'Cambiar el diodo bypass en caso de que sea este el motivo.', // 10
+    'Se recomienda la limpieza del módulo si se estima que no va a llover pronto, con el fin de evitar daños al módulo.', // 11
+    'Tener cuidado con las subidas de voltaje debido a las pérdidas de aislamiento por altas temperaturas.', // 12
+    'Análisis en detalle por experto.', // 13
+    'Análisis en detalle por experto.', // 14
+    'Eliminación de la fuente de sombras.', // 15
+    'Hacer seguimiento de le evolución.', // 16
+    'Revisar módulos, estado de operación del inversor, cableado, conectores y fusibles.', // 17
+    'Revisar módulos.', // 18
+    '', // 19
+    'Revisar módulos.', // 20
+    'Revisar módulos.', // 21
   ],
   pcPerdidas: [
     0, // Para que coincida el indice con el tipo de anomalia

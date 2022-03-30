@@ -1,7 +1,12 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+
+import { Map } from 'ol';
+
+import { take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
@@ -9,20 +14,16 @@ import { AnomaliasControlService } from '../../services/anomalias-control.servic
 import { ReportControlService } from '@core/services/report-control.service';
 import { OlMapService } from '@core/services/ol-map.service';
 import { PlantaService } from '@core/services/planta.service';
-import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { Anomalia } from '@core/models/anomalia';
-import { Map } from 'ol';
 import { PlantaInterface } from '@core/models/planta';
-import { take } from 'rxjs/operators';
-import { Layer } from 'ol/layer';
 
 @Component({
   selector: 'app-anomalias-list',
   templateUrl: './anomalias-list.component.html',
   styleUrls: ['./anomalias-list.component.css'],
 })
-export class AnomaliasListComponent implements OnInit, AfterViewInit {
+export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy {
   displayedColumns: string[] = ['tipo', 'perdidas', 'temp', 'gradiente'];
   dataSource: MatTableDataSource<any>;
   public selectedRow: string;
@@ -34,56 +35,61 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatSort) sort: MatSort;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     public filterService: FilterService,
     private anomaliasControlService: AnomaliasControlService,
     private reportControlService: ReportControlService,
     private olMapService: OlMapService,
-    private plantaService: PlantaService,
-    private anomaliaService: AnomaliaService
+    private plantaService: PlantaService
   ) {}
 
   ngOnInit() {
-    this.olMapService.map$.subscribe((map) => (this.map = map));
+    this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
     this.plantaService
       .getPlanta(this.reportControlService.plantaId)
       .pipe(take(1))
       .subscribe((planta) => (this.planta = planta));
 
-    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-      this.filterService.filteredElements$.subscribe((elems) => {
-        const filteredElements = [];
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+        this.filterService.filteredElements$.subscribe((elems) => {
+          const filteredElements = [];
 
-        elems = elems.sort(this.anomaliaService.sortByGlobalCoords);
+          elems
+            .filter((elem) => (elem as Anomalia).informeId === informeId)
+            .forEach((anom) =>
+              filteredElements.push({
+                id: anom.id,
+                tipoLabel: GLOBAL.labels_tipos[anom.tipo],
+                tipo: anom.tipo,
+                perdidas: anom.perdidas,
+                temp: anom.temperaturaMax,
+                temperaturaMax: anom.temperaturaMax,
+                gradiente: anom.gradienteNormalizado,
+                gradienteNormalizado: anom.gradienteNormalizado,
+                color: GLOBAL.colores_tipos_hex[anom.tipo],
+                clase: anom.clase,
+                anomalia: anom,
+                selected: false,
+                hovered: false,
+              })
+            );
 
-        elems
-          .filter((elem) => (elem as Anomalia).informeId === informeId)
-          .forEach((anom) =>
-            filteredElements.push({
-              id: anom.id,
-              tipoLabel: GLOBAL.labels_tipos[anom.tipo],
-              tipo: anom.tipo,
-              perdidas: anom.perdidas,
-              temp: anom.temperaturaMax,
-              temperaturaMax: anom.temperaturaMax,
-              gradiente: anom.gradienteNormalizado,
-              gradienteNormalizado: anom.gradienteNormalizado,
-              color: GLOBAL.colores_tipos_hex[anom.tipo],
-              clase: anom.clase,
-              anomalia: anom,
-              selected: false,
-              hovered: false,
-            })
-          );
+          this.dataSource = new MatTableDataSource(filteredElements);
+          this.dataSource.sort = this.sort;
+        });
+      })
+    );
 
-        this.dataSource = new MatTableDataSource(filteredElements);
-        this.dataSource.sort = this.sort;
-      });
-    });
-
-    this.anomaliasControlService.anomaliaHover$.subscribe((anomHov) => (this.anomaliaHover = anomHov));
-    this.anomaliasControlService.anomaliaSelect$.subscribe((anomSel) => (this.anomaliaSelect = anomSel));
+    this.subscriptions.add(
+      this.anomaliasControlService.anomaliaHover$.subscribe((anomHov) => (this.anomaliaHover = anomHov))
+    );
+    this.subscriptions.add(
+      this.anomaliasControlService.anomaliaSelect$.subscribe((anomSel) => (this.anomaliaSelect = anomSel))
+    );
   }
 
   ngAfterViewInit(): void {
@@ -135,5 +141,9 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit {
     if (zoom) {
       this.map.getView().setZoom(this.planta.zoom + 6);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

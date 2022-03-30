@@ -103,6 +103,11 @@ export class ReportControlService {
                 // filtramos las anomalias por criterio de criticidad del cliente
                 this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
 
+                // ordenamos las anomalias por tipo
+                this.allFilterableElements = this.anomaliaService.sortAnomsByTipo(
+                  this.allFilterableElements as Anomalia[]
+                );
+
                 if (this.allFilterableElements.length === 0) {
                   this.noAnomsReport = true;
                 } else {
@@ -173,6 +178,11 @@ export class ReportControlService {
                         // tslint:disable-next-line: triple-equals
                         this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
 
+                        // ordenamos las anomalias por tipo
+                        this.allFilterableElements = this.anomaliaService.sortAnomsByTipo(
+                          this.allFilterableElements as Anomalia[]
+                        );
+
                         // iniciamos filter service
                         this.filterService
                           .initService(this.allFilterableElements, true, this.sharedId)
@@ -211,6 +221,11 @@ export class ReportControlService {
                         // filtramos las anomalias por criterio de criticidad del cliente
                         // tslint:disable-next-line: triple-equals
                         this.allFilterableElements = anoms.filter((anom) => anom.tipo != 0 && anom.criticidad !== null);
+
+                        // ordenamos las anomalias por tipo
+                        this.allFilterableElements = this.anomaliaService.sortAnomsByTipo(
+                          this.allFilterableElements as Anomalia[]
+                        );
 
                         // iniciamos filter service
                         this.filterService

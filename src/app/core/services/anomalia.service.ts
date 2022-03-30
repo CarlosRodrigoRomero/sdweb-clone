@@ -560,6 +560,44 @@ export class AnomaliaService {
     return value;
   }
 
+  sortAnomsByTipo(anomalias: Anomalia[]): Anomalia[] {
+    const sortedTipos: number[] = [
+      20, // PID regular
+      21, // PID irregular
+      18, // 'Posible PID'
+      17, // 'Módulo en CA (string)'
+      4, // 'String'
+      5, // 'Módulo en CA'
+      10, // '2x Substring CA'
+      3, // 'Substring en CA'
+      7, // 'Módulo en CC'
+      6, // 'Substring en CC'
+      12, // 'Vidrio roto'
+      13, // 'Resist. anómala'
+      14, // 'Caja conexiones'
+      19, // 'Falta módulo'
+      16, // 'Yellowing'
+      8, // 'Célula'
+      9, // 'Varias células'
+      11, // 'Suciedad'
+      15, // 'Sombras'
+      2, // 'VPV'
+      1, // 'PC'
+      0, // '0'
+    ];
+
+    const sortedAnoms: Anomalia[] = [];
+
+    sortedTipos.forEach((tipo) => {
+      // tslint:disable-next-line: triple-equals
+      const anomsTipo = anomalias.filter((anom) => anom.tipo == tipo);
+
+      sortedAnoms.push(...anomsTipo);
+    });
+
+    return sortedAnoms;
+  }
+
   /////////////////////////////////////////////////////////////////////////////////////////////
 
   get selectedInformeId(): string {
