@@ -5,7 +5,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { GLOBAL } from '@core/services/global';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 
-import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 
 interface PlantaChart {
@@ -19,8 +18,6 @@ interface PlantaChart {
 })
 export class AnomaliasGravesChartComponent implements OnInit {
   private plantas: PlantaInterface[];
-  private informes: InformeInterface[];
-  private maePlantas: number[] = [];
   private anomsGravesChart: PlantaChart[] = [];
   dataAnomsGraves: number[] = [];
   plantasId: string[] = [];

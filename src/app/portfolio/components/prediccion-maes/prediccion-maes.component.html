@@ -1,1 +1,16 @@
-<p>prediccion-maes works!</p>
+<mat-card>
+  <div class="chart" id="chart">
+    <apx-chart
+      *ngIf="dataLoaded"
+      [series]="chartOptions.series"
+      [chart]="chartOptions.chart"
+      [xaxis]="chartOptions.xaxis"
+      [dataLabels]="chartOptions.dataLabels"
+      [grid]="chartOptions.grid"
+      [stroke]="chartOptions.stroke"
+      [yaxis]="chartOptions.yaxis"
+      [fill]="chartOptions.fill"
+      [colors]="chartOptions.colors"
+    ></apx-chart>
+  </div>
+</mat-card>
