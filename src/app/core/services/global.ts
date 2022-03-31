@@ -73,7 +73,7 @@ export let GLOBAL = {
     'Sombras', // 15
     'Yellowing', // 16
     'Módulo en CA (string)', // 17
-    'Posible PID', // 18
+    'PID fase temprana', // 18
     'Falta módulo', // 19
     'PID regular', // 20
     'PID irregular', // 21
@@ -97,7 +97,7 @@ export let GLOBAL = {
     'rgba(170, 0, 255,1)', // 'Sombras', // 15
     'rgba(255, 255, 255,1)', // 'Yellowing', // 16
     '#fd504d', // 'Módulo en CA (string)', // 17
-    '#9B0000', // 'Posible PID', // 18
+    '#9B0000', // 'PID fase temprana', // 18
     'rgba(196, 196, 196,1)', // 'Falta módulo', // 19
     '#9B0000', // 'PID regular', // 20
     '#9B0000', // 'PID irregular', // 21
@@ -121,7 +121,7 @@ export let GLOBAL = {
     'rgba(170, 0, 255, 1)', // 'Sombras', // 15
     'rgba(255, 255, 255, 1)', // 'Yellowing', // 16
     'rgba(255, 0, 0, 1)', // 'Módulo en CA (string)', // 17
-    'rgba(155, 0, 0, 1)', // 'Posible PID', // 18
+    'rgba(155, 0, 0, 1)', // 'PID fase temprana', // 18
     'rgba(196, 196, 196, 1)', // 'Falta módulo', // 19
     'rgba(155, 0, 0, 1)', // 'PID regular', // 20
     'rgba(155, 0, 0, 1)', // 'PID irregular', // 21
@@ -146,7 +146,7 @@ export let GLOBAL = {
     'Módulo con sombras', // 15
     'Yellowing', // 16
     'Módulo en string con baja producción', // 17
-    'Posible PID', // 18
+    'PID en fase temprana', // 18
     'Falta módulo', // 19
     'PID regular', // 20
     'PID irregular', // 21
@@ -170,10 +170,10 @@ export let GLOBAL = {
     'Existe algún elemento que está provocando sombras que evitan el correcto funcionamiento del módulo o módulos afectados.', // 15
     'Suelen aparecer por defectos en la fabricación. No suele afectar al rendimiento del módulo.', // 16
     'Los módulos que componen el string se encuentran a una temperatura varios grados superior a la temperatura normal de operación del módulo. Es posible que el string esté en circuito abierto.', // 17
-    'Es posible que el módulo sufra de PID.', // 18
-    'Falta el módulo en esta posición', // 19
-    'El módulo sufre de PID de tipo regular', // 20
-    'El módulo sufre de PID de tipo irregular', // 21
+    'El módulo sufre de PID en fase temprana.', // 18
+    'Falta el módulo en esta posición.', // 19
+    'El módulo sufre de PID de tipo regular.', // 20
+    'El módulo sufre de PID de tipo irregular.', // 21
   ],
   pcRecomendacion: [
     '0', // 0
@@ -218,7 +218,7 @@ export let GLOBAL = {
     0.02, // "Módulo afectado por sombras" // 15
     0, // Yellowing //16
     1, // "String en CA", // 17
-    0.05, // "Posible PID" // 18
+    0.05, // "PID fase temprana" // 18
     0, // Falta modulo // 19
     0.55, // PID regular // 20
     0.2, // PID irregular // 21
@@ -226,7 +226,7 @@ export let GLOBAL = {
   sortedAnomsTipos: [
     20, // PID regular
     21, // PID irregular
-    18, // 'Posible PID'
+    18, // 'PID fase temprana'
     17, // 'Módulo en CA (string)'
     4, // 'String'
     5, // 'Módulo en CA'
