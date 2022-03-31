@@ -99,18 +99,28 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.authService.user$.subscribe((user) => {
         if (user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
           this.hasNotifications = true;
-          this.notifications.push({
-            content: 'Hay nuevos strings abiertos en la planta Demo',
-            filter: 'CA (string)',
-          });
-          this.notifications.push({
-            content: 'Planta 3 tiene 6 módulos con células calientes con gradiente mayor de 40 ºC',
-            filter: '',
-          });
-          this.notifications.push({
-            content: 'Planta 1 tienen un problema con strings abiertos',
-            filter: '',
-          });
+          // vaciamos las notificaciones
+          this.notifications = [];
+          // diferenciamos entre el portfolio y el informe
+          if (this.router.url.includes('egF0cbpXnnBnjcrusoeR')) {
+            this.notifications.push({
+              content: 'Hay 17 módulos en circuito abierto (string)',
+              filter: 'CA (string)',
+            });
+          } else {
+            this.notifications.push({
+              content: 'Hay nuevos strings abiertos en la planta Demo',
+              filter: 'CA (string)',
+            });
+            this.notifications.push({
+              content: 'Planta 3 tiene 6 módulos con células calientes con gradiente mayor de 40 ºC',
+              filter: '',
+            });
+            this.notifications.push({
+              content: 'Planta 1 tienen un problema con strings abiertos',
+              filter: '',
+            });
+          }
         }
       })
     );
