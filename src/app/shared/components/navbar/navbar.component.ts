@@ -100,8 +100,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
         if (user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
           this.hasNotifications = true;
           this.notifications.push({
-            content: 'Notificación',
-            filter: 'sombras',
+            content: 'Hay nuevos strings abiertos en la planta Demo',
+            filter: 'CA (string)',
+          });
+          this.notifications.push({
+            content: 'Planta 3 tiene 6 módulos con células calientes con gradiente mayor de 40 ºC',
+            filter: '',
+          });
+          this.notifications.push({
+            content: 'Planta 1 tienen un problema con strings abiertos',
+            filter: '',
           });
         }
       })
