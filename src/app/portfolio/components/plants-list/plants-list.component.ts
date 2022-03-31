@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
 import { MatTableDataSource } from '@angular/material/table';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { GLOBAL } from '@core/services/global';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
@@ -55,11 +56,16 @@ export class PlantsListComponent implements OnInit {
   expandedRow: PlantData | null;
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
+  pdfDemo =
+    'https://firebasestorage.googleapis.com/v0/b/sdweb-d33ce.appspot.com/o/informes%2F62dvYbGgoMkMNCuNCOEc%2Finforme.pdf?alt=media&token=e7360912-80a4-43eb-bbca-b41868c8a9d6';
+  excelDemo =
+    'https://firebasestorage.googleapis.com/v0/b/sdweb-d33ce.appspot.com/o/informes%2F62dvYbGgoMkMNCuNCOEc%2Finforme.xlsx?alt=media&token=05aab4b1-452d-4822-8a50-dc788739a620';
 
   constructor(
     private portfolioControlService: PortfolioControlService,
     private router: Router,
-    private demoService: DemoService
+    private demoService: DemoService,
+    private _snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -119,11 +125,68 @@ export class PlantsListComponent implements OnInit {
     // this.portfolioControlService.setExternalStyle(row.plantaId, false);
   }
 
+  onClick(row: any) {
+    if (!this.checkFake(row.plantaId)) {
+      // comprobamos si es una planta que solo se ve en el informe antiguo
+      if (this.portfolioControlService.checkPlantaSoloWebAntigua(row.plantaId)) {
+        this.navigateOldReport(row.informeReciente.id);
+      } else {
+        this.navegateNewReport(row);
+      }
+    } else {
+      this.openSnackBarDemo();
+    }
+  }
+
+  private checkFake(plantaId: string): boolean {
+    const fakeIds = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+    if (fakeIds.includes(plantaId)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private navegateNewReport(row: any) {
+    // provisional - no abre ningun informe de fijas anterior al 1/05/2021 salvo DEMO
+    if (row.tipo === 'seguidores') {
+      this.router.navigate(['clients/tracker/' + row.plantaId]);
+    } else {
+      if (row.ultimaInspeccion > GLOBAL.newReportsDate || row.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+        this.router.navigate(['clients/fixed/' + row.plantaId]);
+      } else {
+        this.openSnackBar();
+      }
+    }
+  }
+
+  private navigateOldReport(informeId: string) {
+    this.router.navigate(['clientes/informe-view/' + informeId + '/informe-overview']);
+  }
+
+  private openSnackBar() {
+    this._snackBar.open('Acceda a inspecciones antiguas a la derecha en la tabla', '', {
+      duration: 5000,
+      verticalPosition: 'top',
+    });
+  }
+
+  private openSnackBarDemo() {
+    this._snackBar.open('Planta sin contenido. Acceda a "Demo 1"', '', {
+      duration: 5000,
+      verticalPosition: 'top',
+    });
+  }
+
   navegateToReport(row: any) {
     if (row.tipo === 'seguidores') {
       this.router.navigate(['clients/tracker/' + row.plantaId]);
     } else {
       this.router.navigate(['clients/fixed/' + row.plantaId]);
     }
+  }
+
+  stopPropagation(event) {
+    event.stopPropagation();
   }
 }

@@ -294,7 +294,7 @@ export class PlantsMapComponent implements OnInit, AfterViewInit, OnDestroy {
         if (feature !== undefined) {
           return new Style({
             image: new Icon({
-              color: this.portfolioControlService.getColorMae(feature.getProperties().informeReciente.mae),
+              color: this.portfolioControlService.getNewColorMae(feature.getProperties().informeReciente.mae),
               crossOrigin: 'anonymous',
               src: 'assets/icons/place_black_24dp.svg',
               scale: 0.8,
