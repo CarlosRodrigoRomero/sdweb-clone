@@ -1,30 +1,43 @@
 <div class="content">
-  <div class="titulo">Listado de plantas</div>
-  <img src="assets/images/escala-gravedad.svg" />
-  <button mat-stroked-button>
+  <div class="left-content">
+    <div class="titulo">{{ viewsTitles[currentView] }}</div>
+    <img *ngIf="currentView === 2 || currentView === 3 || currentView === 4" src="assets/images/escala-gravedad.svg" />
+  </div>
+
+  <!--   <button mat-stroked-button>
     <mat-icon>sort</mat-icon>
     <span>Ordenar por MAE</span>
-  </button>
+  </button> -->
   <div class="views-btns">
-    <button mat-stroked-button (click)="sendViewSelected(0)">
-      <mat-icon>format_list_numbered</mat-icon>
-      <span>RESUMEN</span>
+    <button mat-stroked-button [ngClass]="{ 'btn-clicked': currentView === 0 }" (click)="sendViewSelected(0)">
+      <div class="view-btn-content">
+        <mat-icon>format_list_numbered</mat-icon>
+        <span>RESUMEN</span>
+      </div>
     </button>
-    <button mat-stroked-button (click)="sendViewSelected(1)">
-      <mat-icon>format_list_numbered</mat-icon>
-      <span>PLANTAS</span>
+    <button mat-stroked-button [ngClass]="{ 'btn-clicked': currentView === 1 }" (click)="sendViewSelected(1)">
+      <div class="view-btn-content">
+        <mat-icon>format_list_numbered</mat-icon>
+        <span>PLANTAS</span>
+      </div>
     </button>
-    <button mat-stroked-button (click)="sendViewSelected(2)">
-      <mat-icon>bar_chart</mat-icon>
-      <span>MAE</span>
+    <button mat-stroked-button [ngClass]="{ 'btn-clicked': currentView === 2 }" (click)="sendViewSelected(2)">
+      <div class="view-btn-content">
+        <mat-icon>bar_chart</mat-icon>
+        <span>MAE</span>
+      </div>
     </button>
-    <button mat-stroked-button (click)="sendViewSelected(3)">
-      <mat-icon>bar_chart</mat-icon>
-      <span>PÉRDIDAS</span>
+    <button mat-stroked-button [ngClass]="{ 'btn-clicked': currentView === 3 }" (click)="sendViewSelected(3)">
+      <div class="view-btn-content">
+        <mat-icon>bar_chart</mat-icon>
+        <span>PÉRDIDAS</span>
+      </div>
     </button>
-    <button mat-stroked-button (click)="sendViewSelected(4)">
-      <mat-icon>online_prediction</mat-icon>
-      <span>PREDICCIÓN</span>
+    <button mat-stroked-button [ngClass]="{ 'btn-clicked': currentView === 4 }" (click)="sendViewSelected(4)">
+      <div class="view-btn-content">
+        <mat-icon class="pred-icon">online_prediction</mat-icon>
+        <span class="pred-label">PREDICCIÓN</span>
+      </div>
     </button>
   </div>
 </div>

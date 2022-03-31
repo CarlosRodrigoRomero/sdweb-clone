@@ -1,8 +1,14 @@
 .content {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: start;
   background-color: white;
+}
+
+.left-content {
+  display: flex;
+  gap: 10rem;
+  align-items: start;
 }
 
 .titulo {
@@ -17,4 +23,22 @@
 
 .views-btns button {
   border-radius: 18px;
+}
+
+.view-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-clicked {
+  background-color: #d1d1d1;
+}
+
+.pred-icon {
+  color: #466df8;
+}
+
+.pred-label {
+  color: #466df8;
 }
