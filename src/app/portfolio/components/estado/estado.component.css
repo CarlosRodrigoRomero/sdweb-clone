@@ -48,4 +48,11 @@ mat-card {
 
 .dato mat-icon {
   color: red;
+  font-size: 30px;
+  margin-bottom: 6px;
+}
+
+.dato-var {
+  display: flex;
+  align-items: center;
 }
