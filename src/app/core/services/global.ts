@@ -37,6 +37,7 @@ export let GLOBAL = {
   mae: [1, 2],
   mae_rangos: [0.0018, 0.0142],
   mae_rangos_labels: ['leve', 'moderado', 'grave'],
+  cc_rangos: [0.02, 0.05],
   newReportsDate: 1619820000,
   anomaliaPorDefecto: 9,
   resolucionCamara: [512, 640],

@@ -104,15 +104,16 @@
             <div class="resumen-superior">
               <span
                 >{{ row.nombre }} tiene un <b>MAE</b> de <b>{{ row.mae * 100 | number: '1.0-2' }}%</b>, lo que equivale
-                a <b>{{ row.mae * row.potencia | number: '1.0-2' }} MWp sin producir</b>. Esto deja la planta en
-                {{ row.potencia * (1 - row.mae) | number: '1.0-2' }} MWp. Este MAE se considera
+                a <b>{{ row.mae * row.potencia * 1000 | number: '1.0-2' }} kWp sin producir</b>. Este MAE se considera
                 <b>{{ row.gravedadMae }}</b
-                >. No disponemos de datos de años anteriores para ver su variación.</span
+                >. Su <b>variación ha sido de {{ row.variacionMae * 100 | number: '1.0-2' }}%</b> respecto del año
+                pasado.</span
               >
               <span>
                 El % de módulos afectados por <b>células calientes</b> es el
-                <b>{{ row.mae * 100 | number: '1.0-2' }}%</b>. Se considera un valor <b>{{ row.gravedadMae }}</b
-                >. No disponemos de datos de años anteriores para ver su variación.
+                <b>{{ row.cc * 100 | number: '1.0-2' }}%</b>. Se considera un valor <b>{{ row.gravedadCC }}</b
+                >. Su <b>variación ha sido de {{ row.variacionCC * 100 | number: '1.0-2' }}%</b> respecto del año
+                pasado.
               </span>
               <!-- DATOS FALSOS DEMO -->
               <div *ngIf="row.nombre == 'Planta 1'">

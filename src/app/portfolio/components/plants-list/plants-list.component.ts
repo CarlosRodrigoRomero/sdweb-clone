@@ -6,11 +6,12 @@ import { MatTableDataSource } from '@angular/material/table';
 
 import { GLOBAL } from '@core/services/global';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
+import { DemoService } from '@core/services/demo.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 
-interface PlantData {
+export interface PlantData {
   nombre: string;
   potencia: number;
   mae: number;
@@ -20,6 +21,8 @@ interface PlantData {
   variacionPerdidas: number;
   ultimaInspeccion: number;
   cc: number;
+  variacionCC: number;
+  gravedadCC: string;
   informesAntiguos?: InformeInterface[];
   plantaId?: string;
   tipo?: string;
@@ -53,7 +56,11 @@ export class PlantsListComponent implements OnInit {
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
 
-  constructor(private portfolioControlService: PortfolioControlService, private router: Router) {}
+  constructor(
+    private portfolioControlService: PortfolioControlService,
+    private router: Router,
+    private demoService: DemoService
+  ) {}
 
   ngOnInit(): void {
     this.plantas = this.portfolioControlService.listaPlantas;
@@ -68,6 +75,7 @@ export class PlantsListComponent implements OnInit {
         .filter((informe) => informe.id !== informeReciente.id)
         .reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
       const variacionMae = informeReciente.mae - informePrevio.mae;
+      const variacionCC = informeReciente.cc - informePrevio.cc;
       const perdidasInfReciente = informeReciente.mae * planta.potencia * 1000;
       const perdidasInfPrevio = informePrevio.mae * planta.potencia * 1000;
       const variacionPerdidas = (perdidasInfReciente - perdidasInfPrevio) / perdidasInfPrevio;
@@ -82,57 +90,23 @@ export class PlantsListComponent implements OnInit {
         potencia: planta.potencia,
         mae: informeReciente.mae,
         variacionMae,
-        gravedadMae: this.getGravedadMae(informeReciente.mae),
+        gravedadMae: this.portfolioControlService.getGravedadMae(informeReciente.mae),
         perdidas: perdidasInfReciente,
         variacionPerdidas,
         ultimaInspeccion: informeReciente.fecha,
         plantaId: planta.id,
         tipo: planta.tipo,
         cc: informeReciente.cc,
+        variacionCC,
+        gravedadCC: this.portfolioControlService.getGravedadCC(informeReciente.cc),
       };
 
-      plantData = this.addFakeWarnings(plantData);
+      plantData = this.demoService.addFakeWarnings(plantData);
 
       plantsData.push(plantData);
     });
 
     this.dataSource.data = plantsData;
-  }
-
-  private getGravedadMae(mae: number) {
-    let gravedad = GLOBAL.mae_rangos_labels[0];
-    GLOBAL.mae_rangos.forEach((rango, index) => {
-      if (mae > rango) {
-        gravedad = GLOBAL.mae_rangos_labels[index + 1];
-      }
-    });
-
-    return gravedad;
-  }
-
-  private addFakeWarnings(plantsData: PlantData) {
-    const warnings: string[] = [];
-    if (plantsData.nombre === 'Planta 1') {
-      warnings.push('3476 módulos en circuito abierto (string)');
-      warnings.push('446 módulos con substring en circuito abierto');
-      warnings.push('63% de anomalías en la fila 1 (más alejada del suelo)');
-
-      plantsData.warnings = warnings;
-    }
-    if (plantsData.nombre === 'Planta 2') {
-      warnings.push('587 módulos afectados por sombras');
-
-      plantsData.warnings = warnings;
-    }
-    if (plantsData.nombre === 'Planta 3') {
-      warnings.push('573 módulos en circuito abierto (string)');
-      warnings.push('147 módulos con substring en circuito abierto');
-      warnings.push('6 módulos con células calientes con gradiente mayor de 40ºC');
-
-      plantsData.warnings = warnings;
-    }
-
-    return plantsData;
   }
 
   hoverPlanta(row) {
