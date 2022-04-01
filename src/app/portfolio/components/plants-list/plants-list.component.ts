@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSort } from '@angular/material/sort';
 
 import { GLOBAL } from '@core/services/global';
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
@@ -42,7 +43,7 @@ export interface PlantData {
     ]),
   ],
 })
-export class PlantsListComponent implements OnInit {
+export class PlantsListComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [
     'nombre',
     'mae',
@@ -60,6 +61,8 @@ export class PlantsListComponent implements OnInit {
     'https://firebasestorage.googleapis.com/v0/b/sdweb-d33ce.appspot.com/o/informes%2F62dvYbGgoMkMNCuNCOEc%2Finforme.pdf?alt=media&token=e7360912-80a4-43eb-bbca-b41868c8a9d6';
   excelDemo =
     'https://firebasestorage.googleapis.com/v0/b/sdweb-d33ce.appspot.com/o/informes%2F62dvYbGgoMkMNCuNCOEc%2Finforme.xlsx?alt=media&token=05aab4b1-452d-4822-8a50-dc788739a620';
+
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(
     private portfolioControlService: PortfolioControlService,
@@ -113,6 +116,10 @@ export class PlantsListComponent implements OnInit {
     });
 
     this.dataSource.data = plantsData;
+  }
+
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
   }
 
   hoverPlanta(row) {
