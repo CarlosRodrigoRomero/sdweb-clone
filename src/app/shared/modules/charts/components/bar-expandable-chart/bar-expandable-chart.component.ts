@@ -174,9 +174,7 @@ export class BarExpandableChartComponent implements OnInit {
       xaxis,
       yaxis: {
         labels: {
-          formatter: (value) => {
-            return value + this.units;
-          },
+          formatter: (value) => this.decimalPipe.transform(value, '1.0-2') + this.units,
         },
         title: {
           text: this.titleY,
@@ -272,7 +270,7 @@ export class BarExpandableChartComponent implements OnInit {
     };
     this.chartOptions.yaxis = {
       labels: {
-        formatter: (value) => value + this.units,
+        formatter: (value) => this.decimalPipe.transform(value, '1.0-2') + this.units,
       },
     };
     this.chartOptions.colors = colorsFiltered;
