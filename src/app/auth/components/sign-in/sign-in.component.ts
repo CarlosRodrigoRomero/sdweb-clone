@@ -5,8 +5,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { AuthService } from '@core/services/auth.service';
-
-import { UserInterface } from '@core/models/user';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sign-in',
@@ -16,8 +15,7 @@ import { UserInterface } from '@core/models/user';
 export class SignInComponent implements OnInit, OnDestroy {
   form: FormGroup;
   hide = true;
-  warningHide = true;
-  private user: UserInterface;
+  showWarning = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -25,9 +23,7 @@ export class SignInComponent implements OnInit, OnDestroy {
     this.buildForm();
   }
 
-  ngOnInit(): void {
-    this.subscriptions.add(this.authService.user$.subscribe((user) => (this.user = user)));
-  }
+  ngOnInit(): void {}
 
   private buildForm() {
     this.form = this.formBuilder.group({
@@ -36,24 +32,26 @@ export class SignInComponent implements OnInit, OnDestroy {
     });
   }
 
-  signIn(event: Event) {
+  async signIn() {
     if (this.form.valid) {
-      this.authService
-        .signIn(this.form.value.email, this.form.value.password)
-        .then(() => {
-          if (this.user !== undefined && this.user !== null) {
+      const { email, password } = this.form.value;
+      try {
+        const user$ = await this.authService.signIn(email, password);
+
+        user$.pipe(take(1)).subscribe((user) => {
+          if (user) {
             // tslint:disable-next-line: triple-equals
-            if (this.user.role == 0 || this.user.role == 1 || this.user.role == 2) {
+            if (user.role == 0 || user.role == 1 || user.role == 2) {
               this.router.navigate(['clients']);
             } else {
               this.router.navigate(['clientes']);
             }
           }
-        })
-        .catch((error) => {
-          console.log(error);
-          this.warningHide = false;
         });
+      } catch (error) {
+        console.log(error);
+        this.showWarning = true;
+      }
     }
   }
 
