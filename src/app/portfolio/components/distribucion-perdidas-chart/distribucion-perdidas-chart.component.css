@@ -1,0 +1,17 @@
+mat-card {
+  height: 100%;
+  max-height: calc(calc(100vh - 282px) / 2); /* 286px - 4px para las sombras */
+}
+
+mat-card-content {
+  height: calc(100% - 42px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#chart {
+  max-width: calc(calc(100vh - 350px) / 2);
+  /* margin: 35px auto; */
+  /* padding: 0; */
+}

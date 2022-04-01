@@ -9,6 +9,8 @@ import { GetNumeroModulosPipe } from './pipes/get-numero-modulos.pipe';
 import { ValidateElementoPlantaPipe } from './pipes/validate-elemento-planta.pipe';
 
 import { MaterialModule } from '@shared/modules/material/material.module';
+import { ChartsModule } from './modules/charts/charts.module';
+import { OlMapsModule } from './modules/ol-maps/ol-maps.module';
 
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ClipboardModule } from 'ngx-clipboard';
@@ -39,6 +41,8 @@ const modules = [
   ReactiveFormsModule,
   NgxMatSelectSearchModule,
   ClipboardModule,
+  OlMapsModule,
+  ChartsModule,
 ];
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];
 

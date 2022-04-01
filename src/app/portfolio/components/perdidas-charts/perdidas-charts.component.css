@@ -1,0 +1,5 @@
+mat-card {
+  height: calc(100% - 4px);
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+}

@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
+
+import { Subscription } from 'rxjs';
 
 import 'ol/ol.css';
 import Circle from 'ol/geom/Circle';
@@ -9,13 +11,16 @@ import { defaults as defaultControls } from 'ol/control.js';
 import Feature from 'ol/Feature';
 import Map from 'ol/Map';
 import View from 'ol/View';
-import { Fill, Stroke, Style } from 'ol/style';
-import { OSM, Vector as VectorSource } from 'ol/source';
+import { Fill, Icon, Stroke, Style } from 'ol/style';
+import { OSM, Vector as VectorSource, XYZ } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat } from 'ol/proj';
+import { Overlay } from 'ol';
+import Point from 'ol/geom/Point';
 
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 import { GLOBAL } from '@core/services/global';
+import { OlMapService } from '@core/services/ol-map.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
@@ -25,75 +30,139 @@ import { InformeInterface } from '@core/models/informe';
   templateUrl: './map-all-plants.component.html',
   styleUrls: ['./map-all-plants.component.css'],
 })
-export class MapAllPlantsComponent implements OnInit {
+export class MapAllPlantsComponent implements OnInit, OnDestroy {
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
   private plantasAñadidasId: string[] = [];
   defaultLng = -4;
   defaultLat = 40;
-  defalutZoom = 5.5;
+  defaultZoom = 5.5;
   geojsonObject: any;
   map: Map;
-  public plantaHover: PlantaInterface;
+  plantaHovered: PlantaInterface;
   private prevFeatureHover: any;
+  private popup: Overlay;
+  labelPlanta: string;
+  private plantasSource: VectorSource;
+  private prevPlantaHovered: PlantaInterface;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private portfolioControlService: PortfolioControlService,
     private router: Router,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private olMapService: OlMapService
   ) {}
 
   ngOnInit(): void {
     this.plantas = this.portfolioControlService.listaPlantas;
     this.informes = this.portfolioControlService.listaInformes;
 
+    this.subscriptions.add(
+      this.portfolioControlService.plantaHovered$.subscribe((planta) => {
+        if (this.map !== undefined) {
+          this.plantaHovered = planta;
+          if (planta !== undefined) {
+            this.labelPlanta = planta.nombre + '  (' + planta.potencia + ' MW)';
+
+            // cuando pasamos de una planta a otra directamente sin pasar por vacio
+            if (this.prevPlantaHovered !== undefined && this.prevPlantaHovered.id !== planta.id) {
+              this.setPlantaStyle(this.prevPlantaHovered.id, false);
+            }
+
+            // cambiamos el estilo a hovered
+            this.setPlantaStyle(planta.id, true);
+
+            // mostramos el popup
+            this.map.getOverlayById('popup').setPosition(fromLonLat([planta.longitud, planta.latitud]));
+
+            this.prevPlantaHovered = planta;
+          } else {
+            // ocultamos el popup
+            this.map.getOverlayById('popup').setPosition(undefined);
+
+            if (this.prevPlantaHovered !== undefined) {
+              // cambiamos el estilo a no hovered
+              this.setPlantaStyle(this.prevPlantaHovered.id, false);
+            }
+          }
+        }
+      })
+    );
+
     this.initMap();
 
-    const vectorSource = new VectorSource({});
+    this.addFeaturesLayer();
+
+    this.addPopupOverlay();
+
+    this.addPointerOnHover();
+    this.addOnHoverAction();
+    this.addOnClickAction();
+  }
+
+  initMap() {
+    const source = new XYZ({
+      url: 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}', // hidrido
+      // url: 'http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', // satelite
+      crossOrigin: '',
+    });
+    const layer = new TileLayer({
+      source,
+    });
+    const view = new View({
+      center: fromLonLat([this.defaultLng, this.defaultLat]),
+      zoom: this.defaultZoom,
+    });
+    const controls = defaultControls({ attribution: false, zoom: false });
+
+    // creamos el mapa a traves del servicio y nos subscribimos a el
+    this.subscriptions.add(
+      this.olMapService.createMap('map', [layer], view, controls).subscribe((map) => (this.map = map))
+    );
+  }
+
+  private addFeaturesLayer() {
+    this.plantasSource = new VectorSource({});
 
     this.plantas.forEach((planta) => {
       const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
       const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
 
-      const feature = new Feature(new Circle(fromLonLat([planta.longitud, planta.latitud]), 1e4));
+      const feature = new Feature({
+        geometry: new Point(fromLonLat([planta.longitud, planta.latitud])),
+      });
+
+      feature.setId(planta.id);
 
       feature.setProperties({
-        mae: informeReciente.mae,
-        plantaId: planta.id,
-        tipo: planta.tipo,
+        planta,
         informeReciente,
       });
 
+      feature.setStyle(
+        new Style({
+          image: new Icon({
+            color: this.portfolioControlService.getColorMae(feature.getProperties().informeReciente.mae),
+            crossOrigin: 'anonymous',
+            src: 'assets/icons/place_black_24dp.svg',
+            scale: 0.8,
+          }),
+        })
+      );
+
       this.portfolioControlService.allFeatures.push(feature);
 
-      vectorSource.addFeature(feature);
+      this.plantasSource.addFeature(feature);
     });
 
-    const vectorLayer = new VectorLayer({
-      source: vectorSource,
+    const plantasLayer = new VectorLayer({
+      source: this.plantasSource,
       style: this.getStyleOnHover(false),
     });
-    this.map.addLayer(vectorLayer);
-  }
 
-  initMap() {
-    this.map = new Map({
-      target: 'map',
-      layers: [
-        new TileLayer({
-          source: new OSM(),
-        }),
-      ],
-      view: new View({
-        center: fromLonLat([this.defaultLng, this.defaultLat]),
-        zoom: this.defalutZoom,
-      }),
-      controls: defaultControls({ attribution: false, zoom: false }).extend([]),
-    });
-
-    this.addPointerOnHover();
-    this.addOnHoverAction();
-    this.addOnClickAction();
+    this.map.addLayer(plantasLayer);
   }
 
   private addPointerOnHover() {
@@ -119,47 +188,38 @@ export class MapAllPlantsComponent implements OnInit {
     let currentFeatureHover;
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
-        const feature = this.map.getFeaturesAtPixel(event.pixel);
+        const features = this.map.getFeaturesAtPixel(event.pixel) as Feature[];
 
-        if (feature.length > 0) {
-          // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
-          if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
-            (this.prevFeatureHover[0] as Feature).setStyle(this.getStyleOnHover(false));
-          }
-          currentFeatureHover = feature;
+        if (features.length > 0) {
+          const feature = features[0] as Feature;
+          const planta = feature.getProperties().planta;
 
-          (feature[0] as Feature).setStyle(this.getStyleOnHover(true));
-
-          this.prevFeatureHover = feature;
+          this.portfolioControlService.plantaHovered = planta;
         }
       } else {
-        this.plantaHover = undefined;
-
-        if (currentFeatureHover !== undefined) {
-          (currentFeatureHover[0] as Feature).setStyle(this.getStyleOnHover(false));
-        }
+        this.portfolioControlService.plantaHovered = undefined;
       }
     });
   }
 
   private addOnClickAction() {
     this.map.on('click', (event) => {
-      const feature = this.map.getFeaturesAtPixel(event.pixel);
+      const features = this.map.getFeaturesAtPixel(event.pixel);
 
-      if (feature.length > 0) {
-        const plantaId = feature[0].getProperties().plantaId;
-        const tipoPlanta = feature[0].getProperties().tipo;
-        const informeReciente = feature[0].getProperties().informeReciente;
+      if (features.length > 0) {
+        const feature = features[0] as Feature;
+        const planta: PlantaInterface = feature.getProperties().planta;
+        const informeReciente = feature.getProperties().informeReciente;
 
-        if (!this.checkFake(plantaId)) {
+        if (!this.checkFake(planta.id)) {
           // comprobamos si es una planta que solo se ve en el informe antiguo
-          if (this.portfolioControlService.checkPlantaSoloWebAntigua(plantaId)) {
+          if (this.portfolioControlService.checkPlantaSoloWebAntigua(planta.id)) {
             this.navigateOldReport(informeReciente.id);
           } else {
-            if (tipoPlanta === 'seguidores') {
-              this.router.navigate(['clients/tracker/' + plantaId]);
-            } else if (informeReciente.fecha > GLOBAL.newReportsDate || plantaId === 'egF0cbpXnnBnjcrusoeR') {
-              this.router.navigate(['clients/fixed/' + plantaId]);
+            if (planta.tipo === 'seguidores') {
+              this.router.navigate(['clients/tracker/' + planta.id]);
+            } else if (informeReciente.fecha > GLOBAL.newReportsDate || planta.id === 'egF0cbpXnnBnjcrusoeR') {
+              this.router.navigate(['clients/fixed/' + planta.id]);
             } else {
               this.openSnackBar();
             }
@@ -169,6 +229,18 @@ export class MapAllPlantsComponent implements OnInit {
         }
       }
     });
+  }
+
+  private addPopupOverlay() {
+    const container = document.getElementById('popup');
+
+    this.popup = new Overlay({
+      id: 'popup',
+      element: container,
+      position: undefined,
+    });
+
+    this.map.addOverlay(this.popup);
   }
 
   private checkFake(plantaId: string): boolean {
@@ -198,17 +270,22 @@ export class MapAllPlantsComponent implements OnInit {
     });
   }
 
+  private setPlantaStyle(plantaId: string, hovered: boolean) {
+    const feature = this.plantasSource.getFeatureById(plantaId);
+
+    feature.setStyle(this.getStyleOnHover(hovered));
+  }
+
   private getStyleOnHover(hovered: boolean) {
     if (hovered) {
       return (feature: Feature) => {
         if (feature !== undefined) {
           return new Style({
-            stroke: new Stroke({
+            image: new Icon({
               color: 'white',
-              width: 6,
-            }),
-            fill: new Fill({
-              color: this.portfolioControlService.getColorMae(feature.getProperties().mae, 0.3),
+              crossOrigin: 'anonymous',
+              src: 'assets/icons/place_black_24dp.svg',
+              // scale: 1.5,
             }),
           });
         }
@@ -217,16 +294,19 @@ export class MapAllPlantsComponent implements OnInit {
       return (feature: Feature) => {
         if (feature !== undefined) {
           return new Style({
-            stroke: new Stroke({
-              color: this.portfolioControlService.getColorMae(feature.getProperties().mae),
-              width: 2,
-            }),
-            fill: new Fill({
-              color: this.portfolioControlService.getColorMae(feature.getProperties().mae, 0.3),
+            image: new Icon({
+              color: this.portfolioControlService.getColorMae(feature.getProperties().informeReciente.mae),
+              crossOrigin: 'anonymous',
+              src: 'assets/icons/place_black_24dp.svg',
+              scale: 0.8,
             }),
           });
         }
       };
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

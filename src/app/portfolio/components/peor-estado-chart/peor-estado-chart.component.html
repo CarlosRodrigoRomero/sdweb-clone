@@ -1,0 +1,19 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Plantas en peor estado</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <app-bar-expandable-chart
+      [data]="dataMae"
+      [dataName]="'MAE'"
+      [labels]="labels"
+      [amplitude]="50"
+      [colors]="coloresMae"
+      [zoomed]="true"
+      [units]="'%'"
+      [titleY]="'MAE'"
+      (elemSelected)="onClick($event)"
+      (chartPositionChange)="chartPositionChange($event)"
+    ></app-bar-expandable-chart>
+  </mat-card-content>
+</mat-card>

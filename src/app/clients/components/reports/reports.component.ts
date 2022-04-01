@@ -15,9 +15,10 @@ export class ReportsComponent implements OnInit, OnDestroy {
   numPlantas = 0;
   potenciaTotal = 0;
   public mapLoaded = false;
+
   private subscription: Subscription = new Subscription();
 
-  constructor(private portfolioControlService: PortfolioControlService, private olMapService: OlMapService) {}
+  constructor(public portfolioControlService: PortfolioControlService, private olMapService: OlMapService) {}
 
   ngOnInit() {
     this.portfolioControlService.initService().then((res) => (this.mapLoaded = res));

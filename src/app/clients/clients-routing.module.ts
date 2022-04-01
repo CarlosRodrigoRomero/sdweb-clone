@@ -12,6 +12,11 @@ const routes: Routes = [
     children: [
       { path: 'plants', component: ReportsComponent },
       {
+        path: 'portfolio',
+        loadChildren: () => import('../portfolio/portfolio.module').then((m) => m.PortfolioModule),
+        canActivate: [AuthGuard],
+      },
+      {
         path: 'fixed',
         loadChildren: () => import('../planta-fija/planta-fija.module').then((m) => m.PlantaFijaModule),
         canActivate: [AuthGuard],

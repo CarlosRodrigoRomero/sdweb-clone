@@ -1,0 +1,31 @@
+.content {
+  height: 100%;
+  display: grid;
+  gap: 1rem;
+  grid-template-rows: 48px auto;
+}
+
+:host ::ng-deep .mat-horizontal-stepper-header-container {
+  display: none;
+}
+
+:host ::ng-deep .mat-horizontal-content-container {
+  padding: 0 24px;
+}
+
+app-view-header {
+  margin-bottom: 1rem;
+  margin: 0 24px;
+}
+
+.plantas-content {
+  display: grid;
+  grid-template-columns: 60% auto;
+  gap: 1rem;
+  align-items: center;
+  height: calc(100vh - 270px);
+}
+
+.step-content {
+  height: calc(100vh - 270px);
+}

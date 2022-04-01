@@ -3,6 +3,19 @@ mat-card {
 }
 
 #map {
-  height: calc(50vh - 86px - 32px );
+  height: calc(50vh - 86px - 32px);
   width: 100%;
+}
+
+.ol-popup {
+  position: absolute;
+  transform: translate(-50%, -140%);
+  background: white;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.popup-label {
+  display: block;
+  width: max-content;
 }

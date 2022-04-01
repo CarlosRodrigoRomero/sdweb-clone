@@ -1,0 +1,155 @@
+mat-card {
+  height: calc(50vh - 86px);
+}
+
+.table-container {
+  position: relative;
+  max-height: calc(50vh - 160px);
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+}
+
+tr.example-detail-row {
+  height: 0;
+  background: whitesmoke;
+}
+
+tr.example-element-row:not(.example-expanded-row):hover {
+  background: whitesmoke;
+}
+
+tr.example-element-row:not(.example-expanded-row):active {
+  background: #efefef;
+}
+
+.example-element-row td {
+  border-bottom-width: 0;
+}
+
+.example-expanded-row {
+  background: whitesmoke;
+  font-weight: 500;
+}
+
+.expanded-panel {
+  overflow: hidden;
+  display: grid;
+  gap: 10px;
+}
+
+.example-element-diagram {
+  min-width: 80px;
+  border: 2px solid black;
+  padding: 8px;
+  font-weight: lighter;
+  margin: 8px 0;
+  height: 104px;
+}
+
+.example-element-symbol {
+  font-weight: bold;
+  font-size: 40px;
+  line-height: normal;
+}
+
+.example-element-description {
+  padding: 16px;
+}
+
+.example-element-description-attribution {
+  opacity: 0.5;
+}
+
+.header-not-centered {
+  font-size: 16px;
+}
+
+.header-centered {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  font-size: 16px;
+  text-align: center;
+}
+
+.cell-content {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.cell-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.cell-icon mat-icon {
+  color: orange;
+}
+
+.acceder-btn {
+  color: blue;
+}
+
+.resumen-superior {
+  display: grid;
+  margin-top: 10px;
+}
+
+.resumen-inferior {
+  display: grid;
+  grid-template-columns: auto fit-content(40%);
+  margin: 0 1rem 1rem 1rem;
+}
+
+.problemas-header {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.alertas {
+  display: grid;
+  gap: 1rem;
+}
+
+.alerta {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.danger {
+  color: #b90009;
+}
+
+.warning {
+  color: #ff9a00;
+}
+
+.descargas-btns {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.btn-icon-pdf {
+  margin-right: 10px;
+  color: red;
+}
+
+.btn-icon-excel {
+  margin-right: 10px;
+  color: green;
+}
+
+.titulo {
+  font-size: 18px;
+  font-weight: 500;
+}

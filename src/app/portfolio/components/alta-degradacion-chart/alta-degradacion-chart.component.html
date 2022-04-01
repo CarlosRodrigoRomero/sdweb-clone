@@ -1,0 +1,19 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Plantas con alta degradación</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <app-bar-expandable-chart
+      [data]="dataVarMae"
+      [dataName]="'Variacion MAE'"
+      [labels]="labels"
+      [amplitude]="50"
+      [colors]="coloresVarMae"
+      [zoomed]="true"
+      [units]="'%'"
+      [titleY]="'Variación MAE'"
+      (elemSelected)="onClick($event)"
+      (chartPositionChange)="chartPositionChange($event)"
+    ></app-bar-expandable-chart>
+  </mat-card-content>
+</mat-card>

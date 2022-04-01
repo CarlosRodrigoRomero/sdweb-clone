@@ -9,6 +9,8 @@ export let GLOBAL = {
   gris: '#546e7a',
   GIS: 'https://solardrontech.es/tileserver.php?/index.json?/',
   colores_mae: ['#00e396', '#0892d0', '#ff0400'], // verde, azul, rojo
+  colores_new_mae: ['#71974C', '#FF9A00', '#B90009'], // verde, ambar, rojo
+  colores_new_mae_rgb: ['rgba(113,151,76,1)', 'rgba(255,154,0,1)', 'rgba(185,0,9,1)'], // verde, ambar, rojo
   colores_mae_rgb: ['rgba(0,227,150,1)', 'rgba(8,146,208,1)', 'rgba(253,80,77,1)'], // verde, azul, rojo
   colores_grad: ['#00e396', '#FF8A00', '#fd504d'], // verde, naranja, rojo
   colores_grad_rgb: ['rgba(0,227,150,1)', 'rgba(255,138,0,1)', 'rgba(253,80,77,1)'], // verde, naranja, rojo
@@ -33,6 +35,9 @@ export let GLOBAL = {
   nombreLocalXFija: 'Columna',
   nombreLocalYFija: 'Altura',
   mae: [1, 2],
+  mae_rangos: [0.0018, 0.0142],
+  mae_rangos_labels: ['leve', 'moderado', 'grave'],
+  cc_rangos: [0.02, 0.05],
   newReportsDate: 1619820000,
   anomaliaPorDefecto: 9,
   resolucionCamara: [512, 640],
@@ -273,10 +278,10 @@ export let GLOBAL = {
     // { nombre: "local_x", descripcion: "Columna" },
     // { nombre: "local_y", descripcion: "Fila" },
     { nombre: 'local_xy', descripcion: 'Fila/Columna' },
-    { nombre: 'temperaturaMax', descripcion: 'Temp. máx' },
+    { nombre: 'temperaturaMax', descripcion: 'Tª Máx' },
     {
       nombre: 'gradienteNormalizado',
-      descripcion: 'Gradiente normalizado',
+      descripcion: 'Grad. Tª Norm.',
     },
     // { nombre: "archivoPublico", descripcion: "Nombre archivo" },
     // { nombre: 'irradiancia', descripcion: 'Irradiancia' },

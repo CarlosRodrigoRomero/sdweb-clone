@@ -1,0 +1,26 @@
+<mat-card>
+  <app-bar-expandable-chart
+    [data]="dataVarMae"
+    [dataName]="'Variacion MAE'"
+    [labels]="labels"
+    [amplitude]="50"
+    [colors]="coloresVarMae"
+    [zoomed]="true"
+    [units]="'%'"
+    [titleY]="'Variación MAE'"
+    (elemSelected)="onClick($event)"
+    (chartPositionChange)="chartPositionChange($event)"
+  ></app-bar-expandable-chart>
+  <app-bar-expandable-chart
+    [data]="dataMae"
+    [dataName]="'MAE'"
+    [labels]="labels"
+    [amplitude]="50"
+    [colors]="coloresMae"
+    [zoomed]="true"
+    [units]="'%'"
+    [titleY]="'MAE'"
+    (elemSelected)="onClick($event)"
+    (chartPositionChange)="chartPositionChange($event)"
+  ></app-bar-expandable-chart>
+</mat-card>
