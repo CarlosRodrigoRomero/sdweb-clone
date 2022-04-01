@@ -1,4 +1,8 @@
 <div class="content">
+  <!-- <mat-form-field class="buscar-input" appearance="outline">
+    <mat-label>Buscar</mat-label>
+    <input matInput (keyup)="applyFilter($event)" #input />
+  </mat-form-field> -->
   <div class="table-container mat-elevation-z1">
     <table mat-table [dataSource]="dataSource" matSort multiTemplateDataRows class="mat-elevation-z8">
       <!-- Nombre y potencia -->

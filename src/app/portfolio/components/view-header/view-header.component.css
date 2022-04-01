@@ -7,8 +7,12 @@
 
 .left-content {
   display: flex;
-  gap: 10rem;
   align-items: start;
+}
+
+.left-content img {
+  position: absolute;
+  left: 500px;
 }
 
 .titulo {

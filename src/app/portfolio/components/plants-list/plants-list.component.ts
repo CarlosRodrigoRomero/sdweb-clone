@@ -122,6 +122,15 @@ export class PlantsListComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
   hoverPlanta(row) {
     this.portfolioControlService.plantaHovered = this.plantas.find((planta) => planta.id === row.plantaId);
     // this.portfolioControlService.setExternalStyle(row.plantaId, true);
