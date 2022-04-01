@@ -1,7 +1,7 @@
 <div class="container">
   <div class="form-material">
     <img class="logo" src="../../../assets/images/logo_sd.png" alt="" />
-    <form [formGroup]="form" align="center" (ngSubmit)="signIn($event)">
+    <form [formGroup]="form" align="center" (ngSubmit)="signIn()">
       <h2 class="titulo">Iniciar sesión</h2>
       <div>
         <mat-form-field class="email-input" appearance="outline">
@@ -24,7 +24,7 @@
           </button>
         </mat-form-field>
       </div>
-      <div *ngIf="!warningHide" class="alert alert-danger">Datos de acceso incorrectos</div>
+      <div *ngIf="showWarning" class="alert alert-danger">Datos de acceso incorrectos</div>
       <button mat-raised-button class="boton-entrar" color="warn" [disabled]="form.invalid" type="submit">
         Entrar
       </button>

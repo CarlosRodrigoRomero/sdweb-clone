@@ -2,10 +2,13 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { User } from 'firebase';
 
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+
+import { UserService } from './user.service';
 
 import { UserInterface } from '../models/user';
 
@@ -13,10 +16,15 @@ import { UserInterface } from '../models/user';
   providedIn: 'root',
 })
 export class AuthService {
-  userData: UserInterface; // Guarda los datos de usuario registrado
-  public user$: Observable<UserInterface>;
+  private user: UserInterface = {}; // Guarda los datos de usuario registrado
+  user$: Observable<UserInterface>;
 
-  constructor(private afAuth: AngularFireAuth, private afs: AngularFirestore, private router: Router) {
+  constructor(
+    private afAuth: AngularFireAuth,
+    private afs: AngularFirestore,
+    private router: Router,
+    private userService: UserService
+  ) {
     this.user$ = this.afAuth.authState.pipe(
       switchMap((user) => {
         if (user) {
@@ -28,8 +36,16 @@ export class AuthService {
     );
   }
 
-  signIn(email: string, password: string) {
-    return this.afAuth.signInWithEmailAndPassword(email, password);
+  async signIn(email: string, password: string) {
+    try {
+      const firebaseUser = await this.afAuth.signInWithEmailAndPassword(email, password);
+
+      return this.userService.getUser(firebaseUser.user.uid);
+
+      // return this.user;
+    } catch (error) {
+      return error;
+    }
   }
 
   forgotPassword(passwordResetEmail: string) {
@@ -64,5 +80,11 @@ export class AuthService {
     if (user !== undefined && user !== null) {
       return user.role === 1 || user.role === 3 || user.role === 4 || user.role === 5;
     }
+  }
+
+  private getUser(firebaseUser: User) {
+    const user = this.afs.doc<UserInterface>(`users/${firebaseUser.uid}`);
+
+    return user;
   }
 }
