@@ -658,7 +658,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       //     // }
       //   });
 
-      //   // Imagenes S1E sin anomalías
+      //   // // Imagenes S1E sin anomalías
       //   this.seguidores1ejeNoAnoms.forEach((seg, index) => {
       //     // if (index < 2) {
       //     this.setImgSeguidor1EjeCanvas(seg, index);
@@ -686,7 +686,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       //         if (
       //           imagesLoaded &&
       //           countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
-      //             +this.countAnomalias + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length &&
+      //             this.countAnomalias + this.seguidores1ejeAnoms
+      //               .length + this.seguidores1ejeNoAnoms.length &&
       //           downloads === 0
       //         ) {
       //           this.calcularInforme();
@@ -696,9 +697,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       //             .download(this.getPrefijoInforme(), () => {
       //               this.downloadReportService.progressBarValue = 0;
 
-      //               this.downloadReportService.generatingPDF = false;
+      //               this.downloadReportService.generatingDownload = false;
       //             });
-      //           this.downloadReportService.endingPDF = true;
+      //           this.downloadReportService.endingDownload = true;
 
       //           downloads++;
       //         }
@@ -706,55 +707,55 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       //     })
       //   );
       // } else {
-      // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-      let downloads = 0;
+        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+        let downloads = 0;
 
-      this.subscriptions.add(
-        this.countLoadedImages$.subscribe((countLoadedImgs) => {
-          this.downloadReportService.progressBarValue = Math.round(
-            (countLoadedImgs / this.anomaliasInforme.length) * 100
-          );
+        this.subscriptions.add(
+          this.countLoadedImages$.subscribe((countLoadedImgs) => {
+            this.downloadReportService.progressBarValue = Math.round(
+              (countLoadedImgs / this.anomaliasInforme.length) * 100
+            );
 
-          // comprobamos que estan cargados los planos de la planta
-          this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
-            // comprobamos que estan cargadas tb el resto de imagenes del PDF
-            this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-              // comprobamos si se van a cargar imagenes de anomalias
-              if (this.informeConImagenes && this.incluirImagenes) {
-                // Cuando se carguen todas las imágenes
-                if (planosLoaded && imagesLoaded && countLoadedImgs === this.countAnomalias && downloads === 0) {
-                  this.calcularInforme();
+            // comprobamos que estan cargados los planos de la planta
+            this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
+              // comprobamos que estan cargadas tb el resto de imagenes del PDF
+              this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
+                // comprobamos si se van a cargar imagenes de anomalias
+                if (this.informeConImagenes && this.incluirImagenes) {
+                  // Cuando se carguen todas las imágenes
+                  if (planosLoaded && imagesLoaded && countLoadedImgs === this.countAnomalias && downloads === 0) {
+                    this.calcularInforme();
 
-                  pdfMake
-                    .createPdf(this.getDocDefinition(this.imageListBase64))
-                    .download(this.getPrefijoInforme(), () => {
+                    pdfMake
+                      .createPdf(this.getDocDefinition(this.imageListBase64))
+                      .download(this.getPrefijoInforme(), () => {
+                        this.downloadReportService.progressBarValue = 0;
+
+                        this.downloadReportService.generatingDownload = false;
+                      });
+                    this.downloadReportService.endingDownload = true;
+
+                    downloads++;
+                  }
+                } else {
+                  // Cuando se carguen todas las imágenes
+                  if (planosLoaded && imagesLoaded && downloads === 0) {
+                    this.calcularInforme();
+
+                    pdfMake.createPdf(this.getDocDefinition()).download(this.getPrefijoInforme(), () => {
                       this.downloadReportService.progressBarValue = 0;
 
                       this.downloadReportService.generatingDownload = false;
                     });
-                  this.downloadReportService.endingDownload = true;
+                    this.downloadReportService.endingDownload = true;
 
-                  downloads++;
+                    downloads++;
+                  }
                 }
-              } else {
-                // Cuando se carguen todas las imágenes
-                if (planosLoaded && imagesLoaded && downloads === 0) {
-                  this.calcularInforme();
-
-                  pdfMake.createPdf(this.getDocDefinition()).download(this.getPrefijoInforme(), () => {
-                    this.downloadReportService.progressBarValue = 0;
-
-                    this.downloadReportService.generatingDownload = false;
-                  });
-                  this.downloadReportService.endingDownload = true;
-
-                  downloads++;
-                }
-              }
+              });
             });
-          });
-        })
-      );
+          })
+        );
       // }
     } else {
       // PLANTAS SEGUIDORES
@@ -882,13 +883,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       anexoAnomalias = this.getAnexoAnomalias(numAnexo);
       numAnexo = 'III';
     }
-    if (this.filtroApartados.includes('anexoSeguidores1EjeAnoms')) {
-      anexoSeguidores1EjeAnoms = this.getAnexoSegs1EjeAnoms(numAnexo);
-      numAnexo = 'IV';
-    }
-    if (this.filtroApartados.includes('anexoSeguidores1EjeNoAnoms')) {
-      anexoSeguidores1EjeNoAnoms = this.getAnexoSegs1EjeNoAnoms(numAnexo);
-    }
+    // if (this.filtroApartados.includes('anexoSeguidores1EjeAnoms')) {
+    //   anexoSeguidores1EjeAnoms = this.getAnexoSegs1EjeAnoms(numAnexo);
+    //   numAnexo = 'IV';
+    // }
+    // if (this.filtroApartados.includes('anexoSeguidores1EjeNoAnoms')) {
+    //   anexoSeguidores1EjeNoAnoms = this.getAnexoSegs1EjeNoAnoms(numAnexo);
+    // }
     if (this.filtroApartados.includes('anexoSeguidores')) {
       anexoSeguidores = this.getAnexoSeguidores(numAnexo);
       numAnexo = 'III';
@@ -929,7 +930,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               body: [
                 [
                   {
-                    text: currentPage,
+                    text: currentPage + 109 + 150 + 150,
                     alignment: 'right',
                     color: 'grey',
                     margin: [0, 0, 0, 0],
@@ -2979,14 +2980,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         },
         {
           columns: [
-            { text: 'Módulo', width: 200, style: 'anomInfoTitle' },
+            { text: this.translation.t('Módulo'), width: 200, style: 'anomInfoTitle' },
             { text: this.anomaliaInfoService.getModuloLabel(anom), style: 'anomInfoValue' },
           ],
         },
         {
           columns: [
             {
-              text: `Criticidad (Criterio ${this.anomaliaService.criterioCriticidad.nombre})`,
+              text:
+                this.translation.t('Criticidad') +
+                this.translation.t('Criterio') +
+                ' ' +
+                this.anomaliaService.criterioCriticidad.nombre +
+                ')',
               width: 200,
               style: 'anomInfoTitle',
             },
@@ -2998,31 +3004,31 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         },
         {
           columns: [
-            { text: 'Clase', width: 200, style: 'anomInfoTitle' },
+            { text: this.translation.t('Clase'), width: 200, style: 'anomInfoTitle' },
             { text: this.anomaliaInfoService.getClaseLabel(anom), style: 'anomInfoValue' },
           ],
         },
         {
           columns: [
-            { text: 'Pérdidas (beta)', width: 200, style: 'anomInfoTitle' },
+            { text: this.translation.t('Pérdidas') + ' (beta)', width: 200, style: 'anomInfoTitle' },
             { text: this.anomaliaInfoService.getPerdidasLabel(anom), style: 'anomInfoValue' },
           ],
         },
         {
           columns: [
-            { text: 'Temperatura Máxima', width: 200, style: 'anomInfoTitle' },
+            { text: this.translation.t('Temperatura máxima'), width: 200, style: 'anomInfoTitle' },
             { text: this.anomaliaInfoService.getTempMaxLabel(anom), style: 'anomInfoValue' },
           ],
         },
         {
           columns: [
-            { text: 'Gradiente Temp. Normalizado', width: 200, style: 'anomInfoTitle' },
+            { text: this.translation.t('Gradiente temp. Normalizado'), width: 200, style: 'anomInfoTitle' },
             { text: this.anomaliaInfoService.getGradNormLabel(anom), style: 'anomInfoValue' },
           ],
         },
         {
           columns: [
-            { text: 'Fecha y hora captura', width: 200, style: 'anomInfoTitle' },
+            { text: this.translation.t('Fecha y hora captura'), width: 200, style: 'anomInfoTitle' },
             {
               text: this.anomaliaInfoService.getFechaHoraLabel(anom),
               style: 'anomInfoValue',
@@ -3031,13 +3037,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         },
         {
           columns: [
-            { text: 'Localización', width: 200, style: 'anomInfoTitle' },
+            { text: this.translation.t('Localización'), width: 200, style: 'anomInfoTitle' },
             { text: this.anomaliaInfoService.getLocalizacionCompleteLabel(anom, this.planta), style: 'anomInfoValue' },
           ],
         },
         {
           columns: [
-            { text: 'Posición GPS', width: 200, style: 'anomInfoTitle' },
+            { text: this.translation.t('Posición GPS'), width: 200, style: 'anomInfoTitle' },
             {
               text: 'link',
               link: this.anomaliaInfoService.getGoogleMapsUrl(anom.featureCoords[0]),
@@ -3780,7 +3786,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         return 'Nº Módulo';
       }
     }
-    return columna.descripcion;
+    return this.translation.t(columna.descripcion);
   }
 
   private getGlobalCoordsLabel(anomalia: Anomalia) {
