@@ -247,5 +247,11 @@
   "Número de serie cámara": "Camera serial number",
   "Resultados": "Results",
   "Informe": "Report",
-  "Posición GPS": "GPS position"
+  "Posición GPS": "GPS position",
+  "Criterio": "Criterion",
+  "Clase": "Class",
+  "Pérdidas": "Losses",
+  "Fecha y hora captura": "Capture date and time",
+  "Tª Máx": "T Max",
+  "Grad Tª Norm": "Norm T Grad"
 }

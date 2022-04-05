@@ -77,7 +77,7 @@ export class ImagesTilesService {
     locAreas.forEach((locArea) => {
       const locAreaCoords = this.pathToCoordinate(locArea.path);
       allLocAreaCoords.push(...locAreaCoords);
-      tileCoords.push(...this.getElemTiles(locAreaCoords, this.getElemExtent(locAreaCoords), 18));
+      tileCoords.push(...this.getElemTiles(locAreaCoords, this.getElemExtent(locAreaCoords), 16));
     });
     tileCoords = this.getCompleteTiles(tileCoords);
 
@@ -158,11 +158,13 @@ export class ImagesTilesService {
 
               canvas.add(image);
 
+              console.log('ok');
               contador++;
               if (contador === tileCoords.length * 2) {
                 this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
               }
             } else {
+              console.log('error');
               contador++;
               if (contador === tileCoords.length * 2) {
                 this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);

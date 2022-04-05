@@ -185,6 +185,13 @@ export class DemoService {
 
       plantsData.warnings = warnings;
     }
+    if (plantsData.nombre === 'Demo') {
+      warnings.push('17 módulos en circuito abierto (string)');
+      warnings.push('2 módulos con substring en circuito abierto');
+      warnings.push('4 módulos con células calientes con gradiente mayor de 40ºC');
+
+      plantsData.warnings = warnings;
+    }
 
     return plantsData;
   }

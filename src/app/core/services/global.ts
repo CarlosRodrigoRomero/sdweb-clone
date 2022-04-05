@@ -281,7 +281,7 @@ export let GLOBAL = {
     { nombre: 'temperaturaMax', descripcion: 'Tª Máx' },
     {
       nombre: 'gradienteNormalizado',
-      descripcion: 'Grad. Tª Norm.',
+      descripcion: 'Grad Tª Norm',
     },
     // { nombre: "archivoPublico", descripcion: "Nombre archivo" },
     // { nombre: 'irradiancia', descripcion: 'Irradiancia' },
