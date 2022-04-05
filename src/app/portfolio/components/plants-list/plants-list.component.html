@@ -144,7 +144,7 @@
                 <!-- ALERTAS FALSAS DEMO -->
                 <div
                   class="alertas"
-                  *ngIf="row.nombre === 'Planta 1' || row.nombre === 'Planta 2' || row.nombre === 'Planta 3'"
+                  *ngIf="row.nombre === 'Demo' || row.nombre === 'Planta 1' || row.nombre === 'Planta 2' || row.nombre === 'Planta 3'"
                 >
                   <div class="alerta" *ngFor="let warning of row.warnings">
                     <mat-icon class="danger">warning</mat-icon>
@@ -153,7 +153,7 @@
                 </div>
 
                 <div
-                  *ngIf="row.nombre !== 'Planta 1' && row.nombre !== 'Planta 2' && row.nombre !== 'Planta 3'"
+                  *ngIf="row.nombre !== 'Demo' && row.nombre !== 'Planta 1' && row.nombre !== 'Planta 2' && row.nombre !== 'Planta 3'"
                   class="alertas"
                 >
                   <div class="alerta">
