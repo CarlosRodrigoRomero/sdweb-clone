@@ -16,6 +16,7 @@ import { CritCoA } from '@core/models/critCoA';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { PcInterface } from '@core/models/pc';
 import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
 
 @Injectable({
   providedIn: 'root',
@@ -89,12 +90,16 @@ export class AnomaliaService {
     );
   }
 
-  getAnomaliasPlanta$(plantaId: string): Observable<Anomalia[]> {
+  getAnomaliasPlanta$(plantaId: string, informs?: InformeInterface[]): Observable<Anomalia[]> {
     const query$ = this.informeService.getInformesDePlanta(plantaId).pipe(
       take(1),
       switchMap((informes) => {
         // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
         informes = this.informeService.getOnlyNewInfomesFijas(informes);
+
+        if (informs !== undefined) {
+          informes = informs;
+        }
 
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
         informes.forEach((informe) => {
@@ -104,8 +109,8 @@ export class AnomaliaService {
         });
         return combineLatest(anomaliaObsList);
       }),
-      map((arr) => arr.flat()),
-      map((arr) => this.getAlturaCorrecta(arr))
+      map((arr) => arr.flat())
+      // map((arr) => this.getAlturaCorrecta(arr))
     );
 
     return query$;
@@ -128,44 +133,44 @@ export class AnomaliaService {
           actions.map((doc) => {
             const data = doc.payload.doc.data() as Anomalia;
             data.id = doc.payload.doc.id;
-            data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
-            data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
+            // data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
+            // data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
             data.criticidad = this.getCriticidad(data);
-            if (data.globalCoords !== undefined && data.globalCoords !== null) {
-              data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
-            }
-            // if (this.planta.alturaBajaPrimero) {
-            //   data.localY = this.planta.filas - data.localY + 1;
+            // if (data.globalCoords !== undefined && data.globalCoords !== null) {
+            //   data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
             // }
-            if (tipo === 'pcs') {
-              data.localX = (data as PcInterface).local_x;
-              data.localY = (data as PcInterface).local_y;
-              if (data.globalCoords === undefined) {
-                data.globalCoords = [];
+            // // if (this.planta.alturaBajaPrimero) {
+            // //   data.localY = this.planta.filas - data.localY + 1;
+            // // }
+            // if (tipo === 'pcs') {
+            //   data.localX = (data as PcInterface).local_x;
+            //   data.localY = (data as PcInterface).local_y;
+            //   if (data.globalCoords === undefined) {
+            //     data.globalCoords = [];
 
-                const globalX = (data as PcInterface).global_x;
-                const globalY = (data as PcInterface).global_y;
-                const globalZ = (data as PcInterface).global_z;
+            //     const globalX = (data as PcInterface).global_x;
+            //     const globalY = (data as PcInterface).global_y;
+            //     const globalZ = (data as PcInterface).global_z;
 
-                if (globalX !== undefined && globalX !== null && globalX !== '' && !isNaN(globalX)) {
-                  data.globalCoords.push(globalX);
+            //     if (globalX !== undefined && globalX !== null && globalX !== '' && !isNaN(globalX)) {
+            //       data.globalCoords.push(globalX);
 
-                  if (globalY !== undefined && globalY !== null && globalY !== '' && !isNaN(globalY)) {
-                    data.globalCoords.push(globalY);
+            //       if (globalY !== undefined && globalY !== null && globalY !== '' && !isNaN(globalY)) {
+            //         data.globalCoords.push(globalY);
 
-                    if (globalZ !== undefined && globalZ !== null && globalZ !== '' && !isNaN(globalZ)) {
-                      data.globalCoords.push(globalZ);
-                    }
-                  }
-                }
-              }
-              data.localId = this.getLocalId(data);
-            }
+            //         if (globalZ !== undefined && globalZ !== null && globalZ !== '' && !isNaN(globalZ)) {
+            //           data.globalCoords.push(globalZ);
+            //         }
+            //       }
+            //     }
+            //   }
+            //   data.localId = this.getLocalId(data);
+            // }
 
-            // Convertimos el objeto en un array
-            if (data.hasOwnProperty('featureCoords')) {
-              data.featureCoords = Object.values(data.featureCoords);
-            }
+            // // Convertimos el objeto en un array
+            // if (data.hasOwnProperty('featureCoords')) {
+            //   data.featureCoords = Object.values(data.featureCoords);
+            // }
 
             return data;
           })
