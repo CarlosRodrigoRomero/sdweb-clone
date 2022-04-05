@@ -158,13 +158,11 @@ export class ImagesTilesService {
 
               canvas.add(image);
 
-              console.log('ok');
               contador++;
               if (contador === tileCoords.length * 2) {
                 this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);
               }
             } else {
-              console.log('error');
               contador++;
               if (contador === tileCoords.length * 2) {
                 this.createFinalImage(tileCoords, lado, allLocAreaCoords, anomalias, canvas, type);

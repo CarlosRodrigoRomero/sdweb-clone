@@ -639,28 +639,26 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     // PLANTAS FIJAS
     if (this.reportControlService.plantaFija) {
-      if (this.informeConImagenes && this.incluirImagenes) {
-        // Imagenes anomalías
-        this.countAnomalias = 0;
-        this.anomaliasInforme.forEach((anomalia, index) => {
-          // if (index < 700) {
-          this.setImgAnomaliaCanvas(anomalia);
-          this.countAnomalias++;
-          // }
-        });
-      }
+      // if (this.informeConImagenes && this.incluirImagenes) {
+      //   // Imagenes anomalías
+      //   this.countAnomalias = 0;
+      //   this.anomaliasInforme.forEach((anomalia, index) => {
+      //     // if (index < 700) {
+      //     this.setImgAnomaliaCanvas(anomalia);
+      //     this.countAnomalias++;
+      //     // }
 
       // if (this.planta.tipo === '1 eje') {
       //   // Imagenes S1E con anomalías
       //   this.seguidores1ejeAnoms.forEach((seg, index) => {
       //     // if (index < 2) {
-      //     this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
+      //       this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
       //     // }
       //   });
 
-      //   // // Imagenes S1E sin anomalías
+      //   // Imagenes S1E sin anomalías
       //   this.seguidores1ejeNoAnoms.forEach((seg, index) => {
-      //     // if (index < 2) {
+      //     // if (index < 2 ) {
       //     this.setImgSeguidor1EjeCanvas(seg, index);
       //     // }
       //   });
@@ -686,8 +684,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       //         if (
       //           imagesLoaded &&
       //           countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
-      //             this.countAnomalias + this.seguidores1ejeAnoms
-      //               .length + this.seguidores1ejeNoAnoms.length &&
+      //             this.countAnomalias + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length &&
       //           downloads === 0
       //         ) {
       //           this.calcularInforme();
@@ -930,7 +927,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               body: [
                 [
                   {
-                    text: currentPage + 109 + 150 + 150,
+                    text: currentPage,
                     alignment: 'right',
                     color: 'grey',
                     margin: [0, 0, 0, 0],
@@ -3083,7 +3080,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       const pagAnexo = [
         {
           // text: `${this.translation.t('Seguidor')} ${this.globalCoordsLabel(seg.globalCoords)}`,
-          text: `${this.translation.t('Seguidor')} ${i + 1}/${this.seguidores1ejeAnoms.length}`,
+          text: `${i + 1}/${this.seguidores1ejeAnoms.length} - ${this.translation.t(
+            'Seguidor'
+          )} ${this.downloadReportService.getNombreS1E(this.seguidores1ejeAnoms[i])}`,
           style: 'h2',
           alignment: 'center',
           pageBreak: 'before',
@@ -3338,7 +3337,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       const pagAnexo = [
         {
           // text: `${this.translation.t('Seguidor')} ${this.globalCoordsLabel(seg.globalCoords)}`,
-          text: `${this.translation.t('Seguidor')} ${i + 1}/${this.seguidores1ejeNoAnoms.length}`,
+          text: `${i + 1}/${this.seguidores1ejeNoAnoms.length} - ${this.translation.t(
+            'Seguidor'
+          )} ${this.downloadReportService.getNombreS1E(this.seguidores1ejeNoAnoms[i])}`,
           style: 'h2',
           alignment: 'center',
           pageBreak: 'before',

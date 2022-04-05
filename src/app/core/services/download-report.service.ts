@@ -152,6 +152,24 @@ export class DownloadReportService {
       });
   }
 
+  getNombreS1E(seg: LocationAreaInterface): string {
+    let nombreS1E = '';
+    if (seg !== undefined) {
+      seg.globalCoords.forEach((gC, index) => {
+        let globalCoord = gC.toString();
+        if (globalCoord.length === 1) {
+          globalCoord = '0' + globalCoord;
+        }
+        nombreS1E += globalCoord;
+        if (index < seg.globalCoords.length - 1) {
+          nombreS1E += '.';
+        }
+      });
+    }
+
+    return nombreS1E;
+  }
+
   getCompleteGlobalCoords(seg: LocationAreaInterface, indexSelected: number): any[] {
     const globalCoords = seg.globalCoords;
 
