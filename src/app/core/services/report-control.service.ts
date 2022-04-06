@@ -513,7 +513,7 @@ export class ReportControlService {
         });
       }
 
-      let rangosDT /*  = this.anomaliaService.criterioCriticidad.rangosDT */;
+      let rangosDT = this.anomaliaService.criterioCriticidad.rangosDT;
       if (rangos !== undefined) {
         rangosDT = rangos;
       }
@@ -554,14 +554,90 @@ export class ReportControlService {
 
         informe.tiposAnomalias = tiposAnomalias;
 
-        console.log(tiposAnomalias);
+        console.log('Tipos anomalias: ' + tiposAnomalias);
 
         this.informeService.updateInforme(informe);
       });
     }
   }
 
-  public sortLocAreas(locAreas: LocationAreaInterface[]) {
+  setNumAnomsByCoA(elems: Anomalia[] | Seguidor[], informes?: InformeInterface[]): void {
+    let anomalias: Anomalia[] = [];
+    if (elems.length > 0) {
+      if (elems[0].hasOwnProperty('tipo')) {
+        anomalias = elems as Anomalia[];
+      } else {
+        elems.forEach((elem) => {
+          anomalias.push(...(elem as Seguidor).anomaliasCliente);
+        });
+      }
+
+      if (informes !== undefined) {
+        this.informes = informes;
+      }
+
+      this.informes.forEach((informe) => {
+        const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
+
+        const numsCoA: number[] = [
+          anomaliasInforme.filter((anom) => anom.clase == 1).length,
+          anomaliasInforme.filter((anom) => anom.clase == 2).length,
+          anomaliasInforme.filter((anom) => anom.clase == 3).length,
+        ];
+
+        console.log('Nº CoA: ' + numsCoA);
+
+        informe.numsCoA = numsCoA;
+
+        this.informeService.updateInforme(informe);
+      });
+    }
+  }
+
+  setNumAnomsByCriticidad(
+    elems: Anomalia[] | Seguidor[],
+    informes?: InformeInterface[],
+    criterio?: CritCriticidad
+  ): void {
+    let anomalias: Anomalia[] = [];
+    if (elems.length > 0) {
+      if (elems[0].hasOwnProperty('tipo')) {
+        anomalias = elems as Anomalia[];
+      } else {
+        elems.forEach((elem) => {
+          anomalias.push(...(elem as Seguidor).anomaliasCliente);
+        });
+      }
+
+      let rangosDT = this.anomaliaService.criterioCriticidad.rangosDT;
+      if (criterio !== undefined) {
+        rangosDT = criterio.rangosDT;
+        this.anomaliaService.criterioCriticidad = criterio;
+      }
+
+      if (informes !== undefined) {
+        this.informes = informes;
+      }
+
+      this.informes.forEach((informe) => {
+        const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
+
+        const numsCriticidad: number[] = [];
+        rangosDT.forEach((rangoDT, index) =>
+          // tslint:disable-next-line: triple-equals
+          numsCriticidad.push(anomaliasInforme.filter((anom) => anom.criticidad == index).length)
+        );
+
+        console.log('Nº criticidad: ' + numsCriticidad);
+
+        informe.numsCriticidad = numsCriticidad;
+
+        this.informeService.updateInforme(informe);
+      });
+    }
+  }
+
+  sortLocAreas(locAreas: LocationAreaInterface[]) {
     // comprobamos si el nombre de las zonas es un numero
     if (!isNaN(parseFloat(locAreas[0].globalCoords[0]))) {
       locAreas = locAreas.sort((a, b) => parseFloat(a.globalCoords[0]) - parseFloat(b.globalCoords[0]));

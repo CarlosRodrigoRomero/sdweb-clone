@@ -154,277 +154,18 @@ export class DownloadExcelPortfolioComponent implements OnInit {
     const plantas = this.portfolioControlService.listaPlantas;
     const informes = this.portfolioControlService.listaInformes;
 
-    console.log(informes.filter((informe) => !informe.hasOwnProperty('tiposAnomalias')).length);
-
-    const criteriosId = [
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'wRubKS2StaZTrc0644lJ',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'aU2iM5nM0S3vMZxMZGff',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'aU2iM5nM0S3vMZxMZGff',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'ZHSp2yNdpORe3XMDAxoA',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'BuAdwZlgE8doyc558oAM',
-      'BuAdwZlgE8doyc558oAM',
-      'BuAdwZlgE8doyc558oAM',
-      'BuAdwZlgE8doyc558oAM',
-      'BuAdwZlgE8doyc558oAM',
-      'BuAdwZlgE8doyc558oAM',
-      'BuAdwZlgE8doyc558oAM',
-      'BuAdwZlgE8doyc558oAM',
-      'BuAdwZlgE8doyc558oAM',
-      'BuAdwZlgE8doyc558oAM',
-      'BuAdwZlgE8doyc558oAM',
-      'BuAdwZlgE8doyc558oAM',
-      'BuAdwZlgE8doyc558oAM',
-      'BuAdwZlgE8doyc558oAM',
-      'aU2iM5nM0S3vMZxMZGff',
-      'cgrOwQnVxWgftFeQICJc',
-      'xuAMPmcDLQAaoVHX1bpi',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'aU2iM5nM0S3vMZxMZGff',
-      'wRubKS2StaZTrc0644lJ',
-      'nByXBdGjlf7ifhVKu6pc',
-      'aU2iM5nM0S3vMZxMZGff',
-    ];
-
-    const criterios: CritCriticidad[] = [
-      {
-        id: 'BuAdwZlgE8doyc558oAM',
-        criterioConstante: [null, null, [3, 4, 5, 6, 7, 10, 12, 14, 17]],
-        labels: ['Leve', 'Media', 'Grave'],
-        nombre: 'Eolia',
-        siempreVisible: [15, 18],
-        rangosDT: [5, 10, 40],
-      },
-      {
-        id: 'ZHSp2yNdpORe3XMDAxoA',
-        criterioConstante: [null, [3, 6, 10, 12], [4, 5, 7, 17, 14]],
-        labels: ['Leve', 'Media', 'Grave'],
-        nombre: 'Solardrone10',
-        siempreVisible: [15, 18],
-        rangosDT: [10, 10, 40],
-      },
-      {
-        id: 'aU2iM5nM0S3vMZxMZGff',
-        criterioConstante: [null, null, [3, 4, 5, 6, 7, 10, 12, 14, 17]],
-        labels: ['Leve', 'Media', 'Grave'],
-        nombre: 'Eolia',
-        siempreVisible: [15, 18],
-        rangosDT: [5, 10, 40],
-      },
-      {
-        id: 'cgrOwQnVxWgftFeQICJc',
-        criterioConstante: [null, null, [3, 4, 5, 6, 7, 10, 12, 14, 17]],
-        labels: ['Leve', 'Media', 'Grave'],
-        nombre: 'Eolia',
-        siempreVisible: [15, 18],
-        rangosDT: [5, 10, 20],
-      },
-      {
-        id: 'nByXBdGjlf7ifhVKu6pc',
-        criterioConstante: [null, null, [3, 4, 5, 6, 7, 10, 12, 14, 17]],
-        labels: ['Leve', 'Media', 'Grave'],
-        nombre: 'Eolia',
-        siempreVisible: [15, 18],
-        rangosDT: [5, 10, 40],
-      },
-      {
-        id: 'wRubKS2StaZTrc0644lJ',
-        criterioConstante: [null, null, [3, 4, 5, 6, 7, 10, 12, 14, 17]],
-        labels: ['Leve', 'Media', 'Grave'],
-        nombre: 'Eolia',
-        siempreVisible: [15, 18],
-        rangosDT: [5, 10, 20, 30, 100],
-      },
-      {
-        id: 'xuAMPmcDLQAaoVHX1bpi',
-        criterioConstante: [null, null, [3, 4, 5, 6, 7, 10, 12, 14, 17]],
-        labels: ['Leve', 'Media', 'Grave'],
-        nombre: 'Eolia',
-        siempreVisible: [15, 18],
-        rangosDT: [5, 10, 40],
-      },
-    ];
+    // plantasPendientes = plantasPendientes.filter(
+    //   (planta) =>
+    //     planta.id !== 'IQYvqbIexG8vpowC0uef' &&
+    //     planta.id !== 'RJmyakiUjSS9xhOHArxl' &&
+    //     planta.id !== 'WWnA1tBqXB6UbbF8d1q4'
+    // );
 
     plantas.forEach((planta, index) => {
-      // if (index < 5) {
+      // if (index < 10) {
       const informesPlanta = informes.filter((informe) => informe.plantaId === planta.id);
 
-      let calcular = false;
+      let calcular = true;
       informesPlanta.forEach((informe) => {
         if (!informe.hasOwnProperty('tiposAnomalias')) {
           calcular = true;
@@ -440,6 +181,7 @@ export class DownloadExcelPortfolioComponent implements OnInit {
 
         let criterio: CritCriticidad;
 
+        console.log('PlantaId: ' + planta.id + ' - ' + planta.nombre);
         this.anomaliaService
           .getCriterioId(planta)
           .pipe(
@@ -454,24 +196,14 @@ export class DownloadExcelPortfolioComponent implements OnInit {
           )
           .pipe(take(1))
           .subscribe((anoms) => {
-            console.log(planta.id);
             const anomalias = anoms.filter((anom) => anom.criticidad !== null);
 
             this.reportControlService.setTiposAnomaliaInformesPlanta(anomalias, informesPlanta, criterio.rangosDT);
+
+            this.reportControlService.setNumAnomsByCoA(anomalias, informesPlanta);
+
+            this.reportControlService.setNumAnomsByCriticidad(anomalias, informesPlanta, criterio);
           });
-
-        // this.anomaliaService
-        //   .getAnomaliasPlanta$(planta.id)
-        //   .pipe(take(1))
-        //   .subscribe((anoms) => {
-        //     console.log(anoms);
-
-        //     const anomalias = anoms.filter((anom) => anom.criticidad !== null);
-
-        //     console.log(anomalias.length);
-
-        //     this.reportControlService.setTiposAnomaliaInformesPlanta(anomalias, informesPlanta, rangos);
-        //   });
       }
       // }
     });
