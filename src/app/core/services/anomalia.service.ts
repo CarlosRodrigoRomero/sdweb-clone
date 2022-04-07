@@ -90,15 +90,15 @@ export class AnomaliaService {
     );
   }
 
-  getAnomaliasPlanta$(plantaId: string, informs?: InformeInterface[]): Observable<Anomalia[]> {
+  getAnomaliasPlanta$(plantaId: string, informesPlanta?: InformeInterface[]): Observable<Anomalia[]> {
     const query$ = this.informeService.getInformesDePlanta(plantaId).pipe(
       take(1),
       switchMap((informes) => {
         // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
         informes = this.informeService.getOnlyNewInfomesFijas(informes);
 
-        if (informs !== undefined) {
-          informes = informs;
+        if (informesPlanta !== undefined) {
+          informes = informesPlanta;
         }
 
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
@@ -109,8 +109,8 @@ export class AnomaliaService {
         });
         return combineLatest(anomaliaObsList);
       }),
-      map((arr) => arr.flat())
-      // map((arr) => this.getAlturaCorrecta(arr))
+      map((arr) => arr.flat()),
+      map((arr) => this.getAlturaCorrecta(arr))
     );
 
     return query$;
@@ -178,6 +178,16 @@ export class AnomaliaService {
       );
 
     return query$;
+  }
+
+  getRealAnomalias(anomalias: Anomalia[]): Anomalia[] {
+    // quitamos las anomalias con criticidad null ya que no son anomalias para el cliente
+    let realAnomalias = anomalias.filter((anom) => anom.criticidad !== null);
+
+    // quitamos las anomalias de tipos en desuso
+    realAnomalias = realAnomalias.filter((anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo));
+
+    return realAnomalias;
   }
 
   async updateAnomalia(anomalia: Anomalia) {

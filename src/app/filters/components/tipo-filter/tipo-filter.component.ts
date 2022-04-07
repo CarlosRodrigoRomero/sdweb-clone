@@ -67,7 +67,9 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.anomaliaService.getAnomaliasPlanta$(this.plantaId).subscribe((anomalias) => {
-        this.allAnomalias = anomalias;
+        // filtramos las anomalias que ya no consideramos anomalias
+        this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
+
         this.tiposElem = [];
         // obtenermos los labels de todas las anomalias
         this._getAllCategorias(anomalias);

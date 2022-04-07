@@ -212,18 +212,18 @@ export class DownloadExcelPortfolioComponent implements OnInit {
         )
         .pipe(take(1))
         .subscribe((anoms) => {
-          let anomalias = anoms.filter((anom) => anom.criticidad !== null);
+          informesPlanta.forEach((informe) => {
+            let anomaliasInforme = anoms.filter((anom) => anom.informeId === informe.id);
 
-          // quitamos anomalias de tipos no usados
-          anomalias = anomalias.filter((anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo));
+            // descartamos las anomalias que no lo son para el cliente
+            anomaliasInforme = this.anomaliaService.getRealAnomalias(anomaliasInforme);
 
-          // console.log('PlantaId: ' + planta.id + ' - ' + planta.nombre);
+            this.reportControlService.setTiposAnomInforme(anomaliasInforme, informe, criterio);
 
-          this.reportControlService.setTiposAnomaliaInformesPlanta(anomalias, informesPlanta, criterio.rangosDT);
+            this.reportControlService.setNumAnomsCoAInforme(anomaliasInforme, informe);
 
-          this.reportControlService.setNumAnomsByCoA(anomalias, informesPlanta);
-
-          this.reportControlService.setNumAnomsByCriticidad(anomalias, informesPlanta, criterio);
+            this.reportControlService.setNumAnomsCritInforme(anomaliasInforme, informe, criterio);
+          });
         });
       // }
     });
