@@ -104,6 +104,11 @@ export class ReportControlService {
                 // filtramos las anomalias por criterio de criticidad del cliente
                 this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
 
+                // quitamos las anomalias de tipos en desuso
+                this.allFilterableElements = this.allFilterableElements.filter(
+                  (anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo)
+                );
+
                 // ordenamos las anomalias por tipo
                 this.allFilterableElements = this.anomaliaService.sortAnomsByTipo(
                   this.allFilterableElements as Anomalia[]
@@ -179,6 +184,11 @@ export class ReportControlService {
                         // tslint:disable-next-line: triple-equals
                         this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
 
+                        // quitamos las anomalias de tipos en desuso
+                        this.allFilterableElements = this.allFilterableElements.filter(
+                          (anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo)
+                        );
+
                         // ordenamos las anomalias por tipo
                         this.allFilterableElements = this.anomaliaService.sortAnomsByTipo(
                           this.allFilterableElements as Anomalia[]
@@ -222,6 +232,11 @@ export class ReportControlService {
                         // filtramos las anomalias por criterio de criticidad del cliente
                         // tslint:disable-next-line: triple-equals
                         this.allFilterableElements = anoms.filter((anom) => anom.tipo != 0 && anom.criticidad !== null);
+
+                        // quitamos las anomalias de tipos en desuso
+                        this.allFilterableElements = this.allFilterableElements.filter(
+                          (anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo)
+                        );
 
                         // ordenamos las anomalias por tipo
                         this.allFilterableElements = this.anomaliaService.sortAnomsByTipo(
@@ -541,7 +556,7 @@ export class ReportControlService {
                     ccs.filter((anom) => anom.gradienteNormalizado >= rangs[i + 1]).length
                 );
               } else {
-                ccGradNorm.push(ccs.filter((anom) => anom.gradienteNormalizado > rango).length);
+                ccGradNorm.push(ccs.filter((anom) => anom.gradienteNormalizado >= rango).length);
               }
             });
 
@@ -554,9 +569,20 @@ export class ReportControlService {
 
         informe.tiposAnomalias = tiposAnomalias;
 
-        console.log('Tipos anomalias: ' + tiposAnomalias);
+        const sumTiposAnoms = tiposAnomalias.reduce((acum, curr, index) => {
+          if (index === 8 || index === 9) {
+            return acum + curr.reduce((a, c) => a + c);
+          } else {
+            return acum + curr;
+          }
+        });
+        // console.log('Tipos anomalias: ' + tiposAnomalias);
 
-        this.informeService.updateInforme(informe);
+        if (sumTiposAnoms === anomaliasInforme.length) {
+          this.informeService.updateInforme(informe);
+        } else {
+          console.log('Informe ' + informe.id + ' no actualizado. PlantaId: ' + informe.plantaId);
+        }
       });
     }
   }
@@ -580,16 +606,25 @@ export class ReportControlService {
         const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
 
         const numsCoA: number[] = [
+          // tslint:disable-next-line: triple-equals
           anomaliasInforme.filter((anom) => anom.clase == 1).length,
+          // tslint:disable-next-line: triple-equals
           anomaliasInforme.filter((anom) => anom.clase == 2).length,
+          // tslint:disable-next-line: triple-equals
           anomaliasInforme.filter((anom) => anom.clase == 3).length,
         ];
 
-        console.log('Nº CoA: ' + numsCoA);
-
         informe.numsCoA = numsCoA;
 
-        this.informeService.updateInforme(informe);
+        const sumCoAs = numsCoA[0] + numsCoA[1] + numsCoA[2];
+
+        // console.log('Nº CoA: ' + numsCoA);
+
+        if (sumCoAs === anomaliasInforme.length) {
+          this.informeService.updateInforme(informe);
+        } else {
+          console.log('Informe ' + informe.id + ' no actualizado. PlantaId: ' + informe.plantaId);
+        }
       });
     }
   }
@@ -628,11 +663,17 @@ export class ReportControlService {
           numsCriticidad.push(anomaliasInforme.filter((anom) => anom.criticidad == index).length)
         );
 
-        console.log('Nº criticidad: ' + numsCriticidad);
-
         informe.numsCriticidad = numsCriticidad;
 
-        this.informeService.updateInforme(informe);
+        const sumCrits = numsCriticidad.reduce((prev, current) => prev + current);
+
+        // console.log('Nº criticidad: ' + numsCriticidad);
+
+        if (sumCrits === anomaliasInforme.length) {
+          this.informeService.updateInforme(informe);
+        } else {
+          console.log('Informe ' + informe.id + ' no actualizado. PlantaId: ' + informe.plantaId);
+        }
       });
     }
   }

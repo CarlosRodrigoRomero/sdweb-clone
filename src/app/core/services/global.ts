@@ -59,6 +59,7 @@ export let GLOBAL = {
   colores_clase: ['#20B2AA', '#FF4500', '#b70000'],
   labels_criticidad: ['Muy baja', 'Baja', 'Media', 'Alta', 'Muy Alta'],
   tipos_criticidad: [1, 2, 3, 4, 5],
+  tipos_no_utilizados: [0, 1, 2, 4, 13, 16],
   labels_tipos: [
     '0',
     'PC',

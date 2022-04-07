@@ -20,13 +20,21 @@ import { CritCriticidad } from '@core/models/critCriticidad';
 })
 export class DownloadExcelPortfolioComponent implements OnInit {
   userDemo = false;
-  private columnas: string[][] = [
-    ['Nombre planta', 'Fecha inspección', 'Potencia (MW)', 'Tipo', 'MAE (%)', 'Nº total anomalías'],
-    ['Células calientes (%)', 'Nº total céls. calientes'],
-    [],
-  ];
-  private columnasNoUtilizadas: number[] = [0, 1, 2, 4, 13, 16];
-  private headersColors = ['FFE5E7E9', 'FFF5B7B1', 'FFD4EFDF'];
+  private columnas = {
+    general: ['Nombre planta', 'Fecha inspección', 'Potencia (MW)', 'Tipo', 'MAE (%)', 'Nº total anomalías'],
+    coa: ['CoA 1', 'CoA 2', 'CoA 3'],
+    criticidad: [],
+    tipos: [],
+    ccs: ['Células calientes (%)', 'Nº total céls. calientes'],
+  };
+  private tiposAnomsNoUtilizados: number[] = GLOBAL.tipos_no_utilizados;
+  private headersColors = {
+    general: 'FFE5E7E9',
+    coa: 'fff9cb9c',
+    criticidad: 'ffd9d2e9',
+    tipos: 'FFB8CCE4',
+    ccs: 'FFF5B7B1',
+  };
   private filas: any[] = [];
   private sheetName = 'Portfolio';
   private excelFileName = 'Portfolio';
@@ -45,6 +53,10 @@ export class DownloadExcelPortfolioComponent implements OnInit {
       this.userDemo = true;
     }
 
+    this.portfolioControlService.criterioCriticidad.labels.forEach((label, index) => {
+      this.columnas.criticidad.push('Criticidad ' + label);
+    });
+
     this.portfolioControlService.criterioCriticidad.rangosDT.forEach((rango, index, rangos) => {
       let columna: string;
       if (index < rangos.length - 1) {
@@ -53,12 +65,14 @@ export class DownloadExcelPortfolioComponent implements OnInit {
         columna = 'Cels. calientes por ΔT Max (norm) >' + rango + 'ºC';
       }
 
-      this.columnas[1].push(columna);
+      this.columnas.ccs.push(columna);
     });
 
-    GLOBAL.labels_tipos.forEach((tipo, index) => {
-      if (!this.columnasNoUtilizadas.includes(index) && index !== 8 && index !== 9) {
-        this.columnas[2].push(tipo);
+    GLOBAL.sortedAnomsTipos.forEach((tipo) => {
+      const labels = GLOBAL.labels_tipos;
+
+      if (!this.tiposAnomsNoUtilizados.includes(tipo) && tipo !== 8 && tipo !== 9) {
+        this.columnas.tipos.push(labels[tipo]);
       }
     });
   }
@@ -108,6 +122,34 @@ export class DownloadExcelPortfolioComponent implements OnInit {
 
         fila['numAnomalias'] = numAnomalias;
 
+        /* ANOMALIAS POR CLASE */
+        if (informe.hasOwnProperty('numsCoA')) {
+          informe.numsCoA.forEach((coa, index) => (fila[`coa${index + 1}`] = coa));
+        } else {
+          fila['coa1'] = 0;
+          fila['coa2'] = 0;
+          fila['coa3'] = 0;
+        }
+
+        /* ANOMALIAS POR CRITICIDAD */
+        if (informe.hasOwnProperty('numsCriticidad')) {
+          this.portfolioControlService.criterioCriticidad.labels.forEach(
+            (_, index) => (fila[`criticidad${index + 1}`] = informe.numsCriticidad[index])
+          );
+        } else {
+          this.portfolioControlService.criterioCriticidad.labels.forEach(
+            (_, index) => (fila[`criticidad${index + 1}`] = 0)
+          );
+        }
+
+        /* ANOMALIAS POR TIPO */
+        GLOBAL.sortedAnomsTipos.forEach((tipo) => {
+          if (!this.tiposAnomsNoUtilizados.includes(tipo) && tipo !== 8 && tipo !== 9) {
+            fila['tipo' + tipo] = informe.tiposAnomalias[tipo];
+          }
+        });
+
+        /* CELULAS CALIENTES */
         let cc = null;
         if (informe.hasOwnProperty('cc') && informe.cc !== null && !isNaN(informe.cc)) {
           cc = Math.round(informe.cc * 10000) / 100;
@@ -124,12 +166,6 @@ export class DownloadExcelPortfolioComponent implements OnInit {
           fila['cc' + (index + 1)] = ccsRango;
         });
 
-        GLOBAL.labels_tipos.forEach((_, index) => {
-          if (!this.columnasNoUtilizadas.includes(index) && index !== 8 && index !== 9) {
-            fila['tipo' + index] = informe.tiposAnomalias[index];
-          }
-        });
-
         this.filas.push(fila);
 
         if (this.filas.length === informes.length) {
@@ -141,8 +177,8 @@ export class DownloadExcelPortfolioComponent implements OnInit {
 
   private downloadExcel() {
     this.excelService.exportAsExcelFile(
-      this.columnas,
-      this.headersColors,
+      Object.values(this.columnas),
+      Object.values(this.headersColors),
       this.filas,
       this.excelFileName,
       this.sheetName,
@@ -154,57 +190,41 @@ export class DownloadExcelPortfolioComponent implements OnInit {
     const plantas = this.portfolioControlService.listaPlantas;
     const informes = this.portfolioControlService.listaInformes;
 
-    // plantasPendientes = plantasPendientes.filter(
-    //   (planta) =>
-    //     planta.id !== 'IQYvqbIexG8vpowC0uef' &&
-    //     planta.id !== 'RJmyakiUjSS9xhOHArxl' &&
-    //     planta.id !== 'WWnA1tBqXB6UbbF8d1q4'
-    // );
+    // const plantasDuplicadas = ['IQYvqbIexG8vpowC0uef', 'RJmyakiUjSS9xhOHArxl', 'WWnA1tBqXB6UbbF8d1q4'];
 
     plantas.forEach((planta, index) => {
-      // if (index < 10) {
+      // if (index < 1) {
       const informesPlanta = informes.filter((informe) => informe.plantaId === planta.id);
 
-      let calcular = true;
-      informesPlanta.forEach((informe) => {
-        if (!informe.hasOwnProperty('tiposAnomalias')) {
-          calcular = true;
-        }
-      });
+      let criterio: CritCriticidad;
 
-      if (calcular) {
-        // let rangos;
+      this.anomaliaService
+        .getCriterioId(planta)
+        .pipe(
+          take(1),
+          switchMap((criterioId) => this.plantaService.getCriterioCriticidad(criterioId)),
+          take(1),
+          switchMap((crit) => {
+            criterio = crit;
+            this.anomaliaService.criterioCriticidad = crit;
+            return this.anomaliaService.getAnomaliasPlanta$(planta.id, informesPlanta);
+          })
+        )
+        .pipe(take(1))
+        .subscribe((anoms) => {
+          let anomalias = anoms.filter((anom) => anom.criticidad !== null);
 
-        // const criterioId = criteriosId[index];
+          // quitamos anomalias de tipos no usados
+          anomalias = anomalias.filter((anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo));
 
-        // rangos = criterios.find((criterio) => criterio.id === criterioId).rangosDT;
+          // console.log('PlantaId: ' + planta.id + ' - ' + planta.nombre);
 
-        let criterio: CritCriticidad;
+          this.reportControlService.setTiposAnomaliaInformesPlanta(anomalias, informesPlanta, criterio.rangosDT);
 
-        console.log('PlantaId: ' + planta.id + ' - ' + planta.nombre);
-        this.anomaliaService
-          .getCriterioId(planta)
-          .pipe(
-            take(1),
-            switchMap((criterioId) => this.plantaService.getCriterioCriticidad(criterioId)),
-            take(1),
-            switchMap((crit) => {
-              criterio = crit;
-              this.anomaliaService.criterioCriticidad = crit;
-              return this.anomaliaService.getAnomaliasPlanta$(planta.id, informesPlanta);
-            })
-          )
-          .pipe(take(1))
-          .subscribe((anoms) => {
-            const anomalias = anoms.filter((anom) => anom.criticidad !== null);
+          this.reportControlService.setNumAnomsByCoA(anomalias, informesPlanta);
 
-            this.reportControlService.setTiposAnomaliaInformesPlanta(anomalias, informesPlanta, criterio.rangosDT);
-
-            this.reportControlService.setNumAnomsByCoA(anomalias, informesPlanta);
-
-            this.reportControlService.setNumAnomsByCriticidad(anomalias, informesPlanta, criterio);
-          });
-      }
+          this.reportControlService.setNumAnomsByCriticidad(anomalias, informesPlanta, criterio);
+        });
       // }
     });
   }
