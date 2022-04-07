@@ -59,6 +59,7 @@ export let GLOBAL = {
   colores_clase: ['#20B2AA', '#FF4500', '#b70000'],
   labels_criticidad: ['Muy baja', 'Baja', 'Media', 'Alta', 'Muy Alta'],
   tipos_criticidad: [1, 2, 3, 4, 5],
+  tipos_no_utilizados: [0, 1, 2, 4, 13, 16],
   labels_tipos: [
     '0',
     'PC',
@@ -83,30 +84,6 @@ export let GLOBAL = {
     'PID regular', // 20
     'PID irregular', // 21
   ],
-  colores_tipos_hex: [
-    'rgba(0, 0, 0, 1)', // '0',
-    'rgba(0, 200, 0)', // 'PC',
-    'rgba(0, 135, 0)', // 'VPV',
-    '#feb019', // 'Substring en CA',
-    '#ff0000', // 'String',
-    'rgba(255, 112, 112,1)', // 'Módulo en CA',
-    'rgba(220, 255, 0,1)', // 'Substring en CC',
-    'rgba(170, 100, 0,1)', // 'Módulo en CC',
-    '#00e396', // 'Célula',
-    '#128254', // 'Varias células',
-    '#ffc800', // '2x Substring CA', // 10nunca más largo que esto, por estética en tabla anexos
-    'rgba(170, 0, 255,1)', // 'Suciedad',
-    'rgba(0, 0, 0,1)', // 'Vidrio roto',
-    'rgba(0, 190, 190,1)', // 'Resist. anómala',
-    'rgba(40, 0, 240,1)', // 'Caja conexiones',
-    'rgba(170, 0, 255,1)', // 'Sombras', // 15
-    'rgba(255, 255, 255,1)', // 'Yellowing', // 16
-    '#fd504d', // 'Módulo en CA (string)', // 17
-    '#9B0000', // 'PID fase temprana', // 18
-    'rgba(196, 196, 196,1)', // 'Falta módulo', // 19
-    '#9B0000', // 'PID regular', // 20
-    '#9B0000', // 'PID irregular', // 21
-  ],
   colores_tipos: [
     'rgba(0, 0, 0, 1)', // '0',
     'rgba(0, 200, 0)', // 'PC',
@@ -119,7 +96,7 @@ export let GLOBAL = {
     'rgba(0, 227, 150, 1)', // 'Célula',
     'rgba(18, 130, 84, 1)', // 'Varias células',
     'rgba(255, 200, 0, 1)', // '2x Substring CA', // nunca más largo que esto, por estética en tabla anexos
-    'rgba(170, 0, 255, 1)', // 'Suciedad',
+    'rgba(0, 190, 190, 1)', // 'Suciedad',
     'rgba(0, 0, 0, 1)', // 'Vidrio roto',
     'rgba(0, 190, 190, 1)', // 'Resist. anómala',
     'rgba(40, 0, 240, 1)', // 'Caja conexiones',
@@ -128,8 +105,8 @@ export let GLOBAL = {
     'rgba(255, 0, 0, 1)', // 'Módulo en CA (string)', // 17
     'rgba(155, 0, 0, 1)', // 'PID fase temprana', // 18
     'rgba(196, 196, 196, 1)', // 'Falta módulo', // 19
-    'rgba(155, 0, 0, 1)', // 'PID regular', // 20
-    'rgba(155, 0, 0, 1)', // 'PID irregular', // 21
+    'rgba(115, 115, 115, 1)', // 'PID regular', // 20
+    'rgba(0, 0, 153, 1)', // 'PID irregular', // 21
   ],
   labels_bloqueadas: [0, 1, 2, 4, 16],
   pcDescripcion: [

@@ -16,6 +16,7 @@ import { CritCoA } from '@core/models/critCoA';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { PcInterface } from '@core/models/pc';
 import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
 
 @Injectable({
   providedIn: 'root',
@@ -89,12 +90,16 @@ export class AnomaliaService {
     );
   }
 
-  getAnomaliasPlanta$(plantaId: string): Observable<Anomalia[]> {
+  getAnomaliasPlanta$(plantaId: string, informesPlanta?: InformeInterface[]): Observable<Anomalia[]> {
     const query$ = this.informeService.getInformesDePlanta(plantaId).pipe(
       take(1),
       switchMap((informes) => {
         // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
         informes = this.informeService.getOnlyNewInfomesFijas(informes);
+
+        if (informesPlanta !== undefined) {
+          informes = informesPlanta;
+        }
 
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
         informes.forEach((informe) => {
@@ -173,6 +178,16 @@ export class AnomaliaService {
       );
 
     return query$;
+  }
+
+  getRealAnomalias(anomalias: Anomalia[]): Anomalia[] {
+    // quitamos las anomalias con criticidad null ya que no son anomalias para el cliente
+    let realAnomalias = anomalias.filter((anom) => anom.criticidad !== null);
+
+    // quitamos las anomalias de tipos en desuso
+    realAnomalias = realAnomalias.filter((anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo));
+
+    return realAnomalias;
   }
 
   async updateAnomalia(anomalia: Anomalia) {

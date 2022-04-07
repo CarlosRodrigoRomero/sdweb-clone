@@ -1,6 +1,9 @@
 import { LatLngLiteral } from '@agm/core';
+
 import { Coordinate } from 'ol/coordinate';
 import { fromLonLat } from 'ol/proj';
+
+import { GLOBAL } from '@core/services/global';
 
 import { Anomalia } from './anomalia';
 import { FilterableElement } from './filterableInterface';
@@ -44,7 +47,9 @@ export class Seguidor implements FilterableElement {
   ) {
     this.anomalias = anomalias;
     // tslint:disable-next-line: triple-equals
-    this.anomaliasCliente = anomalias.filter((anom) => anom.tipo != 0 && anom.criticidad !== null);
+    this.anomaliasCliente = anomalias.filter(
+      (anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo) && anom.criticidad !== null
+    );
     this.plantaId = plantaId;
     this.filas = filas;
     this.columnas = columnas;

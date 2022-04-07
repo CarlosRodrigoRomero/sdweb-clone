@@ -70,7 +70,7 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
                 temperaturaMax: anom.temperaturaMax,
                 gradiente: anom.gradienteNormalizado,
                 gradienteNormalizado: anom.gradienteNormalizado,
-                color: GLOBAL.colores_tipos_hex[anom.tipo],
+                color: GLOBAL.colores_tipos[anom.tipo],
                 clase: anom.clase,
                 anomalia: anom,
                 selected: false,

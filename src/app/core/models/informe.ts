@@ -33,4 +33,6 @@ export interface InformeInterface {
   camara?: string;
   camaraSN?: number;
   tiposAnomalias?: any[];
+  numsCoA?: number[];
+  numsCriticidad?: number[];
 }

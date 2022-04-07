@@ -1,9 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
+import { switchMap, take } from 'rxjs/operators';
+
 import { PortfolioControlService } from '@core/services/portfolio-control.service';
 import { ExcelService } from '@core/services/excel.service';
 import { GLOBAL } from '@core/services/global';
+import { AnomaliaService } from '@core/services/anomalia.service';
+import { PlantaService } from '@core/services/planta.service';
+
+import { ReportControlService } from '@core/services/report-control.service';
+import { CritCriticidad } from '@core/models/critCriticidad';
 
 @Component({
   selector: 'app-download-excel-portfolio',
@@ -13,13 +20,21 @@ import { GLOBAL } from '@core/services/global';
 })
 export class DownloadExcelPortfolioComponent implements OnInit {
   userDemo = false;
-  private columnas: string[][] = [
-    ['Nombre planta', 'Fecha inspección', 'Potencia (MW)', 'Tipo', 'MAE (%)', 'Nº total anomalías'],
-    ['Células calientes (%)', 'Nº total céls. calientes'],
-    [],
-  ];
-  private columnasNoUtilizadas: number[] = [0, 1, 2, 4, 13, 16];
-  private headersColors = ['FFE5E7E9', 'FFF5B7B1', 'FFD4EFDF'];
+  private columnas = {
+    general: ['Nombre planta', 'Fecha inspección', 'Potencia (MW)', 'Tipo', 'MAE (%)', 'Nº total anomalías'],
+    coa: ['CoA 1', 'CoA 2', 'CoA 3'],
+    criticidad: [],
+    tipos: [],
+    ccs: ['Células calientes (%)', 'Nº total céls. calientes'],
+  };
+  private tiposAnomsNoUtilizados: number[] = GLOBAL.tipos_no_utilizados;
+  private headersColors = {
+    general: 'FFE5E7E9',
+    coa: 'fff9cb9c',
+    criticidad: 'ffd9d2e9',
+    tipos: 'FFB8CCE4',
+    ccs: 'FFF5B7B1',
+  };
   private filas: any[] = [];
   private sheetName = 'Portfolio';
   private excelFileName = 'Portfolio';
@@ -27,13 +42,20 @@ export class DownloadExcelPortfolioComponent implements OnInit {
   constructor(
     private portfolioControlService: PortfolioControlService,
     private excelService: ExcelService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private anomaliaService: AnomaliaService,
+    private reportControlService: ReportControlService,
+    private plantaService: PlantaService
   ) {}
 
   ngOnInit(): void {
     if (this.portfolioControlService.user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
       this.userDemo = true;
     }
+
+    this.portfolioControlService.criterioCriticidad.labels.forEach((label, index) => {
+      this.columnas.criticidad.push('Criticidad ' + label);
+    });
 
     this.portfolioControlService.criterioCriticidad.rangosDT.forEach((rango, index, rangos) => {
       let columna: string;
@@ -43,12 +65,14 @@ export class DownloadExcelPortfolioComponent implements OnInit {
         columna = 'Cels. calientes por ΔT Max (norm) >' + rango + 'ºC';
       }
 
-      this.columnas[1].push(columna);
+      this.columnas.ccs.push(columna);
     });
 
-    GLOBAL.labels_tipos.forEach((tipo, index) => {
-      if (!this.columnasNoUtilizadas.includes(index) && index !== 8 && index !== 9) {
-        this.columnas[2].push(tipo);
+    GLOBAL.sortedAnomsTipos.forEach((tipo) => {
+      const labels = GLOBAL.labels_tipos;
+
+      if (!this.tiposAnomsNoUtilizados.includes(tipo) && tipo !== 8 && tipo !== 9) {
+        this.columnas.tipos.push(labels[tipo]);
       }
     });
   }
@@ -98,6 +122,34 @@ export class DownloadExcelPortfolioComponent implements OnInit {
 
         fila['numAnomalias'] = numAnomalias;
 
+        /* ANOMALIAS POR CLASE */
+        if (informe.hasOwnProperty('numsCoA')) {
+          informe.numsCoA.forEach((coa, index) => (fila[`coa${index + 1}`] = coa));
+        } else {
+          fila['coa1'] = 0;
+          fila['coa2'] = 0;
+          fila['coa3'] = 0;
+        }
+
+        /* ANOMALIAS POR CRITICIDAD */
+        if (informe.hasOwnProperty('numsCriticidad')) {
+          this.portfolioControlService.criterioCriticidad.labels.forEach(
+            (_, index) => (fila[`criticidad${index + 1}`] = informe.numsCriticidad[index])
+          );
+        } else {
+          this.portfolioControlService.criterioCriticidad.labels.forEach(
+            (_, index) => (fila[`criticidad${index + 1}`] = 0)
+          );
+        }
+
+        /* ANOMALIAS POR TIPO */
+        GLOBAL.sortedAnomsTipos.forEach((tipo) => {
+          if (!this.tiposAnomsNoUtilizados.includes(tipo) && tipo !== 8 && tipo !== 9) {
+            fila['tipo' + tipo] = informe.tiposAnomalias[tipo];
+          }
+        });
+
+        /* CELULAS CALIENTES */
         let cc = null;
         if (informe.hasOwnProperty('cc') && informe.cc !== null && !isNaN(informe.cc)) {
           cc = Math.round(informe.cc * 10000) / 100;
@@ -114,12 +166,6 @@ export class DownloadExcelPortfolioComponent implements OnInit {
           fila['cc' + (index + 1)] = ccsRango;
         });
 
-        GLOBAL.labels_tipos.forEach((_, index) => {
-          if (!this.columnasNoUtilizadas.includes(index) && index !== 8 && index !== 9) {
-            fila['tipo' + index] = informe.tiposAnomalias[index];
-          }
-        });
-
         this.filas.push(fila);
 
         if (this.filas.length === informes.length) {
@@ -131,12 +177,55 @@ export class DownloadExcelPortfolioComponent implements OnInit {
 
   private downloadExcel() {
     this.excelService.exportAsExcelFile(
-      this.columnas,
-      this.headersColors,
+      Object.values(this.columnas),
+      Object.values(this.headersColors),
       this.filas,
       this.excelFileName,
       this.sheetName,
       undefined
     );
+  }
+
+  calculate() {
+    const plantas = this.portfolioControlService.listaPlantas;
+    const informes = this.portfolioControlService.listaInformes;
+
+    // const plantasDuplicadas = ['IQYvqbIexG8vpowC0uef', 'RJmyakiUjSS9xhOHArxl', 'WWnA1tBqXB6UbbF8d1q4'];
+
+    plantas.forEach((planta, index) => {
+      // if (index < 1) {
+      const informesPlanta = informes.filter((informe) => informe.plantaId === planta.id);
+
+      let criterio: CritCriticidad;
+
+      this.anomaliaService
+        .getCriterioId(planta)
+        .pipe(
+          take(1),
+          switchMap((criterioId) => this.plantaService.getCriterioCriticidad(criterioId)),
+          take(1),
+          switchMap((crit) => {
+            criterio = crit;
+            this.anomaliaService.criterioCriticidad = crit;
+            return this.anomaliaService.getAnomaliasPlanta$(planta.id, informesPlanta);
+          })
+        )
+        .pipe(take(1))
+        .subscribe((anoms) => {
+          informesPlanta.forEach((informe) => {
+            let anomaliasInforme = anoms.filter((anom) => anom.informeId === informe.id);
+
+            // descartamos las anomalias que no lo son para el cliente
+            anomaliasInforme = this.anomaliaService.getRealAnomalias(anomaliasInforme);
+
+            this.reportControlService.setTiposAnomInforme(anomaliasInforme, informe, criterio);
+
+            this.reportControlService.setNumAnomsCoAInforme(anomaliasInforme, informe);
+
+            this.reportControlService.setNumAnomsCritInforme(anomaliasInforme, informe, criterio);
+          });
+        });
+      // }
+    });
   }
 }
