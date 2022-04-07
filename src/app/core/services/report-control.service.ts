@@ -19,6 +19,7 @@ import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { LocationAreaInterface } from '@core/models/location';
 import { GLOBAL } from './global';
+import { CritCriticidad } from '@core/models/critCriticidad';
 
 @Injectable({
   providedIn: 'root',
@@ -100,8 +101,8 @@ export class ReportControlService {
                 take(1)
               )
               .subscribe((anoms) => {
-                // filtramos las anomalias por criterio de criticidad del cliente
-                this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
+                // filtramos las anomalias que ya no consideramos anomalias
+                this.allFilterableElements = this.anomaliaService.getRealAnomalias(anoms);
 
                 // ordenamos las anomalias por tipo
                 this.allFilterableElements = this.anomaliaService.sortAnomsByTipo(
@@ -114,8 +115,8 @@ export class ReportControlService {
                   this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
                 }
 
-                // guardamos el numero de anomalias de cada tipo por informe en la DB
-                this.setTiposAnomaliaInformes(this.allFilterableElements as Anomalia[]);
+                // guardamos los datos de los diferentes recuentos de anomalias en el informe
+                this.setCountAnomsInformesPlanta(this.allFilterableElements as Anomalia[]);
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
                 this.setMaeInformesPlantaFija(this.allFilterableElements as Anomalia[]);
@@ -174,9 +175,8 @@ export class ReportControlService {
                         take(1)
                       )
                       .subscribe((anoms) => {
-                        // filtramos las anomalias por criterio de criticidad del cliente
-                        // tslint:disable-next-line: triple-equals
-                        this.allFilterableElements = anoms.filter((anom) => anom.criticidad !== null);
+                        // filtramos las anomalias que ya no consideramos anomalias
+                        this.allFilterableElements = this.anomaliaService.getRealAnomalias(anoms);
 
                         // ordenamos las anomalias por tipo
                         this.allFilterableElements = this.anomaliaService.sortAnomsByTipo(
@@ -218,9 +218,8 @@ export class ReportControlService {
                         take(1)
                       )
                       .subscribe((anoms) => {
-                        // filtramos las anomalias por criterio de criticidad del cliente
-                        // tslint:disable-next-line: triple-equals
-                        this.allFilterableElements = anoms.filter((anom) => anom.tipo != 0 && anom.criticidad !== null);
+                        // filtramos las anomalias que ya no consideramos anomalias
+                        this.allFilterableElements = this.anomaliaService.getRealAnomalias(anoms);
 
                         // ordenamos las anomalias por tipo
                         this.allFilterableElements = this.anomaliaService.sortAnomsByTipo(
@@ -276,8 +275,8 @@ export class ReportControlService {
               .subscribe((segs) => {
                 this.allFilterableElements = segs;
 
-                // guardamos el numero de anomalias de cada tipo por informe en la DB
-                this.setTiposAnomaliaInformes(this.allFilterableElements as Seguidor[]);
+                // guardamos los datos de los diferentes recuentos de anomalias en el informe
+                this.setCountAnomsInformesPlanta(this.allFilterableElements as Seguidor[]);
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
                 this.setMaeInformesPlantaSeguidores(segs);
@@ -414,14 +413,7 @@ export class ReportControlService {
 
   private setMaeInformesPlantaSeguidores(seguidores: Seguidor[]) {
     this.informes.forEach((informe) => {
-      if (
-        // tslint:disable-next-line: triple-equals
-        informe.mae == 0 ||
-        informe.mae === undefined ||
-        informe.mae === null ||
-        isNaN(informe.mae) ||
-        informe.mae === Infinity
-      ) {
+      if (this.checkIfNumberValueWrong(informe.mae)) {
         const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
         let mae = 0;
         seguidoresInforme.forEach((seg) => (mae = mae + seg.mae));
@@ -434,14 +426,7 @@ export class ReportControlService {
 
   private setMaeInformesPlantaFija(anomalias: Anomalia[]) {
     this.informes.forEach((informe) => {
-      if (
-        // tslint:disable-next-line: triple-equals
-        informe.mae == 0 ||
-        informe.mae === undefined ||
-        informe.mae === null ||
-        isNaN(informe.mae) ||
-        informe.mae === Infinity
-      ) {
+      if (this.checkIfNumberValueWrong(informe.mae)) {
         if (anomalias.length > 0) {
           const perdidas = anomalias.map((anom) => anom.perdidas);
           let perdidasTotales = 0;
@@ -459,14 +444,7 @@ export class ReportControlService {
 
   private setCCInformesPlantaSeguidores(seguidores: Seguidor[]) {
     this.informes.forEach((informe) => {
-      if (
-        // tslint:disable-next-line: triple-equals
-        informe.cc == 0 ||
-        informe.cc === undefined ||
-        informe.cc === null ||
-        isNaN(informe.cc) ||
-        informe.cc === Infinity
-      ) {
+      if (this.checkIfNumberValueWrong(informe.cc)) {
         const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
         let cc = 0;
         seguidoresInforme.forEach((seg) => (cc = cc + seg.celsCalientes));
@@ -479,14 +457,7 @@ export class ReportControlService {
 
   private setCCInformesPlantaFija(anomalias: Anomalia[]) {
     this.informes.forEach((informe) => {
-      if (
-        // tslint:disable-next-line: triple-equals
-        informe.cc == 0 ||
-        informe.cc === undefined ||
-        informe.cc === null ||
-        isNaN(informe.cc) ||
-        informe.cc === Infinity
-      ) {
+      if (this.checkIfNumberValueWrong(informe.cc)) {
         if (anomalias.length > 0) {
           // tslint:disable-next-line: triple-equals
           const celCals = anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
@@ -501,7 +472,22 @@ export class ReportControlService {
     });
   }
 
-  private setTiposAnomaliaInformes(elems: Anomalia[] | Seguidor[]) {
+  private checkIfNumberValueWrong(value: any): boolean {
+    if (
+      // tslint:disable-next-line: triple-equals
+      value == 0 ||
+      value === undefined ||
+      value === null ||
+      isNaN(value) ||
+      value === Infinity
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private setCountAnomsInformesPlanta(elems: Anomalia[] | Seguidor[]) {
     let anomalias: Anomalia[] = [];
     if (elems.length > 0) {
       if (elems[0].hasOwnProperty('tipo')) {
@@ -511,57 +497,124 @@ export class ReportControlService {
           anomalias.push(...(elem as Seguidor).anomaliasCliente);
         });
       }
-    }
 
-    this.informes.forEach((informe) => {
-      const tiposAnomalias = new Array(GLOBAL.labels_tipos.length);
-
-      if (elems.length > 0) {
+      this.informes.forEach((informe) => {
         const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
 
-        GLOBAL.labels_tipos.forEach((_, index) => {
-          // las celulas calientes las dividimos por gradiente normalizado segun el criterio de criticidad de la empresa
-          if (index === 8 || index === 9) {
-            const ccGradNorm: number[] = [];
-            // tslint:disable-next-line: triple-equals
-            const ccs = anomaliasInforme.filter((anom) => anom.tipo == index);
+        // guardamos el recuento de anomalias por tipo
+        this.setTiposAnomInforme(anomaliasInforme, informe);
 
-            this.anomaliaService.criterioCriticidad.rangosDT.forEach((rango, i, rangos) => {
-              if (i < rangos.length - 1) {
-                ccGradNorm.push(
-                  ccs.filter((anom) => anom.gradienteNormalizado >= rango).length -
-                    ccs.filter((anom) => anom.gradienteNormalizado >= rangos[i + 1]).length
-                );
-              } else {
-                ccGradNorm.push(ccs.filter((anom) => anom.gradienteNormalizado >= rango).length);
-              }
-            });
+        // guardamos el recuento de anomalias por clase
+        this.setNumAnomsCoAInforme(anomaliasInforme, informe);
 
-            tiposAnomalias[index] = ccGradNorm;
-          } else {
-            // tslint:disable-next-line: triple-equals
-            tiposAnomalias[index] = anomaliasInforme.filter((anom) => anom.tipo == index).length;
-          }
-        });
-      } else {
-        GLOBAL.labels_tipos.forEach((_, index) => {
-          if (index === 8 || index === 9) {
-            const ccGradNorm: number[] = [];
-            this.anomaliaService.criterioCriticidad.rangosDT.forEach(() => ccGradNorm.push(0));
-            tiposAnomalias[index] = ccGradNorm;
-          } else {
-            tiposAnomalias[index] = 0;
-          }
-        });
+        // guardamos el recuento de anomalias por criticidad
+        this.setNumAnomsCritInforme(anomaliasInforme, informe);
+      });
+    }
+  }
+
+  setTiposAnomInforme(anomalias: Anomalia[], informe: InformeInterface, criterio?: CritCriticidad) {
+    if (anomalias.length > 0 && !informe.hasOwnProperty('tiposAnomalias')) {
+      let rangosDT = this.anomaliaService.criterioCriticidad.rangosDT;
+      if (criterio !== undefined) {
+        rangosDT = criterio.rangosDT;
       }
+
+      const tiposAnomalias = new Array(GLOBAL.labels_tipos.length);
+
+      GLOBAL.labels_tipos.forEach((_, index) => {
+        // las celulas calientes las dividimos por gradiente normalizado segun el criterio de criticidad de la empresa
+        if (index === 8 || index === 9) {
+          const ccGradNorm: number[] = [];
+          // tslint:disable-next-line: triple-equals
+          const ccs = anomalias.filter((anom) => anom.tipo == index);
+
+          rangosDT.forEach((rango, i, rangs) => {
+            if (i < rangs.length - 1) {
+              ccGradNorm.push(
+                ccs.filter((anom) => anom.gradienteNormalizado >= rango).length -
+                  ccs.filter((anom) => anom.gradienteNormalizado >= rangs[i + 1]).length
+              );
+            } else {
+              ccGradNorm.push(ccs.filter((anom) => anom.gradienteNormalizado >= rango).length);
+            }
+          });
+
+          tiposAnomalias[index] = ccGradNorm;
+        } else {
+          // tslint:disable-next-line: triple-equals
+          tiposAnomalias[index] = anomalias.filter((anom) => anom.tipo == index).length;
+        }
+      });
 
       informe.tiposAnomalias = tiposAnomalias;
 
-      this.informeService.updateInforme(informe);
-    });
+      const sumTiposAnoms = tiposAnomalias.reduce((acum, curr, index) => {
+        if (index === 8 || index === 9) {
+          return acum + curr.reduce((a, c) => a + c);
+        } else {
+          return acum + curr;
+        }
+      });
+
+      if (sumTiposAnoms === anomalias.length) {
+        this.informeService.updateInforme(informe);
+      } else {
+        console.log('Informe ' + informe.id + ' no actualizado. PlantaId: ' + informe.plantaId);
+      }
+    }
   }
 
-  public sortLocAreas(locAreas: LocationAreaInterface[]) {
+  setNumAnomsCoAInforme(anomalias: Anomalia[], informe: InformeInterface): void {
+    if (anomalias.length > 0 && !informe.hasOwnProperty('numsCoA')) {
+      const numsCoA: number[] = [
+        // tslint:disable-next-line: triple-equals
+        anomalias.filter((anom) => anom.clase == 1).length,
+        // tslint:disable-next-line: triple-equals
+        anomalias.filter((anom) => anom.clase == 2).length,
+        // tslint:disable-next-line: triple-equals
+        anomalias.filter((anom) => anom.clase == 3).length,
+      ];
+
+      informe.numsCoA = numsCoA;
+
+      const sumCoAs = numsCoA[0] + numsCoA[1] + numsCoA[2];
+
+      if (sumCoAs === anomalias.length) {
+        this.informeService.updateInforme(informe);
+      } else {
+        console.log('Informe ' + informe.id + ' no actualizado. PlantaId: ' + informe.plantaId);
+      }
+    }
+  }
+
+  setNumAnomsCritInforme(anomalias: Anomalia[], informe: InformeInterface, criterio?: CritCriticidad): void {
+    if (anomalias.length > 0 && !informe.hasOwnProperty('numsCriticidad')) {
+      let rangosDT = this.anomaliaService.criterioCriticidad.rangosDT;
+      if (criterio !== undefined) {
+        rangosDT = criterio.rangosDT;
+        this.anomaliaService.criterioCriticidad = criterio;
+      }
+
+      const numsCriticidad: number[] = [];
+      rangosDT.forEach((rangoDT, index) =>
+        // tslint:disable-next-line: triple-equals
+        numsCriticidad.push(anomalias.filter((anom) => anom.criticidad == index).length)
+      );
+
+      informe.numsCriticidad = numsCriticidad;
+
+      const sumCrits = numsCriticidad.reduce((prev, current) => prev + current);
+
+      if (sumCrits === anomalias.length) {
+        this.informeService.updateInforme(informe);
+      } else {
+        console.log('Informe ' + informe.id + ' no actualizado. PlantaId: ' + informe.plantaId);
+      }
+    }
+  }
+
+  sortLocAreas(locAreas: LocationAreaInterface[]) {
     // comprobamos si el nombre de las zonas es un numero
     if (!isNaN(parseFloat(locAreas[0].globalCoords[0]))) {
       locAreas = locAreas.sort((a, b) => parseFloat(a.globalCoords[0]) - parseFloat(b.globalCoords[0]));
