@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+
+import { Subscription } from 'rxjs';
 
 import { GLOBAL } from '@core/services/global';
 import { AnomaliaService } from '@core/services/anomalia.service';
@@ -11,15 +13,19 @@ import { Anomalia } from '@core/models/anomalia';
   templateUrl: './anom-tipo-control.component.html',
   styleUrls: ['./anom-tipo-control.component.css'],
 })
-export class AnomTipoLegendComponent implements OnInit {
+export class AnomTipoLegendComponent implements OnInit, OnDestroy {
   tiposAnomalia: string[] = GLOBAL.labels_tipos;
   anomaliaColors: string[] = GLOBAL.colores_tipos;
   anomaliaSelected: Anomalia = undefined;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(private classificationService: ClassificationService, private anomaliaService: AnomaliaService) {}
 
   ngOnInit(): void {
-    this.classificationService.anomaliaSelected$.subscribe((anom) => (this.anomaliaSelected = anom));
+    this.subscriptions.add(
+      this.classificationService.anomaliaSelected$.subscribe((anom) => (this.anomaliaSelected = anom))
+    );
   }
 
   updateAnomalia(tipo: number) {
@@ -34,5 +40,9 @@ export class AnomTipoLegendComponent implements OnInit {
       // reseteamos lo seleccionado
       this.classificationService.resetElemsSelected();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
