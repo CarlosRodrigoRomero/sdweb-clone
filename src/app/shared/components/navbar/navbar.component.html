@@ -19,6 +19,9 @@
   <span class="example-spacer"></span>
 
   <div class="right">
+    <!-- MENU ALERTAS INFORME TERMINADO -->
+    <app-warnings-menu *ngIf="isAdmin && !isPortfolio"></app-warnings-menu>
+
     <!-- <app-switch-theme></app-switch-theme> -->
 
     <!-- BOTON NOTIFICACIONES PROVISIONAL -->

@@ -23,13 +23,14 @@ interface Notification {
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit, OnDestroy {
-  public isShared = false;
-  public userLogged: boolean;
+  isShared = false;
+  userLogged: boolean;
   private user: UserInterface;
-  public isAdmin: boolean;
+  isAdmin: boolean;
   loadSummary = false;
   hasNotifications = false;
   notifications: Notification[] = [];
+  isPortfolio = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -55,6 +56,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
           this.isAdmin = this.authService.userIsAdmin(user);
         })
       );
+      if (this.router.url.includes('plants')) {
+        this.isPortfolio = true;
+      }
     }
 
     this.subscriptions.add(

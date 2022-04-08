@@ -23,6 +23,7 @@ import { PlantSummaryComponent } from './components/plant-summary/plant-summary.
 import { MatSelectedSearchComponent } from './components/mat-selected-search/mat-selected-search.component';
 import { MatDialogConfirmComponent } from './components/mat-dialog-confirm/mat-dialog-confirm.component';
 import { LoadingComponent } from './components/loading/loading.component';
+import { WarningsMenuComponent } from './components/warnings-menu/warnings-menu.component';
 
 const components = [
   NavbarComponent,
@@ -47,7 +48,7 @@ const modules = [
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];
 
 @NgModule({
-  declarations: [...components, ...pipes, MatDialogConfirmComponent],
+  declarations: [...components, ...pipes, MatDialogConfirmComponent, WarningsMenuComponent],
   imports: [...modules],
   exports: [...components, ...modules, ...pipes],
 })
