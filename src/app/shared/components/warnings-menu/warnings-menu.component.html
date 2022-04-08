@@ -1,5 +1,5 @@
 <button class="btn-notif" mat-icon-button [matMenuTriggerFor]="warningMenu">
-  <mat-icon matBadge="{{ warnings.length }}" matBadgeColor="primary">bug_report</mat-icon>
+  <mat-icon matBadge="{{ warnings.length > 0 ? warnings.length : '✓' }}" matBadgeColor="primary">bug_report</mat-icon>
 </button>
 <mat-menu class="notif-menu" #warningMenu="matMenu">
   <button mat-menu-item *ngFor="let warning of warnings">
