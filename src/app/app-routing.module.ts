@@ -1,7 +1,9 @@
 import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 import { NgModule } from '@angular/core';
-import { AvisoLegalComponent } from './cts/aviso-legal/aviso-legal.component';
-import { AuthGuard } from './core/services/auth.guard';
+
+import { AuthGuard } from '@core/services/auth.guard';
+
+import { AvisoLegalComponent } from '@shared/components/aviso-legal/aviso-legal.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'clients', pathMatch: 'full' },
@@ -60,9 +62,9 @@ export const routes: Routes = [
   providers: [],
   imports: [
     RouterModule.forRoot(routes, {
-    preloadingStrategy: PreloadAllModules,
-    relativeLinkResolution: 'legacy'
-}),
+      preloadingStrategy: PreloadAllModules,
+      relativeLinkResolution: 'legacy',
+    }),
   ],
   exports: [RouterModule],
 })
