@@ -76,12 +76,18 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
             this.checkNumsCriticidad();
             this.checkFilsColsPlanta();
             this.checkZones();
+            this.checkZoneNames();
           }
         })
     );
   }
 
   fixProblem(type: string) {
+    const urlPlantaEdit = this.router.serializeUrl(this.router.createUrlTree(['admin/plants/edit/' + this.planta.id]));
+    const urlLocalizaciones = this.router.serializeUrl(
+      this.router.createUrlTree(['clientes/auto-loc/' + this.planta.id])
+    );
+
     switch (type) {
       case 'tiposAnom':
         this.reportControlService.setTiposAnomInforme(this.anomaliasInforme, this.selectedInforme, true);
@@ -93,16 +99,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         this.reportControlService.setNumAnomsCritInforme(this.anomaliasInforme, this.selectedInforme, true);
         break;
       case 'filsColsPlanta':
-        const urlFilsCols = this.router.serializeUrl(
-          this.router.createUrlTree(['admin/plants/edit/' + this.planta.id])
-        );
-        window.open(urlFilsCols, '_blank');
+        window.open(urlPlantaEdit, '_blank');
         break;
       case 'zonasPlanta':
-        const urlZonasPlanta = this.router.serializeUrl(
-          this.router.createUrlTree(['clientes/auto-loc/' + this.planta.id])
-        );
-        window.open(urlZonasPlanta, '_blank');
+        window.open(urlLocalizaciones, '_blank');
+        break;
+      case 'nombresZonas':
+        window.open(urlPlantaEdit, '_blank');
         break;
     }
   }
@@ -162,18 +165,45 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   }
 
   private checkZones() {
-    if (!this.reportControlService.plantaFija) {
-      if (this.seguidorService.numGlobalCoords < 1) {
+    if (this.reportControlService.plantaFija) {
+      if (this.reportControlService.numFixedGlobalCoords < 1) {
         this.warnings.push({
           content: 'Faltan las zonas de la planta',
           type: 'zonasPlanta',
         });
       }
     } else {
-      if (this.reportControlService.numFixedGlobalCoords < 1) {
+      if (this.seguidorService.numGlobalCoords < 1) {
         this.warnings.push({
           content: 'Faltan las zonas de la planta',
           type: 'zonasPlanta',
+        });
+      }
+    }
+  }
+
+  private checkZoneNames() {
+    let hasZones = false;
+    if (this.reportControlService.plantaFija) {
+      if (this.reportControlService.numFixedGlobalCoords >= 1) {
+        hasZones = true;
+      }
+    } else {
+      if (this.seguidorService.numGlobalCoords >= 1) {
+        hasZones = true;
+      }
+    }
+
+    if (hasZones) {
+      if (
+        !this.planta.hasOwnProperty('nombreGlobalCoords') ||
+        this.planta.nombreGlobalCoords === null ||
+        this.planta.nombreGlobalCoords === undefined ||
+        this.planta.nombreGlobalCoords.length === 0
+      ) {
+        this.warnings.push({
+          content: 'Faltan los nombres de las zonas de la planta',
+          type: 'nombresZonas',
         });
       }
     }
