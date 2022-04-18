@@ -6,7 +6,6 @@ import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
 
 import { FilterService } from '@core/services/filter.service';
 import { FilterControlService } from '@core/services/filter-control.service';
-import { ReportControlService } from '@core/services/report-control.service';
 
 import { PerdidasFilter } from '@core/models/perdidasFilter';
 
@@ -25,11 +24,7 @@ export class PerdidasFilterComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(
-    private filterService: FilterService,
-    private filterControlService: FilterControlService,
-    private reportControlService: ReportControlService
-  ) {}
+  constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
