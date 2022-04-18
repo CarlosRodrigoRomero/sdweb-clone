@@ -1,13 +1,13 @@
 .content {
   display: flex;
   justify-content: space-between;
-  align-items: start;
+  align-items: flex-start;
   background-color: white;
 }
 
 .left-content {
   display: flex;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .left-content img {
