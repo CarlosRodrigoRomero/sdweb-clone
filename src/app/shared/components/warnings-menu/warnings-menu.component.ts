@@ -7,6 +7,7 @@ import { combineLatest, Subscription } from 'rxjs';
 import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
 import { PlantaService } from '@core/services/planta.service';
+import { SeguidorService } from '@core/services/seguidor.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -36,7 +37,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     private reportControlService: ReportControlService,
     private informeService: InformeService,
     private plantaService: PlantaService,
-    private router: Router
+    private router: Router,
+    private seguidorService: SeguidorService
   ) {}
 
   ngOnInit(): void {
@@ -73,6 +75,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
             this.checkNumsCoA();
             this.checkNumsCriticidad();
             this.checkFilsColsPlanta();
+            this.checkZones();
           }
         })
     );
@@ -90,10 +93,16 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         this.reportControlService.setNumAnomsCritInforme(this.anomaliasInforme, this.selectedInforme, true);
         break;
       case 'filsColsPlanta':
-        // this.router.navigate(['admin/plants/edit/' + this.planta.id]);
-
-        const url = this.router.serializeUrl(this.router.createUrlTree(['admin/plants/edit/' + this.planta.id]));
-        window.open(url, '_blank');
+        const urlFilsCols = this.router.serializeUrl(
+          this.router.createUrlTree(['admin/plants/edit/' + this.planta.id])
+        );
+        window.open(urlFilsCols, '_blank');
+        break;
+      case 'zonasPlanta':
+        const urlZonasPlanta = this.router.serializeUrl(
+          this.router.createUrlTree(['clientes/auto-loc/' + this.planta.id])
+        );
+        window.open(urlZonasPlanta, '_blank');
         break;
     }
   }
@@ -144,10 +153,27 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   private checkFilsColsPlanta() {
     if (!this.reportControlService.plantaFija) {
       if (this.planta.columnas <= 1 || this.planta.columnas === undefined || this.planta.columnas === null) {
-        // if (true) {
         this.warnings.push({
           content: 'El nº de filas y columnas de la planta no son correctos y por tanto MAE y CC están mal',
           type: 'filsColsPlanta',
+        });
+      }
+    }
+  }
+
+  private checkZones() {
+    if (!this.reportControlService.plantaFija) {
+      if (this.seguidorService.numGlobalCoords < 1) {
+        this.warnings.push({
+          content: 'Faltan las zonas de la planta',
+          type: 'zonasPlanta',
+        });
+      }
+    } else {
+      if (this.reportControlService.numFixedGlobalCoords < 1) {
+        this.warnings.push({
+          content: 'Faltan las zonas de la planta',
+          type: 'zonasPlanta',
         });
       }
     }

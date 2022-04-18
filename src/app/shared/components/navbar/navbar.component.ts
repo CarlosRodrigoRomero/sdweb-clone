@@ -30,7 +30,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   loadSummary = false;
   hasNotifications = false;
   notifications: Notification[] = [];
-  isPortfolio = false;
+  isReport = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -56,8 +56,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
           this.isAdmin = this.authService.userIsAdmin(user);
         })
       );
-      if (this.router.url.includes('plants')) {
-        this.isPortfolio = true;
+      if (this.router.url.includes('fixed') || this.router.url.includes('tracker')) {
+        this.isReport = true;
       }
     }
 
