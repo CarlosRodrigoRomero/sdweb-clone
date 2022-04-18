@@ -1,11 +1,17 @@
-<button class="btn-notif" mat-icon-button [matMenuTriggerFor]="warningMenu">
-  <mat-icon matBadge="{{ warnings.length > 0 ? warnings.length : '✓' }}" matBadgeColor="primary">bug_report</mat-icon>
-</button>
-<mat-menu class="notif-menu" #warningMenu="matMenu">
-  <button mat-menu-item *ngFor="let warning of warnings">
-    <div class="btn-content">
-      <mat-icon class="btn-icon">warning</mat-icon>
-      <span class="btn-label">{{ warning }}</span>
-    </div>
+<div class="content">
+  <button class="btn-notif" mat-icon-button [matMenuTriggerFor]="warningMenu">
+    <mat-icon *ngIf="warnings.length > 0" matBadge="{{ warnings.length }}" matBadgeColor="primary">bug_report</mat-icon>
   </button>
-</mat-menu>
+  <mat-menu class="notif-menu" #warningMenu="matMenu">
+    <button mat-menu-item *ngFor="let warning of warnings">
+      <div class="btn-content">
+        <mat-icon class="btn-icon">warning</mat-icon>
+        <span class="btn-label">{{ warning }}</span>
+      </div>
+    </button>
+  </mat-menu>
+
+  <div class="icon-no-warnings">
+    <mat-icon *ngIf="warnings.length === 0" matBadge="✓">bug_report</mat-icon>
+  </div>
+</div>

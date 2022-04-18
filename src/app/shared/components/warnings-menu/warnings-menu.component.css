@@ -1,0 +1,14 @@
+.content {
+  display: flex;
+  align-content: center;
+  margin-right: 2rem;
+}
+
+.icon-no-warnings {
+  display: flex;
+  align-self: center;
+}
+
+:host ::ng-deep .icon-no-warnings mat-icon .mat-badge-content {
+    background: green;
+}
