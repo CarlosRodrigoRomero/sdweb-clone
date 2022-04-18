@@ -2,7 +2,7 @@
   <mat-card-content class="card-content">
     <span class="example-list-section">
       <mat-checkbox
-        class="example-margin"
+        class="checkbox"
         [checked]="allComplete"
         [indeterminate]="someComplete()"
         (change)="setVisibilityAllLayers($event.checked)"
@@ -15,10 +15,14 @@
         <mat-icon>keyboard_arrow_down</mat-icon>
       </button>
       <mat-menu class="menu-tipo" #menu="matMenu">
-        <section class="example-section">
-          <span class="example-list-section">
+        <section class="areas-section">
+          <span>
             <li *ngFor="let subtask of task.subtasks; index as i" (click)="stopPropagation($event)">
-              <mat-checkbox [(ngModel)]="subtask.completed" (ngModelChange)="setVisibilityLayer(i)">
+              <mat-checkbox
+                class="checkbox"
+                [(ngModel)]="subtask.completed"
+                (ngModelChange)="setVisibilityLayer(i)"
+              >
                 {{ subtask.name }}
               </mat-checkbox>
             </li>

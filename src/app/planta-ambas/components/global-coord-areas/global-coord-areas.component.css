@@ -5,18 +5,16 @@
 }
 
 .global-areas-card {
-  opacity: 0.8;
+  display: flex;
+  justify-content: center;
+  opacity: 0.9;
   min-width: 250px;
   box-shadow: none !important;
   min-height: 64px;
   height: 64px;
 }
 
-.btn-menu {
-  top: -5px;
-}
-
-.example-section {
+.areas-section {
   margin: 5px 15px 0 15px;
 }
 
@@ -30,4 +28,8 @@ li {
   color: white;
   padding: 0px 6px;
   font-size: 12px;
+}
+
+:host ::ng-deep .checkbox .mat-checkbox-label {
+  /* font-size: 1rem; */
 }
