@@ -1,14 +1,17 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
 
 import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
+import { PlantaService } from '@core/services/planta.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { InformeInterface } from '@core/models/informe';
+import { PlantaInterface } from '@core/models/planta';
 
 interface Warning {
   type: string;
@@ -25,10 +28,16 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   private allAnomalias: Anomalia[] = [];
   private selectedInforme: InformeInterface;
   private anomaliasInforme: Anomalia[] = [];
+  private planta: PlantaInterface;
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
+  constructor(
+    private reportControlService: ReportControlService,
+    private informeService: InformeService,
+    private plantaService: PlantaService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -44,10 +53,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
             return combineLatest([
               this.informeService.getInformesDePlanta(this.reportControlService.plantaId),
               this.reportControlService.selectedInformeId$,
+              this.plantaService.getPlanta(this.reportControlService.plantaId),
             ]);
           })
         )
-        .subscribe(([informes, informeId]) => {
+        .subscribe(([informes, informeId, planta]) => {
+          this.planta = planta;
+
           this.selectedInforme = informes.find((informe) => informe.id === informeId);
 
           this.anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
@@ -57,9 +69,10 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
             this.warnings = [];
             // this.warnings = [{ content: 'hola', type: 'tipo' }];
 
-            this.checkTiposAnoms(this.anomaliasInforme, this.selectedInforme);
-            this.checkNumsCoA(this.anomaliasInforme, this.selectedInforme);
-            this.checkNumsCriticidad(this.anomaliasInforme, this.selectedInforme);
+            this.checkTiposAnoms();
+            this.checkNumsCoA();
+            this.checkNumsCriticidad();
+            this.checkFilsColsPlanta();
           }
         })
     );
@@ -76,12 +89,18 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       case 'numsCriticidad':
         this.reportControlService.setNumAnomsCritInforme(this.anomaliasInforme, this.selectedInforme, true);
         break;
+      case 'filsColsPlanta':
+        // this.router.navigate(['admin/plants/edit/' + this.planta.id]);
+
+        const url = this.router.serializeUrl(this.router.createUrlTree(['admin/plants/edit/' + this.planta.id]));
+        window.open(url, '_blank');
+        break;
     }
   }
 
-  private checkTiposAnoms(anomalias: Anomalia[], informe: InformeInterface) {
-    if (informe !== undefined && anomalias.length > 0) {
-      const sumTiposAnoms = informe.tiposAnomalias.reduce((acum, curr, index) => {
+  private checkTiposAnoms() {
+    if (this.selectedInforme !== undefined && this.anomaliasInforme.length > 0) {
+      const sumTiposAnoms = this.selectedInforme.tiposAnomalias.reduce((acum, curr, index) => {
         // las celulas calientes son un array por separado
         if (index === 8 || index === 9) {
           return acum + curr.reduce((a, c) => a + c);
@@ -90,7 +109,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         }
       });
 
-      if (anomalias.length !== sumTiposAnoms) {
+      if (this.anomaliasInforme.length !== sumTiposAnoms) {
         this.warnings.push({
           content: 'El nº de anomalías no coincide con la suma de los tipos de anomalías',
           type: 'tiposAnom',
@@ -99,24 +118,36 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     }
   }
 
-  private checkNumsCoA(anomalias: Anomalia[], informe: InformeInterface) {
-    if (informe !== undefined && anomalias.length > 0) {
-      const sumNumsCoA = informe.numsCoA.reduce((acum, curr) => acum + curr);
+  private checkNumsCoA() {
+    if (this.selectedInforme !== undefined && this.anomaliasInforme.length > 0) {
+      const sumNumsCoA = this.selectedInforme.numsCoA.reduce((acum, curr) => acum + curr);
 
-      if (anomalias.length !== sumNumsCoA) {
+      if (this.anomaliasInforme.length !== sumNumsCoA) {
         this.warnings.push({ content: 'El nº de anomalías no coincide con la suma de los CoA', type: 'numsCoA' });
       }
     }
   }
 
-  private checkNumsCriticidad(anomalias: Anomalia[], informe: InformeInterface) {
-    if (informe !== undefined && anomalias.length > 0) {
-      const sumNumsCriticidad = informe.numsCriticidad.reduce((acum, curr) => acum + curr);
+  private checkNumsCriticidad() {
+    if (this.selectedInforme !== undefined && this.anomaliasInforme.length > 0) {
+      const sumNumsCriticidad = this.selectedInforme.numsCriticidad.reduce((acum, curr) => acum + curr);
 
-      if (anomalias.length !== sumNumsCriticidad) {
+      if (this.anomaliasInforme.length !== sumNumsCriticidad) {
         this.warnings.push({
           content: 'El nº de anomalías no coincide con la suma de las anomalías por criticidad',
           type: 'numsCriticidad',
+        });
+      }
+    }
+  }
+
+  private checkFilsColsPlanta() {
+    if (!this.reportControlService.plantaFija) {
+      if (this.planta.columnas <= 1 || this.planta.columnas === undefined || this.planta.columnas === null) {
+        // if (true) {
+        this.warnings.push({
+          content: 'El nº de filas y columnas de la planta no son correctos y por tanto MAE y CC están mal',
+          type: 'filsColsPlanta',
         });
       }
     }
