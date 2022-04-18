@@ -4,11 +4,17 @@
   margin-right: 2rem;
 }
 
-.icon-no-warnings {
+.item-content {
   display: flex;
-  align-self: center;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.icon-no-warnings mat-icon {
+  vertical-align: bottom;
 }
 
 :host ::ng-deep .icon-no-warnings mat-icon .mat-badge-content {
-    background: green;
+  background: green;
 }
