@@ -639,71 +639,72 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     // PLANTAS FIJAS
     if (this.reportControlService.plantaFija) {
-      // if (this.informeConImagenes && this.incluirImagenes) {
-      //   // Imagenes anomalías
-      //   this.countAnomalias = 0;
-      //   this.anomaliasInforme.forEach((anomalia, index) => {
-      //     // if (index < 700) {
-      //     this.setImgAnomaliaCanvas(anomalia);
-      //     this.countAnomalias++;
-      //     // }
+      if (this.informeConImagenes && this.incluirImagenes) {
+        // Imagenes anomalías
+        this.countAnomalias = 0;
+        this.anomaliasInforme.forEach((anomalia, index) => {
+          // if (index < 700) {
+          this.setImgAnomaliaCanvas(anomalia);
+          this.countAnomalias++;
+          // }
+        });
 
-      // if (this.planta.tipo === '1 eje') {
-      //   // Imagenes S1E con anomalías
-      //   this.seguidores1ejeAnoms.forEach((seg, index) => {
-      //     // if (index < 2) {
-      //       this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
-      //     // }
-      //   });
+        // if (this.planta.tipo === '1 eje') {
+        //   // Imagenes S1E con anomalías
+        //   this.seguidores1ejeAnoms.forEach((seg, index) => {
+        //     // if (index < 2) {
+        //       this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
+        //     // }
+        //   });
 
-      //   // Imagenes S1E sin anomalías
-      //   this.seguidores1ejeNoAnoms.forEach((seg, index) => {
-      //     // if (index < 2 ) {
-      //     this.setImgSeguidor1EjeCanvas(seg, index);
-      //     // }
-      //   });
+        //   // Imagenes S1E sin anomalías
+        //   this.seguidores1ejeNoAnoms.forEach((seg, index) => {
+        //     // if (index < 2 ) {
+        //     this.setImgSeguidor1EjeCanvas(seg, index);
+        //     // }
+        //   });
 
-      //   // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-      //   let downloads = 0;
+        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+        let downloads = 0;
 
-      //   this.subscriptions.add(
-      //     combineLatest([
-      //       this.countLoadedImages$,
-      //       this.countLoadedImagesSegs1EjeAnoms$,
-      //       this.countLoadedImagesSegs1EjeNoAnoms$,
-      //     ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
-      //       this.downloadReportService.progressBarValue = Math.round(
-      //         ((countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
-      //           (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
-      //           100
-      //       );
+        this.subscriptions.add(
+          combineLatest([
+            this.countLoadedImages$,
+            this.countLoadedImagesSegs1EjeAnoms$,
+            this.countLoadedImagesSegs1EjeNoAnoms$,
+          ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
+            this.downloadReportService.progressBarValue = Math.round(
+              ((countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
+                (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
+                100
+            );
 
-      //       // comprobamos que estan cargadas tb el resto de imagenes del PDF
-      //       this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-      //         // Cuando se carguen todas las imágenes
-      //         if (
-      //           imagesLoaded &&
-      //           countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
-      //             this.countAnomalias + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length &&
-      //           downloads === 0
-      //         ) {
-      //           this.calcularInforme();
+            // comprobamos que estan cargadas tb el resto de imagenes del PDF
+            this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
+              // Cuando se carguen todas las imágenes
+              if (
+                imagesLoaded &&
+                countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
+                  this.countAnomalias + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length &&
+                downloads === 0
+              ) {
+                this.calcularInforme();
 
-      //           pdfMake
-      //             .createPdf(this.getDocDefinition(this.imageListBase64))
-      //             .download(this.getPrefijoInforme(), () => {
-      //               this.downloadReportService.progressBarValue = 0;
+                pdfMake
+                  .createPdf(this.getDocDefinition(this.imageListBase64))
+                  .download(this.getPrefijoInforme(), () => {
+                    this.downloadReportService.progressBarValue = 0;
 
-      //               this.downloadReportService.generatingDownload = false;
-      //             });
-      //           this.downloadReportService.endingDownload = true;
+                    this.downloadReportService.generatingDownload = false;
+                  });
+                this.downloadReportService.endingDownload = true;
 
-      //           downloads++;
-      //         }
-      //       });
-      //     })
-      //   );
-      // } else {
+                downloads++;
+              }
+            });
+          })
+        );
+      } else {
         // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
         let downloads = 0;
 
@@ -753,7 +754,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             });
           })
         );
-      // }
+      }
     } else {
       // PLANTAS SEGUIDORES
       // Generar imagenes
@@ -945,6 +946,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           };
         }
       },
+
+      pageMargins: [40, 60, 40, 40],
 
       styles: {
         h1: {
