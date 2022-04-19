@@ -9,12 +9,14 @@ import { InformeService } from '@core/services/informe.service';
 import { PlantaService } from '@core/services/planta.service';
 import { SeguidorService } from '@core/services/seguidor.service';
 import { FilterService } from '@core/services/filter.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 import { LocationFilter } from '@core/models/locationFilter';
+import { LocationAreaInterface } from '@core/models/location';
 
 interface Warning {
   type: string;
@@ -33,6 +35,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   private selectedInforme: InformeInterface;
   private anomaliasInforme: Anomalia[] = [];
   private planta: PlantaInterface;
+  private locAreas: LocationAreaInterface[] = [];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -42,7 +45,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     private plantaService: PlantaService,
     private router: Router,
     private seguidorService: SeguidorService,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private anomaliaService: AnomaliaService
   ) {}
 
   ngOnInit(): void {
@@ -60,11 +64,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
               this.informeService.getInformesDePlanta(this.reportControlService.plantaId),
               this.reportControlService.selectedInformeId$,
               this.plantaService.getPlanta(this.reportControlService.plantaId),
+              this.plantaService.getLocationsArea(this.reportControlService.plantaId),
             ]);
           })
         )
-        .subscribe(([informes, informeId, planta]) => {
+        .subscribe(([informes, informeId, planta, locAreas]) => {
           this.planta = planta;
+          this.locAreas = locAreas;
 
           this.selectedInforme = informes.find((informe) => informe.id === informeId);
 
@@ -73,27 +79,26 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
           if (this.selectedInforme !== undefined && this.anomaliasInforme.length > 0) {
             // reseteamos warnings con cada actualización
             this.warnings = [];
-            // this.warnings = [{ content: 'hola', type: 'tipo' }];
 
-            this.checkTiposAnoms();
-            this.checkNumsCoA();
-            this.checkNumsCriticidad();
-            this.checkFilsColsPlanta();
-            this.checkZones();
-            this.checkZoneNames();
-            this.checkFilColAnoms();
+            this.checkWanings();
           }
         })
     );
+  }
+
+  private checkWanings() {
+    this.checkTiposAnoms();
+    this.checkNumsCoA();
+    this.checkNumsCriticidad();
+    this.checkFilsColsPlanta();
+    this.checkZonesWarnings();
+    this.checkFilColAnoms();
   }
 
   fixProblem(type: string) {
     const urlPlantaEdit = this.router.serializeUrl(this.router.createUrlTree(['admin/plants/edit/' + this.planta.id]));
     const urlLocalizaciones = this.router.serializeUrl(
       this.router.createUrlTree(['clientes/auto-loc/' + this.planta.id])
-    );
-    const differentFilColAnoms = this.anomaliasInforme.filter(
-      (anom) => anom.localY > this.planta.filas || anom.localX > this.planta.columnas
     );
 
     switch (type) {
@@ -118,6 +123,12 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       case 'filsColsAnoms':
         const filColFilter: LocationFilter = new LocationFilter('location', this.planta.filas, this.planta.columnas);
         this.filterService.addFilter(filColFilter);
+        break;
+      case 'modulosPlanta':
+        window.open(urlLocalizaciones, '_blank');
+        break;
+      case 'modulosAnoms':
+        this.fixModulosAnoms();
         break;
     }
   }
@@ -189,27 +200,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     }
   }
 
-  private checkZones() {
-    if (this.reportControlService.plantaFija) {
-      if (this.reportControlService.numFixedGlobalCoords < 1) {
-        this.warnings.push({
-          content: 'Faltan las zonas de la planta',
-          type: 'zonasPlanta',
-          action: 'Ir a Localizaciones',
-        });
-      }
-    } else {
-      if (this.seguidorService.numGlobalCoords < 1) {
-        this.warnings.push({
-          content: 'Faltan las zonas de la planta',
-          type: 'zonasPlanta',
-          action: 'Ir a Localizaciones',
-        });
-      }
-    }
-  }
-
-  private checkZoneNames() {
+  private checkZonesWarnings() {
     let hasZones = false;
     if (this.reportControlService.plantaFija) {
       if (this.reportControlService.numFixedGlobalCoords >= 1) {
@@ -222,18 +213,48 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     }
 
     if (hasZones) {
-      if (
-        !this.planta.hasOwnProperty('nombreGlobalCoords') ||
-        this.planta.nombreGlobalCoords === null ||
-        this.planta.nombreGlobalCoords === undefined ||
-        this.planta.nombreGlobalCoords.length === 0
-      ) {
-        this.warnings.push({
-          content: 'Faltan los nombres de las zonas de la planta',
-          type: 'nombresZonas',
-          action: 'Ir a Editar planta',
-        });
-      }
+      this.checkZonesNames();
+
+      this.checkModulosWarnings();
+    } else {
+      // añadimos el aviso de que faltan las zonas de la planta
+      this.warnings.push({
+        content: 'Faltan las zonas de la planta',
+        type: 'zonasPlanta',
+        action: 'Ir a Localizaciones',
+      });
+    }
+  }
+
+  private checkModulosWarnings() {
+    const areasConModulo = this.locAreas.filter(
+      (locArea) => locArea.hasOwnProperty('modulo') && locArea.modulo !== null && locArea.modulo !== undefined
+    );
+
+    if (areasConModulo.length > 0) {
+      this.checkModulosAnoms();
+    } else {
+      // añadimos el aviso de que faltan los modulos de la planta
+      this.warnings.push({
+        content: 'Faltan los módulos de la planta',
+        type: 'modulosPlanta',
+        action: 'Ir a Localizaciones',
+      });
+    }
+  }
+
+  private checkZonesNames() {
+    if (
+      !this.planta.hasOwnProperty('nombreGlobalCoords') ||
+      this.planta.nombreGlobalCoords === null ||
+      this.planta.nombreGlobalCoords === undefined ||
+      this.planta.nombreGlobalCoords.length === 0
+    ) {
+      this.warnings.push({
+        content: 'Faltan los nombres de las zonas de la planta',
+        type: 'nombresZonas',
+        action: 'Ir a Editar planta',
+      });
     }
   }
 
@@ -252,6 +273,32 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         });
       }
     }
+  }
+
+  private checkModulosAnoms() {
+    const anomsSinModulo = this.anomaliasInforme.filter((anom) => anom.modulo === null || anom.modulo === undefined);
+
+    if (anomsSinModulo.length > 0) {
+      this.warnings.push({
+        content: `Hay ${anomsSinModulo.length} anomalías sin módulo`,
+        type: 'modulosAnoms',
+        action: 'Corregir',
+      });
+    }
+  }
+
+  private fixModulosAnoms() {
+    const anomsSinModulo = this.anomaliasInforme.filter((anom) => anom.modulo === null || anom.modulo === undefined);
+
+    anomsSinModulo.forEach((anom) => {
+      const modulo = this.anomaliaService.getModule(anom.featureCoords[0], this.locAreas);
+
+      if (modulo !== null) {
+        anom.modulo = modulo;
+
+        this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
+      }
+    });
   }
 
   ngOnDestroy(): void {

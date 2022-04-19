@@ -6,10 +6,14 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import { Observable, combineLatest, BehaviorSubject, iif, of } from 'rxjs';
 import { map, take, switchMap } from 'rxjs/operators';
 
+import { Coordinate } from 'ol/coordinate';
+import Polygon from 'ol/geom/Polygon';
+
 import { InformeService } from './informe.service';
 import { GLOBAL } from './global';
 import { PlantaService } from '@core/services/planta.service';
 import { AdminService } from '@core/services/admin.service';
+import { OlMapService } from './ol-map.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { CritCoA } from '@core/models/critCoA';
@@ -17,6 +21,8 @@ import { CritCriticidad } from '@core/models/critCriticidad';
 import { PcInterface } from '@core/models/pc';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+import { LocationAreaInterface } from '@core/models/location';
+import { ModuloInterface } from '@core/models/modulo';
 
 @Injectable({
   providedIn: 'root',
@@ -35,7 +41,8 @@ export class AnomaliaService {
     private storage: AngularFireStorage,
     private informeService: InformeService,
     private plantaService: PlantaService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private olMapService: OlMapService
   ) {}
 
   initService(plantaId: string): Promise<void> {
@@ -586,6 +593,28 @@ export class AnomaliaService {
     });
 
     return sortedAnoms;
+  }
+
+  getModule(coords: Coordinate, locAreas: LocationAreaInterface[]): ModuloInterface {
+    let modulo: ModuloInterface;
+    const locAreasWithModule = locAreas.filter((locArea) => locArea.modulo !== undefined);
+
+    if (locAreasWithModule.length === 1) {
+      modulo = locAreasWithModule[0].modulo;
+    } else {
+      locAreasWithModule.forEach((locArea) => {
+        const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat((locArea as any).path));
+
+        if (polygon.intersectsCoordinate(coords)) {
+          modulo = locArea.modulo;
+        }
+      });
+    }
+    if (modulo === undefined) {
+      modulo = null;
+    }
+
+    return modulo;
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////
