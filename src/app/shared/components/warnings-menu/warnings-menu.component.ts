@@ -8,15 +8,18 @@ import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
 import { PlantaService } from '@core/services/planta.service';
 import { SeguidorService } from '@core/services/seguidor.service';
+import { FilterService } from '@core/services/filter.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
+import { LocationFilter } from '@core/models/locationFilter';
 
 interface Warning {
   type: string;
   content: string;
+  action: string;
 }
 
 @Component({
@@ -38,7 +41,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     private informeService: InformeService,
     private plantaService: PlantaService,
     private router: Router,
-    private seguidorService: SeguidorService
+    private seguidorService: SeguidorService,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
@@ -77,6 +81,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
             this.checkFilsColsPlanta();
             this.checkZones();
             this.checkZoneNames();
+            this.checkFilColAnoms();
           }
         })
     );
@@ -86,6 +91,9 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     const urlPlantaEdit = this.router.serializeUrl(this.router.createUrlTree(['admin/plants/edit/' + this.planta.id]));
     const urlLocalizaciones = this.router.serializeUrl(
       this.router.createUrlTree(['clientes/auto-loc/' + this.planta.id])
+    );
+    const differentFilColAnoms = this.anomaliasInforme.filter(
+      (anom) => anom.localY > this.planta.filas || anom.localX > this.planta.columnas
     );
 
     switch (type) {
@@ -107,6 +115,10 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       case 'nombresZonas':
         window.open(urlPlantaEdit, '_blank');
         break;
+      case 'filsColsAnoms':
+        const filColFilter: LocationFilter = new LocationFilter('location', this.planta.filas, this.planta.columnas);
+        this.filterService.addFilter(filColFilter);
+        break;
     }
   }
 
@@ -125,6 +137,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         this.warnings.push({
           content: 'El nº de anomalías no coincide con la suma de los tipos de anomalías',
           type: 'tiposAnom',
+          action: 'Corregir',
         });
       }
     }
@@ -135,7 +148,11 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       const sumNumsCoA = this.selectedInforme.numsCoA.reduce((acum, curr) => acum + curr);
 
       if (this.anomaliasInforme.length !== sumNumsCoA) {
-        this.warnings.push({ content: 'El nº de anomalías no coincide con la suma de los CoA', type: 'numsCoA' });
+        this.warnings.push({
+          content: 'El nº de anomalías no coincide con la suma de los CoA',
+          type: 'numsCoA',
+          action: 'Corregir',
+        });
       }
     }
   }
@@ -148,17 +165,25 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         this.warnings.push({
           content: 'El nº de anomalías no coincide con la suma de las anomalías por criticidad',
           type: 'numsCriticidad',
+          action: 'Corregir',
         });
       }
     }
   }
 
   private checkFilsColsPlanta() {
-    if (!this.reportControlService.plantaFija) {
-      if (this.planta.columnas <= 1 || this.planta.columnas === undefined || this.planta.columnas === null) {
+    if (this.planta.columnas <= 1 || this.planta.columnas === undefined || this.planta.columnas === null) {
+      if (this.reportControlService.plantaFija) {
+        this.warnings.push({
+          content: 'El nº de filas y columnas de la planta no son correctos',
+          type: 'filsColsPlanta',
+          action: 'Ir a Editar planta',
+        });
+      } else {
         this.warnings.push({
           content: 'El nº de filas y columnas de la planta no son correctos y por tanto MAE y CC están mal',
           type: 'filsColsPlanta',
+          action: 'Ir a Editar planta',
         });
       }
     }
@@ -170,6 +195,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         this.warnings.push({
           content: 'Faltan las zonas de la planta',
           type: 'zonasPlanta',
+          action: 'Ir a Localizaciones',
         });
       }
     } else {
@@ -177,6 +203,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         this.warnings.push({
           content: 'Faltan las zonas de la planta',
           type: 'zonasPlanta',
+          action: 'Ir a Localizaciones',
         });
       }
     }
@@ -204,6 +231,27 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         this.warnings.push({
           content: 'Faltan los nombres de las zonas de la planta',
           type: 'nombresZonas',
+          action: 'Ir a Editar planta',
+        });
+      }
+    }
+  }
+
+  private checkFilColAnoms() {
+    // primero comprobamos que el nº de filas y columnas de la planta sean correctos
+    if (this.planta.columnas > 1 && this.planta.columnas !== undefined && this.planta.columnas !== null) {
+      console.log('ok');
+      // const differentFilColAnoms = this.anomaliasInforme.filter(
+      //   (anom) => anom.localY > this.planta.filas || anom.localX > this.planta.columnas
+      // );
+
+      const differentFilColAnoms = this.anomaliasInforme.filter((anom) => anom.localY === 1);
+
+      if (differentFilColAnoms.length > 0) {
+        this.warnings.push({
+          content: 'Hay posibles anomalías con datos de fila y columna erroneos',
+          type: 'filsColsAnoms',
+          action: 'Filtrar',
         });
       }
     }
