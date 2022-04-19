@@ -116,7 +116,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         window.open(urlPlantaEdit, '_blank');
         break;
       case 'filsColsAnoms':
-        const filColFilter: LocationFilter = new LocationFilter('location', this.planta.filas, this.planta.columnas);
+        const filColFilter: LocationFilter = new LocationFilter('location', 1, this.planta.columnas);
         this.filterService.addFilter(filColFilter);
         break;
     }
@@ -240,7 +240,6 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   private checkFilColAnoms() {
     // primero comprobamos que el nº de filas y columnas de la planta sean correctos
     if (this.planta.columnas > 1 && this.planta.columnas !== undefined && this.planta.columnas !== null) {
-      console.log('ok');
       // const differentFilColAnoms = this.anomaliasInforme.filter(
       //   (anom) => anom.localY > this.planta.filas || anom.localX > this.planta.columnas
       // );
