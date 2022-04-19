@@ -25,11 +25,14 @@
 }
 
 .line-content {
+  display: flex;
   margin-left: 1rem;
+  gap: 1rem;
 }
 
-.line-content span {
-  margin-right: 1rem;
+.line-sub-content {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .meteo-content {
@@ -44,4 +47,13 @@
 .meteo-line {
   display: flex;
   width: max-content;
+}
+
+.imput {
+  text-align: right;
+  background: whitesmoke;
+  width: 50px;
+  border-bottom: 1px solid lightgrey;
+  margin-bottom: 1px;
+  font-weight: 700;
 }

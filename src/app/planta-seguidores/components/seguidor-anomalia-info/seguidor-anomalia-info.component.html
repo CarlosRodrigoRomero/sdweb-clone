@@ -19,15 +19,24 @@
         <span class="subtitle-label">Temperaturas:</span>
       </div>
       <div class="line-content">
-        <span *ngIf="anomaliaInfo.temperaturaMax !== undefined"
-          >T. Máx: <b>{{ anomaliaInfo.temperaturaMax }}ºC</b></span
-        >
-        <span *ngIf="anomaliaInfo.temperaturaRef !== undefined" style="color: blue"
-          >T. Ref: <b>{{ anomaliaInfo.temperaturaRef }}ºC</b>
-        </span>
-        <span *ngIf="anomaliaInfo.gradienteNormalizado !== undefined" style="color: red"
-          >&Delta;T (norm): <b>+ {{ anomaliaInfo.gradienteNormalizado | number: '1.0-1' }}ºC</b></span
-        >
+        <div class="line-sub-content" *ngIf="anomaliaInfo.temperaturaMax !== undefined">
+          <span>T. Máx:</span>
+          <span
+            ><b>{{ anomaliaInfo.temperaturaMax }}ºC</b></span
+          >
+        </div>
+        <div class="line-sub-content" *ngIf="anomaliaInfo.temperaturaRef !== undefined" style="color: blue">
+          <span>T. Ref: </span>
+          <span
+            ><b>{{ anomaliaInfo.temperaturaRef }}ºC</b></span
+          >
+        </div>
+        <div class="line-sub-content" *ngIf="anomaliaInfo.gradienteNormalizado !== undefined" style="color: red">
+          <span>&Delta;T (norm):</span>
+          <span
+            ><b>+{{ anomaliaInfo.gradienteNormalizado | number: '1.0-1' }}ºC</b></span
+          >
+        </div>
       </div>
     </div>
     <div class="line-info">
@@ -50,12 +59,34 @@
         <span class="subtitle-label">Localización: </span>
       </div>
       <div class="line-content">
-        <span
-          >Fila: <b>{{ anomaliaInfo.fila }}</b></span
-        >
-        <span
-          >Columna: <b>{{ anomaliaInfo.columna }}</b>
-        </span>
+        <div class="line-sub-content">
+          <span>Fila:</span>
+          <span *ngIf="!isAdmin"
+            ><b>{{ anomaliaInfo.fila }}</b></span
+          >
+          <input
+            *ngIf="isAdmin"
+            class="imput"
+            matInput
+            type="number"
+            [value]="anomaliaInfo.fila"
+            (change)="updateAnomalia($event.target.value, 'localY')"
+          />
+        </div>
+        <div class="line-sub-content">
+          <span>Columna:</span>
+          <span *ngIf="!isAdmin"
+            ><b>{{ anomaliaInfo.columna }}</b></span
+          >
+          <input
+            *ngIf="isAdmin"
+            class="imput"
+            matInput
+            type="number"
+            [value]="anomaliaInfo.columna"
+            (change)="updateAnomalia($event.target.value, 'localX')"
+          />
+        </div>
       </div>
     </div>
     <div class="line-info">

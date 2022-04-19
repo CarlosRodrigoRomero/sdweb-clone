@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 
 import { GLOBAL } from '@core/services/global';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
+import { AnomaliaService } from '@core/services/anomalia.service';
+import { AuthService } from '@core/services/auth.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
@@ -16,10 +18,15 @@ import { PcInterface } from '@core/models/pc';
 export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
   anomaliaSelected: Anomalia = undefined;
   anomaliaInfo = {};
+  isAdmin = false;
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private seguidorViewService: SeguidorViewService) {}
+  constructor(
+    private seguidorViewService: SeguidorViewService,
+    private anomaliaService: AnomaliaService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -51,6 +58,14 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    this.subscriptions.add(
+      this.authService.user$.subscribe((user) => (this.isAdmin = this.authService.userIsAdmin(user)))
+    );
+  }
+
+  updateAnomalia(value: any, field: string) {
+    this.anomaliaService.updateAnomaliaField(this.anomaliaSelected.id, field, Number(value));
   }
 
   ngOnDestroy(): void {
