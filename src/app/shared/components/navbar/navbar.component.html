@@ -12,7 +12,7 @@
     <img src="../../../assets/images/drone_red.png" height="30" class="d-inline-block align-top" alt="" />
   </a>
 
-  <div id="plant-summary" *ngIf="loadSummary">
+  <div id="plant-summary" *ngIf="loadContent">
     <app-plant-summary></app-plant-summary>
   </div>
 
@@ -20,7 +20,7 @@
 
   <div class="right">
     <!-- MENU ALERTAS INFORME TERMINADO ANTES DE ENTREGAR -->
-    <app-warnings-menu *ngIf="isAdmin && isReport"></app-warnings-menu>
+    <app-warnings-menu *ngIf="isAdmin && isReport && loadContent"></app-warnings-menu>
 
     <!-- <app-switch-theme></app-switch-theme> -->
 

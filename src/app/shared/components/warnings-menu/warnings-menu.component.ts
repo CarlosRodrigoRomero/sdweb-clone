@@ -146,18 +146,26 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
 
   private checkTiposAnoms() {
     if (this.selectedInforme !== undefined && this.anomaliasInforme.length > 0) {
-      const sumTiposAnoms = this.selectedInforme.tiposAnomalias.reduce((acum, curr, index) => {
-        // las celulas calientes son un array por separado
-        if (index === 8 || index === 9) {
-          return acum + curr.reduce((a, c) => a + c);
-        } else {
-          return acum + curr;
-        }
-      });
+      if (this.selectedInforme.tiposAnomalias.length > 0) {
+        const sumTiposAnoms = this.selectedInforme.tiposAnomalias.reduce((acum, curr, index) => {
+          // las celulas calientes son un array por separado
+          if (index === 8 || index === 9) {
+            return acum + curr.reduce((a, c) => a + c);
+          } else {
+            return acum + curr;
+          }
+        });
 
-      if (this.anomaliasInforme.length !== sumTiposAnoms) {
+        if (this.anomaliasInforme.length !== sumTiposAnoms) {
+          this.warnings.push({
+            content: 'El nº de anomalías no coincide con la suma de los tipos de anomalías',
+            type: 'tiposAnom',
+            action: 'Corregir',
+          });
+        }
+      } else {
         this.warnings.push({
-          content: 'El nº de anomalías no coincide con la suma de los tipos de anomalías',
+          content: 'El nº de anomalías por tipo es incorrecto',
           type: 'tiposAnom',
           action: 'Corregir',
         });

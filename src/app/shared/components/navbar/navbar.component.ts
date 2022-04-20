@@ -27,7 +27,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   userLogged: boolean;
   private user: UserInterface;
   isAdmin: boolean;
-  loadSummary = false;
+  loadContent = false;
   hasNotifications = false;
   notifications: Notification[] = [];
   isReport = false;
@@ -63,7 +63,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.reportControlService.mapLoaded$.subscribe((value) => {
-        this.loadSummary = value;
+        this.loadContent = value;
 
         if (value) {
           setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
