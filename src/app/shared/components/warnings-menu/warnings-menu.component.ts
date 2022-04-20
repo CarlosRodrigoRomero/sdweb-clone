@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
-import { switchMap, take } from 'rxjs/operators';
+import { catchError, switchMap, take } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
 
 import { ReportControlService } from '@core/services/report-control.service';
@@ -47,7 +48,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     private router: Router,
     private seguidorService: SeguidorService,
     private filterService: FilterService,
-    private anomaliaService: AnomaliaService
+    private anomaliaService: AnomaliaService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -94,6 +96,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     this.checkFilsColsPlanta();
     this.checkFilColAnoms();
     this.checkZonesWarnings();
+    this.checkAerialLayer();
+    this.checkThermalLayer();
   }
 
   fixProblem(type: string) {
@@ -385,6 +389,57 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
       }
     });
+  }
+
+  private checkAerialLayer() {
+    const url = 'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInforme.id + '_visual/1/1/1.png';
+
+    this.http
+      .get(url)
+      .pipe(
+        take(1),
+        catchError((error) => {
+          // no recibimos respuesta del servidor porque no existe
+          if (error.status === 0) {
+            this.warnings.push({
+              content: 'No existe la capa visual',
+              type: 'visualLayer',
+              action: '',
+            });
+          }
+
+          return [];
+        }),
+        take(1)
+      )
+      .subscribe((data) => console.log(''));
+  }
+
+  private checkThermalLayer() {
+    if (this.reportControlService.plantaFija) {
+      const url =
+        'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInforme.id + '_thermal/1/1/1.png';
+
+      this.http
+        .get(url)
+        .pipe(
+          take(1),
+          catchError((error) => {
+            // no recibimos respuesta del servidor porque no existe
+            if (error.status === 0) {
+              this.warnings.push({
+                content: 'No existe la capa térmica',
+                type: 'thermalLayer',
+                action: '',
+              });
+            }
+
+            return [];
+          }),
+          take(1)
+        )
+        .subscribe((data) => console.log(''));
+    }
   }
 
   ngOnDestroy(): void {
