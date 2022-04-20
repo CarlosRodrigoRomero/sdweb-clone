@@ -17,6 +17,7 @@ import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 import { LocationFilter } from '@core/models/locationFilter';
 import { LocationAreaInterface } from '@core/models/location';
+import { WrongGlobalCoordsFilter } from '@core/models/wrongGlobalCoordsFilter';
 
 interface Warning {
   type: string;
@@ -91,8 +92,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     this.checkNumsCoA();
     this.checkNumsCriticidad();
     this.checkFilsColsPlanta();
-    this.checkZonesWarnings();
     this.checkFilColAnoms();
+    this.checkZonesWarnings();
   }
 
   fixProblem(type: string) {
@@ -129,6 +130,12 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         break;
       case 'modulosAnoms':
         this.fixModulosAnoms();
+        break;
+      case 'globalCoordsAnoms':
+        this.filterWrongGlobalCoordsAnoms();
+        break;
+      case 'noGlobalCoordsAnoms':
+        this.fixNoGlobalCoordsAnoms();
         break;
     }
   }
@@ -200,21 +207,28 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     }
   }
 
-  private checkZonesWarnings() {
-    let hasZones = false;
-    if (this.reportControlService.plantaFija) {
-      if (this.reportControlService.numFixedGlobalCoords >= 1) {
-        hasZones = true;
-      }
-    } else {
-      if (this.seguidorService.numGlobalCoords >= 1) {
-        hasZones = true;
+  private checkFilColAnoms() {
+    // primero comprobamos que el nº de filas y columnas de la planta sean correctos
+    if (this.planta.columnas > 1 && this.planta.columnas !== undefined && this.planta.columnas !== null) {
+      const differentFilColAnoms = this.anomaliasInforme.filter(
+        (anom) => anom.localY > this.planta.filas || anom.localX > this.planta.columnas
+      );
+
+      if (differentFilColAnoms.length > 0) {
+        this.warnings.push({
+          content: 'Hay posibles anomalías con datos de fila y columna erroneos',
+          type: 'filsColsAnoms',
+          action: 'Filtrar',
+        });
       }
     }
+  }
 
-    if (hasZones) {
+  private checkZonesWarnings() {
+    if (this.locAreas.length > 0) {
+      this.checkWrongGlobalCoordsAnoms();
+      this.checkNoGlobalCoordsAnoms();
       this.checkZonesNames();
-
       this.checkModulosWarnings();
     } else {
       // añadimos el aviso de que faltan las zonas de la planta
@@ -222,6 +236,102 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         content: 'Faltan las zonas de la planta',
         type: 'zonasPlanta',
         action: 'Ir a Localizaciones',
+      });
+    }
+  }
+
+  private checkWrongGlobalCoordsAnoms() {
+    let anomsWrongGlobals: Anomalia[];
+    if (this.reportControlService.plantaFija) {
+      anomsWrongGlobals = this.anomaliasInforme.filter(
+        (anom) => anom.globalCoords[this.reportControlService.numFixedGlobalCoords - 1] === null
+      );
+    } else {
+      anomsWrongGlobals = this.anomaliasInforme.filter(
+        (anom) => anom.globalCoords[this.seguidorService.numGlobalCoords - 1] === null
+      );
+    }
+
+    if (anomsWrongGlobals.length > 0) {
+      if (anomsWrongGlobals.length === 1) {
+        this.warnings.push({
+          content: `Hay ${anomsWrongGlobals.length} anomalía que puede estar mal posicionada y estar fuera de las zonas que debería`,
+          type: 'globalCoordsAnoms',
+          action: 'Filtrar',
+        });
+      } else {
+        this.warnings.push({
+          content: `Hay ${anomsWrongGlobals.length} anomalías que pueden estar mal posicionadas y estar fuera de las zonas que deberían`,
+          type: 'globalCoordsAnoms',
+          action: 'Filtrar',
+        });
+      }
+    }
+  }
+
+  private filterWrongGlobalCoordsAnoms() {
+    let wrongGlobalsFilter: WrongGlobalCoordsFilter;
+    if (this.reportControlService.plantaFija) {
+      wrongGlobalsFilter = new WrongGlobalCoordsFilter(
+        'wrongGlobals',
+        this.reportControlService.numFixedGlobalCoords - 1
+      );
+    } else {
+      wrongGlobalsFilter = new WrongGlobalCoordsFilter('wrongGlobals', this.seguidorService.numGlobalCoords - 1);
+    }
+
+    this.filterService.addFilter(wrongGlobalsFilter);
+  }
+
+  private checkNoGlobalCoordsAnoms() {
+    const noGlobalCoordsAnoms = this.anomaliasInforme.filter(
+      (anom) => anom.globalCoords === null || anom.globalCoords === undefined || anom.globalCoords[0] === null
+    );
+
+    if (noGlobalCoordsAnoms.length > 0) {
+      if (noGlobalCoordsAnoms.length === 1) {
+        this.warnings.push({
+          content: `Hay ${noGlobalCoordsAnoms.length} anomalía que no tiene globalCoords`,
+          type: 'noGlobalCoordsAnoms',
+          action: 'Corregir',
+        });
+      } else {
+        this.warnings.push({
+          content: `Hay ${noGlobalCoordsAnoms.length} anomalías que no tienen globalCoords`,
+          type: 'noGlobalCoordsAnoms',
+          action: 'Corregir',
+        });
+      }
+    }
+  }
+
+  private fixNoGlobalCoordsAnoms() {
+    const noGlobalCoordsAnoms = this.anomaliasInforme.filter(
+      (anom) => anom.globalCoords === null || anom.globalCoords === undefined || anom.globalCoords[0] === null
+    );
+
+    noGlobalCoordsAnoms.forEach((anom) => {
+      const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(anom.featureCoords[0], this.locAreas);
+
+      if (globalCoords !== null && globalCoords !== undefined && globalCoords[0] !== null) {
+        anom.globalCoords = globalCoords;
+
+        this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', globalCoords);
+      }
+    });
+  }
+
+  private checkZonesNames() {
+    if (
+      !this.planta.hasOwnProperty('nombreGlobalCoords') ||
+      this.planta.nombreGlobalCoords === null ||
+      this.planta.nombreGlobalCoords === undefined ||
+      this.planta.nombreGlobalCoords.length === 0
+    ) {
+      this.warnings.push({
+        content: 'Faltan los nombres de las zonas de la planta',
+        type: 'nombresZonas',
+        action: 'Ir a Editar planta',
       });
     }
   }
@@ -243,47 +353,23 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     }
   }
 
-  private checkZonesNames() {
-    if (
-      !this.planta.hasOwnProperty('nombreGlobalCoords') ||
-      this.planta.nombreGlobalCoords === null ||
-      this.planta.nombreGlobalCoords === undefined ||
-      this.planta.nombreGlobalCoords.length === 0
-    ) {
-      this.warnings.push({
-        content: 'Faltan los nombres de las zonas de la planta',
-        type: 'nombresZonas',
-        action: 'Ir a Editar planta',
-      });
-    }
-  }
-
-  private checkFilColAnoms() {
-    // primero comprobamos que el nº de filas y columnas de la planta sean correctos
-    if (this.planta.columnas > 1 && this.planta.columnas !== undefined && this.planta.columnas !== null) {
-      const differentFilColAnoms = this.anomaliasInforme.filter(
-        (anom) => anom.localY > this.planta.filas || anom.localX > this.planta.columnas
-      );
-
-      if (differentFilColAnoms.length > 0) {
-        this.warnings.push({
-          content: 'Hay posibles anomalías con datos de fila y columna erroneos',
-          type: 'filsColsAnoms',
-          action: 'Filtrar',
-        });
-      }
-    }
-  }
-
   private checkModulosAnoms() {
     const anomsSinModulo = this.anomaliasInforme.filter((anom) => anom.modulo === null || anom.modulo === undefined);
 
     if (anomsSinModulo.length > 0) {
-      this.warnings.push({
-        content: `Hay ${anomsSinModulo.length} anomalías sin módulo`,
-        type: 'modulosAnoms',
-        action: 'Corregir',
-      });
+      if (anomsSinModulo.length === 1) {
+        this.warnings.push({
+          content: `Hay ${anomsSinModulo.length} anomalía sin módulo`,
+          type: 'modulosAnoms',
+          action: 'Corregir',
+        });
+      } else {
+        this.warnings.push({
+          content: `Hay ${anomsSinModulo.length} anomalías sin módulo`,
+          type: 'modulosAnoms',
+          action: 'Corregir',
+        });
+      }
     }
   }
 
