@@ -119,8 +119,8 @@ export class ReportControlService {
                 this.setCountAnomsInformesPlanta(this.allFilterableElements as Anomalia[]);
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
-                this.setMaeInformesPlantaFija(this.allFilterableElements as Anomalia[]);
-                this.setCCInformesPlantaFija(this.allFilterableElements as Anomalia[]);
+                this.checkMaeInformes(this.allFilterableElements);
+                this.checkCCInformes(this.allFilterableElements);
 
                 // iniciamos filter service
                 this.filterService.initService(this.allFilterableElements).then((filtersInit) => {
@@ -279,8 +279,8 @@ export class ReportControlService {
                 this.setCountAnomsInformesPlanta(this.allFilterableElements as Seguidor[]);
 
                 // calculamos el MAE y las CC de los informes si no tuviesen
-                this.setMaeInformesPlantaSeguidores(segs);
-                this.setCCInformesPlantaSeguidores(segs);
+                this.checkMaeInformes(this.allFilterableElements);
+                this.checkCCInformes(this.allFilterableElements);
 
                 // iniciamos filter service
                 this.filterService.initService(segs).then((filtersInit) => {
@@ -411,65 +411,73 @@ export class ReportControlService {
     return numGlobalCoords;
   }
 
-  private setMaeInformesPlantaSeguidores(seguidores: Seguidor[]) {
+  private checkMaeInformes(elems: FilterableElement[]): void {
     this.informes.forEach((informe) => {
       if (this.checkIfNumberValueWrong(informe.mae)) {
-        const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
-        let mae = 0;
-        seguidoresInforme.forEach((seg) => (mae = mae + seg.mae));
-        informe.mae = mae / seguidoresInforme.length;
-
-        this.informeService.updateInforme(informe);
-      }
-    });
-  }
-
-  private setMaeInformesPlantaFija(anomalias: Anomalia[]) {
-    this.informes.forEach((informe) => {
-      if (this.checkIfNumberValueWrong(informe.mae)) {
-        if (anomalias.length > 0) {
-          const perdidas = anomalias.map((anom) => anom.perdidas);
-          let perdidasTotales = 0;
-          perdidas.forEach((perd) => (perdidasTotales += perd));
-
-          informe.mae = perdidasTotales / informe.numeroModulos;
+        if (elems[0].hasOwnProperty('anomaliasCliente')) {
+          this.setMaeInformeSeguidores(elems as Seguidor[], informe);
         } else {
-          informe.mae = 0;
+          this.setMaeInformeFija(elems as Anomalia[], informe);
         }
-
-        this.informeService.updateInforme(informe);
       }
     });
   }
 
-  private setCCInformesPlantaSeguidores(seguidores: Seguidor[]) {
+  setMaeInformeSeguidores(seguidores: Seguidor[], informe: InformeInterface) {
+    const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
+    let mae = 0;
+    seguidoresInforme.forEach((seg) => (mae = mae + seg.mae));
+    informe.mae = mae / seguidoresInforme.length;
+
+    this.informeService.updateInforme(informe);
+  }
+
+  private setMaeInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
+    if (anomalias.length > 0) {
+      const perdidas = anomalias.map((anom) => anom.perdidas);
+      let perdidasTotales = 0;
+      perdidas.forEach((perd) => (perdidasTotales += perd));
+
+      informe.mae = perdidasTotales / informe.numeroModulos;
+    } else {
+      informe.mae = 0;
+    }
+
+    this.informeService.updateInforme(informe);
+  }
+
+  private checkCCInformes(elems: FilterableElement[]): void {
     this.informes.forEach((informe) => {
       if (this.checkIfNumberValueWrong(informe.cc)) {
-        const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
-        let cc = 0;
-        seguidoresInforme.forEach((seg) => (cc = cc + seg.celsCalientes));
-        informe.cc = cc / seguidoresInforme.length;
-
-        this.informeService.updateInforme(informe);
+        if (elems[0].hasOwnProperty('anomaliasCliente')) {
+          this.setCCInformeSeguidores(elems as Seguidor[], informe);
+        } else {
+          this.setCCInformeFija(elems as Anomalia[], informe);
+        }
       }
     });
   }
 
-  private setCCInformesPlantaFija(anomalias: Anomalia[]) {
-    this.informes.forEach((informe) => {
-      if (this.checkIfNumberValueWrong(informe.cc)) {
-        if (anomalias.length > 0) {
-          // tslint:disable-next-line: triple-equals
-          const celCals = anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+  setCCInformeSeguidores(seguidores: Seguidor[], informe: InformeInterface) {
+    const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
+    let cc = 0;
+    seguidoresInforme.forEach((seg) => (cc = cc + seg.celsCalientes));
+    informe.cc = cc / seguidoresInforme.length;
 
-          informe.cc = celCals.length / informe.numeroModulos;
-        } else {
-          informe.cc = 0;
-        }
+    this.informeService.updateInforme(informe);
+  }
 
-        this.informeService.updateInforme(informe);
-      }
-    });
+  private setCCInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
+    if (anomalias.length > 0) {
+      // tslint:disable-next-line: triple-equals
+      const celCals = anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+
+      informe.cc = celCals.length / informe.numeroModulos;
+    } else {
+      informe.cc = 0;
+    }
+
+    this.informeService.updateInforme(informe);
   }
 
   private checkIfNumberValueWrong(value: any): boolean {
