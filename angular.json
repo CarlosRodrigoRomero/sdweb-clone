@@ -52,7 +52,19 @@
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.min.js"
             ],
-            "allowedCommonJsDependencies": ["lodash"]
+            "allowedCommonJsDependencies": [
+              "lodash",
+              "fabric",
+              "mousetrap",
+              "firebase/app",
+              "apexcharts",
+              "chart.js",
+              "@firebase/auth",
+              "@firebase/component",
+              "file-saver",
+              "pbf",
+              "pica"
+            ]
           },
           "configurations": {
             "production": {

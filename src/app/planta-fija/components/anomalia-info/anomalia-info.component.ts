@@ -1,9 +1,10 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormControl, FormGroup } from '@angular/forms';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
-import { switchMap, take } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import { SwiperComponent } from 'swiper/angular';
@@ -29,7 +30,7 @@ import { PlantaService } from '@core/services/planta.service';
 import { ShareReportService } from '@core/services/share-report.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { ReportControlService } from '@core/services/report-control.service';
-import { InformeService } from '@core/services/informe.service';
+import { AuthService } from '@core/services/auth.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
@@ -104,6 +105,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
   public seccionVuelo = false;
   private informeSelected: InformeInterface = undefined;
   private planta: PlantaInterface;
+  isAdmin = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -116,7 +118,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
     public anomaliaService: AnomaliaService,
     private storage: AngularFireStorage,
     private reportControlService: ReportControlService,
-    private informeService: InformeService
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -157,6 +159,10 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
           this.getInfoAdcional();
         }
       })
+    );
+
+    this.subscriptions.add(
+      this.authService.user$.subscribe((user) => (this.isAdmin = this.authService.userIsAdmin(user)))
     );
   }
 
@@ -209,24 +215,22 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
       });
     }
 
+    const localY = this.anomaliaSelect.localY;
+    if (localY !== undefined && localY !== null) {
+      fila = localY;
+    }
+
+    const localX = this.anomaliaSelect.localX;
+    if (localX !== undefined && localX !== null) {
+      columna = localX;
+    }
+
     const numModulo = this.plantaService.getNumeroModulo(this.anomaliaSelect, 'anomalia', this.planta);
     if (numModulo !== undefined) {
       if (!isNaN(Number(numModulo))) {
         numeroModulo = numModulo;
       } else {
         numeroModulo = undefined;
-      }
-    }
-
-    if (numeroModulo === undefined) {
-      const localY = this.anomaliaSelect.localY;
-      if (localY !== undefined && localY !== null) {
-        fila = localY;
-      }
-
-      const localX = this.anomaliaSelect.localX;
-      if (localX !== undefined && localX !== null) {
-        columna = localX;
       }
     }
 
@@ -400,6 +404,10 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
       this.anomaliaSelect[field] = event.target.value;
     }
     this.anomaliaService.updateAnomalia(this.anomaliaSelect);
+  }
+
+  updateAnomalia(value: any, field: string) {
+    this.anomaliaService.updateAnomaliaField(this.anomaliaSelect.id, field, Number(value));
   }
 
   deleteAnomalia() {

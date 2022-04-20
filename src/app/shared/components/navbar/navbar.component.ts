@@ -23,13 +23,14 @@ interface Notification {
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit, OnDestroy {
-  public isShared = false;
-  public userLogged: boolean;
+  isShared = false;
+  userLogged: boolean;
   private user: UserInterface;
-  public isAdmin: boolean;
-  loadSummary = false;
+  isAdmin: boolean;
+  loadContent = false;
   hasNotifications = false;
   notifications: Notification[] = [];
+  isReport = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -55,11 +56,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
           this.isAdmin = this.authService.userIsAdmin(user);
         })
       );
+      if (this.router.url.includes('fixed') || this.router.url.includes('tracker')) {
+        this.isReport = true;
+      }
     }
 
     this.subscriptions.add(
       this.reportControlService.mapLoaded$.subscribe((value) => {
-        this.loadSummary = value;
+        this.loadContent = value;
 
         if (value) {
           setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);

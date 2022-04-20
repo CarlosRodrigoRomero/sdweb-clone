@@ -1,0 +1,25 @@
+.content {
+  display: flex;
+  align-content: center;
+  margin-right: 2rem;
+}
+
+.item-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: unset;
+}
+
+.icon-no-warnings mat-icon {
+  vertical-align: bottom;
+}
+
+:host ::ng-deep .icon-no-warnings mat-icon .mat-badge-content {
+  background: green;
+}
+
+.btn-icon {
+  color: red;
+}

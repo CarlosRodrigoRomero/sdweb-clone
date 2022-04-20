@@ -144,13 +144,33 @@
                 <span class="subtitulo">{{ zona.nombre }}</span>
               </div>
             </div>
-            <div class="elemento" *ngIf="infoAdicional.localizacion.fila">
+            <div class="elemento" *ngIf="infoAdicional.localizacion.numeroModulo === undefined && !isAdmin">
               <span class="titulo">Fila</span>
               <span class="subtitulo">{{ infoAdicional.localizacion.fila }}</span>
             </div>
-            <div class="elemento" *ngIf="infoAdicional.localizacion.columna">
+            <div class="elemento" *ngIf="isAdmin">
+              <span class="titulo">Fila</span>
+              <input
+                class="imput"
+                matInput
+                type="number"
+                [value]="infoAdicional.localizacion.fila"
+                (change)="updateAnomalia($event.target.value, 'localY')"
+              />
+            </div>
+            <div class="elemento" *ngIf="infoAdicional.localizacion.numeroModulo === undefined && !isAdmin">
               <span class="titulo">Columna</span>
               <span class="subtitulo">{{ infoAdicional.localizacion.columna }}</span>
+            </div>
+            <div class="elemento" *ngIf="isAdmin">
+              <span class="titulo">Columna</span>
+              <input
+                class="imput"
+                matInput
+                type="number"
+                [value]="infoAdicional.localizacion.columna"
+                (change)="updateAnomalia($event.target.value, 'localX')"
+              />
             </div>
             <div class="elemento" *ngIf="infoAdicional.localizacion.numeroModulo">
               <span class="titulo">Nº módulo</span>

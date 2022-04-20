@@ -502,19 +502,19 @@ export class ReportControlService {
         const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
 
         // guardamos el recuento de anomalias por tipo
-        this.setTiposAnomInforme(anomaliasInforme, informe);
+        this.setTiposAnomInforme(anomaliasInforme, informe, false);
 
         // guardamos el recuento de anomalias por clase
-        this.setNumAnomsCoAInforme(anomaliasInforme, informe);
+        this.setNumAnomsCoAInforme(anomaliasInforme, informe, false);
 
         // guardamos el recuento de anomalias por criticidad
-        this.setNumAnomsCritInforme(anomaliasInforme, informe);
+        this.setNumAnomsCritInforme(anomaliasInforme, informe, false);
       });
     }
   }
 
-  setTiposAnomInforme(anomalias: Anomalia[], informe: InformeInterface, criterio?: CritCriticidad) {
-    if (anomalias.length > 0 && !informe.hasOwnProperty('tiposAnomalias')) {
+  setTiposAnomInforme(anomalias: Anomalia[], informe: InformeInterface, replace: boolean, criterio?: CritCriticidad) {
+    if (anomalias.length > 0 && (!informe.hasOwnProperty('tiposAnomalias') || replace)) {
       let rangosDT = this.anomaliaService.criterioCriticidad.rangosDT;
       if (criterio !== undefined) {
         rangosDT = criterio.rangosDT;
@@ -565,8 +565,8 @@ export class ReportControlService {
     }
   }
 
-  setNumAnomsCoAInforme(anomalias: Anomalia[], informe: InformeInterface): void {
-    if (anomalias.length > 0 && !informe.hasOwnProperty('numsCoA')) {
+  setNumAnomsCoAInforme(anomalias: Anomalia[], informe: InformeInterface, replace: boolean): void {
+    if (anomalias.length > 0 && (!informe.hasOwnProperty('numsCoA') || replace)) {
       const numsCoA: number[] = [
         // tslint:disable-next-line: triple-equals
         anomalias.filter((anom) => anom.clase == 1).length,
@@ -588,8 +588,13 @@ export class ReportControlService {
     }
   }
 
-  setNumAnomsCritInforme(anomalias: Anomalia[], informe: InformeInterface, criterio?: CritCriticidad): void {
-    if (anomalias.length > 0 && !informe.hasOwnProperty('numsCriticidad')) {
+  setNumAnomsCritInforme(
+    anomalias: Anomalia[],
+    informe: InformeInterface,
+    replace: boolean,
+    criterio?: CritCriticidad
+  ): void {
+    if (anomalias.length > 0 && (!informe.hasOwnProperty('numsCriticidad') || replace)) {
       let rangosDT = this.anomaliaService.criterioCriticidad.rangosDT;
       if (criterio !== undefined) {
         rangosDT = criterio.rangosDT;

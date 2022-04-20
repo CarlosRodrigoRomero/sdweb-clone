@@ -218,11 +218,11 @@ export class DownloadExcelPortfolioComponent implements OnInit {
             // descartamos las anomalias que no lo son para el cliente
             anomaliasInforme = this.anomaliaService.getRealAnomalias(anomaliasInforme);
 
-            this.reportControlService.setTiposAnomInforme(anomaliasInforme, informe, criterio);
+            this.reportControlService.setTiposAnomInforme(anomaliasInforme, informe, true, criterio);
 
-            this.reportControlService.setNumAnomsCoAInforme(anomaliasInforme, informe);
+            this.reportControlService.setNumAnomsCoAInforme(anomaliasInforme, informe, true);
 
-            this.reportControlService.setNumAnomsCritInforme(anomaliasInforme, informe, criterio);
+            this.reportControlService.setNumAnomsCritInforme(anomaliasInforme, informe, true, criterio);
           });
         });
       // }

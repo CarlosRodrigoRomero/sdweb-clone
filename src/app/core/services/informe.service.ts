@@ -91,6 +91,9 @@ export class InformeService {
         actions.map((a) => {
           const data = a.payload.doc.data() as InformeInterface;
           data.id = a.payload.doc.id;
+          if (data.tiposAnomalias !== undefined && data.tiposAnomalias !== null) {
+            data.tiposAnomalias = Object.values(data.tiposAnomalias);
+          }
           return data;
         })
       )
@@ -104,6 +107,9 @@ export class InformeService {
         actions.map((a) => {
           const data = a.payload.doc.data() as InformeInterface;
           data.id = a.payload.doc.id;
+          if (data.tiposAnomalias !== undefined && data.tiposAnomalias !== null) {
+            data.tiposAnomalias = Object.values(data.tiposAnomalias);
+          }
           return data;
         })
       ),
@@ -128,6 +134,9 @@ export class InformeService {
         } else {
           const data = action.payload.data() as InformeInterface;
           data.id = action.payload.id;
+          if (data.tiposAnomalias !== undefined && data.tiposAnomalias !== null) {
+            data.tiposAnomalias = Object.values(data.tiposAnomalias);
+          }
           return data;
         }
       })

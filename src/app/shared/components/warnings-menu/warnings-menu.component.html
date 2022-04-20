@@ -1,0 +1,18 @@
+<div class="content">
+  <button *ngIf="warnings.length > 0" class="btn-notif" mat-icon-button [matMenuTriggerFor]="warningMenu">
+    <mat-icon matBadge="{{ warnings.length }}" matBadgeColor="primary">bug_report</mat-icon>
+  </button>
+  <mat-menu class="notif-menu" #warningMenu="matMenu">
+    <div class="item-content" mat-menu-item *ngFor="let warning of warnings" (click)="$event.stopPropagation()">
+      <div class="icon-and-label">
+        <mat-icon class="btn-icon">warning</mat-icon>
+        <span class="btn-label">{{ warning.content }}</span>
+      </div>
+      <button mat-stroked-button (click)="fixProblem(warning.type)" color="primary">{{ warning.action }}</button>
+    </div>
+  </mat-menu>
+
+  <div class="icon-no-warnings">
+    <mat-icon *ngIf="warnings.length === 0" matBadge="✓">bug_report</mat-icon>
+  </div>
+</div>

@@ -40,6 +40,16 @@
   font-size: 1.1rem;
 }
 
+.imput {
+  font-weight: 300;
+  font-size: 1.1rem;
+  text-align: right;
+  background: whitesmoke;
+  width: fit-content;
+  border-bottom: 1px solid lightgrey;
+  margin-bottom: 1px;
+}
+
 .link-descarga {
   padding: 0 4px;
 }

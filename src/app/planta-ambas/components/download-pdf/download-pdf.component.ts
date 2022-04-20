@@ -31,33 +31,18 @@ import { ImageProcessService } from '../../services/image-process.service';
 import { AnomaliaInfoService } from '@core/services/anomalia-info.service';
 import { ImagesLoadService } from '../../services/images-load.service';
 import { ImagesTilesService } from '../../services/images-tiles.service';
+import { ReportPdfService } from '@core/services/report-pdf.service';
 
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
 import { Translation } from '@shared/utils/translations/translations';
 import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
+import { AnomsTable } from './pdf-structure';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
-
-export interface Apartado {
-  nombre: string;
-  descripcion: string;
-  orden: number;
-  elegible: boolean;
-  apt?: number;
-}
-
-export interface AnomsTable {
-  // antes PcsTable
-  tipo: string;
-  coa1: number;
-  coa2: number;
-  coa3: number;
-  total: number;
-}
 
 @Component({
   selector: 'app-download-pdf',
@@ -90,7 +75,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private filtroColumnas: string[];
   private layerInformeSelected: TileLayer;
   private alturaMax = 0;
-  private noAnomReport = false;
 
   // IMAGENES
   private imgLogoBase64: string;
@@ -108,7 +92,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private imgSolardroneBase64: string;
   private imagesPlantaCompleta = {};
 
-  private apartadosInforme: Apartado[];
   private countCategoria;
   private countPosicion;
   private countCategoriaClase;
@@ -135,8 +118,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private anomSeguidores1Eje: Anomalia[][] = [];
   private seguidores1ejeNoAnoms: LocationAreaInterface[] = [];
   private largestLocAreas: LocationAreaInterface[] = [];
-  private informeConImagenes = false;
-  private incluirImagenes = false;
   simplePDF = false;
   private maxAnomsConImgs = 500;
 
@@ -156,7 +137,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     private imageProcessService: ImageProcessService,
     private anomaliaInfoService: AnomaliaInfoService,
     private imagesLoadService: ImagesLoadService,
-    private imagesTilesService: ImagesTilesService
+    private imagesTilesService: ImagesTilesService,
+    private reportPdfService: ReportPdfService
   ) {}
 
   ngOnInit(): void {
@@ -170,16 +152,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       })
     );
 
-    // comprobamos si tiene anomalias el informe
-    this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomReport = value)));
-
     // comprobamos el numero de anomalias para imprimir o no imagenes
     this.subscriptions.add(
       this.reportControlService.allFilterableElements$.subscribe((elems) => {
         if (elems.length <= this.maxAnomsConImgs && elems.length > 0) {
-          this.informeConImagenes = true;
+          this.reportPdfService.informeConImagenes = true;
         } else {
-          this.informeConImagenes = false;
+          this.reportPdfService.informeConImagenes = false;
         }
       })
     );
@@ -317,189 +296,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     );
   }
 
-  private loadApartadosInforme() {
-    this.apartadosInforme = [
-      {
-        nombre: 'introduccion',
-        descripcion: 'Introducción',
-        orden: 1,
-        apt: 1,
-        elegible: false,
-      },
-      {
-        nombre: 'criterios',
-        descripcion: 'Criterios de operación',
-        orden: 2,
-        apt: 1,
-        elegible: true,
-      },
-      {
-        nombre: 'normalizacion',
-        descripcion: 'Normalización de gradientes de temperatura',
-        orden: 3,
-        apt: 1,
-        elegible: true,
-      },
-      {
-        nombre: 'datosVuelo',
-        descripcion: 'Datos del vuelo',
-        orden: 4,
-        apt: 1,
-        elegible: true,
-      },
-      // {
-      //   nombre: 'irradiancia',
-      //   descripcion: 'Irradiancia durante el vuelo',
-      //   orden: 5,
-      //   apt: 1,
-      //   elegible: true,
-      // },
-      {
-        nombre: 'paramsTermicos',
-        descripcion: 'Ajuste de parámetros térmicos',
-        orden: 6,
-        apt: 1,
-        elegible: true,
-      },
-      /* {
-        nombre: 'perdidaPR',
-        descripcion: 'Pérdida de Performance Ratio',
-        orden: 7,
-        apt: 1,
-        elegible: true,
-      }, */
-      {
-        nombre: 'clasificacion',
-        descripcion: 'Cómo se clasifican las anomalías',
-        orden: 8,
-        apt: 1,
-        elegible: true,
-      },
-      {
-        nombre: 'resultadosClase',
-        descripcion: 'Resultados por clase',
-        orden: 11,
-        apt: 2,
-        elegible: true,
-      },
-      {
-        nombre: 'resultadosCategoria',
-        descripcion: 'Resultados por categoría',
-        orden: 12,
-        apt: 2,
-        elegible: true,
-      },
-      {
-        nombre: 'resultadosPosicion',
-        descripcion: 'Resultados por posición',
-        orden: 13,
-        apt: 2,
-        elegible: true,
-      },
-    ];
-
-    if (!this.simplePDF) {
-      this.apartadosInforme.push(
-        {
-          nombre: 'perdidaPR',
-          descripcion: 'Pérdida de Performance Ratio',
-          orden: 7,
-          apt: 1,
-          elegible: true,
-        },
-        {
-          nombre: 'resultadosMAE',
-          descripcion: 'MAE de la planta',
-          orden: 14,
-          apt: 2,
-          elegible: true,
-        }
-      );
-    }
-
-    if (!this.noAnomReport) {
-      this.apartadosInforme.push({
-        nombre: 'anexo1',
-        descripcion: 'Anexo I: Listado resumen de anomalías térmicas',
-        orden: 15,
-        elegible: true,
-      });
-    }
-
-    if (this.planta.tipo === 'seguidores') {
-      this.apartadosInforme.push({
-        nombre: 'anexoSeguidores',
-        descripcion: 'Anexo II: Anomalías térmicas por seguidor',
-        orden: 16,
-        elegible: true,
-      });
-
-      if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
-        this.apartadosInforme.push({
-          nombre: 'anexoSegsNoAnoms',
-          descripcion: 'Anexo III: Seguidores sin anomalías',
-          orden: 17,
-          elegible: true,
-        });
-      }
-    } else {
-      // si no hay zonas no se incluye el plano termico
-      if (this.reportControlService.thereAreZones) {
-        this.apartadosInforme.push({
-          nombre: 'planoTermico',
-          descripcion: 'Plano térmico',
-          orden: 9,
-          apt: 2,
-          elegible: false,
-        });
-      }
-      // solo disponible para plantas con pocas anomalias
-      if (this.informeConImagenes && this.incluirImagenes) {
-        this.apartadosInforme.push({
-          nombre: 'anexoAnomalias',
-          descripcion: 'Anexo II: Anomalías térmicas',
-          orden: 16,
-          elegible: true,
-        });
-      }
-
-      // if (this.planta.tipo === '1 eje') {
-      //   this.apartadosInforme.push({
-      //     nombre: 'anexoSeguidores1EjeAnoms',
-      //     descripcion: 'Anexo III: Anomalías térmicas por seguidor',
-      //     orden: 17,
-      //     elegible: true,
-      //   });
-
-      //   this.apartadosInforme.push({
-      //     nombre: 'anexoSeguidores1EjeNoAnoms',
-      //     descripcion: 'Anexo III: Seguidores sin anomalías',
-      //     orden: 18,
-      //     elegible: true,
-      //   });
-      // }
-    }
-
-    // solo se añade el plano visual si hay zonas y es un informe de 2021 en adelante
-    if (this.reportControlService.thereAreZones && this.selectedInforme.fecha > GLOBAL.newReportsDate) {
-      this.apartadosInforme.push({
-        nombre: 'planoVisual',
-        descripcion: 'Plano visual',
-        orden: 10,
-        apt: 2,
-        elegible: false,
-      });
-    }
-
-    this.apartadosInforme = this.apartadosInforme.sort((a: Apartado, b: Apartado) => {
-      return a.orden - b.orden;
-    });
-
-    // if (this.filtroApartados === undefined) {
-    this.filtroApartados = this.apartadosInforme.map((element) => element.nombre);
-    // }
-  }
-
   private loadOtherImages() {
     this.subscriptions.add(
       this.imagesLoadService.imgIrradianciaBase64$.subscribe((img) => (this.imgIrradianciaBase64 = img))
@@ -546,7 +342,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(() => (this.downloadReportService.filteredPDF = undefined));
   }
 
-  public setSimplePDF(checked: boolean) {
+  setSimplePDF(checked: boolean) {
     this.downloadReportService.simplePDF = checked;
   }
 
@@ -567,7 +363,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   selectDownloadType() {
     if (this.reportControlService.plantaFija) {
-      if (this.informeConImagenes) {
+      if (this.reportPdfService.informeConImagenes) {
         this.selectDownloadAnomImages();
       } else {
         this.downloadPDF();
@@ -583,7 +379,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe((response: boolean) => {
-      this.incluirImagenes = response;
+      this.reportPdfService.incluirImagenes = response;
 
       this.downloadPDF();
     });
@@ -591,7 +387,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   selectProgressBarMode() {
     if (this.reportControlService.plantaFija) {
-      if (this.informeConImagenes && this.incluirImagenes) {
+      if (this.reportPdfService.informeConImagenes && this.reportPdfService.incluirImagenes) {
         this.downloadReportService.progressBarMode = 'determinate';
       } else {
         this.downloadReportService.progressBarMode = 'indeterminate';
@@ -616,7 +412,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   public downloadPDF() {
     // cargamos los apartados del informe
-    this.loadApartadosInforme();
+    this.reportPdfService.loadApartadosInforme(this.planta, this.selectedInforme);
+
+    this.filtroApartados = this.reportPdfService.apartadosInforme.map((element) => element.nombre);
 
     // seleccionamos el modo de progressBar
     this.selectProgressBarMode();
@@ -639,7 +437,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     // PLANTAS FIJAS
     if (this.reportControlService.plantaFija) {
-      if (this.informeConImagenes && this.incluirImagenes) {
+      if (this.reportPdfService.informeConImagenes && this.reportPdfService.incluirImagenes) {
         // Imagenes anomalías
         this.countAnomalias = 0;
         this.anomaliasInforme.forEach((anomalia, index) => {
@@ -719,7 +517,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               // comprobamos que estan cargadas tb el resto de imagenes del PDF
               this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
                 // comprobamos si se van a cargar imagenes de anomalias
-                if (this.informeConImagenes && this.incluirImagenes) {
+                if (this.reportPdfService.informeConImagenes && this.reportPdfService.incluirImagenes) {
                   // Cuando se carguen todas las imágenes
                   if (planosLoaded && imagesLoaded && countLoadedImgs === this.countAnomalias && downloads === 0) {
                     this.calcularInforme();
