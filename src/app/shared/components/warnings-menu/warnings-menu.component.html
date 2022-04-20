@@ -5,7 +5,7 @@
   <mat-menu class="notif-menu" #warningMenu="matMenu">
     <div class="item-content" mat-menu-item *ngFor="let warning of warnings" (click)="$event.stopPropagation()">
       <div class="icon-and-label">
-        <mat-icon class="btn-icon">warning</mat-icon>
+        <mat-icon class="btn-icon" color="primary">warning</mat-icon>
         <span class="btn-label">{{ warning.content }}</span>
       </div>
       <button mat-stroked-button (click)="fixProblem(warning.type)" color="primary">{{ warning.action }}</button>

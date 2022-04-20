@@ -19,7 +19,3 @@
 :host ::ng-deep .icon-no-warnings mat-icon .mat-badge-content {
   background: green;
 }
-
-.btn-icon {
-  color: red;
-}
