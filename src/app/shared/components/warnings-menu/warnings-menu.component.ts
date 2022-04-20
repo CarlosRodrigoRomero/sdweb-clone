@@ -412,7 +412,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   }
 
   private checkAerialLayer() {
-    const url = 'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInforme.id + '_visual/1/1/1.png';
+    const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInforme.id + '_visual/1/1/1.png';
 
     this.http
       .get(url)
@@ -438,7 +438,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   private checkThermalLayer() {
     if (this.reportControlService.plantaFija) {
       const url =
-        'http://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInforme.id + '_thermal/1/1/1.png';
+        'https://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInforme.id + '_thermal/1/1/1.png';
 
       this.http
         .get(url)
