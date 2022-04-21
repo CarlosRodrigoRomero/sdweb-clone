@@ -337,7 +337,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       (anom) => anom.globalCoords === null || anom.globalCoords === undefined || anom.globalCoords[0] === null
     );
 
-    noGlobalCoordsAnoms.forEach((anom) => {
+    noGlobalCoordsAnoms.forEach((anom, index, anoms) => {
       const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(anom.featureCoords[0], this.locAreas);
 
       if (globalCoords !== null && globalCoords !== undefined && globalCoords[0] !== null) {
@@ -345,9 +345,12 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
 
         this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', globalCoords);
       }
-    });
 
-    // this.checkWanings();
+      // checkeamos los warnings al terminar de escribir los modulos que faltan
+      if (index === anoms.length - 1) {
+        this.checkWanings();
+      }
+    });
   }
 
   private checkZonesNames() {
@@ -405,12 +408,14 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   private fixModulosAnoms() {
     const anomsSinModulo = this.anomaliasInforme.filter((anom) => anom.modulo === null || anom.modulo === undefined);
 
-    anomsSinModulo.forEach((anom) => {
+    anomsSinModulo.forEach((anom, index, anoms) => {
       let modulo: ModuloInterface;
       if (this.reportControlService.plantaFija) {
         modulo = this.anomaliaService.getModule(anom.featureCoords[0], this.locAreas);
 
         if (modulo !== null) {
+          anom.modulo = modulo;
+
           this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
         }
       } else {
@@ -426,6 +431,11 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
 
           this.pcService.updatePc(anom as PcInterface);
         }
+      }
+
+      // checkeamos los warnings al terminar de escribir los modulos que faltan
+      if (index === anoms.length - 1) {
+        this.checkWanings();
       }
     });
   }
