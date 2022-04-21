@@ -152,6 +152,12 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     }
   }
 
+  private addWarning(warning: Warning) {
+    if (!this.warnings.map((warn) => warn.content).includes(warning.content)) {
+      this.warnings.push(warning);
+    }
+  }
+
   private checkTiposAnoms() {
     if (this.selectedInforme !== undefined && this.anomaliasInforme.length > 0) {
       if (this.selectedInforme.tiposAnomalias.length > 0) {
@@ -165,18 +171,22 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         });
 
         if (this.anomaliasInforme.length !== sumTiposAnoms) {
-          this.warnings.push({
+          const warning = {
             content: 'El nº de anomalías no coincide con la suma de los tipos de anomalías',
             types: ['tiposAnom'],
             actions: ['Corregir'],
-          });
+          };
+
+          this.addWarning(warning);
         }
       } else {
-        this.warnings.push({
+        const warning = {
           content: 'El nº de anomalías por tipo es incorrecto',
           types: ['tiposAnom'],
           actions: ['Corregir'],
-        });
+        };
+
+        this.addWarning(warning);
       }
     }
   }
@@ -186,11 +196,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       const sumNumsCoA = this.selectedInforme.numsCoA.reduce((acum, curr) => acum + curr);
 
       if (this.anomaliasInforme.length !== sumNumsCoA) {
-        this.warnings.push({
+        const warning = {
           content: 'El nº de anomalías no coincide con la suma de los CoA',
           types: ['numsCoA'],
           actions: ['Corregir'],
-        });
+        };
+
+        this.addWarning(warning);
       }
     }
   }
@@ -200,11 +212,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       const sumNumsCriticidad = this.selectedInforme.numsCriticidad.reduce((acum, curr) => acum + curr);
 
       if (this.anomaliasInforme.length !== sumNumsCriticidad) {
-        this.warnings.push({
+        const warning = {
           content: 'El nº de anomalías no coincide con la suma de las anomalías por criticidad',
           types: ['numsCriticidad'],
           actions: ['Corregir'],
-        });
+        };
+
+        this.addWarning(warning);
       }
     }
   }
@@ -212,17 +226,21 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   private checkFilsColsPlanta() {
     if (this.planta.columnas <= 1 || this.planta.columnas === undefined || this.planta.columnas === null) {
       if (this.reportControlService.plantaFija) {
-        this.warnings.push({
+        const warning = {
           content: 'El nº de filas y columnas de la planta no son correctos',
           types: ['filsColsPlanta'],
           actions: ['Ir a Editar planta'],
-        });
+        };
+
+        this.addWarning(warning);
       } else {
-        this.warnings.push({
+        const warning = {
           content: 'El nº de filas y columnas de la planta no son correctos y por tanto MAE y CC están mal',
           types: ['filsColsPlanta', 'recalMAEyCC'],
           actions: ['Ir a Editar planta', 'Recalcular MAE y CC'],
-        });
+        };
+
+        this.addWarning(warning);
       }
     }
   }
@@ -242,11 +260,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       );
 
       if (differentFilColAnoms.length > 0) {
-        this.warnings.push({
+        const warning = {
           content: 'Hay anomalías con posibles datos de fila y columna erroneos',
           types: ['filsColsAnoms'],
           actions: ['Filtrar'],
-        });
+        };
+
+        this.addWarning(warning);
       }
     }
   }
@@ -259,11 +279,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       this.checkModulosWarnings();
     } else {
       // añadimos el aviso de que faltan las zonas de la planta
-      this.warnings.push({
+      const warning = {
         content: 'Faltan las zonas de la planta',
         types: ['irLoc'],
         actions: ['Ir a Localizaciones'],
-      });
+      };
+
+      this.addWarning(warning);
     }
   }
 
@@ -281,17 +303,21 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
 
     if (anomsWrongGlobals.length > 0) {
       if (anomsWrongGlobals.length === 1) {
-        this.warnings.push({
+        const warning = {
           content: `Hay ${anomsWrongGlobals.length} anomalía que puede estar mal posicionada y estar fuera de las zonas que debería`,
           types: ['globalCoordsAnoms', 'irLoc'],
           actions: ['Filtrar', 'Ir a Localizaciones'],
-        });
+        };
+
+        this.addWarning(warning);
       } else {
-        this.warnings.push({
+        const warning = {
           content: `Hay ${anomsWrongGlobals.length} anomalías que pueden estar mal posicionadas y estar fuera de las zonas que deberían`,
           types: ['globalCoordsAnoms', 'irLoc'],
           actions: ['Filtrar', 'Ir a Localizaciones'],
-        });
+        };
+
+        this.addWarning(warning);
       }
     }
   }
@@ -317,17 +343,21 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
 
     if (noGlobalCoordsAnoms.length > 0) {
       if (noGlobalCoordsAnoms.length === 1) {
-        this.warnings.push({
+        const warning = {
           content: `Hay ${noGlobalCoordsAnoms.length} anomalía que no tiene globalCoords`,
           types: ['noGlobalCoordsAnoms'],
           actions: ['Corregir'],
-        });
+        };
+
+        this.addWarning(warning);
       } else {
-        this.warnings.push({
+        const warning = {
           content: `Hay ${noGlobalCoordsAnoms.length} anomalías que no tienen globalCoords`,
           types: ['noGlobalCoordsAnoms'],
           actions: ['Corregir'],
-        });
+        };
+
+        this.addWarning(warning);
       }
     }
   }
@@ -360,11 +390,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       this.planta.nombreGlobalCoords === undefined ||
       this.planta.nombreGlobalCoords.length === 0
     ) {
-      this.warnings.push({
+      const warning = {
         content: 'Faltan los nombres de las zonas de la planta',
         types: ['nombresZonas'],
         actions: ['Ir a Editar planta'],
-      });
+      };
+
+      this.addWarning(warning);
     }
   }
 
@@ -377,11 +409,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       this.checkModulosAnoms();
     } else {
       // añadimos el aviso de que faltan los modulos de la planta
-      this.warnings.push({
+      const warning = {
         content: 'Faltan los módulos de la planta',
         types: ['irLoc'],
         actions: ['Ir a Localizaciones'],
-      });
+      };
+
+      this.addWarning(warning);
     }
   }
 
@@ -390,17 +424,21 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
 
     if (anomsSinModulo.length > 0) {
       if (anomsSinModulo.length === 1) {
-        this.warnings.push({
+        const warning = {
           content: `Hay ${anomsSinModulo.length} anomalía sin módulo`,
           types: ['modulosAnoms'],
           actions: ['Corregir'],
-        });
+        };
+
+        this.addWarning(warning);
       } else {
-        this.warnings.push({
+        const warning = {
           content: `Hay ${anomsSinModulo.length} anomalías sin módulo`,
           types: ['modulosAnoms'],
           actions: ['Corregir'],
-        });
+        };
+
+        this.addWarning(warning);
       }
     }
   }
@@ -450,11 +488,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         catchError((error) => {
           // no recibimos respuesta del servidor porque no existe
           if (error.status === 0) {
-            this.warnings.push({
+            const warning = {
               content: 'No existe la capa visual',
               types: ['visualLayer'],
               actions: [''],
-            });
+            };
+
+            this.addWarning(warning);
           }
 
           return [];
@@ -476,11 +516,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
           catchError((error) => {
             // no recibimos respuesta del servidor porque no existe
             if (error.status === 0) {
-              this.warnings.push({
+              const warning = {
                 content: 'No existe la capa térmica',
                 types: ['thermalLayer'],
                 actions: [''],
-              });
+              };
+
+              this.addWarning(warning);
             }
 
             return [];
