@@ -55,6 +55,11 @@ export const routes: Routes = [
     loadChildren: () => import('./classification/classification.module').then((m) => m.ClassificationModule),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'autogeo',
+    loadChildren: () => import('./autogeo/autogeo.module').then((m) => m.AutogeoModule),
+    canActivate: [AuthGuard],
+  },
   { path: '**', redirectTo: 'clients', pathMatch: 'full' },
 ];
 

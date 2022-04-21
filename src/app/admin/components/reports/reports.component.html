@@ -55,6 +55,9 @@
         <button mat-icon-button [routerLink]="['./edit', element.informeId]">
           <mat-icon>edit</mat-icon>
         </button>
+        <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../autogeo', element.informeId]"
+          >AutoGeo</a
+        >
         <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../clusters', element.informeId]"
           >Clusters</a
         >
