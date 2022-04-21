@@ -11,6 +11,7 @@ import { PlantaService } from '@core/services/planta.service';
 import { SeguidorService } from '@core/services/seguidor.service';
 import { FilterService } from '@core/services/filter.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
+import { PcService } from '@core/services/pc.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -19,6 +20,8 @@ import { PlantaInterface } from '@core/models/planta';
 import { LocationFilter } from '@core/models/locationFilter';
 import { LocationAreaInterface } from '@core/models/location';
 import { WrongGlobalCoordsFilter } from '@core/models/wrongGlobalCoordsFilter';
+import { ModuloInterface } from '@core/models/modulo';
+import { PcInterface } from '@core/models/pc';
 
 interface Warning {
   types: string[];
@@ -50,13 +53,15 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     private seguidorService: SeguidorService,
     private filterService: FilterService,
     private anomaliaService: AnomaliaService,
-    private http: HttpClient
+    private http: HttpClient,
+    private pcService: PcService
   ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
       this.reportControlService.allFilterableElements$
         .pipe(
+          take(1),
           switchMap((elems) => {
             if (this.reportControlService.plantaFija) {
               this.allAnomalias = elems as Anomalia[];
@@ -82,9 +87,6 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
           this.anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
 
           if (this.selectedInforme !== undefined && this.anomaliasInforme.length > 0) {
-            // reseteamos warnings con cada actualización
-            this.warnings = [];
-
             this.checkWanings();
           }
         })
@@ -92,6 +94,9 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   }
 
   private checkWanings() {
+    // reseteamos warnings con cada actualización
+    this.warnings = [];
+
     this.checkTiposAnoms();
     this.checkNumsCoA();
     this.checkNumsCriticidad();
@@ -124,7 +129,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       case 'recalMAEyCC':
         this.recalMAEyCC();
         break;
-      case 'zonasPlanta':
+      case 'irLoc':
         window.open(urlLocalizaciones, '_blank');
         break;
       case 'nombresZonas':
@@ -134,9 +139,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         const filColFilter: LocationFilter = new LocationFilter('location', this.planta.filas, this.planta.columnas);
         this.filterService.addFilter(filColFilter);
         break;
-      case 'modulosPlanta':
-        window.open(urlLocalizaciones, '_blank');
-        break;
+
       case 'modulosAnoms':
         this.fixModulosAnoms();
         break;
@@ -240,7 +243,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
 
       if (differentFilColAnoms.length > 0) {
         this.warnings.push({
-          content: 'Hay posibles anomalías con datos de fila y columna erroneos',
+          content: 'Hay anomalías con posibles datos de fila y columna erroneos',
           types: ['filsColsAnoms'],
           actions: ['Filtrar'],
         });
@@ -258,7 +261,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       // añadimos el aviso de que faltan las zonas de la planta
       this.warnings.push({
         content: 'Faltan las zonas de la planta',
-        types: ['zonasPlanta'],
+        types: ['irLoc'],
         actions: ['Ir a Localizaciones'],
       });
     }
@@ -280,14 +283,14 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       if (anomsWrongGlobals.length === 1) {
         this.warnings.push({
           content: `Hay ${anomsWrongGlobals.length} anomalía que puede estar mal posicionada y estar fuera de las zonas que debería`,
-          types: ['globalCoordsAnoms'],
-          actions: ['Filtrar'],
+          types: ['globalCoordsAnoms', 'irLoc'],
+          actions: ['Filtrar', 'Ir a Localizaciones'],
         });
       } else {
         this.warnings.push({
           content: `Hay ${anomsWrongGlobals.length} anomalías que pueden estar mal posicionadas y estar fuera de las zonas que deberían`,
-          types: ['globalCoordsAnoms'],
-          actions: ['Filtrar'],
+          types: ['globalCoordsAnoms', 'irLoc'],
+          actions: ['Filtrar', 'Ir a Localizaciones'],
         });
       }
     }
@@ -343,6 +346,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', globalCoords);
       }
     });
+
+    // this.checkWanings();
   }
 
   private checkZonesNames() {
@@ -371,7 +376,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       // añadimos el aviso de que faltan los modulos de la planta
       this.warnings.push({
         content: 'Faltan los módulos de la planta',
-        types: ['modulosPlanta'],
+        types: ['irLoc'],
         actions: ['Ir a Localizaciones'],
       });
     }
@@ -401,12 +406,26 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     const anomsSinModulo = this.anomaliasInforme.filter((anom) => anom.modulo === null || anom.modulo === undefined);
 
     anomsSinModulo.forEach((anom) => {
-      const modulo = this.anomaliaService.getModule(anom.featureCoords[0], this.locAreas);
+      let modulo: ModuloInterface;
+      if (this.reportControlService.plantaFija) {
+        modulo = this.anomaliaService.getModule(anom.featureCoords[0], this.locAreas);
 
-      if (modulo !== null) {
-        anom.modulo = modulo;
+        if (modulo !== null) {
+          this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
+        }
+      } else {
+        const seguidoresInforme = this.allSeguidores.filter((seg) => seg.informeId === this.selectedInforme.id);
+        const seguidorAnom = seguidoresInforme.find(
+          (seg) => seg.globalCoords.toString().replace(/,/g, '') === anom.globalCoords.toString().replace(/,/g, '')
+        );
 
-        this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
+        modulo = seguidorAnom.modulo;
+
+        if (modulo !== null) {
+          anom.modulo = modulo;
+
+          this.pcService.updatePc(anom as PcInterface);
+        }
       }
     });
   }

@@ -124,7 +124,10 @@ export class SeguidorService {
               if (zona !== undefined) {
                 modulo = zona.modulo;
               } else {
-                modulo = anomaliasSeguidor[0].modulo;
+                const anomaliaConModulo = anomaliasSeguidor.find(
+                  (anom) => anom.modulo !== null && anom.modulo !== undefined
+                );
+                modulo = anomaliaConModulo.modulo;
                 // modulo = this.getSeguidorModule(locAreaList);
               }
 
