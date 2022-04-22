@@ -115,7 +115,7 @@ export class RawModulesComponent implements OnInit, OnDestroy {
       const polygon = evt.feature.getGeometry() as Polygon;
       const coords = polygon.getCoordinates();
       coords[0].pop(); // quitamos el ultimo punto que es igual al primero
-      const centroid = this.structuresService.getCentroid(coords[0]);
+      const centroid = this.olMapService.getCentroid(coords[0]);
 
       const rawModule: RawModule = {
         coords: coords[0],

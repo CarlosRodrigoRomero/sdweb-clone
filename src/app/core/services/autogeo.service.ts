@@ -8,7 +8,7 @@ import { map } from 'rxjs/operators';
 import { Coordinate } from 'ol/coordinate';
 
 export interface Mesa {
-  id: string;
+  id?: string;
   coords: Coordinate[];
 }
 
@@ -18,6 +18,22 @@ export interface Mesa {
 export class AutogeoService {
   constructor(private afs: AngularFirestore) {}
 
+  addMesa(informeId: string, mesa: Mesa) {
+    // obtenemos un ID aleatorio
+    const id = this.afs.createId();
+
+    this.afs
+      .collection<Mesa>('autogeo/' + informeId + '/mesas')
+      .doc(id)
+      .set(mesa)
+      .then(() => {
+        console.log('Mesa creada correctamente con ID: ', id);
+      })
+      .catch((error) => {
+        console.error('Error al crear mesa: ', error);
+      });
+  }
+
   getMesas(informeId: string): Observable<Mesa[]> {
     const query$ = this.afs
       .collection<Mesa>('autogeo/' + informeId + '/mesas')
@@ -25,12 +41,11 @@ export class AutogeoService {
       .pipe(
         map((actions) =>
           actions.map((doc) => {
-            console.log('ok');
             const data = doc.payload.doc.data();
             data.id = doc.payload.doc.id;
 
             // Convertimos el objeto en un array
-            data.coords = this.coordsDbToArray((data as any).tl, (data as any).tr, (data as any).br, (data as any).bl);
+            data.coords = this.coordsDbToArray(data.coords);
 
             return data;
           })
@@ -39,11 +54,25 @@ export class AutogeoService {
     return query$;
   }
 
-  private coordsDbToArray(tl: any, tr: any, br: any, bl: any): Coordinate[] {
-    const topLeft = Object.values(tl) as Coordinate;
-    const topRight = Object.values(tr) as Coordinate;
-    const bottomRight = Object.values(br) as Coordinate;
-    const bottomLeft = Object.values(bl) as Coordinate;
+  deleteMesa(informeId: string, id: string) {
+    const colRef = this.afs.collection('autogeo/' + informeId + '/mesas');
+
+    colRef
+      .doc(id)
+      .delete()
+      .then(() => {
+        console.log('Mesa eliminada correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al eliminar mesa: ', error);
+      });
+  }
+
+  private coordsDbToArray(coords: any): Coordinate[] {
+    const topLeft = [coords.topLeft.long, coords.topLeft.lat] as Coordinate;
+    const topRight = [coords.topRight.long, coords.topRight.lat] as Coordinate;
+    const bottomRight = [coords.bottomRight.long, coords.bottomRight.lat] as Coordinate;
+    const bottomLeft = [coords.bottomLeft.long, coords.bottomLeft.lat] as Coordinate;
 
     return [topLeft, topRight, bottomRight, bottomLeft];
   }

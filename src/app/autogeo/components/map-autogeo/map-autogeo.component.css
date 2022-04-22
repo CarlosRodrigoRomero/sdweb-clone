@@ -1,4 +1,12 @@
 .map {
-    height: calc(100vh - 70px);
-    width: 100%;
-  }
+  height: calc(100vh - 70px);
+  width: 100%;
+}
+
+.crud-btns {
+  position: absolute;
+  top: 80px;
+  left: 50px;
+  display: flex;
+  gap: 1rem;
+}

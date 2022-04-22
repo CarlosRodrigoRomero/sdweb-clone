@@ -258,7 +258,7 @@ export class NormModulesComponent implements OnInit, OnDestroy {
 
       this.coordsNewNormMod = this.structuresService.coordinateToObject(coords);
 
-      const centroid = this.structuresService.getCentroid(coords[0]);
+      const centroid = this.olMapService.getCentroid(coords[0]);
 
       this.centroidDB = this.structuresService.prepareCentroidToDB(centroid);
 

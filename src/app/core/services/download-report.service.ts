@@ -6,6 +6,7 @@ import { take } from 'rxjs/operators';
 import inside from 'point-in-polygon';
 
 import { PlantaService } from '@core/services/planta.service';
+import { OlMapService } from './ol-map.service';
 
 import { FilterableElement } from '@core/models/filterableInterface';
 import { PlantaInterface } from '@core/models/planta';
@@ -39,7 +40,7 @@ export class DownloadReportService {
   private _simplePDF = true;
   simplePDF$ = new BehaviorSubject<boolean>(this._simplePDF);
 
-  constructor(private plantaService: PlantaService) {}
+  constructor(private plantaService: PlantaService, private olMapService: OlMapService) {}
 
   sortByPosition(a: FilterableElement, b: FilterableElement): number {
     if (this.sortByGlobalCoords(a, b) !== 0) {
@@ -174,7 +175,7 @@ export class DownloadReportService {
     const globalCoords = seg.globalCoords;
 
     this.noS1EsLocAreas.forEach((locArea) => {
-      const centroid = this.getCentroid(this.pathToCoordinate(seg.path));
+      const centroid = this.olMapService.getCentroid(this.pathToCoordinate(seg.path));
       const polygon = this.pathToCoordinate(locArea.path);
 
       if (inside(centroid, polygon)) {
@@ -187,17 +188,6 @@ export class DownloadReportService {
     });
 
     return globalCoords;
-  }
-
-  getCentroid(coords: Coordinate[]): Coordinate {
-    let sumLong = 0;
-    let sumLat = 0;
-    coords.forEach((coord) => {
-      sumLong += coord[0];
-      sumLat += coord[1];
-    });
-
-    return [sumLong / coords.length, sumLat / coords.length];
   }
 
   pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {

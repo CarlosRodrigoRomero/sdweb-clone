@@ -123,6 +123,65 @@ export class OlMapService {
     return [coordsList];
   }
 
+  coordinateToObject(coordinate: Coordinate): any {
+    return { long: coordinate[0], lat: coordinate[1] };
+  }
+
+  fourSidePolygonCoordToObject(coordinates: Coordinate[]): any {
+    if (coordinates.length === 4) {
+      const latSort = coordinates.sort((a, b) => a[1] - b[1]);
+      const tops = latSort.slice(2, 4);
+      const bottoms = latSort.slice(0, 2);
+
+      let topLeft = tops[0];
+      let topRight = tops[1];
+      if (tops[0][0] > tops[1][0]) {
+        topRight = tops[0];
+        topLeft = tops[1];
+      }
+
+      let bottomLeft = bottoms[0];
+      let bottomRight = bottoms[1];
+      if (bottoms[0][0] > bottoms[1][0]) {
+        bottomRight = bottoms[0];
+        bottomLeft = bottoms[1];
+      }
+
+      const coordsDB = {
+        topLeft: this.coordinateToObject(topLeft),
+        topRight: this.coordinateToObject(topRight),
+        bottomRight: this.coordinateToObject(bottomRight),
+        bottomLeft: this.coordinateToObject(bottomLeft),
+      };
+
+      return coordsDB;
+    } else {
+      return null;
+    }
+  }
+
+  coordsDBToCoordinate(coords: any) {
+    const coordinates: Coordinate[] = [
+      [coords.topLeft.long, coords.topLeft.lat],
+      [coords.topRight.long, coords.topRight.lat],
+      [coords.bottomRight.long, coords.bottomRight.lat],
+      [coords.bottomLeft.long, coords.bottomLeft.lat],
+    ];
+
+    return coordinates;
+  }
+
+  getCentroid(coords: Coordinate[]): Coordinate {
+    let sumLong = 0;
+    let sumLat = 0;
+    coords.forEach((coord) => {
+      sumLong += coord[0];
+      sumLat += coord[1];
+    });
+
+    return [sumLong / coords.length, sumLat / coords.length];
+  }
+
   resetService() {
     this.map = undefined;
     this.draw = undefined;
@@ -133,6 +192,8 @@ export class OlMapService {
     this.seguidorLayers = [];
     this.incrementoLayers = [];
   }
+
+  ///////////////////////////////////////////////////////////////////////
 
   get draw() {
     return this._draw;

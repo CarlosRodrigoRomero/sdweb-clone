@@ -14,6 +14,7 @@ import { PlantaService } from '@core/services/planta.service';
 import { AnomaliaInfoService } from '@core/services/anomalia-info.service';
 import { DownloadReportService } from '@core/services/download-report.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
+import { OlMapService } from '@core/services/ol-map.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -88,7 +89,8 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     private storage: AngularFireStorage,
     private anomaliaInfoService: AnomaliaInfoService,
     private downloadReportService: DownloadReportService,
-    private anomaliaService: AnomaliaService
+    private anomaliaService: AnomaliaService,
+    private olMapService: OlMapService
   ) {}
 
   ngOnInit(): void {
@@ -304,13 +306,13 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     if (this.reportControlService.plantaFija) {
       row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(
-        this.downloadReportService.getCentroid(anomalia.featureCoords)
+        this.olMapService.getCentroid(anomalia.featureCoords)
       );
     } else {
       const seguidor = (this.allElems as Seguidor[]).find((seguidor) => seguidor.nombre === anomalia.nombreSeguidor);
 
       row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(
-        this.downloadReportService.getCentroid(seguidor.featureCoords)
+        this.olMapService.getCentroid(seguidor.featureCoords)
       );
     }
 

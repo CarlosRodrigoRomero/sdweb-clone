@@ -2654,12 +2654,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
       let gpsLink = '';
       if (this.reportControlService.plantaFija) {
-        gpsLink = this.anomaliaInfoService.getGoogleMapsUrl(this.downloadReportService.getCentroid(anom.featureCoords));
+        gpsLink = this.anomaliaInfoService.getGoogleMapsUrl(this.olMapService.getCentroid(anom.featureCoords));
       } else {
         const seguidor = this.seguidoresInforme.find((seg) => seg.nombre === anom.nombreSeguidor);
 
         gpsLink = this.anomaliaInfoService.getGoogleMapsUrl(
-          this.downloadReportService.getCentroid(seguidor.featureCoords)
+          this.olMapService.getCentroid(seguidor.featureCoords)
         );
       }
 
@@ -3269,7 +3269,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                       {
                         text: 'link',
                         link: this.anomaliaInfoService.getGoogleMapsUrl(
-                          this.downloadReportService.getCentroid(seg.featureCoords)
+                          this.olMapService.getCentroid(seg.featureCoords)
                         ),
                         style: 'linkCellAnexo1',
                         noWrap: true,
@@ -3451,7 +3451,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                       {
                         text: 'link',
                         link: this.anomaliaInfoService.getGoogleMapsUrl(
-                          this.downloadReportService.getCentroid(seg.featureCoords)
+                          this.olMapService.getCentroid(seg.featureCoords)
                         ),
                         style: 'linkCellAnexo1',
                         noWrap: true,

@@ -10,6 +10,7 @@ import TileLayer from 'ol/layer/Tile';
 import { defaults as defaultControls } from 'ol/control.js';
 import { fromLonLat } from 'ol/proj';
 import VectorLayer from 'ol/layer/Vector';
+import { DoubleClickZoom, Draw, Select } from 'ol/interaction';
 
 import { OlMapService } from '@core/services/ol-map.service';
 import { InformeService } from '@core/services/informe.service';
@@ -21,6 +22,12 @@ import VectorSource from 'ol/source/Vector';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import Polygon from 'ol/geom/Polygon';
+import GeometryType from 'ol/geom/GeometryType';
+import { DrawEvent } from 'ol/interaction/Draw';
+import { Coordinate } from 'ol/coordinate';
+import { FeatureLike } from 'ol/Feature';
+import { Fill } from 'ol/style';
+import { click } from 'ol/events/condition';
 
 @Component({
   selector: 'app-map-autogeo',
@@ -33,7 +40,9 @@ export class MapAutogeoComponent implements OnInit {
   private informeId: string;
   private planta: PlantaInterface;
   private mesasLayer: VectorLayer;
-  private mesas: Mesa[];
+  private mesas: Mesa[] = [];
+  private draw: Draw;
+  private mesaSelected: Mesa;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -63,17 +72,15 @@ export class MapAutogeoComponent implements OnInit {
           this.initMap();
 
           this.createMesasLayer();
+          this.addMesas();
+
+          this.addPointerOnHover();
+          this.addOnHoverMesaAction();
+          this.addSelectMesasInteraction();
         }
       });
 
     this.olMapService.getAerialLayers().subscribe((layers) => (this.aerialLayers = layers));
-
-    this.autogeoService.getMesas(this.informeId).subscribe((mesas) => {
-      console.log(mesas);
-      this.mesas = mesas;
-
-      this.mesas.forEach((mesa) => this.addMesa(mesa));
-    });
   }
 
   private initMap(): void {
@@ -116,12 +123,7 @@ export class MapAutogeoComponent implements OnInit {
   private createMesasLayer() {
     this.mesasLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: new Style({
-        stroke: new Stroke({
-          width: 2,
-          color: 'white',
-        }),
-      }),
+      style: this.getStyleMesa(false),
     });
 
     this.mesasLayer.setProperties({
@@ -129,6 +131,16 @@ export class MapAutogeoComponent implements OnInit {
     });
 
     this.map.addLayer(this.mesasLayer);
+  }
+
+  private addMesas() {
+    this.autogeoService.getMesas(this.informeId).subscribe((mesas) => {
+      if (this.mesas.length !== mesas.length) {
+        this.mesas = mesas;
+
+        this.mesas.forEach((mesa) => this.addMesa(mesa));
+      }
+    });
   }
 
   private addMesa(mesa: Mesa) {
@@ -142,5 +154,145 @@ export class MapAutogeoComponent implements OnInit {
     });
 
     mBSource.addFeature(feature);
+  }
+
+  drawMesa() {
+    const sourceMesas = this.mesasLayer.getSource();
+
+    this.draw = new Draw({
+      source: sourceMesas,
+      type: GeometryType.POLYGON,
+      maxPoints: 4,
+      stopClick: true,
+    });
+    this.olMapService.draw = this.draw;
+
+    this.map.addInteraction(this.draw);
+
+    this.draw.on('drawend', (evt) => {
+      // desactivamos el dobleclick para que no interfiera al cerrar poligono
+      this.map.getInteractions().forEach((interaction) => {
+        if (interaction instanceof DoubleClickZoom) {
+          this.map.removeInteraction(interaction);
+        }
+      });
+      // obtenemos coordenadas del poligono
+      const coords = this.olMapService.fourSidePolygonCoordToObject(this.getCoords(evt));
+
+      if (coords !== null) {
+        const mesa: Mesa = { coords };
+
+        this.autogeoService.addMesa(this.informeId, mesa);
+      }
+
+      // terminamos el modo draw
+      this.map.removeInteraction(this.draw);
+    });
+  }
+
+  private addPointerOnHover() {
+    this.map.on('pointermove', (event) => {
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        const features = this.map.getFeaturesAtPixel(event.pixel);
+
+        if (features.length > 0) {
+          // cambia el puntero por el de seleccionar
+          this.map.getViewport().style.cursor = 'pointer';
+        } else {
+          // vuelve a poner el puntero normal
+          this.map.getViewport().style.cursor = 'inherit';
+        }
+      } else {
+        // vuelve a poner el puntero normal
+        this.map.getViewport().style.cursor = 'inherit';
+      }
+    });
+  }
+
+  private addOnHoverMesaAction() {
+    let currentFeatureHover: Feature;
+    this.map.on('pointermove', (event) => {
+      if (currentFeatureHover !== undefined) {
+        currentFeatureHover.setStyle(this.getStyleMesa(false));
+        currentFeatureHover = undefined;
+      }
+
+      this.map.forEachFeatureAtPixel(event.pixel, (feature) => {
+        const f = feature as Feature;
+        if (f.getProperties().name === 'mesa') {
+          currentFeatureHover = f;
+          currentFeatureHover.setStyle(this.getStyleMesa(true));
+        }
+      });
+    });
+  }
+
+  private addSelectMesasInteraction() {
+    const select = new Select({
+      style: this.getStyleMesa(true),
+      condition: click,
+      layers: (l) => {
+        if (l.getProperties().id === 'mesasLayer') {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    });
+
+    this.map.addInteraction(select);
+
+    select.on('select', (e) => {
+      if (e.selected.length > 0) {
+        const feature = e.selected[0];
+        if (feature.getProperties().properties.name === 'mesa') {
+          const mesaId = feature.getProperties().properties.id;
+
+          this.autogeoService.deleteMesa(this.informeId, mesaId);
+        }
+      }
+    });
+  }
+
+  getCoords(event: DrawEvent): Coordinate[] {
+    const polygon = event.feature.getGeometry() as Polygon;
+    const coords = polygon.getCoordinates()[0];
+
+    // quitamos el ultimo punto que es el mismo que el primero
+    coords.pop();
+
+    return coords;
+  }
+
+  private getStyleMesa(hovered: boolean) {
+    if (hovered) {
+      return (feature: Feature) => {
+        if (feature !== undefined) {
+          return new Style({
+            stroke: new Stroke({
+              width: 4,
+              color: 'white',
+            }),
+            fill: new Fill({
+              color: 'rgba(255, 255, 255, 0.2)',
+            }),
+          });
+        }
+      };
+    } else {
+      return (feature: Feature) => {
+        if (feature !== undefined) {
+          return new Style({
+            stroke: new Stroke({
+              width: 2,
+              color: 'white',
+            }),
+            fill: new Fill({
+              color: 'rgba(255, 255, 255, 0)',
+            }),
+          });
+        }
+      };
+    }
   }
 }
