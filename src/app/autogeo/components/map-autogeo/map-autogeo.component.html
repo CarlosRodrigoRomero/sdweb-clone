@@ -15,7 +15,7 @@
       <span>Desactivar modo crear mesas</span>
     </div>
   </button>
-  <button mat-raised-button (click)="deleteMode = !deleteMode">
+  <button mat-raised-button (click)="changeDeleteMode()">
     <div class="btn-content" *ngIf="!deleteMode">
       <mat-icon>delete</mat-icon>
       <span>Activar modo eliminar</span>

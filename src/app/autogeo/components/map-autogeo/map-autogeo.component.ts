@@ -216,6 +216,20 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
       // terminamos el modo crear mesas
       this.map.removeInteraction(this.draw);
     }
+
+    if (this.deleteMode) {
+      this.deleteMode = false;
+    }
+  }
+
+  changeDeleteMode() {
+    this.deleteMode = !this.deleteMode;
+
+    if (this.createMode) {
+      this.createMode = false;
+      // terminamos el modo crear mesas
+      this.map.removeInteraction(this.draw);
+    }
   }
 
   private addPointerOnHover() {
