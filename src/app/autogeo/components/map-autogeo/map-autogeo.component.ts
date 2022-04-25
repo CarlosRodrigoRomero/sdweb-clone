@@ -10,7 +10,7 @@ import TileLayer from 'ol/layer/Tile';
 import { defaults as defaultControls } from 'ol/control.js';
 import { fromLonLat } from 'ol/proj';
 import VectorLayer from 'ol/layer/Vector';
-import { DoubleClickZoom, Draw, Select } from 'ol/interaction';
+import { DoubleClickZoom, Draw, Modify, Select } from 'ol/interaction';
 
 import { OlMapService } from '@core/services/ol-map.service';
 import { InformeService } from '@core/services/informe.service';
@@ -27,7 +27,7 @@ import { DrawEvent } from 'ol/interaction/Draw';
 import { Coordinate } from 'ol/coordinate';
 import { FeatureLike } from 'ol/Feature';
 import { Fill } from 'ol/style';
-import { click } from 'ol/events/condition';
+import { click, never } from 'ol/events/condition';
 
 @Component({
   selector: 'app-map-autogeo',
@@ -80,6 +80,7 @@ export class MapAutogeoComponent implements OnInit {
           this.addPointerOnHover();
           this.addOnHoverMesaAction();
           this.addSelectMesasInteraction();
+          this.addModifyMesasInteraction();
         }
       });
 
@@ -179,7 +180,11 @@ export class MapAutogeoComponent implements OnInit {
         }
       });
       // obtenemos coordenadas del poligono
-      const coords = this.olMapService.fourSidePolygonCoordToObject(this.getCoords(evt));
+      const coordsOl = this.getCoords(evt.feature);
+      // quitamos el ultimo punto que es el mismo que el primero
+      coordsOl.pop();
+      // convertimos las coordenadas para la base de datos
+      const coords = this.olMapService.fourSidePolygonCoordToObject(coordsOl);
 
       if (coords !== null) {
         const mesa: Mesa = { coords };
@@ -267,12 +272,29 @@ export class MapAutogeoComponent implements OnInit {
     });
   }
 
-  getCoords(event: DrawEvent): Coordinate[] {
-    const polygon = event.feature.getGeometry() as Polygon;
-    const coords = polygon.getCoordinates()[0];
+  private addModifyMesasInteraction() {
+    const modify = new Modify({ source: this.mesasSource, insertVertexCondition: never });
 
-    // quitamos el ultimo punto que es el mismo que el primero
-    coords.pop();
+    modify.on('modifyend', (e) => {
+      if (e.features.getArray().length > 0) {
+        const mesaId = e.features.getArray()[0].getProperties().properties.id;
+        const mesa = this.mesas.find((m) => m.id === mesaId);
+        const coords = this.olMapService.fourSidePolygonCoordToObject(this.getCoords(e.features.getArray()[0]));
+
+        if (coords !== null) {
+          mesa.coords = coords;
+
+          this.autogeoService.updateMesa(this.informeId, mesa);
+        }
+      }
+    });
+
+    this.map.addInteraction(modify);
+  }
+
+  getCoords(feature: Feature): Coordinate[] {
+    const polygon = feature.getGeometry() as Polygon;
+    const coords = polygon.getCoordinates()[0];
 
     return coords;
   }

@@ -34,6 +34,20 @@ export class AutogeoService {
       });
   }
 
+  updateMesa(informeId: string, mesa: Mesa) {
+    const colRef = this.afs.collection('autogeo/' + informeId + '/mesas');
+
+    colRef
+      .doc(mesa.id)
+      .update(mesa)
+      .then(() => {
+        console.log('Mesa actualizada correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al actualizar mesa: ', error);
+      });
+  }
+
   getMesas(informeId: string): Observable<Mesa[]> {
     const query$ = this.afs
       .collection<Mesa>('autogeo/' + informeId + '/mesas')
