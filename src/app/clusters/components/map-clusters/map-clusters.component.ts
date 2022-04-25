@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 
 import { take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
-import { fromLonLat, transformExtent } from 'ol/proj';
+import { fromLonLat } from 'ol/proj';
 import XYZ from 'ol/source/XYZ';
 import View from 'ol/View';
 import { defaults as defaultControls } from 'ol/control.js';
@@ -36,7 +37,7 @@ import { Cluster } from '@core/models/cluster';
   templateUrl: './map-clusters.component.html',
   styleUrls: ['./map-clusters.component.css'],
 })
-export class MapClustersComponent implements OnInit {
+export class MapClustersComponent implements OnInit, OnDestroy {
   private planta: PlantaInterface;
   private satelliteLayer: TileLayer;
   private map: Map;
@@ -55,6 +56,8 @@ export class MapClustersComponent implements OnInit {
   private mesasLayer: VectorLayer;
   private mesasSource: VectorSource;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private olMapService: OlMapService,
     private clustersService: ClustersService,
@@ -67,9 +70,13 @@ export class MapClustersComponent implements OnInit {
     this.planta = this.clustersService.planta;
     this.coordsPuntosTrayectoria = this.clustersService.coordsPuntosTrayectoria;
     this.puntosTrayectoria = this.clustersService.puntosTrayectoria;
-    this.clustersService.joinActive$.subscribe((joi) => (this.joinActive = joi));
-    this.clustersService.clusterSelected$.subscribe((cluster) => (this.clusterSelected = cluster));
-    this.clustersService.createClusterActive$.subscribe((create) => (this.createClusterActive = create));
+    this.subscriptions.add(this.clustersService.joinActive$.subscribe((joi) => (this.joinActive = joi)));
+    this.subscriptions.add(
+      this.clustersService.clusterSelected$.subscribe((cluster) => (this.clusterSelected = cluster))
+    );
+    this.subscriptions.add(
+      this.clustersService.createClusterActive$.subscribe((create) => (this.createClusterActive = create))
+    );
 
     this.initMap();
 
@@ -261,48 +268,50 @@ export class MapClustersComponent implements OnInit {
   }
 
   private addClusters() {
-    this.clustersService.clusters$.subscribe((clusters) => {
-      if (clusters !== undefined) {
-        this.clusters = clusters;
-        const clustersLayer = this.map
-          .getLayers()
-          .getArray()
-          .find((layer) => layer.getProperties().id === 'clustersLayer') as VectorLayer;
+    this.subscriptions.add(
+      this.clustersService.clusters$.subscribe((clusters) => {
+        if (clusters !== undefined) {
+          this.clusters = clusters;
+          const clustersLayer = this.map
+            .getLayers()
+            .getArray()
+            .find((layer) => layer.getProperties().id === 'clustersLayer') as VectorLayer;
 
-        const clustersSource = clustersLayer.getSource();
-        clustersSource.clear();
+          const clustersSource = clustersLayer.getSource();
+          clustersSource.clear();
 
-        clusters.forEach((cluster) => {
-          const isJoined = this.isJoinedCluster(cluster);
+          clusters.forEach((cluster) => {
+            const isJoined = this.isJoinedCluster(cluster);
 
-          const puntoA = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoAId);
-          if (puntoA !== undefined) {
-            const featureA = new Feature({
-              geometry: new Circle(fromLonLat([puntoA.long, puntoA.lat]), 4),
-              properties: {
-                id: cluster.id,
-                name: 'puntoClusterA',
-                isJoined,
-              },
-            });
-            clustersSource.addFeature(featureA);
-          }
+            const puntoA = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoAId);
+            if (puntoA !== undefined) {
+              const featureA = new Feature({
+                geometry: new Circle(fromLonLat([puntoA.long, puntoA.lat]), 4),
+                properties: {
+                  id: cluster.id,
+                  name: 'puntoClusterA',
+                  isJoined,
+                },
+              });
+              clustersSource.addFeature(featureA);
+            }
 
-          const puntoB = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoBId);
-          if (puntoB !== undefined) {
-            const featureB = new Feature({
-              geometry: new Circle(fromLonLat([puntoB.long, puntoB.lat]), 4),
-              properties: {
-                id: cluster.id,
-                name: 'puntoClusterB',
-                isJoined,
-              },
-            });
-            clustersSource.addFeature(featureB);
-          }
-        });
-      }
-    });
+            const puntoB = this.puntosTrayectoria.find((punto) => punto.id === cluster.puntoBId);
+            if (puntoB !== undefined) {
+              const featureB = new Feature({
+                geometry: new Circle(fromLonLat([puntoB.long, puntoB.lat]), 4),
+                properties: {
+                  id: cluster.id,
+                  name: 'puntoClusterB',
+                  isJoined,
+                },
+              });
+              clustersSource.addFeature(featureB);
+            }
+          });
+        }
+      })
+    );
   }
 
   private createMesasAutogeoLayer() {
@@ -814,5 +823,9 @@ export class MapClustersComponent implements OnInit {
         return false;
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
