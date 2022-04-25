@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 
@@ -19,14 +20,16 @@ import Circle from 'ol/geom/Circle';
 import { Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
 import VectorLayer from 'ol/layer/Vector';
+import Polygon from 'ol/geom/Polygon';
 
 import { OlMapService } from '@core/services/ol-map.service';
 import { ClustersService } from '@core/services/clusters.service';
+import { AutogeoService, Mesa } from '@core/services/autogeo.service';
+import { GLOBAL } from '@core/services/global';
 
 import { PlantaInterface } from '@core/models/planta';
 import { PuntoTrayectoria } from '@core/models/puntoTrayectoria';
 import { Cluster } from '@core/models/cluster';
-import { GLOBAL } from '@core/services/global';
 
 @Component({
   selector: 'app-map-clusters',
@@ -49,11 +52,15 @@ export class MapClustersComponent implements OnInit {
   private deleteMode = false;
   private joinActive = false;
   private createClusterActive = false;
+  private mesasLayer: VectorLayer;
+  private mesasSource: VectorSource;
 
   constructor(
     private olMapService: OlMapService,
     private clustersService: ClustersService,
-    private hotkeysService: HotkeysService
+    private hotkeysService: HotkeysService,
+    private autogeoService: AutogeoService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -66,6 +73,8 @@ export class MapClustersComponent implements OnInit {
 
     this.initMap();
 
+    this.createMesasAutogeoLayer();
+    this.addMesasAutogeo();
     this.addTrayectoria();
     this.addPuntosTrayectoria();
     this.createClustersLayer();
@@ -294,6 +303,47 @@ export class MapClustersComponent implements OnInit {
         });
       }
     });
+  }
+
+  private createMesasAutogeoLayer() {
+    this.mesasSource = new VectorSource({ wrapX: false });
+
+    this.mesasLayer = new VectorLayer({
+      source: this.mesasSource,
+      style: new Style({
+        stroke: new Stroke({
+          width: 4,
+          color: 'blue',
+        }),
+      }),
+    });
+
+    this.mesasLayer.setProperties({
+      id: 'mesasLayer',
+    });
+
+    this.map.addLayer(this.mesasLayer);
+  }
+
+  private addMesasAutogeo() {
+    const informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+
+    this.autogeoService
+      .getMesas(informeId)
+      .pipe(take(1))
+      .subscribe((mesas) => mesas.forEach((mesa) => this.addMesaAutogeo(mesa)));
+  }
+
+  private addMesaAutogeo(mesa: Mesa) {
+    const feature = new Feature({
+      geometry: new Polygon([mesa.coords]),
+      properties: {
+        id: mesa.id,
+        name: 'mesa',
+      },
+    });
+
+    this.mesasSource.addFeature(feature);
   }
 
   private addPointerOnHover() {
