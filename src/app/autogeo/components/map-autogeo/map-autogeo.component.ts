@@ -40,9 +40,12 @@ export class MapAutogeoComponent implements OnInit {
   private informeId: string;
   private planta: PlantaInterface;
   private mesasLayer: VectorLayer;
+  private mesasSource: VectorSource;
   private mesas: Mesa[] = [];
   private draw: Draw;
   private mesaSelected: Mesa;
+  deleteMode = false;
+  createMode = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -121,8 +124,10 @@ export class MapAutogeoComponent implements OnInit {
   }
 
   private createMesasLayer() {
+    this.mesasSource = new VectorSource({ wrapX: false });
+
     this.mesasLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
+      source: this.mesasSource,
       style: this.getStyleMesa(false),
     });
 
@@ -135,16 +140,15 @@ export class MapAutogeoComponent implements OnInit {
 
   private addMesas() {
     this.autogeoService.getMesas(this.informeId).subscribe((mesas) => {
-      if (this.mesas.length !== mesas.length) {
-        this.mesas = mesas;
+      this.mesasSource.clear();
 
-        this.mesas.forEach((mesa) => this.addMesa(mesa));
-      }
+      this.mesas = mesas;
+
+      this.mesas.forEach((mesa) => this.addMesa(mesa));
     });
   }
 
   private addMesa(mesa: Mesa) {
-    const mBSource = this.mesasLayer.getSource();
     const feature = new Feature({
       geometry: new Polygon([mesa.coords]),
       properties: {
@@ -153,14 +157,12 @@ export class MapAutogeoComponent implements OnInit {
       },
     });
 
-    mBSource.addFeature(feature);
+    this.mesasSource.addFeature(feature);
   }
 
   drawMesa() {
-    const sourceMesas = this.mesasLayer.getSource();
-
     this.draw = new Draw({
-      source: sourceMesas,
+      source: this.mesasSource,
       type: GeometryType.POLYGON,
       maxPoints: 4,
       stopClick: true,
@@ -184,10 +186,19 @@ export class MapAutogeoComponent implements OnInit {
 
         this.autogeoService.addMesa(this.informeId, mesa);
       }
-
-      // terminamos el modo draw
-      this.map.removeInteraction(this.draw);
     });
+  }
+
+  changeCreateMode() {
+    this.createMode = !this.createMode;
+
+    if (this.createMode) {
+      // comenzamos el modo crear mesas
+      this.drawMesa();
+    } else {
+      // terminamos el modo crear mesas
+      this.map.removeInteraction(this.draw);
+    }
   }
 
   private addPointerOnHover() {
@@ -243,12 +254,14 @@ export class MapAutogeoComponent implements OnInit {
     this.map.addInteraction(select);
 
     select.on('select', (e) => {
-      if (e.selected.length > 0) {
-        const feature = e.selected[0];
-        if (feature.getProperties().properties.name === 'mesa') {
-          const mesaId = feature.getProperties().properties.id;
+      if (this.deleteMode) {
+        if (e.selected.length > 0) {
+          const feature = e.selected[0];
+          if (feature.getProperties().properties.name === 'mesa') {
+            const mesaId = feature.getProperties().properties.id;
 
-          this.autogeoService.deleteMesa(this.informeId, mesaId);
+            this.autogeoService.deleteMesa(this.informeId, mesaId);
+          }
         }
       }
     });

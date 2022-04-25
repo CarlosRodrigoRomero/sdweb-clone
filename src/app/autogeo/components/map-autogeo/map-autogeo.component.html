@@ -1,6 +1,28 @@
 <div id="map" class="map"></div>
 
 <div class="crud-btns">
-  <button mat-raised-button (click)="drawMesa()">Crear mesa</button>
-  <button mat-raised-button>Eliminar mesa</button>
+  <button mat-raised-button (click)="changeCreateMode()">
+    <div class="btn-content" *ngIf="!createMode">
+      <mat-icon>add_circle</mat-icon>
+      <span>Activar modo crear mesas</span>
+    </div>
+    <div class="btn-content" *ngIf="createMode">
+      <mat-icon>cancel</mat-icon>
+      <span>Desactivar modo crear mesas</span>
+    </div>
+  </button>
+  <button mat-raised-button (click)="deleteMode = !deleteMode">
+    <div class="btn-content" *ngIf="!deleteMode">
+      <mat-icon>delete</mat-icon>
+      <span>Activar modo eliminar</span>
+    </div>
+    <div class="btn-content" *ngIf="deleteMode">
+      <mat-icon>cancel</mat-icon>
+      <span>Desactivar modo eliminar</span>
+    </div>
+  </button>
 </div>
+
+<mat-card *ngIf="deleteMode" class="delete-mode-warn">
+  <mat-card-title>MODO ELIMINAR ACTIVADO</mat-card-title>
+</mat-card>
