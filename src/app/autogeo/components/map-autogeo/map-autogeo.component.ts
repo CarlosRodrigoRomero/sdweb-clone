@@ -11,6 +11,14 @@ import { defaults as defaultControls } from 'ol/control.js';
 import { fromLonLat } from 'ol/proj';
 import VectorLayer from 'ol/layer/Vector';
 import { DoubleClickZoom, Draw, Modify, Select } from 'ol/interaction';
+import VectorSource from 'ol/source/Vector';
+import Style from 'ol/style/Style';
+import Stroke from 'ol/style/Stroke';
+import Polygon from 'ol/geom/Polygon';
+import GeometryType from 'ol/geom/GeometryType';
+import { Coordinate } from 'ol/coordinate';
+import { Fill } from 'ol/style';
+import { click, never } from 'ol/events/condition';
 
 import { OlMapService } from '@core/services/ol-map.service';
 import { InformeService } from '@core/services/informe.service';
@@ -18,16 +26,6 @@ import { PlantaService } from '@core/services/planta.service';
 import { AutogeoService, Mesa } from '@core/services/autogeo.service';
 
 import { PlantaInterface } from '@core/models/planta';
-import VectorSource from 'ol/source/Vector';
-import Style from 'ol/style/Style';
-import Stroke from 'ol/style/Stroke';
-import Polygon from 'ol/geom/Polygon';
-import GeometryType from 'ol/geom/GeometryType';
-import { DrawEvent } from 'ol/interaction/Draw';
-import { Coordinate } from 'ol/coordinate';
-import { FeatureLike } from 'ol/Feature';
-import { Fill } from 'ol/style';
-import { click, never } from 'ol/events/condition';
 
 @Component({
   selector: 'app-map-autogeo',
@@ -38,14 +36,14 @@ export class MapAutogeoComponent implements OnInit {
   private map: Map;
   private aerialLayers: TileLayer[];
   private informeId: string;
-  private planta: PlantaInterface;
+  planta: PlantaInterface;
   private mesasLayer: VectorLayer;
   private mesasSource: VectorSource;
   private mesas: Mesa[] = [];
   private draw: Draw;
-  private mesaSelected: Mesa;
   deleteMode = false;
   createMode = false;
+  mapLoaded = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -62,29 +60,37 @@ export class MapAutogeoComponent implements OnInit {
 
     this.addAerialLayer(this.informeId);
 
-    this.informeService
-      .getInforme(this.informeId)
-      .pipe(
-        take(1),
-        switchMap((informe) => this.plantaService.getPlanta(informe.plantaId))
-      )
-      .subscribe((planta) => {
-        this.planta = planta;
+    this.subscriptions.add(this.olMapService.getAerialLayers().subscribe((layers) => (this.aerialLayers = layers)));
 
-        if (this.map === undefined) {
-          this.initMap();
+    this.subscriptions.add(
+      this.autogeoService.mapLoaded$.subscribe((loaded) => {
+        this.mapLoaded = loaded;
+      })
+    );
 
-          this.createMesasLayer();
-          this.addMesas();
+    this.subscriptions.add(
+      this.informeService
+        .getInforme(this.informeId)
+        .pipe(
+          take(1),
+          switchMap((informe) => this.plantaService.getPlanta(informe.plantaId))
+        )
+        .subscribe((planta) => {
+          this.planta = planta;
 
-          this.addPointerOnHover();
-          this.addOnHoverMesaAction();
-          this.addSelectMesasInteraction();
-          this.addModifyMesasInteraction();
-        }
-      });
+          if (this.map === undefined) {
+            this.initMap();
 
-    this.olMapService.getAerialLayers().subscribe((layers) => (this.aerialLayers = layers));
+            this.createMesasLayer();
+            this.addMesas();
+
+            this.addPointerOnHover();
+            this.addOnHoverMesaAction();
+            this.addSelectMesasInteraction();
+            this.addModifyMesasInteraction();
+          }
+        })
+    );
   }
 
   private initMap(): void {
@@ -105,9 +111,13 @@ export class MapAutogeoComponent implements OnInit {
       maxZoom: this.planta.zoom + 8,
     });
 
-    this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {
-      this.map = map;
-    });
+    this.subscriptions.add(
+      this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {
+        this.map = map;
+
+        this.map.once('postrender', () => (this.autogeoService.mapLoaded = true));
+      })
+    );
   }
 
   private addAerialLayer(informeId: string) {
@@ -140,13 +150,15 @@ export class MapAutogeoComponent implements OnInit {
   }
 
   private addMesas() {
-    this.autogeoService.getMesas(this.informeId).subscribe((mesas) => {
-      this.mesasSource.clear();
+    this.subscriptions.add(
+      this.autogeoService.getMesas(this.informeId).subscribe((mesas) => {
+        this.mesasSource.clear();
 
-      this.mesas = mesas;
+        this.mesas = mesas;
 
-      this.mesas.forEach((mesa) => this.addMesa(mesa));
-    });
+        this.mesas.forEach((mesa) => this.addMesa(mesa));
+      })
+    );
   }
 
   private addMesa(mesa: Mesa) {

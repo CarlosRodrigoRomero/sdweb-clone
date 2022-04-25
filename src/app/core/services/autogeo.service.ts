@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { Coordinate } from 'ol/coordinate';
@@ -16,6 +16,9 @@ export interface Mesa {
   providedIn: 'root',
 })
 export class AutogeoService {
+  private _mapLoaded = false;
+  mapLoaded$ = new BehaviorSubject<boolean>(this._mapLoaded);
+
   constructor(private afs: AngularFirestore) {}
 
   addMesa(informeId: string, mesa: Mesa) {
@@ -89,5 +92,16 @@ export class AutogeoService {
     const bottomLeft = [coords.bottomLeft.long, coords.bottomLeft.lat] as Coordinate;
 
     return [topLeft, topRight, bottomRight, bottomLeft];
+  }
+
+  /////////////////////////////////////////////////////////////////////
+
+  get mapLoaded(): boolean {
+    return this._mapLoaded;
+  }
+
+  set mapLoaded(value: boolean) {
+    this._mapLoaded = value;
+    this.mapLoaded$.next(value);
   }
 }

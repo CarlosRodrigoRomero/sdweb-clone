@@ -3,10 +3,16 @@
   width: 100%;
 }
 
-.crud-btns {
+.planta {
   position: absolute;
   top: 80px;
   left: 50px;
+}
+
+.crud-btns {
+  position: absolute;
+  top: 170px;
+  left: 10px;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;

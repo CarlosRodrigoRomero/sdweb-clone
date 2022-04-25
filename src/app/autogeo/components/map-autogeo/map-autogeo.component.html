@@ -1,5 +1,9 @@
 <div id="map" class="map"></div>
 
+<mat-card class="planta">
+  <mat-card-title *ngIf="mapLoaded">{{ planta.nombre }}</mat-card-title>
+</mat-card>
+
 <div class="crud-btns">
   <button mat-raised-button (click)="changeCreateMode()">
     <div class="btn-content" *ngIf="!createMode">
