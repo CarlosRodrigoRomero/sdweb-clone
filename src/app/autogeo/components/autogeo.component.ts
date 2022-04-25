@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -9,7 +9,7 @@ import { AutogeoService } from '@core/services/autogeo.service';
   templateUrl: './autogeo.component.html',
   styleUrls: ['./autogeo.component.css'],
 })
-export class AutogeoComponent implements OnInit {
+export class AutogeoComponent implements OnInit, OnDestroy {
   mapLoaded = false;
 
   private subscriptions: Subscription = new Subscription();
@@ -18,5 +18,9 @@ export class AutogeoComponent implements OnInit {
 
   ngOnInit(): void {
     this.subscriptions.add(this.autogeoService.mapLoaded$.subscribe((loaded) => (this.mapLoaded = loaded)));
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

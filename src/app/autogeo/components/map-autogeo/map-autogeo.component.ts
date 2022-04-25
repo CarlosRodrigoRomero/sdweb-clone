@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
@@ -32,7 +32,7 @@ import { PlantaInterface } from '@core/models/planta';
   templateUrl: './map-autogeo.component.html',
   styleUrls: ['./map-autogeo.component.css'],
 })
-export class MapAutogeoComponent implements OnInit {
+export class MapAutogeoComponent implements OnInit, OnDestroy {
   private map: Map;
   private aerialLayers: TileLayer[];
   private informeId: string;
@@ -341,5 +341,9 @@ export class MapAutogeoComponent implements OnInit {
         }
       };
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
