@@ -15,9 +15,10 @@ import { CanvasComponent } from './components/canvas/canvas.component';
 import { EditPcDetailComponent } from './components/edit-pc-detail/edit-pc-detail.component';
 
 import { ValidateElementoPlantaPipe } from '@shared/pipes/validate-elemento-planta.pipe';
+import { CheckWarningsComponent } from './components/check-warnings/check-warnings.component';
 
 @NgModule({
-  declarations: [InformeEditComponent, EditMapComponent, EditListComponent, CanvasComponent, EditPcDetailComponent],
+  declarations: [InformeEditComponent, EditMapComponent, EditListComponent, CanvasComponent, EditPcDetailComponent, CheckWarningsComponent],
   imports: [
     SharedModule,
     InformeEditRoutingModule,

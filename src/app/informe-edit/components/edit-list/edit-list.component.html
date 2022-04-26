@@ -84,4 +84,5 @@
     ></tr>
   </table>
   <button *ngIf="pcsOrEstructuras" (click)="recalcularLocs()">Recalcular locs</button>
+  <app-check-warnings *ngIf="pcsOrEstructuras"></app-check-warnings>
 </div>
