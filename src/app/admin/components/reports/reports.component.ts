@@ -3,12 +3,13 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
 
 import { InformeService } from '@core/services/informe.service';
 import { ThermalService } from '@core/services/thermal.service';
 import { PlantaService } from '@core/services/planta.service';
+import { WarningService } from '@core/services/warning.service';
 
 import { PlantaInterface } from '@core/models/planta';
 
@@ -19,7 +20,16 @@ import { PlantaInterface } from '@core/models/planta';
 })
 export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   private plantas: PlantaInterface[];
-  displayedColumns: string[] = ['planta', 'fecha', 'tipo', 'potencia', 'informeId', 'disponible', 'actions'];
+  displayedColumns: string[] = [
+    'warnings',
+    'planta',
+    'fecha',
+    'tipo',
+    'potencia',
+    'informeId',
+    'disponible',
+    'actions',
+  ];
   dataSource = new MatTableDataSource<any>();
   private subscriptions: Subscription = new Subscription();
 
@@ -28,7 +38,8 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private informeService: InformeService,
     private plantaService: PlantaService,
-    private thermalService: ThermalService
+    private thermalService: ThermalService,
+    private warningService: WarningService
   ) {}
 
   ngOnInit(): void {
@@ -52,7 +63,6 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
             if (thermalLayers.map((tL) => tL.informeId).includes(informe.id)) {
               thermalLayerPending = false;
             }
-
             dataInformes.push({
               planta: planta.nombre,
               fecha: informe.fecha,

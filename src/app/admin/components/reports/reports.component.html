@@ -13,6 +13,15 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
+    <!-- Alertas -->
+    <ng-container matColumnDef="warnings">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Alertas</th>
+      <td mat-cell *matCellDef="let element">
+        <app-warnings [informeId]="element.informeId"></app-warnings>
+        <!-- <app-warnings-menu *ngIf="element.warnings"></app-warnings-menu> -->
+      </td>
+    </ng-container>
+
     <!-- Planta -->
     <ng-container matColumnDef="planta">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Planta</th>

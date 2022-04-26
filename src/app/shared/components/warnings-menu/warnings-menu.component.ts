@@ -12,6 +12,7 @@ import { SeguidorService } from '@core/services/seguidor.service';
 import { FilterService } from '@core/services/filter.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { PcService } from '@core/services/pc.service';
+import { WarningService } from '@core/services/warning.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -22,12 +23,7 @@ import { LocationAreaInterface } from '@core/models/location';
 import { WrongGlobalCoordsFilter } from '@core/models/wrongGlobalCoordsFilter';
 import { ModuloInterface } from '@core/models/modulo';
 import { PcInterface } from '@core/models/pc';
-
-interface Warning {
-  types: string[];
-  content: string;
-  actions: string[];
-}
+import { Warning } from './warnings';
 
 @Component({
   selector: 'app-warnings-menu',
@@ -54,7 +50,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     private filterService: FilterService,
     private anomaliaService: AnomaliaService,
     private http: HttpClient,
-    private pcService: PcService
+    private pcService: PcService,
+    private warningService: WarningService
   ) {}
 
   ngOnInit(): void {
@@ -94,17 +91,29 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   }
 
   private checkWanings() {
-    // reseteamos warnings con cada actualización
-    this.warnings = [];
+    this.warningService.getWarnings(this.selectedInforme.id).subscribe((warnings) => {
+      this.warnings = warnings;
 
-    this.checkTiposAnoms();
-    this.checkNumsCoA();
-    this.checkNumsCriticidad();
-    this.checkFilsColsPlanta();
-    this.checkFilColAnoms();
-    this.checkZonesWarnings();
-    this.checkAerialLayer();
-    this.checkThermalLayer();
+      // setTimeout(() => {
+      //   this.checkTiposAnoms();
+      //   this.checkNumsCoA();
+      //   // this.checkNumsCriticidad();
+      //   // this.checkFilsColsPlanta();
+      //   // this.checkFilColAnoms();
+      //   // this.checkZonesWarnings();
+      //   // this.checkAerialLayer();
+      //   // this.checkThermalLayer();
+      // }, 2000);
+
+      this.checkTiposAnoms();
+      this.checkNumsCoA();
+      // this.checkNumsCriticidad();
+      // this.checkFilsColsPlanta();
+      // this.checkFilColAnoms();
+      // this.checkZonesWarnings();
+      // this.checkAerialLayer();
+      // this.checkThermalLayer();
+    });
   }
 
   fixProblem(type: string) {
@@ -120,48 +129,61 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       case 'numsCoA':
         this.reportControlService.setNumAnomsCoAInforme(this.anomaliasInforme, this.selectedInforme, true);
         break;
-      case 'numsCriticidad':
-        this.reportControlService.setNumAnomsCritInforme(this.anomaliasInforme, this.selectedInforme, true);
-        break;
-      case 'filsColsPlanta':
-        window.open(urlPlantaEdit, '_blank');
-        break;
-      case 'recalMAEyCC':
-        this.recalMAEyCC();
-        break;
-      case 'irLoc':
-        window.open(urlLocalizaciones, '_blank');
-        break;
-      case 'nombresZonas':
-        window.open(urlPlantaEdit, '_blank');
-        break;
-      case 'filsColsAnoms':
-        const filColFilter: LocationFilter = new LocationFilter('location', this.planta.filas, this.planta.columnas);
-        this.filterService.addFilter(filColFilter);
-        break;
+      // case 'numsCriticidad':
+      //   this.reportControlService.setNumAnomsCritInforme(this.anomaliasInforme, this.selectedInforme, true);
+      //   break;
+      // case 'filsColsPlanta':
+      //   window.open(urlPlantaEdit, '_blank');
+      //   break;
+      // case 'recalMAEyCC':
+      //   this.recalMAEyCC();
+      //   break;
+      // case 'irLoc':
+      //   window.open(urlLocalizaciones, '_blank');
+      //   break;
+      // case 'nombresZonas':
+      //   window.open(urlPlantaEdit, '_blank');
+      //   break;
+      // case 'filsColsAnoms':
+      //   const filColFilter: LocationFilter = new LocationFilter('location', this.planta.filas, this.planta.columnas);
+      //   this.filterService.addFilter(filColFilter);
+      //   break;
 
-      case 'modulosAnoms':
-        this.fixModulosAnoms();
-        break;
-      case 'globalCoordsAnoms':
-        this.filterWrongGlobalCoordsAnoms();
-        break;
-      case 'noGlobalCoordsAnoms':
-        this.fixNoGlobalCoordsAnoms();
-        break;
+      // case 'modulosAnoms':
+      //   this.fixModulosAnoms();
+      //   break;
+      // case 'globalCoordsAnoms':
+      //   this.filterWrongGlobalCoordsAnoms();
+      //   break;
+      // case 'noGlobalCoordsAnoms':
+      //   this.fixNoGlobalCoordsAnoms();
+      //   break;
     }
   }
 
   private addWarning(warning: Warning) {
-    if (!this.warnings.map((warn) => warn.content).includes(warning.content)) {
-      this.warnings.push(warning);
+    if (this.warnings.map((warn) => warn.type).includes(warning.type)) {
+      this.warningService.updateWarning(this.selectedInforme.id, warning);
+    } else {
+      this.warningService.addWarning(this.selectedInforme.id, warning);
+    }
+  }
+
+  private checkOldWarning(type: string) {
+    const oldWarning = this.warnings.find((warn) => warn.type === type);
+
+    if (oldWarning) {
+      this.warningService.deleteWarning(this.selectedInforme.id, oldWarning.id);
     }
   }
 
   private checkTiposAnoms() {
     if (this.selectedInforme !== undefined && this.anomaliasInforme.length > 0) {
       if (this.selectedInforme.tiposAnomalias.length > 0) {
-        const sumTiposAnoms = this.selectedInforme.tiposAnomalias.reduce((acum, curr, index) => {
+        // primero eliminamos la alerta antigua de no tener tipoAnoms si la hubiera
+        this.checkOldWarning('tiposAnom');
+
+        const sumTiposAnom = this.selectedInforme.tiposAnomalias.reduce((acum, curr, index) => {
           // las celulas calientes son un array por separado
           if (index === 8 || index === 9) {
             return acum + curr.reduce((a, c) => a + c);
@@ -170,20 +192,21 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
           }
         });
 
-        if (this.anomaliasInforme.length !== sumTiposAnoms) {
+        if (this.anomaliasInforme.length !== sumTiposAnom) {
           const warning = {
-            content: 'El nº de anomalías no coincide con la suma de los tipos de anomalías',
-            types: ['tiposAnom'],
-            actions: ['Corregir'],
+            type: 'sumTiposAnom',
+            visible: true,
           };
 
           this.addWarning(warning);
+        } else {
+          // eliminamos la alerta antigua si la hubiera
+          this.checkOldWarning('sumTiposAnom');
         }
       } else {
         const warning = {
-          content: 'El nº de anomalías por tipo es incorrecto',
-          types: ['tiposAnom'],
-          actions: ['Corregir'],
+          type: 'tiposAnom',
+          visible: true,
         };
 
         this.addWarning(warning);
@@ -193,13 +216,27 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
 
   private checkNumsCoA() {
     if (this.selectedInforme !== undefined && this.anomaliasInforme.length > 0) {
-      const sumNumsCoA = this.selectedInforme.numsCoA.reduce((acum, curr) => acum + curr);
+      if (this.selectedInforme.numsCoA.length > 0) {
+        // primero eliminamos la alerta antigua de no tener numsCoA si la hubiera
+        this.checkOldWarning('numsCoA');
 
-      if (this.anomaliasInforme.length !== sumNumsCoA) {
+        const sumNumsCoA = this.selectedInforme.numsCoA.reduce((acum, curr) => acum + curr);
+
+        if (this.anomaliasInforme.length !== sumNumsCoA) {
+          const warning = {
+            type: 'sumNumsCoA',
+            visible: true,
+          };
+
+          this.addWarning(warning);
+        } else {
+          // eliminamos la alerta antigua si la hubiera
+          this.checkOldWarning('sumNumsCoA');
+        }
+      } else {
         const warning = {
-          content: 'El nº de anomalías no coincide con la suma de los CoA',
-          types: ['numsCoA'],
-          actions: ['Corregir'],
+          type: 'numsCoA',
+          visible: true,
         };
 
         this.addWarning(warning);
@@ -207,13 +244,23 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     }
   }
 
-  private checkNumsCriticidad() {
+  /* private checkNumsCriticidad() {
     if (this.selectedInforme !== undefined && this.anomaliasInforme.length > 0) {
-      const sumNumsCriticidad = this.selectedInforme.numsCriticidad.reduce((acum, curr) => acum + curr);
+      if (this.selectedInforme.numsCriticidad.length > 0) {
+        const sumNumsCriticidad = this.selectedInforme.numsCriticidad.reduce((acum, curr) => acum + curr);
 
-      if (this.anomaliasInforme.length !== sumNumsCriticidad) {
+        if (this.anomaliasInforme.length !== sumNumsCriticidad) {
+          const warning = {
+            content: 'El nº de anomalías no coincide con la suma de las anomalías por criticidad',
+            types: ['sumNumsCriticidad'],
+            actions: ['Corregir'],
+          };
+
+          this.addWarning(warning);
+        }
+      } else {
         const warning = {
-          content: 'El nº de anomalías no coincide con la suma de las anomalías por criticidad',
+          content: 'El nº de anomalías por criticidad es incorrecto',
           types: ['numsCriticidad'],
           actions: ['Corregir'],
         };
@@ -532,7 +579,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         .subscribe((data) => console.log(''));
     }
   }
-
+ */
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }

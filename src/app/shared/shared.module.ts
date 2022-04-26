@@ -24,6 +24,7 @@ import { MatSelectedSearchComponent } from './components/mat-selected-search/mat
 import { MatDialogConfirmComponent } from './components/mat-dialog-confirm/mat-dialog-confirm.component';
 import { LoadingComponent } from './components/loading/loading.component';
 import { WarningsMenuComponent } from './components/warnings-menu/warnings-menu.component';
+import { WarningsComponent } from './components/warnings/warnings.component';
 
 const components = [
   NavbarComponent,
@@ -32,6 +33,9 @@ const components = [
   PlantSummaryComponent,
   MatSelectedSearchComponent,
   LoadingComponent,
+  MatDialogConfirmComponent,
+  WarningsMenuComponent,
+  WarningsComponent,
 ];
 const modules = [
   CommonModule,
@@ -48,7 +52,7 @@ const modules = [
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];
 
 @NgModule({
-  declarations: [...components, ...pipes, MatDialogConfirmComponent, WarningsMenuComponent],
+  declarations: [...components, ...pipes],
   imports: [...modules],
   exports: [...components, ...modules, ...pipes],
 })

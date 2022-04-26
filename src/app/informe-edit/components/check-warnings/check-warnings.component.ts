@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 import { catchError, switchMap, take } from 'rxjs/operators';
 
@@ -7,17 +8,13 @@ import { AnomaliaService } from '@core/services/anomalia.service';
 import { InformeService } from '@core/services/informe.service';
 import { PlantaService } from '@core/services/planta.service';
 import { SeguidorService } from '@core/services/seguidor.service';
+import { WarningService } from '@core/services/warning.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
-import { HttpClient } from '@angular/common/http';
-
-interface Warning {
-  tipo: string;
-  visible: boolean;
-}
+import { Warning } from '@shared/components/warnings-menu/warnings';
 
 @Component({
   selector: 'app-check-warnings',
@@ -39,7 +36,8 @@ export class CheckWarningsComponent implements OnInit {
     private informeService: InformeService,
     private plantaService: PlantaService,
     private seguidorService: SeguidorService,
-    private http: HttpClient
+    private http: HttpClient,
+    private warningService: WarningService
   ) {}
 
   ngOnInit(): void {
@@ -75,6 +73,8 @@ export class CheckWarningsComponent implements OnInit {
           });
         });
       });
+
+    this.warningService.getWarnings(this.informeId).subscribe((warnings) => (this.warnings = warnings));
   }
 
   private checkWanings() {
@@ -90,8 +90,10 @@ export class CheckWarningsComponent implements OnInit {
   }
 
   private addWarning(warning: Warning) {
-    if (!this.warnings.map((warn) => warn.tipo).includes(warning.tipo)) {
-      this.warnings.push(warning);
+    if (this.warnings.map((warn) => warn.type).includes(warning.type)) {
+      this.warningService.updateWarning(this.informeId, warning);
+    } else {
+      this.warningService.addWarning(this.informeId, warning);
     }
   }
 
@@ -109,7 +111,7 @@ export class CheckWarningsComponent implements OnInit {
 
         if (this.anomalias.length !== sumTiposAnoms) {
           const warning: Warning = {
-            tipo: 'tiposAnom',
+            type: 'sumTiposAnom',
             visible: true,
           };
 
@@ -117,7 +119,7 @@ export class CheckWarningsComponent implements OnInit {
         }
       } else {
         const warning: Warning = {
-          tipo: 'tiposAnom',
+          type: 'tiposAnom',
           visible: true,
         };
 
@@ -128,11 +130,20 @@ export class CheckWarningsComponent implements OnInit {
 
   private checkNumsCoA() {
     if (this.informe !== undefined && this.anomalias.length > 0) {
-      const sumNumsCoA = this.informe.numsCoA.reduce((acum, curr) => acum + curr);
+      if (this.informe.numsCoA.length > 0) {
+        const sumNumsCoA = this.informe.numsCoA.reduce((acum, curr) => acum + curr);
 
-      if (this.anomalias.length !== sumNumsCoA) {
+        if (this.anomalias.length !== sumNumsCoA) {
+          const warning: Warning = {
+            type: 'sumNumsCoA',
+            visible: true,
+          };
+
+          this.addWarning(warning);
+        }
+      } else {
         const warning: Warning = {
-          tipo: 'numsCoA',
+          type: 'numsCoA',
           visible: true,
         };
 
@@ -143,11 +154,20 @@ export class CheckWarningsComponent implements OnInit {
 
   private checkNumsCriticidad() {
     if (this.informe !== undefined && this.anomalias.length > 0) {
-      const sumNumsCriticidad = this.informe.numsCriticidad.reduce((acum, curr) => acum + curr);
+      if (this.informe.numsCriticidad.length > 0) {
+        const sumNumsCriticidad = this.informe.numsCriticidad.reduce((acum, curr) => acum + curr);
 
-      if (this.anomalias.length !== sumNumsCriticidad) {
+        if (this.anomalias.length !== sumNumsCriticidad) {
+          const warning: Warning = {
+            type: 'sumNumsCriticidad',
+            visible: true,
+          };
+
+          this.addWarning(warning);
+        }
+      } else {
         const warning: Warning = {
-          tipo: 'numsCriticidad',
+          type: 'numsCriticidad',
           visible: true,
         };
 
@@ -159,7 +179,7 @@ export class CheckWarningsComponent implements OnInit {
   private checkFilsColsPlanta() {
     if (this.planta.columnas <= 1 || this.planta.columnas === undefined || this.planta.columnas === null) {
       const warning: Warning = {
-        tipo: 'filsColsPlanta',
+        type: 'filsColsPlanta',
         visible: true,
       };
 
@@ -176,7 +196,7 @@ export class CheckWarningsComponent implements OnInit {
 
       if (differentFilColAnoms.length > 0) {
         const warning: Warning = {
-          tipo: 'filsColsAnoms',
+          type: 'filsColsAnoms',
           visible: true,
         };
 
@@ -194,7 +214,7 @@ export class CheckWarningsComponent implements OnInit {
     } else {
       // añadimos el aviso de que faltan las zonas de la planta
       const warning: Warning = {
-        tipo: 'noLocAreas',
+        type: 'noLocAreas',
         visible: true,
       };
 
@@ -209,7 +229,7 @@ export class CheckWarningsComponent implements OnInit {
 
     if (anomsWrongGlobals.length > 0) {
       const warning: Warning = {
-        tipo: 'wrongLocAnoms',
+        type: 'wrongLocAnoms',
         visible: true,
       };
 
@@ -224,7 +244,7 @@ export class CheckWarningsComponent implements OnInit {
 
     if (noGlobalCoordsAnoms.length > 0) {
       const warning: Warning = {
-        tipo: 'noGlobalCoordsAnoms',
+        type: 'noGlobalCoordsAnoms',
         visible: true,
       };
 
@@ -240,7 +260,7 @@ export class CheckWarningsComponent implements OnInit {
       this.planta.nombreGlobalCoords.length === 0
     ) {
       const warning: Warning = {
-        tipo: 'nombresZonas',
+        type: 'nombresZonas',
         visible: true,
       };
 
@@ -258,7 +278,7 @@ export class CheckWarningsComponent implements OnInit {
     } else {
       // añadimos el aviso de que faltan los modulos de la planta
       const warning: Warning = {
-        tipo: 'modulosPlanta',
+        type: 'modulosPlanta',
         visible: true,
       };
 
@@ -271,7 +291,7 @@ export class CheckWarningsComponent implements OnInit {
 
     if (anomsSinModulo.length > 0) {
       const warning: Warning = {
-        tipo: 'modulosAnoms',
+        type: 'modulosAnoms',
         visible: true,
       };
 
@@ -280,7 +300,7 @@ export class CheckWarningsComponent implements OnInit {
   }
 
   private checkAerialLayer() {
-    const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + this.informe.id + '_visual/1/1/1.png';
+    const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + this.informeId + '_visual/1/1/1.png';
 
     this.http
       .get(url)
@@ -290,7 +310,7 @@ export class CheckWarningsComponent implements OnInit {
           // no recibimos respuesta del servidor porque no existe
           if (error.status === 0) {
             const warning: Warning = {
-              tipo: 'visualLayer',
+              type: 'visualLayer',
               visible: true,
             };
 
