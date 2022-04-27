@@ -69,7 +69,7 @@ export class CheckWarningsComponent implements OnInit {
           this.anomaliaService.getAnomalias$(this.informeId, 'pcs').subscribe((anoms) => {
             this.anomalias = this.anomaliaService.getRealAnomalias(anoms);
 
-            this.checkWanings();
+            // this.checkWanings();
           });
         });
       });
@@ -77,78 +77,27 @@ export class CheckWarningsComponent implements OnInit {
     this.warningService.getWarnings(this.informeId).subscribe((warnings) => (this.warnings = warnings));
   }
 
-  private checkWanings() {
-    this.warnings = [];
-
-    this.checkTiposAnoms();
-    this.checkNumsCoA();
-    this.checkNumsCriticidad();
-    this.checkFilsColsPlanta();
+  checkWarnings() {
+    this.warningService.checkTiposAnoms(this.informe, this.anomalias, this.warnings);
+    this.warningService.checkNumsCoA(this.informe, this.anomalias, this.warnings);
+    this.warningService.checkNumsCriticidad(this.informe, this.anomalias, this.warnings);
+    this.warningService.checkFilsColsPlanta(this.planta, this.informe, this.warnings);
     this.checkFilColAnoms();
     this.checkZonesWarnings();
     this.checkAerialLayer();
   }
 
   private addWarning(warning: Warning) {
-    if (this.warnings.map((warn) => warn.type).includes(warning.type)) {
-      this.warningService.updateWarning(this.informeId, warning);
-    } else {
+    if (!this.warnings.map((warn) => warn.type).includes(warning.type)) {
       this.warningService.addWarning(this.informeId, warning);
     }
   }
 
-  private checkTiposAnoms() {
-    if (this.informe !== undefined && this.anomalias.length > 0) {
-      if (this.informe.tiposAnomalias.length > 0) {
-        const sumTiposAnoms = this.informe.tiposAnomalias.reduce((acum, curr, index) => {
-          // las celulas calientes son un array por separado
-          if (index === 8 || index === 9) {
-            return acum + curr.reduce((a, c) => a + c);
-          } else {
-            return acum + curr;
-          }
-        });
+  private checkOldWarning(type: string) {
+    const oldWarning = this.warnings.find((warn) => warn.type === type);
 
-        if (this.anomalias.length !== sumTiposAnoms) {
-          const warning: Warning = {
-            type: 'sumTiposAnom',
-            visible: true,
-          };
-
-          this.addWarning(warning);
-        }
-      } else {
-        const warning: Warning = {
-          type: 'tiposAnom',
-          visible: true,
-        };
-
-        this.addWarning(warning);
-      }
-    }
-  }
-
-  private checkNumsCoA() {
-    if (this.informe !== undefined && this.anomalias.length > 0) {
-      if (this.informe.numsCoA.length > 0) {
-        const sumNumsCoA = this.informe.numsCoA.reduce((acum, curr) => acum + curr);
-
-        if (this.anomalias.length !== sumNumsCoA) {
-          const warning: Warning = {
-            type: 'sumNumsCoA',
-            visible: true,
-          };
-
-          this.addWarning(warning);
-        }
-      } else {
-        const warning: Warning = {
-          type: 'numsCoA',
-          visible: true,
-        };
-
-        this.addWarning(warning);
-      }
+    if (oldWarning) {
+      this.warningService.deleteWarning(this.informeId, oldWarning.id);
     }
   }
 
@@ -173,17 +122,6 @@ export class CheckWarningsComponent implements OnInit {
 
         this.addWarning(warning);
       }
-    }
-  }
-
-  private checkFilsColsPlanta() {
-    if (this.planta.columnas <= 1 || this.planta.columnas === undefined || this.planta.columnas === null) {
-      const warning: Warning = {
-        type: 'filsColsPlanta',
-        visible: true,
-      };
-
-      this.addWarning(warning);
     }
   }
 
