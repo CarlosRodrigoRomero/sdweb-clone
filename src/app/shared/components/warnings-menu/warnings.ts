@@ -161,4 +161,20 @@ export const warnings: Warning[] = [
       },
     ],
   },
+  {
+    type: 'noLocAreas',
+    message: 'Faltan las zonas de la planta',
+    adminActions: [
+      {
+        name: 'irLocs',
+        label: 'Ir a Localizaciones',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'irLocs',
+        label: 'Ir a Localizaciones',
+      },
+    ],
+  },
 ];

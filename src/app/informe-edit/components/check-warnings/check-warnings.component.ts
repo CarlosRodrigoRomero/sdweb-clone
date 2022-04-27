@@ -83,7 +83,7 @@ export class CheckWarningsComponent implements OnInit {
     this.warningService.checkNumsCriticidad(this.informe, this.anomalias, this.warnings);
     this.warningService.checkFilsColsPlanta(this.planta, this.informe, this.warnings);
     this.warningService.checkFilsColsAnoms(this.planta, this.anomalias, this.informe, this.warnings);
-    this.checkZonesWarnings();
+    this.warningService.checkZonesWarnings(this.locAreas, this.informe, this.warnings);
     this.checkAerialLayer();
   }
 
@@ -122,23 +122,6 @@ export class CheckWarningsComponent implements OnInit {
 
         this.addWarning(warning);
       }
-    }
-  }
-
-  private checkZonesWarnings() {
-    if (this.locAreas.length > 0) {
-      this.checkWrongLocationAnoms();
-      this.checkNoGlobalCoordsAnoms();
-      this.checkZonesNames();
-      this.checkModulosWarnings();
-    } else {
-      // añadimos el aviso de que faltan las zonas de la planta
-      const warning: Warning = {
-        type: 'noLocAreas',
-        visible: true,
-      };
-
-      this.addWarning(warning);
     }
   }
 

@@ -9,6 +9,7 @@ import { Warning, warnings } from '@shared/components/warnings-menu/warnings';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
+import { LocationAreaInterface } from '@core/models/location';
 
 @Injectable({
   providedIn: 'root',
@@ -281,6 +282,26 @@ export class WarningService {
     } else {
       // eliminamos la alerta antigua si la hubiera
       this.checkOldWarning('filsColsAnoms', warns, informe.id);
+    }
+  }
+
+  checkZonesWarnings(locAreas: LocationAreaInterface[], informe: InformeInterface, warns: Warning[]) {
+    if (locAreas.length > 0) {
+      // primero eliminamos la alerta antigua de no locAreas si la hubiera
+      this.checkOldWarning('noLocAreas', warns, informe.id);
+
+      // this.checkWrongGlobalCoordsAnoms();
+      // this.checkNoGlobalCoordsAnoms();
+      // this.checkZonesNames();
+      // this.checkModulosWarnings();
+    } else {
+      // añadimos el aviso de que faltan las zonas de la planta
+      const warning: Warning = {
+        type: 'noLocAreas',
+        visible: true,
+      };
+
+      this.checkAddWarning(warning, warns, informe.id);
     }
   }
 }

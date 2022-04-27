@@ -99,7 +99,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       this.warningService.checkNumsCriticidad(this.selectedInforme, this.anomaliasInforme, this.warnings);
       this.warningService.checkFilsColsPlanta(this.planta, this.selectedInforme, this.warnings);
       this.warningService.checkFilsColsAnoms(this.planta, this.anomaliasInforme, this.selectedInforme, this.warnings);
-      // this.checkZonesWarnings();
+      this.warningService.checkZonesWarnings(this.locAreas, this.selectedInforme, this.warnings);
       // this.checkAerialLayer();
       // this.checkThermalLayer();
     });
@@ -151,22 +151,6 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     }
   }
 
-  private addWarning(warning: Warning) {
-    if (this.warnings.map((warn) => warn.type).includes(warning.type)) {
-      this.warningService.updateWarning(this.selectedInforme.id, warning);
-    } else {
-      this.warningService.addWarning(this.selectedInforme.id, warning);
-    }
-  }
-
-  private checkOldWarning(type: string) {
-    const oldWarning = this.warnings.find((warn) => warn.type === type);
-
-    if (oldWarning) {
-      this.warningService.deleteWarning(this.selectedInforme.id, oldWarning.id);
-    }
-  }
-
   private recalMAEyCC() {
     const seguidoresInforme = this.allSeguidores.filter((seg) => seg.informeId === this.selectedInforme.id);
 
@@ -174,23 +158,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     this.reportControlService.setCCInformeSeguidores(seguidoresInforme, this.selectedInforme);
   }
 
-  // private checkZonesWarnings() {
-  //   if (this.locAreas.length > 0) {
-  //     this.checkWrongGlobalCoordsAnoms();
-  //     this.checkNoGlobalCoordsAnoms();
-  //     this.checkZonesNames();
-  //     this.checkModulosWarnings();
-  //   } else {
-  //     // añadimos el aviso de que faltan las zonas de la planta
-  //     const warning = {
-  //       content: 'Faltan las zonas de la planta',
-  //       types: ['irLoc'],
-  //       actions: ['Ir a Localizaciones'],
-  //     };
-
-  //     this.addWarning(warning);
-  //   }
-  // }
+  
 
   // private checkWrongGlobalCoordsAnoms() {
   //   let anomsWrongGlobals: Anomalia[];
