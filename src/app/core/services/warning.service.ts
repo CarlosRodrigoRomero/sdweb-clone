@@ -262,4 +262,25 @@ export class WarningService {
       }
     }
   }
+
+  checkFilsColsAnoms(planta: PlantaInterface, anomalias: Anomalia[], informe: InformeInterface, warns: Warning[]) {
+    // primero comprobamos que el nº de filas y columnas de la planta sean correctos
+    if (planta.columnas > 1 && planta.columnas !== undefined && planta.columnas !== null) {
+      const differentFilColAnoms = anomalias.filter(
+        (anom) => anom.localY > planta.filas || anom.localX > planta.columnas
+      );
+
+      if (differentFilColAnoms.length > 0) {
+        const warning: Warning = {
+          type: 'filsColsAnoms',
+          visible: true,
+        };
+
+        this.checkAddWarning(warning, warns, informe.id);
+      }
+    } else {
+      // eliminamos la alerta antigua si la hubiera
+      this.checkOldWarning('filsColsAnoms', warns, informe.id);
+    }
+  }
 }

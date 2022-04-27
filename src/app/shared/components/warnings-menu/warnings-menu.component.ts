@@ -98,7 +98,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       this.warningService.checkNumsCoA(this.selectedInforme, this.anomaliasInforme, this.warnings);
       this.warningService.checkNumsCriticidad(this.selectedInforme, this.anomaliasInforme, this.warnings);
       this.warningService.checkFilsColsPlanta(this.planta, this.selectedInforme, this.warnings);
-      // this.checkFilColAnoms();
+      this.warningService.checkFilsColsAnoms(this.planta, this.anomaliasInforme, this.selectedInforme, this.warnings);
       // this.checkZonesWarnings();
       // this.checkAerialLayer();
       // this.checkThermalLayer();
@@ -124,18 +124,19 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       case 'irPlantaEdit':
         window.open(urlPlantaEdit, '_blank');
         break;
-      // case 'recalMAEyCC':
-      //   this.recalMAEyCC();
-      //   break;
+      case 'recalMAEyCC':
+        this.recalMAEyCC();
+        break;
+      case 'filsColsAnoms':
+        const filColFilter: LocationFilter = new LocationFilter('location', this.planta.filas, this.planta.columnas);
+        this.filterService.addFilter(filColFilter);
+        break;
+
       // case 'irLoc':
       //   window.open(urlLocalizaciones, '_blank');
       //   break;
       // case 'nombresZonas':
       //   window.open(urlPlantaEdit, '_blank');
-      //   break;
-      // case 'filsColsAnoms':
-      //   const filColFilter: LocationFilter = new LocationFilter('location', this.planta.filas, this.planta.columnas);
-      //   this.filterService.addFilter(filColFilter);
       //   break;
 
       // case 'modulosAnoms':
@@ -166,31 +167,12 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     }
   }
 
-  // private recalMAEyCC() {
-  //   const seguidoresInforme = this.allSeguidores.filter((seg) => seg.informeId === this.selectedInforme.id);
+  private recalMAEyCC() {
+    const seguidoresInforme = this.allSeguidores.filter((seg) => seg.informeId === this.selectedInforme.id);
 
-  //   this.reportControlService.setMaeInformeSeguidores(seguidoresInforme, this.selectedInforme);
-  //   this.reportControlService.setCCInformeSeguidores(seguidoresInforme, this.selectedInforme);
-  // }
-
-  // private checkFilColAnoms() {
-  //   // primero comprobamos que el nº de filas y columnas de la planta sean correctos
-  //   if (this.planta.columnas > 1 && this.planta.columnas !== undefined && this.planta.columnas !== null) {
-  //     const differentFilColAnoms = this.anomaliasInforme.filter(
-  //       (anom) => anom.localY > this.planta.filas || anom.localX > this.planta.columnas
-  //     );
-
-  //     if (differentFilColAnoms.length > 0) {
-  //       const warning = {
-  //         content: 'Hay anomalías con posibles datos de fila y columna erroneos',
-  //         types: ['filsColsAnoms'],
-  //         actions: ['Filtrar'],
-  //       };
-
-  //       this.addWarning(warning);
-  //     }
-  //   }
-  // }
+    this.reportControlService.setMaeInformeSeguidores(seguidoresInforme, this.selectedInforme);
+    this.reportControlService.setCCInformeSeguidores(seguidoresInforme, this.selectedInforme);
+  }
 
   // private checkZonesWarnings() {
   //   if (this.locAreas.length > 0) {

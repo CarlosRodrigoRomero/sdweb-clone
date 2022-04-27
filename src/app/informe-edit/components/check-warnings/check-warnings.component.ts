@@ -82,7 +82,7 @@ export class CheckWarningsComponent implements OnInit {
     this.warningService.checkNumsCoA(this.informe, this.anomalias, this.warnings);
     this.warningService.checkNumsCriticidad(this.informe, this.anomalias, this.warnings);
     this.warningService.checkFilsColsPlanta(this.planta, this.informe, this.warnings);
-    this.checkFilColAnoms();
+    this.warningService.checkFilsColsAnoms(this.planta, this.anomalias, this.informe, this.warnings);
     this.checkZonesWarnings();
     this.checkAerialLayer();
   }
@@ -117,24 +117,6 @@ export class CheckWarningsComponent implements OnInit {
       } else {
         const warning: Warning = {
           type: 'numsCriticidad',
-          visible: true,
-        };
-
-        this.addWarning(warning);
-      }
-    }
-  }
-
-  private checkFilColAnoms() {
-    // primero comprobamos que el nº de filas y columnas de la planta sean correctos
-    if (this.planta.columnas > 1 && this.planta.columnas !== undefined && this.planta.columnas !== null) {
-      const differentFilColAnoms = this.anomalias.filter(
-        (anom) => anom.localY > this.planta.filas || anom.localX > this.planta.columnas
-      );
-
-      if (differentFilColAnoms.length > 0) {
-        const warning: Warning = {
-          type: 'filsColsAnoms',
           visible: true,
         };
 

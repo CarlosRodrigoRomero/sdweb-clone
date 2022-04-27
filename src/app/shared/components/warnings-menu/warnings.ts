@@ -145,4 +145,20 @@ export const warnings: Warning[] = [
       },
     ],
   },
+  {
+    type: 'filsColsAnoms',
+    message: 'Hay anomalías con posibles datos de fila y columna erroneos',
+    adminActions: [
+      {
+        name: 'irInforme',
+        label: 'Ir al Informe',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'filsColsAnoms',
+        label: 'Filtrar',
+      },
+    ],
+  },
 ];
