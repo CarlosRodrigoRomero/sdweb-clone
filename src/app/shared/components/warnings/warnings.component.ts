@@ -51,9 +51,9 @@ export class WarningsComponent implements OnInit {
     const urlLocalizaciones = this.router.serializeUrl(
       this.router.createUrlTree(['clientes/auto-loc/' + this.planta.id])
     );
-    let urlInforme = this.router.serializeUrl(this.router.createUrlTree(['clients/tracker/' + this.informeId]));
+    let urlInforme = this.router.serializeUrl(this.router.createUrlTree(['clients/tracker/' + this.planta.id]));
     if (this.planta.tipo !== 'seguidores') {
-      urlInforme = this.router.serializeUrl(this.router.createUrlTree(['clients/fixed/' + this.informeId]));
+      urlInforme = this.router.serializeUrl(this.router.createUrlTree(['clients/fixed/' + this.planta.id]));
     }
 
     switch (action) {

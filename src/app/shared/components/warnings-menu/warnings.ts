@@ -177,4 +177,24 @@ export const warnings: Warning[] = [
       },
     ],
   },
+  {
+    type: 'wrongLocAnoms',
+    message: 'Hay anomalías que pueden estar mal posicionadas y estar fuera de las zonas que deberían',
+    adminActions: [
+      {
+        name: 'irInforme',
+        label: 'Ir al Informe',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'wrongLocAnoms',
+        label: 'Filtrar',
+      },
+      {
+        name: 'irLocs',
+        label: 'Ir a Localizaciones',
+      },
+    ],
+  },
 ];

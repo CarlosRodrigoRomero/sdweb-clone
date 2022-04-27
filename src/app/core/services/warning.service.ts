@@ -5,6 +5,8 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { ReportControlService } from './report-control.service';
+
 import { Warning, warnings } from '@shared/components/warnings-menu/warnings';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
@@ -15,7 +17,7 @@ import { LocationAreaInterface } from '@core/models/location';
   providedIn: 'root',
 })
 export class WarningService {
-  constructor(private afs: AngularFirestore) {}
+  constructor(private afs: AngularFirestore, private reportControlService: ReportControlService) {}
 
   addWarning(informeId: string, warning: Warning) {
     // obtenemos un ID aleatorio
@@ -285,12 +287,21 @@ export class WarningService {
     }
   }
 
-  checkZonesWarnings(locAreas: LocationAreaInterface[], informe: InformeInterface, warns: Warning[]) {
+  checkZonesWarnings(
+    locAreas: LocationAreaInterface[],
+    informe: InformeInterface,
+    warns: Warning[],
+    planta: PlantaInterface,
+    anomalias: Anomalia[]
+  ) {
     if (locAreas.length > 0) {
       // primero eliminamos la alerta antigua de no locAreas si la hubiera
       this.checkOldWarning('noLocAreas', warns, informe.id);
 
-      // this.checkWrongGlobalCoordsAnoms();
+      // solo para fijas y S1E puede comprobamos las anomalias fuera de zonas
+      if (planta.tipo !== 'seguidores') {
+        this.checkWrongLocationAnoms(anomalias, warns, informe.id);
+      }
       // this.checkNoGlobalCoordsAnoms();
       // this.checkZonesNames();
       // this.checkModulosWarnings();
@@ -302,6 +313,24 @@ export class WarningService {
       };
 
       this.checkAddWarning(warning, warns, informe.id);
+    }
+  }
+
+  private checkWrongLocationAnoms(anomalias: Anomalia[], warns: Warning[], informeId: string) {
+    const numGlobalCoords = this.reportControlService.getNumGlobalCoords(anomalias);
+
+    const anomsWrongGlobals = anomalias.filter((anom) => anom.globalCoords[numGlobalCoords - 1] === null);
+
+    if (anomsWrongGlobals.length > 0) {
+      const warning: Warning = {
+        type: 'wrongLocAnoms',
+        visible: true,
+      };
+
+      this.checkAddWarning(warning, warns, informeId);
+    } else {
+      // eliminamos la alerta antigua si la hubiera
+      this.checkOldWarning('wrongLocAnoms', warns, informeId);
     }
   }
 }

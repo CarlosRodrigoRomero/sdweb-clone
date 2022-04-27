@@ -388,7 +388,7 @@ export class ReportControlService {
     }
   }
 
-  private getNumGlobalCoords(anoms: Anomalia[]): number {
+  getNumGlobalCoords(anoms: Anomalia[]): number {
     let numGlobalCoords = anoms[0].globalCoords.length;
 
     for (let index = numGlobalCoords - 1; index >= 0; index--) {

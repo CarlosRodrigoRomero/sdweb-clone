@@ -99,7 +99,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       this.warningService.checkNumsCriticidad(this.selectedInforme, this.anomaliasInforme, this.warnings);
       this.warningService.checkFilsColsPlanta(this.planta, this.selectedInforme, this.warnings);
       this.warningService.checkFilsColsAnoms(this.planta, this.anomaliasInforme, this.selectedInforme, this.warnings);
-      this.warningService.checkZonesWarnings(this.locAreas, this.selectedInforme, this.warnings);
+      this.warningService.checkZonesWarnings(
+        this.locAreas,
+        this.selectedInforme,
+        this.warnings,
+        this.planta,
+        this.anomaliasInforme
+      );
       // this.checkAerialLayer();
       // this.checkThermalLayer();
     });
@@ -131,10 +137,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         const filColFilter: LocationFilter = new LocationFilter('location', this.planta.filas, this.planta.columnas);
         this.filterService.addFilter(filColFilter);
         break;
+      case 'wrongLocAnoms':
+        this.filterWrongLocAnoms();
+        break;
+      case 'irLocs':
+        window.open(urlLocalizaciones, '_blank');
+        break;
 
-      // case 'irLoc':
-      //   window.open(urlLocalizaciones, '_blank');
-      //   break;
       // case 'nombresZonas':
       //   window.open(urlPlantaEdit, '_blank');
       //   break;
@@ -142,9 +151,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       // case 'modulosAnoms':
       //   this.fixModulosAnoms();
       //   break;
-      // case 'globalCoordsAnoms':
-      //   this.filterWrongGlobalCoordsAnoms();
-      //   break;
+
       // case 'noGlobalCoordsAnoms':
       //   this.fixNoGlobalCoordsAnoms();
       //   break;
@@ -158,54 +165,14 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     this.reportControlService.setCCInformeSeguidores(seguidoresInforme, this.selectedInforme);
   }
 
-  
+  private filterWrongLocAnoms() {
+    const wrongGlobalsFilter = new WrongGlobalCoordsFilter(
+      'wrongGlobals',
+      this.reportControlService.numFixedGlobalCoords - 1
+    );
 
-  // private checkWrongGlobalCoordsAnoms() {
-  //   let anomsWrongGlobals: Anomalia[];
-  //   if (this.reportControlService.plantaFija) {
-  //     anomsWrongGlobals = this.anomaliasInforme.filter(
-  //       (anom) => anom.globalCoords[this.reportControlService.numFixedGlobalCoords - 1] === null
-  //     );
-  //   } else {
-  //     anomsWrongGlobals = this.anomaliasInforme.filter(
-  //       (anom) => anom.globalCoords[this.seguidorService.numGlobalCoords - 1] === null
-  //     );
-  //   }
-
-  //   if (anomsWrongGlobals.length > 0) {
-  //     if (anomsWrongGlobals.length === 1) {
-  //       const warning = {
-  //         content: `Hay ${anomsWrongGlobals.length} anomalía que puede estar mal posicionada y estar fuera de las zonas que debería`,
-  //         types: ['globalCoordsAnoms', 'irLoc'],
-  //         actions: ['Filtrar', 'Ir a Localizaciones'],
-  //       };
-
-  //       this.addWarning(warning);
-  //     } else {
-  //       const warning = {
-  //         content: `Hay ${anomsWrongGlobals.length} anomalías que pueden estar mal posicionadas y estar fuera de las zonas que deberían`,
-  //         types: ['globalCoordsAnoms', 'irLoc'],
-  //         actions: ['Filtrar', 'Ir a Localizaciones'],
-  //       };
-
-  //       this.addWarning(warning);
-  //     }
-  //   }
-  // }
-
-  // private filterWrongGlobalCoordsAnoms() {
-  //   let wrongGlobalsFilter: WrongGlobalCoordsFilter;
-  //   if (this.reportControlService.plantaFija) {
-  //     wrongGlobalsFilter = new WrongGlobalCoordsFilter(
-  //       'wrongGlobals',
-  //       this.reportControlService.numFixedGlobalCoords - 1
-  //     );
-  //   } else {
-  //     wrongGlobalsFilter = new WrongGlobalCoordsFilter('wrongGlobals', this.seguidorService.numGlobalCoords - 1);
-  //   }
-
-  //   this.filterService.addFilter(wrongGlobalsFilter);
-  // }
+    this.filterService.addFilter(wrongGlobalsFilter);
+  }
 
   // private checkNoGlobalCoordsAnoms() {
   //   const noGlobalCoordsAnoms = this.anomaliasInforme.filter(

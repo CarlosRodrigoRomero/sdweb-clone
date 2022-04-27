@@ -83,60 +83,13 @@ export class CheckWarningsComponent implements OnInit {
     this.warningService.checkNumsCriticidad(this.informe, this.anomalias, this.warnings);
     this.warningService.checkFilsColsPlanta(this.planta, this.informe, this.warnings);
     this.warningService.checkFilsColsAnoms(this.planta, this.anomalias, this.informe, this.warnings);
-    this.warningService.checkZonesWarnings(this.locAreas, this.informe, this.warnings);
+    this.warningService.checkZonesWarnings(this.locAreas, this.informe, this.warnings, this.planta, this.anomalias);
     this.checkAerialLayer();
   }
 
   private addWarning(warning: Warning) {
     if (!this.warnings.map((warn) => warn.type).includes(warning.type)) {
       this.warningService.addWarning(this.informeId, warning);
-    }
-  }
-
-  private checkOldWarning(type: string) {
-    const oldWarning = this.warnings.find((warn) => warn.type === type);
-
-    if (oldWarning) {
-      this.warningService.deleteWarning(this.informeId, oldWarning.id);
-    }
-  }
-
-  private checkNumsCriticidad() {
-    if (this.informe !== undefined && this.anomalias.length > 0) {
-      if (this.informe.numsCriticidad.length > 0) {
-        const sumNumsCriticidad = this.informe.numsCriticidad.reduce((acum, curr) => acum + curr);
-
-        if (this.anomalias.length !== sumNumsCriticidad) {
-          const warning: Warning = {
-            type: 'sumNumsCriticidad',
-            visible: true,
-          };
-
-          this.addWarning(warning);
-        }
-      } else {
-        const warning: Warning = {
-          type: 'numsCriticidad',
-          visible: true,
-        };
-
-        this.addWarning(warning);
-      }
-    }
-  }
-
-  private checkWrongLocationAnoms() {
-    let anomsWrongGlobals: Anomalia[];
-
-    anomsWrongGlobals = this.anomalias.filter((anom) => anom.globalCoords[this.seguidoresIndex] === null);
-
-    if (anomsWrongGlobals.length > 0) {
-      const warning: Warning = {
-        type: 'wrongLocAnoms',
-        visible: true,
-      };
-
-      this.addWarning(warning);
     }
   }
 
