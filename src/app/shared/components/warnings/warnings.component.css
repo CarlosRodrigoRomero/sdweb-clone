@@ -5,3 +5,7 @@
   gap: 1rem;
   cursor: unset;
 }
+
+::ng-deep .mat-menu-panel {
+  max-width: none !important;
+}

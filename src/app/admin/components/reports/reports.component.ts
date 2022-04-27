@@ -9,7 +9,6 @@ import { combineLatest, Subscription } from 'rxjs';
 import { InformeService } from '@core/services/informe.service';
 import { ThermalService } from '@core/services/thermal.service';
 import { PlantaService } from '@core/services/planta.service';
-import { WarningService } from '@core/services/warning.service';
 
 import { PlantaInterface } from '@core/models/planta';
 
@@ -38,8 +37,7 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private informeService: InformeService,
     private plantaService: PlantaService,
-    private thermalService: ThermalService,
-    private warningService: WarningService
+    private thermalService: ThermalService
   ) {}
 
   ngOnInit(): void {

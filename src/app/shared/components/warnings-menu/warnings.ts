@@ -18,7 +18,7 @@ export const warnings: Warning[] = [
     message: 'El nº de anomalías no coincide con la suma de los tipos de anomalías',
     adminActions: [
       {
-        name: 'tiposAnom',
+        name: 'irInforme',
         label: 'Ir al Informe',
       },
     ],
@@ -34,7 +34,7 @@ export const warnings: Warning[] = [
     message: 'El nº de anomalías por tipo es incorrecto',
     adminActions: [
       {
-        name: 'tiposAnom',
+        name: 'irInforme',
         label: 'Ir al Informe',
       },
     ],
@@ -50,7 +50,7 @@ export const warnings: Warning[] = [
     message: 'El nº de anomalías no coincide con la suma de los CoA',
     adminActions: [
       {
-        name: 'numsCoA',
+        name: 'irInforme',
         label: 'Ir al Informe',
       },
     ],
@@ -66,7 +66,7 @@ export const warnings: Warning[] = [
     message: 'El nº de anomalías por clase es incorrecto',
     adminActions: [
       {
-        name: 'numsCoA',
+        name: 'irInforme',
         label: 'Ir al Informe',
       },
     ],
