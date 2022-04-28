@@ -67,6 +67,8 @@ export class PlantaService {
         } else {
           const data = action.payload.data() as PlantaInterface;
           data.id = action.payload.id;
+          data.zoom = this.getZoomPlanta(data);
+
           return data;
         }
       })
@@ -115,6 +117,8 @@ export class PlantaService {
         actions.map((a) => {
           const data = a.payload.doc.data() as PlantaInterface;
           data.id = a.payload.doc.id;
+          data.zoom = this.getZoomPlanta(data);
+
           return data;
         })
       )
@@ -239,6 +243,8 @@ export class PlantaService {
           actions.map((a) => {
             const data = a.payload.doc.data() as PlantaInterface;
             data.id = a.payload.doc.id;
+            data.zoom = this.getZoomPlanta(data);
+
             return data;
           })
         ),
@@ -803,5 +809,13 @@ export class PlantaService {
         )
       );
     return query$;
+  }
+
+  private getZoomPlanta(planta: PlantaInterface): number {
+    let zoom = 17;
+    if (planta.potencia >= 10) {
+      zoom = zoom - 1;
+    }
+    return zoom;
   }
 }
