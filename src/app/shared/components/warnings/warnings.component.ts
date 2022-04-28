@@ -1,12 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { switchMap, take } from 'rxjs/operators';
+
 import { WarningService } from '@core/services/warning.service';
 import { PlantaService } from '@core/services/planta.service';
 import { InformeService } from '@core/services/informe.service';
+import { GLOBAL } from '@core/services/global';
 
 import { Warning } from '../warnings-menu/warnings';
-import { switchMap, take } from 'rxjs/operators';
 import { PlantaInterface } from '@core/models/planta';
 
 @Component({
@@ -49,6 +51,7 @@ export class WarningsComponent implements OnInit {
     if (this.planta.tipo !== 'seguidores') {
       urlInforme = this.router.serializeUrl(this.router.createUrlTree(['clients/fixed/' + this.planta.id]));
     }
+    const urlStorage = GLOBAL.urlStorageInformes + '~2F' + this.informeId;
 
     switch (action) {
       case 'irInforme':
@@ -59,6 +62,9 @@ export class WarningsComponent implements OnInit {
         break;
       case 'irLocs':
         window.open(urlLocalizaciones, '_blank');
+        break;
+      case 'irStorage':
+        window.open(urlStorage, '_blank');
         break;
     }
   }

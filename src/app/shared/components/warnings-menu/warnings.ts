@@ -293,4 +293,36 @@ export const warnings: Warning[] = [
       },
     ],
   },
+  {
+    type: 'imgPortada',
+    message: 'Falta la imagen de portada en Storage',
+    adminActions: [
+      {
+        name: 'irStorage',
+        label: 'Ir al Storage',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'irStorage',
+        label: 'Ir al Storage',
+      },
+    ],
+  },
+  {
+    type: 'imgSuciedad',
+    message: 'Falta la imagen de suciedad en Storage',
+    adminActions: [
+      {
+        name: 'irStorage',
+        label: 'Ir al Storage',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'irStorage',
+        label: 'Ir al Storage',
+      },
+    ],
+  },
 ];

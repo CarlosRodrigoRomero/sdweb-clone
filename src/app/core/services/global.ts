@@ -16,6 +16,8 @@ export let GLOBAL = {
   colores_grad_rgb: ['rgba(0,227,150,1)', 'rgba(255,138,0,1)', 'rgba(253,80,77,1)'], // verde, naranja, rojo
   color_rojo_interfaz: '#d32f2f', // red 700 material
   url: 'http://localhost:3977/api',
+  urlStorageInformes:
+    'https://console.firebase.google.com/project/sdweb-d33ce/storage/sdweb-d33ce.appspot.com/files/~2Finformes',
   num_tipos: 16,
   camaraTermica: 'DJI XT2 640 13mm (Numero de serie: 297106)',
   ultimaCalibracion: '03/2020',

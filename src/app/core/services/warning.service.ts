@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 import { Observable } from 'rxjs';
 import { catchError, map, take } from 'rxjs/operators';
@@ -21,7 +22,8 @@ export class WarningService {
   constructor(
     private afs: AngularFirestore,
     private reportControlService: ReportControlService,
-    private http: HttpClient
+    private http: HttpClient,
+    private storage: AngularFireStorage
   ) {}
 
   addWarning(informeId: string, warning: Warning) {
@@ -533,6 +535,50 @@ export class WarningService {
         take(1)
       )
       .subscribe((data) => console.log(''));
+
+    // confirmamos que ha sido checkeado
+    return true;
+  }
+
+  checkImagePortada(informeId: string, warns: Warning[]): boolean {
+    this.storage
+      .ref(`informes/${informeId}/portada.jpg`)
+      .getDownloadURL()
+      .toPromise()
+      .then((url) => {
+        // eliminamos la alerta antigua si la hubiera
+        this.checkOldWarning('imgPortada', warns, informeId);
+      })
+      .catch((error) => {
+        const warning: Warning = {
+          type: 'imgPortada',
+          visible: true,
+        };
+
+        this.checkAddWarning(warning, warns, informeId);
+      });
+
+    // confirmamos que ha sido checkeado
+    return true;
+  }
+
+  checkImageSuciedad(informeId: string, warns: Warning[]): boolean {
+    this.storage
+      .ref(`informes/${informeId}/suciedad.jpg`)
+      .getDownloadURL()
+      .toPromise()
+      .then((url) => {
+        // eliminamos la alerta antigua si la hubiera
+        this.checkOldWarning('imgSuciedad', warns, informeId);
+      })
+      .catch((error) => {
+        const warning: Warning = {
+          type: 'imgSuciedad',
+          visible: true,
+        };
+
+        this.checkAddWarning(warning, warns, informeId);
+      });
 
     // confirmamos que ha sido checkeado
     return true;

@@ -11,6 +11,7 @@ import { FilterService } from '@core/services/filter.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { PcService } from '@core/services/pc.service';
 import { WarningService } from '@core/services/warning.service';
+import { GLOBAL } from '@core/services/global';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -107,6 +108,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     );
     this.warningService.checkAerialLayer(this.selectedInforme.id, this.warnings);
     this.warningService.checkThermalLayer(this.selectedInforme.id, this.warnings);
+    this.warningService.checkImagePortada(this.selectedInforme.id, this.warnings);
+    this.warningService.checkImageSuciedad(this.selectedInforme.id, this.warnings);
   }
 
   fixProblem(action: string) {
@@ -114,6 +117,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     const urlLocalizaciones = this.router.serializeUrl(
       this.router.createUrlTree(['clientes/auto-loc/' + this.planta.id])
     );
+    const urlStorage = GLOBAL.urlStorageInformes + '~2F' + this.selectedInforme.id;
 
     switch (action) {
       case 'tiposAnom':
@@ -149,6 +153,9 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         break;
       case 'modulosAnoms':
         this.fixModulosAnoms();
+        break;
+      case 'irStorage':
+        window.open(urlStorage, '_blank');
         break;
     }
   }

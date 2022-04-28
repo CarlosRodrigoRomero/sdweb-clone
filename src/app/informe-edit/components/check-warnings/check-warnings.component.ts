@@ -96,6 +96,8 @@ export class CheckWarningsComponent implements OnInit {
       this.anomalias
     );
     const aerialLayerChecked = this.warningService.checkAerialLayer(this.informe.id, this.warnings);
+    const imgPortadaChecked = this.warningService.checkImagePortada(this.informe.id, this.warnings);
+    const imgSuciedadChecked = this.warningService.checkImageSuciedad(this.informe.id, this.warnings);
 
     if (
       tiposAnomsChecked &&
@@ -104,7 +106,9 @@ export class CheckWarningsComponent implements OnInit {
       filsColsPlantaChecked &&
       filsColsAnomsChecked &&
       zonesChecked &&
-      aerialLayerChecked
+      aerialLayerChecked &&
+      imgPortadaChecked &&
+      imgSuciedadChecked
     ) {
       this.checking = false;
     }
