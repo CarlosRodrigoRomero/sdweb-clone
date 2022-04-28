@@ -357,4 +357,20 @@ export const warnings: Warning[] = [
       },
     ],
   },
+  {
+    type: 'tempMaxAnoms',
+    message: 'Hay un error con la temperaturas máximas de varias anomalías',
+    adminActions: [
+      {
+        name: 'irInforme',
+        label: 'Ir al Informe',
+      },
+    ],
+    reportActions: [
+      {
+        name: '',
+        label: '',
+      },
+    ],
+  },
 ];

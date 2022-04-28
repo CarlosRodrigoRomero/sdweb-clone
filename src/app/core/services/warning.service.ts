@@ -617,4 +617,26 @@ export class WarningService {
     // confirmamos que ha sido checkeado
     return true;
   }
+
+  checkTempMaxAnomsError(anomalias: Anomalia[], warns: Warning[], informeId: string): boolean {
+    const highestTemp = anomalias.sort((a, b) => b.temperaturaMax - a.temperaturaMax)[0].temperaturaMax;
+
+    const wrongMaxTempAnoms = anomalias.filter((anom) => anom.temperaturaMax === highestTemp);
+
+    // si son más de 10 con la temp max es un error en el calculo
+    if (wrongMaxTempAnoms.length > 10) {
+      const warning: Warning = {
+        type: 'tempMaxAnoms',
+        visible: true,
+      };
+
+      this.checkAddWarning(warning, warns, informeId);
+    } else {
+      // eliminamos la alerta antigua si la hubiera
+      this.checkOldWarning('tempMaxAnoms', warns, informeId);
+    }
+
+    // confirmamos que ha sido checkeado
+    return true;
+  }
 }

@@ -112,6 +112,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     this.warningService.checkThermalLayer(this.selectedInforme.id, this.warnings);
     this.warningService.checkImagePortada(this.selectedInforme.id, this.warnings);
     this.warningService.checkImageSuciedad(this.selectedInforme.id, this.warnings);
+    this.warningService.checkTempMaxAnomsError(this.anomaliasInforme, this.warnings, this.selectedInforme.id);
   }
 
   fixProblem(action: string) {
