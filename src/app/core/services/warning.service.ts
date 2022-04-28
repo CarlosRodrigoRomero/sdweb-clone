@@ -359,18 +359,20 @@ export class WarningService {
   private checkWrongLocationAnoms(anomalias: Anomalia[], warns: Warning[], informeId: string): boolean {
     const numGlobalCoords = this.reportControlService.getNumGlobalCoords(anomalias);
 
-    const anomsWrongGlobals = anomalias.filter((anom) => anom.globalCoords[numGlobalCoords - 1] === null);
+    if (numGlobalCoords > 0) {
+      const anomsWrongGlobals = anomalias.filter((anom) => anom.globalCoords[numGlobalCoords - 1] === null);
 
-    if (anomsWrongGlobals.length > 0) {
-      const warning: Warning = {
-        type: 'wrongLocAnoms',
-        visible: true,
-      };
+      if (anomsWrongGlobals.length > 0) {
+        const warning: Warning = {
+          type: 'wrongLocAnoms',
+          visible: true,
+        };
 
-      this.checkAddWarning(warning, warns, informeId);
-    } else {
-      // eliminamos la alerta antigua si la hubiera
-      this.checkOldWarning('wrongLocAnoms', warns, informeId);
+        this.checkAddWarning(warning, warns, informeId);
+      } else {
+        // eliminamos la alerta antigua si la hubiera
+        this.checkOldWarning('wrongLocAnoms', warns, informeId);
+      }
     }
 
     // confirmamos que ha sido checkeado

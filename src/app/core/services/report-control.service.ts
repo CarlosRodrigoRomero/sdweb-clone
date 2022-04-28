@@ -389,22 +389,25 @@ export class ReportControlService {
   }
 
   getNumGlobalCoords(anoms: Anomalia[]): number {
-    let numGlobalCoords = anoms[0].globalCoords.length;
+    let numGlobalCoords = 0;
+    if (anoms.length > 0) {
+      numGlobalCoords = anoms[0].globalCoords.length;
 
-    for (let index = numGlobalCoords - 1; index >= 0; index--) {
-      if (
-        anoms.filter(
-          (anom) =>
-            anom.globalCoords[index] !== null &&
-            anom.globalCoords[index] !== undefined &&
-            anom.globalCoords[index] !== ''
-        ).length > 0
-      ) {
-        numGlobalCoords = index + 1;
+      for (let index = numGlobalCoords - 1; index >= 0; index--) {
+        if (
+          anoms.filter(
+            (anom) =>
+              anom.globalCoords[index] !== null &&
+              anom.globalCoords[index] !== undefined &&
+              anom.globalCoords[index] !== ''
+          ).length > 0
+        ) {
+          numGlobalCoords = index + 1;
 
-        break;
-      } else {
-        numGlobalCoords = index;
+          break;
+        } else {
+          numGlobalCoords = index;
+        }
       }
     }
 
