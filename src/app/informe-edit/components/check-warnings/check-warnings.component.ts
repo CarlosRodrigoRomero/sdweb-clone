@@ -66,11 +66,9 @@ export class CheckWarningsComponent implements OnInit {
         this.seguidoresIndex = this.seguidorService.getIndiceGlobalCoordsSeguidores(locAreas);
 
         this.anomaliaService.initService(this.planta.id).then(() => {
-          this.anomaliaService.getAnomalias$(this.informeId, 'pcs').subscribe((anoms) => {
-            this.anomalias = this.anomaliaService.getRealAnomalias(anoms);
-
-            // this.checkWanings();
-          });
+          this.anomaliaService
+            .getAnomalias$(this.informeId, 'pcs')
+            .subscribe((anoms) => (this.anomalias = this.anomaliaService.getRealAnomalias(anoms)));
         });
       });
 
@@ -84,50 +82,6 @@ export class CheckWarningsComponent implements OnInit {
     this.warningService.checkFilsColsPlanta(this.planta, this.informe, this.warnings);
     this.warningService.checkFilsColsAnoms(this.planta, this.anomalias, this.informe, this.warnings);
     this.warningService.checkZonesWarnings(this.locAreas, this.informe, this.warnings, this.planta, this.anomalias);
-    this.checkAerialLayer();
-  }
-
-  private addWarning(warning: Warning) {
-    if (!this.warnings.map((warn) => warn.type).includes(warning.type)) {
-      this.warningService.addWarning(this.informeId, warning);
-    }
-  }
-
-  private checkModulosAnoms() {
-    const anomsSinModulo = this.anomalias.filter((anom) => anom.modulo === null || anom.modulo === undefined);
-
-    if (anomsSinModulo.length > 0) {
-      const warning: Warning = {
-        type: 'modulosAnoms',
-        visible: true,
-      };
-
-      this.addWarning(warning);
-    }
-  }
-
-  private checkAerialLayer() {
-    const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + this.informeId + '_visual/1/1/1.png';
-
-    this.http
-      .get(url)
-      .pipe(
-        take(1),
-        catchError((error) => {
-          // no recibimos respuesta del servidor porque no existe
-          if (error.status === 0) {
-            const warning: Warning = {
-              type: 'visualLayer',
-              visible: true,
-            };
-
-            this.addWarning(warning);
-          }
-
-          return [];
-        }),
-        take(1)
-      )
-      .subscribe((data) => console.log(''));
+    this.warningService.checkAerialLayer(this.informe.id, this.warnings);
   }
 }

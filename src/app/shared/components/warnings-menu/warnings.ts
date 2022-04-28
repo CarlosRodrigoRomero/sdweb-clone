@@ -261,4 +261,36 @@ export const warnings: Warning[] = [
       },
     ],
   },
+  {
+    type: 'visualLayer',
+    message: 'No existe la capa visual',
+    adminActions: [
+      {
+        name: '',
+        label: '',
+      },
+    ],
+    reportActions: [
+      {
+        name: '',
+        label: '',
+      },
+    ],
+  },
+  {
+    type: 'thermalLayer',
+    message: 'No existe la capa térmica',
+    adminActions: [
+      {
+        name: '',
+        label: '',
+      },
+    ],
+    reportActions: [
+      {
+        name: '',
+        label: '',
+      },
+    ],
+  },
 ];

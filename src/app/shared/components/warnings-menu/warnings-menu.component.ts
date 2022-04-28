@@ -109,8 +109,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       this.planta,
       this.anomaliasInforme
     );
-    // this.checkAerialLayer();
-    // this.checkThermalLayer();
+    this.warningService.checkAerialLayer(this.selectedInforme.id, this.warnings);
+    this.warningService.checkThermalLayer(this.selectedInforme.id, this.warnings);
   }
 
   fixProblem(action: string) {
@@ -218,61 +218,6 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  // private checkAerialLayer() {
-  //   const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInforme.id + '_visual/1/1/1.png';
-
-  //   this.http
-  //     .get(url)
-  //     .pipe(
-  //       take(1),
-  //       catchError((error) => {
-  //         // no recibimos respuesta del servidor porque no existe
-  //         if (error.status === 0) {
-  //           const warning = {
-  //             content: 'No existe la capa visual',
-  //             types: ['visualLayer'],
-  //             actions: [''],
-  //           };
-
-  //           this.addWarning(warning);
-  //         }
-
-  //         return [];
-  //       }),
-  //       take(1)
-  //     )
-  //     .subscribe((data) => console.log(''));
-  // }
-
-  // private checkThermalLayer() {
-  //   if (this.reportControlService.plantaFija) {
-  //     const url =
-  //       'https://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInforme.id + '_thermal/1/1/1.png';
-
-  //     this.http
-  //       .get(url)
-  //       .pipe(
-  //         take(1),
-  //         catchError((error) => {
-  //           // no recibimos respuesta del servidor porque no existe
-  //           if (error.status === 0) {
-  //             const warning = {
-  //               content: 'No existe la capa térmica',
-  //               types: ['thermalLayer'],
-  //               actions: [''],
-  //             };
-
-  //             this.addWarning(warning);
-  //           }
-
-  //           return [];
-  //         }),
-  //         take(1)
-  //       )
-  //       .subscribe((data) => console.log(''));
-  //   }
-  // }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();

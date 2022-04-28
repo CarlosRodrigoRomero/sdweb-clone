@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { catchError, map, take } from 'rxjs/operators';
 
 import { ReportControlService } from './report-control.service';
 
@@ -17,7 +18,11 @@ import { LocationAreaInterface } from '@core/models/location';
   providedIn: 'root',
 })
 export class WarningService {
-  constructor(private afs: AngularFirestore, private reportControlService: ReportControlService) {}
+  constructor(
+    private afs: AngularFirestore,
+    private reportControlService: ReportControlService,
+    private http: HttpClient
+  ) {}
 
   addWarning(informeId: string, warning: Warning) {
     // obtenemos un ID aleatorio
@@ -410,6 +415,66 @@ export class WarningService {
     } else {
       // eliminamos la alerta antigua si la hubiera
       this.checkOldWarning('modulosAnoms', warns, informeId);
+    }
+  }
+
+  checkAerialLayer(informeId: string, warns: Warning[]) {
+    const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_visual/1/1/1.png';
+
+    this.http
+      .get(url)
+      .pipe(
+        take(1),
+        catchError((error) => {
+          // no recibimos respuesta del servidor porque no existe
+          if (error.status === 0) {
+            const warning: Warning = {
+              type: 'visualLayer',
+              visible: true,
+            };
+
+            this.checkAddWarning(warning, warns, informeId);
+          } else {
+            // si recibimos respuesta del servidor, es que existe la capa
+            // y eliminamos la alerta antigua si la hubiera
+            this.checkOldWarning('visualLayer', warns, informeId);
+          }
+
+          return [];
+        }),
+        take(1)
+      )
+      .subscribe((data) => console.log(''));
+  }
+
+  checkThermalLayer(informeId: string, warns: Warning[]) {
+    if (this.reportControlService.plantaFija) {
+      const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_thermal/1/1/1.png';
+
+      this.http
+        .get(url)
+        .pipe(
+          take(1),
+          catchError((error) => {
+            // no recibimos respuesta del servidor porque no existe
+            if (error.status === 0) {
+              const warning: Warning = {
+                type: 'thermalLayer',
+                visible: true,
+              };
+
+              this.checkAddWarning(warning, warns, informeId);
+            } else {
+              // si recibimos respuesta del servidor, es que existe la capa
+              // y eliminamos la alerta antigua si la hubiera
+              this.checkOldWarning('thermalLayer', warns, informeId);
+            }
+
+            return [];
+          }),
+          take(1)
+        )
+        .subscribe((data) => console.log(''));
     }
   }
 }
