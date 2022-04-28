@@ -325,4 +325,36 @@ export const warnings: Warning[] = [
       },
     ],
   },
+  {
+    type: 'mae',
+    message: 'El MAE es incorrecto',
+    adminActions: [
+      {
+        name: 'irInforme',
+        label: 'Ir al Informe',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'recalMAEyCC',
+        label: 'Corregir',
+      },
+    ],
+  },
+  {
+    type: 'cc',
+    message: 'El CC es incorrecto',
+    adminActions: [
+      {
+        name: 'irInforme',
+        label: 'Ir al Informe',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'recalMAEyCC',
+        label: 'Corregir',
+      },
+    ],
+  },
 ];

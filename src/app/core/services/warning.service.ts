@@ -256,6 +256,40 @@ export class WarningService {
     return true;
   }
 
+  checkMAE(informe: InformeInterface, warns: Warning[]): boolean {
+    if (informe.mae >= 1) {
+      const warning: Warning = {
+        type: 'mae',
+        visible: true,
+      };
+
+      this.checkAddWarning(warning, warns, informe.id);
+    } else {
+      // eliminamos la alerta antigua si la hubiera
+      this.checkOldWarning('mae', warns, informe.id);
+    }
+
+    // confirmamos que ha sido checkeado
+    return true;
+  }
+
+  checkCC(informe: InformeInterface, warns: Warning[]): boolean {
+    if (informe.cc >= 1) {
+      const warning: Warning = {
+        type: 'cc',
+        visible: true,
+      };
+
+      this.checkAddWarning(warning, warns, informe.id);
+    } else {
+      // eliminamos la alerta antigua si la hubiera
+      this.checkOldWarning('cc', warns, informe.id);
+    }
+
+    // confirmamos que ha sido checkeado
+    return true;
+  }
+
   checkFilsColsPlanta(planta: PlantaInterface, informe: InformeInterface, warns: Warning[]): boolean {
     if (planta.columnas <= 1 || planta.columnas === undefined || planta.columnas === null) {
       let warning: Warning;

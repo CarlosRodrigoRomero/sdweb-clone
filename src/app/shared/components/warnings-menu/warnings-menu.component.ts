@@ -97,6 +97,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     this.warningService.checkTiposAnoms(this.selectedInforme, this.anomaliasInforme, this.warnings);
     this.warningService.checkNumsCoA(this.selectedInforme, this.anomaliasInforme, this.warnings);
     this.warningService.checkNumsCriticidad(this.selectedInforme, this.anomaliasInforme, this.warnings);
+    this.warningService.checkMAE(this.selectedInforme, this.warnings);
+    this.warningService.checkCC(this.selectedInforme, this.warnings);
     this.warningService.checkFilsColsPlanta(this.planta, this.selectedInforme, this.warnings);
     this.warningService.checkFilsColsAnoms(this.planta, this.anomaliasInforme, this.selectedInforme, this.warnings);
     this.warningService.checkZonesWarnings(
@@ -161,10 +163,15 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   }
 
   private recalMAEyCC() {
-    const seguidoresInforme = this.allSeguidores.filter((seg) => seg.informeId === this.selectedInforme.id);
+    if (this.reportControlService.plantaFija) {
+      this.reportControlService.setMaeInformeFija(this.anomaliasInforme, this.selectedInforme);
+      this.reportControlService.setCCInformeFija(this.anomaliasInforme, this.selectedInforme);
+    } else {
+      const seguidoresInforme = this.allSeguidores.filter((seg) => seg.informeId === this.selectedInforme.id);
 
-    this.reportControlService.setMaeInformeSeguidores(seguidoresInforme, this.selectedInforme);
-    this.reportControlService.setCCInformeSeguidores(seguidoresInforme, this.selectedInforme);
+      this.reportControlService.setMaeInformeSeguidores(seguidoresInforme, this.selectedInforme);
+      this.reportControlService.setCCInformeSeguidores(seguidoresInforme, this.selectedInforme);
+    }
   }
 
   private filterWrongLocAnoms() {

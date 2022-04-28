@@ -81,6 +81,8 @@ export class CheckWarningsComponent implements OnInit {
     const tiposAnomsChecked = this.warningService.checkTiposAnoms(this.informe, this.anomalias, this.warnings);
     const numsCoAChecked = this.warningService.checkNumsCoA(this.informe, this.anomalias, this.warnings);
     const numsCritChecked = this.warningService.checkNumsCriticidad(this.informe, this.anomalias, this.warnings);
+    const maeChecked = this.warningService.checkMAE(this.informe, this.warnings);
+    const ccChecked = this.warningService.checkCC(this.informe, this.warnings);
     const filsColsPlantaChecked = this.warningService.checkFilsColsPlanta(this.planta, this.informe, this.warnings);
     const filsColsAnomsChecked = this.warningService.checkFilsColsAnoms(
       this.planta,
@@ -103,6 +105,8 @@ export class CheckWarningsComponent implements OnInit {
       tiposAnomsChecked &&
       numsCoAChecked &&
       numsCritChecked &&
+      maeChecked &&
+      ccChecked &&
       filsColsPlantaChecked &&
       filsColsAnomsChecked &&
       zonesChecked &&

@@ -435,7 +435,7 @@ export class ReportControlService {
     this.informeService.updateInforme(informe);
   }
 
-  private setMaeInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
+  setMaeInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
     if (anomalias.length > 0) {
       const perdidas = anomalias.map((anom) => anom.perdidas);
       let perdidasTotales = 0;
@@ -470,7 +470,7 @@ export class ReportControlService {
     this.informeService.updateInforme(informe);
   }
 
-  private setCCInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
+  setCCInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
     if (anomalias.length > 0) {
       // tslint:disable-next-line: triple-equals
       const celCals = anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
