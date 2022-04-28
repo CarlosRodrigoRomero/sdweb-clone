@@ -148,14 +148,12 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       case 'noGlobalCoordsAnoms':
         this.fixNoGlobalCoordsAnoms();
         break;
-
-      // case 'nombresZonas':
-      //   window.open(urlPlantaEdit, '_blank');
-      //   break;
-
-      // case 'modulosAnoms':
-      //   this.fixModulosAnoms();
-      //   break;
+      case 'nombresZonas':
+        window.open(urlPlantaEdit, '_blank');
+        break;
+      case 'modulosAnoms':
+        this.fixModulosAnoms();
+        break;
     }
   }
 
@@ -180,7 +178,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       (anom) => anom.globalCoords === null || anom.globalCoords === undefined || anom.globalCoords[0] === null
     );
 
-    noGlobalCoordsAnoms.forEach((anom, index, anoms) => {
+    noGlobalCoordsAnoms.forEach((anom) => {
       const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(anom.featureCoords[0], this.locAreas);
 
       if (globalCoords !== null && globalCoords !== undefined && globalCoords[0] !== null) {
@@ -188,91 +186,38 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
 
         this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', globalCoords);
       }
-
-      // checkeamos los warnings al terminar de escribir los modulos que faltan
-      if (index === anoms.length - 1) {
-        this.checkWarnings();
-      }
     });
   }
 
-  // private checkModulosWarnings() {
-  //   const areasConModulo = this.locAreas.filter(
-  //     (locArea) => locArea.hasOwnProperty('modulo') && locArea.modulo !== null && locArea.modulo !== undefined
-  //   );
+  private fixModulosAnoms() {
+    const anomsSinModulo = this.anomaliasInforme.filter((anom) => anom.modulo === null || anom.modulo === undefined);
 
-  //   if (areasConModulo.length > 0) {
-  //     this.checkModulosAnoms();
-  //   } else {
-  //     // añadimos el aviso de que faltan los modulos de la planta
-  //     const warning = {
-  //       content: 'Faltan los módulos de la planta',
-  //       types: ['irLoc'],
-  //       actions: ['Ir a Localizaciones'],
-  //     };
+    anomsSinModulo.forEach((anom) => {
+      let modulo: ModuloInterface;
+      if (this.reportControlService.plantaFija) {
+        modulo = this.anomaliaService.getModule(anom.featureCoords[0], this.locAreas);
 
-  //     this.addWarning(warning);
-  //   }
-  // }
+        if (modulo !== null) {
+          anom.modulo = modulo;
 
-  // private checkModulosAnoms() {
-  //   const anomsSinModulo = this.anomaliasInforme.filter((anom) => anom.modulo === null || anom.modulo === undefined);
+          this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
+        }
+      } else {
+        const seguidoresInforme = this.allSeguidores.filter((seg) => seg.informeId === this.selectedInforme.id);
+        const seguidorAnom = seguidoresInforme.find(
+          (seg) => seg.globalCoords.toString().replace(/,/g, '') === anom.globalCoords.toString().replace(/,/g, '')
+        );
 
-  //   if (anomsSinModulo.length > 0) {
-  //     if (anomsSinModulo.length === 1) {
-  //       const warning = {
-  //         content: `Hay ${anomsSinModulo.length} anomalía sin módulo`,
-  //         types: ['modulosAnoms'],
-  //         actions: ['Corregir'],
-  //       };
+        modulo = seguidorAnom.modulo;
 
-  //       this.addWarning(warning);
-  //     } else {
-  //       const warning = {
-  //         content: `Hay ${anomsSinModulo.length} anomalías sin módulo`,
-  //         types: ['modulosAnoms'],
-  //         actions: ['Corregir'],
-  //       };
+        if (modulo !== null) {
+          anom.modulo = modulo;
 
-  //       this.addWarning(warning);
-  //     }
-  //   }
-  // }
-
-  // private fixModulosAnoms() {
-  //   const anomsSinModulo = this.anomaliasInforme.filter((anom) => anom.modulo === null || anom.modulo === undefined);
-
-  //   anomsSinModulo.forEach((anom, index, anoms) => {
-  //     let modulo: ModuloInterface;
-  //     if (this.reportControlService.plantaFija) {
-  //       modulo = this.anomaliaService.getModule(anom.featureCoords[0], this.locAreas);
-
-  //       if (modulo !== null) {
-  //         anom.modulo = modulo;
-
-  //         this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
-  //       }
-  //     } else {
-  //       const seguidoresInforme = this.allSeguidores.filter((seg) => seg.informeId === this.selectedInforme.id);
-  //       const seguidorAnom = seguidoresInforme.find(
-  //         (seg) => seg.globalCoords.toString().replace(/,/g, '') === anom.globalCoords.toString().replace(/,/g, '')
-  //       );
-
-  //       modulo = seguidorAnom.modulo;
-
-  //       if (modulo !== null) {
-  //         anom.modulo = modulo;
-
-  //         this.pcService.updatePc(anom as PcInterface);
-  //       }
-  //     }
-
-  //     // checkeamos los warnings al terminar de escribir los modulos que faltan
-  //     if (index === anoms.length - 1) {
-  //       this.checkWanings();
-  //     }
-  //   });
-  // }
+          this.pcService.updatePc(anom as PcInterface);
+        }
+      }
+    });
+  }
 
   // private checkAerialLayer() {
   //   const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + this.selectedInforme.id + '_visual/1/1/1.png';

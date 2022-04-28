@@ -93,55 +93,6 @@ export class CheckWarningsComponent implements OnInit {
     }
   }
 
-  private checkNoGlobalCoordsAnoms() {
-    const noGlobalCoordsAnoms = this.anomalias.filter(
-      (anom) => anom.globalCoords === null || anom.globalCoords === undefined || anom.globalCoords[0] === null
-    );
-
-    if (noGlobalCoordsAnoms.length > 0) {
-      const warning: Warning = {
-        type: 'noGlobalCoordsAnoms',
-        visible: true,
-      };
-
-      this.addWarning(warning);
-    }
-  }
-
-  private checkZonesNames() {
-    if (
-      !this.planta.hasOwnProperty('nombreGlobalCoords') ||
-      this.planta.nombreGlobalCoords === null ||
-      this.planta.nombreGlobalCoords === undefined ||
-      this.planta.nombreGlobalCoords.length === 0
-    ) {
-      const warning: Warning = {
-        type: 'nombresZonas',
-        visible: true,
-      };
-
-      this.addWarning(warning);
-    }
-  }
-
-  private checkModulosWarnings() {
-    const areasConModulo = this.locAreas.filter(
-      (locArea) => locArea.hasOwnProperty('modulo') && locArea.modulo !== null && locArea.modulo !== undefined
-    );
-
-    if (areasConModulo.length > 0) {
-      this.checkModulosAnoms();
-    } else {
-      // añadimos el aviso de que faltan los modulos de la planta
-      const warning: Warning = {
-        type: 'modulosPlanta',
-        visible: true,
-      };
-
-      this.addWarning(warning);
-    }
-  }
-
   private checkModulosAnoms() {
     const anomsSinModulo = this.anomalias.filter((anom) => anom.modulo === null || anom.modulo === undefined);
 

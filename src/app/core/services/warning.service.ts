@@ -304,7 +304,7 @@ export class WarningService {
       }
       this.checkNoGlobalCoordsAnoms(anomalias, warns, informe.id);
       this.checkZonesNames(planta, warns, informe.id);
-      // this.checkModulosWarnings();
+      this.checkModulosWarnings(locAreas, warns, informe.id, anomalias);
     } else {
       // añadimos el aviso de que faltan las zonas de la planta
       const warning: Warning = {
@@ -368,6 +368,48 @@ export class WarningService {
     } else {
       // eliminamos la alerta antigua si la hubiera
       this.checkOldWarning('nombresZonas', warns, informeId);
+    }
+  }
+
+  private checkModulosWarnings(
+    locAreas: LocationAreaInterface[],
+    warns: Warning[],
+    informeId: string,
+    anomalias: Anomalia[]
+  ) {
+    const areasConModulo = locAreas.filter(
+      (locArea) => locArea.hasOwnProperty('modulo') && locArea.modulo !== null && locArea.modulo !== undefined
+    );
+
+    if (areasConModulo.length > 0) {
+      // primero eliminamos la alerta antigua de no hay modulos en la planta si la hubiera
+      this.checkOldWarning('modulosPlanta', warns, informeId);
+
+      this.checkModulosAnoms(anomalias, warns, informeId);
+    } else {
+      // añadimos el aviso de que faltan los modulos de la planta
+      const warning: Warning = {
+        type: 'modulosPlanta',
+        visible: true,
+      };
+
+      this.checkAddWarning(warning, warns, informeId);
+    }
+  }
+
+  private checkModulosAnoms(anomalias: Anomalia[], warns: Warning[], informeId: string) {
+    const anomsSinModulo = anomalias.filter((anom) => anom.modulo === null || anom.modulo === undefined);
+
+    if (anomsSinModulo.length > 0) {
+      const warning: Warning = {
+        type: 'modulosAnoms',
+        visible: true,
+      };
+
+      this.checkAddWarning(warning, warns, informeId);
+    } else {
+      // eliminamos la alerta antigua si la hubiera
+      this.checkOldWarning('modulosAnoms', warns, informeId);
     }
   }
 }

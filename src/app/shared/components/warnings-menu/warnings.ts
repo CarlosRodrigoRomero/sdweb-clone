@@ -229,4 +229,36 @@ export const warnings: Warning[] = [
       },
     ],
   },
+  {
+    type: 'modulosPlanta',
+    message: 'Faltan los módulos de la planta',
+    adminActions: [
+      {
+        name: 'irLocs',
+        label: 'Ir a Localizaciones',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'irLocs',
+        label: 'Ir a Localizaciones',
+      },
+    ],
+  },
+  {
+    type: 'modulosAnoms',
+    message: 'Hay anomalías sin módulo',
+    adminActions: [
+      {
+        name: 'irInforme',
+        label: 'Ir al Informe',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'modulosAnoms',
+        label: 'Corregir',
+      },
+    ],
+  },
 ];
