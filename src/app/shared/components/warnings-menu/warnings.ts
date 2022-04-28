@@ -213,4 +213,20 @@ export const warnings: Warning[] = [
       },
     ],
   },
+  {
+    type: 'nombresZonas',
+    message: 'Faltan los nombres de las zonas de la planta',
+    adminActions: [
+      {
+        name: 'irPlantaEdit',
+        label: 'Ir a Editar planta',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'irPlantaEdit',
+        label: 'Ir a Editar planta',
+      },
+    ],
+  },
 ];

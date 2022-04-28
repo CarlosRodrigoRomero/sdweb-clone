@@ -196,23 +196,6 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     });
   }
 
-  // private checkZonesNames() {
-  //   if (
-  //     !this.planta.hasOwnProperty('nombreGlobalCoords') ||
-  //     this.planta.nombreGlobalCoords === null ||
-  //     this.planta.nombreGlobalCoords === undefined ||
-  //     this.planta.nombreGlobalCoords.length === 0
-  //   ) {
-  //     const warning = {
-  //       content: 'Faltan los nombres de las zonas de la planta',
-  //       types: ['nombresZonas'],
-  //       actions: ['Ir a Editar planta'],
-  //     };
-
-  //     this.addWarning(warning);
-  //   }
-  // }
-
   // private checkModulosWarnings() {
   //   const areasConModulo = this.locAreas.filter(
   //     (locArea) => locArea.hasOwnProperty('modulo') && locArea.modulo !== null && locArea.modulo !== undefined

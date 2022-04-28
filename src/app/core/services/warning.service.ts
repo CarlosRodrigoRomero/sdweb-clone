@@ -303,7 +303,7 @@ export class WarningService {
         this.checkWrongLocationAnoms(anomalias, warns, informe.id);
       }
       this.checkNoGlobalCoordsAnoms(anomalias, warns, informe.id);
-      // this.checkZonesNames();
+      this.checkZonesNames(planta, warns, informe.id);
       // this.checkModulosWarnings();
     } else {
       // añadimos el aviso de que faltan las zonas de la planta
@@ -349,6 +349,25 @@ export class WarningService {
     } else {
       // eliminamos la alerta antigua si la hubiera
       this.checkOldWarning('noGlobalCoordsAnoms', warns, informeId);
+    }
+  }
+
+  private checkZonesNames(planta: PlantaInterface, warns: Warning[], informeId: string) {
+    if (
+      !planta.hasOwnProperty('nombreGlobalCoords') ||
+      planta.nombreGlobalCoords === null ||
+      planta.nombreGlobalCoords === undefined ||
+      planta.nombreGlobalCoords.length === 0
+    ) {
+      const warning: Warning = {
+        type: 'nombresZonas',
+        visible: true,
+      };
+
+      this.checkAddWarning(warning, warns, informeId);
+    } else {
+      // eliminamos la alerta antigua si la hubiera
+      this.checkOldWarning('nombresZonas', warns, informeId);
     }
   }
 }
