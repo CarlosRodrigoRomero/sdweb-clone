@@ -148,7 +148,7 @@ export class WarningService {
     }
   }
 
-  checkTiposAnoms(informe: InformeInterface, anomalias: Anomalia[], warns: Warning[]) {
+  checkTiposAnoms(informe: InformeInterface, anomalias: Anomalia[], warns: Warning[]): boolean {
     if (informe !== undefined && anomalias.length > 0) {
       if (informe.hasOwnProperty('tiposAnomalias') && informe.tiposAnomalias.length > 0) {
         // primero eliminamos la alerta antigua de no tener tipoAnoms si la hubiera
@@ -183,9 +183,12 @@ export class WarningService {
         this.checkAddWarning(warning, warns, informe.id);
       }
     }
+
+    // confirmamos que ha sido checkeado
+    return true;
   }
 
-  checkNumsCoA(informe: InformeInterface, anomalias: Anomalia[], warns: Warning[]) {
+  checkNumsCoA(informe: InformeInterface, anomalias: Anomalia[], warns: Warning[]): boolean {
     if (informe !== undefined && anomalias.length > 0) {
       if (informe.numsCoA.length > 0) {
         // primero eliminamos la alerta antigua de no tener numsCoA si la hubiera
@@ -213,9 +216,12 @@ export class WarningService {
         this.checkAddWarning(warning, warns, informe.id);
       }
     }
+
+    // confirmamos que ha sido checkeado
+    return true;
   }
 
-  checkNumsCriticidad(informe: InformeInterface, anomalias: Anomalia[], warns: Warning[]) {
+  checkNumsCriticidad(informe: InformeInterface, anomalias: Anomalia[], warns: Warning[]): boolean {
     if (informe !== undefined && anomalias.length > 0) {
       if (informe.numsCriticidad.length > 0) {
         // primero eliminamos la alerta antigua de no tener numsCoA si la hubiera
@@ -243,9 +249,12 @@ export class WarningService {
         this.checkAddWarning(warning, warns, informe.id);
       }
     }
+
+    // confirmamos que ha sido checkeado
+    return true;
   }
 
-  checkFilsColsPlanta(planta: PlantaInterface, informe: InformeInterface, warns: Warning[]) {
+  checkFilsColsPlanta(planta: PlantaInterface, informe: InformeInterface, warns: Warning[]): boolean {
     if (planta.columnas <= 1 || planta.columnas === undefined || planta.columnas === null) {
       let warning: Warning;
       if (planta.tipo === 'seguidores') {
@@ -269,9 +278,17 @@ export class WarningService {
         this.checkOldWarning('filsColsPlantaFija', warns, informe.id);
       }
     }
+
+    // confirmamos que ha sido checkeado
+    return true;
   }
 
-  checkFilsColsAnoms(planta: PlantaInterface, anomalias: Anomalia[], informe: InformeInterface, warns: Warning[]) {
+  checkFilsColsAnoms(
+    planta: PlantaInterface,
+    anomalias: Anomalia[],
+    informe: InformeInterface,
+    warns: Warning[]
+  ): boolean {
     // primero comprobamos que el nº de filas y columnas de la planta sean correctos
     if (planta.columnas > 1 && planta.columnas !== undefined && planta.columnas !== null) {
       const differentFilColAnoms = anomalias.filter(
@@ -290,6 +307,9 @@ export class WarningService {
         this.checkOldWarning('filsColsAnoms', warns, informe.id);
       }
     }
+
+    // confirmamos que ha sido checkeado
+    return true;
   }
 
   checkZonesWarnings(
@@ -298,18 +318,30 @@ export class WarningService {
     warns: Warning[],
     planta: PlantaInterface,
     anomalias: Anomalia[]
-  ) {
+  ): boolean {
     if (locAreas.length > 0) {
       // primero eliminamos la alerta antigua de no locAreas si la hubiera
       this.checkOldWarning('noLocAreas', warns, informe.id);
 
+      let wrongLocAnomsChecked = false;
       // solo para fijas y S1E puede comprobamos las anomalias fuera de zonas
       if (planta.tipo !== 'seguidores') {
-        this.checkWrongLocationAnoms(anomalias, warns, informe.id);
+        wrongLocAnomsChecked = this.checkWrongLocationAnoms(anomalias, warns, informe.id);
       }
-      this.checkNoGlobalCoordsAnoms(anomalias, warns, informe.id);
-      this.checkZonesNames(planta, warns, informe.id);
-      this.checkModulosWarnings(locAreas, warns, informe.id, anomalias);
+      const noGlobalCoordsAnomsChecked = this.checkNoGlobalCoordsAnoms(anomalias, warns, informe.id);
+      const zonesNamesChecked = this.checkZonesNames(planta, warns, informe.id);
+      const modulosChecked = this.checkModulosWarnings(locAreas, warns, informe.id, anomalias);
+
+      // comprobamos que todas alertas de zonas han sido checkeadas
+      if (planta.tipo !== 'seguidores') {
+        if (wrongLocAnomsChecked && noGlobalCoordsAnomsChecked && zonesNamesChecked && modulosChecked) {
+          return true;
+        }
+      } else {
+        if (noGlobalCoordsAnomsChecked && zonesNamesChecked && modulosChecked) {
+          return true;
+        }
+      }
     } else {
       // añadimos el aviso de que faltan las zonas de la planta
       const warning: Warning = {
@@ -318,10 +350,13 @@ export class WarningService {
       };
 
       this.checkAddWarning(warning, warns, informe.id);
+
+      // confirmamos que ha sido checkeado
+      return true;
     }
   }
 
-  private checkWrongLocationAnoms(anomalias: Anomalia[], warns: Warning[], informeId: string) {
+  private checkWrongLocationAnoms(anomalias: Anomalia[], warns: Warning[], informeId: string): boolean {
     const numGlobalCoords = this.reportControlService.getNumGlobalCoords(anomalias);
 
     const anomsWrongGlobals = anomalias.filter((anom) => anom.globalCoords[numGlobalCoords - 1] === null);
@@ -337,9 +372,12 @@ export class WarningService {
       // eliminamos la alerta antigua si la hubiera
       this.checkOldWarning('wrongLocAnoms', warns, informeId);
     }
+
+    // confirmamos que ha sido checkeado
+    return true;
   }
 
-  private checkNoGlobalCoordsAnoms(anomalias: Anomalia[], warns: Warning[], informeId: string) {
+  private checkNoGlobalCoordsAnoms(anomalias: Anomalia[], warns: Warning[], informeId: string): boolean {
     const noGlobalCoordsAnoms = anomalias.filter(
       (anom) => anom.globalCoords === null || anom.globalCoords === undefined || anom.globalCoords[0] === null
     );
@@ -355,9 +393,12 @@ export class WarningService {
       // eliminamos la alerta antigua si la hubiera
       this.checkOldWarning('noGlobalCoordsAnoms', warns, informeId);
     }
+
+    // confirmamos que ha sido checkeado
+    return true;
   }
 
-  private checkZonesNames(planta: PlantaInterface, warns: Warning[], informeId: string) {
+  private checkZonesNames(planta: PlantaInterface, warns: Warning[], informeId: string): boolean {
     if (
       !planta.hasOwnProperty('nombreGlobalCoords') ||
       planta.nombreGlobalCoords === null ||
@@ -374,6 +415,9 @@ export class WarningService {
       // eliminamos la alerta antigua si la hubiera
       this.checkOldWarning('nombresZonas', warns, informeId);
     }
+
+    // confirmamos que ha sido checkeado
+    return true;
   }
 
   private checkModulosWarnings(
@@ -381,7 +425,7 @@ export class WarningService {
     warns: Warning[],
     informeId: string,
     anomalias: Anomalia[]
-  ) {
+  ): boolean {
     const areasConModulo = locAreas.filter(
       (locArea) => locArea.hasOwnProperty('modulo') && locArea.modulo !== null && locArea.modulo !== undefined
     );
@@ -390,7 +434,11 @@ export class WarningService {
       // primero eliminamos la alerta antigua de no hay modulos en la planta si la hubiera
       this.checkOldWarning('modulosPlanta', warns, informeId);
 
-      this.checkModulosAnoms(anomalias, warns, informeId);
+      const modulosAnomsChecked = this.checkModulosAnoms(anomalias, warns, informeId);
+
+      if (modulosAnomsChecked) {
+        return true;
+      }
     } else {
       // añadimos el aviso de que faltan los modulos de la planta
       const warning: Warning = {
@@ -399,10 +447,13 @@ export class WarningService {
       };
 
       this.checkAddWarning(warning, warns, informeId);
+
+      // confirmamos que ha sido checkeado
+      return true;
     }
   }
 
-  private checkModulosAnoms(anomalias: Anomalia[], warns: Warning[], informeId: string) {
+  private checkModulosAnoms(anomalias: Anomalia[], warns: Warning[], informeId: string): boolean {
     const anomsSinModulo = anomalias.filter((anom) => anom.modulo === null || anom.modulo === undefined);
 
     if (anomsSinModulo.length > 0) {
@@ -416,9 +467,12 @@ export class WarningService {
       // eliminamos la alerta antigua si la hubiera
       this.checkOldWarning('modulosAnoms', warns, informeId);
     }
+
+    // confirmamos que ha sido checkeado
+    return true;
   }
 
-  checkAerialLayer(informeId: string, warns: Warning[]) {
+  checkAerialLayer(informeId: string, warns: Warning[]): boolean {
     const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_visual/1/1/1.png';
 
     this.http
@@ -445,36 +499,40 @@ export class WarningService {
         take(1)
       )
       .subscribe((data) => console.log(''));
+
+    // confirmamos que ha sido checkeado
+    return true;
   }
 
-  checkThermalLayer(informeId: string, warns: Warning[]) {
-    if (this.reportControlService.plantaFija) {
-      const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_thermal/1/1/1.png';
+  checkThermalLayer(informeId: string, warns: Warning[]): boolean {
+    const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_thermal/1/1/1.png';
 
-      this.http
-        .get(url)
-        .pipe(
-          take(1),
-          catchError((error) => {
-            // no recibimos respuesta del servidor porque no existe
-            if (error.status === 0) {
-              const warning: Warning = {
-                type: 'thermalLayer',
-                visible: true,
-              };
+    this.http
+      .get(url)
+      .pipe(
+        take(1),
+        catchError((error) => {
+          // no recibimos respuesta del servidor porque no existe
+          if (error.status === 0) {
+            const warning: Warning = {
+              type: 'thermalLayer',
+              visible: true,
+            };
 
-              this.checkAddWarning(warning, warns, informeId);
-            } else {
-              // si recibimos respuesta del servidor, es que existe la capa
-              // y eliminamos la alerta antigua si la hubiera
-              this.checkOldWarning('thermalLayer', warns, informeId);
-            }
+            this.checkAddWarning(warning, warns, informeId);
+          } else {
+            // si recibimos respuesta del servidor, es que existe la capa
+            // y eliminamos la alerta antigua si la hubiera
+            this.checkOldWarning('thermalLayer', warns, informeId);
+          }
 
-            return [];
-          }),
-          take(1)
-        )
-        .subscribe((data) => console.log(''));
-    }
+          return [];
+        }),
+        take(1)
+      )
+      .subscribe((data) => console.log(''));
+
+    // confirmamos que ha sido checkeado
+    return true;
   }
 }

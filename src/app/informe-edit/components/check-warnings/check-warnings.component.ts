@@ -27,6 +27,7 @@ export class CheckWarningsComponent implements OnInit {
   private anomalias: Anomalia[];
   private warnings: Warning[] = [];
   private locAreas: LocationAreaInterface[] = [];
+  checking = false;
 
   constructor(
     private anomaliaService: AnomaliaService,
@@ -41,6 +42,8 @@ export class CheckWarningsComponent implements OnInit {
   }
 
   loadDataAndCheck() {
+    this.checking = true;
+
     combineLatest([this.informeService.getInforme(this.informeId), this.warningService.getWarnings(this.informeId)])
       .pipe(
         take(1),
@@ -75,12 +78,35 @@ export class CheckWarningsComponent implements OnInit {
   }
 
   checkWarnings() {
-    this.warningService.checkTiposAnoms(this.informe, this.anomalias, this.warnings);
-    this.warningService.checkNumsCoA(this.informe, this.anomalias, this.warnings);
-    this.warningService.checkNumsCriticidad(this.informe, this.anomalias, this.warnings);
-    this.warningService.checkFilsColsPlanta(this.planta, this.informe, this.warnings);
-    this.warningService.checkFilsColsAnoms(this.planta, this.anomalias, this.informe, this.warnings);
-    this.warningService.checkZonesWarnings(this.locAreas, this.informe, this.warnings, this.planta, this.anomalias);
-    this.warningService.checkAerialLayer(this.informe.id, this.warnings);
+    const tiposAnomsChecked = this.warningService.checkTiposAnoms(this.informe, this.anomalias, this.warnings);
+    const numsCoAChecked = this.warningService.checkNumsCoA(this.informe, this.anomalias, this.warnings);
+    const numsCritChecked = this.warningService.checkNumsCriticidad(this.informe, this.anomalias, this.warnings);
+    const filsColsPlantaChecked = this.warningService.checkFilsColsPlanta(this.planta, this.informe, this.warnings);
+    const filsColsAnomsChecked = this.warningService.checkFilsColsAnoms(
+      this.planta,
+      this.anomalias,
+      this.informe,
+      this.warnings
+    );
+    const zonesChecked = this.warningService.checkZonesWarnings(
+      this.locAreas,
+      this.informe,
+      this.warnings,
+      this.planta,
+      this.anomalias
+    );
+    const aerialLayerChecked = this.warningService.checkAerialLayer(this.informe.id, this.warnings);
+
+    if (
+      tiposAnomsChecked &&
+      numsCoAChecked &&
+      numsCritChecked &&
+      filsColsPlantaChecked &&
+      filsColsAnomsChecked &&
+      zonesChecked &&
+      aerialLayerChecked
+    ) {
+      this.checking = false;
+    }
   }
 }

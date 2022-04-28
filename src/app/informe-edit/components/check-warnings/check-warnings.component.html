@@ -1,1 +1,13 @@
 <button mat-raised-button (click)="loadDataAndCheck()">Terminar clasificación</button>
+
+<div class="checking" *ngIf="checking">
+  <mat-card class="bar-progress">
+    <mat-card-content>
+      <h5>Procesando...</h5>
+
+      <section class="example-section">
+        <mat-progress-bar mode="indeterminate"> </mat-progress-bar>
+      </section>
+    </mat-card-content>
+  </mat-card>
+</div>

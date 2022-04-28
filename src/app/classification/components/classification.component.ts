@@ -325,22 +325,47 @@ export class ClassificationComponent implements OnInit {
             .subscribe((anoms) => {
               this.realAnoms = this.anomaliaService.getRealAnomalias(anoms);
 
-              this.checkWarnings();
+              console.log('ok');
 
-              this.processing = false;
+              this.checkWarnings();
             });
         });
       });
   }
 
   checkWarnings() {
-    this.warningService.checkTiposAnoms(this.informe, this.realAnoms, this.warnings);
-    this.warningService.checkNumsCoA(this.informe, this.realAnoms, this.warnings);
-    this.warningService.checkNumsCriticidad(this.informe, this.realAnoms, this.warnings);
-    this.warningService.checkFilsColsPlanta(this.planta, this.informe, this.warnings);
-    this.warningService.checkFilsColsAnoms(this.planta, this.realAnoms, this.informe, this.warnings);
-    this.warningService.checkZonesWarnings(this.locAreas, this.informe, this.warnings, this.planta, this.realAnoms);
-    this.warningService.checkAerialLayer(this.informe.id, this.warnings);
+    const tiposAnomsChecked = this.warningService.checkTiposAnoms(this.informe, this.realAnoms, this.warnings);
+    const numsCoAChecked = this.warningService.checkNumsCoA(this.informe, this.realAnoms, this.warnings);
+    const numsCritChecked = this.warningService.checkNumsCriticidad(this.informe, this.realAnoms, this.warnings);
+    const filsColsPlantaChecked = this.warningService.checkFilsColsPlanta(this.planta, this.informe, this.warnings);
+    const filsColsAnomsChecked = this.warningService.checkFilsColsAnoms(
+      this.planta,
+      this.realAnoms,
+      this.informe,
+      this.warnings
+    );
+    const zonesChecked = this.warningService.checkZonesWarnings(
+      this.locAreas,
+      this.informe,
+      this.warnings,
+      this.planta,
+      this.realAnoms
+    );
+    const aerialLayerChecked = this.warningService.checkAerialLayer(this.informe.id, this.warnings);
+    const thermalLayerChecked = this.warningService.checkThermalLayer(this.informe.id, this.warnings);
+
+    if (
+      tiposAnomsChecked &&
+      numsCoAChecked &&
+      numsCritChecked &&
+      filsColsPlantaChecked &&
+      filsColsAnomsChecked &&
+      zonesChecked &&
+      aerialLayerChecked &&
+      thermalLayerChecked
+    ) {
+      this.processing = false;
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
