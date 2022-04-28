@@ -280,10 +280,10 @@ export class WarningService {
         };
 
         this.checkAddWarning(warning, warns, informe.id);
+      } else {
+        // eliminamos la alerta antigua si la hubiera
+        this.checkOldWarning('filsColsAnoms', warns, informe.id);
       }
-    } else {
-      // eliminamos la alerta antigua si la hubiera
-      this.checkOldWarning('filsColsAnoms', warns, informe.id);
     }
   }
 
@@ -302,7 +302,7 @@ export class WarningService {
       if (planta.tipo !== 'seguidores') {
         this.checkWrongLocationAnoms(anomalias, warns, informe.id);
       }
-      // this.checkNoGlobalCoordsAnoms();
+      this.checkNoGlobalCoordsAnoms(anomalias, warns, informe.id);
       // this.checkZonesNames();
       // this.checkModulosWarnings();
     } else {
@@ -331,6 +331,24 @@ export class WarningService {
     } else {
       // eliminamos la alerta antigua si la hubiera
       this.checkOldWarning('wrongLocAnoms', warns, informeId);
+    }
+  }
+
+  private checkNoGlobalCoordsAnoms(anomalias: Anomalia[], warns: Warning[], informeId: string) {
+    const noGlobalCoordsAnoms = anomalias.filter(
+      (anom) => anom.globalCoords === null || anom.globalCoords === undefined || anom.globalCoords[0] === null
+    );
+
+    if (noGlobalCoordsAnoms.length > 0) {
+      const warning: Warning = {
+        type: 'noGlobalCoordsAnoms',
+        visible: true,
+      };
+
+      this.checkAddWarning(warning, warns, informeId);
+    } else {
+      // eliminamos la alerta antigua si la hubiera
+      this.checkOldWarning('noGlobalCoordsAnoms', warns, informeId);
     }
   }
 }

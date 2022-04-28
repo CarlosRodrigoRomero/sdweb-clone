@@ -197,4 +197,20 @@ export const warnings: Warning[] = [
       },
     ],
   },
+  {
+    type: 'noGlobalCoordsAnoms',
+    message: 'Hay anomalías que no tienen globalCoords',
+    adminActions: [
+      {
+        name: 'irInforme',
+        label: 'Ir al Informe',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'noGlobalCoordsAnoms',
+        label: 'Corregir',
+      },
+    ],
+  },
 ];
