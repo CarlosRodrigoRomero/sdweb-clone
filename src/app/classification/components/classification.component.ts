@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 
 import { ThemePalette } from '@angular/material/core';
 import { ProgressBarMode } from '@angular/material/progress-bar';
@@ -11,11 +12,15 @@ import { ClustersService } from '@core/services/clusters.service';
 import { InformeService } from '@core/services/informe.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { PlantaService } from '@core/services/planta.service';
+import { WarningService } from '@core/services/warning.service';
 
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
 import { Coordinate } from 'ol/coordinate';
+import { PlantaInterface } from '@core/models/planta';
+import { Warning } from '@shared/components/warnings-menu/warnings';
+import { LocationAreaInterface } from '@core/models/location';
 
 @Component({
   selector: 'app-classification',
@@ -24,7 +29,7 @@ import { Coordinate } from 'ol/coordinate';
 })
 export class ClassificationComponent implements OnInit {
   serviceInit = false;
-  nombrePlanta: string;
+  planta: PlantaInterface;
   normModHovered: NormalizedModule = undefined;
   private anomalias: Anomalia[] = [];
   private informe: InformeInterface;
@@ -33,11 +38,18 @@ export class ClassificationComponent implements OnInit {
   anomsNoGlobals: Anomalia[] = [];
   anomsDisconnected: Anomalia[] = [];
   private normModules: NormalizedModule[];
+  private _anomsProcesed = false;
+  private anomsProcesed$ = new BehaviorSubject<boolean>(this._anomsProcesed);
   processing = false;
   progressBarColor: ThemePalette = 'primary';
   progressBarMode: ProgressBarMode = 'determinate';
   progressBarValue = 0;
   everSynced = false;
+  private warnings: Warning[] = [];
+  private locAreas: LocationAreaInterface[] = [];
+  private realAnoms: Anomalia[] = [];
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private classificationService: ClassificationService,
@@ -45,12 +57,13 @@ export class ClassificationComponent implements OnInit {
     private informeService: InformeService,
     private http: HttpClient,
     private anomaliaService: AnomaliaService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private warningService: WarningService
   ) {}
 
   ngOnInit(): void {
     this.classificationService.initService().then((value) => (this.serviceInit = value));
-    this.classificationService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre));
+    this.classificationService.planta$.subscribe((planta) => (this.planta = planta));
     this.classificationService.normModHovered$.subscribe((normMod) => (this.normModHovered = normMod));
 
     // lo iniciamos para poder acceder a la info de la trayectoria del vuelo
@@ -64,12 +77,17 @@ export class ClassificationComponent implements OnInit {
     this.informeService
       .getInforme(this.classificationService.informeId)
       .subscribe((informe) => (this.informe = informe));
+
+    this.anomsProcesed$.subscribe((procesed) => {
+      if (procesed) {
+        this.loadDataAndCheckWarnings();
+      }
+    });
   }
 
   endClassification() {
     // actualizamos el informe con los datos que le faltan
     this.updateInforme();
-
     // actualizamos las anomalias con los datos que les faltan
     this.updateAnomalias();
   }
@@ -102,7 +120,7 @@ export class ClassificationComponent implements OnInit {
           count++;
           this.progressBarValue = Math.round((count / this.anomalias.length) * 100);
           if (count === this.anomalias.length) {
-            this.processing = false;
+            this.anomsProcesed = true;
 
             this.syncAnomsState();
           }
@@ -113,7 +131,7 @@ export class ClassificationComponent implements OnInit {
           count++;
           this.progressBarValue = Math.round((count / this.anomalias.length) * 100);
           if (count === this.anomalias.length) {
-            this.processing = false;
+            this.anomsProcesed = true;
 
             this.syncAnomsState();
           }
@@ -274,5 +292,65 @@ export class ClassificationComponent implements OnInit {
     const celCals = this.anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
     return celCals.length / this.informe.numeroModulos;
+  }
+
+  private loadDataAndCheckWarnings() {
+    combineLatest([
+      this.informeService.getInforme(this.classificationService.informeId),
+      this.warningService.getWarnings(this.classificationService.informeId),
+    ])
+      .pipe(
+        take(1),
+        switchMap(([informe, warnings]) => {
+          this.informe = informe;
+          this.warnings = warnings;
+
+          return this.plantaService.getPlanta(informe.plantaId);
+        }),
+        take(1),
+        switchMap((planta) => {
+          this.planta = planta;
+
+          return this.plantaService.getLocationsArea(planta.id);
+        }),
+        take(1)
+      )
+      .subscribe((locAreas) => {
+        this.locAreas = locAreas;
+
+        this.anomaliaService.initService(this.planta.id).then(() => {
+          this.anomaliaService
+            .getAnomalias$(this.classificationService.informeId, 'anomalias')
+            .pipe(take(1))
+            .subscribe((anoms) => {
+              this.realAnoms = this.anomaliaService.getRealAnomalias(anoms);
+
+              this.checkWarnings();
+
+              this.processing = false;
+            });
+        });
+      });
+  }
+
+  checkWarnings() {
+    this.warningService.checkTiposAnoms(this.informe, this.realAnoms, this.warnings);
+    this.warningService.checkNumsCoA(this.informe, this.realAnoms, this.warnings);
+    this.warningService.checkNumsCriticidad(this.informe, this.realAnoms, this.warnings);
+    this.warningService.checkFilsColsPlanta(this.planta, this.informe, this.warnings);
+    this.warningService.checkFilsColsAnoms(this.planta, this.realAnoms, this.informe, this.warnings);
+    this.warningService.checkZonesWarnings(this.locAreas, this.informe, this.warnings, this.planta, this.realAnoms);
+    this.warningService.checkAerialLayer(this.informe.id, this.warnings);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  get anomsProcesed() {
+    return this._anomsProcesed;
+  }
+
+  set anomsProcesed(value: boolean) {
+    this._anomsProcesed = value;
+    this.anomsProcesed$.next(value);
   }
 }

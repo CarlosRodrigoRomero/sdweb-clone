@@ -38,34 +38,6 @@ export class CheckWarningsComponent implements OnInit {
 
   ngOnInit(): void {
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
-
-    // this.informeService
-    //   .getInforme(this.informeId)
-    //   .pipe(
-    //     take(1),
-    //     switchMap((informe) => {
-    //       this.informe = informe;
-
-    //       return this.plantaService.getPlanta(informe.plantaId);
-    //     }),
-    //     take(1),
-    //     switchMap((planta) => {
-    //       this.planta = planta;
-
-    //       return this.plantaService.getLocationsArea(planta.id);
-    //     })
-    //   )
-    //   .subscribe((locAreas) => {
-    //     this.locAreas = locAreas;
-
-    //     this.anomaliaService.initService(this.planta.id).then(() => {
-    //       this.anomaliaService
-    //         .getAnomalias$(this.informeId, 'pcs')
-    //         .subscribe((anoms) => (this.anomalias = this.anomaliaService.getRealAnomalias(anoms)));
-    //     });
-    //   });
-
-    // this.warningService.getWarnings(this.informeId).subscribe((warnings) => (this.warnings = warnings));
   }
 
   loadDataAndCheck() {
