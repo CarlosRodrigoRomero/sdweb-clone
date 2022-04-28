@@ -1,14 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 
-import { catchError, switchMap, take } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
 
 import { ReportControlService } from '@core/services/report-control.service';
 import { InformeService } from '@core/services/informe.service';
 import { PlantaService } from '@core/services/planta.service';
-import { SeguidorService } from '@core/services/seguidor.service';
 import { FilterService } from '@core/services/filter.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { PcService } from '@core/services/pc.service';
@@ -47,10 +45,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     private informeService: InformeService,
     private plantaService: PlantaService,
     private router: Router,
-    private seguidorService: SeguidorService,
     private filterService: FilterService,
     private anomaliaService: AnomaliaService,
-    private http: HttpClient,
     private pcService: PcService,
     private warningService: WarningService
   ) {}

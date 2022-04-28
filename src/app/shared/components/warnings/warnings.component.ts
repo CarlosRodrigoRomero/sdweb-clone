@@ -7,7 +7,6 @@ import { InformeService } from '@core/services/informe.service';
 
 import { Warning } from '../warnings-menu/warnings';
 import { switchMap, take } from 'rxjs/operators';
-import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 
 @Component({
@@ -17,7 +16,6 @@ import { PlantaInterface } from '@core/models/planta';
 })
 export class WarningsComponent implements OnInit {
   warnings: Warning[] = [];
-  private informe: InformeInterface;
   private planta: PlantaInterface;
 
   @Input() informeId: string;
@@ -36,11 +34,7 @@ export class WarningsComponent implements OnInit {
       .getInforme(this.informeId)
       .pipe(
         take(1),
-        switchMap((informe) => {
-          this.informe = informe;
-
-          return this.plantaService.getPlanta(informe.plantaId);
-        }),
+        switchMap((informe) => this.plantaService.getPlanta(informe.plantaId)),
         take(1)
       )
       .subscribe((planta) => (this.planta = planta));
