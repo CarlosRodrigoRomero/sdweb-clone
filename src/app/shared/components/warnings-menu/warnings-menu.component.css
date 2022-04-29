@@ -2,6 +2,8 @@
   display: flex;
   align-content: center;
   margin-right: 2rem;
+  border: 1px solid grey;
+  border-radius: 22px;
 }
 
 .item-content {
@@ -12,10 +14,38 @@
   cursor: unset;
 }
 
+.icon-no-warnings {
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .icon-no-warnings mat-icon {
   vertical-align: bottom;
 }
 
 :host ::ng-deep .icon-no-warnings mat-icon .mat-badge-content {
   background: green;
+}
+
+.btn-sync mat-icon {
+  color: grey;
+}
+
+.checking {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.bar-progress {
+  margin-top: 100px;
+  width: fit-content;
+  left: 50%;
+  transform: translate(-50%, 0%);
 }

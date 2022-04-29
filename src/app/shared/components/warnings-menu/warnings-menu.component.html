@@ -1,4 +1,7 @@
 <div class="content">
+  <button mat-icon-button class="btn-sync" (click)="loadDataAndCheck(); offChecked()">
+    <mat-icon>sync</mat-icon>
+  </button>
   <button *ngIf="warnings.length > 0" class="btn-notif" mat-icon-button [matMenuTriggerFor]="warningMenu">
     <mat-icon matBadge="{{ warnings.length }}" matBadgeColor="primary">bug_report</mat-icon>
   </button>
@@ -19,7 +22,19 @@
     </div>
   </mat-menu>
 
-  <div class="icon-no-warnings">
-    <mat-icon *ngIf="warnings.length === 0" matBadge="✓">bug_report</mat-icon>
+  <div class="icon-no-warnings" *ngIf="warnings.length === 0">
+    <mat-icon matBadge="✓">bug_report</mat-icon>
   </div>
+</div>
+
+<div class="checking" *ngIf="!checked">
+  <mat-card class="bar-progress">
+    <mat-card-content>
+      <h5>Procesando...</h5>
+
+      <section class="example-section">
+        <mat-progress-bar mode="indeterminate"> </mat-progress-bar>
+      </section>
+    </mat-card-content>
+  </mat-card>
 </div>

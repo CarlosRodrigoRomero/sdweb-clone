@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
 
 import { ReportControlService } from '@core/services/report-control.service';
@@ -12,6 +12,7 @@ import { AnomaliaService } from '@core/services/anomalia.service';
 import { PcService } from '@core/services/pc.service';
 import { WarningService } from '@core/services/warning.service';
 import { GLOBAL } from '@core/services/global';
+import { SeguidorService } from '@core/services/seguidor.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -38,6 +39,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   private locAreas: LocationAreaInterface[] = [];
   private allSeguidores: Seguidor[] = [];
   private informes: InformeInterface[] = this.reportControlService.informes;
+  checked = true;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -49,24 +51,34 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     private filterService: FilterService,
     private anomaliaService: AnomaliaService,
     private pcService: PcService,
-    private warningService: WarningService
+    private warningService: WarningService,
+    private seguidorService: SeguidorService
   ) {}
 
   ngOnInit(): void {
-    if (this.reportControlService.plantaFija) {
-      this.allAnomalias = this.reportControlService.allFilterableElements as Anomalia[];
-    } else {
-      this.allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
-      (this.reportControlService.allFilterableElements as Seguidor[]).forEach((seg) =>
-        this.allAnomalias.push(...seg.anomaliasCliente)
-      );
-    }
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+        this.selectedInforme = this.informes.find((informe) => informe.id === informeId);
+
+        if (this.selectedInforme !== undefined) {
+          this.loadDataAndCheck();
+        }
+      })
+    );
 
     this.subscriptions.add(
-      this.reportControlService.selectedInformeId$
+      this.warningService.getWarnings(this.selectedInforme.id).subscribe((warnings) => (this.warnings = warnings))
+    );
+  }
+
+  loadDataAndCheck() {
+    if (this.reportControlService.plantaFija) {
+      this.anomaliaService
+        .getAnomalias$(this.selectedInforme.id, 'anomalias')
         .pipe(
-          switchMap((informeId) => {
-            this.selectedInforme = this.informes.find((informe) => informe.id === informeId);
+          take(1),
+          switchMap((anomalias) => {
+            this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
 
             return combineLatest([
               this.informeService.getInformesDePlanta(this.reportControlService.plantaId),
@@ -74,7 +86,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
               this.plantaService.getLocationsArea(this.reportControlService.plantaId),
               this.warningService.getWarnings(this.selectedInforme.id),
             ]);
-          })
+          }),
+          take(1)
         )
         .subscribe(([informes, planta, locAreas, warnings]) => {
           this.informes = informes;
@@ -87,32 +100,61 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
           this.selectedInforme = this.informes.find((informe) => informe.id === this.selectedInforme.id);
 
           if (this.selectedInforme !== undefined) {
-            this.checkWarnings();
+            this.checked = this.warningService.checkWarnings(
+              this.selectedInforme,
+              this.anomaliasInforme,
+              this.warnings,
+              this.planta,
+              this.locAreas
+            );
           }
-        })
-    );
+        });
+    } else {
+      this.seguidorService
+        .getSeguidores$(this.selectedInforme.id, this.reportControlService.plantaId, 'pcs')
+        .pipe(
+          take(1),
+          switchMap((segs) => {
+            this.allSeguidores = segs;
+
+            // vaciamos primero para que no se acumule
+            this.allAnomalias = [];
+            this.allSeguidores.forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
+
+            return combineLatest([
+              this.informeService.getInformesDePlanta(this.reportControlService.plantaId),
+              this.plantaService.getPlanta(this.reportControlService.plantaId),
+              this.plantaService.getLocationsArea(this.reportControlService.plantaId),
+              this.warningService.getWarnings(this.selectedInforme.id),
+            ]);
+          }),
+          take(1)
+        )
+        .subscribe(([informes, planta, locAreas, warnings]) => {
+          this.informes = informes;
+          this.planta = planta;
+          this.locAreas = locAreas;
+          this.warnings = warnings;
+
+          this.anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === this.selectedInforme.id);
+
+          this.selectedInforme = this.informes.find((informe) => informe.id === this.selectedInforme.id);
+
+          if (this.selectedInforme !== undefined) {
+            this.checked = this.warningService.checkWarnings(
+              this.selectedInforme,
+              this.anomaliasInforme,
+              this.warnings,
+              this.planta,
+              this.locAreas
+            );
+          }
+        });
+    }
   }
 
-  private checkWarnings() {
-    this.warningService.checkTiposAnoms(this.selectedInforme, this.anomaliasInforme, this.warnings);
-    this.warningService.checkNumsCoA(this.selectedInforme, this.anomaliasInforme, this.warnings);
-    this.warningService.checkNumsCriticidad(this.selectedInforme, this.anomaliasInforme, this.warnings);
-    this.warningService.checkMAE(this.selectedInforme, this.warnings);
-    this.warningService.checkCC(this.selectedInforme, this.warnings);
-    this.warningService.checkFilsColsPlanta(this.planta, this.selectedInforme, this.warnings);
-    this.warningService.checkFilsColsAnoms(this.planta, this.anomaliasInforme, this.selectedInforme, this.warnings);
-    this.warningService.checkZonesWarnings(
-      this.locAreas,
-      this.selectedInforme,
-      this.warnings,
-      this.planta,
-      this.anomaliasInforme
-    );
-    this.warningService.checkAerialLayer(this.selectedInforme.id, this.warnings);
-    this.warningService.checkThermalLayer(this.selectedInforme.id, this.warnings);
-    this.warningService.checkImagePortada(this.selectedInforme.id, this.warnings);
-    this.warningService.checkImageSuciedad(this.selectedInforme.id, this.warnings);
-    this.warningService.checkTempMaxAnomsError(this.anomaliasInforme, this.warnings, this.selectedInforme.id);
+  offChecked() {
+    this.checked = false;
   }
 
   fixProblem(action: string) {

@@ -136,6 +136,44 @@ export class WarningService {
     };
   }
 
+  checkWarnings(
+    informe: InformeInterface,
+    anomalias: Anomalia[],
+    warns: Warning[],
+    planta: PlantaInterface,
+    locAreas: LocationAreaInterface[]
+  ): boolean {
+    const tiposAnomsChecked = this.checkTiposAnoms(informe, anomalias, warns);
+    const numsCoAChecked = this.checkNumsCoA(informe, anomalias, warns);
+    const numsCritChecked = this.checkNumsCriticidad(informe, anomalias, warns);
+    const maeChecked = this.checkMAE(informe, warns);
+    const ccChecked = this.checkCC(informe, warns);
+    const filsColsPlantaChecked = this.checkFilsColsPlanta(planta, informe, warns);
+    const filsColsAnomsChecked = this.checkFilsColsAnoms(planta, anomalias, informe, warns);
+    const zonesChecked = this.checkZonesWarnings(locAreas, informe, warns, planta, anomalias);
+    const aerialLayerChecked = this.checkAerialLayer(informe.id, warns);
+    const imgPortadaChecked = this.checkImagePortada(informe.id, warns);
+    const imgSuciedadChecked = this.checkImageSuciedad(informe.id, warns);
+    const tempMaxAnomsChecked = this.checkTempMaxAnomsError(anomalias, warns, informe.id);
+
+    if (
+      tiposAnomsChecked &&
+      numsCoAChecked &&
+      numsCritChecked &&
+      maeChecked &&
+      ccChecked &&
+      filsColsPlantaChecked &&
+      filsColsAnomsChecked &&
+      zonesChecked &&
+      aerialLayerChecked &&
+      imgPortadaChecked &&
+      imgSuciedadChecked &&
+      tempMaxAnomsChecked
+    ) {
+      return true;
+    }
+  }
+
   private checkAddWarning(warning: Warning, warns: Warning[], informeId: string) {
     if (!warns.map((warn) => warn.type).includes(warning.type)) {
       this.addWarning(informeId, warning);
