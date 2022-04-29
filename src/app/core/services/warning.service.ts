@@ -19,6 +19,8 @@ import { LocationAreaInterface } from '@core/models/location';
   providedIn: 'root',
 })
 export class WarningService {
+  private warningsAdded: string[] = [];
+
   constructor(
     private afs: AngularFirestore,
     private reportControlService: ReportControlService,
@@ -143,6 +145,9 @@ export class WarningService {
     planta: PlantaInterface,
     locAreas: LocationAreaInterface[]
   ): boolean {
+    // reseteamos las alertas añadidas
+    this.warningsAdded = [];
+
     const tiposAnomsChecked = this.checkTiposAnoms(informe, anomalias, warns);
     const numsCoAChecked = this.checkNumsCoA(informe, anomalias, warns);
     const numsCritChecked = this.checkNumsCriticidad(informe, anomalias, warns);
@@ -151,10 +156,16 @@ export class WarningService {
     const filsColsPlantaChecked = this.checkFilsColsPlanta(planta, informe, warns);
     const filsColsAnomsChecked = this.checkFilsColsAnoms(planta, anomalias, informe, warns);
     const zonesChecked = this.checkZonesWarnings(locAreas, informe, warns, planta, anomalias);
-    const aerialLayerChecked = this.checkAerialLayer(informe.id, warns);
+    const visualLayerChecked = this.checkVisualLayer(informe.id, warns);
     const imgPortadaChecked = this.checkImagePortada(informe.id, warns);
     const imgSuciedadChecked = this.checkImageSuciedad(informe.id, warns);
     const tempMaxAnomsChecked = this.checkTempMaxAnomsError(anomalias, warns, informe.id);
+    let thermalLayerChecked = false;
+    if (planta.tipo === 'seguidores') {
+      thermalLayerChecked = true;
+    } else {
+      thermalLayerChecked = this.checkThermalLayer(informe.id, warns);
+    }
 
     if (
       tiposAnomsChecked &&
@@ -165,26 +176,42 @@ export class WarningService {
       filsColsPlantaChecked &&
       filsColsAnomsChecked &&
       zonesChecked &&
-      aerialLayerChecked &&
+      visualLayerChecked &&
+      thermalLayerChecked &&
       imgPortadaChecked &&
       imgSuciedadChecked &&
       tempMaxAnomsChecked
     ) {
+      console.log(informe.id);
+
+      // eliminamos posibles alertas que ya no sean necesarias
+      this.checkUnusedWarnings(warns, informe.id);
+
+      // indicamos que todas las alertas han sido checkeadas
       return true;
     }
   }
 
   private checkAddWarning(warning: Warning, warns: Warning[], informeId: string) {
     if (!warns.map((warn) => warn.type).includes(warning.type)) {
+      this.warningsAdded.push(warning.type);
       this.addWarning(informeId, warning);
     }
   }
 
-  private checkOldWarning(type: string, warns: Warning[], informeId: string) {
-    const oldWarning = warns.find((warn) => warn.type === type);
+  private checkOldWarnings(type: string, warns: Warning[], informeId: string) {
+    const oldWarnings = warns.filter((warn) => warn.type === type);
 
-    if (oldWarning) {
-      this.deleteWarning(informeId, oldWarning.id);
+    if (oldWarnings.length > 0) {
+      oldWarnings.forEach((oldWarning) => this.deleteWarning(informeId, oldWarning.id));
+    }
+  }
+
+  private checkUnusedWarnings(warns: Warning[], informeId: string) {
+    const warnsUnused = warns.filter((warn) => !this.warningsAdded.includes(warn.type));
+
+    if (warnsUnused.length > 0) {
+      warnsUnused.forEach((warn) => this.deleteWarning(informeId, warn.id));
     }
   }
 
@@ -192,7 +219,7 @@ export class WarningService {
     if (informe !== undefined && anomalias.length > 0) {
       if (informe.hasOwnProperty('tiposAnomalias') && informe.tiposAnomalias.length > 0) {
         // primero eliminamos la alerta antigua de no tener tipoAnoms si la hubiera
-        this.checkOldWarning('tiposAnom', warns, informe.id);
+        this.checkOldWarnings('tiposAnom', warns, informe.id);
 
         const sumTiposAnom = informe.tiposAnomalias.reduce((acum, curr, index) => {
           // las celulas calientes son un array por separado
@@ -212,7 +239,7 @@ export class WarningService {
           this.checkAddWarning(warning, warns, informe.id);
         } else {
           // eliminamos la alerta antigua si la hubiera
-          this.checkOldWarning('sumTiposAnom', warns, informe.id);
+          this.checkOldWarnings('sumTiposAnom', warns, informe.id);
         }
       } else {
         const warning: Warning = {
@@ -232,7 +259,7 @@ export class WarningService {
     if (informe !== undefined && anomalias.length > 0) {
       if (informe.numsCoA.length > 0) {
         // primero eliminamos la alerta antigua de no tener numsCoA si la hubiera
-        this.checkOldWarning('numsCoA', warns, informe.id);
+        this.checkOldWarnings('numsCoA', warns, informe.id);
 
         const sumNumsCoA = informe.numsCoA.reduce((acum, curr) => acum + curr);
 
@@ -245,7 +272,7 @@ export class WarningService {
           this.checkAddWarning(warning, warns, informe.id);
         } else {
           // eliminamos la alerta antigua si la hubiera
-          this.checkOldWarning('sumNumsCoA', warns, informe.id);
+          this.checkOldWarnings('sumNumsCoA', warns, informe.id);
         }
       } else {
         const warning: Warning = {
@@ -265,7 +292,7 @@ export class WarningService {
     if (informe !== undefined && anomalias.length > 0) {
       if (informe.numsCriticidad.length > 0) {
         // primero eliminamos la alerta antigua de no tener numsCoA si la hubiera
-        this.checkOldWarning('numsCriticidad', warns, informe.id);
+        this.checkOldWarnings('numsCriticidad', warns, informe.id);
 
         const sumNumsCriticidad = informe.numsCriticidad.reduce((acum, curr) => acum + curr);
 
@@ -278,7 +305,7 @@ export class WarningService {
           this.checkAddWarning(warning, warns, informe.id);
         } else {
           // eliminamos la alerta antigua si la hubiera
-          this.checkOldWarning('sumNumsCriticidad', warns, informe.id);
+          this.checkOldWarnings('sumNumsCriticidad', warns, informe.id);
         }
       } else {
         const warning: Warning = {
@@ -304,7 +331,7 @@ export class WarningService {
       this.checkAddWarning(warning, warns, informe.id);
     } else {
       // eliminamos la alerta antigua si la hubiera
-      this.checkOldWarning('mae', warns, informe.id);
+      this.checkOldWarnings('mae', warns, informe.id);
     }
 
     // confirmamos que ha sido checkeado
@@ -321,7 +348,7 @@ export class WarningService {
       this.checkAddWarning(warning, warns, informe.id);
     } else {
       // eliminamos la alerta antigua si la hubiera
-      this.checkOldWarning('cc', warns, informe.id);
+      this.checkOldWarnings('cc', warns, informe.id);
     }
 
     // confirmamos que ha sido checkeado
@@ -347,9 +374,9 @@ export class WarningService {
     } else {
       // eliminamos la alerta antigua si la hubiera
       if (planta.tipo === 'seguidores') {
-        this.checkOldWarning('filsColsPlantaSegs', warns, informe.id);
+        this.checkOldWarnings('filsColsPlantaSegs', warns, informe.id);
       } else {
-        this.checkOldWarning('filsColsPlantaFija', warns, informe.id);
+        this.checkOldWarnings('filsColsPlantaFija', warns, informe.id);
       }
     }
 
@@ -378,7 +405,7 @@ export class WarningService {
         this.checkAddWarning(warning, warns, informe.id);
       } else {
         // eliminamos la alerta antigua si la hubiera
-        this.checkOldWarning('filsColsAnoms', warns, informe.id);
+        this.checkOldWarnings('filsColsAnoms', warns, informe.id);
       }
     }
 
@@ -395,7 +422,7 @@ export class WarningService {
   ): boolean {
     if (locAreas.length > 0) {
       // primero eliminamos la alerta antigua de no locAreas si la hubiera
-      this.checkOldWarning('noLocAreas', warns, informe.id);
+      this.checkOldWarnings('noLocAreas', warns, informe.id);
 
       let wrongLocAnomsChecked = false;
       // solo para fijas y S1E puede comprobamos las anomalias fuera de zonas
@@ -445,7 +472,7 @@ export class WarningService {
         this.checkAddWarning(warning, warns, informeId);
       } else {
         // eliminamos la alerta antigua si la hubiera
-        this.checkOldWarning('wrongLocAnoms', warns, informeId);
+        this.checkOldWarnings('wrongLocAnoms', warns, informeId);
       }
     }
 
@@ -467,7 +494,7 @@ export class WarningService {
       this.checkAddWarning(warning, warns, informeId);
     } else {
       // eliminamos la alerta antigua si la hubiera
-      this.checkOldWarning('noGlobalCoordsAnoms', warns, informeId);
+      this.checkOldWarnings('noGlobalCoordsAnoms', warns, informeId);
     }
 
     // confirmamos que ha sido checkeado
@@ -489,7 +516,7 @@ export class WarningService {
       this.checkAddWarning(warning, warns, informeId);
     } else {
       // eliminamos la alerta antigua si la hubiera
-      this.checkOldWarning('nombresZonas', warns, informeId);
+      this.checkOldWarnings('nombresZonas', warns, informeId);
     }
 
     // confirmamos que ha sido checkeado
@@ -508,7 +535,7 @@ export class WarningService {
 
     if (areasConModulo.length > 0) {
       // primero eliminamos la alerta antigua de no hay modulos en la planta si la hubiera
-      this.checkOldWarning('modulosPlanta', warns, informeId);
+      this.checkOldWarnings('modulosPlanta', warns, informeId);
 
       const modulosAnomsChecked = this.checkModulosAnoms(anomalias, warns, informeId);
 
@@ -541,14 +568,14 @@ export class WarningService {
       this.checkAddWarning(warning, warns, informeId);
     } else {
       // eliminamos la alerta antigua si la hubiera
-      this.checkOldWarning('modulosAnoms', warns, informeId);
+      this.checkOldWarnings('modulosAnoms', warns, informeId);
     }
 
     // confirmamos que ha sido checkeado
     return true;
   }
 
-  checkAerialLayer(informeId: string, warns: Warning[]): boolean {
+  checkVisualLayer(informeId: string, warns: Warning[]): boolean {
     const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_visual/1/1/1.png';
 
     this.http
@@ -567,7 +594,7 @@ export class WarningService {
           } else {
             // si recibimos respuesta del servidor, es que existe la capa
             // y eliminamos la alerta antigua si la hubiera
-            this.checkOldWarning('visualLayer', warns, informeId);
+            this.checkOldWarnings('visualLayer', warns, informeId);
           }
 
           return [];
@@ -599,7 +626,7 @@ export class WarningService {
           } else {
             // si recibimos respuesta del servidor, es que existe la capa
             // y eliminamos la alerta antigua si la hubiera
-            this.checkOldWarning('thermalLayer', warns, informeId);
+            this.checkOldWarnings('thermalLayer', warns, informeId);
           }
 
           return [];
@@ -619,7 +646,7 @@ export class WarningService {
       .toPromise()
       .then((url) => {
         // eliminamos la alerta antigua si la hubiera
-        this.checkOldWarning('imgPortada', warns, informeId);
+        this.checkOldWarnings('imgPortada', warns, informeId);
       })
       .catch((error) => {
         const warning: Warning = {
@@ -641,7 +668,7 @@ export class WarningService {
       .toPromise()
       .then((url) => {
         // eliminamos la alerta antigua si la hubiera
-        this.checkOldWarning('imgSuciedad', warns, informeId);
+        this.checkOldWarnings('imgSuciedad', warns, informeId);
       })
       .catch((error) => {
         const warning: Warning = {
@@ -657,21 +684,26 @@ export class WarningService {
   }
 
   checkTempMaxAnomsError(anomalias: Anomalia[], warns: Warning[], informeId: string): boolean {
-    const highestTemp = anomalias.sort((a, b) => b.temperaturaMax - a.temperaturaMax)[0].temperaturaMax;
+    if (anomalias.length > 0) {
+      const highestTemp = anomalias.sort((a, b) => b.temperaturaMax - a.temperaturaMax)[0].temperaturaMax;
 
-    const wrongMaxTempAnoms = anomalias.filter((anom) => anom.temperaturaMax === highestTemp);
+      const wrongMaxTempAnoms = anomalias.filter((anom) => anom.temperaturaMax === highestTemp);
 
-    // si son más de 10 con la temp max es un error en el calculo
-    if (wrongMaxTempAnoms.length > 10) {
-      const warning: Warning = {
-        type: 'tempMaxAnoms',
-        visible: true,
-      };
+      // si son más de 10 con la temp max es un error en el calculo
+      if (wrongMaxTempAnoms.length > 10) {
+        const warning: Warning = {
+          type: 'tempMaxAnoms',
+          visible: true,
+        };
 
-      this.checkAddWarning(warning, warns, informeId);
+        this.checkAddWarning(warning, warns, informeId);
+      } else {
+        // eliminamos la alerta antigua si la hubiera
+        this.checkOldWarnings('tempMaxAnoms', warns, informeId);
+      }
     } else {
       // eliminamos la alerta antigua si la hubiera
-      this.checkOldWarning('tempMaxAnoms', warns, informeId);
+      this.checkOldWarnings('tempMaxAnoms', warns, informeId);
     }
 
     // confirmamos que ha sido checkeado

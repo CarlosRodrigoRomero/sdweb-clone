@@ -8,9 +8,11 @@ import { ExcelService } from '@core/services/excel.service';
 import { GLOBAL } from '@core/services/global';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { PlantaService } from '@core/services/planta.service';
+import { WarningService } from '@core/services/warning.service';
 
 import { ReportControlService } from '@core/services/report-control.service';
 import { CritCriticidad } from '@core/models/critCriticidad';
+import { LocationAreaInterface } from '@core/models/location';
 
 @Component({
   selector: 'app-download-excel-portfolio',
@@ -45,7 +47,8 @@ export class DownloadExcelPortfolioComponent implements OnInit {
     private datePipe: DatePipe,
     private anomaliaService: AnomaliaService,
     private reportControlService: ReportControlService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private warningService: WarningService
   ) {}
 
   ngOnInit(): void {
@@ -190,42 +193,57 @@ export class DownloadExcelPortfolioComponent implements OnInit {
     const plantas = this.portfolioControlService.listaPlantas;
     const informes = this.portfolioControlService.listaInformes;
 
-    // const plantasDuplicadas = ['IQYvqbIexG8vpowC0uef', 'RJmyakiUjSS9xhOHArxl', 'WWnA1tBqXB6UbbF8d1q4'];
-
     plantas.forEach((planta, index) => {
-      // if (index < 1) {
+      // if (index < 20) {
       const informesPlanta = informes.filter((informe) => informe.plantaId === planta.id);
 
-      let criterio: CritCriticidad;
+      if (informesPlanta.length > 0) {
+        let locationAreas: LocationAreaInterface[] = [];
+        let criterio: CritCriticidad;
 
-      this.anomaliaService
-        .getCriterioId(planta)
-        .pipe(
-          take(1),
-          switchMap((criterioId) => this.plantaService.getCriterioCriticidad(criterioId)),
-          take(1),
-          switchMap((crit) => {
-            criterio = crit;
-            this.anomaliaService.criterioCriticidad = crit;
-            return this.anomaliaService.getAnomaliasPlanta$(planta.id, informesPlanta);
-          })
-        )
-        .pipe(take(1))
-        .subscribe((anoms) => {
-          informesPlanta.forEach((informe) => {
-            let anomaliasInforme = anoms.filter((anom) => anom.informeId === informe.id);
+        this.plantaService
+          .getLocationsArea(planta.id)
+          .pipe(
+            take(1),
+            switchMap((locAreas) => {
+              locationAreas = locAreas;
 
-            // descartamos las anomalias que no lo son para el cliente
-            anomaliasInforme = this.anomaliaService.getRealAnomalias(anomaliasInforme);
+              return this.anomaliaService.getCriterioId(planta);
+            }),
+            take(1),
+            switchMap((criterioId) => this.plantaService.getCriterioCriticidad(criterioId)),
+            take(1),
+            switchMap((crit) => {
+              criterio = crit;
+              return this.anomaliaService.getAnomaliasPlanta$(planta, informesPlanta, criterio);
+            }),
+            take(1)
+          )
+          .subscribe((anoms) => {
+            informesPlanta.forEach((informe) => {
+              let anomaliasInforme = anoms.filter((anom) => anom.informeId === informe.id);
 
-            this.reportControlService.setTiposAnomInforme(anomaliasInforme, informe, true, criterio);
+              // descartamos las anomalias que no lo son para el cliente
+              anomaliasInforme = this.anomaliaService.getRealAnomalias(anomaliasInforme);
 
-            this.reportControlService.setNumAnomsCoAInforme(anomaliasInforme, informe, true);
+              this.warningService
+                .getWarnings(informe.id)
+                .pipe(take(1))
+                .subscribe((warnings) => {
+                  if (warnings.length === 0) {
+                    this.warningService.checkWarnings(informe, anomaliasInforme, warnings, planta, locationAreas);
+                  }
+                });
 
-            this.reportControlService.setNumAnomsCritInforme(anomaliasInforme, informe, true, criterio);
+              // this.reportControlService.setTiposAnomInforme(anomaliasInforme, informe, true, criterio);
+
+              // this.reportControlService.setNumAnomsCoAInforme(anomaliasInforme, informe, true);
+
+              // this.reportControlService.setNumAnomsCritInforme(anomaliasInforme, informe, true, criterio);
+            });
           });
-        });
-      // }
+        // }
+      }
     });
   }
 }

@@ -61,6 +61,7 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
             if (thermalLayers.map((tL) => tL.informeId).includes(informe.id)) {
               thermalLayerPending = false;
             }
+
             dataInformes.push({
               planta: planta.nombre,
               fecha: informe.fecha,

@@ -279,7 +279,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     if (anomalia.hasOwnProperty('localId')) {
       localId = anomalia.localId;
     } else {
-      localId = this.anomaliaService.getLocalId(anomalia);
+      localId = this.anomaliaService.getLocalId(anomalia, this.planta);
     }
     row.localId = localId;
     if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {

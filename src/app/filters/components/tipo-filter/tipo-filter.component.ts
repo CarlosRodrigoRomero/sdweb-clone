@@ -3,17 +3,19 @@ import { SelectionModel } from '@angular/cdk/collections';
 
 import { MatCheckboxChange } from '@angular/material/checkbox';
 
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { GLOBAL } from '@core/services/global';
 import { FilterService } from '@core/services/filter.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { FilterControlService } from '@core/services/filter-control.service';
 import { ReportControlService } from '@core/services/report-control.service';
+import { PlantaService } from '@core/services/planta.service';
 
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { Anomalia } from '@core/models/anomalia';
-import { Subscription } from 'rxjs';
+import { PlantaInterface } from '@core/models/planta';
 
 export interface LabelTipo {
   label?: string;
@@ -40,6 +42,7 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
   selection = new SelectionModel<LabelTipo>(true, []);
 
   public plantaId: string;
+  private planta: PlantaInterface;
   public informesIdList: string[];
   public allAnomalias: Anomalia[];
 
@@ -55,7 +58,8 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
     private filterService: FilterService,
     private anomaliaService: AnomaliaService,
     private filterControlService: FilterControlService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private plantaService: PlantaService
   ) {}
 
   ngOnInit(): void {
@@ -66,28 +70,38 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.anomaliaService.getAnomaliasPlanta$(this.plantaId).subscribe((anomalias) => {
-        // filtramos las anomalias que ya no consideramos anomalias
-        this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
+      this.plantaService
+        .getPlanta(this.plantaId)
+        .pipe(
+          take(1),
+          switchMap((planta) => {
+            this.planta = planta;
 
-        this.tiposElem = [];
-        // obtenermos los labels de todas las anomalias
-        this._getAllCategorias(anomalias);
-        this.labelsCategoria.forEach((label, i) => {
-          this.tiposElem.push({ label, color: this.coloresCategoria[i] });
+            return this.anomaliaService.getAnomaliasPlanta$(this.planta);
+          })
+        )
+        .subscribe((anomalias) => {
+          // filtramos las anomalias que ya no consideramos anomalias
+          this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
 
-          this.tiposSelected.push(false);
-        });
+          this.tiposElem = [];
+          // obtenermos los labels de todas las anomalias
+          this._getAllCategorias(anomalias);
+          this.labelsCategoria.forEach((label, i) => {
+            this.tiposElem.push({ label, color: this.coloresCategoria[i] });
 
-        this.numsCategoria.forEach((num) => {
-          this.filterTipoCounts.push(
-            this.allAnomalias
-              .filter((elem) => elem.informeId === this.selectedInformeId)
-              // tslint:disable-next-line: triple-equals
-              .filter((elem) => elem.tipo == num).length
-          );
-        });
-      })
+            this.tiposSelected.push(false);
+          });
+
+          this.numsCategoria.forEach((num) => {
+            this.filterTipoCounts.push(
+              this.allAnomalias
+                .filter((elem) => elem.informeId === this.selectedInformeId)
+                // tslint:disable-next-line: triple-equals
+                .filter((elem) => elem.tipo == num).length
+            );
+          });
+        })
     );
 
     // nos suscribimos a los tipos seleccionados de filter control

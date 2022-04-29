@@ -97,7 +97,7 @@ export class CheckWarningsComponent implements OnInit {
       this.planta,
       this.anomalias
     );
-    const aerialLayerChecked = this.warningService.checkAerialLayer(this.informe.id, this.warnings);
+    const aerialLayerChecked = this.warningService.checkVisualLayer(this.informe.id, this.warnings);
     const imgPortadaChecked = this.warningService.checkImagePortada(this.informe.id, this.warnings);
     const imgSuciedadChecked = this.warningService.checkImageSuciedad(this.informe.id, this.warnings);
     const tempMaxAnomsChecked = this.warningService.checkTempMaxAnomsError(

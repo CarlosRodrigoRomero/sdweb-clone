@@ -97,8 +97,16 @@ export class AnomaliaService {
     );
   }
 
-  getAnomaliasPlanta$(plantaId: string, informesPlanta?: InformeInterface[]): Observable<Anomalia[]> {
-    const query$ = this.informeService.getInformesDePlanta(plantaId).pipe(
+  getAnomaliasPlanta$(
+    planta: PlantaInterface,
+    informesPlanta?: InformeInterface[],
+    criterio?: CritCriticidad
+  ): Observable<Anomalia[]> {
+    if (this.planta === undefined) {
+      this.planta = planta;
+    }
+
+    const query$ = this.informeService.getInformesDePlanta(planta.id).pipe(
       take(1),
       switchMap((informes) => {
         // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
@@ -110,14 +118,20 @@ export class AnomaliaService {
 
         const anomaliaObsList = Array<Observable<Anomalia[]>>();
         informes.forEach((informe) => {
-          // traemos ambos tipos de anomalias por si hay pcs antiguos
-          anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs'));
-          anomaliaObsList.push(this.getAnomalias$(informe.id, 'anomalias'));
+          if (criterio !== undefined) {
+            // traemos ambos tipos de anomalias por si hay pcs antiguos
+            anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs', criterio));
+            anomaliaObsList.push(this.getAnomalias$(informe.id, 'anomalias', criterio));
+          } else {
+            // traemos ambos tipos de anomalias por si hay pcs antiguos
+            anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs'));
+            anomaliaObsList.push(this.getAnomalias$(informe.id, 'anomalias'));
+          }
         });
         return combineLatest(anomaliaObsList);
       }),
       map((arr) => arr.flat()),
-      map((arr) => this.getAlturaCorrecta(arr))
+      map((arr) => this.getAlturaCorrecta(arr, planta))
     );
 
     return query$;
@@ -131,7 +145,7 @@ export class AnomaliaService {
     return combineLatest(anomaliaObsList).pipe(map((arr) => arr.flat()));
   }
 
-  getAnomalias$(informeId: string, tipo?: 'anomalias' | 'pcs'): Observable<Anomalia[]> {
+  getAnomalias$(informeId: string, tipo?: 'anomalias' | 'pcs', criterio?: CritCriticidad): Observable<Anomalia[]> {
     const query$ = this.afs
       .collection<Anomalia>(tipo, (ref) => ref.where('informeId', '==', informeId))
       .snapshotChanges()
@@ -142,13 +156,14 @@ export class AnomaliaService {
             data.id = doc.payload.doc.id;
             data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
             data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
-            data.criticidad = this.getCriticidad(data);
+            if (criterio !== undefined) {
+              data.criticidad = this.getCriticidad(data, criterio);
+            } else {
+              data.criticidad = this.getCriticidad(data);
+            }
             if (data.globalCoords !== undefined && data.globalCoords !== null) {
               data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
             }
-            // if (this.planta.alturaBajaPrimero) {
-            //   data.localY = this.planta.filas - data.localY + 1;
-            // }
             if (tipo === 'pcs') {
               data.localX = (data as PcInterface).local_x;
               data.localY = (data as PcInterface).local_y;
@@ -171,7 +186,7 @@ export class AnomaliaService {
                   }
                 }
               }
-              data.localId = this.getLocalId(data);
+              data.localId = this.getLocalId(data, this.planta);
             }
 
             // Convertimos el objeto en un array
@@ -260,7 +275,7 @@ export class AnomaliaService {
     );
   }
 
-  getLocalId(anomalia: Anomalia): string {
+  getLocalId(anomalia: Anomalia, planta: PlantaInterface): string {
     const parts: string[] = [];
     anomalia.globalCoords.forEach((coord) => {
       if (coord !== undefined && coord !== null && coord !== '') {
@@ -352,28 +367,34 @@ export class AnomaliaService {
     return clase;
   }
 
-  private getCriticidad(anomalia: Anomalia): number {
+  private getCriticidad(anomalia: Anomalia, criterio?: CritCriticidad): number {
     // si hay criterio y no cumple ninguno devolvemos null
     let criticidad = null;
-    if (this.criterioCriticidad !== undefined) {
-      if (this.criterioCriticidad.hasOwnProperty('criterioConstante')) {
-        const criterioConstante = Object.values(this.criterioCriticidad.criterioConstante);
+    let criterioCriticidad: CritCriticidad;
+    if (criterio !== undefined) {
+      criterioCriticidad = criterio;
+    } else {
+      criterioCriticidad = this.criterioCriticidad;
+    }
+    if (criterioCriticidad !== undefined) {
+      if (criterioCriticidad.hasOwnProperty('criterioConstante')) {
+        const criterioConstante = Object.values(criterioCriticidad.criterioConstante);
         criterioConstante.forEach((value, index) => {
           if (value.includes(anomalia.tipo)) {
             criticidad = index;
           }
         });
       }
-      if (this.criterioCriticidad.hasOwnProperty('siempreVisible')) {
-        if (this.criterioCriticidad.siempreVisible.includes(anomalia.tipo)) {
+      if (criterioCriticidad.hasOwnProperty('siempreVisible')) {
+        if (criterioCriticidad.siempreVisible.includes(anomalia.tipo)) {
           if (criticidad === null) {
             criticidad = 0;
           }
         }
       }
-      if (this.criterioCriticidad.hasOwnProperty('rangosDT')) {
+      if (criterioCriticidad.hasOwnProperty('rangosDT')) {
         if (criticidad === null) {
-          this.criterioCriticidad.rangosDT.forEach((value, index) => {
+          criterioCriticidad.rangosDT.forEach((value, index) => {
             if (anomalia.gradienteNormalizado >= value) {
               criticidad = index;
             }
@@ -445,13 +466,13 @@ export class AnomaliaService {
     return difenciaEnMinutos;
   }
 
-  public getAlturaCorrecta(anomalias: Anomalia[]) {
-    if (this.planta.tipo !== 'seguidores' && this.planta.alturaBajaPrimero) {
+  private getAlturaCorrecta(anomalias: Anomalia[], planta: PlantaInterface) {
+    if (planta.tipo !== 'seguidores' && planta.alturaBajaPrimero) {
       anomalias.forEach((anom) => {
         const alturaMax = Math.max(
           ...[
             ...anomalias.filter((a) => a.globalCoords.toString() === anom.globalCoords.toString()).map((a) => a.localY),
-            this.planta.filas,
+            planta.filas,
           ]
         );
         anom.localY = alturaMax - anom.localY + 1;

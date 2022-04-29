@@ -11,6 +11,7 @@ import { ShareReportService } from '@core/services/share-report.service';
 import { InformeService } from '@core/services/informe.service';
 import { AnomaliaService } from '@core/services/anomalia.service';
 import { SeguidorService } from '@core/services/seguidor.service';
+import { PlantaService } from '@core/services/planta.service';
 
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 import { FilterableElement } from '@core/models/filterableInterface';
@@ -20,6 +21,7 @@ import { Seguidor } from '@core/models/seguidor';
 import { LocationAreaInterface } from '@core/models/location';
 import { GLOBAL } from './global';
 import { CritCriticidad } from '@core/models/critCriticidad';
+import { PlantaInterface } from '@core/models/planta';
 
 @Injectable({
   providedIn: 'root',
@@ -35,6 +37,8 @@ export class ReportControlService {
   private sharedId: string;
   private _plantaId: string = undefined;
   public plantaId$ = new BehaviorSubject<string>(this._plantaId);
+  private _planta: PlantaInterface = undefined;
+  planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
   private _selectedInformeId: string = undefined;
   public selectedInformeId$ = new BehaviorSubject<string>(this._selectedInformeId);
   private _informesIdList: string[] = [];
@@ -62,7 +66,8 @@ export class ReportControlService {
     private informeService: InformeService,
     private anomaliaService: AnomaliaService,
     private seguidorService: SeguidorService,
-    @Inject(WINDOW) private window: Window
+    @Inject(WINDOW) private window: Window,
+    private plantaService: PlantaService
   ) {}
 
   initService(): Promise<boolean> {
@@ -77,9 +82,15 @@ export class ReportControlService {
         return new Promise((initService) => {
           // iniciamos anomalia service antes de obtener las anomalias
           this.anomaliaService.initService(this.plantaId).then(() =>
-            this.informeService
-              .getInformesDePlanta(this.plantaId)
+            this.plantaService
+              .getPlanta(this.plantaId)
               .pipe(
+                take(1),
+                switchMap((planta) => {
+                  this.planta = planta;
+
+                  return this.informeService.getInformesDePlanta(this.plantaId);
+                }),
                 take(1),
                 // obtenemos los informes de la planta
                 switchMap((informes) => {
@@ -96,7 +107,7 @@ export class ReportControlService {
                   this.selectedInformeId = this._informesIdList[this._informesIdList.length - 1];
 
                   // obtenemos todas las anomalías
-                  return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
+                  return this.anomaliaService.getAnomaliasPlanta$(this.planta);
                 }),
                 take(1)
               )
@@ -164,13 +175,19 @@ export class ReportControlService {
                 if (!this.router.url.includes('filterable')) {
                   // iniciamos anomalia service antes de obtener las anomalias
                   this.anomaliaService.initService(this.plantaId).then(() =>
-                    this.informeService
-                      .getInforme(this.selectedInformeId)
+                    this.plantaService
+                      .getPlanta(this.plantaId)
                       .pipe(
+                        take(1),
+                        switchMap((planta) => {
+                          this.planta = planta;
+
+                          return this.informeService.getInforme(this.selectedInformeId);
+                        }),
                         take(1),
                         switchMap((informe) => {
                           this.informes = [informe];
-                          return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
+                          return this.anomaliaService.getAnomaliasPlanta$(this.planta);
                         }),
                         take(1)
                       )
@@ -196,9 +213,15 @@ export class ReportControlService {
                   //////////////////// FILTERABLE SHARED REPORT /////////////////////////
                   // iniciamos anomalia service antes de obtener las anomalias
                   this.anomaliaService.initService(this.plantaId).then(() =>
-                    this.informeService
-                      .getInformesDePlanta(this.plantaId)
+                    this.plantaService
+                      .getPlanta(this.plantaId)
                       .pipe(
+                        take(1),
+                        switchMap((planta) => {
+                          this.planta = planta;
+
+                          return this.informeService.getInformesDePlanta(this.plantaId);
+                        }),
                         take(1),
                         // obtenemos los informes de la planta
                         switchMap((informes) => {
@@ -213,7 +236,7 @@ export class ReportControlService {
                           }
 
                           // obtenemos todas las anomalías
-                          return this.anomaliaService.getAnomaliasPlanta$(this.plantaId);
+                          return this.anomaliaService.getAnomaliasPlanta$(this.planta);
                         }),
                         take(1)
                       )
@@ -415,15 +438,17 @@ export class ReportControlService {
   }
 
   private checkMaeInformes(elems: FilterableElement[]): void {
-    this.informes.forEach((informe) => {
-      if (this.checkIfNumberValueWrong(informe.mae)) {
-        if (elems[0].hasOwnProperty('anomaliasCliente')) {
-          this.setMaeInformeSeguidores(elems as Seguidor[], informe);
-        } else {
-          this.setMaeInformeFija(elems as Anomalia[], informe);
+    if (elems.length > 0) {
+      this.informes.forEach((informe) => {
+        if (this.checkIfNumberValueWrong(informe.mae)) {
+          if (elems[0].hasOwnProperty('anomaliasCliente')) {
+            this.setMaeInformeSeguidores(elems as Seguidor[], informe);
+          } else {
+            this.setMaeInformeFija(elems as Anomalia[], informe);
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   setMaeInformeSeguidores(seguidores: Seguidor[], informe: InformeInterface) {
@@ -450,15 +475,17 @@ export class ReportControlService {
   }
 
   private checkCCInformes(elems: FilterableElement[]): void {
-    this.informes.forEach((informe) => {
-      if (this.checkIfNumberValueWrong(informe.cc)) {
-        if (elems[0].hasOwnProperty('anomaliasCliente')) {
-          this.setCCInformeSeguidores(elems as Seguidor[], informe);
-        } else {
-          this.setCCInformeFija(elems as Anomalia[], informe);
+    if (elems.length > 0) {
+      this.informes.forEach((informe) => {
+        if (this.checkIfNumberValueWrong(informe.cc)) {
+          if (elems[0].hasOwnProperty('anomaliasCliente')) {
+            this.setCCInformeSeguidores(elems as Seguidor[], informe);
+          } else {
+            this.setCCInformeFija(elems as Anomalia[], informe);
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   setCCInformeSeguidores(seguidores: Seguidor[], informe: InformeInterface) {
@@ -795,5 +822,14 @@ export class ReportControlService {
   set completeView(value: boolean) {
     this._completeView = value;
     this.completeView$.next(value);
+  }
+
+  get planta() {
+    return this._planta;
+  }
+
+  set planta(value: PlantaInterface) {
+    this._planta = value;
+    this.planta$.next(value);
   }
 }
