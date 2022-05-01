@@ -4,37 +4,37 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { CommonModule } from '@angular/common';
 
-import { environment } from '../environments/environment';
-
-import { AppComponent } from './app.component';
-
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFirestoreModule, SETTINGS } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
-import { HttpClientModule } from '@angular/common/http';
-import { AppRoutingModule } from './app-routing.module';
-
-import { AuthService } from '@core/services/auth.service';
-import { WINDOW_PROVIDERS } from './window.providers';
-
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { HotkeyModule } from 'angular2-hotkeys';
+
+import { AppRoutingModule } from './app-routing.module';
+import { SharedModule } from './shared/shared.module';
+import { CoreModule } from '@core/core.module';
+
+import { AuthService } from './data/services/auth.service';
+
+import { environment } from '../environments/environment';
+
+import { AppComponent } from './app.component';
+
+import { WINDOW_PROVIDERS } from './window.providers';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule,
     BrowserAnimationsModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule,
     AngularFireAuthModule,
     AngularFireStorageModule,
-    FormsModule,
-    ReactiveFormsModule,
+    SharedModule,
+    CoreModule,
     CommonModule,
     HotkeyModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),

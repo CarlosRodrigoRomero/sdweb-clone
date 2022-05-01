@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { ThemeService } from '@core/services/theme.service';
+import { ThemeService } from '@data/services/theme.service';
 
 @Component({
   selector: 'app-switch-theme',

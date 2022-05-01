@@ -3,10 +3,10 @@ import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
-import { AuthService } from '@core/services/auth.service';
-import { ReportControlService } from '@core/services/report-control.service';
-import { ThemeService } from '@core/services/theme.service';
-import { FilterService } from '@core/services/filter.service';
+import { AuthService } from '@data/services/auth.service';
+import { ReportControlService } from '@data/services/report-control.service';
+import { ThemeService } from '@data/services/theme.service';
+import { FilterService } from '@data/services/filter.service';
 
 import { UserInterface } from '@core/models/user';
 import { TipoElemFilter } from '@core/models/tipoPcFilter';

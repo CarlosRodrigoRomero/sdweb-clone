@@ -3,7 +3,7 @@ import { LatLngLiteral } from '@agm/core';
 import { Coordinate } from 'ol/coordinate';
 import { fromLonLat } from 'ol/proj';
 
-import { GLOBAL } from '@core/services/global';
+import { GLOBAL } from '@data/constants/global';
 
 import { Anomalia } from './anomalia';
 import { FilterableElement } from './filterableInterface';

@@ -4,15 +4,15 @@ import { Router } from '@angular/router';
 import { switchMap, take } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
 
-import { ReportControlService } from '@core/services/report-control.service';
-import { InformeService } from '@core/services/informe.service';
-import { PlantaService } from '@core/services/planta.service';
-import { FilterService } from '@core/services/filter.service';
-import { AnomaliaService } from '@core/services/anomalia.service';
-import { PcService } from '@core/services/pc.service';
-import { WarningService } from '@core/services/warning.service';
-import { GLOBAL } from '@core/services/global';
-import { SeguidorService } from '@core/services/seguidor.service';
+import { ReportControlService } from '@data/services/report-control.service';
+import { InformeService } from '@data/services/informe.service';
+import { PlantaService } from '@data/services/planta.service';
+import { FilterService } from '@data/services/filter.service';
+import { AnomaliaService } from '@data/services/anomalia.service';
+import { PcService } from '@data/services/pc.service';
+import { WarningService } from '@data/services/warning.service';
+import { GLOBAL } from '@data/constants/global';
+import { SeguidorService } from '@data/services/seguidor.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';

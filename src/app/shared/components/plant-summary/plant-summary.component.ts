@@ -4,9 +4,9 @@ import { NavigationStart, Router, Event } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
-import { InformeService } from '@core/services/informe.service';
-import { ReportControlService } from '@core/services/report-control.service';
-import { PlantaService } from '@core/services/planta.service';
+import { InformeService } from '@data/services/informe.service';
+import { ReportControlService } from '@data/services/report-control.service';
+import { PlantaService } from '@data/services/planta.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';

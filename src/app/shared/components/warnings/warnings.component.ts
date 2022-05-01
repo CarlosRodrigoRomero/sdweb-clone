@@ -3,10 +3,10 @@ import { Router } from '@angular/router';
 
 import { switchMap, take } from 'rxjs/operators';
 
-import { WarningService } from '@core/services/warning.service';
-import { PlantaService } from '@core/services/planta.service';
-import { InformeService } from '@core/services/informe.service';
-import { GLOBAL } from '@core/services/global';
+import { WarningService } from '@data/services/warning.service';
+import { PlantaService } from '@data/services/planta.service';
+import { InformeService } from '@data/services/informe.service';
+import { GLOBAL } from '@data/constants/global';
 
 import { Warning } from '../warnings-menu/warnings';
 import { PlantaInterface } from '@core/models/planta';

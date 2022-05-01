@@ -2,7 +2,7 @@ import { Component, HostBinding, OnInit } from '@angular/core';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Router } from '@angular/router';
 
-import { ThemeService } from '@core/services/theme.service';
+import { ThemeService } from '@data/services/theme.service';
 
 // declare var gtag;
 

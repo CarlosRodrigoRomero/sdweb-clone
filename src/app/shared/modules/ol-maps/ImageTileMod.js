@@ -3,7 +3,7 @@ import TileState from 'ol/TileState.js';
 import { createCanvasContext2D } from 'ol/dom.js';
 import { listenImage } from 'ol/Image.js';
 
-import { GLOBAL } from '@core/services/global';
+import { GLOBAL } from '@data/constants/global';
 
 class ImageTileMod extends Tile {
   /**

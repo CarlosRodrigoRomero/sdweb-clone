@@ -1,4 +1,4 @@
-import { GLOBAL } from '../services/global';
+import { GLOBAL } from '@data/constants/global';
 import { ElementoPlantaInterface } from './elementoPlanta';
 import { LatLngLiteral } from '@agm/core';
 import { ModuloInterface } from './modulo';

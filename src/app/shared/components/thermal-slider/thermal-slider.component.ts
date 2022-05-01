@@ -7,9 +7,9 @@ import { Subscription } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
 
-import { OlMapService } from '@core/services/ol-map.service';
-import { ThermalService } from '@core/services/thermal.service';
-import { ReportControlService } from '@core/services/report-control.service';
+import { OlMapService } from '@data/services/ol-map.service';
+import { ThermalService } from '@data/services/thermal.service';
+import { ReportControlService } from '@data/services/report-control.service';
 
 @Component({
   selector: 'app-thermal-slider',
