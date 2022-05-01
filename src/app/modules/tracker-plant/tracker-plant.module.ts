@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { PlantaSeguidoresRoutingModule } from './tracker-plant-routing.module';
 import { SharedModule } from '@shared/shared.module';
-import { FiltersModule } from '../filters/filters.module';
+import { FiltersModule } from '@modules/filters/filters.module';
 import { StatsPlantModule } from '@modules/stats-plant/stats-plant.module';
 import { SharedPlantsModule } from '@modules/shared-plants/shared-plants.module';
 
@@ -54,10 +54,10 @@ import { SeguidorImagesAreaComponent } from './components/seguidor-images-area/s
   imports: [
     CommonModule,
     PlantaSeguidoresRoutingModule,
-    SharedModule,
     FiltersModule,
     StatsPlantModule,
     SharedPlantsModule,
+    SharedModule,
   ],
 })
 export class TrackerPlantModule {}

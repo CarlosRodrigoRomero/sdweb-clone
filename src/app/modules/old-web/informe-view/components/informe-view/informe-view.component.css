@@ -44,7 +44,7 @@
 }
 
 .header-informe {
-  background-image: url('src/assets/images/informe-portada.jpg');
+  background-image: url('assets/images/informe-portada.jpg');
   border: 1px solid grey;
   margin-top: 1rem;
   padding: 1rem 0rem 0rem 1rem;

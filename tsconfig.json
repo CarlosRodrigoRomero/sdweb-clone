@@ -21,7 +21,8 @@
       "@core/*": ["app/core/*"],
       "@shared/*": ["app/shared/*"],
       "@modules/*": ["app/modules/*"],
-      "@data/*": ["app/data/*"]
+      "@data/*": ["app/data/*"],
+      "@layout/*": ["app/layout/*"]
     }
   }
 }

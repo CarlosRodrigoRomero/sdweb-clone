@@ -12,19 +12,21 @@ import { AngularFireStorageModule } from '@angular/fire/storage';
 import { HotkeyModule } from 'angular2-hotkeys';
 
 import { AppRoutingModule } from './app-routing.module';
-import { SharedModule } from './shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 import { CoreModule } from '@core/core.module';
 
-import { AuthService } from './data/services/auth.service';
+import { AuthService } from '@data/services/auth.service';
 
 import { environment } from '../environments/environment';
 
 import { AppComponent } from './app.component';
+import { SkeletonComponent } from '@layout/skeleton/skeleton.component';
+import { NavbarComponent } from '@layout/navbar/navbar.component';
 
 import { WINDOW_PROVIDERS } from './window.providers';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, SkeletonComponent, NavbarComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

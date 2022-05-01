@@ -8,9 +8,9 @@ import { SwiperModule } from 'swiper/angular';
 
 import { PlantaFijaRoutingModule } from './fixed-plant-routing.module';
 import { SharedModule } from '@shared/shared.module';
-import { FiltersModule } from '../filters/filters.module';
+import { FiltersModule } from '@modules/filters/filters.module';
 import { StatsPlantModule } from '@modules/stats-plant/stats-plant.module';
-import { SharedPlantsModule } from '../shared-plants/shared-plants.module';
+import { SharedPlantsModule } from '@modules/shared-plants/shared-plants.module';
 
 import { AnomaliasListComponent } from './components/anomalias-list/anomalias-list.component';
 import { MapComponent } from './components/map/map.component';
@@ -29,7 +29,6 @@ import { SliderOpacityComponent } from './components/slider-opacity/slider-opaci
     SliderOpacityComponent,
   ],
   imports: [
-    SharedModule,
     PlantaFijaRoutingModule,
     NgApexchartsModule,
     FiltersModule,
@@ -37,6 +36,7 @@ import { SliderOpacityComponent } from './components/slider-opacity/slider-opaci
     SwiperModule,
     StatsPlantModule,
     SharedPlantsModule,
+    SharedModule,
   ],
   exports: [MapViewComponent],
 })
