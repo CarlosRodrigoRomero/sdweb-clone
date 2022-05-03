@@ -73,6 +73,7 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
               disponible: informe.disponible,
               thermalLayerPending,
               plantaId: planta.id,
+              tipoInforme: this.getTipoInforme(planta.tipo),
             });
           });
 
@@ -80,6 +81,14 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
           this.dataSource.data = dataInformes.sort((a, b) => b.fecha - a.fecha);
         })
     );
+  }
+
+  private getTipoInforme(tipo: string): string {
+    if (tipo === 'seguidores') {
+      return 'tracker';
+    } else {
+      return 'fixed';
+    }
   }
 
   ngAfterViewInit(): void {

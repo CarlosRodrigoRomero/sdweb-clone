@@ -6,7 +6,7 @@
 
   <mat-form-field>
     <mat-label>Buscar</mat-label>
-    <input matInput (keyup)="applyFilter($event)" placeholder="Informe" #search  />
+    <input matInput (keyup)="applyFilter($event)" placeholder="Informe" #search />
   </mat-form-field>
 
   <div class="tabla-container">
@@ -61,7 +61,15 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Acciones</th>
         <td class="actions" mat-cell *matCellDef="let element">
-          <button mat-icon-button [routerLink]="['./edit', element.informeId]">
+          <button
+            class="btn-login"
+            mat-icon-button
+            [routerLink]="['../../clients', element.tipoInforme, element.informeId]"
+            matTooltip="Acceder al Informe"
+          >
+            <mat-icon>login</mat-icon>
+          </button>
+          <button mat-icon-button [routerLink]="['./edit', element.informeId]" matTooltip="Editar Informe">
             <mat-icon>edit</mat-icon>
           </button>
           <a mat-button [routerLink]="['../../clientes/auto-loc', element.plantaId]">Localizaciones</a>
