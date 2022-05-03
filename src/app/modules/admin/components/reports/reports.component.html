@@ -6,88 +6,93 @@
 
   <mat-form-field>
     <mat-label>Buscar</mat-label>
-    <input matInput (keyup)="applyFilter($event)" placeholder="Informe" #input />
+    <input matInput (keyup)="applyFilter($event)" placeholder="Informe" #input cdkFocusInitial #inputName="matInput" />
   </mat-form-field>
 
-  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  <div class="tabla-container">
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
-    <!-- Alertas -->
-    <ng-container matColumnDef="warnings">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Alertas</th>
-      <td mat-cell *matCellDef="let element">
-        <app-warnings [informeId]="element.informeId"></app-warnings>
-      </td>
-    </ng-container>
+      <!-- Alertas -->
+      <ng-container matColumnDef="warnings">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Alertas</th>
+        <td mat-cell *matCellDef="let element">
+          <app-warnings [informeId]="element.informeId"></app-warnings>
+        </td>
+      </ng-container>
 
-    <!-- Planta -->
-    <ng-container matColumnDef="planta">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Planta</th>
-      <td mat-cell *matCellDef="let element">{{ element.planta }}</td>
-    </ng-container>
+      <!-- Planta -->
+      <ng-container matColumnDef="planta">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Planta</th>
+        <td mat-cell *matCellDef="let element">{{ element.planta }}</td>
+      </ng-container>
 
-    <!-- Fecha -->
-    <ng-container matColumnDef="fecha">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
-      <td mat-cell *matCellDef="let element">{{ element.fecha * 1000 | date: 'dd/MM/yyyy' }}</td>
-    </ng-container>
+      <!-- Fecha -->
+      <ng-container matColumnDef="fecha">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
+        <td mat-cell *matCellDef="let element">{{ element.fecha * 1000 | date: 'dd/MM/yyyy' }}</td>
+      </ng-container>
 
-    <!-- Tipo -->
-    <ng-container matColumnDef="tipo">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
-      <td mat-cell *matCellDef="let element">{{ element.tipo }}</td>
-    </ng-container>
+      <!-- Tipo -->
+      <ng-container matColumnDef="tipo">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
+        <td mat-cell *matCellDef="let element">{{ element.tipo }}</td>
+      </ng-container>
 
-    <!-- Potencia -->
-    <ng-container matColumnDef="potencia">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencia</th>
-      <td mat-cell *matCellDef="let element">{{ element.potencia | number: '1.0-2' }} MW</td>
-    </ng-container>
+      <!-- Potencia -->
+      <ng-container matColumnDef="potencia">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencia</th>
+        <td mat-cell *matCellDef="let element">{{ element.potencia | number: '1.0-2' }} MW</td>
+      </ng-container>
 
-    <!-- Informe ID -->
-    <ng-container matColumnDef="informeId">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Informe ID</th>
-      <td mat-cell *matCellDef="let element">{{ element.informeId }}</td>
-    </ng-container>
+      <!-- Informe ID -->
+      <ng-container matColumnDef="informeId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Informe ID</th>
+        <td mat-cell *matCellDef="let element">{{ element.informeId }}</td>
+      </ng-container>
 
-    <!-- Disponible -->
-    <ng-container matColumnDef="disponible">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Disponible</th>
-      <td mat-cell *matCellDef="let element">{{ element.disponible ? 'Si' : 'No' }}</td>
-    </ng-container>
+      <!-- Disponible -->
+      <ng-container matColumnDef="disponible">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Disponible</th>
+        <td mat-cell *matCellDef="let element">{{ element.disponible ? 'Si' : 'No' }}</td>
+      </ng-container>
 
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>Acciones</th>
-      <td class="actions" mat-cell *matCellDef="let element">
-        <button mat-icon-button [routerLink]="['./edit', element.informeId]">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <a mat-button [routerLink]="['../../clientes/auto-loc', element.plantaId]">Localizaciones</a>
-        <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../autogeo', element.informeId]"
-          >AutoGeo</a
-        >
-        <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../clusters', element.informeId]"
-          >Clusters</a
-        >
-        <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../structures', element.informeId]"
-          >Estructuras</a
-        >
-        <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../classification', element.informeId]"
-          >Clasificación</a
-        >
-        <a mat-button *ngIf="element.tipo === 'seguidores'" [routerLink]="['../../clientes/informe-edit', element.informeId]"
-          >Clasificación</a
-        >
-        <a
-          mat-button
-          *ngIf="element.tipo !== 'seguidores' && element.thermalLayerPending"
-          [routerLink]="['../thermalLayer', element.informeId]"
-        >
-          <mat-icon>add</mat-icon>
-          <span>Thermal</span>
-        </a>
-      </td>
-    </ng-container>
-  </table>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td class="actions" mat-cell *matCellDef="let element">
+          <button mat-icon-button [routerLink]="['./edit', element.informeId]">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <a mat-button [routerLink]="['../../clientes/auto-loc', element.plantaId]">Localizaciones</a>
+          <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../autogeo', element.informeId]"
+            >AutoGeo</a
+          >
+          <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../clusters', element.informeId]"
+            >Clusters</a
+          >
+          <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../structures', element.informeId]"
+            >Estructuras</a
+          >
+          <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../classification', element.informeId]"
+            >Clasificación</a
+          >
+          <a
+            mat-button
+            *ngIf="element.tipo === 'seguidores'"
+            [routerLink]="['../../clientes/informe-edit', element.informeId]"
+            >Clasificación</a
+          >
+          <a
+            mat-button
+            *ngIf="element.tipo !== 'seguidores' && element.thermalLayerPending"
+            [routerLink]="['../thermalLayer', element.informeId]"
+          >
+            <mat-icon>add</mat-icon>
+            <span>Thermal</span>
+          </a>
+        </td>
+      </ng-container>
+    </table>
+  </div>
 </div>

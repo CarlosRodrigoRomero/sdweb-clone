@@ -2,6 +2,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatInput } from '@angular/material/input';
 
 import { switchMap, take } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
@@ -33,6 +34,7 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
 
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild('inputName') inputName: MatInput;
 
   constructor(
     private informeService: InformeService,
@@ -82,6 +84,7 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
+    this.inputName.focus();
   }
 
   applyFilter(event: Event) {

@@ -16,3 +16,8 @@ table {
   width: 100%;
 }
 
+.tabla-container {
+  position: relative;
+  height: calc(100vh - 220px);
+  overflow: auto;
+}
