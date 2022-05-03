@@ -354,16 +354,12 @@ export class WarningService {
   }
 
   checkFilsColsPlanta(planta: PlantaInterface, informe: InformeInterface, warns: Warning[]): boolean {
+    // esta alerta solo es para S2E
     if (planta.columnas <= 1 || planta.columnas === undefined || planta.columnas === null) {
       let warning: Warning;
       if (planta.tipo === 'seguidores') {
         warning = {
           type: 'filsColsPlantaSegs',
-          visible: true,
-        };
-      } else {
-        warning = {
-          type: 'filsColsPlantaFija',
           visible: true,
         };
       }
@@ -373,8 +369,6 @@ export class WarningService {
       // eliminamos la alerta antigua si la hubiera
       if (planta.tipo === 'seguidores') {
         this.checkOldWarnings('filsColsPlantaSegs', warns, informe.id);
-      } else {
-        this.checkOldWarnings('filsColsPlantaFija', warns, informe.id);
       }
     }
 

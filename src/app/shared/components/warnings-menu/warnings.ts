@@ -110,22 +110,6 @@ export const warnings: Warning[] = [
     ],
   },
   {
-    type: 'filsColsPlantaFija',
-    message: 'El nº de filas y columnas de la planta no son correctos',
-    adminActions: [
-      {
-        name: 'irPlantaEdit',
-        label: 'Ir a Editar planta',
-      },
-    ],
-    reportActions: [
-      {
-        name: 'irPlantaEdit',
-        label: 'Ir a Editar planta',
-      },
-    ],
-  },
-  {
     type: 'filsColsPlantaSegs',
     message: 'El nº de filas y columnas de la planta no son correctos y por tanto MAE y CC están mal',
     adminActions: [
