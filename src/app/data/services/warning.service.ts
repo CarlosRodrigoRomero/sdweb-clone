@@ -146,7 +146,7 @@ export class WarningService {
     locAreas: LocationAreaInterface[]
   ): boolean {
     // reseteamos las alertas añadidas
-    this.warningsAdded = [];
+    this.warningsAdded = warns.map((warn) => warn.type);
 
     const tiposAnomsChecked = this.checkTiposAnoms(informe, anomalias, warns);
     const numsCoAChecked = this.checkNumsCoA(informe, anomalias, warns);

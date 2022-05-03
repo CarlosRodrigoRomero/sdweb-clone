@@ -79,12 +79,15 @@
   </div>
 </div>
 
-<mat-card class="bar-progress" *ngIf="processing">
-  <mat-card-content>
-    <h5>Procesando...</h5>
+<div class="checking" *ngIf="processing">
+  <mat-card class="bar-progress">
+    <mat-card-content>
+      <h5>Procesando...</h5>
 
-    <section class="example-section">
-      <mat-progress-bar [color]="progressBarColor" [mode]="determinate" [value]="progressBarValue"> </mat-progress-bar>
-    </section>
-  </mat-card-content>
-</mat-card>
+      <section class="example-section">
+        <mat-progress-bar [color]="progressBarColor" [mode]="determinate" [value]="progressBarValue">
+        </mat-progress-bar>
+      </section>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -325,7 +325,7 @@ export class ClassificationComponent implements OnInit {
             .subscribe((anoms) => {
               this.realAnoms = this.anomaliaService.getRealAnomalias(anoms);
 
-              this.warningService.checkWarnings(
+              this.processing = !this.warningService.checkWarnings(
                 this.informe,
                 this.realAnoms,
                 this.warnings,
