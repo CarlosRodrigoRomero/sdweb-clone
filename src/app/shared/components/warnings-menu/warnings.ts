@@ -177,6 +177,7 @@ export const warnings: Warning[] = [
       },
     ],
   },
+  // solo para fijas y S1E
   {
     type: 'wrongLocAnoms',
     message: 'Hay anomalías que pueden estar mal posicionadas y estar fuera de las zonas que deberían',
@@ -194,6 +195,10 @@ export const warnings: Warning[] = [
       {
         name: 'irLocs',
         label: 'Ir a Localizaciones',
+      },
+      {
+        name: 'recalGlobalCoords',
+        label: 'Recalcular globalCoords',
       },
     ],
   },

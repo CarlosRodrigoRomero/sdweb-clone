@@ -24,6 +24,7 @@ import { WrongGlobalCoordsFilter } from '@core/models/wrongGlobalCoordsFilter';
 import { ModuloInterface } from '@core/models/modulo';
 import { PcInterface } from '@core/models/pc';
 import { Warning } from './warnings';
+import { OlMapService } from '@data/services/ol-map.service';
 
 @Component({
   selector: 'app-warnings-menu',
@@ -52,7 +53,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     private anomaliaService: AnomaliaService,
     private pcService: PcService,
     private warningService: WarningService,
-    private seguidorService: SeguidorService
+    private seguidorService: SeguidorService,
+    private olMapService: OlMapService
   ) {}
 
   ngOnInit(): void {
@@ -187,6 +189,9 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       case 'wrongLocAnoms':
         this.filterWrongLocAnoms();
         break;
+      case 'recalGlobalCoords':
+        this.recalWrongLocAnoms();
+        break;
       case 'irLocs':
         window.open(urlLocalizaciones, '_blank');
         break;
@@ -224,6 +229,24 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     );
 
     this.filterService.addFilter(wrongGlobalsFilter);
+  }
+
+  private recalWrongLocAnoms() {
+    // nos traemos de nuevo las locAreas por si hay nuevas o se han modificado en localizaciones
+    this.plantaService
+      .getLocationsArea(this.reportControlService.plantaId)
+      .pipe(take(1))
+      .subscribe((locAreas) => {
+        this.locAreas = locAreas;
+
+        // corregimos los elementos filtrados previamente que son los que tienen las globalCoords mal
+        this.filterService.filteredElements.forEach((anom) => {
+          const anomCentroid = this.olMapService.getCentroid((anom as Anomalia).featureCoords);
+          const newGlobalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(anomCentroid, this.locAreas);
+
+          this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGlobalCoords);
+        });
+      });
   }
 
   private fixNoGlobalCoordsAnoms() {
