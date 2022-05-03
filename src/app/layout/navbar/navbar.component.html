@@ -20,7 +20,7 @@
 
   <div class="right">
     <!-- MENU ALERTAS INFORME TERMINADO ANTES DE ENTREGAR -->
-    <app-warnings-menu *ngIf="isAdmin && isReport && loadContent"></app-warnings-menu>
+    <app-warnings-menu *ngIf="isAdmin && isReport && loadContent && !isDemo"></app-warnings-menu>
 
     <!-- <app-switch-theme></app-switch-theme> -->
 

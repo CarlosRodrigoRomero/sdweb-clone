@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { PlantData } from '@modules/portfolio/components/plants-list/plants-list.component';
 import { PlantaInterface } from '@core/models/planta';
@@ -7,7 +8,10 @@ import { PlantaInterface } from '@core/models/planta';
   providedIn: 'root',
 })
 export class DemoService {
-  constructor() {}
+  plantaId = 'egF0cbpXnnBnjcrusoeR';
+  informesId = ['vfMHFBPvNFnOFgfCgM9L', '4ruzdxY6zYxvUOucACQ0'];
+
+  constructor(private router: Router) {}
 
   addPlantasFake(plantas: PlantaInterface[]) {
     const plantasFake: PlantaInterface[] = [
@@ -194,5 +198,15 @@ export class DemoService {
     }
 
     return plantsData;
+  }
+
+  checkIsDemo(): boolean {
+    const currentPlantaId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+
+    if (currentPlantaId === this.plantaId) {
+      return true;
+    }
+
+    return false;
   }
 }

@@ -11,6 +11,7 @@ import { FilterService } from '@data/services/filter.service';
 import { UserInterface } from '@core/models/user';
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { GradientFilter } from '@core/models/gradientFilter';
+import { DemoService } from '@data/services/demo.service';
 
 interface Notification {
   content: string;
@@ -31,6 +32,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   hasNotifications = false;
   notifications: Notification[] = [];
   isReport = false;
+  isDemo = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -41,7 +43,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private router: Router,
     private themeService: ThemeService,
     private reportControlService: ReportControlService,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private demoService: DemoService
   ) {}
 
   ngOnInit() {
@@ -128,6 +131,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    // comprobamos si es la planta demo
+    this.isDemo = this.demoService.checkIsDemo();
 
     // this.themeService.themeSelected$.subscribe((theme) => (this.themeSelected = theme));
   }
