@@ -182,8 +182,6 @@ export class WarningService {
       imgSuciedadChecked &&
       tempMaxAnomsChecked
     ) {
-      console.log(informe.id);
-
       // eliminamos posibles alertas que ya no sean necesarias
       this.checkUnusedWarnings(warns, informe.id);
 

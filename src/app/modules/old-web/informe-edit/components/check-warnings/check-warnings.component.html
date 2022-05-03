@@ -1,6 +1,6 @@
 <button mat-raised-button (click)="loadDataAndCheck()">Terminar clasificación</button>
 
-<div class="checking" *ngIf="checking">
+<div class="checking" *ngIf="!checked">
   <mat-card class="bar-progress">
     <mat-card-content>
       <h5>Procesando...</h5>

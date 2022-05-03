@@ -27,7 +27,7 @@ export class CheckWarningsComponent implements OnInit {
   private anomalias: Anomalia[];
   private warnings: Warning[] = [];
   private locAreas: LocationAreaInterface[] = [];
-  checking = false;
+  checked = true;
 
   constructor(
     private anomaliaService: AnomaliaService,
@@ -42,7 +42,7 @@ export class CheckWarningsComponent implements OnInit {
   }
 
   loadDataAndCheck() {
-    this.checking = true;
+    this.checked = false;
 
     combineLatest([this.informeService.getInforme(this.informeId), this.warningService.getWarnings(this.informeId)])
       .pipe(
@@ -71,56 +71,15 @@ export class CheckWarningsComponent implements OnInit {
             .subscribe((anoms) => {
               this.anomalias = this.anomaliaService.getRealAnomalias(anoms);
 
-              this.checkWarnings();
+              this.checked = this.warningService.checkWarnings(
+                this.informe,
+                this.anomalias,
+                this.warnings,
+                this.planta,
+                this.locAreas
+              );
             });
         });
       });
-  }
-
-  checkWarnings() {
-    const tiposAnomsChecked = this.warningService.checkTiposAnoms(this.informe, this.anomalias, this.warnings);
-    const numsCoAChecked = this.warningService.checkNumsCoA(this.informe, this.anomalias, this.warnings);
-    const numsCritChecked = this.warningService.checkNumsCriticidad(this.informe, this.anomalias, this.warnings);
-    const maeChecked = this.warningService.checkMAE(this.informe, this.warnings);
-    const ccChecked = this.warningService.checkCC(this.informe, this.warnings);
-    const filsColsPlantaChecked = this.warningService.checkFilsColsPlanta(this.planta, this.informe, this.warnings);
-    const filsColsAnomsChecked = this.warningService.checkFilsColsAnoms(
-      this.planta,
-      this.anomalias,
-      this.informe,
-      this.warnings
-    );
-    const zonesChecked = this.warningService.checkZonesWarnings(
-      this.locAreas,
-      this.informe,
-      this.warnings,
-      this.planta,
-      this.anomalias
-    );
-    const aerialLayerChecked = this.warningService.checkVisualLayer(this.informe.id, this.warnings);
-    const imgPortadaChecked = this.warningService.checkImagePortada(this.informe.id, this.warnings);
-    const imgSuciedadChecked = this.warningService.checkImageSuciedad(this.informe.id, this.warnings);
-    const tempMaxAnomsChecked = this.warningService.checkTempMaxAnomsError(
-      this.anomalias,
-      this.warnings,
-      this.informe.id
-    );
-
-    if (
-      tiposAnomsChecked &&
-      numsCoAChecked &&
-      numsCritChecked &&
-      maeChecked &&
-      ccChecked &&
-      filsColsPlantaChecked &&
-      filsColsAnomsChecked &&
-      zonesChecked &&
-      aerialLayerChecked &&
-      imgPortadaChecked &&
-      imgSuciedadChecked &&
-      tempMaxAnomsChecked
-    ) {
-      this.checking = false;
-    }
   }
 }
