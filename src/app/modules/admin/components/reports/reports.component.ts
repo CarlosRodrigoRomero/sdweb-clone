@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -34,7 +34,7 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
 
   @ViewChild(MatSort) sort: MatSort;
-  @ViewChild('inputName') inputName: MatInput;
+  @ViewChild('search') search: ElementRef;
 
   constructor(
     private informeService: InformeService,
@@ -84,7 +84,7 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
-    this.inputName.focus();
+    this.search.nativeElement.focus();
   }
 
   applyFilter(event: Event) {

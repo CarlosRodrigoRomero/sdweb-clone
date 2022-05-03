@@ -1,24 +1,23 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
-import { PlantaService } from '@data/services/planta.service';
-
-import { PlantaInterface } from '@core/models/planta';
 import { take } from 'rxjs/operators';
+
+import { PlantaService } from '@data/services/planta.service';
 
 @Component({
   selector: 'app-plants',
   templateUrl: './plants.component.html',
   styleUrls: ['./plants.component.css'],
 })
-export class PlantsComponent implements OnInit {
-  private plantas: PlantaInterface[];
-  displayedColumns: string[] = ['nombre', 'tipo', 'empresa', 'potencia', 'actions'];
-  dataSource = new MatTableDataSource<PlantaInterface>();
+export class PlantsComponent implements OnInit, AfterViewInit {
+  displayedColumns: string[] = ['nombre', 'id', 'tipo', 'empresa', 'potencia', 'actions'];
+  dataSource = new MatTableDataSource<any>();
 
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild('search') search: ElementRef;
 
   constructor(private plantaService: PlantaService) {}
 
@@ -26,7 +25,27 @@ export class PlantsComponent implements OnInit {
     this.plantaService
       .getAllPlantas()
       .pipe(take(1))
-      .subscribe((plantas) => (this.dataSource.data = plantas));
+      .subscribe((plantas) => {
+        const dataPlantas: any[] = [];
+        plantas.forEach((planta) => {
+          const dataPlanta = {
+            nombre: planta.nombre,
+            id: planta.id,
+            tipo: planta.tipo,
+            empresa: planta.empresa,
+            potencia: planta.potencia,
+          };
+
+          dataPlantas.push(dataPlanta);
+        });
+
+        this.dataSource.data = dataPlantas;
+      });
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
+    this.search.nativeElement.focus();
   }
 
   applyFilter(event: Event) {

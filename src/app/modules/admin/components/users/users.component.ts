@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChild, OnDestroy, OnInit } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, OnDestroy, OnInit, ElementRef } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -21,6 +21,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
 
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild('search') search: ElementRef;
 
   constructor(private adminService: AdminService) {}
 
@@ -40,6 +41,12 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
+    this.search.nativeElement.focus();
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   ngOnDestroy(): void {

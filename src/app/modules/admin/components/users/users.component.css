@@ -8,6 +8,16 @@
   margin-bottom: 1rem;
 }
 
+mat-form-field {
+  width: 100%;
+}
+
+.tabla-container {
+  position: relative;
+  height: calc(100vh - 220px);
+  overflow: auto;
+}
+
 table {
   width: 100%;
 }
