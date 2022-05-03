@@ -63,6 +63,7 @@
         <button mat-icon-button [routerLink]="['./edit', element.informeId]">
           <mat-icon>edit</mat-icon>
         </button>
+        <a mat-button [routerLink]="['../../clientes/auto-loc', element.plantaId]">Localizaciones</a>
         <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../autogeo', element.informeId]"
           >AutoGeo</a
         >
@@ -73,6 +74,9 @@
           >Estructuras</a
         >
         <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../classification', element.informeId]"
+          >Clasificación</a
+        >
+        <a mat-button *ngIf="element.tipo === 'seguidores'" [routerLink]="['../../clientes/informe-edit', element.informeId]"
           >Clasificación</a
         >
         <a

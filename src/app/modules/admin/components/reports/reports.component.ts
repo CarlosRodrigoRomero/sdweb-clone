@@ -70,6 +70,7 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
               informeId: informe.id,
               disponible: informe.disponible,
               thermalLayerPending,
+              plantaId: planta.id,
             });
           });
 
