@@ -169,7 +169,9 @@ export class ClustersService {
     if (thumbnailId !== undefined) {
       // Creamos una referencia a la imagen
       const storageRef = this.storage.ref('');
-      const imageRef = storageRef.child('vuelos/' + this.vueloId + '/thumbnails/' + thumbnailId + '.png');
+
+      let imageExt = '.jpg';
+      let imageRef = storageRef.child('vuelos/' + this.vueloId + '/thumbnails/' + thumbnailId + imageExt);
 
       // Obtenemos la URL y descargamos el archivo capturando los posibles errores
       imageRef
@@ -181,7 +183,37 @@ export class ClustersService {
         .catch((error) => {
           switch (error.code) {
             case 'storage/object-not-found':
-              console.log("File doesn't exist");
+              // provamos a ver si existe la imagen antigua en .png
+              imageExt = '.png';
+              imageRef = storageRef.child('vuelos/' + this.vueloId + '/thumbnails/' + thumbnailId + imageExt);
+
+              // Obtenemos la URL y descargamos el archivo capturando los posibles errores
+              imageRef
+                .getDownloadURL()
+                .toPromise()
+                .then((url) => {
+                  this.urlImageThumbnail = url;
+                })
+                .catch((err) => {
+                  switch (err.code) {
+                    case 'storage/object-not-found':
+                      console.log("File doesn't exist");
+                      break;
+
+                    case 'storage/unauthorized':
+                      console.log("User doesn't have permission to access the object");
+                      break;
+
+                    case 'storage/canceled':
+                      console.log('User canceled the upload');
+                      break;
+
+                    case 'storage/unknown':
+                      console.log('Unknown error occurred, inspect the server response');
+                      break;
+                  }
+                });
+
               break;
 
             case 'storage/unauthorized':
