@@ -184,7 +184,21 @@ export class MapClustersComponent implements OnInit, OnDestroy {
       source: satellite,
     });
 
-    const layers = [this.satelliteLayer];
+    const aerial = new XYZ({
+      url:
+        'http://solardrontech.es/tileserver.php?/index.json?/' +
+        this.clustersService.informeId +
+        '_visual/{z}/{x}/{y}.png',
+      crossOrigin: '',
+    });
+
+    const aerialLayer = new TileLayer({
+      source: aerial,
+    });
+
+    aerialLayer.setProperties({ name: 'aerial' });
+
+    const layers = [this.satelliteLayer, aerialLayer];
 
     // MAPA
     const view = new View({
