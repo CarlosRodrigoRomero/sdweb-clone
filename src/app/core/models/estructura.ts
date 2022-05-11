@@ -263,6 +263,17 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     return { top, bottom, left, right } as RectanguloInterface;
   }
 
+  getPolygonPc(columna: number, fila: number): any[] {
+    const cuadrilatero = this.getCuadrilatero(columna, fila);
+
+    return [
+      { x: cuadrilatero.tl.x, y: cuadrilatero.tl.y },
+      { x: cuadrilatero.tr.x, y: cuadrilatero.tr.y },
+      { x: cuadrilatero.br.x, y: cuadrilatero.br.y },
+      { x: cuadrilatero.bl.x, y: cuadrilatero.bl.y },
+    ];
+  }
+
   getRectanguloAutoEst(fila: number, columna: number) {
     const rect = this.estructuraCoords[fila - 1][columna - 1];
 

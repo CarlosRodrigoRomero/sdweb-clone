@@ -22,6 +22,7 @@ export interface PcInterface {
   img_top?: number;
   img_width?: number;
   img_height?: number;
+  coords?: number[][];
   img_x?: number;
   img_y?: number;
   local_id?: number;
@@ -46,6 +47,7 @@ export interface PcInterface {
   refLeft?: number;
   refHeight?: number;
   refWidth?: number;
+  coordsRef?: number[][];
   camaraNombre?: string;
   camaraLente?: string;
   camaraSN?: number;
@@ -82,6 +84,7 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   temperaturaMax?: number;
   temperaturaMedia?: number;
   temperaturaRef?: number;
+  coords?: number[][];
   img_left?: number;
   img_top?: number;
   img_width?: number;
@@ -106,6 +109,7 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   gradiente?: number;
   gradienteNormalizado?: number;
   polygonCoords?: Array<Array<number>>;
+  coordsRef?: number[][];
   refTop?: number;
   refLeft?: number;
   refHeight?: number;

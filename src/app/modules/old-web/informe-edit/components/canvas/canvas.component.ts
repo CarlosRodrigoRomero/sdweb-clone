@@ -525,6 +525,16 @@ export class CanvasComponent implements OnInit {
   }
 
   private drawPcInCanvas(pc: PcInterface) {
+    if (pc.hasOwnProperty('coords')) {
+      // primero comprovamos las PC tipo poligono
+      this.drawPolygonsInCanvas(pc);
+    } else {
+      // luego las tipo rectangulo
+      this.drawRectsInCanvas(pc);
+    }
+  }
+
+  private drawRectsInCanvas(pc: PcInterface) {
     const rect2 = new fabric.Rect({
       left: pc.img_left,
       top: pc.img_top,
@@ -588,6 +598,39 @@ export class CanvasComponent implements OnInit {
 
     this.canvas.add(rect);
     this.canvas.add(rectRef);
+
+    this.canvas.renderAll();
+  }
+
+  private drawPolygonsInCanvas(pc: PcInterface) {
+    const polygon = new fabric.Polygon(pc.coords, {
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'white',
+      strokeWidth: 2,
+      selectable: false,
+      objectCaching: false,
+      hoverCursor: 'pointer',
+      id: pc.id,
+      ref: false,
+      hasRotatingPoint: false,
+      hasControls: false,
+    });
+
+    const polygonRef = new fabric.Polygon(pc.coordsRef, {
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'blue',
+      strokeWidth: 2,
+      selectable: true,
+      objectCaching: false,
+      hoverCursor: 'pointer',
+      id: pc.id,
+      ref: true,
+      hasRotatingPoint: false,
+      hasControls: true,
+    });
+
+    this.canvas.add(polygon);
+    this.canvas.add(polygonRef);
 
     this.canvas.renderAll();
   }
@@ -740,6 +783,7 @@ export class CanvasComponent implements OnInit {
     let estEncontrada = null;
     if (this.estructuraList !== null) {
       this.estructuraList.some((est) => {
+        // primero las autoestructuras
         if (est.estructuraMatrix === null) {
           est.estructuraCoords.some((fila) => {
             fila.some((modulo) => {
@@ -799,10 +843,12 @@ export class CanvasComponent implements OnInit {
     let columna: number;
     let columnaReal: number;
     let filaReal: number;
-    let rectInteriorPc: RectanguloInterface;
+    // let rectInteriorPc: RectanguloInterface;
+    let polygonPc: number[][];
 
     // Referencia
-    let rectInteriorRef: RectanguloInterface;
+    let polygonRef: number[][];
+    // let rectInteriorRef: RectanguloInterface;
     let filaRef: number;
     let columnaRef: number;
 
@@ -810,32 +856,36 @@ export class CanvasComponent implements OnInit {
     const estructura = this.getEstructuraPunto(point);
     if (estructura !== null) {
       if (estructura.estructuraMatrix === null) {
+        // autoestructuras
         [fila, columna] = estructura.getFilaColumnaAutoEst(event.offsetX, event.offsetY);
 
         [filaReal, columnaReal] = [fila, columna];
         [columnaRef, filaRef] = estructura.getFilaColumnaRef(columna, fila);
 
-        rectInteriorPc = estructura.getRectanguloAutoEst(fila, columna);
-        rectInteriorRef = estructura.getRectanguloAutoEst(filaRef, columnaRef);
+        // rectInteriorPc = estructura.getRectanguloAutoEst(fila, columna);
+        // rectInteriorRef = estructura.getRectanguloAutoEst(filaRef, columnaRef);
       } else {
+        // estructuras
         [fila, columna] = estructura.calcularFilaColumna(event.offsetX, event.offsetY);
 
         [columnaReal, filaReal] = estructura.getLocalCoordsFromEstructura(columna, fila);
         [columnaRef, filaRef] = estructura.getFilaColumnaRef(columna, fila);
 
-        if (event.altKey) {
-          rectInteriorPc = estructura.getRectanguloExterior(columna, fila);
-          rectInteriorRef = estructura.getRectanguloExterior(columnaRef, filaRef);
-        } else {
-          rectInteriorPc = estructura.getRectanguloInterior(columna, fila);
-          rectInteriorRef = estructura.getRectanguloInterior(columnaRef, filaRef);
-        }
+        polygonPc = estructura.getPolygonPc(columna, fila);
+        polygonRef = estructura.getPolygonPc(columnaRef, filaRef);
+        // if (event.altKey) {
+        //   rectInteriorPc = estructura.getRectanguloExterior(columna, fila);
+        //   rectInteriorRef = estructura.getRectanguloExterior(columnaRef, filaRef);
+        // } else {
+        //   rectInteriorPc = estructura.getRectanguloInterior(columna, fila);
+        //   rectInteriorRef = estructura.getRectanguloInterior(columnaRef, filaRef);
+        // }
 
         // tamaño por defecto cuando no hay estructura
-        this.setSquareBase(
-          this.planta,
-          Math.min(rectInteriorPc.bottom - rectInteriorPc.top, rectInteriorPc.right - rectInteriorPc.left)
-        );
+        // this.setSquareBase(
+        //   this.planta,
+        //   Math.min(rectInteriorPc.bottom - rectInteriorPc.top, rectInteriorPc.right - rectInteriorPc.left)
+        // );
       }
 
       // Localizaciones
@@ -856,10 +906,8 @@ export class CanvasComponent implements OnInit {
         globalCoords, //
         gps_lng: estructura.getLatLng().lng,
         gps_lat: estructura.getLatLng().lat,
-        img_left: rectInteriorPc.left,
-        img_top: rectInteriorPc.top,
-        img_width: rectInteriorPc.right - rectInteriorPc.left,
-        img_height: rectInteriorPc.bottom - rectInteriorPc.top,
+        coords: polygonPc,
+        coordsRef: polygonRef,
         img_x: 0, // coordenadas raw del punto mas caliente
         img_y: 0, // coordenadas raw del punto mas caliente
         local_id: this.localIdCount,
@@ -867,10 +915,6 @@ export class CanvasComponent implements OnInit {
         informeId: this.informeId,
         datetime: this.currentDatetime,
         resuelto: false,
-        refLeft: rectInteriorRef.left,
-        refTop: rectInteriorRef.top,
-        refWidth: rectInteriorRef.right - rectInteriorRef.left,
-        refHeight: rectInteriorRef.bottom - rectInteriorRef.top,
         modulo,
       };
 
@@ -878,14 +922,20 @@ export class CanvasComponent implements OnInit {
       const pcInCanvas = this.checkIfPcInCanvas();
       if (pcInCanvas) {
         const selectedPc = pcInCanvas as Pc;
-        newPc.refHeight = selectedPc.refHeight;
-        newPc.refWidth = selectedPc.refWidth;
-        newPc.refTop = selectedPc.refTop;
-        newPc.refLeft = selectedPc.refLeft;
-        if (event.shiftKey) {
-          newPc.img_width = selectedPc.img_width;
-          newPc.img_height = selectedPc.img_height;
+        if (pcInCanvas.hasOwnProperty('coords')) {
+          // PCs tipo poligono
+          newPc.coordsRef = selectedPc.coordsRef;
+        } else {
+          // PCs tipo rectangulo
+          newPc.refHeight = selectedPc.refHeight;
+          newPc.refWidth = selectedPc.refWidth;
+          newPc.refTop = selectedPc.refTop;
+          newPc.refLeft = selectedPc.refLeft;
+
+          // borramos la nueva ref para seguir usando la angigua
+          delete newPc.coordsRef;
         }
+
         if (!this.estructura) {
           if (selectedPc.archivo === newPc.archivo && this.planta.tipo === 'seguidores') {
             newPc.globalCoords = selectedPc.globalCoords;
