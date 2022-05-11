@@ -495,14 +495,14 @@ export class CanvasComponent implements OnInit {
         fila.forEach((modulo, index) => {
           const puntos = [
             { x: modulo[0][0], y: modulo[0][1] },
+            { x: modulo[1][0], y: modulo[1][1] },
             { x: modulo[2][0], y: modulo[2][1] },
             { x: modulo[3][0], y: modulo[3][1] },
-            { x: modulo[1][0], y: modulo[1][1] },
           ];
 
           const polygon = new fabric.Polygon(puntos, {
             left: modulo[0][0],
-            top: modulo[0][1],
+            top: modulo[2][1],
             fill: 'rgba(0,0,0,0)',
             stroke: '#2874A6',
             strokeWidth: 0.5,
@@ -607,13 +607,13 @@ export class CanvasComponent implements OnInit {
       fill: 'rgba(0,0,0,0)',
       stroke: 'white',
       strokeWidth: 2,
-      selectable: false,
+      selectable: true,
       objectCaching: false,
       hoverCursor: 'pointer',
       id: pc.id,
       ref: false,
       hasRotatingPoint: false,
-      hasControls: false,
+      hasControls: true,
     });
 
     const polygonRef = new fabric.Polygon(pc.coordsRef, {
@@ -862,8 +862,8 @@ export class CanvasComponent implements OnInit {
         [filaReal, columnaReal] = [fila, columna];
         [columnaRef, filaRef] = estructura.getFilaColumnaRef(columna, fila);
 
-        // rectInteriorPc = estructura.getRectanguloAutoEst(fila, columna);
-        // rectInteriorRef = estructura.getRectanguloAutoEst(filaRef, columnaRef);
+        polygonPc = estructura.getPolygonPc(columna, fila);
+        polygonRef = estructura.getPolygonPc(columnaRef, filaRef);
       } else {
         // estructuras
         [fila, columna] = estructura.calcularFilaColumna(event.offsetX, event.offsetY);
@@ -873,13 +873,6 @@ export class CanvasComponent implements OnInit {
 
         polygonPc = estructura.getPolygonPc(columna, fila);
         polygonRef = estructura.getPolygonPc(columnaRef, filaRef);
-        // if (event.altKey) {
-        //   rectInteriorPc = estructura.getRectanguloExterior(columna, fila);
-        //   rectInteriorRef = estructura.getRectanguloExterior(columnaRef, filaRef);
-        // } else {
-        //   rectInteriorPc = estructura.getRectanguloInterior(columna, fila);
-        //   rectInteriorRef = estructura.getRectanguloInterior(columnaRef, filaRef);
-        // }
 
         // tamaño por defecto cuando no hay estructura
         // this.setSquareBase(

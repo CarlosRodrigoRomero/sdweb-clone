@@ -318,6 +318,7 @@ export class InformeService {
         actions.map((a) => {
           const data = a.payload.doc.data() as EstructuraInterface;
           data.id = a.payload.doc.id;
+
           return new Estructura(data);
         })
       )

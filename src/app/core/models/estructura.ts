@@ -162,8 +162,10 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
         array[index] = Object.values(fila);
       });
       array.forEach((fila, indexF) => {
-        fila.forEach((columna, indexC) => {
-          array[indexF][indexC] = Object.values(columna);
+        fila.forEach((col, indexC) => {
+          const columna = coords[indexF + 1][indexC + 1];
+
+          array[indexF][indexC] = [columna.tl, columna.tr, columna.br, columna.bl];
         });
       });
 
@@ -196,7 +198,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     });
   }
 
-  getCuadrilatero(columna: number, fila: number): CuadrilateroInterface {
+  getPolygonPointsEst(columna: number, fila: number): CuadrilateroInterface {
     const p1 = this.estructuraMatrix[fila - 1][columna - 1] as Point;
     const p2 = this.estructuraMatrix[fila - 1][columna] as Point;
     const p3 = this.estructuraMatrix[fila][columna] as Point;
@@ -210,6 +212,17 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     const topRight = this.getTrBl(others)[1];
 
     return { tl: topLeft, tr: topRight, br: bottomRight, bl: bottomLeft } as CuadrilateroInterface;
+  }
+
+  getPolygonPointsAutoEst(columna: number, fila: number): CuadrilateroInterface {
+    const polygon = this.estructuraCoords[fila - 1][columna - 1];
+
+    const tl = { x: polygon[0][0], y: polygon[0][1] } as Point;
+    const tr = { x: polygon[1][0], y: polygon[1][1] } as Point;
+    const br = { x: polygon[2][0], y: polygon[2][1] } as Point;
+    const bl = { x: polygon[3][0], y: polygon[3][1] } as Point;
+
+    return { tl, tr, br, bl } as CuadrilateroInterface;
   }
 
   getFilaColumnaRef(columna: number, fila: number): number[] {
@@ -242,7 +255,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   }
 
   getRectanguloExterior(columna: number, fila: number): RectanguloInterface {
-    const cuadrilatero = this.getCuadrilatero(columna, fila);
+    const cuadrilatero = this.getPolygonPointsEst(columna, fila);
 
     const top = Math.round(Math.min(cuadrilatero.tr.y, cuadrilatero.tl.y));
     const left = Math.round(Math.min(cuadrilatero.bl.x, cuadrilatero.tl.x));
@@ -253,7 +266,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   }
 
   getRectanguloInterior(columna: number, fila: number): RectanguloInterface {
-    const cuadrilatero = this.getCuadrilatero(columna, fila);
+    const cuadrilatero = this.getPolygonPointsEst(columna, fila);
 
     const top = Math.round(Math.max(cuadrilatero.tr.y, cuadrilatero.tl.y));
     const left = Math.round(Math.max(cuadrilatero.bl.x, cuadrilatero.tl.x));
@@ -264,20 +277,19 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   }
 
   getPolygonPc(columna: number, fila: number): any[] {
-    const cuadrilatero = this.getCuadrilatero(columna, fila);
+    let polygon;
+    if (this.estructuraMatrix === null) {
+      polygon = this.getPolygonPointsAutoEst(columna, fila);
+    } else {
+      polygon = this.getPolygonPointsEst(columna, fila);
+    }
 
     return [
-      { x: cuadrilatero.tl.x, y: cuadrilatero.tl.y },
-      { x: cuadrilatero.tr.x, y: cuadrilatero.tr.y },
-      { x: cuadrilatero.br.x, y: cuadrilatero.br.y },
-      { x: cuadrilatero.bl.x, y: cuadrilatero.bl.y },
+      { x: polygon.tl.x, y: polygon.tl.y },
+      { x: polygon.tr.x, y: polygon.tr.y },
+      { x: polygon.br.x, y: polygon.br.y },
+      { x: polygon.bl.x, y: polygon.bl.y },
     ];
-  }
-
-  getRectanguloAutoEst(fila: number, columna: number) {
-    const rect = this.estructuraCoords[fila - 1][columna - 1];
-
-    return { top: rect[2][1], bottom: rect[0][1], left: rect[0][0], right: rect[1][0] } as RectanguloInterface;
   }
 
   getFilaColumnaAutoEst(x: number, y: number): any[] {
