@@ -100,7 +100,7 @@ export class InformeService {
     );
   }
 
-  getInformesDePlanta(plantaId: string): Observable<InformeInterface[]> {
+  getInformesDisponiblesDePlanta(plantaId: string): Observable<InformeInterface[]> {
     const query$ = this.afs.collection<InformeInterface>('informes', (ref) => ref.where('plantaId', '==', plantaId));
     return query$.snapshotChanges().pipe(
       map((actions) =>
@@ -115,6 +115,28 @@ export class InformeService {
       ),
       // solo traemos los disponibles
       map((informes) => informes.filter((informe) => informe.disponible)),
+      // los ordenamos por fecha
+      map((informes) => informes.sort((a, b) => a.fecha - b.fecha)),
+      // nos quedamos con los 2 más recientes por el momento
+      map((informes) =>
+        informes.filter((informe, index) => index === informes.length - 1 || index === informes.length - 2)
+      )
+    );
+  }
+
+  getInformesDePlanta(plantaId: string): Observable<InformeInterface[]> {
+    const query$ = this.afs.collection<InformeInterface>('informes', (ref) => ref.where('plantaId', '==', plantaId));
+    return query$.snapshotChanges().pipe(
+      map((actions) =>
+        actions.map((a) => {
+          const data = a.payload.doc.data() as InformeInterface;
+          data.id = a.payload.doc.id;
+          if (data.tiposAnomalias !== undefined && data.tiposAnomalias !== null) {
+            data.tiposAnomalias = Object.values(data.tiposAnomalias);
+          }
+          return data;
+        })
+      ),
       // los ordenamos por fecha
       map((informes) => informes.sort((a, b) => a.fecha - b.fecha)),
       // nos quedamos con los 2 más recientes por el momento

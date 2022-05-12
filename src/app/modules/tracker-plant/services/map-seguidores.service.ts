@@ -34,7 +34,7 @@ export class MapSeguidoresService {
   initService(plantaId: string) {
     this.plantaId = plantaId;
 
-    this.informeService.getInformesDePlanta(this.plantaId).subscribe((informes) => {
+    this.informeService.getInformesDisponiblesDePlanta(this.plantaId).subscribe((informes) => {
       // los ordenamos de menos a mas reciente y los añadimos a la lista
       informes
         .sort((a, b) => a.fecha - b.fecha)

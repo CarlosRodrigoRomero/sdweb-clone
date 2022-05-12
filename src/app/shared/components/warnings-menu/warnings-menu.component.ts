@@ -83,7 +83,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
             this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
 
             return combineLatest([
-              this.informeService.getInformesDePlanta(this.reportControlService.plantaId),
+              this.informeService.getInformesDisponiblesDePlanta(this.reportControlService.plantaId),
               this.plantaService.getPlanta(this.reportControlService.plantaId),
               this.plantaService.getLocationsArea(this.reportControlService.plantaId),
               this.warningService.getWarnings(this.selectedInforme.id),
@@ -124,7 +124,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
             this.allSeguidores.forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
 
             return combineLatest([
-              this.informeService.getInformesDePlanta(this.reportControlService.plantaId),
+              this.informeService.getInformesDisponiblesDePlanta(this.reportControlService.plantaId),
               this.plantaService.getPlanta(this.reportControlService.plantaId),
               this.plantaService.getLocationsArea(this.reportControlService.plantaId),
               this.warningService.getWarnings(this.selectedInforme.id),

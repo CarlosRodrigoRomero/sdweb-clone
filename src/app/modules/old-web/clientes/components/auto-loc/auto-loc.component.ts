@@ -205,7 +205,12 @@ export class AutoLocComponent implements OnInit, AfterViewInit {
       .getInformesDePlanta(this.plantaId)
       .pipe(take(1))
       .subscribe((informes) => {
-        const informeReciente = informes.pop();
+        let informeReciente = informes[0];
+        informes.forEach((informe) => {
+          if (informe.fecha > informeReciente.fecha) {
+            informeReciente = informe;
+          }
+        });
 
         if (informeReciente !== undefined) {
           if (informeReciente.fecha > GLOBAL.newReportsDate) {

@@ -722,7 +722,7 @@ export class PlantaService {
       const ortofoto = planta.ortofoto;
       map.setOptions({ maxZoom: ortofoto.mapMaxZoom });
       map.setOptions({ minZoom: ortofoto.mapMinZoom });
-      map.mapTypeId = 'roadmap';
+      map.mapTypeId = 'satellite';
       const mapBounds = new google.maps.LatLngBounds(
         new google.maps.LatLng(ortofoto.bounds.south, ortofoto.bounds.west),
         new google.maps.LatLng(ortofoto.bounds.north, ortofoto.bounds.east)
@@ -764,7 +764,7 @@ export class PlantaService {
     const mapMinZoom = planta.zoom - 2;
     const mapMaxZoom = planta.zoom + 8;
 
-    map.mapTypeId = 'roadmap';
+    map.mapTypeId = 'satellite';
     map.setOptions({ maxZoom: mapMaxZoom });
     map.setOptions({ minZoom: mapMinZoom });
 

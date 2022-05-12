@@ -48,7 +48,7 @@ export class SeguidorService {
 
           this.getDifferentLocAreas(plantaId);
 
-          return this.informeService.getInformesDePlanta(plantaId);
+          return this.informeService.getInformesDisponiblesDePlanta(plantaId);
         })
       )
       .pipe(

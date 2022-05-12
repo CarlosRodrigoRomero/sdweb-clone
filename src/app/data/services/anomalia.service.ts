@@ -106,7 +106,7 @@ export class AnomaliaService {
       this.planta = planta;
     }
 
-    const query$ = this.informeService.getInformesDePlanta(planta.id).pipe(
+    const query$ = this.informeService.getInformesDisponiblesDePlanta(planta.id).pipe(
       take(1),
       switchMap((informes) => {
         // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua

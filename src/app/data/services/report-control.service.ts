@@ -89,7 +89,7 @@ export class ReportControlService {
                 switchMap((planta) => {
                   this.planta = planta;
 
-                  return this.informeService.getInformesDePlanta(this.plantaId);
+                  return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
                 }),
                 take(1),
                 // obtenemos los informes de la planta
@@ -220,7 +220,7 @@ export class ReportControlService {
                         switchMap((planta) => {
                           this.planta = planta;
 
-                          return this.informeService.getInformesDePlanta(this.plantaId);
+                          return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
                         }),
                         take(1),
                         // obtenemos los informes de la planta
@@ -276,7 +276,7 @@ export class ReportControlService {
           // iniciamos anomalia service para cargar los criterios la planta
           this.anomaliaService.initService(this.plantaId).then(() => {
             this.informeService
-              .getInformesDePlanta(this.plantaId)
+              .getInformesDisponiblesDePlanta(this.plantaId)
               .pipe(
                 take(1),
                 // obtenemos los informes de la planta
@@ -372,7 +372,7 @@ export class ReportControlService {
                   // iniciamos anomalia service para cargar los criterios la planta
                   this.anomaliaService.initService(this.plantaId).then(() =>
                     this.informeService
-                      .getInformesDePlanta(this.plantaId)
+                      .getInformesDisponiblesDePlanta(this.plantaId)
                       .pipe(
                         take(1),
                         // obtenemos los informes de la planta

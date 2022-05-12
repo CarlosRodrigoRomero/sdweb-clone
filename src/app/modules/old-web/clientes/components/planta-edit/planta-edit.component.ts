@@ -112,7 +112,7 @@ export class PlantaEditComponent implements OnInit {
   simularCriteriosClasificacion(criterio: CriteriosClasificacion) {
     // Obtener informes de la planta
     this.informeService
-      .getInformesDePlanta(this.plantaId)
+      .getInformesDisponiblesDePlanta(this.plantaId)
       .pipe(take(1))
       .subscribe((informes) => {
         informes.forEach((informe) => {
@@ -159,7 +159,7 @@ export class PlantaEditComponent implements OnInit {
 
     // Obtener informes de la planta
     this.informeService
-      .getInformesDePlanta(this.plantaId)
+      .getInformesDisponiblesDePlanta(this.plantaId)
       .pipe(take(1))
       .subscribe((informes) => {
         informes.forEach((informe) => {
