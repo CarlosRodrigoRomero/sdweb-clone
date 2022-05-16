@@ -37,6 +37,9 @@ export class CanvasComponent implements OnInit {
   @Input() pcsOrEstructuras: boolean;
   @Input() carpetaJpgGray: string;
   @Input() currentDatetime: number;
+  @Input() currentCamera: string;
+  @Input() currentCameraSN: number;
+  @Input() currentTlinearGain: number;
   @Input() currentTrackheading: number;
   @Input() currentImageRotation: number;
 
@@ -909,6 +912,9 @@ export class CanvasComponent implements OnInit {
         datetime: this.currentDatetime,
         resuelto: false,
         modulo,
+        camaraNombre: this.currentCamera,
+        camaraSN: this.currentCameraSN,
+        TlinearGain: this.currentTlinearGain,
       };
 
       //

@@ -41,7 +41,7 @@ export class InformeEditComponent implements OnInit {
   public defaultZoom: number;
   public fileList: string[];
 
-  public coords;
+  public flightData;
   public event: MouseEvent;
   public currentTrackheading: number;
   public currentImageRotation: number;
@@ -55,6 +55,9 @@ export class InformeEditComponent implements OnInit {
   public imageWidth: number;
   public imageHeight: number;
   public currentDatetime: number;
+  currentCameraSN: number;
+  currentTlinearGain: number;
+  currentCamera: string;
   public manualRotation: boolean;
   private gmtHoursDiff: number;
   public lastRef: number[];
@@ -139,7 +142,7 @@ export class InformeEditComponent implements OnInit {
 
     this.rangeValue = 0;
     this.fileList = new Array();
-    this.coords = new Array();
+    this.flightData = new Array();
 
     // this.max_temp = 70;
     // this.min_temp = 41;
@@ -197,7 +200,7 @@ export class InformeEditComponent implements OnInit {
     const arrayIndex = this.fileList.indexOf(archivoVuelo.archivo);
     this.rangeValue = arrayIndex + 1;
 
-    const currentCcoords = this.coords[arrayIndex];
+    const currentCcoords = this.flightData[arrayIndex];
 
     // Setear droneLatLng (para que se extienda a todos los childs)
     this.informeService.droneLatLng.next({
@@ -206,6 +209,9 @@ export class InformeEditComponent implements OnInit {
     });
 
     this.currentDatetime = this.getDateTimeFromDateAndTime(currentCcoords.Date, currentCcoords.Time);
+    this.currentCamera = currentCcoords.Camera;
+    this.currentCameraSN = Number(currentCcoords.CameraSerialNumber);
+    this.currentTlinearGain = Number(currentCcoords.TlinearGain);
     this.currentTrackheading = Math.round(currentCcoords.TrackHeading);
     this.currentImageRotation = this.getCurrentImageRotation(this.currentTrackheading);
   }
@@ -532,7 +538,7 @@ export class InformeEditComponent implements OnInit {
     if (this.currentFlight !== flightName) {
       this.currentFlight = flightName;
       this.fileList = this.flightsData[flightName].files;
-      this.coords = this.flightsData[flightName].coords;
+      this.flightData = this.flightsData[flightName].coords;
     }
   }
 

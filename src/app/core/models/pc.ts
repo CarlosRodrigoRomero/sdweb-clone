@@ -67,6 +67,7 @@ export interface PcInterface {
   clase?: number;
   numeroSerie?: string;
   globalCoords?: any[];
+  TlinearGain?: number;
 }
 
 export class Pc implements PcInterface, ElementoPlantaInterface {
@@ -133,6 +134,7 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   clase?: number;
   numeroSerie?: string;
   globalCoords?: any[];
+  TlinearGain?: number;
 
   constructor(pc: PcInterface) {
     Object.assign(this, pc);
