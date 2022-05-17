@@ -208,7 +208,7 @@ export class InformeEditComponent implements OnInit {
       lng: parseFloat(currentCcoords.Longitude),
     });
 
-    this.currentDatetime = this.getDateTimeFromDateAndTime(currentCcoords.Date, currentCcoords.Time);
+    this.currentDatetime = currentCcoords.Datetime;
     this.currentCamera = currentCcoords.Camera;
     this.currentCameraSN = Number(currentCcoords.CameraSerialNumber);
     this.currentTlinearGain = Number(currentCcoords.TlinearGain);
