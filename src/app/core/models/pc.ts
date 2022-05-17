@@ -22,7 +22,7 @@ export interface PcInterface {
   img_top?: number;
   img_width?: number;
   img_height?: number;
-  coords?: number[][];
+  coords?: any[];
   img_x?: number;
   img_y?: number;
   local_id?: number;
@@ -47,7 +47,7 @@ export interface PcInterface {
   refLeft?: number;
   refHeight?: number;
   refWidth?: number;
-  coordsRef?: number[][];
+  coordsRef?: any[];
   camaraNombre?: string;
   camaraLente?: string;
   camaraSN?: number;

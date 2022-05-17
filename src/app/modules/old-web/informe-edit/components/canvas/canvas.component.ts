@@ -85,6 +85,7 @@ export class CanvasComponent implements OnInit {
   public successMessage: string;
   public alertMessage: string;
   currentLatLng: LatLngLiteral;
+  private elementSelectedOrigin: any;
 
   constructor(
     public informeService: InformeService,
@@ -616,7 +617,8 @@ export class CanvasComponent implements OnInit {
       id: pc.id,
       ref: false,
       hasRotatingPoint: false,
-      hasControls: true,
+      hasControls: false,
+      type: 'polygon',
     });
 
     const polygonRef = new fabric.Polygon(pc.coordsRef, {
@@ -629,7 +631,8 @@ export class CanvasComponent implements OnInit {
       id: pc.id,
       ref: true,
       hasRotatingPoint: false,
-      hasControls: true,
+      hasControls: false,
+      type: 'polygon',
     });
 
     this.canvas.add(polygon);
@@ -692,6 +695,16 @@ export class CanvasComponent implements OnInit {
       }
     });
 
+    // Seleccionar pcs
+    this.canvas.on('mouse:down', (options) => {
+      if (options.hasOwnProperty('target') && options.target !== null) {
+        if (options.target.hasOwnProperty('ref')) {
+          // seleccionamos el origen del movimiento
+          this.elementSelectedOrigin = options.target.aCoords.tl;
+        }
+      }
+    });
+
     // Creacion de Estructura con boton derecho
     this.canvas.on('mouse:down', (options) => {
       if ((options.button === 3 || (options.button === 1 && options.e.ctrlKey)) && !this.polygonMode) {
@@ -733,8 +746,6 @@ export class CanvasComponent implements OnInit {
       if (options.target !== null && options.target.hasOwnProperty('ref')) {
         const selectedPc = this.allPcs.find((item) => item.id === options.target.id);
         this.informeService.selectElementoPlanta(selectedPc);
-
-        ///////////////////
       }
     });
     ///////////////////////////////////////////////////
@@ -742,37 +753,50 @@ export class CanvasComponent implements OnInit {
     // Seleccionar al hacer click
     this.canvas.on('mouse:up', (options) => {});
 
+    // al mover o modificar
     this.canvas.on('object:modified', (options) => {
-      // En el caso de que sea un
+      // En el caso de que sea una anomalia
       if (options.target !== null && options.target.hasOwnProperty('ref')) {
-        const actObjRaw = this.transformActObjToRaw(options.target);
-        // this.selectPcFromLocalId(options.target.local_id);
+        const actObjRaw = options.target;
 
         if (actObjRaw.ref === true) {
-          this.selectedPc.refTop = Math.round(actObjRaw.top);
+          if (actObjRaw.hasOwnProperty('type') && actObjRaw.type === 'polygon') {
+            // asignamos las nuevas coordenadas
+            const newOrigin = actObjRaw.aCoords.tl;
+            const coordsRef = this.getNewCoords(this.selectedPc.coordsRef, newOrigin);
+            this.selectedPc.coordsRef = coordsRef;
+          } else {
+            // antiguos rectangulos
+            this.selectedPc.refTop = Math.round(actObjRaw.top);
 
-          this.selectedPc.refLeft = Math.round(actObjRaw.left);
-          this.selectedPc.refWidth = Math.round(
-            Math.abs(actObjRaw.aCoords.tr.x - actObjRaw.aCoords.tl.x) - actObjRaw.strokeWidth / 2
-          );
-          this.selectedPc.refHeight = Math.round(
-            Math.abs(actObjRaw.aCoords.bl.y - actObjRaw.aCoords.tl.y) - actObjRaw.strokeWidth / 2
-          );
+            this.selectedPc.refLeft = Math.round(actObjRaw.left);
+            this.selectedPc.refWidth = Math.round(
+              Math.abs(actObjRaw.aCoords.tr.x - actObjRaw.aCoords.tl.x) - actObjRaw.strokeWidth / 2
+            );
+            this.selectedPc.refHeight = Math.round(
+              Math.abs(actObjRaw.aCoords.bl.y - actObjRaw.aCoords.tl.y) - actObjRaw.strokeWidth / 2
+            );
+          }
         } else {
-          this.selectedPc.img_top = Math.round(actObjRaw.top);
-          this.selectedPc.img_left = Math.round(actObjRaw.left);
-          this.selectedPc.img_width = Math.round(
-            Math.abs(actObjRaw.aCoords.tr.x - actObjRaw.aCoords.tl.x) - actObjRaw.strokeWidth / 2
-          );
-          this.selectedPc.img_height = Math.round(
-            Math.abs(actObjRaw.aCoords.bl.y - actObjRaw.aCoords.tl.y) - actObjRaw.strokeWidth / 2
-          );
+          if (actObjRaw.hasOwnProperty('type') && actObjRaw.type === 'polygon') {
+            // asignamos las nuevas coordenadas
+            const newOrigin = actObjRaw.aCoords.tl;
+            const coords = this.getNewCoords(this.selectedPc.coords, newOrigin);
+            this.selectedPc.coords = coords;
+          } else {
+            // antiguos rectangulos
+            this.selectedPc.img_top = Math.round(actObjRaw.top);
+            this.selectedPc.img_left = Math.round(actObjRaw.left);
+            this.selectedPc.img_width = Math.round(
+              Math.abs(actObjRaw.aCoords.tr.x - actObjRaw.aCoords.tl.x) - actObjRaw.strokeWidth / 2
+            );
+            this.selectedPc.img_height = Math.round(
+              Math.abs(actObjRaw.aCoords.bl.y - actObjRaw.aCoords.tl.y) - actObjRaw.strokeWidth / 2
+            );
+          }
         }
         this.pcService.updatePc(this.selectedPc);
-      } else if (options.target.type === 'polygon') {
       }
-
-      // this.canvas.on('object:modified', this.onObjectModified);
     });
   }
 
@@ -780,6 +804,21 @@ export class CanvasComponent implements OnInit {
     return puntos.map((p) => {
       return [p.x, p.y];
     });
+  }
+
+  private pointsToDB(puntos: Point[]) {
+    return puntos.map((p) => {
+      return { x: p.x, y: p.y };
+    });
+  }
+
+  private getNewCoords(coords: any[], newOrigin: any): any[] {
+    const difX = newOrigin.x - this.elementSelectedOrigin.x;
+    const difY = newOrigin.y - this.elementSelectedOrigin.y;
+    const newCoords = coords.map((p) => {
+      return { x: p.x + difX, y: p.y + difY };
+    });
+    return newCoords;
   }
 
   private getEstructuraPunto(punto: Point) {
@@ -912,10 +951,21 @@ export class CanvasComponent implements OnInit {
         datetime: this.currentDatetime,
         resuelto: false,
         modulo,
-        camaraNombre: this.currentCamera,
-        camaraSN: this.currentCameraSN,
-        TlinearGain: this.currentTlinearGain,
       };
+
+      if (this.currentCamera !== undefined) {
+        newPc.camaraNombre = this.currentCamera;
+      }
+      if (this.currentCameraSN !== undefined && this.currentCameraSN !== null && !isNaN(this.currentCameraSN)) {
+        newPc.camaraSN = this.currentCameraSN;
+      }
+      if (
+        this.currentTlinearGain !== undefined &&
+        this.currentTlinearGain !== null &&
+        !isNaN(this.currentTlinearGain)
+      ) {
+        newPc.TlinearGain = this.currentTlinearGain;
+      }
 
       //
       const pcInCanvas = this.checkIfPcInCanvas();
@@ -1197,41 +1247,5 @@ export class CanvasComponent implements OnInit {
       this.squareHeight = this.squareBase;
       this.squareWidth = Math.round(this.squareHeight * this.squareProp);
     }
-  }
-
-  private transformActObjToRaw(actObj) {
-    let left: number;
-    let top: number;
-    let width: number;
-    let height: number;
-
-    // Los angulos de rotacion son positivos en sentido horario
-    if (this.currentImageRotation === 270 || this.currentImageRotation === -90) {
-      left = this.imageWidth - actObj.top - actObj.height;
-      top = actObj.left;
-      width = actObj.height;
-      height = actObj.width;
-    } else if (this.currentImageRotation === 180) {
-      left = this.imageWidth - actObj.left - actObj.width;
-      top = this.imageHeight - actObj.top - actObj.height;
-      width = actObj.width;
-      height = actObj.height;
-    } else if (this.currentImageRotation === 90) {
-      left = actObj.top;
-      top = this.imageHeight - actObj.left - actObj.height;
-      width = actObj.height;
-      height = actObj.width;
-    } else {
-      left = actObj.left;
-      top = actObj.top;
-      width = actObj.width;
-      height = actObj.height;
-    }
-    actObj.left = left;
-    actObj.top = top;
-    actObj.width = width;
-    actObj.height = height;
-
-    return actObj;
   }
 }
