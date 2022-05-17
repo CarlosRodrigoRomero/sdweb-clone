@@ -68,6 +68,8 @@ export interface PcInterface {
   numeroSerie?: string;
   globalCoords?: any[];
   TlinearGain?: number;
+  FrameNumber?: number;
+  FrameRate?: number;
 }
 
 export class Pc implements PcInterface, ElementoPlantaInterface {
@@ -135,6 +137,8 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   numeroSerie?: string;
   globalCoords?: any[];
   TlinearGain?: number;
+  FrameNumber?: number;
+  FrameRate?: number;
 
   constructor(pc: PcInterface) {
     Object.assign(this, pc);

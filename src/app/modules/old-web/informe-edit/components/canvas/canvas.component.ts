@@ -42,6 +42,8 @@ export class CanvasComponent implements OnInit {
   @Input() currentTlinearGain: number;
   @Input() currentTrackheading: number;
   @Input() currentImageRotation: number;
+  @Input() currentFrameNumber: number;
+  @Input() currentFrameRate: number;
 
   @Input() set planta$(obs: Observable<PlantaInterface>) {
     obs.pipe(take(1)).subscribe((planta) => {
@@ -931,7 +933,7 @@ export class CanvasComponent implements OnInit {
       // Creamos el nuevo PC
       this.localIdCount += 1;
 
-      const newPc: PcInterface = {
+      let newPc: PcInterface = {
         id: '',
         archivo: this.informeService.selectedArchivoVuelo.archivo,
         vuelo: this.informeService.selectedArchivoVuelo.vuelo,
@@ -953,21 +955,8 @@ export class CanvasComponent implements OnInit {
         modulo,
       };
 
-      if (this.currentCamera !== undefined) {
-        newPc.camaraNombre = this.currentCamera;
-      }
-      if (this.currentCameraSN !== undefined && this.currentCameraSN !== null && !isNaN(this.currentCameraSN)) {
-        newPc.camaraSN = this.currentCameraSN;
-      }
-      if (
-        this.currentTlinearGain !== undefined &&
-        this.currentTlinearGain !== null &&
-        !isNaN(this.currentTlinearGain)
-      ) {
-        newPc.TlinearGain = this.currentTlinearGain;
-      }
+      newPc = this.addNewPcProperties(newPc);
 
-      //
       const pcInCanvas = this.checkIfPcInCanvas();
       if (pcInCanvas) {
         const selectedPc = pcInCanvas as Pc;
@@ -1005,6 +994,27 @@ export class CanvasComponent implements OnInit {
       });
     }
   }
+
+  private addNewPcProperties(pc: PcInterface) {
+    if (this.currentCamera !== undefined) {
+      pc.camaraNombre = this.currentCamera;
+    }
+    if (this.currentCameraSN !== undefined && this.currentCameraSN !== null && !isNaN(this.currentCameraSN)) {
+      pc.camaraSN = this.currentCameraSN;
+    }
+    if (this.currentTlinearGain !== undefined && this.currentTlinearGain !== null && !isNaN(this.currentTlinearGain)) {
+      pc.TlinearGain = this.currentTlinearGain;
+    }
+    if (this.currentFrameNumber !== undefined && this.currentFrameNumber !== null && !isNaN(this.currentFrameNumber)) {
+      pc.FrameNumber = this.currentFrameNumber;
+    }
+    if (this.currentFrameRate !== undefined && this.currentFrameRate !== null && !isNaN(this.currentFrameRate)) {
+      pc.FrameRate = this.currentFrameRate;
+    }
+
+    return pc;
+  }
+
   checkIfPcInCanvas() {
     const pcsInCanvas = this.allPcs.filter((pc) => {
       return pc.archivo === this.informeService.selectedArchivoVuelo.archivo;

@@ -58,6 +58,8 @@ export class InformeEditComponent implements OnInit {
   currentCameraSN: number;
   currentTlinearGain: number;
   currentCamera: string;
+  currentFrameNumber: number;
+  currentFrameRate: number;
   public manualRotation: boolean;
   private gmtHoursDiff: number;
   public lastRef: number[];
@@ -208,10 +210,12 @@ export class InformeEditComponent implements OnInit {
       lng: parseFloat(currentCcoords.Longitude),
     });
 
-    this.currentDatetime = currentCcoords.Datetime;
+    this.currentDatetime = Number(currentCcoords.Datetime);
     this.currentCamera = currentCcoords.Camera;
     this.currentCameraSN = Number(currentCcoords.CameraSerialNumber);
     this.currentTlinearGain = Number(currentCcoords.TlinearGain);
+    this.currentFrameNumber = Number(currentCcoords.FrameNumber);
+    this.currentFrameRate = Number(currentCcoords.FrameRate);
     this.currentTrackheading = Math.round(currentCcoords.TrackHeading);
     this.currentImageRotation = this.getCurrentImageRotation(this.currentTrackheading);
   }
