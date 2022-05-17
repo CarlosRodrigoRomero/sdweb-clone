@@ -97,7 +97,7 @@ export class ReportEditComponent implements OnInit {
       humedadRelativa: [, [Validators.min(0), Validators.max(1)]],
       nubosidad: [, [Validators.min(0), Validators.max(8)]],
       gsd: [3],
-      correccHoraSrt: [8],
+      correccHoraSrt: [0],
       disponible: [false],
       vientoVelocidad: [],
       vientoDireccion: [, [Validators.min(0), Validators.max(360)]],

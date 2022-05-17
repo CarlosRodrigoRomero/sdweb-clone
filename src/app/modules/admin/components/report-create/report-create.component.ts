@@ -67,7 +67,7 @@ export class ReportCreateComponent implements OnInit {
       humedadRelativa: [, [Validators.required, Validators.min(0), Validators.max(1)]],
       nubosidad: [, [Validators.required, Validators.min(0), Validators.max(8)]],
       gsd: [3, [Validators.required]],
-      correccHoraSrt: [8, [Validators.required]],
+      correccHoraSrt: [0, [Validators.required]],
       disponible: [false, [Validators.required]],
       vientoVelocidad: [, [Validators.required]],
       vientoDireccion: [, [Validators.required, Validators.min(0), Validators.max(360)]],
