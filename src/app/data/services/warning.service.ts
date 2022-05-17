@@ -213,7 +213,7 @@ export class WarningService {
     }
   }
 
-  checkTiposAnoms(informe: InformeInterface, anomalias: Anomalia[], warns: Warning[]): boolean {
+  private checkTiposAnoms(informe: InformeInterface, anomalias: Anomalia[], warns: Warning[]): boolean {
     if (informe !== undefined && anomalias.length > 0) {
       if (informe.hasOwnProperty('tiposAnomalias') && informe.tiposAnomalias.length > 0) {
         // primero eliminamos la alerta antigua de no tener tipoAnoms si la hubiera
@@ -362,9 +362,9 @@ export class WarningService {
           type: 'filsColsPlantaSegs',
           visible: true,
         };
-      }
 
-      this.checkAddWarning(warning, warns, informe.id);
+        this.checkAddWarning(warning, warns, informe.id);
+      }
     } else {
       // eliminamos la alerta antigua si la hubiera
       if (planta.tipo === 'seguidores') {
