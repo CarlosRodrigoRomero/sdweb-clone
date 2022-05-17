@@ -153,15 +153,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     );
 
     // comprobamos el numero de anomalias para imprimir o no imagenes
-    this.subscriptions.add(
-      this.reportControlService.allFilterableElements$.subscribe((elems) => {
-        if (elems.length <= this.maxAnomsConImgs && elems.length > 0) {
-          this.reportPdfService.informeConImagenes = true;
-        } else {
-          this.reportPdfService.informeConImagenes = false;
-        }
-      })
-    );
+    // this.subscriptions.add(
+    //   combineLatest([
+    //     this.reportControlService.selectedInformeId$,
+    //     this.reportControlService.allFilterableElements$,
+    //   ]).subscribe(([informeId, elems]) => {
+
+    //     if (elems.length <= this.maxAnomsConImgs && elems.length > 0) {
+    //       this.reportPdfService.informeConImagenes = true;
+    //     } else {
+    //       this.reportPdfService.informeConImagenes = false;
+    //     }
+    //   })
+    // );
 
     this.subscriptions.add(
       this.imagesTilesService.layerInformeSelected$.subscribe((layer) => (this.layerInformeSelected = layer))
@@ -222,9 +226,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             this.selectedInforme = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
             if (this.reportControlService.plantaFija) {
-              this.anomaliasInforme = this.reportControlService.allFilterableElements as Anomalia[];
+              this.anomaliasInforme = this.reportControlService.allFilterableElements.filter(
+                (elem) => elem.informeId === informeId
+              ) as Anomalia[];
             } else {
-              const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
+              const allSeguidores = this.reportControlService.allFilterableElements.filter(
+                (elem) => elem.informeId === informeId
+              ) as Seguidor[];
               // filtramos los del informe actual y los ordenamos por globals
               this.seguidoresInforme = allSeguidores
                 .filter((seg) => seg.informeId === informeId)
@@ -245,6 +253,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
               // ordenamos la lista de anomalias por tipo
               this.anomaliasInforme = this.anomaliaService.sortAnomsByTipo(this.anomaliasInforme);
+            }
+
+            // comprobamos el numero de anomalias para imprimir o no imagenes
+            if (this.anomaliasInforme.length <= this.maxAnomsConImgs && this.anomaliasInforme.length > 0) {
+              this.reportPdfService.informeConImagenes = true;
+            } else {
+              this.reportPdfService.informeConImagenes = false;
             }
 
             return this.downloadReportService.seguidores1Eje$;
@@ -410,7 +425,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     return prefijo;
   }
 
-  public downloadPDF() {
+  private downloadPDF() {
     // cargamos los apartados del informe
     this.reportPdfService.loadApartadosInforme(this.planta, this.selectedInforme);
 
@@ -427,6 +442,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.imagesLoadService.loadChangingImages(this.selectedInforme.id);
 
     if (this.reportControlService.thereAreZones) {
+      // reseteamos el contador de planos cargados en cada descarga
+      this.imagesTilesService.imagesPlantaLoaded = 0;
       // cargamos las orto termica y visual de la planta
       this.getImgsPlanos();
     }
@@ -465,18 +482,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
         let downloads = 0;
 
-        this.subscriptions.add(
-          combineLatest([
-            this.countLoadedImages$,
-            this.countLoadedImagesSegs1EjeAnoms$,
-            this.countLoadedImagesSegs1EjeNoAnoms$,
-          ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
-            this.downloadReportService.progressBarValue = Math.round(
-              ((countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
-                (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
-                100
-            );
+        const subscription = combineLatest([
+          this.countLoadedImages$,
+          this.countLoadedImagesSegs1EjeAnoms$,
+          this.countLoadedImagesSegs1EjeNoAnoms$,
+        ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
+          this.downloadReportService.progressBarValue = Math.round(
+            ((countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
+              (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
+              100
+          );
 
+          // comprobamos que estan cargados los planos de la planta
+          this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
             // comprobamos que estan cargadas tb el resto de imagenes del PDF
             this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
               // Cuando se carguen todas las imágenes
@@ -494,64 +512,68 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                     this.downloadReportService.progressBarValue = 0;
 
                     this.downloadReportService.generatingDownload = false;
+
+                    subscription.unsubscribe();
                   });
                 this.downloadReportService.endingDownload = true;
 
                 downloads++;
               }
             });
-          })
-        );
+          });
+        });
       } else {
         // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
         let downloads = 0;
 
-        this.subscriptions.add(
-          this.countLoadedImages$.subscribe((countLoadedImgs) => {
-            this.downloadReportService.progressBarValue = Math.round(
-              (countLoadedImgs / this.anomaliasInforme.length) * 100
-            );
+        const subscription = this.countLoadedImages$.subscribe((countLoadedImgs) => {
+          this.downloadReportService.progressBarValue = Math.round(
+            (countLoadedImgs / this.anomaliasInforme.length) * 100
+          );
 
-            // comprobamos que estan cargados los planos de la planta
-            this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
-              // comprobamos que estan cargadas tb el resto de imagenes del PDF
-              this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-                // comprobamos si se van a cargar imagenes de anomalias
-                if (this.reportPdfService.informeConImagenes && this.reportPdfService.incluirImagenes) {
-                  // Cuando se carguen todas las imágenes
-                  if (planosLoaded && imagesLoaded && countLoadedImgs === this.countAnomalias && downloads === 0) {
-                    this.calcularInforme();
+          // comprobamos que estan cargados los planos de la planta
+          this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
+            // comprobamos que estan cargadas tb el resto de imagenes del PDF
+            this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
+              // comprobamos si se van a cargar imagenes de anomalias
+              if (this.reportPdfService.informeConImagenes && this.reportPdfService.incluirImagenes) {
+                // Cuando se carguen todas las imágenes
+                if (planosLoaded && imagesLoaded && countLoadedImgs === this.countAnomalias && downloads === 0) {
+                  this.calcularInforme();
 
-                    pdfMake
-                      .createPdf(this.getDocDefinition(this.imageListBase64))
-                      .download(this.getPrefijoInforme(), () => {
-                        this.downloadReportService.progressBarValue = 0;
-
-                        this.downloadReportService.generatingDownload = false;
-                      });
-                    this.downloadReportService.endingDownload = true;
-
-                    downloads++;
-                  }
-                } else {
-                  // Cuando se carguen todas las imágenes
-                  if (planosLoaded && imagesLoaded && downloads === 0) {
-                    this.calcularInforme();
-
-                    pdfMake.createPdf(this.getDocDefinition()).download(this.getPrefijoInforme(), () => {
+                  pdfMake
+                    .createPdf(this.getDocDefinition(this.imageListBase64))
+                    .download(this.getPrefijoInforme(), () => {
                       this.downloadReportService.progressBarValue = 0;
 
                       this.downloadReportService.generatingDownload = false;
-                    });
-                    this.downloadReportService.endingDownload = true;
 
-                    downloads++;
-                  }
+                      subscription.unsubscribe();
+                    });
+                  this.downloadReportService.endingDownload = true;
+
+                  downloads++;
                 }
-              });
+              } else {
+                // Cuando se carguen todas las imágenes
+                if (planosLoaded && imagesLoaded && downloads === 0) {
+                  this.calcularInforme();
+
+                  pdfMake.createPdf(this.getDocDefinition()).download(this.getPrefijoInforme(), () => {
+                    this.downloadReportService.progressBarValue = 0;
+
+                    this.downloadReportService.generatingDownload = false;
+
+                    subscription.unsubscribe();
+                  });
+                  this.downloadReportService.endingDownload = true;
+
+                  downloads++;
+                }
+              }
             });
-          })
-        );
+          });
+        });
       }
     } else {
       // PLANTAS SEGUIDORES
@@ -565,30 +587,30 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
       let downloads = 0;
 
-      this.subscriptions.add(
-        this.countLoadedImages$.subscribe((countLoadedImgs) => {
-          this.downloadReportService.progressBarValue = Math.round(
-            (countLoadedImgs / this.seguidoresInforme.length) * 100
-          );
+      const subscription = this.countLoadedImages$.subscribe((countLoadedImgs) => {
+        this.downloadReportService.progressBarValue = Math.round(
+          (countLoadedImgs / this.seguidoresInforme.length) * 100
+        );
 
-          // comprobamos que estan cargadas tb el resto de imagenes del PDF
-          this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-            // Cuando se carguen todas las imágenes
-            if (imagesLoaded && countLoadedImgs === this.countSeguidores && downloads === 0) {
-              this.calcularInforme();
+        // comprobamos que estan cargadas tb el resto de imagenes del PDF
+        this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
+          // Cuando se carguen todas las imágenes
+          if (imagesLoaded && countLoadedImgs === this.countSeguidores && downloads === 0) {
+            this.calcularInforme();
 
-              pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
-                this.downloadReportService.progressBarValue = 0;
+            pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
+              this.downloadReportService.progressBarValue = 0;
 
-                this.downloadReportService.generatingDownload = false;
-              });
-              this.downloadReportService.endingDownload = true;
+              this.downloadReportService.generatingDownload = false;
 
-              downloads++;
-            }
-          });
-        })
-      );
+              subscription.unsubscribe();
+            });
+            this.downloadReportService.endingDownload = true;
+
+            downloads++;
+          }
+        });
+      });
     }
   }
 
@@ -2658,9 +2680,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       } else {
         const seguidor = this.seguidoresInforme.find((seg) => seg.nombre === anom.nombreSeguidor);
 
-        gpsLink = this.anomaliaInfoService.getGoogleMapsUrl(
-          this.olMapService.getCentroid(seguidor.featureCoords)
-        );
+        gpsLink = this.anomaliaInfoService.getGoogleMapsUrl(this.olMapService.getCentroid(seguidor.featureCoords));
       }
 
       const row = [];

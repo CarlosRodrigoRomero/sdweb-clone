@@ -22,6 +22,8 @@ export class ReportPdfService {
   constructor(private reportControlService: ReportControlService) {}
 
   loadApartadosInforme(planta: PlantaInterface, selectedInforme: InformeInterface) {
+    this.apartadosInforme = [];
+
     const nombresApartados = [
       'introduccion',
       'criterios',
