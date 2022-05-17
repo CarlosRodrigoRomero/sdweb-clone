@@ -1,10 +1,10 @@
 <div class="popup">
   <mat-card class="popup-hover" *ngIf="anomaliaHover">
     <mat-card-content class="popup-hover-content">
-      <!-- <div class="elemento">
-        <span class="titulo">ID Anomalía</span>
-        <span class="subtitulo">{{ anomaliaHover.localId }}</span>
-      </div> -->
+      <div class="elemento">
+        <span class="titulo"># Anomalía</span>
+        <span class="subtitulo">{{ anomaliaHover.numAnom }}</span>
+      </div>
       <div class="elemento">
         <span class="titulo">Tipo</span>
         <span class="subtitulo">{{ pcDescripcion[anomaliaHover.tipo] }}</span>
@@ -43,10 +43,10 @@
       <mat-tab-group mat-align-tabs="center">
         <mat-tab label="General">
           <div class="tab-content">
-            <!-- <div class="elemento">
-              <span class="titulo">ID Anomalía</span>
-              <span class="subtitulo">{{ infoAdicional.id }}</span>
-            </div> -->
+            <div class="elemento">
+              <span class="titulo"># Anomalía</span>
+              <span class="subtitulo">{{ infoAdicional.numAnom }}</span>
+            </div>
             <div class="elemento">
               <span class="titulo">Tipo</span>
               <span class="subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] }}</span>

@@ -39,6 +39,7 @@ import { PlantaInterface } from '@core/models/planta';
 
 interface InfoAdicional {
   id?: string;
+  numAnom?: number;
   vuelo?: {
     fecha?: string;
     hora?: string;
@@ -348,7 +349,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
 
     this.infoAdicional = {
       // GENERAL
-      id: this.anomaliaSelect.localId,
+      numAnom: this.anomaliaSelect.numAnom,
       vuelo: {
         fecha,
         hora,

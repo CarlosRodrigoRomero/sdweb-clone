@@ -24,4 +24,5 @@ export interface FilterableElement {
   local_y?: number;
   localX?: number;
   localY?: number;
+  numAnom?: number;
 }

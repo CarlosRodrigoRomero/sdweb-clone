@@ -32,6 +32,7 @@ export class Anomalia implements FilterableElement {
   vientoVelocidad?: number;
   vientoDireccion?: number;
   nombreSeguidor?: string;
+  numAnom?: number;
 
   constructor(
     tipo: number,

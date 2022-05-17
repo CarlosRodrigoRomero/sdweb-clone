@@ -26,7 +26,8 @@ import { FilterableElement } from '@core/models/filterableInterface';
 import { Translation } from '@shared/utils/translations/translations';
 
 interface Fila {
-  localId?: string;
+  // localId?: string;
+  numAnom?: number;
   visualImage?: string;
   thermalImage?: string;
   temperaturaRef?: number;
@@ -220,7 +221,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   }
 
   private getColumnas() {
-    this.columnas[0].push('ID');
+    this.columnas[0].push(this.translation.t('# Anomalía'));
 
     if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
       this.columnas[0].push(this.translation.t('Imagen térmica'));
@@ -275,13 +276,14 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private getRowData(anomalia: Anomalia, index: number) {
     const row: Fila = {};
 
-    let localId;
-    if (anomalia.hasOwnProperty('localId')) {
-      localId = anomalia.localId;
-    } else {
-      localId = this.anomaliaService.getLocalId(anomalia, this.planta);
-    }
-    row.localId = localId;
+    // let localId;
+    // if (anomalia.hasOwnProperty('localId')) {
+    //   localId = anomalia.localId;
+    // } else {
+    //   localId = this.anomaliaService.getLocalId(anomalia, this.planta);
+    // }
+    // row.localId = localId;
+    row.numAnom = anomalia.numAnom;
     if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
       row.thermalImage = null;
       row.visualImage = null;
@@ -305,15 +307,11 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     row.localX = anomalia.localX;
 
     if (this.reportControlService.plantaFija) {
-      row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(
-        this.olMapService.getCentroid(anomalia.featureCoords)
-      );
+      row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(this.olMapService.getCentroid(anomalia.featureCoords));
     } else {
       const seguidor = (this.allElems as Seguidor[]).find((seguidor) => seguidor.nombre === anomalia.nombreSeguidor);
 
-      row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(
-        this.olMapService.getCentroid(seguidor.featureCoords)
-      );
+      row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(this.olMapService.getCentroid(seguidor.featureCoords));
     }
 
     let datetime = anomalia.datetime;

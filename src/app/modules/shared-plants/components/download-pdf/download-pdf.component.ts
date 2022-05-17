@@ -2639,7 +2639,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       style: 'tableHeaderBlue',
     });
 
-    this.anomaliasInforme = this.anomaliasInforme.sort(this.downloadReportService.sortByGlobalCoords);
+    // this.anomaliasInforme = this.anomaliasInforme.sort(this.downloadReportService.sortByGlobalCoords);
 
     cabecera.push({
       text: this.translation.t('Posición GPS'),
@@ -2669,10 +2669,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     // Body
     const body = [];
-    let contadorAnoms = 0;
     const totalAnoms = this.anomaliasInforme.length;
     for (const anom of this.anomaliasInforme) {
-      contadorAnoms += 1;
 
       let gpsLink = '';
       if (this.reportControlService.plantaFija) {
@@ -2685,7 +2683,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
       const row = [];
       row.push({
-        text: `${contadorAnoms}/${totalAnoms}`,
+        text: `${anom.numAnom}/${totalAnoms}`,
         noWrap: true,
         style: 'tableCellAnexo1',
       });

@@ -120,6 +120,9 @@ export class ReportControlService {
                   this.allFilterableElements as Anomalia[]
                 );
 
+                // añadimos un nº único a cada anomalia
+                this.allFilterableElements = this.addNumAnom(this.allFilterableElements as Anomalia[], this.informes);
+
                 if (this.allFilterableElements.length === 0) {
                   this.noAnomsReport = true;
                 } else {
@@ -200,6 +203,12 @@ export class ReportControlService {
                           this.allFilterableElements as Anomalia[]
                         );
 
+                        // añadimos un nº único a cada anomalia
+                        this.allFilterableElements = this.addNumAnom(
+                          this.allFilterableElements as Anomalia[],
+                          this.informes
+                        );
+
                         // iniciamos filter service
                         this.filterService
                           .initService(this.allFilterableElements, true, this.sharedId)
@@ -247,6 +256,12 @@ export class ReportControlService {
                         // ordenamos las anomalias por tipo
                         this.allFilterableElements = this.anomaliaService.sortAnomsByTipo(
                           this.allFilterableElements as Anomalia[]
+                        );
+
+                        // añadimos un nº único a cada anomalia
+                        this.allFilterableElements = this.addNumAnom(
+                          this.allFilterableElements as Anomalia[],
+                          this.informes
                         );
 
                         // iniciamos filter service
@@ -435,6 +450,19 @@ export class ReportControlService {
     }
 
     return numGlobalCoords;
+  }
+
+  private addNumAnom(anomalias: Anomalia[], informes: InformeInterface[]): Anomalia[] {
+    const anomsWithNumAnom = [];
+    informes.forEach((informe) => {
+      let anomsInforme = anomalias.filter((anom) => anom.informeId === informe.id);
+      anomsInforme = anomsInforme.map((anom, index) => {
+        anom.numAnom = index + 1;
+        return anom;
+      });
+      anomsWithNumAnom.push(...anomsInforme);
+    });
+    return anomsWithNumAnom;
   }
 
   private checkMaeInformes(elems: FilterableElement[]): void {

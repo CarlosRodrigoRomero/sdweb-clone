@@ -253,5 +253,6 @@
   "Pérdidas": "Losses",
   "Fecha y hora captura": "Capture date and time",
   "Tª Máx": "T Max",
-  "Grad Tª Norm": "Norm T Grad"
+  "Grad Tª Norm": "Norm T Grad", 
+  "# Anomalía": "# Abnormality"
 }

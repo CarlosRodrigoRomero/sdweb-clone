@@ -24,7 +24,7 @@ import { PlantaInterface } from '@core/models/planta';
   styleUrls: ['./anomalias-list.component.css'],
 })
 export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy {
-  displayedColumns: string[] = ['tipo', 'perdidas', 'temp', 'gradiente'];
+  displayedColumns: string[] = ['numAnom', 'tipo', 'perdidas', 'temp', 'gradiente'];
   dataSource: MatTableDataSource<any>;
   public selectedRow: string;
   public prevSelectedRow: any;
@@ -75,6 +75,7 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
                 anomalia: anom,
                 selected: false,
                 hovered: false,
+                numAnom: anom.numAnom,
               })
             );
 
