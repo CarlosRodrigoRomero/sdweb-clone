@@ -2,8 +2,7 @@
   <mat-card class="popup-hover" *ngIf="anomaliaHover">
     <mat-card-content class="popup-hover-content">
       <div class="elemento">
-        <span class="titulo"># Anomalía</span>
-        <span class="subtitulo">{{ anomaliaHover.numAnom }}</span>
+        <span class="titulo-resalt">Anomalía #{{ anomaliaHover.numAnom }}</span>
       </div>
       <div class="elemento">
         <span class="titulo">Tipo</span>
@@ -44,8 +43,7 @@
         <mat-tab label="General">
           <div class="tab-content">
             <div class="elemento">
-              <span class="titulo"># Anomalía</span>
-              <span class="subtitulo">{{ infoAdicional.numAnom }}</span>
+              <span class="titulo-resalt">Anomalía #{{ anomaliaSelect.numAnom }}</span>
             </div>
             <div class="elemento">
               <span class="titulo">Tipo</span>

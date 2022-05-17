@@ -81,6 +81,8 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
 
           this.dataSource = new MatTableDataSource(filteredElements);
           this.dataSource.sort = this.sort;
+
+          this.dataSource.filterPredicate = (data, filter: string): boolean => data.numAnom.toString() === filter;
         });
       })
     );

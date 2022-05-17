@@ -40,6 +40,12 @@
   font-size: 1.1rem;
 }
 
+.titulo-resalt {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
 .imput {
   font-weight: 300;
   font-size: 1.1rem;
