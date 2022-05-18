@@ -192,6 +192,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           take(1),
           switchMap((planta) => {
             this.planta = planta;
+            console.log(this.planta.empresa);
 
             // if (this.planta.tipo === '1 eje') {
             //   this.downloadReportService.getSeguidores1Eje(this.planta.id);
@@ -2671,7 +2672,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const body = [];
     const totalAnoms = this.anomaliasInforme.length;
     for (const anom of this.anomaliasInforme) {
-
       let gpsLink = '';
       if (this.reportControlService.plantaFija) {
         gpsLink = this.anomaliaInfoService.getGoogleMapsUrl(this.olMapService.getCentroid(anom.featureCoords));
@@ -3644,7 +3644,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     } else if (columnaNombre === 'severidad') {
       return anomalia.clase.toString();
     } else if (columnaNombre === 'criticidad') {
-      return 'Leve' /* this.labelsCriticidad[anomalia.criticidad] */;
+      return this.labelsCriticidad[anomalia.criticidad];
     } else if (columnaNombre === 'local_id') {
       return this.getLocalId(anomalia);
     } else {
