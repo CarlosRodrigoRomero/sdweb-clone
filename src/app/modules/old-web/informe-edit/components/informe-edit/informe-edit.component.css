@@ -1,5 +1,25 @@
 .header {
   display: flex;
+  justify-content: space-between;
+}
+
+.left-header-content {
+  display: flex;
+}
+
+.move-arrows {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.move-arrows button {
+  width: 18px;
+  height: 30px;
+}
+
+.up-down-arrows {
+  display: grid;
 }
 
 .btn-secondary {
@@ -122,21 +142,4 @@
 #container-ppal {
   height: 100vh;
   overflow: hidden;
-}
-
-.move-arrows {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  right: 16px;
-  top: -8px;
-}
-
-.move-arrows button {
-  width: 18px;
-  height: 30px;
-}
-
-.up-down-arrows {
-  display: grid;
 }
