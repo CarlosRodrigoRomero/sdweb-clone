@@ -826,13 +826,13 @@ export class CanvasComponent implements OnInit {
   private getEstructuraPunto(punto: Point) {
     let estEncontrada = null;
     if (this.estructuraList !== null) {
-      this.estructuraList.some((est) => {
+      this.estructuraList.forEach((est) => {
         // primero las autoestructuras
         if (est.estructuraMatrix === null) {
-          est.estructuraCoords.some((fila) => {
-            fila.some((modulo) => {
-              const moduloCorrecto = [modulo[2], modulo[3], modulo[1], modulo[0]];
-              if (inside([punto.x, punto.y], moduloCorrecto)) {
+          est.estructuraCoords.forEach((fila) => {
+            fila.forEach((modulo) => {
+              // const moduloCorrecto = [modulo[2], modulo[3], modulo[1], modulo[0]];
+              if (inside([punto.x, punto.y], modulo)) {
                 estEncontrada = est;
               }
             });
