@@ -239,7 +239,9 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     this.columnas[1].push(this.translation.t('Criticidad'));
 
     if (this.reportControlService.plantaFija) {
-      this.columnas[2].push(this.translation.t('Localización'));
+      this.columnas[2].push(
+        this.translation.t('Localización') + ' (' + this.plantaService.getLabelNombreGlobalCoords(this.planta) + ')'
+      );
     } else {
       this.columnas[2].push(this.translation.t('Seguidor'));
     }
