@@ -250,7 +250,7 @@ export let GLOBAL = {
     // { nombre: "datetimeString", descripcion: "Fecha/hora" }
   ],
   columnasAnomPdf: [
-    { nombre: 'local_id', descripcion: '#ID' },
+    // { nombre: 'local_id', descripcion: '#ID' },
     { nombre: 'severidad', descripcion: 'Clase (CoA)' },
     { nombre: 'criticidad', descripcion: 'Criticidad' },
     { nombre: 'tipo', descripcion: 'Categoría' },

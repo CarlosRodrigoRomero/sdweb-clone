@@ -556,6 +556,15 @@ export class PlantaService {
     return '';
   }
 
+  getLabelNombreGlobalCoords(planta: PlantaInterface): string {
+    let label = '';
+    if (planta.nombreGlobalCoords.length > 0) {
+      label = planta.nombreGlobalCoords.join('.');
+    }
+
+    return label;
+  }
+
   setLocAreaListFromPlantaId(plantaId: string): void {
     const locAreaList = [];
     this.getLocationsArea(plantaId)

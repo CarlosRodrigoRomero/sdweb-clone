@@ -192,7 +192,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           take(1),
           switchMap((planta) => {
             this.planta = planta;
-            console.log(this.planta.empresa);
 
             // if (this.planta.tipo === '1 eje') {
             //   this.downloadReportService.getSeguidores1Eje(this.planta.id);
@@ -2649,7 +2648,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     if (this.reportControlService.plantaFija) {
       cabecera.push({
-        text: this.translation.t('Localización'),
+        text: this.translation.t('Localización') /* + ' (' + this.plantaService.getLabelNombreGlobalCoords(this.planta) + ')' */,
         style: 'tableHeaderBlue',
         noWrap: true,
       });
