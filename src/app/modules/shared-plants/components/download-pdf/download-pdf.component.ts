@@ -44,6 +44,10 @@ import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
 
+import { DRONE } from '@data/constants/drone';
+
+
+
 @Component({
   selector: 'app-download-pdf',
   templateUrl: './download-pdf.component.html',
@@ -1606,7 +1610,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             style: 'tableLeft',
           },
           {
-            text: `${GLOBAL.uav}`,
+            text: `${DRONE.model}`,
           },
         ],
         [
@@ -1615,7 +1619,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             style: 'tableLeft',
           },
           {
-            text: `${this.translation.t(GLOBAL.camaraTermica)}`,
+            text: `${this.translation.t(DRONE.camaraTermica)}`,
           },
         ],
         [
@@ -1624,7 +1628,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             style: 'tableLeft',
           },
           {
-            text: `${GLOBAL.ultimaCalibracion}`,
+            text: `${DRONE.ultimaCalibracion}`,
           },
         ],
       ];

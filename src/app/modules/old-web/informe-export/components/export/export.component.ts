@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { GLOBAL } from '@data/constants/global';
+import { DRONE } from '@data/constants/drone';
 
 import { PcService, SeguidorInterface } from '@data/services/pc.service';
 
@@ -1274,7 +1275,7 @@ export class ExportComponent implements OnInit {
                       style: 'tableLeft',
                     },
                     {
-                      text: `${this.global.uav}`,
+                      text: `${DRONE.model}`,
                     },
                   ],
                   [
@@ -1283,7 +1284,7 @@ export class ExportComponent implements OnInit {
                       style: 'tableLeft',
                     },
                     {
-                      text: `${this.global.camaraTermica}`,
+                      text: `${DRONE.camaraTermica}`,
                     },
                   ],
                   [
@@ -1292,7 +1293,7 @@ export class ExportComponent implements OnInit {
                       style: 'tableLeft',
                     },
                     {
-                      text: `${this.global.ultimaCalibracion}`,
+                      text: `${DRONE.ultimaCalibracion}`,
                     },
                   ],
 

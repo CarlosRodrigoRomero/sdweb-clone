@@ -88,6 +88,7 @@ export class CanvasComponent implements OnInit {
   public alertMessage: string;
   currentLatLng: LatLngLiteral;
   private elementSelectedOrigin: any;
+  private estructuraSelectedIndex = 0;
 
   constructor(
     public informeService: InformeService,
@@ -230,7 +231,7 @@ export class CanvasComponent implements OnInit {
   }
 
   selectElementoPlanta(elementoPlanta: ElementoPlantaInterface): void {
-    if (elementoPlanta == null) {
+    if (elementoPlanta === null) {
       this.estructura = null;
       this.selectedPc = null;
     } else {
@@ -251,9 +252,16 @@ export class CanvasComponent implements OnInit {
         }
       }
     }
+  }
 
-    // Dibujar los elementos correspondientes en el canvas
-    // Si es un PC:
+  setEstructuraIndex(elementoPlanta: ElementoPlantaInterface): void {
+    if (this.estructuraList.length > 0) {
+      this.estructuraList.forEach((est, i) => {
+        if (est.id === elementoPlanta.id) {
+          this.estructuraSelectedIndex = i;
+        }
+      });
+    }
   }
 
   selectEstructuraInCanvas(estructura: Estructura) {
@@ -299,17 +307,19 @@ export class CanvasComponent implements OnInit {
           this.estructuraList = estList;
 
           this.dibujarEstructuraList(this.estructuraList);
-          if (this.informeService.selectedElementoPlanta == null) {
-            this.informeService.selectElementoPlanta(this.estructuraList[0]);
-          } else if (this.informeService.selectedElementoPlanta.id !== this.estructuraList[0].id) {
-            this.informeService.selectElementoPlanta(this.estructuraList[0]);
+          if (this.informeService.selectedElementoPlanta === null) {
+            this.informeService.selectElementoPlanta(this.estructuraList[this.estructuraSelectedIndex]);
+          } else if (
+            this.informeService.selectedElementoPlanta.id !== this.estructuraList[this.estructuraSelectedIndex].id
+          ) {
+            this.informeService.selectElementoPlanta(this.estructuraList[this.estructuraSelectedIndex]);
           }
         }
         if (autoEstList.length > 0) {
           this.estructuraList = autoEstList;
 
           this.dibujarEstructuraList(this.estructuraList);
-          if (this.informeService.selectedElementoPlanta == null) {
+          if (this.informeService.selectedElementoPlanta === null) {
             this.informeService.selectElementoPlanta(this.estructuraList[0]);
           } else if (this.informeService.selectedElementoPlanta.id !== this.estructuraList[0].id) {
             this.informeService.selectElementoPlanta(this.estructuraList[0]);
@@ -435,7 +445,7 @@ export class CanvasComponent implements OnInit {
         this.alertMessage = undefined;
         this.getEstList(this.estructura.archivo);
       })
-      .catch((res) => {
+      .catch((err) => {
         this.alertMessage = 'Error actualizando estructura';
       });
   }
@@ -692,6 +702,7 @@ export class CanvasComponent implements OnInit {
         if (options.button === 1 && options.hasOwnProperty('target') && options.target !== null) {
           if (options.target.hasOwnProperty('estructura')) {
             this.selectElementoPlanta(options.target.estructura);
+            this.setEstructuraIndex(options.target.estructura);
           }
         }
       }
