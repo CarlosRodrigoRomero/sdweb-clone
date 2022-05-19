@@ -202,21 +202,21 @@ export class InformeEditComponent implements OnInit {
     const arrayIndex = this.fileList.indexOf(archivoVuelo.archivo);
     this.rangeValue = arrayIndex + 1;
 
-    const currentCcoords = this.flightData[arrayIndex];
+    const currentCoords = this.flightData[arrayIndex];
 
     // Setear droneLatLng (para que se extienda a todos los childs)
     this.informeService.droneLatLng.next({
-      lat: parseFloat(currentCcoords.Latitude),
-      lng: parseFloat(currentCcoords.Longitude),
+      lat: parseFloat(currentCoords.Latitude),
+      lng: parseFloat(currentCoords.Longitude),
     });
 
-    this.currentDatetime = Number(currentCcoords.Datetime);
-    this.currentCamera = currentCcoords.Camera;
-    this.currentCameraSN = Number(currentCcoords.CameraSerialNumber);
-    this.currentTlinearGain = Number(currentCcoords.TlinearGain);
-    this.currentFrameNumber = Number(currentCcoords.FrameNumber);
-    this.currentFrameRate = Number(currentCcoords.FrameRate);
-    this.currentTrackheading = Math.round(currentCcoords.TrackHeading);
+    this.currentDatetime = Number(currentCoords.Datetime);
+    this.currentCamera = currentCoords.Camera;
+    this.currentCameraSN = Number(currentCoords.CameraSerialNumber);
+    this.currentTlinearGain = Number(currentCoords.TlinearGain);
+    this.currentFrameNumber = Number(currentCoords.FrameNumber);
+    this.currentFrameRate = Number(currentCoords.FrameRate);
+    this.currentTrackheading = Math.round(currentCoords.TrackHeading);
     this.currentImageRotation = this.getCurrentImageRotation(this.currentTrackheading);
   }
 

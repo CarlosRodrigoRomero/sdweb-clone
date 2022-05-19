@@ -201,25 +201,45 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
   drawAnomalia(anomalia: Anomalia) {
     const pc = anomalia as PcInterface;
 
-    const polygon = new fabric.Rect({
-      left: pc.img_left,
-      top: pc.img_top,
-      fill: 'rgba(0,0,0,0)',
-      stroke: this.seguidorViewService.getAnomaliaColor(anomalia),
-      strokeWidth: 2,
-      width: pc.img_width,
-      height: pc.img_height,
-      hasControls: false,
-      lockMovementY: true,
-      lockMovementX: true,
-      anomId: anomalia.id,
-      ref: 'anom',
-      selectable: false,
-      hoverCursor: 'pointer',
-      rx: 4,
-      ry: 4,
-      anomalia,
-    });
+    let polygon;
+    if (pc.hasOwnProperty('coords')) {
+      polygon = new fabric.Polygon(pc.coords, {
+        fill: 'transparent',
+        stroke: this.seguidorViewService.getAnomaliaColor(anomalia),
+        strokeWidth: 2,
+        strokeDashArray: [5, 5],
+        hasControls: false,
+        lockMovementY: true,
+        lockMovementX: true,
+        anomId: anomalia.id,
+        ref: 'anom',
+        selectable: false,
+        hoverCursor: 'pointer',
+        rx: 4,
+        ry: 4,
+        anomalia,
+      });
+    } else {
+      polygon = new fabric.Rect({
+        left: pc.img_left,
+        top: pc.img_top,
+        fill: 'rgba(0,0,0,0)',
+        stroke: this.seguidorViewService.getAnomaliaColor(anomalia),
+        strokeWidth: 2,
+        width: pc.img_width,
+        height: pc.img_height,
+        hasControls: false,
+        lockMovementY: true,
+        lockMovementX: true,
+        anomId: anomalia.id,
+        ref: 'anom',
+        selectable: false,
+        hoverCursor: 'pointer',
+        rx: 4,
+        ry: 4,
+        anomalia,
+      });
+    }
 
     this.anomsCanvas.add(polygon);
     this.anomsCanvas.renderAll();
