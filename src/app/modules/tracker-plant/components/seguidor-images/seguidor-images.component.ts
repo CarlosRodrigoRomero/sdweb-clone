@@ -207,7 +207,6 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
         fill: 'transparent',
         stroke: this.seguidorViewService.getAnomaliaColor(anomalia),
         strokeWidth: 2,
-        strokeDashArray: [5, 5],
         hasControls: false,
         lockMovementY: true,
         lockMovementX: true,

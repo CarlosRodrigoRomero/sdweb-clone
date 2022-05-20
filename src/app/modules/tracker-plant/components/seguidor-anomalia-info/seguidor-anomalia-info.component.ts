@@ -47,7 +47,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
             recomendacion: GLOBAL.pcRecomendacion[this.anomaliaSelected.tipo],
             fila: this.anomaliaSelected.localY,
             columna: this.anomaliaSelected.localX,
-            fecha: this.anomaliaSelected.datetime,
+            fecha: this.getRightDatetime(this.anomaliaSelected.datetime),
             irradiancia: this.anomaliaSelected.irradiancia,
             // vientoDireccion: this.anomaliaSelected.vientoDireccion,
             // vientoVelocidad: this.anomaliaSelected.vientoVelocidad,
@@ -62,6 +62,14 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.authService.user$.subscribe((user) => (this.isAdmin = this.authService.userIsAdmin(user)))
     );
+  }
+
+  private getRightDatetime(datetime: number) {
+    if (datetime.toString().length === 19) {
+      return datetime / 1000000000;
+    } else {
+      return datetime;
+    }
   }
 
   updateAnomalia(value: any, field: string) {
