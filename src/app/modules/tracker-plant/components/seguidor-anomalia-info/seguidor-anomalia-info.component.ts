@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 
 import { GLOBAL } from '@data/constants/global';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
-import { AnomaliaService } from '@data/services/anomalia.service';
+import { PcService } from '@data/services/pc.service';
 import { AuthService } from '@data/services/auth.service';
 
 import { Anomalia } from '@core/models/anomalia';
@@ -24,8 +24,8 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
 
   constructor(
     private seguidorViewService: SeguidorViewService,
-    private anomaliaService: AnomaliaService,
-    private authService: AuthService
+    private authService: AuthService,
+    private pcService: PcService
   ) {}
 
   ngOnInit(): void {
@@ -73,7 +73,13 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
   }
 
   updateAnomalia(value: any, field: string) {
-    this.anomaliaService.updateAnomaliaField(this.anomaliaSelected.id, field, Number(value));
+    this.anomaliaSelected[field] = Number(value);
+    if (field === 'local_x') {
+      this.anomaliaSelected.localX = Number(value);
+    } else {
+      this.anomaliaSelected.localY = Number(value);
+    }
+    this.pcService.updatePc(this.anomaliaSelected as PcInterface);
   }
 
   ngOnDestroy(): void {
