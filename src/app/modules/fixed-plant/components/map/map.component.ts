@@ -109,7 +109,6 @@ export class MapComponent implements OnInit, OnDestroy {
               // this.thermalService.sliderMin = tl.rangeTempMin;
               // this.thermalService.sliderMax = tl.rangeTempMax;
 
-              // TODO: Comprobar que existe...
               if (tl !== undefined) {
                 this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id));
               }
@@ -186,13 +185,17 @@ export class MapComponent implements OnInit, OnDestroy {
 
   private addAerialLayer(informeId: string) {
     const aerial = new XYZ({
-      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_visual/{z}/{x}/{y}.png',
-      crossOrigin: '',
+      url: GLOBAL.GIS + informeId + '_visual/{z}/{x}/{y}.png',
+      crossOrigin: 'anonymous',
     });
 
     const aerialLayer = new TileLayer({
       source: aerial,
       preload: Infinity,
+    });
+
+    aerialLayer.setProperties({
+      informeId,
     });
 
     this.olMapService.addAerialLayer(aerialLayer);

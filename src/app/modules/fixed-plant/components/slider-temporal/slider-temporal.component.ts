@@ -96,6 +96,7 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
 
     this.setThermalLayersOpacity(this.informesIdList[roundedValue]);
     this.setAnomaliaLayersOpacity(this.informesIdList[roundedValue]);
+    this.setAerialLayersOpacity(this.informesIdList[roundedValue]);
   }
 
   setThermalLayersOpacity(informeId: string) {
