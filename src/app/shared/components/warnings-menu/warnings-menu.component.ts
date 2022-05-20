@@ -186,6 +186,10 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         const filColFilter: LocationFilter = new LocationFilter('location', this.planta.filas, this.planta.columnas);
         this.filterService.addFilter(filColFilter);
         break;
+      case 'filsColsAnoms0':
+        const filCol0Filter: LocationFilter = new LocationFilter('locationTipo0', this.planta.filas, this.planta.columnas);
+        this.filterService.addFilter(filCol0Filter);
+        break;
       case 'wrongLocAnoms':
         this.filterWrongLocAnoms();
         break;

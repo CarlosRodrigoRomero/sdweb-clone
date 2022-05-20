@@ -155,6 +155,7 @@ export class WarningService {
     const ccChecked = this.checkCC(informe, warns);
     const filsColsPlantaChecked = this.checkFilsColsPlanta(planta, informe, warns);
     const filsColsAnomsChecked = this.checkFilsColsAnoms(planta, anomalias, informe, warns);
+    const filsColsAnomsTipo0Checked = this.checkFilsColsTipo0Anoms(planta, anomalias, informe, warns);
     const zonesChecked = this.checkZonesWarnings(locAreas, informe, warns, planta, anomalias);
     const visualLayerChecked = this.checkVisualLayer(informe.id, warns);
     const imgPortadaChecked = this.checkImagePortada(informe.id, warns);
@@ -175,6 +176,7 @@ export class WarningService {
       ccChecked &&
       filsColsPlantaChecked &&
       filsColsAnomsChecked &&
+      filsColsAnomsTipo0Checked &&
       zonesChecked &&
       visualLayerChecked &&
       thermalLayerChecked &&
@@ -385,7 +387,7 @@ export class WarningService {
     // primero comprobamos que el nº de filas y columnas de la planta sean correctos
     if (planta.columnas > 1 && planta.columnas !== undefined && planta.columnas !== null) {
       const differentFilColAnoms = anomalias.filter(
-        (anom) => anom.localY > planta.filas || anom.localX > planta.columnas
+        (anom) => anom.localX === 0 || anom.localY === 0 || anom.localY > planta.filas || anom.localX > planta.columnas
       );
 
       if (differentFilColAnoms.length > 0) {
@@ -399,6 +401,32 @@ export class WarningService {
         // eliminamos la alerta antigua si la hubiera
         this.checkOldWarnings('filsColsAnoms', warns, informe.id);
       }
+    }
+
+    // confirmamos que ha sido checkeado
+    return true;
+  }
+
+  checkFilsColsTipo0Anoms(
+    planta: PlantaInterface,
+    anomalias: Anomalia[],
+    informe: InformeInterface,
+    warns: Warning[]
+  ): boolean {
+    const differentFilColAnoms = anomalias.filter((anom) => anom.localX == 0 || anom.localY == 0);
+
+    console.log(differentFilColAnoms.length);
+
+    if (differentFilColAnoms.length > 0) {
+      const warning: Warning = {
+        type: 'filsColsAnoms0',
+        visible: true,
+      };
+
+      this.checkAddWarning(warning, warns, informe.id);
+    } else {
+      // eliminamos la alerta antigua si la hubiera
+      this.checkOldWarnings('filsColsAnoms0', warns, informe.id);
     }
 
     // confirmamos que ha sido checkeado

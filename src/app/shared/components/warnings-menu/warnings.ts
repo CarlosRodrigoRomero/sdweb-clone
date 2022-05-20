@@ -146,6 +146,22 @@ export const warnings: Warning[] = [
     ],
   },
   {
+    type: 'filsColsAnoms0',
+    message: 'Hay anomalías con fila o columna igual a 0',
+    adminActions: [
+      {
+        name: 'irInforme',
+        label: 'Ir al Informe',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'filsColsAnoms0',
+        label: 'Filtrar',
+      },
+    ],
+  },
+  {
     type: 'noLocAreas',
     message: 'Faltan las zonas de la planta',
     adminActions: [
