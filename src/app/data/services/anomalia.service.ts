@@ -150,8 +150,8 @@ export class AnomaliaService {
       .collection<Anomalia>(tipo, (ref) => ref.where('informeId', '==', informeId))
       .snapshotChanges()
       .pipe(
-        map((actions) =>
-          actions.map((doc) => {
+        map((actions) => {
+          let anoms = actions.map((doc, index) => {
             const data = doc.payload.doc.data() as Anomalia;
             data.id = doc.payload.doc.id;
             data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
@@ -164,6 +164,7 @@ export class AnomaliaService {
             if (data.globalCoords !== undefined && data.globalCoords !== null) {
               data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
             }
+            data.numAnom = index + 1;
             if (tipo === 'pcs') {
               data.localX = (data as PcInterface).local_x;
               data.localY = (data as PcInterface).local_y;
@@ -195,8 +196,16 @@ export class AnomaliaService {
             }
 
             return data;
-          })
-        )
+          });
+
+          // ordenamos las anomalias por tipo de más grave a menos grave
+          anoms = this.sortAnomsByTipo(anoms);
+
+          // añadimos un numero individual a cada anomalía
+          anoms = this.addNumAnom(anoms);
+
+          return anoms;
+        })
       );
 
     return query$;
@@ -273,6 +282,17 @@ export class AnomaliaService {
         return criterioId;
       })
     );
+  }
+
+  private addNumAnom(anomalias: Anomalia[]): Anomalia[] {
+    const realAnomalias = this.getRealAnomalias(anomalias);
+
+    realAnomalias.map((anom, index) => {
+      anom.numAnom = index + 1;
+      return anom;
+    });
+
+    return anomalias;
   }
 
   getLocalId(anomalia: Anomalia, planta: PlantaInterface): string {

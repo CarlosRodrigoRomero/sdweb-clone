@@ -47,9 +47,7 @@ export class Seguidor implements FilterableElement {
   ) {
     this.anomalias = anomalias;
     // tslint:disable-next-line: triple-equals
-    this.anomaliasCliente = anomalias.filter(
-      (anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo) && anom.criticidad !== null
-    );
+    this.anomaliasCliente = this.getRealAnomalias(anomalias);
     this.plantaId = plantaId;
     this.filas = filas;
     this.columnas = columnas;
@@ -163,5 +161,15 @@ export class Seguidor implements FilterableElement {
     }
 
     return moduloLabel;
+  }
+
+  private getRealAnomalias(anomalias: Anomalia[]): Anomalia[] {
+    // quitamos las anomalias con criticidad null ya que no son anomalias para el cliente
+    let realAnomalias = anomalias.filter((anom) => anom.criticidad !== null);
+
+    // quitamos las anomalias de tipos en desuso
+    realAnomalias = realAnomalias.filter((anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo));
+
+    return realAnomalias;
   }
 }

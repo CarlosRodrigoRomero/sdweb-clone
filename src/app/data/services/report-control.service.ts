@@ -112,16 +112,7 @@ export class ReportControlService {
                 take(1)
               )
               .subscribe((anoms) => {
-                // filtramos las anomalias que ya no consideramos anomalias
                 this.allFilterableElements = this.anomaliaService.getRealAnomalias(anoms);
-
-                // ordenamos las anomalias por tipo
-                this.allFilterableElements = this.anomaliaService.sortAnomsByTipo(
-                  this.allFilterableElements as Anomalia[]
-                );
-
-                // añadimos un nº único a cada anomalia
-                this.allFilterableElements = this.addNumAnom(this.allFilterableElements as Anomalia[], this.informes);
 
                 if (this.allFilterableElements.length === 0) {
                   this.noAnomsReport = true;
@@ -195,19 +186,7 @@ export class ReportControlService {
                         take(1)
                       )
                       .subscribe((anoms) => {
-                        // filtramos las anomalias que ya no consideramos anomalias
                         this.allFilterableElements = this.anomaliaService.getRealAnomalias(anoms);
-
-                        // ordenamos las anomalias por tipo
-                        this.allFilterableElements = this.anomaliaService.sortAnomsByTipo(
-                          this.allFilterableElements as Anomalia[]
-                        );
-
-                        // añadimos un nº único a cada anomalia
-                        this.allFilterableElements = this.addNumAnom(
-                          this.allFilterableElements as Anomalia[],
-                          this.informes
-                        );
 
                         // iniciamos filter service
                         this.filterService
@@ -250,19 +229,7 @@ export class ReportControlService {
                         take(1)
                       )
                       .subscribe((anoms) => {
-                        // filtramos las anomalias que ya no consideramos anomalias
                         this.allFilterableElements = this.anomaliaService.getRealAnomalias(anoms);
-
-                        // ordenamos las anomalias por tipo
-                        this.allFilterableElements = this.anomaliaService.sortAnomsByTipo(
-                          this.allFilterableElements as Anomalia[]
-                        );
-
-                        // añadimos un nº único a cada anomalia
-                        this.allFilterableElements = this.addNumAnom(
-                          this.allFilterableElements as Anomalia[],
-                          this.informes
-                        );
 
                         // iniciamos filter service
                         this.filterService
@@ -452,7 +419,16 @@ export class ReportControlService {
     return numGlobalCoords;
   }
 
-  private addNumAnom(anomalias: Anomalia[], informes: InformeInterface[]): Anomalia[] {
+  private addNumAnom(elements: FilterableElement[], informes: InformeInterface[]): Anomalia[] {
+    let anomalias: Anomalia[] = [];
+    if (elements[0].hasOwnProperty('anomaliasCliente')) {
+      elements.forEach((element) => anomalias.push(...(element as Seguidor).anomaliasCliente));
+    } else {
+      anomalias = elements as Anomalia[];
+    }
+    // lar ordenamos por tipo de anomalía
+    anomalias = this.anomaliaService.sortAnomsByTipo(anomalias);
+
     const anomsWithNumAnom = [];
     informes.forEach((informe) => {
       let anomsInforme = anomalias.filter((anom) => anom.informeId === informe.id);

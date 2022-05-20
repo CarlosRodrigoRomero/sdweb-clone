@@ -46,8 +46,6 @@ import { PcInterface } from '@core/models/pc';
 
 import { DRONE } from '@data/constants/drone';
 
-
-
 @Component({
   selector: 'app-download-pdf',
   templateUrl: './download-pdf.component.html',
@@ -254,9 +252,15 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                   this.anomaliasInforme.push(...anomaliasSeguidor);
                 }
               });
+              for (let index = 0; index < this.anomaliasInforme.length; index++) {
+                const anoms = this.anomaliasInforme.filter((anom) => anom.numAnom === index + 1);
+                if (anoms.length > 1) {
+                  console.log(anoms.map(anom => anom.globalCoords));
+                }
+              }
 
               // ordenamos la lista de anomalias por tipo
-              this.anomaliasInforme = this.anomaliaService.sortAnomsByTipo(this.anomaliasInforme);
+              this.anomaliasInforme = this.anomaliasInforme.sort((a, b) => a.numAnom - b.numAnom);
             }
 
             // comprobamos el numero de anomalias para imprimir o no imagenes
@@ -2643,8 +2647,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       style: 'tableHeaderBlue',
     });
 
-    // this.anomaliasInforme = this.anomaliasInforme.sort(this.downloadReportService.sortByGlobalCoords);
-
     cabecera.push({
       text: this.translation.t('Posición GPS'),
       style: 'tableHeaderBlue',
@@ -2652,7 +2654,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     if (this.reportControlService.plantaFija) {
       cabecera.push({
-        text: this.translation.t('Localización') /* + ' (' + this.plantaService.getLabelNombreGlobalCoords(this.planta) + ')' */,
+        text: this.translation.t(
+          'Localización'
+        ) /* + ' (' + this.plantaService.getLabelNombreGlobalCoords(this.planta) + ')' */,
         style: 'tableHeaderBlue',
         noWrap: true,
       });

@@ -70,6 +70,7 @@ export interface PcInterface {
   TlinearGain?: number;
   FrameNumber?: number;
   FrameRate?: number;
+  numAnom?: number;
 }
 
 export class Pc implements PcInterface, ElementoPlantaInterface {
@@ -139,6 +140,7 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   TlinearGain?: number;
   FrameNumber?: number;
   FrameRate?: number;
+  numAnom?: number;
 
   constructor(pc: PcInterface) {
     Object.assign(this, pc);
