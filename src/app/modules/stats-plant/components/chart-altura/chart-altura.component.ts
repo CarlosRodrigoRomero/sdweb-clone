@@ -187,7 +187,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
   private getAlturaMax() {
     return Math.max(
       ...[
-        ...this.allAnomalias.map((anom) => Number(anom.localY)).filter((fila) => typeof fila === 'number'),
+        ...this.allCC.map((anom) => Number(anom.localY)).filter((fila) => typeof fila === 'number'),
         this.planta.filas,
       ]
     );
