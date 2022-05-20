@@ -103,8 +103,12 @@ export class DownloadReportService {
 
   getAltura(planta: PlantaInterface, localY: number) {
     // Por defecto, la altura alta es la numero 1
-    if (planta.alturaBajaPrimero) {
-      return planta.filas - (localY - 1);
+    if (planta.tipo !== 'seguidores' && planta.alturaBajaPrimero) {
+      let altura = planta.filas - (localY - 1);
+      if (altura < 1) {
+        altura = 1;
+      }
+      return altura;
     } else {
       return localY;
     }

@@ -1263,25 +1263,44 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   }
 
   drawAnomalia(pc: PcInterface, canvas: any, contadorPc: number) {
-    const polygon = new fabric.Rect({
-      left: pc.img_left,
-      top: pc.img_top,
-      fill: 'rgba(0,0,0,0)',
-      stroke: 'white',
-      // stroke: this.seguidorViewService.getAnomaliaColor(anomalia),
-      strokeWidth: 2,
-      width: pc.img_width,
-      height: pc.img_height,
-      hasControls: false,
-      lockMovementY: true,
-      lockMovementX: true,
-      anomId: pc.id,
-      ref: 'anom',
-      selectable: false,
-      hoverCursor: 'pointer',
-      rx: 4,
-      ry: 4,
-    });
+    let polygon;
+    if (pc.hasOwnProperty('coords')) {
+      polygon = new fabric.Polygon(pc.coords, {
+        fill: 'transparent',
+        stroke: 'white',
+        // stroke: this.seguidorViewService.getAnomaliaColor(anomalia),
+        strokeWidth: 2,
+        hasControls: false,
+        lockMovementY: true,
+        lockMovementX: true,
+        anomId: pc.id,
+        ref: 'anom',
+        selectable: false,
+        hoverCursor: 'pointer',
+        rx: 4,
+        ry: 4,
+      });
+    } else {
+      polygon = new fabric.Rect({
+        left: pc.img_left,
+        top: pc.img_top,
+        fill: 'rgba(0,0,0,0)',
+        // stroke: this.seguidorViewService.getAnomaliaColor(anomalia),
+        strokeWidth: 2,
+        width: pc.img_width,
+        height: pc.img_height,
+        hasControls: false,
+        lockMovementY: true,
+        lockMovementX: true,
+        anomId: pc.id,
+        ref: 'anom',
+        selectable: false,
+        hoverCursor: 'pointer',
+        rx: 4,
+        ry: 4,
+      });
+    }
+
     const label = new fabric.Text(contadorPc.toString(), {
       left: pc.img_left,
       top: pc.img_top - 26,

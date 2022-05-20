@@ -415,8 +415,6 @@ export class WarningService {
   ): boolean {
     const differentFilColAnoms = anomalias.filter((anom) => anom.localX == 0 || anom.localY == 0);
 
-    console.log(differentFilColAnoms.length);
-
     if (differentFilColAnoms.length > 0) {
       const warning: Warning = {
         type: 'filsColsAnoms0',
