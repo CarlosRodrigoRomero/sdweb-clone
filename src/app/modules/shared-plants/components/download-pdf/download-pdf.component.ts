@@ -255,7 +255,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               for (let index = 0; index < this.anomaliasInforme.length; index++) {
                 const anoms = this.anomaliasInforme.filter((anom) => anom.numAnom === index + 1);
                 if (anoms.length > 1) {
-                  console.log(anoms.map(anom => anom.globalCoords));
+                  console.log(anoms.map((anom) => anom.globalCoords));
                 }
               }
 
@@ -3040,7 +3040,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     }
     if (this.selectedInforme.hasOwnProperty('viento')) {
       segBodyTableHeader.push({
-        text: this.translation.t('Viento'),
+        text: this.translation.t('Viento') + ' (Beaufort)',
         style: 'tableHeaderImageData',
       });
       segBodyTableContent.push({
@@ -3272,7 +3272,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                       },
 
                       {
-                        text: this.translation.t('Viento'),
+                        text: this.translation.t('Viento') + ' (Beaufort)',
                         style: 'tableHeaderImageData',
                       },
 
@@ -3454,7 +3454,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                       },
 
                       {
-                        text: this.translation.t('Viento'),
+                        text: this.translation.t('Viento') + ' (Beaufort)',
                         style: 'tableHeaderImageData',
                       },
 

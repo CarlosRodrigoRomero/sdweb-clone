@@ -138,8 +138,8 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
               }
             });
 
-            // ordenamos la lista de anomalias por tipo
-            this.anomaliasInforme = this.anomaliaService.sortAnomsByTipo(this.anomaliasInforme);
+            // ordenamos la lista de anomalias por su indice
+            this.anomaliasInforme = this.anomaliasInforme.sort((a, b) => a.numAnom - b.numAnom);
 
             this.columnasLink = [2, 3];
 
@@ -320,6 +320,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     if (this.informeSelected.correccHoraSrt !== undefined) {
       datetime += this.informeSelected.correccHoraSrt * 3600;
     }
+    console.log(datetime);
     row.datetime = this.datePipe.transform(datetime * 1000, 'dd/MM/yyyy HH:mm:ss');
     row.lugar = this.planta.nombre;
     if (anomalia.hasOwnProperty('irradiancia') && anomalia.irradiancia !== null) {

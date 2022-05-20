@@ -165,6 +165,7 @@ export class AnomaliaService {
               data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
             }
             data.numAnom = index + 1;
+            data.datetime = this.getRightDatetime(data.datetime);
             if (tipo === 'pcs') {
               data.localX = (data as PcInterface).local_x;
               data.localY = (data as PcInterface).local_y;
@@ -219,6 +220,14 @@ export class AnomaliaService {
     realAnomalias = realAnomalias.filter((anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo));
 
     return realAnomalias;
+  }
+
+  private getRightDatetime(datetime: number) {
+    if (datetime.toString().length === 19) {
+      return datetime / 1000000000;
+    } else {
+      return datetime;
+    }
   }
 
   async updateAnomalia(anomalia: Anomalia) {
