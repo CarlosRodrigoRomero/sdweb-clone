@@ -53,8 +53,10 @@ import { DRONE } from '@data/constants/drone';
   providers: [DecimalPipe, DatePipe],
 })
 export class DownloadPdfComponent implements OnInit, OnDestroy {
-  private _countLoadedImages = 0;
-  countLoadedImages$ = new BehaviorSubject<number>(this._countLoadedImages);
+  private _countLoadedThermalImages = 0;
+  countLoadedThermalImages$ = new BehaviorSubject<number>(this._countLoadedThermalImages);
+  private _countLoadedVisualImages = 0;
+  countLoadedVisualImages$ = new BehaviorSubject<number>(this._countLoadedVisualImages);
   private _countLoadedImagesSegs1EjeAnoms = 0;
   countLoadedImagesSegs1EjeAnoms$ = new BehaviorSubject<number>(this._countLoadedImagesSegs1EjeAnoms);
   private _countLoadedImagesSegs1EjeNoAnoms = 0;
@@ -301,7 +303,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.widthPlano = 500;
 
     this.widthImageSeguidor = 450;
-    this.widthImageAnomalia = 300;
+    this.widthImageAnomalia = 250;
     this.hasUserArea = false;
 
     this.subscriptions.add(
@@ -450,7 +452,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       this.getImgsPlanos();
     }
 
-    this.countLoadedImages = 0;
+    this.countLoadedThermalImages = 0;
+    this.countLoadedVisualImages = 0;
     this.countLoadedImagesSegs1EjeAnoms = 0;
     this.countLoadedImagesSegs1EjeNoAnoms = 0;
 
@@ -486,13 +489,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         let downloads = 0;
 
         const subscription = combineLatest([
-          this.countLoadedImages$,
+          this.countLoadedThermalImages$,
+          this.countLoadedVisualImages$,
           this.countLoadedImagesSegs1EjeAnoms$,
           this.countLoadedImagesSegs1EjeNoAnoms$,
-        ]).subscribe(([countLoadedImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
+        ]).subscribe(([countLoadedThermalImgs, countLoadedVisualImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
           this.downloadReportService.progressBarValue = Math.round(
-            ((countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
-              (this.anomaliasInforme.length + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
+            ((countLoadedThermalImgs + countLoadedVisualImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
+              (this.anomaliasInforme.length * 2 + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
               100
           );
 
@@ -503,7 +507,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               // Cuando se carguen todas las imágenes
               if (
                 imagesLoaded &&
-                countLoadedImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
+                countLoadedThermalImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
                   this.countAnomalias + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length &&
                 downloads === 0
               ) {
@@ -529,7 +533,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
         let downloads = 0;
 
-        const subscription = this.countLoadedImages$.subscribe((countLoadedImgs) => {
+        const subscription = this.countLoadedThermalImages$.subscribe((countLoadedImgs) => {
           this.downloadReportService.progressBarValue = Math.round(
             (countLoadedImgs / this.anomaliasInforme.length) * 100
           );
@@ -590,7 +594,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
       let downloads = 0;
 
-      const subscription = this.countLoadedImages$.subscribe((countLoadedImgs) => {
+      const subscription = this.countLoadedThermalImages$.subscribe((countLoadedImgs) => {
         this.downloadReportService.progressBarValue = Math.round(
           (countLoadedImgs / this.seguidoresInforme.length) * 100
         );
@@ -936,7 +940,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         url,
         (img) => {
           if (img !== null) {
-            const processImg = this.imageProcessService.transformPixels(img);
+            let processImg = img;
+            if (layer === 'thermal') {
+              processImg = this.imageProcessService.transformPixels(img);
+            }
 
             const image = new fabric.Image(processImg, {
               width,
@@ -971,7 +978,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                 format: 'png',
               });
 
-              this.countLoadedImages++;
+              if (layer === 'thermal') {
+                this.countLoadedThermalImages++;
+              } else {
+                this.countLoadedVisualImages++;
+              }
             }
           } else {
             contador++;
@@ -991,7 +1002,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                 format: 'png',
               });
 
-              this.countLoadedImages++;
+              if (layer === 'thermal') {
+                this.countLoadedThermalImages++;
+              } else {
+                this.countLoadedVisualImages++;
+              }
             }
           }
         },
@@ -1211,7 +1226,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               );
             }
 
-            this.countLoadedImages++;
+            this.countLoadedThermalImages++;
           },
           null,
           { crossOrigin: 'anonymous' }
@@ -1224,7 +1239,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           this.imagesLoadService.jpgQuality
         );
 
-        this.countLoadedImages++;
+        this.countLoadedThermalImages++;
 
         switch (error.code) {
           case 'storage/object-not-found':
@@ -2797,6 +2812,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               alignment: 'center',
             },
           ],
+          columnGap: 14,
         },
         {
           columns: [
@@ -3867,13 +3883,22 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   //////////////////////////////////////////////////////
 
-  get countLoadedImages() {
-    return this._countLoadedImages;
+  get countLoadedThermalImages() {
+    return this._countLoadedThermalImages;
   }
 
-  set countLoadedImages(value: number) {
-    this._countLoadedImages = value;
-    this.countLoadedImages$.next(value);
+  set countLoadedThermalImages(value: number) {
+    this._countLoadedThermalImages = value;
+    this.countLoadedThermalImages$.next(value);
+  }
+
+  get countLoadedVisualImages() {
+    return this._countLoadedVisualImages;
+  }
+
+  set countLoadedVisualImages(value: number) {
+    this._countLoadedVisualImages = value;
+    this.countLoadedVisualImages$.next(value);
   }
 
   get countLoadedImagesSegs1EjeAnoms() {
