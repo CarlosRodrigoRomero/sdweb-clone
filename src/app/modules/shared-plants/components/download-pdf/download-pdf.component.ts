@@ -252,12 +252,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                   this.anomaliasInforme.push(...anomaliasSeguidor);
                 }
               });
-              for (let index = 0; index < this.anomaliasInforme.length; index++) {
-                const anoms = this.anomaliasInforme.filter((anom) => anom.numAnom === index + 1);
-                if (anoms.length > 1) {
-                  console.log(anoms.map((anom) => anom.globalCoords));
-                }
-              }
 
               // ordenamos la lista de anomalias por tipo
               this.anomaliasInforme = this.anomaliasInforme.sort((a, b) => a.numAnom - b.numAnom);
@@ -467,7 +461,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         this.countAnomalias = 0;
         this.anomaliasInforme.forEach((anomalia, index) => {
           // if (index < 700) {
-          this.setImgAnomaliaCanvas(anomalia);
+          this.setImgAnomaliaCanvas(anomalia, 'thermal');
+          this.setImgAnomaliaCanvas(anomalia, 'visual');
           this.countAnomalias++;
           // }
         });
@@ -911,7 +906,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     };
   }
 
-  private setImgAnomaliaCanvas(anomalia: Anomalia) {
+  private setImgAnomaliaCanvas(anomalia: Anomalia, layer: string) {
     let zoomLevel = 22;
     // parche para la planta Logrosan que tiene huecos en la capa termica
     if (this.planta.id === 'AyKgsY6F3TqGQGYNaOUY') {
@@ -931,7 +926,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const height = canvas.height / lado;
     let contador = 0;
     tileCoords.forEach((tileCoord, index) => {
-      const url = GLOBAL.GIS + `${this.selectedInforme.id}_thermal/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+      const url =
+        GLOBAL.GIS + `${this.selectedInforme.id}_${layer}/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
 
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;
@@ -971,7 +967,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               );
               this.imagesTilesService.drawPolygonInCanvas(anomalia.id, canvas, coordsPolygonCanvas);
               this.imagesTilesService.canvasCenterAndZoom(coordsPolygonCanvas, canvas);
-              this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
+              this.imageListBase64[`imgCanvas_${layer}_${anomalia.id}`] = canvas.toDataURL({
                 format: 'png',
               });
 
@@ -991,7 +987,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               );
               this.imagesTilesService.drawPolygonInCanvas(anomalia.id, canvas, coordsPolygonCanvas);
               this.imagesTilesService.canvasCenterAndZoom(coordsPolygonCanvas, canvas);
-              this.imageListBase64[`imgCanvas${anomalia.id}`] = canvas.toDataURL({
+              this.imageListBase64[`imgCanvas_${layer}_${anomalia.id}`] = canvas.toDataURL({
                 format: 'png',
               });
 
@@ -2789,9 +2785,18 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         },
         '\n',
         {
-          image: `imgCanvas${anom.id}`,
-          width: this.widthImageAnomalia,
-          alignment: 'center',
+          columns: [
+            {
+              image: `imgCanvas_thermal_${anom.id}`,
+              width: this.widthImageAnomalia,
+              alignment: 'center',
+            },
+            {
+              image: `imgCanvas_visual_${anom.id}`,
+              width: this.widthImageAnomalia,
+              alignment: 'center',
+            },
+          ],
         },
         {
           columns: [
