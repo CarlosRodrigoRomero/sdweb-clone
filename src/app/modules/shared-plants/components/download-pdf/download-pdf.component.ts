@@ -395,13 +395,19 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private selectDownloadAnomImages() {
     const dialogRef = this.dialog.open(MatDialogConfirmComponent, {
       data: '¿Quiere incluir imágenes de las anomalías?',
+      // disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe((response: boolean) => {
-      this.reportPdfService.incluirImagenes = response;
+    dialogRef
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe((response: boolean) => {
+        if (response !== undefined) {
+          this.reportPdfService.incluirImagenes = response;
 
-      this.downloadPDF();
-    });
+          this.downloadPDF();
+        }
+      });
   }
 
   selectProgressBarMode() {

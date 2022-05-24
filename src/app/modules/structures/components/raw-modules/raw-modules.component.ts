@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { MatDialog } from '@angular/material/dialog';
 
+import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
@@ -81,11 +82,14 @@ export class RawModulesComponent implements OnInit, OnDestroy {
       data: 'Se restaurarán todos los módulos eliminados manualmente. ¿Desea continuar?',
     });
 
-    dialogRef.afterClosed().subscribe((response: boolean) => {
-      if (response) {
-        this.restoreDeletedModules();
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe((response: boolean) => {
+        if (response) {
+          this.restoreDeletedModules();
+        }
+      });
   }
 
   drawRawModules() {

@@ -3,6 +3,6 @@
   <p>{{ menssage }}</p>
 </div>
 <div mat-dialog-actions>
-  <button mat-button (click)="closeDialog()">No</button>
-  <button #btnSi mat-button (click)="confirmDialog()" cdkFocusInitial>Sí</button>
+  <button mat-button (click)="confirmDialog(false)">No</button>
+  <button mat-button (click)="confirmDialog(true)" cdkFocusInitial>Sí</button>
 </div>

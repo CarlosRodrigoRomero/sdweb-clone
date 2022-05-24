@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 import { MatDialog } from '@angular/material/dialog';
 
@@ -21,6 +22,7 @@ import { StructuresService } from '@data/services/structures.service';
 
 import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
 import { ModuleGroup } from '@core/models/moduleGroup';
+
 
 @Component({
   selector: 'app-module-groups',
@@ -327,7 +329,7 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
       data: 'Esto también eliminará los modulos normalizados asociados a esta agrupación. ¿Desea continuar?',
     });
 
-    dialogRef.afterClosed().subscribe((response: boolean) => {
+    dialogRef.afterClosed().pipe(take(1)).subscribe((response: boolean) => {
       if (response) {
         this.deleteModuleGroup();
       }

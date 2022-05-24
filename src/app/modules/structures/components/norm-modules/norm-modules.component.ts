@@ -282,7 +282,7 @@ export class NormModulesComponent implements OnInit, OnDestroy {
       data: 'Se eliminará el módulo de forma permanente. ¿Desea continuar?',
     });
 
-    dialogRef.afterClosed().subscribe((response: boolean) => {
+    dialogRef.afterClosed().pipe(take(1)).subscribe((response: boolean) => {
       if (response) {
         this.deleteNormModule();
       }
