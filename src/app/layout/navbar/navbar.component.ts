@@ -74,33 +74,34 @@ export class NavbarComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.subscriptions.add(
-      this.reportControlService.plantaId$.subscribe((plantaId) => {
-        if (plantaId !== undefined) {
-          if (plantaId === '3JXI01XmcE3G1d4WNMMd' || plantaId === 'buzSMRcLEEeLfhnqfbbG') {
-            this.hasNotifications = true;
-            if (plantaId === '3JXI01XmcE3G1d4WNMMd') {
-              this.notifications.push({
-                content: 'Hay 20 módulos en circuito abierto (string)',
-                filter: 'CA (string)',
-              });
-              this.notifications.push({
-                content: 'Hay varias anomalías térmicas como consecuencia de suciedad en los módulos',
-                filter: 'suciedad',
-              });
-            }
-            if (plantaId === 'buzSMRcLEEeLfhnqfbbG') {
-              this.notifications = [
-                {
-                  content: 'Hay 2 células calientes con un gradiente mayor de 40 ºC (Grave)',
-                  filter: 'cc gradiente 40',
-                },
-              ];
-            }
-          }
-        }
-      })
-    );
+    // NOTIFICACIONES PROVISIONALES
+    // this.subscriptions.add(
+    //   this.reportControlService.plantaId$.subscribe((plantaId) => {
+    //     if (plantaId !== undefined) {
+    //       if (plantaId === '3JXI01XmcE3G1d4WNMMd' || plantaId === 'buzSMRcLEEeLfhnqfbbG') {
+    //         this.hasNotifications = true;
+    //         if (plantaId === '3JXI01XmcE3G1d4WNMMd') {
+    //           this.notifications.push({
+    //             content: 'Hay 20 módulos en circuito abierto (string)',
+    //             filter: 'CA (string)',
+    //           });
+    //           this.notifications.push({
+    //             content: 'Hay varias anomalías térmicas como consecuencia de suciedad en los módulos',
+    //             filter: 'suciedad',
+    //           });
+    //         }
+    //         if (plantaId === 'buzSMRcLEEeLfhnqfbbG') {
+    //           this.notifications = [
+    //             {
+    //               content: 'Hay 2 células calientes con un gradiente mayor de 40 ºC (Grave)',
+    //               filter: 'cc gradiente 40',
+    //             },
+    //           ];
+    //         }
+    //       }
+    //     }
+    //   })
+    // );
 
     this.subscriptions.add(
       this.authService.user$.subscribe((user) => {
