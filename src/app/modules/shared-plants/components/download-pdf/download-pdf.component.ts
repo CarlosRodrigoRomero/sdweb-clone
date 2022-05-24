@@ -493,59 +493,35 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           this.countLoadedVisualImages$,
           this.countLoadedImagesSegs1EjeAnoms$,
           this.countLoadedImagesSegs1EjeNoAnoms$,
-        ]).subscribe(([countLoadedThermalImgs, countLoadedVisualImgs, countLoadedImgSegs1EjeAnoms, countLoadedImgSegs1EjeNoAnoms]) => {
-          this.downloadReportService.progressBarValue = Math.round(
-            ((countLoadedThermalImgs + countLoadedVisualImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms) /
-              (this.anomaliasInforme.length * 2 + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length)) *
-              100
-          );
+        ]).subscribe(
+          ([
+            countLoadedThermalImgs,
+            countLoadedVisualImgs,
+            countLoadedImgSegs1EjeAnoms,
+            countLoadedImgSegs1EjeNoAnoms,
+          ]) => {
+            this.downloadReportService.progressBarValue = Math.round(
+              ((countLoadedThermalImgs +
+                countLoadedVisualImgs +
+                countLoadedImgSegs1EjeAnoms +
+                countLoadedImgSegs1EjeNoAnoms) /
+                (this.anomaliasInforme.length * 2 +
+                  this.seguidores1ejeAnoms.length +
+                  this.seguidores1ejeNoAnoms.length)) *
+                100
+            );
 
-          // comprobamos que estan cargados los planos de la planta
-          this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
-            // comprobamos que estan cargadas tb el resto de imagenes del PDF
-            this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-              // Cuando se carguen todas las imágenes
-              if (
-                imagesLoaded &&
-                countLoadedThermalImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
-                  this.countAnomalias + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length &&
-                downloads === 0
-              ) {
-                this.calcularInforme();
-
-                pdfMake
-                  .createPdf(this.getDocDefinition(this.imageListBase64))
-                  .download(this.getPrefijoInforme(), () => {
-                    this.downloadReportService.progressBarValue = 0;
-
-                    this.downloadReportService.generatingDownload = false;
-
-                    subscription.unsubscribe();
-                  });
-                this.downloadReportService.endingDownload = true;
-
-                downloads++;
-              }
-            });
-          });
-        });
-      } else {
-        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-        let downloads = 0;
-
-        const subscription = this.countLoadedThermalImages$.subscribe((countLoadedImgs) => {
-          this.downloadReportService.progressBarValue = Math.round(
-            (countLoadedImgs / this.anomaliasInforme.length) * 100
-          );
-
-          // comprobamos que estan cargados los planos de la planta
-          this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
-            // comprobamos que estan cargadas tb el resto de imagenes del PDF
-            this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-              // comprobamos si se van a cargar imagenes de anomalias
-              if (this.reportPdfService.informeConImagenes && this.reportPdfService.incluirImagenes) {
+            // comprobamos que estan cargados los planos de la planta
+            this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
+              // comprobamos que estan cargadas tb el resto de imagenes del PDF
+              this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
                 // Cuando se carguen todas las imágenes
-                if (planosLoaded && imagesLoaded && countLoadedImgs === this.countAnomalias && downloads === 0) {
+                if (
+                  imagesLoaded &&
+                  countLoadedThermalImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
+                    this.countAnomalias + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length &&
+                  downloads === 0
+                ) {
                   this.calcularInforme();
 
                   pdfMake
@@ -561,24 +537,50 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
                   downloads++;
                 }
-              } else {
-                // Cuando se carguen todas las imágenes
-                if (planosLoaded && imagesLoaded && downloads === 0) {
-                  this.calcularInforme();
+              });
+            });
+          }
+        );
+      } else {
+        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+        let downloads = 0;
 
-                  pdfMake.createPdf(this.getDocDefinition()).download(this.getPrefijoInforme(), () => {
+        // comprobamos que estan cargados los planos de la planta
+        this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
+          // comprobamos que estan cargadas tb el resto de imagenes del PDF
+          this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
+            // comprobamos si se van a cargar imagenes de anomalias
+            if (this.reportPdfService.informeConImagenes && this.reportPdfService.incluirImagenes) {
+              // Cuando se carguen todas las imágenes
+              if (planosLoaded && imagesLoaded && downloads === 0) {
+                this.calcularInforme();
+
+                pdfMake
+                  .createPdf(this.getDocDefinition(this.imageListBase64))
+                  .download(this.getPrefijoInforme(), () => {
                     this.downloadReportService.progressBarValue = 0;
 
                     this.downloadReportService.generatingDownload = false;
-
-                    subscription.unsubscribe();
                   });
-                  this.downloadReportService.endingDownload = true;
+                this.downloadReportService.endingDownload = true;
 
-                  downloads++;
-                }
+                downloads++;
               }
-            });
+            } else {
+              // Cuando se carguen todas las imágenes
+              if (planosLoaded && imagesLoaded && downloads === 0) {
+                this.calcularInforme();
+
+                pdfMake.createPdf(this.getDocDefinition()).download(this.getPrefijoInforme(), () => {
+                  this.downloadReportService.progressBarValue = 0;
+
+                  this.downloadReportService.generatingDownload = false;
+                });
+                this.downloadReportService.endingDownload = true;
+
+                downloads++;
+              }
+            }
           });
         });
       }
