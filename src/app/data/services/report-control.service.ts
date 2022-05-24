@@ -12,6 +12,7 @@ import { InformeService } from '@data/services/informe.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { SeguidorService } from '@data/services/seguidor.service';
 import { PlantaService } from '@data/services/planta.service';
+import { AuthService } from '@data/services/auth.service';
 
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 import { FilterableElement } from '@core/models/filterableInterface';
@@ -58,6 +59,7 @@ export class ReportControlService {
   private _numFixedGlobalCoords: number = 3;
   private _noAnomsReport = false;
   noAnomsReport$ = new BehaviorSubject<boolean>(this._noAnomsReport);
+  private userIsAdmin = false;
 
   constructor(
     private router: Router,
@@ -67,10 +69,15 @@ export class ReportControlService {
     private anomaliaService: AnomaliaService,
     private seguidorService: SeguidorService,
     @Inject(WINDOW) private window: Window,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private authService: AuthService
   ) {}
 
   initService(): Promise<boolean> {
+    this.authService.user$.pipe(take(1)).subscribe((user) => {
+      this.userIsAdmin = this.authService.userIsAdmin(user);
+    });
+
     ////////////////////// PLANTA FIJA ////////////////////////
     if (this.router.url.includes('fixed')) {
       this.plantaFija = true;
@@ -444,7 +451,13 @@ export class ReportControlService {
   private checkMaeInformes(elems: FilterableElement[]): void {
     if (elems.length > 0) {
       this.informes.forEach((informe) => {
-        if (this.checkIfNumberValueWrong(informe.mae)) {
+        if (this.userIsAdmin) {
+          if (elems[0].hasOwnProperty('anomaliasCliente')) {
+            this.setMaeInformeSeguidores(elems as Seguidor[], informe);
+          } else {
+            this.setMaeInformeFija(elems as Anomalia[], informe);
+          }
+        } else if (this.checkIfNumberValueWrong(informe.mae)) {
           if (elems[0].hasOwnProperty('anomaliasCliente')) {
             this.setMaeInformeSeguidores(elems as Seguidor[], informe);
           } else {
