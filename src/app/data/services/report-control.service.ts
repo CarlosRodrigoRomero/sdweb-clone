@@ -23,6 +23,7 @@ import { LocationAreaInterface } from '@core/models/location';
 import { GLOBAL } from '@data/constants/global';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { PlantaInterface } from '@core/models/planta';
+import { UserInterface } from '@core/models/user';
 
 @Injectable({
   providedIn: 'root',
@@ -59,6 +60,7 @@ export class ReportControlService {
   private _numFixedGlobalCoords: number = 3;
   private _noAnomsReport = false;
   noAnomsReport$ = new BehaviorSubject<boolean>(this._noAnomsReport);
+  user: UserInterface;
   private userIsAdmin = false;
 
   constructor(
@@ -75,6 +77,7 @@ export class ReportControlService {
 
   initService(): Promise<boolean> {
     this.authService.user$.pipe(take(1)).subscribe((user) => {
+      this.user = user;
       this.userIsAdmin = this.authService.userIsAdmin(user);
     });
 

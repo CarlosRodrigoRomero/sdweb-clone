@@ -71,8 +71,8 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
           take(1),
           switchMap((informes) => {
             this.maeData = informes.map((inf) => inf.mae * 100);
-            this.maeMedio = this.portfolioControlService.maeMedio * 100;
-            this.maeSigma = this.portfolioControlService.maeSigma * 100;
+            this.maeMedio = 1;
+            this.maeSigma = 0.5;
 
             if (this.maeMedio !== undefined && this.maeSigma !== undefined) {
               this.maeColors = this.maeData.map((mae) => {
@@ -187,15 +187,6 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
                       background: '#053e86',
                     },
                     text: 'Media MAE Portfolio',
-                  },
-                },
-                {
-                  y: this.maeMedio + this.maeSigma,
-                  y2: this.maeMedio - this.maeSigma,
-                  borderColor: '#000',
-                  fillColor: '#2478ff',
-                  label: {
-                    text: 'desviación std.',
                   },
                 },
               ],

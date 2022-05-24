@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 
 import { Feature } from 'ol';
 import { Fill, Stroke, Style } from 'ol/style';
@@ -59,6 +59,7 @@ export class PortfolioControlService {
         .pipe(
           take(1),
           switchMap((user) => {
+            // solo para cuentas DEMO por ahora
             if (user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2' || user.uid === 'AM2qmC06OWPb3V1gXJXyEpGS3Uz2') {
               this.isDemo = true;
               this.newPortfolio = true;
@@ -86,7 +87,7 @@ export class PortfolioControlService {
             ]);
           })
         )
-        .pipe(take(1))
+        .pipe(take(3))
         .subscribe(([plantas, informes]) => {
           if (plantas !== undefined) {
             // AÑADIMOS PLANTAS FALSAS SOLO EN LOS USUARIOS DEMO
@@ -116,15 +117,8 @@ export class PortfolioControlService {
                     informe.mae !== null &&
                     informe.disponible === true
                   ) {
-                    // dividimos por 100 el mae de los informes antiguos de fijas xq se ven en la web antigua
-                    if (
-                      (planta.tipo !== 'seguidores' &&
-                        informe.fecha < GLOBAL.newReportsDate &&
-                        planta.id !== 'egF0cbpXnnBnjcrusoeR') ||
-                      this.checkPlantaSoloWebAntigua(planta.id)
-                    ) {
-                      informe.mae = informe.mae / 100;
-                    }
+                    // comprobamos si es un mae aniguo o nuevo
+                    informe.mae = this.getRightMae(planta, informe);
 
                     // añadimos el informe a la lista
                     this.listaInformes.push(informe);
@@ -201,6 +195,49 @@ export class PortfolioControlService {
           }
         });
     });
+  }
+
+  getMaeMedioPortfolio(user: UserInterface): Observable<number> {
+    return combineLatest([this.plantaService.getPlantasDeEmpresa(user), this.informeService.getInformes()]).pipe(
+      map(([plantas, informes]) => {
+        const maePlantas: number[] = [];
+        const potenciaPlantas: number[] = [];
+
+        plantas.forEach((planta) => {
+          const informesPlanta = informes.filter((informe) => informe.disponible && informe.plantaId === planta.id);
+          if (planta.hasOwnProperty('informes') && planta.informes.length > 0) {
+            planta.informes.forEach((informe) => {
+              if (!informesPlanta.map((inf) => inf.id).includes(informe.id) && informe.disponible) {
+                informesPlanta.push(informe);
+              }
+            });
+          }
+          if (informesPlanta.length > 0) {
+            // añadimos el mae del informe más reciente
+            const informeReciente = informesPlanta.sort((a, b) => a.fecha - b.fecha).pop();
+            if (informeReciente.hasOwnProperty('mae')) {
+              maePlantas.push(this.getRightMae(planta, informeReciente));
+              potenciaPlantas.push(planta.potencia);
+            }
+          }
+        });
+
+        return this.weightedAverage(maePlantas, potenciaPlantas);
+      })
+    );
+  }
+
+  getRightMae(planta: PlantaInterface, informe: InformeInterface): number {
+    let mae = informe.mae;
+    // dividimos por 100 el mae de los informes antiguos de fijas xq se ven en la web antigua
+    if (
+      (planta.tipo !== 'seguidores' && informe.fecha < GLOBAL.newReportsDate && planta.id !== 'egF0cbpXnnBnjcrusoeR') ||
+      this.checkPlantaSoloWebAntigua(planta.id)
+    ) {
+      mae = mae / 100;
+    }
+
+    return mae;
   }
 
   private average(data) {
