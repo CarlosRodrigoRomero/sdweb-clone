@@ -197,7 +197,7 @@ export class PortfolioControlService {
     });
   }
 
-  getMaeMedioPortfolio(user: UserInterface): Observable<number> {
+  getMaeMedioAndSigmaPortfolio(user: UserInterface): Observable<number[]> {
     return combineLatest([this.plantaService.getPlantasDeEmpresa(user), this.informeService.getInformes()]).pipe(
       map(([plantas, informes]) => {
         const maePlantas: number[] = [];
@@ -222,7 +222,10 @@ export class PortfolioControlService {
           }
         });
 
-        return this.weightedAverage(maePlantas, potenciaPlantas);
+        const maeMedio = this.weightedAverage(maePlantas, potenciaPlantas);
+        const maeSigma = this.DAM(maePlantas, maeMedio);
+
+        return [maeMedio, maeSigma];
       })
     );
   }
