@@ -7,9 +7,14 @@ import * as firebase from 'firebase/app';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
-import { PlantaService } from './planta.service';
-import { InformeService } from './informe.service';
+import { Coordinate } from 'ol/coordinate';
+import Point from 'ol/geom/Point';
+import LineString from 'ol/geom/LineString';
+
+import { PlantaService } from '@data/services/planta.service';
+import { InformeService } from '@data/services/informe.service';
 import { FilterService } from '@data/services/filter.service';
+import { ThermalService } from '@data/services/thermal.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { RawModule } from '@core/models/moduloBruto';
@@ -17,9 +22,7 @@ import { FilterModuloBruto } from '@core/models/filterModuloBruto';
 import { FilterableElement } from '@core/models/filterableInterface';
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
-import { Coordinate } from 'ol/coordinate';
-import Point from 'ol/geom/Point';
-import LineString from 'ol/geom/LineString';
+
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { ModuleGroup } from '@core/models/moduleGroup';
 
@@ -78,7 +81,8 @@ export class StructuresService {
     private informeService: InformeService,
     private plantaService: PlantaService,
     public afs: AngularFirestore,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private thermalService: ThermalService
   ) {}
 
   initService(): Promise<boolean> {
@@ -96,7 +100,7 @@ export class StructuresService {
           switchMap((planta) => {
             this.planta = planta;
 
-            return this.informeService.getThermalLayerDB$(this.informeId);
+            return this.thermalService.getReportThermalLayerDB(this.informeId);
           })
         )
         .subscribe((layers) => {

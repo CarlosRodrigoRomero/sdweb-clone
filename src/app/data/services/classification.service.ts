@@ -14,6 +14,7 @@ import { PlantaService } from './planta.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { StructuresService } from '@data/services/structures.service';
+import { ThermalService } from '@data/services/thermal.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
@@ -51,7 +52,8 @@ export class ClassificationService {
     private plantaService: PlantaService,
     private anomaliaService: AnomaliaService,
     private olMapService: OlMapService,
-    private structuresService: StructuresService
+    private structuresService: StructuresService,
+    private thermalService: ThermalService
   ) {}
 
   initService(): Promise<boolean> {
@@ -71,7 +73,7 @@ export class ClassificationService {
 
             this.getLocAreasWithModules();
 
-            return this.informeService.getThermalLayerDB$(this.informeId);
+            return this.thermalService.getReportThermalLayerDB(this.informeId);
           }),
           take(1),
           switchMap((layers) => {

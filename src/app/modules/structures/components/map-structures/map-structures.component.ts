@@ -83,8 +83,8 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
 
     this.informeId = this.structuresService.informeId;
 
-    this.informeService
-      .getThermalLayerDB$(this.informeId)
+    this.thermalService
+      .getReportThermalLayerDB(this.informeId)
       .pipe(take(1))
       .subscribe((layersDB) => {
         // nos suscribimos a las capas termicas del mapa
@@ -357,7 +357,7 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
 
           if (feature !== undefined) {
             this.rawModHovered = this.rawMods.find((rawMod) => rawMod.id === feature.getProperties().properties.id);
-          } 
+          }
         }
       } else {
         this.rawModHovered = undefined;

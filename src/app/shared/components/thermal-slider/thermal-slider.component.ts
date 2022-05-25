@@ -1,23 +1,31 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { LabelType, Options } from '@angular-slider/ngx-slider';
 
-import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { combineLatest, Subscription } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
 
 import { OlMapService } from '@data/services/ol-map.service';
 import { ThermalService } from '@data/services/thermal.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { InformeService } from '@data/services/informe.service';
+
+import { ThermalLayerInterface } from '@core/models/thermalLayer';
 
 @Component({
   selector: 'app-thermal-slider',
   templateUrl: './thermal-slider.component.html',
   styleUrls: ['./thermal-slider.component.scss'],
 })
-export class ThermalSliderComponent implements OnInit, OnDestroy {
+export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
   private thermalLayers: TileLayer[];
+  private selectedThermalLayer: ThermalLayerInterface;
+
+  @Input() informeId: string;
+
   private subscriptions: Subscription = new Subscription();
 
   /* Valores de inicio */
@@ -42,14 +50,17 @@ export class ThermalSliderComponent implements OnInit, OnDestroy {
     private thermalService: ThermalService,
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
-    private router: Router
+    private router: Router,
+    private informeService: InformeService
   ) {}
 
   ngOnInit(): void {
+    // capas termicas del mapa
     this.subscriptions.add(this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers)));
 
     this.subscriptions.add(
-      this.thermalService.sliderMax$.subscribe(() => {
+      this.thermalService.sliderMax$.subscribe((value) => {
+        this.highTemp = value;
         this.thermalLayers.forEach((tl) => {
           tl.getSource().changed();
         });
@@ -57,7 +68,8 @@ export class ThermalSliderComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.thermalService.sliderMin$.subscribe(() => {
+      this.thermalService.sliderMin$.subscribe((value) => {
+        this.lowTemp = value;
         this.thermalLayers.forEach((tl) => {
           tl.getSource().changed();
         });
@@ -72,6 +84,37 @@ export class ThermalSliderComponent implements OnInit, OnDestroy {
       this.thermalService.sliderMax = 50;
       this.lowTemp = 0;
       this.highTemp = 50;
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.informeId) {
+      combineLatest([
+        this.thermalService.getReportThermalLayerDB(this.informeId),
+        this.informeService.getInforme(this.informeId),
+      ])
+        .pipe(take(1))
+        .subscribe(([layers, informe]) => {
+          this.selectedThermalLayer = layers[0];
+
+          this.optionsTemp = {
+            floor: this.selectedThermalLayer.rangeTempMin,
+            ceil: this.selectedThermalLayer.rangeTempMax,
+            translate: this.optionsTemp.translate,
+          };
+
+          // asignamos los valores de forma automatica
+          if (informe.temperatura - 10 < this.optionsTemp.floor) {
+            this.thermalService.sliderMin = this.optionsTemp.floor;
+          } else {
+            this.thermalService.sliderMin = informe.temperatura - 10;
+          }
+          if (informe.temperatura + 40 > this.optionsTemp.ceil) {
+            this.thermalService.sliderMax = this.optionsTemp.ceil;
+          } else {
+            this.thermalService.sliderMax = informe.temperatura + 40;
+          }
+        });
     }
   }
 

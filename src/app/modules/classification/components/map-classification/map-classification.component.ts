@@ -92,8 +92,8 @@ export class MapClassificationComponent implements OnInit {
 
     this.classificationService.normModSelected$.subscribe((normMod) => (this.normModSelected = normMod));
 
-    this.informeService
-      .getThermalLayerDB$(this.informeId)
+    this.thermalService
+      .getReportThermalLayerDB(this.informeId)
       .pipe(take(1))
       .subscribe((layers) => {
         // comprobamos si existe la thermalLayer

@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { InformeService } from '@data/services/informe.service';
+import { ThermalService } from '@data/services/thermal.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
@@ -27,7 +28,8 @@ export class ThermalLayerCreateComponent implements OnInit, OnDestroy {
     private router: Router,
     private informeService: InformeService,
     private formBuilder: FormBuilder,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private thermalService: ThermalService
   ) {}
 
   ngOnInit(): void {
@@ -63,7 +65,7 @@ export class ThermalLayerCreateComponent implements OnInit, OnDestroy {
       };
 
       // Crea thermalLayer en la DB
-      this.informeService.addThermalLayer(thermalLayer);
+      this.thermalService.addThermalLayer(thermalLayer);
 
       // aviso de capa termica creada correctamente
       this.openSnackBar();
