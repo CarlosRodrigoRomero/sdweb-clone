@@ -22,7 +22,7 @@ export class StructuresComponent implements OnInit, OnDestroy {
   createRawModMode = false;
   nombrePlanta: string;
   private map: Map;
-  private informe: InformeInterface;
+  informe: InformeInterface;
   modulesLoaded = false;
 
   private subscriptions: Subscription = new Subscription();

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { switchMap, take } from 'rxjs/operators';
@@ -27,12 +27,12 @@ import { LocationAreaInterface } from '@core/models/location';
   templateUrl: './classification.component.html',
   styleUrls: ['./classification.component.css'],
 })
-export class ClassificationComponent implements OnInit {
+export class ClassificationComponent implements OnInit, OnDestroy {
   serviceInit = false;
   planta: PlantaInterface;
   normModHovered: NormalizedModule = undefined;
   private anomalias: Anomalia[] = [];
-  private informe: InformeInterface;
+  informe: InformeInterface;
   anomaliasNoData: Anomalia[] = [];
   anomsNoModule: Anomalia[] = [];
   anomsNoGlobals: Anomalia[] = [];
@@ -63,26 +63,35 @@ export class ClassificationComponent implements OnInit {
 
   ngOnInit(): void {
     this.classificationService.initService().then((value) => (this.serviceInit = value));
-    this.classificationService.planta$.subscribe((planta) => (this.planta = planta));
-    this.classificationService.normModHovered$.subscribe((normMod) => (this.normModHovered = normMod));
+    this.subscriptions.add(this.classificationService.planta$.subscribe((planta) => (this.planta = planta)));
+    this.subscriptions.add(
+      this.classificationService.normModHovered$.subscribe((normMod) => (this.normModHovered = normMod))
+    );
 
     // lo iniciamos para poder acceder a la info de la trayectoria del vuelo
-    this.clustersService.initService().pipe(take(1)).subscribe();
+    this.subscriptions.add(this.clustersService.initService().pipe(take(1)).subscribe());
 
-    this.classificationService.normModules$.subscribe((normMods) => (this.normModules = normMods));
+    this.subscriptions.add(
+      this.classificationService.normModules$.subscribe((normMods) => (this.normModules = normMods))
+    );
 
-    this.classificationService.listaAnomalias$.subscribe((anomalias) => (this.anomalias = anomalias));
+    this.subscriptions.add(
+      this.classificationService.listaAnomalias$.subscribe((anomalias) => (this.anomalias = anomalias))
+    );
 
     // traemos el informe
     this.informeService
       .getInforme(this.classificationService.informeId)
+      .pipe(take(1))
       .subscribe((informe) => (this.informe = informe));
 
-    this.anomsProcesed$.subscribe((procesed) => {
-      if (procesed) {
-        this.loadDataAndCheckWarnings();
-      }
-    });
+    this.subscriptions.add(
+      this.anomsProcesed$.subscribe((procesed) => {
+        if (procesed) {
+          this.loadDataAndCheckWarnings();
+        }
+      })
+    );
   }
 
   endClassification() {
@@ -335,6 +344,10 @@ export class ClassificationComponent implements OnInit {
             });
         });
       });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
