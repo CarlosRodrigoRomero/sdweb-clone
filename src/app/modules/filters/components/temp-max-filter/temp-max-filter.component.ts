@@ -6,8 +6,11 @@ import { LabelType, Options, PointerType } from '@angular-slider/ngx-slider';
 
 import { FilterService } from '@data/services/filter.service';
 import { FilterControlService } from '@data/services/filter-control.service';
+import { ReportControlService } from '@data/services/report-control.service';
 
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
+import { Anomalia } from '@core/models/anomalia';
+import { Seguidor } from '@core/models/seguidor';
 
 @Component({
   selector: 'app-temp-max-filter',
@@ -15,29 +18,46 @@ import { TempMaxFilter } from '@core/models/tempMaxFilter';
   styleUrls: ['./temp-max-filter.component.css'],
 })
 export class TempMaxFilterComponent implements OnInit, OnDestroy {
-  minTemp = 50;
-  maxTemp = 120;
-  rangoMinTemp: number;
-  rangoMaxTemp: number;
+  floor = 50;
+  ceil = 120;
+  minTemp: number;
+  maxTemp: number;
   filtroTempMax: TempMaxFilter;
   options: Options;
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
+  constructor(
+    private filterService: FilterService,
+    private filterControlService: FilterControlService,
+    private reportControlService: ReportControlService
+  ) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(
-      this.filterControlService.minTempMaxSource.subscribe((value) => (this.rangoMinTemp = value))
-    );
-    this.subscriptions.add(
-      this.filterControlService.maxTempMaxSource.subscribe((value) => (this.rangoMaxTemp = value))
-    );
+    let anomalias: Anomalia[];
+    if (this.reportControlService.plantaFija) {
+      anomalias = this.reportControlService.allFilterableElements as Anomalia[];
+    } else {
+      this.reportControlService.allFilterableElements.forEach((elem) => {
+        const seguidor = elem as Seguidor;
+        if (seguidor.anomaliasCliente.length > 0) {
+          anomalias.push(...seguidor.anomaliasCliente);
+        }
+      });
+    }
+    anomalias = anomalias.sort((a, b) => a.temperaturaMax - b.temperaturaMax);
+    this.floor = Math.round(anomalias[0].temperaturaMax);
+    this.ceil = Math.round(anomalias[anomalias.length - 1].temperaturaMax);
+
+    this.filterControlService.minTempMaxDefault = this.floor;
+    this.filterControlService.maxTempMaxDefault = this.ceil;
+    this.filterControlService.minTempMax = this.floor;
+    this.filterControlService.maxTempMax = this.ceil;
 
     this.options = {
-      floor: this.minTemp,
-      ceil: this.maxTemp,
-      step: 2,
+      floor: this.filterControlService.minTempMaxDefault,
+      ceil: this.filterControlService.maxTempMaxDefault,
+      step: 1,
       translate: (value: number, label: LabelType): string => {
         switch (label) {
           case LabelType.Low:
@@ -49,19 +69,22 @@ export class TempMaxFilterComponent implements OnInit, OnDestroy {
         }
       },
       getSelectionBarColor: (minValue: number, maxValue: number): string => {
-        if (minValue === this.minTemp && maxValue === this.maxTemp) {
+        if (minValue === this.floor && maxValue === this.ceil) {
           return '#c4c4c4';
         }
         return '#455a64';
       },
       getPointerColor: (value: number, pointerType: PointerType.Min | PointerType.Max): string => {
-        if (value !== this.minTemp) {
-          if (value !== this.maxTemp) {
+        if (value !== this.floor) {
+          if (value !== this.ceil) {
             return '#455a64';
           }
         }
       },
     };
+
+    this.subscriptions.add(this.filterControlService.minTempMaxSource.subscribe((value) => (this.minTemp = value)));
+    this.subscriptions.add(this.filterControlService.maxTempMaxSource.subscribe((value) => (this.maxTemp = value)));
   }
 
   onChangeFiltroTempMax(lowValue: number, highValue: number) {
@@ -72,7 +95,7 @@ export class TempMaxFilterComponent implements OnInit, OnDestroy {
     this.filterControlService.minTempMax = lowValue;
     this.filterControlService.maxTempMax = highValue;
 
-    if (this.rangoMinTemp === this.minTemp && this.rangoMaxTemp === this.maxTemp) {
+    if (this.minTemp === this.floor && this.maxTemp === this.ceil) {
       // si se selecciona el mínimo desactivamos el filtro ...
       this.filterService.deleteFilter(this.filtroTempMax);
     } else {
