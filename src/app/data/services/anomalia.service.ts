@@ -165,7 +165,9 @@ export class AnomaliaService {
               data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
             }
             data.numAnom = index + 1;
-            data.datetime = this.getRightDatetime(data.datetime);
+            if (data.datetime !== undefined) {
+              data.datetime = this.getRightDatetime(data.datetime);
+            }
             if (tipo === 'pcs') {
               data.localX = (data as PcInterface).local_x;
               data.localY = (data as PcInterface).local_y;
