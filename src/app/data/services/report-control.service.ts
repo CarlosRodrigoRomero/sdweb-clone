@@ -481,8 +481,9 @@ export class ReportControlService {
   }
 
   setMaeInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
-    if (anomalias.length > 0) {
-      const perdidas = anomalias.map((anom) => anom.perdidas);
+    const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
+    if (anomaliasInforme.length > 0) {
+      const perdidas = anomaliasInforme.map((anom) => anom.perdidas);
       let perdidasTotales = 0;
       perdidas.forEach((perd) => (perdidasTotales += perd));
 
@@ -518,9 +519,10 @@ export class ReportControlService {
   }
 
   setCCInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
-    if (anomalias.length > 0) {
+    const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
+    if (anomaliasInforme.length > 0) {
       // tslint:disable-next-line: triple-equals
-      const celCals = anomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+      const celCals = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
       informe.cc = celCals.length / informe.numeroModulos;
     } else {
