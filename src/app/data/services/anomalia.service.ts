@@ -166,6 +166,9 @@ export class AnomaliaService {
             }
             data.numAnom = index + 1;
             data.datetime = this.getRightDatetime(data.datetime);
+            if (!data.hasOwnProperty('temperaturaRef') || data.temperaturaRef === 0) {
+              data.temperaturaRef = data.temperaturaMax - data.gradienteNormalizado;
+            }
             if (tipo === 'pcs') {
               data.localX = (data as PcInterface).local_x;
               data.localY = (data as PcInterface).local_y;

@@ -14,6 +14,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { InformeService } from '@data/services/informe.service';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
+import { MathOperations } from '@core/classes/math-operations';
 
 @Component({
   selector: 'app-thermal-slider',
@@ -76,6 +77,8 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
       })
     );
 
+    this.setInitialValues();
+
     // PLANTA NUEVO CLIENTE
     const informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
     if (this.reportControlService.plantaId === '3JXI01XmcE3G1d4WNMMd' || informeId === 'EQKwnkexFVUJ5YLZfHsM') {
@@ -89,12 +92,10 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.informeId) {
-      combineLatest([
-        this.thermalService.getReportThermalLayerDB(this.informeId),
-        this.informeService.getInforme(this.informeId),
-      ])
+      this.thermalService
+        .getReportThermalLayerDB(this.informeId)
         .pipe(take(1))
-        .subscribe(([layers, informe]) => {
+        .subscribe((layers) => {
           this.selectedThermalLayer = layers[0];
 
           this.optionsTemp = {
@@ -102,20 +103,32 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
             ceil: this.selectedThermalLayer.rangeTempMax,
             translate: this.optionsTemp.translate,
           };
-
-          // asignamos los valores de forma automatica
-          if (informe.temperatura - 10 < this.optionsTemp.floor) {
-            this.thermalService.sliderMin = this.optionsTemp.floor;
-          } else {
-            this.thermalService.sliderMin = informe.temperatura - 10;
-          }
-          if (informe.temperatura + 40 > this.optionsTemp.ceil) {
-            this.thermalService.sliderMax = this.optionsTemp.ceil;
-          } else {
-            this.thermalService.sliderMax = informe.temperatura + 40;
-          }
         });
     }
+  }
+
+  setInitialValues() {
+    this.informeService
+      .getInforme(this.informeId)
+      .pipe(take(1))
+      .subscribe((informe) => {
+        // const anomaliasInforme = this.reportControlService.allAnomalias.filter(
+        //   (anom) => anom.informeId === this.informeId
+        // );
+        // const tempRefMedia = Math.round(MathOperations.average(anomaliasInforme.map((anom) => anom.temperaturaRef)));
+
+        // asignamos los valores de forma automatica
+        if (informe.temperatura /* tempRefMedia */ - 10 < this.optionsTemp.floor) {
+          this.thermalService.sliderMin = this.optionsTemp.floor;
+        } else {
+          this.thermalService.sliderMin = informe.temperatura /* tempRefMedia */ - 10;
+        }
+        if (informe.temperatura /* tempRefMedia */ + 40 > this.optionsTemp.ceil) {
+          this.thermalService.sliderMax = this.optionsTemp.ceil;
+        } else {
+          this.thermalService.sliderMax = informe.temperatura /* tempRefMedia */ + 40;
+        }
+      });
   }
 
   onChangeTemperatureSlider(lowValue: number, highValue: number) {

@@ -34,7 +34,7 @@ export class TempMaxFilterComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    let anomalias: Anomalia[];
+    let anomalias: Anomalia[] = [];
     if (this.reportControlService.plantaFija) {
       anomalias = this.reportControlService.allFilterableElements as Anomalia[];
     } else {

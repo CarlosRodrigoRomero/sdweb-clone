@@ -53,6 +53,8 @@ export class ReportControlService {
   public mapLoaded$ = new BehaviorSubject<boolean>(this._mapLoaded);
   private _allFilterableElements: FilterableElement[] = [];
   public allFilterableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFilterableElements);
+  private _allAnomalias: Anomalia[] = [];
+  allAnomalias$ = new BehaviorSubject<Anomalia[]>(this._allAnomalias);
   public plantaFija = false;
   private _thereAreZones = true;
   public thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
@@ -130,6 +132,8 @@ export class ReportControlService {
                   this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
                 }
 
+                this.allAnomalias = this.allFilterableElements as Anomalia[];
+
                 // guardamos los datos de los diferentes recuentos de anomalias en el informe
                 this.setCountAnomsInformesPlanta(this.allFilterableElements as Anomalia[]);
 
@@ -198,6 +202,8 @@ export class ReportControlService {
                       .subscribe((anoms) => {
                         this.allFilterableElements = this.anomaliaService.getRealAnomalias(anoms);
 
+                        this.allAnomalias = this.allFilterableElements as Anomalia[];
+
                         // iniciamos filter service
                         this.filterService
                           .initService(this.allFilterableElements, true, this.sharedId)
@@ -240,6 +246,8 @@ export class ReportControlService {
                       )
                       .subscribe((anoms) => {
                         this.allFilterableElements = this.anomaliaService.getRealAnomalias(anoms);
+
+                        this.allAnomalias = this.allFilterableElements as Anomalia[];
 
                         // iniciamos filter service
                         this.filterService
@@ -289,6 +297,12 @@ export class ReportControlService {
               )
               .subscribe((segs) => {
                 this.allFilterableElements = segs;
+
+                (this.allFilterableElements as Seguidor[]).forEach((seg) => {
+                  if (seg.anomaliasCliente.length > 0) {
+                    this.allAnomalias.push(...seg.anomaliasCliente);
+                  }
+                });
 
                 // guardamos los datos de los diferentes recuentos de anomalias en el informe
                 this.setCountAnomsInformesPlanta(this.allFilterableElements as Seguidor[]);
@@ -352,6 +366,12 @@ export class ReportControlService {
                       .subscribe((segs) => {
                         this.allFilterableElements = segs;
 
+                        (this.allFilterableElements as Seguidor[]).forEach((seg) => {
+                          if (seg.anomaliasCliente.length > 0) {
+                            this.allAnomalias.push(...seg.anomaliasCliente);
+                          }
+                        });
+
                         // iniciamos filter service
                         this.filterService.initService(segs, true, this.sharedId).then((filtersInit) => {
                           // enviamos respuesta de servicio iniciado
@@ -384,6 +404,12 @@ export class ReportControlService {
                       )
                       .subscribe((segs) => {
                         this.allFilterableElements = segs;
+
+                        (this.allFilterableElements as Seguidor[]).forEach((seg) => {
+                          if (seg.anomaliasCliente.length > 0) {
+                            this.allAnomalias.push(...seg.anomaliasCliente);
+                          }
+                        });
 
                         // iniciamos filter service
                         this.filterService.initService(segs, true, this.sharedId).then((filtersInit) => {
@@ -427,28 +453,6 @@ export class ReportControlService {
     }
 
     return numGlobalCoords;
-  }
-
-  private addNumAnom(elements: FilterableElement[], informes: InformeInterface[]): Anomalia[] {
-    let anomalias: Anomalia[] = [];
-    if (elements[0].hasOwnProperty('anomaliasCliente')) {
-      elements.forEach((element) => anomalias.push(...(element as Seguidor).anomaliasCliente));
-    } else {
-      anomalias = elements as Anomalia[];
-    }
-    // lar ordenamos por tipo de anomalía
-    anomalias = this.anomaliaService.sortAnomsByTipo(anomalias);
-
-    const anomsWithNumAnom = [];
-    informes.forEach((informe) => {
-      let anomsInforme = anomalias.filter((anom) => anom.informeId === informe.id);
-      anomsInforme = anomsInforme.map((anom, index) => {
-        anom.numAnom = index + 1;
-        return anom;
-      });
-      anomsWithNumAnom.push(...anomsInforme);
-    });
-    return anomsWithNumAnom;
   }
 
   private checkMaeInformes(elems: FilterableElement[]): void {
@@ -799,6 +803,15 @@ export class ReportControlService {
   set allFilterableElements(value: FilterableElement[]) {
     this._allFilterableElements = value;
     this.allFilterableElements$.next(value);
+  }
+
+  get allAnomalias(): Anomalia[] {
+    return this._allAnomalias;
+  }
+
+  set allAnomalias(value: Anomalia[]) {
+    this._allAnomalias = value;
+    this.allAnomalias$.next(value);
   }
 
   get thereAreZones() {
