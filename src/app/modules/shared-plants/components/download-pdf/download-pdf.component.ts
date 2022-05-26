@@ -123,7 +123,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private seguidores1ejeNoAnoms: LocationAreaInterface[] = [];
   private largestLocAreas: LocationAreaInterface[] = [];
   simplePDF = false;
-  private maxAnomsConImgs = 500;
+  private maxAnomsConImgs = 250;
 
   private subscriptions: Subscription = new Subscription();
 
