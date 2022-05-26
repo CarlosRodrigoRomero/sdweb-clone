@@ -15,7 +15,6 @@ export class StatsService {
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _loadStats = false;
   loadStats$ = new BehaviorSubject<boolean>(this._loadStats);
-  allElems = this.reportControlService.allFilterableElements;
   informesIdList: string[] = this.reportControlService.informesIdList;
   dateLabels: string[] = [];
   private _loadCCyGradChart = true;

@@ -121,30 +121,15 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
         .subscribe((informeId) => {
           this.informeSelected = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
-          // reseteamos con cada cambio de informe
-          this.anomaliasInforme = [];
+          // filtramos las anomalias del informe seleccionado
+          this.anomaliasInforme = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId);
 
-          if (this.reportControlService.plantaFija) {
-            this.anomaliasInforme = (this.allElems as Anomalia[]).filter((anom) => anom.informeId === informeId);
+          // ordenamos la lista de anomalias por su indice
+          this.anomaliasInforme = this.anomaliasInforme.sort((a, b) => a.numAnom - b.numAnom);
 
-            this.columnasLink = [10];
-          } else {
-            const seguidoresInforme = (this.allElems as Seguidor[]).filter((seg) => seg.informeId === informeId);
+          this.columnasLink = [2, 3];
 
-            seguidoresInforme.forEach((seguidor) => {
-              const anomaliasSeguidor = seguidor.anomaliasCliente;
-              if (anomaliasSeguidor.length > 0) {
-                this.anomaliasInforme.push(...anomaliasSeguidor);
-              }
-            });
-
-            // ordenamos la lista de anomalias por su indice
-            this.anomaliasInforme = this.anomaliasInforme.sort((a, b) => a.numAnom - b.numAnom);
-
-            this.columnasLink = [2, 3];
-
-            this.inicioFilters = 7;
-          }
+          this.inicioFilters = 7;
 
           // vaciamos el contenido con cada cambio de informe
           this.json = new Array(this.anomaliasInforme.length);
@@ -320,7 +305,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     if (this.informeSelected.correccHoraSrt !== undefined) {
       datetime += this.informeSelected.correccHoraSrt * 3600;
     }
-    console.log(datetime);
     row.datetime = this.datePipe.transform(datetime * 1000, 'dd/MM/yyyy HH:mm:ss');
     row.lugar = this.planta.nombre;
     if (anomalia.hasOwnProperty('irradiancia') && anomalia.irradiancia !== null) {

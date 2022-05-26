@@ -34,18 +34,7 @@ export class TempMaxFilterComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    let anomalias: Anomalia[] = [];
-    if (this.reportControlService.plantaFija) {
-      anomalias = this.reportControlService.allFilterableElements as Anomalia[];
-    } else {
-      this.reportControlService.allFilterableElements.forEach((elem) => {
-        const seguidor = elem as Seguidor;
-        if (seguidor.anomaliasCliente.length > 0) {
-          anomalias.push(...seguidor.anomaliasCliente);
-        }
-      });
-    }
-    anomalias = anomalias.sort((a, b) => a.temperaturaMax - b.temperaturaMax);
+    const anomalias = this.reportControlService.allAnomalias.sort((a, b) => a.temperaturaMax - b.temperaturaMax);
     this.floor = Math.round(anomalias[0].temperaturaMax);
     this.ceil = Math.round(anomalias[anomalias.length - 1].temperaturaMax);
 

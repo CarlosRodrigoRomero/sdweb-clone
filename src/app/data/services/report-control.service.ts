@@ -112,11 +112,10 @@ export class ReportControlService {
                   // evitamos cargar los informes dobles al navegar atras y volver
                   if (this.informesIdList.length === 0) {
                     // añadimos los informes  a la lista
-                    this.informes.forEach((informe) => this._informesIdList.push(informe.id));
-                    this.informesIdList$.next(this._informesIdList);
+                    this.informes.forEach((informe) => this.informesIdList.push(informe.id));
                   }
 
-                  this.selectedInformeId = this._informesIdList[this._informesIdList.length - 1];
+                  this.selectedInformeId = this.informesIdList[this.informesIdList.length - 1];
 
                   // obtenemos todas las anomalías
                   return this.anomaliaService.getAnomaliasPlanta$(this.planta);
@@ -235,8 +234,7 @@ export class ReportControlService {
                           // evitamos cargar los informes dobles al navegar atras y volver
                           if (this.informesIdList.length === 0) {
                             // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                            this.informes.forEach((informe) => this._informesIdList.push(informe.id));
-                            this.informesIdList$.next(this._informesIdList);
+                            this.informes.forEach((informe) => this.informesIdList.push(informe.id));
                           }
 
                           // obtenemos todas las anomalías
@@ -286,10 +284,9 @@ export class ReportControlService {
                   // evitamos cargar los informes dobles al navegar atras y volver
                   if (this.informesIdList.length === 0) {
                     // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                    this.informes.forEach((informe) => this._informesIdList.push(informe.id));
-                    this.informesIdList$.next(this._informesIdList);
+                    this.informes.forEach((informe) => this.informesIdList.push(informe.id));
                   }
-                  this.selectedInformeId = this._informesIdList[this._informesIdList.length - 1];
+                  this.selectedInformeId = this.informesIdList[this.informesIdList.length - 1];
                   // obtenemos todos los seguidores
                   return this.seguidorService.getSeguidoresPlanta$(this.plantaId);
                 }),
@@ -394,8 +391,7 @@ export class ReportControlService {
                           // evitamos cargar los informes dobles al navegar atras y volver
                           if (this.informesIdList.length === 0) {
                             // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                            this.informes.forEach((informe) => this._informesIdList.push(informe.id));
-                            this.informesIdList$.next(this._informesIdList);
+                            this.informes.forEach((informe) => this.informesIdList.push(informe.id));
                           }
                           // obtenemos todos los seguidores
                           return this.seguidorService.getSeguidoresPlanta$(this.plantaId);

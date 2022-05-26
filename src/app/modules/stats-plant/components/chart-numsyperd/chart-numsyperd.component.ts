@@ -1,6 +1,5 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { combineLatest, Subscription } from 'rxjs';
 
 import {
   ChartComponent,
@@ -20,11 +19,9 @@ import {
 } from 'ng-apexcharts';
 
 import { GLOBAL } from '@data/constants/global';
-import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
-import { Seguidor } from '@core/models/seguidor';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -58,7 +55,7 @@ export interface DataPlot {
   templateUrl: './chart-numsyperd.component.html',
   styleUrls: ['./chart-numsyperd.component.css'],
 })
-export class ChartNumsyperdComponent implements OnInit, OnDestroy {
+export class ChartNumsyperdComponent implements OnInit {
   @ViewChild('charNumYPer') chartNumYPer: ChartComponent;
   public chartOptionsComun: Partial<ChartOptions>;
   public chartOptions1: Partial<ChartOptions>;
@@ -76,35 +73,22 @@ export class ChartNumsyperdComponent implements OnInit, OnDestroy {
   public allAnomalias: Anomalia[] = [];
   public chartHeight = 300;
 
-  private subscriptions: Subscription = new Subscription();
-
-  constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
+  constructor(private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(
-      combineLatest([
-        this.reportControlService.allFilterableElements$,
-        this.reportControlService.informesIdList$,
-      ]).subscribe(([elems, informes]) => {
-        if (this.reportControlService.plantaFija) {
-          this.allAnomalias = elems as Anomalia[];
-        } else {
-          (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
-        }
+    this.informesList = this.reportControlService.informesIdList;
 
-        this.informesList = informes;
+    this.allAnomalias = this.reportControlService.allAnomalias;
 
-        this.dataPlot = [];
-        this.getAllCategorias(this.allAnomalias);
+    this.dataPlot = [];
+    this.getAllCategorias(this.allAnomalias);
 
-        this.informesList.forEach((informeId) => {
-          const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
-          this.dataPlot.push(this.calculateDataPlot(anomaliasInforme, informeId));
-        });
+    this.informesList.forEach((informeId) => {
+      const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
+      this.dataPlot.push(this.calculateDataPlot(anomaliasInforme, informeId));
+    });
 
-        this.initChart();
-      })
-    );
+    this.initChart();
   }
 
   private getAllCategorias(anomalias): void {
@@ -305,9 +289,5 @@ export class ChartNumsyperdComponent implements OnInit, OnDestroy {
       };
       this.chartLoaded = true;
     }
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
   }
 }

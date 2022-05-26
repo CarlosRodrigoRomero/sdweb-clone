@@ -107,17 +107,12 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscriptions.add(
       combineLatest([
-        this.reportControlService.allFilterableElements$,
         this.reportControlService.informesIdList$,
         this.plantaService.getPlanta(this.reportControlService.plantaId),
       ])
         .pipe(
-          switchMap(([elems, informesId, planta]) => {
-            if (this.reportControlService.plantaFija) {
-              this.allAnomalias = elems as Anomalia[];
-            } else {
-              (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
-            }
+          switchMap(([informesId, planta]) => {
+            this.allAnomalias = this.reportControlService.allAnomalias;
 
             // tslint:disable-next-line: triple-equals
             this.allCC = this.allAnomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
