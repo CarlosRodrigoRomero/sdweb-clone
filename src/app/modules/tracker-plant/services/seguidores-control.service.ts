@@ -24,6 +24,7 @@ import { GLOBAL } from '@data/constants/global';
 import { MapSeguidoresService } from './map-seguidores.service';
 
 import { Seguidor } from '@core/models/seguidor';
+import { MathOperations } from '@core/classes/math-operations';
 
 @Injectable({
   providedIn: 'root',
@@ -345,8 +346,8 @@ export class SeguidoresControlService {
         .filter((seg) => (seg as Seguidor).informeId === informeId)
         .map((seg) => (seg as Seguidor).mae);
 
-      this.maesMedio.push(this.average(maes));
-      this.maesSigma.push(this.standardDeviation(maes));
+      this.maesMedio.push(MathOperations.average(maes));
+      this.maesSigma.push(MathOperations.standardDeviation(maes));
     });
   }
 
@@ -357,24 +358,9 @@ export class SeguidoresControlService {
         .map((seg) => (seg as Seguidor).celsCalientes)
         .filter((cc) => !isNaN(cc) && cc !== Infinity && cc !== -Infinity);
 
-      this.ccsMedio.push(this.average(celsCalientes));
-      this.ccsSigma.push(this.standardDeviation(celsCalientes));
+      this.ccsMedio.push(MathOperations.average(celsCalientes));
+      this.ccsSigma.push(MathOperations.standardDeviation(celsCalientes));
     });
-  }
-
-  private average(data: number[]): number {
-    const sum = data.reduce(function (sum, value) {
-      return sum + value;
-    }, 0);
-
-    const avg = sum / data.length;
-    return avg;
-  }
-
-  private standardDeviation(values): number {
-    const n = values.length;
-    const mean = values.reduce((a, b) => a + b) / n;
-    return Math.sqrt(values.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
   }
 
   private latLonLiteralToLonLat(path: LatLngLiteral[]) {

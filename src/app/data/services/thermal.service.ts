@@ -22,6 +22,53 @@ export class ThermalService {
 
   constructor(private afs: AngularFirestore) {}
 
+  addThermalLayer(thermalLayer: ThermalLayerInterface) {
+    this.afs
+      .collection('thermalLayers')
+      .doc(thermalLayer.id)
+      .set(thermalLayer)
+      .then((docRef) => {
+        console.log('ThermalLayer creada correctamente');
+      })
+      .catch((error) => {
+        console.error('Error creando thermalLayer: ', error);
+      });
+  }
+
+  getReportThermalLayerDB(informeId: string): Observable<ThermalLayerInterface[]> {
+    const query$ = this.afs
+      .collection<ThermalLayerInterface>('thermalLayers', (ref) => ref.where('informeId', '==', informeId))
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((doc) => {
+            let data = doc.payload.doc.data() as ThermalLayerInterface;
+            data.id = doc.payload.doc.id;
+
+            return data;
+          })
+        )
+      );
+    return query$;
+  }
+
+  getPlantThermalLayerDB(plantaId: string): Observable<ThermalLayerInterface[]> {
+    const query$ = this.afs
+      .collection<ThermalLayerInterface>('thermalLayers', (ref) => ref.where('plantaId', '==', plantaId))
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((doc) => {
+            let data = doc.payload.doc.data() as ThermalLayerInterface;
+            data.id = doc.payload.doc.id;
+
+            return data;
+          })
+        )
+      );
+    return query$;
+  }
+
   getThermalLayers(): Observable<ThermalLayerInterface[]> {
     this.afs
       .collection('thermalLayers')

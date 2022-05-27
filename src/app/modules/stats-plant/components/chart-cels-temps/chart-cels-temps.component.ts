@@ -63,64 +63,54 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.informesIdList = this.reportControlService.informesIdList;
+
+    this.allAnomalias = this.reportControlService.allAnomalias;
+
     this.subscriptions.add(
-      combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informesIdList$])
-        .pipe(
-          switchMap(([elems, informesId]) => {
-            if (this.reportControlService.plantaFija) {
-              this.allAnomalias = elems as Anomalia[];
-            } else {
-              (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
-            }
+      this.informeService.getDateLabelsInformes(this.informesIdList).subscribe((dateLabels) => {
+        this.dateLabels = dateLabels;
 
-            this.informesIdList = informesId;
+        const data = [];
 
-            return this.informeService.getDateLabelsInformes(this.informesIdList);
-          })
-        )
-        .subscribe((dateLabels) => {
-          this.dateLabels = dateLabels;
+        this.informesIdList.forEach((informeId) => {
+          const celsCals = this.allAnomalias
+            .filter((anom) => anom.informeId === informeId)
+            // tslint:disable-next-line: triple-equals
+            .filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
-          const data = [];
+          this.gradienteMinimoCriterio = this.anomaliaService.criterioCriticidad.rangosDT[0];
 
-          this.informesIdList.forEach((informeId) => {
-            const celsCals = this.allAnomalias
-              .filter((anom) => anom.informeId === informeId)
-              // tslint:disable-next-line: triple-equals
-              .filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+          if (this.gradienteMinimoCriterio < 10) {
+            const range1 = celsCals.filter((cc) => cc.gradienteNormalizado < 10 && cc.gradienteNormalizado >= 0);
+            const range2 = celsCals.filter((cc) => cc.gradienteNormalizado < 20 && cc.gradienteNormalizado >= 10);
+            const range3 = celsCals.filter((cc) => cc.gradienteNormalizado < 30 && cc.gradienteNormalizado >= 20);
+            const range4 = celsCals.filter((cc) => cc.gradienteNormalizado < 40 && cc.gradienteNormalizado >= 30);
+            const range5 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
 
-            this.gradienteMinimoCriterio = this.anomaliaService.criterioCriticidad.rangosDT[0];
+            this.categories = [
+              this.gradienteMinimoCriterio.toString() + '-10 ºC',
+              '10-20 ºC',
+              '20-30 ºC',
+              '30-40 ºC',
+              '>40 ºC',
+            ];
 
-            if (this.gradienteMinimoCriterio < 10) {
-              const range1 = celsCals.filter((cc) => cc.gradienteNormalizado < 10 && cc.gradienteNormalizado >= 0);
-              const range2 = celsCals.filter((cc) => cc.gradienteNormalizado < 20 && cc.gradienteNormalizado >= 10);
-              const range3 = celsCals.filter((cc) => cc.gradienteNormalizado < 30 && cc.gradienteNormalizado >= 20);
-              const range4 = celsCals.filter((cc) => cc.gradienteNormalizado < 40 && cc.gradienteNormalizado >= 30);
-              const range5 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
+            data.push([range1.length, range2.length, range3.length, range4.length, range5.length]);
+          } else {
+            const range1 = celsCals.filter((cc) => cc.gradienteNormalizado < 20 && cc.gradienteNormalizado >= 10);
+            const range2 = celsCals.filter((cc) => cc.gradienteNormalizado < 30 && cc.gradienteNormalizado >= 20);
+            const range3 = celsCals.filter((cc) => cc.gradienteNormalizado < 40 && cc.gradienteNormalizado >= 30);
+            const range4 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
 
-              this.categories = [
-                this.gradienteMinimoCriterio.toString() + '-10 ºC',
-                '10-20 ºC',
-                '20-30 ºC',
-                '30-40 ºC',
-                '>40 ºC',
-              ];
+            this.categories = ['10-20 ºC', '20-30 ºC', '30-40 ºC', '>40 ºC'];
 
-              data.push([range1.length, range2.length, range3.length, range4.length, range5.length]);
-            } else {
-              const range1 = celsCals.filter((cc) => cc.gradienteNormalizado < 20 && cc.gradienteNormalizado >= 10);
-              const range2 = celsCals.filter((cc) => cc.gradienteNormalizado < 30 && cc.gradienteNormalizado >= 20);
-              const range3 = celsCals.filter((cc) => cc.gradienteNormalizado < 40 && cc.gradienteNormalizado >= 30);
-              const range4 = celsCals.filter((cc) => cc.gradienteNormalizado >= 40);
+            data.push([range1.length, range2.length, range3.length, range4.length]);
+          }
+        });
 
-              this.categories = ['10-20 ºC', '20-30 ºC', '30-40 ºC', '>40 ºC'];
-
-              data.push([range1.length, range2.length, range3.length, range4.length]);
-            }
-          });
-
-          this._initChartData(data);
-        })
+        this._initChartData(data);
+      })
     );
   }
 

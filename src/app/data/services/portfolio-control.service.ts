@@ -19,6 +19,7 @@ import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 import { UserInterface } from '@core/models/user';
 import { CritCriticidad } from '@core/models/critCriticidad';
+import { MathOperations } from '@core/classes/math-operations';
 
 @Injectable({
   providedIn: 'root',
@@ -183,11 +184,11 @@ export class PortfolioControlService {
               }
             });
 
-            this.maeMedio = this.weightedAverage(
+            this.maeMedio = MathOperations.weightedAverage(
               this.maePlantas,
               this.listaPlantas.map((planta) => planta.potencia)
             );
-            this.maeSigma = this.DAM(this.maePlantas, this.maeMedio);
+            this.maeSigma = MathOperations.DAM(this.maePlantas, this.maeMedio);
 
             this.initialized = true;
 
@@ -222,8 +223,8 @@ export class PortfolioControlService {
           }
         });
 
-        const maeMedio = this.weightedAverage(maePlantas, potenciaPlantas);
-        const maeSigma = this.DAM(maePlantas, maeMedio);
+        const maeMedio = MathOperations.weightedAverage(maePlantas, potenciaPlantas);
+        const maeSigma = MathOperations.DAM(maePlantas, maeMedio);
 
         return [maeMedio, maeSigma];
       })
@@ -241,58 +242,6 @@ export class PortfolioControlService {
     }
 
     return mae;
-  }
-
-  private average(data) {
-    const sum = data.reduce((s, value) => {
-      return s + value;
-    }, 0);
-
-    const avg = sum / data.length;
-    return avg;
-  }
-
-  private weightedAverage(arrValues, arrWeights) {
-    const result = arrValues
-      .map((value, i) => {
-        const weight = arrWeights[i];
-        const sum = value * weight;
-
-        return [sum, weight];
-      })
-      .reduce(
-        (p, c) => {
-          return [p[0] + c[0], p[1] + c[1]];
-        },
-        [0, 0]
-      );
-
-    return result[0] / result[1];
-  }
-
-  private standardDeviation(values) {
-    const avg = this.average(values);
-
-    const squareDiffs = values.map((value) => {
-      const diff = value - avg;
-      const sqrDiff = diff * diff;
-      return sqrDiff;
-    });
-
-    const avgSquareDiff = this.average(squareDiffs);
-
-    const stdDev = Math.sqrt(avgSquareDiff);
-    return stdDev;
-  }
-
-  private DAM(values: number[], average: number): number {
-    // desviacion media absoluta, para que no afectanten los extremos a la desviacion
-    let sumatorioDesviaciones = 0;
-    values.forEach((value) => {
-      sumatorioDesviaciones = sumatorioDesviaciones + Math.abs(value - average);
-    });
-
-    return sumatorioDesviaciones / values.length;
   }
 
   checkPlantaSoloWebAntigua(plantaId: string): boolean {

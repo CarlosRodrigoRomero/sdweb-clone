@@ -26,6 +26,7 @@ import {
 import { StatsService } from '@data/services/stats.service';
 
 import { InformeInterface } from '@core/models/informe';
+import { MathOperations } from '@core/classes/math-operations';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -107,17 +108,12 @@ export class ChartPctCelsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    combineLatest([this.reportControlService.allFilterableElements$, this.reportControlService.informes$])
-      .pipe(
-        take(1),
-        switchMap(([elems, informes]) => {
-          this.allAnomalias = elems as Anomalia[];
-          this.informes = informes;
-          this.informesIdList = informes.map((informe) => informe.id);
+    this.allAnomalias = this.reportControlService.allAnomalias;
+    this.informes = this.reportControlService.informes;
+    this.informesIdList = this.informes.map((informe) => informe.id);
 
-          return this.informeService.getDateLabelsInformes(this.informesIdList);
-        })
-      )
+    this.informeService
+      .getDateLabelsInformes(this.informesIdList)
       .pipe(take(1))
       .subscribe((dateLabels) => {
         this.dateLabels = dateLabels;
@@ -128,9 +124,10 @@ export class ChartPctCelsComponent implements OnInit {
           data1.push(informe.cc * 100);
 
           const anomsInforme = this.allAnomalias.filter((anom) => anom.informeId === informe.id);
-          const gradientes = anomsInforme.map((anom) => anom.gradienteNormalizado);
-          let gradienteTotal = 0;
-          gradientes.forEach((grad) => (gradienteTotal += Number(grad)));
+          const gradientes = anomsInforme
+            .filter((anom) => anom.gradienteNormalizado !== undefined)
+            .map((anom) => anom.gradienteNormalizado);
+          const gradienteTotal = MathOperations.sumArray(gradientes);
 
           data2.push(Number((gradienteTotal / anomsInforme.length).toFixed(2)));
         });

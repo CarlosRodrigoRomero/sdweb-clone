@@ -7,9 +7,14 @@ import * as firebase from 'firebase/app';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
-import { PlantaService } from './planta.service';
-import { InformeService } from './informe.service';
+import { Coordinate } from 'ol/coordinate';
+import Point from 'ol/geom/Point';
+import LineString from 'ol/geom/LineString';
+
+import { PlantaService } from '@data/services/planta.service';
+import { InformeService } from '@data/services/informe.service';
 import { FilterService } from '@data/services/filter.service';
+import { ThermalService } from '@data/services/thermal.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { RawModule } from '@core/models/moduloBruto';
@@ -17,11 +22,10 @@ import { FilterModuloBruto } from '@core/models/filterModuloBruto';
 import { FilterableElement } from '@core/models/filterableInterface';
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
-import { Coordinate } from 'ol/coordinate';
-import Point from 'ol/geom/Point';
-import LineString from 'ol/geom/LineString';
+
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { ModuleGroup } from '@core/models/moduleGroup';
+import { MathOperations } from '@core/classes/math-operations';
 
 @Injectable({
   providedIn: 'root',
@@ -78,7 +82,8 @@ export class StructuresService {
     private informeService: InformeService,
     private plantaService: PlantaService,
     public afs: AngularFirestore,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private thermalService: ThermalService
   ) {}
 
   initService(): Promise<boolean> {
@@ -96,7 +101,7 @@ export class StructuresService {
           switchMap((planta) => {
             this.planta = planta;
 
-            return this.informeService.getThermalLayerDB$(this.informeId);
+            return this.thermalService.getReportThermalLayerDB(this.informeId);
           })
         )
         .subscribe((layers) => {
@@ -119,16 +124,16 @@ export class StructuresService {
 
   setInitialAveragesAndStandardDeviations() {
     const areas = this.allRawModules.map((module) => module.area);
-    this.areaAverage = this.average(areas);
-    this.areaStdDev = this.standardDeviation(areas);
+    this.areaAverage = MathOperations.average(areas);
+    this.areaStdDev = MathOperations.standardDeviation(areas);
 
     const aspectRatios = this.allRawModules.map((module) => module.aspectRatio);
-    this.aspectRatioAverage = this.average(aspectRatios);
-    this.aspectRatioStdDev = this.standardDeviation(aspectRatios);
+    this.aspectRatioAverage = MathOperations.average(aspectRatios);
+    this.aspectRatioStdDev = MathOperations.standardDeviation(aspectRatios);
 
     const confianzas = this.allRawModules.map((module) => module.confianza);
-    this.confianzaAverage = this.average(confianzas);
-    this.confianzaStdDev = this.standardDeviation(confianzas);
+    this.confianzaAverage = MathOperations.average(confianzas);
+    this.confianzaStdDev = MathOperations.standardDeviation(confianzas);
 
     // cargamos los modulos en bruto
     this.loadRawModules = true;
@@ -136,40 +141,16 @@ export class StructuresService {
 
   updateAveragesAndStandardDeviations(modules: RawModule[]) {
     const areas = modules.map((module) => module.area);
-    this.areaAverage = this.average(areas);
-    this.areaStdDev = this.standardDeviation(areas);
+    this.areaAverage = MathOperations.average(areas);
+    this.areaStdDev = MathOperations.standardDeviation(areas);
 
     const aspectRatios = modules.map((module) => module.aspectRatio);
-    this.aspectRatioAverage = this.average(aspectRatios);
-    this.aspectRatioStdDev = this.standardDeviation(aspectRatios);
+    this.aspectRatioAverage = MathOperations.average(aspectRatios);
+    this.aspectRatioStdDev = MathOperations.standardDeviation(aspectRatios);
 
     const confianzas = modules.map((module) => module.confianza);
-    this.confianzaAverage = this.average(confianzas);
-    this.confianzaStdDev = this.standardDeviation(confianzas);
-  }
-
-  private average(values: number[]): number {
-    const sum = values.reduce((s, value) => s + value, 0);
-
-    const avg = sum / values.length;
-
-    return avg;
-  }
-
-  private standardDeviation(values: number[]): number {
-    const n = values.length;
-    const mean = values.reduce((a, b) => a + b) / n;
-    return Math.sqrt(values.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
-  }
-
-  private DAM(values: number[], average: number): number {
-    // desviacion media absoluta, para que no afectanten los extremos a la desviacion
-    let sumatorioDesviaciones = 0;
-    values.forEach((value) => {
-      sumatorioDesviaciones = sumatorioDesviaciones + Math.abs(value - average);
-    });
-
-    return sumatorioDesviaciones / values.length;
+    this.confianzaAverage = MathOperations.average(confianzas);
+    this.confianzaStdDev = MathOperations.standardDeviation(confianzas);
   }
 
   addRawModule(module: RawModule) {

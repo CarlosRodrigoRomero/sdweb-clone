@@ -53,6 +53,8 @@ export class ReportControlService {
   public mapLoaded$ = new BehaviorSubject<boolean>(this._mapLoaded);
   private _allFilterableElements: FilterableElement[] = [];
   public allFilterableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFilterableElements);
+  private _allAnomalias: Anomalia[] = [];
+  allAnomalias$ = new BehaviorSubject<Anomalia[]>(this._allAnomalias);
   public plantaFija = false;
   private _thereAreZones = true;
   public thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
@@ -110,11 +112,10 @@ export class ReportControlService {
                   // evitamos cargar los informes dobles al navegar atras y volver
                   if (this.informesIdList.length === 0) {
                     // añadimos los informes  a la lista
-                    this.informes.forEach((informe) => this._informesIdList.push(informe.id));
-                    this.informesIdList$.next(this._informesIdList);
+                    this.informes.forEach((informe) => this.informesIdList.push(informe.id));
                   }
 
-                  this.selectedInformeId = this._informesIdList[this._informesIdList.length - 1];
+                  this.selectedInformeId = this.informesIdList[this.informesIdList.length - 1];
 
                   // obtenemos todas las anomalías
                   return this.anomaliaService.getAnomaliasPlanta$(this.planta);
@@ -129,6 +130,8 @@ export class ReportControlService {
                 } else {
                   this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
                 }
+
+                this.allAnomalias = this.allFilterableElements as Anomalia[];
 
                 // guardamos los datos de los diferentes recuentos de anomalias en el informe
                 this.setCountAnomsInformesPlanta(this.allFilterableElements as Anomalia[]);
@@ -198,6 +201,8 @@ export class ReportControlService {
                       .subscribe((anoms) => {
                         this.allFilterableElements = this.anomaliaService.getRealAnomalias(anoms);
 
+                        this.allAnomalias = this.allFilterableElements as Anomalia[];
+
                         // iniciamos filter service
                         this.filterService
                           .initService(this.allFilterableElements, true, this.sharedId)
@@ -229,8 +234,7 @@ export class ReportControlService {
                           // evitamos cargar los informes dobles al navegar atras y volver
                           if (this.informesIdList.length === 0) {
                             // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                            this.informes.forEach((informe) => this._informesIdList.push(informe.id));
-                            this.informesIdList$.next(this._informesIdList);
+                            this.informes.forEach((informe) => this.informesIdList.push(informe.id));
                           }
 
                           // obtenemos todas las anomalías
@@ -240,6 +244,8 @@ export class ReportControlService {
                       )
                       .subscribe((anoms) => {
                         this.allFilterableElements = this.anomaliaService.getRealAnomalias(anoms);
+
+                        this.allAnomalias = this.allFilterableElements as Anomalia[];
 
                         // iniciamos filter service
                         this.filterService
@@ -278,10 +284,9 @@ export class ReportControlService {
                   // evitamos cargar los informes dobles al navegar atras y volver
                   if (this.informesIdList.length === 0) {
                     // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                    this.informes.forEach((informe) => this._informesIdList.push(informe.id));
-                    this.informesIdList$.next(this._informesIdList);
+                    this.informes.forEach((informe) => this.informesIdList.push(informe.id));
                   }
-                  this.selectedInformeId = this._informesIdList[this._informesIdList.length - 1];
+                  this.selectedInformeId = this.informesIdList[this.informesIdList.length - 1];
                   // obtenemos todos los seguidores
                   return this.seguidorService.getSeguidoresPlanta$(this.plantaId);
                 }),
@@ -289,6 +294,12 @@ export class ReportControlService {
               )
               .subscribe((segs) => {
                 this.allFilterableElements = segs;
+
+                (this.allFilterableElements as Seguidor[]).forEach((seg) => {
+                  if (seg.anomaliasCliente.length > 0) {
+                    this.allAnomalias.push(...seg.anomaliasCliente);
+                  }
+                });
 
                 // guardamos los datos de los diferentes recuentos de anomalias en el informe
                 this.setCountAnomsInformesPlanta(this.allFilterableElements as Seguidor[]);
@@ -352,6 +363,12 @@ export class ReportControlService {
                       .subscribe((segs) => {
                         this.allFilterableElements = segs;
 
+                        (this.allFilterableElements as Seguidor[]).forEach((seg) => {
+                          if (seg.anomaliasCliente.length > 0) {
+                            this.allAnomalias.push(...seg.anomaliasCliente);
+                          }
+                        });
+
                         // iniciamos filter service
                         this.filterService.initService(segs, true, this.sharedId).then((filtersInit) => {
                           // enviamos respuesta de servicio iniciado
@@ -374,8 +391,7 @@ export class ReportControlService {
                           // evitamos cargar los informes dobles al navegar atras y volver
                           if (this.informesIdList.length === 0) {
                             // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                            this.informes.forEach((informe) => this._informesIdList.push(informe.id));
-                            this.informesIdList$.next(this._informesIdList);
+                            this.informes.forEach((informe) => this.informesIdList.push(informe.id));
                           }
                           // obtenemos todos los seguidores
                           return this.seguidorService.getSeguidoresPlanta$(this.plantaId);
@@ -384,6 +400,12 @@ export class ReportControlService {
                       )
                       .subscribe((segs) => {
                         this.allFilterableElements = segs;
+
+                        (this.allFilterableElements as Seguidor[]).forEach((seg) => {
+                          if (seg.anomaliasCliente.length > 0) {
+                            this.allAnomalias.push(...seg.anomaliasCliente);
+                          }
+                        });
 
                         // iniciamos filter service
                         this.filterService.initService(segs, true, this.sharedId).then((filtersInit) => {
@@ -427,28 +449,6 @@ export class ReportControlService {
     }
 
     return numGlobalCoords;
-  }
-
-  private addNumAnom(elements: FilterableElement[], informes: InformeInterface[]): Anomalia[] {
-    let anomalias: Anomalia[] = [];
-    if (elements[0].hasOwnProperty('anomaliasCliente')) {
-      elements.forEach((element) => anomalias.push(...(element as Seguidor).anomaliasCliente));
-    } else {
-      anomalias = elements as Anomalia[];
-    }
-    // lar ordenamos por tipo de anomalía
-    anomalias = this.anomaliaService.sortAnomsByTipo(anomalias);
-
-    const anomsWithNumAnom = [];
-    informes.forEach((informe) => {
-      let anomsInforme = anomalias.filter((anom) => anom.informeId === informe.id);
-      anomsInforme = anomsInforme.map((anom, index) => {
-        anom.numAnom = index + 1;
-        return anom;
-      });
-      anomsWithNumAnom.push(...anomsInforme);
-    });
-    return anomsWithNumAnom;
   }
 
   private checkMaeInformes(elems: FilterableElement[]): void {
@@ -801,6 +801,15 @@ export class ReportControlService {
   set allFilterableElements(value: FilterableElement[]) {
     this._allFilterableElements = value;
     this.allFilterableElements$.next(value);
+  }
+
+  get allAnomalias(): Anomalia[] {
+    return this._allAnomalias;
+  }
+
+  set allAnomalias(value: Anomalia[]) {
+    this._allAnomalias = value;
+    this.allAnomalias$.next(value);
   }
 
   get thereAreZones() {

@@ -156,21 +156,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       })
     );
 
-    // comprobamos el numero de anomalias para imprimir o no imagenes
-    // this.subscriptions.add(
-    //   combineLatest([
-    //     this.reportControlService.selectedInformeId$,
-    //     this.reportControlService.allFilterableElements$,
-    //   ]).subscribe(([informeId, elems]) => {
-
-    //     if (elems.length <= this.maxAnomsConImgs && elems.length > 0) {
-    //       this.reportPdfService.informeConImagenes = true;
-    //     } else {
-    //       this.reportPdfService.informeConImagenes = false;
-    //     }
-    //   })
-    // );
-
     this.subscriptions.add(
       this.imagesTilesService.layerInformeSelected$.subscribe((layer) => (this.layerInformeSelected = layer))
     );
@@ -229,11 +214,15 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           switchMap(([informeId, filteredPDF]) => {
             this.selectedInforme = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
-            if (this.reportControlService.plantaFija) {
-              this.anomaliasInforme = this.reportControlService.allFilterableElements.filter(
-                (elem) => elem.informeId === informeId
-              ) as Anomalia[];
-            } else {
+            this.anomaliasInforme = this.reportControlService.allAnomalias.filter(
+              (anom) => anom.informeId === informeId
+            );
+
+            // ordenamos la lista de anomalias por tipo
+            this.anomaliasInforme = this.anomaliasInforme.sort((a, b) => a.numAnom - b.numAnom);
+
+            // obtenemos los seguidores del informe y los ordenamos por globals
+            if (!this.reportControlService.plantaFija) {
               const allSeguidores = this.reportControlService.allFilterableElements.filter(
                 (elem) => elem.informeId === informeId
               ) as Seguidor[];
@@ -245,18 +234,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               if (this.seguidoresInforme.length > 0) {
                 this.seguidoresLoaded = true;
               }
-
-              this.anomaliasInforme = [];
-
-              this.seguidoresInforme.forEach((seguidor) => {
-                const anomaliasSeguidor = seguidor.anomaliasCliente;
-                if (anomaliasSeguidor.length > 0) {
-                  this.anomaliasInforme.push(...anomaliasSeguidor);
-                }
-              });
-
-              // ordenamos la lista de anomalias por tipo
-              this.anomaliasInforme = this.anomaliasInforme.sort((a, b) => a.numAnom - b.numAnom);
             }
 
             // comprobamos el numero de anomalias para imprimir o no imagenes
@@ -1303,7 +1280,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       polygon = new fabric.Rect({
         left: pc.img_left,
         top: pc.img_top,
-        fill: 'rgba(0,0,0,0)',
+        fill: 'transparent',
+        stroke: 'white',
         // stroke: this.seguidorViewService.getAnomaliaColor(anomalia),
         strokeWidth: 2,
         width: pc.img_width,

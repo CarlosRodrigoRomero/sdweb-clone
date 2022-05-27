@@ -28,6 +28,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   noAnomsReport = false;
   thereAreZones = true;
   generatingDownload = false;
+  selectedInformeId: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -71,6 +72,10 @@ export class MapViewComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.downloadReportService.generatingDownload$.subscribe((value) => (this.generatingDownload = value))
+    );
+
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
     );
   }
 

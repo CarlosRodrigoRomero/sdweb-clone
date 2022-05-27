@@ -84,19 +84,9 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
             // filtramos por si hay zonas con el mismo nombre
             this.zones = this.plantaService.getUniqueLargestLocAreas(this.zones);
 
-            return combineLatest([
-              this.reportControlService.allFilterableElements$,
-              this.reportControlService.informesIdList$,
-            ]);
-          }),
-          switchMap(([elems, informesId]) => {
-            if (this.reportControlService.plantaFija) {
-              this.allAnomalias = elems as Anomalia[];
-            } else {
-              (elems as Seguidor[]).forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
-            }
+            this.informesIdList = this.reportControlService.informesIdList;
 
-            this.informesIdList = informesId;
+            this.allAnomalias = this.reportControlService.allAnomalias;
 
             return this.informeService.getDateLabelsInformes(this.informesIdList);
           })
