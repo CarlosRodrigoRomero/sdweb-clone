@@ -1,17 +1,15 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { Router } from '@angular/router';
 
 import { LabelType, Options } from '@angular-slider/ngx-slider';
 
 import { take } from 'rxjs/operators';
-import { combineLatest, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
 
 import { OlMapService } from '@data/services/ol-map.service';
 import { ThermalService } from '@data/services/thermal.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { InformeService } from '@data/services/informe.service';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { MathOperations } from '@core/classes/math-operations';
@@ -51,9 +49,7 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
     private thermalService: ThermalService,
     private olMapService: OlMapService,
-    private reportControlService: ReportControlService,
-    private router: Router,
-    private informeService: InformeService
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
