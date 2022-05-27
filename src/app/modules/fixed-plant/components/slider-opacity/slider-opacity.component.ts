@@ -28,14 +28,9 @@ export class SliderOpacityComponent implements OnInit {
     this.olMapService
       .getThermalLayers()
       .pipe(
+        take(1),
         switchMap((layers) => {
           this.thermalLayers = layers;
-
-          this.thermalLayers.forEach((layer) => {
-            layer.on('change:visible', () => {
-              console.log('ok');
-            });
-          });
 
           return this.mapControlService.sliderThermalOpacitySource;
         })
@@ -49,6 +44,32 @@ export class SliderOpacityComponent implements OnInit {
           }
         });
       });
+
+    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+      this.selectedInformeId = informeId;
+      // retrasamos 100ms para que se actualice despues de la capa térmica
+      setTimeout(() => {
+        const valueSlider = this.mapControlService.sliderThermalOpacity;
+        this.thermalLayers.forEach((layer) => {
+          if (layer.getProperties().informeId === this.selectedInformeId) {
+            layer.setOpacity(valueSlider / 100);
+          } else {
+            layer.setOpacity(0);
+          }
+        });
+      }, 100);
+    });
+
+    // nos subscribimos a los valores del slider
+    this.mapControlService.sliderThermalOpacitySource.subscribe((v) => {
+      this.thermalLayers.forEach((layer) => {
+        if (layer.getProperties().informeId === this.selectedInformeId) {
+          layer.setOpacity(v / 100);
+        } else {
+          layer.setOpacity(0);
+        }
+      });
+    });
   }
 
   onChangeThermalOpacitySlider(e: MatSliderChange) {
