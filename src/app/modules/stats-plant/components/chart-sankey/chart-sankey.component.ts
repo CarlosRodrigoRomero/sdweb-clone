@@ -49,14 +49,14 @@ export class ChartSankeyComponent implements AfterViewInit {
     //   'Nuevas',
     // ];
     const colors_nodes = [
-      GLOBAL.colores_tipos[8], // 'Célula caliente',
-      GLOBAL.colores_tipos[8], // 'Célula caliente.',
-      GLOBAL.colores_tipos[9], // 'Varias células calientes.',
-      GLOBAL.colores_tipos[17], // 'String',
-      GLOBAL.colores_tipos[9], // 'Varias células calientes',
-      GLOBAL.colores_tipos[3], // 'Substring en CA.',
-      GLOBAL.colores_tipos[3], // 'Substring en CA',
-      GLOBAL.colores_tipos[10], // '2x Substring en CA.',
+      '#00E396', // 'Célula caliente'
+      '#00E396', // 'Célula caliente.',
+      '#128254', // 'Varias células calientes.',
+      '#FF0000', // 'String',
+      '#128254', // 'Varias células calientes',
+      '#FEB019', // 'Substring en CA.',
+      '#FEB019', // 'Substring en CA',
+      '#00BEBE', // '2x Substring en CA.',
       '#474747', // 'Nuevas',
       '#000', // 'Unknown',
     ];
