@@ -25,6 +25,7 @@ import { InformeService } from '@data/services/informe.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { Anomalia } from '@core/models/anomalia';
+import { Colors } from '@core/classes/colors';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -91,7 +92,6 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
           })
         )
         .subscribe((dateLabels) => {
-          console.log(dateLabels);
           this.dateLabels = dateLabels;
 
           this.chartData = [];
@@ -164,6 +164,16 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
       });
     }
 
+    const opacity = new Array(series.length);
+    for (let index = 0; index < opacity.length; index++) {
+      opacity[index] = 1 - (opacity.length - (index + 1)) * 0.25;
+    }
+
+    const colors = new Array(series.length);
+    opacity.forEach((op, index) => {
+      colors[index] = Colors.hexToRgb(GLOBAL.gris, op);
+    });
+
     let titleXAxis = 'Zona';
 
     if (this.reportControlService.nombreGlobalCoords.length > 0) {
@@ -197,11 +207,11 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
         legend: {
           show: true,
           showForSingleSeries: true,
-          // markers: {
-          //   fillColors: [GLOBAL.gris],
-          // },
-          labels: {
-            useSeriesColors: true,
+          markers: {
+            fillColors: colors,
+          },
+          onItemHover: {
+            highlightDataSeries: false,
           },
         },
         plotOptions: {
@@ -215,8 +225,7 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
           enabled: false,
         },
         fill: {
-          opacity: [0.75, 1],
-          colors: [GLOBAL.gris],
+          colors,
         },
         stroke: {
           show: true,
