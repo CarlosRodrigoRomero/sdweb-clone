@@ -7,7 +7,7 @@ import { SharedModule } from '@shared/shared.module';
 
 import { PlantaStatsComponent } from './components/planta-stats.component';
 import { ChartAlturaComponent } from './components/chart-altura/chart-altura.component';
-import { ChartAnomaliasZonasComponent } from './components/chart-anomalias-zonas/chart-anomalias-zonas.component';
+import { ChartMaeZonasComponent } from './components/chart-mae-zonas/chart-mae-zonas.component';
 import { ChartCelsPorZonasComponent } from './components/chart-cels-por-zonas/chart-cels-por-zonas.component';
 import { ChartCelsTempsComponent } from './components/chart-cels-temps/chart-cels-temps.component';
 import { ChartMaeGlobalComponent } from './components/chart-mae-global/chart-mae-global.component';
@@ -20,7 +20,7 @@ import { ChartSankeyPotenciaComponent } from './components/chart-sankey-potencia
   declarations: [
     PlantaStatsComponent,
     ChartAlturaComponent,
-    ChartAnomaliasZonasComponent,
+    ChartMaeZonasComponent,
     ChartCelsPorZonasComponent,
     ChartCelsTempsComponent,
     ChartMaeGlobalComponent,

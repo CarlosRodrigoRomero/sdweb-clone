@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { combineLatest, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import {
@@ -24,7 +24,6 @@ import { PlantaService } from '@data/services/planta.service';
 import { InformeService } from '@data/services/informe.service';
 
 import { LocationAreaInterface } from '@core/models/location';
-import { Seguidor } from '@core/models/seguidor';
 import { Anomalia } from '@core/models/anomalia';
 
 export type ChartOptions = {
@@ -43,11 +42,11 @@ export type ChartOptions = {
 };
 
 @Component({
-  selector: 'app-chart-anomalias-zonas',
-  templateUrl: './chart-anomalias-zonas.component.html',
-  styleUrls: ['./chart-anomalias-zonas.component.css'],
+  selector: 'app-chart-mae-zonas',
+  templateUrl: './chart-mae-zonas.component.html',
+  styleUrls: ['./chart-mae-zonas.component.css'],
 })
-export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
+export class ChartMaeZonasComponent implements OnInit, OnDestroy {
   @ViewChild('chart-anomalias-zonas') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
   informesIdList: string[];
@@ -92,6 +91,7 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
           })
         )
         .subscribe((dateLabels) => {
+          console.log(dateLabels);
           this.dateLabels = dateLabels;
 
           this.chartData = [];
@@ -195,7 +195,14 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
           },
         },
         legend: {
-          show: false,
+          show: true,
+          showForSingleSeries: true,
+          // markers: {
+          //   fillColors: [GLOBAL.gris],
+          // },
+          labels: {
+            useSeriesColors: true,
+          },
         },
         plotOptions: {
           bar: {
@@ -208,8 +215,8 @@ export class ChartAnomaliasZonasComponent implements OnInit, OnDestroy {
           enabled: false,
         },
         fill: {
-          opacity: 1,
-          colors: ['#7F7F7F', '#FF6B6B'],
+          opacity: [0.75, 1],
+          colors: [GLOBAL.gris],
         },
         stroke: {
           show: true,
