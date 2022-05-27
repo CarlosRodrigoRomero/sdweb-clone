@@ -21,8 +21,8 @@ export class ImageProcessService {
   selectedInformeId: string;
 
   constructor(private thermalService: ThermalService, private reportControlService: ReportControlService) {
-    this.thermalService.sliderMin$.subscribe((value) => (this.sliderMin = value));
-    this.thermalService.sliderMax$.subscribe((value) => (this.sliderMax = value));
+    // this.thermalService.sliderMin$.subscribe((value) => (this.sliderMin = value));
+    // this.thermalService.sliderMax$.subscribe((value) => (this.sliderMax = value));
 
     this.reportControlService.selectedInformeId$
       .pipe(

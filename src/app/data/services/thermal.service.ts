@@ -14,11 +14,11 @@ export class ThermalService {
   private _thermalLayers: ThermalLayerInterface[] = [];
   thermalLayers$ = new BehaviorSubject<ThermalLayerInterface[]>(this._thermalLayers);
 
-  private _sliderMin: number = 25;
-  sliderMin$ = new BehaviorSubject<number>(this._sliderMin);
+  private _sliderMin: number[] = [];
+  sliderMin$ = new BehaviorSubject<number[]>(this._sliderMin);
 
-  private _sliderMax: number = 75;
-  sliderMax$ = new BehaviorSubject<number>(this._sliderMax);
+  private _sliderMax: number[] = [];
+  sliderMax$ = new BehaviorSubject<number[]>(this._sliderMax);
 
   constructor(private afs: AngularFirestore) {}
 
@@ -42,7 +42,7 @@ export class ThermalService {
       .pipe(
         map((actions) =>
           actions.map((doc) => {
-            let data = doc.payload.doc.data() as ThermalLayerInterface;
+            const data = doc.payload.doc.data() as ThermalLayerInterface;
             data.id = doc.payload.doc.id;
 
             return data;
@@ -59,7 +59,7 @@ export class ThermalService {
       .pipe(
         map((actions) =>
           actions.map((doc) => {
-            let data = doc.payload.doc.data() as ThermalLayerInterface;
+            const data = doc.payload.doc.data() as ThermalLayerInterface;
             data.id = doc.payload.doc.id;
 
             return data;
@@ -82,22 +82,15 @@ export class ThermalService {
           });
         })
       )
-      .subscribe((tL) => {
-        this.thermalLayers = tL;
-        // if (tL.length > 0) {
-        //   this.thermalLayers = tL;
-        // } else {
-        //   this.thermalLayers = undefined;
-        // }
-      });
+      .subscribe((tL) => (this.thermalLayers = tL));
 
     return this.thermalLayers$;
   }
 
   resetService() {
     this.thermalLayers = [];
-    this.sliderMin = 25;
-    this.sliderMax = 75;
+    this.sliderMin = [];
+    this.sliderMax = [];
   }
 
   get thermalLayers() {
@@ -113,7 +106,7 @@ export class ThermalService {
     return this._sliderMin;
   }
 
-  set sliderMin(value: number) {
+  set sliderMin(value: number[]) {
     this._sliderMin = value;
     this.sliderMin$.next(value);
   }
@@ -122,7 +115,7 @@ export class ThermalService {
     return this._sliderMax;
   }
 
-  set sliderMax(value: number) {
+  set sliderMax(value: number[]) {
     this._sliderMax = value;
     this.sliderMax$.next(value);
   }

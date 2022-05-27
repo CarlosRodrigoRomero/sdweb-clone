@@ -103,14 +103,14 @@ export class MapComponent implements OnInit, OnDestroy {
             this.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
 
             // Para cada informe, hay que crear 2 capas: térmica y vectorial
-            informes.forEach((informe) => {
+            informes.forEach((informe, index) => {
               const tl = thermalLayers.find((item) => item.informeId === informe.id);
 
               // this.thermalService.sliderMin = tl.rangeTempMin;
               // this.thermalService.sliderMax = tl.rangeTempMax;
 
               if (tl !== undefined) {
-                this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id));
+                this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id, index));
               }
 
               // creamos las capas de anomalías para los diferentes informes
@@ -153,7 +153,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
   }
 
-  private _createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {
+  private _createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string, index: number): TileLayer {
     // Iniciar mapa térmico
     const tl = new TileLayer({
       source: new XYZ_mod({
@@ -167,6 +167,7 @@ export class MapComponent implements OnInit, OnDestroy {
           imageTile.thermalService = this.thermalService;
           imageTile.getImage().src = src;
           imageTile.thermalLayer = thermalLayer;
+          imageTile.index = index;
         },
       }),
       preload: Infinity,

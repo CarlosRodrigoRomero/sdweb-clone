@@ -70,8 +70,8 @@ class ImageTileMod extends Tile {
   getImage() {
     // this.image_.src = this.imageSource;
     if (this.imageLoaded == undefined) {
-      this.sliderMin = this.thermalService.sliderMin;
-      this.sliderMax = this.thermalService.sliderMax;
+      this.sliderMin = this.thermalService.sliderMin[this.index];
+      this.sliderMax = this.thermalService.sliderMax[this.index];
       this.imageLoaded = true;
       // this.imageRaw_.src = this.src_;
       return this.image_;
@@ -82,11 +82,14 @@ class ImageTileMod extends Tile {
       }
 
       // Si el slider no ha cambiado
-      if (this.sliderMax == this.thermalService.sliderMax && this.sliderMin == this.thermalService.sliderMin) {
+      if (
+        this.sliderMax == this.thermalService.sliderMax[this.index] &&
+        this.sliderMin == this.thermalService.sliderMin[this.index]
+      ) {
         return this.lastCanvas_;
       } else {
-        this.sliderMin = this.thermalService.sliderMin;
-        this.sliderMax = this.thermalService.sliderMax;
+        this.sliderMin = this.thermalService.sliderMin[this.index];
+        this.sliderMax = this.thermalService.sliderMax[this.index];
         this.lastCanvas_ = this.transformPixels_(this.image_);
         return this.lastCanvas_;
       }
