@@ -1,4 +1,5 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { LabelType, Options } from '@angular-slider/ngx-slider';
 
@@ -24,8 +25,9 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
   private thermalLayers: TileLayer[] = [];
   private thermalLayersDB: ThermalLayerInterface[] = [];
   private indexSelected: number;
+  private thermalLayersLoaded = false;
 
-  @Input() informeId: string;
+  @Input() selectedInformeId: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -50,32 +52,12 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
     private thermalService: ThermalService,
     private olMapService: OlMapService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    // capas termicas del mapa
-    combineLatest([
-      this.olMapService.getThermalLayers(),
-      this.thermalService.getPlantThermalLayerDB(this.reportControlService.plantaId),
-    ])
-      .pipe(take(1))
-      .subscribe(([layers, layersDB]) => {
-        this.thermalLayers = layers;
-        this.thermalLayersDB = layersDB;
-
-        if (this.thermalLayers.length > 0 && this.thermalLayersDB.length > 0) {
-          // establecemos el indice seleccinado
-          this.indexSelected = this.thermalLayersDB.length - 1;
-
-          // le damos el tamaño de la capa termica seleccionada
-          this.thermalService.sliderMin = new Array(this.thermalLayersDB.length).fill(null);
-          this.thermalService.sliderMax = new Array(this.thermalLayersDB.length).fill(null);
-
-          // iniciamos cada capa
-          this.thermalLayersDB.forEach((layerDB) => this.setInitialValues(layerDB.informeId));
-        }
-      });
+    this.loadThermalLayers();
 
     this.subscriptions.add(
       this.thermalService.sliderMin$.subscribe((value) => {
@@ -104,8 +86,8 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.informeId) {
-      const index = this.thermalLayersDB.findIndex((layerDB) => layerDB.informeId === this.informeId);
+    if (changes.informeId && this.thermalLayersLoaded) {
+      const index = this.thermalLayersDB.findIndex((layerDB) => layerDB.informeId === this.selectedInformeId);
 
       if (index !== -1) {
         this.indexSelected = index;
@@ -118,21 +100,64 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
           translate: this.optionsTemp.translate,
         };
 
-        this.setInitialValues(this.informeId);
-
-        // this.refreshNonSelectedLayers();
+        this.setInitialValues(this.selectedInformeId);
       }
     }
+  }
+
+  private loadThermalLayers() {
+    const id = this.router.url.split('/')[this.router.url.split('/').length - 1];
+    const typeId = this.getIdType();
+    let getLayersDB = this.thermalService.getReportThermalLayerDB(id);
+    if (typeId === 'plantId') {
+      getLayersDB = this.thermalService.getPlantThermalLayerDB(id);
+    }
+
+    // capas termicas del mapa
+    combineLatest([this.olMapService.getThermalLayers(), getLayersDB])
+      .pipe(take(1))
+      .subscribe(([layers, layersDB]) => {
+        this.thermalLayers = layers;
+        this.thermalLayersDB = layersDB;
+
+        if (this.thermalLayers.length > 0 && this.thermalLayersDB.length > 0) {
+          // establecemos el indice seleccinado
+          this.indexSelected = this.thermalLayersDB.length - 1;
+
+          // le damos el tamaño de la capa termica seleccionada
+          this.thermalService.sliderMin = new Array(this.thermalLayersDB.length).fill(null);
+          this.thermalService.sliderMax = new Array(this.thermalLayersDB.length).fill(null);
+
+          // iniciamos cada capa
+          this.thermalLayersDB.forEach((layerDB, index) => {
+            this.setInitialValues(layerDB.informeId);
+            if (index === this.thermalLayersDB.length - 1) {
+              this.thermalLayersLoaded = true;
+            }
+          });
+        }
+      });
+  }
+
+  private getIdType(): string {
+    let type = 'reportId';
+    if (this.router.url.includes('clients')) {
+      type = 'plantId';
+    }
+    return type;
   }
 
   setInitialValues(informeId: string) {
     const indexInforme = this.thermalLayersDB.findIndex((layerDB) => layerDB.informeId === informeId);
     const layerInforme = this.thermalLayers.find((layer) => layer.getProperties().informeId === informeId);
 
-    // asignamos los valores de forma automatica
-    const { tempMin, tempMax } = this.getInitialTempsLayer(informeId);
+    let [tempMin, tempMax] = [25, 75];
+    // si estamos en un informe asignamos los valores basados en las temperaturas de referencia
+    if (this.getIdType() === 'plantId') {
+      [tempMin, tempMax] = this.getInitialTempsLayer(informeId);
+    }
 
-    if (informeId === this.informeId) {
+    if (informeId === this.selectedInformeId) {
       this.lowTemp = tempMin;
       this.highTemp = tempMax;
     }
@@ -146,18 +171,7 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private refreshNonSelectedLayers() {
-    if (this.thermalLayers.length > 0) {
-      this.thermalLayers.forEach((layer) => {
-        if (layer.getProperties().informeId !== this.informeId) {
-          this.setInitialValues(layer.getProperties().informeId);
-          layer.getSource().changed();
-        }
-      });
-    }
-  }
-
-  private getInitialTempsLayer(informeId: string): any {
+  private getInitialTempsLayer(informeId: string): number[] {
     const tempRefMedia = this.getTempRefMedia(informeId);
     const thermalLayerDB = this.thermalLayersDB.find((layer) => layer.informeId === informeId);
 
@@ -174,7 +188,7 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
       }
     }
 
-    return { tempMin, tempMax };
+    return [tempMin, tempMax];
   }
 
   private getTempRefMedia(informeId: string) {

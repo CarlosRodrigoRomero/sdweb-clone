@@ -150,15 +150,15 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
     // Iniciar mapa térmico
     const source = new XYZ_mod({
       url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',
-      crossOrigin: '',
+      crossOrigin: 'anonymous',
       tileClass: ImageTileMod,
-      transition: 255,
       tileLoadFunction: (imageTile, src) => {
         imageTile.rangeTempMax = thermalLayer.rangeTempMax;
         imageTile.rangeTempMin = thermalLayer.rangeTempMin;
         imageTile.thermalService = this.thermalService;
         imageTile.getImage().src = src;
         imageTile.thermalLayer = thermalLayer;
+        imageTile.index = 0;
       },
     });
 

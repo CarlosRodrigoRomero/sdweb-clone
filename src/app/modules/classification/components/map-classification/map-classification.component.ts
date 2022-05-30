@@ -135,9 +135,8 @@ export class MapClassificationComponent implements OnInit {
     const tl = new TileLayer({
       source: new XYZ_mod({
         url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',
-        crossOrigin: '',
+        crossOrigin: 'anonymous',
         tileClass: ImageTileMod,
-        transition: 255,
         tileLoadFunction: (imageTile, src) => {
           imageTile.rangeTempMax = thermalLayer.rangeTempMax;
           imageTile.rangeTempMin = thermalLayer.rangeTempMin;
@@ -145,7 +144,8 @@ export class MapClassificationComponent implements OnInit {
           imageTile.thermalService = this.thermalService;
           imageTile.getImage().src = src;
           imageTile.thermalLayer = thermalLayer;
-        },
+          imageTile.index = 0;
+          },
       }),
 
       // extent: this.extent1,

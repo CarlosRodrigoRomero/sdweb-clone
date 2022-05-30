@@ -160,7 +160,6 @@ export class MapComponent implements OnInit, OnDestroy {
         url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',
         crossOrigin: 'anonymous',
         tileClass: ImageTileMod,
-        transition: 255,
         tileLoadFunction: (imageTile, src) => {
           imageTile.rangeTempMax = thermalLayer.rangeTempMax;
           imageTile.rangeTempMin = thermalLayer.rangeTempMin;

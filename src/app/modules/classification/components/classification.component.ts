@@ -7,6 +7,8 @@ import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressBarMode } from '@angular/material/progress-bar';
 
+import { Coordinate } from 'ol/coordinate';
+
 import { ClassificationService } from '@data/services/classification.service';
 import { ClustersService } from '@data/services/clusters.service';
 import { InformeService } from '@data/services/informe.service';
@@ -17,7 +19,6 @@ import { WarningService } from '@data/services/warning.service';
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
-import { Coordinate } from 'ol/coordinate';
 import { PlantaInterface } from '@core/models/planta';
 import { Warning } from '@shared/components/warnings-menu/warnings';
 import { LocationAreaInterface } from '@core/models/location';
@@ -48,6 +49,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
   private warnings: Warning[] = [];
   private locAreas: LocationAreaInterface[] = [];
   private realAnoms: Anomalia[] = [];
+  informeId: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -62,7 +64,11 @@ export class ClassificationComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.classificationService.initService().then((value) => (this.serviceInit = value));
+    this.classificationService.initService().then((value) => {
+      this.serviceInit = value;
+
+      this.informeId = this.classificationService.informeId;
+    });
     this.subscriptions.add(this.classificationService.planta$.subscribe((planta) => (this.planta = planta)));
     this.subscriptions.add(
       this.classificationService.normModHovered$.subscribe((normMod) => (this.normModHovered = normMod))
