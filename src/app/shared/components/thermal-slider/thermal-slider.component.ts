@@ -27,7 +27,7 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
   private indexSelected: number;
   private thermalLayersLoaded = false;
 
-  @Input() selectedInformeId: string;
+  @Input() informeId: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -87,7 +87,7 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.informeId && this.thermalLayersLoaded) {
-      const index = this.thermalLayersDB.findIndex((layerDB) => layerDB.informeId === this.selectedInformeId);
+      const index = this.thermalLayersDB.findIndex((layerDB) => layerDB.informeId === this.informeId);
 
       if (index !== -1) {
         this.indexSelected = index;
@@ -100,7 +100,7 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
           translate: this.optionsTemp.translate,
         };
 
-        this.setInitialValues(this.selectedInformeId);
+        this.setInitialValues(this.informeId);
       }
     }
   }
@@ -149,7 +149,6 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
 
   setInitialValues(informeId: string) {
     const indexInforme = this.thermalLayersDB.findIndex((layerDB) => layerDB.informeId === informeId);
-    const layerInforme = this.thermalLayers.find((layer) => layer.getProperties().informeId === informeId);
 
     let [tempMin, tempMax] = [25, 75];
     // si estamos en un informe asignamos los valores basados en las temperaturas de referencia
@@ -157,18 +156,13 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
       [tempMin, tempMax] = this.getInitialTempsLayer(informeId);
     }
 
-    if (informeId === this.selectedInformeId) {
+    if (informeId === this.informeId) {
       this.lowTemp = tempMin;
       this.highTemp = tempMax;
     }
 
     this.setSliderMinValue(tempMin, indexInforme);
     this.setSliderMaxValue(tempMax, indexInforme);
-
-    // refrescamos la capa termica selecionada
-    if (layerInforme) {
-      layerInforme.getSource().changed();
-    }
   }
 
   private getInitialTempsLayer(informeId: string): number[] {

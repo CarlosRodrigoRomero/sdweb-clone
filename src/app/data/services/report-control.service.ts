@@ -12,7 +12,6 @@ import { InformeService } from '@data/services/informe.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { SeguidorService } from '@data/services/seguidor.service';
 import { PlantaService } from '@data/services/planta.service';
-import { AuthService } from '@data/services/auth.service';
 
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 import { FilterableElement } from '@core/models/filterableInterface';
@@ -23,7 +22,6 @@ import { LocationAreaInterface } from '@core/models/location';
 import { GLOBAL } from '@data/constants/global';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { PlantaInterface } from '@core/models/planta';
-import { UserInterface } from '@core/models/user';
 
 @Injectable({
   providedIn: 'root',
@@ -62,8 +60,6 @@ export class ReportControlService {
   private _numFixedGlobalCoords: number = 3;
   private _noAnomsReport = false;
   noAnomsReport$ = new BehaviorSubject<boolean>(this._noAnomsReport);
-  user: UserInterface;
-  private userIsAdmin = false;
 
   constructor(
     private router: Router,
@@ -73,16 +69,10 @@ export class ReportControlService {
     private anomaliaService: AnomaliaService,
     private seguidorService: SeguidorService,
     @Inject(WINDOW) private window: Window,
-    private plantaService: PlantaService,
-    private authService: AuthService
+    private plantaService: PlantaService
   ) {}
 
   initService(): Promise<boolean> {
-    this.authService.user$.pipe(take(1)).subscribe((user) => {
-      this.user = user;
-      this.userIsAdmin = this.authService.userIsAdmin(user);
-    });
-
     ////////////////////// PLANTA FIJA ////////////////////////
     if (this.router.url.includes('fixed')) {
       this.plantaFija = true;
@@ -454,13 +444,7 @@ export class ReportControlService {
   private checkMaeInformes(elems: FilterableElement[]): void {
     if (elems.length > 0) {
       this.informes.forEach((informe) => {
-        if (this.userIsAdmin) {
-          if (elems[0].hasOwnProperty('anomaliasCliente')) {
-            this.setMaeInformeSeguidores(elems as Seguidor[], informe);
-          } else {
-            this.setMaeInformeFija(elems as Anomalia[], informe);
-          }
-        } else if (this.checkIfNumberValueWrong(informe.mae)) {
+        if (this.checkIfNumberValueWrong(informe.mae)) {
           if (elems[0].hasOwnProperty('anomaliasCliente')) {
             this.setMaeInformeSeguidores(elems as Seguidor[], informe);
           } else {

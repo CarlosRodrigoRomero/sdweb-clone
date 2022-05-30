@@ -19,22 +19,24 @@ export class ImageProcessService {
   sliderCeil = 100;
   thermalLayer: ThermalLayerInterface;
   selectedInformeId: string;
+  private indexSelected = 0;
 
   constructor(private thermalService: ThermalService, private reportControlService: ReportControlService) {
-    // this.thermalService.sliderMin$.subscribe((value) => (this.sliderMin = value));
-    // this.thermalService.sliderMax$.subscribe((value) => (this.sliderMax = value));
+    this.thermalService.sliderMin$.subscribe((value) => (this.sliderMin = value[this.indexSelected]));
+    this.thermalService.sliderMax$.subscribe((value) => (this.sliderMax = value[this.indexSelected]));
 
     this.reportControlService.selectedInformeId$
       .pipe(
         switchMap((informeId) => {
           this.selectedInformeId = informeId;
 
-          return this.thermalService.getThermalLayers();
+          return this.thermalService.getReportThermalLayerDB(informeId);
         })
       )
       .subscribe((layers) => {
-        if (this.reportControlService.selectedInformeId !== undefined) {
+        if (this.selectedInformeId !== undefined) {
           this.thermalLayer = layers.find((tL) => tL.informeId === this.selectedInformeId);
+          this.indexSelected = layers.findIndex((tL) => tL.informeId === this.selectedInformeId);
         }
       });
   }
