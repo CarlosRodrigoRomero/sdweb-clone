@@ -927,7 +927,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           if (img !== null) {
             let processImg = img;
             if (layer === 'thermal') {
-              processImg = this.imageProcessService.transformPixels(img);
+              processImg = this.imageProcessService.transformPixels(img, this.selectedInforme.id);
             }
 
             const image = new fabric.Image(processImg, {
@@ -1059,7 +1059,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         url,
         (img) => {
           if (img !== null) {
-            img = this.imageProcessService.transformPixels(img);
+            img = this.imageProcessService.transformPixels(img, this.selectedInforme.id);
 
             const image = new fabric.Image(img, {
               width,
@@ -2838,6 +2838,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             {
               text:
                 this.translation.t('Criticidad') +
+                ' (' +
                 this.translation.t('Criterio') +
                 ' ' +
                 this.anomaliaService.criterioCriticidad.nombre +

@@ -120,6 +120,9 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
         this.thermalLayers = layers;
         this.thermalLayersDB = layersDB;
 
+        // asignamos las capas al servicio para acceder de otros lados
+        this.thermalService.thermalLayers = layersDB;
+
         if (this.thermalLayers.length > 0 && this.thermalLayersDB.length > 0) {
           // establecemos el indice seleccinado
           this.indexSelected = this.thermalLayersDB.length - 1;

@@ -1,50 +1,48 @@
 import { Injectable } from '@angular/core';
 
-import { switchMap } from 'rxjs/operators';
-
 import { ThermalService } from '@data/services/thermal.service';
-import { ReportControlService } from '@data/services/report-control.service';
-import { GLOBAL } from '@data/constants/global';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
+
+import { GLOBAL } from '@data/constants/global';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ImageProcessService {
-  palette = GLOBAL.ironPalette;
-  sliderMin = 25;
-  sliderMax = 75;
-  sliderFloor = 25;
-  sliderCeil = 100;
-  thermalLayer: ThermalLayerInterface;
-  selectedInformeId: string;
+  private palette = GLOBAL.ironPalette;
+  private sliderMin = 25;
+  private sliderMax = 75;
+  private sliderFloor = 25;
+  private sliderCeil = 100;
+  private thermalLayer: ThermalLayerInterface;
   private indexSelected = 0;
 
-  constructor(private thermalService: ThermalService, private reportControlService: ReportControlService) {
-    this.thermalService.sliderMin$.subscribe((value) => (this.sliderMin = value[this.indexSelected]));
-    this.thermalService.sliderMax$.subscribe((value) => (this.sliderMax = value[this.indexSelected]));
+  constructor(private thermalService: ThermalService) {}
 
-    this.reportControlService.selectedInformeId$
-      .pipe(
-        switchMap((informeId) => {
-          this.selectedInformeId = informeId;
-
-          return this.thermalService.getReportThermalLayerDB(informeId);
-        })
-      )
-      .subscribe((layers) => {
-        if (this.selectedInformeId !== undefined) {
-          this.thermalLayer = layers.find((tL) => tL.informeId === this.selectedInformeId);
-          this.indexSelected = layers.findIndex((tL) => tL.informeId === this.selectedInformeId);
-        }
-      });
+  setSliderValues(index: number) {
+    this.sliderMin = this.thermalService.sliderMin[index];
+    this.sliderMax = this.thermalService.sliderMax[index];
+    this.sliderFloor = this.thermalLayer.rangeTempMin;
+    this.sliderCeil = this.thermalLayer.rangeTempMax;
   }
 
-  transformPixels(image) {
+  private getIndexThermalLayer(informeId: string) {
+    return this.thermalService.thermalLayers.findIndex((tL) => tL.informeId === informeId);
+  }
+
+  transformPixels(image: any, informeId: string) {
+    this.thermalLayer = this.thermalService.thermalLayers.find((tL) => tL.informeId === informeId);
+
+    // obtenemos el indice de la capa
+    this.indexSelected = this.getIndexThermalLayer(informeId);
+
+    // seteamos los valores actuales del slider
+    this.setSliderValues(this.indexSelected);
+
     let canvas = document.createElement('canvas');
     canvas = this.drawImage_(image, canvas);
-    let context = canvas.getContext('2d');
+    const context = canvas.getContext('2d');
 
     if (canvas.width == 0) {
       return image;
@@ -52,11 +50,11 @@ export class ImageProcessService {
 
     const inputData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-    var output = context.createImageData(canvas.width, canvas.height);
+    const output = context.createImageData(canvas.width, canvas.height);
 
     // Iterate through every pixel
     for (let i = 0; i < inputData.data.length; i += 4) {
-      let pixel = [inputData.data[i + 0], inputData.data[i + 1], inputData.data[i + 2], inputData.data[i + 3]];
+      const pixel = [inputData.data[i + 0], inputData.data[i + 1], inputData.data[i + 2], inputData.data[i + 3]];
       if (pixel[3] == 0) {
         continue;
       }
@@ -75,6 +73,7 @@ export class ImageProcessService {
       output.data[i + 3] = pixel[3]; // A value
     }
     context.putImageData(output, 0, 0);
+
     return canvas;
   }
 
@@ -87,7 +86,7 @@ export class ImageProcessService {
     return canvas;
   }
 
-  temp2palette_(temperatura) {
+  temp2palette_(temperatura: number) {
     const index = Math.round(
       ((this.palette.length - 1) / (this.sliderMax - this.sliderMin)) * (temperatura - this.sliderMin)
     );
@@ -102,7 +101,7 @@ export class ImageProcessService {
     return this.palette[index];
   }
 
-  rgb2temp_(pixel) {
+  rgb2temp_(pixel: number[]) {
     if (this.thermalLayer.codificationType === undefined || this.thermalLayer.codificationType === 'rgb') {
       const precision = 0.1;
       const gradosMantenerPrecision = 255 * precision;

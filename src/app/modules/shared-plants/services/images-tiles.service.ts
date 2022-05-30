@@ -140,7 +140,7 @@ export class ImagesTilesService {
           url,
           (img) => {
             if (img !== null) {
-              img = this.imageProcessService.transformPixels(img);
+              img = this.imageProcessService.transformPixels(img, selectedInformeId);
 
               const image = new fabric.Image(img, {
                 width,
@@ -178,7 +178,7 @@ export class ImagesTilesService {
           (img) => {
             if (img !== null) {
               if (type === 'thermal') {
-                img = this.imageProcessService.transformPixels(img);
+                img = this.imageProcessService.transformPixels(img, selectedInformeId);
               }
 
               const image = new fabric.Image(img, {
