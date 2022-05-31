@@ -26,6 +26,7 @@ import { InformeService } from '@data/services/informe.service';
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
 import { Seguidor } from '@core/models/seguidor';
+import { Colors } from '@core/classes/colors';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -147,6 +148,16 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
 
     // espera a que el charData tenga datos
     if (this.chartData[0] !== undefined) {
+      const opacity = new Array(series.length);
+      for (let index = 0; index < opacity.length; index++) {
+        opacity[index] = 1 - (opacity.length - (index + 1)) * 0.25;
+      }
+
+      const colors = new Array(series.length);
+      opacity.forEach((op, index) => {
+        colors[index] = Colors.hexToRgb(GLOBAL.gris, op);
+      });
+
       this.chartOptions = {
         series,
         chart: {
@@ -170,21 +181,20 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
           },
         },
         legend: {
-          show: false,
-        },
-        plotOptions: {
-          bar: {
-            horizontal: false,
-            columnWidth: '75%',
-            endingShape: 'rounded',
+          show: true,
+          showForSingleSeries: true,
+          markers: {
+            fillColors: colors,
+          },
+          onItemHover: {
+            highlightDataSeries: false,
           },
         },
         dataLabels: {
           enabled: false,
         },
         fill: {
-          opacity: 1,
-          colors: ['#7F7F7F', '#FF6B6B'],
+          colors,
         },
         stroke: {
           show: true,
