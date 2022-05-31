@@ -189,16 +189,49 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     return points.slice(0, k);
   }
 
+  private sortByProximity(points: Point[]): Point[] {
+    const point1 = points[0];
+    const point2 = this.closestPoint(
+      point1,
+      points.filter((point, index) => index !== 0)
+    );
+    const point3 = this.closestPoint(
+      point2,
+      points.filter((point) => point !== point1 && point !== point2)
+    );
+    const point4 = points.find((point) => point !== point1 && point !== point2 && point !== point3);
+
+    return [point1, point2, point3, point4];
+  }
+
+  private closestPoint(point: Point, points: Point[]) {
+    let minDistance = 10000000;
+    let closestPoint;
+
+    for (let a = 0; a < points.length; a++) {
+      const distance = Math.sqrt(
+        (point.x - points[a].x) * (point.x - points[a].x) + (point.y - points[a].y) * (point.y - points[a].y)
+      );
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestPoint = points[a];
+      }
+    }
+
+    return closestPoint;
+  }
+
   private getDistanceFromOrigin(p: Point) {
     return p.x * p.x + p.y * p.y;
   }
+
   private getTrBl(points: Point[]): Point[] {
     return points.sort((p1, p2) => {
       return p1.x - p2.x;
     });
   }
 
-  getPolygonPointsEst(columna: number, fila: number): CuadrilateroInterface {
+  getRectPointsEst(columna: number, fila: number): CuadrilateroInterface {
     const p1 = this.estructuraMatrix[fila - 1][columna - 1] as Point;
     const p2 = this.estructuraMatrix[fila - 1][columna] as Point;
     const p3 = this.estructuraMatrix[fila][columna] as Point;
@@ -212,6 +245,17 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     const topRight = this.getTrBl(others)[1];
 
     return { tl: topLeft, tr: topRight, br: bottomRight, bl: bottomLeft } as CuadrilateroInterface;
+  }
+
+  getPolygonPointsEst(columna: number, fila: number): Point[] {
+    const p1 = this.estructuraMatrix[fila - 1][columna - 1] as Point;
+    const p2 = this.estructuraMatrix[fila - 1][columna] as Point;
+    const p3 = this.estructuraMatrix[fila][columna] as Point;
+    const p4 = this.estructuraMatrix[fila][columna - 1] as Point;
+    const points = [p1, p2, p3, p4];
+    const sortedPoints = this.sortByProximity(points);
+
+    return sortedPoints;
   }
 
   getPolygonPointsAutoEst(columna: number, fila: number): CuadrilateroInterface {
@@ -255,7 +299,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   }
 
   getRectanguloExterior(columna: number, fila: number): RectanguloInterface {
-    const cuadrilatero = this.getPolygonPointsEst(columna, fila);
+    const cuadrilatero = this.getRectPointsEst(columna, fila);
 
     const top = Math.round(Math.min(cuadrilatero.tr.y, cuadrilatero.tl.y));
     const left = Math.round(Math.min(cuadrilatero.bl.x, cuadrilatero.tl.x));
@@ -266,7 +310,7 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
   }
 
   getRectanguloInterior(columna: number, fila: number): RectanguloInterface {
-    const cuadrilatero = this.getPolygonPointsEst(columna, fila);
+    const cuadrilatero = this.getRectPointsEst(columna, fila);
 
     const top = Math.round(Math.max(cuadrilatero.tr.y, cuadrilatero.tl.y));
     const left = Math.round(Math.max(cuadrilatero.bl.x, cuadrilatero.tl.x));
@@ -278,18 +322,26 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
 
   getPolygonPc(columna: number, fila: number): any[] {
     let polygon;
+    let polygonSorted;
     if (this.estructuraMatrix === null) {
       polygon = this.getPolygonPointsAutoEst(columna, fila);
+      polygonSorted = [
+        { x: polygon.tl.x, y: polygon.tl.y },
+        { x: polygon.tr.x, y: polygon.tr.y },
+        { x: polygon.br.x, y: polygon.br.y },
+        { x: polygon.bl.x, y: polygon.bl.y },
+      ];
     } else {
       polygon = this.getPolygonPointsEst(columna, fila);
+      polygonSorted = [
+        { x: polygon[0].x, y: polygon[0].y },
+        { x: polygon[1].x, y: polygon[1].y },
+        { x: polygon[2].x, y: polygon[2].y },
+        { x: polygon[3].x, y: polygon[3].y },
+      ];
     }
 
-    return [
-      { x: polygon.tl.x, y: polygon.tl.y },
-      { x: polygon.tr.x, y: polygon.tr.y },
-      { x: polygon.br.x, y: polygon.br.y },
-      { x: polygon.bl.x, y: polygon.bl.y },
-    ];
+    return polygonSorted;
   }
 
   getFilaColumnaAutoEst(x: number, y: number): any[] {
