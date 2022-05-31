@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { ThermalService } from '@data/services/thermal.service';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
+import { ReportControlService } from '@data/services/report-control.service';
 
 import { GLOBAL } from '@data/constants/global';
 
@@ -18,7 +19,7 @@ export class ImageProcessService {
   private thermalLayer: ThermalLayerInterface;
   private indexSelected = 0;
 
-  constructor(private thermalService: ThermalService) {}
+  constructor(private thermalService: ThermalService, private reportControlService: ReportControlService) {}
 
   setSliderValues(index: number) {
     this.sliderMin = this.thermalService.sliderMin[index];
@@ -28,7 +29,7 @@ export class ImageProcessService {
   }
 
   private getIndexThermalLayer(informeId: string) {
-    return this.thermalService.thermalLayers.findIndex((tL) => tL.informeId === informeId);
+    return this.reportControlService.informes.findIndex((informe) => informe.id === informeId);
   }
 
   transformPixels(image: any, informeId: string) {
