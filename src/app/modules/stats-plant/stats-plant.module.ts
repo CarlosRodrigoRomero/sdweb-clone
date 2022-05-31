@@ -11,7 +11,7 @@ import { ChartMaeZonasComponent } from './components/chart-mae-zonas/chart-mae-z
 import { ChartCelsPorZonasComponent } from './components/chart-cels-por-zonas/chart-cels-por-zonas.component';
 import { ChartCelsTempsComponent } from './components/chart-cels-temps/chart-cels-temps.component';
 import { ChartMaeGlobalComponent } from './components/chart-mae-global/chart-mae-global.component';
-import { ChartNumsyperdComponent } from './components/chart-numsyperd/chart-numsyperd.component';
+import { ChartTipoAnomsComponent } from './components/chart-tipo-anoms/chart-tipo-anoms.component';
 import { ChartPctCelsComponent } from './components/chart-pct-cels/chart-pct-cels.component';
 import { ChartSankeyComponent } from './components/chart-sankey/chart-sankey.component';
 import { ChartSankeyPotenciaComponent } from './components/chart-sankey-potencia/chart-sankey-potencia.component';
@@ -24,7 +24,7 @@ import { ChartSankeyPotenciaComponent } from './components/chart-sankey-potencia
     ChartCelsPorZonasComponent,
     ChartCelsTempsComponent,
     ChartMaeGlobalComponent,
-    ChartNumsyperdComponent,
+    ChartTipoAnomsComponent,
     ChartPctCelsComponent,
     ChartSankeyComponent,
     ChartSankeyPotenciaComponent,

@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
+import { take } from 'rxjs/operators';
 
 import {
   ChartComponent,
@@ -20,6 +21,7 @@ import {
 
 import { GLOBAL } from '@data/constants/global';
 import { ReportControlService } from '@data/services/report-control.service';
+import { InformeService } from '@data/services/informe.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
@@ -51,12 +53,12 @@ export interface DataPlot {
 }
 
 @Component({
-  selector: 'app-chart-numsyperd',
-  templateUrl: './chart-numsyperd.component.html',
-  styleUrls: ['./chart-numsyperd.component.css'],
+  selector: 'app-chart-tipo-anoms',
+  templateUrl: './chart-tipo-anoms.component.html',
+  styleUrls: ['./chart-tipo-anoms.component.css'],
 })
-export class ChartNumsyperdComponent implements OnInit {
-  @ViewChild('charNumYPer') chartNumYPer: ChartComponent;
+export class ChartTipoAnomsComponent implements OnInit {
+  @ViewChild('chartTipoAnoms') chartTipoAnoms: ChartComponent;
   public chartOptionsComun: Partial<ChartOptions>;
   public chartOptions1: Partial<ChartOptions>;
   public chartOptions2: Partial<ChartOptions>;
@@ -68,27 +70,36 @@ export class ChartNumsyperdComponent implements OnInit {
 
   public chartLoaded = false;
   public selectedInformeId: string;
-  public informesList: string[];
+  public informesIdList: string[];
   public dataPlot: DataPlot[];
   public allAnomalias: Anomalia[] = [];
   public chartHeight = 300;
 
-  constructor(private reportControlService: ReportControlService) {}
+  private labelDatesReports: string;
+
+  constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
 
   ngOnInit(): void {
-    this.informesList = this.reportControlService.informesIdList;
+    this.informesIdList = this.reportControlService.informesIdList;
 
     this.allAnomalias = this.reportControlService.allAnomalias;
 
     this.dataPlot = [];
     this.getAllCategorias(this.allAnomalias);
 
-    this.informesList.forEach((informeId) => {
+    this.informesIdList.forEach((informeId) => {
       const anomaliasInforme = this.allAnomalias.filter((item) => item.informeId === informeId);
       this.dataPlot.push(this.calculateDataPlot(anomaliasInforme, informeId));
     });
 
-    this.initChart();
+    this.informeService
+      .getDateLabelsInformes(this.informesIdList)
+      .pipe(take(1))
+      .subscribe((labels) => {
+        this.labelDatesReports = labels.join(' - ');
+
+        this.initChart();
+      });
   }
 
   private getAllCategorias(anomalias): void {
@@ -233,7 +244,7 @@ export class ChartNumsyperdComponent implements OnInit {
         series: seriesNumCat,
         colors: this.coloresCategoria,
         title: {
-          text: '# Anomalías',
+          text: '# Anomalías     (' + this.labelDatesReports + ')',
           align: 'left',
         },
 
@@ -262,7 +273,7 @@ export class ChartNumsyperdComponent implements OnInit {
       this.chartOptions2 = {
         series: seriesMaeCat,
         title: {
-          text: 'MAE',
+          text: 'MAE     (' + this.labelDatesReports + ')',
           align: 'left',
         },
         chart: {
