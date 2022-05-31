@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { switchMap } from 'rxjs/operators';
-import { combineLatest, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import {
   ApexAxisChartSeries,
@@ -23,7 +22,7 @@ import { InformeService } from '@data/services/informe.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 
 import { Anomalia } from '@core/models/anomalia';
-import { Seguidor } from '@core/models/seguidor';
+import { Colors } from '@core/classes/colors';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -40,11 +39,11 @@ export type ChartOptions = {
 };
 
 @Component({
-  selector: 'app-chart-cels-temps',
-  templateUrl: './chart-cels-temps.component.html',
-  styleUrls: ['./chart-cels-temps.component.css'],
+  selector: 'app-chart-cels-grad',
+  templateUrl: './chart-cels-grad.component.html',
+  styleUrls: ['./chart-cels-grad.component.css'],
 })
-export class ChartCelsTempsComponent implements OnInit, OnDestroy {
+export class ChartCelsGradComponent implements OnInit, OnDestroy {
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
   dataLoaded = false;
@@ -119,13 +118,32 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
       return { name: dateLabel, data: data[index] };
     });
 
+    const opacity = new Array(series.length);
+    for (let index = 0; index < opacity.length; index++) {
+      opacity[index] = 1 - (opacity.length - (index + 1)) * 0.25;
+    }
+
+    const colors = new Array(series.length);
+    opacity.forEach((op, index) => {
+      colors[index] = Colors.hexToRgb(GLOBAL.gris, op);
+    });
+
     this.chartOptions = {
       series,
       chart: {
         type: 'bar',
         height: 250,
       },
-      legend: { show: false },
+      legend: {
+        show: true,
+        showForSingleSeries: true,
+        markers: {
+          fillColors: colors,
+        },
+        onItemHover: {
+          highlightDataSeries: false,
+        },
+      },
       colors: [GLOBAL.gris, GLOBAL.gris],
       plotOptions: {
         bar: {
@@ -138,8 +156,7 @@ export class ChartCelsTempsComponent implements OnInit, OnDestroy {
         enabled: false,
       },
       fill: {
-        opacity: 1,
-        colors: ['#7F7F7F', '#FF6B6B'],
+        colors,
       },
       stroke: {
         show: true,

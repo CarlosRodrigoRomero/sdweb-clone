@@ -9,7 +9,7 @@ import { PlantaStatsComponent } from './components/planta-stats.component';
 import { ChartAlturaComponent } from './components/chart-altura/chart-altura.component';
 import { ChartMaeZonasComponent } from './components/chart-mae-zonas/chart-mae-zonas.component';
 import { ChartCelsPorZonasComponent } from './components/chart-cels-por-zonas/chart-cels-por-zonas.component';
-import { ChartCelsTempsComponent } from './components/chart-cels-temps/chart-cels-temps.component';
+import { ChartCelsGradComponent } from './components/chart-cels-grad/chart-cels-grad.component';
 import { ChartMaeGlobalComponent } from './components/chart-mae-global/chart-mae-global.component';
 import { ChartTipoAnomsComponent } from './components/chart-tipo-anoms/chart-tipo-anoms.component';
 import { ChartPctCelsComponent } from './components/chart-pct-cels/chart-pct-cels.component';
@@ -22,7 +22,7 @@ import { ChartSankeyPotenciaComponent } from './components/chart-sankey-potencia
     ChartAlturaComponent,
     ChartMaeZonasComponent,
     ChartCelsPorZonasComponent,
-    ChartCelsTempsComponent,
+    ChartCelsGradComponent,
     ChartMaeGlobalComponent,
     ChartTipoAnomsComponent,
     ChartPctCelsComponent,
