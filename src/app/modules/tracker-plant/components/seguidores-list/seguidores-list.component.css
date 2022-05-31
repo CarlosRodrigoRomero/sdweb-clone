@@ -14,6 +14,10 @@
   padding: 0 1rem 0 0;
 }
 
+:host ::ng-deep .mat-sort-header-container {
+  justify-content: center;
+}
+
 table {
   width: 100%;
 }
@@ -23,15 +27,6 @@ table {
   height: calc(100vh - 280px);
   overflow: auto;
   min-width: 350px;
-}
-
-.label-tipo {
-  display: flex;
-  align-items: center;
-}
-
-.label-tipo mat-icon {
-  margin-right: 0.5rem;
 }
 
 .mat-row {
@@ -44,4 +39,13 @@ table {
 
 .mat-row.hovered {
   background-color: whitesmoke;
+}
+
+.row-content {
+  display: flex;
+  justify-content: center;
+}
+
+.row-content mat-icon {
+  margin-right: 0.5rem;
 }

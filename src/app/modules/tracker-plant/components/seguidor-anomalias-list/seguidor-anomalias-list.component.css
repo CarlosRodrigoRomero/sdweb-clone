@@ -11,6 +11,10 @@ table {
   padding: 0 1rem 0 0;
 }
 
+:host ::ng-deep .mat-sort-header-container {
+  justify-content: center;
+}
+
 .mat-row {
   cursor: pointer;
 }
@@ -21,4 +25,9 @@ table {
 
 .mat-row.hovered {
   background-color: lightgray;
+}
+
+.row-content {
+  display: flex;
+  justify-content: center;
 }
