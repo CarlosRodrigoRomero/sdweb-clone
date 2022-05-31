@@ -31,7 +31,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
   anomaliaSelected: Anomalia = undefined;
   viewSelected = 0;
   dataSource: MatTableDataSource<AnomaliaData>;
-  displayedColumns = ['id', 'tipo', 'perdidas', 'tempMax', 'gradiente'];
+  displayedColumns = ['numAnom', 'tipo', 'perdidas', 'tempMax', 'gradiente'];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -83,7 +83,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
                 gradiente = anom.gradienteNormalizado + 'ºC';
               }
               anomaliasTabla.push({
-                id: anom.localId,
+                numAnom: anom.numAnom,
                 tipo: GLOBAL.pcDescripcion[anom.tipo],
                 perdidas,
                 tempMax,
