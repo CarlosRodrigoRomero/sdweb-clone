@@ -15,6 +15,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { MathOperations } from '@core/classes/math-operations';
 import { THERMAL } from '@data/constants/thermal';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-thermal-slider',
@@ -26,6 +27,7 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
   private thermalLayersDB: ThermalLayerInterface[] = [];
   private indexSelected: number;
   private thermalLayersLoaded = false;
+  private informes: InformeInterface[] = [];
 
   @Input() informeId: string;
 
@@ -57,6 +59,8 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.informes = this.reportControlService.informes;
+
     this.loadThermalLayers();
 
     this.subscriptions.add(
@@ -87,7 +91,7 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.informeId && this.thermalLayersLoaded) {
-      const index = this.thermalLayersDB.findIndex((layerDB) => layerDB.informeId === this.informeId);
+      const index = this.informes.findIndex((informe) => informe.id === this.informeId);
 
       if (index !== -1) {
         this.indexSelected = index;
@@ -151,11 +155,11 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   setInitialValues(informeId: string) {
-    const indexInforme = this.thermalLayersDB.findIndex((layerDB) => layerDB.informeId === informeId);
-
+    let indexInforme = 0;
     let [tempMin, tempMax] = [25, 75];
     // si estamos en un informe asignamos los valores basados en las temperaturas de referencia
     if (this.getIdType() === 'plantId') {
+      indexInforme = this.informes.findIndex((informe) => informe.id === informeId);
       [tempMin, tempMax] = this.getInitialTempsLayer(informeId);
     }
 
