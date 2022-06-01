@@ -75,15 +75,13 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
           switchMap((informeId) => {
             this.selectedInforme = this.informes.find((informe) => informe.id === informeId);
 
-            return this.warningService.getWarnings(this.selectedInforme.id);
+            return this.warningService.getWarnings(informeId);
           })
         )
         .subscribe((warnings) => {
           this.warnings = warnings;
 
-          if (this.selectedInforme !== undefined) {
-            this.loadDataAndCheck();
-          }
+          this.loadDataAndCheck();
         })
     );
   }
