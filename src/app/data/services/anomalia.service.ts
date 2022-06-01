@@ -152,7 +152,6 @@ export class AnomaliaService {
             if (data.globalCoords !== undefined && data.globalCoords !== null) {
               data.globalCoords = Object.values(data.globalCoords); // pasamos los objetos a array
             }
-            data.numAnom = index + 1;
             if (data.datetime !== undefined) {
               data.datetime = this.getRightDatetime(data.datetime);
               if (!data.hasOwnProperty('temperaturaRef') || data.temperaturaRef === 0) {
