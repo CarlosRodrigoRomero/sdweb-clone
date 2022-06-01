@@ -38,32 +38,24 @@ export class SeguidorService {
     private plantaService: PlantaService
   ) {}
 
-  getSeguidoresPlanta$(plantaId: string): Observable<Seguidor[]> {
-    return this.plantaService
-      .getPlanta(plantaId)
-      .pipe(
-        take(1),
-        switchMap((planta) => {
-          this.planta = planta;
+  getSeguidoresPlanta$(plantaId: string, informes: InformeInterface[]): Observable<Seguidor[]> {
+    return this.plantaService.getPlanta(plantaId).pipe(
+      take(1),
+      switchMap((planta) => {
+        this.planta = planta;
 
-          this.getDifferentLocAreas(plantaId);
+        this.getDifferentLocAreas(plantaId);
 
-          return this.informeService.getInformesDisponiblesDePlanta(plantaId);
-        })
-      )
-      .pipe(
-        take(1),
-        switchMap((informes) => {
-          const anomaliaObsList = Array<Observable<Seguidor[]>>();
-          informes.forEach((informe) => {
-            // traemos ambos tipos de anomalias por si hay pcs antiguos
-            anomaliaObsList.push(this.getSeguidores$(informe.id, plantaId, 'pcs'));
-            anomaliaObsList.push(this.getSeguidores$(informe.id, plantaId, 'anomalias'));
-          });
-          return combineLatest(anomaliaObsList);
-        }),
-        map((arr) => arr.flat())
-      );
+        const anomaliaObsList = Array<Observable<Seguidor[]>>();
+        informes.forEach((informe) => {
+          // traemos ambos tipos de anomalias por si hay pcs antiguos
+          anomaliaObsList.push(this.getSeguidores$(informe.id, plantaId, 'pcs'));
+          anomaliaObsList.push(this.getSeguidores$(informe.id, plantaId, 'anomalias'));
+        });
+        return combineLatest(anomaliaObsList);
+      }),
+      map((arr) => arr.flat())
+    );
   }
 
   getSeguidores$(informeId: string, plantaId: string, tipo?: 'anomalias' | 'pcs'): Observable<Seguidor[]> {

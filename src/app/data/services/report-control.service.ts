@@ -220,23 +220,14 @@ export class ReportControlService {
                   //////////////////// FILTERABLE SHARED REPORT /////////////////////////
                   // iniciamos anomalia service antes de obtener las anomalias
                   this.anomaliaService.initService(this.plantaId).then(() =>
-                    this.authService.user$
+                    this.plantaService
+                      .getPlanta(this.plantaId)
                       .pipe(
-                        take(1),
-                        switchMap((user) => {
-                          this.user = user;
-
-                          return this.plantaService.getPlanta(this.plantaId);
-                        }),
                         take(1),
                         switchMap((planta) => {
                           this.planta = planta;
 
-                          if (this.authService.userIsAdmin(this.user)) {
-                            return this.informeService.getInformesDePlanta(this.plantaId);
-                          } else {
-                            return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
-                          }
+                          return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
                         }),
                         take(1),
                         // obtenemos los informes de la planta
@@ -316,7 +307,7 @@ export class ReportControlService {
                   }
                   this.selectedInformeId = this.informesIdList[this.informesIdList.length - 1];
                   // obtenemos todos los seguidores
-                  return this.seguidorService.getSeguidoresPlanta$(this.plantaId);
+                  return this.seguidorService.getSeguidoresPlanta$(this.plantaId, this.informes);
                 }),
                 take(1)
               )
@@ -384,7 +375,8 @@ export class ReportControlService {
                         take(1),
                         switchMap((informe) => {
                           this.informes = [informe];
-                          return this.seguidorService.getSeguidoresPlanta$(this.plantaId);
+
+                          return this.seguidorService.getSeguidoresPlanta$(this.plantaId, this.informes);
                         }),
                         take(1)
                       )
@@ -408,13 +400,20 @@ export class ReportControlService {
                   //////////////////// FILTERABLE SHARED REPORT /////////////////////////
                   // iniciamos anomalia service para cargar los criterios la planta
                   this.anomaliaService.initService(this.plantaId).then(() =>
-                    this.informeService
-                      .getInformesDisponiblesDePlanta(this.plantaId)
+                    this.plantaService
+                      .getPlanta(this.plantaId)
                       .pipe(
+                        take(1),
+                        switchMap((planta) => {
+                          this.planta = planta;
+
+                          return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
+                        }),
                         take(1),
                         // obtenemos los informes de la planta
                         switchMap((informes) => {
                           this.informes = informes;
+                          console.log(informes);
 
                           // evitamos cargar los informes dobles al navegar atras y volver
                           if (this.informesIdList.length === 0) {
@@ -422,7 +421,7 @@ export class ReportControlService {
                             this.informes.forEach((informe) => this.informesIdList.push(informe.id));
                           }
                           // obtenemos todos los seguidores
-                          return this.seguidorService.getSeguidoresPlanta$(this.plantaId);
+                          return this.seguidorService.getSeguidoresPlanta$(this.plantaId, this.informes);
                         }),
                         take(1)
                       )
