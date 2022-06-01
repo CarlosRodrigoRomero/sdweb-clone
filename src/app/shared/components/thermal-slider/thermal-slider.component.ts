@@ -110,11 +110,10 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private loadThermalLayers() {
-    const id = this.router.url.split('/')[this.router.url.split('/').length - 1];
-    const typeId = this.getIdType();
-    let getLayersDB = this.thermalService.getReportThermalLayerDB(id);
-    if (typeId === 'plantId') {
-      getLayersDB = this.thermalService.getPlantThermalLayerDB(id);
+    const informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+    let getLayersDB = this.thermalService.getReportThermalLayerDB(informeId);
+    if (!this.checkIfInformeId()) {
+      getLayersDB = this.thermalService.getPlantThermalLayerDB(this.reportControlService.plantaId);
     }
 
     // capas termicas del mapa
@@ -146,19 +145,19 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
       });
   }
 
-  private getIdType(): string {
-    let type = 'reportId';
-    if (this.router.url.includes('clients')) {
-      type = 'plantId';
+  private checkIfInformeId(): boolean {
+    if (this.router.url.includes('clients') || this.router.url.includes('shared')) {
+      return false;
+    } else {
+      return true;
     }
-    return type;
   }
 
   setInitialValues(informeId: string) {
     let indexInforme = 0;
     let [tempMin, tempMax] = [25, 75];
     // si estamos en un informe asignamos los valores basados en las temperaturas de referencia
-    if (this.getIdType() === 'plantId') {
+    if (!this.checkIfInformeId()) {
       indexInforme = this.informes.findIndex((informe) => informe.id === informeId);
       [tempMin, tempMax] = this.getInitialTempsLayer(informeId);
     }
