@@ -99,42 +99,30 @@ export class AnomaliaService {
 
   getAnomaliasPlanta$(
     planta: PlantaInterface,
-    informesPlanta?: InformeInterface[],
+    informes: InformeInterface[],
     criterio?: CritCriticidad
   ): Observable<Anomalia[]> {
     if (this.planta === undefined) {
       this.planta = planta;
     }
 
-    const query$ = this.informeService.getInformesDisponiblesDePlanta(planta.id).pipe(
-      take(1),
-      switchMap((informes) => {
-        // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
-        informes = this.informeService.getOnlyNewInfomesFijas(informes);
+    const anomaliaObsList = Array<Observable<Anomalia[]>>();
+    informes.forEach((informe) => {
+      if (criterio !== undefined) {
+        // traemos ambos tipos de anomalias por si hay pcs antiguos
+        anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs', criterio));
+        anomaliaObsList.push(this.getAnomalias$(informe.id, 'anomalias', criterio));
+      } else {
+        // traemos ambos tipos de anomalias por si hay pcs antiguos
+        anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs'));
+        anomaliaObsList.push(this.getAnomalias$(informe.id, 'anomalias'));
+      }
+    });
 
-        if (informesPlanta !== undefined) {
-          informes = informesPlanta;
-        }
-
-        const anomaliaObsList = Array<Observable<Anomalia[]>>();
-        informes.forEach((informe) => {
-          if (criterio !== undefined) {
-            // traemos ambos tipos de anomalias por si hay pcs antiguos
-            anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs', criterio));
-            anomaliaObsList.push(this.getAnomalias$(informe.id, 'anomalias', criterio));
-          } else {
-            // traemos ambos tipos de anomalias por si hay pcs antiguos
-            anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs'));
-            anomaliaObsList.push(this.getAnomalias$(informe.id, 'anomalias'));
-          }
-        });
-        return combineLatest(anomaliaObsList);
-      }),
+    return combineLatest(anomaliaObsList).pipe(
       map((arr) => arr.flat()),
       map((arr) => this.getAlturaCorrecta(arr, planta))
     );
-
-    return query$;
   }
 
   getAnomaliasInforme$(informeId: string): Observable<Anomalia[]> {

@@ -77,7 +77,7 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
           switchMap((planta) => {
             this.planta = planta;
 
-            return this.anomaliaService.getAnomaliasPlanta$(this.planta);
+            return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.reportControlService.informes);
           })
         )
         .subscribe((anomalias) => {

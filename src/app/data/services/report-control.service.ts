@@ -12,6 +12,7 @@ import { InformeService } from '@data/services/informe.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { SeguidorService } from '@data/services/seguidor.service';
 import { PlantaService } from '@data/services/planta.service';
+import { AuthService } from '@data/services/auth.service';
 
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 import { FilterableElement } from '@core/models/filterableInterface';
@@ -22,6 +23,7 @@ import { LocationAreaInterface } from '@core/models/location';
 import { GLOBAL } from '@data/constants/global';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { PlantaInterface } from '@core/models/planta';
+import { UserInterface } from '@core/models/user';
 
 @Injectable({
   providedIn: 'root',
@@ -60,6 +62,7 @@ export class ReportControlService {
   private _numFixedGlobalCoords: number = 3;
   private _noAnomsReport = false;
   noAnomsReport$ = new BehaviorSubject<boolean>(this._noAnomsReport);
+  private user: UserInterface;
 
   constructor(
     private router: Router,
@@ -69,7 +72,8 @@ export class ReportControlService {
     private anomaliaService: AnomaliaService,
     private seguidorService: SeguidorService,
     @Inject(WINDOW) private window: Window,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private authService: AuthService
   ) {}
 
   initService(): Promise<boolean> {
@@ -84,14 +88,23 @@ export class ReportControlService {
         return new Promise((initService) => {
           // iniciamos anomalia service antes de obtener las anomalias
           this.anomaliaService.initService(this.plantaId).then(() =>
-            this.plantaService
-              .getPlanta(this.plantaId)
+            this.authService.user$
               .pipe(
+                take(1),
+                switchMap((user) => {
+                  this.user = user;
+
+                  return this.plantaService.getPlanta(this.plantaId);
+                }),
                 take(1),
                 switchMap((planta) => {
                   this.planta = planta;
 
-                  return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
+                  if (this.authService.userIsAdmin(this.user)) {
+                    return this.informeService.getInformesDePlanta(this.plantaId);
+                  } else {
+                    return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
+                  }
                 }),
                 take(1),
                 // obtenemos los informes de la planta
@@ -108,7 +121,7 @@ export class ReportControlService {
                   this.selectedInformeId = this.informesIdList[this.informesIdList.length - 1];
 
                   // obtenemos todas las anomalías
-                  return this.anomaliaService.getAnomaliasPlanta$(this.planta);
+                  return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
                 }),
                 take(1)
               )
@@ -184,7 +197,8 @@ export class ReportControlService {
                         take(1),
                         switchMap((informe) => {
                           this.informes = [informe];
-                          return this.anomaliaService.getAnomaliasPlanta$(this.planta);
+
+                          return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
                         }),
                         take(1)
                       )
@@ -228,7 +242,7 @@ export class ReportControlService {
                           }
 
                           // obtenemos todas las anomalías
-                          return this.anomaliaService.getAnomaliasPlanta$(this.planta);
+                          return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
                         }),
                         take(1)
                       )
@@ -263,9 +277,24 @@ export class ReportControlService {
         return new Promise((initService) => {
           // iniciamos anomalia service para cargar los criterios la planta
           this.anomaliaService.initService(this.plantaId).then(() => {
-            this.informeService
-              .getInformesDisponiblesDePlanta(this.plantaId)
+            this.authService.user$
               .pipe(
+                take(1),
+                switchMap((user) => {
+                  this.user = user;
+
+                  return this.plantaService.getPlanta(this.plantaId);
+                }),
+                take(1),
+                switchMap((planta) => {
+                  this.planta = planta;
+
+                  if (this.authService.userIsAdmin(this.user)) {
+                    return this.informeService.getInformesDePlanta(this.plantaId);
+                  } else {
+                    return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
+                  }
+                }),
                 take(1),
                 // obtenemos los informes de la planta
                 switchMap((informes) => {
