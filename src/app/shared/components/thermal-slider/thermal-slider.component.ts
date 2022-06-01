@@ -66,7 +66,6 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
     this.subscriptions.add(
       this.thermalService.sliderMin$.subscribe((value) => {
         const minValue = value[this.indexSelected];
-
         if (minValue) {
           this.lowTemp = minValue;
           if (this.thermalLayers.length > 0) {
@@ -113,7 +112,10 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
     const informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
     let getLayersDB = this.thermalService.getReportThermalLayerDB(informeId);
     if (!this.checkIfInformeId()) {
-      getLayersDB = this.thermalService.getPlantThermalLayerDB(this.reportControlService.plantaId);
+      getLayersDB = this.thermalService.getPlantThermalLayerDB(
+        this.reportControlService.plantaId,
+        this.reportControlService.informes.map((informe) => informe.id)
+      );
     }
 
     // capas termicas del mapa

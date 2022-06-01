@@ -220,14 +220,23 @@ export class ReportControlService {
                   //////////////////// FILTERABLE SHARED REPORT /////////////////////////
                   // iniciamos anomalia service antes de obtener las anomalias
                   this.anomaliaService.initService(this.plantaId).then(() =>
-                    this.plantaService
-                      .getPlanta(this.plantaId)
+                    this.authService.user$
                       .pipe(
+                        take(1),
+                        switchMap((user) => {
+                          this.user = user;
+
+                          return this.plantaService.getPlanta(this.plantaId);
+                        }),
                         take(1),
                         switchMap((planta) => {
                           this.planta = planta;
 
-                          return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
+                          if (this.authService.userIsAdmin(this.user)) {
+                            return this.informeService.getInformesDePlanta(this.plantaId);
+                          } else {
+                            return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
+                          }
                         }),
                         take(1),
                         // obtenemos los informes de la planta

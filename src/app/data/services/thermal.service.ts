@@ -52,7 +52,7 @@ export class ThermalService {
     return query$;
   }
 
-  getPlantThermalLayerDB(plantaId: string): Observable<ThermalLayerInterface[]> {
+  getPlantThermalLayerDB(plantaId: string, informesId: string[]): Observable<ThermalLayerInterface[]> {
     const query$ = this.afs
       .collection<ThermalLayerInterface>('thermalLayers', (ref) => ref.where('plantaId', '==', plantaId))
       .snapshotChanges()
@@ -64,7 +64,8 @@ export class ThermalService {
 
             return data;
           })
-        )
+        ),
+        map((thermalLayers) => thermalLayers.filter((thermalLayer) => informesId.includes(thermalLayer.informeId)))
       );
     return query$;
   }

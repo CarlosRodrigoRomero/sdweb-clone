@@ -11,8 +11,9 @@ import { FilterService } from '@data/services/filter.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { PcService } from '@data/services/pc.service';
 import { WarningService } from '@data/services/warning.service';
-import { GLOBAL } from '@data/constants/global';
 import { SeguidorService } from '@data/services/seguidor.service';
+import { AuthService } from '@data/services/auth.service';
+import { OlMapService } from '@data/services/ol-map.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -24,7 +25,9 @@ import { WrongGlobalCoordsFilter } from '@core/models/wrongGlobalCoordsFilter';
 import { ModuloInterface } from '@core/models/modulo';
 import { PcInterface } from '@core/models/pc';
 import { Warning } from './warnings';
-import { OlMapService } from '@data/services/ol-map.service';
+import { UserInterface } from '@core/models/user';
+
+import { GLOBAL } from '@data/constants/global';
 
 @Component({
   selector: 'app-warnings-menu',
@@ -41,6 +44,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   private allSeguidores: Seguidor[] = [];
   private informes: InformeInterface[] = this.reportControlService.informes;
   checked = true;
+  private user: UserInterface;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -54,26 +58,42 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     private pcService: PcService,
     private warningService: WarningService,
     private seguidorService: SeguidorService,
-    private olMapService: OlMapService
+    private olMapService: OlMapService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-        this.selectedInforme = this.informes.find((informe) => informe.id === informeId);
+      this.authService.user$
+        .pipe(
+          take(1),
+          switchMap((user) => {
+            this.user = user;
 
-        if (this.selectedInforme !== undefined) {
-          this.loadDataAndCheck();
-        }
-      })
-    );
+            return this.reportControlService.selectedInformeId$;
+          }),
+          switchMap((informeId) => {
+            this.selectedInforme = this.informes.find((informe) => informe.id === informeId);
 
-    this.subscriptions.add(
-      this.warningService.getWarnings(this.selectedInforme.id).subscribe((warnings) => (this.warnings = warnings))
+            return this.warningService.getWarnings(this.selectedInforme.id);
+          })
+        )
+        .subscribe((warnings) => {
+          this.warnings = warnings;
+
+          if (this.selectedInforme !== undefined) {
+            this.loadDataAndCheck();
+          }
+        })
     );
   }
 
   loadDataAndCheck() {
+    let getInformes$ = this.informeService.getInformesDisponiblesDePlanta(this.reportControlService.plantaId);
+    if (this.authService.userIsAdmin(this.user)) {
+      getInformes$ = this.informeService.getInformesDePlanta(this.reportControlService.plantaId);
+    }
+
     if (this.reportControlService.plantaFija) {
       this.anomaliaService
         .getAnomalias$(this.selectedInforme.id, 'anomalias')
@@ -83,7 +103,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
             this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
 
             return combineLatest([
-              this.informeService.getInformesDisponiblesDePlanta(this.reportControlService.plantaId),
+              getInformes$,
               this.plantaService.getPlanta(this.reportControlService.plantaId),
               this.plantaService.getLocationsArea(this.reportControlService.plantaId),
               this.warningService.getWarnings(this.selectedInforme.id),
@@ -124,7 +144,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
             this.allSeguidores.forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
 
             return combineLatest([
-              this.informeService.getInformesDisponiblesDePlanta(this.reportControlService.plantaId),
+              getInformes$,
               this.plantaService.getPlanta(this.reportControlService.plantaId),
               this.plantaService.getLocationsArea(this.reportControlService.plantaId),
               this.warningService.getWarnings(this.selectedInforme.id),
@@ -187,7 +207,11 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         this.filterService.addFilter(filColFilter);
         break;
       case 'filsColsAnoms0':
-        const filCol0Filter: LocationFilter = new LocationFilter('locationTipo0', this.planta.filas, this.planta.columnas);
+        const filCol0Filter: LocationFilter = new LocationFilter(
+          'locationTipo0',
+          this.planta.filas,
+          this.planta.columnas
+        );
         this.filterService.addFilter(filCol0Filter);
         break;
       case 'wrongLocAnoms':
