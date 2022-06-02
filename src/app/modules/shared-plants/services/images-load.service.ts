@@ -42,7 +42,7 @@ export class ImagesLoadService {
   private _imgLogoBase64: string = undefined;
   imgLogoBase64$ = new BehaviorSubject<string>(this._imgLogoBase64);
 
-  widthImgSolardroneTech = 300;
+  widthImgSolardroneTech = 200;
   private _imgSolardroneBase64: string = undefined;
   imgSolardroneBase64$ = new BehaviorSubject<string>(this._imgSolardroneBase64);
 
