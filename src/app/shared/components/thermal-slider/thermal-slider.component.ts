@@ -198,11 +198,8 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
       }
     }
 
-    // PARCHE PARA SIRUELA MAYO 2022
-    if (informeId === 'M3PTkSUQfjPEd898haeR') {
-      tempMin = tempMin + 15;
-      tempMax = tempMax + 15;
-    }
+    // aplicamos parches para ciertas plantas
+    [tempMin, tempMax] = this.applyPatchs(informeId, tempMin, tempMax);
 
     if (tempMax < THERMAL.limitMax) {
       if (thermalLayerDB.rangeTempMax < THERMAL.limitMax) {
@@ -210,6 +207,20 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
       } else {
         tempMax = THERMAL.limitMax;
       }
+    }
+
+    return [tempMin, tempMax];
+  }
+
+  private applyPatchs(informeId: string, tempMin: number, tempMax: number): number[] {
+    // PARCHE PARA SIRUELA MAYO 2022
+    if (informeId === 'M3PTkSUQfjPEd898haeR') {
+      tempMin = tempMin + 15;
+      tempMax = tempMax + 15;
+    }
+    // PARCHE VILLAROBLEDO 1 NOVIEMBRE 2021
+    if (informeId === 'm61ebnPfzPqqS5xWm7sy') {
+      tempMax = 100;
     }
 
     return [tempMin, tempMax];
