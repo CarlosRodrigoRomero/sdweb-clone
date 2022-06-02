@@ -190,6 +190,12 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
       }
     }
 
+    // PARCHE PARA SIRUELA MAYO 2022
+    if (informeId === 'M3PTkSUQfjPEd898haeR') {
+      tempMin = tempMin + 15;
+      tempMax = tempMax + 15;
+    }
+
     return [tempMin, tempMax];
   }
 
