@@ -201,14 +201,6 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
     // aplicamos parches para ciertas plantas
     [tempMin, tempMax] = this.applyPatchs(informeId, tempMin, tempMax);
 
-    if (tempMax < THERMAL.limitMax) {
-      if (thermalLayerDB.rangeTempMax < THERMAL.limitMax) {
-        tempMax = thermalLayerDB.rangeTempMax;
-      } else {
-        tempMax = THERMAL.limitMax;
-      }
-    }
-
     return [tempMin, tempMax];
   }
 
@@ -221,6 +213,16 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
     // PARCHE VILLAROBLEDO 1 NOVIEMBRE 2021
     if (informeId === 'm61ebnPfzPqqS5xWm7sy') {
       tempMax = 100;
+    }
+    // PARCHE VERAZCRUZ MAYO 2022
+    if (informeId === 'PC8PsQ34puUxRhSaj2KA') {
+      tempMin = 30;
+      tempMax = 75;
+    }
+    // PARCHE BARBASTRO MAYO 2022
+    if (informeId === 'lR4PzmBML80tIFSKwSbT') {
+      tempMin = 30;
+      tempMax = 75;
     }
 
     return [tempMin, tempMax];
