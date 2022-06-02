@@ -19,6 +19,7 @@ import { LocationAreaInterface } from '@core/models/location';
   providedIn: 'root',
 })
 export class WarningService {
+  private warningTypes = warnings.map((w) => w.type);
   private warningsAdded: string[] = [];
 
   constructor(
@@ -208,7 +209,9 @@ export class WarningService {
   }
 
   private checkUnusedWarnings(warns: Warning[], informeId: string) {
-    const warnsUnused = warns.filter((warn) => !this.warningsAdded.includes(warn.type));
+    const warnsUnused = warns.filter(
+      (warn) => !this.warningsAdded.includes(warn.type) || !this.warningTypes.includes(warn.type)
+    );
 
     if (warnsUnused.length > 0) {
       warnsUnused.forEach((warn) => this.deleteWarning(informeId, warn.id));
