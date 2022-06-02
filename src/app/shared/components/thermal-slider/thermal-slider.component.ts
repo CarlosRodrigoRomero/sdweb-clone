@@ -132,6 +132,14 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
           // establecemos el indice seleccinado
           this.indexSelected = this.thermalLayersDB.length - 1;
 
+          const selectedThermalLayer = this.thermalLayersDB[this.indexSelected];
+
+          this.optionsTemp = {
+            floor: selectedThermalLayer.rangeTempMin,
+            ceil: selectedThermalLayer.rangeTempMax,
+            translate: this.optionsTemp.translate,
+          };
+
           // le damos el tamaño de la capa termica seleccionada
           this.thermalService.sliderMin = new Array(this.thermalLayersDB.length).fill(null);
           this.thermalService.sliderMax = new Array(this.thermalLayersDB.length).fill(null);
@@ -194,6 +202,14 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
     if (informeId === 'M3PTkSUQfjPEd898haeR') {
       tempMin = tempMin + 15;
       tempMax = tempMax + 15;
+    }
+
+    if (tempMax < THERMAL.limitMax) {
+      if (thermalLayerDB.rangeTempMax < THERMAL.limitMax) {
+        tempMax = thermalLayerDB.rangeTempMax;
+      } else {
+        tempMax = THERMAL.limitMax;
+      }
     }
 
     return [tempMin, tempMax];
