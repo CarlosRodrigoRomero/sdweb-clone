@@ -7,6 +7,7 @@ import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent, ApexYAx
 import { GLOBAL } from '@data/constants/global';
 import { ReportControlService } from '@data/services/report-control.service';
 import { InformeService } from '@data/services/informe.service';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
@@ -103,7 +104,11 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
     },
   };
 
-  constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
+  constructor(
+    private reportControlService: ReportControlService,
+    private informeService: InformeService,
+    private anomaliaInfoService: AnomaliaInfoService
+  ) {}
 
   ngOnInit(): void {
     this.allAnomalias = this.reportControlService.allAnomalias;
@@ -116,7 +121,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.informeService.getDateLabelsInformes(this.informesIdList).subscribe((dateLabels) => {
-        const alturaMax = this.getAlturaMax();
+        const alturaMax = this.planta.filas;
 
         if (this.allCC.length > 0) {
           const series = [];
@@ -133,7 +138,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
                   y: this.allCC
                     .filter((anom) => anom.informeId === this.informesIdList[i])
                     // tslint:disable-next-line: triple-equals
-                    .filter((anom) => anom.localY == index).length,
+                    .filter((anom) => this.anomaliaInfoService.getAltura(anom.localY, this.planta) == index).length,
                 });
               });
 
@@ -168,15 +173,6 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
           this.dataLoaded = true;
         }
       })
-    );
-  }
-
-  private getAlturaMax() {
-    return Math.max(
-      ...[
-        ...this.allCC.map((anom) => Number(anom.localY)).filter((fila) => typeof fila === 'number'),
-        this.planta.filas,
-      ]
     );
   }
 

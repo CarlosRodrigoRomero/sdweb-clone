@@ -290,7 +290,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       row.localizacion = anomalia.nombreSeguidor;
     }
 
-    row.localY = anomalia.localY;
+    row.localY = this.anomaliaInfoService.getAltura(anomalia.localY, this.planta);
     row.localX = anomalia.localX;
 
     if (this.reportControlService.plantaFija) {

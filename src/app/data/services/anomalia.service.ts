@@ -119,10 +119,7 @@ export class AnomaliaService {
       }
     });
 
-    return combineLatest(anomaliaObsList).pipe(
-      map((arr) => arr.flat()),
-      map((arr) => this.getAlturaCorrecta(arr, planta))
-    );
+    return combineLatest(anomaliaObsList).pipe(map((arr) => arr.flat()));
   }
 
   getAnomaliasInforme$(informeId: string): Observable<Anomalia[]> {
@@ -487,22 +484,6 @@ export class AnomaliaService {
     const difenciaEnMinutos = -(diferenciaFechas / (1000 * 60));
 
     return difenciaEnMinutos;
-  }
-
-  private getAlturaCorrecta(anomalias: Anomalia[], planta: PlantaInterface) {
-    if (planta.tipo !== 'seguidores' && planta.alturaBajaPrimero) {
-      anomalias.forEach((anom) => {
-        const alturaMax = Math.max(
-          ...[
-            ...anomalias.filter((a) => a.globalCoords.toString() === anom.globalCoords.toString()).map((a) => a.localY),
-            planta.filas,
-          ]
-        );
-        anom.localY = alturaMax - anom.localY + 1;
-      });
-    }
-
-    return anomalias;
   }
 
   downloadImage(folder: string, anomalia: Anomalia) {

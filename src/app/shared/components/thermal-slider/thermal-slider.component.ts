@@ -224,6 +224,11 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
       tempMin = 30;
       tempMax = 75;
     }
+    // PARCHE HOYA VICENTES OCTUBRE 2021
+    if (informeId === 'bopuGnf8J50NYeQtyVS1') {
+      tempMin = 35;
+      tempMax = 70;
+    }
 
     return [tempMin, tempMax];
   }

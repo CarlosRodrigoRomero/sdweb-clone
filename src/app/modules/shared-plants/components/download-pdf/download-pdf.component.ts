@@ -259,8 +259,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             }
           });
 
-          // obtenemos la altura maxima de los modulos
-          this.alturaMax = this.getAlturaMax();
+          this.alturaMax = this.planta.filas;
 
           this.arrayFilas = Array(this.alturaMax)
             .fill(0)
@@ -323,12 +322,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.imagesTilesService.imagesPlantaCompleta$.subscribe((imgs) => (this.imagesPlantaCompleta = imgs))
-    );
-  }
-
-  private getAlturaMax() {
-    return Math.max(
-      ...[...this.anomaliasInforme.map((anom) => Number(anom.localY)).filter((fila) => !isNaN(fila)), this.planta.filas]
     );
   }
 
@@ -2880,7 +2873,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           columns: [
             { text: this.translation.t('Fecha y hora captura'), width: 200, style: 'anomInfoTitle' },
             {
-              text: this.anomaliaInfoService.getFechaHoraLabel(anom),
+              text: this.anomaliaInfoService.getFechaHoraLabel(anom, this.selectedInforme),
               style: 'anomInfoValue',
             },
           ],
@@ -3760,7 +3753,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     for (const j of this.arrayFilas) {
       const arrayFila = [];
       arrayFila.push({
-        text: this.plantaService.getAltura(this.planta, j, this.alturaMax).toString(),
+        text: this.anomaliaInfoService.getAltura(j, this.planta).toString(),
         style: 'tableHeaderBlue',
       });
       const countPosicionFila = this.countPosicion[j - 1];
@@ -3785,7 +3778,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     for (let i = 1; i <= this.alturaMax; i++) {
       const arrayFila = [];
       arrayFila.push({
-        text: 'Fila ' + this.plantaService.getAltura(this.planta, i, this.alturaMax).toString(),
+        text: 'Fila ' + this.anomaliaInfoService.getAltura( i, this.planta).toString(),
         style: 'tableHeaderBlue',
       });
 

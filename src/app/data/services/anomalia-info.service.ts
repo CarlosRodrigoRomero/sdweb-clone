@@ -2,7 +2,6 @@ import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { formatNumber, formatDate } from '@angular/common';
 
 import { AnomaliaService } from '@data/services/anomalia.service';
-import { ReportControlService } from '@data/services/report-control.service';
 import { PlantaService } from '@data/services/planta.service';
 import { GLOBAL } from '@data/constants/global';
 import { DownloadReportService } from './download-report.service';
@@ -18,14 +17,12 @@ import proj4 from 'proj4';
   providedIn: 'root',
 })
 export class AnomaliaInfoService {
-  private selectedInforme: InformeInterface;
   private translation: Translation;
   private language: string;
 
   constructor(
     @Inject(LOCALE_ID) public locale: string,
     private anomaliaService: AnomaliaService,
-    private reportControlService: ReportControlService,
     private plantaService: PlantaService,
     private downloadReportService: DownloadReportService
   ) {
@@ -36,10 +33,6 @@ export class AnomaliaInfoService {
         this.language = 'es';
       }
       this.translation = new Translation(this.language);
-    });
-
-    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-      this.selectedInforme = this.reportControlService.informes.find((informe) => informe.id === informeId);
     });
   }
 
@@ -75,14 +68,14 @@ export class AnomaliaInfoService {
     return `${formatNumber(anomalia.gradienteNormalizado, this.locale, '1.0-1')} ºC`;
   }
 
-  getFechaHoraLabel(anomalia: Anomalia): string {
+  getFechaHoraLabel(anomalia: Anomalia, informe: InformeInterface): string {
     let correctHoraSrt = 8;
     if (
-      this.selectedInforme.hasOwnProperty('correctHoraSrt') &&
-      this.selectedInforme.correccHoraSrt !== undefined &&
-      this.selectedInforme.correccHoraSrt !== null
+      informe.hasOwnProperty('correctHoraSrt') &&
+      informe.correccHoraSrt !== undefined &&
+      informe.correccHoraSrt !== null
     ) {
-      correctHoraSrt = this.selectedInforme.correccHoraSrt;
+      correctHoraSrt = informe.correccHoraSrt;
     }
     const correctHoraSrtUnix = correctHoraSrt * 3600;
     const fecha = formatDate((anomalia.datetime + correctHoraSrtUnix) * 1000, 'dd/MM/yyyy', this.locale);
@@ -158,9 +151,8 @@ export class AnomaliaInfoService {
       if (!isNaN(Number(numModulo))) {
         label += `${this.translation.t('Nº módulo')}: ${numModulo}`;
       } else {
-        label += `${this.translation.t('Fila')}: ${anomalia.localY} / ${this.translation.t('Columna')}: ${
-          anomalia.localX
-        }`;
+        const altura = this.getAltura(anomalia.localY, planta);
+        label += `${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${anomalia.localX}`;
       }
     }
 
@@ -173,5 +165,18 @@ export class AnomaliaInfoService {
     const url = `http://www.google.com/maps/place/${coordConverted[1]},${coordConverted[0]}/data=!3m1!1e3`;
 
     return url;
+  }
+
+  getAltura(localY: number, planta: PlantaInterface) {
+    // Por defecto, la altura alta es la numero 1
+    if (planta.tipo !== 'seguidores' && planta.alturaBajaPrimero) {
+      let altura = planta.filas - (localY - 1);
+      if (altura < 1) {
+        altura = 1;
+      }
+      return altura;
+    } else {
+      return localY;
+    }
   }
 }

@@ -908,7 +908,7 @@ export class ExportComponent implements OnInit {
     for (const j of this.arrayFilas) {
       const arrayFila = [];
       arrayFila.push({
-        text: this.plantaService.getAltura(this.planta, j).toString(),
+        text: this.anomaliaInfoService.getAltura(j, this.planta).toString(),
         style: 'tableHeaderRed',
       });
       const countPosicionFila = this.countPosicion[j - 1];

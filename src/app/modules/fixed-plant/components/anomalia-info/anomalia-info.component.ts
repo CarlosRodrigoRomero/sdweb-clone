@@ -4,7 +4,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import { SwiperComponent } from 'swiper/angular';
@@ -31,6 +31,7 @@ import { ShareReportService } from '@data/services/share-report.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AuthService } from '@data/services/auth.service';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
@@ -119,7 +120,8 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
     public anomaliaService: AnomaliaService,
     private storage: AngularFireStorage,
     private reportControlService: ReportControlService,
-    private authService: AuthService
+    private authService: AuthService,
+    private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
   ngOnInit(): void {
@@ -152,18 +154,22 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
       });
 
     this.subscriptions.add(
-      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-        this.informeSelected = this.reportControlService.informes.find((informe) => informe.id === informeId);
+      this.authService.user$
+        .pipe(
+          take(1),
+          switchMap((user) => {
+            this.isAdmin = this.authService.userIsAdmin(user);
+            return this.reportControlService.selectedInformeId$;
+          })
+        )
+        .subscribe((informeId) => {
+          this.informeSelected = this.reportControlService.informes.find((informe) => informe.id === informeId);
 
-        if (this.informeSelected !== undefined && this.anomaliaSelect !== undefined) {
-          // obtenemos la info adicional
-          this.getInfoAdcional();
-        }
-      })
-    );
-
-    this.subscriptions.add(
-      this.authService.user$.subscribe((user) => (this.isAdmin = this.authService.userIsAdmin(user)))
+          if (this.informeSelected !== undefined && this.anomaliaSelect !== undefined) {
+            // obtenemos la info adicional
+            this.getInfoAdcional();
+          }
+        })
     );
   }
 
@@ -216,7 +222,10 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
       });
     }
 
-    const localY = this.anomaliaSelect.localY;
+    let localY = this.anomaliaInfoService.getAltura(this.anomaliaSelect.localY, this.planta);
+    if (this.isAdmin) {
+      localY = this.anomaliaSelect.localY;
+    }
     if (localY !== undefined && localY !== null) {
       fila = localY;
     }
@@ -408,6 +417,9 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   updateAnomalia(value: any, field: string) {
+    // la actualizamos en la anomalía local
+    this.anomaliaSelect[field] = value;
+    // la actualizamos en la DB
     this.anomaliaService.updateAnomaliaField(this.anomaliaSelect.id, field, Number(value));
   }
 

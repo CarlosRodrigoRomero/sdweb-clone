@@ -9,6 +9,7 @@ import { AuthService } from '@data/services/auth.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
+import { switchMap, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-seguidor-anomalia-info',
@@ -30,47 +31,54 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.seguidorViewService.anomaliaSelected$.subscribe((anom) => {
-        this.anomaliaSelected = anom;
+      this.authService.user$
+        .pipe(
+          take(1),
+          switchMap((user) => {
+            this.isAdmin = this.authService.userIsAdmin(user);
 
-        if (this.anomaliaSelected !== undefined) {
-          this.anomaliaInfo = {
-            localId: this.anomaliaSelected.localId,
-            clase: GLOBAL.labels_clase[this.anomaliaSelected.clase],
-            claseColor: GLOBAL.colores_clase[this.anomaliaSelected.clase],
-            temperaturaMax: this.anomaliaSelected.temperaturaMax,
-            temperaturaRef: this.anomaliaSelected.temperaturaRef,
-            gradienteNormalizado: this.anomaliaSelected.gradienteNormalizado,
-            tipo: GLOBAL.pcDescripcion[this.anomaliaSelected.tipo],
-            perdidas: this.anomaliaSelected.perdidas,
-            causa: GLOBAL.pcCausa[this.anomaliaSelected.tipo],
-            recomendacion: GLOBAL.pcRecomendacion[this.anomaliaSelected.tipo],
-            fila: this.anomaliaSelected.localY,
-            columna: this.anomaliaSelected.localX,
-            fecha: this.anomaliaSelected.datetime,
-            irradiancia: this.anomaliaSelected.irradiancia,
-            // vientoDireccion: this.anomaliaSelected.vientoDireccion,
-            // vientoVelocidad: this.anomaliaSelected.vientoVelocidad,
-            viento: (this.anomaliaSelected as PcInterface).viento,
-            temperaturaAire: (this.anomaliaSelected as PcInterface).temperaturaAire,
-            nubosidad: (this.anomaliaSelected as PcInterface).nubosidad,
-          };
-        }
-      })
-    );
+            return this.seguidorViewService.anomaliaSelected$;
+          })
+        )
+        .subscribe((anom) => {
+          this.anomaliaSelected = anom;
 
-    this.subscriptions.add(
-      this.authService.user$.subscribe((user) => (this.isAdmin = this.authService.userIsAdmin(user)))
+          if (this.anomaliaSelected !== undefined) {
+            this.anomaliaInfo = {
+              localId: this.anomaliaSelected.localId,
+              clase: GLOBAL.labels_clase[this.anomaliaSelected.clase],
+              claseColor: GLOBAL.colores_clase[this.anomaliaSelected.clase],
+              temperaturaMax: this.anomaliaSelected.temperaturaMax,
+              temperaturaRef: this.anomaliaSelected.temperaturaRef,
+              gradienteNormalizado: this.anomaliaSelected.gradienteNormalizado,
+              tipo: GLOBAL.pcDescripcion[this.anomaliaSelected.tipo],
+              perdidas: this.anomaliaSelected.perdidas,
+              causa: GLOBAL.pcCausa[this.anomaliaSelected.tipo],
+              recomendacion: GLOBAL.pcRecomendacion[this.anomaliaSelected.tipo],
+              fila: this.anomaliaSelected.localY,
+              columna: this.anomaliaSelected.localX,
+              fecha: this.anomaliaSelected.datetime,
+              irradiancia: this.anomaliaSelected.irradiancia,
+              // vientoDireccion: this.anomaliaSelected.vientoDireccion,
+              // vientoVelocidad: this.anomaliaSelected.vientoVelocidad,
+              viento: (this.anomaliaSelected as PcInterface).viento,
+              temperaturaAire: (this.anomaliaSelected as PcInterface).temperaturaAire,
+              nubosidad: (this.anomaliaSelected as PcInterface).nubosidad,
+            };
+          }
+        })
     );
   }
 
   updateAnomalia(value: any, field: string) {
+    // actualizamos la anomalía local
     this.anomaliaSelected[field] = Number(value);
     if (field === 'local_x') {
       this.anomaliaSelected.localX = Number(value);
     } else {
       this.anomaliaSelected.localY = Number(value);
     }
+    // actualizamos en la DB
     this.pcService.updatePc(this.anomaliaSelected as PcInterface);
   }
 
