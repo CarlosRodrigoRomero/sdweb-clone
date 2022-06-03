@@ -8,18 +8,11 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 import { take } from 'rxjs/operators';
 
-import Map from 'ol/Map';
-import XYZ from 'ol/source/XYZ';
-import { Tile as TileLayer } from 'ol/layer';
-import { View } from 'ol';
-import { FullScreen, defaults as defaultControls } from 'ol/control';
-
 import { PlantaService } from '@data/services/planta.service';
 import { AdminService } from '@data/services/admin.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { UserInterface } from '@core/models/user';
-import { fromLonLat } from 'ol/proj';
 
 @Component({
   selector: 'app-plant-create',
@@ -65,10 +58,10 @@ export class PlantCreateComponent implements OnInit {
       alturaBajaPrimero: [false, [Validators.required]],
       autoLocReady: [false, [Validators.required]],
       filas: [, [Validators.required]],
-      columnas: [, [Validators.required]],
+      columnas: [],
       latitud: [, [Validators.required]],
       longitud: [, [Validators.required]],
-      zoom: [, [Validators.required]],
+      zoom: [17, [Validators.required]],
       nombreGlobalCoords: [],
       potencia: [, [Validators.required]],
       tipo: [, [Validators.required]],
