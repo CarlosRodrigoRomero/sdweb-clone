@@ -105,77 +105,69 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.allAnomalias = this.reportControlService.allAnomalias;
+
+    // tslint:disable-next-line: triple-equals
+    this.allCC = this.allAnomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+
+    this.informesIdList = this.reportControlService.informesIdList;
+    this.planta = this.reportControlService.planta;
+
     this.subscriptions.add(
-      combineLatest([
-        this.reportControlService.informesIdList$,
-        this.plantaService.getPlanta(this.reportControlService.plantaId),
-      ])
-        .pipe(
-          switchMap(([informesId, planta]) => {
-            this.allAnomalias = this.reportControlService.allAnomalias;
+      this.informeService.getDateLabelsInformes(this.informesIdList).subscribe((dateLabels) => {
+        const alturaMax = this.getAlturaMax();
+        console.log(alturaMax, this.allCC);
 
-            // tslint:disable-next-line: triple-equals
-            this.allCC = this.allAnomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+        if (this.allCC.length > 0) {
+          const series = [];
+          if (this.planta.tipo !== 'seguidores' && this.planta.alturaBajaPrimero) {
+            for (let index = 1; index <= alturaMax; index++) {
+              const row = {
+                name: index.toString(),
+                data: [],
+              };
 
-            this.informesIdList = informesId;
-            this.planta = planta;
-
-            return this.informeService.getDateLabelsInformes(this.informesIdList);
-          })
-        )
-        .subscribe((dateLabels) => {
-          const alturaMax = this.getAlturaMax();
-
-          if (this.allCC.length > 0) {
-            const series = [];
-            if (this.planta.tipo !== 'seguidores' && this.planta.alturaBajaPrimero) {
-              for (let index = 1; index <= alturaMax; index++) {
-                const row = {
-                  name: index.toString(),
-                  data: [],
-                };
-
-                dateLabels.forEach((dateLabel, i) => {
-                  row.data.push({
-                    x: dateLabel,
-                    y: this.allCC
-                      .filter((anom) => anom.informeId === this.informesIdList[i])
-                      // tslint:disable-next-line: triple-equals
-                      .filter((anom) => anom.localY == index).length,
-                  });
+              dateLabels.forEach((dateLabel, i) => {
+                row.data.push({
+                  x: dateLabel,
+                  y: this.allCC
+                    .filter((anom) => anom.informeId === this.informesIdList[i])
+                    // tslint:disable-next-line: triple-equals
+                    .filter((anom) => anom.localY == index).length,
                 });
+              });
 
-                series.push(row);
-              }
-            } else {
-              for (let index = alturaMax; index > 0; index--) {
-                const row = {
-                  name: index.toString(),
-                  data: [],
-                };
+              series.push(row);
+            }
+          } else {
+            for (let index = alturaMax; index > 0; index--) {
+              const row = {
+                name: index.toString(),
+                data: [],
+              };
 
-                dateLabels.forEach((dateLabel, i) => {
-                  row.data.push({
-                    x: dateLabel,
-                    y: this.allCC
-                      .filter((anom) => anom.informeId === this.informesIdList[i])
-                      // tslint:disable-next-line: triple-equals
-                      .filter((anom) => anom.localY == index).length,
-                  });
+              dateLabels.forEach((dateLabel, i) => {
+                row.data.push({
+                  x: dateLabel,
+                  y: this.allCC
+                    .filter((anom) => anom.informeId === this.informesIdList[i])
+                    // tslint:disable-next-line: triple-equals
+                    .filter((anom) => anom.localY == index).length,
                 });
+              });
 
-                series.push(row);
-              }
+              series.push(row);
             }
-
-            // aplicamos a todas salvo a DEMO
-            if (this.reportControlService.plantaId !== 'egF0cbpXnnBnjcrusoeR') {
-              this.chartOptions.series = series;
-            }
-
-            this.dataLoaded = true;
           }
-        })
+
+          // aplicamos a todas salvo a DEMO
+          if (this.reportControlService.plantaId !== 'egF0cbpXnnBnjcrusoeR') {
+            this.chartOptions.series = series;
+          }
+
+          this.dataLoaded = true;
+        }
+      })
     );
   }
 
