@@ -20,6 +20,13 @@ export class MapControlService {
 
   constructor() {}
 
+  resetService() {
+    this.sliderMin = 25;
+    this.sliderMax = 75;
+    this.sliderTemporal = 100;
+    this.sliderThermalOpacity = 100;
+  }
+
   /////////////////
   get sliderMin() {
     return this._sliderMin;

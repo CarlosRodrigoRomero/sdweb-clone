@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { MatSliderChange } from '@angular/material/slider';
+
+import { Subscription } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
 
@@ -14,9 +16,11 @@ import { switchMap, take } from 'rxjs/operators';
   templateUrl: './slider-opacity.component.html',
   styleUrls: ['./slider-opacity.component.scss'],
 })
-export class SliderOpacityComponent implements OnInit {
+export class SliderOpacityComponent implements OnInit, OnDestroy {
   private thermalLayers: TileLayer[];
   private selectedInformeId: string;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private mapControlService: MapControlService,
@@ -25,54 +29,45 @@ export class SliderOpacityComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.olMapService
-      .getThermalLayers()
-      .pipe(
-        take(1),
-        switchMap((layers) => {
-          this.thermalLayers = layers;
+    this.subscriptions.add(
+      this.olMapService
+        .getThermalLayers()
+        .pipe(
+          switchMap((layers) => {
+            this.thermalLayers = layers;
 
-          return this.mapControlService.sliderThermalOpacitySource;
+            return this.reportControlService.selectedInformeId$;
+          }),
+          switchMap((informeId) => {
+            this.selectedInformeId = informeId;
+
+            return this.mapControlService.sliderThermalOpacitySource;
+          })
+        )
+        .subscribe((v) => {
+          this.thermalLayers.forEach((layer) => {
+            // retrasamos 100ms para que sea posterior a la carga de la thermal
+            setTimeout(() => {
+              layer.setOpacity(v / 100);
+
+              if (layer.getProperties().informeId === this.selectedInformeId) {
+                layer.setVisible(true);
+              } else {
+                layer.setVisible(false);
+              }
+            }, 100);
+          });
         })
-      )
-      .subscribe((v) => {
-        this.thermalLayers.forEach((layer) => {
-          if (layer.getProperties().informeId === this.selectedInformeId) {
-            layer.setOpacity(v / 100);
-          } else {
-            layer.setOpacity(0);
-          }
-        });
-      });
-
-    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-      this.selectedInformeId = informeId;
-      // retrasamos 100ms para que se actualice despues de la capa térmica
-      setTimeout(() => {
-        const valueSlider = this.mapControlService.sliderThermalOpacity;
-        this.thermalLayers.forEach((layer) => {
-          if (layer.getProperties().informeId === this.selectedInformeId) {
-            layer.setOpacity(valueSlider / 100);
-          } else {
-            layer.setOpacity(0);
-          }
-        });
-      }, 100);
-    });
-
-    // nos subscribimos a los valores del slider
-    this.mapControlService.sliderThermalOpacitySource.subscribe((v) => {
-      this.thermalLayers.forEach((layer) => {
-        if (layer.getProperties().informeId === this.selectedInformeId) {
-          layer.setOpacity(v / 100);
-        } else {
-          layer.setOpacity(0);
-        }
-      });
-    });
+    );
   }
 
   onChangeThermalOpacitySlider(e: MatSliderChange) {
     this.mapControlService.sliderThermalOpacity = e.value;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+
+    this.mapControlService.resetService();
   }
 }
