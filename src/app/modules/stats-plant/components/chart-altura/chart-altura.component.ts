@@ -1,18 +1,15 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { combineLatest, Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
-import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent, ApexYAxis } from 'ng-apexcharts';
+import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent, ApexYAxis, ApexTooltip } from 'ng-apexcharts';
 
 import { GLOBAL } from '@data/constants/global';
 import { ReportControlService } from '@data/services/report-control.service';
 import { InformeService } from '@data/services/informe.service';
-import { PlantaService } from '@data/services/planta.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
-import { Seguidor } from '@core/models/seguidor';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -20,6 +17,7 @@ export type ChartOptions = {
   dataLabels: ApexDataLabels;
   colors: any;
   yaxis: ApexYAxis;
+  tooltip: ApexTooltip;
 };
 @Component({
   selector: 'app-chart-altura',
@@ -96,13 +94,16 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
         text: 'Fila',
       },
     },
+    tooltip: {
+      y: {
+        formatter: (value) => {
+          return value.toString();
+        },
+      },
+    },
   };
 
-  constructor(
-    private reportControlService: ReportControlService,
-    private informeService: InformeService,
-    private plantaService: PlantaService
-  ) {}
+  constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
 
   ngOnInit(): void {
     this.allAnomalias = this.reportControlService.allAnomalias;
@@ -116,7 +117,6 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.informeService.getDateLabelsInformes(this.informesIdList).subscribe((dateLabels) => {
         const alturaMax = this.getAlturaMax();
-        console.log(alturaMax, this.allCC);
 
         if (this.allCC.length > 0) {
           const series = [];
