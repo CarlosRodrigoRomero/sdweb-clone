@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { switchMap, take } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
@@ -23,6 +23,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { SeguidorService } from '@data/services/seguidor.service';
 
 import { LocationAreaInterface } from '@core/models/location';
+import { PlantaInterface } from '@core/models/planta';
 
 export interface Task {
   name: string;
@@ -36,7 +37,7 @@ export interface Task {
   styleUrls: ['./global-coord-areas.component.css'],
 })
 export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
-  public plantaId: string;
+  public planta: PlantaInterface;
   private globalCoordAreas: LocationAreaInterface[][] = [];
   public globalCoordAreasVectorSources: VectorSource[] = [];
   public globalCoordAreasVectorLayers: VectorLayer[] = [];
@@ -84,39 +85,26 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
       }
     }
 
+    this.planta = this.reportControlService.planta;
+
+    // si tiene nombres propios se los aplicamos
+    if (this.planta.nombreGlobalCoords !== undefined && this.planta.nombreGlobalCoords.length > 0) {
+      this.nombreGlobalCoords = this.planta.nombreGlobalCoords;
+    }
+
+    // guardamos los nombre en el servicio
+    this.reportControlService.nombreGlobalCoords = this.nombreGlobalCoords;
+
+    this.nombreGlobalCoords.forEach((nombre) => {
+      this.task.subtasks.push({ name: nombre, completed: false });
+    });
+
     this.subscriptions.add(
-      this.reportControlService.plantaId$
-        .pipe(
-          switchMap((plantaId) => {
-            this.plantaId = plantaId;
+      this.olMapService.getMap().subscribe((map) => {
+        this.map = map;
 
-            return this.plantaService.getPlanta(plantaId);
-          }),
-          switchMap((planta) => {
-            // si tiene nombres propios se los aplicamos
-            if (planta.nombreGlobalCoords !== undefined && planta.nombreGlobalCoords.length > 0) {
-              this.nombreGlobalCoords = planta.nombreGlobalCoords;
-            }
-
-            // if (this.reportControlService.plantaFija) {
-            //   this.numAreas = this.nombreGlobalCoords.length;
-            // }
-
-            // guardamos los nombre en el servicio
-            this.reportControlService.nombreGlobalCoords = this.nombreGlobalCoords;
-
-            this.nombreGlobalCoords.forEach((nombre) => {
-              this.task.subtasks.push({ name: nombre, completed: false });
-            });
-
-            return this.olMapService.getMap();
-          })
-        )
-        .subscribe((map) => {
-          this.map = map;
-
-          this.addLocationAreas();
-        })
+        this.addLocationAreas();
+      })
     );
   }
 
@@ -184,7 +172,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.plantaService
-        .getLocationsArea(this.plantaId)
+        .getLocationsArea(this.planta.id)
         .pipe(take(1))
         .subscribe((locAreas) => {
           // si la planta es de seguidores obtenemos las areas ya sin seguidores
