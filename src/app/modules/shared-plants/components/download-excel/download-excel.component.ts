@@ -127,7 +127,9 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
           // ordenamos la lista de anomalias por su indice
           this.anomaliasInforme = this.anomaliasInforme.sort((a, b) => a.numAnom - b.numAnom);
 
-          this.columnasLink = [2, 3];
+          if (!this.reportControlService.plantaFija) {
+            this.columnasLink = [2, 3];
+          }
 
           this.inicioFilters = 7;
 
