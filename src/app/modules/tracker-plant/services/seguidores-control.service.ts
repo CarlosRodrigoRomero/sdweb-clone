@@ -41,6 +41,7 @@ export class SeguidoresControlService {
   public prevSeguidorSelected: Seguidor;
   private sharedReportNoFilters = false;
   private seguidorLayers: VectorLayer[];
+  private zonasLayers: VectorLayer[];
   private prevFeatureHover: Feature;
   private toggleViewSelected: number = undefined;
   private _seguidorViewOpened = false;
@@ -73,14 +74,16 @@ export class SeguidoresControlService {
     const getMap = this.olMapService.getMap();
     const getSegLayers = this.olMapService.getSeguidorLayers();
     const getIfSharedWithFilters = this.reportControlService.sharedReportWithFilters$;
+    const getZonasLayers = this.olMapService.zonasLayers$;
 
     return new Promise((initService) => {
-      combineLatest([getMap, getSegLayers, getIfSharedWithFilters])
+      combineLatest([getMap, getSegLayers, getIfSharedWithFilters, getZonasLayers])
         .pipe(take(1))
-        .subscribe(([map, segL, isSharedWithFil]) => {
+        .subscribe(([map, segL, isSharedWithFil, zonasL]) => {
           this.map = map;
           this.seguidorLayers = segL;
           this.sharedReportNoFilters = !isSharedWithFil;
+          this.zonasLayers = zonasL;
         });
 
       this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
@@ -128,7 +131,7 @@ export class SeguidoresControlService {
     return [maeLayer, celsCalientesLayer, gradNormMaxLayer];
   }
 
-  public mostrarSeguidores() {
+  mostrarSeguidores() {
     this.filterService.filteredElements$.subscribe((seguidores) => {
       if (this.sharedReportNoFilters) {
         // Dibujamos seguidores solo del informe seleccionado
@@ -566,8 +569,6 @@ export class SeguidoresControlService {
       return GLOBAL.colores_grad[2];
     }
   }
-
-  
 
   setExternalStyle(seguidorId: string, focus: boolean) {
     const layersInforme = this.seguidorLayers.filter(

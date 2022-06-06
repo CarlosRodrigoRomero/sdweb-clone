@@ -24,6 +24,8 @@ import { SeguidoresControlService } from '../../services/seguidores-control.serv
 import { PlantaInterface } from '@core/models/planta';
 import { Seguidor } from '@core/models/seguidor';
 import { InformeInterface } from '@core/models/informe';
+import { ZonasService } from '@data/services/zonas.service';
+import { SeguidorService } from '@data/services/seguidor.service';
 
 @Component({
   selector: 'app-map-seguidores',
@@ -45,6 +47,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public aerialLayers: TileLayer[];
   public thermalSource;
   private seguidorLayers: VectorLayer[];
+  private zonasLayers: VectorLayer[];
   private incrementoLayers: VectorLayer[];
   public leftOpened: boolean;
   public rightOpened: boolean;
@@ -64,7 +67,9 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     private incrementosService: IncrementosService,
     private reportControlService: ReportControlService,
     private seguidoresControlService: SeguidoresControlService,
-    private shareReportService: ShareReportService
+    private shareReportService: ShareReportService,
+    private zonasService: ZonasService,
+    private seguidorService: SeguidorService
   ) {}
 
   ngOnInit(): void {
@@ -86,11 +91,15 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
           this.subscriptions.add(
             this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers))
           );
+          this.subscriptions.add(this.olMapService.zonasLayers$.subscribe((layers) => (this.zonasLayers = layers)));
 
           // ordenamos los informes por fecha
           this.informeIdList = informes.map((informe) => informe.id);
 
           informes.forEach((informe) => {
+            // creamos las capas de zonas para los diferentes informes
+            this.olMapService.zonasLayers.push(this.zonasService.createZonasLayer(informe.id));
+
             // creamos las capas de los seguidores para los diferentes informes
             this.seguidoresControlService
               .createSeguidorLayers(informe.id)
@@ -137,6 +146,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
           this.initMap();
 
           this.addPopupOverlay();
+          this.addZoomEvent();
         })
     );
   }
@@ -179,6 +189,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     );
 
     this.seguidorLayers.forEach((l) => this.map.addLayer(l));
+    this.zonasLayers.forEach((l) => this.map.addLayer(l));
 
     // inicializamos el servicio que controla el comportamiento de los seguidores
     this.seguidoresControlService.initService().then((value) => {
@@ -188,6 +199,13 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
         this.subscriptions.add(
           this.seguidoresControlService.seguidorHovered$.subscribe((segHover) => (this.seguidorHovered = segHover))
         );
+      }
+    });
+
+    // iniciamos el servicio que controla las zonas y las cargamos
+    this.zonasService.initService().then((value) => {
+      if (value) {
+        this.zonasService.addZonas(this.seguidorService.zones, this.zonasLayers);
       }
     });
   }
@@ -219,6 +237,23 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     });
 
     this.olMapService.addAerialLayer(aerialLayer);
+  }
+
+  private addZoomEvent() {
+    this.map.on('moveend', (event) => {
+      const zoom = this.map.getView().getZoom();
+      if (zoom >= 19) {
+        // this.zonasLayers.forEach((l) => l.setOpacity(0));
+        // this.seguidorLayers.forEach((l) => l.setOpacity(1));
+        this.zonasLayers.forEach((l) => l.setVisible(false));
+        this.seguidorLayers.forEach((l) => l.setVisible(true));
+      } else {
+        // this.zonasLayers.forEach((l) => l.setOpacity(1));
+        // this.seguidorLayers.forEach((l) => l.setOpacity(0));
+        this.zonasLayers.forEach((l) => l.setVisible(true));
+        this.seguidorLayers.forEach((l) => l.setVisible(false));
+      }
+    });
   }
 
   ngOnDestroy(): void {

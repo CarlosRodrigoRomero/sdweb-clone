@@ -30,6 +30,8 @@ export class OlMapService {
   private anomaliaLayers$ = new BehaviorSubject<VectorLayer[]>(this.anomaliaLayers);
   private seguidorLayers: VectorLayer[] = [];
   private seguidorLayers$ = new BehaviorSubject<VectorLayer[]>(this.seguidorLayers);
+  private _zonasLayers: VectorLayer[] = [];
+  zonasLayers$ = new BehaviorSubject<VectorLayer[]>(this._zonasLayers);
   private incrementoLayers: VectorLayer[] = [];
   private incrementoLayers$ = new BehaviorSubject<VectorLayer[]>(this.incrementoLayers);
   private aerialLayers: TileLayer[] = [];
@@ -182,6 +184,14 @@ export class OlMapService {
     return [sumLong / coords.length, sumLat / coords.length];
   }
 
+  setViewCenter(center: Coordinate) {
+    this.map.getView().setCenter(center);
+  }
+
+  setViewZoom(zoom: number) {
+    this.map.getView().setZoom(zoom);
+  }
+
   resetService() {
     this.map = undefined;
     this.draw = undefined;
@@ -211,5 +221,14 @@ export class OlMapService {
   set map(value: Map) {
     this._map = value;
     this.map$.next(value);
+  }
+
+  get zonasLayers(): VectorLayer[] {
+    return this._zonasLayers;
+  }
+
+  set zonasLayers(value: VectorLayer[]) {
+    this._zonasLayers = value;
+    this.zonasLayers$.next(value);
   }
 }
