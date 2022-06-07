@@ -14,11 +14,14 @@ import { OlMapService } from './ol-map.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { ReportControlService } from './report-control.service';
+import { GLOBAL } from '@data/constants/global';
+import { Anomalia } from '@core/models/anomalia';
+import { Seguidor } from '@core/models/seguidor';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ZonasService {
+export class ZonesControlService {
   private map: Map;
   private selectedInformeId: string;
 
@@ -34,34 +37,29 @@ export class ZonasService {
     });
   }
 
-  createZonasLayer(informeId: string): VectorLayer {
-    const layer = new VectorLayer({
+  createZonasLayers(informeId: string): VectorLayer {
+    console.log(informeId);
+    const maeLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: new Style({
-        fill: new Fill({
-          color: 'rgba(0,0,0,0)',
-        }),
-        stroke: new Stroke({
-          color: 'white',
-          width: 4,
-        }),
-      }),
+      style: this.getStyleMae(false),
     });
-    layer.setProperties({
+    maeLayer.setProperties({
       informeId,
       id: '0',
     });
 
-    return layer;
+    return maeLayer;
   }
 
   addZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
-    console.log(zonas, layers);
-    // Para cada vector layer (que corresponde a un informe)
+    // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
+      const elemsLayer = this.getElemsLayer(l);
+      console.log(elemsLayer);
       const source = l.getSource();
       source.clear();
       zonas.forEach((zona) => {
+        // const elemsZona = elemsLayer.filter((elem) => elem.globalCoords);
         const coords = this.pathToLonLat(zona.path);
         // crea poligono seguidor
         const feature = new Feature({
@@ -81,6 +79,17 @@ export class ZonasService {
     this.addSelectInteraction();
 
     // this.addClickOutFeatures();
+  }
+
+  private getElemsLayer(layer: VectorLayer) {
+    const informeId = layer.getProperties().informeId;
+    const allElems = this.reportControlService.allFilterableElements;
+    const elemsLayer = allElems.filter((elem) => elem.informeId === informeId);
+    if (this.reportControlService.plantaFija) {
+      return elemsLayer as Anomalia[];
+    } else {
+      return elemsLayer as Seguidor[];
+    }
   }
 
   private addSelectInteraction() {
@@ -125,5 +134,34 @@ export class ZonasService {
       }
     });
     return gCoords.join('.');
+  }
+
+  // ESTILOS MAE
+  private getStyleMae(focused: boolean) {
+    return (feature) => {
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        return new Style({
+          stroke: new Stroke({
+            color: focused ? 'white' : 'red' /* this.getColorMae(feature) */,
+            width: focused ? 6 : 4,
+          }),
+          fill: new Fill({
+            color: 'rgba(255,255,255, 0)',
+          }),
+        });
+      }
+    };
+  }
+
+  private getColorMae(feature: Feature) {
+    const mae = feature.getProperties().properties.mae as number;
+
+    if (mae < 0.01) {
+      return GLOBAL.colores_mae[0];
+    } else if (mae < 0.05) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
   }
 }

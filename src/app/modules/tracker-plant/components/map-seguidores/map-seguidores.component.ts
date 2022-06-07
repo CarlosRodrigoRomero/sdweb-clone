@@ -20,12 +20,11 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { ShareReportService } from '@data/services/share-report.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { ZonesControlService } from '@data/services/zones-control.service';
+import { SeguidorService } from '@data/services/seguidor.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { Seguidor } from '@core/models/seguidor';
-import { InformeInterface } from '@core/models/informe';
-import { ZonasService } from '@data/services/zonas.service';
-import { SeguidorService } from '@data/services/seguidor.service';
 
 @Component({
   selector: 'app-map-seguidores',
@@ -68,7 +67,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     private reportControlService: ReportControlService,
     private seguidoresControlService: SeguidoresControlService,
     private shareReportService: ShareReportService,
-    private zonasService: ZonasService,
+    private zonesControlService: ZonesControlService,
     private seguidorService: SeguidorService
   ) {}
 
@@ -98,7 +97,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
 
           informes.forEach((informe) => {
             // creamos las capas de zonas para los diferentes informes
-            this.olMapService.zonasLayers.push(this.zonasService.createZonasLayer(informe.id));
+            this.olMapService.zonasLayers.push(this.zonesControlService.createZonasLayers(informe.id));
 
             // creamos las capas de los seguidores para los diferentes informes
             this.seguidoresControlService
@@ -139,9 +138,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
 
           // asignamos los IDs necesarios para compartir
           this.shareReportService.setPlantaId(this.plantaId);
-
-          // asignamos el informe para compartir
-          // this.shareReportService.setInformeID(this.informesList[this.informesList.length - 1]);
 
           this.initMap();
 
@@ -203,9 +199,9 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     });
 
     // iniciamos el servicio que controla las zonas y las cargamos
-    this.zonasService.initService().then((value) => {
+    this.zonesControlService.initService().then((value) => {
       if (value) {
-        this.zonasService.addZonas(this.seguidorService.zones, this.zonasLayers);
+        this.zonesControlService.addZonas(this.seguidorService.zones, this.zonasLayers);
       }
     });
   }
