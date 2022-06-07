@@ -22,6 +22,8 @@
     <!-- MENU ALERTAS INFORME TERMINADO ANTES DE ENTREGAR -->
     <app-warnings-menu *ngIf="isAdmin && isReport && loadContent && !isDemo"></app-warnings-menu>
 
+    <app-report-recalc *ngIf="isAdmin && isReport && loadContent && !isDemo"></app-report-recalc>
+
     <!-- <app-switch-theme></app-switch-theme> -->
 
     <!-- BOTON NOTIFICACIONES PROVISIONAL -->
