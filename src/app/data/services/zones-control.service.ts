@@ -17,6 +17,7 @@ import { ReportControlService } from './report-control.service';
 import { GLOBAL } from '@data/constants/global';
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
+import { FilterableElement } from '@core/models/filterableInterface';
 
 @Injectable({
   providedIn: 'root',
@@ -38,7 +39,6 @@ export class ZonesControlService {
   }
 
   createZonasLayers(informeId: string): VectorLayer {
-    console.log(informeId);
     const maeLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleMae(false),
@@ -54,20 +54,29 @@ export class ZonesControlService {
   addZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
-      const elemsLayer = this.getElemsLayer(l);
-      console.log(elemsLayer);
+      const informeId = l.getProperties().informeId;
+      const elemsLayer = this.getElemsLayer(informeId);
       const source = l.getSource();
       source.clear();
       zonas.forEach((zona) => {
-        // const elemsZona = elemsLayer.filter((elem) => elem.globalCoords);
+        const elemsZona = this.getElemsZona(zona, elemsLayer);
+        // para anomalías enviamos el numero de zonas para calcular el MAE
+        let mae = 0;
+        if (this.reportControlService.plantaFija) {
+          mae = this.getMaeZona(elemsZona, informeId, elemsLayer.length);
+        } else {
+          mae = this.getMaeZona(elemsZona, informeId);
+        }
+        console.log(mae);
         const coords = this.pathToLonLat(zona.path);
         // crea poligono seguidor
         const feature = new Feature({
           geometry: new Polygon(coords),
           properties: {
             id: this.getGlobalsLabel(zona.globalCoords),
-            informeId: l.getProperties().informeId,
+            informeId,
             centroid: this.olMapService.getCentroid(coords[0]),
+            mae,
           },
         });
         source.addFeature(feature);
@@ -81,8 +90,7 @@ export class ZonesControlService {
     // this.addClickOutFeatures();
   }
 
-  private getElemsLayer(layer: VectorLayer) {
-    const informeId = layer.getProperties().informeId;
+  private getElemsLayer(informeId: string) {
     const allElems = this.reportControlService.allFilterableElements;
     const elemsLayer = allElems.filter((elem) => elem.informeId === informeId);
     if (this.reportControlService.plantaFija) {
@@ -90,6 +98,39 @@ export class ZonesControlService {
     } else {
       return elemsLayer as Seguidor[];
     }
+  }
+
+  private getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]) {
+    let elemsZona: FilterableElement[] = [];
+    zona.globalCoords.forEach((gC, index) => {
+      if (gC !== null) {
+        elemsZona = elems.filter((elem) => elem.globalCoords[index] === gC);
+      }
+    });
+
+    return elemsZona;
+  }
+
+  private getMaeZona(elems: FilterableElement[], informeId: string, numZonas?: number): number {
+    const informe = this.reportControlService.informes.find((informe) => informe.id === informeId);
+    let mae = 0;
+    if (numZonas) {
+      const anomaliasZona = elems as Anomalia[];
+      if (anomaliasZona.length > 0) {
+        const perdidas = anomaliasZona.map((anom) => anom.perdidas);
+        let perdidasTotales = 0;
+        perdidas.forEach((perd) => (perdidasTotales += perd));
+
+        // suponemos zonas iguales para dar un valor aproximado
+        mae = perdidasTotales / (informe.numeroModulos / numZonas);
+      }
+    } else {
+      const seguidoresZona = elems as Seguidor[];
+      seguidoresZona.forEach((seg) => (mae = mae + seg.mae));
+      mae = mae / seguidoresZona.length;
+    }
+
+    return mae;
   }
 
   private addSelectInteraction() {
@@ -142,7 +183,7 @@ export class ZonesControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focused ? 'white' : 'red' /* this.getColorMae(feature) */,
+            color: focused ? 'white' : this.getColorMae(feature),
             width: focused ? 6 : 4,
           }),
           fill: new Fill({

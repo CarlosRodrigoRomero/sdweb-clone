@@ -106,6 +106,7 @@ export class SeguidoresControlService {
     const maeLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleSeguidoresMae(false),
+      visible: false,
     });
     maeLayer.setProperties({
       informeId,
@@ -114,6 +115,7 @@ export class SeguidoresControlService {
     const celsCalientesLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleSeguidoresCelsCalientes(false),
+      visible: false,
     });
     celsCalientesLayer.setProperties({
       informeId,
@@ -122,6 +124,7 @@ export class SeguidoresControlService {
     const gradNormMaxLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleSeguidoresGradienteNormMax(false),
+      visible: false,
     });
     gradNormMaxLayer.setProperties({
       informeId,

@@ -241,12 +241,12 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
       if (zoom >= 19) {
         // this.zonasLayers.forEach((l) => l.setOpacity(0));
         // this.seguidorLayers.forEach((l) => l.setOpacity(1));
-        this.zonasLayers.forEach((l) => l.setVisible(false));
+        // this.zonasLayers.forEach((l) => l.setVisible(false));
         this.seguidorLayers.forEach((l) => l.setVisible(true));
       } else {
         // this.zonasLayers.forEach((l) => l.setOpacity(1));
         // this.seguidorLayers.forEach((l) => l.setOpacity(0));
-        this.zonasLayers.forEach((l) => l.setVisible(true));
+        // this.zonasLayers.forEach((l) => l.setVisible(true));
         this.seguidorLayers.forEach((l) => l.setVisible(false));
       }
     });
