@@ -569,7 +569,8 @@ export class WarningService {
     warns: Warning[],
     informeId: string
   ) {
-    const zones = this.zonesService.getZones(planta, locAreas);
+    let zones = this.zonesService.getZones(planta, locAreas);
+    zones = this.zonesService.getCompleteGlobalCoords(zones);
     const repeatZones = UtilitiesService.findDuplicates(zones.map((zone) => zone.globalCoords.toString()));
 
     if (repeatZones.length > 0) {
