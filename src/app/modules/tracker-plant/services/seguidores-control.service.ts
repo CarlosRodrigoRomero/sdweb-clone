@@ -22,6 +22,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { FilterService } from '@data/services/filter.service';
 import { GLOBAL } from '@data/constants/global';
 import { MapSeguidoresService } from './map-seguidores.service';
+import { ZonesControlService } from '@data/services/zones-control.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { MathOperations } from '@core/classes/math-operations';
@@ -66,7 +67,8 @@ export class SeguidoresControlService {
     private reportControlService: ReportControlService,
     private filterService: FilterService,
     private mapSeguidoresService: MapSeguidoresService,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private zonesControlService: ZonesControlService
   ) {}
 
   initService(): Promise<boolean> {
@@ -114,7 +116,7 @@ export class SeguidoresControlService {
       maeLayer.setProperties({
         informeId,
         view: '0',
-        zone: zone.globalCoords.join('.'),
+        zone,
       });
       seguidoresLayers.push(maeLayer);
       const celsCalientesLayer = new VectorLayer({
@@ -125,7 +127,7 @@ export class SeguidoresControlService {
       celsCalientesLayer.setProperties({
         informeId,
         view: '1',
-        zone: zone.globalCoords.join('.'),
+        zone,
       });
       seguidoresLayers.push(celsCalientesLayer);
       const gradNormMaxLayer = new VectorLayer({
@@ -136,7 +138,7 @@ export class SeguidoresControlService {
       gradNormMaxLayer.setProperties({
         informeId,
         view: '2',
-        zone: zone.globalCoords.join('.'),
+        zone,
       });
       seguidoresLayers.push(gradNormMaxLayer);
     });
@@ -166,9 +168,15 @@ export class SeguidoresControlService {
   private dibujarSeguidores(seguidores: Seguidor[]) {
     // Para cada vector layer (que corresponde a un informe)
     this.seguidorLayers.forEach((l) => {
+      // filtra los seguidores correspondientes al informe
+      const seguidoresInforme = seguidores.filter((seguidor) => seguidor.informeId === l.getProperties().informeId);
+      const seguidoresZona = this.zonesControlService.getElemsZona(
+        l.getProperties().zone,
+        seguidoresInforme
+      ) as Seguidor[];
       const source = l.getSource();
       source.clear();
-      seguidores.forEach((seguidor) => {
+      seguidoresZona.forEach((seguidor) => {
         // crea poligono seguidor
         const feature = new Feature({
           geometry: new Polygon(this.latLonLiteralToLonLat(seguidor.path)),

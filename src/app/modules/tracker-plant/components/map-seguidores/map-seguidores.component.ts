@@ -88,7 +88,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
         const allZones = this.zonesService.getZonesBySize(this.reportControlService.planta, locAreas);
         const smallZones = allZones[allZones.length - 1];
 
-        this.informes.forEach((informe) => {
+        this.informes.forEach((informe, index) => {
           // creamos las capas de los seguidores para los diferentes informes
           this.seguidoresControlService
             .createSeguidorLayers(informe.id, smallZones)
@@ -97,10 +97,12 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
           // añadimos las ortofotos aereas de cada informe
           this.addAerialLayer(informe.id);
 
-          this.initMap();
+          if (index === this.informes.length - 1) {
+            this.initMap();
 
-          this.addPopupOverlay();
-          this.addZoomEvent();
+            this.addPopupOverlay();
+            this.addZoomEvent();
+          }
         });
       });
 
