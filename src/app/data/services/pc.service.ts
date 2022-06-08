@@ -515,4 +515,17 @@ export class PcService {
     });
     return zonas.sort();
   }
+
+  getLocalId(pc: PcInterface): string {
+    const data = [];
+    pc.globalCoords.forEach((gC) => {
+      if (gC !== null) {
+        data.push(gC);
+      }
+    });
+    data.push(pc.local_x);
+    data.push(pc.local_y);
+
+    return data.join('.');
+  }
 }

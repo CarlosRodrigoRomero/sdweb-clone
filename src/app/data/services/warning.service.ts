@@ -8,6 +8,8 @@ import { Observable } from 'rxjs';
 import { catchError, map, take } from 'rxjs/operators';
 
 import { ReportControlService } from './report-control.service';
+import { UtilitiesService } from './utilities.service';
+import { ZonesService } from './zones.service';
 
 import { Warning, warnings } from '@shared/components/warnings-menu/warnings';
 import { InformeInterface } from '@core/models/informe';
@@ -26,7 +28,9 @@ export class WarningService {
     private afs: AngularFirestore,
     private reportControlService: ReportControlService,
     private http: HttpClient,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private utilitiesService: UtilitiesService,
+    private zonesService: ZonesService
   ) {}
 
   addWarning(informeId: string, warning: Warning) {
@@ -434,7 +438,7 @@ export class WarningService {
     return true;
   }
 
-  checkZonesWarnings(
+  private checkZonesWarnings(
     locAreas: LocationAreaInterface[],
     informe: InformeInterface,
     warns: Warning[],
@@ -452,15 +456,22 @@ export class WarningService {
       }
       const noGlobalCoordsAnomsChecked = this.checkNoGlobalCoordsAnoms(anomalias, warns, informe.id);
       const zonesNamesChecked = this.checkZonesNames(planta, warns, informe.id);
+      const zonesRepeatChecked = this.checkZonesRepeat(planta, locAreas, warns, informe.id);
       const modulosChecked = this.checkModulosWarnings(locAreas, warns, informe.id, anomalias);
 
       // comprobamos que todas alertas de zonas han sido checkeadas
       if (planta.tipo !== 'seguidores') {
-        if (wrongLocAnomsChecked && noGlobalCoordsAnomsChecked && zonesNamesChecked && modulosChecked) {
+        if (
+          wrongLocAnomsChecked &&
+          noGlobalCoordsAnomsChecked &&
+          zonesNamesChecked &&
+          zonesRepeatChecked &&
+          modulosChecked
+        ) {
           return true;
         }
       } else {
-        if (noGlobalCoordsAnomsChecked && zonesNamesChecked && modulosChecked) {
+        if (noGlobalCoordsAnomsChecked && zonesNamesChecked && zonesRepeatChecked && modulosChecked) {
           return true;
         }
       }
@@ -522,13 +533,21 @@ export class WarningService {
     return true;
   }
 
-  private checkZonesNames(planta: PlantaInterface, warns: Warning[], informeId: string): boolean {
+  private checkHaveZonesNames(planta: PlantaInterface): boolean {
     if (
       !planta.hasOwnProperty('nombreGlobalCoords') ||
       planta.nombreGlobalCoords === null ||
       planta.nombreGlobalCoords === undefined ||
       planta.nombreGlobalCoords.length === 0
     ) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  private checkZonesNames(planta: PlantaInterface, warns: Warning[], informeId: string): boolean {
+    if (!this.checkHaveZonesNames(planta)) {
       const warning: Warning = {
         type: 'nombresZonas',
         visible: true,
@@ -538,6 +557,32 @@ export class WarningService {
     } else {
       // eliminamos la alerta antigua si la hubiera
       this.checkOldWarnings('nombresZonas', warns, informeId);
+    }
+
+    // confirmamos que ha sido checkeado
+    return true;
+  }
+
+  private checkZonesRepeat(
+    planta: PlantaInterface,
+    locAreas: LocationAreaInterface[],
+    warns: Warning[],
+    informeId: string
+  ) {
+    let zones = this.zonesService.getZones(planta, locAreas);
+    zones = this.zonesService.getCompleteGlobalCoords(zones);
+    const repeatZones = UtilitiesService.findDuplicates(zones.map((zone) => zone.globalCoords.toString()));
+
+    if (repeatZones.length > 0) {
+      const warning: Warning = {
+        type: 'zonasRepeat',
+        visible: true,
+      };
+
+      this.checkAddWarning(warning, warns, informeId);
+    } else {
+      // eliminamos la alerta antigua si la hubiera
+      this.checkOldWarnings('zonasRepeat', warns, informeId);
     }
 
     // confirmamos que ha sido checkeado

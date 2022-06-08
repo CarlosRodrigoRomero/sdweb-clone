@@ -330,6 +330,7 @@ export class PlantaService {
       if (altura < 1) {
         altura = 1;
       }
+      return altura;
     } else {
       return localY;
     }

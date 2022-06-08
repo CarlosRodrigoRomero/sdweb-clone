@@ -1,0 +1,11 @@
+<div class="content">
+  <button class="btn-recalc" mat-icon-button [matMenuTriggerFor]="recalcMenu">
+    <mat-icon>build</mat-icon>
+  </button>
+  <mat-menu class="notif-menu" #recalcMenu="matMenu">
+    <button mat-menu-item (click)="recalMAEyCC()">
+      <mat-icon>sync</mat-icon>
+      <span>Recalcular MAE y CC</span>
+    </button>
+  </mat-menu>
+</div>

@@ -144,14 +144,9 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
       this.plantaId = this.reportControlService.plantaId;
     }
 
-    this.plantaService
-      .getPlanta(this.plantaId)
-      .pipe(take(1))
-      .subscribe((planta) => {
-        this.planta = planta;
+    this.planta = this.reportControlService.planta;
 
-        this.nombreGlobalCoords = planta.nombreGlobalCoords;
-      });
+    this.nombreGlobalCoords = this.planta.nombreGlobalCoords;
 
     this.subscriptions.add(
       this.authService.user$

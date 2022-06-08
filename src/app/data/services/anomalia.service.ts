@@ -303,7 +303,7 @@ export class AnomaliaService {
       }
     });
 
-    let numeroModulo = this.plantaService.getNumeroModulo(anomalia, 'anomalia', this.planta);
+    let numeroModulo = this.plantaService.getNumeroModulo(anomalia, 'anomalia', planta);
     if (isNaN(Number(numeroModulo))) {
       numeroModulo = undefined;
     }

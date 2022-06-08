@@ -11,14 +11,15 @@ import PointInPolygon from 'point-in-polygon';
 import { InformeService } from './informe.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { PlantaService } from '@data/services/planta.service';
-import { GLOBAL } from '@data/constants/global';
+import { ZonesService } from './zones.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
 import { LocationAreaInterface } from '@core/models/location';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
-import { PcInterface } from '@core/models/pc';
+
+import { GLOBAL } from '@data/constants/global';
 
 @Injectable({
   providedIn: 'root',
@@ -35,7 +36,8 @@ export class SeguidorService {
     public afs: AngularFirestore,
     private storage: AngularFireStorage,
     private anomaliaService: AnomaliaService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private zonesService: ZonesService
   ) {}
 
   getSeguidoresPlanta$(plantaId: string, informes: InformeInterface[]): Observable<Seguidor[]> {
@@ -159,7 +161,8 @@ export class SeguidorService {
         this.locAreaModulos = locAreaList.filter((locArea) => locArea.modulo !== undefined);
 
         // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
-        const indiceSeleccionado = this.getIndiceGlobalCoordsSeguidores(locAreaList);
+        const indiceSeleccionado = this.zonesService.getIndiceGlobalCoordsSeguidores(locAreaList);
+        this.numGlobalCoords = indiceSeleccionado + 1;
 
         // filtramos las areas seleccionadas para los seguidores
         this.locAreaSeguidores = locAreaList.filter(
@@ -184,31 +187,6 @@ export class SeguidorService {
           });
         }
       });
-  }
-
-  getIndiceGlobalCoordsSeguidores(locAreas: LocationAreaInterface[]) {
-    const coordsLength = locAreas[0].globalCoords.length;
-
-    let indiceSeleccionado;
-
-    for (let index = coordsLength - 1; index >= 0; index--) {
-      const notNullLocAreas = locAreas.filter(
-        (locArea) =>
-          locArea.globalCoords[index] !== undefined &&
-          locArea.globalCoords[index] !== null &&
-          locArea.globalCoords[index] !== ''
-      );
-
-      if (notNullLocAreas.length > 0) {
-        indiceSeleccionado = index;
-
-        this.numGlobalCoords = indiceSeleccionado + 1;
-
-        break;
-      }
-    }
-
-    return indiceSeleccionado;
   }
 
   private sortAnomList(anoms: Anomalia[]): any[][] {

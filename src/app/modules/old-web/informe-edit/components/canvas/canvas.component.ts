@@ -942,8 +942,6 @@ export class CanvasComponent implements OnInit {
       [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(this.estructura.getLatLng());
 
       // Creamos el nuevo PC
-      this.localIdCount += 1;
-
       let newPc: PcInterface = {
         id: '',
         archivo: this.informeService.selectedArchivoVuelo.archivo,
@@ -958,13 +956,23 @@ export class CanvasComponent implements OnInit {
         coordsRef: polygonRef,
         img_x: 0, // coordenadas raw del punto mas caliente
         img_y: 0, // coordenadas raw del punto mas caliente
-        local_id: this.localIdCount,
+        // local_id: this.localIdCount,
         image_rotation: this.currentImageRotation,
         informeId: this.informeId,
         datetime: this.currentDatetime,
         resuelto: false,
         modulo,
       };
+
+      let localId;
+      if (typeof this.localIdCount === 'number') {
+        this.localIdCount += 1;
+        localId = this.localIdCount;
+      } else {
+        localId = this.pcService.getLocalId(newPc);
+      }
+
+      newPc.local_id = localId;
 
       newPc = this.addNewPcProperties(newPc);
 
