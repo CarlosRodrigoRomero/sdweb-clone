@@ -23,6 +23,7 @@ import { SeguidoresControlService } from '../../services/seguidores-control.serv
 
 import { PlantaInterface } from '@core/models/planta';
 import { Seguidor } from '@core/models/seguidor';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-map-seguidores',
@@ -32,6 +33,7 @@ import { Seguidor } from '@core/models/seguidor';
 export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public plantaId: string;
   public planta: PlantaInterface;
+  private informes: InformeInterface[];
   public map: Map;
   public rangeMin: number;
   public rangeMax: number;
@@ -67,75 +69,61 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.planta = this.reportControlService.planta;
+    this.informes = this.reportControlService.informes;
+
     this.mousePosition = null;
 
+    this.subscriptions.add(this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers)));
+
+    // ordenamos los informes por fecha
+    this.informeIdList = this.informes.map((informe) => informe.id);
+
+    this.informes.forEach((informe) => {
+      // creamos las capas de los seguidores para los diferentes informes
+      this.seguidoresControlService
+        .createSeguidorLayers(informe.id)
+        .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
+
+      // añadimos las ortofotos aereas de cada informe
+      this.addAerialLayer(informe.id);
+    });
+
+    // los subscribimos al toggle de vitas y al slider temporal
     this.subscriptions.add(
-      this.reportControlService.plantaId$
-        .pipe(
-          take(1),
-          switchMap((plantaId) => {
-            this.plantaId = plantaId;
+      combineLatest([
+        this.mapSeguidoresService.toggleViewSelected$,
+        this.mapSeguidoresService.sliderTemporalSelected$,
+        this.olMapService.getAerialLayers(),
+      ]).subscribe(([toggleValue, sliderValue, aerialLayers]) => {
+        const numLayerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (this.informes.length - 1))));
 
-            // Obtenemos todas las capas para esta planta
-            return combineLatest([this.reportControlService.informes$, this.plantaService.getPlanta(this.plantaId)]);
-          })
-        )
-        .pipe(take(1))
-        .subscribe(([informes, planta]) => {
-          this.subscriptions.add(
-            this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers))
-          );
+        this.mapSeguidoresService.layerSelected = numLayerSelected;
 
-          // ordenamos los informes por fecha
-          this.informeIdList = informes.map((informe) => informe.id);
+        // ocultamos las 3 capas de las vistas
+        this.seguidorLayers.forEach((layer) => layer.setOpacity(0));
 
-          informes.forEach((informe) => {
-            // creamos las capas de los seguidores para los diferentes informes
-            this.seguidoresControlService
-              .createSeguidorLayers(informe.id)
-              .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
+        // mostramos la capa seleccionada
+        const layerSelected = this.seguidorLayers[numLayerSelected];
+        if (layerSelected !== undefined) {
+          layerSelected.setOpacity(1);
+        }
 
-            // añadimos las ortofotos aereas de cada informe
-            this.addAerialLayer(informe.id);
-          });
-
-          // los subscribimos al toggle de vitas y al slider temporal
-          combineLatest([
-            this.mapSeguidoresService.toggleViewSelected$,
-            this.mapSeguidoresService.sliderTemporalSelected$,
-            this.olMapService.getAerialLayers(),
-          ]).subscribe(([toggleValue, sliderValue, aerialLayers]) => {
-            const numLayerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (informes.length - 1))));
-
-            this.mapSeguidoresService.layerSelected = numLayerSelected;
-
-            // ocultamos las 3 capas de las vistas
-            this.seguidorLayers.forEach((layer) => layer.setOpacity(0));
-
-            // mostramos la capa seleccionada
-            const layerSelected = this.seguidorLayers[numLayerSelected];
-            if (layerSelected !== undefined) {
-              layerSelected.setOpacity(1);
-            }
-
-            this.aerialLayers = aerialLayers;
-          });
-
-          this.planta = planta;
-
-          this.subscriptions.add(
-            this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
-          );
-
-          // asignamos los IDs necesarios para compartir
-          this.shareReportService.setPlantaId(this.plantaId);
-
-          this.initMap();
-
-          this.addPopupOverlay();
-          this.addZoomEvent();
-        })
+        this.aerialLayers = aerialLayers;
+      })
     );
+
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+    );
+
+    // asignamos los IDs necesarios para compartir
+    this.shareReportService.setPlantaId(this.plantaId);
+
+    this.initMap();
+
+    this.addPopupOverlay();
+    this.addZoomEvent();
   }
 
   initMap() {
