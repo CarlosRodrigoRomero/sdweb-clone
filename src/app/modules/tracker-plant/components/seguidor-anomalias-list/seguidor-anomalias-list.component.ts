@@ -6,7 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { combineLatest, Subscription } from 'rxjs';
 
 import { GLOBAL } from '@data/constants/global';
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 
 import { Seguidor } from '@core/models/seguidor';

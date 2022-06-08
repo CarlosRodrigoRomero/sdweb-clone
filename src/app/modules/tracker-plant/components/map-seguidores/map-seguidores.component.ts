@@ -19,8 +19,9 @@ import { FilterService } from '@data/services/filter.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ShareReportService } from '@data/services/share-report.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { ZonesService } from '@data/services/zones.service';
+import { ViewReportService } from '@data/services/view-report.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { Seguidor } from '@core/models/seguidor';
@@ -67,7 +68,8 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     private reportControlService: ReportControlService,
     private seguidoresControlService: SeguidoresControlService,
     private shareReportService: ShareReportService,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private viewReportService: ViewReportService
   ) {}
 
   ngOnInit(): void {
@@ -109,7 +111,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     // los subscribimos al toggle de vitas y al slider temporal
     this.subscriptions.add(
       combineLatest([
-        this.mapSeguidoresService.toggleViewSelected$,
+        this.viewReportService.toggleViewSelected$,
         this.mapSeguidoresService.sliderTemporalSelected$,
         this.olMapService.getAerialLayers(),
       ]).subscribe(([toggleValue, sliderValue, aerialLayers]) => {

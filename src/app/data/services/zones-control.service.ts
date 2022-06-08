@@ -9,17 +9,20 @@ import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style } from 'ol/style';
 import Select from 'ol/interaction/Select';
 import { Map } from 'ol';
+import { click } from 'ol/events/condition';
 
 import { OlMapService } from './ol-map.service';
+import { FilterService } from './filter.service';
+import { ReportControlService } from './report-control.service';
+import { ViewReportService } from './view-report.service';
 
 import { LocationAreaInterface } from '@core/models/location';
-import { ReportControlService } from './report-control.service';
-import { GLOBAL } from '@data/constants/global';
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { FilterableElement } from '@core/models/filterableInterface';
-import { click } from 'ol/events/condition';
-import { FilterService } from './filter.service';
+
+import { GLOBAL } from '@data/constants/global';
+import { take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -27,11 +30,15 @@ import { FilterService } from './filter.service';
 export class ZonesControlService {
   private map: Map;
   private selectedInformeId: string;
+  private toggleViewSelected: number;
+  private seguidoresLayers: VectorLayer[];
+  private layerSelected: VectorLayer;
 
   constructor(
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private viewReportService: ViewReportService
   ) {}
 
   initService(): Promise<boolean> {
@@ -39,6 +46,13 @@ export class ZonesControlService {
       this.olMapService.getMap().subscribe((map) => (this.map = map));
 
       this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
+
+      this.viewReportService.toggleViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
+
+      this.olMapService
+        .getSeguidorLayers()
+        .pipe(take(1))
+        .subscribe((layers) => (this.seguidoresLayers = layers));
 
       initService(true);
     });
@@ -51,7 +65,7 @@ export class ZonesControlService {
     });
     maeLayer.setProperties({
       informeId,
-      view: '0',
+      view: 0,
     });
 
     return maeLayer;
@@ -94,6 +108,7 @@ export class ZonesControlService {
               informeId,
               centroid: this.olMapService.getCentroid(coords[0]),
               mae,
+              type: 'zone',
             },
           });
           source.addFeature(feature);
@@ -102,7 +117,7 @@ export class ZonesControlService {
     });
 
     // añadimos acciones sobre las zonas
-    // this.addOnHoverAction();
+    this.addOnHoverAction();
     this.addSelectInteraction();
 
     // this.addClickOutFeatures();
@@ -141,6 +156,70 @@ export class ZonesControlService {
     return mae;
   }
 
+  private addOnHoverAction() {
+    let currentFeatureHover;
+    const estilosViewFocused = [
+      this.getStyleMae(true),
+      // this.getStyleSeguidoresCelsCalientes(true),
+      // this.getStyleSeguidoresGradienteNormMax(true),
+    ];
+    const estilosViewUnfocused = [
+      this.getStyleMae(false),
+      // this.getStyleSeguidoresCelsCalientes(false),
+      // this.getStyleSeguidoresGradienteNormMax(false),
+    ];
+
+    this.map.on('pointermove', (event) => {
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        const feature = this.map
+          .getFeaturesAtPixel(event.pixel)
+          .filter((item) => item.getProperties().properties !== undefined)
+          .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
+          .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
+        // .filter((item) => item.getProperties().properties.view === this.toggleViewSelected);
+
+        if (feature !== undefined) {
+          if (this.reportControlService.plantaFija) {
+          } else {
+            this.layerSelected = this.seguidoresLayers.find(
+              (l) =>
+                l.getProperties().zoneId === feature.getProperties().properties.id &&
+                l.getProperties().view === this.toggleViewSelected
+            );
+            this.layerSelected.setVisible(true);
+          }
+        }
+
+        // if (feature !== undefined) {
+        //   // cuando pasamos de un seguidor a otro directamente sin pasar por vacio
+        //   if (this.prevFeatureHover !== undefined) {
+        //     this.prevFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+        //   }
+        //   currentFeatureHover = feature;
+
+        //   const seguidorId = feature.getProperties().properties.seguidorId;
+        //   const seguidor = this.listaSeguidores.filter((seg) => seg.id === seguidorId)[0];
+
+        //   feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
+
+        //   if (this.selectedInformeId === seguidor.informeId) {
+        //     this.seguidorHovered = seguidor;
+        //   }
+        //   this.prevFeatureHover = feature;
+        // }
+      } else {
+        if (this.layerSelected !== undefined) {
+          this.layerSelected.setVisible(false);
+        }
+        // this.seguidorHovered = undefined;
+        // if (currentFeatureHover !== undefined) {
+        //   currentFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+        //   currentFeatureHover = undefined;
+        // }
+      }
+    });
+  }
+
   private addSelectInteraction() {
     const select = new Select({
       // style: this.getStyleSeguidores(),
@@ -176,7 +255,7 @@ export class ZonesControlService {
     return [path.map((coords) => fromLonLat([coords.lng, coords.lat]))];
   }
 
-  private getGlobalsLabel(globalCoords: any[]): string {
+  getGlobalsLabel(globalCoords: any[]): string {
     const gCoords: any[] = [];
     globalCoords.map((gC) => {
       if (gC !== null) {

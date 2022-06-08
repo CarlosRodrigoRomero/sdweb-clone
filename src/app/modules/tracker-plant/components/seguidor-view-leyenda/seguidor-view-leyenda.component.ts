@@ -3,7 +3,7 @@ import { Seguidor } from '@core/models/seguidor';
 
 import { Subscription } from 'rxjs';
 
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 import { GLOBAL } from '@data/constants/global';
 

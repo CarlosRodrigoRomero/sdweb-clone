@@ -2,7 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import { MapSeguidoresService } from '../../services/map-seguidores.service';
+import { ViewReportService } from '@data/services/view-report.service';
+
 import { GLOBAL } from '@data/constants/global';
 
 @Component({
@@ -18,7 +19,7 @@ export class LeyendaComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private mapSeguidoresService: MapSeguidoresService) {}
+  constructor(private viewReportService: ViewReportService) {}
 
   ngOnInit(): void {
     this.viewsLabels = [
@@ -28,7 +29,7 @@ export class LeyendaComponent implements OnInit, OnDestroy {
     ];
 
     this.subscriptions.add(
-      this.mapSeguidoresService.toggleViewSelected$.subscribe((view) => (this.viewSelected = view))
+      this.viewReportService.toggleViewSelected$.subscribe((view) => (this.viewSelected = view))
     );
   }
 

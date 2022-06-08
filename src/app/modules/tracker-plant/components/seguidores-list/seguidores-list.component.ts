@@ -6,11 +6,11 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
-import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { PlantaService } from '@data/services/planta.service';
+import { ViewReportService } from '@data/services/view-report.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
@@ -43,16 +43,16 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(
-    private mapSeguidoresService: MapSeguidoresService,
     public filterService: FilterService,
     private reportControlService: ReportControlService,
     private seguidoresControlService: SeguidoresControlService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private viewReportService: ViewReportService
   ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.mapSeguidoresService.toggleViewSelected$.subscribe((sel) => {
+      this.viewReportService.toggleViewSelected$.subscribe((sel) => {
         this.viewSeleccionada = Number(sel);
 
         // cambiammos la ultima columna con la vista seleccionada

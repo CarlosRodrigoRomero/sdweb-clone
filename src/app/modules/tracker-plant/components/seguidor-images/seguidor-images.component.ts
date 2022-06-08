@@ -6,7 +6,7 @@ import { switchMap } from 'rxjs/operators';
 import 'fabric';
 declare let fabric;
 
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 

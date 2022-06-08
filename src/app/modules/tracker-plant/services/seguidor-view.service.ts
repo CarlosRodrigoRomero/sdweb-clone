@@ -5,9 +5,9 @@ import { BehaviorSubject } from 'rxjs';
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { SeguidorService } from '@data/services/seguidor.service';
-import { SeguidoresControlService } from '../services/seguidores-control.service';
-import { MapSeguidoresService } from './map-seguidores.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { ViewReportService } from '@data/services/view-report.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
@@ -39,12 +39,12 @@ export class SeguidorViewService {
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
-    private mapSeguidoresService: MapSeguidoresService,
     private seguidorService: SeguidorService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private viewReportService: ViewReportService
   ) {
     this.toggleViewSelected$.subscribe((view) => (this.viewSelected = view));
-    this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSelected) => (this.toggleViewSelected = viewSelected));
+    this.viewReportService.toggleViewSelected$.subscribe((viewSelected) => (this.toggleViewSelected = viewSelected));
 
     this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
   }
@@ -91,7 +91,7 @@ export class SeguidorViewService {
     this.seguidoresControlService.visualImageExist = true;
     this.imagesLoaded = false;
     // volvemos el valor al de la vista del mapa
-    this.toggleViewSelected = this.mapSeguidoresService.toggleViewSelected;
+    this.toggleViewSelected = this.viewReportService.toggleViewSelected;
     // limpiamos la feature seleccionada
     this.seguidoresControlService.clearSelectFeature();
     // seleccionamos el mismo que el mapa al cerrar

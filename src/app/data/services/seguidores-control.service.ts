@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, combineLatest } from 'rxjs';
-import { take } from 'rxjs/operators';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
@@ -20,13 +19,14 @@ import VectorSource from 'ol/source/Vector';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { FilterService } from '@data/services/filter.service';
-import { GLOBAL } from '@data/constants/global';
-import { MapSeguidoresService } from './map-seguidores.service';
 import { ZonesControlService } from '@data/services/zones-control.service';
+import { ViewReportService } from '@data/services/view-report.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { MathOperations } from '@core/classes/math-operations';
 import { LocationAreaInterface } from '@core/models/location';
+
+import { GLOBAL } from '@data/constants/global';
 
 @Injectable({
   providedIn: 'root',
@@ -66,9 +66,9 @@ export class SeguidoresControlService {
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
     private filterService: FilterService,
-    private mapSeguidoresService: MapSeguidoresService,
     private storage: AngularFireStorage,
-    private zonesControlService: ZonesControlService
+    private zonesControlService: ZonesControlService,
+    private viewReportService: ViewReportService
   ) {}
 
   initService(): Promise<boolean> {
@@ -94,7 +94,7 @@ export class SeguidoresControlService {
       this.getMaesMedioSigma();
       this.getCCsMedioSigma();
 
-      this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => {
+      this.viewReportService.toggleViewSelected$.subscribe((viewSel) => {
         this.toggleViewSelected = viewSel;
 
         // reseteamos la interaccion con cada vista para obtener el estilo correcto
@@ -109,6 +109,7 @@ export class SeguidoresControlService {
     let seguidoresLayers: VectorLayer[] = [];
     if (zones.length > 0) {
       zones.forEach((zone) => {
+        const zoneId = this.zonesControlService.getGlobalsLabel(zone.globalCoords);
         const maeLayer = new VectorLayer({
           source: new VectorSource({ wrapX: false }),
           style: this.getStyleSeguidoresMae(false),
@@ -116,8 +117,9 @@ export class SeguidoresControlService {
         });
         maeLayer.setProperties({
           informeId,
-          view: '0',
+          view: 0,
           type: 'seguidores',
+          zoneId,
           zone,
         });
         seguidoresLayers.push(maeLayer);
@@ -128,8 +130,9 @@ export class SeguidoresControlService {
         });
         celsCalientesLayer.setProperties({
           informeId,
-          view: '1',
+          view: 1,
           type: 'seguidores',
+          zoneId,
           zone,
         });
         seguidoresLayers.push(celsCalientesLayer);
@@ -140,8 +143,9 @@ export class SeguidoresControlService {
         });
         gradNormMaxLayer.setProperties({
           informeId,
-          view: '2',
+          view: 2,
           type: 'seguidores',
+          zoneId,
           zone,
         });
         seguidoresLayers.push(gradNormMaxLayer);
