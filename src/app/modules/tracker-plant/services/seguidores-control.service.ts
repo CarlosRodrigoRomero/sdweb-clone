@@ -106,8 +106,47 @@ export class SeguidoresControlService {
   }
 
   createSeguidorLayers(informeId: string, zones: LocationAreaInterface[]): VectorLayer[] {
-    const seguidoresLayers: VectorLayer[] = [];
-    zones.forEach((zone) => {
+    let seguidoresLayers: VectorLayer[] = [];
+    if (zones.length > 0) {
+      zones.forEach((zone) => {
+        const maeLayer = new VectorLayer({
+          source: new VectorSource({ wrapX: false }),
+          style: this.getStyleSeguidoresMae(false),
+          visible: false,
+        });
+        maeLayer.setProperties({
+          informeId,
+          view: '0',
+          type: 'seguidores',
+          zone,
+        });
+        seguidoresLayers.push(maeLayer);
+        const celsCalientesLayer = new VectorLayer({
+          source: new VectorSource({ wrapX: false }),
+          style: this.getStyleSeguidoresCelsCalientes(false),
+          visible: false,
+        });
+        celsCalientesLayer.setProperties({
+          informeId,
+          view: '1',
+          type: 'seguidores',
+          zone,
+        });
+        seguidoresLayers.push(celsCalientesLayer);
+        const gradNormMaxLayer = new VectorLayer({
+          source: new VectorSource({ wrapX: false }),
+          style: this.getStyleSeguidoresGradienteNormMax(false),
+          visible: false,
+        });
+        gradNormMaxLayer.setProperties({
+          informeId,
+          view: '2',
+          type: 'seguidores',
+          zone,
+        });
+        seguidoresLayers.push(gradNormMaxLayer);
+      });
+    } else {
       const maeLayer = new VectorLayer({
         source: new VectorSource({ wrapX: false }),
         style: this.getStyleSeguidoresMae(false),
@@ -116,7 +155,7 @@ export class SeguidoresControlService {
       maeLayer.setProperties({
         informeId,
         view: '0',
-        zone,
+        type: 'seguidores',
       });
       seguidoresLayers.push(maeLayer);
       const celsCalientesLayer = new VectorLayer({
@@ -127,7 +166,7 @@ export class SeguidoresControlService {
       celsCalientesLayer.setProperties({
         informeId,
         view: '1',
-        zone,
+        type: 'seguidores',
       });
       seguidoresLayers.push(celsCalientesLayer);
       const gradNormMaxLayer = new VectorLayer({
@@ -138,10 +177,11 @@ export class SeguidoresControlService {
       gradNormMaxLayer.setProperties({
         informeId,
         view: '2',
-        zone,
+        type: 'seguidores',
       });
-      seguidoresLayers.push(gradNormMaxLayer);
-    });
+
+      seguidoresLayers = [maeLayer, celsCalientesLayer, gradNormMaxLayer];
+    }
 
     return seguidoresLayers;
   }
@@ -282,7 +322,8 @@ export class SeguidoresControlService {
           l.getProperties().informeId === this.selectedInformeId &&
           // tslint:disable-next-line: triple-equals
           l.getProperties().view == this.toggleViewSelected &&
-          l.getProperties().hasOwnProperty('zone')
+          l.getProperties().hasOwnProperty('type') &&
+          l.getProperties().type === 'seguidores'
         ) {
           return true;
         } else {

@@ -19,6 +19,7 @@ import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { FilterableElement } from '@core/models/filterableInterface';
 import { click } from 'ol/events/condition';
+import { FilterService } from './filter.service';
 
 @Injectable({
   providedIn: 'root',
@@ -27,7 +28,11 @@ export class ZonesControlService {
   private map: Map;
   private selectedInformeId: string;
 
-  constructor(private olMapService: OlMapService, private reportControlService: ReportControlService) {}
+  constructor(
+    private olMapService: OlMapService,
+    private reportControlService: ReportControlService,
+    private filterService: FilterService
+  ) {}
 
   initService(): Promise<boolean> {
     return new Promise((initService) => {
@@ -52,34 +57,47 @@ export class ZonesControlService {
     return maeLayer;
   }
 
-  addZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
+  mostrarZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
+    this.filterService.filteredElements$.subscribe((elems) => {
+      this.addZonas(zonas, layers, elems);
+    });
+  }
+
+  private addZonas(zonas: LocationAreaInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
       const informeId = l.getProperties().informeId;
-      const elemsLayer = this.getElemsLayer(informeId);
+      const elemsInforme = this.reportControlService.allFilterableElements.filter(
+        (elem) => elem.informeId === informeId
+      );
+      const elemsFiltered = elems.filter((elem) => elem.informeId === informeId);
       const source = l.getSource();
       source.clear();
       zonas.forEach((zona) => {
-        const elemsZona = this.getElemsZona(zona, elemsLayer);
-        // para anomalías enviamos el numero de zonas para calcular el MAE
-        let mae = 0;
-        if (this.reportControlService.plantaFija) {
-          mae = this.getMaeZona(elemsZona, informeId, elemsLayer.length);
-        } else {
-          mae = this.getMaeZona(elemsZona, informeId);
+        const elemsFilteredZona = this.getElemsZona(zona, elemsFiltered);
+        // si no hay seguidores dentro de la zona no la añadimos
+        if (elemsFilteredZona.length > 0) {
+          const allElemsZona = this.getElemsZona(zona, elemsInforme);
+          // para anomalías enviamos el numero de zonas para calcular el MAE
+          let mae = 0;
+          if (this.reportControlService.plantaFija) {
+            mae = this.getMaeZona(allElemsZona, informeId, elemsInforme.length);
+          } else {
+            mae = this.getMaeZona(allElemsZona, informeId);
+          }
+          const coords = this.pathToLonLat(zona.path);
+          // crea poligono seguidor
+          const feature = new Feature({
+            geometry: new Polygon(coords),
+            properties: {
+              id: this.getGlobalsLabel(zona.globalCoords),
+              informeId,
+              centroid: this.olMapService.getCentroid(coords[0]),
+              mae,
+            },
+          });
+          source.addFeature(feature);
         }
-        const coords = this.pathToLonLat(zona.path);
-        // crea poligono seguidor
-        const feature = new Feature({
-          geometry: new Polygon(coords),
-          properties: {
-            id: this.getGlobalsLabel(zona.globalCoords),
-            informeId,
-            centroid: this.olMapService.getCentroid(coords[0]),
-            mae,
-          },
-        });
-        source.addFeature(feature);
       });
     });
 
@@ -88,16 +106,6 @@ export class ZonesControlService {
     this.addSelectInteraction();
 
     // this.addClickOutFeatures();
-  }
-
-  private getElemsLayer(informeId: string) {
-    const allElems = this.reportControlService.allFilterableElements;
-    const elemsLayer = allElems.filter((elem) => elem.informeId === informeId);
-    if (this.reportControlService.plantaFija) {
-      return elemsLayer as Anomalia[];
-    } else {
-      return elemsLayer as Seguidor[];
-    }
   }
 
   getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]) {

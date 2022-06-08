@@ -44,7 +44,7 @@ export class ZonesComponent implements OnInit {
         // iniciamos el servicio que controla las zonas y las cargamos
         this.zonesControlService.initService().then((value) => {
           if (value) {
-            this.zonesControlService.addZonas(this.zones[this.zones.length - 1], this.zonesLayers);
+            this.zonesControlService.mostrarZonas(this.zones[this.zones.length - 1], this.zonesLayers);
           }
         });
       });
