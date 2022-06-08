@@ -11,6 +11,7 @@ import { DialogFilteredReportComponent } from './components/dialog-filtered-repo
 import { ShareReportComponent } from './components/share-report/share-report.component';
 import { SelectLanguageComponent } from './components/select-language/select-language.component';
 import { DownloadExcelComponent } from './components/download-excel/download-excel.component';
+import { ZonesComponent } from './components/zones/zones.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { DownloadExcelComponent } from './components/download-excel/download-exc
     ShareReportComponent,
     SelectLanguageComponent,
     DownloadExcelComponent,
+    ZonesComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
@@ -30,6 +32,7 @@ import { DownloadExcelComponent } from './components/download-excel/download-exc
     ProgressBarPdfComponent,
     ShareReportComponent,
     DownloadExcelComponent,
+    ZonesComponent,
   ],
 })
 export class SharedPlantsModule {}

@@ -67,7 +67,6 @@ export class ZonesControlService {
         } else {
           mae = this.getMaeZona(elemsZona, informeId);
         }
-        console.log(mae);
         const coords = this.pathToLonLat(zona.path);
         // crea poligono seguidor
         const feature = new Feature({
@@ -112,7 +111,7 @@ export class ZonesControlService {
   }
 
   private getMaeZona(elems: FilterableElement[], informeId: string, numZonas?: number): number {
-    const informe = this.reportControlService.informes.find((informe) => informe.id === informeId);
+    const informe = this.reportControlService.informes.find((inf) => inf.id === informeId);
     let mae = 0;
     if (numZonas) {
       const anomaliasZona = elems as Anomalia[];
@@ -183,26 +182,26 @@ export class ZonesControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focused ? 'white' : this.getColorMae(feature),
+            color: focused ? 'white' : this.getColorMae(feature, 1),
             width: focused ? 6 : 4,
           }),
           fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
+            color: focused ? 'white' : this.getColorMae(feature, 0.1),
           }),
         });
       }
     };
   }
 
-  private getColorMae(feature: Feature) {
+  private getColorMae(feature: Feature, opacity: number) {
     const mae = feature.getProperties().properties.mae as number;
 
     if (mae < 0.01) {
-      return GLOBAL.colores_mae[0];
+      return GLOBAL.colores_mae_rgb[0].replace(',1)', ',' + opacity + ')');
     } else if (mae < 0.05) {
-      return GLOBAL.colores_mae[1];
+      return GLOBAL.colores_mae_rgb[1].replace(',1)', ',' + opacity + ')');
     } else {
-      return GLOBAL.colores_mae[2];
+      return GLOBAL.colores_mae_rgb[2].replace(',1)', ',' + opacity + ')');
     }
   }
 }

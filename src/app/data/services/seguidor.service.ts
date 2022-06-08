@@ -161,7 +161,7 @@ export class SeguidorService {
         this.locAreaModulos = locAreaList.filter((locArea) => locArea.modulo !== undefined);
 
         // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
-        const indiceSeleccionado = this.zonesService.getIndiceGlobalCoordsSeguidores(locAreaList);
+        const indiceSeleccionado = this.zonesService.getIndexNotNull(locAreaList);
         this.numGlobalCoords = indiceSeleccionado + 1;
 
         // filtramos las areas seleccionadas para los seguidores

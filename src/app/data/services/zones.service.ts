@@ -13,7 +13,7 @@ import { PlantaInterface } from '@core/models/planta';
 export class ZonesService {
   constructor(private plantaService: PlantaService) {}
 
-  getZones(planta: PlantaInterface, locAreas: LocationAreaInterface[]) {
+  getZones(planta: PlantaInterface, locAreas: LocationAreaInterface[]): LocationAreaInterface[] {
     // obtenemos las areas descartando las que no tienen globals, que son las de los modulos
     const realLocAreas = locAreas.filter(
       (locArea) => locArea.globalCoords.toString() !== ',,' && locArea.globalCoords.toString() !== ''
@@ -21,7 +21,7 @@ export class ZonesService {
 
     if (planta.tipo === 'seguidores') {
       // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
-      const indiceSeleccionado = this.getIndiceGlobalCoordsSeguidores(realLocAreas);
+      const indiceSeleccionado = this.getIndexNotNull(realLocAreas);
 
       // filtramos las areas seleccionadas para los seguidores
       const locAreaSeguidores = realLocAreas.filter(
@@ -40,7 +40,22 @@ export class ZonesService {
     }
   }
 
-  getIndiceGlobalCoordsSeguidores(locAreas: LocationAreaInterface[]): number {
+  getZonesBySize(planta: PlantaInterface, locAreas: LocationAreaInterface[]): LocationAreaInterface[][] {
+    const zones = this.getZones(planta, locAreas);
+    const indexNotNull = this.getIndexNotNull(zones);
+    const zonesBySize = new Array<LocationAreaInterface[]>(indexNotNull + 1);
+    for (let index = indexNotNull; index >= 0; index--) {
+      let indexZones = zones.filter((zone) => zone.globalCoords[index]);
+      if (zonesBySize[index + 1] !== undefined) {
+        indexZones = indexZones.filter((zone) => !zonesBySize[index + 1].includes(zone));
+      }
+      zonesBySize[index] = indexZones;
+    }
+
+    return zonesBySize;
+  }
+
+  getIndexNotNull(locAreas: LocationAreaInterface[]): number {
     const coordsLength = locAreas[0].globalCoords.length;
 
     let indiceSeleccionado;
