@@ -25,6 +25,7 @@ import { MapSeguidoresService } from './map-seguidores.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { MathOperations } from '@core/classes/math-operations';
+import { LocationAreaInterface } from '@core/models/location';
 
 @Injectable({
   providedIn: 'root',
@@ -78,7 +79,7 @@ export class SeguidoresControlService {
 
     return new Promise((initService) => {
       combineLatest([getMap, getSegLayers, getIfSharedWithFilters, getZonasLayers])
-        .pipe(take(1))
+        // .pipe(take(1))
         .subscribe(([map, segL, isSharedWithFil, zonasL]) => {
           this.map = map;
           this.seguidorLayers = segL;
@@ -102,36 +103,45 @@ export class SeguidoresControlService {
     });
   }
 
-  public createSeguidorLayers(informeId: string): VectorLayer[] {
-    const maeLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleSeguidoresMae(false),
-      visible: false,
-    });
-    maeLayer.setProperties({
-      informeId,
-      id: '0',
-    });
-    const celsCalientesLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleSeguidoresCelsCalientes(false),
-      visible: false,
-    });
-    celsCalientesLayer.setProperties({
-      informeId,
-      id: '1',
-    });
-    const gradNormMaxLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleSeguidoresGradienteNormMax(false),
-      visible: false,
-    });
-    gradNormMaxLayer.setProperties({
-      informeId,
-      id: '2',
+  createSeguidorLayers(informeId: string, zones: LocationAreaInterface[]): VectorLayer[] {
+    const seguidoresLayers: VectorLayer[] = [];
+    zones.forEach((zone) => {
+      const maeLayer = new VectorLayer({
+        source: new VectorSource({ wrapX: false }),
+        style: this.getStyleSeguidoresMae(false),
+        visible: false,
+      });
+      maeLayer.setProperties({
+        informeId,
+        view: '0',
+        zone: zone.globalCoords.join('.'),
+      });
+      seguidoresLayers.push(maeLayer);
+      const celsCalientesLayer = new VectorLayer({
+        source: new VectorSource({ wrapX: false }),
+        style: this.getStyleSeguidoresCelsCalientes(false),
+        visible: false,
+      });
+      celsCalientesLayer.setProperties({
+        informeId,
+        view: '1',
+        zone: zone.globalCoords.join('.'),
+      });
+      seguidoresLayers.push(celsCalientesLayer);
+      const gradNormMaxLayer = new VectorLayer({
+        source: new VectorSource({ wrapX: false }),
+        style: this.getStyleSeguidoresGradienteNormMax(false),
+        visible: false,
+      });
+      gradNormMaxLayer.setProperties({
+        informeId,
+        view: '2',
+        zone: zone.globalCoords.join('.'),
+      });
+      seguidoresLayers.push(gradNormMaxLayer);
     });
 
-    return [maeLayer, celsCalientesLayer, gradNormMaxLayer];
+    return seguidoresLayers;
   }
 
   mostrarSeguidores() {
@@ -156,16 +166,15 @@ export class SeguidoresControlService {
   private dibujarSeguidores(seguidores: Seguidor[]) {
     // Para cada vector layer (que corresponde a un informe)
     this.seguidorLayers.forEach((l) => {
-      // filtra los seguidores correspondientes al informe
-      const filtered = seguidores.filter((seguidor) => seguidor.informeId === l.getProperties().informeId);
       const source = l.getSource();
       source.clear();
-      filtered.forEach((seguidor) => {
+      seguidores.forEach((seguidor) => {
         // crea poligono seguidor
         const feature = new Feature({
           geometry: new Polygon(this.latLonLiteralToLonLat(seguidor.path)),
           properties: {
-            layer: l.getProperties().id,
+            view: l.getProperties().view,
+            zone: l.getProperties().zone,
             seguidorId: seguidor.id,
             informeId: seguidor.informeId,
             mae: seguidor.mae,
@@ -182,8 +191,6 @@ export class SeguidoresControlService {
     // añadimos acciones sobre los seguidores
     this.addCursorOnHover();
     this.addOnHoverAction();
-
-    // this.addClickOutFeatures();
   }
 
   private addCursorOnHover() {
@@ -224,7 +231,7 @@ export class SeguidoresControlService {
           .filter((item) => item.getProperties().properties !== undefined)
           .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
           // tslint:disable-next-line: triple-equals
-          .filter((item) => item.getProperties().properties.layer == this.toggleViewSelected)[0] as Feature;
+          .filter((item) => item.getProperties().properties.view == this.toggleViewSelected)[0] as Feature;
 
         if (feature !== undefined) {
           // cuando pasamos de un seguidor a otro directamente sin pasar por vacio
@@ -266,7 +273,8 @@ export class SeguidoresControlService {
         if (
           l.getProperties().informeId === this.selectedInformeId &&
           // tslint:disable-next-line: triple-equals
-          l.getProperties().id == this.toggleViewSelected
+          l.getProperties().view == this.toggleViewSelected &&
+          l.getProperties().hasOwnProperty('zone')
         ) {
           return true;
         } else {
@@ -311,21 +319,6 @@ export class SeguidoresControlService {
 
     // la añadimos de nuevo
     this.addSelectInteraction();
-  }
-
-  private addClickOutFeatures() {
-    this.map.on('click', (event) => {
-      const feature = this.map
-        .getFeaturesAtPixel(event.pixel)
-        .filter((item) => item.getProperties().properties !== undefined)
-        .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
-      if (feature.length === 0) {
-        if (this.seguidorSelected !== undefined) {
-          this.setExternalStyle(this.seguidorSelected.id, false);
-        }
-        this.seguidorSelected = undefined;
-      }
-    });
   }
 
   private getStyleSeguidores() {

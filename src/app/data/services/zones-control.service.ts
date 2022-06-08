@@ -18,6 +18,7 @@ import { GLOBAL } from '@data/constants/global';
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { FilterableElement } from '@core/models/filterableInterface';
+import { click } from 'ol/events/condition';
 
 @Injectable({
   providedIn: 'root',
@@ -45,7 +46,7 @@ export class ZonesControlService {
     });
     maeLayer.setProperties({
       informeId,
-      id: '0',
+      view: '0',
     });
 
     return maeLayer;
@@ -99,7 +100,7 @@ export class ZonesControlService {
     }
   }
 
-  private getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]) {
+  getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]) {
     let elemsZona: FilterableElement[] = [];
     zona.globalCoords.forEach((gC, index) => {
       if (gC !== null) {
@@ -135,18 +136,19 @@ export class ZonesControlService {
   private addSelectInteraction() {
     const select = new Select({
       // style: this.getStyleSeguidores(),
-      // condition: click,
-      // layers: (l) => {
-      //   if (
-      //     l.getProperties().informeId === this.selectedInformeId &&
-      //     // tslint:disable-next-line: triple-equals
-      //     l.getProperties().id == this.toggleViewSelected
-      //   ) {
-      //     return true;
-      //   } else {
-      //     return false;
-      //   }
-      // },
+      condition: click,
+      layers: (l) => {
+        if (
+          l.getProperties().informeId === this.selectedInformeId &&
+          // tslint:disable-next-line: triple-equals
+          // l.getProperties().view == this.toggleViewSelected &&
+          !l.getProperties().hasOwnProperty('zone')
+        ) {
+          return true;
+        } else {
+          return false;
+        }
+      },
     });
 
     this.map.addInteraction(select);

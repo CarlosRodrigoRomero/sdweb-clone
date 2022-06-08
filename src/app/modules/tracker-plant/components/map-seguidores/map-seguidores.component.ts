@@ -20,6 +20,7 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { ShareReportService } from '@data/services/share-report.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { ZonesService } from '@data/services/zones.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { Seguidor } from '@core/models/seguidor';
@@ -65,7 +66,8 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     private incrementosService: IncrementosService,
     private reportControlService: ReportControlService,
     private seguidoresControlService: SeguidoresControlService,
-    private shareReportService: ShareReportService
+    private shareReportService: ShareReportService,
+    private zonesService: ZonesService
   ) {}
 
   ngOnInit(): void {
@@ -79,15 +81,28 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     // ordenamos los informes por fecha
     this.informeIdList = this.informes.map((informe) => informe.id);
 
-    this.informes.forEach((informe) => {
-      // creamos las capas de los seguidores para los diferentes informes
-      this.seguidoresControlService
-        .createSeguidorLayers(informe.id)
-        .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
+    this.plantaService
+      .getLocationsArea(this.reportControlService.plantaId)
+      .pipe(take(1))
+      .subscribe((locAreas) => {
+        const allZones = this.zonesService.getZonesBySize(this.reportControlService.planta, locAreas);
+        const smallZones = allZones[allZones.length - 1];
 
-      // añadimos las ortofotos aereas de cada informe
-      this.addAerialLayer(informe.id);
-    });
+        this.informes.forEach((informe) => {
+          // creamos las capas de los seguidores para los diferentes informes
+          this.seguidoresControlService
+            .createSeguidorLayers(informe.id, smallZones)
+            .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
+
+          // añadimos las ortofotos aereas de cada informe
+          this.addAerialLayer(informe.id);
+
+          this.initMap();
+
+          this.addPopupOverlay();
+          this.addZoomEvent();
+        });
+      });
 
     // los subscribimos al toggle de vitas y al slider temporal
     this.subscriptions.add(
@@ -100,14 +115,12 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
 
         this.mapSeguidoresService.layerSelected = numLayerSelected;
 
-        // ocultamos las 3 capas de las vistas
-        this.seguidorLayers.forEach((layer) => layer.setOpacity(0));
-
-        // mostramos la capa seleccionada
-        const layerSelected = this.seguidorLayers[numLayerSelected];
-        if (layerSelected !== undefined) {
-          layerSelected.setOpacity(1);
-        }
+        // ocultamos las capas de las vistas no seleccionadas
+        this.seguidorLayers.forEach((layer) => {
+          if (layer.getProperties().view !== numLayerSelected) {
+            layer.setVisible(false);
+          }
+        });
 
         this.aerialLayers = aerialLayers;
       })
@@ -119,11 +132,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
 
     // asignamos los IDs necesarios para compartir
     this.shareReportService.setPlantaId(this.plantaId);
-
-    this.initMap();
-
-    this.addPopupOverlay();
-    this.addZoomEvent();
   }
 
   initMap() {
