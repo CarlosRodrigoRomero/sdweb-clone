@@ -43,6 +43,7 @@ export class SeguidoresControlService {
   public prevSeguidorSelected: Seguidor;
   private sharedReportNoFilters = false;
   private seguidorLayers: VectorLayer[];
+  private prevSeguidorLayer: VectorLayer;
   private zonasLayers: VectorLayer[];
   private prevFeatureHover: Feature;
   private toggleViewSelected: number;
@@ -243,8 +244,10 @@ export class SeguidoresControlService {
         });
 
         if (this.reportControlService.thereAreZones) {
+          const properties = feature.getProperties().properties;
+          properties.zone = l.getProperties().zone;
           feature.setProperties({
-            zone: l.getProperties().zone,
+            properties,
           });
         }
 
@@ -631,63 +634,43 @@ export class SeguidoresControlService {
   }
 
   setExternalStyle(seguidorId: string, focus: boolean) {
+    const estilosViewFocused = [
+      this.getStyleSeguidoresMae(true),
+      this.getStyleSeguidoresCelsCalientes(true),
+      this.getStyleSeguidoresGradienteNormMax(true),
+    ];
+    const estilosViewUnfocused = [
+      this.getStyleSeguidoresMae(false),
+      this.getStyleSeguidoresCelsCalientes(false),
+      this.getStyleSeguidoresGradienteNormMax(false),
+    ];
+
     const layersInforme = this.seguidorLayers.filter(
       (layer) => layer.getProperties().informeId === this.selectedInformeId
     );
 
-    const layerView = layersInforme[this.toggleViewSelected];
+    const layersView = layersInforme.filter((layer) => layer.getProperties().view === this.toggleViewSelected);
 
-    const features = layerView.getSource().getFeatures();
+    const features: Feature[] = [];
+    layersView.forEach((layer) => features.push(...layer.getSource().getFeatures()));
 
     const feature = features.find((f) => f.getProperties().properties.seguidorId === seguidorId);
 
-    const focusedStyle = new Style({
-      stroke: new Stroke({
-        color: 'white',
-        width: 6,
-      }),
-      fill: new Fill({
-        color: 'rgba(255, 255, 255, 0)',
-      }),
-    });
-
-    let unfocusedStyle;
-    if (this.toggleViewSelected === 0) {
-      unfocusedStyle = new Style({
-        stroke: new Stroke({
-          color: this.getColorSeguidorMae(feature),
-          width: 4,
-        }),
-        fill: new Fill({
-          color: 'rgba(255, 255, 255, 0)',
-        }),
-      });
-    } else if (this.toggleViewSelected === 1) {
-      unfocusedStyle = new Style({
-        stroke: new Stroke({
-          color: this.getColorSeguidorCelsCalientes(feature),
-          width: 4,
-        }),
-        fill: new Fill({
-          color: 'rgba(255, 255, 255, 0)',
-        }),
-      });
+    if (focus) {
+      feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
     } else {
-      unfocusedStyle = new Style({
-        stroke: new Stroke({
-          color: this.getColorSeguidorGradienteNormMax(feature),
-          width: 4,
-        }),
-        fill: new Fill({
-          color: 'rgba(255, 255, 255, 0)',
-        }),
-      });
+      feature.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
     }
 
-    if (focus) {
-      feature.setStyle(focusedStyle);
-    } else {
-      feature.setStyle(unfocusedStyle);
+    // mostramos u ocultamos las zona de los seguidores si la hubiera
+    if (feature.getProperties().properties.hasOwnProperty('zone')) {
+      const zoneSeguidor = feature.getProperties().properties.zone;
+      const layerZoneSeguidor = layersView.find(
+        (layer) => layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneSeguidor.globalCoords)
+      );
+      layerZoneSeguidor.setVisible(focus);
+
+      this.prevSeguidorLayer = layerZoneSeguidor;
     }
   }
 
