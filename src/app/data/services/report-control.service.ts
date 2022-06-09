@@ -24,6 +24,7 @@ import { GLOBAL } from '@data/constants/global';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { PlantaInterface } from '@core/models/planta';
 import { UserInterface } from '@core/models/user';
+import { ZonesService } from './zones.service';
 
 @Injectable({
   providedIn: 'root',
@@ -56,7 +57,7 @@ export class ReportControlService {
   private _allAnomalias: Anomalia[] = [];
   allAnomalias$ = new BehaviorSubject<Anomalia[]>(this._allAnomalias);
   public plantaFija = false;
-  private _thereAreZones = true;
+  private _thereAreZones = false;
   public thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
   private _nombreGlobalCoords: string[] = [];
   private _numFixedGlobalCoords: number = 3;
@@ -73,60 +74,78 @@ export class ReportControlService {
     private seguidorService: SeguidorService,
     @Inject(WINDOW) private window: Window,
     private plantaService: PlantaService,
-    private authService: AuthService
+    private authService: AuthService,
+    private zonesService: ZonesService
   ) {}
 
   initService(): Promise<boolean> {
-    ////////////////////// PLANTA FIJA ////////////////////////
-    if (this.router.url.includes('fixed')) {
-      this.plantaFija = true;
+    if (!this.router.url.includes('shared')) {
+      // obtenemos plantaId de la url
+      this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
-      if (!this.router.url.includes('shared')) {
-        // obtenemos plantaId de la url
-        this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+      return new Promise((initService) => {
+        // iniciamos anomalia service antes de obtener las anomalias
+        this.anomaliaService.initService(this.plantaId).then(() =>
+          this.authService.user$
+            .pipe(
+              take(1),
+              switchMap((user) => {
+                this.user = user;
 
-        return new Promise((initService) => {
-          // iniciamos anomalia service antes de obtener las anomalias
-          this.anomaliaService.initService(this.plantaId).then(() =>
-            this.authService.user$
-              .pipe(
-                take(1),
-                switchMap((user) => {
-                  this.user = user;
+                return this.plantaService.getPlanta(this.plantaId);
+              }),
+              take(1),
+              switchMap((planta) => {
+                this.planta = planta;
 
-                  return this.plantaService.getPlanta(this.plantaId);
-                }),
-                take(1),
-                switchMap((planta) => {
-                  this.planta = planta;
+                return this.plantaService.getLocationsArea(this.plantaId);
+              }),
+              take(1),
+              switchMap((locAreas) => {
+                const zones = this.zonesService.getZones(this.planta, locAreas);
+                if (zones.length > 0) {
+                  this.thereAreZones = true;
+                }
 
-                  if (this.authService.userIsAdmin(this.user)) {
-                    return this.informeService.getInformesDePlanta(this.plantaId);
-                  } else {
-                    return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
-                  }
-                }),
-                take(1),
-                // obtenemos los informes de la planta
-                switchMap((informes) => {
+                if (this.authService.userIsAdmin(this.user)) {
+                  return this.informeService.getInformesDePlanta(this.plantaId);
+                } else {
+                  return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
+                }
+              }),
+              take(1),
+              // obtenemos los informes de la planta
+              switchMap((informes) => {
+                if (this.router.url.includes('fixed')) {
+                  this.plantaFija = true;
+
                   // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
                   this.informes = this.informeService.getOnlyNewInfomesFijas(informes);
+                } else {
+                  this.informes = informes;
+                }
 
-                  // evitamos cargar los informes dobles al navegar atras y volver
-                  if (this.informesIdList.length === 0) {
-                    // añadimos los informes  a la lista
-                    this.informes.forEach((informe) => this.informesIdList.push(informe.id));
-                  }
+                // evitamos cargar los informes dobles al navegar atras y volver
+                if (this.informesIdList.length === 0) {
+                  // añadimos los informes  a la lista
+                  this.informes.forEach((informe) => this.informesIdList.push(informe.id));
+                }
 
-                  this.selectedInformeId = this.informesIdList[this.informesIdList.length - 1];
+                this.selectedInformeId = this.informesIdList[this.informesIdList.length - 1];
 
+                if (this.plantaFija) {
                   // obtenemos todas las anomalías
                   return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
-                }),
-                take(1)
-              )
-              .subscribe((anoms) => {
-                this.allFilterableElements = this.anomaliaService.getRealAnomalias(anoms);
+                } else {
+                  // obtenemos todos los seguidores
+                  return this.seguidorService.getSeguidoresPlanta$(this.plantaId, this.informes);
+                }
+              }),
+              take(1)
+            )
+            .subscribe((elems) => {
+              if (this.plantaFija) {
+                this.allFilterableElements = this.anomaliaService.getRealAnomalias(elems as Anomalia[]);
 
                 if (this.allFilterableElements.length === 0) {
                   this.noAnomsReport = true;
@@ -135,320 +154,198 @@ export class ReportControlService {
                 }
 
                 this.allAnomalias = this.allFilterableElements as Anomalia[];
-
-                // guardamos los datos de los diferentes recuentos de anomalias en el informe
-                this.setCountAnomsInformesPlanta(this.allFilterableElements as Anomalia[]);
-
-                // calculamos el MAE y las CC de los informes si no tuviesen
-                this.checkMaeInformes(this.allFilterableElements);
-                this.checkCCInformes(this.allFilterableElements);
-
-                // iniciamos filter service
-                this.filterService.initService(this.allFilterableElements).then((filtersInit) => {
-                  // enviamos respuesta de servicio iniciado
-                  initService(filtersInit);
-                });
-              })
-          );
-        });
-      } else {
-        ///////////////////// SHARED REPORT ///////////////////////
-        this.sharedReport = true;
-
-        // comprobamos si es filtrable
-        if (!this.router.url.includes('filterable')) {
-          this.sharedReportWithFilters = false;
-        }
-        // obtenemos el ID de la URL
-        this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 1];
-
-        // iniciamos el servicio share-report
-        this.shareReportService.initService(this.sharedId);
-
-        return new Promise((initService) => {
-          // obtenemos los parámetros necesarios
-          this.shareReportService
-            .getParamsById(this.sharedId)
-            .get()
-            .toPromise()
-            .then((doc) => {
-              if (doc.exists) {
-                const params = doc.data() as ParamsFilterShare;
-                this.plantaId = params.plantaId;
-                this.selectedInformeId = params.informeId;
-
-                // comprobamos si ese enlace shared debe mostrar la vista completa
-                if (this.completeViewPlants.includes(this.plantaId)) {
-                  this.completeView = true;
-                }
-
-                if (!this.router.url.includes('filterable')) {
-                  // iniciamos anomalia service antes de obtener las anomalias
-                  this.anomaliaService.initService(this.plantaId).then(() =>
-                    this.plantaService
-                      .getPlanta(this.plantaId)
-                      .pipe(
-                        take(1),
-                        switchMap((planta) => {
-                          this.planta = planta;
-
-                          return this.informeService.getInforme(this.selectedInformeId);
-                        }),
-                        take(1),
-                        switchMap((informe) => {
-                          this.informes = [informe];
-
-                          return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
-                        }),
-                        take(1)
-                      )
-                      .subscribe((anoms) => {
-                        this.allFilterableElements = this.anomaliaService.getRealAnomalias(anoms);
-
-                        this.allAnomalias = this.allFilterableElements as Anomalia[];
-
-                        // iniciamos filter service
-                        this.filterService
-                          .initService(this.allFilterableElements, true, this.sharedId)
-                          .then((filtersInit) => {
-                            // enviamos respuesta de servicio iniciado
-                            initService(filtersInit);
-                          });
-                      })
-                  );
-                } else {
-                  //////////////////// FILTERABLE SHARED REPORT /////////////////////////
-                  // iniciamos anomalia service antes de obtener las anomalias
-                  this.anomaliaService.initService(this.plantaId).then(() =>
-                    this.plantaService
-                      .getPlanta(this.plantaId)
-                      .pipe(
-                        take(1),
-                        switchMap((planta) => {
-                          this.planta = planta;
-
-                          return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
-                        }),
-                        take(1),
-                        // obtenemos los informes de la planta
-                        switchMap((informes) => {
-                          // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
-                          this.informes = this.informeService.getOnlyNewInfomesFijas(informes);
-
-                          // evitamos cargar los informes dobles al navegar atras y volver
-                          if (this.informesIdList.length === 0) {
-                            // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                            this.informes.forEach((informe) => this.informesIdList.push(informe.id));
-                          }
-
-                          // obtenemos todas las anomalías
-                          return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
-                        }),
-                        take(1)
-                      )
-                      .subscribe((anoms) => {
-                        this.allFilterableElements = this.anomaliaService.getRealAnomalias(anoms);
-
-                        this.allAnomalias = this.allFilterableElements as Anomalia[];
-
-                        // iniciamos filter service
-                        this.filterService
-                          .initService(this.allFilterableElements, true, this.sharedId)
-                          .then((filtersInit) => {
-                            // enviamos respuesta de servicio iniciado
-                            initService(filtersInit);
-                          });
-                      })
-                  );
-                }
               } else {
-                console.log('No existe el documento');
-              }
-            })
-            .catch((error) => console.log('Error accediendo al documento: ', error));
-        });
-      }
-    } else {
-      /////////////////// PLANTA SEGUIDORES //////////////////////
-      if (!this.router.url.includes('shared')) {
-        // obtenemos plantaId de la url
-        this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 1];
-
-        return new Promise((initService) => {
-          // iniciamos anomalia service para cargar los criterios la planta
-          this.anomaliaService.initService(this.plantaId).then(() => {
-            this.authService.user$
-              .pipe(
-                take(1),
-                switchMap((user) => {
-                  this.user = user;
-
-                  return this.plantaService.getPlanta(this.plantaId);
-                }),
-                take(1),
-                switchMap((planta) => {
-                  this.planta = planta;
-
-                  if (this.authService.userIsAdmin(this.user)) {
-                    return this.informeService.getInformesDePlanta(this.plantaId);
-                  } else {
-                    return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
-                  }
-                }),
-                take(1),
-                // obtenemos los informes de la planta
-                switchMap((informes) => {
-                  this.informes = informes;
-
-                  // evitamos cargar los informes dobles al navegar atras y volver
-                  if (this.informesIdList.length === 0) {
-                    // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                    this.informes.forEach((informe) => this.informesIdList.push(informe.id));
-                  }
-                  this.selectedInformeId = this.informesIdList[this.informesIdList.length - 1];
-                  // obtenemos todos los seguidores
-                  return this.seguidorService.getSeguidoresPlanta$(this.plantaId, this.informes);
-                }),
-                take(1)
-              )
-              .subscribe((segs) => {
-                this.allFilterableElements = segs;
+                this.allFilterableElements = elems;
 
                 (this.allFilterableElements as Seguidor[]).forEach((seg) => {
                   if (seg.anomaliasCliente.length > 0) {
                     this.allAnomalias.push(...seg.anomaliasCliente);
                   }
                 });
+              }
 
-                // guardamos los datos de los diferentes recuentos de anomalias en el informe
-                this.setCountAnomsInformesPlanta(this.allFilterableElements as Seguidor[]);
+              // guardamos los datos de los diferentes recuentos de anomalias en el informe
+              this.setCountAnomsInformesPlanta(this.allFilterableElements);
 
-                // calculamos el MAE y las CC de los informes si no tuviesen
-                this.checkMaeInformes(this.allFilterableElements);
-                this.checkCCInformes(this.allFilterableElements);
+              // calculamos el MAE y las CC de los informes si no tuviesen
+              this.checkMaeInformes(this.allFilterableElements);
+              this.checkCCInformes(this.allFilterableElements);
 
-                // iniciamos filter service
-                this.filterService.initService(segs).then((filtersInit) => {
-                  // enviamos respuesta de servicio iniciado
-                  initService(filtersInit);
-                });
+              // iniciamos filter service
+              this.filterService.initService(this.allFilterableElements).then((filtersInit) => {
+                // enviamos respuesta de servicio iniciado
+                initService(filtersInit);
               });
-          });
-        });
-      } else {
-        ///////////////////// SHARED REPORT ///////////////////////
-        this.sharedReport = true;
+            })
+        );
+      });
+    } else {
+      ///////////////////// SHARED REPORT ///////////////////////
+      this.sharedReport = true;
 
-        // comprobamos si es filtrable
-        if (!this.router.url.includes('filterable')) {
-          this.sharedReportWithFilters = false;
-        }
-        // obtenemos el ID de la URL
-        this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+      // comprobamos si es filtrable
+      if (!this.router.url.includes('filterable')) {
+        this.sharedReportWithFilters = false;
+      }
+      // obtenemos el ID de la URL
+      this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
-        // iniciamos el servicio share-report
-        this.shareReportService.initService(this.sharedId);
+      // iniciamos el servicio share-report
+      this.shareReportService.initService(this.sharedId);
 
-        return new Promise((initService) => {
-          // obtenemos los parámetros necesarios
-          this.shareReportService
-            .getParamsById(this.sharedId)
-            .get()
-            .toPromise()
-            .then((doc) => {
-              if (doc.exists) {
-                const params = doc.data() as ParamsFilterShare;
-                this.plantaId = params.plantaId;
-                this.selectedInformeId = params.informeId;
+      return new Promise((initService) => {
+        // obtenemos los parámetros necesarios
+        this.shareReportService
+          .getParamsById(this.sharedId)
+          .get()
+          .toPromise()
+          .then((doc) => {
+            if (doc.exists) {
+              const params = doc.data() as ParamsFilterShare;
+              this.plantaId = params.plantaId;
+              this.selectedInformeId = params.informeId;
 
-                // comprobamos si ese enlace shared debe mostrar la vista completa
-                if (this.completeViewPlants.includes(this.plantaId)) {
-                  this.completeView = true;
-                }
+              // comprobamos si ese enlace shared debe mostrar la vista completa
+              if (this.completeViewPlants.includes(this.plantaId)) {
+                this.completeView = true;
+              }
 
-                if (!this.router.url.includes('filterable')) {
-                  // iniciamos anomalia service antes de obtener las anomalias
-                  this.anomaliaService.initService(this.plantaId).then(() =>
-                    this.informeService
-                      .getInforme(this.selectedInformeId)
-                      .pipe(
-                        take(1),
-                        switchMap((informe) => {
-                          this.informes = [informe];
+              if (!this.router.url.includes('filterable')) {
+                // iniciamos anomalia service antes de obtener las anomalias
+                this.anomaliaService.initService(this.plantaId).then(() =>
+                  this.plantaService
+                    .getPlanta(this.plantaId)
+                    .pipe(
+                      take(1),
+                      switchMap((planta) => {
+                        this.planta = planta;
 
+                        return this.plantaService.getLocationsArea(this.plantaId);
+                      }),
+                      take(1),
+                      switchMap((locAreas) => {
+                        const zones = this.zonesService.getZones(this.planta, locAreas);
+                        if (zones.length > 0) {
+                          this.thereAreZones = true;
+                        }
+
+                        return this.informeService.getInforme(this.selectedInformeId);
+                      }),
+                      take(1),
+                      switchMap((informe) => {
+                        this.informes = [informe];
+
+                        if (this.router.url.includes('fixed')) {
+                          this.plantaFija = true;
+
+                          return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
+                        } else {
                           return this.seguidorService.getSeguidoresPlanta$(this.plantaId, this.informes);
-                        }),
-                        take(1)
-                      )
-                      .subscribe((segs) => {
-                        this.allFilterableElements = segs;
+                        }
+                      }),
+                      take(1)
+                    )
+                    .subscribe((elems) => {
+                      if (this.plantaFija) {
+                        this.allFilterableElements = this.anomaliaService.getRealAnomalias(elems as Anomalia[]);
+
+                        this.allAnomalias = this.allFilterableElements as Anomalia[];
+                      } else {
+                        this.allFilterableElements = elems;
 
                         (this.allFilterableElements as Seguidor[]).forEach((seg) => {
                           if (seg.anomaliasCliente.length > 0) {
                             this.allAnomalias.push(...seg.anomaliasCliente);
                           }
                         });
+                      }
 
-                        // iniciamos filter service
-                        this.filterService.initService(segs, true, this.sharedId).then((filtersInit) => {
+                      // iniciamos filter service
+                      this.filterService
+                        .initService(this.allFilterableElements, true, this.sharedId)
+                        .then((filtersInit) => {
                           // enviamos respuesta de servicio iniciado
                           initService(filtersInit);
                         });
-                      })
-                  );
-                } else {
-                  //////////////////// FILTERABLE SHARED REPORT /////////////////////////
-                  // iniciamos anomalia service para cargar los criterios la planta
-                  this.anomaliaService.initService(this.plantaId).then(() =>
-                    this.plantaService
-                      .getPlanta(this.plantaId)
-                      .pipe(
-                        take(1),
-                        switchMap((planta) => {
-                          this.planta = planta;
+                    })
+                );
+              } else {
+                //////////////////// FILTERABLE SHARED REPORT /////////////////////////
+                // iniciamos anomalia service antes de obtener las anomalias
+                this.anomaliaService.initService(this.plantaId).then(() =>
+                  this.plantaService
+                    .getPlanta(this.plantaId)
+                    .pipe(
+                      take(1),
+                      switchMap((planta) => {
+                        this.planta = planta;
 
-                          return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
-                        }),
-                        take(1),
-                        // obtenemos los informes de la planta
-                        switchMap((informes) => {
-                          this.informes = informes;
-                          console.log(informes);
+                        return this.plantaService.getLocationsArea(this.plantaId);
+                      }),
+                      take(1),
+                      switchMap((locAreas) => {
+                        const zones = this.zonesService.getZones(this.planta, locAreas);
+                        if (zones.length > 0) {
+                          this.thereAreZones = true;
+                        }
 
-                          // evitamos cargar los informes dobles al navegar atras y volver
-                          if (this.informesIdList.length === 0) {
-                            // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                            this.informes.forEach((informe) => this.informesIdList.push(informe.id));
-                          }
+                        return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
+                      }),
+                      take(1),
+                      // obtenemos los informes de la planta
+                      switchMap((informes) => {
+                        // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
+                        this.informes = this.informeService.getOnlyNewInfomesFijas(informes);
+
+                        // evitamos cargar los informes dobles al navegar atras y volver
+                        if (this.informesIdList.length === 0) {
+                          // ordenamos los informes de menos a mas reciente y los añadimos a la lista
+                          this.informes.forEach((informe) => this.informesIdList.push(informe.id));
+                        }
+
+                        if (this.router.url.includes('fixed')) {
+                          this.plantaFija = true;
+
+                          // obtenemos todas las anomalías
+                          return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
+                        } else {
                           // obtenemos todos los seguidores
                           return this.seguidorService.getSeguidoresPlanta$(this.plantaId, this.informes);
-                        }),
-                        take(1)
-                      )
-                      .subscribe((segs) => {
-                        this.allFilterableElements = segs;
+                        }
+                      }),
+                      take(1)
+                    )
+                    .subscribe((elems) => {
+                      if (this.plantaFija) {
+                        this.allFilterableElements = this.anomaliaService.getRealAnomalias(elems as Anomalia[]);
+
+                        this.allAnomalias = this.allFilterableElements as Anomalia[];
+                      } else {
+                        this.allFilterableElements = elems;
 
                         (this.allFilterableElements as Seguidor[]).forEach((seg) => {
                           if (seg.anomaliasCliente.length > 0) {
                             this.allAnomalias.push(...seg.anomaliasCliente);
                           }
                         });
+                      }
 
-                        // iniciamos filter service
-                        this.filterService.initService(segs, true, this.sharedId).then((filtersInit) => {
+                      // iniciamos filter service
+                      this.filterService
+                        .initService(this.allFilterableElements, true, this.sharedId)
+                        .then((filtersInit) => {
                           // enviamos respuesta de servicio iniciado
                           initService(filtersInit);
                         });
-                      })
-                  );
-                }
-              } else {
-                console.log('No existe el documento');
+                    })
+                );
               }
-            })
-            .catch((error) => console.log('Error accediendo al documento: ', error));
-        });
-      }
+            } else {
+              console.log('No existe el documento');
+            }
+          })
+          .catch((error) => console.log('Error accediendo al documento: ', error));
+      });
     }
   }
 
@@ -568,7 +465,7 @@ export class ReportControlService {
     }
   }
 
-  private setCountAnomsInformesPlanta(elems: Anomalia[] | Seguidor[]) {
+  private setCountAnomsInformesPlanta(elems: FilterableElement[]) {
     let anomalias: Anomalia[] = [];
     if (elems.length > 0) {
       if (elems[0].hasOwnProperty('tipo')) {
@@ -734,7 +631,7 @@ export class ReportControlService {
     this.mapLoaded = false;
     this.allFilterableElements = [];
     this.plantaFija = false;
-    this.thereAreZones = true;
+    this.thereAreZones = false;
     this.noAnomsReport = false;
     this.numFixedGlobalCoords = 3;
   }

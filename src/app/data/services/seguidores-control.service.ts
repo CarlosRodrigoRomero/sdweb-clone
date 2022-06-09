@@ -45,7 +45,7 @@ export class SeguidoresControlService {
   private seguidorLayers: VectorLayer[];
   private zonasLayers: VectorLayer[];
   private prevFeatureHover: Feature;
-  private toggleViewSelected: number = undefined;
+  private toggleViewSelected: number;
   private _seguidorViewOpened = false;
   public seguidorViewOpened$ = new BehaviorSubject<boolean>(this._seguidorViewOpened);
   private _urlVisualImageSeguidor: string = undefined;
@@ -105,9 +105,9 @@ export class SeguidoresControlService {
     });
   }
 
-  createSeguidorLayers(informeId: string, zones: LocationAreaInterface[]): VectorLayer[] {
+  createSeguidorLayers(informeId: string, zones?: LocationAreaInterface[]): VectorLayer[] {
     let seguidoresLayers: VectorLayer[] = [];
-    if (zones.length > 0) {
+    if (zones !== undefined) {
       zones.forEach((zone) => {
         const zoneId = this.zonesControlService.getGlobalsLabel(zone.globalCoords);
         const maeLayer = new VectorLayer({

@@ -92,25 +92,45 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
       .getLocationsArea(this.reportControlService.plantaId)
       .pipe(take(1))
       .subscribe((locAreas) => {
-        const allZones = this.zonesService.getZonesBySize(this.reportControlService.planta, locAreas);
-        const smallZones = allZones[allZones.length - 1];
+        const zones = this.zonesService.getZones(this.planta, locAreas);
+        if (zones.length > 0) {
+          const allZones = this.zonesService.getZonesBySize(this.reportControlService.planta, locAreas);
+          const smallZones = allZones[allZones.length - 1];
 
-        this.informes.forEach((informe, index) => {
-          // creamos las capas de los seguidores para los diferentes informes
-          this.seguidoresControlService
-            .createSeguidorLayers(informe.id, smallZones)
-            .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
+          this.informes.forEach((informe, index) => {
+            // creamos las capas de los seguidores para los diferentes informes
+            this.seguidoresControlService
+              .createSeguidorLayers(informe.id, smallZones)
+              .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
-          // añadimos las ortofotos aereas de cada informe
-          this.addAerialLayer(informe.id);
+            // añadimos las ortofotos aereas de cada informe
+            this.addAerialLayer(informe.id);
 
-          if (index === this.informes.length - 1) {
-            this.initMap();
+            if (index === this.informes.length - 1) {
+              this.initMap();
 
-            this.addPopupOverlay();
-            this.addZoomEvent();
-          }
-        });
+              this.addPopupOverlay();
+              this.addZoomEvent();
+            }
+          });
+        } else {
+          this.informes.forEach((informe, index) => {
+            // creamos las capas de los seguidores para los diferentes informes
+            this.seguidoresControlService
+              .createSeguidorLayers(informe.id)
+              .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
+
+            // añadimos las ortofotos aereas de cada informe
+            this.addAerialLayer(informe.id);
+
+            if (index === this.informes.length - 1) {
+              this.initMap();
+
+              this.addPopupOverlay();
+              this.addZoomEvent();
+            }
+          });
+        }
       });
 
     // los subscribimos al toggle de vitas y al slider temporal
@@ -143,32 +163,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
 
     // asignamos los IDs necesarios para compartir
     this.shareReportService.setPlantaId(this.plantaId);
-
-    this.subscriptions.add(
-      this.olMapService.currentZoom$.subscribe((zoom) => {
-        this.currentZoom = zoom;
-
-        if (zoom >= this.zonesControlService.zoomChangeView) {
-          this.seguidorLayers.forEach((l) => {
-            if (
-              l.getProperties().view === this.toggleViewSelected &&
-              l.getProperties().informeId === this.selectedInformeId
-            ) {
-              l.setVisible(true);
-            }
-          });
-        } else {
-          this.seguidorLayers.forEach((l) => {
-            if (
-              l.getProperties().view === this.toggleViewSelected &&
-              l.getProperties().informeId === this.selectedInformeId
-            ) {
-              l.setVisible(false);
-            }
-          });
-        }
-      })
-    );
   }
 
   initMap() {

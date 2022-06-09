@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 
 import PointInPolygon from 'point-in-polygon';
 
-import { PlantaService } from './planta.service';
-
 import { LocationAreaInterface } from '@core/models/location';
 import { PlantaInterface } from '@core/models/planta';
 
@@ -11,12 +9,15 @@ import { PlantaInterface } from '@core/models/planta';
   providedIn: 'root',
 })
 export class ZonesService {
-  constructor(private plantaService: PlantaService) {}
+  constructor() {}
 
   getZones(planta: PlantaInterface, locAreas: LocationAreaInterface[]): LocationAreaInterface[] {
     // obtenemos las areas descartando las que no tienen globals, que son las de los modulos
     const realLocAreas = locAreas.filter(
-      (locArea) => locArea.globalCoords.toString() !== ',,' && locArea.globalCoords.toString() !== ''
+      (locArea) =>
+        locArea.globalCoords.toString() !== ',' &&
+        locArea.globalCoords.toString() !== ',,' &&
+        locArea.globalCoords.toString() !== ''
     );
 
     if (planta.tipo === 'seguidores') {

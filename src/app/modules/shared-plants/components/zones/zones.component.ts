@@ -11,6 +11,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { ZonesService } from '@data/services/zones.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ZonesControlService } from '@data/services/zones-control.service';
+import { ViewReportService } from '@data/services/view-report.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 
@@ -22,7 +23,10 @@ import { LocationAreaInterface } from '@core/models/location';
 export class ZonesComponent implements OnInit {
   private zones: LocationAreaInterface[][] = [];
   private zonesLayers: VectorLayer[] = [];
+  private seguidorLayers: VectorLayer[];
   private map: Map;
+  private viewSelected = 0;
+  public selectedInformeId: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -31,7 +35,8 @@ export class ZonesComponent implements OnInit {
     private reportControlService: ReportControlService,
     private zonesService: ZonesService,
     private olMapService: OlMapService,
-    private zonesControlService: ZonesControlService
+    private zonesControlService: ZonesControlService,
+    private viewReportService: ViewReportService
   ) {}
 
   ngOnInit(): void {
@@ -66,5 +71,37 @@ export class ZonesComponent implements OnInit {
         this.zonesLayers.forEach((l) => this.map.addLayer(l));
       }
     });
+
+    this.viewReportService.toggleViewSelected$.subscribe((value) => (this.viewSelected = 0));
+
+    this.subscriptions.add(
+      this.olMapService.currentZoom$.subscribe((zoom) => {
+        if (zoom >= this.zonesControlService.zoomChangeView) {
+          this.seguidorLayers.forEach((l) => {
+            if (
+              l.getProperties().view === this.viewSelected &&
+              l.getProperties().informeId === this.selectedInformeId
+            ) {
+              l.setVisible(true);
+            }
+          });
+        } else {
+          this.seguidorLayers.forEach((l) => {
+            if (
+              l.getProperties().view === this.viewSelected &&
+              l.getProperties().informeId === this.selectedInformeId
+            ) {
+              l.setVisible(false);
+            }
+          });
+        }
+      })
+    );
+
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+    );
+
+    this.subscriptions.add(this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers)));
   }
 }
