@@ -21,7 +21,7 @@ export class ViewToggleComponent implements OnInit, OnDestroy {
   }
 
   onToggleChange(value) {
-    this.viewReportService.toggleViewSelected = value;
+    this.viewReportService.toggleViewSelected = Number(value);
   }
 
   ngOnDestroy(): void {

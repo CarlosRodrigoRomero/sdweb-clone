@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import VectorLayer from 'ol/layer/Vector';
 import { Map } from 'ol';
@@ -22,7 +22,7 @@ import { LocationAreaInterface } from '@core/models/location';
 })
 export class ZonesComponent implements OnInit {
   private zones: LocationAreaInterface[][] = [];
-  private zonesLayers: VectorLayer[] = [];
+  private zonesLayers: VectorLayer[];
   private seguidorLayers: VectorLayer[];
   private map: Map;
   private viewSelected = 0;
@@ -75,27 +75,39 @@ export class ZonesComponent implements OnInit {
     this.viewReportService.toggleViewSelected$.subscribe((value) => (this.viewSelected = 0));
 
     this.subscriptions.add(
-      this.olMapService.currentZoom$.subscribe((zoom) => {
-        if (zoom >= this.zonesControlService.zoomChangeView) {
-          this.seguidorLayers.forEach((l) => {
-            if (
-              l.getProperties().view === this.viewSelected &&
-              l.getProperties().informeId === this.selectedInformeId
-            ) {
-              l.setVisible(true);
+      this.olMapService
+        .getSeguidorLayers()
+        .pipe(
+          take(1),
+          switchMap((layers) => {
+            this.seguidorLayers = layers;
+
+            return this.olMapService.currentZoom$;
+          })
+        )
+        .subscribe((zoom) => {
+          if (this.seguidorLayers !== undefined) {
+            if (zoom >= this.zonesControlService.zoomChangeView) {
+              this.seguidorLayers.forEach((l) => {
+                if (
+                  l.getProperties().view === this.viewSelected &&
+                  l.getProperties().informeId === this.selectedInformeId
+                ) {
+                  l.setVisible(true);
+                }
+              });
+            } else {
+              this.seguidorLayers.forEach((l) => {
+                if (
+                  l.getProperties().view === this.viewSelected &&
+                  l.getProperties().informeId === this.selectedInformeId
+                ) {
+                  l.setVisible(false);
+                }
+              });
             }
-          });
-        } else {
-          this.seguidorLayers.forEach((l) => {
-            if (
-              l.getProperties().view === this.viewSelected &&
-              l.getProperties().informeId === this.selectedInformeId
-            ) {
-              l.setVisible(false);
-            }
-          });
-        }
-      })
+          }
+        })
     );
 
     this.subscriptions.add(

@@ -58,7 +58,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public informeIdList: string[] = [];
   public sharedReport = false;
   private popup: Overlay;
-  private currentZoom: number;
   private toggleViewSelected: number;
 
   private subscriptions: Subscription = new Subscription();
@@ -139,26 +138,33 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
         this.viewReportService.toggleViewSelected$,
         this.mapSeguidoresService.sliderTemporalSelected$,
         this.olMapService.getAerialLayers(),
-      ]).subscribe(([toggleValue, sliderValue, aerialLayers]) => {
-        this.toggleViewSelected = toggleValue;
+        this.reportControlService.selectedInformeId$,
+        this.olMapService.currentZoom$,
+      ]).subscribe(([toggleValue, sliderValue, aerialLayers, informeId, currentZoom]) => {
+        this.toggleViewSelected = Number(toggleValue);
+        this.selectedInformeId = informeId;
 
-        const numLayerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (this.informes.length - 1))));
+        const numLayerSelected =
+          this.toggleViewSelected + Number(3 * (sliderValue / (100 / (this.informes.length - 1))));
 
         this.mapSeguidoresService.layerSelected = numLayerSelected;
 
-        // ocultamos las capas de las vistas no seleccionadas
-        this.seguidorLayers.forEach((layer) => {
-          if (layer.getProperties().view !== numLayerSelected) {
-            layer.setVisible(false);
-          }
-        });
+        if (!this.reportControlService.thereAreZones || currentZoom > this.zonesControlService.zoomChangeView) {
+          // mostramos las capas de la vista seleccionada y ocultamos las que no
+          this.seguidorLayers.forEach((layer) => {
+            if (
+              layer.getProperties().view === this.toggleViewSelected &&
+              layer.getProperties().informeId === this.selectedInformeId
+            ) {
+              layer.setVisible(true);
+            } else {
+              layer.setVisible(false);
+            }
+          });
+        }
 
         this.aerialLayers = aerialLayers;
       })
-    );
-
-    this.subscriptions.add(
-      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
     );
 
     // asignamos los IDs necesarios para compartir
