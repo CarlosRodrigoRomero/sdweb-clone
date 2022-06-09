@@ -29,10 +29,13 @@ import { take } from 'rxjs/operators';
 })
 export class ZonesControlService {
   private map: Map;
+  zoomChangeView = 19;
   private selectedInformeId: string;
   private toggleViewSelected: number;
   private seguidoresLayers: VectorLayer[];
-  private layerSelected: VectorLayer;
+  private currentLayerHovered: VectorLayer;
+  private prevLayerHovered: VectorLayer;
+  private currentZoom: number;
 
   constructor(
     private olMapService: OlMapService,
@@ -53,6 +56,8 @@ export class ZonesControlService {
         .getSeguidorLayers()
         .pipe(take(1))
         .subscribe((layers) => (this.seguidoresLayers = layers));
+
+      this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom));
 
       initService(true);
     });
@@ -118,7 +123,7 @@ export class ZonesControlService {
 
     // añadimos acciones sobre las zonas
     this.addOnHoverAction();
-    this.addSelectInteraction();
+    // this.addSelectInteraction();
 
     // this.addClickOutFeatures();
   }
@@ -170,52 +175,60 @@ export class ZonesControlService {
     ];
 
     this.map.on('pointermove', (event) => {
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        const feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties().properties !== undefined)
-          .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
-          .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
-        // .filter((item) => item.getProperties().properties.view === this.toggleViewSelected);
+      if (this.currentZoom < this.zoomChangeView) {
+        if (this.map.hasFeatureAtPixel(event.pixel)) {
+          const feature = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined)
+            .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
+            .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
+          // .filter((item) => item.getProperties().properties.view === this.toggleViewSelected);
 
-        if (feature !== undefined) {
-          if (this.reportControlService.plantaFija) {
-          } else {
-            this.layerSelected = this.seguidoresLayers.find(
-              (l) =>
-                l.getProperties().zoneId === feature.getProperties().properties.id &&
-                l.getProperties().view === this.toggleViewSelected
-            );
-            this.layerSelected.setVisible(true);
+          if (feature !== undefined) {
+            if (this.reportControlService.plantaFija) {
+            } else {
+              // cuando pasamos de una zona a otra directamente sin pasar por vacio
+              if (this.prevLayerHovered !== undefined) {
+                this.prevLayerHovered.setVisible(false);
+              }
+              this.currentLayerHovered = this.seguidoresLayers.find(
+                (l) =>
+                  l.getProperties().zoneId === feature.getProperties().properties.id &&
+                  l.getProperties().view === this.toggleViewSelected
+              );
+              this.currentLayerHovered.setVisible(true);
+
+              this.prevLayerHovered = this.currentLayerHovered;
+            }
           }
+
+          // if (feature !== undefined) {
+          //   // cuando pasamos de un seguidor a otro directamente sin pasar por vacio
+          //   if (this.prevFeatureHover !== undefined) {
+          //     this.prevFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+          //   }
+          //   currentFeatureHover = feature;
+
+          //   const seguidorId = feature.getProperties().properties.seguidorId;
+          //   const seguidor = this.listaSeguidores.filter((seg) => seg.id === seguidorId)[0];
+
+          //   feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
+
+          //   if (this.selectedInformeId === seguidor.informeId) {
+          //     this.seguidorHovered = seguidor;
+          //   }
+          //   this.prevFeatureHover = feature;
+          // }
+        } else {
+          if (this.currentLayerHovered !== undefined) {
+            this.currentLayerHovered.setVisible(false);
+          }
+          // this.seguidorHovered = undefined;
+          // if (currentFeatureHover !== undefined) {
+          //   currentFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+          //   currentFeatureHover = undefined;
+          // }
         }
-
-        // if (feature !== undefined) {
-        //   // cuando pasamos de un seguidor a otro directamente sin pasar por vacio
-        //   if (this.prevFeatureHover !== undefined) {
-        //     this.prevFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
-        //   }
-        //   currentFeatureHover = feature;
-
-        //   const seguidorId = feature.getProperties().properties.seguidorId;
-        //   const seguidor = this.listaSeguidores.filter((seg) => seg.id === seguidorId)[0];
-
-        //   feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
-
-        //   if (this.selectedInformeId === seguidor.informeId) {
-        //     this.seguidorHovered = seguidor;
-        //   }
-        //   this.prevFeatureHover = feature;
-        // }
-      } else {
-        if (this.layerSelected !== undefined) {
-          this.layerSelected.setVisible(false);
-        }
-        // this.seguidorHovered = undefined;
-        // if (currentFeatureHover !== undefined) {
-        //   currentFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
-        //   currentFeatureHover = undefined;
-        // }
       }
     });
   }

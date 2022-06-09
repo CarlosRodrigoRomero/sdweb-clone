@@ -21,6 +21,8 @@ import { fromLonLat } from 'ol/proj';
 export class OlMapService {
   private _map = undefined;
   public map$ = new BehaviorSubject<any>(this._map);
+  private _currentZoom = 17;
+  currentZoom$ = new BehaviorSubject<number>(this._currentZoom);
   private _draw: Draw = undefined;
   public draw$ = new BehaviorSubject<Draw>(this._draw);
   private drawLayers: VectorLayer[] = [];
@@ -201,6 +203,7 @@ export class OlMapService {
     this.anomaliaLayers = [];
     this.seguidorLayers = [];
     this.incrementoLayers = [];
+    this.currentZoom = 17;
   }
 
   ///////////////////////////////////////////////////////////////////////
@@ -221,6 +224,15 @@ export class OlMapService {
   set map(value: Map) {
     this._map = value;
     this.map$.next(value);
+  }
+
+  get currentZoom(): number {
+    return this._currentZoom;
+  }
+
+  set currentZoom(value: number) {
+    this._currentZoom = value;
+    this.currentZoom$.next(value);
   }
 
   get zonasLayers(): VectorLayer[] {

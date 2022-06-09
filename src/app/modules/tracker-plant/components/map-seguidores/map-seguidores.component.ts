@@ -26,6 +26,7 @@ import { ViewReportService } from '@data/services/view-report.service';
 import { PlantaInterface } from '@core/models/planta';
 import { Seguidor } from '@core/models/seguidor';
 import { InformeInterface } from '@core/models/informe';
+import { ZonesControlService } from '@data/services/zones-control.service';
 
 @Component({
   selector: 'app-map-seguidores',
@@ -57,6 +58,9 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public informeIdList: string[] = [];
   public sharedReport = false;
   private popup: Overlay;
+  private currentZoom: number;
+  private toggleViewSelected: number;
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -69,7 +73,8 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     private seguidoresControlService: SeguidoresControlService,
     private shareReportService: ShareReportService,
     private zonesService: ZonesService,
-    private viewReportService: ViewReportService
+    private viewReportService: ViewReportService,
+    private zonesControlService: ZonesControlService
   ) {}
 
   ngOnInit(): void {
@@ -115,6 +120,8 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
         this.mapSeguidoresService.sliderTemporalSelected$,
         this.olMapService.getAerialLayers(),
       ]).subscribe(([toggleValue, sliderValue, aerialLayers]) => {
+        this.toggleViewSelected = toggleValue;
+
         const numLayerSelected = Number(toggleValue) + Number(3 * (sliderValue / (100 / (this.informes.length - 1))));
 
         this.mapSeguidoresService.layerSelected = numLayerSelected;
@@ -136,6 +143,32 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
 
     // asignamos los IDs necesarios para compartir
     this.shareReportService.setPlantaId(this.plantaId);
+
+    this.subscriptions.add(
+      this.olMapService.currentZoom$.subscribe((zoom) => {
+        this.currentZoom = zoom;
+
+        if (zoom >= this.zonesControlService.zoomChangeView) {
+          this.seguidorLayers.forEach((l) => {
+            if (
+              l.getProperties().view === this.toggleViewSelected &&
+              l.getProperties().informeId === this.selectedInformeId
+            ) {
+              l.setVisible(true);
+            }
+          });
+        } else {
+          this.seguidorLayers.forEach((l) => {
+            if (
+              l.getProperties().view === this.toggleViewSelected &&
+              l.getProperties().informeId === this.selectedInformeId
+            ) {
+              l.setVisible(false);
+            }
+          });
+        }
+      })
+    );
   }
 
   initMap() {
@@ -219,14 +252,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   }
 
   private addZoomEvent() {
-    this.map.on('moveend', (event) => {
-      const zoom = this.map.getView().getZoom();
-      if (zoom >= 19) {
-        this.seguidorLayers.forEach((l) => l.setVisible(true));
-      } else {
-        this.seguidorLayers.forEach((l) => l.setVisible(false));
-      }
-    });
+    this.map.on('moveend', (event) => (this.olMapService.currentZoom = this.map.getView().getZoom()));
   }
 
   ngOnDestroy(): void {
