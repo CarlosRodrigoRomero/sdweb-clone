@@ -11,6 +11,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { PlantaService } from '@data/services/planta.service';
 import { ViewReportService } from '@data/services/view-report.service';
+import { ZonesControlService } from '@data/services/zones-control.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
@@ -47,7 +48,8 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
     private reportControlService: ReportControlService,
     private seguidoresControlService: SeguidoresControlService,
     private plantaService: PlantaService,
-    private viewReportService: ViewReportService
+    private viewReportService: ViewReportService,
+    private zonesControlService: ZonesControlService
   ) {}
 
   ngOnInit(): void {
@@ -137,7 +139,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
   hoverSeguidor(row: any) {
     if (this.seguidorSelected === undefined) {
       this.seguidoresControlService.seguidorHovered = row.seguidor;
-      this.seguidoresControlService.setExternalStyle(row.seguidor.id, true);
+      this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, true, true);
       this.seguidoresControlService.setPopupPosition(row.seguidor.featureCoords[0]);
     }
   }
@@ -145,7 +147,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
   unhoverSeguidor(row: any) {
     if (this.seguidorSelected === undefined) {
       this.seguidoresControlService.seguidorHovered = undefined;
-      this.seguidoresControlService.setExternalStyle(row.seguidor.id, false);
+      this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, false, false);
     }
   }
 
@@ -155,12 +157,15 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
 
     // reiniciamos el estilo al anterior seguidor
     if (this.seguidoresControlService.prevSeguidorSelected !== undefined) {
-      this.seguidoresControlService.setExternalStyle(this.seguidoresControlService.prevSeguidorSelected.id, false);
+      this.seguidoresControlService.setExternalStyleSeguidor(
+        this.seguidoresControlService.prevSeguidorSelected.id,
+        false
+      );
     }
     this.seguidoresControlService.prevSeguidorSelected = row.seguidor;
 
     this.seguidoresControlService.seguidorSelected = row.seguidor;
-    this.seguidoresControlService.setExternalStyle(row.seguidor.id, true);
+    this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, false, false);
     this.seguidoresControlService.seguidorViewOpened = true;
   }
 

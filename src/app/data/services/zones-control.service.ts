@@ -34,7 +34,7 @@ export class ZonesControlService {
   private toggleViewSelected: number;
   private seguidoresLayers: VectorLayer[];
   private currentLayerHovered: VectorLayer;
-  private prevLayerHovered: VectorLayer;
+  prevLayerHovered: VectorLayer;
   private currentZoom: number;
 
   constructor(
@@ -78,7 +78,8 @@ export class ZonesControlService {
 
   mostrarZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
     this.filterService.filteredElements$.subscribe((elems) => {
-      this.addZonas(zonas, layers, elems);
+      const elemsReport = elems.filter((elem) => elem.informeId === this.selectedInformeId);
+      this.addZonas(zonas, layers, elemsReport);
     });
   }
 
@@ -194,7 +195,8 @@ export class ZonesControlService {
               this.currentLayerHovered = this.seguidoresLayers.find(
                 (l) =>
                   l.getProperties().zoneId === feature.getProperties().properties.id &&
-                  l.getProperties().view === this.toggleViewSelected
+                  l.getProperties().view === this.toggleViewSelected &&
+                  l.getProperties().informeId === this.selectedInformeId
               );
               this.currentLayerHovered.setVisible(true);
 
