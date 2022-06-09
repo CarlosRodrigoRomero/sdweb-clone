@@ -74,7 +74,7 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
       combineLatest([
         this.olMapService.getThermalLayers(),
         this.olMapService.getAnomaliaLayers(),
-        this.olMapService.getAerialLayers(),
+        this.olMapService.aerialLayers$,
       ]).subscribe(([thermalLayers, anomLayers, aerialLayers]) => {
         this.thermalLayers = thermalLayers;
         this.anomaliaLayers = anomLayers;

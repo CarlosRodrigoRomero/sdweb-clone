@@ -14,6 +14,9 @@ import TileLayer from 'ol/layer/Tile';
 import { Draw } from 'ol/interaction';
 import { Coordinate } from 'ol/coordinate';
 import { fromLonLat } from 'ol/proj';
+import XYZ from 'ol/source/XYZ';
+
+import { GLOBAL } from '@data/constants/global';
 
 @Injectable({
   providedIn: 'root',
@@ -36,8 +39,8 @@ export class OlMapService {
   zonasLayers$ = new BehaviorSubject<VectorLayer[]>(this._zonasLayers);
   private incrementoLayers: VectorLayer[] = [];
   private incrementoLayers$ = new BehaviorSubject<VectorLayer[]>(this.incrementoLayers);
-  private aerialLayers: TileLayer[] = [];
-  private aerialLayers$ = new BehaviorSubject<TileLayer[]>(this.aerialLayers);
+  private _aerialLayers: TileLayer[] = [];
+  aerialLayers$ = new BehaviorSubject<TileLayer[]>(this._aerialLayers);
 
   constructor() {}
 
@@ -108,13 +111,22 @@ export class OlMapService {
     return this.incrementoLayers$.asObservable();
   }
 
-  addAerialLayer(layer: TileLayer) {
-    this.aerialLayers.push(layer);
-    this.aerialLayers$.next(this.aerialLayers);
-  }
+  addAerialLayer(informeId: string) {
+    const aerial = new XYZ({
+      url: GLOBAL.GIS + informeId + '_visual/{z}/{x}/{y}.png',
+      crossOrigin: 'anonymous',
+    });
 
-  getAerialLayers() {
-    return this.aerialLayers$.asObservable();
+    const aerialLayer = new TileLayer({
+      source: aerial,
+      preload: Infinity,
+    });
+
+    aerialLayer.setProperties({
+      informeId,
+    });
+
+    this.aerialLayers.push(aerialLayer);
   }
 
   latLonLiteralToLonLat(path: LatLngLiteral[]) {
@@ -242,5 +254,14 @@ export class OlMapService {
   set zonasLayers(value: VectorLayer[]) {
     this._zonasLayers = value;
     this.zonasLayers$.next(value);
+  }
+
+  get aerialLayers(): TileLayer[] {
+    return this._aerialLayers;
+  }
+
+  set aerialLayers(value: TileLayer[]) {
+    this._aerialLayers = value;
+    this.aerialLayers$.next(value);
   }
 }

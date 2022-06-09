@@ -75,7 +75,7 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.olMapService.getAerialLayers().subscribe((aerialLayers) => {
+      this.olMapService.aerialLayers$.subscribe((aerialLayers) => {
         this.aerialLayers = aerialLayers;
 
         this.setAerialLayersOpacity(this.selectedInformeId);

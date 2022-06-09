@@ -103,7 +103,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
               .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
             // añadimos las ortofotos aereas de cada informe
-            this.addAerialLayer(informe.id);
+            this.olMapService.addAerialLayer(informe.id);
 
             if (index === this.informes.length - 1) {
               this.initMap();
@@ -120,7 +120,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
               .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
             // añadimos las ortofotos aereas de cada informe
-            this.addAerialLayer(informe.id);
+            this.olMapService.addAerialLayer(informe.id);
 
             if (index === this.informes.length - 1) {
               this.initMap();
@@ -137,7 +137,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
       combineLatest([
         this.viewReportService.toggleViewSelected$,
         this.mapSeguidoresService.sliderTemporalSelected$,
-        this.olMapService.getAerialLayers(),
+        this.olMapService.aerialLayers$,
         this.reportControlService.selectedInformeId$,
         this.olMapService.currentZoom$,
       ]).subscribe(([toggleValue, sliderValue, aerialLayers, informeId, currentZoom]) => {
@@ -236,19 +236,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     });
 
     this.map.addOverlay(this.popup);
-  }
-
-  private addAerialLayer(informeId: string) {
-    const aerial = new XYZ({
-      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_visual/{z}/{x}/{y}.png',
-      crossOrigin: null,
-    });
-
-    const aerialLayer = new TileLayer({
-      source: aerial,
-    });
-
-    this.olMapService.addAerialLayer(aerialLayer);
   }
 
   private addZoomEvent() {

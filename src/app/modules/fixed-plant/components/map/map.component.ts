@@ -117,7 +117,7 @@ export class MapComponent implements OnInit, OnDestroy {
               this.olMapService.addAnomaliaLayer(this._createAnomaliaLayer(informe.id));
 
               // añadimos las ortofotos aereas de cada informe
-              this.addAerialLayer(informe.id);
+              this.olMapService.addAerialLayer(informe.id);
             });
 
             this.planta = planta;
@@ -128,7 +128,7 @@ export class MapComponent implements OnInit, OnDestroy {
             return combineLatest([
               this.olMapService.getThermalLayers(),
               this.olMapService.getAnomaliaLayers(),
-              this.olMapService.getAerialLayers(),
+              this.olMapService.aerialLayers$,
               this.reportControlService.selectedInformeId$,
             ]);
           })
@@ -181,24 +181,6 @@ export class MapComponent implements OnInit, OnDestroy {
     });
 
     return tl;
-  }
-
-  private addAerialLayer(informeId: string) {
-    const aerial = new XYZ({
-      url: GLOBAL.GIS + informeId + '_visual/{z}/{x}/{y}.png',
-      crossOrigin: 'anonymous',
-    });
-
-    const aerialLayer = new TileLayer({
-      source: aerial,
-      preload: Infinity,
-    });
-
-    aerialLayer.setProperties({
-      informeId,
-    });
-
-    this.olMapService.addAerialLayer(aerialLayer);
   }
 
   private _createAnomaliaLayer(informeId: string): VectorLayer {

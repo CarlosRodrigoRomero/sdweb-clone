@@ -23,7 +23,7 @@ export class SliderOpacityComponent implements OnInit, OnDestroy {
   constructor(private mapSeguidoresService: MapSeguidoresService, private olMapService: OlMapService) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(this.olMapService.getAerialLayers().subscribe((layers) => (this.aerialLayers = layers)));
+    this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayers = layers)));
 
     this.subscriptions.add(
       this.mapSeguidoresService.layerSelected$.subscribe((layerSel) => (this.layerSelected = layerSel))

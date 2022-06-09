@@ -58,9 +58,9 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
-    this.addAerialLayer(this.informeId);
+    this.olMapService.addAerialLayer(this.informeId);
 
-    this.subscriptions.add(this.olMapService.getAerialLayers().subscribe((layers) => (this.aerialLayers = layers)));
+    this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayers = layers)));
 
     this.subscriptions.add(
       this.autogeoService.mapLoaded$.subscribe((loaded) => {
@@ -118,20 +118,6 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
         this.map.once('postrender', () => (this.autogeoService.mapLoaded = true));
       })
     );
-  }
-
-  private addAerialLayer(informeId: string) {
-    const aerial = new XYZ({
-      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_visual/{z}/{x}/{y}.png',
-      crossOrigin: '',
-    });
-
-    const aerialLayer = new TileLayer({
-      source: aerial,
-      preload: Infinity,
-    });
-
-    this.olMapService.addAerialLayer(aerialLayer);
   }
 
   private createMesasLayer() {
