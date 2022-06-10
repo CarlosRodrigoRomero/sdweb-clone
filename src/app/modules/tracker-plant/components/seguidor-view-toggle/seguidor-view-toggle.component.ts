@@ -18,11 +18,11 @@ export class SeguidorViewToggleComponent implements OnInit, OnDestroy {
   constructor(private viewReportService: ViewReportService, private seguidorViewService: SeguidorViewService) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(this.viewReportService.toggleViewSelected$.subscribe((view) => (this.viewSelected = view)));
+    this.subscriptions.add(this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSelected = view)));
   }
 
   onToggleChange(value) {
-    this.seguidorViewService.toggleViewSelected = value;
+    this.seguidorViewService.seguidorViewSelected = value;
   }
 
   ngOnDestroy(): void {

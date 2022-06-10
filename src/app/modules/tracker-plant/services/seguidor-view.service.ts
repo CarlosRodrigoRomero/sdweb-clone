@@ -26,8 +26,8 @@ export class SeguidorViewService {
   public anomaliaHovered$ = new BehaviorSubject<Anomalia>(this._anomaliaHovered);
   private _sliderTemporalSelected: number = 100;
   public sliderTemporalSelected$ = new BehaviorSubject<number>(this._sliderTemporalSelected);
-  private _toggleViewSelected = 0;
-  public toggleViewSelected$ = new BehaviorSubject<number>(this._toggleViewSelected);
+  private _seguidorViewSelected = 0;
+  public seguidorViewSelected$ = new BehaviorSubject<number>(this._seguidorViewSelected);
   private _selectedInformeId: string = undefined;
   public selectedInformeId$ = new BehaviorSubject<string>(this._selectedInformeId);
   private _visualCanvas: any = undefined;
@@ -35,7 +35,7 @@ export class SeguidorViewService {
   private _anomsCanvas: any = undefined;
   private _imagesLoaded = false;
   public imagesLoaded$ = new BehaviorSubject<boolean>(this._imagesLoaded);
-  private viewSelected = 0;
+  private localViewSelected = 0;
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
@@ -43,18 +43,18 @@ export class SeguidorViewService {
     private reportControlService: ReportControlService,
     private viewReportService: ViewReportService
   ) {
-    this.toggleViewSelected$.subscribe((view) => (this.viewSelected = view));
-    this.viewReportService.toggleViewSelected$.subscribe((viewSelected) => (this.toggleViewSelected = viewSelected));
+    this.seguidorViewSelected$.subscribe((view) => (this.localViewSelected = view));
+    this.viewReportService.reportViewSelected$.subscribe((viewSelected) => (this.seguidorViewSelected = viewSelected));
 
     this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
   }
 
   getAnomaliaColor(anomalia: Anomalia): string {
     // tslint:disable-next-line: triple-equals
-    if (this.viewSelected == 0) {
+    if (this.localViewSelected == 0) {
       return this.seguidorService.getPerdidasAnomColor(anomalia);
       // tslint:disable-next-line: triple-equals
-    } else if (this.viewSelected == 1) {
+    } else if (this.localViewSelected == 1) {
       return this.seguidorService.getCelsCalientesAnomColor(anomalia);
     } else {
       return this.seguidorService.getGradienteAnomColor(anomalia);
@@ -91,7 +91,7 @@ export class SeguidorViewService {
     this.seguidoresControlService.visualImageExist = true;
     this.imagesLoaded = false;
     // volvemos el valor al de la vista del mapa
-    this.toggleViewSelected = this.viewReportService.toggleViewSelected;
+    this.seguidorViewSelected = this.viewReportService.reportViewSelected;
     // limpiamos la feature seleccionada
     this.seguidoresControlService.clearSelectFeature();
     // seleccionamos el mismo que el mapa al cerrar
@@ -151,13 +151,13 @@ export class SeguidorViewService {
     this.sliderTemporalSelected$.next(value);
   }
 
-  get toggleViewSelected() {
-    return this._toggleViewSelected;
+  get seguidorViewSelected() {
+    return this._seguidorViewSelected;
   }
 
-  set toggleViewSelected(selected: number) {
-    this._toggleViewSelected = selected;
-    this.toggleViewSelected$.next(selected);
+  set seguidorViewSelected(selected: number) {
+    this._seguidorViewSelected = selected;
+    this.seguidorViewSelected$.next(selected);
   }
 
   get selectedInformeId() {

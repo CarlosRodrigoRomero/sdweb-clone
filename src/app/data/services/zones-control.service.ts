@@ -50,7 +50,7 @@ export class ZonesControlService {
 
       this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
 
-      this.viewReportService.toggleViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
+      this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
 
       this.olMapService
         .getSeguidorLayers()

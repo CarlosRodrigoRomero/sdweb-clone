@@ -28,7 +28,7 @@ export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.seguidorViewService.toggleViewSelected$.subscribe((view) => {
+      this.seguidorViewService.seguidorViewSelected$.subscribe((view) => {
         this.viewSelected = view;
 
         if (this.seguidorSelected !== undefined) {

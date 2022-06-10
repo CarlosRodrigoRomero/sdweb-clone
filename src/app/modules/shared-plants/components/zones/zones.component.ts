@@ -72,7 +72,7 @@ export class ZonesComponent implements OnInit {
       }
     });
 
-    this.viewReportService.toggleViewSelected$.subscribe((value) => (this.viewSelected = 0));
+    this.viewReportService.reportViewSelected$.subscribe((value) => (this.viewSelected = 0));
 
     this.subscriptions.add(
       this.olMapService

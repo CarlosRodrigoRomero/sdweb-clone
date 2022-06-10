@@ -12,6 +12,7 @@ import { MapControlService } from '../../services/map-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { InformeService } from '@data/services/informe.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { ViewReportService } from '@data/services/view-report.service';
 
 @Component({
   selector: 'app-slider-temporal',
@@ -20,12 +21,15 @@ import { ReportControlService } from '@data/services/report-control.service';
 })
 export class SliderTemporalComponent implements OnInit, OnDestroy {
   private thermalLayers: TileLayer[];
-  private anomaliaLayers: VectorLayer[];
   private aerialLayers: TileLayer[];
+  private anomaliaLayers: VectorLayer[];
+  private seguidorLayers: VectorLayer[];
   public selectedInformeId: string;
   private informesIdList: string[];
   private sliderLoaded = false;
   public sliderLoaded$ = new BehaviorSubject<boolean>(this.sliderLoaded);
+  private reportViewSelected: number;
+
   private subscriptions: Subscription = new Subscription();
 
   /* Slider Values*/
@@ -45,7 +49,8 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
     private mapControlService: MapControlService,
     private olMapService: OlMapService,
     private informeService: InformeService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private viewReportService: ViewReportService
   ) {}
 
   ngOnInit(): void {
@@ -63,7 +68,19 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
     });
 
     this.subscriptions.add(
-      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+        this.selectedInformeId = informeId;
+
+        this.setThermalLayersOpacity(this.selectedInformeId);
+        // this.setAerialLayersOpacity(this.selectedInformeId);
+
+        if (this.anomaliaLayers !== undefined) {
+          this.setAnomaliaLayersOpacity(this.selectedInformeId);
+        }
+        // if (this.seguidorLayers !== undefined) {
+        //   this.setSeguidorLayersOpacity(this.selectedInformeId);
+        // }
+      })
     );
 
     this.currentYear = this.informesIdList.indexOf(this.selectedInformeId) * 100;
@@ -73,17 +90,29 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       combineLatest([
         this.olMapService.getThermalLayers(),
+        // this.olMapService.aerialLayers$,
         this.olMapService.getAnomaliaLayers(),
-        this.olMapService.aerialLayers$,
-      ]).subscribe(([thermalLayers, anomLayers, aerialLayers]) => {
+        // this.olMapService.getSeguidorLayers(),
+      ]).subscribe(([thermalLayers, /* aerialLayers, */ anomLayers, /* segLayers */]) => {
         this.thermalLayers = thermalLayers;
-        this.anomaliaLayers = anomLayers;
-        this.aerialLayers = aerialLayers;
+        // this.aerialLayers = aerialLayers;
+
+        if (anomLayers.length > 0) {
+          this.anomaliaLayers = anomLayers;
+          this.setAnomaliaLayersOpacity(this.selectedInformeId);
+        }
+        // if (segLayers.length > 0) {
+        //   this.seguidorLayers = segLayers;
+        //   this.setSeguidorLayersOpacity(this.selectedInformeId);
+        // }
 
         this.setThermalLayersOpacity(this.selectedInformeId);
-        this.setAnomaliaLayersOpacity(this.selectedInformeId);
-        this.setAerialLayersOpacity(this.selectedInformeId);
+        // this.setAerialLayersOpacity(this.selectedInformeId);
       })
+    );
+
+    this.subscriptions.add(
+      this.viewReportService.reportViewSelected$.subscribe((view) => (this.reportViewSelected = view))
     );
   }
 
@@ -93,14 +122,20 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
     const roundedValue = Math.round(value / (100 / (this.informesIdList.length - 1)));
 
     this.reportControlService.selectedInformeId = this.informesIdList[roundedValue];
-
-    this.setThermalLayersOpacity(this.informesIdList[roundedValue]);
-    this.setAnomaliaLayersOpacity(this.informesIdList[roundedValue]);
-    this.setAerialLayersOpacity(this.informesIdList[roundedValue]);
   }
 
   setThermalLayersOpacity(informeId: string) {
     this.thermalLayers.forEach((layer, index) => {
+      if (index === this.informesIdList.indexOf(informeId)) {
+        layer.setOpacity(1);
+      } else {
+        layer.setOpacity(0);
+      }
+    });
+  }
+
+  private setAerialLayersOpacity(informeId: string) {
+    this.aerialLayers.forEach((layer, index) => {
       if (index === this.informesIdList.indexOf(informeId)) {
         layer.setOpacity(1);
       } else {
@@ -119,9 +154,9 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
     });
   }
 
-  private setAerialLayersOpacity(informeId: string) {
-    this.aerialLayers.forEach((layer, index) => {
-      if (index === this.informesIdList.indexOf(informeId)) {
+  private setSeguidorLayersOpacity(informeId: string) {
+    this.seguidorLayers.forEach((layer) => {
+      if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
         layer.setOpacity(1);
       } else {
         layer.setOpacity(0);

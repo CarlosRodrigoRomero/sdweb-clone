@@ -29,7 +29,7 @@ export class LeyendaComponent implements OnInit, OnDestroy {
     ];
 
     this.subscriptions.add(
-      this.viewReportService.toggleViewSelected$.subscribe((view) => (this.viewSelected = view))
+      this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSelected = view))
     );
   }
 

@@ -6,17 +6,17 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class ViewReportService {
-  private _toggleViewSelected = 0;
-  toggleViewSelected$ = new BehaviorSubject<number>(this._toggleViewSelected);
+  private _reportViewSelected = 0;
+  reportViewSelected$ = new BehaviorSubject<number>(this._reportViewSelected);
 
   constructor() {}
 
-  get toggleViewSelected() {
-    return this._toggleViewSelected;
+  get reportViewSelected() {
+    return this._reportViewSelected;
   }
 
-  set toggleViewSelected(selected: number) {
-    this._toggleViewSelected = selected;
-    this.toggleViewSelected$.next(selected);
+  set reportViewSelected(selected: number) {
+    this._reportViewSelected = selected;
+    this.reportViewSelected$.next(selected);
   }
 }

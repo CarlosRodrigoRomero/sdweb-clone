@@ -12,7 +12,6 @@ import { SeguidoresListComponent } from './components/seguidores-list/seguidores
 import { MapSeguidoresComponent } from './components/map-seguidores/map-seguidores.component';
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
 import { ViewToggleComponent } from './components/view-toggle/view-toggle.component';
-import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
 import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.component';
 import { SeguidorViewComponent } from './components/seguidor-view/seguidor-view.component';
 import { SeguidorImagesComponent } from './components/seguidor-images/seguidor-images.component';
@@ -27,6 +26,7 @@ import { LeyendaComponent } from './components/leyenda/leyenda.component';
 import { SeguidorViewNavbarComponent } from './components/seguidor-view-navbar/seguidor-view-navbar.component';
 import { SeguidorViewLeyendaComponent } from './components/seguidor-view-leyenda/seguidor-view-leyenda.component';
 import { SeguidorImagesAreaComponent } from './components/seguidor-images-area/seguidor-images-area.component';
+import { ViewControlComponent } from './components/view-control/view-control.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +35,6 @@ import { SeguidorImagesAreaComponent } from './components/seguidor-images-area/s
     MapSeguidoresComponent,
     SliderTemporalComponent,
     ViewToggleComponent,
-    SliderOpacityComponent,
     SeguidorInfoComponent,
     SeguidorViewComponent,
     SeguidorImagesComponent,
@@ -50,6 +49,7 @@ import { SeguidorImagesAreaComponent } from './components/seguidor-images-area/s
     SeguidorViewNavbarComponent,
     SeguidorViewLeyendaComponent,
     SeguidorImagesAreaComponent,
+    ViewControlComponent,
   ],
   imports: [
     CommonModule,

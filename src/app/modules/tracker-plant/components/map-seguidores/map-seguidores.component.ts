@@ -58,7 +58,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public informeIdList: string[] = [];
   public sharedReport = false;
   private popup: Overlay;
-  private toggleViewSelected: number;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -132,39 +131,10 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
         }
       });
 
-    // los subscribimos al toggle de vitas y al slider temporal
+    this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayers = layers)));
+
     this.subscriptions.add(
-      combineLatest([
-        this.viewReportService.toggleViewSelected$,
-        this.mapSeguidoresService.sliderTemporalSelected$,
-        this.olMapService.aerialLayers$,
-        this.reportControlService.selectedInformeId$,
-        this.olMapService.currentZoom$,
-      ]).subscribe(([toggleValue, sliderValue, aerialLayers, informeId, currentZoom]) => {
-        this.toggleViewSelected = Number(toggleValue);
-        this.selectedInformeId = informeId;
-
-        const numLayerSelected =
-          this.toggleViewSelected + Number(3 * (sliderValue / (100 / (this.informes.length - 1))));
-
-        this.mapSeguidoresService.layerSelected = numLayerSelected;
-
-        if (!this.reportControlService.thereAreZones || currentZoom > this.zonesControlService.zoomChangeView) {
-          // mostramos las capas de la vista seleccionada y ocultamos las que no
-          this.seguidorLayers.forEach((layer) => {
-            if (
-              layer.getProperties().view === this.toggleViewSelected &&
-              layer.getProperties().informeId === this.selectedInformeId
-            ) {
-              layer.setVisible(true);
-            } else {
-              layer.setVisible(false);
-            }
-          });
-        }
-
-        this.aerialLayers = aerialLayers;
-      })
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
     );
 
     // asignamos los IDs necesarios para compartir

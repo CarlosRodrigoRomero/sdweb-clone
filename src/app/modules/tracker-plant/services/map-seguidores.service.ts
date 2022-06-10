@@ -26,9 +26,6 @@ export class MapSeguidoresService {
   private _toggleViewSelected = 0;
   public toggleViewSelected$ = new BehaviorSubject<number>(this._toggleViewSelected);
 
-  private _layerSelected = undefined;
-  public layerSelected$ = new BehaviorSubject<number>(this._layerSelected);
-
   constructor(private informeService: InformeService) {}
 
   initService(plantaId: string) {
@@ -55,7 +52,6 @@ export class MapSeguidoresService {
     this.sliderTemporalSelected = 100;
     this.sliderOpacity = 100;
     this.toggleViewSelected = 0;
-    this.layerSelected = undefined;
   }
 
   getPlantaId(): Observable<string> {
@@ -82,15 +78,6 @@ export class MapSeguidoresService {
   set toggleViewSelected(selected: number) {
     this._toggleViewSelected = selected;
     this.toggleViewSelected$.next(selected);
-  }
-
-  get layerSelected() {
-    return this._layerSelected;
-  }
-
-  set layerSelected(value: number) {
-    this._layerSelected = value;
-    this.layerSelected$.next(value);
   }
 
   get sliderOpacity() {

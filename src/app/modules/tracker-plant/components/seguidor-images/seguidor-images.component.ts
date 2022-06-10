@@ -71,7 +71,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
             // obtenemos imagen visual
             this.seguidoresControlService.getImageSeguidor('jpgVisual');
 
-            return this.seguidorViewService.toggleViewSelected$;
+            return this.seguidorViewService.seguidorViewSelected$;
           }),
           switchMap((view) => {
             this.viewSelected = view;

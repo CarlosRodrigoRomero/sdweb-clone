@@ -54,7 +54,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.viewReportService.toggleViewSelected$.subscribe((sel) => {
+      this.viewReportService.reportViewSelected$.subscribe((sel) => {
         this.viewSeleccionada = Number(sel);
 
         // cambiammos la ultima columna con la vista seleccionada

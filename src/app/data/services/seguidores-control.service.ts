@@ -92,7 +92,7 @@ export class SeguidoresControlService {
       this.getMaesMedioSigma();
       this.getCCsMedioSigma();
 
-      this.viewReportService.toggleViewSelected$.subscribe((viewSel) => {
+      this.viewReportService.reportViewSelected$.subscribe((viewSel) => {
         this.toggleViewSelected = viewSel;
 
         // reseteamos la interaccion con cada vista para obtener el estilo correcto
@@ -360,7 +360,6 @@ export class SeguidoresControlService {
 
             this.seguidorViewOpened = true;
 
-            console.log(this.zonesControlService.prevLayerHovered, this.olMapService.currentZoom);
             // ocultamos la capa de seguidores si hubiese alguna mostrandose
             if (
               this.zonesControlService.prevLayerHovered !== undefined &&

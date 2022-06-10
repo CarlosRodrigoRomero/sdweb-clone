@@ -46,7 +46,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
     this.subscriptions.add(
       combineLatest([
         this.seguidoresControlService.seguidorSelected$,
-        this.seguidorViewService.toggleViewSelected$,
+        this.seguidorViewService.seguidorViewSelected$,
       ]).subscribe(([seguidor, view]) => {
         this.seguidorSelected = seguidor;
         this.viewSelected = view;
