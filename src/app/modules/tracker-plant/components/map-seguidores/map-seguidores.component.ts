@@ -81,8 +81,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
 
     this.mousePosition = null;
 
-    this.subscriptions.add(this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers)));
-
     // ordenamos los informes por fecha
     this.informeIdList = this.informes.map((informe) => informe.id);
 
@@ -96,7 +94,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
           const smallZones = allZones[allZones.length - 1];
 
           this.informes.forEach((informe, index) => {
-            // creamos las capas de los seguidores para los diferentes informes
+            // creamos las capas de los seguidores para los diferentes informes o zonas
             this.seguidoresControlService
               .createSeguidorLayers(informe.id, smallZones)
               .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
@@ -132,6 +130,8 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
       });
 
     this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayers = layers)));
+
+    this.subscriptions.add(this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers)));
 
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))

@@ -19,6 +19,7 @@ import { GLOBAL } from '@data/constants/global';
 import { ImageProcessService } from './image-process.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { ZonesService } from '@data/services/zones.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
@@ -41,7 +42,8 @@ export class ImagesTilesService {
   constructor(
     private imageProcessService: ImageProcessService,
     private olMapService: OlMapService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private zonesService: ZonesService
   ) {
     this.olMapService.map$.subscribe((map) => (this.map = map));
   }
@@ -49,7 +51,7 @@ export class ImagesTilesService {
   checkImgsPlanosLoaded(): Promise<boolean> {
     return new Promise((loaded) => {
       this.imagesPlantaLoaded$.subscribe((value) => {
-        if (this.reportControlService.thereAreZones) {
+        if (this.zonesService.thereAreZones) {
           if (this.reportControlService.plantaFija) {
             if (value === 2) {
               loaded(true);

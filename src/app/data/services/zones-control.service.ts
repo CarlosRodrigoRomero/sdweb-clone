@@ -136,8 +136,6 @@ export class ZonesControlService {
 
     // añadimos acciones sobre las zonas
     this.addOnHoverAction();
-
-    // this.addClickOutFeatures();
   }
 
   private getPropertyView(

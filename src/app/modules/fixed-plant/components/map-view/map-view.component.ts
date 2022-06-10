@@ -9,6 +9,7 @@ import { StatsService } from '@data/services/stats.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ThermalService } from '@data/services/thermal.service';
 import { DownloadReportService } from '@data/services/download-report.service';
+import { ZonesService } from '@data/services/zones.service';
 
 @Component({
   selector: 'app-map-view',
@@ -41,7 +42,8 @@ export class MapViewComponent implements OnInit, OnDestroy {
     private statsService: StatsService,
     private olMapService: OlMapService,
     private thermalService: ThermalService,
-    private downloadReportService: DownloadReportService
+    private downloadReportService: DownloadReportService,
+    private zonesService: ZonesService
   ) {}
 
   ngOnInit(): void {
@@ -66,7 +68,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.subscriptions.add(this.reportControlService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
+    this.subscriptions.add(this.zonesService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
 
     this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
 

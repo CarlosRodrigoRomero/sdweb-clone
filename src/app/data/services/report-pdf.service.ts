@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { GLOBAL } from '@data/constants/global';
 import { ReportControlService } from './report-control.service';
+import { ZonesService } from './zones.service';
 
 import { Apartado, ApartadosInforme } from '@modules/shared-plants/components/download-pdf/pdf-structure';
 import { PlantaInterface } from '@core/models/planta';
@@ -19,7 +20,7 @@ export class ReportPdfService {
   informeConImagenes = false;
   incluirImagenes = false;
 
-  constructor(private reportControlService: ReportControlService) {}
+  constructor(private reportControlService: ReportControlService, private zonesService: ZonesService) {}
 
   loadApartadosInforme(planta: PlantaInterface, selectedInforme: InformeInterface) {
     this.apartadosInforme = [];
@@ -51,7 +52,7 @@ export class ReportPdfService {
         nombresApartados.push('anexoSegsNoAnoms');
       }
     } else {
-      if (this.reportControlService.thereAreZones) {
+      if (this.zonesService.thereAreZones) {
         nombresApartados.push('planoTermico');
       }
       // solo disponible para plantas con pocas anomalias
@@ -64,7 +65,7 @@ export class ReportPdfService {
     }
 
     // solo se añade el plano visual si hay zonas y es un informe de 2021 en adelante
-    if (this.reportControlService.thereAreZones && selectedInforme.fecha > GLOBAL.newReportsDate) {
+    if (this.zonesService.thereAreZones && selectedInforme.fecha > GLOBAL.newReportsDate) {
       nombresApartados.push('planoVisual');
     }
 

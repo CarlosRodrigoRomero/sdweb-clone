@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 
 import { WINDOW } from '../../window.providers';
 
-import { BehaviorSubject } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, from } from 'rxjs';
+import { flatMap, switchMap, take } from 'rxjs/operators';
 
 import { FilterService } from '@data/services/filter.service';
 import { ShareReportService } from '@data/services/share-report.service';
@@ -57,13 +57,12 @@ export class ReportControlService {
   private _allAnomalias: Anomalia[] = [];
   allAnomalias$ = new BehaviorSubject<Anomalia[]>(this._allAnomalias);
   public plantaFija = false;
-  private _thereAreZones = false;
-  public thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
   private _nombreGlobalCoords: string[] = [];
   private _numFixedGlobalCoords: number = 3;
   private _noAnomsReport = false;
   noAnomsReport$ = new BehaviorSubject<boolean>(this._noAnomsReport);
   private user: UserInterface;
+  private zones: LocationAreaInterface[] = [];
 
   constructor(
     private router: Router,
@@ -98,14 +97,19 @@ export class ReportControlService {
               switchMap((planta) => {
                 this.planta = planta;
 
-                return this.plantaService.getLocationsArea(this.plantaId);
+                // iniciamos el servicio de zonas
+                return from(this.zonesService.initService(this.planta));
+              }),
+              take(1),
+              switchMap(() => {
+                /*   return this.plantaService.getLocationsArea(this.plantaId);
               }),
               take(1),
               switchMap((locAreas) => {
-                const zones = this.zonesService.getZones(this.planta, locAreas);
-                if (zones.length > 0) {
+                this.zones = this.zonesService.getZones(this.planta, locAreas);
+                if (this.zones.length > 0) {
                   this.thereAreZones = true;
-                }
+                } */
 
                 if (this.authService.userIsAdmin(this.user)) {
                   return this.informeService.getInformesDePlanta(this.plantaId);
@@ -224,9 +228,9 @@ export class ReportControlService {
                       }),
                       take(1),
                       switchMap((locAreas) => {
-                        const zones = this.zonesService.getZones(this.planta, locAreas);
-                        if (zones.length > 0) {
-                          this.thereAreZones = true;
+                        this.zones = this.zonesService.getZones(this.planta, locAreas);
+                        if (this.zones.length > 0) {
+                          // this.thereAreZones = true;
                         }
 
                         return this.informeService.getInforme(this.selectedInformeId);
@@ -284,9 +288,9 @@ export class ReportControlService {
                       }),
                       take(1),
                       switchMap((locAreas) => {
-                        const zones = this.zonesService.getZones(this.planta, locAreas);
-                        if (zones.length > 0) {
-                          this.thereAreZones = true;
+                        this.zones = this.zonesService.getZones(this.planta, locAreas);
+                        if (this.zones.length > 0) {
+                          // this.thereAreZones = true;
                         }
 
                         return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
@@ -631,7 +635,6 @@ export class ReportControlService {
     this.mapLoaded = false;
     this.allFilterableElements = [];
     this.plantaFija = false;
-    this.thereAreZones = false;
     this.noAnomsReport = false;
     this.numFixedGlobalCoords = 3;
   }
@@ -728,15 +731,6 @@ export class ReportControlService {
   set allAnomalias(value: Anomalia[]) {
     this._allAnomalias = value;
     this.allAnomalias$.next(value);
-  }
-
-  get thereAreZones() {
-    return this._thereAreZones;
-  }
-
-  set thereAreZones(value: boolean) {
-    this._thereAreZones = value;
-    this.thereAreZones$.next(value);
   }
 
   get nombreGlobalCoords() {

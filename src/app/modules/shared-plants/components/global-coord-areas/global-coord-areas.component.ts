@@ -21,6 +21,7 @@ import { PlantaService } from '@data/services/planta.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { SeguidorService } from '@data/services/seguidor.service';
+import { ZonesService } from '@data/services/zones.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { PlantaInterface } from '@core/models/planta';
@@ -58,7 +59,8 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
     private plantaService: PlantaService,
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
-    private seguidorService: SeguidorService
+    private seguidorService: SeguidorService,
+    private zonesService: ZonesService
   ) {}
 
   ngOnInit(): void {
@@ -71,7 +73,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
           this.nombreGlobalCoords.push('Zona ' + letras[index]);
         }
       } else {
-        this.reportControlService.thereAreZones = false;
+        this.zonesService.thereAreZones = false;
       }
     } else {
       if (this.seguidorService.numGlobalCoords > 1) {
@@ -81,7 +83,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
           this.nombreGlobalCoords.push('Zona ' + letras[index]);
         }
       } else {
-        this.reportControlService.thereAreZones = false;
+        this.zonesService.thereAreZones = false;
       }
     }
 

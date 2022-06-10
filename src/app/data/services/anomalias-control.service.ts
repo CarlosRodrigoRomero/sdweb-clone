@@ -15,14 +15,18 @@ import SimpleGeometry from 'ol/geom/SimpleGeometry';
 import GeometryType from 'ol/geom/GeometryType';
 import { createBox } from 'ol/interaction/Draw';
 import { Coordinate } from 'ol/coordinate';
+import VectorSource from 'ol/source/Vector';
 
-import { GLOBAL } from '@data/constants/global';
 import { OlMapService } from '@data/services/ol-map.service';
 import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
+import { ZonesControlService } from '@data/services/zones-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
+import { LocationAreaInterface } from '@core/models/location';
+
+import { GLOBAL } from '@data/constants/global';
 
 @Injectable({
   providedIn: 'root',
@@ -49,7 +53,8 @@ export class AnomaliasControlService {
     private olMapService: OlMapService,
     private filterService: FilterService,
     private reportControlService: ReportControlService,
-    private anomaliaService: AnomaliaService
+    private anomaliaService: AnomaliaService,
+    private zonesControlService: ZonesControlService
   ) {}
 
   initService(): Observable<boolean> {
@@ -75,6 +80,27 @@ export class AnomaliasControlService {
     });
 
     return this.initialized$;
+  }
+
+  createAnomaliaLayers(informeId: string, zones?: LocationAreaInterface[]): VectorLayer[] {
+    const anomaliasLayers: VectorLayer[] = [];
+    if (zones !== undefined) {
+      zones.forEach((zone) => {
+        const zoneId = this.zonesControlService.getGlobalsLabel(zone.globalCoords);
+        const perdidasLayer = new VectorLayer({
+          source: new VectorSource({ wrapX: false }),
+          style: this.getStyleAnomaliasMapa(false),
+        });
+        perdidasLayer.setProperties({
+          informeId,
+          type: 'anomalias',
+          zoneId,
+        });
+        anomaliasLayers.push(perdidasLayer);
+      });
+    }
+
+    return anomaliasLayers;
   }
 
   public mostrarAnomalias() {

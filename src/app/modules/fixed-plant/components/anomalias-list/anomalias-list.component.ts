@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 
 import { GLOBAL } from '@data/constants/global';
 import { FilterService } from '@data/services/filter.service';
-import { AnomaliasControlService } from '../../services/anomalias-control.service';
+import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { PlantaService } from '@data/services/planta.service';

@@ -21,6 +21,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { FilterService } from '@data/services/filter.service';
 import { ZonesControlService } from '@data/services/zones-control.service';
 import { ViewReportService } from '@data/services/view-report.service';
+import { ZonesService } from '@data/services/zones.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { MathOperations } from '@core/classes/math-operations';
@@ -68,7 +69,8 @@ export class SeguidoresControlService {
     private filterService: FilterService,
     private storage: AngularFireStorage,
     private zonesControlService: ZonesControlService,
-    private viewReportService: ViewReportService
+    private viewReportService: ViewReportService,
+    private zonesService: ZonesService
   ) {}
 
   initService(): Promise<boolean> {
@@ -216,7 +218,7 @@ export class SeguidoresControlService {
       const seguidoresInforme = seguidores.filter((seguidor) => seguidor.informeId === l.getProperties().informeId);
       let seguidoresLayer = seguidoresInforme;
       // si hay zonas divimos los seguidores tb por zonas
-      if (this.reportControlService.thereAreZones) {
+      if (this.zonesService.thereAreZones) {
         seguidoresLayer = this.zonesControlService.getElemsZona(
           l.getProperties().zone,
           seguidoresInforme
@@ -242,7 +244,7 @@ export class SeguidoresControlService {
           },
         });
 
-        if (this.reportControlService.thereAreZones) {
+        if (this.zonesService.thereAreZones) {
           const properties = feature.getProperties().properties;
           properties.zone = l.getProperties().zone;
           feature.setProperties({

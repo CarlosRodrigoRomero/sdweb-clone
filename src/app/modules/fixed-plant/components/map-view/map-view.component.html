@@ -62,9 +62,9 @@
               <!-- CONTROLES VISUALES -->
               <div class="visual-control">
                 <app-thermal-slider [informeId]="selectedInformeId"></app-thermal-slider>
-                <app-global-coord-areas *ngIf="thereAreZones"></app-global-coord-areas>
+                <!-- <app-global-coord-areas *ngIf="thereAreZones"></app-global-coord-areas> -->
                 <app-slider-opacity></app-slider-opacity>
-                <app-zones></app-zones>
+                <app-zones *ngIf="thereAreZones"></app-zones>
               </div>
             </div>
           </div>

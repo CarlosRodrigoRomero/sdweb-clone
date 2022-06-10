@@ -32,6 +32,7 @@ import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 import { ImagesLoadService } from '../../services/images-load.service';
 import { ImagesTilesService } from '../../services/images-tiles.service';
 import { ReportPdfService } from '@data/services/report-pdf.service';
+import { ZonesService } from '@data/services/zones.service';
 
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
 import { Translation } from '@shared/utils/translations/translations';
@@ -142,7 +143,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     private anomaliaInfoService: AnomaliaInfoService,
     private imagesLoadService: ImagesLoadService,
     private imagesTilesService: ImagesTilesService,
-    private reportPdfService: ReportPdfService
+    private reportPdfService: ReportPdfService,
+    private zonesService: ZonesService
   ) {}
 
   ngOnInit(): void {
@@ -421,7 +423,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     // cargamos imagenes que cambian con cada informe
     this.imagesLoadService.loadChangingImages(this.selectedInforme.id);
 
-    if (this.reportControlService.thereAreZones) {
+    if (this.zonesService.thereAreZones) {
       // reseteamos el contador de planos cargados en cada descarga
       this.imagesTilesService.imagesPlantaLoaded = 0;
       // cargamos las orto termica y visual de la planta
@@ -3778,7 +3780,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     for (let i = 1; i <= this.alturaMax; i++) {
       const arrayFila = [];
       arrayFila.push({
-        text: 'Fila ' + this.anomaliaInfoService.getAltura( i, this.planta).toString(),
+        text: 'Fila ' + this.anomaliaInfoService.getAltura(i, this.planta).toString(),
         style: 'tableHeaderBlue',
       });
 

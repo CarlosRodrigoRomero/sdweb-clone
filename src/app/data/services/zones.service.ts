@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 
+import { take } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
+
 import PointInPolygon from 'point-in-polygon';
+
+import { PlantaService } from './planta.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { PlantaInterface } from '@core/models/planta';
@@ -9,7 +14,29 @@ import { PlantaInterface } from '@core/models/planta';
   providedIn: 'root',
 })
 export class ZonesService {
-  constructor() {}
+  locAreas: LocationAreaInterface[] = [];
+  zones: LocationAreaInterface[] = [];
+  private _thereAreZones = false;
+  thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
+
+  constructor(private plantaService: PlantaService) {}
+
+  initService(planta: PlantaInterface): Promise<boolean> {
+    return new Promise((initService) => {
+      this.plantaService
+        .getLocationsArea(planta.id)
+        .pipe(take(1))
+        .subscribe((locAreas) => {
+          this.locAreas = locAreas;
+          this.zones = this.getZones(planta, locAreas);
+          if (this.zones.length > 0) {
+            this.thereAreZones = true;
+          }
+
+          initService(true);
+        });
+    });
+  }
 
   getZones(planta: PlantaInterface, locAreas: LocationAreaInterface[]): LocationAreaInterface[] {
     // obtenemos las areas descartando las que no tienen globals, que son las de los modulos
@@ -127,5 +154,14 @@ export class ZonesService {
     });
 
     return [sumLat / locArea.path.length, sumLong / locArea.path.length];
+  }
+
+  get thereAreZones(): boolean {
+    return this._thereAreZones;
+  }
+
+  set thereAreZones(value: boolean) {
+    this._thereAreZones = value;
+    this.thereAreZones$.next(value);
   }
 }
