@@ -63,17 +63,36 @@ export class ZonesControlService {
     });
   }
 
-  createZonasLayers(informeId: string): VectorLayer {
+  createZonasLayers(informeId: string): VectorLayer[] {
     const maeLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleMae(false),
+      visible: true,
     });
     maeLayer.setProperties({
       informeId,
       view: 0,
     });
+    const ccLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleCelsCalientes(false),
+      visible: false,
+    });
+    ccLayer.setProperties({
+      informeId,
+      view: 1,
+    });
+    const gradLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleGradienteNormMax(false),
+      visible: false,
+    });
+    gradLayer.setProperties({
+      informeId,
+      view: 2,
+    });
 
-    return maeLayer;
+    return [maeLayer, ccLayer, gradLayer];
   }
 
   mostrarZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
@@ -85,25 +104,21 @@ export class ZonesControlService {
   private addZonas(zonas: LocationAreaInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
+      const view = l.getProperties().view;
       const informeId = l.getProperties().informeId;
       const elemsInforme = this.reportControlService.allFilterableElements.filter(
         (elem) => elem.informeId === informeId
       );
-      const elemsFiltered = elems.filter((elem) => elem.informeId === informeId);
+      const elemsFilteredInforme = elems.filter((elem) => elem.informeId === informeId);
       const source = l.getSource();
       source.clear();
       zonas.forEach((zona) => {
-        const elemsFilteredZona = this.getElemsZona(zona, elemsFiltered);
+        const elemsFilteredZona = this.getElemsZona(zona, elemsFilteredInforme);
         // si no hay seguidores dentro de la zona no la añadimos
         if (elemsFilteredZona.length > 0) {
           const allElemsZona = this.getElemsZona(zona, elemsInforme);
-          // para anomalías enviamos el numero de zonas para calcular el MAE
-          let mae = 0;
-          if (this.reportControlService.plantaFija) {
-            mae = this.getMaeZona(allElemsZona, informeId, elemsInforme.length);
-          } else {
-            mae = this.getMaeZona(allElemsZona, informeId);
-          }
+          const property = this.getPropertyView(view, informeId, elemsInforme, allElemsZona);
+
           const coords = this.pathToLonLat(zona.path);
           // crea poligono seguidor
           const feature = new Feature({
@@ -112,8 +127,8 @@ export class ZonesControlService {
               id: this.getGlobalsLabel(zona.globalCoords),
               informeId,
               centroid: this.olMapService.getCentroid(coords[0]),
-              mae,
               type: 'zone',
+              [property.type]: property.value,
             },
           });
           source.addFeature(feature);
@@ -123,9 +138,39 @@ export class ZonesControlService {
 
     // añadimos acciones sobre las zonas
     this.addOnHoverAction();
-    // this.addSelectInteraction();
 
     // this.addClickOutFeatures();
+  }
+
+  private getPropertyView(
+    view: number,
+    informeId: string,
+    elemsInforme: FilterableElement[],
+    elemsZona: FilterableElement[]
+  ): any {
+    switch (view) {
+      case 0:
+        let mae = 0;
+        // para anomalías enviamos el numero de zonas para calcular el MAE
+        if (this.reportControlService.plantaFija) {
+          mae = this.getMaeZona(elemsZona, informeId, elemsInforme.length);
+        } else {
+          mae = this.getMaeZona(elemsZona, informeId);
+        }
+        return { type: 'mae', value: mae };
+      case 1:
+        let celsCalientes = 0;
+        // para anomalías enviamos el numero de zonas para calcular el CC
+        if (this.reportControlService.plantaFija) {
+          celsCalientes = this.getCCZona(elemsZona, informeId, elemsInforme.length);
+        } else {
+          celsCalientes = this.getCCZona(elemsZona, informeId);
+        }
+        return { type: 'celsCalientes', value: celsCalientes };
+      case 2:
+        const grad = this.getGradNormMaxZona(elemsZona);
+        return { type: 'gradienteNormalizado', value: grad };
+    }
   }
 
   getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]) {
@@ -159,6 +204,47 @@ export class ZonesControlService {
     }
 
     return mae;
+  }
+
+  private getCCZona(elems: FilterableElement[], informeId: string, numZonas?: number): number {
+    const informe = this.reportControlService.informes.find((inf) => inf.id === informeId);
+    let cc = 0;
+    if (numZonas) {
+      const anomaliasZona = elems as Anomalia[];
+      if (anomaliasZona.length > 0) {
+        const celsCalientes = anomaliasZona.filter((anom) => anom.tipo === 8 || anom.tipo === 9);
+
+        // suponemos zonas iguales para dar un valor aproximado
+        cc = celsCalientes.length / (informe.numeroModulos / numZonas);
+      }
+    } else {
+      const seguidoresZona = elems as Seguidor[];
+      seguidoresZona.forEach((seg) => (cc = cc + seg.celsCalientes));
+      cc = cc / seguidoresZona.length;
+    }
+
+    return cc;
+  }
+
+  private getGradNormMaxZona(elems: FilterableElement[]): number {
+    let gradNormMax = 0;
+    if (this.reportControlService.plantaFija) {
+      const anomaliasZona = elems as Anomalia[];
+      if (anomaliasZona.length > 0) {
+        const gradientes = anomaliasZona.map((anom) => anom.gradienteNormalizado);
+
+        // devolvemos el gradiente normalizado máximo en la zona
+        gradNormMax = Math.max(...gradientes);
+      }
+    } else {
+      const seguidoresZona = elems as Seguidor[];
+      const gradientes = seguidoresZona.map((seg) => seg.gradienteNormalizado);
+
+      // devolvemos el gradiente normalizado máximo en la zona
+      gradNormMax = Math.max(...gradientes);
+    }
+
+    return gradNormMax;
   }
 
   private addOnHoverAction() {
@@ -234,37 +320,6 @@ export class ZonesControlService {
     });
   }
 
-  private addSelectInteraction() {
-    const select = new Select({
-      // style: this.getStyleSeguidores(),
-      condition: click,
-      layers: (l) => {
-        if (
-          l.getProperties().informeId === this.selectedInformeId &&
-          // tslint:disable-next-line: triple-equals
-          // l.getProperties().view == this.toggleViewSelected &&
-          !l.getProperties().hasOwnProperty('zone')
-        ) {
-          return true;
-        } else {
-          return false;
-        }
-      },
-    });
-
-    this.map.addInteraction(select);
-    select.on('select', (e) => {
-      if (e.selected.length > 0) {
-        if (e.selected[0].getProperties().hasOwnProperty('properties')) {
-          const center = e.selected[0].getProperties().properties.centroid;
-
-          this.olMapService.setViewCenter(center);
-          this.olMapService.setViewZoom(19);
-        }
-      }
-    });
-  }
-
   private pathToLonLat(path: any): Coordinate[][] {
     return [path.map((coords) => fromLonLat([coords.lng, coords.lat]))];
   }
@@ -305,6 +360,64 @@ export class ZonesControlService {
       return GLOBAL.colores_mae_rgb[1].replace(',1)', ',' + opacity + ')');
     } else {
       return GLOBAL.colores_mae_rgb[2].replace(',1)', ',' + opacity + ')');
+    }
+  }
+
+  // ESTILOS CELS CALIENTES
+  private getStyleCelsCalientes(focused) {
+    return (feature) => {
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        return new Style({
+          stroke: new Stroke({
+            color: focused ? 'white' : this.getColorCelsCalientes(feature, 1),
+            width: focused ? 6 : 4,
+          }),
+          fill: new Fill({
+            color: focused ? 'white' : this.getColorCelsCalientes(feature, 0.1),
+          }),
+        });
+      }
+    };
+  }
+
+  private getColorCelsCalientes(feature: Feature, opacity: number) {
+    const celsCalientes = feature.getProperties().properties.celsCalientes;
+
+    if (celsCalientes < 0.02) {
+      return GLOBAL.colores_mae_rgb[0].replace(',1)', ',' + opacity + ')');
+    } else if (celsCalientes < 0.1) {
+      return GLOBAL.colores_mae_rgb[1].replace(',1)', ',' + opacity + ')');
+    } else {
+      return GLOBAL.colores_mae_rgb[2].replace(',1)', ',' + opacity + ')');
+    }
+  }
+
+  // ESTILOS GRADIENTE NORMALIZADO MAX
+  private getStyleGradienteNormMax(focused) {
+    return (feature) => {
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        return new Style({
+          stroke: new Stroke({
+            color: focused ? 'white' : this.getColorGradienteNormMax(feature, 1),
+            width: focused ? 6 : 4,
+          }),
+          fill: new Fill({
+            color: focused ? 'white' : this.getColorGradienteNormMax(feature, 0.1),
+          }),
+        });
+      }
+    };
+  }
+
+  private getColorGradienteNormMax(feature: Feature, opacity: number) {
+    const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
+
+    if (gradNormMax < 10) {
+      return GLOBAL.colores_grad_rgb[0].replace(',1)', ',' + opacity + ')');
+    } else if (gradNormMax < 40) {
+      return GLOBAL.colores_grad_rgb[1].replace(',1)', ',' + opacity + ')');
+    } else {
+      return GLOBAL.colores_grad_rgb[2].replace(',1)', ',' + opacity + ')');
     }
   }
 }

@@ -58,7 +58,7 @@ export class ZonesComponent implements OnInit, OnDestroy {
 
     // creamos las capas de zonas para los diferentes informes
     this.reportControlService.informes.forEach((informe) => {
-      this.olMapService.addZonesLayer(this.zonesControlService.createZonasLayers(informe.id));
+      this.zonesControlService.createZonasLayers(informe.id).forEach((layer) => this.olMapService.addZoneLayer(layer));
     });
 
     this.olMapService.map$.subscribe((map) => {

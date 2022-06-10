@@ -98,7 +98,7 @@ export class OlMapService {
     this.seguidorLayers$.next(this.seguidorLayers);
   }
 
-  addZonesLayer(layer: VectorLayer) {
+  addZoneLayer(layer: VectorLayer) {
     this._zonasLayers.push(layer);
     this.zonasLayers$.next(this._zonasLayers);
   }
