@@ -29,7 +29,7 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
   recalMAEyCC() {
     if (this.reportControlService.plantaFija) {
       const anomaliasInforme = this.reportControlService.allAnomalias.filter(
-        (anom) => anom.informeId === this.selectedInforme
+        (anom) => anom.informeId === this.selectedInforme.id
       );
       this.reportControlService.setMaeInformeFija(anomaliasInforme, this.selectedInforme);
       this.reportControlService.setCCInformeFija(anomaliasInforme, this.selectedInforme);
