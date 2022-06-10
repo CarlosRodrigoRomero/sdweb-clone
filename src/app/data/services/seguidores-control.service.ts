@@ -104,7 +104,7 @@ export class SeguidoresControlService {
   }
 
   createSeguidorLayers(informeId: string, zones?: LocationAreaInterface[]): VectorLayer[] {
-    let seguidoresLayers: VectorLayer[] = [];
+    const seguidoresLayers: VectorLayer[] = [];
     if (zones !== undefined) {
       zones.forEach((zone) => {
         const zoneId = this.zonesControlService.getGlobalsLabel(zone.globalCoords);

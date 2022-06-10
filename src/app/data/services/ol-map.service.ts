@@ -98,6 +98,11 @@ export class OlMapService {
     this.seguidorLayers$.next(this.seguidorLayers);
   }
 
+  addZonesLayer(layer: VectorLayer) {
+    this._zonasLayers.push(layer);
+    this.zonasLayers$.next(this._zonasLayers);
+  }
+
   getSeguidorLayers() {
     return this.seguidorLayers$.asObservable();
   }
@@ -126,7 +131,8 @@ export class OlMapService {
       informeId,
     });
 
-    this.aerialLayers.push(aerialLayer);
+    this._aerialLayers.push(aerialLayer);
+    this.aerialLayers$.next(this._aerialLayers);
   }
 
   latLonLiteralToLonLat(path: LatLngLiteral[]) {
@@ -214,6 +220,7 @@ export class OlMapService {
     this.aerialLayers = [];
     this.anomaliaLayers = [];
     this.seguidorLayers = [];
+    this.zonasLayers = [];
     this.incrementoLayers = [];
     this.currentZoom = 17;
   }

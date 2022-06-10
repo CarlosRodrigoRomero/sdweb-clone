@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
@@ -20,7 +20,7 @@ import { LocationAreaInterface } from '@core/models/location';
   templateUrl: './zones.component.html',
   styleUrls: ['./zones.component.css'],
 })
-export class ZonesComponent implements OnInit {
+export class ZonesComponent implements OnInit, OnDestroy {
   private zones: LocationAreaInterface[][] = [];
   private zonesLayers: VectorLayer[];
   private seguidorLayers: VectorLayer[];
@@ -54,15 +54,11 @@ export class ZonesComponent implements OnInit {
         });
       });
 
-    this.subscriptions.add(
-      this.olMapService.zonasLayers$.subscribe((layers) => {
-        this.zonesLayers = layers;
-      })
-    );
+    this.subscriptions.add(this.olMapService.zonasLayers$.subscribe((layers) => (this.zonesLayers = layers)));
 
     // creamos las capas de zonas para los diferentes informes
     this.reportControlService.informes.forEach((informe) => {
-      this.olMapService.zonasLayers.push(this.zonesControlService.createZonasLayers(informe.id));
+      this.olMapService.addZonesLayer(this.zonesControlService.createZonasLayers(informe.id));
     });
 
     this.olMapService.map$.subscribe((map) => {
@@ -115,5 +111,9 @@ export class ZonesComponent implements OnInit {
     );
 
     this.subscriptions.add(this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers)));
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

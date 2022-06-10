@@ -19,6 +19,7 @@ import { ZonesControlService } from '@data/services/zones-control.service';
 export class ViewControlComponent implements OnInit, OnDestroy {
   private aerialLayers: TileLayer[];
   private seguidorLayers: VectorLayer[];
+  private zonesLayers: VectorLayer[];
   public selectedInformeId: string;
   private reportViewSelected: number;
   private currentZoom: number;
@@ -40,12 +41,15 @@ export class ViewControlComponent implements OnInit, OnDestroy {
       .pipe(take(1))
       .subscribe((layers) => (this.seguidorLayers = layers));
 
+    this.olMapService.zonasLayers$.pipe(take(1)).subscribe((layers) => (this.zonesLayers = layers));
+
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {
         this.selectedInformeId = informeId;
 
-        this.setAerialLayersOpacity(this.selectedInformeId);
-        this.setSeguidorLayersOpacity(this.selectedInformeId);
+        this.setAerialLayersVisibility(this.selectedInformeId);
+        this.setSeguidorLayersVisibility(this.selectedInformeId);
+        this.setZonesLayersVisibility(this.selectedInformeId);
       })
     );
 
@@ -53,15 +57,16 @@ export class ViewControlComponent implements OnInit, OnDestroy {
       this.viewReportService.reportViewSelected$.subscribe((view) => {
         this.reportViewSelected = view;
 
-        this.setAerialLayersOpacity(this.selectedInformeId);
-        this.setSeguidorLayersOpacity(this.selectedInformeId);
+        this.setAerialLayersVisibility(this.selectedInformeId);
+        this.setSeguidorLayersVisibility(this.selectedInformeId);
+        this.setZonesLayersVisibility(this.selectedInformeId);
       })
     );
 
     this.subscriptions.add(this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom)));
   }
 
-  private setAerialLayersOpacity(informeId: string) {
+  private setAerialLayersVisibility(informeId: string) {
     this.aerialLayers.forEach((layer) => {
       if (layer.getProperties().informeId === informeId) {
         layer.setVisible(true);
@@ -71,13 +76,23 @@ export class ViewControlComponent implements OnInit, OnDestroy {
     });
   }
 
-  private setSeguidorLayersOpacity(informeId: string) {
+  private setSeguidorLayersVisibility(informeId: string) {
     this.seguidorLayers.forEach((layer) => {
       if (
         layer.getProperties().informeId === informeId &&
         layer.getProperties().view === this.reportViewSelected &&
         this.currentZoom >= this.zonesControlService.zoomChangeView
       ) {
+        layer.setVisible(true);
+      } else {
+        layer.setVisible(false);
+      }
+    });
+  }
+
+  private setZonesLayersVisibility(informeId: string) {
+    this.zonesLayers.forEach((layer) => {
+      if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
         layer.setVisible(true);
       } else {
         layer.setVisible(false);

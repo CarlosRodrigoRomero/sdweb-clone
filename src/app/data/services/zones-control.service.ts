@@ -78,8 +78,7 @@ export class ZonesControlService {
 
   mostrarZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
     this.filterService.filteredElements$.subscribe((elems) => {
-      const elemsReport = elems.filter((elem) => elem.informeId === this.selectedInformeId);
-      this.addZonas(zonas, layers, elemsReport);
+      this.addZonas(zonas, layers, elems);
     });
   }
 
