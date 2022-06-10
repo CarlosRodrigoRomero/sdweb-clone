@@ -16,7 +16,6 @@
   bottom: 10px;
   display: grid;
   grid-template-columns: 100%;
-  gap: 1rem;
   left: 50%;
   transform: translate(-50%, 0%);
 }

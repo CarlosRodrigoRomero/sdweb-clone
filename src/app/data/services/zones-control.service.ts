@@ -6,10 +6,8 @@ import Polygon from 'ol/geom/Polygon';
 import VectorLayer from 'ol/layer/Vector';
 import { fromLonLat } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
-import { Fill, Stroke, Style } from 'ol/style';
-import Select from 'ol/interaction/Select';
+import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Map } from 'ol';
-import { click } from 'ol/events/condition';
 
 import { OlMapService } from './ol-map.service';
 import { FilterService } from './filter.service';
@@ -66,7 +64,7 @@ export class ZonesControlService {
   createZonasLayers(informeId: string): VectorLayer[] {
     const maeLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleMae(false),
+      style: this.getStyleMae(),
       visible: true,
     });
     maeLayer.setProperties({
@@ -75,7 +73,7 @@ export class ZonesControlService {
     });
     const ccLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleCelsCalientes(false),
+      style: this.getStyleCelsCalientes(),
       visible: false,
     });
     ccLayer.setProperties({
@@ -84,7 +82,7 @@ export class ZonesControlService {
     });
     const gradLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleGradienteNormMax(false),
+      style: this.getStyleGradienteNormMax(),
       visible: false,
     });
     gradLayer.setProperties({
@@ -248,18 +246,6 @@ export class ZonesControlService {
   }
 
   private addOnHoverAction() {
-    let currentFeatureHover;
-    const estilosViewFocused = [
-      this.getStyleMae(true),
-      // this.getStyleSeguidoresCelsCalientes(true),
-      // this.getStyleSeguidoresGradienteNormMax(true),
-    ];
-    const estilosViewUnfocused = [
-      this.getStyleMae(false),
-      // this.getStyleSeguidoresCelsCalientes(false),
-      // this.getStyleSeguidoresGradienteNormMax(false),
-    ];
-
     this.map.on('pointermove', (event) => {
       if (this.currentZoom < this.zoomChangeView) {
         if (this.map.hasFeatureAtPixel(event.pixel)) {
@@ -268,7 +254,6 @@ export class ZonesControlService {
             .filter((item) => item.getProperties().properties !== undefined)
             .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
             .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
-          // .filter((item) => item.getProperties().properties.view === this.toggleViewSelected);
 
           if (feature !== undefined) {
             if (this.reportControlService.plantaFija) {
@@ -288,33 +273,10 @@ export class ZonesControlService {
               this.prevLayerHovered = this.currentLayerHovered;
             }
           }
-
-          // if (feature !== undefined) {
-          //   // cuando pasamos de un seguidor a otro directamente sin pasar por vacio
-          //   if (this.prevFeatureHover !== undefined) {
-          //     this.prevFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
-          //   }
-          //   currentFeatureHover = feature;
-
-          //   const seguidorId = feature.getProperties().properties.seguidorId;
-          //   const seguidor = this.listaSeguidores.filter((seg) => seg.id === seguidorId)[0];
-
-          //   feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
-
-          //   if (this.selectedInformeId === seguidor.informeId) {
-          //     this.seguidorHovered = seguidor;
-          //   }
-          //   this.prevFeatureHover = feature;
-          // }
         } else {
           if (this.currentLayerHovered !== undefined) {
             this.currentLayerHovered.setVisible(false);
           }
-          // this.seguidorHovered = undefined;
-          // if (currentFeatureHover !== undefined) {
-          //   currentFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
-          //   currentFeatureHover = undefined;
-          // }
         }
       }
     });
@@ -335,17 +297,18 @@ export class ZonesControlService {
   }
 
   // ESTILOS MAE
-  private getStyleMae(focused: boolean) {
+  private getStyleMae() {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focused ? 'white' : this.getColorMae(feature, 1),
-            width: focused ? 6 : 4,
+            color: this.getColorMae(feature, 1),
+            width: 4,
           }),
           fill: new Fill({
-            color: focused ? 'white' : this.getColorMae(feature, 0.1),
+            color: this.getColorMae(feature, 0.1),
           }),
+          text: this.getLabelStyle(feature),
         });
       }
     };
@@ -364,17 +327,18 @@ export class ZonesControlService {
   }
 
   // ESTILOS CELS CALIENTES
-  private getStyleCelsCalientes(focused) {
+  private getStyleCelsCalientes() {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focused ? 'white' : this.getColorCelsCalientes(feature, 1),
-            width: focused ? 6 : 4,
+            color: this.getColorCelsCalientes(feature, 1),
+            width: 4,
           }),
           fill: new Fill({
-            color: focused ? 'white' : this.getColorCelsCalientes(feature, 0.1),
+            color: this.getColorCelsCalientes(feature, 0.1),
           }),
+          text: this.getLabelStyle(feature),
         });
       }
     };
@@ -393,17 +357,18 @@ export class ZonesControlService {
   }
 
   // ESTILOS GRADIENTE NORMALIZADO MAX
-  private getStyleGradienteNormMax(focused) {
+  private getStyleGradienteNormMax() {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focused ? 'white' : this.getColorGradienteNormMax(feature, 1),
-            width: focused ? 6 : 4,
+            color: this.getColorGradienteNormMax(feature, 1),
+            width: 4,
           }),
           fill: new Fill({
-            color: focused ? 'white' : this.getColorGradienteNormMax(feature, 0.1),
+            color: this.getColorGradienteNormMax(feature, 0.1),
           }),
+          text: this.getLabelStyle(feature),
         });
       }
     };
@@ -419,5 +384,19 @@ export class ZonesControlService {
     } else {
       return GLOBAL.colores_grad_rgb[2].replace(',1)', ',' + opacity + ')');
     }
+  }
+
+  private getLabelStyle(feature: Feature) {
+    return new Text({
+      text: feature.getProperties().properties.id,
+      font: 'bold 14px Roboto',
+      fill: new Fill({
+        color: 'black',
+      }),
+      stroke: new Stroke({
+        color: 'white',
+        width: 4,
+      }),
+    });
   }
 }
