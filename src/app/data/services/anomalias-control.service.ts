@@ -135,7 +135,7 @@ export class AnomaliasControlService {
       // filtra las anomalías correspondientes al informe
       const anomaliasInforme = anomalias.filter((item) => item.informeId === l.getProperties().informeId);
       let anomaliasLayer = anomaliasInforme;
-      // si hay zonas divimos los seguidores tb por zonas
+      // si hay zonas divimos las anomalias tb por zonas
       if (this.zonesService.thereAreZones) {
         anomaliasLayer = this.zonesControlService.getElemsZona(l.getProperties().zone, anomaliasInforme) as Anomalia[];
       }

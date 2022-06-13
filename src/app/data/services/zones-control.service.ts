@@ -183,7 +183,9 @@ export class ZonesControlService {
   getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]) {
     const labelZona = this.getGlobalsLabel(zona.globalCoords);
 
-    return elems.filter((elem) => this.getGlobalsLabel(elem.globalCoords, false) === labelZona);
+    return elems.filter(
+      (elem) => this.getGlobalsLabel(elem.globalCoords, this.reportControlService.plantaFija) === labelZona
+    );
   }
 
   private getMaeZona(elems: FilterableElement[], informeId: string, numZonas?: number): number {
@@ -303,7 +305,7 @@ export class ZonesControlService {
     });
 
     // si la planta es de seguidores quitamos el último elemento
-    if (plantaFija === false) {
+    if (plantaFija !== undefined && plantaFija === false) {
       gCoords.pop();
     }
 

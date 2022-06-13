@@ -284,10 +284,7 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private addZoomEvent() {
-    this.map.on('moveend', (event) => {
-      console.log(this.map.getView().getZoom());
-      this.olMapService.currentZoom = this.map.getView().getZoom();
-    });
+    this.map.on('moveend', (event) => (this.olMapService.currentZoom = this.map.getView().getZoom()));
   }
 
   private transform(extent) {
