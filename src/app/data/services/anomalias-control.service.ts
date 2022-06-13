@@ -98,7 +98,8 @@ export class AnomaliasControlService {
         const zoneId = this.zonesControlService.getGlobalsLabel(zone.globalCoords);
         const perdidasLayer = new VectorLayer({
           source: new VectorSource({ wrapX: false }),
-          style: this.getStyleAnomaliasMapa(false),
+          style: this.getStylePerdidas(false),
+          // style: this.getStyleAnomaliasMapa(false),
           visible: false,
         });
         perdidasLayer.setProperties({
@@ -155,6 +156,7 @@ export class AnomaliasControlService {
             anomaliaId: anom.id,
             tipo: anom.tipo,
             informeId: anom.informeId,
+            perdidas: anom.perdidas,
           },
         });
 
@@ -232,14 +234,14 @@ export class AnomaliasControlService {
           if (feature !== undefined) {
             // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
             if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
-              this.prevFeatureHover.setStyle(this.getStyleAnomaliasMapa(false));
+              this.prevFeatureHover.setStyle(this.getStylePerdidas(false));
             }
             currentFeatureHover = feature;
 
             const anomaliaId = feature.getProperties().properties.anomaliaId;
             const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
 
-            feature.setStyle(this.getStyleAnomaliasMapa(true));
+            feature.setStyle(this.getStylePerdidas(true));
 
             if (this.selectedInformeId === anomalia.informeId) {
               this.anomaliaHover = anomalia;
@@ -250,7 +252,7 @@ export class AnomaliasControlService {
           this.anomaliaHover = undefined;
 
           if (currentFeatureHover !== undefined) {
-            currentFeatureHover.setStyle(this.getStyleAnomaliasMapa(false));
+            currentFeatureHover.setStyle(this.getStylePerdidas(false));
             currentFeatureHover = undefined;
           }
         }
@@ -260,7 +262,7 @@ export class AnomaliasControlService {
 
   private addSelectInteraction() {
     const select = new Select({
-      style: this.getStyleAnomaliasMapa(true),
+      style: this.getStylePerdidas(true),
       condition: click,
       layers: (l) => {
         if (l.getProperties().informeId === this.selectedInformeId) {
@@ -379,6 +381,34 @@ export class AnomaliasControlService {
   set anomaliaHover(value: Anomalia) {
     this._anomaliaHover = value;
     this.anomaliaHover$.next(value);
+  }
+
+  private getStylePerdidas(focused: boolean) {
+    return (feature) => {
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        return new Style({
+          stroke: new Stroke({
+            color: focused ? 'white' : this.getColorMae(feature),
+            width: focused ? 6 : 4,
+          }),
+          fill: new Fill({
+            color: 'rgba(255,255,255, 0)',
+          }),
+        });
+      }
+    };
+  }
+
+  private getColorMae(feature: Feature) {
+    const perdidas = feature.getProperties().properties.perdidas as number;
+
+    if (perdidas < 0.3) {
+      return GLOBAL.colores_mae[0];
+    } else if (perdidas < 0.5) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
   }
 
   public getStyleAnomaliasMapa(selected = false) {
