@@ -203,7 +203,7 @@ export class SeguidoresControlService {
         this.prevSeguidorSelected = undefined;
         this.seguidorSelected = undefined;
       } else {
-        // Dibujamos seguidores solo del informe seleccionado
+        // Dibujamos seguidores solo del informe compartido
         const segsFiltered = seguidores.filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId);
         this.dibujarSeguidores(segsFiltered as Seguidor[]);
         this.listaSeguidores = seguidores as Seguidor[];

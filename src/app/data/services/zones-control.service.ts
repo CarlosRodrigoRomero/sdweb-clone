@@ -30,6 +30,7 @@ export class ZonesControlService {
   zoomChangeView = 19;
   private selectedInformeId: string;
   private toggleViewSelected: number;
+  private anomaliasLayers: VectorLayer[];
   private seguidoresLayers: VectorLayer[];
   private currentLayerHovered: VectorLayer;
   prevLayerHovered: VectorLayer;
@@ -50,10 +51,17 @@ export class ZonesControlService {
 
       this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
 
-      this.olMapService
-        .getSeguidorLayers()
-        .pipe(take(1))
-        .subscribe((layers) => (this.seguidoresLayers = layers));
+      if (this.reportControlService.plantaFija) {
+        this.olMapService
+          .getAnomaliaLayers()
+          .pipe(take(1))
+          .subscribe((layers) => (this.anomaliasLayers = layers));
+      } else {
+        this.olMapService
+          .getSeguidorLayers()
+          .pipe(take(1))
+          .subscribe((layers) => (this.seguidoresLayers = layers));
+      }
 
       this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom));
 
@@ -65,7 +73,7 @@ export class ZonesControlService {
     const maeLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleMae(),
-      visible: true,
+      visible: false,
     });
     maeLayer.setProperties({
       informeId,
@@ -170,14 +178,9 @@ export class ZonesControlService {
   }
 
   getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]) {
-    let elemsZona: FilterableElement[] = [];
-    zona.globalCoords.forEach((gC, index) => {
-      if (gC !== null) {
-        elemsZona = elems.filter((elem) => elem.globalCoords[index] === gC);
-      }
-    });
+    const labelZona = this.getGlobalsLabel(zona.globalCoords);
 
-    return elemsZona;
+    return elems.filter((elem) => this.getGlobalsLabel(elem.globalCoords) === labelZona);
   }
 
   private getMaeZona(elems: FilterableElement[], informeId: string, numZonas?: number): number {

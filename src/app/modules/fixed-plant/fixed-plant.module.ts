@@ -16,18 +16,10 @@ import { AnomaliasListComponent } from './components/anomalias-list/anomalias-li
 import { MapComponent } from './components/map/map.component';
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.component';
-import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
 
 @NgModule({
-  declarations: [
-    MapViewComponent,
-    AnomaliaInfoComponent,
-    AnomaliasListComponent,
-    MapComponent,
-    SliderTemporalComponent,
-    SliderOpacityComponent,
-  ],
+  declarations: [MapViewComponent, AnomaliaInfoComponent, AnomaliasListComponent, MapComponent, SliderOpacityComponent],
   imports: [
     PlantaFijaRoutingModule,
     NgApexchartsModule,

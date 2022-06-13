@@ -22,6 +22,7 @@ import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { ZonesControlService } from '@data/services/zones-control.service';
+import { ZonesService } from './zones.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
@@ -54,7 +55,8 @@ export class AnomaliasControlService {
     private filterService: FilterService,
     private reportControlService: ReportControlService,
     private anomaliaService: AnomaliaService,
-    private zonesControlService: ZonesControlService
+    private zonesControlService: ZonesControlService,
+    private zonesService: ZonesService
   ) {}
 
   initService(): Observable<boolean> {
@@ -90,11 +92,14 @@ export class AnomaliasControlService {
         const perdidasLayer = new VectorLayer({
           source: new VectorSource({ wrapX: false }),
           style: this.getStyleAnomaliasMapa(false),
+          visible: false,
         });
         perdidasLayer.setProperties({
           informeId,
           type: 'anomalias',
           zoneId,
+          view: 0,
+          zone,
         });
         anomaliasLayers.push(perdidasLayer);
       });
@@ -105,17 +110,19 @@ export class AnomaliasControlService {
 
   public mostrarAnomalias() {
     this.filterService.filteredElements$.subscribe((anomalias) => {
-      if (this.sharedReportNoFilters) {
-        const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
-        this.dibujarAnomalias(anomFil as Anomalia[]);
-        this.listaAnomalias = anomalias as Anomalia[];
-      } else {
+      if (!this.sharedReportNoFilters) {
+        // Dibujar anomalias
         this.dibujarAnomalias(anomalias as Anomalia[]);
         this.listaAnomalias = anomalias as Anomalia[];
 
         // reiniciamos las anomalias seleccionadas cada vez que se aplica un filtro
         this.prevAnomaliaSelect = undefined;
         this.anomaliaSelect = undefined;
+      } else {
+        // dibujamos solo anomalias del informe compartido
+        const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
+        this.dibujarAnomalias(anomFil as Anomalia[]);
+        this.listaAnomalias = anomalias as Anomalia[];
       }
     });
   }
@@ -124,18 +131,34 @@ export class AnomaliasControlService {
     // Para cada vector layer (que corresponde a un informe)
     this.anomaliaLayers.forEach((l) => {
       // filtra las anomalías correspondientes al informe
-      const filtered = anomalias.filter((item) => item.informeId === l.getProperties().informeId);
+      const anomaliasInforme = anomalias.filter((item) => item.informeId === l.getProperties().informeId);
+      let anomaliasLayer = anomaliasInforme;
+      // si hay zonas divimos los seguidores tb por zonas
+      if (this.zonesService.thereAreZones) {
+        anomaliasLayer = this.zonesControlService.getElemsZona(l.getProperties().zone, anomaliasInforme) as Anomalia[];
+      }
+
       const source = l.getSource();
       source.clear();
-      filtered.forEach((anom) => {
+      anomaliasLayer.forEach((anom) => {
         const feature = new Feature({
           geometry: new Polygon([anom.featureCoords]),
           properties: {
+            view: l.getProperties().view,
             anomaliaId: anom.id,
             tipo: anom.tipo,
             informeId: anom.informeId,
           },
         });
+
+        if (this.zonesService.thereAreZones) {
+          const properties = feature.getProperties().properties;
+          properties.zone = l.getProperties().zone;
+          feature.setProperties({
+            properties,
+          });
+        }
+
         source.addFeature(feature);
       });
     });

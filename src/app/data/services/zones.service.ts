@@ -16,6 +16,7 @@ import { PlantaInterface } from '@core/models/planta';
 export class ZonesService {
   locAreas: LocationAreaInterface[] = [];
   zones: LocationAreaInterface[] = [];
+  zonesBySize: LocationAreaInterface[][] = [];
   private _thereAreZones = false;
   thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
 
@@ -31,6 +32,8 @@ export class ZonesService {
           this.zones = this.getZones(planta, locAreas);
           if (this.zones.length > 0) {
             this.thereAreZones = true;
+
+            this.zonesBySize = this.getCompleteGlobals(this.zones, planta);
           }
 
           initService(true);
@@ -130,7 +133,7 @@ export class ZonesService {
           if (PointInPolygon(centroid, polygon)) {
             largestZone.globalCoords.forEach((coord, i) => {
               if (coord !== null && coord !== undefined && coord !== '') {
-                // si la global del otherZone es incorrecta le aplicamos la del area
+                // si la global del otherZone es incorrecta le aplicamos la de la zona mayor
                 if (globalCoordsZone[i] === null || globalCoordsZone[i] === undefined || globalCoordsZone[i] === '') {
                   globalCoordsZone[i] = coord;
                 }
@@ -142,6 +145,49 @@ export class ZonesService {
       });
 
       return [...largestZones, ...otherZones];
+    }
+  }
+
+  private getCompleteGlobals(zones: LocationAreaInterface[], planta: PlantaInterface): LocationAreaInterface[][] {
+    const zonesBySize = this.getZonesBySize(planta, zones);
+    if (zonesBySize.length === 1) {
+      return [zones];
+    } else if (zonesBySize.length > 1) {
+      zonesBySize.forEach((zonesSize, index) => {
+        // las mayores ya tienen las globals correctas
+        if (index > 0) {
+          const zonasMayores = zonesBySize[index - 1];
+
+          zonesSize.forEach((zone) => {
+            const globalCoordsZone: string[] = zone.globalCoords;
+            // calculamos el centroide de la zona
+            const centroid = this.getLocAreaCentroid(zone);
+
+            zonasMayores.forEach((zonaMayor) => {
+              const polygon = zonaMayor.path.map((coord) => [coord.lat, coord.lng]);
+
+              // comprobamos si esta dentro de la largestZone
+              if (PointInPolygon(centroid, polygon)) {
+                zonaMayor.globalCoords.forEach((coord, i) => {
+                  if (coord !== null && coord !== undefined && coord !== '') {
+                    // si la global del otherZone es incorrecta le aplicamos la de la zona mayor
+                    if (
+                      globalCoordsZone[i] === null ||
+                      globalCoordsZone[i] === undefined ||
+                      globalCoordsZone[i] === ''
+                    ) {
+                      globalCoordsZone[i] = coord;
+                    }
+                  }
+                });
+                zone.globalCoords = globalCoordsZone;
+              }
+            });
+          });
+        }
+      });
+
+      return zonesBySize;
     }
   }
 

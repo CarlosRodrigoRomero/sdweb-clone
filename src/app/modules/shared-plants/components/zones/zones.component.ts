@@ -40,19 +40,14 @@ export class ZonesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.plantaService
-      .getLocationsArea(this.reportControlService.plantaId)
-      .pipe(take(1))
-      .subscribe((locAreas) => {
-        this.zones = this.zonesService.getZonesBySize(this.reportControlService.planta, locAreas);
+    this.zones = this.zonesService.zonesBySize;
 
-        // iniciamos el servicio que controla las zonas y las cargamos
-        this.zonesControlService.initService().then((value) => {
-          if (value) {
-            this.zonesControlService.mostrarZonas(this.zones[this.zones.length - 1], this.zonesLayers);
-          }
-        });
-      });
+    // iniciamos el servicio que controla las zonas y las cargamos
+    this.zonesControlService.initService().then((value) => {
+      if (value) {
+        this.zonesControlService.mostrarZonas(this.zones[this.zones.length - 1], this.zonesLayers);
+      }
+    });
 
     this.subscriptions.add(this.olMapService.zonasLayers$.subscribe((layers) => (this.zonesLayers = layers)));
 

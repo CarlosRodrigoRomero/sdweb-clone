@@ -94,18 +94,15 @@ export class MapComponent implements OnInit, OnDestroy {
         this.thermalLayersDB = layers;
 
         if (this.zonesService.thereAreZones) {
-          const allZones = this.zonesService.getZonesBySize(
-            this.reportControlService.planta,
-            this.zonesService.locAreas
-          );
+          const allZones = this.zonesService.zonesBySize;
           const smallZones = allZones[allZones.length - 1];
 
           // Para cada informe, hay que crear 2 capas: térmica y vectorial
           this.informes.forEach((informe, index) => {
-            const tl = this.thermalLayersDB.find((item) => item.informeId === informe.id);
+            const thermalLayerDB = this.thermalLayersDB.find((item) => item.informeId === informe.id);
 
-            if (tl !== undefined) {
-              this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id, index));
+            if (thermalLayerDB !== undefined) {
+              this.olMapService.addThermalLayer(this.createThermalLayer(thermalLayerDB, informe.id, index));
             }
 
             // creamos las capas de anomalías para los diferentes informes o zonas
@@ -115,14 +112,18 @@ export class MapComponent implements OnInit, OnDestroy {
 
             // añadimos las ortofotos aereas de cada informe
             this.olMapService.addAerialLayer(informe.id);
+
+            if (index === this.informes.length - 1) {
+              this.initMap();
+            }
           });
         } else {
           // Para cada informe, hay que crear 2 capas: térmica y vectorial
           this.informes.forEach((informe, index) => {
-            const tl = this.thermalLayersDB.find((item) => item.informeId === informe.id);
+            const thermalLayerDB = this.thermalLayersDB.find((item) => item.informeId === informe.id);
 
-            if (tl !== undefined) {
-              this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id, index));
+            if (thermalLayerDB !== undefined) {
+              this.olMapService.addThermalLayer(this.createThermalLayer(thermalLayerDB, informe.id, index));
             }
 
             // creamos las capas de anomalías para los diferentes informes o zonas
@@ -132,6 +133,10 @@ export class MapComponent implements OnInit, OnDestroy {
 
             // añadimos las ortofotos aereas de cada informe
             this.olMapService.addAerialLayer(informe.id);
+
+            if (index === this.informes.length - 1) {
+              this.initMap();
+            }
           });
         }
       });
@@ -149,12 +154,10 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers)));
 
-    this.initMap();
-
     this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
   }
 
-  private _createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string, index: number): TileLayer {
+  private createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string, index: number): TileLayer {
     // Iniciar mapa térmico
     const tl = new TileLayer({
       source: new XYZ_mod({
@@ -172,29 +175,17 @@ export class MapComponent implements OnInit, OnDestroy {
       }),
       preload: Infinity,
     });
-    // solo lo aplicamos a la planta DEMO
-    if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
-      tl.setExtent(this.extent1);
-    }
 
     tl.setProperties({
       informeId,
     });
 
+    // solo lo aplicamos a la planta DEMO
+    if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
+      tl.setExtent(this.extent1);
+    }
+
     return tl;
-  }
-
-  private _createAnomaliaLayer(informeId: string): VectorLayer {
-    const vl = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.anomaliasControlService.getStyleAnomaliasMapa(false),
-    });
-
-    vl.setProperties({
-      informeId,
-    });
-
-    return vl;
   }
 
   initMap() {

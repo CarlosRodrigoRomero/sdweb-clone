@@ -18,6 +18,8 @@ import { ZonesControlService } from '@data/services/zones-control.service';
 })
 export class ViewControlComponent implements OnInit, OnDestroy {
   private aerialLayers: TileLayer[];
+  private thermalLayers: TileLayer[];
+  private anomaliaLayers: VectorLayer[];
   private seguidorLayers: VectorLayer[];
   private zonesLayers: VectorLayer[];
   public selectedInformeId: string;
@@ -36,10 +38,22 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.olMapService.aerialLayers$.pipe(take(1)).subscribe((layers) => (this.aerialLayers = layers));
 
-    this.olMapService
-      .getSeguidorLayers()
-      .pipe(take(1))
-      .subscribe((layers) => (this.seguidorLayers = layers));
+    if (this.reportControlService.plantaFija) {
+      this.olMapService
+        .getThermalLayers()
+        .pipe(take(1))
+        .subscribe((layers) => (this.thermalLayers = layers));
+
+      this.olMapService
+        .getAnomaliaLayers()
+        .pipe(take(1))
+        .subscribe((layers) => (this.anomaliaLayers = layers));
+    } else {
+      this.olMapService
+        .getSeguidorLayers()
+        .pipe(take(1))
+        .subscribe((layers) => (this.seguidorLayers = layers));
+    }
 
     this.olMapService.zonasLayers$.pipe(take(1)).subscribe((layers) => (this.zonesLayers = layers));
 
@@ -47,9 +61,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {
         this.selectedInformeId = informeId;
 
-        this.setAerialLayersVisibility(this.selectedInformeId);
-        this.setSeguidorLayersVisibility(this.selectedInformeId);
-        this.setZonesLayersVisibility(this.selectedInformeId);
+        this.setLayersVisibility(this.selectedInformeId);
       })
     );
 
@@ -57,18 +69,60 @@ export class ViewControlComponent implements OnInit, OnDestroy {
       this.viewReportService.reportViewSelected$.subscribe((view) => {
         this.reportViewSelected = view;
 
-        this.setAerialLayersVisibility(this.selectedInformeId);
-        this.setSeguidorLayersVisibility(this.selectedInformeId);
-        this.setZonesLayersVisibility(this.selectedInformeId);
+        this.setLayersVisibility(this.selectedInformeId);
       })
     );
 
     this.subscriptions.add(this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom)));
+
+    // establecemos las visibilidades de inicio cuando el mapa ha cargado
+    this.subscriptions.add(
+      this.reportControlService.mapLoaded$.subscribe((loaded) => {
+        if (loaded) {
+          this.setLayersVisibility(this.selectedInformeId);
+        }
+      })
+    );
+  }
+
+  private setLayersVisibility(informeId: string) {
+    this.setAerialLayersVisibility(informeId);
+    this.setZonesLayersVisibility(informeId);
+    if (this.reportControlService.plantaFija) {
+      this.setThermalLayersVisibility(informeId);
+      this.setAnomaliaLayersVisibility(informeId);
+    } else {
+      this.setSeguidorLayersVisibility(informeId);
+    }
   }
 
   private setAerialLayersVisibility(informeId: string) {
     this.aerialLayers.forEach((layer) => {
       if (layer.getProperties().informeId === informeId) {
+        layer.setVisible(true);
+      } else {
+        layer.setVisible(false);
+      }
+    });
+  }
+
+  private setThermalLayersVisibility(informeId: string) {
+    this.thermalLayers.forEach((layer) => {
+      if (layer.getProperties().informeId === informeId) {
+        layer.setVisible(true);
+      } else {
+        layer.setVisible(false);
+      }
+    });
+  }
+
+  private setAnomaliaLayersVisibility(informeId: string) {
+    this.anomaliaLayers.forEach((layer) => {
+      if (
+        layer.getProperties().informeId === informeId &&
+        layer.getProperties().view === this.reportViewSelected &&
+        this.currentZoom >= this.zonesControlService.zoomChangeView
+      ) {
         layer.setVisible(true);
       } else {
         layer.setVisible(false);

@@ -27,7 +27,7 @@
   padding-left: 50px;
   padding-right: 50px;
   height: 100%;
-  min-width: 350px;
+  min-width: 250px;
   max-width: 400px;
   left: 50%;
   transform: translate(-50%, 0%);
@@ -44,4 +44,8 @@
 
 .one-informe span {
   font-size: medium;
+}
+
+.temporal-slider {
+  min-width: 250px;
 }

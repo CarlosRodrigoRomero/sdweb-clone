@@ -12,6 +12,8 @@ import { ShareReportComponent } from './components/share-report/share-report.com
 import { SelectLanguageComponent } from './components/select-language/select-language.component';
 import { DownloadExcelComponent } from './components/download-excel/download-excel.component';
 import { ZonesComponent } from './components/zones/zones.component';
+import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
+import { ViewControlComponent } from './components/view-control/view-control.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +26,8 @@ import { ZonesComponent } from './components/zones/zones.component';
     SelectLanguageComponent,
     DownloadExcelComponent,
     ZonesComponent,
+    SliderTemporalComponent,
+    ViewControlComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
@@ -33,6 +37,8 @@ import { ZonesComponent } from './components/zones/zones.component';
     ShareReportComponent,
     DownloadExcelComponent,
     ZonesComponent,
+    SliderTemporalComponent,
+    ViewControlComponent,
   ],
 })
 export class SharedPlantsModule {}

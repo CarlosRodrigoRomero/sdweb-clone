@@ -10,7 +10,6 @@ import { SharedPlantsModule } from '@modules/shared-plants/shared-plants.module'
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { SeguidoresListComponent } from './components/seguidores-list/seguidores-list.component';
 import { MapSeguidoresComponent } from './components/map-seguidores/map-seguidores.component';
-import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
 import { ViewToggleComponent } from './components/view-toggle/view-toggle.component';
 import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.component';
 import { SeguidorViewComponent } from './components/seguidor-view/seguidor-view.component';
@@ -26,14 +25,12 @@ import { LeyendaComponent } from './components/leyenda/leyenda.component';
 import { SeguidorViewNavbarComponent } from './components/seguidor-view-navbar/seguidor-view-navbar.component';
 import { SeguidorViewLeyendaComponent } from './components/seguidor-view-leyenda/seguidor-view-leyenda.component';
 import { SeguidorImagesAreaComponent } from './components/seguidor-images-area/seguidor-images-area.component';
-import { ViewControlComponent } from './components/view-control/view-control.component';
 
 @NgModule({
   declarations: [
     MapViewComponent,
     SeguidoresListComponent,
     MapSeguidoresComponent,
-    SliderTemporalComponent,
     ViewToggleComponent,
     SeguidorInfoComponent,
     SeguidorViewComponent,
@@ -49,7 +46,6 @@ import { ViewControlComponent } from './components/view-control/view-control.com
     SeguidorViewNavbarComponent,
     SeguidorViewLeyendaComponent,
     SeguidorImagesAreaComponent,
-    ViewControlComponent,
   ],
   imports: [
     CommonModule,

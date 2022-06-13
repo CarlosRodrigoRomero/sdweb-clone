@@ -12,9 +12,6 @@ export class MapControlService {
   private _sliderMax: number = 75;
   public sliderMaxSource = new BehaviorSubject<number>(this._sliderMax);
 
-  private _sliderTemporal: number = 100;
-  public sliderTemporalSource = new BehaviorSubject<number>(this._sliderTemporal);
-
   private _sliderThermalOpacity: number = 100;
   public sliderThermalOpacitySource = new BehaviorSubject<number>(this._sliderThermalOpacity);
 
@@ -23,11 +20,9 @@ export class MapControlService {
   resetService() {
     this.sliderMin = 25;
     this.sliderMax = 75;
-    this.sliderTemporal = 100;
     this.sliderThermalOpacity = 100;
   }
 
-  /////////////////
   get sliderMin() {
     return this._sliderMin;
   }
@@ -35,7 +30,7 @@ export class MapControlService {
     this._sliderMin = value;
     this.sliderMaxSource.next(value);
   }
-  /////////////////
+
   get sliderMax() {
     return this._sliderMax;
   }
@@ -44,16 +39,7 @@ export class MapControlService {
 
     this.sliderMinSource.next(value);
   }
-  /////////////////
-  get sliderTemporal() {
-    return this._sliderTemporal;
-  }
-  set sliderTemporal(value: number) {
-    this._sliderTemporal = value;
 
-    this.sliderTemporalSource.next(value);
-  }
-  /////////////////
   get sliderThermalOpacity() {
     return this._sliderThermalOpacity;
   }
