@@ -22,7 +22,8 @@ import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { ZonesControlService } from '@data/services/zones-control.service';
-import { ZonesService } from './zones.service';
+import { ZonesService } from '@data/services/zones.service';
+import { ViewReportService } from '@data/services/view-report.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
@@ -46,6 +47,7 @@ export class AnomaliasControlService {
   public listaAnomalias: Anomalia[];
   private anomaliaLayers: VectorLayer[];
   private sharedReportNoFilters = false;
+  private toggleViewSelected: number;
 
   private _coordsPointer: Coordinate = undefined;
   public coordsPointer$ = new BehaviorSubject<Coordinate>(this._coordsPointer);
@@ -56,7 +58,8 @@ export class AnomaliasControlService {
     private reportControlService: ReportControlService,
     private anomaliaService: AnomaliaService,
     private zonesControlService: ZonesControlService,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private viewReportService: ViewReportService
   ) {}
 
   initService(): Promise<boolean> {
@@ -83,6 +86,8 @@ export class AnomaliasControlService {
         this.prevFeatureHover = undefined;
         this.anomaliaSelect = undefined;
       });
+
+      this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
     });
   }
 
@@ -222,7 +227,7 @@ export class AnomaliasControlService {
             .getFeaturesAtPixel(event.pixel)
             .filter((item) => item.getProperties().properties !== undefined)
             .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
-            .filter((item) => item.getProperties().properties.view === /* this.toggleViewSelected */ 0)[0] as Feature;
+            .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)[0] as Feature;
 
           if (feature !== undefined) {
             // cuando pasamos de una anomalia a otra directamente sin pasar por vacio

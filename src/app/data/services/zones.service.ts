@@ -34,6 +34,7 @@ export class ZonesService {
             this.thereAreZones = true;
 
             this.zonesBySize = this.getCompleteGlobals(this.zones);
+            this.zones = this.zonesBySize.flat();
           }
 
           initService(true);
@@ -147,7 +148,7 @@ export class ZonesService {
     }
   }
 
-  private getCompleteGlobals(zones: LocationAreaInterface[]): LocationAreaInterface[][] {
+  getCompleteGlobals(zones: LocationAreaInterface[]): LocationAreaInterface[][] {
     const zonesBySize = this.getZonesBySize(zones);
     if (zonesBySize.length === 1) {
       return [zones];

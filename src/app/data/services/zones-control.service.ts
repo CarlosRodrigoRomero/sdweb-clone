@@ -262,12 +262,6 @@ export class ZonesControlService {
             .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
 
           if (feature !== undefined) {
-            /* if (this.reportControlService.plantaFija) {
-              // cuando pasamos de una zona a otra directamente sin pasar por vacio
-              if (this.prevLayerHovered !== undefined) {
-                this.prevLayerHovered.setVisible(false);
-              }
-            } else { */
             // cuando pasamos de una zona a otra directamente sin pasar por vacio
             if (this.prevLayerHovered !== undefined) {
               this.prevLayerHovered.setVisible(false);
@@ -281,7 +275,6 @@ export class ZonesControlService {
             this.currentLayerHovered.setVisible(true);
 
             this.prevLayerHovered = this.currentLayerHovered;
-            // }
           }
         } else {
           if (this.currentLayerHovered !== undefined) {
