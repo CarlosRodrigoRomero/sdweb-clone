@@ -90,28 +90,51 @@ export class MapComponent implements OnInit, OnDestroy {
     this.plantaService
       .getThermalLayers$(this.planta.id)
       .pipe(take(1))
-      .subscribe((layers) => (this.thermalLayersDB = layers));
+      .subscribe((layers) => {
+        this.thermalLayersDB = layers;
 
-    if (this.zonesService.thereAreZones) {
-      const allZones = this.zonesService.getZonesBySize(this.reportControlService.planta, locAreas);
-      const smallZones = allZones[allZones.length - 1];
-    } else {
-    }
+        if (this.zonesService.thereAreZones) {
+          const allZones = this.zonesService.getZonesBySize(
+            this.reportControlService.planta,
+            this.zonesService.locAreas
+          );
+          const smallZones = allZones[allZones.length - 1];
 
-    // Para cada informe, hay que crear 2 capas: térmica y vectorial
-    this.informes.forEach((informe, index) => {
-      const tl = this.thermalLayersDB.find((item) => item.informeId === informe.id);
+          // Para cada informe, hay que crear 2 capas: térmica y vectorial
+          this.informes.forEach((informe, index) => {
+            const tl = this.thermalLayersDB.find((item) => item.informeId === informe.id);
 
-      if (tl !== undefined) {
-        this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id, index));
-      }
+            if (tl !== undefined) {
+              this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id, index));
+            }
 
-      // creamos las capas de anomalías para los diferentes informes o zonas
-      this.anomaliasControlService.createAnomaliaLayer(informe.id);
+            // creamos las capas de anomalías para los diferentes informes o zonas
+            this.anomaliasControlService
+              .createAnomaliaLayers(informe.id, smallZones)
+              .forEach((layer) => this.olMapService.addAnomaliaLayer(layer));
 
-      // añadimos las ortofotos aereas de cada informe
-      this.olMapService.addAerialLayer(informe.id);
-    });
+            // añadimos las ortofotos aereas de cada informe
+            this.olMapService.addAerialLayer(informe.id);
+          });
+        } else {
+          // Para cada informe, hay que crear 2 capas: térmica y vectorial
+          this.informes.forEach((informe, index) => {
+            const tl = this.thermalLayersDB.find((item) => item.informeId === informe.id);
+
+            if (tl !== undefined) {
+              this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id, index));
+            }
+
+            // creamos las capas de anomalías para los diferentes informes o zonas
+            this.anomaliasControlService
+              .createAnomaliaLayers(informe.id)
+              .forEach((layer) => this.olMapService.addAnomaliaLayer(layer));
+
+            // añadimos las ortofotos aereas de cada informe
+            this.olMapService.addAerialLayer(informe.id);
+          });
+        }
+      });
 
     // asignamos los IDs necesarios para compartir
     this.shareReportService.setPlantaId(this.planta.id);
@@ -150,7 +173,7 @@ export class MapComponent implements OnInit, OnDestroy {
       preload: Infinity,
     });
     // solo lo aplicamos a la planta DEMO
-    if (this.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+    if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
       tl.setExtent(this.extent1);
     }
 
@@ -185,7 +208,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     let aerial;
     // solo lo aplicamos a la planta DEMO
-    if (this.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+    if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
       aerial = new XYZ({
         url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
         crossOrigin: '',
@@ -216,7 +239,7 @@ export class MapComponent implements OnInit, OnDestroy {
     // MAPA
     let view: View;
 
-    if (this.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+    if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
       // solo lo aplicamos a la planta DEMO
       view = new View({
         center: fromLonLat([this.planta.longitud, this.planta.latitud]),
