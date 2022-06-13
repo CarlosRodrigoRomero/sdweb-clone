@@ -115,6 +115,8 @@ export class MapComponent implements OnInit, OnDestroy {
 
             if (index === this.informes.length - 1) {
               this.initMap();
+
+              this.addZoomEvent();
             }
           });
         } else {
@@ -136,6 +138,8 @@ export class MapComponent implements OnInit, OnDestroy {
 
             if (index === this.informes.length - 1) {
               this.initMap();
+
+              this.addZoomEvent();
             }
           });
         }
@@ -253,7 +257,8 @@ export class MapComponent implements OnInit, OnDestroy {
         this.map = map;
 
         this.map.once('postrender', () => {
-          setTimeout(() => (this.reportControlService.mapLoaded = true), 2000);
+          // setTimeout(() => (this.reportControlService.mapLoaded = true), 2000);
+          this.reportControlService.mapLoaded = true;
         });
       })
     );
@@ -261,25 +266,28 @@ export class MapComponent implements OnInit, OnDestroy {
     this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
 
     // inicializamos el servicio que controla el comportamiento de las anomalias
-    this.subscriptions.add(
-      this.anomaliasControlService
-        .initService()
-        .pipe(
-          switchMap((value) => {
-            if (value) {
-              this.anomaliasControlService.mostrarAnomalias();
-              return combineLatest([
-                this.anomaliasControlService.anomaliaHover$,
-                this.anomaliasControlService.anomaliaSelect$,
-              ]);
-            }
+    this.anomaliasControlService.initService().then((value) => {
+      if (value) {
+        this.anomaliasControlService.mostrarAnomalias();
+
+        this.subscriptions.add(
+          combineLatest([
+            this.anomaliasControlService.anomaliaHover$,
+            this.anomaliasControlService.anomaliaSelect$,
+          ]).subscribe(([anomHover, anomSelect]) => {
+            this.anomaliaHover = anomHover;
+            this.anomaliaSelect = anomSelect;
           })
-        )
-        .subscribe(([anomHover, anomSelect]) => {
-          this.anomaliaHover = anomHover;
-          this.anomaliaSelect = anomSelect;
-        })
-    );
+        );
+      }
+    });
+  }
+
+  private addZoomEvent() {
+    this.map.on('moveend', (event) => {
+      console.log(this.map.getView().getZoom());
+      this.olMapService.currentZoom = this.map.getView().getZoom();
+    });
   }
 
   private transform(extent) {

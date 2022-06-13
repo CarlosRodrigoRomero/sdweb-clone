@@ -90,7 +90,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
       .subscribe((locAreas) => {
         const zones = this.zonesService.getZones(this.planta, locAreas);
         if (zones.length > 0) {
-          const allZones = this.zonesService.getZonesBySize(this.reportControlService.planta, locAreas);
+          const allZones = this.zonesService.zonesBySize;
           const smallZones = allZones[allZones.length - 1];
 
           this.informes.forEach((informe, index) => {

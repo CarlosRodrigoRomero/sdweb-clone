@@ -33,7 +33,7 @@ export class ZonesService {
           if (this.zones.length > 0) {
             this.thereAreZones = true;
 
-            this.zonesBySize = this.getCompleteGlobals(this.zones, planta);
+            this.zonesBySize = this.getCompleteGlobals(this.zones);
           }
 
           initService(true);
@@ -71,8 +71,7 @@ export class ZonesService {
     }
   }
 
-  getZonesBySize(planta: PlantaInterface, locAreas: LocationAreaInterface[]): LocationAreaInterface[][] {
-    const zones = this.getZones(planta, locAreas);
+  private getZonesBySize(zones: LocationAreaInterface[]): LocationAreaInterface[][] {
     const indexNotNull = this.getIndexNotNull(zones);
     const zonesBySize = new Array<LocationAreaInterface[]>(indexNotNull + 1);
     for (let index = indexNotNull; index >= 0; index--) {
@@ -148,8 +147,8 @@ export class ZonesService {
     }
   }
 
-  private getCompleteGlobals(zones: LocationAreaInterface[], planta: PlantaInterface): LocationAreaInterface[][] {
-    const zonesBySize = this.getZonesBySize(planta, zones);
+  private getCompleteGlobals(zones: LocationAreaInterface[]): LocationAreaInterface[][] {
+    const zonesBySize = this.getZonesBySize(zones);
     if (zonesBySize.length === 1) {
       return [zones];
     } else if (zonesBySize.length > 1) {

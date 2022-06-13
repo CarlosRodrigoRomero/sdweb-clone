@@ -30,8 +30,7 @@ export class ZonesControlService {
   zoomChangeView = 19;
   private selectedInformeId: string;
   private toggleViewSelected: number;
-  private anomaliasLayers: VectorLayer[];
-  private seguidoresLayers: VectorLayer[];
+  private elemsLayers: VectorLayer[];
   private currentLayerHovered: VectorLayer;
   prevLayerHovered: VectorLayer;
   private currentZoom: number;
@@ -45,7 +44,13 @@ export class ZonesControlService {
 
   initService(): Promise<boolean> {
     return new Promise((initService) => {
-      this.olMapService.getMap().subscribe((map) => (this.map = map));
+      this.olMapService.getMap().subscribe((map) => {
+        this.map = map;
+
+        if (this.map !== undefined) {
+          initService(true);
+        }
+      });
 
       this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
 
@@ -55,17 +60,15 @@ export class ZonesControlService {
         this.olMapService
           .getAnomaliaLayers()
           .pipe(take(1))
-          .subscribe((layers) => (this.anomaliasLayers = layers));
+          .subscribe((layers) => (this.elemsLayers = layers));
       } else {
         this.olMapService
           .getSeguidorLayers()
           .pipe(take(1))
-          .subscribe((layers) => (this.seguidoresLayers = layers));
+          .subscribe((layers) => (this.elemsLayers = layers));
       }
 
       this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom));
-
-      initService(true);
     });
   }
 
@@ -180,7 +183,7 @@ export class ZonesControlService {
   getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]) {
     const labelZona = this.getGlobalsLabel(zona.globalCoords);
 
-    return elems.filter((elem) => this.getGlobalsLabel(elem.globalCoords) === labelZona);
+    return elems.filter((elem) => this.getGlobalsLabel(elem.globalCoords, false) === labelZona);
   }
 
   private getMaeZona(elems: FilterableElement[], informeId: string, numZonas?: number): number {
@@ -257,22 +260,26 @@ export class ZonesControlService {
             .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
 
           if (feature !== undefined) {
-            if (this.reportControlService.plantaFija) {
-            } else {
+            /* if (this.reportControlService.plantaFija) {
               // cuando pasamos de una zona a otra directamente sin pasar por vacio
               if (this.prevLayerHovered !== undefined) {
                 this.prevLayerHovered.setVisible(false);
               }
-              this.currentLayerHovered = this.seguidoresLayers.find(
-                (l) =>
-                  l.getProperties().zoneId === feature.getProperties().properties.id &&
-                  l.getProperties().view === this.toggleViewSelected &&
-                  l.getProperties().informeId === this.selectedInformeId
-              );
-              this.currentLayerHovered.setVisible(true);
-
-              this.prevLayerHovered = this.currentLayerHovered;
+            } else { */
+            // cuando pasamos de una zona a otra directamente sin pasar por vacio
+            if (this.prevLayerHovered !== undefined) {
+              this.prevLayerHovered.setVisible(false);
             }
+            this.currentLayerHovered = this.elemsLayers.find(
+              (l) =>
+                l.getProperties().zoneId === feature.getProperties().properties.id &&
+                l.getProperties().view === this.toggleViewSelected &&
+                l.getProperties().informeId === this.selectedInformeId
+            );
+            this.currentLayerHovered.setVisible(true);
+
+            this.prevLayerHovered = this.currentLayerHovered;
+            // }
           }
         } else {
           if (this.currentLayerHovered !== undefined) {
@@ -287,13 +294,19 @@ export class ZonesControlService {
     return [path.map((coords) => fromLonLat([coords.lng, coords.lat]))];
   }
 
-  getGlobalsLabel(globalCoords: any[]): string {
+  getGlobalsLabel(globalCoords: any[], plantaFija?: boolean): string {
     const gCoords: any[] = [];
     globalCoords.map((gC) => {
       if (gC !== null) {
         gCoords.push(gC);
       }
     });
+
+    // si la planta es de seguidores quitamos el último elemento
+    if (plantaFija === false) {
+      gCoords.pop();
+    }
+
     return gCoords.join('.');
   }
 

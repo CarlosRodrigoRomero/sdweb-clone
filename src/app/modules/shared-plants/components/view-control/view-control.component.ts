@@ -73,7 +73,13 @@ export class ViewControlComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.subscriptions.add(this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom)));
+    this.subscriptions.add(
+      this.olMapService.currentZoom$.subscribe((zoom) => {
+        this.currentZoom = zoom;
+
+        this.setLayersVisibility(this.selectedInformeId);
+      })
+    );
 
     // establecemos las visibilidades de inicio cuando el mapa ha cargado
     this.subscriptions.add(

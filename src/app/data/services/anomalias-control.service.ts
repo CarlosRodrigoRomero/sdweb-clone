@@ -59,29 +59,31 @@ export class AnomaliasControlService {
     private zonesService: ZonesService
   ) {}
 
-  initService(): Observable<boolean> {
+  initService(): Promise<boolean> {
     const getMap = this.olMapService.getMap();
     const getAnomLayers = this.olMapService.getAnomaliaLayers();
     const getIfSharedWithFilters = this.reportControlService.sharedReportWithFilters$;
 
-    combineLatest([getMap, getAnomLayers, getIfSharedWithFilters])
-      .pipe(take(1))
-      .subscribe(([map, anomL, isSharedWithFil]) => {
-        this.map = map;
-        this.anomaliaLayers = anomL;
-        this.sharedReportNoFilters = !isSharedWithFil;
+    return new Promise((initService) => {
+      combineLatest([getMap, getAnomLayers, getIfSharedWithFilters])
+        // .pipe(take(1))
+        .subscribe(([map, anomL, isSharedWithFil]) => {
+          this.map = map;
+          this.anomaliaLayers = anomL;
+          this.sharedReportNoFilters = !isSharedWithFil;
 
-        this.initialized$.next(true);
+          if (this.map !== undefined) {
+            initService(true);
+          }
+        });
+
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+        this.selectedInformeId = informeId;
+        this.prevAnomaliaSelect = undefined;
+        this.prevFeatureHover = undefined;
+        this.anomaliaSelect = undefined;
       });
-
-    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-      this.selectedInformeId = informeId;
-      this.prevAnomaliaSelect = undefined;
-      this.prevFeatureHover = undefined;
-      this.anomaliaSelect = undefined;
     });
-
-    return this.initialized$;
   }
 
   createAnomaliaLayers(informeId: string, zones?: LocationAreaInterface[]): VectorLayer[] {
@@ -219,19 +221,20 @@ export class AnomaliasControlService {
           const feature = this.map
             .getFeaturesAtPixel(event.pixel)
             .filter((item) => item.getProperties().properties !== undefined)
-            .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
+            .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
+            .filter((item) => item.getProperties().properties.view === /* this.toggleViewSelected */ 0)[0] as Feature;
 
-          if (feature.length > 0) {
+          if (feature !== undefined) {
             // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
             if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
-              (this.prevFeatureHover[0] as Feature).setStyle(this.getStyleAnomaliasMapa(false));
+              this.prevFeatureHover.setStyle(this.getStyleAnomaliasMapa(false));
             }
             currentFeatureHover = feature;
 
-            const anomaliaId = feature[0].getProperties().properties.anomaliaId;
+            const anomaliaId = feature.getProperties().properties.anomaliaId;
             const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
 
-            (feature[0] as Feature).setStyle(this.getStyleAnomaliasMapa(true));
+            feature.setStyle(this.getStyleAnomaliasMapa(true));
 
             if (this.selectedInformeId === anomalia.informeId) {
               this.anomaliaHover = anomalia;
@@ -242,7 +245,7 @@ export class AnomaliasControlService {
           this.anomaliaHover = undefined;
 
           if (currentFeatureHover !== undefined) {
-            (currentFeatureHover[0] as Feature).setStyle(this.getStyleAnomaliasMapa(false));
+            currentFeatureHover.setStyle(this.getStyleAnomaliasMapa(false));
             currentFeatureHover = undefined;
           }
         }
