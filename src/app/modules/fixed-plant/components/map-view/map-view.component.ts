@@ -18,8 +18,7 @@ import { ZonesService } from '@data/services/zones.service';
 })
 export class MapViewComponent implements OnInit, OnDestroy {
   public plantaFija = true;
-  public leftOpened = true;
-  public rightOpened = true;
+  public rightOpened = false;
   public statsOpened: boolean;
   public anomaliasLoaded = false;
   public notSharedReport = true;

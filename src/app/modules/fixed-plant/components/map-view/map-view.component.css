@@ -94,13 +94,10 @@ app-download-progress-bar {
 }
 
 .left-sidenav {
-  position: absolute;
   display: flex;
-  margin: 60px 10px 10px;
-  border-radius: 4px;
-  padding: 15px;
+  padding: 0.5rem;
   width: fit-content;
-  max-width: 400px;
+  max-width: 300px;
 }
 
 @media (max-width: 420px) {
