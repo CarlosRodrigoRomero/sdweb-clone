@@ -93,6 +93,15 @@ app-download-progress-bar {
   transform: translate(-50%, 0%);
 }
 
+.info-change-view {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  top: 9px;
+  left: 9px;
+}
+
 .left-sidenav {
   display: flex;
   padding: 0.5rem;

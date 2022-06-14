@@ -43,6 +43,14 @@
           <app-map></app-map>
 
           <div>
+            <div class="info-change-view">
+              <!-- TOGGLE MAPAS -->
+              <app-view-toggle></app-view-toggle>
+
+              <!-- LEYENDA -->
+              <app-leyenda></app-leyenda>
+            </div>
+
             <div class="btns-export">
               <!-- BOTON COMPARTIR -->
               <app-share-report *ngIf="notSharedReport || completeView"></app-share-report>
