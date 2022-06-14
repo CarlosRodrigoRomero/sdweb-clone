@@ -18,8 +18,7 @@ import { ZonesService } from '@data/services/zones.service';
   styleUrls: ['./map-view.component.css'],
 })
 export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
-  public leftOpened = true;
-  public rightOpened = true;
+  public rightOpened = false;
   public statsOpened: boolean;
   public seguidorViewOpened: boolean;
   public seguidoresLoaded = false;

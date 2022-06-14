@@ -106,14 +106,6 @@ app-download-progress-bar {
   }
 }
 
-.btn-left {
-  position: absolute;
-  top: 10px;
-  height: 40px;
-  margin-left: 10px;
-  padding: 0px 4px 0px 0px;
-}
-
 .right-sidenav {
   position: absolute;
   display: flex;
