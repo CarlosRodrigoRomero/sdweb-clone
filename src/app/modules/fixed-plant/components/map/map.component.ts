@@ -257,12 +257,12 @@ export class MapComponent implements OnInit, OnDestroy {
         this.map = map;
 
         this.map.once('postrender', () => {
-          // setTimeout(() => (this.reportControlService.mapLoaded = true), 2000);
           this.reportControlService.mapLoaded = true;
         });
       })
     );
 
+    // añadimos las capas de anomalías al mapa
     this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
 
     // inicializamos el servicio que controla el comportamiento de las anomalias

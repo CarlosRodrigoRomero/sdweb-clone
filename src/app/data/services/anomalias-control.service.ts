@@ -110,12 +110,39 @@ export class AnomaliasControlService {
           zone,
         });
         anomaliasLayers.push(perdidasLayer);
+
+        const celsCalientesLayer = new VectorLayer({
+          source: new VectorSource({ wrapX: false }),
+          style: this.getStyleCelsCalientes(false),
+          visible: false,
+        });
+        celsCalientesLayer.setProperties({
+          informeId,
+          type: 'anomalias',
+          zoneId,
+          view: 1,
+          zone,
+        });
+        anomaliasLayers.push(celsCalientesLayer);
+
+        const gradNormMaxLayer = new VectorLayer({
+          source: new VectorSource({ wrapX: false }),
+          style: this.getStyleGradienteNormMax(false),
+          visible: false,
+        });
+        gradNormMaxLayer.setProperties({
+          informeId,
+          type: 'anomalias',
+          zoneId,
+          view: 2,
+          zone,
+        });
+        anomaliasLayers.push(gradNormMaxLayer);
       });
     } else {
       const perdidasLayer = new VectorLayer({
         source: new VectorSource({ wrapX: false }),
         style: this.getStylePerdidas(false),
-        // style: this.getStyleAnomaliasMapa(false),
         visible: false,
       });
       perdidasLayer.setProperties({
@@ -124,12 +151,36 @@ export class AnomaliasControlService {
         view: 0,
       });
       anomaliasLayers.push(perdidasLayer);
+
+      const celsCalientesLayer = new VectorLayer({
+        source: new VectorSource({ wrapX: false }),
+        style: this.getStyleCelsCalientes(false),
+        visible: false,
+      });
+      celsCalientesLayer.setProperties({
+        informeId,
+        type: 'anomalias',
+        view: 1,
+      });
+      anomaliasLayers.push(celsCalientesLayer);
+
+      const gradNormMaxLayer = new VectorLayer({
+        source: new VectorSource({ wrapX: false }),
+        style: this.getStyleGradienteNormMax(false),
+        visible: false,
+      });
+      gradNormMaxLayer.setProperties({
+        informeId,
+        type: 'anomalias',
+        view: 2,
+      });
+      anomaliasLayers.push(gradNormMaxLayer);
     }
 
     return anomaliasLayers;
   }
 
-  public mostrarAnomalias() {
+  mostrarAnomalias() {
     this.filterService.filteredElements$.subscribe((anomalias) => {
       if (!this.sharedReportNoFilters) {
         // Dibujar anomalias
@@ -170,6 +221,7 @@ export class AnomaliasControlService {
             tipo: anom.tipo,
             informeId: anom.informeId,
             perdidas: anom.perdidas,
+            gradienteNormalizado: anom.gradienteNormalizado,
           },
         });
 
@@ -235,6 +287,17 @@ export class AnomaliasControlService {
 
   private addOnHoverAction() {
     let currentFeatureHover;
+    const estilosViewFocused = [
+      this.getStylePerdidas(true),
+      this.getStyleCelsCalientes(true),
+      this.getStyleGradienteNormMax(true),
+    ];
+    const estilosViewUnfocused = [
+      this.getStylePerdidas(false),
+      this.getStyleCelsCalientes(false),
+      this.getStyleGradienteNormMax(false),
+    ];
+
     this.map.on('pointermove', (event) => {
       if (this.anomaliaSelect === undefined) {
         if (this.map.hasFeatureAtPixel(event.pixel)) {
@@ -247,14 +310,14 @@ export class AnomaliasControlService {
           if (feature !== undefined) {
             // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
             if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
-              this.prevFeatureHover.setStyle(this.getStylePerdidas(false));
+              this.prevFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
             }
             currentFeatureHover = feature;
 
             const anomaliaId = feature.getProperties().properties.anomaliaId;
             const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
 
-            feature.setStyle(this.getStylePerdidas(true));
+            feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
 
             if (this.selectedInformeId === anomalia.informeId) {
               this.anomaliaHover = anomalia;
@@ -265,7 +328,7 @@ export class AnomaliasControlService {
           this.anomaliaHover = undefined;
 
           if (currentFeatureHover !== undefined) {
-            currentFeatureHover.setStyle(this.getStylePerdidas(false));
+            currentFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
             currentFeatureHover = undefined;
           }
         }
@@ -396,6 +459,7 @@ export class AnomaliasControlService {
     this.anomaliaHover$.next(value);
   }
 
+  // ESTILOS PERDIDAS
   private getStylePerdidas(focused: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
@@ -424,7 +488,66 @@ export class AnomaliasControlService {
     }
   }
 
-  public getStyleAnomaliasMapa(selected = false) {
+  // ESTILOS CELS CALIENTES
+  private getStyleCelsCalientes(focused) {
+    return (feature) => {
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        return new Style({
+          stroke: new Stroke({
+            color: focused ? 'white' : GLOBAL.colores_tipos[8] /* this.getColorCelsCalientes(feature) */,
+            width: focused ? 6 : 4,
+          }),
+          fill: new Fill({
+            color: 'rgba(255,255,255, 0)',
+          }),
+        });
+      }
+    };
+  }
+
+  private getColorCelsCalientes(feature: Feature) {
+    const celsCalientes = feature.getProperties().properties.celsCalientes;
+
+    if (celsCalientes < 0.02) {
+      return GLOBAL.colores_mae[0];
+    } else if (celsCalientes < 0.1) {
+      return GLOBAL.colores_mae[1];
+    } else {
+      return GLOBAL.colores_mae[2];
+    }
+  }
+
+  // ESTILOS GRADIENTE NORMALIZADO MAX
+  private getStyleGradienteNormMax(focused) {
+    return (feature) => {
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        return new Style({
+          stroke: new Stroke({
+            color: focused ? 'white' : this.getColorGradienteNormMax(feature),
+            width: focused ? 6 : 4,
+          }),
+          fill: new Fill({
+            color: 'rgba(255,255,255, 0)',
+          }),
+        });
+      }
+    };
+  }
+
+  private getColorGradienteNormMax(feature: Feature) {
+    const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
+
+    if (gradNormMax < 10) {
+      return GLOBAL.colores_grad[0];
+    } else if (gradNormMax < 40) {
+      return GLOBAL.colores_grad[1];
+    } else {
+      return GLOBAL.colores_grad[2];
+    }
+  }
+
+  // ESTILO POR TIPOS
+  getStyleAnomaliasMapa(selected = false) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         if (selected) {

@@ -46,15 +46,13 @@ export class ViewControlComponent implements OnInit, OnDestroy {
         .pipe(take(1))
         .subscribe((layers) => (this.thermalLayers = layers));
 
-      this.olMapService
-        .getAnomaliaLayers()
-        .pipe(take(1))
-        .subscribe((layers) => (this.anomaliaLayers = layers));
+      this.subscriptions.add(
+        this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers))
+      );
     } else {
-      this.olMapService
-        .getSeguidorLayers()
-        .pipe(take(1))
-        .subscribe((layers) => (this.seguidorLayers = layers));
+      this.subscriptions.add(
+        this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidorLayers = layers))
+      );
     }
 
     this.olMapService.zonasLayers$.pipe(take(1)).subscribe((layers) => (this.zonesLayers = layers));
