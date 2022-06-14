@@ -10,7 +10,6 @@ import { SharedPlantsModule } from '@modules/shared-plants/shared-plants.module'
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { SeguidoresListComponent } from './components/seguidores-list/seguidores-list.component';
 import { MapSeguidoresComponent } from './components/map-seguidores/map-seguidores.component';
-import { ViewToggleComponent } from './components/view-toggle/view-toggle.component';
 import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.component';
 import { SeguidorViewComponent } from './components/seguidor-view/seguidor-view.component';
 import { SeguidorImagesComponent } from './components/seguidor-images/seguidor-images.component';
@@ -21,7 +20,6 @@ import { SeguidorSliderTemporalComponent } from './components/seguidor-slider-te
 import { SeguidorAnomaliaInfoComponent } from './components/seguidor-anomalia-info/seguidor-anomalia-info.component';
 import { SeguidorAnomaliasListComponent } from './components/seguidor-anomalias-list/seguidor-anomalias-list.component';
 import { SeguidorImageDownloadComponent } from './components/seguidor-image-download/seguidor-image-download.component';
-import { LeyendaComponent } from './components/leyenda/leyenda.component';
 import { SeguidorViewNavbarComponent } from './components/seguidor-view-navbar/seguidor-view-navbar.component';
 import { SeguidorViewLeyendaComponent } from './components/seguidor-view-leyenda/seguidor-view-leyenda.component';
 import { SeguidorImagesAreaComponent } from './components/seguidor-images-area/seguidor-images-area.component';
@@ -31,7 +29,6 @@ import { SeguidorImagesAreaComponent } from './components/seguidor-images-area/s
     MapViewComponent,
     SeguidoresListComponent,
     MapSeguidoresComponent,
-    ViewToggleComponent,
     SeguidorInfoComponent,
     SeguidorViewComponent,
     SeguidorImagesComponent,
@@ -42,7 +39,6 @@ import { SeguidorImagesAreaComponent } from './components/seguidor-images-area/s
     SeguidorAnomaliaInfoComponent,
     SeguidorAnomaliasListComponent,
     SeguidorImageDownloadComponent,
-    LeyendaComponent,
     SeguidorViewNavbarComponent,
     SeguidorViewLeyendaComponent,
     SeguidorImagesAreaComponent,

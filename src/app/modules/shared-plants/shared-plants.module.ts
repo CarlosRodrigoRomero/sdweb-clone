@@ -14,6 +14,8 @@ import { DownloadExcelComponent } from './components/download-excel/download-exc
 import { ZonesComponent } from './components/zones/zones.component';
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
 import { ViewControlComponent } from './components/view-control/view-control.component';
+import { ViewToggleComponent } from './components/view-toggle/view-toggle.component';
+import { LeyendaComponent } from './components/leyenda/leyenda.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +30,8 @@ import { ViewControlComponent } from './components/view-control/view-control.com
     ZonesComponent,
     SliderTemporalComponent,
     ViewControlComponent,
+    ViewToggleComponent,
+    LeyendaComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
@@ -39,6 +43,8 @@ import { ViewControlComponent } from './components/view-control/view-control.com
     ZonesComponent,
     SliderTemporalComponent,
     ViewControlComponent,
+    ViewToggleComponent,
+    LeyendaComponent,
   ],
 })
 export class SharedPlantsModule {}
