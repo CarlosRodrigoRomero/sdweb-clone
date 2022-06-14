@@ -57,15 +57,9 @@ export class ZonesControlService {
       this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
 
       if (this.reportControlService.plantaFija) {
-        this.olMapService
-          .getAnomaliaLayers()
-          .pipe(take(1))
-          .subscribe((layers) => (this.elemsLayers = layers));
+        this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.elemsLayers = layers));
       } else {
-        this.olMapService
-          .getSeguidorLayers()
-          .pipe(take(1))
-          .subscribe((layers) => (this.elemsLayers = layers));
+        this.olMapService.getSeguidorLayers().subscribe((layers) => (this.elemsLayers = layers));
       }
 
       this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom));
@@ -266,6 +260,7 @@ export class ZonesControlService {
             if (this.prevLayerHovered !== undefined) {
               this.prevLayerHovered.setVisible(false);
             }
+
             this.currentLayerHovered = this.elemsLayers.find(
               (l) =>
                 l.getProperties().zoneId === feature.getProperties().properties.id &&
