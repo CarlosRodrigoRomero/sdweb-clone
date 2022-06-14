@@ -30,10 +30,9 @@ export class ZonesControlService {
   private selectedInformeId: string;
   private toggleViewSelected: number;
   private elemsLayers: VectorLayer[];
-  private currentLayerHovered: VectorLayer;
+  private layerHovered: VectorLayer;
   prevLayerHovered: VectorLayer;
-  currentLayerSelected: VectorLayer;
-  prevLayerSelected: VectorLayer;
+  layerSelected: VectorLayer;
   private currentZoom: number;
 
   constructor(
@@ -248,33 +247,36 @@ export class ZonesControlService {
 
   private addOnHoverAction() {
     this.map.on('pointermove', (event) => {
-      if (this.currentZoom < this.zoomChangeView) {
-        if (this.map.hasFeatureAtPixel(event.pixel)) {
-          const feature = this.map
-            .getFeaturesAtPixel(event.pixel)
-            .filter((item) => item.getProperties().properties !== undefined)
-            .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
-            .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
+      // solo cambiamos estilos hover si no hay una capa de anomalias seleccionada
+      if (this.layerSelected === undefined) {
+        if (this.currentZoom < this.zoomChangeView) {
+          if (this.map.hasFeatureAtPixel(event.pixel)) {
+            const feature = this.map
+              .getFeaturesAtPixel(event.pixel)
+              .filter((item) => item.getProperties().properties !== undefined)
+              .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
+              .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
 
-          if (feature !== undefined) {
-            // cuando pasamos de una zona a otra directamente sin pasar por vacio
-            if (this.prevLayerHovered !== undefined) {
-              this.prevLayerHovered.setVisible(false);
+            if (feature !== undefined) {
+              // cuando pasamos de una zona a otra directamente sin pasar por vacio
+              if (this.prevLayerHovered !== undefined) {
+                this.prevLayerHovered.setVisible(false);
+              }
+
+              this.layerHovered = this.elemsLayers.find(
+                (l) =>
+                  l.getProperties().zoneId === feature.getProperties().properties.id &&
+                  l.getProperties().view === this.toggleViewSelected &&
+                  l.getProperties().informeId === this.selectedInformeId
+              );
+              this.layerHovered.setVisible(true);
+
+              this.prevLayerHovered = this.layerHovered;
             }
-
-            this.currentLayerHovered = this.elemsLayers.find(
-              (l) =>
-                l.getProperties().zoneId === feature.getProperties().properties.id &&
-                l.getProperties().view === this.toggleViewSelected &&
-                l.getProperties().informeId === this.selectedInformeId
-            );
-            this.currentLayerHovered.setVisible(true);
-
-            this.prevLayerHovered = this.currentLayerHovered;
-          }
-        } else {
-          if (this.currentLayerHovered !== undefined) {
-            this.currentLayerHovered.setVisible(false);
+          } else {
+            if (this.layerHovered !== undefined) {
+              this.layerHovered.setVisible(false);
+            }
           }
         }
       }

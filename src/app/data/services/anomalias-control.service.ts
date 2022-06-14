@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest } from 'rxjs';
 
 import Map from 'ol/Map';
 import { Fill, Stroke, Style } from 'ol/style';
 import { Feature } from 'ol';
 import VectorLayer from 'ol/layer/Vector';
-import VectorImageLayer from 'ol/layer/VectorImage';
 import Polygon from 'ol/geom/Polygon';
 import { Draw, Modify, Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
@@ -34,8 +32,6 @@ import { GLOBAL } from '@data/constants/global';
   providedIn: 'root',
 })
 export class AnomaliasControlService {
-  private _initialized = false;
-  private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   public map: Map;
   public selectedInformeId: string;
   private _anomaliaSelect: Anomalia = undefined;
@@ -48,6 +44,7 @@ export class AnomaliasControlService {
   private anomaliaLayers: VectorLayer[];
   private sharedReportNoFilters = false;
   private toggleViewSelected: number;
+  private currentZoom: number;
 
   private _coordsPointer: Coordinate = undefined;
   public coordsPointer$ = new BehaviorSubject<Coordinate>(this._coordsPointer);
@@ -68,17 +65,11 @@ export class AnomaliasControlService {
     const getIfSharedWithFilters = this.reportControlService.sharedReportWithFilters$;
 
     return new Promise((initService) => {
-      combineLatest([getMap, getAnomLayers, getIfSharedWithFilters])
-        // .pipe(take(1))
-        .subscribe(([map, anomL, isSharedWithFil]) => {
-          this.map = map;
-          this.anomaliaLayers = anomL;
-          this.sharedReportNoFilters = !isSharedWithFil;
-
-          if (this.map !== undefined) {
-            initService(true);
-          }
-        });
+      combineLatest([getMap, getAnomLayers, getIfSharedWithFilters]).subscribe(([map, anomL, isSharedWithFil]) => {
+        this.map = map;
+        this.anomaliaLayers = anomL;
+        this.sharedReportNoFilters = !isSharedWithFil;
+      });
 
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {
         this.selectedInformeId = informeId;
@@ -88,6 +79,10 @@ export class AnomaliasControlService {
       });
 
       this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
+
+      this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom));
+
+      initService(true);
     });
   }
 
@@ -324,13 +319,13 @@ export class AnomaliasControlService {
             }
             this.prevFeatureHover = feature;
           }
-        } else {
-          this.anomaliaHover = undefined;
+        }
+      } else {
+        this.anomaliaHover = undefined;
 
-          if (currentFeatureHover !== undefined) {
-            currentFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
-            currentFeatureHover = undefined;
-          }
+        if (currentFeatureHover !== undefined) {
+          currentFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+          currentFeatureHover = undefined;
         }
       }
     });
@@ -394,7 +389,12 @@ export class AnomaliasControlService {
           this.setExternalStyle(this.anomaliaSelect.id, false, false);
         }
         this.anomaliaSelect = undefined;
-        this.zonesControlService.currentLayerSelected = undefined;
+
+        if (this.zonesControlService.layerSelected !== undefined) {
+          // ocultamos la capa
+          this.setLayerVisibility(this.zonesControlService.layerSelected, false);
+          this.zonesControlService.layerSelected = undefined;
+        }
       }
     });
   }
@@ -638,10 +638,13 @@ export class AnomaliasControlService {
     // mostramos u ocultamos las zona de la anomalia si la hubiera
     if (feature.getProperties().properties.hasOwnProperty('zone')) {
       // solo cambiamos estilos si no hay una capa de anomalias seleccionada
-      if (this.zonesControlService.currentLayerSelected === undefined) {
+      if (this.zonesControlService.layerSelected === undefined) {
         // si hay una capa de anomalias previa con hover la ocultamos
         if (this.zonesControlService.prevLayerHovered !== undefined) {
-          this.zonesControlService.prevLayerHovered.setVisible(false);
+          // pero solo si estamos en zoom out
+          if (this.currentZoom < this.zonesControlService.zoomChangeView) {
+            this.zonesControlService.prevLayerHovered.setVisible(false);
+          }
         }
 
         const zoneSeguidor = feature.getProperties().properties.zone;
@@ -649,10 +652,24 @@ export class AnomaliasControlService {
           (layer) =>
             layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneSeguidor.globalCoords)
         );
-        layerZoneSeguidor.setVisible(visible);
+
+        // solo la ocultamos si estamos en zoom out
+        if (visible === false) {
+          if (this.currentZoom < this.zonesControlService.zoomChangeView) {
+            layerZoneSeguidor.setVisible(visible);
+          }
+        } else {
+          layerZoneSeguidor.setVisible(visible);
+        }
 
         this.zonesControlService.prevLayerHovered = layerZoneSeguidor;
       }
+    }
+  }
+
+  private setLayerVisibility(layer: VectorLayer, visible: boolean) {
+    if (this.currentZoom < this.zonesControlService.zoomChangeView) {
+      layer.setVisible(visible);
     }
   }
 

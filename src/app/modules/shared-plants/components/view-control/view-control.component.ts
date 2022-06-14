@@ -129,24 +129,27 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   }
 
   private setAnomaliaLayersVisibility(informeId: string) {
-    // solo actualizamos la vista cuando no hay una capa de anomalia seleccionada
-    if (this.zonesControlService.currentLayerSelected === undefined) {
-      this.anomaliaLayers.forEach((layer) => {
-        if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
-          if (this.zonesService.thereAreZones) {
-            if (this.currentZoom >= this.zonesControlService.zoomChangeView) {
-              layer.setVisible(true);
-            } else {
+    this.anomaliaLayers.forEach((layer) => {
+      if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
+        if (this.zonesService.thereAreZones) {
+          if (this.currentZoom >= this.zonesControlService.zoomChangeView) {
+            layer.setVisible(true);
+          } else {
+            // ocultamos todas las capas salvo la seleccionada si hay alguna
+            if (
+              this.zonesControlService.layerSelected !== undefined &&
+              layer.getProperties().zoneId !== this.zonesControlService.layerSelected.getProperties().zoneId
+            ) {
               layer.setVisible(false);
             }
-          } else {
-            layer.setVisible(true);
           }
         } else {
-          layer.setVisible(false);
+          layer.setVisible(true);
         }
-      });
-    }
+      } else {
+        layer.setVisible(false);
+      }
+    });
   }
 
   private setSeguidorLayersVisibility(informeId: string) {

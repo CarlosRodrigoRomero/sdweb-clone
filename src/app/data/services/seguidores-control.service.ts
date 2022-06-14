@@ -82,13 +82,11 @@ export class SeguidoresControlService {
     const getIfSharedWithFilters = this.reportControlService.sharedReportWithFilters$;
 
     return new Promise((initService) => {
-      combineLatest([getMap, getSegLayers, getIfSharedWithFilters])
-        // .pipe(take(1))
-        .subscribe(([map, segL, isSharedWithFil]) => {
-          this.map = map;
-          this.seguidorLayers = segL;
-          this.sharedReportNoFilters = !isSharedWithFil;
-        });
+      combineLatest([getMap, getSegLayers, getIfSharedWithFilters]).subscribe(([map, segL, isSharedWithFil]) => {
+        this.map = map;
+        this.seguidorLayers = segL;
+        this.sharedReportNoFilters = !isSharedWithFil;
+      });
 
       this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
 

@@ -154,7 +154,7 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
     // quitamos el hover de la anomalia
     this.anomaliasControlService.anomaliaHover = undefined;
 
-    this.zonesControlService.currentLayerSelected = this.anomaliasControlService.getLayerViewAnomalias(row.id);
+    this.zonesControlService.layerSelected = this.anomaliasControlService.getLayerViewAnomalias(row.id);
 
     // reiniciamos el estilo a la anterior anomalia
     if (this.anomaliasControlService.prevAnomaliaSelect !== undefined) {
