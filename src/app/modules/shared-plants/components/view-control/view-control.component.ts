@@ -10,6 +10,7 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ViewReportService } from '@data/services/view-report.service';
 import { ZonesControlService } from '@data/services/zones-control.service';
+import { ZonesService } from '@data/services/zones.service';
 
 @Component({
   selector: 'app-view-control',
@@ -32,7 +33,8 @@ export class ViewControlComponent implements OnInit, OnDestroy {
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
     private viewReportService: ViewReportService,
-    private zonesControlService: ZonesControlService
+    private zonesControlService: ZonesControlService,
+    private zonesService: ZonesService
   ) {}
 
   ngOnInit(): void {
@@ -73,13 +75,15 @@ export class ViewControlComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.subscriptions.add(
-      this.olMapService.currentZoom$.subscribe((zoom) => {
-        this.currentZoom = zoom;
+    if (this.zonesService.thereAreZones) {
+      this.subscriptions.add(
+        this.olMapService.currentZoom$.subscribe((zoom) => {
+          this.currentZoom = zoom;
 
-        this.setLayersVisibility(this.selectedInformeId);
-      })
-    );
+          this.setLayersVisibility(this.selectedInformeId);
+        })
+      );
+    }
 
     // establecemos las visibilidades de inicio cuando el mapa ha cargado
     this.subscriptions.add(
@@ -93,7 +97,11 @@ export class ViewControlComponent implements OnInit, OnDestroy {
 
   private setLayersVisibility(informeId: string) {
     this.setAerialLayersVisibility(informeId);
-    this.setZonesLayersVisibility(informeId);
+
+    if (this.zonesService.thereAreZones) {
+      this.setZonesLayersVisibility(informeId);
+    }
+
     if (this.reportControlService.plantaFija) {
       this.setThermalLayersVisibility(informeId);
       this.setAnomaliaLayersVisibility(informeId);
@@ -124,12 +132,16 @@ export class ViewControlComponent implements OnInit, OnDestroy {
 
   private setAnomaliaLayersVisibility(informeId: string) {
     this.anomaliaLayers.forEach((layer) => {
-      if (
-        layer.getProperties().informeId === informeId &&
-        layer.getProperties().view === this.reportViewSelected &&
-        this.currentZoom >= this.zonesControlService.zoomChangeView
-      ) {
-        layer.setVisible(true);
+      if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
+        if (this.zonesService.thereAreZones) {
+          if (this.currentZoom >= this.zonesControlService.zoomChangeView) {
+            layer.setVisible(true);
+          } else {
+            layer.setVisible(false);
+          }
+        } else {
+          layer.setVisible(true);
+        }
       } else {
         layer.setVisible(false);
       }
@@ -138,12 +150,16 @@ export class ViewControlComponent implements OnInit, OnDestroy {
 
   private setSeguidorLayersVisibility(informeId: string) {
     this.seguidorLayers.forEach((layer) => {
-      if (
-        layer.getProperties().informeId === informeId &&
-        layer.getProperties().view === this.reportViewSelected &&
-        this.currentZoom >= this.zonesControlService.zoomChangeView
-      ) {
-        layer.setVisible(true);
+      if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
+        if (this.zonesService.thereAreZones) {
+          if (this.currentZoom >= this.zonesControlService.zoomChangeView) {
+            layer.setVisible(true);
+          } else {
+            layer.setVisible(false);
+          }
+        } else {
+          layer.setVisible(true);
+        }
       } else {
         layer.setVisible(false);
       }

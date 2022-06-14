@@ -111,6 +111,19 @@ export class AnomaliasControlService {
         });
         anomaliasLayers.push(perdidasLayer);
       });
+    } else {
+      const perdidasLayer = new VectorLayer({
+        source: new VectorSource({ wrapX: false }),
+        style: this.getStylePerdidas(false),
+        // style: this.getStyleAnomaliasMapa(false),
+        visible: false,
+      });
+      perdidasLayer.setProperties({
+        informeId,
+        type: 'anomalias',
+        view: 0,
+      });
+      anomaliasLayers.push(perdidasLayer);
     }
 
     return anomaliasLayers;
