@@ -37,7 +37,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
   public seguidorHovered: Seguidor = undefined;
   public seguidorSelected: Seguidor = undefined;
   private planta: PlantaInterface;
-  private informeId: string;
+  private selectedInformeId: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -72,18 +72,13 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
       })
     );
 
-    this.subscriptions.add(
-      this.plantaService
-        .getPlanta(this.reportControlService.plantaId)
-        .pipe(
-          take(1),
-          switchMap((planta) => {
-            this.planta = planta;
+    this.planta = this.reportControlService.planta;
 
-            return this.reportControlService.selectedInformeId$;
-          }),
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$
+        .pipe(
           switchMap((informeId) => {
-            this.informeId = informeId;
+            this.selectedInformeId = informeId;
 
             return this.filterService.filteredElements$;
           })
@@ -92,7 +87,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
           const filteredElements = [];
 
           elems
-            .filter((elem) => (elem as Seguidor).informeId === this.informeId)
+            .filter((elem) => (elem as Seguidor).informeId === this.selectedInformeId)
             .forEach((elem) => {
               const seguidor = elem as Seguidor;
 

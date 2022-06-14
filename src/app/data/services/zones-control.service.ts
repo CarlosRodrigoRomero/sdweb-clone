@@ -20,7 +20,6 @@ import { Seguidor } from '@core/models/seguidor';
 import { FilterableElement } from '@core/models/filterableInterface';
 
 import { GLOBAL } from '@data/constants/global';
-import { take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -33,6 +32,8 @@ export class ZonesControlService {
   private elemsLayers: VectorLayer[];
   private currentLayerHovered: VectorLayer;
   prevLayerHovered: VectorLayer;
+  currentLayerSelected: VectorLayer;
+  prevLayerSelected: VectorLayer;
   private currentZoom: number;
 
   constructor(

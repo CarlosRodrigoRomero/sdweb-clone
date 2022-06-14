@@ -57,6 +57,7 @@ export class SeguidoresControlService {
   thermalImageExist$ = new BehaviorSubject<boolean>(this._thermalImageExist);
   private _visualImageExist = true;
   visualImageExist$ = new BehaviorSubject<boolean>(this._visualImageExist);
+  private currentZoom: number;
 
   private maesMedio: number[] = [];
   private maesSigma: number[] = [];
@@ -100,6 +101,8 @@ export class SeguidoresControlService {
         // reseteamos la interaccion con cada vista para obtener el estilo correcto
         this.resetSelectInteraction();
       });
+
+      this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom));
 
       initService(true);
     });
@@ -678,14 +681,25 @@ export class SeguidoresControlService {
     if (feature.getProperties().properties.hasOwnProperty('zone')) {
       // si hay una capa se seguidores previa seleccionada la ocultamos
       if (this.zonesControlService.prevLayerHovered !== undefined) {
-        this.zonesControlService.prevLayerHovered.setVisible(false);
+        // pero solo si estamos en zoom out
+        if (this.currentZoom < this.zonesControlService.zoomChangeView) {
+          this.zonesControlService.prevLayerHovered.setVisible(false);
+        }
       }
 
       const zoneSeguidor = feature.getProperties().properties.zone;
       const layerZoneSeguidor = layers.find(
         (layer) => layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneSeguidor.globalCoords)
       );
-      layerZoneSeguidor.setVisible(visible);
+
+      // solo la ocultamos si estamos en zoom out
+      if (visible === false) {
+        if (this.currentZoom < this.zonesControlService.zoomChangeView) {
+          layerZoneSeguidor.setVisible(visible);
+        }
+      } else {
+        layerZoneSeguidor.setVisible(visible);
+      }
 
       this.zonesControlService.prevLayerHovered = layerZoneSeguidor;
     }

@@ -359,7 +359,7 @@ export class AnomaliasControlService {
     this.map.addInteraction(select);
     select.on('select', (e) => {
       if (this.anomaliaSelect !== undefined) {
-        this.setExternalStyle(this.anomaliaSelect.id, false);
+        this.setExternalStyle(this.anomaliaSelect.id, false, false);
         this.anomaliaSelect = undefined;
       }
 
@@ -369,11 +369,11 @@ export class AnomaliasControlService {
           const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
 
           if (this.prevAnomaliaSelect !== undefined) {
-            this.setExternalStyle(this.prevAnomaliaSelect.id, false);
+            this.setExternalStyle(this.prevAnomaliaSelect.id, false, false);
           }
           this.prevAnomaliaSelect = anomalia;
           this.anomaliaSelect = anomalia;
-          this.setExternalStyle(anomalia.id, true);
+          this.setExternalStyle(anomalia.id, true, true);
           this.anomaliaHover = undefined;
         }
       }
@@ -391,9 +391,10 @@ export class AnomaliasControlService {
         .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
       if (feature.length === 0) {
         if (this.anomaliaSelect !== undefined) {
-          this.setExternalStyle(this.anomaliaSelect.id, false);
+          this.setExternalStyle(this.anomaliaSelect.id, false, false);
         }
         this.anomaliaSelect = undefined;
+        this.zonesControlService.currentLayerSelected = undefined;
       }
     });
   }
@@ -463,7 +464,7 @@ export class AnomaliasControlService {
         return new Style({
           stroke: new Stroke({
             color: focused ? 'white' : this.getColorMae(feature),
-            width: focused ? 6 : 4,
+            width: focused ? 4 : 2,
           }),
           fill: new Fill({
             color: 'rgba(255,255,255, 0)',
@@ -492,7 +493,7 @@ export class AnomaliasControlService {
         return new Style({
           stroke: new Stroke({
             color: focused ? 'white' : GLOBAL.colores_tipos[8] /* this.getColorCelsCalientes(feature) */,
-            width: focused ? 6 : 4,
+            width: focused ? 4 : 2,
           }),
           fill: new Fill({
             color: 'rgba(255,255,255, 0)',
@@ -521,7 +522,7 @@ export class AnomaliasControlService {
         return new Style({
           stroke: new Stroke({
             color: focused ? 'white' : this.getColorGradienteNormMax(feature),
-            width: focused ? 6 : 4,
+            width: focused ? 4 : 2,
           }),
           fill: new Fill({
             color: 'rgba(255,255,255, 0)',
@@ -579,7 +580,27 @@ export class AnomaliasControlService {
     }
   }
 
-  setExternalStyle(anomaliaId: string, focus: boolean) {
+  getLayerViewAnomalias(anomaliaId: string) {
+    const layersInforme = this.anomaliaLayers.filter(
+      (layer) => layer.getProperties().informeId === this.selectedInformeId
+    );
+
+    const layersView = layersInforme.filter((layer) => layer.getProperties().view === this.toggleViewSelected);
+
+    let layerViewAnomalia: VectorLayer;
+    layersView.forEach((layer) => {
+      const featuresLayer = layer.getSource().getFeatures();
+      featuresLayer.forEach((f) => {
+        if (f.getProperties().properties.anomaliaId === anomaliaId) {
+          layerViewAnomalia = layer;
+        }
+      });
+    });
+
+    return layerViewAnomalia;
+  }
+
+  setExternalStyle(anomaliaId: string, focus: boolean, layerVisible?: boolean) {
     const estilosViewFocused = [
       this.getStylePerdidas(true),
       this.getStyleCelsCalientes(true),
@@ -591,14 +612,14 @@ export class AnomaliasControlService {
       this.getStyleGradienteNormMax(false),
     ];
 
-    const features = this.anomaliaLayers
-      .find(
-        (layer) =>
-          layer.getProperties().informeId === this.selectedInformeId &&
-          layer.getProperties().view === this.toggleViewSelected
-      )
-      .getSource()
-      .getFeatures();
+    const layersInforme = this.anomaliaLayers.filter(
+      (layer) => layer.getProperties().informeId === this.selectedInformeId
+    );
+
+    const layersView = layersInforme.filter((layer) => layer.getProperties().view === this.toggleViewSelected);
+
+    const features: Feature[] = [];
+    layersView.forEach((layer) => features.push(...layer.getSource().getFeatures()));
 
     const feature = features.find((f) => f.getProperties().properties.anomaliaId === anomaliaId);
 
@@ -606,6 +627,32 @@ export class AnomaliasControlService {
       feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
     } else {
       feature.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+    }
+
+    if (layerVisible !== undefined) {
+      this.setExternalStyleAnomaliaLayer(feature, layersView, layerVisible);
+    }
+  }
+
+  setExternalStyleAnomaliaLayer(feature: Feature, layers: VectorLayer[], visible: boolean) {
+    // mostramos u ocultamos las zona de la anomalia si la hubiera
+    if (feature.getProperties().properties.hasOwnProperty('zone')) {
+      // solo cambiamos estilos si no hay una capa de anomalias seleccionada
+      if (this.zonesControlService.currentLayerSelected === undefined) {
+        // si hay una capa de anomalias previa con hover la ocultamos
+        if (this.zonesControlService.prevLayerHovered !== undefined) {
+          this.zonesControlService.prevLayerHovered.setVisible(false);
+        }
+
+        const zoneSeguidor = feature.getProperties().properties.zone;
+        const layerZoneSeguidor = layers.find(
+          (layer) =>
+            layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneSeguidor.globalCoords)
+        );
+        layerZoneSeguidor.setVisible(visible);
+
+        this.zonesControlService.prevLayerHovered = layerZoneSeguidor;
+      }
     }
   }
 
