@@ -337,8 +337,7 @@ export class SeguidoresControlService {
       layers: (l) => {
         if (
           l.getProperties().informeId === this.selectedInformeId &&
-          // tslint:disable-next-line: triple-equals
-          l.getProperties().view == this.toggleViewSelected &&
+          l.getProperties().view === this.toggleViewSelected &&
           l.getProperties().hasOwnProperty('type') &&
           l.getProperties().type === 'seguidores'
         ) {
