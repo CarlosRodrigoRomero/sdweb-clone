@@ -19,8 +19,8 @@ import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { FilterableElement } from '@core/models/filterableInterface';
 
-import { GLOBAL } from '@data/constants/global';
 import { COLOR } from '@data/constants/color';
+import { Select } from 'ol/interaction';
 
 @Injectable({
   providedIn: 'root',
@@ -49,6 +49,8 @@ export class ZonesControlService {
 
         if (this.map !== undefined) {
           initService(true);
+
+          this.addSelectInteraction();
         }
       });
 
@@ -75,6 +77,7 @@ export class ZonesControlService {
     maeLayer.setProperties({
       informeId,
       view: 0,
+      type: 'zonas',
     });
     const ccLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
@@ -84,6 +87,7 @@ export class ZonesControlService {
     ccLayer.setProperties({
       informeId,
       view: 1,
+      type: 'zonas',
     });
     const gradLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
@@ -93,6 +97,7 @@ export class ZonesControlService {
     gradLayer.setProperties({
       informeId,
       view: 2,
+      type: 'zonas',
     });
 
     return [maeLayer, ccLayer, gradLayer];
@@ -280,6 +285,36 @@ export class ZonesControlService {
     });
   }
 
+  private addSelectInteraction() {
+    const select = new Select({
+      style: this.getStyleZonas(),
+      layers: (l) => {
+        if (
+          l.getProperties().informeId === this.selectedInformeId &&
+          l.getProperties().view === this.toggleViewSelected &&
+          l.getProperties().hasOwnProperty('type') &&
+          l.getProperties().type === 'zonas'
+        ) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    });
+
+    this.map.addInteraction(select);
+    select.on('select', (e) => {
+      if (e.selected.length > 0) {
+        if (e.selected[0].getProperties().hasOwnProperty('properties')) {
+          const centroidZone = e.selected[0].getProperties().properties.centroid;
+
+          this.olMapService.setViewCenter(centroidZone);
+          this.olMapService.setViewZoom(19);
+        }
+      }
+    });
+  }
+
   private pathToLonLat(path: any): Coordinate[][] {
     return [path.map((coords) => fromLonLat([coords.lng, coords.lat]))];
   }
@@ -298,6 +333,12 @@ export class ZonesControlService {
     }
 
     return gCoords.join('.');
+  }
+
+  private getStyleZonas() {
+    const estilosView = [this.getStyleMae(), this.getStyleCelsCalientes(), this.getStyleGradienteNormMax()];
+
+    return estilosView[this.toggleViewSelected];
   }
 
   // ESTILOS MAE
