@@ -104,7 +104,8 @@ export class SeguidoresControlService {
         this.toggleViewSelected = viewSel;
 
         // reseteamos la interaccion con cada vista para obtener el estilo correcto
-        this.resetSelectInteraction();
+        // this.resetSelectInteraction();
+        this.refreshLayersView();
       });
 
       this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom));
@@ -382,18 +383,23 @@ export class SeguidoresControlService {
   private addZoomEvent() {
     this.map.on('moveend', (event) => {
       this.olMapService.currentZoom = this.map.getView().getZoom();
-      this.map
-        .getLayers()
-        .getArray()
-        .forEach((layer) => {
-          if (
-            layer.getProperties().informeId === this.selectedInformeId &&
-            layer.getProperties().view === this.toggleViewSelected
-          ) {
-            (layer as VectorLayer).getSource().changed();
-          }
-        });
+
+      this.refreshLayersView();
     });
+  }
+
+  private refreshLayersView() {
+    this.map
+      .getLayers()
+      .getArray()
+      .forEach((layer) => {
+        if (
+          layer.getProperties().informeId === this.selectedInformeId &&
+          layer.getProperties().view === this.toggleViewSelected
+        ) {
+          (layer as VectorLayer).getSource().changed();
+        }
+      });
   }
 
   clearSelectFeature() {

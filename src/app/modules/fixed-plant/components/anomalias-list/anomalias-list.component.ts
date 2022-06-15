@@ -139,22 +139,20 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
   hoverAnomalia(row: any) {
     if (this.anomaliasControlService.anomaliaSelect === undefined) {
       this.anomaliasControlService.anomaliaHover = row.anomalia;
-      this.anomaliasControlService.setExternalStyle(row.id, true, true);
+      this.anomaliasControlService.setExternalStyle(row.id, true);
     }
   }
 
   unhoverAnomalia(row: any) {
     if (this.anomaliasControlService.anomaliaSelect === undefined) {
       this.anomaliasControlService.anomaliaHover = undefined;
-      this.anomaliasControlService.setExternalStyle(row.id, false, false);
+      this.anomaliasControlService.setExternalStyle(row.id, false);
     }
   }
 
   selectAnomalia(row: any, zoom: boolean) {
     // quitamos el hover de la anomalia
     this.anomaliasControlService.anomaliaHover = undefined;
-
-    this.zonesControlService.layerSelected = this.anomaliasControlService.getLayerViewAnomalias(row.id);
 
     // reiniciamos el estilo a la anterior anomalia
     if (this.anomaliasControlService.prevAnomaliaSelect !== undefined) {
@@ -163,7 +161,7 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
     this.anomaliasControlService.prevAnomaliaSelect = row.anomalia;
 
     this.anomaliasControlService.anomaliaSelect = row.anomalia;
-    this.anomaliasControlService.setExternalStyle(row.id, true, true);
+    this.anomaliasControlService.setExternalStyle(row.id, true);
 
     // centramos la vista al hacer click
     this.centerView(row.anomalia, zoom);

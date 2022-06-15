@@ -313,7 +313,7 @@ export class AnomaliasControlService {
             this.prevFeatureHover = feature;
           } else {
             if (this.anomaliaHover !== undefined) {
-              this.setExternalStyle(this.anomaliaHover.id, false, false);
+              this.setExternalStyle(this.anomaliaHover.id, false);
 
               this.anomaliaHover = undefined;
             }
@@ -354,7 +354,7 @@ export class AnomaliasControlService {
       this.anomaliaHover = undefined;
 
       if (this.anomaliaSelect !== undefined) {
-        this.setExternalStyle(this.anomaliaSelect.id, false, false);
+        this.setExternalStyle(this.anomaliaSelect.id, false);
         this.anomaliaSelect = undefined;
       }
 
@@ -369,10 +369,10 @@ export class AnomaliasControlService {
           this.zonesControlService.layerSelected = this.getLayerViewAnomalias(anomaliaId);
 
           // aplicamos estilos
-          this.setExternalStyle(anomaliaId, true, true);
+          this.setExternalStyle(anomaliaId, true);
 
           if (this.prevAnomaliaSelect !== undefined && this.prevAnomaliaSelect.id !== anomaliaId) {
-            this.setExternalStyle(this.prevAnomaliaSelect.id, false, false);
+            this.setExternalStyle(this.prevAnomaliaSelect.id, false);
           }
 
           this.prevAnomaliaSelect = anomalia;
@@ -392,7 +392,7 @@ export class AnomaliasControlService {
         .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
       if (feature.length === 0) {
         if (this.anomaliaSelect !== undefined) {
-          this.setExternalStyle(this.anomaliaSelect.id, false, false);
+          this.setExternalStyle(this.anomaliaSelect.id, false);
 
           this.anomaliaSelect = undefined;
         }
@@ -624,18 +624,7 @@ export class AnomaliasControlService {
     return layerViewAnomalia;
   }
 
-  setExternalStyle(anomaliaId: string, focus: boolean, layerVisible?: boolean) {
-    const estilosViewFocused = [
-      this.getStylePerdidas(true),
-      this.getStyleCelsCalientes(true),
-      this.getStyleGradienteNormMax(true),
-    ];
-    const estilosViewUnfocused = [
-      this.getStylePerdidas(false),
-      this.getStyleCelsCalientes(false),
-      this.getStyleGradienteNormMax(false),
-    ];
-
+  setExternalStyle(anomaliaId: string, focus: boolean) {
     const layersInforme = this.anomaliaLayers.filter(
       (layer) => layer.getProperties().informeId === this.selectedInformeId
     );
@@ -648,13 +637,9 @@ export class AnomaliasControlService {
     const feature = features.find((f) => f.getProperties().properties.anomaliaId === anomaliaId);
 
     if (focus) {
-      feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
+      feature.setStyle(this.getStyleAnomalias(true));
     } else {
-      feature.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
-    }
-
-    if (layerVisible !== undefined) {
-      this.setExternalStyleAnomaliaLayer(feature, layersView, layerVisible);
+      feature.setStyle(this.getStyleAnomalias(false));
     }
   }
 

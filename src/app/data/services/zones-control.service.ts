@@ -313,7 +313,7 @@ export class ZonesControlService {
             width: 4,
           }),
           fill: new Fill({
-            color: this.currentZoom >= this.zoomChangeView ? 'rgba(0,0,0,0)' : this.getColorMae(feature, 0.5),
+            color: this.currentZoom >= this.zoomChangeView ? 'rgba(0,0,0,0)' : this.getColorMae(feature, 0.6),
           }),
           text: this.getLabelStyle(feature),
         });
@@ -343,7 +343,7 @@ export class ZonesControlService {
             width: 4,
           }),
           fill: new Fill({
-            color: this.currentZoom >= this.zoomChangeView ? 'rgba(0,0,0,0)' : this.getColorCelsCalientes(feature, 0.1),
+            color: this.currentZoom >= this.zoomChangeView ? 'rgba(0,0,0,0)' : this.getColorCelsCalientes(feature, 0.6),
           }),
           text: this.getLabelStyle(feature),
         });
@@ -374,7 +374,7 @@ export class ZonesControlService {
           }),
           fill: new Fill({
             color:
-              this.currentZoom >= this.zoomChangeView ? 'rgba(0,0,0,0)' : this.getColorGradienteNormMax(feature, 0.1),
+              this.currentZoom >= this.zoomChangeView ? 'rgba(0,0,0,0)' : this.getColorGradienteNormMax(feature, 0.6),
           }),
           text: this.getLabelStyle(feature),
         });
