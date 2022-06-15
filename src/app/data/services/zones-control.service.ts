@@ -26,7 +26,7 @@ import { GLOBAL } from '@data/constants/global';
 })
 export class ZonesControlService {
   private map: Map;
-  zoomChangeView = 19;
+  zoomChangeView = 17.5;
   private selectedInformeId: string;
   private toggleViewSelected: number;
   private elemsLayers: VectorLayer[];
@@ -140,7 +140,7 @@ export class ZonesControlService {
     });
 
     // añadimos acciones sobre las zonas
-    this.addOnHoverAction();
+    // this.addOnHoverAction();
   }
 
   private getPropertyView(
@@ -313,7 +313,7 @@ export class ZonesControlService {
             width: 4,
           }),
           fill: new Fill({
-            color: this.getColorMae(feature, 0.1),
+            color: this.currentZoom >= this.zoomChangeView ? 'rgba(0,0,0,0)' : this.getColorMae(feature, 0.5),
           }),
           text: this.getLabelStyle(feature),
         });
@@ -343,7 +343,7 @@ export class ZonesControlService {
             width: 4,
           }),
           fill: new Fill({
-            color: this.getColorCelsCalientes(feature, 0.1),
+            color: this.currentZoom >= this.zoomChangeView ? 'rgba(0,0,0,0)' : this.getColorCelsCalientes(feature, 0.1),
           }),
           text: this.getLabelStyle(feature),
         });
@@ -373,7 +373,8 @@ export class ZonesControlService {
             width: 4,
           }),
           fill: new Fill({
-            color: this.getColorGradienteNormMax(feature, 0.1),
+            color:
+              this.currentZoom >= this.zoomChangeView ? 'rgba(0,0,0,0)' : this.getColorGradienteNormMax(feature, 0.1),
           }),
           text: this.getLabelStyle(feature),
         });

@@ -106,7 +106,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
               this.initMap();
 
               this.addPopupOverlay();
-              this.addZoomEvent();
             }
           });
         } else {
@@ -123,7 +122,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
               this.initMap();
 
               this.addPopupOverlay();
-              this.addZoomEvent();
             }
           });
         }
@@ -206,10 +204,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     });
 
     this.map.addOverlay(this.popup);
-  }
-
-  private addZoomEvent() {
-    this.map.on('moveend', (event) => (this.olMapService.currentZoom = this.map.getView().getZoom()));
   }
 
   ngOnDestroy(): void {

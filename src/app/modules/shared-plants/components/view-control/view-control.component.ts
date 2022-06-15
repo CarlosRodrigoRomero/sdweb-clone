@@ -135,13 +135,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
           if (this.currentZoom >= this.zonesControlService.zoomChangeView) {
             layer.setVisible(true);
           } else {
-            // ocultamos todas las capas salvo la seleccionada si hay alguna
-            if (
-              this.zonesControlService.layerSelected !== undefined &&
-              layer.getProperties().zoneId !== this.zonesControlService.layerSelected.getProperties().zoneId
-            ) {
-              layer.setVisible(false);
-            }
+            layer.setVisible(false);
           }
         } else {
           layer.setVisible(true);

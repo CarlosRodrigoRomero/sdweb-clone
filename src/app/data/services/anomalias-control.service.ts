@@ -69,6 +69,14 @@ export class AnomaliasControlService {
         this.map = map;
         this.anomaliaLayers = anomL;
         this.sharedReportNoFilters = !isSharedWithFil;
+
+        if (this.map !== undefined) {
+          // añadimos acciones sobre las anomalias
+          this.addPointerOnHover();
+          this.addOnHoverAction();
+          this.addClickOutFeatures();
+          this.addZoomEvent();
+        }
       });
 
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {
@@ -231,15 +239,11 @@ export class AnomaliasControlService {
         source.addFeature(feature);
       });
     });
-
     // eliminamos la interacciones anteriores si las huviese
     this.removeSelectAnomaliaInteractions();
 
-    // añadimos acciones sobre las anomalias
-    this.addPointerOnHover();
-    this.addOnHoverAction();
+    // añadimos la nueva interaccion
     this.addSelectInteraction();
-    this.addClickOutFeatures();
   }
 
   private removeSelectAnomaliaInteractions() {
@@ -282,16 +286,6 @@ export class AnomaliasControlService {
 
   private addOnHoverAction() {
     let currentFeatureHover;
-    const estilosViewFocused = [
-      this.getStylePerdidas(true),
-      this.getStyleCelsCalientes(true),
-      this.getStyleGradienteNormMax(true),
-    ];
-    const estilosViewUnfocused = [
-      this.getStylePerdidas(false),
-      this.getStyleCelsCalientes(false),
-      this.getStyleGradienteNormMax(false),
-    ];
 
     this.map.on('pointermove', (event) => {
       if (this.anomaliaSelect === undefined) {
@@ -305,26 +299,31 @@ export class AnomaliasControlService {
           if (feature !== undefined) {
             // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
             if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
-              this.prevFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+              this.prevFeatureHover.setStyle(this.getStyleAnomalias(false));
             }
             currentFeatureHover = feature;
 
             const anomaliaId = feature.getProperties().properties.anomaliaId;
             const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
 
-            feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
+            feature.setStyle(this.getStyleAnomalias(true));
 
-            if (this.selectedInformeId === anomalia.informeId) {
-              this.anomaliaHover = anomalia;
-            }
+            this.anomaliaHover = anomalia;
+
             this.prevFeatureHover = feature;
+          } else {
+            if (this.anomaliaHover !== undefined) {
+              this.setExternalStyle(this.anomaliaHover.id, false, false);
+
+              this.anomaliaHover = undefined;
+            }
           }
         }
       } else {
         this.anomaliaHover = undefined;
 
         if (currentFeatureHover !== undefined) {
-          currentFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+          currentFeatureHover.setStyle(this.getStyleAnomalias(false));
           currentFeatureHover = undefined;
         }
       }
@@ -333,7 +332,6 @@ export class AnomaliasControlService {
 
   private addSelectInteraction() {
     const select = new Select({
-      style: this.getStyleAnomalias(),
       condition: click,
       layers: (l) => {
         if (
@@ -353,6 +351,8 @@ export class AnomaliasControlService {
 
     this.map.addInteraction(select);
     select.on('select', (e) => {
+      this.anomaliaHover = undefined;
+
       if (this.anomaliaSelect !== undefined) {
         this.setExternalStyle(this.anomaliaSelect.id, false, false);
         this.anomaliaSelect = undefined;
@@ -361,15 +361,21 @@ export class AnomaliasControlService {
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().hasOwnProperty('properties')) {
           const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
-          const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
+          const anomalia = this.listaAnomalias.find((anom) => anom.id === anomaliaId);
 
-          if (this.prevAnomaliaSelect !== undefined) {
+          this.anomaliaSelect = anomalia;
+
+          // seleccionamos la capa de la anomalia
+          this.zonesControlService.layerSelected = this.getLayerViewAnomalias(anomaliaId);
+
+          // aplicamos estilos
+          this.setExternalStyle(anomaliaId, true, true);
+
+          if (this.prevAnomaliaSelect !== undefined && this.prevAnomaliaSelect.id !== anomaliaId) {
             this.setExternalStyle(this.prevAnomaliaSelect.id, false, false);
           }
+
           this.prevAnomaliaSelect = anomalia;
-          this.anomaliaSelect = anomalia;
-          this.setExternalStyle(anomalia.id, true, true);
-          this.anomaliaHover = undefined;
         }
       }
     });
@@ -387,8 +393,9 @@ export class AnomaliasControlService {
       if (feature.length === 0) {
         if (this.anomaliaSelect !== undefined) {
           this.setExternalStyle(this.anomaliaSelect.id, false, false);
+
+          this.anomaliaSelect = undefined;
         }
-        this.anomaliaSelect = undefined;
 
         if (this.zonesControlService.layerSelected !== undefined) {
           // ocultamos la capa
@@ -396,6 +403,23 @@ export class AnomaliasControlService {
           this.zonesControlService.layerSelected = undefined;
         }
       }
+    });
+  }
+
+  private addZoomEvent() {
+    this.map.on('moveend', (event) => {
+      this.olMapService.currentZoom = this.map.getView().getZoom();
+      this.map
+        .getLayers()
+        .getArray()
+        .forEach((layer) => {
+          if (
+            layer.getProperties().informeId === this.selectedInformeId &&
+            layer.getProperties().view === this.toggleViewSelected
+          ) {
+            (layer as VectorLayer).getSource().changed();
+          }
+        });
     });
   }
 
@@ -447,11 +471,11 @@ export class AnomaliasControlService {
     this.anomaliaService.addAnomalia(anomalia);
   }
 
-  private getStyleAnomalias() {
+  private getStyleAnomalias(focus: boolean) {
     const estilosView = [
-      this.getStylePerdidas(false),
-      this.getStyleCelsCalientes(false),
-      this.getStyleGradienteNormMax(false),
+      this.getStylePerdidas(focus),
+      this.getStyleCelsCalientes(focus),
+      this.getStyleGradienteNormMax(focus),
     ];
 
     return estilosView[this.toggleViewSelected];
@@ -647,22 +671,22 @@ export class AnomaliasControlService {
           }
         }
 
-        const zoneSeguidor = feature.getProperties().properties.zone;
-        const layerZoneSeguidor = layers.find(
+        const zoneAnomalia = feature.getProperties().properties.zone;
+        const layerZoneAnomalia = layers.find(
           (layer) =>
-            layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneSeguidor.globalCoords)
+            layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneAnomalia.globalCoords)
         );
 
         // solo la ocultamos si estamos en zoom out
         if (visible === false) {
           if (this.currentZoom < this.zonesControlService.zoomChangeView) {
-            layerZoneSeguidor.setVisible(visible);
+            layerZoneAnomalia.setVisible(visible);
           }
         } else {
-          layerZoneSeguidor.setVisible(visible);
+          layerZoneAnomalia.setVisible(visible);
         }
 
-        this.zonesControlService.prevLayerHovered = layerZoneSeguidor;
+        this.zonesControlService.prevLayerHovered = layerZoneAnomalia;
       }
     }
   }

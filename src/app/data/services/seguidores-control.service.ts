@@ -86,6 +86,13 @@ export class SeguidoresControlService {
         this.map = map;
         this.seguidorLayers = segL;
         this.sharedReportNoFilters = !isSharedWithFil;
+
+        if (this.map !== undefined) {
+          // añadimos acciones sobre los seguidores
+          this.addCursorOnHover();
+          this.addOnHoverAction();
+          this.addZoomEvent();
+        }
       });
 
       this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
@@ -256,9 +263,6 @@ export class SeguidoresControlService {
         source.addFeature(feature);
       });
     });
-    // añadimos acciones sobre los seguidores
-    this.addCursorOnHover();
-    this.addOnHoverAction();
   }
 
   private addCursorOnHover() {
@@ -372,6 +376,23 @@ export class SeguidoresControlService {
           }
         }
       }
+    });
+  }
+
+  private addZoomEvent() {
+    this.map.on('moveend', (event) => {
+      this.olMapService.currentZoom = this.map.getView().getZoom();
+      this.map
+        .getLayers()
+        .getArray()
+        .forEach((layer) => {
+          if (
+            layer.getProperties().informeId === this.selectedInformeId &&
+            layer.getProperties().view === this.toggleViewSelected
+          ) {
+            (layer as VectorLayer).getSource().changed();
+          }
+        });
     });
   }
 

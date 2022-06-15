@@ -115,8 +115,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
             if (index === this.informes.length - 1) {
               this.initMap();
-
-              this.addZoomEvent();
             }
           });
         } else {
@@ -138,8 +136,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
             if (index === this.informes.length - 1) {
               this.initMap();
-
-              this.addZoomEvent();
             }
           });
         }
@@ -281,10 +277,6 @@ export class MapComponent implements OnInit, OnDestroy {
         );
       }
     });
-  }
-
-  private addZoomEvent() {
-    this.map.on('moveend', (event) => (this.olMapService.currentZoom = this.map.getView().getZoom()));
   }
 
   private transform(extent) {
