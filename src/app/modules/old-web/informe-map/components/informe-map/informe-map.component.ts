@@ -9,8 +9,9 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import { MatDialog } from '@angular/material/dialog';
 import { PlantaService } from '@data/services/planta.service';
 import { InformeService } from '@data/services/informe.service';
-import { GLOBAL } from '@data/constants/global';
 import { PcDetailsDialogComponent } from '../../../informe-view/components/pc-details-dialog/pc-details-dialog.component';
+
+import { COLOR } from '@data/constants/color';
 
 declare const google: any;
 
@@ -65,7 +66,7 @@ export class InformeMapComponent implements OnInit {
   }
 
   getStrokeColor(severidad: number) {
-    return GLOBAL.colores_clase[severidad - 1];
+    return COLOR.colores_clase[severidad - 1];
   }
 
   onMapCircleClick(selectedPc: PcInterface, sinPcs: boolean = false): void {

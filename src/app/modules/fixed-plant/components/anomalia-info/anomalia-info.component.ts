@@ -25,7 +25,6 @@ import SwiperCore, {
 // install Swiper components
 SwiperCore.use([Navigation, Pagination, Scrollbar, A11y, Virtual, Zoom, Autoplay, Thumbs, Controller]);
 
-import { GLOBAL } from '@data/constants/global';
 import { PlantaService } from '@data/services/planta.service';
 import { ShareReportService } from '@data/services/share-report.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
@@ -37,6 +36,9 @@ import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
+
+import { COLOR } from '@data/constants/color';
+import { GLOBAL } from '@data/constants/global';
 
 interface InfoAdicional {
   id?: string;
@@ -134,7 +136,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
       gradienteNormalizado: 'number',
       perdidas: 'number',
     };
-    this.coloresClase = GLOBAL.colores_clase;
+    this.coloresClase = COLOR.colores_clase;
 
     if (this.router.url.includes('shared')) {
       this.subscriptions.add(

@@ -26,11 +26,12 @@ import Polygon from 'ol/geom/Polygon';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ClustersService } from '@data/services/clusters.service';
 import { AutogeoService, Mesa } from '@data/services/autogeo.service';
-import { GLOBAL } from '@data/constants/global';
 
 import { PlantaInterface } from '@core/models/planta';
 import { PuntoTrayectoria } from '@core/models/puntoTrayectoria';
 import { Cluster } from '@core/models/cluster';
+
+import { COLOR } from '@data/constants/color';
 
 @Component({
   selector: 'app-map-clusters',
@@ -764,7 +765,7 @@ export class MapClustersComponent implements OnInit, OnDestroy {
 
   private getClusterColor(clusterId: string) {
     const cluster = this.clusters.find((cluster) => cluster.id === clusterId);
-    const colorAleatorio = GLOBAL.clusterColors[Math.round(Math.random() * (GLOBAL.clusterColors.length - 1))];
+    const colorAleatorio = COLOR.clusterColors[Math.round(Math.random() * (COLOR.clusterColors.length - 1))];
     // comprobamos si tiene ya un color asignado
     if (cluster.color !== undefined) {
       return cluster.color;

@@ -28,6 +28,7 @@ import { MathOperations } from '@core/classes/math-operations';
 import { LocationAreaInterface } from '@core/models/location';
 
 import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
 
 @Injectable({
   providedIn: 'root',
@@ -103,8 +104,7 @@ export class SeguidoresControlService {
       this.viewReportService.reportViewSelected$.subscribe((viewSel) => {
         this.toggleViewSelected = viewSel;
 
-        // reseteamos la interaccion con cada vista para obtener el estilo correcto
-        // this.resetSelectInteraction();
+        // refrescamos la capa para que la vista se muestre correctamente
         this.refreshLayersView();
       });
 
@@ -581,21 +581,21 @@ export class SeguidoresControlService {
     const mae = feature.getProperties().properties.mae as number;
 
     if (mae < 0.01) {
-      return GLOBAL.colores_mae[0];
+      return COLOR.colores_severity[0];
     } else if (mae < 0.05) {
-      return GLOBAL.colores_mae[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_mae[2];
+      return COLOR.colores_severity[2];
     }
   }
 
   getColorSeguidorMaeExternal(mae: number) {
     if (mae < 0.01) {
-      return GLOBAL.colores_mae[0];
+      return COLOR.colores_severity[0];
     } else if (mae < 0.05) {
-      return GLOBAL.colores_mae[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_mae[2];
+      return COLOR.colores_severity[2];
     }
   }
 
@@ -620,11 +620,11 @@ export class SeguidoresControlService {
     const celsCalientes = feature.getProperties().properties.celsCalientes;
 
     if (celsCalientes < 0.02) {
-      return GLOBAL.colores_mae[0];
+      return COLOR.colores_severity[0];
     } else if (celsCalientes < 0.1) {
-      return GLOBAL.colores_mae[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_mae[2];
+      return COLOR.colores_severity[2];
     }
   }
 
@@ -649,21 +649,21 @@ export class SeguidoresControlService {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
     if (gradNormMax < 10) {
-      return GLOBAL.colores_grad[0];
+      return COLOR.colores_severity[0];
     } else if (gradNormMax < 40) {
-      return GLOBAL.colores_grad[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_grad[2];
+      return COLOR.colores_severity[2];
     }
   }
 
   getColorSeguidorGradienteNormMaxExternal(gradNormMax: number) {
     if (gradNormMax < 10) {
-      return GLOBAL.colores_grad[0];
+      return COLOR.colores_severity[0];
     } else if (gradNormMax < 40) {
-      return GLOBAL.colores_grad[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_grad[2];
+      return COLOR.colores_severity[2];
     }
   }
 

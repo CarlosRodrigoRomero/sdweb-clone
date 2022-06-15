@@ -16,13 +16,15 @@ import {
   ApexTooltip,
 } from 'ng-apexcharts';
 
-import { GLOBAL } from '@data/constants/global';
 import { ReportControlService } from '@data/services/report-control.service';
 import { InformeService } from '@data/services/informe.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 
 import { Anomalia } from '@core/models/anomalia';
+
 import { Colors } from '@core/classes/colors';
+
+import { COLOR } from '@data/constants/color';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -125,7 +127,7 @@ export class ChartCelsGradComponent implements OnInit, OnDestroy {
 
     const colors = new Array(series.length);
     opacity.forEach((op, index) => {
-      colors[index] = Colors.hexToRgb(GLOBAL.gris, op);
+      colors[index] = Colors.hexToRgb(COLOR.gris, op);
     });
 
     this.chartOptions = {
@@ -144,7 +146,7 @@ export class ChartCelsGradComponent implements OnInit, OnDestroy {
           highlightDataSeries: false,
         },
       },
-      colors: [GLOBAL.gris, GLOBAL.gris],
+      colors: [COLOR.gris, COLOR.gris],
       plotOptions: {
         bar: {
           horizontal: false,

@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { GLOBAL } from '@data/constants/global';
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
+
+import { COLOR } from '@data/constants/color';
 
 interface PlantaChart {
   planta: PlantaInterface;
@@ -57,7 +58,7 @@ export class PeorEstadoChartComponent implements OnInit {
       this.dataMae.push(plant.mae * 100);
       this.plantasId.push(plant.planta.id);
       this.labels.push(plant.planta.nombre);
-      this.coloresMae.push(GLOBAL.colores_new_mae[2]);
+      this.coloresMae.push(COLOR.colores_severity[2]);
     });
   }
 

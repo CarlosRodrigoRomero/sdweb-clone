@@ -5,10 +5,9 @@ import { MatTableDataSource } from '@angular/material/table';
 
 import { Map } from 'ol';
 
-import { switchMap, take } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
-import { GLOBAL } from '@data/constants/global';
 import { FilterService } from '@data/services/filter.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
@@ -19,6 +18,9 @@ import { ZonesControlService } from '@data/services/zones-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
+
+import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
 
 @Component({
   selector: 'app-anomalias-list',
@@ -99,7 +101,7 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
                 temperaturaMax: anom.temperaturaMax,
                 gradiente: anom.gradienteNormalizado,
                 gradienteNormalizado: anom.gradienteNormalizado,
-                color: GLOBAL.colores_tipos[anom.tipo],
+                color: COLOR.colores_tipos[anom.tipo],
                 clase: anom.clase,
                 anomalia: anom,
                 selected: false,

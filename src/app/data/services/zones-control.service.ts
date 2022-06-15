@@ -20,6 +20,7 @@ import { Seguidor } from '@core/models/seguidor';
 import { FilterableElement } from '@core/models/filterableInterface';
 
 import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
 
 @Injectable({
   providedIn: 'root',
@@ -32,7 +33,6 @@ export class ZonesControlService {
   private elemsLayers: VectorLayer[];
   private layerHovered: VectorLayer;
   prevLayerHovered: VectorLayer;
-  layerSelected: VectorLayer;
   private currentZoom: number;
 
   constructor(
@@ -247,36 +247,33 @@ export class ZonesControlService {
 
   private addOnHoverAction() {
     this.map.on('pointermove', (event) => {
-      // solo cambiamos estilos hover si no hay una capa de anomalias seleccionada
-      if (this.layerSelected === undefined) {
-        if (this.currentZoom < this.zoomChangeView) {
-          if (this.map.hasFeatureAtPixel(event.pixel)) {
-            const feature = this.map
-              .getFeaturesAtPixel(event.pixel)
-              .filter((item) => item.getProperties().properties !== undefined)
-              .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
-              .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
+      if (this.currentZoom < this.zoomChangeView) {
+        if (this.map.hasFeatureAtPixel(event.pixel)) {
+          const feature = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined)
+            .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
+            .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
 
-            if (feature !== undefined) {
-              // cuando pasamos de una zona a otra directamente sin pasar por vacio
-              if (this.prevLayerHovered !== undefined) {
-                this.prevLayerHovered.setVisible(false);
-              }
-
-              this.layerHovered = this.elemsLayers.find(
-                (l) =>
-                  l.getProperties().zoneId === feature.getProperties().properties.id &&
-                  l.getProperties().view === this.toggleViewSelected &&
-                  l.getProperties().informeId === this.selectedInformeId
-              );
-              this.layerHovered.setVisible(true);
-
-              this.prevLayerHovered = this.layerHovered;
+          if (feature !== undefined) {
+            // cuando pasamos de una zona a otra directamente sin pasar por vacio
+            if (this.prevLayerHovered !== undefined) {
+              this.prevLayerHovered.setVisible(false);
             }
-          } else {
-            if (this.layerHovered !== undefined) {
-              this.layerHovered.setVisible(false);
-            }
+
+            this.layerHovered = this.elemsLayers.find(
+              (l) =>
+                l.getProperties().zoneId === feature.getProperties().properties.id &&
+                l.getProperties().view === this.toggleViewSelected &&
+                l.getProperties().informeId === this.selectedInformeId
+            );
+            this.layerHovered.setVisible(true);
+
+            this.prevLayerHovered = this.layerHovered;
+          }
+        } else {
+          if (this.layerHovered !== undefined) {
+            this.layerHovered.setVisible(false);
           }
         }
       }
@@ -325,11 +322,11 @@ export class ZonesControlService {
     const mae = feature.getProperties().properties.mae as number;
 
     if (mae < 0.01) {
-      return GLOBAL.colores_mae_rgb[0].replace(',1)', ',' + opacity + ')');
+      return COLOR.colores_severity_rgb[0].replace(',1)', ',' + opacity + ')');
     } else if (mae < 0.05) {
-      return GLOBAL.colores_mae_rgb[1].replace(',1)', ',' + opacity + ')');
+      return COLOR.colores_severity_rgb[1].replace(',1)', ',' + opacity + ')');
     } else {
-      return GLOBAL.colores_mae_rgb[2].replace(',1)', ',' + opacity + ')');
+      return COLOR.colores_severity_rgb[2].replace(',1)', ',' + opacity + ')');
     }
   }
 
@@ -355,11 +352,11 @@ export class ZonesControlService {
     const celsCalientes = feature.getProperties().properties.celsCalientes;
 
     if (celsCalientes < 0.02) {
-      return GLOBAL.colores_mae_rgb[0].replace(',1)', ',' + opacity + ')');
+      return COLOR.colores_severity_rgb[0].replace(',1)', ',' + opacity + ')');
     } else if (celsCalientes < 0.1) {
-      return GLOBAL.colores_mae_rgb[1].replace(',1)', ',' + opacity + ')');
+      return COLOR.colores_severity_rgb[1].replace(',1)', ',' + opacity + ')');
     } else {
-      return GLOBAL.colores_mae_rgb[2].replace(',1)', ',' + opacity + ')');
+      return COLOR.colores_severity_rgb[2].replace(',1)', ',' + opacity + ')');
     }
   }
 
@@ -386,11 +383,11 @@ export class ZonesControlService {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
     if (gradNormMax < 10) {
-      return GLOBAL.colores_grad_rgb[0].replace(',1)', ',' + opacity + ')');
+      return COLOR.colores_severity_rgb[0].replace(',1)', ',' + opacity + ')');
     } else if (gradNormMax < 40) {
-      return GLOBAL.colores_grad_rgb[1].replace(',1)', ',' + opacity + ')');
+      return COLOR.colores_severity_rgb[1].replace(',1)', ',' + opacity + ')');
     } else {
-      return GLOBAL.colores_grad_rgb[2].replace(',1)', ',' + opacity + ')');
+      return COLOR.colores_severity_rgb[2].replace(',1)', ',' + opacity + ')');
     }
   }
 

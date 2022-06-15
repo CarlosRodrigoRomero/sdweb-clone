@@ -1,5 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
-import { GLOBAL } from '@data/constants/global';
+
+import { COLOR } from '@data/constants/color';
+
 declare let google;
 
 @Component({
@@ -64,7 +66,7 @@ export class ChartSankeyPotenciaComponent implements AfterViewInit {
       '#bfbfbf', // 'Célula caliente',
       '#bfbfbf', // 'Célula caliente.',
       '#bfbfbf', // 'Varias células calientes.',
-      GLOBAL.gris, // 'String',
+      COLOR.gris, // 'String',
       '#bfbfbf', // 'Varias células calientes',
       '#bfbfbf', // 'Substring en CA.',
       '#bfbfbf', // 'Substring en CA',

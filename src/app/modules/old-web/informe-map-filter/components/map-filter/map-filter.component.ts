@@ -1,17 +1,20 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { GLOBAL } from '@data/constants/global';
-import { LatLngLiteral } from '@agm/core';
+import { Component, OnInit } from '@angular/core';
 
-import { PlantaInterface } from '@core/models/planta';
-import { InformeInterface } from '@core/models/informe';
-import { FilterInterface } from '@core/models/filter';
+import { Observable } from 'rxjs';
+
+import { LatLngLiteral } from '@agm/core';
 
 import { PcService } from '@data/services/pc.service';
 import { PlantaService } from '@data/services/planta.service';
 import { InformeService } from '@data/services/informe.service';
 import { FilterService } from '@data/services/filter.service';
-import { Observable } from 'rxjs';
+
 import { AreaFilter } from '@core/models/areaFilter';
+import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
+import { FilterInterface } from '@core/models/filter';
+
+import { COLOR } from '@data/constants/color';
 
 declare const google: any;
 @Component({
@@ -79,7 +82,7 @@ export class MapFilterComponent implements OnInit {
   }
 
   getStrokeColor(severidad: number) {
-    return GLOBAL.colores_clase[severidad - 1];
+    return COLOR.colores_clase[severidad - 1];
   }
 
   initDrawingManager() {

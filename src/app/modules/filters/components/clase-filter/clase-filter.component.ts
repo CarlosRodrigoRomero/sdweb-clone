@@ -5,11 +5,13 @@ import { Subscription } from 'rxjs';
 
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 
-import { GLOBAL } from '@data/constants/global';
 import { FilterService } from '@data/services/filter.service';
 import { FilterControlService } from '@data/services/filter-control.service';
 
 import { ClaseFilter } from '@core/models/claseFilter';
+
+import { COLOR } from '@data/constants/color';
+import { GLOBAL } from '@data/constants/global';
 
 interface Clase {
   label?: string;
@@ -40,7 +42,7 @@ export class ClaseFilterComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.coloresClase = GLOBAL.colores_clase;
+    this.coloresClase = COLOR.colores_clase;
 
     this.subscriptions.add(
       this.filterControlService.claseSelected$.subscribe((sel) => {

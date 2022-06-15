@@ -1,9 +1,7 @@
 import Tile from 'ol/Tile.js';
-import TileState from 'ol/TileState.js';
 import { createCanvasContext2D } from 'ol/dom.js';
-import { listenImage } from 'ol/Image.js';
 
-import { GLOBAL } from '@data/constants/global';
+import { PALETTE } from '@data/constants/palette';
 
 class ImageTileMod extends Tile {
   /**
@@ -23,7 +21,7 @@ class ImageTileMod extends Tile {
      * @type {?string}
      */
     this.crossOrigin_ = 'Anonymous';
-    this.palette = GLOBAL.ironPalette;
+    this.palette = PALETTE.ironPalette;
 
     /**
      * Image URI

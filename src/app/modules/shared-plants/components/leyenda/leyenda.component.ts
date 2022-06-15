@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 
 import { ViewReportService } from '@data/services/view-report.service';
 
-import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
 
 @Component({
   selector: 'app-leyenda',
@@ -12,7 +12,7 @@ import { GLOBAL } from '@data/constants/global';
   styleUrls: ['./leyenda.component.css'],
 })
 export class LeyendaComponent implements OnInit, OnDestroy {
-  colors = [GLOBAL.colores_mae, GLOBAL.colores_mae, GLOBAL.colores_grad];
+  colors = [COLOR.colores_severity, COLOR.colores_severity, COLOR.colores_severity];
   viewSelected: number;
   viewsLabels: string[][];
   viewsTitle: string[] = ['MAE por seguidor', 'Cels. Calientes por seguidor', 'ΔT Max (norm) por seguidor'];

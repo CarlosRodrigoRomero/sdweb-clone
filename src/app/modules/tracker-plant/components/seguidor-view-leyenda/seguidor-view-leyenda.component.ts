@@ -5,7 +5,8 @@ import { Subscription } from 'rxjs';
 
 import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
-import { GLOBAL } from '@data/constants/global';
+
+import { COLOR } from '@data/constants/color';
 
 @Component({
   selector: 'app-seguidor-view-leyenda',
@@ -17,7 +18,7 @@ export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
   private seguidorSelected: Seguidor;
   viewsTitle: string[] = ['Pérdidas', 'Cels. Calientes', 'ΔT Max (norm)'];
   numCelsCalientes = 0;
-  colors = [GLOBAL.colores_mae, GLOBAL.colores_mae, GLOBAL.colores_grad];
+  colors = [COLOR.colores_severity, COLOR.colores_severity, COLOR.colores_severity];
 
   private subscriptions: Subscription = new Subscription();
 

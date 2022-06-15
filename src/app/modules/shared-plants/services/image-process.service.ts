@@ -5,13 +5,13 @@ import { ThermalService } from '@data/services/thermal.service';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { ReportControlService } from '@data/services/report-control.service';
 
-import { GLOBAL } from '@data/constants/global';
+import { PALETTE } from '@data/constants/palette';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ImageProcessService {
-  private palette = GLOBAL.ironPalette;
+  private palette = PALETTE.ironPalette;
   private sliderMin = 25;
   private sliderMax = 75;
   private sliderFloor = 25;

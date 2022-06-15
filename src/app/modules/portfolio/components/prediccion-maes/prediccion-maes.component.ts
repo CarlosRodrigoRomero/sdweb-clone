@@ -13,6 +13,7 @@ import {
 } from 'ng-apexcharts';
 
 import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -118,12 +119,12 @@ export class PrediccionMaesComponent implements OnInit {
         },
       },
       colors: [
-        GLOBAL.colores_new_mae[2],
-        GLOBAL.colores_new_mae[2],
-        GLOBAL.colores_new_mae[0],
-        GLOBAL.colores_new_mae[0],
-        GLOBAL.colores_new_mae[1],
-        GLOBAL.colores_new_mae[1],
+        COLOR.colores_severity[2],
+        COLOR.colores_severity[2],
+        COLOR.colores_severity[0],
+        COLOR.colores_severity[0],
+        COLOR.colores_severity[1],
+        COLOR.colores_severity[1],
       ],
       legend: {
         show: false,
@@ -133,42 +134,42 @@ export class PrediccionMaesComponent implements OnInit {
           {
             seriesIndex: 0,
             dataPointIndex: 0,
-            fillColor: GLOBAL.colores_new_mae[2],
+            fillColor: COLOR.colores_severity[2],
             strokeColor: '#fff',
             size: 7,
           },
           {
             seriesIndex: 0,
             dataPointIndex: 1,
-            fillColor: GLOBAL.colores_new_mae[2],
+            fillColor: COLOR.colores_severity[2],
             strokeColor: '#fff',
             size: 7,
           },
           {
             seriesIndex: 2,
             dataPointIndex: 0,
-            fillColor: GLOBAL.colores_new_mae[0],
+            fillColor: COLOR.colores_severity[0],
             strokeColor: '#fff',
             size: 7,
           },
           {
             seriesIndex: 2,
             dataPointIndex: 1,
-            fillColor: GLOBAL.colores_new_mae[0],
+            fillColor: COLOR.colores_severity[0],
             strokeColor: '#fff',
             size: 7,
           },
           {
             seriesIndex: 4,
             dataPointIndex: 0,
-            fillColor: GLOBAL.colores_new_mae[1],
+            fillColor: COLOR.colores_severity[1],
             strokeColor: '#fff',
             size: 7,
           },
           {
             seriesIndex: 4,
             dataPointIndex: 1,
-            fillColor: GLOBAL.colores_new_mae[1],
+            fillColor: COLOR.colores_severity[1],
             strokeColor: '#fff',
             size: 7,
           },

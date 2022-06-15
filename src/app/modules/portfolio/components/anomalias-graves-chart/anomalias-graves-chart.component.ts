@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { GLOBAL } from '@data/constants/global';
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
+
+import { COLOR } from '@data/constants/color';
 
 interface PlantaChart {
   planta: PlantaInterface;
@@ -49,7 +50,7 @@ export class AnomaliasGravesChartComponent implements OnInit {
       this.plantasId.push(plant.planta.id);
       // this.informesRecientes.push(plant.informeReciente);
       this.labels.push(plant.planta.nombre);
-      this.coloresVarMae.push(GLOBAL.colores_new_mae[2]);
+      this.coloresVarMae.push(COLOR.colores_severity[2]);
     });
   }
 

@@ -26,7 +26,7 @@ import { ViewReportService } from '@data/services/view-report.service';
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
 
-import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
 
 @Injectable({
   providedIn: 'root',
@@ -365,9 +365,6 @@ export class AnomaliasControlService {
 
           this.anomaliaSelect = anomalia;
 
-          // seleccionamos la capa de la anomalia
-          this.zonesControlService.layerSelected = this.getLayerViewAnomalias(anomaliaId);
-
           // aplicamos estilos
           this.setExternalStyle(anomaliaId, true);
 
@@ -395,12 +392,6 @@ export class AnomaliasControlService {
           this.setExternalStyle(this.anomaliaSelect.id, false);
 
           this.anomaliaSelect = undefined;
-        }
-
-        if (this.zonesControlService.layerSelected !== undefined) {
-          // ocultamos la capa
-          this.setLayerVisibility(this.zonesControlService.layerSelected, false);
-          this.zonesControlService.layerSelected = undefined;
         }
       }
     });
@@ -502,11 +493,11 @@ export class AnomaliasControlService {
     const perdidas = feature.getProperties().properties.perdidas as number;
 
     if (perdidas < 0.3) {
-      return GLOBAL.colores_mae[0];
+      return COLOR.colores_severity[0];
     } else if (perdidas < 0.5) {
-      return GLOBAL.colores_mae[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_mae[2];
+      return COLOR.colores_severity[2];
     }
   }
 
@@ -516,7 +507,7 @@ export class AnomaliasControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focused ? 'white' : GLOBAL.colores_tipos[8] /* this.getColorCelsCalientes(feature) */,
+            color: focused ? 'white' : COLOR.colores_tipos[8] /* this.getColorCelsCalientes(feature) */,
             width: focused ? 4 : 2,
           }),
           fill: new Fill({
@@ -531,11 +522,11 @@ export class AnomaliasControlService {
     const celsCalientes = feature.getProperties().properties.celsCalientes;
 
     if (celsCalientes < 0.02) {
-      return GLOBAL.colores_mae[0];
+      return COLOR.colores_severity[0];
     } else if (celsCalientes < 0.1) {
-      return GLOBAL.colores_mae[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_mae[2];
+      return COLOR.colores_severity[2];
     }
   }
 
@@ -560,11 +551,11 @@ export class AnomaliasControlService {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
     if (gradNormMax < 10) {
-      return GLOBAL.colores_grad[0];
+      return COLOR.colores_severity[0];
     } else if (gradNormMax < 40) {
-      return GLOBAL.colores_grad[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_grad[2];
+      return COLOR.colores_severity[2];
     }
   }
 
@@ -600,7 +591,7 @@ export class AnomaliasControlService {
     if (feature !== undefined) {
       const tipo = parseInt(feature.getProperties().properties.tipo);
 
-      return GLOBAL.colores_tipos[tipo];
+      return COLOR.colores_tipos[tipo];
     }
   }
 
@@ -646,33 +637,29 @@ export class AnomaliasControlService {
   setExternalStyleAnomaliaLayer(feature: Feature, layers: VectorLayer[], visible: boolean) {
     // mostramos u ocultamos las zona de la anomalia si la hubiera
     if (feature.getProperties().properties.hasOwnProperty('zone')) {
-      // solo cambiamos estilos si no hay una capa de anomalias seleccionada
-      if (this.zonesControlService.layerSelected === undefined) {
-        // si hay una capa de anomalias previa con hover la ocultamos
-        if (this.zonesControlService.prevLayerHovered !== undefined) {
-          // pero solo si estamos en zoom out
-          if (this.currentZoom < this.zonesControlService.zoomChangeView) {
-            this.zonesControlService.prevLayerHovered.setVisible(false);
-          }
+      // si hay una capa de anomalias previa con hover la ocultamos
+      if (this.zonesControlService.prevLayerHovered !== undefined) {
+        // pero solo si estamos en zoom out
+        if (this.currentZoom < this.zonesControlService.zoomChangeView) {
+          this.zonesControlService.prevLayerHovered.setVisible(false);
         }
+      }
 
-        const zoneAnomalia = feature.getProperties().properties.zone;
-        const layerZoneAnomalia = layers.find(
-          (layer) =>
-            layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneAnomalia.globalCoords)
-        );
+      const zoneAnomalia = feature.getProperties().properties.zone;
+      const layerZoneAnomalia = layers.find(
+        (layer) => layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneAnomalia.globalCoords)
+      );
 
-        // solo la ocultamos si estamos en zoom out
-        if (visible === false) {
-          if (this.currentZoom < this.zonesControlService.zoomChangeView) {
-            layerZoneAnomalia.setVisible(visible);
-          }
-        } else {
+      // solo la ocultamos si estamos en zoom out
+      if (visible === false) {
+        if (this.currentZoom < this.zonesControlService.zoomChangeView) {
           layerZoneAnomalia.setVisible(visible);
         }
-
-        this.zonesControlService.prevLayerHovered = layerZoneAnomalia;
+      } else {
+        layerZoneAnomalia.setVisible(visible);
       }
+
+      this.zonesControlService.prevLayerHovered = layerZoneAnomalia;
     }
   }
 

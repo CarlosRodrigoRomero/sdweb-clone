@@ -20,6 +20,7 @@ import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 
 import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
 
 @Injectable({
   providedIn: 'root',
@@ -302,11 +303,11 @@ export class SeguidorService {
 
   getPerdidasAnomColor(anomalia: Anomalia) {
     if (anomalia.perdidas < 0.33) {
-      return GLOBAL.colores_mae[0];
+      return COLOR.colores_severity[0];
     } else if (anomalia.perdidas < 0.66) {
-      return GLOBAL.colores_mae[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_mae[2];
+      return COLOR.colores_severity[2];
     }
   }
 
@@ -316,11 +317,11 @@ export class SeguidorService {
 
   getGradienteAnomColor(anomalia: Anomalia) {
     if (anomalia.gradienteNormalizado < 10) {
-      return GLOBAL.colores_grad[0];
+      return COLOR.colores_severity[0];
     } else if (anomalia.gradienteNormalizado < 40) {
-      return GLOBAL.colores_grad[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_grad[2];
+      return COLOR.colores_severity[2];
     }
   }
 }
