@@ -366,14 +366,6 @@ export class SeguidoresControlService {
             this.seguidorSelected = seguidor;
 
             this.seguidorViewOpened = true;
-
-            // ocultamos la capa de seguidores si hubiese alguna mostrandose
-            if (
-              this.zonesControlService.prevLayerHovered !== undefined &&
-              this.olMapService.currentZoom < this.zonesControlService.zoomChangeView
-            ) {
-              this.zonesControlService.prevLayerHovered.setVisible(false);
-            }
           }
         }
       }
@@ -389,17 +381,19 @@ export class SeguidoresControlService {
   }
 
   private refreshLayersView() {
-    this.map
-      .getLayers()
-      .getArray()
-      .forEach((layer) => {
-        if (
-          layer.getProperties().informeId === this.selectedInformeId &&
-          layer.getProperties().view === this.toggleViewSelected
-        ) {
-          (layer as VectorLayer).getSource().changed();
-        }
-      });
+    if (this.map !== undefined) {
+      this.map
+        .getLayers()
+        .getArray()
+        .forEach((layer) => {
+          if (
+            layer.getProperties().informeId === this.selectedInformeId &&
+            layer.getProperties().view === this.toggleViewSelected
+          ) {
+            (layer as VectorLayer).getSource().changed();
+          }
+        });
+    }
   }
 
   clearSelectFeature() {
@@ -704,14 +698,6 @@ export class SeguidoresControlService {
   setExternalStyleSeguidorLayer(feature: Feature, layers: VectorLayer[], visible: boolean) {
     // mostramos u ocultamos las zona de los seguidores si la hubiera
     if (feature.getProperties().properties.hasOwnProperty('zone')) {
-      // si hay una capa se seguidores previa seleccionada la ocultamos
-      if (this.zonesControlService.prevLayerHovered !== undefined) {
-        // pero solo si estamos en zoom out
-        if (this.currentZoom < this.zonesControlService.zoomChangeView) {
-          this.zonesControlService.prevLayerHovered.setVisible(false);
-        }
-      }
-
       const zoneSeguidor = feature.getProperties().properties.zone;
       const layerZoneSeguidor = layers.find(
         (layer) => layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneSeguidor.globalCoords)
@@ -725,8 +711,6 @@ export class SeguidoresControlService {
       } else {
         layerZoneSeguidor.setVisible(visible);
       }
-
-      this.zonesControlService.prevLayerHovered = layerZoneSeguidor;
     }
   }
 

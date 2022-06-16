@@ -23,14 +23,12 @@ export class LeyendaComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.viewsLabels = [
-      ['Muy bueno', 'Correcto', 'Mejorable'],
-      ['Muy bueno', 'Correcto', 'Mejorable'],
+      ['Bueno', 'Medio', 'Alto'],
+      ['Bueno', 'Medio', 'Alto'],
       ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
     ];
 
-    this.subscriptions.add(
-      this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSelected = view))
-    );
+    this.subscriptions.add(this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSelected = view)));
   }
 
   ngOnDestroy(): void {

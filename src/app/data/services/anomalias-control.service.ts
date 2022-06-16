@@ -637,14 +637,6 @@ export class AnomaliasControlService {
   setExternalStyleAnomaliaLayer(feature: Feature, layers: VectorLayer[], visible: boolean) {
     // mostramos u ocultamos las zona de la anomalia si la hubiera
     if (feature.getProperties().properties.hasOwnProperty('zone')) {
-      // si hay una capa de anomalias previa con hover la ocultamos
-      if (this.zonesControlService.prevLayerHovered !== undefined) {
-        // pero solo si estamos en zoom out
-        if (this.currentZoom < this.zonesControlService.zoomChangeView) {
-          this.zonesControlService.prevLayerHovered.setVisible(false);
-        }
-      }
-
       const zoneAnomalia = feature.getProperties().properties.zone;
       const layerZoneAnomalia = layers.find(
         (layer) => layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneAnomalia.globalCoords)
@@ -658,8 +650,6 @@ export class AnomaliasControlService {
       } else {
         layerZoneAnomalia.setVisible(visible);
       }
-
-      this.zonesControlService.prevLayerHovered = layerZoneAnomalia;
     }
   }
 

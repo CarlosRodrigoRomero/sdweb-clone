@@ -30,9 +30,8 @@ export class ZonesControlService {
   zoomChangeView = 17.5;
   private selectedInformeId: string;
   private toggleViewSelected: number;
-  private elemsLayers: VectorLayer[];
-  private layerHovered: VectorLayer;
-  prevLayerHovered: VectorLayer;
+  private featureHovered: Feature;
+  private prevFeatureHovered: Feature;
   private currentZoom: number;
 
   constructor(
@@ -50,6 +49,8 @@ export class ZonesControlService {
         if (this.map !== undefined) {
           initService(true);
 
+          // añadimos acciones sobre las zonas
+          this.addOnHoverAction();
           this.addSelectInteraction();
         }
       });
@@ -58,12 +59,6 @@ export class ZonesControlService {
 
       this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
 
-      if (this.reportControlService.plantaFija) {
-        this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.elemsLayers = layers));
-      } else {
-        this.olMapService.getSeguidorLayers().subscribe((layers) => (this.elemsLayers = layers));
-      }
-
       this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom));
     });
   }
@@ -71,7 +66,7 @@ export class ZonesControlService {
   createZonasLayers(informeId: string): VectorLayer[] {
     const maeLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleMae(),
+      style: this.getStyleMae(false),
       visible: false,
     });
     maeLayer.setProperties({
@@ -81,7 +76,7 @@ export class ZonesControlService {
     });
     const ccLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleCelsCalientes(),
+      style: this.getStyleCelsCalientes(false),
       visible: false,
     });
     ccLayer.setProperties({
@@ -91,7 +86,7 @@ export class ZonesControlService {
     });
     const gradLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleGradienteNormMax(),
+      style: this.getStyleGradienteNormMax(false),
       visible: false,
     });
     gradLayer.setProperties({
@@ -143,9 +138,6 @@ export class ZonesControlService {
         }
       });
     });
-
-    // añadimos acciones sobre las zonas
-    // this.addOnHoverAction();
   }
 
   private getPropertyView(
@@ -252,34 +244,27 @@ export class ZonesControlService {
 
   private addOnHoverAction() {
     this.map.on('pointermove', (event) => {
-      if (this.currentZoom < this.zoomChangeView) {
-        if (this.map.hasFeatureAtPixel(event.pixel)) {
-          const feature = this.map
-            .getFeaturesAtPixel(event.pixel)
-            .filter((item) => item.getProperties().properties !== undefined)
-            .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
-            .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        const feature = this.map
+          .getFeaturesAtPixel(event.pixel)
+          .filter((item) => item.getProperties().properties !== undefined)
+          .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
+          .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
 
-          if (feature !== undefined) {
-            // cuando pasamos de una zona a otra directamente sin pasar por vacio
-            if (this.prevLayerHovered !== undefined) {
-              this.prevLayerHovered.setVisible(false);
-            }
-
-            this.layerHovered = this.elemsLayers.find(
-              (l) =>
-                l.getProperties().zoneId === feature.getProperties().properties.id &&
-                l.getProperties().view === this.toggleViewSelected &&
-                l.getProperties().informeId === this.selectedInformeId
-            );
-            this.layerHovered.setVisible(true);
-
-            this.prevLayerHovered = this.layerHovered;
+        if (feature !== undefined) {
+          // cuando pasamos de una zona a otra directamente sin pasar por vacio
+          if (this.prevFeatureHovered !== undefined) {
+            this.prevFeatureHovered.setStyle(this.getStyleZonas(false));
           }
-        } else {
-          if (this.layerHovered !== undefined) {
-            this.layerHovered.setVisible(false);
-          }
+
+          this.featureHovered = feature;
+          this.featureHovered.setStyle(this.getStyleZonas(true));
+
+          this.prevFeatureHovered = feature;
+        }
+      } else {
+        if (this.featureHovered !== undefined) {
+          this.featureHovered.setStyle(this.getStyleZonas(false));
         }
       }
     });
@@ -287,7 +272,7 @@ export class ZonesControlService {
 
   private addSelectInteraction() {
     const select = new Select({
-      style: this.getStyleZonas(),
+      style: this.getStyleZonas(false),
       layers: (l) => {
         if (
           l.getProperties().informeId === this.selectedInformeId &&
@@ -335,19 +320,23 @@ export class ZonesControlService {
     return gCoords.join('.');
   }
 
-  private getStyleZonas() {
-    const estilosView = [this.getStyleMae(), this.getStyleCelsCalientes(), this.getStyleGradienteNormMax()];
+  private getStyleZonas(focus: boolean) {
+    const estilosView = [
+      this.getStyleMae(focus),
+      this.getStyleCelsCalientes(focus),
+      this.getStyleGradienteNormMax(focus),
+    ];
 
     return estilosView[this.toggleViewSelected];
   }
 
   // ESTILOS MAE
-  private getStyleMae() {
+  private getStyleMae(focus: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: this.getColorMae(feature, 1),
+            color: focus ? 'white' : this.getColorMae(feature, 1),
             width: 4,
           }),
           fill: new Fill({
@@ -372,12 +361,12 @@ export class ZonesControlService {
   }
 
   // ESTILOS CELS CALIENTES
-  private getStyleCelsCalientes() {
+  private getStyleCelsCalientes(focus: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: this.getColorCelsCalientes(feature, 1),
+            color: focus ? 'white' : this.getColorCelsCalientes(feature, 1),
             width: 4,
           }),
           fill: new Fill({
@@ -402,12 +391,12 @@ export class ZonesControlService {
   }
 
   // ESTILOS GRADIENTE NORMALIZADO MAX
-  private getStyleGradienteNormMax() {
+  private getStyleGradienteNormMax(focus: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: this.getColorGradienteNormMax(feature, 1),
+            color: focus ? 'white' : this.getColorGradienteNormMax(feature, 1),
             width: 4,
           }),
           fill: new Fill({

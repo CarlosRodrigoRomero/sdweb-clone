@@ -1,5 +1,7 @@
 import Tile from 'ol/Tile.js';
+import TileState from 'ol/TileState.js';
 import { createCanvasContext2D } from 'ol/dom.js';
+import { listenImage } from 'ol/Image.js';
 
 import { PALETTE } from '@data/constants/palette';
 
