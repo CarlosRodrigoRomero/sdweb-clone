@@ -30,6 +30,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   thereAreZones = true;
   generatingDownload = false;
   selectedInformeId: string;
+  numInformes = 1;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -48,7 +49,11 @@ export class MapViewComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.reportControlService.initService().then((res) => (this.anomaliasLoaded = res));
+    this.reportControlService.initService().then((res) => {
+      this.anomaliasLoaded = res;
+
+      this.numInformes = this.reportControlService.informes.length;
+    });
 
     this.subscriptions.add(
       this.reportControlService.sharedReportWithFilters$.subscribe((value) => (this.showFilters = value))

@@ -30,6 +30,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public mapLoaded = false;
   noAnomsReport = false;
   generatingDownload = false;
+  numInformes = 1;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -51,7 +52,11 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.reportControlService.initService().then((res) => (this.seguidoresLoaded = res));
+    this.reportControlService.initService().then((res) => {
+      this.seguidoresLoaded = res;
+
+      this.numInformes = this.reportControlService.informes.length;
+    });
 
     this.subscriptions.add(
       this.reportControlService.sharedReportWithFilters$.subscribe((value) => (this.showFilters = value))
