@@ -134,7 +134,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
   hoverSeguidor(row: any) {
     if (this.seguidorSelected === undefined) {
       this.seguidoresControlService.seguidorHovered = row.seguidor;
-      this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, true, true);
+      this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, true);
       this.seguidoresControlService.setPopupPosition(row.seguidor.featureCoords[0]);
     }
   }
@@ -142,7 +142,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
   unhoverSeguidor(row: any) {
     if (this.seguidorSelected === undefined) {
       this.seguidoresControlService.seguidorHovered = undefined;
-      this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, false, false);
+      this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, false);
     }
   }
 
@@ -160,7 +160,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
     this.seguidoresControlService.prevSeguidorSelected = row.seguidor;
 
     this.seguidoresControlService.seguidorSelected = row.seguidor;
-    this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, false, false);
+    this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, false);
     this.seguidoresControlService.seguidorViewOpened = true;
   }
 

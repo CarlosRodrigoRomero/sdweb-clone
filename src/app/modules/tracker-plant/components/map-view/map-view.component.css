@@ -90,7 +90,6 @@ app-share-report {
   display: flex;
   padding: 0.5rem;
   width: fit-content;
-  max-width: 300px;
 }
 
 .right-sidenav {

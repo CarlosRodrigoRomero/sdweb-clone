@@ -1,5 +1,6 @@
 .resumen {
   display: flex;
+  gap: 1rem;
 }
 
 .grupo1 {
@@ -8,16 +9,13 @@
   align-items: center;
 }
 
-.grupo1 mat-icon {
-  margin-right: 0.5rem;
-}
-
 .titulo {
-  font-size: 24px;
-  margin-right: 1rem;
+  font-size: 20px;
+  margin-right: 0.6rem;
 }
 
 .subtitulo {
+  font-size: 20px;
   margin-right: 1em;
   font-weight: 400;
 }
@@ -28,7 +26,6 @@
   cursor: pointer;
   color: grey;
   vertical-align: middle;
-  margin-right: 15px;
 }
 
 .menu-grupo2 .subtitulo {
@@ -49,11 +46,11 @@
 .grupo3 {
   display: inline-flex;
   width: max-content;
+  gap: 1rem;
 }
 
 .grupo3 .elemento {
   display: inline-flex;
-  margin-left: 1.3rem;
   align-items: center;
 }
 
@@ -68,7 +65,8 @@
 }
 
 .valor-mae {
-  font-size: 38px;
+  font-size: 30px;
+  font-weight: 300;
 }
 
 .titulo-cc {
@@ -78,7 +76,8 @@
 }
 
 .valor-cc {
-  font-size: 32px;
+  font-size: 24px;
+  font-weight: 300;
 }
 
 .success {
@@ -88,9 +87,13 @@
 .help {
   cursor: pointer;
   color: darkgrey;
-  font-size: 18px;
-  margin-top: 5px;
-  /* margin-right: 0.5rem; */
+  font-size: 16px;
+  margin-top: 7px;
+}
+
+.fecha {
+  font-size: 24px;
+  font-weight: 300;
 }
 
 .tooltip-style {

@@ -339,9 +339,12 @@ export class ZonesControlService {
             color: focus ? 'white' : this.getColorMae(feature, 1),
             width: 4,
           }),
-          fill: new Fill({
-            color: this.currentZoom >= this.zoomChangeView ? 'rgba(0,0,0,0)' : this.getColorMae(feature, 0.6),
-          }),
+          fill:
+            this.currentZoom >= this.zoomChangeView
+              ? null
+              : new Fill({
+                  color: this.getColorMae(feature, 0.6),
+                }),
           text: this.getLabelStyle(feature),
         });
       }
@@ -369,9 +372,12 @@ export class ZonesControlService {
             color: focus ? 'white' : this.getColorCelsCalientes(feature, 1),
             width: 4,
           }),
-          fill: new Fill({
-            color: this.currentZoom >= this.zoomChangeView ? 'rgba(0,0,0,0)' : this.getColorCelsCalientes(feature, 0.6),
-          }),
+          fill:
+            this.currentZoom >= this.zoomChangeView
+              ? null
+              : new Fill({
+                  color: this.getColorCelsCalientes(feature, 0.6),
+                }),
           text: this.getLabelStyle(feature),
         });
       }
@@ -399,10 +405,12 @@ export class ZonesControlService {
             color: focus ? 'white' : this.getColorGradienteNormMax(feature, 1),
             width: 4,
           }),
-          fill: new Fill({
-            color:
-              this.currentZoom >= this.zoomChangeView ? 'rgba(0,0,0,0)' : this.getColorGradienteNormMax(feature, 0.6),
-          }),
+          fill:
+            this.currentZoom >= this.zoomChangeView
+              ? null
+              : new Fill({
+                  color: this.getColorGradienteNormMax(feature, 0.6),
+                }),
           text: this.getLabelStyle(feature),
         });
       }

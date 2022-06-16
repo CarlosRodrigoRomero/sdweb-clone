@@ -21,12 +21,10 @@ import { ShareReportService } from '@data/services/share-report.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { ZonesService } from '@data/services/zones.service';
-import { ViewReportService } from '@data/services/view-report.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { Seguidor } from '@core/models/seguidor';
 import { InformeInterface } from '@core/models/informe';
-import { ZonesControlService } from '@data/services/zones-control.service';
 
 @Component({
   selector: 'app-map-seguidores',
@@ -71,8 +69,6 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     private seguidoresControlService: SeguidoresControlService,
     private shareReportService: ShareReportService,
     private zonesService: ZonesService,
-    private viewReportService: ViewReportService,
-    private zonesControlService: ZonesControlService
   ) {}
 
   ngOnInit(): void {

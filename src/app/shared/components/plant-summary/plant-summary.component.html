@@ -3,6 +3,7 @@
     <!-- <mat-icon color="primary">home</mat-icon> -->
     <span class="titulo">{{ nombrePlanta }}</span>
     <span class="subtitulo">({{ potenciaPlanta | number: '1.0-2' }} MW / {{ tipoPlanta }})</span>
+    <span class="fecha">{{ fechaSelectedInforme }}</span>
   </div>
   <div class="grupo2" [matMenuTriggerFor]="menu" matTooltip="Datos del vuelo" matTooltipClass="tooltip-style">
     <mat-icon>info</mat-icon>
@@ -58,7 +59,7 @@
         matTooltipClass="tooltip-style"
         >help</mat-icon
       >
-      <span class="titulo-mae">MAE</span>
+      <span class="titulo">MAE</span>
       <span class="valor-mae">{{ informe.mae * 100 | number: '1.0-2' }}%</span>
       <!-- <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon> -->
     </div>
@@ -69,7 +70,7 @@
         matTooltipClass="tooltip-style"
         >help</mat-icon
       >
-      <span class="titulo-cc">CC</span>
+      <span class="titulo">CC</span>
       <span class="valor-cc">{{ informe.cc * 100 | number: '1.0-2' }}%</span>
       <!-- <mat-icon *ngIf="informe.cc < 3" class="success">arrow_circle_down</mat-icon> -->
     </div>
@@ -77,7 +78,7 @@
       <mat-icon class="help" matTooltip="Nº total de anomalías del informe seleccionado" matTooltipClass="tooltip-style"
         >help</mat-icon
       >
-      <span class="titulo-cc"># anomalías</span>
+      <span class="titulo"># anomalías</span>
       <span class="valor-cc">{{ informe.numsCoA[0] + informe.numsCoA[1] + informe.numsCoA[2] }}</span>
     </div>
   </div>

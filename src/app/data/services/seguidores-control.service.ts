@@ -27,7 +27,6 @@ import { Seguidor } from '@core/models/seguidor';
 import { MathOperations } from '@core/classes/math-operations';
 import { LocationAreaInterface } from '@core/models/location';
 
-import { GLOBAL } from '@data/constants/global';
 import { COLOR } from '@data/constants/color';
 
 @Injectable({
@@ -92,6 +91,7 @@ export class SeguidoresControlService {
           // añadimos acciones sobre los seguidores
           this.addCursorOnHover();
           this.addOnHoverAction();
+          this.addSelectInteraction();
           this.addZoomEvent();
         }
       });
@@ -339,7 +339,7 @@ export class SeguidoresControlService {
 
   private addSelectInteraction() {
     const select = new Select({
-      style: this.getStyleSeguidores(),
+      style: this.getStyleSeguidores(false),
       layers: (l) => {
         if (
           l.getProperties().informeId === this.selectedInformeId &&
@@ -404,23 +404,11 @@ export class SeguidoresControlService {
     });
   }
 
-  private resetSelectInteraction() {
-    // eliminamos la anterior interacción para que la actual obtenga el estilo correcto
-    this.map.getInteractions().forEach((interaction) => {
-      if (interaction instanceof Select) {
-        this.map.removeInteraction(interaction);
-      }
-    });
-
-    // la añadimos de nuevo
-    this.addSelectInteraction();
-  }
-
-  private getStyleSeguidores() {
+  private getStyleSeguidores(focus: boolean) {
     const estilosView = [
-      this.getStyleSeguidoresMae(false),
-      this.getStyleSeguidoresCelsCalientes(false),
-      this.getStyleSeguidoresGradienteNormMax(false),
+      this.getStyleSeguidoresMae(focus),
+      this.getStyleSeguidoresCelsCalientes(focus),
+      this.getStyleSeguidoresGradienteNormMax(focus),
     ];
 
     return estilosView[this.toggleViewSelected];
@@ -661,18 +649,7 @@ export class SeguidoresControlService {
     }
   }
 
-  setExternalStyleSeguidor(seguidorId: string, focus: boolean, layerVisible?: boolean) {
-    const estilosViewFocused = [
-      this.getStyleSeguidoresMae(true),
-      this.getStyleSeguidoresCelsCalientes(true),
-      this.getStyleSeguidoresGradienteNormMax(true),
-    ];
-    const estilosViewUnfocused = [
-      this.getStyleSeguidoresMae(false),
-      this.getStyleSeguidoresCelsCalientes(false),
-      this.getStyleSeguidoresGradienteNormMax(false),
-    ];
-
+  setExternalStyleSeguidor(seguidorId: string, focus: boolean) {
     const layersInforme = this.seguidorLayers.filter(
       (layer) => layer.getProperties().informeId === this.selectedInformeId
     );
@@ -685,13 +662,9 @@ export class SeguidoresControlService {
     const feature = features.find((f) => f.getProperties().properties.seguidorId === seguidorId);
 
     if (focus) {
-      feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
+      feature.setStyle(this.getStyleSeguidores(true));
     } else {
-      feature.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
-    }
-
-    if (layerVisible !== undefined) {
-      this.setExternalStyleSeguidorLayer(feature, layersView, layerVisible);
+      feature.setStyle(this.getStyleSeguidores(false));
     }
   }
 

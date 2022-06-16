@@ -106,7 +106,6 @@ app-download-progress-bar {
   display: flex;
   padding: 0.5rem;
   width: fit-content;
-  max-width: 300px;
 }
 
 @media (max-width: 420px) {
