@@ -27,6 +27,8 @@ import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
 
 import { COLOR } from '@data/constants/color';
+import { TipoElemFilter } from '@core/models/tipoPcFilter';
+import { GLOBAL } from '@data/constants/global';
 
 @Injectable({
   providedIn: 'root',
@@ -86,7 +88,12 @@ export class AnomaliasControlService {
         this.anomaliaSelect = undefined;
       });
 
-      this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
+      this.viewReportService.reportViewSelected$.subscribe((viewSel) => {
+        this.toggleViewSelected = viewSel;
+
+        // filtramos las ccs para la vista CelsCalientes
+        this.filterService.filterCCs(this.toggleViewSelected);
+      });
 
       this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom));
 
@@ -507,7 +514,7 @@ export class AnomaliasControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focused ? 'white' : COLOR.colores_tipos[8] /* this.getColorCelsCalientes(feature) */,
+            color: focused ? 'white' : this.getColorCelsCalientes(feature),
             width: focused ? 4 : 2,
           }),
           fill: new Fill({
@@ -519,11 +526,11 @@ export class AnomaliasControlService {
   }
 
   private getColorCelsCalientes(feature: Feature) {
-    const celsCalientes = feature.getProperties().properties.celsCalientes;
+    const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
-    if (celsCalientes < 0.02) {
+    if (gradNormMax < 10) {
       return COLOR.colores_severity[0];
-    } else if (celsCalientes < 0.1) {
+    } else if (gradNormMax < 40) {
       return COLOR.colores_severity[1];
     } else {
       return COLOR.colores_severity[2];

@@ -20,6 +20,7 @@ export class FilterService {
   private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   public filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
+  private prevAllFilterableElems: FilterableElement[];
   private _filteredElements: FilterableElement[] = [];
   public filteredElements$ = new BehaviorSubject<FilterableElement[]>(this.filteredElements);
   private _allFiltrableElements: FilterableElement[] = [];
@@ -205,6 +206,18 @@ export class FilterService {
       }
     } else {
       this.filteredElements = elems;
+    }
+  }
+
+  filterCCs(viewSelected: number) {
+    if (viewSelected === 1) {
+      this.prevAllFilterableElems = this.allFiltrableElements;
+      this.allFiltrableElements = this.allFiltrableElements.filter((elem) => elem.tipo == 8 || elem.tipo == 9);
+      this.processFilters();
+    } else if (this.prevAllFilterableElems !== undefined) {
+      this.allFiltrableElements = this.prevAllFilterableElems;
+      this.processFilters();
+      this.prevAllFilterableElems = undefined;
     }
   }
 
