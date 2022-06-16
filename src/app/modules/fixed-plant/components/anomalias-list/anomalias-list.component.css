@@ -10,6 +10,10 @@
   padding-bottom: 6px;
 }
 
+:host ::ng-deep .mat-sort-header-container {
+  justify-content: center;
+}
+
 table {
   width: 100%;
 }
@@ -31,6 +35,11 @@ table {
 
 .mat-row {
   cursor: pointer;
+}
+
+.row-data {
+  display: flex;
+  justify-content: center;
 }
 
 .mat-column-tipo {

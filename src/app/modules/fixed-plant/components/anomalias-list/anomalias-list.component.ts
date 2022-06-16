@@ -29,7 +29,7 @@ import { COLOR } from '@data/constants/color';
 })
 export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy {
   viewSeleccionada = 0;
-  displayedColumns: string[] = [];
+  displayedColumns: string[] = ['numAnom', 'tipo', 'temp', 'perdidas', 'gradiente'];
   dataSource: MatTableDataSource<any>;
   public selectedRow: string;
   public prevSelectedRow: any;
@@ -59,19 +59,6 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
     this.subscriptions.add(
       this.viewReportService.reportViewSelected$.subscribe((sel) => {
         this.viewSeleccionada = Number(sel);
-
-        // cambiammos la ultima columna con la vista seleccionada
-        switch (this.viewSeleccionada) {
-          case 0:
-            this.displayedColumns = ['numAnom', 'tipo', 'temp', 'perdidas'];
-            break;
-          case 1:
-            this.displayedColumns = ['numAnom', 'tipo', 'temp', 'celsCalientes'];
-            break;
-          case 2:
-            this.displayedColumns = ['numAnom', 'tipo', 'temp', 'gradiente'];
-            break;
-        }
       })
     );
 
