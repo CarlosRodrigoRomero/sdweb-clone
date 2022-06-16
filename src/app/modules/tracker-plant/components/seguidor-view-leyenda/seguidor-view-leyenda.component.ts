@@ -17,8 +17,9 @@ export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
   viewSelected: number;
   private seguidorSelected: Seguidor;
   viewsTitle: string[] = ['Pérdidas', 'Cels. Calientes', 'ΔT Max (norm)'];
+  viewsLabels: string[][];
   numCelsCalientes = 0;
-  colors = [COLOR.colores_severity, COLOR.colores_severity, COLOR.colores_severity];
+  colors = COLOR.colores_severity;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -53,6 +54,12 @@ export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    this.viewsLabels = [
+      ['Bajas', 'Medias', 'Altas'],
+      ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
+      ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
+    ];
   }
 
   ngOnDestroy(): void {

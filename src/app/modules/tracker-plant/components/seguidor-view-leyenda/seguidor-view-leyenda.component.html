@@ -1,26 +1,37 @@
 <mat-card>
   <mat-card-content>
     <div *ngIf="viewSelected != 1">
-      <span class="title">{{ viewsTitle[viewSelected] }}</span>
+      <span class="titulo">{{ viewsTitle[viewSelected] }}</span>
       <div class="line">
-        <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
-        <span *ngIf="viewSelected == 0">Altas</span>
-        <span *ngIf="viewSelected == 2">Grave</span>
+        <mat-icon [ngStyle]="{ color: colors[2] }">crop_5_4</mat-icon>
+        <span> {{ viewsLabels[viewSelected][2] }}</span>
       </div>
       <div class="line">
-        <mat-icon [ngStyle]="{ color: colors[viewSelected][1] }">crop_5_4</mat-icon>
-        <span *ngIf="viewSelected == 0">Medias</span>
-        <span *ngIf="viewSelected == 2">Medio</span>
+        <mat-icon [ngStyle]="{ color: colors[1] }">crop_5_4</mat-icon>
+        <span>{{ viewsLabels[viewSelected][1] }}</span>
       </div>
       <div class="line">
-        <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
-        <span *ngIf="viewSelected == 0">Bajas</span>
-        <span *ngIf="viewSelected == 2">Leve</span>
+        <mat-icon [ngStyle]="{ color: colors[0] }">crop_5_4</mat-icon>
+        <span> {{ viewsLabels[viewSelected][0] }}</span>
       </div>
     </div>
     <div *ngIf="viewSelected == 1">
       <span class="cc-label" *ngIf="numCelsCalientes === 0">Ningún módulo con celulas calientes</span>
-      <span class="cc-label" *ngIf="numCelsCalientes > 0">Solo módulos con celulas calientes</span>
+      <div *ngIf="numCelsCalientes > 0">
+        <span class="titulo">{{ viewsTitle[viewSelected] }}</span>
+        <div class="line">
+          <mat-icon [ngStyle]="{ color: colors[2] }">crop_5_4</mat-icon>
+          <span> {{ viewsLabels[viewSelected][2] }}</span>
+        </div>
+        <div class="line">
+          <mat-icon [ngStyle]="{ color: colors[1] }">crop_5_4</mat-icon>
+          <span>{{ viewsLabels[viewSelected][1] }}</span>
+        </div>
+        <div class="line">
+          <mat-icon [ngStyle]="{ color: colors[0] }">crop_5_4</mat-icon>
+          <span> {{ viewsLabels[viewSelected][0] }}</span>
+        </div>
+      </div>
     </div>
   </mat-card-content>
 </mat-card>
