@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject, combineLatest } from 'rxjs';
+import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
 import { Fill, Stroke, Style } from 'ol/style';
@@ -45,9 +45,10 @@ export class AnomaliasControlService {
   private sharedReportNoFilters = false;
   private toggleViewSelected: number;
   private currentZoom: number;
-
   private _coordsPointer: Coordinate = undefined;
   public coordsPointer$ = new BehaviorSubject<Coordinate>(this._coordsPointer);
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private olMapService: OlMapService,
@@ -65,35 +66,41 @@ export class AnomaliasControlService {
     const getIfSharedWithFilters = this.reportControlService.sharedReportWithFilters$;
 
     return new Promise((initService) => {
-      combineLatest([getMap, getAnomLayers, getIfSharedWithFilters]).subscribe(([map, anomL, isSharedWithFil]) => {
-        this.map = map;
-        this.anomaliaLayers = anomL;
-        this.sharedReportNoFilters = !isSharedWithFil;
+      this.subscriptions.add(
+        combineLatest([getMap, getAnomLayers, getIfSharedWithFilters]).subscribe(([map, anomL, isSharedWithFil]) => {
+          this.map = map;
+          this.anomaliaLayers = anomL;
+          this.sharedReportNoFilters = !isSharedWithFil;
 
-        if (this.map !== undefined) {
-          // añadimos acciones sobre las anomalias
-          this.addPointerOnHover();
-          this.addOnHoverAction();
-          this.addClickOutFeatures();
-          this.addZoomEvent();
-        }
-      });
+          if (this.map !== undefined) {
+            // añadimos acciones sobre las anomalias
+            this.addPointerOnHover();
+            this.addOnHoverAction();
+            this.addClickOutFeatures();
+            this.addZoomEvent();
+          }
+        })
+      );
 
-      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-        this.selectedInformeId = informeId;
-        this.prevAnomaliaSelect = undefined;
-        this.prevFeatureHover = undefined;
-        this.anomaliaSelect = undefined;
-      });
+      this.subscriptions.add(
+        this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+          this.selectedInformeId = informeId;
+          this.prevAnomaliaSelect = undefined;
+          this.prevFeatureHover = undefined;
+          this.anomaliaSelect = undefined;
+        })
+      );
 
-      this.viewReportService.reportViewSelected$.subscribe((viewSel) => {
-        this.toggleViewSelected = viewSel;
+      this.subscriptions.add(
+        this.viewReportService.reportViewSelected$.subscribe((viewSel) => {
+          this.toggleViewSelected = viewSel;
 
-        // filtramos las ccs para la vista CelsCalientes
-        this.filterService.filterCCs(this.toggleViewSelected);
-      });
+          // filtramos las ccs para la vista CelsCalientes
+          this.filterService.filterCCs(this.toggleViewSelected);
+        })
+      );
 
-      this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom));
+      this.subscriptions.add(this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom)));
 
       initService(true);
     });
@@ -188,22 +195,24 @@ export class AnomaliasControlService {
   }
 
   mostrarAnomalias() {
-    this.filterService.filteredElements$.subscribe((anomalias) => {
-      if (!this.sharedReportNoFilters) {
-        // Dibujar anomalias
-        this.dibujarAnomalias(anomalias as Anomalia[]);
-        this.listaAnomalias = anomalias as Anomalia[];
+    this.subscriptions.add(
+      this.filterService.filteredElements$.subscribe((anomalias) => {
+        if (!this.sharedReportNoFilters) {
+          // Dibujar anomalias
+          this.dibujarAnomalias(anomalias as Anomalia[]);
+          this.listaAnomalias = anomalias as Anomalia[];
 
-        // reiniciamos las anomalias seleccionadas cada vez que se aplica un filtro
-        this.prevAnomaliaSelect = undefined;
-        this.anomaliaSelect = undefined;
-      } else {
-        // dibujamos solo anomalias del informe compartido
-        const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
-        this.dibujarAnomalias(anomFil as Anomalia[]);
-        this.listaAnomalias = anomalias as Anomalia[];
-      }
-    });
+          // reiniciamos las anomalias seleccionadas cada vez que se aplica un filtro
+          this.prevAnomaliaSelect = undefined;
+          this.anomaliaSelect = undefined;
+        } else {
+          // dibujamos solo anomalias del informe compartido
+          const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
+          this.dibujarAnomalias(anomFil as Anomalia[]);
+          this.listaAnomalias = anomalias as Anomalia[];
+        }
+      })
+    );
   }
 
   private dibujarAnomalias(anomalias: Anomalia[]) {
@@ -483,7 +492,7 @@ export class AnomaliasControlService {
         return new Style({
           stroke: new Stroke({
             color: focused ? 'white' : this.getColorMae(feature),
-            width: focused ? 4 : 2,
+            width: focused ? 5 : 4,
           }),
           fill: new Fill({
             color: 'rgba(255,255,255, 0)',
@@ -512,7 +521,7 @@ export class AnomaliasControlService {
         return new Style({
           stroke: new Stroke({
             color: focused ? 'white' : this.getColorCelsCalientes(feature),
-            width: focused ? 4 : 2,
+            width: focused ? 5 : 4,
           }),
           fill: new Fill({
             color: 'rgba(255,255,255, 0)',
@@ -541,7 +550,7 @@ export class AnomaliasControlService {
         return new Style({
           stroke: new Stroke({
             color: focused ? 'white' : this.getColorGradienteNormMax(feature),
-            width: focused ? 4 : 2,
+            width: focused ? 5 : 4,
           }),
           fill: new Fill({
             color: 'rgba(255,255,255, 0)',
@@ -661,6 +670,22 @@ export class AnomaliasControlService {
     if (this.currentZoom < this.zonesControlService.zoomChangeView) {
       layer.setVisible(visible);
     }
+  }
+
+  resetService() {
+    this.selectedInformeId = undefined;
+    this.anomaliaSelect = undefined;
+    this.anomaliaHover = undefined;
+    this.prevFeatureHover = undefined;
+    this.prevAnomaliaSelect = undefined;
+    this.listaAnomalias = [];
+    this.anomaliaLayers = [];
+    this.sharedReportNoFilters = false;
+    this.toggleViewSelected = undefined;
+    this.currentZoom = undefined;
+    this.coordsPointer = undefined;
+
+    this.subscriptions.unsubscribe();
   }
 
   ///////////////////////////////////////////////////////////

@@ -11,6 +11,7 @@ import { ThermalService } from '@data/services/thermal.service';
 import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ViewReportService } from '@data/services/view-report.service';
+import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 
 @Component({
   selector: 'app-map-view',
@@ -45,7 +46,8 @@ export class MapViewComponent implements OnInit, OnDestroy {
     private thermalService: ThermalService,
     private downloadReportService: DownloadReportService,
     private zonesService: ZonesService,
-    private viewReportService: ViewReportService
+    private viewReportService: ViewReportService,
+    private anomaliasControlService: AnomaliasControlService
   ) {}
 
   ngOnInit(): void {
@@ -110,5 +112,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.downloadReportService.resetService();
     this.viewReportService.resetService();
     this.zonesService.resetService();
+    this.anomaliasControlService.resetService();
   }
 }

@@ -127,10 +127,15 @@ export class OlMapService {
         .pipe(
           take(1),
           catchError((error) => {
+            let aerialLayer: TileLayer;
+
             // no recibimos respuesta del servidor porque no existe
             if (error.status === 0) {
-              this._aerialLayers.push(null);
-              this.aerialLayers$.next(this._aerialLayers);
+              aerialLayer = new TileLayer({});
+              aerialLayer.setProperties({
+                informeId,
+                exist: false,
+              });
             } else {
               // si recibimos respuesta del servidor, es que existe la capa
               const aerial = new XYZ({
@@ -138,19 +143,21 @@ export class OlMapService {
                 crossOrigin: 'anonymous',
               });
 
-              const aerialLayer = new TileLayer({
+              aerialLayer = new TileLayer({
                 source: aerial,
                 preload: Infinity,
               });
 
               aerialLayer.setProperties({
                 informeId,
+                exist: true,
               });
-
-              this._aerialLayers.push(aerialLayer);
-              this.aerialLayers$.next(this._aerialLayers);
             }
+            this._aerialLayers.push(aerialLayer);
+            this.aerialLayers$.next(this._aerialLayers);
+
             resolve();
+
             return [];
           }),
           take(1)

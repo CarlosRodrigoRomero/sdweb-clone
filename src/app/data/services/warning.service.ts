@@ -150,7 +150,6 @@ export class WarningService {
     planta: PlantaInterface,
     locAreas: LocationAreaInterface[]
   ): boolean {
-    const start1 = performance.now();
     // reseteamos las alertas añadidas
     this.warningsAdded = warns.map((warn) => warn.type);
 
@@ -193,17 +192,21 @@ export class WarningService {
       // eliminamos posibles alertas que ya no sean necesarias
       this.checkUnusedWarnings(warns, informe.id);
 
-      const end1 = performance.now();
-      console.log(`Tiempo de ejecución de checkWarnings: ${end1 - start1} ms`);
       // indicamos que todas las alertas han sido checkeadas
       return true;
     }
   }
 
   private checkAddWarning(warning: Warning, warns: Warning[], informeId: string) {
-    if (!warns.map((warn) => warn.type).includes(warning.type)) {
+    const existWarnings = warns.filter((warn) => warn.type === warning.type);
+
+    if (existWarnings.length === 0) {
       this.warningsAdded.push(warning.type);
       this.addWarning(informeId, warning);
+    } else if (existWarnings.length > 1) {
+      // eliminamos los duplicados
+      existWarnings.pop();
+      existWarnings.forEach((warn) => this.deleteWarning(informeId, warn.id));
     }
   }
 

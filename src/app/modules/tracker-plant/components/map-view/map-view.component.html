@@ -68,6 +68,9 @@
                   <app-download-report *ngIf="notSharedReport || completeView"></app-download-report>
                 </div>
 
+                <app-zones *ngIf="thereAreZones"></app-zones>
+                <app-view-control></app-view-control>
+
                 <div class="map-control">
                   <!-- CONTROL TEMPORAL -->
                   <div class="temporal-control">
@@ -78,9 +81,6 @@
                   <!-- <div class="visual-control">
                     <app-global-coord-areas *ngIf="thereAreZones"></app-global-coord-areas>
                   </div> -->
-
-                  <app-zones *ngIf="thereAreZones"></app-zones>
-                  <app-view-control></app-view-control>
                 </div>
               </div>
             </div>
