@@ -1,19 +1,9 @@
 mat-card {
-  opacity: 0.9;
   border-color: transparent;
   box-shadow: none !important;
   padding: 8px 16px;
   min-width: 250px;
 }
-
-/* ::ng-deep .opacity-slider {
-  .mat-slider-thumb {
-    background-color: grey !important;
-  }
-  .mat-slider-track-fill {
-    background-color: grey !important;
-  }
-} */
 
 .opacity-slider-group {
   display: inline-flex;

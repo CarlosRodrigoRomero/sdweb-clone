@@ -16,6 +16,7 @@ export class LeyendaComponent implements OnInit, OnDestroy {
   viewSelected: number;
   viewsLabels: string[][];
   viewsTitle: string[] = ['MAE por seguidor', 'Cels. Calientes por seguidor', 'ΔT Max (norm) por seguidor'];
+  viewsCCsLabels: string[] = ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'];
 
   private subscriptions: Subscription = new Subscription();
 

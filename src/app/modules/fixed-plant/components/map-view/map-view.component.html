@@ -63,6 +63,9 @@
               <mat-icon>tune</mat-icon>
             </button>
 
+            <app-zones *ngIf="thereAreZones"></app-zones>
+            <app-view-control></app-view-control>
+
             <div id="map-control" class="map-control">
               <!-- CONTROL TEMPORAL -->
               <div class="temporal-control">
@@ -74,8 +77,6 @@
                 <app-thermal-slider [informeId]="selectedInformeId"></app-thermal-slider>
                 <!-- <app-global-coord-areas *ngIf="thereAreZones"></app-global-coord-areas> -->
                 <app-slider-opacity></app-slider-opacity>
-                <app-zones *ngIf="thereAreZones"></app-zones>
-                <app-view-control></app-view-control>
               </div>
             </div>
           </div>

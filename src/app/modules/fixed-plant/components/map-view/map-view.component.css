@@ -7,14 +7,14 @@
   bottom: 0.5rem;
   display: grid;
   grid-template-columns: 100%;
-  gap: 1rem;
+  gap: 0.5rem;
   left: 50%;
   transform: translate(-50%, 0%);
 }
 
 .visual-control {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .btn-open-controls {

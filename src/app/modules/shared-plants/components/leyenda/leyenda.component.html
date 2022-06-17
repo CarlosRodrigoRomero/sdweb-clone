@@ -1,17 +1,38 @@
 <mat-card>
   <mat-card-content>
-    <!-- <span class="title">{{ viewsTitle[viewSelected] }}</span> -->
-    <div class="line">
-      <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
-      <span> {{ viewsLabels[viewSelected][2] }}</span>
+    <div class="leyenda-block">
+      <span *ngIf="viewSelected == 1" class="lines-tittle">Zonas (% ccs)</span>
+      <div class="lines">
+        <div class="line">
+          <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
+          <span> {{ viewsLabels[viewSelected][2] }}</span>
+        </div>
+        <div class="line">
+          <mat-icon [ngStyle]="{ color: colors[viewSelected][1] }">crop_5_4</mat-icon>
+          <span>{{ viewsLabels[viewSelected][1] }}</span>
+        </div>
+        <div class="line">
+          <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
+          <span> {{ viewsLabels[viewSelected][0] }}</span>
+        </div>
+      </div>
     </div>
-    <div class="line">
-      <mat-icon [ngStyle]="{ color: colors[viewSelected][1] }">crop_5_4</mat-icon>
-      <span>{{ viewsLabels[viewSelected][1] }}</span>
-    </div>
-    <div class="line">
-      <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
-      <span> {{ viewsLabels[viewSelected][0] }}</span>
+    <div class="leyenda-block" *ngIf="viewSelected == 1">
+      <span class="lines-tittle">Anomalías</span>
+      <div class="lines">
+        <div class="line">
+          <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
+          <span> {{ viewsCCsLabels[2] }}</span>
+        </div>
+        <div class="line">
+          <mat-icon [ngStyle]="{ color: colors[viewSelected][1] }">crop_5_4</mat-icon>
+          <span>{{ viewsCCsLabels[1] }}</span>
+        </div>
+        <div class="line">
+          <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
+          <span> {{ viewsCCsLabels[0] }}</span>
+        </div>
+      </div>
     </div>
   </mat-card-content>
 </mat-card>

@@ -1,10 +1,27 @@
 mat-card {
-  max-width: 190px;
-  opacity: 0.9;
+  width: fit-content;
 }
 
 mat-card-content {
-  display: grid;
+  display: flex;
+  gap: 1rem;
+}
+
+.leyenda-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.lines-tittle {
+  font-size: medium;
+  font-weight: 500;
+  margin-left: 1rem;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
   gap: 0.3rem;
 }
 
@@ -16,9 +33,4 @@ mat-card-content {
 .line span {
   font-size: medium;
   margin-left: 0.5rem;
-}
-
-.title {
-  font-size: medium;
-  font-weight: 500;
 }
