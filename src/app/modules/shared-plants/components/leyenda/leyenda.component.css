@@ -34,3 +34,8 @@ mat-card-content {
   font-size: medium;
   margin-left: 0.5rem;
 }
+
+.view-1 {
+  display: flex;
+  gap: 1rem;
+}

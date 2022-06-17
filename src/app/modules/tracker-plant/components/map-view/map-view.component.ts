@@ -114,5 +114,6 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mapSeguidoresService.resetService();
     this.downloadReportService.resetService();
     this.viewReportService.resetService();
+    this.zonesService.resetService();
   }
 }

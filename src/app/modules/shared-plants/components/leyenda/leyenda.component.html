@@ -1,25 +1,55 @@
 <mat-card>
   <mat-card-content>
-    <div class="leyenda-block">
-      <span *ngIf="viewSelected == 1" class="lines-tittle">Zonas (% ccs)</span>
-      <div class="lines">
-        <div class="line">
-          <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
-          <span> {{ viewsLabels[viewSelected][2] }}</span>
-        </div>
-        <div class="line">
-          <mat-icon [ngStyle]="{ color: colors[viewSelected][1] }">crop_5_4</mat-icon>
-          <span>{{ viewsLabels[viewSelected][1] }}</span>
-        </div>
-        <div class="line">
-          <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
-          <span> {{ viewsLabels[viewSelected][0] }}</span>
-        </div>
+    <div *ngIf="!plantaFija || (plantaFija && viewSelected != 1)" class="lines">
+      <div class="line">
+        <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
+        <span> {{ viewsLabels[viewSelected][2] }}</span>
+      </div>
+      <div class="line">
+        <mat-icon [ngStyle]="{ color: colors[viewSelected][1] }">crop_5_4</mat-icon>
+        <span>{{ viewsLabels[viewSelected][1] }}</span>
+      </div>
+      <div class="line">
+        <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
+        <span> {{ viewsLabels[viewSelected][0] }}</span>
       </div>
     </div>
-    <div class="leyenda-block" *ngIf="viewSelected == 1">
-      <span class="lines-tittle">Anomalías</span>
-      <div class="lines">
+
+    <div *ngIf="plantaFija && viewSelected == 1" class="leyenda-block">
+      <div *ngIf="thereAreZones" class="view-1">
+        <div class="lines">
+          <span class="lines-tittle">Zonas (% ccs)</span>
+          <div class="line">
+            <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
+            <span> {{ viewsLabels[viewSelected][2] }}</span>
+          </div>
+          <div class="line">
+            <mat-icon [ngStyle]="{ color: colors[viewSelected][1] }">crop_5_4</mat-icon>
+            <span>{{ viewsLabels[viewSelected][1] }}</span>
+          </div>
+          <div class="line">
+            <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
+            <span> {{ viewsLabels[viewSelected][0] }}</span>
+          </div>
+        </div>
+        <div class="lines">
+          <span class="lines-tittle">Anomalías</span>
+          <div class="line">
+            <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
+            <span> {{ viewsCCsLabels[2] }}</span>
+          </div>
+          <div class="line">
+            <mat-icon [ngStyle]="{ color: colors[viewSelected][1] }">crop_5_4</mat-icon>
+            <span>{{ viewsCCsLabels[1] }}</span>
+          </div>
+          <div class="line">
+            <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
+            <span> {{ viewsCCsLabels[0] }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!thereAreZones" class="lines">
         <div class="line">
           <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
           <span> {{ viewsCCsLabels[2] }}</span>

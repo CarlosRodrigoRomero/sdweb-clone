@@ -202,6 +202,13 @@ export class ZonesService {
     return [sumLat / locArea.path.length, sumLong / locArea.path.length];
   }
 
+  resetService() {
+    this.locAreas = [];
+    this.zones = [];
+    this.zonesBySize = [];
+    this.thereAreZones = false;
+  }
+
   get thereAreZones(): boolean {
     return this._thereAreZones;
   }

@@ -109,5 +109,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.thermalService.resetService();
     this.downloadReportService.resetService();
     this.viewReportService.resetService();
+    this.zonesService.resetService();
   }
 }
