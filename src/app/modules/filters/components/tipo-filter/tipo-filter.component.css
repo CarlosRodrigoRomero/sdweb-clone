@@ -45,12 +45,3 @@ li {
   margin-top: -6px;
   text-align: end;
 }
-
-.label-tipo {
-  display: inline-flex;
-  margin-top: 0.4rem;
-}
-
-.label-tipo mat-icon {
-  margin-right: 0.5rem;
-}
