@@ -102,15 +102,6 @@ export class ReportControlService {
               }),
               take(1),
               switchMap(() => {
-                /*   return this.plantaService.getLocationsArea(this.plantaId);
-              }),
-              take(1),
-              switchMap((locAreas) => {
-                this.zones = this.zonesService.getZones(this.planta, locAreas);
-                if (this.zones.length > 0) {
-                  this.thereAreZones = true;
-                } */
-
                 if (this.authService.userIsAdmin(this.user)) {
                   return this.informeService.getInformesDePlanta(this.plantaId);
                 } else {

@@ -58,7 +58,7 @@ export class PlantCreateComponent implements OnInit {
       alturaBajaPrimero: [false, [Validators.required]],
       autoLocReady: [false, [Validators.required]],
       filas: [, [Validators.required]],
-      columnas: [],
+      columnas: [, [Validators.required]],
       latitud: [, [Validators.required]],
       longitud: [, [Validators.required]],
       zoom: [17, [Validators.required]],

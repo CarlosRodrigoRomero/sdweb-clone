@@ -98,7 +98,7 @@ export class MapComponent implements OnInit, OnDestroy {
           const smallZones = allZones[allZones.length - 1];
 
           // Para cada informe, hay que crear 2 capas: térmica y vectorial
-          this.informes.forEach((informe, index) => {
+          this.informes.forEach(async (informe, index) => {
             const thermalLayerDB = this.thermalLayersDB.find((item) => item.informeId === informe.id);
 
             if (thermalLayerDB !== undefined) {
@@ -111,7 +111,7 @@ export class MapComponent implements OnInit, OnDestroy {
               .forEach((layer) => this.olMapService.addAnomaliaLayer(layer));
 
             // añadimos las ortofotos aereas de cada informe
-            this.olMapService.addAerialLayer(informe.id);
+            await this.olMapService.addAerialLayer(informe.id);
 
             if (index === this.informes.length - 1) {
               this.initMap();
@@ -119,7 +119,7 @@ export class MapComponent implements OnInit, OnDestroy {
           });
         } else {
           // Para cada informe, hay que crear 2 capas: térmica y vectorial
-          this.informes.forEach((informe, index) => {
+          this.informes.forEach(async (informe, index) => {
             const thermalLayerDB = this.thermalLayersDB.find((item) => item.informeId === informe.id);
 
             if (thermalLayerDB !== undefined) {
@@ -132,7 +132,7 @@ export class MapComponent implements OnInit, OnDestroy {
               .forEach((layer) => this.olMapService.addAnomaliaLayer(layer));
 
             // añadimos las ortofotos aereas de cada informe
-            this.olMapService.addAerialLayer(informe.id);
+            await this.olMapService.addAerialLayer(informe.id);
 
             if (index === this.informes.length - 1) {
               this.initMap();

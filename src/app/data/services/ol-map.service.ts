@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -17,6 +18,7 @@ import { fromLonLat } from 'ol/proj';
 import XYZ from 'ol/source/XYZ';
 
 import { GLOBAL } from '@data/constants/global';
+import { catchError, take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -42,7 +44,7 @@ export class OlMapService {
   private _aerialLayers: TileLayer[] = [];
   aerialLayers$ = new BehaviorSubject<TileLayer[]>(this._aerialLayers);
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   createMap(
     id: string,
@@ -116,23 +118,45 @@ export class OlMapService {
     return this.incrementoLayers$.asObservable();
   }
 
-  addAerialLayer(informeId: string) {
-    const aerial = new XYZ({
-      url: GLOBAL.GIS + informeId + '_visual/{z}/{x}/{y}.png',
-      crossOrigin: 'anonymous',
-    });
+  addAerialLayer(informeId: string): Promise<void> {
+    const url = GLOBAL.GIS + informeId + '_visual/1/1/1.png';
 
-    const aerialLayer = new TileLayer({
-      source: aerial,
-      preload: Infinity,
-    });
+    return new Promise((resolve, reject) => {
+      this.http
+        .get(url)
+        .pipe(
+          take(1),
+          catchError((error) => {
+            // no recibimos respuesta del servidor porque no existe
+            if (error.status === 0) {
+              this._aerialLayers.push(null);
+              this.aerialLayers$.next(this._aerialLayers);
+            } else {
+              // si recibimos respuesta del servidor, es que existe la capa
+              const aerial = new XYZ({
+                url: GLOBAL.GIS + informeId + '_visual/{z}/{x}/{y}.png',
+                crossOrigin: 'anonymous',
+              });
 
-    aerialLayer.setProperties({
-      informeId,
-    });
+              const aerialLayer = new TileLayer({
+                source: aerial,
+                preload: Infinity,
+              });
 
-    this._aerialLayers.push(aerialLayer);
-    this.aerialLayers$.next(this._aerialLayers);
+              aerialLayer.setProperties({
+                informeId,
+              });
+
+              this._aerialLayers.push(aerialLayer);
+              this.aerialLayers$.next(this._aerialLayers);
+            }
+            resolve();
+            return [];
+          }),
+          take(1)
+        )
+        .subscribe(() => {});
+    });
   }
 
   latLonLiteralToLonLat(path: LatLngLiteral[]) {

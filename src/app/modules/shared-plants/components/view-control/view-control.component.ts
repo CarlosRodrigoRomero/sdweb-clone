@@ -38,7 +38,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.olMapService.aerialLayers$.pipe(take(1)).subscribe((layers) => (this.aerialLayers = layers));
+    this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayers = layers)));
 
     if (this.reportControlService.plantaFija) {
       this.olMapService
@@ -110,10 +110,12 @@ export class ViewControlComponent implements OnInit, OnDestroy {
 
   private setAerialLayersVisibility(informeId: string) {
     this.aerialLayers.forEach((layer) => {
-      if (layer.getProperties().informeId === informeId) {
-        layer.setVisible(true);
-      } else {
-        layer.setVisible(false);
+      if (layer !== null) {
+        if (layer.getProperties().informeId === informeId) {
+          layer.setVisible(true);
+        } else {
+          layer.setVisible(false);
+        }
       }
     });
   }

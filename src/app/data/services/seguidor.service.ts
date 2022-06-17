@@ -57,7 +57,9 @@ export class SeguidorService {
         });
         return combineLatest(anomaliaObsList);
       }),
-      map((arr) => arr.flat())
+      map((arr) => {
+        return arr.flat();
+      })
     );
   }
 

@@ -150,6 +150,7 @@ export class WarningService {
     planta: PlantaInterface,
     locAreas: LocationAreaInterface[]
   ): boolean {
+    const start1 = performance.now();
     // reseteamos las alertas añadidas
     this.warningsAdded = warns.map((warn) => warn.type);
 
@@ -192,6 +193,8 @@ export class WarningService {
       // eliminamos posibles alertas que ya no sean necesarias
       this.checkUnusedWarnings(warns, informe.id);
 
+      const end1 = performance.now();
+      console.log(`Tiempo de ejecución de checkWarnings: ${end1 - start1} ms`);
       // indicamos que todas las alertas han sido checkeadas
       return true;
     }

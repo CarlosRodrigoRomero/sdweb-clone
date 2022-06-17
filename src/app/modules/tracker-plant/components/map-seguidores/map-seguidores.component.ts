@@ -68,7 +68,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     private reportControlService: ReportControlService,
     private seguidoresControlService: SeguidoresControlService,
     private shareReportService: ShareReportService,
-    private zonesService: ZonesService,
+    private zonesService: ZonesService
   ) {}
 
   ngOnInit(): void {
@@ -89,14 +89,14 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
           const allZones = this.zonesService.zonesBySize;
           const smallZones = allZones[allZones.length - 1];
 
-          this.informes.forEach((informe, index) => {
+          this.informes.forEach(async (informe, index) => {
             // creamos las capas de los seguidores para los diferentes informes o zonas
             this.seguidoresControlService
               .createSeguidorLayers(informe.id, smallZones)
               .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
             // añadimos las ortofotos aereas de cada informe
-            this.olMapService.addAerialLayer(informe.id);
+            await this.olMapService.addAerialLayer(informe.id);
 
             if (index === this.informes.length - 1) {
               this.initMap();
@@ -105,14 +105,14 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
             }
           });
         } else {
-          this.informes.forEach((informe, index) => {
+          this.informes.forEach(async (informe, index) => {
             // creamos las capas de los seguidores para los diferentes informes
             this.seguidoresControlService
               .createSeguidorLayers(informe.id)
               .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
             // añadimos las ortofotos aereas de cada informe
-            this.olMapService.addAerialLayer(informe.id);
+            await this.olMapService.addAerialLayer(informe.id);
 
             if (index === this.informes.length - 1) {
               this.initMap();

@@ -27,7 +27,7 @@ import { Select } from 'ol/interaction';
 })
 export class ZonesControlService {
   private map: Map;
-  zoomChangeView = 17.5;
+  zoomChangeView = 18;
   private selectedInformeId: string;
   private toggleViewSelected: number;
   private featureHovered: Feature;
@@ -143,7 +143,7 @@ export class ZonesControlService {
   private getPropertyView(
     view: number,
     informeId: string,
-    elemsInforme: FilterableElement[],
+    zonasInforme: FilterableElement[],
     elemsZona: FilterableElement[]
   ): any {
     switch (view) {
@@ -151,7 +151,7 @@ export class ZonesControlService {
         let mae = 0;
         // para anomalías enviamos el numero de zonas para calcular el MAE
         if (this.reportControlService.plantaFija) {
-          mae = this.getMaeZona(elemsZona, informeId, elemsInforme.length);
+          mae = this.getMaeZona(elemsZona, informeId, zonasInforme.length);
         } else {
           mae = this.getMaeZona(elemsZona, informeId);
         }
@@ -160,7 +160,7 @@ export class ZonesControlService {
         let celsCalientes = 0;
         // para anomalías enviamos el numero de zonas para calcular el CC
         if (this.reportControlService.plantaFija) {
-          celsCalientes = this.getCCZona(elemsZona, informeId, elemsInforme.length);
+          celsCalientes = this.getCCZona(elemsZona, informeId, zonasInforme.length);
         } else {
           celsCalientes = this.getCCZona(elemsZona, informeId);
         }
@@ -337,7 +337,7 @@ export class ZonesControlService {
         return new Style({
           stroke: new Stroke({
             color: focus ? 'white' : this.getColorMae(feature, 1),
-            width: 4,
+            width: this.currentZoom >= this.zoomChangeView ? 2 : 4,
           }),
           fill:
             this.currentZoom >= this.zoomChangeView
@@ -370,7 +370,7 @@ export class ZonesControlService {
         return new Style({
           stroke: new Stroke({
             color: focus ? 'white' : this.getColorCelsCalientes(feature, 1),
-            width: 4,
+            width: this.currentZoom >= this.zoomChangeView ? 2 : 4,
           }),
           fill:
             this.currentZoom >= this.zoomChangeView
@@ -403,7 +403,7 @@ export class ZonesControlService {
         return new Style({
           stroke: new Stroke({
             color: focus ? 'white' : this.getColorGradienteNormMax(feature, 1),
-            width: 4,
+            width: this.currentZoom >= this.zoomChangeView ? 2 : 4,
           }),
           fill:
             this.currentZoom >= this.zoomChangeView
