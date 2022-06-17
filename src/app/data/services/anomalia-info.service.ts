@@ -1,6 +1,8 @@
 import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { formatNumber, formatDate } from '@angular/common';
 
+import { Subscription } from 'rxjs';
+
 import proj4 from 'proj4';
 
 import { AnomaliaService } from '@data/services/anomalia.service';
@@ -23,20 +25,24 @@ export class AnomaliaInfoService {
   private translation: Translation;
   private language: string;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     @Inject(LOCALE_ID) public locale: string,
     private anomaliaService: AnomaliaService,
     private plantaService: PlantaService,
     private downloadReportService: DownloadReportService
   ) {
-    this.downloadReportService.englishLang$.subscribe((lang) => {
-      if (lang) {
-        this.language = 'en';
-      } else {
-        this.language = 'es';
-      }
-      this.translation = new Translation(this.language);
-    });
+    this.subscriptions.add(
+      this.downloadReportService.englishLang$.subscribe((lang) => {
+        if (lang) {
+          this.language = 'en';
+        } else {
+          this.language = 'es';
+        }
+        this.translation = new Translation(this.language);
+      })
+    );
   }
 
   getTipoLabel(anomalia: Anomalia): string {
@@ -191,5 +197,12 @@ export class AnomaliaInfoService {
     } else {
       return COLOR.colores_severity[2];
     }
+  }
+
+  resetService() {
+    this.translation = undefined;
+    this.language = undefined;
+
+    this.subscriptions.unsubscribe();
   }
 }

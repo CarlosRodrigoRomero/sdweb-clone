@@ -7,11 +7,10 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 import { StatsService } from '@data/services/stats.service';
-import { OlMapService } from '@data/services/ol-map.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
-import { ViewReportService } from '@data/services/view-report.service';
+import { ResetServices } from '@data/services/reset-services.service';
 
 @Component({
   selector: 'app-map-view',
@@ -44,11 +43,10 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     private seguidoresControlService: SeguidoresControlService,
     private seguidorViewService: SeguidorViewService,
     private statsService: StatsService,
-    private olMapService: OlMapService,
     private mapSeguidoresService: MapSeguidoresService,
     private downloadReportService: DownloadReportService,
     private zonesService: ZonesService,
-    private viewReportService: ViewReportService
+    private resetServices: ResetServices
   ) {}
 
   ngOnInit(): void {
@@ -107,13 +105,10 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     // cancelamos las suscripciones
     this.subscriptions.unsubscribe();
 
-    // reseteamos los servicios a sus valores por defecto
-    this.reportControlService.resetService();
-    this.olMapService.resetService();
     this.seguidorViewService.sidenav = undefined;
+
+    // reseteamos los servicios a sus valores por defecto
+    this.resetServices.resetServices();
     this.mapSeguidoresService.resetService();
-    this.downloadReportService.resetService();
-    this.viewReportService.resetService();
-    this.zonesService.resetService();
   }
 }

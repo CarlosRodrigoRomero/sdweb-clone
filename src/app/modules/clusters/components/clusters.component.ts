@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+
+import { Subscription } from 'rxjs';
 
 import { ClustersService } from '@data/services/clusters.service';
+import { ResetServices } from '@data/services/reset-services.service';
 
 import { Cluster } from '@core/models/cluster';
 
@@ -9,16 +12,26 @@ import { Cluster } from '@core/models/cluster';
   templateUrl: './clusters.component.html',
   styleUrls: ['./clusters.component.css'],
 })
-export class ClustersComponent implements OnInit {
+export class ClustersComponent implements OnInit, OnDestroy {
   public trayectoriaLoaded = false;
   public nombrePlanta: string;
   clusterSelected: Cluster = undefined;
 
-  constructor(private clustersService: ClustersService) {}
+  private subscriptions: Subscription = new Subscription();
+
+  constructor(private clustersService: ClustersService, private resetServices: ResetServices) {}
 
   ngOnInit(): void {
-    this.clustersService.initService().subscribe((v) => (this.trayectoriaLoaded = v));
-    this.clustersService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre));
-    this.clustersService.clusterSelected$.subscribe((cluster) => (this.clusterSelected = cluster));
+    this.subscriptions.add(this.clustersService.initService().subscribe((v) => (this.trayectoriaLoaded = v)));
+    this.subscriptions.add(this.clustersService.planta$.subscribe((planta) => (this.nombrePlanta = planta.nombre)));
+    this.subscriptions.add(
+      this.clustersService.clusterSelected$.subscribe((cluster) => (this.clusterSelected = cluster))
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+
+    this.resetServices.resetServices();
   }
 }

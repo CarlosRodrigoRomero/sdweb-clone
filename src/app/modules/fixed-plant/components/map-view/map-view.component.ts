@@ -6,12 +6,9 @@ import { MatSidenav } from '@angular/material/sidenav';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { StatsService } from '@data/services/stats.service';
-import { OlMapService } from '@data/services/ol-map.service';
-import { ThermalService } from '@data/services/thermal.service';
 import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
-import { ViewReportService } from '@data/services/view-report.service';
-import { AnomaliasControlService } from '@data/services/anomalias-control.service';
+import { ResetServices } from '@data/services/reset-services.service';
 
 @Component({
   selector: 'app-map-view',
@@ -42,12 +39,9 @@ export class MapViewComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private statsService: StatsService,
-    private olMapService: OlMapService,
-    private thermalService: ThermalService,
     private downloadReportService: DownloadReportService,
     private zonesService: ZonesService,
-    private viewReportService: ViewReportService,
-    private anomaliasControlService: AnomaliasControlService
+    private resetServicesService: ResetServices
   ) {}
 
   ngOnInit(): void {
@@ -106,12 +100,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
 
     // reseteamos los servicios a sus valores por defecto
-    this.reportControlService.resetService();
-    this.olMapService.resetService();
-    this.thermalService.resetService();
-    this.downloadReportService.resetService();
-    this.viewReportService.resetService();
-    this.zonesService.resetService();
-    this.anomaliasControlService.resetService();
+    this.resetServicesService.resetServices();
   }
 }

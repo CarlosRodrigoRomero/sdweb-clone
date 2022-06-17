@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject, combineLatest } from 'rxjs';
+import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
@@ -64,6 +64,8 @@ export class SeguidoresControlService {
   private ccsMedio: number[] = [];
   private ccsSigma: number[] = [];
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
@@ -82,33 +84,39 @@ export class SeguidoresControlService {
     const getIfSharedWithFilters = this.reportControlService.sharedReportWithFilters$;
 
     return new Promise((initService) => {
-      combineLatest([getMap, getSegLayers, getIfSharedWithFilters]).subscribe(([map, segL, isSharedWithFil]) => {
-        this.map = map;
-        this.seguidorLayers = segL;
-        this.sharedReportNoFilters = !isSharedWithFil;
+      this.subscriptions.add(
+        combineLatest([getMap, getSegLayers, getIfSharedWithFilters]).subscribe(([map, segL, isSharedWithFil]) => {
+          this.map = map;
+          this.seguidorLayers = segL;
+          this.sharedReportNoFilters = !isSharedWithFil;
 
-        if (this.map !== undefined) {
-          // añadimos acciones sobre los seguidores
-          this.addCursorOnHover();
-          this.addOnHoverAction();
-          this.addSelectInteraction();
-          this.addZoomEvent();
-        }
-      });
+          if (this.map !== undefined) {
+            // añadimos acciones sobre los seguidores
+            this.addCursorOnHover();
+            this.addOnHoverAction();
+            this.addSelectInteraction();
+            this.addZoomEvent();
+          }
+        })
+      );
 
-      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
+      this.subscriptions.add(
+        this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+      );
 
       this.getMaesMedioSigma();
       this.getCCsMedioSigma();
 
-      this.viewReportService.reportViewSelected$.subscribe((viewSel) => {
-        this.toggleViewSelected = viewSel;
+      this.subscriptions.add(
+        this.viewReportService.reportViewSelected$.subscribe((viewSel) => {
+          this.toggleViewSelected = viewSel;
 
-        // refrescamos la capa para que la vista se muestre correctamente
-        this.refreshLayersView();
-      });
+          // refrescamos la capa para que la vista se muestre correctamente
+          this.refreshLayersView();
+        })
+      );
 
-      this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom));
+      this.subscriptions.add(this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom)));
 
       initService(true);
     });
@@ -202,22 +210,24 @@ export class SeguidoresControlService {
   }
 
   mostrarSeguidores() {
-    this.filterService.filteredElements$.subscribe((seguidores) => {
-      if (!this.sharedReportNoFilters) {
-        // Dibujar seguidores
-        this.dibujarSeguidores(seguidores as Seguidor[]);
-        this.listaSeguidores = seguidores as Seguidor[];
+    this.subscriptions.add(
+      this.filterService.filteredElements$.subscribe((seguidores) => {
+        if (!this.sharedReportNoFilters) {
+          // Dibujar seguidores
+          this.dibujarSeguidores(seguidores as Seguidor[]);
+          this.listaSeguidores = seguidores as Seguidor[];
 
-        // reiniciamos los seguidores seleccionados cada vez que se aplica un filtro
-        this.prevSeguidorSelected = undefined;
-        this.seguidorSelected = undefined;
-      } else {
-        // Dibujamos seguidores solo del informe compartido
-        const segsFiltered = seguidores.filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId);
-        this.dibujarSeguidores(segsFiltered as Seguidor[]);
-        this.listaSeguidores = seguidores as Seguidor[];
-      }
-    });
+          // reiniciamos los seguidores seleccionados cada vez que se aplica un filtro
+          this.prevSeguidorSelected = undefined;
+          this.seguidorSelected = undefined;
+        } else {
+          // Dibujamos seguidores solo del informe compartido
+          const segsFiltered = seguidores.filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId);
+          this.dibujarSeguidores(segsFiltered as Seguidor[]);
+          this.listaSeguidores = seguidores as Seguidor[];
+        }
+      })
+    );
   }
 
   private dibujarSeguidores(seguidores: Seguidor[]) {
@@ -685,6 +695,32 @@ export class SeguidoresControlService {
         layerZoneSeguidor.setVisible(visible);
       }
     }
+  }
+
+  resetService() {
+    this.selectedInformeId = undefined;
+    this.seguidorHovered = undefined;
+    this.seguidorSelected = undefined;
+    this.listaSeguidores = undefined;
+    this.listaAllSeguidores = undefined;
+    this.prevSeguidorSelected = undefined;
+    this.sharedReportNoFilters = false;
+    this.seguidorLayers = undefined;
+    this.zonasLayers = undefined;
+    this.prevFeatureHover = undefined;
+    this.toggleViewSelected = undefined;
+    this.seguidorViewOpened = undefined;
+    this.urlVisualImageSeguidor = undefined;
+    this.urlThermalImageSeguidor = undefined;
+    this.thermalImageExist = true;
+    this.visualImageExist = true;
+    this.currentZoom = undefined;
+    this.maesMedio = [];
+    this.maesSigma = [];
+    this.ccsMedio = [];
+    this.ccsSigma = [];
+
+    this.subscriptions.unsubscribe();
   }
 
   get seguidorHovered() {

@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 
+import moment from 'moment';
+
 import { Map } from 'ol';
 import { fromLonLat } from 'ol/proj';
 import { Coordinate } from 'ol/coordinate';
-
-import moment from 'moment';
 
 import { PlantaService } from './planta.service';
 import { InformeService } from './informe.service';
@@ -48,6 +48,8 @@ export class ClustersService {
   private _createClusterActive = false;
   createClusterActive$ = new BehaviorSubject<boolean>(this._createClusterActive);
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private afs: AngularFirestore,
     private plantaService: PlantaService,
@@ -60,43 +62,45 @@ export class ClustersService {
     // obtenemos el ID de la URL
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
-    this.informeService
-      .getInforme(this.informeId)
-      .pipe(
-        take(1),
-        switchMap((informe) => {
-          this.vueloId = informe.vueloId;
+    this.subscriptions.add(
+      this.informeService
+        .getInforme(this.informeId)
+        .pipe(
+          take(1),
+          switchMap((informe) => {
+            this.vueloId = informe.vueloId;
 
-          this.clustersRef = this.afs.collection('vuelos/' + this.vueloId + '/clusters');
+            this.clustersRef = this.afs.collection('vuelos/' + this.vueloId + '/clusters');
 
-          return this.plantaService.getPlanta(informe.plantaId);
-        })
-      )
-      .pipe(
-        take(1),
-        switchMap((planta) => {
-          this.planta = planta;
+            return this.plantaService.getPlanta(informe.plantaId);
+          })
+        )
+        .pipe(
+          take(1),
+          switchMap((planta) => {
+            this.planta = planta;
 
-          return combineLatest([this.getPuntosTrayectoria(), this.getClusters()]);
-        })
-      )
-      .subscribe(([puntos, clusters]) => {
-        // obtenemos las coordenas de los puntos de la trayectoria
-        if (this.coordsPuntosTrayectoria.length === 0) {
-          puntos.forEach((punto: any) => this.coordsPuntosTrayectoria.push(fromLonLat([punto.long, punto.lat])));
-        }
-
-        // evita que cuando no haya clusters no cargue
-        if (clusters === undefined) {
-          if (puntos.length > 0) {
-            this.initialized$.next(true);
+            return combineLatest([this.getPuntosTrayectoria(), this.getClusters()]);
+          })
+        )
+        .subscribe(([puntos, clusters]) => {
+          // obtenemos las coordenas de los puntos de la trayectoria
+          if (this.coordsPuntosTrayectoria.length === 0) {
+            puntos.forEach((punto: any) => this.coordsPuntosTrayectoria.push(fromLonLat([punto.long, punto.lat])));
           }
-        } else if (clusters.length > 0) {
-          if (puntos.length > 0) {
-            this.initialized$.next(true);
+
+          // evita que cuando no haya clusters no cargue
+          if (clusters === undefined) {
+            if (puntos.length > 0) {
+              this.initialized$.next(true);
+            }
+          } else if (clusters.length > 0) {
+            if (puntos.length > 0) {
+              this.initialized$.next(true);
+            }
           }
-        }
-      });
+        })
+    );
 
     return this.initialized$;
   }
@@ -120,47 +124,51 @@ export class ClustersService {
     const puntosTrayectoriaRef = this.afs.collection('vuelos/' + this.vueloId + '/puntosTrayectoria');
     // const puntosTrayectoriaRef = this.afs.collection('vuelos/' + 'Alconera02' + '/puntosTrayectoria');
 
-    puntosTrayectoriaRef
-      .snapshotChanges()
-      .pipe(
-        take(1),
-        map((actions) => {
-          return actions.map((a) => {
-            const data = a.payload.doc.data() as PuntoTrayectoria;
-            const id = a.payload.doc.id;
-            return { id, ...data };
-          });
-        })
-      )
-      .subscribe((puntos) => {
-        // ordenamos los puntos por fecha
-        this.puntosTrayectoria = puntos.sort((a, b) => this.dateStringToUnix(a.date) - this.dateStringToUnix(b.date));
+    this.subscriptions.add(
+      puntosTrayectoriaRef
+        .snapshotChanges()
+        .pipe(
+          take(1),
+          map((actions) => {
+            return actions.map((a) => {
+              const data = a.payload.doc.data() as PuntoTrayectoria;
+              const id = a.payload.doc.id;
+              return { id, ...data };
+            });
+          })
+        )
+        .subscribe((puntos) => {
+          // ordenamos los puntos por fecha
+          this.puntosTrayectoria = puntos.sort((a, b) => this.dateStringToUnix(a.date) - this.dateStringToUnix(b.date));
 
-        this.puntosTrayectoria$.next(this.puntosTrayectoria);
-      });
+          this.puntosTrayectoria$.next(this.puntosTrayectoria);
+        })
+    );
 
     return this.puntosTrayectoria$;
   }
 
   private getClusters(): Observable<Cluster[]> {
-    this.clustersRef
-      .snapshotChanges()
-      .pipe(
-        map((actions) => {
-          return actions.map((a) => {
-            const data = a.payload.doc.data() as Cluster;
-            data.id = a.payload.doc.id;
-            return { ...data };
-          });
+    this.subscriptions.add(
+      this.clustersRef
+        .snapshotChanges()
+        .pipe(
+          map((actions) => {
+            return actions.map((a) => {
+              const data = a.payload.doc.data() as Cluster;
+              data.id = a.payload.doc.id;
+              return { ...data };
+            });
+          })
+        )
+        .subscribe((clusters) => {
+          if (clusters.length > 0) {
+            this.clusters = clusters;
+          } else {
+            this.clusters = undefined;
+          }
         })
-      )
-      .subscribe((clusters) => {
-        if (clusters.length > 0) {
-          this.clusters = clusters;
-        } else {
-          this.clusters = undefined;
-        }
-      });
+    );
 
     return this.clusters$;
   }
@@ -350,6 +358,24 @@ export class ClustersService {
       // eliminamos tambien los JOIN que pudiese haber a este cluster
       this.deleteJoinClusterId(clusterId);
     }
+  }
+
+  resetService() {
+    this._initialized = false;
+    this.informeId = undefined;
+    this.vueloId = undefined;
+    this._planta = {};
+    this.puntosTrayectoria = [];
+    this.coordsPuntosTrayectoria = [];
+    this._puntoHover = undefined;
+    this._urlImageThumbnail = undefined;
+    this.clustersRef = undefined;
+    this._clusters = [];
+    this._joinActive = false;
+    this._clusterSelected = undefined;
+    this.createClusterActive = false;
+
+    this.subscriptions.unsubscribe();
   }
 
   get planta() {
