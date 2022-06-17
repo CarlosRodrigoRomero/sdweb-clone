@@ -1,6 +1,8 @@
 import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { formatNumber, formatDate } from '@angular/common';
 
+import proj4 from 'proj4';
+
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { PlantaService } from '@data/services/planta.service';
 import { GLOBAL } from '@data/constants/global';
@@ -11,7 +13,8 @@ import { Translation } from '@shared/utils/translations/translations';
 import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
-import proj4 from 'proj4';
+
+import { COLOR } from '@data/constants/color';
 
 @Injectable({
   providedIn: 'root',
@@ -177,6 +180,16 @@ export class AnomaliaInfoService {
       return altura;
     } else {
       return localY;
+    }
+  }
+
+  getPerdidasColor(perdidas: number): string {
+    if (perdidas < 0.3) {
+      return COLOR.colores_severity[0];
+    } else if (perdidas < 0.5) {
+      return COLOR.colores_severity[1];
+    } else {
+      return COLOR.colores_severity[2];
     }
   }
 }

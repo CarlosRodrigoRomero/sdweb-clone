@@ -19,9 +19,9 @@ import {
   ApexPlotOptions,
 } from 'ng-apexcharts';
 
-
 import { ReportControlService } from '@data/services/report-control.service';
 import { InformeService } from '@data/services/informe.service';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
@@ -80,7 +80,11 @@ export class ChartTipoAnomsComponent implements OnInit {
 
   private labelDatesReports: string;
 
-  constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
+  constructor(
+    private reportControlService: ReportControlService,
+    private informeService: InformeService,
+    private anomaliaInfoService: AnomaliaInfoService
+  ) {}
 
   ngOnInit(): void {
     this.informesIdList = this.reportControlService.informesIdList;
@@ -115,7 +119,7 @@ export class ChartTipoAnomsComponent implements OnInit {
     allNumCategorias.forEach((i) => {
       if (anomalias.filter((anom) => anom.tipo === i).length > 0) {
         labelsCategoria.push(GLOBAL.labels_tipos[i]);
-        coloresCategoria.push(COLOR.colores_tipos[i]);
+        coloresCategoria.push(this.anomaliaInfoService.getPerdidasColor(GLOBAL.pcPerdidas[i]));
         numsCategoria.push(i);
       }
     });

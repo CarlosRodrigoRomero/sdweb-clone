@@ -27,8 +27,6 @@ import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
 
 import { COLOR } from '@data/constants/color';
-import { TipoElemFilter } from '@core/models/tipoPcFilter';
-import { GLOBAL } from '@data/constants/global';
 
 @Injectable({
   providedIn: 'root',
@@ -109,7 +107,6 @@ export class AnomaliasControlService {
         const perdidasLayer = new VectorLayer({
           source: new VectorSource({ wrapX: false }),
           style: this.getStylePerdidas(false),
-          // style: this.getStyleAnomaliasMapa(false),
           visible: false,
         });
         perdidasLayer.setProperties({
