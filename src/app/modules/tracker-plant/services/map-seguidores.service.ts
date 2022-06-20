@@ -49,9 +49,9 @@ export class MapSeguidoresService {
   resetService() {
     this.plantaId = '';
     this.informesList = [];
-    this.sliderTemporalSelected = 100;
-    this.sliderOpacity = 100;
-    this.toggleViewSelected = 0;
+    this._sliderTemporalSelected = 100;
+    this._sliderOpacity = 100;
+    this._toggleViewSelected = 0;
   }
 
   getPlantaId(): Observable<string> {

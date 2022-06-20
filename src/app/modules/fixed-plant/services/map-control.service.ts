@@ -18,9 +18,9 @@ export class MapControlService {
   constructor() {}
 
   resetService() {
-    this.sliderMin = 25;
-    this.sliderMax = 75;
-    this.sliderThermalOpacity = 100;
+    this._sliderMin = 25;
+    this._sliderMax = 75;
+    this._sliderThermalOpacity = 100;
   }
 
   get sliderMin() {

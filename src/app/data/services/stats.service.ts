@@ -15,7 +15,7 @@ export class StatsService {
   private initialized$ = new BehaviorSubject<boolean>(this._initialized);
   private _loadStats = false;
   loadStats$ = new BehaviorSubject<boolean>(this._loadStats);
-  informesIdList: string[] = this.reportControlService.informesIdList;
+  informesIdList: string[];
   dateLabels: string[] = [];
   private _loadCCyGradChart = true;
   loadCCyGradChart$ = new BehaviorSubject<boolean>(this._loadCCyGradChart);
@@ -26,6 +26,8 @@ export class StatsService {
   constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
 
   initService() {
+    this.informesIdList = this.reportControlService.informesIdList;
+
     this.subscriptions.add(
       this.informeService.getDateLabelsInformes(this.informesIdList).subscribe((dateLabels) => {
         this.dateLabels = dateLabels;
@@ -46,6 +48,13 @@ export class StatsService {
   }
 
   resetService() {
+    this._initialized = false;
+    this._loadStats = false;
+    this.informesIdList = undefined;
+    this.dateLabels = [];
+    this._loadCCyGradChart = true;
+    this.sidenav = undefined;
+
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();
   }

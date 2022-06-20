@@ -373,7 +373,7 @@ export class ClustersService {
     this._clusters = [];
     this._joinActive = false;
     this._clusterSelected = undefined;
-    this.createClusterActive = false;
+    this._createClusterActive = false;
 
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();

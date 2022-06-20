@@ -25,10 +25,6 @@ export class FilterService {
   public filteredElements$ = new BehaviorSubject<FilterableElement[]>(this.filteredElements);
   private _allFiltrableElements: FilterableElement[] = [];
   public allFiltrableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFiltrableElements);
-  private _filteredElementsWithoutFilterTipo: FilterableElement[] = [];
-  public filteredElementsWithoutFilterTipo$ = new BehaviorSubject<FilterableElement[]>(
-    this._filteredElementsWithoutFilterTipo
-  );
   public plantaSeguidores = false;
 
   private subscriptions: Subscription = new Subscription();
@@ -63,9 +59,6 @@ export class FilterService {
       } else {
         response(true);
       }
-
-      // para contabilizar los diferentes filtros 'tipo'
-      this.filteredElementsWithoutFilterTipo = elems;
     });
   }
 
@@ -273,51 +266,6 @@ export class FilterService {
     this.processFilters();
   }
 
-  private excludeTipoFilters() {
-    const everyFilterFiltrableElements: Array<FilterableElement[]> = new Array<FilterableElement[]>();
-
-    // comprobamos si hay filtros de tipo 'multiple'
-    if (this.filters.filter((filter) => this.multipleFilters.includes(filter.type)).length > 0) {
-      // separamos los elems por tipo de filtro excluyendo los filtros "tipo"
-      this.multipleFilters
-        .filter((type) => type !== 'tipo')
-        .forEach((type) => {
-          const newFiltrableElements: FilterableElement[] = [];
-          if (this.filters.filter((filter) => filter.type === type).length > 0) {
-            this.filters
-              .filter((filter) => filter.type === type)
-              .forEach((filter) => {
-                filter.applyFilter(this.allFiltrableElements).forEach((pc) => newFiltrableElements.push(pc));
-              });
-            // añadimos un array de cada tipo
-            everyFilterFiltrableElements.push(newFiltrableElements);
-          }
-        });
-    }
-
-    // añadimos al array los elems filtrados de los filtros no 'multiple'
-    this.filters
-      .filter((filter) => !this.multipleFilters.includes(filter.type))
-      .forEach((filter) => {
-        const newFiltrableElements = filter.applyFilter(this.allFiltrableElements);
-        everyFilterFiltrableElements.push(newFiltrableElements);
-      });
-
-    // calculamos la interseccion de los array de los diferentes tipos
-    if (everyFilterFiltrableElements.length > 0) {
-      this.filteredElementsWithoutFilterTipo = everyFilterFiltrableElements.reduce((anterior, actual) =>
-        anterior.filter((pc) => actual.includes(pc))
-      );
-    }
-
-    // comprobamos que hay algun filtro activo
-    if (everyFilterFiltrableElements.length === 0) {
-      this.filteredElementsWithoutFilterTipo = this.allFiltrableElements;
-    }
-
-    this.filteredElementsWithoutFilterTipo$.next(this.filteredElementsWithoutFilterTipo);
-  }
-
   addElement(element: FilterableElement) {
     this.allFiltrableElements.push(element);
 
@@ -336,9 +284,8 @@ export class FilterService {
     this.otherFilters = ['confianza', 'aspectRatio', 'areaM'];
     this.filters = [];
     this.prevAllFilterableElems = undefined;
-    this.filteredElements = [];
-    this.allFiltrableElements = [];
-    this.filteredElementsWithoutFilterTipo = [];
+    this._filteredElements = [];
+    this._allFiltrableElements = [];
     this.plantaSeguidores = false;
 
     this.subscriptions.unsubscribe();
@@ -363,14 +310,5 @@ export class FilterService {
   set filteredElements(value: FilterableElement[]) {
     this._filteredElements = value;
     this.filteredElements$.next(value);
-  }
-
-  get filteredElementsWithoutFilterTipo() {
-    return this._filteredElementsWithoutFilterTipo;
-  }
-
-  set filteredElementsWithoutFilterTipo(value: FilterableElement[]) {
-    this._filteredElementsWithoutFilterTipo = value;
-    this.filteredElementsWithoutFilterTipo$.next(value);
   }
 }

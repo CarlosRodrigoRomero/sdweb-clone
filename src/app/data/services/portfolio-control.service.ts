@@ -267,17 +267,6 @@ export class PortfolioControlService {
     this.map.getOverlayById('popup').setPosition(coords);
   }
 
-  resetService() {
-    this.plantaHovered = undefined;
-    this.maePlantas = [];
-    this.maeMedio = undefined;
-    this.maeSigma = undefined;
-    this.numPlantas = 0;
-    this.potenciaTotal = 0;
-    this.listaPlantas = [];
-    this.allFeatures = [];
-  }
-
   /////////////////     ESTILOS      ////////////////////
 
   public getColorMae(mae: number, opacity?: number): string {
@@ -394,6 +383,17 @@ export class PortfolioControlService {
     } else {
       feature.setStyle(unfocusedStyle);
     }
+  }
+
+  resetService() {
+    this._plantaHovered = undefined;
+    this.maePlantas = [];
+    this._maeMedio = undefined;
+    this._maeSigma = undefined;
+    this.numPlantas = 0;
+    this.potenciaTotal = 0;
+    this.listaPlantas = [];
+    this.allFeatures = [];
   }
 
   get plantaHovered() {

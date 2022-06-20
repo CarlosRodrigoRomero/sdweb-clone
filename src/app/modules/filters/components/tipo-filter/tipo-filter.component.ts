@@ -116,25 +116,6 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
       this.filterControlService.selectedTipoLabels$.subscribe((labels) => (this.selectedLabels = labels))
     );
 
-    // this.reportControlService.selectedInformeId$.subscribe((informeID) => {
-    //   this.filterService.filteredElementsWithoutFilterTipo$.subscribe((elems) => {
-    //     // estas anomalias son las anomalias filtradas
-    //     this.allAnomalias = elems as Anomalia[];
-    //     this.allAnomalias
-    //       .filter((elem) => elem.informeId === informeID)
-    //       .map(() => {
-    //         if (this.numsCategoria !== undefined) {
-    //           this.numsCategoria.forEach((num, i) => {
-    //             this.filterTipoCounts[i] = this.allAnomalias
-    //               .filter((elem) => elem.informeId === informeID)
-    //               // tslint:disable-next-line: triple-equals
-    //               .filter((elem) => elem.tipo == num).length;
-    //           });
-    //         }
-    //       });
-    //   });
-    // });
-
     // nos suscribimos al estado en el control de filtros
     this.subscriptions.add(
       this.filterControlService.labelTipoDefaultStatus$.subscribe((value) => (this.defaultLabelStatus = value))

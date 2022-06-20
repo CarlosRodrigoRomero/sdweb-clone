@@ -5,8 +5,6 @@ import { Subscription } from 'rxjs';
 import { StatsService } from '@data/services/stats.service';
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { PlantaService } from '@data/services/planta.service';
-import { InformeService } from '@data/services/informe.service';
 import { ZonesService } from '@data/services/zones.service';
 
 @Component({

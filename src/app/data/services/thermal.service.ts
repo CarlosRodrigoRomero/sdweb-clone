@@ -93,9 +93,9 @@ export class ThermalService {
   }
 
   resetService() {
-    this.thermalLayers = [];
-    this.sliderMin = [];
-    this.sliderMax = [];
+    this._thermalLayers = [];
+    this._sliderMin = [];
+    this._sliderMax = [];
 
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();

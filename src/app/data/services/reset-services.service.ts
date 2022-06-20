@@ -11,17 +11,17 @@ import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { ClustersService } from '@data/services/clusters.service';
-import { FilterService } from './filter.service';
-import { PcService } from './pc.service';
-import { PlantaService } from './planta.service';
-import { ShareReportService } from './share-report.service';
-import { StatsService } from './stats.service';
-import { StructuresService } from './structures.service';
-import { ZonesControlService } from './zones-control.service';
-import { PortfolioControlService } from './portfolio-control.service';
-import { ImageProcessService } from './image-process.service';
-import { ImagesLoadService } from './images-load.service';
-import { ImagesTilesService } from './images-tiles.service';
+import { FilterService } from '@data/services/filter.service';
+import { PcService } from '@data/services/pc.service';
+import { PlantaService } from '@data/services/planta.service';
+import { ShareReportService } from '@data/services/share-report.service';
+import { StatsService } from '@data/services/stats.service';
+import { StructuresService } from '@data/services/structures.service';
+import { ZonesControlService } from '@data/services/zones-control.service';
+import { PortfolioControlService } from '@data/services/portfolio-control.service';
+import { ImageProcessService } from '@data/services/image-process.service';
+import { ImagesLoadService } from '@data/services/images-load.service';
+import { ImagesTilesService } from '@data/services/images-tiles.service';
 
 @Injectable({
   providedIn: 'root',

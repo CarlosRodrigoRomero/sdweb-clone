@@ -15,8 +15,8 @@ export class ViewReportService {
   constructor() {}
 
   resetService() {
-    this.reportViewSelected = 0;
-    this.sliderTemporal = 100;
+    this._reportViewSelected = 0;
+    this._sliderTemporal = 100;
   }
 
   get reportViewSelected() {

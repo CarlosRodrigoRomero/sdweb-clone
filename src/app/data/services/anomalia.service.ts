@@ -595,7 +595,7 @@ export class AnomaliaService {
     this.allAnomaliasInforme = undefined;
     this.criterioCoA = GLOBAL.criterioCoA;
     this.criterioCriticidad = undefined;
-    this.hasCriticidad = false;
+    this._hasCriticidad = false;
     this.planta = undefined;
 
     this.subscriptions.unsubscribe();

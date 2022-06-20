@@ -215,17 +215,11 @@ export class ReportControlService {
                       switchMap((planta) => {
                         this.planta = planta;
 
-                        return this.plantaService.getLocationsArea(this.plantaId);
+                        // iniciamos el servicio de zonas
+                        return from(this.zonesService.initService(this.planta));
                       }),
                       take(1),
-                      switchMap((locAreas) => {
-                        this.zones = this.zonesService.getZones(this.planta, locAreas);
-                        if (this.zones.length > 0) {
-                          // this.thereAreZones = true;
-                        }
-
-                        return this.informeService.getInforme(this.selectedInformeId);
-                      }),
+                      switchMap(() => this.informeService.getInforme(this.selectedInformeId)),
                       take(1),
                       switchMap((informe) => {
                         this.informes = [informe];
@@ -275,20 +269,15 @@ export class ReportControlService {
                       switchMap((planta) => {
                         this.planta = planta;
 
-                        return this.plantaService.getLocationsArea(this.plantaId);
+                        // iniciamos el servicio de zonas
+                        return from(this.zonesService.initService(this.planta));
                       }),
                       take(1),
-                      switchMap((locAreas) => {
-                        this.zones = this.zonesService.getZones(this.planta, locAreas);
-                        if (this.zones.length > 0) {
-                          // this.thereAreZones = true;
-                        }
-
-                        return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
-                      }),
+                      switchMap(() => this.informeService.getInformesDisponiblesDePlanta(this.plantaId)),
                       take(1),
                       // obtenemos los informes de la planta
                       switchMap((informes) => {
+                        console.log(informes);
                         // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
                         this.informes = this.informeService.getOnlyNewInfomesFijas(informes);
 
@@ -615,23 +604,23 @@ export class ReportControlService {
     return locAreas;
   }
 
-  resetService() {
-    this.sharedReport = false;
-    this.sharedReportWithFilters = true;
-    this.plantaId = undefined;
-    this.selectedInformeId = undefined;
-    this.informes = [];
-    this.informesIdList = [];
-    this.initialized = false;
-    this.mapLoaded = false;
-    this.allFilterableElements = [];
-    this.plantaFija = false;
-    this.noAnomsReport = false;
-    this.numFixedGlobalCoords = 3;
-  }
-
   getHostname(): string {
     return this.window.location.hostname;
+  }
+
+  resetService() {
+    this._sharedReport = false;
+    this._sharedReportWithFilters = true;
+    this._plantaId = undefined;
+    this._selectedInformeId = undefined;
+    this._informes = [];
+    this._informesIdList = [];
+    this._initialized = false;
+    this._mapLoaded = false;
+    this._allFilterableElements = [];
+    this.plantaFija = false;
+    this._noAnomsReport = false;
+    this._numFixedGlobalCoords = 3;
   }
 
   get sharedReport() {

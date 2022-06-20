@@ -674,8 +674,8 @@ export class AnomaliasControlService {
 
   resetService() {
     this.selectedInformeId = undefined;
-    this.anomaliaSelect = undefined;
-    this.anomaliaHover = undefined;
+    this._anomaliaSelect = undefined;
+    this._anomaliaHover = undefined;
     this.prevFeatureHover = undefined;
     this.prevAnomaliaSelect = undefined;
     this.listaAnomalias = [];
@@ -683,7 +683,7 @@ export class AnomaliasControlService {
     this.sharedReportNoFilters = false;
     this.toggleViewSelected = undefined;
     this.currentZoom = undefined;
-    this.coordsPointer = undefined;
+    this._coordsPointer = undefined;
 
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();

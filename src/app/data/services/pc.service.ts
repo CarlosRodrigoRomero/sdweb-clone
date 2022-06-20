@@ -542,6 +542,20 @@ export class PcService {
   }
 
   resetService() {
+    this.pcsCollection = undefined;
+    this.allPcsInformeEdit$ = undefined;
+    this.allPcs = undefined;
+    this.pcDoc = undefined;
+    this.url = undefined;
+    this.filtroClase = new BehaviorSubject<number[]>(new Array<number>());
+    this.filtroCategoria = new BehaviorSubject<number[]>(new Array<number>());
+    this.filtroGradiente = new BehaviorSubject<number>(GLOBAL.filtroGradientePorDefecto);
+    this.currentFiltroClase = undefined;
+    this.currentFiltroCategoria = undefined;
+    this.currentFiltroGradiente = undefined;
+    this.filteredPcsSource = new BehaviorSubject<PcInterface[]>(new Array<PcInterface>());
+    this.filteredSeguidores = new BehaviorSubject<SeguidorInterface[]>(new Array<SeguidorInterface>());
+
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();
   }
