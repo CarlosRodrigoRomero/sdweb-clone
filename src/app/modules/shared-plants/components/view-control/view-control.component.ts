@@ -55,7 +55,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
       );
     }
 
-    this.olMapService.zonasLayers$.pipe(take(1)).subscribe((layers) => (this.zonesLayers = layers));
+    this.subscriptions.add(this.olMapService.zonasLayers$.subscribe((layers) => (this.zonesLayers = layers)));
 
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {

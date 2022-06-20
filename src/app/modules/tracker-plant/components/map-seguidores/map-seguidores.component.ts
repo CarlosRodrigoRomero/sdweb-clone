@@ -159,10 +159,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
       this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {
         this.map = map;
 
-        this.map.once('postrender', () => {
-          // setTimeout(() => (this.reportControlService.mapLoaded = true), 2000);
-          this.reportControlService.mapLoaded = true;
-        });
+        this.map.once('postrender', () => (this.reportControlService.mapLoaded = true));
       })
     );
 

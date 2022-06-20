@@ -2,14 +2,8 @@
   <a *ngIf="themeSelected === 'light-theme'" class="navbar-brand" (click)="navigateHome()">
     <img src="../../../assets/images/logo_sd.png" height="50" class="d-inline-block align-top" alt="" />
   </a>
-  <a *ngIf="themeSelected === 'dark-theme'" class="navbar-brand" (click)="navigateHome()">
-    <img src="../../../assets/images/logo_white.png" height="50" class="d-inline-block align-top" alt="" />
-  </a>
   <a *ngIf="themeSelected === 'light-theme'" class="navbar-brand-logo" (click)="navigateHome()" display="none">
     <img src="../../../assets/images/favicon.png" height="30" class="d-inline-block align-top" alt="" />
-  </a>
-  <a *ngIf="themeSelected === 'dark-theme'" class="navbar-brand-logo" (click)="navigateHome()" display="none">
-    <img src="../../../assets/images/drone_red.png" height="30" class="d-inline-block align-top" alt="" />
   </a>
 
   <div id="plant-summary" *ngIf="loadContent">
@@ -22,9 +16,8 @@
     <!-- MENU ALERTAS INFORME TERMINADO ANTES DE ENTREGAR -->
     <app-warnings-menu *ngIf="isAdmin && isReport && loadContent && !isDemo"></app-warnings-menu>
 
+    <!-- MENU RECALCULAR MAE Y CC -->
     <app-report-recalc *ngIf="isAdmin && isReport && loadContent && !isDemo"></app-report-recalc>
-
-    <!-- <app-switch-theme></app-switch-theme> -->
 
     <!-- BOTON NOTIFICACIONES PROVISIONAL -->
     <button class="btn-notif" *ngIf="hasNotifications" mat-icon-button [matMenuTriggerFor]="notifMenu">
