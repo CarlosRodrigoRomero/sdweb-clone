@@ -204,5 +204,6 @@ export class AnomaliaInfoService {
     this.language = undefined;
 
     this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 }

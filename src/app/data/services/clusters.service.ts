@@ -376,6 +376,7 @@ export class ClustersService {
     this.createClusterActive = false;
 
     this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 
   get planta() {

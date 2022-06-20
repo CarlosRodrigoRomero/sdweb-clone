@@ -7,7 +7,7 @@ import Map from 'ol/Map';
 import { StructuresService } from '@data/services/structures.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { InformeService } from '@data/services/informe.service';
-import { ThermalService } from '@data/services/thermal.service';
+import { ResetServices } from '@data/services/reset-services.service';
 
 import { InformeInterface } from '@core/models/informe';
 
@@ -31,7 +31,7 @@ export class StructuresComponent implements OnInit, OnDestroy {
     private structuresService: StructuresService,
     private olMapService: OlMapService,
     private informeService: InformeService,
-    private thermalService: ThermalService
+    private resetServices: ResetServices
   ) {}
 
   ngOnInit(): void {
@@ -99,8 +99,6 @@ export class StructuresComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
 
     // reseteamos los servicios a sus valores por defecto
-    this.olMapService.resetService();
-    this.thermalService.resetService();
-    this.structuresService.resetService();
+    this.resetServices.resetServices();
   }
 }

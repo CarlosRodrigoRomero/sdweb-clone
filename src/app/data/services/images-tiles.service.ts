@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 
 import { TileCoord } from 'ol/tilecoord';
 import { Coordinate } from 'ol/coordinate';
 import { Extent } from 'ol/extent';
 import TileLayer from 'ol/layer/Tile';
 import TileGrid from 'ol/tilegrid/TileGrid';
+import { Map } from 'ol';
 
 import { fromLonLat } from 'ol/proj';
 import { LatLngLiteral } from '@agm/core';
@@ -15,15 +16,15 @@ import { fabric } from 'fabric';
 
 import inside from 'point-in-polygon';
 
-import { GLOBAL } from '@data/constants/global';
-import { ImageProcessService } from './image-process.service';
+import { ImageProcessService } from '@data/services/image-process.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ZonesService } from '@data/services/zones.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
-import { Map } from 'ol';
+
+import { GLOBAL } from '@data/constants/global';
 
 @Injectable({
   providedIn: 'root',
@@ -39,32 +40,36 @@ export class ImagesTilesService {
   private _imagesPlantaLoaded = 0;
   imagesPlantaLoaded$ = new BehaviorSubject<number>(this._imagesPlantaLoaded);
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private imageProcessService: ImageProcessService,
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
     private zonesService: ZonesService
   ) {
-    this.olMapService.map$.subscribe((map) => (this.map = map));
+    this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
   }
 
   checkImgsPlanosLoaded(): Promise<boolean> {
     return new Promise((loaded) => {
-      this.imagesPlantaLoaded$.subscribe((value) => {
-        if (this.zonesService.thereAreZones) {
-          if (this.reportControlService.plantaFija) {
-            if (value === 2) {
-              loaded(true);
+      this.subscriptions.add(
+        this.imagesPlantaLoaded$.subscribe((value) => {
+          if (this.zonesService.thereAreZones) {
+            if (this.reportControlService.plantaFija) {
+              if (value === 2) {
+                loaded(true);
+              }
+            } else {
+              if (value === 1) {
+                loaded(true);
+              }
             }
           } else {
-            if (value === 1) {
-              loaded(true);
-            }
+            loaded(true);
           }
-        } else {
-          loaded(true);
-        }
-      });
+        })
+      );
     });
   }
 
@@ -465,6 +470,9 @@ export class ImagesTilesService {
     this.imagesPlantaCompleta = {};
     this.layerInformeSelected = undefined;
     this.imagesPlantaLoaded = 0;
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

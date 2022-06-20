@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 
+import { Subscription } from 'rxjs';
+
 import { Coordinate } from 'ol/coordinate';
 import Feature from 'ol/Feature';
 import Polygon from 'ol/geom/Polygon';
@@ -34,6 +36,8 @@ export class ZonesControlService {
   private prevFeatureHovered: Feature;
   private currentZoom: number;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
@@ -43,23 +47,29 @@ export class ZonesControlService {
 
   initService(): Promise<boolean> {
     return new Promise((initService) => {
-      this.olMapService.getMap().subscribe((map) => {
-        this.map = map;
+      this.subscriptions.add(
+        this.olMapService.getMap().subscribe((map) => {
+          this.map = map;
 
-        if (this.map !== undefined) {
-          initService(true);
+          if (this.map !== undefined) {
+            initService(true);
 
-          // añadimos acciones sobre las zonas
-          this.addOnHoverAction();
-          this.addSelectInteraction();
-        }
-      });
+            // añadimos acciones sobre las zonas
+            this.addOnHoverAction();
+            this.addSelectInteraction();
+          }
+        })
+      );
 
-      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
+      this.subscriptions.add(
+        this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+      );
 
-      this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel));
+      this.subscriptions.add(
+        this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel))
+      );
 
-      this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom));
+      this.subscriptions.add(this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom)));
     });
   }
 
@@ -99,9 +109,11 @@ export class ZonesControlService {
   }
 
   mostrarZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
-    this.filterService.filteredElements$.subscribe((elems) => {
-      this.addZonas(zonas, layers, elems);
-    });
+    this.subscriptions.add(
+      this.filterService.filteredElements$.subscribe((elems) => {
+        this.addZonas(zonas, layers, elems);
+      })
+    );
   }
 
   private addZonas(zonas: LocationAreaInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
@@ -429,7 +441,7 @@ export class ZonesControlService {
     }
   }
 
-  private getLabelStyle(feature: Feature) {
+  getLabelStyle(feature: Feature) {
     return new Text({
       text: feature.getProperties().properties.id,
       font: 'bold 14px Roboto',
@@ -441,5 +453,18 @@ export class ZonesControlService {
         width: 4,
       }),
     });
+  }
+
+  resetService() {
+    this.map = undefined;
+    this.zoomChangeView = 18;
+    this.selectedInformeId = undefined;
+    this.toggleViewSelected = undefined;
+    this.featureHovered = undefined;
+    this.prevFeatureHovered = undefined;
+    this.currentZoom = undefined;
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 }

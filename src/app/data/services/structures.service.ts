@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/firestore';
 import * as firebase from 'firebase/app';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import { Coordinate } from 'ol/coordinate';
@@ -19,7 +19,6 @@ import { ThermalService } from '@data/services/thermal.service';
 import { PlantaInterface } from '@core/models/planta';
 import { RawModule } from '@core/models/moduloBruto';
 import { FilterModuloBruto } from '@core/models/filterModuloBruto';
-import { FilterableElement } from '@core/models/filterableInterface';
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 
@@ -77,6 +76,8 @@ export class StructuresService {
   public confianzaAverage: number = undefined;
   public confianzaStdDev: number = undefined;
 
+  private subscriptions = new Subscription();
+
   constructor(
     private router: Router,
     private informeService: InformeService,
@@ -90,35 +91,37 @@ export class StructuresService {
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
     return new Promise((initService) => {
-      this.informeService
-        .getInforme(this.informeId)
-        .pipe(
-          take(1),
-          switchMap((informe) => this.plantaService.getPlanta(informe.plantaId))
-        )
-        .pipe(
-          take(1),
-          switchMap((planta) => {
-            this.planta = planta;
+      this.subscriptions.add(
+        this.informeService
+          .getInforme(this.informeId)
+          .pipe(
+            take(1),
+            switchMap((informe) => this.plantaService.getPlanta(informe.plantaId))
+          )
+          .pipe(
+            take(1),
+            switchMap((planta) => {
+              this.planta = planta;
 
-            return this.thermalService.getReportThermalLayerDB(this.informeId);
+              return this.thermalService.getReportThermalLayerDB(this.informeId);
+            })
+          )
+          .subscribe((layers) => {
+            this.thermalLayer = layers[0];
+
+            // cargamos las agrupaciones
+            this.getModuleGroups()
+              .pipe(take(1))
+              .subscribe((modGroups) => (this.allModGroups = modGroups));
+
+            // cargamos los modulos normalizados
+            this.getNormModules()
+              .pipe(take(1))
+              .subscribe((normMods) => (this.allNormModules = normMods));
+
+            initService(true);
           })
-        )
-        .subscribe((layers) => {
-          this.thermalLayer = layers[0];
-
-          // cargamos las agrupaciones
-          this.getModuleGroups()
-            .pipe(take(1))
-            .subscribe((modGroups) => (this.allModGroups = modGroups));
-
-          // cargamos los modulos normalizados
-          this.getNormModules()
-            .pipe(take(1))
-            .subscribe((normMods) => (this.allNormModules = normMods));
-
-          initService(true);
-        });
+      );
     });
   }
 
@@ -541,6 +544,9 @@ export class StructuresService {
     this.aspectRatioStdDev = undefined;
     this.confianzaAverage = undefined;
     this.confianzaStdDev = undefined;
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 
   ////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 
 import { ShareReportService } from '@data/services/share-report.service';
 import { FilterControlService } from '@data/services/filter-control.service';
@@ -31,6 +31,8 @@ export class FilterService {
   );
   public plantaSeguidores = false;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private router: Router,
     private shareReportService: ShareReportService,
@@ -43,16 +45,20 @@ export class FilterService {
 
     return new Promise((response, reject) => {
       if (shared) {
-        this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params));
+        this.subscriptions.add(
+          this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params))
+        );
 
         // obtenemos lo filtros guardados en al DB y los añadimos
-        this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
-          if (filters.length > 0) {
-            this.addFilters(filters);
+        this.subscriptions.add(
+          this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
+            if (filters.length > 0) {
+              this.addFilters(filters);
 
-            response(true);
-          }
-        });
+              response(true);
+            }
+          })
+        );
         response(true);
       } else {
         response(true);
@@ -322,6 +328,21 @@ export class FilterService {
     if (this.router.url.includes('tracker')) {
       this.plantaSeguidores = true;
     }
+  }
+
+  resetService() {
+    this.multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad'];
+    this.noAmosSegsFilters = ['area'];
+    this.otherFilters = ['confianza', 'aspectRatio', 'areaM'];
+    this.filters = [];
+    this.prevAllFilterableElems = undefined;
+    this.filteredElements = [];
+    this.allFiltrableElements = [];
+    this.filteredElementsWithoutFilterTipo = [];
+    this.plantaSeguidores = false;
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 
   /////////////////////////////////////////////////

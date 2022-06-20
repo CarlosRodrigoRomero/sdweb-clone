@@ -29,7 +29,6 @@ export class WarningService {
     private reportControlService: ReportControlService,
     private http: HttpClient,
     private storage: AngularFireStorage,
-    private utilitiesService: UtilitiesService,
     private zonesService: ZonesService
   ) {}
 

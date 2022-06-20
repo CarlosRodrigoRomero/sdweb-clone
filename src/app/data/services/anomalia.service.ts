@@ -599,6 +599,7 @@ export class AnomaliaService {
     this.planta = undefined;
 
     this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////

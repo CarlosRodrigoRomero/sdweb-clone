@@ -22,30 +22,31 @@ import { fabric } from 'fabric';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { DownloadReportService } from '@data/services/download-report.service';
-import { GLOBAL } from '@data/constants/global';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { PlantaService } from '@data/services/planta.service';
 import { FilterService } from '@data/services/filter.service';
 import { OlMapService } from '@data/services/ol-map.service';
-import { ImageProcessService } from '../../services/image-process.service';
+import { ImageProcessService } from '@data/services/image-process.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
-import { ImagesLoadService } from '../../services/images-load.service';
-import { ImagesTilesService } from '../../services/images-tiles.service';
+import { ImagesLoadService } from '@data/services/images-load.service';
+import { ImagesTilesService } from '@data/services/images-tiles.service';
 import { ReportPdfService } from '@data/services/report-pdf.service';
 import { ZonesService } from '@data/services/zones.service';
+import { ResetServices } from '@data/services/reset-services.service';
 
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
 import { Translation } from '@shared/utils/translations/translations';
 import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
-import { AnomsTable } from './pdf-structure';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
+import { AnomsTable } from './pdf-structure';
 
 import { DRONE } from '@data/constants/drone';
+import { GLOBAL } from '@data/constants/global';
 
 @Component({
   selector: 'app-download-pdf',
@@ -144,7 +145,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     private imagesLoadService: ImagesLoadService,
     private imagesTilesService: ImagesTilesService,
     private reportPdfService: ReportPdfService,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private resetServices: ResetServices
   ) {}
 
   ngOnInit(): void {
@@ -3858,9 +3860,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
 
-    this.imageProcessService.resetService();
-    this.imagesLoadService.resetService();
-    this.imagesTilesService.resetService();
+    this.resetServices.resetServices();
   }
 
   //////////////////////////////////////////////////////

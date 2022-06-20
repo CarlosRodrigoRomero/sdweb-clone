@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
 
-import { Observable, BehaviorSubject, EMPTY, of } from 'rxjs';
+import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import Polygon from 'ol/geom/Polygon';
@@ -43,6 +43,8 @@ export class PlantaService {
   public currentFilteredLocAreas$ = this.filteredLocAreasSource.asObservable();
   public locAreaList: LocationAreaInterface[];
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private afs: AngularFirestore,
     public auth: AuthService,
@@ -52,9 +54,11 @@ export class PlantaService {
     this.currentPlantId = this.activatedRoute.snapshot.paramMap.get('id');
     this.currentPlantId$.next(this.currentPlantId);
 
-    this.getModulos().subscribe((modulos) => {
-      this.modulos = modulos;
-    });
+    this.subscriptions.add(
+      this.getModulos().subscribe((modulos) => {
+        this.modulos = modulos;
+      })
+    );
   }
 
   getPlanta(plantaId: string): Observable<PlantaInterface> {
@@ -826,5 +830,17 @@ export class PlantaService {
       zoom = zoom - 1;
     }
     return zoom;
+  }
+
+  resetService() {
+    this.planta = undefined;
+    this.currentPlantId = '';
+    this.plantaDoc = undefined;
+    this.plantasCollection = undefined;
+    this.modulos = undefined;
+    this.locAreaList = undefined;
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 }

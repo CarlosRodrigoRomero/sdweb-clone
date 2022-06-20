@@ -721,6 +721,7 @@ export class SeguidoresControlService {
     this.ccsSigma = [];
 
     this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 
   get seguidorHovered() {

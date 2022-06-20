@@ -4,7 +4,7 @@ import { AngularFireStorage } from '@angular/fire/storage';
 
 import { fabric } from 'fabric';
 
-import { BehaviorSubject, combineLatest } from 'rxjs';
+import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 
 import { DownloadReportService } from '@data/services/download-report.service';
 
@@ -58,15 +58,19 @@ export class ImagesLoadService {
   private _imgLogoFooterBase64: string = undefined;
   imgLogoFooterBase64$ = new BehaviorSubject<string>(this._imgLogoFooterBase64);
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(private storage: AngularFireStorage, private downloadReportService: DownloadReportService) {}
 
   checkImagesLoaded(): Promise<boolean> {
     return new Promise((loaded) => {
-      combineLatest([this.loadedChangingImages$, this.loadedFixedImages$]).subscribe(([imgC, imgF]) => {
-        if (imgC + imgF === this.numChangingImages + this.numFixedImages) {
-          loaded(true);
-        }
-      });
+      this.subscriptions.add(
+        combineLatest([this.loadedChangingImages$, this.loadedFixedImages$]).subscribe(([imgC, imgF]) => {
+          if (imgC + imgF === this.numChangingImages + this.numFixedImages) {
+            loaded(true);
+          }
+        })
+      );
     });
   }
 
@@ -191,11 +195,13 @@ export class ImagesLoadService {
 
     // Logo Solardrone en español o inglés
     let archivoLogo = 'logo_sd_tecno';
-    this.downloadReportService.englishLang$.subscribe((lang) => {
-      if (lang) {
-        archivoLogo = 'logo_sd_techno';
-      }
-    });
+    this.subscriptions.add(
+      this.downloadReportService.englishLang$.subscribe((lang) => {
+        if (lang) {
+          archivoLogo = 'logo_sd_techno';
+        }
+      })
+    );
 
     fabric.util.loadImage(
       `../../../assets/images/${archivoLogo}.png`,
@@ -350,6 +356,9 @@ export class ImagesLoadService {
     this.imgFormulaMaeBase64 = undefined;
     this.imgCurvaMaeBase64 = undefined;
     this.imgLogoFooterBase64 = undefined;
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 
   ////////////////////////////////////////////////////////////

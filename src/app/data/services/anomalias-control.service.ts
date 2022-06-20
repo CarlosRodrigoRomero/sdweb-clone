@@ -686,6 +686,7 @@ export class AnomaliasControlService {
     this.coordsPointer = undefined;
 
     this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 
   ///////////////////////////////////////////////////////////
