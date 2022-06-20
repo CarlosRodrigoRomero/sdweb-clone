@@ -137,6 +137,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     const satelliteLayer = new TileLayer({
       source: satellite,
     });
+    satelliteLayer.setProperties({ type: 'satellite' });
 
     const layers = [
       satelliteLayer,

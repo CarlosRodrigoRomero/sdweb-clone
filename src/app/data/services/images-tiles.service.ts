@@ -226,7 +226,10 @@ export class ImagesTilesService {
     // obtenemos los tileCoords de cada coordenada
     let tilesCoord: TileCoord[] = [];
 
-    this.layerInformeSelected = this.map.getLayers().getArray()[0] as TileLayer;
+    this.layerInformeSelected = this.olMapService.map
+      .getLayers()
+      .getArray()
+      .find((layer) => layer.getProperties().type === 'satellite') as TileLayer;
 
     const source = this.layerInformeSelected.getSource();
     const tileGrid = source.getTileGrid();

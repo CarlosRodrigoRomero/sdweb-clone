@@ -325,7 +325,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.imagesTilesService.imagesPlantaCompleta$.subscribe((imgs) => (this.imagesPlantaCompleta = imgs))
+      this.imagesTilesService.imagesPlantaCompleta$.subscribe((imgs) => {
+        this.imagesPlantaCompleta = imgs;
+        console.log(imgs);
+      })
     );
   }
 
