@@ -32,7 +32,6 @@ import { InformeInterface } from '@core/models/informe';
   styleUrls: ['./map-seguidores.component.scss'],
 })
 export class MapSeguidoresComponent implements OnInit, OnDestroy {
-  public plantaId: string;
   public planta: PlantaInterface;
   private informes: InformeInterface[];
   public map: Map;
@@ -126,7 +125,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     );
 
     // asignamos los IDs necesarios para compartir
-    this.shareReportService.setPlantaId(this.plantaId);
+    this.shareReportService.setPlantaId(this.planta.id);
   }
 
   initMap() {

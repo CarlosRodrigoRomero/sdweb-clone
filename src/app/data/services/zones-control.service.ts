@@ -319,7 +319,7 @@ export class ZonesControlService {
   getGlobalsLabel(globalCoords: any[], plantaFija?: boolean): string {
     const gCoords: any[] = [];
     globalCoords.map((gC) => {
-      if (gC !== null) {
+      if (gC !== null && gC !== '') {
         gCoords.push(gC);
       }
     });
