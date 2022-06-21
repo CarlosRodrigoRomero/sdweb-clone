@@ -586,7 +586,7 @@ export class CanvasComponent implements OnInit {
       left: transformedRect.left,
       top: transformedRect.top,
       fill: 'rgba(0,0,0,0)',
-      stroke: 'white',
+      stroke: this.getColorByTipo(pc.tipo),
       strokeWidth,
       hasControls: true,
       width: transformedRect.width - strokeWidth,
@@ -618,10 +618,14 @@ export class CanvasComponent implements OnInit {
     this.canvas.renderAll();
   }
 
+  private getColorByTipo(tipo: number): string {
+    return GLOBAL.colores_tipos[tipo];
+  }
+
   private drawPolygonsInCanvas(pc: PcInterface) {
     const polygon = new fabric.Polygon(pc.coords, {
       fill: 'rgba(0,0,0,0)',
-      stroke: 'white',
+      stroke: this.getColorByTipo(pc.tipo),
       strokeWidth: 2,
       selectable: true,
       objectCaching: false,

@@ -84,7 +84,7 @@ export let GLOBAL = {
     'PID irregular', // 21
   ],
   colores_tipos: [
-    'rgba(0, 0, 0, 1)', // '0',
+    'rgba(255, 255, 255, 1)', // '0',
     'rgba(0, 200, 0)', // 'PC',
     'rgba(0, 135, 0)', // 'VPV',
     'rgba(254, 176, 25, 1)', // 'Substring en CA',
