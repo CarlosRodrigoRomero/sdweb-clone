@@ -226,10 +226,7 @@ export class ImagesTilesService {
     // obtenemos los tileCoords de cada coordenada
     let tilesCoord: TileCoord[] = [];
 
-    this.layerInformeSelected = this.olMapService.map
-      .getLayers()
-      .getArray()
-      .find((layer) => layer.getProperties().type === 'satellite') as TileLayer;
+    this.layerInformeSelected = this.map.getLayers().getArray()[0] as TileLayer;
 
     const source = this.layerInformeSelected.getSource();
     const tileGrid = source.getTileGrid();
@@ -330,9 +327,10 @@ export class ImagesTilesService {
 
     this.canvasCenterAndZoom(coordsSegCanvas, canvas);
 
-    this.imagesPlantaCompleta[type] = canvas.toDataURL({
+    this._imagesPlantaCompleta[type] = canvas.toDataURL({
       format: 'png',
     });
+    this.imagesPlantaCompleta$.next(this._imagesPlantaCompleta);
 
     this.imagesPlantaLoaded++;
   }
@@ -479,15 +477,6 @@ export class ImagesTilesService {
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  get imagesPlantaCompleta() {
-    return this._imagesPlantaCompleta;
-  }
-
-  set imagesPlantaCompleta(value) {
-    this._imagesPlantaCompleta = value;
-    this.imagesPlantaCompleta$.next(value);
-  }
 
   get imagesPlantaLoaded() {
     return this._imagesPlantaLoaded;

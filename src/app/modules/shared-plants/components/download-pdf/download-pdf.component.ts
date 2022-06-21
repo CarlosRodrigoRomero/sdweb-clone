@@ -199,16 +199,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             // cargamos las imagenes que no cambian al cambiar de informe
             this.imagesLoadService.loadFixedImages(this.planta.empresa);
 
-            return this.plantaService.getLocationsArea(this.planta.id);
-          }),
-          take(1),
-          switchMap((locAreas) => {
-            this.largestLocAreas = locAreas.filter(
-              (locArea) =>
-                locArea.globalCoords[0] !== undefined &&
-                locArea.globalCoords[0] !== null &&
-                locArea.globalCoords[0] !== ''
-            );
+            this.largestLocAreas = this.zonesService.zonesBySize[0];
 
             return combineLatest([
               this.reportControlService.selectedInformeId$,
@@ -325,10 +316,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.imagesTilesService.imagesPlantaCompleta$.subscribe((imgs) => {
-        this.imagesPlantaCompleta = imgs;
-        console.log(imgs);
-      })
+      this.imagesTilesService.imagesPlantaCompleta$.subscribe((imgs) => (this.imagesPlantaCompleta = imgs))
     );
   }
 
@@ -530,6 +518,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         // comprobamos que estan cargados los planos de la planta
         this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
+          console.log(this.imagesPlantaCompleta);
           // comprobamos que estan cargadas tb el resto de imagenes del PDF
           this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
             // comprobamos si se van a cargar imagenes de anomalias
