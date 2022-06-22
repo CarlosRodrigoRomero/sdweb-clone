@@ -29,7 +29,6 @@ export class WarningService {
     private reportControlService: ReportControlService,
     private http: HttpClient,
     private storage: AngularFireStorage,
-    private utilitiesService: UtilitiesService,
     private zonesService: ZonesService
   ) {}
 
@@ -198,9 +197,15 @@ export class WarningService {
   }
 
   private checkAddWarning(warning: Warning, warns: Warning[], informeId: string) {
-    if (!warns.map((warn) => warn.type).includes(warning.type)) {
+    const existWarnings = warns.filter((warn) => warn.type === warning.type);
+
+    if (existWarnings.length === 0) {
       this.warningsAdded.push(warning.type);
       this.addWarning(informeId, warning);
+    } else if (existWarnings.length > 1) {
+      // eliminamos los duplicados
+      existWarnings.pop();
+      existWarnings.forEach((warn) => this.deleteWarning(informeId, warn.id));
     }
   }
 
@@ -570,19 +575,21 @@ export class WarningService {
     informeId: string
   ) {
     let zones = this.zonesService.getZones(planta, locAreas);
-    zones = this.zonesService.getCompleteGlobalCoords(zones);
-    const repeatZones = UtilitiesService.findDuplicates(zones.map((zone) => zone.globalCoords.toString()));
+    if (zones.length > 0) {
+      zones = this.zonesService.getCompleteGlobals(zones).flat();
+      const repeatZones = UtilitiesService.findDuplicates(zones.map((zone) => zone.globalCoords.toString()));
 
-    if (repeatZones.length > 0) {
-      const warning: Warning = {
-        type: 'zonasRepeat',
-        visible: true,
-      };
+      if (repeatZones.length > 0) {
+        const warning: Warning = {
+          type: 'zonasRepeat',
+          visible: true,
+        };
 
-      this.checkAddWarning(warning, warns, informeId);
-    } else {
-      // eliminamos la alerta antigua si la hubiera
-      this.checkOldWarnings('zonasRepeat', warns, informeId);
+        this.checkAddWarning(warning, warns, informeId);
+      } else {
+        // eliminamos la alerta antigua si la hubiera
+        this.checkOldWarnings('zonasRepeat', warns, informeId);
+      }
     }
 
     // confirmamos que ha sido checkeado

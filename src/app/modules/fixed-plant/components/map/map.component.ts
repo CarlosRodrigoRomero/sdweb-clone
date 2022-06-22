@@ -21,13 +21,15 @@ import { GLOBAL } from '@data/constants/global';
 import { FilterService } from '@data/services/filter.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ShareReportService } from '@data/services/share-report.service';
-import { AnomaliasControlService } from '../../services/anomalias-control.service';
+import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ThermalService } from '@data/services/thermal.service';
+import { ZonesService } from '@data/services/zones.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { Anomalia } from '@core/models/anomalia';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-map',
@@ -35,8 +37,8 @@ import { ThermalLayerInterface } from '@core/models/thermalLayer';
   styleUrls: ['./map.component.scss'],
 })
 export class MapComponent implements OnInit, OnDestroy {
-  public plantaId: string;
   public planta: PlantaInterface;
+  private informes: InformeInterface[];
   public map: Map;
   public rangeMin: number;
   public rangeMax: number;
@@ -48,6 +50,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public aerialLayers: TileLayer[];
   private extent1: any;
   public thermalSource;
+  private thermalLayersDB: ThermalLayerInterface[];
   private thermalLayers: TileLayer[];
   private anomaliaLayers: VectorLayer[];
   public leftOpened: boolean;
@@ -55,7 +58,6 @@ export class MapComponent implements OnInit, OnDestroy {
   public statsOpened: boolean;
   public anomaliasLoaded = false;
   public mousePosition;
-  public informeIdList: string[] = [];
   public sharedReport = false;
   noAnomsReport = false;
   public coordsPointer;
@@ -70,7 +72,8 @@ export class MapComponent implements OnInit, OnDestroy {
     private shareReportService: ShareReportService,
     private anomaliasControlService: AnomaliasControlService,
     private reportControlService: ReportControlService,
-    private thermalService: ThermalService
+    private thermalService: ThermalService,
+    private zonesService: ZonesService
   ) {}
 
   ngOnInit(): void {
@@ -78,82 +81,83 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.anomaliasControlService.coordsPointer$.subscribe((coords) => (this.coordsPointer = coords));
 
+    this.planta = this.reportControlService.planta;
+    this.informes = this.reportControlService.informes;
+
     // Para la demo, agregamos un extent a todas las capas:
     this.extent1 = this.transform([-7.0608, 38.523619, -7.056351, 38.522765]);
 
+    this.plantaService
+      .getThermalLayers$(this.planta.id)
+      .pipe(take(1))
+      .subscribe((layers) => {
+        this.thermalLayersDB = layers;
+
+        if (this.zonesService.thereAreZones) {
+          const allZones = this.zonesService.zonesBySize;
+          const smallZones = allZones[allZones.length - 1];
+
+          // Para cada informe, hay que crear 2 capas: térmica y vectorial
+          this.informes.forEach(async (informe, index) => {
+            const thermalLayerDB = this.thermalLayersDB.find((item) => item.informeId === informe.id);
+
+            if (thermalLayerDB !== undefined) {
+              this.olMapService.addThermalLayer(this.createThermalLayer(thermalLayerDB, informe.id, index));
+            }
+
+            // creamos las capas de anomalías para los diferentes informes o zonas
+            this.anomaliasControlService
+              .createAnomaliaLayers(informe.id, smallZones)
+              .forEach((layer) => this.olMapService.addAnomaliaLayer(layer));
+
+            // añadimos las ortofotos aereas de cada informe
+            await this.olMapService.addAerialLayer(informe.id);
+
+            if (index === this.informes.length - 1) {
+              this.initMap();
+            }
+          });
+        } else {
+          // Para cada informe, hay que crear 2 capas: térmica y vectorial
+          this.informes.forEach(async (informe, index) => {
+            const thermalLayerDB = this.thermalLayersDB.find((item) => item.informeId === informe.id);
+
+            if (thermalLayerDB !== undefined) {
+              this.olMapService.addThermalLayer(this.createThermalLayer(thermalLayerDB, informe.id, index));
+            }
+
+            // creamos las capas de anomalías para los diferentes informes o zonas
+            this.anomaliasControlService
+              .createAnomaliaLayers(informe.id)
+              .forEach((layer) => this.olMapService.addAnomaliaLayer(layer));
+
+            // añadimos las ortofotos aereas de cada informe
+            await this.olMapService.addAerialLayer(informe.id);
+
+            if (index === this.informes.length - 1) {
+              this.initMap();
+            }
+          });
+        }
+      });
+
+    // asignamos los IDs necesarios para compartir
+    this.shareReportService.setPlantaId(this.planta.id);
+
+    this.subscriptions.add(this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers)));
+
+    this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayers = layers)));
+
     this.subscriptions.add(
-      this.reportControlService.plantaId$
-        .pipe(
-          take(1),
-          switchMap((plantaId) => {
-            this.plantaId = plantaId;
-
-            // Obtenemos todas las capas para esta planta
-            return combineLatest([
-              this.plantaService.getThermalLayers$(this.plantaId),
-              this.reportControlService.informes$,
-              this.plantaService.getPlanta(this.plantaId),
-            ]);
-          })
-        )
-        .pipe(
-          take(1),
-          switchMap(([thermalLayers, informes, planta]) => {
-            // ordenamos los informes por fecha
-            this.informeIdList = informes.sort((a, b) => a.fecha - b.fecha).map((informe) => informe.id);
-
-            // Para cada informe, hay que crear 2 capas: térmica y vectorial
-            informes.forEach((informe, index) => {
-              const tl = thermalLayers.find((item) => item.informeId === informe.id);
-
-              // this.thermalService.sliderMin = tl.rangeTempMin;
-              // this.thermalService.sliderMax = tl.rangeTempMax;
-
-              if (tl !== undefined) {
-                this.olMapService.addThermalLayer(this._createThermalLayer(tl, informe.id, index));
-              }
-
-              // creamos las capas de anomalías para los diferentes informes
-              this.olMapService.addAnomaliaLayer(this._createAnomaliaLayer(informe.id));
-
-              // añadimos las ortofotos aereas de cada informe
-              this.addAerialLayer(informe.id);
-            });
-
-            this.planta = planta;
-
-            // asignamos los IDs necesarios para compartir
-            this.shareReportService.setPlantaId(this.plantaId);
-
-            return combineLatest([
-              this.olMapService.getThermalLayers(),
-              this.olMapService.getAnomaliaLayers(),
-              this.olMapService.getAerialLayers(),
-              this.reportControlService.selectedInformeId$,
-            ]);
-          })
-        )
-        .subscribe(([therLayers, anomLayers, aerLayers, informeId]) => {
-          if (this.anomaliaLayers === undefined) {
-            // nos suscribimos a las capas termica y de anomalias
-            this.thermalLayers = therLayers;
-            this.anomaliaLayers = anomLayers;
-            this.aerialLayers = aerLayers;
-          }
-
-          // nos suscribimos al informe seleccionado
-          this.selectedInformeId = informeId;
-
-          if (this.map === undefined) {
-            this.initMap();
-          }
-        })
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
     );
+
+    this.subscriptions.add(this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers)));
 
     this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
   }
 
-  private _createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string, index: number): TileLayer {
+  private createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string, index: number): TileLayer {
     // Iniciar mapa térmico
     const tl = new TileLayer({
       source: new XYZ_mod({
@@ -171,47 +175,17 @@ export class MapComponent implements OnInit, OnDestroy {
       }),
       preload: Infinity,
     });
-    // solo lo aplicamos a la planta DEMO
-    if (this.plantaId === 'egF0cbpXnnBnjcrusoeR') {
-      tl.setExtent(this.extent1);
-    }
 
     tl.setProperties({
       informeId,
     });
 
+    // solo lo aplicamos a la planta DEMO
+    if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
+      tl.setExtent(this.extent1);
+    }
+
     return tl;
-  }
-
-  private addAerialLayer(informeId: string) {
-    const aerial = new XYZ({
-      url: GLOBAL.GIS + informeId + '_visual/{z}/{x}/{y}.png',
-      crossOrigin: 'anonymous',
-    });
-
-    const aerialLayer = new TileLayer({
-      source: aerial,
-      preload: Infinity,
-    });
-
-    aerialLayer.setProperties({
-      informeId,
-    });
-
-    this.olMapService.addAerialLayer(aerialLayer);
-  }
-
-  private _createAnomaliaLayer(informeId: string): VectorLayer {
-    const vl = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.anomaliasControlService.getStyleAnomaliasMapa(false),
-    });
-
-    vl.setProperties({
-      informeId,
-    });
-
-    return vl;
   }
 
   initMap() {
@@ -225,7 +199,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     let aerial;
     // solo lo aplicamos a la planta DEMO
-    if (this.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+    if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
       aerial = new XYZ({
         url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
         crossOrigin: '',
@@ -256,7 +230,7 @@ export class MapComponent implements OnInit, OnDestroy {
     // MAPA
     let view: View;
 
-    if (this.plantaId === 'egF0cbpXnnBnjcrusoeR') {
+    if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
       // solo lo aplicamos a la planta DEMO
       view = new View({
         center: fromLonLat([this.planta.longitud, this.planta.latitud]),
@@ -278,34 +252,31 @@ export class MapComponent implements OnInit, OnDestroy {
       this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {
         this.map = map;
 
-        this.map.once('postrender', () => {
-          setTimeout(() => (this.reportControlService.mapLoaded = true), 2000);
-        });
+        if (this.map !== undefined) {
+          this.map.once('postrender', () => (this.reportControlService.mapLoaded = true));
+        }
       })
     );
 
+    // añadimos las capas de anomalías al mapa
     this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
 
     // inicializamos el servicio que controla el comportamiento de las anomalias
-    this.subscriptions.add(
-      this.anomaliasControlService
-        .initService()
-        .pipe(
-          switchMap((value) => {
-            if (value) {
-              this.anomaliasControlService.mostrarAnomalias();
-              return combineLatest([
-                this.anomaliasControlService.anomaliaHover$,
-                this.anomaliasControlService.anomaliaSelect$,
-              ]);
-            }
+    this.anomaliasControlService.initService().then((value) => {
+      if (value) {
+        this.anomaliasControlService.mostrarAnomalias();
+
+        this.subscriptions.add(
+          combineLatest([
+            this.anomaliasControlService.anomaliaHover$,
+            this.anomaliasControlService.anomaliaSelect$,
+          ]).subscribe(([anomHover, anomSelect]) => {
+            this.anomaliaHover = anomHover;
+            this.anomaliaSelect = anomSelect;
           })
-        )
-        .subscribe(([anomHover, anomSelect]) => {
-          this.anomaliaHover = anomHover;
-          this.anomaliaSelect = anomSelect;
-        })
-    );
+        );
+      }
+    });
   }
 
   private transform(extent) {

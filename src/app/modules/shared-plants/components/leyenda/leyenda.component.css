@@ -1,0 +1,41 @@
+mat-card {
+  width: fit-content;
+}
+
+mat-card-content {
+  display: flex;
+  gap: 1rem;
+}
+
+.leyenda-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.lines-tittle {
+  font-size: medium;
+  font-weight: 500;
+  margin-left: 1rem;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+}
+
+.line span {
+  font-size: medium;
+  margin-left: 0.5rem;
+}
+
+.view-1 {
+  display: flex;
+  gap: 1rem;
+}

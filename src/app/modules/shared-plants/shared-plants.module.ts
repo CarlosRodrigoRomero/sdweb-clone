@@ -11,6 +11,11 @@ import { DialogFilteredReportComponent } from './components/dialog-filtered-repo
 import { ShareReportComponent } from './components/share-report/share-report.component';
 import { SelectLanguageComponent } from './components/select-language/select-language.component';
 import { DownloadExcelComponent } from './components/download-excel/download-excel.component';
+import { ZonesComponent } from './components/zones/zones.component';
+import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
+import { ViewControlComponent } from './components/view-control/view-control.component';
+import { ViewToggleComponent } from './components/view-toggle/view-toggle.component';
+import { LeyendaComponent } from './components/leyenda/leyenda.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +27,11 @@ import { DownloadExcelComponent } from './components/download-excel/download-exc
     ShareReportComponent,
     SelectLanguageComponent,
     DownloadExcelComponent,
+    ZonesComponent,
+    SliderTemporalComponent,
+    ViewControlComponent,
+    ViewToggleComponent,
+    LeyendaComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
@@ -30,6 +40,11 @@ import { DownloadExcelComponent } from './components/download-excel/download-exc
     ProgressBarPdfComponent,
     ShareReportComponent,
     DownloadExcelComponent,
+    ZonesComponent,
+    SliderTemporalComponent,
+    ViewControlComponent,
+    ViewToggleComponent,
+    LeyendaComponent,
   ],
 })
 export class SharedPlantsModule {}

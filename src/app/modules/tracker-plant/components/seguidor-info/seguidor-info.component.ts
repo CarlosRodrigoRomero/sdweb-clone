@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 
 import { Seguidor } from '@core/models/seguidor';
 

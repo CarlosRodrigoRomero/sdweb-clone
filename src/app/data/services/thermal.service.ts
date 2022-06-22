@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { AngularFirestore } from '@angular/fire/firestore';
@@ -19,6 +19,8 @@ export class ThermalService {
 
   private _sliderMax: number[] = [];
   sliderMax$ = new BehaviorSubject<number[]>(this._sliderMax);
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(private afs: AngularFirestore) {}
 
@@ -71,19 +73,21 @@ export class ThermalService {
   }
 
   getThermalLayers(): Observable<ThermalLayerInterface[]> {
-    this.afs
-      .collection('thermalLayers')
-      .snapshotChanges()
-      .pipe(
-        map((actions) => {
-          return actions.map((a) => {
-            const data = a.payload.doc.data() as ThermalLayerInterface;
-            data.id = a.payload.doc.id;
-            return { ...data };
-          });
-        })
-      )
-      .subscribe((tL) => (this.thermalLayers = tL));
+    this.subscriptions.add(
+      this.afs
+        .collection('thermalLayers')
+        .snapshotChanges()
+        .pipe(
+          map((actions) => {
+            return actions.map((a) => {
+              const data = a.payload.doc.data() as ThermalLayerInterface;
+              data.id = a.payload.doc.id;
+              return { ...data };
+            });
+          })
+        )
+        .subscribe((tL) => (this.thermalLayers = tL))
+    );
 
     return this.thermalLayers$;
   }
@@ -92,6 +96,9 @@ export class ThermalService {
     this.thermalLayers = [];
     this.sliderMin = [];
     this.sliderMax = [];
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 
   get thermalLayers() {

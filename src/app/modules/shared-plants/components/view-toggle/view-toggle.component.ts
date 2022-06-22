@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import { MapSeguidoresService } from '../../services/map-seguidores.service';
+import { ViewReportService } from '@data/services/view-report.service';
 
 @Component({
   selector: 'app-view-toggle',
@@ -14,16 +14,14 @@ export class ViewToggleComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private mapSeguidoresService: MapSeguidoresService) {}
+  constructor(private viewReportService: ViewReportService) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(
-      this.mapSeguidoresService.toggleViewSelected$.subscribe((view) => (this.viewSelected = view))
-    );
+    this.subscriptions.add(this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSelected = view)));
   }
 
   onToggleChange(value) {
-    this.mapSeguidoresService.toggleViewSelected = value;
+    this.viewReportService.reportViewSelected = Number(value);
   }
 
   ngOnDestroy(): void {

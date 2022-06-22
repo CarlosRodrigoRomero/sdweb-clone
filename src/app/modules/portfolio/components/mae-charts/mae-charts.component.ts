@@ -3,11 +3,12 @@ import { Router } from '@angular/router';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { GLOBAL } from '@data/constants/global';
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
+
+import { COLOR } from '@data/constants/color';
 
 interface PlantaChart {
   planta: PlantaInterface;
@@ -105,11 +106,11 @@ export class MaeChartsComponent implements OnInit {
   private getColorVarMae(varMae: number) {
     let colorMae = '';
     if (varMae >= 0.02) {
-      colorMae = GLOBAL.colores_new_mae[2];
+      colorMae = COLOR.colores_severity[2];
     } else if (varMae <= 0) {
-      colorMae = GLOBAL.colores_new_mae[0];
+      colorMae = COLOR.colores_severity[0];
     } else {
-      colorMae = GLOBAL.colores_new_mae[1];
+      colorMae = COLOR.colores_severity[1];
     }
 
     return colorMae;

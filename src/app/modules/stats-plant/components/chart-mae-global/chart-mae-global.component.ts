@@ -25,7 +25,7 @@ import { InformeService } from '@data/services/informe.service';
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
 import { AuthService } from '@data/services/auth.service';
 
-import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -84,11 +84,11 @@ export class ChartMaeGlobalComponent implements OnInit {
           if (this.maeMedio !== undefined && this.maeSigma !== undefined) {
             this.maeColors = this.maeData.map((mae) => {
               if (mae >= this.maeMedio + this.maeSigma) {
-                return GLOBAL.colores_mae_rgb[2];
+                return COLOR.colores_severity_rgb[2];
               } else if (mae <= this.maeMedio) {
-                return GLOBAL.colores_mae_rgb[0];
+                return COLOR.colores_severity_rgb[0];
               } else {
-                return GLOBAL.colores_mae_rgb[1];
+                return COLOR.colores_severity_rgb[1];
               }
             });
           }

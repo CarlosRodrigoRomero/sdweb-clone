@@ -3,9 +3,10 @@ import { Seguidor } from '@core/models/seguidor';
 
 import { Subscription } from 'rxjs';
 
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
-import { GLOBAL } from '@data/constants/global';
+
+import { COLOR } from '@data/constants/color';
 
 @Component({
   selector: 'app-seguidor-view-leyenda',
@@ -16,8 +17,9 @@ export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
   viewSelected: number;
   private seguidorSelected: Seguidor;
   viewsTitle: string[] = ['Pérdidas', 'Cels. Calientes', 'ΔT Max (norm)'];
+  viewsLabels: string[][];
   numCelsCalientes = 0;
-  colors = [GLOBAL.colores_mae, GLOBAL.colores_mae, GLOBAL.colores_grad];
+  colors = COLOR.colores_severity;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -28,7 +30,7 @@ export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.seguidorViewService.toggleViewSelected$.subscribe((view) => {
+      this.seguidorViewService.seguidorViewSelected$.subscribe((view) => {
         this.viewSelected = view;
 
         if (this.seguidorSelected !== undefined) {
@@ -52,6 +54,12 @@ export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    this.viewsLabels = [
+      ['Bajas', 'Medias', 'Altas'],
+      ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
+      ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
+    ];
   }
 
   ngOnDestroy(): void {

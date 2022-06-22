@@ -8,6 +8,7 @@ import { PortfolioControlService } from '@data/services/portfolio-control.servic
 
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
+import { COLOR } from '@data/constants/color';
 
 interface PlantaChart {
   planta: PlantaInterface;
@@ -108,11 +109,11 @@ export class PerdidasChartsComponent implements OnInit {
   private getColorPerdidas(perdidas: number) {
     let colorPerdidas = '';
     if (perdidas >= 0.2) {
-      colorPerdidas = GLOBAL.colores_new_mae[2];
+      colorPerdidas = COLOR.colores_severity[2];
     } else if (perdidas <= 0.1) {
-      colorPerdidas = GLOBAL.colores_new_mae[0];
+      colorPerdidas = COLOR.colores_severity[0];
     } else {
-      colorPerdidas = GLOBAL.colores_new_mae[1];
+      colorPerdidas = COLOR.colores_severity[1];
     }
 
     return colorPerdidas;
@@ -121,11 +122,11 @@ export class PerdidasChartsComponent implements OnInit {
   private getColorVarPerdidas(varPerdidas: number) {
     let colorPerdidas = '';
     if (varPerdidas >= 1) {
-      colorPerdidas = GLOBAL.colores_new_mae[2];
+      colorPerdidas = COLOR.colores_severity[2];
     } else if (varPerdidas <= 0) {
-      colorPerdidas = GLOBAL.colores_new_mae[0];
+      colorPerdidas = COLOR.colores_severity[0];
     } else {
-      colorPerdidas = GLOBAL.colores_new_mae[1];
+      colorPerdidas = COLOR.colores_severity[1];
     }
 
     return colorPerdidas;

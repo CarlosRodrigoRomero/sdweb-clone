@@ -6,9 +6,9 @@ import { MatSidenav } from '@angular/material/sidenav';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { StatsService } from '@data/services/stats.service';
-import { OlMapService } from '@data/services/ol-map.service';
-import { ThermalService } from '@data/services/thermal.service';
 import { DownloadReportService } from '@data/services/download-report.service';
+import { ZonesService } from '@data/services/zones.service';
+import { ResetServices } from '@data/services/reset-services.service';
 
 @Component({
   selector: 'app-map-view',
@@ -17,8 +17,7 @@ import { DownloadReportService } from '@data/services/download-report.service';
 })
 export class MapViewComponent implements OnInit, OnDestroy {
   public plantaFija = true;
-  public leftOpened = true;
-  public rightOpened = true;
+  public rightOpened = false;
   public statsOpened: boolean;
   public anomaliasLoaded = false;
   public notSharedReport = true;
@@ -29,6 +28,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   thereAreZones = true;
   generatingDownload = false;
   selectedInformeId: string;
+  numInformes = 1;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -39,13 +39,17 @@ export class MapViewComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private statsService: StatsService,
-    private olMapService: OlMapService,
-    private thermalService: ThermalService,
-    private downloadReportService: DownloadReportService
+    private downloadReportService: DownloadReportService,
+    private zonesService: ZonesService,
+    private resetServicesService: ResetServices
   ) {}
 
   ngOnInit(): void {
-    this.reportControlService.initService().then((res) => (this.anomaliasLoaded = res));
+    this.reportControlService.initService().then((res) => {
+      this.anomaliasLoaded = res;
+
+      this.numInformes = this.reportControlService.informes.length;
+    });
 
     this.subscriptions.add(
       this.reportControlService.sharedReportWithFilters$.subscribe((value) => (this.showFilters = value))
@@ -66,7 +70,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.subscriptions.add(this.reportControlService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
+    this.subscriptions.add(this.zonesService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
 
     this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
 
@@ -96,9 +100,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
 
     // reseteamos los servicios a sus valores por defecto
-    this.reportControlService.resetService();
-    this.olMapService.resetService();
-    this.thermalService.resetService();
-    this.downloadReportService.resetService();
+    this.resetServicesService.resetServices();
   }
 }

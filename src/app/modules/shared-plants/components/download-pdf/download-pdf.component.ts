@@ -22,29 +22,31 @@ import { fabric } from 'fabric';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { DownloadReportService } from '@data/services/download-report.service';
-import { GLOBAL } from '@data/constants/global';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { PlantaService } from '@data/services/planta.service';
 import { FilterService } from '@data/services/filter.service';
 import { OlMapService } from '@data/services/ol-map.service';
-import { ImageProcessService } from '../../services/image-process.service';
+import { ImageProcessService } from '@data/services/image-process.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
-import { ImagesLoadService } from '../../services/images-load.service';
-import { ImagesTilesService } from '../../services/images-tiles.service';
+import { ImagesLoadService } from '@data/services/images-load.service';
+import { ImagesTilesService } from '@data/services/images-tiles.service';
 import { ReportPdfService } from '@data/services/report-pdf.service';
+import { ZonesService } from '@data/services/zones.service';
+import { ResetServices } from '@data/services/reset-services.service';
 
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
 import { Translation } from '@shared/utils/translations/translations';
 import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
-import { AnomsTable } from './pdf-structure';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
+import { AnomsTable } from './pdf-structure';
 
 import { DRONE } from '@data/constants/drone';
+import { GLOBAL } from '@data/constants/global';
 
 @Component({
   selector: 'app-download-pdf',
@@ -142,7 +144,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     private anomaliaInfoService: AnomaliaInfoService,
     private imagesLoadService: ImagesLoadService,
     private imagesTilesService: ImagesTilesService,
-    private reportPdfService: ReportPdfService
+    private reportPdfService: ReportPdfService,
+    private zonesService: ZonesService,
+    private resetServices: ResetServices
   ) {}
 
   ngOnInit(): void {
@@ -195,16 +199,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             // cargamos las imagenes que no cambian al cambiar de informe
             this.imagesLoadService.loadFixedImages(this.planta.empresa);
 
-            return this.plantaService.getLocationsArea(this.planta.id);
-          }),
-          take(1),
-          switchMap((locAreas) => {
-            this.largestLocAreas = locAreas.filter(
-              (locArea) =>
-                locArea.globalCoords[0] !== undefined &&
-                locArea.globalCoords[0] !== null &&
-                locArea.globalCoords[0] !== ''
-            );
+            this.largestLocAreas = this.zonesService.zonesBySize[0];
 
             return combineLatest([
               this.reportControlService.selectedInformeId$,
@@ -343,10 +338,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           this.largestLocAreas,
           'thermal',
           this.selectedInforme.id,
+          this.map,
           this.anomaliasInforme
         );
       }
-      this.imagesTilesService.setImgPlanoPlanta(this.largestLocAreas, 'visual', this.selectedInforme.id);
+      this.imagesTilesService.setImgPlanoPlanta(this.largestLocAreas, 'visual', this.selectedInforme.id, this.map);
     }
   }
 
@@ -421,7 +417,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     // cargamos imagenes que cambian con cada informe
     this.imagesLoadService.loadChangingImages(this.selectedInforme.id);
 
-    if (this.reportControlService.thereAreZones) {
+    if (this.zonesService.thereAreZones) {
       // reseteamos el contador de planos cargados en cada descarga
       this.imagesTilesService.imagesPlantaLoaded = 0;
       // cargamos las orto termica y visual de la planta
@@ -523,6 +519,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         // comprobamos que estan cargados los planos de la planta
         this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
+          console.log(this.imagesPlantaCompleta);
           // comprobamos que estan cargadas tb el resto de imagenes del PDF
           this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
             // comprobamos si se van a cargar imagenes de anomalias
@@ -897,7 +894,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const tileCoords = this.imagesTilesService.getElemTiles(
       anomalia.featureCoords,
       this.imagesTilesService.getElemExtent(anomalia.featureCoords),
-      zoomLevel
+      zoomLevel, this.map
     );
 
     const canvas = new fabric.Canvas('canvas');
@@ -1032,7 +1029,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const tileCoords = this.imagesTilesService.getElemTiles(
       segCoords,
       this.imagesTilesService.getElemExtent(segCoords),
-      22
+      22, this.map
     );
 
     const canvas = new fabric.Canvas('canvas');
@@ -3778,7 +3775,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     for (let i = 1; i <= this.alturaMax; i++) {
       const arrayFila = [];
       arrayFila.push({
-        text: 'Fila ' + this.anomaliaInfoService.getAltura( i, this.planta).toString(),
+        text: 'Fila ' + this.anomaliaInfoService.getAltura(i, this.planta).toString(),
         style: 'tableHeaderBlue',
       });
 
@@ -3856,9 +3853,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
 
-    this.imageProcessService.resetService();
-    this.imagesLoadService.resetService();
-    this.imagesTilesService.resetService();
+    this.resetServices.resetServices();
   }
 
   //////////////////////////////////////////////////////

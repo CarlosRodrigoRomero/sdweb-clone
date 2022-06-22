@@ -19,11 +19,14 @@ import {
   ApexPlotOptions,
 } from 'ng-apexcharts';
 
-import { GLOBAL } from '@data/constants/global';
 import { ReportControlService } from '@data/services/report-control.service';
 import { InformeService } from '@data/services/informe.service';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
+
+import { COLOR } from '@data/constants/color';
+import { GLOBAL } from '@data/constants/global';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -77,7 +80,11 @@ export class ChartTipoAnomsComponent implements OnInit {
 
   private labelDatesReports: string;
 
-  constructor(private reportControlService: ReportControlService, private informeService: InformeService) {}
+  constructor(
+    private reportControlService: ReportControlService,
+    private informeService: InformeService,
+    private anomaliaInfoService: AnomaliaInfoService
+  ) {}
 
   ngOnInit(): void {
     this.informesIdList = this.reportControlService.informesIdList;
@@ -112,7 +119,7 @@ export class ChartTipoAnomsComponent implements OnInit {
     allNumCategorias.forEach((i) => {
       if (anomalias.filter((anom) => anom.tipo === i).length > 0) {
         labelsCategoria.push(GLOBAL.labels_tipos[i]);
-        coloresCategoria.push(GLOBAL.colores_tipos[i]);
+        coloresCategoria.push(this.anomaliaInfoService.getPerdidasColor(GLOBAL.pcPerdidas[i]));
         numsCategoria.push(i);
       }
     });
@@ -283,7 +290,7 @@ export class ChartTipoAnomsComponent implements OnInit {
           width: '100%',
           height: this.chartHeight,
         },
-        colors: [GLOBAL.gris],
+        colors: [COLOR.gris],
         yaxis: {
           max: (v) => {
             return Math.round(1.1 * v);

@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import { GLOBAL } from '@data/constants/global';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 import { PcService } from '@data/services/pc.service';
 import { AuthService } from '@data/services/auth.service';
@@ -10,6 +9,9 @@ import { AuthService } from '@data/services/auth.service';
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
 import { switchMap, take } from 'rxjs/operators';
+
+import { COLOR } from '@data/constants/color';
+import { GLOBAL } from '@data/constants/global';
 
 @Component({
   selector: 'app-seguidor-anomalia-info',
@@ -47,7 +49,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
             this.anomaliaInfo = {
               localId: this.anomaliaSelected.localId,
               clase: GLOBAL.labels_clase[this.anomaliaSelected.clase],
-              claseColor: GLOBAL.colores_clase[this.anomaliaSelected.clase],
+              claseColor: COLOR.colores_clase[this.anomaliaSelected.clase],
               temperaturaMax: this.anomaliaSelected.temperaturaMax,
               temperaturaRef: this.anomaliaSelected.temperaturaRef,
               gradienteNormalizado: this.anomaliaSelected.gradienteNormalizado,

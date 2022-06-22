@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
-import { OlMapService } from '@data/services/ol-map.service';
+import { ResetServices } from '@data/services/reset-services.service';
 
 @Component({
   selector: 'app-reports',
@@ -18,7 +18,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription = new Subscription();
 
-  constructor(public portfolioControlService: PortfolioControlService, private olMapService: OlMapService) {}
+  constructor(public portfolioControlService: PortfolioControlService, private resetServices: ResetServices) {}
 
   ngOnInit() {
     this.portfolioControlService.initService().then((res) => (this.mapLoaded = res));
@@ -29,7 +29,6 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
 
     // reseteamos los servicios a sus valores por defecto
-    this.portfolioControlService.resetService();
-    this.olMapService.resetService();
+    this.resetServices.resetServices();
   }
 }

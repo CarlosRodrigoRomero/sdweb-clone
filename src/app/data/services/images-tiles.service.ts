@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 
 import { TileCoord } from 'ol/tilecoord';
 import { Coordinate } from 'ol/coordinate';
 import { Extent } from 'ol/extent';
 import TileLayer from 'ol/layer/Tile';
 import TileGrid from 'ol/tilegrid/TileGrid';
+import { Map } from 'ol';
 
 import { fromLonLat } from 'ol/proj';
 import { LatLngLiteral } from '@agm/core';
@@ -15,21 +16,20 @@ import { fabric } from 'fabric';
 
 import inside from 'point-in-polygon';
 
-import { GLOBAL } from '@data/constants/global';
-import { ImageProcessService } from './image-process.service';
-import { OlMapService } from '@data/services/ol-map.service';
+import { ImageProcessService } from '@data/services/image-process.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { ZonesService } from '@data/services/zones.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
-import { Map } from 'ol';
+
+import { GLOBAL } from '@data/constants/global';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ImagesTilesService {
   private tileResolution = 256;
-  private map: Map;
   private _imagesPlantaCompleta = {};
   imagesPlantaCompleta$ = new BehaviorSubject<{}>(this._imagesPlantaCompleta);
   private _layerInformeSelected: TileLayer = undefined;
@@ -38,31 +38,33 @@ export class ImagesTilesService {
   private _imagesPlantaLoaded = 0;
   imagesPlantaLoaded$ = new BehaviorSubject<number>(this._imagesPlantaLoaded);
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private imageProcessService: ImageProcessService,
-    private olMapService: OlMapService,
-    private reportControlService: ReportControlService
-  ) {
-    this.olMapService.map$.subscribe((map) => (this.map = map));
-  }
+    private reportControlService: ReportControlService,
+    private zonesService: ZonesService
+  ) {}
 
   checkImgsPlanosLoaded(): Promise<boolean> {
     return new Promise((loaded) => {
-      this.imagesPlantaLoaded$.subscribe((value) => {
-        if (this.reportControlService.thereAreZones) {
-          if (this.reportControlService.plantaFija) {
-            if (value === 2) {
-              loaded(true);
+      this.subscriptions.add(
+        this.imagesPlantaLoaded$.subscribe((value) => {
+          if (this.zonesService.thereAreZones) {
+            if (this.reportControlService.plantaFija) {
+              if (value === 2) {
+                loaded(true);
+              }
+            } else {
+              if (value === 1) {
+                loaded(true);
+              }
             }
           } else {
-            if (value === 1) {
-              loaded(true);
-            }
+            loaded(true);
           }
-        } else {
-          loaded(true);
-        }
-      });
+        })
+      );
     });
   }
 
@@ -70,6 +72,7 @@ export class ImagesTilesService {
     locAreas: LocationAreaInterface[],
     type: string,
     selectedInformeId: string,
+    map: Map,
     anomalias?: Anomalia[]
   ) {
     let tileCoords: TileCoord[] = [];
@@ -77,7 +80,7 @@ export class ImagesTilesService {
     locAreas.forEach((locArea) => {
       const locAreaCoords = this.pathToCoordinate(locArea.path);
       allLocAreaCoords.push(...locAreaCoords);
-      tileCoords.push(...this.getElemTiles(locAreaCoords, this.getElemExtent(locAreaCoords), 16));
+      tileCoords.push(...this.getElemTiles(locAreaCoords, this.getElemExtent(locAreaCoords), 16, map));
     });
     tileCoords = this.getCompleteTiles(tileCoords);
 
@@ -215,11 +218,11 @@ export class ImagesTilesService {
     });
   }
 
-  getElemTiles(coords: Coordinate[], extents: Extent[], zoomLevel: number): TileCoord[] {
+  getElemTiles(coords: Coordinate[], extents: Extent[], zoomLevel: number, map: Map): TileCoord[] {
     // obtenemos los tileCoords de cada coordenada
     let tilesCoord: TileCoord[] = [];
 
-    this.layerInformeSelected = this.map.getLayers().getArray()[0] as TileLayer;
+    this.layerInformeSelected = map.getLayers().getArray()[0] as TileLayer;
 
     const source = this.layerInformeSelected.getSource();
     const tileGrid = source.getTileGrid();
@@ -320,9 +323,10 @@ export class ImagesTilesService {
 
     this.canvasCenterAndZoom(coordsSegCanvas, canvas);
 
-    this.imagesPlantaCompleta[type] = canvas.toDataURL({
+    this._imagesPlantaCompleta[type] = canvas.toDataURL({
       format: 'png',
     });
+    this.imagesPlantaCompleta$.next(this._imagesPlantaCompleta);
 
     this.imagesPlantaLoaded++;
   }
@@ -459,22 +463,15 @@ export class ImagesTilesService {
   }
 
   resetService() {
-    this.map = undefined;
-    this.imagesPlantaCompleta = {};
+    this._imagesPlantaCompleta = {};
     this.layerInformeSelected = undefined;
     this.imagesPlantaLoaded = 0;
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  get imagesPlantaCompleta() {
-    return this._imagesPlantaCompleta;
-  }
-
-  set imagesPlantaCompleta(value) {
-    this._imagesPlantaCompleta = value;
-    this.imagesPlantaCompleta$.next(value);
-  }
 
   get imagesPlantaLoaded() {
     return this._imagesPlantaLoaded;

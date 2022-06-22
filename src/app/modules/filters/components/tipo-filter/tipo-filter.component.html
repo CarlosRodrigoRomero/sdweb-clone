@@ -15,12 +15,9 @@
             [name]="tipo.label"
             (change)="onChangeFiltroTipo($event)"
           >
-            <div class="label-tipo">
-              <mat-icon [ngStyle]="{ color: tipo.color }" class="icon">crop_16_9</mat-icon>
-              <span style="font-size: 15px">
-                {{ tipo.label }}
-              </span>
-            </div>
+            <span style="font-size: 15px">
+              {{ tipo.label }}
+            </span>
           </mat-checkbox>
         </li>
       </div>

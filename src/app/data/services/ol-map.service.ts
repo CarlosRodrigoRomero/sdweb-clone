@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -14,6 +15,10 @@ import TileLayer from 'ol/layer/Tile';
 import { Draw } from 'ol/interaction';
 import { Coordinate } from 'ol/coordinate';
 import { fromLonLat } from 'ol/proj';
+import XYZ from 'ol/source/XYZ';
+
+import { GLOBAL } from '@data/constants/global';
+import { catchError, take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +26,8 @@ import { fromLonLat } from 'ol/proj';
 export class OlMapService {
   private _map = undefined;
   public map$ = new BehaviorSubject<any>(this._map);
+  private _currentZoom = 17;
+  currentZoom$ = new BehaviorSubject<number>(this._currentZoom);
   private _draw: Draw = undefined;
   public draw$ = new BehaviorSubject<Draw>(this._draw);
   private drawLayers: VectorLayer[] = [];
@@ -30,12 +37,14 @@ export class OlMapService {
   private anomaliaLayers$ = new BehaviorSubject<VectorLayer[]>(this.anomaliaLayers);
   private seguidorLayers: VectorLayer[] = [];
   private seguidorLayers$ = new BehaviorSubject<VectorLayer[]>(this.seguidorLayers);
+  private _zonasLayers: VectorLayer[] = [];
+  zonasLayers$ = new BehaviorSubject<VectorLayer[]>(this._zonasLayers);
   private incrementoLayers: VectorLayer[] = [];
   private incrementoLayers$ = new BehaviorSubject<VectorLayer[]>(this.incrementoLayers);
-  private aerialLayers: TileLayer[] = [];
-  private aerialLayers$ = new BehaviorSubject<TileLayer[]>(this.aerialLayers);
+  private _aerialLayers: TileLayer[] = [];
+  aerialLayers$ = new BehaviorSubject<TileLayer[]>(this._aerialLayers);
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   createMap(
     id: string,
@@ -91,6 +100,11 @@ export class OlMapService {
     this.seguidorLayers$.next(this.seguidorLayers);
   }
 
+  addZoneLayer(layer: VectorLayer) {
+    this._zonasLayers.push(layer);
+    this.zonasLayers$.next(this._zonasLayers);
+  }
+
   getSeguidorLayers() {
     return this.seguidorLayers$.asObservable();
   }
@@ -104,13 +118,52 @@ export class OlMapService {
     return this.incrementoLayers$.asObservable();
   }
 
-  addAerialLayer(layer: TileLayer) {
-    this.aerialLayers.push(layer);
-    this.aerialLayers$.next(this.aerialLayers);
-  }
+  addAerialLayer(informeId: string): Promise<void> {
+    const url = GLOBAL.GIS + informeId + '_visual/1/1/1.png';
 
-  getAerialLayers() {
-    return this.aerialLayers$.asObservable();
+    return new Promise((resolve, reject) => {
+      this.http
+        .get(url)
+        .pipe(
+          take(1),
+          catchError((error) => {
+            let aerialLayer: TileLayer;
+
+            // no recibimos respuesta del servidor porque no existe
+            if (error.status === 0) {
+              aerialLayer = new TileLayer({});
+              aerialLayer.setProperties({
+                informeId,
+                exist: false,
+              });
+            } else {
+              // si recibimos respuesta del servidor, es que existe la capa
+              const aerial = new XYZ({
+                url: GLOBAL.GIS + informeId + '_visual/{z}/{x}/{y}.png',
+                crossOrigin: 'anonymous',
+              });
+
+              aerialLayer = new TileLayer({
+                source: aerial,
+                preload: Infinity,
+              });
+
+              aerialLayer.setProperties({
+                informeId,
+                exist: true,
+              });
+            }
+            this._aerialLayers.push(aerialLayer);
+            this.aerialLayers$.next(this._aerialLayers);
+
+            resolve();
+
+            return [];
+          }),
+          take(1)
+        )
+        .subscribe(() => {});
+    });
   }
 
   latLonLiteralToLonLat(path: LatLngLiteral[]) {
@@ -182,6 +235,14 @@ export class OlMapService {
     return [sumLong / coords.length, sumLat / coords.length];
   }
 
+  setViewCenter(center: Coordinate) {
+    this.map.getView().setCenter(center);
+  }
+
+  setViewZoom(zoom: number) {
+    this.map.getView().setZoom(zoom);
+  }
+
   resetService() {
     this.map = undefined;
     this.draw = undefined;
@@ -190,7 +251,9 @@ export class OlMapService {
     this.aerialLayers = [];
     this.anomaliaLayers = [];
     this.seguidorLayers = [];
+    this.zonasLayers = [];
     this.incrementoLayers = [];
+    this.currentZoom = 17;
   }
 
   ///////////////////////////////////////////////////////////////////////
@@ -211,5 +274,32 @@ export class OlMapService {
   set map(value: Map) {
     this._map = value;
     this.map$.next(value);
+  }
+
+  get currentZoom(): number {
+    return this._currentZoom;
+  }
+
+  set currentZoom(value: number) {
+    this._currentZoom = value;
+    this.currentZoom$.next(value);
+  }
+
+  get zonasLayers(): VectorLayer[] {
+    return this._zonasLayers;
+  }
+
+  set zonasLayers(value: VectorLayer[]) {
+    this._zonasLayers = value;
+    this.zonasLayers$.next(value);
+  }
+
+  get aerialLayers(): TileLayer[] {
+    return this._aerialLayers;
+  }
+
+  set aerialLayers(value: TileLayer[]) {
+    this._aerialLayers = value;
+    this.aerialLayers$.next(value);
   }
 }

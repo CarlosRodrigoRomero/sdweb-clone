@@ -6,7 +6,6 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { switchMap, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
-import { GLOBAL } from '@data/constants/global';
 import { FilterService } from '@data/services/filter.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { FilterControlService } from '@data/services/filter-control.service';
@@ -16,6 +15,9 @@ import { PlantaService } from '@data/services/planta.service';
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
+
+import { COLOR } from '@data/constants/color';
+import { GLOBAL } from '@data/constants/global';
 
 export interface LabelTipo {
   label?: string;
@@ -114,25 +116,6 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
       this.filterControlService.selectedTipoLabels$.subscribe((labels) => (this.selectedLabels = labels))
     );
 
-    // this.reportControlService.selectedInformeId$.subscribe((informeID) => {
-    //   this.filterService.filteredElementsWithoutFilterTipo$.subscribe((elems) => {
-    //     // estas anomalias son las anomalias filtradas
-    //     this.allAnomalias = elems as Anomalia[];
-    //     this.allAnomalias
-    //       .filter((elem) => elem.informeId === informeID)
-    //       .map(() => {
-    //         if (this.numsCategoria !== undefined) {
-    //           this.numsCategoria.forEach((num, i) => {
-    //             this.filterTipoCounts[i] = this.allAnomalias
-    //               .filter((elem) => elem.informeId === informeID)
-    //               // tslint:disable-next-line: triple-equals
-    //               .filter((elem) => elem.tipo == num).length;
-    //           });
-    //         }
-    //       });
-    //   });
-    // });
-
     // nos suscribimos al estado en el control de filtros
     this.subscriptions.add(
       this.filterControlService.labelTipoDefaultStatus$.subscribe((value) => (this.defaultLabelStatus = value))
@@ -198,7 +181,7 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
     allNumCategorias.forEach((i) => {
       if (anomalias.filter((anom) => anom.tipo === i).length > 0) {
         labelsCategoria.push(GLOBAL.labels_tipos[i]);
-        coloresCategoria.push(GLOBAL.colores_tipos[i]);
+        coloresCategoria.push(COLOR.colores_tipos[i]);
         numsCategoria.push(i);
       }
     });

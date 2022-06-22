@@ -6,7 +6,7 @@ import { switchMap } from 'rxjs/operators';
 import 'fabric';
 declare let fabric;
 
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 
@@ -71,7 +71,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
             // obtenemos imagen visual
             this.seguidoresControlService.getImageSeguidor('jpgVisual');
 
-            return this.seguidorViewService.toggleViewSelected$;
+            return this.seguidorViewService.seguidorViewSelected$;
           }),
           switchMap((view) => {
             this.viewSelected = view;

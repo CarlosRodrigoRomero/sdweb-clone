@@ -5,9 +5,7 @@ import { Subscription } from 'rxjs';
 import { StatsService } from '@data/services/stats.service';
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { PlantaService } from '@data/services/planta.service';
-import { InformeService } from '@data/services/informe.service';
-import { take } from 'rxjs/operators';
+import { ZonesService } from '@data/services/zones.service';
 
 @Component({
   selector: 'app-planta-stats',
@@ -28,14 +26,13 @@ export class PlantaStatsComponent implements OnInit, OnDestroy {
     private statsService: StatsService,
     private portfolioControlService: PortfolioControlService,
     public reportControlService: ReportControlService,
-    private plantaService: PlantaService,
-    private informeService: InformeService
+    private zonesService: ZonesService
   ) {}
 
   ngOnInit(): void {
     this.portfolioControlService.initService().then((res) => (this.portfolioLoaded = res));
 
-    this.subscriptions.add(this.reportControlService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
+    this.subscriptions.add(this.zonesService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
 
     this.subscriptions.add(this.reportControlService.sharedReport$.subscribe((shared) => (this.sharedReport = shared)));
 

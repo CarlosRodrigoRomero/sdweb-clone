@@ -2,11 +2,13 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import { GLOBAL } from '@data/constants/global';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { ClassificationService } from '@data/services/classification.service';
 
 import { Anomalia } from '@core/models/anomalia';
+
+import { COLOR } from '@data/constants/color';
+import { GLOBAL } from '@data/constants/global';
 
 @Component({
   selector: 'app-anom-tipo-control',
@@ -15,7 +17,7 @@ import { Anomalia } from '@core/models/anomalia';
 })
 export class AnomTipoLegendComponent implements OnInit, OnDestroy {
   tiposAnomalia: string[] = GLOBAL.labels_tipos;
-  anomaliaColors: string[] = GLOBAL.colores_tipos;
+  anomaliaColors: string[] = COLOR.colores_tipos;
   anomaliaSelected: Anomalia = undefined;
 
   private subscriptions: Subscription = new Subscription();

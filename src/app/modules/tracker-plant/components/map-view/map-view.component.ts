@@ -4,12 +4,13 @@ import { Subscription } from 'rxjs';
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { ReportControlService } from '@data/services/report-control.service';
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 import { StatsService } from '@data/services/stats.service';
-import { OlMapService } from '@data/services/ol-map.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { DownloadReportService } from '@data/services/download-report.service';
+import { ZonesService } from '@data/services/zones.service';
+import { ResetServices } from '@data/services/reset-services.service';
 
 @Component({
   selector: 'app-map-view',
@@ -17,8 +18,7 @@ import { DownloadReportService } from '@data/services/download-report.service';
   styleUrls: ['./map-view.component.css'],
 })
 export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
-  public leftOpened = true;
-  public rightOpened = true;
+  public rightOpened = false;
   public statsOpened: boolean;
   public seguidorViewOpened: boolean;
   public seguidoresLoaded = false;
@@ -29,6 +29,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public mapLoaded = false;
   noAnomsReport = false;
   generatingDownload = false;
+  numInformes = 1;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -42,13 +43,18 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     private seguidoresControlService: SeguidoresControlService,
     private seguidorViewService: SeguidorViewService,
     private statsService: StatsService,
-    private olMapService: OlMapService,
     private mapSeguidoresService: MapSeguidoresService,
-    private downloadReportService: DownloadReportService
+    private downloadReportService: DownloadReportService,
+    private zonesService: ZonesService,
+    private resetServices: ResetServices
   ) {}
 
   ngOnInit(): void {
-    this.reportControlService.initService().then((res) => (this.seguidoresLoaded = res));
+    this.reportControlService.initService().then((res) => {
+      this.seguidoresLoaded = res;
+
+      this.numInformes = this.reportControlService.informes.length;
+    });
 
     this.subscriptions.add(
       this.reportControlService.sharedReportWithFilters$.subscribe((value) => (this.showFilters = value))
@@ -64,7 +70,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
       this.seguidoresControlService.seguidorViewOpened$.subscribe((opened) => (this.seguidorViewOpened = opened))
     );
 
-    this.subscriptions.add(this.reportControlService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
+    this.subscriptions.add(this.zonesService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
 
     this.subscriptions.add(
       this.reportControlService.mapLoaded$.subscribe((value) => {
@@ -99,11 +105,10 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     // cancelamos las suscripciones
     this.subscriptions.unsubscribe();
 
-    // reseteamos los servicios a sus valores por defecto
-    this.reportControlService.resetService();
-    this.olMapService.resetService();
     this.seguidorViewService.sidenav = undefined;
+
+    // reseteamos los servicios a sus valores por defecto
+    this.resetServices.resetServices();
     this.mapSeguidoresService.resetService();
-    this.downloadReportService.resetService();
   }
 }

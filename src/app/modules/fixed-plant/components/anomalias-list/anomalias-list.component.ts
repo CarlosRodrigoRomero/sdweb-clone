@@ -5,18 +5,22 @@ import { MatTableDataSource } from '@angular/material/table';
 
 import { Map } from 'ol';
 
-import { take } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
-import { GLOBAL } from '@data/constants/global';
 import { FilterService } from '@data/services/filter.service';
-import { AnomaliasControlService } from '../../services/anomalias-control.service';
+import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { PlantaService } from '@data/services/planta.service';
+import { ViewReportService } from '@data/services/view-report.service';
+import { ZonesControlService } from '@data/services/zones-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
+
+import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
 
 @Component({
   selector: 'app-anomalias-list',
@@ -24,7 +28,8 @@ import { PlantaInterface } from '@core/models/planta';
   styleUrls: ['./anomalias-list.component.css'],
 })
 export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy {
-  displayedColumns: string[] = ['numAnom', 'tipo', 'perdidas', 'temp', 'gradiente'];
+  viewSeleccionada = 0;
+  displayedColumns: string[] = ['numAnom', 'tipo', 'temp', 'perdidas', 'gradiente'];
   dataSource: MatTableDataSource<any>;
   public selectedRow: string;
   public prevSelectedRow: any;
@@ -32,6 +37,7 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
   public anomaliaSelect;
   private map: Map;
   private planta: PlantaInterface;
+  private selectedInformeId: string;
 
   @ViewChild(MatSort) sort: MatSort;
 
@@ -42,24 +48,36 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
     private anomaliasControlService: AnomaliasControlService,
     private reportControlService: ReportControlService,
     private olMapService: OlMapService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private viewReportService: ViewReportService,
+    private zonesControlService: ZonesControlService
   ) {}
 
   ngOnInit() {
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
-    this.plantaService
-      .getPlanta(this.reportControlService.plantaId)
-      .pipe(take(1))
-      .subscribe((planta) => (this.planta = planta));
+    this.subscriptions.add(
+      this.viewReportService.reportViewSelected$.subscribe((sel) => {
+        this.viewSeleccionada = Number(sel);
+      })
+    );
+
+    this.planta = this.reportControlService.planta;
 
     this.subscriptions.add(
-      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-        this.filterService.filteredElements$.subscribe((elems) => {
+      this.reportControlService.selectedInformeId$
+        .pipe(
+          switchMap((informeId) => {
+            this.selectedInformeId = informeId;
+
+            return this.filterService.filteredElements$;
+          })
+        )
+        .subscribe((elems) => {
           const filteredElements = [];
 
           elems
-            .filter((elem) => (elem as Anomalia).informeId === informeId)
+            .filter((elem) => (elem as Anomalia).informeId === this.selectedInformeId)
             .forEach((anom) =>
               filteredElements.push({
                 id: anom.id,
@@ -70,7 +88,7 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
                 temperaturaMax: anom.temperaturaMax,
                 gradiente: anom.gradienteNormalizado,
                 gradienteNormalizado: anom.gradienteNormalizado,
-                color: GLOBAL.colores_tipos[anom.tipo],
+                color: COLOR.colores_tipos[anom.tipo],
                 clase: anom.clase,
                 anomalia: anom,
                 selected: false,
@@ -83,8 +101,7 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
           this.dataSource.sort = this.sort;
 
           this.dataSource.filterPredicate = (data, filter: string): boolean => data.numAnom.toString() === filter;
-        });
-      })
+        })
     );
 
     this.subscriptions.add(

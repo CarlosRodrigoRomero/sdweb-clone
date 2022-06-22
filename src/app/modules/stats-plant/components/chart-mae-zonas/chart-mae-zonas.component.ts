@@ -18,14 +18,17 @@ import {
   ApexTitleSubtitle,
 } from 'ng-apexcharts';
 
-import { GLOBAL } from '@data/constants/global';
 import { ReportControlService } from '@data/services/report-control.service';
 import { PlantaService } from '@data/services/planta.service';
 import { InformeService } from '@data/services/informe.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { Anomalia } from '@core/models/anomalia';
+
 import { Colors } from '@core/classes/colors';
+
+import { COLOR } from '@data/constants/color';
+import { GLOBAL } from '@data/constants/global';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -171,7 +174,7 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
 
     const colors = new Array(series.length);
     opacity.forEach((op, index) => {
-      colors[index] = Colors.hexToRgb(GLOBAL.gris, op);
+      colors[index] = Colors.hexToRgb(COLOR.gris, op);
     });
 
     let titleXAxis = 'Zona';
@@ -238,7 +241,7 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
             text: titleXAxis,
           },
         },
-        colors: [GLOBAL.gris],
+        colors: [COLOR.gris],
         yaxis: {
           decimalsInFloat: 0,
           max: (v) => {

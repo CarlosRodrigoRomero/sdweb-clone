@@ -3,14 +3,12 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 
-import { Observable, combineLatest, BehaviorSubject, iif, of } from 'rxjs';
+import { Observable, combineLatest, BehaviorSubject, iif, of, Subscription } from 'rxjs';
 import { map, take, switchMap } from 'rxjs/operators';
 
 import { Coordinate } from 'ol/coordinate';
 import Polygon from 'ol/geom/Polygon';
 
-import { InformeService } from './informe.service';
-import { GLOBAL } from '@data/constants/global';
 import { PlantaService } from '@data/services/planta.service';
 import { AdminService } from '@data/services/admin.service';
 import { OlMapService } from './ol-map.service';
@@ -24,6 +22,8 @@ import { InformeInterface } from '@core/models/informe';
 import { LocationAreaInterface } from '@core/models/location';
 import { ModuloInterface } from '@core/models/modulo';
 
+import { GLOBAL } from '@data/constants/global';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -36,10 +36,11 @@ export class AnomaliaService {
   public hasCriticidad$ = new BehaviorSubject<boolean>(this._hasCriticidad);
   private planta: PlantaInterface;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     public afs: AngularFirestore,
     private storage: AngularFireStorage,
-    private informeService: InformeService,
     private plantaService: PlantaService,
     private adminService: AdminService,
     private olMapService: OlMapService
@@ -48,25 +49,27 @@ export class AnomaliaService {
   initService(plantaId: string): Promise<void> {
     // obtenemos el criterio de criticidad de la planta si tuviese
     return new Promise((resolve, reject) => {
-      this.plantaService
-        .getPlanta(plantaId)
-        .pipe(
-          take(1),
-          switchMap((planta) => {
-            this.planta = planta;
+      this.subscriptions.add(
+        this.plantaService
+          .getPlanta(plantaId)
+          .pipe(
+            take(1),
+            switchMap((planta) => {
+              this.planta = planta;
 
-            return this.getCriterioId(planta);
-          }),
-          switchMap((criterioId) => this.plantaService.getCriterioCriticidad(criterioId))
-        )
-        .subscribe((criterio: CritCriticidad) => {
-          if (criterio.labels !== undefined) {
-            this.criterioCriticidad = criterio;
-          }
+              return this.getCriterioId(planta);
+            }),
+            switchMap((criterioId) => this.plantaService.getCriterioCriticidad(criterioId))
+          )
+          .subscribe((criterio: CritCriticidad) => {
+            if (criterio.labels !== undefined) {
+              this.criterioCriticidad = criterio;
+            }
 
-          // servicio iniciado
-          resolve();
-        });
+            // servicio iniciado
+            resolve();
+          })
+      );
     });
   }
 
@@ -494,6 +497,7 @@ export class AnomaliaService {
     this.storage
       .ref(`informes/${anomalia.informeId}/${folder}/${anomalia.archivoPublico}`)
       .getDownloadURL()
+      .pipe(take(1))
       .subscribe((downloadUrl) => {
         // (anomalia as PcInterface).downloadUrlStringRjpg = downloadUrl;
         const xhr = new XMLHttpRequest();
@@ -509,62 +513,6 @@ export class AnomaliaService {
           const url = window.URL.createObjectURL(blob);
           a.href = url;
           a.download = `${prefijo}_${anomalia.archivoPublico}`;
-          a.click();
-          window.URL.revokeObjectURL(url);
-        };
-        xhr.open('GET', downloadUrl);
-        xhr.send();
-      });
-  }
-
-  downloadRjpg(anomalia: Anomalia) {
-    this.storage
-      // .ref(`informes/${anomalia.informeId}/rjpg/${anomalia.archivoPublico}`)
-      .ref(`informes/${anomalia.informeId}/rjpg/informes_qfqeerbHSTROqL8O2TVk_jpg_200803_Arguedas_1.1.jpg`) // DEMO
-      .getDownloadURL()
-      .subscribe((downloadUrl) => {
-        (anomalia as PcInterface).downloadUrlStringRjpg = downloadUrl;
-        const xhr = new XMLHttpRequest();
-        xhr.responseType = 'blob';
-        xhr.onload = (event) => {
-          /* Create a new Blob object using the response
-           *  data of the onload object.
-           */
-          const blob = new Blob([xhr.response], { type: 'image/jpg' });
-          const a: any = document.createElement('a');
-          a.style = 'display: none';
-          document.body.appendChild(a);
-          const url = window.URL.createObjectURL(blob);
-          a.href = url;
-          a.download = `radiometrico_${anomalia.archivoPublico}`;
-          a.click();
-          window.URL.revokeObjectURL(url);
-        };
-        xhr.open('GET', downloadUrl);
-        xhr.send();
-      });
-  }
-
-  downloadJpgVisual(anomalia: Anomalia) {
-    this.storage
-      // .ref(`informes/${anomalia.informeId}/jpgVisual/${anomalia.archivoPublico}`)
-      .ref(`informes/${anomalia.informeId}/jpgVisual/informes_qfqeerbHSTROqL8O2TVk_jpgVisual_200803_Arguedas_1.1.jpg`) // DEMO
-      .getDownloadURL()
-      .subscribe((downloadUrl) => {
-        (anomalia as PcInterface).downloadUrlStringVisual = downloadUrl;
-        const xhr = new XMLHttpRequest();
-        xhr.responseType = 'blob';
-        xhr.onload = (event) => {
-          /* Create a new Blob object using the response
-           *  data of the onload object.
-           */
-          const blob = new Blob([xhr.response], { type: 'image/jpg' });
-          const a: any = document.createElement('a');
-          a.style = 'display: none';
-          document.body.appendChild(a);
-          const url = window.URL.createObjectURL(blob);
-          a.href = url;
-          a.download = `visual_${anomalia.archivoPublico}`;
           a.click();
           window.URL.revokeObjectURL(url);
         };
@@ -640,6 +588,18 @@ export class AnomaliaService {
     }
 
     return modulo;
+  }
+
+  resetService() {
+    this.selectedInformeId = undefined;
+    this.allAnomaliasInforme = undefined;
+    this.criterioCoA = GLOBAL.criterioCoA;
+    this.criterioCriticidad = undefined;
+    this.hasCriticidad = false;
+    this.planta = undefined;
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////

@@ -16,10 +16,12 @@
       <mat-sidenav
         *ngIf="showFilters"
         #sidenavLeft
-        [(opened)]="leftOpened"
+        opened
+        mode="side"
+        [fixedInViewport]="true"
         class="left-sidenav"
+        [fixedTopGap]="70"
         position="start"
-        disableClose
       >
         <div class="titulo">
           <h4>Filtros</h4>
@@ -41,6 +43,14 @@
           <app-map></app-map>
 
           <div>
+            <div class="info-change-view">
+              <!-- TOGGLE MAPAS -->
+              <app-view-toggle></app-view-toggle>
+
+              <!-- LEYENDA -->
+              <app-leyenda></app-leyenda>
+            </div>
+
             <div class="btns-export">
               <!-- BOTON COMPARTIR -->
               <app-share-report *ngIf="notSharedReport || completeView"></app-share-report>
@@ -53,37 +63,26 @@
               <mat-icon>tune</mat-icon>
             </button>
 
+            <app-zones *ngIf="thereAreZones"></app-zones>
+            <app-view-control></app-view-control>
+
             <div id="map-control" class="map-control">
               <!-- CONTROL TEMPORAL -->
               <div class="temporal-control">
-                <app-slider-temporal *ngIf="showFilters"></app-slider-temporal>
+                <app-slider-temporal *ngIf="numInformes > 1 && showFilters"></app-slider-temporal>
               </div>
 
               <!-- CONTROLES VISUALES -->
               <div class="visual-control">
                 <app-thermal-slider [informeId]="selectedInformeId"></app-thermal-slider>
-                <app-global-coord-areas *ngIf="thereAreZones"></app-global-coord-areas>
+                <!-- <app-global-coord-areas *ngIf="thereAreZones"></app-global-coord-areas> -->
                 <app-slider-opacity></app-slider-opacity>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- BOTON SIDENAV FILTROS -->
         <div *ngIf="anomaliasLoaded">
-          <button
-            *ngIf="showFilters"
-            mat-raised-button
-            class="btn-left"
-            (click)="sidenavLeft.toggle()"
-            matTooltip="Filtros"
-            matTooltipClass="tooltip-style"
-          >
-            <mat-icon *ngIf="!leftOpened">keyboard_arrow_right</mat-icon>
-            <mat-icon *ngIf="leftOpened">keyboard_arrow_left</mat-icon>
-            <mat-icon>filter_alt</mat-icon>
-          </button>
-
           <!-- BOTON SIDENAV LISTA ANOMALIAS -->
           <button
             mat-raised-button

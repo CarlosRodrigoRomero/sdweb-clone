@@ -6,11 +6,12 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
-import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { PlantaService } from '@data/services/planta.service';
+import { ViewReportService } from '@data/services/view-report.service';
+import { ZonesControlService } from '@data/services/zones-control.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
@@ -36,23 +37,24 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
   public seguidorHovered: Seguidor = undefined;
   public seguidorSelected: Seguidor = undefined;
   private planta: PlantaInterface;
-  private informeId: string;
+  private selectedInformeId: string;
 
   private subscriptions: Subscription = new Subscription();
 
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(
-    private mapSeguidoresService: MapSeguidoresService,
     public filterService: FilterService,
     private reportControlService: ReportControlService,
     private seguidoresControlService: SeguidoresControlService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private viewReportService: ViewReportService,
+    private zonesControlService: ZonesControlService
   ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.mapSeguidoresService.toggleViewSelected$.subscribe((sel) => {
+      this.viewReportService.reportViewSelected$.subscribe((sel) => {
         this.viewSeleccionada = Number(sel);
 
         // cambiammos la ultima columna con la vista seleccionada
@@ -70,18 +72,13 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
       })
     );
 
-    this.subscriptions.add(
-      this.plantaService
-        .getPlanta(this.reportControlService.plantaId)
-        .pipe(
-          take(1),
-          switchMap((planta) => {
-            this.planta = planta;
+    this.planta = this.reportControlService.planta;
 
-            return this.reportControlService.selectedInformeId$;
-          }),
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$
+        .pipe(
           switchMap((informeId) => {
-            this.informeId = informeId;
+            this.selectedInformeId = informeId;
 
             return this.filterService.filteredElements$;
           })
@@ -90,7 +87,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
           const filteredElements = [];
 
           elems
-            .filter((elem) => (elem as Seguidor).informeId === this.informeId)
+            .filter((elem) => (elem as Seguidor).informeId === this.selectedInformeId)
             .forEach((elem) => {
               const seguidor = elem as Seguidor;
 
@@ -137,7 +134,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
   hoverSeguidor(row: any) {
     if (this.seguidorSelected === undefined) {
       this.seguidoresControlService.seguidorHovered = row.seguidor;
-      this.seguidoresControlService.setExternalStyle(row.seguidor.id, true);
+      this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, true);
       this.seguidoresControlService.setPopupPosition(row.seguidor.featureCoords[0]);
     }
   }
@@ -145,7 +142,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
   unhoverSeguidor(row: any) {
     if (this.seguidorSelected === undefined) {
       this.seguidoresControlService.seguidorHovered = undefined;
-      this.seguidoresControlService.setExternalStyle(row.seguidor.id, false);
+      this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, false);
     }
   }
 
@@ -155,12 +152,15 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
 
     // reiniciamos el estilo al anterior seguidor
     if (this.seguidoresControlService.prevSeguidorSelected !== undefined) {
-      this.seguidoresControlService.setExternalStyle(this.seguidoresControlService.prevSeguidorSelected.id, false);
+      this.seguidoresControlService.setExternalStyleSeguidor(
+        this.seguidoresControlService.prevSeguidorSelected.id,
+        false
+      );
     }
     this.seguidoresControlService.prevSeguidorSelected = row.seguidor;
 
     this.seguidoresControlService.seguidorSelected = row.seguidor;
-    this.seguidoresControlService.setExternalStyle(row.seguidor.id, true);
+    this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, false);
     this.seguidoresControlService.seguidorViewOpened = true;
   }
 

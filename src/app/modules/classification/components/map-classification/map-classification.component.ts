@@ -19,10 +19,11 @@ import { OSM } from 'ol/source';
 import { click } from 'ol/events/condition';
 import LineString from 'ol/geom/LineString';
 
+import moment from 'moment';
+
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 
-import { GLOBAL } from '@data/constants/global';
 import { ClassificationService } from '@data/services/classification.service';
 import { InformeService } from '@data/services/informe.service';
 import { OlMapService } from '@data/services/ol-map.service';
@@ -36,7 +37,9 @@ import { PlantaInterface } from '@core/models/planta';
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { Anomalia } from '@core/models/anomalia';
 
-import moment from 'moment';
+import { COLOR } from '@data/constants/color';
+import { GLOBAL } from '@data/constants/global';
+import { PALETTE } from '@data/constants/palette';
 
 @Component({
   selector: 'app-map-classification',
@@ -54,7 +57,7 @@ export class MapClassificationComponent implements OnInit {
   private normModLayer: VectorLayer = undefined;
   private prevFeatureHover: Feature;
   thermalLayerVisibility = true;
-  private palette = GLOBAL.ironPalette;
+  private palette = PALETTE.ironPalette;
   normModSelected: NormalizedModule;
   anomaliaSelected: Anomalia;
   public showAnomOk = false;
@@ -145,7 +148,7 @@ export class MapClassificationComponent implements OnInit {
           imageTile.getImage().src = src;
           imageTile.thermalLayer = thermalLayer;
           imageTile.index = 0;
-          },
+        },
       }),
 
       // extent: this.extent1,
@@ -487,7 +490,7 @@ export class MapClassificationComponent implements OnInit {
 
           return new Style({
             stroke: new Stroke({
-              color: GLOBAL.colores_tipos[anomalia.tipo],
+              color: COLOR.colores_tipos[anomalia.tipo],
               width: hovered ? 4 : 2,
             }),
             fill: new Fill({
@@ -519,10 +522,10 @@ export class MapClassificationComponent implements OnInit {
   }
 
   setThermalPalette() {
-    if (this.palette === GLOBAL.ironPalette) {
-      this.palette = GLOBAL.rainbow_hc_palette;
+    if (this.palette === PALETTE.ironPalette) {
+      this.palette = PALETTE.rainbow_hc_palette;
     } else {
-      this.palette = GLOBAL.ironPalette;
+      this.palette = PALETTE.ironPalette;
     }
 
     this.map

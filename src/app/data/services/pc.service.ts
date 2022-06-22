@@ -1,14 +1,18 @@
 import { Injectable } from '@angular/core';
-import { PcInterface, Pc } from '@core/models/pc';
+
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { Observable, BehaviorSubject } from 'rxjs';
+
+import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { map, take, switchMap } from 'rxjs/operators';
-import { GLOBAL } from '@data/constants/global';
-import { PlantaService } from './planta.service';
-import { AuthService } from './auth.service';
+
+import { PlantaService } from '@data/services/planta.service';
+import { AuthService } from '@data/services/auth.service';
+
 import { UserAreaInterface } from '@core/models/userArea';
 import { CritCoA } from '@core/models/critCoA';
-import { stringify } from '@angular/compiler/src/util';
+import { PcInterface, Pc } from '@core/models/pc';
+
+import { GLOBAL } from '@data/constants/global';
 
 export interface SeguidorInterface {
   pcs: PcInterface[];
@@ -45,6 +49,8 @@ export class PcService {
   private filteredSeguidores = new BehaviorSubject<SeguidorInterface[]>(new Array<SeguidorInterface>());
   public filteredSeguidores$ = this.filteredSeguidores.asObservable();
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(public afs: AngularFirestore, public plantaService: PlantaService, public auth: AuthService) {
     this.pcsCollection = afs.collection<PcInterface>('pcs');
 
@@ -71,13 +77,6 @@ export class PcService {
     this.filtroGradiente$.subscribe((filtro) => {
       this.currentFiltroGradiente = filtro;
     });
-    // console.log('filtrosCategorias', this.filtroCategoria, this.filtroClase);
-    // this.currentFilteredPcs$ = this.filtroCategoria$
-    //   .mergeMap( filtro1 => this.filtroClase$
-    //     .mergeMap( filtro2 => this.allPcs$
-    //       .mergeMap( allPcs => allPcs.filter( (pc) => {
-    //         return filtro2.includes(pc.tipo) && filtro1.includes(this.getPcCoA(pc));
-    //       }))));
   }
 
   private aplicarFiltros() {
@@ -527,5 +526,17 @@ export class PcService {
     data.push(pc.local_y);
 
     return data.join('.');
+  }
+
+  resetService() {
+    this.allPcsInformeEdit$ = undefined;
+    this.allPcs = undefined;
+    this.pcDoc = undefined;
+    this.url = undefined;
+    this.filteredPcsSource = new BehaviorSubject<PcInterface[]>(new Array<PcInterface>());
+    this.filteredSeguidores = new BehaviorSubject<SeguidorInterface[]>(new Array<SeguidorInterface>());
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 }

@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 
+import { take } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
+
 import PointInPolygon from 'point-in-polygon';
 
 import { PlantaService } from './planta.service';
@@ -11,17 +14,46 @@ import { PlantaInterface } from '@core/models/planta';
   providedIn: 'root',
 })
 export class ZonesService {
+  locAreas: LocationAreaInterface[] = [];
+  zones: LocationAreaInterface[] = [];
+  zonesBySize: LocationAreaInterface[][] = [];
+  private _thereAreZones = false;
+  thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
+
   constructor(private plantaService: PlantaService) {}
 
-  getZones(planta: PlantaInterface, locAreas: LocationAreaInterface[]) {
+  initService(planta: PlantaInterface): Promise<boolean> {
+    return new Promise((initService) => {
+      this.plantaService
+        .getLocationsArea(planta.id)
+        .pipe(take(1))
+        .subscribe((locAreas) => {
+          this.locAreas = locAreas;
+          this.zones = this.getZones(planta, locAreas);
+          if (this.zones.length > 0) {
+            this.thereAreZones = true;
+
+            this.zonesBySize = this.getCompleteGlobals(this.zones);
+            this.zones = this.zonesBySize.flat();
+          }
+
+          initService(true);
+        });
+    });
+  }
+
+  getZones(planta: PlantaInterface, locAreas: LocationAreaInterface[]): LocationAreaInterface[] {
     // obtenemos las areas descartando las que no tienen globals, que son las de los modulos
     const realLocAreas = locAreas.filter(
-      (locArea) => locArea.globalCoords.toString() !== ',,' && locArea.globalCoords.toString() !== ''
+      (locArea) =>
+        locArea.globalCoords.toString() !== ',' &&
+        locArea.globalCoords.toString() !== ',,' &&
+        locArea.globalCoords.toString() !== ''
     );
 
     if (planta.tipo === 'seguidores') {
       // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
-      const indiceSeleccionado = this.getIndiceGlobalCoordsSeguidores(realLocAreas);
+      const indiceSeleccionado = this.getIndexNotNull(realLocAreas);
 
       // filtramos las areas seleccionadas para los seguidores
       const locAreaSeguidores = realLocAreas.filter(
@@ -40,10 +72,24 @@ export class ZonesService {
     }
   }
 
-  getIndiceGlobalCoordsSeguidores(locAreas: LocationAreaInterface[]): number {
-    const coordsLength = locAreas[0].globalCoords.length;
+  private getZonesBySize(zones: LocationAreaInterface[]): LocationAreaInterface[][] {
+    const indexNotNull = this.getIndexNotNull(zones);
+    const zonesBySize = new Array<LocationAreaInterface[]>(indexNotNull + 1);
+    for (let index = indexNotNull; index >= 0; index--) {
+      let indexZones = zones.filter((zone) => zone.globalCoords[index]);
+      if (zonesBySize[index + 1] !== undefined) {
+        indexZones = indexZones.filter((zone) => !zonesBySize[index + 1].includes(zone));
+      }
+      zonesBySize[index] = indexZones;
+    }
 
+    return zonesBySize;
+  }
+
+  getIndexNotNull(locAreas: LocationAreaInterface[]): number {
     let indiceSeleccionado;
+
+    const coordsLength = locAreas[0].globalCoords.length;
 
     for (let index = coordsLength - 1; index >= 0; index--) {
       const notNullLocAreas = locAreas.filter(
@@ -87,7 +133,7 @@ export class ZonesService {
           if (PointInPolygon(centroid, polygon)) {
             largestZone.globalCoords.forEach((coord, i) => {
               if (coord !== null && coord !== undefined && coord !== '') {
-                // si la global del otherZone es incorrecta le aplicamos la del area
+                // si la global del otherZone es incorrecta le aplicamos la de la zona mayor
                 if (globalCoordsZone[i] === null || globalCoordsZone[i] === undefined || globalCoordsZone[i] === '') {
                   globalCoordsZone[i] = coord;
                 }
@@ -102,6 +148,49 @@ export class ZonesService {
     }
   }
 
+  getCompleteGlobals(zones: LocationAreaInterface[]): LocationAreaInterface[][] {
+    const zonesBySize = this.getZonesBySize(zones);
+    if (zonesBySize.length === 1) {
+      return [zones];
+    } else if (zonesBySize.length > 1) {
+      zonesBySize.forEach((zonesSize, index) => {
+        // las mayores ya tienen las globals correctas
+        if (index > 0) {
+          const zonasMayores = zonesBySize[index - 1];
+
+          zonesSize.forEach((zone) => {
+            const globalCoordsZone: string[] = zone.globalCoords;
+            // calculamos el centroide de la zona
+            const centroid = this.getLocAreaCentroid(zone);
+
+            zonasMayores.forEach((zonaMayor) => {
+              const polygon = zonaMayor.path.map((coord) => [coord.lat, coord.lng]);
+
+              // comprobamos si esta dentro de la largestZone
+              if (PointInPolygon(centroid, polygon)) {
+                zonaMayor.globalCoords.forEach((coord, i) => {
+                  if (coord !== null && coord !== undefined && coord !== '') {
+                    // si la global del otherZone es incorrecta le aplicamos la de la zona mayor
+                    if (
+                      globalCoordsZone[i] === null ||
+                      globalCoordsZone[i] === undefined ||
+                      globalCoordsZone[i] === ''
+                    ) {
+                      globalCoordsZone[i] = coord;
+                    }
+                  }
+                });
+                zone.globalCoords = globalCoordsZone;
+              }
+            });
+          });
+        }
+      });
+
+      return zonesBySize;
+    }
+  }
+
   private getLocAreaCentroid(locArea: LocationAreaInterface): number[] {
     let sumLong = 0;
     let sumLat = 0;
@@ -111,5 +200,21 @@ export class ZonesService {
     });
 
     return [sumLat / locArea.path.length, sumLong / locArea.path.length];
+  }
+
+  resetService() {
+    this.locAreas = [];
+    this.zones = [];
+    this.zonesBySize = [];
+    this.thereAreZones = false;
+  }
+
+  get thereAreZones(): boolean {
+    return this._thereAreZones;
+  }
+
+  set thereAreZones(value: boolean) {
+    this._thereAreZones = value;
+    this.thereAreZones$.next(value);
   }
 }

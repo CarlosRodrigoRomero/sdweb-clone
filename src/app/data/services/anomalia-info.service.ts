@@ -1,6 +1,10 @@
 import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { formatNumber, formatDate } from '@angular/common';
 
+import { Subscription } from 'rxjs';
+
+import proj4 from 'proj4';
+
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { PlantaService } from '@data/services/planta.service';
 import { GLOBAL } from '@data/constants/global';
@@ -11,7 +15,8 @@ import { Translation } from '@shared/utils/translations/translations';
 import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
-import proj4 from 'proj4';
+
+import { COLOR } from '@data/constants/color';
 
 @Injectable({
   providedIn: 'root',
@@ -20,20 +25,24 @@ export class AnomaliaInfoService {
   private translation: Translation;
   private language: string;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     @Inject(LOCALE_ID) public locale: string,
     private anomaliaService: AnomaliaService,
     private plantaService: PlantaService,
     private downloadReportService: DownloadReportService
   ) {
-    this.downloadReportService.englishLang$.subscribe((lang) => {
-      if (lang) {
-        this.language = 'en';
-      } else {
-        this.language = 'es';
-      }
-      this.translation = new Translation(this.language);
-    });
+    this.subscriptions.add(
+      this.downloadReportService.englishLang$.subscribe((lang) => {
+        if (lang) {
+          this.language = 'en';
+        } else {
+          this.language = 'es';
+        }
+        this.translation = new Translation(this.language);
+      })
+    );
   }
 
   getTipoLabel(anomalia: Anomalia): string {
@@ -178,5 +187,20 @@ export class AnomaliaInfoService {
     } else {
       return localY;
     }
+  }
+
+  getPerdidasColor(perdidas: number): string {
+    if (perdidas < 0.3) {
+      return COLOR.colores_severity[0];
+    } else if (perdidas < 0.5) {
+      return COLOR.colores_severity[1];
+    } else {
+      return COLOR.colores_severity[2];
+    }
+  }
+
+  resetService() {
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 }

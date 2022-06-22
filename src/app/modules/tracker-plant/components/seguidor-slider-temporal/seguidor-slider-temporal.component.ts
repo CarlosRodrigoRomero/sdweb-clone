@@ -8,7 +8,7 @@ import { LabelType, Options } from '@angular-slider/ngx-slider';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { InformeService } from '@data/services/informe.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 
 @Component({

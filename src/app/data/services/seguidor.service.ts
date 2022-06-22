@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore } from '@angular/fire/firestore';
-import { AngularFireStorage } from '@angular/fire/storage';
 
 import PointInPolygon from 'point-in-polygon';
 
-import { InformeService } from './informe.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { PlantaService } from '@data/services/planta.service';
 import { ZonesService } from './zones.service';
@@ -19,7 +17,7 @@ import { LocationAreaInterface } from '@core/models/location';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 
-import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
 
 @Injectable({
   providedIn: 'root',
@@ -32,9 +30,7 @@ export class SeguidorService {
   private locAreaModulos: LocationAreaInterface[] = [];
 
   constructor(
-    private informeService: InformeService,
     public afs: AngularFirestore,
-    private storage: AngularFireStorage,
     private anomaliaService: AnomaliaService,
     private plantaService: PlantaService,
     private zonesService: ZonesService
@@ -56,7 +52,9 @@ export class SeguidorService {
         });
         return combineLatest(anomaliaObsList);
       }),
-      map((arr) => arr.flat())
+      map((arr) => {
+        return arr.flat();
+      })
     );
   }
 
@@ -161,7 +159,7 @@ export class SeguidorService {
         this.locAreaModulos = locAreaList.filter((locArea) => locArea.modulo !== undefined);
 
         // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
-        const indiceSeleccionado = this.zonesService.getIndiceGlobalCoordsSeguidores(locAreaList);
+        const indiceSeleccionado = this.zonesService.getIndexNotNull(locAreaList);
         this.numGlobalCoords = indiceSeleccionado + 1;
 
         // filtramos las areas seleccionadas para los seguidores
@@ -302,25 +300,31 @@ export class SeguidorService {
 
   getPerdidasAnomColor(anomalia: Anomalia) {
     if (anomalia.perdidas < 0.33) {
-      return GLOBAL.colores_mae[0];
+      return COLOR.colores_severity[0];
     } else if (anomalia.perdidas < 0.66) {
-      return GLOBAL.colores_mae[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_mae[2];
+      return COLOR.colores_severity[2];
     }
   }
 
   getCelsCalientesAnomColor(anomalia: Anomalia) {
-    return 'red';
+    if (anomalia.gradienteNormalizado < 10) {
+      return COLOR.colores_severity[0];
+    } else if (anomalia.gradienteNormalizado < 40) {
+      return COLOR.colores_severity[1];
+    } else {
+      return COLOR.colores_severity[2];
+    }
   }
 
   getGradienteAnomColor(anomalia: Anomalia) {
     if (anomalia.gradienteNormalizado < 10) {
-      return GLOBAL.colores_grad[0];
+      return COLOR.colores_severity[0];
     } else if (anomalia.gradienteNormalizado < 40) {
-      return GLOBAL.colores_grad[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_grad[2];
+      return COLOR.colores_severity[2];
     }
   }
 }

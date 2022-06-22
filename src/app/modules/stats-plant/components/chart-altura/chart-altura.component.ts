@@ -4,13 +4,14 @@ import { Subscription } from 'rxjs';
 
 import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent, ApexYAxis, ApexTooltip } from 'ng-apexcharts';
 
-import { GLOBAL } from '@data/constants/global';
 import { ReportControlService } from '@data/services/report-control.service';
 import { InformeService } from '@data/services/informe.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
+
+import { COLOR } from '@data/constants/color';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -89,7 +90,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
     dataLabels: {
       enabled: false,
     },
-    colors: [GLOBAL.gris],
+    colors: [COLOR.gris],
     yaxis: {
       title: {
         text: 'Fila',

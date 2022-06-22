@@ -417,7 +417,11 @@ export class InformeService {
     return this.informe;
   }
 
-  getDateLabelsInformes(informesId: string[]) {
+  getDateLabelInforme(informe: InformeInterface): string {
+    return this.unixToDateLabel(informe.fecha);
+  }
+
+  getDateLabelsInformes(informesId: string[]): Observable<string[]> {
     return combineLatest(
       informesId.map((informeId) =>
         this.getInforme(informeId).pipe(

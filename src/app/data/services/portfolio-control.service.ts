@@ -8,7 +8,6 @@ import { Fill, Stroke, Style } from 'ol/style';
 import Map from 'ol/Map';
 import { Coordinate } from 'ol/coordinate';
 
-import { GLOBAL } from '@data/constants/global';
 import { AuthService } from '@data/services/auth.service';
 import { PlantaService } from '@data/services/planta.service';
 import { InformeService } from '@data/services/informe.service';
@@ -20,6 +19,9 @@ import { InformeInterface } from '@core/models/informe';
 import { UserInterface } from '@core/models/user';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { MathOperations } from '@core/classes/math-operations';
+
+import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
 
 @Injectable({
   providedIn: 'root',
@@ -265,17 +267,6 @@ export class PortfolioControlService {
     this.map.getOverlayById('popup').setPosition(coords);
   }
 
-  resetService() {
-    this.plantaHovered = undefined;
-    this.maePlantas = [];
-    this.maeMedio = undefined;
-    this.maeSigma = undefined;
-    this.numPlantas = 0;
-    this.potenciaTotal = 0;
-    this.listaPlantas = [];
-    this.allFeatures = [];
-  }
-
   /////////////////     ESTILOS      ////////////////////
 
   public getColorMae(mae: number, opacity?: number): string {
@@ -283,16 +274,16 @@ export class PortfolioControlService {
     if (this.numPlantas < 3) {
       GLOBAL.mae_rangos.forEach((rango, index) => {
         if (mae > rango) {
-          colorMae = GLOBAL.colores_mae_rgb[index + 1];
+          colorMae = COLOR.colores_severity_rgb[index + 1];
         }
       });
     } else {
       if (mae >= this.maeMedio + this.maeSigma) {
-        colorMae = GLOBAL.colores_mae_rgb[2];
+        colorMae = COLOR.colores_severity_rgb[2];
       } else if (mae <= this.maeMedio) {
-        colorMae = GLOBAL.colores_mae_rgb[0];
+        colorMae = COLOR.colores_severity_rgb[0];
       } else {
-        colorMae = GLOBAL.colores_mae_rgb[1];
+        colorMae = COLOR.colores_severity_rgb[1];
       }
     }
 
@@ -309,16 +300,16 @@ export class PortfolioControlService {
     if (this.numPlantas < 3) {
       GLOBAL.mae_rangos.forEach((rango, index) => {
         if (mae >= rango) {
-          colorMae = GLOBAL.colores_new_mae_rgb[index + 1];
+          colorMae = COLOR.colores_severity_rgb[index + 1];
         }
       });
     } else {
       if (mae >= this.maeMedio + this.maeSigma) {
-        colorMae = GLOBAL.colores_new_mae_rgb[2];
+        colorMae = COLOR.colores_severity_rgb[2];
       } else if (mae <= this.maeMedio) {
-        colorMae = GLOBAL.colores_new_mae_rgb[0];
+        colorMae = COLOR.colores_severity_rgb[0];
       } else {
-        colorMae = GLOBAL.colores_new_mae_rgb[1];
+        colorMae = COLOR.colores_severity_rgb[1];
       }
     }
 
@@ -392,6 +383,17 @@ export class PortfolioControlService {
     } else {
       feature.setStyle(unfocusedStyle);
     }
+  }
+
+  resetService() {
+    this.plantaHovered = undefined;
+    this.maePlantas = [];
+    this.maeMedio = undefined;
+    this.maeSigma = undefined;
+    this.numPlantas = 0;
+    this.potenciaTotal = 0;
+    this.listaPlantas = [];
+    this.allFeatures = [];
   }
 
   get plantaHovered() {

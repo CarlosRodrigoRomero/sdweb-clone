@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { SeguidorService } from '@data/services/seguidor.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';

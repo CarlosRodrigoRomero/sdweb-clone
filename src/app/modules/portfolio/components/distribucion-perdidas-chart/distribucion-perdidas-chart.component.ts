@@ -17,7 +17,8 @@ import { PortfolioControlService } from '@data/services/portfolio-control.servic
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
-import { GLOBAL } from '@data/constants/global';
+
+import { COLOR } from '@data/constants/color';
 
 export type ChartOptions = {
   series: ApexNonAxisChartSeries;
@@ -98,7 +99,7 @@ export class DistribucionPerdidasChartComponent implements OnInit {
       theme: {
         monochrome: {
           enabled: true,
-          color: GLOBAL.colores_new_mae[2],
+          color: COLOR.colores_severity[2],
         },
       },
       plotOptions: {

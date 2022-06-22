@@ -12,7 +12,7 @@ import Pica from 'pica';
 import { GLOBAL } from '@data/constants/global';
 import { PcService } from '@data/services/pc.service';
 import { PlantaService } from '@data/services/planta.service';
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 
 import { PcInterface } from '@core/models/pc';
 import { PlantaInterface } from '@core/models/planta';

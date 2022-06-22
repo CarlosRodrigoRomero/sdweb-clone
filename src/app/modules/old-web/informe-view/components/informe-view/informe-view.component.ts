@@ -10,11 +10,14 @@ import { PcService } from '@data/services/pc.service';
 import { InformeService } from '@data/services/informe.service';
 import { PlantaService } from '@data/services/planta.service';
 import { AuthService } from '@data/services/auth.service';
-import { GLOBAL } from '@data/constants/global';
 
 import { PcInterface } from '@core/models/pc';
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
+
+import { COLOR } from '@data/constants/color';
+import { GLOBAL } from '@data/constants/global';
+
 
 @Component({
   selector: 'app-informe-view',
@@ -110,8 +113,8 @@ export class InformeViewComponent implements OnInit, OnDestroy {
       datasets: [
         {
           label: 'Clase',
-          backgroundColor: GLOBAL.colores_clase,
-          hoverBackgroundColor: GLOBAL.colores_clase,
+          backgroundColor: COLOR.colores_clase,
+          hoverBackgroundColor: COLOR.colores_clase,
           data: [1, 1, 1, 1],
         },
       ],
@@ -169,8 +172,8 @@ export class InformeViewComponent implements OnInit, OnDestroy {
       datasets: [
         {
           label: 'Severidad',
-          backgroundColor: GLOBAL.colores_clase,
-          hoverBackgroundColor: GLOBAL.colores_clase,
+          backgroundColor: COLOR.colores_clase,
+          hoverBackgroundColor: COLOR.colores_clase,
           data: this.countSeveridad,
         },
       ],

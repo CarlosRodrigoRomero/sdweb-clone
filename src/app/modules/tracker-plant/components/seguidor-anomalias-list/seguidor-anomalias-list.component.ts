@@ -6,7 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { combineLatest, Subscription } from 'rxjs';
 
 import { GLOBAL } from '@data/constants/global';
-import { SeguidoresControlService } from '../../services/seguidores-control.service';
+import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 
 import { Seguidor } from '@core/models/seguidor';
@@ -46,7 +46,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
     this.subscriptions.add(
       combineLatest([
         this.seguidoresControlService.seguidorSelected$,
-        this.seguidorViewService.toggleViewSelected$,
+        this.seguidorViewService.seguidorViewSelected$,
       ]).subscribe(([seguidor, view]) => {
         this.seguidorSelected = seguidor;
         this.viewSelected = view;

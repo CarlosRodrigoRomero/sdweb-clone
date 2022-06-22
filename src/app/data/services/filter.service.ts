@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 
 import { ShareReportService } from '@data/services/share-report.service';
 import { FilterControlService } from '@data/services/filter-control.service';
@@ -20,15 +20,14 @@ export class FilterService {
   private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   public filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
+  private prevAllFilterableElems: FilterableElement[];
   private _filteredElements: FilterableElement[] = [];
   public filteredElements$ = new BehaviorSubject<FilterableElement[]>(this.filteredElements);
   private _allFiltrableElements: FilterableElement[] = [];
   public allFiltrableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFiltrableElements);
-  private _filteredElementsWithoutFilterTipo: FilterableElement[] = [];
-  public filteredElementsWithoutFilterTipo$ = new BehaviorSubject<FilterableElement[]>(
-    this._filteredElementsWithoutFilterTipo
-  );
   public plantaSeguidores = false;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private router: Router,
@@ -42,23 +41,24 @@ export class FilterService {
 
     return new Promise((response, reject) => {
       if (shared) {
-        this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params));
+        this.subscriptions.add(
+          this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params))
+        );
 
         // obtenemos lo filtros guardados en al DB y los añadimos
-        this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
-          if (filters.length > 0) {
-            this.addFilters(filters);
+        this.subscriptions.add(
+          this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
+            if (filters.length > 0) {
+              this.addFilters(filters);
 
-            response(true);
-          }
-        });
+              response(true);
+            }
+          })
+        );
         response(true);
       } else {
         response(true);
       }
-
-      // para contabilizar los diferentes filtros 'tipo'
-      this.filteredElementsWithoutFilterTipo = elems;
     });
   }
 
@@ -208,6 +208,18 @@ export class FilterService {
     }
   }
 
+  filterCCs(viewSelected: number) {
+    if (viewSelected === 1) {
+      this.prevAllFilterableElems = this.allFiltrableElements;
+      this.allFiltrableElements = this.allFiltrableElements.filter((elem) => elem.tipo == 8 || elem.tipo == 9);
+      this.processFilters();
+    } else if (this.prevAllFilterableElems !== undefined) {
+      this.allFiltrableElements = this.prevAllFilterableElems;
+      this.processFilters();
+      this.prevAllFilterableElems = undefined;
+    }
+  }
+
   private unapplyFilters() {
     this.filteredElements = this.allFiltrableElements;
   }
@@ -254,51 +266,6 @@ export class FilterService {
     this.processFilters();
   }
 
-  private excludeTipoFilters() {
-    const everyFilterFiltrableElements: Array<FilterableElement[]> = new Array<FilterableElement[]>();
-
-    // comprobamos si hay filtros de tipo 'multiple'
-    if (this.filters.filter((filter) => this.multipleFilters.includes(filter.type)).length > 0) {
-      // separamos los elems por tipo de filtro excluyendo los filtros "tipo"
-      this.multipleFilters
-        .filter((type) => type !== 'tipo')
-        .forEach((type) => {
-          const newFiltrableElements: FilterableElement[] = [];
-          if (this.filters.filter((filter) => filter.type === type).length > 0) {
-            this.filters
-              .filter((filter) => filter.type === type)
-              .forEach((filter) => {
-                filter.applyFilter(this.allFiltrableElements).forEach((pc) => newFiltrableElements.push(pc));
-              });
-            // añadimos un array de cada tipo
-            everyFilterFiltrableElements.push(newFiltrableElements);
-          }
-        });
-    }
-
-    // añadimos al array los elems filtrados de los filtros no 'multiple'
-    this.filters
-      .filter((filter) => !this.multipleFilters.includes(filter.type))
-      .forEach((filter) => {
-        const newFiltrableElements = filter.applyFilter(this.allFiltrableElements);
-        everyFilterFiltrableElements.push(newFiltrableElements);
-      });
-
-    // calculamos la interseccion de los array de los diferentes tipos
-    if (everyFilterFiltrableElements.length > 0) {
-      this.filteredElementsWithoutFilterTipo = everyFilterFiltrableElements.reduce((anterior, actual) =>
-        anterior.filter((pc) => actual.includes(pc))
-      );
-    }
-
-    // comprobamos que hay algun filtro activo
-    if (everyFilterFiltrableElements.length === 0) {
-      this.filteredElementsWithoutFilterTipo = this.allFiltrableElements;
-    }
-
-    this.filteredElementsWithoutFilterTipo$.next(this.filteredElementsWithoutFilterTipo);
-  }
-
   addElement(element: FilterableElement) {
     this.allFiltrableElements.push(element);
 
@@ -309,6 +276,20 @@ export class FilterService {
     if (this.router.url.includes('tracker')) {
       this.plantaSeguidores = true;
     }
+  }
+
+  resetService() {
+    this.multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad'];
+    this.noAmosSegsFilters = ['area'];
+    this.otherFilters = ['confianza', 'aspectRatio', 'areaM'];
+    this.filters = [];
+    this.prevAllFilterableElems = undefined;
+    this.filteredElements = [];
+    this.allFiltrableElements = [];
+    this.plantaSeguidores = false;
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 
   /////////////////////////////////////////////////
@@ -329,14 +310,5 @@ export class FilterService {
   set filteredElements(value: FilterableElement[]) {
     this._filteredElements = value;
     this.filteredElements$.next(value);
-  }
-
-  get filteredElementsWithoutFilterTipo() {
-    return this._filteredElementsWithoutFilterTipo;
-  }
-
-  set filteredElementsWithoutFilterTipo(value: FilterableElement[]) {
-    this._filteredElementsWithoutFilterTipo = value;
-    this.filteredElementsWithoutFilterTipo$.next(value);
   }
 }

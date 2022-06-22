@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
@@ -24,17 +24,21 @@ export class ShareReportService {
   private params$ = new BehaviorSubject<ParamsFilterShare>(this.params);
   private idDB: string;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(private afs: AngularFirestore) {}
 
   initService(id: string) {
-    this.afs
-      .collection('share')
-      .doc(id)
-      .get()
-      .subscribe((params) => {
-        this.params = params.data();
-        this.params$.next(this.params);
-      });
+    this.subscriptions.add(
+      this.afs
+        .collection('share')
+        .doc(id)
+        .get()
+        .subscribe((params) => {
+          this.params = params.data();
+          this.params$.next(this.params);
+        })
+    );
   }
 
   setPlantaId(plantaId: string) {
@@ -181,89 +185,99 @@ export class ShareReportService {
     const filters: FilterInterface[] = [];
     const filters$ = new BehaviorSubject<FilterInterface[]>(filters);
 
-    this.afs
-      .collection('share')
-      .doc(id)
-      .get()
-      .subscribe((params) => {
-        this.params = params.data();
+    this.subscriptions.add(
+      this.afs
+        .collection('share')
+        .doc(id)
+        .get()
+        .subscribe((params) => {
+          this.params = params.data();
 
-        if (Object.keys(this.params).includes('minGradient')) {
-          if (this.params.minGradient !== null) {
-            const gradientFilter = new GradientFilter('gradient', this.params.minGradient, this.params.maxGradient);
-            filters.push(gradientFilter);
+          if (Object.keys(this.params).includes('minGradient')) {
+            if (this.params.minGradient !== null) {
+              const gradientFilter = new GradientFilter('gradient', this.params.minGradient, this.params.maxGradient);
+              filters.push(gradientFilter);
+            }
           }
-        }
-        if (Object.keys(this.params).includes('minPerdidas')) {
-          if (this.params.minPerdidas !== null) {
-            const perdidasFilter = new PerdidasFilter('perdidas', this.params.minPerdidas, this.params.maxPerdidas);
-            filters.push(perdidasFilter);
+          if (Object.keys(this.params).includes('minPerdidas')) {
+            if (this.params.minPerdidas !== null) {
+              const perdidasFilter = new PerdidasFilter('perdidas', this.params.minPerdidas, this.params.maxPerdidas);
+              filters.push(perdidasFilter);
+            }
           }
-        }
-        if (Object.keys(this.params).includes('minTempMax')) {
-          if (this.params.minTempMax !== null) {
-            const tempMaxFilter = new TempMaxFilter('tempMax', this.params.minTempMax, this.params.maxTempMax);
-            filters.push(tempMaxFilter);
+          if (Object.keys(this.params).includes('minTempMax')) {
+            if (this.params.minTempMax !== null) {
+              const tempMaxFilter = new TempMaxFilter('tempMax', this.params.minTempMax, this.params.maxTempMax);
+              filters.push(tempMaxFilter);
+            }
           }
-        }
-        if (Object.keys(this.params).includes('area')) {
-          if (this.params.area !== null) {
-            const coordinates = [];
-            this.params.area.forEach((num, index) => {
-              if (!(index % 2)) {
-                const c = [num, this.params.area[index + 1]];
-                coordinates.push(c);
-              }
-            });
-            const areaFilter = new AreaFilter('area', [coordinates]);
-            filters.push(areaFilter);
+          if (Object.keys(this.params).includes('area')) {
+            if (this.params.area !== null) {
+              const coordinates = [];
+              this.params.area.forEach((num, index) => {
+                if (!(index % 2)) {
+                  const c = [num, this.params.area[index + 1]];
+                  coordinates.push(c);
+                }
+              });
+              const areaFilter = new AreaFilter('area', [coordinates]);
+              filters.push(areaFilter);
+            }
           }
-        }
-        if (Object.keys(this.params).includes('clase')) {
-          if (this.params.clase !== null) {
-            this.params.clase.forEach((clase, index) => {
-              if (clase) {
-                const claseFilter = new ClaseFilter('CoA_' + (index + 1), 'clase', index + 1);
-                filters.push(claseFilter);
-              }
-            });
+          if (Object.keys(this.params).includes('clase')) {
+            if (this.params.clase !== null) {
+              this.params.clase.forEach((clase, index) => {
+                if (clase) {
+                  const claseFilter = new ClaseFilter('CoA_' + (index + 1), 'clase', index + 1);
+                  filters.push(claseFilter);
+                }
+              });
+            }
           }
-        }
-        if (Object.keys(this.params).includes('criticidad')) {
-          if (this.params.criticidad !== null) {
-            this.params.criticidad.forEach((crit, index) => {
-              if (crit) {
-                const criticidadFilter = new CriticidadFilter(index.toString(), 'criticidad', index);
+          if (Object.keys(this.params).includes('criticidad')) {
+            if (this.params.criticidad !== null) {
+              this.params.criticidad.forEach((crit, index) => {
+                if (crit) {
+                  const criticidadFilter = new CriticidadFilter(index.toString(), 'criticidad', index);
 
-                filters.push(criticidadFilter);
-              }
-            });
+                  filters.push(criticidadFilter);
+                }
+              });
+            }
           }
-        }
-        if (Object.keys(this.params).includes('modulo')) {
-          if (this.params.modulo !== null) {
-            const moduloFilter = new ModuloPcFilter('', 'modulo', this.params.modulo);
-            filters.push(moduloFilter);
+          if (Object.keys(this.params).includes('modulo')) {
+            if (this.params.modulo !== null) {
+              const moduloFilter = new ModuloPcFilter('', 'modulo', this.params.modulo);
+              filters.push(moduloFilter);
+            }
           }
-        }
-        if (Object.keys(this.params).includes('tipo')) {
-          if (this.params.tipo !== null) {
-            this.params.tipo.forEach((tipo, index, tipos) => {
-              if (tipo !== undefined && tipo !== null) {
-                const tipoFilter = new TipoElemFilter('', 'tipo', tipo, tipos.length, index);
-                filters.push(tipoFilter);
-              }
-            });
+          if (Object.keys(this.params).includes('tipo')) {
+            if (this.params.tipo !== null) {
+              this.params.tipo.forEach((tipo, index, tipos) => {
+                if (tipo !== undefined && tipo !== null) {
+                  const tipoFilter = new TipoElemFilter('', 'tipo', tipo, tipos.length, index);
+                  filters.push(tipoFilter);
+                }
+              });
+            }
           }
-        }
-        if (Object.keys(this.params).includes('zona')) {
-          if (this.params.zona !== null) {
-            const zonaFilter = new ZonaFilter('', 'zona', this.params.zona);
-            filters.push(zonaFilter);
+          if (Object.keys(this.params).includes('zona')) {
+            if (this.params.zona !== null) {
+              const zonaFilter = new ZonaFilter('', 'zona', this.params.zona);
+              filters.push(zonaFilter);
+            }
           }
-        }
-        filters$.next(filters);
-      });
+          filters$.next(filters);
+        })
+    );
     return filters$.asObservable();
+  }
+
+  resetService() {
+    this.params = {};
+    this.idDB = undefined;
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 }

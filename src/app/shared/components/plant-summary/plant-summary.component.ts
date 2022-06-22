@@ -21,6 +21,7 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
   nombrePlanta = 'Planta';
   potenciaPlanta = 1;
   tipoPlanta = 'fija';
+  fechaSelectedInforme;
   public planta: PlantaInterface = undefined;
   public _informe: InformeInterface = undefined;
   public informe$ = new BehaviorSubject<InformeInterface>(this._informe);
@@ -47,6 +48,8 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
             }),
             switchMap((informes) => {
               this.informe = informes.find((informe) => informe.id === this.selectedInformeId);
+
+              this.fechaSelectedInforme = this.informeService.getDateLabelInforme(this.informe);
 
               return this.plantaService.getPlanta(this.informe.plantaId);
             })

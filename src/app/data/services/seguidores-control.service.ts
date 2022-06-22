@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject, combineLatest } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
@@ -20,11 +19,15 @@ import VectorSource from 'ol/source/Vector';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { FilterService } from '@data/services/filter.service';
-import { GLOBAL } from '@data/constants/global';
-import { MapSeguidoresService } from './map-seguidores.service';
+import { ZonesControlService } from '@data/services/zones-control.service';
+import { ViewReportService } from '@data/services/view-report.service';
+import { ZonesService } from '@data/services/zones.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { MathOperations } from '@core/classes/math-operations';
+import { LocationAreaInterface } from '@core/models/location';
+
+import { COLOR } from '@data/constants/color';
 
 @Injectable({
   providedIn: 'root',
@@ -41,8 +44,9 @@ export class SeguidoresControlService {
   public prevSeguidorSelected: Seguidor;
   private sharedReportNoFilters = false;
   private seguidorLayers: VectorLayer[];
+  private zonasLayers: VectorLayer[];
   private prevFeatureHover: Feature;
-  private toggleViewSelected: number = undefined;
+  private toggleViewSelected: number;
   private _seguidorViewOpened = false;
   public seguidorViewOpened$ = new BehaviorSubject<boolean>(this._seguidorViewOpened);
   private _urlVisualImageSeguidor: string = undefined;
@@ -53,18 +57,23 @@ export class SeguidoresControlService {
   thermalImageExist$ = new BehaviorSubject<boolean>(this._thermalImageExist);
   private _visualImageExist = true;
   visualImageExist$ = new BehaviorSubject<boolean>(this._visualImageExist);
+  private currentZoom: number;
 
   private maesMedio: number[] = [];
   private maesSigma: number[] = [];
   private ccsMedio: number[] = [];
   private ccsSigma: number[] = [];
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
     private filterService: FilterService,
-    private mapSeguidoresService: MapSeguidoresService,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private zonesControlService: ZonesControlService,
+    private viewReportService: ViewReportService,
+    private zonesService: ZonesService
   ) {}
 
   initService(): Promise<boolean> {
@@ -75,91 +84,174 @@ export class SeguidoresControlService {
     const getIfSharedWithFilters = this.reportControlService.sharedReportWithFilters$;
 
     return new Promise((initService) => {
-      combineLatest([getMap, getSegLayers, getIfSharedWithFilters])
-        .pipe(take(1))
-        .subscribe(([map, segL, isSharedWithFil]) => {
+      this.subscriptions.add(
+        combineLatest([getMap, getSegLayers, getIfSharedWithFilters]).subscribe(([map, segL, isSharedWithFil]) => {
           this.map = map;
           this.seguidorLayers = segL;
           this.sharedReportNoFilters = !isSharedWithFil;
-        });
 
-      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
+          if (this.map !== undefined) {
+            // añadimos acciones sobre los seguidores
+            this.addCursorOnHover();
+            this.addOnHoverAction();
+            this.addSelectInteraction();
+            this.addZoomEvent();
+          }
+        })
+      );
+
+      this.subscriptions.add(
+        this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+      );
 
       this.getMaesMedioSigma();
       this.getCCsMedioSigma();
 
-      this.mapSeguidoresService.toggleViewSelected$.subscribe((viewSel) => {
-        this.toggleViewSelected = viewSel;
+      this.subscriptions.add(
+        this.viewReportService.reportViewSelected$.subscribe((viewSel) => {
+          this.toggleViewSelected = viewSel;
 
-        // reseteamos la interaccion con cada vista para obtener el estilo correcto
-        this.resetSelectInteraction();
-      });
+          // refrescamos la capa para que la vista se muestre correctamente
+          this.refreshLayersView();
+        })
+      );
+
+      this.subscriptions.add(this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom)));
 
       initService(true);
     });
   }
 
-  public createSeguidorLayers(informeId: string): VectorLayer[] {
-    const maeLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleSeguidoresMae(false),
-    });
-    maeLayer.setProperties({
-      informeId,
-      id: '0',
-    });
-    const celsCalientesLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleSeguidoresCelsCalientes(false),
-    });
-    celsCalientesLayer.setProperties({
-      informeId,
-      id: '1',
-    });
-    const gradNormMaxLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleSeguidoresGradienteNormMax(false),
-    });
-    gradNormMaxLayer.setProperties({
-      informeId,
-      id: '2',
-    });
+  createSeguidorLayers(informeId: string, zones?: LocationAreaInterface[]): VectorLayer[] {
+    const seguidoresLayers: VectorLayer[] = [];
+    if (zones !== undefined) {
+      zones.forEach((zone) => {
+        const zoneId = this.zonesControlService.getGlobalsLabel(zone.globalCoords);
+        const maeLayer = new VectorLayer({
+          source: new VectorSource({ wrapX: false }),
+          style: this.getStyleSeguidoresMae(false),
+          visible: false,
+        });
+        maeLayer.setProperties({
+          informeId,
+          view: 0,
+          type: 'seguidores',
+          zoneId,
+          zone,
+        });
+        seguidoresLayers.push(maeLayer);
 
-    return [maeLayer, celsCalientesLayer, gradNormMaxLayer];
+        const celsCalientesLayer = new VectorLayer({
+          source: new VectorSource({ wrapX: false }),
+          style: this.getStyleSeguidoresCelsCalientes(false),
+          visible: false,
+        });
+        celsCalientesLayer.setProperties({
+          informeId,
+          view: 1,
+          type: 'seguidores',
+          zoneId,
+          zone,
+        });
+        seguidoresLayers.push(celsCalientesLayer);
+
+        const gradNormMaxLayer = new VectorLayer({
+          source: new VectorSource({ wrapX: false }),
+          style: this.getStyleSeguidoresGradienteNormMax(false),
+          visible: false,
+        });
+        gradNormMaxLayer.setProperties({
+          informeId,
+          view: 2,
+          type: 'seguidores',
+          zoneId,
+          zone,
+        });
+        seguidoresLayers.push(gradNormMaxLayer);
+      });
+    } else {
+      const maeLayer = new VectorLayer({
+        source: new VectorSource({ wrapX: false }),
+        style: this.getStyleSeguidoresMae(false),
+        visible: true,
+      });
+      maeLayer.setProperties({
+        informeId,
+        view: 0,
+        type: 'seguidores',
+      });
+      seguidoresLayers.push(maeLayer);
+
+      const celsCalientesLayer = new VectorLayer({
+        source: new VectorSource({ wrapX: false }),
+        style: this.getStyleSeguidoresCelsCalientes(false),
+        visible: true,
+      });
+      celsCalientesLayer.setProperties({
+        informeId,
+        view: 1,
+        type: 'seguidores',
+      });
+      seguidoresLayers.push(celsCalientesLayer);
+
+      const gradNormMaxLayer = new VectorLayer({
+        source: new VectorSource({ wrapX: false }),
+        style: this.getStyleSeguidoresGradienteNormMax(false),
+        visible: true,
+      });
+      gradNormMaxLayer.setProperties({
+        informeId,
+        view: 2,
+        type: 'seguidores',
+      });
+    }
+
+    return seguidoresLayers;
   }
 
-  public mostrarSeguidores() {
-    this.filterService.filteredElements$.subscribe((seguidores) => {
-      if (this.sharedReportNoFilters) {
-        // Dibujamos seguidores solo del informe seleccionado
-        const segsFiltered = seguidores.filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId);
-        this.dibujarSeguidores(segsFiltered as Seguidor[]);
-        this.listaSeguidores = seguidores as Seguidor[];
-      } else {
-        // Dibujar seguidores
-        this.dibujarSeguidores(seguidores as Seguidor[]);
-        this.listaSeguidores = seguidores as Seguidor[];
+  mostrarSeguidores() {
+    this.subscriptions.add(
+      this.filterService.filteredElements$.subscribe((seguidores) => {
+        if (!this.sharedReportNoFilters) {
+          // Dibujar seguidores
+          this.dibujarSeguidores(seguidores as Seguidor[]);
+          this.listaSeguidores = seguidores as Seguidor[];
 
-        // reiniciamos los seguidores seleccionados cada vez que se aplica un filtro
-        this.prevSeguidorSelected = undefined;
-        this.seguidorSelected = undefined;
-      }
-    });
+          // reiniciamos los seguidores seleccionados cada vez que se aplica un filtro
+          this.prevSeguidorSelected = undefined;
+          this.seguidorSelected = undefined;
+        } else {
+          // Dibujamos seguidores solo del informe compartido
+          const segsFiltered = seguidores.filter((seg) => (seg as Seguidor).informeId === this.selectedInformeId);
+          this.dibujarSeguidores(segsFiltered as Seguidor[]);
+          this.listaSeguidores = seguidores as Seguidor[];
+        }
+      })
+    );
   }
 
   private dibujarSeguidores(seguidores: Seguidor[]) {
     // Para cada vector layer (que corresponde a un informe)
     this.seguidorLayers.forEach((l) => {
       // filtra los seguidores correspondientes al informe
-      const filtered = seguidores.filter((seguidor) => seguidor.informeId === l.getProperties().informeId);
+      const seguidoresInforme = seguidores.filter((seguidor) => seguidor.informeId === l.getProperties().informeId);
+      let seguidoresLayer = seguidoresInforme;
+      // si hay zonas divimos los seguidores tb por zonas
+      if (this.zonesService.thereAreZones) {
+        seguidoresLayer = this.zonesControlService.getElemsZona(
+          l.getProperties().zone,
+          seguidoresInforme
+        ) as Seguidor[];
+      }
+
       const source = l.getSource();
       source.clear();
-      filtered.forEach((seguidor) => {
+      seguidoresLayer.forEach((seguidor) => {
         // crea poligono seguidor
         const feature = new Feature({
           geometry: new Polygon(this.latLonLiteralToLonLat(seguidor.path)),
           properties: {
-            layer: l.getProperties().id,
+            view: l.getProperties().view,
             seguidorId: seguidor.id,
             informeId: seguidor.informeId,
             mae: seguidor.mae,
@@ -170,14 +262,18 @@ export class SeguidoresControlService {
             columnas: seguidor.columnas,
           },
         });
+
+        if (this.zonesService.thereAreZones) {
+          const properties = feature.getProperties().properties;
+          properties.zone = l.getProperties().zone;
+          feature.setProperties({
+            properties,
+          });
+        }
+
         source.addFeature(feature);
       });
     });
-    // añadimos acciones sobre los seguidores
-    this.addCursorOnHover();
-    this.addOnHoverAction();
-
-    // this.addClickOutFeatures();
   }
 
   private addCursorOnHover() {
@@ -217,8 +313,7 @@ export class SeguidoresControlService {
           .getFeaturesAtPixel(event.pixel)
           .filter((item) => item.getProperties().properties !== undefined)
           .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
-          // tslint:disable-next-line: triple-equals
-          .filter((item) => item.getProperties().properties.layer == this.toggleViewSelected)[0] as Feature;
+          .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)[0] as Feature;
 
         if (feature !== undefined) {
           // cuando pasamos de un seguidor a otro directamente sin pasar por vacio
@@ -254,13 +349,13 @@ export class SeguidoresControlService {
 
   private addSelectInteraction() {
     const select = new Select({
-      style: this.getStyleSeguidores(),
-      // condition: click,
+      style: this.getStyleSeguidores(false),
       layers: (l) => {
         if (
           l.getProperties().informeId === this.selectedInformeId &&
-          // tslint:disable-next-line: triple-equals
-          l.getProperties().id == this.toggleViewSelected
+          l.getProperties().view === this.toggleViewSelected &&
+          l.getProperties().hasOwnProperty('type') &&
+          l.getProperties().type === 'seguidores'
         ) {
           return true;
         } else {
@@ -287,46 +382,45 @@ export class SeguidoresControlService {
     });
   }
 
+  private addZoomEvent() {
+    this.map.on('moveend', (event) => {
+      this.olMapService.currentZoom = this.map.getView().getZoom();
+
+      this.refreshLayersView();
+    });
+  }
+
+  private refreshLayersView() {
+    if (this.map !== undefined) {
+      this.map
+        .getLayers()
+        .getArray()
+        .forEach((layer) => {
+          if (
+            layer.getProperties().informeId === this.selectedInformeId &&
+            layer.getProperties().view === this.toggleViewSelected
+          ) {
+            (layer as VectorLayer).getSource().changed();
+          }
+        });
+    }
+  }
+
   clearSelectFeature() {
-    this.map.getInteractions().forEach((interaction) => {
-      if (interaction instanceof Select) {
-        interaction.getFeatures().clear();
-      }
-    });
-  }
-
-  private resetSelectInteraction() {
-    // eliminamos la anterior interacción para que la actual obtenga el estilo correcto
-    this.map.getInteractions().forEach((interaction) => {
-      if (interaction instanceof Select) {
-        this.map.removeInteraction(interaction);
-      }
-    });
-
-    // la añadimos de nuevo
-    this.addSelectInteraction();
-  }
-
-  private addClickOutFeatures() {
-    this.map.on('click', (event) => {
-      const feature = this.map
-        .getFeaturesAtPixel(event.pixel)
-        .filter((item) => item.getProperties().properties !== undefined)
-        .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
-      if (feature.length === 0) {
-        if (this.seguidorSelected !== undefined) {
-          this.setExternalStyle(this.seguidorSelected.id, false);
+    if (this.map !== undefined) {
+      this.map.getInteractions().forEach((interaction) => {
+        if (interaction instanceof Select) {
+          interaction.getFeatures().clear();
         }
-        this.seguidorSelected = undefined;
-      }
-    });
+      });
+    }
   }
 
-  private getStyleSeguidores() {
+  private getStyleSeguidores(focus: boolean) {
     const estilosView = [
-      this.getStyleSeguidoresMae(false),
-      this.getStyleSeguidoresCelsCalientes(false),
-      this.getStyleSeguidoresGradienteNormMax(false),
+      this.getStyleSeguidoresMae(focus),
+      this.getStyleSeguidoresCelsCalientes(focus),
+      this.getStyleSeguidoresGradienteNormMax(focus),
     ];
 
     return estilosView[this.toggleViewSelected];
@@ -481,21 +575,21 @@ export class SeguidoresControlService {
     const mae = feature.getProperties().properties.mae as number;
 
     if (mae < 0.01) {
-      return GLOBAL.colores_mae[0];
+      return COLOR.colores_severity[0];
     } else if (mae < 0.05) {
-      return GLOBAL.colores_mae[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_mae[2];
+      return COLOR.colores_severity[2];
     }
   }
 
   getColorSeguidorMaeExternal(mae: number) {
     if (mae < 0.01) {
-      return GLOBAL.colores_mae[0];
+      return COLOR.colores_severity[0];
     } else if (mae < 0.05) {
-      return GLOBAL.colores_mae[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_mae[2];
+      return COLOR.colores_severity[2];
     }
   }
 
@@ -520,11 +614,11 @@ export class SeguidoresControlService {
     const celsCalientes = feature.getProperties().properties.celsCalientes;
 
     if (celsCalientes < 0.02) {
-      return GLOBAL.colores_mae[0];
+      return COLOR.colores_severity[0];
     } else if (celsCalientes < 0.1) {
-      return GLOBAL.colores_mae[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_mae[2];
+      return COLOR.colores_severity[2];
     }
   }
 
@@ -549,85 +643,87 @@ export class SeguidoresControlService {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
     if (gradNormMax < 10) {
-      return GLOBAL.colores_grad[0];
+      return COLOR.colores_severity[0];
     } else if (gradNormMax < 40) {
-      return GLOBAL.colores_grad[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_grad[2];
+      return COLOR.colores_severity[2];
     }
   }
 
   getColorSeguidorGradienteNormMaxExternal(gradNormMax: number) {
     if (gradNormMax < 10) {
-      return GLOBAL.colores_grad[0];
+      return COLOR.colores_severity[0];
     } else if (gradNormMax < 40) {
-      return GLOBAL.colores_grad[1];
+      return COLOR.colores_severity[1];
     } else {
-      return GLOBAL.colores_grad[2];
+      return COLOR.colores_severity[2];
     }
   }
 
-  
-
-  setExternalStyle(seguidorId: string, focus: boolean) {
+  setExternalStyleSeguidor(seguidorId: string, focus: boolean) {
     const layersInforme = this.seguidorLayers.filter(
       (layer) => layer.getProperties().informeId === this.selectedInformeId
     );
 
-    const layerView = layersInforme[this.toggleViewSelected];
+    const layersView = layersInforme.filter((layer) => layer.getProperties().view === this.toggleViewSelected);
 
-    const features = layerView.getSource().getFeatures();
+    const features: Feature[] = [];
+    layersView.forEach((layer) => features.push(...layer.getSource().getFeatures()));
 
     const feature = features.find((f) => f.getProperties().properties.seguidorId === seguidorId);
 
-    const focusedStyle = new Style({
-      stroke: new Stroke({
-        color: 'white',
-        width: 6,
-      }),
-      fill: new Fill({
-        color: 'rgba(255, 255, 255, 0)',
-      }),
-    });
-
-    let unfocusedStyle;
-    if (this.toggleViewSelected === 0) {
-      unfocusedStyle = new Style({
-        stroke: new Stroke({
-          color: this.getColorSeguidorMae(feature),
-          width: 4,
-        }),
-        fill: new Fill({
-          color: 'rgba(255, 255, 255, 0)',
-        }),
-      });
-    } else if (this.toggleViewSelected === 1) {
-      unfocusedStyle = new Style({
-        stroke: new Stroke({
-          color: this.getColorSeguidorCelsCalientes(feature),
-          width: 4,
-        }),
-        fill: new Fill({
-          color: 'rgba(255, 255, 255, 0)',
-        }),
-      });
-    } else {
-      unfocusedStyle = new Style({
-        stroke: new Stroke({
-          color: this.getColorSeguidorGradienteNormMax(feature),
-          width: 4,
-        }),
-        fill: new Fill({
-          color: 'rgba(255, 255, 255, 0)',
-        }),
-      });
-    }
-
     if (focus) {
-      feature.setStyle(focusedStyle);
+      feature.setStyle(this.getStyleSeguidores(true));
     } else {
-      feature.setStyle(unfocusedStyle);
+      feature.setStyle(this.getStyleSeguidores(false));
     }
+  }
+
+  setExternalStyleSeguidorLayer(feature: Feature, layers: VectorLayer[], visible: boolean) {
+    // mostramos u ocultamos las zona de los seguidores si la hubiera
+    if (feature.getProperties().properties.hasOwnProperty('zone')) {
+      const zoneSeguidor = feature.getProperties().properties.zone;
+      const layerZoneSeguidor = layers.find(
+        (layer) => layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneSeguidor.globalCoords)
+      );
+
+      // solo la ocultamos si estamos en zoom out
+      if (visible === false) {
+        if (this.currentZoom < this.zonesControlService.zoomChangeView) {
+          layerZoneSeguidor.setVisible(visible);
+        }
+      } else {
+        layerZoneSeguidor.setVisible(visible);
+      }
+    }
+  }
+
+  resetService() {
+    this.selectedInformeId = undefined;
+    this.seguidorHovered = undefined;
+    this.seguidorSelected = undefined;
+    this.listaSeguidores = undefined;
+    this.listaAllSeguidores = undefined;
+    this.prevSeguidorSelected = undefined;
+    this.sharedReportNoFilters = false;
+    this.seguidorLayers = undefined;
+    this.zonasLayers = undefined;
+    this.prevFeatureHover = undefined;
+    this.toggleViewSelected = undefined;
+    this.seguidorViewOpened = undefined;
+    this.urlVisualImageSeguidor = undefined;
+    this.urlThermalImageSeguidor = undefined;
+    this.thermalImageExist = true;
+    this.visualImageExist = true;
+    this.currentZoom = undefined;
+    this.maesMedio = [];
+    this.maesSigma = [];
+    this.ccsMedio = [];
+    this.ccsSigma = [];
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
   }
 
   get seguidorHovered() {

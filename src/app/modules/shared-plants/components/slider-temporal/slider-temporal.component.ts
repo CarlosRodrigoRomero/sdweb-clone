@@ -1,16 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { combineLatest, Subscription } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 
 import { LabelType, Options } from '@angular-slider/ngx-slider';
 
-import TileLayer from 'ol/layer/Tile';
-
-import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { InformeService } from '@data/services/informe.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { OlMapService } from '@data/services/ol-map.service';
+import { ViewReportService } from '@data/services/view-report.service';
 
 @Component({
   selector: 'app-slider-temporal',
@@ -19,11 +16,13 @@ import { OlMapService } from '@data/services/ol-map.service';
 })
 export class SliderTemporalComponent implements OnInit, OnDestroy {
   public selectedInformeId: string;
-  public informesIdList: string[];
-  public sliderLoaded = false;
-  private aerialLayers: TileLayer[];
+  private informesIdList: string[];
+  private sliderLoaded = false;
+  public sliderLoaded$ = new BehaviorSubject<boolean>(this.sliderLoaded);
 
-  /* Slider Values */
+  private subscriptions: Subscription = new Subscription();
+
+  /* Slider Values*/
   currentYear = 100;
   dates: string[] = [];
   optionsTemporalSlider: Options = {
@@ -36,71 +35,40 @@ export class SliderTemporalComponent implements OnInit, OnDestroy {
     },
   };
 
-  private subscriptions: Subscription = new Subscription();
-
   constructor(
-    private mapSeguidoresService: MapSeguidoresService,
     private informeService: InformeService,
     private reportControlService: ReportControlService,
-    private olMapService: OlMapService
+    private viewReportService: ViewReportService
   ) {}
 
   ngOnInit(): void {
+    this.informesIdList = this.reportControlService.informesIdList;
+
     this.subscriptions.add(
-      this.reportControlService.informesIdList$
-        .pipe(
-          take(1),
-          switchMap((informesId) => {
-            this.informesIdList = informesId;
+      this.getDatesInformes(this.informesIdList).subscribe((dates) => {
+        this.dates = dates;
 
-            return this.getDatesInformes(informesId);
-          })
-        )
-        .subscribe((dates) => {
-          this.dates = dates;
-
-          // ya tenemos los labels y ahora mostramos el slider
-          this.sliderLoaded = true;
-        })
+        // ya tenemos los labels y ahora mostramos el slider
+        this.sliderLoaded = true;
+        this.sliderLoaded$.next(this.sliderLoaded);
+      })
     );
 
     this.subscriptions.add(
-      this.reportControlService.selectedInformeId$.subscribe((informeID) => (this.selectedInformeId = informeID))
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
     );
 
     this.currentYear = this.informesIdList.indexOf(this.selectedInformeId) * 100;
 
-    this.subscriptions.add(
-      this.mapSeguidoresService.sliderTemporalSelected$.subscribe((value) => (this.currentYear = value))
-    );
-
-    this.subscriptions.add(
-      this.olMapService.getAerialLayers().subscribe((aerialLayers) => {
-        this.aerialLayers = aerialLayers;
-
-        this.setAerialLayersOpacity(this.selectedInformeId);
-      })
-    );
+    this.viewReportService.sliderTemporal = this.currentYear;
   }
 
   onChangeTemporalSlider(value: number) {
-    this.mapSeguidoresService.sliderTemporalSelected = value;
+    this.viewReportService.sliderTemporal = value;
 
     const roundedValue = Math.round(value / (100 / (this.informesIdList.length - 1)));
 
     this.reportControlService.selectedInformeId = this.informesIdList[roundedValue];
-
-    this.setAerialLayersOpacity(this.informesIdList[roundedValue]);
-  }
-
-  private setAerialLayersOpacity(informeId: string) {
-    this.aerialLayers.forEach((layer, index) => {
-      if (index === this.informesIdList.indexOf(informeId)) {
-        layer.setOpacity(1);
-      } else {
-        layer.setOpacity(0);
-      }
-    });
   }
 
   getDatesInformes(informesId: string[]) {
