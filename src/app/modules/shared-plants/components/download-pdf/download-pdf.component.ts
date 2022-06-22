@@ -338,10 +338,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           this.largestLocAreas,
           'thermal',
           this.selectedInforme.id,
+          this.map,
           this.anomaliasInforme
         );
       }
-      this.imagesTilesService.setImgPlanoPlanta(this.largestLocAreas, 'visual', this.selectedInforme.id);
+      this.imagesTilesService.setImgPlanoPlanta(this.largestLocAreas, 'visual', this.selectedInforme.id, this.map);
     }
   }
 
@@ -893,7 +894,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const tileCoords = this.imagesTilesService.getElemTiles(
       anomalia.featureCoords,
       this.imagesTilesService.getElemExtent(anomalia.featureCoords),
-      zoomLevel
+      zoomLevel, this.map
     );
 
     const canvas = new fabric.Canvas('canvas');
@@ -1028,7 +1029,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const tileCoords = this.imagesTilesService.getElemTiles(
       segCoords,
       this.imagesTilesService.getElemExtent(segCoords),
-      22
+      22, this.map
     );
 
     const canvas = new fabric.Canvas('canvas');

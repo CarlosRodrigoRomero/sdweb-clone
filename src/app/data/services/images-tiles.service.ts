@@ -17,7 +17,6 @@ import { fabric } from 'fabric';
 import inside from 'point-in-polygon';
 
 import { ImageProcessService } from '@data/services/image-process.service';
-import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ZonesService } from '@data/services/zones.service';
 
@@ -31,7 +30,6 @@ import { GLOBAL } from '@data/constants/global';
 })
 export class ImagesTilesService {
   private tileResolution = 256;
-  private map: Map;
   private _imagesPlantaCompleta = {};
   imagesPlantaCompleta$ = new BehaviorSubject<{}>(this._imagesPlantaCompleta);
   private _layerInformeSelected: TileLayer = undefined;
@@ -44,12 +42,9 @@ export class ImagesTilesService {
 
   constructor(
     private imageProcessService: ImageProcessService,
-    private olMapService: OlMapService,
     private reportControlService: ReportControlService,
     private zonesService: ZonesService
-  ) {
-    this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
-  }
+  ) {}
 
   checkImgsPlanosLoaded(): Promise<boolean> {
     return new Promise((loaded) => {
@@ -77,6 +72,7 @@ export class ImagesTilesService {
     locAreas: LocationAreaInterface[],
     type: string,
     selectedInformeId: string,
+    map: Map,
     anomalias?: Anomalia[]
   ) {
     let tileCoords: TileCoord[] = [];
@@ -84,7 +80,7 @@ export class ImagesTilesService {
     locAreas.forEach((locArea) => {
       const locAreaCoords = this.pathToCoordinate(locArea.path);
       allLocAreaCoords.push(...locAreaCoords);
-      tileCoords.push(...this.getElemTiles(locAreaCoords, this.getElemExtent(locAreaCoords), 16));
+      tileCoords.push(...this.getElemTiles(locAreaCoords, this.getElemExtent(locAreaCoords), 16, map));
     });
     tileCoords = this.getCompleteTiles(tileCoords);
 
@@ -222,11 +218,11 @@ export class ImagesTilesService {
     });
   }
 
-  getElemTiles(coords: Coordinate[], extents: Extent[], zoomLevel: number): TileCoord[] {
+  getElemTiles(coords: Coordinate[], extents: Extent[], zoomLevel: number, map: Map): TileCoord[] {
     // obtenemos los tileCoords de cada coordenada
     let tilesCoord: TileCoord[] = [];
 
-    this.layerInformeSelected = this.map.getLayers().getArray()[0] as TileLayer;
+    this.layerInformeSelected = map.getLayers().getArray()[0] as TileLayer;
 
     const source = this.layerInformeSelected.getSource();
     const tileGrid = source.getTileGrid();
@@ -467,7 +463,6 @@ export class ImagesTilesService {
   }
 
   resetService() {
-    this.map = undefined;
     this._imagesPlantaCompleta = {};
     this.layerInformeSelected = undefined;
     this.imagesPlantaLoaded = 0;

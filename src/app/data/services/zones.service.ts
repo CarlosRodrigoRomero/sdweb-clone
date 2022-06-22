@@ -87,9 +87,9 @@ export class ZonesService {
   }
 
   getIndexNotNull(locAreas: LocationAreaInterface[]): number {
-    const coordsLength = locAreas[0].globalCoords.length;
-
     let indiceSeleccionado;
+
+    const coordsLength = locAreas[0].globalCoords.length;
 
     for (let index = coordsLength - 1; index >= 0; index--) {
       const notNullLocAreas = locAreas.filter(

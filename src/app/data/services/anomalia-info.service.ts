@@ -200,9 +200,6 @@ export class AnomaliaInfoService {
   }
 
   resetService() {
-    this.translation = undefined;
-    this.language = undefined;
-
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();
   }

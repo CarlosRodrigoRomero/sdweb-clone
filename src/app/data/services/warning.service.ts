@@ -575,19 +575,21 @@ export class WarningService {
     informeId: string
   ) {
     let zones = this.zonesService.getZones(planta, locAreas);
-    zones = this.zonesService.getCompleteGlobals(zones).flat();
-    const repeatZones = UtilitiesService.findDuplicates(zones.map((zone) => zone.globalCoords.toString()));
+    if (zones.length > 0) {
+      zones = this.zonesService.getCompleteGlobals(zones).flat();
+      const repeatZones = UtilitiesService.findDuplicates(zones.map((zone) => zone.globalCoords.toString()));
 
-    if (repeatZones.length > 0) {
-      const warning: Warning = {
-        type: 'zonasRepeat',
-        visible: true,
-      };
+      if (repeatZones.length > 0) {
+        const warning: Warning = {
+          type: 'zonasRepeat',
+          visible: true,
+        };
 
-      this.checkAddWarning(warning, warns, informeId);
-    } else {
-      // eliminamos la alerta antigua si la hubiera
-      this.checkOldWarnings('zonasRepeat', warns, informeId);
+        this.checkAddWarning(warning, warns, informeId);
+      } else {
+        // eliminamos la alerta antigua si la hubiera
+        this.checkOldWarnings('zonasRepeat', warns, informeId);
+      }
     }
 
     // confirmamos que ha sido checkeado
