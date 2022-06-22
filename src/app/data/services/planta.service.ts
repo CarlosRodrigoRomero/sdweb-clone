@@ -54,11 +54,9 @@ export class PlantaService {
     this.currentPlantId = this.activatedRoute.snapshot.paramMap.get('id');
     this.currentPlantId$.next(this.currentPlantId);
 
-    this.subscriptions.add(
-      this.getModulos().subscribe((modulos) => {
-        this.modulos = modulos;
-      })
-    );
+    this.getModulos().subscribe((modulos) => {
+      this.modulos = modulos;
+    });
   }
 
   getPlanta(plantaId: string): Observable<PlantaInterface> {
@@ -834,10 +832,8 @@ export class PlantaService {
 
   resetService() {
     this.planta = undefined;
-    this.currentPlantId = '';
     this.plantaDoc = undefined;
     this.plantasCollection = undefined;
-    this.modulos = undefined;
     this.locAreaList = undefined;
 
     this.subscriptions.unsubscribe();

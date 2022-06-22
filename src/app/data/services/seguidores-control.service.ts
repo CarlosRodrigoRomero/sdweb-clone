@@ -407,11 +407,13 @@ export class SeguidoresControlService {
   }
 
   clearSelectFeature() {
-    this.map.getInteractions().forEach((interaction) => {
-      if (interaction instanceof Select) {
-        interaction.getFeatures().clear();
-      }
-    });
+    if (this.map !== undefined) {
+      this.map.getInteractions().forEach((interaction) => {
+        if (interaction instanceof Select) {
+          interaction.getFeatures().clear();
+        }
+      });
+    }
   }
 
   private getStyleSeguidores(focus: boolean) {

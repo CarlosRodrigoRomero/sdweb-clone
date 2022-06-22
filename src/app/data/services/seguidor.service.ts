@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore } from '@angular/fire/firestore';
-import { AngularFireStorage } from '@angular/fire/storage';
 
 import PointInPolygon from 'point-in-polygon';
 
-import { InformeService } from './informe.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { PlantaService } from '@data/services/planta.service';
 import { ZonesService } from './zones.service';
@@ -19,7 +17,6 @@ import { LocationAreaInterface } from '@core/models/location';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 
-import { GLOBAL } from '@data/constants/global';
 import { COLOR } from '@data/constants/color';
 
 @Injectable({
@@ -33,9 +30,7 @@ export class SeguidorService {
   private locAreaModulos: LocationAreaInterface[] = [];
 
   constructor(
-    private informeService: InformeService,
     public afs: AngularFirestore,
-    private storage: AngularFireStorage,
     private anomaliaService: AnomaliaService,
     private plantaService: PlantaService,
     private zonesService: ZonesService

@@ -56,7 +56,7 @@ export class ReportControlService {
   public allFilterableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFilterableElements);
   private _allAnomalias: Anomalia[] = [];
   allAnomalias$ = new BehaviorSubject<Anomalia[]>(this._allAnomalias);
-  public plantaFija = false;
+  public plantaFija = undefined;
   private _nombreGlobalCoords: string[] = [];
   private _numFixedGlobalCoords: number = 3;
   private _noAnomsReport = false;
@@ -117,6 +117,8 @@ export class ReportControlService {
                   // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
                   this.informes = this.informeService.getOnlyNewInfomesFijas(informes);
                 } else {
+                  this.plantaFija = false;
+
                   this.informes = informes;
                 }
 
@@ -229,6 +231,8 @@ export class ReportControlService {
 
                           return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
                         } else {
+                          this.plantaFija = false;
+
                           return this.seguidorService.getSeguidoresPlanta$(this.plantaId, this.informes);
                         }
                       }),
@@ -293,6 +297,8 @@ export class ReportControlService {
                           // obtenemos todas las anomalías
                           return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
                         } else {
+                          this.plantaFija = false;
+
                           // obtenemos todos los seguidores
                           return this.seguidorService.getSeguidoresPlanta$(this.plantaId, this.informes);
                         }
@@ -618,7 +624,7 @@ export class ReportControlService {
     this.initialized = false;
     this.mapLoaded = false;
     this.allFilterableElements = [];
-    this.plantaFija = false;
+    this.plantaFija = undefined;
     this.noAnomsReport = false;
     this.numFixedGlobalCoords = 3;
   }

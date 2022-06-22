@@ -3,8 +3,6 @@ import { Injectable } from '@angular/core';
 import { AutoFilter, CellValue, Workbook } from 'exceljs';
 import * as FileSaver from 'file-saver';
 
-import { ReportControlService } from './report-control.service';
-
 const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8';
 const EXCEL_EXT = '.xlsx';
 
@@ -12,7 +10,7 @@ const EXCEL_EXT = '.xlsx';
   providedIn: 'root',
 })
 export class ExcelService {
-  constructor(private reportControlService: ReportControlService) {}
+  constructor() {}
 
   public exportAsExcelFile(
     headersArray: string[][],

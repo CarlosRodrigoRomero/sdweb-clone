@@ -66,30 +66,17 @@ export class PcService {
         .map((_, i) => i + 1)
     );
 
-    this.subscriptions.add(
-      this.filtroClase$.subscribe((filtro) => {
-        this.currentFiltroClase = filtro;
-      })
-    );
+    this.filtroClase$.subscribe((filtro) => {
+      this.currentFiltroClase = filtro;
+    });
 
-    this.subscriptions.add(
-      this.filtroCategoria$.subscribe((filtro) => {
-        this.currentFiltroCategoria = filtro;
-      })
-    );
+    this.filtroCategoria$.subscribe((filtro) => {
+      this.currentFiltroCategoria = filtro;
+    });
 
-    this.subscriptions.add(
-      this.filtroGradiente$.subscribe((filtro) => {
-        this.currentFiltroGradiente = filtro;
-      })
-    );
-    // console.log('filtrosCategorias', this.filtroCategoria, this.filtroClase);
-    // this.currentFilteredPcs$ = this.filtroCategoria$
-    //   .mergeMap( filtro1 => this.filtroClase$
-    //     .mergeMap( filtro2 => this.allPcs$
-    //       .mergeMap( allPcs => allPcs.filter( (pc) => {
-    //         return filtro2.includes(pc.tipo) && filtro1.includes(this.getPcCoA(pc));
-    //       }))));
+    this.filtroGradiente$.subscribe((filtro) => {
+      this.currentFiltroGradiente = filtro;
+    });
   }
 
   private aplicarFiltros() {
@@ -542,17 +529,10 @@ export class PcService {
   }
 
   resetService() {
-    this.pcsCollection = undefined;
     this.allPcsInformeEdit$ = undefined;
     this.allPcs = undefined;
     this.pcDoc = undefined;
     this.url = undefined;
-    this.filtroClase = new BehaviorSubject<number[]>(new Array<number>());
-    this.filtroCategoria = new BehaviorSubject<number[]>(new Array<number>());
-    this.filtroGradiente = new BehaviorSubject<number>(GLOBAL.filtroGradientePorDefecto);
-    this.currentFiltroClase = undefined;
-    this.currentFiltroCategoria = undefined;
-    this.currentFiltroGradiente = undefined;
     this.filteredPcsSource = new BehaviorSubject<PcInterface[]>(new Array<PcInterface>());
     this.filteredSeguidores = new BehaviorSubject<SeguidorInterface[]>(new Array<SeguidorInterface>());
 

@@ -101,11 +101,13 @@ export class ViewControlComponent implements OnInit, OnDestroy {
       this.setZonesLayersVisibility(informeId);
     }
 
-    if (this.reportControlService.plantaFija) {
-      this.setThermalLayersVisibility(informeId);
-      this.setAnomaliaLayersVisibility(informeId);
-    } else {
-      this.setSeguidorLayersVisibility(informeId);
+    if (this.reportControlService.plantaFija !== undefined) {
+      if (this.reportControlService.plantaFija) {
+        this.setThermalLayersVisibility(informeId);
+        this.setAnomaliaLayersVisibility(informeId);
+      } else {
+        this.setSeguidorLayersVisibility(informeId);
+      }
     }
   }
 
