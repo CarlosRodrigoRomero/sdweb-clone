@@ -665,18 +665,19 @@ export class PlantaService {
     if (this.locAreaList !== undefined) {
       this.locAreaList.forEach((polygon, i, array) => {
         if (google.maps.geometry.poly.containsLocation(latLng, polygon)) {
-          if (polygon.globalX !== undefined && polygon.globalX !== null && polygon.globalX !== '') {
-            globalCoords[0] = polygon.globalX;
-          }
-          if (polygon.globalY !== undefined && polygon.globalY !== null && polygon.globalY !== '') {
-            globalCoords[1] = polygon.globalY;
-          }
           if (polygon.hasOwnProperty('globalCoords') && polygon.globalCoords !== undefined) {
             polygon.globalCoords.forEach((item, index) => {
               if (item !== null && item !== undefined && item !== '') {
                 globalCoords[index] = item;
               }
             });
+          } else {
+            if (polygon.globalX !== undefined && polygon.globalX !== null && polygon.globalX !== '') {
+              globalCoords[0] = polygon.globalX;
+            }
+            if (polygon.globalY !== undefined && polygon.globalY !== null && polygon.globalY !== '') {
+              globalCoords[1] = polygon.globalY;
+            }
           }
 
           if (polygon.hasOwnProperty('modulo')) {
@@ -703,12 +704,6 @@ export class PlantaService {
         const polygon = new Polygon(this.olMapService.latLonLiteralToLonLat(locArea.path));
 
         if (polygon.intersectsCoordinate(coords)) {
-          if (locArea.globalX.length > 0) {
-            globalCoords[0] = locArea.globalX;
-          }
-          if (locArea.globalY.length > 0) {
-            globalCoords[1] = locArea.globalY;
-          }
           if (locArea.hasOwnProperty('globalCoords') && locArea.globalCoords !== undefined) {
             locArea.globalCoords.forEach((item, index) => {
               if (item !== null) {
@@ -720,6 +715,13 @@ export class PlantaService {
                 }
               }
             });
+          } else {
+            if (locArea.globalX.length > 0) {
+              globalCoords[0] = locArea.globalX;
+            }
+            if (locArea.globalY.length > 0) {
+              globalCoords[1] = locArea.globalY;
+            }
           }
         }
       });
