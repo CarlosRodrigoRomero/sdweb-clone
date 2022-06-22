@@ -699,8 +699,8 @@ export class SeguidoresControlService {
 
   resetService() {
     this.selectedInformeId = undefined;
-    this._seguidorHovered = undefined;
-    this._seguidorSelected = undefined;
+    this.seguidorHovered = undefined;
+    this.seguidorSelected = undefined;
     this.listaSeguidores = undefined;
     this.listaAllSeguidores = undefined;
     this.prevSeguidorSelected = undefined;
@@ -709,11 +709,11 @@ export class SeguidoresControlService {
     this.zonasLayers = undefined;
     this.prevFeatureHover = undefined;
     this.toggleViewSelected = undefined;
-    this._seguidorViewOpened = undefined;
-    this._urlVisualImageSeguidor = undefined;
-    this._urlThermalImageSeguidor = undefined;
-    this._thermalImageExist = true;
-    this._visualImageExist = true;
+    this.seguidorViewOpened = undefined;
+    this.urlVisualImageSeguidor = undefined;
+    this.urlThermalImageSeguidor = undefined;
+    this.thermalImageExist = true;
+    this.visualImageExist = true;
     this.currentZoom = undefined;
     this.maesMedio = [];
     this.maesSigma = [];

@@ -469,8 +469,8 @@ export class ImagesTilesService {
   resetService() {
     this.map = undefined;
     this._imagesPlantaCompleta = {};
-    this._layerInformeSelected = undefined;
-    this._imagesPlantaLoaded = 0;
+    this.layerInformeSelected = undefined;
+    this.imagesPlantaLoaded = 0;
 
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();

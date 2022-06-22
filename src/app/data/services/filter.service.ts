@@ -284,8 +284,8 @@ export class FilterService {
     this.otherFilters = ['confianza', 'aspectRatio', 'areaM'];
     this.filters = [];
     this.prevAllFilterableElems = undefined;
-    this._filteredElements = [];
-    this._allFiltrableElements = [];
+    this.filteredElements = [];
+    this.allFiltrableElements = [];
     this.plantaSeguidores = false;
 
     this.subscriptions.unsubscribe();

@@ -196,7 +196,6 @@ export class MapComponent implements OnInit, OnDestroy {
     const satelliteLayer = new TileLayer({
       source: satellite,
     });
-    satelliteLayer.setProperties({ type: 'satellite' });
 
     let aerial;
     // solo lo aplicamos a la planta DEMO

@@ -609,18 +609,18 @@ export class ReportControlService {
   }
 
   resetService() {
-    this._sharedReport = false;
-    this._sharedReportWithFilters = true;
-    this._plantaId = undefined;
-    this._selectedInformeId = undefined;
-    this._informes = [];
-    this._informesIdList = [];
-    this._initialized = false;
-    this._mapLoaded = false;
-    this._allFilterableElements = [];
+    this.sharedReport = false;
+    this.sharedReportWithFilters = true;
+    this.plantaId = undefined;
+    this.selectedInformeId = undefined;
+    this.informes = [];
+    this.informesIdList = [];
+    this.initialized = false;
+    this.mapLoaded = false;
+    this.allFilterableElements = [];
     this.plantaFija = false;
-    this._noAnomsReport = false;
-    this._numFixedGlobalCoords = 3;
+    this.noAnomsReport = false;
+    this.numFixedGlobalCoords = 3;
   }
 
   get sharedReport() {

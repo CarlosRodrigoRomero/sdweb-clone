@@ -168,7 +168,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   }
 
   private setZonesLayersVisibility(informeId: string) {
-    if (this.zonesLayers.length === this.reportControlService.informes.length * 3) {
+    if (this.zonesLayers.length) {
       this.zonesLayers.forEach((layer) => {
         if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
           layer.setVisible(true);

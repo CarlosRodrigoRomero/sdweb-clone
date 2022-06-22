@@ -244,16 +244,16 @@ export class OlMapService {
   }
 
   resetService() {
-    this._map = undefined;
-    this._draw = undefined;
+    this.map = undefined;
+    this.draw = undefined;
     this.drawLayers = [];
     this.thermalLayers = [];
-    this._aerialLayers = [];
+    this.aerialLayers = [];
     this.anomaliaLayers = [];
     this.seguidorLayers = [];
-    this._zonasLayers = [];
+    this.zonasLayers = [];
     this.incrementoLayers = [];
-    this._currentZoom = 17;
+    this.currentZoom = 17;
   }
 
   ///////////////////////////////////////////////////////////////////////

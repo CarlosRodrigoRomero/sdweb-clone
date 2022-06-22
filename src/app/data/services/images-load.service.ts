@@ -344,18 +344,18 @@ export class ImagesLoadService {
   }
 
   resetService() {
-    this._loadedChangingImages = 0;
-    this._loadedFixedImages = 0;
-    this._imgIrradianciaBase64 = undefined;
-    this._imgSuciedadBase64 = undefined;
-    this._imgPortadaBase64 = undefined;
+    this.loadedChangingImages = 0;
+    this.loadedFixedImages = 0;
+    this.imgIrradianciaBase64 = undefined;
+    this.imgSuciedadBase64 = undefined;
+    this.imgPortadaBase64 = undefined;
     this.heightLogoEmpresa = undefined;
     this.scaleImgLogoHeader = undefined;
-    this._imgLogoBase64 = undefined;
-    this._imgSolardroneBase64 = undefined;
-    this._imgFormulaMaeBase64 = undefined;
-    this._imgCurvaMaeBase64 = undefined;
-    this._imgLogoFooterBase64 = undefined;
+    this.imgLogoBase64 = undefined;
+    this.imgSolardroneBase64 = undefined;
+    this.imgFormulaMaeBase64 = undefined;
+    this.imgCurvaMaeBase64 = undefined;
+    this.imgLogoFooterBase64 = undefined;
 
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();

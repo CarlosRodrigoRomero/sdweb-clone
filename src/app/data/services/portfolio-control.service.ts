@@ -386,10 +386,10 @@ export class PortfolioControlService {
   }
 
   resetService() {
-    this._plantaHovered = undefined;
+    this.plantaHovered = undefined;
     this.maePlantas = [];
-    this._maeMedio = undefined;
-    this._maeSigma = undefined;
+    this.maeMedio = undefined;
+    this.maeSigma = undefined;
     this.numPlantas = 0;
     this.potenciaTotal = 0;
     this.listaPlantas = [];

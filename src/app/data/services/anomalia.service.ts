@@ -591,11 +591,11 @@ export class AnomaliaService {
   }
 
   resetService() {
-    this._selectedInformeId = undefined;
+    this.selectedInformeId = undefined;
     this.allAnomaliasInforme = undefined;
     this.criterioCoA = GLOBAL.criterioCoA;
     this.criterioCriticidad = undefined;
-    this._hasCriticidad = false;
+    this.hasCriticidad = false;
     this.planta = undefined;
 
     this.subscriptions.unsubscribe();

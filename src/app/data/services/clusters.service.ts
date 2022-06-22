@@ -364,16 +364,16 @@ export class ClustersService {
     this._initialized = false;
     this.informeId = undefined;
     this.vueloId = undefined;
-    this._planta = {};
+    this.planta = {};
     this.puntosTrayectoria = [];
     this.coordsPuntosTrayectoria = [];
-    this._puntoHover = undefined;
-    this._urlImageThumbnail = undefined;
+    this.puntoHover = undefined;
+    this.urlImageThumbnail = undefined;
     this.clustersRef = undefined;
-    this._clusters = [];
-    this._joinActive = false;
-    this._clusterSelected = undefined;
-    this._createClusterActive = false;
+    this.clusters = [];
+    this.joinActive = false;
+    this.clusterSelected = undefined;
+    this.createClusterActive = false;
 
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();

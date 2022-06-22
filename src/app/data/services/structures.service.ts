@@ -516,25 +516,25 @@ export class StructuresService {
   }
 
   resetService() {
-    this._endFilterSubscription = false;
+    this.endFilterSubscription = false;
 
-    this._modulesLoaded = false;
-    this._loadRawModules = false;
-    this._allRawModules = [];
-    this._createRawModMode = false;
-    this._deleteRawModMode = false;
-    this._deletedRawModIds = [];
+    this.modulesLoaded = false;
+    this.loadRawModules = false;
+    this.allRawModules = [];
+    this.createRawModMode = false;
+    this.deleteRawModMode = false;
+    this.deletedRawModIds = [];
 
-    this._reportNumModules = 0;
+    this.reportNumModules = 0;
 
-    this._drawModGroups = false;
-    this._modGroupSelectedId = undefined;
-    this._allModGroups = [];
+    this.drawModGroups = false;
+    this.modGroupSelectedId = undefined;
+    this.allModGroups = [];
 
-    this._loadNormModules = false;
-    this._editNormModules = false;
-    this._normModSelected = undefined;
-    this._allNormModules = [];
+    this.loadNormModules = false;
+    this.editNormModules = false;
+    this.normModSelected = undefined;
+    this.allNormModules = [];
 
     // this.thermalLayer = undefined;
 

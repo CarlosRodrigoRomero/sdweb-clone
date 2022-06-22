@@ -49,10 +49,10 @@ export class StatsService {
 
   resetService() {
     this._initialized = false;
-    this._loadStats = false;
+    this.loadStats = false;
     this.informesIdList = undefined;
     this.dateLabels = [];
-    this._loadCCyGradChart = true;
+    this.loadCCyGradChart = true;
     this.sidenav = undefined;
 
     this.subscriptions.unsubscribe();

@@ -205,15 +205,15 @@ export class DownloadReportService {
 
   resetService() {
     // reiniciamos los valores
-    this._generatingDownload = false;
-    this._endingDownload = false;
-    this._progressBarValue = 0;
-    this._progressBarMode = 'determinate';
-    this._filteredPDF = undefined;
-    this._seguidores1Eje = [];
+    this.generatingDownload = false;
+    this.endingDownload = false;
+    this.progressBarValue = 0;
+    this.progressBarMode = 'determinate';
+    this.filteredPDF = undefined;
+    this.seguidores1Eje = [];
     this.noS1EsLocAreas = [];
-    this._englishLang = false;
-    this._typeDownload = 'pdf';
+    this.englishLang = false;
+    this.typeDownload = 'pdf';
   }
 
   //////////////////////////////////////////////////////

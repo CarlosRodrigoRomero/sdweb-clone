@@ -206,7 +206,7 @@ export class ZonesService {
     this.locAreas = [];
     this.zones = [];
     this.zonesBySize = [];
-    this._thereAreZones = false;
+    this.thereAreZones = false;
   }
 
   get thereAreZones(): boolean {
