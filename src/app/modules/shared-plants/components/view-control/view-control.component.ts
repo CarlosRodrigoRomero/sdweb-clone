@@ -56,6 +56,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
     }
 
     this.subscriptions.add(this.olMapService.zonasLayers$.subscribe((layers) => (this.zonesLayers = layers)));
+    // this.olMapService.zonasLayers$.pipe(take(1)).subscribe((layers) => (this.zonesLayers = layers));
 
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {
@@ -167,13 +168,15 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   }
 
   private setZonesLayersVisibility(informeId: string) {
-    this.zonesLayers.forEach((layer) => {
-      if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
-        layer.setVisible(true);
-      } else {
-        layer.setVisible(false);
-      }
-    });
+    if (this.zonesLayers.length === this.reportControlService.informes.length * 3) {
+      this.zonesLayers.forEach((layer) => {
+        if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
+          layer.setVisible(true);
+        } else {
+          layer.setVisible(false);
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
