@@ -263,7 +263,7 @@ export class ZonesControlService {
           .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
           .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
 
-        if (feature !== undefined) {
+        if (feature !== undefined && this.currentZoom < this.zoomChangeView) {
           // cuando pasamos de una zona a otra directamente sin pasar por vacio
           if (this.prevFeatureHovered !== undefined) {
             this.prevFeatureHovered.setStyle(this.getStyleZonas(false));
@@ -303,10 +303,13 @@ export class ZonesControlService {
     select.on('select', (e) => {
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().hasOwnProperty('properties')) {
-          const centroidZone = e.selected[0].getProperties().properties.centroid;
+          const zoomIn = 19;
+          if (this.currentZoom < zoomIn) {
+            const centroidZone = e.selected[0].getProperties().properties.centroid;
 
-          this.olMapService.setViewCenter(centroidZone);
-          this.olMapService.setViewZoom(19);
+            this.olMapService.setViewCenter(centroidZone);
+            this.olMapService.setViewZoom(zoomIn);
+          }
         }
       }
     });
@@ -348,14 +351,14 @@ export class ZonesControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focus ? 'white' : this.getColorMae(feature, 1),
-            width: this.currentZoom >= this.zoomChangeView ? 2 : 4,
+            color: focus ? 'white' : 'black',
+            width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
           }),
           fill:
             this.currentZoom >= this.zoomChangeView
               ? null
               : new Fill({
-                  color: this.getColorMae(feature, 0.6),
+                  color: this.getColorMae(feature, 0.9),
                 }),
           text: this.getLabelStyle(feature),
         });
@@ -381,14 +384,14 @@ export class ZonesControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focus ? 'white' : this.getColorCelsCalientes(feature, 1),
-            width: this.currentZoom >= this.zoomChangeView ? 2 : 4,
+            color: focus ? 'white' : 'black',
+            width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
           }),
           fill:
             this.currentZoom >= this.zoomChangeView
               ? null
               : new Fill({
-                  color: this.getColorCelsCalientes(feature, 0.6),
+                  color: this.getColorCelsCalientes(feature, 0.9),
                 }),
           text: this.getLabelStyle(feature),
         });
@@ -414,14 +417,14 @@ export class ZonesControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focus ? 'white' : this.getColorGradienteNormMax(feature, 1),
-            width: this.currentZoom >= this.zoomChangeView ? 2 : 4,
+            color: focus ? 'white' : 'black',
+            width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
           }),
           fill:
             this.currentZoom >= this.zoomChangeView
               ? null
               : new Fill({
-                  color: this.getColorGradienteNormMax(feature, 0.6),
+                  color: this.getColorGradienteNormMax(feature, 0.9),
                 }),
           text: this.getLabelStyle(feature),
         });
