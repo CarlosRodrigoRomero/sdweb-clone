@@ -11,7 +11,10 @@ import { LatLngLiteral } from '@agm/core/map-types';
 
 import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 
-import { GLOBAL } from '@data/constants/global';
+import inside from 'point-in-polygon';
+
+declare let fabric;
+
 import { PcInterface, Pc } from '@core/models/pc';
 import { InformeService } from '@data/services/informe.service';
 import { PlantaService } from '@data/services/planta.service';
@@ -24,9 +27,8 @@ import { ArchivoVueloInterface } from '@core/models/archivoVuelo';
 import { EstructuraInterface } from '@core/models/estructura';
 import { PlantaInterface } from '@core/models/planta';
 
-import inside from 'point-in-polygon';
-
-declare let fabric;
+import { COLOR } from '@data/constants/color';
+import { GLOBAL } from '@data/constants/global';
 
 @Component({
   selector: 'app-canvas',
@@ -619,7 +621,7 @@ export class CanvasComponent implements OnInit {
   }
 
   private getColorByTipo(tipo: number): string {
-    return GLOBAL.colores_tipos[tipo];
+    return COLOR.colores_tipos[tipo];
   }
 
   private drawPolygonsInCanvas(pc: PcInterface) {
