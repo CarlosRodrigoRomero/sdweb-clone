@@ -314,7 +314,13 @@ export class SeguidorService {
   }
 
   getCelsCalientesAnomColor(anomalia: Anomalia) {
-    return 'red';
+    if (anomalia.gradienteNormalizado < 10) {
+      return COLOR.colores_severity[0];
+    } else if (anomalia.gradienteNormalizado < 40) {
+      return COLOR.colores_severity[1];
+    } else {
+      return COLOR.colores_severity[2];
+    }
   }
 
   getGradienteAnomColor(anomalia: Anomalia) {
