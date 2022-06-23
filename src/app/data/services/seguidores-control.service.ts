@@ -204,6 +204,7 @@ export class SeguidoresControlService {
         view: 2,
         type: 'seguidores',
       });
+      seguidoresLayers.push(gradNormMaxLayer);
     }
 
     return seguidoresLayers;
