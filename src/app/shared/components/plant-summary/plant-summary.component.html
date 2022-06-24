@@ -33,9 +33,9 @@
           <mat-icon color="secondary">east</mat-icon>
           <h5 class="subtitulo">{{ informe.vientoDireccion }}º</h5>
         </div>
-        <div *ngIf="informe.vientoVelocidad !== undefined" class="elemento">
+        <div *ngIf="vientoVelocidad !== undefined" class="elemento">
           <mat-icon color="secondary">air</mat-icon>
-          <h5 class="subtitulo">{{ informe.vientoVelocidad }} (Beaufort)</h5>
+          <h5 class="subtitulo">{{ vientoVelocidad }} (Beaufort)</h5>
         </div>
         <div
           *ngIf="

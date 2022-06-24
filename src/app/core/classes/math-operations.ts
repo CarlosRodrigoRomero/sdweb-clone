@@ -53,4 +53,39 @@ export class MathOperations {
 
     return sumDesvs / values.length;
   }
+
+  static kmhToBeaufort(kmh: number): number {
+    switch (true) {
+      case kmh >= 0 && kmh <= 1:
+        return 0;
+      case kmh >= 2 && kmh <= 5:
+        return 1;
+      case kmh >= 6 && kmh <= 11:
+        return 2;
+      case kmh >= 12 && kmh <= 19:
+        return 3;
+      case kmh >= 20 && kmh <= 28:
+        return 4;
+      case kmh >= 29 && kmh <= 38:
+        return 5;
+      case kmh >= 39 && kmh <= 49:
+        return 6;
+      case kmh >= 50 && kmh <= 61:
+        return 7;
+      case kmh >= 62 && kmh <= 74:
+        return 8;
+      case kmh >= 75 && kmh <= 88:
+        return 9;
+      case kmh >= 89 && kmh <= 102:
+        return 10;
+      case kmh >= 103 && kmh <= 117:
+        return 11;
+      case kmh >= 118:
+        return 12;
+    }
+  }
+
+  static kmhToMs(kmh: number): number {
+    return (kmh * 1000) / 3600;
+  }
 }

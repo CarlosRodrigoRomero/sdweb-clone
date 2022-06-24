@@ -10,6 +10,7 @@ import { PlantaService } from '@data/services/planta.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
+import { MathOperations } from '@core/classes/math-operations';
 
 @Component({
   selector: 'app-plant-summary',
@@ -22,6 +23,7 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
   potenciaPlanta = 1;
   tipoPlanta = 'fija';
   fechaSelectedInforme;
+  vientoVelocidad: number;
   public planta: PlantaInterface = undefined;
   public _informe: InformeInterface = undefined;
   public informe$ = new BehaviorSubject<InformeInterface>(this._informe);
@@ -50,6 +52,10 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
               this.informe = informes.find((informe) => informe.id === this.selectedInformeId);
 
               this.fechaSelectedInforme = this.informeService.getDateLabelInforme(this.informe);
+
+              if (this.informe.vientoVelocidad !== undefined) {
+                this.vientoVelocidad = MathOperations.kmhToBeaufort(this.informe.vientoVelocidad);
+              }
 
               return this.plantaService.getPlanta(this.informe.plantaId);
             })
