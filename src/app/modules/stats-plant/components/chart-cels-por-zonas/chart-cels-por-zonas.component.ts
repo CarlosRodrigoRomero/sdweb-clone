@@ -21,6 +21,7 @@ import {
 import { ReportControlService } from '@data/services/report-control.service';
 import { PlantaService } from '@data/services/planta.service';
 import { InformeService } from '@data/services/informe.service';
+import { ZonesService } from '@data/services/zones.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
@@ -64,47 +65,35 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
-    private informeService: InformeService
+    private informeService: InformeService,
+    private zonesService: ZonesService
   ) {}
 
   ngOnInit(): void {
+    this.zones = this.zonesService.zonesBySize[0];
+
+    // filtramos por si hay zonas con el mismo nombre
+    this.zones = this.plantaService.getUniqueLargestLocAreas(this.zones);
+
+    this.informesIdList = this.reportControlService.informesIdList;
+
+    this.allAnomalias = this.reportControlService.allAnomalias;
+
     this.subscriptions.add(
-      this.plantaService
-        .getLocationsArea(this.reportControlService.plantaId)
-        .pipe(
-          switchMap((locAreas) => {
-            // obtenemos las zonas mayores
-            this.zones = locAreas.filter(
-              (locArea) =>
-                locArea.globalCoords[0] !== undefined &&
-                locArea.globalCoords[0] !== null &&
-                locArea.globalCoords[0] !== ''
-            );
+      this.informeService.getDateLabelsInformes(this.informesIdList).subscribe((dateLabels) => {
+        this.dateLabels = dateLabels;
 
-            // filtramos por si hay zonas con el mismo nombre
-            this.zones = this.plantaService.getUniqueLargestLocAreas(this.zones);
+        this.chartData = [];
+        this.informesIdList.forEach((informeId) => {
+          const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
 
-            this.informesIdList = this.reportControlService.informesIdList;
+          // tslint:disable-next-line: triple-equals
+          const celscalInforme = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
-            this.allAnomalias = this.reportControlService.allAnomalias;
-
-            return this.informeService.getDateLabelsInformes(this.informesIdList);
-          })
-        )
-        .subscribe((dateLabels) => {
-          this.dateLabels = dateLabels;
-
-          this.chartData = [];
-          this.informesIdList.forEach((informeId) => {
-            const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
-
-            // tslint:disable-next-line: triple-equals
-            const celscalInforme = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
-
-            this.chartData.push(this._calculateChartData(celscalInforme));
-          });
-          this._initChart();
-        })
+          this.chartData.push(this._calculateChartData(celscalInforme));
+        });
+        this._initChart();
+      })
     );
   }
 
