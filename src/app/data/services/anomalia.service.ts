@@ -138,6 +138,7 @@ export class AnomaliaService {
       .collection<Anomalia>(tipo, (ref) => ref.where('informeId', '==', informeId))
       .snapshotChanges()
       .pipe(
+        take(1),
         map((actions) => {
           let anoms = actions.map((doc, index) => {
             const data = doc.payload.doc.data() as Anomalia;

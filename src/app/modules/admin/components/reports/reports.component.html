@@ -61,17 +61,18 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Acciones</th>
         <td class="actions" mat-cell *matCellDef="let element">
-          <button
+          <a
+            mat-button
             class="btn-login"
             mat-icon-button
             [routerLink]="['../../clients', element.tipoInforme, element.plantaId]"
             matTooltip="Acceder al Informe"
           >
             <mat-icon>login</mat-icon>
-          </button>
-          <button mat-icon-button [routerLink]="['./edit', element.informeId]" matTooltip="Editar Informe">
+          </a>
+          <a mat-button mat-icon-button [routerLink]="['./edit', element.informeId]" matTooltip="Editar Informe">
             <mat-icon>edit</mat-icon>
-          </button>
+          </a>
           <a mat-button [routerLink]="['../../clientes/auto-loc', element.plantaId]">Localizaciones</a>
           <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../autogeo', element.informeId]"
             >AutoGeo</a
