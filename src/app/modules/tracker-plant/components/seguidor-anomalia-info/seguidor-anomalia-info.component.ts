@@ -1,14 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 import { PcService } from '@data/services/pc.service';
 import { AuthService } from '@data/services/auth.service';
+import { ReportControlService } from '@data/services/report-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
-import { switchMap, take } from 'rxjs/operators';
 
 import { COLOR } from '@data/constants/color';
 import { GLOBAL } from '@data/constants/global';
@@ -28,7 +29,8 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
   constructor(
     private seguidorViewService: SeguidorViewService,
     private authService: AuthService,
-    private pcService: PcService
+    private pcService: PcService,
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
@@ -59,7 +61,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
               recomendacion: GLOBAL.pcRecomendacion[this.anomaliaSelected.tipo],
               fila: this.anomaliaSelected.localY,
               columna: this.anomaliaSelected.localX,
-              fecha: this.anomaliaSelected.datetime,
+              fecha: this.fixNewTiffDates(this.anomaliaSelected.datetime),
               irradiancia: this.anomaliaSelected.irradiancia,
               // vientoDireccion: this.anomaliaSelected.vientoDireccion,
               // vientoVelocidad: this.anomaliaSelected.vientoVelocidad,
@@ -70,6 +72,14 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
           }
         })
     );
+  }
+
+  private fixNewTiffDates(date: number): number {
+    // quitamos 2 horas a las plantas de seguidores a partir de 2022 por el cambio de formato a TIFF
+    const init2022 = 1640995200;
+    if (!this.reportControlService.plantaFija && date > init2022) {
+      return date - 7200;
+    }
   }
 
   updateAnomalia(value: any, field: string) {
