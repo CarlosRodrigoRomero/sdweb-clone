@@ -19,6 +19,7 @@ import inside from 'point-in-polygon';
 import { ImageProcessService } from '@data/services/image-process.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ZonesService } from '@data/services/zones.service';
+import { DemoService } from '@data/services/demo.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
@@ -43,13 +44,17 @@ export class ImagesTilesService {
   constructor(
     private imageProcessService: ImageProcessService,
     private reportControlService: ReportControlService,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private demoService: DemoService
   ) {}
 
   checkImgsPlanosLoaded(): Promise<boolean> {
     return new Promise((loaded) => {
       this.subscriptions.add(
         this.imagesPlantaLoaded$.subscribe((value) => {
+          if (this.demoService.checkIsDemo()) {
+            loaded(true);
+          }
           if (this.zonesService.thereAreZones) {
             if (this.reportControlService.plantaFija) {
               if (value === 2) {

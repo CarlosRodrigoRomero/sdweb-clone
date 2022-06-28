@@ -10,6 +10,10 @@ import { PlantaInterface } from '@core/models/planta';
 export class DemoService {
   plantaId = 'egF0cbpXnnBnjcrusoeR';
   informesId = ['vfMHFBPvNFnOFgfCgM9L', '4ruzdxY6zYxvUOucACQ0'];
+  visualLayer = 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png';
+  demoGIS = 'https://solardrontech.es/demo_rgb/';
+  pdf =
+    'https://firebasestorage.googleapis.com/v0/b/sdweb-d33ce.appspot.com/o/informes%2FvfMHFBPvNFnOFgfCgM9L%2Finforme.pdf?alt=media&token=95627352-546e-4a91-b19d-8cc5ec39b2cb';
 
   constructor(private router: Router) {}
 

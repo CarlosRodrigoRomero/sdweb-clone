@@ -33,6 +33,7 @@ import { ImagesTilesService } from '@data/services/images-tiles.service';
 import { ReportPdfService } from '@data/services/report-pdf.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ResetServices } from '@data/services/reset-services.service';
+import { DemoService } from '@data/services/demo.service';
 
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
 import { Translation } from '@shared/utils/translations/translations';
@@ -146,7 +147,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     private imagesTilesService: ImagesTilesService,
     private reportPdfService: ReportPdfService,
     private zonesService: ZonesService,
-    private resetServices: ResetServices
+    private resetServices: ResetServices,
+    private demoService: DemoService
   ) {}
 
   ngOnInit(): void {
@@ -519,7 +521,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
         // comprobamos que estan cargados los planos de la planta
         this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
-          console.log(this.imagesPlantaCompleta);
           // comprobamos que estan cargadas tb el resto de imagenes del PDF
           this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
             // comprobamos si se van a cargar imagenes de anomalias
@@ -894,7 +895,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const tileCoords = this.imagesTilesService.getElemTiles(
       anomalia.featureCoords,
       this.imagesTilesService.getElemExtent(anomalia.featureCoords),
-      zoomLevel, this.map
+      zoomLevel,
+      this.map
     );
 
     const canvas = new fabric.Canvas('canvas');
@@ -905,8 +907,21 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const height = canvas.height / lado;
     let contador = 0;
     tileCoords.forEach((tileCoord, index) => {
-      const url =
-        GLOBAL.GIS + `${this.selectedInforme.id}_${layer}/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+      let url = `${GLOBAL.GIS}${this.selectedInforme.id}_${layer}/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+
+      /* DEMO */
+      if (this.demoService.checkIsDemo()) {
+        if (layer === 'thermal') {
+          if (this.selectedInforme.id === 'vfMHFBPvNFnOFgfCgM9L') {
+            url = `${GLOBAL.GIS}demo_thermal_2020/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+          } else {
+            url = `${GLOBAL.GIS}demo_thermal_2019/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+          }
+        }
+        if (layer === 'visual') {
+          url = `${this.demoService.demoGIS}${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+        }
+      }
 
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;
@@ -1029,7 +1044,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const tileCoords = this.imagesTilesService.getElemTiles(
       segCoords,
       this.imagesTilesService.getElemExtent(segCoords),
-      22, this.map
+      22,
+      this.map
     );
 
     const canvas = new fabric.Canvas('canvas');

@@ -5,6 +5,7 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import { Subscription } from 'rxjs';
 
 import { ReportControlService } from '@data/services/report-control.service';
+import { DemoService } from '@data/services/demo.service';
 
 @Component({
   selector: 'app-download-report',
@@ -19,14 +20,19 @@ export class DownloadReportComponent implements OnInit, OnDestroy {
   excelExist = true;
   excelUrl: string;
   plantaDemo = false;
-  pdfDemo =
-    'https://firebasestorage.googleapis.com/v0/b/sdweb-d33ce.appspot.com/o/informes%2F62dvYbGgoMkMNCuNCOEc%2Finforme.pdf?alt=media&token=e7360912-80a4-43eb-bbca-b41868c8a9d6';
+  pdfDemo: string;
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private storage: AngularFireStorage, public reportControlService: ReportControlService) {}
+  constructor(
+    private storage: AngularFireStorage,
+    public reportControlService: ReportControlService,
+    private demoService: DemoService
+  ) {}
 
   ngOnInit(): void {
+    this.pdfDemo = this.demoService.pdf;
+
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {
         this.selectedInformeId = informeId;
