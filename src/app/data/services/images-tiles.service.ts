@@ -380,9 +380,10 @@ export class ImagesTilesService {
   }
 
   drawPolygonInCanvas(id: string, canvas: any, coordsPolygonCanvas: number[], index?: number, strokeAnomalia?: number) {
-    let strokeWidth = 2;
-    let rx = 4;
-    let ry = 4;
+    const longestSide = Math.max(coordsPolygonCanvas[2], coordsPolygonCanvas[3]);
+    let strokeWidth = longestSide * 0.02;
+    let rx = strokeWidth * 2;
+    let ry = strokeWidth * 2;
     if (strokeAnomalia !== undefined) {
       strokeWidth = strokeAnomalia;
       rx = 0;
@@ -430,7 +431,7 @@ export class ImagesTilesService {
   canvasCenterAndZoom(coordsPolygon: number[], canvas: any, trim?: boolean) {
     const longestSide = Math.max(coordsPolygon[2], coordsPolygon[3]);
     const polygonCentroid = [coordsPolygon[0] + coordsPolygon[2] / 2, coordsPolygon[1] + coordsPolygon[3] / 2];
-    const zoom = canvas.getWidth() / (longestSide + 120);
+    const zoom = canvas.getWidth() / (longestSide * 2);
 
     // VERDINALES
     let desviacion = 1;

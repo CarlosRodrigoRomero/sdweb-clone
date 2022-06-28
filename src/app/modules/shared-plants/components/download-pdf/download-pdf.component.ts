@@ -892,6 +892,21 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     if (this.planta.id === 'AyKgsY6F3TqGQGYNaOUY') {
       zoomLevel = 20;
     }
+
+    // a partir del 6/06/2022 la visual tiene 23 niveles de zoom
+    if (
+      layer === 'visual' &&
+      this.selectedInforme.fecha > GLOBAL.newVisualLayerDate &&
+      this.selectedInforme.id !== 'ISV7bS3eQWV4Cbveshlv'
+    ) {
+      zoomLevel = 23;
+    }
+
+    // la visual de Ibahernando 2022 tiene 24 niveles de zoom
+    if (layer === 'visual' && this.selectedInforme.id === 'KzD5R0In2B4UsymWLOTT') {
+      zoomLevel = 24;
+    }
+
     const tileCoords = this.imagesTilesService.getElemTiles(
       anomalia.featureCoords,
       this.imagesTilesService.getElemExtent(anomalia.featureCoords),

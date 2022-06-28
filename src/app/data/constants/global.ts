@@ -30,6 +30,7 @@ export let GLOBAL = {
   mae_rangos_labels: ['leve', 'moderado', 'grave'],
   cc_rangos: [0.02, 0.05],
   newReportsDate: 1619820000,
+  newVisualLayerDate: 1654473600, // compienza el 6/06/2022
   anomaliaPorDefecto: 9,
   resolucionCamara: [512, 640],
   globalCoordsEstructura: [0, 1, 2],
