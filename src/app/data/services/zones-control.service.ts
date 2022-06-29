@@ -47,6 +47,10 @@ export class ZonesControlService {
 
   initService(): Promise<boolean> {
     return new Promise((initService) => {
+      if (this.reportControlService.plantaFija) {
+        this.zoomChangeView = 20;
+      }
+
       this.subscriptions.add(
         this.olMapService.getMap().subscribe((map) => {
           this.map = map;
@@ -323,7 +327,7 @@ export class ZonesControlService {
     select.on('select', (e) => {
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().hasOwnProperty('properties')) {
-          const zoomIn = 19;
+          const zoomIn = this.zoomChangeView;
           if (this.currentZoom < zoomIn) {
             const centroidZone = e.selected[0].getProperties().properties.centroid;
 

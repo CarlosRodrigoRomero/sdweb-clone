@@ -29,8 +29,6 @@ import { LocationAreaInterface } from '@core/models/location';
 
 import { Colors } from '@core/classes/colors';
 
-import { COLOR } from '@data/constants/color';
-
 @Injectable({
   providedIn: 'root',
 })
@@ -592,13 +590,7 @@ export class SeguidoresControlService {
   }
 
   getColorSeguidorMae(mae: number, opacity: number): string {
-    if (mae < 0.01) {
-      return Colors.hexToRgb(COLOR.colores_severity[0], opacity);
-    } else if (mae < 0.05) {
-      return Colors.hexToRgb(COLOR.colores_severity[1], opacity);
-    } else {
-      return Colors.hexToRgb(COLOR.colores_severity[2], opacity);
-    }
+    return Colors.getColor(mae, [0.01, 0.05], opacity);
   }
 
   // ESTILOS CELS CALIENTES
@@ -632,13 +624,7 @@ export class SeguidoresControlService {
   private getColorSeguidorCelsCalientes(feature: Feature, opacity: number) {
     const celsCalientes = feature.getProperties().properties.celsCalientes;
 
-    if (celsCalientes < 0.02) {
-      return Colors.hexToRgb(COLOR.colores_severity[0], opacity);
-    } else if (celsCalientes < 0.1) {
-      return Colors.hexToRgb(COLOR.colores_severity[1], opacity);
-    } else {
-      return Colors.hexToRgb(COLOR.colores_severity[2], opacity);
-    }
+    return Colors.getColor(celsCalientes, [0.02, 0.1], opacity);
   }
 
   // ESTILOS GRADIENTE NORMALIZADO MAX
@@ -676,13 +662,7 @@ export class SeguidoresControlService {
   }
 
   getColorSeguidorGradienteNormMax(gradNormMax: number, opacity: number) {
-    if (gradNormMax < 10) {
-      return Colors.hexToRgb(COLOR.colores_severity[0], opacity);
-    } else if (gradNormMax < 40) {
-      return Colors.hexToRgb(COLOR.colores_severity[1], opacity);
-    } else {
-      return Colors.hexToRgb(COLOR.colores_severity[2], opacity);
-    }
+    return Colors.getColor(gradNormMax, [10, 40], opacity);
   }
 
   getLabelStyle(feature: Feature) {

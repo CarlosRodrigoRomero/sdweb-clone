@@ -26,6 +26,8 @@ import { ViewReportService } from '@data/services/view-report.service';
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
 
+import { Colors } from '@core/classes/colors';
+
 import { COLOR } from '@data/constants/color';
 
 @Injectable({
@@ -47,6 +49,7 @@ export class AnomaliasControlService {
   private currentZoom: number;
   private _coordsPointer: Coordinate = undefined;
   public coordsPointer$ = new BehaviorSubject<Coordinate>(this._coordsPointer);
+  private zoomChangeView = 22;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -491,27 +494,28 @@ export class AnomaliasControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focused ? 'white' : this.getColorMae(feature),
-            width: focused ? 5 : 4,
+            color:
+              this.currentZoom >= this.zoomChangeView
+                ? focused
+                  ? 'white'
+                  : this.getColorMae(feature, 1)
+                : focused
+                ? 'white'
+                : 'black',
+            width: this.currentZoom >= this.zoomChangeView ? 4 : focused ? 2 : 1,
           }),
           fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
+            color: this.currentZoom >= this.zoomChangeView ? 'rgba(255,255,255, 0)' : this.getColorMae(feature, 0.9),
           }),
         });
       }
     };
   }
 
-  private getColorMae(feature: Feature) {
+  private getColorMae(feature: Feature, opacity: number): string {
     const perdidas = feature.getProperties().properties.perdidas as number;
 
-    if (perdidas < 0.3) {
-      return COLOR.colores_severity[0];
-    } else if (perdidas < 0.5) {
-      return COLOR.colores_severity[1];
-    } else {
-      return COLOR.colores_severity[2];
-    }
+    return Colors.getColor(perdidas, [0.3, 0.5], opacity);
   }
 
   // ESTILOS CELS CALIENTES
@@ -520,27 +524,31 @@ export class AnomaliasControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focused ? 'white' : this.getColorCelsCalientes(feature),
-            width: focused ? 5 : 4,
+            color:
+              this.currentZoom >= this.zoomChangeView
+                ? focused
+                  ? 'white'
+                  : this.getColorCelsCalientes(feature, 1)
+                : focused
+                ? 'white'
+                : 'black',
+            width: this.currentZoom >= this.zoomChangeView ? 4 : focused ? 2 : 1,
           }),
           fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
+            color:
+              this.currentZoom >= this.zoomChangeView
+                ? 'rgba(255,255,255, 0)'
+                : this.getColorCelsCalientes(feature, 0.9),
           }),
         });
       }
     };
   }
 
-  private getColorCelsCalientes(feature: Feature) {
+  private getColorCelsCalientes(feature: Feature, opacity: number): string {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
-    if (gradNormMax < 10) {
-      return COLOR.colores_severity[0];
-    } else if (gradNormMax < 40) {
-      return COLOR.colores_severity[1];
-    } else {
-      return COLOR.colores_severity[2];
-    }
+    return Colors.getColor(gradNormMax, [10, 40], opacity);
   }
 
   // ESTILOS GRADIENTE NORMALIZADO MAX
@@ -549,27 +557,31 @@ export class AnomaliasControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focused ? 'white' : this.getColorGradienteNormMax(feature),
-            width: focused ? 5 : 4,
+            color:
+              this.currentZoom >= this.zoomChangeView
+                ? focused
+                  ? 'white'
+                  : this.getColorGradienteNormMax(feature, 1)
+                : focused
+                ? 'white'
+                : 'black',
+            width: this.currentZoom >= this.zoomChangeView ? 4 : focused ? 2 : 1,
           }),
           fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
+            color:
+              this.currentZoom >= this.zoomChangeView
+                ? 'rgba(255,255,255, 0)'
+                : this.getColorGradienteNormMax(feature, 0.9),
           }),
         });
       }
     };
   }
 
-  private getColorGradienteNormMax(feature: Feature) {
+  private getColorGradienteNormMax(feature: Feature, opacity: number) {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
-    if (gradNormMax < 10) {
-      return COLOR.colores_severity[0];
-    } else if (gradNormMax < 40) {
-      return COLOR.colores_severity[1];
-    } else {
-      return COLOR.colores_severity[2];
-    }
+    return Colors.getColor(gradNormMax, [10, 40], opacity);
   }
 
   // ESTILO POR TIPOS

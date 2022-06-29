@@ -1,3 +1,5 @@
+import { COLOR } from '@data/constants/color';
+
 export class Colors {
   static hexToRgb(hex: string, opacity: number): string {
     return (
@@ -12,5 +14,15 @@ export class Colors {
       opacity.toString() +
       ')'
     );
+  }
+
+  static getColor(value: number, range: number[], opacity: number): string {
+    if (value < range[0]) {
+      return Colors.hexToRgb(COLOR.colores_severity[0], opacity);
+    } else if (value < range[1]) {
+      return Colors.hexToRgb(COLOR.colores_severity[1], opacity);
+    } else {
+      return Colors.hexToRgb(COLOR.colores_severity[2], opacity);
+    }
   }
 }
