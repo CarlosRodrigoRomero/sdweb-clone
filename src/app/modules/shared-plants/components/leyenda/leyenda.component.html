@@ -2,15 +2,15 @@
   <mat-card-content>
     <div *ngIf="!plantaFija || (plantaFija && viewSelected != 1)" class="lines">
       <div class="line">
-        <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
+        <img class="leyenda-icon" src="assets/icons/leyenda-grave.png" alt="" />
         <span> {{ viewsLabels[viewSelected][2] }}</span>
       </div>
       <div class="line">
-        <mat-icon [ngStyle]="{ color: colors[viewSelected][1] }">crop_5_4</mat-icon>
+        <img class="leyenda-icon" src="assets/icons/leyenda-medio.png" alt="" />
         <span>{{ viewsLabels[viewSelected][1] }}</span>
       </div>
       <div class="line">
-        <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
+        <img class="leyenda-icon" src="assets/icons/leyenda-leve.png" alt="" />
         <span> {{ viewsLabels[viewSelected][0] }}</span>
       </div>
     </div>
@@ -20,15 +20,15 @@
         <div class="lines">
           <span class="lines-tittle">Zonas (% ccs)</span>
           <div class="line">
-            <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
+            <img class="leyenda-icon" src="assets/icons/leyenda-grave.png" alt="" />
             <span> {{ viewsLabels[viewSelected][2] }}</span>
           </div>
           <div class="line">
-            <mat-icon [ngStyle]="{ color: colors[viewSelected][1] }">crop_5_4</mat-icon>
+            <img class="leyenda-icon" src="assets/icons/leyenda-medio.png" alt="" />
             <span>{{ viewsLabels[viewSelected][1] }}</span>
           </div>
           <div class="line">
-            <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
+            <img class="leyenda-icon" src="assets/icons/leyenda-leve.png" alt="" />
             <span> {{ viewsLabels[viewSelected][0] }}</span>
           </div>
         </div>
