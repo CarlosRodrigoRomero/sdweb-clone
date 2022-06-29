@@ -366,12 +366,12 @@ export class ZonesControlService {
   }
 
   // ESTILOS MAE
-  private getStyleMae(focus: boolean) {
+  private getStyleMae(focused: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focus ? 'white' : 'black',
+            color: focused ? 'white' : 'black',
             width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
           }),
           fill:
