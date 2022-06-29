@@ -128,9 +128,7 @@ export class ZonesControlService {
       const source = l.getSource();
       source.clear();
       zonas.forEach((zona) => {
-        const elemsFilteredZona = this.getElemsZona(zona, elemsFilteredInforme);
-        // si no hay seguidores dentro de la zona no la añadimos
-        if (elemsFilteredZona.length > 0) {
+        if (elemsInforme.length === elemsFilteredInforme.length) {
           const allElemsZona = this.getElemsZona(zona, elemsInforme);
           const property = this.getPropertyView(view, informeId, elemsInforme, allElemsZona);
 
@@ -147,6 +145,28 @@ export class ZonesControlService {
             },
           });
           source.addFeature(feature);
+        } else {
+          const elemsFilteredZona = this.getElemsZona(zona, elemsFilteredInforme);
+
+          // si no hay seguidores dentro de la zona no la añadimos
+          if (elemsFilteredZona === null || elemsFilteredZona.length > 0) {
+            const allElemsZona = this.getElemsZona(zona, elemsInforme);
+            const property = this.getPropertyView(view, informeId, elemsInforme, allElemsZona);
+
+            const coords = this.pathToLonLat(zona.path);
+            // crea poligono seguidor
+            const feature = new Feature({
+              geometry: new Polygon(coords),
+              properties: {
+                id: this.getGlobalsLabel(zona.globalCoords),
+                informeId,
+                centroid: this.olMapService.getCentroid(coords[0]),
+                type: 'zone',
+                [property.type]: property.value,
+              },
+            });
+            source.addFeature(feature);
+          }
         }
       });
     });
