@@ -49,7 +49,7 @@ export class AnomaliasControlService {
   private currentZoom: number;
   private _coordsPointer: Coordinate = undefined;
   public coordsPointer$ = new BehaviorSubject<Coordinate>(this._coordsPointer);
-  private zoomChangeView = 22;
+  zoomChangeView = 22;
 
   private subscriptions: Subscription = new Subscription();
 

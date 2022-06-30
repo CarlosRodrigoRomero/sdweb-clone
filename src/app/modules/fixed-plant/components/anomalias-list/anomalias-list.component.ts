@@ -12,9 +12,7 @@ import { FilterService } from '@data/services/filter.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
-import { PlantaService } from '@data/services/planta.service';
 import { ViewReportService } from '@data/services/view-report.service';
-import { ZonesControlService } from '@data/services/zones-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
@@ -48,9 +46,7 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
     private anomaliasControlService: AnomaliasControlService,
     private reportControlService: ReportControlService,
     private olMapService: OlMapService,
-    private plantaService: PlantaService,
-    private viewReportService: ViewReportService,
-    private zonesControlService: ZonesControlService
+    private viewReportService: ViewReportService
   ) {}
 
   ngOnInit() {
@@ -159,7 +155,8 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
   private centerView(anomalia: Anomalia, zoom: boolean) {
     this.map.getView().setCenter(anomalia.featureCoords[0]);
     if (zoom) {
-      this.map.getView().setZoom(this.planta.zoom + 6);
+      // aplicamos el zoom en el que cambian la vista de la anomalia para mostrar detalles
+      this.map.getView().setZoom(this.anomaliasControlService.zoomChangeView);
     }
   }
 
