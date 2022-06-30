@@ -148,7 +148,7 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
           image: new Icon({
             crossOrigin: 'anonymous',
             src: iconSrc,
-            scale: 0.6,
+            scale: 0.5,
           }),
         })
       );
@@ -308,11 +308,10 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
     if (hovered) {
       return (feature: Feature) => {
         if (feature !== undefined) {
-          const iconSrc = this.getMaeIcon(feature.getProperties().informeReciente.mae);
+          const iconSrc = 'assets/icons/location-pin-hovered.png';
 
           return new Style({
             image: new Icon({
-              color: 'white',
               crossOrigin: 'anonymous',
               src: iconSrc,
               scale: 0.8,
@@ -329,7 +328,7 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
             image: new Icon({
               crossOrigin: 'anonymous',
               src: iconSrc,
-              scale: 0.6,
+              scale: 0.5,
             }),
           });
         }
