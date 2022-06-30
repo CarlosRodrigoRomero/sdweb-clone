@@ -1,5 +1,18 @@
-mat-card {
+.principal-card {
   height: calc(50vh - 86px);
+}
+
+.title-map {
+  position: absolute;
+  z-index: 1;
+  top: 1.5rem;
+  left: 1.5rem;
+  padding: 0.5rem;
+}
+
+.title-map span {
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 #map {
