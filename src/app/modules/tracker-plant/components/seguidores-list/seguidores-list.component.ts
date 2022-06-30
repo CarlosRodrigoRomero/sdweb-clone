@@ -4,17 +4,16 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { Subscription } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
 import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { SeguidoresControlService } from '@data/services/seguidores-control.service';
-import { PlantaService } from '@data/services/planta.service';
 import { ViewReportService } from '@data/services/view-report.service';
-import { ZonesControlService } from '@data/services/zones-control.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
+import { COLOR } from '@data/constants/color';
 
 interface SeguidorData {
   id: string;
@@ -34,9 +33,8 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
   viewSeleccionada = 0;
   displayedColumns: string[] = [];
   dataSource: MatTableDataSource<SeguidorData>;
-  public seguidorHovered: Seguidor = undefined;
-  public seguidorSelected: Seguidor = undefined;
-  private planta: PlantaInterface;
+  seguidorHovered: Seguidor = undefined;
+  seguidorSelected: Seguidor = undefined;
   private selectedInformeId: string;
 
   private subscriptions: Subscription = new Subscription();
@@ -47,9 +45,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
     public filterService: FilterService,
     private reportControlService: ReportControlService,
     private seguidoresControlService: SeguidoresControlService,
-    private plantaService: PlantaService,
-    private viewReportService: ViewReportService,
-    private zonesControlService: ZonesControlService
+    private viewReportService: ViewReportService
   ) {}
 
   ngOnInit(): void {
@@ -60,19 +56,17 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
         // cambiammos la ultima columna con la vista seleccionada
         switch (this.viewSeleccionada) {
           case 0:
-            this.displayedColumns = ['nombre', 'numAnomalias', 'modulo', 'mae'];
+            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'mae'];
             break;
           case 1:
-            this.displayedColumns = ['nombre', 'numAnomalias', 'modulo', 'celsCalientes'];
+            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'celsCalientes'];
             break;
           case 2:
-            this.displayedColumns = ['nombre', 'numAnomalias', 'modulo', 'gradiente'];
+            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'gradiente'];
             break;
         }
       })
     );
-
-    this.planta = this.reportControlService.planta;
 
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$
@@ -92,13 +86,13 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
               const seguidor = elem as Seguidor;
 
               filteredElements.push({
-                // color: this.seguidoresControlService.getColorSeguidorMaeExternal(seguidor.mae),
                 nombre: seguidor.nombre,
                 numAnomalias: seguidor.anomaliasCliente.length,
                 modulo: seguidor.moduloLabel,
                 mae: seguidor.mae,
                 celsCalientes: seguidor.celsCalientes,
                 gradiente: seguidor.gradienteNormalizado,
+                colors: this.getColorsViewSeguidor(seguidor),
                 seguidor,
               });
             });
@@ -120,6 +114,24 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
     if (this.dataSource !== undefined) {
       this.dataSource.sort = this.sort;
     }
+  }
+
+  private getColorsViewSeguidor(seguidor: Seguidor): string[] {
+    let colors: string[] = [];
+    if (seguidor.anomaliasCliente.length > 0) {
+      const colorMae = this.seguidoresControlService.getColorSeguidorMae(seguidor.mae, 1);
+      const colorCCs = this.seguidoresControlService.getColorSeguidorGradienteNormMax(seguidor.gradienteNormalizado, 1);
+      const colorGradNormMax = this.seguidoresControlService.getColorSeguidorGradienteNormMax(
+        seguidor.gradienteNormalizado,
+        1
+      );
+
+      colors = [colorMae, colorCCs, colorGradNormMax];
+    } else {
+      colors = [COLOR.color_no_anoms, COLOR.color_no_anoms, COLOR.color_no_anoms];
+    }
+
+    return colors;
   }
 
   applyFilter(event: Event) {

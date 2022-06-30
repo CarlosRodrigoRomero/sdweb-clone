@@ -18,6 +18,10 @@
   justify-content: center;
 }
 
+:host ::ng-deep td.mat-cell:first-of-type {
+  padding-left: 0px;
+}
+
 table {
   width: 100%;
 }
@@ -48,4 +52,9 @@ table {
 
 .row-content mat-icon {
   margin-right: 0.5rem;
+}
+
+.color-row {
+  width: 10px;
+  height: 48px;
 }

@@ -85,18 +85,17 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
                 gradiente = anom.gradienteNormalizado + 'ºC';
               }
 
-              const colors = this.getAnomViewColors(anom);
-
               anomaliasTabla.push({
                 numAnom: anom.numAnom,
                 tipo: GLOBAL.pcDescripcion[anom.tipo],
                 perdidas,
                 tempMax,
                 gradiente,
-                colors,
+                colors: this.getAnomViewColors(anom),
                 anomalia: anom,
               });
             });
+
             this.dataSource = new MatTableDataSource(anomaliasTabla);
             this.dataSource.sort = this.sort;
           }
