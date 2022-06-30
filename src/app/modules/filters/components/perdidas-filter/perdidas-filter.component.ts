@@ -9,6 +9,8 @@ import { FilterControlService } from '@data/services/filter-control.service';
 
 import { PerdidasFilter } from '@core/models/perdidasFilter';
 
+import { COLOR } from '@data/constants/color';
+
 @Component({
   selector: 'app-perdidas-filter',
   templateUrl: './perdidas-filter.component.html',
@@ -53,12 +55,12 @@ export class PerdidasFilterComponent implements OnInit, OnDestroy {
         if (minValue === this.minPerdidas && maxValue === this.maxPerdidas) {
           return '#c4c4c4';
         }
-        return '#455a64';
+        return COLOR.color_rojo_interfaz;
       },
       getPointerColor: (value: number, pointerType: PointerType.Min | PointerType.Max): string => {
         if (value !== this.minPerdidas) {
           if (value !== this.maxPerdidas) {
-            return '#455a64';
+            return COLOR.color_rojo_interfaz;
           }
         }
       },

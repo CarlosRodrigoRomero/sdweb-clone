@@ -9,13 +9,13 @@ import { FilterControlService } from '@data/services/filter-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
 
 import { TempMaxFilter } from '@core/models/tempMaxFilter';
-import { Anomalia } from '@core/models/anomalia';
-import { Seguidor } from '@core/models/seguidor';
+
+import { COLOR } from '@data/constants/color';
 
 @Component({
   selector: 'app-temp-max-filter',
   templateUrl: './temp-max-filter.component.html',
-  styleUrls: ['./temp-max-filter.component.css'],
+  styleUrls: ['./temp-max-filter.component.scss'],
 })
 export class TempMaxFilterComponent implements OnInit, OnDestroy {
   floor = 50;
@@ -67,12 +67,12 @@ export class TempMaxFilterComponent implements OnInit, OnDestroy {
         if (minValue === this.floor && maxValue === this.ceil) {
           return '#c4c4c4';
         }
-        return '#455a64';
+        return COLOR.color_rojo_interfaz;
       },
       getPointerColor: (value: number, pointerType: PointerType.Min | PointerType.Max): string => {
         if (value !== this.floor) {
           if (value !== this.ceil) {
-            return '#455a64';
+            return COLOR.color_rojo_interfaz;
           }
         }
       },
