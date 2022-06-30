@@ -13,6 +13,10 @@
         <img class="leyenda-icon" src="assets/icons/leyenda-leve.png" alt="" />
         <span> {{ viewsLabels[viewSelected][0] }}</span>
       </div>
+      <div class="line">
+        <img class="leyenda-icon" src="assets/icons/leyenda-no-anoms.png" alt="" />
+        <span> Sin anomalías</span>
+      </div>
     </div>
 
     <div *ngIf="plantaFija && viewSelected == 1" class="leyenda-block">
@@ -30,6 +34,10 @@
           <div class="line">
             <img class="leyenda-icon" src="assets/icons/leyenda-leve.png" alt="" />
             <span> {{ viewsLabels[viewSelected][0] }}</span>
+          </div>
+          <div class="line">
+            <img class="leyenda-icon" src="assets/icons/leyenda-no-anoms.png" alt="" />
+            <span> Sin anomalías</span>
           </div>
         </div>
         <div class="lines">

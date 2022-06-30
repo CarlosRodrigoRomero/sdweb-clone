@@ -2,6 +2,7 @@ export let COLOR = {
   gris: '#546e7a',
   colores_mae: ['#00e396', '#0892d0', '#ff0400'], // verde, azul, rojo
   colores_mae_rgb: ['rgba(0,227,150,1)', 'rgba(8,146,208,1)', 'rgba(253,80,77,1)'], // verde, azul, rojo
+  color_no_anoms: '#E8E8E8',
   colores_severity: ['#71974C', '#FF9A00', '#B90009'], // verde, ambar, rojo
   colores_severity_rgb: ['rgba(113,151,76,1)', 'rgba(255,154,0,1)', 'rgba(185,0,9,1)'], // verde, ambar, rojo
   colores_grad: ['#00e396', '#FF8A00', '#fd504d'], // verde, naranja, rojo

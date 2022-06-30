@@ -28,6 +28,7 @@ import { MathOperations } from '@core/classes/math-operations';
 import { LocationAreaInterface } from '@core/models/location';
 
 import { Colors } from '@core/classes/colors';
+import { COLOR } from '@data/constants/color';
 
 @Injectable({
   providedIn: 'root',
@@ -263,6 +264,7 @@ export class SeguidoresControlService {
             anomalias: seguidor.anomalias,
             filas: seguidor.filas,
             columnas: seguidor.columnas,
+            numAnoms: seguidor.anomaliasCliente.length,
           },
         });
 
@@ -561,26 +563,53 @@ export class SeguidoresControlService {
   private getStyleSeguidoresMae(focused: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color:
-              this.currentZoom >= this.zoomChangeView
-                ? focused
+        if (feature.getProperties().properties.numAnoms > 0) {
+          return new Style({
+            stroke: new Stroke({
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? focused
+                    ? 'white'
+                    : this.getColorFeatureMae(feature, 1)
+                  : focused
                   ? 'white'
-                  : this.getColorFeatureMae(feature, 1)
-                : focused
-                ? 'white'
-                : 'black',
-            width: focused ? 4 : 2,
-          }),
-          fill: new Fill({
-            color:
-              this.currentZoom >= this.zoomChangeView ? 'rgba(255,255,255, 0)' : this.getColorFeatureMae(feature, 0.9),
-          }),
-          text: this.getLabelStyle(feature),
-        });
+                  : 'black',
+              width: focused ? 4 : 2,
+            }),
+            fill: new Fill({
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? 'rgba(255,255,255, 0)'
+                  : this.getColorFeatureMae(feature, 0.9),
+            }),
+            text: this.getLabelStyle(feature),
+          });
+        } else {
+          return this.getNoAnomsStyle(feature, focused);
+        }
       }
     };
+  }
+
+  private getNoAnomsStyle(feature: Feature, focused: boolean) {
+    return new Style({
+      stroke: new Stroke({
+        color:
+          this.currentZoom >= this.zoomChangeView
+            ? focused
+              ? 'white'
+              : Colors.hexToRgb(COLOR.color_no_anoms, 1)
+            : focused
+            ? 'white'
+            : 'black',
+        width: focused ? 4 : 2,
+      }),
+      fill: new Fill({
+        color:
+          this.currentZoom >= this.zoomChangeView ? 'rgba(255,255,255, 0)' : Colors.hexToRgb(COLOR.color_no_anoms, 0.9),
+      }),
+      text: this.getLabelStyle(feature),
+    });
   }
 
   private getColorFeatureMae(feature: Feature, opacity: number) {
@@ -597,26 +626,30 @@ export class SeguidoresControlService {
   private getStyleSeguidoresCelsCalientes(focused) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color:
-              this.currentZoom >= this.zoomChangeView
-                ? focused
+        if (feature.getProperties().properties.numAnoms > 0) {
+          return new Style({
+            stroke: new Stroke({
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? focused
+                    ? 'white'
+                    : this.getColorSeguidorCelsCalientes(feature, 1)
+                  : focused
                   ? 'white'
-                  : this.getColorSeguidorCelsCalientes(feature, 1)
-                : focused
-                ? 'white'
-                : 'black',
-            width: focused ? 4 : 2,
-          }),
-          fill: new Fill({
-            color:
-              this.currentZoom >= this.zoomChangeView
-                ? 'rgba(255,255,255, 0)'
-                : this.getColorSeguidorCelsCalientes(feature, 0.9),
-          }),
-          text: this.getLabelStyle(feature),
-        });
+                  : 'black',
+              width: focused ? 4 : 2,
+            }),
+            fill: new Fill({
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? 'rgba(255,255,255, 0)'
+                  : this.getColorSeguidorCelsCalientes(feature, 0.9),
+            }),
+            text: this.getLabelStyle(feature),
+          });
+        } else {
+          return this.getNoAnomsStyle(feature, focused);
+        }
       }
     };
   }
@@ -631,26 +664,30 @@ export class SeguidoresControlService {
   private getStyleSeguidoresGradienteNormMax(focused) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color:
-              this.currentZoom >= this.zoomChangeView
-                ? focused
+        if (feature.getProperties().properties.numAnoms > 0) {
+          return new Style({
+            stroke: new Stroke({
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? focused
+                    ? 'white'
+                    : this.getColorFeatureGradienteNormMax(feature, 1)
+                  : focused
                   ? 'white'
-                  : this.getColorFeatureGradienteNormMax(feature, 1)
-                : focused
-                ? 'white'
-                : 'black',
-            width: focused ? 4 : 2,
-          }),
-          fill: new Fill({
-            color:
-              this.currentZoom >= this.zoomChangeView
-                ? 'rgba(255,255,255, 0)'
-                : this.getColorFeatureGradienteNormMax(feature, 0.9),
-          }),
-          text: this.getLabelStyle(feature),
-        });
+                  : 'black',
+              width: focused ? 4 : 2,
+            }),
+            fill: new Fill({
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? 'rgba(255,255,255, 0)'
+                  : this.getColorFeatureGradienteNormMax(feature, 0.9),
+            }),
+            text: this.getLabelStyle(feature),
+          });
+        } else {
+          return this.getNoAnomsStyle(feature, focused);
+        }
       }
     };
   }
