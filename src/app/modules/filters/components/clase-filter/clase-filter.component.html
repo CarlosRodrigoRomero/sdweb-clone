@@ -8,12 +8,7 @@
       [checked]="claseSelected[i]"
       (change)="onChangeClaseFilter($event)"
     >
-      <div class="label">
-        <!-- <mat-icon [ngStyle]="{ color: coloresClase[i] }">circle</mat-icon> -->
-        <span class="text-label" style="font-size: 15px">
-          {{ elem.label }}
-        </span>
-      </div>
+      {{ elem.label }}
     </mat-button-toggle>
   </mat-button-toggle-group>
 </div>

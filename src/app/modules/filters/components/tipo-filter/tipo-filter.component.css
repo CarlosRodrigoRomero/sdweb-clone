@@ -23,6 +23,7 @@ h5 {
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 15px;
+  color: #d32f2f;
 }
 
 :host ::ng-deep .menu-tipo .mat-menu-content:not(:empty) {

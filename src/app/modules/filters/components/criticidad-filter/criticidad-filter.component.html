@@ -8,12 +8,7 @@
       [name]="elem.label"
       [checked]="criticidadSelected[i]"
       (change)="onChangeCriticidadFilter($event)"
-    >
-      <div class="label">
-        <span class="text-label" style="font-size: 15px">
-          {{ elem.label }}
-        </span>
-      </div>
+      >{{ elem.label }}
     </mat-button-toggle>
   </mat-button-toggle-group>
 </div>
