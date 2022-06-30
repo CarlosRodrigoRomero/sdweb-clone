@@ -12,7 +12,7 @@ import { SeguidoresControlService } from '@data/services/seguidores-control.serv
 import { ViewReportService } from '@data/services/view-report.service';
 
 import { Seguidor } from '@core/models/seguidor';
-import { PlantaInterface } from '@core/models/planta';
+
 import { COLOR } from '@data/constants/color';
 
 interface SeguidorData {

@@ -18,7 +18,8 @@ import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
 
 import { GLOBAL } from '@data/constants/global';
-import { COLOR } from '@data/constants/color';
+
+import { Colors } from '@core/classes/colors';
 
 @Component({
   selector: 'app-anomalias-list',
@@ -27,14 +28,13 @@ import { COLOR } from '@data/constants/color';
 })
 export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy {
   viewSeleccionada = 0;
-  displayedColumns: string[] = ['numAnom', 'tipo', 'temp', 'perdidas', 'gradiente'];
+  displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'temp', 'perdidas', 'gradiente'];
   dataSource: MatTableDataSource<any>;
   public selectedRow: string;
   public prevSelectedRow: any;
   public anomaliaHover;
   public anomaliaSelect;
   private map: Map;
-  private planta: PlantaInterface;
   private selectedInformeId: string;
 
   @ViewChild(MatSort) sort: MatSort;
@@ -58,8 +58,6 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
       })
     );
 
-    this.planta = this.reportControlService.planta;
-
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$
         .pipe(
@@ -74,24 +72,26 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
 
           elems
             .filter((elem) => (elem as Anomalia).informeId === this.selectedInformeId)
-            .forEach((anom) =>
+            .forEach((elem) => {
+              const anomalia = elem as Anomalia;
+
               filteredElements.push({
-                id: anom.id,
-                tipoLabel: GLOBAL.labels_tipos[anom.tipo],
-                tipo: anom.tipo,
-                perdidas: anom.perdidas,
-                temp: anom.temperaturaMax,
-                temperaturaMax: anom.temperaturaMax,
-                gradiente: anom.gradienteNormalizado,
-                gradienteNormalizado: anom.gradienteNormalizado,
-                color: COLOR.colores_tipos[anom.tipo],
-                clase: anom.clase,
-                anomalia: anom,
+                id: anomalia.id,
+                tipoLabel: GLOBAL.labels_tipos[anomalia.tipo],
+                tipo: anomalia.tipo,
+                perdidas: anomalia.perdidas,
+                temp: anomalia.temperaturaMax,
+                temperaturaMax: anomalia.temperaturaMax,
+                gradiente: anomalia.gradienteNormalizado,
+                gradienteNormalizado: anomalia.gradienteNormalizado,
+                clase: anomalia.clase,
+                anomalia,
                 selected: false,
                 hovered: false,
-                numAnom: anom.numAnom,
-              })
-            );
+                numAnom: anomalia.numAnom,
+                colors: this.getAnomViewColors(anomalia),
+              });
+            });
 
           this.dataSource = new MatTableDataSource(filteredElements);
           this.dataSource.sort = this.sort;
@@ -110,6 +110,13 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
+  }
+
+  private getAnomViewColors(anomalia: Anomalia): string[] {
+    const colorPerdidas = Colors.getColorPerdidas(anomalia.perdidas, 1);
+    const colorCCs = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
+    const colorGradNormMax = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
+    return [colorPerdidas, colorCCs, colorGradNormMax];
   }
 
   applyFilter(event: Event) {

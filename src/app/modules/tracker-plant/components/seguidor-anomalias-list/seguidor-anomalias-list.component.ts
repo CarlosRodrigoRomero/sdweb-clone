@@ -11,8 +11,8 @@ import { SeguidorViewService } from '../../services/seguidor-view.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { Anomalia } from '@core/models/anomalia';
+
 import { Colors } from '@core/classes/colors';
-import { COLOR } from '@data/constants/color';
 
 interface AnomaliaData {
   id: string;
