@@ -11,6 +11,8 @@ import { SeguidorViewService } from '../../services/seguidor-view.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { Anomalia } from '@core/models/anomalia';
+import { Colors } from '@core/classes/colors';
+import { COLOR } from '@data/constants/color';
 
 interface AnomaliaData {
   id: string;
@@ -31,7 +33,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
   anomaliaSelected: Anomalia = undefined;
   viewSelected = 0;
   dataSource: MatTableDataSource<AnomaliaData>;
-  displayedColumns = ['numAnom', 'tipo', 'perdidas', 'tempMax', 'gradiente'];
+  displayedColumns = ['colors', 'numAnom', 'tipo', 'perdidas', 'tempMax', 'gradiente'];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -82,12 +84,16 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
               if (anom.gradienteNormalizado !== undefined) {
                 gradiente = anom.gradienteNormalizado + 'ºC';
               }
+
+              const colors = this.getAnomViewColors(anom);
+
               anomaliasTabla.push({
                 numAnom: anom.numAnom,
                 tipo: GLOBAL.pcDescripcion[anom.tipo],
                 perdidas,
                 tempMax,
                 gradiente,
+                colors,
                 anomalia: anom,
               });
             });
@@ -112,6 +118,13 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
     }
   }
 
+  private getAnomViewColors(anomalia: Anomalia): string[] {
+    const colorPerdidas = Colors.getColorPerdidas(anomalia.perdidas, 1);
+    const colorCCs = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
+    const colorGradNormMax = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
+    return [colorPerdidas, colorCCs, colorGradNormMax];
+  }
+
   hoverAnomalia(row: any) {
     if (this.anomaliaSelected !== row.anomalia) {
       this.seguidorViewService.anomaliaHovered = row.anomalia;
@@ -134,6 +147,10 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
     this.seguidorViewService.prevAnomaliaSelected = this.anomaliaSelected;
 
     this.seguidorViewService.anomaliaSelected = row.anomalia;
+  }
+
+  setStyleRow() {
+    const rowSelected = document.getElementsByClassName('mat-row mat-row-selected');
   }
 
   ngOnDestroy(): void {
