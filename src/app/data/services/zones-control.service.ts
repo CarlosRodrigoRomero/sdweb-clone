@@ -134,7 +134,7 @@ export class ZonesControlService {
       zonas.forEach((zona) => {
         if (elemsInforme.length === elemsFilteredInforme.length) {
           const allElemsZona = this.getElemsZona(zona, elemsInforme);
-          const property = this.getPropertyView(view, informeId, elemsInforme, allElemsZona);
+          const property = this.getPropertyView(view, informeId, zona, zonas, allElemsZona);
 
           const coords = this.pathToLonLat(zona.path);
           // crea poligono seguidor
@@ -145,6 +145,7 @@ export class ZonesControlService {
               informeId,
               centroid: this.olMapService.getCentroid(coords[0]),
               type: 'zone',
+              area: this.getArea(coords),
               [property.type]: property.value,
             },
           });
@@ -155,7 +156,7 @@ export class ZonesControlService {
           // si no hay seguidores dentro de la zona no la añadimos
           if (elemsFilteredZona === null || elemsFilteredZona.length > 0) {
             const allElemsZona = this.getElemsZona(zona, elemsInforme);
-            const property = this.getPropertyView(view, informeId, elemsInforme, allElemsZona);
+            const property = this.getPropertyView(view, informeId, zona, zonas, allElemsZona);
 
             const coords = this.pathToLonLat(zona.path);
             // crea poligono seguidor
@@ -166,6 +167,7 @@ export class ZonesControlService {
                 informeId,
                 centroid: this.olMapService.getCentroid(coords[0]),
                 type: 'zone',
+                area: this.getArea(coords),
                 [property.type]: property.value,
               },
             });
@@ -176,33 +178,39 @@ export class ZonesControlService {
     });
   }
 
+  private getArea(coords: Coordinate[][]): number {
+    const polygon = new Polygon(coords);
+    return polygon.getArea();
+  }
+
   private getPropertyView(
     view: number,
     informeId: string,
-    zonasInforme: FilterableElement[],
-    elemsZona: FilterableElement[]
+    zona: LocationAreaInterface,
+    zonas: LocationAreaInterface[],
+    allElemsZona: FilterableElement[]
   ): any {
     switch (view) {
       case 0:
         let mae = 0;
         // para anomalías enviamos el numero de zonas para calcular el MAE
         if (this.reportControlService.plantaFija) {
-          mae = this.getMaeZona(elemsZona, informeId, zonasInforme.length);
+          mae = this.getMaeZona(allElemsZona, informeId, zona, zonas);
         } else {
-          mae = this.getMaeZona(elemsZona, informeId);
+          mae = this.getMaeZona(allElemsZona, informeId);
         }
         return { type: 'mae', value: mae };
       case 1:
         let celsCalientes = 0;
         // para anomalías enviamos el numero de zonas para calcular el CC
         if (this.reportControlService.plantaFija) {
-          celsCalientes = this.getCCZona(elemsZona, informeId, zonasInforme.length);
+          celsCalientes = this.getCCZona(allElemsZona, informeId, zona, zonas);
         } else {
-          celsCalientes = this.getCCZona(elemsZona, informeId);
+          celsCalientes = this.getCCZona(allElemsZona, informeId);
         }
         return { type: 'celsCalientes', value: celsCalientes };
       case 2:
-        const grad = this.getGradNormMaxZona(elemsZona);
+        const grad = this.getGradNormMaxZona(allElemsZona);
         return { type: 'gradienteNormalizado', value: grad };
     }
   }
@@ -215,18 +223,23 @@ export class ZonesControlService {
     );
   }
 
-  private getMaeZona(elems: FilterableElement[], informeId: string, numZonas?: number): number {
+  private getMaeZona(
+    elems: FilterableElement[],
+    informeId: string,
+    zona?: LocationAreaInterface,
+    zonas?: LocationAreaInterface[]
+  ): number {
     const informe = this.reportControlService.informes.find((inf) => inf.id === informeId);
     let mae = 0;
-    if (numZonas) {
+    if (zona) {
       const anomaliasZona = elems as Anomalia[];
       if (anomaliasZona.length > 0) {
-        const perdidas = anomaliasZona.map((anom) => anom.perdidas);
-        let perdidasTotales = 0;
-        perdidas.forEach((perd) => (perdidasTotales += perd));
+        const perdidasTotales = anomaliasZona.reduce((acc, curr) => acc + curr.perdidas, 0);
+        const areaZona = this.getArea(this.pathToLonLat(zona.path));
+        const areaTotalZonas = zonas.reduce((acc, curr) => acc + this.getArea(this.pathToLonLat(curr.path)), 0);
 
-        // suponemos zonas iguales para dar un valor aproximado
-        mae = perdidasTotales / (informe.numeroModulos / numZonas);
+        // obtenemos el nº de modulos ponderados al area de la zona
+        mae = perdidasTotales / ((informe.numeroModulos * areaZona) / areaTotalZonas);
       }
     } else {
       const seguidoresZona = elems as Seguidor[];
@@ -237,16 +250,23 @@ export class ZonesControlService {
     return mae;
   }
 
-  private getCCZona(elems: FilterableElement[], informeId: string, numZonas?: number): number {
+  private getCCZona(
+    elems: FilterableElement[],
+    informeId: string,
+    zona?: LocationAreaInterface,
+    zonas?: LocationAreaInterface[]
+  ): number {
     const informe = this.reportControlService.informes.find((inf) => inf.id === informeId);
     let cc = 0;
-    if (numZonas) {
+    if (zona) {
       const anomaliasZona = elems as Anomalia[];
       if (anomaliasZona.length > 0) {
         const celsCalientes = anomaliasZona.filter((anom) => anom.tipo === 8 || anom.tipo === 9);
+        const areaZona = this.getArea(this.pathToLonLat(zona.path));
+        const areaTotalZonas = zonas.reduce((acc, curr) => acc + this.getArea(this.pathToLonLat(curr.path)), 0);
 
-        // suponemos zonas iguales para dar un valor aproximado
-        cc = celsCalientes.length / (informe.numeroModulos / numZonas);
+        // obtenemos el nº de modulos ponderados al area de la zona
+        cc = celsCalientes.length / ((informe.numeroModulos * areaZona) / areaTotalZonas);
       }
     } else {
       const seguidoresZona = elems as Seguidor[];
