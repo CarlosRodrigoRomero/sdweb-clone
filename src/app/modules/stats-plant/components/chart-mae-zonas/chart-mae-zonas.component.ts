@@ -179,8 +179,8 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
 
     let titleXAxis = 'Zona';
 
-    if (this.reportControlService.nombreGlobalCoords.length > 0) {
-      titleXAxis = this.reportControlService.nombreGlobalCoords[0];
+    if (this.reportControlService.planta.nombreGlobalCoords.length > 0) {
+      titleXAxis = this.reportControlService.planta.nombreGlobalCoords[0];
     }
 
     // espera a que el dataPlot tenga datos
