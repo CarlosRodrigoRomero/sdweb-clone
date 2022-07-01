@@ -222,7 +222,6 @@ export class ChartTipoAnomsComponent implements OnInit {
       },
       tooltip: {
         followCursor: false,
-        theme: 'dark',
         x: {
           show: false,
         },
