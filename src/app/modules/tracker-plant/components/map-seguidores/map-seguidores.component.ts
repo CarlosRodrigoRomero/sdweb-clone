@@ -79,42 +79,21 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     // ordenamos los informes por fecha
     this.informeIdList = this.informes.map((informe) => informe.id);
 
-    if (this.zonesService.thereAreZones) {
-      const allZones = this.zonesService.zonesBySize;
-      const smallZones = allZones[allZones.length - 1];
+    this.informes.forEach(async (informe, index) => {
+      // creamos las capas de los seguidores para los diferentes informes
+      this.seguidoresControlService
+        .createSeguidorLayers(informe.id)
+        .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
-      this.informes.forEach(async (informe, index) => {
-        // creamos las capas de los seguidores para los diferentes informes o zonas
-        this.seguidoresControlService
-          .createSeguidorLayers(informe.id, smallZones)
-          .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
+      // añadimos las ortofotos aereas de cada informe
+      await this.olMapService.addAerialLayer(informe.id);
 
-        // añadimos las ortofotos aereas de cada informe
-        await this.olMapService.addAerialLayer(informe.id);
+      if (index === this.informes.length - 1) {
+        this.initMap();
 
-        if (index === this.informes.length - 1) {
-          this.initMap();
-
-          this.addPopupOverlay();
-        }
-      });
-    } else {
-      this.informes.forEach(async (informe, index) => {
-        // creamos las capas de los seguidores para los diferentes informes
-        this.seguidoresControlService
-          .createSeguidorLayers(informe.id)
-          .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
-
-        // añadimos las ortofotos aereas de cada informe
-        await this.olMapService.addAerialLayer(informe.id);
-
-        if (index === this.informes.length - 1) {
-          this.initMap();
-
-          this.addPopupOverlay();
-        }
-      });
-    }
+        this.addPopupOverlay();
+      }
+    });
 
     this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayers = layers)));
 

@@ -93,52 +93,26 @@ export class MapComponent implements OnInit, OnDestroy {
       .subscribe((layers) => {
         this.thermalLayersDB = layers;
 
-        if (this.zonesService.thereAreZones) {
-          const allZones = this.zonesService.zonesBySize;
-          const smallZones = allZones[allZones.length - 1];
+        // Para cada informe, hay que crear 2 capas: térmica y vectorial
+        this.informes.forEach(async (informe, index) => {
+          const thermalLayerDB = this.thermalLayersDB.find((item) => item.informeId === informe.id);
 
-          // Para cada informe, hay que crear 2 capas: térmica y vectorial
-          this.informes.forEach(async (informe, index) => {
-            const thermalLayerDB = this.thermalLayersDB.find((item) => item.informeId === informe.id);
+          if (thermalLayerDB !== undefined) {
+            this.olMapService.addThermalLayer(this.createThermalLayer(thermalLayerDB, informe.id, index));
+          }
 
-            if (thermalLayerDB !== undefined) {
-              this.olMapService.addThermalLayer(this.createThermalLayer(thermalLayerDB, informe.id, index));
-            }
+          // creamos las capas de anomalías para los diferentes informes o zonas
+          this.anomaliasControlService
+            .createAnomaliaLayers(informe.id)
+            .forEach((layer) => this.olMapService.addAnomaliaLayer(layer));
 
-            // creamos las capas de anomalías para los diferentes informes o zonas
-            this.anomaliasControlService
-              .createAnomaliaLayers(informe.id, smallZones)
-              .forEach((layer) => this.olMapService.addAnomaliaLayer(layer));
+          // añadimos las ortofotos aereas de cada informe
+          await this.olMapService.addAerialLayer(informe.id);
 
-            // añadimos las ortofotos aereas de cada informe
-            await this.olMapService.addAerialLayer(informe.id);
-
-            if (index === this.informes.length - 1) {
-              this.initMap();
-            }
-          });
-        } else {
-          // Para cada informe, hay que crear 2 capas: térmica y vectorial
-          this.informes.forEach(async (informe, index) => {
-            const thermalLayerDB = this.thermalLayersDB.find((item) => item.informeId === informe.id);
-
-            if (thermalLayerDB !== undefined) {
-              this.olMapService.addThermalLayer(this.createThermalLayer(thermalLayerDB, informe.id, index));
-            }
-
-            // creamos las capas de anomalías para los diferentes informes o zonas
-            this.anomaliasControlService
-              .createAnomaliaLayers(informe.id)
-              .forEach((layer) => this.olMapService.addAnomaliaLayer(layer));
-
-            // añadimos las ortofotos aereas de cada informe
-            await this.olMapService.addAerialLayer(informe.id);
-
-            if (index === this.informes.length - 1) {
-              this.initMap();
-            }
-          });
-        }
+          if (index === this.informes.length - 1) {
+            this.initMap();
+          }
+        });
       });
 
     // asignamos los IDs necesarios para compartir

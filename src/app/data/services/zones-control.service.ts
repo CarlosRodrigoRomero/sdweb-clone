@@ -194,6 +194,20 @@ export class ZonesControlService {
     }
   }
 
+  // getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]): FilterableElement[] {
+  //   let elemsFiltered: FilterableElement[];
+  //   zona.globalCoords.forEach((coord, index) => {
+  //     if (coord !== null) {
+  //       if (elemsFiltered === undefined) {
+  //         elemsFiltered = elems.filter((elem) => elem.globalCoords[index] === coord);
+  //       } else {
+  //         elemsFiltered = elemsFiltered.filter((elem) => elem.globalCoords[index] === coord);
+  //       }
+  //     }
+  //   });
+  //   return elemsFiltered;
+  // }
+
   getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]) {
     const labelZona = this.getGlobalsLabel(zona.globalCoords);
 

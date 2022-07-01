@@ -124,90 +124,44 @@ export class SeguidoresControlService {
     });
   }
 
-  createSeguidorLayers(informeId: string, zones?: LocationAreaInterface[]): VectorLayer[] {
+  createSeguidorLayers(informeId: string): VectorLayer[] {
     const seguidoresLayers: VectorLayer[] = [];
-    if (zones !== undefined) {
-      zones.forEach((zone) => {
-        const zoneId = this.zonesControlService.getGlobalsLabel(zone.globalCoords);
-        const maeLayer = new VectorLayer({
-          source: new VectorSource({ wrapX: false }),
-          style: this.getStyleSeguidoresMae(false),
-          visible: false,
-        });
-        maeLayer.setProperties({
-          informeId,
-          view: 0,
-          type: 'seguidores',
-          zoneId,
-          zone,
-        });
-        seguidoresLayers.push(maeLayer);
+    
+    const maeLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleSeguidoresMae(false),
+      visible: true,
+    });
+    maeLayer.setProperties({
+      informeId,
+      view: 0,
+      type: 'seguidores',
+    });
+    seguidoresLayers.push(maeLayer);
 
-        const celsCalientesLayer = new VectorLayer({
-          source: new VectorSource({ wrapX: false }),
-          style: this.getStyleSeguidoresCelsCalientes(false),
-          visible: false,
-        });
-        celsCalientesLayer.setProperties({
-          informeId,
-          view: 1,
-          type: 'seguidores',
-          zoneId,
-          zone,
-        });
-        seguidoresLayers.push(celsCalientesLayer);
+    const celsCalientesLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleSeguidoresCelsCalientes(false),
+      visible: true,
+    });
+    celsCalientesLayer.setProperties({
+      informeId,
+      view: 1,
+      type: 'seguidores',
+    });
+    seguidoresLayers.push(celsCalientesLayer);
 
-        const gradNormMaxLayer = new VectorLayer({
-          source: new VectorSource({ wrapX: false }),
-          style: this.getStyleSeguidoresGradienteNormMax(false),
-          visible: false,
-        });
-        gradNormMaxLayer.setProperties({
-          informeId,
-          view: 2,
-          type: 'seguidores',
-          zoneId,
-          zone,
-        });
-        seguidoresLayers.push(gradNormMaxLayer);
-      });
-    } else {
-      const maeLayer = new VectorLayer({
-        source: new VectorSource({ wrapX: false }),
-        style: this.getStyleSeguidoresMae(false),
-        visible: true,
-      });
-      maeLayer.setProperties({
-        informeId,
-        view: 0,
-        type: 'seguidores',
-      });
-      seguidoresLayers.push(maeLayer);
-
-      const celsCalientesLayer = new VectorLayer({
-        source: new VectorSource({ wrapX: false }),
-        style: this.getStyleSeguidoresCelsCalientes(false),
-        visible: true,
-      });
-      celsCalientesLayer.setProperties({
-        informeId,
-        view: 1,
-        type: 'seguidores',
-      });
-      seguidoresLayers.push(celsCalientesLayer);
-
-      const gradNormMaxLayer = new VectorLayer({
-        source: new VectorSource({ wrapX: false }),
-        style: this.getStyleSeguidoresGradienteNormMax(false),
-        visible: true,
-      });
-      gradNormMaxLayer.setProperties({
-        informeId,
-        view: 2,
-        type: 'seguidores',
-      });
-      seguidoresLayers.push(gradNormMaxLayer);
-    }
+    const gradNormMaxLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleSeguidoresGradienteNormMax(false),
+      visible: true,
+    });
+    gradNormMaxLayer.setProperties({
+      informeId,
+      view: 2,
+      type: 'seguidores',
+    });
+    seguidoresLayers.push(gradNormMaxLayer);
 
     return seguidoresLayers;
   }
@@ -238,18 +192,10 @@ export class SeguidoresControlService {
     this.seguidorLayers.forEach((l) => {
       // filtra los seguidores correspondientes al informe
       const seguidoresInforme = seguidores.filter((seguidor) => seguidor.informeId === l.getProperties().informeId);
-      let seguidoresLayer = seguidoresInforme;
-      // si hay zonas divimos los seguidores tb por zonas
-      if (this.zonesService.thereAreZones) {
-        seguidoresLayer = this.zonesControlService.getElemsZona(
-          l.getProperties().zone,
-          seguidoresInforme
-        ) as Seguidor[];
-      }
 
       const source = l.getSource();
       source.clear();
-      seguidoresLayer.forEach((seguidor) => {
+      seguidoresInforme.forEach((seguidor) => {
         // crea poligono seguidor
         const feature = new Feature({
           geometry: new Polygon(this.latLonLiteralToLonLat(seguidor.path)),
@@ -267,14 +213,6 @@ export class SeguidoresControlService {
             numAnoms: seguidor.anomaliasCliente.length,
           },
         });
-
-        if (this.zonesService.thereAreZones) {
-          const properties = feature.getProperties().properties;
-          properties.zone = l.getProperties().zone;
-          feature.setProperties({
-            properties,
-          });
-        }
 
         source.addFeature(feature);
       });
@@ -732,25 +670,6 @@ export class SeguidoresControlService {
       feature.setStyle(this.getStyleSeguidores(true));
     } else {
       feature.setStyle(this.getStyleSeguidores(false));
-    }
-  }
-
-  setExternalStyleSeguidorLayer(feature: Feature, layers: VectorLayer[], visible: boolean) {
-    // mostramos u ocultamos las zona de los seguidores si la hubiera
-    if (feature.getProperties().properties.hasOwnProperty('zone')) {
-      const zoneSeguidor = feature.getProperties().properties.zone;
-      const layerZoneSeguidor = layers.find(
-        (layer) => layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneSeguidor.globalCoords)
-      );
-
-      // solo la ocultamos si estamos en zoom out
-      if (visible === false) {
-        if (this.currentZoom < this.zonesControlService.zoomChangeView) {
-          layerZoneSeguidor.setVisible(visible);
-        }
-      } else {
-        layerZoneSeguidor.setVisible(visible);
-      }
     }
   }
 
