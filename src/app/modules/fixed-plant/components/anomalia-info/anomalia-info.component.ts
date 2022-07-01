@@ -212,8 +212,8 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
 
     const coords = this.anomaliaSelect.globalCoords;
 
-    if (this.reportControlService.nombreGlobalCoords !== undefined) {
-      this.reportControlService.nombreGlobalCoords.forEach((nombre, index) => {
+    if (this.planta.nombreGlobalCoords !== undefined) {
+      this.planta.nombreGlobalCoords.forEach((nombre, index) => {
         const zona: Zona = { tipo: nombre, nombre: coords[index] };
         zonas.push(zona);
       });
