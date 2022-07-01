@@ -19,6 +19,8 @@ export class ZonesService {
   zonesBySize: LocationAreaInterface[][] = [];
   private _thereAreZones = false;
   thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
+  private _thereAreLargestZones = false;
+  thereAreLargestZones$ = new BehaviorSubject<boolean>(this._thereAreLargestZones);
 
   constructor(private plantaService: PlantaService) {}
 
@@ -34,6 +36,10 @@ export class ZonesService {
             this.thereAreZones = true;
 
             this.zonesBySize = this.getCompleteGlobals(this.zones);
+            if (this.zonesBySize.length > 1) {
+              this.thereAreLargestZones = true;
+            }
+
             this.zones = this.zonesBySize.flat();
           }
 
@@ -216,5 +222,14 @@ export class ZonesService {
   set thereAreZones(value: boolean) {
     this._thereAreZones = value;
     this.thereAreZones$.next(value);
+  }
+
+  get thereAreLargestZones(): boolean {
+    return this._thereAreLargestZones;
+  }
+
+  set thereAreLargestZones(value: boolean) {
+    this._thereAreLargestZones = value;
+    this.thereAreLargestZones$.next(value);
   }
 }

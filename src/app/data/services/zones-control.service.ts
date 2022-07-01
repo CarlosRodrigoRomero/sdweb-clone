@@ -139,6 +139,7 @@ export class ZonesControlService {
         const property = this.getPropertyView(view, informeId, zona, zonas, allElemsZona);
 
         const coords = this.pathToLonLat(zona.path);
+
         // crea poligono seguidor
         const feature = new Feature({
           geometry: new Polygon(coords),
@@ -149,12 +150,18 @@ export class ZonesControlService {
             type: 'zone',
             area: this.getArea(coords),
             numElems: elemsFilteredZona.length,
+            name: this.getSmallGlobal(zona.globalCoords),
             [property.type]: property.value,
           },
         });
         source.addFeature(feature);
       });
     });
+  }
+
+  private getSmallGlobal(globalCoords: string[]): string {
+    const notNullGlobals = globalCoords.filter((gC) => gC !== null);
+    return notNullGlobals[notNullGlobals.length - 1].toString();
   }
 
   private getArea(coords: Coordinate[][]): number {
@@ -352,7 +359,7 @@ export class ZonesControlService {
     });
   }
 
-  private pathToLonLat(path: any): Coordinate[][] {
+  pathToLonLat(path: any): Coordinate[][] {
     return [path.map((coords) => fromLonLat([coords.lng, coords.lat]))];
   }
 

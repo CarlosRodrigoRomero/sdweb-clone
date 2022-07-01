@@ -26,6 +26,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   public mapLoaded = false;
   noAnomsReport = false;
   thereAreZones = true;
+  thereAreLargestZones = false;
   generatingDownload = false;
   selectedInformeId: string;
   numInformes = 1;
@@ -71,6 +72,10 @@ export class MapViewComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(this.zonesService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
+
+    this.subscriptions.add(
+      this.zonesService.thereAreLargestZones$.subscribe((value) => (this.thereAreLargestZones = value))
+    );
 
     this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
 

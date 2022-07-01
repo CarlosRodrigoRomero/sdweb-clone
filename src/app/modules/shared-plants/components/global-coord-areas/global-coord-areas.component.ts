@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
@@ -8,20 +7,16 @@ import VectorLayer from 'ol/layer/Vector';
 import { fromLonLat } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
-import GeoJSON from 'ol/format/GeoJSON';
 import { Coordinate } from 'ol/coordinate';
 import Polygon from 'ol/geom/Polygon';
-import Overlay from 'ol/Overlay';
-import OverlayPositioning from 'ol/OverlayPositioning';
 import Feature from 'ol/Feature';
 
 import { LatLngLiteral } from '@agm/core';
 
-import { PlantaService } from '@data/services/planta.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { SeguidorService } from '@data/services/seguidor.service';
 import { ZonesService } from '@data/services/zones.service';
+import { ZonesControlService } from '@data/services/zones-control.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { PlantaInterface } from '@core/models/planta';
@@ -39,7 +34,7 @@ export interface Task {
 })
 export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   public planta: PlantaInterface;
-  private globalCoordAreas: LocationAreaInterface[][] = [];
+  private zones: LocationAreaInterface[][] = [];
   public globalCoordAreasVectorSources: VectorSource[] = [];
   public globalCoordAreasVectorLayers: VectorLayer[] = [];
   private nombreGlobalCoords: string[] = [];
@@ -56,190 +51,93 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
 
   constructor(
-    private plantaService: PlantaService,
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
-    private seguidorService: SeguidorService,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private zonesControlService: ZonesControlService
   ) {}
 
   ngOnInit(): void {
-    const letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
-    if (this.reportControlService.plantaFija) {
-      this.numAreas = this.reportControlService.numFixedGlobalCoords;
-      if (this.numAreas > 0) {
-        // ponemos un nombre estandar a las zonas por si no tubiese un nombre definido por la empresa
-        for (let index = 0; index < this.reportControlService.numFixedGlobalCoords; index++) {
-          this.nombreGlobalCoords.push('Zona ' + letras[index]);
-        }
-      } else {
-        this.zonesService.thereAreZones = false;
-      }
-    } else {
-      if (this.seguidorService.numGlobalCoords > 1) {
-        // restamos 1 al numero de global coords xq las pequeñas son los seguidores
-        this.numAreas = this.seguidorService.numGlobalCoords - 1;
-        for (let index = 0; index < this.numAreas; index++) {
-          this.nombreGlobalCoords.push('Zona ' + letras[index]);
-        }
-      } else {
-        this.zonesService.thereAreZones = false;
-      }
-    }
+    this.numAreas = this.zonesService.zonesBySize.length - 1;
 
     this.planta = this.reportControlService.planta;
 
-    // si tiene nombres propios se los aplicamos
-    if (this.planta.nombreGlobalCoords !== undefined && this.planta.nombreGlobalCoords.length > 0) {
-      this.nombreGlobalCoords = this.planta.nombreGlobalCoords;
-    }
-
-    // guardamos los nombre en el servicio
-    this.reportControlService.nombreGlobalCoords = this.nombreGlobalCoords;
+    this.nombreGlobalCoords = this.planta.nombreGlobalCoords;
+    // quitamos las más pequeñas porque ya se muestran por defecto
+    this.nombreGlobalCoords.pop();
 
     this.nombreGlobalCoords.forEach((nombre) => {
       this.task.subtasks.push({ name: nombre, completed: false });
     });
 
+    // quitamos las más pequeñas porque ya se muestran por defecto
+    this.zones = this.zonesService.zonesBySize.filter((zones, index, allZones) => index < allZones.length - 1);
+
     this.subscriptions.add(
       this.olMapService.getMap().subscribe((map) => {
         this.map = map;
 
-        this.addLocationAreas();
+        if (this.map !== undefined) {
+          this.addLocationAreas();
+        }
       })
     );
   }
 
   private addLocationAreas() {
-    const styles = {
-      LineString: new Style({
-        stroke: new Stroke({
-          color: '#dbdbdb',
-          lineDash: [4],
-          width: 2,
-        }),
-        fill: new Fill({
-          color: 'rgba(0, 0, 255, 0)',
-        }),
-        text: new Text({
-          font: '16px "Open Sans", "Arial Unicode MS", "sans-serif"',
-          placement: 'point',
-          textAlign: 'end',
-          textBaseline: 'end',
-          fill: new Fill({
-            color: 'white',
-          }),
-          stroke: new Stroke({
-            color: 'black',
-            width: 1,
-          }),
-          text: '',
-        }),
-      }),
-    };
+    this.zones.forEach((zones, i) => {
+      this.globalCoordAreasVectorSources[i] = new VectorSource();
 
-    const styleFunction = (feature) => {
-      if (feature !== undefined) {
-        const style = styles[feature.getGeometry().getType()];
+      zones.forEach((zone) => {
+        const feature = new Feature({
+          geometry: new Polygon([this.pathToCoordinate(zone.path)]),
+          properties: {
+            id: zone.globalCoords[i].toString(),
+            tipo: 'areaGlobalCoord',
+          },
+        });
 
-        // ZOOM FIJO DEMO
-        if (this.map.getView().getZoom() > 20) {
-          this.nombreGlobalCoords.forEach((nombre, index) => {
-            if (
-              feature.get('globalCoords')[index] !== null &&
-              feature.get('globalCoords')[index] !== undefined &&
-              feature.get('globalCoords')[index] !== ''
-            ) {
-              style.getText().setText(nombre + ' ' + feature.get('globalCoords')[index]);
-            }
-          });
-        } else {
-          if (
-            feature.get('globalCoords')[0] !== null &&
-            feature.get('globalCoords')[0] !== undefined &&
-            feature.get('globalCoords')[0] !== ''
-          ) {
-            style.getText().setText(this.nombreGlobalCoords[0] + ' ' + feature.get('globalCoords')[0]);
-          } else {
-            style.getText().setText('');
-          }
-          // this.nombreGlobalCoords.forEach(() => {
-          //   style.getText().setText('');
-          // });
-        }
+        this.globalCoordAreasVectorSources[i].addFeature(feature);
+      });
 
-        return style;
-      }
-    };
-
-    this.subscriptions.add(
-      this.plantaService
-        .getLocationsArea(this.planta.id)
-        .pipe(take(1))
-        .subscribe((locAreas) => {
-          // si la planta es de seguidores obtenemos las areas ya sin seguidores
-          if (!this.reportControlService.plantaFija) {
-            locAreas = this.seguidorService.zones;
-          }
-
-          this.nombreGlobalCoords.forEach((nombre, i) => {
-            if (this.globalCoordAreas.length < this.nombreGlobalCoords.length) {
-              this.globalCoordAreas.push(
-                locAreas.filter(
-                  (locArea) =>
-                    locArea.globalCoords[i] !== null &&
-                    locArea.globalCoords[i] !== undefined &&
-                    locArea.globalCoords[i] !== ''
-                )
-              );
-
-              this.globalCoordAreasVectorSources[i] = new VectorSource({
-                features: new GeoJSON().readFeatures(this.locAreasToGeoJSON(this.globalCoordAreas[i])),
-              });
-              this.globalCoordAreasVectorSources[i]
-                .getFeatures()
-                .forEach((feature) => feature.setProperties({ tipo: 'areaGlobalCoord' }));
-              this.map.addLayer(
-                (this.globalCoordAreasVectorLayers[i] = new VectorLayer({
-                  source: this.globalCoordAreasVectorSources[i],
-                  visible: false,
-                  style: styleFunction,
-                }))
-              );
-            }
-          });
-
-          // this.addPointerOnHover();
-          // this.addOnHoverLabel();
-        })
-    );
+      this.map.addLayer(
+        (this.globalCoordAreasVectorLayers[i] = new VectorLayer({
+          source: this.globalCoordAreasVectorSources[i],
+          visible: false,
+          style: this.getStyleLocAreas(),
+        }))
+      );
+    });
   }
 
-  private getLabelArea(feature: Feature): string {
-    if (
-      feature.get('globalCoords')[0] !== null &&
-      feature.get('globalCoords')[0] !== undefined &&
-      feature.get('globalCoords')[0] !== ''
-    ) {
-      const label = 'Instalación ' + feature.get('globalCoords')[0];
-      return label;
-    } else if (
-      feature.get('globalCoords')[1] !== null &&
-      feature.get('globalCoords')[1] !== undefined &&
-      feature.get('globalCoords')[1] !== ''
-    ) {
-      this.globalCoordAreas[0].forEach((instalacion) => {
-        // obtenemos el poligono para calcular si esta dentro feature
-        const polygon = new Polygon([this.pathToCoordinate(instalacion.path)]);
+  private getStyleLocAreas() {
+    return (feature) => {
+      if (feature !== undefined) {
+        return new Style({
+          stroke: new Stroke({
+            color: 'black',
+            width: 2,
+            lineDash: [4],
+          }),
+          fill: null,
+          text: this.getLabelStyle(feature),
+        });
+      }
+    };
+  }
 
-        if (polygon.intersectsCoordinate((feature.getGeometry() as Polygon).getCoordinates()[0][0])) {
-          const label = 'Instalación ' + instalacion.globalCoords[0] + ' - Calle ' + feature.get('globalCoords')[1];
-          return label;
-        }
-      });
-    } else {
-      return 'blablabla';
-    }
+  private getLabelStyle(feature: Feature) {
+    return new Text({
+      text: feature.getProperties().properties.id,
+      font: 'bold 16px Roboto',
+      fill: new Fill({
+        color: 'white',
+      }),
+      stroke: new Stroke({
+        color: 'black',
+        width: 8,
+      }),
+    });
   }
 
   private pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {
@@ -249,115 +147,6 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
       coordenadas.push(coordenada);
     });
     return coordenadas;
-  }
-
-  private addPointerOnHover() {
-    this.map.on('pointermove', (event) => {
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        const feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties() !== undefined)
-          .filter((item) => item.getProperties().tipo === 'areaGlobalCoord');
-
-        if (feature.length > 0) {
-          // cambia el puntero por el de seleccionar
-          this.map.getViewport().style.cursor = 'pointer';
-        } else {
-          // vuelve a poner el puntero normal
-          this.map.getViewport().style.cursor = 'inherit';
-        }
-      } else {
-        // vuelve a poner el puntero normal
-        this.map.getViewport().style.cursor = 'inherit';
-      }
-    });
-  }
-
-  private addOnHoverLabel() {
-    // Overlay para los detalles de cada anomalia
-    const element = document.getElementById('popup');
-
-    const popup = new Overlay({
-      element,
-      positioning: OverlayPositioning.BOTTOM_CENTER,
-      stopEvent: false,
-      offset: [0, -10],
-    });
-
-    this.map.addOverlay(popup);
-
-    const areaNames = ['Instalación', 'Calle', 'Mesa'];
-
-    this.map.on('pointermove', (event) => {
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        const coords = event.coordinate;
-        const feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties() !== undefined)
-          .filter((item) => item.getProperties().tipo === 'areaGlobalCoord');
-
-        if (feature.length > 0) {
-          popup.setPosition(undefined);
-          popup.setPosition(coords);
-
-          for (let i = 0; i < 3; i++) {
-            if (feature[0].get('globalCoords')[i] !== null) {
-              element.innerHTML = areaNames[i] + ' ' + feature[0].get('globalCoords')[i];
-            }
-          }
-        } else {
-          popup.setPosition(undefined);
-        }
-      } else {
-        popup.setPosition(undefined);
-      }
-    });
-  }
-
-  private locAreasToGeoJSON(locAreas: LocationAreaInterface[]) {
-    let listOfFeatures = [];
-    locAreas.forEach((locArea) => {
-      let coordsList = [];
-      locArea.path.forEach((coords) => {
-        coordsList.push(fromLonLat([coords.lng, coords.lat]));
-      });
-      // Al ser un poligono, la 1era y ultima coord deben ser iguales:
-      coordsList.push(coordsList[0]);
-
-      listOfFeatures.push({
-        type: 'Feature',
-        properties: {
-          // para la demo
-          globalCoords: locArea.globalCoords,
-          // globalCoords: locArea.globalX,
-          // globalCoords: this.getGlobalCoords(locArea),
-        },
-        geometry: {
-          type: 'LineString',
-          coordinates: coordsList,
-        },
-      });
-    });
-    const geojsonObject = {
-      type: 'FeatureCollection',
-      // crs: {
-      //   type: 'name',
-      //   properties: {
-      //     name: 'EPSG:3857',
-      //   },
-      // },
-      features: listOfFeatures,
-    };
-
-    return geojsonObject;
-  }
-
-  private getGlobalCoords(locArea: LocationAreaInterface): string {
-    const locs = [...locArea.globalCoords, locArea.globalX, locArea.globalY];
-
-    const globalCoord = locs.find((loc) => loc !== '');
-
-    return globalCoord;
   }
 
   setVisibilityLayer(index: number) {
