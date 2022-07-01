@@ -241,6 +241,7 @@ export class AnomaliasControlService {
             informeId: anom.informeId,
             perdidas: anom.perdidas,
             gradienteNormalizado: anom.gradienteNormalizado,
+            type: 'anomalia',
           },
         });
 
@@ -310,7 +311,8 @@ export class AnomaliasControlService {
             .getFeaturesAtPixel(event.pixel)
             .filter((item) => item.getProperties().properties !== undefined)
             .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
-            .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)[0] as Feature;
+            .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)
+            .filter((item) => item.getProperties().properties.type === 'anomalia')[0] as Feature;
 
           if (feature !== undefined) {
             // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
@@ -334,14 +336,22 @@ export class AnomaliasControlService {
               this.anomaliaHover = undefined;
             }
           }
+        } else {
+          if (this.anomaliaHover !== undefined) {
+            this.setExternalStyle(this.anomaliaHover.id, false);
+
+            this.anomaliaHover = undefined;
+          }
         }
       } else {
+        console.log('ok');
         this.anomaliaHover = undefined;
 
-        if (currentFeatureHover !== undefined) {
-          currentFeatureHover.setStyle(this.getStyleAnomalias(false));
-          currentFeatureHover = undefined;
-        }
+        // if (currentFeatureHover !== undefined) {
+        //   console.log('ok');
+        //   currentFeatureHover.setStyle(this.getStyleAnomalias(false));
+        //   currentFeatureHover = undefined;
+        // }
       }
     });
   }
