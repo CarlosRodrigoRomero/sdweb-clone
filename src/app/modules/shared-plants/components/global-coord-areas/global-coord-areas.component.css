@@ -7,7 +7,6 @@
 .global-areas-card {
   display: flex;
   justify-content: center;
-  opacity: 0.9;
   min-width: 250px;
   box-shadow: none !important;
   min-height: 64px;
@@ -28,8 +27,4 @@ li {
   color: white;
   padding: 0px 6px;
   font-size: 12px;
-}
-
-:host ::ng-deep .checkbox .mat-checkbox-label {
-  /* font-size: 1rem; */
 }

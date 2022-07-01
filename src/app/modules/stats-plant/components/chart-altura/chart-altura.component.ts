@@ -40,42 +40,42 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
   public chartOptions: Partial<ChartOptions> = {
     series: [
       {
-        name: 'A',
+        name: '1',
         data: [
           { x: 'Jul 2019', y: 35 },
           { x: 'Jun 2020', y: 25 },
         ],
       },
       {
-        name: 'B',
+        name: '2',
         data: [
           { x: 'Jul 2019', y: 20 },
           { x: 'Jun 2020', y: 17 },
         ],
       },
       {
-        name: 'C',
+        name: '3',
         data: [
           { x: 'Jul 2019', y: 20 },
           { x: 'Jun 2020', y: 15 },
         ],
       },
       {
-        name: 'D',
+        name: '4',
         data: [
           { x: 'Jul 2019', y: 15 },
           { x: 'Jun 2020', y: 25 },
         ],
       },
       {
-        name: 'E',
+        name: '5',
         data: [
           { x: 'Jul 2019', y: 18 },
           { x: 'Jun 2020', y: 20 },
         ],
       },
       {
-        name: 'F',
+        name: '6',
         data: [
           { x: 'Jul 2019', y: 36 },
           { x: 'Jun 2020', y: 18 },
@@ -84,7 +84,6 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
     ],
     chart: {
       height: 170,
-      width: '100%',
       type: 'heatmap',
     },
     dataLabels: {
@@ -94,6 +93,12 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
     yaxis: {
       title: {
         text: 'Fila',
+      },
+      labels: {
+        minWidth: 10,
+        formatter: (value) => {
+          return Math.round(value).toString();
+        },
       },
     },
     tooltip: {
