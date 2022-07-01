@@ -2,13 +2,21 @@
   <table mat-table [dataSource]="dataSource" matSort matSortActive="numAnom" matSortDirection="asc">
     <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <div *ngIf="column === 'colors'"></div>
         <div *ngIf="column === 'numAnom'">#</div>
-        <div *ngIf="column !== 'numAnom'">
+        <div *ngIf="column !== 'numAnom' && column !== 'colors'">
           {{ column | uppercase }}
         </div>
       </th>
       <td mat-cell *matCellDef="let element">
-        <div class="row-content">
+        <div
+          *ngIf="column === 'colors'"
+          class="color-row"
+          [ngStyle]="{ background: element[column][viewSelected] }"
+        >
+          <span [ngStyle]="{ color: element[column][viewSelected] }">.</span>
+        </div>
+        <div *ngIf="column !== 'colors'" class="row-content">
           <span>{{ element[column] }}</span>
         </div>
       </td>
@@ -20,7 +28,10 @@
       (mouseover)="hoverAnomalia(row)"
       (mouseleave)="unhoverAnomalia(row)"
       (click)="selectAnomalia(row)"
-      [ngClass]="{ selected: row.anomalia === anomaliaSelected, hovered: row.anomalia === anomaliaHovered }"
+      [ngClass]="{
+        selected: row.anomalia === anomaliaSelected,
+        hovered: row.anomalia === anomaliaHovered
+      }"
       *matRowDef="let row; columns: displayedColumns"
     ></tr>
 

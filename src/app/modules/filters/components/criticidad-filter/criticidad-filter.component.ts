@@ -19,7 +19,7 @@ interface Criticidad {
 @Component({
   selector: 'app-criticidad-filter',
   templateUrl: './criticidad-filter.component.html',
-  styleUrls: ['./criticidad-filter.component.css'],
+  styleUrls: ['./criticidad-filter.component.scss'],
 })
 export class CriticidadFilterComponent implements OnInit, OnDestroy {
   criticidadElems: Criticidad[] = [];

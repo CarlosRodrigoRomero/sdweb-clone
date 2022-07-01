@@ -26,7 +26,10 @@ import { ViewReportService } from '@data/services/view-report.service';
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
 
+import { Colors } from '@core/classes/colors';
+
 import { COLOR } from '@data/constants/color';
+import { StringDecoder } from 'string_decoder';
 
 @Injectable({
   providedIn: 'root',
@@ -47,6 +50,7 @@ export class AnomaliasControlService {
   private currentZoom: number;
   private _coordsPointer: Coordinate = undefined;
   public coordsPointer$ = new BehaviorSubject<Coordinate>(this._coordsPointer);
+  zoomChangeView = 22;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -106,90 +110,44 @@ export class AnomaliasControlService {
     });
   }
 
-  createAnomaliaLayers(informeId: string, zones?: LocationAreaInterface[]): VectorLayer[] {
+  createAnomaliaLayers(informeId: string): VectorLayer[] {
     const anomaliasLayers: VectorLayer[] = [];
-    if (zones !== undefined) {
-      zones.forEach((zone) => {
-        const zoneId = this.zonesControlService.getGlobalsLabel(zone.globalCoords);
-        const perdidasLayer = new VectorLayer({
-          source: new VectorSource({ wrapX: false }),
-          style: this.getStylePerdidas(false),
-          visible: false,
-        });
-        perdidasLayer.setProperties({
-          informeId,
-          type: 'anomalias',
-          zoneId,
-          view: 0,
-          zone,
-        });
-        anomaliasLayers.push(perdidasLayer);
 
-        const celsCalientesLayer = new VectorLayer({
-          source: new VectorSource({ wrapX: false }),
-          style: this.getStyleCelsCalientes(false),
-          visible: false,
-        });
-        celsCalientesLayer.setProperties({
-          informeId,
-          type: 'anomalias',
-          zoneId,
-          view: 1,
-          zone,
-        });
-        anomaliasLayers.push(celsCalientesLayer);
+    const perdidasLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStylePerdidas(false),
+      visible: false,
+    });
+    perdidasLayer.setProperties({
+      informeId,
+      type: 'anomalias',
+      view: 0,
+    });
+    anomaliasLayers.push(perdidasLayer);
 
-        const gradNormMaxLayer = new VectorLayer({
-          source: new VectorSource({ wrapX: false }),
-          style: this.getStyleGradienteNormMax(false),
-          visible: false,
-        });
-        gradNormMaxLayer.setProperties({
-          informeId,
-          type: 'anomalias',
-          zoneId,
-          view: 2,
-          zone,
-        });
-        anomaliasLayers.push(gradNormMaxLayer);
-      });
-    } else {
-      const perdidasLayer = new VectorLayer({
-        source: new VectorSource({ wrapX: false }),
-        style: this.getStylePerdidas(false),
-        visible: false,
-      });
-      perdidasLayer.setProperties({
-        informeId,
-        type: 'anomalias',
-        view: 0,
-      });
-      anomaliasLayers.push(perdidasLayer);
+    const celsCalientesLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleCelsCalientes(false),
+      visible: false,
+    });
+    celsCalientesLayer.setProperties({
+      informeId,
+      type: 'anomalias',
+      view: 1,
+    });
+    anomaliasLayers.push(celsCalientesLayer);
 
-      const celsCalientesLayer = new VectorLayer({
-        source: new VectorSource({ wrapX: false }),
-        style: this.getStyleCelsCalientes(false),
-        visible: false,
-      });
-      celsCalientesLayer.setProperties({
-        informeId,
-        type: 'anomalias',
-        view: 1,
-      });
-      anomaliasLayers.push(celsCalientesLayer);
-
-      const gradNormMaxLayer = new VectorLayer({
-        source: new VectorSource({ wrapX: false }),
-        style: this.getStyleGradienteNormMax(false),
-        visible: false,
-      });
-      gradNormMaxLayer.setProperties({
-        informeId,
-        type: 'anomalias',
-        view: 2,
-      });
-      anomaliasLayers.push(gradNormMaxLayer);
-    }
+    const gradNormMaxLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleGradienteNormMax(false),
+      visible: false,
+    });
+    gradNormMaxLayer.setProperties({
+      informeId,
+      type: 'anomalias',
+      view: 2,
+    });
+    anomaliasLayers.push(gradNormMaxLayer);
 
     return anomaliasLayers;
   }
@@ -220,15 +178,10 @@ export class AnomaliasControlService {
     this.anomaliaLayers.forEach((l) => {
       // filtra las anomalías correspondientes al informe
       const anomaliasInforme = anomalias.filter((item) => item.informeId === l.getProperties().informeId);
-      let anomaliasLayer = anomaliasInforme;
-      // si hay zonas divimos las anomalias tb por zonas
-      if (this.zonesService.thereAreZones) {
-        anomaliasLayer = this.zonesControlService.getElemsZona(l.getProperties().zone, anomaliasInforme) as Anomalia[];
-      }
 
       const source = l.getSource();
       source.clear();
-      anomaliasLayer.forEach((anom) => {
+      anomaliasInforme.forEach((anom) => {
         const feature = new Feature({
           geometry: new Polygon([anom.featureCoords]),
           properties: {
@@ -238,16 +191,9 @@ export class AnomaliasControlService {
             informeId: anom.informeId,
             perdidas: anom.perdidas,
             gradienteNormalizado: anom.gradienteNormalizado,
+            type: 'anomalia',
           },
         });
-
-        if (this.zonesService.thereAreZones) {
-          const properties = feature.getProperties().properties;
-          properties.zone = l.getProperties().zone;
-          feature.setProperties({
-            properties,
-          });
-        }
 
         source.addFeature(feature);
       });
@@ -298,8 +244,6 @@ export class AnomaliasControlService {
   }
 
   private addOnHoverAction() {
-    let currentFeatureHover;
-
     this.map.on('pointermove', (event) => {
       if (this.anomaliaSelect === undefined) {
         if (this.map.hasFeatureAtPixel(event.pixel)) {
@@ -307,14 +251,14 @@ export class AnomaliasControlService {
             .getFeaturesAtPixel(event.pixel)
             .filter((item) => item.getProperties().properties !== undefined)
             .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
-            .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)[0] as Feature;
+            .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)
+            .filter((item) => item.getProperties().properties.type === 'anomalia')[0] as Feature;
 
           if (feature !== undefined) {
             // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
             if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
               this.prevFeatureHover.setStyle(this.getStyleAnomalias(false));
             }
-            currentFeatureHover = feature;
 
             const anomaliaId = feature.getProperties().properties.anomaliaId;
             const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
@@ -331,14 +275,15 @@ export class AnomaliasControlService {
               this.anomaliaHover = undefined;
             }
           }
+        } else {
+          if (this.anomaliaHover !== undefined) {
+            this.setExternalStyle(this.anomaliaHover.id, false);
+
+            this.anomaliaHover = undefined;
+          }
         }
       } else {
         this.anomaliaHover = undefined;
-
-        if (currentFeatureHover !== undefined) {
-          currentFeatureHover.setStyle(this.getStyleAnomalias(false));
-          currentFeatureHover = undefined;
-        }
       }
     });
   }
@@ -395,14 +340,14 @@ export class AnomaliasControlService {
   }
 
   private addClickOutFeatures() {
-    this.map.on('click', (event) => {
+    this.map.on('click', async (event) => {
       const feature = this.map
         .getFeaturesAtPixel(event.pixel)
         .filter((item) => item.getProperties().properties !== undefined)
         .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
       if (feature.length === 0) {
         if (this.anomaliaSelect !== undefined) {
-          this.setExternalStyle(this.anomaliaSelect.id, false);
+          await this.setExternalStyle(this.anomaliaSelect.id, false);
 
           this.anomaliaSelect = undefined;
         }
@@ -491,27 +436,28 @@ export class AnomaliasControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focused ? 'white' : this.getColorMae(feature),
-            width: focused ? 5 : 4,
+            color:
+              this.currentZoom >= this.zoomChangeView
+                ? focused
+                  ? 'white'
+                  : this.getColorMae(feature, 1)
+                : focused
+                ? 'white'
+                : 'black',
+            width: this.currentZoom >= this.zoomChangeView ? 4 : focused ? 2 : 1,
           }),
           fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
+            color: this.currentZoom >= this.zoomChangeView ? 'rgba(255,255,255, 0)' : this.getColorMae(feature, 0.9),
           }),
         });
       }
     };
   }
 
-  private getColorMae(feature: Feature) {
+  private getColorMae(feature: Feature, opacity: number): string {
     const perdidas = feature.getProperties().properties.perdidas as number;
 
-    if (perdidas < 0.3) {
-      return COLOR.colores_severity[0];
-    } else if (perdidas < 0.5) {
-      return COLOR.colores_severity[1];
-    } else {
-      return COLOR.colores_severity[2];
-    }
+    return Colors.getColor(perdidas, [0.3, 0.5], opacity);
   }
 
   // ESTILOS CELS CALIENTES
@@ -520,27 +466,31 @@ export class AnomaliasControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focused ? 'white' : this.getColorCelsCalientes(feature),
-            width: focused ? 5 : 4,
+            color:
+              this.currentZoom >= this.zoomChangeView
+                ? focused
+                  ? 'white'
+                  : this.getColorCelsCalientes(feature, 1)
+                : focused
+                ? 'white'
+                : 'black',
+            width: this.currentZoom >= this.zoomChangeView ? 4 : focused ? 2 : 1,
           }),
           fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
+            color:
+              this.currentZoom >= this.zoomChangeView
+                ? 'rgba(255,255,255, 0)'
+                : this.getColorCelsCalientes(feature, 0.9),
           }),
         });
       }
     };
   }
 
-  private getColorCelsCalientes(feature: Feature) {
+  private getColorCelsCalientes(feature: Feature, opacity: number): string {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
-    if (gradNormMax < 10) {
-      return COLOR.colores_severity[0];
-    } else if (gradNormMax < 40) {
-      return COLOR.colores_severity[1];
-    } else {
-      return COLOR.colores_severity[2];
-    }
+    return Colors.getColor(gradNormMax, [10, 40], opacity);
   }
 
   // ESTILOS GRADIENTE NORMALIZADO MAX
@@ -549,27 +499,31 @@ export class AnomaliasControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: focused ? 'white' : this.getColorGradienteNormMax(feature),
-            width: focused ? 5 : 4,
+            color:
+              this.currentZoom >= this.zoomChangeView
+                ? focused
+                  ? 'white'
+                  : this.getColorGradienteNormMax(feature, 1)
+                : focused
+                ? 'white'
+                : 'black',
+            width: this.currentZoom >= this.zoomChangeView ? 4 : focused ? 2 : 1,
           }),
           fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
+            color:
+              this.currentZoom >= this.zoomChangeView
+                ? 'rgba(255,255,255, 0)'
+                : this.getColorGradienteNormMax(feature, 0.9),
           }),
         });
       }
     };
   }
 
-  private getColorGradienteNormMax(feature: Feature) {
+  private getColorGradienteNormMax(feature: Feature, opacity: number) {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
-    if (gradNormMax < 10) {
-      return COLOR.colores_severity[0];
-    } else if (gradNormMax < 40) {
-      return COLOR.colores_severity[1];
-    } else {
-      return COLOR.colores_severity[2];
-    }
+    return Colors.getColor(gradNormMax, [10, 40], opacity);
   }
 
   // ESTILO POR TIPOS
@@ -628,7 +582,7 @@ export class AnomaliasControlService {
     return layerViewAnomalia;
   }
 
-  setExternalStyle(anomaliaId: string, focus: boolean) {
+  setExternalStyle(anomaliaId: string, focused: boolean) {
     const layersInforme = this.anomaliaLayers.filter(
       (layer) => layer.getProperties().informeId === this.selectedInformeId
     );
@@ -640,35 +594,10 @@ export class AnomaliasControlService {
 
     const feature = features.find((f) => f.getProperties().properties.anomaliaId === anomaliaId);
 
-    if (focus) {
+    if (focused) {
       feature.setStyle(this.getStyleAnomalias(true));
     } else {
       feature.setStyle(this.getStyleAnomalias(false));
-    }
-  }
-
-  setExternalStyleAnomaliaLayer(feature: Feature, layers: VectorLayer[], visible: boolean) {
-    // mostramos u ocultamos las zona de la anomalia si la hubiera
-    if (feature.getProperties().properties.hasOwnProperty('zone')) {
-      const zoneAnomalia = feature.getProperties().properties.zone;
-      const layerZoneAnomalia = layers.find(
-        (layer) => layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneAnomalia.globalCoords)
-      );
-
-      // solo la ocultamos si estamos en zoom out
-      if (visible === false) {
-        if (this.currentZoom < this.zonesControlService.zoomChangeView) {
-          layerZoneAnomalia.setVisible(visible);
-        }
-      } else {
-        layerZoneAnomalia.setVisible(visible);
-      }
-    }
-  }
-
-  private setLayerVisibility(layer: VectorLayer, visible: boolean) {
-    if (this.currentZoom < this.zonesControlService.zoomChangeView) {
-      layer.setVisible(visible);
     }
   }
 

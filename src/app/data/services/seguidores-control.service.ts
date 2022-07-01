@@ -12,7 +12,7 @@ import VectorLayer from 'ol/layer/Vector';
 import Feature from 'ol/Feature';
 import { Coordinate } from 'ol/coordinate';
 import { fromLonLat } from 'ol/proj';
-import { Fill, Stroke, Style } from 'ol/style';
+import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Select } from 'ol/interaction';
 import VectorSource from 'ol/source/Vector';
 
@@ -27,6 +27,7 @@ import { Seguidor } from '@core/models/seguidor';
 import { MathOperations } from '@core/classes/math-operations';
 import { LocationAreaInterface } from '@core/models/location';
 
+import { Colors } from '@core/classes/colors';
 import { COLOR } from '@data/constants/color';
 
 @Injectable({
@@ -58,6 +59,7 @@ export class SeguidoresControlService {
   private _visualImageExist = true;
   visualImageExist$ = new BehaviorSubject<boolean>(this._visualImageExist);
   private currentZoom: number;
+  private zoomChangeView = 21;
 
   private maesMedio: number[] = [];
   private maesSigma: number[] = [];
@@ -122,90 +124,44 @@ export class SeguidoresControlService {
     });
   }
 
-  createSeguidorLayers(informeId: string, zones?: LocationAreaInterface[]): VectorLayer[] {
+  createSeguidorLayers(informeId: string): VectorLayer[] {
     const seguidoresLayers: VectorLayer[] = [];
-    if (zones !== undefined) {
-      zones.forEach((zone) => {
-        const zoneId = this.zonesControlService.getGlobalsLabel(zone.globalCoords);
-        const maeLayer = new VectorLayer({
-          source: new VectorSource({ wrapX: false }),
-          style: this.getStyleSeguidoresMae(false),
-          visible: false,
-        });
-        maeLayer.setProperties({
-          informeId,
-          view: 0,
-          type: 'seguidores',
-          zoneId,
-          zone,
-        });
-        seguidoresLayers.push(maeLayer);
+    
+    const maeLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleSeguidoresMae(false),
+      visible: true,
+    });
+    maeLayer.setProperties({
+      informeId,
+      view: 0,
+      type: 'seguidores',
+    });
+    seguidoresLayers.push(maeLayer);
 
-        const celsCalientesLayer = new VectorLayer({
-          source: new VectorSource({ wrapX: false }),
-          style: this.getStyleSeguidoresCelsCalientes(false),
-          visible: false,
-        });
-        celsCalientesLayer.setProperties({
-          informeId,
-          view: 1,
-          type: 'seguidores',
-          zoneId,
-          zone,
-        });
-        seguidoresLayers.push(celsCalientesLayer);
+    const celsCalientesLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleSeguidoresCelsCalientes(false),
+      visible: true,
+    });
+    celsCalientesLayer.setProperties({
+      informeId,
+      view: 1,
+      type: 'seguidores',
+    });
+    seguidoresLayers.push(celsCalientesLayer);
 
-        const gradNormMaxLayer = new VectorLayer({
-          source: new VectorSource({ wrapX: false }),
-          style: this.getStyleSeguidoresGradienteNormMax(false),
-          visible: false,
-        });
-        gradNormMaxLayer.setProperties({
-          informeId,
-          view: 2,
-          type: 'seguidores',
-          zoneId,
-          zone,
-        });
-        seguidoresLayers.push(gradNormMaxLayer);
-      });
-    } else {
-      const maeLayer = new VectorLayer({
-        source: new VectorSource({ wrapX: false }),
-        style: this.getStyleSeguidoresMae(false),
-        visible: true,
-      });
-      maeLayer.setProperties({
-        informeId,
-        view: 0,
-        type: 'seguidores',
-      });
-      seguidoresLayers.push(maeLayer);
-
-      const celsCalientesLayer = new VectorLayer({
-        source: new VectorSource({ wrapX: false }),
-        style: this.getStyleSeguidoresCelsCalientes(false),
-        visible: true,
-      });
-      celsCalientesLayer.setProperties({
-        informeId,
-        view: 1,
-        type: 'seguidores',
-      });
-      seguidoresLayers.push(celsCalientesLayer);
-
-      const gradNormMaxLayer = new VectorLayer({
-        source: new VectorSource({ wrapX: false }),
-        style: this.getStyleSeguidoresGradienteNormMax(false),
-        visible: true,
-      });
-      gradNormMaxLayer.setProperties({
-        informeId,
-        view: 2,
-        type: 'seguidores',
-      });
-      seguidoresLayers.push(gradNormMaxLayer);
-    }
+    const gradNormMaxLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleSeguidoresGradienteNormMax(false),
+      visible: true,
+    });
+    gradNormMaxLayer.setProperties({
+      informeId,
+      view: 2,
+      type: 'seguidores',
+    });
+    seguidoresLayers.push(gradNormMaxLayer);
 
     return seguidoresLayers;
   }
@@ -236,24 +192,17 @@ export class SeguidoresControlService {
     this.seguidorLayers.forEach((l) => {
       // filtra los seguidores correspondientes al informe
       const seguidoresInforme = seguidores.filter((seguidor) => seguidor.informeId === l.getProperties().informeId);
-      let seguidoresLayer = seguidoresInforme;
-      // si hay zonas divimos los seguidores tb por zonas
-      if (this.zonesService.thereAreZones) {
-        seguidoresLayer = this.zonesControlService.getElemsZona(
-          l.getProperties().zone,
-          seguidoresInforme
-        ) as Seguidor[];
-      }
 
       const source = l.getSource();
       source.clear();
-      seguidoresLayer.forEach((seguidor) => {
+      seguidoresInforme.forEach((seguidor) => {
         // crea poligono seguidor
         const feature = new Feature({
           geometry: new Polygon(this.latLonLiteralToLonLat(seguidor.path)),
           properties: {
             view: l.getProperties().view,
             seguidorId: seguidor.id,
+            name: seguidor.nombre,
             informeId: seguidor.informeId,
             mae: seguidor.mae,
             gradienteNormalizado: seguidor.gradienteNormalizado,
@@ -261,16 +210,9 @@ export class SeguidoresControlService {
             anomalias: seguidor.anomalias,
             filas: seguidor.filas,
             columnas: seguidor.columnas,
+            numAnoms: seguidor.anomaliasCliente.length,
           },
         });
-
-        if (this.zonesService.thereAreZones) {
-          const properties = feature.getProperties().properties;
-          properties.zone = l.getProperties().zone;
-          feature.setProperties({
-            properties,
-          });
-        }
 
         source.addFeature(feature);
       });
@@ -559,107 +501,157 @@ export class SeguidoresControlService {
   private getStyleSeguidoresMae(focused: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : this.getColorSeguidorMae(feature),
-            width: focused ? 6 : 4,
-          }),
-          fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
-          }),
-        });
+        if (feature.getProperties().properties.numAnoms > 0) {
+          return new Style({
+            stroke: new Stroke({
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? focused
+                    ? 'white'
+                    : this.getColorFeatureMae(feature, 1)
+                  : focused
+                  ? 'white'
+                  : 'black',
+              width: focused ? 4 : 2,
+            }),
+            fill: new Fill({
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? 'rgba(255,255,255, 0)'
+                  : this.getColorFeatureMae(feature, 0.9),
+            }),
+            text: this.getLabelStyle(feature),
+          });
+        } else {
+          return this.getNoAnomsStyle(feature, focused);
+        }
       }
     };
   }
 
-  private getColorSeguidorMae(feature: Feature) {
-    const mae = feature.getProperties().properties.mae as number;
-
-    if (mae < 0.01) {
-      return COLOR.colores_severity[0];
-    } else if (mae < 0.05) {
-      return COLOR.colores_severity[1];
-    } else {
-      return COLOR.colores_severity[2];
-    }
+  private getNoAnomsStyle(feature: Feature, focused: boolean) {
+    return new Style({
+      stroke: new Stroke({
+        color:
+          this.currentZoom >= this.zoomChangeView
+            ? focused
+              ? 'white'
+              : Colors.hexToRgb(COLOR.color_no_anoms, 1)
+            : focused
+            ? 'white'
+            : 'black',
+        width: focused ? 4 : 2,
+      }),
+      fill: new Fill({
+        color:
+          this.currentZoom >= this.zoomChangeView ? 'rgba(255,255,255, 0)' : Colors.hexToRgb(COLOR.color_no_anoms, 0.9),
+      }),
+      text: this.getLabelStyle(feature),
+    });
   }
 
-  getColorSeguidorMaeExternal(mae: number) {
-    if (mae < 0.01) {
-      return COLOR.colores_severity[0];
-    } else if (mae < 0.05) {
-      return COLOR.colores_severity[1];
-    } else {
-      return COLOR.colores_severity[2];
-    }
+  private getColorFeatureMae(feature: Feature, opacity: number) {
+    const mae = feature.getProperties().properties.mae as number;
+
+    return this.getColorSeguidorMae(mae, opacity);
+  }
+
+  getColorSeguidorMae(mae: number, opacity: number): string {
+    return Colors.getColor(mae, [0.01, 0.05], opacity);
   }
 
   // ESTILOS CELS CALIENTES
   private getStyleSeguidoresCelsCalientes(focused) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : this.getColorSeguidorCelsCalientes(feature),
-            width: focused ? 6 : 4,
-          }),
-          fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
-          }),
-        });
+        if (feature.getProperties().properties.numAnoms > 0) {
+          return new Style({
+            stroke: new Stroke({
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? focused
+                    ? 'white'
+                    : this.getColorSeguidorCelsCalientes(feature, 1)
+                  : focused
+                  ? 'white'
+                  : 'black',
+              width: focused ? 4 : 2,
+            }),
+            fill: new Fill({
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? 'rgba(255,255,255, 0)'
+                  : this.getColorSeguidorCelsCalientes(feature, 0.9),
+            }),
+            text: this.getLabelStyle(feature),
+          });
+        } else {
+          return this.getNoAnomsStyle(feature, focused);
+        }
       }
     };
   }
 
-  private getColorSeguidorCelsCalientes(feature: Feature) {
+  private getColorSeguidorCelsCalientes(feature: Feature, opacity: number) {
     const celsCalientes = feature.getProperties().properties.celsCalientes;
 
-    if (celsCalientes < 0.02) {
-      return COLOR.colores_severity[0];
-    } else if (celsCalientes < 0.1) {
-      return COLOR.colores_severity[1];
-    } else {
-      return COLOR.colores_severity[2];
-    }
+    return Colors.getColor(celsCalientes, [0.02, 0.1], opacity);
   }
 
   // ESTILOS GRADIENTE NORMALIZADO MAX
   private getStyleSeguidoresGradienteNormMax(focused) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : this.getColorSeguidorGradienteNormMax(feature),
-            width: focused ? 6 : 4,
-          }),
-          fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
-          }),
-        });
+        if (feature.getProperties().properties.numAnoms > 0) {
+          return new Style({
+            stroke: new Stroke({
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? focused
+                    ? 'white'
+                    : this.getColorFeatureGradienteNormMax(feature, 1)
+                  : focused
+                  ? 'white'
+                  : 'black',
+              width: focused ? 4 : 2,
+            }),
+            fill: new Fill({
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? 'rgba(255,255,255, 0)'
+                  : this.getColorFeatureGradienteNormMax(feature, 0.9),
+            }),
+            text: this.getLabelStyle(feature),
+          });
+        } else {
+          return this.getNoAnomsStyle(feature, focused);
+        }
       }
     };
   }
 
-  private getColorSeguidorGradienteNormMax(feature: Feature) {
+  private getColorFeatureGradienteNormMax(feature: Feature, opacity: number) {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
-    if (gradNormMax < 10) {
-      return COLOR.colores_severity[0];
-    } else if (gradNormMax < 40) {
-      return COLOR.colores_severity[1];
-    } else {
-      return COLOR.colores_severity[2];
-    }
+    return this.getColorSeguidorGradienteNormMax(gradNormMax, opacity);
   }
 
-  getColorSeguidorGradienteNormMaxExternal(gradNormMax: number) {
-    if (gradNormMax < 10) {
-      return COLOR.colores_severity[0];
-    } else if (gradNormMax < 40) {
-      return COLOR.colores_severity[1];
-    } else {
-      return COLOR.colores_severity[2];
-    }
+  getColorSeguidorGradienteNormMax(gradNormMax: number, opacity: number) {
+    return Colors.getColor(gradNormMax, [10, 40], opacity);
+  }
+
+  getLabelStyle(feature: Feature) {
+    return new Text({
+      text: feature.getProperties().properties.name,
+      font: 'bold 14px Roboto',
+      fill: new Fill({
+        color: 'black',
+      }),
+      stroke: new Stroke({
+        color: 'white',
+        width: 4,
+      }),
+    });
   }
 
   setExternalStyleSeguidor(seguidorId: string, focus: boolean) {
@@ -678,25 +670,6 @@ export class SeguidoresControlService {
       feature.setStyle(this.getStyleSeguidores(true));
     } else {
       feature.setStyle(this.getStyleSeguidores(false));
-    }
-  }
-
-  setExternalStyleSeguidorLayer(feature: Feature, layers: VectorLayer[], visible: boolean) {
-    // mostramos u ocultamos las zona de los seguidores si la hubiera
-    if (feature.getProperties().properties.hasOwnProperty('zone')) {
-      const zoneSeguidor = feature.getProperties().properties.zone;
-      const layerZoneSeguidor = layers.find(
-        (layer) => layer.getProperties().zoneId === this.zonesControlService.getGlobalsLabel(zoneSeguidor.globalCoords)
-      );
-
-      // solo la ocultamos si estamos en zoom out
-      if (visible === false) {
-        if (this.currentZoom < this.zonesControlService.zoomChangeView) {
-          layerZoneSeguidor.setVisible(visible);
-        }
-      } else {
-        layerZoneSeguidor.setVisible(visible);
-      }
     }
   }
 

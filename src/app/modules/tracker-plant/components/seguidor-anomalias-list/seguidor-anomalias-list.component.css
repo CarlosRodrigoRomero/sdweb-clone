@@ -15,12 +15,16 @@ table {
   justify-content: center;
 }
 
+:host ::ng-deep td.mat-cell:first-of-type {
+  padding-left: 0px;
+}
+
 .mat-row {
   cursor: pointer;
 }
 
 .mat-row.selected {
-  background-color: lightcoral;
+  background-color: rgb(187, 187, 187);
 }
 
 .mat-row.hovered {
@@ -30,4 +34,9 @@ table {
 .row-content {
   display: flex;
   justify-content: center;
+}
+
+.color-row {
+  width: 10px;
+  height: 48px;
 }

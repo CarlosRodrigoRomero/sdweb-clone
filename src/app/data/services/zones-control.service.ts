@@ -23,6 +23,7 @@ import { FilterableElement } from '@core/models/filterableInterface';
 
 import { COLOR } from '@data/constants/color';
 import { Select } from 'ol/interaction';
+import { Colors } from '@core/classes/colors';
 
 @Injectable({
   providedIn: 'root',
@@ -47,6 +48,10 @@ export class ZonesControlService {
 
   initService(): Promise<boolean> {
     return new Promise((initService) => {
+      if (this.reportControlService.plantaFija) {
+        this.zoomChangeView = 20;
+      }
+
       this.subscriptions.add(
         this.olMapService.getMap().subscribe((map) => {
           this.map = map;
@@ -129,59 +134,86 @@ export class ZonesControlService {
       source.clear();
       zonas.forEach((zona) => {
         const elemsFilteredZona = this.getElemsZona(zona, elemsFilteredInforme);
-        // si no hay seguidores dentro de la zona no la añadimos
-        if (elemsFilteredZona.length > 0) {
-          const allElemsZona = this.getElemsZona(zona, elemsInforme);
-          const property = this.getPropertyView(view, informeId, elemsInforme, allElemsZona);
 
-          const coords = this.pathToLonLat(zona.path);
-          // crea poligono seguidor
-          const feature = new Feature({
-            geometry: new Polygon(coords),
-            properties: {
-              id: this.getGlobalsLabel(zona.globalCoords),
-              informeId,
-              centroid: this.olMapService.getCentroid(coords[0]),
-              type: 'zone',
-              [property.type]: property.value,
-            },
-          });
-          source.addFeature(feature);
-        }
+        const allElemsZona = this.getElemsZona(zona, elemsInforme);
+        const property = this.getPropertyView(view, informeId, zona, zonas, allElemsZona);
+
+        const coords = this.pathToLonLat(zona.path);
+
+        // crea poligono seguidor
+        const feature = new Feature({
+          geometry: new Polygon(coords),
+          properties: {
+            id: this.getGlobalsLabel(zona.globalCoords),
+            informeId,
+            centroid: this.olMapService.getCentroid(coords[0]),
+            type: 'zone',
+            area: this.getArea(coords),
+            numElems: elemsFilteredZona.length,
+            name: this.getSmallGlobal(zona.globalCoords),
+            [property.type]: property.value,
+          },
+        });
+        source.addFeature(feature);
       });
     });
+  }
+
+  private getSmallGlobal(globalCoords: string[]): string {
+    const notNullGlobals = globalCoords.filter((gC) => gC !== null);
+    return notNullGlobals[notNullGlobals.length - 1].toString();
+  }
+
+  private getArea(coords: Coordinate[][]): number {
+    const polygon = new Polygon(coords);
+    return polygon.getArea();
   }
 
   private getPropertyView(
     view: number,
     informeId: string,
-    zonasInforme: FilterableElement[],
-    elemsZona: FilterableElement[]
+    zona: LocationAreaInterface,
+    zonas: LocationAreaInterface[],
+    allElemsZona: FilterableElement[]
   ): any {
     switch (view) {
       case 0:
         let mae = 0;
         // para anomalías enviamos el numero de zonas para calcular el MAE
         if (this.reportControlService.plantaFija) {
-          mae = this.getMaeZona(elemsZona, informeId, zonasInforme.length);
+          mae = this.getMaeZona(allElemsZona, informeId, zona, zonas);
         } else {
-          mae = this.getMaeZona(elemsZona, informeId);
+          mae = this.getMaeZona(allElemsZona, informeId);
         }
         return { type: 'mae', value: mae };
       case 1:
         let celsCalientes = 0;
         // para anomalías enviamos el numero de zonas para calcular el CC
         if (this.reportControlService.plantaFija) {
-          celsCalientes = this.getCCZona(elemsZona, informeId, zonasInforme.length);
+          celsCalientes = this.getCCZona(allElemsZona, informeId, zona, zonas);
         } else {
-          celsCalientes = this.getCCZona(elemsZona, informeId);
+          celsCalientes = this.getCCZona(allElemsZona, informeId);
         }
         return { type: 'celsCalientes', value: celsCalientes };
       case 2:
-        const grad = this.getGradNormMaxZona(elemsZona);
+        const grad = this.getGradNormMaxZona(allElemsZona);
         return { type: 'gradienteNormalizado', value: grad };
     }
   }
+
+  // getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]): FilterableElement[] {
+  //   let elemsFiltered: FilterableElement[];
+  //   zona.globalCoords.forEach((coord, index) => {
+  //     if (coord !== null) {
+  //       if (elemsFiltered === undefined) {
+  //         elemsFiltered = elems.filter((elem) => elem.globalCoords[index] === coord);
+  //       } else {
+  //         elemsFiltered = elemsFiltered.filter((elem) => elem.globalCoords[index] === coord);
+  //       }
+  //     }
+  //   });
+  //   return elemsFiltered;
+  // }
 
   getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]) {
     const labelZona = this.getGlobalsLabel(zona.globalCoords);
@@ -191,18 +223,23 @@ export class ZonesControlService {
     );
   }
 
-  private getMaeZona(elems: FilterableElement[], informeId: string, numZonas?: number): number {
+  private getMaeZona(
+    elems: FilterableElement[],
+    informeId: string,
+    zona?: LocationAreaInterface,
+    zonas?: LocationAreaInterface[]
+  ): number {
     const informe = this.reportControlService.informes.find((inf) => inf.id === informeId);
     let mae = 0;
-    if (numZonas) {
+    if (zona) {
       const anomaliasZona = elems as Anomalia[];
       if (anomaliasZona.length > 0) {
-        const perdidas = anomaliasZona.map((anom) => anom.perdidas);
-        let perdidasTotales = 0;
-        perdidas.forEach((perd) => (perdidasTotales += perd));
+        const perdidasTotales = anomaliasZona.reduce((acc, curr) => acc + curr.perdidas, 0);
+        const areaZona = this.getArea(this.pathToLonLat(zona.path));
+        const areaTotalZonas = zonas.reduce((acc, curr) => acc + this.getArea(this.pathToLonLat(curr.path)), 0);
 
-        // suponemos zonas iguales para dar un valor aproximado
-        mae = perdidasTotales / (informe.numeroModulos / numZonas);
+        // obtenemos el nº de modulos ponderados al area de la zona
+        mae = perdidasTotales / ((informe.numeroModulos * areaZona) / areaTotalZonas);
       }
     } else {
       const seguidoresZona = elems as Seguidor[];
@@ -213,16 +250,23 @@ export class ZonesControlService {
     return mae;
   }
 
-  private getCCZona(elems: FilterableElement[], informeId: string, numZonas?: number): number {
+  private getCCZona(
+    elems: FilterableElement[],
+    informeId: string,
+    zona?: LocationAreaInterface,
+    zonas?: LocationAreaInterface[]
+  ): number {
     const informe = this.reportControlService.informes.find((inf) => inf.id === informeId);
     let cc = 0;
-    if (numZonas) {
+    if (zona) {
       const anomaliasZona = elems as Anomalia[];
       if (anomaliasZona.length > 0) {
         const celsCalientes = anomaliasZona.filter((anom) => anom.tipo === 8 || anom.tipo === 9);
+        const areaZona = this.getArea(this.pathToLonLat(zona.path));
+        const areaTotalZonas = zonas.reduce((acc, curr) => acc + this.getArea(this.pathToLonLat(curr.path)), 0);
 
-        // suponemos zonas iguales para dar un valor aproximado
-        cc = celsCalientes.length / (informe.numeroModulos / numZonas);
+        // obtenemos el nº de modulos ponderados al area de la zona
+        cc = celsCalientes.length / ((informe.numeroModulos * areaZona) / areaTotalZonas);
       }
     } else {
       const seguidoresZona = elems as Seguidor[];
@@ -303,7 +347,7 @@ export class ZonesControlService {
     select.on('select', (e) => {
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().hasOwnProperty('properties')) {
-          const zoomIn = 19;
+          const zoomIn = this.zoomChangeView;
           if (this.currentZoom < zoomIn) {
             const centroidZone = e.selected[0].getProperties().properties.centroid;
 
@@ -315,7 +359,7 @@ export class ZonesControlService {
     });
   }
 
-  private pathToLonLat(path: any): Coordinate[][] {
+  pathToLonLat(path: any): Coordinate[][] {
     return [path.map((coords) => fromLonLat([coords.lng, coords.lat]))];
   }
 
@@ -345,23 +389,51 @@ export class ZonesControlService {
     return estilosView[this.toggleViewSelected];
   }
 
+  // ESTILO SIN ANOMALIAS
+  private getNoAnomsStyle(feature: Feature, focused: boolean) {
+    return new Style({
+      stroke: new Stroke({
+        color: focused ? 'white' : 'black',
+        width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
+      }),
+      fill:
+        this.currentZoom >= this.zoomChangeView
+          ? null
+          : new Fill({
+              color: Colors.hexToRgb(COLOR.color_no_anoms, 0.9),
+            }),
+      text: this.getLabelStyle(feature),
+    });
+  }
+
   // ESTILOS MAE
-  private getStyleMae(focus: boolean) {
+  private getStyleMae(focused: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focus ? 'white' : 'black',
-            width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
-          }),
-          fill:
-            this.currentZoom >= this.zoomChangeView
-              ? null
-              : new Fill({
-                  color: this.getColorMae(feature, 0.9),
-                }),
-          text: this.getLabelStyle(feature),
-        });
+        if (feature.getProperties().properties.numElems > 0) {
+          return new Style({
+            stroke: new Stroke({
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? focused
+                    ? 'white'
+                    : this.getColorMae(feature, 1)
+                  : focused
+                  ? 'white'
+                  : 'black',
+              width: 2,
+            }),
+            fill:
+              this.currentZoom >= this.zoomChangeView
+                ? null
+                : new Fill({
+                    color: this.getColorMae(feature, 0.9),
+                  }),
+            text: this.getLabelStyle(feature),
+          });
+        } else {
+          return this.getNoAnomsStyle(feature, focused);
+        }
       }
     };
   }
@@ -379,22 +451,26 @@ export class ZonesControlService {
   }
 
   // ESTILOS CELS CALIENTES
-  private getStyleCelsCalientes(focus: boolean) {
+  private getStyleCelsCalientes(focused: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focus ? 'white' : 'black',
-            width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
-          }),
-          fill:
-            this.currentZoom >= this.zoomChangeView
-              ? null
-              : new Fill({
-                  color: this.getColorCelsCalientes(feature, 0.9),
-                }),
-          text: this.getLabelStyle(feature),
-        });
+        if (feature.getProperties().properties.numElems > 0) {
+          return new Style({
+            stroke: new Stroke({
+              color: focused ? 'white' : 'black',
+              width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
+            }),
+            fill:
+              this.currentZoom >= this.zoomChangeView
+                ? null
+                : new Fill({
+                    color: this.getColorCelsCalientes(feature, 0.9),
+                  }),
+            text: this.getLabelStyle(feature),
+          });
+        } else {
+          return this.getNoAnomsStyle(feature, focused);
+        }
       }
     };
   }
@@ -412,22 +488,26 @@ export class ZonesControlService {
   }
 
   // ESTILOS GRADIENTE NORMALIZADO MAX
-  private getStyleGradienteNormMax(focus: boolean) {
+  private getStyleGradienteNormMax(focused: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focus ? 'white' : 'black',
-            width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
-          }),
-          fill:
-            this.currentZoom >= this.zoomChangeView
-              ? null
-              : new Fill({
-                  color: this.getColorGradienteNormMax(feature, 0.9),
-                }),
-          text: this.getLabelStyle(feature),
-        });
+        if (feature.getProperties().properties.numElems > 0) {
+          return new Style({
+            stroke: new Stroke({
+              color: focused ? 'white' : 'black',
+              width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
+            }),
+            fill:
+              this.currentZoom >= this.zoomChangeView
+                ? null
+                : new Fill({
+                    color: this.getColorGradienteNormMax(feature, 0.9),
+                  }),
+            text: this.getLabelStyle(feature),
+          });
+        } else {
+          return this.getNoAnomsStyle(feature, focused);
+        }
       }
     };
   }

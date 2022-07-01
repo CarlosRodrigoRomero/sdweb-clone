@@ -6,7 +6,7 @@ mat-card {
   min-width: 250px;
 }
 
-::ng-deep {
+:host ::ng-deep {
   .temperature-slider .ngx-slider .ngx-slider-selection {
     z-index: 2 !important;
     background: linear-gradient(90deg, #010106, #481461, #b02f4c, #f36d18, #f9fb93) !important;
@@ -30,5 +30,9 @@ mat-card {
     background-color: #333 !important;
     border-top-left-radius: 3px !important;
     border-top-right-radius: 3px !important;
+  }
+
+  .temperature-slider .ngx-slider .ngx-slider-limit {
+    display: none;
   }
 }

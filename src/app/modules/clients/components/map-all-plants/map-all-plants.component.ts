@@ -141,13 +141,14 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
         informeReciente,
       });
 
+      const iconSrc = this.getMaeIcon(informeReciente.mae);
+
       feature.setStyle(
         new Style({
           image: new Icon({
-            color: this.portfolioControlService.getColorMae(feature.getProperties().informeReciente.mae),
             crossOrigin: 'anonymous',
-            src: 'assets/icons/place_black_24dp.svg',
-            scale: 0.8,
+            src: iconSrc,
+            scale: 0.5,
           }),
         })
       );
@@ -243,6 +244,33 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
     this.map.addOverlay(this.popup);
   }
 
+  private getMaeIcon(mae: number): string {
+    const srcIcons = [
+      'assets/icons/location-pin-leve.png',
+      'assets/icons/location-pin-medio.png',
+      'assets/icons/location-pin-grave.png',
+    ];
+
+    let srcIcon = '';
+    if (this.portfolioControlService.numPlantas < 3) {
+      GLOBAL.mae_rangos.forEach((rango, index) => {
+        if (mae > rango) {
+          srcIcon = srcIcons[index + 1];
+        }
+      });
+    } else {
+      if (mae < this.portfolioControlService.maeMedio) {
+        srcIcon = srcIcons[0];
+      } else if (mae <= this.portfolioControlService.maeMedio + this.portfolioControlService.maeSigma) {
+        srcIcon = srcIcons[1];
+      } else {
+        srcIcon = srcIcons[2];
+      }
+    }
+
+    return srcIcon;
+  }
+
   private checkFake(plantaId: string): boolean {
     const fakeIds = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10'];
     if (fakeIds.includes(plantaId)) {
@@ -280,12 +308,13 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
     if (hovered) {
       return (feature: Feature) => {
         if (feature !== undefined) {
+          const iconSrc = 'assets/icons/location-pin-hovered.png';
+
           return new Style({
             image: new Icon({
-              color: 'white',
               crossOrigin: 'anonymous',
-              src: 'assets/icons/place_black_24dp.svg',
-              // scale: 1.5,
+              src: iconSrc,
+              scale: 0.8,
             }),
           });
         }
@@ -293,12 +322,13 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
     } else {
       return (feature: Feature) => {
         if (feature !== undefined) {
+          const iconSrc = this.getMaeIcon(feature.getProperties().informeReciente.mae);
+
           return new Style({
             image: new Icon({
-              color: this.portfolioControlService.getColorMae(feature.getProperties().informeReciente.mae),
               crossOrigin: 'anonymous',
-              src: 'assets/icons/place_black_24dp.svg',
-              scale: 0.8,
+              src: iconSrc,
+              scale: 0.5,
             }),
           });
         }

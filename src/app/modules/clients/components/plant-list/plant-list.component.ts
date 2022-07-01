@@ -21,6 +21,7 @@ interface PlantsData {
   informesAntiguos: InformeInterface[];
   plantaId: string;
   tipo: string;
+  color: String;
 }
 
 @Component({
@@ -30,13 +31,13 @@ interface PlantsData {
 })
 export class PlantListComponent implements OnInit, AfterViewInit {
   public displayedColumns: string[] = [
+    'color',
     'nombre',
     'potencia',
     'mae',
     'tipo',
     'ultimaInspeccion',
     'inspeccionesAntiguas',
-    /* 'compartir', */
   ];
   public dataSource = new MatTableDataSource<PlantsData>();
   private plantas: PlantaInterface[];
@@ -76,6 +77,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
         plantaId: planta.id,
         tipo: planta.tipo,
         informeReciente,
+        color: this.portfolioControlService.getColorMae(informeReciente.mae),
       });
     });
 

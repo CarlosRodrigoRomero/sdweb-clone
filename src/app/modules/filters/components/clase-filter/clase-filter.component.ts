@@ -21,7 +21,7 @@ interface Clase {
 @Component({
   selector: 'app-clase-filter',
   templateUrl: './clase-filter.component.html',
-  styleUrls: ['./clase-filter.component.css'],
+  styleUrls: ['./clase-filter.component.scss'],
 })
 export class ClaseFilterComponent implements OnInit, OnDestroy {
   claseElems: Clase[] = [];

@@ -27,6 +27,7 @@ import { StatsService } from '@data/services/stats.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { MathOperations } from '@core/classes/math-operations';
+import { COLOR } from '@data/constants/color';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -77,7 +78,6 @@ export class ChartPctCelsComponent implements OnInit {
     },
     tooltip: {
       followCursor: false,
-      theme: 'dark',
       x: {
         show: false,
       },
@@ -171,7 +171,7 @@ export class ChartPctCelsComponent implements OnInit {
           },
         },
       },
-      colors: ['#FF6B6B'],
+      colors: [COLOR.gris],
       dataLabels: {
         enabled: true,
         formatter: (value) => Math.round(value * 100) / 100 + '%',
@@ -248,7 +248,7 @@ export class ChartPctCelsComponent implements OnInit {
           },
         },
       },
-      colors: ['#546E7A'],
+      colors: [COLOR.gris],
       dataLabels: {
         enabled: true,
         formatter: (value) => Math.round(value * 10) / 10 + ' ºC',

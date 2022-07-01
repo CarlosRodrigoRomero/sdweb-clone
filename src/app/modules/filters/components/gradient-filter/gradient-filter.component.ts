@@ -9,10 +9,12 @@ import { FilterControlService } from '@data/services/filter-control.service';
 
 import { GradientFilter } from '@core/models/gradientFilter';
 
+import { COLOR } from '@data/constants/color';
+
 @Component({
   selector: 'app-gradient-filter',
   templateUrl: './gradient-filter.component.html',
-  styleUrls: ['./gradient-filter.component.css'],
+  styleUrls: ['./gradient-filter.component.scss'],
 })
 export class GradientFilterComponent implements OnInit, OnDestroy {
   minGradiente = 0;
@@ -51,12 +53,12 @@ export class GradientFilterComponent implements OnInit, OnDestroy {
         if (minValue === this.minGradiente && maxValue === this.maxGradiente) {
           return '#c4c4c4';
         }
-        return '#455a64';
+        return COLOR.color_rojo_interfaz;
       },
       getPointerColor: (value: number, pointerType: PointerType.Min | PointerType.Max): string => {
         if (value !== this.minGradiente) {
           if (value !== this.maxGradiente) {
-            return '#455a64';
+            return COLOR.color_rojo_interfaz;
           }
         }
       },
