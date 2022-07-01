@@ -13,3 +13,8 @@ span {
   font-size: 1.1rem;
   font-weight: 400;
 }
+
+
+.filter-active {
+  color: #d32f2f;
+}
