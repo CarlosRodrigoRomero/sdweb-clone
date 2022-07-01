@@ -406,8 +406,15 @@ export class ZonesControlService {
         if (feature.getProperties().properties.numElems > 0) {
           return new Style({
             stroke: new Stroke({
-              color: focused ? 'white' : 'black',
-              width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? focused
+                    ? 'white'
+                    : this.getColorMae(feature, 1)
+                  : focused
+                  ? 'white'
+                  : 'black',
+              width: 2,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
