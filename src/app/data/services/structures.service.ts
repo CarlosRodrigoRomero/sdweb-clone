@@ -8,7 +8,6 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import { Coordinate } from 'ol/coordinate';
-import Point from 'ol/geom/Point';
 import LineString from 'ol/geom/LineString';
 
 import { PlantaService } from '@data/services/planta.service';
@@ -110,14 +109,14 @@ export class StructuresService {
             this.thermalLayer = layers[0];
 
             // cargamos las agrupaciones
-            this.getModuleGroups()
-              .pipe(take(1))
-              .subscribe((modGroups) => (this.allModGroups = modGroups));
+            // this.getModuleGroups()
+            //   .pipe(take(1))
+            //   .subscribe((modGroups) => (this.allModGroups = modGroups));
 
             // cargamos los modulos normalizados
-            this.getNormModules()
-              .pipe(take(1))
-              .subscribe((normMods) => (this.allNormModules = normMods));
+            // this.getNormModules()
+            //   .pipe(take(1))
+            //   .subscribe((normMods) => (this.allNormModules = normMods));
 
             initService(true);
           })

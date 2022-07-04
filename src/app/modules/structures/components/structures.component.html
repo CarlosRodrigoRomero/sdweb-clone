@@ -3,11 +3,19 @@
     <div class="left-bar">
       <h4>{{ nombrePlanta }}</h4>
       <mat-vertical-stepper [linear]="true" #stepper>
+        <!-- FASE CARGAR -->
+        <mat-step>
+          <ng-template matStepLabel>Cargar módulos</ng-template>
+          <app-load-elems></app-load-elems>
+          <button mat-stroked-button matStepperNext>Siguiente</button>
+        </mat-step>
+
         <!-- FASE 1 -->
         <mat-step>
           <ng-template matStepLabel>Filtrar módulos</ng-template>
           <app-raw-modules-filters></app-raw-modules-filters>
-          <div class="next-button">
+          <div>
+            <button mat-stroked-button matStepperPrevious>Atrás</button>
             <button mat-stroked-button [disabled]="!modulesLoaded" matStepperNext (click)="endFilterSubscription()">
               Siguiente
             </button>
@@ -26,7 +34,7 @@
               [disabled]="deleteRawModMode || createRawModMode"
               mat-stroked-button
               matStepperNext
-              (click)="resetFase2(); setReportNumModules()"
+              (click)="resetAddDelRawModulesPhase()"
             >
               Siguiente
             </button>
@@ -50,11 +58,13 @@
             <app-module-groups></app-module-groups>
           </div>
           <div>
-            <button class="back-btn" mat-stroked-button matStepperPrevious (click)="resetFase4()">Atrás</button>
+            <button class="back-btn" mat-stroked-button matStepperPrevious (click)="resetEditGroupsPhase()">
+              Atrás
+            </button>
             <button
               mat-stroked-button
               matStepperNext
-              (click)="toggleLoadRawModules(false); toggleLoadNormModules(true); resetFase4()"
+              (click)="toggleLoadRawModules(false); toggleLoadNormModules(true); resetEditGroupsPhase()"
             >
               Siguiente
             </button>
@@ -91,7 +101,7 @@
               class="back-btn"
               mat-stroked-button
               matStepperPrevious
-              (click)="toggleEditNormModules(false); resetFase6()"
+              (click)="toggleEditNormModules(false); resetEditNormModulesPhase()"
             >
               Atrás
             </button>

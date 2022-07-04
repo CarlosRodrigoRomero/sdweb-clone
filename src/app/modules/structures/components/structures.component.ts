@@ -64,25 +64,25 @@ export class StructuresComponent implements OnInit, OnDestroy {
     this.structuresService.loadNormModules = load;
   }
 
-  toggleEditNormModules(edit: boolean) {
+  toggleEditNormModulesPhase(edit: boolean) {
     // habilitamos edicion de los módulos normalizados
     this.structuresService.editNormModules = edit;
   }
 
-  resetFase2() {
+  resetAddDelRawModulesPhase() {
     this.structuresService.deleteRawModMode = undefined;
     this.map.removeInteraction(this.olMapService.draw);
     this.olMapService.draw = undefined;
   }
 
-  resetFase4() {
+  resetEditGroupsPhase() {
     this.structuresService.drawModGroups = false;
     this.structuresService.modGroupSelectedId = undefined;
     this.map.removeInteraction(this.olMapService.draw);
     this.olMapService.draw = undefined;
   }
 
-  resetFase6() {
+  resetEditNormModules() {
     this.structuresService.normModSelected = undefined;
     this.map.removeInteraction(this.olMapService.draw);
     this.olMapService.draw = undefined;
