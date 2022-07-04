@@ -12,6 +12,8 @@ import { fromLonLat } from 'ol/proj';
 import { Coordinate } from 'ol/coordinate';
 import { RawModule } from '@core/models/moduloBruto';
 import { ModuleGroup } from '@core/models/moduleGroup';
+import { NormModulesComponent } from '../norm-modules/norm-modules.component';
+import { NormalizedModule } from '@core/models/normalizedModule';
 
 interface ZoneTask {
   id: string;
@@ -39,6 +41,8 @@ export class LoadElemsComponent implements OnInit {
     this.zonesService.initService(this.structuresService.planta).then((init) => {
       if (init) {
         this.largestZones = this.zonesService.zonesBySize[0];
+        // las ordenamos por su global mayor
+        this.largestZones = this.largestZones.sort((a, b) => a.globalCoords[0] - b.globalCoords[0]);
 
         this.largestZones.forEach((zone) => {
           this.zones.push({
@@ -57,6 +61,7 @@ export class LoadElemsComponent implements OnInit {
 
     this.loadRawModules(selectedZones);
     this.loadModuleGroups(selectedZones);
+    this.loadNormModules(selectedZones);
   }
 
   private loadRawModules(zones: LocationAreaInterface[]) {
@@ -71,8 +76,8 @@ export class LoadElemsComponent implements OnInit {
           const polygonZone = new Polygon([coordsZone]);
 
           const includedModules = modulos.filter((modulo) => {
-            const coordModulo = [modulo.centroid_gps_long, modulo.centroid_gps_lat] as Coordinate;
-            return polygonZone.intersectsCoordinate(coordModulo);
+            const centroid = [modulo.centroid_gps_long, modulo.centroid_gps_lat] as Coordinate;
+            return polygonZone.intersectsCoordinate(centroid);
           });
 
           selectedModules.push(...includedModules);
@@ -102,6 +107,29 @@ export class LoadElemsComponent implements OnInit {
         });
 
         this.structuresService.allModGroups = selectedModGroups;
+      });
+  }
+
+  private loadNormModules(zones: LocationAreaInterface[]) {
+    this.structuresService
+      .getNormModules()
+      .pipe(take(1))
+      .subscribe((normModules) => {
+        const selectedNormModules: NormalizedModule[] = [];
+
+        zones.forEach((zone) => {
+          const coordsZone = this.olMapService.pathToCoordinate(zone.path);
+          const polygonZone = new Polygon([coordsZone]);
+
+          const includedNormMods = normModules.filter((normMod) => {
+            const centroid = [normMod.centroid_gps.long, normMod.centroid_gps.lat] as Coordinate;
+            return polygonZone.intersectsCoordinate(centroid);
+          });
+
+          selectedNormModules.push(...includedNormMods);
+        });
+
+        this.structuresService.allNormModules = selectedNormModules;
       });
   }
 

@@ -131,12 +131,9 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
       maxZoom: this.planta.zoom + 8,
     });
 
-    this.olMapService
-      .createMap('map', layers, view, defaultControls({ attribution: false }))
-      // .pipe(take(1))
-      .subscribe((map) => {
-        this.map = map;
-      });
+    this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {
+      this.map = map;
+    });
   }
 
   private createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {
@@ -166,117 +163,6 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
     });
 
     return tl;
-  }
-
-  private addInitialRawModules() {
-    this.subscriptions.add(
-      this.structuresService
-        .getModulosBrutos()
-        .pipe(
-          take(1),
-          switchMap((modulos) => {
-            // asignamos todos los modulos
-            this.structuresService.allRawModules = modulos;
-
-            if (modulos.length > 0) {
-              // calculamos las medias y desviaciones
-              this.structuresService.setInitialAveragesAndStandardDeviations();
-            }
-
-            return this.filterService.initService(modulos);
-          })
-        )
-        .subscribe((init) => {
-          if (init) {
-            const mBSource = this.rawModLayer.getSource();
-
-            this.subscriptionFilters.add(
-              this.structuresService
-                .getFiltersParams()
-                .pipe(
-                  take(1),
-                  switchMap((filtParams) => {
-                    if (filtParams.length > 0) {
-                      this.structuresService.applyFilters(filtParams);
-
-                      this.structuresService.deletedRawModIds = filtParams[0].eliminados;
-                    }
-
-                    return this.filterService.filteredElements$;
-                  })
-                )
-                .subscribe((elems) => {
-                  mBSource.clear();
-
-                  if (this.rawModDeletedIds !== undefined && this.rawModDeletedIds.length > 0) {
-                    this.rawMods = (elems as RawModule[]).filter((mB) => !this.rawModDeletedIds.includes(mB.id));
-                  } else {
-                    this.rawMods = elems as RawModule[];
-                  }
-
-                  if (this.rawMods.length > 0) {
-                    // actualizamos las medias y desviaciones estandar con los modulos filtrados
-                    this.structuresService.updateAveragesAndStandardDeviations(this.rawMods);
-
-                    // asignamos el numero de modulos del informe
-                    this.structuresService.reportNumModules = this.rawMods.length;
-
-                    this.rawMods.forEach((rawMod, index) => {
-                      this.addRawModule(rawMod);
-
-                      if (index === this.rawMods.length - 1) {
-                        this.structuresService.modulesLoaded = true;
-                      }
-                    });
-                  } else {
-                    // si no hay modulos permitimos tambien avanzar a la siguiente fase
-                    this.structuresService.modulesLoaded = true;
-                  }
-                })
-            );
-          }
-        })
-    );
-  }
-
-  private addRawModule(rawMod: RawModule) {
-    const mBSource = this.rawModLayer.getSource();
-    const feature = new Feature({
-      geometry: new Polygon([rawMod.coords]),
-      properties: {
-        id: rawMod.id,
-        name: 'rawMod',
-        visible: true,
-      },
-    });
-
-    mBSource.addFeature(feature);
-  }
-
-  private setInvisible(invisible: boolean) {
-    if (invisible) {
-      return (feature: Feature) => {
-        if (feature !== undefined) {
-          return new Style({
-            stroke: new Stroke({
-              color: 'rgba(0,0,0,0)',
-              width: 1,
-            }),
-          });
-        }
-      };
-    } else {
-      return (feature: Feature) => {
-        if (feature !== undefined) {
-          return new Style({
-            stroke: new Stroke({
-              color: 'white',
-              width: 2,
-            }),
-          });
-        }
-      };
-    }
   }
 
   setLayerVisibility() {

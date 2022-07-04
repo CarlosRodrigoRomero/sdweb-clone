@@ -16,9 +16,7 @@
           <app-raw-modules-filters></app-raw-modules-filters>
           <div>
             <button mat-stroked-button matStepperPrevious>Atrás</button>
-            <button mat-stroked-button [disabled]="!modulesLoaded" matStepperNext (click)="endFilterSubscription()">
-              Siguiente
-            </button>
+            <button mat-stroked-button matStepperNext (click)="endFilterSubscription()">Siguiente</button>
           </div>
         </mat-step>
 

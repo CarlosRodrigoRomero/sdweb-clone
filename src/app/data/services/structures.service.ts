@@ -37,9 +37,6 @@ export class StructuresService {
   private _endFilterSubscription = false;
   endFilterSubscription$ = new BehaviorSubject<boolean>(this._endFilterSubscription);
 
-  private _modulesLoaded = false;
-  modulesLoaded$ = new BehaviorSubject<boolean>(this._modulesLoaded);
-
   private _loadRawModules = false;
   loadRawModules$ = new BehaviorSubject<boolean>(this._loadRawModules);
   private _allRawModules: RawModule[] = [];
@@ -517,7 +514,6 @@ export class StructuresService {
   resetService() {
     this.endFilterSubscription = false;
 
-    this.modulesLoaded = false;
     this.loadRawModules = false;
     this.allRawModules = [];
     this.createRawModMode = false;
@@ -549,15 +545,6 @@ export class StructuresService {
   }
 
   ////////////////////////////////////////////////
-
-  get modulesLoaded() {
-    return this._modulesLoaded;
-  }
-
-  set modulesLoaded(value: boolean) {
-    this._modulesLoaded = value;
-    this.modulesLoaded$.next(value);
-  }
 
   get planta() {
     return this._planta;
