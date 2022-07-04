@@ -393,8 +393,13 @@ export class ZonesControlService {
   private getNoAnomsStyle(feature: Feature, focused: boolean) {
     return new Style({
       stroke: new Stroke({
-        color: focused ? 'white' : 'black',
-        width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
+        color:
+          this.currentZoom >= this.zoomChangeView
+            ? Colors.hexToRgb(COLOR.color_no_anoms, 1)
+            : focused
+            ? 'white'
+            : 'black',
+        width: 2,
       }),
       fill:
         this.currentZoom >= this.zoomChangeView
@@ -414,13 +419,7 @@ export class ZonesControlService {
           return new Style({
             stroke: new Stroke({
               color:
-                this.currentZoom >= this.zoomChangeView
-                  ? focused
-                    ? 'white'
-                    : this.getColorMae(feature, 1)
-                  : focused
-                  ? 'white'
-                  : 'black',
+                this.currentZoom >= this.zoomChangeView ? this.getColorMae(feature, 1) : focused ? 'white' : 'black',
               width: 2,
             }),
             fill:
@@ -457,8 +456,13 @@ export class ZonesControlService {
         if (feature.getProperties().properties.numElems > 0) {
           return new Style({
             stroke: new Stroke({
-              color: focused ? 'white' : 'black',
-              width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? this.getColorCelsCalientes(feature, 1)
+                  : focused
+                  ? 'white'
+                  : 'black',
+              width: 2,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
@@ -494,8 +498,13 @@ export class ZonesControlService {
         if (feature.getProperties().properties.numElems > 0) {
           return new Style({
             stroke: new Stroke({
-              color: focused ? 'white' : 'black',
-              width: this.currentZoom >= this.zoomChangeView ? 1 : 2,
+              color:
+                this.currentZoom >= this.zoomChangeView
+                  ? this.getColorGradienteNormMax(feature, 1)
+                  : focused
+                  ? 'white'
+                  : 'black',
+              width: 2,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
