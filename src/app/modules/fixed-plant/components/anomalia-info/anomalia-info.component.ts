@@ -37,7 +37,6 @@ import { PcInterface } from '@core/models/pc';
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 
-import { COLOR } from '@data/constants/color';
 import { GLOBAL } from '@data/constants/global';
 
 interface InfoAdicional {
@@ -91,22 +90,17 @@ interface Zona {
   styleUrls: ['./anomalia-info.component.css'],
 })
 export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() anomaliaSelect: Anomalia;
-  @Input() anomaliaHover: Anomalia;
-  public displayedColumns: string[] = ['clase', 'tipo', 'tempMax', 'gradienteNormalizado', 'perdidas'];
-  public dataSource: Anomalia[];
-  public dataType: any;
-  public pcDescripcion: string[];
-  public criticidadLabels: string[];
-  public infoAdicional: InfoAdicional;
-  private plantaId: string;
-  private nombreGlobalCoords: string[];
-  public coloresClase: string[];
-  public tiposAnomalias: string[] = GLOBAL.labels_tipos;
-  public seccionModulo = false;
-  public seccionImagen = false;
-  public seccionLocalizacion = false;
-  public seccionVuelo = false;
+  displayedColumns: string[] = ['clase', 'tipo', 'tempMax', 'gradienteNormalizado', 'perdidas'];
+  dataSource: Anomalia[];
+  localizacion: string;
+  pcDescripcion: string[];
+  criticidadLabels: string[];
+  infoAdicional: InfoAdicional;
+  tiposAnomalias: string[] = GLOBAL.labels_tipos;
+  seccionModulo = false;
+  seccionImagen = false;
+  seccionLocalizacion = false;
+  seccionVuelo = false;
   private informeSelected: InformeInterface = undefined;
   private planta: PlantaInterface;
   isAdmin = false;
@@ -114,6 +108,8 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
   private subscriptions: Subscription = new Subscription();
 
   @ViewChild('swiperRef', { static: false }) swiperRef?: SwiperComponent;
+  @Input() anomaliaSelect: Anomalia;
+  @Input() anomaliaHover: Anomalia;
 
   constructor(
     private plantaService: PlantaService,
@@ -130,25 +126,8 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
     this.pcDescripcion = GLOBAL.pcDescripcion;
     this.criticidadLabels = this.anomaliaService.criterioCriticidad.labels;
     this.dataSource = [this.anomaliaHover];
-    this.dataType = {
-      clase: 'number',
-      tipo: 'number',
-      gradienteNormalizado: 'number',
-      perdidas: 'number',
-    };
-    this.coloresClase = COLOR.colores_clase;
-
-    if (this.router.url.includes('shared')) {
-      this.subscriptions.add(
-        this.shareReportService.getParams().subscribe((params) => (this.plantaId = params.plantaId))
-      );
-    } else {
-      this.plantaId = this.reportControlService.plantaId;
-    }
 
     this.planta = this.reportControlService.planta;
-
-    this.nombreGlobalCoords = this.planta.nombreGlobalCoords;
 
     this.subscriptions.add(
       this.authService.user$
@@ -171,16 +150,20 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
+    this.planta = this.reportControlService.planta;
+
     // si hay una anomalia seleccionada deja de aparecer el popup en el hover
     if (this.anomaliaSelect === undefined) {
       this.infoAdicional = undefined;
       if (this.anomaliaHover !== undefined) {
         this.dataSource = [this.anomaliaHover];
+        this.localizacion = this.anomaliaInfoService.getLocalizacionCompleteLabel(this.anomaliaHover, this.planta);
       } else {
         this.dataSource = null;
       }
     } else {
       this.dataSource = [this.anomaliaSelect];
+      this.localizacion = this.anomaliaInfoService.getLocalizacionCompleteLabel(this.anomaliaSelect, this.planta);
 
       setTimeout(() => {
         // obtenemos la info adicional

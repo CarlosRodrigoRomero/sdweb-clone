@@ -34,6 +34,10 @@
         <span class="titulo">Criticidad (Criterio {{ anomaliaService.criterioCriticidad.nombre }})</span>
         <span class="subtitulo">{{ criticidadLabels[anomaliaHover.criticidad] }}</span>
       </div>
+      <div class="elemento">
+        <span class="titulo">Localización</span>
+        <span class="subtitulo">{{ localizacion }}</span>
+      </div>
     </mat-card-content>
   </mat-card>
 
@@ -48,14 +52,6 @@
             <div class="elemento">
               <span class="titulo">Tipo</span>
               <span class="subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] }}</span>
-              <!-- <mat-form-field appearance="fill">
-                  <mat-label>{{ pcDescripcion[anomaliaSelect.tipo] }}</mat-label>
-                  <mat-select (selectionChange)="onEdit($event, 'tipo')">
-                    <mat-option *ngFor="let tipo of tiposAnomalias; index as i" [value]="i">
-                      {{ tipo }}
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field> -->
             </div>
             <div class="elemento">
               <span class="titulo">Temperatura Max</span>
@@ -63,12 +59,6 @@
                 >{{ anomaliaSelect.temperaturaMax | number: '1.0-1' }} ºC</span
               >
               <span *ngIf="anomaliaSelect.temperaturaMax === 0" class="subtitulo">Pronto disponible</span>
-              <!-- <input
-                  (change)="onEdit($event, 'temperaturaMax')"
-                  type="text"
-                  matImput
-                  [(ngModel)]="anomaliaSelect.temperaturaMax"
-                /> -->
             </div>
             <div class="elemento">
               <span class="titulo">Gradiente Temp. Normalizado</span>
@@ -76,12 +66,6 @@
                 >{{ anomaliaSelect.gradienteNormalizado | number: '1.0-1' }} ºC</span
               >
               <span *ngIf="anomaliaSelect.gradienteNormalizado === 0" class="subtitulo">Pronto disponible</span>
-              <!-- <input
-                  (change)="onEdit($event, 'gradienteNormalizado')"
-                  type="text"
-                  matImput
-                  [(ngModel)]="anomaliaSelect.gradienteNormalizado"
-                /> -->
             </div>
             <div class="elemento">
               <span class="titulo">Pérdidas (beta)</span>
@@ -95,6 +79,10 @@
             <div class="elemento" *ngIf="anomaliaSelect.criticidad !== undefined">
               <span class="titulo">Criticidad (Criterio {{ anomaliaService.criterioCriticidad.nombre }})</span>
               <span class="subtitulo">{{ criticidadLabels[anomaliaSelect.criticidad] }}</span>
+            </div>
+            <div class="elemento">
+              <span class="titulo">Localización</span>
+              <span class="subtitulo">{{ localizacion }}</span>
             </div>
           </div>
         </mat-tab>
@@ -131,48 +119,6 @@
             <div class="elemento" *ngIf="infoAdicional.vuelo.vientoDireccion !== undefined">
               <span class="titulo">Dirección viento</span>
               <span class="subtitulo">{{ infoAdicional.vuelo.vientoDireccion }}º</span>
-            </div>
-          </div>
-        </mat-tab>
-        <mat-tab label="Localización" *ngIf="seccionLocalizacion">
-          <div class="tab-content">
-            <div *ngIf="infoAdicional.localizacion.zonas">
-              <div class="elemento" *ngFor="let zona of infoAdicional.localizacion.zonas">
-                <span class="titulo">{{ zona.tipo }}</span>
-                <span class="subtitulo">{{ zona.nombre }}</span>
-              </div>
-            </div>
-            <div class="elemento" *ngIf="infoAdicional.localizacion.numeroModulo === undefined && !isAdmin">
-              <span class="titulo">Fila</span>
-              <span class="subtitulo">{{ infoAdicional.localizacion.fila }}</span>
-            </div>
-            <div class="elemento" *ngIf="isAdmin">
-              <span class="titulo">Fila</span>
-              <input
-                class="imput"
-                matInput
-                type="number"
-                [value]="infoAdicional.localizacion.fila"
-                (change)="updateAnomalia($event.target.value, 'localY')"
-              />
-            </div>
-            <div class="elemento" *ngIf="infoAdicional.localizacion.numeroModulo === undefined && !isAdmin">
-              <span class="titulo">Columna</span>
-              <span class="subtitulo">{{ infoAdicional.localizacion.columna }}</span>
-            </div>
-            <div class="elemento" *ngIf="isAdmin">
-              <span class="titulo">Columna</span>
-              <input
-                class="imput"
-                matInput
-                type="number"
-                [value]="infoAdicional.localizacion.columna"
-                (change)="updateAnomalia($event.target.value, 'localX')"
-              />
-            </div>
-            <div class="elemento" *ngIf="infoAdicional.localizacion.numeroModulo">
-              <span class="titulo">Nº módulo</span>
-              <span class="subtitulo">{{ infoAdicional.localizacion.numeroModulo }}</span>
             </div>
           </div>
         </mat-tab>

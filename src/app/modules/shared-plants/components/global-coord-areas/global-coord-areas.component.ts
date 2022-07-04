@@ -62,9 +62,10 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
 
     this.planta = this.reportControlService.planta;
 
-    this.nombreGlobalCoords = this.planta.nombreGlobalCoords;
     // quitamos las más pequeñas porque ya se muestran por defecto
-    this.nombreGlobalCoords.pop();
+    this.nombreGlobalCoords = this.planta.nombreGlobalCoords.filter(
+      (nombre, index, nombres) => index < nombres.length - 1
+    );
 
     this.nombreGlobalCoords.forEach((nombre) => {
       this.task.subtasks.push({ name: nombre, completed: false });
