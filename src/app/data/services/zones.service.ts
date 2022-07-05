@@ -213,6 +213,7 @@ export class ZonesService {
     this.zones = [];
     this.zonesBySize = [];
     this.thereAreZones = false;
+    this.thereAreLargestZones = false;
   }
 
   get thereAreZones(): boolean {
