@@ -97,6 +97,10 @@ export class ReportControlService {
               switchMap((planta) => {
                 this.planta = planta;
 
+                if (this.planta.hasOwnProperty('nombreGlobalCoords')) {
+                  this.nombreGlobalCoords = this.planta.nombreGlobalCoords;
+                }
+
                 // iniciamos el servicio de zonas
                 return from(this.zonesService.initService(this.planta));
               }),
