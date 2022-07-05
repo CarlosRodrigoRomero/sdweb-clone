@@ -1,6 +1,4 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { FormControl, FormGroup } from '@angular/forms';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
@@ -25,8 +23,6 @@ import SwiperCore, {
 // install Swiper components
 SwiperCore.use([Navigation, Pagination, Scrollbar, A11y, Virtual, Zoom, Autoplay, Thumbs, Controller]);
 
-import { PlantaService } from '@data/services/planta.service';
-import { ShareReportService } from '@data/services/share-report.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AuthService } from '@data/services/auth.service';
@@ -58,12 +54,6 @@ interface InfoAdicional {
     modeloModulo?: string;
     tipoPanelModulo?: string;
     potencia?: number;
-  };
-  localizacion?: {
-    zonas?: Zona[];
-    fila?: number;
-    columna?: number;
-    numeroModulo?: string;
   };
   termico?: {
     gradiente?: number;
@@ -99,7 +89,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
   tiposAnomalias: string[] = GLOBAL.labels_tipos;
   seccionModulo = false;
   seccionImagen = false;
-  seccionLocalizacion = false;
   seccionVuelo = false;
   private informeSelected: InformeInterface = undefined;
   private planta: PlantaInterface;
@@ -112,9 +101,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
   @Input() anomaliaHover: Anomalia;
 
   constructor(
-    private plantaService: PlantaService,
-    private router: Router,
-    private shareReportService: ShareReportService,
     public anomaliaService: AnomaliaService,
     private storage: AngularFireStorage,
     private reportControlService: ReportControlService,
@@ -184,48 +170,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
       marcaModulo = this.anomaliaSelect.modulo.marca;
       modeloModulo = this.anomaliaSelect.modulo.modelo;
       potencia = this.anomaliaSelect.modulo.potencia;
-    }
-
-    /* LOCALIZACION */
-
-    const zonas: Zona[] = [];
-    let fila: number;
-    let columna: number;
-    let numeroModulo: string;
-
-    const coords = this.anomaliaSelect.globalCoords;
-
-    if (this.reportControlService.nombreGlobalCoords !== undefined) {
-      this.reportControlService.nombreGlobalCoords.forEach((nombre, index) => {
-        const zona: Zona = { tipo: nombre, nombre: coords[index] };
-        zonas.push(zona);
-      });
-    }
-
-    let localY = this.anomaliaInfoService.getAltura(this.anomaliaSelect.localY, this.planta);
-    if (this.isAdmin) {
-      localY = this.anomaliaSelect.localY;
-    }
-    if (localY !== undefined && localY !== null) {
-      fila = localY;
-    }
-
-    const localX = this.anomaliaSelect.localX;
-    if (localX !== undefined && localX !== null) {
-      columna = localX;
-    }
-
-    const numModulo = this.plantaService.getNumeroModulo(this.anomaliaSelect, 'anomalia', this.planta);
-    if (numModulo !== undefined) {
-      if (!isNaN(Number(numModulo))) {
-        numeroModulo = numModulo;
-      } else {
-        numeroModulo = undefined;
-      }
-    }
-
-    if (zonas !== undefined || fila !== undefined || columna !== undefined || numeroModulo !== undefined) {
-      this.seccionLocalizacion = true;
     }
 
     /* VUELO */
@@ -354,12 +298,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
         modeloModulo,
         // tipoPanelModulo: 'tipo panel',
         potencia,
-      },
-      localizacion: {
-        zonas,
-        fila,
-        columna,
-        numeroModulo,
       },
 
       // TERMICO
