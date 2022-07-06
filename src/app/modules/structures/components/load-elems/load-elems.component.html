@@ -1,4 +1,4 @@
-<div class="content-load">
+<div *ngIf="thereAreZones" class="content-load">
   <section class="example-section">
     <span class="example-list-section">
       <mat-checkbox
@@ -22,4 +22,7 @@
   </section>
 
   <button mat-raised-button (click)="loadElems()">Cargar</button>
+</div>
+<div *ngIf="!thereAreZones && !modulesLoaded" class="loading">
+  <span>Cargando modulos...</span>
 </div>

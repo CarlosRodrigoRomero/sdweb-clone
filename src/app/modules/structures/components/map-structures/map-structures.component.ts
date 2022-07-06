@@ -1,32 +1,23 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { switchMap, take } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
 import View from 'ol/View';
-import { Feature, Map } from 'ol';
+import { Map } from 'ol';
 import { fromLonLat } from 'ol/proj';
 import { defaults as defaultControls } from 'ol/control.js';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import { Fill, Stroke, Style } from 'ol/style';
-import Polygon from 'ol/geom/Polygon';
-import { Select } from 'ol/interaction';
-import { click } from 'ol/events/condition';
-import { OSM, Source } from 'ol/source';
-import { FeatureLike } from 'ol/Feature';
+import { OSM } from 'ol/source';
 
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 
 import { OlMapService } from '@data/services/ol-map.service';
 import { StructuresService } from '@data/services/structures.service';
-import { InformeService } from '@data/services/informe.service';
 import { GLOBAL } from '@data/constants/global';
 import { ThermalService } from '@data/services/thermal.service';
-import { FilterService } from '@data/services/filter.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
@@ -41,17 +32,11 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
   private planta: PlantaInterface;
   private informeId: string = undefined;
   private map: Map;
-  private satelliteLayer: TileLayer;
   public thermalSource;
   private thermalLayer: TileLayer = undefined;
   private thermalLayerDB: ThermalLayerInterface;
   private thermalLayers: TileLayer[];
-  private rawMods: RawModule[];
-  private deleteMode = false;
-  private rawModDeletedIds: string[] = [];
   public layerVisibility = true;
-  private prevFeatureHover: Feature;
-  private rawModLayer: VectorLayer;
   endFilterSubscription = false;
   public rawModHovered: RawModule;
 
@@ -61,9 +46,7 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
   constructor(
     private olMapService: OlMapService,
     private structuresService: StructuresService,
-    private informeService: InformeService,
-    private thermalService: ThermalService,
-    private filterService: FilterService
+    private thermalService: ThermalService
   ) {}
 
   ngOnInit(): void {
@@ -76,10 +59,6 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
         }
       })
     );
-
-    this.subscriptions.add(this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteMode = mode)));
-
-    this.subscriptions.add(this.structuresService.deletedRawModIds$.subscribe((ids) => (this.rawModDeletedIds = ids)));
 
     this.informeId = this.structuresService.informeId;
 

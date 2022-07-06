@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { switchMap, take } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import Polygon from 'ol/geom/Polygon';
 import { Coordinate } from 'ol/coordinate';
@@ -26,10 +27,14 @@ interface ZoneTask {
   templateUrl: './load-elems.component.html',
   styleUrls: ['./load-elems.component.css'],
 })
-export class LoadElemsComponent implements OnInit {
+export class LoadElemsComponent implements OnInit, OnDestroy {
   zones: ZoneTask[] = [];
   private largestZones: LocationAreaInterface[] = [];
   allComplete = false;
+  thereAreZones = false;
+  modulesLoaded = false;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private structuresService: StructuresService,
@@ -41,48 +46,67 @@ export class LoadElemsComponent implements OnInit {
   ngOnInit(): void {
     this.zonesService.initService(this.structuresService.planta).then((init) => {
       if (init) {
-        this.largestZones = this.zonesService.zonesBySize[0];
-        // las ordenamos por su global mayor
-        this.largestZones = this.largestZones.sort((a, b) => a.globalCoords[0] - b.globalCoords[0]);
+        if (this.zonesService.zonesBySize.length > 0) {
+          this.thereAreZones = true;
 
-        this.largestZones.forEach((zone) => {
-          this.zones.push({
-            id: zone.id,
-            completed: false,
-            name: this.zoneTaskName(zone),
+          this.largestZones = this.zonesService.zonesBySize[0];
+
+          // las ordenamos por su global mayor
+          this.largestZones = this.largestZones.sort((a, b) => a.globalCoords[0] - b.globalCoords[0]);
+
+          this.largestZones.forEach((zone) => {
+            this.zones.push({
+              id: zone.id,
+              completed: false,
+              name: this.zoneTaskName(zone),
+            });
           });
-        });
+        } else {
+          this.loadElems();
+        }
       }
     });
+
+    this.subscriptions.add(this.structuresService.modulesLoaded$.subscribe((load) => (this.modulesLoaded = load)));
   }
 
   loadElems() {
-    const selectedTaskZones = this.zones.filter((zone) => zone.completed);
-    const selectedZones = this.largestZones.filter((zone) => selectedTaskZones.find((t) => t.id === zone.id));
+    if (this.thereAreZones) {
+      const selectedTaskZones = this.zones.filter((zone) => zone.completed);
+      const selectedZones = this.largestZones.filter((zone) => selectedTaskZones.find((t) => t.id === zone.id));
 
-    this.loadRawModules(selectedZones);
-    this.loadModuleGroups(selectedZones);
-    this.loadNormModules(selectedZones);
+      this.loadRawModules(selectedZones);
+      this.loadModuleGroups(selectedZones);
+      this.loadNormModules(selectedZones);
+    } else {
+      this.loadRawModules();
+      this.loadModuleGroups();
+      this.loadNormModules();
+    }
   }
 
-  private loadRawModules(zones: LocationAreaInterface[]) {
+  private loadRawModules(zones?: LocationAreaInterface[]) {
     this.structuresService
       .getModulosBrutos()
       .pipe(take(1))
       .subscribe((modulos) => {
-        const selectedModules: RawModule[] = [];
+        let selectedModules: RawModule[] = [];
 
-        zones.forEach((zone) => {
-          const coordsZone = this.olMapService.pathToCoordinate(zone.path);
-          const polygonZone = new Polygon([coordsZone]);
+        if (zones) {
+          zones.forEach((zone) => {
+            const coordsZone = this.olMapService.pathToCoordinate(zone.path);
+            const polygonZone = new Polygon([coordsZone]);
 
-          const includedModules = modulos.filter((modulo) => {
-            const centroid = [modulo.centroid_gps_long, modulo.centroid_gps_lat] as Coordinate;
-            return polygonZone.intersectsCoordinate(centroid);
+            const includedModules = modulos.filter((modulo) => {
+              const centroid = [modulo.centroid_gps_long, modulo.centroid_gps_lat] as Coordinate;
+              return polygonZone.intersectsCoordinate(centroid);
+            });
+
+            selectedModules.push(...includedModules);
           });
-
-          selectedModules.push(...includedModules);
-        });
+        } else {
+          selectedModules = modulos;
+        }
 
         this.structuresService.allRawModules = selectedModules;
 
@@ -95,47 +119,55 @@ export class LoadElemsComponent implements OnInit {
       });
   }
 
-  private loadModuleGroups(zones: LocationAreaInterface[]) {
+  private loadModuleGroups(zones?: LocationAreaInterface[]) {
     this.structuresService
       .getModuleGroups()
       .pipe(take(1))
       .subscribe((modGroups) => {
-        const selectedModGroups: ModuleGroup[] = [];
+        let selectedModGroups: ModuleGroup[] = [];
 
-        zones.forEach((zone) => {
-          const coordsZone = this.olMapService.pathToCoordinate(zone.path);
-          const polygonZone = new Polygon([coordsZone]);
+        if (zones) {
+          zones.forEach((zone) => {
+            const coordsZone = this.olMapService.pathToCoordinate(zone.path);
+            const polygonZone = new Polygon([coordsZone]);
 
-          const includedModGroups = modGroups.filter((modGroup) => {
-            const centroid = this.olMapService.getCentroid(modGroup.coords);
-            return polygonZone.intersectsCoordinate(centroid);
+            const includedModGroups = modGroups.filter((modGroup) => {
+              const centroid = this.olMapService.getCentroid(modGroup.coords);
+              return polygonZone.intersectsCoordinate(centroid);
+            });
+
+            selectedModGroups.push(...includedModGroups);
           });
-
-          selectedModGroups.push(...includedModGroups);
-        });
+        } else {
+          selectedModGroups = modGroups;
+        }
 
         this.structuresService.allModGroups = selectedModGroups;
       });
   }
 
-  private loadNormModules(zones: LocationAreaInterface[]) {
+  private loadNormModules(zones?: LocationAreaInterface[]) {
     this.structuresService
       .getNormModules()
       .pipe(take(1))
       .subscribe((normModules) => {
-        const selectedNormModules: NormalizedModule[] = [];
+        let selectedNormModules: NormalizedModule[] = [];
 
-        zones.forEach((zone) => {
-          const coordsZone = this.olMapService.pathToCoordinate(zone.path);
-          const polygonZone = new Polygon([coordsZone]);
+        if (zones) {
+          zones.forEach((zone) => {
+            const coordsZone = this.olMapService.pathToCoordinate(zone.path);
+            const polygonZone = new Polygon([coordsZone]);
 
-          const includedNormMods = normModules.filter((normMod) => {
-            const centroid = [normMod.centroid_gps.long, normMod.centroid_gps.lat] as Coordinate;
-            return polygonZone.intersectsCoordinate(centroid);
+            const includedNormMods = normModules.filter((normMod) => {
+              const centroid = [normMod.centroid_gps.long, normMod.centroid_gps.lat] as Coordinate;
+              return polygonZone.intersectsCoordinate(centroid);
+            });
+
+            selectedNormModules.push(...includedNormMods);
           });
-
-          selectedNormModules.push(...includedNormMods);
-        });
+        } else {
+          selectedNormModules = normModules;
+        }
 
         this.structuresService.allNormModules = selectedNormModules;
       });
@@ -165,5 +197,9 @@ export class LoadElemsComponent implements OnInit {
       return;
     }
     this.zones.forEach((t) => (t.completed = completed));
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

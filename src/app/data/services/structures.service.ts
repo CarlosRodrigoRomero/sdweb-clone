@@ -37,6 +37,9 @@ export class StructuresService {
   private _endFilterSubscription = false;
   endFilterSubscription$ = new BehaviorSubject<boolean>(this._endFilterSubscription);
 
+  private _modulesLoaded = false;
+  modulesLoaded$ = new BehaviorSubject<boolean>(this._modulesLoaded);
+
   private _loadRawModules = false;
   loadRawModules$ = new BehaviorSubject<boolean>(this._loadRawModules);
   private _allRawModules: RawModule[] = [];
@@ -569,6 +572,15 @@ export class StructuresService {
 
   set thermalLayer(value: ThermalLayerInterface) {
     this._thermalLayer = value;
+  }
+
+  get modulesLoaded() {
+    return this._modulesLoaded;
+  }
+
+  set modulesLoaded(value: boolean) {
+    this._modulesLoaded = value;
+    this.modulesLoaded$.next(value);
   }
 
   /* RAW MODULES */

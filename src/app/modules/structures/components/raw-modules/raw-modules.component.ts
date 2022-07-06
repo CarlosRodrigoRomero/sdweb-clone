@@ -142,6 +142,10 @@ export class RawModulesComponent implements OnInit, OnDestroy {
 
             this.rawMods.forEach((rawMod, index) => {
               this.addRawModule(rawMod);
+
+              if (index === this.rawMods.length - 1) {
+                this.structuresService.modulesLoaded = true;
+              }
             });
           }
         })
