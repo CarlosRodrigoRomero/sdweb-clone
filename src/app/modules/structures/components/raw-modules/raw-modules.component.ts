@@ -138,7 +138,7 @@ export class RawModulesComponent implements OnInit, OnDestroy {
             this.structuresService.updateAveragesAndStandardDeviations(this.rawMods);
 
             // asignamos el numero de modulos del informe
-            this.structuresService.reportNumModules = this.rawMods.length;
+            this.setReportNumModules();
 
             this.rawMods.forEach((rawMod, index) => {
               this.addRawModule(rawMod);
@@ -146,6 +146,17 @@ export class RawModulesComponent implements OnInit, OnDestroy {
           }
         })
     );
+  }
+
+  private setReportNumModules() {
+    const allRawModules = this.structuresService.allRawModules;
+    if (this.rawModDeletedIds !== undefined && this.rawModDeletedIds.length > 0) {
+      this.structuresService.reportNumModules = allRawModules.filter(
+        (mod) => !this.rawModDeletedIds.includes(mod.id)
+      ).length;
+    } else {
+      this.structuresService.reportNumModules = allRawModules.length;
+    }
   }
 
   private addRawModule(rawMod: RawModule) {
