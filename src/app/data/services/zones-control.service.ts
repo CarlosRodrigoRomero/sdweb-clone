@@ -201,26 +201,14 @@ export class ZonesControlService {
     }
   }
 
-  // getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]): FilterableElement[] {
-  //   let elemsFiltered: FilterableElement[];
-  //   zona.globalCoords.forEach((coord, index) => {
-  //     if (coord !== null) {
-  //       if (elemsFiltered === undefined) {
-  //         elemsFiltered = elems.filter((elem) => elem.globalCoords[index] === coord);
-  //       } else {
-  //         elemsFiltered = elemsFiltered.filter((elem) => elem.globalCoords[index] === coord);
-  //       }
-  //     }
-  //   });
-  //   return elemsFiltered;
-  // }
-
   getElemsZona(zona: LocationAreaInterface, elems: FilterableElement[]) {
-    const labelZona = this.getGlobalsLabel(zona.globalCoords);
+    const zonaPolygon = new Polygon([this.olMapService.pathToCoordinate(zona.path)]);
 
-    return elems.filter(
-      (elem) => this.getGlobalsLabel(elem.globalCoords, this.reportControlService.plantaFija) === labelZona
-    );
+    return elems.filter((elem) => {
+      const elemCentroid = this.olMapService.getCentroid(elem.featureCoords);
+
+      return zonaPolygon.intersectsCoordinate(elemCentroid);
+    });
   }
 
   private getMaeZona(
@@ -535,7 +523,7 @@ export class ZonesControlService {
 
   getLabelStyle(feature: Feature) {
     return new Text({
-      text: feature.getProperties().properties.id,
+      text: feature.getProperties().properties.name,
       font: 'bold 14px Roboto',
       fill: new Fill({
         color: 'black',

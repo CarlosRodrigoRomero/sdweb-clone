@@ -1,3 +1,5 @@
+import { Coordinate } from 'ol/coordinate';
+
 import { ModuloInterface } from './modulo';
 
 export interface FilterableElement {
@@ -25,4 +27,5 @@ export interface FilterableElement {
   localX?: number;
   localY?: number;
   numAnom?: number;
+  featureCoords?: Coordinate[];
 }
