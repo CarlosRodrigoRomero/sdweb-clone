@@ -1,19 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
+
+import Polygon from 'ol/geom/Polygon';
+import { Coordinate } from 'ol/coordinate';
 
 import { StructuresService } from '@data/services/structures.service';
 import { ZonesService } from '@data/services/zones.service';
 import { OlMapService } from '@data/services/ol-map.service';
+import { FilterService } from '@data/services/filter.service';
 
-import { LocationAreaInterface } from '@core/models/location';
-import Polygon from 'ol/geom/Polygon';
-import { fromLonLat } from 'ol/proj';
-import { Coordinate } from 'ol/coordinate';
 import { RawModule } from '@core/models/moduloBruto';
 import { ModuleGroup } from '@core/models/moduleGroup';
-import { NormModulesComponent } from '../norm-modules/norm-modules.component';
 import { NormalizedModule } from '@core/models/normalizedModule';
+import { LocationAreaInterface } from '@core/models/location';
 
 interface ZoneTask {
   id: string;
@@ -34,7 +34,8 @@ export class LoadElemsComponent implements OnInit {
   constructor(
     private structuresService: StructuresService,
     private zonesService: ZonesService,
-    private olMapService: OlMapService
+    private olMapService: OlMapService,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
@@ -84,6 +85,13 @@ export class LoadElemsComponent implements OnInit {
         });
 
         this.structuresService.allRawModules = selectedModules;
+
+        if (selectedModules.length > 0) {
+          // calculamos las medias y desviaciones
+          this.structuresService.setInitialAveragesAndStandardDeviations();
+        }
+
+        this.filterService.initService(selectedModules);
       });
   }
 

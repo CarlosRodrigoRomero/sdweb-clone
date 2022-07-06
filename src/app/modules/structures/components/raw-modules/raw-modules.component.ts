@@ -121,7 +121,7 @@ export class RawModulesComponent implements OnInit, OnDestroy {
               this.structuresService.deletedRawModIds = filtParams[0].eliminados;
             }
 
-            return this.filterService.allFiltrableElements$;
+            return this.filterService.filteredElements$;
           })
         )
         .subscribe((elems) => {
