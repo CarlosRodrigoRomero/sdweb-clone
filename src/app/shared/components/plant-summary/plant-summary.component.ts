@@ -7,10 +7,12 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import { InformeService } from '@data/services/informe.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { PlantaService } from '@data/services/planta.service';
+import { FilterService } from '@data/services/filter.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 import { MathOperations } from '@core/classes/math-operations';
+import { Seguidor } from '@core/models/seguidor';
 
 @Component({
   selector: 'app-plant-summary',
@@ -28,16 +30,26 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
   public _informe: InformeInterface = undefined;
   public informe$ = new BehaviorSubject<InformeInterface>(this._informe);
   private selectedInformeId: string;
+  numAnoms = 0;
+  numAnomsFiltered = 0;
+
   private subscription: Subscription = new Subscription();
 
   constructor(
     private router: Router,
     private informeService: InformeService,
     private reportControlService: ReportControlService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
+    this.planta = this.reportControlService.planta;
+
+    this.nombrePlanta = this.planta.nombre;
+    this.potenciaPlanta = this.planta.potencia;
+    this.tipoPlanta = this.planta.tipo;
+
     // si cargamos vista informe directamente, nos subscribimos al informe seleccionado
     if (this.router.url.includes('fixed') || this.router.url.includes('tracker')) {
       this.subscription.add(
@@ -46,10 +58,9 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
             switchMap((informeId) => {
               this.selectedInformeId = informeId;
 
-              return this.reportControlService.informes$;
-            }),
-            switchMap((informes) => {
-              this.informe = informes.find((informe) => informe.id === this.selectedInformeId);
+              this.informe = this.reportControlService.informes.find(
+                (informe) => informe.id === this.selectedInformeId
+              );
 
               this.fechaSelectedInforme = this.informeService.getDateLabelInforme(this.informe);
 
@@ -57,15 +68,24 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
                 this.vientoVelocidad = MathOperations.kmhToBeaufort(this.informe.vientoVelocidad);
               }
 
-              return this.plantaService.getPlanta(this.informe.plantaId);
+              this.numAnoms = this.reportControlService.allAnomalias.filter(
+                (anom) => anom.informeId === this.selectedInformeId
+              ).length;
+
+              return this.filterService.filteredElements$;
             })
           )
-          .subscribe((planta) => {
-            this.planta = planta;
+          .subscribe((elems) => {
+            const elemsInforme = elems.filter((elem) => elem.informeId === this.selectedInformeId);
 
-            this.nombrePlanta = this.planta.nombre;
-            this.potenciaPlanta = this.planta.potencia;
-            this.tipoPlanta = this.planta.tipo;
+            if (this.reportControlService.plantaFija) {
+              this.numAnomsFiltered = elemsInforme.length;
+            } else {
+              this.numAnomsFiltered = elemsInforme.reduce(
+                (acc, elem) => acc + (elem as Seguidor).anomaliasCliente.length,
+                0
+              );
+            }
           })
       );
     }
@@ -75,22 +95,19 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
         if (event.url.includes('fixed') || event.url.includes('tracker')) {
           // si navegamos a vista informe nos suscribimos al informe seleccionado
           this.subscription.add(
-            this.reportControlService.selectedInformeId$
-              .pipe(
-                switchMap((informeId) => this.informeService.getInforme(informeId)),
-                switchMap((informe) => {
-                  this.informe = informe;
+            this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+              this.selectedInformeId = informeId;
 
-                  return this.plantaService.getPlanta(this.informe.plantaId);
-                })
-              )
-              .subscribe((planta) => {
-                this.planta = planta;
+              this.informe = this.reportControlService.informes.find(
+                (informe) => informe.id === this.selectedInformeId
+              );
 
-                this.nombrePlanta = this.planta.nombre;
-                this.potenciaPlanta = this.planta.potencia;
-                this.tipoPlanta = this.planta.tipo;
-              })
+              this.planta = this.reportControlService.planta;
+
+              this.nombrePlanta = this.planta.nombre;
+              this.potenciaPlanta = this.planta.potencia;
+              this.tipoPlanta = this.planta.tipo;
+            })
           );
         } else {
           // sino cancelamos la suscripcion
