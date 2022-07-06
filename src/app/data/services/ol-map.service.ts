@@ -235,6 +235,15 @@ export class OlMapService {
     return [sumLong / coords.length, sumLat / coords.length];
   }
 
+  pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {
+    const coordenadas: Coordinate[] = [];
+    path.forEach((coord) => {
+      const coordenada: Coordinate = fromLonLat([coord.lng, coord.lat]);
+      coordenadas.push(coordenada);
+    });
+    return coordenadas;
+  }
+
   setViewCenter(center: Coordinate) {
     this.map.getView().setCenter(center);
   }

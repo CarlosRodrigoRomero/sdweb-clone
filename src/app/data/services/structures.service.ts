@@ -8,7 +8,6 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
 import { Coordinate } from 'ol/coordinate';
-import Point from 'ol/geom/Point';
 import LineString from 'ol/geom/LineString';
 
 import { PlantaService } from '@data/services/planta.service';
@@ -37,9 +36,6 @@ export class StructuresService {
 
   private _endFilterSubscription = false;
   endFilterSubscription$ = new BehaviorSubject<boolean>(this._endFilterSubscription);
-
-  private _modulesLoaded = false;
-  modulesLoaded$ = new BehaviorSubject<boolean>(this._modulesLoaded);
 
   private _loadRawModules = false;
   loadRawModules$ = new BehaviorSubject<boolean>(this._loadRawModules);
@@ -110,14 +106,14 @@ export class StructuresService {
             this.thermalLayer = layers[0];
 
             // cargamos las agrupaciones
-            this.getModuleGroups()
-              .pipe(take(1))
-              .subscribe((modGroups) => (this.allModGroups = modGroups));
+            // this.getModuleGroups()
+            //   .pipe(take(1))
+            //   .subscribe((modGroups) => (this.allModGroups = modGroups));
 
             // cargamos los modulos normalizados
-            this.getNormModules()
-              .pipe(take(1))
-              .subscribe((normMods) => (this.allNormModules = normMods));
+            // this.getNormModules()
+            //   .pipe(take(1))
+            //   .subscribe((normMods) => (this.allNormModules = normMods));
 
             initService(true);
           })
@@ -518,7 +514,6 @@ export class StructuresService {
   resetService() {
     this.endFilterSubscription = false;
 
-    this.modulesLoaded = false;
     this.loadRawModules = false;
     this.allRawModules = [];
     this.createRawModMode = false;
@@ -550,15 +545,6 @@ export class StructuresService {
   }
 
   ////////////////////////////////////////////////
-
-  get modulesLoaded() {
-    return this._modulesLoaded;
-  }
-
-  set modulesLoaded(value: boolean) {
-    this._modulesLoaded = value;
-    this.modulesLoaded$.next(value);
-  }
 
   get planta() {
     return this._planta;

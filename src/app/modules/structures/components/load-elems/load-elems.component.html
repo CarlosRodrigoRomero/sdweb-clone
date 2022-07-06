@@ -1,0 +1,25 @@
+<div class="content-load">
+  <section class="example-section">
+    <span class="example-list-section">
+      <mat-checkbox
+        class="example-margin"
+        [checked]="allComplete"
+        [indeterminate]="someComplete()"
+        (change)="setAll($event.checked)"
+      >
+        Seleccionar todas
+      </mat-checkbox>
+    </span>
+    <span class="example-list-section">
+      <ul>
+        <li *ngFor="let zone of zones">
+          <mat-checkbox [(ngModel)]="zone.completed">
+            {{ zone.name }}
+          </mat-checkbox>
+        </li>
+      </ul>
+    </span>
+  </section>
+
+  <button mat-raised-button (click)="loadElems()">Cargar</button>
+</div>

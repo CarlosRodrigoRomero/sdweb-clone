@@ -23,7 +23,6 @@ export class StructuresComponent implements OnInit, OnDestroy {
   nombrePlanta: string;
   private map: Map;
   informe: InformeInterface;
-  modulesLoaded = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -36,7 +35,6 @@ export class StructuresComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.structuresService.initService().then((init) => (this.serviceInit = init));
-    this.subscriptions.add(this.structuresService.modulesLoaded$.subscribe((load) => (this.modulesLoaded = load)));
     this.subscriptions.add(
       this.structuresService.deleteRawModMode$.subscribe((mode) => (this.deleteRawModMode = mode))
     );
@@ -64,25 +62,25 @@ export class StructuresComponent implements OnInit, OnDestroy {
     this.structuresService.loadNormModules = load;
   }
 
-  toggleEditNormModules(edit: boolean) {
+  toggleEditNormModulesPhase(edit: boolean) {
     // habilitamos edicion de los módulos normalizados
     this.structuresService.editNormModules = edit;
   }
 
-  resetFase2() {
+  resetAddDelRawModulesPhase() {
     this.structuresService.deleteRawModMode = undefined;
     this.map.removeInteraction(this.olMapService.draw);
     this.olMapService.draw = undefined;
   }
 
-  resetFase4() {
+  resetEditGroupsPhase() {
     this.structuresService.drawModGroups = false;
     this.structuresService.modGroupSelectedId = undefined;
     this.map.removeInteraction(this.olMapService.draw);
     this.olMapService.draw = undefined;
   }
 
-  resetFase6() {
+  resetEditNormModules() {
     this.structuresService.normModSelected = undefined;
     this.map.removeInteraction(this.olMapService.draw);
     this.olMapService.draw = undefined;

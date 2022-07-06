@@ -3,18 +3,24 @@
     <div class="left-bar">
       <h4>{{ nombrePlanta }}</h4>
       <mat-vertical-stepper [linear]="true" #stepper>
-        <!-- FASE 1 -->
+        <!-- FASE CARGAR -->
+        <mat-step>
+          <ng-template matStepLabel>Cargar módulos</ng-template>
+          <app-load-elems></app-load-elems>
+          <button mat-stroked-button matStepperNext>Siguiente</button>
+        </mat-step>
+
+        <!-- FASE FILTRAR MODULOS EN BRUTO -->
         <mat-step>
           <ng-template matStepLabel>Filtrar módulos</ng-template>
           <app-raw-modules-filters></app-raw-modules-filters>
-          <div class="next-button">
-            <button mat-stroked-button [disabled]="!modulesLoaded" matStepperNext (click)="endFilterSubscription()">
-              Siguiente
-            </button>
+          <div>
+            <button mat-stroked-button matStepperPrevious>Atrás</button>
+            <button mat-stroked-button matStepperNext (click)="endFilterSubscription()">Siguiente</button>
           </div>
         </mat-step>
 
-        <!-- FASE 2 -->
+        <!-- FASE MODIFICAR MODULOS EN BRUTO -->
         <mat-step>
           <ng-template matStepLabel>Crear y eliminar módulos</ng-template>
           <div class="filter-warning">
@@ -26,14 +32,14 @@
               [disabled]="deleteRawModMode || createRawModMode"
               mat-stroked-button
               matStepperNext
-              (click)="resetFase2(); setReportNumModules()"
+              (click)="resetAddDelRawModulesPhase(); setReportNumModules()"
             >
               Siguiente
             </button>
           </div>
         </mat-step>
 
-        <!-- FASE 3 -->
+        <!-- FASE CREAR AGRUPACIONES -->
         <mat-step>
           <ng-template matStepLabel>Crear agrupaciones auto</ng-template>
           <app-auto-module-groups></app-auto-module-groups>
@@ -43,25 +49,27 @@
           </div>
         </mat-step>
 
-        <!-- FASE 4 -->
+        <!-- FASE MODIFICAR AGRUPACIONES -->
         <mat-step>
           <ng-template matStepLabel>Editar agrupaciones</ng-template>
           <div>
             <app-module-groups></app-module-groups>
           </div>
           <div>
-            <button class="back-btn" mat-stroked-button matStepperPrevious (click)="resetFase4()">Atrás</button>
+            <button class="back-btn" mat-stroked-button matStepperPrevious (click)="resetEditGroupsPhase()">
+              Atrás
+            </button>
             <button
               mat-stroked-button
               matStepperNext
-              (click)="toggleLoadRawModules(false); toggleLoadNormModules(true); resetFase4()"
+              (click)="toggleLoadRawModules(false); toggleLoadNormModules(true); resetEditGroupsPhase()"
             >
               Siguiente
             </button>
           </div>
         </mat-step>
 
-        <!-- FASE 4 -->
+        <!-- FASE CREAR MODULOS NORMALIZADOS -->
         <mat-step>
           <ng-template matStepLabel>Normalizar módulos auto</ng-template>
           <div>
@@ -80,7 +88,7 @@
           </div>
         </mat-step>
 
-        <!-- FASE 6 -->
+        <!-- FASE MODIFICAR MODULOS NORMALIZADOS -->
         <mat-step>
           <ng-template matStepLabel>Editar módulos normalizados</ng-template>
           <div>
@@ -91,11 +99,10 @@
               class="back-btn"
               mat-stroked-button
               matStepperPrevious
-              (click)="toggleEditNormModules(false); resetFase6()"
+              (click)="toggleEditNormModules(false); resetEditNormModulesPhase()"
             >
               Atrás
             </button>
-            <!-- <button mat-stroked-button matStepperNext>Siguiente</button> -->
           </div>
         </mat-step>
       </mat-vertical-stepper>

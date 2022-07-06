@@ -15,6 +15,7 @@ import { NormModCreatePopupComponent } from './components/norm-mod-create-popup/
 import { AutoNormModulesComponent } from './components/auto-norm-modules/auto-norm-modules.component';
 import { RawModulesFiltersComponent } from './components/raw-modules-filters/raw-modules-filters.component';
 import { RefreshComponent } from './components/refresh/refresh.component';
+import { LoadElemsComponent } from './components/load-elems/load-elems.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { RefreshComponent } from './components/refresh/refresh.component';
     AutoNormModulesComponent,
     RawModulesFiltersComponent,
     RefreshComponent,
+    LoadElemsComponent,
   ],
   imports: [CommonModule, StructuresRoutingModule, SharedModule, FiltersModule],
 })
