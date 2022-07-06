@@ -80,10 +80,10 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         )
         .subscribe((warnings) => {
           this.warnings = warnings;
-
-          // this.loadDataAndCheck();
         })
     );
+
+    this.planta = this.reportControlService.planta;
   }
 
   loadDataAndCheck() {
