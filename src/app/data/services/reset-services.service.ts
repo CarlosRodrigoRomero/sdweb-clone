@@ -12,6 +12,7 @@ import { SeguidoresControlService } from '@data/services/seguidores-control.serv
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { ClustersService } from '@data/services/clusters.service';
 import { FilterService } from '@data/services/filter.service';
+import { FilterControlService } from '@data/services/filter-control.service';
 import { PcService } from '@data/services/pc.service';
 import { PlantaService } from '@data/services/planta.service';
 import { ShareReportService } from '@data/services/share-report.service';
@@ -40,6 +41,7 @@ export class ResetServices {
     private anomaliaService: AnomaliaService,
     private clustersService: ClustersService,
     private filterService: FilterService,
+    private filterControlService: FilterControlService,
     private pcService: PcService,
     private plantaService: PlantaService,
     private shareReportService: ShareReportService,
@@ -65,6 +67,7 @@ export class ResetServices {
     this.anomaliaService.resetService();
     this.clustersService.resetService();
     this.filterService.resetService();
+    this.filterControlService.resetService();
     this.pcService.resetService();
     this.plantaService.resetService();
     this.shareReportService.resetService();

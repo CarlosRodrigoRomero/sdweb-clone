@@ -34,7 +34,7 @@ export class PerdidasFilterComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.filterControlService.maxPerdidasSource.subscribe((value) => (this.rangoMaxPerdidas = value))
+      this.filterControlService.maxPerdidas$.subscribe((value) => (this.rangoMaxPerdidas = value))
     );
 
     this.options = {

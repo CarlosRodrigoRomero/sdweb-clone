@@ -11,26 +11,26 @@ import { ParamsFilterShare } from '@core/models/paramsFilterShare';
   providedIn: 'root',
 })
 export class FilterControlService {
-  public minPerdidasDefault: number = 0;
-  private _minPerdidas: number = 0;
-  public minPerdidasSource = new BehaviorSubject<number>(this._minPerdidas);
-  public maxPerdidasDefault: number = 100;
-  private _maxPerdidas: number = 100;
-  public maxPerdidasSource = new BehaviorSubject<number>(this._maxPerdidas);
+  minPerdidasDefault = 0;
+  private _minPerdidas = 0;
+  minPerdidasSource = new BehaviorSubject<number>(this._minPerdidas);
+  maxPerdidasDefault = 100;
+  private _maxPerdidas = 100;
+  maxPerdidas$ = new BehaviorSubject<number>(this._maxPerdidas);
 
-  public minTempMaxDefault: number = 50;
-  private _minTempMax: number = 50;
-  public minTempMaxSource = new BehaviorSubject<number>(this._minTempMax);
-  public maxTempMaxDefault: number = 120;
-  private _maxTempMax: number = 120;
-  public maxTempMaxSource = new BehaviorSubject<number>(this._maxTempMax);
+  minTempMaxDefault = 50;
+  private _minTempMax = 50;
+  minTempMax$ = new BehaviorSubject<number>(this._minTempMax);
+  maxTempMaxDefault = 120;
+  private _maxTempMax = 120;
+  maxTempMax$ = new BehaviorSubject<number>(this._maxTempMax);
 
-  public minGradienteDefault: number = 0;
-  private _minGradiente: number = 0;
-  public minGradienteSource = new BehaviorSubject<number>(this._minGradiente);
-  public maxGradienteDefault: number = 80;
-  private _maxGradiente: number = 80;
-  public maxGradienteSource = new BehaviorSubject<number>(this._maxGradiente);
+  minGradienteDefault = 0;
+  private _minGradiente = 0;
+  minGradiente$ = new BehaviorSubject<number>(this._minGradiente);
+  maxGradienteDefault = 80;
+  private _maxGradiente = 80;
+  maxGradiente$ = new BehaviorSubject<number>(this._maxGradiente);
 
   private _labelTipoDefaultStatus = true;
   public labelTipoDefaultStatus$ = new BehaviorSubject<boolean>(this._labelTipoDefaultStatus);
@@ -134,6 +134,22 @@ export class FilterControlService {
       });
   }
 
+  resetService() {
+    this.minPerdidas = 0;
+    this.maxPerdidas = 100;
+    this.minTempMax = 0;
+    this.maxTempMax = 120;
+    this.minGradiente = 0;
+    this.maxGradiente = 80;
+    this.labelTipoDefaultStatus = true;
+    this.selectedTipoLabels = [this.selectedTipoDefaultLabel];
+    this.tiposSelected = [];
+    this.claseSelected = [false, false, false];
+    this.criticidadSelected = [false, false, false, false, false];
+    this.activeDrawArea = false;
+    this.activeDeleteArea = false;
+  }
+
   //////////////////////////////////////////////////
 
   /* PERDIDAS */
@@ -152,7 +168,7 @@ export class FilterControlService {
 
   set maxPerdidas(value: number) {
     this._maxPerdidas = value;
-    this.maxPerdidasSource.next(value);
+    this.maxPerdidas$.next(value);
   }
 
   /* TEMPERATURA MAXIMA */
@@ -162,7 +178,7 @@ export class FilterControlService {
 
   set minTempMax(value: number) {
     this._minTempMax = value;
-    this.minTempMaxSource.next(value);
+    this.minTempMax$.next(value);
   }
 
   get maxTempMax() {
@@ -171,7 +187,7 @@ export class FilterControlService {
 
   set maxTempMax(value: number) {
     this._maxTempMax = value;
-    this.maxTempMaxSource.next(value);
+    this.maxTempMax$.next(value);
   }
 
   /* GRADIENTE NORMALIZADO */
@@ -181,7 +197,7 @@ export class FilterControlService {
 
   set minGradiente(value: number) {
     this._minGradiente = value;
-    this.minGradienteSource.next(value);
+    this.minGradiente$.next(value);
   }
 
   get maxGradiente() {
@@ -190,7 +206,7 @@ export class FilterControlService {
 
   set maxGradiente(value: number) {
     this._maxGradiente = value;
-    this.maxGradienteSource.next(value);
+    this.maxGradiente$.next(value);
   }
 
   /* TIPOS DE ANOMALIAS */

@@ -30,10 +30,10 @@ export class GradientFilterComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.filterControlService.minGradienteSource.subscribe((value) => (this.rangoMinGradiente = value))
+      this.filterControlService.minGradiente$.subscribe((value) => (this.rangoMinGradiente = value))
     );
     this.subscriptions.add(
-      this.filterControlService.maxGradienteSource.subscribe((value) => (this.rangoMaxGradiente = value))
+      this.filterControlService.maxGradiente$.subscribe((value) => (this.rangoMaxGradiente = value))
     );
 
     this.options = {

@@ -283,6 +283,7 @@ export class FilterService {
     this.noAmosSegsFilters = ['area'];
     this.otherFilters = ['confianza', 'aspectRatio', 'areaM'];
     this.filters = [];
+    this.filters$.next(this.filters);
     this.prevAllFilterableElems = undefined;
     this.filteredElements = [];
     this.allFiltrableElements = [];

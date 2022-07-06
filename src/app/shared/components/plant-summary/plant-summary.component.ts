@@ -6,7 +6,6 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 
 import { InformeService } from '@data/services/informe.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { PlantaService } from '@data/services/planta.service';
 import { FilterService } from '@data/services/filter.service';
 
 import { InformeInterface } from '@core/models/informe';
@@ -39,7 +38,6 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
     private router: Router,
     private informeService: InformeService,
     private reportControlService: ReportControlService,
-    private plantaService: PlantaService,
     private filterService: FilterService
   ) {}
 
@@ -128,5 +126,7 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
     this.informe$.next(value);
   }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 }

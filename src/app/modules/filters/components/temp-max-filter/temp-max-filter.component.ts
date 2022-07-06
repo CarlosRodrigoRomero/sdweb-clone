@@ -78,8 +78,8 @@ export class TempMaxFilterComponent implements OnInit, OnDestroy {
       },
     };
 
-    this.subscriptions.add(this.filterControlService.minTempMaxSource.subscribe((value) => (this.minTemp = value)));
-    this.subscriptions.add(this.filterControlService.maxTempMaxSource.subscribe((value) => (this.maxTemp = value)));
+    this.subscriptions.add(this.filterControlService.minTempMax$.subscribe((value) => (this.minTemp = value)));
+    this.subscriptions.add(this.filterControlService.maxTempMax$.subscribe((value) => (this.maxTemp = value)));
   }
 
   onChangeFiltroTempMax(lowValue: number, highValue: number) {
