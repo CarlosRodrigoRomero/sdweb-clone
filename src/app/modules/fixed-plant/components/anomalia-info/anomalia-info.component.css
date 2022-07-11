@@ -55,6 +55,7 @@
   width: fit-content;
   border-bottom: 1px solid lightgrey;
   margin-bottom: 1px;
+  max-width: 60px;
 }
 
 .link-descarga {

@@ -30,6 +30,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   noAnomsReport = false;
   generatingDownload = false;
   numInformes = 1;
+  thereAreLargestZones = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -71,6 +72,10 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     );
 
     this.subscriptions.add(this.zonesService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
+
+    this.subscriptions.add(
+      this.zonesService.thereAreLargestZones$.subscribe((value) => (this.thereAreLargestZones = value))
+    );
 
     this.subscriptions.add(
       this.reportControlService.mapLoaded$.subscribe((value) => {

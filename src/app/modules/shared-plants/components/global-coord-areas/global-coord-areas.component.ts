@@ -16,7 +16,6 @@ import { LatLngLiteral } from '@agm/core';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ZonesService } from '@data/services/zones.service';
-import { ZonesControlService } from '@data/services/zones-control.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { PlantaInterface } from '@core/models/planta';
@@ -53,8 +52,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   constructor(
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
-    private zonesService: ZonesService,
-    private zonesControlService: ZonesControlService
+    private zonesService: ZonesService
   ) {}
 
   ngOnInit(): void {
@@ -62,10 +60,17 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
 
     this.planta = this.reportControlService.planta;
 
-    // quitamos las más pequeñas porque ya se muestran por defecto
-    this.nombreGlobalCoords = this.planta.nombreGlobalCoords.filter(
-      (nombre, index, nombres) => index < nombres.length - 1
-    );
+    // comprobamos si tiene los nombres de las zonas
+    if (this.reportControlService.planta.hasOwnProperty('nombreGlobalCoords')) {
+      // quitamos las más pequeñas porque ya se muestran por defecto
+      this.nombreGlobalCoords = this.planta.nombreGlobalCoords.filter(
+        (nombre, index, nombres) => index < nombres.length - 1
+      );
+    } else {
+      for (let index = 0; index < this.numAreas; index++) {
+        this.nombreGlobalCoords.push('Zona');
+      }
+    }
 
     this.nombreGlobalCoords.forEach((nombre) => {
       this.task.subtasks.push({ name: nombre, completed: false });

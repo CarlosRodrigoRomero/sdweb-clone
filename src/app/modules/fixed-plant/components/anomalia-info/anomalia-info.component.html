@@ -83,6 +83,24 @@
             <div class="elemento">
               <span class="titulo">Localización</span>
               <span class="subtitulo">{{ localizacion }}</span>
+              <div *ngIf="isAdmin">
+                <span class="titulo">Fila</span>
+                <input
+                  class="imput"
+                  matInput
+                  type="number"
+                  [value]="anomaliaSelect.localY"
+                  (change)="updateAnomalia($event.target.value, 'localY')"
+                />
+                <span class="titulo">Columna</span>
+                <input
+                  class="imput"
+                  matInput
+                  type="number"
+                  [value]="anomaliaSelect.localX"
+                  (change)="updateAnomalia($event.target.value, 'localX')"
+                />
+              </div>
             </div>
           </div>
         </mat-tab>
