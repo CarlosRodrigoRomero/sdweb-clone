@@ -143,8 +143,6 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
 
       const iconSrc = this.getMaeIcon(informeReciente.mae);
 
-      console.log(iconSrc);
-
       feature.setStyle(
         new Style({
           image: new Icon({

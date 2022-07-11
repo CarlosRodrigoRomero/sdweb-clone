@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 
 import { Subscription } from 'rxjs';
 
@@ -25,6 +26,7 @@ export type ChartOptions = {
   selector: 'app-chart-altura',
   templateUrl: './chart-altura.component.html',
   styleUrls: ['./chart-altura.component.css'],
+  providers: [DecimalPipe],
 })
 export class ChartAlturaComponent implements OnInit, OnDestroy {
   informesIdList: string[];
@@ -95,9 +97,9 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
         text: 'Fila',
       },
       labels: {
-        minWidth: 10,
+        minWidth: 50,
         formatter: (value) => {
-          return Math.round(value).toString();
+          return this.decimalPipe.transform(value, '1.0-0');
         },
       },
     },
@@ -113,7 +115,8 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private informeService: InformeService,
-    private anomaliaInfoService: AnomaliaInfoService
+    private anomaliaInfoService: AnomaliaInfoService,
+    private decimalPipe: DecimalPipe
   ) {}
 
   ngOnInit(): void {
