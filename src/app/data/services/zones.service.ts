@@ -3,9 +3,12 @@ import { Injectable } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 
+import * as turf from '@turf/turf';
+
 import PointInPolygon from 'point-in-polygon';
 
 import { PlantaService } from './planta.service';
+import { OlMapService } from './ol-map.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { PlantaInterface } from '@core/models/planta';
@@ -22,7 +25,7 @@ export class ZonesService {
   private _thereAreLargestZones = false;
   thereAreLargestZones$ = new BehaviorSubject<boolean>(this._thereAreLargestZones);
 
-  constructor(private plantaService: PlantaService) {}
+  constructor(private plantaService: PlantaService, private olMapService: OlMapService) {}
 
   initService(planta: PlantaInterface): Promise<boolean> {
     return new Promise((initService) => {
@@ -50,12 +53,16 @@ export class ZonesService {
 
   getZones(planta: PlantaInterface, locAreas: LocationAreaInterface[]): LocationAreaInterface[] {
     // obtenemos las areas descartando las que no tienen globals, que son las de los modulos
-    const realLocAreas = locAreas.filter(
+    let realLocAreas = locAreas.filter(
       (locArea) =>
         locArea.globalCoords.toString() !== ',' &&
         locArea.globalCoords.toString() !== ',,' &&
         locArea.globalCoords.toString() !== ''
     );
+
+    if (planta.id === 'fjub5AUln6LZER8cQhyw') {
+      realLocAreas = this.getZonesByIntersection(realLocAreas);
+    }
 
     if (planta.tipo === 'seguidores') {
       // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
@@ -90,6 +97,44 @@ export class ZonesService {
     }
 
     return zonesBySize;
+  }
+
+  private getZonesByIntersection(zones: LocationAreaInterface[]) {
+    const zonasInterseccion: LocationAreaInterface[] = [];
+
+    console.log(zones[0]);
+
+    const zonasMayores = zones.filter((zone) => zone.globalCoords[0] !== null);
+    const zonasMenores = zones.filter((zone) => zone.globalCoords[1] !== null);
+
+    zonasMayores.forEach((zonaMayor) => {
+      const coordsZonaMayor = this.olMapService.pathToCoordinate(zonaMayor.path);
+      coordsZonaMayor.push(coordsZonaMayor[0]);
+      const polygonZonaMayor = turf.polygon([coordsZonaMayor]);
+      zonasMenores.forEach((zonaMenor) => {
+        const coordsZonaMenor = this.olMapService.pathToCoordinate(zonaMenor.path);
+        coordsZonaMenor.push(coordsZonaMenor[0]);
+        const polygonZonaMenor = turf.polygon([coordsZonaMenor]);
+
+        const intersect = turf.intersect(polygonZonaMayor, polygonZonaMenor);
+        if (intersect !== null) {
+          const locArea: LocationAreaInterface = {
+            globalX: zonaMayor.globalCoords[0],
+            globalY: zonaMenor.globalCoords[1],
+            globalCoords: [zonaMayor.globalCoords[0], zonaMenor.globalCoords[1]],
+            nombreModulo: zonaMayor.nombreModulo,
+            potenciaModulo: zonaMayor.potenciaModulo,
+            path: this.olMapService.coordinateToPath(turf.getCoords(intersect)),
+          };
+
+          zonasInterseccion.push(locArea);
+        }
+      });
+    });
+
+    console.log(zonasInterseccion[0]);
+
+    return zonasInterseccion;
   }
 
   getIndexNotNull(locAreas: LocationAreaInterface[]): number {

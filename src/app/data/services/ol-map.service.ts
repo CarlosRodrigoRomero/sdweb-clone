@@ -14,7 +14,7 @@ import VectorSource from 'ol/source/Vector';
 import TileLayer from 'ol/layer/Tile';
 import { Draw } from 'ol/interaction';
 import { Coordinate } from 'ol/coordinate';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, toLonLat } from 'ol/proj';
 import XYZ from 'ol/source/XYZ';
 
 import { GLOBAL } from '@data/constants/global';
@@ -242,6 +242,18 @@ export class OlMapService {
       coordenadas.push(coordenada);
     });
     return coordenadas;
+  }
+
+  coordinateToPath(coordinates: Coordinate[]): LatLngLiteral[] {
+    const path: LatLngLiteral[] = [];
+    coordinates[0].forEach((coord, index, coords) => {
+      // quitamos el ultimo xq es igual al primero
+      if (index < coords.length - 1) {
+        const latLng: LatLngLiteral = { lng: coord[0] / 100000, lat: coord[1] / 100000 };
+        path.push(latLng);
+      }
+    });
+    return path;
   }
 
   setViewCenter(center: Coordinate) {
