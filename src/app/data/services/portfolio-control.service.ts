@@ -272,6 +272,7 @@ export class PortfolioControlService {
   public getColorMae(mae: number, opacity?: number): string {
     let colorMae = '';
     if (this.numPlantas < 3) {
+      colorMae = COLOR.colores_severity_rgb[0];
       GLOBAL.mae_rangos.forEach((rango, index) => {
         if (mae > rango) {
           colorMae = COLOR.colores_severity_rgb[index + 1];

@@ -143,6 +143,8 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
 
       const iconSrc = this.getMaeIcon(informeReciente.mae);
 
+      console.log(iconSrc);
+
       feature.setStyle(
         new Style({
           image: new Icon({
@@ -253,6 +255,7 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
 
     let srcIcon = '';
     if (this.portfolioControlService.numPlantas < 3) {
+      srcIcon = srcIcons[0];
       GLOBAL.mae_rangos.forEach((rango, index) => {
         if (mae > rango) {
           srcIcon = srcIcons[index + 1];
