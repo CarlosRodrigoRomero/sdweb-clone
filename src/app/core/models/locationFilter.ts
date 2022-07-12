@@ -15,27 +15,9 @@ export class LocationFilter implements FilterInterface {
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
     if (this.type === 'locationTipo0') {
-      return elems.filter((elem) => {
-        if (elem.hasOwnProperty('anomaliasCliente')) {
-          return (
-            (elem as Seguidor).anomaliasCliente.filter((anom) => anom.localY === 0 || anom.localX === 0).length > 0
-          );
-        } else {
-          return elem.localY === 0 || elem.localX === 0;
-        }
-      });
+      return elems.filter((elem) => elem.localY === 0 || elem.localX === 0);
     } else {
-      return elems.filter((elem) => {
-        if (elem.hasOwnProperty('anomaliasCliente')) {
-          return (
-            (elem as Seguidor).anomaliasCliente.filter(
-              (anom) => anom.localY > this.filasPlanta || anom.localX > this.columnasPlanta
-            ).length > 0
-          );
-        } else {
-          return elem.localY > this.filasPlanta || elem.localX > this.columnasPlanta;
-        }
-      });
+      return elems.filter((elem) => elem.localY > this.filasPlanta || elem.localX > this.columnasPlanta);
     }
   }
 

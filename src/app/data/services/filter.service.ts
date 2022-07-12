@@ -5,6 +5,7 @@ import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 
 import { ShareReportService } from '@data/services/share-report.service';
 import { FilterControlService } from '@data/services/filter-control.service';
+import { AnomaliaService } from './anomalia.service';
 
 import { FilterableElement } from '@core/models/filterableInterface';
 import { FilterInterface } from '@core/models/filter';
@@ -15,7 +16,7 @@ import { Anomalia } from '@core/models/anomalia';
   providedIn: 'root',
 })
 export class FilterService {
-  private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad'];
+  private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location'];
   private noAmosSegsFilters = ['area'];
   private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   public filters: FilterInterface[] = [];
@@ -32,7 +33,8 @@ export class FilterService {
   constructor(
     private router: Router,
     private shareReportService: ShareReportService,
-    private filterControlService: FilterControlService
+    private filterControlService: FilterControlService,
+    private anomaliaService: AnomaliaService
   ) {}
 
   initService(elems: FilterableElement[], shared?: boolean, sharedId?: string): Promise<boolean> {
@@ -112,7 +114,8 @@ export class FilterService {
           this.applyNoAnomsSegsFilters(this.allFiltrableElements);
         } else {
           const elemsFiltered = this.allFiltrableElements.filter((elem) => {
-            const newAnomaliasCliente = this.applyFilters((elem as Seguidor).anomalias) as Anomalia[];
+            const realAnomalias = this.anomaliaService.getRealAnomalias((elem as Seguidor).anomalias);
+            const newAnomaliasCliente = this.applyFilters(realAnomalias) as Anomalia[];
             if (newAnomaliasCliente !== undefined) {
               (elem as Seguidor).anomaliasCliente = newAnomaliasCliente;
             }
