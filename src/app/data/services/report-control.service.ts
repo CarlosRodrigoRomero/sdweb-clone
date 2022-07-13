@@ -387,24 +387,23 @@ export class ReportControlService {
     const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
     let mae = 0;
     seguidoresInforme.forEach((seg) => (mae = mae + seg.mae));
-    informe.mae = mae / seguidoresInforme.length;
+    mae = mae / seguidoresInforme.length;
 
-    this.informeService.updateInforme(informe);
+    this.informeService.updateInformeField(informe.id, 'mae', mae);
   }
 
   setMaeInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
     const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
+    let mae = 0;
     if (anomaliasInforme.length > 0) {
       const perdidas = anomaliasInforme.map((anom) => anom.perdidas);
       let perdidasTotales = 0;
       perdidas.forEach((perd) => (perdidasTotales += perd));
 
-      informe.mae = perdidasTotales / informe.numeroModulos;
-    } else {
-      informe.mae = 0;
+      mae = perdidasTotales / informe.numeroModulos;
     }
 
-    this.informeService.updateInforme(informe);
+    this.informeService.updateInformeField(informe.id, 'mae', mae);
   }
 
   private checkCCInformes(elems: FilterableElement[]): void {
@@ -425,23 +424,22 @@ export class ReportControlService {
     const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
     let cc = 0;
     seguidoresInforme.forEach((seg) => (cc = cc + seg.celsCalientes));
-    informe.cc = cc / seguidoresInforme.length;
+    cc = cc / seguidoresInforme.length;
 
-    this.informeService.updateInforme(informe);
+    this.informeService.updateInformeField(informe.id, 'cc', cc);
   }
 
   setCCInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
     const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
+    let cc = 0;
     if (anomaliasInforme.length > 0) {
       // tslint:disable-next-line: triple-equals
       const celCals = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
-      informe.cc = celCals.length / informe.numeroModulos;
-    } else {
-      informe.cc = 0;
+      cc = celCals.length / informe.numeroModulos;
     }
 
-    this.informeService.updateInforme(informe);
+    this.informeService.updateInformeField(informe.id, 'cc', cc);
   }
 
   private checkIfNumberValueWrong(value: any): boolean {

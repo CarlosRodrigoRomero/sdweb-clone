@@ -392,6 +392,22 @@ export class InformeService {
       });
   }
 
+  updateInformeField(id: string, field: string, value: any) {
+    const informe = {};
+    informe[field] = value;
+
+    this.afs
+      .collection('informes')
+      .doc(id)
+      .update(informe)
+      .then(() => {
+        console.log('Informe actualizado correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al actualizar el informe: ', error);
+      });
+  }
+
   addInforme(informe: InformeInterface) {
     informe.id = this.afs.createId();
 
