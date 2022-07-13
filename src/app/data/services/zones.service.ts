@@ -18,6 +18,7 @@ import { PlantaInterface } from '@core/models/planta';
 })
 export class ZonesService {
   locAreas: LocationAreaInterface[] = [];
+  locAreaSeguidores: LocationAreaInterface[] = [];
   zones: LocationAreaInterface[] = [];
   zonesBySize: LocationAreaInterface[][] = [];
   private _thereAreZones = false;
@@ -69,7 +70,7 @@ export class ZonesService {
       const indiceSeleccionado = this.getIndexNotNull(realLocAreas);
 
       // filtramos las areas seleccionadas para los seguidores
-      const locAreaSeguidores = realLocAreas.filter(
+      this.locAreaSeguidores = realLocAreas.filter(
         (locArea) =>
           locArea.globalCoords[indiceSeleccionado] !== null &&
           locArea.globalCoords[indiceSeleccionado] !== undefined &&
@@ -77,7 +78,7 @@ export class ZonesService {
       );
 
       // filtramos las areas que no son seguidores
-      const locAreaNoSeguidores = realLocAreas.filter((locArea) => !locAreaSeguidores.includes(locArea));
+      const locAreaNoSeguidores = realLocAreas.filter((locArea) => !this.locAreaSeguidores.includes(locArea));
 
       return locAreaNoSeguidores;
     } else {
@@ -102,10 +103,12 @@ export class ZonesService {
   private getZonesByIntersection(zones: LocationAreaInterface[]) {
     const zonasInterseccion: LocationAreaInterface[] = [];
 
-    console.log(zones[0]);
-
-    const zonasMayores = zones.filter((zone) => zone.globalCoords[0] !== null);
-    const zonasMenores = zones.filter((zone) => zone.globalCoords[1] !== null);
+    const zonasMayores = zones.filter(
+      (zone) => zone.globalCoords[0] !== null && zone.globalCoords[0] !== undefined && zone.globalCoords[0] !== ''
+    );
+    const zonasMenores = zones.filter(
+      (zone) => zone.globalCoords[1] !== null && zone.globalCoords[1] !== undefined && zone.globalCoords[1] !== ''
+    );
 
     zonasMayores.forEach((zonaMayor) => {
       const coordsZonaMayor = this.olMapService.pathToCoordinate(zonaMayor.path);
@@ -119,12 +122,12 @@ export class ZonesService {
         const intersect = turf.intersect(polygonZonaMayor, polygonZonaMenor);
         if (intersect !== null) {
           const locArea: LocationAreaInterface = {
-            globalX: zonaMayor.globalCoords[0],
-            globalY: zonaMenor.globalCoords[1],
+            globalX: zonaMayor.globalX,
+            globalY: zonaMenor.globalY,
             globalCoords: [zonaMayor.globalCoords[0], zonaMenor.globalCoords[1]],
             nombreModulo: zonaMayor.nombreModulo,
             potenciaModulo: zonaMayor.potenciaModulo,
-            path: this.olMapService.coordinateToPath(turf.getCoords(intersect)),
+            path: this.olMapService.turfCoordinateToPath(turf.getCoords(intersect)),
           };
 
           zonasInterseccion.push(locArea);
@@ -132,9 +135,7 @@ export class ZonesService {
       });
     });
 
-    console.log(zonasInterseccion[0]);
-
-    return zonasInterseccion;
+    return [...zonasMayores, ...zonasInterseccion];
   }
 
   getIndexNotNull(locAreas: LocationAreaInterface[]): number {

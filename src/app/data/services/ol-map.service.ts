@@ -19,6 +19,7 @@ import XYZ from 'ol/source/XYZ';
 
 import { GLOBAL } from '@data/constants/global';
 import { catchError, take } from 'rxjs/operators';
+import proj4 from 'proj4';
 
 @Injectable({
   providedIn: 'root',
@@ -244,12 +245,14 @@ export class OlMapService {
     return coordenadas;
   }
 
-  coordinateToPath(coordinates: Coordinate[]): LatLngLiteral[] {
+  turfCoordinateToPath(coordinates: Coordinate[][]): LatLngLiteral[] {
     const path: LatLngLiteral[] = [];
     coordinates[0].forEach((coord, index, coords) => {
+      const coordConverted = proj4('EPSG:3857', 'EPSG:4326', coord);
+
       // quitamos el ultimo xq es igual al primero
       if (index < coords.length - 1) {
-        const latLng: LatLngLiteral = { lng: coord[0] / 100000, lat: coord[1] / 100000 };
+        const latLng: LatLngLiteral = { lng: coordConverted[0], lat: coordConverted[1] };
         path.push(latLng);
       }
     });
