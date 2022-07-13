@@ -14,11 +14,12 @@ import VectorSource from 'ol/source/Vector';
 import TileLayer from 'ol/layer/Tile';
 import { Draw } from 'ol/interaction';
 import { Coordinate } from 'ol/coordinate';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, toLonLat } from 'ol/proj';
 import XYZ from 'ol/source/XYZ';
 
 import { GLOBAL } from '@data/constants/global';
 import { catchError, take } from 'rxjs/operators';
+import proj4 from 'proj4';
 
 @Injectable({
   providedIn: 'root',
@@ -242,6 +243,20 @@ export class OlMapService {
       coordenadas.push(coordenada);
     });
     return coordenadas;
+  }
+
+  turfCoordinateToPath(coordinates: Coordinate[][]): LatLngLiteral[] {
+    const path: LatLngLiteral[] = [];
+    coordinates[0].forEach((coord, index, coords) => {
+      const coordConverted = proj4('EPSG:3857', 'EPSG:4326', coord);
+
+      // quitamos el ultimo xq es igual al primero
+      if (index < coords.length - 1) {
+        const latLng: LatLngLiteral = { lng: coordConverted[0], lat: coordConverted[1] };
+        path.push(latLng);
+      }
+    });
+    return path;
   }
 
   setViewCenter(center: Coordinate) {
