@@ -23,6 +23,7 @@ import { LocationAreaInterface } from '@core/models/location';
 import { ModuloInterface } from '@core/models/modulo';
 
 import { GLOBAL } from '@data/constants/global';
+import { Patches } from '@core/classes/patches';
 
 @Injectable({
   providedIn: 'root',
@@ -141,8 +142,14 @@ export class AnomaliaService {
         take(1),
         map((actions) => {
           let anoms = actions.map((doc, index) => {
-            const data = doc.payload.doc.data() as Anomalia;
+            let data = doc.payload.doc.data() as Anomalia;
             data.id = doc.payload.doc.id;
+
+            // Parche para Casas de Don Pedro Junio 2022
+            if (Patches.checkInformeId(informeId)) {
+              data = Patches.applyPatches(informeId, data);
+            }
+
             data.perdidas = this.getPerdidas(data); // cambiamos el valor de la DB por uno basado en el tipo
             data.clase = this.getCoA(data); // cambiamos el valor de la DB por uno basado en el tipo
             if (criterio !== undefined) {
