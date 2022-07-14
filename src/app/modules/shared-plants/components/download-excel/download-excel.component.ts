@@ -105,41 +105,31 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.subscriptions.add(
-      this.plantaService
-        .getPlanta(this.reportControlService.plantaId)
-        .pipe(
-          take(1),
-          switchMap((planta) => {
-            this.planta = planta;
+    this.planta = this.reportControlService.planta;
 
-            this.allElems = this.reportControlService.allFilterableElements;
+    this.allElems = this.reportControlService.allFilterableElements;
 
-            return this.reportControlService.selectedInformeId$;
-          })
-        )
-        .subscribe((informeId) => {
-          this.informeSelected = this.reportControlService.informes.find((informe) => informeId === informe.id);
+    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+      this.informeSelected = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
-          // filtramos las anomalias del informe seleccionado
-          this.anomaliasInforme = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId);
+      // filtramos las anomalias del informe seleccionado
+      this.anomaliasInforme = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId);
 
-          // ordenamos la lista de anomalias por su indice
-          this.anomaliasInforme = this.anomaliasInforme.sort((a, b) => a.numAnom - b.numAnom);
+      // ordenamos la lista de anomalias por su indice
+      this.anomaliasInforme = this.anomaliasInforme.sort((a, b) => a.numAnom - b.numAnom);
 
-          if (!this.reportControlService.plantaFija) {
-            this.columnasLink = [2, 3];
-          }
+      if (!this.reportControlService.plantaFija) {
+        this.columnasLink = [2, 3];
+      }
 
-          this.inicioFilters = 7;
+      this.inicioFilters = 7;
 
-          // vaciamos el contenido con cada cambio de informe
-          this.json = new Array(this.anomaliasInforme.length);
+      // vaciamos el contenido con cada cambio de informe
+      this.json = new Array(this.anomaliasInforme.length);
 
-          // reseteamos el contador de filas
-          this.linksCargados = 0;
-        })
-    );
+      // reseteamos el contador de filas
+      this.linksCargados = 0;
+    });
   }
 
   checkDownloadType() {
