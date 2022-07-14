@@ -52,7 +52,7 @@ export let GLOBAL = {
   tipos_criticidad: [1, 2, 3, 4, 5],
   tipos_no_utilizados: [0, 1, 2, 4, 13, 16],
   labels_tipos: [
-    '0',
+    '0',  
     'PC',
     'VPV',
     'Substring en CA',

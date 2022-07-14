@@ -401,6 +401,7 @@ export class AnomaliaService {
       criterioCriticidad = this.criterioCriticidad;
     }
     if (criterioCriticidad !== undefined) {
+      // aquellas que siempre son de un criterio sin importar el gradiente
       if (criterioCriticidad.hasOwnProperty('criterioConstante')) {
         const criterioConstante = Object.values(criterioCriticidad.criterioConstante);
         criterioConstante.forEach((value, index) => {
@@ -410,6 +411,7 @@ export class AnomaliaService {
         });
       }
       if (criterioCriticidad.hasOwnProperty('siempreVisible')) {
+        // aquellas que deben verse aunque sean muy leves
         if (criterioCriticidad.siempreVisible.includes(anomalia.tipo)) {
           if (criticidad === null) {
             criticidad = 0;
@@ -418,11 +420,31 @@ export class AnomaliaService {
       }
       if (criterioCriticidad.hasOwnProperty('rangosDT')) {
         if (criticidad === null) {
-          criterioCriticidad.rangosDT.forEach((value, index) => {
-            if (anomalia.gradienteNormalizado >= value) {
-              criticidad = index;
+          // aquellas que dependen del gradiente y la temperatura Max
+          if (criterioCriticidad.hasOwnProperty('rangosTMax')) {
+            for (let index = 0; index < criterioCriticidad.rangosTMax.length; index++) {
+              const rangoTMax = criterioCriticidad.rangosTMax[index];
+              const rangosDT = criterioCriticidad.rangosDT[index];
+
+              // solo aplicamos la temperatura Max para el ultimo rango
+              if (index === criterioCriticidad.rangosTMax.length - 1) {
+                if (anomalia.temperaturaMax >= rangoTMax || anomalia.gradienteNormalizado >= rangosDT) {
+                  criticidad = index;
+                }
+              } else {
+                if (anomalia.gradienteNormalizado >= rangosDT) {
+                  criticidad = index;
+                }
+              }
             }
-          });
+          } else {
+            // aquellas que solo dependen del gradiente
+            criterioCriticidad.rangosDT.forEach((value, index) => {
+              if (anomalia.gradienteNormalizado >= value) {
+                criticidad = index;
+              }
+            });
+          }
         }
       }
     } else {
