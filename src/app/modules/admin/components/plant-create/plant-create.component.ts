@@ -56,6 +56,7 @@ export class PlantCreateComponent implements OnInit {
     this.form = this.formBuilder.group({
       nombre: [, [Validators.required]],
       alturaBajaPrimero: [false, [Validators.required]],
+      columnaDchaPrimero: [false, [Validators.required]],
       autoLocReady: [false, [Validators.required]],
       filas: [, [Validators.required]],
       columnas: [, [Validators.required]],
@@ -85,6 +86,8 @@ export class PlantCreateComponent implements OnInit {
         this.planta.tipo = this.tipo;
         this.planta.vertical = this.vertical;
         this.planta.alturaBajaPrimero = this.form.get('alturaBajaPrimero').value;
+        this.planta.columnaDchaPrimero = this.form.get('columnaDchaPrimero').value;
+
         this.planta.autoLocReady = this.form.get('autoLocReady').value;
         this.planta.empresa = this.empresaSelected.uid;
 
