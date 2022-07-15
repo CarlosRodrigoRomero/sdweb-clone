@@ -228,7 +228,7 @@ export class AutoLocComponent implements OnInit, AfterViewInit {
     // area.visible = true;
     const polygon = new google.maps.Polygon({
       paths: area.path,
-      strokeColor: area.hasOwnProperty('modulo') ? 'yellow' : 'white',
+      strokeColor: this.getPolygonColor(area),
       strokeOpacity: this._strokeOpacity,
       strokeWeight: 2,
       fillColor: this.getFillColor(area),
@@ -246,6 +246,16 @@ export class AutoLocComponent implements OnInit, AfterViewInit {
       this.selectArea(area);
       this.modifyArea(area);
     });
+  }
+
+  private getPolygonColor(area: AreaInterface) {
+    if (area.hasOwnProperty('modulo')) {
+      return 'yellow';
+    }
+    if (area.hasOwnProperty('tipoSeguidor')) {
+      return 'blue';
+    }
+    return 'white';
   }
 
   private modifyArea(area: AreaInterface) {
@@ -594,6 +604,9 @@ export class AutoLocComponent implements OnInit, AfterViewInit {
 
   getFillColorLocArea(locArea: LocationAreaInterface) {
     if (locArea.hasOwnProperty('modulo')) {
+      return 'grey';
+    }
+    if (locArea.hasOwnProperty('tipoSeguidor')) {
       return 'grey';
     }
     if (locArea.hasOwnProperty('globalCoords')) {

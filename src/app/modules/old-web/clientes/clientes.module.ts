@@ -9,6 +9,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 
 import { ClientesRoutingModule } from './clientes-routing.module';
 import { SharedModule } from '@shared/shared.module';
+import { LocationModule } from '@modules/location/location.module';
 
 import { AuthService } from '@data/services/auth.service';
 
@@ -45,6 +46,7 @@ import { ModuloAddComponent } from './components/modulo-add/modulo-add.component
     ChartModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    LocationModule,
   ],
   providers: [AuthService, MatDatepickerModule],
 })

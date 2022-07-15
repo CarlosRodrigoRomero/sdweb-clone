@@ -43,6 +43,21 @@ export class TipoSeguidorService {
       );
   }
 
+getTiposSeguidor(): Observable<TipoSeguidor[]> {
+  return this.afs
+    .collection<TipoSeguidor>('tiposSeguidor')
+    .snapshotChanges()
+    .pipe(
+      map((actions) => {
+        return actions.map((a) => {
+          const tipoSeguidor = a.payload.doc.data() as TipoSeguidor;
+          tipoSeguidor.id = a.payload.doc.id;
+          return tipoSeguidor;
+        });
+      })
+    );
+}
+
   updateTipoSeguidor(tipoSeguidor: TipoSeguidor) {}
 
   deleteTipoSeguidor(tipoSeguidor: TipoSeguidor) {}

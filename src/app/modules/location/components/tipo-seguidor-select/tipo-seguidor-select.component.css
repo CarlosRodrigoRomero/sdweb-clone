@@ -1,0 +1,15 @@
+.content-tipo-seguidor {
+  display: flex;
+  align-items: baseline;
+}
+
+.contenedor-menu {
+  display: flex;
+  flex-direction: column;
+  margin: 1rem;
+  gap: 0.5rem;
+}
+
+.input-num-modulos {
+  width: 100%;
+}
