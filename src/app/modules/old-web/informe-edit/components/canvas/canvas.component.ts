@@ -920,6 +920,9 @@ export class CanvasComponent implements OnInit {
         // autoestructuras
         [fila, columna] = estructura.getFilaColumnaAutoEst(event.offsetX, event.offsetY);
 
+        // console.log(fila, columna);
+        // console.log(estructura.getNumFilColAutoEst(fila, columna));
+
         [filaReal, columnaReal] = [fila, columna];
         [columnaRef, filaRef] = estructura.getFilaColumnaRef(columna, fila);
 

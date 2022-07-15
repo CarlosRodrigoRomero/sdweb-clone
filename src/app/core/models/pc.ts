@@ -10,6 +10,8 @@ export interface PcInterface {
   tipo?: number;
   local_x?: number;
   local_y?: number;
+  numFilas?: number;
+  numColumnas?: number;
   global_x?: any;
   global_y?: any;
   global_z?: any;
@@ -71,6 +73,7 @@ export interface PcInterface {
   FrameNumber?: number;
   FrameRate?: number;
   numAnom?: number;
+  autoEstId?: string;
 }
 
 export class Pc implements PcInterface, ElementoPlantaInterface {
@@ -80,6 +83,8 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   tipo?: number;
   local_x?: number;
   local_y?: number;
+  numFilas?: number;
+  numColumnas?: number;
   global_x?: any;
   global_y?: any;
   global_z?: any;
@@ -141,6 +146,7 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   FrameNumber?: number;
   FrameRate?: number;
   numAnom?: number;
+  autoEstId?: string;
 
   constructor(pc: PcInterface) {
     Object.assign(this, pc);
