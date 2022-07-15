@@ -4,9 +4,12 @@
 }
 
 .contenedor-menu {
+  margin: 1rem;
+}
+
+.example-form {
   display: flex;
   flex-direction: column;
-  margin: 1rem;
   gap: 0.5rem;
 }
 

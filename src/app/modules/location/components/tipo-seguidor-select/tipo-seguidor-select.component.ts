@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { take } from 'rxjs/operators';
 
@@ -19,14 +20,43 @@ export class TipoSeguidorSelectComponent implements OnInit {
 
   tiposSeguidor: TipoSeguidor[] = [];
   tipoFila = true;
+  form: FormGroup;
 
-  constructor(private tipoSeguidorService: TipoSeguidorService) {}
+  constructor(private tipoSeguidorService: TipoSeguidorService, private formBuilder: FormBuilder) {}
 
   ngOnInit(): void {
     this.tipoSeguidorService
       .getTiposSeguidor()
       .pipe(take(1))
       .subscribe((tipos) => (this.tiposSeguidor = tipos));
+
+    this.buildForm();
+  }
+
+  private buildForm() {
+    this.form = this.formBuilder.group({
+      tipoFila: [true],
+      nombre: [, [Validators.required]],
+    });
+  }
+
+  onSubmit(event: Event) {
+    event.preventDefault();
+    if (this.form.valid) {
+      const tipoSeguidor: TipoSeguidor = {
+        nombre: this.form.value.nombre,
+        tipoFila: this.form.value.tipoFila,
+        numModulos: this.getNumModulos(this.form.value.nombre),
+      };
+
+      // Crea la planta en la DB
+      this.tipoSeguidorService.addTipoSeguidor(tipoSeguidor);
+    }
+  }
+
+  private getNumModulos(nombre: string): number[] {
+    const numModulos = nombre.split('.').map((num) => Number(num));
+    return numModulos;
   }
 
   updateTipoSeguidor(event: MatSelectChange) {

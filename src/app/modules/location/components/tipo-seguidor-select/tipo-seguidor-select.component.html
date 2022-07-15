@@ -25,17 +25,23 @@
   </button>
   <mat-menu #menu="matMenu">
     <div class="contenedor-menu">
-      <h5>Añadir nuevo tipo de seguidor</h5>
-      <mat-checkbox class="editable-check" [(ngModel)]="tipoFila" (click)="stopPropagation($event)"
-        >Ordenado por filas</mat-checkbox
-      >
-      <span *ngIf="tipoFila">Indica el número de módulos por fila separados por puntos</span>
       <span *ngIf="!tipoFila">Indica el número de módulos por columna separados por puntos</span>
-      <form class="example-form">
-        <mat-form-field class="input-num-modulos" appearance="outline" (click)="stopPropagation($event)">
+      <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
+        <h5>Añadir nuevo tipo de seguidor</h5>
+        <mat-checkbox
+          formControlName="tipoFila"
+          class="editable-check"
+          [(ngModel)]="tipoFila"
+          (click)="stopPropagation($event)"
+          >Ordenado por filas</mat-checkbox
+        >
+        <span *ngIf="tipoFila">Indica el número de módulos por fila separados por puntos</span>
+
+        <mat-form-field class="input-num-modulos" appearance="fill" (click)="stopPropagation($event)">
           <mat-label>Número de módulos</mat-label>
-          <input matInput placeholder="4.6.6.4" />
+          <input matInput formControlName="nombre" placeholder="4.6.6.4" />
         </mat-form-field>
+        <button [disabled]="form.invalid" mat-raised-button color="warn" type="submit">Añadir</button>
       </form>
     </div>
   </mat-menu>
