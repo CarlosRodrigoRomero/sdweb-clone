@@ -12,6 +12,7 @@ import Polygon from 'ol/geom/Polygon';
 import { PlantaService } from '@data/services/planta.service';
 import { AdminService } from '@data/services/admin.service';
 import { OlMapService } from './ol-map.service';
+import { AnomaliaInfoService } from './anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { CritCoA } from '@core/models/critCoA';
@@ -44,7 +45,8 @@ export class AnomaliaService {
     private storage: AngularFireStorage,
     private plantaService: PlantaService,
     private adminService: AdminService,
-    private olMapService: OlMapService
+    private olMapService: OlMapService,
+    private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
   initService(plantaId: string): Promise<void> {
@@ -218,25 +220,6 @@ export class AnomaliaService {
     return realAnomalias;
   }
 
-  getAlturaAnom(anomalia: Anomalia, planta: PlantaInterface, tipoSeguidor?: TipoSeguidor): number {
-    let localY = anomalia.localY;
-    if (planta.alturaBajaPrimero) {
-      if (planta.tipo === 'seguidores' && tipoSeguidor) {
-        // si se cuenta por filas la altura es el nº de filas
-        let altura = tipoSeguidor.numModulos.length;
-        // si se cuenta por columnas entonces la altura es idependiente por columna
-        if (!tipoSeguidor.tipoFila) {
-          altura = tipoSeguidor.numModulos[anomalia.localX - 1];
-        }
-        localY = altura - localY + 1;
-      } else if (planta.tipo !== 'seguidores') {
-        // para fijas la altura se basa en el nº de filas de la planta
-        localY = planta.filas - localY + 1;
-      }
-    }
-    return localY;
-  }
-
   private getRightDatetime(datetime: number) {
     if (datetime.toString().length === 19) {
       return datetime / 1000000000;
@@ -327,7 +310,7 @@ export class AnomaliaService {
       }
     });
 
-    let numeroModulo = this.plantaService.getNumeroModulo(anomalia, 'anomalia', planta);
+    let numeroModulo = this.anomaliaInfoService.getNumeroModulo(anomalia, planta, 'anomalia');
     if (isNaN(Number(numeroModulo))) {
       numeroModulo = undefined;
     }

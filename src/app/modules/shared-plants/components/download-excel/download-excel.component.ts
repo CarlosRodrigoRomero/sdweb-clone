@@ -3,10 +3,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
-import { switchMap, take } from 'rxjs/operators';
 import { BehaviorSubject, Subscription } from 'rxjs';
-
-import proj4 from 'proj4';
 
 import { ExcelService } from '@data/services/excel.service';
 import { ReportControlService } from '@data/services/report-control.service';
@@ -24,7 +21,6 @@ import { PcInterface } from '@core/models/pc';
 import { FilterableElement } from '@core/models/filterableInterface';
 
 import { Translation } from '@shared/utils/translations/translations';
-import { TipoSeguidor } from '@core/models/tipoSeguidor';
 
 interface Fila {
   // localId?: string;
@@ -283,24 +279,13 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       row.localizacion = anomalia.nombreSeguidor;
     }
 
-    let seguidor: Seguidor;
-    if (!this.reportControlService.plantaFija) {
-      seguidor = (this.allElems as Seguidor[]).find((seg) => seg.nombre === anomalia.nombreSeguidor);
-    }
+    row.localY = this.anomaliaInfoService.getAlturaAnom(anomalia, this.planta);
+    row.localX = anomalia.localX;
 
-    let tipoSeguidor: TipoSeguidor;
-    if (seguidor === undefined) {
-      row.localY = this.anomaliaService.getAlturaAnom(anomalia, this.planta, tipoSeguidor);
-      row.localX = anomalia.localX;
-
+    if (this.reportControlService.plantaFija) {
       row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(this.olMapService.getCentroid(anomalia.featureCoords));
     } else {
-      if (seguidor.hasOwnProperty('tipoSeguidor')) {
-        tipoSeguidor = seguidor.tipoSeguidor;
-      }
-
-      row.localY = this.anomaliaService.getAlturaAnom(anomalia, this.planta, tipoSeguidor);
-      row.localX = anomalia.localX;
+      const seguidor = (this.allElems as Seguidor[]).find((seg) => seg.nombre === anomalia.nombreSeguidor);
 
       row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(this.olMapService.getCentroid(seguidor.featureCoords));
     }

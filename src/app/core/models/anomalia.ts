@@ -2,6 +2,7 @@ import { Coordinate } from 'ol/coordinate.js';
 
 import { FilterableElement } from './filterableInterface';
 import { ModuloInterface } from './modulo';
+import { TipoSeguidor } from './tipoSeguidor';
 
 export class Anomalia implements FilterableElement {
   id?: string;
@@ -33,6 +34,7 @@ export class Anomalia implements FilterableElement {
   vientoDireccion?: number;
   nombreSeguidor?: string;
   numAnom?: number;
+  tipoSeguidor?: TipoSeguidor;
 
   constructor(
     tipo: number,

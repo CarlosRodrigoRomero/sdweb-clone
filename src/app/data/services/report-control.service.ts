@@ -139,7 +139,7 @@ export class ReportControlService {
                   return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
                 } else {
                   // obtenemos todos los seguidores
-                  return this.seguidorService.getSeguidoresPlanta$(this.plantaId, this.informes);
+                  return this.seguidorService.getSeguidoresPlanta$(this.planta, this.informes);
                 }
               }),
               take(1)
@@ -237,7 +237,7 @@ export class ReportControlService {
                         } else {
                           this.plantaFija = false;
 
-                          return this.seguidorService.getSeguidoresPlanta$(this.plantaId, this.informes);
+                          return this.seguidorService.getSeguidoresPlanta$(this.planta, this.informes);
                         }
                       }),
                       take(1)
@@ -304,7 +304,7 @@ export class ReportControlService {
                           this.plantaFija = false;
 
                           // obtenemos todos los seguidores
-                          return this.seguidorService.getSeguidoresPlanta$(this.plantaId, this.informes);
+                          return this.seguidorService.getSeguidoresPlanta$(this.planta, this.informes);
                         }
                       }),
                       take(1)

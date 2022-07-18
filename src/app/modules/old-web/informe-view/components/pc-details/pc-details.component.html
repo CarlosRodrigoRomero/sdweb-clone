@@ -54,14 +54,14 @@
       <div class="displayFlex" *ngIf="planta.tipo === 'seguidores'; else fija">
         <div *ngIf="!checkIsNaN(pc.global_x)" class="pc-details-derecha-item-tabla">
           <span class="text-center"><u>Seguidor</u></span>
-          <span class="text-center">{{ plantaService.getNombreSeguidor(pc) }}</span>
+          <span class="text-center">{{ seguidorService.getNombreSeguidor(pc) }}</span>
         </div>
         <div class="pc-details-derecha-item-tabla">
           <span *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"
             ><u>{{ plantaService.getNombreLocalX(planta) }}/{{ plantaService.getNombreLocalY(planta) }}</u></span
           >
           <span *ngIf="planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"><u>Nº Módulo</u></span>
-          <span class="text-center">{{ plantaService.getNumeroModulo(pc) }}</span>
+          <span class="text-center">{{ anomaliaInfoService.getNumeroModulo(pc, planta) }}</span>
         </div>
       </div>
 
@@ -83,7 +83,7 @@
             ><u>{{ plantaService.getNombreLocalX(planta) }}/{{ plantaService.getNombreLocalY(planta) }}</u></span
           >
           <span *ngIf="planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"><u>Nº Módulo</u></span>
-          <span class="text-center">{{ plantaService.getNumeroModulo(pc) }}</span>
+          <span class="text-center">{{ anomaliaInfoService.getNumeroModulo(pc, planta) }}</span>
         </div>
       </ng-template>
     </div>

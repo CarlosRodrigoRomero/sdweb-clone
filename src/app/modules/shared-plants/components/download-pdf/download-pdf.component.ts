@@ -180,34 +180,22 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     // suscripciones a las imagenes
     this.loadOtherImages();
 
+    this.planta = this.reportControlService.planta;
+
+    this.plantaService.planta = this.planta;
+
+    this.columnasAnomalia = GLOBAL.columnasAnomPdf;
+
+    this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
+
+    // cargamos las imagenes que no cambian al cambiar de informe
+    this.imagesLoadService.loadFixedImages(this.planta.empresa);
+
+    this.largestLocAreas = this.zonesService.zonesBySize[0];
+
     this.subscriptions.add(
-      this.plantaService
-        .getPlanta(this.reportControlService.plantaId)
+      combineLatest([this.reportControlService.selectedInformeId$, this.downloadReportService.filteredPDF$])
         .pipe(
-          take(1),
-          switchMap((planta) => {
-            this.planta = planta;
-
-            // if (this.planta.tipo === '1 eje') {
-            //   this.downloadReportService.getSeguidores1Eje(this.planta.id);
-            // }
-
-            this.plantaService.planta = planta;
-
-            this.columnasAnomalia = GLOBAL.columnasAnomPdf;
-
-            this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
-
-            // cargamos las imagenes que no cambian al cambiar de informe
-            this.imagesLoadService.loadFixedImages(this.planta.empresa);
-
-            this.largestLocAreas = this.zonesService.zonesBySize[0];
-
-            return combineLatest([
-              this.reportControlService.selectedInformeId$,
-              this.downloadReportService.filteredPDF$,
-            ]);
-          }),
           switchMap(([informeId, filteredPDF]) => {
             this.selectedInforme = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
@@ -2439,9 +2427,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         titulo = this.translation.t('Resultados por posición de la anomalía dentro del seguidor');
         texto1 = `${this.translation.t(
           'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran'
-        )} (${this.plantaService.getNombreLocalX(this.planta)} ${this.translation.t(
+        )} (${this.anomaliaInfoService.getNombreLocalX(this.planta)} ${this.translation.t(
           'y'
-        )} ${this.plantaService.getNombreLocalY(this.planta)}) ${this.translation.t(
+        )} ${this.anomaliaInfoService.getNombreLocalY(this.planta)}) ${this.translation.t(
           'dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
         )}`;
         body = this.getTablaPosicion();
@@ -3673,7 +3661,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       label += coord;
 
       if (index < globals.length - 1) {
-        label += this.plantaService.getGlobalsConector(this.planta);
+        label += this.anomaliaInfoService.getGlobalsConector(this.planta);
       }
     });
 
@@ -3744,7 +3732,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       localIdParts.push(anomalia.localX.toString());
     }
     if (anomalia.localY !== undefined && anomalia.localY !== null && anomalia.localY > 0) {
-      localIdParts.push(this.downloadReportService.getAltura(this.planta, anomalia.localY).toString());
+      localIdParts.push(this.anomaliaInfoService.getAlturaAnom(anomalia, this.planta).toString());
     }
 
     let localId = '';
@@ -3864,7 +3852,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       contadorAnoms += 1;
       const row = [];
       row.push({
-        text: `${contadorAnoms}/${totalAnomsSeguidor}`,
+        text: anom.numAnom,
         noWrap: true,
         style: 'tableCellAnexo1',
       });

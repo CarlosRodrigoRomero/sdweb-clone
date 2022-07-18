@@ -13,6 +13,7 @@ import { PcInterface } from '@core/models/pc';
 import { PcService } from '@data/services/pc.service';
 import { PlantaService } from '@data/services/planta.service';
 import { InformeService } from '@data/services/informe.service';
+import { SeguidorService } from '@data/services/seguidor.service';
 
 @Component({
   selector: 'app-pc-list',
@@ -46,7 +47,8 @@ export class PcListComponent implements OnInit {
   constructor(
     public pcService: PcService,
     public plantaService: PlantaService,
-    private informeService: InformeService
+    private informeService: InformeService,
+    public seguidorService: SeguidorService
   ) {
     this.pcDescripcion = GLOBAL.pcDescripcion;
     this.pcPerdidas = GLOBAL.pcPerdidas;
@@ -72,7 +74,7 @@ export class PcListComponent implements OnInit {
         filter = filter.toLowerCase();
         if (this.planta.tipo === 'seguidores') {
           return (
-            this.plantaService.getNombreSeguidor(pc).toLowerCase().includes(filter) ||
+            this.seguidorService.getNombreSeguidor(pc).toLowerCase().includes(filter) ||
             pc.local_id.toString().toLowerCase().includes(filter)
           );
         } else {

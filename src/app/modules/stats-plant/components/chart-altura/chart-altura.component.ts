@@ -7,6 +7,7 @@ import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent, ApexYAx
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { InformeService } from '@data/services/informe.service';
+import { AnomaliaService } from '@data/services/anomalia.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
@@ -115,8 +116,9 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private informeService: InformeService,
-    private anomaliaInfoService: AnomaliaInfoService,
-    private decimalPipe: DecimalPipe
+    private decimalPipe: DecimalPipe,
+    private anomaliaService: AnomaliaService,
+    private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
   ngOnInit(): void {
@@ -147,7 +149,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
                   y: this.allCC
                     .filter((anom) => anom.informeId === this.informesIdList[i])
                     // tslint:disable-next-line: triple-equals
-                    .filter((anom) => this.anomaliaInfoService.getAltura(anom.localY, this.planta) == index).length,
+                    .filter((anom) => this.anomaliaInfoService.getAlturaAnom(anom, this.planta) == index).length,
                 });
               });
 

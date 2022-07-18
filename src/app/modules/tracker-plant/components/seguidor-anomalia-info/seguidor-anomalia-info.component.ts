@@ -7,8 +7,7 @@ import { SeguidorViewService } from '../../services/seguidor-view.service';
 import { PcService } from '@data/services/pc.service';
 import { AuthService } from '@data/services/auth.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { AnomaliaService } from '@data/services/anomalia.service';
-import { SeguidoresControlService } from '@data/services/seguidores-control.service';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
@@ -33,8 +32,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private pcService: PcService,
     private reportControlService: ReportControlService,
-    private anomaliaService: AnomaliaService,
-    private seguidoresControlService: SeguidoresControlService
+    private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
   ngOnInit(): void {
@@ -52,16 +50,6 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
           this.anomaliaSelected = anom;
 
           if (this.anomaliaSelected !== undefined) {
-            // para los clientes mostramos la correcta y para nosotros la de la DB
-            let fila = this.anomaliaSelected.localY;
-            if (!this.isAdmin) {
-              fila = this.anomaliaService.getAlturaAnom(
-                this.anomaliaSelected,
-                this.reportControlService.planta,
-                this.seguidoresControlService.seguidorSelected.tipoSeguidor
-              );
-            }
-
             this.anomaliaInfo = {
               localId: this.anomaliaSelected.localId,
               clase: GLOBAL.labels_clase[this.anomaliaSelected.clase],
@@ -73,7 +61,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
               perdidas: this.anomaliaSelected.perdidas,
               causa: GLOBAL.pcCausa[this.anomaliaSelected.tipo],
               recomendacion: GLOBAL.pcRecomendacion[this.anomaliaSelected.tipo],
-              fila,
+              fila: this.anomaliaInfoService.getAlturaAnom(this.anomaliaSelected, this.reportControlService.planta),
               columna: this.anomaliaSelected.localX,
               fecha: this.fixNewTiffDates(this.anomaliaSelected.datetime),
               irradiancia: this.anomaliaSelected.irradiancia,

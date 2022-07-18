@@ -7,6 +7,7 @@ import inside from 'point-in-polygon';
 
 import { PlantaService } from '@data/services/planta.service';
 import { OlMapService } from './ol-map.service';
+import { AnomaliaInfoService } from './anomalia-info.service';
 
 import { FilterableElement } from '@core/models/filterableInterface';
 import { PlantaInterface } from '@core/models/planta';
@@ -40,7 +41,11 @@ export class DownloadReportService {
   private _simplePDF = true;
   simplePDF$ = new BehaviorSubject<boolean>(this._simplePDF);
 
-  constructor(private plantaService: PlantaService, private olMapService: OlMapService) {}
+  constructor(
+    private plantaService: PlantaService,
+    private olMapService: OlMapService,
+    private anomaliaInfoService: AnomaliaInfoService
+  ) {}
 
   sortByPosition(a: FilterableElement, b: FilterableElement): number {
     if (this.sortByGlobalCoords(a, b) !== 0) {
@@ -89,7 +94,7 @@ export class DownloadReportService {
   }
 
   getPositionModulo(planta: PlantaInterface, anomalia: Anomalia): string {
-    const altura = this.getAltura(planta, anomalia.localY);
+    const altura = this.anomaliaInfoService.getAlturaAnom(anomalia, planta);
     if (
       planta.hasOwnProperty('etiquetasLocalXY') &&
       planta.etiquetasLocalXY[altura] !== undefined &&

@@ -6,7 +6,6 @@ import { Subscription } from 'rxjs';
 import proj4 from 'proj4';
 
 import { AnomaliaService } from '@data/services/anomalia.service';
-import { PlantaService } from '@data/services/planta.service';
 import { GLOBAL } from '@data/constants/global';
 import { DownloadReportService } from './download-report.service';
 
@@ -17,7 +16,7 @@ import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 
 import { COLOR } from '@data/constants/color';
-import { TipoSeguidor } from '@core/models/tipoSeguidor';
+import { PcInterface } from '@core/models/pc';
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +30,6 @@ export class AnomaliaInfoService {
   constructor(
     @Inject(LOCALE_ID) public locale: string,
     private anomaliaService: AnomaliaService,
-    private plantaService: PlantaService,
     private downloadReportService: DownloadReportService
   ) {
     this.subscriptions.add(
@@ -134,14 +132,14 @@ export class AnomaliaInfoService {
       label += coord;
 
       if (index < globals.length - 1) {
-        label += this.plantaService.getGlobalsConector(planta);
+        label += this.getGlobalsConector(planta);
       }
     });
 
     return label;
   }
 
-  getLocalizacionCompleteLabel(anomalia: Anomalia, planta: PlantaInterface, tipoSeguidor?: TipoSeguidor) {
+  getLocalizacionCompleteLabel(anomalia: Anomalia, planta: PlantaInterface) {
     let label = '';
 
     const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
@@ -156,12 +154,12 @@ export class AnomaliaInfoService {
       }
     });
 
-    const numModulo = this.plantaService.getNumeroModulo(anomalia, 'anomalia', planta);
+    const numModulo = this.getNumeroModulo(anomalia, planta, 'anomalia');
     if (numModulo !== undefined) {
       if (!isNaN(Number(numModulo))) {
         label += `${this.translation.t('Nº módulo')}: ${numModulo}`;
       } else {
-        const altura = this.anomaliaService.getAlturaAnom(anomalia, planta, tipoSeguidor);
+        const altura = this.getAlturaAnom(anomalia, planta);
         label += `${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${anomalia.localX}`;
       }
     }
@@ -190,6 +188,25 @@ export class AnomaliaInfoService {
     }
   }
 
+  getAlturaAnom(anomalia: Anomalia, planta: PlantaInterface): number {
+    let localY = anomalia.localY;
+    if (planta.alturaBajaPrimero) {
+      if (planta.tipo === 'seguidores' && anomalia.hasOwnProperty('tipoSeguidor')) {
+        // si se cuenta por filas la altura es el nº de filas
+        let altura = anomalia.tipoSeguidor.numModulos.length;
+        // si se cuenta por columnas entonces la altura es idependiente por columna
+        if (!anomalia.tipoSeguidor.tipoFila) {
+          altura = anomalia.tipoSeguidor.numModulos[anomalia.localX - 1];
+        }
+        localY = altura - localY + 1;
+      } else if (planta.tipo !== 'seguidores') {
+        // para fijas la altura se basa en el nº de filas de la planta
+        localY = planta.filas - localY + 1;
+      }
+    }
+    return localY;
+  }
+
   getPerdidasColor(perdidas: number): string {
     if (perdidas < 0.3) {
       return COLOR.colores_severity[0];
@@ -198,6 +215,128 @@ export class AnomaliaInfoService {
     } else {
       return COLOR.colores_severity[2];
     }
+  }
+
+  getNumeroModulo(elem: PcInterface | Anomalia, planta: PlantaInterface, type?: string): string {
+    let localX = (elem as PcInterface).local_x;
+    let localY = (elem as PcInterface).local_y;
+    if (type === 'anomalia') {
+      localX = (elem as Anomalia).localX;
+      localY = (elem as Anomalia).localY;
+    }
+
+    const altura = this.getAlturaAnom(elem as Anomalia, planta);
+
+    if (
+      planta.hasOwnProperty('etiquetasLocalXY') &&
+      planta.etiquetasLocalXY[altura] !== undefined &&
+      planta.etiquetasLocalXY[altura][localX - 1] !== undefined
+    ) {
+      return planta.etiquetasLocalXY[altura][localX - 1];
+    }
+
+    return this.getEtiquetaLocalX(planta, elem, type).concat('/').concat(this.getEtiquetaLocalY(planta, elem, type));
+  }
+
+  getEtiquetaLocalX(planta: PlantaInterface, elem: PcInterface | Anomalia, type?: string): string {
+    let localX = (elem as PcInterface).local_x;
+    if (type === 'anomalia') {
+      localX = (elem as Anomalia).localX;
+    }
+
+    if (localX <= 0) {
+      return GLOBAL.stringParaDesconocido;
+    }
+    if (planta.hasOwnProperty('etiquetasLocalX')) {
+      const newLocalX = localX > planta.etiquetasLocalX.length ? planta.etiquetasLocalX.length : localX;
+      return planta.etiquetasLocalX[newLocalX - 1];
+    }
+    return localX.toString();
+  }
+
+  getEtiquetaLocalY(planta: PlantaInterface, elem: PcInterface | Anomalia, type?: string): string {
+    let localY = (elem as PcInterface).local_y;
+    if (type === 'anomalia') {
+      localY = (elem as Anomalia).localY;
+    }
+
+    if (localY <= 0) {
+      return GLOBAL.stringParaDesconocido;
+    }
+    if (planta.hasOwnProperty('etiquetasLocalY')) {
+      const newLocalY = localY > planta.etiquetasLocalY.length ? planta.etiquetasLocalY.length : localY;
+      if (planta.alturaBajaPrimero) {
+        return planta.etiquetasLocalY[newLocalY - 1];
+      }
+      return planta.etiquetasLocalY[planta.etiquetasLocalY.length - newLocalY];
+    }
+    return this.getAlturaAnom(elem as Anomalia, planta).toString();
+  }
+
+  getEtiquetaGlobals(pc: PcInterface, planta: PlantaInterface): string {
+    let nombreEtiqueta = '';
+    if (pc.hasOwnProperty('global_x') && !Number.isNaN(pc.global_x) && pc.global_x !== null) {
+      nombreEtiqueta = nombreEtiqueta.concat(pc.global_x.toString());
+    }
+    if (pc.hasOwnProperty('global_y') && !Number.isNaN(pc.global_y) && pc.global_y !== null) {
+      if (nombreEtiqueta.length > 0) {
+        nombreEtiqueta = nombreEtiqueta.concat(this.getGlobalsConector(planta));
+      }
+      nombreEtiqueta = nombreEtiqueta.concat(pc.global_y.toString());
+    }
+    return nombreEtiqueta;
+  }
+
+  getGlobalsConector(planta: PlantaInterface): string {
+    if (planta.hasOwnProperty('stringConectorGlobals')) {
+      return planta.stringConectorGlobals;
+    }
+
+    return GLOBAL.stringConectorGlobalsDefault;
+  }
+
+  getNombreColsGlobal(planta: PlantaInterface) {
+    let nombreCol = this.getNombreGlobalX(planta);
+    if (nombreCol.length > 0) {
+      nombreCol = nombreCol.concat(this.getGlobalsConector(planta));
+    }
+    nombreCol = nombreCol.concat(this.getNombreGlobalY(planta));
+
+    return nombreCol;
+  }
+
+  getNombreGlobalX(planta: PlantaInterface): string {
+    if (planta.tipo !== '2 ejes') {
+      if (planta.hasOwnProperty('nombreGlobalX')) {
+        return planta.nombreGlobalX;
+      }
+      return GLOBAL.nombreGlobalXFija;
+    }
+    return '';
+  }
+
+  getNombreGlobalY(planta: PlantaInterface): string {
+    if (planta.tipo !== '2 ejes') {
+      if (planta.hasOwnProperty('nombreGlobalY')) {
+        return planta.nombreGlobalY;
+      }
+      return GLOBAL.nombreGlobalYFija;
+    }
+    return '';
+  }
+
+  getNombreLocalX(planta: PlantaInterface): string {
+    if (planta.hasOwnProperty('nombreLocalX')) {
+      return planta.nombreLocalX;
+    }
+    return GLOBAL.nombreLocalXFija;
+  }
+
+  getNombreLocalY(planta: PlantaInterface): string {
+    if (planta.hasOwnProperty('nombreLocalY')) {
+      return planta.nombreLocalY;
+    }
+    return GLOBAL.nombreLocalYFija;
   }
 
   resetService() {

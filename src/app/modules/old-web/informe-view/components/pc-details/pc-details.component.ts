@@ -1,19 +1,26 @@
 import { Component, OnInit, Input, OnChanges } from '@angular/core';
 
-import { GLOBAL } from '@data/constants/global';
-import { AngularFireStorage } from '@angular/fire/storage';
-import 'fabric';
 import { MatDialog } from '@angular/material/dialog';
 
+import { AngularFireStorage } from '@angular/fire/storage';
+
 import { take } from 'rxjs/operators';
+
+import 'fabric';
+declare let fabric;
+
+import { PlantaService } from '@data/services/planta.service';
+import { PcService } from '@data/services/pc.service';
+import { SeguidorService } from '@data/services/seguidor.service';
+
 import { PcInterface } from '@core/models/pc';
 import { InformeInterface } from '@core//models/informe';
 import { PlantaInterface } from '@core/models/planta';
-import { PlantaService } from '@data/services/planta.service';
-import { PcService } from '@data/services/pc.service';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
+
 import { PcDetailsDialogComponent } from '../../../informe-view/components/pc-details-dialog/pc-details-dialog.component';
 
-declare let fabric;
+import { GLOBAL } from '@data/constants/global';
 
 @Component({
   selector: 'app-pc-details',
@@ -44,7 +51,9 @@ export class PcDetailsComponent implements OnInit, OnChanges {
     private storage: AngularFireStorage,
     public dialog: MatDialog,
     public plantaService: PlantaService,
-    public pcService: PcService
+    public pcService: PcService,
+    public anomaliaInfoService: AnomaliaInfoService,
+    public seguidorService: SeguidorService
   ) {}
 
   ngOnInit() {

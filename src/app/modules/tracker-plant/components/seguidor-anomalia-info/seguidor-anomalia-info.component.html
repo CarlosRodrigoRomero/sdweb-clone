@@ -61,7 +61,7 @@
       <div class="line-content">
         <div class="line-sub-content">
           <span>Fila:</span>
-          <span *ngIf="!isAdmin"
+          <span
             ><b>{{ anomaliaInfo.fila }}</b></span
           >
           <input
@@ -69,13 +69,13 @@
             class="imput"
             matInput
             type="number"
-            [value]="anomaliaInfo.fila"
+            [value]="anomaliaSelected.localY"
             (change)="updateAnomalia($event.target.value, 'local_y')"
           />
         </div>
         <div class="line-sub-content">
           <span>Columna:</span>
-          <span *ngIf="!isAdmin"
+          <span
             ><b>{{ anomaliaInfo.columna }}</b></span
           >
           <input
@@ -83,7 +83,7 @@
             class="imput"
             matInput
             type="number"
-            [value]="anomaliaInfo.columna"
+            [value]="anomaliaSelected.localX"
             (change)="updateAnomalia($event.target.value, 'local_x')"
           />
         </div>
