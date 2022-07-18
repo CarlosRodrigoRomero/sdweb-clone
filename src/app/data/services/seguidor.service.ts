@@ -18,6 +18,7 @@ import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 
 import { COLOR } from '@data/constants/color';
+import { TipoSeguidor } from '@core/models/tipoSeguidor';
 
 @Injectable({
   providedIn: 'root',
@@ -123,12 +124,13 @@ export class SeguidorService {
               }
 
               const zonaTipoSeguidor = this.getZonaTipoSeguidor(areaSeg);
-
+              let tipoSeguidor: TipoSeguidor;
               if (zonaTipoSeguidor !== undefined) {
-                anomaliasSeguidor.map((anom) => {
-                  anom.localY = this.anomaliaService.getAlturaAnom(anom, this.planta, zonaTipoSeguidor.tipoSeguidor);
-                  return anom;
-                });
+                tipoSeguidor = zonaTipoSeguidor.tipoSeguidor;
+                // anomaliasSeguidor.map((anom) => {
+                //   anom.localY = this.anomaliaService.getAlturaAnom(anom, this.planta, zonaTipoSeguidor.tipoSeguidor);
+                //   return anom;
+                // });
               }
 
               const seguidor = new Seguidor(
@@ -143,6 +145,11 @@ export class SeguidorService {
                 'seguidor_' + count++ + '_' + informeId
               );
               seguidor.nombre = this.getSeguidorName(seguidor);
+
+              // si existe le añadimos el tipo seguidor
+              if (tipoSeguidor !== undefined) {
+                seguidor.tipoSeguidor = tipoSeguidor;
+              }
 
               // guardamos el nombre del seguidor en cada anomalia
               anomaliasSeguidor.forEach((anom) => (anom.nombreSeguidor = seguidor.nombre));

@@ -17,6 +17,7 @@ import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 
 import { COLOR } from '@data/constants/color';
+import { TipoSeguidor } from '@core/models/tipoSeguidor';
 
 @Injectable({
   providedIn: 'root',
@@ -140,7 +141,7 @@ export class AnomaliaInfoService {
     return label;
   }
 
-  getLocalizacionCompleteLabel(anomalia: Anomalia, planta: PlantaInterface) {
+  getLocalizacionCompleteLabel(anomalia: Anomalia, planta: PlantaInterface, tipoSeguidor?: TipoSeguidor) {
     let label = '';
 
     const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
@@ -160,7 +161,7 @@ export class AnomaliaInfoService {
       if (!isNaN(Number(numModulo))) {
         label += `${this.translation.t('Nº módulo')}: ${numModulo}`;
       } else {
-        const altura = this.getAltura(anomalia.localY, planta);
+        const altura = this.anomaliaService.getAlturaAnom(anomalia, planta, tipoSeguidor);
         label += `${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${anomalia.localX}`;
       }
     }
