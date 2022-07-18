@@ -24,6 +24,7 @@ import { PcInterface } from '@core/models/pc';
 import { FilterableElement } from '@core/models/filterableInterface';
 
 import { Translation } from '@shared/utils/translations/translations';
+import { TipoSeguidor } from '@core/models/tipoSeguidor';
 
 interface Fila {
   // localId?: string;
@@ -282,13 +283,24 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       row.localizacion = anomalia.nombreSeguidor;
     }
 
-    row.localY = this.anomaliaInfoService.getAltura(anomalia.localY, this.planta);
-    row.localX = anomalia.localX;
+    let seguidor: Seguidor;
+    if (!this.reportControlService.plantaFija) {
+      seguidor = (this.allElems as Seguidor[]).find((seg) => seg.nombre === anomalia.nombreSeguidor);
+    }
 
-    if (this.reportControlService.plantaFija) {
+    let tipoSeguidor: TipoSeguidor;
+    if (seguidor === undefined) {
+      row.localY = this.anomaliaService.getAlturaAnom(anomalia, this.planta, tipoSeguidor);
+      row.localX = anomalia.localX;
+
       row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(this.olMapService.getCentroid(anomalia.featureCoords));
     } else {
-      const seguidor = (this.allElems as Seguidor[]).find((seguidor) => seguidor.nombre === anomalia.nombreSeguidor);
+      if (seguidor.hasOwnProperty('tipoSeguidor')) {
+        tipoSeguidor = seguidor.tipoSeguidor;
+      }
+
+      row.localY = this.anomaliaService.getAlturaAnom(anomalia, this.planta, tipoSeguidor);
+      row.localX = anomalia.localX;
 
       row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(this.olMapService.getCentroid(seguidor.featureCoords));
     }
