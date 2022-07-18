@@ -12,6 +12,8 @@ import { OlMapService } from './ol-map.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { PlantaInterface } from '@core/models/planta';
+import Polygon from 'ol/geom/Polygon';
+import { Coordinate } from 'ol/coordinate';
 
 @Injectable({
   providedIn: 'root',
@@ -243,6 +245,17 @@ export class ZonesService {
     }
   }
 
+  isZoneInsideLargestZone(zone: LocationAreaInterface, largestZone: LocationAreaInterface): boolean {
+    const coordsLargestZone = this.olMapService.pathToCoordinate(largestZone.path);
+    const polygonLargestZone = new Polygon([coordsLargestZone]);
+
+    const coordsZone = this.olMapService.pathToCoordinate(zone.path);
+    const centroidZone = this.olMapService.getCentroid(coordsZone);
+
+    // comprobamos si esta dentro de la largestZone
+    return polygonLargestZone.intersectsCoordinate(centroidZone);
+  }
+
   private getLocAreaCentroid(locArea: LocationAreaInterface): number[] {
     let sumLong = 0;
     let sumLat = 0;
@@ -251,6 +264,7 @@ export class ZonesService {
       sumLat += coord.lat;
     });
 
+    // devuelve el centroide en formato [lat, lng]
     return [sumLat / locArea.path.length, sumLong / locArea.path.length];
   }
 

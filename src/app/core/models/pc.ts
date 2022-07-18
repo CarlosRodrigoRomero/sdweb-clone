@@ -1,7 +1,9 @@
 import { Observable } from 'rxjs';
-import { ModuloInterface } from './modulo';
-import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
+
 import { LatLngLiteral } from '@agm/core';
+
+import { ModuloInterface } from '@core/models/modulo';
+import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
 
 export interface PcInterface {
   id?: string;

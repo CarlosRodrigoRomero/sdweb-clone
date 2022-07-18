@@ -27,7 +27,8 @@ export class SeguidorService {
   numGlobalCoords: number;
   public zones: LocationAreaInterface[] = [];
   private locAreaSeguidores: LocationAreaInterface[] = [];
-  private locAreaModulos: LocationAreaInterface[] = [];
+  private locAreasModulo: LocationAreaInterface[] = [];
+  private locAreasTipoSeguidor: LocationAreaInterface[] = [];
 
   constructor(
     public afs: AngularFirestore,
@@ -79,25 +80,25 @@ export class SeguidorService {
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
           let count = 0;
 
-          this.locAreaSeguidores.forEach((locArea) => {
+          this.locAreaSeguidores.forEach((areaSeg) => {
             let anomaliasSeguidor: Anomalia[] = [];
             if (sortedAnoms !== null) {
               const anomsLargestLocArea = sortedAnoms[0].find(
-                (array) => (array[0] as Anomalia).globalCoords[0] === locArea.globalCoords[0]
+                (array) => (array[0] as Anomalia).globalCoords[0] === areaSeg.globalCoords[0]
               );
 
               if (anomsLargestLocArea !== undefined) {
                 anomaliasSeguidor = anomsLargestLocArea.filter(
                   (anomalia) =>
                     anomalia.globalCoords.slice(0, this.numGlobalCoords).toString() ===
-                    locArea.globalCoords.slice(0, this.numGlobalCoords).toString()
+                    areaSeg.globalCoords.slice(0, this.numGlobalCoords).toString()
                 );
               }
             } else {
               anomaliasSeguidor = anomaliaList.filter(
                 (anomalia) =>
                   anomalia.globalCoords.slice(0, this.numGlobalCoords).toString() ===
-                  locArea.globalCoords.slice(0, this.numGlobalCoords).toString()
+                  areaSeg.globalCoords.slice(0, this.numGlobalCoords).toString()
               );
             }
 
@@ -106,13 +107,13 @@ export class SeguidorService {
               // ordenamos las anomalias por tipo
               anomaliasSeguidor = this.anomaliaService.sortAnomsByTipo(anomaliasSeguidor);
 
-              const zona = this.locAreaModulos
+              const zonaModulo = this.locAreasModulo
                 // tslint:disable-next-line: triple-equals
-                .find((locA) => locA.globalCoords[0] == locArea.globalCoords[0]);
+                .find((locA) => locA.globalCoords[0] == areaSeg.globalCoords[0]);
 
               let modulo;
-              if (zona !== undefined) {
-                modulo = zona.modulo;
+              if (zonaModulo !== undefined) {
+                modulo = zonaModulo.modulo;
               } else {
                 const anomaliaConModulo = anomaliasSeguidor.find(
                   (anom) => anom.modulo !== null && anom.modulo !== undefined
@@ -121,19 +122,27 @@ export class SeguidorService {
                 // modulo = this.getSeguidorModule(locAreaList);
               }
 
+              const zonaTipoSeguidor = this.getZonaTipoSeguidor(areaSeg);
+
+              if (zonaTipoSeguidor !== undefined) {
+                anomaliasSeguidor.map((anom) => {
+                  anom.localY = this.anomaliaService.getAlturaAnom(anom, this.planta, zonaTipoSeguidor.tipoSeguidor);
+                  return anom;
+                });
+              }
+
               const seguidor = new Seguidor(
                 anomaliasSeguidor,
                 this.planta.filas,
                 this.planta.columnas,
-                locArea.path,
+                areaSeg.path,
                 plantaId,
                 informeId,
                 modulo,
-                locArea.globalCoords,
+                areaSeg.globalCoords,
                 'seguidor_' + count++ + '_' + informeId
               );
               seguidor.nombre = this.getSeguidorName(seguidor);
-              // seguidor.imageName = this.getImageName(seguidor, informe);
 
               // guardamos el nombre del seguidor en cada anomalia
               anomaliasSeguidor.forEach((anom) => (anom.nombreSeguidor = seguidor.nombre));
@@ -154,7 +163,10 @@ export class SeguidorService {
     this.zones = this.zonesService.zones;
 
     // guardamos las zonas con módulos
-    this.locAreaModulos = locAreas.filter((locArea) => locArea.modulo !== undefined);
+    this.locAreasModulo = locAreas.filter((locArea) => locArea.modulo !== undefined);
+
+    // guardamos las zonas con tipoSeguidor
+    this.locAreasTipoSeguidor = locAreas.filter((locArea) => locArea.tipoSeguidor !== undefined);
 
     // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
     const indiceSeleccionado = this.zonesService.getIndexNotNull(locAreas);
@@ -166,6 +178,14 @@ export class SeguidorService {
         locArea.globalCoords = this.getCompleteGlobalCoords(this.zones, locArea);
       });
     }
+  }
+
+  private getZonaTipoSeguidor(zonaSeg: LocationAreaInterface) {
+    const zonaTipoSeguidor = this.locAreasTipoSeguidor.find((locA) =>
+      this.zonesService.isZoneInsideLargestZone(zonaSeg, locA)
+    );
+
+    return zonaTipoSeguidor;
   }
 
   private sortAnomList(anoms: Anomalia[]): any[][] {

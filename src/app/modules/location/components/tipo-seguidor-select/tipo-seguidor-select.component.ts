@@ -1,20 +1,19 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
-import { take } from 'rxjs/operators';
 
 import { TipoSeguidorService } from '@data/services/tipo-seguidor.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { TipoSeguidor } from '@core/models/tipoSeguidor';
 import { MatSelectChange } from '@angular/material/select';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-tipo-seguidor-select',
   templateUrl: './tipo-seguidor-select.component.html',
   styleUrls: ['./tipo-seguidor-select.component.css'],
 })
-export class TipoSeguidorSelectComponent implements OnInit {
+export class TipoSeguidorSelectComponent implements OnInit, OnDestroy {
   @Input() selectedLocationArea: LocationAreaInterface;
   @Output() locAreaUpdated = new EventEmitter<LocationAreaInterface>();
 
@@ -22,13 +21,14 @@ export class TipoSeguidorSelectComponent implements OnInit {
   tipoFila = true;
   form: FormGroup;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(private tipoSeguidorService: TipoSeguidorService, private formBuilder: FormBuilder) {}
 
   ngOnInit(): void {
-    this.tipoSeguidorService
-      .getTiposSeguidor()
-      .pipe(take(1))
-      .subscribe((tipos) => (this.tiposSeguidor = tipos));
+    this.subscriptions.add(
+      this.tipoSeguidorService.getTiposSeguidor().subscribe((tipos) => (this.tiposSeguidor = tipos))
+    );
 
     this.buildForm();
   }
@@ -43,8 +43,9 @@ export class TipoSeguidorSelectComponent implements OnInit {
   onSubmit(event: Event) {
     event.preventDefault();
     if (this.form.valid) {
+      const nombre = this.getRightName(this.form.value.nombre, this.form.value.tipoFila);
       const tipoSeguidor: TipoSeguidor = {
-        nombre: this.form.value.nombre,
+        nombre,
         tipoFila: this.form.value.tipoFila,
         numModulos: this.getNumModulos(this.form.value.nombre),
       };
@@ -57,6 +58,14 @@ export class TipoSeguidorSelectComponent implements OnInit {
   private getNumModulos(nombre: string): number[] {
     const numModulos = nombre.split('.').map((num) => Number(num));
     return numModulos;
+  }
+
+  private getRightName(nombre: string, tipoFila: boolean): string {
+    if (tipoFila) {
+      return 'fila_' + nombre;
+    } else {
+      return 'columna_' + nombre;
+    }
   }
 
   updateTipoSeguidor(event: MatSelectChange) {
@@ -72,5 +81,9 @@ export class TipoSeguidorSelectComponent implements OnInit {
 
   stopPropagation(event) {
     event.stopPropagation();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

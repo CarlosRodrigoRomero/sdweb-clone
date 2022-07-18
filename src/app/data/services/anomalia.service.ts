@@ -23,6 +23,7 @@ import { LocationAreaInterface } from '@core/models/location';
 import { ModuloInterface } from '@core/models/modulo';
 
 import { GLOBAL } from '@data/constants/global';
+import { TipoSeguidor } from '@core/models/tipoSeguidor';
 
 @Injectable({
   providedIn: 'root',
@@ -162,8 +163,8 @@ export class AnomaliaService {
               }
             }
             if (tipo === 'pcs') {
-              data.localX = (data as PcInterface).local_x;
-              data.localY = (data as PcInterface).local_y;
+              data.localX = Number((data as PcInterface).local_x);
+              data.localY = Number((data as PcInterface).local_y);
               if (data.globalCoords === undefined) {
                 data.globalCoords = [];
 
@@ -215,6 +216,25 @@ export class AnomaliaService {
     realAnomalias = realAnomalias.filter((anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo));
 
     return realAnomalias;
+  }
+
+  getAlturaAnom(anomalia: Anomalia, planta: PlantaInterface, tipoSeguidor?: TipoSeguidor): number {
+    let localY = anomalia.localY;
+    if (planta.alturaBajaPrimero) {
+      if (planta.tipo === 'seguidores' && tipoSeguidor) {
+        // si se cuenta por filas la altura es el nº de filas
+        let altura = tipoSeguidor.numModulos.length;
+        // si se cuenta por columnas entonces la altura es idependiente por columna
+        if (!tipoSeguidor.tipoFila) {
+          altura = tipoSeguidor.numModulos[anomalia.localX - 1];
+        }
+        localY = altura - localY + 1;
+      } else if (planta.tipo !== 'seguidores') {
+        // para fijas la altura se basa en el nº de filas de la planta
+        localY = planta.filas - localY + 1;
+      }
+    }
+    return localY;
   }
 
   private getRightDatetime(datetime: number) {
