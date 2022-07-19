@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { WINDOW } from '../../window.providers';
 
 import { BehaviorSubject, from } from 'rxjs';
-import { flatMap, switchMap, take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import { FilterService } from '@data/services/filter.service';
 import { ShareReportService } from '@data/services/share-report.service';
@@ -625,6 +625,7 @@ export class ReportControlService {
     this.informesIdList = [];
     this.initialized = false;
     this.mapLoaded = false;
+    this.allAnomalias = [];
     this.allFilterableElements = [];
     this.plantaFija = undefined;
     this.noAnomsReport = false;
