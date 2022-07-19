@@ -5,17 +5,18 @@ import { take } from 'rxjs/operators';
 
 import inside from 'point-in-polygon';
 
+import { Coordinate } from 'ol/coordinate';
+import { fromLonLat } from 'ol/proj';
+
+import { LatLngLiteral } from '@agm/core';
+
 import { PlantaService } from '@data/services/planta.service';
 import { OlMapService } from './ol-map.service';
-import { AnomaliaInfoService } from './anomalia-info.service';
 
 import { FilterableElement } from '@core/models/filterableInterface';
 import { PlantaInterface } from '@core/models/planta';
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
-import { LatLngLiteral } from '@agm/core';
-import { Coordinate } from 'ol/coordinate';
-import { fromLonLat } from 'ol/proj';
 
 @Injectable({
   providedIn: 'root',
@@ -41,11 +42,7 @@ export class DownloadReportService {
   private _simplePDF = true;
   simplePDF$ = new BehaviorSubject<boolean>(this._simplePDF);
 
-  constructor(
-    private plantaService: PlantaService,
-    private olMapService: OlMapService,
-    private anomaliaInfoService: AnomaliaInfoService
-  ) {}
+  constructor(private plantaService: PlantaService, private olMapService: OlMapService) {}
 
   sortByPosition(a: FilterableElement, b: FilterableElement): number {
     if (this.sortByGlobalCoords(a, b) !== 0) {
@@ -93,8 +90,7 @@ export class DownloadReportService {
     return value;
   }
 
-  getPositionModulo(planta: PlantaInterface, anomalia: Anomalia): string {
-    const altura = this.anomaliaInfoService.getAlturaAnom(anomalia, planta);
+  getPositionModulo(planta: PlantaInterface, anomalia: Anomalia, altura: number): string {
     if (
       planta.hasOwnProperty('etiquetasLocalXY') &&
       planta.etiquetasLocalXY[altura] !== undefined &&
@@ -103,19 +99,6 @@ export class DownloadReportService {
       return planta.etiquetasLocalXY[altura][anomalia.localX - 1];
     } else {
       return (altura + '/' + anomalia.localX).toString();
-    }
-  }
-
-  getAltura(planta: PlantaInterface, localY: number) {
-    // Por defecto, la altura alta es la numero 1
-    if (planta.tipo !== 'seguidores' && planta.alturaBajaPrimero) {
-      let altura = planta.filas - (localY - 1);
-      if (altura < 1) {
-        altura = 1;
-      }
-      return altura;
-    } else {
-      return localY;
     }
   }
 

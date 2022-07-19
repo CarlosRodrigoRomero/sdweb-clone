@@ -271,7 +271,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     row.gradienteNormalizado = Number(this.decimalPipe.transform(anomalia.gradienteNormalizado, '1.2-2'));
     row.tipo = this.anomaliaInfoService.getTipoLabel(anomalia);
     row.clase = anomalia.clase;
-    row.criticidad = this.anomaliaInfoService.getCriticidadLabel(anomalia);
+    row.criticidad = this.anomaliaInfoService.getCriticidadLabel(anomalia, this.anomaliaService.criterioCriticidad);
 
     if (this.reportControlService.plantaFija) {
       row.localizacion = this.anomaliaInfoService.getLocalizacionReducLabel(anomalia, this.planta);

@@ -5,8 +5,6 @@ import { Subscription } from 'rxjs';
 
 import proj4 from 'proj4';
 
-import { AnomaliaService } from '@data/services/anomalia.service';
-import { GLOBAL } from '@data/constants/global';
 import { DownloadReportService } from './download-report.service';
 
 import { Translation } from '@shared/utils/translations/translations';
@@ -15,8 +13,11 @@ import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 
-import { COLOR } from '@data/constants/color';
 import { PcInterface } from '@core/models/pc';
+import { CritCriticidad } from '@core/models/critCriticidad';
+
+import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
 
 @Injectable({
   providedIn: 'root',
@@ -27,11 +28,7 @@ export class AnomaliaInfoService {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(
-    @Inject(LOCALE_ID) public locale: string,
-    private anomaliaService: AnomaliaService,
-    private downloadReportService: DownloadReportService
-  ) {
+  constructor(@Inject(LOCALE_ID) public locale: string, private downloadReportService: DownloadReportService) {
     this.subscriptions.add(
       this.downloadReportService.englishLang$.subscribe((lang) => {
         if (lang) {
@@ -56,8 +53,8 @@ export class AnomaliaInfoService {
     return this.translation.t(GLOBAL.pcRecomendacion[anomalia.tipo]);
   }
 
-  getCriticidadLabel(anomalia: Anomalia): string {
-    return this.translation.t(this.anomaliaService.criterioCriticidad.labels[anomalia.criticidad]);
+  getCriticidadLabel(anomalia: Anomalia, criterio: CritCriticidad): string {
+    return this.translation.t(criterio.labels[anomalia.criticidad]);
   }
 
   getClaseLabel(anomalia: Anomalia): string {

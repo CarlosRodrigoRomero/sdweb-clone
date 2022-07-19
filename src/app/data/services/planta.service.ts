@@ -11,10 +11,11 @@ import { Coordinate } from 'ol/coordinate';
 
 import { LatLngLiteral } from '@agm/core/map-types';
 
+declare const google: any;
+
 import { AuthService } from '@data/services/auth.service';
 import { GLOBAL } from '@data/constants/global';
 import { OlMapService } from '@data/services/ol-map.service';
-import { AnomaliaInfoService } from './anomalia-info.service';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { PlantaInterface } from '@core/models/planta';
@@ -22,12 +23,8 @@ import { CriteriosClasificacion } from '@core/models/criteriosClasificacion';
 import { LocationAreaInterface } from '@core/models/location';
 import { UserInterface } from '@core/models/user';
 import { ModuloInterface } from '@core/models/modulo';
-import { PcInterface } from '@core/models/pc';
 import { UserAreaInterface } from '@core/models/userArea';
 import { CritCriticidad } from '@core/models/critCriticidad';
-import { Anomalia } from '@core/models/anomalia';
-
-declare const google: any;
 
 @Injectable({
   providedIn: 'root',
@@ -50,8 +47,7 @@ export class PlantaService {
     private afs: AngularFirestore,
     public auth: AuthService,
     private activatedRoute: ActivatedRoute,
-    private olMapService: OlMapService,
-    private anomaliaInfoService: AnomaliaInfoService
+    private olMapService: OlMapService
   ) {
     this.currentPlantId = this.activatedRoute.snapshot.paramMap.get('id');
     this.currentPlantId$.next(this.currentPlantId);
@@ -300,19 +296,6 @@ export class PlantaService {
         })
       )
     );
-  }
-
-  getAltura(planta: PlantaInterface, localY: number) {
-    // Por defecto, la altura alta es la numero 1
-    if (planta.tipo !== 'seguidores' && planta.alturaBajaPrimero) {
-      let altura = planta.filas - (localY - 1);
-      if (altura < 1) {
-        altura = 1;
-      }
-      return altura;
-    } else {
-      return localY;
-    }
   }
 
   getGlobalCoordsColumns(planta: PlantaInterface, columnsToDisplay: string[]): string[] {

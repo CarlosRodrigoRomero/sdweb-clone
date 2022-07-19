@@ -2856,7 +2856,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
               style: 'anomInfoTitle',
             },
             {
-              text: this.anomaliaInfoService.getCriticidadLabel(anom),
+              text: this.anomaliaInfoService.getCriticidadLabel(anom, this.anomaliaService.criterioCriticidad),
               style: 'anomInfoValue',
             },
           ],
@@ -3683,7 +3683,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         .concat(' ')
         .concat(this.datePipe.transform(anomalia.datetime * 1000, 'HH:mm:ss'));
     } else if (columnaNombre === 'local_xy') {
-      return this.downloadReportService.getPositionModulo(this.planta, anomalia).toString();
+      const altura = this.anomaliaInfoService.getAlturaAnom(anomalia, this.planta);
+      return this.downloadReportService.getPositionModulo(this.planta, anomalia, altura).toString();
     } else if (columnaNombre === 'severidad') {
       return anomalia.clase.toString();
     } else if (columnaNombre === 'criticidad') {
