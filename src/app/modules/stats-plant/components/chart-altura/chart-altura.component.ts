@@ -7,7 +7,6 @@ import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent, ApexYAx
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { InformeService } from '@data/services/informe.service';
-import { AnomaliaService } from '@data/services/anomalia.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
@@ -117,7 +116,6 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
     private reportControlService: ReportControlService,
     private informeService: InformeService,
     private decimalPipe: DecimalPipe,
-    private anomaliaService: AnomaliaService,
     private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
@@ -136,7 +134,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
 
         if (this.allCC.length > 0) {
           const series = [];
-          if (this.planta.tipo !== 'seguidores' && this.planta.alturaBajaPrimero) {
+          if (this.planta.alturaBajaPrimero) {
             for (let index = 1; index <= alturaMax; index++) {
               const row = {
                 name: index.toString(),

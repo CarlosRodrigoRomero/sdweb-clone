@@ -3758,30 +3758,52 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const arrayHeader = [];
     arrayHeader.push({});
 
-    for (const i of this.arrayColumnas) {
+    for (const col of this.arrayColumnas) {
       arrayHeader.push({
-        text: i.toString(),
+        text: col.toString(),
         style: 'tableHeaderBlue',
       });
     }
 
     array.push(arrayHeader);
 
-    for (const j of this.arrayFilas) {
-      const arrayFila = [];
-      arrayFila.push({
-        text: this.anomaliaInfoService.getAltura(j, this.planta).toString(),
-        style: 'tableHeaderBlue',
-      });
-      const countPosicionFila = this.countPosicion[j - 1];
-      for (const i of this.arrayColumnas) {
+    if (this.planta.alturaBajaPrimero) {
+      for (let index = this.arrayFilas.length - 1; index >= 0; index--) {
+        const fila = this.arrayFilas[index];
+        const arrayFila = [];
         arrayFila.push({
-          text: countPosicionFila[i - 1].toString(),
-          style: 'tableCell',
+          text: fila.toString(),
+          style: 'tableHeaderBlue',
         });
-      }
+        const filaCorrecta = this.arrayFilas.length - fila + 1;
+        const countPosicionFila = this.countPosicion[filaCorrecta - 1];
+        for (const col of this.arrayColumnas) {
+          arrayFila.push({
+            text: countPosicionFila[col - 1].toString(),
+            style: 'tableCell',
+          });
+        }
 
-      array.push(arrayFila);
+        array.push(arrayFila);
+      }
+    } else {
+      for (let index = 1; index < this.arrayFilas.length; index++) {
+        const fila = this.arrayFilas[index];
+        const arrayFila = [];
+        arrayFila.push({
+          text: fila.toString(),
+          style: 'tableHeaderBlue',
+        });
+        const countPosicionFila = this.countPosicion[fila - 1];
+        for (const col of this.arrayColumnas) {
+          arrayFila.push({
+            text: countPosicionFila[col - 1].toString(),
+            style: 'tableCell',
+          });
+        }
+
+        array.push(arrayFila);
+      }
     }
 
     return array;
