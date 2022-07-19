@@ -1258,7 +1258,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private drawAllPcsInCanvas(pcs: PcInterface[], canvas, vistaPrevia: boolean = false, scale = 1, top0 = 0, left0 = 0) {
     let contadorPcs = 0;
     if (pcs.length > 0) {
-      pcs.forEach((pc, i, a) => {
+      pcs.forEach((pc) => {
         contadorPcs++;
         this.drawAnomalia(pc, canvas, contadorPcs);
       });
@@ -1307,7 +1307,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       });
     }
 
-    const label = new fabric.Text(contadorPc.toString(), {
+    const label = new fabric.Text(pc.numAnom.toString(), {
       left: pc.img_left,
       top: pc.img_top - 26,
       fontSize: 20,
@@ -3684,7 +3684,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         .concat(this.datePipe.transform(anomalia.datetime * 1000, 'HH:mm:ss'));
     } else if (columnaNombre === 'local_xy') {
       const altura = this.anomaliaInfoService.getAlturaAnom(anomalia, this.planta);
-      return this.downloadReportService.getPositionModulo(this.planta, anomalia, altura).toString();
+      const columna = this.anomaliaInfoService.getColumnaAnom(anomalia, this.planta);
+      return this.downloadReportService.getPositionModulo(this.planta, altura, columna).toString();
     } else if (columnaNombre === 'severidad') {
       return anomalia.clase.toString();
     } else if (columnaNombre === 'criticidad') {
@@ -3758,11 +3759,21 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const arrayHeader = [];
     arrayHeader.push({});
 
-    for (const col of this.arrayColumnas) {
-      arrayHeader.push({
-        text: col.toString(),
-        style: 'tableHeaderBlue',
-      });
+    if (this.planta.hasOwnProperty('columnaDchaPrimero') && this.planta.columnaDchaPrimero) {
+      for (let i = this.arrayColumnas.length - 1; i >= 0; i--) {
+        const columna = this.arrayColumnas[i];
+        arrayHeader.push({
+          text: columna.toString(),
+          style: 'tableHeaderBlue',
+        });
+      }
+    } else {
+      for (const col of this.arrayColumnas) {
+        arrayHeader.push({
+          text: col.toString(),
+          style: 'tableHeaderBlue',
+        });
+      }
     }
 
     array.push(arrayHeader);
@@ -3777,11 +3788,21 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         });
         const filaCorrecta = this.arrayFilas.length - fila + 1;
         const countPosicionFila = this.countPosicion[filaCorrecta - 1];
-        for (const col of this.arrayColumnas) {
-          arrayFila.push({
-            text: countPosicionFila[col - 1].toString(),
-            style: 'tableCell',
-          });
+        if (this.planta.hasOwnProperty('columnaDchaPrimero') && this.planta.columnaDchaPrimero) {
+          for (let i = this.arrayColumnas.length - 1; i >= 0; i--) {
+            const columna = this.arrayColumnas[i];
+            arrayFila.push({
+              text: countPosicionFila[columna - 1].toString(),
+              style: 'tableCell',
+            });
+          }
+        } else {
+          for (const col of this.arrayColumnas) {
+            arrayFila.push({
+              text: countPosicionFila[col - 1].toString(),
+              style: 'tableCell',
+            });
+          }
         }
 
         array.push(arrayFila);

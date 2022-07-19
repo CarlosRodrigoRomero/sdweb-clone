@@ -90,15 +90,15 @@ export class DownloadReportService {
     return value;
   }
 
-  getPositionModulo(planta: PlantaInterface, anomalia: Anomalia, altura: number): string {
+  getPositionModulo(planta: PlantaInterface, altura: number, columna: number): string {
     if (
       planta.hasOwnProperty('etiquetasLocalXY') &&
       planta.etiquetasLocalXY[altura] !== undefined &&
-      planta.etiquetasLocalXY[altura][anomalia.localX - 1] !== undefined
+      planta.etiquetasLocalXY[altura][columna - 1] !== undefined
     ) {
-      return planta.etiquetasLocalXY[altura][anomalia.localX - 1];
+      return planta.etiquetasLocalXY[altura][columna - 1];
     } else {
-      return (altura + '/' + anomalia.localX).toString();
+      return (altura + '/' + columna).toString();
     }
   }
 

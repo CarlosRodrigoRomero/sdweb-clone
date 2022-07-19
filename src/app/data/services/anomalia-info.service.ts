@@ -157,7 +157,8 @@ export class AnomaliaInfoService {
         label += `${this.translation.t('Nº módulo')}: ${numModulo}`;
       } else {
         const altura = this.getAlturaAnom(anomalia, planta);
-        label += `${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${anomalia.localX}`;
+        const columna = this.getColumnaAnom(anomalia, planta);
+        label += `${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`;
       }
     }
 
@@ -202,6 +203,22 @@ export class AnomaliaInfoService {
       }
     }
     return localY;
+  }
+
+  getColumnaAnom(anomalia: Anomalia, planta: PlantaInterface): number {
+    let localX = anomalia.localX;
+    if (planta.hasOwnProperty('columnaDchaPrimero') && planta.columnaDchaPrimero) {
+      if (planta.tipo === 'seguidores' && anomalia.hasOwnProperty('tipoSeguidor')) {
+        // si se cuenta por columnas el nº de columnas es equivalente al array
+        let columnas = anomalia.tipoSeguidor.numModulos.length;
+        // si se cuenta por filas la altura es el nº de filas
+        if (anomalia.tipoSeguidor.tipoFila) {
+          columnas = anomalia.tipoSeguidor.numModulos[anomalia.localY - 1];
+        }
+        localX = columnas - localX + 1;
+      }
+    }
+    return localX;
   }
 
   getPerdidasColor(perdidas: number): string {

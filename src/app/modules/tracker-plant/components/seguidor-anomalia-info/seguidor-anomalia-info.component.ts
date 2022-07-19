@@ -62,7 +62,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
               causa: GLOBAL.pcCausa[this.anomaliaSelected.tipo],
               recomendacion: GLOBAL.pcRecomendacion[this.anomaliaSelected.tipo],
               fila: this.anomaliaInfoService.getAlturaAnom(this.anomaliaSelected, this.reportControlService.planta),
-              columna: this.anomaliaSelected.localX,
+              columna: this.anomaliaInfoService.getColumnaAnom(this.anomaliaSelected, this.reportControlService.planta),
               fecha: this.fixNewTiffDates(this.anomaliaSelected.datetime),
               irradiancia: this.anomaliaSelected.irradiancia,
               // vientoDireccion: this.anomaliaSelected.vientoDireccion,
