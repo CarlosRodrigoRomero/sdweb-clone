@@ -98,7 +98,12 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
             const polygonZone = new Polygon([coordsZone]);
 
             const includedModules = modulos.filter((modulo) => {
-              const centroid = [modulo.centroid_gps_long, modulo.centroid_gps_lat] as Coordinate;
+              let centroid;
+              if (modulo.hasOwnProperty('centroid_gps_long')) {
+                centroid = [modulo.centroid_gps_long, modulo.centroid_gps_lat] as Coordinate;
+              } else {
+                centroid = this.olMapService.getCentroid(modulo.coords);
+              }
               return polygonZone.intersectsCoordinate(centroid);
             });
 
