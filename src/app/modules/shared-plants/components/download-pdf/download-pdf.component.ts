@@ -3787,8 +3787,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         array.push(arrayFila);
       }
     } else {
-      for (let index = 1; index < this.arrayFilas.length; index++) {
-        const fila = this.arrayFilas[index];
+      for (const fila of this.arrayFilas) {
         const arrayFila = [];
         arrayFila.push({
           text: fila.toString(),
