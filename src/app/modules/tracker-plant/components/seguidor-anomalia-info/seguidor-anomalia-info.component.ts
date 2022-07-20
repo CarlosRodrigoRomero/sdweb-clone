@@ -51,7 +51,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
 
           if (this.anomaliaSelected !== undefined) {
             this.anomaliaInfo = {
-              localId: this.anomaliaSelected.localId,
+              numAnom: this.anomaliaSelected.numAnom,
               clase: GLOBAL.labels_clase[this.anomaliaSelected.clase],
               claseColor: COLOR.colores_clase[this.anomaliaSelected.clase],
               temperaturaMax: this.anomaliaSelected.temperaturaMax,

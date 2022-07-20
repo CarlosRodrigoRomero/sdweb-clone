@@ -1,6 +1,6 @@
 <div class="anomalia-info" *ngIf="anomaliaSelected">
   <h5 class="title">
-    Anomalía <b>#{{ anomaliaInfo.localId }}</b>
+    Anomalía <b>{{ anomaliaInfo.numAnom }}</b>
     <span *ngIf="anomaliaInfo.clase !== undefined" [ngStyle]="{ color: anomaliaInfo.claseColor }">
       ({{ anomaliaInfo.clase }})</span
     >
