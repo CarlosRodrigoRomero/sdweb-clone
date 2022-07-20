@@ -48,8 +48,8 @@
 
 app-seguidor-view-toggle {
   position: absolute;
-  right: 132px;
-  top: 472px;
+  right: 254px;
+  top: 15px;
   z-index: 8;
 }
 
@@ -63,7 +63,7 @@ app-seguidor-image-toggle {
 app-seguidor-view-leyenda {
   position: absolute;
   right: 640px;
-  top: 16px;
+  top: 64px;
   z-index: 8;
   transform: translate(100%, 0);
 }
@@ -80,6 +80,26 @@ app-seguidor-image-download {
   z-index: 8;
   right: 15px;
   top: 472px;
+}
+
+app-seguidor-anomalia-info {
+  display: grid;
+  row-gap: 1rem;
+  width: 640px;
+  height: calc(100vh - 684px);
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.slider-temporal {
+  position: absolute;
+  z-index: 8;
+  right: 77px;
+  top: 450px;
+  width: 500px;
+  background: white;
+  padding: 0.5rem 0 0;
+  border-radius: 4px;
 }
 
 .left-content {

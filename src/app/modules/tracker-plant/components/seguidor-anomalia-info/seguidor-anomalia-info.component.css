@@ -2,11 +2,6 @@
   margin-left: 0.5rem;
 }
 
-.info {
-  overflow: auto;
-  max-height: calc(100vh - 788px);
-}
-
 .line-info {
   display: flex;
   margin-top: 0.3rem;
