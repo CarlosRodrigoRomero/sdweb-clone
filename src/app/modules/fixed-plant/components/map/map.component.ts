@@ -7,10 +7,12 @@ import Map from 'ol/Map';
 import OSM from 'ol/source/OSM';
 import { fromLonLat, transformExtent } from 'ol/proj.js';
 import View from 'ol/View';
-import { TileDebug, Vector as VectorSource } from 'ol/source';
+import { TileDebug, TileWMS, Vector as VectorSource, WMTS } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { defaults as defaultControls } from 'ol/control.js';
 import XYZ from 'ol/source/XYZ';
+import { getTopLeft, getWidth } from 'ol/extent';
+import { get as getProjection } from 'ol/proj';
 
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
@@ -30,6 +32,8 @@ import { PlantaInterface } from '@core/models/planta';
 import { Anomalia } from '@core/models/anomalia';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { InformeInterface } from '@core/models/informe';
+import WMTSTileGrid from 'ol/tilegrid/WMTS';
+import Projection from 'ol/proj/Projection';
 
 @Component({
   selector: 'app-map',
@@ -174,8 +178,93 @@ export class MapComponent implements OnInit, OnDestroy {
     let aerial;
     // solo lo aplicamos a la planta DEMO
     if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
+      let gridNames = [
+        'EPSG:3857:0',
+        'EPSG:3857:1',
+        'EPSG:3857:2',
+        'EPSG:3857:3',
+        'EPSG:3857:4',
+        'EPSG:3857:5',
+        'EPSG:3857:6',
+        'EPSG:3857:7',
+        'EPSG:3857:8',
+        'EPSG:3857:9',
+        'EPSG:3857:10',
+        'EPSG:3857:11',
+        'EPSG:3857:12',
+        'EPSG:3857:13',
+        'EPSG:3857:14',
+        'EPSG:3857:15',
+        'EPSG:3857:16',
+        'EPSG:3857:17',
+        'EPSG:3857:18',
+        'EPSG:3857:19',
+        'EPSG:3857:20',
+        'EPSG:3857:21',
+      ];
+      let baseParams = ['VERSION', 'LAYER', 'STYLE', 'TILEMATRIX', 'TILEMATRIXSET', 'SERVICE', 'FORMAT'];
+      let params = {
+        VERSION: '1.0.0',
+        LAYER: 'sd:demo_rgb',
+        STYLE: 'default',
+        TILEMATRIX: gridNames,
+        TILEMATRIXSET: 'EPSG:3857',
+        SERVICE: 'WMTS',
+        FORMAT: 'image/png',
+      };
+
+      const projection = getProjection('EPSG:3857');
+      const projectionExtent = projection.getExtent();
+      const size = getWidth(projectionExtent) / 256;
+      const resolutions = new Array(19);
+      const matrixIds = new Array(19);
+      for (let z = 0; z < 19; ++z) {
+        // generate resolutions and matrixIds arrays for this WMTS
+        resolutions[z] = size / Math.pow(2, z);
+        matrixIds[z] = z;
+      }
+
+      let url = 'http://65.108.78.123:8080/geoserver/gwc/service/wmts?';
+      for (const param in params) {
+        if (baseParams.indexOf(param.toUpperCase()) < 0) {
+          url = url + param + '=' + params[param] + '&';
+        }
+      }
+      url = url.slice(0, -1);
+
+      aerial = new TileWMS({
+        url: 'http://65.108.78.123:8080/geoserver/sd/wms/{z}/{x}/{y}.png',
+        params: { LAYERS: 'sd:demo_rgb', TILED: true },
+        serverType: 'geoserver',
+        transition: 0,
+      });
+
       aerial = new XYZ({
-        url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
+        url: 'http://65.108.78.123:8080/geoserver/sd/wms/{z}/{x}/{y}.png',
+        crossOrigin: '',
+      });
+
+      // aerial = new XYZ({
+      //   url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
+      //   crossOrigin: '',
+      // });
+
+      const aerialLayer = new TileLayer({
+        source: aerial,
+      });
+
+      aerialLayer.setExtent(this.extent1);
+
+      this.aerialLayers = [aerialLayer];
+    }
+
+    // TEST SIRUELA
+    if (this.planta.id === '3JXI01XmcE3G1d4WNMMd') {
+      aerial = new TileWMS({
+        url: 'http://65.108.78.123:8080/geoserver/sd/wms',
+        params: { LAYERS: 'sd:test', TILED: true },
+        serverType: 'geoserver',
+        transition: 0,
         crossOrigin: '',
       });
 
