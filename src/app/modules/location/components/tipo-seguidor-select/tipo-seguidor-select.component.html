@@ -1,0 +1,48 @@
+<div class="content-tipo-seguidor">
+  <mat-form-field>
+    <mat-label *ngIf="!selectedLocationArea.hasOwnProperty('tipoSeguidor')">Tipo seguidor</mat-label>
+    <mat-label *ngIf="selectedLocationArea.hasOwnProperty('tipoSeguidor')">{{
+      selectedLocationArea.tipoSeguidor.nombre
+    }}</mat-label>
+    <mat-select [(ngModel)]="selectedLocationArea.tipoSeguidor" (selectionChange)="updateTipoSeguidor($event)">
+      <mat-option *ngFor="let tipo of tiposSeguidor" [value]="tipo"> {{ tipo.nombre }} </mat-option>
+    </mat-select>
+
+    <button
+      mat-button
+      *ngIf="selectedLocationArea.hasOwnProperty('tipoSeguidor')"
+      matSuffix
+      mat-icon-button
+      aria-label="Clear"
+      (click)="clearTipoSeguidor(selectedLocationArea)"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <button mat-icon-button [matMenuTriggerFor]="menu">
+    <mat-icon>add_circle_outline</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <div class="contenedor-menu">
+      <span *ngIf="!tipoFila">Indica el número de módulos por columna separados por puntos</span>
+      <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
+        <h5>Añadir nuevo tipo de seguidor</h5>
+        <mat-checkbox
+          formControlName="tipoFila"
+          class="editable-check"
+          [(ngModel)]="tipoFila"
+          (click)="stopPropagation($event)"
+          >Ordenado por filas</mat-checkbox
+        >
+        <span *ngIf="tipoFila">Indica el número de módulos por fila separados por puntos</span>
+
+        <mat-form-field class="input-num-modulos" appearance="fill" (click)="stopPropagation($event)">
+          <mat-label>Número de módulos</mat-label>
+          <input matInput formControlName="nombre" placeholder="4.6.6.4" />
+        </mat-form-field>
+        <button [disabled]="form.invalid" mat-raised-button color="warn" type="submit">Añadir</button>
+      </form>
+    </div>
+  </mat-menu>
+</div>

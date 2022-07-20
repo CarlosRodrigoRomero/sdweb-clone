@@ -7,6 +7,7 @@ import { SeguidorViewService } from '../../services/seguidor-view.service';
 import { PcService } from '@data/services/pc.service';
 import { AuthService } from '@data/services/auth.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
@@ -30,7 +31,8 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
     private seguidorViewService: SeguidorViewService,
     private authService: AuthService,
     private pcService: PcService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
   ngOnInit(): void {
@@ -59,8 +61,8 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
               perdidas: this.anomaliaSelected.perdidas,
               causa: GLOBAL.pcCausa[this.anomaliaSelected.tipo],
               recomendacion: GLOBAL.pcRecomendacion[this.anomaliaSelected.tipo],
-              fila: this.anomaliaSelected.localY,
-              columna: this.anomaliaSelected.localX,
+              fila: this.anomaliaInfoService.getAlturaAnom(this.anomaliaSelected, this.reportControlService.planta),
+              columna: this.anomaliaInfoService.getColumnaAnom(this.anomaliaSelected, this.reportControlService.planta),
               fecha: this.fixNewTiffDates(this.anomaliaSelected.datetime),
               irradiancia: this.anomaliaSelected.irradiancia,
               // vientoDireccion: this.anomaliaSelected.vientoDireccion,

@@ -92,6 +92,7 @@ export class PlantEditComponent implements OnInit {
     this.form = this.formBuilder.group({
       nombre: [, [Validators.required]],
       alturaBajaPrimero: [false, [Validators.required]],
+      columnaDchaPrimero: [false, [Validators.required]],
       autoLocReady: [false, [Validators.required]],
       filas: [1, [Validators.required]],
       columnas: [1, [Validators.required]],
@@ -141,6 +142,9 @@ export class PlantEditComponent implements OnInit {
     }
     if (this.form.get('alturaBajaPrimero').value !== null) {
       this.planta.alturaBajaPrimero = this.form.get('alturaBajaPrimero').value;
+    }
+    if (this.form.get('columnaDchaPrimero').value !== null) {
+      this.planta.columnaDchaPrimero = this.form.get('columnaDchaPrimero').value;
     }
     if (this.form.get('autoLocReady').value !== null) {
       this.planta.autoLocReady = this.form.get('autoLocReady').value;

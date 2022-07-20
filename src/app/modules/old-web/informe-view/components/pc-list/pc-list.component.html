@@ -53,7 +53,7 @@
     <ng-container matColumnDef="seguidor">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Seguidor</th>
       <td mat-cell *matCellDef="let element">
-        <span *ngIf="!checkIsNaN(element.global_x)">{{ plantaService.getNombreSeguidor(element) }}</span>
+        <span *ngIf="!checkIsNaN(element.global_x)">{{ seguidorService.getNombreSeguidor(element) }}</span>
       </td>
     </ng-container>
 

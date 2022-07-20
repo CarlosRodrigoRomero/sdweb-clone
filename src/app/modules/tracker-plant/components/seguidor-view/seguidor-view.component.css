@@ -68,6 +68,13 @@ app-seguidor-view-leyenda {
   transform: translate(100%, 0);
 }
 
+app-seguidor-image-origin {
+  position: absolute;
+  z-index: 8;
+  right: 600px;
+  top: 472px;
+}
+
 app-seguidor-image-download {
   position: absolute;
   z-index: 8;

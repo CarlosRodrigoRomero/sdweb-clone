@@ -8,8 +8,8 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import PointInPolygon from 'point-in-polygon';
 
 import { AnomaliaService } from '@data/services/anomalia.service';
-import { PlantaService } from '@data/services/planta.service';
 import { ZonesService } from './zones.service';
+import { AnomaliaInfoService } from './anomalia-info.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { PlantaInterface } from '@core/models/planta';
@@ -18,6 +18,8 @@ import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 
 import { COLOR } from '@data/constants/color';
+import { TipoSeguidor } from '@core/models/tipoSeguidor';
+import { PcInterface } from '@core/models/pc';
 
 @Injectable({
   providedIn: 'root',
@@ -27,31 +29,28 @@ export class SeguidorService {
   numGlobalCoords: number;
   public zones: LocationAreaInterface[] = [];
   private locAreaSeguidores: LocationAreaInterface[] = [];
-  private locAreaModulos: LocationAreaInterface[] = [];
+  private locAreasModulo: LocationAreaInterface[] = [];
+  private locAreasTipoSeguidor: LocationAreaInterface[] = [];
 
   constructor(
     public afs: AngularFirestore,
     private anomaliaService: AnomaliaService,
-    private plantaService: PlantaService,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
-  getSeguidoresPlanta$(plantaId: string, informes: InformeInterface[]): Observable<Seguidor[]> {
-    return this.plantaService.getPlanta(plantaId).pipe(
-      take(1),
-      switchMap((planta) => {
-        this.planta = planta;
+  getSeguidoresPlanta$(planta: PlantaInterface, informes: InformeInterface[]): Observable<Seguidor[]> {
+    this.planta = planta;
 
-        this.getDifferentLocAreas(plantaId);
+    this.getDifferentLocAreas(planta.id);
 
-        const anomaliaObsList = Array<Observable<Seguidor[]>>();
-        informes.forEach((informe) => {
-          // traemos ambos tipos de anomalias por si hay pcs antiguos
-          anomaliaObsList.push(this.getSeguidores$(informe.id, plantaId, 'pcs'));
-          anomaliaObsList.push(this.getSeguidores$(informe.id, plantaId, 'anomalias'));
-        });
-        return combineLatest(anomaliaObsList);
-      }),
+    const anomaliaObsList = Array<Observable<Seguidor[]>>();
+    informes.forEach((informe) => {
+      // traemos ambos tipos de anomalias por si hay pcs antiguos
+      anomaliaObsList.push(this.getSeguidores$(informe.id, planta.id, 'pcs'));
+      anomaliaObsList.push(this.getSeguidores$(informe.id, planta.id, 'anomalias'));
+    });
+    return combineLatest(anomaliaObsList).pipe(
       map((arr) => {
         return arr.flat();
       })
@@ -79,25 +78,25 @@ export class SeguidorService {
           // detectamos que anomalias estan dentro de cada locArea y creamos cada seguidor
           let count = 0;
 
-          this.locAreaSeguidores.forEach((locArea) => {
+          this.locAreaSeguidores.forEach((areaSeg) => {
             let anomaliasSeguidor: Anomalia[] = [];
             if (sortedAnoms !== null) {
               const anomsLargestLocArea = sortedAnoms[0].find(
-                (array) => (array[0] as Anomalia).globalCoords[0] === locArea.globalCoords[0]
+                (array) => (array[0] as Anomalia).globalCoords[0] === areaSeg.globalCoords[0]
               );
 
               if (anomsLargestLocArea !== undefined) {
                 anomaliasSeguidor = anomsLargestLocArea.filter(
                   (anomalia) =>
                     anomalia.globalCoords.slice(0, this.numGlobalCoords).toString() ===
-                    locArea.globalCoords.slice(0, this.numGlobalCoords).toString()
+                    areaSeg.globalCoords.slice(0, this.numGlobalCoords).toString()
                 );
               }
             } else {
               anomaliasSeguidor = anomaliaList.filter(
                 (anomalia) =>
                   anomalia.globalCoords.slice(0, this.numGlobalCoords).toString() ===
-                  locArea.globalCoords.slice(0, this.numGlobalCoords).toString()
+                  areaSeg.globalCoords.slice(0, this.numGlobalCoords).toString()
               );
             }
 
@@ -106,13 +105,13 @@ export class SeguidorService {
               // ordenamos las anomalias por tipo
               anomaliasSeguidor = this.anomaliaService.sortAnomsByTipo(anomaliasSeguidor);
 
-              const zona = this.locAreaModulos
+              const zonaModulo = this.locAreasModulo
                 // tslint:disable-next-line: triple-equals
-                .find((locA) => locA.globalCoords[0] == locArea.globalCoords[0]);
+                .find((locA) => locA.globalCoords[0] == areaSeg.globalCoords[0]);
 
               let modulo;
-              if (zona !== undefined) {
-                modulo = zona.modulo;
+              if (zonaModulo !== undefined) {
+                modulo = zonaModulo.modulo;
               } else {
                 const anomaliaConModulo = anomaliasSeguidor.find(
                   (anom) => anom.modulo !== null && anom.modulo !== undefined
@@ -121,19 +120,33 @@ export class SeguidorService {
                 // modulo = this.getSeguidorModule(locAreaList);
               }
 
+              const zonaTipoSeguidor = this.getZonaTipoSeguidor(areaSeg);
+              let tipoSeguidor: TipoSeguidor;
+              if (zonaTipoSeguidor !== undefined) {
+                tipoSeguidor = zonaTipoSeguidor.tipoSeguidor;
+                anomaliasSeguidor.map((anom) => {
+                  anom.tipoSeguidor = tipoSeguidor;
+                  return anom;
+                });
+              }
+
               const seguidor = new Seguidor(
                 anomaliasSeguidor,
                 this.planta.filas,
                 this.planta.columnas,
-                locArea.path,
+                areaSeg.path,
                 plantaId,
                 informeId,
                 modulo,
-                locArea.globalCoords,
+                areaSeg.globalCoords,
                 'seguidor_' + count++ + '_' + informeId
               );
               seguidor.nombre = this.getSeguidorName(seguidor);
-              // seguidor.imageName = this.getImageName(seguidor, informe);
+
+              // si existe le añadimos el tipo seguidor
+              // if (tipoSeguidor !== undefined) {
+              //   seguidor.tipoSeguidor = tipoSeguidor;
+              // }
 
               // guardamos el nombre del seguidor en cada anomalia
               anomaliasSeguidor.forEach((anom) => (anom.nombreSeguidor = seguidor.nombre));
@@ -154,7 +167,10 @@ export class SeguidorService {
     this.zones = this.zonesService.zones;
 
     // guardamos las zonas con módulos
-    this.locAreaModulos = locAreas.filter((locArea) => locArea.modulo !== undefined);
+    this.locAreasModulo = locAreas.filter((locArea) => locArea.modulo !== undefined);
+
+    // guardamos las zonas con tipoSeguidor
+    this.locAreasTipoSeguidor = locAreas.filter((locArea) => locArea.tipoSeguidor !== undefined);
 
     // detectamos la globalCoords mas pequeña que es la utilizaremos para el seguidor
     const indiceSeleccionado = this.zonesService.getIndexNotNull(locAreas);
@@ -166,6 +182,14 @@ export class SeguidorService {
         locArea.globalCoords = this.getCompleteGlobalCoords(this.zones, locArea);
       });
     }
+  }
+
+  private getZonaTipoSeguidor(zonaSeg: LocationAreaInterface) {
+    const zonaTipoSeguidor = this.locAreasTipoSeguidor.find((locA) =>
+      this.zonesService.isZoneInsideLargestZone(zonaSeg, locA)
+    );
+
+    return zonaTipoSeguidor;
   }
 
   private sortAnomList(anoms: Anomalia[]): any[][] {
@@ -197,7 +221,7 @@ export class SeguidorService {
         nombre = nombre + coord;
       } else {
         if (coord !== null && coord !== undefined && coord !== '') {
-          nombre = nombre + this.plantaService.getGlobalsConector(this.planta) + coord;
+          nombre = nombre + this.anomaliaInfoService.getGlobalsConector(this.planta) + coord;
         }
       }
     });
@@ -277,6 +301,32 @@ export class SeguidorService {
 
       return imageName;
     }
+  }
+
+  getNombreSeguidor(pc: PcInterface) {
+    let nombreSeguidor = '';
+    if (pc.hasOwnProperty('global_x')) {
+      if (!Number.isNaN(pc.global_x) && pc.global_x !== null) {
+        nombreSeguidor = nombreSeguidor.concat(pc.global_x.toString());
+      }
+    }
+    if (pc.hasOwnProperty('global_y')) {
+      if (!Number.isNaN(pc.global_y) && pc.global_y !== null) {
+        if (nombreSeguidor.length > 0) {
+          nombreSeguidor = nombreSeguidor.concat(this.anomaliaInfoService.getGlobalsConector(this.planta));
+        }
+        nombreSeguidor = nombreSeguidor.concat(pc.global_y.toString());
+      }
+    }
+    if (pc.hasOwnProperty('global_z')) {
+      if (!Number.isNaN(pc.global_z) && pc.global_z !== null) {
+        if (nombreSeguidor.length > 0) {
+          nombreSeguidor = nombreSeguidor.concat(this.anomaliaInfoService.getGlobalsConector(this.planta));
+        }
+        nombreSeguidor = nombreSeguidor.concat(pc.global_z.toString());
+      }
+    }
+    return nombreSeguidor;
   }
 
   getPerdidasAnomColor(anomalia: Anomalia) {

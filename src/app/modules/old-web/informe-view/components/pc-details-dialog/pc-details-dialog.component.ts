@@ -13,7 +13,9 @@ import { InformeInterface } from '@core/models/informe';
 import { AuthService } from '@data/services/auth.service';
 import { UserInterface } from '@core/models/user';
 import { PcService } from '@data/services/pc.service';
-import { PlantaService } from '@data/services/planta.service';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
+import { SeguidorService } from '@data/services/seguidor.service';
+
 import { DialogData } from '../../../informe-map/components/informe-map/informe-map.component';
 
 const pica = Pica();
@@ -60,7 +62,8 @@ export class PcDetailsDialogComponent implements OnInit {
     public auth: AuthService,
     private storage: AngularFireStorage,
     public dialogRef: MatDialogRef<PcDetailsDialogComponent>,
-    public plantaService: PlantaService,
+    public anomaliaInfoService: AnomaliaInfoService,
+    public seguidorService: SeguidorService,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
   ) {
     this.minTemp = 41;
@@ -575,10 +578,10 @@ export class PcDetailsDialogComponent implements OnInit {
   }
 
   getEtiquetaLocalX(pc: PcInterface) {
-    return this.plantaService.getEtiquetaLocalX(this.planta, pc);
+    return this.anomaliaInfoService.getEtiquetaLocalX(this.planta, pc);
   }
   getEtiquetaLocalY(pc: PcInterface) {
-    return this.plantaService.getEtiquetaLocalY(this.planta, pc);
+    return this.anomaliaInfoService.getEtiquetaLocalY(this.planta, pc);
   }
   updatePcInDb(pc: PcInterface) {
     delete pc.downloadUrlVisual$;

@@ -283,6 +283,22 @@ export const warnings: Warning[] = [
     ],
   },
   {
+    type: 'tiposSeguidor',
+    message: 'Faltan los tipos de seguidor de la planta',
+    adminActions: [
+      {
+        name: 'irLocs',
+        label: 'Ir a Localizaciones',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'irLocs',
+        label: 'Ir a Localizaciones',
+      },
+    ],
+  },
+  {
     type: 'visualLayer',
     message: 'No existe la capa visual',
     adminActions: [

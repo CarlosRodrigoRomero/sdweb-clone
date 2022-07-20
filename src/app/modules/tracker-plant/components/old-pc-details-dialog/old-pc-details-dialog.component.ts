@@ -2,24 +2,22 @@ import { Component, OnInit } from '@angular/core';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
-import { take, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import 'fabric';
 declare let fabric;
 
-import Pica from 'pica';
-
-import { GLOBAL } from '@data/constants/global';
 import { PcService } from '@data/services/pc.service';
-import { PlantaService } from '@data/services/planta.service';
 import { SeguidoresControlService } from '@data/services/seguidores-control.service';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
+import { SeguidorService } from '@data/services/seguidor.service';
 
 import { PcInterface } from '@core/models/pc';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 import { Seguidor } from '@core/models/seguidor';
 
-const pica = Pica();
+import { GLOBAL } from '@data/constants/global';
 
 @Component({
   selector: 'app-old-pc-details-dialog',
@@ -62,8 +60,9 @@ export class OldPcDetailsDialogComponent implements OnInit {
   constructor(
     public pcService: PcService,
     private storage: AngularFireStorage,
-    public plantaService: PlantaService,
-    private seguidoresControlService: SeguidoresControlService
+    private seguidoresControlService: SeguidoresControlService,
+    public anomaliaInfoService: AnomaliaInfoService,
+    public seguidorService: SeguidorService
   ) {
     this.minTemp = 41;
     this.maxTemp = 70;
@@ -585,10 +584,10 @@ export class OldPcDetailsDialogComponent implements OnInit {
   }
 
   getEtiquetaLocalX(pc: PcInterface) {
-    return this.plantaService.getEtiquetaLocalX(this.planta, pc);
+    return this.anomaliaInfoService.getEtiquetaLocalX(this.planta, pc);
   }
   getEtiquetaLocalY(pc: PcInterface) {
-    return this.plantaService.getEtiquetaLocalY(this.planta, pc);
+    return this.anomaliaInfoService.getEtiquetaLocalY(this.planta, pc);
   }
   updatePcInDb(pc: PcInterface) {
     delete pc.downloadUrlVisual$;

@@ -7,6 +7,8 @@ import { PcService, SeguidorInterface } from '@data/services/pc.service';
 import { PcInterface } from '@core/models/pc';
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
+import { SeguidorService } from '@data/services/seguidor.service';
 
 import 'fabric';
 declare let fabric;
@@ -132,7 +134,9 @@ export class ExportComponent implements OnInit {
     private storage: AngularFireStorage,
     private pcService: PcService,
     private plantaService: PlantaService,
-    private informeService: InformeService
+    private informeService: InformeService,
+    private anomaliaInfoService: AnomaliaInfoService,
+    private seguidorService: SeguidorService
   ) {
     this.numCategorias = Array(GLOBAL.labels_tipos.length)
       .fill(0)
@@ -486,10 +490,10 @@ export class ExportComponent implements OnInit {
     let pcColumnasTemp = GLOBAL.pcColumnas;
 
     const i = pcColumnasTemp.findIndex((e) => e.nombre === 'local_xy');
-    pcColumnasTemp[i].descripcion = this.plantaService
+    pcColumnasTemp[i].descripcion = this.anomaliaInfoService
       .getNombreLocalX(planta)
       .concat('/')
-      .concat(this.plantaService.getNombreLocalY(planta));
+      .concat(this.anomaliaInfoService.getNombreLocalY(planta));
 
     return pcColumnasTemp;
   }
@@ -690,7 +694,7 @@ export class ExportComponent implements OnInit {
 
     const scale = Math.max(1 / numImagesSeguidor, 0.5);
 
-    const canvas = new fabric.Canvas(`imgSeguidorCanvas${this.plantaService.getNombreSeguidor(seguidor.pcs[0])}`);
+    const canvas = new fabric.Canvas(`imgSeguidorCanvas${this.seguidorService.getNombreSeguidor(seguidor.pcs[0])}`);
     canvas.height = canvas.height + separacionImagenes;
     canvas.backgroundColor = 'white';
 
@@ -908,7 +912,7 @@ export class ExportComponent implements OnInit {
     for (const j of this.arrayFilas) {
       const arrayFila = [];
       arrayFila.push({
-        text: this.anomaliaInfoService.getAltura(j, this.planta).toString(),
+        text: this.getAltura(j, this.planta).toString(),
         style: 'tableHeaderRed',
       });
       const countPosicionFila = this.countPosicion[j - 1];
@@ -924,6 +928,19 @@ export class ExportComponent implements OnInit {
 
     return array;
   };
+
+  private getAltura(localY: number, planta: PlantaInterface) {
+    // Por defecto, la altura alta es la numero 1
+    if (planta.tipo !== 'seguidores' && planta.alturaBajaPrimero) {
+      let altura = planta.filas - (localY - 1);
+      if (altura < 1) {
+        altura = 1;
+      }
+      return altura;
+    } else {
+      return localY;
+    }
+  }
 
   private getTextoIrradiancia() {
     if (this.informe.irradiancia === 0) {
@@ -942,16 +959,16 @@ export class ExportComponent implements OnInit {
   private getTextoLocalizar() {
     if (this.planta.tipo === 'seguidores') {
       return `${this.t.t('Además todos ellos tienen asociado los parámetros')} '${this.t.t(
-        this.plantaService.getNombreGlobalX(this.planta)
-      )}', '${this.t.t(this.plantaService.getNombreLocalX(this.planta))}' ${this.t.t('y')} '${this.t.t(
-        this.plantaService.getNombreLocalY(this.planta)
+        this.anomaliaInfoService.getNombreGlobalX(this.planta)
+      )}', '${this.t.t(this.anomaliaInfoService.getNombreLocalX(this.planta))}' ${this.t.t('y')} '${this.t.t(
+        this.anomaliaInfoService.getNombreLocalY(this.planta)
       )}' ${this.t.t('según el mapa habitual de la planta')}.`;
     } else {
       return `${this.t.t('Además todos ellos tienen asociado los parámetros')} '${this.t.t(
-        this.plantaService.getNombreGlobalX(this.planta)
-      )}', '${this.t.t(this.plantaService.getNombreGlobalY(this.planta))}', '${this.t.t(
-        this.plantaService.getNombreLocalX(this.planta)
-      )}' ${this.t.t('y')} '${this.t.t(this.plantaService.getNombreLocalY(this.planta))}' ${this.t.t(
+        this.anomaliaInfoService.getNombreGlobalX(this.planta)
+      )}', '${this.t.t(this.anomaliaInfoService.getNombreGlobalY(this.planta))}', '${this.t.t(
+        this.anomaliaInfoService.getNombreLocalX(this.planta)
+      )}' ${this.t.t('y')} '${this.t.t(this.anomaliaInfoService.getNombreLocalY(this.planta))}' ${this.t.t(
         'según el mapa habitual de la planta'
       )}.`;
     }
@@ -1974,9 +1991,11 @@ export class ExportComponent implements OnInit {
       if (this.planta.tipo === 'seguidores') {
         texto1 = `${this.t.t(
           'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas en la posición en la que se encuentran'
-        )} (${this.plantaService.getNombreLocalX(this.planta)} ${this.t.t('y')} ${this.plantaService.getNombreLocalY(
-          this.planta
-        )}) ${this.t.t('dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.')}`;
+        )} (${this.anomaliaInfoService.getNombreLocalX(this.planta)} ${this.t.t(
+          'y'
+        )} ${this.anomaliaInfoService.getNombreLocalY(this.planta)}) ${this.t.t(
+          'dentro de cada seguidor. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
+        )}`;
       } else {
         texto1 = this.t.t(
           'Los números de la siguiente tabla indican la cantidad de anomalías térmicas registradas por altura. Sólo se incluyen anomalías térmicas de clase 2 y 3.'
@@ -2245,11 +2264,11 @@ export class ExportComponent implements OnInit {
       });
     } else {
       this.filteredPcs = this.filteredPcs.sort(this.pcService.sortByGlobals);
-      let nombreCol = this.t.t(this.plantaService.getNombreGlobalX(this.planta));
+      let nombreCol = this.t.t(this.anomaliaInfoService.getNombreGlobalX(this.planta));
       if (nombreCol.length > 0) {
-        nombreCol = nombreCol.concat(this.plantaService.getGlobalsConector());
+        nombreCol = nombreCol.concat(this.anomaliaInfoService.getGlobalsConector(this.planta));
       }
-      nombreCol = nombreCol.concat(this.t.t(this.plantaService.getNombreGlobalY(this.planta)));
+      nombreCol = nombreCol.concat(this.t.t(this.anomaliaInfoService.getNombreGlobalY(this.planta)));
       cabecera.push({
         text: nombreCol,
         style: 'tableHeaderRed',
@@ -2278,7 +2297,7 @@ export class ExportComponent implements OnInit {
         style: 'tableCellAnexo1',
       });
       row.push({
-        text: this.plantaService.getEtiquetaGlobals(pc),
+        text: this.anomaliaInfoService.getEtiquetaGlobals(pc, this.planta),
         noWrap: true,
         style: 'tableCellAnexo1',
       });
@@ -2334,7 +2353,7 @@ export class ExportComponent implements OnInit {
         .concat(' ')
         .concat(this.datePipe.transform(pc.datetime * 1000, 'HH:mm:ss'));
     } else if (columnaNombre === 'local_xy') {
-      return this.plantaService.getNumeroModulo(pc).toString();
+      return this.anomaliaInfoService.getNumeroModulo(pc, this.planta).toString();
     } else if (columnaNombre === 'severidad') {
       return this.pcService.getPcCoA(pc).toString();
     } else {

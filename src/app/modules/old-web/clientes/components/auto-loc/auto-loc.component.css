@@ -27,6 +27,9 @@ agm-map {
 .liPropiedadesLocArea {
   list-style: none;
   margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 tr.mat-row {
   height: 20px;
@@ -44,4 +47,12 @@ table {
 
 .input60 {
   width: 60px;
+}
+
+.success-message {
+  position: absolute;
+  top: 150px;
+  left: 50%;
+  width: fit-content;
+  transform: translateX(-50%);
 }

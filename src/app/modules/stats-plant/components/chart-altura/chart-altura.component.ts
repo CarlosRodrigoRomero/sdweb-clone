@@ -115,8 +115,8 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private informeService: InformeService,
-    private anomaliaInfoService: AnomaliaInfoService,
-    private decimalPipe: DecimalPipe
+    private decimalPipe: DecimalPipe,
+    private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
   ngOnInit(): void {
@@ -134,7 +134,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
 
         if (this.allCC.length > 0) {
           const series = [];
-          if (this.planta.tipo !== 'seguidores' && this.planta.alturaBajaPrimero) {
+          if (this.planta.alturaBajaPrimero) {
             for (let index = 1; index <= alturaMax; index++) {
               const row = {
                 name: index.toString(),
@@ -147,7 +147,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
                   y: this.allCC
                     .filter((anom) => anom.informeId === this.informesIdList[i])
                     // tslint:disable-next-line: triple-equals
-                    .filter((anom) => this.anomaliaInfoService.getAltura(anom.localY, this.planta) == index).length,
+                    .filter((anom) => this.anomaliaInfoService.getAlturaAnom(anom, this.planta) == index).length,
                 });
               });
 

@@ -372,6 +372,13 @@ export class Estructura implements EstructuraInterface, ElementoPlantaInterface 
     return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
   }
 
+  getNumFilColAutoEst(fila: number, columna: number) {
+    const numFilas = this.estructuraCoords.length;
+    const numColumnas = this.estructuraCoords[fila].length;
+
+    return [numFilas, numColumnas];
+  }
+
   getLocalCoordsFromEstructura(columna, fila) {
     let columnaReal = columna;
     let filaReal = fila;

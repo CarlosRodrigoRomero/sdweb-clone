@@ -8,6 +8,7 @@ import { GLOBAL } from '@data/constants/global';
 import { Anomalia } from './anomalia';
 import { FilterableElement } from './filterableInterface';
 import { ModuloInterface } from './modulo';
+import { TipoSeguidor } from './tipoSeguidor';
 
 export class Seguidor implements FilterableElement {
   // Filtrable Interface
@@ -32,6 +33,7 @@ export class Seguidor implements FilterableElement {
   celsCalientes?: number;
   moduloLabel?: string;
   imageName?: string;
+  tipoSeguidor?: TipoSeguidor;
 
   constructor(
     anomalias: Anomalia[],
@@ -43,7 +45,8 @@ export class Seguidor implements FilterableElement {
     modulo: ModuloInterface,
     globalCoords: string[],
     id?: string,
-    nombre?: string
+    nombre?: string,
+    tipoSeguidor?: TipoSeguidor
   ) {
     this.anomalias = anomalias;
     // tslint:disable-next-line: triple-equals
@@ -64,6 +67,7 @@ export class Seguidor implements FilterableElement {
     this.nombre = nombre;
     this.celsCalientes = this.getCelsCalientes(this.anomaliasCliente);
     this.moduloLabel = this.getModuloLabel();
+    this.tipoSeguidor = tipoSeguidor;
   }
 
   private getPerdidas(anomalias: Anomalia[]): number {

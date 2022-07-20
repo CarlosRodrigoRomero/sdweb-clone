@@ -22,7 +22,7 @@ import { SeguidorAnomaliasListComponent } from './components/seguidor-anomalias-
 import { SeguidorImageDownloadComponent } from './components/seguidor-image-download/seguidor-image-download.component';
 import { SeguidorViewNavbarComponent } from './components/seguidor-view-navbar/seguidor-view-navbar.component';
 import { SeguidorViewLeyendaComponent } from './components/seguidor-view-leyenda/seguidor-view-leyenda.component';
-import { SeguidorImagesAreaComponent } from './components/seguidor-images-area/seguidor-images-area.component';
+import { SeguidorImageOriginComponent } from './components/seguidor-image-origin/seguidor-image-origin.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +41,7 @@ import { SeguidorImagesAreaComponent } from './components/seguidor-images-area/s
     SeguidorImageDownloadComponent,
     SeguidorViewNavbarComponent,
     SeguidorViewLeyendaComponent,
-    SeguidorImagesAreaComponent,
+    SeguidorImageOriginComponent,
   ],
   imports: [
     CommonModule,

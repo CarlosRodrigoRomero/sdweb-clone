@@ -1,0 +1,18 @@
+.content-tipo-seguidor {
+  display: flex;
+  align-items: baseline;
+}
+
+.contenedor-menu {
+  margin: 1rem;
+}
+
+.example-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-num-modulos {
+  width: 100%;
+}

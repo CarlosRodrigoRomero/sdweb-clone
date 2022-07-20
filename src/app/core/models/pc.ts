@@ -1,7 +1,9 @@
 import { Observable } from 'rxjs';
-import { ModuloInterface } from './modulo';
-import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
+
 import { LatLngLiteral } from '@agm/core';
+
+import { ModuloInterface } from '@core/models/modulo';
+import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
 
 export interface PcInterface {
   id?: string;
@@ -10,6 +12,8 @@ export interface PcInterface {
   tipo?: number;
   local_x?: number;
   local_y?: number;
+  numFilas?: number;
+  numColumnas?: number;
   global_x?: any;
   global_y?: any;
   global_z?: any;
@@ -71,6 +75,7 @@ export interface PcInterface {
   FrameNumber?: number;
   FrameRate?: number;
   numAnom?: number;
+  autoEstId?: string;
 }
 
 export class Pc implements PcInterface, ElementoPlantaInterface {
@@ -80,6 +85,8 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   tipo?: number;
   local_x?: number;
   local_y?: number;
+  numFilas?: number;
+  numColumnas?: number;
   global_x?: any;
   global_y?: any;
   global_z?: any;
@@ -141,6 +148,7 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   FrameNumber?: number;
   FrameRate?: number;
   numAnom?: number;
+  autoEstId?: string;
 
   constructor(pc: PcInterface) {
     Object.assign(this, pc);

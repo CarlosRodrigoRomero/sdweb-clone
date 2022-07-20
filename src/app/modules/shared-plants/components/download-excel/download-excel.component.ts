@@ -3,10 +3,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
-import { switchMap, take } from 'rxjs/operators';
 import { BehaviorSubject, Subscription } from 'rxjs';
-
-import proj4 from 'proj4';
 
 import { ExcelService } from '@data/services/excel.service';
 import { ReportControlService } from '@data/services/report-control.service';
@@ -274,7 +271,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     row.gradienteNormalizado = Number(this.decimalPipe.transform(anomalia.gradienteNormalizado, '1.2-2'));
     row.tipo = this.anomaliaInfoService.getTipoLabel(anomalia);
     row.clase = anomalia.clase;
-    row.criticidad = this.anomaliaInfoService.getCriticidadLabel(anomalia);
+    row.criticidad = this.anomaliaInfoService.getCriticidadLabel(anomalia, this.anomaliaService.criterioCriticidad);
 
     if (this.reportControlService.plantaFija) {
       row.localizacion = this.anomaliaInfoService.getLocalizacionReducLabel(anomalia, this.planta);
@@ -282,13 +279,13 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       row.localizacion = anomalia.nombreSeguidor;
     }
 
-    row.localY = this.anomaliaInfoService.getAltura(anomalia.localY, this.planta);
+    row.localY = this.anomaliaInfoService.getAlturaAnom(anomalia, this.planta);
     row.localX = anomalia.localX;
 
     if (this.reportControlService.plantaFija) {
       row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(this.olMapService.getCentroid(anomalia.featureCoords));
     } else {
-      const seguidor = (this.allElems as Seguidor[]).find((seguidor) => seguidor.nombre === anomalia.nombreSeguidor);
+      const seguidor = (this.allElems as Seguidor[]).find((seg) => seg.nombre === anomalia.nombreSeguidor);
 
       row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(this.olMapService.getCentroid(seguidor.featureCoords));
     }

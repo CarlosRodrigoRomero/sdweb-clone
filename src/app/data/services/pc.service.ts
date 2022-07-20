@@ -5,8 +5,8 @@ import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument 
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { map, take, switchMap } from 'rxjs/operators';
 
-import { PlantaService } from '@data/services/planta.service';
 import { AuthService } from '@data/services/auth.service';
+import { SeguidorService } from './seguidor.service';
 
 import { UserAreaInterface } from '@core/models/userArea';
 import { CritCoA } from '@core/models/critCoA';
@@ -51,7 +51,7 @@ export class PcService {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(public afs: AngularFirestore, public plantaService: PlantaService, public auth: AuthService) {
+  constructor(private afs: AngularFirestore, private auth: AuthService, private seguidorService: SeguidorService) {
     this.pcsCollection = afs.collection<PcInterface>('pcs');
 
     this.filtroCategoria.next(
@@ -137,13 +137,13 @@ export class PcService {
     let oldNombreSeguidor = '981768';
     for (let pc of pcList) {
       pc = this.globalCoordsToClasic(pc);
-      const nombreSeguidor = this.plantaService.getNombreSeguidor(pc);
+      const nombreSeguidor = this.seguidorService.getNombreSeguidor(pc);
       if (nombreSeguidor !== oldNombreSeguidor) {
         oldNombreSeguidor = nombreSeguidor;
 
         const data = {
           pcs: pcList.filter((element) => {
-            return this.plantaService.getNombreSeguidor(element) === nombreSeguidor;
+            return this.seguidorService.getNombreSeguidor(element) === nombreSeguidor;
           }),
           global_x: pc.global_x,
           global_y: pc.global_y,

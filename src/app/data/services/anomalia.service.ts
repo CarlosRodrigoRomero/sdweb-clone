@@ -12,6 +12,7 @@ import Polygon from 'ol/geom/Polygon';
 import { PlantaService } from '@data/services/planta.service';
 import { AdminService } from '@data/services/admin.service';
 import { OlMapService } from './ol-map.service';
+import { AnomaliaInfoService } from './anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { CritCoA } from '@core/models/critCoA';
@@ -23,6 +24,7 @@ import { LocationAreaInterface } from '@core/models/location';
 import { ModuloInterface } from '@core/models/modulo';
 
 import { GLOBAL } from '@data/constants/global';
+
 import { Patches } from '@core/classes/patches';
 
 @Injectable({
@@ -44,7 +46,8 @@ export class AnomaliaService {
     private storage: AngularFireStorage,
     private plantaService: PlantaService,
     private adminService: AdminService,
-    private olMapService: OlMapService
+    private olMapService: OlMapService,
+    private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
   initService(plantaId: string): Promise<void> {
@@ -169,8 +172,8 @@ export class AnomaliaService {
               }
             }
             if (tipo === 'pcs') {
-              data.localX = (data as PcInterface).local_x;
-              data.localY = (data as PcInterface).local_y;
+              data.localX = Number((data as PcInterface).local_x);
+              data.localY = Number((data as PcInterface).local_y);
               if (data.globalCoords === undefined) {
                 data.globalCoords = [];
 
@@ -314,7 +317,7 @@ export class AnomaliaService {
       }
     });
 
-    let numeroModulo = this.plantaService.getNumeroModulo(anomalia, 'anomalia', planta);
+    let numeroModulo = this.anomaliaInfoService.getNumeroModulo(anomalia, planta, 'anomalia');
     if (isNaN(Number(numeroModulo))) {
       numeroModulo = undefined;
     }

@@ -463,6 +463,7 @@ export class WarningService {
       const zonesNamesChecked = this.checkZonesNames(planta, warns, informe.id);
       const zonesRepeatChecked = this.checkZonesRepeat(planta, locAreas, warns, informe.id);
       const modulosChecked = this.checkModulosWarnings(locAreas, warns, informe.id, anomalias);
+      const tiposSeguidorChecked = this.checkTiposSeguidorWarnings(locAreas, warns, informe.id, planta);
 
       // comprobamos que todas alertas de zonas han sido checkeadas
       if (planta.tipo !== 'seguidores') {
@@ -471,12 +472,19 @@ export class WarningService {
           noGlobalCoordsAnomsChecked &&
           zonesNamesChecked &&
           zonesRepeatChecked &&
-          modulosChecked
+          modulosChecked &&
+          tiposSeguidorChecked
         ) {
           return true;
         }
       } else {
-        if (noGlobalCoordsAnomsChecked && zonesNamesChecked && zonesRepeatChecked && modulosChecked) {
+        if (
+          noGlobalCoordsAnomsChecked &&
+          zonesNamesChecked &&
+          zonesRepeatChecked &&
+          modulosChecked &&
+          tiposSeguidorChecked
+        ) {
           return true;
         }
       }
@@ -625,6 +633,40 @@ export class WarningService {
       this.checkAddWarning(warning, warns, informeId);
 
       // confirmamos que ha sido checkeado
+      return true;
+    }
+  }
+
+  private checkTiposSeguidorWarnings(
+    locAreas: LocationAreaInterface[],
+    warns: Warning[],
+    informeId: string,
+    planta: PlantaInterface
+  ): boolean {
+    if (planta.alturaBajaPrimero || (planta.hasOwnProperty('columnaDchaPrimero') && planta.columnaDchaPrimero)) {
+      const areasConTipoSeguidor = locAreas.filter((locArea) => locArea.hasOwnProperty('tipoSeguidor'));
+
+      if (areasConTipoSeguidor.length > 0) {
+        // primero eliminamos la alerta antigua de no hay tiposSeguidor si la hubiera
+        this.checkOldWarnings('tiposSeguidor', warns, informeId);
+
+        return true;
+      } else {
+        // añadimos el aviso de que faltan los modulos de la planta
+        const warning: Warning = {
+          type: 'tiposSeguidor',
+          visible: true,
+        };
+
+        this.checkAddWarning(warning, warns, informeId);
+
+        // confirmamos que ha sido checkeado
+        return true;
+      }
+    } else {
+      // eliminamos la alerta antigua de no hay tipoSeguidor si la hubiera
+      this.checkOldWarnings('tiposSeguidor', warns, informeId);
+
       return true;
     }
   }
