@@ -1,0 +1,10 @@
+.origin-icons {
+  background: white;
+  padding: 0.5rem;
+  border-radius: 4px;
+  display: flex;
+}
+
+.origin-icon {
+  width: 24px;
+}
