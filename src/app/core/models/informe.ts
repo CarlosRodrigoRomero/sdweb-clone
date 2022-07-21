@@ -35,4 +35,5 @@ export interface InformeInterface {
   tiposAnomalias?: any[];
   numsCoA?: number[];
   numsCriticidad?: number[];
+  empresaId?: string;
 }

@@ -92,6 +92,20 @@ export class PortfolioControlService {
         )
         .pipe(take(3))
         .subscribe(([plantas, informes]) => {
+          const informesExtra = this.informeService.getInformesWithEmpresaId(informes, this.user.uid);
+
+          const plantasExtra: PlantaInterface[] = [];
+          informesExtra.forEach((informe) => {
+            this.plantaService
+              .getPlanta(informe.plantaId)
+              .pipe(take(1))
+              .subscribe((planta) => {
+                if (!plantas.includes(planta)) {
+                  plantasExtra.push(planta);
+                }
+              });
+          });
+
           if (plantas !== undefined) {
             // AÑADIMOS PLANTAS FALSAS SOLO EN LOS USUARIOS DEMO
             if (this.usersFakePlants.includes(this.user.uid)) {
@@ -120,7 +134,7 @@ export class PortfolioControlService {
                     informe.mae !== null &&
                     informe.disponible === true
                   ) {
-                    // comprobamos si es un mae aniguo o nuevo
+                    // comprobamos si es un mae antiguo o nuevo
                     informe.mae = this.getRightMae(planta, informe);
 
                     // añadimos el informe a la lista

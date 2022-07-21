@@ -470,6 +470,10 @@ export class InformeService {
     return month + ' ' + year;
   }
 
+  getInformesWithEmpresaId(informes: InformeInterface[], empresaId: string): InformeInterface[] {
+    return informes.filter((informe) => informe.hasOwnProperty('empresaId') && informe.empresaId === empresaId);
+  }
+
   ///////////////////////////////////////////////////////
 
   get avisadorMoveElements() {
