@@ -48,6 +48,7 @@ import { AnomsTable } from './pdf-structure';
 
 import { DRONE } from '@data/constants/drone';
 import { GLOBAL } from '@data/constants/global';
+import { Patches } from '@core/classes/patches';
 
 @Component({
   selector: 'app-download-pdf',
@@ -877,15 +878,17 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private setImgAnomaliaCanvas(anomalia: Anomalia, layer: string) {
     let zoomLevel = 22;
     // parche para la planta Logrosan que tiene huecos en la capa termica
-    if (this.planta.id === 'AyKgsY6F3TqGQGYNaOUY') {
-      zoomLevel = 20;
+    if (Patches.checkId(this.planta.id)) {
+      zoomLevel = Patches.applyPatches(this.planta.id);
     }
 
     // a partir del 6/06/2022 la visual tiene 23 niveles de zoom
+    // salvo Abertura 2022 y Arasur 2022
     if (
       layer === 'visual' &&
       this.selectedInforme.fecha > GLOBAL.newVisualLayerDate &&
-      this.selectedInforme.id !== 'ISV7bS3eQWV4Cbveshlv'
+      this.selectedInforme.id !== 'ISV7bS3eQWV4Cbveshlv' &&
+      this.selectedInforme.id !== 'J89VwzqnoKJd2RUj3QFT'
     ) {
       zoomLevel = 23;
     }

@@ -149,7 +149,7 @@ export class AnomaliaService {
             data.id = doc.payload.doc.id;
 
             // Parche para Casas de Don Pedro Junio 2022
-            if (Patches.checkInformeId(informeId)) {
+            if (Patches.checkId(informeId)) {
               data = Patches.applyPatches(informeId, data);
             }
 
