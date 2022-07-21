@@ -454,39 +454,22 @@ export class WarningService {
       // primero eliminamos la alerta antigua de no locAreas si la hubiera
       this.checkOldWarnings('noLocAreas', warns, informe.id);
 
-      let wrongLocAnomsChecked = false;
-      // solo para fijas y S1E puede comprobamos las anomalias fuera de zonas
-      if (planta.tipo !== 'seguidores') {
-        wrongLocAnomsChecked = this.checkWrongLocationAnoms(anomalias, warns, informe.id);
-      }
+      const wrongLocAnomsChecked = this.checkWrongLocationAnoms(anomalias, warns, informe.id, planta);
       const noGlobalCoordsAnomsChecked = this.checkNoGlobalCoordsAnoms(anomalias, warns, informe.id);
       const zonesNamesChecked = this.checkZonesNames(planta, warns, informe.id);
       const zonesRepeatChecked = this.checkZonesRepeat(planta, locAreas, warns, informe.id);
       const modulosChecked = this.checkModulosWarnings(locAreas, warns, informe.id, anomalias);
       const tiposSeguidorChecked = this.checkTiposSeguidorWarnings(locAreas, warns, informe.id, planta);
 
-      // comprobamos que todas alertas de zonas han sido checkeadas
-      if (planta.tipo !== 'seguidores') {
-        if (
-          wrongLocAnomsChecked &&
-          noGlobalCoordsAnomsChecked &&
-          zonesNamesChecked &&
-          zonesRepeatChecked &&
-          modulosChecked &&
-          tiposSeguidorChecked
-        ) {
-          return true;
-        }
-      } else {
-        if (
-          noGlobalCoordsAnomsChecked &&
-          zonesNamesChecked &&
-          zonesRepeatChecked &&
-          modulosChecked &&
-          tiposSeguidorChecked
-        ) {
-          return true;
-        }
+      if (
+        wrongLocAnomsChecked &&
+        noGlobalCoordsAnomsChecked &&
+        zonesNamesChecked &&
+        zonesRepeatChecked &&
+        modulosChecked &&
+        tiposSeguidorChecked
+      ) {
+        return true;
       }
     } else {
       // añadimos el aviso de que faltan las zonas de la planta
@@ -502,23 +485,33 @@ export class WarningService {
     }
   }
 
-  private checkWrongLocationAnoms(anomalias: Anomalia[], warns: Warning[], informeId: string): boolean {
-    const numGlobalCoords = this.reportControlService.getNumGlobalCoords(anomalias);
+  private checkWrongLocationAnoms(
+    anomalias: Anomalia[],
+    warns: Warning[],
+    informeId: string,
+    planta: PlantaInterface
+  ): boolean {
+    if (planta.tipo !== 'seguidores') {
+      const numGlobalCoords = this.reportControlService.getNumGlobalCoords(anomalias);
 
-    if (numGlobalCoords > 0) {
-      const anomsWrongGlobals = anomalias.filter((anom) => anom.globalCoords[numGlobalCoords - 1] === null);
+      if (numGlobalCoords > 0) {
+        const anomsWrongGlobals = anomalias.filter((anom) => anom.globalCoords[numGlobalCoords - 1] === null);
 
-      if (anomsWrongGlobals.length > 0) {
-        const warning: Warning = {
-          type: 'wrongLocAnoms',
-          visible: true,
-        };
+        if (anomsWrongGlobals.length > 0) {
+          const warning: Warning = {
+            type: 'wrongLocAnoms',
+            visible: true,
+          };
 
-        this.checkAddWarning(warning, warns, informeId);
-      } else {
-        // eliminamos la alerta antigua si la hubiera
-        this.checkOldWarnings('wrongLocAnoms', warns, informeId);
+          this.checkAddWarning(warning, warns, informeId);
+        } else {
+          // eliminamos la alerta antigua si la hubiera
+          this.checkOldWarnings('wrongLocAnoms', warns, informeId);
+        }
       }
+    } else {
+      // eliminamos la alerta antigua si la hubiera
+      this.checkOldWarnings('wrongLocAnoms', warns, informeId);
     }
 
     // confirmamos que ha sido checkeado
@@ -643,24 +636,31 @@ export class WarningService {
     informeId: string,
     planta: PlantaInterface
   ): boolean {
-    if (planta.alturaBajaPrimero || (planta.hasOwnProperty('columnaDchaPrimero') && planta.columnaDchaPrimero)) {
-      const areasConTipoSeguidor = locAreas.filter((locArea) => locArea.hasOwnProperty('tipoSeguidor'));
+    if (planta.tipo === 'seguidor') {
+      if (planta.alturaBajaPrimero || (planta.hasOwnProperty('columnaDchaPrimero') && planta.columnaDchaPrimero)) {
+        const areasConTipoSeguidor = locAreas.filter((locArea) => locArea.hasOwnProperty('tipoSeguidor'));
 
-      if (areasConTipoSeguidor.length > 0) {
-        // primero eliminamos la alerta antigua de no hay tiposSeguidor si la hubiera
+        if (areasConTipoSeguidor.length > 0) {
+          // primero eliminamos la alerta antigua de no hay tiposSeguidor si la hubiera
+          this.checkOldWarnings('tiposSeguidor', warns, informeId);
+
+          return true;
+        } else {
+          // añadimos el aviso de que faltan los modulos de la planta
+          const warning: Warning = {
+            type: 'tiposSeguidor',
+            visible: true,
+          };
+
+          this.checkAddWarning(warning, warns, informeId);
+
+          // confirmamos que ha sido checkeado
+          return true;
+        }
+      } else {
+        // eliminamos la alerta antigua de no hay tipoSeguidor si la hubiera
         this.checkOldWarnings('tiposSeguidor', warns, informeId);
 
-        return true;
-      } else {
-        // añadimos el aviso de que faltan los modulos de la planta
-        const warning: Warning = {
-          type: 'tiposSeguidor',
-          visible: true,
-        };
-
-        this.checkAddWarning(warning, warns, informeId);
-
-        // confirmamos que ha sido checkeado
         return true;
       }
     } else {
