@@ -1,13 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { switchMap, take } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
-import OSM from 'ol/source/OSM';
-import { fromLonLat, transformExtent, transform } from 'ol/proj.js';
+import { fromLonLat, transformExtent } from 'ol/proj.js';
 import View from 'ol/View';
-import { TileDebug, TileWMS, Vector as VectorSource } from 'ol/source';
+import { TileDebug } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { defaults as defaultControls } from 'ol/control.js';
 import XYZ from 'ol/source/XYZ';
@@ -173,14 +172,9 @@ export class MapComponent implements OnInit, OnDestroy {
     // solo lo aplicamos a la planta DEMO
     if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
       aerial = new XYZ({
-        url: 'http://65.108.78.123:8080/geoserver/gwc/service/tms/1.0.0/sd:demo_rgb@WebMercatorQuad@png/{z}/{x}/{y}.png',
-        crossOrigin: '',
+        url: 'http://65.108.78.123:8080/geoserver/gwc/service/tms/1.0.0/sd:demo_rgb@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true',
+        crossOrigin: 'anonymous',
       });
-
-      // aerial = new XYZ({
-      //   url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
-      //   crossOrigin: '',
-      // });
 
       const aerialLayer = new TileLayer({
         source: aerial,
@@ -192,39 +186,26 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     // TEST SIRUELA
-    if (this.planta.id === '3JXI01XmcE3G1d4WNMMd') {
-      aerial = new XYZ({
-        url: 'http://65.108.78.123:8080/geoserver/gwc/service/tms/1.0.0/sd:test@WebMercatorQuad@png/{z}/{x}/{y}.png',
-        crossOrigin: '',
-      });
+    // if (this.planta.id === '3JXI01XmcE3G1d4WNMMd') {
+    //   aerial = new XYZ({
+    //     url: 'http://65.108.78.123:8080/geoserver/gwc/service/tms/1.0.0/sd:test@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true',
+    //     crossOrigin: 'anonymous',
+    //   });
 
-      // aerial = new TileWMS({
-      //   url: 'http://65.108.78.123:8080/geoserver/sd/wms',
-      //   params: { LAYERS: 'sd:test', TILED: true },
-      //   serverType: 'geoserver',
-      //   transition: 0,
-      // });
+    //   const aerialLayer = new TileLayer({
+    //     source: aerial,
+    //   });
 
-      const aerialLayer = new TileLayer({
-        source: aerial,
-      });
-
-      aerialLayer.setExtent(this.extent1);
-
-      this.aerialLayers = [aerialLayer];
-    }
-
-    const osmLayer = new TileLayer({
-      source: new OSM(),
-    });
+    //   this.aerialLayers = [aerialLayer];
+    // }
 
     const layers = [
       satelliteLayer,
       ...this.aerialLayers,
       ...this.thermalLayers,
-      new TileLayer({
-        source: new TileDebug(),
-      }),
+      // new TileLayer({
+      //   source: new TileDebug(),
+      // }),
     ];
 
     // MAPA
