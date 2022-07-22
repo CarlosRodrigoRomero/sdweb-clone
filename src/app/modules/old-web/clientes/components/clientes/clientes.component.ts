@@ -24,15 +24,19 @@ export class ClientesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const informeId = this.router.url.split('/')[this.router.url.split('/').length - 2];
+    if (this.router.url.includes('informe-view')) {
+      const informeId = this.router.url.split('/')[this.router.url.split('/').length - 2];
 
-    this.informeService
-      .getInforme(informeId)
-      .pipe(switchMap((informe) => this.plantaService.getPlanta(informe.plantaId)))
-      .subscribe((planta) => {
-        this.seguidorService.planta = planta;
+      this.informeService
+        .getInforme(informeId)
+        .pipe(switchMap((informe) => this.plantaService.getPlanta(informe.plantaId)))
+        .subscribe((planta) => {
+          this.seguidorService.planta = planta;
 
-        this.dataLoaded = true;
-      });
+          this.dataLoaded = true;
+        });
+    } else {
+      this.dataLoaded = true;
+    }
   }
 }
