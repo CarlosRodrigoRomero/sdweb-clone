@@ -85,34 +85,31 @@ export class PortfolioControlService {
             this.criterioCriticidad = criterio;
 
             return combineLatest([
+              this.plantaService.getAllPlantas(),
               this.plantaService.getPlantasDeEmpresa(this.user),
               this.informeService.getInformes(),
             ]);
           })
         )
         .pipe(take(3))
-        .subscribe(([plantas, informes]) => {
+        .subscribe(([plantas, plantasEmpresa, informes]) => {
           const informesExtra = this.informeService.getInformesWithEmpresaId(informes, this.user.uid);
 
-          const plantasExtra: PlantaInterface[] = [];
-          informesExtra.forEach((informe) => {
-            this.plantaService
-              .getPlanta(informe.plantaId)
-              .pipe(take(1))
-              .subscribe((planta) => {
-                if (!plantas.includes(planta)) {
-                  plantasExtra.push(planta);
-                }
-              });
-          });
+          const plantasExtra: PlantaInterface[] = plantas.filter(
+            (planta) =>
+              informesExtra.map((informe) => informe.plantaId).includes(planta.id) &&
+              !plantasEmpresa.map((pl) => pl.id).includes(planta.id)
+          );
 
-          if (plantas !== undefined) {
+          plantasEmpresa.push(...plantasExtra);
+
+          if (plantasEmpresa !== undefined) {
             // AÑADIMOS PLANTAS FALSAS SOLO EN LOS USUARIOS DEMO
             if (this.usersFakePlants.includes(this.user.uid)) {
-              plantas = this.demoService.addPlantasFake(plantas);
+              plantasEmpresa = this.demoService.addPlantasFake(plantasEmpresa);
             }
 
-            plantas.forEach((planta) => {
+            plantasEmpresa.forEach((planta) => {
               const informesPlanta = informes.filter((inf) => inf.plantaId === planta.id);
 
               if (informesPlanta.length > 0) {
