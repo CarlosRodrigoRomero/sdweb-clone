@@ -98,14 +98,14 @@ export class ImagesTilesService {
 
     let contador = 0;
     tileCoords.forEach((tileCoord, index) => {
-      const url = GLOBAL.GIS + `${selectedInformeId}_${type}/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+      const url = GLOBAL.urlServidorAntiguo + `${selectedInformeId}_${type}/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
 
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;
 
       if (type === 'thermal') {
         const visualUrl =
-          GLOBAL.GIS + `${selectedInformeId}_visual/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+          GLOBAL.urlServidorAntiguo + `${selectedInformeId}_visual/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
 
         fabric.util.loadImage(
           visualUrl,

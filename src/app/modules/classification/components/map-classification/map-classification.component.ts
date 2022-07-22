@@ -25,7 +25,6 @@ import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 
 import { ClassificationService } from '@data/services/classification.service';
-import { InformeService } from '@data/services/informe.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ThermalService } from '@data/services/thermal.service';
 import { StructuresService } from '@data/services/structures.service';
@@ -40,6 +39,7 @@ import { Anomalia } from '@core/models/anomalia';
 import { COLOR } from '@data/constants/color';
 import { GLOBAL } from '@data/constants/global';
 import { PALETTE } from '@data/constants/palette';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-map-classification',
@@ -48,9 +48,9 @@ import { PALETTE } from '@data/constants/palette';
 })
 export class MapClassificationComponent implements OnInit {
   private planta: PlantaInterface;
-  private informeId: string = undefined;
+  private informe: InformeInterface;
   private map: Map;
-  private thermalLayer: ThermalLayerInterface;
+  private thermalLayerDB: ThermalLayerInterface;
   private thermalLayers: TileLayer[];
   private normModules: NormalizedModule[];
   private listaAnomalias: Anomalia[] = [];
@@ -61,12 +61,12 @@ export class MapClassificationComponent implements OnInit {
   normModSelected: NormalizedModule;
   anomaliaSelected: Anomalia;
   public showAnomOk = false;
+  private aerialLayer: TileLayer;
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
     private classificationService: ClassificationService,
-    private informeService: InformeService,
     private olMapService: OlMapService,
     private thermalService: ThermalService,
     private structuresService: StructuresService,
@@ -77,7 +77,7 @@ export class MapClassificationComponent implements OnInit {
   ngOnInit(): void {
     this.planta = this.classificationService.planta;
 
-    this.informeId = this.classificationService.informeId;
+    this.informe = this.classificationService.informe;
 
     // nos conectamos a la lista de anomalias
     this.classificationService.listaAnomalias$.subscribe((anomalias) => (this.listaAnomalias = anomalias));
@@ -95,8 +95,13 @@ export class MapClassificationComponent implements OnInit {
 
     this.classificationService.normModSelected$.subscribe((normMod) => (this.normModSelected = normMod));
 
+    this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayer = layers[0])));
+
+    // añadimos las ortofotos aereas de cada informe
+    this.olMapService.addAerialLayer(this.informe);
+
     this.thermalService
-      .getReportThermalLayerDB(this.informeId)
+      .getReportThermalLayerDB(this.informe.id)
       .pipe(take(1))
       .subscribe((layers) => {
         // comprobamos si existe la thermalLayer
@@ -110,9 +115,19 @@ export class MapClassificationComponent implements OnInit {
           );
 
           // esta es la thermalLayer de la DB
-          this.thermalLayer = layers[0];
+          this.thermalLayerDB = layers[0];
 
-          this.olMapService.addThermalLayer(this.createThermalLayer(this.thermalLayer, this.informeId));
+          if (this.thermalLayerDB !== undefined) {
+            const thermalLayer = this.olMapService.createThermalLayer(this.thermalLayerDB, this.informe, 0);
+
+            thermalLayer.setProperties({
+              informeId: this.informe.id,
+              name: 'thermalLayer',
+              layerDB: thermalLayer,
+            });
+
+            this.olMapService.addThermalLayer(thermalLayer);
+          }
 
           this.initMap();
 
@@ -133,58 +148,12 @@ export class MapClassificationComponent implements OnInit {
       });
   }
 
-  private createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {
-    // Iniciar mapa térmico
-    const tl = new TileLayer({
-      source: new XYZ_mod({
-        url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',
-        crossOrigin: 'anonymous',
-        tileClass: ImageTileMod,
-        tileLoadFunction: (imageTile, src) => {
-          imageTile.rangeTempMax = thermalLayer.rangeTempMax;
-          imageTile.rangeTempMin = thermalLayer.rangeTempMin;
-          imageTile.palette = this.palette;
-          imageTile.thermalService = this.thermalService;
-          imageTile.getImage().src = src;
-          imageTile.thermalLayer = thermalLayer;
-          imageTile.index = 0;
-        },
-      }),
-
-      // extent: this.extent1,
-    });
-    tl.setProperties({
-      informeId,
-      name: 'thermalLayer',
-      layerDB: thermalLayer,
-    });
-
-    return tl;
-  }
-
   initMap() {
-    /* const satellite = new XYZ({
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      crossOrigin: '',
-    });
-    const satelliteLayer = new TileLayer({
-      source: satellite,
-    }); */
-
     const osmLayer = new TileLayer({
       source: new OSM(),
     });
 
-    const aerial = new XYZ({
-      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + this.informeId + '_visual/{z}/{x}/{y}.png',
-      crossOrigin: '',
-    });
-
-    const aerialLayer = new TileLayer({
-      source: aerial,
-    });
-
-    const layers = [osmLayer, aerialLayer, ...this.thermalLayers];
+    const layers = [osmLayer, this.aerialLayer, ...this.thermalLayers];
 
     // MAPA
     const view = new View({

@@ -103,6 +103,7 @@ export class ReportEditComponent implements OnInit {
       vientoDireccion: [, [Validators.min(0), Validators.max(360)]],
       camara: [],
       camaraSN: [],
+      servidorCapas: [, [Validators.required]],
     });
   }
 
@@ -147,6 +148,9 @@ export class ReportEditComponent implements OnInit {
       }
       if (this.form.get('camaraSN').value !== null) {
         this.informe.camaraSN = this.form.get('camaraSN').value;
+      }
+      if (this.form.get('servidorCapas').value !== null) {
+        this.informe.servidorCapas = this.form.get('servidorCapas').value;
       }
       if (this.plantaSelected !== undefined) {
         this.informe.plantaId = this.plantaSelected.id;

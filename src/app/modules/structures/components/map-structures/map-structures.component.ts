@@ -118,7 +118,7 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
   private createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {
     // Iniciar mapa térmico
     const source = new XYZ_mod({
-      url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',
+      url: GLOBAL.urlServidorAntiguo + thermalLayer.gisName + '/{z}/{x}/{y}.png',
       crossOrigin: 'anonymous',
       tileClass: ImageTileMod,
       tileLoadFunction: (imageTile, src) => {

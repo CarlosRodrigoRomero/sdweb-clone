@@ -58,8 +58,6 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
 
-    this.olMapService.addAerialLayer(this.informeId);
-
     this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayers = layers)));
 
     this.subscriptions.add(
@@ -73,7 +71,11 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
         .getInforme(this.informeId)
         .pipe(
           take(1),
-          switchMap((informe) => this.plantaService.getPlanta(informe.plantaId))
+          switchMap((informe) => {
+            this.olMapService.addAerialLayer(informe);
+
+            return this.plantaService.getPlanta(informe.plantaId);
+          })
         )
         .subscribe((planta) => {
           this.planta = planta;

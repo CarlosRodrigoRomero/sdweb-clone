@@ -2,8 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject, Observable } from 'rxjs';
+import { catchError, take } from 'rxjs/operators';
 
 import { LatLngLiteral } from '@agm/core';
+
+import proj4 from 'proj4';
 
 import { Collection, Map, View } from 'ol';
 import { Control } from 'ol/control';
@@ -14,12 +17,18 @@ import VectorSource from 'ol/source/Vector';
 import TileLayer from 'ol/layer/Tile';
 import { Draw } from 'ol/interaction';
 import { Coordinate } from 'ol/coordinate';
-import { fromLonLat, toLonLat } from 'ol/proj';
+import { fromLonLat } from 'ol/proj';
 import XYZ from 'ol/source/XYZ';
 
+import { ThermalService } from '@data/services/thermal.service';
+
+import { InformeInterface } from '@core/models/informe';
+import { ThermalLayerInterface } from '@core/models/thermalLayer';
+
 import { GLOBAL } from '@data/constants/global';
-import { catchError, take } from 'rxjs/operators';
-import proj4 from 'proj4';
+
+import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
+import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 
 @Injectable({
   providedIn: 'root',
@@ -45,7 +54,7 @@ export class OlMapService {
   private _aerialLayers: TileLayer[] = [];
   aerialLayers$ = new BehaviorSubject<TileLayer[]>(this._aerialLayers);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private thermalService: ThermalService) {}
 
   createMap(
     id: string,
@@ -119,12 +128,29 @@ export class OlMapService {
     return this.incrementoLayers$.asObservable();
   }
 
-  addAerialLayer(informeId: string): Promise<void> {
-    const url = GLOBAL.GIS + informeId + '_visual/1/1/1.png';
+  addAerialLayer(informe: InformeInterface): Promise<void> {
+    let url: string;
+    let urlCheck: string;
+    if (informe.hasOwnProperty('servidorCapas')) {
+      switch (informe.servidorCapas) {
+        case 'geoserver': {
+          urlCheck = GLOBAL.urlGeoserver + informe.id + '@WebMercatorQuad@png/1/1/1.png?flipY=true';
+          url = GLOBAL.urlGeoserver + informe.id + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
+          break;
+        }
+        case 'old': {
+          url = GLOBAL.urlServidorAntiguo + informe.id + '_visual/{z}/{x}/{y}.png';
+          urlCheck = GLOBAL.urlServidorAntiguo + informe.id + '_visual/1/1/1.png';
+        }
+      }
+    } else {
+      url = GLOBAL.urlServidorAntiguo + informe.id + '_visual/{z}/{x}/{y}.png';
+      urlCheck = GLOBAL.urlServidorAntiguo + informe.id + '_visual/1/1/1.png';
+    }
 
     return new Promise((resolve, reject) => {
       this.http
-        .get(url)
+        .get(urlCheck)
         .pipe(
           take(1),
           catchError((error) => {
@@ -134,14 +160,14 @@ export class OlMapService {
             if (error.status === 0) {
               aerialLayer = new TileLayer({});
               aerialLayer.setProperties({
-                informeId,
+                informeId: informe.id,
                 exist: false,
               });
             } else {
               // si recibimos respuesta del servidor, es que existe la capa
               const aerial = new XYZ({
-                url: GLOBAL.GIS + informeId + '_visual/{z}/{x}/{y}.png',
-                crossOrigin: 'anonymous',
+                url,
+                crossOrigin: null,
               });
 
               aerialLayer = new TileLayer({
@@ -150,7 +176,7 @@ export class OlMapService {
               });
 
               aerialLayer.setProperties({
-                informeId,
+                informeId: informe.id,
                 exist: true,
               });
             }
@@ -165,6 +191,47 @@ export class OlMapService {
         )
         .subscribe(() => {});
     });
+  }
+
+  createThermalLayer(thermalLayer: ThermalLayerInterface, informe: InformeInterface, index: number): TileLayer {
+    // Iniciar mapa térmico
+    let url: string;
+    let crossOrigin = null;
+    if (informe.hasOwnProperty('servidorCapas')) {
+      switch (informe.servidorCapas) {
+        case 'geoserver': {
+          url = GLOBAL.urlGeoserver + thermalLayer.gisName + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
+          break;
+        }
+        case 'old': {
+          url = GLOBAL.urlServidorAntiguo + thermalLayer.gisName + '/{z}/{x}/{y}.png';
+          crossOrigin = 'anonymous';
+          break;
+        }
+      }
+    } else {
+      url = GLOBAL.urlServidorAntiguo + thermalLayer.gisName + '/{z}/{x}/{y}.png';
+      crossOrigin = 'anonymous';
+    }
+
+    const tl = new TileLayer({
+      source: new XYZ_mod({
+        url,
+        crossOrigin,
+        tileClass: ImageTileMod,
+        tileLoadFunction: (imageTile, src) => {
+          imageTile.rangeTempMax = thermalLayer.rangeTempMax;
+          imageTile.rangeTempMin = thermalLayer.rangeTempMin;
+          imageTile.thermalService = this.thermalService;
+          imageTile.getImage().src = src;
+          imageTile.thermalLayer = thermalLayer;
+          imageTile.index = index;
+        },
+      }),
+      preload: Infinity,
+    });
+
+    return tl;
   }
 
   latLonLiteralToLonLat(path: LatLngLiteral[]) {
