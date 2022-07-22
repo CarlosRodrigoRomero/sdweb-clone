@@ -25,7 +25,7 @@ import { PcInterface } from '@core/models/pc';
   providedIn: 'root',
 })
 export class SeguidorService {
-  private planta: PlantaInterface;
+  planta: PlantaInterface;
   numGlobalCoords: number;
   public zones: LocationAreaInterface[] = [];
   private locAreaSeguidores: LocationAreaInterface[] = [];

@@ -339,6 +339,16 @@ export class AnomaliaInfoService {
     return '';
   }
 
+  getNombreGlobalZ(planta: PlantaInterface): string {
+    if (planta.tipo !== '2 ejes') {
+      if (planta.hasOwnProperty('nombreGlobalZ')) {
+        return planta.nombreGlobalZ;
+      }
+      return GLOBAL.nombreGlobalZFija;
+    }
+    return '';
+  }
+
   getNombreLocalX(planta: PlantaInterface): string {
     if (planta.hasOwnProperty('nombreLocalX')) {
       return planta.nombreLocalX;

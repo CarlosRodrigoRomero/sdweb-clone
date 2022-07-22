@@ -14,6 +14,7 @@ import { PcService } from '@data/services/pc.service';
 import { PlantaService } from '@data/services/planta.service';
 import { InformeService } from '@data/services/informe.service';
 import { SeguidorService } from '@data/services/seguidor.service';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 @Component({
   selector: 'app-pc-list',
@@ -48,7 +49,8 @@ export class PcListComponent implements OnInit {
     public pcService: PcService,
     public plantaService: PlantaService,
     private informeService: InformeService,
-    public seguidorService: SeguidorService
+    public seguidorService: SeguidorService,
+    public anomaliaInfoService: AnomaliaInfoService
   ) {
     this.pcDescripcion = GLOBAL.pcDescripcion;
     this.pcPerdidas = GLOBAL.pcPerdidas;

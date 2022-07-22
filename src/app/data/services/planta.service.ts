@@ -461,16 +461,6 @@ export class PlantaService {
       });
   }
 
-  getNombreGlobalZ(planta: PlantaInterface): string {
-    if (planta.tipo !== '2 ejes') {
-      if (planta.hasOwnProperty('nombreGlobalZ')) {
-        return planta.nombreGlobalZ;
-      }
-      return GLOBAL.nombreGlobalZFija;
-    }
-    return '';
-  }
-
   setLocAreaList(locAreaList: LocationAreaInterface[]) {
     this.locAreaList = locAreaList;
   }

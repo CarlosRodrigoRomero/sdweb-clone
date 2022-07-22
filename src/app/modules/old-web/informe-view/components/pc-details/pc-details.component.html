@@ -58,7 +58,7 @@
         </div>
         <div class="pc-details-derecha-item-tabla">
           <span *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"
-            ><u>{{ plantaService.getNombreLocalX(planta) }}/{{ plantaService.getNombreLocalY(planta) }}</u></span
+            ><u>{{ anomaliaInfoService.getNombreLocalX(planta) }}/{{ anomaliaInfoService.getNombreLocalY(planta) }}</u></span
           >
           <span *ngIf="planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"><u>Nº Módulo</u></span>
           <span class="text-center">{{ anomaliaInfoService.getNumeroModulo(pc, planta) }}</span>
@@ -68,19 +68,19 @@
       <ng-template class="displayFlex" #fija>
         <div *ngIf="columnsToDisplay.includes('global_x')" class="pc-details-derecha-item-tabla">
           <span class="text-center"
-            ><u>{{ plantaService.getNombreGlobalX(planta) }}</u></span
+            ><u>{{ anomaliaInfoService.getNombreGlobalX(planta) }}</u></span
           >
           <span class="text-center">{{ pc.global_x }}</span>
         </div>
         <div class="pc-details-derecha-item-tabla" *ngIf="columnsToDisplay.includes('global_y')">
           <span class="text-center"
-            ><u>{{ plantaService.getNombreGlobalY(planta) }}</u></span
+            ><u>{{ anomaliaInfoService.getNombreGlobalY(planta) }}</u></span
           >
           <span class="text-center">{{ pc.global_y }}</span>
         </div>
         <div class="pc-details-derecha-item-tabla">
           <span *ngIf="!planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"
-            ><u>{{ plantaService.getNombreLocalX(planta) }}/{{ plantaService.getNombreLocalY(planta) }}</u></span
+            ><u>{{ anomaliaInfoService.getNombreLocalX(planta) }}/{{ anomaliaInfoService.getNombreLocalY(planta) }}</u></span
           >
           <span *ngIf="planta.hasOwnProperty('etiquetasLocalXY')" class="text-center"><u>Nº Módulo</u></span>
           <span class="text-center">{{ anomaliaInfoService.getNumeroModulo(pc, planta) }}</span>
