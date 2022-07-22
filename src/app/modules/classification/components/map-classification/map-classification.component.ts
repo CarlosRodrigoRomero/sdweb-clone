@@ -22,7 +22,6 @@ import LineString from 'ol/geom/LineString';
 import moment from 'moment';
 
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
-import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 
 import { ClassificationService } from '@data/services/classification.service';
 import { OlMapService } from '@data/services/ol-map.service';
@@ -37,7 +36,6 @@ import { NormalizedModule } from '@core/models/normalizedModule';
 import { Anomalia } from '@core/models/anomalia';
 
 import { COLOR } from '@data/constants/color';
-import { GLOBAL } from '@data/constants/global';
 import { PALETTE } from '@data/constants/palette';
 import { InformeInterface } from '@core/models/informe';
 
@@ -123,7 +121,7 @@ export class MapClassificationComponent implements OnInit {
             thermalLayer.setProperties({
               informeId: this.informe.id,
               name: 'thermalLayer',
-              layerDB: thermalLayer,
+              layerDB: this.thermalLayerDB,
             });
 
             this.olMapService.addThermalLayer(thermalLayer);
@@ -134,12 +132,9 @@ export class MapClassificationComponent implements OnInit {
           this.createNormModLayer();
           this.addNormModules();
 
-          // this.addZoomEvent();
-
           this.addPointerOnHover();
           this.addOnHoverAction();
           this.addOnDoubleClickInteraction();
-          // this.addClickInteraction();
           this.addSelectInteraction();
           this.addClickOutFeatures();
         } else {
@@ -213,18 +208,6 @@ export class MapClassificationComponent implements OnInit {
 
         normModsSource.addFeature(feature);
       });
-    });
-  }
-
-  private addZoomEvent() {
-    this.map.on('moveend', () => {
-      const zoom = this.map.getView().getZoom();
-
-      if (zoom > this.planta.zoom + 3) {
-        this.normModLayer.setVisible(true);
-      } else {
-        this.normModLayer.setVisible(false);
-      }
     });
   }
 
@@ -310,40 +293,6 @@ export class MapClassificationComponent implements OnInit {
         }
       }
     });
-  }
-
-  private addClickInteraction() {
-    let features;
-
-    this.map.on('click', (event) => {
-      features = this.map.getFeaturesAtPixel(event.pixel);
-      const feature = features[0] as Feature;
-      if (feature) {
-        // asignamos el modulo normalizado seleccionado
-        this.classificationService.normModAnomaliaSelected = this.normModules.find(
-          (normMod) => normMod.id === feature.getProperties().properties.id
-        );
-      }
-    });
-
-    const translate = new Translate({
-      features,
-    });
-
-    translate.on('translateend', (e) => {
-      const newCoords = (e.features.getArray()[0].getGeometry() as Polygon).getCoordinates();
-
-      // aplicamos las nuevas coordenadas del modulo y guardamos los cambios en la DB
-      this.classificationService.normModAnomaliaSelected.coords = this.structuresService.coordinateToObject(newCoords);
-      this.structuresService.updateNormModule(this.classificationService.normModAnomaliaSelected);
-
-      // actualizamos tb la anomalia seleccionada en la DB
-      this.anomaliaService.updateAnomaliaField(this.classificationService.normModAnomaliaSelected.id, 'featureCoords', {
-        ...newCoords[0],
-      });
-    });
-
-    this.map.addInteraction(translate);
   }
 
   private addSelectInteraction() {
@@ -511,6 +460,7 @@ export class MapClassificationComponent implements OnInit {
           imageTile.thermalService = this.thermalService;
           imageTile.getImage().src = src;
           imageTile.thermalLayer = thermalLayerDB;
+          imageTile.index = 0;
         });
       });
   }

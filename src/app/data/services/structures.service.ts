@@ -20,9 +20,10 @@ import { RawModule } from '@core/models/moduloBruto';
 import { FilterModuloBruto } from '@core/models/filterModuloBruto';
 import { ModuloBrutoFilter } from '@core/models/moduloBrutoFilter';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
-
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { ModuleGroup } from '@core/models/moduleGroup';
+import { InformeInterface } from '@core/models/informe';
+
 import { MathOperations } from '@core/classes/math-operations';
 
 @Injectable({
@@ -30,6 +31,7 @@ import { MathOperations } from '@core/classes/math-operations';
 })
 export class StructuresService {
   private _informeId: string;
+  informe: InformeInterface;
   private _planta: PlantaInterface = {};
   planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
   private _thermalLayer: ThermalLayerInterface;
@@ -95,7 +97,11 @@ export class StructuresService {
           .getInforme(this.informeId)
           .pipe(
             take(1),
-            switchMap((informe) => this.plantaService.getPlanta(informe.plantaId))
+            switchMap((informe) => {
+              this.informe = informe;
+
+              return this.plantaService.getPlanta(informe.plantaId);
+            })
           )
           .pipe(
             take(1),
