@@ -581,7 +581,7 @@ export class WarningService {
       const repeatZones = UtilitiesService.findDuplicates(zones.map((zone) => zone.globalCoords.toString()));
 
       if (repeatZones.length > 0) {
-        console.log('Zonas con el mismo nombre: ' + repeatZones);
+        console.log('Zonas con el mismo nombre: ' + repeatZones.join(' | '));
 
         const warning: Warning = {
           type: 'zonasRepeat',

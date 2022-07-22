@@ -147,8 +147,8 @@ export class MapComponent implements OnInit, OnDestroy {
     // solo lo aplicamos a la planta DEMO
     if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
       aerial = new XYZ({
-        url: GLOBAL.urlGeoserver + 'demo_rgb' + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true',
-        crossOrigin: null,
+        url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
+        crossOrigin: '',
       });
 
       const aerialLayer = new TileLayer({
@@ -161,18 +161,18 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     // TEST SIRUELA
-    if (this.planta.id === '3JXI01XmcE3G1d4WNMMd') {
-      aerial = new XYZ({
-        url: GLOBAL.urlGeoserver + 'test' + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true',
-        crossOrigin: null,
-      });
+    // if (this.planta.id === '3JXI01XmcE3G1d4WNMMd') {
+    //   aerial = new XYZ({
+    //     url: GLOBAL.urlGeoserver + 'test' + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true',
+    //     crossOrigin: null,
+    //   });
 
-      const aerialLayer = new TileLayer({
-        source: aerial,
-      });
+    //   const aerialLayer = new TileLayer({
+    //     source: aerial,
+    //   });
 
-      this.aerialLayers = [aerialLayer];
-    }
+    //   this.aerialLayers = [aerialLayer];
+    // }
 
     const layers = [
       satelliteLayer,

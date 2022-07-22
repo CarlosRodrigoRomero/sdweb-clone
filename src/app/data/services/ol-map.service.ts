@@ -134,8 +134,8 @@ export class OlMapService {
     if (informe.hasOwnProperty('servidorCapas')) {
       switch (informe.servidorCapas) {
         case 'geoserver': {
-          urlCheck = GLOBAL.urlGeoserver + informe.id + '@WebMercatorQuad@png/1/1/1.png?flipY=true';
-          url = GLOBAL.urlGeoserver + informe.id + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
+          urlCheck = GLOBAL.urlGeoserver + informe.id + '_visual@WebMercatorQuad@png/1/1/1.png?flipY=true';
+          url = GLOBAL.urlGeoserver + informe.id + '_visual@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
           break;
         }
         case 'old': {
@@ -212,16 +212,6 @@ export class OlMapService {
     } else {
       url = GLOBAL.urlServidorAntiguo + thermalLayer.gisName + '/{z}/{x}/{y}.png';
       crossOrigin = 'anonymous';
-    }
-
-    // if (informe.id === 'vfMHFBPvNFnOFgfCgM9L') {
-    //   url = GLOBAL.urlGeoserver + 'demo_thermal_2020' + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
-    //   crossOrigin = 'anonymous';
-    // }
-
-    if (informe.id === 'M3PTkSUQfjPEd898haeR') {
-      url = GLOBAL.urlGeoserver + thermalLayer.gisName + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
-      crossOrigin = null;
     }
 
     const tl = new TileLayer({
