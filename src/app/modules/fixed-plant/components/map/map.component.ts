@@ -163,7 +163,7 @@ export class MapComponent implements OnInit, OnDestroy {
     // TEST SIRUELA
     if (this.planta.id === '3JXI01XmcE3G1d4WNMMd') {
       aerial = new XYZ({
-        url: GLOBAL.urlGeoserver + 'test' + 'test@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true',
+        url: GLOBAL.urlGeoserver + 'test' + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true',
         crossOrigin: null,
       });
 

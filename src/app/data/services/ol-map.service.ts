@@ -214,6 +214,16 @@ export class OlMapService {
       crossOrigin = 'anonymous';
     }
 
+    // if (informe.id === 'vfMHFBPvNFnOFgfCgM9L') {
+    //   url = GLOBAL.urlGeoserver + 'demo_thermal_2020' + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
+    //   crossOrigin = 'anonymous';
+    // }
+
+    if (informe.id === 'M3PTkSUQfjPEd898haeR') {
+      url = GLOBAL.urlGeoserver + thermalLayer.gisName + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
+      crossOrigin = null;
+    }
+
     const tl = new TileLayer({
       source: new XYZ_mod({
         url,
