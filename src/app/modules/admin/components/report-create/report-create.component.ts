@@ -73,6 +73,7 @@ export class ReportCreateComponent implements OnInit {
       vientoDireccion: [, [Validators.required, Validators.min(0), Validators.max(360)]],
       camara: [, [Validators.required]],
       camaraSN: [, [Validators.required]],
+      servidorCapas: ['geoserver', [Validators.required]],
     });
   }
 
@@ -88,13 +89,15 @@ export class ReportCreateComponent implements OnInit {
         this.informe.nubosidad = this.form.get('nubosidad').value;
         this.informe.gsd = this.form.get('gsd').value;
         this.informe.correccHoraSrt = this.form.get('correccHoraSrt').value;
-        this.informe.disponible = this.form.get('disponible').value;
         this.informe.vientoVelocidad = this.form.get('vientoVelocidad').value;
         this.informe.vientoDireccion = this.form.get('vientoDireccion').value;
         this.informe.camara = this.form.get('camara').value;
         this.informe.camaraSN = this.form.get('camaraSN').value;
         this.informe.plantaId = this.plantaSelected.id;
         this.informe.vueloId = this.vueloSelected.id;
+        this.informe.servidorCapas = this.form.get('servidorCapas').value;
+
+        this.informe.disponible = false;
 
         // Crea el informe en la DB
         this.informeService.addInforme(this.informe);

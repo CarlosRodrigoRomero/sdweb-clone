@@ -1,27 +1,23 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { take } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
-import XYZ from 'ol/source/XYZ';
 import View from 'ol/View';
 import { Map } from 'ol';
 import { fromLonLat } from 'ol/proj';
 import { defaults as defaultControls } from 'ol/control.js';
 import { OSM } from 'ol/source';
 
-import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
-import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
-
 import { OlMapService } from '@data/services/ol-map.service';
 import { StructuresService } from '@data/services/structures.service';
-import { GLOBAL } from '@data/constants/global';
 import { ThermalService } from '@data/services/thermal.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { RawModule } from '@core/models/moduloBruto';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-map-structures',
@@ -30,15 +26,15 @@ import { RawModule } from '@core/models/moduloBruto';
 })
 export class MapStructuresComponent implements OnInit, OnDestroy {
   private planta: PlantaInterface;
-  private informeId: string = undefined;
+  private informe: InformeInterface;
   private map: Map;
   public thermalSource;
-  private thermalLayer: TileLayer = undefined;
+  private thermalLayer: TileLayer;
   private thermalLayerDB: ThermalLayerInterface;
-  private thermalLayers: TileLayer[];
   public layerVisibility = true;
   endFilterSubscription = false;
   public rawModHovered: RawModule;
+  private aerialLayer: TileLayer;
 
   private subscriptionFilters: Subscription = new Subscription();
   private subscriptions: Subscription = new Subscription();
@@ -51,6 +47,7 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.planta = this.structuresService.planta;
+    this.informe = this.structuresService.informe;
 
     this.subscriptions.add(
       this.structuresService.endFilterSubscription$.subscribe((end) => {
@@ -60,23 +57,45 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.informeId = this.structuresService.informeId;
+    // añadimos las ortofotos aereas de cada informe
+    this.olMapService.addAerialLayer(this.informe);
 
     this.thermalService
-      .getReportThermalLayerDB(this.informeId)
+      .getReportThermalLayerDB(this.informe.id)
       .pipe(take(1))
       .subscribe((layersDB) => {
-        // nos suscribimos a las capas termicas del mapa
+        // nos suscribimos a las capas termica y visual del mapa
         this.subscriptions.add(
-          this.olMapService.getThermalLayers().subscribe((tLayers) => (this.thermalLayers = tLayers))
+          combineLatest([this.olMapService.getThermalLayers(), this.olMapService.aerialLayers$]).subscribe(
+            ([tLayers, vLayers]) => {
+              this.thermalLayer = tLayers[0];
+
+              this.aerialLayer = vLayers[0];
+
+              if (this.aerialLayer !== undefined) {
+                this.aerialLayer.setProperties({ name: 'aerial' });
+              }
+
+              if (this.thermalLayer !== undefined && this.aerialLayer !== undefined) {
+                console.log('.');
+                this.initMap();
+              }
+            }
+          )
         );
 
         // esta es la thermalLayer de la DB
         this.thermalLayerDB = layersDB[0];
 
-        this.thermalLayer = this.createThermalLayer(this.thermalLayerDB, this.informeId);
+        if (this.thermalLayerDB !== undefined) {
+          const tL = this.olMapService.createThermalLayer(this.thermalLayerDB, this.informe, 0);
 
-        this.olMapService.addThermalLayer(this.thermalLayer);
+          tL.setProperties({
+            informeId: this.informe.id,
+          });
+
+          this.olMapService.addThermalLayer(tL);
+        }
 
         this.initMap();
       });
@@ -89,18 +108,7 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
 
     osmLayer.setProperties({ name: 'osm' });
 
-    const aerial = new XYZ({
-      url: 'http://solardrontech.es/tileserver.php?/index.json?/' + this.informeId + '_visual/{z}/{x}/{y}.png',
-      crossOrigin: '',
-    });
-
-    const aerialLayer = new TileLayer({
-      source: aerial,
-    });
-
-    aerialLayer.setProperties({ name: 'aerial' });
-
-    const layers = [osmLayer, aerialLayer, ...this.thermalLayers];
+    const layers = [osmLayer, this.aerialLayer, this.thermalLayer];
 
     // MAPA
     const view = new View({
@@ -113,35 +121,6 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
     this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {
       this.map = map;
     });
-  }
-
-  private createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string): TileLayer {
-    // Iniciar mapa térmico
-    const source = new XYZ_mod({
-      url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',
-      crossOrigin: 'anonymous',
-      tileClass: ImageTileMod,
-      tileLoadFunction: (imageTile, src) => {
-        imageTile.rangeTempMax = thermalLayer.rangeTempMax;
-        imageTile.rangeTempMin = thermalLayer.rangeTempMin;
-        imageTile.thermalService = this.thermalService;
-        imageTile.getImage().src = src;
-        imageTile.thermalLayer = thermalLayer;
-        imageTile.index = 0;
-      },
-    });
-
-    // source.on('tileloadend', () => this.thermalNotExist$.next(false));
-
-    const tl = new TileLayer({
-      source,
-    });
-
-    tl.setProperties({
-      informeId,
-    });
-
-    return tl;
   }
 
   setLayerVisibility() {

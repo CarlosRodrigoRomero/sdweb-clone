@@ -7,6 +7,8 @@ import { AngularFirestore } from '@angular/fire/firestore';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 
+
+
 @Injectable({
   providedIn: 'root',
 })
@@ -91,6 +93,8 @@ export class ThermalService {
 
     return this.thermalLayers$;
   }
+
+  
 
   resetService() {
     this.thermalLayers = [];

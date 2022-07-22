@@ -913,15 +913,15 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const height = canvas.height / lado;
     let contador = 0;
     tileCoords.forEach((tileCoord, index) => {
-      let url = `${GLOBAL.GIS}${this.selectedInforme.id}_${layer}/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+      let url = `${GLOBAL.urlServidorAntiguo}${this.selectedInforme.id}_${layer}/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
 
       /* DEMO */
       if (this.demoService.checkIsDemo()) {
         if (layer === 'thermal') {
           if (this.selectedInforme.id === 'vfMHFBPvNFnOFgfCgM9L') {
-            url = `${GLOBAL.GIS}demo_thermal_2020/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+            url = `${GLOBAL.urlServidorAntiguo}demo_thermal_2020/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
           } else {
-            url = `${GLOBAL.GIS}demo_thermal_2019/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+            url = `${GLOBAL.urlServidorAntiguo}demo_thermal_2019/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
           }
         }
         if (layer === 'visual') {
@@ -1062,7 +1062,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const height = canvas.height / lado;
     let contador = 0;
     tileCoords.forEach((tileCoord, index) => {
-      const url = GLOBAL.GIS + `${this.selectedInforme.id}_thermal/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+      const url = GLOBAL.urlServidorAntiguo + `${this.selectedInforme.id}_thermal/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
 
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;

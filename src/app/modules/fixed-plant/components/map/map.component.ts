@@ -11,9 +11,6 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { defaults as defaultControls } from 'ol/control.js';
 import XYZ from 'ol/source/XYZ';
 
-import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
-import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
-
 import { PlantaService } from '@data/services/planta.service';
 import { MapControlService } from '../../services/map-control.service';
 import { GLOBAL } from '@data/constants/global';
@@ -22,7 +19,6 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { ShareReportService } from '@data/services/share-report.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { ThermalService } from '@data/services/thermal.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { Anomalia } from '@core/models/anomalia';
@@ -69,8 +65,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
     private anomaliasControlService: AnomaliasControlService,
-    private reportControlService: ReportControlService,
-    private thermalService: ThermalService
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
@@ -95,7 +90,18 @@ export class MapComponent implements OnInit, OnDestroy {
           const thermalLayerDB = this.thermalLayersDB.find((item) => item.informeId === informe.id);
 
           if (thermalLayerDB !== undefined) {
-            this.olMapService.addThermalLayer(this.createThermalLayer(thermalLayerDB, informe.id, index));
+            const thermalLayer = this.olMapService.createThermalLayer(thermalLayerDB, informe, index);
+
+            thermalLayer.setProperties({
+              informeId: informe.id,
+            });
+
+            // solo lo aplicamos a la planta DEMO
+            if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
+              thermalLayer.setExtent(this.extent1);
+            }
+
+            this.olMapService.addThermalLayer(thermalLayer);
           }
 
           // creamos las capas de anomalías para los diferentes informes o zonas
@@ -104,7 +110,7 @@ export class MapComponent implements OnInit, OnDestroy {
             .forEach((layer) => this.olMapService.addAnomaliaLayer(layer));
 
           // añadimos las ortofotos aereas de cada informe
-          await this.olMapService.addAerialLayer(informe.id);
+          await this.olMapService.addAerialLayer(informe);
 
           if (index === this.informes.length - 1) {
             this.initMap();
@@ -128,37 +134,6 @@ export class MapComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
   }
 
-  private createThermalLayer(thermalLayer: ThermalLayerInterface, informeId: string, index: number): TileLayer {
-    // Iniciar mapa térmico
-    const tl = new TileLayer({
-      source: new XYZ_mod({
-        url: GLOBAL.GIS + thermalLayer.gisName + '/{z}/{x}/{y}.png',
-        crossOrigin: 'anonymous',
-        tileClass: ImageTileMod,
-        tileLoadFunction: (imageTile, src) => {
-          imageTile.rangeTempMax = thermalLayer.rangeTempMax;
-          imageTile.rangeTempMin = thermalLayer.rangeTempMin;
-          imageTile.thermalService = this.thermalService;
-          imageTile.getImage().src = src;
-          imageTile.thermalLayer = thermalLayer;
-          imageTile.index = index;
-        },
-      }),
-      preload: Infinity,
-    });
-
-    tl.setProperties({
-      informeId,
-    });
-
-    // solo lo aplicamos a la planta DEMO
-    if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
-      tl.setExtent(this.extent1);
-    }
-
-    return tl;
-  }
-
   initMap() {
     const satellite = new XYZ({
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -172,8 +147,8 @@ export class MapComponent implements OnInit, OnDestroy {
     // solo lo aplicamos a la planta DEMO
     if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
       aerial = new XYZ({
-        url: 'http://65.108.78.123:8080/geoserver/gwc/service/tms/1.0.0/sd:demo_rgb@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true',
-        crossOrigin: 'anonymous',
+        url: GLOBAL.urlGeoserver + 'demo_rgb' + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true',
+        crossOrigin: null,
       });
 
       const aerialLayer = new TileLayer({
@@ -186,18 +161,18 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     // TEST SIRUELA
-    // if (this.planta.id === '3JXI01XmcE3G1d4WNMMd') {
-    //   aerial = new XYZ({
-    //     url: 'http://65.108.78.123:8080/geoserver/gwc/service/tms/1.0.0/sd:test@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true',
-    //     crossOrigin: 'anonymous',
-    //   });
+    if (this.planta.id === '3JXI01XmcE3G1d4WNMMd') {
+      aerial = new XYZ({
+        url: GLOBAL.urlGeoserver + 'test' + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true',
+        crossOrigin: null,
+      });
 
-    //   const aerialLayer = new TileLayer({
-    //     source: aerial,
-    //   });
+      const aerialLayer = new TileLayer({
+        source: aerial,
+      });
 
-    //   this.aerialLayers = [aerialLayer];
-    // }
+      this.aerialLayers = [aerialLayer];
+    }
 
     const layers = [
       satelliteLayer,

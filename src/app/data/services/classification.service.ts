@@ -22,12 +22,14 @@ import { NormalizedModule } from '@core/models/normalizedModule';
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
 import { ModuloInterface } from '@core/models/modulo';
+import { InformeInterface } from '@core/models/informe';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ClassificationService {
   private _informeId: string;
+  informe: InformeInterface;
   private _planta: PlantaInterface = {};
   planta$ = new BehaviorSubject<PlantaInterface>(this._planta);
   private _thermalLayer: ThermalLayerInterface;
@@ -64,7 +66,11 @@ export class ClassificationService {
         .getInforme(this.informeId)
         .pipe(
           take(1),
-          switchMap((informe) => this.plantaService.getPlanta(informe.plantaId))
+          switchMap((informe) => {
+            this.informe = informe;
+
+            return this.plantaService.getPlanta(informe.plantaId);
+          })
         )
         .pipe(
           take(1),

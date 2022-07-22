@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { switchMap, take } from 'rxjs/operators';
-import { combineLatest, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
 import { fromLonLat } from 'ol/proj.js';
@@ -12,7 +11,6 @@ import { Overlay } from 'ol';
 import { defaults as defaultControls } from 'ol/control.js';
 import XYZ from 'ol/source/XYZ';
 
-import { PlantaService } from '@data/services/planta.service';
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { IncrementosService } from '../../services/incrementos.service';
 import { FilterService } from '@data/services/filter.service';
@@ -20,7 +18,6 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { ShareReportService } from '@data/services/share-report.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { SeguidoresControlService } from '@data/services/seguidores-control.service';
-import { ZonesService } from '@data/services/zones.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { Seguidor } from '@core/models/seguidor';
@@ -60,14 +57,12 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
 
   constructor(
     public mapSeguidoresService: MapSeguidoresService,
-    private plantaService: PlantaService,
     public filterService: FilterService,
     private olMapService: OlMapService,
     private incrementosService: IncrementosService,
     private reportControlService: ReportControlService,
     private seguidoresControlService: SeguidoresControlService,
-    private shareReportService: ShareReportService,
-    private zonesService: ZonesService
+    private shareReportService: ShareReportService
   ) {}
 
   ngOnInit(): void {
@@ -86,7 +81,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
         .forEach((layer) => this.olMapService.addSeguidorLayer(layer));
 
       // añadimos las ortofotos aereas de cada informe
-      await this.olMapService.addAerialLayer(informe.id);
+      await this.olMapService.addAerialLayer(informe);
 
       if (index === this.informes.length - 1) {
         this.initMap();

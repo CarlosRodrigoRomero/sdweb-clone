@@ -6,10 +6,11 @@ export let GLOBAL = {
   // 3: Estructuras
   // 4: Localizaciones
   // 5: Clasificación
-  GIS: 'https://solardrontech.es/tileserver.php?/index.json?/',
+  urlServidorAntiguo: 'https://solardrontech.es/tileserver.php?/index.json?/',
   url: 'http://localhost:3977/api',
   urlStorageInformes:
     'https://console.firebase.google.com/project/sdweb-d33ce/storage/sdweb-d33ce.appspot.com/files/~2Finformes',
+  urlGeoserver: 'https://geoserver.solardrone.app:8081/geoserver/gwc/service/tms/1.0.0/sd:',
   num_tipos: 16,
   carpetaJpgGray: 'gray\\',
   temperaturaLimiteFabricantes: 90,
@@ -52,7 +53,7 @@ export let GLOBAL = {
   tipos_criticidad: [1, 2, 3, 4, 5],
   tipos_no_utilizados: [0, 1, 2, 4, 13, 16],
   labels_tipos: [
-    '0',  
+    '0',
     'PC',
     'VPV',
     'Substring en CA',
