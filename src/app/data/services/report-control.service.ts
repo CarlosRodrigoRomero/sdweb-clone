@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 
 import { WINDOW } from '../../window.providers';
 
-import { BehaviorSubject, from } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, from } from 'rxjs';
+import { map, switchMap, take } from 'rxjs/operators';
 
 import { FilterService } from '@data/services/filter.service';
 import { ShareReportService } from '@data/services/share-report.service';
@@ -107,7 +107,10 @@ export class ReportControlService {
               take(1),
               switchMap(() => {
                 if (this.authService.userIsAdmin(this.user)) {
-                  return this.informeService.getInformesDePlanta(this.plantaId);
+                  return combineLatest([
+                    this.informeService.getInformesDePlanta(this.plantaId),
+                    this.informeService.getInformesDeEmpresa(this.planta.empresa),
+                  ]).pipe(map((infs) => infs.flat()));
                 } else {
                   return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
                 }

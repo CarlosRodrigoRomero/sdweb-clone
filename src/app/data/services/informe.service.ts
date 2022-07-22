@@ -146,6 +146,57 @@ export class InformeService {
     );
   }
 
+  getInformesDisponiblesDeEmpresa(empresaId: string): Observable<InformeInterface[]> {
+    const query$ = this.afs.collection<InformeInterface>('informes', (ref) => ref.where('empresaId', '==', empresaId));
+    return query$.snapshotChanges().pipe(
+      map((actions) =>
+        actions.map((a) => {
+          const data = a.payload.doc.data() as InformeInterface;
+          data.id = a.payload.doc.id;
+          if (data.tiposAnomalias !== undefined && data.tiposAnomalias !== null) {
+            data.tiposAnomalias = Object.values(data.tiposAnomalias);
+          }
+          return data;
+        })
+      ),
+      // solo traemos los disponibles
+      map((informes) => informes.filter((informe) => informe.disponible)),
+      // los ordenamos por fecha
+      map((informes) => informes.sort((a, b) => a.fecha - b.fecha)),
+      // nos quedamos con los 2 más recientes por el momento
+      map((informes) =>
+        informes.filter((informe, index) => index === informes.length - 1 || index === informes.length - 2)
+      )
+    );
+  }
+
+  getInformesDeEmpresa(empresaId: string): Observable<InformeInterface[]> {
+    const query$ = this.afs.collection<InformeInterface>('informes', (ref) => ref.where('empresaId', '==', empresaId));
+    return query$.snapshotChanges().pipe(
+      map((actions) =>
+        actions.map((a) => {
+          const data = a.payload.doc.data() as InformeInterface;
+
+          if (data.hasOwnProperty('empresaId')) {
+            return null;
+          } else {
+            data.id = a.payload.doc.id;
+            if (data.tiposAnomalias !== undefined && data.tiposAnomalias !== null) {
+              data.tiposAnomalias = Object.values(data.tiposAnomalias);
+            }
+            return data;
+          }
+        })
+      ),
+      // los ordenamos por fecha
+      map((informes) => informes.sort((a, b) => a.fecha - b.fecha)),
+      // nos quedamos con los 2 más recientes por el momento
+      map((informes) =>
+        informes.filter((informe, index) => index === informes.length - 1 || index === informes.length - 2)
+      )
+    );
+  }
+
   getInforme(id: string): Observable<InformeInterface> {
     this.informeDoc = this.afs.doc<InformeInterface>('informes/' + id);
 
