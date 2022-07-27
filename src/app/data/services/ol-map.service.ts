@@ -196,7 +196,7 @@ export class OlMapService {
   createThermalLayer(thermalLayer: ThermalLayerInterface, informe: InformeInterface, index: number): TileLayer {
     // Iniciar mapa térmico
     let url: string;
-    let crossOrigin = null;
+    let crossOrigin = 'anonymous';
     if (informe.hasOwnProperty('servidorCapas')) {
       switch (informe.servidorCapas) {
         case 'geoserver': {
