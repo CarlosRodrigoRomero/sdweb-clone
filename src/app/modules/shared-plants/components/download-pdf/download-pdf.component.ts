@@ -1278,6 +1278,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   drawAnomalia(pc: PcInterface, canvas: any, contadorPc: number) {
     let polygon;
+    let label;
     if (pc.hasOwnProperty('coords')) {
       polygon = new fabric.Polygon(pc.coords, {
         fill: 'transparent',
@@ -1293,6 +1294,17 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         hoverCursor: 'pointer',
         rx: 4,
         ry: 4,
+      });
+
+      label = new fabric.Text(pc.numAnom.toString(), {
+        left: pc.coords[0].x + 3,
+        top: pc.coords[0].y + 2,
+        fontSize: 10,
+        // textBackgroundColor: 'red',
+        ref: 'text',
+        selectable: false,
+        hoverCursor: 'default',
+        fill: 'white',
       });
     } else {
       polygon = new fabric.Rect({
@@ -1314,18 +1326,18 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         rx: 4,
         ry: 4,
       });
-    }
 
-    const label = new fabric.Text(pc.numAnom.toString(), {
-      left: pc.img_left,
-      top: pc.img_top - 26,
-      fontSize: 20,
-      // textBackgroundColor: 'red',
-      ref: 'text',
-      selectable: false,
-      hoverCursor: 'default',
-      fill: 'white',
-    });
+      label = new fabric.Text(pc.numAnom.toString(), {
+        left: pc.img_left + 3,
+        top: pc.img_top + 2,
+        fontSize: 10,
+        // textBackgroundColor: 'red',
+        ref: 'text',
+        selectable: false,
+        hoverCursor: 'default',
+        fill: 'white',
+      });
+    }
 
     canvas.add(polygon);
     canvas.add(label);
