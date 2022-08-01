@@ -89,26 +89,27 @@ export class RawModulesComponent implements OnInit, OnDestroy {
   }
 
   private createRawModulesLayer() {
-    this.rawModLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: new Style({
-        stroke: new Stroke({
-          width: 2,
-          color: 'white',
+    // si no existe previamente la creamos
+    if (this.rawModLayer === undefined) {
+      this.rawModLayer = new VectorLayer({
+        source: new VectorSource({ wrapX: false }),
+        style: new Style({
+          stroke: new Stroke({
+            width: 2,
+            color: 'white',
+          }),
         }),
-      }),
-    });
+      });
 
-    this.rawModLayer.setProperties({
-      id: 'rawModLayer',
-    });
+      this.rawModLayer.setProperties({
+        id: 'rawModLayer',
+      });
 
-    this.map.addLayer(this.rawModLayer);
+      this.map.addLayer(this.rawModLayer);
+    }
   }
 
   private addRawModules() {
-    const rawModSource = this.rawModLayer.getSource();
-
     this.subscriptions.add(
       this.structuresService.allRawModules$
         .pipe(
@@ -125,28 +126,31 @@ export class RawModulesComponent implements OnInit, OnDestroy {
           })
         )
         .subscribe((elems) => {
-          rawModSource.clear();
+          if (this.rawModLayer !== undefined) {
+            const rawModSource = this.rawModLayer.getSource();
+            rawModSource.clear();
 
-          if (this.rawModDeletedIds !== undefined && this.rawModDeletedIds.length > 0) {
-            this.rawMods = (elems as RawModule[]).filter((mB) => !this.rawModDeletedIds.includes(mB.id));
-          } else {
-            this.rawMods = elems as RawModule[];
-          }
+            if (this.rawModDeletedIds !== undefined && this.rawModDeletedIds.length > 0) {
+              this.rawMods = (elems as RawModule[]).filter((mB) => !this.rawModDeletedIds.includes(mB.id));
+            } else {
+              this.rawMods = elems as RawModule[];
+            }
 
-          if (this.rawMods.length > 0) {
-            // actualizamos las medias y desviaciones estandar con los modulos filtrados
-            this.structuresService.updateAveragesAndStandardDeviations(this.rawMods);
+            if (this.rawMods.length > 0) {
+              // actualizamos las medias y desviaciones estandar con los modulos filtrados
+              this.structuresService.updateAveragesAndStandardDeviations(this.rawMods);
 
-            // asignamos el numero de modulos del informe
-            this.setReportNumModules();
+              // asignamos el numero de modulos del informe
+              this.setReportNumModules();
 
-            this.rawMods.forEach((rawMod, index) => {
-              this.addRawModule(rawMod);
+              this.rawMods.forEach((rawMod, index) => {
+                this.addRawModule(rawMod);
 
-              if (index === this.rawMods.length - 1) {
-                this.structuresService.modulesLoaded = true;
-              }
-            });
+                if (index === this.rawMods.length - 1) {
+                  this.structuresService.modulesLoaded = true;
+                }
+              });
+            }
           }
         })
     );

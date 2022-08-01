@@ -96,8 +96,6 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
 
           this.olMapService.addThermalLayer(tL);
         }
-
-        this.initMap();
       });
   }
 

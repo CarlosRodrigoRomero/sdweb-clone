@@ -23,7 +23,6 @@ import { StructuresService } from '@data/services/structures.service';
 import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm/mat-dialog-confirm.component';
 import { ModuleGroup } from '@core/models/moduleGroup';
 
-
 @Component({
   selector: 'app-module-groups',
   templateUrl: './module-groups.component.html',
@@ -33,7 +32,7 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
   private vectorGroup: VectorLayer;
   private map: Map;
   private draw: Draw;
-  private mGLayer = new VectorLayer();
+  private mGLayer: VectorLayer;
   modGroupSelectedId: string;
   drawActive = false;
 
@@ -67,49 +66,53 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
   }
 
   private createModulesGroupsLayer() {
-    this.mGLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: new Style({
-        stroke: new Stroke({
-          color: 'darkblue',
-          width: 2,
+    // si no existe previamente la creamos
+    if (this.mGLayer === undefined) {
+      this.mGLayer = new VectorLayer({
+        source: new VectorSource({ wrapX: false }),
+        style: new Style({
+          stroke: new Stroke({
+            color: 'darkblue',
+            width: 2,
+          }),
         }),
-      }),
-    });
+      });
 
-    this.mGLayer.setProperties({
-      id: 'mGLayer',
-    });
+      this.mGLayer.setProperties({
+        id: 'mGLayer',
+      });
 
-    this.map.addLayer(this.mGLayer);
+      this.map.addLayer(this.mGLayer);
+    }
   }
 
   private addModuleGroups() {
-    const mGSource = this.mGLayer.getSource();
-
     this.subscriptions.add(
       this.structuresService.allModGroups$.subscribe((groups) => {
-        mGSource.clear();
+        if (this.mGLayer !== undefined) {
+          const mGSource = this.mGLayer.getSource();
+          mGSource.clear();
 
-        groups.forEach((mG) => {
-          let coords = mG.coords;
+          groups.forEach((mG) => {
+            let coords = mG.coords;
 
-          if (coords.length <= 2 || coords[2] === undefined) {
-            coords = this.getAllCoordsRectangle(mG.coords);
-          }
+            if (coords.length <= 2 || coords[2] === undefined) {
+              coords = this.getAllCoordsRectangle(mG.coords);
+            }
 
-          const feature = new Feature({
-            geometry: new Polygon([coords]),
-            properties: {
-              id: mG.id,
-              name: 'moduleGroup',
-            },
+            const feature = new Feature({
+              geometry: new Polygon([coords]),
+              properties: {
+                id: mG.id,
+                name: 'moduleGroup',
+              },
+            });
+
+            this.getAllCoordsRectangle(mG.coords);
+
+            mGSource.addFeature(feature);
           });
-
-          this.getAllCoordsRectangle(mG.coords);
-
-          mGSource.addFeature(feature);
-        });
+        }
       })
     );
   }
@@ -329,11 +332,14 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
       data: 'Esto también eliminará los modulos normalizados asociados a esta agrupación. ¿Desea continuar?',
     });
 
-    dialogRef.afterClosed().pipe(take(1)).subscribe((response: boolean) => {
-      if (response) {
-        this.deleteModuleGroup();
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe((response: boolean) => {
+        if (response) {
+          this.deleteModuleGroup();
+        }
+      });
   }
 
   deleteModuleGroup() {
