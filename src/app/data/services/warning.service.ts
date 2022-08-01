@@ -7,9 +7,10 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import { Observable } from 'rxjs';
 import { catchError, map, take } from 'rxjs/operators';
 
-import { ReportControlService } from './report-control.service';
-import { UtilitiesService } from './utilities.service';
-import { ZonesService } from './zones.service';
+import { ReportControlService } from '@data/services/report-control.service';
+import { UtilitiesService } from '@data/services/utilities.service';
+import { ZonesService } from '@data/services/zones.service';
+import { GeoserverService } from '@data/services/geoserver.service';
 
 import { Warning, warnings } from '@shared/components/warnings-menu/warnings';
 import { InformeInterface } from '@core/models/informe';
@@ -29,7 +30,8 @@ export class WarningService {
     private reportControlService: ReportControlService,
     private http: HttpClient,
     private storage: AngularFireStorage,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private geoserverService: GeoserverService
   ) {}
 
   addWarning(informeId: string, warning: Warning) {
@@ -161,7 +163,7 @@ export class WarningService {
     const filsColsAnomsChecked = this.checkFilsColsAnoms(planta, anomalias, informe, warns);
     const filsColsAnomsTipo0Checked = this.checkFilsColsTipo0Anoms(planta, anomalias, informe, warns);
     const zonesChecked = this.checkZonesWarnings(locAreas, informe, warns, planta, anomalias);
-    const visualLayerChecked = this.checkVisualLayer(informe.id, warns);
+    const visualLayerChecked = this.checkVisualLayer(informe, warns);
     const imgPortadaChecked = this.checkImagePortada(informe.id, warns);
     const imgSuciedadChecked = this.checkImageSuciedad(informe.id, warns);
     const tempMaxAnomsChecked = this.checkTempMaxAnomsError(anomalias, warns, informe.id);
@@ -169,7 +171,7 @@ export class WarningService {
     if (planta.tipo === 'seguidores') {
       thermalLayerChecked = true;
     } else {
-      thermalLayerChecked = this.checkThermalLayer(informe.id, warns);
+      thermalLayerChecked = this.checkThermalLayer(informe, warns);
     }
 
     if (
@@ -692,8 +694,8 @@ export class WarningService {
     return true;
   }
 
-  checkVisualLayer(informeId: string, warns: Warning[]): boolean {
-    const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_visual/1/1/1.png';
+  checkVisualLayer(informe: InformeInterface, warns: Warning[]): boolean {
+    const url = this.geoserverService.getGeoserverUrl(informe, 'visual', true);
 
     this.http
       .get(url)
@@ -707,11 +709,11 @@ export class WarningService {
               visible: true,
             };
 
-            this.checkAddWarning(warning, warns, informeId);
+            this.checkAddWarning(warning, warns, informe.id);
           } else {
             // si recibimos respuesta del servidor, es que existe la capa
             // y eliminamos la alerta antigua si la hubiera
-            this.checkOldWarnings('visualLayer', warns, informeId);
+            this.checkOldWarnings('visualLayer', warns, informe.id);
           }
 
           return [];
@@ -724,8 +726,8 @@ export class WarningService {
     return true;
   }
 
-  checkThermalLayer(informeId: string, warns: Warning[]): boolean {
-    const url = 'https://solardrontech.es/tileserver.php?/index.json?/' + informeId + '_thermal/1/1/1.png';
+  checkThermalLayer(informe: InformeInterface, warns: Warning[]): boolean {
+    const url = this.geoserverService.getGeoserverUrl(informe, 'thermal', true);
 
     this.http
       .get(url)
@@ -739,11 +741,11 @@ export class WarningService {
               visible: true,
             };
 
-            this.checkAddWarning(warning, warns, informeId);
+            this.checkAddWarning(warning, warns, informe.id);
           } else {
             // si recibimos respuesta del servidor, es que existe la capa
             // y eliminamos la alerta antigua si la hubiera
-            this.checkOldWarnings('thermalLayer', warns, informeId);
+            this.checkOldWarnings('thermalLayer', warns, informe.id);
           }
 
           return [];
