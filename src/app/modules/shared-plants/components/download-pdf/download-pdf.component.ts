@@ -328,12 +328,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         this.imagesTilesService.setImgPlanoPlanta(
           this.largestLocAreas,
           'thermal',
-          this.selectedInforme.id,
+          this.selectedInforme,
           this.map,
           this.anomaliasInforme
         );
       }
-      this.imagesTilesService.setImgPlanoPlanta(this.largestLocAreas, 'visual', this.selectedInforme.id, this.map);
+      this.imagesTilesService.setImgPlanoPlanta(this.largestLocAreas, 'visual', this.selectedInforme, this.map);
     }
   }
 

@@ -20,11 +20,13 @@ import { ImageProcessService } from '@data/services/image-process.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ZonesService } from '@data/services/zones.service';
 import { DemoService } from '@data/services/demo.service';
+import { GeoserverService } from '@data/services/geoserver.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
 
 import { GLOBAL } from '@data/constants/global';
+import { InformeInterface } from '@core/models/informe';
 
 @Injectable({
   providedIn: 'root',
@@ -45,7 +47,8 @@ export class ImagesTilesService {
     private imageProcessService: ImageProcessService,
     private reportControlService: ReportControlService,
     private zonesService: ZonesService,
-    private demoService: DemoService
+    private demoService: DemoService,
+    private geoserverService: GeoserverService
   ) {}
 
   checkImgsPlanosLoaded(): Promise<boolean> {
@@ -76,7 +79,7 @@ export class ImagesTilesService {
   setImgPlanoPlanta(
     locAreas: LocationAreaInterface[],
     type: string,
-    selectedInformeId: string,
+    selectedInforme: InformeInterface,
     map: Map,
     anomalias?: Anomalia[]
   ) {
@@ -98,14 +101,13 @@ export class ImagesTilesService {
 
     let contador = 0;
     tileCoords.forEach((tileCoord, index) => {
-      const url = GLOBAL.urlServidorAntiguo + `${selectedInformeId}_${type}/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+      const url: string = this.geoserverService.getGeoserverUrl(selectedInforme, type, false, tileCoord);
 
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;
 
       if (type === 'thermal') {
-        const visualUrl =
-          GLOBAL.urlServidorAntiguo + `${selectedInformeId}_visual/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+        const visualUrl = this.geoserverService.getGeoserverUrl(selectedInforme, 'visual', false, tileCoord);
 
         fabric.util.loadImage(
           visualUrl,
@@ -148,7 +150,7 @@ export class ImagesTilesService {
           url,
           (img) => {
             if (img !== null) {
-              img = this.imageProcessService.transformPixels(img, selectedInformeId);
+              img = this.imageProcessService.transformPixels(img, selectedInforme.id);
 
               const image = new fabric.Image(img, {
                 width,
@@ -186,7 +188,7 @@ export class ImagesTilesService {
           (img) => {
             if (img !== null) {
               if (type === 'thermal') {
-                img = this.imageProcessService.transformPixels(img, selectedInformeId);
+                img = this.imageProcessService.transformPixels(img, selectedInforme.id);
               }
 
               const image = new fabric.Image(img, {

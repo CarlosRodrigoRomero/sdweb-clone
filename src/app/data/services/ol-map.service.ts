@@ -24,6 +24,7 @@ import { ThermalService } from '@data/services/thermal.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
+import { GeoserverService } from './geoserver.service';
 
 import { GLOBAL } from '@data/constants/global';
 
@@ -54,7 +55,11 @@ export class OlMapService {
   private _aerialLayers: TileLayer[] = [];
   aerialLayers$ = new BehaviorSubject<TileLayer[]>(this._aerialLayers);
 
-  constructor(private http: HttpClient, private thermalService: ThermalService) {}
+  constructor(
+    private http: HttpClient,
+    private thermalService: ThermalService,
+    private geoserverService: GeoserverService
+  ) {}
 
   createMap(
     id: string,
@@ -129,24 +134,24 @@ export class OlMapService {
   }
 
   addAerialLayer(informe: InformeInterface): Promise<void> {
-    let url: string;
-    let urlCheck: string;
-    if (informe.hasOwnProperty('servidorCapas')) {
-      switch (informe.servidorCapas) {
-        case 'geoserver': {
-          urlCheck = GLOBAL.urlGeoserver + informe.id + '_visual@WebMercatorQuad@png/1/1/1.png?flipY=true';
-          url = GLOBAL.urlGeoserver + informe.id + '_visual@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
-          break;
-        }
-        case 'old': {
-          url = GLOBAL.urlServidorAntiguo + informe.id + '_visual/{z}/{x}/{y}.png';
-          urlCheck = GLOBAL.urlServidorAntiguo + informe.id + '_visual/1/1/1.png';
-        }
-      }
-    } else {
-      url = GLOBAL.urlServidorAntiguo + informe.id + '_visual/{z}/{x}/{y}.png';
-      urlCheck = GLOBAL.urlServidorAntiguo + informe.id + '_visual/1/1/1.png';
-    }
+    const url: string = this.geoserverService.getGeoserverUrl(informe, 'visual');
+    const urlCheck: string = this.geoserverService.getGeoserverUrl(informe, 'visual', true);
+    // if (informe.hasOwnProperty('servidorCapas')) {
+    //   switch (informe.servidorCapas) {
+    //     case 'geoserver': {
+    //       urlCheck = GLOBAL.urlGeoserver + informe.id + '_visual@WebMercatorQuad@png/1/1/1.png?flipY=true';
+    //       url = GLOBAL.urlGeoserver + informe.id + '_visual@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
+    //       break;
+    //     }
+    //     case 'old': {
+    //       url = GLOBAL.urlServidorAntiguo + informe.id + '_visual/{z}/{x}/{y}.png';
+    //       urlCheck = GLOBAL.urlServidorAntiguo + informe.id + '_visual/1/1/1.png';
+    //     }
+    //   }
+    // } else {
+    //   url = GLOBAL.urlServidorAntiguo + informe.id + '_visual/{z}/{x}/{y}.png';
+    //   urlCheck = GLOBAL.urlServidorAntiguo + informe.id + '_visual/1/1/1.png';
+    // }
 
     return new Promise((resolve, reject) => {
       this.http
