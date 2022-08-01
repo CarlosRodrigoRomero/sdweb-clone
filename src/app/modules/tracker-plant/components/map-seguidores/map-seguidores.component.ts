@@ -125,7 +125,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
       zoom: this.planta.zoom,
       minZoom: this.planta.zoom - 2,
-      maxZoom: this.planta.zoom + 8,
+      maxZoom: 24,
     });
 
     // creamos el mapa a traves del servicio y nos subscribimos a el

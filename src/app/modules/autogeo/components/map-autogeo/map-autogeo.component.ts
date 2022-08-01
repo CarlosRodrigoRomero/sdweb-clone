@@ -110,7 +110,7 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
       zoom: this.planta.zoom,
       minZoom: this.planta.zoom - 2,
-      maxZoom: this.planta.zoom + 8,
+      maxZoom: 24,
     });
 
     this.subscriptions.add(

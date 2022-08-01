@@ -34,6 +34,7 @@ import { ReportPdfService } from '@data/services/report-pdf.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ResetServices } from '@data/services/reset-services.service';
 import { DemoService } from '@data/services/demo.service';
+import { GeoserverService } from '@data/services/geoserver.service';
 
 import { DialogFilteredReportComponent } from '../dialog-filtered-report/dialog-filtered-report.component';
 import { Translation } from '@shared/utils/translations/translations';
@@ -149,7 +150,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     private reportPdfService: ReportPdfService,
     private zonesService: ZonesService,
     private resetServices: ResetServices,
-    private demoService: DemoService
+    private demoService: DemoService,
+    private geoserverService: GeoserverService
   ) {}
 
   ngOnInit(): void {
@@ -913,7 +915,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const height = canvas.height / lado;
     let contador = 0;
     tileCoords.forEach((tileCoord, index) => {
-      let url = `${GLOBAL.urlServidorAntiguo}${this.selectedInforme.id}_${layer}/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+      let url = this.geoserverService.getGeoserverUrl(this.selectedInforme, layer, false, tileCoord);
 
       /* DEMO */
       if (this.demoService.checkIsDemo()) {
@@ -928,6 +930,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           url = `${this.demoService.demoGIS}${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
         }
       }
+
+      console.log(url);
 
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;
@@ -1062,7 +1066,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     const height = canvas.height / lado;
     let contador = 0;
     tileCoords.forEach((tileCoord, index) => {
-      const url = GLOBAL.urlServidorAntiguo + `${this.selectedInforme.id}_thermal/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
+      const url =
+        GLOBAL.urlServidorAntiguo +
+        `${this.selectedInforme.id}_thermal/${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
 
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;

@@ -113,7 +113,7 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
       zoom: this.planta.zoom,
       minZoom: this.planta.zoom - 2,
-      maxZoom: this.planta.zoom + 8,
+      maxZoom: 24,
     });
 
     this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {

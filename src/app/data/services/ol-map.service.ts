@@ -136,22 +136,6 @@ export class OlMapService {
   addAerialLayer(informe: InformeInterface): Promise<void> {
     const url: string = this.geoserverService.getGeoserverUrl(informe, 'visual');
     const urlCheck: string = this.geoserverService.getGeoserverUrl(informe, 'visual', true);
-    // if (informe.hasOwnProperty('servidorCapas')) {
-    //   switch (informe.servidorCapas) {
-    //     case 'geoserver': {
-    //       urlCheck = GLOBAL.urlGeoserver + informe.id + '_visual@WebMercatorQuad@png/1/1/1.png?flipY=true';
-    //       url = GLOBAL.urlGeoserver + informe.id + '_visual@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
-    //       break;
-    //     }
-    //     case 'old': {
-    //       url = GLOBAL.urlServidorAntiguo + informe.id + '_visual/{z}/{x}/{y}.png';
-    //       urlCheck = GLOBAL.urlServidorAntiguo + informe.id + '_visual/1/1/1.png';
-    //     }
-    //   }
-    // } else {
-    //   url = GLOBAL.urlServidorAntiguo + informe.id + '_visual/{z}/{x}/{y}.png';
-    //   urlCheck = GLOBAL.urlServidorAntiguo + informe.id + '_visual/1/1/1.png';
-    // }
 
     return new Promise((resolve, reject) => {
       this.http
@@ -201,7 +185,6 @@ export class OlMapService {
   createThermalLayer(thermalLayer: ThermalLayerInterface, informe: InformeInterface, index: number): TileLayer {
     // Iniciar mapa térmico
     let url: string;
-    let crossOrigin = 'anonymous';
     if (informe.hasOwnProperty('servidorCapas')) {
       switch (informe.servidorCapas) {
         case 'geoserver': {
@@ -210,19 +193,17 @@ export class OlMapService {
         }
         case 'old': {
           url = GLOBAL.urlServidorAntiguo + thermalLayer.gisName + '/{z}/{x}/{y}.png';
-          crossOrigin = 'anonymous';
           break;
         }
       }
     } else {
       url = GLOBAL.urlServidorAntiguo + thermalLayer.gisName + '/{z}/{x}/{y}.png';
-      crossOrigin = 'anonymous';
     }
 
     const tl = new TileLayer({
       source: new XYZ_mod({
         url,
-        crossOrigin,
+        crossOrigin: 'anonymous',
         tileClass: ImageTileMod,
         tileLoadFunction: (imageTile, src) => {
           imageTile.rangeTempMax = thermalLayer.rangeTempMax;

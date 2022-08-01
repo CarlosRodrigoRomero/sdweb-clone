@@ -160,20 +160,6 @@ export class MapComponent implements OnInit, OnDestroy {
       this.aerialLayers = [aerialLayer];
     }
 
-    // TEST SIRUELA
-    // if (this.planta.id === '3JXI01XmcE3G1d4WNMMd') {
-    //   aerial = new XYZ({
-    //     url: GLOBAL.urlGeoserver + 'test' + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true',
-    //     crossOrigin: null,
-    //   });
-
-    //   const aerialLayer = new TileLayer({
-    //     source: aerial,
-    //   });
-
-    //   this.aerialLayers = [aerialLayer];
-    // }
-
     const layers = [
       satelliteLayer,
       ...this.aerialLayers,
@@ -200,7 +186,7 @@ export class MapComponent implements OnInit, OnDestroy {
         center: fromLonLat([this.planta.longitud, this.planta.latitud]),
         zoom: this.planta.zoom,
         minZoom: this.planta.zoom - 2,
-        maxZoom: this.planta.zoom + 8,
+        maxZoom: 24,
       });
     }
 
