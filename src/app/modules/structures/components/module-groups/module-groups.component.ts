@@ -72,8 +72,8 @@ export class ModuleGroupsComponent implements OnInit, OnDestroy {
         source: new VectorSource({ wrapX: false }),
         style: new Style({
           stroke: new Stroke({
-            color: 'darkblue',
-            width: 2,
+            color: 'green',
+            width: 4,
           }),
         }),
       });
