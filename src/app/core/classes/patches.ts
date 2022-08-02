@@ -25,13 +25,13 @@ export class Patches {
   }
 
   static plantsTwoClients(plantaId: string, userId: string, informes: InformeInterface[]): InformeInterface[] {
-    const plantasCompradas = ['3JXI01XmcE3G1d4WNMMd'];
+    const plantasCompradas = ['NJjVdM0e94vhHVfveaPh', 'G1m2tuoEaRtuiCHtcI7g']; // Carbonero, Martin Muñoz
 
     let informesCliente = informes;
     if (plantasCompradas.includes(plantaId)) {
-      const pleniumId = '7OB3WwV744cYZ4P6v9TURwSgarr2';
+      const pleniumId = '82gvWxNTFsb25E2gjSdk0ezPlnJ2';
       if (userId === pleniumId) {
-        informesCliente = informes.filter((informe) => informe.empresaId !== pleniumId);
+        informesCliente = informes.filter((informe) => informe.empresaId === pleniumId);
       } else {
         informesCliente = informes.filter((informe) => !informe.hasOwnProperty('empresaId'));
       }

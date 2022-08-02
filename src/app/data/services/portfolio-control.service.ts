@@ -23,6 +23,8 @@ import { MathOperations } from '@core/classes/math-operations';
 import { GLOBAL } from '@data/constants/global';
 import { COLOR } from '@data/constants/color';
 
+import { Patches } from '@core/classes/patches';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -110,7 +112,10 @@ export class PortfolioControlService {
             }
 
             plantasEmpresa.forEach((planta) => {
-              const informesPlanta = informes.filter((inf) => inf.plantaId === planta.id);
+              let informesPlanta = informes.filter((inf) => inf.plantaId === planta.id);
+
+              // aplicamos parche para plantas compradas por Plenium a RIOS
+              informesPlanta = Patches.plantsTwoClients(planta.id, this.user.uid, informesPlanta);
 
               if (informesPlanta.length > 0) {
                 informesPlanta.forEach((informe) => {
