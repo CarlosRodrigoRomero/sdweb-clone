@@ -14,8 +14,8 @@ import { LatLngLiteral } from '@agm/core/map-types';
 declare const google: any;
 
 import { AuthService } from '@data/services/auth.service';
-import { GLOBAL } from '@data/constants/global';
 import { OlMapService } from '@data/services/ol-map.service';
+import { GeoserverService } from './geoserver.service';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { PlantaInterface } from '@core/models/planta';
@@ -25,6 +25,7 @@ import { UserInterface } from '@core/models/user';
 import { ModuloInterface } from '@core/models/modulo';
 import { UserAreaInterface } from '@core/models/userArea';
 import { CritCriticidad } from '@core/models/critCriticidad';
+import { InformeInterface } from '@core/models/informe';
 
 @Injectable({
   providedIn: 'root',
@@ -47,7 +48,8 @@ export class PlantaService {
     private afs: AngularFirestore,
     public auth: AuthService,
     private activatedRoute: ActivatedRoute,
-    private olMapService: OlMapService
+    private olMapService: OlMapService,
+    private geoserverService: GeoserverService
   ) {
     this.currentPlantId = this.activatedRoute.snapshot.paramMap.get('id');
     this.currentPlantId$.next(this.currentPlantId);
@@ -578,7 +580,7 @@ export class PlantaService {
     }
   }
 
-  loadOrtoImage(planta: PlantaInterface, informeId: string, map: any) {
+  loadOrtoImage(planta: PlantaInterface, informe: InformeInterface, map: any) {
     const mapBounds = new google.maps.LatLngBounds(
       new google.maps.LatLng(planta.latitud - 0.02, planta.longitud - 0.02),
       new google.maps.LatLng(planta.latitud + 0.02, planta.longitud + 0.02)
@@ -590,7 +592,8 @@ export class PlantaService {
     map.setOptions({ maxZoom: mapMaxZoom });
     map.setOptions({ minZoom: mapMinZoom });
 
-    // https://developers.google.com/maps/documentation/javascript/examples/maptype-image-overlay
+    const urlServer = this.geoserverService.getGeoserverUrl(informe, 'visual');
+
     const imageMapType = new google.maps.ImageMapType({
       getTileUrl(coord, zoom) {
         const proj = map.getProjection();
@@ -601,11 +604,11 @@ export class PlantaService {
           proj.fromPointToLatLng(new google.maps.Point(coord.x * tileXSize, (coord.y + 1) * tileYSize)),
           proj.fromPointToLatLng(new google.maps.Point((coord.x + 1) * tileXSize, coord.y * tileYSize))
         );
-        if (!mapBounds.intersects(tileBounds) || zoom < mapMinZoom || zoom > mapMaxZoom) return null;
-        return `https://solardrontech.es/tileserver.php?/index.json?/${informeId}_visual/{z}/{x}/{y}.png`
-          .replace('{z}', zoom)
-          .replace('{x}', coord.x)
-          .replace('{y}', coord.y);
+        if (!mapBounds.intersects(tileBounds) || zoom < mapMinZoom || zoom > mapMaxZoom) {
+          return null;
+        }
+        const url = urlServer.replace('{z}', zoom).replace('{x}', coord.x).replace('{y}', coord.y);
+        return url;
       },
       tileSize: new google.maps.Size(256, 256),
       minZoom: mapMinZoom,

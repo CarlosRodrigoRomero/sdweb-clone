@@ -13,7 +13,6 @@ import XYZ from 'ol/source/XYZ';
 
 import { PlantaService } from '@data/services/planta.service';
 import { MapControlService } from '../../services/map-control.service';
-import { GLOBAL } from '@data/constants/global';
 import { FilterService } from '@data/services/filter.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ShareReportService } from '@data/services/share-report.service';

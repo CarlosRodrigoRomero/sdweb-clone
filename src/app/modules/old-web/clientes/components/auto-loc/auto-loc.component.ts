@@ -214,7 +214,7 @@ export class AutoLocComponent implements OnInit, AfterViewInit {
 
         if (informeReciente !== undefined) {
           if (informeReciente.fecha > GLOBAL.newReportsDate) {
-            this.plantaService.loadOrtoImage(this.planta, informeReciente.id, map);
+            this.plantaService.loadOrtoImage(this.planta, informeReciente, map);
           } else {
             this.plantaService.initMap(this.planta, map);
           }
