@@ -76,7 +76,7 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
       const selectedZones = this.largestZones.filter((zone) => selectedTaskZones.find((t) => t.id === zone.id));
 
       this.loadRawModules(selectedZones);
-      this.loadModuleGroups(selectedZones);
+      this.loadModuleGroups();
       this.loadNormModules(selectedZones);
     } else {
       this.loadRawModules();
