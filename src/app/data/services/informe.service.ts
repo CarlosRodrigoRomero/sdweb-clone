@@ -12,7 +12,6 @@ import { LatLng as number, LatLngLiteral } from '@agm/core';
 import { GLOBAL } from '@data/constants/global';
 import { PlantaService } from '@data/services/planta.service';
 
-import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { InformeInterface } from '@core/models/informe';
 import { EstructuraInterface, Estructura } from '@core/models/estructura';
 import { ArchivoVueloInterface } from '@core/models/archivoVuelo';

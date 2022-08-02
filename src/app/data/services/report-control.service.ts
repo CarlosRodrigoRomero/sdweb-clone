@@ -25,6 +25,7 @@ import { CritCriticidad } from '@core/models/critCriticidad';
 import { PlantaInterface } from '@core/models/planta';
 import { UserInterface } from '@core/models/user';
 import { ZonesService } from './zones.service';
+import { Patches } from '@core/classes/patches';
 
 @Injectable({
   providedIn: 'root',
@@ -118,15 +119,16 @@ export class ReportControlService {
               take(1),
               // obtenemos los informes de la planta
               switchMap((informes) => {
+                // parche plantas que compró Plenium a RIOS
+                this.informes = Patches.plantsTwoClients(this.planta.id, this.user.uid, informes);
+
                 if (this.router.url.includes('fixed')) {
                   this.plantaFija = true;
 
                   // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
-                  this.informes = this.informeService.getOnlyNewInfomesFijas(informes);
+                  this.informes = this.informeService.getOnlyNewInfomesFijas(this.informes);
                 } else {
                   this.plantaFija = false;
-
-                  this.informes = informes;
                 }
 
                 // evitamos cargar los informes dobles al navegar atras y volver
