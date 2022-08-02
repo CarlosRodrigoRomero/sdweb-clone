@@ -13,6 +13,7 @@ import { OSM } from 'ol/source';
 import { OlMapService } from '@data/services/ol-map.service';
 import { StructuresService } from '@data/services/structures.service';
 import { ThermalService } from '@data/services/thermal.service';
+import { StructuresControlService } from '@data/services/structures-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
@@ -33,7 +34,7 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
   private thermalLayerDB: ThermalLayerInterface;
   public layerVisibility = true;
   endFilterSubscription = false;
-  public rawModHovered: RawModule;
+  rawModHovered: RawModule;
   private aerialLayer: TileLayer;
 
   private subscriptionFilters: Subscription = new Subscription();
@@ -42,7 +43,8 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
   constructor(
     private olMapService: OlMapService,
     private structuresService: StructuresService,
-    private thermalService: ThermalService
+    private thermalService: ThermalService,
+    private structuresControlService: StructuresControlService
   ) {}
 
   ngOnInit(): void {
@@ -97,6 +99,10 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
           this.olMapService.addThermalLayer(tL);
         }
       });
+
+    this.subscriptions.add(
+      this.structuresControlService.rawModHovered$.subscribe((rawMod) => (this.rawModHovered = rawMod))
+    );
   }
 
   initMap() {

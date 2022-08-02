@@ -17,6 +17,7 @@ import Feature, { FeatureLike } from 'ol/Feature';
 import { StructuresService } from '@data/services/structures.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { FilterService } from '@data/services/filter.service';
+import { StructuresControlService } from '@data/services/structures-control.service';
 
 import { RawModule } from '@core/models/moduloBruto';
 
@@ -39,7 +40,6 @@ export class RawModulesComponent implements OnInit, OnDestroy {
   private rawModLayer: VectorLayer;
   private rawMods: RawModule[];
   private prevFeatureHover: Feature;
-  public rawModHovered: RawModule;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -47,7 +47,8 @@ export class RawModulesComponent implements OnInit, OnDestroy {
     private structuresService: StructuresService,
     private olMapService: OlMapService,
     public dialog: MatDialog,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private structuresControlService: StructuresControlService
   ) {}
 
   ngOnInit(): void {
@@ -245,7 +246,9 @@ export class RawModulesComponent implements OnInit, OnDestroy {
             }
             currentFeatureHover = feature;
 
-            this.rawModHovered = this.rawMods.find((rawMod) => rawMod.id === feature.getProperties().properties.id);
+            this.structuresControlService.rawModHovered = this.rawMods.find(
+              (rawMod) => rawMod.id === feature.getProperties().properties.id
+            );
 
             // aplicamos el efecto resaltado
             feature.setStyle(this.getStyleRawMod(true));
@@ -259,11 +262,13 @@ export class RawModulesComponent implements OnInit, OnDestroy {
             .filter((item) => item.getProperties().properties.name === 'rawMod')[0] as Feature;
 
           if (feature !== undefined) {
-            this.rawModHovered = this.rawMods.find((rawMod) => rawMod.id === feature.getProperties().properties.id);
+            this.structuresControlService.rawModHovered = this.rawMods.find(
+              (rawMod) => rawMod.id === feature.getProperties().properties.id
+            );
           }
         }
       } else {
-        this.rawModHovered = undefined;
+        this.structuresControlService.rawModHovered = undefined;
         if (currentFeatureHover !== undefined) {
           // quitamos el efecto resaltado
           currentFeatureHover.setStyle(this.getStyleRawMod(false));
