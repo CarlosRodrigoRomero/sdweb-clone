@@ -23,6 +23,8 @@ import { MathOperations } from '@core/classes/math-operations';
 import { GLOBAL } from '@data/constants/global';
 import { COLOR } from '@data/constants/color';
 
+import { Patches } from '@core/classes/patches';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -85,21 +87,35 @@ export class PortfolioControlService {
             this.criterioCriticidad = criterio;
 
             return combineLatest([
+              this.plantaService.getAllPlantas(),
               this.plantaService.getPlantasDeEmpresa(this.user),
               this.informeService.getInformes(),
             ]);
           })
         )
         .pipe(take(3))
-        .subscribe(([plantas, informes]) => {
-          if (plantas !== undefined) {
+        .subscribe(([plantas, plantasEmpresa, informes]) => {
+          const informesExtra = this.informeService.getInformesWithEmpresaId(informes, this.user.uid);
+
+          const plantasExtra: PlantaInterface[] = plantas.filter(
+            (planta) =>
+              informesExtra.map((informe) => informe.plantaId).includes(planta.id) &&
+              !plantasEmpresa.map((pl) => pl.id).includes(planta.id)
+          );
+
+          plantasEmpresa.push(...plantasExtra);
+
+          if (plantasEmpresa !== undefined) {
             // AÑADIMOS PLANTAS FALSAS SOLO EN LOS USUARIOS DEMO
             if (this.usersFakePlants.includes(this.user.uid)) {
-              plantas = this.demoService.addPlantasFake(plantas);
+              plantasEmpresa = this.demoService.addPlantasFake(plantasEmpresa);
             }
 
-            plantas.forEach((planta) => {
-              const informesPlanta = informes.filter((inf) => inf.plantaId === planta.id);
+            plantasEmpresa.forEach((planta) => {
+              let informesPlanta = informes.filter((inf) => inf.plantaId === planta.id);
+
+              // aplicamos parche para plantas compradas por Plenium a RIOS
+              informesPlanta = Patches.plantsTwoClients(planta.id, this.user.uid, informesPlanta);
 
               if (informesPlanta.length > 0) {
                 informesPlanta.forEach((informe) => {
@@ -120,7 +136,7 @@ export class PortfolioControlService {
                     informe.mae !== null &&
                     informe.disponible === true
                   ) {
-                    // comprobamos si es un mae aniguo o nuevo
+                    // comprobamos si es un mae antiguo o nuevo
                     informe.mae = this.getRightMae(planta, informe);
 
                     // añadimos el informe a la lista

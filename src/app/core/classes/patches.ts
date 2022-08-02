@@ -1,4 +1,5 @@
 import { Anomalia } from '@core/models/anomalia';
+import { InformeInterface } from '@core/models/informe';
 
 export class Patches {
   static checkId(id: string): boolean {
@@ -27,5 +28,21 @@ export class Patches {
         const zoomLevel = 20;
         return zoomLevel;
     }
+  }
+
+  static plantsTwoClients(plantaId: string, userId: string, informes: InformeInterface[]): InformeInterface[] {
+    const plantasCompradas = ['NJjVdM0e94vhHVfveaPh', 'G1m2tuoEaRtuiCHtcI7g']; // Carbonero, Martin Muñoz
+
+    let informesCliente = informes;
+    if (plantasCompradas.includes(plantaId)) {
+      const pleniumId = '82gvWxNTFsb25E2gjSdk0ezPlnJ2';
+      if (userId === pleniumId) {
+        informesCliente = informes.filter((informe) => informe.empresaId === pleniumId);
+      } else {
+        informesCliente = informes.filter((informe) => !informe.hasOwnProperty('empresaId'));
+      }
+    }
+
+    return informesCliente;
   }
 }

@@ -12,7 +12,6 @@ import { LatLng as number, LatLngLiteral } from '@agm/core';
 import { GLOBAL } from '@data/constants/global';
 import { PlantaService } from '@data/services/planta.service';
 
-import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { InformeInterface } from '@core/models/informe';
 import { EstructuraInterface, Estructura } from '@core/models/estructura';
 import { ArchivoVueloInterface } from '@core/models/archivoVuelo';
@@ -135,6 +134,57 @@ export class InformeService {
             data.tiposAnomalias = Object.values(data.tiposAnomalias);
           }
           return data;
+        })
+      ),
+      // los ordenamos por fecha
+      map((informes) => informes.sort((a, b) => a.fecha - b.fecha)),
+      // nos quedamos con los 2 más recientes por el momento
+      map((informes) =>
+        informes.filter((informe, index) => index === informes.length - 1 || index === informes.length - 2)
+      )
+    );
+  }
+
+  getInformesDisponiblesDeEmpresa(empresaId: string): Observable<InformeInterface[]> {
+    const query$ = this.afs.collection<InformeInterface>('informes', (ref) => ref.where('empresaId', '==', empresaId));
+    return query$.snapshotChanges().pipe(
+      map((actions) =>
+        actions.map((a) => {
+          const data = a.payload.doc.data() as InformeInterface;
+          data.id = a.payload.doc.id;
+          if (data.tiposAnomalias !== undefined && data.tiposAnomalias !== null) {
+            data.tiposAnomalias = Object.values(data.tiposAnomalias);
+          }
+          return data;
+        })
+      ),
+      // solo traemos los disponibles
+      map((informes) => informes.filter((informe) => informe.disponible)),
+      // los ordenamos por fecha
+      map((informes) => informes.sort((a, b) => a.fecha - b.fecha)),
+      // nos quedamos con los 2 más recientes por el momento
+      map((informes) =>
+        informes.filter((informe, index) => index === informes.length - 1 || index === informes.length - 2)
+      )
+    );
+  }
+
+  getInformesDeEmpresa(empresaId: string): Observable<InformeInterface[]> {
+    const query$ = this.afs.collection<InformeInterface>('informes', (ref) => ref.where('empresaId', '==', empresaId));
+    return query$.snapshotChanges().pipe(
+      map((actions) =>
+        actions.map((a) => {
+          const data = a.payload.doc.data() as InformeInterface;
+
+          if (data.hasOwnProperty('empresaId')) {
+            return null;
+          } else {
+            data.id = a.payload.doc.id;
+            if (data.tiposAnomalias !== undefined && data.tiposAnomalias !== null) {
+              data.tiposAnomalias = Object.values(data.tiposAnomalias);
+            }
+            return data;
+          }
         })
       ),
       // los ordenamos por fecha
@@ -468,6 +518,10 @@ export class InformeService {
     const month = monthNames[date.getMonth()];
 
     return month + ' ' + year;
+  }
+
+  getInformesWithEmpresaId(informes: InformeInterface[], empresaId: string): InformeInterface[] {
+    return informes.filter((informe) => informe.hasOwnProperty('empresaId') && informe.empresaId === empresaId);
   }
 
   ///////////////////////////////////////////////////////
