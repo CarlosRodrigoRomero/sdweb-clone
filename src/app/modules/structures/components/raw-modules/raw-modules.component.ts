@@ -42,6 +42,7 @@ export class RawModulesComponent implements OnInit, OnDestroy {
   private prevFeatureHover: Feature;
 
   private subscriptions: Subscription = new Subscription();
+  private rawModsSubscriptions: Subscription = new Subscription();
 
   constructor(
     private structuresService: StructuresService,
@@ -111,7 +112,7 @@ export class RawModulesComponent implements OnInit, OnDestroy {
   }
 
   private addRawModules() {
-    this.subscriptions.add(
+    this.rawModsSubscriptions.add(
       this.structuresService.allRawModules$
         .pipe(
           switchMap((rawMods) => from(this.filterService.initService(rawMods))),
@@ -317,9 +318,9 @@ export class RawModulesComponent implements OnInit, OnDestroy {
             this.structuresService.addFilter('eliminados', this.rawModDeletedIds);
 
             // quitamos el modulo de la lista de modulos filtrados
-            this.filterService.filteredElements = this.filterService.filteredElements.filter(
-              (elem) => elem.id !== e.selected[0].getProperties().properties.id
-            );
+            // this.filterService.filteredElements = this.filterService.filteredElements.filter(
+            //   (elem) => elem.id !== e.selected[0].getProperties().properties.id
+            // );
           }
         }
       }
@@ -357,6 +358,9 @@ export class RawModulesComponent implements OnInit, OnDestroy {
   }
 
   switchDeleteMode() {
+    // cancelamos la suscripcion a los modulos
+    this.rawModsSubscriptions.unsubscribe();
+
     this.structuresService.deleteRawModMode = !this.structuresService.deleteRawModMode;
   }
 
