@@ -9,6 +9,7 @@ import { Map } from 'ol';
 import { fromLonLat } from 'ol/proj';
 import { defaults as defaultControls } from 'ol/control.js';
 import { OSM } from 'ol/source';
+import { DoubleClickZoom } from 'ol/interaction';
 
 import { OlMapService } from '@data/services/ol-map.service';
 import { StructuresService } from '@data/services/structures.service';
@@ -124,6 +125,13 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
 
     this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {
       this.map = map;
+
+      // desactivamos el zoom al hacer dobleclick para que no interfiera
+      this.map.getInteractions().forEach((interaction) => {
+        if (interaction instanceof DoubleClickZoom) {
+          this.map.removeInteraction(interaction);
+        }
+      });
     });
   }
 
