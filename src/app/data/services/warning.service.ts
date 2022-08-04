@@ -640,7 +640,7 @@ export class WarningService {
     informeId: string,
     planta: PlantaInterface
   ): boolean {
-    if (planta.tipo === 'seguidor') {
+    if (planta.tipo === 'seguidores') {
       if (planta.alturaBajaPrimero || (planta.hasOwnProperty('columnaDchaPrimero') && planta.columnaDchaPrimero)) {
         const areasConTipoSeguidor = locAreas.filter((locArea) => locArea.hasOwnProperty('tipoSeguidor'));
 
