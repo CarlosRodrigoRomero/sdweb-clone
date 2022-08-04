@@ -57,7 +57,6 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
   zones: LocationAreaInterface[];
   chartData: number[][];
   chartLoaded = false;
-  thereAreZones = true;
   private dateLabels: string[];
 
   private subscriptions: Subscription = new Subscription();
@@ -92,6 +91,7 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
 
           this.chartData.push(this._calculateChartData(celscalInforme));
         });
+
         this._initChart();
       })
     );

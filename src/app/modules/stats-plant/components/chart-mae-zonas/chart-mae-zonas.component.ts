@@ -59,7 +59,6 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
   zones: LocationAreaInterface[];
   chartData: number[][];
   chartLoaded = false;
-  thereAreZones = true;
   private dateLabels: string[];
 
   private subscriptions: Subscription = new Subscription();

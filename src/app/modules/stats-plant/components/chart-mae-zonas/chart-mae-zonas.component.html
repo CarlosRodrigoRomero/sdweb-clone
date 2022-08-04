@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card >
   <mat-card-header>
     <mat-card-title>MAE por zonas</mat-card-title>
     <mat-card-subtitle>Para visualizar dónde están los problemas de rendimiento</mat-card-subtitle>
@@ -6,7 +6,7 @@
   <mat-card-content>
     <div class="mae-zonas">
       <apx-chart
-        *ngIf="chartLoaded && thereAreZones"
+        *ngIf="chartLoaded"
         id="chart-anomalias-zonas"
         [series]="chartOptions.series"
         [chart]="chartOptions.chart"
