@@ -702,6 +702,7 @@ export class WarningService {
       .pipe(
         take(1),
         catchError((error) => {
+          console.log(error);
           // no recibimos respuesta del servidor porque no existe
           if (error.status === 0) {
             const warning: Warning = {
@@ -734,6 +735,7 @@ export class WarningService {
       .pipe(
         take(1),
         catchError((error) => {
+          console.log(error);
           // no recibimos respuesta del servidor porque no existe
           if (error.status === 0) {
             const warning: Warning = {
