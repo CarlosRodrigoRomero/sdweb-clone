@@ -280,7 +280,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     }
 
     row.localY = this.anomaliaInfoService.getAlturaAnom(anomalia, this.planta);
-    row.localX = anomalia.localX;
+    row.localX = this.anomaliaInfoService.getColumnaAnom(anomalia, this.planta);
 
     if (this.reportControlService.plantaFija) {
       row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(this.olMapService.getCentroid(anomalia.featureCoords));
