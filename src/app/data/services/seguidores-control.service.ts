@@ -126,7 +126,7 @@ export class SeguidoresControlService {
 
   createSeguidorLayers(informeId: string): VectorLayer[] {
     const seguidoresLayers: VectorLayer[] = [];
-    
+
     const maeLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleSeguidoresMae(false),
@@ -370,7 +370,9 @@ export class SeguidoresControlService {
   }
 
   setPopupPosition(coords: Coordinate) {
-    this.map.getOverlayById('popup').setPosition(coords);
+    const popupCoords = [coords[0] + 20, coords[1] + 20] as Coordinate;
+
+    this.map.getOverlayById('popup').setPosition(popupCoords);
   }
 
   private getMaesMedioSigma() {

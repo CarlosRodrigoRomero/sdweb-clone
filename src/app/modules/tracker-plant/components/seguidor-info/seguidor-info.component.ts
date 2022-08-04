@@ -4,7 +4,6 @@ import { Subscription } from 'rxjs';
 
 import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 import { Seguidor } from '@core/models/seguidor';
 
@@ -22,8 +21,7 @@ export class SeguidorInfoComponent implements OnInit, OnDestroy {
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
-    private reportControlService: ReportControlService,
-    private anomaliaInfoService: AnomaliaInfoService
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
