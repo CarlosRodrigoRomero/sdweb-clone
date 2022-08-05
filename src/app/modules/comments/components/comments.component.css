@@ -1,0 +1,9 @@
+.content {
+  width: 100%;
+}
+
+.list-sidenav {
+  display: flex;
+  padding: 0.5rem;
+  width: fit-content;
+}

@@ -1,1 +1,21 @@
-<p>comments works!</p>
+<app-loading *ngIf="!anomaliasLoaded"></app-loading>
+<div *ngIf="anomaliasLoaded">
+  <div class="content">
+    <mat-sidenav-container class="main-container" [hasBackdrop]="false">
+      <mat-sidenav
+        #sidenavLista
+        opened
+        mode="side"
+        [fixedInViewport]="true"
+        class="list-sidenav"
+        [fixedTopGap]="70"
+        position="start"
+      >
+        <app-anomalias-list></app-anomalias-list>
+      </mat-sidenav>
+      <mat-sidenav-content>
+        <app-comments-zone></app-comments-zone>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </div>
+</div>

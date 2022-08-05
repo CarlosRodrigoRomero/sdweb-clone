@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+
+import { MatSidenav } from '@angular/material/sidenav';
 
 import { ReportControlService } from '@data/services/report-control.service';
 
@@ -8,6 +10,8 @@ import { ReportControlService } from '@data/services/report-control.service';
   styleUrls: ['./comments.component.css'],
 })
 export class CommentsComponent implements OnInit {
+  @ViewChild('sidenavLista') sidenavLeft: MatSidenav;
+
   anomaliasLoaded = false;
 
   constructor(private reportControlService: ReportControlService) {}
