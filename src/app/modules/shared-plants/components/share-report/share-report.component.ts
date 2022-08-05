@@ -43,7 +43,11 @@ export class ShareReportComponent {
 
     let sharedType: string;
     if (this.versionTecnicos) {
-      sharedType = '/comments/';
+      if (this.reportControlService.plantaFija) {
+        sharedType = '/comments-fixed-shared/';
+      } else {
+        sharedType = '/comments-tracker-shared/';
+      }
     } else {
       if (this.reportControlService.plantaFija) {
         sharedType = '/fixed-filterable-shared/';
