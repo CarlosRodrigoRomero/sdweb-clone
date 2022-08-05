@@ -64,7 +64,7 @@ export class StructuresComponent implements OnInit, OnDestroy {
     this.structuresService.loadNormModules = load;
   }
 
-  toggleEditNormModulesPhase(edit: boolean) {
+  toggleEditNormModules(edit: boolean) {
     // habilitamos edicion de los módulos normalizados
     this.structuresService.editNormModules = edit;
   }
