@@ -51,6 +51,11 @@ export const routes: Routes = [
     loadChildren: () => import('@modules/tracker-plant/tracker-plant.module').then((m) => m.TrackerPlantModule),
   },
   {
+    path: 'comments',
+    component: SkeletonComponent,
+    loadChildren: () => import('@modules/comments/comments.module').then((m) => m.CommentsModule),
+  },
+  {
     path: 'clusters',
     component: SkeletonComponent,
     loadChildren: () => import('@modules/clusters/clusters.module').then((m) => m.ClustersModule),
