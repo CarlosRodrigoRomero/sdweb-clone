@@ -17,7 +17,8 @@ import { ReportControlService } from '@data/services/report-control.service';
 })
 export class ShareReportComponent {
   items: Observable<any[]>;
-  public onlyFiltered = false;
+  onlyFiltered = false;
+  versionTecnicos = false;
 
   constructor(
     private shareReportService: ShareReportService,
@@ -28,10 +29,11 @@ export class ShareReportComponent {
 
   copyLink() {
     this.clipboardService.copy(this.getShareLink());
+
     this.openSnackBar();
   }
 
-  getShareLink(): string {
+  private getShareLink(): string {
     // primero guarda los params en la DB
     this.shareReportService.setSelectedInformeId(this.reportControlService.selectedInformeId);
     this.shareReportService.saveParams();
@@ -40,15 +42,19 @@ export class ShareReportComponent {
     const id = this.shareReportService.getParamsDbId();
 
     let sharedType: string;
-    if (this.reportControlService.plantaFija) {
-      sharedType = '/fixed-filterable-shared/';
-      if (this.onlyFiltered) {
-        sharedType = '/fixed-shared/';
-      }
+    if (this.versionTecnicos) {
+      sharedType = '/comments/';
     } else {
-      sharedType = '/tracker-filterable-shared/';
-      if (this.onlyFiltered) {
-        sharedType = '/tracker-shared/';
+      if (this.reportControlService.plantaFija) {
+        sharedType = '/fixed-filterable-shared/';
+        if (this.onlyFiltered) {
+          sharedType = '/fixed-shared/';
+        }
+      } else {
+        sharedType = '/tracker-filterable-shared/';
+        if (this.onlyFiltered) {
+          sharedType = '/tracker-shared/';
+        }
       }
     }
 

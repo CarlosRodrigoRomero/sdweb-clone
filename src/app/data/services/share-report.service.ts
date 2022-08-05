@@ -4,6 +4,8 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
+import { AnomaliaService } from './anomalia.service';
+
 import { FilterInterface } from '@core/models/filter';
 import { GradientFilter } from '@core/models/gradientFilter';
 import { PerdidasFilter } from '@core/models/perdidasFilter';
@@ -26,7 +28,7 @@ export class ShareReportService {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private afs: AngularFirestore) {}
+  constructor(private afs: AngularFirestore, private anomaliaService: AnomaliaService) {}
 
   initService(id: string) {
     this.subscriptions.add(
@@ -80,7 +82,9 @@ export class ShareReportService {
         break;
       case 'criticidad':
         if (this.params.criticidad === undefined || this.params.criticidad === null) {
-          this.params.criticidad = [false, false, false, false, false];
+          const criticidad = new Array(this.anomaliaService.criterioCriticidad.labels.length).fill(false);
+
+          this.params.criticidad = criticidad;
           this.params.criticidad[(filter as CriticidadFilter).criticidad] =
             !this.params.criticidad[(filter as CriticidadFilter).criticidad];
         } else {
