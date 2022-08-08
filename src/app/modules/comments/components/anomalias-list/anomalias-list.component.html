@@ -32,7 +32,7 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr
         class="table-row"
-        (click)="selectAnomalia(row, false)"
+        (click)="selectAnomalia(row)"
         mat-row
         [ngClass]="{ selected: row.anomalia === anomaliaSelect }"
         *matRowDef="let row; columns: displayedColumns"

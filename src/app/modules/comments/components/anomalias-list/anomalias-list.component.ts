@@ -6,6 +6,7 @@ import { MatSort } from '@angular/material/sort';
 import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
+import { ComentariosControlService } from '@data/services/comentarios-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -30,7 +31,8 @@ export class AnomaliasListComponent implements OnInit {
   constructor(
     private filterService: FilterService,
     private reportControlService: ReportControlService,
-    private anomaliaInfoService: AnomaliaInfoService
+    private anomaliaInfoService: AnomaliaInfoService,
+    private comentariosControlService: ComentariosControlService
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +55,10 @@ export class AnomaliasListComponent implements OnInit {
       this.dataSource = new MatTableDataSource(this.anomsData);
       this.dataSource.sort = this.sort;
     });
+  }
+
+  selectAnomalia(row: any) {
+    this.comentariosControlService.sidenavOpened = false;
   }
 
   applyFilter(event: Event) {

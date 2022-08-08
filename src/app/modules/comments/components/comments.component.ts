@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { ReportControlService } from '@data/services/report-control.service';
+import { ComentariosControlService } from '@data/services/comentarios-control.service';
 
 @Component({
   selector: 'app-comments',
@@ -11,14 +12,19 @@ import { ReportControlService } from '@data/services/report-control.service';
 })
 export class CommentsComponent implements OnInit {
   @ViewChild('sidenavLista') sidenavLeft: MatSidenav;
-
   anomaliasLoaded = false;
+  sidenavOpened = true;
 
-  constructor(private reportControlService: ReportControlService) {}
+  constructor(
+    private reportControlService: ReportControlService,
+    private comentariosControlService: ComentariosControlService
+  ) {}
 
   ngOnInit(): void {
     this.reportControlService.initService().then((res) => {
       this.anomaliasLoaded = res;
     });
+
+    this.comentariosControlService.sidenavOpened$.subscribe((opened) => (this.sidenavOpened = opened));
   }
 }

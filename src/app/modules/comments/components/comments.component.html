@@ -4,7 +4,7 @@
     <mat-sidenav-container class="main-container" [hasBackdrop]="false">
       <mat-sidenav
         #sidenavLista
-        opened
+        [(opened)]="sidenavOpened"
         mode="side"
         [fixedInViewport]="true"
         class="list-sidenav"
