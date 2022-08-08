@@ -1,9 +1,12 @@
 .content {
   width: 100%;
   height: calc(100vh - 70px);
+  display: grid;
+  grid-template-rows: 1fr 3fr;
+  gap: 1rem;
 }
 
-.up-row {
+.top-row {
   display: flex;
   width: 100%;
 }

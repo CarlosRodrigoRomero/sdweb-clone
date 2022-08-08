@@ -6,11 +6,15 @@ import { SharedModule } from '@shared/shared.module';
 
 import { CommentsComponent } from './components/comments.component';
 import { AnomaliasListComponent } from './components/anomalias-list/anomalias-list.component';
-import { CommentsZoneComponent } from './components/comments-zone/comments-zone.component';
+import { AnomaliaContentComponent } from './components/anomalia-content/anomalia-content.component';
 import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.component';
+import { CommentsAreaComponent } from './components/comments-area/comments-area.component';
+import { NewCommentComponent } from './components/new-comment/new-comment.component';
+import { CommentComponent } from './components/comment/comment.component';
+import { CommentsListComponent } from './components/comments-list/comments-list.component';
 
 @NgModule({
-  declarations: [CommentsComponent, AnomaliasListComponent, CommentsZoneComponent, AnomaliaInfoComponent],
+  declarations: [CommentsComponent, AnomaliasListComponent, AnomaliaContentComponent, AnomaliaInfoComponent, CommentsAreaComponent, NewCommentComponent, CommentComponent, CommentsListComponent],
   imports: [CommonModule, CommentsRoutingModule, SharedModule],
 })
 export class CommentsModule {}

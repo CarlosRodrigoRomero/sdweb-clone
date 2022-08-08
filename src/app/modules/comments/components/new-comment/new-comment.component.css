@@ -1,0 +1,7 @@
+:host ::ng-deep .send-input .mat-form-field-wrapper {
+  padding-bottom: 0.2rem;
+}
+
+.send-input {
+  width: 100%;
+}

@@ -1,7 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
+
+import { Subscription } from 'rxjs';
 
 import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
@@ -23,13 +25,15 @@ interface RowAnomData {
   templateUrl: './anomalias-list.component.html',
   styleUrls: ['./anomalias-list.component.css'],
 })
-export class AnomaliasListComponent implements OnInit {
+export class AnomaliasListComponent implements OnInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
   dataSource: MatTableDataSource<RowAnomData>;
   private anomalias: Anomalia[];
   private anomsData: RowAnomData[];
   displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion'];
   anomaliaSelected: Anomalia;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private filterService: FilterService,
@@ -39,35 +43,42 @@ export class AnomaliasListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.filterService.filteredElements$.subscribe((elems) => {
-      this.anomalias = [];
-      if (this.reportControlService.plantaFija) {
-        this.anomalias = elems as Anomalia[];
-      } else {
-        elems.forEach((seg) => this.anomalias.push(...(seg as Seguidor).anomaliasCliente));
-      }
+    this.subscriptions.add(
+      this.filterService.filteredElements$.subscribe((elems) => {
+        this.anomalias = [];
+        if (this.reportControlService.plantaFija) {
+          this.anomalias = elems as Anomalia[];
+        } else {
+          elems.forEach((seg) => this.anomalias.push(...(seg as Seguidor).anomaliasCliente));
+        }
 
-      this.anomsData = [];
-      this.anomalias.forEach((anom) => {
-        this.anomsData.push({
-          id: anom.id,
-          numAnom: anom.numAnom,
-          tipo: this.anomaliaInfoService.getTipoLabel(anom),
-          localizacion: this.anomaliaInfoService.getLocalizacionCompleteLabel(anom, this.reportControlService.planta),
+        this.comentariosControlService.anomaliaSelected = this.anomalias[0];
+
+        this.anomsData = [];
+        this.anomalias.forEach((anom) => {
+          this.anomsData.push({
+            id: anom.id,
+            numAnom: anom.numAnom,
+            tipo: this.anomaliaInfoService.getTipoLabel(anom),
+            localizacion: this.anomaliaInfoService.getLocalizacionCompleteLabel(anom, this.reportControlService.planta),
+          });
         });
-      });
 
-      this.dataSource = new MatTableDataSource(this.anomsData);
-      this.dataSource.sort = this.sort;
-    });
+        this.dataSource = new MatTableDataSource(this.anomsData);
+        this.dataSource.sort = this.sort;
+      })
+    );
+
+    this.subscriptions.add(
+      this.comentariosControlService.anomaliaSelected$.subscribe((anom) => (this.anomaliaSelected = anom))
+    );
   }
 
   selectAnomalia(row: any) {
     this.closeSidenav();
 
     // seleccionamos la anomalia
-    this.anomaliaSelected = this.anomalias.find((anom) => anom.id === row.id);
-    this.comentariosControlService.anomaliaSelected = this.anomaliaSelected;
+    this.comentariosControlService.anomaliaSelected = this.anomalias.find((anom) => anom.id === row.id);
   }
 
   private closeSidenav() {
@@ -84,5 +95,9 @@ export class AnomaliasListComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

@@ -1,0 +1,6 @@
+.content {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto min-content;
+  padding: 0 0.5rem;
+}
