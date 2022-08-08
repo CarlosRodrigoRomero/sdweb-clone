@@ -2,12 +2,16 @@ import { Injectable } from '@angular/core';
 
 import { BehaviorSubject } from 'rxjs';
 
+import { Anomalia } from '@core/models/anomalia';
+
 @Injectable({
   providedIn: 'root',
 })
 export class ComentariosControlService {
   private _sidenavOpened = true;
   sidenavOpened$ = new BehaviorSubject<boolean>(this._sidenavOpened);
+  private _anomaliaSelected: Anomalia = undefined;
+  anomaliaSelected$ = new BehaviorSubject<Anomalia>(this._anomaliaSelected);
 
   constructor() {}
 
@@ -18,5 +22,14 @@ export class ComentariosControlService {
   set sidenavOpened(value: boolean) {
     this._sidenavOpened = value;
     this.sidenavOpened$.next(value);
+  }
+
+  get anomaliaSelected(): Anomalia {
+    return this._anomaliaSelected;
+  }
+
+  set anomaliaSelected(value: Anomalia) {
+    this._anomaliaSelected = value;
+    this.anomaliaSelected$.next(value);
   }
 }

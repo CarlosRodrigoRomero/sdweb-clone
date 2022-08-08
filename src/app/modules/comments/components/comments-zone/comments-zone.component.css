@@ -2,3 +2,8 @@
   width: 100%;
   height: calc(100vh - 70px);
 }
+
+.up-row {
+  display: flex;
+  width: 100%;
+}

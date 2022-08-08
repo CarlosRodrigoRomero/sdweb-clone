@@ -12,6 +12,8 @@ import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 
 interface RowAnomData {
+  id: string;
+  numAnom: number;
   tipo: string;
   localizacion: string;
 }
@@ -26,7 +28,7 @@ export class AnomaliasListComponent implements OnInit {
   dataSource: MatTableDataSource<RowAnomData>;
   private anomalias: Anomalia[];
   private anomsData: RowAnomData[];
-  displayedColumns: string[] = ['tipo', 'localizacion'];
+  displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion'];
 
   constructor(
     private filterService: FilterService,
@@ -47,6 +49,8 @@ export class AnomaliasListComponent implements OnInit {
       this.anomsData = [];
       this.anomalias.forEach((anom) => {
         this.anomsData.push({
+          id: anom.id,
+          numAnom: anom.numAnom,
           tipo: this.anomaliaInfoService.getTipoLabel(anom),
           localizacion: this.anomaliaInfoService.getLocalizacionCompleteLabel(anom, this.reportControlService.planta),
         });
@@ -58,7 +62,11 @@ export class AnomaliasListComponent implements OnInit {
   }
 
   selectAnomalia(row: any) {
+    // cerramos el sidenav
     this.comentariosControlService.sidenavOpened = false;
+
+    // seleccionamos la anomalia
+    this.comentariosControlService.anomaliaSelected = this.anomalias.find((anom) => anom.id === row.id);
   }
 
   applyFilter(event: Event) {
