@@ -29,6 +29,7 @@ export class AnomaliasListComponent implements OnInit {
   private anomalias: Anomalia[];
   private anomsData: RowAnomData[];
   displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion'];
+  anomaliaSelected: Anomalia;
 
   constructor(
     private filterService: FilterService,
@@ -62,11 +63,18 @@ export class AnomaliasListComponent implements OnInit {
   }
 
   selectAnomalia(row: any) {
-    // cerramos el sidenav
-    this.comentariosControlService.sidenavOpened = false;
+    this.closeSidenav();
 
     // seleccionamos la anomalia
-    this.comentariosControlService.anomaliaSelected = this.anomalias.find((anom) => anom.id === row.id);
+    this.anomaliaSelected = this.anomalias.find((anom) => anom.id === row.id);
+    this.comentariosControlService.anomaliaSelected = this.anomaliaSelected;
+  }
+
+  private closeSidenav() {
+    // cerramos el sidenav si estamos en mobile
+    if (window.screen.width < 768) {
+      this.comentariosControlService.sidenavOpened = false;
+    }
   }
 
   applyFilter(event: Event) {

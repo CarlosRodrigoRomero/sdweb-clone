@@ -40,7 +40,7 @@
         class="table-row"
         (click)="selectAnomalia(row)"
         mat-row
-        [ngClass]="{ selected: row.anomalia === anomaliaSelect }"
+        [ngClass]="{ selected: anomaliaSelected !== undefined ? row.id === anomaliaSelected.id : false }"
         *matRowDef="let row; columns: displayedColumns"
       ></tr>
 

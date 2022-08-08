@@ -18,3 +18,7 @@
 table {
   width: 100%;
 }
+
+.mat-row.selected {
+  background-color: lightgrey;
+}
