@@ -586,7 +586,7 @@ export class PlantaService {
       new google.maps.LatLng(planta.latitud + 0.02, planta.longitud + 0.02)
     );
     const mapMinZoom = planta.zoom - 2;
-    const mapMaxZoom = planta.zoom + 8;
+    const mapMaxZoom = 24;
 
     map.mapTypeId = 'satellite';
     map.setOptions({ maxZoom: mapMaxZoom });

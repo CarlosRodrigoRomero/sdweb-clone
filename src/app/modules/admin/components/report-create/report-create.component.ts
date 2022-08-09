@@ -73,7 +73,7 @@ export class ReportCreateComponent implements OnInit {
       vientoDireccion: [, [Validators.required, Validators.min(0), Validators.max(360)]],
       camara: [, [Validators.required]],
       camaraSN: [, [Validators.required]],
-      // servidorCapas: ['geoserver', [Validators.required]],
+      servidorCapas: ['geoserver', [Validators.required]],
     });
   }
 
@@ -95,7 +95,7 @@ export class ReportCreateComponent implements OnInit {
         this.informe.camaraSN = this.form.get('camaraSN').value;
         this.informe.plantaId = this.plantaSelected.id;
         this.informe.vueloId = this.vueloSelected.id;
-        // this.informe.servidorCapas = this.form.get('servidorCapas').value;
+        this.informe.servidorCapas = this.form.get('servidorCapas').value;
 
         this.informe.disponible = false;
 
