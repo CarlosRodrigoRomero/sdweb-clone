@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { DatePipe } from '@angular/common';
 
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
@@ -9,28 +10,33 @@ import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
+import { ComentariosService } from '@data/services/comentarios.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
+import { Comentario } from '@core/models/comentario';
+import { switchMap } from 'rxjs/operators';
 
 interface RowAnomData {
   id: string;
-  numAnom: number;
+  numComs: number;
   tipo: string;
   localizacion: string;
+  fechaUltCom?: string;
 }
 
 @Component({
   selector: 'app-anomalias-list',
   templateUrl: './anomalias-list.component.html',
   styleUrls: ['./anomalias-list.component.css'],
+  providers: [DatePipe],
 })
 export class AnomaliasListComponent implements OnInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
   dataSource: MatTableDataSource<RowAnomData>;
   private anomalias: Anomalia[];
   private anomsData: RowAnomData[];
-  displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion'];
+  displayedColumns: string[] = ['numComs', 'tipo', 'localizacion', 'fecha'];
   anomaliaSelected: Anomalia;
 
   private subscriptions: Subscription = new Subscription();
@@ -39,34 +45,58 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
     private filterService: FilterService,
     private reportControlService: ReportControlService,
     private anomaliaInfoService: AnomaliaInfoService,
-    private comentariosControlService: ComentariosControlService
+    private comentariosControlService: ComentariosControlService,
+    private comentariosService: ComentariosService,
+    private datePipe: DatePipe
   ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.filterService.filteredElements$.subscribe((elems) => {
-        this.anomalias = [];
-        if (this.reportControlService.plantaFija) {
-          this.anomalias = elems as Anomalia[];
-        } else {
-          elems.forEach((seg) => this.anomalias.push(...(seg as Seguidor).anomaliasCliente));
-        }
+      this.filterService.filteredElements$
+        .pipe(
+          switchMap((elems) => {
+            this.anomalias = [];
+            if (this.reportControlService.plantaFija) {
+              this.anomalias = elems as Anomalia[];
+            } else {
+              elems.forEach((seg) => this.anomalias.push(...(seg as Seguidor).anomaliasCliente));
+            }
 
-        this.comentariosControlService.anomaliaSelected = this.anomalias[0];
+            this.comentariosControlService.anomaliaSelected = this.anomalias[0];
 
-        this.anomsData = [];
-        this.anomalias.forEach((anom) => {
-          this.anomsData.push({
-            id: anom.id,
-            numAnom: anom.numAnom,
-            tipo: this.anomaliaInfoService.getTipoLabel(anom),
-            localizacion: this.anomaliaInfoService.getLocalizacionCompleteLabel(anom, this.reportControlService.planta),
+            return this.comentariosService.getComentariosInforme(this.anomalias[0].informeId);
+          })
+        )
+        .subscribe((comentarios) => {
+          this.anomsData = [];
+          this.anomalias.forEach((anom) => {
+            const comentariosAnom = comentarios.filter((com) => com.anomaliaId === anom.id);
+            let fechaUltCom = null;
+            if (comentariosAnom.length > 0) {
+              const ultimoComentario = comentariosAnom.sort((a, b) => b.datetime - a.datetime)[0];
+              fechaUltCom = this.datePipe.transform(ultimoComentario.datetime, 'dd/MM/yyyy HH:mm');
+            }
+
+            let numComs = comentariosAnom.length;
+            if (numComs === 0) {
+              numComs = null;
+            }
+
+            this.anomsData.push({
+              id: anom.id,
+              numComs,
+              tipo: this.anomaliaInfoService.getTipoLabel(anom),
+              localizacion: this.anomaliaInfoService.getLocalizacionCompleteLabel(
+                anom,
+                this.reportControlService.planta
+              ),
+              fechaUltCom,
+            });
           });
-        });
 
-        this.dataSource = new MatTableDataSource(this.anomsData);
-        this.dataSource.sort = this.sort;
-      })
+          this.dataSource = new MatTableDataSource(this.anomsData);
+          this.dataSource.sort = this.sort;
+        })
     );
 
     this.subscriptions.add(

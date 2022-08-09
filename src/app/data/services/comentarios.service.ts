@@ -38,4 +38,10 @@ export class ComentariosService {
       .collection<Comentario>('comentarios', (ref) => ref.where('anomaliaId', '==', anomaliaId))
       .valueChanges();
   }
+
+  getComentariosInforme(informeId: string): Observable<Comentario[]> {
+    return this.afs
+      .collection<Comentario>('comentarios', (ref) => ref.where('informeId', '==', informeId))
+      .valueChanges();
+  }
 }

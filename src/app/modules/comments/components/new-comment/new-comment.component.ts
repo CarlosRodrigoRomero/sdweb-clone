@@ -38,6 +38,7 @@ export class NewCommentComponent implements OnInit {
         texto: this.form.get('texto').value,
         datetime: Date.now(),
         anomaliaId: this.comentariosControlService.anomaliaSelected.id,
+        informeId: this.comentariosControlService.anomaliaSelected.informeId,
       };
 
       this.comentariosService.addComentario(this.comentario);

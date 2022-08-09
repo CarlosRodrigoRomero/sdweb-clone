@@ -3,5 +3,6 @@ export interface Comentario {
   texto: string;
   datetime: number;
   anomaliaId: string;
+  informeId: string;
   autor?: string;
 }
