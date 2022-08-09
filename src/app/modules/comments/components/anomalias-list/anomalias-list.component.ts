@@ -22,6 +22,7 @@ interface RowAnomData {
   numComs: number;
   tipo: string;
   localizacion: string;
+  posicion: string;
   fechaUltCom?: string;
 }
 
@@ -82,14 +83,14 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
               numComs = null;
             }
 
+            const [localizacion, posicion] = this.getLocPos(anom);
+
             this.anomsData.push({
               id: anom.id,
               numComs,
               tipo: this.anomaliaInfoService.getTipoLabel(anom),
-              localizacion: this.anomaliaInfoService.getLocalizacionCompleteLabel(
-                anom,
-                this.reportControlService.planta
-              ),
+              localizacion,
+              posicion,
               fechaUltCom,
             });
           });
@@ -102,6 +103,15 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.comentariosControlService.anomaliaSelected$.subscribe((anom) => (this.anomaliaSelected = anom))
     );
+  }
+
+  private getLocPos(anom: Anomalia): [string, string] {
+    const locElems = this.anomaliaInfoService.getLocalizacionCompleteElems(anom, this.reportControlService.planta);
+
+    const localizacion = locElems.filter((_, index) => index < locElems.length - 1).join(' / ');
+    const posicion = locElems[locElems.length - 1];
+
+    return [localizacion, posicion];
   }
 
   selectAnomalia(row: any) {

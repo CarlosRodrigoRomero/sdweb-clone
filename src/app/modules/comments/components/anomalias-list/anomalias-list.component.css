@@ -22,3 +22,13 @@ table {
 .mat-row.selected {
   background-color: lightgrey;
 }
+
+.row-loc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.posicion {
+  font-size: 10px;
+}

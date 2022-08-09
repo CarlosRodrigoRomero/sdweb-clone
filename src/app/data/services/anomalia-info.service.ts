@@ -136,6 +136,35 @@ export class AnomaliaInfoService {
     return label;
   }
 
+  getLocalizacionCompleteElems(anomalia: Anomalia, planta: PlantaInterface): string[] {
+    const elems: string[] = [];
+
+    const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
+
+    globals.forEach((coord, index) => {
+      if (coord !== undefined && coord !== null && coord !== '') {
+        if (planta.hasOwnProperty('nombreGlobalCoords')) {
+          elems.push(`${this.translation.t(planta.nombreGlobalCoords[index])}: ${coord}`);
+        } else {
+          elems.push(`${coord}`);
+        }
+      }
+    });
+
+    const numModulo = this.getNumeroModulo(anomalia, planta, 'anomalia');
+    if (numModulo !== undefined) {
+      if (!isNaN(Number(numModulo))) {
+        elems.push(`${this.translation.t('Nº módulo')}: ${numModulo}`);
+      } else {
+        const altura = this.getAlturaAnom(anomalia, planta);
+        const columna = this.getColumnaAnom(anomalia, planta);
+        elems.push(`${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`);
+      }
+    }
+
+    return elems;
+  }
+
   getLocalizacionCompleteLabel(anomalia: Anomalia, planta: PlantaInterface) {
     let label = '';
 
