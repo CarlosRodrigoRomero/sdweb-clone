@@ -2,4 +2,21 @@
   <h5 class="title">
     Anomalía <b>{{ anomaliaInfo.numAnom }}</b>
   </h5>
+
+  <div class="elem-info">
+    <span>Nº de serie</span>
+    <mat-form-field appearance="fill">
+      <mat-label>Nº serie</mat-label>
+      <input matInput (change)="updateAnomalia($event.target.value, 'numeroSerie')"/>
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="hide = !hide"
+        [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="hide"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
 </div>
