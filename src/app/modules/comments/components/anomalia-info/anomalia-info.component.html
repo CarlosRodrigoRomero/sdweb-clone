@@ -5,18 +5,20 @@
 
   <div class="elem-info">
     <span>Nº de serie</span>
-    <mat-form-field appearance="fill">
-      <mat-label>Nº serie</mat-label>
-      <input matInput (change)="updateAnomalia($event.target.value, 'numeroSerie')"/>
-      <button
-        mat-icon-button
-        matSuffix
-        (click)="hide = !hide"
-        [attr.aria-label]="'Hide password'"
-        [attr.aria-pressed]="hide"
-      >
+    <div *ngIf="!editInput" class="read-input">
+      <span>{{ anomaliaSelected.hasOwnProperty('numeroSerie') ? anomaliaSelected.numeroSerie : 'Desconocido' }}</span>
+      <button mat-icon-button (click)="editInput = true">
         <mat-icon>edit</mat-icon>
       </button>
-    </mat-form-field>
+    </div>
+    <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
+      <mat-form-field *ngIf="editInput" appearance="fill">
+        <mat-label>Nº serie</mat-label>
+        <input matInput formControlName="numeroSerie" />
+        <button mat-icon-button matSuffix type="submit" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+          <mat-icon>done</mat-icon>
+        </button>
+      </mat-form-field>
+    </form>
   </div>
 </div>

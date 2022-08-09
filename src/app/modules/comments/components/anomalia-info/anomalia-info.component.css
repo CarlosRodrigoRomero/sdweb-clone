@@ -2,3 +2,19 @@
   width: 100%;
   min-height: 150px;
 }
+
+.elem-info {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.read-input {
+  display: flex;
+  align-items: center;
+}
+
+.read-input span {
+  font-size: 18px;
+  font-weight: 500;
+}
