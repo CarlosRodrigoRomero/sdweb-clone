@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
+import { Observable } from 'rxjs';
+
 import { Comentario } from '@core/models/comentario';
 
 @Injectable({
@@ -31,7 +33,9 @@ export class ComentariosService {
       });
   }
 
-  getComentariosAnomalia(anomaliaId: string) {
-    return this.afs.collection('comentarios', (ref) => ref.where('anomaliaId', '==', anomaliaId)).valueChanges();
+  getComentariosAnomalia(anomaliaId: string): Observable<Comentario[]> {
+    return this.afs
+      .collection<Comentario>('comentarios', (ref) => ref.where('anomaliaId', '==', anomaliaId))
+      .valueChanges();
   }
 }
