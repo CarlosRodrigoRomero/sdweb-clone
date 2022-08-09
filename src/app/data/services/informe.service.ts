@@ -170,13 +170,18 @@ export class InformeService {
   }
 
   getInformesDeEmpresa(empresaId: string): Observable<InformeInterface[]> {
+    // plantas de RIOS han pasado a ser de Plenium
+    if (empresaId === 'r7KAq8yibRSNzvSruYQpwCjK05r1') {
+      empresaId = '82gvWxNTFsb25E2gjSdk0ezPlnJ2';
+    }
+
     const query$ = this.afs.collection<InformeInterface>('informes', (ref) => ref.where('empresaId', '==', empresaId));
     return query$.snapshotChanges().pipe(
       map((actions) =>
         actions.map((a) => {
           const data = a.payload.doc.data() as InformeInterface;
 
-          if (data.hasOwnProperty('empresaId')) {
+          if (!data.hasOwnProperty('empresaId')) {
             return null;
           } else {
             data.id = a.payload.doc.id;
@@ -188,11 +193,7 @@ export class InformeService {
         })
       ),
       // los ordenamos por fecha
-      map((informes) => informes.sort((a, b) => a.fecha - b.fecha)),
-      // nos quedamos con los 2 más recientes por el momento
-      map((informes) =>
-        informes.filter((informe, index) => index === informes.length - 1 || index === informes.length - 2)
-      )
+      map((informes) => informes.sort((a, b) => a.fecha - b.fecha))
     );
   }
 
