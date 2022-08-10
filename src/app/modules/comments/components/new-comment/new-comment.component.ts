@@ -1,19 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { ComentariosService } from '@data/services/comentarios.service';
 
 import { Comentario } from '@core/models/comentario';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-new-comment',
   templateUrl: './new-comment.component.html',
   styleUrls: ['./new-comment.component.css'],
 })
-export class NewCommentComponent implements OnInit {
+export class NewCommentComponent implements OnInit, OnDestroy {
   form: FormGroup;
   comentario: Comentario;
+  tipoComentarioSelected: string;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -23,6 +27,10 @@ export class NewCommentComponent implements OnInit {
 
   ngOnInit(): void {
     this.buildForm();
+
+    this.subscriptions.add(
+      this.comentariosControlService.tipoComentarioSelected$.subscribe((tipo) => (this.tipoComentarioSelected = tipo))
+    );
   }
 
   private buildForm() {
@@ -35,6 +43,7 @@ export class NewCommentComponent implements OnInit {
     event.preventDefault();
     if (this.form.valid) {
       this.comentario = {
+        tipo: this.tipoComentarioSelected,
         texto: this.form.get('texto').value,
         datetime: Date.now(),
         anomaliaId: this.comentariosControlService.anomaliaSelected.id,
@@ -45,5 +54,9 @@ export class NewCommentComponent implements OnInit {
 
       this.form.reset();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

@@ -1,6 +1,10 @@
 .content {
   height: 100%;
   display: grid;
-  grid-template-rows: auto min-content;
+  /* grid-template-rows: auto min-content; */
   gap: 0.5rem;
+}
+
+.toggle-tipo-coment {
+  width: fit-content;
 }

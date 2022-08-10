@@ -13,7 +13,9 @@ export class ComentariosControlService {
   private _anomaliaSelected: Anomalia = undefined;
   anomaliaSelected$ = new BehaviorSubject<Anomalia>(this._anomaliaSelected);
   private _dataLoaded = false;
-  public dataLoaded$ = new BehaviorSubject<boolean>(this._dataLoaded);
+  dataLoaded$ = new BehaviorSubject<boolean>(this._dataLoaded);
+  private _tipoComentarioSelected = 'anomalia';
+  tipoComentarioSelected$ = new BehaviorSubject<string>(this._tipoComentarioSelected);
 
   constructor() {}
 
@@ -42,5 +44,14 @@ export class ComentariosControlService {
   set dataLoaded(value: boolean) {
     this._dataLoaded = value;
     this.dataLoaded$.next(value);
+  }
+
+  get tipoComentarioSelected(): string {
+    return this._tipoComentarioSelected;
+  }
+
+  set tipoComentarioSelected(value: string) {
+    this._tipoComentarioSelected = value;
+    this.tipoComentarioSelected$.next(value);
   }
 }

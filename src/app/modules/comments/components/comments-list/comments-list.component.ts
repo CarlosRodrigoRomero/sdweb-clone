@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import { ComentariosService } from '@data/services/comentarios.service';
@@ -26,9 +26,16 @@ export class CommentsListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscriptions.add(
       this.comentariosControlService.anomaliaSelected$
-        .pipe(switchMap((anom) => this.comentariosService.getComentariosAnomalia(anom.id)))
-        .subscribe((coments) => {
-          this.comentariosAnomalia = coments;
+        .pipe(
+          switchMap((anom) =>
+            combineLatest([
+              this.comentariosService.getComentariosAnomalia(anom.id),
+              this.comentariosControlService.tipoComentarioSelected$,
+            ])
+          )
+        )
+        .subscribe(([coments, tipo]) => {
+          this.comentariosAnomalia = coments.filter((c) => c.tipo === tipo);
 
           // los ordenamos de más reciente a más antiguo
           this.comentariosAnomalia = this.comentariosAnomalia.sort((a, b) => a.datetime - b.datetime);
