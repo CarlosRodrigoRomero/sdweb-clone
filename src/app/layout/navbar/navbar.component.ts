@@ -7,6 +7,7 @@ import { AuthService } from '@data/services/auth.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ThemeService } from '@data/services/theme.service';
 import { FilterService } from '@data/services/filter.service';
+import { ComentariosControlService } from '@data/services/comentarios-control.service';
 
 import { UserInterface } from '@core/models/user';
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
@@ -33,6 +34,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   notifications: Notification[] = [];
   isReport = false;
   isDemo = false;
+  dataLoaded = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -44,7 +46,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     private reportControlService: ReportControlService,
     private filterService: FilterService,
-    private demoService: DemoService
+    private demoService: DemoService,
+    private comentariosControlService: ComentariosControlService
   ) {}
 
   ngOnInit() {
@@ -135,6 +138,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     // comprobamos si es la planta demo
     this.isDemo = this.demoService.checkIsDemo();
+
+    this.subscriptions.add(this.comentariosControlService.dataLoaded$.subscribe((value) => (this.dataLoaded = value)));
 
     // this.themeService.themeSelected$.subscribe((theme) => (this.themeSelected = theme));
   }

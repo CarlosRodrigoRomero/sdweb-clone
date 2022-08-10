@@ -12,6 +12,8 @@ export class ComentariosControlService {
   sidenavOpened$ = new BehaviorSubject<boolean>(this._sidenavOpened);
   private _anomaliaSelected: Anomalia = undefined;
   anomaliaSelected$ = new BehaviorSubject<Anomalia>(this._anomaliaSelected);
+  private _dataLoaded = false;
+  public dataLoaded$ = new BehaviorSubject<boolean>(this._dataLoaded);
 
   constructor() {}
 
@@ -31,5 +33,14 @@ export class ComentariosControlService {
   set anomaliaSelected(value: Anomalia) {
     this._anomaliaSelected = value;
     this.anomaliaSelected$.next(value);
+  }
+
+  get dataLoaded(): boolean {
+    return this._dataLoaded;
+  }
+
+  set dataLoaded(value: boolean) {
+    this._dataLoaded = value;
+    this.dataLoaded$.next(value);
   }
 }

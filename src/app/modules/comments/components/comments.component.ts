@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { MatSidenav } from '@angular/material/sidenav';
 
@@ -10,7 +10,7 @@ import { ComentariosControlService } from '@data/services/comentarios-control.se
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.css'],
 })
-export class CommentsComponent implements OnInit {
+export class CommentsComponent implements OnInit, OnDestroy {
   @ViewChild('sidenavLista') sidenavLeft: MatSidenav;
   anomaliasLoaded = false;
   sidenavOpened = true;
@@ -23,8 +23,14 @@ export class CommentsComponent implements OnInit {
   ngOnInit(): void {
     this.reportControlService.initService().then((res) => {
       this.anomaliasLoaded = res;
+
+      this.comentariosControlService.dataLoaded = res;
     });
 
     this.comentariosControlService.sidenavOpened$.subscribe((opened) => (this.sidenavOpened = opened));
+  }
+
+  ngOnDestroy(): void {
+    this.comentariosControlService.dataLoaded = false;
   }
 }

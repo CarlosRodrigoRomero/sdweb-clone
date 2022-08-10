@@ -1,0 +1,27 @@
+.grupo1 {
+  display: flex;
+  width: max-content;
+  align-items: center;
+}
+
+.titulo {
+  font-size: 20px;
+  margin-right: 0.6rem;
+}
+
+.subtitulo {
+  font-size: 20px;
+  margin-right: 1em;
+  font-weight: 400;
+}
+
+.fecha {
+  font-size: 22px;
+  font-weight: 300;
+}
+
+@media (max-width: 768px) {
+  .subtitulo {
+    display: none;
+  }
+}
