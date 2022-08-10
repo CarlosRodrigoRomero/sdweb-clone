@@ -428,10 +428,10 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         // Imagenes anomalías
         this.countAnomalias = 0;
         this.anomaliasInforme.forEach((anomalia, index) => {
-          // if (index < 700) {
-          this.setImgAnomaliaCanvas(anomalia, 'thermal');
-          this.setImgAnomaliaCanvas(anomalia, 'visual');
-          this.countAnomalias++;
+          // if (index < 2) {
+            this.setImgAnomaliaCanvas(anomalia, 'thermal');
+            this.setImgAnomaliaCanvas(anomalia, 'visual');
+            this.countAnomalias++;
           // }
         });
 
@@ -885,12 +885,13 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     }
 
     // a partir del 6/06/2022 la visual tiene 23 niveles de zoom
-    // salvo Abertura 2022 y Arasur 2022
+    // salvo Abertura 2022, Arasur 2022 y Avila 2022
     if (
       layer === 'visual' &&
       this.selectedInforme.fecha > GLOBAL.newVisualLayerDate &&
       this.selectedInforme.id !== 'ISV7bS3eQWV4Cbveshlv' &&
-      this.selectedInforme.id !== 'J89VwzqnoKJd2RUj3QFT'
+      this.selectedInforme.id !== 'J89VwzqnoKJd2RUj3QFT' &&
+      this.selectedInforme.id !== 'jRCIrgJawbiGv7mOaa8Z'
     ) {
       zoomLevel = 23;
     }

@@ -199,6 +199,7 @@ export class AutoLocComponent implements OnInit, AfterViewInit {
 
   onMapReady(map) {
     this.map = map;
+
     this.initDrawingManager(map);
 
     this.informeService

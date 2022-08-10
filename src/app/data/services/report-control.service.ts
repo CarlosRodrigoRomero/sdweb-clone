@@ -108,10 +108,11 @@ export class ReportControlService {
               take(1),
               switchMap(() => {
                 if (this.authService.userIsAdmin(this.user)) {
-                  return combineLatest([
-                    this.informeService.getInformesDePlanta(this.plantaId),
-                    this.informeService.getInformesDeEmpresa(this.planta.empresa),
-                  ]).pipe(map((infs) => infs.flat()));
+                  return this.informeService.getInformesDePlanta(this.plantaId);
+                  // return combineLatest([
+                  //   this.informeService.getInformesDePlanta(this.plantaId),
+                  //   this.informeService.getInformesDeEmpresa(this.planta.empresa),
+                  // ]).pipe(map((infs) => infs.flat()));
                 } else {
                   return this.informeService.getInformesDisponiblesDePlanta(this.plantaId);
                 }
