@@ -11,7 +11,8 @@
         [fixedTopGap]="70"
         position="start"
       >
-        <app-anomalias-list></app-anomalias-list>
+        <app-anomalias-list *ngIf="vistaSelected === 'list'"></app-anomalias-list>
+        <app-map-comments *ngIf="vistaSelected === 'map'"></app-map-comments>
       </mat-sidenav>
       <mat-sidenav-content>
         <app-anomalia-content></app-anomalia-content>

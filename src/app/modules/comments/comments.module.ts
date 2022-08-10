@@ -12,9 +12,10 @@ import { CommentsAreaComponent } from './components/comments-area/comments-area.
 import { NewCommentComponent } from './components/new-comment/new-comment.component';
 import { CommentComponent } from './components/comment/comment.component';
 import { CommentsListComponent } from './components/comments-list/comments-list.component';
+import { MapCommentsComponent } from './components/map-comments/map-comments.component';
 
 @NgModule({
-  declarations: [CommentsComponent, AnomaliasListComponent, AnomaliaContentComponent, AnomaliaInfoComponent, CommentsAreaComponent, NewCommentComponent, CommentComponent, CommentsListComponent],
+  declarations: [CommentsComponent, AnomaliasListComponent, AnomaliaContentComponent, AnomaliaInfoComponent, CommentsAreaComponent, NewCommentComponent, CommentComponent, CommentsListComponent, MapCommentsComponent],
   imports: [CommonModule, CommentsRoutingModule, SharedModule],
 })
 export class CommentsModule {}

@@ -2,6 +2,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { MatSidenav } from '@angular/material/sidenav';
 
+import { Subscription } from 'rxjs';
+
 import { ReportControlService } from '@data/services/report-control.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 
@@ -14,6 +16,9 @@ export class CommentsComponent implements OnInit, OnDestroy {
   @ViewChild('sidenavLista') sidenavLeft: MatSidenav;
   anomaliasLoaded = false;
   sidenavOpened = true;
+  vistaSelected: string;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private reportControlService: ReportControlService,
@@ -28,9 +33,13 @@ export class CommentsComponent implements OnInit, OnDestroy {
     });
 
     this.comentariosControlService.sidenavOpened$.subscribe((opened) => (this.sidenavOpened = opened));
+
+    this.comentariosControlService.vistaSelected$.subscribe((vista) => (this.vistaSelected = vista));
   }
 
   ngOnDestroy(): void {
     this.comentariosControlService.dataLoaded = false;
+
+    this.subscriptions.unsubscribe();
   }
 }

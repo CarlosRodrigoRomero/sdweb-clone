@@ -16,6 +16,8 @@ export class ComentariosControlService {
   dataLoaded$ = new BehaviorSubject<boolean>(this._dataLoaded);
   private _tipoComentarioSelected = 'anomalia';
   tipoComentarioSelected$ = new BehaviorSubject<string>(this._tipoComentarioSelected);
+  private _vistaSelected = 'list';
+  vistaSelected$ = new BehaviorSubject<string>(this._vistaSelected);
 
   constructor() {}
 
@@ -53,5 +55,14 @@ export class ComentariosControlService {
   set tipoComentarioSelected(value: string) {
     this._tipoComentarioSelected = value;
     this.tipoComentarioSelected$.next(value);
+  }
+
+  get vistaSelected(): string {
+    return this._vistaSelected;
+  }
+
+  set vistaSelected(value: string) {
+    this._vistaSelected = value;
+    this.vistaSelected$.next(value);
   }
 }

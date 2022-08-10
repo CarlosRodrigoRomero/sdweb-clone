@@ -121,6 +121,10 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
     this.comentariosControlService.anomaliaSelected = this.anomalias.find((anom) => anom.id === row.id);
   }
 
+  selectVistaMap() {
+    this.comentariosControlService.vistaSelected = 'map';
+  }
+
   private closeSidenav() {
     // cerramos el sidenav si estamos en mobile
     if (window.screen.width < 768) {
