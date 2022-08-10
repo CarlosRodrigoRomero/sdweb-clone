@@ -4,6 +4,11 @@
   </h5>
 
   <div class="elem-info">
+    <span class="titulo">Localización</span>
+    <span class="subtitulo">{{ anomaliaInfo.localizacion }}</span>
+  </div>
+
+  <div class="elem-info">
     <span>Nº de serie</span>
     <div *ngIf="!editInput" class="read-input">
       <span>{{ anomaliaSelected.hasOwnProperty('numeroSerie') ? anomaliaSelected.numeroSerie : 'Desconocido' }}</span>

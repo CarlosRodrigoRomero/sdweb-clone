@@ -3,11 +3,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
+import { ReportControlService } from '@data/services/report-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
 interface AnomaliaInfo {
   numAnom: number;
+  localizacion: string;
 }
 
 @Component({
@@ -20,11 +23,14 @@ export class AnomaliaInfoComponent implements OnInit {
   anomaliaInfo: AnomaliaInfo = undefined;
   editInput = false;
   form: FormGroup;
+  localizacion: string;
 
   constructor(
     private comentariosControlService: ComentariosControlService,
     private anomaliaService: AnomaliaService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private anomaliaInfoService: AnomaliaInfoService,
+    private reportControlService: ReportControlService
   ) {
     this.buildForm();
   }
@@ -39,6 +45,7 @@ export class AnomaliaInfoComponent implements OnInit {
       if (this.anomaliaSelected !== undefined) {
         this.anomaliaInfo = {
           numAnom: this.anomaliaSelected.numAnom,
+          localizacion: this.anomaliaInfoService.getLocalizacionCompleteLabel(this.anomaliaSelected, this.reportControlService.planta),
         };
 
         if (this.anomaliaSelected.hasOwnProperty('numeroSerie')) {

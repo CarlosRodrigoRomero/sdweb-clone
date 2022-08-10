@@ -120,26 +120,33 @@ export class AnomaliaInfoService {
     }
   }
 
-  getLocalizacionReducLabel(anomalia: Anomalia, planta: PlantaInterface) {
-    let label = '';
-
-    const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
-
-    globals.forEach((coord, index) => {
-      label += coord;
-
-      if (index < globals.length - 1) {
-        label += this.getGlobalsConector(planta);
+  getRightGlobalCoords(anomalia: Anomalia): string[] {
+    let globalCoords = anomalia.globalCoords;
+    for (let index = anomalia.globalCoords.length - 1; index >= 0; index--) {
+      const gC = anomalia.globalCoords[index];
+      if (gC !== null) {
+        globalCoords = anomalia.globalCoords.slice(0, index + 1);
+        break;
       }
-    });
+    }
 
-    return label;
+    return globalCoords;
+  }
+
+  getLocalizacionReducLabel(anomalia: Anomalia, planta: PlantaInterface): string {
+    const globalCoords = this.getRightGlobalCoords(anomalia);
+
+    return globalCoords.join(this.getGlobalsConector(planta));
+  }
+
+  getPosicionReducLabel(anomalia: Anomalia): string {
+    return 'Fil: ' + anomalia.localY + ' / Col: ' + anomalia.localX;
   }
 
   getLocalizacionCompleteElems(anomalia: Anomalia, planta: PlantaInterface): string[] {
     const elems: string[] = [];
 
-    const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
+    const globals = this.getRightGlobalCoords(anomalia);
 
     globals.forEach((coord, index) => {
       if (coord !== undefined && coord !== null && coord !== '') {

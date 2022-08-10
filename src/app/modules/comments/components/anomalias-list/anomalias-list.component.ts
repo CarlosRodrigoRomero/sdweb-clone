@@ -41,6 +41,7 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
   private anomsData: RowAnomData[];
   displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion', 'fecha', 'numComs'];
   anomaliaSelected: Anomalia;
+  headerLocLabel = '';
 
   private subscriptions: Subscription = new Subscription();
 
@@ -87,15 +88,13 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
               numComs = null;
             }
 
-            const [localizacion, posicion] = this.getLocPos(anom);
-
             this.anomsData.push({
               id: anom.id,
               numAnom: anom.numAnom,
               numComs,
               tipo: this.anomaliaInfoService.getTipoLabel(anom),
-              localizacion,
-              posicion,
+              localizacion: this.anomaliaInfoService.getLocalizacionReducLabel(anom, this.reportControlService.planta),
+              posicion: this.anomaliaInfoService.getPosicionReducLabel(anom),
               fechaUltCom,
               horaUltCom,
             });
@@ -109,19 +108,10 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.comentariosControlService.anomaliaSelected$.subscribe((anom) => (this.anomaliaSelected = anom))
     );
-  }
 
-  private getLocPos(anom: Anomalia): [string, string] {
-    const locElems = this.anomaliaInfoService.getLocalizacionCompleteElems(anom, this.reportControlService.planta);
-
-    const localizacion = locElems
-      .filter((_, index) => index < locElems.length - 1)
-      .join('.')
-      .replace('A: ', '')
-      .replace('Mesa: ', '');
-    const posicion = locElems[locElems.length - 1];
-
-    return [localizacion, posicion];
+    if (this.reportControlService.planta.hasOwnProperty('nombreGlobalCoords')) {
+      this.headerLocLabel = '(' + this.reportControlService.planta.nombreGlobalCoords.join('.') + ')';
+    }
   }
 
   selectAnomalia(row: any) {
