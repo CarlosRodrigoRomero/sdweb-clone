@@ -17,9 +17,9 @@
       </ng-container> -->
 
       <!-- Nº de anomalía -->
-      <ng-container matColumnDef="numComs">
+      <ng-container matColumnDef="numAnom">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>
-        <td mat-cell *matCellDef="let row">{{ row.numComs }}</td>
+        <td mat-cell *matCellDef="let row">{{ row.numAnom }}</td>
       </ng-container>
 
       <!-- Tipo de anomalía -->
@@ -51,6 +51,16 @@
           <div class="row-data">
             <span>{{ row.horaUltCom }}</span>
             <span class="small-data">{{ row.fechaUltCom }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Nº de comentarios -->
+      <ng-container matColumnDef="numComs">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+        <td mat-cell *matCellDef="let row">
+          <div class="num-comentarios" *ngIf="row.numComs !== null">
+            <span>{{ row.numComs }}</span>
           </div>
         </td>
       </ng-container>

@@ -19,6 +19,7 @@ import { switchMap } from 'rxjs/operators';
 
 interface RowAnomData {
   id: string;
+  numAnom: number;
   numComs: number;
   tipo: string;
   localizacion: string;
@@ -38,7 +39,7 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
   dataSource: MatTableDataSource<RowAnomData>;
   private anomalias: Anomalia[];
   private anomsData: RowAnomData[];
-  displayedColumns: string[] = ['numComs', 'tipo', 'localizacion', 'fecha'];
+  displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion', 'fecha', 'numComs'];
   anomaliaSelected: Anomalia;
 
   private subscriptions: Subscription = new Subscription();
@@ -90,6 +91,7 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
 
             this.anomsData.push({
               id: anom.id,
+              numAnom: anom.numAnom,
               numComs,
               tipo: this.anomaliaInfoService.getTipoLabel(anom),
               localizacion,
