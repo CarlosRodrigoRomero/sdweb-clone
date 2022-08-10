@@ -112,7 +112,11 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
   private getLocPos(anom: Anomalia): [string, string] {
     const locElems = this.anomaliaInfoService.getLocalizacionCompleteElems(anom, this.reportControlService.planta);
 
-    const localizacion = locElems.filter((_, index) => index < locElems.length - 1).join(' / ');
+    const localizacion = locElems
+      .filter((_, index) => index < locElems.length - 1)
+      .join('.')
+      .replace('A: ', '')
+      .replace('Mesa: ', '');
     const posicion = locElems[locElems.length - 1];
 
     return [localizacion, posicion];
