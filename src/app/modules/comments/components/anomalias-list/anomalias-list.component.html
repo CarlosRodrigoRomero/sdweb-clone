@@ -32,9 +32,9 @@
       <ng-container matColumnDef="localizacion">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Localización</th>
         <td mat-cell *matCellDef="let row">
-          <div class="row-loc">
+          <div class="row-data">
             <span>{{ row.localizacion }}</span>
-            <span class="posicion">{{ row.posicion }}</span>
+            <span class="small-data">{{ row.posicion }}</span>
           </div>
         </td>
       </ng-container>
@@ -42,7 +42,12 @@
       <!-- Fecha -->
       <ng-container matColumnDef="fecha">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Último comentario</th>
-        <td mat-cell *matCellDef="let row">{{ row.fechaUltCom }}</td>
+        <td mat-cell *matCellDef="let row">
+          <div class="row-data">
+            <span>{{ row.horaUltCom }}</span>
+            <span class="small-data">{{ row.fechaUltCom }}</span>
+          </div>
+        </td>
       </ng-container>
 
       -->

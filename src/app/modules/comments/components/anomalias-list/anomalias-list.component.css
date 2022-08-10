@@ -1,6 +1,7 @@
 .content {
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
 .buscar-input {
@@ -13,6 +14,9 @@
 
 .tabla-container {
   margin: 4px;
+  position: relative;
+  height: 100%;
+  overflow: auto;
 }
 
 table {
@@ -23,12 +27,12 @@ table {
   background-color: lightgrey;
 }
 
-.row-loc {
+.row-data {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.posicion {
+.small-data {
   font-size: 10px;
 }

@@ -24,6 +24,7 @@ interface RowAnomData {
   localizacion: string;
   posicion: string;
   fechaUltCom?: string;
+  horaUltCom?: string;
 }
 
 @Component({
@@ -73,9 +74,11 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
           this.anomalias.forEach((anom) => {
             const comentariosAnom = comentarios.filter((com) => com.anomaliaId === anom.id);
             let fechaUltCom = null;
+            let horaUltCom = null;
             if (comentariosAnom.length > 0) {
               const ultimoComentario = comentariosAnom.sort((a, b) => b.datetime - a.datetime)[0];
-              fechaUltCom = this.datePipe.transform(ultimoComentario.datetime, 'dd/MM/yyyy HH:mm');
+              fechaUltCom = this.datePipe.transform(ultimoComentario.datetime, 'dd/MM/yyyy');
+              horaUltCom = this.datePipe.transform(ultimoComentario.datetime, 'HH:mm');
             }
 
             let numComs = comentariosAnom.length;
@@ -92,6 +95,7 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
               localizacion,
               posicion,
               fechaUltCom,
+              horaUltCom,
             });
           });
 
