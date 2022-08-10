@@ -1,4 +1,10 @@
 <div class="content">
-    <app-comments-list></app-comments-list>
-    <app-new-comment></app-new-comment>
+  <mat-button-toggle-group #group="matButtonToggleGroup">
+    <mat-button-toggle value="left" aria-label="Text align left">
+      <span>Comentarios</span>
+    </mat-button-toggle>
+    <mat-button-toggle value="center" aria-label="Text align center"> <span>IV</span> </mat-button-toggle>
+  </mat-button-toggle-group>
+  <app-comments-list></app-comments-list>
+  <app-new-comment></app-new-comment>
 </div>

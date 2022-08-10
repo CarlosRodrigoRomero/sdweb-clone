@@ -44,4 +44,18 @@ export class ComentariosService {
       .collection<Comentario>('comentarios', (ref) => ref.where('informeId', '==', informeId))
       .valueChanges();
   }
+
+  deleteComentario(comentarioId: string) {
+    const ref = this.afs.collection('comentarios/');
+
+    ref
+      .doc(comentarioId)
+      .delete()
+      .then(() => {
+        console.log('Comentario eliminado correctamente con ID: ', comentarioId);
+      })
+      .catch((error) => {
+        console.error('Error al eliminar comentario: ', error);
+      });
+  }
 }
