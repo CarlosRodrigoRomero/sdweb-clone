@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 import Map from 'ol/Map';
 import { defaults as defaultControls } from 'ol/control.js';
@@ -8,12 +9,16 @@ import { fromLonLat } from 'ol/proj';
 import XYZ from 'ol/source/XYZ';
 import TileLayer from 'ol/layer/Tile';
 import View from 'ol/View';
+import VectorLayer from 'ol/layer/Vector';
 
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { PlantaService } from '@data/services/planta.service';
+import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-map-comments',
@@ -23,19 +28,58 @@ import { PlantaInterface } from '@core/models/planta';
 export class MapCommentsComponent implements OnInit {
   private map: Map;
   private planta: PlantaInterface;
+  private informe: InformeInterface;
+  private thermalLayers: TileLayer[];
+  private anomaliaLayers: VectorLayer[];
+  private aerialLayers: TileLayer[];
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
     private comentariosControlService: ComentariosControlService,
     private olMapService: OlMapService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private plantaService: PlantaService,
+    private anomaliasControlService: AnomaliasControlService
   ) {}
 
   ngOnInit(): void {
     this.planta = this.reportControlService.planta;
+    this.informe = this.reportControlService.informes.find(
+      (inf) => inf.id === this.reportControlService.selectedInformeId
+    );
 
-    this.initMap();
+    this.plantaService
+      .getThermalLayers$(this.planta.id)
+      .pipe(take(1))
+      .subscribe(async (thermalLayers) => {
+        // creamos las capas termica, visual y de anomalías para cada informe
+        const thermalLayerDB = thermalLayers.find((item) => item.informeId === this.informe.id);
+
+        if (thermalLayerDB !== undefined) {
+          const thermalLayer = this.olMapService.createThermalLayer(thermalLayerDB, this.informe, 0);
+
+          thermalLayer.setProperties({
+            informeId: this.informe.id,
+          });
+
+          this.olMapService.addThermalLayer(thermalLayer);
+        }
+
+        // creamos la capa de anomalías
+        this.olMapService.addAnomaliaLayer(this.anomaliasControlService.createCommentsAnomaliaLayers(this.informe.id));
+
+        // añadimos las ortofotos aereas de cada informe
+        await this.olMapService.addAerialLayer(this.informe);
+
+        this.initMap();
+      });
+
+    this.subscriptions.add(this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers)));
+
+    this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayers = layers)));
+
+    this.subscriptions.add(this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers)));
   }
 
   private initMap() {
@@ -47,7 +91,7 @@ export class MapCommentsComponent implements OnInit {
       source: satellite,
     });
 
-    const layers = [satelliteLayer];
+    const layers = [satelliteLayer, ...this.aerialLayers /* , ...this.thermalLayers */];
 
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
@@ -61,6 +105,26 @@ export class MapCommentsComponent implements OnInit {
         this.map = map;
       })
     );
+
+    // añadimos las capas de anomalías al mapa
+    this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
+
+    // inicializamos el servicio que controla el comportamiento de las anomalias
+    this.anomaliasControlService.initService().then((value) => {
+      if (value) {
+        this.anomaliasControlService.mostrarAnomalias();
+
+        // this.subscriptions.add(
+        //   combineLatest([
+        //     this.anomaliasControlService.anomaliaHover$,
+        //     this.anomaliasControlService.anomaliaSelect$,
+        //   ]).subscribe(([anomHover, anomSelect]) => {
+        //     this.anomaliaHover = anomHover;
+        //     this.anomaliaSelect = anomSelect;
+        //   })
+        // );
+      }
+    });
   }
 
   selectVistaList() {

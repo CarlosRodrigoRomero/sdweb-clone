@@ -19,17 +19,13 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
-import { ZonesControlService } from '@data/services/zones-control.service';
-import { ZonesService } from '@data/services/zones.service';
 import { ViewReportService } from '@data/services/view-report.service';
 
 import { Anomalia } from '@core/models/anomalia';
-import { LocationAreaInterface } from '@core/models/location';
 
 import { Colors } from '@core/classes/colors';
 
 import { COLOR } from '@data/constants/color';
-import { StringDecoder } from 'string_decoder';
 
 @Injectable({
   providedIn: 'root',
@@ -59,8 +55,6 @@ export class AnomaliasControlService {
     private filterService: FilterService,
     private reportControlService: ReportControlService,
     private anomaliaService: AnomaliaService,
-    private zonesControlService: ZonesControlService,
-    private zonesService: ZonesService,
     private viewReportService: ViewReportService
   ) {}
 
@@ -150,6 +144,21 @@ export class AnomaliasControlService {
     anomaliasLayers.push(gradNormMaxLayer);
 
     return anomaliasLayers;
+  }
+
+  createCommentsAnomaliaLayers(informeId: string): VectorLayer {
+    const perdidasLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStylePerdidas(false),
+      visible: true,
+    });
+    perdidasLayer.setProperties({
+      informeId,
+      type: 'anomalias',
+      view: 0,
+    });
+
+    return perdidasLayer;
   }
 
   mostrarAnomalias() {
