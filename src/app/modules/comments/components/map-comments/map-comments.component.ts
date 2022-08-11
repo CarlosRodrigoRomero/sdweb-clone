@@ -10,6 +10,12 @@ import XYZ from 'ol/source/XYZ';
 import TileLayer from 'ol/layer/Tile';
 import View from 'ol/View';
 import VectorLayer from 'ol/layer/Vector';
+import { click } from 'ol/events/condition';
+import Select from 'ol/interaction/Select';
+import { circular } from 'ol/geom/Polygon';
+import VectorSource from 'ol/source/Vector';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
 
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
@@ -19,6 +25,7 @@ import { AnomaliasControlService } from '@data/services/anomalias-control.servic
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+import { Anomalia } from '@core/models/anomalia';
 
 @Component({
   selector: 'app-map-comments',
@@ -73,6 +80,9 @@ export class MapCommentsComponent implements OnInit {
         await this.olMapService.addAerialLayer(this.informe);
 
         this.initMap();
+
+        this.addSelectInteraction();
+        this.addGeoLocation();
       });
 
     this.subscriptions.add(this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers)));
@@ -91,12 +101,19 @@ export class MapCommentsComponent implements OnInit {
       source: satellite,
     });
 
-    const layers = [satelliteLayer, ...this.aerialLayers /* , ...this.thermalLayers */];
+    const geoLocSource = new VectorSource();
+    const geoLocLayer = new VectorLayer({
+      source: geoLocSource,
+    });
+
+    geoLocLayer.setProperties({ type: 'geoLoc' });
+
+    const layers = [satelliteLayer, geoLocLayer, ...this.aerialLayers /* , ...this.thermalLayers */];
 
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
       zoom: this.planta.zoom,
-      minZoom: this.planta.zoom - 2,
+      // minZoom: this.planta.zoom - 2,
       maxZoom: 24,
     });
 
@@ -112,22 +129,61 @@ export class MapCommentsComponent implements OnInit {
     // inicializamos el servicio que controla el comportamiento de las anomalias
     this.anomaliasControlService.initService().then((value) => {
       if (value) {
-        this.anomaliasControlService.mostrarAnomalias();
-
-        // this.subscriptions.add(
-        //   combineLatest([
-        //     this.anomaliasControlService.anomaliaHover$,
-        //     this.anomaliasControlService.anomaliaSelect$,
-        //   ]).subscribe(([anomHover, anomSelect]) => {
-        //     this.anomaliaHover = anomHover;
-        //     this.anomaliaSelect = anomSelect;
-        //   })
-        // );
+        this.anomaliasControlService.mostrarAnomalias(true);
       }
     });
   }
 
-  selectVistaList() {
-    this.comentariosControlService.vistaSelected = 'list';
+  openList() {
+    this.comentariosControlService.listOpened = true;
+  }
+
+  private addSelectInteraction() {
+    const select = new Select({
+      condition: click,
+    });
+
+    select.setProperties({ id: 'selectAnomalia' });
+
+    this.map.addInteraction(select);
+    select.on('select', (e) => {
+      if (e.selected.length > 0) {
+        if (e.selected[0].getProperties().hasOwnProperty('properties')) {
+          const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
+          const anomalia = this.reportControlService.allAnomalias.find((anom) => anom.id === anomaliaId);
+
+          this.comentariosControlService.anomaliaSelected = anomalia;
+
+          this.comentariosControlService.infoOpened = true;
+        }
+      }
+    });
+  }
+
+  addGeoLocation() {
+    const geoLocLayer = this.map
+      .getLayers()
+      .getArray()
+      .find((layer) => layer.getProperties().type === 'geoLoc') as VectorLayer;
+
+    const geoLocSource = geoLocLayer.getSource() as VectorSource;
+
+    navigator.geolocation.watchPosition(
+      (pos) => {
+        const coords = [pos.coords.longitude, pos.coords.latitude];
+        const accuracy = circular(coords, pos.coords.accuracy);
+        geoLocSource.clear(true);
+        geoLocSource.addFeatures([
+          new Feature(accuracy.transform('EPSG:4326', this.map.getView().getProjection())),
+          new Feature(new Point(fromLonLat(coords))),
+        ]);
+      },
+      (error) => {
+        alert(`ERROR: ${error.message}`);
+      },
+      {
+        enableHighAccuracy: true,
+      }
+    );
   }
 }

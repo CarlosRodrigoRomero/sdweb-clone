@@ -8,26 +8,38 @@ import { Anomalia } from '@core/models/anomalia';
   providedIn: 'root',
 })
 export class ComentariosControlService {
-  private _sidenavOpened = true;
-  sidenavOpened$ = new BehaviorSubject<boolean>(this._sidenavOpened);
+  private _listOpened = true;
+  listOpened$ = new BehaviorSubject<boolean>(this._listOpened);
+  private _infoOpened = false;
+  infoOpened$ = new BehaviorSubject<boolean>(this._infoOpened);
   private _anomaliaSelected: Anomalia = undefined;
   anomaliaSelected$ = new BehaviorSubject<Anomalia>(this._anomaliaSelected);
   private _dataLoaded = false;
   dataLoaded$ = new BehaviorSubject<boolean>(this._dataLoaded);
   private _tipoComentarioSelected = 'anomalia';
   tipoComentarioSelected$ = new BehaviorSubject<string>(this._tipoComentarioSelected);
+  vistas = ['map', 'list'];
   private _vistaSelected = 'list';
   vistaSelected$ = new BehaviorSubject<string>(this._vistaSelected);
 
   constructor() {}
 
-  get sidenavOpened(): boolean {
-    return this._sidenavOpened;
+  get listOpened(): boolean {
+    return this._listOpened;
   }
 
-  set sidenavOpened(value: boolean) {
-    this._sidenavOpened = value;
-    this.sidenavOpened$.next(value);
+  set listOpened(value: boolean) {
+    this._listOpened = value;
+    this.listOpened$.next(value);
+  }
+
+  get infoOpened(): boolean {
+    return this._infoOpened;
+  }
+
+  set infoOpened(value: boolean) {
+    this._infoOpened = value;
+    this.infoOpened$.next(value);
   }
 
   get anomaliaSelected(): Anomalia {

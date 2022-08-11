@@ -1,16 +1,16 @@
 .content {
   width: 100%;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 86px);
   display: grid;
   grid-template-rows: min-content auto;
   gap: 1rem;
-  padding: 0.5rem;
   overflow: hidden;
 }
 
 .top-row {
   display: flex;
   width: 100%;
+  gap: 0.5rem;
 }
 
 .bottom-row {

@@ -4,18 +4,30 @@
     <mat-sidenav-container class="main-container" [hasBackdrop]="false">
       <mat-sidenav
         #sidenavLista
-        [(opened)]="sidenavOpened"
-        mode="side"
+        [(opened)]="listOpened"
+        mode="over"
         [fixedInViewport]="true"
         class="list-sidenav"
         [fixedTopGap]="70"
         position="start"
       >
-        <app-anomalias-list *ngIf="vistaSelected === 'list'"></app-anomalias-list>
-        <app-map-comments *ngIf="vistaSelected === 'map'"></app-map-comments>
+        <app-anomalias-list></app-anomalias-list>
       </mat-sidenav>
-      <mat-sidenav-content>
+
+      <mat-sidenav
+        #sidenavInfo
+        [(opened)]="infoOpened"
+        mode="over"
+        [fixedInViewport]="true"
+        class="list-sidenav"
+        [fixedTopGap]="70"
+        position="end"
+      >
         <app-anomalia-content></app-anomalia-content>
+      </mat-sidenav>
+
+      <mat-sidenav-content>
+        <app-map-comments></app-map-comments>
       </mat-sidenav-content>
     </mat-sidenav-container>
   </div>
