@@ -127,8 +127,6 @@ export class MapCommentsComponent implements OnInit {
 
   openList() {
     this.comentariosControlService.listOpened = true;
-
-    // this.comentariosControlService.vistaSelected = 'list';
   }
 
   private addSelectInteraction() {

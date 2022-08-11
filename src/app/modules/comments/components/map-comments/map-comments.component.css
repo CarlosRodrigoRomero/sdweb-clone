@@ -1,10 +1,10 @@
 .btn-list {
   position: absolute;
-  right: 1rem;
-  top: 1rem;
-  height: 40px;
+  right: 0.7rem;
+  top: 0.7rem;
+  height: 60px;
   padding: 0;
-  width: 40px;
+  width: 60px;
   min-width: unset !important;
   z-index: 1;
 }
