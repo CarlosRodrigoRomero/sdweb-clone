@@ -11,6 +11,7 @@ import { Anomalia } from '@core/models/anomalia';
 interface AnomaliaInfo {
   numAnom: number;
   localizacion: string;
+  tipo: string;
 }
 
 @Component({
@@ -45,7 +46,11 @@ export class AnomaliaInfoComponent implements OnInit {
       if (this.anomaliaSelected !== undefined) {
         this.anomaliaInfo = {
           numAnom: this.anomaliaSelected.numAnom,
-          localizacion: this.anomaliaInfoService.getLocalizacionCompleteLabel(this.anomaliaSelected, this.reportControlService.planta),
+          localizacion: this.anomaliaInfoService.getLocalizacionCompleteLabel(
+            this.anomaliaSelected,
+            this.reportControlService.planta
+          ),
+          tipo: this.anomaliaInfoService.getTipoLabel(this.anomaliaSelected),
         };
 
         if (this.anomaliaSelected.hasOwnProperty('numeroSerie')) {
