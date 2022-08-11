@@ -1,9 +1,6 @@
 .content {
-  height: 40vh;
+  height: 250px;
   overflow: auto;
-  /* display: flex;
-  flex-direction: column;
-  justify-content: flex-end; */
 }
 
 .comentarios {

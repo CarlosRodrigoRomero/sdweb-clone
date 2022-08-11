@@ -5,6 +5,8 @@ import { ComentariosControlService } from '@data/services/comentarios-control.se
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { OlMapService } from '@data/services/ol-map.service';
+import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
@@ -31,7 +33,9 @@ export class AnomaliaInfoComponent implements OnInit {
     private anomaliaService: AnomaliaService,
     private formBuilder: FormBuilder,
     private anomaliaInfoService: AnomaliaInfoService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private olMapService: OlMapService,
+    private anomaliasControlService: AnomaliasControlService
   ) {
     this.buildForm();
   }
@@ -85,5 +89,13 @@ export class AnomaliaInfoComponent implements OnInit {
     this.anomaliaSelected[field] = value;
     // la actualizamos en la DB
     this.anomaliaService.updateAnomaliaField(this.anomaliaSelected.id, field, value);
+  }
+
+  goToAnomMap() {
+    this.olMapService.setViewCenter(this.anomaliaSelected.featureCoords[0]);
+    this.olMapService.setViewZoom(this.anomaliasControlService.zoomChangeView);
+
+    this.comentariosControlService.infoOpened = false;
+    this.comentariosControlService.listOpened = false;
   }
 }
