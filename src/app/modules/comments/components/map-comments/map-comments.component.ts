@@ -127,7 +127,9 @@ export class MapCommentsComponent implements OnInit {
     });
   }
 
-  selectVistaList() {
-    this.comentariosControlService.vistaSelected = 'list';
+  openList() {
+    this.comentariosControlService.listOpened = true;
+
+    // this.comentariosControlService.vistaSelected = 'list';
   }
 }

@@ -15,7 +15,8 @@ import { ComentariosControlService } from '@data/services/comentarios-control.se
 export class CommentsComponent implements OnInit, OnDestroy {
   @ViewChild('sidenavLista') sidenavLeft: MatSidenav;
   anomaliasLoaded = false;
-  sidenavOpened = true;
+  listOpened = true;
+  infoOpened = false;
   vistaSelected: string;
 
   private subscriptions: Subscription = new Subscription();
@@ -32,7 +33,9 @@ export class CommentsComponent implements OnInit, OnDestroy {
       this.comentariosControlService.dataLoaded = res;
     });
 
-    this.comentariosControlService.sidenavOpened$.subscribe((opened) => (this.sidenavOpened = opened));
+    this.comentariosControlService.listOpened$.subscribe((opened) => (this.listOpened = opened));
+
+    this.comentariosControlService.infoOpened$.subscribe((opened) => (this.infoOpened = opened));
 
     this.comentariosControlService.vistaSelected$.subscribe((vista) => (this.vistaSelected = vista));
   }

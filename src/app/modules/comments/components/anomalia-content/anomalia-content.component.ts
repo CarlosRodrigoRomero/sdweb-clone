@@ -13,6 +13,6 @@ export class AnomaliaContentComponent implements OnInit {
   ngOnInit(): void {}
 
   goBack() {
-    this.comentariosControlService.sidenavOpened = true;
+    this.comentariosControlService.listOpened = true;
   }
 }

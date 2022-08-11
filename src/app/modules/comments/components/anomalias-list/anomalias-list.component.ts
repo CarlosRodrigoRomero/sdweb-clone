@@ -121,27 +121,34 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
   }
 
   selectAnomalia(row: any) {
-    this.closeSidenav();
+    this.openInfo();
 
     // seleccionamos la anomalia
     this.comentariosControlService.anomaliaSelected = this.anomalias.find((anom) => anom.id === row.id);
   }
 
-  selectVistaMap() {
-    this.comentariosControlService.vistaSelected = 'map';
+  openInfo() {
+    this.comentariosControlService.infoOpened = true;
+  }
+
+  closeListAndInfo() {
+    this.comentariosControlService.listOpened = false;
+    this.comentariosControlService.infoOpened = false;
+
+    // this.comentariosControlService.vistaSelected = 'map';
   }
 
   goToAnomMap(coords: Coordinate) {
     this.olMapService.setViewCenter(coords);
     this.olMapService.setViewZoom(this.anomaliasControlService.zoomChangeView);
 
-    this.selectVistaMap();
+    this.closeListAndInfo();
   }
 
   private closeSidenav() {
     // cerramos el sidenav si estamos en mobile
     if (window.screen.width < 768) {
-      this.comentariosControlService.sidenavOpened = false;
+      this.comentariosControlService.listOpened = false;
     }
   }
 
