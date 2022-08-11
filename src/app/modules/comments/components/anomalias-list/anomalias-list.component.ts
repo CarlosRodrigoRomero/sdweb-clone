@@ -5,17 +5,19 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 
 import { Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { ComentariosService } from '@data/services/comentarios.service';
+import { OlMapService } from '@data/services/ol-map.service';
+import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
-import { Comentario } from '@core/models/comentario';
-import { switchMap } from 'rxjs/operators';
+import { Coordinate } from 'ol/coordinate';
 
 interface RowAnomData {
   id: string;
@@ -26,6 +28,7 @@ interface RowAnomData {
   posicion: string;
   fechaUltCom?: string;
   horaUltCom?: string;
+  coords?: Coordinate;
 }
 
 @Component({
@@ -39,7 +42,7 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
   dataSource: MatTableDataSource<RowAnomData>;
   private anomalias: Anomalia[];
   private anomsData: RowAnomData[];
-  displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion', 'fecha', 'numComs'];
+  displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion', 'fecha', /* 'map', */ 'numComs'];
   anomaliaSelected: Anomalia;
   headerLocLabel = '';
 
@@ -51,7 +54,9 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
     private anomaliaInfoService: AnomaliaInfoService,
     private comentariosControlService: ComentariosControlService,
     private comentariosService: ComentariosService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private olMapService: OlMapService,
+    private anomaliasControlService: AnomaliasControlService
   ) {}
 
   ngOnInit(): void {
@@ -97,6 +102,7 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
               posicion: this.anomaliaInfoService.getPosicionReducLabel(anom),
               fechaUltCom,
               horaUltCom,
+              coords: anom.featureCoords[0],
             });
           });
 
@@ -123,6 +129,13 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
 
   selectVistaMap() {
     this.comentariosControlService.vistaSelected = 'map';
+  }
+
+  goToAnomMap(coords: Coordinate) {
+    this.olMapService.setViewCenter(coords);
+    this.olMapService.setViewZoom(this.anomaliasControlService.zoomChangeView);
+
+    this.selectVistaMap();
   }
 
   private closeSidenav() {
