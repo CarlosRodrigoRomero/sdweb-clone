@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import Map from 'ol/Map';
-import { defaults as defaultControls } from 'ol/control.js';
+import { Control, defaults as defaultControls } from 'ol/control.js';
 import { fromLonLat } from 'ol/proj';
 import XYZ from 'ol/source/XYZ';
 import TileLayer from 'ol/layer/Tile';
@@ -25,7 +25,6 @@ import { AnomaliasControlService } from '@data/services/anomalias-control.servic
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
-import { Anomalia } from '@core/models/anomalia';
 
 @Component({
   selector: 'app-map-comments',
@@ -184,6 +183,28 @@ export class MapCommentsComponent implements OnInit {
       {
         enableHighAccuracy: true,
       }
+    );
+
+    this.addCenterControl(geoLocSource);
+  }
+
+  addCenterControl(source: VectorSource) {
+    const centerControl = document.getElementById('center-btn');
+
+    centerControl.className = 'ol-control ol-unselectable locate';
+    centerControl.innerHTML = '<button title="Locate me">◎</button>';
+    centerControl.addEventListener('click', () => {
+      if (!source.isEmpty()) {
+        this.map.getView().fit(source.getExtent(), {
+          maxZoom: 18,
+          duration: 500,
+        });
+      }
+    });
+    this.map.addControl(
+      new Control({
+        element: centerControl,
+      })
     );
   }
 }
