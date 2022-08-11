@@ -12,7 +12,7 @@ export class AnomaliaContentComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  goBack() {
-    this.comentariosControlService.listOpened = true;
+  closeInfo() {
+    this.comentariosControlService.infoOpened = false;
   }
 }

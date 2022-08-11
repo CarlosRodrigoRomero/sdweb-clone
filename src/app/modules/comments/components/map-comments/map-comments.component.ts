@@ -10,6 +10,8 @@ import XYZ from 'ol/source/XYZ';
 import TileLayer from 'ol/layer/Tile';
 import View from 'ol/View';
 import VectorLayer from 'ol/layer/Vector';
+import { click } from 'ol/events/condition';
+import Select from 'ol/interaction/Select';
 
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
@@ -19,6 +21,7 @@ import { AnomaliasControlService } from '@data/services/anomalias-control.servic
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+import { Anomalia } from '@core/models/anomalia';
 
 @Component({
   selector: 'app-map-comments',
@@ -32,6 +35,7 @@ export class MapCommentsComponent implements OnInit {
   private thermalLayers: TileLayer[];
   private anomaliaLayers: VectorLayer[];
   private aerialLayers: TileLayer[];
+  private anomaliaSelected: Anomalia;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -73,6 +77,8 @@ export class MapCommentsComponent implements OnInit {
         await this.olMapService.addAerialLayer(this.informe);
 
         this.initMap();
+
+        this.addSelectInteraction();
       });
 
     this.subscriptions.add(this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers)));
@@ -112,24 +118,38 @@ export class MapCommentsComponent implements OnInit {
     // inicializamos el servicio que controla el comportamiento de las anomalias
     this.anomaliasControlService.initService().then((value) => {
       if (value) {
-        this.anomaliasControlService.mostrarAnomalias();
-
-        // this.subscriptions.add(
-        //   combineLatest([
-        //     this.anomaliasControlService.anomaliaHover$,
-        //     this.anomaliasControlService.anomaliaSelect$,
-        //   ]).subscribe(([anomHover, anomSelect]) => {
-        //     this.anomaliaHover = anomHover;
-        //     this.anomaliaSelect = anomSelect;
-        //   })
-        // );
+        this.anomaliasControlService.mostrarAnomalias(true);
       }
     });
+
+    this.comentariosControlService.anomaliaSelected$.subscribe((anomalia) => (this.anomaliaSelected = anomalia));
   }
 
   openList() {
     this.comentariosControlService.listOpened = true;
 
     // this.comentariosControlService.vistaSelected = 'list';
+  }
+
+  private addSelectInteraction() {
+    const select = new Select({
+      condition: click,
+    });
+
+    select.setProperties({ id: 'selectAnomalia' });
+
+    this.map.addInteraction(select);
+    select.on('select', (e) => {
+      if (e.selected.length > 0) {
+        if (e.selected[0].getProperties().hasOwnProperty('properties')) {
+          const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
+          const anomalia = this.reportControlService.allAnomalias.find((anom) => anom.id === anomaliaId);
+
+          this.comentariosControlService.anomaliaSelected = anomalia;
+
+          this.comentariosControlService.infoOpened = true;
+        }
+      }
+    });
   }
 }

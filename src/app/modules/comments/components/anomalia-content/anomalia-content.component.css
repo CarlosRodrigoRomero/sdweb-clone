@@ -11,6 +11,7 @@
 .top-row {
   display: flex;
   width: 100%;
+  gap: 0.5rem;
 }
 
 .bottom-row {
