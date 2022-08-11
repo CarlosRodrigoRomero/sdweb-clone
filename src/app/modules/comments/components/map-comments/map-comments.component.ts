@@ -12,6 +12,10 @@ import View from 'ol/View';
 import VectorLayer from 'ol/layer/Vector';
 import { click } from 'ol/events/condition';
 import Select from 'ol/interaction/Select';
+import { circular } from 'ol/geom/Polygon';
+import VectorSource from 'ol/source/Vector';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
 
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
@@ -35,7 +39,6 @@ export class MapCommentsComponent implements OnInit {
   private thermalLayers: TileLayer[];
   private anomaliaLayers: VectorLayer[];
   private aerialLayers: TileLayer[];
-  private anomaliaSelected: Anomalia;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -79,6 +82,7 @@ export class MapCommentsComponent implements OnInit {
         this.initMap();
 
         this.addSelectInteraction();
+        this.addGeoLocation();
       });
 
     this.subscriptions.add(this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers)));
@@ -97,12 +101,19 @@ export class MapCommentsComponent implements OnInit {
       source: satellite,
     });
 
-    const layers = [satelliteLayer, ...this.aerialLayers /* , ...this.thermalLayers */];
+    const geoLocSource = new VectorSource();
+    const geoLocLayer = new VectorLayer({
+      source: geoLocSource,
+    });
+
+    geoLocLayer.setProperties({ type: 'geoLoc' });
+
+    const layers = [satelliteLayer, geoLocLayer, ...this.aerialLayers /* , ...this.thermalLayers */];
 
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
       zoom: this.planta.zoom,
-      minZoom: this.planta.zoom - 2,
+      // minZoom: this.planta.zoom - 2,
       maxZoom: 24,
     });
 
@@ -121,8 +132,6 @@ export class MapCommentsComponent implements OnInit {
         this.anomaliasControlService.mostrarAnomalias(true);
       }
     });
-
-    this.comentariosControlService.anomaliaSelected$.subscribe((anomalia) => (this.anomaliaSelected = anomalia));
   }
 
   openList() {
@@ -149,5 +158,32 @@ export class MapCommentsComponent implements OnInit {
         }
       }
     });
+  }
+
+  addGeoLocation() {
+    const geoLocLayer = this.map
+      .getLayers()
+      .getArray()
+      .find((layer) => layer.getProperties().type === 'geoLoc') as VectorLayer;
+
+    const geoLocSource = geoLocLayer.getSource() as VectorSource;
+
+    navigator.geolocation.watchPosition(
+      (pos) => {
+        const coords = [pos.coords.longitude, pos.coords.latitude];
+        const accuracy = circular(coords, pos.coords.accuracy);
+        geoLocSource.clear(true);
+        geoLocSource.addFeatures([
+          new Feature(accuracy.transform('EPSG:4326', this.map.getView().getProjection())),
+          new Feature(new Point(fromLonLat(coords))),
+        ]);
+      },
+      (error) => {
+        alert(`ERROR: ${error.message}`);
+      },
+      {
+        enableHighAccuracy: true,
+      }
+    );
   }
 }
