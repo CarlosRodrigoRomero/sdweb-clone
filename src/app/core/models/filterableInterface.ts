@@ -28,4 +28,5 @@ export interface FilterableElement {
   localY?: number;
   numAnom?: number;
   featureCoords?: Coordinate[];
+  checked?: boolean;
 }

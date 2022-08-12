@@ -86,18 +86,13 @@ export class ZonesCommentControlService {
   private addZonas(zonas: LocationAreaInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
-      const view = l.getProperties().view;
       const informeId = l.getProperties().informeId;
-      const elemsInforme = this.reportControlService.allFilterableElements.filter(
-        (elem) => elem.informeId === informeId
-      );
-      const elemsFilteredInforme = elems.filter((elem) => elem.informeId === informeId);
       const source = l.getSource();
       source.clear();
       zonas.forEach((zona) => {
-        const elemsFilteredZona = this.zonesControlService.getElemsZona(zona, elemsFilteredInforme);
+        const elemsZona = this.zonesControlService.getElemsZona(zona, elems);
 
-        const allElemsZona = this.zonesControlService.getElemsZona(zona, elemsInforme);
+        const elemsChecked = elemsZona.filter((elem) => elem.checked);
 
         const coords = this.zonesControlService.pathToLonLat(zona.path);
 
@@ -110,7 +105,8 @@ export class ZonesCommentControlService {
             // centroid: this.olMapService.getCentroid(coords[0]),
             // type: 'zone',
             // area: this.getArea(coords),
-            numElems: elemsFilteredZona.length,
+            numElems: elemsZona.length,
+            numChecked: elemsChecked.length,
             // name: this.getSmallGlobal(zona.globalCoords),
           },
         });
@@ -167,14 +163,15 @@ export class ZonesCommentControlService {
   }
 
   private getColor(feature: Feature, opacity: number) {
-    // const numChecked = feature.getProperties().properties.numChecked;
-    const numChecked = 2;
+    const numChecked = feature.getProperties().properties.numChecked;
     const numElems = feature.getProperties().properties.numElems;
 
     if (numChecked >= numElems) {
-      return COLOR.colores_severity[1].replace(',1)', ',' + opacity + ')');
-    } else {
+      // VERDE OK
       return COLOR.colores_severity[0].replace(',1)', ',' + opacity + ')');
+    } else {
+      // NARANJA PENDIENTE
+      return COLOR.colores_severity[1].replace(',1)', ',' + opacity + ')');
     }
   }
 
