@@ -1,0 +1,28 @@
+.content {
+  width: 100%;
+  height: calc(100vh - 86px);
+  display: grid;
+  grid-template-rows: min-content auto;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+.top-row {
+  display: flex;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.bottom-row {
+  overflow: auto;
+}
+
+.back-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .back-btn {
+    display: unset;
+  }
+}

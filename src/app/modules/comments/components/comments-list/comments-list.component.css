@@ -1,0 +1,11 @@
+.content {
+  height: 250px;
+  overflow: auto;
+}
+
+.comentarios {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}

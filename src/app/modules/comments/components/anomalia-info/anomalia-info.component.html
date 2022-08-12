@@ -1,0 +1,41 @@
+<div *ngIf="anomaliaSelected" class="content">
+  <h5 class="title">
+    Anomalía {{ anomaliaInfo.numAnom }} <b>({{ anomaliaInfo.tipo }})</b>
+  </h5>
+
+  <div class="images">
+    <img src="assets/images/thermal_image.png" height="100" alt="" />
+    <img src="assets/images/visual_image.png" height="100" alt="" />
+  </div>
+
+  <div class="elem-info">
+    <span class="titulo">Localización</span>
+    <span class="subtitulo">{{ anomaliaInfo.localizacion }}</span>
+  </div>
+
+  <div class="elem-info">
+    <span>Nº de serie</span>
+    <div *ngIf="!editInput" class="read-input">
+      <span>{{ anomaliaSelected.hasOwnProperty('numeroSerie') ? anomaliaSelected.numeroSerie : 'Desconocido' }}</span>
+      <button mat-icon-button (click)="editInput = true">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+    <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
+      <mat-form-field *ngIf="editInput" appearance="fill">
+        <mat-label>Nº serie</mat-label>
+        <input matInput formControlName="numeroSerie" />
+        <button mat-icon-button matSuffix type="submit" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+          <mat-icon>done</mat-icon>
+        </button>
+      </mat-form-field>
+    </form>
+  </div>
+
+  <div class="elem-info">
+    <span class="titulo">Ir al mapa</span>
+    <button mat-icon-button (click)="goToAnomMap()">
+      <mat-icon>place</mat-icon>
+    </button>
+  </div>
+</div>

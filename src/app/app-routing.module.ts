@@ -51,6 +51,18 @@ export const routes: Routes = [
     loadChildren: () => import('@modules/tracker-plant/tracker-plant.module').then((m) => m.TrackerPlantModule),
   },
   {
+    path: 'comments-fixed-shared',
+    component: SkeletonComponent,
+    loadChildren: () => import('@modules/comments/comments.module').then((m) => m.CommentsModule),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'comments-tracker-shared',
+    component: SkeletonComponent,
+    loadChildren: () => import('@modules/comments/comments.module').then((m) => m.CommentsModule),
+    canActivate: [AuthGuard],
+  },
+  {
     path: 'clusters',
     component: SkeletonComponent,
     loadChildren: () => import('@modules/clusters/clusters.module').then((m) => m.ClustersModule),

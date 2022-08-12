@@ -10,8 +10,12 @@
 <mat-menu #menu="matMenu" class="menu">
   <div class="contenedor-menu">
     <div class="row">
-      <!-- <mat-icon color="primary">link</mat-icon> -->
       <h5>Obtener enlace</h5>
+    </div>
+    <div class="row">
+      <!-- <mat-checkbox class="editable-check" [(ngModel)]="versionTecnicos" (click)="stopPropagation($event)"
+        >Versión para técnicos de campo</mat-checkbox
+      > -->
     </div>
     <div class="row">
       <mat-checkbox class="editable-check" [(ngModel)]="onlyFiltered" (click)="stopPropagation($event)"

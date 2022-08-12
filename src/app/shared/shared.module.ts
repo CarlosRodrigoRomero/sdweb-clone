@@ -25,6 +25,7 @@ import { LoadingComponent } from './components/loading/loading.component';
 import { WarningsMenuComponent } from './components/warnings-menu/warnings-menu.component';
 import { WarningsComponent } from './components/warnings/warnings.component';
 import { ReportRecalcComponent } from './components/report-recalc/report-recalc.component';
+import { SimplePlantSummaryComponent } from './components/simple-plant-summary/simple-plant-summary.component';
 
 const components = [
   SpinnerComponent,
@@ -36,6 +37,7 @@ const components = [
   WarningsMenuComponent,
   WarningsComponent,
   ReportRecalcComponent,
+  SimplePlantSummaryComponent,
 ];
 const modules = [
   CommonModule,

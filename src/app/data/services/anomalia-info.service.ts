@@ -120,20 +120,56 @@ export class AnomaliaInfoService {
     }
   }
 
-  getLocalizacionReducLabel(anomalia: Anomalia, planta: PlantaInterface) {
-    let label = '';
+  getRightGlobalCoords(anomalia: Anomalia): string[] {
+    let globalCoords = anomalia.globalCoords;
+    for (let index = anomalia.globalCoords.length - 1; index >= 0; index--) {
+      const gC = anomalia.globalCoords[index];
+      if (gC !== null) {
+        globalCoords = anomalia.globalCoords.slice(0, index + 1);
+        break;
+      }
+    }
 
-    const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
+    return globalCoords;
+  }
+
+  getLocalizacionReducLabel(anomalia: Anomalia, planta: PlantaInterface): string {
+    const globalCoords = this.getRightGlobalCoords(anomalia);
+
+    return globalCoords.join(this.getGlobalsConector(planta));
+  }
+
+  getPosicionReducLabel(anomalia: Anomalia): string {
+    return 'Fil: ' + anomalia.localY + ' / Col: ' + anomalia.localX;
+  }
+
+  getLocalizacionCompleteElems(anomalia: Anomalia, planta: PlantaInterface): string[] {
+    const elems: string[] = [];
+
+    const globals = this.getRightGlobalCoords(anomalia);
 
     globals.forEach((coord, index) => {
-      label += coord;
-
-      if (index < globals.length - 1) {
-        label += this.getGlobalsConector(planta);
+      if (coord !== undefined && coord !== null && coord !== '') {
+        if (planta.hasOwnProperty('nombreGlobalCoords')) {
+          elems.push(`${this.translation.t(planta.nombreGlobalCoords[index])}: ${coord}`);
+        } else {
+          elems.push(`${coord}`);
+        }
       }
     });
 
-    return label;
+    const numModulo = this.getNumeroModulo(anomalia, planta, 'anomalia');
+    if (numModulo !== undefined) {
+      if (!isNaN(Number(numModulo))) {
+        elems.push(`${this.translation.t('Nº módulo')}: ${numModulo}`);
+      } else {
+        const altura = this.getAlturaAnom(anomalia, planta);
+        const columna = this.getColumnaAnom(anomalia, planta);
+        elems.push(`${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`);
+      }
+    }
+
+    return elems;
   }
 
   getLocalizacionCompleteLabel(anomalia: Anomalia, planta: PlantaInterface) {

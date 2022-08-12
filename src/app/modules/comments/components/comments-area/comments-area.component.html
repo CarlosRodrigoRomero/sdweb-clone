@@ -1,0 +1,18 @@
+<div class="content">
+  <div class="top-row">
+    <mat-button-toggle-group
+      class="toggle-tipo-coment"
+      name="fontStyle"
+      aria-label="Font Style"
+      [(ngModel)]="tipoComentario"
+      (change)="setTipoComentario($event)"
+    >
+      <mat-button-toggle value="anomalia">Comentarios</mat-button-toggle>
+      <mat-button-toggle value="iv">IV</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+  <div class="bottom-row">
+    <app-comments-list></app-comments-list>
+    <app-new-comment></app-new-comment>
+  </div>
+</div>

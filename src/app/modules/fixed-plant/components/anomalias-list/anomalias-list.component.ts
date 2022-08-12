@@ -15,7 +15,6 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { ViewReportService } from '@data/services/view-report.service';
 
 import { Anomalia } from '@core/models/anomalia';
-import { PlantaInterface } from '@core/models/planta';
 
 import { GLOBAL } from '@data/constants/global';
 

@@ -5,6 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "start:prod": "ng serve --prod",
+    "serve": "ng serve",
+    "serve-mobile": "ng serve --host=0.0.0.0",
     "build": "ng build",
     "build:prod": "ng build --prod",
     "test": "ng test",

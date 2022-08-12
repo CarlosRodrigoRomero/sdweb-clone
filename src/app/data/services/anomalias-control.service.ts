@@ -19,17 +19,13 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
-import { ZonesControlService } from '@data/services/zones-control.service';
-import { ZonesService } from '@data/services/zones.service';
 import { ViewReportService } from '@data/services/view-report.service';
 
 import { Anomalia } from '@core/models/anomalia';
-import { LocationAreaInterface } from '@core/models/location';
 
 import { Colors } from '@core/classes/colors';
 
 import { COLOR } from '@data/constants/color';
-import { StringDecoder } from 'string_decoder';
 
 @Injectable({
   providedIn: 'root',
@@ -59,8 +55,6 @@ export class AnomaliasControlService {
     private filterService: FilterService,
     private reportControlService: ReportControlService,
     private anomaliaService: AnomaliaService,
-    private zonesControlService: ZonesControlService,
-    private zonesService: ZonesService,
     private viewReportService: ViewReportService
   ) {}
 
@@ -152,22 +146,43 @@ export class AnomaliasControlService {
     return anomaliasLayers;
   }
 
-  mostrarAnomalias() {
+  createCommentsAnomaliaLayers(informeId: string): VectorLayer {
+    const perdidasLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStylePerdidas(false),
+      visible: true,
+    });
+    perdidasLayer.setProperties({
+      informeId,
+      type: 'anomalias',
+    });
+
+    return perdidasLayer;
+  }
+
+  mostrarAnomalias(comentarios?: boolean): void {
     this.subscriptions.add(
       this.filterService.filteredElements$.subscribe((anomalias) => {
-        if (!this.sharedReportNoFilters) {
-          // Dibujar anomalias
-          this.dibujarAnomalias(anomalias as Anomalia[]);
-          this.listaAnomalias = anomalias as Anomalia[];
-
-          // reiniciamos las anomalias seleccionadas cada vez que se aplica un filtro
-          this.prevAnomaliaSelect = undefined;
-          this.anomaliaSelect = undefined;
-        } else {
-          // dibujamos solo anomalias del informe compartido
+        if (comentarios) {
+          // dibujamos las anomalias del informe de comentarios
           const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
-          this.dibujarAnomalias(anomFil as Anomalia[]);
+          this.dibujarAnomsComentarios(anomFil as Anomalia[]);
           this.listaAnomalias = anomalias as Anomalia[];
+        } else {
+          if (!this.sharedReportNoFilters) {
+            // Dibujar anomalias
+            this.dibujarAnomalias(anomalias as Anomalia[]);
+            this.listaAnomalias = anomalias as Anomalia[];
+
+            // reiniciamos las anomalias seleccionadas cada vez que se aplica un filtro
+            this.prevAnomaliaSelect = undefined;
+            this.anomaliaSelect = undefined;
+          } else {
+            // dibujamos solo anomalias del informe compartido
+            const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
+            this.dibujarAnomalias(anomFil as Anomalia[]);
+            this.listaAnomalias = anomalias as Anomalia[];
+          }
         }
       })
     );
@@ -203,6 +218,30 @@ export class AnomaliasControlService {
 
     // añadimos la nueva interaccion
     this.addSelectInteraction();
+  }
+
+  private dibujarAnomsComentarios(anomalias: Anomalia[]) {
+    // Para cada vector layer (que corresponde a un informe)
+    this.anomaliaLayers.forEach((l) => {
+      // filtra las anomalías correspondientes al informe
+      const anomaliasInforme = anomalias.filter((item) => item.informeId === l.getProperties().informeId);
+
+      const source = l.getSource();
+      source.clear();
+      anomaliasInforme.forEach((anom) => {
+        const feature = new Feature({
+          geometry: new Polygon([anom.featureCoords]),
+          properties: {
+            anomaliaId: anom.id,
+            informeId: anom.informeId,
+            perdidas: anom.perdidas,
+            type: 'anomalia',
+          },
+        });
+
+        source.addFeature(feature);
+      });
+    });
   }
 
   private removeSelectAnomaliaInteractions() {
