@@ -21,7 +21,7 @@ export let COLOR = {
     'rgba(0, 227, 150, 1)', // 'Célula',
     'rgba(18, 130, 84, 1)', // 'Varias células',
     'rgba(255, 200, 0, 1)', // '2x Substring CA', // nunca más largo que esto, por estética en tabla anexos
-    'rgba(0, 190, 190, 1)', // 'Suciedad',
+    'rgb(0, 153, 255, 1)', // 'Suciedad',
     'rgba(0, 0, 0, 1)', // 'Vidrio roto',
     'rgba(0, 190, 190, 1)', // 'Resist. anómala',
     'rgba(40, 0, 240, 1)', // 'Caja conexiones',
