@@ -195,8 +195,7 @@ export class MapCommentsComponent implements OnInit {
 
     navigator.geolocation.watchPosition(
       (pos) => {
-        // const coords = [pos.coords.longitude, pos.coords.latitude];
-        const coords = [this.planta.longitud, this.planta.latitud];
+        const coords = [pos.coords.longitude, pos.coords.latitude];
         const accuracy = circular(coords, pos.coords.accuracy);
         geoLocSource.clear(true);
         geoLocSource.addFeatures([
