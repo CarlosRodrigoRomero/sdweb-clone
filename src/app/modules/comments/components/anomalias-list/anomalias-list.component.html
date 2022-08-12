@@ -2,7 +2,7 @@
   <div class="top-row">
     <mat-form-field class="buscar-input" appearance="outline">
       <mat-label>Buscar anomalía</mat-label>
-      <input matInput (keyup)="applyFilter($event)" #input />
+      <input matInput (keyup)="applyFilter($event)" #input autocomplete="off" />
     </mat-form-field>
     <button mat-raised-button class="btn-map" (click)="closeListAndInfo()">
       <mat-icon>map</mat-icon>
