@@ -24,13 +24,13 @@
       <!-- Nº de anomalía -->
       <ng-container matColumnDef="numAnom">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>
-        <td mat-cell *matCellDef="let row">{{ row.numAnom }}</td>
+        <td mat-cell (click)="selectAnomalia(row)" *matCellDef="let row">{{ row.numAnom }}</td>
       </ng-container>
 
       <!-- Tipo de anomalía -->
       <ng-container matColumnDef="tipo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
-        <td mat-cell *matCellDef="let row">{{ row.tipo }}</td>
+        <td mat-cell (click)="selectAnomalia(row)" *matCellDef="let row">{{ row.tipo }}</td>
       </ng-container>
 
       <!-- Localización -->
@@ -41,7 +41,7 @@
             <span>{{ headerLocLabel }}</span>
           </div>
         </th>
-        <td mat-cell *matCellDef="let row">
+        <td mat-cell (click)="selectAnomalia(row)" *matCellDef="let row">
           <div class="row-data">
             <span>{{ row.localizacion }}</span>
             <span class="small-data">{{ row.posicion }}</span>
@@ -52,7 +52,7 @@
       <!-- Fecha -->
       <ng-container matColumnDef="fecha">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Último comentario</th>
-        <td mat-cell *matCellDef="let row">
+        <td mat-cell (click)="selectAnomalia(row)" *matCellDef="let row">
           <div class="row-data">
             <span>{{ row.horaUltCom }}</span>
             <span class="small-data">{{ row.fechaUltCom }}</span>
@@ -61,14 +61,14 @@
       </ng-container>
 
       <!-- Ir al mapa -->
-      <!-- <ng-container matColumnDef="map">
+      <ng-container matColumnDef="map">
         <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
         <td mat-cell *matCellDef="let row">
           <button mat-icon-button (click)="goToAnomMap(row.coords)">
             <mat-icon>place</mat-icon>
           </button>
         </td>
-      </ng-container> -->
+      </ng-container>
 
       <!-- Nº de comentarios -->
       <ng-container matColumnDef="numComs">
@@ -84,7 +84,6 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr
         class="table-row"
-        (click)="selectAnomalia(row)"
         mat-row
         [ngClass]="{ selected: anomaliaSelected !== undefined ? row.id === anomaliaSelected.id : false }"
         *matRowDef="let row; columns: displayedColumns"
