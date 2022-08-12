@@ -41,7 +41,7 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
   dataSource: MatTableDataSource<RowAnomData>;
   private anomalias: Anomalia[];
   private anomsData: RowAnomData[];
-  displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion', 'fecha', 'map', 'numComs'];
+  displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion', 'fecha', 'numComs', 'map'];
   anomaliaSelected: Anomalia;
   headerLocLabel = '';
 
