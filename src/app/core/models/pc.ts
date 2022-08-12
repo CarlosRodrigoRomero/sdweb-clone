@@ -76,6 +76,7 @@ export interface PcInterface {
   FrameRate?: number;
   numAnom?: number;
   autoEstId?: string;
+  revisada?: boolean;
 }
 
 export class Pc implements PcInterface, ElementoPlantaInterface {
@@ -149,6 +150,7 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   FrameRate?: number;
   numAnom?: number;
   autoEstId?: string;
+  revisada?: boolean;
 
   constructor(pc: PcInterface) {
     Object.assign(this, pc);

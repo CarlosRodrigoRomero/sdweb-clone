@@ -51,7 +51,6 @@ export class ZonesCommentControlService {
             initService(true);
 
             // añadimos acciones sobre las zonas
-            // this.addOnHoverAction();
             // this.addSelectInteraction();
           }
         })
@@ -111,7 +110,7 @@ export class ZonesCommentControlService {
             // centroid: this.olMapService.getCentroid(coords[0]),
             // type: 'zone',
             // area: this.getArea(coords),
-            // numElems: elemsFilteredZona.length,
+            numElems: elemsFilteredZona.length,
             // name: this.getSmallGlobal(zona.globalCoords),
           },
         });
@@ -168,7 +167,15 @@ export class ZonesCommentControlService {
   }
 
   private getColor(feature: Feature, opacity: number) {
-    return 'rgb(20,60,90,1)'.replace(',1)', ',' + opacity + ')');
+    // const numChecked = feature.getProperties().properties.numChecked;
+    const numChecked = 2;
+    const numElems = feature.getProperties().properties.numElems;
+
+    if (numChecked >= numElems) {
+      return COLOR.colores_severity[1].replace(',1)', ',' + opacity + ')');
+    } else {
+      return COLOR.colores_severity[0].replace(',1)', ',' + opacity + ')');
+    }
   }
 
   getLabelStyle(feature: Feature) {

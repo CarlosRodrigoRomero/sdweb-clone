@@ -36,6 +36,7 @@ export class Anomalia implements FilterableElement {
   numAnom?: number;
   tipoSeguidor?: TipoSeguidor;
   numeroSerie?: string;
+  revisada?: boolean;
 
   constructor(
     tipo: number,
