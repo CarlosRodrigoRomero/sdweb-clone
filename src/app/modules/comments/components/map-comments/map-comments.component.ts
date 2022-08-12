@@ -138,7 +138,7 @@ export class MapCommentsComponent implements OnInit {
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
       zoom: this.planta.zoom,
-      // minZoom: this.planta.zoom - 2,
+      minZoom: this.planta.zoom - 2,
       maxZoom: 24,
     });
 

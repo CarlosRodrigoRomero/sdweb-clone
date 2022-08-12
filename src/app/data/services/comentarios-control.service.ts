@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 
 import { BehaviorSubject } from 'rxjs';
 
+import { ReportControlService } from './report-control.service';
+
 import { Anomalia } from '@core/models/anomalia';
 
 @Injectable({
@@ -22,7 +24,7 @@ export class ComentariosControlService {
   private _vistaSelected = 'list';
   vistaSelected$ = new BehaviorSubject<string>(this._vistaSelected);
 
-  constructor() {}
+  constructor(private reportControlService: ReportControlService) {}
 
   get listOpened(): boolean {
     return this._listOpened;
