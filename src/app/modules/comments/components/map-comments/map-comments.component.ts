@@ -133,7 +133,7 @@ export class MapCommentsComponent implements OnInit {
 
     geoLocLayer.setProperties({ type: 'geoLoc' });
 
-    const layers = [satelliteLayer, ...this.aerialLayers, geoLocLayer /* , ...this.thermalLayers */];
+    const layers = [satelliteLayer, ...this.aerialLayers, geoLocLayer , ...this.thermalLayers];
 
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),

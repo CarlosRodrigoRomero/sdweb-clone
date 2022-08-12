@@ -9,6 +9,10 @@
   max-width: 450px;
 }
 
+app-thermal-slider {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .list-sidenav {
     width: 100%;
