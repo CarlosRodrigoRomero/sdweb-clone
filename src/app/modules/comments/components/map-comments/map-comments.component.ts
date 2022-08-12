@@ -159,8 +159,8 @@ export class MapCommentsComponent implements OnInit {
     });
   }
 
-  openList() {
-    this.comentariosControlService.listOpened = true;
+  openCloseList() {
+    this.comentariosControlService.listOpened = !this.comentariosControlService.listOpened;
   }
 
   private addSelectInteraction() {

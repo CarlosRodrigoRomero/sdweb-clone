@@ -8,7 +8,7 @@ import { Anomalia } from '@core/models/anomalia';
   providedIn: 'root',
 })
 export class ComentariosControlService {
-  private _listOpened = true;
+  private _listOpened = false;
   listOpened$ = new BehaviorSubject<boolean>(this._listOpened);
   private _infoOpened = false;
   infoOpened$ = new BehaviorSubject<boolean>(this._infoOpened);
