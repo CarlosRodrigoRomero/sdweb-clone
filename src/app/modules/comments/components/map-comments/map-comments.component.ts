@@ -133,7 +133,7 @@ export class MapCommentsComponent implements OnInit {
 
     geoLocLayer.setProperties({ type: 'geoLoc' });
 
-    const layers = [satelliteLayer, geoLocLayer, ...this.aerialLayers /* , ...this.thermalLayers */];
+    const layers = [satelliteLayer, ...this.aerialLayers, geoLocLayer /* , ...this.thermalLayers */];
 
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
@@ -195,7 +195,8 @@ export class MapCommentsComponent implements OnInit {
 
     navigator.geolocation.watchPosition(
       (pos) => {
-        const coords = [pos.coords.longitude, pos.coords.latitude];
+        // const coords = [pos.coords.longitude, pos.coords.latitude];
+        const coords = [this.planta.longitud, this.planta.latitud];
         const accuracy = circular(coords, pos.coords.accuracy);
         geoLocSource.clear(true);
         geoLocSource.addFeatures([
