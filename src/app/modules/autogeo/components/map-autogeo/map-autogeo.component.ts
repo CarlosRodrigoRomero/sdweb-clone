@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Subscription } from 'rxjs';
+import { from, Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
 import { Feature, Map, View } from 'ol';
@@ -26,6 +26,7 @@ import { PlantaService } from '@data/services/planta.service';
 import { AutogeoService, Mesa } from '@data/services/autogeo.service';
 
 import { PlantaInterface } from '@core/models/planta';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-map-autogeo',
@@ -36,6 +37,7 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
   private map: Map;
   private aerialLayers: TileLayer[];
   private informeId: string;
+  private informe: InformeInterface;
   planta: PlantaInterface;
   private mesasLayer: VectorLayer;
   private mesasSource: VectorSource;
@@ -72,10 +74,12 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
         .pipe(
           take(1),
           switchMap((informe) => {
-            this.olMapService.addAerialLayer(informe);
+            this.informe = informe;
 
-            return this.plantaService.getPlanta(informe.plantaId);
-          })
+            return from(this.olMapService.addAerialLayer(informe));
+          }),
+          take(1),
+          switchMap(() => this.plantaService.getPlanta(this.informe.plantaId))
         )
         .subscribe((planta) => {
           this.planta = planta;
