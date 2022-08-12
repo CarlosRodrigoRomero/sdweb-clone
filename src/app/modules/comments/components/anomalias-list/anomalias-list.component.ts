@@ -17,7 +17,6 @@ import { AnomaliasControlService } from '@data/services/anomalias-control.servic
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
-import { Coordinate } from 'ol/coordinate';
 
 interface RowAnomData {
   id: string;
@@ -28,7 +27,7 @@ interface RowAnomData {
   posicion: string;
   fechaUltCom?: string;
   horaUltCom?: string;
-  coords?: Coordinate;
+  anomalia?: Anomalia;
 }
 
 @Component({
@@ -102,7 +101,7 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
               posicion: this.anomaliaInfoService.getPosicionReducLabel(anom),
               fechaUltCom,
               horaUltCom,
-              coords: anom.featureCoords[0],
+              anomalia: anom,
             });
           });
 
@@ -138,8 +137,10 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
     // this.comentariosControlService.vistaSelected = 'map';
   }
 
-  goToAnomMap(coords: Coordinate) {
-    this.olMapService.setViewCenter(coords);
+  goToAnomMap(anomalia: Anomalia) {
+    this.comentariosControlService.anomaliaSelected = anomalia;
+
+    this.olMapService.setViewCenter(anomalia.featureCoords[0]);
     this.olMapService.setViewZoom(this.anomaliasControlService.zoomChangeView);
 
     this.closeListAndInfo();

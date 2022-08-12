@@ -25,6 +25,7 @@ import { AnomaliasControlService } from '@data/services/anomalias-control.servic
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+import { Stroke, Style } from 'ol/style';
 
 @Component({
   selector: 'app-map-comments',
@@ -38,6 +39,7 @@ export class MapCommentsComponent implements OnInit {
   private thermalLayers: TileLayer[];
   private anomaliaLayers: VectorLayer[];
   private aerialLayers: TileLayer[];
+  private prevFeatureSelected: Feature;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -89,6 +91,30 @@ export class MapCommentsComponent implements OnInit {
     this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayers = layers)));
 
     this.subscriptions.add(this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers)));
+
+    this.subscriptions.add(
+      this.comentariosControlService.anomaliaSelected$.subscribe((anom) => {
+        if (this.prevFeatureSelected !== undefined) {
+          this.prevFeatureSelected.setStyle(this.anomaliasControlService.getStylePerdidas(false));
+        }
+
+        if (anom !== undefined) {
+          if (this.anomaliaLayers.length > 0) {
+            const anomaliaFeature = this.anomaliaLayers[0]
+              .getSource()
+              .getFeatures()
+              .find((feature) => feature.getProperties().properties.anomaliaId === anom.id);
+
+            if (anomaliaFeature !== undefined) {
+              anomaliaFeature.setStyle(this.anomaliasControlService.getStylePerdidas(true));
+
+              // seleccionamos la anomalia para luego cambiar su estilo
+              this.prevFeatureSelected = anomaliaFeature;
+            }
+          }
+        }
+      })
+    );
   }
 
   private initMap() {

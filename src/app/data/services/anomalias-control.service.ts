@@ -470,7 +470,7 @@ export class AnomaliasControlService {
   }
 
   // ESTILOS PERDIDAS
-  private getStylePerdidas(focused: boolean) {
+  getStylePerdidas(focused: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
